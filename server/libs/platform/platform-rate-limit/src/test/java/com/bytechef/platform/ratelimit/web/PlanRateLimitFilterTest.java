@@ -113,6 +113,32 @@ public class PlanRateLimitFilterTest {
         verify(rateLimiter).tryConsume(eq("sync:public"), any());
     }
 
+    @Test
+    public void testJobResumePathConsumesPerIpResumeBucket() throws ServletException, IOException {
+        MockFilterChain filterChain = filter("/job/resume/v1.123.abc.sig");
+
+        // Anonymous resume callbacks are metered per client IP, not per tenant.
+        verify(rateLimiter).tryConsume(eq("resume:127.0.0.1"), any());
+        assertThat(filterChain.getRequest()).isNotNull();
+    }
+
+    @Test
+    public void testJobResumePathRejectedWhenResumeBucketExhausted() throws ServletException, IOException {
+        when(rateLimiter.tryConsume(eq("resume:127.0.0.1"), any())).thenReturn(false);
+
+        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/job/resume/v1.123.abc.sig");
+
+        request.setRequestURI("/job/resume/v1.123.abc.sig");
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        MockFilterChain filterChain = new MockFilterChain();
+
+        planRateLimitFilter.doFilter(request, response, filterChain);
+
+        assertThat(response.getStatus()).isEqualTo(429);
+        assertThat(filterChain.getRequest()).isNull();
+    }
+
     private MockFilterChain filter(String path) throws ServletException, IOException {
         MockHttpServletRequest request = new MockHttpServletRequest("POST", path);
 

@@ -20,6 +20,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
+import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.automation.ai.a2a.domain.A2aProject;
@@ -45,7 +46,10 @@ import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.plan.provider.PlanLimitsProvider;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
 import com.bytechef.platform.workflow.execution.JobExecutionErrors;
+import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
+import com.bytechef.platform.workflow.execution.token.ApprovalFormUrls;
+import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
@@ -84,10 +88,13 @@ public class AutomationA2AServerFacade implements A2AAgentExecutor {
     private final A2aProjectService a2aProjectService;
     private final A2aProjectWorkflowService a2aProjectWorkflowService;
     private final A2aServerService a2aServerService;
+    private final ObjectProvider<ApprovalTokens> approvalTokensObjectProvider;
     private final JobCompletionAwaiter jobCompletionAwaiter;
+    private final JobService jobService;
     private final ObjectProvider<PlanLimitsProvider> planLimitsProviderObjectProvider;
     private final PrincipalJobFacade principalJobFacade;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
+    private final @Nullable String publicUrl;
     private final TaskExecutionService taskExecutionService;
     private final TaskFileStorage taskFileStorage;
     private final WorkflowService workflowService;
@@ -95,18 +102,22 @@ public class AutomationA2AServerFacade implements A2AAgentExecutor {
     @SuppressFBWarnings("EI")
     public AutomationA2AServerFacade(
         A2aProjectService a2aProjectService, A2aProjectWorkflowService a2aProjectWorkflowService,
-        A2aServerService a2aServerService, JobCompletionAwaiter jobCompletionAwaiter,
+        A2aServerService a2aServerService, ObjectProvider<ApprovalTokens> approvalTokensObjectProvider,
+        JobCompletionAwaiter jobCompletionAwaiter, JobService jobService,
         ObjectProvider<PlanLimitsProvider> planLimitsProviderObjectProvider, PrincipalJobFacade principalJobFacade,
-        ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
+        ProjectDeploymentWorkflowService projectDeploymentWorkflowService, @Nullable String publicUrl,
         TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage, WorkflowService workflowService) {
 
         this.a2aProjectService = a2aProjectService;
         this.a2aProjectWorkflowService = a2aProjectWorkflowService;
         this.a2aServerService = a2aServerService;
+        this.approvalTokensObjectProvider = approvalTokensObjectProvider;
         this.jobCompletionAwaiter = jobCompletionAwaiter;
+        this.jobService = jobService;
         this.planLimitsProviderObjectProvider = planLimitsProviderObjectProvider;
         this.principalJobFacade = principalJobFacade;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
+        this.publicUrl = publicUrl;
         this.taskExecutionService = taskExecutionService;
         this.taskFileStorage = taskFileStorage;
         this.workflowService = workflowService;
@@ -164,6 +175,13 @@ public class AutomationA2AServerFacade implements A2AAgentExecutor {
         try {
             Job job = jobCompletionAwaiter.await(jobId, resolveSyncTimeout())
                 .join();
+
+            // A STOPPED run with a stored resume id is paused on a human approval, not finished — surface the
+            // task as input-required with a pointer to the hosted form, so the calling agent knows the run is
+            // blocked on a human decision. The jobId lets tasks/get refresh the task once the human decides.
+            if (job.getStatus() == Job.Status.STOPPED) {
+                return inputRequired(job);
+            }
 
             JobExecutionErrors.checkForError(job, taskExecutionService);
 
@@ -234,6 +252,94 @@ public class AutomationA2AServerFacade implements A2AAgentExecutor {
         }
 
         return planSyncRunTimeout;
+    }
+
+    /**
+     * Re-checks a run that paused on a pending approval, for the {@code tasks/get} refresh path. Completed runs return
+     * their real output, failed runs an error, still-paused runs a fresh input-required descriptor; a run mid-resume
+     * (STARTED) returns {@code null} so the stored task stays input-required until it settles.
+     */
+    @Override
+    public @Nullable A2AAgentResult pollRun(long jobId) {
+        Job job = jobService.fetchJob(jobId)
+            .orElse(null);
+
+        if (job == null) {
+            return null;
+        }
+
+        return switch (job.getStatus()) {
+            case STOPPED -> inputRequired(job);
+            case COMPLETED -> A2AAgentResult.ofText(readOutputText(job));
+            case FAILED -> A2AAgentResult.ofError("The workflow run failed after the approval was resolved");
+            default -> null;
+        };
+    }
+
+    private String readOutputText(Job job) {
+        if (job.getOutputs() == null) {
+            return "";
+        }
+
+        Object output = getCallableResponseOutput(job)
+            .orElseGet(() -> taskFileStorage.readJobOutputs(job.getOutputs()));
+
+        return output == null ? "" : String.valueOf(output);
+    }
+
+    /**
+     * Resolves a task id against durable state so a paused run stays pollable after the protocol layer's in-memory task
+     * cache evicted it, the process restarted, or the poll landed on another node. The id is the run's resume token, so
+     * it is verified against the value stored on the job before anything is returned: a caller cannot poll a run by
+     * guessing or forging an id, and an id whose stored token no longer matches resolves to nothing.
+     */
+    @Override
+    public @Nullable A2AAgentResult pollTask(String taskId) {
+        JobResumeId jobResumeId;
+
+        try {
+            jobResumeId = JobResumeId.parse(taskId);
+        } catch (Exception exception) {
+            return null;
+        }
+
+        Job job = jobService.fetchJob(jobResumeId.getJobId())
+            .orElse(null);
+
+        if (job == null) {
+            return null;
+        }
+
+        Object storedJobResumeId = job.getMetadata(MetadataConstants.JOB_RESUME_ID);
+
+        if (storedJobResumeId == null || !taskId.equals(storedJobResumeId.toString())) {
+            return null;
+        }
+
+        return pollRun(job.getId());
+    }
+
+    /**
+     * An input-required result carrying the run's resume token as the task id, so {@code tasks/get} can recover the
+     * task from the persisted job once the in-memory cache no longer holds it.
+     */
+    private A2AAgentResult inputRequired(Job job) {
+        Object jobResumeId = job.getMetadata(MetadataConstants.JOB_RESUME_ID);
+
+        return A2AAgentResult.ofInputRequired(
+            describePendingApproval(job), job.getId(), jobResumeId == null ? null : jobResumeId.toString());
+    }
+
+    private String describePendingApproval(Job job) {
+        Object jobResumeId = job.getMetadata(MetadataConstants.JOB_RESUME_ID);
+
+        return ApprovalFormUrls
+            .buildFormUrl(
+                publicUrl, jobResumeId == null ? null : jobResumeId.toString(),
+                approvalTokensObjectProvider.getIfAvailable())
+            .map(formUrl -> "Approval required — the workflow run is paused waiting for a human decision. " +
+                "Resolve it at: " + formUrl)
+            .orElse("Approval required — the workflow run is paused waiting for a human decision.");
     }
 
     private Optional<Object> getCallableResponseOutput(Job job) {

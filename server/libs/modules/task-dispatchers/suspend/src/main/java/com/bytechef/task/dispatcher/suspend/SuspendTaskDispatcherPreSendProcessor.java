@@ -81,6 +81,13 @@ public class SuspendTaskDispatcherPreSendProcessor implements TaskDispatcherPreS
 
         jobMetadata.remove(MetadataConstants.JOB_RESUME_ID);
 
+        // Clear the approval-reminder and approval-escalation markers (written by the coordinator's
+        // ApprovalReminderMonitor / ApprovalEscalationMonitor under "approvalReminderSentAt" / "approvalEscalatedAt")
+        // so they are per-suspend, not per-run: a later Approval step in the same run then gets its own reminder and
+        // escalation instead of being suppressed by the first approval's markers.
+        jobMetadata.remove("approvalReminderSentAt");
+        jobMetadata.remove("approvalEscalatedAt");
+
         job.setMetadata(jobMetadata);
 
         jobService.update(job);

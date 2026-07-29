@@ -38,6 +38,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.discord.action.DiscordSendDirectMessageAction;
+import com.bytechef.component.discord.cluster.DiscordApprovalChannel;
 import com.google.auto.service.AutoService;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +60,9 @@ public class DiscordComponentHandler extends AbstractDiscordComponentHandler {
 
     @Override
     public List<ModifiableClusterElementDefinition<?>> getCustomClusterElements() {
-        return List.of(tool(DiscordSendDirectMessageAction.ACTION_DEFINITION));
+        return List.of(
+            DiscordApprovalChannel.CLUSTER_ELEMENT_DEFINITION,
+            tool(DiscordSendDirectMessageAction.ACTION_DEFINITION));
     }
 
     @Override

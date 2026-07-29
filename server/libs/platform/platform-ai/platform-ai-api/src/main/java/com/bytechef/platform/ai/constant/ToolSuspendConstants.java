@@ -36,6 +36,16 @@ public final class ToolSuspendConstants {
     /** {@code continueParameters} key holding the pending tool call id (a {@code String}). */
     public static final String PENDING_TOOL_CALL_ID = "__bytechef_pending_tool_call_id__";
 
+    /**
+     * {@code continueParameters} key holding the name of a tool call intercepted by the per-tool approval gate. Its
+     * presence marks the suspend as a gate approval: on resume, {@code approved=true} executes the tool with the
+     * original arguments, {@code approved=false} patches a denial into the loop.
+     */
+    public static final String GATED_TOOL_NAME = "__bytechef_gated_tool_name__";
+
+    /** {@code continueParameters} key holding the gated tool call's original JSON arguments (a {@code String}). */
+    public static final String GATED_TOOL_INPUT = "__bytechef_gated_tool_input__";
+
     private ToolSuspendConstants() {
     }
 }

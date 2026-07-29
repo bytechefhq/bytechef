@@ -23,9 +23,11 @@ import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableAuthorization;
+import com.bytechef.component.definition.ComponentDsl.ModifiableClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.Property;
+import com.bytechef.component.mattermost.cluster.MattermostApprovalChannel;
 import com.google.auto.service.AutoService;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +46,11 @@ public class MattermostComponentHandler extends AbstractMattermostComponentHandl
             .categories(ComponentCategory.COMMUNICATION)
             .customAction(true)
             .customActionHelp("", "https://developers.mattermost.com/api-documentation/");
+    }
+
+    @Override
+    public List<ModifiableClusterElementDefinition<?>> getCustomClusterElements() {
+        return List.of(MattermostApprovalChannel.CLUSTER_ELEMENT_DEFINITION);
     }
 
     @Override

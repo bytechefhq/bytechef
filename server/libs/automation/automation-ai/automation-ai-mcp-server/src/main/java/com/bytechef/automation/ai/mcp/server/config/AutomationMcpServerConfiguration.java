@@ -17,6 +17,7 @@
 package com.bytechef.automation.ai.mcp.server.config;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.automation.ai.mcp.server.facade.AutomationMcpToolFacade;
@@ -41,7 +42,9 @@ import com.bytechef.platform.plan.provider.PlanLimitsProvider;
 import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
+import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
+import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import io.modelcontextprotocol.common.McpTransportContext;
 import io.modelcontextprotocol.server.McpServerFeatures;
 import io.modelcontextprotocol.spec.McpSchema;
@@ -49,6 +52,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.jspecify.annotations.Nullable;
 import org.springframework.ai.mcp.McpToolUtils;
 import org.springframework.ai.mcp.server.webmvc.transport.WebMvcStreamableServerTransportProvider;
 import org.springframework.beans.factory.ObjectProvider;
@@ -89,19 +93,23 @@ public class AutomationMcpServerConfiguration {
 
     @Bean
     AutomationMcpToolFacade mcpToolFacade(
+        ObjectProvider<ApprovalTokens> approvalTokensObjectProvider,
         ClusterElementDefinitionFacade clusterElementDefinitionFacade,
         ClusterElementDefinitionService clusterElementDefinitionService, TaskFileStorage durableTaskFileStorage,
-        Evaluator evaluator, JobCompletionAwaiter jobCompletionAwaiter, McpComponentService mcpComponentService,
+        Evaluator evaluator, JobCompletionAwaiter jobCompletionAwaiter, JobResumeFacade jobResumeFacade,
+        JobService jobService, McpComponentService mcpComponentService, McpProjectService mcpProjectService,
         McpProjectWorkflowService mcpProjectWorkflowService, McpServerService mcpServerService,
         ObjectProvider<PlanLimitsProvider> planLimitsProviderObjectProvider,
         PrincipalJobFacade principalJobFacade, ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
+        @Value("${bytechef.public-url:#{null}}") @Nullable String publicUrl,
         TaskExecutionService taskExecutionService, ToolExecutionRecorder toolExecutionRecorder,
         WorkflowService workflowService, WorkspaceMcpServerService workspaceMcpServerService) {
 
         return new AutomationMcpToolFacade(
-            clusterElementDefinitionFacade, clusterElementDefinitionService, evaluator, jobCompletionAwaiter,
-            mcpComponentService, mcpProjectWorkflowService, mcpServerService, planLimitsProviderObjectProvider,
-            principalJobFacade, projectDeploymentWorkflowService, taskExecutionService, durableTaskFileStorage,
+            approvalTokensObjectProvider, clusterElementDefinitionFacade, clusterElementDefinitionService, evaluator,
+            jobCompletionAwaiter, jobResumeFacade, jobService, mcpComponentService, mcpProjectService,
+            mcpProjectWorkflowService, mcpServerService, planLimitsProviderObjectProvider, principalJobFacade,
+            projectDeploymentWorkflowService, publicUrl, taskExecutionService, durableTaskFileStorage,
             toolExecutionRecorder, workflowService, workspaceMcpServerService);
     }
 
@@ -184,10 +192,16 @@ public class AutomationMcpServerConfiguration {
                 .map(mcpTool -> McpToolUtils.toAsyncToolSpecification(mcpToolFacade.getFunctionToolCallback(mcpTool)))
                 .forEach(tools::add);
 
+        // Workflow-backed tools run synchronously and can pause on a human approval — decorate them with URL-mode
+        // elicitation so capable clients get pointed at the hosted approval form and receive the resumed run's
+        // real output in the same tools/call.
         mcpProjectService.getMcpServerMcpProjects(mcpServer.getId())
             .stream()
             .flatMap(mcpProject -> CollectionUtils.stream(mcpToolFacade.getFunctionToolCallbacks(mcpProject)))
             .map(McpToolUtils::toAsyncToolSpecification)
+            .map(
+                toolSpecification -> ApprovalElicitingToolSpecifications.decorate(
+                    toolSpecification, mcpToolFacade, mcpServer.getId()))
             .forEach(tools::add);
 
         workspaceMcpServerService.fetchWorkspaceIdByMcpServerId(mcpServer.getId())

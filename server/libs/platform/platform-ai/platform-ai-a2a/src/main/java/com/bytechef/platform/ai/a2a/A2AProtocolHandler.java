@@ -70,6 +70,17 @@ public class A2AProtocolHandler {
 
     // Bounded LRU of recently-produced tasks so tasks/get can return a task shortly after message/send. Tasks complete
     // synchronously, so this is a short-lived courtesy cache, not durable task storage.
+    // taskId -> paused run's jobId for input-required tasks, so tasks/get can refresh their state once the human
+    // resolves the approval. Bounded the same way as recentTasks.
+    private final Map<String, Long> taskJobIds = Collections.synchronizedMap(
+        new LinkedHashMap<>(16, 0.75f, true) {
+
+            @Override
+            protected boolean removeEldestEntry(Map.Entry<String, Long> eldest) {
+                return size() > MAX_RECENT_TASKS;
+            }
+        });
+
     private final Map<String, Task> recentTasks = Collections.synchronizedMap(
         new LinkedHashMap<>(16, 0.75f, true) {
 
@@ -127,6 +138,14 @@ public class A2AProtocolHandler {
         return new SendMessageResponse(requestId, task);
     }
 
+    private void rememberJobId(String taskId, A2AAgentResult agentResult) {
+        if (agentResult.inputRequired() && agentResult.jobId() != null) {
+            taskJobIds.put(taskId, agentResult.jobId());
+        } else {
+            taskJobIds.remove(taskId);
+        }
+    }
+
     /**
      * Dispatches a JSON-RPC {@code tasks/get} request: returns the recently-produced task with {@code taskId}, or a
      * {@link TaskNotFoundError} if it is not in the short-lived recent-task cache (tasks are not durably stored).
@@ -143,10 +162,100 @@ public class A2AProtocolHandler {
         Task task = recentTasks.get(taskId);
 
         if (task == null) {
+            // The in-memory cache is a courtesy cache, not storage: it evicts, it is per-process, and it dies with the
+            // process. Fall back to durable state so a paused run stays pollable across eviction, restart, and nodes.
+            task = resolveTaskFromDurableState(taskId);
+        }
+
+        if (task == null) {
             return new GetTaskResponse(requestId, new TaskNotFoundError());
         }
 
+        task = refreshInputRequiredTask(taskId, task);
+
         return new GetTaskResponse(requestId, task);
+    }
+
+    /**
+     * Refreshes an {@code input-required} task by re-checking its paused run: once the human resolves the approval, the
+     * stored snapshot is replaced with the run's actual outcome (completed with output / failed / a fresh
+     * input-required descriptor for a follow-up approval), so pollers see the final result instead of a task frozen at
+     * input-required forever. Tasks without a known jobId, non-input-required tasks, and indeterminate poll results
+     * keep the stored snapshot.
+     */
+    private Task refreshInputRequiredTask(String taskId, Task task) {
+        TaskStatus taskStatus = task.getStatus();
+
+        if (taskStatus.state() != TaskState.INPUT_REQUIRED) {
+            return task;
+        }
+
+        Long jobId = taskJobIds.get(taskId);
+
+        if (jobId == null) {
+            return task;
+        }
+
+        A2AAgentResult refreshedResult;
+
+        try {
+            refreshedResult = agentExecutor.pollRun(jobId);
+        } catch (Exception exception) {
+            return task;
+        }
+
+        if (refreshedResult == null) {
+            return task;
+        }
+
+        Message refreshedMessage = buildAgentMessage(taskId, task.getContextId(), refreshedResult);
+
+        Task refreshedTask = new Task(
+            taskId, task.getContextId(), new TaskStatus(resolveTaskState(refreshedResult), refreshedMessage, null),
+            List.of(), List.of(), null);
+
+        recentTasks.put(taskId, refreshedTask);
+
+        rememberJobId(taskId, refreshedResult);
+
+        return refreshedTask;
+    }
+
+    /**
+     * Rebuilds a task the in-memory cache no longer holds by resolving the id against durable state through
+     * {@link A2AAgentExecutor#pollTask(String)}. Returns {@code null} when the id resolves to nothing, which the caller
+     * surfaces as {@link TaskNotFoundError} — the pre-existing behavior for genuinely unknown ids.
+     */
+    private @Nullable Task resolveTaskFromDurableState(String taskId) {
+        A2AAgentResult agentResult;
+
+        try {
+            agentResult = agentExecutor.pollTask(taskId);
+        } catch (Exception exception) {
+            // An unresolvable id is indistinguishable from an unknown one to the caller: both yield TaskNotFoundError.
+            return null;
+        }
+
+        if (agentResult == null) {
+            return null;
+        }
+
+        // The original context id died with the cache entry; the A2A task carries a fresh one rather than failing the
+        // poll, since the client correlates on the task id it supplied.
+        String contextId = UUID.randomUUID()
+            .toString();
+
+        Message agentMessage = buildAgentMessage(taskId, contextId, agentResult);
+
+        Task task = new Task(
+            taskId, contextId, new TaskStatus(resolveTaskState(agentResult), agentMessage, null), List.of(), List.of(),
+            null);
+
+        recentTasks.put(taskId, task);
+
+        rememberJobId(taskId, agentResult);
+
+        return task;
     }
 
     /**
@@ -163,7 +272,9 @@ public class A2AProtocolHandler {
             return new JSONRPCErrorResponse(requestId, new InvalidParamsError("A task id is required"));
         }
 
-        if (!recentTasks.containsKey(taskId)) {
+        // Existence is judged the same way tasks/get judges it — cache first, then durable state — so a task that is
+        // still pollable never reports "not found" here just because this process no longer caches it.
+        if (!recentTasks.containsKey(taskId) && resolveTaskFromDurableState(taskId) == null) {
             return new CancelTaskResponse(requestId, new TaskNotFoundError());
         }
 
@@ -214,11 +325,31 @@ public class A2AProtocolHandler {
 
         A2AAgentResult agentResult = runAgent(agentId, text, contextId, inboundMessage.getMessageId());
 
-        TaskState finalState = agentResult.success() ? TaskState.COMPLETED : TaskState.FAILED;
+        TaskState finalState = resolveTaskState(agentResult);
         Message agentMessage = buildAgentMessage(taskId, contextId, agentResult);
         TaskStatus finalStatus = new TaskStatus(finalState, agentMessage, null);
 
         recentTasks.put(taskId, new Task(taskId, contextId, finalStatus, List.of(), List.of(), null));
+
+        rememberJobId(taskId, agentResult);
+
+        // A stream must name its task before the run starts, but a paused run's durable id (its resume token) only
+        // exists once it pauses — and renaming the task mid-stream would break the client's correlation. Register the
+        // durable id as an additional handle instead: the streamed id stays stable, and the durable one keeps
+        // resolving after this cache forgets the run. Clients recover it from the resume token in the approval form
+        // URL carried by the status message.
+        String durableTaskId = agentResult.taskId();
+
+        if (durableTaskId != null && !durableTaskId.equals(taskId)) {
+            recentTasks.put(
+                durableTaskId,
+                new Task(
+                    durableTaskId, contextId, new TaskStatus(
+                        finalState, buildAgentMessage(durableTaskId, contextId, agentResult), null),
+                    List.of(), List.of(), null));
+
+            rememberJobId(durableTaskId, agentResult);
+        }
 
         sink.send(
             new SendStreamingMessageResponse(
@@ -273,20 +404,39 @@ public class A2AProtocolHandler {
     }
 
     private Task toTask(@Nullable String contextId, A2AAgentResult agentResult) {
-        String taskId = UUID.randomUUID()
-            .toString();
+        // A paused run supplies a durable id (its resume token) so tasks/get can recover the task from persistent
+        // state later; everything else is short-lived and keeps a random id.
+        String taskId = agentResult.taskId() != null
+            ? agentResult.taskId()
+            : UUID.randomUUID()
+                .toString();
         String effectiveContextId = contextId != null
             ? contextId
             : UUID.randomUUID()
                 .toString();
 
-        TaskState taskState = agentResult.success() ? TaskState.COMPLETED : TaskState.FAILED;
+        TaskState taskState = resolveTaskState(agentResult);
 
         Message agentMessage = buildAgentMessage(taskId, effectiveContextId, agentResult);
 
         TaskStatus taskStatus = new TaskStatus(taskState, agentMessage, null);
 
+        rememberJobId(taskId, agentResult);
+
         return new Task(taskId, effectiveContextId, taskStatus, List.of(), List.of(), null);
+    }
+
+    /**
+     * Maps the agent result onto the A2A task state: a run paused on a human decision surfaces as
+     * {@code input-required} (per the A2A task lifecycle) rather than completed, so the calling agent knows the task is
+     * blocked on the human, not finished.
+     */
+    private static TaskState resolveTaskState(A2AAgentResult agentResult) {
+        if (agentResult.inputRequired()) {
+            return TaskState.INPUT_REQUIRED;
+        }
+
+        return agentResult.success() ? TaskState.COMPLETED : TaskState.FAILED;
     }
 
     private static Message buildAgentMessage(String taskId, String contextId, A2AAgentResult agentResult) {

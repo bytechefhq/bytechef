@@ -21,6 +21,7 @@ import com.bytechef.atlas.execution.repository.JobRepository;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.ListPagingAndSortingRepository;
@@ -48,6 +49,12 @@ public interface JdbcJobRepository
 
     @Override
     Optional<Job> findById(Long id);
+
+    @Override
+    @Modifying
+    @Query("UPDATE job SET status = :newStatus, version = version + 1 WHERE id = :id AND status = :currentStatus")
+    int updateStatusIfCurrentStatus(
+        @Param("id") long id, @Param("currentStatus") int currentStatus, @Param("newStatus") int newStatus);
 
     @Override
     @Query("SELECT COUNT(*) FROM job WHERE status=2 AND end_date >= current_date-1 AND end_date < current_date")

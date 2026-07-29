@@ -17,6 +17,7 @@
 package com.bytechef.component.approval.task.cluster;
 
 import static com.bytechef.component.definition.approval.ApprovalChannelFunction.APPROVAL_CHANNELS;
+import static com.bytechef.component.definition.approval.ApprovalChannelFunction.EXPIRES_AT;
 
 import com.bytechef.automation.task.domain.ApprovalTask;
 import com.bytechef.automation.task.facade.ApprovalTaskFacade;
@@ -24,6 +25,8 @@ import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.approval.ApprovalChannelFunction;
+import java.time.Instant;
+import java.time.format.DateTimeParseException;
 
 /**
  * @author Ivica Cardic
@@ -50,10 +53,30 @@ public class ApprovalTaskApprovalChannel {
             .jobResumeId(jobResumeId)
             .status(ApprovalTask.Status.OPEN)
             .priority(ApprovalTask.Priority.MEDIUM)
+            .dueDate(parseExpiresAt(inputParameters))
             .build();
 
         approvalTaskFacade.createApprovalTask(approvalTask);
 
         return null;
+    }
+
+    /**
+     * Maps the request's expiry (published by the calling approval action under the well-known {@code expiresAt} key)
+     * onto the task's due date, so the Approval Tasks page shows when the request lapses. Absent or unparseable values
+     * leave the due date unset.
+     */
+    private static Instant parseExpiresAt(Parameters inputParameters) {
+        String expiresAt = inputParameters.getString(EXPIRES_AT);
+
+        if (expiresAt == null || expiresAt.isBlank()) {
+            return null;
+        }
+
+        try {
+            return Instant.parse(expiresAt);
+        } catch (DateTimeParseException dateTimeParseException) {
+            return null;
+        }
     }
 }

@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectProvider;
 
 class ClusterElementDefinitionServiceImplVisibilityTest {
 
@@ -38,7 +39,8 @@ class ClusterElementDefinitionServiceImplVisibilityTest {
         ComponentVisibilityProvider disableSlack = componentName -> !componentName.equals("slack");
 
         service = new ClusterElementDefinitionServiceImpl(
-            mock(ComponentDefinitionRegistry.class), mock(ContextFactory.class), List.of(disableSlack));
+            mock(ComponentDefinitionRegistry.class), mock(ContextFactory.class), List.of(disableSlack),
+            mock(ObjectProvider.class));
     }
 
     @Test

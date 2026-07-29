@@ -20,13 +20,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
@@ -35,6 +40,8 @@ import com.bytechef.platform.workflow.execution.event.JobResumedEvent;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade.JobResumeOutcome;
 import com.bytechef.platform.workflow.execution.token.ApprovalTokensImpl;
 import com.bytechef.tenant.TenantContext;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.time.Clock;
 import java.time.Duration;
 import java.util.HashMap;
@@ -44,8 +51,10 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.ApplicationEventPublisher;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;
@@ -68,7 +77,11 @@ public class JobResumeFacadeTest {
     @Mock
     private JobService jobService;
 
+    @Mock
+    private TaskExecutionService taskExecutionService;
+
     private JobResumeFacadeImpl jobResumeFacade;
+    private SimpleMeterRegistry meterRegistry;
 
     static {
         ObjectMapper objectMapper = JsonMapper.builder()
@@ -78,12 +91,26 @@ public class JobResumeFacadeTest {
     }
 
     @BeforeEach
+    @SuppressWarnings("unchecked")
     void setUp() {
         // Unconfigured (no secret, not required) -> resolveInnerToken passes the legacy token through unchanged.
         ApprovalTokensImpl approvalTokens = new ApprovalTokensImpl(
             Clock.systemUTC(), null, List.of(), Duration.ofDays(30), Duration.ofSeconds(60), false);
 
-        jobResumeFacade = new JobResumeFacadeImpl(applicationEventPublisher, approvalTokens, jobFacade, jobService);
+        meterRegistry = new SimpleMeterRegistry();
+
+        ObjectProvider<MeterRegistry> meterRegistryObjectProvider = mock(ObjectProvider.class);
+
+        lenient().when(meterRegistryObjectProvider.getIfAvailable())
+            .thenReturn(meterRegistry);
+
+        // Default: the run's resume claim succeeds. The lost-claim case overrides this to false.
+        lenient().when(jobService.tryClaimResume(any()))
+            .thenReturn(true);
+
+        jobResumeFacade = new JobResumeFacadeImpl(
+            applicationEventPublisher, approvalTokens, jobFacade, jobService, meterRegistryObjectProvider,
+            taskExecutionService);
     }
 
     @Test
@@ -181,6 +208,157 @@ public class JobResumeFacadeTest {
 
         verify(jobFacade).resumeJob(JOB_ID, TASK_EXECUTION_ID, data);
         verify(applicationEventPublisher).publishEvent(any(JobResumedEvent.class));
+
+        // No "approved" key (ask-user-question style resume) -> no approval-resolution counter.
+        assertThat(meterRegistry.find("bytechef_approval_resolution")
+            .counter()).isNull();
+    }
+
+    @Test
+    public void testResumeJobReturnsGoneWhenTheClaimIsLostToAConcurrentResolutionOrExpiry() {
+        JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
+
+        Job job = jobOf(Job.Status.STOPPED, jobResumeId.toString());
+
+        when(jobService.getJob(JOB_ID)).thenReturn(job);
+        when(jobService.tryClaimResume(any())).thenReturn(false);
+
+        JobResumeOutcome outcome = jobResumeFacade.resumeJob(jobResumeId.toString(), Map.of("approved", true));
+
+        // The loser of a concurrent resolution — or a resume that raced the expiry sweep flipping the run to FAILED —
+        // must be told GONE, with no resume dispatch, no resumed event, and no approval-resolution counter increment.
+        assertThat(outcome).isEqualTo(JobResumeOutcome.GONE);
+
+        verify(jobFacade, never()).resumeJob(anyLong(), anyLong(), any());
+        verify(applicationEventPublisher, never()).publishEvent(any(JobResumedEvent.class));
+
+        assertThat(meterRegistry.find("bytechef_approval_resolution")
+            .counter()).isNull();
+    }
+
+    @Test
+    public void testResumeJobCountsApprovalResolution() {
+        JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
+
+        Job job = jobOf(Job.Status.STOPPED, jobResumeId.toString());
+
+        when(jobService.getJob(JOB_ID)).thenReturn(job);
+
+        JobResumeOutcome outcome = jobResumeFacade.resumeJob(
+            jobResumeId.toString(), Map.of("approved", false, "comment", "not now"));
+
+        assertThat(outcome).isEqualTo(JobResumeOutcome.OK);
+
+        assertThat(meterRegistry.counter("bytechef_approval_resolution", "approved", "false")
+            .count()).isEqualTo(1.0);
+    }
+
+    @Test
+    public void testResumeJobWithNullDataDoesNotThrow() {
+        JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
+
+        Job job = jobOf(Job.Status.STOPPED, jobResumeId.toString());
+
+        when(jobService.getJob(JOB_ID)).thenReturn(job);
+
+        // A GET or body-less POST to /job/resume passes null data; it must normalize to an empty map, not NPE inside
+        // the transaction (which would roll back an already-accepted resume).
+        JobResumeOutcome outcome = jobResumeFacade.resumeJob(jobResumeId.toString(), null);
+
+        assertThat(outcome).isEqualTo(JobResumeOutcome.OK);
+
+        verify(jobFacade).resumeJob(eq(JOB_ID), eq(TASK_EXECUTION_ID), anyMap());
+    }
+
+    @Test
+    public void testResumeJobStampsVerifiedApprovedBy() {
+        JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
+
+        Job job = jobOf(Job.Status.STOPPED, jobResumeId.toString());
+
+        when(jobService.getJob(JOB_ID)).thenReturn(job);
+
+        JobResumeOutcome outcome = jobResumeFacade.resumeJob(
+            jobResumeId.toString(), Map.of("approved", true), "@jane");
+
+        assertThat(outcome).isEqualTo(JobResumeOutcome.OK);
+
+        ArgumentCaptor<Map<String, Object>> dataCaptor = ArgumentCaptor.captor();
+
+        verify(jobFacade).resumeJob(eq(JOB_ID), eq(TASK_EXECUTION_ID), dataCaptor.capture());
+
+        assertThat(dataCaptor.getValue()).containsEntry("approvedBy", "@jane");
+    }
+
+    @Test
+    public void testResumeJobStripsSpoofedApprovedByWhenNoVerifiedIdentity() {
+        JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
+
+        Job job = jobOf(Job.Status.STOPPED, jobResumeId.toString());
+
+        when(jobService.getJob(JOB_ID)).thenReturn(job);
+
+        JobResumeOutcome outcome = jobResumeFacade.resumeJob(
+            jobResumeId.toString(), Map.of("approved", true, "approvedBy", "@attacker"));
+
+        assertThat(outcome).isEqualTo(JobResumeOutcome.OK);
+
+        ArgumentCaptor<Map<String, Object>> dataCaptor = ArgumentCaptor.captor();
+
+        verify(jobFacade).resumeJob(eq(JOB_ID), eq(TASK_EXECUTION_ID), dataCaptor.capture());
+
+        assertThat(dataCaptor.getValue()).doesNotContainKey("approvedBy");
+    }
+
+    @Test
+    public void testResumeJobReturnsGoneWhenSuspendExpired() {
+        JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
+
+        Job job = jobOf(Job.Status.STOPPED, jobResumeId.toString());
+
+        when(jobService.getJob(JOB_ID)).thenReturn(job);
+
+        TaskExecution taskExecution = new TaskExecution();
+
+        taskExecution.putMetadata(
+            "suspend",
+            Map.of("expiresAt", java.time.Instant.now()
+                .minusSeconds(60)
+                .toEpochMilli()));
+
+        when(taskExecutionService.getTaskExecution(TASK_EXECUTION_ID)).thenReturn(taskExecution);
+
+        JobResumeOutcome outcome = jobResumeFacade.resumeJob(jobResumeId.toString(), Map.of("approved", true));
+
+        assertThat(outcome).isEqualTo(JobResumeOutcome.GONE);
+
+        verify(jobFacade, never()).resumeJob(anyLong(), anyLong(), anyMap());
+
+        assertThat(meterRegistry.counter("bytechef_approval_expired", "source", "resume")
+            .count()).isEqualTo(1.0);
+    }
+
+    @Test
+    public void testResumeJobProceedsWhenSuspendNotExpired() {
+        JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
+
+        Job job = jobOf(Job.Status.STOPPED, jobResumeId.toString());
+
+        when(jobService.getJob(JOB_ID)).thenReturn(job);
+
+        TaskExecution taskExecution = new TaskExecution();
+
+        taskExecution.putMetadata(
+            "suspend",
+            Map.of("expiresAt", java.time.Instant.now()
+                .plusSeconds(3600)
+                .toEpochMilli()));
+
+        when(taskExecutionService.getTaskExecution(TASK_EXECUTION_ID)).thenReturn(taskExecution);
+
+        JobResumeOutcome outcome = jobResumeFacade.resumeJob(jobResumeId.toString(), Map.of("approved", true));
+
+        assertThat(outcome).isEqualTo(JobResumeOutcome.OK);
     }
 
     private static Job jobOf(Job.Status status, String storedJobResumeIdString) {

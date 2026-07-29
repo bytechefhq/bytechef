@@ -36,7 +36,10 @@ import org.springframework.data.relational.core.mapping.Table;
 public final class ApprovalTask {
 
     public enum Status {
-        OPEN, IN_PROGRESS, COMPLETED
+
+        // Persisted as INT ordinal - append new values at the end only.
+        // EXPIRED = the backing approval can no longer be resolved (the paused run expired, failed, or was purged).
+        OPEN, IN_PROGRESS, COMPLETED, EXPIRED
     }
 
     public enum Priority {

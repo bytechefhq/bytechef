@@ -22,6 +22,8 @@ import static org.mockito.Mockito.when;
 import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.message.broker.memory.AsyncMessageBroker;
 import com.bytechef.platform.coordinator.event.listener.SseStreamApplicationEventListener;
 import com.bytechef.platform.webhook.event.SseStreamEvent;
@@ -54,6 +56,12 @@ class JobCompletionAwaiterIntTest {
 
     @Mock
     private JobService jobService;
+
+    @Mock
+    private TaskExecutionService taskExecutionService;
+
+    @Mock
+    private TaskFileStorage taskFileStorage;
 
     private AsyncMessageBroker messageBroker;
 
@@ -91,7 +99,7 @@ class JobCompletionAwaiterIntTest {
             });
 
         SseStreamApplicationEventListener sseStreamApplicationEventListener = new SseStreamApplicationEventListener(
-            messageBroker);
+            messageBroker, taskExecutionService, taskFileStorage);
 
         CompletableFuture<Job> future = jobCompletionAwaiter.await(jobId, Duration.ofSeconds(5));
 

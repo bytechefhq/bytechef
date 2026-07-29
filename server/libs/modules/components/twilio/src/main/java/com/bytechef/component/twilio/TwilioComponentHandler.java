@@ -25,6 +25,8 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.twilio.action.TwilioMakeCallAction;
 import com.bytechef.component.twilio.action.TwilioSendSMSAction;
 import com.bytechef.component.twilio.action.TwilioSendWhatsAppMessageAction;
+import com.bytechef.component.twilio.cluster.TwilioSmsApprovalChannel;
+import com.bytechef.component.twilio.cluster.TwilioWhatsAppApprovalChannel;
 import com.bytechef.component.twilio.connection.TwilioConnection;
 import com.bytechef.component.twilio.trigger.TwilioInboundCallTrigger;
 import com.bytechef.component.twilio.trigger.TwilioNewWhatsappMessageTrigger;
@@ -50,6 +52,8 @@ public class TwilioComponentHandler implements ComponentHandler {
             TwilioSendSMSAction.ACTION_DEFINITION,
             TwilioSendWhatsAppMessageAction.ACTION_DEFINITION)
         .clusterElements(
+            TwilioSmsApprovalChannel.CLUSTER_ELEMENT_DEFINITION,
+            TwilioWhatsAppApprovalChannel.CLUSTER_ELEMENT_DEFINITION,
             tool(TwilioMakeCallAction.ACTION_DEFINITION),
             tool(TwilioSendSMSAction.ACTION_DEFINITION),
             tool(TwilioSendWhatsAppMessageAction.ACTION_DEFINITION))

@@ -37,6 +37,7 @@ import com.bytechef.platform.component.definition.MultipleConnectionsOutputFunct
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
 import com.bytechef.platform.component.definition.MultipleConnectionsResumePerformFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
+import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,6 +50,7 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.ChatClient.ChatClientRequestSpec;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.model.tool.ToolCallingManager;
+import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * @author Ivica Cardic
@@ -57,16 +59,22 @@ public class AiAgentChatAction extends AbstractAiAgentChatAction {
 
     public static ChatActionDefinitionWrapper of(
         AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
-        ToolCallingManager toolCallingManager) {
+        ToolCallingManager toolCallingManager,
+        @Nullable ObjectProvider<ToolExecutionRecorder> toolExecutionRecorderObjectProvider) {
 
-        return new AiAgentChatAction(aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager).build();
+        return new AiAgentChatAction(
+            aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager,
+            toolExecutionRecorderObjectProvider).build();
     }
 
     private AiAgentChatAction(
         AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
-        ToolCallingManager toolCallingManager) {
+        ToolCallingManager toolCallingManager,
+        @Nullable ObjectProvider<ToolExecutionRecorder> toolExecutionRecorderObjectProvider) {
 
-        super(aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
+        super(
+            aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager,
+            toolExecutionRecorderObjectProvider);
     }
 
     private ChatActionDefinitionWrapper build() {
@@ -103,6 +111,11 @@ public class AiAgentChatAction extends AbstractAiAgentChatAction {
 
         Object response = resumeChat(
             inputParameters, connectionParameters, extensions, continueParameters, data, context);
+
+        // The resumed continuation checkpoints each completed tool round (the checkpointer is wired in
+        // buildPatchedRequestSpec). Clear it on success — mirroring perform — so the stale pre-approval conversation
+        // does not linger in data storage or get restored if this agent node runs again in the same job.
+        clearConversationCheckpoint(context);
 
         return ResumeResponse.of(new HashMap<>(Map.of("response", response)));
     }

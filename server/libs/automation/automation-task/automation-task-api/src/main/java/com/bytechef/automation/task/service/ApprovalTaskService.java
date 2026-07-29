@@ -43,5 +43,11 @@ public interface ApprovalTaskService {
 
     List<ApprovalTask> getApprovalTasks(List<Long> ids);
 
+    /**
+     * Returns the approval tasks whose backing approval may still be pending — OPEN and IN_PROGRESS rows — for
+     * reconciliation against the backing run's state.
+     */
+    List<ApprovalTask> getUnresolvedApprovalTasks();
+
     ApprovalTask update(ApprovalTask approvalTask);
 }

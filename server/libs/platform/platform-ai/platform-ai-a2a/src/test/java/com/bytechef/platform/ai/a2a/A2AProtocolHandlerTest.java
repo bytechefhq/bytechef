@@ -70,6 +70,63 @@ class A2AProtocolHandlerTest {
     }
 
     @Test
+    void testInputRequiredAgentResultProducesInputRequiredTask() {
+        A2AProtocolHandler handler = new A2AProtocolHandler(
+            request -> A2AAgentResult
+                .ofInputRequired("Approval required — resolve it at: https://example.com/resume/t"));
+
+        MessageSendParams params = new MessageSendParams(userMessage("run it"), null, null);
+
+        JSONRPCResponse<?> response = handler.handle(
+            "agent-1", "req-1", A2AProtocolHandler.METHOD_SEND_MESSAGE, params);
+
+        Task task = (Task) ((SendMessageResponse) response).getResult();
+
+        assertThat(task.getStatus()
+            .state()).isEqualTo(TaskState.INPUT_REQUIRED);
+        assertThat(A2AProtocolHandler.extractText(task.getStatus()
+            .message())).contains("Approval required");
+    }
+
+    @Test
+    void testInputRequiredTaskRefreshesOnTasksGetOnceTheRunCompletes() {
+        // First call pauses on approval; the poll (fired by tasks/get) reports the run completed.
+        A2AAgentExecutor agentExecutor = new A2AAgentExecutor() {
+
+            @Override
+            public A2AAgentResult execute(A2AAgentRequest request) {
+                return A2AAgentResult.ofInputRequired("Approval required", 42L);
+            }
+
+            @Override
+            public A2AAgentResult pollRun(long jobId) {
+                return A2AAgentResult.ofText("approved and finished");
+            }
+        };
+
+        A2AProtocolHandler handler = new A2AProtocolHandler(agentExecutor);
+
+        MessageSendParams params = new MessageSendParams(userMessage("run it"), null, null);
+
+        JSONRPCResponse<?> sendResponse = handler.handle(
+            "agent-1", "req-1", A2AProtocolHandler.METHOD_SEND_MESSAGE, params);
+
+        Task pendingTask = (Task) ((SendMessageResponse) sendResponse).getResult();
+
+        assertThat(pendingTask.getStatus()
+            .state()).isEqualTo(TaskState.INPUT_REQUIRED);
+
+        GetTaskResponse getResponse = (GetTaskResponse) handler.handleGetTask("req-2", pendingTask.getId());
+
+        Task refreshedTask = (Task) getResponse.getResult();
+
+        assertThat(refreshedTask.getStatus()
+            .state()).isEqualTo(TaskState.COMPLETED);
+        assertThat(A2AProtocolHandler.extractText(refreshedTask.getStatus()
+            .message())).isEqualTo("approved and finished");
+    }
+
+    @Test
     void testFailedAgentResultProducesFailedTask() {
         A2AProtocolHandler handler = new A2AProtocolHandler(request -> A2AAgentResult.ofError("boom"));
 
@@ -194,6 +251,127 @@ class A2AProtocolHandlerTest {
 
         assertThat(response).isInstanceOf(GetTaskResponse.class);
         assertThat(((GetTaskResponse) response).getError()).isNotNull();
+    }
+
+    @Test
+    void testGetTaskResolvesUncachedTaskFromDurableState() {
+        // The task was never produced by this handler instance — the cache evicted it, the process restarted, or the
+        // poll landed on another node. It must still resolve through durable state rather than 404.
+        A2AProtocolHandler handler = new A2AProtocolHandler(new A2AAgentExecutor() {
+
+            @Override
+            public A2AAgentResult execute(A2AAgentRequest request) {
+                return A2AAgentResult.ofText("unused");
+            }
+
+            @Override
+            public A2AAgentResult pollTask(String taskId) {
+                return "durable-task-1".equals(taskId) ? A2AAgentResult.ofText("resolved output") : null;
+            }
+        });
+
+        JSONRPCResponse<?> response = handler.handleGetTask("req-durable", "durable-task-1");
+
+        assertThat(response).isInstanceOf(GetTaskResponse.class);
+
+        GetTaskResponse getTaskResponse = (GetTaskResponse) response;
+
+        assertThat(getTaskResponse.getError()).isNull();
+
+        Task task = getTaskResponse.getResult();
+
+        assertThat(task.getId()).isEqualTo("durable-task-1");
+        assertThat(task.getStatus()
+            .state()).isEqualTo(TaskState.COMPLETED);
+    }
+
+    @Test
+    void testGetTaskStillReturnsNotFoundWhenDurableStateResolvesNothing() {
+        A2AProtocolHandler handler = new A2AProtocolHandler(new A2AAgentExecutor() {
+
+            @Override
+            public A2AAgentResult execute(A2AAgentRequest request) {
+                return A2AAgentResult.ofText("unused");
+            }
+
+            @Override
+            public A2AAgentResult pollTask(String taskId) {
+                // An id that does not verify against stored state resolves to nothing.
+                return null;
+            }
+        });
+
+        JSONRPCResponse<?> response = handler.handleGetTask("req-durable-miss", "forged-task-id");
+
+        assertThat(response).isInstanceOf(GetTaskResponse.class);
+        assertThat(((GetTaskResponse) response).getError()).isNotNull();
+    }
+
+    @Test
+    void testInputRequiredTaskUsesDurableTaskId() {
+        A2AProtocolHandler handler = new A2AProtocolHandler(
+            request -> A2AAgentResult.ofInputRequired("approve me", 42L, "job-resume-token"));
+
+        SendMessageResponse sendResponse = (SendMessageResponse) handler.handle(
+            "agent-1", "req-durable-id", A2AProtocolHandler.METHOD_SEND_MESSAGE,
+            new MessageSendParams(userMessage("hi"), null, null));
+
+        Task task = (Task) sendResponse.getResult();
+
+        // The paused run's resume token becomes the task id, so a later tasks/get can recover it from the job.
+        assertThat(task.getId()).isEqualTo("job-resume-token");
+        assertThat(task.getStatus()
+            .state()).isEqualTo(TaskState.INPUT_REQUIRED);
+    }
+
+    @Test
+    void testStreamedPausedRunIsAlsoPollableByItsDurableId() throws Exception {
+        A2AProtocolHandler handler = new A2AProtocolHandler(
+            request -> A2AAgentResult.ofInputRequired("approve me", 42L, "stream-resume-token"));
+
+        List<JSONRPCResponse<?>> events = new ArrayList<>();
+
+        handler.handleStream(
+            "agent-1", "req-stream-durable", A2AProtocolHandler.METHOD_STREAM_MESSAGE,
+            new MessageSendParams(userMessage("run it"), null, null), events::add);
+
+        // The streamed task keeps one stable id across both events — renaming it mid-stream would break correlation.
+        TaskStatusUpdateEvent workingEvent =
+            (TaskStatusUpdateEvent) ((SendStreamingMessageResponse) events.get(0)).getResult();
+        TaskStatusUpdateEvent finalEvent =
+            (TaskStatusUpdateEvent) ((SendStreamingMessageResponse) events.get(1)).getResult();
+
+        assertThat(finalEvent.getTaskId()).isEqualTo(workingEvent.getTaskId());
+
+        // ...and the durable id is registered as an additional handle, so the paused run stays pollable by it.
+        GetTaskResponse getTaskResponse =
+            (GetTaskResponse) handler.handleGetTask("req-poll", "stream-resume-token");
+
+        assertThat(getTaskResponse.getError()).isNull();
+        assertThat(((Task) getTaskResponse.getResult()).getId()).isEqualTo("stream-resume-token");
+    }
+
+    @Test
+    void testCancelResolvesUncachedTaskFromDurableStateInsteadOfNotFound() {
+        A2AProtocolHandler handler = new A2AProtocolHandler(new A2AAgentExecutor() {
+
+            @Override
+            public A2AAgentResult execute(A2AAgentRequest request) {
+                return A2AAgentResult.ofText("unused");
+            }
+
+            @Override
+            public A2AAgentResult pollTask(String taskId) {
+                return "durable-task-2".equals(taskId) ? A2AAgentResult.ofText("done") : null;
+            }
+        });
+
+        JSONRPCResponse<?> response = handler.handleCancelTask("req-cancel-durable", "durable-task-2");
+
+        // A task that tasks/get can still resolve must not report "not found" here — it reports not-cancelable.
+        assertThat(response).isInstanceOf(CancelTaskResponse.class);
+        assertThat(((CancelTaskResponse) response).getError()
+            .getMessage()).contains("cannot be canceled");
     }
 
     @Test

@@ -158,6 +158,18 @@ public class RemoteJobServiceClient implements JobService {
     }
 
     @Override
+    public boolean tryClaimResume(Job job) {
+        Boolean claimed = loadBalancedRestClient.put(
+            uriBuilder -> uriBuilder
+                .host(EXECUTION_APP)
+                .path(JOB_SERVICE + "/try-claim-resume")
+                .build(),
+            job, Boolean.class);
+
+        return Boolean.TRUE.equals(claimed);
+    }
+
+    @Override
     public Job setStatusToStarted(long id) {
         return loadBalancedRestClient.put(
             uriBuilder -> uriBuilder

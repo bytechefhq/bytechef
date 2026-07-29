@@ -124,6 +124,13 @@ public interface WebhookWorkflowExecutor {
     boolean hasStreamingTask(WorkflowExecutionId workflowExecutionId);
 
     /**
+     * Returns {@code true} when the workflow contains at least one approval task ({@code approval/v1/...}). Chat
+     * surfaces use this to route the run onto the streaming/event-bridge path even without a streaming task, so the
+     * approval card event raised by the chat approval channel has a registered listener to land on.
+     */
+    boolean hasApprovalTask(WorkflowExecutionId workflowExecutionId);
+
+    /**
      * Checks whether the workflow associated with the given execution id is currently disabled. Both transports use
      * this to short-circuit the dispatch path before execution is invoked.
      */

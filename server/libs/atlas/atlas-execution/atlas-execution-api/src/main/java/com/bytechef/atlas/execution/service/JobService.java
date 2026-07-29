@@ -70,6 +70,16 @@ public interface JobService {
 
     Job resumeToStatusStarted(long id);
 
+    /**
+     * Atomically claims a suspended run for resume by transitioning the given (already-read) job from STOPPED to
+     * STARTED under its optimistic-lock version. Returns {@code true} for the single winner and {@code false} when the
+     * claim is lost — because a concurrent resolution already claimed it or the expiry sweep flipped it to FAILED,
+     * either of which bumps the version. The lost-claim case is reported as a return value rather than a thrown
+     * {@link org.springframework.dao.OptimisticLockingFailureException} so a transactional caller can react without the
+     * shared transaction being marked rollback-only.
+     */
+    boolean tryClaimResume(Job job);
+
     Job setStatusToStarted(long id);
 
     Job setStatusToStopped(long id);

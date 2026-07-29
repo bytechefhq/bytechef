@@ -48,6 +48,11 @@ public class PlanRateLimitFilter extends OncePerRequestFilter {
 
     private static final RateLimitPolicy LOGIN_POLICY = new RateLimitPolicy(10, 1);
 
+    // Anonymous approval/resume callbacks (/job/resume/**) are authenticated only by the signed capability token in
+    // the path. A generous fixed per-IP budget meters the surface against enumeration/DoS without getting in the way
+    // of legitimate approvers (an occasional click) — independent of the plan tier, like login.
+    private static final RateLimitPolicy RESUME_POLICY = new RateLimitPolicy(60, 1);
+
     private final PlanLimitRejectionCounter planLimitRejectionCounter;
     private final PlanLimitsProvider planLimitsProvider;
     private final RateLimiter rateLimiter;
@@ -73,6 +78,22 @@ public class PlanRateLimitFilter extends OncePerRequestFilter {
         if ("/api/authentication".equals(path) && "POST".equalsIgnoreCase(request.getMethod())) {
             if (!rateLimiter.tryConsume("login:" + clientIp(request), LOGIN_POLICY)) {
                 planLimitRejectionCounter.increment("login");
+
+                reject(response);
+
+                return;
+            }
+
+            filterChain.doFilter(request, response);
+
+            return;
+        }
+
+        // Anonymous suspended-job resume callbacks live outside /api/**, so they otherwise fall through unmetered.
+        // Throttle them per client IP with a fixed budget.
+        if (path.startsWith("/job/resume/")) {
+            if (!rateLimiter.tryConsume("resume:" + clientIp(request), RESUME_POLICY)) {
+                planLimitRejectionCounter.increment("resume");
 
                 reject(response);
 

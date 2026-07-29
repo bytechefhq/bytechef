@@ -19,6 +19,7 @@ package com.bytechef.component.google.mail.cluster;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.approval.ApprovalChannelFunction.APPROVAL_CHANNELS;
+import static com.bytechef.component.definition.approval.ApprovalChannelFunction.EXPIRES_AT;
 import static com.bytechef.component.definition.approval.ApprovalChannelFunction.FORM_DESCRIPTION;
 import static com.bytechef.component.definition.approval.ApprovalChannelFunction.FORM_TITLE;
 import static com.bytechef.component.definition.approval.ApprovalChannelFunction.INPUTS;
@@ -81,7 +82,9 @@ public class GoogleMailApprovalChannel {
         Gmail gmail = GoogleServices.getMail(connectionParameters);
 
         List<String> toAddresses = inputParameters.getRequiredList(TO, String.class);
-        String subject = context.escaper(escaper -> escaper.escapeHtml(inputParameters.getRequiredString(SUBJECT)));
+        // A MIME Subject header is plain text (jakarta.mail applies its own RFC 2047 encoding), so it must NOT be
+        // HTML-escaped — escaping corrupts subjects containing &, <, or >.
+        String subject = inputParameters.getRequiredString(SUBJECT);
 
         MimeMessage mimeMessage = new MimeMessage(Session.getDefaultInstance(new Properties(), null));
 
@@ -91,42 +94,51 @@ public class GoogleMailApprovalChannel {
 
         List<Map<String, ?>> inputs = inputParameters.getList(INPUTS, new TypeReference<>() {}, List.of());
 
-        String body;
+        StringBuilder builder = new StringBuilder();
+
+        String formTitle = inputParameters.getString(FORM_TITLE);
+        String titleTrim = formTitle == null ? null : formTitle.trim();
+
+        if (titleTrim != null && !titleTrim.isBlank()) {
+            builder.append("<h2>")
+                .append((String) context.escaper(escaper -> escaper.escapeHtml(titleTrim)))
+                .append("</h2>");
+        }
+
+        String formDescription = inputParameters.getString(FORM_DESCRIPTION);
+        String descTrim = formDescription == null ? null : formDescription.trim();
+
+        if (descTrim != null && !descTrim.isBlank()) {
+            builder.append("<p>")
+                .append((String) context.escaper(escaper -> escaper.escapeHtml(descTrim)))
+                .append("</p>");
+        }
+
+        String expiresAt = inputParameters.getString(EXPIRES_AT);
+
+        if (expiresAt != null && !expiresAt.isBlank()) {
+            builder.append("<p>Expires: ")
+                .append((String) context.escaper(escaper -> escaper.escapeHtml(expiresAt)))
+                .append("</p>");
+        }
 
         if (inputs.isEmpty()) {
-            String formTitle = inputParameters.getString(FORM_TITLE);
-            String formDescription = inputParameters.getString(FORM_DESCRIPTION);
-
-            StringBuilder builder = new StringBuilder();
-
-            String titleTrim = formTitle == null ? null : formTitle.trim();
-            if (titleTrim != null && !titleTrim.isBlank()) {
-                builder.append("<h2>")
-                    .append((String) context.escaper(escaper -> escaper.escapeHtml(titleTrim)))
-                    .append("</h2>");
-            }
-
-            String descTrim = formDescription == null ? null : formDescription.trim();
-            if (descTrim != null && !descTrim.isBlank()) {
-                builder.append("<p>")
-                    .append((String) context.escaper(escaper -> escaper.escapeHtml(descTrim)))
-                    .append("</p>");
-            }
-
             builder.append("<p><a href=\"")
                 .append((String) context.escaper(escaper -> escaper.escapeHtml(formUrl + "?approved=true")))
                 .append("\">Approve</a> | ")
                 .append("<a href=\"")
                 .append((String) context.escaper(escaper -> escaper.escapeHtml(formUrl + "?approved=false")))
                 .append("\">Discard</a></p>");
-
-            body = builder.toString();
         } else {
             String safeUrl = context.escaper(escaper -> escaper.escapeHtml(formUrl == null ? "#" : formUrl));
 
-            body = "<p>You have a new approval request. Please review and respond using the link below:</p>" +
-                "<p><a href=\"" + safeUrl + "\">Open Approval Form</a></p>";
+            builder.append("<p>Please review and respond using the link below:</p>")
+                .append("<p><a href=\"")
+                .append(safeUrl)
+                .append("\">Open Approval Form</a></p>");
         }
+
+        String body = builder.toString();
 
         MimeBodyPart mimeBodyPart = new MimeBodyPart();
 

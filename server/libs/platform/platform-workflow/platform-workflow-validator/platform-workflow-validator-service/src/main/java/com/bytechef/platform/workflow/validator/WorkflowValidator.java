@@ -120,6 +120,7 @@ public class WorkflowValidator {
             processTasks(
                 taskDefinitionProvider, taskOutputProvider, clusterTypesProvider, taskDefinitionMap,
                 taskOutputMap, clusterTypesMap, workflowJsonNode, taskJsonNodes, errors, warnings);
+            validateChatOnlyApprovalChannels(workflowJsonNode, taskJsonNodes, warnings);
             validateWorkflowTasks(
                 taskJsonNodes, inputJsonNodes, taskDefinitionMap, taskOutputMap, nodeOutputMap, clusterTypesMap,
                 errors, warnings);
@@ -572,6 +573,141 @@ public class WorkflowValidator {
                     type, taskOutputProvider.getTaskOutputProperty(type, "trigger", warnings));
             });
         }
+    }
+
+    /**
+     * Warns about tasks whose approval requests can only be delivered to the chat channel while the workflow does not
+     * start from a chat trigger. The chat channel publishes the approval card onto the run's live chat stream; a run
+     * started by webhook or schedule has no chat listener, so the run pauses with no live card and is only resolvable
+     * from the pending-approvals inbox or the hosted form. Covers both explicitly configured chat-only
+     * {@code approvalChannels} and AI agent tasks with a gated tool ({@code requiresApproval}) and no configured
+     * channels, which default to the chat channel.
+     */
+    private static void validateChatOnlyApprovalChannels(
+        JsonNode workflowJsonNode, List<JsonNode> taskJsonNodes, StringBuilder warnings) {
+
+        if (hasChatCapableTrigger(workflowJsonNode)) {
+            return;
+        }
+
+        for (JsonNode taskJsonNode : taskJsonNodes) {
+            if (!taskJsonNode.isObject() || !taskJsonNode.has("clusterElements")) {
+                continue;
+            }
+
+            JsonNode clusterElementsJsonNode = taskJsonNode.get("clusterElements");
+
+            if (!clusterElementsJsonNode.isObject()) {
+                continue;
+            }
+
+            List<String> approvalChannelTypes = getApprovalChannelTypes(clusterElementsJsonNode);
+
+            boolean chatOnlyChannels = !approvalChannelTypes.isEmpty() &&
+                approvalChannelTypes.stream()
+                    .allMatch(WorkflowValidator::isChatApprovalChannelType);
+            boolean implicitChatDefault = approvalChannelTypes.isEmpty() &&
+                hasGatedTool(clusterElementsJsonNode);
+
+            if (chatOnlyChannels || implicitChatDefault) {
+                StringUtils.appendWithNewline(
+                    "Task '" + getNodeName(taskJsonNode) + "' delivers approval requests only to the chat channel" +
+                        (implicitChatDefault ? " (the default when no approval channels are configured)" : "") +
+                        ", but the workflow does not start from a chat trigger. Runs started by webhook or " +
+                        "schedule will pause without a live approval card and are only resolvable from the " +
+                        "pending run approvals list or the hosted form. Configure a fallback approval channel " +
+                        "(Slack, email, approval task) or use a chat trigger.",
+                    warnings);
+            }
+        }
+    }
+
+    private static boolean hasChatCapableTrigger(JsonNode workflowJsonNode) {
+        JsonNode triggersJsonNode = workflowJsonNode.get("triggers");
+
+        if (triggersJsonNode == null || !triggersJsonNode.isArray()) {
+            return false;
+        }
+
+        for (JsonNode triggerJsonNode : triggersJsonNode) {
+            if (!triggerJsonNode.isObject() || !triggerJsonNode.has("type")) {
+                continue;
+            }
+
+            JsonNode typeJsonNode = triggerJsonNode.get("type");
+
+            String type = typeJsonNode.asString();
+
+            if (type.startsWith("chat/")) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static List<String> getApprovalChannelTypes(JsonNode clusterElementsJsonNode) {
+        JsonNode approvalChannelsJsonNode = clusterElementsJsonNode.get("approvalChannels");
+
+        if (approvalChannelsJsonNode == null || !approvalChannelsJsonNode.isArray()) {
+            return List.of();
+        }
+
+        List<String> approvalChannelTypes = new ArrayList<>();
+
+        for (JsonNode approvalChannelJsonNode : approvalChannelsJsonNode) {
+            if (approvalChannelJsonNode.isObject() && approvalChannelJsonNode.has("type")) {
+                JsonNode typeJsonNode = approvalChannelJsonNode.get("type");
+
+                approvalChannelTypes.add(typeJsonNode.asString());
+            }
+        }
+
+        return approvalChannelTypes;
+    }
+
+    private static boolean isChatApprovalChannelType(String type) {
+        String[] typeParts = type.split("/");
+
+        return typeParts.length == 3 && "approval".equals(typeParts[0]) && "chat".equals(typeParts[2]);
+    }
+
+    private static boolean hasGatedTool(JsonNode clusterElementsJsonNode) {
+        JsonNode toolsJsonNode = clusterElementsJsonNode.get("tools");
+
+        if (toolsJsonNode == null || !toolsJsonNode.isArray()) {
+            return false;
+        }
+
+        for (JsonNode toolJsonNode : toolsJsonNode) {
+            if (!toolJsonNode.isObject() || !toolJsonNode.has("parameters")) {
+                continue;
+            }
+
+            JsonNode parametersJsonNode = toolJsonNode.get("parameters");
+
+            if (parametersJsonNode.isObject() && parametersJsonNode.has("requiresApproval")) {
+                JsonNode requiresApprovalJsonNode = parametersJsonNode.get("requiresApproval");
+
+                if (requiresApprovalJsonNode.isBoolean() && requiresApprovalJsonNode.asBoolean()) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private static String getNodeName(JsonNode taskJsonNode) {
+        JsonNode nameJsonNode = taskJsonNode.get("name");
+
+        if (nameJsonNode != null && nameJsonNode.isString()) {
+            return nameJsonNode.asString();
+        }
+
+        JsonNode typeJsonNode = taskJsonNode.get("type");
+
+        return typeJsonNode != null ? typeJsonNode.asString() : "unknown";
     }
 
     public static List<String> getDuplicateNodeNames(String workflow) {

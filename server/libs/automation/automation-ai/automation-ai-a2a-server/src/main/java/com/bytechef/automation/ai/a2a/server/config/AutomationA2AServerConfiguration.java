@@ -17,6 +17,7 @@
 package com.bytechef.automation.ai.a2a.server.config;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.automation.ai.a2a.server.facade.AutomationA2AServerFacade;
@@ -29,7 +30,10 @@ import com.bytechef.platform.ai.a2a.A2AProtocolHandler;
 import com.bytechef.platform.plan.provider.PlanLimitsProvider;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
+import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -50,16 +54,19 @@ public class AutomationA2AServerConfiguration {
     @Bean
     AutomationA2AServerFacade automationA2AServerFacade(
         A2aProjectService a2aProjectService, A2aProjectWorkflowService a2aProjectWorkflowService,
-        A2aServerService a2aServerService, JobCompletionAwaiter jobCompletionAwaiter,
+        A2aServerService a2aServerService, ObjectProvider<ApprovalTokens> approvalTokensObjectProvider,
+        JobCompletionAwaiter jobCompletionAwaiter, JobService jobService,
         ObjectProvider<PlanLimitsProvider> planLimitsProviderObjectProvider, PrincipalJobFacade principalJobFacade,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
+        @Value("${bytechef.public-url:#{null}}") @Nullable String publicUrl,
         TaskExecutionService taskExecutionService, TaskFileStorage durableTaskFileStorage,
         WorkflowService workflowService) {
 
         return new AutomationA2AServerFacade(
-            a2aProjectService, a2aProjectWorkflowService, a2aServerService, jobCompletionAwaiter,
-            planLimitsProviderObjectProvider, principalJobFacade, projectDeploymentWorkflowService,
-            taskExecutionService, durableTaskFileStorage, workflowService);
+            a2aProjectService, a2aProjectWorkflowService, a2aServerService, approvalTokensObjectProvider,
+            jobCompletionAwaiter, jobService, planLimitsProviderObjectProvider, principalJobFacade,
+            projectDeploymentWorkflowService, publicUrl, taskExecutionService, durableTaskFileStorage,
+            workflowService);
     }
 
     @Bean

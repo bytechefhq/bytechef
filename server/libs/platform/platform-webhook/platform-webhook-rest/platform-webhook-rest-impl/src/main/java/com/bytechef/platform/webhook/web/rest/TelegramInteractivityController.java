@@ -41,11 +41,16 @@ import org.springframework.web.client.RestClient;
  */
 @RestController
 @ConditionalOnCoordinator
-public class TelegramInteractivityController {
+public final class TelegramInteractivityController {
 
     private final TelegramInteractivityHandler telegramInteractivityHandler;
 
-    @SuppressFBWarnings("EI")
+    // approvalTokensObjectProvider.getIfAvailable() can throw if the ApprovalTokens bean is ambiguous, which
+    // SpotBugs flags as a finalizer-attack vector (CT_CONSTRUCTOR_THROW). The class is final, so nothing can
+    // subclass it to exploit a partially-constructed instance; the residual warning is safe to suppress.
+    @SuppressFBWarnings({
+        "EI", "CT_CONSTRUCTOR_THROW"
+    })
     public TelegramInteractivityController(
         ApprovalShortTokenStore approvalShortTokenStore, ConnectionService connectionService,
         JobResumeFacade jobResumeFacade, ObjectProvider<ApprovalTokens> approvalTokensObjectProvider) {

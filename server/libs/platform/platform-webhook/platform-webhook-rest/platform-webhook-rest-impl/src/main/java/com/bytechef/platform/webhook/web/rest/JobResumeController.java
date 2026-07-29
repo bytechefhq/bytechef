@@ -18,12 +18,14 @@ package com.bytechef.platform.webhook.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.platform.ai.constant.AiAgentSseEventType;
 import com.bytechef.platform.job.sync.SseStreamBridge;
 import com.bytechef.platform.webhook.executor.SseStreamBridgeRegistry;
 import com.bytechef.platform.webhook.executor.SseStreamBridgeRegistry.Registration;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade.JobResumeOutcome;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -244,18 +246,36 @@ public class JobResumeController {
                 return;
             }
 
-            if (payload instanceof Map<?, ?> map && map.containsKey("event")) {
-                String event = (String) map.get("event");
-                Object data = map.entrySet()
-                    .stream()
-                    .filter(entry -> !"event".equals(entry.getKey()))
-                    .findFirst()
-                    .map(Map.Entry::getValue)
-                    .orElse(null);
+            if (payload instanceof Map<?, ?> map) {
+                // AI Agent SSE event types (approval_request, ask_user_question, tool_execution) become named
+                // events — mirroring WebhookSseStreamBridge — so a resumed turn's interactive events reach the
+                // same client eventHandlers as on the original webhook stream, instead of arriving mangled as
+                // generic `stream` payloads.
+                if (map.containsKey(AiAgentSseEventType.EVENT_TYPE)) {
+                    String eventType = (String) map.get(AiAgentSseEventType.EVENT_TYPE);
 
-                sendEvent(emitter, event, data);
+                    Map<String, Object> eventData = new LinkedHashMap<>((Map<String, Object>) map);
 
-                return;
+                    eventData.remove(AiAgentSseEventType.EVENT_TYPE);
+
+                    sendEvent(emitter, eventType, eventData);
+
+                    return;
+                }
+
+                if (map.containsKey("event")) {
+                    String event = (String) map.get("event");
+                    Object data = map.entrySet()
+                        .stream()
+                        .filter(entry -> !"event".equals(entry.getKey()))
+                        .findFirst()
+                        .map(Map.Entry::getValue)
+                        .orElse(null);
+
+                    sendEvent(emitter, event, data);
+
+                    return;
+                }
             }
 
             sendEvent(emitter, "stream", payload);

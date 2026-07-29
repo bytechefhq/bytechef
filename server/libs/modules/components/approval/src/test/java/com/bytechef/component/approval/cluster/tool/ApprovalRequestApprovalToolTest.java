@@ -88,6 +88,44 @@ class ApprovalRequestApprovalToolTest {
     }
 
     @Test
+    void testToolDefersWhenAnotherToolAlreadySuspendedThisRound() throws Exception {
+        ClusterElementDefinitionService clusterElementDefinitionService = mock(ClusterElementDefinitionService.class);
+        ClusterElementContextAware clusterElementContextAware = mock(ClusterElementContextAware.class);
+        ActionContextAware actionContextAware = mock(ActionContextAware.class);
+
+        when(
+            clusterElementContextAware.toActionContext(
+                "approval", 1, "requestApproval", null)).thenReturn(actionContextAware);
+
+        // A prior tool call in the same round already set a suspend on the shared agent context.
+        when(actionContextAware.getSuspend()).thenReturn(
+            new ActionContext.Suspend(Map.of(), java.time.Instant.now()));
+
+        ModifiableClusterElementDefinition<MultipleConnectionsToolFunction> definition =
+            ApprovalRequestApprovalTool.of(clusterElementDefinitionService);
+
+        MultipleConnectionsToolFunction toolFunction = definition.getElement();
+
+        assertNotNull(toolFunction, "Cluster element must expose the tool function");
+
+        Parameters inputParameters = mock(Parameters.class);
+        Parameters connectionParameters = mock(Parameters.class);
+        Parameters extensions = mock(Parameters.class);
+
+        Object result = toolFunction.apply(
+            inputParameters, connectionParameters, extensions, Map.of(), clusterElementContextAware);
+
+        assertEquals(
+            "{\"deferred\": true, \"reason\": \"Another tool call is awaiting approval. Retry this tool call after " +
+                "the pending approval is resolved.\"}",
+            result, "The second suspending tool in a round must defer instead of overwriting the first suspend.");
+
+        // Deferral must short-circuit before performing: no second suspend, no channel delivery.
+        verify(actionContextAware, org.mockito.Mockito.never()).suspend(
+            org.mockito.ArgumentMatchers.any(ActionContext.Suspend.class));
+    }
+
+    @Test
     void testToolFunctionAndDefinitionMetadataIsStable() {
         ClusterElementDefinitionService clusterElementDefinitionService = mock(ClusterElementDefinitionService.class);
 

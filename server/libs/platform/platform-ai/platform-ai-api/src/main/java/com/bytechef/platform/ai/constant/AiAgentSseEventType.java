@@ -28,6 +28,7 @@ public final class AiAgentSseEventType {
 
     public static final String EVENT_TYPE = "__eventType";
 
+    public static final String APPROVAL_REQUEST = "approval_request";
     public static final String ASK_USER_QUESTION = "ask_user_question";
     public static final String TOOL_EXECUTION = "tool_execution";
 }

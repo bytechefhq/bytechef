@@ -17,6 +17,9 @@
 package com.bytechef.automation.task.facade;
 
 import com.bytechef.automation.task.domain.ApprovalTask;
+import com.bytechef.automation.task.domain.PendingApproval;
+import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Facade for cross-service approval task operations that span the task module and other domain services.
@@ -34,4 +37,14 @@ public interface ApprovalTaskFacade {
      * @return the persisted approval task
      */
     ApprovalTask createApprovalTask(ApprovalTask approvalTask);
+
+    /**
+     * Lists every workflow run currently paused on a human approval (STOPPED with a stored resume id), regardless of
+     * which channels delivered the request — the pending-approvals inbox view. Optionally scoped to a single
+     * environment so the listing matches the environment-scoped approval-task inbox shown alongside it.
+     *
+     * @param environmentId the environment (ordinal) to restrict to, or {@code null} for all environments
+     * @return the pending approvals, newest first
+     */
+    List<PendingApproval> getPendingApprovals(@Nullable Integer environmentId);
 }

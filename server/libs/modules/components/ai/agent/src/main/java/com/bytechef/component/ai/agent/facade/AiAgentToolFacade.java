@@ -20,6 +20,7 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.ai.constant.AiAgentToolContextKey;
+import com.bytechef.platform.ai.constant.AiAgentToolSseContext;
 import com.bytechef.platform.ai.tool.FromAiResult;
 import com.bytechef.platform.ai.tool.facade.AbstractToolFacade;
 import com.bytechef.platform.ai.tool.util.FromAiInputSchemaUtils;
@@ -163,9 +164,23 @@ public class AiAgentToolFacade extends AbstractToolFacade {
                 : (ActionContext) toolContext.getContext()
                     .get(AiAgentToolContextKey.ACTION_CONTEXT);
 
-            return clusterElementDefinitionService.executeTool(
-                componentName, componentVersion, clusterElementName, MapUtils.concat(request, resolvedParameters),
-                extensions, componentConnections, editorEnvironment, agentActionContext);
+            // Bind the agent's streaming SSE surface for the current thread so a tool invoked with a component context
+            // (e.g. requestApproval) can forward an interactive card onto the live agent stream instead of dropping it.
+            if (toolContext != null) {
+                Map<String, Object> toolContextMap = toolContext.getContext();
+
+                AiAgentToolSseContext.set(
+                    toolContextMap.get(AiAgentToolContextKey.SSE_EMITTER_REFERENCE),
+                    toolContextMap.get(AiAgentToolContextKey.SSE_BUFFERED_EVENTS));
+            }
+
+            try {
+                return clusterElementDefinitionService.executeTool(
+                    componentName, componentVersion, clusterElementName, MapUtils.concat(request, resolvedParameters),
+                    extensions, componentConnections, editorEnvironment, agentActionContext);
+            } finally {
+                AiAgentToolSseContext.clear();
+            }
         };
     }
 

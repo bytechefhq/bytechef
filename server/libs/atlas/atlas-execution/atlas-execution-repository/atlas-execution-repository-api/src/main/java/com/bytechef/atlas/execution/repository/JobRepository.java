@@ -82,6 +82,19 @@ public interface JobRepository {
 
     Optional<Job> findById(Long id);
 
+    /**
+     * Atomically transitions a job's status only if it currently holds {@code currentStatus}, bumping the optimistic
+     * version so a concurrent version-based update loses. Returns the number of rows changed — 1 for the single winner,
+     * 0 when the job is no longer in {@code currentStatus}. Reports the lost race as a count rather than an exception
+     * so a transactional caller is not left with a rollback-only transaction.
+     *
+     * @param id            the job id
+     * @param currentStatus the required current status ordinal
+     * @param newStatus     the status ordinal to transition to
+     * @return the number of rows updated (0 or 1)
+     */
+    int updateStatusIfCurrentStatus(long id, int currentStatus, int newStatus);
+
     Optional<Job> findByTaskExecutionId(Long taskExecutionId);
 
     Optional<Job> findLastJob();

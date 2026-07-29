@@ -151,6 +151,19 @@ public class RemoteJobServiceController {
 
     @RequestMapping(
         method = RequestMethod.PUT,
+        value = "/try-claim-resume",
+        consumes = {
+            "application/json"
+        },
+        produces = {
+            "application/json"
+        })
+    public ResponseEntity<Boolean> tryClaimResume(@RequestBody Job job) {
+        return ResponseEntity.ok(jobService.tryClaimResume(job));
+    }
+
+    @RequestMapping(
+        method = RequestMethod.PUT,
         value = "/update",
         consumes = {
             "application/json"

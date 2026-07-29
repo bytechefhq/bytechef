@@ -21,17 +21,23 @@ import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
 
 import com.bytechef.component.approval.action.ApprovalRequestApprovalAction;
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableClusterElementDefinition;
 import com.bytechef.component.definition.Property;
+import com.bytechef.platform.ai.constant.AiAgentToolSseContext;
 import com.bytechef.platform.ai.constant.ToolSuspendConstants;
+import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.ClusterElementContextAware;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
+import com.bytechef.platform.component.definition.SuspendAwareSseEmitterHandler;
 import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import java.util.List;
 import java.util.Optional;
+import java.util.Queue;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Adapts the {@link ApprovalRequestApprovalAction} into a {@link MultipleConnectionsToolFunction} so the AI agent can
@@ -76,13 +82,76 @@ public class ApprovalRequestApprovalTool {
             .object(() -> (inputParameters, connectionParameters, extensions, componentConnections, context) -> {
                 ClusterElementContextAware clusterElementContextAware = (ClusterElementContextAware) context;
 
+                // On the agent path toActionContext returns the LIVE shared agent context, so this is the same
+                // surface SuspendableToolCallingManager reads.
                 ActionContext actionContext = clusterElementContextAware.toActionContext(
                     APPROVAL, 1, "requestApproval", null);
 
-                performFunction.apply(inputParameters, componentConnections, extensions, actionContext);
+                // Only ONE suspend may exist per tool round (two sentinels make the loop manager throw and fail the
+                // whole turn — after channels already delivered live requests). If another tool call already
+                // suspended this round (a second requestApproval, or a gated tool that ran first), defer this one
+                // with a plain response so the model retries it after the pending approval resolves — mirroring
+                // ApprovalGateToolCallback's guard.
+                if (((ActionContextAware) actionContext).getSuspend() != null) {
+                    return "{\"deferred\": true, \"reason\": \"Another tool call is awaiting approval. Retry this " +
+                        "tool call after the pending approval is resolved.\"}";
+                }
+
+                Object result = performFunction.apply(inputParameters, componentConnections, extensions, actionContext);
+
+                if (result instanceof SuspendAwareSseEmitterHandler suspendAwareSseEmitterHandler) {
+                    // In editor runs the action returns the approval card event as a one-shot emitter output, drained
+                    // by the task pipeline's post-output processor — but the tool path invokes perform directly and
+                    // has no post-output processing. Drain the handler inline through an emitter that forwards the card
+                    // onto the agent's live SSE stream (bound for this thread by AiAgentToolFacade), so the suspend
+                    // inside it still lands on the shared action context AND the canvas test chat renders the card.
+                    suspendAwareSseEmitterHandler.handle(new AgentStreamForwardingSseEmitter());
+                }
 
                 return ToolSuspendConstants.SUSPENDED_SENTINEL;
             });
+    }
+
+    /**
+     * Forwards a drained editor card event onto the agent's live SSE stream — sending to the connected emitter when one
+     * is attached, otherwise buffering it for when the client connects — using the emitter reference / buffered-events
+     * queue that {@code AiAgentToolFacade} binds to the current thread for the duration of the tool call. Silently
+     * drops the event only when neither is present (no agent stream is attached), matching the gate's behaviour.
+     */
+    private static final class AgentStreamForwardingSseEmitter
+        implements ActionDefinition.SseEmitterHandler.SseEmitter {
+
+        @Override
+        public void addTimeoutListener(Runnable timeoutListener) {
+        }
+
+        @Override
+        public void complete() {
+        }
+
+        @Override
+        public void error(Throwable throwable) {
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public void send(Object data) {
+            Object emitterReferenceObject = AiAgentToolSseContext.getEmitterReference();
+
+            if (emitterReferenceObject instanceof AtomicReference<?> emitterReference
+                && emitterReference.get() instanceof ActionDefinition.SseEmitterHandler.SseEmitter sseEmitter) {
+
+                sseEmitter.send(data);
+
+                return;
+            }
+
+            Object bufferedEventsObject = AiAgentToolSseContext.getBufferedEvents();
+
+            if (bufferedEventsObject instanceof Queue<?> queue) {
+                ((Queue<Object>) queue).add(data);
+            }
+        }
     }
 
     private ApprovalRequestApprovalTool() {

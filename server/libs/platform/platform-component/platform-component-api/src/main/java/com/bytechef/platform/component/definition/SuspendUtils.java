@@ -18,6 +18,7 @@ package com.bytechef.platform.component.definition;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.platform.component.constant.MetadataConstants;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
@@ -66,5 +67,36 @@ public class SuspendUtils {
         }
 
         return suspend;
+    }
+
+    /**
+     * Extracts the suspend expiry from a task execution's metadata (the {@code suspend.expiresAt} value the worker
+     * persisted), or {@code null} when the metadata carries no suspend or no expiry. Handles both the epoch-millis
+     * number form (JSON round-trip) and the ISO-8601 string form.
+     *
+     * @param taskExecutionMetadata the suspended task execution's metadata map
+     * @return the expiry instant, or {@code null} when absent
+     */
+    @SuppressWarnings("unchecked")
+    public static @Nullable Instant extractSuspendExpiresAt(Map<String, ?> taskExecutionMetadata) {
+        Object suspendValue = taskExecutionMetadata.get(MetadataConstants.SUSPEND);
+
+        if (!(suspendValue instanceof Map)) {
+            return null;
+        }
+
+        Object expiresAtValue = ((Map<String, ?>) suspendValue).get("expiresAt");
+
+        if (expiresAtValue instanceof Number expiresAtNumber) {
+            return Instant.ofEpochMilli(expiresAtNumber.longValue());
+        } else if (expiresAtValue instanceof String expiresAtString) {
+            try {
+                return Instant.parse(expiresAtString);
+            } catch (Exception exception) {
+                return null;
+            }
+        }
+
+        return null;
     }
 }

@@ -18,10 +18,12 @@ package com.bytechef.component.slack.cluster;
 
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.approval.ApprovalChannelFunction.APPROVAL_CHANNELS;
+import static com.bytechef.component.definition.approval.ApprovalChannelFunction.EXPIRES_AT;
 import static com.bytechef.component.definition.approval.ApprovalChannelFunction.FORM_DESCRIPTION;
 import static com.bytechef.component.definition.approval.ApprovalChannelFunction.FORM_TITLE;
 import static com.bytechef.component.definition.approval.ApprovalChannelFunction.INPUTS;
 import static com.bytechef.component.slack.constant.SlackConstants.CHANNEL;
+import static com.bytechef.component.slack.constant.SlackConstants.SIGNING_SECRET;
 import static com.bytechef.component.slack.constant.SlackConstants.TEXT;
 import static com.bytechef.component.slack.constant.SlackConstants.TYPE;
 import static com.bytechef.component.slack.util.SlackSendMessageUtils.sendMessage;
@@ -55,7 +57,6 @@ public class SlackApprovalChannel {
                     .required(true))
             .object(() -> SlackApprovalChannel::perform);
 
-    @SuppressWarnings("PMD.UnusedFormalParameter")
     private static Object perform(
         Parameters inputParameters, Parameters connectionParameters, String formUrl, ClusterElementContext context) {
 
@@ -63,10 +64,29 @@ public class SlackApprovalChannel {
 
         List<Map<String, ?>> inputs = inputParameters.getList(INPUTS, new TypeReference<>() {}, List.of());
 
+        String signingSecret = connectionParameters.getString(SIGNING_SECRET);
+
+        boolean inPlace = signingSecret != null && !signingSecret.isBlank();
+
         String text;
         List<Map<String, Object>> elements;
 
-        if (inputs.isEmpty()) {
+        if (inputs.isEmpty() && inPlace) {
+            // The connection carries the Slack app's signing secret, so the app's interactivity Request URL can be
+            // verified server-side: send in-place block_actions buttons that resolve the approval without leaving
+            // Slack (see SlackInteractivityController). The button value is the tokenized resume id — the same
+            // capability the hosted-form URL carries.
+            String resumeId = formUrl.substring(formUrl.lastIndexOf('/') + 1);
+
+            text = buildSummaryText(inputParameters);
+            elements = List.of(
+                Map.of(
+                    TYPE, "button", TEXT, Map.of(TYPE, "plain_text", TEXT, "Approve"),
+                    "style", "primary", "action_id", "approval_approve", "value", resumeId),
+                Map.of(
+                    TYPE, "button", TEXT, Map.of(TYPE, "plain_text", TEXT, "Discard"),
+                    "style", "danger", "action_id", "approval_discard", "value", resumeId));
+        } else if (inputs.isEmpty()) {
             text = buildSummaryText(inputParameters);
             elements = List.of(
                 Map.of(
@@ -76,7 +96,7 @@ public class SlackApprovalChannel {
                     TYPE, "button", TEXT, Map.of(TYPE, "plain_text", TEXT, "Discard"),
                     "style", "danger", "url", formUrl + "?approved=false"));
         } else {
-            text = "You have a new approval request. Please review and respond using the link below.";
+            text = buildSummaryText(inputParameters);
             elements = List.of(
                 Map.of(
                     TYPE, "button", TEXT, Map.of(TYPE, "plain_text", TEXT, "Open Approval Form"),
@@ -101,7 +121,7 @@ public class SlackApprovalChannel {
 
         if (formTitle != null && !formTitle.isBlank()) {
             builder.append("*")
-                .append(formTitle)
+                .append(escapeMrkdwn(formTitle))
                 .append("*");
         }
 
@@ -110,13 +130,31 @@ public class SlackApprovalChannel {
                 builder.append("\n");
             }
 
-            builder.append(formDescription);
+            builder.append(escapeMrkdwn(formDescription));
         }
 
         if (builder.isEmpty()) {
-            return "You have a new approval request.";
+            builder.append("You have a new approval request.");
+        }
+
+        String expiresAt = inputParameters.getString(EXPIRES_AT);
+
+        if (expiresAt != null && !expiresAt.isBlank()) {
+            builder.append("\nExpires: ")
+                .append(expiresAt);
         }
 
         return builder.toString();
+    }
+
+    /**
+     * Escapes Slack mrkdwn control characters so caller-supplied text — for a gated tool the description embeds the
+     * AI-chosen tool arguments verbatim — cannot forge {@code <url|text>} links next to the real Approve/Discard
+     * buttons.
+     */
+    static String escapeMrkdwn(String text) {
+        return text.replace("&", "&amp;")
+            .replace("<", "&lt;")
+            .replace(">", "&gt;");
     }
 }

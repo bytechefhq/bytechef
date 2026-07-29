@@ -100,14 +100,6 @@ public interface ActionContextAware extends ActionContext, JobContextAware {
     Long getJobPrincipalWorkflowId();
 
     /**
-     * Retrieves the unique identifier for a job, if available.
-     *
-     * @return the job ID as a {@link Long}, or {@code null} if the job ID is not set.
-     */
-    @Nullable
-    Long getJobId();
-
-    /**
      * Retrieves the parent task execution id of the current job, if the job runs as a sub-workflow of another job.
      * Returns {@code null} for top-level jobs (the common case) and for editor-environment / in-process invocations
      * with no persisted Atlas Job. The agent-tool sub-workflow bridge ({@code WorkflowCallWorkflowTool}) uses this to

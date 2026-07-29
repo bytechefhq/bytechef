@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.telegram.constant.TelegramConstants.BOT_TOKEN;
+import static com.bytechef.component.telegram.constant.TelegramConstants.WEBHOOK_SECRET_TOKEN;
 
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
@@ -37,7 +38,16 @@ public class TelegramConnection {
                 .properties(
                     string(BOT_TOKEN)
                         .label("Bot Token")
-                        .required(true)))
+                        .required(true),
+                    string(WEBHOOK_SECRET_TOKEN)
+                        .label("Webhook Secret Token")
+                        .description(
+                            "Optional secret token set when registering this bot's webhook (setWebhook) at " +
+                                "<public-url>/telegram/interactivity. When set, field-less approval requests use " +
+                                "in-place Approve/Discard buttons resolved through that webhook, verified against " +
+                                "this token. Use a bot dedicated to approvals, since a bot has a single webhook. " +
+                                "Leave empty to deliver approval links to the hosted form.")
+                        .required(false)))
         .help("", "https://docs.bytechef.io/reference/components/telegram_v1#connection-setup")
         .version(1);
 

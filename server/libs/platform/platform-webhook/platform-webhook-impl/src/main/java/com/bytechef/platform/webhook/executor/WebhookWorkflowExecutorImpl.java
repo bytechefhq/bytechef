@@ -291,6 +291,17 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
     }
 
     @Override
+    public boolean hasApprovalTask(WorkflowExecutionId workflowExecutionId) {
+        Workflow workflow = workflowService.getWorkflow(getWorkflowId(workflowExecutionId));
+
+        return workflow.getTasks(true)
+            .stream()
+            .map(WorkflowTask::getType)
+            .filter(Objects::nonNull)
+            .anyMatch(type -> type.startsWith("approval/"));
+    }
+
+    @Override
     public boolean isWorkflowDisabled(WorkflowExecutionId workflowExecutionId) {
         JobPrincipalAccessor jobPrincipalAccessor =
             jobPrincipalAccessorRegistry.getJobPrincipalAccessor(workflowExecutionId.getType());

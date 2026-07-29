@@ -26,6 +26,15 @@ import org.jspecify.annotations.Nullable;
 public interface JobContextAware {
 
     /**
+     * Retrieves the unique identifier for the job the current execution belongs to, if available.
+     *
+     * @return the job ID as a {@link Long}, or {@code null} if the execution is not bound to a persisted job (e.g.
+     *         editor-environment runs).
+     */
+    @Nullable
+    Long getJobId();
+
+    /**
      * Converts the provided component information and connection details into an {@link ActionContext} instance.
      *
      * @param componentName       the name of the component associated with the action context.
