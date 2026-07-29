@@ -14,6 +14,8 @@ dependencies {
     implementation(project(":server:libs:automation:automation-ai:automation-ai-mcp-server-api"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-api"))
+    implementation(project(":server:libs:platform:platform-tool-execution:platform-tool-execution-api"))
+    runtimeOnly(project(":server:libs:platform:platform-tool-execution:platform-tool-execution-service"))
     implementation(project(":server:libs:automation:automation-ai:automation-ai-mcp:automation-ai-mcp-api"))
     implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:core:commons:commons-util"))

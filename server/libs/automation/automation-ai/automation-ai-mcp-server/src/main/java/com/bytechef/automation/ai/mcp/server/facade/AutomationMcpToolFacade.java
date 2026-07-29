@@ -26,6 +26,7 @@ import com.bytechef.automation.ai.mcp.domain.McpProject;
 import com.bytechef.automation.ai.mcp.domain.McpProjectWorkflow;
 import com.bytechef.automation.ai.mcp.server.exception.McpServerErrorType;
 import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
+import com.bytechef.automation.ai.mcp.service.WorkspaceMcpServerService;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.commons.util.ConvertUtils;
@@ -50,6 +51,10 @@ import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
+import com.bytechef.platform.tool.execution.ToolExecutionEvent;
+import com.bytechef.platform.tool.execution.ToolExecutionKind;
+import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
+import com.bytechef.platform.tool.execution.ToolExecutionSurface;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
 import com.bytechef.platform.workflow.execution.JobExecutionErrors;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
@@ -84,7 +89,9 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private final TaskExecutionService taskExecutionService;
     private final TaskFileStorage taskFileStorage;
+    private final ToolExecutionRecorder toolExecutionRecorder;
     private final WorkflowService workflowService;
+    private final WorkspaceMcpServerService workspaceMcpServerService;
 
     @SuppressFBWarnings("EI")
     public AutomationMcpToolFacade(
@@ -93,7 +100,9 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
         JobCompletionAwaiter jobCompletionAwaiter, McpComponentService mcpComponentService,
         McpProjectWorkflowService mcpProjectWorkflowService, McpServerService mcpServerService,
         PrincipalJobFacade principalJobFacade, ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
-        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage, WorkflowService workflowService) {
+        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage,
+        ToolExecutionRecorder toolExecutionRecorder, WorkflowService workflowService,
+        WorkspaceMcpServerService workspaceMcpServerService) {
 
         super(evaluator);
 
@@ -107,7 +116,9 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
         this.taskExecutionService = taskExecutionService;
         this.taskFileStorage = taskFileStorage;
+        this.toolExecutionRecorder = toolExecutionRecorder;
         this.workflowService = workflowService;
+        this.workspaceMcpServerService = workspaceMcpServerService;
     }
 
     public FunctionToolCallback<Map<String, Object>, Object> getFunctionToolCallback(McpTool mcpTool) {
@@ -119,15 +130,16 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
 
         List<FromAiResult> fromAiResults = extractFromAiResults(mcpTool.getParameters());
 
+        String toolName = getToolName(
+            clusterElementDefinition.getComponentName(), clusterElementDefinition.getName(), mcpTool.getParameters());
+
         FunctionToolCallback.Builder<Map<String, Object>, Object> builder = FunctionToolCallback
             .builder(
-                getToolName(
-                    clusterElementDefinition.getComponentName(), clusterElementDefinition.getName(),
-                    mcpTool.getParameters()),
+                toolName,
                 getClusterElementToolCallbackFunction(
-                    clusterElementDefinition.getComponentName(), clusterElementDefinition.getComponentVersion(),
-                    clusterElementDefinition.getName(), mcpTool.getParameters(), mcpComponent.getConnectionId(),
-                    mcpComponent.getMcpServerId()))
+                    toolName, clusterElementDefinition.getComponentName(),
+                    clusterElementDefinition.getComponentVersion(), clusterElementDefinition.getName(),
+                    mcpTool.getParameters(), mcpComponent.getConnectionId(), mcpComponent.getMcpServerId()))
             .inputType(Map.class)
             .inputSchema(FromAiInputSchemaUtils.generateInputSchema(fromAiResults));
 
@@ -169,7 +181,8 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
                 .builder(
                     Objects.requireNonNull(toolName),
                     getWorkflowToolCallbackFunction(
-                        projectDeploymentWorkflow, trigger.getName(), workflowParameters, mcpProject.getMcpServerId()))
+                        toolName, projectDeploymentWorkflow, trigger.getName(), workflowParameters,
+                        mcpProject.getMcpServerId()))
                 .inputType(Map.class)
                 .inputSchema(FromAiInputSchemaUtils.generateInputSchema(fromAiResults));
 
@@ -186,8 +199,11 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
     }
 
     private Function<Map<String, Object>, Object> getClusterElementToolCallbackFunction(
-        String componentName, int componentVersion, String clusterElementName, Map<String, ?> parameters,
-        @Nullable Long connectionId, long mcpServerId) {
+        String toolName, String componentName, int componentVersion, String clusterElementName,
+        Map<String, ?> parameters, @Nullable Long connectionId, long mcpServerId) {
+
+        Long workspaceId = workspaceMcpServerService.fetchWorkspaceIdByMcpServerId(mcpServerId)
+            .orElse(null);
 
         return request -> {
             McpServer mcpServer = mcpServerService.getMcpServer(mcpServerId);
@@ -202,15 +218,27 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
                 resolvedParameters.put(entry.getKey(), resolveParameterValue(entry.getValue(), request));
             }
 
-            return clusterElementDefinitionFacade.executeTool(
-                componentName, componentVersion, clusterElementName, MapUtils.concat(request, resolvedParameters),
-                connectionId);
+            return toolExecutionRecorder.record(
+                ToolExecutionEvent
+                    .builder(ToolExecutionSurface.MCP_AUTOMATION, ToolExecutionKind.COMPONENT, toolName)
+                    .componentName(componentName)
+                    .componentVersion(componentVersion)
+                    .operationName(clusterElementName)
+                    .connectionId(connectionId)
+                    .mcpServerId(mcpServerId)
+                    .workspaceId(workspaceId),
+                () -> clusterElementDefinitionFacade.executeTool(
+                    componentName, componentVersion, clusterElementName,
+                    MapUtils.concat(request, resolvedParameters), connectionId));
         };
     }
 
     private Function<Map<String, Object>, Object> getWorkflowToolCallbackFunction(
-        ProjectDeploymentWorkflow projectDeploymentWorkflow, String triggerName, Map<String, ?> workflowParameters,
-        long mcpServerId) {
+        String toolName, ProjectDeploymentWorkflow projectDeploymentWorkflow, String triggerName,
+        Map<String, ?> workflowParameters, long mcpServerId) {
+
+        Long workspaceId = workspaceMcpServerService.fetchWorkspaceIdByMcpServerId(mcpServerId)
+            .orElse(null);
 
         return inputParameters -> {
             McpServer mcpServer = mcpServerService.getMcpServer(mcpServerId);
@@ -235,17 +263,25 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
                 new JobParametersDTO(projectDeploymentWorkflow.getWorkflowId(), inputs),
                 projectDeploymentWorkflow.getProjectDeploymentId(), PlatformType.AUTOMATION);
 
-            Job job = jobCompletionAwaiter.await(jobId, JobCompletionAwaiter.DEFAULT_SYNC_TIMEOUT)
-                .join();
+            return toolExecutionRecorder.record(
+                ToolExecutionEvent
+                    .builder(ToolExecutionSurface.MCP_AUTOMATION, ToolExecutionKind.WORKFLOW, toolName)
+                    .mcpServerId(mcpServerId)
+                    .workspaceId(workspaceId)
+                    .jobId(jobId),
+                () -> {
+                    Job job = jobCompletionAwaiter.await(jobId, JobCompletionAwaiter.DEFAULT_SYNC_TIMEOUT)
+                        .join();
 
-            JobExecutionErrors.checkForError(job, taskExecutionService);
+                    JobExecutionErrors.checkForError(job, taskExecutionService);
 
-            if (job.getOutputs() == null) {
-                return null;
-            }
+                    if (job.getOutputs() == null) {
+                        return null;
+                    }
 
-            return getCallableResponseOutput(job)
-                .orElseGet(() -> taskFileStorage.readJobOutputs(job.getOutputs()));
+                    return getCallableResponseOutput(job)
+                        .orElseGet(() -> taskFileStorage.readJobOutputs(job.getOutputs()));
+                });
         };
     }
 
