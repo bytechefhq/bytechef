@@ -580,6 +580,32 @@ Spec: `docs/superpowers/specs/2026-07-21-agent-hitl-approval-chat-design.md`; us
   only reachable via the pending-approvals inbox or the hosted form.
 - AI Hub copilot chat is OUT of scope (keeps its pinned `askUserQuestion`).
 
+### Auto-memory storage providers
+
+`bytechef.ai.auto-memory.provider` selects where AI auto-memories are stored:
+
+- `JDBC` (**default**) — the relational `ai_auto_memory` / `workspace_ai_auto_memory` tables. Existing
+  deployments are unaffected; the JDBC binding is gated with `matchIfMissing = true`.
+- `FILESYSTEM` / `AWS` — one JSON object per memory through the shared `FileStorageService`
+  (`platform-ai-auto-memory-repository-file-storage`). Both values use the SAME CE implementation and
+  differ only in which service `FileStorageServiceRegistry` resolves, so `AWS` needs no module of its
+  own — it works wherever the EE `file-storage-aws` module is on the classpath and configured.
+
+Exactly one binding is ever active. Selecting a provider whose `FileStorageService` is not registered
+**fails fast at startup** rather than falling back, since a fallback would write memories to storage
+the operator did not choose.
+
+File-backed layout:
+`ai_auto_memory/{workspaceId}/{principalType}_{principalId}/{environment}/{id}.json`. Path segments use
+only lowercase alphanumerics and `_` — `FilesystemFileStorageService` normalizes directories to that
+alphabet, so a hyphen is stripped and distinct names could otherwise collide.
+
+Limitations, by design: file backends are **best-effort single-writer** (whole-object writes,
+last-write-wins on concurrent edits of the same memory, no cross-object transaction); the duplicate-name
+check stays the service layer's job as it already is for JDBC; ordering comes from the stored
+`updatedAt` because `FileEntry` carries no modification time; and there is **no migration path between
+providers** — switching does not move existing memories.
+
 ### Domain copilot slice pattern (context store / knowledge base / data table)
 
 Each domain slice follows the same shape (see `docs/superpowers/plans/` for the slice plans):
@@ -927,12 +953,29 @@ npm run format           # Format code
 npm run check            # Run lint, typecheck, and tests
 ```
 
-### Creating Custom Components via CLI
-ByteChef includes a CLI tool for scaffolding components:
+### CLI
+ByteChef includes a CLI (`cli/`, Spring Boot + Spring Shell) that scaffolds custom components and
+calls the public REST API (automation and embedded). It uses the `application` plugin. Build a
+`bytechef` binary with `installDist` — this is the normal way to use it, since the binary runs from
+your current working directory so relative paths behave as expected:
 ```bash
-cd cli
-./gradlew :cli-app:bootRun --args="component init openapi --name=my-component --openapi-path=/path/to/openapi.yaml"
+# Build the distribution; binary lands at cli/cli-app/build/install/bytechef/bin/bytechef
+./gradlew :cli:cli-app:installDist
+
+# Scaffold a component from an OpenAPI spec
+bytechef component init --name my-component --open-api-path ./openapi.yaml --output-path .
+
+# Public API commands (store a profile first)
+bytechef configure --host https://app.bytechef.io --token <public-api-token> --environment PRODUCTION --workspace-id 1
+bytechef automation execution list --output table
+bytechef embedded integration list --external-user-id user-42
 ```
+For a quick dev invocation without building the distribution, use the `run` task — but note its
+working directory is `cli/cli-app`, so pass **absolute** paths:
+```bash
+./gradlew :cli:cli-app:run --args="component init --name my-component --open-api-path /abs/openapi.yaml --output-path /abs/out"
+```
+See `cli/README.md` for the full command reference.
 
 ### Resolving PR Review Comments
 - Use `gh api graphql` with `resolveReviewThread` mutation to close threads programmatically
