@@ -99,6 +99,41 @@ describe('animateNodePositions', () => {
         expect(rafCallbacks.length).toBe(1);
     });
 
+    it('should snap to target positions without animating when a node travels a large distance', () => {
+        // A long tween re-renders the whole flow every frame across a big stretch of canvas; under
+        // heavy main-thread load Chrome's compositor has left paint trails (stale afterimages of the
+        // moving node). Beyond the displacement cutoff the tween must snap instead.
+        const nodes = [createNode('a', 0, 0), createNode('b', 100, 100)];
+        const targetNodes = [createNode('a', 0, 1500), createNode('b', 100, 120)];
+        const setNodes = vi.fn();
+
+        animateNodePositions(nodes, targetNodes, setNodes);
+
+        expect(setNodes).toHaveBeenCalledExactlyOnceWith(targetNodes);
+        expect(rafCallbacks.length).toBe(0);
+    });
+
+    it('should still animate when the largest travel stays under the displacement cutoff', () => {
+        const nodes = [createNode('a', 0, 0)];
+        const targetNodes = [createNode('a', 0, 600)];
+        const setNodes = vi.fn();
+
+        animateNodePositions(nodes, targetNodes, setNodes);
+
+        expect(rafCallbacks.length).toBe(1);
+    });
+
+    it('should not let a brand-new node (no previous position) trigger the snap', () => {
+        // New nodes render directly at their target position, so their "travel" is not real motion.
+        const nodes = [createNode('a', 0, 0)];
+        const targetNodes = [createNode('a', 0, 100), createNode('b', 2000, 2000)];
+        const setNodes = vi.fn();
+
+        animateNodePositions(nodes, targetNodes, setNodes);
+
+        expect(rafCallbacks.length).toBe(1);
+    });
+
     it('should interpolate positions during animation', () => {
         const nodes = [createNode('a', 0, 0)];
         const targetNodes = [createNode('a', 300, 600)];
@@ -108,17 +143,41 @@ describe('animateNodePositions', () => {
 
         animateNodePositions(nodes, targetNodes, setNodes, {duration: 300});
 
-        // Simulate mid-animation at 150ms (half duration)
-        rafCallbacks[0](150);
+        // The clock starts at the first frame; simulate mid-animation 150ms later
+        rafCallbacks[0](1000);
+        rafCallbacks[1](1150);
 
         expect(setNodes).toHaveBeenCalled();
 
-        const interpolatedNodes = setNodes.mock.calls[0][0];
+        const interpolatedNodes = setNodes.mock.calls[1][0];
         const position = interpolatedNodes[0].position;
 
         // At t=0.5, easeOutCubic(0.5) = 1 - (0.5)^3 = 0.875
         expect(position.x).toBeCloseTo(300 * 0.875, 1);
         expect(position.y).toBeCloseTo(600 * 0.875, 1);
+    });
+
+    it('should ignore time the main thread spent blocked before the first frame', () => {
+        const nodes = [createNode('a', 0, 0)];
+        const targetNodes = [createNode('a', 300, 600)];
+        const setNodes = vi.fn();
+
+        animateNodePositions(nodes, targetNodes, setNodes, {duration: 300});
+
+        // The canvas render after the layout switch can block for far longer
+        // than the whole tween — the first frame must still start at progress 0
+        rafCallbacks[0](10_000);
+
+        const firstFrameNodes = setNodes.mock.calls[0][0];
+
+        expect(firstFrameNodes[0].position).toEqual({x: 0, y: 0});
+
+        rafCallbacks[1](10_150);
+
+        const midFrameNodes = setNodes.mock.calls[1][0];
+
+        // easeOutCubic(0.5) = 0.875
+        expect(midFrameNodes[0].position.x).toBeCloseTo(300 * 0.875, 1);
     });
 
     it('should set final target positions when animation completes', () => {
@@ -130,8 +189,9 @@ describe('animateNodePositions', () => {
 
         animateNodePositions(nodes, targetNodes, setNodes, {duration: 300});
 
-        // Simulate completion at 300ms
-        rafCallbacks[0](300);
+        // Simulate completion 300ms after the first frame
+        rafCallbacks[0](1000);
+        rafCallbacks[1](1300);
 
         expect(setNodes).toHaveBeenCalledWith(targetNodes);
     });
@@ -145,8 +205,9 @@ describe('animateNodePositions', () => {
 
         animateNodePositions(nodes, targetNodes, setNodes, {duration: 300});
 
-        // Simulate overshoot at 500ms
-        rafCallbacks[0](500);
+        // Simulate overshoot 500ms after the first frame
+        rafCallbacks[0](1000);
+        rafCallbacks[1](1500);
 
         expect(setNodes).toHaveBeenCalledWith(targetNodes);
     });
@@ -162,11 +223,12 @@ describe('animateNodePositions', () => {
 
         expect(rafCallbacks.length).toBe(1);
 
-        // Tick at 100ms (not done yet)
-        rafCallbacks[0](100);
+        // First frame starts the clock, second lands mid-animation (not done yet)
+        rafCallbacks[0](1000);
+        rafCallbacks[1](1100);
 
         // Should have requested another frame
-        expect(rafCallbacks.length).toBe(2);
+        expect(rafCallbacks.length).toBe(3);
     });
 
     it('should not request another frame when animation is complete', () => {
@@ -180,11 +242,12 @@ describe('animateNodePositions', () => {
 
         expect(rafCallbacks.length).toBe(1);
 
-        // Tick at 300ms (done)
-        rafCallbacks[0](300);
+        // First frame starts the clock, second completes the animation
+        rafCallbacks[0](1000);
+        rafCallbacks[1](1300);
 
         // Should NOT have requested another frame
-        expect(rafCallbacks.length).toBe(1);
+        expect(rafCallbacks.length).toBe(2);
     });
 
     it('should cancel animation when cancel function is called', () => {
@@ -213,10 +276,11 @@ describe('animateNodePositions', () => {
 
         animateNodePositions(nodes, targetNodes, setNodes, {duration: 300});
 
-        // Tick at 150ms
-        rafCallbacks[0](150);
+        // First frame starts the clock, second lands mid-animation
+        rafCallbacks[0](1000);
+        rafCallbacks[1](1150);
 
-        const interpolatedNodes = setNodes.mock.calls[0][0];
+        const interpolatedNodes = setNodes.mock.calls[1][0];
 
         // Node 'b' has no previous position, should be at target position
         const nodeB = interpolatedNodes.find((node: Node) => node.id === 'b');
@@ -234,10 +298,11 @@ describe('animateNodePositions', () => {
 
         animateNodePositions(nodes, targetNodes, setNodes, {duration: 300});
 
-        // Tick at 300ms (complete)
-        rafCallbacks[0](300);
+        // First frame starts the clock, second completes the animation
+        rafCallbacks[0](1000);
+        rafCallbacks[1](1300);
 
-        const finalNodes = setNodes.mock.calls[0][0];
+        const finalNodes = setNodes.mock.calls[1][0];
 
         expect(finalNodes[0].position).toEqual({x: 300, y: 0});
         expect(finalNodes[1].position).toEqual({x: 100, y: 400});
@@ -252,18 +317,19 @@ describe('animateNodePositions', () => {
 
         animateNodePositions(nodes, targetNodes, setNodes);
 
-        // At 150ms (half of default 300ms)
-        rafCallbacks[0](150);
+        // First frame starts the clock; 150ms later is half of the default 300ms
+        rafCallbacks[0](1000);
+        rafCallbacks[1](1150);
 
-        const interpolatedNodes = setNodes.mock.calls[0][0];
+        const interpolatedNodes = setNodes.mock.calls[1][0];
 
         // easeOutCubic(0.5) = 0.875
         expect(interpolatedNodes[0].position.x).toBeCloseTo(300 * 0.875, 1);
 
-        // At 300ms should complete
-        rafCallbacks[1](300);
+        // 300ms after the first frame the animation completes
+        rafCallbacks[2](1300);
 
-        const finalNodes = setNodes.mock.calls[1][0];
+        const finalNodes = setNodes.mock.calls[2][0];
 
         expect(finalNodes).toBe(targetNodes);
     });
@@ -294,10 +360,11 @@ describe('animateNodePositions', () => {
 
         animateNodePositions(nodes, targetNodes, setNodes, {duration: 300});
 
-        // Tick at 150ms (half duration)
-        rafCallbacks[0](150);
+        // First frame starts the clock, second lands at half duration
+        rafCallbacks[0](1000);
+        rafCallbacks[1](1150);
 
-        const interpolatedNodes = setNodes.mock.calls[0][0];
+        const interpolatedNodes = setNodes.mock.calls[1][0];
         const interpolatedParent = interpolatedNodes.find((node: Node) => node.id === 'condition_1');
         const interpolatedGhost = interpolatedNodes.find((node: Node) => node.id === 'ghost');
 
@@ -343,10 +410,11 @@ describe('animateNodePositions', () => {
 
         animateNodePositions(nodes, targetNodes, setNodes, {duration: 300});
 
-        // Tick at 150ms
-        rafCallbacks[0](150);
+        // First frame starts the clock, second lands at half duration
+        rafCallbacks[0](1000);
+        rafCallbacks[1](1150);
 
-        const interpolatedNodes = setNodes.mock.calls[0][0];
+        const interpolatedNodes = setNodes.mock.calls[1][0];
         const interpolatedDispatcher = interpolatedNodes.find((node: Node) => node.id === 'condition_1');
         const interpolatedChild = interpolatedNodes.find((node: Node) => node.id === 'httpClient_1');
         const interpolatedGhost = interpolatedNodes.find((node: Node) => node.id === 'condition_1-top-ghost');
@@ -387,9 +455,10 @@ describe('animateNodePositions', () => {
 
         animateNodePositions(nodes, targetNodes, setNodes, {duration: 300});
 
-        rafCallbacks[0](150);
+        rafCallbacks[0](1000);
+        rafCallbacks[1](1150);
 
-        const interpolatedNodes = setNodes.mock.calls[0][0];
+        const interpolatedNodes = setNodes.mock.calls[1][0];
         const interpolatedLoop = interpolatedNodes.find((node: Node) => node.id === 'loop_1');
         const interpolatedChild = interpolatedNodes.find((node: Node) => node.id === 'httpClient_1');
 
@@ -427,9 +496,10 @@ describe('animateNodePositions', () => {
 
         animateNodePositions(nodes, targetNodes, setNodes, {duration: 300});
 
-        rafCallbacks[0](150);
+        rafCallbacks[0](1000);
+        rafCallbacks[1](1150);
 
-        const interpolatedNodes = setNodes.mock.calls[0][0];
+        const interpolatedNodes = setNodes.mock.calls[1][0];
         const interpolatedBranch = interpolatedNodes.find((node: Node) => node.id === 'branch_1');
         const interpolatedChild = interpolatedNodes.find((node: Node) => node.id === 'httpClient_1');
 
@@ -467,9 +537,10 @@ describe('animateNodePositions', () => {
 
         animateNodePositions(nodes, targetNodes, setNodes, {duration: 300});
 
-        rafCallbacks[0](150);
+        rafCallbacks[0](1000);
+        rafCallbacks[1](1150);
 
-        const interpolatedNodes = setNodes.mock.calls[0][0];
+        const interpolatedNodes = setNodes.mock.calls[1][0];
         const interpolatedParallel = interpolatedNodes.find((node: Node) => node.id === 'parallel_1');
         const interpolatedChild = interpolatedNodes.find((node: Node) => node.id === 'httpClient_1');
 
@@ -506,9 +577,10 @@ describe('animateNodePositions', () => {
 
         animateNodePositions(nodes, targetNodes, setNodes, {duration: 300});
 
-        rafCallbacks[0](150);
+        rafCallbacks[0](1000);
+        rafCallbacks[1](1150);
 
-        const interpolatedNodes = setNodes.mock.calls[0][0];
+        const interpolatedNodes = setNodes.mock.calls[1][0];
         const interpolatedEach = interpolatedNodes.find((node: Node) => node.id === 'each_1');
         const interpolatedChild = interpolatedNodes.find((node: Node) => node.id === 'httpClient_1');
 
@@ -545,9 +617,10 @@ describe('animateNodePositions', () => {
 
         animateNodePositions(nodes, targetNodes, setNodes, {duration: 300});
 
-        rafCallbacks[0](150);
+        rafCallbacks[0](1000);
+        rafCallbacks[1](1150);
 
-        const interpolatedNodes = setNodes.mock.calls[0][0];
+        const interpolatedNodes = setNodes.mock.calls[1][0];
         const interpolatedForkJoin = interpolatedNodes.find((node: Node) => node.id === 'forkJoin_1');
         const interpolatedChild = interpolatedNodes.find((node: Node) => node.id === 'httpClient_1');
 
@@ -597,9 +670,10 @@ describe('animateNodePositions', () => {
 
         animateNodePositions(nodes, targetNodes, setNodes, {duration: 300});
 
-        rafCallbacks[0](150);
+        rafCallbacks[0](1000);
+        rafCallbacks[1](1150);
 
-        const interpolatedNodes = setNodes.mock.calls[0][0];
+        const interpolatedNodes = setNodes.mock.calls[1][0];
         const interpolatedLoop = interpolatedNodes.find((node: Node) => node.id === 'loop_1');
         const interpolatedCondition = interpolatedNodes.find((node: Node) => node.id === 'condition_1');
         const interpolatedChild = interpolatedNodes.find((node: Node) => node.id === 'httpClient_1');
@@ -646,9 +720,10 @@ describe('animateNodePositions', () => {
 
         animateNodePositions(nodes, targetNodes, setNodes, {duration: 300});
 
-        rafCallbacks[0](150);
+        rafCallbacks[0](1000);
+        rafCallbacks[1](1150);
 
-        const interpolatedNodes = setNodes.mock.calls[0][0];
+        const interpolatedNodes = setNodes.mock.calls[1][0];
         const interpolatedDispatcher = interpolatedNodes.find((node: Node) => node.id === 'condition_1');
         const interpolatedBottom = interpolatedNodes.find((node: Node) => node.id === 'condition_1-bottom-ghost');
         const interpolatedLeft = interpolatedNodes.find((node: Node) => node.id === 'condition_1-left-ghost');
@@ -688,9 +763,10 @@ describe('animateNodePositions', () => {
 
         animateNodePositions(nodes, targetNodes, setNodes, {duration: 300});
 
-        rafCallbacks[0](150);
+        rafCallbacks[0](1000);
+        rafCallbacks[1](1150);
 
-        const interpolatedNodes = setNodes.mock.calls[0][0];
+        const interpolatedNodes = setNodes.mock.calls[1][0];
         const interpolatedDispatcher = interpolatedNodes.find((node: Node) => node.id === 'condition_1');
         const interpolatedPlaceholder = interpolatedNodes.find((node: Node) => node.id === 'condition_1-placeholder');
 
@@ -730,9 +806,10 @@ describe('animateNodePositions', () => {
 
         animateNodePositions(nodes, targetNodes, setNodes, {duration: 300});
 
-        rafCallbacks[0](150);
+        rafCallbacks[0](1000);
+        rafCallbacks[1](1150);
 
-        const interpolatedNodes = setNodes.mock.calls[0][0];
+        const interpolatedNodes = setNodes.mock.calls[1][0];
         const interpolatedDispatcher = interpolatedNodes.find((node: Node) => node.id === 'condition_1');
         const interpolatedChild = interpolatedNodes.find((node: Node) => node.id === 'httpClient_1');
 
@@ -758,9 +835,10 @@ describe('animateNodePositions', () => {
 
         animateNodePositions(nodes, targetNodes, setNodes, {duration: 300});
 
-        rafCallbacks[0](150);
+        rafCallbacks[0](1000);
+        rafCallbacks[1](1150);
 
-        const interpolatedNodes = setNodes.mock.calls[0][0];
+        const interpolatedNodes = setNodes.mock.calls[1][0];
         const interpolatedGhost = interpolatedNodes[0];
 
         // Should interpolate independently as a root node (easeOutCubic(0.5) = 0.875)
@@ -791,9 +869,10 @@ describe('animateNodePositions', () => {
 
         animateNodePositions(nodes, targetNodes, setNodes, {duration: 300});
 
-        rafCallbacks[0](150);
+        rafCallbacks[0](1000);
+        rafCallbacks[1](1150);
 
-        const interpolatedNodes = setNodes.mock.calls[0][0];
+        const interpolatedNodes = setNodes.mock.calls[1][0];
 
         expect(interpolatedNodes[0].data).toEqual({label: 'Node A', taskDispatcher: true});
         expect(interpolatedNodes[0].type).toBe('workflow');
