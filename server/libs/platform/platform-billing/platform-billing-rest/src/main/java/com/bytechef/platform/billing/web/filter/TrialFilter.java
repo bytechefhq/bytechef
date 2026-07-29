@@ -42,7 +42,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
  */
 public class TrialFilter extends OncePerRequestFilter {
 
-    private static final Logger logger = LoggerFactory.getLogger(TrialFilter.class);
+    private static final Logger log = LoggerFactory.getLogger(TrialFilter.class);
 
     private final TrialService trialService;
 
@@ -85,7 +85,7 @@ public class TrialFilter extends OncePerRequestFilter {
 
         if (trial.expired()) {
 
-            logger.debug("Trial expired for tenant {}. Sending trial expired response.", tenantId);
+            log.debug("Trial expired for tenant {}. Sending trial expired response.", tenantId);
 
             sendTrialExpiredResponse(response);
 

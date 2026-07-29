@@ -29,6 +29,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.platform.billing.client.StripeClient;
 import com.bytechef.platform.billing.config.BillingProperties;
 import com.bytechef.platform.billing.domain.BillingSubscription;
+import com.bytechef.platform.billing.exception.InvalidWebhookSignatureException;
 import com.bytechef.platform.billing.service.BillingSubscriptionService;
 import com.bytechef.platform.billing.service.BillingUsageService;
 import com.bytechef.platform.billing.service.BillingWebhookEventService;
@@ -136,12 +137,12 @@ class BillingSubscriptionFacadeImplTest {
     void testVerifyWebhookSignaturePropagatesStripeClientFailure() {
         String payload = subscriptionUpdatedPayload(STRIPE_SUBSCRIPTION_ID, "STARTER");
 
-        doThrow(new RuntimeException("Invalid Stripe signature"))
+        doThrow(new InvalidWebhookSignatureException("Invalid Stripe signature", null))
             .when(stripeClient)
             .verifyWebhookSignature(payload, "t=1,v1=invalid");
 
         assertThatThrownBy(() -> facade.verifyWebhookSignature(payload, "t=1,v1=invalid"))
-            .isInstanceOf(RuntimeException.class)
+            .isInstanceOf(InvalidWebhookSignatureException.class)
             .hasMessage("Invalid Stripe signature");
     }
 
