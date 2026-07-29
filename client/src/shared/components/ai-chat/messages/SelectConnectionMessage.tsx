@@ -14,7 +14,7 @@ import {useGetWorkspaceConnectionsQuery} from '@/shared/queries/automation/conne
 import {useGetConnectionDefinitionQuery} from '@/shared/queries/platform/connectionDefinitions.queries';
 import {DataMessagePartProps, useThreadRuntime} from '@assistant-ui/react';
 import {CheckIcon} from 'lucide-react';
-import {useEffect, useMemo, useState} from 'react';
+import {useMemo, useState} from 'react';
 
 export interface SelectConnectionDataI {
     componentLabel: string;
@@ -46,13 +46,17 @@ const VISIBILITY_LABELS: Record<ConnectionVisibilityType, string> = {
  * </p>
  *
  * <p>
- * The dropdown dims once a follow-up message lands on the thread (the user picked, or the agent moved on)
- * so the user sees past-tense at a glance. Same pattern as AskUserQuestion.
+ * The dropdown stays interactive until the user picks; once they do, it collapses to a past-tense
+ * "Picked: &lt;name&gt;" summary. It deliberately does NOT dim or disable itself when later messages land on
+ * the thread. {@code selectConnection} is signaling-only and does not stop the agent's turn, so the agent
+ * routinely emits follow-up messages (a second picker, an askUserQuestion, narration) right after rendering
+ * this one — disabling on "a later message arrived" would kill this picker before the user could act on it,
+ * forcing the agent to re-issue selectConnection and leaving a dead, greyed-out dropdown behind. Same
+ * reasoning as AskUserQuestion, which abandoned the supersede-dim pattern for exactly this bug.
  * </p>
  */
 const SelectConnectionMessage = ({data}: DataMessagePartProps<SelectConnectionDataI>) => {
     const [pickedConnection, setPickedConnection] = useState<{id: number; name: string} | undefined>();
-    const [supersededByLaterMessage, setSupersededByLaterMessage] = useState(false);
 
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
@@ -94,18 +98,6 @@ const SelectConnectionMessage = ({data}: DataMessagePartProps<SelectConnectionDa
             visibility,
         })).filter((group) => group.connections.length > 0);
     }, [selectableConnections]);
-
-    useEffect(() => {
-        const initialMessageCount = threadRuntime.getState().messages.length;
-
-        return threadRuntime.subscribe(() => {
-            const currentCount = threadRuntime.getState().messages.length;
-
-            if (currentCount > initialMessageCount) {
-                setSupersededByLaterMessage(true);
-            }
-        });
-    }, [threadRuntime]);
 
     const handleSelectChange = (value: string) => {
         const connectionId = Number(value);
@@ -152,8 +144,8 @@ const SelectConnectionMessage = ({data}: DataMessagePartProps<SelectConnectionDa
     }
 
     return (
-        <div className={`mt-2 flex w-full min-w-0 items-center gap-2${supersededByLaterMessage ? 'opacity-60' : ''}`}>
-            <Select disabled={supersededByLaterMessage} onValueChange={handleSelectChange}>
+        <div className="mt-2 flex w-full min-w-0 items-center gap-2">
+            <Select onValueChange={handleSelectChange}>
                 <div className="min-w-0 flex-1">
                     <SelectTrigger>
                         <SelectValue placeholder={`Choose ${data.componentLabel} connection...`} />
