@@ -6,33 +6,49 @@ describe('computeBranchCaseLabelPosition', () => {
     const defaultCoords = {sourceX: 100, sourceY: 200, targetX: 300, targetY: 400};
 
     describe('LR layout', () => {
-        it('should position at (sourceX, targetY) without edge button', () => {
+        it('should anchor above the row line, 44px past the split bar', () => {
             const result = computeBranchCaseLabelPosition({
                 ...defaultCoords,
                 layoutDirection: 'LR',
             });
 
-            expect(result).toEqual({x: 100, y: 400});
+            expect(result).toEqual({anchor: 'above', x: 144, y: 388});
         });
 
-        it('should offset y by 10px when hasEdgeButton is true', () => {
+        it('should lift the chip above the icon band when the row shares the dispatcher axis', () => {
             const result = computeBranchCaseLabelPosition({
-                ...defaultCoords,
-                hasEdgeButton: true,
                 layoutDirection: 'LR',
+                sourceX: 100,
+                sourceY: 200,
+                targetX: 300,
+                targetY: 210,
             });
 
-            expect(result).toEqual({x: 100, y: 410});
+            expect(result).toEqual({anchor: 'above', x: 144, y: 144});
         });
 
-        it('should not offset y when hasEdgeButton is false', () => {
+        it('should drop below the line for the row under the dispatcher label text', () => {
             const result = computeBranchCaseLabelPosition({
-                ...defaultCoords,
-                hasEdgeButton: false,
                 layoutDirection: 'LR',
+                sourceX: 100,
+                sourceY: 200,
+                targetX: 300,
+                targetY: 325,
             });
 
-            expect(result).toEqual({x: 100, y: 400});
+            expect(result).toEqual({anchor: 'below', x: 144, y: 337});
+        });
+
+        it('should stay above the line for the row just above the axis', () => {
+            const result = computeBranchCaseLabelPosition({
+                layoutDirection: 'LR',
+                sourceX: 100,
+                sourceY: 200,
+                targetX: 300,
+                targetY: 75,
+            });
+
+            expect(result).toEqual({anchor: 'above', x: 144, y: 63});
         });
     });
 
@@ -43,17 +59,7 @@ describe('computeBranchCaseLabelPosition', () => {
                 layoutDirection: 'TB',
             });
 
-            expect(result).toEqual({x: 300, y: 210});
-        });
-
-        it('should always apply offset in TB mode regardless of hasEdgeButton', () => {
-            const result = computeBranchCaseLabelPosition({
-                ...defaultCoords,
-                hasEdgeButton: true,
-                layoutDirection: 'TB',
-            });
-
-            expect(result).toEqual({x: 300, y: 210});
+            expect(result).toEqual({anchor: 'center', x: 300, y: 210});
         });
     });
 });

@@ -3869,14 +3869,14 @@ describe('centerDispatcherPlaceholdersOnMainAxis', () => {
         const bottomGhost: Node = {
             data: {taskDispatcherId: 'condition_1'},
             id: 'condition_1-condition-bottom-ghost',
-            position: {x: 504, y: 1298},
+            position: {x: 504, y: 814},
             type: 'taskDispatcherBottomGhostNode',
         };
 
         const placeholder: Node = {
             data: {taskDispatcherId: 'condition_1'},
             id: 'condition_1-condition-right-placeholder-0',
-            position: {x: 649, y: 1104},
+            position: {x: 649, y: 408},
             type: 'placeholder',
         };
 
@@ -3897,12 +3897,57 @@ describe('centerDispatcherPlaceholdersOnMainAxis', () => {
 
         centerDispatcherPlaceholdersOnMainAxis(allNodes, edges, 'y');
 
-        // Visual centers: topGhost=314+1=315, bottomGhost=1298+1=1299
-        // Midpoint of centers: (315+1299)/2 = 807
-        // Placeholder position: 807 - 28/2 = 793
-        expect(placeholder.position.y).toBe(793);
+        // Visual centers: topGhost=314+1=315, bottomGhost=814+1=815
+        // Midpoint of centers: (315+815)/2 = 565
+        // Placeholder position: 565 - 28/2 = 551
+        expect(placeholder.position.y).toBe(551);
         // x should be unchanged
         expect(placeholder.position.x).toBe(649);
+    });
+
+    it('keeps the placeholder at its layout spot when the frame interior is far taller', () => {
+        const topGhost: Node = {
+            data: {taskDispatcherId: 'condition_1'},
+            id: 'condition_1-condition-top-ghost',
+            position: {x: 504, y: 314},
+            type: 'taskDispatcherTopGhostNode',
+        };
+
+        const bottomGhost: Node = {
+            data: {taskDispatcherId: 'condition_1'},
+            id: 'condition_1-condition-bottom-ghost',
+            position: {x: 504, y: 1298},
+            type: 'taskDispatcherBottomGhostNode',
+        };
+
+        const placeholder: Node = {
+            data: {taskDispatcherId: 'condition_1'},
+            id: 'condition_1-condition-right-placeholder-0',
+            position: {x: 649, y: 408},
+            type: 'placeholder',
+        };
+
+        const edges: Edge[] = [
+            {
+                id: 'tg=>ph',
+                source: 'condition_1-condition-top-ghost',
+                target: 'condition_1-condition-right-placeholder-0',
+            },
+            {
+                id: 'ph=>bg',
+                source: 'condition_1-condition-right-placeholder-0',
+                target: 'condition_1-condition-bottom-ghost',
+            },
+        ];
+
+        const allNodes = [topGhost, bottomGhost, placeholder];
+
+        centerDispatcherPlaceholdersOnMainAxis(allNodes, edges, 'y');
+
+        // Interior slack (984 - 28) exceeds CHAIN_CENTERING_MAX_SLACK, so the
+        // placeholder is NOT pulled to mid-frame — a centered placeholder in an
+        // oversized frame reads as a floating island between two huge voids
+        expect(placeholder.position.y).toBe(408);
     });
 
     it('should center condition left placeholder on y-axis (TB mode)', () => {

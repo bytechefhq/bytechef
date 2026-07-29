@@ -83,12 +83,12 @@ describe('WorkflowEditorToolbar - layout engine button', () => {
         expect(screen.getByLabelText('Switch to standard layout engine')).toBeInTheDocument();
     });
 
-    it('is disabled when the workflow contains an unsupported dispatcher', () => {
+    it('is disabled when the workflow contains an unknown dispatcher', () => {
         useWorkflowDataStore.setState({
             nodes: [
                 {
-                    data: {componentName: 'loop', taskDispatcher: true, taskDispatcherId: 'loop_1'},
-                    id: 'loop_1',
+                    data: {componentName: 'mystery-dispatcher', taskDispatcher: true, taskDispatcherId: 'mystery_1'},
+                    id: 'mystery_1',
                     position: {x: 0, y: 0},
                     type: 'workflow',
                 },
@@ -98,5 +98,22 @@ describe('WorkflowEditorToolbar - layout engine button', () => {
         renderToolbar(false);
 
         expect(screen.getByLabelText('Switch to experimental layout engine')).toBeDisabled();
+    });
+
+    it('stays enabled for cluster-root workflows', () => {
+        useWorkflowDataStore.setState({
+            nodes: [
+                {
+                    data: {clusterRoot: true, componentName: 'aiAgent', workflowNodeName: 'aiAgent_1'},
+                    id: 'aiAgent_1',
+                    position: {x: 0, y: 0},
+                    type: 'clusterRoot',
+                },
+            ],
+        });
+
+        renderToolbar(false);
+
+        expect(screen.getByLabelText('Switch to experimental layout engine')).toBeEnabled();
     });
 });
