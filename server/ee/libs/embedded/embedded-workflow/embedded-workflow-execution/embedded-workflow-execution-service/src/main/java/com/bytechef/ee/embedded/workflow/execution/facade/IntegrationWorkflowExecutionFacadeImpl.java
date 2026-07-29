@@ -42,6 +42,8 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigu
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
+import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
+import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.ee.embedded.workflow.execution.dto.WorkflowExecutionDTO;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -76,6 +78,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -89,6 +92,7 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
     private static final Logger log = LoggerFactory.getLogger(IntegrationWorkflowExecutionFacadeImpl.class);
 
     private final ComponentDefinitionService componentDefinitionService;
+    private final ConnectedUserService connectedUserService;
     private final ContextService contextService;
     private final EnvironmentService environmentService;
     private final Evaluator evaluator;
@@ -109,7 +113,8 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
 
     @SuppressFBWarnings("EI")
     public IntegrationWorkflowExecutionFacadeImpl(
-        ComponentDefinitionService componentDefinitionService, ContextService contextService,
+        ComponentDefinitionService componentDefinitionService, ConnectedUserService connectedUserService,
+        ContextService contextService,
         EnvironmentService environmentService, Evaluator evaluator, PrincipalJobService principalJobService,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceService integrationInstanceService,
@@ -121,6 +126,7 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
         TriggerFileStorage triggerFileStorage, WorkflowService workflowService) {
 
         this.componentDefinitionService = componentDefinitionService;
+        this.connectedUserService = connectedUserService;
         this.contextService = contextService;
         this.environmentService = environmentService;
         this.evaluator = evaluator;
@@ -138,6 +144,65 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
         this.triggerExecutionService = triggerExecutionService;
         this.triggerFileStorage = triggerFileStorage;
         this.workflowService = workflowService;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public WorkflowExecutionDTO getConnectedUserWorkflowExecution(String externalUserId, long id) {
+        WorkflowExecutionDTO workflowExecutionDTO = getWorkflowExecution(id);
+
+        IntegrationInstance integrationInstance = workflowExecutionDTO.integrationInstance();
+
+        ConnectedUser connectedUser = connectedUserService.getConnectedUser(
+            Validate.notNull(integrationInstance.getConnectedUserId(), "connectedUserId"));
+
+        if (!Objects.equals(connectedUser.getExternalId(), externalUserId)) {
+            throw new AccessDeniedException("Access is denied");
+        }
+
+        return workflowExecutionDTO;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<WorkflowExecutionDTO> getConnectedUserWorkflowExecutions(
+        String externalUserId, long environmentId, Status jobStatus, Instant jobStartDate, Instant jobEndDate,
+        Long integrationInstanceConfigurationId, int pageNumber) {
+
+        Environment environment = environmentService.getEnvironment(environmentId);
+
+        ConnectedUser connectedUser = OptionalUtils.orElse(
+            connectedUserService.fetchConnectedUser(externalUserId, environment), null);
+
+        if (connectedUser == null) {
+            return Page.empty();
+        }
+
+        List<Long> integrationInstanceIds = integrationInstanceService
+            .getConnectedUserIntegrationInstances(Validate.notNull(connectedUser.getId(), "id"), environment)
+            .stream()
+            .filter(integrationInstance -> integrationInstanceConfigurationId == null ||
+                Objects.equals(
+                    integrationInstance.getIntegrationInstanceConfigurationId(), integrationInstanceConfigurationId))
+            .map(IntegrationInstance::getId)
+            .toList();
+
+        if (integrationInstanceIds.isEmpty()) {
+            return Page.empty();
+        }
+
+        List<String> workflowIds = CollectionUtils.map(
+            integrationWorkflowFacade.getIntegrationWorkflows(), IntegrationWorkflowDTO::getId);
+
+        if (workflowIds.isEmpty()) {
+            return Page.empty();
+        }
+
+        Page<Long> jobIdsPage = principalJobService.getJobIds(
+            jobStatus, jobStartDate, jobEndDate, integrationInstanceIds, PlatformType.EMBEDDED, workflowIds, true,
+            pageNumber);
+
+        return toWorkflowExecutionsPage(jobIdsPage, null, integrationInstanceConfigurationId);
     }
 
     @Override
@@ -240,77 +305,83 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
                     jobStatus, jobStartDate, jobEndDate, integrationInstanceConfigurationIds, PlatformType.EMBEDDED,
                     workflowIds, true, pageNumber);
 
-                List<Long> jobIds = jobIdsPage.getContent();
-
-                if (jobIds.isEmpty()) {
-                    return Page.empty();
-                }
-
-                List<Job> jobs = jobService.getJobs(jobIds);
-
-                Map<Long, Job> jobMap = jobs.stream()
-                    .collect(Collectors.toMap(
-                        job -> Validate.notNull(job.getId(), "id"), Function.identity()));
-
-                List<Integration> integrations = new ArrayList<>();
-
-                if (integrationId == null) {
-                    integrations.addAll(integrationService.getIntegrations());
-                } else {
-                    integrations.add(integrationService.getIntegration(integrationId));
-                }
-
-                List<Workflow> workflows = workflowService.getWorkflows(
-                    CollectionUtils.map(jobs, Job::getWorkflowId));
-
-                List<PrincipalJob> principalJobs =
-                    principalJobService.getPrincipalJobs(jobIds, PlatformType.EMBEDDED);
-
-                Map<Long, Long> jobToPrincipalMap = principalJobs.stream()
-                    .collect(Collectors.toMap(PrincipalJob::getJobId, PrincipalJob::getPrincipalId));
-
-                List<Long> instanceIds = principalJobs.stream()
-                    .map(PrincipalJob::getPrincipalId)
-                    .distinct()
-                    .toList();
-
-                Map<Long, IntegrationInstance> instanceMap =
-                    integrationInstanceService.getIntegrationInstances(instanceIds)
-                        .stream()
-                        .collect(Collectors.toMap(
-                            instance -> Validate.notNull(instance.getId(), "id"), Function.identity()));
-
-                List<Long> configIds = instanceMap.values()
-                    .stream()
-                    .map(IntegrationInstance::getIntegrationInstanceConfigurationId)
-                    .distinct()
-                    .toList();
-
-                Map<Long, IntegrationInstanceConfiguration> configMap =
-                    integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(configIds)
-                        .stream()
-                        .collect(Collectors.toMap(
-                            config -> Validate.notNull(config.getId(), "id"), Function.identity()));
-
-                List<TriggerExecution> triggerExecutions =
-                    triggerExecutionService.getJobTriggerExecutions(jobIds);
-
-                Map<Long, TriggerExecution> triggerExecutionByJobIdMap = new HashMap<>();
-
-                for (TriggerExecution triggerExecution : triggerExecutions) {
-                    for (Long triggerJobId : triggerExecution.getJobIds()) {
-                        triggerExecutionByJobIdMap.putIfAbsent(triggerJobId, triggerExecution);
-                    }
-                }
-
-                List<WorkflowExecutionDTO> workflowExecutionDTOs = buildWorkflowExecutionDTOs(
-                    jobIds, jobMap, workflows, integrations, jobToPrincipalMap, instanceMap, configMap,
-                    triggerExecutionByJobIdMap, integrationInstanceConfigurationId);
-
-                return new PageImpl<>(
-                    workflowExecutionDTOs, jobIdsPage.getPageable(), jobIdsPage.getTotalElements());
+                return toWorkflowExecutionsPage(jobIdsPage, integrationId, integrationInstanceConfigurationId);
             }
         }
+    }
+
+    private Page<WorkflowExecutionDTO> toWorkflowExecutionsPage(
+        Page<Long> jobIdsPage, Long integrationId, Long integrationInstanceConfigurationId) {
+
+        List<Long> jobIds = jobIdsPage.getContent();
+
+        if (jobIds.isEmpty()) {
+            return Page.empty();
+        }
+
+        List<Job> jobs = jobService.getJobs(jobIds);
+
+        Map<Long, Job> jobMap = jobs.stream()
+            .collect(Collectors.toMap(
+                job -> Validate.notNull(job.getId(), "id"), Function.identity()));
+
+        List<Integration> integrations = new ArrayList<>();
+
+        if (integrationId == null) {
+            integrations.addAll(integrationService.getIntegrations());
+        } else {
+            integrations.add(integrationService.getIntegration(integrationId));
+        }
+
+        List<Workflow> workflows = workflowService.getWorkflows(
+            CollectionUtils.map(jobs, Job::getWorkflowId));
+
+        List<PrincipalJob> principalJobs =
+            principalJobService.getPrincipalJobs(jobIds, PlatformType.EMBEDDED);
+
+        Map<Long, Long> jobToPrincipalMap = principalJobs.stream()
+            .collect(Collectors.toMap(PrincipalJob::getJobId, PrincipalJob::getPrincipalId));
+
+        List<Long> instanceIds = principalJobs.stream()
+            .map(PrincipalJob::getPrincipalId)
+            .distinct()
+            .toList();
+
+        Map<Long, IntegrationInstance> instanceMap =
+            integrationInstanceService.getIntegrationInstances(instanceIds)
+                .stream()
+                .collect(Collectors.toMap(
+                    instance -> Validate.notNull(instance.getId(), "id"), Function.identity()));
+
+        List<Long> configIds = instanceMap.values()
+            .stream()
+            .map(IntegrationInstance::getIntegrationInstanceConfigurationId)
+            .distinct()
+            .toList();
+
+        Map<Long, IntegrationInstanceConfiguration> configMap =
+            integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(configIds)
+                .stream()
+                .collect(Collectors.toMap(
+                    config -> Validate.notNull(config.getId(), "id"), Function.identity()));
+
+        List<TriggerExecution> triggerExecutions =
+            triggerExecutionService.getJobTriggerExecutions(jobIds);
+
+        Map<Long, TriggerExecution> triggerExecutionByJobIdMap = new HashMap<>();
+
+        for (TriggerExecution triggerExecution : triggerExecutions) {
+            for (Long triggerJobId : triggerExecution.getJobIds()) {
+                triggerExecutionByJobIdMap.putIfAbsent(triggerJobId, triggerExecution);
+            }
+        }
+
+        List<WorkflowExecutionDTO> workflowExecutionDTOs = buildWorkflowExecutionDTOs(
+            jobIds, jobMap, workflows, integrations, jobToPrincipalMap, instanceMap, configMap,
+            triggerExecutionByJobIdMap, integrationInstanceConfigurationId);
+
+        return new PageImpl<>(
+            workflowExecutionDTOs, jobIdsPage.getPageable(), jobIdsPage.getTotalElements());
     }
 
     private List<WorkflowExecutionDTO> buildWorkflowExecutionDTOs(

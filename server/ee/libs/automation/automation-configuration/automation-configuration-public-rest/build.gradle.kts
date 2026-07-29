@@ -41,6 +41,7 @@ dependencies {
     implementation("jakarta.validation:jakarta.validation-api")
     implementation(libs.org.mapstruct)
     implementation(libs.org.mapstruct.extensions.spring.mapstruct.spring.annotations)
+    implementation(libs.org.openapitools.jackson.databind.nullable)
     implementation("org.slf4j:slf4j-api")
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-web")
@@ -48,6 +49,7 @@ dependencies {
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
+    implementation(project(":server:libs:automation:automation-workflow:automation-workflow-execution:automation-workflow-execution-api"))
 
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-api"))
     implementation(project(":server:ee:libs:platform:platform-code-workflow:platform-code-workflow-configuration:platform-code-workflow-configuration-api"))

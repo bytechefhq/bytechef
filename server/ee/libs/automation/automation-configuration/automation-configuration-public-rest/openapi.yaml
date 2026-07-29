@@ -10,7 +10,109 @@ tags:
     description: "The Automation Project Code Workflow Public API"
   - name: "project-git"
     description: "The Automation Project Git Public API"
+  - name: "workflow-execution"
+    description: "The Automation Workflow Execution Public API"
 paths:
+  /workflow-executions:
+    get:
+      description: "Get the page of workflow executions of a workspace. Execution input, output and task data\
+        \ are never included in list responses - fetch a single execution by id for the full detail."
+      summary: "Get workflow executions"
+      tags:
+        - "workflow-execution"
+      operationId: "getWorkflowExecutionsPage"
+      parameters:
+        - name: "workspaceId"
+          description: "The id of a workspace."
+          in: "query"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "X-Environment"
+          description: "The environment. Executions are filtered to the same environment the API key authenticated\
+            \ for; when omitted, PRODUCTION is used."
+          in: "header"
+          required: false
+          schema:
+            $ref: "#/components/schemas/Environment"
+        - name: "status"
+          description: "The status of an execution."
+          in: "query"
+          required: false
+          schema:
+            $ref: "#/components/schemas/WorkflowExecutionStatus"
+        - name: "startDate"
+          description: "Return only executions that started at or after this instant."
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            format: "date-time"
+        - name: "endDate"
+          description: "Return only executions that started at or before this instant."
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            format: "date-time"
+        - name: "projectId"
+          description: "The id of a project."
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "projectDeploymentId"
+          description: "The id of a project deployment."
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "workflowId"
+          description: "The id of a workflow."
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+        - name: "pageNumber"
+          description: "The number of the page to return."
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            format: "int32"
+            default: 0
+      responses:
+        "200":
+          description: "The page of workflow executions."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Page"
+  /workflow-executions/{id}:
+    get:
+      description: "Get a workflow execution by id, including its inputs, outputs, error and task executions."
+      summary: "Get a workflow execution by id"
+      tags:
+        - "workflow-execution"
+      operationId: "getWorkflowExecution"
+      parameters:
+        - name: "id"
+          description: "The id of a workflow execution."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "The workflow execution object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkflowExecution"
   /projects/deploy:
     post:
       description: "Deploy a new code based project."
@@ -54,3 +156,214 @@ paths:
       responses:
         "204":
           description: "Successful operation."
+components:
+  schemas:
+    Page:
+      description: "A page of a list of objects. It carries information about the position of the sublist\
+        \ inside the entire list."
+      type: "object"
+      properties:
+        number:
+          description: "The current page."
+          type: "integer"
+        size:
+          description: "The size of the page."
+          type: "integer"
+        numberOfElements:
+          description: "The number of elements."
+          type: "integer"
+        totalPages:
+          description: "The total number of pages."
+          type: "integer"
+        totalElements:
+          description: "The total number of elements."
+          type: "integer"
+        content:
+          description: "The list of elements."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/WorkflowExecutionBasic"
+    Environment:
+      description: "The environment."
+      type: "string"
+      enum:
+        - "DEVELOPMENT"
+        - "STAGING"
+        - "PRODUCTION"
+    WorkflowExecutionStatus:
+      description: "The status of a workflow execution."
+      type: "string"
+      enum:
+        - "CREATED"
+        - "STARTED"
+        - "STOPPED"
+        - "FAILED"
+        - "COMPLETED"
+    ExecutionError:
+      description: "The error that terminated an execution."
+      type: "object"
+      properties:
+        message:
+          description: "The error message."
+          type: "string"
+        stackTrace:
+          description: "The error stack trace."
+          type: "array"
+          items:
+            type: "string"
+    ProjectReference:
+      description: "The project a workflow execution belongs to."
+      type: "object"
+      properties:
+        id:
+          description: "The id of a project."
+          type: "integer"
+          format: "int64"
+        name:
+          description: "The name of a project."
+          type: "string"
+    ProjectDeploymentReference:
+      description: "The project deployment a workflow execution ran under."
+      type: "object"
+      properties:
+        id:
+          description: "The id of a project deployment."
+          type: "integer"
+          format: "int64"
+        name:
+          description: "The name of a project deployment."
+          type: "string"
+        projectVersion:
+          description: "The deployed project version."
+          type: "integer"
+        environmentId:
+          description: "The id of the environment the deployment targets."
+          type: "integer"
+          format: "int64"
+        enabled:
+          description: "Whether the deployment is enabled."
+          type: "boolean"
+    WorkflowReference:
+      description: "The workflow a workflow execution ran."
+      type: "object"
+      properties:
+        id:
+          description: "The id of a workflow."
+          type: "string"
+        label:
+          description: "The label of a workflow."
+          type: "string"
+    TaskExecution:
+      description: "The execution of a single workflow task, including its input and output."
+      type: "object"
+      properties:
+        id:
+          description: "The id of a task execution."
+          type: "string"
+        name:
+          description: "The name of the executed workflow task."
+          type: "string"
+        title:
+          description: "The title of the executed workflow task."
+          type: "string"
+        type:
+          description: "The type of the executed workflow task."
+          type: "string"
+        status:
+          description: "The status of a task execution."
+          type: "string"
+          enum:
+            - "CREATED"
+            - "STARTED"
+            - "COMPLETED"
+            - "FAILED"
+            - "CANCELLED"
+        startDate:
+          description: "The instant a task execution started."
+          type: "string"
+          format: "date-time"
+        endDate:
+          description: "The instant a task execution ended."
+          type: "string"
+          format: "date-time"
+        error:
+          $ref: "#/components/schemas/ExecutionError"
+        input:
+          description: "The resolved input parameters of a task execution."
+          type: "object"
+          additionalProperties: true
+        output:
+          description: "The output of a task execution."
+    WorkflowExecutionBasic:
+      description: "A workflow execution list row. Never carries execution data - fetch the execution by id\
+        \ for inputs, outputs and task executions."
+      type: "object"
+      required:
+        - "id"
+      properties:
+        id:
+          description: "The id of a workflow execution."
+          type: "integer"
+          format: "int64"
+          readOnly: true
+        status:
+          $ref: "#/components/schemas/WorkflowExecutionStatus"
+        startDate:
+          description: "The instant an execution started."
+          type: "string"
+          format: "date-time"
+        endDate:
+          description: "The instant an execution ended. Null while the execution is running."
+          type: "string"
+          format: "date-time"
+        error:
+          $ref: "#/components/schemas/ExecutionError"
+        project:
+          $ref: "#/components/schemas/ProjectReference"
+        projectDeployment:
+          $ref: "#/components/schemas/ProjectDeploymentReference"
+        workflow:
+          $ref: "#/components/schemas/WorkflowReference"
+    WorkflowExecution:
+      description: "The full detail of a workflow execution, including inputs, outputs, error and task\
+        \ executions."
+      type: "object"
+      required:
+        - "id"
+      properties:
+        id:
+          description: "The id of a workflow execution."
+          type: "integer"
+          format: "int64"
+          readOnly: true
+        status:
+          $ref: "#/components/schemas/WorkflowExecutionStatus"
+        startDate:
+          description: "The instant an execution started."
+          type: "string"
+          format: "date-time"
+        endDate:
+          description: "The instant an execution ended. Null while the execution is running."
+          type: "string"
+          format: "date-time"
+        error:
+          $ref: "#/components/schemas/ExecutionError"
+        inputs:
+          description: "The inputs the execution ran with."
+          type: "object"
+          additionalProperties: true
+        outputs:
+          description: "The outputs the execution produced."
+          type: "object"
+          additionalProperties: true
+        project:
+          $ref: "#/components/schemas/ProjectReference"
+        projectDeployment:
+          $ref: "#/components/schemas/ProjectDeploymentReference"
+        workflow:
+          $ref: "#/components/schemas/WorkflowReference"
+        taskExecutions:
+          description: "The executions of the workflow's tasks."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/TaskExecution"

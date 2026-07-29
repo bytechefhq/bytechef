@@ -10,6 +10,8 @@ tags:
     description: "The Embedded App Event Trigger Public API"
   - name: "request-trigger"
     description: "The Embedded Request Trigger Public API"
+  - name: "workflow-execution"
+    description: "The Embedded Workflow Execution Public API"
 paths:
 #  /components:
 #    get:
@@ -511,6 +513,115 @@ paths:
 #          description: "Limit Exceeded"
 #        "500":
 #          description: "Internal Error"
+  /{externalUserId}/workflow-executions:
+    get:
+      description: "Get the page of workflow executions of the tenant. Execution input, output and task data\
+        \ are never included in list responses - fetch a single execution by id for the full detail."
+      summary: "Get workflow executions"
+      tags:
+        - "workflow-execution"
+      operationId: "getWorkflowExecutionsPage"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+        - name: "externalUserId"
+          description: "The external user id."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "status"
+          description: "The status of an execution."
+          in: "query"
+          required: false
+          schema:
+            $ref: "#/components/schemas/WorkflowExecutionStatus"
+        - name: "startDate"
+          description: "Return only executions that started at or after this instant."
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            format: "date-time"
+        - name: "endDate"
+          description: "Return only executions that started at or before this instant."
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            format: "date-time"
+        - name: "integrationInstanceConfigurationId"
+          description: "The id of an integration instance configuration."
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "pageNumber"
+          description: "The number of the page to return."
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            format: "int32"
+            default: 0
+      responses:
+        "200":
+          description: "The page of workflow executions."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Page"
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+  /{externalUserId}/workflow-executions/{id}:
+    get:
+      description: "Get a workflow execution by id, including its inputs, outputs, error and task executions."
+      summary: "Get a workflow execution by id"
+      tags:
+        - "workflow-execution"
+      operationId: "getWorkflowExecution"
+      parameters:
+        - name: "externalUserId"
+          description: "The external user id."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "id"
+          description: "The id of a workflow execution."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "The workflow execution object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkflowExecution"
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "500":
+          $ref: "#/components/responses/internalServerError"
 components:
   securitySchemes:
     bearerAuth:
@@ -603,6 +714,180 @@ components:
               errors:
                 $ref: "#/components/schemas/Errors"
   schemas:
+    Page:
+      description: "A page of a list of objects. It carries information about the position of the sublist\
+        \ inside the entire list."
+      type: "object"
+      properties:
+        number:
+          description: "The current page."
+          type: "integer"
+        size:
+          description: "The size of the page."
+          type: "integer"
+        numberOfElements:
+          description: "The number of elements."
+          type: "integer"
+        totalPages:
+          description: "The total number of pages."
+          type: "integer"
+        totalElements:
+          description: "The total number of elements."
+          type: "integer"
+        content:
+          description: "The list of elements."
+          type: "array"
+          items:
+            type: "object"
+    WorkflowExecutionStatus:
+      description: "The status of a workflow execution."
+      type: "string"
+      enum:
+        - "CREATED"
+        - "STARTED"
+        - "STOPPED"
+        - "FAILED"
+        - "COMPLETED"
+    ExecutionError:
+      description: "The error that terminated an execution."
+      type: "object"
+      properties:
+        message:
+          description: "The error message."
+          type: "string"
+        stackTrace:
+          description: "The error stack trace."
+          type: "array"
+          items:
+            type: "string"
+    IntegrationReference:
+      description: "The integration a workflow execution belongs to."
+      type: "object"
+      properties:
+        id:
+          description: "The id of an integration."
+          type: "integer"
+          format: "int64"
+        componentName:
+          description: "The name of the integration's component."
+          type: "string"
+    WorkflowReference:
+      description: "The workflow a workflow execution ran."
+      type: "object"
+      properties:
+        label:
+          description: "The label of a workflow."
+          type: "string"
+    TaskExecution:
+      description: "The execution of a single workflow task, including its input and output."
+      type: "object"
+      properties:
+        id:
+          description: "The id of a task execution."
+          type: "string"
+        name:
+          description: "The name of the executed workflow task."
+          type: "string"
+        title:
+          description: "The title of the executed workflow task."
+          type: "string"
+        type:
+          description: "The type of the executed workflow task."
+          type: "string"
+        status:
+          description: "The status of a task execution."
+          type: "string"
+          enum:
+            - "CREATED"
+            - "STARTED"
+            - "COMPLETED"
+            - "FAILED"
+            - "CANCELLED"
+        startDate:
+          description: "The instant a task execution started."
+          type: "string"
+          format: "date-time"
+        endDate:
+          description: "The instant a task execution ended."
+          type: "string"
+          format: "date-time"
+        error:
+          $ref: "#/components/schemas/ExecutionError"
+        input:
+          description: "The resolved input parameters of a task execution."
+          type: "object"
+          additionalProperties: true
+        output:
+          description: "The output of a task execution."
+    WorkflowExecutionBasic:
+      description: "A workflow execution list row. Never carries execution data - fetch the execution by id\
+        \ for inputs, outputs and task executions."
+      type: "object"
+      required:
+        - "id"
+      properties:
+        id:
+          description: "The id of a workflow execution."
+          type: "integer"
+          format: "int64"
+          readOnly: true
+        status:
+          $ref: "#/components/schemas/WorkflowExecutionStatus"
+        startDate:
+          description: "The instant an execution started."
+          type: "string"
+          format: "date-time"
+        endDate:
+          description: "The instant an execution ended. Null while the execution is running."
+          type: "string"
+          format: "date-time"
+        error:
+          $ref: "#/components/schemas/ExecutionError"
+        integration:
+          $ref: "#/components/schemas/IntegrationReference"
+        workflow:
+          $ref: "#/components/schemas/WorkflowReference"
+    WorkflowExecution:
+      description: "The full detail of a workflow execution, including inputs, outputs, error and task\
+        \ executions."
+      type: "object"
+      required:
+        - "id"
+      properties:
+        id:
+          description: "The id of a workflow execution."
+          type: "integer"
+          format: "int64"
+          readOnly: true
+        status:
+          $ref: "#/components/schemas/WorkflowExecutionStatus"
+        startDate:
+          description: "The instant an execution started."
+          type: "string"
+          format: "date-time"
+        endDate:
+          description: "The instant an execution ended. Null while the execution is running."
+          type: "string"
+          format: "date-time"
+        error:
+          $ref: "#/components/schemas/ExecutionError"
+        inputs:
+          description: "The inputs the execution ran with."
+          type: "object"
+          additionalProperties: true
+        outputs:
+          description: "The outputs the execution produced."
+          type: "object"
+          additionalProperties: true
+        integration:
+          $ref: "#/components/schemas/IntegrationReference"
+        workflow:
+          $ref: "#/components/schemas/WorkflowReference"
+        taskExecutions:
+          description: "The executions of the workflow's tasks."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/TaskExecution"
 #    Action:
 #      type: "object"
 #      required:

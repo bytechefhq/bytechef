@@ -34,6 +34,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigu
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
+import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.component.domain.ComponentDefinition;
@@ -75,7 +76,8 @@ public class IntegrationWorkflowExecutionFacadeTest {
         taskFileStorage = mock(TaskFileStorage.class);
 
         facade = new IntegrationWorkflowExecutionFacadeImpl(
-            componentDefinitionService, contextService, mock(EnvironmentService.class), evaluator,
+            componentDefinitionService, mock(ConnectedUserService.class), contextService,
+            mock(EnvironmentService.class), evaluator,
             mock(PrincipalJobService.class), mock(IntegrationInstanceConfigurationService.class),
             mock(IntegrationInstanceService.class), mock(IntegrationInstanceConfigurationWorkflowService.class),
             mock(IntegrationService.class), mock(IntegrationWorkflowFacade.class),
