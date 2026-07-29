@@ -100,7 +100,6 @@ class PersistedEnumOrdinalContractTest {
             AiObservabilityTraceStatus.ERROR);
     }
 
-
     @Test
     void testAiObservabilityAlertConditionOrdinalContract() {
         assertThat(AiObservabilityAlertCondition.values()).containsExactly(

@@ -151,8 +151,7 @@ public class ComponentIndexGenerator {
         boolean anyPropertyRequired = connectionDefinition.getProperties()
             .orElse(List.of())
             .stream()
-            .anyMatch(property -> property.getRequired()
-                .orElse(false));
+            .anyMatch(property -> Boolean.TRUE.equals(property.getRequired()));
 
         boolean authorizationRequired = connectionDefinition.getAuthorizationRequired()
             .orElse(true);

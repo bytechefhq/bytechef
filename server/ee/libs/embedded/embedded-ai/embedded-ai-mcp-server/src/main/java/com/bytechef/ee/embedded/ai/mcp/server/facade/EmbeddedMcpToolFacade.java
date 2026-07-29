@@ -11,6 +11,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
+import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.ConvertUtils;
@@ -56,6 +57,7 @@ import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
+import com.bytechef.platform.plan.provider.PlanLimitsProvider;
 import com.bytechef.platform.tool.execution.ToolExecutionEvent;
 import com.bytechef.platform.tool.execution.ToolExecutionKind;
 import com.bytechef.platform.tool.execution.ToolExecutionOutcome;
@@ -63,8 +65,14 @@ import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
 import com.bytechef.platform.tool.execution.ToolExecutionSurface;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
 import com.bytechef.platform.workflow.execution.JobExecutionErrors;
+import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
+import com.bytechef.platform.workflow.execution.token.ApprovalFormUrls;
+import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
+import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -77,6 +85,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.function.FunctionToolCallback;
+import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * Tool facade for the embedded MCP server. Handles both component-level tools (direct action execution) and integration
@@ -91,6 +100,9 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
 
     private static final Logger log = LoggerFactory.getLogger(EmbeddedMcpToolFacade.class);
 
+    private static final long RESUME_POLL_INTERVAL_MILLIS = 500;
+
+    private final ObjectProvider<ApprovalTokens> approvalTokensObjectProvider;
     private final ClusterElementDefinitionFacade clusterElementDefinitionFacade;
     private final ClusterElementDefinitionService clusterElementDefinitionService;
     private final ComponentDefinitionService componentDefinitionService;
@@ -101,11 +113,14 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
     private final IntegrationInstanceService integrationInstanceService;
     private final IntegrationService integrationService;
     private final JobCompletionAwaiter jobCompletionAwaiter;
+    private final JobResumeFacade jobResumeFacade;
+    private final JobService jobService;
     private final McpComponentService mcpComponentService;
     private final McpIntegrationInstanceToolService mcpIntegrationInstanceToolService;
     private final IntegrationInstanceWorkflowService integrationInstanceWorkflowService;
     private final McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService;
     private final McpServerService mcpServerService;
+    private final ObjectProvider<PlanLimitsProvider> planLimitsProviderObjectProvider;
     private final PrincipalJobFacade principalJobFacade;
     private final String publicUrl;
     private final TaskExecutionService taskExecutionService;
@@ -115,6 +130,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
 
     @SuppressFBWarnings("EI")
     public EmbeddedMcpToolFacade(
+        ObjectProvider<ApprovalTokens> approvalTokensObjectProvider,
         ClusterElementDefinitionFacade clusterElementDefinitionFacade,
         ClusterElementDefinitionService clusterElementDefinitionService,
         ComponentDefinitionService componentDefinitionService, ConnectedUserService connectedUserService,
@@ -122,16 +138,19 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         IntegrationInstanceService integrationInstanceService,
         IntegrationInstanceWorkflowService integrationInstanceWorkflowService, IntegrationService integrationService,
-        JobCompletionAwaiter jobCompletionAwaiter, JwtTokenService jwtTokenService,
+        JobCompletionAwaiter jobCompletionAwaiter, JobResumeFacade jobResumeFacade, JobService jobService,
+        JwtTokenService jwtTokenService,
         McpComponentService mcpComponentService,
         McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService,
         McpIntegrationInstanceToolService mcpIntegrationInstanceToolService,
-        McpServerService mcpServerService, PrincipalJobFacade principalJobFacade, String publicUrl,
+        McpServerService mcpServerService, ObjectProvider<PlanLimitsProvider> planLimitsProviderObjectProvider,
+        PrincipalJobFacade principalJobFacade, String publicUrl,
         TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage,
         ToolExecutionRecorder toolExecutionRecorder, WorkflowService workflowService) {
 
         super(evaluator);
 
+        this.approvalTokensObjectProvider = approvalTokensObjectProvider;
         this.clusterElementDefinitionFacade = clusterElementDefinitionFacade;
         this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.componentDefinitionService = componentDefinitionService;
@@ -142,17 +161,44 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
         this.integrationInstanceService = integrationInstanceService;
         this.integrationService = integrationService;
         this.jobCompletionAwaiter = jobCompletionAwaiter;
+        this.jobResumeFacade = jobResumeFacade;
+        this.jobService = jobService;
         this.mcpComponentService = mcpComponentService;
         this.integrationInstanceWorkflowService = integrationInstanceWorkflowService;
         this.mcpIntegrationInstanceToolService = mcpIntegrationInstanceToolService;
         this.mcpIntegrationInstanceConfigurationWorkflowService = mcpIntegrationInstanceConfigurationWorkflowService;
         this.mcpServerService = mcpServerService;
+        this.planLimitsProviderObjectProvider = planLimitsProviderObjectProvider;
         this.principalJobFacade = principalJobFacade;
         this.publicUrl = publicUrl;
         this.taskExecutionService = taskExecutionService;
         this.taskFileStorage = taskFileStorage;
         this.toolExecutionRecorder = toolExecutionRecorder;
         this.workflowService = workflowService;
+    }
+
+    /**
+     * Resolves the synchronous-run await timeout: the configured default, tightened to the tenant plan's
+     * {@code syncRunTimeout} when one is set. The plan can only tighten the limit, never extend it — mirroring the
+     * automation MCP and A2A sync surfaces.
+     */
+    private Duration resolveSyncTimeout() {
+        PlanLimitsProvider planLimitsProvider = planLimitsProviderObjectProvider.getIfAvailable();
+
+        if (planLimitsProvider == null) {
+            return JobCompletionAwaiter.DEFAULT_SYNC_TIMEOUT;
+        }
+
+        Duration planSyncRunTimeout = planLimitsProvider.getPlanLimits(TenantContext.getCurrentTenantId())
+            .syncRunTimeout();
+
+        if (planSyncRunTimeout == null ||
+            planSyncRunTimeout.compareTo(JobCompletionAwaiter.DEFAULT_SYNC_TIMEOUT) >= 0) {
+
+            return JobCompletionAwaiter.DEFAULT_SYNC_TIMEOUT;
+        }
+
+        return planSyncRunTimeout;
     }
 
     public @Nullable FunctionToolCallback<Map<String, Object>, Object> getFunctionToolCallback(
@@ -422,8 +468,14 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
             return toolExecutionRecorder.record(
                 eventBuilder.jobId(jobId),
                 () -> {
-                    Job job = jobCompletionAwaiter.await(jobId, JobCompletionAwaiter.DEFAULT_SYNC_TIMEOUT)
+                    Job job = jobCompletionAwaiter.await(jobId, resolveSyncTimeout())
                         .join();
+
+                    // A STOPPED run with a stored resume id is paused on a human approval, not finished — return a
+                    // clear pointer to the hosted form instead of an empty result (mirrors AutomationMcpToolFacade).
+                    if (job.getStatus() == Job.Status.STOPPED) {
+                        return describePendingApproval(job);
+                    }
 
                     JobExecutionErrors.checkForError(job, taskExecutionService);
 
@@ -435,6 +487,162 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
                         .orElseGet(() -> taskFileStorage.readJobOutputs(job.getOutputs()));
                 });
         };
+    }
+
+    private Map<String, Object> describePendingApproval(Job job) {
+        Object jobResumeId = job.getMetadata(MetadataConstants.JOB_RESUME_ID);
+
+        String jobResumeIdString = jobResumeId == null ? null : jobResumeId.toString();
+        ApprovalTokens approvalTokens = approvalTokensObjectProvider.getIfAvailable();
+
+        String formUrl = ApprovalFormUrls
+            .buildFormUrl(publicUrl, jobResumeIdString, approvalTokens)
+            .orElse(null);
+
+        Map<String, Object> result = new HashMap<>();
+
+        result.put("status", "approval_required");
+        result.put(
+            "message",
+            formUrl == null
+                ? "Approval required — the workflow run is paused waiting for a human decision."
+                : "Approval required — the workflow run is paused waiting for a human decision. " +
+                    "Resolve it at: " + formUrl);
+
+        if (formUrl != null) {
+            result.put("formUrl", formUrl);
+        }
+
+        // Carried independently of formUrl so form-mode elicitation works without a configured public URL — the hosted
+        // form needs a public URL, an inline approval decision only needs the token.
+        ApprovalFormUrls.buildResumeToken(jobResumeIdString, approvalTokens)
+            .ifPresent(resumeToken -> result.put("resumeToken", resumeToken));
+
+        if (job.getId() != null) {
+            result.put("jobId", job.getId());
+        }
+
+        return result;
+    }
+
+    /**
+     * Returns the server-authoritative hosted approval-form URL for a run genuinely paused on a human approval (STOPPED
+     * with a stored resume id), or empty otherwise. The MCP elicitation decorator uses this instead of trusting a
+     * {@code formUrl} echoed in tool-output text (a workflow could craft an {@code approval_required} descriptor as its
+     * output and point the reviewer at an attacker URL). Resolved under the current tenant, so it only ever names this
+     * tenant's own runs.
+     */
+    public Optional<String> resolvePendingApprovalFormUrl(long jobId) {
+        Job job = jobService.fetchJob(jobId)
+            .orElse(null);
+
+        if (job == null || job.getStatus() != Job.Status.STOPPED) {
+            return Optional.empty();
+        }
+
+        Object jobResumeId = job.getMetadata(MetadataConstants.JOB_RESUME_ID);
+
+        if (jobResumeId == null) {
+            return Optional.empty();
+        }
+
+        return ApprovalFormUrls.buildFormUrl(
+            publicUrl, jobResumeId.toString(), approvalTokensObjectProvider.getIfAvailable());
+    }
+
+    /**
+     * Returns the server-authoritative signed resume token for a run genuinely paused on a human approval (STOPPED with
+     * a stored resume id), or empty otherwise. Re-derived from the run's OWN state — like
+     * {@link #resolvePendingApprovalFormUrl} — and available even when no public URL is configured so form-mode
+     * elicitation still functions.
+     */
+    public Optional<String> resolvePendingApprovalResumeToken(long jobId) {
+        Job job = jobService.fetchJob(jobId)
+            .orElse(null);
+
+        if (job == null || job.getStatus() != Job.Status.STOPPED) {
+            return Optional.empty();
+        }
+
+        Object jobResumeId = job.getMetadata(MetadataConstants.JOB_RESUME_ID);
+
+        if (jobResumeId == null) {
+            return Optional.empty();
+        }
+
+        return ApprovalFormUrls.buildResumeToken(
+            jobResumeId.toString(), approvalTokensObjectProvider.getIfAvailable());
+    }
+
+    /**
+     * Re-awaits a workflow run whose initial synchronous wait ended on a pending approval, after the human has been
+     * pointed at the hosted form (via MCP URL elicitation). The completion awaiter treats STOPPED as terminal — so a
+     * plain await would hand back the still-paused job the instant a client acknowledges the elicitation. Instead this
+     * polls until the job leaves STOPPED (the resume flips it to STARTED) or the sync deadline passes, then awaits real
+     * completion. Returns the run's outputs on completion, a fresh pending-approval descriptor if still (or again)
+     * paused, or throws on a failed run — mirroring the initial call's semantics.
+     */
+    public @Nullable Object awaitApprovedWorkflowRun(long jobId) {
+        Instant deadline = Instant.now()
+            .plus(resolveSyncTimeout());
+
+        Job job = jobService.getJob(jobId);
+
+        while (job.getStatus() == Job.Status.STOPPED && Instant.now()
+            .isBefore(deadline)) {
+
+            try {
+                Thread.sleep(RESUME_POLL_INTERVAL_MILLIS);
+            } catch (InterruptedException interruptedException) {
+                Thread.currentThread()
+                    .interrupt();
+
+                break;
+            }
+
+            job = jobService.getJob(jobId);
+        }
+
+        if (job.getStatus() == Job.Status.STOPPED) {
+            return describePendingApproval(job);
+        }
+
+        Duration remaining = Duration.between(Instant.now(), deadline);
+
+        job = jobCompletionAwaiter.await(jobId, remaining.isNegative() ? Duration.ofSeconds(1) : remaining)
+            .join();
+
+        if (job.getStatus() == Job.Status.STOPPED) {
+            return describePendingApproval(job);
+        }
+
+        Job completedJob = job;
+
+        JobExecutionErrors.checkForError(completedJob, taskExecutionService);
+
+        if (completedJob.getOutputs() == null) {
+            return null;
+        }
+
+        return getCallableResponseOutput(completedJob)
+            .orElseGet(() -> taskFileStorage.readJobOutputs(completedJob.getOutputs()));
+    }
+
+    /**
+     * Resolves a pending approval directly with the decision collected through MCP FORM elicitation (approved +
+     * optional comment) and then awaits the resumed run. A resume that is no longer possible (already resolved,
+     * expired, or an invalid token) returns an {@code approval_unavailable} descriptor instead of throwing.
+     */
+    public @Nullable Object resolveApprovalAndAwait(String resumeToken, Map<String, Object> data, long jobId) {
+        JobResumeFacade.JobResumeOutcome outcome = jobResumeFacade.resumeJob(resumeToken, data);
+
+        if (outcome != JobResumeFacade.JobResumeOutcome.OK) {
+            return Map.of(
+                "status", "approval_unavailable",
+                "message", "The approval could no longer be resolved (" + outcome + ").");
+        }
+
+        return awaitApprovedWorkflowRun(jobId);
     }
 
     private boolean isToolEnabled(long integrationInstanceId, long mcpToolId) {

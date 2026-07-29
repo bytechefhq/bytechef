@@ -294,8 +294,13 @@ public final class GuestComponentBridge {
             .ifPresent(description -> propertyMap.put("description", description));
         property.getDisplayCondition()
             .ifPresent(displayCondition -> propertyMap.put("displayCondition", displayCondition));
-        property.getRequired()
-            .ifPresent(required -> propertyMap.put("required", required));
+
+        Boolean required = property.getRequired();
+
+        if (required != null) {
+            propertyMap.put("required", required);
+        }
+
         property.getAdvancedOption()
             .ifPresent(advancedOption -> propertyMap.put("advancedOption", advancedOption));
         property.getHidden()

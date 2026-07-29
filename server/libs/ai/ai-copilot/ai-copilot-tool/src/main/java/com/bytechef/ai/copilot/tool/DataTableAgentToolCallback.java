@@ -33,8 +33,7 @@ import org.springframework.ai.tool.definition.ToolDefinition;
 import tools.jackson.core.JacksonException;
 
 /**
- * Hand-rolled Spring AI {@link ToolCallback} that exposes the Data Table Copilot subagent to the parent ai_hub
- * agent.
+ * Hand-rolled Spring AI {@link ToolCallback} that exposes the Data Table Copilot subagent to the parent ai_hub agent.
  *
  * @author Ivica Cardic
  */

@@ -12,6 +12,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoInteractions;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
@@ -33,9 +34,11 @@ import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
+import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * @version ee
@@ -51,16 +54,17 @@ class EmbeddedMcpToolFacadeEnabledTest {
     @Test
     void testGetFunctionToolCallbackReturnsNullWhenToolDisabled() {
         EmbeddedMcpToolFacade facade = new EmbeddedMcpToolFacade(
-            mock(ClusterElementDefinitionFacade.class), clusterElementDefinitionService,
+            mock(ObjectProvider.class), mock(ClusterElementDefinitionFacade.class), clusterElementDefinitionService,
             mock(ComponentDefinitionService.class), mock(ConnectedUserService.class), mock(Evaluator.class),
             mock(IntegrationInstanceConfigurationService.class),
             mock(IntegrationInstanceConfigurationWorkflowService.class), mock(IntegrationInstanceService.class),
             mock(IntegrationInstanceWorkflowService.class), mock(IntegrationService.class),
-            mock(JobCompletionAwaiter.class), mock(JwtTokenService.class), mcpComponentService,
+            mock(JobCompletionAwaiter.class), mock(JobResumeFacade.class), mock(JobService.class),
+            mock(JwtTokenService.class), mcpComponentService,
             mock(McpIntegrationInstanceConfigurationWorkflowService.class), mcpIntegrationInstanceToolService,
-            mock(McpServerService.class), mock(PrincipalJobFacade.class), "http://localhost:9555",
-            mock(TaskExecutionService.class), mock(TaskFileStorage.class), mock(ToolExecutionRecorder.class),
-            mock(WorkflowService.class));
+            mock(McpServerService.class), mock(ObjectProvider.class), mock(PrincipalJobFacade.class),
+            "http://localhost:9555", mock(TaskExecutionService.class), mock(TaskFileStorage.class),
+            mock(ToolExecutionRecorder.class), mock(WorkflowService.class));
 
         McpTool disabledTool = new McpTool("disabled-tool", Map.of(), 10L);
 

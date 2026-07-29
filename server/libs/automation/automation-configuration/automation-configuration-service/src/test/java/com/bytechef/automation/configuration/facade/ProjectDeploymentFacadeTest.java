@@ -61,11 +61,11 @@ class ProjectDeploymentFacadeTest {
 
         projectDeployment.setTagIds(List.of(20L, 21L));
 
-        when(projectDeploymentService.getProjectDeployments())
+        when(projectDeploymentService.getProjectDeployments(null, null, null, null, 1L))
             .thenReturn(List.of(projectDeployment));
         when(tagService.getTags(List.of(20L, 21L))).thenReturn(List.of(new Tag("x"), new Tag("y")));
 
-        List<Tag> tags = projectDeploymentFacade.getProjectDeploymentTags();
+        List<Tag> tags = projectDeploymentFacade.getProjectDeploymentTags(1L);
 
         assertThat(tags).hasSize(2);
     }

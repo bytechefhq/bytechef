@@ -37,6 +37,12 @@ public interface ApprovalChannelFunction {
         new ClusterElementType("APPROVAL_CHANNELS", "approvalChannels", "Channels", true, false);
 
     /**
+     * Key under which the calling approval action publishes the request's expiry as an ISO-8601 instant string, so a
+     * channel can tell the approver when the request lapses. Absent when the caller has no expiry.
+     */
+    String EXPIRES_AT = "expiresAt";
+
+    /**
      * Key under which the calling approval action publishes the form description.
      */
     String FORM_DESCRIPTION = "formDescription";
@@ -56,9 +62,15 @@ public interface ApprovalChannelFunction {
     /**
      * Delivers the approval request through this channel and returns the channel-specific result.
      *
+     * <p>
+     * {@code formUrl} is always <b>non-null and non-blank</b>: both callers (the Approval action and the tool gate)
+     * resolve the hosted-form URL and throw {@link IllegalStateException} before invoking any channel when it cannot be
+     * built (e.g. no public URL configured). Channels may therefore use it directly; any "no public URL" fallback
+     * branch is defensive dead code, not a supported path.
+     *
      * @param inputParameters      the input parameters configured for the channel
      * @param connectionParameters the connection parameters
-     * @param formUrl              the URL of the approval form the user opens to respond
+     * @param formUrl              the non-null URL of the approval form the user opens to respond
      * @param context              the cluster element execution context
      * @return the result of delivering the approval request
      * @throws Exception if the request cannot be delivered

@@ -17,6 +17,10 @@
 package com.bytechef.component.approval.action;
 
 import static com.bytechef.component.approval.constant.ApprovalConstants.DEFAULT_VALUE;
+import static com.bytechef.component.approval.constant.ApprovalConstants.EXPIRES_IN;
+import static com.bytechef.component.approval.constant.ApprovalConstants.EXPIRES_IN_UNIT;
+import static com.bytechef.component.approval.constant.ApprovalConstants.EXPIRES_IN_UNIT_DAYS;
+import static com.bytechef.component.approval.constant.ApprovalConstants.EXPIRES_IN_UNIT_HOURS;
 import static com.bytechef.component.approval.constant.ApprovalConstants.FIELD_DESCRIPTION;
 import static com.bytechef.component.approval.constant.ApprovalConstants.FIELD_LABEL;
 import static com.bytechef.component.approval.constant.ApprovalConstants.FIELD_NAME;
@@ -54,11 +58,13 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Property.ControlType.TEXT_AREA;
 import static com.bytechef.component.definition.approval.ApprovalChannelFunction.APPROVAL_CHANNELS;
+import static com.bytechef.component.definition.approval.ApprovalChannelFunction.EXPIRES_AT;
 import static com.bytechef.component.definition.approval.ApprovalChannelFunction.FORM_DESCRIPTION;
 import static com.bytechef.component.definition.approval.ApprovalChannelFunction.FORM_TITLE;
 import static com.bytechef.component.definition.approval.ApprovalChannelFunction.INPUTS;
 
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.component.approval.cluster.ChatApprovalChannel;
 import com.bytechef.component.approval.util.FieldType;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionContext.Suspend;
@@ -71,6 +77,7 @@ import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
+import com.bytechef.platform.component.definition.SuspendAwareSseEmitterHandler;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
@@ -80,11 +87,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Ivica Cardic
  */
 public class ApprovalRequestApprovalAction {
+
+    private static final Logger log = LoggerFactory.getLogger(ApprovalRequestApprovalAction.class);
 
     private static final String FORM_URL = "formUrl";
 
@@ -211,6 +222,21 @@ public class ApprovalRequestApprovalAction {
                                     .description("Whether this field is required.")
                                     .defaultValue(false)
                                     .required(false)))
+                    .required(false),
+                integer(EXPIRES_IN)
+                    .label("Expires In")
+                    .description(
+                        "How long the approval request stays resolvable. When it lapses, the request can no longer " +
+                            "be approved and the paused run is failed. Defaults to 60 days.")
+                    .minValue(1)
+                    .required(false),
+                string(EXPIRES_IN_UNIT)
+                    .label("Expires In Unit")
+                    .description("The time unit for the Expires In value.")
+                    .options(
+                        option("Hours", EXPIRES_IN_UNIT_HOURS),
+                        option("Days", EXPIRES_IN_UNIT_DAYS))
+                    .defaultValue(EXPIRES_IN_UNIT_DAYS)
                     .required(false))
             .output(ApprovalRequestApprovalAction::output)
             .perform((MultipleConnectionsPerformFunction) approvalRequestApprovalAction::perform)
@@ -225,6 +251,13 @@ public class ApprovalRequestApprovalAction {
         List<ModifiableValueProperty<?, ?>> properties = new ArrayList<>();
 
         properties.add(bool("approved"));
+        // The reviewer's optional note, valid on BOTH outcomes (approve-with-comment and reject-with-comment alike).
+        // "comment" is a reserved key on the approval form; a user-defined field with that name takes precedence and
+        // suppresses the built-in comment box.
+        properties.add(string("comment"));
+        // The verified identity of whoever resolved the approval, when the resolving channel could establish one
+        // (e.g. Slack in-place resolution). Absent for the anonymous hosted form, which has no trusted identity.
+        properties.add(string("approvedBy"));
 
         for (Map<String, ?> input : inputs) {
             String fieldName = (String) input.get(FIELD_NAME);
@@ -275,31 +308,134 @@ public class ApprovalRequestApprovalAction {
 
         String formUrl = resumeUrl.replace("/job/resume/", "/resume/");
 
-        if (!actionContextAware.isEditorEnvironment()) {
+        Instant expiresAt = getExpiresAt(inputParameters);
+
+        if (actionContextAware.isEditorEnvironment()) {
+            // Editor test runs skip channels (they are production transports), but the canvas test run listens on
+            // the job's SSE stream. Deliver the same approval card event the chat channel would send by returning a
+            // one-shot SSE emitter output: the in-process post-output processor drains it into the test-run stream
+            // bridges. The suspend must happen inside the emitter handler — suspending before returning would make
+            // the service layer replace the emitter output with the Suspend and the card would never be sent.
+            if (actionContextAware.getJobId() != null) {
+                return createEditorApprovalRequestEmitterHandler(inputParameters, formUrl, expiresAt,
+                    actionContextAware);
+            }
+        } else {
             ClusterElementMap clusterElementMap = ClusterElementMap.of(extensions);
 
             List<ClusterElement> approvalChannels = clusterElementMap.getClusterElements(APPROVAL_CHANNELS);
 
-            for (ClusterElement approvalChannel : approvalChannels) {
-                ComponentConnection componentConnection = componentConnections.get(
-                    approvalChannel.getWorkflowNodeName());
+            deliverToChannels(
+                approvalChannels, inputParameters, componentConnections, formUrl, expiresAt, actionContextAware);
+        }
 
-                Map<String, Object> channelInputParameters = MapUtils.concat(
-                    new HashMap<>(inputParameters.toMap()), new HashMap<>(approvalChannel.getParameters()));
+        suspend(context, formUrl, expiresAt);
 
+        return null;
+    }
+
+    /**
+     * Delivers the approval request to every configured channel, best-effort: a channel whose send fails is logged and
+     * skipped so the remaining channels (and the suspend itself) still happen — a deleted Slack channel must not
+     * prevent the email fallback from delivering, and a delivery failure must pause the run rather than fail it. Only
+     * when EVERY configured channel fails is the action failed, because then nobody was notified and pausing would be
+     * the silent no-op the fallback advice exists to prevent. Channels additionally receive the computed expiry under
+     * the well-known {@code expiresAt} key (ISO-8601) so messages can tell the approver when the request lapses.
+     */
+    private void deliverToChannels(
+        List<ClusterElement> approvalChannels, Parameters inputParameters,
+        Map<String, ComponentConnection> componentConnections, String formUrl, Instant expiresAt,
+        ActionContextAware actionContextAware) {
+
+        if (approvalChannels.isEmpty()) {
+            return;
+        }
+
+        int deliveredCount = 0;
+        Exception lastException = null;
+
+        for (ClusterElement approvalChannel : approvalChannels) {
+            ComponentConnection componentConnection = componentConnections.get(
+                approvalChannel.getWorkflowNodeName());
+
+            Map<String, Object> channelInputParameters = MapUtils.concat(
+                new HashMap<>(inputParameters.toMap()), new HashMap<>(approvalChannel.getParameters()));
+
+            channelInputParameters.put(EXPIRES_AT, expiresAt.toString());
+
+            try {
                 clusterElementDefinitionService.executeApprovalChannel(
                     approvalChannel.getComponentName(), approvalChannel.getComponentVersion(),
                     approvalChannel.getClusterElementName(), channelInputParameters, formUrl, componentConnection,
                     actionContextAware);
+
+                deliveredCount++;
+            } catch (Exception exception) {
+                lastException = exception;
+
+                log.warn(
+                    "Approval channel {}/{} failed to deliver the approval request: {}",
+                    approvalChannel.getComponentName(), approvalChannel.getClusterElementName(),
+                    exception.getMessage());
             }
         }
 
-        Instant expiresAt = Instant.now()
-            .plus(60, ChronoUnit.DAYS);
+        if (deliveredCount == 0) {
+            throw new IllegalStateException(
+                "None of the " + approvalChannels.size() + " configured approval channels could deliver the " +
+                    "approval request.",
+                lastException);
+        }
+    }
 
+    private static void suspend(ActionContext context, String formUrl, Instant expiresAt) {
         context.suspend(new Suspend(Map.of(FORM_URL, formUrl), expiresAt));
+    }
 
-        return null;
+    /**
+     * Resolves the suspend expiry from the optional Expires In / Expires In Unit properties; an unset or invalid value
+     * falls back to the 60-day default.
+     */
+    private static Instant getExpiresAt(Parameters inputParameters) {
+        Integer expiresIn = inputParameters.getInteger(EXPIRES_IN);
+
+        if (expiresIn == null || expiresIn < 1) {
+            return Instant.now()
+                .plus(60, ChronoUnit.DAYS);
+        }
+
+        String expiresInUnit = inputParameters.getString(EXPIRES_IN_UNIT, EXPIRES_IN_UNIT_DAYS);
+
+        ChronoUnit chronoUnit = EXPIRES_IN_UNIT_HOURS.equals(expiresInUnit) ? ChronoUnit.HOURS : ChronoUnit.DAYS;
+
+        return Instant.now()
+            .plus(expiresIn, chronoUnit);
+    }
+
+    /**
+     * Builds the editor-run delivery for the approval card: a {@link SuspendAwareSseEmitterHandler} that sends the
+     * {@code approval_request} data event onto the run's SSE stream, suspends the run, and completes. The wrapper
+     * carries the action context so the post-output processor can observe the suspend once the stream is drained — the
+     * same mechanism the AI agent's streaming action uses for mid-stream suspends.
+     */
+    private static SuspendAwareSseEmitterHandler createEditorApprovalRequestEmitterHandler(
+        Parameters inputParameters, String formUrl, Instant expiresAt, ActionContextAware actionContextAware) {
+
+        Map<String, Object> eventData = ChatApprovalChannel.buildApprovalRequestEventData(inputParameters, formUrl);
+
+        // The builder reads the expiry from the channel input parameters, which only the production fan-out
+        // populates — the editor event gets it from the action's own computed value instead.
+        eventData.put(EXPIRES_AT, expiresAt.toString());
+
+        return new SuspendAwareSseEmitterHandler(
+            sseEmitter -> {
+                sseEmitter.send(eventData);
+
+                suspend(actionContextAware, formUrl, expiresAt);
+
+                sseEmitter.complete();
+            },
+            actionContextAware);
     }
 
     @SuppressWarnings("PMD.UnusedFormalParameter")

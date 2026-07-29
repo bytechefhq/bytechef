@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.ai.mcp.server.config;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.CollectionUtils;
@@ -39,12 +40,15 @@ import com.bytechef.platform.mcp.server.McpToolAuthorizationEvaluator;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpToolService;
+import com.bytechef.platform.plan.provider.PlanLimitsProvider;
 import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.security.web.config.SecurityConfigurerContributor;
 import com.bytechef.platform.security.web.mcp.oauth2.McpJwtDecoderFactory;
 import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
+import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
+import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import com.bytechef.tenant.domain.TenantKey;
 import io.modelcontextprotocol.common.McpTransportContext;
 import io.modelcontextprotocol.server.McpServerFeatures;
@@ -110,7 +114,7 @@ public class EmbeddedMcpServerConfiguration {
 
     @Bean
     EmbeddedMcpToolFacade embeddedMcpToolFacade(
-        ApplicationProperties applicationProperties,
+        ApplicationProperties applicationProperties, ObjectProvider<ApprovalTokens> approvalTokensObjectProvider,
         ClusterElementDefinitionFacade clusterElementDefinitionFacade,
         ClusterElementDefinitionService clusterElementDefinitionService,
         ComponentDefinitionService componentDefinitionService, ConnectedUserService connectedUserService,
@@ -119,21 +123,25 @@ public class EmbeddedMcpServerConfiguration {
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         IntegrationInstanceService integrationInstanceService,
         IntegrationInstanceWorkflowService integrationInstanceWorkflowService, IntegrationService integrationService,
-        JobCompletionAwaiter jobCompletionAwaiter, JwtTokenService jwtTokenService,
-        McpComponentService mcpComponentService,
+        JobCompletionAwaiter jobCompletionAwaiter, JobResumeFacade jobResumeFacade, JobService jobService,
+        JwtTokenService jwtTokenService, McpComponentService mcpComponentService,
         McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService,
         McpIntegrationInstanceToolService mcpIntegrationInstanceToolService, McpServerService mcpServerService,
-        PrincipalJobFacade principalJobFacade, TaskExecutionService taskExecutionService,
-        ToolExecutionRecorder toolExecutionRecorder, WorkflowService workflowService) {
+        ObjectProvider<PlanLimitsProvider> planLimitsProviderObjectProvider, PrincipalJobFacade principalJobFacade,
+        TaskExecutionService taskExecutionService, ToolExecutionRecorder toolExecutionRecorder,
+        WorkflowService workflowService) {
 
         return new EmbeddedMcpToolFacade(
-            clusterElementDefinitionFacade, clusterElementDefinitionService, componentDefinitionService,
+            approvalTokensObjectProvider, clusterElementDefinitionFacade, clusterElementDefinitionService,
+            componentDefinitionService,
             connectedUserService, evaluator, integrationInstanceConfigurationService,
             integrationInstanceConfigurationWorkflowService, integrationInstanceService,
-            integrationInstanceWorkflowService, integrationService, jobCompletionAwaiter, jwtTokenService,
-            mcpComponentService, mcpIntegrationInstanceConfigurationWorkflowService, mcpIntegrationInstanceToolService,
-            mcpServerService, principalJobFacade, applicationProperties.getPublicUrl(), taskExecutionService,
-            durableTaskFileStorage, toolExecutionRecorder, workflowService);
+            integrationInstanceWorkflowService, integrationService, jobCompletionAwaiter, jobResumeFacade, jobService,
+            jwtTokenService, mcpComponentService, mcpIntegrationInstanceConfigurationWorkflowService,
+            mcpIntegrationInstanceToolService,
+            mcpServerService, planLimitsProviderObjectProvider, principalJobFacade,
+            applicationProperties.getPublicUrl(), taskExecutionService, durableTaskFileStorage, toolExecutionRecorder,
+            workflowService);
     }
 
     @Bean
@@ -182,6 +190,9 @@ public class EmbeddedMcpServerConfiguration {
                             }
                         });
 
+                // Workflow-backed tools run synchronously and can pause on a human approval — decorate them with
+                // elicitation so capable clients get pointed at the hosted approval form and receive the resumed run's
+                // real output in the same tools/call (mirrors the automation MCP server).
                 mcpIntegrationInstanceConfigurationService
                     .getMcpServerMcpIntegrationInstanceConfigurations(mcpServer.getId())
                     .stream()
@@ -189,6 +200,8 @@ public class EmbeddedMcpServerConfiguration {
                         embeddedMcpToolFacade.getFunctionToolCallbacks(
                             mcpIntegrationInstanceConfiguration, externalUserId, environment, tenantId)))
                     .map(McpToolUtils::toAsyncToolSpecification)
+                    .map(toolSpecification -> EmbeddedApprovalElicitingToolSpecifications.decorate(
+                        toolSpecification, embeddedMcpToolFacade))
                     .forEach(toolSpecifications::add);
 
                 return toolSpecifications;

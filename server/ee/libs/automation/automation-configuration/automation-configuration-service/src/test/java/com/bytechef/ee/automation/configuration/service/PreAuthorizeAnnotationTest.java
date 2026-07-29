@@ -186,6 +186,7 @@ class PreAuthorizeAnnotationTest {
             CustomRoleService.class.getMethod("getCustomRoles"),
             "isTenantAdmin()");
     }
+
     private void assertPreAuthorize(Method interfaceMethod, String expectedExpression) {
         // The annotation lives on the implementation, not the interface, so resolve through the impl class. We
         // accept any class in the same package whose name follows the conventional ServiceImpl pattern.

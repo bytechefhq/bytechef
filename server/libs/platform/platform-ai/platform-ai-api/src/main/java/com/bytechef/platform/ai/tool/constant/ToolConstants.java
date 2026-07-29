@@ -21,6 +21,27 @@ package com.bytechef.platform.ai.tool.constant;
  */
 public class ToolConstants {
 
+    /**
+     * Optional integer parameter on a gated TOOLS cluster-element entry: how long a raised approval request stays
+     * resolvable before it expires. Unset falls back to the 60-day default. Interpreted together with
+     * {@link #APPROVAL_EXPIRES_IN_UNIT}.
+     */
+    public static final String APPROVAL_EXPIRES_IN = "approvalExpiresIn";
+
+    /**
+     * Optional time unit for {@link #APPROVAL_EXPIRES_IN}: {@link #APPROVAL_EXPIRES_IN_UNIT_HOURS} or days (the default
+     * when unset).
+     */
+    public static final String APPROVAL_EXPIRES_IN_UNIT = "approvalExpiresInUnit";
+
+    public static final String APPROVAL_EXPIRES_IN_UNIT_HOURS = "HOURS";
+
+    /**
+     * Boolean parameter on a TOOLS cluster-element entry marking it for the platform-enforced approval gate: every
+     * invocation raises a human-approval request and suspends instead of executing (HITL phase 3).
+     */
+    public static final String REQUIRES_APPROVAL = "requiresApproval";
+
     public static final String TOOL_DESCRIPTION = "toolDescription";
     public static final String TOOL_NAME = "toolName";
 

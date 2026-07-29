@@ -55,7 +55,7 @@ public final class WorkflowPersistCaptureUtils {
      * Renders an authoritative, unambiguously-labeled id trailer for the most recently persisted workflow, or
      * {@code null} when the subagent persisted nothing (e.g. an analysis-only reply) or an id is missing. The parent
      * agent is instructed to use these exact values, so a transposed or hallucinated {@code projectWorkflowId} can no
-     * longer reach {@code openWorkflowTab}.
+     * longer reach {@code openResourceTab}.
      */
     @SuppressFBWarnings(
         value = "VA_FORMAT_STRING_USES_NEWLINE",

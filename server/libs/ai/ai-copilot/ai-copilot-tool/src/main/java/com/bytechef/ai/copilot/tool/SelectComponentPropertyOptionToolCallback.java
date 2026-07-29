@@ -39,10 +39,10 @@ import tools.jackson.core.JacksonException;
 
 /**
  * Unified variant of {@link SelectPropertyOptionToolCallback} / {@link SelectTriggerPropertyOptionToolCallback} for
- * agents that want ONE pinned picker tool for both operation kinds: a {@code kind} input (ACTION | TRIGGER) selects
- * the resolution path. The tool name stays {@code selectPropertyOption} and the emitted
- * {@code select-property-option} marker is unchanged, so the chat client's picker rendering works without changes.
- * The per-kind twins remain for surfaces that keep them registered.
+ * agents that want ONE pinned picker tool for both operation kinds: a {@code kind} input (ACTION | TRIGGER) selects the
+ * resolution path. The tool name stays {@code selectPropertyOption} and the emitted {@code select-property-option}
+ * marker is unchanged, so the chat client's picker rendering works without changes. The per-kind twins remain for
+ * surfaces that keep them registered.
  *
  * @author Ivica Cardic
  */

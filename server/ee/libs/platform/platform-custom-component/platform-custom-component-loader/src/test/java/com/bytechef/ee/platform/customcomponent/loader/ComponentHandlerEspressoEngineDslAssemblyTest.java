@@ -118,8 +118,7 @@ class ComponentHandlerEspressoEngineDslAssemblyTest {
 
         assertEquals("Name", nameProperty.getLabel()
             .orElse(null));
-        assertEquals(Boolean.TRUE, nameProperty.getRequired()
-            .orElse(null));
+        assertEquals(Boolean.TRUE, nameProperty.getRequired());
         assertEquals(100, nameProperty.getMaxLength()
             .orElse(null));
 

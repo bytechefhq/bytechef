@@ -28,11 +28,25 @@ public class NotificationHandlerContext {
         public NotificationHandlerContext build() {
             NotificationHandlerContext notificationHandlerContext = new NotificationHandlerContext();
 
+            notificationHandlerContext.approvalExpiresAt = approvalExpiresAt;
+            notificationHandlerContext.approvalFormUrl = approvalFormUrl;
             notificationHandlerContext.eventType = eventType;
             notificationHandlerContext.jobId = jobId;
             notificationHandlerContext.jobName = jobName;
 
             return notificationHandlerContext;
+        }
+
+        public Builder approvalExpiresAt(String approvalExpiresAt) {
+            this.approvalExpiresAt = approvalExpiresAt;
+
+            return this;
+        }
+
+        public Builder approvalFormUrl(String approvalFormUrl) {
+            this.approvalFormUrl = approvalFormUrl;
+
+            return this;
         }
 
         public Builder eventType(NotificationEvent.Type eventType) {
@@ -53,9 +67,26 @@ public class NotificationHandlerContext {
             return this;
         }
 
+        private String approvalExpiresAt;
+        private String approvalFormUrl;
         private NotificationEvent.Type eventType;
         private Long jobId;
         private String jobName;
+    }
+
+    /**
+     * ISO-8601 instant at which the pending approval expires; set only for approval-related event types.
+     */
+    public String getApprovalExpiresAt() {
+        return approvalExpiresAt;
+    }
+
+    /**
+     * Hosted approval form URL for the pending approval; set only for approval-related event types when a public URL is
+     * configured.
+     */
+    public String getApprovalFormUrl() {
+        return approvalFormUrl;
     }
 
     public NotificationEvent.Type getEventType() {
@@ -74,6 +105,8 @@ public class NotificationHandlerContext {
 
     }
 
+    private String approvalExpiresAt;
+    private String approvalFormUrl;
     private NotificationEvent.Type eventType;
     private Long jobId;
     private String jobName;

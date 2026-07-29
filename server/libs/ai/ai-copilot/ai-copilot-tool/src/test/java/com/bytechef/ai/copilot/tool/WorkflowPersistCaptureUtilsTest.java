@@ -76,7 +76,7 @@ class WorkflowPersistCaptureUtilsTest {
 
         assertThat(trailer)
             .isNotNull()
-            .contains("openWorkflowTab")
+            .contains("openResourceTab")
             .contains("workflowId=\"wf-uuid-1\"")
             .contains("projectId=7")
             .contains("projectWorkflowId=55")

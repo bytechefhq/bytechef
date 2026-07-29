@@ -10,6 +10,8 @@ package com.bytechef.ee.automation.ai.gateway.facade;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.automation.ai.gateway.budget.AiGatewayBudgetChecker;
 import com.bytechef.ee.automation.ai.gateway.evaluation.AiEvalExecutor;
+import com.bytechef.ee.automation.ai.gateway.guardrail.AiGatewayGuardrails;
+import com.bytechef.ee.automation.ai.gateway.guardrail.StreamingResponseRedactor;
 import com.bytechef.ee.automation.ai.gateway.ratelimit.AiGatewayRateLimitChecker;
 import com.bytechef.ee.automation.ai.gateway.service.AiGatewayWorkspaceSettingsService;
 import com.bytechef.ee.automation.ai.gateway.service.WorkspaceAiGatewayProjectService;
@@ -163,6 +165,7 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
     private final AiGatewayChatModelFactory aiGatewayChatModelFactory;
     private final AiGatewayContextCompressor aiGatewayContextCompressor;
     private final AiGatewayCostCalculator aiGatewayCostCalculator;
+    private final AiGatewayGuardrails aiGatewayGuardrails;
     private final AiGatewayEmbeddingModelFactory aiGatewayEmbeddingModelFactory;
     private final AiGatewayModelDeploymentService aiGatewayModelDeploymentService;
     private final AiGatewayModelService aiGatewayModelService;
@@ -198,6 +201,7 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
         AiGatewayChatModelFactory aiGatewayChatModelFactory,
         AiGatewayContextCompressor aiGatewayContextCompressor,
         AiGatewayCostCalculator aiGatewayCostCalculator,
+        AiGatewayGuardrails aiGatewayGuardrails,
         AiGatewayEmbeddingModelFactory aiGatewayEmbeddingModelFactory,
         AiGatewayModelDeploymentService aiGatewayModelDeploymentService,
         AiGatewayModelService aiGatewayModelService,
@@ -229,6 +233,7 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
         this.aiGatewayChatModelFactory = aiGatewayChatModelFactory;
         this.aiGatewayContextCompressor = aiGatewayContextCompressor;
         this.aiGatewayCostCalculator = aiGatewayCostCalculator;
+        this.aiGatewayGuardrails = aiGatewayGuardrails;
         this.aiGatewayEmbeddingModelFactory = aiGatewayEmbeddingModelFactory;
         this.aiGatewayModelDeploymentService = aiGatewayModelDeploymentService;
         this.aiGatewayModelService = aiGatewayModelService;
@@ -334,12 +339,15 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
         checkRateLimits(request.tags());
 
         Long workspaceId = resolveWorkspaceIdFromTags(request.tags());
+        Long projectId = resolveProjectId(request.tags());
 
         ResolvedPrompt resolvedPrompt = resolvePrompt(promptHeaders, workspaceId, request);
 
         if (resolvedPrompt != null) {
             request = prependSystemMessage(request, resolvedPrompt.content());
         }
+
+        request = aiGatewayGuardrails.apply(request, workspaceId, projectId);
 
         long startTime = System.currentTimeMillis();
 
@@ -362,6 +370,11 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
 
             throw exception;
         }
+
+        // Dual-directional scanning: redact PII/secrets from the completion before it is traced or returned, so
+        // internal data does not leak back through the model output. Redaction only (never blocks); non-streaming path
+        // only — see chatCompletionStream for the streaming path.
+        response = aiGatewayGuardrails.redactResponse(response, workspaceId, projectId);
 
         processTracingHeaders(tracingHeaders, workspaceId, request, response, startTime, success, resolvedPrompt);
 
@@ -541,19 +554,46 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
         checkRateLimits(request.tags());
 
         Long workspaceId = resolveWorkspaceIdFromTags(request.tags());
+        Long projectId = resolveProjectId(request.tags());
 
         ResolvedPrompt resolvedPrompt = resolvePrompt(promptHeaders, workspaceId, request);
 
-        AiGatewayChatCompletionRequest effectiveRequest = resolvedPrompt != null
-            ? prependSystemMessage(request, resolvedPrompt.content())
-            : request;
+        // Request-direction guardrails apply as on the sync path. Response scanning on the streaming path is opt-in via
+        // the response-scan-streaming-enabled operator flag (see StreamingResponseRedactor): a null redactor here keeps
+        // the default token-by-token behavior byte-for-byte unchanged; a non-null one masks PII/secrets across chunk
+        // boundaries at the cost of a lookahead delay.
+        AiGatewayChatCompletionRequest effectiveRequest = aiGatewayGuardrails.apply(
+            resolvedPrompt != null
+                ? prependSystemMessage(request, resolvedPrompt.content())
+                : request,
+            workspaceId, projectId);
 
         long startTime = System.currentTimeMillis();
 
+        AiGatewayProject project = resolveProject(effectiveRequest.tags());
+
+        RoutedDeployments routedDeployments = null;
         ModelResolution modelResolution;
 
         try {
-            modelResolution = resolveModel(effectiveRequest.model());
+            // Honor the routing policy on the streaming path too: previously streaming always used the request's
+            // literal model and ignored routing entirely. When a routing policy is set the request now streams from
+            // the routed deployment and fails over to the next deployment BEFORE the first token is emitted (see
+            // AiGatewayRetryHandler.executeStreamWithRetry).
+            if (effectiveRequest.routingPolicy() != null) {
+                routedDeployments = selectRoutedDeployments(effectiveRequest);
+
+                AiGatewayModelDeployment primaryDeployment = routedDeployments.orderedDeployments()
+                    .get(0);
+                AiGatewayModel primaryModel = routedDeployments.modelMap()
+                    .get(primaryDeployment.getModelId());
+                AiGatewayProvider primaryProvider =
+                    aiGatewayProviderService.getProvider(primaryModel.getProviderId());
+
+                modelResolution = new ModelResolution(primaryProvider, primaryModel);
+            } else {
+                modelResolution = resolveModel(effectiveRequest.model());
+            }
         } catch (Exception exception) {
             try {
                 aiGatewayRequestLogService.create(createErrorLog(effectiveRequest, startTime, exception), workspaceId);
@@ -568,76 +608,164 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
         AiGatewayProvider provider = modelResolution.provider();
         AiGatewayModel model = modelResolution.model();
 
-        AiGatewayProject project = resolveProject(effectiveRequest.tags());
-
-        ChatModel chatModel = aiGatewayChatModelFactory.getChatModel(provider);
-
-        AiGatewayChatCompletionRequest processedRequest = compressMessages(effectiveRequest, model, project);
-
-        Prompt prompt = buildPrompt(processedRequest, model.getName());
+        // servedModel/servedProvider default to the routed primary (or the literal model on the non-routing path) and
+        // are overwritten by whichever deployment actually streams a token, so the request log records the deployment
+        // that served rather than the one first selected.
+        AtomicReference<AiGatewayModel> servedModel = new AtomicReference<>(model);
+        AtomicReference<AiGatewayProvider> servedProvider = new AtomicReference<>(provider);
 
         AtomicLong streamInputTokens = new AtomicLong(0);
         AtomicLong streamOutputTokens = new AtomicLong(0);
         AtomicReference<Throwable> streamError = new AtomicReference<>();
         StringBuilder streamOutputContent = new StringBuilder();
 
-        return chatModel.stream(prompt)
-            .map(chatResponse -> {
-                if (chatResponse.getMetadata() != null && chatResponse.getMetadata()
-                    .getUsage() != null) {
+        // When streaming response scanning is active, deltas are masked through the redactor and the terminal
+        // finish_reason is deferred onto the flush chunk so the client never sees "stop" before the masked tail.
+        StreamingResponseRedactor responseRedactor =
+            aiGatewayGuardrails.newStreamingResponseRedactor(workspaceId, projectId);
+        AtomicReference<String> deferredFinishReason = new AtomicReference<>();
 
-                    long promptTokens = chatResponse.getMetadata()
-                        .getUsage()
-                        .getPromptTokens();
-                    long completionTokens = chatResponse.getMetadata()
-                        .getUsage()
-                        .getCompletionTokens();
+        Flux<ChatResponse> chatResponseFlux;
 
-                    if (promptTokens > 0) {
-                        streamInputTokens.set(promptTokens);
-                    }
+        if (routedDeployments != null) {
+            Map<Long, AiGatewayModel> routedModelMap = routedDeployments.modelMap();
 
-                    if (completionTokens > 0) {
-                        streamOutputTokens.set(completionTokens);
-                    }
+            chatResponseFlux = aiGatewayRetryHandler.executeStreamWithRetry(
+                routedDeployments.orderedDeployments(),
+                deployment -> {
+                    AiGatewayModel deploymentModel = routedModelMap.get(deployment.getModelId());
+                    AiGatewayProvider deploymentProvider =
+                        aiGatewayProviderService.getProvider(deploymentModel.getProviderId());
+                    ChatModel deploymentChatModel = aiGatewayChatModelFactory.getChatModel(deploymentProvider);
+                    Prompt deploymentPrompt = buildPrompt(
+                        compressMessages(effectiveRequest, deploymentModel, project), deploymentModel.getName());
+
+                    return deploymentChatModel.stream(deploymentPrompt)
+                        .doOnNext(chatResponse -> {
+                            servedModel.set(deploymentModel);
+                            servedProvider.set(deploymentProvider);
+                        });
+                });
+        } else {
+            ChatModel chatModel = aiGatewayChatModelFactory.getChatModel(provider);
+            Prompt prompt = buildPrompt(compressMessages(effectiveRequest, model, project), model.getName());
+
+            chatResponseFlux = chatModel.stream(prompt);
+        }
+
+        Flux<AiGatewayChatCompletionResponse> chunkFlux = chatResponseFlux
+            .map(chatResponse -> toStreamChunkResponse(
+                chatResponse, effectiveRequest, streamInputTokens, streamOutputTokens, streamOutputContent,
+                responseRedactor, deferredFinishReason));
+
+        if (responseRedactor != null) {
+            chunkFlux = chunkFlux.concatWith(Flux.defer(() -> {
+                String tail = responseRedactor.flush();
+                String finishReason = deferredFinishReason.get();
+
+                // One redaction metric per stream (the redactor masks per-chunk); mirrors the non-streaming path.
+                if (responseRedactor.isRedacted()) {
+                    aiGatewayGuardrails.recordResponseRedacted();
                 }
 
-                Generation generation = chatResponse.getResult();
-
-                if (generation == null) {
-                    return new AiGatewayChatCompletionResponse(
-                        UUID.randomUUID()
-                            .toString(),
-                        "chat.completion.chunk",
-                        System.currentTimeMillis() / 1000, effectiveRequest.model(), List.of(), null);
+                if (tail.isEmpty() && finishReason == null) {
+                    return Flux.<AiGatewayChatCompletionResponse>empty();
                 }
 
-                String chunkText = generation.getOutput()
-                    .getText();
+                return Flux.just(streamChunkOf(effectiveRequest.model(), tail, finishReason));
+            }));
+        }
 
-                if (chunkText != null) {
-                    streamOutputContent.append(chunkText);
-                }
-
-                AiGatewayChatMessage delta = new AiGatewayChatMessage(
-                    AiGatewayChatRole.ASSISTANT, chunkText);
-
-                AiGatewayChatCompletionResponse.Choice choice =
-                    new AiGatewayChatCompletionResponse.Choice(0, delta,
-                        generation.getMetadata()
-                            .getFinishReason());
-
-                return new AiGatewayChatCompletionResponse(
-                    UUID.randomUUID()
-                        .toString(),
-                    "chat.completion.chunk",
-                    System.currentTimeMillis() / 1000, effectiveRequest.model(), List.of(choice), null);
-            })
+        return chunkFlux
             .doOnError(streamError::set)
             .doFinally(signalType -> finalizeStreamRequest(
                 signalType, streamInputTokens, streamOutputTokens, streamError, streamOutputContent,
-                effectiveRequest, effectiveTracingHeaders, workspaceId, model, provider, project, startTime,
-                traceIdHolder));
+                effectiveRequest, effectiveTracingHeaders, workspaceId, servedModel.get(), servedProvider.get(),
+                project, startTime, traceIdHolder));
+    }
+
+    /**
+     * Maps a single streamed {@link ChatResponse} chunk to a gateway response chunk, accumulating token usage and the
+     * concatenated (raw) output content for the post-stream request log. When {@code responseRedactor} is non-null the
+     * emitted delta is masked for PII/secrets and the terminal {@code finish_reason} is captured into
+     * {@code deferredFinishReason} instead of being emitted here, so it can ride the redactor's flush chunk after any
+     * held-back tail. The raw output accumulation is unchanged (the trace path has its own redaction control).
+     */
+    private AiGatewayChatCompletionResponse toStreamChunkResponse(
+        ChatResponse chatResponse, AiGatewayChatCompletionRequest effectiveRequest, AtomicLong streamInputTokens,
+        AtomicLong streamOutputTokens, StringBuilder streamOutputContent,
+        @Nullable StreamingResponseRedactor responseRedactor, AtomicReference<String> deferredFinishReason) {
+
+        if (chatResponse.getMetadata() != null && chatResponse.getMetadata()
+            .getUsage() != null) {
+
+            long promptTokens = chatResponse.getMetadata()
+                .getUsage()
+                .getPromptTokens();
+            long completionTokens = chatResponse.getMetadata()
+                .getUsage()
+                .getCompletionTokens();
+
+            if (promptTokens > 0) {
+                streamInputTokens.set(promptTokens);
+            }
+
+            if (completionTokens > 0) {
+                streamOutputTokens.set(completionTokens);
+            }
+        }
+
+        Generation generation = chatResponse.getResult();
+
+        if (generation == null) {
+            return new AiGatewayChatCompletionResponse(
+                UUID.randomUUID()
+                    .toString(),
+                "chat.completion.chunk",
+                System.currentTimeMillis() / 1000, effectiveRequest.model(), List.of(), null);
+        }
+
+        String chunkText = generation.getOutput()
+            .getText();
+
+        if (chunkText != null) {
+            streamOutputContent.append(chunkText);
+        }
+
+        String deltaText = chunkText;
+        String finishReason = generation.getMetadata()
+            .getFinishReason();
+
+        if (responseRedactor != null) {
+            deltaText = responseRedactor.push(chunkText);
+
+            if (finishReason != null) {
+                deferredFinishReason.set(finishReason);
+            }
+
+            finishReason = null;
+        }
+
+        return streamChunkOf(effectiveRequest.model(), deltaText, finishReason);
+    }
+
+    /**
+     * Builds a single {@code chat.completion.chunk} response carrying an assistant delta with the given text and finish
+     * reason.
+     */
+    private static AiGatewayChatCompletionResponse streamChunkOf(
+        String model, @Nullable String deltaText, @Nullable String finishReason) {
+
+        AiGatewayChatMessage delta = new AiGatewayChatMessage(AiGatewayChatRole.ASSISTANT, deltaText);
+
+        AiGatewayChatCompletionResponse.Choice choice =
+            new AiGatewayChatCompletionResponse.Choice(0, delta, finishReason);
+
+        return new AiGatewayChatCompletionResponse(
+            UUID.randomUUID()
+                .toString(),
+            "chat.completion.chunk",
+            System.currentTimeMillis() / 1000, model, List.of(choice), null);
     }
 
     private void finalizeStreamRequest(
@@ -742,6 +870,11 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
         checkRateLimits(request.tags());
 
         Long workspaceId = resolveWorkspaceIdFromTags(request.tags());
+        Long projectId = resolveProjectId(request.tags());
+
+        // Cover the embeddings path with the request-direction guardrails (redact PII/secrets, block terms/injection)
+        // before the input leaves ByteChef — previously only chat completions were guardrailed.
+        List<String> guardrailedInputs = aiGatewayGuardrails.applyToInputs(request.input(), workspaceId, projectId);
 
         long startTime = System.currentTimeMillis();
 
@@ -753,7 +886,7 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
         EmbeddingModel embeddingModel = aiGatewayEmbeddingModelFactory.getEmbeddingModel(provider);
 
         EmbeddingRequest embeddingRequest = new EmbeddingRequest(
-            request.input(),
+            guardrailedInputs,
             org.springframework.ai.embedding.EmbeddingOptions.builder()
                 .model(model.getName())
                 .build());
@@ -960,6 +1093,17 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
     private AiGatewayChatCompletionResponse chatCompletionWithRouting(
         AiGatewayChatCompletionRequest request) {
 
+        // Response cache is keyed on the request content (model-agnostic), so it applies to the routing path exactly
+        // as it does to the direct path; previously routed requests always bypassed the cache.
+        if (isWorkspaceCachingEnabled(request.tags()) && aiGatewayResponseCache.shouldCache(request)) {
+            String cacheKey = aiGatewayResponseCache.computeCacheKey(request);
+            AiGatewayChatCompletionResponse cached = aiGatewayResponseCache.get(cacheKey);
+
+            if (cached != null) {
+                return cached;
+            }
+        }
+
         Long workspaceId = resolveWorkspaceIdFromTags(request.tags());
         long startTime = System.currentTimeMillis();
 
@@ -990,46 +1134,9 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
                 "No enabled deployments for routing policy: " + routingPolicy.getName());
         }
 
-        Map<String, Double> latencyByModelName = aiGatewayRequestLogService.getAverageLatencyByModel(
-            Instant.now()
-                .minus(Duration.ofHours(1)));
-
-        Map<Long, Double> averageLatencyByModelId = modelMap.entrySet()
-            .stream()
-            .filter(entry -> latencyByModelName.containsKey(entry.getValue()
-                .getName()))
-            .collect(Collectors.toMap(Map.Entry::getKey, entry -> latencyByModelName.get(entry.getValue()
-                .getName())));
-
-        double promptComplexityScore;
-
-        try {
-            promptComplexityScore = promptComplexityScorer.score(request);
-        } catch (Exception exception) {
-            log.warn("Prompt complexity scoring failed; falling back to most capable tier", exception);
-
-            promptComplexityScore = 1.0;
-        }
-
         AiGatewayProject project = resolveProject(request.tags());
 
-        Map<String, String> tags = request.tags() != null ? request.tags() : Map.of();
-
-        Map<Long, String> providerTypeByModelId = modelMap.entrySet()
-            .stream()
-            .collect(Collectors.toMap(
-                Map.Entry::getKey,
-                entry -> {
-                    AiGatewayProvider provider =
-                        aiGatewayProviderService.getProvider(entry.getValue()
-                            .getProviderId());
-
-                    return provider.getType()
-                        .name();
-                }));
-
-        AiGatewayRoutingContext routingContext = new AiGatewayRoutingContext(
-            averageLatencyByModelId, modelMap, promptComplexityScore, providerTypeByModelId, tags);
+        AiGatewayRoutingContext routingContext = buildRoutingContext(request, modelMap);
 
         AiGatewayModelDeployment primaryDeployment = aiGatewayRouter.route(
             routingPolicy.getStrategy(), enabledDeployments, routingContext);
@@ -1047,44 +1154,61 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
         }
 
         try {
-            return aiGatewayRetryHandler.executeWithRetry(orderedDeployments, deployment -> {
-                AiGatewayModel model = modelMap.get(deployment.getModelId());
-                AiGatewayProvider provider = aiGatewayProviderService.getProvider(model.getProviderId());
+            AiGatewayChatCompletionResponse response =
+                aiGatewayRetryHandler.executeWithRetry(orderedDeployments, deployment -> {
+                    AiGatewayModel model = modelMap.get(deployment.getModelId());
+                    AiGatewayProvider provider = aiGatewayProviderService.getProvider(model.getProviderId());
 
-                ChatModel chatModel = aiGatewayChatModelFactory.getChatModel(provider);
+                    ChatModel chatModel = aiGatewayChatModelFactory.getChatModel(provider);
 
-                AiGatewayChatCompletionRequest processedRequest = compressMessages(request, model, project);
+                    AiGatewayChatCompletionRequest processedRequest = compressMessages(request, model, project);
 
-                Prompt prompt = buildPrompt(processedRequest, model.getName());
+                    Prompt prompt = buildPrompt(processedRequest, model.getName());
 
-                ChatResponse chatResponse = chatModel.call(prompt);
+                    ChatResponse chatResponse = chatModel.call(prompt);
 
-                int[] tokenCounts = extractTokenCounts(chatResponse);
+                    int[] tokenCounts = extractTokenCounts(chatResponse);
 
-                AiLlmUsage requestLog = createSuccessLog(
-                    request, model, provider, startTime, tokenCounts[0], tokenCounts[1]);
+                    AiLlmUsage requestLog = createSuccessLog(
+                        request, model, provider, startTime, tokenCounts[0], tokenCounts[1]);
 
-                setProjectIdFromProject(requestLog, project);
+                    setProjectIdFromProject(requestLog, project);
 
-                requestLog.setRoutingPolicyId(routingPolicy.getId());
-                requestLog.setRoutingStrategy(routingPolicy.getStrategy() == null ? null : routingPolicy.getStrategy()
-                    .ordinal());
+                    requestLog.setRoutingPolicyId(routingPolicy.getId());
+                    requestLog.setRoutingStrategy(
+                        routingPolicy.getStrategy() == null ? null : routingPolicy.getStrategy()
+                            .ordinal());
+
+                    try {
+                        aiGatewayRequestLogService.create(requestLog, workspaceId);
+                    } catch (Exception logException) {
+                        recordRequestLogPersistFailure("routing", "success");
+
+                        log.error("Failed to persist request log for routed model '{}' — " +
+                            "cost of ${} will be missing from spend tracking. " +
+                            "Alert on ai_gateway.request_log.persist_failure{{kind=routing}}.",
+                            request.model(), requestLog.getCost(), logException);
+                    }
+
+                    enforcePostRequestBudget(request.tags());
+
+                    return toResponse(chatResponse, request.model());
+                });
+
+            if (isWorkspaceCachingEnabled(request.tags()) && aiGatewayResponseCache.shouldCache(request)) {
+                String cacheKey = aiGatewayResponseCache.computeCacheKey(request);
 
                 try {
-                    aiGatewayRequestLogService.create(requestLog, workspaceId);
-                } catch (Exception logException) {
-                    recordRequestLogPersistFailure("routing", "success");
-
-                    log.error("Failed to persist request log for routed model '{}' — " +
-                        "cost of ${} will be missing from spend tracking. " +
-                        "Alert on ai_gateway.request_log.persist_failure{{kind=routing}}.",
-                        request.model(), requestLog.getCost(), logException);
+                    aiGatewayResponseCache.put(cacheKey, response);
+                } catch (Exception cacheException) {
+                    log.warn(
+                        "Failed to cache routed chat completion response for model '{}' (key={}); " +
+                            "request already succeeded, continuing",
+                        request.model(), cacheKey, cacheException);
                 }
+            }
 
-                enforcePostRequestBudget(request.tags());
-
-                return toResponse(chatResponse, request.model());
-            });
+            return response;
         } catch (Exception exception) {
             try {
                 AiLlmUsage errorLog = createErrorLog(request, startTime, exception);
@@ -1258,6 +1382,108 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
         }
 
         return new Prompt(messages, chatOptionsBuilder.build());
+    }
+
+    /**
+     * Builds the router scoring context (average per-model latency over the last hour, prompt-complexity score, and
+     * per-model provider type) shared by the blocking and streaming routing paths. A scorer failure degrades to the
+     * most-capable tier (score 1.0) rather than failing the request.
+     */
+    private AiGatewayRoutingContext buildRoutingContext(
+        AiGatewayChatCompletionRequest request, Map<Long, AiGatewayModel> modelMap) {
+
+        Map<String, Double> latencyByModelName = aiGatewayRequestLogService.getAverageLatencyByModel(
+            Instant.now()
+                .minus(Duration.ofHours(1)));
+
+        Map<Long, Double> averageLatencyByModelId = modelMap.entrySet()
+            .stream()
+            .filter(entry -> latencyByModelName.containsKey(entry.getValue()
+                .getName()))
+            .collect(Collectors.toMap(Map.Entry::getKey, entry -> latencyByModelName.get(entry.getValue()
+                .getName())));
+
+        double promptComplexityScore;
+
+        try {
+            promptComplexityScore = promptComplexityScorer.score(request);
+        } catch (Exception exception) {
+            log.warn("Prompt complexity scoring failed; falling back to most capable tier", exception);
+
+            promptComplexityScore = 1.0;
+        }
+
+        Map<String, String> tags = request.tags() != null ? request.tags() : Map.of();
+
+        Map<Long, String> providerTypeByModelId = modelMap.entrySet()
+            .stream()
+            .collect(Collectors.toMap(
+                Map.Entry::getKey,
+                entry -> {
+                    AiGatewayProvider provider = aiGatewayProviderService.getProvider(entry.getValue()
+                        .getProviderId());
+
+                    return provider.getType()
+                        .name();
+                }));
+
+        return new AiGatewayRoutingContext(
+            averageLatencyByModelId, modelMap, promptComplexityScore, providerTypeByModelId, tags);
+    }
+
+    /**
+     * Selects the routed deployments for a request that specifies a routing policy: runs the same router selection used
+     * on the non-streaming path and returns the primary deployment first, followed by the remaining enabled deployments
+     * as ordered fallbacks, together with each deployment's resolved model.
+     *
+     * <p>
+     * The streaming path uses the ordered list with {@code executeStreamWithRetry}, which fails over across deployments
+     * only <em>before</em> the first token is emitted (once SSE bytes are flushed they cannot be retracted).
+     * </p>
+     */
+    private RoutedDeployments selectRoutedDeployments(AiGatewayChatCompletionRequest request) {
+        AiGatewayRoutingPolicy routingPolicy =
+            aiGatewayRoutingPolicyService.getRoutingPolicyByName(request.routingPolicy());
+
+        List<AiGatewayModelDeployment> deployments =
+            aiGatewayModelDeploymentService.getDeploymentsByRoutingPolicyId(routingPolicy.getId());
+
+        List<AiGatewayModelDeployment> enabledDeployments = deployments.stream()
+            .filter(AiGatewayModelDeployment::isEnabled)
+            .toList();
+
+        if (enabledDeployments.isEmpty()) {
+            throw new IllegalStateException(
+                "No enabled deployments for routing policy: " + routingPolicy.getName());
+        }
+
+        Map<Long, AiGatewayModel> modelMap = enabledDeployments.stream()
+            .map(AiGatewayModelDeployment::getModelId)
+            .distinct()
+            .collect(Collectors.toMap(modelId -> modelId, aiGatewayModelService::getModel));
+
+        AiGatewayRoutingContext routingContext = buildRoutingContext(request, modelMap);
+
+        AiGatewayModelDeployment primaryDeployment = aiGatewayRouter.route(
+            routingPolicy.getStrategy(), enabledDeployments, routingContext);
+
+        List<AiGatewayModelDeployment> orderedDeployments = new ArrayList<>();
+
+        orderedDeployments.add(primaryDeployment);
+
+        for (AiGatewayModelDeployment deployment : enabledDeployments) {
+            if (!deployment.getId()
+                .equals(primaryDeployment.getId())) {
+
+                orderedDeployments.add(deployment);
+            }
+        }
+
+        return new RoutedDeployments(orderedDeployments, modelMap);
+    }
+
+    private record RoutedDeployments(
+        List<AiGatewayModelDeployment> orderedDeployments, Map<Long, AiGatewayModel> modelMap) {
     }
 
     private ModelResolution resolveModel(String modelIdentifier) {
@@ -1544,6 +1770,16 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
         return workspaceAiGatewayProjectService.fetchProjectByWorkspaceIdAndSlug(
             Long.parseLong(workspaceId), projectSlug)
             .orElse(null);
+    }
+
+    /**
+     * Resolves the numeric project id from the request tags (the {@code project_id} tag is a per-workspace slug), or
+     * {@code null} when the request is not attributed to a project. Used to layer project-scoped guardrail overrides.
+     */
+    private @Nullable Long resolveProjectId(Map<String, String> tags) {
+        AiGatewayProject project = resolveProject(tags);
+
+        return project != null ? project.getId() : null;
     }
 
     private boolean resolveCompressionEnabled(@Nullable AiGatewayProject project) {

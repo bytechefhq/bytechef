@@ -40,8 +40,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.ai.chat.model.ToolContext;
 
 /**
- * Covers the kind-keyed dispatch of the unified lookup tool: ACTION routes to the action resolver path, TRIGGER to
- * the trigger path, and an invalid kind is rejected before any resolution happens.
+ * Covers the kind-keyed dispatch of the unified lookup tool: ACTION routes to the action resolver path, TRIGGER to the
+ * trigger path, and an invalid kind is rejected before any resolution happens.
  *
  * @author Ivica Cardic
  */
