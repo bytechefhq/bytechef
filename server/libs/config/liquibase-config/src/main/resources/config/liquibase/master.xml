@@ -33,6 +33,7 @@
     <includeAll path="classpath:config/liquibase/changelog/platform/resource_grant/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />
     <includeAll path="classpath:config/liquibase/changelog/automation/configuration/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />
     <includeAll path="classpath:config/liquibase/changelog/automation/mcp/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />
+    <includeAll path="classpath:config/liquibase/changelog/automation/a2a/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />
     <!--
         platform/ai/llm/usage holds the shared ai_llm_usage table — single canonical LLM bookkeeping store for
         every agent surface. Loaded BEFORE automation/ai_gateway/ because the gateway's later

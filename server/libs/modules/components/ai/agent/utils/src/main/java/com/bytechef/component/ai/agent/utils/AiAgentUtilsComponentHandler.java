@@ -25,6 +25,7 @@ import com.bytechef.component.ai.agent.utils.action.AiAgentUtilsCreateAiSkillAct
 import com.bytechef.component.ai.agent.utils.action.AiAgentUtilsDeleteAiSkillAction;
 import com.bytechef.component.ai.agent.utils.action.AiAgentUtilsRemoveFileFromAiSkillAction;
 import com.bytechef.component.ai.agent.utils.action.AiAgentUtilsUpdateAiSkillAction;
+import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsAgentClientTool;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsAskUserQuestionTool;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsAutoMemoryTool;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsBraveWebSearchTool;
@@ -66,8 +67,9 @@ public class AiAgentUtilsComponentHandler implements ComponentHandler {
         AiAgentUtilsAutoMemoryTool agentUtilsAutoMemoryTool = new AiAgentUtilsAutoMemoryTool(aiAutoMemoryService);
 
         List<ClusterElementDefinition<?>> clusterElements = new ArrayList<>(List.of(
-            // Disabled for now: AiAgentUtilsAgentClientTool requires the io.a2a SDK at runtime.
-            // AiAgentUtilsAgentClientTool.CLUSTER_ELEMENT_DEFINITION,
+            // Delegates a task to a remote A2A agent. The io.a2a client transport is passed explicitly (no
+            // ServiceLoader discovery), so class loading is safe; a transport failure surfaces only at execution time.
+            AiAgentUtilsAgentClientTool.CLUSTER_ELEMENT_DEFINITION,
             AiAgentUtilsAskUserQuestionTool.CLUSTER_ELEMENT_DEFINITION,
             AiAgentUtilsFileSystemTools.CLUSTER_ELEMENT_DEFINITION,
             AiAgentUtilsShellTools.CLUSTER_ELEMENT_DEFINITION,

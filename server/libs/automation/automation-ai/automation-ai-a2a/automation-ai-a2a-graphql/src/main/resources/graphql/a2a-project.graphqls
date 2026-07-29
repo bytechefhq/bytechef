@@ -1,0 +1,31 @@
+extend type Query {
+    a2aProjectsByServerId(a2aServerId: ID!): [A2aProject]
+}
+
+extend type Mutation {
+    createA2aProject(input: CreateA2aProjectInput!): A2aProject
+    updateA2aProject(id: ID!, input: UpdateA2aProjectInput!): A2aProject
+    deleteA2aProject(id: ID!): Boolean
+}
+
+type A2aProject {
+    id: ID!
+    a2aServerId: ID!
+    projectId: ID
+    projectVersion: Int
+    workflowIds: [String!]!
+    createdDate: Long
+    lastModifiedDate: Long
+    version: Int
+}
+
+input CreateA2aProjectInput {
+    a2aServerId: ID!
+    projectId: ID!
+    projectVersion: Int!
+    selectedWorkflowIds: [String!]!
+}
+
+input UpdateA2aProjectInput {
+    selectedWorkflowIds: [String!]!
+}

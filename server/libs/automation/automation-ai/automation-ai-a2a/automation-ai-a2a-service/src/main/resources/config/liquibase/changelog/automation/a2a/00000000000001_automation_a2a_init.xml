@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="00000000000001" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="a2a_server"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="a2a_server">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="TEXT"/>
+            <column name="type" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="environment" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="enabled" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="authentication_required" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="secret_key" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint constraintName="uk_a2a_server_secret_key" tableName="a2a_server" columnNames="secret_key" />
+
+        <createTable tableName="a2a_project">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="a2a_server_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_a2a_project_a2a_server_id" references="a2a_server(id)"/>
+            </column>
+            <column name="project_deployment_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_a2a_project_project_deployment" references="project_deployment(id)"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint constraintName="uk_a2a_project_a2a_server_project_deployment" tableName="a2a_project" columnNames="a2a_server_id,project_deployment_id" />
+
+        <createTable tableName="a2a_project_workflow">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="a2a_project_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_a2a_project_workflow_a2a_project" references="a2a_project(id)"/>
+            </column>
+            <column name="project_deployment_workflow_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_a2a_project_workflow_project_deployment_workflow" references="project_deployment_workflow(id)"/>
+            </column>
+            <column name="parameters" type="TEXT"/>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint constraintName="uk_a2a_project_workflow_project_deployment_workflow" tableName="a2a_project_workflow" columnNames="a2a_project_id,project_deployment_workflow_id" />
+    </changeSet>
+</databaseChangeLog>

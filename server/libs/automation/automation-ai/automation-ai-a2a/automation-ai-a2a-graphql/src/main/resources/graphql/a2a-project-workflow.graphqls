@@ -1,0 +1,24 @@
+extend type Query {
+    a2aProjectWorkflowsByA2aProjectId(a2aProjectId: ID!): [A2aProjectWorkflow]
+}
+
+extend type Mutation {
+    updateA2aProjectWorkflowParameters(id: ID!, input: A2aProjectWorkflowParametersInput!): A2aProjectWorkflow
+}
+
+type A2aProjectWorkflow {
+    id: ID!
+    a2aProjectId: Long
+    projectDeploymentWorkflowId: Long
+    workflowId: String
+    workflowLabel: String
+    skillName: String
+    skillDescription: String
+    skillTags: [String!]
+}
+
+input A2aProjectWorkflowParametersInput {
+    skillName: String
+    skillDescription: String
+    skillTags: [String!]
+}
