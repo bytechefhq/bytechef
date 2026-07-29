@@ -1,0 +1,5 @@
+mutation updateA2aProject($id: ID!, $input: UpdateA2aProjectInput!) {
+    updateA2aProject(id: $id, input: $input) {
+        id
+    }
+}

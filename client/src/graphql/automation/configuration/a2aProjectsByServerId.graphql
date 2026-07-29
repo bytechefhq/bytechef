@@ -1,0 +1,9 @@
+query a2aProjectsByServerId($a2aServerId: ID!) {
+    a2aProjectsByServerId(a2aServerId: $a2aServerId) {
+        a2aServerId
+        id
+        projectId
+        projectVersion
+        workflowIds
+    }
+}

@@ -1,0 +1,15 @@
+query a2aServers($type: PlatformType!) {
+    a2aServers(type: $type) {
+        authenticationRequired
+        createdDate
+        description
+        enabled
+        environmentId
+        id
+        lastModifiedDate
+        name
+        secretKey
+        type
+        version
+    }
+}

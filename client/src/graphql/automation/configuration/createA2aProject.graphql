@@ -1,0 +1,5 @@
+mutation createA2aProject($input: CreateA2aProjectInput!) {
+    createA2aProject(input: $input) {
+        id
+    }
+}

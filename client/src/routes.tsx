@@ -59,6 +59,7 @@ const Home = lazy(() => import('@/pages/home/Home'));
 const KnowledgeBase = lazy(() => import('@/pages/automation/knowledge-base/KnowledgeBase'));
 const KnowledgeBases = lazy(() => import('@/pages/automation/knowledge-bases/KnowledgeBases'));
 const McpServer = lazy(() => import('@/pages/settings/platform/mcp-server/McpServer'));
+const A2aServers = lazy(() => import('@/pages/automation/a2a-servers/A2aServers'));
 const McpServers = lazy(() => import('@/pages/automation/mcp-servers/McpServers'));
 const Notifications = lazy(() => import('@/pages/settings/platform/notifications/Notifications'));
 const Project = lazy(() => import('@/pages/automation/project/Project'));
@@ -846,6 +847,16 @@ export const getRouter = (queryClient: QueryClient) =>
                                         </PrivateRoute>
                                     ),
                                     path: 'mcp-servers',
+                                },
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <LazyLoadWrapper hasLeftSidebar>
+                                                <A2aServers />
+                                            </LazyLoadWrapper>
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'a2a-servers',
                                 },
                                 {
                                     element: (

@@ -1,0 +1,3 @@
+mutation deleteA2aServer($id: ID!) {
+    deleteA2aServer(id: $id)
+}
