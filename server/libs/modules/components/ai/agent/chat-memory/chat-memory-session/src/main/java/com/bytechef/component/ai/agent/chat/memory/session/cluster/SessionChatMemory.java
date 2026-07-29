@@ -173,8 +173,11 @@ public class SessionChatMemory {
             .sessionRepository(resolveSessionRepository(extensions, componentConnections))
             .build();
 
+        // Session memory persists the full tool request/response transcript, so the advisor runs inside the
+        // tool-calling loop; the agent disables the tool advisor's own in-loop history to avoid double-writing.
         SessionMemoryAdvisor.Builder builder = SessionMemoryAdvisor.builder(sessionService)
-            .defaultUserId(inputParameters.getString(DEFAULT_USER_ID, DEFAULT_USER_ID_VALUE));
+            .defaultUserId(inputParameters.getString(DEFAULT_USER_ID, DEFAULT_USER_ID_VALUE))
+            .order(ChatMemoryFunction.TOOL_MESSAGE_PERSISTENCE_ADVISOR_ORDER);
 
         String agentBranch = inputParameters.getString(AGENT_BRANCH);
 
@@ -194,7 +197,7 @@ public class SessionChatMemory {
 
         ToolCallback[] toolCallbacks = resolveRecallToolCallbacks(inputParameters, sessionService);
 
-        return new ChatMemoryFunction.Result(advisor, null, toolCallbacks);
+        return new ChatMemoryFunction.Result(advisor, null, toolCallbacks, true);
     }
 
     private SessionRepository resolveSessionRepository(

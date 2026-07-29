@@ -82,11 +82,13 @@ public final class PinnedToolSearchToolCallingAdvisor extends ToolSearchToolCall
 
     /**
      * Constructs the advisor with the search-loop collaborators {@code buildModeAdvisor} already owns. The remaining
-     * constructor arguments are fixed to the stock {@code ToolSearchToolCallingAdvisor.Builder} defaults (the base
-     * builder exposes no getters for them, so they are reproduced here rather than read back): the default
-     * tool-execution eligibility checker, reference-tool-name accumulation on, an LRU eviction strategy, and —
-     * load-bearing — the in-loop conversation history left enabled (see {@code buildModeAdvisor} for why disabling it
-     * strips the conversation under the RC1 ChatMemory ordering).
+     * constructor arguments follow the stock {@code ToolSearchToolCallingAdvisor.Builder} defaults (the base builder
+     * exposes no getters for them, so they are reproduced here rather than read back): the default tool-execution
+     * eligibility checker, reference-tool-name accumulation on, and an LRU eviction strategy. The one deliberate
+     * deviation is the in-loop conversation history, which is <b>disabled</b>: the AI Hub mounts a session-backed
+     * memory advisor INSIDE the tool loop (order greater than this advisor's), which persists and rehydrates the full
+     * tool request/response transcript on every iteration — keeping the advisor's own history enabled on top of that
+     * would inject the same intra-turn messages twice (see {@code buildModeAdvisor}).
      */
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public PinnedToolSearchToolCallingAdvisor(
@@ -95,7 +97,8 @@ public final class PinnedToolSearchToolCallingAdvisor extends ToolSearchToolCall
 
         super(
             toolCallingManager, DEFAULT_ORDER, DEFAULT_TOOL_EXECUTION_ELIGIBILITY_CHECKER, toolIndex,
-            loadDefaultSystemMessageSuffix(), true, maxResults, true, sessionIdKeyName, new LruEvictionStrategy(1000));
+            loadDefaultSystemMessageSuffix(), true, maxResults, false, sessionIdKeyName,
+            new LruEvictionStrategy(1000));
 
         this.pinnedToolNames = Set.copyOf(pinnedToolNames);
         this.catalogToolCallbacks = List.copyOf(catalogToolCallbacks);

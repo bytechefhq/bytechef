@@ -272,16 +272,16 @@ public class ToolSearchAdvisorConfiguration {
         // PinnedToolSearchToolCallingAdvisor pins ALWAYS_ON_TOOL_NAMES so they stay callable without a preceding
         // searchTool hit — the system prompt instructs the model to call those specialists/core tools directly by name,
         // but the stock advisor hides every static tool behind tool search and a follow-up turn calling one directly
-        // would fail with "No ToolCallback found". It also keeps the advisor's OWN in-loop conversation history enabled
-        // (do NOT disable it): Spring AI 2.0.0-RC1 orders the ChatMemory advisor UPSTREAM of this tool-search advisor
-        // (Advisor.DEFAULT_CHAT_MEMORY_PRECEDENCE_ORDER MIN+200 vs the tool loop's MIN+300), so ChatMemory wraps the
-        // whole tool-execution loop and no longer re-participates per iteration. The tool loop re-traverses only the
-        // downstream chain, so the advisor must carry the [assistant(tool_calls), tool-result] pairs itself. Disabling
-        // its internal history (correct under the old M-series ordering, where ChatMemory sat downstream and supplied
-        // history per-iteration) now strips the conversation on re-invocation: iteration N+1 is sent only [system,
-        // tool_result] — the user message and the assistant(tool_calls) are gone — producing an orphaned tool_result
-        // that Anthropic rejects with HTTP 400 ("tool_result without a corresponding tool_use"). Mirrors the RC1 fix in
-        // AbstractAiAgentChatAction, which removed the same disableInternalConversationHistory() workaround.
+        // would fail with "No ToolCallback found". Its OWN in-loop conversation history is DISABLED: the AI Hub mounts
+        // a session-backed memory advisor (SessionMemoryAdvisor, TOOL_MESSAGE_PERSISTENCE_ADVISOR_ORDER = MIN+400)
+        // INSIDE the tool loop — downstream of this advisor (MIN+300) — so it re-participates on every iteration,
+        // persisting and rehydrating the full [user, assistant(tool_calls), tool_result] transcript from the session
+        // store. That in-loop memory is what keeps each iteration's prompt valid (no orphaned tool_result); keeping
+        // the advisor's internal history enabled on top of it would inject the same intra-turn messages twice.
+        // Mirrors AbstractAiAgentChatAction's conditional disableInternalConversationHistory() for
+        // tool-message-persisting memory types. (Historical note: while memory sat UPSTREAM of the loop — the
+        // MessageChatMemoryAdvisor arrangement — the internal history was load-bearing and disabling it produced
+        // Anthropic HTTP 400 "tool_result without a corresponding tool_use".)
         //
         // Session id read from the conversation id (mirrors the vendored advisor, which derived its search session from
         // ChatMemory.CONVERSATION_ID); MultiSessionToolIndex unions it with the catalog and per-mode global sessions.

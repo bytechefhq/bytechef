@@ -21,21 +21,19 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.agent.chat.memory.builtin.session.cluster.BuiltInSessionChatMemory;
+import com.bytechef.component.ai.agent.chat.memory.builtin.session.util.BuiltInSessionRepositoryFactory;
+import com.bytechef.component.ai.agent.chat.memory.builtin.session.util.BuiltInSessionRepositoryFactory.BuiltInSessionRepository;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.annotation.PreDestroy;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
-import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
-import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.S3ClientBuilder;
 
 /**
  * @author Ivica Cardic
@@ -43,67 +41,41 @@ import software.amazon.awssdk.services.s3.S3ClientBuilder;
 @Component(BUILT_IN_SESSION_CHAT_MEMORY + "_v1_ComponentHandler")
 public class BuiltInSessionChatMemoryComponentHandler implements ComponentHandler {
 
+    private static final Logger log = LoggerFactory.getLogger(BuiltInSessionChatMemoryComponentHandler.class);
+
     private final ComponentDefinition componentDefinition;
-    private final S3Client s3Client;
+    private final AutoCloseable closeable;
 
     @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
     public BuiltInSessionChatMemoryComponentHandler(
         @Autowired(required = false) @Nullable JdbcTemplate jdbcTemplate, Environment environment) {
 
-        boolean awsProvider = "aws".equals(environment.getProperty("bytechef.ai.session.provider"));
+        BuiltInSessionRepository builtInSessionRepository = BuiltInSessionRepositoryFactory.create(
+            environment, jdbcTemplate);
 
-        String bucketPrefix;
-        String keyPrefix;
-
-        if (awsProvider) {
-            s3Client = buildS3Client(environment);
-            bucketPrefix = environment.getProperty("bytechef.ai.session.aws.bucket-prefix", "bytechef-session");
-            keyPrefix = environment.getProperty("bytechef.ai.session.aws.key-prefix", "");
-        } else {
-            s3Client = null;
-            bucketPrefix = null;
-            keyPrefix = "";
-        }
+        this.closeable = builtInSessionRepository.closeable();
 
         this.componentDefinition = component(BUILT_IN_SESSION_CHAT_MEMORY)
             .title("Built-in Session Repository")
             .description("Built-in storage backend for Session Chat Memory.")
             .icon("path:assets/built-in-session-chat-memory.svg")
             .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
-            .clusterElements(BuiltInSessionChatMemory.of(jdbcTemplate, s3Client, bucketPrefix, keyPrefix));
+            .clusterElements(BuiltInSessionChatMemory.of(builtInSessionRepository.sessionRepository()));
     }
 
     @PreDestroy
     public void destroy() {
-        if (s3Client != null) {
-            s3Client.close();
+        if (closeable != null) {
+            try {
+                closeable.close();
+            } catch (Exception exception) {
+                log.warn("Failed to close built-in session repository client", exception);
+            }
         }
     }
 
     @Override
     public ComponentDefinition getDefinition() {
         return componentDefinition;
-    }
-
-    private static S3Client buildS3Client(Environment environment) {
-        S3ClientBuilder builder = S3Client.builder();
-
-        String region = environment.getProperty("bytechef.ai.session.aws.region");
-
-        if (region != null && !region.isBlank()) {
-            builder.region(Region.of(region));
-        }
-
-        String accessKeyId = environment.getProperty("bytechef.ai.session.aws.access-key-id");
-        String secretAccessKey = environment.getProperty("bytechef.ai.session.aws.secret-access-key");
-
-        if (accessKeyId != null && !accessKeyId.isBlank() && secretAccessKey != null && !secretAccessKey.isBlank()) {
-            builder.credentialsProvider(
-                StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKeyId, secretAccessKey)));
-        } else {
-            builder.credentialsProvider(DefaultCredentialsProvider.create());
-        }
-
-        return builder.build();
     }
 }

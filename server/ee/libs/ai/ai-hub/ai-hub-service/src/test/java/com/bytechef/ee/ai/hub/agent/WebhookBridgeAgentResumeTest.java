@@ -351,7 +351,10 @@ class WebhookBridgeAgentResumeTest {
             webhookFacade, taskService, resumeRegistry, jsonMapper, assetFileFacade,
             mock(com.bytechef.ee.ai.hub.metric.WorkflowChatMetrics.class),
             mock(WorkflowChatJobRegistry.class),
-            mock(org.springframework.ai.chat.memory.ChatMemory.class),
+            new com.bytechef.ee.ai.hub.memory.AiHubSessionMemory(
+                org.springframework.ai.session.InMemorySessionRepository.builder()
+                    .build(),
+                null),
             guard, null);
     }
 

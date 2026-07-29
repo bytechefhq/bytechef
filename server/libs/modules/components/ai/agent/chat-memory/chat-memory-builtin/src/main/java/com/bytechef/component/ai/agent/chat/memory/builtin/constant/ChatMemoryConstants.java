@@ -23,6 +23,15 @@ public class ChatMemoryConstants {
 
     public static final String CHAT_MEMORY = "chatMemory";
     public static final String CONVERSATION_ID = "conversationId";
+
+    /**
+     * User id assigned to sessions the built-in chat memory creates (by the advisor and by the actions), and the id the
+     * list/options lookups query by — {@code SessionRepository} has no list-all API, only {@code findByUserId}. Matches
+     * the standalone Session Chat Memory's default user id. Sessions created with an explicit per-request user id are
+     * not returned by the built-in listing.
+     */
+    public static final String DEFAULT_USER_ID = "bytechef";
+
     public static final String MESSAGES = "messages";
     public static final String MESSAGE_CONTENT = "content";
     public static final String MESSAGE_ROLE = "role";

@@ -459,6 +459,98 @@ class AbstractAiAgentChatActionTest {
     }
 
     @Test
+    void testSupportingChatMemoryAdvisorOrderedInsideToolCallingAdvisor() throws Exception {
+        // A memory type that declares supportsToolMessagePersistence=true builds its advisor with
+        // TOOL_MESSAGE_PERSISTENCE_ADVISOR_ORDER (> ToolCallingAdvisor.DEFAULT_ORDER), so the memory advisor runs
+        // INSIDE the tool loop and captures the full per-iteration tool request/response transcript. This pins the
+        // inside-the-loop placement for supporting memory types (in-memory / redis / neo4j).
+        Parameters inputParameters = MockParametersFactory.create(Map.of());
+
+        Map<String, Object> modelElement = buildModelElement();
+
+        Map<String, Object> chatMemoryParameters = new HashMap<>();
+        chatMemoryParameters.put("conversationId", "test-conversation");
+
+        Map<String, Object> chatMemoryElement = new HashMap<>();
+        chatMemoryElement.put("name", "chatMemory_1");
+        chatMemoryElement.put("type", "testComponent/v1/testChatMemory");
+        chatMemoryElement.put("parameters", chatMemoryParameters);
+
+        Parameters extensions = MockParametersFactory.create(
+            Map.of("clusterElements", Map.of("model", modelElement, "chatMemory", chatMemoryElement)));
+
+        stubModelLookup();
+
+        ChatMemoryFunction chatMemoryFunction = mock(ChatMemoryFunction.class);
+
+        when(clusterElementDefinitionService.<ChatMemoryFunction>getClusterElement(
+            eq("testComponent"), eq(1), eq("testChatMemory"))).thenReturn(chatMemoryFunction);
+
+        // Built exactly as the supporting production components do: inside-loop order plus the capability flag.
+        MessageChatMemoryAdvisor insideLoopChatMemoryAdvisor = MessageChatMemoryAdvisor
+            .builder(mock(ChatMemory.class))
+            .order(ChatMemoryFunction.TOOL_MESSAGE_PERSISTENCE_ADVISOR_ORDER)
+            .build();
+
+        when(chatMemoryFunction.apply(any(), any(), any(), any()))
+            .thenReturn(new ChatMemoryFunction.Result(insideLoopChatMemoryAdvisor, null, true));
+
+        ComponentConnection componentConnection = new ComponentConnection(
+            "testComponent", 1, 1L, Map.of(), null);
+        Map<String, ComponentConnection> connectionParameters = Map.of(
+            "model_1", componentConnection,
+            "chatMemory_1", componentConnection);
+
+        ActionContextAware actionContext = mock(ActionContextAware.class);
+
+        TestAiAgentChatAction action = new TestAiAgentChatAction(
+            aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
+
+        try (MockedStatic<ModelUtils> modelUtilsMockedStatic = mockStatic(ModelUtils.class)) {
+            modelUtilsMockedStatic.when(() -> ModelUtils.getMessages(any(), any()))
+                .thenReturn(List.of());
+
+            ChatClient.ChatClientRequestSpec spec = action.getChatClientRequestSpec(
+                inputParameters, connectionParameters, extensions, null, actionContext);
+
+            List<Advisor> advisors = ((DefaultChatClient.DefaultChatClientRequestSpec) spec).getAdvisors();
+
+            ToolCallingAdvisor toolCallAdvisor = findToolCallAdvisor(advisors);
+
+            Advisor chatMemoryAdvisor = advisors.stream()
+                .filter(advisor -> advisor instanceof BaseChatMemoryAdvisor)
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("ChatMemoryAdvisor missing from advisor chain"));
+
+            assertThat(chatMemoryAdvisor.getOrder())
+                .as(
+                    "A memory type declaring supportsToolMessagePersistence must run inside the tool loop " +
+                        "(order > ToolCallingAdvisor.DEFAULT_ORDER) so it captures the full tool transcript.")
+                .isGreaterThan(toolCallAdvisor.getOrder());
+
+            // The inside-loop memory advisor now records the per-iteration transcript, so the tool advisor's own
+            // in-loop history MUST be disabled to avoid double-writing the same tool messages.
+            assertThat(readConversationHistoryEnabled(toolCallAdvisor))
+                .as(
+                    "When memory persists tool messages inside the loop, ToolCallingAdvisor.disableInternal" +
+                        "ConversationHistory() must be applied so the transcript is not written twice.")
+                .isFalse();
+        }
+    }
+
+    @Test
+    void testToolMessagePersistenceAdvisorOrderIsInsideToolLoop() {
+        // The inside-loop memory order must stay strictly downstream of the tool advisor so a supporting memory
+        // advisor re-participates on every tool-loop iteration. Independent of Spring AI's memory default.
+        ToolCallingAdvisor toolCallingAdvisor = ToolCallingAdvisor.builder()
+            .build();
+
+        assertThat(ChatMemoryFunction.TOOL_MESSAGE_PERSISTENCE_ADVISOR_ORDER)
+            .as("TOOL_MESSAGE_PERSISTENCE_ADVISOR_ORDER must be greater than ToolCallingAdvisor.DEFAULT_ORDER")
+            .isGreaterThan(toolCallingAdvisor.getOrder());
+    }
+
+    @Test
     void testSpringAiDefaultOrdersComposeCorrectly() {
         // Safety net for Spring AI version bumps. Our chat-memory components and AbstractAiAgentChatAction
         // both rely on Spring AI's builder defaults (no explicit .order(...) / .advisorOrder(...) calls).

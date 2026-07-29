@@ -17,6 +17,7 @@
 package com.bytechef.component.ai.agent.chat.memory.builtin.action;
 
 import static com.bytechef.component.ai.agent.chat.memory.builtin.constant.ChatMemoryConstants.CONVERSATION_ID;
+import static com.bytechef.component.ai.agent.chat.memory.builtin.constant.ChatMemoryConstants.DEFAULT_USER_ID;
 import static com.bytechef.component.ai.agent.chat.memory.builtin.constant.ChatMemoryConstants.MESSAGES;
 import static com.bytechef.component.ai.agent.chat.memory.builtin.constant.ChatMemoryConstants.MESSAGE_CONTENT;
 import static com.bytechef.component.ai.agent.chat.memory.builtin.constant.ChatMemoryConstants.MESSAGE_ROLE;
@@ -32,20 +33,22 @@ import com.bytechef.component.ai.agent.chat.memory.builtin.util.ChatMemoryUtils;
 import com.bytechef.component.definition.ActionDefinition.PerformFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.Instant;
 import java.util.Map;
-import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.session.EventFilter;
+import org.springframework.ai.session.Session;
+import org.springframework.ai.session.SessionEvent;
+import org.springframework.ai.session.SessionRepository;
 
 /**
  * @author Ivica Cardic
  */
 public class ChatMemoryAddMessagesAction {
 
-    public static ModifiableActionDefinition of(ChatMemoryRepository chatMemoryRepository) {
+    public static ModifiableActionDefinition of(SessionRepository sessionRepository) {
         return action("addMessages")
             .title("Add Messages")
             .description("Adds messages to the chat memory for a conversation.")
@@ -53,7 +56,7 @@ public class ChatMemoryAddMessagesAction {
                 string(CONVERSATION_ID)
                     .label("Conversation ID")
                     .description("The unique identifier for the conversation.")
-                    .options(ChatMemoryUtils.getFirstMessages(chatMemoryRepository))
+                    .options(ChatMemoryUtils.getFirstMessages(sessionRepository))
                     .required(true),
                 array(MESSAGES)
                     .label("Messages")
@@ -80,35 +83,44 @@ public class ChatMemoryAddMessagesAction {
                             string(CONVERSATION_ID),
                             integer("messageCount"))))
             .perform((PerformFunction) (inputParameters, connectionParameters, context) -> perform(
-                inputParameters, chatMemoryRepository));
+                inputParameters, sessionRepository));
     }
 
     private ChatMemoryAddMessagesAction() {
     }
 
-    protected static Object perform(
-        Parameters inputParameters, ChatMemoryRepository chatMemoryRepository) {
-
+    protected static Object perform(Parameters inputParameters, SessionRepository sessionRepository) {
         String conversationId = inputParameters.getRequiredString(CONVERSATION_ID);
         Object[] messagesArray = inputParameters.getRequiredArray(MESSAGES);
 
-        List<Message> existingMessages = new ArrayList<>(chatMemoryRepository.findByConversationId(conversationId));
+        if (sessionRepository.findById(conversationId)
+            .isEmpty()) {
 
-        for (Object messageObj : messagesArray) {
-            if (messageObj instanceof Map<?, ?> messageMap) {
+            sessionRepository.save(Session.builder()
+                .id(conversationId)
+                .userId(DEFAULT_USER_ID)
+                .createdAt(Instant.now())
+                .build());
+        }
+
+        for (Object messageObject : messagesArray) {
+            if (messageObject instanceof Map<?, ?> messageMap) {
                 String role = (String) messageMap.get(MESSAGE_ROLE);
                 String content = (String) messageMap.get(MESSAGE_CONTENT);
-                Message message = createMessage(role, content);
 
-                existingMessages.add(message);
+                sessionRepository.appendEvent(SessionEvent.builder()
+                    .sessionId(conversationId)
+                    .message(createMessage(role, content))
+                    .build());
             }
         }
 
-        chatMemoryRepository.saveAll(conversationId, existingMessages);
+        int messageCount = sessionRepository.findEvents(conversationId, EventFilter.all())
+            .size();
 
         return Map.of(
             CONVERSATION_ID, conversationId,
-            "messageCount", existingMessages.size());
+            "messageCount", messageCount);
     }
 
     private static Message createMessage(String role, String content) {

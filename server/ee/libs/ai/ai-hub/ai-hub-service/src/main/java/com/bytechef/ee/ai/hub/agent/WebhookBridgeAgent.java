@@ -22,6 +22,7 @@ import com.bytechef.automation.assetfile.domain.AssetFile;
 import com.bytechef.automation.assetfile.service.AssetFileFacade;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody.ContentType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
+import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.ee.ai.hub.metric.WorkflowChatMetrics;
 import com.bytechef.ee.ai.hub.task.AiHubTask;
 import com.bytechef.ee.ai.hub.task.AiHubTaskKind;
@@ -51,7 +52,9 @@ import java.util.concurrent.CompletionException;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.session.Session;
+import org.springframework.ai.session.SessionEvent;
+import org.springframework.ai.session.SessionRepository;
 import tools.jackson.databind.json.JsonMapper;
 
 /**
@@ -128,7 +131,7 @@ public class WebhookBridgeAgent extends LocalAgent {
     private final AssetFileFacade assetFileFacade;
     private final WorkflowChatMetrics metrics;
     private final WorkflowChatJobRegistry jobRegistry;
-    private final ChatMemory chatMemory;
+    private final AiHubSessionMemory sessionMemory;
     private final WorkflowChatGuard guard;
     @Nullable
     private final JobFacade jobFacade;
@@ -137,7 +140,7 @@ public class WebhookBridgeAgent extends LocalAgent {
     public WebhookBridgeAgent(
         WebhookWorkflowExecutor webhookWorkflowExecutor, AiHubTaskService taskService,
         WebhookResumeRegistry resumeRegistry, JsonMapper jsonMapper, AssetFileFacade assetFileFacade,
-        WorkflowChatMetrics metrics, WorkflowChatJobRegistry jobRegistry, ChatMemory chatMemory,
+        WorkflowChatMetrics metrics, WorkflowChatJobRegistry jobRegistry, AiHubSessionMemory sessionMemory,
         WorkflowChatGuard guard, @Nullable JobFacade jobFacade) throws AGUIException {
 
         // LocalAgent's constructor demands a non-null systemMessage OR systemMessageProvider; the bridge has no
@@ -153,7 +156,7 @@ public class WebhookBridgeAgent extends LocalAgent {
         this.assetFileFacade = assetFileFacade;
         this.metrics = metrics;
         this.jobRegistry = jobRegistry;
-        this.chatMemory = chatMemory;
+        this.sessionMemory = sessionMemory;
         this.guard = guard;
         this.jobFacade = jobFacade;
         this.resumeHttpClient = HttpClient.newBuilder()
@@ -801,35 +804,51 @@ public class WebhookBridgeAgent extends LocalAgent {
     }
 
     /**
-     * Persists a user/assistant exchange to {@code SPRING_AI_CHAT_MEMORY} so the task thread survives a page reload.
-     * The bridge bypasses the LLM agent's {@code ChatMemory} advisor pipeline, so without this call workflow-chat tasks
-     * would have no persisted history — clicking back into a workflow chat after navigating away would render an empty
-     * thread even though the task row exists.
+     * Persists a user/assistant exchange to the AI Hub session store so the task thread survives a page reload. The
+     * bridge bypasses the LLM agent's memory advisor pipeline, so without this call workflow-chat tasks would have no
+     * persisted history — clicking back into a workflow chat after navigating away would render an empty thread even
+     * though the task row exists.
      *
      * <p>
-     * Best-effort: a chat-memory write failure logs at WARN and the user-visible turn continues. The Spring AI
-     * {@link ChatMemory} bean is workspace-shared (one bean for the whole app), keyed by {@code threadId} which
-     * uniquely identifies a task across the workspace+user partition.
+     * Best-effort: a session-store write failure logs at WARN and the user-visible turn continues. The
+     * {@link AiHubSessionMemory} bean is workspace-shared (one bean for the whole app); sessions are keyed by
+     * {@code threadId}, which uniquely identifies a task across the workspace+user partition, and owned by the AI Hub's
+     * shared session user id.
      * </p>
      *
      * <p>
-     * <b>Preserve-context note:</b> we always write, even for stateless workflows that don't read chat-memory. The cost
-     * is small (two rows per turn) and the failure mode for "don't write" is much worse (lost thread on reload).
-     * Workflows that explicitly want to bound their context window can prune chat-memory via Spring AI's window-size
-     * config rather than opt out per-task.
+     * <b>Preserve-context note:</b> we always write, even for stateless workflows that don't read the history. The cost
+     * is small (two events per turn) and the failure mode for "don't write" is much worse (lost thread on reload).
      * </p>
      */
     private void
         persistTurnToChatMemory(String threadId, String userMessageText, @Nullable String assistantMessageText) {
         try {
-            chatMemory.add(threadId, new org.springframework.ai.chat.messages.UserMessage(userMessageText));
+            SessionRepository sessionRepository = sessionMemory.sessionRepository();
+
+            if (sessionRepository.findById(threadId)
+                .isEmpty()) {
+
+                sessionRepository.save(Session.builder()
+                    .id(threadId)
+                    .userId(AiHubSessionMemory.SESSION_USER_ID)
+                    .createdAt(java.time.Instant.now())
+                    .build());
+            }
+
+            sessionRepository.appendEvent(SessionEvent.builder()
+                .sessionId(threadId)
+                .message(new org.springframework.ai.chat.messages.UserMessage(userMessageText))
+                .build());
 
             if (assistantMessageText != null && !assistantMessageText.isBlank()) {
-                chatMemory.add(threadId,
-                    new org.springframework.ai.chat.messages.AssistantMessage(assistantMessageText));
+                sessionRepository.appendEvent(SessionEvent.builder()
+                    .sessionId(threadId)
+                    .message(new org.springframework.ai.chat.messages.AssistantMessage(assistantMessageText))
+                    .build());
             }
         } catch (RuntimeException exception) {
-            log.warn("Failed to persist workflow-chat turn to chat-memory for threadId {}", threadId, exception);
+            log.warn("Failed to persist workflow-chat turn to session memory for threadId {}", threadId, exception);
         }
     }
 

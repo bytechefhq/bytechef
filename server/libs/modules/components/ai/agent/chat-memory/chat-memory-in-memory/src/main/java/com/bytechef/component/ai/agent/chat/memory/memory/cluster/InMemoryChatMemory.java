@@ -57,9 +57,13 @@ public class InMemoryChatMemory {
             .chatMemoryRepository(InMemoryChatMemoryRepositoryHolder.getInstance())
             .build();
 
+        // In-memory chat memory safely persists the full tool request/response transcript, so its advisor runs inside
+        // the ToolCallingAdvisor loop (see ChatMemoryFunction.TOOL_MESSAGE_PERSISTENCE_ADVISOR_ORDER); the agent
+        // disables the tool advisor's own in-loop history to avoid double-writing.
         return new ChatMemoryFunction.Result(
             MessageChatMemoryAdvisor.builder(inMemoryChatMemory)
+                .order(ChatMemoryFunction.TOOL_MESSAGE_PERSISTENCE_ADVISOR_ORDER)
                 .build(),
-            inMemoryChatMemory);
+            inMemoryChatMemory, true);
     }
 }

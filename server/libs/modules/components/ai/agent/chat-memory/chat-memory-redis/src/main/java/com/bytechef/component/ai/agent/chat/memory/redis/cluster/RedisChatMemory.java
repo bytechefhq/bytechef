@@ -57,10 +57,14 @@ public class RedisChatMemory {
             .chatMemoryRepository(getChatMemoryRepository(connectionParameters))
             .build();
 
+        // Redis chat memory safely persists the full tool request/response transcript, so its advisor runs inside the
+        // ToolCallingAdvisor loop (see ChatMemoryFunction.TOOL_MESSAGE_PERSISTENCE_ADVISOR_ORDER); the agent disables
+        // the tool advisor's own in-loop history to avoid double-writing.
         return new ChatMemoryFunction.Result(
             MessageChatMemoryAdvisor.builder(chatMemory)
+                .order(ChatMemoryFunction.TOOL_MESSAGE_PERSISTENCE_ADVISOR_ORDER)
                 .build(),
-            chatMemory);
+            chatMemory, true);
     }
 
     private RedisChatMemory() {

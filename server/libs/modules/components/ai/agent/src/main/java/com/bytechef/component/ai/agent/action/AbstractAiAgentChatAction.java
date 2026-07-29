@@ -449,12 +449,31 @@ public abstract class AbstractAiAgentChatAction {
             .ifPresent(advisors::add);
 
         // tool call
+        //
+        // When the selected chat-memory type can safely persist the full tool request/response transcript, its advisor
+        // is built with an inside-the-loop order (TOOL_MESSAGE_PERSISTENCE_ADVISOR_ORDER > ToolCallingAdvisor
+        // .DEFAULT_ORDER), so it records every intra-turn tool message. In that case the tool advisor's own in-loop
+        // history MUST be disabled — otherwise the same transcript is written twice (once by each history). Memory
+        // types that don't support it keep the default outside-the-loop placement and the tool advisor keeps its own
+        // in-loop history (the Spring AI RC1 default that keeps each tool-call iteration valid).
 
-        advisors.add(
-            ToolCallingAdvisor.builder()
-                .toolCallingManager(
-                    new SuspendableToolCallingManager(toolCallingManager, (ActionContextAware) context))
-                .build());
+        boolean persistToolMessagesInLoop = chatMemoryResult
+            .map(ChatMemoryFunction.Result::supportsToolMessagePersistence)
+            .orElse(false);
+
+        SuspendableToolCallingManager suspendableToolCallingManager = new SuspendableToolCallingManager(
+            toolCallingManager, (ActionContextAware) context);
+
+        ToolCallingAdvisor toolCallingAdvisor = persistToolMessagesInLoop
+            ? ToolCallingAdvisor.builder()
+                .toolCallingManager(suspendableToolCallingManager)
+                .disableInternalConversationHistory()
+                .build()
+            : ToolCallingAdvisor.builder()
+                .toolCallingManager(suspendableToolCallingManager)
+                .build();
+
+        advisors.add(toolCallingAdvisor);
 
         clusterElementMap.fetchClusterElement(RAG)
             .map(clusterElement -> getRagAdvisor(connectionParameters, clusterElement, context))

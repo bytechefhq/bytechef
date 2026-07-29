@@ -192,15 +192,26 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
      */
     @Override
     protected Map<String, Object> advisorParams(RunAgentInput input) {
+        Map<String, Object> advisorParams = new HashMap<>();
+
+        // The session memory advisor resolves its session from SessionMemoryAdvisor.SESSION_ID_CONTEXT_KEY, whose
+        // literal equals ChatMemory.CONVERSATION_ID. The parent agent only sets this param on its own chatMemory
+        // branch (not taken — the AI Hub mounts SessionMemoryAdvisor directly), so publish the thread id here.
+        String threadId = input.threadId();
+
+        if (threadId != null && !threadId.isBlank()) {
+            advisorParams.put(ChatMemory.CONVERSATION_ID, threadId);
+        }
+
         State state = input.state();
 
         Long environmentId = state == null ? null : NumberUtils.asLong(state.get(AiHubStateKeys.ENVIRONMENT_ID));
 
-        if (environmentId == null || environmentId < 0 || environmentId >= Environment.values().length) {
-            return Map.of();
+        if (environmentId != null && environmentId >= 0 && environmentId < Environment.values().length) {
+            advisorParams.put(AiHubStateKeys.ENVIRONMENT_ID, environmentId);
         }
 
-        return Map.of(AiHubStateKeys.ENVIRONMENT_ID, environmentId);
+        return advisorParams;
     }
 
     @Override

@@ -42,6 +42,8 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowSe
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.data.table.configuration.facade.WorkspaceDataTableFacade;
 import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseFacade;
+import com.bytechef.component.ai.agent.chat.memory.builtin.session.util.BuiltInSessionRepositoryFactory;
+import com.bytechef.component.ai.agent.chat.memory.builtin.session.util.BuiltInSessionRepositoryFactory.BuiltInSessionRepository;
 import com.bytechef.ee.ai.hub.agent.AiHubRoutingAgent;
 import com.bytechef.ee.ai.hub.agent.AiHubSpringAIAgent;
 import com.bytechef.ee.ai.hub.agent.WebhookBridgeAgent;
@@ -49,6 +51,7 @@ import com.bytechef.ee.ai.hub.agent.WebhookResumeRegistry;
 import com.bytechef.ee.ai.hub.agent.WorkflowChatGuard;
 import com.bytechef.ee.ai.hub.agent.WorkflowChatJobRegistry;
 import com.bytechef.ee.ai.hub.artifact.ArtifactGeneratorRegistry;
+import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.ee.ai.hub.metric.AiHubToolAttachMetrics;
 import com.bytechef.ee.ai.hub.metric.WorkflowChatMetrics;
 import com.bytechef.ee.ai.hub.personalagent.AiHubPersonalAgentService;
@@ -159,18 +162,20 @@ import java.util.function.Supplier;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.toolsearch.ToolSearchToolCallingAdvisor;
-import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
+import org.springframework.jdbc.core.JdbcTemplate;
 import tools.jackson.databind.json.JsonMapper;
 
 /**
@@ -220,7 +225,7 @@ public class AiHubConfiguration {
     // router still injects it through its explicit @Qualifier("aiHubAskSpringAIAgent").
     @Bean(defaultCandidate = false)
     AiHubSpringAIAgent aiHubAskSpringAIAgent(
-        ChatMemory chatMemory, ChatModel chatModel, ObjectProvider<ToolCallback> toolCallbackProvider,
+        AiHubSessionMemory aiHubSessionMemory, ChatModel chatModel, ObjectProvider<ToolCallback> toolCallbackProvider,
         @Qualifier("researchChatClient") ObjectProvider<ChatClient> researchChatClientProvider,
         @Qualifier("skillsAskSubAgentChatClient") ObjectProvider<ChatClient> skillsAskSubAgentChatClientProvider,
         @Qualifier("clusterElementAskSubAgentChatClient") //
@@ -334,7 +339,6 @@ public class AiHubConfiguration {
 
         AiHubSpringAIAgent.Builder builder = AiHubSpringAIAgent.builder()
             .agentId(name.toLowerCase())
-            .chatMemory(chatMemory)
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(promptAiHubAskResource))
             .toolCallbacks(toolCallbacks)
@@ -343,6 +347,11 @@ public class AiHubConfiguration {
             // the invoking tenant and user's SecurityContext. Without this, @PreAuthorize-protected facade
             // calls (ProjectFacadeImpl, etc.) throw AuthorizationDeniedException on bounded-elastic threads.
             .securityContextRehydrator(securityContextRehydrator);
+
+        // Session-backed conversation memory, INSIDE the tool-calling loop (order > tool-search advisor's) so the
+        // full tool request/response transcript is persisted and rehydrated per iteration. The tool-search advisor's
+        // own in-loop history is disabled (PinnedToolSearchToolCallingAdvisor) to avoid double-writing.
+        builder.advisor(aiHubSessionMemory.createSessionMemoryAdvisor());
 
         toolSearchToolCallAdvisorProvider.ifAvailable(builder::advisor);
 
@@ -372,7 +381,7 @@ public class AiHubConfiguration {
     // controllers' List<LocalAgent> and injected only through @Qualifier("aiHubBuildSpringAIAgent").
     @Bean(defaultCandidate = false)
     AiHubSpringAIAgent aiHubBuildSpringAIAgent(
-        ChatMemory chatMemory, ChatModel chatModel, ObjectProvider<ToolCallback> toolCallbackProvider,
+        AiHubSessionMemory aiHubSessionMemory, ChatModel chatModel, ObjectProvider<ToolCallback> toolCallbackProvider,
         @Qualifier("researchChatClient") ObjectProvider<ChatClient> researchChatClientProvider,
         @Qualifier("dataAnalystChatClient") ObjectProvider<ChatClient> dataAnalystChatClientProvider,
         @Qualifier("imageGeneratorChatClient") ObjectProvider<ChatClient> imageGeneratorChatClientProvider,
@@ -544,7 +553,6 @@ public class AiHubConfiguration {
 
         AiHubSpringAIAgent.Builder buildBuilder = AiHubSpringAIAgent.builder()
             .agentId(name.toLowerCase())
-            .chatMemory(chatMemory)
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(promptAiHubBuildResource))
             .toolCallbacks(toolCallbacks)
@@ -555,6 +563,9 @@ public class AiHubConfiguration {
             // Mirrors aiHubAskSpringAIAgent — tenant + SecurityContext rehydration on tool execution so
             // @PreAuthorize-protected facade calls don't throw on Reactor scheduler threads.
             .securityContextRehydrator(securityContextRehydrator);
+
+        // Session-backed conversation memory, INSIDE the tool-calling loop — mirrors aiHubAskSpringAIAgent.
+        buildBuilder.advisor(aiHubSessionMemory.createSessionMemoryAdvisor());
 
         toolSearchToolCallAdvisorProvider.ifAvailable(buildBuilder::advisor);
 
@@ -573,18 +584,34 @@ public class AiHubConfiguration {
         return buildBuilder.build();
     }
 
+    /**
+     * The AI Hub's session-based conversation memory over the application session backend
+     * ({@code bytechef.ai.memory.provider}, jdbc by default). AutoCloseable — Spring disposes the owning Redis/S3
+     * client on shutdown.
+     */
+    @Bean
+    AiHubSessionMemory aiHubSessionMemory(
+        Environment environment, @Autowired(required = false) @Nullable JdbcTemplate jdbcTemplate) {
+
+        BuiltInSessionRepository builtInSessionRepository = BuiltInSessionRepositoryFactory.create(
+            environment, jdbcTemplate);
+
+        return new AiHubSessionMemory(
+            builtInSessionRepository.sessionRepository(), builtInSessionRepository.closeable());
+    }
+
     @Bean
     @ConditionalOnBean(WebhookWorkflowExecutor.class)
     WebhookBridgeAgent webhookBridgeAgent(
         WebhookWorkflowExecutor webhookFacade, AiHubTaskService taskService,
         WebhookResumeRegistry webhookResumeRegistry, JsonMapper jsonMapper, AssetFileFacade assetFileFacade,
         WorkflowChatMetrics workflowChatMetrics, WorkflowChatJobRegistry workflowChatJobRegistry,
-        ChatMemory chatMemory, WorkflowChatGuard workflowChatGuard,
+        AiHubSessionMemory aiHubSessionMemory, WorkflowChatGuard workflowChatGuard,
         ObjectProvider<com.bytechef.atlas.execution.facade.JobFacade> jobFacadeProvider) throws AGUIException {
 
         return new WebhookBridgeAgent(
             webhookFacade, taskService, webhookResumeRegistry, jsonMapper, assetFileFacade,
-            workflowChatMetrics, workflowChatJobRegistry, chatMemory, workflowChatGuard,
+            workflowChatMetrics, workflowChatJobRegistry, aiHubSessionMemory, workflowChatGuard,
             jobFacadeProvider.getIfAvailable());
     }
 

@@ -14,6 +14,8 @@ dependencies {
     implementation(project(":spring-ai:spring-ai-agent-utils:auto-memory"))
     implementation("org.springframework.ai:spring-ai-tool-search-advisor")
     implementation("org.springframework.ai:spring-ai-tool-search-tool")
+    implementation(libs.org.springaicommunity.spring.ai.session.management)
+    implementation(project(":server:libs:modules:components:ai:agent:chat-memory:chat-memory-builtin-session"))
     implementation("io.micrometer:micrometer-core")
     implementation("jakarta.annotation:jakarta.annotation-api")
     implementation("org.springframework.boot:spring-boot-actuator")

@@ -23,18 +23,19 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
+import com.bytechef.component.ai.agent.chat.memory.builtin.util.ChatMemoryUtils;
 import com.bytechef.component.definition.ActionDefinition.PerformFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import java.util.List;
 import java.util.Map;
-import org.springframework.ai.chat.memory.ChatMemoryRepository;
+import org.springframework.ai.session.SessionRepository;
 
 /**
  * @author Ivica Cardic
  */
 public class ChatMemoryListConversationsAction {
 
-    public static ModifiableActionDefinition of(ChatMemoryRepository chatMemoryRepository) {
+    public static ModifiableActionDefinition of(SessionRepository sessionRepository) {
         return action("listConversations")
             .title("List Conversations")
             .description("Lists all conversation IDs in the chat memory.")
@@ -46,14 +47,14 @@ public class ChatMemoryListConversationsAction {
                                 .items(string()),
                             integer("count"))))
             .perform((PerformFunction) (inputParameters, connectionParameters, context) -> perform(
-                chatMemoryRepository));
+                sessionRepository));
     }
 
     private ChatMemoryListConversationsAction() {
     }
 
-    protected static Object perform(ChatMemoryRepository chatMemoryRepository) {
-        List<String> conversationIds = chatMemoryRepository.findConversationIds();
+    protected static Object perform(SessionRepository sessionRepository) {
+        List<String> conversationIds = ChatMemoryUtils.findConversationIds(sessionRepository);
 
         return Map.of(
             "conversationIds", conversationIds,
