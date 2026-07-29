@@ -37,5 +37,5 @@ public interface BillingSubscriptionRepository extends ListCrudRepository<Billin
 
     Optional<BillingSubscription> findFirstByPlanNameOrderByCreatedDateDesc(String planName);
 
-    Optional<BillingSubscription> findByStripeSubscriptionId(String stripeSubscriptionId);
+    Optional<BillingSubscription> findBySubscriptionId(String subscriptionId);
 }

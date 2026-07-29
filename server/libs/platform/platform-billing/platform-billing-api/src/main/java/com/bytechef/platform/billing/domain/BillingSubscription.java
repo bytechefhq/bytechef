@@ -33,9 +33,9 @@ public class BillingSubscription {
     public enum Status {
         INCOMPLETE, INCOMPLETE_EXPIRED, TRIALING, ACTIVE, PAST_DUE, CANCELED, UNPAID, PAUSED, UNKNOWN;
 
-        public static Status fromStripe(String stripeStatus) {
+        public static Status fromProviderStatus(String providerStatus) {
             try {
-                return valueOf(stripeStatus.toUpperCase()
+                return valueOf(providerStatus.toUpperCase()
                     .replace('-', '_'));
             } catch (IllegalArgumentException e) {
                 return UNKNOWN;
@@ -72,20 +72,20 @@ public class BillingSubscription {
     @Column
     private String status;
 
-    @Column("stripe_customer_id")
-    private String stripeCustomerId;
+    @Column("customer_id")
+    private String customerId;
 
-    @Column("stripe_product_id")
-    private String stripeProductId;
+    @Column("product_id")
+    private String productId;
 
-    @Column("stripe_subscription_id")
-    private String stripeSubscriptionId;
+    @Column("subscription_id")
+    private String subscriptionId;
 
-    @Column("stripe_usage_product_id")
-    private String stripeUsageProductId;
+    @Column("usage_product_id")
+    private String usageProductId;
 
-    @Column("task_limit")
-    private int taskLimit;
+    @Column("product_unit_limit")
+    private int productUnitLimit;
 
     @Column("last_reported_at")
     private Instant lastReportedAt;
@@ -140,24 +140,24 @@ public class BillingSubscription {
         return Status.valueOf(status);
     }
 
-    public String getStripeCustomerId() {
-        return stripeCustomerId;
+    public String getCustomerId() {
+        return customerId;
     }
 
-    public String getStripeProductId() {
-        return stripeProductId;
+    public String getProductId() {
+        return productId;
     }
 
-    public String getStripeSubscriptionId() {
-        return stripeSubscriptionId;
+    public String getSubscriptionId() {
+        return subscriptionId;
     }
 
-    public String getStripeUsageProductId() {
-        return stripeUsageProductId;
+    public String getUsageProductId() {
+        return usageProductId;
     }
 
-    public int getTaskLimit() {
-        return taskLimit;
+    public int getProductUnitLimit() {
+        return productUnitLimit;
     }
 
     public boolean isCancelAtPeriodEnd() {
@@ -196,24 +196,24 @@ public class BillingSubscription {
         this.status = status.name();
     }
 
-    public void setStripeCustomerId(String stripeCustomerId) {
-        this.stripeCustomerId = stripeCustomerId;
+    public void setCustomerId(String customerId) {
+        this.customerId = customerId;
     }
 
-    public void setStripeProductId(String stripeProductId) {
-        this.stripeProductId = stripeProductId;
+    public void setProductId(String productId) {
+        this.productId = productId;
     }
 
-    public void setStripeSubscriptionId(String stripeSubscriptionId) {
-        this.stripeSubscriptionId = stripeSubscriptionId;
+    public void setSubscriptionId(String subscriptionId) {
+        this.subscriptionId = subscriptionId;
     }
 
-    public void setStripeUsageProductId(String stripeUsageProductId) {
-        this.stripeUsageProductId = stripeUsageProductId;
+    public void setUsageProductId(String usageProductId) {
+        this.usageProductId = usageProductId;
     }
 
-    public void setTaskLimit(int taskLimit) {
-        this.taskLimit = taskLimit;
+    public void setProductUnitLimit(int productUnitLimit) {
+        this.productUnitLimit = productUnitLimit;
     }
 
     public void setLastReportedAt(Instant lastReportedAt) {
@@ -224,11 +224,11 @@ public class BillingSubscription {
     public String toString() {
         return "BillingSubscription{" +
             "id=" + id +
-            ", stripeSubscriptionId='" + stripeSubscriptionId + '\'' +
-            ", stripeCustomerId='" + stripeCustomerId + '\'' +
+            ", subscriptionId='" + subscriptionId + '\'' +
+            ", customerId='" + customerId + '\'' +
             ", status='" + status + '\'' +
             ", planName='" + planName + '\'' +
-            ", taskLimit=" + taskLimit +
+            ", productUnitLimit=" + productUnitLimit +
             ", currentPeriodStart=" + currentPeriodStart +
             ", currentPeriodEnd=" + currentPeriodEnd +
             ", cancelAtPeriodEnd=" + cancelAtPeriodEnd +

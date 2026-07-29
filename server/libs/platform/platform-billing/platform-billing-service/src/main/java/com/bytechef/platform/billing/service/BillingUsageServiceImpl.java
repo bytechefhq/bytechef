@@ -82,9 +82,9 @@ public class BillingUsageServiceImpl implements BillingUsageService {
         int count = countTaskExecutionsSince(lowerBound, scheduledFireTime);
 
         if (count > 0) {
-            String idempotencyKey = subscription.getStripeSubscriptionId() + "_" + scheduledFireTime.getEpochSecond();
+            String idempotencyKey = subscription.getSubscriptionId() + "_" + scheduledFireTime.getEpochSecond();
 
-            stripeClient.reportMeterEvent(subscription.getStripeCustomerId(), count, idempotencyKey);
+            stripeClient.reportMeterEvent(subscription.getCustomerId(), count, idempotencyKey);
         }
 
         subscription.setLastReportedAt(scheduledFireTime);
