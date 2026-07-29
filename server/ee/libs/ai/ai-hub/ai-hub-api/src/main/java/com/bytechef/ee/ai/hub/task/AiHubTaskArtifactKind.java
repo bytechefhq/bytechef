@@ -57,5 +57,9 @@ public enum AiHubTaskArtifactKind {
 
     // Agent-opened / composer-referenced skill (SkillsTools archive). Appended at the END per the JDBC
     // enum-storage convention so all earlier ordinals stay pinned.
-    SKILL_REFERENCED
+    SKILL_REFERENCED,
+
+    // Agent-referenced custom component (custom component source). Appended at the END per the JDBC
+    // enum-storage convention so all earlier ordinals stay pinned.
+    CUSTOM_COMPONENT_REFERENCED
 }

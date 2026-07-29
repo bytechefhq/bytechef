@@ -98,6 +98,9 @@ class EnumOrdinalStabilityTest {
         // Agent-opened / composer-referenced skill (SkillsTools archive). Appended at the END per the JDBC
         // enum-storage convention so all earlier ordinals stay pinned.
         expected.put("SKILL_REFERENCED", 23);
+        // Agent-referenced custom component (custom component source). Appended at the END per the JDBC
+        // enum-storage convention so all earlier ordinals stay pinned.
+        expected.put("CUSTOM_COMPONENT_REFERENCED", 24);
 
         OrdinalStabilityAssertions.assertOrdinalsMatch(
             AiHubTaskArtifactKind.values(), expected,

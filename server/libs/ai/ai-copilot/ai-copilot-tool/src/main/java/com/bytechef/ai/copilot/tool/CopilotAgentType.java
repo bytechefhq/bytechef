@@ -48,7 +48,8 @@ public enum CopilotAgentType implements AgentType {
     SAMPLE_OUTPUT_ASK("sample_output_ask", false),
     SAMPLE_OUTPUT_BUILD("sample_output_build", false),
     SAMPLE_OUTPUT("sample_output", true),
-    SAMPLE_OUTPUT_AGENT("sample_output_agent", false);
+    SAMPLE_OUTPUT_AGENT("sample_output_agent", false),
+    CUSTOM_COMPONENT_AGENT("custom_component_agent", false);
 
     private final String key;
     private final boolean fallback;

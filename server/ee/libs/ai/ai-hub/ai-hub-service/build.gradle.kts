@@ -74,6 +74,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-mcp:platform-mcp-api"))
     implementation(project(":server:libs:automation:automation-ai:automation-ai-tool"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-tool"))
+    implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-tool"))
     implementation(project(":server:libs:ai:ai-api"))
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-api"))
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-tool"))

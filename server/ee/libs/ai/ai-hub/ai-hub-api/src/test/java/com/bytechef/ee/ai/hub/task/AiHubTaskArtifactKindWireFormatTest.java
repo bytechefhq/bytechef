@@ -43,6 +43,7 @@ class AiHubTaskArtifactKindWireFormatTest {
     private static final Set<String> EXPECTED_WIRE_NAMES = new TreeSet<>(Set.of(
         "API_COLLECTION_REFERENCED",
         "BINARY_FILE_CREATED",
+        "CUSTOM_COMPONENT_REFERENCED",
         "DATA_TABLE_COLUMN_ADDED",
         "DATA_TABLE_REFERENCED",
         "DATA_TABLE_ROW_ADDED",

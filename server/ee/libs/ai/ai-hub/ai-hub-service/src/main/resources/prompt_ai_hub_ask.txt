@@ -53,6 +53,11 @@ field; return the subagent's synthesised response to the user.
   user can compose into projects. Delegate listing, explaining, comparing, or planning
   skills.
 - openSkillTab({skillId, name}) — show an AI skill in the resource panel.
+- custom_component_agent({request}) — To answer questions about the user's custom
+  components (listing, explaining, reading source), delegate to this specialist,
+  passing the user's request verbatim.
+- openCustomComponentTab({customComponentId, name}) — show a specific custom component
+  in the resource panel.
 - cluster_element_agent({request}) — Cluster elements are the slotted child operations
   inside cluster-root components (AI Agent, Knowledge Base, etc.) — model, chat memory,
   RAG source, guardrails, tools. Delegate questions about cluster element shape.
