@@ -17,14 +17,18 @@
 package com.bytechef.platform.workflow.execution.dto;
 
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
+import com.bytechef.atlas.configuration.util.WorkflowTaskUtils;
 import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.error.ExecutionError;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -121,10 +125,62 @@ public record TaskExecutionDTO(
             return new TaskExecutionDTO(taskExecutionDTO, List.of(), iterationItems, taskExecutionDTO.childJob());
         }
 
+        if (type != null && type.toLowerCase()
+            .contains("on-error")) {
+            WorkflowTask workflowTask = taskExecutionDTO.workflowTask();
+
+            Set<String> mainBranchTaskNames = collectBranchTaskNames(workflowTask, "main-branch");
+            Set<String> errorBranchTaskNames = collectBranchTaskNames(workflowTask, "on-error-branch");
+
+            List<TaskExecutionDTO> mainBranchTasks = new ArrayList<>();
+            List<TaskExecutionDTO> errorBranchTasks = new ArrayList<>();
+
+            for (TaskExecutionDTO child : matchingChildren) {
+                TaskExecutionDTO builtChild = buildTasksTree(child, tasksMap);
+                String childTaskName = builtChild.workflowTask() == null ? null : builtChild.workflowTask().getName();
+
+                if (childTaskName != null && errorBranchTaskNames.contains(childTaskName)) {
+                    errorBranchTasks.add(builtChild);
+                }
+                else if (childTaskName != null && mainBranchTaskNames.contains(childTaskName)) {
+                    mainBranchTasks.add(builtChild);
+                }
+                else {
+                    mainBranchTasks.add(builtChild);
+                }
+            }
+
+            List<List<TaskExecutionDTO>> branchItems = new ArrayList<>();
+
+            if (!mainBranchTasks.isEmpty()) {
+                branchItems.add(mainBranchTasks);
+            }
+
+            if (!errorBranchTasks.isEmpty()) {
+                branchItems.add(errorBranchTasks);
+            }
+
+            return new TaskExecutionDTO(taskExecutionDTO, List.of(), branchItems, taskExecutionDTO.childJob());
+        }
+
         List<TaskExecutionDTO> children = matchingChildren.stream()
             .map(child -> buildTasksTree(child, tasksMap))
             .toList();
 
         return new TaskExecutionDTO(taskExecutionDTO, children, List.of(), taskExecutionDTO.childJob());
+    }
+
+    private static Set<String> collectBranchTaskNames(WorkflowTask workflowTask, String branchKey) {
+        if (workflowTask == null) {
+            return Set.of();
+        }
+
+        List<WorkflowTask> branchTasks = MapUtils.getList(
+            workflowTask.getParameters(), branchKey, WorkflowTask.class, List.of());
+
+        return WorkflowTaskUtils.getTasks(branchTasks, null)
+            .stream()
+            .map(WorkflowTask::getName)
+            .collect(Collectors.toCollection(HashSet::new));
     }
 }

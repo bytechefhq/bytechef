@@ -14,6 +14,18 @@ import {twMerge} from 'tailwind-merge';
 
 const ITERATIONS_PAGE_SIZE = 100;
 
+const ON_ERROR_BRANCH_LABELS = ['Try branch', 'Error branch'];
+
+const isOnErrorDispatcher = (type?: string) => type?.toLowerCase().includes('on-error') ?? false;
+
+const getIterationLabel = (taskExecution: TaskExecution, index: number) => {
+    if (isOnErrorDispatcher(taskExecution.type)) {
+        return ON_ERROR_BRANCH_LABELS[index] ?? `Branch ${index + 1}`;
+    }
+
+    return `${taskExecution.title || ''} iteration ${index + 1}`;
+};
+
 const isTaskExecution = (execution: TaskExecution | TriggerExecution): execution is TaskExecution =>
     'jobId' in execution;
 
@@ -109,12 +121,17 @@ const WorkflowExecutionsAccordionItem = ({
             >
                 {hasIterations ? (
                     <Accordion className="mt-2 space-y-2" defaultValue={defaultValue} type="multiple">
-                        {taskExecution.iterations?.slice(0, visibleIterationCount).map((iteration, index) => {
+                        {taskExecution.iterations
+                            ?.slice(0, visibleIterationCount)
+                            .map((iteration, index) => ({index, iteration}))
+                            .filter(({iteration}) => !isOnErrorDispatcher(taskExecution.type) || iteration.length > 0)
+                            .map(({iteration, index}) => {
                             const iterationValue = `${taskExecution.id}-iteration-${index}`;
                             const currentIterationItem = taskExecution.input?.items?.[index];
                             const convertedIterationItems = (iteration as unknown[]).map((item) =>
                                 TaskExecutionFromJSON(item)
                             );
+                            const iterationLabel = getIterationLabel(taskExecution, index);
 
                             return (
                                 <AccordionItem className="border-b-0" key={iterationValue} value={iterationValue}>
@@ -123,7 +140,7 @@ const WorkflowExecutionsAccordionItem = ({
                                             <AccordionTrigger className="flex w-full min-w-0 items-center justify-between rounded-md border border-stroke-neutral-primary p-2 hover:border-stroke-brand-primary hover:no-underline focus-visible:outline-stroke-brand-focus focus-visible:transition-colors data-[state=open]:hover:border-stroke-brand-secondary [&_svg]:size-5 [&[data-state=closed]:hover>svg]:rotate-0! [&[data-state=open]>svg]:rotate-180!">
                                                 <div className="flex w-full items-center justify-between">
                                                     <span className="text-sm font-medium text-content-neutral-primary">
-                                                        {taskExecution.title || ''} iteration {index + 1}
+                                                        {iterationLabel}
                                                     </span>
 
                                                     <div className="mr-2 flex items-center gap-x-1 text-xs text-content-neutral-secondary">
