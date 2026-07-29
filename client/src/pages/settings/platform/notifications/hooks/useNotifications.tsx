@@ -27,7 +27,7 @@ const formSchema = z.object({
     name: z.string().min(1, 'Name is required').max(256, 'Name cannot be longer than 256 characters'),
     notificationEventIds: z.array(z.string()).nonempty('Please select at least one notification event.'),
     settings: z.record(z.string(), z.any()),
-    type: z.enum(['EMAIL', 'WEBHOOK'], {
+    type: z.enum(['EMAIL', 'SLACK', 'WEBHOOK'], {
         message: 'Please select a notification type.',
     }),
 });

@@ -3,10 +3,10 @@ import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {
     AiObservabilityAlertCondition,
     AiObservabilityAlertMetric,
-    useAiObservabilityNotificationChannelsQuery,
     useCreateAiObservabilityAlertRuleMutation,
     useTestAiObservabilityAlertRuleMutation,
     useUpdateAiObservabilityAlertRuleMutation,
+    useWorkspaceNotificationsQuery,
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {XIcon} from 'lucide-react';
@@ -42,7 +42,9 @@ const CONDITION_LABELS: Record<string, string> = {
 };
 
 const AiObservabilityAlertRuleDialog = ({onClose, rule, workspaceId}: AiObservabilityAlertRuleDialogProps) => {
-    const [channelIds, setChannelIds] = useState<string[]>((rule?.channelIds?.filter(Boolean) as string[]) ?? []);
+    const [notificationIds, setNotificationIds] = useState<string[]>(
+        (rule?.notificationIds?.filter(Boolean) as string[]) ?? []
+    );
     const [condition, setCondition] = useState<AiObservabilityAlertCondition>(
         rule?.condition ?? AiObservabilityAlertCondition.GreaterThan
     );
@@ -61,11 +63,14 @@ const AiObservabilityAlertRuleDialog = ({onClose, rule, workspaceId}: AiObservab
 
     const isEditMode = !!rule;
 
-    const {data: channelsData} = useAiObservabilityNotificationChannelsQuery({
-        workspaceId: currentWorkspaceId != null ? String(currentWorkspaceId) : '',
-    });
+    // Delivery targets come from the central notification registry: the workspace's own notifications plus the
+    // global (unassigned) ones. Channels are managed under Settings -> Notifications.
+    const {data: workspaceNotificationsData} = useWorkspaceNotificationsQuery(
+        {workspaceId: currentWorkspaceId != null ? String(currentWorkspaceId) : ''},
+        {enabled: currentWorkspaceId != null}
+    );
 
-    const availableChannels = channelsData?.aiObservabilityNotificationChannels ?? [];
+    const availableNotifications = workspaceNotificationsData?.workspaceNotifications ?? [];
 
     const createMutation = useCreateAiObservabilityAlertRuleMutation({
         onSuccess: () => {
@@ -95,22 +100,22 @@ const AiObservabilityAlertRuleDialog = ({onClose, rule, workspaceId}: AiObservab
         },
     });
 
-    const handleChannelToggle = useCallback((channelId: string) => {
-        setChannelIds((previous) =>
-            previous.includes(channelId)
-                ? previous.filter((identifier) => identifier !== channelId)
-                : [...previous, channelId]
+    const handleNotificationToggle = useCallback((notificationId: string) => {
+        setNotificationIds((previous) =>
+            previous.includes(notificationId)
+                ? previous.filter((identifier) => identifier !== notificationId)
+                : [...previous, notificationId]
         );
     }, []);
 
     const handleSubmit = useCallback(() => {
         const input = {
-            channelIds,
             condition,
             cooldownMinutes,
             enabled,
             metric,
             name,
+            notificationIds,
             threshold,
             windowMinutes,
             workspaceId,
@@ -122,7 +127,6 @@ const AiObservabilityAlertRuleDialog = ({onClose, rule, workspaceId}: AiObservab
             createMutation.mutate({input});
         }
     }, [
-        channelIds,
         condition,
         cooldownMinutes,
         createMutation,
@@ -130,6 +134,7 @@ const AiObservabilityAlertRuleDialog = ({onClose, rule, workspaceId}: AiObservab
         isEditMode,
         metric,
         name,
+        notificationIds,
         rule,
         threshold,
         updateMutation,
@@ -240,25 +245,25 @@ const AiObservabilityAlertRuleDialog = ({onClose, rule, workspaceId}: AiObservab
                     </fieldset>
 
                     <fieldset className="border-0">
-                        <label className="mb-1 block text-sm font-medium">Notification Channels</label>
+                        <label className="mb-1 block text-sm font-medium">Notifications</label>
 
-                        {availableChannels.length === 0 ? (
+                        {availableNotifications.length === 0 ? (
                             <p className="text-sm text-muted-foreground">
-                                No notification channels configured. Create one in the Channels tab first.
+                                No notifications available. Create one under Settings &gt; Notifications first.
                             </p>
                         ) : (
                             <div className="space-y-2">
-                                {availableChannels.map((channel) =>
-                                    channel ? (
-                                        <label className="flex items-center gap-2 text-sm" key={channel.id}>
+                                {availableNotifications.map((notification) =>
+                                    notification ? (
+                                        <label className="flex items-center gap-2 text-sm" key={notification.id}>
                                             <input
-                                                checked={channelIds.includes(channel.id)}
-                                                onChange={() => handleChannelToggle(channel.id)}
+                                                checked={notificationIds.includes(notification.id)}
+                                                onChange={() => handleNotificationToggle(notification.id)}
                                                 type="checkbox"
                                             />
 
                                             <span>
-                                                {channel.name} ({channel.type})
+                                                {notification.name} ({notification.type})
                                             </span>
                                         </label>
                                     ) : null

@@ -37,7 +37,7 @@ export function getWorkflowStatusType(job: Job, triggerExecution?: TriggerExecut
         return 'running';
     }
 
-    if (jobStatus === 'STOPPED') {
+    if (jobStatus === 'STOPPED' || jobStatus === 'CANCELLED') {
         return 'stopped';
     }
 

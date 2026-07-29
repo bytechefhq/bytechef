@@ -11,8 +11,11 @@ import WorkflowExecutionsHeader from '@/shared/components/workflow-executions/Wo
 import WorkflowExecutionsTabsPanel from '@/shared/components/workflow-executions/WorkflowExecutionsTabsPanel';
 import WorkflowTaskExecutionItem from '@/shared/components/workflow-executions/WorkflowTaskExecutionItem';
 import WorkflowTriggerExecutionItem from '@/shared/components/workflow-executions/WorkflowTriggerExecutionItem';
+import {getWorkflowStatusType} from '@/shared/components/workflow-executions/util/workflowExecution-utils';
 import {ExecutionError, Job, TaskExecution, TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
+import {useWorkflowExecutionCostQuery} from '@/shared/middleware/graphql';
 import {useGetWorkflowExecutionTaskExecutionQuery} from '@/shared/queries/automation/workflowExecutions.queries';
+import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {TabValueType} from '@/shared/types';
 import {WorkflowIcon} from 'lucide-react';
 import {useCallback, useMemo} from 'react';
@@ -60,12 +63,28 @@ const WorkflowExecutionSheetContent = ({
 }: WorkflowExecutionSheetContentProps) => {
     const isTaskSelected = !!selectedItem && !isTriggerExecution && selectedItem.id !== undefined;
 
+    const application = useApplicationInfoStore((state) => state.application);
+
     const {data: selectedTaskExecution, isLoading: selectedTaskExecutionLoading} =
         useGetWorkflowExecutionTaskExecutionQuery(
             {id: Number(workflowExecutionId), taskExecutionId: Number(selectedItem?.id)},
             isTaskSelected,
             false
         );
+
+    // The cost row is written by an EE listener when the job reaches terminal status, so the query is skipped in CE
+    // and while the workflow is still running; a null result (recording disabled) simply hides the cost line.
+    const {data: workflowExecutionCostData} = useWorkflowExecutionCostQuery(
+        {jobId: String(job?.id)},
+        {
+            enabled:
+                application?.edition === 'EE' &&
+                !!job?.id &&
+                getWorkflowStatusType(job, triggerExecution) !== 'running',
+        }
+    );
+
+    const workflowExecutionCost = workflowExecutionCostData?.workflowExecutionCost || undefined;
 
     const breadcrumbItems = useMemo<BreadcrumbEntryI[]>(() => {
         if (subflowStack.length === 0) {
@@ -88,7 +107,7 @@ const WorkflowExecutionSheetContent = ({
 
     return (
         <div className="flex size-full flex-col">
-            <WorkflowExecutionsHeader job={job} triggerExecution={triggerExecution} />
+            <WorkflowExecutionsHeader cost={workflowExecutionCost} job={job} triggerExecution={triggerExecution} />
 
             {jobFailedWithNoExecutions ? (
                 <div className="flex-1 p-4">

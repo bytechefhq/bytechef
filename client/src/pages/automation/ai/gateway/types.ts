@@ -8,7 +8,6 @@ import {
     AiObservabilityAlertRulesQuery,
     AiObservabilityExportJobQuery,
     AiObservabilityExportJobsQuery,
-    AiObservabilityNotificationChannelsQuery,
     AiObservabilitySessionQuery,
     AiObservabilitySessionsQuery,
     AiObservabilityTraceQuery,
@@ -43,10 +42,6 @@ export type AiObservabilityAlertEventType = NonNullable<
 
 export type AiObservabilityAlertRuleType = NonNullable<
     NonNullable<AiObservabilityAlertRulesQuery['aiObservabilityAlertRules']>[number]
->;
-
-export type AiObservabilityNotificationChannelType = NonNullable<
-    NonNullable<AiObservabilityNotificationChannelsQuery['aiObservabilityNotificationChannels']>[number]
 >;
 
 export type AiGatewayModelType = NonNullable<

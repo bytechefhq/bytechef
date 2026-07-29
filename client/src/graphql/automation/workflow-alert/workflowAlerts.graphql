@@ -1,0 +1,52 @@
+query workflowAlertRules($workspaceId: ID!) {
+    workflowAlertRules(workspaceId: $workspaceId) {
+        cooldownMinutes
+        enabled
+        id
+        lastTriggeredDate
+        name
+        notificationIds
+        ruleType
+        threshold
+        windowMinutes
+        workflowId
+    }
+}
+
+query workflowAlertEvents($workspaceId: ID!) {
+    workflowAlertEvents(workspaceId: $workspaceId) {
+        createdDate
+        id
+        jobId
+        message
+        triggeredValue
+        workflowAlertRuleId
+    }
+}
+
+mutation createWorkflowAlertRule($workspaceId: ID!, $input: WorkflowAlertRuleInput!) {
+    createWorkflowAlertRule(workspaceId: $workspaceId, input: $input) {
+        id
+    }
+}
+
+mutation updateWorkflowAlertRule($id: ID!, $input: WorkflowAlertRuleInput!) {
+    updateWorkflowAlertRule(id: $id, input: $input) {
+        id
+    }
+}
+
+mutation deleteWorkflowAlertRule($id: ID!) {
+    deleteWorkflowAlertRule(id: $id)
+}
+
+mutation sendTestWorkflowAlert($id: ID!) {
+    sendTestWorkflowAlert(id: $id)
+}
+
+mutation enableWorkflowAlertRule($id: ID!, $enabled: Boolean!) {
+    enableWorkflowAlertRule(id: $id, enabled: $enabled) {
+        enabled
+        id
+    }
+}

@@ -1,6 +1,6 @@
 query aiObservabilityAlertRules($workspaceId: ID!) {
     aiObservabilityAlertRules(workspaceId: $workspaceId) {
-        channelIds
+        notificationIds
         condition
         cooldownMinutes
         createdDate
@@ -20,7 +20,7 @@ query aiObservabilityAlertRules($workspaceId: ID!) {
 
 query aiObservabilityAlertRule($id: ID!) {
     aiObservabilityAlertRule(id: $id) {
-        channelIds
+        notificationIds
         condition
         cooldownMinutes
         createdDate
@@ -40,7 +40,7 @@ query aiObservabilityAlertRule($id: ID!) {
 
 mutation createAiObservabilityAlertRule($input: AiObservabilityAlertRuleInput!) {
     createAiObservabilityAlertRule(input: $input) {
-        channelIds
+        notificationIds
         condition
         cooldownMinutes
         createdDate
@@ -59,7 +59,7 @@ mutation createAiObservabilityAlertRule($input: AiObservabilityAlertRuleInput!) 
 
 mutation updateAiObservabilityAlertRule($id: ID!, $input: AiObservabilityAlertRuleInput!) {
     updateAiObservabilityAlertRule(id: $id, input: $input) {
-        channelIds
+        notificationIds
         condition
         cooldownMinutes
         createdDate

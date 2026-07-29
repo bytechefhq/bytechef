@@ -101,6 +101,7 @@ export interface Notification {
  */
 export const NotificationTypeEnum = {
     Email: 'EMAIL',
+    Slack: 'SLACK',
     Webhook: 'WEBHOOK'
 } as const;
 export type NotificationTypeEnum = typeof NotificationTypeEnum[keyof typeof NotificationTypeEnum];

@@ -155,6 +155,15 @@ const NotificationDialog = ({
                                                         {NotificationTypeEnum.Webhook.toString()}
                                                     </SelectItem>
                                                 )}
+
+                                                {ff_1132 && (
+                                                    <SelectItem
+                                                        key={NotificationTypeEnum.Slack.toString()}
+                                                        value={NotificationTypeEnum.Slack.toString()}
+                                                    >
+                                                        {NotificationTypeEnum.Slack.toString()}
+                                                    </SelectItem>
+                                                )}
                                             </SelectContent>
                                         </Select>
                                     </FormControl>
@@ -187,17 +196,18 @@ const NotificationDialog = ({
                             />
                         )}
 
-                        {notificationType === NotificationTypeEnum.Webhook && (
+                        {notificationType === NotificationTypeEnum.Slack && (
                             <FormField
                                 control={control}
-                                name="settings.webhook"
+                                name="settings.slackWebhookUrl"
                                 render={({field}) => (
                                     <FormItem>
-                                        <FormLabel>Webhook URL</FormLabel>
+                                        <FormLabel>Slack Webhook URL</FormLabel>
 
                                         <FormControl>
                                             <Input
                                                 onChange={(e) => field.onChange(e.target.value)}
+                                                placeholder="https://hooks.slack.com/services/..."
                                                 value={(field.value as string) || ''}
                                             />
                                         </FormControl>
@@ -206,6 +216,50 @@ const NotificationDialog = ({
                                     </FormItem>
                                 )}
                             />
+                        )}
+
+                        {notificationType === NotificationTypeEnum.Webhook && (
+                            <>
+                                <FormField
+                                    control={control}
+                                    name="settings.webhook"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Webhook URL</FormLabel>
+
+                                            <FormControl>
+                                                <Input
+                                                    onChange={(e) => field.onChange(e.target.value)}
+                                                    value={(field.value as string) || ''}
+                                                />
+                                            </FormControl>
+
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <FormField
+                                    control={control}
+                                    name="settings.webhookSecret"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Webhook Secret</FormLabel>
+
+                                            <FormControl>
+                                                <Input
+                                                    onChange={(e) => field.onChange(e.target.value)}
+                                                    placeholder="Optional — signs deliveries with X-ByteChef-Signature"
+                                                    type="password"
+                                                    value={(field.value as string) || ''}
+                                                />
+                                            </FormControl>
+
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </>
                         )}
 
                         <DialogFooter>

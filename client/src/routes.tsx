@@ -62,6 +62,7 @@ const McpServer = lazy(() => import('@/pages/settings/platform/mcp-server/McpSer
 const A2aServers = lazy(() => import('@/pages/automation/a2a-servers/A2aServers'));
 const McpServers = lazy(() => import('@/pages/automation/mcp-servers/McpServers'));
 const Notifications = lazy(() => import('@/pages/settings/platform/notifications/Notifications'));
+const WorkflowAlerts = lazy(() => import('@/pages/settings/platform/workflow-alerts/WorkflowAlerts'));
 const Project = lazy(() => import('@/pages/automation/project/Project'));
 const ProjectDeployments = lazy(() => import('@/pages/automation/project-deployments/ProjectDeployments'));
 const ProjectTemplate = lazy(() => import('@/pages/automation/template/project-template/ProjectTemplate'));
@@ -450,6 +451,18 @@ const platformSettingsRoutes = {
                 <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
                     <EEVersion>
                         <LazyLoadWrapper>
+                            <WorkflowAlerts />
+                        </LazyLoadWrapper>
+                    </EEVersion>
+                </PrivateRoute>
+            ),
+            path: 'workflow-alerts',
+        },
+        {
+            element: (
+                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                    <EEVersion>
+                        <LazyLoadWrapper>
                             <IdentityProvidersPage />
                         </LazyLoadWrapper>
                     </EEVersion>
@@ -541,6 +554,10 @@ const platformSettingsRoutes = {
         {
             href: 'notifications',
             title: 'Notifications',
+        },
+        {
+            href: 'workflow-alerts',
+            title: 'Alerts',
         },
         {
             href: 'identity-providers',

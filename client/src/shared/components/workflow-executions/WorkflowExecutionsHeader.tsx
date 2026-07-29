@@ -3,7 +3,26 @@ import {getWorkflowStatusType} from '@/shared/components/workflow-executions/uti
 import {Job, TriggerExecution} from '@/shared/middleware/platform/workflow/execution';
 import {CheckIcon, LoaderCircleIcon} from 'lucide-react';
 
-const WorkflowExecutionsHeader = ({job, triggerExecution}: {job: Job; triggerExecution?: TriggerExecution}) => {
+export interface WorkflowExecutionCostInfoI {
+    currency: string;
+    totalCost: number;
+}
+
+interface WorkflowExecutionsHeaderProps {
+    cost?: WorkflowExecutionCostInfoI;
+    job: Job;
+    triggerExecution?: TriggerExecution;
+}
+
+const formatCost = ({currency, totalCost}: WorkflowExecutionCostInfoI) =>
+    new Intl.NumberFormat(undefined, {
+        currency,
+        maximumFractionDigits: 6,
+        minimumFractionDigits: 2,
+        style: 'currency',
+    }).format(totalCost);
+
+const WorkflowExecutionsHeader = ({cost, job, triggerExecution}: WorkflowExecutionsHeaderProps) => {
     const startTime = job?.startDate?.getTime();
     const endTime = job?.endDate?.getTime();
 
@@ -58,6 +77,8 @@ const WorkflowExecutionsHeader = ({job, triggerExecution}: {job: Job; triggerExe
                 <span>Duration: {duration}ms</span>
 
                 <span>{`${taskExecutionsCount} task${taskExecutionsCount > 1 ? 's' : ''} executed`}</span>
+
+                {cost && <span>{`Cost: ${formatCost(cost)}`}</span>}
             </div>
         </header>
     );

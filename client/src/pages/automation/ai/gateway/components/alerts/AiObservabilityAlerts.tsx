@@ -3,13 +3,11 @@ import {twMerge} from 'tailwind-merge';
 
 import AiObservabilityAlertHistory from './AiObservabilityAlertHistory';
 import AiObservabilityAlertRules from './AiObservabilityAlertRules';
-import AiObservabilityNotificationChannels from './AiObservabilityNotificationChannels';
 
-type AlertsSubTabType = 'channels' | 'history' | 'rules';
+type AlertsSubTabType = 'history' | 'rules';
 
 const SUB_TABS: {label: string; value: AlertsSubTabType}[] = [
     {label: 'Rules', value: 'rules'},
-    {label: 'Channels', value: 'channels'},
     {label: 'History', value: 'history'},
 ];
 
@@ -36,8 +34,6 @@ const AiObservabilityAlerts = () => {
             </div>
 
             {activeSubTab === 'rules' && <AiObservabilityAlertRules />}
-
-            {activeSubTab === 'channels' && <AiObservabilityNotificationChannels />}
 
             {activeSubTab === 'history' && <AiObservabilityAlertHistory />}
         </div>
