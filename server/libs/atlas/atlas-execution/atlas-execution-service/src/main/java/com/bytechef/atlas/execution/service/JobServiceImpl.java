@@ -25,6 +25,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -148,6 +149,10 @@ public class JobServiceImpl implements JobService {
     public Job resumeToStatusStarted(long id) {
         Job job = OptionalUtils.get(jobRepository.findById(id), String.format("Unknown job %s", id));
 
+        if (job.getStatus() == Job.Status.STARTED) {
+            return job;
+        }
+
         Assert.isTrue(isRestartable(job), "can't resume job " + id + " as it is " + job.getStatus());
         Assert.isTrue(
             job.getParentTaskExecutionId() == null || job.getStatus() == Job.Status.STOPPED,
@@ -163,6 +168,12 @@ public class JobServiceImpl implements JobService {
         jobRepository.save(job);
 
         return job;
+    }
+
+    @Override
+    public boolean tryClaimResume(Job job) {
+        return jobRepository.updateStatusIfCurrentStatus(
+            Objects.requireNonNull(job.getId(), "id"), Job.Status.STOPPED.ordinal(), Job.Status.STARTED.ordinal()) == 1;
     }
 
     @Override

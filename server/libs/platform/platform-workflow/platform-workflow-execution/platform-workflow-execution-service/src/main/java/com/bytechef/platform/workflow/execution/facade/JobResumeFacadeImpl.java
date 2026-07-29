@@ -17,16 +17,21 @@
 package com.bytechef.platform.workflow.execution.facade;
 
 import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
+import com.bytechef.platform.component.definition.SuspendUtils;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.JobSuspends;
 import com.bytechef.platform.workflow.execution.event.JobResumedEvent;
 import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.micrometer.core.instrument.MeterRegistry;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -52,32 +57,44 @@ public class JobResumeFacadeImpl implements JobResumeFacade {
 
     private static final Logger log = LoggerFactory.getLogger(JobResumeFacadeImpl.class);
 
+    private static final String APPROVAL_RESOLUTION_METRIC_NAME = "bytechef_approval_resolution";
+
+    private static final String APPROVED = "approved";
+
+    private static final String APPROVED_BY = "approvedBy";
+
     private final ApplicationEventPublisher applicationEventPublisher;
     private final ObjectProvider<ApprovalTokens> approvalTokensProvider;
     private final JobFacade jobFacade;
     private final JobService jobService;
+    private final ObjectProvider<MeterRegistry> meterRegistryObjectProvider;
+    private final TaskExecutionService taskExecutionService;
     private final TransactionOperations transactionOperations;
 
     @Autowired
     @SuppressFBWarnings("EI")
     public JobResumeFacadeImpl(
         ApplicationEventPublisher applicationEventPublisher, ObjectProvider<ApprovalTokens> approvalTokensProvider,
-        JobFacade jobFacade, JobService jobService, PlatformTransactionManager platformTransactionManager) {
+        JobFacade jobFacade, JobService jobService, ObjectProvider<MeterRegistry> meterRegistryObjectProvider,
+        PlatformTransactionManager platformTransactionManager, TaskExecutionService taskExecutionService) {
 
         this(
-            applicationEventPublisher, approvalTokensProvider, jobFacade, jobService,
-            new TransactionTemplate(platformTransactionManager));
+            applicationEventPublisher, approvalTokensProvider, jobFacade, jobService, meterRegistryObjectProvider,
+            new TransactionTemplate(platformTransactionManager), taskExecutionService);
     }
 
     @SuppressFBWarnings("EI")
     public JobResumeFacadeImpl(
         ApplicationEventPublisher applicationEventPublisher, ObjectProvider<ApprovalTokens> approvalTokensProvider,
-        JobFacade jobFacade, JobService jobService, TransactionOperations transactionOperations) {
+        JobFacade jobFacade, JobService jobService, ObjectProvider<MeterRegistry> meterRegistryObjectProvider,
+        TransactionOperations transactionOperations, TaskExecutionService taskExecutionService) {
 
         this.applicationEventPublisher = applicationEventPublisher;
         this.approvalTokensProvider = approvalTokensProvider;
         this.jobFacade = jobFacade;
         this.jobService = jobService;
+        this.meterRegistryObjectProvider = meterRegistryObjectProvider;
+        this.taskExecutionService = taskExecutionService;
         this.transactionOperations = transactionOperations;
     }
 
@@ -125,19 +142,27 @@ public class JobResumeFacadeImpl implements JobResumeFacade {
 
     @Override
     public JobResumeOutcome resumeJob(String id, Map<String, Object> data) {
-        return resumeJob(id, data, false, jobId -> {});
+        return resumeJob(id, data, null, false, jobId -> {});
+    }
+
+    @Override
+    public JobResumeOutcome resumeJob(String id, Map<String, Object> data, String approvedBy) {
+        return resumeJob(id, data, approvedBy, false, jobId -> {});
     }
 
     @Override
     public JobResumeOutcome resumeJobStreaming(
         String id, Map<String, Object> data, LongConsumer jobIdConsumer) {
 
-        return resumeJob(id, data, true, jobIdConsumer);
+        return resumeJob(id, data, null, true, jobIdConsumer);
     }
 
     @SuppressFBWarnings("CRLF_INJECTION_LOGS")
     private JobResumeOutcome resumeJob(
-        String id, Map<String, Object> data, boolean streaming, LongConsumer jobIdConsumer) {
+        String id, Map<String, Object> data, @Nullable String approvedBy, boolean streaming,
+        LongConsumer jobIdConsumer) {
+
+        Map<String, Object> resumeData = normalizeApprovedBy(data, approvedBy);
 
         Optional<String> innerTokenOptional = resolveInnerToken(id);
 
@@ -174,15 +199,33 @@ public class JobResumeFacadeImpl implements JobResumeFacade {
                 return JobResumeOutcome.STREAMING_NOT_ALLOWED;
             }
 
+            if (isSuspendExpired(job)) {
+                log.warn("Rejected resume for job {}: the pending approval expired", jobResumeId.getJobId());
+
+                incrementApprovalExpiredCounter("resume");
+
+                return JobResumeOutcome.GONE;
+            }
+
             consumeJobResumeId(job);
+
+            if (!jobService.tryClaimResume(job)) {
+                log.warn(
+                    "Lost the resume claim for job {} to a concurrent resolution or the expiry sweep",
+                    jobResumeId.getJobId());
+
+                return JobResumeOutcome.GONE;
+            }
 
             jobIdConsumer.accept(jobResumeId.getJobId());
 
             jobFacade.resumeJob(
                 jobResumeId.getJobId(), MapUtils.getLong(job.getMetadata(), MetadataConstants.TASK_EXECUTION_RESUME_ID),
-                data);
+                resumeData);
 
             applicationEventPublisher.publishEvent(new JobResumedEvent(id));
+
+            incrementApprovalResolutionCounter(resumeData);
 
             return JobResumeOutcome.OK;
         });
@@ -202,6 +245,62 @@ public class JobResumeFacadeImpl implements JobResumeFacade {
         }
 
         return approvalTokens.resolveInnerToken(id);
+    }
+
+    private static Map<String, Object> normalizeApprovedBy(Map<String, Object> data, String approvedBy) {
+        Map<String, Object> resumeData = data == null ? new HashMap<>() : new HashMap<>(data);
+
+        resumeData.remove(APPROVED_BY);
+
+        if (approvedBy != null && !approvedBy.isBlank()) {
+            resumeData.put(APPROVED_BY, approvedBy);
+        }
+
+        return resumeData;
+    }
+
+    private void incrementApprovalResolutionCounter(Map<String, Object> data) {
+        if (!data.containsKey(APPROVED)) {
+            return;
+        }
+
+        MeterRegistry meterRegistry = meterRegistryObjectProvider.getIfAvailable();
+
+        if (meterRegistry == null) {
+            return;
+        }
+
+        meterRegistry.counter(APPROVAL_RESOLUTION_METRIC_NAME, APPROVED, String.valueOf(data.get(APPROVED)))
+            .increment();
+    }
+
+    private boolean isSuspendExpired(Job job) {
+        Long taskExecutionResumeId = MapUtils.getLong(job.getMetadata(), MetadataConstants.TASK_EXECUTION_RESUME_ID);
+
+        if (taskExecutionResumeId == null) {
+            return false;
+        }
+
+        try {
+            TaskExecution taskExecution = taskExecutionService.getTaskExecution(taskExecutionResumeId);
+
+            Instant expiresAt = SuspendUtils.extractSuspendExpiresAt(taskExecution.getMetadata());
+
+            return expiresAt != null && expiresAt.isBefore(Instant.now());
+        } catch (Exception exception) {
+            return false;
+        }
+    }
+
+    private void incrementApprovalExpiredCounter(String source) {
+        MeterRegistry meterRegistry = meterRegistryObjectProvider.getIfAvailable();
+
+        if (meterRegistry == null) {
+            return;
+        }
+
+        meterRegistry.counter("bytechef_approval_expired", "source", source)
+            .increment();
     }
 
     private void consumeJobResumeId(Job job) {

@@ -82,6 +82,7 @@ import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import com.bytechef.task.dispatcher.suspend.SuspendTaskDispatcherPreSendProcessor;
 import com.bytechef.task.dispatcher.suspend.completion.SuspendTaskCompletionHandler;
 import com.bytechef.tenant.TenantContext;
+import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.tracing.Tracer;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -238,7 +239,8 @@ class AiAgentChatActionIntTest {
             event -> {}, new StaticListableBeanFactory().getBeanProvider(ApprovalTokens.class),
             new JobFacadeImpl(
                 eventPublisher, contextService, jobService, taskExecutionService, taskFileStorage, workflowService),
-            jobService, TransactionOperations.withoutTransaction());
+            jobService, new StaticListableBeanFactory().getBeanProvider(MeterRegistry.class),
+            TransactionOperations.withoutTransaction(), taskExecutionService);
     }
 
     @Test

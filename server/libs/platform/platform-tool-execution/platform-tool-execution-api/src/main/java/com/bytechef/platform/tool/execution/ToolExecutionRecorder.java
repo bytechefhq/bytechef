@@ -24,4 +24,6 @@ import java.util.function.Supplier;
 public interface ToolExecutionRecorder {
 
     <V> V record(ToolExecutionEvent.Builder builder, Supplier<V> execution);
+
+    void record(ToolExecutionEvent event);
 }

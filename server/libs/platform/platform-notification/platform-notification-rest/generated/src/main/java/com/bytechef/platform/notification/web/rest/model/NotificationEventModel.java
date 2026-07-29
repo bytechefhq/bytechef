@@ -42,7 +42,11 @@ public class NotificationEventModel {
     
     JOB_STARTED("JOB_STARTED"),
     
-    JOB_STOPPED("JOB_STOPPED");
+    JOB_STOPPED("JOB_STOPPED"),
+    
+    JOB_APPROVAL_EXPIRING("JOB_APPROVAL_EXPIRING"),
+    
+    JOB_APPROVAL_ESCALATED("JOB_APPROVAL_ESCALATED");
 
     private final String value;
 

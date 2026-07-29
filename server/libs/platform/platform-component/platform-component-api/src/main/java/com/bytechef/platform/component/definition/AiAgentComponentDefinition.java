@@ -17,6 +17,7 @@
 package com.bytechef.platform.component.definition;
 
 import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
+import static com.bytechef.component.definition.approval.ApprovalChannelFunction.APPROVAL_CHANNELS;
 import static com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction.CHAT_MEMORY;
 import static com.bytechef.platform.component.definition.ai.agent.GuardrailsFunction.GUARDRAILS;
 import static com.bytechef.platform.component.definition.ai.agent.ModelFunction.MODEL;
@@ -43,7 +44,7 @@ public interface AiAgentComponentDefinition extends ClusterRootComponentDefiniti
 
     @Override
     default List<ClusterElementType> getClusterElementTypes() {
-        return List.of(MODEL, CHAT_MEMORY, RAG, GUARDRAILS, TOOLS);
+        return List.of(MODEL, CHAT_MEMORY, RAG, GUARDRAILS, TOOLS, APPROVAL_CHANNELS);
     }
 
     @Override

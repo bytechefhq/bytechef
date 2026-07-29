@@ -73,12 +73,10 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
-import com.bytechef.platform.ai.approval.ApprovalRequestEvents;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
-import com.bytechef.platform.component.definition.SuspendAwareSseEmitterHandler;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
@@ -307,12 +305,7 @@ public class ApprovalRequestApprovalAction {
 
         Instant expiresAt = getExpiresAt(inputParameters);
 
-        if (actionContextAware.isEditorEnvironment()) {
-            if (actionContextAware.getJobId() != null) {
-                return createEditorApprovalRequestEmitterHandler(inputParameters, formUrl, expiresAt,
-                    actionContextAware);
-            }
-        } else {
+        if (!actionContextAware.isEditorEnvironment()) {
             ClusterElementMap clusterElementMap = ClusterElementMap.of(extensions);
 
             List<ClusterElement> approvalChannels = clusterElementMap.getClusterElements(APPROVAL_CHANNELS);
@@ -390,24 +383,6 @@ public class ApprovalRequestApprovalAction {
 
         return Instant.now()
             .plus(expiresIn, chronoUnit);
-    }
-
-    private static SuspendAwareSseEmitterHandler createEditorApprovalRequestEmitterHandler(
-        Parameters inputParameters, String formUrl, Instant expiresAt, ActionContextAware actionContextAware) {
-
-        Map<String, Object> eventData = ApprovalRequestEvents.buildApprovalRequestEventData(inputParameters, formUrl);
-
-        eventData.put(EXPIRES_AT, expiresAt.toString());
-
-        return new SuspendAwareSseEmitterHandler(
-            sseEmitter -> {
-                sseEmitter.send(eventData);
-
-                suspend(actionContextAware, formUrl, expiresAt);
-
-                sseEmitter.complete();
-            },
-            actionContextAware);
     }
 
     @SuppressWarnings("PMD.UnusedFormalParameter")

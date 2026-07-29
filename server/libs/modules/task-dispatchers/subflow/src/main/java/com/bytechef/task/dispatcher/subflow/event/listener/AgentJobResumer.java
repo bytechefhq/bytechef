@@ -100,6 +100,12 @@ class AgentJobResumer {
             return false;
         }
 
+        if (!jobService.tryClaimResume(agentJob)) {
+            log.warn("Lost the resume claim for agent job {} and suspend {}", agentJobId, agentJobResumeId);
+
+            return false;
+        }
+
         try {
             jobFacade.resumeJob(agentJobId, taskExecutionResumeId, subflowOutcome.toResumeData());
         } catch (RuntimeException exception) {

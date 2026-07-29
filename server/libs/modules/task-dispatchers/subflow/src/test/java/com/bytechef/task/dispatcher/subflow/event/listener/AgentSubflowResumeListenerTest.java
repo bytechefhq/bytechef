@@ -93,6 +93,8 @@ class AgentSubflowResumeListenerTest {
 
         lenient().when(jobService.getJob(AGENT_JOB_ID))
             .thenReturn(agentJob);
+        lenient().when(jobService.tryClaimResume(any()))
+            .thenReturn(true);
         lenient().when(taskExecutionService.fetchLastJobTaskExecution(SUBFLOW_JOB_ID))
             .thenReturn(Optional.empty());
     }

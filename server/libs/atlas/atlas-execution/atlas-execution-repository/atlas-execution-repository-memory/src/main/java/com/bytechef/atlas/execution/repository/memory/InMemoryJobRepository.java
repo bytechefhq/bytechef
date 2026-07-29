@@ -155,6 +155,27 @@ public class InMemoryJobRepository implements JobRepository {
     }
 
     @Override
+    public int updateStatusIfCurrentStatus(long id, int currentStatus, int newStatus) {
+        int[] updatedCount = {
+            0
+        };
+
+        cache.computeIfPresent(TenantCacheKeyUtils.getKey(id), (key, job) -> {
+            if (job.getStatus()
+                .ordinal() == currentStatus) {
+
+                job.setStatus(Job.Status.values()[newStatus]);
+
+                updatedCount[0] = 1;
+            }
+
+            return job;
+        });
+
+        return updatedCount[0];
+    }
+
+    @Override
     public Optional<Job> findLastJob() {
         throw new UnsupportedOperationException();
     }

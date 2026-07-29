@@ -21,6 +21,7 @@ package com.bytechef.component.whatsapp.constant;
  */
 public class WhatsAppConstants {
 
+    public static final String APP_SECRET = "appSecret";
     public static final String BODY = "body";
     public static final String CONTACTS = "contacts";
     public static final String GET_MESSAGE = "getMessage";

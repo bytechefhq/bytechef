@@ -36,7 +36,8 @@ import org.springframework.data.relational.core.mapping.Table;
 public final class ApprovalTask {
 
     public enum Status {
-        OPEN, IN_PROGRESS, COMPLETED
+
+        OPEN, IN_PROGRESS, COMPLETED, EXPIRED
     }
 
     public enum Priority {

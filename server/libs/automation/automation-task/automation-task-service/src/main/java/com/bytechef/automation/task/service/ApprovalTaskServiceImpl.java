@@ -99,6 +99,13 @@ public class ApprovalTaskServiceImpl implements ApprovalTaskService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<ApprovalTask> getUnresolvedApprovalTasks() {
+        return approvalTaskRepository.findAllByStatusIn(
+            List.of(ApprovalTask.Status.OPEN.ordinal(), ApprovalTask.Status.IN_PROGRESS.ordinal()));
+    }
+
+    @Override
     public ApprovalTask update(ApprovalTask approvalTask) {
         Assert.notNull(approvalTask, "'approvalTask' must not be null");
         Assert.notNull(approvalTask.getId(), "'id' must not be null");

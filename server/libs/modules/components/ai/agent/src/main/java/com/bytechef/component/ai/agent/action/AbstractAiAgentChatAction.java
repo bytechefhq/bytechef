@@ -52,6 +52,7 @@ import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.ai.agent.BaseToolFunction;
+import com.bytechef.platform.ai.constant.ToolSuspendConstants;
 import com.bytechef.platform.ai.tool.AiAgentToolContext;
 import com.bytechef.platform.ai.tool.ToolSuspension;
 import com.bytechef.platform.ai.tool.ToolSuspensionException;
@@ -66,6 +67,10 @@ import com.bytechef.platform.component.definition.ai.agent.RagFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
+import com.bytechef.platform.tool.execution.ToolExecutionKind;
+import com.bytechef.platform.tool.execution.ToolExecutionOutcome;
+import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
+import com.bytechef.platform.tool.execution.ToolExecutionSurface;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -99,6 +104,7 @@ import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.augment.AugmentedToolCallbackProvider;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.ai.tool.metadata.ToolMetadata;
+import org.springframework.beans.factory.ObjectProvider;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -120,14 +126,30 @@ public abstract class AbstractAiAgentChatAction {
     private final ClusterElementToolCallbacks clusterElementToolCallbacks;
     private final ToolCallingManager toolCallingManager;
 
+    private final @Nullable ObjectProvider<ToolExecutionRecorder> toolExecutionRecorderObjectProvider;
+
     protected AbstractAiAgentChatAction(
         AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
         ToolCallingManager toolCallingManager) {
+
+        this(aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager, null);
+    }
+
+    protected AbstractAiAgentChatAction(
+        AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
+        ToolCallingManager toolCallingManager,
+        @Nullable ObjectProvider<ToolExecutionRecorder> toolExecutionRecorderObjectProvider) {
 
         this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.clusterElementToolCallbacks =
             new ClusterElementToolCallbacks(aiAgentToolFacade, clusterElementDefinitionService);
         this.toolCallingManager = toolCallingManager;
+        this.toolExecutionRecorderObjectProvider = toolExecutionRecorderObjectProvider;
+    }
+
+    private @Nullable ToolExecutionRecorder fetchToolExecutionRecorder() {
+        return toolExecutionRecorderObjectProvider == null
+            ? null : toolExecutionRecorderObjectProvider.getIfAvailable();
     }
 
     protected ChatClient.ChatClientRequestSpec getChatClientRequestSpec(
@@ -139,12 +161,9 @@ public abstract class AbstractAiAgentChatAction {
             ModelUtils.getMessages(inputParameters, context), false);
     }
 
-    protected ChatClient.ChatClientRequestSpec getChatClientRequestSpec(
-        Parameters inputParameters, Map<String, ComponentConnection> connectionParameters, Parameters extensions,
-        @Nullable ToolExecutionListener toolExecutionListener, ActionContext context,
-        List<Message> messages, boolean resumedTurn) throws Exception {
-
-        ClusterElementMap clusterElementMap = ClusterElementMap.of(extensions);
+    private ChatModel resolveChatModel(
+        Parameters inputParameters, Map<String, ComponentConnection> connectionParameters,
+        ClusterElementMap clusterElementMap) throws Exception {
 
         ClusterElement modelClusterElement = clusterElementMap.getClusterElement(MODEL);
 
@@ -157,9 +176,19 @@ public abstract class AbstractAiAgentChatAction {
         Map<String, Object> concatenatedInputParameters = MapUtils.concat(
             new HashMap<>(inputParameters.toMap()), new HashMap<>(modelClusterElement.getParameters()));
 
-        ChatModel chatModel = (ChatModel) modelFunction.apply(
+        return (ChatModel) modelFunction.apply(
             ParametersFactory.create(concatenatedInputParameters),
             ParametersFactory.create(modelConnection.getParameters()), true);
+    }
+
+    protected ChatClient.ChatClientRequestSpec getChatClientRequestSpec(
+        Parameters inputParameters, Map<String, ComponentConnection> connectionParameters, Parameters extensions,
+        @Nullable ToolExecutionListener toolExecutionListener, ActionContext context,
+        List<Message> messages, boolean resumedTurn) throws Exception {
+
+        ClusterElementMap clusterElementMap = ClusterElementMap.of(extensions);
+
+        ChatModel chatModel = resolveChatModel(inputParameters, connectionParameters, clusterElementMap);
 
         String conversationId = clusterElementMap.fetchClusterElement(CHAT_MEMORY)
             .map(clusterElement -> resolveConversationId(inputParameters, clusterElement))
@@ -361,11 +390,128 @@ public abstract class AbstractAiAgentChatAction {
 
         Map<String, ?> resumeData = data.toMap();
 
-        String toolResult = resumeData.isEmpty() ? NO_HUMAN_RESPONSE_TOOL_RESULT : JsonUtils.write(resumeData);
+        String toolResult;
+
+        if (continueParameters.getString(ToolSuspendConstants.GATED_TOOL_NAME) != null) {
+            toolResult = resolveGatedToolResumeData(
+                inputParameters, continueParameters, data, connectionParameters, extensions, context);
+        } else {
+            toolResult = resumeData.isEmpty() ? NO_HUMAN_RESPONSE_TOOL_RESULT : JsonUtils.write(resumeData);
+        }
 
         return getChatClientRequestSpec(
             inputParameters, connectionParameters, extensions, toolExecutionListener, context,
             agentToolSuspension.resumeConversation(toolResult), true);
+    }
+
+    @SuppressWarnings("unchecked")
+    String resolveGatedToolResumeData(
+        Parameters inputParameters, Parameters continueParameters, Parameters data,
+        Map<String, ComponentConnection> connectionParameters, Parameters extensions, ActionContext context)
+        throws Exception {
+
+        boolean approved = data.getBoolean("approved", false);
+        String comment = data.getString("comment");
+        boolean hasComment = comment != null && !comment.isBlank();
+        String approvedBy = data.getString("approvedBy");
+        boolean hasApprovedBy = approvedBy != null && !approvedBy.isBlank();
+        ToolExecutionRecorder toolExecutionRecorder = fetchToolExecutionRecorder();
+
+        if (!approved) {
+            recordGateResolution(
+                toolExecutionRecorder, continueParameters, context, ToolExecutionOutcome.APPROVAL_DENIED);
+
+            Map<String, Object> denial = new HashMap<>();
+
+            denial.put("denied", true);
+            denial.put("reason", hasComment ? "Denied by reviewer: " + comment : "Denied by reviewer.");
+
+            if (hasApprovedBy) {
+                denial.put("deniedBy", approvedBy);
+            }
+
+            return JsonUtils.write(denial);
+        }
+
+        String gatedToolName = continueParameters.getRequiredString(ToolSuspendConstants.GATED_TOOL_NAME);
+        String gatedToolInput = continueParameters.getRequiredString(ToolSuspendConstants.GATED_TOOL_INPUT);
+        ClusterElementMap clusterElementMap = ClusterElementMap.of(extensions);
+
+        ToolCallback gatedToolCallback = clusterElementMap.getClusterElements(BaseToolFunction.TOOLS)
+            .stream()
+            .flatMap(
+                clusterElement -> clusterElementToolCallbacks.build(clusterElement, connectionParameters, context).stream())
+            .filter(toolCallback -> {
+                ToolDefinition toolDefinition = toolCallback.getToolDefinition();
+
+                return gatedToolName.equals(toolDefinition.name());
+            })
+            .findFirst()
+            .orElseThrow(() -> new IllegalStateException(
+                "The approved tool '" + gatedToolName + "' is no longer configured on the agent node; the " +
+                    "approval cannot be applied."));
+
+        Map<String, Map<String, String>> toolSimulations =
+            (Map<String, Map<String, String>>) inputParameters.get(TOOL_SIMULATIONS);
+
+        ToolCallback effectiveToolCallback = toolSimulations == null || toolSimulations.isEmpty()
+            ? gatedToolCallback
+            : createSimulationAwareToolCallback(
+                gatedToolCallback, toolSimulations,
+                resolveChatModel(inputParameters, connectionParameters, clusterElementMap), context);
+
+        Map<String, Object> approvedResult = new HashMap<>();
+
+        approvedResult.put("approvedByReviewer", true);
+
+        if (hasComment) {
+            approvedResult.put("reviewerComment", comment);
+        }
+
+        if (hasApprovedBy) {
+            approvedResult.put("reviewer", approvedBy);
+        }
+
+        ToolContext toolContext = new ToolContext(new AiAgentToolContext(context).toMap());
+
+        try {
+            String result = toolExecutionRecorder == null
+                ? effectiveToolCallback.call(gatedToolInput, toolContext)
+                : toolExecutionRecorder.record(
+                    createGateResolutionEventBuilder(continueParameters, context),
+                    () -> effectiveToolCallback.call(gatedToolInput, toolContext));
+
+            approvedResult.put("result", result);
+        } catch (Exception exception) {
+            approvedResult.put(
+                "error", Objects.toString(exception.getMessage(), "Tool execution failed after approval"));
+        }
+
+        return JsonUtils.write(approvedResult);
+    }
+
+    private static void recordGateResolution(
+        @Nullable ToolExecutionRecorder toolExecutionRecorder, Parameters continueParameters, ActionContext context,
+        ToolExecutionOutcome outcome) {
+
+        if (toolExecutionRecorder == null) {
+            return;
+        }
+
+        toolExecutionRecorder.record(
+            createGateResolutionEventBuilder(continueParameters, context)
+                .outcome(outcome)
+                .build());
+    }
+
+    private static com.bytechef.platform.tool.execution.ToolExecutionEvent.Builder createGateResolutionEventBuilder(
+        Parameters continueParameters, ActionContext context) {
+
+        return com.bytechef.platform.tool.execution.ToolExecutionEvent
+            .builder(
+                ToolExecutionSurface.AI_AGENT, ToolExecutionKind.COMPONENT,
+                continueParameters.getRequiredString(ToolSuspendConstants.GATED_TOOL_NAME))
+            .jobId(((ActionContextAware) context).getJobId());
     }
 
     protected @Nullable Consumer<List<Message>> createConversationCheckpointer(

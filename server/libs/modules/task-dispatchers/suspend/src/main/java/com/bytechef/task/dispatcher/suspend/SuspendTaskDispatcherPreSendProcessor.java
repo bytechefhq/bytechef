@@ -98,6 +98,9 @@ public class SuspendTaskDispatcherPreSendProcessor implements TaskDispatcherPreS
 
         jobMetadata.remove(MetadataConstants.JOB_RESUME_ID);
 
+        jobMetadata.remove("approvalReminderSentAt");
+        jobMetadata.remove("approvalEscalatedAt");
+
         job.setMetadata(jobMetadata);
 
         jobService.update(job);

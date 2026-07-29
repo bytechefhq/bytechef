@@ -59,6 +59,8 @@ public interface JobRepository {
 
     Optional<Job> findById(Long id);
 
+    int updateStatusIfCurrentStatus(long id, int currentStatus, int newStatus);
+
     Optional<Job> findByTaskExecutionId(Long taskExecutionId);
 
     Optional<Job> findLastJob();

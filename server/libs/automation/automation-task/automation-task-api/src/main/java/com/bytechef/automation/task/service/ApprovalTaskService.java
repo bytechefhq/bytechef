@@ -43,5 +43,7 @@ public interface ApprovalTaskService {
 
     List<ApprovalTask> getApprovalTasks(List<Long> ids);
 
+    List<ApprovalTask> getUnresolvedApprovalTasks();
+
     ApprovalTask update(ApprovalTask approvalTask);
 }

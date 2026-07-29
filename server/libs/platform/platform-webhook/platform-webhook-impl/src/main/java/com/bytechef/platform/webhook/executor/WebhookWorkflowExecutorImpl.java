@@ -264,6 +264,13 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
     }
 
     @Override
+    public boolean hasSuspendingTask(WorkflowExecutionId workflowExecutionId) {
+        Optional<WorkflowTask> suspendingTask = findSuspendingTask(getWorkflowId(workflowExecutionId));
+
+        return suspendingTask.isPresent();
+    }
+
+    @Override
     public boolean isWorkflowDisabled(WorkflowExecutionId workflowExecutionId) {
         JobPrincipalAccessor jobPrincipalAccessor =
             jobPrincipalAccessorRegistry.getJobPrincipalAccessor(workflowExecutionId.getType());

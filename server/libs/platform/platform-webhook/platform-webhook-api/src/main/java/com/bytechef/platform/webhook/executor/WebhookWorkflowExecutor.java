@@ -109,6 +109,14 @@ public interface WebhookWorkflowExecutor {
     boolean hasStreamingTask(WorkflowExecutionId workflowExecutionId);
 
     /**
+     * Returns {@code true} when the workflow contains at least one task that pauses the run: an approval
+     * ({@code approval/v1/...}, {@code waitForApproval/v1}) or a wait ({@code wait/v1/...}). Chat surfaces use this to
+     * route such a run onto the streaming/event-bridge path, where the approval card event raised by the chat approval
+     * channel has a registered listener.
+     */
+    boolean hasSuspendingTask(WorkflowExecutionId workflowExecutionId);
+
+    /**
      * Checks whether the workflow associated with the given execution id is currently disabled. Both transports use
      * this to short-circuit the dispatch path before execution is invoked.
      */

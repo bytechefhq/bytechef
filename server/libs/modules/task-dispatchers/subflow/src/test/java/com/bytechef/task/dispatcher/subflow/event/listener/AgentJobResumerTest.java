@@ -62,6 +62,8 @@ class AgentJobResumerTest {
     void testResumesTheAgentAndConsumesTheSuspend() {
         stubAgentJob(Job.Status.STOPPED, waitingMetadata());
 
+        when(jobService.tryClaimResume(any())).thenReturn(true);
+
         boolean resumed = new AgentJobResumer(jobFacade, jobService).resume(
             AGENT_JOB_ID, AGENT_JOB_RESUME_ID, SUBFLOW_OUTCOME);
 
@@ -135,6 +137,7 @@ class AgentJobResumerTest {
     void testReportsNotResumedWhenDispatchingTheResumeFails() {
         stubAgentJob(Job.Status.STOPPED, waitingMetadata());
 
+        when(jobService.tryClaimResume(any())).thenReturn(true);
         doThrow(new IllegalStateException("broker down")).when(jobFacade)
             .resumeJob(anyLong(), anyLong(), any());
 
@@ -142,6 +145,15 @@ class AgentJobResumerTest {
             AGENT_JOB_ID, AGENT_JOB_RESUME_ID, SUBFLOW_OUTCOME);
 
         assertThat(resumed).isFalse();
+    }
+
+    @Test
+    void testDoesNotResumeWhenTheClaimIsLost() {
+        stubAgentJob(Job.Status.STOPPED, waitingMetadata());
+
+        when(jobService.tryClaimResume(any())).thenReturn(false);
+
+        assertNotResumed();
     }
 
     private void assertNotResumed() {

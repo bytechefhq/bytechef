@@ -17,6 +17,8 @@
 package com.bytechef.atlas.execution.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
 
 import com.bytechef.atlas.configuration.converter.StringToWorkflowTaskConverter;
 import com.bytechef.atlas.configuration.converter.WorkflowTaskToStringConverter;
@@ -61,8 +63,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import tools.jackson.databind.ObjectMapper;
 
 /**
@@ -84,12 +86,15 @@ public class JobFacadeIntTest {
     private JobRepository jobRepository;
 
     @Autowired
+    private JobService jobService;
+
+    @Autowired
     private TaskExecutionRepository taskExecutionRepository;
 
     @Test
     public void testRequiredParameters() {
         Assertions.assertThrows(
-            NullPointerException.class,
+            IllegalArgumentException.class,
             () -> jobFacade.createJob(new JobParametersDTO("aGVsbG8x", Collections.emptyMap())));
     }
 
@@ -120,6 +125,79 @@ public class JobFacadeIntTest {
         assertThat(jobRepository.findById(childJobId)).isEmpty();
         assertThat(taskExecutionRepository.findById(parentTaskExecutionId)).isEmpty();
         assertThat(taskExecutionRepository.findById(childTaskExecutionId)).isEmpty();
+    }
+
+    @Test
+    public void testOptimisticLockRejectsConcurrentStoppedResumeClaim() {
+        Job job = newJob();
+
+        job.setStatus(Job.Status.STOPPED);
+
+        long jobId = Validate.notNull(jobRepository.save(job)
+            .getId(), "id");
+
+        Job racerA = jobRepository.findById(jobId)
+            .orElseThrow();
+        Job racerB = jobRepository.findById(jobId)
+            .orElseThrow();
+
+        racerA.setStatus(Job.Status.STARTED);
+
+        jobRepository.save(racerA);
+
+        racerB.setStatus(Job.Status.STARTED);
+
+        assertThatThrownBy(() -> jobRepository.save(racerB)).isInstanceOf(OptimisticLockingFailureException.class);
+
+        assertThat(jobRepository.findById(jobId))
+            .get()
+            .extracting(Job::getStatus)
+            .isEqualTo(Job.Status.STARTED);
+    }
+
+    @Test
+    public void testTryClaimResumeReturnsFalseWithoutThrowingWhenClaimIsLost() {
+        Job job = newJob();
+
+        job.setStatus(Job.Status.STOPPED);
+
+        long jobId = Validate.notNull(jobRepository.save(job)
+            .getId(), "id");
+
+        Job racerA = jobRepository.findById(jobId)
+            .orElseThrow();
+        Job racerB = jobRepository.findById(jobId)
+            .orElseThrow();
+
+        assertThat(jobService.tryClaimResume(racerA)).isTrue();
+
+        assertThat(jobService.tryClaimResume(racerB)).isFalse();
+    }
+
+    @Test
+    public void testResumeToStatusStartedTransitionsStoppedJob() {
+        Job job = newJob();
+
+        job.setStatus(Job.Status.STOPPED);
+
+        long jobId = Validate.notNull(jobRepository.save(job)
+            .getId(), "id");
+
+        assertThat(jobService.resumeToStatusStarted(jobId)
+            .getStatus()).isEqualTo(Job.Status.STARTED);
+    }
+
+    @Test
+    public void testResumeToStatusStartedIsIdempotentForAlreadyClaimedJob() {
+        Job job = newJob();
+
+        job.setStatus(Job.Status.STARTED);
+
+        long jobId = Validate.notNull(jobRepository.save(job)
+            .getId(), "id");
+
+        assertThat(jobService.resumeToStatusStarted(jobId)
+            .getStatus()).isEqualTo(Job.Status.STARTED);
     }
 
     private static Job newJob() {
@@ -158,19 +236,26 @@ public class JobFacadeIntTest {
     @Configuration
     public static class WorkflowExecutionIntTestConfiguration {
 
-        @MockitoBean
-        private ContextService contextService;
+        @Bean
+        ContextService contextService() {
+            return mock(ContextService.class);
+        }
 
-        @MockitoBean
-        private WorkflowService workflowService;
+        @Bean
+        WorkflowService workflowService() {
+            return mock(WorkflowService.class);
+        }
 
-        @MockitoBean
-        private TaskFileStorage taskFileStorage;
+        @Bean
+        TaskFileStorage taskFileStorage() {
+            return mock(TaskFileStorage.class);
+        }
 
         @Bean
         JobFacade jobFacade(
-            ApplicationEventPublisher eventPublisher, JobService jobService,
-            TaskExecutionService taskExecutionService) {
+            ApplicationEventPublisher eventPublisher, ContextService contextService, JobService jobService,
+            TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage,
+            WorkflowService workflowService) {
 
             return new JobFacadeImpl(
                 eventPublisher, contextService, jobService, taskExecutionService, taskFileStorage, workflowService);

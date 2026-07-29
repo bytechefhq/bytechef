@@ -20,6 +20,8 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.task.domain.ApprovalTask;
 import com.bytechef.automation.task.domain.ApprovalTask.Priority;
 import com.bytechef.automation.task.domain.ApprovalTask.Status;
+import com.bytechef.automation.task.domain.PendingApproval;
+import com.bytechef.automation.task.facade.ApprovalTaskFacade;
 import com.bytechef.automation.task.service.ApprovalTaskService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
@@ -27,6 +29,7 @@ import java.util.List;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -36,10 +39,14 @@ import org.springframework.stereotype.Controller;
 @ConditionalOnCoordinator
 public class ApprovalTaskGraphQlController {
 
+    private final ApprovalTaskFacade approvalTaskFacade;
     private final ApprovalTaskService approvalTaskService;
 
     @SuppressFBWarnings("EI")
-    public ApprovalTaskGraphQlController(ApprovalTaskService approvalTaskService) {
+    public ApprovalTaskGraphQlController(
+        ApprovalTaskFacade approvalTaskFacade, ApprovalTaskService approvalTaskService) {
+
+        this.approvalTaskFacade = approvalTaskFacade;
         this.approvalTaskService = approvalTaskService;
     }
 
@@ -56,18 +63,27 @@ public class ApprovalTaskGraphQlController {
     }
 
     @QueryMapping
+    @PreAuthorize("isTenantAdmin()")
     public ApprovalTask approvalTask(@Argument long id) {
         return approvalTaskService.getApprovalTask(id);
     }
 
     @QueryMapping
+    @PreAuthorize("isTenantAdmin()")
     public List<ApprovalTask> approvalTasks(@Argument Integer environmentId) {
         return approvalTaskService.getApprovalTasks(environmentId);
     }
 
     @QueryMapping
+    @PreAuthorize("isTenantAdmin()")
     public List<ApprovalTask> approvalTasksByIds(@Argument List<Long> ids) {
         return approvalTaskService.getApprovalTasks(ids);
+    }
+
+    @QueryMapping
+    @PreAuthorize("isTenantAdmin()")
+    public List<PendingApproval> pendingApprovals(@Argument Integer environmentId) {
+        return approvalTaskFacade.getPendingApprovals(environmentId);
     }
 
     @MutationMapping

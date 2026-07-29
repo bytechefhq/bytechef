@@ -74,6 +74,11 @@ public class ToolExecutionRecorderImpl implements ToolExecutionRecorder {
         }
     }
 
+    @Override
+    public void record(ToolExecutionEvent event) {
+        emit(event);
+    }
+
     private void emit(ToolExecutionEvent event) {
         try {
             MeterRegistry meterRegistry = meterRegistryProvider.getIfAvailable();

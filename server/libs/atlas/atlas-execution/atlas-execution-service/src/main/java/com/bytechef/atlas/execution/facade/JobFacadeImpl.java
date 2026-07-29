@@ -17,6 +17,7 @@
 package com.bytechef.atlas.execution.facade;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.coordinator.event.DeleteJobEvent;
 import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
 import com.bytechef.atlas.coordinator.event.ResumeJobEvent;
 import com.bytechef.atlas.coordinator.event.StartJobEvent;
@@ -106,6 +107,10 @@ public class JobFacadeImpl implements JobFacade {
         deleteJobFiles(id);
 
         taskExecutionService.deleteJobTaskExecutions(id);
+
+        Job job = jobService.getJob(id);
+
+        eventPublisher.publishEvent(new DeleteJobEvent(id, job.getMetadata()));
 
         jobService.deleteJob(id);
     }

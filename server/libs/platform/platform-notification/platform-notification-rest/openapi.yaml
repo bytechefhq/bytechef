@@ -191,3 +191,5 @@ components:
             - "JOB_FAILED"
             - "JOB_STARTED"
             - "JOB_STOPPED"
+            - "JOB_APPROVAL_EXPIRING"
+            - "JOB_APPROVAL_ESCALATED"

@@ -60,6 +60,8 @@ public interface JobService {
 
     Job resumeToStatusStarted(long id);
 
+    boolean tryClaimResume(Job job);
+
     Job setStatusToStarted(long id);
 
     Job setStatusToStopped(long id);

@@ -107,6 +107,11 @@ public record JobServiceWrapper(JobSyncExecutor.JobFactoryFunction jobFactoryFun
     }
 
     @Override
+    public boolean tryClaimResume(Job job) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Job setStatusToStarted(long id) {
         throw new UnsupportedOperationException();
     }
