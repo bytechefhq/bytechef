@@ -12,7 +12,7 @@ import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {ClusterElementsType, NodeDataType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
 import {Handle, Position} from '@xyflow/react';
-import {CheckIcon, ComponentIcon, EllipsisVerticalIcon, XIcon} from 'lucide-react';
+import {CheckIcon, ComponentIcon, EllipsisVerticalIcon, Loader2Icon, XIcon} from 'lucide-react';
 import {KeyboardEvent, ReactNode, forwardRef, memo, useCallback, useMemo, useState} from 'react';
 import sanitize from 'sanitize-html';
 import {twMerge} from 'tailwind-merge';
@@ -27,7 +27,7 @@ import {
 import useNodeClickHandler from '../hooks/useNodeClick';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
-import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
+import useWorkflowEditorStore, {type WorkflowTestNodeStateI} from '../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import {mapHandlePosition} from '../utils/directionUtils';
 import {getTask} from '../utils/getTask';
@@ -42,6 +42,21 @@ import styles from './NodeTypes.module.css';
 
 type EffectiveDirectionType = Parameters<typeof mapHandlePosition>[1];
 type NodePositionType = {x: number; y: number} | undefined;
+
+function formatTestNodeDuration(durationMillis: number): string {
+    if (durationMillis < 1000) {
+        return `${durationMillis}ms`;
+    }
+
+    if (durationMillis < 60000) {
+        return `${(durationMillis / 1000).toFixed(1)}s`;
+    }
+
+    const minutes = Math.floor(durationMillis / 60000);
+    const seconds = Math.round((durationMillis % 60000) / 1000);
+
+    return `${minutes}m ${seconds}s`;
+}
 
 interface WorkflowNodeContentProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'id'> {
     clusterElementTypesCount: number;
@@ -72,6 +87,7 @@ interface WorkflowNodeContentProps extends Omit<React.HTMLAttributes<HTMLDivElem
     setRenameValue: (value: string) => void;
     setSwitchPopoverOpen: (open: boolean) => void;
     switchPopoverOpen: boolean;
+    testNodeState?: WorkflowTestNodeStateI;
     workflowNodeDetailsPanelOpen: boolean;
 }
 
@@ -106,6 +122,7 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
             setRenameValue,
             setSwitchPopoverOpen,
             switchPopoverOpen,
+            testNodeState,
             workflowNodeDetailsPanelOpen,
             ...rest
         },
@@ -185,7 +202,11 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                             isClusterElement &&
                                 !isNestedClusterRoot &&
                                 !hasSavedClusterElementPosition &&
-                                'border-dashed'
+                                'border-dashed',
+                            testNodeState && 'relative',
+                            testNodeState?.status === 'RUNNING' && 'border-blue-500 hover:border-blue-500',
+                            testNodeState?.status === 'COMPLETED' && 'border-green-500 hover:border-green-500',
+                            testNodeState?.status === 'FAILED' && 'border-red-500 hover:border-red-500'
                         )}
                         onClick={handleNodeClick}
                         style={
@@ -196,6 +217,32 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                                   : undefined
                         }
                     >
+                        {testNodeState && (
+                            <span
+                                className={twMerge(
+                                    'absolute -top-2.5 -right-2.5 z-10 flex size-5 items-center justify-center rounded-full text-white',
+                                    testNodeState.status === 'RUNNING' && 'bg-blue-500',
+                                    testNodeState.status === 'COMPLETED' && 'bg-green-500',
+                                    testNodeState.status === 'FAILED' && 'bg-red-500'
+                                )}
+                                title={testNodeState.error}
+                            >
+                                {testNodeState.status === 'RUNNING' && (
+                                    <Loader2Icon className="!size-3.5 animate-spin" />
+                                )}
+
+                                {testNodeState.status === 'COMPLETED' && <CheckIcon className="!size-3.5" />}
+
+                                {testNodeState.status === 'FAILED' && <XIcon className="!size-3.5" />}
+                            </span>
+                        )}
+
+                        {testNodeState?.durationMillis != null && testNodeState.status !== 'RUNNING' && (
+                            <span className="absolute -bottom-2.5 left-1/2 z-10 -translate-x-1/2 rounded-full border border-stroke-neutral-tertiary bg-surface-neutral-primary px-1.5 text-xs leading-4 text-content-neutral-secondary">
+                                {formatTestNodeDuration(testNodeState.durationMillis)}
+                            </span>
+                        )}
+
                         <div
                             className={twMerge(
                                 (isMainRootClusterElement || isNestedClusterRoot) && 'flex items-center gap-4',
@@ -507,6 +554,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
         setCopiedWorkflowId,
         setRenamingNodeName,
         setRootClusterElementNodeData,
+        workflowTestNodeStates,
     } = useWorkflowEditorStore(
         useShallow((state) => ({
             clusterElementsCanvasOpen: state.clusterElementsCanvasOpen,
@@ -520,6 +568,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
             setCopiedWorkflowId: state.setCopiedWorkflowId,
             setRenamingNodeName: state.setRenamingNodeName,
             setRootClusterElementNodeData: state.setRootClusterElementNodeData,
+            workflowTestNodeStates: state.workflowTestNodeStates,
         }))
     );
 
@@ -902,6 +951,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
         setRenameValue,
         setSwitchPopoverOpen,
         switchPopoverOpen,
+        testNodeState: workflowTestNodeStates[data.workflowNodeName],
         workflowNodeDetailsPanelOpen,
     } satisfies WorkflowNodeContentProps;
 

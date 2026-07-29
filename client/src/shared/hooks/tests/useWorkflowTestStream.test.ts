@@ -4,20 +4,26 @@ import {afterEach, describe, expect, it, vi} from 'vitest';
 
 import {useWorkflowTestStream} from '../useWorkflowTestStream';
 
+const mockResetWorkflowTestNodeStates = vi.fn();
 const mockSetWorkflowIsRunning = vi.fn();
 const mockSetWorkflowTestExecution = vi.fn();
+const mockSetWorkflowTestNodeState = vi.fn();
 
 vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowEditorStore', () => ({
     default: vi.fn((selector) =>
         selector({
+            resetWorkflowTestNodeStates: mockResetWorkflowTestNodeStates,
             setWorkflowIsRunning: mockSetWorkflowIsRunning,
             setWorkflowTestExecution: mockSetWorkflowTestExecution,
+            setWorkflowTestNodeState: mockSetWorkflowTestNodeState,
         })
     ),
     useWorkflowEditorStore: vi.fn((selector) =>
         selector({
+            resetWorkflowTestNodeStates: mockResetWorkflowTestNodeStates,
             setWorkflowIsRunning: mockSetWorkflowIsRunning,
             setWorkflowTestExecution: mockSetWorkflowTestExecution,
+            setWorkflowTestNodeState: mockSetWorkflowTestNodeState,
         })
     ),
 }));
@@ -303,5 +309,118 @@ describe('useWorkflowTestStream', () => {
         act(() => {
             eventHandlers.stream({text: ''});
         });
+    });
+
+    it('should reset node states on start event', () => {
+        renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
+
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        const eventHandlers = (useSSE as any).mock.calls[0][1].eventHandlers;
+
+        act(() => {
+            eventHandlers.start({jobId: 'job-123'});
+        });
+
+        expect(mockResetWorkflowTestNodeStates).toHaveBeenCalled();
+    });
+
+    it('should handle task_started event', () => {
+        renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
+
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        const eventHandlers = (useSSE as any).mock.calls[0][1].eventHandlers;
+
+        act(() => {
+            eventHandlers.task_started({name: 'task_1', taskExecutionId: '10'});
+        });
+
+        expect(mockSetWorkflowTestNodeState).toHaveBeenCalledWith('task_1', {status: 'RUNNING'});
+    });
+
+    it('should handle task_completed event', () => {
+        renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
+
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        const eventHandlers = (useSSE as any).mock.calls[0][1].eventHandlers;
+
+        act(() => {
+            eventHandlers.task_completed({name: 'task_1', status: 'COMPLETED', taskExecutionId: '10'});
+        });
+
+        expect(mockSetWorkflowTestNodeState).toHaveBeenCalledWith('task_1', {status: 'COMPLETED'});
+    });
+
+    it('should compute duration for task_completed event with dates', () => {
+        renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
+
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        const eventHandlers = (useSSE as any).mock.calls[0][1].eventHandlers;
+
+        act(() => {
+            eventHandlers.task_completed({
+                endDate: '2026-07-20T10:00:01.250Z',
+                name: 'task_1',
+                startDate: '2026-07-20T10:00:00.000Z',
+                status: 'COMPLETED',
+                taskExecutionId: '10',
+            });
+        });
+
+        expect(mockSetWorkflowTestNodeState).toHaveBeenCalledWith('task_1', {
+            durationMillis: 1250,
+            status: 'COMPLETED',
+        });
+    });
+
+    it('should handle task_completed event with failed status', () => {
+        renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
+
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        const eventHandlers = (useSSE as any).mock.calls[0][1].eventHandlers;
+
+        act(() => {
+            eventHandlers.task_completed({name: 'task_1', status: 'FAILED', taskExecutionId: '10'});
+        });
+
+        expect(mockSetWorkflowTestNodeState).toHaveBeenCalledWith('task_1', {status: 'FAILED'});
+    });
+
+    it('should handle task_failed event', () => {
+        renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
+
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        const eventHandlers = (useSSE as any).mock.calls[0][1].eventHandlers;
+
+        act(() => {
+            eventHandlers.task_failed({error: 'Boom', name: 'task_1', taskExecutionId: '10'});
+        });
+
+        expect(mockSetWorkflowTestNodeState).toHaveBeenCalledWith('task_1', {error: 'Boom', status: 'FAILED'});
+    });
+
+    it('should handle task_started event with string data', () => {
+        renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
+
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        const eventHandlers = (useSSE as any).mock.calls[0][1].eventHandlers;
+
+        act(() => {
+            eventHandlers.task_started('{"name":"task_1","taskExecutionId":"10"}');
+        });
+
+        expect(mockSetWorkflowTestNodeState).toHaveBeenCalledWith('task_1', {status: 'RUNNING'});
+    });
+
+    it('should ignore task events without a name', () => {
+        renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
+
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        const eventHandlers = (useSSE as any).mock.calls[0][1].eventHandlers;
+
+        act(() => {
+            eventHandlers.task_started({taskExecutionId: '10'});
+        });
+
+        expect(mockSetWorkflowTestNodeState).not.toHaveBeenCalled();
     });
 });

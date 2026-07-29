@@ -17,6 +17,44 @@ export interface UseWorkflowTestStreamProps {
     onStart?: (jobId: string) => void;
 }
 
+interface TaskLifecyclePayloadI {
+    endDate?: string;
+    error?: string;
+    name?: string;
+    startDate?: string;
+    status?: string;
+    taskExecutionId?: string;
+}
+
+function computeDurationMillis(startDate?: string, endDate?: string): number | undefined {
+    if (!startDate || !endDate) {
+        return undefined;
+    }
+
+    const startMillis = Date.parse(startDate);
+    const endMillis = Date.parse(endDate);
+
+    if (Number.isNaN(startMillis) || Number.isNaN(endMillis) || endMillis < startMillis) {
+        return undefined;
+    }
+
+    return endMillis - startMillis;
+}
+
+function parseTaskLifecyclePayload(data: unknown): TaskLifecyclePayloadI | undefined {
+    try {
+        const payload = typeof data === 'string' ? JSON.parse(data) : data;
+
+        if (payload && typeof payload === 'object') {
+            return payload as TaskLifecyclePayloadI;
+        }
+    } catch (error) {
+        console.error('Failed to parse task lifecycle event:', error);
+    }
+
+    return undefined;
+}
+
 export interface UseWorkflowTestStreamResultI {
     close: () => void;
     error: string | null;
@@ -34,12 +72,15 @@ export function useWorkflowTestStream({
     const [streamRequest, setStreamRequest] = useState<SSERequestType>(null);
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
-    const {setWorkflowIsRunning, setWorkflowTestExecution} = useWorkflowEditorStore(
-        useShallow((state) => ({
-            setWorkflowIsRunning: state.setWorkflowIsRunning,
-            setWorkflowTestExecution: state.setWorkflowTestExecution,
-        }))
-    );
+    const {resetWorkflowTestNodeStates, setWorkflowIsRunning, setWorkflowTestExecution, setWorkflowTestNodeState} =
+        useWorkflowEditorStore(
+            useShallow((state) => ({
+                resetWorkflowTestNodeStates: state.resetWorkflowTestNodeStates,
+                setWorkflowIsRunning: state.setWorkflowIsRunning,
+                setWorkflowTestExecution: state.setWorkflowTestExecution,
+                setWorkflowTestNodeState: state.setWorkflowTestNodeState,
+            }))
+        );
     const {appendToLastAssistantMessage, setLastAssistantMessageContent, setResumeUrl} = useWorkflowTestChatStore(
         useShallow((state) => ({
             appendToLastAssistantMessage: state.appendToLastAssistantMessage,
@@ -120,6 +161,8 @@ export function useWorkflowTestStream({
 
                     const jobId = String(startData.jobId);
 
+                    resetWorkflowTestNodeStates();
+
                     persistJobId(jobId);
 
                     if (onStart) {
@@ -141,6 +184,32 @@ export function useWorkflowTestStream({
 
                 if (chunk) {
                     appendToLastAssistantMessage(chunk);
+                }
+            },
+            task_completed: (data) => {
+                const payload = parseTaskLifecyclePayload(data);
+
+                if (payload?.name) {
+                    const durationMillis = computeDurationMillis(payload.startDate, payload.endDate);
+
+                    setWorkflowTestNodeState(payload.name, {
+                        ...(durationMillis != null && {durationMillis}),
+                        status: payload.status === 'FAILED' ? 'FAILED' : 'COMPLETED',
+                    });
+                }
+            },
+            task_failed: (data) => {
+                const payload = parseTaskLifecyclePayload(data);
+
+                if (payload?.name) {
+                    setWorkflowTestNodeState(payload.name, {error: payload.error, status: 'FAILED'});
+                }
+            },
+            task_started: (data) => {
+                const payload = parseTaskLifecyclePayload(data);
+
+                if (payload?.name) {
+                    setWorkflowTestNodeState(payload.name, {status: 'RUNNING'});
                 }
             },
         },
