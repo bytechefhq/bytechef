@@ -18,13 +18,19 @@ import java.util.List;
  */
 public interface CustomComponentFacade {
 
+    CustomComponent createEmptyCustomComponent(String name, CustomComponent.Language language);
+
     void delete(Long id);
 
     CustomComponentDefinitionRecord getCustomComponentDefinition(Long id);
 
     List<CustomComponent> getCustomComponents();
 
+    String getCustomComponentSource(long id);
+
     void save(byte[] bytes, CustomComponent.Language language);
+
+    void updateCustomComponentSource(long id, String content);
 
     @SuppressFBWarnings("EI")
     record CustomComponentDefinitionRecord(

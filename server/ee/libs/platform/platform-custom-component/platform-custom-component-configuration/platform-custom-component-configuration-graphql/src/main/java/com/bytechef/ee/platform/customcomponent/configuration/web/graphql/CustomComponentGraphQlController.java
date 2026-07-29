@@ -56,6 +56,16 @@ class CustomComponentGraphQlController {
         return customComponentFacade.getCustomComponents();
     }
 
+    @QueryMapping
+    String customComponentSource(@Argument Long id) {
+        return customComponentFacade.getCustomComponentSource(id);
+    }
+
+    @MutationMapping
+    CustomComponent createCustomComponent(@Argument String name, @Argument CustomComponent.Language language) {
+        return customComponentFacade.createEmptyCustomComponent(name, language);
+    }
+
     @MutationMapping
     boolean deleteCustomComponent(@Argument Long id) {
         customComponentFacade.delete(id);
@@ -66,6 +76,13 @@ class CustomComponentGraphQlController {
     @MutationMapping
     boolean enableCustomComponent(@Argument Long id, @Argument boolean enable) {
         customComponentService.enableCustomComponent(id, enable);
+
+        return true;
+    }
+
+    @MutationMapping
+    boolean updateCustomComponentSource(@Argument Long id, @Argument String content) {
+        customComponentFacade.updateCustomComponentSource(id, content);
 
         return true;
     }

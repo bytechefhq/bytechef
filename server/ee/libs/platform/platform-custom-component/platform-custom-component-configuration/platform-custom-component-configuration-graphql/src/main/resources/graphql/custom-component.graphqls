@@ -2,11 +2,14 @@ extend type Query {
     customComponent(id: ID!): CustomComponent
     customComponentDefinition(id: ID!): CustomComponentDefinition
     customComponents: [CustomComponent!]!
+    customComponentSource(id: ID!): String!
 }
 
 extend type Mutation {
+    createCustomComponent(name: String!, language: CustomComponentLanguage!): CustomComponent!
     deleteCustomComponent(id: ID!): Boolean!
     enableCustomComponent(id: ID!, enable: Boolean!): Boolean!
+    updateCustomComponentSource(id: ID!, content: String!): Boolean!
 }
 
 type CustomComponent {
