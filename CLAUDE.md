@@ -483,6 +483,50 @@ trigger + post-turn query invalidation.
   applied on the MCP surface (no AG-UI stream). Spec:
   `docs/superpowers/specs/2026-07-18-management-mcp-manager-subagents-design.md`.
 
+### A2A servers (Agent2Agent, automation)
+
+- Module layout mirrors MCP but with its own tables: registration stack in
+  `automation-ai-a2a` (`-api` domain/services/facade, `-service` impls + `a2a_server` /
+  `a2a_project` / `a2a_project_workflow` liquibase, `-graphql` CRUD) plus the HTTP surface in
+  `automation-ai-a2a-server`; the transport-agnostic protocol core (`A2AProtocolHandler`,
+  card factory, executor SPI) is CE in `platform-ai-a2a` (dep: `a2a-java-sdk-spec` only —
+  never pull the client SDK's transports into the server).
+- Endpoints: `GET /api/automation/a2a/{secretKey}/.well-known/agent-card.json` and
+  `POST /api/automation/a2a/{secretKey}` (JSON-RPC: `message/send`, `message/stream` → SSE
+  via `SseEmitter`, `tasks/get`, `tasks/cancel`). The card advertises `streaming=false` —
+  `message/stream` is event-level (working → final `TaskStatusUpdateEvent`), not token-level.
+  Tasks live in a bounded in-handler LRU, not durable storage.
+- A workflow is A2A-exposable only with a `workflow/newWorkflowCall` trigger (same gate as
+  MCP); `message/send` routes the text to the server's first exposed workflow as the
+  `message` input keyed by the trigger name, run synchronously via `PrincipalJobFacade` +
+  `JobCompletionAwaiter`. Skill metadata (`skillName`/`skillDescription`/`skillTags`
+  constants on `A2aProjectWorkflow`) lives in its `parameters` map, falling back to the
+  workflow's label/description.
+- Auth reuses the shared MCP api-key plumbing (`McpApiKeyHttpConfigurer` +
+  `TenantAwareApiKeyAuthenticationFilter`) with an A2A path converter + per-server provider;
+  the secret is the tenant anchor, anonymous when `authenticationRequired=false`. GraphQL
+  mutations are `ROLE_ADMIN`, reads `isAuthenticated()`. The AI Agent's `agentClientTool`
+  (`sendTaskToRemoteAgent`) is the client counterpart. Spec:
+  `docs/superpowers/specs/2026-07-19-expose-ai-agent-a2a-server-design.md`; user docs:
+  `docs/content/docs/automation/a2a-servers.mdx`.
+
+### AI Gateway content guardrails (EE)
+
+- `AiGatewayGuardrails` runs in `AiGatewayFacadeImpl` on sync + streaming paths after prompt
+  resolution. Effective policy per request = global properties
+  (`bytechef.ai.gateway.guardrails.pii-redaction-enabled` / `blocked-terms` /
+  `moderation-enabled`) OR'd/unioned with the per-workspace `AiGatewayWorkspaceSettings`
+  fields (`redactPii`, `blockedTerms`, `moderationEnabled`). The workspace `redactPii`
+  setting drives BOTH trace-payload digesting and upstream prompt masking.
+- Violations throw `AiGatewayGuardrailException` (lives in `platform-ai-gateway-api` so the
+  public-rest `AiGatewayExceptionHandler` can map it) → HTTP 422 `guardrail_violation`; the
+  wire message never echoes the offending content or matched term.
+- Moderation: `AiGatewayModerationClassifier` SPI; `PromptBasedModerationClassifier`
+  registers only when `bytechef.ai.gateway.guardrails.moderation-model` names a catalog model
+  identifier and fails open on any error. Guardrails takes the classifier as a Spring-optional
+  `@Nullable` constructor dep. Order: redact → blocked terms → moderation (checks see
+  redacted text). Regexes must stay free of nested optional quantifiers (SpotBugs ReDoS).
+
 ### Sidebar navigation groups (Client)
 
 `AppSidebarNavItemI` has an optional `group` field; `AppSidebar` folds CONSECUTIVE items sharing
