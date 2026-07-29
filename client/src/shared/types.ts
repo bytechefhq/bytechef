@@ -187,6 +187,8 @@ export type ClusterElementsType = {
 export type NodeDataType = {
     branchData?: BranchDataType;
     branchId?: string;
+    branchIndex?: number;
+    caseKey?: string | number;
     clusterElements?: ClusterElementsType | Array<ClusterElementDefinitionBasic>;
     clusterElementName?: string;
     clusterElementType?: string;
@@ -216,6 +218,7 @@ export type NodeDataType = {
     mapData?: MapDataType;
     mapId?: string;
     maxRetries?: number;
+    onErrorCase?: 'mainBranch' | 'onErrorBranch';
     onErrorData?: OnErrorDataType;
     onErrorId?: string;
     metadata?: {
