@@ -1,0 +1,74 @@
+import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
+import Editor, {loader} from '@monaco-editor/react';
+import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
+import JsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
+import TsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
+import YamlWorker from 'monaco-yaml/yaml.worker?worker';
+import {useEffect, useState} from 'react';
+
+import type {EditorOptionsType, StandaloneCodeEditorType} from '@/shared/components/MonacoTypes';
+import type {editor} from 'monaco-editor';
+
+window.MonacoEnvironment = {
+    getWorker(_moduleId: string, label: string) {
+        switch (label) {
+            case 'editorWorkerService':
+                return new EditorWorker();
+            case 'javascript':
+            case 'typescript':
+                return new TsWorker();
+            case 'json':
+                return new JsonWorker();
+            case 'yaml':
+                return new YamlWorker();
+            default:
+                console.error(
+                    `MonacoEnvironment.getWorker: unexpected worker label "${label}", falling back to EditorWorker.`
+                );
+
+                return new EditorWorker();
+        }
+    },
+};
+
+let monacoConfigured = false;
+
+async function ensureMonacoConfigured(): Promise<void> {
+    if (monacoConfigured) {
+        return;
+    }
+
+    const monaco = await import('monaco-editor');
+
+    loader.config({monaco});
+
+    monacoConfigured = true;
+}
+
+interface MonacoEditorProps {
+    className?: string;
+    defaultLanguage: string;
+    onChange: (value: string | undefined) => void;
+    onMount: (editor: StandaloneCodeEditorType) => void;
+    onValidate?: (markers: editor.IMarkerData[]) => void;
+    options?: EditorOptionsType;
+    value?: string;
+}
+
+const MonacoEditorWrapper = (props: MonacoEditorProps) => {
+    const [isReady, setIsReady] = useState(monacoConfigured);
+
+    useEffect(() => {
+        if (!isReady) {
+            ensureMonacoConfigured().then(() => setIsReady(true));
+        }
+    }, [isReady]);
+
+    if (!isReady) {
+        return <MonacoEditorLoader />;
+    }
+
+    return <Editor {...props} loading={<MonacoEditorLoader />} />;
+};
+
+export default MonacoEditorWrapper;

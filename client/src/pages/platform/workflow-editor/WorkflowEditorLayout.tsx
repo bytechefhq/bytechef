@@ -2,9 +2,7 @@ import {ReactFlowProvider} from '@xyflow/react';
 
 import './WorkflowEditorLayout.css';
 
-import ClusterElementsCanvasDialog from '@/pages/platform/workflow-editor/components/ClusterElementsCanvasDialog';
 import WorkflowNodeDetailsPanel from '@/pages/platform/workflow-editor/components/WorkflowNodeDetailsPanel';
-import WorkflowTestChatPanel from '@/pages/platform/workflow-editor/components/workflow-test-chat/WorkflowTestChatPanel';
 import useWorkflowEditorLayout from '@/pages/platform/workflow-editor/hooks/useWorkflowEditorLayout';
 import {useWorkflowLayout} from '@/pages/platform/workflow-editor/hooks/useWorkflowLayout';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
@@ -36,14 +34,21 @@ import WorkflowInputsSheet from './components/workflow-inputs/WorkflowInputsShee
 import useDataPillPanelStore from './stores/useDataPillPanelStore';
 import useWorkflowDataStore from './stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from './stores/useWorkflowNodeDetailsPanelStore';
+import useWorkflowTestChatStore from './stores/useWorkflowTestChatStore';
 import {clearAllWorkflowMutations} from './utils/workflowMutationGuard';
 
+const ClusterElementsCanvasDialog = lazy(
+    () => import('@/pages/platform/workflow-editor/components/ClusterElementsCanvasDialog')
+);
 const IntegrationCodeWorkflowDetail = lazy(
     () => import('@/pages/platform/code-workflow/IntegrationCodeWorkflowDetail')
 );
 const ProjectCodeWorkflowDetail = lazy(() => import('@/pages/platform/code-workflow/ProjectCodeWorkflowDetail'));
 const DataPillPanel = lazy(() => import('./components/datapills/DataPillPanel'));
 const WorkflowEditor = lazy(() => import('./components/WorkflowEditor'));
+const WorkflowTestChatPanel = lazy(
+    () => import('@/pages/platform/workflow-editor/components/workflow-test-chat/WorkflowTestChatPanel')
+);
 const WorkflowRightSidebar = lazy(() => import('./components/WorkflowRightSidebar'));
 const WorkflowNodesSidebar = lazy(() => import('./components/WorkflowNodesSidebar'));
 
@@ -107,6 +112,7 @@ const WorkflowEditorLayout = ({
         }))
     );
     const dataPillPanelOpen = useDataPillPanelStore((state) => state.dataPillPanelOpen);
+    const workflowTestChatPanelOpen = useWorkflowTestChatStore((state) => state.workflowTestChatPanelOpen);
 
     const {
         componentDefinitions,
@@ -314,17 +320,23 @@ const WorkflowEditorLayout = ({
             )}
 
             {clusterDialogMounted && (
-                <ClusterElementsCanvasDialog
-                    onOpenChange={handleClusterElementsCanvasOpenChange}
-                    open={clusterElementsCanvasOpen}
-                    previousComponentDefinitions={previousComponentDefinitions}
-                    updateWorkflowMutation={updateWorkflowMutation!}
-                    workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
-                    workflowReferenceId={workflowReferenceId}
-                />
+                <Suspense fallback={null}>
+                    <ClusterElementsCanvasDialog
+                        onOpenChange={handleClusterElementsCanvasOpenChange}
+                        open={clusterElementsCanvasOpen}
+                        previousComponentDefinitions={previousComponentDefinitions}
+                        updateWorkflowMutation={updateWorkflowMutation!}
+                        workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
+                        workflowReferenceId={workflowReferenceId}
+                    />
+                </Suspense>
             )}
 
-            {workflow.id && <WorkflowTestChatPanel />}
+            {workflow.id && workflowTestChatPanelOpen && (
+                <Suspense fallback={null}>
+                    <WorkflowTestChatPanel />
+                </Suspense>
+            )}
 
             {currentNode?.type && !isMainRootClusterElement && !clusterElementsCanvasOpen && dataPillPanelOpen && (
                 <Suspense fallback={<DataPillPanelSkeleton />}>

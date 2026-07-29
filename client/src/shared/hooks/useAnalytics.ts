@@ -1,8 +1,9 @@
 import {UserI} from '@/shared/models/user.model';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
-import {PostHog} from 'posthog-js';
 import {useRef} from 'react';
 import {useShallow} from 'zustand/react/shallow';
+
+import type {PostHog} from 'posthog-js';
 
 export interface AnalyticsI {
     captureComponentUsed(name: string, actionName?: string, triggerName?: string): void;

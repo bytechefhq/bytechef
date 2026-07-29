@@ -3,11 +3,12 @@ import {
     setLastAssistantMessageContent as setContentHelper,
 } from '@/shared/util/assistant-message-utils';
 import {generateRandomId} from '@/shared/util/random-utils';
-import {ThreadMessageLike} from '@assistant-ui/react';
 
 /* eslint-disable sort-keys */
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
+
+import type {ThreadMessageLike} from '@assistant-ui/react';
 
 interface WorkflowTestChatStateI {
     conversationId: string | undefined;

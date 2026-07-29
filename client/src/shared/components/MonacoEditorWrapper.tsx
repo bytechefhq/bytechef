@@ -1,74 +1,19 @@
 import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
-import Editor, {loader} from '@monaco-editor/react';
-import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
-import JsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
-import TsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
-import YamlWorker from 'monaco-yaml/yaml.worker?worker';
-import {useEffect, useState} from 'react';
+import {Suspense, lazy} from 'react';
 
-import type {EditorOptionsType, StandaloneCodeEditorType} from '@/shared/components/MonacoTypes';
-import type {editor} from 'monaco-editor';
+import type {ComponentProps} from 'react';
 
-window.MonacoEnvironment = {
-    getWorker(_moduleId: string, label: string) {
-        switch (label) {
-            case 'editorWorkerService':
-                return new EditorWorker();
-            case 'javascript':
-            case 'typescript':
-                return new TsWorker();
-            case 'json':
-                return new JsonWorker();
-            case 'yaml':
-                return new YamlWorker();
-            default:
-                console.error(
-                    `MonacoEnvironment.getWorker: unexpected worker label "${label}", falling back to EditorWorker.`
-                );
+const MonacoEditorWrapperImpl = lazy(() => import('@/shared/components/MonacoEditorWrapperImpl'));
 
-                return new EditorWorker();
-        }
-    },
-};
-
-let monacoConfigured = false;
-
-async function ensureMonacoConfigured(): Promise<void> {
-    if (monacoConfigured) {
-        return;
-    }
-
-    const monaco = await import('monaco-editor');
-
-    loader.config({monaco});
-
-    monacoConfigured = true;
-}
-
-interface MonacoEditorProps {
-    className?: string;
-    defaultLanguage: string;
-    onChange: (value: string | undefined) => void;
-    onMount: (editor: StandaloneCodeEditorType) => void;
-    onValidate?: (markers: editor.IMarkerData[]) => void;
-    options?: EditorOptionsType;
-    value?: string;
-}
-
-const MonacoEditorWrapper = (props: MonacoEditorProps) => {
-    const [isReady, setIsReady] = useState(monacoConfigured);
-
-    useEffect(() => {
-        if (!isReady) {
-            ensureMonacoConfigured().then(() => setIsReady(true));
-        }
-    }, [isReady]);
-
-    if (!isReady) {
-        return <MonacoEditorLoader />;
-    }
-
-    return <Editor {...props} loading={<MonacoEditorLoader />} />;
-};
+/**
+ * Lazy boundary for Monaco. The implementation (and monaco-editor + its workers)
+ * loads only when an editor actually renders, keeping monaco out of every
+ * initial chunk. All import sites keep using this path unchanged.
+ */
+const MonacoEditorWrapper = (props: ComponentProps<typeof MonacoEditorWrapperImpl>) => (
+    <Suspense fallback={<MonacoEditorLoader />}>
+        <MonacoEditorWrapperImpl {...props} />
+    </Suspense>
+);
 
 export default MonacoEditorWrapper;
