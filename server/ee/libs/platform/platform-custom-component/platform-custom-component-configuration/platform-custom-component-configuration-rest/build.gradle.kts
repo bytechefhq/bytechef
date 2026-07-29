@@ -23,6 +23,27 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
     )
 }
 
+val generateInternalOpenAPISpring by tasks.registering(org.openapitools.generator.gradle.plugin.tasks.GenerateTask::class) {
+    apiPackage.set("com.bytechef.ee.platform.customcomponent.configuration.internal.web.rest")
+    configOptions.set(
+        mapOf(
+            "interfaceOnly" to "true",
+            "useSpringBoot3" to "true",
+            "useTags" to "true"
+        )
+    )
+    generatorName.set("spring")
+    inputSpec.set( "$projectDir/openapi-internal.yaml")
+    modelNameSuffix.set("Model")
+    modelPackage.set("com.bytechef.ee.platform.customcomponent.configuration.internal.web.rest.model")
+    outputDir.set("$projectDir/generated")
+    schemaMappings.set(
+        mapOf(
+            "Page" to "org.springframework.data.domain.Page",
+        )
+    )
+}
+
 sourceSets.main.get().java.srcDir("$projectDir/generated/src/main/java")
 
 //val generateOpenAPITypeScriptFetch by tasks.registering(org.openapitools.generator.gradle.plugin.tasks.GenerateTask::class) {
@@ -33,7 +54,7 @@ sourceSets.main.get().java.srcDir("$projectDir/generated/src/main/java")
 //}
 
 tasks.register("generateOpenAPI") {
-    dependsOn(generateOpenAPISpring/*, generateOpenAPITypeScriptFetch*/)
+    dependsOn(generateOpenAPISpring, generateInternalOpenAPISpring/*, generateOpenAPITypeScriptFetch*/)
 }
 
 dependencies {
@@ -61,5 +82,6 @@ dependencies {
 
     testImplementation("org.springframework:spring-webflux")
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
+    testImplementation(project(":server:libs:platform:platform-security-web:platform-security-web-impl"))
     testImplementation(project(":server:libs:test:test-int-support"))
 }
