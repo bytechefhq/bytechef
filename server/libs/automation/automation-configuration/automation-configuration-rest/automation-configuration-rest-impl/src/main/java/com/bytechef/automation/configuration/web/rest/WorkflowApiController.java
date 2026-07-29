@@ -69,13 +69,14 @@ public class WorkflowApiController extends AbstractWorkflowApiController impleme
     public ResponseEntity<CreateProjectWorkflow200ResponseModel> generateProjectWorkflow(
         @PathVariable("projectId") Long projectId, @RequestBody GenerateProjectWorkflowRequest request) {
 
-        ProjectWorkflow projectWorkflow = aiWorkflowGeneratorFacade.generateWorkflow(projectId, request.prompt());
+        ProjectWorkflow projectWorkflow = aiWorkflowGeneratorFacade.generateWorkflow(
+            projectId, request.prompt(), request.environmentId());
 
         return ResponseEntity.ok(
             new CreateProjectWorkflow200ResponseModel().projectWorkflowId(projectWorkflow.getId()));
     }
 
-    public record GenerateProjectWorkflowRequest(String prompt) {
+    public record GenerateProjectWorkflowRequest(String prompt, int environmentId) {
     }
 
     @Override

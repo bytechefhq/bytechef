@@ -19,7 +19,6 @@ package com.bytechef.automation.configuration.facade;
 import com.bytechef.ai.copilot.service.CopilotWorkflowGenerator;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.commons.util.JsonUtils;
-import com.bytechef.platform.configuration.context.EnvironmentContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +54,7 @@ public class AiWorkflowGeneratorFacadeImpl implements AiWorkflowGeneratorFacade 
      * facade proxy before generation starts — so the agent can read and update the row it is filling.
      */
     @Override
-    public ProjectWorkflow generateWorkflow(long projectId, String prompt) {
+    public ProjectWorkflow generateWorkflow(long projectId, String prompt, int environmentId) {
         if (StringUtils.isBlank(prompt)) {
             throw new IllegalArgumentException("prompt must not be blank");
         }
@@ -68,12 +67,6 @@ public class AiWorkflowGeneratorFacadeImpl implements AiWorkflowGeneratorFacade 
         }
 
         ProjectWorkflow projectWorkflow = projectWorkflowFacade.addWorkflow(projectId, buildEmptyDefinition(prompt));
-
-        // Design-time generation carries no request-supplied environment; resolve the AI provider under the ambient
-        // EnvironmentContext (bound by the request boundary, PRODUCTION when unset) rather than defaulting silently
-        // inside the agent.
-        int environmentId = EnvironmentContext.getCurrentEnvironment()
-            .ordinal();
 
         copilotWorkflowGenerator.generateWorkflow(
             projectWorkflow.getWorkflowId(), prompt.strip(), null, Set.of(), environmentId);

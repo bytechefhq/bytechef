@@ -27,5 +27,5 @@ import com.bytechef.automation.configuration.domain.ProjectWorkflow;
  */
 public interface AiWorkflowGeneratorFacade {
 
-    ProjectWorkflow generateWorkflow(long projectId, String prompt);
+    ProjectWorkflow generateWorkflow(long projectId, String prompt, int environmentId);
 }

@@ -39,7 +39,7 @@ public interface AiSkillApiFacade {
 
     AiSkill createAiSkillFromInstructions(String name, @Nullable String description, String instructions);
 
-    AiSkill generateAiSkill(String prompt);
+    AiSkill generateAiSkill(String prompt, int environmentId);
 
     void deleteAiSkill(long id);
 
