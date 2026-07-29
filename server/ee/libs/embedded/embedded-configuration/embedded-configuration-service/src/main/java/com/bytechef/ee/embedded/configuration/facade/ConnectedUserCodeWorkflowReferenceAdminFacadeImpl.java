@@ -15,6 +15,7 @@ import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectServic
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -106,8 +107,10 @@ public class ConnectedUserCodeWorkflowReferenceAdminFacadeImpl
 
         ConnectedUser connectedUser = connectedUserMap.get(connectedUserProject.getConnectedUserId());
 
+        Environment environment = connectedUser.getEnvironment();
+
         return new ConnectedUserCodeWorkflowReferenceDTO(
-            reference.getCatalogWorkflowUuid(), connectedUser.getExternalId(), reference.isEnabled(),
-            reference.isDangling(), reference.getDanglingReason());
+            reference.getCatalogWorkflowUuid(), connectedUser.getExternalId(), environment.name(),
+            reference.isEnabled(), reference.isDangling(), reference.getDanglingReason());
     }
 }

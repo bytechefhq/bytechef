@@ -1,6 +1,7 @@
 type ConnectedUserCodeWorkflowReference {
     catalogWorkflowUuid: ID!
     externalUserId: String!
+    environment: String!
     enabled: Boolean!
     dangling: Boolean!
     danglingReason: String

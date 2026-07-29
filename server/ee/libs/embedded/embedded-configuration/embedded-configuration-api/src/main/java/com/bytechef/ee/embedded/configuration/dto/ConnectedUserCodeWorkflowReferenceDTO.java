@@ -13,5 +13,6 @@ package com.bytechef.ee.embedded.configuration.dto;
  * @author Ivica Cardic
  */
 public record ConnectedUserCodeWorkflowReferenceDTO(
-    String catalogWorkflowUuid, String externalUserId, boolean enabled, boolean dangling, String danglingReason) {
+    String catalogWorkflowUuid, String externalUserId, String environment, boolean enabled, boolean dangling,
+    String danglingReason) {
 }

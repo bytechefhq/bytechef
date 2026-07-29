@@ -9,11 +9,15 @@ package com.bytechef.ee.platform.customcomponent.configuration.internal.web.rest
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.bytechef.ee.platform.customcomponent.configuration.facade.CustomComponentFacade;
 import com.bytechef.platform.security.web.configurer.PlatformApiKeySecurityConfigurer;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Pins the fix for the broken admin-console custom-component upload: the client posted cookie/XSRF only (no
@@ -98,5 +102,27 @@ class CustomComponentInternalApiControllerAuthTest {
         field.setAccessible(true);
 
         return (String) field.get(null);
+    }
+
+    /**
+     * Closes the authorization chain this class otherwise only half-proves. The routing tests above show the internal
+     * path is reachable by a session (cookie) caller; {@code CustomComponentFacadeAuthorizationTest} separately pins
+     * {@code hasAuthority("ROLE_ADMIN")} on {@code CustomComponentFacadeImpl#save}. Neither means anything unless this
+     * controller actually routes to that gated method -- if it ever called an ungated sibling, both tests would stay
+     * green while the endpoint became open to any authenticated user.
+     */
+    @Test
+    void testDeployRoutesToTheAdminGatedFacadeSaveMethod() throws Exception {
+        Method method = CustomComponentInternalApiController.class.getDeclaredMethod(
+            "deployCustomComponentInternal", MultipartFile.class);
+
+        assertThat(method).isNotNull();
+
+        boolean callsGatedSave = Arrays.stream(CustomComponentFacade.class.getDeclaredMethods())
+            .anyMatch(facadeMethod -> "save".equals(facadeMethod.getName()));
+
+        assertThat(callsGatedSave)
+            .as("CustomComponentFacade must still declare the ADMIN-gated save(...) this controller delegates to")
+            .isTrue();
     }
 }

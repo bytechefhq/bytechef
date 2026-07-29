@@ -12,6 +12,7 @@ import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.List;
 import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 /**
@@ -149,6 +150,12 @@ public class RemoteProjectWorkflowServiceClient implements ProjectWorkflowServic
 
     @Override
     public ProjectWorkflow update(ProjectWorkflow projectWorkflow) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public ProjectWorkflow
+        updateErrorWorkflow(long id, @Nullable Long errorProjectWorkflowId, boolean errorWorkflowDisabled) {
         throw new UnsupportedOperationException();
     }
 

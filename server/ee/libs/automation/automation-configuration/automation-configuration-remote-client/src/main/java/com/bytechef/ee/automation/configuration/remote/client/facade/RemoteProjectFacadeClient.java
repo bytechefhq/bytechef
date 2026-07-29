@@ -113,4 +113,9 @@ public class RemoteProjectFacadeClient implements ProjectFacade {
     public void updateProject(ProjectDTO projectDTO) {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public void updateProjectErrorWorkflow(long projectId, Long errorProjectWorkflowId) {
+        throw new UnsupportedOperationException();
+    }
 }
