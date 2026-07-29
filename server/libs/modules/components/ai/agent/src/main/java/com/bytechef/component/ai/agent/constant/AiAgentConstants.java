@@ -35,4 +35,13 @@ public class AiAgentConstants {
         LLMConstants.ATTACHMENTS_PROPERTY,
         LLMConstants.MESSAGES_PROPERTY,
         LLMConstants.RESPONSE_PROPERTY);
+
+    // Streaming chat always streams text: a streamed response cannot be validated against a JSON schema or
+    // self-corrected (the tokens are already flowing), so the structured-output response format is omitted.
+    public static final List<Property> STREAM_CHAT_PROPERTIES = List.of(
+        LLMConstants.FORMAT_PROPERTY,
+        LLMConstants.PROMPT_PROPERTY,
+        LLMConstants.SYSTEM_PROMPT_PROPERTY,
+        LLMConstants.ATTACHMENTS_PROPERTY,
+        LLMConstants.MESSAGES_PROPERTY);
 }

@@ -84,6 +84,11 @@ public class AiAgentRealtimeChatAction extends AbstractAiAgentChatAction {
     private static final String ASSISTANT_TOKEN_TYPE = "assistant_token";
     private static final String ERROR_TYPE = "error";
 
+    @Override
+    protected boolean isStreaming() {
+        return true;
+    }
+
     public static ActionDefinition of(
         AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
         ToolCallingManager toolCallingManager,

@@ -24,6 +24,7 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
@@ -334,7 +335,7 @@ class AbstractAiAgentChatActionTest {
                     .hasMessageContaining("guardrails");
         }
 
-        verify(actionContext, org.mockito.Mockito.atLeastOnce()).log(any());
+        verify(actionContext, atLeastOnce()).log(any());
     }
 
     @Test
@@ -763,6 +764,56 @@ class AbstractAiAgentChatActionTest {
         }
     }
 
+    @Test
+    void testCreatePromptForcesTextResponseFormatWhenStreaming() {
+        Parameters inputParameters = MockParametersFactory.create(
+            Map.of("response", Map.of("responseFormat", "JSON", "responseSchema", "{\"type\":\"object\"}")));
+
+        ActionContext context = mock(ActionContext.class);
+
+        AbstractAiAgentChatAction action = new StreamingTestAiAgentChatAction(
+            mock(AiAgentToolFacade.class), mock(ClusterElementDefinitionService.class),
+            mock(ToolCallingManager.class));
+
+        action.createPrompt(
+            ChatClient.builder(mock(ChatModel.class))
+                .build(),
+            inputParameters, context);
+
+        // A streaming action forces TEXT, so the JSON schema converter is never built and context.json is untouched —
+        // the model is not asked for structured output on a path that cannot validate or self-correct it.
+        verifyNoInteractions(context);
+    }
+
+    @Test
+    void testCreatePromptHonorsJsonResponseFormatWhenNotStreaming() {
+        Parameters inputParameters = MockParametersFactory.create(
+            Map.of("response", Map.of("responseFormat", "JSON", "responseSchema", "{\"type\":\"object\"}")));
+
+        ActionContext context = mock(ActionContext.class);
+        Context.Json json = mock(Context.Json.class);
+
+        when(json.readMap(anyString(), eq(Object.class))).thenReturn(new LinkedHashMap<>(Map.of("type", "object")));
+        when(json.write(any())).thenReturn("{\"type\":\"object\"}");
+        when(context.json(any())).thenAnswer(invocation -> {
+            Context.ContextFunction<Context.Json, Object> contextFunction = invocation.getArgument(0);
+
+            return contextFunction.apply(json);
+        });
+
+        AbstractAiAgentChatAction action = new TestAiAgentChatAction(
+            mock(AiAgentToolFacade.class), mock(ClusterElementDefinitionService.class),
+            mock(ToolCallingManager.class));
+
+        action.createPrompt(
+            ChatClient.builder(mock(ChatModel.class))
+                .build(),
+            inputParameters, context);
+
+        // The non-streaming path builds the JSON schema converter, so the structured-output format instruction is sent.
+        verify(context, atLeastOnce()).json(any());
+    }
+
     private static class TestAiAgentChatAction extends AbstractAiAgentChatAction {
 
         TestAiAgentChatAction(
@@ -770,6 +821,21 @@ class AbstractAiAgentChatActionTest {
             ToolCallingManager toolCallingManager) {
 
             super(aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
+        }
+    }
+
+    private static class StreamingTestAiAgentChatAction extends TestAiAgentChatAction {
+
+        StreamingTestAiAgentChatAction(
+            AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
+            ToolCallingManager toolCallingManager) {
+
+            super(aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
+        }
+
+        @Override
+        protected boolean isStreaming() {
+            return true;
         }
     }
 }

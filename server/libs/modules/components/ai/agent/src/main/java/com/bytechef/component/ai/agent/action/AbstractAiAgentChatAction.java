@@ -643,11 +643,22 @@ public abstract class AbstractAiAgentChatAction {
         }
     }
 
-    private static ChatClient.ChatClientRequestSpec createPrompt(
+    /**
+     * Whether this action streams its response. Streaming actions always produce text: a streamed response cannot be
+     * validated against a JSON schema or self-corrected once the tokens are flowing, so they force
+     * {@link ResponseFormat#TEXT} regardless of what the input parameters request.
+     */
+    protected boolean isStreaming() {
+        return false;
+    }
+
+    // Package-private for testing the streaming force-to-TEXT guard.
+    ChatClient.ChatClientRequestSpec createPrompt(
         ChatClient chatClient, Parameters inputParameters, ActionContext context) {
 
-        ResponseFormat responseFormat = inputParameters.getFromPath(
-            RESPONSE + "." + RESPONSE_FORMAT, ResponseFormat.class, ResponseFormat.TEXT);
+        ResponseFormat responseFormat = isStreaming()
+            ? ResponseFormat.TEXT
+            : inputParameters.getFromPath(RESPONSE + "." + RESPONSE_FORMAT, ResponseFormat.class, ResponseFormat.TEXT);
 
         if (responseFormat == ResponseFormat.TEXT) {
             return chatClient.prompt();

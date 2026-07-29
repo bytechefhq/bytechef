@@ -16,7 +16,7 @@
 
 package com.bytechef.component.ai.agent.action;
 
-import static com.bytechef.component.ai.agent.constant.AiAgentConstants.CHAT_PROPERTIES;
+import static com.bytechef.component.ai.agent.constant.AiAgentConstants.STREAM_CHAT_PROPERTIES;
 import static com.bytechef.component.definition.ActionDefinition.SseEmitterHandler.SseEmitter;
 import static com.bytechef.component.definition.ComponentDsl.action;
 
@@ -67,6 +67,11 @@ import reactor.core.publisher.Flux;
  */
 public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
 
+    @Override
+    protected boolean isStreaming() {
+        return true;
+    }
+
     public static ActionDefinition of(
         AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
         ToolCallingManager toolCallingManager,
@@ -106,7 +111,7 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
             action("streamChat")
                 .title("Chat (stream)")
                 .description("Chat with the AI agent and stream the response.")
-                .properties(CHAT_PROPERTIES)
+                .properties(STREAM_CHAT_PROPERTIES)
                 .output(
                     (MultipleConnectionsOutputFunction) (
                         inputParameters, componentConnections, extensions, context) -> ModelUtils.output(
