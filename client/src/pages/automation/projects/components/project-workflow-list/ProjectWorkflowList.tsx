@@ -8,6 +8,7 @@ import {useConvertN8nToWorkflow} from '@/pages/automation/project/hooks/useConve
 import handleImportN8nWorkflow from '@/pages/automation/project/utils/handleImportN8nWorkflow';
 import handleImportWorkflow from '@/pages/automation/project/utils/handleImportWorkflow';
 import ProjectWorkflowListItem from '@/pages/automation/projects/components/project-workflow-list/ProjectWorkflowListItem';
+import GenerateWorkflowDialog from '@/shared/components/workflow/GenerateWorkflowDialog';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useHasEnabledAiProvider} from '@/shared/hooks/useHasEnabledAiProvider';
@@ -18,7 +19,14 @@ import {useGetProjectWorkflowsQuery} from '@/shared/queries/automation/projectWo
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {useQueryClient} from '@tanstack/react-query';
-import {ChevronDownIcon, LayoutTemplateIcon, LoaderCircleIcon, UploadIcon, WorkflowIcon} from 'lucide-react';
+import {
+    ChevronDownIcon,
+    LayoutTemplateIcon,
+    LoaderCircleIcon,
+    SparklesIcon,
+    UploadIcon,
+    WorkflowIcon,
+} from 'lucide-react';
 import {useRef, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {toast} from 'sonner';
@@ -35,6 +43,7 @@ const ProjectWorkflowList = ({
     taskDispatcherDefinitions?: TaskDispatcherDefinition[];
 }) => {
     const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
+    const [showGenerateWorkflowDialog, setShowGenerateWorkflowDialog] = useState(false);
 
     const {captureProjectWorkflowCreated, captureProjectWorkflowImported} = useAnalytics();
     const navigate = useNavigate();
@@ -192,6 +201,17 @@ const ProjectWorkflowList = ({
                                                     onClick={(event) => {
                                                         event.stopPropagation();
 
+                                                        setShowGenerateWorkflowDialog(true);
+                                                    }}
+                                                >
+                                                    <SparklesIcon /> Generate with AI
+                                                </DropdownMenuItem>
+
+                                                <DropdownMenuItem
+                                                    className="dropdown-menu-item"
+                                                    onClick={(event) => {
+                                                        event.stopPropagation();
+
                                                         navigate(`./${project.id}/templates`);
                                                     }}
                                                 >
@@ -256,6 +276,10 @@ const ProjectWorkflowList = ({
                     parentId={project.id}
                     useGetWorkflowQuery={useGetWorkflowQuery}
                 />
+            )}
+
+            {showGenerateWorkflowDialog && project.id != null && (
+                <GenerateWorkflowDialog onClose={() => setShowGenerateWorkflowDialog(false)} projectId={project.id} />
             )}
 
             <input

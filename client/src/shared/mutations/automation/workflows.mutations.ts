@@ -25,6 +25,35 @@ export const useCreateProjectWorkflowMutation = (mutationProps?: CreateProjectWo
     });
 };
 
+export interface GenerateProjectWorkflowRequestI {
+    id: number;
+    prompt: string;
+}
+
+interface GenerateProjectWorkflowMutationProps {
+    onSuccess?: (result: CreateProjectWorkflow200Response, variables: GenerateProjectWorkflowRequestI) => void;
+    onError?: (error: Error, variables: GenerateProjectWorkflowRequestI) => void;
+}
+
+export const useGenerateProjectWorkflowMutation = (mutationProps?: GenerateProjectWorkflowMutationProps) =>
+    useMutation({
+        mutationFn: async (request: GenerateProjectWorkflowRequestI): Promise<CreateProjectWorkflow200Response> => {
+            const response = await fetch(`/api/automation/internal/projects/${request.id}/workflows/generate`, {
+                body: JSON.stringify({prompt: request.prompt}),
+                headers: {'Content-Type': 'application/json'},
+                method: 'POST',
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to generate workflow: ${response.status} ${response.statusText}`);
+            }
+
+            return response.json();
+        },
+        onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
+    });
+
 interface DeleteWorkflowMutationProps {
     onSuccess?: (result: void, variables: DeleteWorkflowRequest) => void;
     onError?: (error: Error, variables: DeleteWorkflowRequest) => void;
