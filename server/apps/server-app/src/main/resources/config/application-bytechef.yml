@@ -16,7 +16,7 @@ bytechef:
       chat:
         anthropic:
           options:
-            model: claude-sonnet-4-6
+            model: claude-opus-4-8
             temperature: 0.5
         deep-seek:
           options:
@@ -32,7 +32,7 @@ bytechef:
             model: meta/llama-3.1-70b-instruct
         openai:
           options:
-            model: gpt-5.1
+            model: gpt-5.4
             temperature: 1
             reasoning-effect: medium
             verbosity: low
