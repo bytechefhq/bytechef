@@ -9,8 +9,8 @@ tasks.withType<com.github.spotbugs.snom.SpotBugsTask>().configureEach {
 }
 
 dependencies {
-    implementation("com.embabel.agent:embabel-agent-api:0.3.5")
-    implementation("com.embabel.agent:embabel-agent-starter-platform:0.3.5")
+    implementation("com.embabel.agent:embabel-agent-api:1.0.0")
+    implementation("com.embabel.agent:embabel-agent-starter-platform:1.0.0")
     implementation("org.jetbrains.kotlin:kotlin-stdlib")
     implementation("org.springframework:spring-context")
     implementation(project(":server:libs:core:commons:commons-util"))

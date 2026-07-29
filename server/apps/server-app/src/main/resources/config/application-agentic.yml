@@ -1,0 +1,25 @@
+# Opt-in profile that lights up the Agentic AI component (Embabel GOAP planner).
+#
+# Activate with: SPRING_PROFILES_ACTIVE=<your profiles>,agentic
+#
+# No provider API key is required: all of the agent's LLM calls go through the workflow's
+# canvas-selected Model cluster element (with its ByteChef connection). Embabel's own model
+# registry is only satisfied at startup by ByteChef's 'bytechef-canvas' placeholder model,
+# which the default-llm property below points at.
+#
+# The exclude list REPLACES the spring.autoconfigure.exclude value from application.yml
+# (profile-specific properties win wholesale), so it must mirror that list minus the Embabel
+# platform entry.
+embabel:
+  models:
+    default-llm: bytechef-canvas
+spring:
+  autoconfigure:
+    exclude:
+      org.springaicommunity.agents.claude.autoconfigure.ClaudeAgentAutoConfiguration,
+      org.springaicommunity.agents.claude.autoconfigure.ClaudeHookAutoConfiguration,
+      org.springframework.ai.model.anthropic.autoconfigure.AnthropicChatAutoConfiguration,
+      org.springframework.ai.model.openai.autoconfigure.OpenAiChatAutoConfiguration,
+      org.springframework.ai.vectorstore.pgvector.autoconfigure.PgVectorStoreAutoConfiguration,
+      org.springframework.boot.data.redis.autoconfigure.DataRedisAutoConfiguration,
+      org.springframework.boot.neo4j.autoconfigure.Neo4jAutoConfiguration

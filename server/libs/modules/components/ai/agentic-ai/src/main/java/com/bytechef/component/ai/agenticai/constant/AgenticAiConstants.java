@@ -16,7 +16,9 @@
 
 package com.bytechef.component.ai.agenticai.constant;
 
+import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.number;
+import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Property.ControlType.TEXT_AREA;
@@ -44,6 +46,10 @@ public class AgenticAiConstants {
     public static final String OUTPUT_BINDING = "outputBinding";
     public static final String ACTION_COST = "actionCost";
     public static final double DEFAULT_ACTION_COST = 1.0;
+    public static final String OUTPUT_SCHEMA = "outputSchema";
+    public static final String OUTPUT_SCHEMA_NAME = "name";
+    public static final String OUTPUT_SCHEMA_TYPE = "type";
+    public static final String OUTPUT_SCHEMA_DESCRIPTION = "description";
 
     public static final List<Property> RUN_PROPERTIES = List.of(
         string(GOAL_DESCRIPTION)
@@ -112,6 +118,39 @@ public class AgenticAiConstants {
                     "values to discourage this action and lower values to encourage it. Defaults to " +
                     "1.0.")
             .defaultValue(DEFAULT_ACTION_COST)
+            .expressionEnabled(false)
+            .required(false),
+        array(OUTPUT_SCHEMA)
+            .label("Output Schema")
+            .description(
+                "Optional. When set, this action produces a structured JSON object with these " +
+                    "properties (a typed binding) instead of free text. Downstream actions receive " +
+                    "the object as JSON, and when the goal output binding is typed the run action " +
+                    "returns the structured object. All actions producing the same output binding " +
+                    "must declare the same schema.")
+            .items(
+                object()
+                    .properties(
+                        string(OUTPUT_SCHEMA_NAME)
+                            .label("Name")
+                            .description("Property name in the produced JSON object.")
+                            .required(true),
+                        string(OUTPUT_SCHEMA_TYPE)
+                            .label("Type")
+                            .description("Value type the model should produce for this property.")
+                            .options(
+                                option("String", "string"),
+                                option("Number", "number"),
+                                option("Integer", "integer"),
+                                option("Boolean", "boolean"),
+                                option("Array", "array"),
+                                option("Object", "object"))
+                            .defaultValue("string")
+                            .required(false),
+                        string(OUTPUT_SCHEMA_DESCRIPTION)
+                            .label("Description")
+                            .description("What this property contains. Guides the model's output.")
+                            .required(false)))
             .expressionEnabled(false)
             .required(false));
 }

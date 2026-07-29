@@ -18,7 +18,6 @@ package com.bytechef.platform.component.definition;
 
 import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
 import static com.bytechef.platform.component.definition.ai.agent.ActionFunction.ACTION;
-import static com.bytechef.platform.component.definition.ai.agent.GoalFunction.GOAL;
 import static com.bytechef.platform.component.definition.ai.agent.ModelFunction.MODEL;
 
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
@@ -31,6 +30,6 @@ public interface AgenticAiComponentDefinition extends ClusterRootComponentDefini
 
     @Override
     default List<ClusterElementType> getClusterElementTypes() {
-        return List.of(MODEL, ACTION, GOAL, TOOLS);
+        return List.of(MODEL, ACTION, TOOLS);
     }
 }

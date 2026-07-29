@@ -9,6 +9,7 @@ logging:
 spring:
   autoconfigure:
     exclude:
+      com.embabel.agent.autoconfigure.platform.AgentPlatformAutoConfiguration,
       org.springframework.boot.data.redis.autoconfigure.DataRedisAutoConfiguration,
       org.springframework.boot.neo4j.autoconfigure.Neo4jAutoConfiguration,
       org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration,
