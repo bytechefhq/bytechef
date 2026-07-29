@@ -225,7 +225,7 @@ const WorkflowCodeEditorSheet = ({
 
                             {(workflowIsRunning || (workflowTestExecution && showBottomPanel)) && (
                                 <ResizablePanel className="rounded-lg bg-surface-neutral-primary" defaultSize={500}>
-                                    {workflowIsRunning ? (
+                                    {workflowIsRunning && !workflowTestExecution?.job ? (
                                         <div className="flex size-full items-center justify-center gap-x-1 p-3 text-center">
                                             <span className="flex animate-spin text-gray-400">
                                                 <RefreshCwIcon className="size-4" />
