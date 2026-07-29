@@ -1,0 +1,47 @@
+query ToolInvocationLogs(
+    $surface: String
+    $outcome: String
+    $mcpServerId: Long
+    $connectedUserId: Long
+    $integrationInstanceId: Long
+    $fromDate: Long
+    $toDate: Long
+    $page: Int
+) {
+    toolInvocationLogs(
+        surface: $surface
+        outcome: $outcome
+        mcpServerId: $mcpServerId
+        connectedUserId: $connectedUserId
+        integrationInstanceId: $integrationInstanceId
+        fromDate: $fromDate
+        toDate: $toDate
+        page: $page
+    ) {
+        content {
+            id
+            surface
+            kind
+            toolName
+            componentName
+            componentVersion
+            operationName
+            connectionId
+            environment
+            externalUserId
+            connectedUserId
+            integrationInstanceId
+            mcpServerId
+            jobId
+            outcome
+            errorType
+            errorMessage
+            durationMs
+            createdDate
+        }
+        number
+        size
+        totalElements
+        totalPages
+    }
+}

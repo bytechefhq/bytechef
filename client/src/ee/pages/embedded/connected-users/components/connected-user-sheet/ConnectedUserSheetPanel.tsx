@@ -2,6 +2,7 @@ import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import ConnectedUserSheetPanelIntegrationList from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelIntegrationList';
 import ConnectedUserSheetPanelMcpServerList from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelMcpServerList';
 import ConnectedUserSheetPanelProfile from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelProfile';
+import ConnectedUserSheetPanelToolInvocationList from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelToolInvocationList';
 import ConnectedUserSheetPanelWorkflowList from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelWorkflowList';
 import {ConnectedUser} from '@/ee/shared/middleware/embedded/connected-user';
 
@@ -36,6 +37,10 @@ const ConnectedUserSheetPanel = ({connectedUser}: ConnectedUserSheetPanelProps) 
                     <TabsTrigger className={tabsTriggerClassName} value="workflows">
                         Automation Workflows
                     </TabsTrigger>
+
+                    <TabsTrigger className={tabsTriggerClassName} value="tool-invocations">
+                        Tool Invocations
+                    </TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="integrations">
@@ -56,6 +61,12 @@ const ConnectedUserSheetPanel = ({connectedUser}: ConnectedUserSheetPanelProps) 
                 <TabsContent value="workflows">
                     {connectedUser.id != null && (
                         <ConnectedUserSheetPanelWorkflowList connectedUserId={connectedUser.id} />
+                    )}
+                </TabsContent>
+
+                <TabsContent value="tool-invocations">
+                    {connectedUser.id != null && (
+                        <ConnectedUserSheetPanelToolInvocationList connectedUserId={connectedUser.id} />
                     )}
                 </TabsContent>
             </Tabs>

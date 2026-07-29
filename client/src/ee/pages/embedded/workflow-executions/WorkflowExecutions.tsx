@@ -8,7 +8,6 @@ import TablePagination from '@/components/TablePagination';
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import AutomationWorkflowExecutionsTable from '@/ee/pages/embedded/workflow-executions/components/AutomationWorkflowExecutionsTable';
-import WorkflowExecutionsFilterTitle from '@/ee/pages/embedded/workflow-executions/components/WorkflowExecutionsFilterTitle';
 import {useWorkflowExecutions} from '@/ee/pages/embedded/workflow-executions/hooks/useWorkflowExecutions';
 import {Integration} from '@/ee/shared/middleware/embedded/configuration';
 import {
@@ -24,6 +23,7 @@ import {useGetIntegrationVersionWorkflowsQuery} from '@/ee/shared/queries/embedd
 import {useGetIntegrationsQuery} from '@/ee/shared/queries/embedded/integrations.queries';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import AutomationWorkflowExecutionSheet from '@/pages/automation/workflow-executions/components/workflow-execution-sheet/WorkflowExecutionSheet';
+import ExecutionsTabs from '@/shared/components/ExecutionsTabs';
 import {useOnEnvironmentChange} from '@/shared/hooks/useOnEnvironmentChange';
 import Footer from '@/shared/layout/Footer';
 import Header from '@/shared/layout/Header';
@@ -450,15 +450,7 @@ export const WorkflowExecutions = () => {
                             <TooltipContent>Refresh</TooltipContent>
                         </Tooltip>
                     }
-                    title={
-                        workflowExecutions && workflowExecutions.length > 0 ? (
-                            <WorkflowExecutionsFilterTitle
-                                filterData={{environment: currentEnvironmentId, status: filterStatus}}
-                            />
-                        ) : (
-                            ''
-                        )
-                    }
+                    title={<ExecutionsTabs basePath="/embedded/executions" />}
                 />
             }
             leftSidebarBody={

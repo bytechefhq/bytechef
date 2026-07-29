@@ -83,6 +83,7 @@ const config: CodegenConfig = {
         '../server/libs/platform/platform-component/platform-component-log/platform-component-log-graphql/src/main/resources/graphql/*.graphqls',
         '../server/libs/ai/ai-mcp/ai-mcp-server-configuration/ai-mcp-server-configuration-graphql/src/main/resources/graphql/*.graphqls',
         '../server/ee/libs/platform/platform-user/platform-user-graphql/src/main/resources/graphql/*.graphqls',
+        '../server/ee/libs/platform/platform-tool-invocation-log/platform-tool-invocation-log-graphql/src/main/resources/graphql/*.graphqls',
         '../server/libs/platform/platform-oauth2-authorization-server/src/main/resources/graphql/*.graphqls',
         '../server/ee/libs/platform/platform-api-connector/platform-api-connector-configuration/platform-api-connector-configuration-graphql/src/main/resources/graphql/*.graphqls',
         '../server/ee/libs/ai/ai-copilot/ai-copilot-graphql/src/main/resources/graphql/*.graphqls',
