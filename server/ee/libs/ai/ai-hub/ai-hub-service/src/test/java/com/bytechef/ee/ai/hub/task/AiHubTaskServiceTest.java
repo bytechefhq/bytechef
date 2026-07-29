@@ -11,7 +11,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.lenient;
@@ -30,7 +29,6 @@ import com.bytechef.ee.ai.hub.task.AiHubTaskService.AiHubTaskMessage;
 import com.bytechef.ee.ai.hub.task.AiHubTaskService.AiHubTaskPatch;
 import com.bytechef.ee.ai.hub.task.repository.AiHubTaskRepository;
 import com.bytechef.ee.ai.hub.toolsearch.ToolSearchCatalogFeeder;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -38,12 +36,9 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 
 /**
  * Unit tests for {@link AiHubTaskServiceImpl}.
@@ -52,8 +47,6 @@ import org.springframework.jdbc.core.RowMapper;
  *
  * @author Ivica Cardic
  */
-// Mockito matcher noise — anyString() matchers passed to JdbcTemplate.query/update mocks are not real SQL strings.
-@SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
 @ExtendWith(MockitoExtension.class)
 class AiHubTaskServiceTest {
 
@@ -70,7 +63,16 @@ class AiHubTaskServiceTest {
     private com.bytechef.ee.ai.hub.task.repository.WorkspaceAiHubTaskRepository workspaceTaskRepository;
 
     @Mock
-    private JdbcTemplate jdbcTemplate;
+    private ObjectProvider<com.bytechef.ee.ai.hub.memory.AiHubSessionMemory> aiHubSessionMemoryProvider;
+
+    @Mock
+    private com.bytechef.ee.ai.hub.memory.AiHubSessionMemory aiHubSessionMemory;
+
+    @Mock
+    private org.springframework.ai.session.SessionService sessionService;
+
+    @Mock
+    private org.springframework.ai.session.SessionRepository sessionRepository;
 
     @Mock
     private com.bytechef.atlas.execution.facade.JobFacade jobFacade;
@@ -81,8 +83,43 @@ class AiHubTaskServiceTest {
     @Mock
     private com.bytechef.ee.ai.hub.agent.InFlightAiHubRunRegistry inFlightRunRegistry;
 
-    @InjectMocks
     private AiHubTaskServiceImpl taskService;
+
+    @org.junit.jupiter.api.BeforeEach
+    void setUp() {
+        lenient().when(aiHubSessionMemoryProvider.getIfAvailable())
+            .thenReturn(aiHubSessionMemory);
+        lenient().when(aiHubSessionMemory.sessionService())
+            .thenReturn(sessionService);
+        lenient().when(aiHubSessionMemory.sessionRepository())
+            .thenReturn(sessionRepository);
+
+        // The optional ObjectProvider dependencies are left null (copyAgentToolTemplate and the tool-search /
+        // artifact paths guard on null) — the same shape the previous @InjectMocks wiring produced.
+        taskService = new AiHubTaskServiceImpl(
+            taskRepository, workspaceTaskRepository, jobFacade, jobRegistry, inFlightRunRegistry, null, null, null,
+            null, aiHubSessionMemoryProvider, null);
+    }
+
+    private static org.springframework.ai.session.SessionEvent sessionEvent(
+        org.springframework.ai.chat.messages.MessageType type, String text, Instant timestamp) {
+
+        org.springframework.ai.session.SessionEvent event = mock(org.springframework.ai.session.SessionEvent.class);
+
+        org.springframework.ai.chat.messages.Message message =
+            type == org.springframework.ai.chat.messages.MessageType.USER
+                ? new org.springframework.ai.chat.messages.UserMessage(text)
+                : new org.springframework.ai.chat.messages.AssistantMessage(text);
+
+        lenient().when(event.getMessageType())
+            .thenReturn(type);
+        lenient().when(event.getMessage())
+            .thenReturn(message);
+        lenient().when(event.getTimestamp())
+            .thenReturn(timestamp);
+
+        return event;
+    }
 
     /**
      * Stubs the workspace-membership lookup for {@code taskId} with the given owning workspace. Tests on the happy path
@@ -198,10 +235,10 @@ class AiHubTaskServiceTest {
 
         Instant now = Instant.parse("2026-04-23T10:00:00Z");
 
-        AiHubTaskMessage expectedMessage = new AiHubTaskMessage("USER", "Hello", now);
+        List<org.springframework.ai.session.SessionEvent> events =
+            List.of(sessionEvent(org.springframework.ai.chat.messages.MessageType.USER, "Hello", now));
 
-        when(jdbcTemplate.query(anyString(), any(RowMapper.class), eq(THREAD_ID)))
-            .thenReturn(List.of(expectedMessage));
+        when(sessionService.getEvents(THREAD_ID)).thenReturn(events);
 
         List<AiHubTaskMessage> messages = taskService.loadMessages(1L, WORKSPACE_ID, USER_ID);
 
@@ -275,7 +312,7 @@ class AiHubTaskServiceTest {
 
         taskService.delete(1L, WORKSPACE_ID, USER_ID);
 
-        verify(jdbcTemplate).update(anyString(), eq(THREAD_ID));
+        verify(sessionService).delete(THREAD_ID);
         verify(taskRepository).delete(task);
     }
 
@@ -292,7 +329,7 @@ class AiHubTaskServiceTest {
             .isInstanceOf(NotFoundException.class)
             .hasMessageContaining("AiHubTask not found");
 
-        verify(jdbcTemplate, never()).update(anyString(), anyString());
+        verify(sessionService, never()).delete(any());
         verify(taskRepository, never()).delete(any());
     }
 
@@ -308,7 +345,7 @@ class AiHubTaskServiceTest {
             .isInstanceOf(NotFoundException.class)
             .hasMessageContaining("AiHubTask not found");
 
-        verify(jdbcTemplate, never()).update(anyString(), anyString());
+        verify(sessionService, never()).delete(any());
         verify(taskRepository, never()).delete(any());
     }
 
@@ -470,10 +507,12 @@ class AiHubTaskServiceTest {
         when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
         stubWorkspaceMembership(WORKSPACE_ID, 1L);
 
-        when(jdbcTemplate.query(anyString(), any(RowMapper.class), eq(THREAD_ID)))
-            .thenReturn(List.of(100L, 200L, 300L));
+        List<org.springframework.ai.session.SessionEvent> events = List.of(
+            sessionEvent(org.springframework.ai.chat.messages.MessageType.USER, "one", Instant.ofEpochMilli(100)),
+            sessionEvent(org.springframework.ai.chat.messages.MessageType.ASSISTANT, "two", Instant.ofEpochMilli(200)),
+            sessionEvent(org.springframework.ai.chat.messages.MessageType.USER, "three", Instant.ofEpochMilli(300)));
 
-        when(jdbcTemplate.update(anyString(), eq(THREAD_ID), any(java.sql.Timestamp.class))).thenReturn(2);
+        when(sessionService.getEvents(THREAD_ID)).thenReturn(events);
 
         when(taskRepository.save(any(AiHubTask.class)))
             .thenAnswer(invocation -> invocation.getArgument(0));
@@ -482,15 +521,14 @@ class AiHubTaskServiceTest {
 
         assertThat(deleted).isEqualTo(2);
 
-        // Verify the cutoff timestamp passed to the DELETE is the message at index 1 (200ms epoch). The DELETE
-        // statement is timestamp-based, so an off-by-one in fromMessageIndex would silently delete the wrong
-        // window — pin the boundary explicitly.
-        ArgumentCaptor<java.sql.Timestamp> cutoffCaptor = ArgumentCaptor.forClass(java.sql.Timestamp.class);
+        // Truncating from visible message index 1 keeps only the first event; pin the boundary so an off-by-one in
+        // the index-to-event mapping would fail the test.
+        ArgumentCaptor<List<org.springframework.ai.session.SessionEvent>> keptCaptor =
+            ArgumentCaptor.forClass(List.class);
 
-        verify(jdbcTemplate).update(anyString(), eq(THREAD_ID), cutoffCaptor.capture());
+        verify(sessionRepository).replaceEvents(eq(THREAD_ID), keptCaptor.capture());
 
-        assertThat(cutoffCaptor.getValue()
-            .getTime()).isEqualTo(200L);
+        assertThat(keptCaptor.getValue()).hasSize(1);
     }
 
     @Test
@@ -505,16 +543,19 @@ class AiHubTaskServiceTest {
         when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
         stubWorkspaceMembership(WORKSPACE_ID, 1L);
 
-        when(jdbcTemplate.query(anyString(), any(RowMapper.class), eq(THREAD_ID)))
-            .thenReturn(List.of(100L, 200L));
+        List<org.springframework.ai.session.SessionEvent> events = List.of(
+            sessionEvent(org.springframework.ai.chat.messages.MessageType.USER, "one", Instant.ofEpochMilli(100)),
+            sessionEvent(org.springframework.ai.chat.messages.MessageType.ASSISTANT, "two", Instant.ofEpochMilli(200)));
+
+        when(sessionService.getEvents(THREAD_ID)).thenReturn(events);
 
         int deleted = taskService.truncateMessagesFrom(1L, WORKSPACE_ID, USER_ID, 5);
 
         assertThat(deleted).isZero();
 
-        // No DELETE fired and no save() either — the task row's updatedAt is preserved when nothing
+        // Nothing replaced and no save() either — the task row's updatedAt is preserved when nothing
         // changed, so the sidebar doesn't re-sort for an effectively-no-op call.
-        verify(jdbcTemplate, never()).update(anyString(), any(), any());
+        verify(sessionRepository, never()).replaceEvents(any(), any());
         verify(taskRepository, never()).save(any());
     }
 
@@ -702,9 +743,9 @@ class AiHubTaskServiceTest {
             .thenReturn(artifactService);
 
         return new AiHubTaskServiceImpl(
-            taskRepository, workspaceTaskRepository, jdbcTemplate, jobFacade, jobRegistry, inFlightRunRegistry,
+            taskRepository, workspaceTaskRepository, jobFacade, jobRegistry, inFlightRunRegistry,
             personalAgentServiceProvider, taskToolFacadeProvider, toolSearchCatalogFeederProvider,
-            taskArtifactServiceProvider, mock(AiHubAuditPublisher.class));
+            taskArtifactServiceProvider, aiHubSessionMemoryProvider, mock(AiHubAuditPublisher.class));
     }
 
     /**

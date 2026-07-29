@@ -59,10 +59,14 @@ public class SelectConnectionToolCallback implements ToolCallback {
         between multiple already-configured Slack workspaces. Call this when the user has multiple
         existing connections for the component AND the next workflow step needs exactly one. The
         client renders a dropdown listing the workspace's existing connections for this component; the
-        user picks one and their choice is captured as their next chat message. Do NOT use this tool
-        to create a new connection — use createConnection for that. Do NOT use this tool when the
-        workspace has zero or one matching connection — call createConnection (zero existing) or
-        just proceed with the single existing connection (one existing).""";
+        user picks one and their choice is captured as their next chat message. Request connections
+        ONE AT A TIME: call this for a single component, then STOP and wait for the user's pick (it
+        arrives as their next "User picked: ..." message) before calling it again for another
+        component. Never request two connections in the same turn — the second picker's choice may
+        not register. Do NOT use this tool to create a new connection — use createConnection for
+        that. Do NOT use this tool when the workspace has zero or one matching connection — call
+        createConnection (zero existing) or just proceed with the single existing connection (one
+        existing).""";
 
     private static final String INPUT_SCHEMA =
         """

@@ -277,6 +277,106 @@ class NonEmptyMessagesAdvisorTest {
             .getText()).isEqualTo("no content");
     }
 
+    @Test
+    void testStripsDanglingAssistantToolCallFollowedByUserMessage() {
+        // EXACT reproduction of the poisoned-thread failure: the assistant emitted a tool_use, the turn was
+        // interrupted before the tool_result persisted, and the user retried. Chat memory replays
+        // ASSISTANT(tool_use) directly followed by USER — Anthropic rejects the tool_use with "tool_use ids were
+        // found without tool_result blocks immediately after", failing every later turn until the thread is cleared.
+        NonEmptyMessagesAdvisor advisor = new NonEmptyMessagesAdvisor();
+
+        AssistantMessage danglingToolUse = AssistantMessage.builder()
+            .content("")
+            .toolCalls(List.of(new ToolCall("call-1", "function", "listConnectionsForComponent", "{}")))
+            .build();
+
+        Prompt prompt = new Prompt(List.of(
+            new UserMessage("Use OpenAI"),
+            danglingToolUse,
+            new UserMessage("try again")));
+
+        ChatClientRequest request = ChatClientRequest.builder()
+            .prompt(prompt)
+            .build();
+
+        List<Message> patched = capturePatchedMessages(advisor, request);
+
+        assertThat(patched).hasSize(2);
+        assertThat(patched.get(0)
+            .getText()).isEqualTo("Use OpenAI");
+        assertThat(patched.get(1)
+            .getText()).isEqualTo("try again");
+    }
+
+    @Test
+    void testKeepsAnsweredToolCallButStripsUnansweredSibling() {
+        // Parallel tool calls where only one result reached memory: keep the answered call (its tool_result
+        // survives) and drop the unanswered one, so the tool_use/tool_result blocks stay balanced.
+        NonEmptyMessagesAdvisor advisor = new NonEmptyMessagesAdvisor();
+
+        AssistantMessage assistantMessage = AssistantMessage.builder()
+            .content("")
+            .toolCalls(List.of(
+                new ToolCall("call-1", "function", "answered", "{}"),
+                new ToolCall("call-2", "function", "unanswered", "{}")))
+            .build();
+
+        ToolResponseMessage toolResponseMessage = ToolResponseMessage.builder()
+            .responses(List.of(new ToolResponseMessage.ToolResponse("call-1", "answered", "{\"ok\":true}")))
+            .build();
+
+        Prompt prompt = new Prompt(List.of(
+            new UserMessage("Q"), assistantMessage, toolResponseMessage, new UserMessage("Next")));
+
+        ChatClientRequest request = ChatClientRequest.builder()
+            .prompt(prompt)
+            .build();
+
+        List<Message> patched = capturePatchedMessages(advisor, request);
+
+        assertThat(patched).hasSize(4);
+
+        AssistantMessage patchedAssistant = (AssistantMessage) patched.get(1);
+
+        assertThat(patchedAssistant.getToolCalls()).hasSize(1);
+        assertThat(patchedAssistant.getToolCalls()
+            .get(0)
+            .id()).isEqualTo("call-1");
+    }
+
+    @Test
+    void testStripsAssistantToolUseOrphanedByEmptyToolResultRemoval() {
+        // Composition of the two passes: an all-empty ToolResponseMessage (lossy chat-memory replay) is stripped
+        // first, which would orphan the preceding assistant tool_use. The pairing pass then removes that tool_use
+        // so no dangling tool_use reaches Anthropic.
+        NonEmptyMessagesAdvisor advisor = new NonEmptyMessagesAdvisor();
+
+        AssistantMessage assistantMessage = AssistantMessage.builder()
+            .content("")
+            .toolCalls(List.of(new ToolCall("call-1", "function", "searchComponents", "{}")))
+            .build();
+
+        Prompt prompt = new Prompt(List.of(
+            new UserMessage("Find Slack"),
+            assistantMessage,
+            ToolResponseMessage.builder()
+                .responses(List.of())
+                .build(),
+            new UserMessage("Anything?")));
+
+        ChatClientRequest request = ChatClientRequest.builder()
+            .prompt(prompt)
+            .build();
+
+        List<Message> patched = capturePatchedMessages(advisor, request);
+
+        assertThat(patched).hasSize(2);
+        assertThat(patched.get(0)
+            .getText()).isEqualTo("Find Slack");
+        assertThat(patched.get(1)
+            .getText()).isEqualTo("Anything?");
+    }
+
     private static ChatClientResponse dispatch(NonEmptyMessagesAdvisor advisor, ChatClientRequest request) {
         CallAdvisorChain chain = mock(CallAdvisorChain.class);
         ChatClientResponse response = mock(ChatClientResponse.class);

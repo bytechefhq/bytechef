@@ -14,6 +14,7 @@ import com.bytechef.ee.ai.hub.audit.AiHubAuditEvent;
 import com.bytechef.ee.ai.hub.audit.AiHubAuditPublisher;
 import com.bytechef.ee.ai.hub.exception.ConflictException;
 import com.bytechef.ee.ai.hub.exception.NotFoundException;
+import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.ee.ai.hub.personalagent.AiHubPersonalAgentResource;
 import com.bytechef.ee.ai.hub.personalagent.AiHubPersonalAgentService;
 import com.bytechef.ee.ai.hub.personalagent.AiHubPersonalAgentTool;
@@ -26,6 +27,7 @@ import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,11 +36,12 @@ import java.util.UUID;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.MessageType;
+import org.springframework.ai.session.SessionEvent;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -71,17 +74,9 @@ public class AiHubTaskServiceImpl implements AiHubTaskService {
      */
     private static final int MESSAGE_LIMIT = 500;
 
-    private static final String CHAT_MEMORY_QUERY =
-        "SELECT type, content, \"timestamp\" FROM SPRING_AI_CHAT_MEMORY WHERE conversation_id = ? " +
-            "ORDER BY \"timestamp\" ASC LIMIT " + MESSAGE_LIMIT;
-
-    private static final String CHAT_MEMORY_DELETE =
-        "DELETE FROM SPRING_AI_CHAT_MEMORY WHERE conversation_id = ?";
-
     private final AiHubTaskRepository taskRepository;
     private final WorkspaceAiHubTaskRepository workspaceTaskRepository;
     private final Clock clock;
-    private final JdbcTemplate jdbcTemplate;
     private final JobFacade jobFacade;
     private final WorkflowChatJobRegistry jobRegistry;
     private final InFlightAiHubRunRegistry inFlightRunRegistry;
@@ -89,23 +84,24 @@ public class AiHubTaskServiceImpl implements AiHubTaskService {
     private final ObjectProvider<AiHubTaskToolFacade> taskToolFacadeProvider;
     private final ObjectProvider<ToolSearchCatalogFeeder> toolSearchCatalogFeederProvider;
     private final ObjectProvider<AiHubTaskArtifactService> taskArtifactServiceProvider;
+    private final ObjectProvider<AiHubSessionMemory> aiHubSessionMemoryProvider;
     private final @Nullable AiHubAuditPublisher auditPublisher;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public AiHubTaskServiceImpl(
         AiHubTaskRepository taskRepository, WorkspaceAiHubTaskRepository workspaceTaskRepository,
-        JdbcTemplate jdbcTemplate, JobFacade jobFacade, WorkflowChatJobRegistry jobRegistry,
+        JobFacade jobFacade, WorkflowChatJobRegistry jobRegistry,
         InFlightAiHubRunRegistry inFlightRunRegistry,
         ObjectProvider<AiHubPersonalAgentService> aiHubPersonalAgentServiceProvider,
         ObjectProvider<AiHubTaskToolFacade> taskToolFacadeProvider,
         ObjectProvider<ToolSearchCatalogFeeder> toolSearchCatalogFeederProvider,
         ObjectProvider<AiHubTaskArtifactService> taskArtifactServiceProvider,
+        ObjectProvider<AiHubSessionMemory> aiHubSessionMemoryProvider,
         @Nullable AiHubAuditPublisher auditPublisher) {
 
         this.taskRepository = taskRepository;
         this.workspaceTaskRepository = workspaceTaskRepository;
         this.clock = Clock.systemUTC();
-        this.jdbcTemplate = jdbcTemplate;
         this.jobFacade = jobFacade;
         this.jobRegistry = jobRegistry;
         this.inFlightRunRegistry = inFlightRunRegistry;
@@ -125,6 +121,7 @@ public class AiHubTaskServiceImpl implements AiHubTaskService {
         // ObjectProvider so a deployment without the artifact service still gets a working AiHubTaskService —
         // the agent resource-template copy below is then a no-op, mirroring copyAgentToolTemplate.
         this.taskArtifactServiceProvider = taskArtifactServiceProvider;
+        this.aiHubSessionMemoryProvider = aiHubSessionMemoryProvider;
         // Nullable so unit tests constructing this impl without an audit publisher (and any deployment that
         // doesn't supply the EE bean) degrade to a no-op; publishTaskCreated/publishTaskDeleted guard on null.
         this.auditPublisher = auditPublisher;
@@ -612,17 +609,41 @@ public class AiHubTaskServiceImpl implements AiHubTaskService {
     public List<AiHubTaskMessage> loadMessages(
         long taskId, long requesterWorkspaceId, long requesterUserId) {
 
-        AiHubTask task =
-            loadAndCheckOwnership(taskId, requesterWorkspaceId, requesterUserId);
+        AiHubTask task = loadAndCheckOwnership(taskId, requesterWorkspaceId, requesterUserId);
 
-        return jdbcTemplate.query(
-            CHAT_MEMORY_QUERY,
-            (resultSet, rowNum) -> new AiHubTaskMessage(
-                resultSet.getString("type"),
-                resultSet.getString("content"),
-                resultSet.getTimestamp("timestamp")
-                    .toInstant()),
-            task.getThreadId());
+        AiHubSessionMemory sessionMemory = aiHubSessionMemoryProvider.getIfAvailable();
+
+        if (sessionMemory == null) {
+            return List.of();
+        }
+
+        return conversationEvents(sessionMemory, task.getThreadId())
+            .stream()
+            .limit(MESSAGE_LIMIT)
+            .map(event -> new AiHubTaskMessage(
+                event.getMessageType()
+                    .name(),
+                event.getMessage()
+                    .getText(),
+                event.getTimestamp()))
+            .toList();
+    }
+
+    private static boolean isVisibleConversationEvent(SessionEvent event) {
+        Message message = event.getMessage();
+
+        return message != null
+            && (event.getMessageType() == MessageType.USER || event.getMessageType() == MessageType.ASSISTANT)
+            && message.getText() != null && !message.getText()
+                .isBlank();
+    }
+
+    private static List<SessionEvent> conversationEvents(AiHubSessionMemory sessionMemory, String threadId) {
+        return sessionMemory.sessionService()
+            .getEvents(threadId)
+            .stream()
+            .filter(AiHubTaskServiceImpl::isVisibleConversationEvent)
+            .toList();
     }
 
     @Override
@@ -716,33 +737,43 @@ public class AiHubTaskServiceImpl implements AiHubTaskService {
             throw new IllegalArgumentException("fromMessageIndex must be non-negative; got " + fromMessageIndex);
         }
 
-        // Read the timestamps of the rows from the same ORDER BY the loadMessages path uses, then delete by
-        // exact-timestamp match. We can't use OFFSET in the DELETE because postgres doesn't support
-        // DELETE ... ORDER BY ... OFFSET. The timestamp list is bounded to MESSAGE_LIMIT (500), so the IN-clause
-        // delete is fine in practice — applies uniformly to STANDARD, WORKFLOW_CHAT, and PERSONAL_AGENT
-        // tasks (any task kind that uses chat-memory). A task that has accumulated more
-        // than MESSAGE_LIMIT messages can re-truncate after the first 500 land outside the window, or be deleted
-        // entirely if the user wants a hard reset.
-        List<Long> timestamps = jdbcTemplate.query(
-            "SELECT \"timestamp\" FROM SPRING_AI_CHAT_MEMORY WHERE conversation_id = ? "
-                + "ORDER BY \"timestamp\" ASC LIMIT " + MESSAGE_LIMIT,
-            (resultSet, rowNum) -> resultSet.getTimestamp("timestamp")
-                .getTime(),
-            task.getThreadId());
+        AiHubSessionMemory sessionMemory = aiHubSessionMemoryProvider.getIfAvailable();
 
-        if (fromMessageIndex >= timestamps.size()) {
-            // Index past the end is a no-op rather than an error. Lets the client send "truncate from N" without
-            // racing the server on history length — the worst case is no rows deleted.
+        if (sessionMemory == null) {
             return 0;
         }
 
-        // We delete by timestamp >= the captured cutoff. Two messages at the same millisecond would both fall in
-        // the deletion window, which is the right semantic — they're indistinguishable for ordering purposes.
-        long cutoffMillis = timestamps.get(fromMessageIndex);
+        String threadId = task.getThreadId();
 
-        int deleted = jdbcTemplate.update(
-            "DELETE FROM SPRING_AI_CHAT_MEMORY WHERE conversation_id = ? AND \"timestamp\" >= ?",
-            task.getThreadId(), new java.sql.Timestamp(cutoffMillis));
+        List<SessionEvent> allEvents = sessionMemory.sessionService()
+            .getEvents(threadId);
+
+        // Map the UI's message index (over the visible USER/ASSISTANT transcript that loadMessages returns) to a
+        // position in the full event list, then drop that event and everything after it (interleaved tool events
+        // included). Index past the end is a no-op rather than an error.
+        int visibleCount = 0;
+        int cutoffEventIndex = -1;
+
+        for (int i = 0; i < allEvents.size(); i++) {
+            if (isVisibleConversationEvent(allEvents.get(i))) {
+                if (visibleCount == fromMessageIndex) {
+                    cutoffEventIndex = i;
+
+                    break;
+                }
+
+                visibleCount++;
+            }
+        }
+
+        if (cutoffEventIndex < 0) {
+            return 0;
+        }
+
+        int deleted = allEvents.size() - cutoffEventIndex;
+
+        sessionMemory.sessionRepository()
+            .replaceEvents(threadId, new ArrayList<>(allEvents.subList(0, cutoffEventIndex)));
 
         // Bump the task's updatedAt so the sidebar re-sorts to the top — same convention every other
         // mutation here uses. messageCount is not authoritative for chat-memory rows (it tracks user-perceived
@@ -823,14 +854,7 @@ public class AiHubTaskServiceImpl implements AiHubTaskService {
 
     private void scheduleChatMemoryDeleteAfterCommit(String threadId) {
         if (!TransactionSynchronizationManager.isSynchronizationActive()) {
-            try {
-                jdbcTemplate.update(CHAT_MEMORY_DELETE, threadId);
-            } catch (DataAccessException exception) {
-                log.warn(
-                    "Failed to delete chat memory rows for threadId {} (task row already removed); leaving "
-                        + "orphan messages for background cleanup",
-                    threadId, exception);
-            }
+            deleteSessionMessages(threadId);
 
             return;
         }
@@ -839,16 +863,26 @@ public class AiHubTaskServiceImpl implements AiHubTaskService {
 
             @Override
             public void afterCommit() {
-                try {
-                    jdbcTemplate.update(CHAT_MEMORY_DELETE, threadId);
-                } catch (DataAccessException exception) {
-                    log.warn(
-                        "Failed to delete chat memory rows for threadId {} (task row already committed); "
-                            + "leaving orphan messages for background cleanup",
-                        threadId, exception);
-                }
+                deleteSessionMessages(threadId);
             }
         });
+    }
+
+    private void deleteSessionMessages(String threadId) {
+        AiHubSessionMemory sessionMemory = aiHubSessionMemoryProvider.getIfAvailable();
+
+        if (sessionMemory == null) {
+            return;
+        }
+
+        try {
+            sessionMemory.sessionService()
+                .delete(threadId);
+        } catch (RuntimeException exception) {
+            log.warn(
+                "Failed to delete session messages for threadId {}; leaving orphan messages for background cleanup",
+                threadId, exception);
+        }
     }
 
     @Override
