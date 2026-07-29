@@ -22,6 +22,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
+import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
@@ -34,6 +35,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.RandomUtils;
 import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.error.ExecutionError;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.component.constant.MetadataConstants;
@@ -69,6 +71,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -139,9 +144,11 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
 
         SseStreamBridge sseStreamBridge = sseStreamBridgeFactory.apply(key);
 
-        List<AutoCloseable> handles = registerListeners(jobId, sseStreamBridge);
-
         String currentTenantId = TenantContext.getCurrentTenantId();
+
+        JobProgressPublisher jobProgressPublisher = new JobProgressPublisher(jobId, currentTenantId, sseStreamBridge);
+
+        List<AutoCloseable> handles = registerListeners(jobId, sseStreamBridge, jobProgressPublisher);
 
         CompletableFuture<WorkflowTestExecutionDTO> future = CompletableFuture.supplyAsync(
             () -> TenantContext.callWithTenantId(currentTenantId, () -> {
@@ -156,6 +163,10 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
 
         future.whenComplete((result, throwable) -> {
             try {
+                // Closed before the terminal event goes out, so a snapshot still in flight can never land after it
+                // and repaint a finished run as running.
+                jobProgressPublisher.close();
+
                 if (throwable != null) {
                     if (throwable instanceof CancellationException) {
                         stop(jobId);
@@ -215,6 +226,15 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
     }
 
     private List<TaskExecutionDTO> getJobTaskExecutions(long jobId) {
+        return getJobTaskExecutions(jobId, false);
+    }
+
+    /**
+     * @param inProgress whether the job is still running. A task that has only just been created may not have pushed
+     *                   its context yet, and its parameters may reference outputs that do not exist yet, so a snapshot
+     *                   of a running job shows such a task without parameters instead of failing the whole snapshot.
+     */
+    private List<TaskExecutionDTO> getJobTaskExecutions(long jobId, boolean inProgress) {
         List<Long> childJobIds = jobService.getChildJobIds(jobId);
         Map<Long, Job> childJobMap = jobService.getJobs(childJobIds)
             .stream()
@@ -223,34 +243,58 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
         List<TaskExecutionDTO> taskExecutionDTOs = CollectionUtils.map(
             taskExecutionService.getJobTaskExecutions(jobId),
             taskExecution -> {
-                long taskExecutionId = Validate.notNull(taskExecution.getId(), "id");
-
-                Map<String, ?> context = taskFileStorage.readContextValue(
-                    contextService.peek(taskExecutionId, Context.Classname.TASK_EXECUTION));
-
                 DefinitionResult definitionResult = getDefinition(taskExecution.getType());
-                WorkflowTask workflowTask = taskExecution.getWorkflowTask();
                 Object output = taskExecution.getOutput() == null
                     ? null
                     : taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput());
 
                 return new TaskExecutionDTO(
                     taskExecution, definitionResult.title(), definitionResult.icon(),
-                    workflowTask.evaluateParameters(context, evaluator), output,
-                    asJobDTO(childJobMap.get(taskExecutionId)));
+                    getParameters(taskExecution, inProgress), output,
+                    asJobDTO(childJobMap.get(taskExecution.getId()), inProgress));
             });
 
         return buildHierarchy(taskExecutionDTOs);
     }
 
-    private JobDTO asJobDTO(Job job) {
+    private Map<String, ?> getParameters(TaskExecution taskExecution, boolean inProgress) {
+        long taskExecutionId = Validate.notNull(taskExecution.getId(), "id");
+        WorkflowTask workflowTask = taskExecution.getWorkflowTask();
+
+        try {
+            Map<String, ?> context = taskFileStorage.readContextValue(
+                contextService.peek(taskExecutionId, Context.Classname.TASK_EXECUTION));
+
+            return workflowTask.evaluateParameters(context, evaluator);
+        } catch (RuntimeException exception) {
+            if (!inProgress) {
+                throw exception;
+            }
+
+            if (log.isTraceEnabled()) {
+                log.trace(
+                    "Unable to evaluate parameters of running task execution {}: {}", taskExecutionId,
+                    exception.getMessage());
+            }
+
+            return Map.of();
+        }
+    }
+
+    private JobDTO asJobDTO(Job job, boolean inProgress) {
         if (job == null) {
             return null;
         }
 
         return new JobDTO(
             job, CollectionUtils.asMap(job.getOutputs(), taskFileStorage::readJobOutputs),
-            getJobTaskExecutions(Validate.notNull(job.getId(), "id")));
+            getJobTaskExecutions(Validate.notNull(job.getId(), "id"), inProgress));
+    }
+
+    private WorkflowTestExecutionDTO getJobProgressSnapshot(long jobId) {
+        Job job = jobService.getJob(jobId);
+
+        return new WorkflowTestExecutionDTO(new JobDTO(job, Map.of(), getJobTaskExecutions(jobId, true)), null);
     }
 
     private JobDTO execute(JobParametersDTO jobParametersDTO) {
@@ -424,30 +468,105 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
             triggerExecutionDTO);
     }
 
-    private List<AutoCloseable> registerListeners(long jobId, SseStreamBridge sseStreamBridge) {
+    private List<AutoCloseable> registerListeners(
+        long jobId, SseStreamBridge sseStreamBridge, JobProgressPublisher jobProgressPublisher) {
+
         List<AutoCloseable> handles = new ArrayList<>();
 
         handles.add(jobSyncExecutor.addJobStatusListener(
-            jobId, (event) -> sseStreamBridge.onEvent(Map.of("event", "job", "payload", event))));
+            jobId,
+            (event) -> {
+                sseStreamBridge.onEvent(
+                    Map.of(
+                        "event", "job_status",
+                        "payload",
+                        Map.of("jobId", String.valueOf(jobId), "status", String.valueOf(event.getStatus()))));
+
+                jobProgressPublisher.requestSnapshot();
+            }));
 
         handles.add(
             jobSyncExecutor.addTaskStartedListener(
-                jobId, (event) -> sseStreamBridge.onEvent(Map.of("event", "task", "payload", event))));
+                jobId, (event) -> {
+                    sseStreamBridge.onEvent(
+                        Map.of(
+                            "event", "task_started", "payload", getTaskStartedPayload(event.getTaskExecutionId())));
+
+                    jobProgressPublisher.requestSnapshot();
+                }));
 
         handles.add(
             jobSyncExecutor.addTaskExecutionCompleteListener(
-                jobId, (event) -> sseStreamBridge.onEvent(Map.of("event", "task", "payload", event))));
+                jobId, (event) -> {
+                    TaskExecution taskExecution = event.getTaskExecution();
+
+                    sseStreamBridge.onEvent(
+                        Map.of("event", "task_completed", "payload", getTaskLifecyclePayload(taskExecution)));
+
+                    jobProgressPublisher.requestSnapshot();
+                }));
 
         handles.add(
             jobSyncExecutor.addErrorListener(jobId, (event) -> {
                 if (log.isDebugEnabled()) {
                     log.debug("Received error event for job {}: {}", jobId, event);
                 }
+
+                if (event instanceof TaskExecutionErrorEvent taskExecutionErrorEvent) {
+                    sseStreamBridge.onEvent(
+                        Map.of(
+                            "event", "task_failed",
+                            "payload", getTaskLifecyclePayload(taskExecutionErrorEvent.getTaskExecution())));
+
+                    jobProgressPublisher.requestSnapshot();
+                }
             }));
 
         handles.add(jobSyncExecutor.addSseStreamBridge(jobId, sseStreamBridge));
 
         return handles;
+    }
+
+    private Map<String, Object> getTaskStartedPayload(long taskExecutionId) {
+        Map<String, Object> payload = new HashMap<>();
+
+        payload.put("taskExecutionId", String.valueOf(taskExecutionId));
+
+        try {
+            TaskExecution taskExecution = taskExecutionService.getTaskExecution(taskExecutionId);
+
+            payload.put("name", taskExecution.getName());
+        } catch (Exception exception) {
+            if (log.isTraceEnabled()) {
+                log.trace("Failed to resolve task execution {}: {}", taskExecutionId, exception.getMessage());
+            }
+        }
+
+        return payload;
+    }
+
+    private static Map<String, Object> getTaskLifecyclePayload(TaskExecution taskExecution) {
+        Map<String, Object> payload = new HashMap<>();
+
+        payload.put("taskExecutionId", String.valueOf(taskExecution.getId()));
+        payload.put("name", taskExecution.getName());
+        payload.put("status", String.valueOf(taskExecution.getStatus()));
+
+        if (taskExecution.getStartDate() != null) {
+            payload.put("startDate", String.valueOf(taskExecution.getStartDate()));
+        }
+
+        if (taskExecution.getEndDate() != null) {
+            payload.put("endDate", String.valueOf(taskExecution.getEndDate()));
+        }
+
+        ExecutionError executionError = taskExecution.getError();
+
+        if (executionError != null) {
+            payload.put("error", Objects.toString(executionError.getMessage(), "An error occurred"));
+        }
+
+        return payload;
     }
 
     private void unregisterListeners(List<AutoCloseable> handles) {
@@ -465,6 +584,79 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
     }
 
     private record DefinitionResult(String title, String icon) {
+    }
+
+    /**
+     * Streams {@code progress} snapshots of a running test job -- the same shape as the final {@code result} -- so the
+     * editor's test output panel can show task executions as they happen instead of a spinner. Task lifecycle events
+     * only request a snapshot; requests arriving within {@link #SNAPSHOT_INTERVAL_MILLIS} coalesce into one, and a
+     * request made while a snapshot is being built schedules a trailing one, so the last state before the result is
+     * never dropped. Building a snapshot reads every task execution's context and output, which is why it is never done
+     * per event nor on the listener thread that delivered the event.
+     */
+    private final class JobProgressPublisher implements AutoCloseable {
+
+        private static final long SNAPSHOT_INTERVAL_MILLIS = 500;
+
+        private final Executor delayedExecutor = CompletableFuture.delayedExecutor(
+            SNAPSHOT_INTERVAL_MILLIS, TimeUnit.MILLISECONDS);
+        private final long jobId;
+        private final Object lock = new Object();
+        private final AtomicBoolean scheduled = new AtomicBoolean();
+        private final SseStreamBridge sseStreamBridge;
+        private final String tenantId;
+
+        private boolean closed;
+
+        private JobProgressPublisher(long jobId, String tenantId, SseStreamBridge sseStreamBridge) {
+            this.jobId = jobId;
+            this.sseStreamBridge = sseStreamBridge;
+            this.tenantId = tenantId;
+        }
+
+        @Override
+        public void close() {
+            synchronized (lock) {
+                closed = true;
+            }
+        }
+
+        private void requestSnapshot() {
+            if (!scheduled.compareAndSet(false, true)) {
+                return;
+            }
+
+            delayedExecutor.execute(() -> TenantContext.runWithTenantId(tenantId, this::publishSnapshot));
+        }
+
+        private void publishSnapshot() {
+            // Cleared before building, so an event that lands while the snapshot is built schedules a trailing one.
+            scheduled.set(false);
+
+            synchronized (lock) {
+                if (closed) {
+                    return;
+                }
+            }
+
+            WorkflowTestExecutionDTO snapshot;
+
+            try {
+                snapshot = getJobProgressSnapshot(jobId);
+            } catch (RuntimeException exception) {
+                if (log.isTraceEnabled()) {
+                    log.trace("Unable to build progress snapshot for job {}: {}", jobId, exception.getMessage());
+                }
+
+                return;
+            }
+
+            synchronized (lock) {
+                if (!closed) {
+                    sseStreamBridge.onEvent(Map.of("event", "progress", "payload", snapshot));
+                }
+            }
+        }
     }
 
     private record WorkflowTestParameters(

@@ -121,10 +121,14 @@ public class TaskWorker {
             started.set(true);
 
             try {
-                eventPublisher.publishEvent(
-                    new TaskStartedApplicationEvent(
-                        Validate.notNull(taskExecution.getJobId(), "id"),
-                        Validate.notNull(taskExecution.getId(), "id")));
+                TaskStartedApplicationEvent taskStartedApplicationEvent = new TaskStartedApplicationEvent(
+                    Validate.notNull(taskExecution.getJobId(), "id"), Validate.notNull(taskExecution.getId(), "id"));
+
+                if (taskExecution.getStartDate() == null) {
+                    taskExecution.setStartDate(taskStartedApplicationEvent.getCreateDate());
+                }
+
+                eventPublisher.publishEvent(taskStartedApplicationEvent);
 
                 TaskExecution completedTaskExecution = doExecuteTask(taskExecution);
 
@@ -298,6 +302,7 @@ public class TaskWorker {
 
         taskExecution.setError(
             new ExecutionError(exception.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(exception))));
+        taskExecution.setEndDate(Instant.now());
         taskExecution.setStatus(Status.FAILED);
 
         eventPublisher.publishEvent(new TaskExecutionErrorEvent(taskExecution));
