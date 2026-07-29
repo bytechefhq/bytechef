@@ -785,6 +785,33 @@ public class AiHubTaskServiceImpl implements AiHubTaskService {
     }
 
     @Override
+    public void appendAssistantMessage(long taskId, long requesterWorkspaceId, long requesterUserId, String content) {
+        AiHubTask task = loadAndCheckOwnership(taskId, requesterWorkspaceId, requesterUserId);
+
+        if (content == null || content.isBlank()) {
+            return;
+        }
+
+        AiHubSessionMemory sessionMemory = aiHubSessionMemoryProvider.getIfAvailable();
+
+        if (sessionMemory == null) {
+            return;
+        }
+
+        String threadId = task.getThreadId();
+
+        sessionMemory.sessionRepository()
+            .appendEvent(
+                SessionEvent.builder()
+                    .sessionId(threadId)
+                    .message(new org.springframework.ai.chat.messages.AssistantMessage(content))
+                    .build());
+
+        task.setUpdatedAt(LocalDateTime.now(clock));
+        taskRepository.save(task);
+    }
+
+    @Override
     public boolean cancelWorkflowChatTurn(long taskId, long requesterWorkspaceId, long requesterUserId) {
         // Ownership check is the same gate as patch/delete — verifies the task belongs to the requester.
         // We don't restrict to kind=WORKFLOW_CHAT here: the cancel-turn surface is workflow-chat-specific by name

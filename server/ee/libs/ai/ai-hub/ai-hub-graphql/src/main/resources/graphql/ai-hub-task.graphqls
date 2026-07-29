@@ -171,6 +171,9 @@ extend type Mutation {
     """
     truncateAiHubTaskMessages(workspaceId: ID!, id: ID!, fromMessageIndex: Int!): Int!
 
+    "Appends an assistant message to the task's chat memory — persists an approval-resolution continuation streamed outside the bridge turn model."
+    appendAiHubTaskAssistantMessage(workspaceId: ID!, id: ID!, content: String!): Boolean!
+
     """
     Cancels an in-flight LLM agent run for a STANDARD or PERSONAL_AGENT task. Companion to
     {@code cancelWorkflowChatTurn}, which targets workflow-chat tasks bound to a workflow execution.

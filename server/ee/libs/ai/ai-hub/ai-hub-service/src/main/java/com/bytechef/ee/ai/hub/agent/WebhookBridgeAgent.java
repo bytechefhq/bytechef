@@ -354,7 +354,11 @@ public class WebhookBridgeAgent extends LocalAgent {
         boolean hasStreamingTask;
 
         try {
-            hasStreamingTask = webhookWorkflowExecutor.hasStreamingTask(workflowExecutionId);
+            // Approval tasks also force the event-bridge path: the chat approval channel publishes the card
+            // event onto the run's SSE stream, which only has a listener when this turn goes through
+            // webhookWorkflowExecutor.stream(...). On the sync path the card would be raised into the void.
+            hasStreamingTask = webhookWorkflowExecutor.hasStreamingTask(workflowExecutionId)
+                || webhookWorkflowExecutor.hasApprovalTask(workflowExecutionId);
         } catch (RuntimeException exception) {
             // Defensive: workflow lookup can fail if the workflow was deleted between the trigger-flags check
             // above and this call. Fall back to the trigger flag rather than failing the whole turn — at worst

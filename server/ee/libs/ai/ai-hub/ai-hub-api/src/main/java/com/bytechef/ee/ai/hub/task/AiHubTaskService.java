@@ -159,6 +159,19 @@ public interface AiHubTaskService {
         long taskId, long requesterWorkspaceId, long requesterUserId, int fromMessageIndex);
 
     /**
+     * Appends an assistant message to the task's chat memory. Used by the workflow-chat client to persist an
+     * approval-resolution continuation — the resumed run's output streams to the client outside the
+     * {@code WebhookBridgeAgent} turn model, so without this write the continuation text would vanish on reload. Blank
+     * content is a no-op. Ownership invariants match {@link #truncateMessagesFrom}.
+     *
+     * @param taskId               the task to append to
+     * @param requesterWorkspaceId workspace the requester claims; must own the task
+     * @param requesterUserId      the requesting user; must own the task
+     * @param content              the assistant message text
+     */
+    void appendAssistantMessage(long taskId, long requesterWorkspaceId, long requesterUserId, String content);
+
+    /**
      * Cancels the in-flight workflow-chat turn for the given task. Returns {@code true} if a job was cancelled,
      * {@code false} when no job is currently running for this task (idempotent — the user may click stop after the
      * workflow has already completed; we report the no-op clearly).

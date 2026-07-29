@@ -283,6 +283,20 @@ public class AiHubTaskGraphQlController {
         return taskService.truncateMessagesFrom(id, workspaceId, userId, fromMessageIndex);
     }
 
+    @MutationMapping
+    public boolean appendAiHubTaskAssistantMessage(
+        @Argument long workspaceId, @Argument long id, @Argument String content) {
+
+        long userId = userService.getCurrentUser()
+            .getId();
+
+        WorkspaceAccessGuard.verifyUserCanAccessWorkspace(workspaceFacade, userId, workspaceId);
+
+        taskService.appendAssistantMessage(id, workspaceId, userId, content);
+
+        return true;
+    }
+
     /**
      * Resolves the owning workspace id for a task. The entity is workspace-agnostic by design (the relation lives in
      * {@code workspace_ai_hub_task}), so we cannot resolve via property access on the entity and have to consult the
