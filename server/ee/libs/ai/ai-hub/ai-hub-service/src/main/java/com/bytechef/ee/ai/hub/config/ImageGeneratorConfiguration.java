@@ -7,11 +7,11 @@
 
 package com.bytechef.ee.ai.hub.config;
 
+import com.bytechef.automation.ai.tool.CreateBinaryAssetFileToolCallback;
 import com.bytechef.automation.assetfile.service.AssetFileFacade;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.ai.hub.task.AiHubTaskService;
 import com.bytechef.ee.ai.hub.tool.AiHubTaskArtifactRecorder;
-import com.bytechef.ee.ai.hub.tool.CreateBinaryAssetFileToolCallback;
 import com.bytechef.ee.ai.hub.tool.GenerateImageToolCallback;
 import com.bytechef.ee.ai.hub.tool.ImageGeneratorToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenFileTabToolCallback;
