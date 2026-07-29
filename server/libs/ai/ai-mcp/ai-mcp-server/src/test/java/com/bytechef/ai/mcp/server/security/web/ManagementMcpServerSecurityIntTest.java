@@ -98,10 +98,7 @@ class ManagementMcpServerSecurityIntTest {
 
         jdbcTemplate.update("DELETE FROM api_key");
 
-        Property property = mock(Property.class);
-
-        when(property.get("secretKey")).thenReturn(MCP_SERVER_SECRET_KEY);
-        when(propertyService.getProperty("mcp.server", Property.Scope.PLATFORM, null)).thenReturn(property);
+        mockProperty(true);
 
         User user = mock(User.class);
 
@@ -171,6 +168,43 @@ class ManagementMcpServerSecurityIntTest {
         HttpResponse<String> httpResponse = postInitialize("wrong-server-secret", secretKey, null);
 
         assertThat(httpResponse.statusCode()).isEqualTo(401);
+    }
+
+    @Test
+    void testInitializeWithoutBearerTokenWhenAuthenticationNotRequiredSucceeds() {
+        mockProperty(false);
+
+        try (McpSyncClient mcpSyncClient = createMcpSyncClient(MCP_SERVER_SECRET_KEY, null, null)) {
+            McpSchema.InitializeResult initializeResult = mcpSyncClient.initialize();
+
+            assertThat(initializeResult).isNotNull();
+            assertThat(initializeResult.serverInfo()
+                .name()).isEqualTo("mcp-server");
+
+            McpSchema.ListToolsResult listToolsResult = mcpSyncClient.listTools();
+
+            assertThat(listToolsResult).isNotNull();
+            assertThat(listToolsResult.tools()).isEmpty();
+        }
+    }
+
+    @Test
+    void testTokenIgnoredWhenAuthenticationNotRequired() throws Exception {
+        String secretKey = seedApiKey(PlatformType.AUTOMATION, ENVIRONMENT);
+
+        mockProperty(false);
+
+        HttpResponse<String> httpResponse = postInitialize(MCP_SERVER_SECRET_KEY, secretKey, null);
+
+        assertThat(httpResponse.statusCode()).isEqualTo(200);
+    }
+
+    private void mockProperty(boolean authenticationRequired) {
+        Property property = mock(Property.class);
+
+        when(property.get("secretKey")).thenReturn(MCP_SERVER_SECRET_KEY);
+        when(property.get("authenticationRequired")).thenReturn(authenticationRequired);
+        when(propertyService.getProperty("mcp.server", Property.Scope.PLATFORM, null)).thenReturn(property);
     }
 
     private String seedApiKey(PlatformType type, Environment environment) {

@@ -127,10 +127,17 @@ public class McpServerServiceImpl implements McpServerService {
 
     @Override
     public McpServer update(McpServer mcpServer) {
+        if (!mcpServer.isAuthenticationRequired() && mcpServer.isEnforceToolAuthorization()) {
+            throw new IllegalArgumentException(
+                "enforceToolAuthorization requires authenticationRequired to be enabled");
+        }
+
         McpServer currentMcpServer = getMcpServer(mcpServer.getId());
 
         currentMcpServer.setName(mcpServer.getName());
         currentMcpServer.setEnabled(mcpServer.isEnabled());
+        currentMcpServer.setAuthenticationRequired(mcpServer.isAuthenticationRequired());
+        currentMcpServer.setEnforceToolAuthorization(mcpServer.isEnforceToolAuthorization());
         currentMcpServer.setSecretKey(mcpServer.getSecretKey());
         currentMcpServer.setTagIds(mcpServer.getTagIds());
         currentMcpServer.setVersion(mcpServer.getVersion());

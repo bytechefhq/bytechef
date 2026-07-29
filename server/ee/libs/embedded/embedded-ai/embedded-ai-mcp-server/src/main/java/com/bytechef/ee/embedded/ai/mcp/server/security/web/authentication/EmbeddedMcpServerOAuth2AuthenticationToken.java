@@ -26,14 +26,17 @@ public class EmbeddedMcpServerOAuth2AuthenticationToken extends AbstractApiKeyAu
 
     private String externalUserId;
     private List<GrantedAuthority> mappedAuthorities = List.of();
+    private String mcpServerSecretKey;
 
     public EmbeddedMcpServerOAuth2AuthenticationToken(
-        long environmentId, String externalUserId, String tenantId, List<GrantedAuthority> mappedAuthorities) {
+        long environmentId, String externalUserId, String tenantId, String mcpServerSecretKey,
+        List<GrantedAuthority> mappedAuthorities) {
 
         super(environmentId, tenantId);
 
         this.externalUserId = externalUserId;
         this.mappedAuthorities = List.copyOf(mappedAuthorities);
+        this.mcpServerSecretKey = mcpServerSecretKey;
     }
 
     @SuppressFBWarnings("EI")
@@ -48,5 +51,9 @@ public class EmbeddedMcpServerOAuth2AuthenticationToken extends AbstractApiKeyAu
     @SuppressFBWarnings("EI")
     public List<GrantedAuthority> getMappedAuthorities() {
         return mappedAuthorities;
+    }
+
+    public String getMcpServerSecretKey() {
+        return mcpServerSecretKey;
     }
 }

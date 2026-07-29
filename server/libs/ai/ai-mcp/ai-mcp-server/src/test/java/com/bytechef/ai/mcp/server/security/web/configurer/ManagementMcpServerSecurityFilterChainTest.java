@@ -91,6 +91,7 @@ class ManagementMcpServerSecurityFilterChainTest {
         Property property = mock(Property.class);
 
         when(property.get("secretKey")).thenReturn(MCP_SERVER_SECRET_KEY);
+        when(property.get("authenticationRequired")).thenReturn(true);
         when(propertyService.getProperty("mcp.server", Property.Scope.PLATFORM, null)).thenReturn(property);
 
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)

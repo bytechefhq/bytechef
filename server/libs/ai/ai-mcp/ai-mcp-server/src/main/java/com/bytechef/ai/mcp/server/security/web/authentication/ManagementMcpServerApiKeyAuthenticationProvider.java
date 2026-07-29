@@ -19,6 +19,7 @@ package com.bytechef.ai.mcp.server.security.web.authentication;
 import com.bytechef.platform.configuration.domain.Property;
 import com.bytechef.platform.configuration.service.PropertyService;
 import com.bytechef.platform.security.service.ApiKeyService;
+import com.bytechef.platform.security.web.mcp.McpAnonymousAuthenticationToken;
 import com.bytechef.platform.security.web.mcp.McpApiKeyCredentials;
 import com.bytechef.platform.security.web.mcp.McpApiKeyEntity;
 import com.bytechef.platform.security.web.mcp.McpApiKeyEntityRepository;
@@ -59,25 +60,34 @@ public class ManagementMcpServerApiKeyAuthenticationProvider implements Authenti
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+        ApiKeyAuthenticationToken apiKeyAuthenticationToken = (ApiKeyAuthenticationToken) authentication;
+
+        McpApiKeyCredentials mcpApiKeyCredentials = (McpApiKeyCredentials) apiKeyAuthenticationToken.getCredentials();
+
+        Property property = propertyService.getProperty("mcp.server", Property.Scope.PLATFORM, null);
+
+        if (!Objects.equals(property.get("secretKey"), mcpApiKeyCredentials.getMcpServerSecretKey())) {
+            throw new BadCredentialsException("Invalid MCP server secret key");
+        }
+
+        if (!Boolean.TRUE.equals(property.get("authenticationRequired"))) {
+            return new McpAnonymousAuthenticationToken(mcpApiKeyCredentials.getMcpServerSecretKey());
+        }
+
+        if (mcpApiKeyCredentials.getSecret() == null) {
+            throw new BadCredentialsException("Authorization token does not exist");
+        }
+
         Authentication authenticatedAuthentication = apiKeyAuthenticationProvider.authenticate(authentication);
 
         if (authenticatedAuthentication == null) {
             return null;
         }
 
-        ApiKeyAuthenticationToken apiKeyAuthenticationToken = (ApiKeyAuthenticationToken) authentication;
-
-        McpApiKeyCredentials mcpApiKeyCredentials = (McpApiKeyCredentials) apiKeyAuthenticationToken.getCredentials();
         McpApiKeyEntity mcpApiKeyEntity = (McpApiKeyEntity) authenticatedAuthentication.getPrincipal();
 
         if (mcpApiKeyEntity.getType() != null) {
             throw new BadCredentialsException("Invalid API key");
-        }
-
-        Property property = propertyService.getProperty("mcp.server", Property.Scope.PLATFORM, null);
-
-        if (!Objects.equals(property.get("secretKey"), mcpApiKeyCredentials.getMcpServerSecretKey())) {
-            throw new BadCredentialsException("Invalid MCP server secret key");
         }
 
         if (mcpApiKeyEntity.getEnvironment() != mcpApiKeyCredentials.getEnvironment()) {

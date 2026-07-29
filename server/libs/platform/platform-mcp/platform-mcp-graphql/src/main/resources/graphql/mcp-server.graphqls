@@ -17,6 +17,7 @@ type McpServer {
     environmentId: ID!
     enabled: Boolean!
     enforceToolAuthorization: Boolean!
+    authenticationRequired: Boolean!
     mcpComponents: [McpComponent]
     url: String!
     secretKey: String!
@@ -48,4 +49,5 @@ input McpServerUpdateInput {
     name: String
     enabled: Boolean
     enforceToolAuthorization: Boolean
+    authenticationRequired: Boolean
 }

@@ -95,6 +95,8 @@ class AutomationMcpServerSecurityFilterChainTest {
 
     @Test
     void testRequestWithoutBearerTokenIsRejected() throws Exception {
+        mockMcpServer(Environment.PRODUCTION);
+
         mockMvc
             .perform(MockMvcRequestBuilders.post("/api/automation/%s/mcp".formatted(MCP_SERVER_SECRET_KEY))
                 .servletPath("/api/automation/%s/mcp".formatted(MCP_SERVER_SECRET_KEY)))
@@ -118,6 +120,8 @@ class AutomationMcpServerSecurityFilterChainTest {
 
     @Test
     void testRequestWithUnknownApiKeyIsRejected() throws Exception {
+        mockMcpServer(Environment.PRODUCTION);
+
         when(apiKeyService.fetchApiKey(API_SECRET_KEY)).thenReturn(Optional.empty());
 
         mockMvc
@@ -132,6 +136,7 @@ class AutomationMcpServerSecurityFilterChainTest {
     @Test
     void testRequestWithWrongTypeApiKeyIsRejected() throws Exception {
         mockApiKey(PlatformType.EMBEDDED, Environment.PRODUCTION);
+        mockMcpServer(Environment.PRODUCTION);
 
         mockMvc
             .perform(
@@ -195,6 +200,7 @@ class AutomationMcpServerSecurityFilterChainTest {
         McpServer mcpServer = mock(McpServer.class);
 
         when(mcpServer.getEnvironment()).thenReturn(environment);
+        when(mcpServer.isAuthenticationRequired()).thenReturn(true);
         when(mcpServerService.getMcpServer(MCP_SERVER_SECRET_KEY)).thenReturn(mcpServer);
     }
 

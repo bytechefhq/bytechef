@@ -17,14 +17,18 @@
 package com.bytechef.platform.security.web.mcp;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockFilterChain;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 
 /**
@@ -40,11 +44,14 @@ class TenantAwareApiKeyAuthenticationFilterTest {
             new McpApiKeyAuthenticationConverter("/api/automation/"));
 
     @Test
-    void testRequestWithoutBearerTokenIsRejectedWith401() throws Exception {
+    void testRequestWithoutBearerTokenIsDelegatedToAuthenticationManager() throws Exception {
         MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest(
             "POST", "/api/automation/server-secret/mcp");
 
         mockHttpServletRequest.setServletPath("/api/automation/server-secret/mcp");
+
+        when(authenticationManager.authenticate(any()))
+            .thenThrow(new BadCredentialsException("Authentication required"));
 
         MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
 
@@ -52,7 +59,7 @@ class TenantAwareApiKeyAuthenticationFilterTest {
             mockHttpServletRequest, mockHttpServletResponse, new MockFilterChain());
 
         assertThat(mockHttpServletResponse.getStatus()).isEqualTo(401);
-        verifyNoInteractions(authenticationManager);
+        verify(authenticationManager).authenticate(any());
     }
 
     @Test

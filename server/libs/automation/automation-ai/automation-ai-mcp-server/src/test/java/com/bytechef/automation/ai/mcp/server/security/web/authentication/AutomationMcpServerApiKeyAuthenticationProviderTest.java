@@ -18,7 +18,9 @@ package com.bytechef.automation.ai.mcp.server.security.web.authentication;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -28,6 +30,7 @@ import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.service.ApiKeyService;
+import com.bytechef.platform.security.web.mcp.McpAnonymousAuthenticationToken;
 import com.bytechef.platform.security.web.mcp.McpApiKeyCredentials;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.AuthorityService;
@@ -70,9 +73,26 @@ class AutomationMcpServerApiKeyAuthenticationProviderTest {
     @Test
     void testAuthenticateWithWrongTypeApiKeyFails() {
         mockApiKey(PlatformType.EMBEDDED, Environment.PRODUCTION);
+        mockMcpServer(Environment.PRODUCTION);
 
         assertThatExceptionOfType(BadCredentialsException.class).isThrownBy(
             () -> automationMcpServerApiKeyAuthenticationProvider.authenticate(getUnauthenticatedToken()));
+    }
+
+    @Test
+    void testAuthenticateWithoutAuthenticationRequiredReturnsAnonymous() {
+        McpServer mcpServer = mock(McpServer.class);
+
+        when(mcpServer.isAuthenticationRequired()).thenReturn(false);
+        when(mcpServerService.getMcpServer("server-secret")).thenReturn(mcpServer);
+
+        Authentication authentication = automationMcpServerApiKeyAuthenticationProvider.authenticate(
+            getUnauthenticatedToken());
+
+        assertThat(authentication).isInstanceOf(McpAnonymousAuthenticationToken.class);
+        assertThat(authentication.isAuthenticated()).isTrue();
+        assertThat(authentication.getAuthorities()).isEmpty();
+        verify(apiKeyService, never()).updateLastUsedDate(anyLong());
     }
 
     @Test
@@ -123,6 +143,7 @@ class AutomationMcpServerApiKeyAuthenticationProviderTest {
         McpServer mcpServer = mock(McpServer.class);
 
         when(mcpServer.getEnvironment()).thenReturn(environment);
+        when(mcpServer.isAuthenticationRequired()).thenReturn(true);
         when(mcpServerService.getMcpServer("server-secret")).thenReturn(mcpServer);
     }
 }

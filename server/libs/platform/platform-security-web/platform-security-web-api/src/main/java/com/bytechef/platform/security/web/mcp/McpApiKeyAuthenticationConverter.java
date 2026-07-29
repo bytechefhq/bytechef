@@ -26,8 +26,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationConverter;
 
 /**
- * Converts an MCP request into an unauthenticated {@link ApiKeyAuthenticationToken}. The Bearer token is mandatory — a
- * missing or malformed Authorization header fails the request with 401 regardless of the URL path secret.
+ * Converts an MCP request into an unauthenticated {@link ApiKeyAuthenticationToken}. The Bearer token is no longer
+ * mandatory at this layer — a missing or malformed Authorization header yields a token whose credential
+ * {@code secretKey} is {@code null}, a marker for "no token presented". The per-server authentication provider resolves
+ * the target MCP server from the URL path secret and decides whether a token is actually required.
  *
  * @author Ivica Cardic
  */
@@ -47,11 +49,11 @@ public class McpApiKeyAuthenticationConverter implements AuthenticationConverter
     public Authentication convert(HttpServletRequest request) {
         String authorization = request.getHeader(AUTHORIZATION_HEADER_NAME);
 
-        if (authorization == null || !authorization.startsWith(BEARER_PREFIX)) {
-            throw new BadCredentialsException("Authorization token does not exist");
-        }
+        String secretKey = null;
 
-        String secretKey = authorization.substring(BEARER_PREFIX.length());
+        if (authorization != null && authorization.startsWith(BEARER_PREFIX)) {
+            secretKey = authorization.substring(BEARER_PREFIX.length());
+        }
 
         String servletPath = request.getServletPath();
 

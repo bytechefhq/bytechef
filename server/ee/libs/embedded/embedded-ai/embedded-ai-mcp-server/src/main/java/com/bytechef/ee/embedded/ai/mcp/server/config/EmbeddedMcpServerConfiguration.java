@@ -197,8 +197,8 @@ public class EmbeddedMcpServerConfiguration {
 
     @Bean
     SecurityConfigurerContributor embeddedMcpServerSecurityConfigurerContributor(
-        ConnectedUserService connectedUserService, SigningKeyService signingKeyService,
-        McpTenantIssuerResolver mcpTenantIssuerResolver) {
+        ConnectedUserService connectedUserService, McpServerService mcpServerService,
+        SigningKeyService signingKeyService, McpTenantIssuerResolver mcpTenantIssuerResolver) {
 
         McpJwtDecoderFactory mcpJwtDecoderFactory = JwtDecoders::fromIssuerLocation;
 
@@ -210,7 +210,8 @@ public class EmbeddedMcpServerConfiguration {
                 getSecurityConfigurerAdapter() {
 
                 return (T) new EmbeddedMcpServerSecurityConfigurer(
-                    connectedUserService, signingKeyService, mcpTenantIssuerResolver, mcpJwtDecoderFactory, null);
+                    connectedUserService, mcpServerService, signingKeyService, mcpTenantIssuerResolver,
+                    mcpJwtDecoderFactory, null);
             }
         };
     }

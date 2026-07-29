@@ -18,6 +18,7 @@ package com.bytechef.ai.mcp.server.configuration.web.graphql;
 
 import com.bytechef.ai.mcp.server.configuration.service.ManagementMcpServerService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
@@ -46,5 +47,15 @@ class ManagementMcpServerGraphQlController {
     @MutationMapping
     String updateManagementMcpServerUrl() {
         return managementMcpServerService.updateManagementMcpServerUrl();
+    }
+
+    @QueryMapping
+    boolean managementMcpServerAuthenticationRequired() {
+        return managementMcpServerService.isAuthenticationRequired();
+    }
+
+    @MutationMapping
+    boolean updateManagementMcpServerAuthenticationRequired(@Argument boolean authenticationRequired) {
+        return managementMcpServerService.updateAuthenticationRequired(authenticationRequired);
     }
 }

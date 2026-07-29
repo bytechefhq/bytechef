@@ -64,6 +64,9 @@ public final class McpServer {
     @Column("enforce_tool_authorization")
     private boolean enforceToolAuthorization;
 
+    @Column("authentication_required")
+    private boolean authenticationRequired = true;
+
     @Column("secret_key")
     private String secretKey;
 
@@ -211,6 +214,14 @@ public final class McpServer {
 
     public void setEnforceToolAuthorization(boolean enforceToolAuthorization) {
         this.enforceToolAuthorization = enforceToolAuthorization;
+    }
+
+    public boolean isAuthenticationRequired() {
+        return authenticationRequired;
+    }
+
+    public void setAuthenticationRequired(boolean authenticationRequired) {
+        this.authenticationRequired = authenticationRequired;
     }
 
     public void setSecretKey(String secretKey) {

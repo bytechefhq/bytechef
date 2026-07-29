@@ -19,6 +19,8 @@ import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.ee.platform.user.domain.IdentityProvider;
 import com.bytechef.ee.platform.user.service.IdentityProviderService;
+import com.bytechef.platform.mcp.domain.McpServer;
+import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.tenant.domain.TenantKey;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
@@ -67,12 +69,17 @@ class EmbeddedMcpServerOAuth2SecurityIntTest {
     // A distinct tenant for the audience tests: they configure a different per-IdP audience policy, so they must
     // resolve against their own tenant rather than sharing the default tenant's cached issuers.
     private static final String AUDIENCE_PATH_SECRET = String.valueOf(TenantKey.of("audience"));
+    // A server that opts out of authentication, so a token-less request is served anonymously.
+    private static final String NO_AUTH_PATH_SECRET = String.valueOf(TenantKey.of("noauth"));
 
     @Autowired
     private ConnectedUserService connectedUserService;
 
     @Autowired
     private IdentityProviderService identityProviderService;
+
+    @Autowired
+    private McpServerService mcpServerService;
 
     @Autowired
     private KeyPair mcpTestSigningKeyPair;
@@ -82,7 +89,12 @@ class EmbeddedMcpServerOAuth2SecurityIntTest {
 
     @BeforeEach
     void beforeEach() {
-        Mockito.reset(connectedUserService, identityProviderService);
+        Mockito.reset(connectedUserService, identityProviderService, mcpServerService);
+
+        McpServer authenticationRequiredMcpServer = mock(McpServer.class);
+
+        when(authenticationRequiredMcpServer.isAuthenticationRequired()).thenReturn(true);
+        when(mcpServerService.getMcpServer(anyString())).thenReturn(authenticationRequiredMcpServer);
 
         IdentityProvider identityProvider = mock(IdentityProvider.class);
 
@@ -134,6 +146,42 @@ class EmbeddedMcpServerOAuth2SecurityIntTest {
             .firstValue("WWW-Authenticate")).hasValue(
                 "Bearer resource_metadata=\"http://localhost:" + port +
                     "/.well-known/oauth-protected-resource/api/embedded/" + PATH_SECRET + "/mcp\"");
+    }
+
+    @Test
+    void testNoTokenWhenAuthenticationNotRequiredHasNoDiscoveryChallenge() throws Exception {
+        mockNoAuthenticationMcpServer();
+
+        HttpResponse<String> httpResponse = postInitialize(NO_AUTH_PATH_SECRET, null);
+
+        assertThat(httpResponse.statusCode()).isEqualTo(200);
+        assertThat(httpResponse.headers()
+            .firstValue("WWW-Authenticate")).isEmpty();
+    }
+
+    @Test
+    void testInitializeAndListToolsWithoutTokenWhenAuthenticationNotRequired() {
+        mockNoAuthenticationMcpServer();
+
+        try (McpSyncClient mcpSyncClient = createMcpSyncClient(NO_AUTH_PATH_SECRET, null)) {
+            McpSchema.InitializeResult initializeResult = mcpSyncClient.initialize();
+
+            assertThat(initializeResult).isNotNull();
+            assertThat(initializeResult.serverInfo()
+                .name()).isEqualTo("embedded-mcp-server");
+
+            McpSchema.ListToolsResult listToolsResult = mcpSyncClient.listTools();
+
+            assertThat(listToolsResult).isNotNull();
+            assertThat(listToolsResult.tools()).isEmpty();
+        }
+    }
+
+    private void mockNoAuthenticationMcpServer() {
+        McpServer mcpServer = mock(McpServer.class);
+
+        when(mcpServer.isAuthenticationRequired()).thenReturn(false);
+        when(mcpServerService.getMcpServer(NO_AUTH_PATH_SECRET)).thenReturn(mcpServer);
     }
 
     @Test

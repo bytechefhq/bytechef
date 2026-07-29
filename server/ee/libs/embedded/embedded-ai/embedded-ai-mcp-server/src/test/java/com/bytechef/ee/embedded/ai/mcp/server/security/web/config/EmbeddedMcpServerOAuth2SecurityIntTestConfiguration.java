@@ -16,6 +16,7 @@ import com.bytechef.ee.embedded.security.service.SigningKeyService;
 import com.bytechef.ee.platform.security.web.mcp.oauth2.McpTenantIssuerResolver;
 import com.bytechef.ee.platform.user.service.IdentityProviderService;
 import com.bytechef.platform.mcp.server.FilterableMcpServerBuilder;
+import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.security.web.mcp.oauth2.McpJwtDecoderFactory;
 import io.modelcontextprotocol.common.McpTransportContext;
@@ -75,6 +76,11 @@ public class EmbeddedMcpServerOAuth2SecurityIntTestConfiguration {
     @Bean
     IdentityProviderService identityProviderService() {
         return mock(IdentityProviderService.class);
+    }
+
+    @Bean
+    McpServerService mcpServerService() {
+        return mock(McpServerService.class);
     }
 
     @Bean
@@ -152,7 +158,8 @@ public class EmbeddedMcpServerOAuth2SecurityIntTestConfiguration {
     @Bean
     SecurityFilterChain securityFilterChain(
         HttpSecurity http, ConnectedUserService connectedUserService, IdentityProviderService identityProviderService,
-        McpJwtDecoderFactory mcpJwtDecoderFactory, SigningKeyService signingKeyService) throws Exception {
+        McpJwtDecoderFactory mcpJwtDecoderFactory, McpServerService mcpServerService,
+        SigningKeyService signingKeyService) throws Exception {
 
         return http
             .authorizeHttpRequests(authorize -> authorize
@@ -164,8 +171,8 @@ public class EmbeddedMcpServerOAuth2SecurityIntTestConfiguration {
                 .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
             .with(
                 new EmbeddedMcpServerSecurityConfigurer(
-                    connectedUserService, signingKeyService, new McpTenantIssuerResolver(identityProviderService),
-                    mcpJwtDecoderFactory, null),
+                    connectedUserService, mcpServerService, signingKeyService,
+                    new McpTenantIssuerResolver(identityProviderService), mcpJwtDecoderFactory, null),
                 withDefaults())
             .build();
     }

@@ -18,19 +18,17 @@ import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.security.exception.UserNotActivatedException;
 import com.bytechef.platform.security.web.mcp.McpAnonymousAuthenticationToken;
-import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 /**
  * @version ee
  *
  * @author Ivica Cardic
  */
-class EmbeddedMcpServerOAuth2AuthenticationProviderTest {
+class EmbeddedMcpServerApiKeyAuthenticationProviderTest {
 
     private static final String EXTERNAL_USER_ID = "ext-user-1";
     private static final long ENVIRONMENT_ID = 0L;
@@ -38,8 +36,8 @@ class EmbeddedMcpServerOAuth2AuthenticationProviderTest {
 
     private final ConnectedUserService connectedUserService = mock(ConnectedUserService.class);
     private final McpServerService mcpServerService = mock(McpServerService.class);
-    private final EmbeddedMcpServerOAuth2AuthenticationProvider provider =
-        new EmbeddedMcpServerOAuth2AuthenticationProvider(connectedUserService, mcpServerService);
+    private final EmbeddedMcpServerApiKeyAuthenticationProvider provider =
+        new EmbeddedMcpServerApiKeyAuthenticationProvider(connectedUserService, mcpServerService);
 
     @Test
     void testAuthenticateResolvesEnabledConnectedUser() {
@@ -52,19 +50,12 @@ class EmbeddedMcpServerOAuth2AuthenticationProviderTest {
         when(connectedUserService.fetchConnectedUser(EXTERNAL_USER_ID, ENVIRONMENT_ID))
             .thenReturn(Optional.of(connectedUser));
 
-        List<GrantedAuthority> mappedAuthorities = List.of(new SimpleGrantedAuthority("ROLE_EDITOR"));
-
         Authentication authentication = provider.authenticate(
-            new EmbeddedMcpServerOAuth2AuthenticationToken(
-                ENVIRONMENT_ID, EXTERNAL_USER_ID, "public", MCP_SERVER_SECRET_KEY, mappedAuthorities));
+            new EmbeddedMcpServerApiKeyAuthenticationToken(
+                ENVIRONMENT_ID, EXTERNAL_USER_ID, "public", MCP_SERVER_SECRET_KEY));
 
         assertThat(authentication.isAuthenticated()).isTrue();
         assertThat(authentication.getName()).isEqualTo(EXTERNAL_USER_ID);
-        assertThat(
-            authentication.getAuthorities()
-                .stream()
-                .map(GrantedAuthority::getAuthority)
-                .toList()).containsExactly("ROLE_EDITOR");
     }
 
     @Test
@@ -79,8 +70,18 @@ class EmbeddedMcpServerOAuth2AuthenticationProviderTest {
 
         assertThatExceptionOfType(UserNotActivatedException.class)
             .isThrownBy(() -> provider.authenticate(
-                new EmbeddedMcpServerOAuth2AuthenticationToken(
-                    ENVIRONMENT_ID, EXTERNAL_USER_ID, "public", MCP_SERVER_SECRET_KEY, List.of())));
+                new EmbeddedMcpServerApiKeyAuthenticationToken(
+                    ENVIRONMENT_ID, EXTERNAL_USER_ID, "public", MCP_SERVER_SECRET_KEY)));
+    }
+
+    @Test
+    void testAuthenticateRejectsMissingTokenWhenAuthenticationRequired() {
+        mockMcpServer(true);
+
+        assertThatExceptionOfType(BadCredentialsException.class)
+            .isThrownBy(() -> provider.authenticate(
+                new EmbeddedMcpServerApiKeyAuthenticationToken(
+                    ENVIRONMENT_ID, null, "public", MCP_SERVER_SECRET_KEY)));
     }
 
     @Test
@@ -88,8 +89,7 @@ class EmbeddedMcpServerOAuth2AuthenticationProviderTest {
         mockMcpServer(false);
 
         Authentication authentication = provider.authenticate(
-            new EmbeddedMcpServerOAuth2AuthenticationToken(
-                ENVIRONMENT_ID, EXTERNAL_USER_ID, "public", MCP_SERVER_SECRET_KEY, List.of()));
+            new EmbeddedMcpServerApiKeyAuthenticationToken(ENVIRONMENT_ID, null, "public", MCP_SERVER_SECRET_KEY));
 
         assertThat(authentication).isInstanceOf(McpAnonymousAuthenticationToken.class);
         assertThat(authentication.isAuthenticated()).isTrue();
@@ -98,9 +98,9 @@ class EmbeddedMcpServerOAuth2AuthenticationProviderTest {
     }
 
     @Test
-    void testSupportsOnlyOAuth2Token() {
-        assertThat(provider.supports(EmbeddedMcpServerOAuth2AuthenticationToken.class)).isTrue();
-        assertThat(provider.supports(EmbeddedMcpServerApiKeyAuthenticationToken.class)).isFalse();
+    void testSupportsOnlyApiKeyToken() {
+        assertThat(provider.supports(EmbeddedMcpServerApiKeyAuthenticationToken.class)).isTrue();
+        assertThat(provider.supports(EmbeddedMcpServerOAuth2AuthenticationToken.class)).isFalse();
     }
 
     private void mockMcpServer(boolean authenticationRequired) {

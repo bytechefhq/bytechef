@@ -101,7 +101,18 @@ public class EmbeddedMcpServerOAuth2AuthenticationConverter extends AbstractApiK
         List<GrantedAuthority> mappedAuthorities = mapAuthorities(jwt, issuer, tenantId);
 
         return new EmbeddedMcpServerOAuth2AuthenticationToken(
-            environment.ordinal(), jwt.getSubject(), tenantId, mappedAuthorities);
+            environment.ordinal(), jwt.getSubject(), tenantId, extractMcpServerSecretKey(request), mappedAuthorities);
+    }
+
+    @Nullable
+    private static String extractMcpServerSecretKey(HttpServletRequest request) {
+        Matcher matcher = PATH_PATTERN.matcher(request.getServletPath());
+
+        if (!matcher.matches()) {
+            return null;
+        }
+
+        return matcher.group(1);
     }
 
     /**

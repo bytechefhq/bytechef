@@ -18,7 +18,9 @@ package com.bytechef.ai.mcp.server.security.web.authentication;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -28,6 +30,7 @@ import com.bytechef.platform.configuration.service.PropertyService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.service.ApiKeyService;
+import com.bytechef.platform.security.web.mcp.McpAnonymousAuthenticationToken;
 import com.bytechef.platform.security.web.mcp.McpApiKeyCredentials;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.AuthorityService;
@@ -61,6 +64,7 @@ class ManagementMcpServerApiKeyAuthenticationProviderTest {
         Property property = mock(Property.class);
 
         when(property.get("secretKey")).thenReturn("server-secret");
+        when(property.get("authenticationRequired")).thenReturn(true);
         when(propertyService.getProperty("mcp.server", Property.Scope.PLATFORM, null)).thenReturn(property);
     }
 
@@ -100,6 +104,40 @@ class ManagementMcpServerApiKeyAuthenticationProviderTest {
         assertThatExceptionOfType(BadCredentialsException.class).isThrownBy(
             () -> managementMcpServerApiKeyAuthenticationProvider.authenticate(
                 getUnauthenticatedToken(Environment.STAGING, "server-secret")));
+    }
+
+    @Test
+    void testAuthenticateWithoutAuthenticationRequiredReturnsAnonymous() {
+        Property property = mock(Property.class);
+
+        when(property.get("secretKey")).thenReturn("server-secret");
+        when(property.get("authenticationRequired")).thenReturn(false);
+        when(propertyService.getProperty("mcp.server", Property.Scope.PLATFORM, null)).thenReturn(property);
+
+        Authentication authentication = managementMcpServerApiKeyAuthenticationProvider.authenticate(
+            getUnauthenticatedToken(Environment.PRODUCTION, "server-secret"));
+
+        assertThat(authentication).isInstanceOf(McpAnonymousAuthenticationToken.class);
+        assertThat(authentication.isAuthenticated()).isTrue();
+        assertThat(authentication.getAuthorities()).isEmpty();
+        verify(apiKeyService, never()).updateLastUsedDate(anyLong());
+    }
+
+    @Test
+    void testAuthenticateWithMissingAuthenticationRequiredKeyReturnsAnonymous() {
+        Property property = mock(Property.class);
+
+        when(property.get("secretKey")).thenReturn("server-secret");
+        when(property.get("authenticationRequired")).thenReturn(null);
+        when(propertyService.getProperty("mcp.server", Property.Scope.PLATFORM, null)).thenReturn(property);
+
+        Authentication authentication = managementMcpServerApiKeyAuthenticationProvider.authenticate(
+            getUnauthenticatedToken(Environment.PRODUCTION, "server-secret"));
+
+        assertThat(authentication).isInstanceOf(McpAnonymousAuthenticationToken.class);
+        assertThat(authentication.isAuthenticated()).isTrue();
+        assertThat(authentication.getAuthorities()).isEmpty();
+        verify(apiKeyService, never()).updateLastUsedDate(anyLong());
     }
 
     private ApiKeyAuthenticationToken getUnauthenticatedToken(Environment environment, String mcpServerSecretKey) {

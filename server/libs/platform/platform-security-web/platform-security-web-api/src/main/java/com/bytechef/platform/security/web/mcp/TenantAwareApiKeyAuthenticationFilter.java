@@ -62,7 +62,9 @@ public class TenantAwareApiKeyAuthenticationFilter extends ApiKeyAuthenticationF
         String authorization = httpServletRequest.getHeader(AUTHORIZATION_HEADER_NAME);
 
         if (authorization == null || !authorization.startsWith(BEARER_PREFIX)) {
-            // no tenant to resolve; the authentication converter rejects matching requests with 401
+            // no tenant to resolve; the converter yields a token with no api-key secret and the authentication
+            // manager (the per-server provider) decides — rejecting with 401 when the server requires
+            // authentication, or authenticating anonymously when it does not
 
             super.doFilterInternal(httpServletRequest, httpServletResponse, filterChain);
 

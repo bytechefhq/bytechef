@@ -21,6 +21,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.function.Predicate;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.util.matcher.RequestMatcher;
@@ -33,6 +34,13 @@ import org.springframework.web.filter.OncePerRequestFilter;
  * that filter's bare {@code 401} for the no-credentials case; it only acts when the resource server is enabled (the
  * contributor adds it only then). Requests that carry a credential pass through to the credential filters unchanged.
  *
+ * <p>
+ * The optional {@code authenticationRequiredPredicate} lets a per-server MCP endpoint opt a token-less request out of
+ * the challenge: when the predicate returns {@code false} for the request (the resolved server does not require
+ * authentication), the request falls through to the credential filters (which serve it anonymously) instead of
+ * receiving the discovery {@code 401}. The default predicate always requires authentication, so existing callers keep
+ * challenging every token-less request.
+ *
  * @author Ivica Cardic
  */
 public class McpDiscoveryAuthenticationFilter extends OncePerRequestFilter {
@@ -40,13 +48,22 @@ public class McpDiscoveryAuthenticationFilter extends OncePerRequestFilter {
     private static final String AUTHORIZATION_HEADER_NAME = "Authorization";
 
     private final AuthenticationEntryPoint authenticationEntryPoint;
+    private final Predicate<HttpServletRequest> authenticationRequiredPredicate;
     private final RequestMatcher mcpRequestMatcher;
 
     public McpDiscoveryAuthenticationFilter(
         RequestMatcher mcpRequestMatcher, AuthenticationEntryPoint authenticationEntryPoint) {
 
+        this(mcpRequestMatcher, authenticationEntryPoint, request -> true);
+    }
+
+    public McpDiscoveryAuthenticationFilter(
+        RequestMatcher mcpRequestMatcher, AuthenticationEntryPoint authenticationEntryPoint,
+        Predicate<HttpServletRequest> authenticationRequiredPredicate) {
+
         this.mcpRequestMatcher = mcpRequestMatcher;
         this.authenticationEntryPoint = authenticationEntryPoint;
+        this.authenticationRequiredPredicate = authenticationRequiredPredicate;
     }
 
     @Override
@@ -54,7 +71,9 @@ public class McpDiscoveryAuthenticationFilter extends OncePerRequestFilter {
         HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
         throws ServletException, IOException {
 
-        if (mcpRequestMatcher.matches(request) && request.getHeader(AUTHORIZATION_HEADER_NAME) == null) {
+        if (mcpRequestMatcher.matches(request) && request.getHeader(AUTHORIZATION_HEADER_NAME) == null
+            && authenticationRequiredPredicate.test(request)) {
+
             authenticationEntryPoint.commence(
                 request, response, new InsufficientAuthenticationException("Authentication is required"));
 

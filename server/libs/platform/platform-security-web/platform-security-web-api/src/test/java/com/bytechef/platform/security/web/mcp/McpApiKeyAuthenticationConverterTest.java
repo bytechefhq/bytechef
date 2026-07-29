@@ -69,11 +69,33 @@ class McpApiKeyAuthenticationConverterTest {
     }
 
     @Test
-    void testConvertWithoutAuthorizationHeaderThrows() {
+    void testConvertWithoutAuthorizationHeaderProducesNullSecretToken() {
         MockHttpServletRequest mockHttpServletRequest = getMockHttpServletRequest();
 
-        assertThatExceptionOfType(BadCredentialsException.class)
-            .isThrownBy(() -> mcpApiKeyAuthenticationConverter.convert(mockHttpServletRequest));
+        ApiKeyAuthenticationToken apiKeyAuthenticationToken =
+            (ApiKeyAuthenticationToken) mcpApiKeyAuthenticationConverter.convert(mockHttpServletRequest);
+
+        McpApiKeyCredentials mcpApiKeyCredentials =
+            (McpApiKeyCredentials) apiKeyAuthenticationToken.getCredentials();
+
+        assertThat(mcpApiKeyCredentials.getMcpServerSecretKey()).isEqualTo("server-secret");
+        assertThat(mcpApiKeyCredentials.getSecret()).isNull();
+    }
+
+    @Test
+    void testConvertWithMalformedAuthorizationHeaderProducesNullSecretToken() {
+        MockHttpServletRequest mockHttpServletRequest = getMockHttpServletRequest();
+
+        mockHttpServletRequest.addHeader("Authorization", "Basic api-secret");
+
+        ApiKeyAuthenticationToken apiKeyAuthenticationToken =
+            (ApiKeyAuthenticationToken) mcpApiKeyAuthenticationConverter.convert(mockHttpServletRequest);
+
+        McpApiKeyCredentials mcpApiKeyCredentials =
+            (McpApiKeyCredentials) apiKeyAuthenticationToken.getCredentials();
+
+        assertThat(mcpApiKeyCredentials.getMcpServerSecretKey()).isEqualTo("server-secret");
+        assertThat(mcpApiKeyCredentials.getSecret()).isNull();
     }
 
     @Test

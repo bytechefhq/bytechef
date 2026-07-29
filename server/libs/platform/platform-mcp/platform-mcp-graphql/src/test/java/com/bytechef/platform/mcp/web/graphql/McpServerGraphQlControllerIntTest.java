@@ -16,8 +16,10 @@
 
 package com.bytechef.platform.mcp.web.graphql;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -34,6 +36,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.graphql.test.autoconfigure.GraphQlTest;
+import org.springframework.graphql.execution.ErrorType;
 import org.springframework.graphql.test.tester.GraphQlTester;
 import org.springframework.test.context.ContextConfiguration;
 
@@ -164,6 +167,171 @@ public class McpServerGraphQlControllerIntTest {
             .path("updateMcpServer.enabled")
             .entity(Boolean.class)
             .isEqualTo(false);
+    }
+
+    @Test
+    void testUpdateMcpServerAuthenticationRequired() {
+        // Given
+        McpServer mockServer = createMockMcpServer(
+            1L, "Test Server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true);
+
+        when(mcpServerService.update(eq(1L), eq("Test Server"), eq(true))).thenReturn(mockServer);
+
+        McpServer updatedMockServer = createMockMcpServer(
+            1L, "Test Server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true);
+
+        updatedMockServer.setAuthenticationRequired(false);
+
+        // Constrain the matcher to the flag the controller must thread onto the domain object. Using a bare
+        // any(McpServer.class) here would make the test vacuous: it would still pass if the controller dropped the
+        // mcpServer.setAuthenticationRequired(input.authenticationRequired()) call, since the mock returns a pre-baked
+        // server regardless. Matching on !isAuthenticationRequired() (plus the explicit verify below) proves the
+        // controller actually passed the input flag through.
+        when(mcpServerService.update(argThat(server -> server != null && !server.isAuthenticationRequired())))
+            .thenReturn(updatedMockServer);
+
+        // When & Then
+        this.graphQlTester
+            .document("""
+                mutation {
+                    updateMcpServer(id: "1", input: {
+                        name: "Test Server",
+                        enabled: true,
+                        authenticationRequired: false
+                    }) {
+                        id
+                        authenticationRequired
+                    }
+                }
+                """)
+            .execute()
+            .path("updateMcpServer.id")
+            .entity(String.class)
+            .isEqualTo("1")
+            .path("updateMcpServer.authenticationRequired")
+            .entity(Boolean.class)
+            .isEqualTo(false);
+
+        verify(mcpServerService).update(argThat(server -> server != null && !server.isAuthenticationRequired()));
+    }
+
+    /**
+     * Mirrors the invariant enforced by {@code McpServerServiceImpl.update(McpServer)} (Task 2):
+     * {@code authenticationRequired == false && enforceToolAuthorization == true} is rejected. The controller applies
+     * both flags to the domain object and calls {@code mcpServerService.update(McpServer)} exactly once, so the mock is
+     * stubbed to throw whenever the combined state passed to that single call violates the invariant, exactly as the
+     * real service would.
+     */
+    @Test
+    void testUpdateMcpServerRejectsInvariantViolation() {
+        // Given
+        McpServer mockServer = createMockMcpServer(
+            1L, "Test Server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true);
+
+        when(mcpServerService.update(eq(1L), eq("Test Server"), eq(true))).thenReturn(mockServer);
+
+        when(mcpServerService.update(argThat(
+            server -> server != null && server.isEnforceToolAuthorization() && !server.isAuthenticationRequired())))
+                .thenThrow(new IllegalArgumentException(
+                    "enforceToolAuthorization requires authenticationRequired to be enabled"));
+
+        // When & Then
+        this.graphQlTester
+            .document("""
+                mutation {
+                    updateMcpServer(id: "1", input: {
+                        name: "Test Server",
+                        enabled: true,
+                        enforceToolAuthorization: true,
+                        authenticationRequired: false
+                    }) {
+                        id
+                    }
+                }
+                """)
+            .execute()
+            .errors()
+            .satisfy(errors -> {
+                assertThat(errors).hasSize(1);
+
+                // Pins current (non-ideal) behavior: the service throws a bare IllegalArgumentException, which falls
+                // through GlobalDataFetcherExceptionResolver unmapped and surfaces as a generic INTERNAL_ERROR (500).
+                // Proper BAD_REQUEST classification (map the invariant violation to a client error) is a tracked
+                // follow-up outside this task's scope — the exception resolver is shared, and the client already
+                // prevents this flag combination. When that follow-up lands, expect to update this assertion to
+                // ErrorType.BAD_REQUEST.
+                assertThat(errors.get(0)
+                    .getErrorType()).isEqualTo(ErrorType.INTERNAL_ERROR);
+            })
+            .path("updateMcpServer")
+            .valueIsNull();
+    }
+
+    /**
+     * Reproduces the scenario described in the whole-branch review: an existing server whose current persisted state is
+     * {@code authenticationRequired == false, enforceToolAuthorization == false} (the post-migration default) is edited
+     * in a single {@code updateMcpServer} mutation that turns BOTH flags on at once. The intermediate state the old
+     * two-call controller would have produced ({@code authenticationRequired == false,
+     * enforceToolAuthorization == true}) violates the invariant enforced by
+     * {@code McpServerServiceImpl.update(McpServer)}, so against the old controller this mutation would fail with an
+     * error on the first of the two {@code mcpServerService.update(McpServer)} calls. Against the fixed controller,
+     * both flags are applied to the domain object before a single {@code update(McpServer)} call, so only the final,
+     * valid combined state ({@code authenticationRequired == true, enforceToolAuthorization == true}) is ever evaluated
+     * by the service.
+     */
+    @Test
+    void testUpdateMcpServerEnablesBothFlagsInSingleUpdate() {
+        // Given
+        McpServer mockServer = createMockMcpServer(
+            1L, "Test Server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true);
+
+        mockServer.setAuthenticationRequired(false);
+        mockServer.setEnforceToolAuthorization(false);
+
+        when(mcpServerService.update(eq(1L), eq("Test Server"), eq(true))).thenReturn(mockServer);
+
+        McpServer updatedMockServer = createMockMcpServer(
+            1L, "Test Server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true);
+
+        updatedMockServer.setAuthenticationRequired(true);
+        updatedMockServer.setEnforceToolAuthorization(true);
+
+        when(mcpServerService.update(argThat(
+            server -> server != null && server.isAuthenticationRequired() && server.isEnforceToolAuthorization())))
+                .thenReturn(updatedMockServer);
+
+        // When & Then
+        this.graphQlTester
+            .document("""
+                mutation {
+                    updateMcpServer(id: "1", input: {
+                        name: "Test Server",
+                        enabled: true,
+                        authenticationRequired: true,
+                        enforceToolAuthorization: true
+                    }) {
+                        id
+                        authenticationRequired
+                        enforceToolAuthorization
+                    }
+                }
+                """)
+            .execute()
+            .errors()
+            .verify()
+            .path("updateMcpServer.id")
+            .entity(String.class)
+            .isEqualTo("1")
+            .path("updateMcpServer.authenticationRequired")
+            .entity(Boolean.class)
+            .isEqualTo(true)
+            .path("updateMcpServer.enforceToolAuthorization")
+            .entity(Boolean.class)
+            .isEqualTo(true);
+
+        verify(mcpServerService).update(
+            argThat(server -> server != null && server.isAuthenticationRequired()
+                && server.isEnforceToolAuthorization()));
     }
 
     @Test

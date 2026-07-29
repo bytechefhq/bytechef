@@ -20,6 +20,7 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.security.service.ApiKeyService;
+import com.bytechef.platform.security.web.mcp.McpAnonymousAuthenticationToken;
 import com.bytechef.platform.security.web.mcp.McpApiKeyCredentials;
 import com.bytechef.platform.security.web.mcp.McpApiKeyEntity;
 import com.bytechef.platform.security.web.mcp.McpApiKeyEntityRepository;
@@ -58,22 +59,31 @@ public class AutomationMcpServerApiKeyAuthenticationProvider implements Authenti
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+        ApiKeyAuthenticationToken apiKeyAuthenticationToken = (ApiKeyAuthenticationToken) authentication;
+
+        McpApiKeyCredentials mcpApiKeyCredentials = (McpApiKeyCredentials) apiKeyAuthenticationToken.getCredentials();
+
+        McpServer mcpServer = getMcpServer(mcpApiKeyCredentials.getMcpServerSecretKey());
+
+        if (!mcpServer.isAuthenticationRequired()) {
+            return new McpAnonymousAuthenticationToken(mcpApiKeyCredentials.getMcpServerSecretKey());
+        }
+
+        if (mcpApiKeyCredentials.getSecret() == null) {
+            throw new BadCredentialsException("Authorization token does not exist");
+        }
+
         Authentication authenticatedAuthentication = apiKeyAuthenticationProvider.authenticate(authentication);
 
         if (authenticatedAuthentication == null) {
             return null;
         }
 
-        ApiKeyAuthenticationToken apiKeyAuthenticationToken = (ApiKeyAuthenticationToken) authentication;
-
-        McpApiKeyCredentials mcpApiKeyCredentials = (McpApiKeyCredentials) apiKeyAuthenticationToken.getCredentials();
         McpApiKeyEntity mcpApiKeyEntity = (McpApiKeyEntity) authenticatedAuthentication.getPrincipal();
 
         if (mcpApiKeyEntity.getType() != PlatformType.AUTOMATION) {
             throw new BadCredentialsException("Invalid API key");
         }
-
-        McpServer mcpServer = getMcpServer(mcpApiKeyCredentials.getMcpServerSecretKey());
 
         if (mcpServer.getEnvironment() != mcpApiKeyEntity.getEnvironment()) {
             throw new BadCredentialsException("Invalid API key");

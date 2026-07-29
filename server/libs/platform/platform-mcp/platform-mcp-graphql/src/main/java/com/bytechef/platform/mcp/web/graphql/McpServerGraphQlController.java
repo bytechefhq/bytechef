@@ -86,8 +86,14 @@ public class McpServerGraphQlController {
     public McpServer updateMcpServer(@Argument long id, @Argument McpServerUpdateInput input) {
         McpServer mcpServer = mcpServerService.update(id, input.name(), input.enabled());
 
-        if (input.enforceToolAuthorization() != null) {
-            mcpServer.setEnforceToolAuthorization(input.enforceToolAuthorization());
+        if (input.enforceToolAuthorization() != null || input.authenticationRequired() != null) {
+            if (input.enforceToolAuthorization() != null) {
+                mcpServer.setEnforceToolAuthorization(input.enforceToolAuthorization());
+            }
+
+            if (input.authenticationRequired() != null) {
+                mcpServer.setAuthenticationRequired(input.authenticationRequired());
+            }
 
             mcpServer = mcpServerService.update(mcpServer);
         }
@@ -159,6 +165,7 @@ public class McpServerGraphQlController {
     public record McpServerInput(String name, PlatformType type, long environmentId, Boolean enabled) {
     }
 
-    public record McpServerUpdateInput(String name, Boolean enabled, Boolean enforceToolAuthorization) {
+    public record McpServerUpdateInput(
+        String name, Boolean enabled, Boolean enforceToolAuthorization, Boolean authenticationRequired) {
     }
 }

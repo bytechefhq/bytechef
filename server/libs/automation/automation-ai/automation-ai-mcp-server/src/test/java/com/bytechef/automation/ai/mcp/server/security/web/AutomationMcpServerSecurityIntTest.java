@@ -137,6 +137,8 @@ class AutomationMcpServerSecurityIntTest {
     void testInitializeWithoutBearerTokenReturnsUnauthorizedWithEmptyBody() throws Exception {
         seedApiKey(PlatformType.AUTOMATION, ENVIRONMENT);
 
+        mockMcpServer(ENVIRONMENT);
+
         HttpResponse<String> httpResponse = postInitialize(MCP_SERVER_SECRET_KEY, null, null);
 
         assertThat(httpResponse.statusCode()).isEqualTo(401);
@@ -146,6 +148,8 @@ class AutomationMcpServerSecurityIntTest {
     @Test
     void testInitializeWithWrongTypeApiKeyIsRejected() throws Exception {
         String secretKey = seedApiKey(PlatformType.EMBEDDED, ENVIRONMENT);
+
+        mockMcpServer(ENVIRONMENT);
 
         HttpResponse<String> httpResponse = postInitialize(MCP_SERVER_SECRET_KEY, secretKey, null);
 
@@ -174,10 +178,44 @@ class AutomationMcpServerSecurityIntTest {
         assertThat(httpResponse.statusCode()).isEqualTo(401);
     }
 
+    @Test
+    void testInitializeWithoutBearerTokenWhenAuthenticationNotRequiredSucceeds() {
+        mockMcpServer(ENVIRONMENT, false);
+
+        try (McpSyncClient mcpSyncClient = createMcpSyncClient(MCP_SERVER_SECRET_KEY, null, null)) {
+            McpSchema.InitializeResult initializeResult = mcpSyncClient.initialize();
+
+            assertThat(initializeResult).isNotNull();
+            assertThat(initializeResult.serverInfo()
+                .name()).isEqualTo("automation-mcp-server");
+
+            McpSchema.ListToolsResult listToolsResult = mcpSyncClient.listTools();
+
+            assertThat(listToolsResult).isNotNull();
+            assertThat(listToolsResult.tools()).isEmpty();
+        }
+    }
+
+    @Test
+    void testTokenIgnoredWhenAuthenticationNotRequired() throws Exception {
+        String secretKey = seedApiKey(PlatformType.EMBEDDED, ENVIRONMENT);
+
+        mockMcpServer(ENVIRONMENT, false);
+
+        HttpResponse<String> httpResponse = postInitialize(MCP_SERVER_SECRET_KEY, secretKey, null);
+
+        assertThat(httpResponse.statusCode()).isEqualTo(200);
+    }
+
     private void mockMcpServer(Environment environment) {
+        mockMcpServer(environment, true);
+    }
+
+    private void mockMcpServer(Environment environment, boolean authenticationRequired) {
         McpServer mcpServer = mock(McpServer.class);
 
         when(mcpServer.getEnvironment()).thenReturn(environment);
+        when(mcpServer.isAuthenticationRequired()).thenReturn(authenticationRequired);
         when(mcpServerService.getMcpServer(MCP_SERVER_SECRET_KEY)).thenReturn(mcpServer);
     }
 
