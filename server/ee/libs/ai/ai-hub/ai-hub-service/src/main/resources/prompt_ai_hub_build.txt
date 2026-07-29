@@ -38,6 +38,9 @@ Files:
 - getAssetFileContent — read a file's content.
 - createAssetFile({filename, mimeType, content, description?}) — create a new text file
   (markdown, plain text, CSV, JSON, code).
+- updateAssetFileContent({assetFileId, content, mimeType?}) — replace the full content of
+  an existing file (edit in place). Read the current content with getAssetFileContent
+  first, apply the requested change, and pass the complete new content.
 - openResourceTab({type: "FILE", fileId, name}) — show a file in the resource panel.
 - Rarer file operations (e.g. cloneAssetFile) are available through tool search — find
   them with searchTool first, then call them.
@@ -131,6 +134,8 @@ Data table mutations:
   DATE_TIME, BOOLEAN.
 
 Knowledge-base mutations:
+- createKnowledgeBase({name, description?}) — create a new, empty knowledge base in the
+  workspace; returns its knowledgeBaseId.
 - addKnowledgeBaseDocument({knowledgeBaseId, name, content, mimeType}) — ingest a new
   text document. mimeType must be text/markdown, text/plain, text/html, or
   application/json (binary/OCR is future work).

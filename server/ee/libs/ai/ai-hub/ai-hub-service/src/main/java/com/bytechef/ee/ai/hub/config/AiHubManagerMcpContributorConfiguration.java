@@ -24,14 +24,14 @@ import org.springframework.context.annotation.Configuration;
 /**
  * Contributes the AI-hub-owned manager subagents ({@code mcp_manager}, {@code personal_agent_manager},
  * {@code deployment_manager}, {@code api_collection_manager}) to the management MCP server through the
- * {@link McpServerToolCallbackContributor} SPI — the same extension point the Copilot specialists use — so external
- * MCP clients can drive MCP-server setup (including fromAi tool mapping), personal agents, deployments, and API
+ * {@link McpServerToolCallbackContributor} SPI — the same extension point the Copilot specialists use — so external MCP
+ * clients can drive MCP-server setup (including fromAi tool mapping), personal agents, deployments, and API
  * collections.
  *
  * <p>
- * Each delegate is wrapped in {@link WorkspaceScopedManagerToolCallback}: the management MCP surface has no AI Hub
- * chat state, so workspace scoping is made explicit at the tool boundary instead. Missing ChatClient beans (feature
- * module absent) skip silently, mirroring how the BUILD agent registers the same delegates. The AG-UI-specific
+ * Each delegate is wrapped in {@link WorkspaceScopedManagerToolCallback}: the management MCP surface has no AI Hub chat
+ * state, so workspace scoping is made explicit at the tool boundary instead. Missing ChatClient beans (feature module
+ * absent) skip silently, mirroring how the BUILD agent registers the same delegates. The AG-UI-specific
  * {@code ProgressReportingToolCallback} wrapper is intentionally NOT applied on this surface.
  * </p>
  *

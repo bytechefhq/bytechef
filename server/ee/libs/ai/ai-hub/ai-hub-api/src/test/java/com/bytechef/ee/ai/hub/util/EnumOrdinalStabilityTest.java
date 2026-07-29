@@ -104,6 +104,9 @@ class EnumOrdinalStabilityTest {
         // Agent-referenced code workflow (code workflow source). Appended at the END per the JDBC
         // enum-storage convention so all earlier ordinals stay pinned.
         expected.put("CODE_WORKFLOW_REFERENCED", 25);
+        // Edit-in-place of an existing asset file via the updateAssetFileContent tool. Appended at the END per
+        // the JDBC enum-storage convention so all earlier ordinals stay pinned.
+        expected.put("FILE_UPDATED", 26);
 
         OrdinalStabilityAssertions.assertOrdinalsMatch(
             AiHubTaskArtifactKind.values(), expected,

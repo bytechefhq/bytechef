@@ -65,5 +65,9 @@ public enum AiHubTaskArtifactKind {
 
     // Agent-referenced code workflow (code workflow source). Appended at the END per the JDBC
     // enum-storage convention so all earlier ordinals stay pinned.
-    CODE_WORKFLOW_REFERENCED
+    CODE_WORKFLOW_REFERENCED,
+
+    // Edit-in-place of an existing asset file via the updateAssetFileContent tool. Appended at the END per the
+    // JDBC enum-storage convention so all earlier ordinals stay pinned.
+    FILE_UPDATED
 }

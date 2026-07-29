@@ -25,12 +25,12 @@ import tools.jackson.databind.json.JsonMapper;
  * ({@code openFileTab}, {@code openWorkflowTab}, {@code openDataTableTab}, {@code openKnowledgeBaseTab},
  * {@code openSkillTab}, {@code openCustomComponentTab}, {@code openCodeWorkflowTab}) into a single {@code type}-keyed
  * tool, trimming the pinned tool list by six entries per agent. The server-side implementation echoes the arguments
- * back as a JSON result carrying the {@code type} discriminator plus the exact legacy field names, so the AI Hub
- * client re-dispatches onto the same per-type validators and tab-store calls the legacy tools used.
+ * back as a JSON result carrying the {@code type} discriminator plus the exact legacy field names, so the AI Hub client
+ * re-dispatches onto the same per-type validators and tab-store calls the legacy tools used.
  *
  * <p>
- * {@code openWorkflowChatTab} / {@code openAiHubPersonalAgentTab} are NOT folded in — their results drive a task
- * switch (thread + navigation), a different contract. The legacy per-type classes also remain for subagent-internal
+ * {@code openWorkflowChatTab} / {@code openAiHubPersonalAgentTab} are NOT folded in — their results drive a task switch
+ * (thread + navigation), a different contract. The legacy per-type classes also remain for subagent-internal
  * registrations (e.g. the data_analyst specialist's {@code openDataTableTab}).
  * </p>
  *
@@ -52,28 +52,29 @@ public class OpenResourceTabToolCallback implements ToolCallback {
         result). DATA_TABLE: dataTableId. KNOWLEDGE_BASE: knowledgeBaseId. SKILL: skillId.
         CUSTOM_COMPONENT: customComponentId. CODE_WORKFLOW: projectId, language.""";
 
-    private static final String INPUT_SCHEMA = """
-        {
-            "type": "object",
-            "properties": {
-                "type": {
-                    "type": "string",
-                    "enum": ["FILE", "WORKFLOW", "DATA_TABLE", "KNOWLEDGE_BASE", "SKILL", "CUSTOM_COMPONENT", "CODE_WORKFLOW"],
-                    "description": "The resource kind to open"
+    private static final String INPUT_SCHEMA =
+        """
+            {
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "enum": ["FILE", "WORKFLOW", "DATA_TABLE", "KNOWLEDGE_BASE", "SKILL", "CUSTOM_COMPONENT", "CODE_WORKFLOW"],
+                        "description": "The resource kind to open"
+                    },
+                    "name": {"type": "string", "description": "Display name for the tab"},
+                    "fileId": {"type": "string", "description": "FILE: workspace asset file id"},
+                    "workflowId": {"type": "string", "description": "WORKFLOW: workflow id"},
+                    "projectId": {"type": "string", "description": "WORKFLOW / CODE_WORKFLOW: owning project id"},
+                    "projectWorkflowId": {"type": "number", "description": "WORKFLOW: project workflow id (from listWorkflows)"},
+                    "dataTableId": {"type": "string", "description": "DATA_TABLE: data table id"},
+                    "knowledgeBaseId": {"type": "string", "description": "KNOWLEDGE_BASE: knowledge base id"},
+                    "skillId": {"type": "string", "description": "SKILL: skill id"},
+                    "customComponentId": {"type": "string", "description": "CUSTOM_COMPONENT: custom component id"},
+                    "language": {"type": "string", "description": "CODE_WORKFLOW: script language"}
                 },
-                "name": {"type": "string", "description": "Display name for the tab"},
-                "fileId": {"type": "string", "description": "FILE: workspace asset file id"},
-                "workflowId": {"type": "string", "description": "WORKFLOW: workflow id"},
-                "projectId": {"type": "string", "description": "WORKFLOW / CODE_WORKFLOW: owning project id"},
-                "projectWorkflowId": {"type": "number", "description": "WORKFLOW: project workflow id (from listWorkflows)"},
-                "dataTableId": {"type": "string", "description": "DATA_TABLE: data table id"},
-                "knowledgeBaseId": {"type": "string", "description": "KNOWLEDGE_BASE: knowledge base id"},
-                "skillId": {"type": "string", "description": "SKILL: skill id"},
-                "customComponentId": {"type": "string", "description": "CUSTOM_COMPONENT: custom component id"},
-                "language": {"type": "string", "description": "CODE_WORKFLOW: script language"}
-            },
-            "required": ["type", "name"]
-        }""";
+                "required": ["type", "name"]
+            }""";
 
     private final JsonMapper jsonMapper = new JsonMapper();
     private final @Nullable AiHubTaskArtifactRecorder artifactRecorder;

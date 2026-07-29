@@ -52,6 +52,7 @@ class AiHubTaskArtifactKindWireFormatTest {
         "DATA_TABLE_ROW_UPDATED",
         "FILE_CREATED",
         "FILE_REFERENCED",
+        "FILE_UPDATED",
         "KB_DOCUMENT_ADDED",
         "KB_DOCUMENT_DELETED",
         "KB_REFERENCED",

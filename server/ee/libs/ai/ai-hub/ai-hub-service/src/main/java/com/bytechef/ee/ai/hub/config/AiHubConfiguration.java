@@ -75,6 +75,7 @@ import com.bytechef.ee.ai.hub.tool.OpenResourceTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenWorkflowChatTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.RemoveTaskToolToolCallback;
 import com.bytechef.ee.ai.hub.tool.RunChatWorkflowToolCallback;
+import com.bytechef.ee.ai.hub.tool.UpdateAssetFileContentToolCallback;
 import com.bytechef.ee.ai.hub.tool.memory.DbAutoMemoryDirectoryOps;
 import com.bytechef.ee.ai.hub.tool.memory.DbMemoryResourceResolver;
 import com.bytechef.ee.ai.hub.toolsearch.AiHubGlobalToolCatalog;
@@ -449,6 +450,7 @@ public class AiHubConfiguration {
 
         // cloneAssetFile is demoted to the searchable catalog (aiHubBuildGlobalToolCatalog).
         toolCallbacks.add(new CreateAssetFileToolCallback(assetFileFacade, aiHubTaskArtifactRecorder));
+        toolCallbacks.add(new UpdateAssetFileContentToolCallback(assetFileFacade, aiHubTaskArtifactRecorder));
         toolCallbacks.add(new GetAssetFileContentToolCallback(assetFileFacade));
         toolCallbacks.add(new ListAssetFilesToolCallback(assetFileFacade));
 
@@ -673,10 +675,10 @@ public class AiHubConfiguration {
 
     /**
      * Registers the Copilot specialist sub-agent ToolCallbacks (skills, context store, knowledge base, data table,
-     * cluster element, code editor, workflow editor, converter) on the supplied tool list. Each is only added when
-     * its backing ChatClient bean is present — Copilot
-     * disabled or a particular specialist missing skips silently. Mirrors {@link #registerSubAgentToolCallbacks} for
-     * the older ChatClient sub-agents (research / data_analyst / image_generator / slide_builder).
+     * cluster element, code editor, workflow editor, converter) on the supplied tool list. Each is only added when its
+     * backing ChatClient bean is present — Copilot disabled or a particular specialist missing skips silently. Mirrors
+     * {@link #registerSubAgentToolCallbacks} for the older ChatClient sub-agents (research / data_analyst /
+     * image_generator / slide_builder).
      *
      * <p>
      * The {@code converterProvider} is nullable because the ASK agent has no Converter specialist (Copilot only ships a
