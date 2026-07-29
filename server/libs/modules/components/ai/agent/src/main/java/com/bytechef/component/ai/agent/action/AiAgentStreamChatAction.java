@@ -39,6 +39,7 @@ import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.context.EnvironmentContextThreadLocalAccessor;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -49,13 +50,16 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Flow;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 import org.jspecify.annotations.Nullable;
 import org.reactivestreams.FlowAdapters;
 import org.springframework.ai.chat.client.ChatClient.ChatClientRequestSpec;
 import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.model.tool.ToolCallingManager;
+import org.springframework.beans.factory.ObjectProvider;
 import reactor.core.publisher.Flux;
 
 /**
@@ -65,17 +69,36 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
 
     public static ActionDefinition of(
         AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
-        ToolCallingManager toolCallingManager) {
+        ToolCallingManager toolCallingManager,
+        @Nullable ObjectProvider<ToolExecutionRecorder> toolExecutionRecorderObjectProvider) {
 
-        return new AiAgentStreamChatAction(aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager)
-            .build();
+        return new AiAgentStreamChatAction(
+            aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager,
+            toolExecutionRecorderObjectProvider).build();
     }
 
     private AiAgentStreamChatAction(
         AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
-        ToolCallingManager toolCallingManager) {
+        ToolCallingManager toolCallingManager,
+        @Nullable ObjectProvider<ToolExecutionRecorder> toolExecutionRecorderObjectProvider) {
 
-        super(aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
+        super(
+            aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager,
+            toolExecutionRecorderObjectProvider);
+    }
+
+    /**
+     * Streaming chat never restores or clears crash checkpoints — restore lives only in
+     * {@link AiAgentChatAction#perform} and nothing clears the row on stream completion. Writing a checkpoint after
+     * every tool round would therefore be dead I/O that also leaves a stale conversation snapshot in {@code
+     * data_storage} until job purge (plus a stale-restore hazard for a non-stream Chat node sharing the same
+     * input-parameters fingerprint). Suppress checkpointing for the streaming path.
+     */
+    @Override
+    protected @Nullable Consumer<List<Message>> createConversationCheckpointer(
+        Parameters inputParameters, ActionContext context) {
+
+        return null;
     }
 
     private ChatActionDefinitionWrapper build() {
