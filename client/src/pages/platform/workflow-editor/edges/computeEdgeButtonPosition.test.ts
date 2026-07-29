@@ -75,6 +75,25 @@ describe('computeEdgeButtonPosition', () => {
             expect(result).toEqual({x: 1207, y: 861});
         });
 
+        it('should center the button on the source column for a ghost-to-ghost merge edge in TB mode', () => {
+            // Merge edge from a nested dispatcher's bottom ghost into the enclosing
+            // dispatcher's bottom ghost bends around the frame corner — the path
+            // center would land on the horizontal run, so the button pins to the
+            // source column, vertically centered on the merge stub
+            const result = computeEdgeButtonPosition(
+                makeParams({
+                    correctedSourceX: 750,
+                    correctedSourceY: 100,
+                    correctedTargetX: 480,
+                    correctedTargetY: 220,
+                    sourceNodeType: 'taskDispatcherBottomGhostNode',
+                    targetNodeType: 'taskDispatcherBottomGhostNode',
+                })
+            );
+
+            expect(result).toEqual({x: 750, y: 160});
+        });
+
         it('should return edge center for bottom ghost source in LR mode', () => {
             const result = computeEdgeButtonPosition(
                 makeParams({
@@ -88,6 +107,40 @@ describe('computeEdgeButtonPosition', () => {
             );
 
             expect(result).toEqual(EDGE_CENTER);
+        });
+    });
+
+    describe('exit edges into a bottom ghost', () => {
+        it('should pin the button to the source column for a long trailing edge in TB mode', () => {
+            // The path corner now bends 16px above the bar, so the smoothstep
+            // center sits on the bottom jog beside foreign columns — the "+"
+            // must stay midway down the column's own vertical run
+            const result = computeEdgeButtonPosition(
+                makeParams({
+                    correctedSourceX: 3383,
+                    correctedSourceY: 2492,
+                    correctedTargetX: 2787,
+                    correctedTargetY: 2984,
+                    targetNodeType: 'taskDispatcherBottomGhostNode',
+                })
+            );
+
+            expect(result).toEqual({x: 3383, y: 2738});
+        });
+
+        it('should pin the button to the source row for a long trailing edge in LR mode', () => {
+            const result = computeEdgeButtonPosition(
+                makeParams({
+                    correctedSourceX: 2492,
+                    correctedSourceY: 3383,
+                    correctedTargetX: 2984,
+                    correctedTargetY: 2787,
+                    isHorizontal: true,
+                    targetNodeType: 'taskDispatcherBottomGhostNode',
+                })
+            );
+
+            expect(result).toEqual({x: 2738, y: 3383});
         });
     });
 
