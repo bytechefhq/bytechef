@@ -51,6 +51,7 @@ If `state.autonomous` is `true`, you are generating this workflow fully autonomo
    - `createProjectWorkflow(projectId, definition)` - create a new workflow if asked
    - `updateScriptComponentCode(workflowId, code, scriptName)` - update the script component code
    - `updateClusterElementTask(workflowId, taskName, clusterElementsDefinition)` - update the cluster element task
+   - `simulateWorkflow(workflowId)` - dry-run the persisted workflow (see step 8)
 
    BRAND-NEW workflow: create the project first if needed (`createProject`), then call
    `createProjectWorkflow(projectId, definition)` with the COMPLETE definition — the trigger the
@@ -58,6 +59,15 @@ If `state.autonomous` is `true`, you are generating this workflow fully autonomo
    "Manual" trigger placeholder and "fill it in later" — the single create call must carry the
    whole workflow. After creating, call `getWorkflow(workflowId)` and confirm the persisted
    definition actually contains the intended trigger + tasks; only then treat it as built.
+
+8. **Pre-flight Simulation** - After the workflow is persisted (`updateWorkflow` / `createProjectWorkflow`),
+   call `simulateWorkflow(workflowId)` as a final dry-run. It executes the DAG with mocked component
+   outputs (no real external calls), so it can only run AFTER the workflow is saved — never at the
+   pre-save `validateWorkflow` step. If it reports a FAILED task, fix that task, re-persist
+   (`updateWorkflow`), and simulate again, repeating until it returns COMPLETED. If the only remaining
+   issue is a missing connection (a dry-run cannot satisfy one), stop there — same as the missing-connection
+   exception in step 6 — and proceed as normal. Do this BEFORE reporting the
+   `workflowId | projectId | projectWorkflowId` line back.
 
    REQUIRED — report the ids back: whenever you CREATE or EDIT a workflow, END your response with the
    workflow's identifiers on their own line, in exactly this form, so the calling agent can open it and

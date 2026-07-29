@@ -182,6 +182,17 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public Object executeDryRunTrigger(String componentName, int componentVersion, String triggerName) {
+        return defaultRestClient.post(
+            uriBuilder -> toUri(uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-dry-run-trigger"),
+            new DryRunTriggerRequest(componentName, componentVersion, triggerName),
+            new ParameterizedTypeReference<>() {});
+    }
+
+    private record DryRunTriggerRequest(String componentName, int componentVersion, String triggerName) {
+    }
+
     private record OptionsRequest(
         String componentName, int componentVersion, String triggerName, String propertyName,
         Map<String, ?> inputParameters, Long connectionId, List<String> lookupDependsOnPaths, String searchText) {

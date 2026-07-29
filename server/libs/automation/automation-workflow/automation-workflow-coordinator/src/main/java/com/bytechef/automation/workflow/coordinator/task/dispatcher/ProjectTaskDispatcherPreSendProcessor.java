@@ -23,6 +23,7 @@ import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.workflow.coordinator.AbstractDispatcherPreSendProcessor;
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
@@ -60,6 +61,9 @@ public class ProjectTaskDispatcherPreSendProcessor extends AbstractDispatcherPre
     @Override
     public TaskExecution process(TaskExecution taskExecution) {
         Job job = jobService.getJob(Validate.notNull(taskExecution.getJobId(), "jobId"));
+
+        taskExecution.putMetadata(
+            MetadataConstants.DRY_RUN, MapUtils.getBoolean(job.getMetadata(), MetadataConstants.DRY_RUN, false));
 
         long projectDeploymentId = principalJobService.getJobPrincipalId(
             Validate.notNull(job.getId(), "id"), PlatformType.AUTOMATION);

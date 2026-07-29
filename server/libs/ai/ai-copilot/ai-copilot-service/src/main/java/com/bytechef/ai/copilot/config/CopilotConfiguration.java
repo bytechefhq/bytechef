@@ -63,6 +63,7 @@ import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.platform.ai.tool.ComponentTools;
 import com.bytechef.platform.ai.tool.FirecrawlTools;
+import com.bytechef.platform.ai.tool.SimulationTools;
 import com.bytechef.platform.ai.tool.TaskTools;
 import com.bytechef.platform.ai.tool.WorkflowInstructionTools;
 import com.bytechef.platform.ai.tool.WorkflowValidatorTools;
@@ -747,12 +748,12 @@ public class CopilotConfiguration {
     @Bean
     ChatClient workflowEditorBuildSubAgentChatClient(
         ChatModel chatModel, ProjectTools projectTools, ProjectWorkflowTools projectWorkflowTools, TaskTools taskTools,
-        ScriptTools scriptTools) {
+        ScriptTools scriptTools, SimulationTools simulationTools) {
 
         return ChatClient.builder(chatModel)
             .defaultSystem(getSystemPrompt(promptWorkflowEditorBuildResource))
             .defaultTools(
-                projectTools, projectWorkflowTools, taskTools, scriptTools, workflowValidatorTools,
+                projectTools, projectWorkflowTools, taskTools, scriptTools, simulationTools, workflowValidatorTools,
                 workflowInstructionTools)
             // One-shot subagent (backs the management MCP workflow_editor agent + AI Hub delegation): give it
             // lookupPropertyOptions so it fetches real option values for dynamic-option properties and sets a valid

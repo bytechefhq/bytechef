@@ -20,6 +20,7 @@ import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.ai.usage.WorkflowLlmUsageEvent;
 import com.bytechef.platform.ai.util.TokenUsageHolder;
 import com.bytechef.platform.component.ComponentConnection;
+import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.service.ActionDefinitionService;
@@ -142,6 +143,15 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
                 }
             }
         }
+    }
+
+    @Override
+    public Object executeDryRunPerform(String componentName, int componentVersion, String actionName) {
+        ActionDefinition actionDefinition = actionDefinitionService.getActionDefinition(
+            componentName, componentVersion, actionName);
+
+        return DryRunOutputResolver.resolve(
+            actionDefinition.isOutputDefined() ? actionDefinition.getOutputResponse() : null);
     }
 
     private ComponentConnection getComponentConnection(Long connectionId) {

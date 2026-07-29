@@ -1,0 +1,14 @@
+{
+  "label": "Simulation Failed",
+  "tasks": [ {
+    "name": "task1",
+    "label": "Produce a value",
+    "type": "test/v1/produce",
+    "parameters": { }
+  }, {
+    "name": "brokenTask",
+    "label": "Reference a non-existent step",
+    "type": "test/v1/missingStep",
+    "parameters": { }
+  } ]
+}

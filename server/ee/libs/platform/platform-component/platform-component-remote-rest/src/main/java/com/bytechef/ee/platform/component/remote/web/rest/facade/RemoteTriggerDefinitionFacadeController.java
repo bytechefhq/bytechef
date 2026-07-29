@@ -215,6 +215,25 @@ public class RemoteTriggerDefinitionFacadeController {
                 webhookValidateRequest.webhookRequest, webhookValidateRequest.connectionId));
     }
 
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = "/execute-dry-run-trigger",
+        consumes = {
+            "application/json"
+        })
+    public ResponseEntity<Object> executeDryRunTrigger(
+        @Valid @RequestBody DryRunTriggerRequest dryRunTriggerRequest) {
+
+        return ResponseEntity.ok(
+            triggerDefinitionFacade.executeDryRunTrigger(
+                dryRunTriggerRequest.componentName, dryRunTriggerRequest.componentVersion,
+                dryRunTriggerRequest.triggerName));
+    }
+
+    @SuppressFBWarnings("EI")
+    public record DryRunTriggerRequest(String componentName, int componentVersion, String triggerName) {
+    }
+
     @SuppressFBWarnings("EI")
     public record DynamicWebhookDisableRequest(
         String componentName, int componentVersion, String triggerName,

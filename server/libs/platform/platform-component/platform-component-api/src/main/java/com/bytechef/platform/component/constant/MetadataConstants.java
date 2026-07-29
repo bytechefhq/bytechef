@@ -23,6 +23,7 @@ public class MetadataConstants {
 
     public static final String CALLABLE_RESPONSE = "__callableResponse";
     public static final String CONNECTION_IDS = "connectionIds";
+    public static final String DRY_RUN = "dryRun";
     public static final String WEBHOOK_RESPONSE = "__webhookResponse";
     public static final String EDITOR_ENVIRONMENT = "editorEnvironment";
     public static final String ENVIRONMENT_ID = "environmentId";

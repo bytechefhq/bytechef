@@ -21,6 +21,7 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookValidateRespon
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
+import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
@@ -176,6 +177,15 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
 
         return triggerDefinitionService.executeWebhookValidateOnEnable(
             componentName, componentVersion, triggerName, inputParameters, webhookRequest, componentConnection);
+    }
+
+    @Override
+    public Object executeDryRunTrigger(String componentName, int componentVersion, String triggerName) {
+        TriggerDefinition triggerDefinition = triggerDefinitionService.getTriggerDefinition(
+            componentName, componentVersion, triggerName);
+
+        return DryRunOutputResolver.resolve(
+            triggerDefinition.isOutputDefined() ? triggerDefinition.getOutputResponse() : null);
     }
 
     private ComponentConnection getComponentConnection(Long connectionId) {

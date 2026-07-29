@@ -57,10 +57,14 @@ import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
+import com.bytechef.platform.job.sync.executor.WebSocketEmitterRegistry;
 import com.bytechef.platform.job.sync.file.storage.InMemoryTaskFileStorage;
+import com.bytechef.platform.job.sync.simulation.WorkflowSimulationFacade;
+import com.bytechef.platform.job.sync.simulation.WorkflowSimulationFacadeImpl;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalFactory;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver;
+import com.bytechef.platform.workflow.test.coordinator.task.dispatcher.SimulationTaskDispatcherPreSendProcessor;
 import com.bytechef.platform.workflow.test.coordinator.task.dispatcher.TestTaskDispatcherPreSendProcessor;
 import com.bytechef.platform.workflow.test.facade.AiAgentTestFacade;
 import com.bytechef.platform.workflow.test.facade.AiAgentTestFacadeImpl;
@@ -118,8 +122,7 @@ public class WorkflowTestConfiguration {
         ComponentDefinitionService componentDefinitionService, Environment environment, Evaluator evaluator,
         ObjectMapper objectMapper, SubflowResolver subflowResolver,
         TaskDispatcherDefinitionService taskDispatcherDefinitionService, TaskExecutor taskExecutor,
-        TaskHandlerRegistry taskHandlerRegistry,
-        com.bytechef.platform.job.sync.executor.WebSocketEmitterRegistry webSocketEmitterRegistry,
+        TaskHandlerRegistry taskHandlerRegistry, WebSocketEmitterRegistry webSocketEmitterRegistry,
         WorkflowNodeOutputFacade workflowNodeOutputFacade,
         WorkflowService workflowService, WorkflowTestConfigurationService workflowTestConfigurationService) {
 
@@ -156,6 +159,42 @@ public class WorkflowTestConfiguration {
                 webSocketEmitterRegistry, workflowService),
             taskDispatcherDefinitionService, taskExecutionService, taskFileStorage, workflowService,
             workflowNodeOutputFacade, workflowTestConfigurationService);
+    }
+
+    @Bean
+    WorkflowSimulationFacade workflowSimulationFacade(
+        Environment environment, Evaluator evaluator, ObjectMapper objectMapper, SubflowResolver subflowResolver,
+        TaskExecutor taskExecutor, TaskHandlerRegistry taskHandlerRegistry,
+        WebSocketEmitterRegistry webSocketEmitterRegistry, WorkflowService workflowService) {
+
+        ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository());
+        CounterService counterService = new CounterServiceImpl(new InMemoryCounterRepository());
+        AsyncMessageBroker asyncMessageBroker = new AsyncMessageBroker(environment);
+        InMemoryTaskExecutionRepository taskExecutionRepository = new InMemoryTaskExecutionRepository();
+
+        JobService jobService = new JobServiceImpl(new InMemoryJobRepository(taskExecutionRepository, objectMapper));
+        TaskExecutionService taskExecutionService = new TaskExecutionServiceImpl(taskExecutionRepository);
+
+        TaskFileStorage taskFileStorage = new InMemoryTaskFileStorage(
+            new TaskFileStorageImpl(new Base64FileStorageService()));
+
+        ApplicationEventPublisher coordinatorEventPublisher = createEventPublisher(asyncMessageBroker);
+
+        JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
+            contextService, evaluator, jobService, 1000, asyncMessageBroker,
+            getApplicationEventListeners(
+                evaluator, coordinatorEventPublisher, jobService, taskExecutionService, taskFileStorage),
+            getTaskCompletionHandlerFactories(
+                contextService, counterService, evaluator, taskExecutionService, taskFileStorage),
+            getTaskDispatcherAdapterFactories(evaluator),
+            List.of(new SimulationTaskDispatcherPreSendProcessor(jobService)),
+            getTaskDispatcherResolverFactories(
+                contextService, counterService, evaluator, coordinatorEventPublisher, jobService, subflowResolver,
+                taskExecutionService, taskFileStorage, workflowService),
+            taskExecutionService, taskExecutor, taskHandlerRegistry, taskFileStorage, 300, webSocketEmitterRegistry,
+            workflowService);
+
+        return new WorkflowSimulationFacadeImpl(jobSyncExecutor, taskExecutionService);
     }
 
     private static ApplicationEventPublisher createEventPublisher(MessageBroker messageBroker) {

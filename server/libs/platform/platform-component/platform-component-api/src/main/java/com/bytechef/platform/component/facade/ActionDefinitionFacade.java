@@ -56,4 +56,10 @@ public interface ActionDefinitionFacade {
         Map<String, ?> extensions, @Nullable Long environmentId, @Nullable PlatformType type,
         boolean editorEnvironment, @Nullable Map<String, ?> continueParameters,
         @Nullable Map<String, ?> resumeData, @Nullable Instant suspendExpiresAt);
+
+    /**
+     * Returns the action's declared STATIC output (sampleOutput, else placeholder, else empty) for a dry-run - never
+     * invokes perform() or a dynamic output function, so it makes no API/connection call.
+     */
+    Object executeDryRunPerform(String componentName, int componentVersion, String actionName);
 }

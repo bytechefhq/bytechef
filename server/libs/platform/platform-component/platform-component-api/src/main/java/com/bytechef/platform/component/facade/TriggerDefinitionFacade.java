@@ -93,4 +93,10 @@ public interface TriggerDefinitionFacade {
     WebhookValidateResponse executeWebhookValidateOnEnable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
         WebhookRequest webhookRequest, @Nullable Long connectionId);
+
+    /**
+     * Returns the trigger's declared STATIC output (sampleOutput, else placeholder, else empty) for a dry-run - never
+     * invokes the trigger or a dynamic output function, so it makes no API/connection call.
+     */
+    Object executeDryRunTrigger(String componentName, int componentVersion, String triggerName);
 }

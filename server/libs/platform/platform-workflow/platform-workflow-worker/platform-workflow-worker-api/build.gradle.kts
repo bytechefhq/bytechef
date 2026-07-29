@@ -7,6 +7,9 @@ dependencies {
     implementation("org.apache.commons:commons-lang3")
     implementation(project(":server:libs:core:commons:commons-util"))
 
+    testImplementation("org.assertj:assertj-core")
+    testImplementation("org.mockito:mockito-core")
+    testImplementation("org.mockito:mockito-junit-jupiter")
     testImplementation(project(":server:libs:core:evaluator:evaluator-api"))
 
     testImplementation(project(":server:libs:config:jackson-config"))

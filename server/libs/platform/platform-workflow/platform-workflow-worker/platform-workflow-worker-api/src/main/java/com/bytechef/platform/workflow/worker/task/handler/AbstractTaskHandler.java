@@ -52,6 +52,10 @@ public abstract class AbstractTaskHandler implements TaskHandler<Object> {
 
     @Override
     public Object handle(TaskExecution taskExecution) throws TaskExecutionException {
+        if (MapUtils.getBoolean(taskExecution.getMetadata(), MetadataConstants.DRY_RUN, false)) {
+            return actionDefinitionFacade.executeDryRunPerform(componentName, componentVersion, actionName);
+        }
+
         Map<String, Long> connectIdMap = MapUtils.getMap(
             taskExecution.getMetadata(), MetadataConstants.CONNECTION_IDS, Long.class, Map.of());
 

@@ -109,6 +109,14 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
             new ParameterizedTypeReference<>() {});
     }
 
+    @Override
+    public Object executeDryRunPerform(String componentName, int componentVersion, String actionName) {
+        return defaultRestClient.post(
+            uriBuilder -> toUri(uriBuilder, componentName, ACTION_DEFINITION_FACADE + "/execute-dry-run-perform"),
+            new DryRunPerformRequest(componentName, componentVersion, actionName),
+            new ParameterizedTypeReference<>() {});
+    }
+
     @SuppressWarnings("unchecked")
     private Map<String, Long> castExtensions(Map<String, ?> extensions) {
         if (extensions == null) {
@@ -130,6 +138,9 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
                         return Long.parseLong(v.toString());
                     }));
         }
+    }
+
+    private record DryRunPerformRequest(String componentName, int componentVersion, String actionName) {
     }
 
     private record MultipleConnectionsOptionsRequest(

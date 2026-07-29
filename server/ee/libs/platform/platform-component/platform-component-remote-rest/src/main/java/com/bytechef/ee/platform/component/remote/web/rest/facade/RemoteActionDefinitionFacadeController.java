@@ -115,6 +115,25 @@ public class RemoteActionDefinitionFacadeController {
                 outputRequest.inputParameters, outputRequest.connectionIds));
     }
 
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = "/execute-dry-run-perform",
+        consumes = {
+            "application/json"
+        })
+    public ResponseEntity<Object> executeDryRunPerform(
+        @Valid @RequestBody DryRunPerformRequest dryRunPerformRequest) {
+
+        return ResponseEntity.ok(
+            actionDefinitionFacade.executeDryRunPerform(
+                dryRunPerformRequest.componentName, dryRunPerformRequest.componentVersion,
+                dryRunPerformRequest.actionName));
+    }
+
+    @SuppressFBWarnings("EI")
+    public record DryRunPerformRequest(String componentName, int componentVersion, String actionName) {
+    }
+
     @SuppressFBWarnings("EI")
     public record MultipleConnectionsOptionsRequest(
         String componentName, int componentVersion, String actionName, String propertyName,

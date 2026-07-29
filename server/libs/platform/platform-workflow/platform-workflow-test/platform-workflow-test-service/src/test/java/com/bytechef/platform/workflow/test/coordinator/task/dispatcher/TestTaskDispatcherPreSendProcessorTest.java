@@ -17,6 +17,7 @@
 package com.bytechef.platform.workflow.test.coordinator.task.dispatcher;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -86,6 +87,7 @@ class TestTaskDispatcherPreSendProcessorTest {
         Job job = mock(Job.class);
 
         when(job.getWorkflowId()).thenReturn(WORKFLOW_ID);
+        when(job.getMetadata()).thenReturn(Map.of());
         when(jobService.getJob(JOB_ID)).thenReturn(job);
         when(workflowTestConfigurationService.getWorkflowTestConfigurationConnections(WORKFLOW_ID, TASK_NAME, 0))
             .thenReturn(List.of());
@@ -103,6 +105,35 @@ class TestTaskDispatcherPreSendProcessorTest {
     }
 
     @Test
+    void processCopiesDryRunFlagFromJobMetadata() {
+        WorkflowTask workflowTask = mock(WorkflowTask.class);
+
+        when(workflowTask.getName()).thenReturn(TASK_NAME);
+
+        TaskExecution taskExecution = TaskExecution.builder()
+            .jobId(JOB_ID)
+            .workflowTask(workflowTask)
+            .build();
+
+        Job job = mock(Job.class);
+
+        when(job.getWorkflowId()).thenReturn(WORKFLOW_ID);
+        doReturn(Map.of(MetadataConstants.DRY_RUN, true)).when(job)
+            .getMetadata();
+        when(jobService.getJob(JOB_ID)).thenReturn(job);
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationConnections(WORKFLOW_ID, TASK_NAME, 0))
+            .thenReturn(List.of());
+        when(workflowNodeOutputFacade.getWorkflowNodeOutput(
+            WORKFLOW_ID, TASK_NAME, Environment.DEVELOPMENT.ordinal()))
+                .thenReturn(null);
+
+        TaskExecution result = processor.process(taskExecution);
+
+        assertThat(result.getMetadata()
+            .get(MetadataConstants.DRY_RUN)).isEqualTo(true);
+    }
+
+    @Test
     void processHandlesEvaluationExceptionGracefully() {
         WorkflowTask workflowTask = mock(WorkflowTask.class);
 
@@ -116,6 +147,7 @@ class TestTaskDispatcherPreSendProcessorTest {
         Job job = mock(Job.class);
 
         when(job.getWorkflowId()).thenReturn(WORKFLOW_ID);
+        when(job.getMetadata()).thenReturn(Map.of());
         when(jobService.getJob(JOB_ID)).thenReturn(job);
         when(workflowTestConfigurationService.getWorkflowTestConfigurationConnections(WORKFLOW_ID, TASK_NAME, 0))
             .thenReturn(List.of());
@@ -147,6 +179,7 @@ class TestTaskDispatcherPreSendProcessorTest {
         Job job = mock(Job.class);
 
         when(job.getWorkflowId()).thenReturn(WORKFLOW_ID);
+        when(job.getMetadata()).thenReturn(Map.of());
         when(jobService.getJob(JOB_ID)).thenReturn(job);
 
         WorkflowTestConfigurationConnection connection =
@@ -181,6 +214,7 @@ class TestTaskDispatcherPreSendProcessorTest {
         Job job = mock(Job.class);
 
         when(job.getWorkflowId()).thenReturn(WORKFLOW_ID);
+        when(job.getMetadata()).thenReturn(Map.of());
         when(jobService.getJob(JOB_ID)).thenReturn(job);
         when(workflowTestConfigurationService.getWorkflowTestConfigurationConnections(WORKFLOW_ID, TASK_NAME, 0))
             .thenReturn(List.of());
@@ -208,6 +242,7 @@ class TestTaskDispatcherPreSendProcessorTest {
         Job job = mock(Job.class);
 
         when(job.getWorkflowId()).thenReturn(WORKFLOW_ID);
+        when(job.getMetadata()).thenReturn(Map.of());
         when(jobService.getJob(JOB_ID)).thenReturn(job);
         when(workflowTestConfigurationService.getWorkflowTestConfigurationConnections(WORKFLOW_ID, TASK_NAME, 0))
             .thenReturn(List.of());
@@ -241,6 +276,7 @@ class TestTaskDispatcherPreSendProcessorTest {
         Job job = mock(Job.class);
 
         when(job.getWorkflowId()).thenReturn(WORKFLOW_ID);
+        when(job.getMetadata()).thenReturn(Map.of());
         when(jobService.getJob(JOB_ID)).thenReturn(job);
         when(workflowTestConfigurationService.getWorkflowTestConfigurationConnections(WORKFLOW_ID, TASK_NAME, 0))
             .thenReturn(List.of());

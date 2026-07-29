@@ -65,6 +65,9 @@ public class TestTaskDispatcherPreSendProcessor implements TaskDispatcherPreSend
     public TaskExecution process(TaskExecution taskExecution) {
         Job job = jobService.getJob(Validate.notNull(taskExecution.getJobId(), "jobId"));
 
+        taskExecution.putMetadata(
+            MetadataConstants.DRY_RUN, MapUtils.getBoolean(job.getMetadata(), MetadataConstants.DRY_RUN, false));
+
         Map<String, Long> connectionIdMap = getConnectionIdMap(job.getWorkflowId(), taskExecution.getName());
 
         if (!connectionIdMap.isEmpty()) {

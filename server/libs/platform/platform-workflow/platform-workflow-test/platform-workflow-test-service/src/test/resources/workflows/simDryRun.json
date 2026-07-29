@@ -1,0 +1,9 @@
+{
+  "label": "Simulation Dry Run",
+  "tasks": [ {
+    "name": "task1",
+    "label": "Record dry-run marker",
+    "type": "test/v1/marker",
+    "parameters": { }
+  } ]
+}
