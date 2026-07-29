@@ -14,6 +14,8 @@ import {ReactNode, memo, useCallback, useEffect, useMemo, useState} from 'react'
 import {useShallow} from 'zustand/shallow';
 
 import {useChatStore} from '@/stores/useChatStore';
+import type {PendingApprovalI} from '@/stores/useChatStore';
+import {ApprovalResolutionContext} from '@/components/approvalResolutionContext';
 import {useSSE} from '@/hooks/useSSE';
 import {useAutomationChatVoiceSession} from '@/hooks/useAutomationChatVoiceSession';
 import {checkVoiceSupport} from '@/lib/BrowserVoiceSession';
@@ -38,6 +40,24 @@ interface AskUserQuestionI {
 interface AskUserQuestionEventI {
     questions: AskUserQuestionI[];
     resumeUrl?: string;
+}
+
+interface ApprovalRequestEventI {
+    expiresAt?: string;
+    formDescription?: string;
+    formTitle?: string;
+    formUrl?: string;
+    inputs?: unknown[];
+    resumeId: string;
+}
+
+function formatApprovalRequest(event: ApprovalRequestEventI): string {
+    const title = event.formTitle || 'Approval requested';
+    const description = event.formDescription ? `\n\n${event.formDescription}` : '';
+    const expiry = event.expiresAt ? `\n\nExpires ${new Date(event.expiresAt).toLocaleString()}` : '';
+    const link = event.formUrl ? `\n\n[Open the approval form](${event.formUrl})` : '';
+
+    return `**${title}**${description}${expiry}${link}`;
 }
 
 function formatAskUserQuestion(event: AskUserQuestionEventI): string {
@@ -230,16 +250,81 @@ export const AutomationChatProvider = memo(function AutomationChatProvider({
         [setLastAssistantMessageContent, setResumeUrl]
     );
 
+    const handleApprovalRequest = useCallback(
+        (data: unknown) => {
+            if (!data || typeof data !== 'object' || !('resumeId' in data)) {
+                return;
+            }
+
+            const event = data as ApprovalRequestEventI;
+
+            const hasInputs = Array.isArray(event.inputs) && event.inputs.length > 0;
+            const approvalResumeUrl = event.formUrl ? event.formUrl.replace('/resume/', '/job/resume/') : null;
+
+            if (!hasInputs && approvalResumeUrl) {
+                useChatStore.getState().setPendingApproval({
+                    expiresAt: event.expiresAt,
+                    formDescription: event.formDescription,
+                    formTitle: event.formTitle,
+                    resumeUrl: approvalResumeUrl,
+                });
+            } else {
+                setMessage({content: formatApprovalRequest(event), role: 'assistant'});
+            }
+
+            setIsRunning(false);
+            setStreamRequest(null);
+        },
+        [setMessage]
+    );
+
     const eventHandlers = useMemo(
         () => ({
+            approval_request: handleApprovalRequest,
             ask_user_question: handleAskUserQuestion,
             error: handleError,
             result: handleResult,
             stream: handleStream,
             message: handleResult, // Handle default SSE 'message' events as results
         }),
-        [handleAskUserQuestion, handleError, handleResult, handleStream]
+        [handleApprovalRequest, handleAskUserQuestion, handleError, handleResult, handleStream]
     );
+
+    const resolveApproval = useCallback(
+        async (pendingApproval: PendingApprovalI, payload: Record<string, unknown>) => {
+            const response = await fetch(pendingApproval.resumeUrl, {
+                body: JSON.stringify(payload),
+                headers: {Accept: 'text/event-stream', 'Content-Type': 'application/json'},
+                method: 'POST',
+            });
+
+            if (!response.ok) {
+                throw new Error(`Resume request failed with status ${response.status}`);
+            }
+
+            const resolvedTitle = pendingApproval.formTitle || 'Approval requested';
+
+            useChatStore.getState().setPendingApproval(null);
+            setMessage({
+                content: `**${resolvedTitle}** — ${payload.approved ? 'approved' : 'discarded'}.`,
+                role: 'assistant',
+            });
+
+            const contentType = response.headers.get('content-type') ?? '';
+
+            if (contentType.includes('text/event-stream')) {
+                setIsRunning(true);
+                setMessage({content: '', role: 'assistant'});
+
+                void drainSseResponse(response, eventHandlers)
+                    .catch((drainError) => console.error('Failed to stream the resumed run:', drainError))
+                    .finally(() => setIsRunning(false));
+            }
+        },
+        [eventHandlers, setMessage]
+    );
+
+    const approvalResolution = useMemo(() => ({resolveApproval}), [resolveApproval]);
 
     const onNew = useCallback(
         async (message: AppendMessage) => {
@@ -387,9 +472,11 @@ export const AutomationChatProvider = memo(function AutomationChatProvider({
 
     return (
         <AutomationChatContext.Provider value={contextValue}>
-            <AssistantRuntimeProvider aui={aui} runtime={runtime}>
-                {children}
-            </AssistantRuntimeProvider>
+            <ApprovalResolutionContext.Provider value={approvalResolution}>
+                <AssistantRuntimeProvider aui={aui} runtime={runtime}>
+                    {children}
+                </AssistantRuntimeProvider>
+            </ApprovalResolutionContext.Provider>
         </AutomationChatContext.Provider>
     );
 });

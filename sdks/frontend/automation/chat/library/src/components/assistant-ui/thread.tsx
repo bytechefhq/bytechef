@@ -17,8 +17,10 @@ import {
   ToolGroupRoot,
   ToolGroupTrigger,
 } from "@/components/assistant-ui/tool-group";
+import { ApprovalCard } from "@/components/ApprovalCard";
 import { TooltipIconButton } from "@/components/assistant-ui/tooltip-icon-button";
 import { Button } from "@/components/ui/button";
+import { useAutomationChatConfig } from "@/hooks/useAutomationChatConfig";
 import { cn } from "@/utils/cn";
 import {
   ActionBarMorePrimitive,
@@ -38,6 +40,7 @@ import {
 import {
   ArrowDownIcon,
   ArrowUpIcon,
+  AudioLinesIcon,
   CheckIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -149,6 +152,7 @@ const ThreadRoot: FC<{ isEmpty: boolean }> = ({ isEmpty }) => {
             )}
           >
             <ThreadScrollToBottom />
+            <ApprovalCard />
             <Composer />
             <AuiIf condition={(s) => isNewChatView(s) && s.composer.isEmpty}>
               <ThreadSuggestions />
@@ -245,9 +249,46 @@ const Composer: FC = () => {
 };
 
 const ComposerAction: FC = () => {
+  const { voice, voiceEnabled } = useAutomationChatConfig();
+
   return (
     <div className="aui-composer-action-wrapper relative flex items-center justify-between">
-      <ComposerAddAttachment />
+      <div className="flex items-center gap-1.5">
+        <ComposerAddAttachment />
+
+        {voiceEnabled && voice && (
+          <TooltipIconButton
+            tooltip={
+              voice.status === "active" || voice.status === "connecting"
+                ? "Stop voice session"
+                : "Start voice session"
+            }
+            side="top"
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="aui-composer-voice size-7 rounded-full"
+            aria-label={
+              voice.status === "active" || voice.status === "connecting"
+                ? "Stop voice session"
+                : "Start voice session"
+            }
+            onClick={() => {
+              if (voice.status === "active" || voice.status === "connecting") {
+                voice.stop();
+              } else {
+                void voice.start();
+              }
+            }}
+          >
+            {voice.status === "active" || voice.status === "connecting" ? (
+              <SquareIcon className="size-4 fill-red-500 text-red-500" />
+            ) : (
+              <AudioLinesIcon className="size-4" />
+            )}
+          </TooltipIconButton>
+        )}
+      </div>
       <div className="flex items-center gap-1.5">
         <AuiIf condition={(s) => s.thread.capabilities.dictation}>
           <AuiIf condition={(s) => s.composer.dictation == null}>
