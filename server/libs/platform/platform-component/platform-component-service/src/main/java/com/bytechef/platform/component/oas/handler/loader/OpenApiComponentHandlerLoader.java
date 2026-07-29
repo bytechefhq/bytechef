@@ -90,6 +90,11 @@ public class OpenApiComponentHandlerLoader extends AbstractComponentHandlerLoade
     }
 
     @Override
+    public String getKind() {
+        return "openapi";
+    }
+
+    @Override
     protected ComponentTaskHandlerFunction getComponentTaskHandlerFunction(OpenApiComponentHandler componentHandler) {
         return (actionName, actionDefinitionFacade) -> new OpenApiComponentTaskHandler(
             actionName, actionDefinitionFacade, componentHandler);

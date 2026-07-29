@@ -16,17 +16,101 @@
 
 package com.bytechef.platform.component.handler.loader;
 
-import org.junit.jupiter.api.Disabled;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.slack.SlackComponentHandler;
+import com.bytechef.platform.component.handler.loader.ComponentHandlerLoader.ComponentHandlerEntry;
+import com.bytechef.platform.component.handler.loader.ComponentHandlerLoader.ProviderEntry;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 /**
+ * Covers the per-component loading API used by the build-time component index: resolving a single handler by its
+ * {@code ServiceLoader} provider class name and enumerating provider class names for index generation.
+ *
  * @author Ivica Cardic
  */
 public class DefaultComponentHandlerLoaderTest {
 
-    @Disabled
+    private final DefaultComponentHandlerLoader defaultComponentHandlerLoader = new DefaultComponentHandlerLoader();
+
     @Test
-    public void testLoadComponentTaskHandlerFactories() {
-        // TODO
+    public void testGetKind() {
+        assertThat(defaultComponentHandlerLoader.getKind()).isEqualTo("default");
+    }
+
+    @Test
+    public void testLoadComponentHandlerByProviderClassName() {
+        Optional<ComponentHandlerEntry> componentHandlerEntryOptional =
+            defaultComponentHandlerLoader.loadComponentHandler(SlackComponentHandler.class.getName());
+
+        assertThat(componentHandlerEntryOptional).isPresent();
+
+        ComponentHandlerEntry componentHandlerEntry = componentHandlerEntryOptional.orElseThrow();
+
+        ComponentHandler componentHandler = componentHandlerEntry.componentHandler();
+
+        assertThat(componentHandler.getName()).isEqualTo("slack");
+        assertThat(componentHandlerEntry.componentTaskHandlerFunction()).isNotNull();
+    }
+
+    @Test
+    public void testLoadComponentHandlerReturnsEmptyForUnknownProviderClassName() {
+        Optional<ComponentHandlerEntry> componentHandlerEntryOptional =
+            defaultComponentHandlerLoader.loadComponentHandler("com.example.DoesNotExistComponentHandler");
+
+        assertThat(componentHandlerEntryOptional).isEmpty();
+    }
+
+    @Test
+    public void testLoadProviderEntriesExposesProviderClassNames() {
+        List<ProviderEntry> providerEntries = defaultComponentHandlerLoader.loadProviderEntries();
+
+        assertThat(providerEntries)
+            .extracting(ProviderEntry::providerClassName)
+            .contains(SlackComponentHandler.class.getName());
+
+        ProviderEntry slackProviderEntry = providerEntries.stream()
+            .filter(providerEntry -> SlackComponentHandler.class.getName()
+                .equals(providerEntry.providerClassName()))
+            .findFirst()
+            .orElseThrow();
+
+        ComponentHandlerEntry componentHandlerEntry = slackProviderEntry.componentHandlerEntry();
+
+        ComponentHandler componentHandler = componentHandlerEntry.componentHandler();
+
+        assertThat(componentHandler.getName()).isEqualTo("slack");
+    }
+
+    @Test
+    public void testLoadComponentHandlersAndProviderEntriesReturnSameComponents() {
+        List<ComponentHandlerEntry> componentHandlerEntries = defaultComponentHandlerLoader.loadComponentHandlers();
+
+        List<ProviderEntry> providerEntries = defaultComponentHandlerLoader.loadProviderEntries();
+
+        List<String> bulkComponentNames = componentHandlerEntries.stream()
+            .map(componentHandlerEntry -> {
+                ComponentHandler componentHandler = componentHandlerEntry.componentHandler();
+
+                return componentHandler.getName();
+            })
+            .sorted()
+            .toList();
+
+        List<String> providerComponentNames = providerEntries.stream()
+            .map(providerEntry -> {
+                ComponentHandlerEntry componentHandlerEntry = providerEntry.componentHandlerEntry();
+
+                ComponentHandler componentHandler = componentHandlerEntry.componentHandler();
+
+                return componentHandler.getName();
+            })
+            .sorted()
+            .toList();
+
+        assertThat(providerComponentNames).isEqualTo(bulkComponentNames);
     }
 }

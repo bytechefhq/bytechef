@@ -22,6 +22,8 @@ import com.bytechef.platform.component.jdbc.handler.JdbcComponentHandlerImpl;
 import com.bytechef.platform.component.task.handler.ComponentTaskHandler;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.ServiceLoader;
 
 /**
@@ -30,21 +32,58 @@ import java.util.ServiceLoader;
 public class JdbcComponentHandlerLoader implements ComponentHandlerLoader {
 
     @Override
+    public String getKind() {
+        return "jdbc";
+    }
+
+    @Override
     public List<ComponentHandlerEntry> loadComponentHandlers() {
         List<ComponentHandlerEntry> componentHandlerEntries = new ArrayList<>();
 
         for (JdbcComponentHandler jdbcComponentHandler : ServiceLoader.load(JdbcComponentHandler.class)) {
-            JdbcComponentHandlerImpl jdbcComponentHandlerImpl = new JdbcComponentHandlerImpl(
-                jdbcComponentHandler.getJdbcComponentDefinition());
-
-            componentHandlerEntries.add(
-                new ComponentHandlerEntry(
-                    jdbcComponentHandlerImpl,
-                    (actionName, actionDefinitionFacade) -> new ComponentTaskHandler(
-                        jdbcComponentHandlerImpl.getName(), jdbcComponentHandlerImpl.getVersion(), actionName,
-                        actionDefinitionFacade)));
+            componentHandlerEntries.add(wrap(jdbcComponentHandler));
         }
 
         return componentHandlerEntries;
+    }
+
+    @Override
+    public Optional<ComponentHandlerEntry> loadComponentHandler(String providerClassName) {
+        return ServiceLoader.load(JdbcComponentHandler.class)
+            .stream()
+            .filter(provider -> {
+                Class<? extends JdbcComponentHandler> type = provider.type();
+
+                return Objects.equals(type.getName(), providerClassName);
+            })
+            .findFirst()
+            .map(provider -> wrap(provider.get()));
+    }
+
+    @Override
+    public List<ProviderEntry> loadProviderEntries() {
+        List<ProviderEntry> providerEntries = new ArrayList<>();
+
+        for (ServiceLoader.Provider<JdbcComponentHandler> provider : ServiceLoader.load(JdbcComponentHandler.class)
+            .stream()
+            .toList()) {
+
+            Class<? extends JdbcComponentHandler> type = provider.type();
+
+            providerEntries.add(new ProviderEntry(type.getName(), wrap(provider.get())));
+        }
+
+        return providerEntries;
+    }
+
+    private ComponentHandlerEntry wrap(JdbcComponentHandler jdbcComponentHandler) {
+        JdbcComponentHandlerImpl jdbcComponentHandlerImpl = new JdbcComponentHandlerImpl(
+            jdbcComponentHandler.getJdbcComponentDefinition());
+
+        return new ComponentHandlerEntry(
+            jdbcComponentHandlerImpl,
+            (actionName, actionDefinitionFacade) -> new ComponentTaskHandler(
+                jdbcComponentHandlerImpl.getName(), jdbcComponentHandlerImpl.getVersion(), actionName,
+                actionDefinitionFacade));
     }
 }

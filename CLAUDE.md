@@ -535,6 +535,12 @@ app variants without actuator start cleanly.
 - `@AutoService(ComponentHandler.class)` — ServiceLoader discovery, no Spring DI available
 - `@Component("name_v1_ComponentHandler")` — Spring discovery, supports constructor injection (used by guardrails, RAG, chat-memory, and agent utils when Spring beans are needed)
 
+### Lazy Component Loading & Build-time Index
+- `ComponentDefinitionRegistry` loads NO ServiceLoader components at Spring startup — all registry beans are `lazyInit`, and the registry constructor only captures suppliers
+- server-app's `generateComponentIndex` Gradle task writes `META-INF/bytechef/component-index.json` at build time; the components-list view is served from index stubs (zero handlers loaded), single components load on demand via recorded provider class names
+- **When an index is present it is authoritative**: a ServiceLoader component missing from the index is invisible (both in the list and per-name resolution). Apps that assemble their classpath differently (EE apps) must either run the generator or ship without an index — absent/corrupt index falls back transparently to full loading on first registry access
+- The first deep read (`getComponentDefinitions()` consumers, first task execution) still triggers a one-time full load; stubs never reach detail/execution paths
+
 ### GraphQL Development Workflow
 - Add schema path to `client/codegen.ts` `schema` array
 - Create operation `.graphql` files in `client/src/graphql/<domain>/`

@@ -25,6 +25,8 @@ import com.bytechef.platform.component.definition.ComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.ComponentHandlerWrapper;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.function.BiFunction;
 
@@ -51,22 +53,57 @@ public abstract class AbstractComponentHandlerLoader<T extends ComponentHandler>
         List<ComponentHandlerEntry> componentHandlerEntries = new ArrayList<>();
 
         for (T componentHandler : ServiceLoader.load(serviceClass)) {
-            ComponentDefinition componentDefinition = componentHandler.getDefinition();
-
-            componentHandlerEntries.add(
-                new ComponentHandlerEntry(
-                    new ComponentHandlerWrapper(
-                        new ComponentDefinitionWrapper(
-                            componentDefinition,
-                            mapActionDefinitions(componentHandler, componentDefinition),
-                            mapClusterElementDefinitions(componentHandler, componentDefinition))),
-                    getComponentTaskHandlerFunction(componentHandler)));
+            componentHandlerEntries.add(wrap(componentHandler));
         }
 
         return componentHandlerEntries;
     }
 
+    @Override
+    public Optional<ComponentHandlerEntry> loadComponentHandler(String providerClassName) {
+        // ServiceLoader.Provider.type() loads the provider class WITHOUT initializing it, so scanning for the
+        // requested class name is cheap; only the matching provider is instantiated (which triggers its static
+        // initializer and definition construction).
+        return ServiceLoader.load(serviceClass)
+            .stream()
+            .filter(provider -> {
+                Class<? extends T> type = provider.type();
+
+                return Objects.equals(type.getName(), providerClassName);
+            })
+            .findFirst()
+            .map(provider -> wrap(provider.get()));
+    }
+
+    @Override
+    public List<ProviderEntry> loadProviderEntries() {
+        List<ProviderEntry> providerEntries = new ArrayList<>();
+
+        for (ServiceLoader.Provider<T> provider : ServiceLoader.load(serviceClass)
+            .stream()
+            .toList()) {
+
+            Class<? extends T> type = provider.type();
+
+            providerEntries.add(new ProviderEntry(type.getName(), wrap(provider.get())));
+        }
+
+        return providerEntries;
+    }
+
     protected abstract ComponentTaskHandlerFunction getComponentTaskHandlerFunction(T componentHandler);
+
+    private ComponentHandlerEntry wrap(T componentHandler) {
+        ComponentDefinition componentDefinition = componentHandler.getDefinition();
+
+        return new ComponentHandlerEntry(
+            new ComponentHandlerWrapper(
+                new ComponentDefinitionWrapper(
+                    componentDefinition,
+                    mapActionDefinitions(componentHandler, componentDefinition),
+                    mapClusterElementDefinitions(componentHandler, componentDefinition))),
+            getComponentTaskHandlerFunction(componentHandler));
+    }
 
     private List<ActionDefinition> mapActionDefinitions(T componentHandler, ComponentDefinition componentDefinition) {
         return componentDefinition.getActions()
