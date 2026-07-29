@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-17T14:33:03.269520+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-29T13:00:37.518114+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 @Validated
 @Tag(name = "billing", description = "The Platform Billing Internal API")
 public interface BillingApi {
@@ -145,7 +145,7 @@ public interface BillingApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"taskLimit\" : 0, \"scheduledPlanName\" : \"scheduledPlanName\", \"currentPeriodEnd\" : \"2000-01-23T04:56:07.000+00:00\", \"cancelAtPeriodEnd\" : true, \"planName\" : \"planName\", \"status\" : \"status\", \"tasksUsed\" : 6 }";
+                    String exampleString = "{ \"scheduledPlanName\" : \"scheduledPlanName\", \"currentPeriodEnd\" : \"2000-01-23T04:56:07.000+00:00\", \"cancelAtPeriodEnd\" : true, \"planName\" : \"planName\", \"productUnitLimit\" : 0, \"status\" : \"status\", \"tasksUsed\" : 6 }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

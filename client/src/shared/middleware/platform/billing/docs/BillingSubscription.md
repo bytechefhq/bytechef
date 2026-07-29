@@ -9,7 +9,7 @@ Name | Type
 ------------ | -------------
 `planName` | string
 `status` | string
-`taskLimit` | number
+`productUnitLimit` | number
 `currentPeriodEnd` | Date
 `cancelAtPeriodEnd` | boolean
 `scheduledPlanName` | string
@@ -24,7 +24,7 @@ import type { BillingSubscription } from ''
 const example = {
   "planName": null,
   "status": null,
-  "taskLimit": null,
+  "productUnitLimit": null,
   "currentPeriodEnd": null,
   "cancelAtPeriodEnd": null,
   "scheduledPlanName": null,

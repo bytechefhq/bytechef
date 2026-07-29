@@ -24,14 +24,14 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "BillingSubscription", description = "A billing subscription.")
 @JsonTypeName("BillingSubscription")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-17T14:33:03.269520+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-29T13:00:37.518114+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 public class BillingSubscriptionModel {
 
   private @Nullable String planName;
 
   private @Nullable String status;
 
-  private @Nullable Integer taskLimit;
+  private @Nullable Integer productUnitLimit;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private @Nullable OffsetDateTime currentPeriodEnd;
@@ -84,25 +84,25 @@ public class BillingSubscriptionModel {
     this.status = status;
   }
 
-  public BillingSubscriptionModel taskLimit(@Nullable Integer taskLimit) {
-    this.taskLimit = taskLimit;
+  public BillingSubscriptionModel productUnitLimit(@Nullable Integer productUnitLimit) {
+    this.productUnitLimit = productUnitLimit;
     return this;
   }
 
   /**
-   * The task limit.
-   * @return taskLimit
+   * The number of units that can be used in the current billing period under flat plan.
+   * @return productUnitLimit
    */
   
-  @Schema(name = "taskLimit", description = "The task limit.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("taskLimit")
-  public @Nullable Integer getTaskLimit() {
-    return taskLimit;
+  @Schema(name = "productUnitLimit", description = "The number of units that can be used in the current billing period under flat plan.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("productUnitLimit")
+  public @Nullable Integer getProductUnitLimit() {
+    return productUnitLimit;
   }
 
-  @JsonProperty("taskLimit")
-  public void setTaskLimit(@Nullable Integer taskLimit) {
-    this.taskLimit = taskLimit;
+  @JsonProperty("productUnitLimit")
+  public void setProductUnitLimit(@Nullable Integer productUnitLimit) {
+    this.productUnitLimit = productUnitLimit;
   }
 
   public BillingSubscriptionModel currentPeriodEnd(@Nullable OffsetDateTime currentPeriodEnd) {
@@ -200,7 +200,7 @@ public class BillingSubscriptionModel {
     BillingSubscriptionModel billingSubscription = (BillingSubscriptionModel) o;
     return Objects.equals(this.planName, billingSubscription.planName) &&
         Objects.equals(this.status, billingSubscription.status) &&
-        Objects.equals(this.taskLimit, billingSubscription.taskLimit) &&
+        Objects.equals(this.productUnitLimit, billingSubscription.productUnitLimit) &&
         Objects.equals(this.currentPeriodEnd, billingSubscription.currentPeriodEnd) &&
         Objects.equals(this.cancelAtPeriodEnd, billingSubscription.cancelAtPeriodEnd) &&
         Objects.equals(this.scheduledPlanName, billingSubscription.scheduledPlanName) &&
@@ -209,7 +209,7 @@ public class BillingSubscriptionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(planName, status, taskLimit, currentPeriodEnd, cancelAtPeriodEnd, scheduledPlanName, tasksUsed);
+    return Objects.hash(planName, status, productUnitLimit, currentPeriodEnd, cancelAtPeriodEnd, scheduledPlanName, tasksUsed);
   }
 
   @Override
@@ -218,7 +218,7 @@ public class BillingSubscriptionModel {
     sb.append("class BillingSubscriptionModel {\n");
     sb.append("    planName: ").append(toIndentedString(planName)).append("\n");
     sb.append("    status: ").append(toIndentedString(status)).append("\n");
-    sb.append("    taskLimit: ").append(toIndentedString(taskLimit)).append("\n");
+    sb.append("    productUnitLimit: ").append(toIndentedString(productUnitLimit)).append("\n");
     sb.append("    currentPeriodEnd: ").append(toIndentedString(currentPeriodEnd)).append("\n");
     sb.append("    cancelAtPeriodEnd: ").append(toIndentedString(cancelAtPeriodEnd)).append("\n");
     sb.append("    scheduledPlanName: ").append(toIndentedString(scheduledPlanName)).append("\n");
