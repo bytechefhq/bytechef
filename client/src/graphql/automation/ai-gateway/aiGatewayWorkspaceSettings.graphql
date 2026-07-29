@@ -1,11 +1,16 @@
 query aiGatewayWorkspaceSettings($workspaceId: ID!) {
     aiGatewayWorkspaceSettings(workspaceId: $workspaceId) {
+        blockedTerms
         cacheEnabled
         cacheTtlSeconds
         defaultRoutingPolicyId
+        injectionDetectionEnabled
         logRetentionDays
+        moderationEnabled
         redactPii
+        redactSecrets
         retryCount
+        scanResponses
         softBudgetWarningPct
         timeoutMs
         workspaceId
@@ -14,12 +19,17 @@ query aiGatewayWorkspaceSettings($workspaceId: ID!) {
 
 mutation updateAiGatewayWorkspaceSettings($input: AiGatewayWorkspaceSettingsInput!) {
     updateAiGatewayWorkspaceSettings(input: $input) {
+        blockedTerms
         cacheEnabled
         cacheTtlSeconds
         defaultRoutingPolicyId
+        injectionDetectionEnabled
         logRetentionDays
+        moderationEnabled
         redactPii
+        redactSecrets
         retryCount
+        scanResponses
         softBudgetWarningPct
         timeoutMs
         workspaceId

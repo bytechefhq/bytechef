@@ -5,6 +5,7 @@ import {XIcon} from 'lucide-react';
 import {useCallback, useState} from 'react';
 
 import {AiGatewayProjectType} from '../../types';
+import AiGatewayProjectGuardrailsSection from './AiGatewayProjectGuardrailsSection';
 
 interface AiGatewayProjectDialogProps {
     onClose: () => void;
@@ -232,6 +233,12 @@ const AiGatewayProjectDialog = ({onClose, project, workspaceId}: AiGatewayProjec
                             value={logRetentionDays ?? ''}
                         />
                     </fieldset>
+
+                    {isEditMode && project?.id && (
+                        <div className="border-t pt-4">
+                            <AiGatewayProjectGuardrailsSection projectId={project.id} />
+                        </div>
+                    )}
                 </div>
 
                 <div className="mt-6 flex justify-end gap-2">
