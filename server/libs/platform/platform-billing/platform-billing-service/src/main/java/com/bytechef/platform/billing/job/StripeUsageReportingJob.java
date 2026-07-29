@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.billing.job;
 
+import com.bytechef.platform.billing.exception.PaymentClientException;
 import com.bytechef.platform.billing.service.BillingUsageService;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -36,8 +37,12 @@ public class StripeUsageReportingJob implements Job {
     public void execute(JobExecutionContext context) {
         log.info("Start Stripe usage report");
 
-        billingUsageService.reportUsage(context.getScheduledFireTime()
-            .toInstant());
+        try {
+            billingUsageService.reportUsage(context.getScheduledFireTime()
+                .toInstant());
+        } catch (PaymentClientException paymentClientException) {
+            log.error("Failed to report Stripe usage", paymentClientException);
+        }
     }
 
     @Autowired

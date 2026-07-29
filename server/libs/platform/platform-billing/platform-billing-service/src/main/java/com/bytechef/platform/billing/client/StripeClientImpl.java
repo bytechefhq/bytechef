@@ -17,6 +17,8 @@
 package com.bytechef.platform.billing.client;
 
 import com.bytechef.platform.billing.config.BillingProperties;
+import com.bytechef.platform.billing.exception.InvalidWebhookSignatureException;
+import com.bytechef.platform.billing.exception.PaymentClientException;
 import com.stripe.Stripe;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
@@ -87,7 +89,7 @@ public class StripeClientImpl implements StripeClient {
             return prices.getFirst()
                 .getId();
         } catch (StripeException stripeException) {
-            throw new RuntimeException(stripeException);
+            throw new PaymentClientException("Failed to fetch default price for product " + productId, stripeException);
         }
     }
 
@@ -104,7 +106,8 @@ public class StripeClientImpl implements StripeClient {
                     .putMetadata("tenantId", tenantId)
                     .build());
         } catch (StripeException stripeException) {
-            throw new RuntimeException(stripeException);
+            throw new PaymentClientException(
+                "Failed to cancel subscription " + stripeSubscriptionId + " at period end", stripeException);
         }
     }
 
@@ -126,7 +129,8 @@ public class StripeClientImpl implements StripeClient {
 
             subscription.update(paramsBuilder.build());
         } catch (StripeException stripeException) {
-            throw new RuntimeException(stripeException);
+            throw new PaymentClientException(
+                "Failed to reactivate subscription " + stripeSubscriptionId, stripeException);
         }
     }
 
@@ -149,7 +153,8 @@ public class StripeClientImpl implements StripeClient {
             Subscription.retrieve(subscriptionId)
                 .update(params);
         } catch (StripeException stripeException) {
-            throw new RuntimeException(stripeException);
+            throw new PaymentClientException(
+                "Failed to upgrade subscription " + subscriptionId + " now", stripeException);
         }
     }
 
@@ -199,7 +204,8 @@ public class StripeClientImpl implements StripeClient {
                     .putMetadata("tenantId", tenantId)
                     .build());
         } catch (StripeException stripeException) {
-            throw new RuntimeException(stripeException);
+            throw new PaymentClientException(
+                "Failed to schedule downgrade for subscription " + subscriptionId, stripeException);
         }
     }
 
@@ -208,7 +214,8 @@ public class StripeClientImpl implements StripeClient {
         try {
             releaseScheduleIfPresent(subscription);
         } catch (StripeException stripeException) {
-            throw new RuntimeException(stripeException);
+            throw new PaymentClientException(
+                "Failed to release schedule for subscription " + subscription.getId(), stripeException);
         }
     }
 
@@ -247,7 +254,7 @@ public class StripeClientImpl implements StripeClient {
 
             return customer.getId();
         } catch (StripeException stripeException) {
-            throw new RuntimeException(stripeException);
+            throw new PaymentClientException("Failed to create customer for email " + email, stripeException);
         }
     }
 
@@ -281,7 +288,8 @@ public class StripeClientImpl implements StripeClient {
 
             return Session.create(params);
         } catch (StripeException stripeException) {
-            throw new RuntimeException(stripeException);
+            throw new PaymentClientException(
+                "Failed to create checkout session for customer " + customerId, stripeException);
         }
     }
 
@@ -295,7 +303,7 @@ public class StripeClientImpl implements StripeClient {
 
             return Price.retrieve(priceId, priceRetrieveParams, null);
         } catch (StripeException stripeException) {
-            throw new RuntimeException(stripeException);
+            throw new PaymentClientException("Failed to retrieve price " + priceId, stripeException);
         }
     }
 
@@ -304,7 +312,7 @@ public class StripeClientImpl implements StripeClient {
         try {
             return Subscription.retrieve(subscriptionId);
         } catch (StripeException stripeException) {
-            throw new RuntimeException(stripeException);
+            throw new PaymentClientException("Failed to retrieve subscription " + subscriptionId, stripeException);
         }
     }
 
@@ -314,7 +322,7 @@ public class StripeClientImpl implements StripeClient {
             return Webhook.constructEvent(payload, sigHeader, billingProperties.stripe()
                 .webhookSecret());
         } catch (SignatureVerificationException signatureVerificationException) {
-            throw new RuntimeException("Invalid Stripe signature");
+            throw new InvalidWebhookSignatureException("Invalid Stripe signature", signatureVerificationException);
         }
     }
 
@@ -335,7 +343,8 @@ public class StripeClientImpl implements StripeClient {
 
             MeterEvent.create(params, requestOptions);
         } catch (StripeException stripeException) {
-            throw new RuntimeException("Failed to report meter event to Stripe", stripeException);
+            throw new PaymentClientException(
+                "Failed to report meter event for customer " + stripeCustomerId, stripeException);
         }
     }
 
