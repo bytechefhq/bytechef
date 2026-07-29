@@ -3,13 +3,13 @@ import {Input} from '@/components/Input/Input';
 import {LayoutDirectionType} from '@/shared/constants';
 import {EdgeLabelRenderer} from '@xyflow/react';
 import {CheckIcon, PenIcon, PlusIcon, TrashIcon} from 'lucide-react';
+import {twMerge} from 'tailwind-merge';
 
 import useBranchCaseLabel from './useBranchCaseLabel';
 
 interface BranchCaseLabelProps {
     caseKey: string | number;
     edgeId: string;
-    hasEdgeButton?: boolean;
     layoutDirection: LayoutDirectionType;
     sourceX: number;
     sourceY: number;
@@ -20,7 +20,6 @@ interface BranchCaseLabelProps {
 export default function BranchCaseLabel({
     caseKey,
     edgeId,
-    hasEdgeButton,
     layoutDirection,
     sourceX,
     sourceY,
@@ -44,7 +43,6 @@ export default function BranchCaseLabel({
     } = useBranchCaseLabel({
         caseKey,
         edgeId,
-        hasEdgeButton,
         layoutDirection,
         sourceX,
         sourceY,
@@ -52,14 +50,30 @@ export default function BranchCaseLabel({
         targetY,
     });
 
+    // TB centers the chip on its case column; LR anchors the chip's right
+    // edge past the split bar with the chip above (or, for the row under the
+    // dispatcher's label text, below) its row line — the anchor comes from
+    // computeBranchCaseLabelPosition.
+    const selfAnchorByPlacement: Record<typeof labelPosition.anchor, string> = {
+        above: 'translate(-100%, -100%)',
+        below: 'translate(-100%, 0%)',
+        center: 'translate(-50%, -50%)',
+    };
+    const selfAnchor = selfAnchorByPlacement[labelPosition.anchor];
+
     return (
         <EdgeLabelRenderer key={`${edgeId}-case-label`}>
             <div
-                className="top-6 z-10 flex items-center rounded-md border-2 border-stroke-neutral-tertiary bg-white p-1 text-xs font-medium shadow-xs hover:border-stroke-brand-secondary-hover"
+                className={twMerge(
+                    'z-10 flex items-center rounded-md border-2 border-stroke-neutral-tertiary bg-white p-1 text-xs font-medium shadow-xs hover:border-stroke-brand-secondary-hover',
+                    // the TB nudge below the bar keeps chips off the bar line; in LR the
+                    // chip is row-centered, so any static offset would miss the row
+                    layoutDirection === 'LR' ? 'top-0' : 'top-6'
+                )}
                 style={{
                     pointerEvents: 'all',
                     position: 'absolute',
-                    transform: `translate(${labelPosition.x}px, ${labelPosition.y}px) translate(-50%, -50%)`,
+                    transform: `translate(${labelPosition.x}px, ${labelPosition.y}px) ${selfAnchor}`,
                 }}
             >
                 {isDefaultCase && <span className="p-1 text-xs">default</span>}
