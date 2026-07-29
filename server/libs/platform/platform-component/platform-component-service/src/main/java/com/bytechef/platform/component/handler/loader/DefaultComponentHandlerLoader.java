@@ -57,6 +57,11 @@ public class DefaultComponentHandlerLoader extends AbstractComponentHandlerLoade
     }
 
     @Override
+    public String getKind() {
+        return "default";
+    }
+
+    @Override
     protected ComponentTaskHandlerFunction getComponentTaskHandlerFunction(ComponentHandler componentHandler) {
         return (actionName, actionDefinitionFacade) -> new ComponentTaskHandler(
             componentHandler.getName(), componentHandler.getVersion(), actionName, actionDefinitionFacade);

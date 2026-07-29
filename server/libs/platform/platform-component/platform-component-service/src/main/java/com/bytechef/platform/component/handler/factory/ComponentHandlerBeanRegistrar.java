@@ -39,6 +39,21 @@ import org.springframework.beans.factory.BeanRegistry;
 import org.springframework.core.env.Environment;
 
 /**
+ * Registers the component-registry beans with a fully lazy loading contract. Component handlers are NEVER loaded at
+ * application startup:
+ *
+ * <ul>
+ * <li>{@link #COMPONENT_HANDLER_ENTRIES_SUPPLIER} is memoized — the {@code ServiceLoader} sweep over all component jars
+ * (which instantiates every handler and, via their static initializers, constructs every component definition) runs at
+ * most once, on the first {@code get()} call, and is shared by the registry and both handler providers.</li>
+ * <li>All three beans are {@code lazyInit}, so Spring does not create them during context refresh.</li>
+ * <li>{@link ComponentDefinitionRegistry}'s constructor is cheap by contract — it only captures the supplier; the
+ * definition load + validation + name/version indexing is deferred to the first registry method call.</li>
+ * </ul>
+ *
+ * The first request that actually needs a component (components list, workflow execution, task-handler resolution) pays
+ * the load exactly once; startup pays nothing.
+ *
  * @author Ivica Cardic
  */
 class ComponentHandlerBeanRegistrar implements BeanRegistrar {
