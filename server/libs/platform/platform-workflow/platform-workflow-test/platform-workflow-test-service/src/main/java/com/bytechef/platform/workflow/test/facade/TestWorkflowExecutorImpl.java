@@ -22,6 +22,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
+import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
@@ -34,6 +35,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.RandomUtils;
 import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.error.ExecutionError;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.component.constant.MetadataConstants;
@@ -426,26 +428,85 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
         List<AutoCloseable> handles = new ArrayList<>();
 
         handles.add(jobSyncExecutor.addJobStatusListener(
-            jobId, (event) -> sseStreamBridge.onEvent(Map.of("event", "job", "payload", event))));
+            jobId,
+            (event) -> sseStreamBridge.onEvent(
+                Map.of(
+                    "event", "job_status",
+                    "payload", Map.of("jobId", String.valueOf(jobId), "status", String.valueOf(event.getStatus()))))));
 
         handles.add(
             jobSyncExecutor.addTaskStartedListener(
-                jobId, (event) -> sseStreamBridge.onEvent(Map.of("event", "task", "payload", event))));
+                jobId, (event) -> sseStreamBridge.onEvent(
+                    Map.of("event", "task_started", "payload", getTaskStartedPayload(event.getTaskExecutionId())))));
 
         handles.add(
             jobSyncExecutor.addTaskExecutionCompleteListener(
-                jobId, (event) -> sseStreamBridge.onEvent(Map.of("event", "task", "payload", event))));
+                jobId, (event) -> {
+                    TaskExecution taskExecution = event.getTaskExecution();
+
+                    sseStreamBridge.onEvent(
+                        Map.of("event", "task_completed", "payload", getTaskLifecyclePayload(taskExecution)));
+                }));
 
         handles.add(
             jobSyncExecutor.addErrorListener(jobId, (event) -> {
                 if (log.isDebugEnabled()) {
                     log.debug("Received error event for job {}: {}", jobId, event);
                 }
+
+                if (event instanceof TaskExecutionErrorEvent taskExecutionErrorEvent) {
+                    sseStreamBridge.onEvent(
+                        Map.of(
+                            "event", "task_failed",
+                            "payload", getTaskLifecyclePayload(taskExecutionErrorEvent.getTaskExecution())));
+                }
             }));
 
         handles.add(jobSyncExecutor.addSseStreamBridge(jobId, sseStreamBridge));
 
         return handles;
+    }
+
+    private Map<String, Object> getTaskStartedPayload(long taskExecutionId) {
+        Map<String, Object> payload = new HashMap<>();
+
+        payload.put("taskExecutionId", String.valueOf(taskExecutionId));
+
+        try {
+            TaskExecution taskExecution = taskExecutionService.getTaskExecution(taskExecutionId);
+
+            payload.put("name", taskExecution.getName());
+        } catch (Exception exception) {
+            if (log.isTraceEnabled()) {
+                log.trace("Failed to resolve task execution {}: {}", taskExecutionId, exception.getMessage());
+            }
+        }
+
+        return payload;
+    }
+
+    private static Map<String, Object> getTaskLifecyclePayload(TaskExecution taskExecution) {
+        Map<String, Object> payload = new HashMap<>();
+
+        payload.put("taskExecutionId", String.valueOf(taskExecution.getId()));
+        payload.put("name", taskExecution.getName());
+        payload.put("status", String.valueOf(taskExecution.getStatus()));
+
+        if (taskExecution.getStartDate() != null) {
+            payload.put("startDate", String.valueOf(taskExecution.getStartDate()));
+        }
+
+        if (taskExecution.getEndDate() != null) {
+            payload.put("endDate", String.valueOf(taskExecution.getEndDate()));
+        }
+
+        ExecutionError executionError = taskExecution.getError();
+
+        if (executionError != null) {
+            payload.put("error", Objects.toString(executionError.getMessage(), "An error occurred"));
+        }
+
+        return payload;
     }
 
     private void unregisterListeners(List<AutoCloseable> handles) {
