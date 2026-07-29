@@ -20,6 +20,13 @@ export enum Source {
     WORKFLOW_CODE_EDITOR = 'WORKFLOW_CODE_EDITOR',
     JSON_SCHEMA_BUILDER = 'JSON_SCHEMA_BUILDER',
     SAMPLE_OUTPUT = 'SAMPLE_OUTPUT',
+    // Coarse surfaces dispatched by CopilotApiController: workflow editor / code workflow, each with an
+    // embedded (integration) counterpart. Values are lowercase to match the server-side dispatch keys and
+    // the `/api/platform/internal/ai/chat/{source}` URL segment.
+    CODE_WORKFLOW = 'code_workflow',
+    CODE_WORKFLOW_EMBEDDED = 'code_workflow_embedded',
+    WORKFLOW_EDITOR_EMBEDDED = 'workflow_editor_embedded',
+    WORKFLOW_EXECUTION_EMBEDDED = 'workflow_execution_embedded',
 }
 
 export type ContextType = {

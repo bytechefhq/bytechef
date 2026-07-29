@@ -119,7 +119,7 @@ describe('WorkflowEditorLayout - code-backed project branching', () => {
         useParamsMock.mockReturnValue({projectId: '123', projectWorkflowId: '456'});
     });
 
-    it('renders CodeWorkflowDetail when codeWorkflow is true and the language is polyglot', async () => {
+    it('renders ProjectCodeWorkflowDetail when codeWorkflow is true and the language is polyglot', async () => {
         mockUseWorkflowEditor(true, 'JAVASCRIPT');
 
         renderLayout();
