@@ -28,10 +28,7 @@ public enum AiHubAgentType implements AgentType {
     IMAGE_GENERATOR("image_generator", false),
     SLIDE_BUILDER("slide_builder", false),
     WORKFLOW_BUILDER("workflow_builder", false),
-    MCP_MANAGER("mcp_manager", false),
-    PERSONAL_AGENT_MANAGER("personal_agent_manager", false),
-    DEPLOYMENT_MANAGER("deployment_manager", false),
-    API_COLLECTION_MANAGER("api_collection_manager", false);
+    PERSONAL_AGENT_MANAGER("personal_agent_manager", false);
 
     private final String key;
     private final boolean fallback;

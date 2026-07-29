@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.ai.hub.config;
 
+import com.bytechef.automation.ai.tool.ManagerSubAgentToolCallback;
 import com.bytechef.ee.ai.hub.personalagent.AiHubPersonalAgentScheduleService;
 import com.bytechef.ee.ai.hub.personalagent.AiHubPersonalAgentService;
 import com.bytechef.ee.ai.hub.task.AiHubTaskService;
@@ -15,7 +16,6 @@ import com.bytechef.ee.ai.hub.tool.CloneAiHubPersonalAgentToolCallback;
 import com.bytechef.ee.ai.hub.tool.CreateAiHubPersonalAgentToolCallback;
 import com.bytechef.ee.ai.hub.tool.DeleteAiHubPersonalAgentToolCallback;
 import com.bytechef.ee.ai.hub.tool.ListAiHubPersonalAgentsToolCallback;
-import com.bytechef.ee.ai.hub.tool.ManagerSubAgentToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenAiHubPersonalAgentTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.SetAiHubPersonalAgentScheduleToolCallback;
 import com.bytechef.ee.ai.hub.tool.UpdateAiHubPersonalAgentToolCallback;

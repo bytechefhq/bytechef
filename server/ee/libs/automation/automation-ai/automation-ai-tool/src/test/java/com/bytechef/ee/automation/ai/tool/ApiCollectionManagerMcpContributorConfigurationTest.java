@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.ai.hub.config;
+package com.bytechef.ee.automation.ai.tool;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -21,23 +21,22 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.beans.factory.ObjectProvider;
 
 /**
- * The AI-hub manager contributor now contributes only {@code personal_agent_manager}; the automation-owned managers are
- * contributed from automation-ai-tool.
+ * Verifies the EE contributor exposes the api_collection_manager subagent (workspace-scoped) on the management MCP
+ * server, and skips an absent ChatClient bean.
  *
  * @version ee
  *
  * @author Ivica Cardic
  */
-class AiHubManagerMcpContributorConfigurationTest {
+class ApiCollectionManagerMcpContributorConfigurationTest {
 
-    private final AiHubManagerMcpContributorConfiguration configuration =
-        new AiHubManagerMcpContributorConfiguration();
+    private final ApiCollectionManagerMcpContributorConfiguration configuration =
+        new ApiCollectionManagerMcpContributorConfiguration();
 
     @Test
-    void testContributesPersonalAgentManagerWhenChatClientPresent() {
-        McpServerToolCallbackContributor contributor =
-            configuration.aiHubPersonalAgentManagerToolCallbackContributor(
-                toPresentProvider(), mock(WorkspaceService.class));
+    void testContributesApiCollectionManagerWhenChatClientPresent() {
+        McpServerToolCallbackContributor contributor = configuration.apiCollectionManagerToolCallbackContributor(
+            toPresentProvider(), mock(WorkspaceService.class));
 
         List<String> toolNames = contributor.getToolCallbacks()
             .stream()
@@ -45,14 +44,13 @@ class AiHubManagerMcpContributorConfigurationTest {
                 .name())
             .toList();
 
-        assertThat(toolNames).containsExactly("personal_agent_manager");
+        assertThat(toolNames).containsExactly("api_collection_manager");
     }
 
     @Test
     void testMissingChatClientIsSkipped() {
-        McpServerToolCallbackContributor contributor =
-            configuration.aiHubPersonalAgentManagerToolCallbackContributor(
-                toAbsentProvider(), mock(WorkspaceService.class));
+        McpServerToolCallbackContributor contributor = configuration.apiCollectionManagerToolCallbackContributor(
+            toAbsentProvider(), mock(WorkspaceService.class));
 
         assertThat(contributor.getToolCallbacks()).isEmpty();
     }
@@ -76,7 +74,6 @@ class AiHubManagerMcpContributorConfigurationTest {
     }
 
     private ObjectProvider<ChatClient> toAbsentProvider() {
-        // A plain mock's ifAvailable is a no-op, mirroring Spring's behaviour for an absent bean.
         @SuppressWarnings("unchecked")
         ObjectProvider<ChatClient> chatClientProvider = mock(ObjectProvider.class);
 

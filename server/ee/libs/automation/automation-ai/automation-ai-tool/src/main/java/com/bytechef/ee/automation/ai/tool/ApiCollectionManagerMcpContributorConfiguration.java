@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.ai.hub.config;
+package com.bytechef.ee.automation.ai.tool;
 
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
 import com.bytechef.automation.ai.tool.WorkspaceScopedManagerToolCallback;
@@ -21,15 +21,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Contributes the AI-hub-owned {@code personal_agent_manager} subagent to the management MCP server through the
- * {@link McpServerToolCallbackContributor} SPI. The other management managers (mcp_manager, deployment_manager,
- * api_collection_manager) are automation-owned and contributed from {@code automation-ai-tool}
- * ({@code ManagerMcpContributorConfiguration} CE, {@code ApiCollectionManagerMcpContributorConfiguration} EE); only the
- * personal-agent manager remains AI-hub-specific.
+ * Contributes the automation-owned {@code api_collection_manager} subagent to the management MCP server through the
+ * {@link McpServerToolCallbackContributor} SPI. It is EE because the API-platform facade it manages is EE; the CE
+ * managers (mcp_manager, deployment_manager) are contributed from {@code ManagerMcpContributorConfiguration}.
  *
  * <p>
  * The delegate is wrapped in {@link WorkspaceScopedManagerToolCallback}: the management MCP surface has no AI Hub chat
- * state, so workspace scoping is made explicit at the tool boundary. A missing ChatClient bean skips silently.
+ * state, so workspace scoping is made explicit at the tool boundary. A missing ChatClient bean skips silently. The
+ * {@code bytechef.ai.hub.enabled} gate is retained so the management-MCP exposure is unchanged from when this manager
+ * lived in ai-hub-service.
  * </p>
  *
  * @version ee
@@ -38,21 +38,21 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @ConditionalOnProperty(prefix = "bytechef.ai.hub", name = "enabled", havingValue = "true")
-public class AiHubManagerMcpContributorConfiguration {
+public class ApiCollectionManagerMcpContributorConfiguration {
 
     @Bean
-    McpServerToolCallbackContributor aiHubPersonalAgentManagerToolCallbackContributor(
-        @Qualifier("personalAgentManagerChatClient") //
-        ObjectProvider<ChatClient> personalAgentManagerChatClientProvider,
+    McpServerToolCallbackContributor apiCollectionManagerToolCallbackContributor(
+        @Qualifier("apiCollectionManagerChatClient") //
+        ObjectProvider<ChatClient> apiCollectionManagerChatClientProvider,
         WorkspaceService workspaceService) {
 
         return () -> {
             List<ToolCallback> toolCallbacks = new ArrayList<>();
 
-            personalAgentManagerChatClientProvider.ifAvailable(
+            apiCollectionManagerChatClientProvider.ifAvailable(
                 chatClient -> toolCallbacks.add(
                     new WorkspaceScopedManagerToolCallback(
-                        PersonalAgentManagerConfiguration.createPersonalAgentManagerToolCallback(chatClient),
+                        ApiCollectionManagerConfiguration.createApiCollectionManagerToolCallback(chatClient),
                         workspaceService)));
 
             return toolCallbacks;
