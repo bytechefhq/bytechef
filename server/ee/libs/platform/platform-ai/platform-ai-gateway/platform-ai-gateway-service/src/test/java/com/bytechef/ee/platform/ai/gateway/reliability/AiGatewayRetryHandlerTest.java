@@ -14,6 +14,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayModelDeployment;
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+import reactor.core.publisher.Flux;
 
 /**
  * @author Ivica Cardic
@@ -195,6 +197,61 @@ class AiGatewayRetryHandlerTest {
                 List.of(firstDeployment, secondDeployment), deploymentArg -> "should not reach"));
 
         assertEquals("All deployments are cooled down", exception.getMessage());
+    }
+
+    @Test
+    void testExecuteStreamWithRetryFailsOverBeforeFirstToken() {
+        AiGatewayModelDeployment firstDeployment = createDeployment(1L);
+        AiGatewayModelDeployment secondDeployment = createDeployment(2L);
+
+        List<String> emitted = retryHandler.<String>executeStreamWithRetry(
+            List.of(firstDeployment, secondDeployment),
+            deployment -> deployment.getId()
+                .equals(1L)
+                    ? Flux.error(new RuntimeException("cold start"))
+                    : Flux.just("a", "b"))
+            .collectList()
+            .block();
+
+        assertEquals(List.of("a", "b"), emitted);
+    }
+
+    @Test
+    void testExecuteStreamWithRetryDoesNotFailOverAfterFirstToken() {
+        AiGatewayModelDeployment firstDeployment = createDeployment(1L);
+        AiGatewayModelDeployment secondDeployment = createDeployment(2L);
+
+        List<String> emitted = new ArrayList<>();
+
+        assertThrows(
+            RuntimeException.class,
+            () -> retryHandler.<String>executeStreamWithRetry(
+                List.of(firstDeployment, secondDeployment),
+                deployment -> deployment.getId()
+                    .equals(1L)
+                        ? Flux.just("a")
+                            .concatWith(Flux.error(new RuntimeException("mid-stream failure")))
+                        : Flux.just("b"))
+                .doOnNext(emitted::add)
+                .blockLast());
+
+        // The first token streamed, so the mid-stream error must propagate: no retry, no failover to "b", and no
+        // replay of "a".
+        assertEquals(List.of("a"), emitted);
+    }
+
+    @Test
+    void testExecuteStreamWithRetryPropagatesWhenAllDeploymentsFailBeforeToken() {
+        AiGatewayModelDeployment firstDeployment = createDeployment(1L);
+        AiGatewayModelDeployment secondDeployment = createDeployment(2L);
+
+        assertThrows(
+            IllegalStateException.class,
+            () -> retryHandler.<String>executeStreamWithRetry(
+                List.of(firstDeployment, secondDeployment),
+                deployment -> Flux.error(new RuntimeException("down")))
+                .collectList()
+                .block());
     }
 
     private AiGatewayModelDeployment createDeployment(Long id) {

@@ -7,24 +7,34 @@ extend type Mutation {
 }
 
 type AiGatewayWorkspaceSettings {
+    blockedTerms: String
     cacheEnabled: Boolean
     cacheTtlSeconds: Int
     defaultRoutingPolicyId: ID
+    injectionDetectionEnabled: Boolean
     logRetentionDays: Int
+    moderationEnabled: Boolean
     redactPii: Boolean
+    redactSecrets: Boolean
     retryCount: Int
+    scanResponses: Boolean
     softBudgetWarningPct: Int
     timeoutMs: Int
     workspaceId: ID!
 }
 
 input AiGatewayWorkspaceSettingsInput {
+    blockedTerms: String
     cacheEnabled: Boolean
     cacheTtlSeconds: Int
     defaultRoutingPolicyId: ID
+    injectionDetectionEnabled: Boolean
     logRetentionDays: Int
+    moderationEnabled: Boolean
     redactPii: Boolean
+    redactSecrets: Boolean
     retryCount: Int
+    scanResponses: Boolean
     softBudgetWarningPct: Int
     timeoutMs: Int
     workspaceId: ID!

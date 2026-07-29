@@ -50,6 +50,10 @@ dependencies {
     testImplementation(project(":server:ee:libs:platform:platform-ai:platform-ai-observability:platform-ai-observability-service"))
     testImplementation(project(":server:libs:config:liquibase-config"))
     testImplementation(project(":server:libs:platform:platform-tag:platform-tag-service"))
+    // Alert-rule delivery targets are platform Notification rows, so the `notification` table's changelog has to be
+    // on the integration-test classpath (master.xml includes it with errorIfMissingOrEmpty, i.e. it is silently
+    // skipped otherwise).
+    testImplementation(project(":server:libs:platform:platform-notification:platform-notification-service"))
     testImplementation(project(":server:libs:config:jackson-config"))
     testImplementation(project(":server:libs:core:encryption:encryption-impl"))
     testImplementation(project(":server:libs:core:file-storage:file-storage-base64-service"))

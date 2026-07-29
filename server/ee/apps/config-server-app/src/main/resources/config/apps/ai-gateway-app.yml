@@ -1,6 +1,6 @@
 bytechef:
   ai:
-    ai-gateway:
+    gateway:
       enabled: true
   edition: ee
 

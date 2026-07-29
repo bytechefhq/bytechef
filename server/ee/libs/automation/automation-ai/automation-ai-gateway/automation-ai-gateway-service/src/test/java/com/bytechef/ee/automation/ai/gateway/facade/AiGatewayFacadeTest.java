@@ -73,6 +73,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -201,10 +202,18 @@ class AiGatewayFacadeTest {
             .when(permissionService.isTenantAdmin())
             .thenReturn(true);
 
-        aiGatewayFacade = new AiGatewayFacadeImpl(
+        aiGatewayFacade = buildFacade(guardrails(false));
+    }
+
+    private AiGatewayFacadeImpl buildFacade(
+        com.bytechef.ee.automation.ai.gateway.guardrail.AiGatewayGuardrails guardrails) {
+
+        return new AiGatewayFacadeImpl(
             aiEvalExecutor, aiGatewayBudgetChecker, aiGatewayRateLimitChecker,
             aiGatewayChatModelFactory, aiGatewayContextCompressor,
-            aiGatewayCostCalculator, aiGatewayEmbeddingModelFactory, aiGatewayModelDeploymentService,
+            aiGatewayCostCalculator,
+            guardrails,
+            aiGatewayEmbeddingModelFactory, aiGatewayModelDeploymentService,
             aiGatewayModelService, workspaceAiGatewayProjectService, aiGatewayProviderService,
             aiGatewayRequestLogService, aiGatewayResponseCache, aiGatewayRetryHandler,
             aiGatewayRouter, aiGatewayRoutingPolicyService, promptComplexityScorer,
@@ -218,6 +227,14 @@ class AiGatewayFacadeTest {
             new org.springframework.context.support.GenericApplicationContext(),
             permissionService,
             transactionManager);
+    }
+
+    private static com.bytechef.ee.automation.ai.gateway.guardrail.AiGatewayGuardrails guardrails(
+        boolean responseScanEnabled) {
+
+        return new com.bytechef.ee.automation.ai.gateway.guardrail.AiGatewayGuardrails(
+            mock(com.bytechef.ee.automation.ai.gateway.service.AiGatewayWorkspaceSettingsService.class), null, null,
+            null, null, false, false, "", false, false, responseScanEnabled, false);
     }
 
     @AfterEach
@@ -370,6 +387,42 @@ class AiGatewayFacadeTest {
             .content());
 
         verify(aiGatewayRequestLogService).create(any(), any());
+    }
+
+    @Test
+    void testChatCompletionRedactsResponseWhenResponseScanningEnabled() {
+        AiGatewayFacade facade = buildFacade(guardrails(true));
+
+        AiGatewayChatCompletionRequest request = createDefaultRequest();
+
+        when(aiGatewayBudgetChecker.checkBudget(1L)).thenReturn(BudgetCheckResult.allowed());
+        when(aiGatewayResponseCache.shouldCache(any())).thenReturn(false);
+
+        AiGatewayProvider provider = createProvider();
+        AiGatewayModel model = createModel(provider);
+
+        when(aiGatewayProviderService.getEnabledProviders()).thenReturn(List.of(provider));
+        when(aiGatewayModelService.getModel(provider.getId(), "gpt-4")).thenReturn(model);
+        when(aiGatewayContextCompressor.compress(any(), any(Integer.class))).thenReturn(request.messages());
+
+        ChatModel chatModel = mock(ChatModel.class);
+
+        // mockChatResponse() itself stubs mocks, so it must be built before when(...) opens a stubbing, otherwise
+        // Mockito reports an UnfinishedStubbingException for the nested stubbing.
+        ChatResponse chatResponse = mockChatResponse("Contact bob@acme.io");
+
+        when(aiGatewayChatModelFactory.getChatModel(any())).thenReturn(chatModel);
+        when(chatModel.call(any(Prompt.class))).thenReturn(chatResponse);
+        when(aiGatewayCostCalculator.calculateCost(any(), any(Integer.class), any(Integer.class)))
+            .thenReturn(BigDecimal.ZERO);
+
+        AiGatewayChatCompletionResponse response = facade.chatCompletion(request,
+            new AiObservabilityTracingHeaders(null, null, null, null, null, Map.of(), List.of()));
+
+        assertEquals("Contact [REDACTED_EMAIL]", response.choices()
+            .get(0)
+            .message()
+            .content());
     }
 
     @Test
@@ -589,6 +642,66 @@ class AiGatewayFacadeTest {
             .verify();
 
         verify(aiGatewayRequestLogService).create(any(), any());
+    }
+
+    @Test
+    void testChatCompletionStreamWithRoutingPolicyStreamsFromRoutedDeployment() {
+        Map<String, String> tags = Map.of("workspace_id", "1");
+
+        AiGatewayChatCompletionRequest request = new AiGatewayChatCompletionRequest(
+            "openai/gpt-4", List.of(new AiGatewayChatMessage("user", "Hello")),
+            null, null, null, true, "my-routing-policy", null, null, null, tags);
+
+        when(aiGatewayBudgetChecker.checkBudget(1L)).thenReturn(BudgetCheckResult.allowed());
+
+        AiGatewayRoutingPolicy routingPolicy = new AiGatewayRoutingPolicy(
+            "my-routing-policy", AiGatewayRoutingStrategyType.SIMPLE);
+
+        ReflectionTestUtils.setField(routingPolicy, "id", 10L);
+
+        when(aiGatewayRoutingPolicyService.getRoutingPolicyByName("my-routing-policy"))
+            .thenReturn(routingPolicy);
+
+        AiGatewayProvider provider = createProvider();
+        AiGatewayModel model = createModel(provider);
+        AiGatewayModelDeployment deployment = new AiGatewayModelDeployment(10L, 1L);
+
+        ReflectionTestUtils.setField(deployment, "id", 100L);
+
+        when(aiGatewayModelDeploymentService.getDeploymentsByRoutingPolicyId(10L))
+            .thenReturn(List.of(deployment));
+        when(aiGatewayModelService.getModel(1L)).thenReturn(model);
+        when(aiGatewayProviderService.getProvider(provider.getId())).thenReturn(provider);
+        when(aiGatewayRequestLogService.getAverageLatencyByModel(any(Instant.class)))
+            .thenReturn(Map.of());
+        when(aiGatewayRouter.route(any(), any(), any())).thenReturn(deployment);
+        when(aiGatewayContextCompressor.compress(any(), any(Integer.class))).thenReturn(request.messages());
+
+        ChatModel chatModel = mock(ChatModel.class);
+        ChatResponse streamChunk = mockStreamChunk("Hello ");
+        ChatResponse streamChunkFinal = mockStreamChunk("World");
+
+        when(aiGatewayChatModelFactory.getChatModel(any())).thenReturn(chatModel);
+        when(chatModel.stream(any(Prompt.class))).thenReturn(Flux.just(streamChunk, streamChunkFinal));
+        when(aiGatewayCostCalculator.calculateCost(any(), any(Integer.class), any(Integer.class)))
+            .thenReturn(new BigDecimal("0.01"));
+
+        // Invoke the real per-deployment stream builder the facade hands to executeStreamWithRetry, on the primary
+        // deployment — verifying the streaming path wires routing through the failover primitive.
+        when(aiGatewayRetryHandler.<ChatResponse>executeStreamWithRetry(any(), any()))
+            .thenAnswer(invocation -> {
+                List<AiGatewayModelDeployment> deployments = invocation.getArgument(0);
+                Function<AiGatewayModelDeployment, Flux<ChatResponse>> action = invocation.getArgument(1);
+
+                return action.apply(deployments.get(0));
+            });
+
+        StepVerifier.create(aiGatewayFacade.chatCompletionStream(request, null))
+            .expectNextCount(2)
+            .verifyComplete();
+
+        verify(aiGatewayRetryHandler).executeStreamWithRetry(any(), any());
+        verify(aiGatewayRouter).route(any(), any(), any());
     }
 
     // --- Issue 18: Embedding tests ---
@@ -1083,9 +1196,13 @@ class AiGatewayFacadeTest {
     }
 
     private ChatResponse mockChatResponse() {
+        return mockChatResponse("Hello");
+    }
+
+    private ChatResponse mockChatResponse(String text) {
         ChatResponse chatResponse = mock(ChatResponse.class);
         Generation generation = mock(Generation.class);
-        AssistantMessage assistantMessage = new AssistantMessage("Hello");
+        AssistantMessage assistantMessage = new AssistantMessage(text);
 
         when(generation.getOutput()).thenReturn(assistantMessage);
         when(generation.getMetadata()).thenReturn(

@@ -11,6 +11,7 @@ import com.bytechef.ee.automation.ai.gateway.public_.workspace.AiGatewayWorkspac
 import com.bytechef.ee.platform.ai.gateway.metrics.AiGatewayMetrics;
 import com.bytechef.ee.platform.ai.gateway.provider.AiGatewayChatModelFactory;
 import com.bytechef.ee.platform.ai.gateway.provider.AiGatewayEmbeddingModelFactory;
+import com.bytechef.ee.platform.ai.observability.service.AiObservabilityNotificationDispatcher;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.configuration.service.PropertyService;
 import com.bytechef.platform.scheduler.AlertScheduler;
@@ -25,8 +26,10 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * Shared mock beans for AI Gateway public-rest integration tests — mirrors the service module's
- * {@code AiGatewayIntTestConfigurationSharedMocks} (minus the package-private
- * {@code AiObservabilityNotificationDispatcher} which we leave as a real bean and never exercise here).
+ * {@code AiGatewayIntTestConfigurationSharedMocks}. {@code AiObservabilityNotificationDispatcher} is mocked rather than
+ * left real: since alert delivery moved onto the central Notification registry it reaches for a
+ * {@code NotificationService} and the shared delivery clients, none of which this OTLP-narrowed slice scans. It is
+ * still needed as a bean because the scanned {@code AiObservabilityAlertEvaluator} takes it as a collaborator.
  *
  * @author Ivica Cardic
  * @version ee
@@ -35,8 +38,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @Retention(RetentionPolicy.RUNTIME)
 @MockitoBean(types = {
     AiGatewayChatModelFactory.class, AiGatewayEmbeddingModelFactory.class, AiGatewayMetrics.class,
-    AiGatewayWorkspaceHeaderResolver.class, AlertScheduler.class, ExportScheduler.class, FileStorageService.class,
-    MeterRegistry.class, PropertyService.class, TagService.class
+    AiGatewayWorkspaceHeaderResolver.class, AiObservabilityNotificationDispatcher.class, AlertScheduler.class,
+    ExportScheduler.class, FileStorageService.class, MeterRegistry.class, PropertyService.class, TagService.class
 })
 public @interface AiGatewayPublicRestIntTestSharedMocks {
 }

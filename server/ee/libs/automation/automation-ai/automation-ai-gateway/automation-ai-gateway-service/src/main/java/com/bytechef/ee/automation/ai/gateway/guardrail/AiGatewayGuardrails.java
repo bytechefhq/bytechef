@@ -17,6 +17,7 @@ import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayChatMessage;
 import com.bytechef.ee.platform.ai.gateway.exception.AiGatewayGuardrailException;
 import com.bytechef.ee.platform.ai.gateway.guardrail.AiGatewayInjectionClassifier;
 import com.bytechef.ee.platform.ai.gateway.guardrail.AiGatewayModerationClassifier;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -30,6 +31,7 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 /**
@@ -66,6 +68,8 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
+@ConditionalOnEEVersion
+@ConditionalOnProperty(prefix = "bytechef.ai.gateway", name = "enabled", havingValue = "true")
 public class AiGatewayGuardrails {
 
     private static final Logger log = LoggerFactory.getLogger(AiGatewayGuardrails.class);

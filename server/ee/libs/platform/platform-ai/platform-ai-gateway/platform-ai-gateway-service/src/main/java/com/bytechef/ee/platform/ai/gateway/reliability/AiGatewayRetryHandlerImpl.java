@@ -13,6 +13,7 @@ import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -217,15 +218,21 @@ public class AiGatewayRetryHandlerImpl implements AiGatewayRetryHandler {
 
         AiGatewayModelDeployment deployment = deployments.get(deploymentIndex);
 
+        // Streaming failover is PRE-FIRST-TOKEN ONLY. Once an element has been emitted, the bytes have been flushed to
+        // the SSE client and cannot be retracted, so neither same-deployment retry nor cross-deployment failover may
+        // re-subscribe (that would replay already-sent tokens). This flag gates both.
+        AtomicBoolean emitted = new AtomicBoolean(false);
+
         return Mono.defer(() -> Mono.just(deployment))
             .flatMapMany(action::apply)
+            .doOnNext(element -> emitted.set(true))
             .retryWhen(
                 Retry.backoff(DEFAULT_MAX_RETRIES, java.time.Duration.ofMillis(BASE_BACKOFF_MS))
                     .maxBackoff(java.time.Duration.ofMillis(MAX_BACKOFF_MS))
                     // Pure predicate: reactor is free to call a filter multiple times, so side effects like
                     // cooldownTracker.recordFailure MUST live in doBeforeRetry below — where Reactor guarantees
-                    // exactly one invocation per retry.
-                    .filter(throwable -> !(throwable instanceof RuntimeException runtimeException
+                    // exactly one invocation per retry. Do not retry once streaming has begun.
+                    .filter(throwable -> !emitted.get() && !(throwable instanceof RuntimeException runtimeException
                         && isNonRetryable(runtimeException)))
                     .doBeforeRetry(retrySignal -> {
                         cooldownTracker.recordFailure(deployment.getId());
@@ -242,7 +249,11 @@ public class AiGatewayRetryHandlerImpl implements AiGatewayRetryHandler {
                     }))
             .doOnComplete(() -> cooldownTracker.recordSuccess(deployment.getId()))
             .onErrorResume(exception -> {
-                if (exception instanceof RuntimeException runtimeException && isNonRetryable(runtimeException)) {
+                // Once streaming has begun, or the error is non-retryable, propagate terminally instead of failing
+                // over to another deployment.
+                if (emitted.get() ||
+                    (exception instanceof RuntimeException runtimeException && isNonRetryable(runtimeException))) {
+
                     return Flux.error(exception);
                 }
 

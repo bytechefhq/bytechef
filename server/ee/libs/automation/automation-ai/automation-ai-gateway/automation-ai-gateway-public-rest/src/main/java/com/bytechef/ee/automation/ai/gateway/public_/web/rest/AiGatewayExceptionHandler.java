@@ -9,6 +9,7 @@ package com.bytechef.ee.automation.ai.gateway.public_.web.rest;
 
 import com.bytechef.ee.platform.ai.gateway.domain.BudgetExceededException;
 import com.bytechef.ee.platform.ai.gateway.domain.RateLimitExceededException;
+import com.bytechef.ee.platform.ai.gateway.exception.AiGatewayGuardrailException;
 import com.bytechef.ee.platform.ai.gateway.exception.AiScoreTargetNotFoundException;
 import com.bytechef.ee.platform.ai.gateway.exception.AiScoreWorkspaceBoundaryException;
 import com.bytechef.ee.platform.ai.gateway.exception.BadRequestException;
@@ -113,6 +114,20 @@ public class AiGatewayExceptionHandler {
         }
 
         return responseBuilder.body(Map.of("error", errorFields));
+    }
+
+    /**
+     * Mapped to HTTP 422 (Unprocessable Entity): the request is well-formed but was refused by a configured content
+     * guardrail (a blocked term). Distinct from a 400 malformed-request and from upstream errors — the client should
+     * revise the prompt, not retry. The exception message is guardrail-authored and names neither the offending content
+     * nor the matched term, so it is safe to echo.
+     */
+    @ExceptionHandler(AiGatewayGuardrailException.class)
+    ResponseEntity<Map<String, Object>> handleGuardrailViolation(AiGatewayGuardrailException exception) {
+        log.info("AI Gateway request rejected by content guardrail");
+
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+            .body(toErrorBody("guardrail_violation", exception.getMessage()));
     }
 
     @ExceptionHandler(BudgetExceededException.class)

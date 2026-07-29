@@ -46,6 +46,10 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
         "com.bytechef.ee.automation.ai.gateway.cost",
         "com.bytechef.ee.automation.ai.gateway.evaluation",
         "com.bytechef.ee.automation.ai.gateway.facade",
+        // AiGatewayFacadeImpl applies the inline content guardrails on both the sync and the streaming path, so
+        // AiGatewayGuardrails is a mandatory collaborator. Mirror production wiring by scanning the package rather
+        // than registering a stub, so the guardrail chain the facade runs in production is the one under test.
+        "com.bytechef.ee.automation.ai.gateway.guardrail",
         // Pulls in AiObservabilityExportExecutor's collaborators that live in the moved/extracted EE platform
         // modules: AiLlmUsageServiceImpl (llm-usage), AiPromptServiceImpl + AiPromptVersionServiceImpl (prompt),
         // and the workspace-agnostic platform-ai-gateway services + cross-cutting helpers (cache, compression,
