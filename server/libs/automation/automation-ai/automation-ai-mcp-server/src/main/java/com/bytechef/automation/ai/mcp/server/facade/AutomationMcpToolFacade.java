@@ -51,6 +51,7 @@ import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
+import com.bytechef.platform.plan.provider.PlanLimitsProvider;
 import com.bytechef.platform.tool.execution.ToolExecutionEvent;
 import com.bytechef.platform.tool.execution.ToolExecutionKind;
 import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
@@ -58,7 +59,9 @@ import com.bytechef.platform.tool.execution.ToolExecutionSurface;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
 import com.bytechef.platform.workflow.execution.JobExecutionErrors;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
+import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -71,6 +74,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.function.FunctionToolCallback;
+import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * @author Matija Petanjek
@@ -85,6 +89,7 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
     private final McpComponentService mcpComponentService;
     private final McpProjectWorkflowService mcpProjectWorkflowService;
     private final McpServerService mcpServerService;
+    private final ObjectProvider<PlanLimitsProvider> planLimitsProviderObjectProvider;
     private final PrincipalJobFacade principalJobFacade;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private final TaskExecutionService taskExecutionService;
@@ -99,6 +104,7 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
         ClusterElementDefinitionService clusterElementDefinitionService, Evaluator evaluator,
         JobCompletionAwaiter jobCompletionAwaiter, McpComponentService mcpComponentService,
         McpProjectWorkflowService mcpProjectWorkflowService, McpServerService mcpServerService,
+        ObjectProvider<PlanLimitsProvider> planLimitsProviderObjectProvider,
         PrincipalJobFacade principalJobFacade, ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
         TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage,
         ToolExecutionRecorder toolExecutionRecorder, WorkflowService workflowService,
@@ -112,6 +118,7 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
         this.mcpComponentService = mcpComponentService;
         this.mcpProjectWorkflowService = mcpProjectWorkflowService;
         this.mcpServerService = mcpServerService;
+        this.planLimitsProviderObjectProvider = planLimitsProviderObjectProvider;
         this.principalJobFacade = principalJobFacade;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
         this.taskExecutionService = taskExecutionService;
@@ -270,7 +277,7 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
                     .workspaceId(workspaceId)
                     .jobId(jobId),
                 () -> {
-                    Job job = jobCompletionAwaiter.await(jobId, JobCompletionAwaiter.DEFAULT_SYNC_TIMEOUT)
+                    Job job = jobCompletionAwaiter.await(jobId, resolveSyncTimeout())
                         .join();
 
                     JobExecutionErrors.checkForError(job, taskExecutionService);
@@ -283,6 +290,29 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
                         .orElseGet(() -> taskFileStorage.readJobOutputs(job.getOutputs()));
                 });
         };
+    }
+
+    /**
+     * The effective wait limit for a synchronous MCP tool run: the default sync timeout, capped by the tenant plan's
+     * {@code syncRunTimeout} when one is set. The plan can only tighten the limit, never extend it.
+     */
+    private Duration resolveSyncTimeout() {
+        PlanLimitsProvider planLimitsProvider = planLimitsProviderObjectProvider.getIfAvailable();
+
+        if (planLimitsProvider == null) {
+            return JobCompletionAwaiter.DEFAULT_SYNC_TIMEOUT;
+        }
+
+        Duration planSyncRunTimeout = planLimitsProvider.getPlanLimits(TenantContext.getCurrentTenantId())
+            .syncRunTimeout();
+
+        if (planSyncRunTimeout == null ||
+            planSyncRunTimeout.compareTo(JobCompletionAwaiter.DEFAULT_SYNC_TIMEOUT) >= 0) {
+
+            return JobCompletionAwaiter.DEFAULT_SYNC_TIMEOUT;
+        }
+
+        return planSyncRunTimeout;
     }
 
     private Optional<Object> getCallableResponseOutput(Job job) {

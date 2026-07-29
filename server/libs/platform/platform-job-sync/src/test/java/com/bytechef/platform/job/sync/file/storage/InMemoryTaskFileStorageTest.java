@@ -143,6 +143,18 @@ class InMemoryTaskFileStorageTest {
         }
 
         @Override
+        public void deleteContextValue(FileEntry fileEntry) {
+        }
+
+        @Override
+        public void deleteJobOutputs(FileEntry fileEntry) {
+        }
+
+        @Override
+        public void deleteTaskExecutionOutput(FileEntry fileEntry) {
+        }
+
+        @Override
         @SuppressWarnings("unchecked")
         public Map<String, ?> readContextValue(FileEntry fileEntry) {
             readContextCalls.incrementAndGet();

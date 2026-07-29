@@ -23,6 +23,8 @@ dependencies {
     implementation(project(":server:libs:platform:platform-security:platform-security-api"))
     implementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
+    implementation(project(":server:libs:core:tenant:tenant-api"))
+    implementation(project(":server:libs:platform:platform-plan:platform-plan-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
 
     runtimeOnly(project(":server:libs:automation:automation-ai:automation-ai-a2a:automation-ai-a2a-service"))

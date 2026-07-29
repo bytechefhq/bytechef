@@ -2,6 +2,7 @@ dependencies {
     api("org.springframework.data:spring-data-commons")
     api(project(":server:libs:atlas:atlas-execution:atlas-execution-api"))
     api(project(":server:libs:core:evaluator:evaluator-api"))
+    api(project(":server:libs:core:exception:exception-api"))
     api(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     api(project(":server:libs:platform:platform-api"))
 

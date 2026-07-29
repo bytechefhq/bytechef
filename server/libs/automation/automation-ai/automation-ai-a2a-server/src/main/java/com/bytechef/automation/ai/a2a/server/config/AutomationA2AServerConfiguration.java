@@ -26,8 +26,10 @@ import com.bytechef.automation.ai.a2a.service.A2aServerService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.platform.ai.a2a.A2AAgentCardFactory;
 import com.bytechef.platform.ai.a2a.A2AProtocolHandler;
+import com.bytechef.platform.plan.provider.PlanLimitsProvider;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -49,13 +51,15 @@ public class AutomationA2AServerConfiguration {
     AutomationA2AServerFacade automationA2AServerFacade(
         A2aProjectService a2aProjectService, A2aProjectWorkflowService a2aProjectWorkflowService,
         A2aServerService a2aServerService, JobCompletionAwaiter jobCompletionAwaiter,
-        PrincipalJobFacade principalJobFacade, ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
+        ObjectProvider<PlanLimitsProvider> planLimitsProviderObjectProvider, PrincipalJobFacade principalJobFacade,
+        ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
         TaskExecutionService taskExecutionService, TaskFileStorage durableTaskFileStorage,
         WorkflowService workflowService) {
 
         return new AutomationA2AServerFacade(
-            a2aProjectService, a2aProjectWorkflowService, a2aServerService, jobCompletionAwaiter, principalJobFacade,
-            projectDeploymentWorkflowService, taskExecutionService, durableTaskFileStorage, workflowService);
+            a2aProjectService, a2aProjectWorkflowService, a2aServerService, jobCompletionAwaiter,
+            planLimitsProviderObjectProvider, principalJobFacade, projectDeploymentWorkflowService,
+            taskExecutionService, durableTaskFileStorage, workflowService);
     }
 
     @Bean

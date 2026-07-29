@@ -42,6 +42,7 @@ import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
 import com.bytechef.platform.job.sync.executor.WebSocketEmitterRegistry;
 import com.bytechef.platform.job.sync.file.storage.InMemoryTaskFileStorage;
+import com.bytechef.platform.plan.provider.PlanLimitsProvider;
 import com.bytechef.platform.webhook.executor.SseStreamBridgeRegistry;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutorImpl;
@@ -71,6 +72,7 @@ import com.bytechef.task.dispatcher.subflow.SubflowTaskDispatcher;
 import com.bytechef.task.dispatcher.subflow.event.listener.SubflowJobStatusEventListener;
 import com.bytechef.tenant.TenantContext;
 import java.util.List;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
@@ -96,6 +98,7 @@ public class WebhookConfiguration {
         Evaluator evaluator, ApplicationEventPublisher eventPublisher, JobCompletionAwaiter jobCompletionAwaiter,
         JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, PrincipalJobFacade principalJobFacade,
         JobService jobService, List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
+        ObjectProvider<PlanLimitsProvider> planLimitsProviderObjectProvider,
         SseStreamBridgeRegistry sseStreamBridgeRegistry, SubflowResolver subflowResolver,
         TaskExecutionService taskExecutionService, @Qualifier("taskExecutor") TaskExecutor taskExecutor,
         TaskHandlerRegistry taskHandlerRegistry, TriggerDefinitionService triggerDefinitionService,
@@ -121,9 +124,10 @@ public class WebhookConfiguration {
             webSocketEmitterRegistry, workflowService);
 
         return new WebhookWorkflowExecutorImpl(
-            eventPublisher, jobCompletionAwaiter, jobPrincipalAccessorRegistry, jobSyncExecutor, principalJobFacade,
-            sseStreamBridgeRegistry, taskExecutionService, durableTaskFileStorage, syncJobTaskFileStorage,
-            triggerDefinitionService, triggerSyncExecutor, workflowService, JobCompletionAwaiter.DEFAULT_SYNC_TIMEOUT);
+            eventPublisher, jobCompletionAwaiter, jobPrincipalAccessorRegistry, jobSyncExecutor,
+            planLimitsProviderObjectProvider, principalJobFacade, sseStreamBridgeRegistry, taskExecutionService,
+            durableTaskFileStorage, syncJobTaskFileStorage, triggerDefinitionService, triggerSyncExecutor,
+            workflowService, JobCompletionAwaiter.DEFAULT_SYNC_TIMEOUT);
     }
 
     private static ApplicationEventPublisher createEventPublisher(MessageBroker messageBroker) {

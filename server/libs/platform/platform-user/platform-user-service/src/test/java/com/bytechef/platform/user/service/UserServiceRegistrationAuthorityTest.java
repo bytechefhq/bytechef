@@ -20,9 +20,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.platform.plan.provider.PlanLimitsProvider;
+import com.bytechef.platform.ratelimit.PlanLimitRejectionCounter;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.user.audit.UserAuditPublisher;
 import com.bytechef.platform.user.domain.Authority;
@@ -42,6 +45,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -87,8 +91,17 @@ class UserServiceRegistrationAuthorityTest {
     void setUp() {
         CacheManager cacheManager = new ConcurrentMapCacheManager();
 
+        @SuppressWarnings("unchecked")
+        ObjectProvider<PlanLimitRejectionCounter> planLimitRejectionCounterObjectProvider =
+            (ObjectProvider<PlanLimitRejectionCounter>) mock(ObjectProvider.class);
+
+        @SuppressWarnings("unchecked")
+        ObjectProvider<PlanLimitsProvider> planLimitsProviderObjectProvider =
+            (ObjectProvider<PlanLimitsProvider>) mock(ObjectProvider.class);
+
         userService = new UserServiceImpl(
-            authorityRepository, cacheManager, passwordEncoder, persistentTokenRepository, tenantService,
+            authorityRepository, cacheManager, passwordEncoder, persistentTokenRepository,
+            planLimitRejectionCounterObjectProvider, planLimitsProviderObjectProvider, tenantService,
             userAuditPublisher, userRepository, 5, Duration.ofMinutes(15));
 
         lenient()

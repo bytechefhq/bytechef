@@ -41,6 +41,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-security:platform-security-api"))
     implementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
+    implementation(project(":server:libs:platform:platform-plan:platform-plan-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-api"))

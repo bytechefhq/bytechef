@@ -56,4 +56,9 @@ public interface AssetFileRepository extends ListCrudRepository<AssetFile, Long>
         """)
     long sumSizeBytesByWorkspaceIdAndEnvironment(
         @Param("workspaceId") Long workspaceId, @Param("environment") int environment);
+
+    @Query("""
+        SELECT COALESCE(SUM(size_bytes), 0) FROM asset_file
+        """)
+    long sumSizeBytes();
 }

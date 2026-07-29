@@ -10,6 +10,8 @@ dependencies {
     implementation(project(":server:libs:core:exception:exception-api"))
     implementation(project(":server:libs:core:tenant:tenant-api"))
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
+    implementation(project(":server:libs:platform:platform-plan:platform-plan-api"))
+    implementation(project(":server:libs:platform:platform-rate-limit"))
     implementation(project(":server:libs:platform:platform-scheduler:platform-scheduler-api"))
     implementation(project(":server:libs:licence:licence-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-token-service"))

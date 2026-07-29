@@ -22,6 +22,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -40,6 +41,9 @@ import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
+import com.bytechef.platform.plan.domain.PlanLimits;
+import com.bytechef.platform.plan.domain.PlanTier;
+import com.bytechef.platform.plan.provider.PlanLimitsProvider;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
@@ -56,6 +60,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.ApplicationEventPublisher;
 
 /**
@@ -113,15 +118,20 @@ public class WebhookWorkflowExecutorTest {
     @Mock
     private WorkflowService workflowService;
 
+    private ObjectProvider<PlanLimitsProvider> planLimitsProviderObjectProvider;
     private WebhookWorkflowExecutorImpl webhookWorkflowExecutor;
     private WorkflowExecutionId workflowExecutionId;
 
     @BeforeEach
+    @SuppressWarnings("unchecked")
     public void setUp() {
+        planLimitsProviderObjectProvider = (ObjectProvider<PlanLimitsProvider>) mock(ObjectProvider.class);
+
         webhookWorkflowExecutor = new WebhookWorkflowExecutorImpl(
-            eventPublisher, jobCompletionAwaiter, jobPrincipalAccessorRegistry, jobSyncExecutor, principalJobFacade,
-            sseStreamBridgeRegistry, taskExecutionService, taskFileStorage, syncJobTaskFileStorage,
-            triggerDefinitionService, webhookWorkflowSyncExecutor, workflowService, Duration.ofSeconds(5));
+            eventPublisher, jobCompletionAwaiter, jobPrincipalAccessorRegistry, jobSyncExecutor,
+            planLimitsProviderObjectProvider, principalJobFacade, sseStreamBridgeRegistry, taskExecutionService,
+            taskFileStorage, syncJobTaskFileStorage, triggerDefinitionService, webhookWorkflowSyncExecutor,
+            workflowService, Duration.ofSeconds(5));
 
         workflowExecutionId = WorkflowExecutionId.of(
             PlatformType.AUTOMATION, JOB_PRINCIPAL_ID, WORKFLOW_UUID, TRIGGER_NAME);
@@ -270,6 +280,47 @@ public class WebhookWorkflowExecutorTest {
             .hasRootCauseMessage("boom");
     }
 
+    @Test
+    public void testTighterPlanSyncRunTimeoutCapsAwaitTimeout() throws Exception {
+        PlanLimits planLimits = new PlanLimits(
+            PlanTier.FREE, null, null, null, null, PlanLimits.DEFAULT_BURST_MULTIPLIER, null,
+            Duration.ofSeconds(1), null, null, null, null, null);
+
+        when(planLimitsProviderObjectProvider.getIfAvailable()).thenReturn(tenantId -> planLimits);
+
+        Job job = job(7L, Job.Status.COMPLETED);
+
+        stubTriggerAndJob("payload", false, 7L, job);
+
+        when(taskExecutionService.getJobTaskExecutions(7L)).thenReturn(List.of());
+
+        webhookWorkflowExecutor.executeSync(workflowExecutionId, mockWebhookRequest())
+            .get();
+
+        verify(jobCompletionAwaiter).await(7L, Duration.ofSeconds(1));
+    }
+
+    @Test
+    public void testLooserPlanSyncRunTimeoutKeepsConfiguredDefault() throws Exception {
+        // Plan allows 10s but the executor was configured with 5s: the plan can only tighten, never extend.
+        PlanLimits planLimits = new PlanLimits(
+            PlanTier.PRO, null, null, null, null, PlanLimits.DEFAULT_BURST_MULTIPLIER, null,
+            Duration.ofSeconds(10), null, null, null, null, null);
+
+        when(planLimitsProviderObjectProvider.getIfAvailable()).thenReturn(tenantId -> planLimits);
+
+        Job job = job(8L, Job.Status.COMPLETED);
+
+        stubTriggerAndJob("payload", false, 8L, job);
+
+        when(taskExecutionService.getJobTaskExecutions(8L)).thenReturn(List.of());
+
+        webhookWorkflowExecutor.executeSync(workflowExecutionId, mockWebhookRequest())
+            .get();
+
+        verify(jobCompletionAwaiter).await(8L, Duration.ofSeconds(5));
+    }
+
     private void stubTriggerAndJob(Object triggerValue, boolean batch, long jobId, Job job) {
         when(webhookWorkflowSyncExecutor.execute(eq(workflowExecutionId), any()))
             .thenReturn(new TriggerOutput(triggerValue, null, batch));
@@ -312,10 +363,10 @@ public class WebhookWorkflowExecutorTest {
     }
 
     private static FileEntry mockFileEntry() {
-        return org.mockito.Mockito.mock(FileEntry.class);
+        return mock(FileEntry.class);
     }
 
     private static WebhookRequest mockWebhookRequest() {
-        return org.mockito.Mockito.mock(WebhookRequest.class);
+        return mock(WebhookRequest.class);
     }
 }

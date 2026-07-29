@@ -37,7 +37,12 @@ import com.bytechef.automation.assetfile.domain.AssetFileSource;
 import com.bytechef.automation.assetfile.exception.AssetFileQuotaExceededException;
 import com.bytechef.automation.assetfile.file.storage.AssetFileFileStorage;
 import com.bytechef.automation.assetfile.metric.AssetFileMetrics;
+import com.bytechef.exception.QuotaLimitExceededException;
 import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.platform.plan.domain.PlanLimits;
+import com.bytechef.platform.plan.domain.PlanTier;
+import com.bytechef.platform.plan.provider.PlanLimitsProvider;
+import com.bytechef.platform.ratelimit.PlanLimitRejectionCounter;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -51,6 +56,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * @author Ivica Cardic
@@ -67,6 +73,12 @@ class AssetFileFacadeTest {
     @Mock
     private AssetFileMetrics metrics;
 
+    @Mock
+    private ObjectProvider<PlanLimitRejectionCounter> planLimitRejectionCounterObjectProvider;
+
+    @Mock
+    private ObjectProvider<PlanLimitsProvider> planLimitsProviderObjectProvider;
+
     private AssetFileFacade facade;
 
     private AutomationAssetFileQuotaProperties quota;
@@ -75,7 +87,11 @@ class AssetFileFacadeTest {
     void setUp() {
         quota = new AutomationAssetFileQuotaProperties(26_214_400L, 1_073_741_824L, 1_048_576L);
 
-        facade = new AssetFileFacadeImpl(service, fileStorage, metrics, quota, new Tika());
+        facade =
+            new AssetFileFacadeImpl(
+                service, fileStorage, metrics, planLimitRejectionCounterObjectProvider,
+                planLimitsProviderObjectProvider,
+                quota, new Tika());
     }
 
     @Test
@@ -113,7 +129,11 @@ class AssetFileFacadeTest {
     void testCreateFromUploadRejectsWhenSingleFileOverLimit() {
         quota = new AutomationAssetFileQuotaProperties(1024L, 1_073_741_824L, 1_048_576L);
 
-        facade = new AssetFileFacadeImpl(service, fileStorage, metrics, quota, new Tika());
+        facade =
+            new AssetFileFacadeImpl(
+                service, fileStorage, metrics, planLimitRejectionCounterObjectProvider,
+                planLimitsProviderObjectProvider,
+                quota, new Tika());
 
         byte[] bytes = new byte[2048];
 
@@ -133,7 +153,11 @@ class AssetFileFacadeTest {
     void testCreateFromUploadRejectsWhenWorkspaceTotalOver() {
         quota = new AutomationAssetFileQuotaProperties(1_000_000L, 10_000L, 1_048_576L);
 
-        facade = new AssetFileFacadeImpl(service, fileStorage, metrics, quota, new Tika());
+        facade =
+            new AssetFileFacadeImpl(
+                service, fileStorage, metrics, planLimitRejectionCounterObjectProvider,
+                planLimitsProviderObjectProvider,
+                quota, new Tika());
 
         byte[] bytes = new byte[2];
 
@@ -147,6 +171,52 @@ class AssetFileFacadeTest {
 
         verifyNoInteractions(fileStorage);
         verify(service, never()).create(any(AssetFile.class), anyLong());
+    }
+
+    @Test
+    void testCreateFromUploadRejectsWhenPlanStorageQuotaOver() {
+        stubMaxStorageBytes(10L);
+
+        when(service.sumSizeBytes()).thenReturn(10L);
+        when(service.fetchByWorkspaceIdAndEnvironmentAndName(eq(1L), anyInt(), anyString()))
+            .thenReturn(Optional.empty());
+
+        byte[] bytes = "hello".getBytes(StandardCharsets.UTF_8);
+
+        assertThatThrownBy(
+            () -> facade.createFromUpload(1L, 0, "hello.txt", "text/plain", new ByteArrayInputStream(bytes)))
+                .isInstanceOf(QuotaLimitExceededException.class);
+
+        verifyNoInteractions(fileStorage);
+        verify(service, never()).create(any(AssetFile.class), anyLong());
+    }
+
+    @Test
+    void testCreateFromUploadAllowedBelowPlanStorageQuota() {
+        stubMaxStorageBytes(1_000_000L);
+
+        when(service.sumSizeBytes()).thenReturn(100L);
+        when(service.sumSizeBytesByWorkspaceIdAndEnvironment(1L, 0)).thenReturn(100L);
+        when(service.fetchByWorkspaceIdAndEnvironmentAndName(eq(1L), anyInt(), anyString()))
+            .thenReturn(Optional.empty());
+
+        byte[] bytes = "hello".getBytes(StandardCharsets.UTF_8);
+        FileEntry stored = new FileEntry("hello.txt", "asset-files/hello.txt");
+
+        when(fileStorage.storeFile(eq("hello.txt"), any(InputStream.class))).thenReturn(stored);
+        when(service.create(any(AssetFile.class), eq(1L))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        AssetFile result = facade.createFromUpload(1L, 0, "hello.txt", "text/plain", new ByteArrayInputStream(bytes));
+
+        assertThat(result.getSizeBytes()).isEqualTo(bytes.length);
+    }
+
+    private void stubMaxStorageBytes(Long maxStorageBytes) {
+        PlanLimits planLimits = new PlanLimits(
+            PlanTier.FREE, null, null, null, null, PlanLimits.DEFAULT_BURST_MULTIPLIER, null, null, null, null,
+            maxStorageBytes, null, null);
+
+        when(planLimitsProviderObjectProvider.getIfAvailable()).thenReturn(tenantId -> planLimits);
     }
 
     @Test
@@ -242,7 +312,11 @@ class AssetFileFacadeTest {
     void testUpdateContentEnforcesDeltaQuota() {
         quota = new AutomationAssetFileQuotaProperties(1_000_000L, 10_000L, 1_048_576L);
 
-        facade = new AssetFileFacadeImpl(service, fileStorage, metrics, quota, new Tika());
+        facade =
+            new AssetFileFacadeImpl(
+                service, fileStorage, metrics, planLimitRejectionCounterObjectProvider,
+                planLimitsProviderObjectProvider,
+                quota, new Tika());
 
         AssetFile existing = new AssetFile();
 

@@ -13,7 +13,11 @@ dependencies {
     implementation("org.springframework.data:spring-data-jdbc")
     implementation("org.springframework.security:spring-security-core")
     implementation(project(":server:libs:core:commons:commons-util"))
+    implementation(project(":server:libs:core:exception:exception-api"))
     implementation(project(":server:libs:core:file-storage:file-storage-api"))
+    implementation(project(":server:libs:core:tenant:tenant-api"))
+    implementation(project(":server:libs:platform:platform-plan:platform-plan-api"))
+    implementation(project(":server:libs:platform:platform-rate-limit"))
     implementation(project(":server:libs:platform:platform-tag:platform-tag-api"))
 
     testImplementation("org.junit.jupiter:junit-jupiter")

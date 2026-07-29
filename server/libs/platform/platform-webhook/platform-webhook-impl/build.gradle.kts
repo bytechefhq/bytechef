@@ -14,6 +14,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
     implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-api"))
     implementation(project(":server:libs:platform:platform-job-sync"))
+    implementation(project(":server:libs:platform:platform-plan:platform-plan-api"))
     implementation(project(":server:libs:platform:platform-webhook:platform-webhook-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-api"))
     implementation(project(":server:libs:modules:components:map"))

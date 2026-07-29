@@ -42,10 +42,13 @@ import com.bytechef.platform.component.constant.WorkflowConstants;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.definition.WorkflowNodeType;
+import com.bytechef.platform.plan.provider.PlanLimitsProvider;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
 import com.bytechef.platform.workflow.execution.JobExecutionErrors;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
+import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +57,7 @@ import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * Bridges inbound A2A (Agent2Agent) requests onto ByteChef's synchronous workflow-execution path, and builds the
@@ -81,6 +85,7 @@ public class AutomationA2AServerFacade implements A2AAgentExecutor {
     private final A2aProjectWorkflowService a2aProjectWorkflowService;
     private final A2aServerService a2aServerService;
     private final JobCompletionAwaiter jobCompletionAwaiter;
+    private final ObjectProvider<PlanLimitsProvider> planLimitsProviderObjectProvider;
     private final PrincipalJobFacade principalJobFacade;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private final TaskExecutionService taskExecutionService;
@@ -91,13 +96,15 @@ public class AutomationA2AServerFacade implements A2AAgentExecutor {
     public AutomationA2AServerFacade(
         A2aProjectService a2aProjectService, A2aProjectWorkflowService a2aProjectWorkflowService,
         A2aServerService a2aServerService, JobCompletionAwaiter jobCompletionAwaiter,
-        PrincipalJobFacade principalJobFacade, ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
+        ObjectProvider<PlanLimitsProvider> planLimitsProviderObjectProvider, PrincipalJobFacade principalJobFacade,
+        ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
         TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage, WorkflowService workflowService) {
 
         this.a2aProjectService = a2aProjectService;
         this.a2aProjectWorkflowService = a2aProjectWorkflowService;
         this.a2aServerService = a2aServerService;
         this.jobCompletionAwaiter = jobCompletionAwaiter;
+        this.planLimitsProviderObjectProvider = planLimitsProviderObjectProvider;
         this.principalJobFacade = principalJobFacade;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
         this.taskExecutionService = taskExecutionService;
@@ -155,7 +162,7 @@ public class AutomationA2AServerFacade implements A2AAgentExecutor {
             projectDeploymentWorkflow.getProjectDeploymentId(), PlatformType.AUTOMATION);
 
         try {
-            Job job = jobCompletionAwaiter.await(jobId, JobCompletionAwaiter.DEFAULT_SYNC_TIMEOUT)
+            Job job = jobCompletionAwaiter.await(jobId, resolveSyncTimeout())
                 .join();
 
             JobExecutionErrors.checkForError(job, taskExecutionService);
@@ -204,6 +211,29 @@ public class AutomationA2AServerFacade implements A2AAgentExecutor {
         }
 
         return exposedWorkflows;
+    }
+
+    /**
+     * The effective wait limit for a synchronous A2A run: the default sync timeout, capped by the tenant plan's
+     * {@code syncRunTimeout} when one is set. The plan can only tighten the limit, never extend it.
+     */
+    private Duration resolveSyncTimeout() {
+        PlanLimitsProvider planLimitsProvider = planLimitsProviderObjectProvider.getIfAvailable();
+
+        if (planLimitsProvider == null) {
+            return JobCompletionAwaiter.DEFAULT_SYNC_TIMEOUT;
+        }
+
+        Duration planSyncRunTimeout = planLimitsProvider.getPlanLimits(TenantContext.getCurrentTenantId())
+            .syncRunTimeout();
+
+        if (planSyncRunTimeout == null ||
+            planSyncRunTimeout.compareTo(JobCompletionAwaiter.DEFAULT_SYNC_TIMEOUT) >= 0) {
+
+            return JobCompletionAwaiter.DEFAULT_SYNC_TIMEOUT;
+        }
+
+        return planSyncRunTimeout;
     }
 
     private Optional<Object> getCallableResponseOutput(Job job) {

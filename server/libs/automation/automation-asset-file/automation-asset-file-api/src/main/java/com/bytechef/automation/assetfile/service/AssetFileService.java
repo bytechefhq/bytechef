@@ -35,6 +35,12 @@ public interface AssetFileService {
 
     AssetFile findById(Long id);
 
+    /**
+     * Total asset-file bytes across the whole tenant (all workspaces, all environments) — the quantity the plan's
+     * {@code maxStorageBytes} limit is compared against.
+     */
+    long sumSizeBytes();
+
     long sumSizeBytesByWorkspaceIdAndEnvironment(Long workspaceId, int environment);
 
     AssetFile update(AssetFile assetFile);

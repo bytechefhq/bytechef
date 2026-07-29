@@ -25,8 +25,12 @@ import com.bytechef.automation.assetfile.exception.AssetFileQuotaExceededExcepti
 import com.bytechef.automation.assetfile.file.storage.AssetFileFileStorage;
 import com.bytechef.automation.assetfile.metric.AssetFileMetrics;
 import com.bytechef.automation.assetfile.util.AssetFileNameSanitizer;
+import com.bytechef.exception.QuotaLimitExceededException;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.plan.provider.PlanLimitsProvider;
+import com.bytechef.platform.ratelimit.PlanLimitRejectionCounter;
+import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -39,6 +43,7 @@ import java.util.Optional;
 import org.apache.tika.Tika;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -57,6 +62,8 @@ public class AssetFileFacadeImpl implements AssetFileFacade {
     private final AssetFileService service;
     private final AssetFileFileStorage fileStorage;
     private final AssetFileMetrics metrics;
+    private final ObjectProvider<PlanLimitRejectionCounter> planLimitRejectionCounterObjectProvider;
+    private final ObjectProvider<PlanLimitsProvider> planLimitsProviderObjectProvider;
     private final AutomationAssetFileQuotaProperties quota;
     private final Tika tika;
 
@@ -64,12 +71,16 @@ public class AssetFileFacadeImpl implements AssetFileFacade {
         AssetFileService service,
         AssetFileFileStorage fileStorage,
         AssetFileMetrics metrics,
+        ObjectProvider<PlanLimitRejectionCounter> planLimitRejectionCounterObjectProvider,
+        ObjectProvider<PlanLimitsProvider> planLimitsProviderObjectProvider,
         AutomationAssetFileQuotaProperties quota,
         Tika tika) {
 
         this.service = service;
         this.fileStorage = fileStorage;
         this.metrics = metrics;
+        this.planLimitRejectionCounterObjectProvider = planLimitRejectionCounterObjectProvider;
+        this.planLimitsProviderObjectProvider = planLimitsProviderObjectProvider;
         this.quota = quota;
         this.tika = tika;
     }
@@ -459,6 +470,8 @@ public class AssetFileFacadeImpl implements AssetFileFacade {
     }
 
     private void enforceWorkspaceQuota(Long workspaceId, int environment, long additionalBytes) {
+        enforcePlanStorageQuota(additionalBytes);
+
         long limit = quota.perWorkspaceTotalBytes();
 
         if (limit < 0) {
@@ -471,6 +484,44 @@ public class AssetFileFacadeImpl implements AssetFileFacade {
             throw new AssetFileQuotaExceededException(
                 "Workspace total %d would exceed limit %d".formatted(current + additionalBytes, limit),
                 current + additionalBytes, limit);
+        }
+    }
+
+    /**
+     * Rejects the write when the tenant-wide asset-file total plus the incoming bytes would exceed the plan's
+     * {@code maxStorageBytes}. Runs alongside the operator-configured per-workspace quota — the tenant ceiling spans
+     * all workspaces and environments. A null limit (or no {@link PlanLimitsProvider} bean) means unlimited.
+     */
+    private void enforcePlanStorageQuota(long additionalBytes) {
+        PlanLimitsProvider planLimitsProvider = planLimitsProviderObjectProvider.getIfAvailable();
+
+        if (planLimitsProvider == null) {
+            return;
+        }
+
+        Long maxStorageBytes = planLimitsProvider.getPlanLimits(TenantContext.getCurrentTenantId())
+            .maxStorageBytes();
+
+        if (maxStorageBytes == null) {
+            return;
+        }
+
+        long current = service.sumSizeBytes();
+
+        if (current + additionalBytes > maxStorageBytes) {
+            countQuotaRejection();
+
+            throw new QuotaLimitExceededException(
+                "Storage quota exceeded: the plan allows at most %d byte(s) of asset storage".formatted(
+                    maxStorageBytes));
+        }
+    }
+
+    private void countQuotaRejection() {
+        PlanLimitRejectionCounter planLimitRejectionCounter = planLimitRejectionCounterObjectProvider.getIfAvailable();
+
+        if (planLimitRejectionCounter != null) {
+            planLimitRejectionCounter.increment("storage");
         }
     }
 

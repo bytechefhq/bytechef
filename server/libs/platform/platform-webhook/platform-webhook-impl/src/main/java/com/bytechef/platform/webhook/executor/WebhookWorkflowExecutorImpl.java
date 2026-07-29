@@ -38,6 +38,7 @@ import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.job.sync.SseStreamBridge;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
+import com.bytechef.platform.plan.provider.PlanLimitsProvider;
 import com.bytechef.platform.webhook.executor.SseStreamBridgeRegistry.Registration;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.coordinator.event.TriggerWebhookEvent;
@@ -62,6 +63,7 @@ import org.apache.commons.lang3.Validate;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.ApplicationEventPublisher;
 
 /**
@@ -75,6 +77,7 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
     private final JobCompletionAwaiter jobCompletionAwaiter;
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
     private final JobSyncExecutor jobSyncExecutor;
+    private final ObjectProvider<PlanLimitsProvider> planLimitsProviderObjectProvider;
     private final PrincipalJobFacade principalJobFacade;
     private final SseStreamBridgeRegistry sseStreamBridgeRegistry;
     private final Duration syncTimeout;
@@ -89,7 +92,7 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
     public WebhookWorkflowExecutorImpl(
         ApplicationEventPublisher eventPublisher, JobCompletionAwaiter jobCompletionAwaiter,
         JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, JobSyncExecutor jobSyncExecutor,
-        PrincipalJobFacade principalJobFacade,
+        ObjectProvider<PlanLimitsProvider> planLimitsProviderObjectProvider, PrincipalJobFacade principalJobFacade,
         SseStreamBridgeRegistry sseStreamBridgeRegistry, TaskExecutionService taskExecutionService,
         TaskFileStorage taskFileStorage, TaskFileStorage syncJobTaskFileStorage,
         TriggerDefinitionService triggerDefinitionService,
@@ -100,6 +103,7 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
         this.jobCompletionAwaiter = jobCompletionAwaiter;
         this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
         this.jobSyncExecutor = jobSyncExecutor;
+        this.planLimitsProviderObjectProvider = planLimitsProviderObjectProvider;
         this.principalJobFacade = principalJobFacade;
         this.sseStreamBridgeRegistry = sseStreamBridgeRegistry;
         this.syncTimeout = syncTimeout;
@@ -331,9 +335,31 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
                 createJobParameters(workflowExecutionId, workflowId, inputMap, triggerOutputValue),
                 workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getType()));
 
-        return jobCompletionAwaiter.await(jobId, syncTimeout)
+        return jobCompletionAwaiter.await(jobId, resolveSyncTimeout(workflowExecutionId.getTenantId()))
             .thenApply(job -> TenantContext.callWithTenantId(
                 workflowExecutionId.getTenantId(), () -> collectOutputs(job)));
+    }
+
+    /**
+     * The effective wait limit for a synchronous run: the operator-configured timeout, capped by the tenant plan's
+     * {@code syncRunTimeout} when one is set. The plan can only tighten the limit, never extend it past the configured
+     * default.
+     */
+    private Duration resolveSyncTimeout(String tenantId) {
+        PlanLimitsProvider planLimitsProvider = planLimitsProviderObjectProvider.getIfAvailable();
+
+        if (planLimitsProvider == null) {
+            return syncTimeout;
+        }
+
+        Duration planSyncRunTimeout = planLimitsProvider.getPlanLimits(tenantId)
+            .syncRunTimeout();
+
+        if (planSyncRunTimeout == null || planSyncRunTimeout.compareTo(syncTimeout) >= 0) {
+            return syncTimeout;
+        }
+
+        return planSyncRunTimeout;
     }
 
     private @Nullable Object collectOutputs(Job job) {

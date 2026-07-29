@@ -22,13 +22,28 @@ import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.plan.domain.PlanLimits;
+import com.bytechef.platform.plan.domain.PlanOveragePolicy;
+import com.bytechef.platform.plan.provider.PlanLimitsProvider;
+import com.bytechef.platform.plan.provider.PlanOveragePolicyProvider;
+import com.bytechef.platform.plan.provider.PlanSpendProvider;
+import com.bytechef.platform.ratelimit.ConcurrentExecutionGate;
+import com.bytechef.platform.ratelimit.PlanLimitRejectionCounter;
+import com.bytechef.platform.ratelimit.RateLimitPolicy;
+import com.bytechef.platform.ratelimit.RateLimiter;
+import com.bytechef.platform.workflow.execution.exception.JobConcurrencyLimitExceededException;
+import com.bytechef.platform.workflow.execution.exception.JobCostLimitExceededException;
+import com.bytechef.platform.workflow.execution.exception.JobRateLimitExceededException;
 import com.bytechef.platform.workflow.execution.service.LicenceJobUsageService;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
+import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.math.BigDecimal;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,17 +60,175 @@ public class PrincipalJobFacadeImpl implements PrincipalJobFacade {
     private final JobService jobService;
     private final WorkflowService workflowService;
     private final LicenceJobUsageService licenceJobUsageService;
+    private final ObjectProvider<ConcurrentExecutionGate> concurrentExecutionGateProvider;
+    private final ObjectProvider<PlanLimitRejectionCounter> planLimitRejectionCounterObjectProvider;
+    private final ObjectProvider<PlanLimitsProvider> planLimitsProviderObjectProvider;
+    private final ObjectProvider<PlanOveragePolicyProvider> planOveragePolicyProviderObjectProvider;
+    private final ObjectProvider<PlanSpendProvider> planSpendProviderObjectProvider;
+    private final ObjectProvider<RateLimiter> rateLimiterObjectProvider;
 
     @SuppressFBWarnings("EI")
     public PrincipalJobFacadeImpl(
         PrincipalJobService principalJobService, JobFacade jobFacade, JobService jobService,
-        WorkflowService workflowService, LicenceJobUsageService licenceJobUsageService) {
+        WorkflowService workflowService, LicenceJobUsageService licenceJobUsageService,
+        ObjectProvider<ConcurrentExecutionGate> concurrentExecutionGateProvider,
+        ObjectProvider<PlanLimitRejectionCounter> planLimitRejectionCounterObjectProvider,
+        ObjectProvider<PlanLimitsProvider> planLimitsProviderObjectProvider,
+        ObjectProvider<PlanOveragePolicyProvider> planOveragePolicyProviderObjectProvider,
+        ObjectProvider<PlanSpendProvider> planSpendProviderObjectProvider,
+        ObjectProvider<RateLimiter> rateLimiterObjectProvider) {
 
         this.principalJobService = principalJobService;
         this.jobFacade = jobFacade;
         this.jobService = jobService;
         this.workflowService = workflowService;
         this.licenceJobUsageService = licenceJobUsageService;
+        this.concurrentExecutionGateProvider = concurrentExecutionGateProvider;
+        this.planLimitRejectionCounterObjectProvider = planLimitRejectionCounterObjectProvider;
+        this.planLimitsProviderObjectProvider = planLimitsProviderObjectProvider;
+        this.planOveragePolicyProviderObjectProvider = planOveragePolicyProviderObjectProvider;
+        this.planSpendProviderObjectProvider = planSpendProviderObjectProvider;
+        this.rateLimiterObjectProvider = rateLimiterObjectProvider;
+    }
+
+    private void countRejection(String limit) {
+        PlanLimitRejectionCounter planLimitRejectionCounter = planLimitRejectionCounterObjectProvider.getIfAvailable();
+
+        if (planLimitRejectionCounter != null) {
+            planLimitRejectionCounter.increment(limit);
+        }
+    }
+
+    /**
+     * Plan-level concurrent-execution admission (Sim model: a slot is held from admission to terminal status, released
+     * by the coordinator's terminal-status listener). No gate/provider bean or a null limit (the SELF_HOSTED default)
+     * admits unconditionally — pre-plan behavior. Applied on the async dispatch path only: sync executions
+     * ({@code createJobWithoutDispatch}) run on a caller thread whose completion events do not always traverse the
+     * coordinator fan-out, so gating them would risk leaked slots.
+     */
+    private void admitConcurrentExecution() {
+        ConcurrentExecutionGate concurrentExecutionGate = concurrentExecutionGateProvider.getIfAvailable();
+        PlanLimitsProvider planLimitsProvider = planLimitsProviderObjectProvider.getIfAvailable();
+
+        if (concurrentExecutionGate == null || planLimitsProvider == null) {
+            return;
+        }
+
+        String tenantId = TenantContext.getCurrentTenantId();
+
+        Integer maxConcurrentExecutions = planLimitsProvider.getPlanLimits(tenantId)
+            .maxConcurrentExecutions();
+
+        if (maxConcurrentExecutions == null) {
+            return;
+        }
+
+        if (!concurrentExecutionGate.tryAcquire("executions:" + tenantId, maxConcurrentExecutions)) {
+            countRejection("concurrency");
+
+            throw new JobConcurrencyLimitExceededException(maxConcurrentExecutions);
+        }
+    }
+
+    /**
+     * Plan-level async submissions-per-minute admission (Sim model: sustained rate x burst multiplier, token bucket).
+     * Checked BEFORE the concurrency slot so a rate-rejected submission never acquires a slot it would then leak. No
+     * limiter/provider bean or a null limit (the SELF_HOSTED default) admits unconditionally.
+     */
+    private void admitAsyncSubmissionRate() {
+        RateLimiter rateLimiter = rateLimiterObjectProvider.getIfAvailable();
+        PlanLimitsProvider planLimitsProvider = planLimitsProviderObjectProvider.getIfAvailable();
+
+        if (rateLimiter == null || planLimitsProvider == null) {
+            return;
+        }
+
+        String tenantId = TenantContext.getCurrentTenantId();
+
+        PlanLimits planLimits = planLimitsProvider.getPlanLimits(tenantId);
+
+        Integer asyncRequestsPerMinute = planLimits.asyncRequestsPerMinute();
+
+        if (asyncRequestsPerMinute == null) {
+            return;
+        }
+
+        RateLimitPolicy rateLimitPolicy = new RateLimitPolicy(asyncRequestsPerMinute, planLimits.burstMultiplier());
+
+        if (!rateLimiter.tryConsume("async:" + tenantId, rateLimitPolicy)) {
+            countRejection("async");
+
+            throw new JobRateLimitExceededException(asyncRequestsPerMinute);
+        }
+    }
+
+    /**
+     * Plan-level monthly-cost admission (Sim model: submissions are refused once the tenant's current-period execution
+     * spend has reached the plan's included monthly cost). No spend provider or plan-limits bean, or a null cost limit
+     * (the SELF_HOSTED default), admits unconditionally. Checked after the cheap local rate check and before the
+     * concurrency slot so a cost-rejected submission never acquires a slot it would then leak; the spend provider is
+     * expected to cache, so this does not run a SUM per submission.
+     */
+    private void admitMonthlyCostCap() {
+        PlanSpendProvider planSpendProvider = planSpendProviderObjectProvider.getIfAvailable();
+        PlanLimitsProvider planLimitsProvider = planLimitsProviderObjectProvider.getIfAvailable();
+
+        if (planSpendProvider == null || planLimitsProvider == null) {
+            return;
+        }
+
+        String tenantId = TenantContext.getCurrentTenantId();
+
+        BigDecimal includedMonthlyCostUsd = planLimitsProvider.getPlanLimits(tenantId)
+            .includedMonthlyCostUsd();
+
+        if (includedMonthlyCostUsd == null) {
+            return;
+        }
+
+        BigDecimal currentPeriodSpendUsd = planSpendProvider.getCurrentPeriodSpendUsd(tenantId);
+
+        if (currentPeriodSpendUsd.compareTo(includedMonthlyCostUsd) >= 0) {
+            if (isOverageAdmitted(tenantId, includedMonthlyCostUsd, currentPeriodSpendUsd)) {
+                return;
+            }
+
+            countRejection("cost");
+
+            throw new JobCostLimitExceededException(includedMonthlyCostUsd);
+        }
+    }
+
+    /**
+     * Whether an over-cap submission is admitted under the tenant's on-demand overage terms (Sim's opt-in overage
+     * model). Without a {@link PlanOveragePolicyProvider} bean — the placeholder state until the billing integration
+     * lands — overage is disabled and the cap hard-stops.
+     */
+    private boolean isOverageAdmitted(
+        String tenantId, BigDecimal includedMonthlyCostUsd, BigDecimal currentPeriodSpendUsd) {
+
+        PlanOveragePolicyProvider planOveragePolicyProvider =
+            planOveragePolicyProviderObjectProvider.getIfAvailable();
+
+        if (planOveragePolicyProvider == null) {
+            return false;
+        }
+
+        PlanOveragePolicy planOveragePolicy = planOveragePolicyProvider.getOveragePolicy(tenantId);
+
+        if (!planOveragePolicy.enabled()) {
+            return false;
+        }
+
+        BigDecimal unbilledLimitUsd = planOveragePolicy.unbilledLimitUsd();
+
+        if (unbilledLimitUsd == null) {
+            return true;
+        }
+
+        BigDecimal unbilledOverageUsd = currentPeriodSpendUsd.subtract(includedMonthlyCostUsd);
+
+        return unbilledOverageUsd.compareTo(unbilledLimitUsd) < 0;
     }
 
     @Override
@@ -79,6 +252,10 @@ public class PrincipalJobFacadeImpl implements PrincipalJobFacade {
     // TODO @Transactional
     public long createJob(JobParametersDTO jobParametersDTO, long jobPrincipalId, PlatformType type) {
         licenceJobUsageService.consumeOrThrow();
+
+        admitAsyncSubmissionRate();
+        admitMonthlyCostCap();
+        admitConcurrentExecution();
 
         long jobId = jobFacade.createJob(jobParametersDTO);
 

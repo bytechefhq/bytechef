@@ -85,6 +85,12 @@ public class AssetFileServiceImpl implements AssetFileService {
 
     @Override
     @Transactional(readOnly = true)
+    public long sumSizeBytes() {
+        return assetFileRepository.sumSizeBytes();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public long sumSizeBytesByWorkspaceIdAndEnvironment(Long workspaceId, int environment) {
         return assetFileRepository.sumSizeBytesByWorkspaceIdAndEnvironment(workspaceId, environment);
     }
