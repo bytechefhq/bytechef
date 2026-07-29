@@ -40,6 +40,8 @@ import com.bytechef.platform.configuration.facade.WorkflowTestConfigurationFacad
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -131,6 +133,57 @@ class ProjectWorkflowToolsTest {
     }
 
     @Test
+    void testCreateProjectWorkflowCapturesPersistedIds() {
+        List<Map<String, Object>> captures = Collections.synchronizedList(new ArrayList<>());
+
+        when(toolContext.getContext())
+            .thenReturn(Map.of("bytechef.workflowEditor.persistedWorkflows", captures));
+
+        ProjectWorkflow projectWorkflow = buildProjectWorkflow(55L, 7L, "wf-uuid-1");
+
+        when(projectWorkflowFacade.addWorkflow(7L, DEFINITION)).thenReturn(projectWorkflow);
+
+        ProjectWorkflowTools tools = newTools();
+
+        tools.createProjectWorkflow(7L, DEFINITION, toolContext);
+
+        assertThat(captures).hasSize(1);
+        assertThat(captures.get(0))
+            .containsEntry("created", true)
+            .containsEntry("workflowId", "wf-uuid-1")
+            .containsEntry("projectId", 7L)
+            .containsEntry("projectWorkflowId", 55L)
+            .containsEntry("name", "My Flow");
+    }
+
+    @Test
+    void testUpdateWorkflowCapturesPersistedIds() {
+        List<Map<String, Object>> captures = Collections.synchronizedList(new ArrayList<>());
+
+        when(toolContext.getContext())
+            .thenReturn(Map.of("bytechef.workflowEditor.persistedWorkflows", captures));
+
+        ProjectWorkflowDTO dto = buildDto("wf-uuid-2", 88L, 3);
+
+        when(projectWorkflowFacade.getProjectWorkflow("wf-uuid-2")).thenReturn(dto);
+
+        ProjectWorkflow projectWorkflow = buildProjectWorkflow(88L, 9L, "wf-uuid-2");
+
+        when(projectWorkflowService.getProjectWorkflow(88L)).thenReturn(projectWorkflow);
+
+        ProjectWorkflowTools tools = newTools();
+
+        tools.updateWorkflow("wf-uuid-2", DEFINITION, toolContext);
+
+        assertThat(captures).hasSize(1);
+        assertThat(captures.get(0))
+            .containsEntry("created", false)
+            .containsEntry("workflowId", "wf-uuid-2")
+            .containsEntry("projectId", 9L)
+            .containsEntry("projectWorkflowId", 88L);
+    }
+
+    @Test
     void testCreateProjectWorkflowSkipsRecordingWhenNoRecorder() {
         when(recorderProvider.getIfAvailable()).thenReturn(null);
 
@@ -165,8 +218,6 @@ class ProjectWorkflowToolsTest {
 
     @Test
     void testUpdateWorkflowSucceedsWhenProjectIdLookupThrows() {
-        when(recorderProvider.getIfAvailable()).thenReturn(recorder);
-
         ProjectWorkflowDTO dto = buildDto("wf-uuid-2", 88L, "Updated Flow", 3);
 
         when(projectWorkflowFacade.getProjectWorkflow("wf-uuid-2")).thenReturn(dto);

@@ -20,6 +20,7 @@ import com.bytechef.ai.agent.tool.AgentType;
 import com.bytechef.ai.agent.tool.CurrentAgentContext;
 import com.bytechef.ai.agent.tool.CurrentAgentContext.AgentBinding;
 import com.bytechef.ai.agent.tool.ToolErrors;
+import com.bytechef.ai.copilot.tool.util.WorkflowPersistCaptureUtils;
 import com.bytechef.commons.util.JsonUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
@@ -98,7 +99,9 @@ public class WorkflowEditorAgentToolCallback implements ToolCallback {
             AgentBinding parent = CurrentAgentContext.current();
             AgentType parentAgent = parent != null ? parent.agentName() : null;
 
-            Map<String, Object> forwardedContext = toolContext == null ? Map.of() : toolContext.getContext();
+            Map<String, Object> parentContext = toolContext == null ? Map.of() : toolContext.getContext();
+
+            Map<String, Object> forwardedContext = WorkflowPersistCaptureUtils.withCaptureHolder(parentContext);
 
             String result = CurrentAgentContext.callWith(
                 CopilotAgentType.WORKFLOW_EDITOR_AGENT, parentAgent,
@@ -113,7 +116,9 @@ public class WorkflowEditorAgentToolCallback implements ToolCallback {
                 return ToolErrors.toolError("workflow_editor subagent returned null");
             }
 
-            return result;
+            String trailer = WorkflowPersistCaptureUtils.renderTrailer(forwardedContext);
+
+            return trailer == null ? result : result + trailer;
         } catch (JacksonException exception) {
             log.warn(
                 "workflow_editor_agent rejected malformed tool input: {} — first 200 chars of input: {}",

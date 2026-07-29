@@ -10,6 +10,7 @@ package com.bytechef.ee.ai.hub.toolsearch;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
 import com.bytechef.component.definition.ai.agent.BaseToolFunction;
 import com.bytechef.ee.ai.hub.agent.AiHubToolCallbackWrappers;
+import com.bytechef.ee.ai.hub.config.AiHubPgVectorConfiguration;
 import com.bytechef.ee.ai.hub.util.ToolNameNormalizer;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -27,6 +28,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.advisor.toolsearch.ToolSearchToolCallingAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.embedding.BatchingStrategy;
+import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.model.tool.DefaultToolCallingManager;
 import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.ai.tool.ToolCallback;
@@ -37,6 +40,8 @@ import org.springframework.ai.tool.resolution.ToolCallbackResolver;
 import org.springframework.ai.tool.toolsearch.ToolIndex;
 import org.springframework.ai.tool.toolsearch.index.vectorstore.VectorToolIndex;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.ai.vectorstore.observation.VectorStoreObservationConvention;
+import org.springframework.ai.vectorstore.pgvector.autoconfigure.PgVectorStoreProperties;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -44,6 +49,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  * Wires up the Tool Search Tool advisor for the AI Hub. The advisor exposes one meta-tool ({@code searchTool}) to the
@@ -93,15 +99,26 @@ public class ToolSearchAdvisorConfiguration {
     /**
      * Tools the system prompt tells the model to call directly by name, so they must stay callable on every iteration
      * rather than being hidden behind a {@code searchTool} hit: the specialist sub-agents (the {@code *_agent}
-     * delegates plus the research / data-analyst / image-generator / slide-builder ChatClient sub-agents) and the core
-     * interaction tools {@code askUserQuestion} and {@code openWorkflowTab}. Names that are absent for a given mode
-     * (e.g. a specialist whose ChatClient bean is disabled) are simply never captured — pinning a missing name is a
-     * no-op. Keep this list small; every entry is sent to the model on every turn, which is the cost the tool-search
-     * advisor otherwise avoids.
+     * delegates plus the research / data-analyst / image-generator / slide-builder ChatClient sub-agents), the core
+     * interaction tools {@code askUserQuestion} and {@code openWorkflowTab}, and the interactive picker tools that
+     * render UI in the chat panel ({@code selectConnection}, {@code createConnection}, {@code selectPropertyOption},
+     * {@code selectTriggerPropertyOption}). The pickers must be pinned like {@code askUserQuestion}: they render only
+     * off a tool-result event, and chat memory does not persist the intermediate {@code searchTool} exchange that once
+     * surfaced them, so on a follow-up turn an unpinned picker is not in the narrowed tool list — the model then
+     * narrates "I've rendered the picker above" without a real call and nothing renders. The auto-memory tools
+     * ({@code MemoryView}, {@code MemoryCreate}, {@code MemoryStrReplace}, {@code MemoryInsert}, {@code MemoryDelete},
+     * {@code MemoryRename}) are pinned for the same reason: {@code AutoMemoryToolsAdvisor} injects them (and the memory
+     * system prompt that instructs the model to use them) before the tool-search loop runs, so without pinning the
+     * narrowing strips them every iteration and the model can never recall or record memories. Names that are absent
+     * for a given mode (e.g. a specialist whose ChatClient bean is disabled, or memory tools in a mode that doesn't
+     * mount the advisor) are simply never captured — pinning a missing name is a no-op. Keep this list small; every
+     * entry is sent to the model on every turn, which is the cost the tool-search advisor otherwise avoids.
      */
     private static final Set<String> ALWAYS_ON_TOOL_NAMES = Set.of(
-        "askUserQuestion", "cluster_element_agent", "code_editor_agent", "converter_agent", "data_analyst",
-        "image_generator", "openWorkflowTab", "research", "skills_agent", "slide_builder", "workflow_editor_agent",
+        "askUserQuestion", "cluster_element_agent", "code_editor_agent", "converter_agent", "createConnection",
+        "data_analyst", "image_generator", "MemoryCreate", "MemoryDelete", "MemoryInsert", "MemoryRename",
+        "MemoryStrReplace", "MemoryView", "openWorkflowTab", "research", "selectConnection", "selectPropertyOption",
+        "selectTriggerPropertyOption", "skills_agent", "slide_builder", "workflow_editor_agent",
         "workflow_execution_agent");
 
     private static final Logger log = LoggerFactory.getLogger(ToolSearchAdvisorConfiguration.class);
@@ -118,10 +135,33 @@ public class ToolSearchAdvisorConfiguration {
         // The pgvector datasource — same JdbcTemplate the vector store uses, so the meta table lives in the same
         // schema and benefits from the same connection pool. Co-locating "all tool-search state" in one schema keeps
         // backups + cleanup straightforward.
-        @Qualifier("pgVectorJdbcTemplate") org.springframework.jdbc.core.JdbcTemplate pgVectorJdbcTemplate) {
+        @Qualifier("pgVectorJdbcTemplate") JdbcTemplate pgVectorJdbcTemplate,
+        @Qualifier("copilotEmbeddingModel") ObjectProvider<EmbeddingModel> copilotEmbeddingModelProvider,
+        PgVectorStoreProperties properties, ObjectProvider<ObservationRegistry> observationRegistry,
+        ObjectProvider<VectorStoreObservationConvention> customObservationConvention,
+        BatchingStrategy batchingStrategy) {
+
+        // Loading (indexing the global catalog, the per-mode global static tools, and per-task subsets) embeds with the
+        // fixed-key copilotEmbeddingModel so boot-time indexing never depends on a per-environment embedding provider
+        // being activated — the same split copilot docs use. The search advisors keep reading through the
+        // @Primary/per-environment CatalogEmbeddingModel over the same ai_hub_tool_search_* table; both must resolve to
+        // the same underlying embedding model for the vectors to be comparable. When copilotEmbeddingModel is absent
+        // (Copilot disabled, no bytechef.ai.copilot.embedding.* key, or a standalone AI Hub app without the Copilot
+        // module), fall back to the reader index so behavior is unchanged.
+        EmbeddingModel copilotEmbeddingModel = copilotEmbeddingModelProvider.getIfAvailable();
+
+        VectorToolIndex loaderVectorToolIndex = toolSearchVectorToolIndex;
+
+        if (copilotEmbeddingModel != null) {
+            VectorStore loaderVectorStore = AiHubPgVectorConfiguration.buildToolSearchVectorStore(
+                pgVectorJdbcTemplate, copilotEmbeddingModel, properties, observationRegistry,
+                customObservationConvention, batchingStrategy);
+
+            loaderVectorToolIndex = new VectorToolIndex(loaderVectorStore);
+        }
 
         return new ToolSearchCatalogFeeder(
-            clusterElementDefinitionService, toolSearchVectorToolIndex, pgVectorJdbcTemplate);
+            clusterElementDefinitionService, loaderVectorToolIndex, pgVectorJdbcTemplate);
     }
 
     /**

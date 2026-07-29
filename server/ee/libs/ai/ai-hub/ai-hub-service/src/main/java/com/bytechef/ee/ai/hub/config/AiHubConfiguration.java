@@ -232,6 +232,7 @@ public class AiHubConfiguration {
         @Qualifier("workflowExecutionAskSubAgentChatClient") //
         ObjectProvider<ChatClient> workflowExecutionAskSubAgentChatClientProvider,
         ArtifactGeneratorRegistry artifactGeneratorRegistry, AiHubTaskService taskService,
+        AiAutoMemoryService aiHubMemoryService,
         DataTableService dataTableService,
         DataTableRowService dataTableRowService, WorkspaceDataTableFacade workspaceDataTableFacade,
         WorkspaceKnowledgeBaseFacade workspaceKnowledgeBaseFacade,
@@ -344,6 +345,18 @@ public class AiHubConfiguration {
             .securityContextRehydrator(securityContextRehydrator);
 
         toolSearchToolCallAdvisorProvider.ifAvailable(builder::advisor);
+
+        // ASK mode gets the same DB-backed auto-memory as BUILD so it can recall (and record) memories while
+        // answering. The memory tool names are pinned in ALWAYS_ON_TOOL_NAMES so the tool-search narrowing doesn't
+        // strip them.
+        builder.advisor(
+            AutoMemoryToolsAdvisor.builder()
+                .autoMemoryTools(
+                    new AutoMemoryTools(
+                        new DbMemoryResourceResolver(aiHubMemoryService),
+                        new DbAutoMemoryDirectoryOps(aiHubMemoryService)))
+                .memorySystemPrompt(promptAiHubAutoMemoryToolsResource)
+                .build());
 
         taskBindingToolCallbackResolverProvider.ifAvailable(builder::taskToolBindingResolver);
 

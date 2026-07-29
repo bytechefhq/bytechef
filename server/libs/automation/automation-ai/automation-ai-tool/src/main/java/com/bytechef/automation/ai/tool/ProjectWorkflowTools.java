@@ -33,6 +33,7 @@ import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.configuration.facade.WorkflowTestConfigurationFacade;
 import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -76,13 +77,9 @@ public class ProjectWorkflowTools {
         }
         """;
 
-    // Tool-context keys carrying the current environment ordinal (DEVELOPMENT=0, STAGING=1, PRODUCTION=2). The AI Hub
-    // runtime writes the first; the in-editor Copilot runtime writes the second. Both are read so the binding lands in
-    // the environment the user is actually working in (matching WorkflowExecutionToolContextKeys and
-    // AgentToolInvocationContext.TOOL_CONTEXT_ENVIRONMENT_ID_KEY respectively, which live in modules this CE module
-    // does not depend on).
     private static final String ASSET_FILE_ENVIRONMENT_ID_KEY = "bytechef.assetFile.environmentId";
     private static final String AGENT_TOOL_ENVIRONMENT_ID_KEY = "bytechef.agentTool.environmentId";
+    private static final String PERSISTED_WORKFLOW_CAPTURE_KEY = "bytechef.workflowEditor.persistedWorkflows";
 
     private final ProjectService projectService;
     private final ProjectWorkflowFacade projectWorkflowFacade;
@@ -261,6 +258,10 @@ public class ProjectWorkflowTools {
                 toolContext, true, projectWorkflow.getWorkflowId(), projectWorkflow.getProjectId(),
                 projectWorkflow.getId(), extractWorkflowName(definition));
 
+            capturePersistedWorkflow(
+                toolContext, true, projectWorkflow.getWorkflowId(), projectWorkflow.getProjectId(),
+                projectWorkflow.getId(), extractWorkflowName(definition));
+
             return new ProjectWorkflowInfo(
                 projectWorkflow.getId(), projectWorkflow.getProjectId(), projectWorkflow.getProjectVersion(),
                 projectWorkflow.getWorkflowId(), projectWorkflow.getUuidAsString(),
@@ -386,8 +387,12 @@ public class ProjectWorkflowTools {
                 connectionKey, connectionId, e);
 
             throw new ExecutionException(
-                "Failed to save workflow test connection: " + e.getMessage(), e,
-                ProjectWorkflowToolErrorType.SAVE_TEST_CONNECTION);
+                ("Could not bind connection %d to node '%s' (key '%s'): %s. This node was NOT connected — tell the "
+                    + "user and do not report it as done. If it is an AI model or other element inside an AI Agent, it "
+                    + "must be connected from the workflow editor. Otherwise verify the connection exists in the "
+                    + "current environment and that the connection key matches the node.")
+                        .formatted(connectionId, workflowNodeName, connectionKey, e.getMessage()),
+                e, ProjectWorkflowToolErrorType.SAVE_TEST_CONNECTION);
         }
     }
 
@@ -427,24 +432,57 @@ public class ProjectWorkflowTools {
         @Nullable ToolContext toolContext, String workflowId, ProjectWorkflowDTO projectWorkflowDTO,
         String definition) {
 
-        WorkflowArtifactRecorder recorder = workflowArtifactRecorderProvider.getIfAvailable();
-
-        if (recorder == null) {
-            return;
-        }
-
         try {
             long projectId = projectWorkflowService.getProjectWorkflow(projectWorkflowDTO.getProjectWorkflowId())
                 .getProjectId();
+            String workflowName = extractWorkflowName(definition);
 
-            recorder.recordWorkflowArtifact(
-                toolContext, false, workflowId, projectId, projectWorkflowDTO.getProjectWorkflowId(),
-                extractWorkflowName(definition));
+            capturePersistedWorkflow(
+                toolContext, false, workflowId, projectId, projectWorkflowDTO.getProjectWorkflowId(), workflowName);
+
+            WorkflowArtifactRecorder recorder = workflowArtifactRecorderProvider.getIfAvailable();
+
+            if (recorder != null) {
+                recorder.recordWorkflowArtifact(
+                    toolContext, false, workflowId, projectId, projectWorkflowDTO.getProjectWorkflowId(), workflowName);
+            }
         } catch (RuntimeException exception) {
-            // Best-effort: neither the projectId lookup nor the recorder may fail the update, which has
-            // already committed.
             log.warn("Failed to record updated workflow artifact (workflowId={})", workflowId, exception);
         }
+    }
+
+    private static void capturePersistedWorkflow(
+        @Nullable ToolContext toolContext, boolean created, String workflowId, long projectId,
+        @Nullable Long projectWorkflowId, String workflowName) {
+
+        if (toolContext == null) {
+            return;
+        }
+
+        Map<String, Object> context = toolContext.getContext();
+
+        if (context == null) {
+            return;
+        }
+
+        Object holder = context.get(PERSISTED_WORKFLOW_CAPTURE_KEY);
+
+        if (!(holder instanceof List<?>)) {
+            return;
+        }
+
+        @SuppressWarnings("unchecked")
+        List<Map<String, Object>> captures = (List<Map<String, Object>>) holder;
+
+        Map<String, Object> entry = new HashMap<>();
+
+        entry.put("created", created);
+        entry.put("workflowId", workflowId);
+        entry.put("projectId", projectId);
+        entry.put("projectWorkflowId", projectWorkflowId);
+        entry.put("name", workflowName);
+
+        captures.add(entry);
     }
 
     private void recordWorkflowArtifact(
@@ -461,7 +499,6 @@ public class ProjectWorkflowTools {
             recorder.recordWorkflowArtifact(toolContext, created, workflowId, projectId, projectWorkflowId,
                 workflowName);
         } catch (RuntimeException exception) {
-            // Best-effort: artifact recording must never fail the workflow persist, which has already committed.
             log.warn("Failed to record workflow artifact (workflowId={})", workflowId, exception);
         }
     }
