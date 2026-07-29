@@ -18,11 +18,26 @@ package com.bytechef.atlas.execution.service;
 
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.file.storage.domain.FileEntry;
+import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
 public interface ContextService {
+
+    /**
+     * Deletes every context row for the given stack (a job id or a task execution id). Used by job deletion and
+     * retention purging; in-memory and remote-client deployments may not support it and throw
+     * {@link UnsupportedOperationException}.
+     */
+    void deleteStackContexts(long stackId);
+
+    /**
+     * Every context value stored for the given stack, all classnames and sub-stacks included — the blobs job deletion
+     * must release before removing the rows. May throw {@link UnsupportedOperationException} like
+     * {@link #deleteStackContexts(long)}.
+     */
+    List<FileEntry> getStackFileEntries(long stackId);
 
     FileEntry peek(long stackId, Context.Classname classname);
 

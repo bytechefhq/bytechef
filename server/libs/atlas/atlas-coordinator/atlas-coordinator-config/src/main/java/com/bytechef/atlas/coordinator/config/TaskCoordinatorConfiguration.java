@@ -26,6 +26,7 @@ import com.bytechef.atlas.coordinator.event.listener.ApplicationEventListener;
 import com.bytechef.atlas.coordinator.event.listener.ErrorEventListener;
 import com.bytechef.atlas.coordinator.event.listener.LogTaskApplicationEventListener;
 import com.bytechef.atlas.coordinator.event.listener.TaskExecutionErrorEventListener;
+import com.bytechef.atlas.coordinator.event.listener.TaskHeartbeatApplicationEventListener;
 import com.bytechef.atlas.coordinator.event.listener.TaskProgressedApplicationEventListener;
 import com.bytechef.atlas.coordinator.event.listener.TaskStartedApplicationEventListener;
 import com.bytechef.atlas.coordinator.job.JobExecutor;
@@ -48,11 +49,14 @@ import com.bytechef.evaluator.Evaluator;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * @author Arik Cohen
@@ -90,6 +94,9 @@ public class TaskCoordinatorConfiguration {
     private TaskFileStorage taskFileStorage;
 
     @Autowired
+    private ObjectProvider<PlatformTransactionManager> platformTransactionManagerObjectProvider;
+
+    @Autowired
     private WorkflowService workflowService;
 
     @Bean
@@ -99,8 +106,12 @@ public class TaskCoordinatorConfiguration {
 
     @Bean
     DefaultTaskCompletionHandler defaultTaskCompletionHandler() {
+        PlatformTransactionManager platformTransactionManager = platformTransactionManagerObjectProvider
+            .getIfAvailable();
+
         return new DefaultTaskCompletionHandler(
             contextService, evaluator, eventPublisher, jobExecutor(), jobService, taskExecutionService, taskFileStorage,
+            platformTransactionManager == null ? null : new TransactionTemplate(platformTransactionManager),
             workflowService);
     }
 
@@ -163,6 +174,11 @@ public class TaskCoordinatorConfiguration {
                 Stream.of(controlTaskDispatcher(), defaultTaskDispatcher())));
 
         return taskDispatcherChain;
+    }
+
+    @Bean
+    TaskHeartbeatApplicationEventListener taskHeartbeatEventListener() {
+        return new TaskHeartbeatApplicationEventListener(taskExecutionService);
     }
 
     @Bean

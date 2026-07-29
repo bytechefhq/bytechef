@@ -1,5 +1,6 @@
 dependencies {
     api("org.springframework:spring-context")
+    api("org.springframework:spring-tx")
     api(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
 
     implementation("org.apache.commons:commons-lang3")

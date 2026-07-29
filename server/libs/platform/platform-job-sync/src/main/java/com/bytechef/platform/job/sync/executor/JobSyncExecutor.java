@@ -214,9 +214,12 @@ public class JobSyncExecutor {
         JobExecutor jobExecutor = new JobExecutor(
             contextService, evaluator, taskDispatcherChain, taskExecutionService, taskFileStorage, workflowService);
 
+        // The sync executor runs against in-memory services with its own event publisher, so completion
+        // stays non-transactional here (null template = pre-transactional behavior, events publish
+        // immediately).
         DefaultTaskCompletionHandler defaultTaskCompletionHandler = new DefaultTaskCompletionHandler(
             contextService, evaluator, coordinatorEventPublisher, jobExecutor, jobService, taskExecutionService,
-            taskFileStorage, workflowService);
+            taskFileStorage, null, workflowService);
 
         TaskCompletionHandlerChain taskCompletionHandlerChain = new TaskCompletionHandlerChain();
 

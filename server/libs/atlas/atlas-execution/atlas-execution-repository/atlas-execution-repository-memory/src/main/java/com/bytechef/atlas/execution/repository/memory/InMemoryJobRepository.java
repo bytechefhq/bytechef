@@ -22,6 +22,7 @@ import com.bytechef.atlas.execution.repository.JobRepository;
 import com.bytechef.commons.util.RandomUtils;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -82,6 +83,44 @@ public class InMemoryJobRepository implements JobRepository {
         return ids.stream()
             .map(id -> cache.get(TenantCacheKeyUtils.getKey(id)))
             .filter(Objects::nonNull)
+            .toList();
+    }
+
+    @Override
+    public List<Job> findAllByStatusAndLastModifiedDateBefore(int status, Instant lastModifiedDate) {
+        return cache.values()
+            .stream()
+            .filter(job -> {
+                Job.Status jobStatus = job.getStatus();
+
+                return jobStatus != null && jobStatus.ordinal() == status && job.getLastModifiedDate() != null &&
+                    job.getLastModifiedDate()
+                        .isBefore(lastModifiedDate);
+            })
+            .toList();
+    }
+
+    @Override
+    public List<Job> findAllByStatusAndStartDateBefore(int status, Instant startDate) {
+        return cache.values()
+            .stream()
+            .filter(job -> {
+                Job.Status jobStatus = job.getStatus();
+
+                return jobStatus != null && jobStatus.ordinal() == status && job.getStartDate() != null &&
+                    job.getStartDate()
+                        .isBefore(startDate);
+            })
+            .toList();
+    }
+
+    @Override
+    public List<Job> findAllByEndDateBefore(Instant endDate) {
+        return cache.values()
+            .stream()
+            .filter(job -> job.getEndDate() != null &&
+                job.getEndDate()
+                    .isBefore(endDate))
             .toList();
     }
 

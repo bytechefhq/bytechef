@@ -12,6 +12,7 @@ import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.ee.remote.client.LoadBalancedRestClient;
 import com.bytechef.file.storage.domain.FileEntry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 import java.util.Map;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
@@ -32,6 +33,16 @@ public class RemoteContextServiceClient implements ContextService {
     @SuppressFBWarnings("EI")
     public RemoteContextServiceClient(LoadBalancedRestClient loadBalancedRestClient) {
         this.loadBalancedRestClient = loadBalancedRestClient;
+    }
+
+    @Override
+    public void deleteStackContexts(long stackId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<FileEntry> getStackFileEntries(long stackId) {
+        throw new UnsupportedOperationException();
     }
 
     @Override

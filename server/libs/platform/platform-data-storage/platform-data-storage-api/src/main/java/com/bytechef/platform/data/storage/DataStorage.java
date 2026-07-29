@@ -30,6 +30,15 @@ public interface DataStorage {
         String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
         PlatformType type);
 
+    /**
+     * Deletes every entry stored under the given scope and scope id, across all components, keys, environments and
+     * platform types. Used by job retention purging to drop {@code CURRENT_EXECUTION} leftovers (crash-orphaned
+     * checkpoints and the like) together with the job. Providers that cannot enumerate entries by scope (the
+     * file-storage provider, remote clients) throw {@link UnsupportedOperationException} and callers must treat that as
+     * a skip.
+     */
+    void deleteScopeData(DataStorageScope scope, String scopeId);
+
     <T> Optional<T> fetch(
         String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
         PlatformType type);

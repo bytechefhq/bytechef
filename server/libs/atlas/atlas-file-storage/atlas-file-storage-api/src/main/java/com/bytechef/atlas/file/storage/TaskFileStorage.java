@@ -25,6 +25,22 @@ import java.util.Map;
  */
 public interface TaskFileStorage {
 
+    /**
+     * Deletes a stored context value blob. Used by job deletion/retention purging; implementations should treat a
+     * missing blob as already deleted.
+     */
+    void deleteContextValue(FileEntry fileEntry);
+
+    /**
+     * Deletes a stored job-outputs blob.
+     */
+    void deleteJobOutputs(FileEntry fileEntry);
+
+    /**
+     * Deletes a stored task-execution output blob.
+     */
+    void deleteTaskExecutionOutput(FileEntry fileEntry);
+
     Map<String, ?> readContextValue(FileEntry fileEntry);
 
     Map<String, ?> readJobOutputs(FileEntry fileEntry);

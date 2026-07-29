@@ -93,5 +93,12 @@ public class FileDataStorageConfiguration {
 
             fileDataStorageService.delete(componentName, scope, scopeId, key, environmentId, type);
         }
+
+        @Override
+        public void deleteScopeData(DataStorageScope scope, String scopeId) {
+            // Entries are stored as one file per (componentName, scope, scopeId, key) under per-type/environment
+            // directories, so a scope-wide sweep would require listing every directory. Callers treat this as a skip.
+            throw new UnsupportedOperationException();
+        }
     }
 }

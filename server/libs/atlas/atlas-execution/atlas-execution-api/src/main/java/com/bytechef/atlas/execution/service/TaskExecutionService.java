@@ -39,6 +39,12 @@ public interface TaskExecutionService {
 
     List<TaskExecution> getJobTaskExecutions(long jobId);
 
+    /**
+     * Returns task executions with the given status whose last-modified timestamp is older than the given instant. With
+     * worker heartbeats refreshing STARTED rows, a stale STARTED row indicates a worker that died mid-task.
+     */
+    List<TaskExecution> getStaleTaskExecutions(TaskExecution.Status status, java.time.Instant lastModifiedDateBefore);
+
     List<TaskExecution> getParentTaskExecutions(long parentId);
 
     TaskExecution update(TaskExecution taskExecution);

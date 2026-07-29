@@ -14,11 +14,14 @@ import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.commons.util.OptionalUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
+import java.time.Instant;
+import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -58,6 +61,42 @@ public class RemoteJobServiceController {
             ResponseEntity
                 .noContent()
                 .build());
+    }
+
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = "/get-stale-jobs",
+        produces = {
+            "application/json"
+        })
+    public ResponseEntity<List<Job>> getStaleJobs(
+        @RequestParam("status") Job.Status status,
+        @RequestParam("lastModifiedDateBefore") Instant lastModifiedDateBefore) {
+
+        return ResponseEntity.ok(jobService.getStaleJobs(status, lastModifiedDateBefore));
+    }
+
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = "/get-long-running-jobs",
+        produces = {
+            "application/json"
+        })
+    public ResponseEntity<List<Job>> getLongRunningJobs(
+        @RequestParam("status") Job.Status status,
+        @RequestParam("startDateBefore") Instant startDateBefore) {
+
+        return ResponseEntity.ok(jobService.getLongRunningJobs(status, startDateBefore));
+    }
+
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = "/get-ended-jobs",
+        produces = {
+            "application/json"
+        })
+    public ResponseEntity<List<Job>> getEndedJobs(@RequestParam("endDateBefore") Instant endDateBefore) {
+        return ResponseEntity.ok(jobService.getEndedJobs(endDateBefore));
     }
 
     @RequestMapping(

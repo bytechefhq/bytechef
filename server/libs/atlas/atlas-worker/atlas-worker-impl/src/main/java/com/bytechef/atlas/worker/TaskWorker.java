@@ -22,6 +22,7 @@ import com.bytechef.atlas.configuration.domain.CancelControlTask;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
 import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
+import com.bytechef.atlas.coordinator.event.TaskHeartbeatApplicationEvent;
 import com.bytechef.atlas.coordinator.event.TaskStartedApplicationEvent;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.domain.TaskExecution.Status;
@@ -34,6 +35,7 @@ import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.message.event.MessageEvent;
+import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.time.Instant;
@@ -47,7 +49,9 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.apache.commons.lang3.Validate;
@@ -78,12 +82,23 @@ public class TaskWorker {
 
     public static final long DEFAULT_TIME_OUT = 24 * 60 * 60 * 1000; // 24 hours
 
+    private static final long HEARTBEAT_INTERVAL_SECONDS = 30;
+
     private final @Nullable Long defaultTimeout;
+    private final ScheduledExecutorService heartbeatExecutorService = Executors.newSingleThreadScheduledExecutor(
+        runnable -> {
+            Thread thread = new Thread(runnable, "task-worker-heartbeat");
+
+            thread.setDaemon(true);
+
+            return thread;
+        });
     private final Evaluator evaluator;
     private final ApplicationEventPublisher eventPublisher;
     private final AsyncTaskExecutor taskExecutor;
     private final TaskHandlerResolver taskHandlerResolver;
     private final Map<Long, TaskExecutionFuture<?>> taskExecutionFutureMap = new ConcurrentHashMap<>();
+    private final Map<Long, String> taskExecutionTenantIds = new ConcurrentHashMap<>();
     private final TaskFileStorage taskFileStorage;
     private final List<TaskExecutionPostOutputProcessor> taskExecutionPostOutputProcessors;
 
@@ -100,6 +115,9 @@ public class TaskWorker {
         this.taskHandlerResolver = taskHandlerResolver;
         this.taskFileStorage = taskFileStorage;
         this.taskExecutionPostOutputProcessors = taskExecutionPostOutputProcessors;
+
+        heartbeatExecutorService.scheduleAtFixedRate(
+            this::publishTaskHeartbeats, HEARTBEAT_INTERVAL_SECONDS, HEARTBEAT_INTERVAL_SECONDS, TimeUnit.SECONDS);
     }
 
     /**
@@ -141,6 +159,7 @@ public class TaskWorker {
         });
 
         taskExecutionFutureMap.put(taskExecution.getId(), new TaskExecutionFuture<>(taskExecution, future));
+        taskExecutionTenantIds.put(taskExecution.getId(), TenantContext.getCurrentTenantId());
 
         try {
             future.get(calculateTimeout(taskExecution), TimeUnit.MILLISECONDS);
@@ -158,6 +177,39 @@ public class TaskWorker {
             }
 
             taskExecutionFutureMap.remove(taskExecution.getId());
+            taskExecutionTenantIds.remove(taskExecution.getId());
+        }
+    }
+
+    /**
+     * Publishes a liveness heartbeat for every in-flight task execution so the coordinator can distinguish long-running
+     * tasks on a live worker from tasks orphaned by a worker crash. Published under the tenant captured at task
+     * receipt, since this runs on a scheduler thread with no tenant context of its own.
+     */
+    private void publishTaskHeartbeats() {
+        for (TaskExecutionFuture<?> taskExecutionFuture : taskExecutionFutureMap.values()) {
+            TaskExecution taskExecution = taskExecutionFuture.taskExecution;
+
+            Long taskExecutionId = taskExecution.getId();
+
+            if (taskExecutionId == null) {
+                continue;
+            }
+
+            String tenantId = taskExecutionTenantIds.get(taskExecutionId);
+
+            if (tenantId == null) {
+                continue;
+            }
+
+            try {
+                TenantContext.runWithTenantId(
+                    tenantId, () -> eventPublisher.publishEvent(new TaskHeartbeatApplicationEvent(taskExecutionId)));
+            } catch (Exception exception) {
+                if (log.isTraceEnabled()) {
+                    log.trace("Failed to publish heartbeat for task execution {}", taskExecutionId, exception);
+                }
+            }
         }
     }
 

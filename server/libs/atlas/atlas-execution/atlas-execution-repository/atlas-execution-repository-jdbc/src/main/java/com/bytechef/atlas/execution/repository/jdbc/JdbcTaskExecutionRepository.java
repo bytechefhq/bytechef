@@ -18,6 +18,7 @@ package com.bytechef.atlas.execution.repository.jdbc;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.repository.TaskExecutionRepository;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jdbc.repository.query.Query;
@@ -36,6 +37,9 @@ public interface JdbcTaskExecutionRepository
 
     @Override
     void deleteById(long id);
+
+    @Override
+    List<TaskExecution> findAllByStatusAndLastModifiedDateBefore(int status, Instant lastModifiedDate);
 
     @Override
     List<TaskExecution> findAllByJobIdOrderByCreatedDate(long jobId);

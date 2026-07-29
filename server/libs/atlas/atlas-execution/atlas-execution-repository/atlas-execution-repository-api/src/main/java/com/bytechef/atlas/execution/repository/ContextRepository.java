@@ -19,6 +19,7 @@
 package com.bytechef.atlas.execution.repository;
 
 import com.bytechef.atlas.execution.domain.Context;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.repository.NoRepositoryBean;
 
@@ -33,6 +34,23 @@ import org.springframework.data.repository.NoRepositoryBean;
  */
 @NoRepositoryBean
 public interface ContextRepository {
+
+    /**
+     * Every context row pushed for the given stack (a job id or a task execution id), all classnames and sub-stacks
+     * included. Used by job deletion to release the stored context blobs; the in-memory repository does not support
+     * this query.
+     *
+     * @param stackId the stack id
+     * @return List<Context>
+     */
+    List<Context> findAllByStackId(long stackId);
+
+    /**
+     * Deletes every context row for the given stack. The in-memory repository does not support this operation.
+     *
+     * @param stackId the stack id
+     */
+    void deleteAllByStackId(long stackId);
 
     Optional<Context> findTop1ByStackIdAndClassnameIdOrderByCreatedDateDesc(long stackId, int classnameId);
 

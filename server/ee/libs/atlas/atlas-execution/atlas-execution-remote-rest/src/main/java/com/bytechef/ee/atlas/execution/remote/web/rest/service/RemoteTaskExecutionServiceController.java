@@ -11,12 +11,14 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
+import java.time.Instant;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -47,6 +49,19 @@ public class RemoteTaskExecutionServiceController {
         })
     public ResponseEntity<TaskExecution> create(@RequestBody TaskExecution taskExecution) {
         return ResponseEntity.ok(taskExecutionService.create(taskExecution));
+    }
+
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = "/get-stale-task-executions",
+        produces = {
+            "application/json"
+        })
+    public ResponseEntity<List<TaskExecution>> getStaleTaskExecutions(
+        @RequestParam("status") TaskExecution.Status status,
+        @RequestParam("lastModifiedDateBefore") Instant lastModifiedDateBefore) {
+
+        return ResponseEntity.ok(taskExecutionService.getStaleTaskExecutions(status, lastModifiedDateBefore));
     }
 
     @RequestMapping(

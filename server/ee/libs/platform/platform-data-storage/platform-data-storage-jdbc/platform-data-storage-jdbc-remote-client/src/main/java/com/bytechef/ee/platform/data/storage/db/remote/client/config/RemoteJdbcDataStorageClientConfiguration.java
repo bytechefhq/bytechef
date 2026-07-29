@@ -89,5 +89,10 @@ public class RemoteJdbcDataStorageClientConfiguration {
 
             jdbcDataStorageService.delete(componentName, scope, scopeId, key, environmentId, type);
         }
+
+        @Override
+        public void deleteScopeData(DataStorageScope scope, String scopeId) {
+            jdbcDataStorageService.deleteScopeData(scope, scopeId);
+        }
     }
 }

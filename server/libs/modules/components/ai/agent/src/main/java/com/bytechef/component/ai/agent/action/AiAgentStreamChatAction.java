@@ -39,6 +39,7 @@ import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.context.EnvironmentContextThreadLocalAccessor;
 import com.bytechef.platform.configuration.domain.Environment;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -92,6 +93,7 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
 
     public class ChatActionDefinitionWrapper extends AbstractActionDefinitionWrapper {
 
+        @SuppressFBWarnings("EI_EXPOSE_REP2")
         public ChatActionDefinitionWrapper(ActionDefinition actionDefinition) {
             super(actionDefinition);
         }

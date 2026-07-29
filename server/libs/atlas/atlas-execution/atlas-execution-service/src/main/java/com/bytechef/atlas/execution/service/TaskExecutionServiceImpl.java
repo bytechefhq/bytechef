@@ -85,6 +85,14 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
     }
 
     @Override
+    public List<TaskExecution> getStaleTaskExecutions(
+        TaskExecution.Status status, java.time.Instant lastModifiedDateBefore) {
+
+        return taskExecutionRepository.findAllByStatusAndLastModifiedDateBefore(
+            status.ordinal(), lastModifiedDateBefore);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public List<TaskExecution> getParentTaskExecutions(long parentId) {
         return taskExecutionRepository.findAllByParentIdOrderByTaskNumber(parentId);

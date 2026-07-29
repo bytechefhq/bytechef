@@ -19,6 +19,7 @@
 package com.bytechef.atlas.execution.repository;
 
 import com.bytechef.atlas.execution.domain.Job;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -49,6 +50,35 @@ public interface JobRepository {
     List<Long> findAllIdsByParentJobId(Long parentJobId);
 
     List<Job> findAllByWorkflowId(String workflowId);
+
+    /**
+     * Returns jobs with the given status whose last-modified timestamp is older than the given instant. Used by orphan
+     * detection to find jobs wedged in STARTED with no live task execution.
+     *
+     * @param status           the status ordinal
+     * @param lastModifiedDate the staleness cutoff
+     * @return List<Job>
+     */
+    List<Job> findAllByStatusAndLastModifiedDateBefore(int status, Instant lastModifiedDate);
+
+    /**
+     * Jobs in the given status whose start date is older than the cutoff — the finder behind the per-run execution
+     * timeout monitor.
+     *
+     * @param status    the status ordinal
+     * @param startDate the run-duration cutoff
+     * @return List<Job>
+     */
+    List<Job> findAllByStatusAndStartDateBefore(int status, Instant startDate);
+
+    /**
+     * Jobs whose end date is older than the cutoff. Only terminal jobs carry an end date, so this finder returns
+     * finished runs eligible for retention purging regardless of their terminal status.
+     *
+     * @param endDate the retention cutoff
+     * @return List<Job>
+     */
+    List<Job> findAllByEndDateBefore(Instant endDate);
 
     Optional<Job> findById(Long id);
 

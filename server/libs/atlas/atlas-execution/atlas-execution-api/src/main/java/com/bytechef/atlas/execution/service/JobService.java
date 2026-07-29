@@ -46,6 +46,24 @@ public interface JobService {
 
     List<Job> getJobs(List<Long> ids);
 
+    /**
+     * Returns jobs with the given status whose last-modified timestamp is older than the given instant. Used by orphan
+     * detection to find jobs wedged in STARTED with no live task execution.
+     */
+    List<Job> getStaleJobs(Job.Status status, java.time.Instant lastModifiedDateBefore);
+
+    /**
+     * Jobs in the given status started before the cutoff — used by the per-run execution timeout monitor. Remote-client
+     * deployments may not support this query and throw {@link UnsupportedOperationException}.
+     */
+    List<Job> getLongRunningJobs(Job.Status status, java.time.Instant startDateBefore);
+
+    /**
+     * Terminal jobs whose end date is older than the cutoff — used by the retention purge monitor. Only terminal jobs
+     * carry an end date, so status filtering is unnecessary.
+     */
+    List<Job> getEndedJobs(java.time.Instant endDateBefore);
+
     Page<Job> getJobsPage(int pageNumber);
 
     Job getTaskExecutionJob(long taskExecutionId);

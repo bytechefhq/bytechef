@@ -19,6 +19,7 @@
 package com.bytechef.atlas.execution.repository;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,6 +36,16 @@ public interface TaskExecutionRepository {
      * @return
      */
     List<TaskExecution> findAll();
+
+    /**
+     * Returns task executions with the given status whose last-modified timestamp is older than the given instant. Used
+     * by orphan detection: with worker heartbeats refreshing STARTED rows, a stale STARTED row indicates a dead worker.
+     *
+     * @param status           the status ordinal
+     * @param lastModifiedDate the staleness cutoff
+     * @return List<TaskExecution>
+     */
+    List<TaskExecution> findAllByStatusAndLastModifiedDateBefore(int status, Instant lastModifiedDate);
 
     /**
      * Returns the execution steps of the given job

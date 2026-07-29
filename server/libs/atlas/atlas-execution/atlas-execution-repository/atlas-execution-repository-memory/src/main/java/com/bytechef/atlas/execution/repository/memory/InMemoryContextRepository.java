@@ -25,6 +25,7 @@ import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
@@ -37,6 +38,18 @@ public class InMemoryContextRepository implements ContextRepository {
 
     private final ConcurrentHashMap<String, Deque<FileEntry>> cache = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, ReentrantLock> locks = new ConcurrentHashMap<>();
+
+    @Override
+    public List<Context> findAllByStackId(long stackId) {
+        // Cache keys are opaque tenant-scoped hashes, so rows cannot be enumerated by stack id. Job deletion is not a
+        // sync-executor (in-memory) code path.
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void deleteAllByStackId(long stackId) {
+        throw new UnsupportedOperationException();
+    }
 
     @Override
     public Optional<Context> findTop1ByStackIdAndClassnameIdOrderByCreatedDateDesc(long stackId, int classnameId) {

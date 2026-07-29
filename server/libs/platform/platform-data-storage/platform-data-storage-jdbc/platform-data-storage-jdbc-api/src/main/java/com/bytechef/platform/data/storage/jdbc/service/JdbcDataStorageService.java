@@ -30,6 +30,12 @@ public interface JdbcDataStorageService {
         String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
         PlatformType type);
 
+    /**
+     * Deletes every entry stored under the given scope and scope id, across all components, keys, environments and
+     * platform types.
+     */
+    void deleteScopeData(DataStorageScope scope, String scopeId);
+
     <T> Optional<T> fetch(
         String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
         PlatformType type);

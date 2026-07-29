@@ -19,6 +19,7 @@ package com.bytechef.atlas.execution.service;
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.repository.ContextRepository;
 import com.bytechef.file.storage.domain.FileEntry;
+import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
@@ -29,6 +30,20 @@ public class ContextServiceImpl implements ContextService {
 
     public ContextServiceImpl(ContextRepository contextRepository) {
         this.contextRepository = contextRepository;
+    }
+
+    @Override
+    public void deleteStackContexts(long stackId) {
+        contextRepository.deleteAllByStackId(stackId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<FileEntry> getStackFileEntries(long stackId) {
+        return contextRepository.findAllByStackId(stackId)
+            .stream()
+            .map(Context::getValue)
+            .toList();
     }
 
     @Override
