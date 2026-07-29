@@ -13,6 +13,7 @@ import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectTagDT
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectVersionDTO;
 import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @version ee
@@ -25,6 +26,15 @@ public interface AutomationWorkflowProjectFacade {
         String name, String description, String category, List<String> tags, String permissionExpression);
 
     String duplicateProjectWorkflow(String workflowId);
+
+    /**
+     * Resolves the id of the marked catalog {@link com.bytechef.automation.configuration.domain.Project} backing the
+     * embedded automation workflow project named {@code name}, if one has already been deployed.
+     *
+     * @param name the display name of the embedded automation workflow project (without the internal marker prefix)
+     * @return the catalog project id, or an empty {@link Optional} if no such project has been deployed yet
+     */
+    Optional<Long> fetchProjectIdByName(String name);
 
     long duplicateProject(long projectId);
 

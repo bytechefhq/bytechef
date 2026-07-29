@@ -12,6 +12,7 @@ import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -71,6 +72,11 @@ public class RemoteConnectedUserServiceClient implements ConnectedUserService {
         Environment environment, String name, LocalDate createDateFrom, LocalDate createDateTo, Long integrationId,
         int pageNumber) {
 
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<ConnectedUser> getConnectedUsers(List<Long> ids) {
         throw new UnsupportedOperationException();
     }
 

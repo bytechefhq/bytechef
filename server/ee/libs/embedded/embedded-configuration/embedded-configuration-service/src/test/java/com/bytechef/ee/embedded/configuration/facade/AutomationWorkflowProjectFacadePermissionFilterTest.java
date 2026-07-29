@@ -19,6 +19,7 @@ import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowService;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
@@ -53,6 +54,7 @@ class AutomationWorkflowProjectFacadePermissionFilterTest {
     private final ConnectedUserService connectedUserService = mock(ConnectedUserService.class);
     private final EmbeddedPermissionEvaluator embeddedPermissionEvaluator =
         new EmbeddedPermissionEvaluator(SpelEvaluator.create());
+    private final ProjectCodeWorkflowService projectCodeWorkflowService = mock(ProjectCodeWorkflowService.class);
     private final ProjectService projectService = mock(ProjectService.class);
     private final ProjectWorkflowFacade projectWorkflowFacade = mock(ProjectWorkflowFacade.class);
     private final ProjectWorkflowService projectWorkflowService = mock(ProjectWorkflowService.class);
@@ -65,8 +67,8 @@ class AutomationWorkflowProjectFacadePermissionFilterTest {
 
     private final AutomationWorkflowProjectFacadeImpl facade = new AutomationWorkflowProjectFacadeImpl(
         categoryService, componentDefinitionService, connectedUserService, embeddedPermissionEvaluator,
-        projectService, projectWorkflowFacade, projectWorkflowService, tagService, workflowNodeTestOutputService,
-        workflowService, workflowTestConfigurationService);
+        projectCodeWorkflowService, projectService, projectWorkflowFacade, projectWorkflowService, tagService,
+        workflowNodeTestOutputService, workflowService, workflowTestConfigurationService);
 
     @Test
     void testGetPublishedProjectsHidesProjectWhenExpressionIsFalse() {

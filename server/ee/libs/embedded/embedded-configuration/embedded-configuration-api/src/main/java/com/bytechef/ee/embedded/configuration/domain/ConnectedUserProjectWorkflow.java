@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.configuration.domain;
 
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.time.Instant;
 import java.util.Objects;
 import org.springframework.data.annotation.CreatedBy;
@@ -43,6 +44,24 @@ public class ConnectedUserProjectWorkflow {
     @Column("workflow_version")
     private Integer workflowVersion;
 
+    @Column("catalog_workflow_uuid")
+    private String catalogWorkflowUuid;
+
+    @Column("copied_from_workflow_uuid")
+    private String copiedFromWorkflowUuid;
+
+    @Column("project_deployment_id")
+    private Long projectDeploymentId;
+
+    @Column
+    private boolean enabled = true;
+
+    @Column
+    private boolean dangling;
+
+    @Column("dangling_reason")
+    private String danglingReason;
+
     @CreatedBy
     @Column("created_by")
     private String createdBy;
@@ -67,12 +86,19 @@ public class ConnectedUserProjectWorkflow {
 
     @PersistenceCreator
     public ConnectedUserProjectWorkflow(
-        Long id, Long connectedUserProjectId, Long projectWorkflowId, Integer workflowVersion, int version) {
+        Long id, Long connectedUserProjectId, @Nullable Long projectWorkflowId, Integer workflowVersion,
+        @Nullable String catalogWorkflowUuid, @Nullable Long projectDeploymentId, boolean enabled, boolean dangling,
+        @Nullable String danglingReason, int version) {
 
         this.id = id;
         this.connectedUserProjectId = AggregateReference.to(connectedUserProjectId);
-        this.projectWorkflowId = AggregateReference.to(projectWorkflowId);
+        this.projectWorkflowId = projectWorkflowId == null ? null : AggregateReference.to(projectWorkflowId);
         this.workflowVersion = workflowVersion;
+        this.catalogWorkflowUuid = catalogWorkflowUuid;
+        this.projectDeploymentId = projectDeploymentId;
+        this.enabled = enabled;
+        this.dangling = dangling;
+        this.danglingReason = danglingReason;
         this.version = version;
     }
 
@@ -102,8 +128,67 @@ public class ConnectedUserProjectWorkflow {
         return connectedUserProjectId.getId();
     }
 
+    @Nullable
     public Long getProjectWorkflowId() {
-        return projectWorkflowId.getId();
+        return projectWorkflowId == null ? null : projectWorkflowId.getId();
+    }
+
+    @Nullable
+    public String getCatalogWorkflowUuid() {
+        return catalogWorkflowUuid;
+    }
+
+    public void setCatalogWorkflowUuid(@Nullable String catalogWorkflowUuid) {
+        this.catalogWorkflowUuid = catalogWorkflowUuid;
+    }
+
+    /**
+     * Set only on a copy-mode row provisioned implicitly by a sync {@code POST /workflows/{workflowUuid}} call against
+     * a visual template's catalog uuid; records that catalog uuid so a repeated call against the same template resolves
+     * this row instead of provisioning a second copy. Null for copy-mode rows created through any other path
+     * (blank-workflow creation, prompt generation, the explicit copy endpoint) and for every reference-mode row.
+     */
+    @Nullable
+    public String getCopiedFromWorkflowUuid() {
+        return copiedFromWorkflowUuid;
+    }
+
+    public void setCopiedFromWorkflowUuid(@Nullable String copiedFromWorkflowUuid) {
+        this.copiedFromWorkflowUuid = copiedFromWorkflowUuid;
+    }
+
+    @Nullable
+    public Long getProjectDeploymentId() {
+        return projectDeploymentId;
+    }
+
+    public void setProjectDeploymentId(@Nullable Long projectDeploymentId) {
+        this.projectDeploymentId = projectDeploymentId;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public boolean isDangling() {
+        return dangling;
+    }
+
+    public void setDangling(boolean dangling) {
+        this.dangling = dangling;
+    }
+
+    @Nullable
+    public String getDanglingReason() {
+        return danglingReason;
+    }
+
+    public void setDanglingReason(@Nullable String danglingReason) {
+        this.danglingReason = danglingReason;
     }
 
     public String getCreatedBy() {
@@ -138,8 +223,8 @@ public class ConnectedUserProjectWorkflow {
         this.connectedUserProjectId = AggregateReference.to(connectedUserProjectId);
     }
 
-    public void setProjectWorkflowId(Long projectWorkflowId) {
-        this.projectWorkflowId = AggregateReference.to(projectWorkflowId);
+    public void setProjectWorkflowId(@Nullable Long projectWorkflowId) {
+        this.projectWorkflowId = projectWorkflowId == null ? null : AggregateReference.to(projectWorkflowId);
     }
 
     public void setVersion(int version) {
@@ -157,6 +242,12 @@ public class ConnectedUserProjectWorkflow {
             ", connectedUserProjectId=" + connectedUserProjectId +
             ", projectWorkflowId=" + projectWorkflowId +
             ", workflowVersion=" + workflowVersion +
+            ", catalogWorkflowUuid='" + catalogWorkflowUuid + '\'' +
+            ", copiedFromWorkflowUuid='" + copiedFromWorkflowUuid + '\'' +
+            ", projectDeploymentId=" + projectDeploymentId +
+            ", enabled=" + enabled +
+            ", dangling=" + dangling +
+            ", danglingReason='" + danglingReason + '\'' +
             ", createdBy='" + createdBy + '\'' +
             ", createdDate=" + createdDate +
             ", lastModifiedBy='" + lastModifiedBy + '\'' +

@@ -79,7 +79,7 @@ class McpIntegrationInstanceWorkflowApiController {
     }
 
     @SuppressWarnings("PMD.UnusedFormalParameter")
-    @PostMapping("/external/{externalUserId}/integration-instances/{id}/mcp-workflows/{workflowUuid}/enable")
+    @PostMapping("/{externalUserId}/integration-instances/{id}/mcp-workflows/{workflowUuid}/enable")
     public ResponseEntity<Void> enableMcpIntegrationInstanceWorkflow(
         @PathVariable String externalUserId, @PathVariable Long id, @PathVariable String workflowUuid) {
 
@@ -92,7 +92,7 @@ class McpIntegrationInstanceWorkflowApiController {
     }
 
     @SuppressWarnings("PMD.UnusedFormalParameter")
-    @DeleteMapping("/external/{externalUserId}/integration-instances/{id}/mcp-workflows/{workflowUuid}/enable")
+    @DeleteMapping("/{externalUserId}/integration-instances/{id}/mcp-workflows/{workflowUuid}/enable")
     public ResponseEntity<Void> disableMcpIntegrationInstanceWorkflow(
         @PathVariable String externalUserId, @PathVariable Long id, @PathVariable String workflowUuid) {
 

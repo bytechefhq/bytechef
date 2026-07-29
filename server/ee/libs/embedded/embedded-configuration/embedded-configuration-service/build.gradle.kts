@@ -25,6 +25,8 @@ dependencies {
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-validator:platform-workflow-validator-api"))
 
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-api"))
+    implementation(project(":server:ee:libs:automation:automation-code-workflow-loader"))
+    implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-api"))
     implementation(project(":server:ee:libs:embedded:embedded-code-workflow-loader"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-api"))
     implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-api"))
@@ -36,6 +38,7 @@ dependencies {
     testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-service"))
     testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-jdbc"))
     testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-service"))
+    testImplementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-service"))
     testImplementation(project(":server:libs:config:liquibase-config"))
     testImplementation(project(":server:libs:core:encryption:encryption-impl"))
     testImplementation(project(":server:libs:core:evaluator:evaluator-impl"))

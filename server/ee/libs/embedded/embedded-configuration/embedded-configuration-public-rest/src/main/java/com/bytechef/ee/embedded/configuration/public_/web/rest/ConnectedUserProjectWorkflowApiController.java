@@ -9,6 +9,8 @@ package com.bytechef.ee.embedded.configuration.public_.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.ee.embedded.configuration.exception.MissingConnectionException;
+import com.bytechef.ee.embedded.configuration.facade.ConnectedUserCodeWorkflowReferenceFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.converter.CaseInsensitiveEnumPropertyEditorSupport;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ConnectedUserProjectWorkflowModel;
@@ -23,6 +25,7 @@ import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.HttpStatus;
@@ -44,15 +47,18 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnEEVersion
 public class ConnectedUserProjectWorkflowApiController implements ConnectedUserProjectWorkflowApi {
 
+    private final ConnectedUserCodeWorkflowReferenceFacade connectedUserCodeWorkflowReferenceFacade;
     private final ConnectedUserProjectFacade connectedUserProjectFacade;
     private final ConversionService conversionService;
     private final EnvironmentService environmentService;
 
     @SuppressFBWarnings("EI")
     public ConnectedUserProjectWorkflowApiController(
+        ConnectedUserCodeWorkflowReferenceFacade connectedUserCodeWorkflowReferenceFacade,
         ConnectedUserProjectFacade connectedUserProjectFacade, ConversionService conversionService,
         EnvironmentService environmentService) {
 
+        this.connectedUserCodeWorkflowReferenceFacade = connectedUserCodeWorkflowReferenceFacade;
         this.connectedUserProjectFacade = connectedUserProjectFacade;
         this.conversionService = conversionService;
         this.environmentService = environmentService;
@@ -110,53 +116,64 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
     }
 
     @Override
-    public ResponseEntity<Void> disableFrontendProjectWorkflow(
+    public ResponseEntity<Object> disableFrontendProjectWorkflow(
         String workflowUuid, EnvironmentModel xEnvironment) {
 
-        connectedUserProjectFacade.enableProjectWorkflow(
+        return doEnableProjectWorkflow(
             OptionalUtils.get(SecurityUtils.fetchCurrentUserLogin(), "User not found"), workflowUuid, false,
-            (long) getEnvironment(xEnvironment).ordinal());
-
-        return ResponseEntity.noContent()
-            .build();
+            xEnvironment);
     }
 
     @Override
-    public ResponseEntity<Void> disableProjectWorkflow(
+    public ResponseEntity<Object> disableProjectWorkflow(
         String externalUserId, String workflowUuid, EnvironmentModel xEnvironment) {
 
         SecurityUtils.checkCurrentUserLogin(externalUserId);
 
-        connectedUserProjectFacade.enableProjectWorkflow(
+        return doEnableProjectWorkflow(
             OptionalUtils.get(SecurityUtils.fetchCurrentUserLogin(), "User not found"), workflowUuid, false,
-            (long) getEnvironment(xEnvironment).ordinal());
-
-        return ResponseEntity.noContent()
-            .build();
+            xEnvironment);
     }
 
     @Override
     @CrossOrigin
-    public ResponseEntity<Void> enableFrontendProjectWorkflow(
+    public ResponseEntity<Object> enableFrontendProjectWorkflow(
         String workflowUuid, EnvironmentModel xEnvironment) {
 
-        connectedUserProjectFacade.enableProjectWorkflow(
+        return doEnableProjectWorkflow(
             OptionalUtils.get(SecurityUtils.fetchCurrentUserLogin(), "User not found"), workflowUuid, true,
-            (long) getEnvironment(xEnvironment).ordinal());
-
-        return ResponseEntity.noContent()
-            .build();
+            xEnvironment);
     }
 
     @Override
-    public ResponseEntity<Void> enableProjectWorkflow(
+    public ResponseEntity<Object> enableProjectWorkflow(
         String externalUserId, String workflowUuid, EnvironmentModel xEnvironment) {
 
         SecurityUtils.checkCurrentUserLogin(externalUserId);
 
-        connectedUserProjectFacade.enableProjectWorkflow(
+        return doEnableProjectWorkflow(
             OptionalUtils.get(SecurityUtils.fetchCurrentUserLogin(), "User not found"), workflowUuid, true,
-            (long) getEnvironment(xEnvironment).ordinal());
+            xEnvironment);
+    }
+
+    /**
+     * Shared by all four enable/disable endpoints (frontend and externalUserId-scoped, enable and disable): a
+     * workflowUuid that resolves to one of the caller's automation-bridge reference rows can surface
+     * {@link MissingConnectionException} out of
+     * {@link ConnectedUserProjectFacade#enableProjectWorkflow(String, String, boolean, Long)} the same way
+     * {@link #provisionWorkflowReference} already does, so it must be mapped to the same 409 shape here instead of
+     * propagating as an unhandled 500.
+     */
+    private ResponseEntity<Object> doEnableProjectWorkflow(
+        String externalUserId, String workflowUuid, boolean enable, EnvironmentModel xEnvironment) {
+
+        try {
+            connectedUserProjectFacade.enableProjectWorkflow(
+                externalUserId, workflowUuid, enable, (long) getEnvironment(xEnvironment).ordinal());
+        } catch (MissingConnectionException missingConnectionException) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Map.of("missingConnectionComponentName", missingConnectionException.getComponentName()));
+        }
 
         return ResponseEntity.noContent()
             .build();
@@ -394,6 +411,37 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
         return ResponseEntity.ok(
             connectedUserProjectFacade.updateProjectWorkflow(
                 externalUserId, workflowUuid, requestModel.getPrompt(), getEnvironment(xEnvironment), true));
+    }
+
+    @Override
+    public ResponseEntity<Object> provisionWorkflowReference(
+        String externalUserId, String workflowUuid, EnvironmentModel xEnvironment) {
+
+        SecurityUtils.checkCurrentUserLogin(externalUserId);
+
+        try {
+            connectedUserCodeWorkflowReferenceFacade.getOrCreateReference(
+                externalUserId, workflowUuid, getEnvironment(xEnvironment));
+        } catch (MissingConnectionException missingConnectionException) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Map.of("missingConnectionComponentName", missingConnectionException.getComponentName()));
+        }
+
+        return ResponseEntity.noContent()
+            .build();
+    }
+
+    @Override
+    public ResponseEntity<Void> deprovisionWorkflowReference(
+        String externalUserId, String workflowUuid, EnvironmentModel xEnvironment) {
+
+        SecurityUtils.checkCurrentUserLogin(externalUserId);
+
+        connectedUserCodeWorkflowReferenceFacade.deleteReference(
+            externalUserId, workflowUuid, getEnvironment(xEnvironment));
+
+        return ResponseEntity.noContent()
+            .build();
     }
 
     @InitBinder

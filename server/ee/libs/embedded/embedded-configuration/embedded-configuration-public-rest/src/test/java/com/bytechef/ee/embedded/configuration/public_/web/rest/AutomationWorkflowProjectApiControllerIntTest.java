@@ -79,7 +79,7 @@ public class AutomationWorkflowProjectApiControllerIntTest {
 
         AutomationWorkflowProjectDTO projectDTO = new AutomationWorkflowProjectDTO(
             PROJECT_ID, "Onboarding Project", "New user onboarding automations", null, List.of(), true, 1, 1,
-            List.of(workflowDTO), null);
+            List.of(workflowDTO), null, false);
 
         when(automationWorkflowProjectFacade.getPublishedProjects())
             .thenReturn(List.of(projectDTO));
@@ -108,7 +108,35 @@ public class AutomationWorkflowProjectApiControllerIntTest {
                 .jsonPath("$[0].workflowTemplates[0].components[0].title")
                 .isEqualTo("Gmail")
                 .jsonPath("$[0].workflowTemplates[0].components[0].icon")
-                .isEqualTo("gmail-icon-svg");
+                .isEqualTo("gmail-icon-svg")
+                .jsonPath("$[0].kind")
+                .isEqualTo("COPY");
+        } catch (Exception exception) {
+            Assertions.fail(exception);
+        }
+    }
+
+    @Test
+    @WithMockUser(username = "user@example.com")
+    public void testGetFrontendProjectsReturnsReferenceKindForCodeWorkflowProject() {
+        AutomationWorkflowProjectDTO projectDTO = new AutomationWorkflowProjectDTO(
+            PROJECT_ID, "Code Workflow Project", "A project backed by a code workflow", null, List.of(), true, 1, 1,
+            List.of(), null, true);
+
+        when(automationWorkflowProjectFacade.getPublishedProjects())
+            .thenReturn(List.of(projectDTO));
+
+        try {
+            webTestClient
+                .get()
+                .uri("/v1/automation/projects")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$[0].kind")
+                .isEqualTo("REFERENCE");
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
@@ -143,7 +171,7 @@ public class AutomationWorkflowProjectApiControllerIntTest {
     public void testGetFrontendProjectsUnpublishedProjectHasEmptyWorkflows() {
         AutomationWorkflowProjectDTO unpublishedProjectDTO = new AutomationWorkflowProjectDTO(
             PROJECT_ID + 1, "Draft Project", "A project with no published version", null, List.of(), false, 1, null,
-            List.of(), null);
+            List.of(), null, false);
 
         when(automationWorkflowProjectFacade.getPublishedProjects())
             .thenReturn(List.of(unpublishedProjectDTO));

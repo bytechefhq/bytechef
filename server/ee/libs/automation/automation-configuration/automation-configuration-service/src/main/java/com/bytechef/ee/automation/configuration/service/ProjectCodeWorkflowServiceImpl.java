@@ -48,7 +48,18 @@ public class ProjectCodeWorkflowServiceImpl implements ProjectCodeWorkflowServic
         return projectCodeWorkflowRepository.findDistinctProjectIds();
     }
 
+    /**
+     * {@code noRollbackFor} is required here: {@code AutomationWorkflowProjectCodeWorkflowFacadeImpl
+     * #fetchPreviousWorkflowUuidsByName} calls this method expecting to catch {@link IllegalArgumentException} as
+     * normal control flow for "no previous deploy yet" -- but without {@code noRollbackFor}, Spring's default
+     * {@code globalRollbackOnParticipationFailure} behavior marks the CALLER's (participating) transaction
+     * rollback-only the instant this method's own {@code @Transactional} proxy sees the exception, regardless of
+     * whether the caller catches it afterward. That poisons the whole {@code save()} transaction on every first deploy
+     * of a project (no {@link ProjectCodeWorkflow} row yet), surfacing only against a real transactional datasource --
+     * mocked unit tests never exercise the real proxy chain, so they never catch it.
+     */
     @Override
+    @Transactional(noRollbackFor = IllegalArgumentException.class)
     public ProjectCodeWorkflow getProjectCodeWorkflow(long projectId) {
         return projectCodeWorkflowRepository.findFirstByProjectIdOrderByIdDesc(projectId)
             .orElseThrow(

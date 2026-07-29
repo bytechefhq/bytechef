@@ -12,6 +12,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 /**
@@ -35,6 +36,11 @@ public class RemoteIntegrationWorkflowServiceClient implements IntegrationWorkfl
 
     @Override
     public void delete(long projectId, int projectVersion, String workflowId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Optional<String> fetchLastWorkflowId(String workflowUuid, Environment environment) {
         throw new UnsupportedOperationException();
     }
 

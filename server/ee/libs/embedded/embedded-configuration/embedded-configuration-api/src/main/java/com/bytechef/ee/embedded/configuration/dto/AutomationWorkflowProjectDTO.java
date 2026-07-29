@@ -19,5 +19,5 @@ import java.util.List;
 public record AutomationWorkflowProjectDTO(
     long id, String name, String description, Long categoryId, List<Long> tagIds, boolean published, int version,
     Integer lastPublishedVersion, List<ConnectedUserWorkflowTemplateDTO> workflowTemplates,
-    String permissionExpression) {
+    String permissionExpression, boolean codeWorkflowProject) {
 }

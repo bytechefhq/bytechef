@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <!-- Reference mode: catalog_workflow_uuid non-null means this row points at a shared catalog
+         ProjectWorkflow instead of holding a per-user copy. project_workflow_id becomes optional
+         because a reference row has no copy to point at. -->
+    <changeSet id="20260727120000-1" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="connected_user_project_workflow" columnName="catalog_workflow_uuid"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="connected_user_project_workflow">
+            <column name="catalog_workflow_uuid" type="VARCHAR(36)"/>
+            <column name="project_deployment_id" type="BIGINT"/>
+            <column name="enabled" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="dangling" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="dangling_reason" type="VARCHAR(255)"/>
+        </addColumn>
+
+        <dropNotNullConstraint
+            tableName="connected_user_project_workflow" columnName="project_workflow_id" columnDataType="BIGINT"/>
+    </changeSet>
+
+    <changeSet id="20260727120000-2" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="connected_user_project_workflow_connection"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="connected_user_project_workflow_connection">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="connected_user_project_workflow_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="workflow_node_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="connection_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint
+            tableName="connected_user_project_workflow_connection"
+            columnNames="connected_user_project_workflow_id, workflow_node_name"/>
+
+        <addForeignKeyConstraint
+            baseTableName="connected_user_project_workflow_connection"
+            baseColumnNames="connected_user_project_workflow_id"
+            constraintName="fk_cupwc_connected_user_project_workflow"
+            referencedTableName="connected_user_project_workflow"
+            referencedColumnNames="id"/>
+    </changeSet>
+
+    <!-- XOR constraint: a row must be either copy-mode (project_workflow_id non-null) or reference-mode
+         (catalog_workflow_uuid non-null), never both or neither. -->
+    <changeSet id="20260727120000-3" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) FROM pg_constraint WHERE conname = 'ck_cupw_project_or_catalog_not_both'
+            </sqlCheck>
+        </preConditions>
+
+        <sql>
+            ALTER TABLE connected_user_project_workflow
+            ADD CONSTRAINT ck_cupw_project_or_catalog_not_both
+            CHECK ((project_workflow_id IS NOT NULL) != (catalog_workflow_uuid IS NOT NULL))
+        </sql>
+
+        <rollback>
+            <sql>ALTER TABLE connected_user_project_workflow DROP CONSTRAINT IF EXISTS ck_cupw_project_or_catalog_not_both;</sql>
+        </rollback>
+    </changeSet>
+
+    <!-- Closes the concurrent-first-call duplicate-row race: two parallel requests for the same
+         (connected user project, catalog workflow uuid) can each observe "no reference exists yet" and
+         separately insert a reference row. Partial index (predicate WHERE catalog_workflow_uuid IS NOT
+         NULL) so copy-mode rows, whose catalog_workflow_uuid is always null, never collide on the index. -->
+    <changeSet id="20260727120000-4" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) FROM pg_indexes WHERE indexname = 'uk_cupw_connected_user_project_id_catalog_workflow_uuid'
+            </sqlCheck>
+        </preConditions>
+
+        <sql>
+            CREATE UNIQUE INDEX uk_cupw_connected_user_project_id_catalog_workflow_uuid
+            ON connected_user_project_workflow (connected_user_project_id, catalog_workflow_uuid)
+            WHERE catalog_workflow_uuid IS NOT NULL
+        </sql>
+
+        <rollback>
+            <sql>DROP INDEX IF EXISTS uk_cupw_connected_user_project_id_catalog_workflow_uuid;</sql>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

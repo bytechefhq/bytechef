@@ -1,4 +1,8 @@
 ---
+# NOTE: any route defined below with NO {externalUserId} path parameter (e.g. /me, /automation/**, /components/**,
+# /integration-instances/**, /integrations/**) is JWT-only by design -- add its literal first path segment to
+# ConnectedUserConstants.FRONTEND_RESERVED_PATH_SEGMENTS (embedded-connected-user-api) so
+# EmbeddedApiKeyAuthenticationConverter rejects non-JWT tokens on it instead of minting a phantom ConnectedUser.
 openapi: "3.0.1"
 info:
   title: "The Embedded Public V1 API"

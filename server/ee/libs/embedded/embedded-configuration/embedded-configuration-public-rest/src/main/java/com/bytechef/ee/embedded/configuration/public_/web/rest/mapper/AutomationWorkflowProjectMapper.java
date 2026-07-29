@@ -29,6 +29,7 @@ public interface AutomationWorkflowProjectMapper
     extends Converter<AutomationWorkflowProjectDTO, AutomationWorkflowProjectModel> {
 
     @Override
+    @Mapping(target = "kind", source = "codeWorkflowProject")
     AutomationWorkflowProjectModel convert(AutomationWorkflowProjectDTO automationWorkflowProjectDTO);
 
     AutomationWorkflowProjectComponentModel toComponentModel(ConnectedUserWorkflowTemplateDTO.Component component);
@@ -36,4 +37,15 @@ public interface AutomationWorkflowProjectMapper
     @Mapping(target = "id", source = "workflowUuid")
     AutomationWorkflowProjectWorkflowTemplateModel toWorkflowTemplateModel(
         ConnectedUserWorkflowTemplateDTO workflowTemplateDTO);
+
+    /**
+     * A catalog project's {@code kind} tells clients whether copying one of its workflow templates creates a per-user
+     * copy ({@code COPY}) or a shared reference ({@code REFERENCE}); the boolean-to-enum conversion is expressed here
+     * so MapStruct can wire it directly into the generated {@link #convert} implementation.
+     */
+    default AutomationWorkflowProjectModel.KindEnum mapKind(boolean codeWorkflowProject) {
+        return codeWorkflowProject
+            ? AutomationWorkflowProjectModel.KindEnum.REFERENCE
+            : AutomationWorkflowProjectModel.KindEnum.COPY;
+    }
 }

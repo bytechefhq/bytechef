@@ -52,6 +52,11 @@ public class RemoteProjectDeploymentServiceClient implements ProjectDeploymentSe
     }
 
     @Override
+    public Optional<ProjectDeployment> fetchProjectDeploymentByName(long projectId, String name) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public boolean isProjectDeploymentEnabled(long projectDeploymentId) {
         throw new UnsupportedOperationException();
     }

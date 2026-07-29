@@ -40,10 +40,10 @@ class AutomationWorkflowProjectGraphQlControllerTest {
 
         AutomationWorkflowProjectDTO projectOne =
             new AutomationWorkflowProjectDTO(1L, "Project One", "First project", null, List.of(), true, 5, 2,
-                List.of(workflowTemplateOne), null);
+                List.of(workflowTemplateOne), null, false);
         AutomationWorkflowProjectDTO projectTwo =
             new AutomationWorkflowProjectDTO(2L, "Project Two", null, 10L, List.of(20L), false, 1, null, List.of(),
-                null);
+                null, false);
 
         when(automationWorkflowProjectFacade.getProjects()).thenReturn(List.of(projectOne, projectTwo));
 

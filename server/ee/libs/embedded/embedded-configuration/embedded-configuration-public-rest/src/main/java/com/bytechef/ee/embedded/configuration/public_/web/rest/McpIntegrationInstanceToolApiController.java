@@ -63,7 +63,7 @@ class McpIntegrationInstanceToolApiController {
     }
 
     @SuppressWarnings("PMD.UnusedFormalParameter")
-    @PostMapping("/external/{externalUserId}/integration-instances/{id}/mcp-tools/{mcpToolId}/enable")
+    @PostMapping("/{externalUserId}/integration-instances/{id}/mcp-tools/{mcpToolId}/enable")
     public ResponseEntity<Void> enableMcpIntegrationInstanceTool(
         @PathVariable String externalUserId, @PathVariable Long id, @PathVariable Long mcpToolId) {
 
@@ -76,7 +76,7 @@ class McpIntegrationInstanceToolApiController {
     }
 
     @SuppressWarnings("PMD.UnusedFormalParameter")
-    @DeleteMapping("/external/{externalUserId}/integration-instances/{id}/mcp-tools/{mcpToolId}/enable")
+    @DeleteMapping("/{externalUserId}/integration-instances/{id}/mcp-tools/{mcpToolId}/enable")
     public ResponseEntity<Void> disableMcpIntegrationInstanceTool(
         @PathVariable String externalUserId, @PathVariable Long id, @PathVariable Long mcpToolId) {
 

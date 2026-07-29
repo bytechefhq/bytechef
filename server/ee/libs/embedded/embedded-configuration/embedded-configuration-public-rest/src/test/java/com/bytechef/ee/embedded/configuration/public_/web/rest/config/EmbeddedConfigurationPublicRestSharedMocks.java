@@ -13,6 +13,7 @@ import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceWorkflowFaca
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
+import com.bytechef.ee.embedded.configuration.facade.ConnectedUserCodeWorkflowReferenceFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserConnectionFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserIntegrationFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserIntegrationInstanceFacade;
@@ -40,7 +41,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @MockitoBean(types = {
-    ClusterElementDefinitionService.class, ComponentDefinitionService.class, ConnectedUserConnectionFacade.class,
+    ClusterElementDefinitionService.class, ComponentDefinitionService.class,
+    ConnectedUserCodeWorkflowReferenceFacade.class, ConnectedUserConnectionFacade.class,
     ConnectedUserIntegrationFacade.class,
     ConnectedUserIntegrationInstanceFacade.class, ConnectedUserProjectFacade.class, ConnectedUserService.class,
     IntegrationInstanceConfigurationWorkflowService.class, IntegrationInstanceWorkflowService.class,

@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.connected.user.service;
 
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.ee.embedded.connected.user.constant.ConnectedUserConstants;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.repository.ConnectedUserRepository;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -15,6 +16,7 @@ import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -46,6 +48,11 @@ public class ConnectedUserServiceImpl implements ConnectedUserService {
 
     @Override
     public ConnectedUser createConnectedUser(String externalId, Environment environment) {
+        if (ConnectedUserConstants.FRONTEND_RESERVED_PATH_SEGMENTS.contains(externalId)) {
+            throw new IllegalArgumentException(
+                "externalId '%s' is reserved and cannot be used for a connected user".formatted(externalId));
+        }
+
         ConnectedUser connectedUser = new ConnectedUser();
 
         connectedUser.setEnabled(true);
@@ -105,6 +112,12 @@ public class ConnectedUserServiceImpl implements ConnectedUserService {
         return connectedUserRepository.findAll(
             environment == null ? null : environment.ordinal(), search, createDateFrom, createDateTo, integrationId,
             pageRequest);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ConnectedUser> getConnectedUsers(List<Long> ids) {
+        return connectedUserRepository.findAllById(ids);
     }
 
     @Override

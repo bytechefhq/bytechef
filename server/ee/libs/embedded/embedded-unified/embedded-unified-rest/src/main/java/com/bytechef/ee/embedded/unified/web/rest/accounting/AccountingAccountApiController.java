@@ -30,6 +30,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
+ * NOTE: this route (and every other {@code /v1/unified/**} route in this module) has NO {@code {externalUserId}} path
+ * parameter, so it is JWT-only by design -- see {@code ConnectedUserConstants.FRONTEND_RESERVED_PATH_SEGMENTS}
+ * (embedded-connected-user-api, entry {@code "unified"}), which {@code EmbeddedApiKeyAuthenticationConverter} uses to
+ * reject non-JWT tokens on it instead of minting a phantom {@code ConnectedUser}.
+ *
  * @version ee
  *
  * @author Ivica Cardic

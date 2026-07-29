@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <!-- Copy-mode dedup: records which published catalog workflow template a copy-mode row was
+         implicitly provisioned from (POST /workflows/{workflowUuid} against a visual template's
+         catalog uuid with no existing copy), so a repeated sync call against the same template uuid
+         resolves the existing copy instead of creating a second one. Null for every row created
+         through any other path (blank-workflow creation, prompt generation, the explicit
+         POST /automation/workflow-templates/{uuid}/copy endpoint); those never need this
+         correlation. Independent of catalog_workflow_uuid (the reference-mode discriminator): a
+         copy-mode row (project_workflow_id non-null, catalog_workflow_uuid null per the XOR
+         constraint added in 20260727120000-3) can carry a non-null copied_from_workflow_uuid at the
+         same time. -->
+    <changeSet id="20260727130000-1" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="connected_user_project_workflow" columnName="copied_from_workflow_uuid"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="connected_user_project_workflow">
+            <column name="copied_from_workflow_uuid" type="VARCHAR(36)"/>
+        </addColumn>
+    </changeSet>
+
+    <!-- Closes the concurrent-first-call duplicate-copy race the same way
+         uk_cupw_connected_user_project_id_catalog_workflow_uuid closes it for reference rows: two
+         parallel sync requests against the same (connected user project, template uuid) can each
+         observe "no copy exists yet" and separately provision one. Partial index so rows that were
+         never implicitly provisioned (copied_from_workflow_uuid null) never collide on it. -->
+    <changeSet id="20260727130000-2" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) FROM pg_indexes WHERE indexname = 'uk_cupw_connected_user_project_id_copied_from_workflow_uuid'
+            </sqlCheck>
+        </preConditions>
+
+        <sql>
+            CREATE UNIQUE INDEX uk_cupw_connected_user_project_id_copied_from_workflow_uuid
+            ON connected_user_project_workflow (connected_user_project_id, copied_from_workflow_uuid)
+            WHERE copied_from_workflow_uuid IS NOT NULL
+        </sql>
+
+        <rollback>
+            <sql>DROP INDEX IF EXISTS uk_cupw_connected_user_project_id_copied_from_workflow_uuid;</sql>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

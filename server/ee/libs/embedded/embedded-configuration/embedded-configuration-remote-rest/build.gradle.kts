@@ -7,4 +7,6 @@ dependencies {
     implementation(project(":server:libs:core:commons:commons-util"))
 
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-api"))
+
+    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
 }

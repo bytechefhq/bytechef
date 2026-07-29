@@ -73,4 +73,9 @@ public class RemoteConnectedUserProjectServiceClient implements ConnectedUserPro
     public List<ConnectedUserProject> getConnectedUserProjects(Long connectedUserId, Environment environment) {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public List<ConnectedUserProject> getConnectedUserProjects(List<Long> ids) {
+        throw new UnsupportedOperationException();
+    }
 }

@@ -27,6 +27,9 @@ import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 
 /**
@@ -220,5 +223,90 @@ class EmbeddedApiKeyAuthenticationConverterTest {
         assertThat(EmbeddedApiKeyAuthenticationConverter.EXTERNAL_USER_ID_PATTERN.matcher(invalidUri)
             .matches())
                 .isFalse();
+    }
+
+    /**
+     * Pins the Critical-severity fix: a non-JWT token on a no-{@code {externalUserId}} "Frontend" path (e.g. the public
+     * catalog listing at {@code /api/embedded/v1/automation/projects}) used to have {@code EXTERNAL_USER_ID_PATTERN}
+     * incidentally capture the literal segment {@code "automation"} as if it were an externalUserId, which
+     * {@code EmbeddedApiKeyAuthenticationProvider}'s get-or-create then turned into a phantom {@code ConnectedUser}
+     * row. The converter must now reject before a token is even produced, so the provider (and its get-or-create) is
+     * never reached -- see {@code EmbeddedApiKeyAuthenticationConverterProviderIntegrationTest} for the
+     * no-ConnectedUser-created proof.
+     *
+     * <p>
+     * Exercises {@link EmbeddedApiKeyAuthenticationConverter#convert(HttpServletRequest)} for EVERY entry in
+     * {@link com.bytechef.ee.embedded.connected.user.constant.ConnectedUserConstants#FRONTEND_RESERVED_PATH_SEGMENTS},
+     * not just a couple of samples, so a future addition to the allowlist that isn't wired through {@code convert()}
+     * correctly is caught immediately.
+     */
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "app-events", "automation", "components", "external", "integration-instances", "integrations", "me",
+        "unified", "workflows"
+    })
+    void testConvertWithNonJwtTokenAndReservedSegmentThrowsBadCredentialsException(String reservedSegment) {
+        String tenantKey = EncodingUtils.base64EncodeToString("test-tenant" + ":randomData");
+
+        when(request.getHeader("Authorization")).thenReturn("Bearer " + tenantKey);
+        when(request.getHeader("X-ENVIRONMENT")).thenReturn(null);
+        when(request.getRequestURI()).thenReturn("/api/embedded/v1/" + reservedSegment + "/probe");
+
+        assertThatThrownBy(() -> converter.convert(request))
+            .isInstanceOf(BadCredentialsException.class);
+    }
+
+    @Test
+    void testConvertWithRetiredExternalPrefixRouteThrowsBadCredentialsException() {
+        // Regression pin for the phantom-connected-user fix: the MCP integration-instance controllers briefly
+        // mounted routes under /external/{externalUserId}/..., so the converter captured the literal "external" as
+        // the user id and the provider's get-or-create minted a phantom ConnectedUser named "external". The routes
+        // are normalized to the bare /{externalUserId}/ prefix and "external" is reserved -- a stale caller of the
+        // old URL must be rejected HERE, before the provider can create any row.
+        String tenantKey = EncodingUtils.base64EncodeToString("test-tenant" + ":randomData");
+
+        when(request.getHeader("Authorization")).thenReturn("Bearer " + tenantKey);
+        when(request.getHeader("X-ENVIRONMENT")).thenReturn(null);
+        when(request.getRequestURI())
+            .thenReturn("/api/embedded/v1/external/user123/integration-instances/1/mcp-tools/2/enable");
+
+        assertThatThrownBy(() -> converter.convert(request))
+            .isInstanceOf(BadCredentialsException.class);
+    }
+
+    @Test
+    void testConvertWithNonJwtTokenAndMeFrontendRouteThrowsIllegalArgumentException() {
+        // "/me" has no trailing path segment, so EXTERNAL_USER_ID_PATTERN never matches it in the first place --
+        // this pins that pre-existing, already-safe behavior stays unchanged by the reserved-segment check.
+        String tenantKey = EncodingUtils.base64EncodeToString("test-tenant" + ":randomData");
+
+        when(request.getHeader("Authorization")).thenReturn("Bearer " + tenantKey);
+        when(request.getHeader("X-ENVIRONMENT")).thenReturn(null);
+        when(request.getRequestURI()).thenReturn("/api/embedded/v1/me");
+
+        assertThatThrownBy(() -> converter.convert(request))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void testConvertWithNonJwtTokenAndRealExternalUserIdPathIsUnchanged() {
+        // Regression guard: a genuine server-to-server /{externalUserId}/ path must keep working, even though its
+        // shape (first-segment-after-/v<n>/, followed by more segments) is otherwise identical to the Frontend case.
+        String tenantId = "test-tenant";
+        String tenantKey = EncodingUtils.base64EncodeToString(tenantId + ":randomData");
+        String externalUserId = "real-external-user-42";
+
+        when(request.getHeader("Authorization")).thenReturn("Bearer " + tenantKey);
+        when(request.getHeader("X-ENVIRONMENT")).thenReturn(null);
+        when(request.getRequestURI()).thenReturn("/api/embedded/v1/" + externalUserId + "/automation/projects");
+
+        Authentication result = converter.convert(request);
+
+        assertThat(result).isNotNull();
+
+        EmbeddedApiKeyAuthenticationToken token = (EmbeddedApiKeyAuthenticationToken) result;
+
+        assertThat(token.getExternalUserId()).isEqualTo(externalUserId);
+        assertThat(token.getTenantId()).isEqualTo(tenantId);
     }
 }

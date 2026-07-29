@@ -1002,6 +1002,31 @@ paths:
       responses:
         "204":
           description: "Successful operation."
+  /automation/projects/deploy:
+    post:
+      description: "Deploy a new automation code workflow into the embedded catalog."
+      summary: "Deploy a new automation code workflow into the embedded catalog"
+      tags:
+      - "automation-project-code-workflow"
+      operationId: "deployAutomationProjectCodeWorkflow"
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: "object"
+              properties:
+                projectFile:
+                  description: "The file of a code-native automation project."
+                  type: "string"
+                  format: "binary"
+        required: true
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AutomationProjectCodeWorkflowDeployResult"
   /integrations/categories:
     get:
       description: "Get integration categories."
@@ -1442,6 +1467,15 @@ components:
         __version:
           type: "integer"
           format: "int32"
+    AutomationProjectCodeWorkflowDeployResult:
+      type: "object"
+      description: "The result of deploying an automation code workflow into the embedded catalog."
+      properties:
+        warnings:
+          description: "Deploy-time trigger validation warnings; a deployed workflow is still usable even with warnings."
+          type: "array"
+          items:
+            type: "string"
     Category:
       $ref: "../../../../../../libs/platform/platform-category/platform-category-rest/openapi.yaml#/components/schemas/Category"
     ConnectedUserProjectWorkflow:

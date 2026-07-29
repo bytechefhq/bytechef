@@ -31,6 +31,7 @@ import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.definition.WorkflowNodeType;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -97,6 +98,20 @@ public class ConnectedUserProjectWorkflowManager {
     }
 
     public String createProjectWorkflow(String externalUserId, String definition, Environment environment) {
+        return createProjectWorkflow(externalUserId, definition, environment, null);
+    }
+
+    /**
+     * @param copiedFromWorkflowUuid the published catalog workflow template uuid this copy was implicitly provisioned
+     *                               from (see {@code RequestTriggerApiController}'s automation-bridge branch), so a
+     *                               later sync call against the same template uuid can resolve this row instead of
+     *                               provisioning a second copy. {@code null} for every other creation path
+     *                               (blank-workflow creation, prompt generation, the explicit
+     *                               {@code copyWorkflowTemplate} endpoint's own bookkeeping).
+     */
+    public String createProjectWorkflow(
+        String externalUserId, String definition, Environment environment, @Nullable String copiedFromWorkflowUuid) {
+
         ConnectedUserProject connectedUserProject = getOrCreateConnectedUserProject(externalUserId, environment);
 
         String effectiveDefinition = StringUtils.isEmpty(definition) ? DEFAULT_DEFINITION : definition;
@@ -108,6 +123,7 @@ public class ConnectedUserProjectWorkflowManager {
 
         connectedUserProjectWorkflow.setConnectedUserProjectId(connectedUserProject.getId());
         connectedUserProjectWorkflow.setProjectWorkflowId(projectWorkflow.getId());
+        connectedUserProjectWorkflow.setCopiedFromWorkflowUuid(copiedFromWorkflowUuid);
 
         connectedUserProjectWorkflowService.create(connectedUserProjectWorkflow);
 

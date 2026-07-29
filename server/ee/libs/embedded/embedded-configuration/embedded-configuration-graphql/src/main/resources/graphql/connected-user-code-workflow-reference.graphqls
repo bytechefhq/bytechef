@@ -1,0 +1,11 @@
+type ConnectedUserCodeWorkflowReference {
+    catalogWorkflowUuid: ID!
+    externalUserId: String!
+    enabled: Boolean!
+    dangling: Boolean!
+    danglingReason: String
+}
+
+extend type Query {
+    connectedUserCodeWorkflowReferences(catalogWorkflowUuids: [ID!]!): [ConnectedUserCodeWorkflowReference!]!
+}
