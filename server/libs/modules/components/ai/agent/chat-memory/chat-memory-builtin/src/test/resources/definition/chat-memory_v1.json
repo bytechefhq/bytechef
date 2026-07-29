@@ -946,7 +946,7 @@
   } ],
   "clusterElements": [ {
     "name": "chatMemory",
-    "description": "Memory is retrieved from the application database and added as prior messages in the conversation.",
+    "description": "Memory is retrieved from the application's session store and added as prior messages in the conversation, including prior tool calls and their results.",
     "element": { },
     "help": null,
     "outputDefinition": null,

@@ -3026,10 +3026,52 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
-    "name": "sendDirectMessage",
+    "description": "Sends an approval request message to a Rocket.Chat channel.",
+    "element": { },
+    "help": null,
+    "name": "rocketchat",
+    "outputDefinition": null,
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "Channel to send the approval request to. Must have the # prefix.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Channel",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "roomId",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    } ],
+    "title": "Rocket.Chat",
+    "type": {
+      "name": "APPROVAL_CHANNELS",
+      "key": "approvalChannels",
+      "label": "Channels",
+      "multipleElements": true,
+      "required": false
+    },
+    "workflowNodeDescription": null
+  }, {
     "description": "Send messages to users on your workspace.",
     "element": { },
     "help": null,
+    "name": "sendDirectMessage",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -4051,10 +4093,10 @@
     },
     "workflowNodeDescription": null
   }, {
-    "name": "sendChannelMessage",
     "description": "Send messages to channel on your workspace.",
     "element": { },
     "help": null,
+    "name": "sendChannelMessage",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -5076,10 +5118,10 @@
     },
     "workflowNodeDescription": null
   }, {
-    "name": "createChannel",
     "description": "Create a public channel.",
     "element": { },
     "help": null,
+    "name": "createChannel",
     "outputDefinition": {
       "output": null,
       "outputResponse": {

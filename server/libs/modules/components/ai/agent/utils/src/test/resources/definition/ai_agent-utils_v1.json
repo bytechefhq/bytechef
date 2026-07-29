@@ -1264,6 +1264,45 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "agentClientTool",
+    "description": "Delegate a task to a remote A2A (Agent2Agent) compliant agent.",
+    "element": { },
+    "help": null,
+    "outputDefinition": null,
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "TEXT",
+      "defaultValue": null,
+      "description": "Base URL of the remote A2A agent. Its agent card is resolved from <baseUrl>/.well-known/agent-card.json.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Base URL",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "baseUrl",
+      "options": null,
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    } ],
+    "title": "Agent Client Tool",
+    "type": {
+      "name": "TOOLS",
+      "key": "tools",
+      "label": "Tools",
+      "multipleElements": true,
+      "required": false
+    },
+    "workflowNodeDescription": null
+  }, {
     "name": "askUserQuestionTool",
     "description": "Ask the user clarifying questions to gather preferences, clarify instructions, or get decisions.",
     "element": { },

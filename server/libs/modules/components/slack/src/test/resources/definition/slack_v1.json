@@ -2569,10 +2569,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
-    "name": "slack",
     "description": "Sends an approval request message via Slack.",
     "element": { },
     "help": null,
+    "name": "slack",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -2611,10 +2611,10 @@
     },
     "workflowNodeDescription": null
   }, {
-    "name": "addReaction",
     "description": "Adds a reaction to a message.",
     "element": { },
     "help": null,
+    "name": "addReaction",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2964,10 +2964,10 @@
     },
     "workflowNodeDescription": null
   }, {
-    "name": "sendApprovalMessage",
     "description": "Sends approval message to a channel.",
     "element": { },
     "help": null,
+    "name": "sendApprovalMessage",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -3687,10 +3687,10 @@
     },
     "workflowNodeDescription": null
   }, {
-    "name": "sendChannelMessage",
     "description": "Sends a message to a public or private channel.",
     "element": { },
     "help": null,
+    "name": "sendChannelMessage",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -4427,10 +4427,10 @@
     },
     "workflowNodeDescription": null
   }, {
-    "name": "sendDirectMessage",
     "description": "Sends a direct message to another user in a workspace. If it hasn't already, a direct message conversation will be created.",
     "element": { },
     "help": null,
+    "name": "sendDirectMessage",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -5231,6 +5231,28 @@
         "placeholder": null,
         "regex": null,
         "required": true,
+        "type": "STRING"
+      }, {
+        "advancedOption": null,
+        "controlType": "TEXT",
+        "defaultValue": null,
+        "description": "The Slack app's signing secret. When set, approval request messages use in-place Approve/Discard buttons resolved directly in Slack — configure the app's Interactivity Request URL to <public-url>/slack/interactivity. When unset, buttons link to the hosted approval form.",
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": "Signing Secret",
+        "languageId": null,
+        "maxLength": null,
+        "metadata": { },
+        "minLength": null,
+        "name": "signingSecret",
+        "options": null,
+        "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
+        "placeholder": null,
+        "regex": null,
+        "required": false,
         "type": "STRING"
       } ],
       "refresh": null,

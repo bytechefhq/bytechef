@@ -205,12 +205,6 @@
     "multipleElements": true,
     "required": false
   }, {
-    "name": "GOAL",
-    "key": "goal",
-    "label": "Goal",
-    "multipleElements": false,
-    "required": false
-  }, {
     "name": "TOOLS",
     "key": "tools",
     "label": "Tools",
@@ -356,6 +350,137 @@
       "placeholder": null,
       "required": false,
       "type": "NUMBER"
+    }, {
+      "advancedOption": null,
+      "controlType": "ARRAY_BUILDER",
+      "defaultValue": null,
+      "description": "Optional. When set, this action produces a structured JSON object with these properties (a typed binding) instead of free text. Downstream actions receive the object as JSON, and when the goal output binding is typed the run action returns the structured object. All actions producing the same output binding must declare the same schema.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": false,
+      "hidden": null,
+      "items": [ {
+        "additionalProperties": null,
+        "advancedOption": null,
+        "controlType": "OBJECT_BUILDER",
+        "defaultValue": null,
+        "description": null,
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "metadata": { },
+        "multipleValues": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "placeholder": null,
+        "properties": [ {
+          "advancedOption": null,
+          "controlType": "TEXT",
+          "defaultValue": null,
+          "description": "Property name in the produced JSON object.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Name",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": "name",
+          "options": null,
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        }, {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": "string",
+          "description": "Value type the model should produce for this property.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Type",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": "type",
+          "options": [ {
+            "description": null,
+            "label": "String",
+            "value": "string"
+          }, {
+            "description": null,
+            "label": "Number",
+            "value": "number"
+          }, {
+            "description": null,
+            "label": "Integer",
+            "value": "integer"
+          }, {
+            "description": null,
+            "label": "Boolean",
+            "value": "boolean"
+          }, {
+            "description": null,
+            "label": "Array",
+            "value": "array"
+          }, {
+            "description": null,
+            "label": "Object",
+            "value": "object"
+          } ],
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": false,
+          "type": "STRING"
+        }, {
+          "advancedOption": null,
+          "controlType": "TEXT",
+          "defaultValue": null,
+          "description": "What this property contains. Guides the model's output.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Description",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": "description",
+          "options": null,
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": false,
+          "type": "STRING"
+        } ],
+        "required": false,
+        "type": "OBJECT"
+      } ],
+      "label": "Output Schema",
+      "maxItems": null,
+      "metadata": { },
+      "minItems": null,
+      "multipleValues": null,
+      "name": "outputSchema",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": false,
+      "type": "ARRAY"
     } ],
     "title": "Action",
     "type": {
