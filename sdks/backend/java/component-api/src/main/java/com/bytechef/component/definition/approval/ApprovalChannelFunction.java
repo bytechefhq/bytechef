@@ -30,6 +30,12 @@ public interface ApprovalChannelFunction {
         new ClusterElementType("APPROVAL_CHANNELS", "approvalChannels", "Channels", true, false);
 
     /**
+     * Key under which the calling approval action publishes the request's expiry as an ISO-8601 instant string, so a
+     * channel can tell the approver when the request lapses. Absent when the caller has no expiry.
+     */
+    String EXPIRES_AT = "expiresAt";
+
+    /**
      * Key under which the calling approval action publishes the form description.
      */
     String FORM_DESCRIPTION = "formDescription";

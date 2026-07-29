@@ -42,5 +42,7 @@ public interface JobResumeFacade {
 
     JobResumeOutcome resumeJob(String id, Map<String, Object> data);
 
+    JobResumeOutcome resumeJob(String id, Map<String, Object> data, String approvedBy);
+
     JobResumeOutcome resumeJobStreaming(String id, Map<String, Object> data, LongConsumer jobIdConsumer);
 }

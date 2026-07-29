@@ -23,9 +23,13 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.platform.coordinator.event.listener.NotificationJobStatusApplicationEventListener;
 import com.bytechef.platform.coordinator.event.listener.SseStreamApplicationEventListener;
+import com.bytechef.platform.coordinator.event.listener.SuspendedTaskStateJobDeletionListener;
 import com.bytechef.platform.coordinator.event.listener.WebhookJobStatusApplicationEventListener;
 import com.bytechef.platform.coordinator.event.listener.WebhookTaskStartedApplicationEventListener;
 import com.bytechef.platform.coordinator.metrics.JobExecutionCounter;
+import com.bytechef.platform.coordinator.monitor.ApprovalEscalationMonitor;
+import com.bytechef.platform.coordinator.monitor.ApprovalExpiryMonitor;
+import com.bytechef.platform.coordinator.monitor.ApprovalReminderMonitor;
 import com.bytechef.platform.coordinator.monitor.JobRetentionMonitor;
 import com.bytechef.platform.coordinator.monitor.JobTimeoutMonitor;
 import com.bytechef.platform.coordinator.monitor.OrphanedJobRecoveryMonitor;
@@ -34,6 +38,8 @@ import com.bytechef.platform.notification.delivery.WebhookNotificationClient;
 import com.bytechef.platform.notification.handler.NotificationHandlerRegistry;
 import com.bytechef.platform.notification.handler.NotificationSenderRegistry;
 import com.bytechef.platform.notification.service.NotificationService;
+import com.bytechef.platform.workflow.execution.service.TaskStateService;
+import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import com.bytechef.tenant.service.TenantService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -133,6 +139,55 @@ public class PlatformCoordinatorConfiguration {
         return new NotificationJobStatusApplicationEventListener(
             jobExecutionCounter.orElse(null), jobService, notificationHandlerRegistry, notificationSenderRegistry,
             notificationService);
+    }
+
+    @Bean
+    @ConditionalOnProperty(
+        name = "bytechef.workflow.execution.approval-expiry.enabled", havingValue = "true", matchIfMissing = true)
+    ApprovalExpiryMonitor approvalExpiryMonitor(
+        ApplicationEventPublisher eventPublisher, ObjectProvider<MeterRegistry> meterRegistryObjectProvider,
+        TaskExecutionService taskExecutionService,
+        ObjectProvider<TaskStateService> taskStateServiceObjectProvider, TenantService tenantService) {
+
+        return new ApprovalExpiryMonitor(
+            eventPublisher, jobService, meterRegistryObjectProvider, taskExecutionService,
+            taskStateServiceObjectProvider.getIfAvailable(), tenantService);
+    }
+
+    @Bean
+    SuspendedTaskStateJobDeletionListener suspendedTaskStateJobDeletionListener(
+        ObjectProvider<TaskStateService> taskStateServiceObjectProvider) {
+
+        return new SuspendedTaskStateJobDeletionListener(taskStateServiceObjectProvider.getIfAvailable());
+    }
+
+    @Bean
+    @ConditionalOnProperty(
+        name = "bytechef.workflow.execution.approval-reminder.enabled", havingValue = "true", matchIfMissing = true)
+    ApprovalReminderMonitor approvalReminderMonitor(
+        ObjectProvider<ApprovalTokens> approvalTokensObjectProvider,
+        @Value("${bytechef.workflow.execution.approval-reminder.lead-time:PT24H}") Duration leadTime,
+        @Value("${bytechef.public-url:#{null}}") String publicUrl, TaskExecutionService taskExecutionService,
+        TenantService tenantService) {
+
+        return new ApprovalReminderMonitor(
+            approvalTokensObjectProvider.getIfAvailable(), jobService, leadTime, notificationHandlerRegistry,
+            notificationSenderRegistry, notificationService, publicUrl, taskExecutionService, tenantService);
+    }
+
+    @Bean
+    @ConditionalOnProperty(
+        name = "bytechef.workflow.execution.approval-escalation.enabled", havingValue = "true",
+        matchIfMissing = true)
+    ApprovalEscalationMonitor approvalEscalationMonitor(
+        @Value("${bytechef.workflow.execution.approval-escalation.after:#{null}}") Duration after,
+        ObjectProvider<ApprovalTokens> approvalTokensObjectProvider,
+        @Value("${bytechef.public-url:#{null}}") String publicUrl, TaskExecutionService taskExecutionService,
+        TenantService tenantService) {
+
+        return new ApprovalEscalationMonitor(
+            after, approvalTokensObjectProvider.getIfAvailable(), jobService, notificationHandlerRegistry,
+            notificationSenderRegistry, notificationService, publicUrl, taskExecutionService, tenantService);
     }
 
     @Bean
