@@ -77,6 +77,7 @@ dependencies {
     implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-tool"))
     implementation(project(":server:libs:ai:ai-api"))
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-api"))
+    implementation(project(":server:libs:ai:ai-copilot:ai-copilot-service"))
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-tool"))
 
     implementation(project(":server:ee:libs:automation:automation-api-platform:automation-api-platform-configuration:automation-api-platform-configuration-api"))

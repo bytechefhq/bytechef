@@ -13,9 +13,12 @@ import com.bytechef.ai.copilot.tool.AskUserQuestionToolCallback;
 import com.bytechef.ai.copilot.tool.ClusterElementAgentToolCallback;
 import com.bytechef.ai.copilot.tool.CodeEditorAgentToolCallback;
 import com.bytechef.ai.copilot.tool.CodeWorkflowAgentToolCallback;
+import com.bytechef.ai.copilot.tool.ContextStoreAgentToolCallback;
 import com.bytechef.ai.copilot.tool.ConverterAgentToolCallback;
 import com.bytechef.ai.copilot.tool.CreateConnectionToolCallback;
 import com.bytechef.ai.copilot.tool.CustomComponentAgentToolCallback;
+import com.bytechef.ai.copilot.tool.DataTableAgentToolCallback;
+import com.bytechef.ai.copilot.tool.KnowledgeBaseAgentToolCallback;
 import com.bytechef.ai.copilot.tool.ListConnectionsForComponentToolCallback;
 import com.bytechef.ai.copilot.tool.LookupActionPropertyOptionsToolCallback;
 import com.bytechef.ai.copilot.tool.LookupTriggerPropertyOptionsToolCallback;
@@ -42,8 +45,6 @@ import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
-import com.bytechef.automation.data.table.configuration.facade.WorkspaceDataTableFacade;
-import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseFacade;
 import com.bytechef.component.ai.agent.chat.memory.builtin.session.util.BuiltInSessionRepositoryFactory;
 import com.bytechef.component.ai.agent.chat.memory.builtin.session.util.BuiltInSessionRepositoryFactory.BuiltInSessionRepository;
 import com.bytechef.ee.ai.hub.agent.AiHubRoutingAgent;
@@ -62,43 +63,26 @@ import com.bytechef.ee.ai.hub.task.AiHubTask;
 import com.bytechef.ee.ai.hub.task.AiHubTaskArtifactService;
 import com.bytechef.ee.ai.hub.task.AiHubTaskService;
 import com.bytechef.ee.ai.hub.task.AiHubTaskToolFacade;
-import com.bytechef.ee.ai.hub.tool.AddDataTableColumnToolCallback;
-import com.bytechef.ee.ai.hub.tool.AddDataTableRowToolCallback;
-import com.bytechef.ee.ai.hub.tool.AddKnowledgeBaseDocumentToolCallback;
 import com.bytechef.ee.ai.hub.tool.AiHubTaskArtifactRecorder;
 import com.bytechef.ee.ai.hub.tool.AttachTaskToolToolCallback;
 import com.bytechef.ee.ai.hub.tool.CloneAiHubPersonalAgentToolCallback;
 import com.bytechef.ee.ai.hub.tool.CloneApiCollectionToolCallback;
 import com.bytechef.ee.ai.hub.tool.CloneAssetFileToolCallback;
-import com.bytechef.ee.ai.hub.tool.CloneDataTableToolCallback;
-import com.bytechef.ee.ai.hub.tool.CloneKnowledgeBaseToolCallback;
 import com.bytechef.ee.ai.hub.tool.CloneMcpProjectToolCallback;
 import com.bytechef.ee.ai.hub.tool.CreateAiHubPersonalAgentToolCallback;
 import com.bytechef.ee.ai.hub.tool.CreateApiCollectionToolCallback;
 import com.bytechef.ee.ai.hub.tool.CreateAssetFileToolCallback;
-import com.bytechef.ee.ai.hub.tool.CreateContextStoreSourceToolCallback;
-import com.bytechef.ee.ai.hub.tool.CreateDataTableFromCsvToolCallback;
-import com.bytechef.ee.ai.hub.tool.CreateDataTableToolCallback;
 import com.bytechef.ee.ai.hub.tool.CreateMcpProjectToolCallback;
 import com.bytechef.ee.ai.hub.tool.CreateProjectDeploymentToolCallback;
 import com.bytechef.ee.ai.hub.tool.CreateWorkflowChatToolCallback;
 import com.bytechef.ee.ai.hub.tool.DeleteAiHubPersonalAgentToolCallback;
-import com.bytechef.ee.ai.hub.tool.DeleteContextStoreSourceToolCallback;
-import com.bytechef.ee.ai.hub.tool.DeleteDataTableRowToolCallback;
-import com.bytechef.ee.ai.hub.tool.DeleteKnowledgeBaseDocumentToolCallback;
 import com.bytechef.ee.ai.hub.tool.DeleteProjectDeploymentToolCallback;
-import com.bytechef.ee.ai.hub.tool.DescribeSourceComponentEntitiesToolCallback;
 import com.bytechef.ee.ai.hub.tool.GetAssetFileContentToolCallback;
-import com.bytechef.ee.ai.hub.tool.GetContextStoreRecordToolCallback;
 import com.bytechef.ee.ai.hub.tool.ListAiHubPersonalAgentsToolCallback;
 import com.bytechef.ee.ai.hub.tool.ListAiHubTasksToolCallback;
 import com.bytechef.ee.ai.hub.tool.ListApiCollectionsToolCallback;
 import com.bytechef.ee.ai.hub.tool.ListAssetFilesToolCallback;
-import com.bytechef.ee.ai.hub.tool.ListAvailableSourceComponentsToolCallback;
 import com.bytechef.ee.ai.hub.tool.ListChatWorkflowsToolCallback;
-import com.bytechef.ee.ai.hub.tool.ListContextSourcesToolCallback;
-import com.bytechef.ee.ai.hub.tool.ListDataTablesToolCallback;
-import com.bytechef.ee.ai.hub.tool.ListKnowledgeBasesToolCallback;
 import com.bytechef.ee.ai.hub.tool.ListMcpServersToolCallback;
 import com.bytechef.ee.ai.hub.tool.ListProjectDeploymentsToolCallback;
 import com.bytechef.ee.ai.hub.tool.ListTaskToolsToolCallback;
@@ -113,18 +97,11 @@ import com.bytechef.ee.ai.hub.tool.OpenWorkflowChatTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenWorkflowTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.PromoteWorkflowToolCallback;
 import com.bytechef.ee.ai.hub.tool.QueryDataTableToolCallback;
-import com.bytechef.ee.ai.hub.tool.QueryKnowledgeBaseToolCallback;
-import com.bytechef.ee.ai.hub.tool.RefreshContextStoreSourceToolCallback;
 import com.bytechef.ee.ai.hub.tool.RemoveTaskToolToolCallback;
 import com.bytechef.ee.ai.hub.tool.RollbackProjectDeploymentToolCallback;
 import com.bytechef.ee.ai.hub.tool.RunChatWorkflowToolCallback;
-import com.bytechef.ee.ai.hub.tool.SearchContextStoreToolCallback;
-import com.bytechef.ee.ai.hub.tool.SemanticSearchContextStoreToolCallback;
-import com.bytechef.ee.ai.hub.tool.SetContextStoreSourceEnabledToolCallback;
 import com.bytechef.ee.ai.hub.tool.ToggleProjectDeploymentToolCallback;
 import com.bytechef.ee.ai.hub.tool.UpdateAiHubPersonalAgentToolCallback;
-import com.bytechef.ee.ai.hub.tool.UpdateContextStoreSourceToolCallback;
-import com.bytechef.ee.ai.hub.tool.UpdateDataTableRowToolCallback;
 import com.bytechef.ee.ai.hub.tool.UpdateProjectDeploymentToolCallback;
 import com.bytechef.ee.ai.hub.tool.memory.DbAutoMemoryDirectoryOps;
 import com.bytechef.ee.ai.hub.tool.memory.DbMemoryResourceResolver;
@@ -134,10 +111,6 @@ import com.bytechef.ee.ai.hub.toolsearch.ToolSearchCatalogFeeder;
 import com.bytechef.ee.ai.hub.util.Mode;
 import com.bytechef.ee.ai.hub.util.Source;
 import com.bytechef.ee.automation.apiplatform.configuration.facade.ApiCollectionFacade;
-import com.bytechef.ee.automation.contextstore.facade.WorkspaceContextStoreSourceFacade;
-import com.bytechef.ee.automation.contextstore.service.WorkspaceContextStoreSourceService;
-import com.bytechef.ee.platform.contextstore.service.ContextStoreQueryService;
-import com.bytechef.ee.platform.contextstore.service.ContextStoreSemanticSearchService;
 import com.bytechef.platform.ai.agent.memory.AutoMemoryTools;
 import com.bytechef.platform.ai.agent.memory.AutoMemoryToolsAdvisor;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryService;
@@ -147,7 +120,6 @@ import com.bytechef.platform.ai.tool.TaskTools;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ActionDefinitionService;
-import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
@@ -155,8 +127,6 @@ import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
-import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseFacade;
-import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
@@ -234,6 +204,12 @@ public class AiHubConfiguration {
         AiHubSessionMemory aiHubSessionMemory, ChatModel chatModel, ObjectProvider<ToolCallback> toolCallbackProvider,
         @Qualifier("researchChatClient") ObjectProvider<ChatClient> researchChatClientProvider,
         @Qualifier("skillsAskSubAgentChatClient") ObjectProvider<ChatClient> skillsAskSubAgentChatClientProvider,
+        @Qualifier("contextStoreAskSubAgentChatClient") //
+        ObjectProvider<ChatClient> contextStoreAskSubAgentChatClientProvider,
+        @Qualifier("knowledgeBaseAskSubAgentChatClient") //
+        ObjectProvider<ChatClient> knowledgeBaseAskSubAgentChatClientProvider,
+        @Qualifier("dataTableAskSubAgentChatClient") //
+        ObjectProvider<ChatClient> dataTableAskSubAgentChatClientProvider,
         @Qualifier("clusterElementAskSubAgentChatClient") //
         ObjectProvider<ChatClient> clusterElementAskSubAgentChatClientProvider,
         @Qualifier("codeEditorAskSubAgentChatClient") //
@@ -249,11 +225,8 @@ public class AiHubConfiguration {
         ArtifactGeneratorRegistry artifactGeneratorRegistry, AiHubTaskService taskService,
         AiAutoMemoryService aiHubMemoryService,
         DataTableService dataTableService,
-        DataTableRowService dataTableRowService, WorkspaceDataTableFacade workspaceDataTableFacade,
-        WorkspaceKnowledgeBaseFacade workspaceKnowledgeBaseFacade,
-        KnowledgeBaseFacade knowledgeBaseFacade, KnowledgeBaseService knowledgeBaseService,
+        DataTableRowService dataTableRowService,
         AiHubTaskToolFacade taskToolFacade,
-        ClusterElementDefinitionService clusterElementDefinitionService,
         ComponentDefinitionService componentDefinitionService,
         ConnectionDefinitionService connectionDefinitionService,
         ConnectionService connectionService,
@@ -264,9 +237,6 @@ public class AiHubConfiguration {
         TriggerDefinitionFacade triggerDefinitionFacade,
         SecurityContextRehydrator securityContextRehydrator,
         PropertyOptionsResolver propertyOptionsResolver,
-        ObjectProvider<ContextStoreQueryService> contextStoreQueryServiceProvider,
-        ObjectProvider<ContextStoreSemanticSearchService> contextStoreSemanticSearchServiceProvider,
-        ObjectProvider<WorkspaceContextStoreSourceService> workspaceContextStoreSourceServiceProvider,
         ObjectProvider<ApiCollectionFacade> apiCollectionFacadeProvider,
         ObjectProvider<AiHubPersonalAgentService> aiHubPersonalAgentServiceProvider,
         @Qualifier("aiHubAskToolSearchToolCallAdvisor") //
@@ -296,14 +266,9 @@ public class AiHubConfiguration {
         toolCallbacks.add(new OpenSkillTabToolCallback(null));
         toolCallbacks.add(new OpenCustomComponentTabToolCallback(null));
         toolCallbacks.add(new OpenCodeWorkflowTabToolCallback(null));
-        toolCallbacks.add(new ListDataTablesToolCallback(workspaceDataTableFacade));
         toolCallbacks.add(
             new QueryDataTableToolCallback(
                 artifactGeneratorRegistry, taskService, dataTableRowService, dataTableService));
-        toolCallbacks.add(
-            new ListKnowledgeBasesToolCallback(workspaceKnowledgeBaseFacade));
-        toolCallbacks.add(
-            new QueryKnowledgeBaseToolCallback(knowledgeBaseFacade, knowledgeBaseService));
         toolCallbacks.add(
             new AttachTaskToolToolCallback(taskService, taskToolFacade, connectionService, aiHubToolAttachMetrics));
         toolCallbacks.add(
@@ -338,18 +303,12 @@ public class AiHubConfiguration {
         // gate — if Copilot is disabled the beans are absent and the registrations are silently
         // skipped). Converter is BUILD-only and passed as null here.
         registerCopilotSubAgentToolCallbacks(
-            toolCallbacks, skillsAskSubAgentChatClientProvider, clusterElementAskSubAgentChatClientProvider,
+            toolCallbacks, skillsAskSubAgentChatClientProvider, contextStoreAskSubAgentChatClientProvider,
+            knowledgeBaseAskSubAgentChatClientProvider, dataTableAskSubAgentChatClientProvider,
+            clusterElementAskSubAgentChatClientProvider,
             codeEditorAskSubAgentChatClientProvider, workflowEditorAskSubAgentChatClientProvider, null,
             workflowExecutionAskSubAgentChatClientProvider, customComponentAskSubAgentChatClientProvider,
             codeWorkflowAskSubAgentChatClientProvider);
-
-        // Context Store consume + discovery — read-only; safe on the ASK agent. Define-side callbacks
-        // (create/update/delete/refresh/setEnabled) are mutations and live on the BUILD agent only.
-        registerContextStoreReadOnlyToolCallbacks(
-            toolCallbacks, contextStoreQueryServiceProvider, workspaceContextStoreSourceServiceProvider,
-            clusterElementDefinitionService);
-        registerContextStoreSemanticSearchToolCallback(
-            toolCallbacks, contextStoreSemanticSearchServiceProvider, workspaceContextStoreSourceServiceProvider);
 
         AiHubSpringAIAgent.Builder builder = AiHubSpringAIAgent.builder()
             .agentId(name.toLowerCase())
@@ -402,6 +361,12 @@ public class AiHubConfiguration {
         @Qualifier("imageGeneratorChatClient") ObjectProvider<ChatClient> imageGeneratorChatClientProvider,
         @Qualifier("slideBuilderChatClient") ObjectProvider<ChatClient> slideBuilderChatClientProvider,
         @Qualifier("skillsBuildSubAgentChatClient") ObjectProvider<ChatClient> skillsBuildSubAgentChatClientProvider,
+        @Qualifier("contextStoreBuildSubAgentChatClient") //
+        ObjectProvider<ChatClient> contextStoreBuildSubAgentChatClientProvider,
+        @Qualifier("knowledgeBaseBuildSubAgentChatClient") //
+        ObjectProvider<ChatClient> knowledgeBaseBuildSubAgentChatClientProvider,
+        @Qualifier("dataTableBuildSubAgentChatClient") //
+        ObjectProvider<ChatClient> dataTableBuildSubAgentChatClientProvider,
         @Qualifier("clusterElementBuildSubAgentChatClient") //
         ObjectProvider<ChatClient> clusterElementBuildSubAgentChatClientProvider,
         @Qualifier("codeEditorBuildSubAgentChatClient") //
@@ -425,13 +390,8 @@ public class AiHubConfiguration {
         ProjectWorkflowService projectWorkflowService,
         TriggerDefinitionService triggerDefinitionService,
         WorkflowFacade workflowFacade, WorkflowService workflowService, DataTableService dataTableService,
-        DataTableRowService dataTableRowService, WorkspaceDataTableFacade workspaceDataTableFacade,
-        WorkspaceKnowledgeBaseFacade workspaceKnowledgeBaseFacade,
-        KnowledgeBaseFacade knowledgeBaseFacade, KnowledgeBaseService knowledgeBaseService,
-        com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade knowledgeBaseDocumentFacade,
-        com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService knowledgeBaseDocumentService,
+        DataTableRowService dataTableRowService,
         ComponentDefinitionService componentDefinitionService,
-        ClusterElementDefinitionService clusterElementDefinitionService,
         ConnectionDefinitionService connectionDefinitionService,
         ConnectionService connectionService,
         WorkspaceConnectionFacade workspaceConnectionFacade,
@@ -441,10 +401,6 @@ public class AiHubConfiguration {
         SecurityContextRehydrator securityContextRehydrator,
         PropertyOptionsResolver propertyOptionsResolver,
         AiHubTaskToolFacade taskToolFacade,
-        ObjectProvider<WorkspaceContextStoreSourceFacade> workspaceContextStoreSourceFacadeProvider,
-        ObjectProvider<ContextStoreQueryService> contextStoreQueryServiceProvider,
-        ObjectProvider<ContextStoreSemanticSearchService> contextStoreSemanticSearchServiceProvider,
-        ObjectProvider<WorkspaceContextStoreSourceService> workspaceContextStoreSourceServiceProvider,
         ObjectProvider<ApiCollectionFacade> apiCollectionFacadeProvider,
         ObjectProvider<McpProjectFacade> mcpProjectFacadeProvider,
         ObjectProvider<com.bytechef.automation.ai.mcp.facade.WorkspaceMcpServerFacade> workspaceMcpServerFacadeProvider,
@@ -473,25 +429,9 @@ public class AiHubConfiguration {
         toolCallbacks.add(new OpenSkillTabToolCallback(aiHubTaskArtifactRecorder));
         toolCallbacks.add(new OpenCustomComponentTabToolCallback(aiHubTaskArtifactRecorder));
         toolCallbacks.add(new OpenCodeWorkflowTabToolCallback(aiHubTaskArtifactRecorder));
-        toolCallbacks.add(new ListDataTablesToolCallback(workspaceDataTableFacade));
         toolCallbacks.add(
             new QueryDataTableToolCallback(
                 artifactGeneratorRegistry, taskService, dataTableRowService, dataTableService));
-        toolCallbacks.add(
-            new ListKnowledgeBasesToolCallback(workspaceKnowledgeBaseFacade));
-        toolCallbacks.add(
-            new QueryKnowledgeBaseToolCallback(knowledgeBaseFacade, knowledgeBaseService));
-
-        registerDataTableMutationToolCallbacks(
-            toolCallbacks, dataTableRowService, dataTableService, workspaceDataTableFacade, taskArtifactService);
-        toolCallbacks.add(
-            new AddKnowledgeBaseDocumentToolCallback(
-                knowledgeBaseDocumentFacade, workspaceKnowledgeBaseFacade, taskArtifactService));
-        toolCallbacks.add(
-            new DeleteKnowledgeBaseDocumentToolCallback(
-                knowledgeBaseDocumentFacade, knowledgeBaseDocumentService, workspaceKnowledgeBaseFacade,
-                taskArtifactService));
-        toolCallbacks.add(new CloneKnowledgeBaseToolCallback(workspaceKnowledgeBaseFacade));
         toolCallbacks.add(
             new ListChatWorkflowsToolCallback(
                 projectDeploymentService, projectDeploymentWorkflowService, projectWorkflowService,
@@ -516,7 +456,9 @@ public class AiHubConfiguration {
         // the BUILD-only Converter sub-agent. Skips registrations when the corresponding ChatClient
         // bean is absent (Copilot disabled).
         registerCopilotSubAgentToolCallbacks(
-            toolCallbacks, skillsBuildSubAgentChatClientProvider, clusterElementBuildSubAgentChatClientProvider,
+            toolCallbacks, skillsBuildSubAgentChatClientProvider, contextStoreBuildSubAgentChatClientProvider,
+            knowledgeBaseBuildSubAgentChatClientProvider, dataTableBuildSubAgentChatClientProvider,
+            clusterElementBuildSubAgentChatClientProvider,
             codeEditorBuildSubAgentChatClientProvider, workflowEditorBuildSubAgentChatClientProvider,
             converterBuildSubAgentChatClientSupplierProvider, workflowExecutionBuildSubAgentChatClientProvider,
             customComponentBuildSubAgentChatClientProvider, codeWorkflowBuildSubAgentChatClientProvider);
@@ -530,11 +472,6 @@ public class AiHubConfiguration {
         toolCallbacks.add(new ToggleProjectDeploymentToolCallback(projectDeploymentFacade));
         toolCallbacks.add(new PromoteWorkflowToolCallback(projectDeploymentFacade));
 
-        registerContextStoreToolCallbacks(
-            toolCallbacks, workspaceContextStoreSourceFacadeProvider, contextStoreQueryServiceProvider,
-            workspaceContextStoreSourceServiceProvider, clusterElementDefinitionService);
-        registerContextStoreSemanticSearchToolCallback(
-            toolCallbacks, contextStoreSemanticSearchServiceProvider, workspaceContextStoreSourceServiceProvider);
         toolCallbacks.add(
             new AttachTaskToolToolCallback(taskService, taskToolFacade, connectionService, aiHubToolAttachMetrics));
         toolCallbacks.add(
@@ -737,32 +674,9 @@ public class AiHubConfiguration {
     }
 
     /**
-     * Registers the data table write-mutation callbacks (add row, update row, delete row, add column, create empty,
-     * create from CSV, clone) on the supplied tool list. Extracted to keep the BUILD-agent bean method within
-     * Checkstyle's per-method line limit; logically a single block of related callbacks.
-     */
-    private static void registerDataTableMutationToolCallbacks(
-        List<ToolCallback> toolCallbacks, DataTableRowService dataTableRowService,
-        DataTableService dataTableService, WorkspaceDataTableFacade workspaceDataTableFacade,
-        AiHubTaskArtifactService taskArtifactService) {
-
-        toolCallbacks.add(
-            new AddDataTableRowToolCallback(dataTableRowService, workspaceDataTableFacade, taskArtifactService));
-        toolCallbacks.add(
-            new UpdateDataTableRowToolCallback(dataTableRowService, workspaceDataTableFacade, taskArtifactService));
-        toolCallbacks.add(
-            new DeleteDataTableRowToolCallback(dataTableRowService, workspaceDataTableFacade, taskArtifactService));
-        toolCallbacks.add(new AddDataTableColumnToolCallback(
-            dataTableService, workspaceDataTableFacade, taskArtifactService));
-        toolCallbacks.add(new CreateDataTableToolCallback(workspaceDataTableFacade));
-        toolCallbacks.add(
-            new CreateDataTableFromCsvToolCallback(dataTableRowService, workspaceDataTableFacade));
-        toolCallbacks.add(new CloneDataTableToolCallback(dataTableService, workspaceDataTableFacade));
-    }
-
-    /**
-     * Registers the Copilot specialist sub-agent ToolCallbacks (skills, cluster element, code editor, workflow editor,
-     * converter) on the supplied tool list. Each is only added when its backing ChatClient bean is present — Copilot
+     * Registers the Copilot specialist sub-agent ToolCallbacks (skills, context store, knowledge base, data table,
+     * cluster element, code editor, workflow editor, converter) on the supplied tool list. Each is only added when
+     * its backing ChatClient bean is present — Copilot
      * disabled or a particular specialist missing skips silently. Mirrors {@link #registerSubAgentToolCallbacks} for
      * the older ChatClient sub-agents (research / data_analyst / image_generator / slide_builder).
      *
@@ -775,6 +689,9 @@ public class AiHubConfiguration {
     private static void registerCopilotSubAgentToolCallbacks(
         List<ToolCallback> toolCallbacks,
         ObjectProvider<ChatClient> skillsSubAgentChatClientProvider,
+        ObjectProvider<ChatClient> contextStoreSubAgentChatClientProvider,
+        ObjectProvider<ChatClient> knowledgeBaseSubAgentChatClientProvider,
+        ObjectProvider<ChatClient> dataTableSubAgentChatClientProvider,
         ObjectProvider<ChatClient> clusterElementSubAgentChatClientProvider,
         ObjectProvider<ChatClient> codeEditorSubAgentChatClientProvider,
         ObjectProvider<ChatClient> workflowEditorSubAgentChatClientProvider,
@@ -786,6 +703,21 @@ public class AiHubConfiguration {
         skillsSubAgentChatClientProvider.ifAvailable(
             chatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(new SkillsAgentToolCallback(chatClient), "skills_agent")));
+
+        contextStoreSubAgentChatClientProvider.ifAvailable(
+            chatClient -> toolCallbacks.add(
+                new ProgressReportingToolCallback(
+                    new ContextStoreAgentToolCallback(chatClient), "context_store_agent")));
+
+        knowledgeBaseSubAgentChatClientProvider.ifAvailable(
+            chatClient -> toolCallbacks.add(
+                new ProgressReportingToolCallback(
+                    new KnowledgeBaseAgentToolCallback(chatClient), "knowledge_base_agent")));
+
+        dataTableSubAgentChatClientProvider.ifAvailable(
+            chatClient -> toolCallbacks.add(
+                new ProgressReportingToolCallback(
+                    new DataTableAgentToolCallback(chatClient), "data_table_agent")));
 
         clusterElementSubAgentChatClientProvider.ifAvailable(
             chatClient -> toolCallbacks.add(
@@ -857,104 +789,6 @@ public class AiHubConfiguration {
         toolCallbacks.add(
             new SelectTriggerPropertyOptionToolCallback(
                 triggerDefinitionService, triggerDefinitionFacade, propertyOptionsResolver, aiHubToolAttachMetrics));
-    }
-
-    /**
-     * Registers the Context Store read-only tool callbacks (consume + discovery) on the supplied tool list. Shared
-     * between the ASK and BUILD agents — both surfaces benefit from being able to enumerate sources, search records,
-     * and explore the source-component catalog without escalating to a mutation.
-     */
-    private static void registerContextStoreReadOnlyToolCallbacks(
-        List<ToolCallback> toolCallbacks,
-        ObjectProvider<ContextStoreQueryService> contextStoreQueryServiceProvider,
-        ObjectProvider<WorkspaceContextStoreSourceService> workspaceContextStoreSourceServiceProvider,
-        ClusterElementDefinitionService clusterElementDefinitionService) {
-
-        ContextStoreQueryService contextStoreQueryService = contextStoreQueryServiceProvider.getIfAvailable();
-        WorkspaceContextStoreSourceService workspaceContextStoreSourceService =
-            workspaceContextStoreSourceServiceProvider.getIfAvailable();
-
-        if (workspaceContextStoreSourceService != null) {
-            toolCallbacks.add(new ListContextSourcesToolCallback(workspaceContextStoreSourceService));
-        }
-
-        if (workspaceContextStoreSourceService != null && contextStoreQueryService != null) {
-            toolCallbacks.add(
-                new SearchContextStoreToolCallback(contextStoreQueryService, workspaceContextStoreSourceService));
-            toolCallbacks.add(
-                new GetContextStoreRecordToolCallback(contextStoreQueryService, workspaceContextStoreSourceService));
-        }
-
-        // Discovery — needs neither the Context Store service stack nor a workspace context. Always-on.
-        toolCallbacks.add(new ListAvailableSourceComponentsToolCallback());
-        toolCallbacks.add(new DescribeSourceComponentEntitiesToolCallback(clusterElementDefinitionService));
-    }
-
-    /**
-     * Registers the Context Store semantic-search tool callback on the supplied tool list, gated on the presence of an
-     * {@link ContextStoreSemanticSearchService} bean. CE-no-embedding deployments and multi-tenant deployments don't
-     * have the bean and therefore skip the registration silently — the callback is read-only and safe on both ASK and
-     * BUILD agents.
-     */
-    private static void registerContextStoreSemanticSearchToolCallback(
-        List<ToolCallback> toolCallbacks,
-        ObjectProvider<ContextStoreSemanticSearchService> contextStoreSemanticSearchServiceProvider,
-        ObjectProvider<WorkspaceContextStoreSourceService> workspaceContextStoreSourceServiceProvider) {
-
-        ContextStoreSemanticSearchService contextStoreSemanticSearchService =
-            contextStoreSemanticSearchServiceProvider.getIfAvailable();
-        WorkspaceContextStoreSourceService workspaceContextStoreSourceService =
-            workspaceContextStoreSourceServiceProvider.getIfAvailable();
-
-        if (contextStoreSemanticSearchService == null || workspaceContextStoreSourceService == null) {
-            return;
-        }
-
-        toolCallbacks.add(
-            new SemanticSearchContextStoreToolCallback(
-                contextStoreSemanticSearchService, workspaceContextStoreSourceService));
-    }
-
-    /**
-     * Registers all Context Store tool callbacks (consume + discovery + define) on the supplied tool list. Used by the
-     * BUILD agent only since define-side callbacks are mutations. Define-side callbacks delegate to
-     * {@link WorkspaceContextStoreSourceFacade} — admin role is enforced at the facade level; chat-level user
-     * confirmation is expected before execution per CC mutation-callback precedent (matches
-     * {@code CreateProjectDeploymentToolCallback}).
-     *
-     * <p>
-     * {@code SemanticSearchContextStoreToolCallback} is registered separately via
-     * {@link #registerContextStoreSemanticSearchToolCallback} on both the ASK and BUILD agents, gated on
-     * {@link ContextStoreSemanticSearchService} bean presence (CE-no-embedding deployments skip it silently).
-     * </p>
-     */
-    private static void registerContextStoreToolCallbacks(
-        List<ToolCallback> toolCallbacks,
-        ObjectProvider<WorkspaceContextStoreSourceFacade> workspaceContextStoreSourceFacadeProvider,
-        ObjectProvider<ContextStoreQueryService> contextStoreQueryServiceProvider,
-        ObjectProvider<WorkspaceContextStoreSourceService> workspaceContextStoreSourceServiceProvider,
-        ClusterElementDefinitionService clusterElementDefinitionService) {
-
-        registerContextStoreReadOnlyToolCallbacks(
-            toolCallbacks, contextStoreQueryServiceProvider, workspaceContextStoreSourceServiceProvider,
-            clusterElementDefinitionService);
-
-        WorkspaceContextStoreSourceFacade workspaceContextStoreSourceFacade =
-            workspaceContextStoreSourceFacadeProvider.getIfAvailable();
-        WorkspaceContextStoreSourceService workspaceContextStoreSourceService =
-            workspaceContextStoreSourceServiceProvider.getIfAvailable();
-
-        if (workspaceContextStoreSourceFacade != null && workspaceContextStoreSourceService != null) {
-            toolCallbacks.add(new CreateContextStoreSourceToolCallback(workspaceContextStoreSourceFacade));
-            toolCallbacks.add(new UpdateContextStoreSourceToolCallback(
-                workspaceContextStoreSourceFacade, workspaceContextStoreSourceService));
-            toolCallbacks.add(new DeleteContextStoreSourceToolCallback(
-                workspaceContextStoreSourceFacade, workspaceContextStoreSourceService));
-            toolCallbacks.add(new RefreshContextStoreSourceToolCallback(
-                workspaceContextStoreSourceFacade, workspaceContextStoreSourceService));
-            toolCallbacks.add(new SetContextStoreSourceEnabledToolCallback(
-                workspaceContextStoreSourceFacade, workspaceContextStoreSourceService));
-        }
     }
 
     private String getSystemPrompt(Resource systemPromptResource) {

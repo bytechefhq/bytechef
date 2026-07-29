@@ -9,11 +9,11 @@ package com.bytechef.ee.ai.hub.config;
 
 import com.bytechef.automation.assetfile.service.AssetFileFacade;
 import com.bytechef.automation.data.table.configuration.facade.WorkspaceDataTableFacade;
-import com.bytechef.ee.ai.hub.tool.AggregateDataTableToolCallback;
 import com.bytechef.ee.ai.hub.tool.DataAnalystToolCallback;
-import com.bytechef.ee.ai.hub.tool.ListDataTablesToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenDataTableTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.QueryDataTableToolCallback;
+import com.bytechef.ee.automation.ai.tool.datatable.AggregateDataTableToolCallback;
+import com.bytechef.ee.automation.ai.tool.datatable.ListDataTablesToolCallback;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
 import java.io.IOException;
