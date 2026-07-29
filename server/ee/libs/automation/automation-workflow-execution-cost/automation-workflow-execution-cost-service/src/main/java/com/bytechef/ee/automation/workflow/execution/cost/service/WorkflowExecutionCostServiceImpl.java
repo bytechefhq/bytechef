@@ -9,6 +9,8 @@ package com.bytechef.ee.automation.workflow.execution.cost.service;
 
 import com.bytechef.ee.automation.workflow.execution.cost.domain.WorkflowExecutionCost;
 import com.bytechef.ee.automation.workflow.execution.cost.repository.WorkflowExecutionCostRepository;
+import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,5 +39,13 @@ public class WorkflowExecutionCostServiceImpl implements WorkflowExecutionCostSe
     @Transactional(readOnly = true)
     public Optional<WorkflowExecutionCost> fetchByJobId(long jobId) {
         return workflowExecutionCostRepository.findByJobId(jobId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public BigDecimal sumTotalCostSince(Instant since) {
+        BigDecimal totalCost = workflowExecutionCostRepository.sumTotalCostSince(since);
+
+        return totalCost == null ? BigDecimal.ZERO : totalCost;
     }
 }

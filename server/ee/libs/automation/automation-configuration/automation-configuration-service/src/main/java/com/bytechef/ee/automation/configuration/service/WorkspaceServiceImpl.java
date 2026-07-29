@@ -17,14 +17,19 @@ import com.bytechef.ee.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import com.bytechef.exception.ConfigurationException;
+import com.bytechef.exception.QuotaLimitExceededException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.plan.provider.PlanLimitsProvider;
+import com.bytechef.platform.ratelimit.PlanLimitRejectionCounter;
 import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.user.service.UserService;
+import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,16 +49,23 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     private static final Logger log = LoggerFactory.getLogger(WorkspaceServiceImpl.class);
 
     private final PermissionService permissionService;
+    private final ObjectProvider<PlanLimitRejectionCounter> planLimitRejectionCounterObjectProvider;
+    private final ObjectProvider<PlanLimitsProvider> planLimitsProviderObjectProvider;
     private final UserService userService;
     private final WorkspaceRepository workspaceRepository;
     private final WorkspaceUserRepository workspaceUserRepository;
 
     @SuppressFBWarnings("EI")
     public WorkspaceServiceImpl(
-        PermissionService permissionService, UserService userService,
-        WorkspaceRepository workspaceRepository, WorkspaceUserRepository workspaceUserRepository) {
+        PermissionService permissionService,
+        ObjectProvider<PlanLimitRejectionCounter> planLimitRejectionCounterObjectProvider,
+        ObjectProvider<PlanLimitsProvider> planLimitsProviderObjectProvider,
+        UserService userService, WorkspaceRepository workspaceRepository,
+        WorkspaceUserRepository workspaceUserRepository) {
 
         this.permissionService = permissionService;
+        this.planLimitRejectionCounterObjectProvider = planLimitRejectionCounterObjectProvider;
+        this.planLimitsProviderObjectProvider = planLimitsProviderObjectProvider;
         this.userService = userService;
         this.workspaceRepository = workspaceRepository;
         this.workspaceUserRepository = workspaceUserRepository;
@@ -64,6 +76,8 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     public Workspace create(Workspace workspace) {
         Assert.notNull(workspace, "'workspace' must not be null");
         Assert.isTrue(workspace.getId() == null, "'workspace.id' must be null");
+
+        enforceWorkspaceQuota();
 
         Workspace savedWorkspace = workspaceRepository.save(workspace);
 
@@ -119,6 +133,42 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         // deletes produce one pair per member and the per-pair TransactionSynchronization overhead is why this is
         // batched rather than looped through evictWorkspaceScopeCache.
         permissionService.evictWorkspaceScopeCaches(cacheEvictionTargets);
+    }
+
+    /**
+     * Rejects the creation when the tenant already holds as many workspaces as its plan's {@code maxWorkspaces} allows.
+     * A null limit (or no {@link PlanLimitsProvider} bean) means unlimited — the pre-plan behavior.
+     */
+    private void enforceWorkspaceQuota() {
+        PlanLimitsProvider planLimitsProvider = planLimitsProviderObjectProvider.getIfAvailable();
+
+        if (planLimitsProvider == null) {
+            return;
+        }
+
+        Integer maxWorkspaces = planLimitsProvider.getPlanLimits(TenantContext.getCurrentTenantId())
+            .maxWorkspaces();
+
+        if (maxWorkspaces == null) {
+            return;
+        }
+
+        long workspaceCount = workspaceRepository.count();
+
+        if (workspaceCount >= maxWorkspaces) {
+            countQuotaRejection();
+
+            throw new QuotaLimitExceededException(
+                "Workspace quota exceeded: the plan allows at most %d workspace(s)".formatted(maxWorkspaces));
+        }
+    }
+
+    private void countQuotaRejection() {
+        PlanLimitRejectionCounter planLimitRejectionCounter = planLimitRejectionCounterObjectProvider.getIfAvailable();
+
+        if (planLimitRejectionCounter != null) {
+            planLimitRejectionCounter.increment("workspace");
+        }
     }
 
     /**

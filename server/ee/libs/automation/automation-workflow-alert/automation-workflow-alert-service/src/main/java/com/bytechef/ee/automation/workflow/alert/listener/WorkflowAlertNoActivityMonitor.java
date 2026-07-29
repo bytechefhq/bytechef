@@ -16,6 +16,8 @@ import com.bytechef.ee.automation.workflow.alert.evaluator.WorkflowAlertEvaluato
 import com.bytechef.ee.automation.workflow.alert.service.WorkflowAlertEventService;
 import com.bytechef.ee.automation.workflow.alert.service.WorkflowAlertRuleService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.tenant.TenantContext;
+import com.bytechef.tenant.service.TenantService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import org.slf4j.Logger;
@@ -39,21 +41,37 @@ public class WorkflowAlertNoActivityMonitor {
 
     private static final Logger log = LoggerFactory.getLogger(WorkflowAlertNoActivityMonitor.class);
 
+    private final TenantService tenantService;
     private final WorkflowAlertDispatcher workflowAlertDispatcher;
     private final WorkflowAlertEventService workflowAlertEventService;
     private final WorkflowAlertRuleService workflowAlertRuleService;
 
     public WorkflowAlertNoActivityMonitor(
-        WorkflowAlertDispatcher workflowAlertDispatcher, WorkflowAlertEventService workflowAlertEventService,
-        WorkflowAlertRuleService workflowAlertRuleService) {
+        TenantService tenantService, WorkflowAlertDispatcher workflowAlertDispatcher,
+        WorkflowAlertEventService workflowAlertEventService, WorkflowAlertRuleService workflowAlertRuleService) {
 
+        this.tenantService = tenantService;
         this.workflowAlertDispatcher = workflowAlertDispatcher;
         this.workflowAlertEventService = workflowAlertEventService;
         this.workflowAlertRuleService = workflowAlertRuleService;
     }
 
+    /**
+     * Sweeps every tenant under its own context: alert rules and their evaluation state are tenant-scoped, so a sweep
+     * under only the scheduler thread's default tenant would never fire NO_ACTIVITY for other tenants.
+     */
     @Scheduled(initialDelayString = "PT5M", fixedDelayString = "PT5M")
     public void checkNoActivity() {
+        for (String tenantId : tenantService.getTenantIds()) {
+            try {
+                TenantContext.runWithTenantId(tenantId, this::checkNoActivityForCurrentTenant);
+            } catch (RuntimeException exception) {
+                log.warn("No-activity sweep failed for tenant {}", tenantId, exception);
+            }
+        }
+    }
+
+    private void checkNoActivityForCurrentTenant() {
         Instant now = Instant.now();
 
         for (WorkflowAlertRule rule : workflowAlertRuleService.getEnabledWorkflowAlertRules(

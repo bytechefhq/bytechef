@@ -17,14 +17,14 @@ import com.bytechef.ee.automation.workflow.alert.service.WorkflowAlertEventServi
 import com.bytechef.ee.automation.workflow.alert.service.WorkflowAlertRuleService;
 import com.bytechef.ee.automation.workflow.execution.cost.service.WorkspaceWorkflowExecutionCostService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.plan.domain.PlanBillingPeriod;
 import com.bytechef.platform.plan.domain.PlanLimits;
 import com.bytechef.platform.plan.provider.PlanLimitsProvider;
 import com.bytechef.tenant.TenantContext;
+import com.bytechef.tenant.service.TenantService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneOffset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
@@ -50,26 +50,39 @@ public class WorkflowAlertUsageMonitor {
     private static final Logger log = LoggerFactory.getLogger(WorkflowAlertUsageMonitor.class);
 
     private final ObjectProvider<PlanLimitsProvider> planLimitsProviderObjectProvider;
+    private final TenantService tenantService;
     private final WorkflowAlertDispatcher workflowAlertDispatcher;
     private final WorkflowAlertEventService workflowAlertEventService;
     private final WorkflowAlertRuleService workflowAlertRuleService;
     private final ObjectProvider<WorkspaceWorkflowExecutionCostService> workspaceWorkflowExecutionCostServiceProvider;
 
     public WorkflowAlertUsageMonitor(
-        ObjectProvider<PlanLimitsProvider> planLimitsProviderObjectProvider,
+        ObjectProvider<PlanLimitsProvider> planLimitsProviderObjectProvider, TenantService tenantService,
         WorkflowAlertDispatcher workflowAlertDispatcher, WorkflowAlertEventService workflowAlertEventService,
         WorkflowAlertRuleService workflowAlertRuleService,
         ObjectProvider<WorkspaceWorkflowExecutionCostService> workspaceWorkflowExecutionCostServiceProvider) {
 
         this.planLimitsProviderObjectProvider = planLimitsProviderObjectProvider;
+        this.tenantService = tenantService;
         this.workflowAlertDispatcher = workflowAlertDispatcher;
         this.workflowAlertEventService = workflowAlertEventService;
         this.workflowAlertRuleService = workflowAlertRuleService;
         this.workspaceWorkflowExecutionCostServiceProvider = workspaceWorkflowExecutionCostServiceProvider;
     }
 
+    /** Sweeps every tenant under its own context — rules, workspaces, and plan limits are all tenant-scoped. */
     @Scheduled(initialDelayString = "PT10M", fixedDelayString = "PT1H")
     public void checkUsage() {
+        for (String tenantId : tenantService.getTenantIds()) {
+            try {
+                TenantContext.runWithTenantId(tenantId, this::checkUsageForCurrentTenant);
+            } catch (RuntimeException exception) {
+                log.warn("Usage-threshold sweep failed for tenant {}", tenantId, exception);
+            }
+        }
+    }
+
+    private void checkUsageForCurrentTenant() {
         PlanLimitsProvider planLimitsProvider = planLimitsProviderObjectProvider.getIfAvailable();
         WorkspaceWorkflowExecutionCostService workspaceWorkflowExecutionCostService =
             workspaceWorkflowExecutionCostServiceProvider.getIfAvailable();
@@ -89,10 +102,8 @@ public class WorkflowAlertUsageMonitor {
 
         Instant now = Instant.now();
 
-        Instant monthStart = LocalDate.now(ZoneOffset.UTC)
-            .withDayOfMonth(1)
-            .atStartOfDay(ZoneOffset.UTC)
-            .toInstant();
+        // Single source of truth for the billing period, shared with the monthly-cost admission gate.
+        Instant monthStart = PlanBillingPeriod.currentPeriodStart();
 
         for (WorkflowAlertRule rule : workflowAlertRuleService.getEnabledWorkflowAlertRules(
             WorkflowAlertRuleType.USAGE_THRESHOLD)) {
