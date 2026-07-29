@@ -318,6 +318,10 @@ server:
     session:
       cookie:
         http-only: true
+        # Lax lets top-level navigations (incl. the OAuth2 redirect back to the app) carry the cookie while blocking
+        # cross-site sub-requests. Mark the cookie Secure in production (see application-prod.yml) — omitted here so
+        # local HTTP development keeps working.
+        same-site: lax
 
 springdoc:
   show-actuator: true

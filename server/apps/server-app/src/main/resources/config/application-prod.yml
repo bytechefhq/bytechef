@@ -13,6 +13,11 @@ server:
     enabled: true
     mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json,image/svg+xml
     min-response-size: 1024
+  servlet:
+    session:
+      cookie:
+        # Production is served over HTTPS — mark the session cookie Secure so it is never sent over plain HTTP.
+        secure: true
 
 spring:
   devtools:

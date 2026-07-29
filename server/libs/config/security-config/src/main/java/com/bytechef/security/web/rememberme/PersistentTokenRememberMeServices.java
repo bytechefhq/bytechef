@@ -42,6 +42,8 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.dao.DataAccessException;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -295,9 +297,8 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
 
         PersistentToken token = optionalToken.orElseThrow();
 
-        // We have a match for this user/series combination
-        log.info("presentedToken={} / tokenValue={}", presentedToken, token.getTokenValue());
-
+        // We have a match for this user/series combination. The token value is a live credential and must never be
+        // logged.
         if (!presentedToken.equals(token.getTokenValue())) {
             // Token doesn't match series value. Delete this session and throw an exception.
             if (tenantService.isMultiTenantEnabled()) {
@@ -334,6 +335,26 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
                 token.getSeries(), token.getTokenValue(), tenantId
             },
             TOKEN_VALIDITY_SECONDS, request, response);
+    }
+
+    /**
+     * Writes the remember-me cookie as a {@code Set-Cookie} header so it can carry {@code SameSite=Lax} (the base
+     * {@link AbstractRememberMeServices#setCookie} uses the legacy Servlet {@code Cookie}, which cannot express
+     * SameSite). HttpOnly is always set; Secure follows the request scheme, matching the base behavior.
+     */
+    @Override
+    protected void setCookie(String[] tokens, int maxAge, HttpServletRequest request, HttpServletResponse response) {
+        String contextPath = request.getContextPath();
+
+        ResponseCookie cookie = ResponseCookie.from(getCookieName(), encodeCookie(tokens))
+            .maxAge(maxAge)
+            .path(contextPath.isEmpty() ? "/" : contextPath)
+            .httpOnly(true)
+            .secure(request.isSecure())
+            .sameSite("Lax")
+            .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 
     @Override
