@@ -89,7 +89,7 @@ dataSources
 # The docs tree has a content section literally named `build`, which the Gradle rule above
 # swallows. Existing pages stayed tracked, so this only bit when a new one was added and
 # `git add` skipped it with nothing but a hint.
-!docs/content/docs/platform/**/build/
+!docs/content/docs/**/build/
 **/generated/generated
 
 ######################
@@ -182,3 +182,4 @@ rebel.xml
 ######################
 **/local.env
 **/.env
+.superpowers/
