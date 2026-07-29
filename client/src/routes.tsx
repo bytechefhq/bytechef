@@ -1004,16 +1004,6 @@ export const getRouter = (queryClient: QueryClient) =>
                                             </LazyLoadWrapper>
                                         </PrivateRoute>
                                     ),
-                                    path: 'ai/skills/create/ai',
-                                },
-                                {
-                                    element: (
-                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <LazyLoadWrapper hasLeftSidebar>
-                                                <AiSkills />
-                                            </LazyLoadWrapper>
-                                        </PrivateRoute>
-                                    ),
                                     path: 'ai/skills/:skillId',
                                 },
                                 {

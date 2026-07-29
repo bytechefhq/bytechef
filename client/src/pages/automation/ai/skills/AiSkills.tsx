@@ -34,22 +34,17 @@ import {
     Trash2Icon,
 } from 'lucide-react';
 import {useEffect} from 'react';
-import {useLocation, useParams} from 'react-router-dom';
+import {useParams} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
 
-type AiSkillsRouteType = 'createWithAi' | 'detail' | 'list';
+type AiSkillsRouteType = 'detail' | 'list';
 
-const determineRoute = (skillId: string | undefined, pathname: string): AiSkillsRouteType => {
-    if (pathname.endsWith('/create/ai')) {
-        return 'createWithAi';
-    }
-
+const determineRoute = (skillId: string | undefined): AiSkillsRouteType => {
     return skillId ? 'detail' : 'list';
 };
 
 const AiSkills = () => {
     const {skillId} = useParams<{skillId?: string}>();
-    const location = useLocation();
 
     const closeSkillDetail = useAiSkillsStore((state) => state.closeSkillDetail);
     const openSkillDetail = useAiSkillsStore((state) => state.openSkillDetail);
@@ -96,26 +91,17 @@ const AiSkills = () => {
         });
     }, []);
 
-    const route = determineRoute(skillId, location.pathname);
-
-    const setSkillsView = useAiSkillsStore((state) => state.setSkillsView);
+    const route = determineRoute(skillId);
 
     useEffect(() => {
         if (route === 'detail' && skillId && selectedSkillId !== skillId) {
             openSkillDetail(skillId, '');
-        } else if (route === 'createWithAi' && skillsView !== 'createWithAi') {
-            setSkillsView('createWithAi');
-        } else if (route === 'list' && (skillsView === 'detail' || skillsView === 'createWithAi')) {
+        } else if (route === 'list' && skillsView === 'detail') {
             closeSkillDetail();
         }
-    }, [closeSkillDetail, openSkillDetail, route, selectedSkillId, setSkillsView, skillId, skillsView]);
+    }, [closeSkillDetail, openSkillDetail, route, selectedSkillId, skillId, skillsView]);
 
-    const headerTitle =
-        route === 'detail'
-            ? (skillsHeaderInfo.title ?? 'Skill')
-            : route === 'createWithAi'
-              ? 'Create Skill with AI'
-              : 'Skills';
+    const headerTitle = route === 'detail' ? (skillsHeaderInfo.title ?? 'Skill') : 'Skills';
 
     const showToolbar = route === 'list' && skillsView !== 'empty';
 
@@ -219,8 +205,7 @@ const AiSkills = () => {
     }
 
     const isDetailView = route === 'detail';
-    const createWithAiOrigin = (location.state as {origin?: 'detail' | 'list'} | null)?.origin;
-    const showSkillsSidebar = isDetailView || (route === 'createWithAi' && createWithAiOrigin === 'detail');
+    const showSkillsSidebar = isDetailView;
 
     const leftSidebarBody = showSkillsSidebar ? (
         <AiSkillsLeftSidebar currentId={skillId} />

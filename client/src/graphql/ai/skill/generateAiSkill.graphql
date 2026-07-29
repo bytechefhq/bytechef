@@ -1,0 +1,9 @@
+mutation generateAiSkill($prompt: String!) {
+    generateAiSkill(prompt: $prompt) {
+        id
+        name
+        description
+        createdDate
+        lastModifiedDate
+    }
+}

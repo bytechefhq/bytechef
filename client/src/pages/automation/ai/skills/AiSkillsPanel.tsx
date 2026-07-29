@@ -1,4 +1,3 @@
-import AiSkillCreateWithAi from '@/pages/automation/ai/skills/components/AiSkillCreateWithAi';
 import AiSkillDetail from '@/pages/automation/ai/skills/components/AiSkillDetail';
 import AiSkillsEmptyState from '@/pages/automation/ai/skills/components/AiSkillsEmptyState';
 import AiSkillsList from '@/pages/automation/ai/skills/components/AiSkillsList';
@@ -33,8 +32,6 @@ const AiSkillsPanel = () => {
             {currentView === 'list' && <AiSkillsList skills={skills} />}
 
             {currentView === 'detail' && <AiSkillDetail />}
-
-            {currentView === 'createWithAi' && <AiSkillCreateWithAi />}
         </div>
     );
 };
