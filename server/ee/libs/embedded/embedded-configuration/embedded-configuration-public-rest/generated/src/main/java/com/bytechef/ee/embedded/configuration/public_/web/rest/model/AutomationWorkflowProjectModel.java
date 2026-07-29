@@ -6,6 +6,7 @@ import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationW
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "AutomationWorkflowProject", description = "An automation workflow catalog project.")
 @JsonTypeName("AutomationWorkflowProject")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-01T09:51:24.564853+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-27T21:42:20.429973+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 public class AutomationWorkflowProjectModel {
 
   private @Nullable Long id;
@@ -37,6 +38,43 @@ public class AutomationWorkflowProjectModel {
 
   @Valid
   private List<@Valid AutomationWorkflowProjectWorkflowTemplateModel> workflowTemplates = new ArrayList<>();
+
+  /**
+   * Whether copying this project's templates creates a per-user copy or a shared reference.
+   */
+  public enum KindEnum {
+    COPY("COPY"),
+    
+    REFERENCE("REFERENCE");
+
+    private final String value;
+
+    KindEnum(String value) {
+      this.value = value;
+    }
+
+    @JsonValue
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    @JsonCreator
+    public static KindEnum fromValue(String value) {
+      for (KindEnum b : KindEnum.values()) {
+        if (b.value.equalsIgnoreCase(value)) {
+          return b;
+        }
+      }
+      throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+  }
+
+  private @Nullable KindEnum kind;
 
   public AutomationWorkflowProjectModel id(@Nullable Long id) {
     this.id = id;
@@ -130,6 +168,27 @@ public class AutomationWorkflowProjectModel {
     this.workflowTemplates = workflowTemplates;
   }
 
+  public AutomationWorkflowProjectModel kind(@Nullable KindEnum kind) {
+    this.kind = kind;
+    return this;
+  }
+
+  /**
+   * Whether copying this project's templates creates a per-user copy or a shared reference.
+   * @return kind
+   */
+  
+  @Schema(name = "kind", description = "Whether copying this project's templates creates a per-user copy or a shared reference.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("kind")
+  public @Nullable KindEnum getKind() {
+    return kind;
+  }
+
+  @JsonProperty("kind")
+  public void setKind(@Nullable KindEnum kind) {
+    this.kind = kind;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -142,12 +201,13 @@ public class AutomationWorkflowProjectModel {
     return Objects.equals(this.id, automationWorkflowProject.id) &&
         Objects.equals(this.name, automationWorkflowProject.name) &&
         Objects.equals(this.description, automationWorkflowProject.description) &&
-        Objects.equals(this.workflowTemplates, automationWorkflowProject.workflowTemplates);
+        Objects.equals(this.workflowTemplates, automationWorkflowProject.workflowTemplates) &&
+        Objects.equals(this.kind, automationWorkflowProject.kind);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, description, workflowTemplates);
+    return Objects.hash(id, name, description, workflowTemplates, kind);
   }
 
   @Override
@@ -158,6 +218,7 @@ public class AutomationWorkflowProjectModel {
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    workflowTemplates: ").append(toIndentedString(workflowTemplates)).append("\n");
+    sb.append("    kind: ").append(toIndentedString(kind)).append("\n");
     sb.append("}");
     return sb.toString();
   }

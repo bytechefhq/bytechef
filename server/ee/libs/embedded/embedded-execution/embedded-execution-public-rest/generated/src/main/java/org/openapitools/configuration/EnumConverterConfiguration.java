@@ -5,6 +5,10 @@ import java.net.URI;
 import java.util.UUID;
 
 import com.bytechef.ee.embedded.execution.public_.web.rest.model.EnvironmentModel;
+import com.bytechef.ee.embedded.execution.public_.web.rest.model.ToolInvocationKindModel;
+import com.bytechef.ee.embedded.execution.public_.web.rest.model.ToolInvocationOutcomeModel;
+import com.bytechef.ee.embedded.execution.public_.web.rest.model.ToolInvocationSurfaceModel;
+import com.bytechef.ee.embedded.execution.public_.web.rest.model.WorkflowExecutionStatusModel;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,6 +30,42 @@ public class EnumConverterConfiguration {
             @Override
             public EnvironmentModel convert(String source) {
                 return EnvironmentModel.fromValue(source);
+            }
+        };
+    }
+    @Bean(name = "org.openapitools.configuration.EnumConverterConfiguration.toolInvocationKindConverter")
+    Converter<String, ToolInvocationKindModel> toolInvocationKindConverter() {
+        return new Converter<String, ToolInvocationKindModel>() {
+            @Override
+            public ToolInvocationKindModel convert(String source) {
+                return ToolInvocationKindModel.fromValue(source);
+            }
+        };
+    }
+    @Bean(name = "org.openapitools.configuration.EnumConverterConfiguration.toolInvocationOutcomeConverter")
+    Converter<String, ToolInvocationOutcomeModel> toolInvocationOutcomeConverter() {
+        return new Converter<String, ToolInvocationOutcomeModel>() {
+            @Override
+            public ToolInvocationOutcomeModel convert(String source) {
+                return ToolInvocationOutcomeModel.fromValue(source);
+            }
+        };
+    }
+    @Bean(name = "org.openapitools.configuration.EnumConverterConfiguration.toolInvocationSurfaceConverter")
+    Converter<String, ToolInvocationSurfaceModel> toolInvocationSurfaceConverter() {
+        return new Converter<String, ToolInvocationSurfaceModel>() {
+            @Override
+            public ToolInvocationSurfaceModel convert(String source) {
+                return ToolInvocationSurfaceModel.fromValue(source);
+            }
+        };
+    }
+    @Bean(name = "org.openapitools.configuration.EnumConverterConfiguration.workflowExecutionStatusConverter")
+    Converter<String, WorkflowExecutionStatusModel> workflowExecutionStatusConverter() {
+        return new Converter<String, WorkflowExecutionStatusModel>() {
+            @Override
+            public WorkflowExecutionStatusModel convert(String source) {
+                return WorkflowExecutionStatusModel.fromValue(source);
             }
         };
     }

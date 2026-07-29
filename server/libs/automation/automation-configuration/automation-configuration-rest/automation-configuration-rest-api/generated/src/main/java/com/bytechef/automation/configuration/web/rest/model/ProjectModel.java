@@ -31,7 +31,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Project", description = "A group of workflows that make one logical project.")
 @JsonTypeName("Project")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-01T09:51:25.283885+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-17T21:39:45.646261+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 public class ProjectModel {
 
   private @Nullable String createdBy;
@@ -60,6 +60,10 @@ public class ProjectModel {
   private @Nullable String uuid;
 
   private @Nullable CategoryModel category;
+
+  private @Nullable Boolean codeWorkflow;
+
+  private @Nullable String codeWorkflowLanguage;
 
   @Valid
   private List<Long> projectWorkflowIds = new ArrayList<>();
@@ -335,6 +339,48 @@ public class ProjectModel {
     this.category = category;
   }
 
+  public ProjectModel codeWorkflow(@Nullable Boolean codeWorkflow) {
+    this.codeWorkflow = codeWorkflow;
+    return this;
+  }
+
+  /**
+   * Whether the project is backed by a code workflow.
+   * @return codeWorkflow
+   */
+  
+  @Schema(name = "codeWorkflow", accessMode = Schema.AccessMode.READ_ONLY, description = "Whether the project is backed by a code workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("codeWorkflow")
+  public @Nullable Boolean getCodeWorkflow() {
+    return codeWorkflow;
+  }
+
+  @JsonProperty("codeWorkflow")
+  public void setCodeWorkflow(@Nullable Boolean codeWorkflow) {
+    this.codeWorkflow = codeWorkflow;
+  }
+
+  public ProjectModel codeWorkflowLanguage(@Nullable String codeWorkflowLanguage) {
+    this.codeWorkflowLanguage = codeWorkflowLanguage;
+    return this;
+  }
+
+  /**
+   * The programming language of the code workflow, if the project is code-backed.
+   * @return codeWorkflowLanguage
+   */
+  
+  @Schema(name = "codeWorkflowLanguage", accessMode = Schema.AccessMode.READ_ONLY, description = "The programming language of the code workflow, if the project is code-backed.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("codeWorkflowLanguage")
+  public @Nullable String getCodeWorkflowLanguage() {
+    return codeWorkflowLanguage;
+  }
+
+  @JsonProperty("codeWorkflowLanguage")
+  public void setCodeWorkflowLanguage(@Nullable String codeWorkflowLanguage) {
+    this.codeWorkflowLanguage = codeWorkflowLanguage;
+  }
+
   public ProjectModel projectWorkflowIds(List<Long> projectWorkflowIds) {
     this.projectWorkflowIds = projectWorkflowIds;
     return this;
@@ -456,6 +502,8 @@ public class ProjectModel {
         Objects.equals(this.lastProjectVersion, project.lastProjectVersion) &&
         Objects.equals(this.uuid, project.uuid) &&
         Objects.equals(this.category, project.category) &&
+        Objects.equals(this.codeWorkflow, project.codeWorkflow) &&
+        Objects.equals(this.codeWorkflowLanguage, project.codeWorkflowLanguage) &&
         Objects.equals(this.projectWorkflowIds, project.projectWorkflowIds) &&
         Objects.equals(this.tags, project.tags) &&
         Objects.equals(this.workspaceId, project.workspaceId) &&
@@ -464,7 +512,7 @@ public class ProjectModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, description, id, lastModifiedBy, lastModifiedDate, name, lastPublishedDate, lastStatus, lastProjectVersion, uuid, category, projectWorkflowIds, tags, workspaceId, version);
+    return Objects.hash(createdBy, createdDate, description, id, lastModifiedBy, lastModifiedDate, name, lastPublishedDate, lastStatus, lastProjectVersion, uuid, category, codeWorkflow, codeWorkflowLanguage, projectWorkflowIds, tags, workspaceId, version);
   }
 
   @Override
@@ -483,6 +531,8 @@ public class ProjectModel {
     sb.append("    lastProjectVersion: ").append(toIndentedString(lastProjectVersion)).append("\n");
     sb.append("    uuid: ").append(toIndentedString(uuid)).append("\n");
     sb.append("    category: ").append(toIndentedString(category)).append("\n");
+    sb.append("    codeWorkflow: ").append(toIndentedString(codeWorkflow)).append("\n");
+    sb.append("    codeWorkflowLanguage: ").append(toIndentedString(codeWorkflowLanguage)).append("\n");
     sb.append("    projectWorkflowIds: ").append(toIndentedString(projectWorkflowIds)).append("\n");
     sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
     sb.append("    workspaceId: ").append(toIndentedString(workspaceId)).append("\n");

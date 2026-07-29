@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("ComponentInputOptionsRequest")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-06-22T19:00:15.503391+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-27T21:42:20.429973+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 public class ComponentInputOptionsRequestModel {
 
   private String componentName;

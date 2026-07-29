@@ -64,7 +64,9 @@ public class ProjectDeploymentWorkflowModel {
     
     FAILED("FAILED"),
     
-    STOPPED("STOPPED");
+    STOPPED("STOPPED"),
+    
+    CANCELLED("CANCELLED");
 
     private final String value;
 

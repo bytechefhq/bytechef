@@ -1,0 +1,255 @@
+package com.bytechef.ee.embedded.execution.public_.web.rest.model;
+
+import java.net.URI;
+import java.util.Objects;
+import com.bytechef.ee.embedded.execution.public_.web.rest.model.ExecutionErrorModel;
+import com.bytechef.ee.embedded.execution.public_.web.rest.model.IntegrationReferenceModel;
+import com.bytechef.ee.embedded.execution.public_.web.rest.model.WorkflowExecutionStatusModel;
+import com.bytechef.ee.embedded.execution.public_.web.rest.model.WorkflowReferenceModel;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.annotation.JsonValue;
+import java.time.OffsetDateTime;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.lang.Nullable;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+
+import java.util.*;
+import jakarta.annotation.Generated;
+
+/**
+ * A workflow execution list row. Never carries execution data - fetch the execution by id for inputs, outputs and task executions.
+ */
+
+@Schema(name = "WorkflowExecutionBasic", description = "A workflow execution list row. Never carries execution data - fetch the execution by id for inputs, outputs and task executions.")
+@JsonTypeName("WorkflowExecutionBasic")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-18T16:40:13.932099944Z[Etc/UTC]", comments = "Generator version: 7.22.0")
+public class WorkflowExecutionBasicModel {
+
+  private Long id;
+
+  private @Nullable WorkflowExecutionStatusModel status;
+
+  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+  private @Nullable OffsetDateTime startDate;
+
+  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+  private @Nullable OffsetDateTime endDate;
+
+  private @Nullable ExecutionErrorModel error;
+
+  private @Nullable IntegrationReferenceModel integration;
+
+  private @Nullable WorkflowReferenceModel workflow;
+
+  public WorkflowExecutionBasicModel() {
+    super();
+  }
+
+  /**
+   * Constructor with only required parameters
+   */
+  public WorkflowExecutionBasicModel(Long id) {
+    this.id = id;
+  }
+
+  public WorkflowExecutionBasicModel id(Long id) {
+    this.id = id;
+    return this;
+  }
+
+  /**
+   * The id of a workflow execution.
+   * @return id
+   */
+  
+  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a workflow execution.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("id")
+  public Long getId() {
+    return id;
+  }
+
+  @JsonProperty("id")
+  public void setId(Long id) {
+    this.id = id;
+  }
+
+  public WorkflowExecutionBasicModel status(@Nullable WorkflowExecutionStatusModel status) {
+    this.status = status;
+    return this;
+  }
+
+  /**
+   * Get status
+   * @return status
+   */
+  @Valid 
+  @Schema(name = "status", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("status")
+  public @Nullable WorkflowExecutionStatusModel getStatus() {
+    return status;
+  }
+
+  @JsonProperty("status")
+  public void setStatus(@Nullable WorkflowExecutionStatusModel status) {
+    this.status = status;
+  }
+
+  public WorkflowExecutionBasicModel startDate(@Nullable OffsetDateTime startDate) {
+    this.startDate = startDate;
+    return this;
+  }
+
+  /**
+   * The instant an execution started.
+   * @return startDate
+   */
+  @Valid 
+  @Schema(name = "startDate", description = "The instant an execution started.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("startDate")
+  public @Nullable OffsetDateTime getStartDate() {
+    return startDate;
+  }
+
+  @JsonProperty("startDate")
+  public void setStartDate(@Nullable OffsetDateTime startDate) {
+    this.startDate = startDate;
+  }
+
+  public WorkflowExecutionBasicModel endDate(@Nullable OffsetDateTime endDate) {
+    this.endDate = endDate;
+    return this;
+  }
+
+  /**
+   * The instant an execution ended. Null while the execution is running.
+   * @return endDate
+   */
+  @Valid 
+  @Schema(name = "endDate", description = "The instant an execution ended. Null while the execution is running.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("endDate")
+  public @Nullable OffsetDateTime getEndDate() {
+    return endDate;
+  }
+
+  @JsonProperty("endDate")
+  public void setEndDate(@Nullable OffsetDateTime endDate) {
+    this.endDate = endDate;
+  }
+
+  public WorkflowExecutionBasicModel error(@Nullable ExecutionErrorModel error) {
+    this.error = error;
+    return this;
+  }
+
+  /**
+   * Get error
+   * @return error
+   */
+  @Valid 
+  @Schema(name = "error", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("error")
+  public @Nullable ExecutionErrorModel getError() {
+    return error;
+  }
+
+  @JsonProperty("error")
+  public void setError(@Nullable ExecutionErrorModel error) {
+    this.error = error;
+  }
+
+  public WorkflowExecutionBasicModel integration(@Nullable IntegrationReferenceModel integration) {
+    this.integration = integration;
+    return this;
+  }
+
+  /**
+   * Get integration
+   * @return integration
+   */
+  @Valid 
+  @Schema(name = "integration", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("integration")
+  public @Nullable IntegrationReferenceModel getIntegration() {
+    return integration;
+  }
+
+  @JsonProperty("integration")
+  public void setIntegration(@Nullable IntegrationReferenceModel integration) {
+    this.integration = integration;
+  }
+
+  public WorkflowExecutionBasicModel workflow(@Nullable WorkflowReferenceModel workflow) {
+    this.workflow = workflow;
+    return this;
+  }
+
+  /**
+   * Get workflow
+   * @return workflow
+   */
+  @Valid 
+  @Schema(name = "workflow", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("workflow")
+  public @Nullable WorkflowReferenceModel getWorkflow() {
+    return workflow;
+  }
+
+  @JsonProperty("workflow")
+  public void setWorkflow(@Nullable WorkflowReferenceModel workflow) {
+    this.workflow = workflow;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    WorkflowExecutionBasicModel workflowExecutionBasic = (WorkflowExecutionBasicModel) o;
+    return Objects.equals(this.id, workflowExecutionBasic.id) &&
+        Objects.equals(this.status, workflowExecutionBasic.status) &&
+        Objects.equals(this.startDate, workflowExecutionBasic.startDate) &&
+        Objects.equals(this.endDate, workflowExecutionBasic.endDate) &&
+        Objects.equals(this.error, workflowExecutionBasic.error) &&
+        Objects.equals(this.integration, workflowExecutionBasic.integration) &&
+        Objects.equals(this.workflow, workflowExecutionBasic.workflow);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id, status, startDate, endDate, error, integration, workflow);
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("class WorkflowExecutionBasicModel {\n");
+    sb.append("    id: ").append(toIndentedString(id)).append("\n");
+    sb.append("    status: ").append(toIndentedString(status)).append("\n");
+    sb.append("    startDate: ").append(toIndentedString(startDate)).append("\n");
+    sb.append("    endDate: ").append(toIndentedString(endDate)).append("\n");
+    sb.append("    error: ").append(toIndentedString(error)).append("\n");
+    sb.append("    integration: ").append(toIndentedString(integration)).append("\n");
+    sb.append("    workflow: ").append(toIndentedString(workflow)).append("\n");
+    sb.append("}");
+    return sb.toString();
+  }
+
+  /**
+   * Convert the given object to string with each line indented by 4 spaces
+   * (except the first line).
+   */
+  private String toIndentedString(@Nullable Object o) {
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
+  }
+}
+
