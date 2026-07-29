@@ -321,6 +321,26 @@ describe('useWorkflowTestRunGuard', () => {
             expect(workflowTestApiInstance.stopWorkflowTest).toHaveBeenCalledWith({jobId}, {keepalive: true});
         });
 
+        it('should NOT stop a running workflow when a progress snapshot sets the job id mid-run', () => {
+            let workflowTestExecution: WorkflowEditorI['workflowTestExecution'] = undefined;
+
+            vi.mocked(useWorkflowEditorStore).mockImplementation((selector: (state: WorkflowEditorI) => unknown) =>
+                selector({
+                    workflowIsRunning: true,
+                    workflowTestExecution,
+                } as WorkflowEditorI)
+            );
+
+            const {rerender} = renderHook(() => useWorkflowTestRunGuard(workflowId, environmentId));
+
+            workflowTestExecution = {job: {id: jobId, status: 'STARTED'}} as WorkflowEditorI['workflowTestExecution'];
+
+            rerender();
+
+            const workflowTestApiInstance = new WorkflowTestApi();
+            expect(workflowTestApiInstance.stopWorkflowTest).not.toHaveBeenCalled();
+        });
+
         it('should NOT stop workflow on unmount if it is NOT running', () => {
             vi.mocked(useWorkflowEditorStore).mockImplementation((selector: (state: WorkflowEditorI) => unknown) =>
                 selector({

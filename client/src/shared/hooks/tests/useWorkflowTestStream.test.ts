@@ -5,23 +5,35 @@ import {afterEach, describe, expect, it, vi} from 'vitest';
 
 import {useWorkflowTestStream} from '../useWorkflowTestStream';
 
+const mockResetWorkflowTestNodeStates = vi.fn();
 const mockSetWorkflowIsRunning = vi.fn();
 const mockSetWorkflowTestExecution = vi.fn();
+const mockSetWorkflowTestNodeState = vi.fn();
 
-vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowEditorStore', () => ({
-    default: vi.fn((selector) =>
-        selector({
-            setWorkflowIsRunning: mockSetWorkflowIsRunning,
-            setWorkflowTestExecution: mockSetWorkflowTestExecution,
-        })
-    ),
-    useWorkflowEditorStore: vi.fn((selector) =>
-        selector({
-            setWorkflowIsRunning: mockSetWorkflowIsRunning,
-            setWorkflowTestExecution: mockSetWorkflowTestExecution,
-        })
-    ),
-}));
+let mockWorkflowIsRunning = false;
+let mockWorkflowTestExecution: {job?: {status?: string}} | undefined;
+
+vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowEditorStore', () => {
+    // Lazy: the mock* consts are hoisted below this factory, so they must only be dereferenced at call time.
+    const getStoreState = () => ({
+        resetWorkflowTestNodeStates: mockResetWorkflowTestNodeStates,
+        setWorkflowIsRunning: mockSetWorkflowIsRunning,
+        setWorkflowTestExecution: mockSetWorkflowTestExecution,
+        setWorkflowTestNodeState: mockSetWorkflowTestNodeState,
+        workflowIsRunning: mockWorkflowIsRunning,
+        workflowTestExecution: mockWorkflowTestExecution,
+    });
+
+    const useStoreMock = Object.assign(
+        vi.fn((selector) => selector(getStoreState())),
+        {getState: getStoreState}
+    );
+
+    return {
+        default: useStoreMock,
+        useWorkflowEditorStore: useStoreMock,
+    };
+});
 
 const mockPersistJobId = vi.fn();
 const usePersistJobId = vi.fn();
@@ -51,6 +63,9 @@ vi.mock('@/shared/hooks/useSSE', () => ({
 
 describe('useWorkflowTestStream', () => {
     afterEach(() => {
+        mockWorkflowIsRunning = false;
+        mockWorkflowTestExecution = undefined;
+
         vi.clearAllMocks();
     });
 
@@ -173,10 +188,14 @@ describe('useWorkflowTestStream', () => {
         });
     });
 
-    it('should return close function from useSSE', () => {
+    it('should close the SSE connection on close', () => {
         const {result} = renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
 
-        expect(result.current.close).toBe(mockClose);
+        act(() => {
+            result.current.close();
+        });
+
+        expect(mockClose).toHaveBeenCalled();
     });
 
     it('should return error from useSSE', () => {
@@ -352,128 +371,175 @@ describe('useWorkflowTestStream', () => {
         });
     });
 
-    it('should clear the stream request and call onStreamEnd when the stream closes', () => {
-        const onStreamEnd = vi.fn();
+    it('should reset node states on start event', () => {
+        renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
 
-        const {result} = renderHook(() => useWorkflowTestStream({onStreamEnd, workflowId: 'workflow-123'}));
-
-        const mockRequest = {init: {method: 'POST'}, url: '/api/platform/internal/workflow-tests'};
-
-        act(() => {
-            result.current.setStreamRequest(mockRequest);
-        });
-
-        expect(useSSE).toHaveBeenLastCalledWith(mockRequest, expect.any(Object));
-
-        const {onClose} = (useSSE as any).mock.lastCall[1];
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        const eventHandlers = (useSSE as any).mock.calls[0][1].eventHandlers;
 
         act(() => {
-            onClose();
+            eventHandlers.start({jobId: 'job-123'});
         });
 
-        expect(onStreamEnd).toHaveBeenCalledTimes(1);
-        expect(useSSE).toHaveBeenLastCalledWith(null, expect.any(Object));
+        expect(mockResetWorkflowTestNodeStates).toHaveBeenCalled();
     });
 
-    it('should stop the run when the stream closes without a result and no onStreamEnd is given', () => {
-        const streamRequest = {init: {method: 'POST'}, url: '/test'};
+    it('should handle task_started event', () => {
+        renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
+
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        const eventHandlers = (useSSE as any).mock.calls[0][1].eventHandlers;
+
+        act(() => {
+            eventHandlers.task_started({name: 'task_1', taskExecutionId: '10'});
+        });
+
+        expect(mockSetWorkflowTestNodeState).toHaveBeenCalledWith('task_1', {status: 'RUNNING'});
+    });
+
+    it('should handle task_completed event', () => {
+        renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
+
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        const eventHandlers = (useSSE as any).mock.calls[0][1].eventHandlers;
+
+        act(() => {
+            eventHandlers.task_completed({name: 'task_1', status: 'COMPLETED', taskExecutionId: '10'});
+        });
+
+        expect(mockSetWorkflowTestNodeState).toHaveBeenCalledWith('task_1', {status: 'COMPLETED'});
+    });
+
+    it('should compute duration for task_completed event with dates', () => {
+        renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
+
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        const eventHandlers = (useSSE as any).mock.calls[0][1].eventHandlers;
+
+        act(() => {
+            eventHandlers.task_completed({
+                endDate: '2026-07-20T10:00:01.250Z',
+                name: 'task_1',
+                startDate: '2026-07-20T10:00:00.000Z',
+                status: 'COMPLETED',
+                taskExecutionId: '10',
+            });
+        });
+
+        expect(mockSetWorkflowTestNodeState).toHaveBeenCalledWith('task_1', {
+            durationMillis: 1250,
+            status: 'COMPLETED',
+        });
+    });
+
+    it('should handle task_completed event with failed status', () => {
+        renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
+
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        const eventHandlers = (useSSE as any).mock.calls[0][1].eventHandlers;
+
+        act(() => {
+            eventHandlers.task_completed({name: 'task_1', status: 'FAILED', taskExecutionId: '10'});
+        });
+
+        expect(mockSetWorkflowTestNodeState).toHaveBeenCalledWith('task_1', {status: 'FAILED'});
+    });
+
+    it('should handle task_failed event', () => {
+        renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
+
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        const eventHandlers = (useSSE as any).mock.calls[0][1].eventHandlers;
+
+        act(() => {
+            eventHandlers.task_failed({error: 'Boom', name: 'task_1', taskExecutionId: '10'});
+        });
+
+        expect(mockSetWorkflowTestNodeState).toHaveBeenCalledWith('task_1', {error: 'Boom', status: 'FAILED'});
+    });
+
+    it('should handle task_started event with string data', () => {
+        renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
+
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        const eventHandlers = (useSSE as any).mock.calls[0][1].eventHandlers;
+
+        act(() => {
+            eventHandlers.task_started('{"name":"task_1","taskExecutionId":"10"}');
+        });
+
+        expect(mockSetWorkflowTestNodeState).toHaveBeenCalledWith('task_1', {status: 'RUNNING'});
+    });
+
+    it('should ignore task events without a name', () => {
+        renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
+
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        const eventHandlers = (useSSE as any).mock.calls[0][1].eventHandlers;
+
+        act(() => {
+            eventHandlers.task_started({taskExecutionId: '10'});
+        });
+
+        expect(mockSetWorkflowTestNodeState).not.toHaveBeenCalled();
+    });
+
+    it('should show a progress snapshot while the workflow is running', () => {
+        mockWorkflowIsRunning = true;
+
+        renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
+
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        const eventHandlers = (useSSE as any).mock.calls[0][1].eventHandlers;
+
+        act(() => {
+            eventHandlers.progress(
+                JSON.stringify({job: {id: '1', priority: 0, status: 'STARTED', taskExecutions: []}})
+            );
+        });
+
+        expect(mockSetWorkflowTestExecution).toHaveBeenCalledWith(
+            expect.objectContaining({job: expect.objectContaining({id: '1', status: 'STARTED'})})
+        );
+        expect(mockSetWorkflowIsRunning).not.toHaveBeenCalledWith(false);
+    });
+
+    it('should ignore a progress snapshot that arrives after the run ended', () => {
+        mockWorkflowIsRunning = false;
+
+        renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
+
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        const eventHandlers = (useSSE as any).mock.calls[0][1].eventHandlers;
+
+        act(() => {
+            eventHandlers.progress({job: {id: '1', priority: 0, status: 'STARTED'}});
+        });
+
+        expect(mockSetWorkflowTestExecution).not.toHaveBeenCalled();
+    });
+
+    it('should drop a progress snapshot on close so a stopped run does not read as running', () => {
+        mockWorkflowTestExecution = {job: {status: 'STARTED'}};
 
         const {result} = renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
 
         act(() => {
-            result.current.setStreamRequest(streamRequest);
+            result.current.close();
         });
 
-        const {onClose} = (useSSE as any).mock.lastCall[1];
-
-        act(() => {
-            onClose();
-        });
-
-        expect(mockSetWorkflowIsRunning).toHaveBeenCalledWith(false);
+        expect(mockSetWorkflowTestExecution).toHaveBeenCalledWith(undefined);
     });
 
-    it('should show the question and keep the run going when the agent asks the user a question', () => {
-        const onStreamEnd = vi.fn();
-        const streamRequest = {init: {method: 'POST'}, url: '/test'};
+    it('should keep a finished result on close', () => {
+        mockWorkflowTestExecution = {job: {status: 'COMPLETED'}};
 
-        const {result} = renderHook(() => useWorkflowTestStream({onStreamEnd, workflowId: 'workflow-123'}));
-
-        act(() => {
-            result.current.setStreamRequest(streamRequest);
-        });
-
-        const eventHandlers = (useSSE as any).mock.lastCall[1].eventHandlers;
+        const {result} = renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
 
         act(() => {
-            eventHandlers.ask_user_question({
-                questions: [{header: 'Color', multiSelect: false, options: [], question: 'Which color?'}],
-            });
+            result.current.close();
         });
 
-        expect(onStreamEnd).not.toHaveBeenCalled();
-        expect(mockSetWorkflowIsRunning).not.toHaveBeenCalledWith(false);
-        expect(useSSE).toHaveBeenLastCalledWith(streamRequest, expect.any(Object));
-    });
-
-    it('should keep a question asked during the run when the run ends with a final message', () => {
-        useWorkflowTestChatStore.setState({messages: [{content: '', role: 'assistant'}]});
-
-        renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
-
-        const eventHandlers = (useSSE as any).mock.lastCall[1].eventHandlers;
-
-        act(() => {
-            eventHandlers.start({jobId: 42});
-            eventHandlers.ask_user_question({
-                questions: [{header: 'Color', multiSelect: false, options: [], question: 'Which color?'}],
-            });
-            eventHandlers.stream('Answer in your next message.');
-            eventHandlers.result({job: {outputs: {message: 'Answer in your next message.'}, status: 'COMPLETED'}});
-        });
-
-        const {messages} = useWorkflowTestChatStore.getState();
-
-        expect(messages[messages.length - 1].content).toEqual(expect.stringContaining('**Color**: Which color?'));
-        expect(mockSetWorkflowIsRunning).toHaveBeenCalledWith(false);
-        expect(mockPersistJobId).toHaveBeenLastCalledWith(null);
-    });
-
-    it('should show the final message of a run that follows a run in which a question was asked', () => {
-        useWorkflowTestChatStore.setState({messages: [{content: '', role: 'assistant'}]});
-
-        renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
-
-        const eventHandlers = (useSSE as any).mock.lastCall[1].eventHandlers;
-
-        act(() => {
-            eventHandlers.start({jobId: 1});
-            eventHandlers.ask_user_question({
-                questions: [{header: 'Color', multiSelect: false, options: [], question: 'Which color?'}],
-            });
-            eventHandlers.result({job: {outputs: {message: 'First'}, status: 'COMPLETED'}});
-        });
-
-        act(() => {
-            useWorkflowTestChatStore.getState().setMessage({content: 'Again', role: 'user'});
-            useWorkflowTestChatStore.getState().setMessage({content: '', role: 'assistant'});
-        });
-
-        act(() => {
-            eventHandlers.start({jobId: 2});
-            eventHandlers.result({job: {outputs: {message: 'Second'}, status: 'COMPLETED'}});
-        });
-
-        const {messages} = useWorkflowTestChatStore.getState();
-
-        expect(messages[messages.length - 1].content).toBe('Second');
-    });
-
-    it('should ignore a stream close when no onStreamEnd is given', () => {
-        renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
-
-        const {onClose} = (useSSE as any).mock.calls[0][1];
-
-        expect(() => act(() => onClose())).not.toThrow();
+        expect(mockSetWorkflowTestExecution).not.toHaveBeenCalled();
     });
 });

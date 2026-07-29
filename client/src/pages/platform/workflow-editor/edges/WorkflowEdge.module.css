@@ -1,0 +1,10 @@
+.runningPath {
+    stroke-dasharray: 6 4;
+    animation: workflowEdgeDash 0.5s linear infinite;
+}
+
+@keyframes workflowEdgeDash {
+    to {
+        stroke-dashoffset: -10;
+    }
+}
