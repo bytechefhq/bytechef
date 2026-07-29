@@ -147,6 +147,8 @@ export function useApprovalTaskDetail(): UseApprovalTaskDetailReturnI {
 
     const handleApprovalSubmitted = useCallback(() => {
         void queryClient.invalidateQueries({queryKey: ['approvalTasks']});
+        // Resolving a task also clears it from the "Pending run approvals" banner, which is a separate query.
+        void queryClient.invalidateQueries({queryKey: ['pendingApprovals']});
     }, [queryClient]);
 
     return {

@@ -9,6 +9,7 @@ interface ToolInvocationsTableProps {
 }
 
 const SURFACE_LABELS: Record<string, string> = {
+    AI_AGENT: 'AI Agent',
     EMBEDDED_API_ACTION: 'Embedded API (Action)',
     EMBEDDED_API_TOOL: 'Embedded API (Tool)',
     MCP_AUTOMATION: 'Automation MCP',

@@ -27,6 +27,9 @@ const cycleStatus = (status: ApprovalTaskI['status']): ApprovalTaskI['status'] =
             return 'in-progress';
         case 'in-progress':
             return 'open';
+        // An expired approval can no longer be resolved — its status is terminal.
+        case 'expired':
+            return 'expired';
         default:
             return 'open';
     }

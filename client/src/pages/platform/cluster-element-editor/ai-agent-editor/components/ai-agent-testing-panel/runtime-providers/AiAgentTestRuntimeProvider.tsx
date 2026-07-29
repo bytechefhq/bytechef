@@ -1,8 +1,13 @@
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
+import {ApprovalResolutionContext, ResumeError} from '@/shared/components/ai-chat/approvalResolutionContext';
 import {SSERequestType, useSSE} from '@/shared/hooks/useSSE';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {AskUserQuestionEventI, formatAskUserQuestionMessage} from '@/shared/util/assistant-message-utils';
+import {
+    ApprovalRequestEventI,
+    AskUserQuestionEventI,
+    formatAskUserQuestionMessage,
+} from '@/shared/util/assistant-message-utils';
 import {extractStreamChunk} from '@/shared/util/stream-utils';
 import {
     AppendMessage,
@@ -13,7 +18,7 @@ import {
     ThreadMessageLike,
     useExternalStoreRuntime,
 } from '@assistant-ui/react';
-import {ReactNode, useEffect, useState} from 'react';
+import {ReactNode, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 import {useAiAgentTestingChatStore, useTestingModeStore} from '../../../stores';
@@ -60,8 +65,41 @@ export default function AiAgentTestRuntimeProvider({children}: Readonly<{childre
 
     useAiAgentTestDataPills();
 
+    const pendingResumeRef = useRef<{reject: (error: Error) => void; resolve: () => void} | null>(null);
+
     const {connectionState, error: sseError} = useSSE(streamRequest, {
         eventHandlers: {
+            approval_request: (data) => {
+                if (typeof data !== 'object' || data === null || !('resumeId' in data)) {
+                    console.error('Received malformed approval_request event:', data);
+
+                    return;
+                }
+
+                const approvalEvent = data as ApprovalRequestEventI;
+
+                // Render the interactive approval card (see ApprovalRequestMessage) so a gated tool suspending in a
+                // test run is resolvable in-panel instead of hanging with no card. Typing never resolves it.
+                setMessage({
+                    content: [
+                        {
+                            data: {
+                                expiresAt: approvalEvent.expiresAt,
+                                formDescription: approvalEvent.formDescription,
+                                formTitle: approvalEvent.formTitle,
+                                formUrl: approvalEvent.formUrl,
+                                hasInputs: Array.isArray(approvalEvent.inputs) && approvalEvent.inputs.length > 0,
+                                kind: 'approval-request',
+                                resumeId: approvalEvent.resumeId,
+                            },
+                            type: 'data-approval-request',
+                        },
+                    ],
+                    role: 'assistant',
+                });
+                setIsRunning(false);
+                setStreamRequest(null);
+            },
             ask_user_question: (data) => {
                 if (
                     typeof data !== 'object' ||
@@ -136,7 +174,42 @@ export default function AiAgentTestRuntimeProvider({children}: Readonly<{childre
                 addToolExecution(toolEvent);
             },
         },
+        onRequestError: (status) => {
+            const pending = pendingResumeRef.current;
+
+            pendingResumeRef.current = null;
+
+            pending?.reject(new ResumeError(status));
+        },
+        onRequestSuccess: () => {
+            const pending = pendingResumeRef.current;
+
+            pendingResumeRef.current = null;
+
+            pending?.resolve();
+        },
     });
+
+    const resolveApproval = useCallback(
+        (resumeId: string, payload: Record<string, unknown>) =>
+            new Promise<void>((resolve, reject) => {
+                pendingResumeRef.current = {reject, resolve};
+
+                setMessage({content: '', role: 'assistant'});
+                setIsRunning(true);
+                setStreamRequest({
+                    init: {
+                        body: JSON.stringify(payload),
+                        headers: {'Content-Type': 'application/json'},
+                        method: 'POST',
+                    },
+                    url: `/job/resume/${resumeId}`,
+                });
+            }),
+        [setMessage]
+    );
+
+    const approvalResolution = useMemo(() => ({resolveApproval}), [resolveApproval]);
 
     useEffect(() => {
         if (connectionState === 'ERROR' && sseError) {
@@ -231,5 +304,9 @@ export default function AiAgentTestRuntimeProvider({children}: Readonly<{childre
         onNew,
     });
 
-    return <AssistantRuntimeProvider runtime={runtime}>{children}</AssistantRuntimeProvider>;
+    return (
+        <ApprovalResolutionContext.Provider value={approvalResolution}>
+            <AssistantRuntimeProvider runtime={runtime}>{children}</AssistantRuntimeProvider>
+        </ApprovalResolutionContext.Provider>
+    );
 }

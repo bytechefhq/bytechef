@@ -5,15 +5,27 @@ import {SSERequestType, useSSE} from '@/shared/hooks/useSSE';
 import {WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
 import {WorkflowTestExecutionFromJSON} from '@/shared/middleware/platform/workflow/test/models/WorkflowTestExecution';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {AskUserQuestionEventI, formatAskUserQuestionMessage} from '@/shared/util/assistant-message-utils';
+import {
+    ApprovalRequestEventI,
+    AskUserQuestionEventI,
+    formatAskUserQuestionMessage,
+} from '@/shared/util/assistant-message-utils';
 import {extractStreamChunk} from '@/shared/util/stream-utils';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 export interface UseWorkflowTestStreamProps {
     workflowId: string;
+    /** Fired when the SSE connection closes or errors — streams that end without a `result` event (e.g. an
+     * approval-resume continuation) still need the running state released. */
+    onClosed?: () => void;
     onResult?: (execution: WorkflowTestExecution) => void;
     onError?: (errorMessage?: string) => void;
+    /** Fired with the HTTP status when the request's initial response is non-2xx (or the connection fails) — lets a
+     * caller reject a pending approval-resume promise instead of silently ending. */
+    onRequestError?: (status: number | null) => void;
+    /** Fired once the request's initial response is 2xx and the stream begins. */
+    onRequestSuccess?: () => void;
     onStart?: (jobId: string) => void;
 }
 
@@ -64,7 +76,10 @@ export interface UseWorkflowTestStreamResultI {
 }
 
 export function useWorkflowTestStream({
+    onClosed,
     onError,
+    onRequestError,
+    onRequestSuccess,
     onResult,
     onStart,
     workflowId,
@@ -81,18 +96,52 @@ export function useWorkflowTestStream({
                 setWorkflowTestNodeState: state.setWorkflowTestNodeState,
             }))
         );
-    const {appendToLastAssistantMessage, setLastAssistantMessageContent, setResumeUrl} = useWorkflowTestChatStore(
-        useShallow((state) => ({
-            appendToLastAssistantMessage: state.appendToLastAssistantMessage,
-            setLastAssistantMessageContent: state.setLastAssistantMessageContent,
-            setResumeUrl: state.setResumeUrl,
-        }))
-    );
+    const {appendToLastAssistantMessage, setLastAssistantMessageContent, setMessage, setResumeUrl} =
+        useWorkflowTestChatStore(
+            useShallow((state) => ({
+                appendToLastAssistantMessage: state.appendToLastAssistantMessage,
+                setLastAssistantMessageContent: state.setLastAssistantMessageContent,
+                setMessage: state.setMessage,
+                setResumeUrl: state.setResumeUrl,
+            }))
+        );
 
     const {getPersistedJobId, persistJobId} = usePersistJobId(workflowId, currentEnvironmentId);
 
-    const {close, error} = useSSE<WorkflowTestExecution>(streamRequest, {
+    const {close, connectionState, error} = useSSE<WorkflowTestExecution>(streamRequest, {
         eventHandlers: {
+            approval_request: (data) => {
+                if (typeof data !== 'object' || data === null || !('resumeId' in data)) {
+                    console.error('Received malformed approval_request event:', data);
+
+                    return;
+                }
+
+                const approvalEvent = data as ApprovalRequestEventI;
+
+                // Render an interactive approval card (see ApprovalRequestMessage) that resolves through the
+                // job-resume endpoint. Deliberately do NOT register a resume URL for the chat input — typing
+                // never resolves an approval; only the card (or the hosted form) does.
+                setMessage({
+                    content: [
+                        {
+                            data: {
+                                expiresAt: approvalEvent.expiresAt,
+                                formDescription: approvalEvent.formDescription,
+                                formTitle: approvalEvent.formTitle,
+                                formUrl: approvalEvent.formUrl,
+                                hasInputs: Array.isArray(approvalEvent.inputs) && approvalEvent.inputs.length > 0,
+                                kind: 'approval-request',
+                                resumeId: approvalEvent.resumeId,
+                            },
+                            type: 'data-approval-request',
+                        },
+                    ],
+                    role: 'assistant',
+                });
+                setWorkflowIsRunning(false);
+                setStreamRequest(null);
+            },
             ask_user_question: (data) => {
                 if (
                     typeof data !== 'object' ||
@@ -213,7 +262,19 @@ export function useWorkflowTestStream({
                 }
             },
         },
+        onRequestError,
+        onRequestSuccess,
     });
+
+    useEffect(() => {
+        if (connectionState === 'CLOSED' || connectionState === 'ERROR') {
+            setWorkflowIsRunning(false);
+
+            if (onClosed) {
+                onClosed();
+            }
+        }
+    }, [connectionState, onClosed, setWorkflowIsRunning]);
 
     return {
         close,

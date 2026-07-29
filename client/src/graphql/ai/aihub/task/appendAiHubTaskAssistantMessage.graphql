@@ -1,0 +1,3 @@
+mutation appendAiHubTaskAssistantMessage($workspaceId: ID!, $id: ID!, $content: String!) {
+    appendAiHubTaskAssistantMessage(workspaceId: $workspaceId, id: $id, content: $content)
+}

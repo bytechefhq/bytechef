@@ -8,6 +8,19 @@ const SPACE = ' ';
 
 export type UseSSEOptionsType = {
     eventHandlers?: EventHandlersType;
+
+    /**
+     * Invoked once when the request's initial response is a non-2xx (or lacks a body), or when the connection fails
+     * before streaming — with the HTTP status when available, otherwise {@code null}. Lets a caller reject a pending
+     * promise on a failed resume/turn instead of silently transitioning to the ERROR state.
+     */
+    onRequestError?: (status: number | null) => void;
+
+    /**
+     * Invoked once when the request's initial response is 2xx and the stream is about to be read. Lets a caller
+     * resolve a pending promise (e.g. an approval resolution) only after the resume was actually accepted.
+     */
+    onRequestSuccess?: () => void;
 };
 
 export type SSERequestType = null | {
@@ -88,6 +101,8 @@ export const useSSE = <T = unknown>(request: SSERequestType, options: UseSSEOpti
 
     const abortControllerRef = useRef<AbortController | null>(null);
     const handlersRef = useRef<EventHandlersType | undefined>(options.eventHandlers);
+    const onRequestErrorRef = useRef<UseSSEOptionsType['onRequestError']>(options.onRequestError);
+    const onRequestSuccessRef = useRef<UseSSEOptionsType['onRequestSuccess']>(options.onRequestSuccess);
 
     const stableRequest = useMemo(() => {
         if (request == null) {
@@ -106,7 +121,9 @@ export const useSSE = <T = unknown>(request: SSERequestType, options: UseSSEOpti
 
     useEffect(() => {
         handlersRef.current = options.eventHandlers;
-    }, [options.eventHandlers]);
+        onRequestErrorRef.current = options.onRequestError;
+        onRequestSuccessRef.current = options.onRequestSuccess;
+    }, [options.eventHandlers, options.onRequestError, options.onRequestSuccess]);
 
     useEffect(() => {
         if (!stableRequest) {
@@ -139,11 +156,15 @@ export const useSSE = <T = unknown>(request: SSERequestType, options: UseSSEOpti
                     setError(`HTTP ${response.status}`);
                     setConnectionState('ERROR');
 
+                    onRequestErrorRef.current?.(response.status);
+
                     return;
                 }
 
                 setError(null);
                 setConnectionState('CONNECTED');
+
+                onRequestSuccessRef.current?.();
 
                 const reader = response.body.getReader();
                 const decoder = new TextDecoder('utf-8');
@@ -190,6 +211,8 @@ export const useSSE = <T = unknown>(request: SSERequestType, options: UseSSEOpti
                 if ((error as Error)?.name !== 'AbortError') {
                     setError('Connection error occurred');
                     setConnectionState('ERROR');
+
+                    onRequestErrorRef.current?.(null);
                 }
             }
         })();

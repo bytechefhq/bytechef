@@ -46,7 +46,7 @@ interface ApprovalTasksStateI {
     updateApprovalTask: (approvalTask: ApprovalTaskI) => void;
 }
 
-const cycleStatus = (currentStatus: string): 'open' | 'in-progress' | 'completed' => {
+const cycleStatus = (currentStatus: string): 'open' | 'in-progress' | 'completed' | 'expired' => {
     switch (currentStatus) {
         case 'open':
             return 'in-progress';
@@ -54,6 +54,9 @@ const cycleStatus = (currentStatus: string): 'open' | 'in-progress' | 'completed
             return 'completed';
         case 'completed':
             return 'open';
+        // An expired approval can no longer be resolved — its status is terminal.
+        case 'expired':
+            return 'expired';
         default:
             return 'open';
     }

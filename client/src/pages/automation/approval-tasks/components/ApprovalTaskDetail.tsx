@@ -24,6 +24,7 @@ export default function ApprovalTaskDetail() {
     } = useApprovalTaskDetail();
 
     const isCompleted = approvalTask?.status === 'completed';
+    const isExpired = approvalTask?.status === 'expired';
 
     if (!approvalTask) {
         return (
@@ -57,6 +58,10 @@ export default function ApprovalTaskDetail() {
 
                     {approvalTask.status === 'completed' ? (
                         <p className="text-lg font-medium text-foreground">This approval task has been completed.</p>
+                    ) : approvalTask.status === 'expired' ? (
+                        <p className="text-lg font-medium text-foreground">
+                            This approval request has expired and can no longer be resolved.
+                        </p>
                     ) : approvalTask.jobResumeId ? (
                         <ApprovalForm
                             id={approvalTask.jobResumeId}
@@ -73,7 +78,7 @@ export default function ApprovalTaskDetail() {
                         <Label className="mb-2 block text-sm font-medium text-foreground">Status</Label>
 
                         <Select
-                            disabled={isCompleted}
+                            disabled={isCompleted || isExpired}
                             onValueChange={(value) => handleStatusChange(value as ApprovalTaskI['status'])}
                             value={approvalTask.status}
                         >

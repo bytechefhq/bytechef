@@ -6,10 +6,19 @@ import {useForm} from 'react-hook-form';
 
 interface UseApprovalFormOptionsI {
     onSubmitted?: (approved: boolean) => void;
+
+    /**
+     * Replaces the default resume-job mutation as the submission transport. Chat surfaces use this to resolve the
+     * approval through their SSE machinery so the resumed run's output streams back into the conversation.
+     */
+    submitOverride?: (data: Record<string, unknown>, approved: boolean) => Promise<void>;
 }
 
 export default function useApprovalForm(id: string | undefined, options?: UseApprovalFormOptionsI) {
     const [approved, setApproved] = useState<boolean | null>(null);
+    const [overrideError, setOverrideError] = useState<string | null>(null);
+    const [overrideSubmitted, setOverrideSubmitted] = useState(false);
+    const [overrideSubmitting, setOverrideSubmitting] = useState(false);
 
     const {data: definition, error, isLoading: loading} = useGetApprovalFormQuery(id ?? '');
 
@@ -38,6 +47,26 @@ export default function useApprovalForm(id: string | undefined, options?: UseApp
 
     const handleSubmit = async (values: Record<string, unknown>, approveValue: boolean) => {
         if (!id) {
+            return;
+        }
+
+        if (options?.submitOverride) {
+            setOverrideSubmitting(true);
+            setOverrideError(null);
+
+            try {
+                await options.submitOverride(values, approveValue);
+
+                setApproved(approveValue);
+                setOverrideSubmitted(true);
+
+                options?.onSubmitted?.(approveValue);
+            } catch (submitError) {
+                setOverrideError(submitError instanceof Error ? submitError.message : 'Failed to submit the approval.');
+            } finally {
+                setOverrideSubmitting(false);
+            }
+
             return;
         }
 
@@ -81,9 +110,9 @@ export default function useApprovalForm(id: string | undefined, options?: UseApp
         form,
         handleSubmit,
         loading,
-        submitError: resumeJobMutation.error?.message ?? null,
-        submitted: resumeJobMutation.isSuccess,
-        submitting: resumeJobMutation.isPending,
+        submitError: options?.submitOverride ? overrideError : (resumeJobMutation.error?.message ?? null),
+        submitted: options?.submitOverride ? overrideSubmitted : resumeJobMutation.isSuccess,
+        submitting: options?.submitOverride ? overrideSubmitting : resumeJobMutation.isPending,
         uiDefinition,
     };
 }

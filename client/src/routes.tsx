@@ -70,6 +70,8 @@ const ProjectTemplates = lazy(() => import('@/pages/automation/templates/project
 const Projects = lazy(() => import('@/pages/automation/projects/Projects'));
 const Sessions = lazy(() => import('@/pages/account/settings/Sessions'));
 const ApprovalTasks = lazy(() => import('@/pages/automation/approval-tasks/ApprovalTasks'));
+const Chat = lazy(() => import('@/pages/automation/chats/Chat'));
+const Chats = lazy(() => import('@/pages/automation/chats/Chats'));
 const WorkflowTemplate = lazy(() => import('@/pages/automation/template/workflow-template/WorkflowTemplate'));
 const WorkflowTemplates = lazy(() => import('@/pages/automation/templates/workflow-templates/WorkflowTemplates'));
 const AssetFiles = lazy(() => import('@/pages/automation/asset-files/AssetFiles'));
@@ -1054,6 +1056,26 @@ export const getRouter = (queryClient: QueryClient) =>
                                         </PrivateRoute>
                                     ),
                                     path: 'ai-hub/workflow-chats',
+                                },
+                                {
+                                    children: [
+                                        {
+                                            element: (
+                                                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                                    <LazyLoadWrapper hasLeftSidebar>
+                                                        <Chat />
+                                                    </LazyLoadWrapper>
+                                                </PrivateRoute>
+                                            ),
+                                            path: ':workflowExecutionId',
+                                        },
+                                    ],
+                                    element: (
+                                        <LazyLoadWrapper hasLeftSidebar>
+                                            <Chats />
+                                        </LazyLoadWrapper>
+                                    ),
+                                    path: 'chats',
                                 },
                                 {
                                     element: (
