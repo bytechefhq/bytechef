@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ByteChef light-theme token values for the tokens the graph uses (mirrors the
+   client/website globals). The widget ships light-only for now. */
+:root {
+    --content-neutral-secondary: 215 19% 35%;
+    --stroke-neutral-secondary: 214 32% 91%;
+    --stroke-neutral-tertiary: 213 27% 84%;
+    --surface-neutral-primary: 0 0% 100%;
+    --surface-neutral-primary-hover: 210 40% 96%;
+}
+
+html,
+body,
+#root {
+    height: 100%;
+    margin: 0;
+}
+
+/* Light-only widget: pin the canvas background regardless of the host's color scheme. */
+body {
+    background: hsl(var(--surface-neutral-primary));
+}
