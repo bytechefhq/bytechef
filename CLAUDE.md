@@ -584,8 +584,9 @@ Spec: `docs/superpowers/specs/2026-07-21-agent-hitl-approval-chat-design.md`; us
 
 `bytechef.ai.auto-memory.provider` selects where AI auto-memories are stored:
 
-- `JDBC` (**default**) — the relational `ai_auto_memory` / `workspace_ai_auto_memory` tables. Existing
-  deployments are unaffected; the JDBC binding is gated with `matchIfMissing = true`.
+- `JDBC` (**default**) — the relational `ai_auto_memory` table, which carries a nullable `workspace_id`
+  column (the `workspace_ai_auto_memory` relation table was collapsed into it). Existing deployments are
+  unaffected; the JDBC binding is gated with `matchIfMissing = true`.
 - `FILESYSTEM` / `AWS` — one JSON object per memory through the shared `FileStorageService`
   (`platform-ai-auto-memory-repository-file-storage`). Both values use the SAME CE implementation and
   differ only in which service `FileStorageServiceRegistry` resolves, so `AWS` needs no module of its
@@ -759,6 +760,37 @@ trigger + post-turn query invalidation.
   `moderation_flagged` / `injection_flagged`) — low-cardinality (no workspace/project tag), wired
   via `ObjectProvider<MeterRegistry>` so it no-ops without a registry. `AiGatewayGuardrails` takes
   it as a `@Nullable` dep and records at each redact/block/flag point.
+
+### Workspace scoping for platform entities
+
+**New platform-package entities get a nullable `workspace_id BIGINT` column — not a
+`workspace_<entity>` relation table.**
+
+- The column is **nullable**, and the entity field is `Long` (never primitive `long`). Null is a real
+  state: embedded has no workspace concept, and some entities use it for "global" scope (a
+  `notification` with no workspace applies everywhere).
+- If the entity later needs to be shared beyond its owning workspace, add a `visibility` column typed
+  `ResourceVisibility` (`PRIVATE < WORKSPACE < ORGANIZATION`, in `platform-api`) and contribute a
+  `ResourceVisibilityPolicy` declaring which rungs the resource supports and which one it is created
+  with. Reach is **additive to a column** — it does not need a relation table, and it expresses
+  ownership + reach, which membership rows cannot.
+- **Exception — named-user grants.** A column expresses *reach* and is the right shape for it. It
+  cannot express "these three specific people" without an unbounded array in a cell. Grants to
+  individual users therefore live in the polymorphic `resource_grant` table (EE, see
+  `platform-resource-grant`). That is the one sanctioned relation table for sharing; the rule above
+  still governs reach. See `docs/superpowers/specs/2026-08-10-resource-visibility-design.md`.
+- Create a `workspace_<entity>` relation table **only** for a genuinely many-to-many relationship with
+  no owner concept — the `workspace_user` shape. The bar: *can the same row legitimately belong to two
+  workspaces with equal standing, today, with an API that does it?*
+
+**Six relation tables deliberately remain** (they are in release `v0.31.2`, so collapsing them would
+mean data migrations against customer data for no user-facing benefit): `workspace_api_key`,
+`workspace_connection`, `workspace_data_table`, `workspace_knowledge_base`, `workspace_mcp_server`, and
+`workspace_user` (which is genuinely many-to-many and correct as-is). The resulting mixed state is
+intentional, not drift.
+
+Background and evidence: `docs/superpowers/specs/2026-07-25-workspace-relation-table-convention-revision.md`.
+This revises the earlier `2026-05-06-workspace-relation-tables-design.md` for new work only.
 
 ### Sidebar navigation groups (Client)
 
@@ -1095,11 +1127,14 @@ See `cli/README.md` for the full command reference.
   with settings keys `email` / `webhook` + `webhookSecret` / `slackWebhookUrl` and a sender + handler
   pair per type (`Email|Webhook|SlackNotificationSender`, `JobStatus*NotificationHandler`). New
   notification surfaces and alert rules must reference `Notification` rows for delivery targets
-  instead of defining their own channel entities. Workspace scoping is EE-side via the
-  `workspace_notification` membership table (`platform-notification-workspace`; no membership row =
-  global). The former EE `AiObservabilityNotificationChannel` table is GONE — a Liquibase data
-  migration (`20260720000004`) converted channels into `Notification` + `workspace_notification`
-  rows and repointed `ai_observability_alert_rule_channel.notification_id`.
+  instead of defining their own channel entities. Workspace scoping is a **nullable
+  `notification.workspace_id` column**, where `NULL` means global — i.e. the notification applies to
+  every workspace. (It was previously the `workspace_notification` membership table, where the ABSENCE
+  of a row meant global; that table was collapsed into the column, so "no row" became "null".) Writes go
+  through `NotificationWorkspaceRepository` in `platform-notification-workspace`. The former EE
+  `AiObservabilityNotificationChannel` table is GONE — a Liquibase data migration (`20260720000004`)
+  converted channels into `Notification` rows, carrying the channel's workspace onto the notification,
+  and repointed `ai_observability_alert_rule_channel.notification_id`.
 
 - Webhook + Slack transports live in CE `server/libs/platform/platform-notification/platform-notification-delivery`:
   `WebhookNotificationClient` is THE single outbound-webhook transport (one `RestTemplate`, one Spring
