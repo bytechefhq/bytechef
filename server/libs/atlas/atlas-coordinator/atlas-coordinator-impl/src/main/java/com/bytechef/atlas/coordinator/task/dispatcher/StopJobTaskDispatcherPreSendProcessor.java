@@ -44,7 +44,7 @@ public class StopJobTaskDispatcherPreSendProcessor implements TaskDispatcherPreS
     public TaskExecution process(TaskExecution taskExecution) {
         Job job = jobService.getJob(Validate.notNull(taskExecution.getJobId(), "jobId"));
 
-        if (job.getStatus() == Job.Status.STOPPED) {
+        if (job.getStatus() == Job.Status.STOPPED || job.getStatus() == Job.Status.CANCELLED) {
             taskExecution.setEndDate(Instant.now());
             taskExecution.setStatus(TaskExecution.Status.CANCELLED);
         }

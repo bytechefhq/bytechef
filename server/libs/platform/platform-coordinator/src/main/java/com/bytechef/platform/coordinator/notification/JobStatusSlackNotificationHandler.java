@@ -17,50 +17,42 @@
 package com.bytechef.platform.coordinator.notification;
 
 import com.bytechef.platform.notification.domain.NotificationEvent.Type;
-import com.bytechef.platform.notification.handler.EmailNotificationHandler;
 import com.bytechef.platform.notification.handler.NotificationEventType;
 import com.bytechef.platform.notification.handler.NotificationHandlerContext;
+import com.bytechef.platform.notification.handler.SlackNotificationHandler;
 import java.util.Locale;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
 
 /**
- * @author Matija Petanjek
+ * Composes the Slack message text for job-status notifications, reusing the same i18n content keys as the email
+ * handler. Payload shape and transport are owned by the shared Slack delivery client behind
+ * {@code SlackNotificationSender}.
+ *
+ * @author Ivica Cardic
  */
 @Component
 @NotificationEventType({
     Type.JOB_CANCELLED, Type.JOB_CREATED, Type.JOB_COMPLETED, Type.JOB_FAILED, Type.JOB_STARTED, Type.JOB_STOPPED
 })
-public class JobStatusEmailNotificationHandler implements EmailNotificationHandler {
+public class JobStatusSlackNotificationHandler implements SlackNotificationHandler {
 
     private final MessageSource messageSource;
 
-    public JobStatusEmailNotificationHandler(MessageSource messageSource) {
+    public JobStatusSlackNotificationHandler(MessageSource messageSource) {
         this.messageSource = messageSource;
     }
 
     @Override
-    public String getContent(NotificationHandlerContext notificationHandlerContext) {
-        return messageSource.getMessage(
+    public String getText(NotificationHandlerContext notificationHandlerContext) {
+        String icon = notificationHandlerContext.getEventType() == Type.JOB_FAILED
+            ? ":rotating_light:" : ":information_source:";
+
+        return icon + " " + messageSource.getMessage(
             "email." + notificationHandlerContext.getEventType() + ".content",
             new Object[] {
                 notificationHandlerContext.getJobName(), notificationHandlerContext.getJobId()
             },
             Locale.getDefault());
-    }
-
-    @Override
-    public String getSubject(NotificationHandlerContext notificationHandlerContext) {
-        return messageSource.getMessage(
-            "email." + notificationHandlerContext.getEventType() + ".subject",
-            new Object[] {
-                notificationHandlerContext.getJobName(), notificationHandlerContext.getJobId()
-            },
-            Locale.getDefault());
-    }
-
-    @Override
-    public boolean isHtml() {
-        return false;
     }
 }

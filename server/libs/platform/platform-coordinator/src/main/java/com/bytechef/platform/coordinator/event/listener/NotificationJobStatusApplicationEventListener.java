@@ -33,11 +33,15 @@ import com.bytechef.platform.notification.service.NotificationService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Matija Petanjek
  */
 public class NotificationJobStatusApplicationEventListener implements ApplicationEventListener {
+
+    private static final Logger log = LoggerFactory.getLogger(NotificationJobStatusApplicationEventListener.class);
 
     private final @Nullable JobExecutionCounter jobExecutionCounter;
     private final JobService jobService;
@@ -86,6 +90,16 @@ public class NotificationJobStatusApplicationEventListener implements Applicatio
 
                 NotificationHandler notificationHandler = notificationHandlerRegistry.getNotificationHandler(
                     eventType, notification.getType());
+
+                if (notificationSender == null || notificationHandler == null) {
+                    // A subscription can outlive its handler coverage (e.g. an event type no handler declares for
+                    // this channel). Skipping with a warning beats an NPE that kills the whole event fan-out.
+                    log.warn(
+                        "No {} found for notification {} and event type {}; skipping",
+                        notificationSender == null ? "sender" : "handler", notification.getId(), eventType);
+
+                    continue;
+                }
 
                 notificationSender.send(notification, notificationHandler, notificationHandlerContext);
             }

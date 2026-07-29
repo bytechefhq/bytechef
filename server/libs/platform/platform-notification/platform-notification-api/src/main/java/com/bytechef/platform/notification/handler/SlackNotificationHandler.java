@@ -16,14 +16,11 @@
 
 package com.bytechef.platform.notification.handler;
 
-/**
- * @author Matija Petanjek
- */
-public interface WebhookNotificationHandler extends NotificationHandler {
+public interface SlackNotificationHandler extends NotificationHandler {
 
     /**
-     * The complete JSON payload for the webhook delivery. The sender owns transport, headers, and signing — handlers
-     * only shape the body.
+     * The final Slack message text (mrkdwn allowed). The sender owns the payload shape and transport — handlers only
+     * compose the message.
      */
-    String getPayload(NotificationHandlerContext notificationHandlerContext);
+    String getText(NotificationHandlerContext notificationHandlerContext);
 }

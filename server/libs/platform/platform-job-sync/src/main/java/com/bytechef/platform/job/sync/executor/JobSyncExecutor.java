@@ -135,7 +135,7 @@ public class JobSyncExecutor {
         this(
             contextService, evaluator, jobService, maxTaskExecutions, memoryMessageBroker, List.of(), List.of(),
             List.of(), taskDispatcherPreSendProcessors, List.of(), taskExecutionService, taskExecutor,
-            taskHandlerRegistry, taskFileStorage, timeout, workflowService);
+            taskHandlerRegistry, taskFileStorage, timeout, new WebSocketEmitterRegistry(), workflowService);
     }
 
     @SuppressFBWarnings("EI")
@@ -147,7 +147,7 @@ public class JobSyncExecutor {
         List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
         List<TaskDispatcherResolverFactory> taskDispatcherResolverFactories, TaskExecutionService taskExecutionService,
         TaskExecutor taskExecutor, TaskHandlerRegistry taskHandlerRegistry, TaskFileStorage taskFileStorage,
-        long timeout, WorkflowService workflowService) {
+        long timeout, WebSocketEmitterRegistry webSocketEmitterRegistry, WorkflowService workflowService) {
 
         this.contextService = contextService;
 
@@ -179,7 +179,7 @@ public class JobSyncExecutor {
             List.of(
                 new CallableResponseTaskExecutionPostOutputProcessor(),
                 new SseStreamTaskExecutionPostOutputProcessor(sseStreamBridges),
-                new WebSocketStreamTaskExecutionPostOutputProcessor(sseStreamBridges),
+                new WebSocketStreamTaskExecutionPostOutputProcessor(sseStreamBridges, webSocketEmitterRegistry),
                 new SuspendTaskExecutionPostOutputProcessor(null),
                 new WebhookResponseTaskExecutionPostOutputProcessor()));
 
@@ -539,7 +539,8 @@ public class JobSyncExecutor {
 
             Job.Status status = jobStatusEvent.getStatus();
 
-            if (status == Job.Status.COMPLETED || status == Job.Status.FAILED || status == Job.Status.STOPPED) {
+            if (status == Job.Status.COMPLETED || status == Job.Status.FAILED || status == Job.Status.STOPPED
+                || status == Job.Status.CANCELLED) {
                 CountDownLatch latch = jobCompletionLatches.get(getKey(jobId));
 
                 if (latch != null) {
@@ -551,7 +552,8 @@ public class JobSyncExecutor {
 
             notifyJobStatusListeners(jobId, jobStatusEvent);
 
-            if (status == Job.Status.COMPLETED || status == Job.Status.FAILED || status == Job.Status.STOPPED) {
+            if (status == Job.Status.COMPLETED || status == Job.Status.FAILED || status == Job.Status.STOPPED
+                || status == Job.Status.CANCELLED) {
                 invalidateListeners(jobId);
             }
         } else if (event instanceof TaskStartedApplicationEvent taskStartedEvent) {

@@ -45,6 +45,11 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
+    public Notification getNotification(long notificationId) {
+        return OptionalUtils.get(notificationRepository.findById(notificationId));
+    }
+
+    @Override
     public List<Notification> getNotifications() {
         return notificationRepository.findAll();
     }

@@ -24,6 +24,7 @@ import com.bytechef.platform.coordinator.event.listener.SseStreamApplicationEven
 import com.bytechef.platform.coordinator.event.listener.WebhookJobStatusApplicationEventListener;
 import com.bytechef.platform.coordinator.event.listener.WebhookTaskStartedApplicationEventListener;
 import com.bytechef.platform.coordinator.metrics.JobExecutionCounter;
+import com.bytechef.platform.notification.delivery.WebhookNotificationClient;
 import com.bytechef.platform.notification.handler.NotificationHandlerRegistry;
 import com.bytechef.platform.notification.handler.NotificationSenderRegistry;
 import com.bytechef.platform.notification.service.NotificationService;
@@ -66,8 +67,10 @@ public class PlatformCoordinatorConfiguration {
     }
 
     @Bean
-    WebhookJobStatusApplicationEventListener webhookJobStatusApplicationEventListener() {
-        return new WebhookJobStatusApplicationEventListener(jobService);
+    WebhookJobStatusApplicationEventListener webhookJobStatusApplicationEventListener(
+        WebhookNotificationClient webhookNotificationClient) {
+
+        return new WebhookJobStatusApplicationEventListener(jobService, webhookNotificationClient);
     }
 
     @Bean

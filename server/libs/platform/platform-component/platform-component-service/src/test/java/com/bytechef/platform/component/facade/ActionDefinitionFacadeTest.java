@@ -61,7 +61,7 @@ class ActionDefinitionFacadeTest {
 
     @BeforeEach
     void setUp() {
-        actionDefinitionFacade = new ActionDefinitionFacadeImpl(connectionService, actionDefinitionService);
+        actionDefinitionFacade = new ActionDefinitionFacadeImpl(connectionService, actionDefinitionService, null);
     }
 
     @Test

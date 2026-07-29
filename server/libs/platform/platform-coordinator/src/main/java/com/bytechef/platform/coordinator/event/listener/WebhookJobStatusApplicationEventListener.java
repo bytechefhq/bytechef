@@ -24,19 +24,21 @@ import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
 import com.bytechef.atlas.coordinator.event.listener.ApplicationEventListener;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.platform.notification.delivery.WebhookNotificationClient;
+import com.bytechef.platform.notification.delivery.WebhookNotificationClient.WebhookRetry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.retry.RetryException;
-import org.springframework.core.retry.RetryPolicy;
-import org.springframework.core.retry.RetryTemplate;
-import org.springframework.util.backoff.ExponentialBackOff;
-import org.springframework.web.client.RestTemplate;
 
 /**
+ * Posts a job's registered {@code JOB_STATUS} callback webhooks on every status transition. Delivery mechanics (HTTP
+ * client, exponential-backoff retry) are delegated to the shared {@link WebhookNotificationClient} — the central
+ * transport for all outbound webhooks; only the per-job payload shaping and the {@link Job.Retry} schedule mapping live
+ * here.
+ *
  * @author Arik Cohen
  * @author Ivica Cardic
  * @since Jun 9, 2017
@@ -46,11 +48,14 @@ public class WebhookJobStatusApplicationEventListener implements ApplicationEven
     private static final Logger log = LoggerFactory.getLogger(WebhookJobStatusApplicationEventListener.class);
 
     private final JobService jobService;
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final WebhookNotificationClient webhookNotificationClient;
 
     @SuppressFBWarnings("EI2")
-    public WebhookJobStatusApplicationEventListener(JobService jobService) {
+    public WebhookJobStatusApplicationEventListener(
+        JobService jobService, WebhookNotificationClient webhookNotificationClient) {
+
         this.jobService = jobService;
+        this.webhookNotificationClient = webhookNotificationClient;
     }
 
     @Override
@@ -66,32 +71,20 @@ public class WebhookJobStatusApplicationEventListener implements ApplicationEven
 
                     webhookEvent.put(WorkflowConstants.EVENT, jobStatusApplicationEvent);
 
-                    RetryTemplate retryTemplate = createRetryTemplate(webhook);
-
-                    try {
-                        retryTemplate.execute(() -> {
-                            if (log.isDebugEnabled()) {
-                                log.debug("Calling data table webhook {} -> {}", webhook.url(), webhookEvent);
-                            }
-
-                            return restTemplate.postForObject(webhook.url(), webhookEvent, String.class);
-                        });
-                    } catch (RetryException e) {
-                        throw new RuntimeException(e);
+                    if (log.isDebugEnabled()) {
+                        log.debug("Calling job status webhook {} -> {}", webhook.url(), webhookEvent);
                     }
+
+                    webhookNotificationClient.deliverEvent(webhook.url(), webhookEvent, toWebhookRetry(webhook));
                 }
             }
         }
     }
 
-    private RetryTemplate createRetryTemplate(Job.Webhook webhook) {
+    private static WebhookRetry toWebhookRetry(Job.Webhook webhook) {
         Job.Retry retry = webhook.retry();
 
-        return new RetryTemplate(
-            RetryPolicy.builder()
-                .backOff(new ExponentialBackOff(getInitialInterval(retry), getMultiplier(retry)))
-                .maxRetries(getMaxAttempts(retry))
-                .build());
+        return new WebhookRetry(getMaxAttempts(retry), getInitialInterval(retry), getMultiplier(retry));
     }
 
     private static int getMaxAttempts(Job.Retry retry) {
@@ -106,17 +99,9 @@ public class WebhookJobStatusApplicationEventListener implements ApplicationEven
             : retry.multiplier();
     }
 
-//    private static long getMaxInterval(Job.Retry retry) {
-//        return (retry.maxInterval() == null
-//            ? Duration.of(2, ChronoUnit.SECONDS)
-//            : Duration.of(retry.maxInterval(), ChronoUnit.SECONDS))
-//                .toMillis();
-//    }
-
-    private static long getInitialInterval(Job.Retry retry) {
-        return (retry.initialInterval() == null
+    private static Duration getInitialInterval(Job.Retry retry) {
+        return retry.initialInterval() == null
             ? Duration.of(2, ChronoUnit.SECONDS)
-            : Duration.of(retry.initialInterval(), ChronoUnit.SECONDS))
-                .toMillis();
+            : Duration.of(retry.initialInterval(), ChronoUnit.SECONDS);
     }
 }

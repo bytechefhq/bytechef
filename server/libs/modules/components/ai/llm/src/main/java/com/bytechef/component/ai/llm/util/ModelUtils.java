@@ -374,7 +374,7 @@ public class ModelUtils {
             return;
         }
 
-        TokenUsageHolder.capture(usage.getPromptTokens(), usage.getCompletionTokens());
+        TokenUsageHolder.capture(metadata.getModel(), usage.getPromptTokens(), usage.getCompletionTokens());
     }
 
     private static String processText(String messageContent) {

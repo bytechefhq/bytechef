@@ -70,6 +70,7 @@ paths:
           - "CREATED"
           - "STARTED"
           - "STOPPED"
+          - "CANCELLED"
           - "FAILED"
           - "COMPLETED"
       - name: "jobStartDate"

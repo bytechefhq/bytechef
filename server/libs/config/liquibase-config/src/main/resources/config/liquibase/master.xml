@@ -34,6 +34,18 @@
     <includeAll path="classpath:config/liquibase/changelog/automation/configuration/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />
     <includeAll path="classpath:config/liquibase/changelog/automation/mcp/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />
     <includeAll path="classpath:config/liquibase/changelog/automation/a2a/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />
+
+    <!--
+        automation/workflow_execution_cost holds the per-job execution cost rows (base run charge + AI usage sum),
+        written by the EE terminal-status listener in automation-workflow-execution-cost-service.
+    -->
+    <includeAll path="classpath:config/liquibase/changelog/automation/workflow_execution_cost" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />
+    <!--
+        automation/workflow_alert holds the workspace-scoped alert rules (Sim alerts model) evaluated on terminal
+        job events by the EE listener in automation-workflow-alert-service. Delivery targets reference
+        notification(id), so this loads after platform/notification.
+    -->
+    <includeAll path="classpath:config/liquibase/changelog/automation/workflow_alert" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />
     <!--
         platform/ai/llm/usage holds the shared ai_llm_usage table — single canonical LLM bookkeeping store for
         every agent surface. Loaded BEFORE automation/ai_gateway/ because the gateway's later

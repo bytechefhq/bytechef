@@ -17,6 +17,8 @@
 package com.bytechef.platform.component.facade;
 
 import com.bytechef.exception.ConfigurationException;
+import com.bytechef.platform.ai.usage.WorkflowLlmUsageEvent;
+import com.bytechef.platform.ai.util.TokenUsageHolder;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
@@ -32,6 +34,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.Nullable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 /**
@@ -42,13 +46,16 @@ import org.springframework.stereotype.Service;
 public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
 
     private final ActionDefinitionService actionDefinitionService;
+    private final @Nullable ApplicationEventPublisher applicationEventPublisher;
     private final ConnectionService connectionService;
 
     @SuppressFBWarnings("EI")
     public ActionDefinitionFacadeImpl(
-        ConnectionService connectionService, ActionDefinitionService actionDefinitionService) {
+        ConnectionService connectionService, ActionDefinitionService actionDefinitionService,
+        @Nullable ApplicationEventPublisher applicationEventPublisher) {
 
         this.actionDefinitionService = actionDefinitionService;
+        this.applicationEventPublisher = applicationEventPublisher;
         this.connectionService = connectionService;
     }
 
@@ -104,10 +111,37 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
         boolean editorEnvironment, Map<String, ?> continueParameters, Map<String, ?> resumeData,
         Instant suspendExpiresAt) {
 
-        return actionDefinitionService.executePerform(
-            componentName, componentVersion, actionName, jobPrincipalId, jobPrincipalWorkflowId, jobId,
-            taskExecutionId, workflowId, inputParameters, getComponentConnections(connectionIds), extensions,
-            environmentId, editorEnvironment, type, continueParameters, resumeData, suspendExpiresAt);
+        // Bracket the execution with the thread-local token-usage window so any sync LLM calls made by this action
+        // (AI agent, LLM components) are attributed to this job. Nested executions (an agent's tool sub-actions on
+        // the same thread) leave the outer window untouched — all tokens land on the same job either way.
+        boolean outermostUsageWindow = !TokenUsageHolder.isTracking();
+
+        if (outermostUsageWindow) {
+            TokenUsageHolder.start();
+        }
+
+        long startMillis = System.currentTimeMillis();
+
+        try {
+            return actionDefinitionService.executePerform(
+                componentName, componentVersion, actionName, jobPrincipalId, jobPrincipalWorkflowId, jobId,
+                taskExecutionId, workflowId, inputParameters, getComponentConnections(connectionIds), extensions,
+                environmentId, editorEnvironment, type, continueParameters, resumeData, suspendExpiresAt);
+        } finally {
+            if (outermostUsageWindow) {
+                TokenUsageHolder.TokenUsage tokenUsage = TokenUsageHolder.getAndClear();
+
+                if (applicationEventPublisher != null && jobId != null &&
+                    (tokenUsage.promptTokens() > 0 || tokenUsage.completionTokens() > 0)) {
+
+                    applicationEventPublisher.publishEvent(
+                        new WorkflowLlmUsageEvent(
+                            jobId, taskExecutionId, jobPrincipalId, jobPrincipalWorkflowId, workflowId, environmentId,
+                            type, componentName, actionName, tokenUsage.model(), tokenUsage.promptTokens(),
+                            tokenUsage.completionTokens(), System.currentTimeMillis() - startMillis));
+                }
+            }
+        }
     }
 
     private ComponentConnection getComponentConnection(Long connectionId) {

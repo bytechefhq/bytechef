@@ -170,10 +170,12 @@ public class JobServiceImpl implements JobService {
         Job job = OptionalUtils.get(jobRepository.findById(id), String.format("Unknown job %s", id));
 
         Assert.isTrue(
-            job.getStatus() == Job.Status.STARTED, "Job id=" + id + " can not be stopped as it is " + job.getStatus());
+            job.getStatus() == Job.Status.STARTED || job.getStatus() == Job.Status.CREATED,
+            "Job id=" + id + " can not be stopped as it is " + job.getStatus());
 
         job.setEndDate(Instant.now());
-        job.setStatus(Job.Status.STOPPED);
+        // A job stopped before it ever started never ran - that is a cancellation, not an interruption.
+        job.setStatus(job.getStatus() == Job.Status.CREATED ? Job.Status.CANCELLED : Job.Status.STOPPED);
 
         jobRepository.save(job);
 

@@ -54,7 +54,9 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
 
     public enum Status {
 
-        CREATED, STARTED, COMPLETED, FAILED, STOPPED
+        // Persisted as INT ordinal - append new values at the end only.
+        // CANCELLED = stopped while still CREATED (never started); STOPPED = interrupted while STARTED.
+        CREATED, STARTED, COMPLETED, FAILED, STOPPED, CANCELLED
     }
 
     @CreatedBy

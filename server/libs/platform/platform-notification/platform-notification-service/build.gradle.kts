@@ -9,6 +9,7 @@ dependencies {
     implementation(project(":server:libs:core:commons:commons-data"))
     implementation(project(":server:libs:platform:platform-mail"))
     implementation(project(":server:libs:platform:platform-notification:platform-notification-api"))
+    implementation(project(":server:libs:platform:platform-notification:platform-notification-delivery"))
 
     testImplementation("org.springframework.boot:spring-boot-starter-cache-test")
     testImplementation(project(":server:libs:config:liquibase-config"))

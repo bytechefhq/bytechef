@@ -41,7 +41,9 @@ import org.springframework.data.relational.core.mapping.Table;
 public class Notification {
 
     public enum Type {
-        EMAIL, WEBHOOK
+
+        // Persisted as INT ordinal - append new values at the end only.
+        EMAIL, WEBHOOK, SLACK
     }
 
     @Id

@@ -19,13 +19,23 @@ package com.bytechef.platform.notification.handler;
 import com.bytechef.platform.mail.MailService;
 import com.bytechef.platform.notification.domain.Notification;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
+ * Delivers EMAIL-channel notifications through {@link MailService} — the single email path for everything the platform
+ * sends (user-account mail and notifications alike). {@code MailService.sendEmail} is already {@code @Async} and
+ * warn-skips when no mail host is configured, so no extra async or error plumbing is needed here. Settings:
+ * {@code email} (recipient address, required).
+ *
  * @author Matija Petanjek
+ * @author Ivica Cardic
  */
 @Component
 public class EmailNotificationSender implements NotificationSender<EmailNotificationHandler> {
+
+    private static final Logger log = LoggerFactory.getLogger(EmailNotificationSender.class);
 
     private final MailService mailService;
 
@@ -33,6 +43,7 @@ public class EmailNotificationSender implements NotificationSender<EmailNotifica
         this.mailService = mailService;
     }
 
+    @Override
     public Notification.Type getType() {
         return Notification.Type.EMAIL;
     }
@@ -44,8 +55,17 @@ public class EmailNotificationSender implements NotificationSender<EmailNotifica
 
         Map<String, Object> settings = notification.getSettings();
 
+        String email = (String) settings.get("email");
+
+        if (email == null || email.isBlank()) {
+            log.warn("Notification {} has no email address configured; skipping delivery", notification.getId());
+
+            return;
+        }
+
         mailService.sendEmail(
-            (String) settings.get("email"), emailNotificationHandler.getSubject(notificationHandlerContext),
-            emailNotificationHandler.getContent(notificationHandlerContext), false, emailNotificationHandler.isHtml());
+            email, emailNotificationHandler.getSubject(notificationHandlerContext),
+            emailNotificationHandler.getContent(notificationHandlerContext), false,
+            emailNotificationHandler.isHtml());
     }
 }
