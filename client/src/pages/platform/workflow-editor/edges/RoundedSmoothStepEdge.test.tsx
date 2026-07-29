@@ -24,7 +24,12 @@ const renderFanInEdgePath = (geometry: EdgeGeometryI) => {
     const {container} = render(
         <svg>
             <RoundedSmoothStepEdge
-                {...({data: {triggerFanIn: true}, id: 'trigger=>task_1', ...geometry} as unknown as EdgeProps)}
+                {...({
+                    data: {triggerFanIn: true},
+                    id: 'trigger=>task_1',
+                    target: 'task_1',
+                    ...geometry,
+                } as unknown as EdgeProps)}
             />
         </svg>
     );

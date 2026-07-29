@@ -3,6 +3,8 @@ import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {NodeDataType} from '@/shared/types';
 import {Edge, Node} from '@xyflow/react';
 
+import {nestedBottomGhostIdForDispatcherTask} from './nestedBottomGhostId';
+
 function createBaseEachStructureEdges(eachId: string): Edge[] {
     const topGhostId = `${eachId}-each-top-ghost`;
     const bottomGhostId = `${eachId}-each-bottom-ghost`;
@@ -83,7 +85,7 @@ function createEdgeSubtaskEdges(eachId: string, eachChildTask: WorkflowTask): Ed
         TASK_DISPATCHER_NAMES.includes(childTaskComponentName) &&
         !CHILDLESS_TASK_DISPATCHER_NAMES.includes(childTaskComponentName)
     ) {
-        const nestedBottomGhostId = `${childTaskId}-${childTaskComponentName}-bottom-ghost`;
+        const nestedBottomGhostId = nestedBottomGhostIdForDispatcherTask(childTaskId);
 
         const edgeFromNestedGhostToBottomGhost = {
             id: `${nestedBottomGhostId}=>${bottomGhostId}`,
