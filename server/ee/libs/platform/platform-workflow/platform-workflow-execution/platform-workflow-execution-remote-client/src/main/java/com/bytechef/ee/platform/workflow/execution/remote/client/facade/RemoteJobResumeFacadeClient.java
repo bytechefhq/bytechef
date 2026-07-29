@@ -50,6 +50,11 @@ public class RemoteJobResumeFacadeClient implements JobResumeFacade {
     }
 
     @Override
+    public JobResumeOutcome resumeJob(String id, Map<String, Object> data, String approvedBy) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public JobResumeOutcome resumeJobStreaming(
         String id, Map<String, Object> data, LongConsumer jobIdConsumer) {
 
