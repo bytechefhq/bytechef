@@ -236,9 +236,8 @@ public class StripeClientImpl implements StripeClient {
                 .findFirst()
                 .map(Customer::getId);
         } catch (StripeException stripeException) {
-            log.error("Failed to fetch customer id for email {} and tenant id {}", email, tenantId, stripeException);
-
-            return Optional.empty();
+            throw new PaymentClientException(
+                "Failed to fetch customer id for email " + email + " and tenant id " + tenantId, stripeException);
         }
     }
 
