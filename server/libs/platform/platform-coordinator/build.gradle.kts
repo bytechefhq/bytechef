@@ -12,6 +12,7 @@ dependencies {
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-impl"))
     implementation(project(":server:libs:atlas:atlas-execution:atlas-execution-service"))
     implementation(project(":server:libs:atlas:atlas-worker:atlas-worker-impl"))
+    implementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:message:message-broker:message-broker-memory"))
     implementation(project(":server:libs:core:tenant:tenant-api"))
@@ -25,5 +26,6 @@ dependencies {
     implementation(project(":server:libs:platform:platform-webhook:platform-webhook-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
 
+    testImplementation(project(":server:libs:atlas:atlas-execution:atlas-execution-repository:atlas-execution-repository-memory"))
     testImplementation(project(":server:libs:test:test-support"))
 }

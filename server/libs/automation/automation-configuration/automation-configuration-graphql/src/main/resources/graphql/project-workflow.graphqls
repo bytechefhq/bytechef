@@ -1,5 +1,7 @@
 extend type Query {
+    eligibleErrorWorkflows(projectId: ID!, projectVersion: Int!): [ProjectWorkflow!]!
     preBuiltWorkflowTemplates(query: String, category: String): [WorkflowTemplate!]!
+    projectWorkflow(id: ID!): ProjectWorkflow
     sharedWorkflow(workflowUuid: String!): SharedWorkflow
     workflowTemplate(id: String!, sharedWorkflow: Boolean!): WorkflowTemplate
 }
@@ -8,6 +10,7 @@ extend type Mutation {
     deleteSharedWorkflow(workflowId: String!): Boolean!
     exportSharedWorkflow(workflowId: String!, description: String): Boolean!
     importWorkflowTemplate(id: String!, projectId: ID!, sharedWorkflow: Boolean!): ID!
+    updateProjectWorkflowErrorWorkflow(projectId: ID!, projectWorkflowId: ID!, errorProjectWorkflowId: ID, errorWorkflowDisabled: Boolean!): Boolean
 }
 
 type ProjectWorkflow {
@@ -23,6 +26,8 @@ type ProjectWorkflow {
     lastModifiedBy: String
     lastModifiedDate: String
     version: Int!
+    errorProjectWorkflowId: ID
+    errorWorkflowDisabled: Boolean!
 }
 
 type SharedWorkflow {

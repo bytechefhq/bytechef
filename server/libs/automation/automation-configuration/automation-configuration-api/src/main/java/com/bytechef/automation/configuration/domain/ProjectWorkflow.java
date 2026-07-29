@@ -19,6 +19,7 @@ package com.bytechef.automation.configuration.domain;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -45,6 +46,12 @@ public final class ProjectWorkflow {
 
     @Column("workflow_id")
     private String workflowId;
+
+    @Column("error_project_workflow_id")
+    private Long errorProjectWorkflowId;
+
+    @Column("error_workflow_disabled")
+    private boolean errorWorkflowDisabled;
 
     @Column("uuid")
     private UUID uuid;
@@ -127,6 +134,15 @@ public final class ProjectWorkflow {
         return workflowId;
     }
 
+    @Nullable
+    public Long getErrorProjectWorkflowId() {
+        return errorProjectWorkflowId;
+    }
+
+    public boolean isErrorWorkflowDisabled() {
+        return errorWorkflowDisabled;
+    }
+
     public UUID getUuid() {
         return uuid;
     }
@@ -165,6 +181,14 @@ public final class ProjectWorkflow {
 
     public void setWorkflowId(String workflowId) {
         this.workflowId = workflowId;
+    }
+
+    public void setErrorProjectWorkflowId(@Nullable Long errorProjectWorkflowId) {
+        this.errorProjectWorkflowId = errorProjectWorkflowId;
+    }
+
+    public void setErrorWorkflowDisabled(boolean errorWorkflowDisabled) {
+        this.errorWorkflowDisabled = errorWorkflowDisabled;
     }
 
     public void setUuid(String uuid) {

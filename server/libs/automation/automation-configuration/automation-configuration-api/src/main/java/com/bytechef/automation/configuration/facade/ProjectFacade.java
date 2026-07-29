@@ -65,4 +65,6 @@ public interface ProjectFacade {
     int publishProject(long id, @Nullable String description, boolean syncWithGit);
 
     void updateProject(ProjectDTO projectDTO);
+
+    void updateProjectErrorWorkflow(long projectId, @Nullable Long errorProjectWorkflowId);
 }

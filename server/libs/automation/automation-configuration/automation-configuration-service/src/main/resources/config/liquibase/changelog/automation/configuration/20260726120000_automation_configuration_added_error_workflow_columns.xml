@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- Error-workflow handler reference. Nullable on both tables: null on project means no project-wide
+         handler, null on project_workflow means inherit the project's. The separate disabled flag exists
+         because null already means inherit, so it cannot also mean "opt out". -->
+    <changeSet id="20260726120000-1" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="project" columnName="error_project_workflow_id"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="project">
+            <column name="error_project_workflow_id" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20260726120000-2" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="project_workflow" columnName="error_project_workflow_id"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="project_workflow">
+            <column name="error_project_workflow_id" type="BIGINT"/>
+            <column name="error_workflow_disabled" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

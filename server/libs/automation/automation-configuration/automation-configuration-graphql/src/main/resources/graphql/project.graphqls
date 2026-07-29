@@ -10,6 +10,7 @@ extend type Mutation {
     deleteSharedProject(id: ID!): Boolean!
     exportSharedProject(id: ID!, description: String): Boolean
     importProjectTemplate(id: String!, workspaceId: ID!, sharedProject: Boolean!): ID!
+    updateProjectErrorWorkflow(projectId: ID!, errorProjectWorkflowId: ID): Boolean
 }
 
 type Project {
@@ -17,6 +18,7 @@ type Project {
     name: String!
     category: Category
     tags: [Tag]
+    errorProjectWorkflowId: ID
 }
 
 type ProjectTemplate {

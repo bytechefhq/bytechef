@@ -20,4 +20,5 @@ dependencies {
     testImplementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-api"))
     testImplementation(project(":server:libs:platform:platform-user:platform-user-api"))
     testImplementation(project(":server:libs:test:test-int-support"))
+    testImplementation(project(":server:libs:test:test-support"))
 }

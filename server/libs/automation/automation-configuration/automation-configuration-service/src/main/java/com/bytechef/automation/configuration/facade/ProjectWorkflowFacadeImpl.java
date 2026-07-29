@@ -73,6 +73,7 @@ import java.util.zip.ZipOutputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.Validate;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -91,6 +92,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
 
     private final ComponentDefinitionHelper componentDefinitionHelper;
     private final EnvironmentService environmentService;
+    private final ErrorWorkflowConfigurationValidator errorWorkflowConfigurationValidator;
     private final PreBuiltTemplateService preBuiltTemplateService;
     private final ProjectDeploymentService projectDeploymentService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
@@ -110,6 +112,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     public ProjectWorkflowFacadeImpl(
         ComponentDefinitionHelper componentDefinitionHelper, PreBuiltTemplateService preBuiltTemplateService,
         ApplicationProperties applicationProperties, EnvironmentService environmentService,
+        ErrorWorkflowConfigurationValidator errorWorkflowConfigurationValidator,
         ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectService projectService,
         ProjectWorkflowService projectWorkflowService, SharedTemplateFileStorage sharedTemplateFileStorage,
@@ -121,6 +124,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
         this.componentDefinitionHelper = componentDefinitionHelper;
         this.preBuiltTemplateService = preBuiltTemplateService;
         this.environmentService = environmentService;
+        this.errorWorkflowConfigurationValidator = errorWorkflowConfigurationValidator;
         this.projectDeploymentService = projectDeploymentService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
         this.projectService = projectService;
@@ -506,6 +510,31 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
         }
 
         return getProjectWorkflow(workflowId);
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#projectId, 'Project', 'WORKFLOW_EDIT')")
+    public void updateWorkflowErrorWorkflow(
+        long projectId, long projectWorkflowId, @Nullable Long errorProjectWorkflowId,
+        boolean errorWorkflowDisabled) {
+
+        // The authz gate keys on projectId, so the mutated workflow MUST belong to that project -- otherwise an
+        // editor of project A could repoint or clear the error handling of any workflow in the tenant by naming
+        // their own projectId alongside a foreign projectWorkflowId. Checked on BOTH the set and clear paths.
+        ProjectWorkflow projectWorkflow = projectWorkflowService.getProjectWorkflow(projectWorkflowId);
+
+        if (projectWorkflow.getProjectId() != projectId) {
+            throw new IllegalArgumentException(
+                "The workflow does not belong to the project the update was authorized against");
+        }
+
+        // Clearing needs no validation: there is no reference left to be invalid -- mirrors
+        // ProjectFacadeImpl.updateProjectErrorWorkflow exactly.
+        if (errorProjectWorkflowId != null) {
+            errorWorkflowConfigurationValidator.validate(projectId, errorProjectWorkflowId, projectWorkflowId);
+        }
+
+        projectWorkflowService.updateErrorWorkflow(projectWorkflowId, errorProjectWorkflowId, errorWorkflowDisabled);
     }
 
     private WorkflowTemplateDTO toWorkflowTemplateDTO(WorkflowTemplate workflowTemplate) {

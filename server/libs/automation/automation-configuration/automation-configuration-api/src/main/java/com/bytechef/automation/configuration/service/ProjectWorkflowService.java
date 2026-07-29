@@ -76,5 +76,7 @@ public interface ProjectWorkflowService {
 
     ProjectWorkflow update(ProjectWorkflow projectWorkflow);
 
+    ProjectWorkflow updateErrorWorkflow(long id, @Nullable Long errorProjectWorkflowId, boolean errorWorkflowDisabled);
+
     ProjectWorkflow updatePermissionExpression(long id, @Nullable String permissionExpression);
 }

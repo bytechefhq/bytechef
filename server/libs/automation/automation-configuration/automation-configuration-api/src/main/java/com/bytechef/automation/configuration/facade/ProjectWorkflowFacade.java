@@ -57,4 +57,7 @@ public interface ProjectWorkflowFacade {
     long importWorkflowTemplate(long projectId, String id, boolean sharedWorkflow);
 
     ProjectWorkflowDTO updateWorkflow(String workflowId, String definition, int version);
+
+    void updateWorkflowErrorWorkflow(
+        long projectId, long projectWorkflowId, @Nullable Long errorProjectWorkflowId, boolean errorWorkflowDisabled);
 }

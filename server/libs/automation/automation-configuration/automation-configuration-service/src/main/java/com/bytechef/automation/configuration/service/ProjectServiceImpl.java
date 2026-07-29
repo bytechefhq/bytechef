@@ -225,6 +225,16 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'Project', 'WORKFLOW_EDIT')")
+    public Project updateErrorWorkflow(long id, @Nullable Long errorProjectWorkflowId) {
+        Project project = getProject(id);
+
+        project.setErrorProjectWorkflowId(errorProjectWorkflowId);
+
+        return projectRepository.save(project);
+    }
+
+    @Override
     public Project updatePermissionExpression(long id, @Nullable String permissionExpression) {
         Project project = getProject(id);
 

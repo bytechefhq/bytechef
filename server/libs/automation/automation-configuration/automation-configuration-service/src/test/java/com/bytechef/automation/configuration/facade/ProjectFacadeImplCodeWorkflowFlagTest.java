@@ -86,7 +86,8 @@ class ProjectFacadeImplCodeWorkflowFlagTest {
     @BeforeEach
     void setUp() {
         projectFacade = new ProjectFacadeImpl(
-            applicationProperties, mock(CategoryService.class), componentDefinitionHelper, preBuiltTemplateService,
+            applicationProperties, mock(CategoryService.class), componentDefinitionHelper,
+            mock(ErrorWorkflowConfigurationValidator.class), preBuiltTemplateService,
             projectCodeWorkflowInfoSupplierProvider, projectWorkflowService, mock(ProjectDeploymentService.class),
             projectService, mock(ProjectDeploymentFacade.class), mock(ProjectWorkflowFacade.class),
             mock(SharedTemplateFileStorage.class), mock(SharedTemplateService.class), tagService,

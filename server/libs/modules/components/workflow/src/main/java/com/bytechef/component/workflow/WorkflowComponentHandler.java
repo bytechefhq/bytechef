@@ -25,6 +25,7 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.workflow.action.WorkflowResponseToWorkflowCallAction;
 import com.bytechef.component.workflow.cluster.WorkflowCallWorkflowTool;
 import com.bytechef.component.workflow.trigger.WorkflowNewWorkflowCallTrigger;
+import com.bytechef.component.workflow.trigger.WorkflowNewWorkflowErrorTrigger;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowDataSource;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver;
 import org.springframework.stereotype.Component;
@@ -43,7 +44,9 @@ public class WorkflowComponentHandler implements ComponentHandler {
             .description("Triggers and actions for workflow-to-workflow communication.")
             .icon("path:assets/workflow.svg")
             .categories(ComponentCategory.HELPERS)
-            .triggers(WorkflowNewWorkflowCallTrigger.TRIGGER_DEFINITION)
+            .triggers(
+                WorkflowNewWorkflowCallTrigger.TRIGGER_DEFINITION,
+                WorkflowNewWorkflowErrorTrigger.TRIGGER_DEFINITION)
             .actions(WorkflowResponseToWorkflowCallAction.ACTION_DEFINITION)
             .clusterElements(WorkflowCallWorkflowTool.of(subflowDataSource, subflowResolver));
     }
