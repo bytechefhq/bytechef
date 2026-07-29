@@ -22,8 +22,11 @@ import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.tool.execution.ToolExecutionEvent;
+import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -40,7 +43,7 @@ class ToolFacadeImplTest {
         clusterElementDefinitionFacade, mock(ClusterElementDefinitionService.class),
         mock(ComponentDefinitionService.class), mock(ConnectedUserService.class), connectionIdHelper,
         mock(IntegrationInstanceConfigurationService.class), mock(IntegrationInstanceService.class),
-        mock(IntegrationService.class));
+        mock(IntegrationService.class), new DirectToolExecutionRecorder());
 
     @Test
     @SuppressWarnings("unchecked")
@@ -65,5 +68,20 @@ class ToolFacadeImplTest {
         assertEquals("user-1", passed.get(EmbeddedToolConstants.EXTERNAL_USER_ID));
         assertEquals("PRODUCTION", passed.get(EmbeddedToolConstants.ENVIRONMENT));
         assertEquals("hi", passed.get("text"));
+    }
+
+    /**
+     * Runs the wrapped execution without publishing telemetry, so the facade's mapping is what the test observes.
+     */
+    private static final class DirectToolExecutionRecorder implements ToolExecutionRecorder {
+
+        @Override
+        public <V> V record(ToolExecutionEvent.Builder builder, Supplier<V> execution) {
+            return execution.get();
+        }
+
+        @Override
+        public void record(ToolExecutionEvent event) {
+        }
     }
 }

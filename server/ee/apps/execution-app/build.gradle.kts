@@ -52,6 +52,7 @@ dependencies {
     implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-remote-client"))
     implementation(project(":server:ee:libs:embedded:embedded-execution:embedded-execution-public-rest"))
     implementation(project(":server:ee:libs:embedded:embedded-execution:embedded-execution-service"))
+    implementation(project(":server:ee:libs:platform:platform-tool-invocation-log:platform-tool-invocation-log-service"))
     implementation(project(":server:ee:libs:embedded:embedded-workflow:embedded-workflow-execution:embedded-workflow-execution-rest"))
     implementation(project(":server:ee:libs:embedded:embedded-workflow:embedded-workflow-execution:embedded-workflow-execution-service"))
     implementation(project(":server:ee:libs:embedded:embedded-swagger"))

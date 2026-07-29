@@ -31,6 +31,7 @@ import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
+import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import java.util.Map;
@@ -58,7 +59,8 @@ class EmbeddedMcpToolFacadeEnabledTest {
             mock(JobCompletionAwaiter.class), mock(JwtTokenService.class), mcpComponentService,
             mock(McpIntegrationInstanceConfigurationWorkflowService.class), mcpIntegrationInstanceToolService,
             mock(McpServerService.class), mock(PrincipalJobFacade.class), "http://localhost:9555",
-            mock(TaskExecutionService.class), mock(TaskFileStorage.class), mock(WorkflowService.class));
+            mock(TaskExecutionService.class), mock(TaskFileStorage.class), mock(ToolExecutionRecorder.class),
+            mock(WorkflowService.class));
 
         McpTool disabledTool = new McpTool("disabled-tool", Map.of(), 10L);
 

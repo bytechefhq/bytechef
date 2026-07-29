@@ -12,6 +12,8 @@ tags:
     description: "The Embedded Request Trigger Public API"
   - name: "workflow-execution"
     description: "The Embedded Workflow Execution Public API"
+  - name: "tool-invocation"
+    description: "The Embedded Tool Invocation Public API"
 paths:
 #  /components:
 #    get:
@@ -622,6 +624,76 @@ paths:
           $ref: "#/components/responses/notFound"
         "500":
           $ref: "#/components/responses/internalServerError"
+  /{externalUserId}/tool-invocations:
+    get:
+      description: "Get the page of a connected user's direct tool/action invocations (MCP component tools,\
+        \ workflow-as-tool calls, and executeAction/executeTool). Input and output payloads are never included."
+      summary: "Get tool invocations"
+      tags:
+        - "tool-invocation"
+      operationId: "getToolInvocationsPage"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+        - name: "externalUserId"
+          description: "The external user id."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "surface"
+          description: "The surface a tool invocation was made through."
+          in: "query"
+          required: false
+          schema:
+            $ref: "#/components/schemas/ToolInvocationSurface"
+        - name: "outcome"
+          description: "The outcome of a tool invocation."
+          in: "query"
+          required: false
+          schema:
+            $ref: "#/components/schemas/ToolInvocationOutcome"
+        - name: "startDate"
+          description: "Return only invocations recorded at or after this instant."
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            format: "date-time"
+        - name: "endDate"
+          description: "Return only invocations recorded at or before this instant."
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            format: "date-time"
+        - name: "pageNumber"
+          description: "The number of the page to return."
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            format: "int32"
+            default: 0
+      responses:
+        "200":
+          description: "The page of tool invocations."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Page"
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "500":
+          $ref: "#/components/responses/internalServerError"
 components:
   securitySchemes:
     bearerAuth:
@@ -739,6 +811,67 @@ components:
           type: "array"
           items:
             type: "object"
+    ToolInvocationSurface:
+      description: "The surface a tool invocation was made through."
+      type: "string"
+      enum:
+        - "MCP_AUTOMATION"
+        - "MCP_EMBEDDED"
+        - "MCP_MANAGEMENT"
+        - "EMBEDDED_API_ACTION"
+        - "EMBEDDED_API_TOOL"
+    ToolInvocationKind:
+      description: "The kind of thing a tool invocation ran."
+      type: "string"
+      enum:
+        - "COMPONENT"
+        - "WORKFLOW"
+        - "CONTRIBUTED"
+        - "MANAGEMENT_TOOL"
+    ToolInvocationOutcome:
+      description: "The outcome of a tool invocation."
+      type: "string"
+      enum:
+        - "SUCCESS"
+        - "ERROR"
+        - "CONNECTION_REQUIRED"
+        - "TIMEOUT"
+    ToolInvocation:
+      description: "A record of a single direct tool/action invocation."
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        surface:
+          $ref: "#/components/schemas/ToolInvocationSurface"
+        kind:
+          $ref: "#/components/schemas/ToolInvocationKind"
+        toolName:
+          type: "string"
+        componentName:
+          type: "string"
+        componentVersion:
+          type: "integer"
+          format: "int32"
+        operationName:
+          type: "string"
+        integrationInstanceId:
+          type: "integer"
+          format: "int64"
+        jobId:
+          type: "integer"
+          format: "int64"
+        outcome:
+          $ref: "#/components/schemas/ToolInvocationOutcome"
+        errorMessage:
+          type: "string"
+        durationMs:
+          type: "integer"
+          format: "int32"
+        createdDate:
+          type: "string"
+          format: "date-time"
     WorkflowExecutionStatus:
       description: "The status of a workflow execution."
       type: "string"

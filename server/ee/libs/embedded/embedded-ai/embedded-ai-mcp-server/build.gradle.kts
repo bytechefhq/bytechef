@@ -36,6 +36,8 @@ dependencies {
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     implementation(project(":server:libs:platform:platform-job-sync"))
     implementation(project(":server:libs:platform:platform-mcp:platform-mcp-api"))
+    implementation(project(":server:libs:platform:platform-tool-execution:platform-tool-execution-api"))
+    runtimeOnly(project(":server:libs:platform:platform-tool-execution:platform-tool-execution-service"))
     implementation(project(":server:libs:platform:platform-mcp:platform-mcp-server-support"))
     implementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
     implementation(project(":server:libs:platform:platform-security-web:platform-security-web-impl"))

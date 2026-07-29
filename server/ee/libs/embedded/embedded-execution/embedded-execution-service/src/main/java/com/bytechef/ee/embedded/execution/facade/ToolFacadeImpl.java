@@ -29,6 +29,10 @@ import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.util.JsonSchemaGeneratorUtils;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.tool.execution.ToolExecutionEvent;
+import com.bytechef.platform.tool.execution.ToolExecutionKind;
+import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
+import com.bytechef.platform.tool.execution.ToolExecutionSurface;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -54,6 +58,8 @@ public class ToolFacadeImpl implements ToolFacade {
     private final IntegrationInstanceService integrationInstanceService;
     private final IntegrationService integrationService;
 
+    private final ToolExecutionRecorder toolExecutionRecorder;
+
     @SuppressFBWarnings("EI")
     public ToolFacadeImpl(
         ClusterElementDefinitionFacade clusterElementDefinitionFacade,
@@ -61,7 +67,8 @@ public class ToolFacadeImpl implements ToolFacade {
         ComponentDefinitionService componentDefinitionService, ConnectedUserService connectedUserService,
         ConnectionIdHelper connectionIdHelper,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
-        IntegrationInstanceService integrationInstanceService, IntegrationService integrationService) {
+        IntegrationInstanceService integrationInstanceService, IntegrationService integrationService,
+        ToolExecutionRecorder toolExecutionRecorder) {
 
         this.clusterElementDefinitionFacade = clusterElementDefinitionFacade;
         this.clusterElementDefinitionService = clusterElementDefinitionService;
@@ -71,6 +78,7 @@ public class ToolFacadeImpl implements ToolFacade {
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.integrationInstanceService = integrationInstanceService;
         this.integrationService = integrationService;
+        this.toolExecutionRecorder = toolExecutionRecorder;
     }
 
     @Override
@@ -128,8 +136,17 @@ public class ToolFacadeImpl implements ToolFacade {
         Map<String, Object> parameters = EmbeddedToolConstants.withConnectedUserContext(
             inputParameters, externalUserId, environment);
 
-        return clusterElementDefinitionFacade.executeTool(
-            result.componentName(), result.clusterElementName(), parameters, connectionId);
+        return toolExecutionRecorder.record(
+            ToolExecutionEvent
+                .builder(ToolExecutionSurface.EMBEDDED_API_TOOL, ToolExecutionKind.COMPONENT, toolName)
+                .componentName(result.componentName())
+                .operationName(result.clusterElementName())
+                .connectionId(connectionId)
+                .externalUserId(externalUserId)
+                .integrationInstanceId(instanceId)
+                .environment(environment == null ? null : environment.ordinal()),
+            () -> clusterElementDefinitionFacade.executeTool(
+                result.componentName(), result.clusterElementName(), parameters, connectionId));
     }
 
     private static boolean filterByCategoryNames(List<String> categoryNames, ComponentDefinition componentDefinition) {

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <!--
+        tool_invocation_log is an append-only access log of direct action/tool executions (MCP component tools,
+        workflow-as-tool calls, and the embedded public executeAction/executeTool paths). Enum dimensions
+        (surface, kind, outcome) are stored by ordinal. It carries identity and outcome metadata only — never the
+        invocation's input parameters or output payload.
+    -->
+    <changeSet id="20260718000001-1" author="Ivica Cardic">
+        <createTable tableName="tool_invocation_log">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="tenant_id" type="VARCHAR(63)"/>
+            <column name="surface" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="kind" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="tool_name" type="VARCHAR(256)"/>
+            <column name="component_name" type="VARCHAR(256)"/>
+            <column name="component_version" type="INT"/>
+            <column name="operation_name" type="VARCHAR(256)"/>
+            <column name="connection_id" type="BIGINT"/>
+            <column name="environment" type="INT"/>
+            <column name="workspace_id" type="BIGINT"/>
+            <column name="external_user_id" type="VARCHAR(256)"/>
+            <column name="connected_user_id" type="BIGINT"/>
+            <column name="integration_instance_id" type="BIGINT"/>
+            <column name="mcp_server_id" type="BIGINT"/>
+            <column name="job_id" type="BIGINT"/>
+            <column name="outcome" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="error_type" type="VARCHAR(256)"/>
+            <column name="error_message" type="VARCHAR(512)"/>
+            <column name="duration_ms" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex tableName="tool_invocation_log" indexName="idx_tool_invocation_log_tenant_surface_created">
+            <column name="tenant_id"/>
+            <column name="surface"/>
+            <column name="created_date" descending="true"/>
+        </createIndex>
+
+        <createIndex tableName="tool_invocation_log" indexName="idx_tool_invocation_log_mcp_server_created">
+            <column name="mcp_server_id"/>
+            <column name="created_date" descending="true"/>
+        </createIndex>
+
+        <createIndex tableName="tool_invocation_log" indexName="idx_tool_invocation_log_connected_user_created">
+            <column name="connected_user_id"/>
+            <column name="created_date" descending="true"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>
