@@ -6,6 +6,7 @@ checkstyle = "13.4.0"
 com-google-auto-service = "1.1.1"
 findsecbugs = "1.14.0"
 graalvm = "25.0.3"
+grpc = "1.83.0"
 io-modelcontextprotocol-sdk = "2.0.0"
 jackson = "2.19.2"
 jacoco = "0.8.13"
@@ -17,8 +18,10 @@ org-mapstruct-extensions-spring = "2.0.0"
 org-springdoc = "3.0.3"
 pmd = "7.23.0"
 spotbugs = "4.9.8"
+protobuf = "4.35.0"
 spring-ai = "2.0.0"
 spring-boot = "4.0.7"
+spring-grpc = "1.0.3"
 spring-cloud-aws = "4.0.2"
 spring-cloud-dependencies = "2025.1.1"
 spring-shell = "4.0.1"
@@ -80,9 +83,18 @@ org-springdoc-springdoc-openapi-starter-webmvc-ui = { module = "org.springdoc:sp
 org-springframework-vault-spring-vault-core = { module = "org.springframework.vault:spring-vault-core", version.ref = "spring-vault" }
 org-wiremock-wiremock = "org.wiremock:wiremock-standalone:3.13.2"
 org-zeroturnaround-zt-exec = "org.zeroturnaround:zt-exec:1.12"
+com-google-protobuf-protobuf-java = { module = "com.google.protobuf:protobuf-java", version.ref = "protobuf" }
+com-google-protobuf-protobuf-java-util = { module = "com.google.protobuf:protobuf-java-util", version.ref = "protobuf" }
+io-grpc-grpc-inprocess = { module = "io.grpc:grpc-inprocess", version.ref = "grpc" }
+io-grpc-grpc-netty-shaded = { module = "io.grpc:grpc-netty-shaded", version.ref = "grpc" }
+io-grpc-grpc-protobuf = { module = "io.grpc:grpc-protobuf", version.ref = "grpc" }
+io-grpc-grpc-stub = { module = "io.grpc:grpc-stub", version.ref = "grpc" }
+io-grpc-grpc-testing = { module = "io.grpc:grpc-testing", version.ref = "grpc" }
+org-springframework-grpc-spring-grpc-server-spring-boot-starter = { module = "org.springframework.grpc:spring-grpc-server-spring-boot-starter", version.ref = "spring-grpc" }
 
 [plugins]
 com-github-ben-manes-versions = "com.github.ben-manes.versions:0.54.0"
+com-google-protobuf = "com.google.protobuf:0.10.0"
 gradle-git-properties = "com.gorylenko.gradle-git-properties:4.0.1"
 jib = "com.google.cloud.tools.jib:3.5.3"
 nl-littlerobots-version-catalog-update = "nl.littlerobots.version-catalog-update:1.1.0"

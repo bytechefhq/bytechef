@@ -47,8 +47,13 @@ dependencies {
     implementation(project(":server:ee:libs:core:remote:remote-rest"))
     implementation(project(":server:ee:libs:platform:platform-component:platform-component-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-remote-client"))
+    implementation(project(":server:ee:libs:platform:platform-connection:platform-connection-remote-grpc"))
     implementation(project(":server:ee:libs:platform:platform-connection:platform-connection-remote-rest"))
     implementation(project(":server:ee:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-remote-client"))
+
+    // gRPC server transport for the optional grpc remote transport (bytechef.remote.transport=grpc);
+    // the server stays dormant until spring.grpc.server.enabled=true.
+    implementation(libs.org.springframework.grpc.spring.grpc.server.spring.boot.starter)
 
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-remote-client"))
     implementation(project(":server:ee:libs:embedded:embedded-swagger"))

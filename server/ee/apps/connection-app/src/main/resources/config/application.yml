@@ -7,5 +7,9 @@ spring:
       password: ${BYTECHEF_CONFIG_SERVER_PASSWORD:dev-config-server-secret}
   config:
     import: optional:configserver:http://localhost:6111
+  grpc:
+    server:
+      # Dormant by default; enabled together with bytechef.remote.transport=grpc for the gRPC remote transport.
+      enabled: false
   profiles:
     active: #spring.profiles.active#

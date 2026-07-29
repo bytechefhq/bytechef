@@ -135,6 +135,11 @@ public class ApplicationProperties {
     private FileStorage fileStorage = new FileStorage();
 
     /**
+     * gRPC remote transport configuration
+     */
+    private Grpc grpc = new Grpc();
+
+    /**
      * Help hub configuration
      */
     private HelpHub helpHub = new HelpHub();
@@ -183,6 +188,11 @@ public class ApplicationProperties {
      * Redis connection configuration
      */
     private Redis redis = new Redis();
+
+    /**
+     * Remote inter-service transport configuration
+     */
+    private Remote remote = new Remote();
 
     /**
      * Static resources configuration
@@ -298,6 +308,10 @@ public class ApplicationProperties {
         return fileStorage;
     }
 
+    public Grpc getGrpc() {
+        return grpc;
+    }
+
     public HelpHub getHelpHub() {
         return helpHub;
     }
@@ -336,6 +350,10 @@ public class ApplicationProperties {
 
     public Redis getRedis() {
         return redis;
+    }
+
+    public Remote getRemote() {
+        return remote;
     }
 
     public Resources getResources() {
@@ -446,6 +464,10 @@ public class ApplicationProperties {
         this.fileStorage = fileStorage;
     }
 
+    public void setGrpc(Grpc grpc) {
+        this.grpc = grpc;
+    }
+
     public void setHelpHub(HelpHub helpHub) {
         this.helpHub = helpHub;
     }
@@ -484,6 +506,10 @@ public class ApplicationProperties {
 
     public void setRedis(Redis redis) {
         this.redis = redis;
+    }
+
+    public void setRemote(Remote remote) {
+        this.remote = remote;
     }
 
     public void setResources(Resources resources) {
@@ -4303,6 +4329,73 @@ public class ApplicationProperties {
 
         public void setEnabled(boolean enabled) {
             this.enabled = enabled;
+        }
+    }
+
+    /**
+     * gRPC remote transport configuration.
+     */
+    public static class Grpc {
+
+        /**
+         * The connection-app gRPC channel target configuration.
+         */
+        private ConnectionApp connectionApp = new ConnectionApp();
+
+        /**
+         * Whether plaintext (non-TLS) gRPC is permitted; only honored for a loopback target.
+         */
+        private boolean plaintextEnabled;
+
+        public ConnectionApp getConnectionApp() {
+            return connectionApp;
+        }
+
+        public void setConnectionApp(ConnectionApp connectionApp) {
+            this.connectionApp = connectionApp;
+        }
+
+        public boolean isPlaintextEnabled() {
+            return plaintextEnabled;
+        }
+
+        public void setPlaintextEnabled(boolean plaintextEnabled) {
+            this.plaintextEnabled = plaintextEnabled;
+        }
+
+        public static class ConnectionApp {
+
+            /**
+             * The gRPC channel target for connection-app (e.g. discovery:///connection-app or host:port).
+             */
+            private String address;
+
+            public String getAddress() {
+                return address;
+            }
+
+            public void setAddress(String address) {
+                this.address = address;
+            }
+        }
+    }
+
+    /**
+     * Remote inter-service transport configuration.
+     */
+    public static class Remote {
+
+        /**
+         * Inter-service remote transport: "rest" (default) or "grpc".
+         */
+        private String transport = "rest";
+
+        public String getTransport() {
+            return transport;
+        }
+
+        public void setTransport(String transport) {
+            this.transport = transport;
         }
     }
 

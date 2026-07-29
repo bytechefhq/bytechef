@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 
@@ -29,6 +30,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
+@ConditionalOnProperty(name = "bytechef.remote.transport", havingValue = "rest", matchIfMissing = true)
 public class RemoteConnectionServiceClient implements ConnectionService {
 
     private final LoadBalancedRestClient loadBalancedRestClient;

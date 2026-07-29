@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+package com.bytechef.ee.platform.connection.remote.grpc;
+
+import "google/protobuf/struct.proto";
+
+option java_multiple_files = true;
+option java_package = "com.bytechef.ee.platform.connection.remote.grpc";
+
+// Proto enums mirror the domain enums by NAME (ConnectionStatus / ResourceVisibility /
+// PlatformType); the mapper converts via Enum.name() so it is robust to ordinal drift. Proto3
+// requires a zero default, so each carries a *_UNSPECIFIED = 0 sentinel not present in the domain.
+
+enum ConnectionStatusProto {
+  CONNECTION_STATUS_UNSPECIFIED = 0;
+  ACTIVE = 1;
+  PENDING_REASSIGNMENT = 2;
+  REVOKED = 3;
+}
+
+enum ConnectionVisibilityProto {
+  CONNECTION_VISIBILITY_UNSPECIFIED = 0;
+  PRIVATE = 1;
+  WORKSPACE = 2;
+  ORGANIZATION = 3;
+}
+
+enum PlatformTypeProto {
+  PLATFORM_TYPE_UNSPECIFIED = 0;
+  AUTOMATION = 1;
+  EMBEDDED = 2;
+}
+
+// Hybrid marshalling: stable scalar/enum fields are typed; the dynamic connection parameters map
+// travels as google.protobuf.Struct. Audit/credential fields are intentionally out of the POC.
+message ConnectionProto {
+  int64 id = 1;
+  string name = 2;
+  string component_name = 3;
+  int32 connection_version = 4;
+  int32 environment = 5;
+  ConnectionStatusProto status = 6;
+  ConnectionVisibilityProto visibility = 7;
+  PlatformTypeProto type = 8;
+  google.protobuf.Struct parameters = 9;
+  repeated int64 tag_ids = 10;
+  int32 version = 11;
+}
+
+message ConnectionListProto {
+  repeated ConnectionProto connections = 1;
+}
+
+message GetConnectionRequest {
+  int64 id = 1;
+}
+
+message GetConnectionsRequest {
+  PlatformTypeProto type = 1;
+}
+
+service ConnectionRemoteService {
+  rpc GetConnection (GetConnectionRequest) returns (ConnectionProto);
+  rpc GetConnections (GetConnectionsRequest) returns (ConnectionListProto);
+}
