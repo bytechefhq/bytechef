@@ -26,7 +26,7 @@ const MonacoEditorWrapper = lazy(() => import('@/shared/components/MonacoEditorW
 
 interface FileTreeNodeProps {
     node: FileTreeNodeI;
-    onRemove: (path: string) => void;
+    onRemove?: (path: string) => void;
     onSelect: (path: string) => void;
     selectedPath: string | null;
 }
@@ -82,14 +82,14 @@ const FileTreeNode = ({node, onRemove, onSelect, selectedPath}: FileTreeNodeProp
                 <span className="truncate">{node.name}</span>
             </Button>
 
-            {!isSkillMd && (
+            {!isSkillMd && onRemove && (
                 <Button
                     aria-label={`Remove ${node.name}`}
                     className="h-auto shrink-0 rounded p-1 text-gray-400 opacity-0 group-hover:opacity-100 hover:text-red-600"
                     onClick={(event) => {
                         event.stopPropagation();
 
-                        onRemove(node.path);
+                        onRemove?.(node.path);
                     }}
                     size="xs"
                     type="button"

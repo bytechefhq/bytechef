@@ -1189,7 +1189,12 @@ export const useProperty = ({
                 hasWorkflowId: !!workflow.id,
             });
 
-            setPropertyParameterValue(value);
+            dispatchValueAction({
+                context: parameterValueContextRef.current,
+                syncDisplayValues: false,
+                type: 'parameterValueResolved',
+                value,
+            });
 
             const editorContent = value.startsWith('=') ? value.substring(1) : value;
 
