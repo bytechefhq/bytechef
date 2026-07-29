@@ -82,7 +82,7 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
             .orElseThrow(() -> new IllegalStateException("No active subscription found"));
 
         stripeClient.cancelAtPeriodEnd(
-            subscription.getStripeSubscriptionId(), TenantContext.getCurrentTenantId());
+            subscription.getSubscriptionId(), TenantContext.getCurrentTenantId());
     }
 
     @Override
@@ -92,7 +92,7 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
         String usagePriceId = stripeClient.fetchProductDefaultPriceId(billingProperties.stripe()
             .productUsageId());
 
-        String customerId = getStripeCustomerId();
+        String customerId = getCustomerId();
 
         Session session = stripeClient.createCheckoutSession(
             customerId, flatPriceId, usagePriceId, planName, billingProperties.stripe()
@@ -104,7 +104,7 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
         return session.getUrl();
     }
 
-    private String getStripeCustomerId() {
+    private String getCustomerId() {
         String tenantId = TenantContext.getCurrentTenantId();
         String userEmail = SecurityContextHolder.getContext()
             .getAuthentication()
@@ -157,7 +157,7 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
 
         BillingSubscriptionWebhookEvent webhookEvent = new BillingSubscriptionWebhookEvent();
 
-        webhookEvent.setStripeEventId(event.getId());
+        webhookEvent.setEventId(event.getId());
         webhookEvent.setEventType(event.getType());
 
         if (savedSubscription != null) {
@@ -173,7 +173,7 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
             .orElseThrow(() -> new IllegalStateException("No active subscription found"));
 
         stripeClient.reactivateSubscription(
-            subscription.getStripeSubscriptionId(), TenantContext.getCurrentTenantId());
+            subscription.getSubscriptionId(), TenantContext.getCurrentTenantId());
     }
 
     @Override
@@ -181,7 +181,7 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
         BillingSubscription currentSubscription = billingSubscriptionService.fetchCurrentSubscription()
             .orElseThrow(() -> new IllegalStateException("No active subscription found"));
 
-        String subscriptionId = currentSubscription.getStripeSubscriptionId();
+        String subscriptionId = currentSubscription.getSubscriptionId();
 
         Subscription stripeSubscription = stripeClient.retrieveSubscription(subscriptionId);
 
@@ -192,7 +192,7 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
 
         if (isUpgrade(currentSubscription.getPlanName(), newPlanName)) {
             stripeClient.upgradeSubscriptionNow(
-                subscriptionId, currentSubscription.getStripeProductId(), newFlatPriceId, newPlanName, tenantId);
+                subscriptionId, currentSubscription.getProductId(), newFlatPriceId, newPlanName, tenantId);
 
             currentSubscription.setScheduledPlanName(null);
         } else {
@@ -201,8 +201,8 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
                     .productUsageId());
 
             stripeClient.scheduleDowngrade(
-                subscriptionId, currentSubscription.getStripeProductId(),
-                currentSubscription.getStripeUsageProductId(), newFlatPriceId, newMeteredPriceId, newPlanName,
+                subscriptionId, currentSubscription.getProductId(),
+                currentSubscription.getUsageProductId(), newFlatPriceId, newMeteredPriceId, newPlanName,
                 tenantId, currentSubscription.getCurrentPeriodEnd()
                     .getEpochSecond());
 
@@ -277,10 +277,10 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
             .getObject()
             .orElseThrow(() -> new RuntimeException("Failed to deserialize subscription"));
 
-        return billingSubscriptionService.fetchSubscriptionByStripeSubscriptionId(stripeSubscription.getId())
+        return billingSubscriptionService.fetchSubscriptionBySubscriptionId(stripeSubscription.getId())
             .map(subscription -> {
                 subscription.setStatus(
-                    BillingSubscription.Status.fromStripe(stripeSubscription.getStatus()));
+                    BillingSubscription.Status.fromProviderStatus(stripeSubscription.getStatus()));
 
                 subscription.setCancelAtPeriodEnd(Boolean.TRUE.equals(stripeSubscription.getCancelAtPeriodEnd()));
 
@@ -295,7 +295,7 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
                     .filter(item -> !isMeteredItem(item))
                     .findFirst()
                     .ifPresent(flatItem -> {
-                        subscription.setStripeProductId(flatItem.getId());
+                        subscription.setProductId(flatItem.getId());
 
                         String productId = flatItem.getPrice()
                             .getProduct();
@@ -322,7 +322,7 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
                         Instant newPeriodStart = Instant.ofEpochSecond(flatItem.getCurrentPeriodStart());
 
                         if (!newPeriodStart.equals(subscription.getCurrentPeriodStart())) {
-                            subscription.setTaskLimit(getTaskLimit(flatItem));
+                            subscription.setProductUnitLimit(getProductUnitLimit(flatItem));
                             subscription.setCurrentPeriodStart(newPeriodStart);
                             subscription.setCurrentPeriodEnd(
                                 Instant.ofEpochSecond(flatItem.getCurrentPeriodEnd()));
@@ -333,7 +333,7 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
                 items.stream()
                     .filter(this::isMeteredItem)
                     .findFirst()
-                    .ifPresent(usageItem -> subscription.setStripeUsageProductId(usageItem.getId()));
+                    .ifPresent(usageItem -> subscription.setUsageProductId(usageItem.getId()));
 
                 return billingSubscriptionService.save(subscription);
             })
@@ -361,7 +361,7 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
             .getObject()
             .orElseThrow(() -> new RuntimeException("Failed to deserialize subscription"));
 
-        return billingSubscriptionService.fetchSubscriptionByStripeSubscriptionId(stripeSubscription.getId())
+        return billingSubscriptionService.fetchSubscriptionBySubscriptionId(stripeSubscription.getId())
             .map(subscription -> {
                 subscription.setStatus(BillingSubscription.Status.CANCELED);
 
@@ -410,14 +410,14 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
 
         BillingSubscription billingSubscription = new BillingSubscription();
 
-        billingSubscription.setStripeCustomerId(session.getCustomer());
-        billingSubscription.setStripeSubscriptionId(stripeSubscription.getId());
-        billingSubscription.setStripeProductId(flatItem.getId());
-        billingSubscription.setStripeUsageProductId(usageItem.getId());
+        billingSubscription.setCustomerId(session.getCustomer());
+        billingSubscription.setSubscriptionId(stripeSubscription.getId());
+        billingSubscription.setProductId(flatItem.getId());
+        billingSubscription.setUsageProductId(usageItem.getId());
         billingSubscription.setPlanName(planName);
         billingSubscription.setStatus(
-            BillingSubscription.Status.fromStripe(stripeSubscription.getStatus()));
-        billingSubscription.setTaskLimit(getTaskLimit(usageItem));
+            BillingSubscription.Status.fromProviderStatus(stripeSubscription.getStatus()));
+        billingSubscription.setProductUnitLimit(getProductUnitLimit(usageItem));
         billingSubscription.setCurrentPeriodStart(Instant.ofEpochSecond(flatItem.getCurrentPeriodStart()));
         billingSubscription.setCurrentPeriodEnd(Instant.ofEpochSecond(flatItem.getCurrentPeriodEnd()));
         billingSubscription.setCancelAtPeriodEnd(stripeSubscription.getCancelAtPeriodEnd());
@@ -436,7 +436,7 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
             });
     }
 
-    private int getTaskLimit(SubscriptionItem usageItem) {
+    private int getProductUnitLimit(SubscriptionItem usageItem) {
         Price usagePrice = stripeClient.retrievePrice(usageItem.getPrice()
             .getId());
 

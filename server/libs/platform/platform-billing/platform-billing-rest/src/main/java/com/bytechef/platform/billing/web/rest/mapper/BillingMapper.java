@@ -32,7 +32,7 @@ public interface BillingMapper extends Converter<BillingSubscriptionDTO, Billing
     @Override
     @Mapping(source = "subscription.planName", target = "planName")
     @Mapping(target = "status", expression = "java(dto.subscription().getStatus().name())")
-    @Mapping(source = "subscription.taskLimit", target = "taskLimit")
+    @Mapping(source = "subscription.productUnitLimit", target = "productUnitLimit")
     @Mapping(source = "subscription.currentPeriodEnd", target = "currentPeriodEnd")
     @Mapping(source = "subscription.cancelAtPeriodEnd", target = "cancelAtPeriodEnd")
     @Mapping(source = "subscription.scheduledPlanName", target = "scheduledPlanName")

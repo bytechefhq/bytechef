@@ -39,8 +39,8 @@ public class BillingSubscriptionWebhookEvent {
     @Id
     private Long id;
 
-    @Column("stripe_event_id")
-    private String stripeEventId;
+    @Column("event_id")
+    private String eventId;
 
     @Column("subscription_id")
     private Long subscriptionId;
@@ -75,8 +75,8 @@ public class BillingSubscriptionWebhookEvent {
         return id;
     }
 
-    public String getStripeEventId() {
-        return stripeEventId;
+    public String getEventId() {
+        return eventId;
     }
 
     public Long getSubscriptionId() {
@@ -91,8 +91,8 @@ public class BillingSubscriptionWebhookEvent {
         this.id = id;
     }
 
-    public void setStripeEventId(String stripeEventId) {
-        this.stripeEventId = stripeEventId;
+    public void setEventId(String eventId) {
+        this.eventId = eventId;
     }
 
     public void setSubscriptionId(Long subscriptionId) {
@@ -103,7 +103,7 @@ public class BillingSubscriptionWebhookEvent {
     public String toString() {
         return "BillingSubscriptionWebhookEvent{" +
             "id=" + id +
-            ", stripeEventId='" + stripeEventId + '\'' +
+            ", eventId='" + eventId + '\'' +
             ", eventType='" + eventType + '\'' +
             ", subscriptionId=" + subscriptionId +
             ", createdDate=" + createdDate +

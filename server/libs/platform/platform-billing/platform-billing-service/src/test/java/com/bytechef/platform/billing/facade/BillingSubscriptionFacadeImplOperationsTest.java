@@ -107,7 +107,7 @@ class BillingSubscriptionFacadeImplOperationsTest {
             invocation -> Webhook.constructEvent(invocation.getArgument(0), invocation.getArgument(1),
                 WEBHOOK_SECRET));
         when(stripeClient.retrieveSubscription(CHECKOUT_SUBSCRIPTION_ID)).thenReturn(checkoutStripeSubscription());
-        when(stripeClient.retrievePrice(any())).thenReturn(priceWithTaskLimit(100L));
+        when(stripeClient.retrievePrice(any())).thenReturn(priceWithProductUnitLimit(100L));
         when(billingSubscriptionService.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
         String payload = checkoutSessionCompletedPayload(CHECKOUT_SUBSCRIPTION_ID, "cus_checkout", "STARTER");
@@ -140,7 +140,7 @@ class BillingSubscriptionFacadeImplOperationsTest {
             invocation -> Webhook.constructEvent(invocation.getArgument(0), invocation.getArgument(1),
                 WEBHOOK_SECRET));
         when(stripeClient.retrieveSubscription(CHECKOUT_SUBSCRIPTION_ID)).thenReturn(checkoutStripeSubscription());
-        when(stripeClient.retrievePrice(any())).thenReturn(priceWithTaskLimit(100L));
+        when(stripeClient.retrievePrice(any())).thenReturn(priceWithProductUnitLimit(100L));
         when(billingSubscriptionService.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
         String payload = checkoutSessionCompletedPayload(CHECKOUT_SUBSCRIPTION_ID, "cus_checkout", "STARTER");
@@ -164,7 +164,7 @@ class BillingSubscriptionFacadeImplOperationsTest {
             invocation -> Webhook.constructEvent(invocation.getArgument(0), invocation.getArgument(1),
                 WEBHOOK_SECRET));
         when(stripeClient.retrieveSubscription(CHECKOUT_SUBSCRIPTION_ID)).thenReturn(checkoutStripeSubscription());
-        when(stripeClient.retrievePrice(any())).thenReturn(priceWithTaskLimit(100L));
+        when(stripeClient.retrievePrice(any())).thenReturn(priceWithProductUnitLimit(100L));
         when(billingSubscriptionService.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
         String payload = checkoutSessionCompletedPayload(CHECKOUT_SUBSCRIPTION_ID, "cus_checkout", "STARTER");
@@ -265,9 +265,9 @@ class BillingSubscriptionFacadeImplOperationsTest {
     private BillingSubscription starterSubscription() {
         BillingSubscription subscription = new BillingSubscription();
 
-        subscription.setStripeSubscriptionId("sub_starter");
-        subscription.setStripeProductId("si_flat_starter");
-        subscription.setStripeUsageProductId("si_usage_starter");
+        subscription.setSubscriptionId("sub_starter");
+        subscription.setProductId("si_flat_starter");
+        subscription.setUsageProductId("si_usage_starter");
         subscription.setPlanName("STARTER");
         subscription.setStatus(BillingSubscription.Status.ACTIVE);
         subscription.setCurrentPeriodEnd(Instant.parse("2026-07-01T00:00:00Z"));
@@ -278,9 +278,9 @@ class BillingSubscriptionFacadeImplOperationsTest {
     private BillingSubscription growthSubscription() {
         BillingSubscription subscription = new BillingSubscription();
 
-        subscription.setStripeSubscriptionId("sub_growth");
-        subscription.setStripeProductId("si_flat_growth");
-        subscription.setStripeUsageProductId("si_usage_growth");
+        subscription.setSubscriptionId("sub_growth");
+        subscription.setProductId("si_flat_growth");
+        subscription.setUsageProductId("si_usage_growth");
         subscription.setPlanName("GROWTH");
         subscription.setStatus(BillingSubscription.Status.ACTIVE);
         subscription.setCurrentPeriodEnd(Instant.parse("2026-07-01T00:00:00Z"));
@@ -334,7 +334,7 @@ class BillingSubscriptionFacadeImplOperationsTest {
         return subscription;
     }
 
-    private Price priceWithTaskLimit(long upTo) {
+    private Price priceWithProductUnitLimit(long upTo) {
         Price.Tier tier = new Price.Tier();
 
         tier.setUpTo(upTo);

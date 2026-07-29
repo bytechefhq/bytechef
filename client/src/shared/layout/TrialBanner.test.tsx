@@ -6,7 +6,7 @@ import {TrialBanner} from './TrialBanner';
 const hoisted = vi.hoisted(() => ({
     navigate: vi.fn(),
     subscription: undefined as
-        | {currentPeriodEnd?: Date; planName?: string; status?: string; taskLimit?: number; tasksUsed?: number}
+        | {currentPeriodEnd?: Date; planName?: string; productUnitLimit?: number; status?: string; tasksUsed?: number}
         | undefined,
 }));
 
@@ -42,8 +42,8 @@ describe('TrialBanner', () => {
         hoisted.subscription = {
             currentPeriodEnd: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
             planName: 'TRIAL',
+            productUnitLimit: 5000,
             status: 'ACTIVE',
-            taskLimit: 5000,
             tasksUsed: 120,
         };
 

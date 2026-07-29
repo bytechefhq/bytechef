@@ -157,8 +157,8 @@ class BillingUsageServiceImplTest {
     private BillingSubscription buildSubscription(String customerId, String subscriptionId, Instant lastReportedAt) {
         BillingSubscription subscription = new BillingSubscription();
 
-        subscription.setStripeCustomerId(customerId);
-        subscription.setStripeSubscriptionId(subscriptionId);
+        subscription.setCustomerId(customerId);
+        subscription.setSubscriptionId(subscriptionId);
         subscription.setStatus(BillingSubscription.Status.ACTIVE);
         subscription.setLastReportedAt(lastReportedAt);
         subscription.setCurrentPeriodStart(Instant.now()

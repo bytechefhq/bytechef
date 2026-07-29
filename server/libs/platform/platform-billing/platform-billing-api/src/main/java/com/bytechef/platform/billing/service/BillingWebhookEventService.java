@@ -23,7 +23,7 @@ import com.bytechef.platform.billing.domain.BillingSubscriptionWebhookEvent;
  */
 public interface BillingWebhookEventService {
 
-    boolean isEventProcessed(String stripeEventId);
+    boolean isEventProcessed(String eventId);
 
     void save(BillingSubscriptionWebhookEvent event);
 }

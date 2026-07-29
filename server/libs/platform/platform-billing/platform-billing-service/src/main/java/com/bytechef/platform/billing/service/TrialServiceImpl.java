@@ -71,8 +71,8 @@ public class TrialServiceImpl implements TrialService {
             subscription.getCurrentPeriodStart(), now);
 
         boolean timeExpired = now.isAfter(subscription.getCurrentPeriodEnd());
-        boolean taskLimitReached = tasksUsed >= subscription.getTaskLimit();
-        boolean expired = timeExpired || taskLimitReached;
+        boolean productUnitLimitReached = tasksUsed >= subscription.getProductUnitLimit();
+        boolean expired = timeExpired || productUnitLimitReached;
 
         if (subscription.getStatus() == BillingSubscription.Status.ACTIVE && expired) {
             expireTrial(subscription);
@@ -80,7 +80,7 @@ public class TrialServiceImpl implements TrialService {
 
         long daysRemaining = Math.max(0, ChronoUnit.DAYS.between(now, subscription.getCurrentPeriodEnd()));
 
-        return new TrialDTO(expired, daysRemaining, tasksUsed, subscription.getTaskLimit());
+        return new TrialDTO(expired, daysRemaining, tasksUsed, subscription.getProductUnitLimit());
     }
 
     private void expireTrial(BillingSubscription subscription) {

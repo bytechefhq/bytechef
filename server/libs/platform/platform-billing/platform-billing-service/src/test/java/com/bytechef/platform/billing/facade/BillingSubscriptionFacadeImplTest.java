@@ -59,7 +59,7 @@ class BillingSubscriptionFacadeImplTest {
 
     private static final String WEBHOOK_SECRET = "whsec_test_webhook_secret";
     private static final String STRIPE_API_KEY = "sk_test_abc123";
-    private static final String STRIPE_SUBSCRIPTION_ID = "sub_test123";
+    private static final String SUBSCRIPTION_ID = "sub_test123";
     private static final String PRODUCT_STARTER_ID = "prod_starter_test";
     private static final String PRODUCT_GROWTH_ID = "prod_growth_test";
     private static final String PRODUCT_USAGE_ID = "prod_usage_test";
@@ -126,7 +126,7 @@ class BillingSubscriptionFacadeImplTest {
 
     @Test
     void testExtractTenantIdReturnsMetadataTenantIdForSubscriptionUpdated() {
-        String payload = subscriptionUpdatedPayload(STRIPE_SUBSCRIPTION_ID, "STARTER");
+        String payload = subscriptionUpdatedPayload(SUBSCRIPTION_ID, "STARTER");
 
         String tenantId = facade.extractTenantId(payload);
 
@@ -135,7 +135,7 @@ class BillingSubscriptionFacadeImplTest {
 
     @Test
     void testVerifyWebhookSignaturePropagatesStripeClientFailure() {
-        String payload = subscriptionUpdatedPayload(STRIPE_SUBSCRIPTION_ID, "STARTER");
+        String payload = subscriptionUpdatedPayload(SUBSCRIPTION_ID, "STARTER");
 
         doThrow(new InvalidWebhookSignatureException("Invalid Stripe signature", null))
             .when(stripeClient)
@@ -150,18 +150,18 @@ class BillingSubscriptionFacadeImplTest {
     void testHandleSubscriptionUpdatedResetsLastReportedAtOnPeriodRollover() throws Exception {
         BillingSubscription subscription = starterSubscription();
 
-        subscription.setStripeSubscriptionId(STRIPE_SUBSCRIPTION_ID);
+        subscription.setSubscriptionId(SUBSCRIPTION_ID);
         subscription.setCurrentPeriodStart(Instant.ofEpochSecond(1777593600L));
         subscription.setLastReportedAt(Instant.parse("2026-05-15T10:00:00Z"));
 
         when(billingWebhookEventService.isEventProcessed(any())).thenReturn(false);
-        when(billingSubscriptionService.fetchSubscriptionByStripeSubscriptionId(STRIPE_SUBSCRIPTION_ID))
+        when(billingSubscriptionService.fetchSubscriptionBySubscriptionId(SUBSCRIPTION_ID))
             .thenReturn(Optional.of(subscription));
         when(billingSubscriptionService.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
-        when(stripeClient.retrievePrice(any())).thenReturn(priceWithTaskLimit(100L));
+        when(stripeClient.retrievePrice(any())).thenReturn(priceWithProductUnitLimit(100L));
 
         String payload = subscriptionUpdatedPayloadWithPeriodRollover(
-            STRIPE_SUBSCRIPTION_ID, 1780272000L, 1782864000L);
+            SUBSCRIPTION_ID, 1780272000L, 1782864000L);
 
         facade.handleWebhookEvent(payload, signPayload(payload, WEBHOOK_SECRET));
 
@@ -179,11 +179,11 @@ class BillingSubscriptionFacadeImplTest {
     @Test
     void testHandleSubscriptionUpdatedDoesNotUpdatePlanName() throws Exception {
         when(billingWebhookEventService.isEventProcessed(any())).thenReturn(false);
-        when(billingSubscriptionService.fetchSubscriptionByStripeSubscriptionId(STRIPE_SUBSCRIPTION_ID))
+        when(billingSubscriptionService.fetchSubscriptionBySubscriptionId(SUBSCRIPTION_ID))
             .thenReturn(Optional.of(starterSubscription()));
         when(billingSubscriptionService.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
-        String payload = subscriptionUpdatedPayload(STRIPE_SUBSCRIPTION_ID, "GROWTH");
+        String payload = subscriptionUpdatedPayload(SUBSCRIPTION_ID, "GROWTH");
         facade.handleWebhookEvent(payload, signPayload(payload, WEBHOOK_SECRET));
 
         ArgumentCaptor<BillingSubscription> captor = ArgumentCaptor.forClass(BillingSubscription.class);
@@ -197,11 +197,11 @@ class BillingSubscriptionFacadeImplTest {
     void testHandleWebhookEventSkipsDuplicateEvent() throws Exception {
         when(billingWebhookEventService.isEventProcessed(any())).thenReturn(true);
 
-        String payload = subscriptionUpdatedPayload(STRIPE_SUBSCRIPTION_ID, "STARTER");
+        String payload = subscriptionUpdatedPayload(SUBSCRIPTION_ID, "STARTER");
 
         facade.handleWebhookEvent(payload, signPayload(payload, WEBHOOK_SECRET));
 
-        verify(billingSubscriptionService, never()).fetchSubscriptionByStripeSubscriptionId(any());
+        verify(billingSubscriptionService, never()).fetchSubscriptionBySubscriptionId(any());
         verify(billingSubscriptionService, never()).save(any());
         verify(billingWebhookEventService, never()).save(any());
     }
@@ -210,14 +210,14 @@ class BillingSubscriptionFacadeImplTest {
     void testHandleSubscriptionDeletedSetsStatusToCanceled() throws Exception {
         BillingSubscription subscription = starterSubscription();
 
-        subscription.setStripeSubscriptionId(STRIPE_SUBSCRIPTION_ID);
+        subscription.setSubscriptionId(SUBSCRIPTION_ID);
 
         when(billingWebhookEventService.isEventProcessed(any())).thenReturn(false);
-        when(billingSubscriptionService.fetchSubscriptionByStripeSubscriptionId(STRIPE_SUBSCRIPTION_ID))
+        when(billingSubscriptionService.fetchSubscriptionBySubscriptionId(SUBSCRIPTION_ID))
             .thenReturn(Optional.of(subscription));
         when(billingSubscriptionService.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
-        String payload = subscriptionDeletedPayload(STRIPE_SUBSCRIPTION_ID);
+        String payload = subscriptionDeletedPayload(SUBSCRIPTION_ID);
 
         facade.handleWebhookEvent(payload, signPayload(payload, WEBHOOK_SECRET));
 
@@ -243,15 +243,15 @@ class BillingSubscriptionFacadeImplTest {
 
         subscription.setPlanName("GROWTH");
         subscription.setStatus(BillingSubscription.Status.ACTIVE);
-        subscription.setStripeSubscriptionId(STRIPE_SUBSCRIPTION_ID);
+        subscription.setSubscriptionId(SUBSCRIPTION_ID);
 
         when(billingWebhookEventService.isEventProcessed(any())).thenReturn(false);
-        when(billingSubscriptionService.fetchSubscriptionByStripeSubscriptionId(STRIPE_SUBSCRIPTION_ID))
+        when(billingSubscriptionService.fetchSubscriptionBySubscriptionId(SUBSCRIPTION_ID))
             .thenReturn(Optional.of(subscription));
         when(billingSubscriptionService.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
-        when(stripeClient.retrievePrice(any())).thenReturn(priceWithTaskLimit(100L));
+        when(stripeClient.retrievePrice(any())).thenReturn(priceWithProductUnitLimit(100L));
 
-        String payload = subscriptionUpdatedPayloadWithProduct(STRIPE_SUBSCRIPTION_ID, PRODUCT_STARTER_ID);
+        String payload = subscriptionUpdatedPayloadWithProduct(SUBSCRIPTION_ID, PRODUCT_STARTER_ID);
 
         facade.handleWebhookEvent(payload, signPayload(payload, WEBHOOK_SECRET));
 
@@ -268,15 +268,15 @@ class BillingSubscriptionFacadeImplTest {
 
         subscription.setPlanName("STARTER");
         subscription.setStatus(BillingSubscription.Status.ACTIVE);
-        subscription.setStripeSubscriptionId(STRIPE_SUBSCRIPTION_ID);
+        subscription.setSubscriptionId(SUBSCRIPTION_ID);
 
         when(billingWebhookEventService.isEventProcessed(any())).thenReturn(false);
-        when(billingSubscriptionService.fetchSubscriptionByStripeSubscriptionId(STRIPE_SUBSCRIPTION_ID))
+        when(billingSubscriptionService.fetchSubscriptionBySubscriptionId(SUBSCRIPTION_ID))
             .thenReturn(Optional.of(subscription));
         when(billingSubscriptionService.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
-        when(stripeClient.retrievePrice(any())).thenReturn(priceWithTaskLimit(100L));
+        when(stripeClient.retrievePrice(any())).thenReturn(priceWithProductUnitLimit(100L));
 
-        String payload = subscriptionUpdatedPayloadWithProduct(STRIPE_SUBSCRIPTION_ID, PRODUCT_GROWTH_ID);
+        String payload = subscriptionUpdatedPayloadWithProduct(SUBSCRIPTION_ID, PRODUCT_GROWTH_ID);
 
         facade.handleWebhookEvent(payload, signPayload(payload, WEBHOOK_SECRET));
 
@@ -294,15 +294,15 @@ class BillingSubscriptionFacadeImplTest {
         subscription.setPlanName("GROWTH");
         subscription.setScheduledPlanName("STARTER");
         subscription.setStatus(BillingSubscription.Status.ACTIVE);
-        subscription.setStripeSubscriptionId(STRIPE_SUBSCRIPTION_ID);
+        subscription.setSubscriptionId(SUBSCRIPTION_ID);
 
         when(billingWebhookEventService.isEventProcessed(any())).thenReturn(false);
-        when(billingSubscriptionService.fetchSubscriptionByStripeSubscriptionId(STRIPE_SUBSCRIPTION_ID))
+        when(billingSubscriptionService.fetchSubscriptionBySubscriptionId(SUBSCRIPTION_ID))
             .thenReturn(Optional.of(subscription));
         when(billingSubscriptionService.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
-        when(stripeClient.retrievePrice(any())).thenReturn(priceWithTaskLimit(100L));
+        when(stripeClient.retrievePrice(any())).thenReturn(priceWithProductUnitLimit(100L));
 
-        String payload = subscriptionUpdatedPayloadWithProduct(STRIPE_SUBSCRIPTION_ID, PRODUCT_STARTER_ID);
+        String payload = subscriptionUpdatedPayloadWithProduct(SUBSCRIPTION_ID, PRODUCT_STARTER_ID);
 
         facade.handleWebhookEvent(payload, signPayload(payload, WEBHOOK_SECRET));
 
@@ -317,15 +317,15 @@ class BillingSubscriptionFacadeImplTest {
     void testHandleSubscriptionUpdatedUpdatesCancelAtPeriodEnd() throws Exception {
         BillingSubscription subscription = starterSubscription();
 
-        subscription.setStripeSubscriptionId(STRIPE_SUBSCRIPTION_ID);
+        subscription.setSubscriptionId(SUBSCRIPTION_ID);
         subscription.setScheduledPlanName("GROWTH");
 
         when(billingWebhookEventService.isEventProcessed(any())).thenReturn(false);
-        when(billingSubscriptionService.fetchSubscriptionByStripeSubscriptionId(STRIPE_SUBSCRIPTION_ID))
+        when(billingSubscriptionService.fetchSubscriptionBySubscriptionId(SUBSCRIPTION_ID))
             .thenReturn(Optional.of(subscription));
         when(billingSubscriptionService.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
-        String payload = subscriptionUpdatedPayloadCancelAtPeriodEnd(STRIPE_SUBSCRIPTION_ID);
+        String payload = subscriptionUpdatedPayloadCancelAtPeriodEnd(SUBSCRIPTION_ID);
 
         facade.handleWebhookEvent(payload, signPayload(payload, WEBHOOK_SECRET));
 
@@ -347,7 +347,7 @@ class BillingSubscriptionFacadeImplTest {
         return subscription;
     }
 
-    private Price priceWithTaskLimit(long upTo) {
+    private Price priceWithProductUnitLimit(long upTo) {
         Price.Tier tier = new Price.Tier();
 
         tier.setUpTo(upTo);

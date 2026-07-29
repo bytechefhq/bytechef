@@ -55,8 +55,8 @@ class BillingSubscriptionServiceImpl implements BillingSubscriptionService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<BillingSubscription> fetchSubscriptionByStripeSubscriptionId(String stripeSubscriptionId) {
-        return billingSubscriptionRepository.findByStripeSubscriptionId(stripeSubscriptionId);
+    public Optional<BillingSubscription> fetchSubscriptionBySubscriptionId(String subscriptionId) {
+        return billingSubscriptionRepository.findBySubscriptionId(subscriptionId);
     }
 
     @Override

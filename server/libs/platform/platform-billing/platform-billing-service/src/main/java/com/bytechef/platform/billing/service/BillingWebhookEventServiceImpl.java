@@ -36,8 +36,8 @@ class BillingWebhookEventServiceImpl implements BillingWebhookEventService {
 
     @Override
     @Transactional(readOnly = true)
-    public boolean isEventProcessed(String stripeEventId) {
-        return billingWebhookEventRepository.existsByStripeEventId(stripeEventId);
+    public boolean isEventProcessed(String eventId) {
+        return billingWebhookEventRepository.existsByEventId(eventId);
     }
 
     @Override
