@@ -18,6 +18,7 @@ import pasteNode from '../utils/pasteNode';
 import AddBranchChip from './AddBranchChip';
 import BinaryCaseLabel from './BinaryCaseLabel';
 import BranchCaseLabel from './BranchCaseLabel';
+import styles from './WorkflowEdge.module.css';
 import computeBinaryCaseLabel from './computeBinaryCaseLabel';
 import computeEdgeButtonPosition from './computeEdgeButtonPosition';
 import computeEdgeCorrectedCoordinates from './computeEdgeCorrectedCoordinates';
@@ -170,6 +171,7 @@ export default function WorkflowEdge({
 
     const copiedNode = useWorkflowEditorStore((state) => state.copiedNode);
     const copiedWorkflowId = useWorkflowEditorStore((state) => state.copiedWorkflowId);
+    const workflowIsRunning = useWorkflowEditorStore((state) => state.workflowIsRunning);
 
     const edgeClusterElementType = (data as Record<string, unknown>)?.clusterElementType;
 
@@ -222,7 +224,10 @@ export default function WorkflowEdge({
     return (
         <>
             <BaseEdge
-                className="fill-none stroke-stroke-neutral-tertiary stroke-2"
+                className={twMerge(
+                    'fill-none stroke-stroke-neutral-tertiary stroke-2',
+                    workflowIsRunning && styles.runningPath
+                )}
                 id={id}
                 markerEnd={markerEnd}
                 path={edgePath}

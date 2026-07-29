@@ -90,7 +90,7 @@ const WorkflowExecutionsTestOutput = ({
 
             <div className="relative size-full">
                 <div className="absolute inset-0 overflow-y-auto">
-                    {workflowIsRunning && (
+                    {workflowIsRunning && !workflowTestExecution?.job && (
                         <div className="flex size-full items-center justify-center gap-x-1 p-3">
                             <span className="flex animate-spin text-content-neutral-tertiary">
                                 <RefreshCwIcon className="size-5" />
@@ -100,7 +100,7 @@ const WorkflowExecutionsTestOutput = ({
                         </div>
                     )}
 
-                    {!workflowIsRunning && (
+                    {(!workflowIsRunning || workflowTestExecution?.job) && (
                         <>
                             {workflowTestExecution?.job && jobFailedWithNoExecutions && (
                                 <div className="flex-1 p-4">
@@ -141,6 +141,9 @@ const WorkflowExecutionsTestOutput = ({
                                                         ? [triggerExecution?.id || '']
                                                         : [selectedExecution?.id || ''])
                                                 }
+                                                // Uncontrolled, so a failure that shows up in a later snapshot of the
+                                                // same run only gets expanded by remounting.
+                                                key={`${job?.id}-${deepestFailedExecution?.path.join('/') ?? ''}`}
                                                 type="multiple"
                                             >
                                                 {triggerExecution && (
