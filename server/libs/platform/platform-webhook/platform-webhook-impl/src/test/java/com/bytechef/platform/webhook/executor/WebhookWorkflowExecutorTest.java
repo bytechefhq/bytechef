@@ -39,6 +39,7 @@ import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
@@ -86,6 +87,9 @@ public class WebhookWorkflowExecutorTest {
     private JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
 
     @Mock
+    private JobSyncExecutor jobSyncExecutor;
+
+    @Mock
     private PrincipalJobFacade principalJobFacade;
 
     @Mock
@@ -96,6 +100,9 @@ public class WebhookWorkflowExecutorTest {
 
     @Mock
     private TaskFileStorage taskFileStorage;
+
+    @Mock
+    private TaskFileStorage syncJobTaskFileStorage;
 
     @Mock
     private TriggerDefinitionService triggerDefinitionService;
@@ -112,9 +119,9 @@ public class WebhookWorkflowExecutorTest {
     @BeforeEach
     public void setUp() {
         webhookWorkflowExecutor = new WebhookWorkflowExecutorImpl(
-            eventPublisher, jobCompletionAwaiter, jobPrincipalAccessorRegistry, principalJobFacade,
-            sseStreamBridgeRegistry, taskExecutionService, taskFileStorage, triggerDefinitionService,
-            webhookWorkflowSyncExecutor, workflowService, Duration.ofSeconds(5));
+            eventPublisher, jobCompletionAwaiter, jobPrincipalAccessorRegistry, jobSyncExecutor, principalJobFacade,
+            sseStreamBridgeRegistry, taskExecutionService, taskFileStorage, syncJobTaskFileStorage,
+            triggerDefinitionService, webhookWorkflowSyncExecutor, workflowService, Duration.ofSeconds(5));
 
         workflowExecutionId = WorkflowExecutionId.of(
             PlatformType.AUTOMATION, JOB_PRINCIPAL_ID, WORKFLOW_UUID, TRIGGER_NAME);

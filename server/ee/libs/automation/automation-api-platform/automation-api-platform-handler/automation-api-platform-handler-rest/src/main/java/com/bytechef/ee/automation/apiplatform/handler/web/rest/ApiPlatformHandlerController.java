@@ -202,6 +202,11 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
         });
     }
 
+    @Override
+    protected boolean useSyncJobExecution() {
+        return true;
+    }
+
     private String getApiPlatformTriggerName(String workflowId) {
         Workflow workflow = workflowService.getWorkflow(workflowId);
 

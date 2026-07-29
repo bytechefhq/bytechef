@@ -77,6 +77,22 @@ public interface WebhookWorkflowExecutor {
         WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
 
     /**
+     * Executes a webhook workflow synchronously in-process through the embedded {@code JobSyncExecutor} and returns an
+     * already-completed future with the workflow outputs. Unlike
+     * {@link #executeSync(WorkflowExecutionId, WebhookRequest)}, the job does not run on the distributed coordinator:
+     * it runs to completion on the calling thread via an in-memory message broker, and the {@code WebhookResponse} is
+     * collected through a per-task task-execution-complete callback rather than read back from the persisted task
+     * output. Reserved for the API Platform request path, which requires the SyncJob execution semantics.
+     *
+     * @param workflowExecutionId the unique identifier of the workflow execution, including details such as tenant,
+     *                            type, and trigger
+     * @param webhookRequest      the webhook request containing headers, parameters, and body relevant to the execution
+     * @return an already-completed future with the result of the execution, or {@code null} if no result is returned
+     */
+    CompletableFuture<@Nullable Object> executeSyncJob(
+        WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
+
+    /**
      * Executes a workflow with streaming output. Events are pushed to {@code sseStreamBridge} as the workflow runs;
      * completion / error are signalled via {@link SseStreamBridge#onComplete()} / {@link SseStreamBridge#onError}.
      *

@@ -18,11 +18,10 @@ package com.bytechef.ai.copilot.tool;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.bytechef.ai.copilot.tool.util.WorkflowPersistCaptureUtils;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.bytechef.ai.copilot.tool.util.WorkflowPersistCaptureUtils;
 import org.junit.jupiter.api.Test;
 
 /**

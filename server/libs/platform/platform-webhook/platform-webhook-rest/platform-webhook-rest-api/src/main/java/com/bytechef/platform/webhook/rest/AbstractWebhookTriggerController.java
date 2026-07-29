@@ -109,9 +109,14 @@ public abstract class AbstractWebhookTriggerController {
         }
 
         if (webhookTriggerFlags.workflowSyncExecution()) {
-            // The job runs on the distributed coordinator; the future completes when it reaches a terminal status,
-            // so the controller can stay non-blocking (async-servlet) while the workflow runs.
-            return webhookWorkflowExecutor.executeSync(workflowExecutionId, webhookRequest)
+            // The distributed path runs the job on the coordinator and completes the future when it reaches a terminal
+            // status, so the controller can stay non-blocking (async-servlet) while the workflow runs. The API Platform
+            // path opts into in-process SyncJob execution instead (already-completed future).
+            CompletableFuture<@Nullable Object> outputsFuture = useSyncJobExecution()
+                ? webhookWorkflowExecutor.executeSyncJob(workflowExecutionId, webhookRequest)
+                : webhookWorkflowExecutor.executeSync(workflowExecutionId, webhookRequest);
+
+            return outputsFuture
                 .thenApply(outputs -> {
                     if (outputs instanceof Map<?, ?> responseMap &&
                         responseMap.containsKey(MetadataConstants.WEBHOOK_RESPONSE)) {
@@ -139,6 +144,16 @@ public abstract class AbstractWebhookTriggerController {
         }
 
         return CompletableFuture.completedFuture(responseEntity);
+    }
+
+    /**
+     * Whether the synchronous execution branch should run the workflow in-process through the embedded SyncJob executor
+     * ({@link WebhookWorkflowExecutor#executeSyncJob}) instead of the distributed coordinator path
+     * ({@link WebhookWorkflowExecutor#executeSync}). Defaults to {@code false}; the API Platform handler overrides it
+     * to {@code true}.
+     */
+    protected boolean useSyncJobExecution() {
+        return false;
     }
 
     protected WebhookRequest getWebhookRequest(
