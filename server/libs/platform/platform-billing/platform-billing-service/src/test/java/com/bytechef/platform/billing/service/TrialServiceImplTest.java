@@ -81,7 +81,7 @@ class TrialServiceImplTest {
             .isFalse();
         assertThat(status.daysRemaining()).isZero();
         assertThat(status.tasksUsed()).isZero();
-        assertThat(status.taskLimit()).isZero();
+        assertThat(status.productUnitLimit()).isZero();
         verify(billingSubscriptionService, never()).save(any());
     }
 
@@ -97,7 +97,7 @@ class TrialServiceImplTest {
 
         assertThat(status.expired()).isFalse();
         assertThat(status.tasksUsed()).isEqualTo(100);
-        assertThat(status.taskLimit()).isEqualTo(5000);
+        assertThat(status.productUnitLimit()).isEqualTo(5000);
         assertThat(status.daysRemaining()).isGreaterThan(0);
         verify(billingSubscriptionService, never()).save(any());
         verify(applicationEventPublisher, never()).publishEvent(any());
@@ -161,7 +161,7 @@ class TrialServiceImplTest {
 
         subscription.setPlanName("TRIAL");
         subscription.setStatus(BillingSubscription.Status.ACTIVE);
-        subscription.setTaskLimit(5000);
+        subscription.setProductUnitLimit(5000);
         subscription.setCurrentPeriodStart(Instant.now()
             .minus(7, ChronoUnit.DAYS));
         subscription.setCurrentPeriodEnd(trialEnd);

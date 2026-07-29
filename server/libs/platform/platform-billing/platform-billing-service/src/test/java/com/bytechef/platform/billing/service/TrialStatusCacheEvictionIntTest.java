@@ -136,7 +136,7 @@ class TrialStatusCacheEvictionIntTest {
 
         subscription.setPlanName("TRIAL");
         subscription.setStatus(BillingSubscription.Status.ACTIVE);
-        subscription.setTaskLimit(5000);
+        subscription.setProductUnitLimit(5000);
         subscription.setCurrentPeriodStart(Instant.now()
             .minus(7, ChronoUnit.DAYS));
         subscription.setCurrentPeriodEnd(Instant.now()

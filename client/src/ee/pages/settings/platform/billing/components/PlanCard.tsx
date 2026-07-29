@@ -8,9 +8,9 @@ interface PlanCardPropsI {
     onChangePlan: () => void;
     onReactivatePlan?: () => void;
     planName: string;
+    productUnitLimit: number;
     renewalDate?: string;
     scheduledPlanName?: string;
-    taskLimit: number;
     tasksUsed: number;
     trialDaysRemaining?: number;
     trialExpired?: boolean;
@@ -22,27 +22,27 @@ const PlanCard = ({
     onChangePlan,
     onReactivatePlan,
     planName,
+    productUnitLimit,
     renewalDate,
     scheduledPlanName,
-    taskLimit,
     tasksUsed,
     trialDaysRemaining,
     trialExpired,
 }: PlanCardPropsI) => {
     const isTrial = trialDaysRemaining !== undefined;
-    const tasksAvailable = taskLimit - tasksUsed;
-    const overageTasksCount = Math.max(0, tasksUsed - taskLimit);
+    const tasksAvailable = productUnitLimit - tasksUsed;
+    const overageTasksCount = Math.max(0, tasksUsed - productUnitLimit);
 
     const {blueFill, blueZoneWidth, orangeFill, orangeZoneWidth} = useMemo(() => {
-        const totalRange = Math.max(tasksUsed, taskLimit);
+        const totalRange = Math.max(tasksUsed, productUnitLimit);
 
         return {
-            blueFill: Math.min(tasksUsed / taskLimit, 1) * 100,
-            blueZoneWidth: (taskLimit / totalRange) * 100,
-            orangeFill: tasksUsed > taskLimit ? 100 : 0,
-            orangeZoneWidth: (Math.max(0, tasksUsed - taskLimit) / totalRange) * 100,
+            blueFill: Math.min(tasksUsed / productUnitLimit, 1) * 100,
+            blueZoneWidth: (productUnitLimit / totalRange) * 100,
+            orangeFill: tasksUsed > productUnitLimit ? 100 : 0,
+            orangeZoneWidth: (Math.max(0, tasksUsed - productUnitLimit) / totalRange) * 100,
         };
-    }, [taskLimit, tasksUsed]);
+    }, [productUnitLimit, tasksUsed]);
 
     return (
         <Card className="w-full max-w-3xl">
@@ -96,7 +96,7 @@ const PlanCard = ({
                                     {' or after '}
 
                                     <span className="font-semibold text-foreground">
-                                        {taskLimit.toLocaleString()} tasks
+                                        {productUnitLimit.toLocaleString()} tasks
                                     </span>
 
                                     {' are used'}
@@ -139,11 +139,11 @@ const PlanCard = ({
                                 <>
                                     <span>Spent {tasksUsed.toLocaleString()}</span>
 
-                                    <span>Limit {taskLimit.toLocaleString()}</span>
+                                    <span>Limit {productUnitLimit.toLocaleString()}</span>
                                 </>
                             ) : overageTasksCount > 0 ? (
                                 <>
-                                    <span>{taskLimit.toLocaleString()} flat rate</span>
+                                    <span>{productUnitLimit.toLocaleString()} flat rate</span>
 
                                     <span>{overageTasksCount.toLocaleString()} usage billed</span>
                                 </>
@@ -151,7 +151,7 @@ const PlanCard = ({
                                 <>
                                     <span>{tasksUsed.toLocaleString()} flat rate</span>
 
-                                    <span>{taskLimit.toLocaleString()} included</span>
+                                    <span>{productUnitLimit.toLocaleString()} included</span>
                                 </>
                             )}
                         </div>

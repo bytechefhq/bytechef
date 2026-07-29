@@ -26,5 +26,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface BillingWebhookEventRepository extends ListCrudRepository<BillingSubscriptionWebhookEvent, Long> {
 
-    boolean existsByStripeEventId(String stripeEventId);
+    boolean existsByEventId(String eventId);
 }
