@@ -16,11 +16,21 @@
 
 package com.bytechef.cli;
 
+import com.bytechef.cli.command.automation.AutomationExecutionCommand;
+import com.bytechef.cli.command.automation.AutomationProjectCommand;
 import com.bytechef.cli.command.component.ComponentCommand;
+import com.bytechef.cli.command.config.ConfigureCommand;
+import com.bytechef.cli.command.embedded.EmbeddedCodeWorkflowCommand;
+import com.bytechef.cli.command.embedded.EmbeddedExecutionCommand;
+import com.bytechef.cli.command.embedded.EmbeddedIntegrationCommand;
+import com.bytechef.cli.command.embedded.EmbeddedUserCommand;
+import com.bytechef.cli.command.embedded.EmbeddedWorkflowCommand;
+import com.bytechef.cli.core.error.CliException;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.shell.core.NonInteractiveShellRunner;
 import org.springframework.shell.core.command.CommandRegistry;
@@ -31,11 +41,44 @@ import org.springframework.shell.core.command.annotation.EnableCommand;
  * @author Ivica Cardic
  */
 @SpringBootApplication
-@EnableCommand(ComponentCommand.class)
+@EnableCommand({
+    ComponentCommand.class, ConfigureCommand.class, AutomationExecutionCommand.class, AutomationProjectCommand.class,
+    EmbeddedIntegrationCommand.class, EmbeddedWorkflowCommand.class, EmbeddedExecutionCommand.class,
+    EmbeddedUserCommand.class, EmbeddedCodeWorkflowCommand.class
+})
 public class CliApplication {
 
     public static void main(String... args) {
-        SpringApplication.run(CliApplication.class, args);
+        System.exit(execute(args));
+    }
+
+    public static int execute(String... args) {
+        try {
+            ConfigurableApplicationContext context = SpringApplication.run(CliApplication.class, args);
+
+            context.close();
+
+            return 0;
+        } catch (Throwable throwable) {
+            Throwable cause = throwable;
+
+            while (cause != null) {
+                if (cause instanceof CliException cliException) {
+                    System.err.println(cliException.getMessage());
+
+                    return cliException.exitCode();
+                }
+
+                cause = cause.getCause();
+            }
+
+            String message = throwable.getMessage();
+
+            System.err.println(message == null ? "Command failed: " + throwable.getClass()
+                .getSimpleName() : message);
+
+            return 1;
+        }
     }
 
     @Bean
