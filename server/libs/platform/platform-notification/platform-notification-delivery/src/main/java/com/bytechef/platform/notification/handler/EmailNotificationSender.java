@@ -16,18 +16,20 @@
 
 package com.bytechef.platform.notification.handler;
 
-import com.bytechef.platform.mail.MailService;
 import com.bytechef.platform.notification.domain.Notification;
+import com.bytechef.platform.notification.email.NotificationEmailGateway;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 
 /**
- * Delivers EMAIL-channel notifications through {@link MailService} — the single email path for everything the platform
- * sends (user-account mail and notifications alike). {@code MailService.sendEmail} is already {@code @Async} and
- * warn-skips when no mail host is configured, so no extra async or error plumbing is needed here. Settings:
- * {@code email} (recipient address, required).
+ * Delivers EMAIL-channel notifications through the {@link NotificationEmailGateway} port. The monolith and
+ * configuration-app bind the port to {@code MailService} — the single email path for everything the platform sends —
+ * while the distributed coordinator binds it to a remote client that proxies the send to configuration-app. Without a
+ * gateway bean at all the channel warn-skips. Settings: {@code email} (recipient address, required).
  *
  * @author Matija Petanjek
  * @author Ivica Cardic
@@ -37,10 +39,11 @@ public class EmailNotificationSender implements NotificationSender<EmailNotifica
 
     private static final Logger log = LoggerFactory.getLogger(EmailNotificationSender.class);
 
-    private final MailService mailService;
+    private final ObjectProvider<NotificationEmailGateway> notificationEmailGatewayObjectProvider;
 
-    public EmailNotificationSender(MailService mailService) {
-        this.mailService = mailService;
+    @SuppressFBWarnings("EI2")
+    public EmailNotificationSender(ObjectProvider<NotificationEmailGateway> notificationEmailGatewayObjectProvider) {
+        this.notificationEmailGatewayObjectProvider = notificationEmailGatewayObjectProvider;
     }
 
     @Override
@@ -63,9 +66,19 @@ public class EmailNotificationSender implements NotificationSender<EmailNotifica
             return;
         }
 
-        mailService.sendEmail(
+        NotificationEmailGateway notificationEmailGateway = notificationEmailGatewayObjectProvider.getIfAvailable();
+
+        if (notificationEmailGateway == null) {
+            log.warn(
+                "No email gateway is available in this deployment; skipping email delivery for notification {}",
+                notification.getId());
+
+            return;
+        }
+
+        notificationEmailGateway.sendEmail(
             email, emailNotificationHandler.getSubject(notificationHandlerContext),
-            emailNotificationHandler.getContent(notificationHandlerContext), false,
+            emailNotificationHandler.getContent(notificationHandlerContext),
             emailNotificationHandler.isHtml());
     }
 }
