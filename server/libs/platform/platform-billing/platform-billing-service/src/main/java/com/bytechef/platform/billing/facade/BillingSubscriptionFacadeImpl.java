@@ -111,7 +111,11 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
             .getName();
 
         return stripeClient.fetchCustomerId(userEmail, tenantId)
-            .orElseGet(() -> stripeClient.createCustomer(userEmail, tenantId));
+            .orElseGet(() -> {
+                log.info("No existing Stripe customer found for email {} and tenant id {}", userEmail, tenantId);
+
+                return stripeClient.createCustomer(userEmail, tenantId);
+            });
     }
 
     @Override
