@@ -1,0 +1,569 @@
+openapi: 3.0.1
+info:
+  title: The Automation Configuration Public V1 API
+  version: "1"
+servers:
+- url: /api/automation/v1
+tags:
+- description: The Automation Project Code Workflow Public API
+  name: project-code-workflow
+- description: The Automation Project Git Public API
+  name: project-git
+- description: The Automation Workflow Execution Public API
+  name: workflow-execution
+paths:
+  /workflow-executions:
+    get:
+      description: "Get the page of workflow executions of a workspace. Execution\
+        \ input, output and task data are never included in list responses - fetch\
+        \ a single execution by id for the full detail."
+      operationId: getWorkflowExecutionsPage
+      parameters:
+      - description: The id of a workspace.
+        explode: true
+        in: query
+        name: workspaceId
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: form
+      - description: "The environment. Executions are filtered to the same environment\
+          \ the API key authenticated for; when omitted, PRODUCTION is used."
+        explode: false
+        in: header
+        name: X-Environment
+        required: false
+        schema:
+          $ref: "#/components/schemas/Environment"
+        style: simple
+      - description: The status of an execution.
+        explode: true
+        in: query
+        name: status
+        required: false
+        schema:
+          $ref: "#/components/schemas/WorkflowExecutionStatus"
+        style: form
+      - description: Return only executions that started at or after this instant.
+        explode: true
+        in: query
+        name: startDate
+        required: false
+        schema:
+          format: date-time
+          type: string
+        style: form
+      - description: Return only executions that started at or before this instant.
+        explode: true
+        in: query
+        name: endDate
+        required: false
+        schema:
+          format: date-time
+          type: string
+        style: form
+      - description: The id of a project.
+        explode: true
+        in: query
+        name: projectId
+        required: false
+        schema:
+          format: int64
+          type: integer
+        style: form
+      - description: The id of a project deployment.
+        explode: true
+        in: query
+        name: projectDeploymentId
+        required: false
+        schema:
+          format: int64
+          type: integer
+        style: form
+      - description: The id of a workflow.
+        explode: true
+        in: query
+        name: workflowId
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: The number of the page to return.
+        explode: true
+        in: query
+        name: pageNumber
+        required: false
+        schema:
+          default: 0
+          format: int32
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Page"
+          description: The page of workflow executions.
+      summary: Get workflow executions
+      tags:
+      - workflow-execution
+      x-accepts:
+      - application/json
+  /workflow-executions/{id}:
+    get:
+      description: "Get a workflow execution by id, including its inputs, outputs,\
+        \ error and task executions."
+      operationId: getWorkflowExecution
+      parameters:
+      - description: The id of a workflow execution.
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkflowExecution"
+          description: The workflow execution object.
+      summary: Get a workflow execution by id
+      tags:
+      - workflow-execution
+      x-accepts:
+      - application/json
+  /projects/deploy:
+    post:
+      description: Deploy a new code based project.
+      operationId: deployProject
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/deployProject_request"
+        required: true
+      responses:
+        "204":
+          description: Successful operation.
+      summary: Deploy a new code based project
+      tags:
+      - project-code-workflow
+      x-content-type: multipart/form-data
+      x-accepts:
+      - application/json
+  /projects/{id}/git/pull:
+    post:
+      description: Pulls project from git repository.
+      operationId: pullProjectFromGit
+      parameters:
+      - description: The id of a project.
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "204":
+          description: Successful operation.
+      summary: Pulls project from git repository.
+      tags:
+      - project-git
+      x-accepts:
+      - application/json
+components:
+  schemas:
+    Page:
+      description: A page of a list of objects. It carries information about the position
+        of the sublist inside the entire list.
+      example:
+        number: 0
+        size: 6
+        numberOfElements: 1
+        totalPages: 5
+        content:
+        - workflow:
+            id: id
+            label: label
+          endDate: 2000-01-23T04:56:07.000+00:00
+          project:
+            name: name
+            id: 7
+          id: 2
+          error:
+            stackTrace:
+            - stackTrace
+            - stackTrace
+            message: message
+          startDate: 2000-01-23T04:56:07.000+00:00
+          projectDeployment:
+            environmentId: 2
+            name: name
+            id: 9
+            enabled: true
+            projectVersion: 3
+          status: CREATED
+        - workflow:
+            id: id
+            label: label
+          endDate: 2000-01-23T04:56:07.000+00:00
+          project:
+            name: name
+            id: 7
+          id: 2
+          error:
+            stackTrace:
+            - stackTrace
+            - stackTrace
+            message: message
+          startDate: 2000-01-23T04:56:07.000+00:00
+          projectDeployment:
+            environmentId: 2
+            name: name
+            id: 9
+            enabled: true
+            projectVersion: 3
+          status: CREATED
+        totalElements: 5
+      properties:
+        number:
+          description: The current page.
+          type: integer
+        size:
+          description: The size of the page.
+          type: integer
+        numberOfElements:
+          description: The number of elements.
+          type: integer
+        totalPages:
+          description: The total number of pages.
+          type: integer
+        totalElements:
+          description: The total number of elements.
+          type: integer
+        content:
+          description: The list of elements.
+          items:
+            $ref: "#/components/schemas/WorkflowExecutionBasic"
+          type: array
+      type: object
+    Environment:
+      description: The environment.
+      enum:
+      - DEVELOPMENT
+      - STAGING
+      - PRODUCTION
+      type: string
+    WorkflowExecutionStatus:
+      description: The status of a workflow execution.
+      enum:
+      - CREATED
+      - STARTED
+      - STOPPED
+      - CANCELLED
+      - FAILED
+      - COMPLETED
+      type: string
+    ExecutionError:
+      description: The error that terminated an execution.
+      example:
+        stackTrace:
+        - stackTrace
+        - stackTrace
+        message: message
+      properties:
+        message:
+          description: The error message.
+          type: string
+        stackTrace:
+          description: The error stack trace.
+          items:
+            type: string
+          type: array
+      type: object
+    ProjectReference:
+      description: The project a workflow execution belongs to.
+      example:
+        name: name
+        id: 7
+      properties:
+        id:
+          description: The id of a project.
+          format: int64
+          type: integer
+        name:
+          description: The name of a project.
+          type: string
+      type: object
+    ProjectDeploymentReference:
+      description: The project deployment a workflow execution ran under.
+      example:
+        environmentId: 2
+        name: name
+        id: 9
+        enabled: true
+        projectVersion: 3
+      properties:
+        id:
+          description: The id of a project deployment.
+          format: int64
+          type: integer
+        name:
+          description: The name of a project deployment.
+          type: string
+        projectVersion:
+          description: The deployed project version.
+          type: integer
+        environmentId:
+          description: The id of the environment the deployment targets.
+          format: int64
+          type: integer
+        enabled:
+          description: Whether the deployment is enabled.
+          type: boolean
+      type: object
+    WorkflowReference:
+      description: The workflow a workflow execution ran.
+      example:
+        id: id
+        label: label
+      properties:
+        id:
+          description: The id of a workflow.
+          type: string
+        label:
+          description: The label of a workflow.
+          type: string
+      type: object
+    TaskExecution:
+      description: "The execution of a single workflow task, including its input and\
+        \ output."
+      example:
+        output: ""
+        input:
+          key: ""
+        endDate: 2000-01-23T04:56:07.000+00:00
+        name: name
+        id: id
+        title: title
+        type: type
+        error:
+          stackTrace:
+          - stackTrace
+          - stackTrace
+          message: message
+        startDate: 2000-01-23T04:56:07.000+00:00
+        status: CREATED
+      properties:
+        id:
+          description: The id of a task execution.
+          type: string
+        name:
+          description: The name of the executed workflow task.
+          type: string
+        title:
+          description: The title of the executed workflow task.
+          type: string
+        type:
+          description: The type of the executed workflow task.
+          type: string
+        status:
+          description: The status of a task execution.
+          enum:
+          - CREATED
+          - STARTED
+          - COMPLETED
+          - FAILED
+          - CANCELLED
+          type: string
+        startDate:
+          description: The instant a task execution started.
+          format: date-time
+          type: string
+        endDate:
+          description: The instant a task execution ended.
+          format: date-time
+          type: string
+        error:
+          $ref: "#/components/schemas/ExecutionError"
+        input:
+          additionalProperties: true
+          description: The resolved input parameters of a task execution.
+          type: object
+        output:
+          description: The output of a task execution.
+      type: object
+    WorkflowExecutionBasic:
+      description: "A workflow execution list row. Never carries execution data -\
+        \ fetch the execution by id for inputs, outputs and task executions."
+      example:
+        workflow:
+          id: id
+          label: label
+        endDate: 2000-01-23T04:56:07.000+00:00
+        project:
+          name: name
+          id: 7
+        id: 2
+        error:
+          stackTrace:
+          - stackTrace
+          - stackTrace
+          message: message
+        startDate: 2000-01-23T04:56:07.000+00:00
+        projectDeployment:
+          environmentId: 2
+          name: name
+          id: 9
+          enabled: true
+          projectVersion: 3
+        status: CREATED
+      properties:
+        id:
+          description: The id of a workflow execution.
+          format: int64
+          readOnly: true
+          type: integer
+        status:
+          $ref: "#/components/schemas/WorkflowExecutionStatus"
+        startDate:
+          description: The instant an execution started.
+          format: date-time
+          type: string
+        endDate:
+          description: The instant an execution ended. Null while the execution is
+            running.
+          format: date-time
+          type: string
+        error:
+          $ref: "#/components/schemas/ExecutionError"
+        project:
+          $ref: "#/components/schemas/ProjectReference"
+        projectDeployment:
+          $ref: "#/components/schemas/ProjectDeploymentReference"
+        workflow:
+          $ref: "#/components/schemas/WorkflowReference"
+      required:
+      - id
+      type: object
+    WorkflowExecution:
+      description: "The full detail of a workflow execution, including inputs, outputs,\
+        \ error and task executions."
+      example:
+        outputs:
+          key: ""
+        taskExecutions:
+        - output: ""
+          input:
+            key: ""
+          endDate: 2000-01-23T04:56:07.000+00:00
+          name: name
+          id: id
+          title: title
+          type: type
+          error:
+            stackTrace:
+            - stackTrace
+            - stackTrace
+            message: message
+          startDate: 2000-01-23T04:56:07.000+00:00
+          status: CREATED
+        - output: ""
+          input:
+            key: ""
+          endDate: 2000-01-23T04:56:07.000+00:00
+          name: name
+          id: id
+          title: title
+          type: type
+          error:
+            stackTrace:
+            - stackTrace
+            - stackTrace
+            message: message
+          startDate: 2000-01-23T04:56:07.000+00:00
+          status: CREATED
+        workflow:
+          id: id
+          label: label
+        endDate: 2000-01-23T04:56:07.000+00:00
+        inputs:
+          key: ""
+        project:
+          name: name
+          id: 7
+        id: 0
+        error:
+          stackTrace:
+          - stackTrace
+          - stackTrace
+          message: message
+        startDate: 2000-01-23T04:56:07.000+00:00
+        projectDeployment:
+          environmentId: 2
+          name: name
+          id: 9
+          enabled: true
+          projectVersion: 3
+        status: CREATED
+      properties:
+        id:
+          description: The id of a workflow execution.
+          format: int64
+          readOnly: true
+          type: integer
+        status:
+          $ref: "#/components/schemas/WorkflowExecutionStatus"
+        startDate:
+          description: The instant an execution started.
+          format: date-time
+          type: string
+        endDate:
+          description: The instant an execution ended. Null while the execution is
+            running.
+          format: date-time
+          type: string
+        error:
+          $ref: "#/components/schemas/ExecutionError"
+        inputs:
+          additionalProperties: true
+          description: The inputs the execution ran with.
+          type: object
+        outputs:
+          additionalProperties: true
+          description: The outputs the execution produced.
+          type: object
+        project:
+          $ref: "#/components/schemas/ProjectReference"
+        projectDeployment:
+          $ref: "#/components/schemas/ProjectDeploymentReference"
+        workflow:
+          $ref: "#/components/schemas/WorkflowReference"
+        taskExecutions:
+          description: The executions of the workflow's tasks.
+          items:
+            $ref: "#/components/schemas/TaskExecution"
+          type: array
+      required:
+      - id
+      type: object
+    deployProject_request:
+      properties:
+        workspaceId:
+          description: The id of a workspace this project will belong.
+          format: int64
+          type: integer
+        projectFile:
+          description: The file of a code-native project.
+          format: binary
+          type: string
+      type: object
+

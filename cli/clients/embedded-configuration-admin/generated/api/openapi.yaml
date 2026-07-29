@@ -1,0 +1,111 @@
+openapi: 3.0.1
+info:
+  title: The Embedded Configuration Admin API
+  version: "1"
+servers:
+- url: /api/platform/v1
+tags:
+- description: The Embedded Automation Project Code Workflow Admin API
+  name: automation-project-code-workflow-admin
+paths:
+  /automation-project-code-workflows:
+    get:
+      description: "List catalog projects in the embedded automation bridge. Unlike\
+        \ the connected-user-scoped embedded public endpoint, this operation is reachable\
+        \ with a plain platform API-key bearer token and does not fabricate a connected-user\
+        \ identity."
+      operationId: listAutomationProjectCodeWorkflows
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/AutomationWorkflowProject"
+                type: array
+          description: The list of automation workflow projects.
+      summary: List catalog projects in the embedded automation bridge
+      tags:
+      - automation-project-code-workflow-admin
+      x-accepts:
+      - application/json
+  /automation-project-code-workflows/deploy:
+    post:
+      description: "Deploy a new automation code workflow into the embedded catalog.\
+        \ Unlike the connected-user-scoped embedded internal endpoint, this operation\
+        \ is reachable with a plain platform API-key bearer token."
+      operationId: deployAutomationProjectCodeWorkflow
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/deployAutomationProjectCodeWorkflow_request"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AutomationProjectCodeWorkflowDeployResult"
+          description: Successful operation.
+      summary: Deploy a new automation code workflow into the embedded catalog
+      tags:
+      - automation-project-code-workflow-admin
+      x-content-type: multipart/form-data
+      x-accepts:
+      - application/json
+components:
+  schemas:
+    AutomationProjectCodeWorkflowDeployResult:
+      example:
+        warnings:
+        - warnings
+        - warnings
+      properties:
+        warnings:
+          items:
+            type: string
+          type: array
+      type: object
+    AutomationWorkflowProject:
+      description: An automation workflow catalog project.
+      example:
+        kind: COPY
+        name: name
+        workflowTemplates:
+        - label: label
+        - label: label
+      properties:
+        name:
+          description: The name of the automation workflow project.
+          type: string
+        kind:
+          description: Whether copying this project's templates creates a per-user
+            copy or a shared reference.
+          enum:
+          - COPY
+          - REFERENCE
+          type: string
+        workflowTemplates:
+          description: The list of catalog workflow templates belonging to this project.
+          items:
+            $ref: "#/components/schemas/AutomationWorkflowProjectWorkflowTemplate"
+          type: array
+      type: object
+    AutomationWorkflowProjectWorkflowTemplate:
+      description: A catalog workflow template within an automation workflow project.
+      example:
+        label: label
+      properties:
+        label:
+          description: The label of the workflow.
+          type: string
+      type: object
+    deployAutomationProjectCodeWorkflow_request:
+      properties:
+        projectFile:
+          description: The file of a code-native automation project.
+          format: binary
+          type: string
+      type: object
+
