@@ -879,6 +879,7 @@ components:
         - "CREATED"
         - "STARTED"
         - "STOPPED"
+        - "CANCELLED"
         - "FAILED"
         - "COMPLETED"
     ExecutionError:

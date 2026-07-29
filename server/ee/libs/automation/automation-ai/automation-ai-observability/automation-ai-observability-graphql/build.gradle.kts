@@ -14,6 +14,8 @@ dependencies {
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:platform:platform-api"))
+    implementation(project(":server:libs:platform:platform-notification:platform-notification-api"))
+    implementation(project(":server:ee:libs:platform:platform-notification:platform-notification-workspace"))
     implementation(project(":server:libs:platform:platform-tag:platform-tag-api"))
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
 

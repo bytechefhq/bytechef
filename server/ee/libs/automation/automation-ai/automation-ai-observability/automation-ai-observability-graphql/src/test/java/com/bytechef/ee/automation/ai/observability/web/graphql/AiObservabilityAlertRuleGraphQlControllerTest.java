@@ -14,12 +14,11 @@ import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.automation.ai.observability.facade.AiObservabilityAlertRuleFacade;
 import com.bytechef.ee.automation.ai.observability.service.AiObservabilityAlertEvaluator;
 import com.bytechef.ee.automation.ai.observability.service.WorkspaceAiObservabilityAlertRuleService;
-import com.bytechef.ee.automation.ai.observability.service.WorkspaceAiObservabilityNotificationChannelService;
 import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityAlertRule;
-import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityNotificationChannel;
-import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityNotificationChannelType;
 import com.bytechef.ee.platform.ai.observability.service.AiObservabilityAlertRuleService;
-import com.bytechef.ee.platform.ai.observability.service.AiObservabilityNotificationChannelService;
+import com.bytechef.ee.platform.notification.workspace.service.WorkspaceNotificationService;
+import com.bytechef.platform.notification.domain.Notification;
+import com.bytechef.platform.notification.service.NotificationService;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,7 +42,7 @@ class AiObservabilityAlertRuleGraphQlControllerTest {
 
     private static final long WORKSPACE_A = 100L;
     private static final long WORKSPACE_B = 200L;
-    private static final long CHANNEL_IN_WORKSPACE_B = 42L;
+    private static final long NOTIFICATION_IN_WORKSPACE_B = 42L;
 
     @Mock
     private AiObservabilityAlertEvaluator aiObservabilityAlertEvaluator;
@@ -52,7 +51,7 @@ class AiObservabilityAlertRuleGraphQlControllerTest {
     private AiObservabilityAlertRuleFacade aiObservabilityAlertRuleFacade;
 
     @Mock
-    private WorkspaceAiObservabilityNotificationChannelService workspaceAiObservabilityNotificationChannelService;
+    private NotificationService notificationService;
 
     @Mock
     private WorkspaceAiObservabilityAlertRuleService workspaceAiObservabilityAlertRuleService;
@@ -61,7 +60,7 @@ class AiObservabilityAlertRuleGraphQlControllerTest {
     private AiObservabilityAlertRuleService aiObservabilityAlertRuleService;
 
     @Mock
-    private AiObservabilityNotificationChannelService aiObservabilityNotificationChannelService;
+    private WorkspaceNotificationService workspaceNotificationService;
 
     @Mock
     private PermissionService permissionService;
@@ -72,26 +71,17 @@ class AiObservabilityAlertRuleGraphQlControllerTest {
     void setUp() {
         controller = new AiObservabilityAlertRuleGraphQlController(
             aiObservabilityAlertEvaluator, aiObservabilityAlertRuleFacade, aiObservabilityAlertRuleService,
-            workspaceAiObservabilityNotificationChannelService,
-            workspaceAiObservabilityAlertRuleService,
-            aiObservabilityNotificationChannelService,
+            notificationService, workspaceAiObservabilityAlertRuleService, workspaceNotificationService,
             new com.bytechef.ee.automation.ai.observability.web.graphql.authorization.WorkspaceAuthorization(
                 permissionService));
     }
 
     @Test
     void testCreateRejectsChannelFromDifferentWorkspace() {
-        AiObservabilityNotificationChannel foreignChannel = new AiObservabilityNotificationChannel(
-            "foreign-channel", AiObservabilityNotificationChannelType.SLACK,
-            "{\"webhookUrl\":\"https://hooks.slack.com/services/T/C/X\"}");
-
-        ReflectionTestUtils.setField(foreignChannel, "id", CHANNEL_IN_WORKSPACE_B);
-
         when(permissionService.hasWorkspaceRole(WORKSPACE_A, "EDITOR")).thenReturn(true);
-        when(aiObservabilityNotificationChannelService.getNotificationChannel(CHANNEL_IN_WORKSPACE_B))
-            .thenReturn(foreignChannel);
-        when(workspaceAiObservabilityNotificationChannelService.getWorkspaceId(CHANNEL_IN_WORKSPACE_B))
-            .thenReturn(WORKSPACE_B);
+        when(notificationService.getNotification(NOTIFICATION_IN_WORKSPACE_B)).thenReturn(new Notification());
+        when(workspaceNotificationService.fetchWorkspaceIdByNotificationId(NOTIFICATION_IN_WORKSPACE_B))
+            .thenReturn(java.util.Optional.of(WORKSPACE_B));
 
         Map<String, Object> input = Map.of(
             "workspaceId", String.valueOf(WORKSPACE_A),
@@ -102,7 +92,7 @@ class AiObservabilityAlertRuleGraphQlControllerTest {
             "windowMinutes", 5,
             "cooldownMinutes", 0,
             "enabled", true,
-            "channelIds", List.of(String.valueOf(CHANNEL_IN_WORKSPACE_B)));
+            "notificationIds", List.of(String.valueOf(NOTIFICATION_IN_WORKSPACE_B)));
 
         assertThatThrownBy(() -> controller.createAiObservabilityAlertRule(input))
             .isInstanceOf(AccessDeniedException.class)
@@ -119,19 +109,12 @@ class AiObservabilityAlertRuleGraphQlControllerTest {
 
         ReflectionTestUtils.setField(existingRule, "id", 1L);
 
-        AiObservabilityNotificationChannel foreignChannel = new AiObservabilityNotificationChannel(
-            "foreign-channel", AiObservabilityNotificationChannelType.WEBHOOK,
-            "{\"url\":\"https://example.com/webhook\"}");
-
-        ReflectionTestUtils.setField(foreignChannel, "id", CHANNEL_IN_WORKSPACE_B);
-
         when(aiObservabilityAlertRuleService.getAlertRule(1L)).thenReturn(existingRule);
         when(workspaceAiObservabilityAlertRuleService.getWorkspaceId(1L)).thenReturn(WORKSPACE_A);
         when(permissionService.hasWorkspaceRole(WORKSPACE_A, "EDITOR")).thenReturn(true);
-        when(aiObservabilityNotificationChannelService.getNotificationChannel(CHANNEL_IN_WORKSPACE_B))
-            .thenReturn(foreignChannel);
-        when(workspaceAiObservabilityNotificationChannelService.getWorkspaceId(CHANNEL_IN_WORKSPACE_B))
-            .thenReturn(WORKSPACE_B);
+        when(notificationService.getNotification(NOTIFICATION_IN_WORKSPACE_B)).thenReturn(new Notification());
+        when(workspaceNotificationService.fetchWorkspaceIdByNotificationId(NOTIFICATION_IN_WORKSPACE_B))
+            .thenReturn(java.util.Optional.of(WORKSPACE_B));
 
         Map<String, Object> input = Map.of(
             "name", "cost-alert",
@@ -141,7 +124,7 @@ class AiObservabilityAlertRuleGraphQlControllerTest {
             "windowMinutes", 5,
             "cooldownMinutes", 0,
             "enabled", true,
-            "channelIds", List.of(String.valueOf(CHANNEL_IN_WORKSPACE_B)));
+            "notificationIds", List.of(String.valueOf(NOTIFICATION_IN_WORKSPACE_B)));
 
         assertThatThrownBy(() -> controller.updateAiObservabilityAlertRule(1L, input))
             .isInstanceOf(AccessDeniedException.class)

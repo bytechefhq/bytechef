@@ -14,7 +14,6 @@ import com.bytechef.ee.automation.ai.gateway.service.AiGatewayIntTestConfigurati
 import com.bytechef.ee.automation.ai.gateway.service.WorkspaceAiGatewayProjectService;
 import com.bytechef.ee.automation.ai.observability.service.WorkspaceAiObservabilityAlertRuleService;
 import com.bytechef.ee.automation.ai.observability.service.WorkspaceAiObservabilityExportJobService;
-import com.bytechef.ee.automation.ai.observability.service.WorkspaceAiObservabilityNotificationChannelService;
 import com.bytechef.ee.automation.ai.observability.service.WorkspaceAiObservabilitySessionService;
 import com.bytechef.ee.automation.ai.observability.service.WorkspaceAiObservabilityTraceService;
 import com.bytechef.ee.automation.ai.observability.service.WorkspaceAiObservabilityWebhookSubscriptionService;
@@ -53,9 +52,6 @@ public class AiObservabilityDataCleanupIntTest {
 
     @Autowired
     private WorkspaceAiObservabilityExportJobService workspaceAiObservabilityExportJobService;
-
-    @Autowired
-    private WorkspaceAiObservabilityNotificationChannelService workspaceAiObservabilityNotificationChannelService;
 
     @Autowired
     private WorkspaceAiObservabilityAlertRuleService workspaceAiObservabilityAlertRuleService;

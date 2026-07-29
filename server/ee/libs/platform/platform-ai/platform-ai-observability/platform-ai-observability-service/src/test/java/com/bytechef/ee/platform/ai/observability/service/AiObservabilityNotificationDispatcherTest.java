@@ -7,8 +7,11 @@
 
 package com.bytechef.ee.platform.ai.observability.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -18,147 +21,125 @@ import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityAlertEven
 import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityAlertMetric;
 import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityAlertRule;
 import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityAlertRuleChannel;
-import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityNotificationChannel;
-import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityNotificationChannelType;
-import com.bytechef.ee.platform.ai.observability.repository.AiObservabilityNotificationChannelRepository;
-import com.bytechef.test.extension.ObjectMapperSetupExtension;
-import java.lang.reflect.Field;
+import com.bytechef.platform.mail.MailService;
+import com.bytechef.platform.notification.delivery.SlackNotificationClient;
+import com.bytechef.platform.notification.delivery.WebhookNotificationClient;
+import com.bytechef.platform.notification.domain.Notification;
+import com.bytechef.platform.notification.service.NotificationService;
 import java.math.BigDecimal;
-import java.time.Instant;
-import java.util.Optional;
+import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.mail.javamail.JavaMailSender;
 
 /**
- * Unit tests for channel-dispatch behavior of {@link AiObservabilityNotificationDispatcher}. Webhook-delivery is
- * exercised by {@code AiObservabilityWebhookDeliveryServiceTest}. This class focuses on: disabled-channel skip,
- * successful-dispatch clearing {@code lastError}, and persistence of {@code lastError} when a channel throws during
- * dispatch.
+ * Pins the post-migration dispatch behavior: alerts deliver through the central platform-notification registry via the
+ * central transports, blank channel settings are skipped, and one broken target never aborts the fan-out.
+ *
+ * @version ee
  *
  * @author Ivica Cardic
- * @version ee
  */
-@ExtendWith({
-    MockitoExtension.class, ObjectMapperSetupExtension.class
-})
+@ExtendWith(MockitoExtension.class)
 class AiObservabilityNotificationDispatcherTest {
 
     @Mock
-    private AiObservabilityNotificationChannelRepository aiObservabilityNotificationChannelRepository;
+    private MailService mailService;
 
     @Mock
-    private JavaMailSender javaMailSender;
+    private NotificationService notificationService;
 
-    private AiObservabilityNotificationDispatcher aiObservabilityNotificationDispatcher;
+    @Mock
+    private SlackNotificationClient slackNotificationClient;
+
+    @Mock
+    private WebhookNotificationClient webhookNotificationClient;
+
+    private AiObservabilityNotificationDispatcher dispatcher;
 
     @BeforeEach
     void setUp() {
-        aiObservabilityNotificationDispatcher = new AiObservabilityNotificationDispatcher(
-            aiObservabilityNotificationChannelRepository, javaMailSender, "no-reply@example.com");
+        dispatcher = new AiObservabilityNotificationDispatcher(
+            mailService, notificationService, slackNotificationClient, webhookNotificationClient);
     }
 
     @Test
-    void testDispatchSkipsDisabledChannelWithoutSendingMail() {
-        AiObservabilityNotificationChannel channel = newEmailChannel(10L);
+    void testDispatchDeliversEmailThroughMailService() {
+        Notification notification = notification(Notification.Type.EMAIL, Map.of("email", "ops@example.com"));
 
-        channel.setEnabled(false);
+        when(notificationService.getNotification(10L)).thenReturn(notification);
 
-        when(aiObservabilityNotificationChannelRepository.findById(10L)).thenReturn(Optional.of(channel));
+        dispatcher.dispatch(rule(10L), event());
 
-        AiObservabilityAlertRule rule = newRule();
-        AiObservabilityAlertEvent event = new AiObservabilityAlertEvent(1L, BigDecimal.ONE, "breach");
-
-        rule.setChannels(Set.of(new AiObservabilityAlertRuleChannel(10L)));
-
-        aiObservabilityNotificationDispatcher.dispatch(rule, event);
-
-        verify(javaMailSender, never()).send(any(org.springframework.mail.SimpleMailMessage.class));
-        // Save should NOT be invoked — no prior lastError to clear, and no new failure to persist.
-        verify(aiObservabilityNotificationChannelRepository, never()).save(any());
+        verify(mailService).sendEmail(
+            eq("ops@example.com"), contains("[ByteChef Alert]"), anyString(), anyBoolean(), anyBoolean());
     }
 
     @Test
-    void testDispatchClearsPriorLastErrorOnSuccessfulDelivery() throws Exception {
-        AiObservabilityNotificationChannel channel = newEmailChannel(20L);
+    void testDispatchDeliversSlackThroughCentralClient() {
+        Notification notification = notification(
+            Notification.Type.SLACK, Map.of("slackWebhookUrl", "https://hooks.slack.com/services/T/C/X"));
 
-        // Pre-seed a prior failure — successful dispatch must clear it and save the channel.
-        channel.setLastError("stale-failure", Instant.now());
+        when(notificationService.getNotification(11L)).thenReturn(notification);
 
-        when(aiObservabilityNotificationChannelRepository.findById(20L)).thenReturn(Optional.of(channel));
+        dispatcher.dispatch(rule(11L), event());
 
-        AiObservabilityAlertRule rule = newRule();
-        AiObservabilityAlertEvent event = new AiObservabilityAlertEvent(1L, BigDecimal.ONE, "breach");
-
-        rule.setChannels(Set.of(new AiObservabilityAlertRuleChannel(20L)));
-
-        aiObservabilityNotificationDispatcher.dispatch(rule, event);
-
-        assertThat(channel.getLastError()).isNull();
-        assertThat(channel.getLastErrorDate()).isNull();
-
-        verify(javaMailSender).send(any(org.springframework.mail.SimpleMailMessage.class));
-        verify(aiObservabilityNotificationChannelRepository).save(channel);
+        verify(slackNotificationClient).send(eq("https://hooks.slack.com/services/T/C/X"), contains("breach"));
     }
 
     @Test
-    void testDispatchPersistsLastErrorWhenChannelDispatchThrows() {
-        AiObservabilityNotificationChannel channel = newEmailChannel(30L);
+    void testBlankSettingsAreSkippedWithoutThrowing() {
+        Notification notification = notification(Notification.Type.EMAIL, Map.of());
 
-        when(aiObservabilityNotificationChannelRepository.findById(30L)).thenReturn(Optional.of(channel));
+        when(notificationService.getNotification(12L)).thenReturn(notification);
 
-        // Corrupt the channel config JSON so parseChannelConfig throws before sendEmailNotification's own
-        // IllegalStateException wrapping — surfaces dispatch()'s outer catch, which is the path under test.
-        try {
-            Field configField = AiObservabilityNotificationChannel.class.getDeclaredField("config");
+        dispatcher.dispatch(rule(12L), event());
 
-            configField.setAccessible(true);
-            configField.set(channel, "not-json");
-        } catch (ReflectiveOperationException reflectiveOperationException) {
-            throw new AssertionError("failed to seed corrupt config", reflectiveOperationException);
-        }
-
-        AiObservabilityAlertRule rule = newRule();
-        AiObservabilityAlertEvent event = new AiObservabilityAlertEvent(1L, BigDecimal.ONE, "breach");
-
-        rule.setChannels(Set.of(new AiObservabilityAlertRuleChannel(30L)));
-
-        aiObservabilityNotificationDispatcher.dispatch(rule, event);
-
-        // lastError should now be populated with the exception class name prefix and a timestamp.
-        assertThat(channel.getLastError())
-            .as("lastError should be persisted so admins can see broken integrations in the UI")
-            .isNotNull();
-        assertThat(channel.getLastErrorDate()).isNotNull();
-
-        verify(aiObservabilityNotificationChannelRepository).save(channel);
+        verify(mailService, never()).sendEmail(anyString(), anyString(), anyString(), anyBoolean(), anyBoolean());
     }
 
-    private static AiObservabilityAlertRule newRule() {
-        return new AiObservabilityAlertRule(
+    @Test
+    void testBrokenTargetDoesNotAbortFanOut() {
+        Notification slackNotification = notification(
+            Notification.Type.SLACK, Map.of("slackWebhookUrl", "https://hooks.slack.com/services/T/C/X"));
+
+        when(notificationService.getNotification(13L)).thenThrow(new IllegalArgumentException("missing"));
+        when(notificationService.getNotification(14L)).thenReturn(slackNotification);
+
+        AiObservabilityAlertRule rule = rule(13L);
+
+        rule.setChannels(
+            Set.of(new AiObservabilityAlertRuleChannel(13L), new AiObservabilityAlertRuleChannel(14L)));
+
+        dispatcher.dispatch(rule, event());
+
+        verify(slackNotificationClient).send(any(), anyString());
+    }
+
+    private static AiObservabilityAlertRule rule(long notificationId) {
+        AiObservabilityAlertRule rule = new AiObservabilityAlertRule(
             "rule", AiObservabilityAlertMetric.ERROR_RATE, AiObservabilityAlertCondition.GREATER_THAN,
-            BigDecimal.valueOf(1), 5, 0);
+            BigDecimal.ONE, 5, 0);
+
+        rule.setChannels(Set.of(new AiObservabilityAlertRuleChannel(notificationId)));
+
+        return rule;
     }
 
-    private static AiObservabilityNotificationChannel newEmailChannel(long id) {
-        AiObservabilityNotificationChannel channel = new AiObservabilityNotificationChannel(
-            "ops-email", AiObservabilityNotificationChannelType.EMAIL,
-            "{\"recipients\":[\"ops@example.com\"]}");
-
-        try {
-            Field idField = AiObservabilityNotificationChannel.class.getDeclaredField("id");
-
-            idField.setAccessible(true);
-            idField.set(channel, id);
-        } catch (ReflectiveOperationException reflectiveOperationException) {
-            throw new AssertionError("failed to seed id", reflectiveOperationException);
-        }
-
-        return channel;
+    private static AiObservabilityAlertEvent event() {
+        return new AiObservabilityAlertEvent(1L, BigDecimal.TWO, "breach");
     }
 
+    private static Notification notification(Notification.Type type, Map<String, Object> settings) {
+        Notification notification = new Notification();
+
+        notification.setName("target");
+        notification.setType(type);
+        notification.setSettings(settings);
+
+        return notification;
+    }
 }

@@ -17,6 +17,7 @@
 package com.bytechef.ee.platform.ai.llm.usage.service;
 
 import com.bytechef.ee.platform.ai.llm.usage.AiLlmUsage;
+import com.bytechef.ee.platform.ai.llm.usage.LlmUsageSource;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +46,12 @@ public interface AiLlmUsageService {
     List<Long> findDistinctWorkspaceIds();
 
     Map<String, Double> getAverageLatencyByModel(Instant since);
+
+    /**
+     * Usage rows attributed to a specific owning container ({@code ownerId}) for one source — e.g. all AI_AGENT rows of
+     * a workflow job. Feeds the per-job execution cost computation.
+     */
+    List<AiLlmUsage> getUsagesByOwner(LlmUsageSource source, long ownerId);
 
     List<AiLlmUsage> getRequestLogs(Instant start, Instant end);
 

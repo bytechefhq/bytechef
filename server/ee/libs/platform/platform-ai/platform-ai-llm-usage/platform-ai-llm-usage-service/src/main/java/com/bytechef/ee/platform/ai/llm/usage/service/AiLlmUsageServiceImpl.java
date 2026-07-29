@@ -20,6 +20,7 @@ import com.bytechef.ee.platform.ai.llm.usage.AiLlmUsage;
 import com.bytechef.ee.platform.ai.llm.usage.LlmCostEstimator;
 import com.bytechef.ee.platform.ai.llm.usage.LlmUsageContext;
 import com.bytechef.ee.platform.ai.llm.usage.LlmUsageRecorder;
+import com.bytechef.ee.platform.ai.llm.usage.LlmUsageSource;
 import com.bytechef.ee.platform.ai.llm.usage.WorkspaceAiLlmUsage;
 import com.bytechef.ee.platform.ai.llm.usage.repository.AiLlmUsageRepository;
 import com.bytechef.ee.platform.ai.llm.usage.repository.WorkspaceAiLlmUsageRepository;
@@ -108,6 +109,12 @@ class AiLlmUsageServiceImpl implements AiLlmUsageService, LlmUsageRecorder {
             .collect(Collectors.groupingBy(
                 AiLlmUsage::getRoutedModel,
                 Collectors.averagingInt(AiLlmUsage::getLatencyMs)));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<AiLlmUsage> getUsagesByOwner(LlmUsageSource source, long ownerId) {
+        return repository.findAllBySourceAndOwnerId(source.ordinal(), ownerId);
     }
 
     @Override

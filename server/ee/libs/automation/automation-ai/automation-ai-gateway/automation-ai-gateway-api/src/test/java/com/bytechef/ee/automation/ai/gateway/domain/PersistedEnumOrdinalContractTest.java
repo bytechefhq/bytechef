@@ -12,7 +12,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayBudgetEnforcementMode;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayProviderType;
 import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityAlertCondition;
-import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityNotificationChannelType;
 import com.bytechef.ee.platform.ai.observability.domain.AiObservabilitySpanLevel;
 import com.bytechef.ee.platform.ai.observability.domain.AiObservabilitySpanStatus;
 import com.bytechef.ee.platform.ai.observability.domain.AiObservabilitySpanType;
@@ -101,13 +100,6 @@ class PersistedEnumOrdinalContractTest {
             AiObservabilityTraceStatus.ERROR);
     }
 
-    @Test
-    void testAiObservabilityNotificationChannelTypeOrdinalContract() {
-        assertThat(AiObservabilityNotificationChannelType.values()).containsExactly(
-            AiObservabilityNotificationChannelType.WEBHOOK,
-            AiObservabilityNotificationChannelType.EMAIL,
-            AiObservabilityNotificationChannelType.SLACK);
-    }
 
     @Test
     void testAiObservabilityAlertConditionOrdinalContract() {

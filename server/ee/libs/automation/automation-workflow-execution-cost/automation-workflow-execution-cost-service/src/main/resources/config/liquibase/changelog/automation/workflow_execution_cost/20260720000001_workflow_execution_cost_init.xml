@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="20260720000001-1" author="Ivica Cardic">
+        <createTable tableName="workflow_execution_cost">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="version" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="job_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="base_run_charge" type="DECIMAL(12,6)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ai_cost" type="DECIMAL(12,6)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="total_cost" type="DECIMAL(12,6)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="currency" type="VARCHAR(3)" defaultValue="USD">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP"/>
+        </createTable>
+
+        <addUniqueConstraint tableName="workflow_execution_cost" columnNames="job_id"
+            constraintName="uq_workflow_execution_cost_job_id"/>
+
+        <!-- Workspace membership join table — workspace is an automation-configuration-owned concept, so foreign
+             modules attach entities to it via workspace_* membership tables instead of workspace_id columns. -->
+        <createTable tableName="workspace_workflow_execution_cost">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="workspace_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="workflow_execution_cost_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP"/>
+            <column name="version" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint tableName="workspace_workflow_execution_cost"
+            columnNames="workspace_id,workflow_execution_cost_id"
+            constraintName="uq_workspace_workflow_execution_cost"/>
+
+        <addForeignKeyConstraint
+            baseTableName="workspace_workflow_execution_cost"
+            baseColumnNames="workflow_execution_cost_id"
+            constraintName="fk_workspace_workflow_execution_cost_cost_id"
+            referencedTableName="workflow_execution_cost"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+
+        <createIndex tableName="workspace_workflow_execution_cost"
+            indexName="idx_workspace_workflow_execution_cost_workspace">
+            <column name="workspace_id"/>
+            <column name="created_date" descending="true"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

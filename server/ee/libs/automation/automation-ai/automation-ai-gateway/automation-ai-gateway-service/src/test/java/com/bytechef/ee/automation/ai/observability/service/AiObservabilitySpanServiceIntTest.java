@@ -47,9 +47,6 @@ public class AiObservabilitySpanServiceIntTest {
     private WorkspaceAiObservabilityExportJobService workspaceAiObservabilityExportJobService;
 
     @Autowired
-    private WorkspaceAiObservabilityNotificationChannelService workspaceAiObservabilityNotificationChannelService;
-
-    @Autowired
     private WorkspaceAiObservabilityAlertRuleService workspaceAiObservabilityAlertRuleService;
 
     @Autowired

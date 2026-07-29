@@ -84,6 +84,7 @@ import com.bytechef.ee.ai.hub.toolsearch.ToolSearchCatalogFeeder;
 import com.bytechef.ee.ai.hub.util.Mode;
 import com.bytechef.ee.ai.hub.util.Source;
 import com.bytechef.ee.automation.apiplatform.configuration.facade.ApiCollectionFacade;
+import com.bytechef.ee.platform.ai.llm.usage.LlmUsageRecorder;
 import com.bytechef.platform.ai.agent.memory.AutoMemoryTools;
 import com.bytechef.platform.ai.agent.memory.AutoMemoryToolsAdvisor;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryService;
@@ -212,6 +213,7 @@ public class AiHubConfiguration {
         ObjectProvider<ToolSearchToolCallingAdvisor> toolSearchToolCallAdvisorProvider,
         ObjectProvider<AiHubTaskBindingToolCallbackResolver> taskBindingToolCallbackResolverProvider,
         ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider,
+        ObjectProvider<LlmUsageRecorder> llmUsageRecorderProvider,
         AiHubToolAttachMetrics aiHubToolAttachMetrics, JsonMapper jsonMapper)
         throws AGUIException {
 
@@ -313,6 +315,9 @@ public class AiHubConfiguration {
         // override capability, agents fall back to workspace default ChatClient (unchanged behaviour).
         overrideChatClientResolverProvider.ifAvailable(builder::overrideChatClientResolver);
 
+        // Per-turn token metering into ai_llm_usage (source = AI_HUB). Absent recorder → advisor logs only.
+        llmUsageRecorderProvider.ifAvailable(builder::llmUsageRecorder);
+
         return builder.build();
     }
 
@@ -375,6 +380,7 @@ public class AiHubConfiguration {
         ObjectProvider<ToolSearchToolCallingAdvisor> toolSearchToolCallAdvisorProvider,
         ObjectProvider<AiHubTaskBindingToolCallbackResolver> taskBindingToolCallbackResolverProvider,
         ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider,
+        ObjectProvider<LlmUsageRecorder> llmUsageRecorderProvider,
         AiHubToolAttachMetrics aiHubToolAttachMetrics, JsonMapper jsonMapper)
         throws AGUIException {
 
@@ -483,6 +489,9 @@ public class AiHubConfiguration {
 
         taskBindingToolCallbackResolverProvider.ifAvailable(buildBuilder::taskToolBindingResolver);
         overrideChatClientResolverProvider.ifAvailable(buildBuilder::overrideChatClientResolver);
+
+        // Per-turn token metering into ai_llm_usage (source = AI_HUB). Absent recorder → advisor logs only.
+        llmUsageRecorderProvider.ifAvailable(buildBuilder::llmUsageRecorder);
 
         return buildBuilder.build();
     }

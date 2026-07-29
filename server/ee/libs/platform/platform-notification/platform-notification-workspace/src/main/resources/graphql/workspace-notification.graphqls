@@ -1,0 +1,19 @@
+extend type Query {
+    """The notifications selectable in a workspace: the workspace's own plus the global (unassigned) ones,
+    in name order. EE only — in CE all notifications are global and served by the REST notifications API."""
+    workspaceNotifications(workspaceId: ID!): [WorkspaceScopedNotification!]!
+}
+
+extend type Mutation {
+    """Scope a notification to a workspace (moves it if it was scoped to another one)."""
+    assignNotificationToWorkspace(notificationId: ID!, workspaceId: ID!): Boolean!
+    """Make a notification global again (visible to every workspace)."""
+    unassignNotificationFromWorkspace(notificationId: ID!): Boolean!
+}
+
+"""A CE Notification projected for workspace-scoped pickers."""
+type WorkspaceScopedNotification {
+    id: ID!
+    name: String!
+    type: String!
+}

@@ -13,7 +13,7 @@ extend type Mutation {
 }
 
 type AiObservabilityAlertRule {
-    channelIds: [ID]
+    notificationIds: [ID]
     condition: AiObservabilityAlertCondition!
     cooldownMinutes: Int!
     createdDate: Long
@@ -31,7 +31,7 @@ type AiObservabilityAlertRule {
 }
 
 input AiObservabilityAlertRuleInput {
-    channelIds: [ID]
+    notificationIds: [ID]
     condition: AiObservabilityAlertCondition!
     cooldownMinutes: Int!
     enabled: Boolean!

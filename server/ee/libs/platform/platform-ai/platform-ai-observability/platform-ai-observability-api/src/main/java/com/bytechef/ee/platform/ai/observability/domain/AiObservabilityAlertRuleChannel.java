@@ -13,5 +13,5 @@ import org.springframework.data.relational.core.mapping.Table;
  * @version ee
  */
 @Table("ai_observability_alert_rule_channel")
-public record AiObservabilityAlertRuleChannel(long notificationChannelId) {
+public record AiObservabilityAlertRuleChannel(long notificationId) {
 }

@@ -1,0 +1,17 @@
+extend type Query {
+    """Per-execution cost row for a terminal job, or null while the job is still running / when cost recording
+    is disabled. totalCost = baseRunCharge + aiCost (USD). EE only — the query resolver is absent in CE."""
+    workflowExecutionCost(jobId: ID!): WorkflowExecutionCost
+}
+
+"""One row per terminal workflow execution, written idempotently by the terminal-status listener."""
+type WorkflowExecutionCost {
+    id: ID!
+    jobId: ID!
+    """Fixed per-run platform charge (bytechef.workflow.execution-cost.base-run-charge-usd)."""
+    baseRunCharge: Float!
+    """Sum of the execution's AI Agent LLM usage costs (ai_llm_usage rows with source = AI_AGENT)."""
+    aiCost: Float!
+    totalCost: Float!
+    currency: String!
+}

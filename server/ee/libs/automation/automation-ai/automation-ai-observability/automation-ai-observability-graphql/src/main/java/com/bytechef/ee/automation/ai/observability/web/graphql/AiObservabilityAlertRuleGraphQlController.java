@@ -11,16 +11,15 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.automation.ai.observability.facade.AiObservabilityAlertRuleFacade;
 import com.bytechef.ee.automation.ai.observability.service.AiObservabilityAlertEvaluator;
 import com.bytechef.ee.automation.ai.observability.service.WorkspaceAiObservabilityAlertRuleService;
-import com.bytechef.ee.automation.ai.observability.service.WorkspaceAiObservabilityNotificationChannelService;
 import com.bytechef.ee.automation.ai.observability.web.graphql.authorization.WorkspaceAuthorization;
 import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityAlertCondition;
 import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityAlertMetric;
 import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityAlertRule;
 import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityAlertRuleChannel;
-import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityNotificationChannel;
 import com.bytechef.ee.platform.ai.observability.service.AiObservabilityAlertRuleService;
-import com.bytechef.ee.platform.ai.observability.service.AiObservabilityNotificationChannelService;
+import com.bytechef.ee.platform.notification.workspace.service.WorkspaceNotificationService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.notification.service.NotificationService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -49,27 +48,26 @@ class AiObservabilityAlertRuleGraphQlController {
     private final AiObservabilityAlertEvaluator aiObservabilityAlertEvaluator;
     private final AiObservabilityAlertRuleFacade aiObservabilityAlertRuleFacade;
     private final AiObservabilityAlertRuleService aiObservabilityAlertRuleService;
-    private final WorkspaceAiObservabilityNotificationChannelService workspaceAiObservabilityNotificationChannelService;
+    private final NotificationService notificationService;
     private final WorkspaceAiObservabilityAlertRuleService workspaceAiObservabilityAlertRuleService;
-    private final AiObservabilityNotificationChannelService aiObservabilityNotificationChannelService;
+    private final WorkspaceNotificationService workspaceNotificationService;
     private final WorkspaceAuthorization workspaceAuthorization;
 
     @SuppressFBWarnings("EI")
     AiObservabilityAlertRuleGraphQlController(
         AiObservabilityAlertEvaluator aiObservabilityAlertEvaluator,
         AiObservabilityAlertRuleFacade aiObservabilityAlertRuleFacade,
-        AiObservabilityAlertRuleService aiObservabilityAlertRuleService,
-        WorkspaceAiObservabilityNotificationChannelService workspaceAiObservabilityNotificationChannelService,
+        AiObservabilityAlertRuleService aiObservabilityAlertRuleService, NotificationService notificationService,
         WorkspaceAiObservabilityAlertRuleService workspaceAiObservabilityAlertRuleService,
-        AiObservabilityNotificationChannelService aiObservabilityNotificationChannelService,
+        WorkspaceNotificationService workspaceNotificationService,
         WorkspaceAuthorization workspaceAuthorization) {
 
         this.aiObservabilityAlertEvaluator = aiObservabilityAlertEvaluator;
         this.aiObservabilityAlertRuleFacade = aiObservabilityAlertRuleFacade;
         this.aiObservabilityAlertRuleService = aiObservabilityAlertRuleService;
-        this.workspaceAiObservabilityNotificationChannelService = workspaceAiObservabilityNotificationChannelService;
         this.workspaceAiObservabilityAlertRuleService = workspaceAiObservabilityAlertRuleService;
-        this.aiObservabilityNotificationChannelService = aiObservabilityNotificationChannelService;
+        this.notificationService = notificationService;
+        this.workspaceNotificationService = workspaceNotificationService;
         this.workspaceAuthorization = workspaceAuthorization;
     }
 
@@ -116,13 +114,11 @@ class AiObservabilityAlertRuleGraphQlController {
             alertRule.setFilters((String) input.get("filters"));
         }
 
-        if (input.get("channelIds") != null) {
+        if (input.get("notificationIds") != null) {
             @SuppressWarnings("unchecked")
-            List<String> channelIds = (List<String>) input.get("channelIds");
+            List<String> notificationIds = (List<String>) input.get("notificationIds");
 
-            Set<AiObservabilityAlertRuleChannel> channels = toWorkspaceOwnedChannels(channelIds, workspaceId);
-
-            alertRule.setChannels(channels);
+            alertRule.setChannels(toWorkspaceVisibleNotifications(notificationIds, workspaceId));
         }
 
         return workspaceAiObservabilityAlertRuleService.createInWorkspace(alertRule, workspaceId);
@@ -204,53 +200,54 @@ class AiObservabilityAlertRuleGraphQlController {
             alertRule.setFilters((String) input.get("filters"));
         }
 
-        if (input.get("channelIds") != null) {
+        if (input.get("notificationIds") != null) {
             @SuppressWarnings("unchecked")
-            List<String> channelIds = (List<String>) input.get("channelIds");
+            List<String> notificationIds = (List<String>) input.get("notificationIds");
 
-            Set<AiObservabilityAlertRuleChannel> channels =
-                toWorkspaceOwnedChannels(channelIds,
-                    workspaceAiObservabilityAlertRuleService.getWorkspaceId(alertRule.getId()));
-
-            alertRule.setChannels(channels);
+            alertRule.setChannels(
+                toWorkspaceVisibleNotifications(
+                    notificationIds, workspaceAiObservabilityAlertRuleService.getWorkspaceId(alertRule.getId())));
         }
 
         return aiObservabilityAlertRuleService.update(alertRule);
     }
 
     /**
-     * Rejects any channelId that belongs to a different workspace. Without this guard a workspace A admin could attach
-     * a workspace B notification channel to a rule — when the rule fires, workspace B's slack/webhook target gets paged
-     * by workspace A's activity.
+     * Rejects any notification that is scoped to a DIFFERENT workspace. Without this guard a workspace A admin could
+     * attach workspace B's notification to a rule — when the rule fires, workspace B's email/slack/webhook target gets
+     * paged by workspace A's activity. Global (unassigned) notifications are visible to every workspace and pass.
      */
-    private Set<AiObservabilityAlertRuleChannel> toWorkspaceOwnedChannels(List<String> channelIds, long workspaceId) {
+    private Set<AiObservabilityAlertRuleChannel> toWorkspaceVisibleNotifications(
+        List<String> notificationIds, long workspaceId) {
+
         Set<AiObservabilityAlertRuleChannel> channels = new HashSet<>();
 
-        for (String rawChannelId : channelIds) {
-            long channelId = Long.parseLong(rawChannelId);
+        for (String rawNotificationId : notificationIds) {
+            long notificationId = Long.parseLong(rawNotificationId);
 
-            AiObservabilityNotificationChannel channel =
-                aiObservabilityNotificationChannelService.getNotificationChannel(channelId);
+            // Existence check — a dangling id should fail the mutation, not the later dispatch.
+            notificationService.getNotification(notificationId);
 
-            Long channelWorkspaceId =
-                workspaceAiObservabilityNotificationChannelService.getWorkspaceId(channel.getId());
+            Long notificationWorkspaceId = workspaceNotificationService
+                .fetchWorkspaceIdByNotificationId(notificationId)
+                .orElse(null);
 
-            if (channelWorkspaceId == null || channelWorkspaceId != workspaceId) {
+            if (notificationWorkspaceId != null && notificationWorkspaceId != workspaceId) {
                 throw new AccessDeniedException(
-                    "Notification channel " + channelId + " does not belong to workspace " + workspaceId);
+                    "Notification " + notificationId + " does not belong to workspace " + workspaceId);
             }
 
-            channels.add(new AiObservabilityAlertRuleChannel(channelId));
+            channels.add(new AiObservabilityAlertRuleChannel(notificationId));
         }
 
         return channels;
     }
 
-    @SchemaMapping(typeName = "AiObservabilityAlertRule", field = "channelIds")
-    public List<String> channelIds(AiObservabilityAlertRule alertRule) {
+    @SchemaMapping(typeName = "AiObservabilityAlertRule", field = "notificationIds")
+    public List<String> notificationIds(AiObservabilityAlertRule alertRule) {
         return alertRule.getChannels()
             .stream()
-            .map(channel -> String.valueOf(channel.notificationChannelId()))
+            .map(channel -> String.valueOf(channel.notificationId()))
             .toList();
     }
 }

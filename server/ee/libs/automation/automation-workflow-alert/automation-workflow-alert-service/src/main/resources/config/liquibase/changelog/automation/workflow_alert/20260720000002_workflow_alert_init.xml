@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="20260720000002-1" author="Ivica Cardic">
+        <createTable tableName="workflow_alert_rule">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="version" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="workflow_id" type="VARCHAR(256)"/>
+            <column name="rule_type" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="threshold" type="DECIMAL(18,6)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="window_minutes" type="INT"/>
+            <column name="cooldown_minutes" type="INT" defaultValueNumeric="60">
+                <constraints nullable="false"/>
+            </column>
+            <column name="enabled" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="consecutive_failures" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="window_start" type="TIMESTAMP"/>
+            <column name="runs_in_window" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="failures_in_window" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ewma_latency_ms" type="DECIMAL(18,6)"/>
+            <column name="last_activity_date" type="TIMESTAMP"/>
+            <column name="last_triggered_date" type="TIMESTAMP"/>
+            <column name="created_date" type="TIMESTAMP"/>
+            <column name="last_modified_date" type="TIMESTAMP"/>
+        </createTable>
+
+        <!-- Workspace membership join table - workspace is an automation-configuration-owned concept, so
+             foreign modules attach entities to it via workspace_* membership tables instead of workspace_id
+             columns. -->
+        <createTable tableName="workspace_workflow_alert_rule">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="workspace_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="workflow_alert_rule_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP"/>
+            <column name="version" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint tableName="workspace_workflow_alert_rule"
+            columnNames="workspace_id,workflow_alert_rule_id"
+            constraintName="uq_workspace_workflow_alert_rule"/>
+
+        <addForeignKeyConstraint
+            baseTableName="workspace_workflow_alert_rule"
+            baseColumnNames="workflow_alert_rule_id"
+            constraintName="fk_workspace_workflow_alert_rule_rule_id"
+            referencedTableName="workflow_alert_rule"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+
+        <createIndex tableName="workspace_workflow_alert_rule" indexName="idx_workspace_workflow_alert_rule_workspace">
+            <column name="workspace_id"/>
+        </createIndex>
+
+        <createTable tableName="workflow_alert_rule_notification">
+            <column name="workflow_alert_rule_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="notification_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey tableName="workflow_alert_rule_notification"
+            columnNames="workflow_alert_rule_id,notification_id"/>
+
+        <addForeignKeyConstraint
+            baseTableName="workflow_alert_rule_notification"
+            baseColumnNames="workflow_alert_rule_id"
+            constraintName="fk_workflow_alert_rule_notification_rule_id"
+            referencedTableName="workflow_alert_rule"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+        <addForeignKeyConstraint
+            baseTableName="workflow_alert_rule_notification"
+            baseColumnNames="notification_id"
+            constraintName="fk_workflow_alert_rule_notification_notification_id"
+            referencedTableName="notification"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+
+        <createTable tableName="workflow_alert_event">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="workflow_alert_rule_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="job_id" type="BIGINT"/>
+            <column name="triggered_value" type="DECIMAL(18,6)"/>
+            <column name="message" type="TEXT"/>
+            <column name="created_date" type="TIMESTAMP"/>
+        </createTable>
+
+        <addForeignKeyConstraint
+            baseTableName="workflow_alert_event"
+            baseColumnNames="workflow_alert_rule_id"
+            constraintName="fk_workflow_alert_event_rule_id"
+            referencedTableName="workflow_alert_rule"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+
+        <createIndex tableName="workflow_alert_event" indexName="idx_workflow_alert_event_rule_created">
+            <column name="workflow_alert_rule_id"/>
+            <column name="created_date" descending="true"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

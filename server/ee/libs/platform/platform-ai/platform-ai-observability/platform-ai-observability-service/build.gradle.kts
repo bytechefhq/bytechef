@@ -5,7 +5,6 @@ dependencies {
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-tx")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
-    implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("org.springframework.data:spring-data-jdbc")
     implementation(project(":server:libs:platform:platform-scheduler:platform-scheduler-api"))
     implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-eval:platform-ai-eval-service"))
@@ -14,6 +13,9 @@ dependencies {
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:encryption:encryption-api"))
     implementation(project(":server:libs:platform:platform-api"))
+    implementation(project(":server:libs:platform:platform-mail"))
+    implementation(project(":server:libs:platform:platform-notification:platform-notification-api"))
+    implementation(project(":server:libs:platform:platform-notification:platform-notification-delivery"))
     implementation(project(":server:libs:platform:platform-tag:platform-tag-api"))
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
 

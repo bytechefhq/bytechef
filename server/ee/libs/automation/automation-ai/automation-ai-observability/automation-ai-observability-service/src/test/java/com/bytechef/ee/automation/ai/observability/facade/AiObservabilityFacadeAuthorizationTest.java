@@ -58,13 +58,6 @@ class AiObservabilityFacadeAuthorizationTest {
     }
 
     @Test
-    void testNotificationChannelGetNotificationChannelsByWorkspaceRequiresViewer() {
-        assertExpression(
-            AiObservabilityNotificationChannelFacadeImpl.class, "getNotificationChannelsByWorkspace",
-            VIEWER_EXPRESSION);
-    }
-
-    @Test
     void testExportJobGetExportJobsByWorkspaceRequiresViewer() {
         assertExpression(AiObservabilityExportJobFacadeImpl.class, "getExportJobsByWorkspace", VIEWER_EXPRESSION);
     }

@@ -27,6 +27,7 @@ import com.bytechef.ee.ai.hub.progress.SubagentProgressEmitter;
 import com.bytechef.ee.ai.hub.tool.AiHubToolInvocationContext;
 import com.bytechef.ee.ai.hub.util.AiHubStateKeys;
 import com.bytechef.ee.ai.hub.util.Source;
+import com.bytechef.ee.platform.ai.llm.usage.LlmUsageRecorder;
 import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -209,6 +210,20 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
 
         if (environmentId != null && environmentId >= 0 && environmentId < Environment.values().length) {
             advisorParams.put(AiHubStateKeys.ENVIRONMENT_ID, environmentId);
+        }
+
+        // Publish the controller-verified workspace + user ids so AiHubModelUsageAdvisor can attribute each turn's
+        // token usage to the right workspace in the ai_llm_usage metering store.
+        Long workspaceId = state == null ? null : NumberUtils.asLong(state.get(AiHubStateKeys.VERIFIED_WORKSPACE_ID));
+
+        if (workspaceId != null && workspaceId > 0) {
+            advisorParams.put(AiHubStateKeys.VERIFIED_WORKSPACE_ID, workspaceId);
+        }
+
+        Long userId = state == null ? null : NumberUtils.asLong(state.get(AiHubStateKeys.AUTHENTICATED_USER_ID));
+
+        if (userId != null && userId > 0) {
+            advisorParams.put(AiHubStateKeys.AUTHENTICATED_USER_ID, userId);
         }
 
         return advisorParams;
@@ -545,6 +560,9 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
         private TaskToolBindingResolver taskToolBindingResolver;
         private @Nullable OverrideChatClientResolver overrideChatClientResolver;
         private @Nullable SecurityContextRehydrator securityContextRehydrator;
+        private @Nullable LlmUsageRecorder llmUsageRecorder;
+        // Captured from agentId() so the usage advisor can tag ai_llm_usage rows with the agent that served the turn.
+        private @Nullable String usageAgentName;
         // Holds the unwrapped tool callbacks the caller registers via toolCallbacks/toolCallback. Deferred
         // wrapping in build() lets us apply the context rehydration wrapper and the empty-return guard
         // regardless of the order the caller supplies securityContextRehydrator / callbacks.
@@ -616,6 +634,14 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
         public Builder agentId(String agentId) {
             super.agentId(agentId);
 
+            this.usageAgentName = agentId;
+
+            return this;
+        }
+
+        public Builder llmUsageRecorder(@Nullable LlmUsageRecorder llmUsageRecorder) {
+            this.llmUsageRecorder = llmUsageRecorder;
+
             return this;
         }
 
@@ -681,11 +707,11 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
             // root level means zero overhead in production.
             super.advisor(new SimpleLoggerAdvisor(Integer.MAX_VALUE));
 
-            // Diagnostic. Logs the model's token usage including the provider's native prompt-cache counters
-            // (cache_read / cache_creation) once per response, so caching effectiveness can be measured directly
-            // rather than inferred from SimpleLoggerAdvisor's flattened usage getters. Gated on its own logger at
-            // DEBUG; zero overhead at the default INFO level. See AiHubModelUsageLoggingAdvisor.
-            super.advisor(new AiHubModelUsageLoggingAdvisor());
+            // Records each turn's token usage into the ai_llm_usage metering store (source = AI_HUB, attributed to
+            // the verified workspace/user published via advisorParams) and logs the provider's native prompt-cache
+            // counters (cache_read / cache_creation) at DEBUG so caching effectiveness can be measured directly
+            // rather than inferred from SimpleLoggerAdvisor's flattened usage getters. See AiHubModelUsageAdvisor.
+            super.advisor(new AiHubModelUsageAdvisor(usageAgentName, llmUsageRecorder));
 
             // Now wrap and register the deferred tool callbacks. We delay until build() so that
             // securityContextRehydrator order doesn't matter for the caller — it can be set before or

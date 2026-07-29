@@ -1,0 +1,68 @@
+extend type Query {
+    """Alert rules configured in the workspace, ordered by name."""
+    workflowAlertRules(workspaceId: ID!): [WorkflowAlertRule!]!
+    """The workspace's most recent fired alerts (max 100, newest first)."""
+    workflowAlertEvents(workspaceId: ID!): [WorkflowAlertEvent!]!
+}
+
+extend type Mutation {
+    createWorkflowAlertRule(workspaceId: ID!, input: WorkflowAlertRuleInput!): WorkflowAlertRule!
+    updateWorkflowAlertRule(id: ID!, input: WorkflowAlertRuleInput!): WorkflowAlertRule!
+    deleteWorkflowAlertRule(id: ID!): Boolean!
+    enableWorkflowAlertRule(id: ID!, enabled: Boolean!): WorkflowAlertRule!
+    """Deliver a synthetic test alert (not persisted to history) through the rule's notifications so admins can
+    verify channel configuration end-to-end."""
+    sendTestWorkflowAlert(id: ID!): Boolean!
+}
+
+"""Sim-modeled alert rule types. The threshold's unit depends on the type: count (CONSECUTIVE_FAILURES,
+ERROR_COUNT), percent 0-100 (FAILURE_RATE), milliseconds (LATENCY_THRESHOLD), multiplier over the rolling
+average (LATENCY_SPIKE), USD (COST_THRESHOLD), percent of the plan's included monthly cost (USAGE_THRESHOLD,
+evaluated hourly); NO_ACTIVITY ignores threshold and alerts after windowMinutes of silence."""
+enum WorkflowAlertRuleType {
+    CONSECUTIVE_FAILURES
+    FAILURE_RATE
+    ERROR_COUNT
+    LATENCY_THRESHOLD
+    LATENCY_SPIKE
+    COST_THRESHOLD
+    NO_ACTIVITY
+    USAGE_THRESHOLD
+}
+
+input WorkflowAlertRuleInput {
+    name: String!
+    """Optional workflow scope; null applies the rule to every run in the workspace."""
+    workflowId: String
+    ruleType: WorkflowAlertRuleType!
+    threshold: Float!
+    """Evaluation window in minutes for windowed rule types; the maximum silence for NO_ACTIVITY."""
+    windowMinutes: Int
+    """Minimum minutes between two firings of the same rule (default 60)."""
+    cooldownMinutes: Int
+    """Delivery targets — platform Notification ids (channels are managed on the Notifications page)."""
+    notificationIds: [ID!]!
+    enabled: Boolean
+}
+
+type WorkflowAlertRule {
+    id: ID!
+    name: String!
+    workflowId: String
+    ruleType: WorkflowAlertRuleType!
+    threshold: Float!
+    windowMinutes: Int
+    cooldownMinutes: Int!
+    enabled: Boolean!
+    notificationIds: [ID!]!
+    lastTriggeredDate: String
+}
+
+type WorkflowAlertEvent {
+    id: ID!
+    workflowAlertRuleId: ID!
+    jobId: ID
+    triggeredValue: Float
+    message: String
+    createdDate: String
+}

@@ -15,10 +15,7 @@ import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityAlertCond
 import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityAlertMetric;
 import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityAlertRule;
 import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityAlertRuleChannel;
-import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityNotificationChannel;
-import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityNotificationChannelType;
 import com.bytechef.ee.platform.ai.observability.service.AiObservabilityAlertRuleService;
-import com.bytechef.ee.platform.ai.observability.service.AiObservabilityNotificationChannelService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -28,6 +25,7 @@ import java.util.Set;
 import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
@@ -47,13 +45,13 @@ public class AiObservabilityAlertRuleServiceIntTest {
     private AiObservabilityAlertRuleService aiObservabilityAlertRuleService;
 
     @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @Autowired
     private WorkspaceAiObservabilityWebhookSubscriptionService workspaceAiObservabilityWebhookSubscriptionService;
 
     @Autowired
     private WorkspaceAiObservabilityExportJobService workspaceAiObservabilityExportJobService;
-
-    @Autowired
-    private WorkspaceAiObservabilityNotificationChannelService workspaceAiObservabilityNotificationChannelService;
 
     @Autowired
     private WorkspaceAiObservabilityAlertRuleService workspaceAiObservabilityAlertRuleService;
@@ -64,20 +62,18 @@ public class AiObservabilityAlertRuleServiceIntTest {
     @Autowired
     private WorkspaceAiObservabilityTraceService workspaceAiObservabilityTraceService;
 
-    @Autowired
-    private AiObservabilityNotificationChannelService aiObservabilityNotificationChannelService;
-
     @Test
     public void testCreateAlertRuleWithChannelAndSnoozeUnsnooze() {
-        AiObservabilityNotificationChannel channel =
-            workspaceAiObservabilityNotificationChannelService.createInWorkspace(
-                new AiObservabilityNotificationChannel(
-                    "ops-email",
-                    AiObservabilityNotificationChannelType.EMAIL,
-                    "{\"to\":\"ops@example.com\"}"),
-                WORKSPACE_ID);
-
-        Long channelId = Validate.notNull(channel.getId(), "id");
+        // Delivery targets are platform Notification rows post channel migration; insert one directly since the
+        // gateway test context does not wire the CE notification service stack.
+        Long notificationId = jdbcTemplate.queryForObject(
+            """
+                INSERT INTO notification (
+                    name, type, settings, created_by, created_date, last_modified_by, last_modified_date, version)
+                VALUES ('ops-email', 0, '{"email": "ops@example.com"}', 'system', now(), 'system', now(), 1)
+                RETURNING id
+                """,
+            Long.class);
 
         AiObservabilityAlertRule rule = new AiObservabilityAlertRule(
             "high-error-rate",
@@ -86,7 +82,7 @@ public class AiObservabilityAlertRuleServiceIntTest {
             new BigDecimal("0.05"), 10, 30);
 
         Set<AiObservabilityAlertRuleChannel> channels = new HashSet<>();
-        channels.add(new AiObservabilityAlertRuleChannel(channelId));
+        channels.add(new AiObservabilityAlertRuleChannel(notificationId));
 
         rule.setChannels(channels);
 
@@ -100,8 +96,8 @@ public class AiObservabilityAlertRuleServiceIntTest {
         assertThat(retrieved)
             .hasFieldOrPropertyWithValue("name", "high-error-rate");
         assertThat(retrieved.getChannels())
-            .extracting(AiObservabilityAlertRuleChannel::notificationChannelId)
-            .contains(channelId);
+            .extracting(AiObservabilityAlertRuleChannel::notificationId)
+            .contains(notificationId);
 
         Instant until = Instant.now()
             .plus(1, ChronoUnit.HOURS);

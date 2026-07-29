@@ -35,6 +35,8 @@ public interface AiLlmUsageRepository extends ListCrudRepository<AiLlmUsage, Lon
 
     List<AiLlmUsage> findAllByCreatedDateBetween(Instant start, Instant end);
 
+    List<AiLlmUsage> findAllBySourceAndOwnerId(Integer source, Long ownerId);
+
     @Query("""
         SELECT r.* FROM ai_llm_usage r
         JOIN workspace_ai_llm_usage wr ON wr.ai_llm_usage_id = r.id
