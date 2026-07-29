@@ -789,15 +789,47 @@ cd cli
   (Lua token bucket) + `RedisConcurrentExecutionGate` (bounded INCR/DECR, 24h self-healing
   TTL); both Redis impls fail open on Redis outages — pinned against a real Redis by
   `RedisPlanEnforcementIntTest` (Testcontainers)), `PlanRateLimitFilter`
-  (order 0, after the security chain: login 10/min/IP, webhooks → sync tier/tenant, public
+  (order 0, after the security chain: login 10/min/IP, webhooks + the MCP/A2A secret-key
+  endpoints (`/{secretKey}/mcp|sse|message`, `/api/automation/a2a/**`) → sync tier/tenant, public
   APIs → api tier/tenant, anonymous `/api/**` → per-IP; reject = 429 + Retry-After), and
-  the two async-admission gates in `PrincipalJobFacadeImpl.createJob` (async only; sync
+  the two async-admission gates in `PrincipalJobFacadeImpl.createJob` plus the monthly-cost cap
+  (`PlanSpendProvider` SPI, EE impl over cost rows, 60s memo, fail-open; over-cap submissions can
+  be admitted under the tenant's on-demand overage terms via the stub `PlanOveragePolicyProvider`
+  SPI — `PlanOveragePolicy(enabled, unbilledLimitUsd)`, Sim's opt-in overage model — no default
+  bean, so the cap hard-stops until the billing integration contributes one) (async only; sync
   `createJobWithoutDispatch` is deliberately ungated to avoid slot leaks): the
   `async:<tenant>` submissions-per-minute bucket (checked FIRST so a rate reject never
   leaks a slot) then `ConcurrentExecutionGate` slots, released by platform-coordinator's
   `ConcurrencySlotReleaseApplicationEventListener`
   on terminal job status (floors at zero; restart over-admits, never wrongly blocks). Never
-  gate inside `server/libs/atlas/` — admission and release both live outside the engine.
+  gate inside `server/libs/atlas/` — admission and release both live outside the engine. Every
+  rejection increments
+  `bytechef_plan_limit_rejection{limit=login|sync|api|preauth|async|concurrency|cost|timeout|workspace|member|storage}`
+  (`PlanLimitRejectionCounter`, no-op without a MeterRegistry).
+- **Quota fields** are enforced at their natural creation points, each via an optional
+  `ObjectProvider<PlanLimitsProvider>` (null limit / no bean = unlimited): `maxWorkspaces` in EE
+  `WorkspaceServiceImpl.create`, `maxMembers` in `UserServiceImpl.create`/`registerUser` (counts ALL
+  user rows — pending invites hold a seat; checked after the non-activated-user cleanup),
+  `maxStorageBytes` in `AssetFileFacadeImpl` (tenant-wide `sumSizeBytes()` alongside the existing
+  per-workspace property quota), `syncRunTimeout` caps the `JobCompletionAwaiter` wait on ALL
+  three sync surfaces — `WebhookWorkflowExecutorImpl`, `AutomationMcpToolFacade`, and
+  `AutomationA2AServerFacade` (plan can only tighten the configured default, never extend), and
+  `logRetentionDays` drives `JobRetentionMonitor` (platform-coordinator, 6h per-tenant sweep,
+  `getEndedJobs(endDateBefore)` finder — endDate exists only on terminal jobs — deleting through
+  `JobFacade.deleteJob`'s cascade and skipping subflow children; works distributed via the remote
+  job service/facade endpoints; operator fallback
+  `bytechef.workflow.execution.retention.default-retention-days`, disable with
+  `bytechef.workflow.execution.retention.enabled=false`). `JobFacadeImpl.deleteJob` also releases
+  file-storage blobs (task outputs, job outputs, context values via `TaskFileStorage.delete*`) and
+  context rows (`ContextService.getStackFileEntries`/`deleteStackContexts`) best-effort — a storage
+  failure never blocks the row delete; in-memory repos throw `UnsupportedOperationException` for
+  context enumeration and the facade skips that portion. The retention monitor additionally drops
+  the purged job's `data_storage` CURRENT_EXECUTION rows via `DataStorage.deleteScopeData(scope,
+  scopeId)` (jdbc provider + remote client implement it; the file-storage provider throws and the
+  monitor skips). Quota rejections throw
+  `QuotaLimitExceededException` (core exception-api) → HTTP 403 without Retry-After — a capacity
+  ceiling, not a retryable rate limit (`RateLimitExceededException` stays 429) — and count into the
+  rejection metric with tags `workspace`/`member`/`storage`.
 
 ## Crash recovery (orphaned jobs)
 
@@ -816,7 +848,17 @@ cd cli
   Stale-row finders are `getStaleTaskExecutions`/`getStaleJobs` (EE remote clients throw
   `UnsupportedOperationException`; the monitor warn-skips, so orphan detection is monolith-only
   for now). Detection lives OUTSIDE `server/libs/atlas/` except the engine-owned heartbeat
-  primitives; semantics pinned by `OrphanedJobRecoveryMonitorTest`.
+  primitives; semantics pinned by `OrphanedJobRecoveryMonitorTest`, and the underlying
+  stale/long-running SQL finders by `StaleExecutionFinderIntTest` (Testcontainers PG).
+- **Per-run timeouts**: `JobTimeoutMonitor` (platform-coordinator, every minute,
+  `bytechef.workflow.execution.timeout.enabled` default on) fails STARTED jobs whose runtime
+  exceeds the plan's `asyncRunTimeout` (per tenant) or the operator fallback
+  `bytechef.workflow.execution.timeout.default-timeout`; with neither set it is a no-op. Uses the
+  startDate-based finder `getLongRunningJobs` (remote clients throw, monitor skips). No
+  auto-resume — a timed-out run would immediately exceed again. Pinned by `JobTimeoutMonitorTest`.
+- **Mockito gotcha**: unstubbed wrapper-returning methods (Long/Integer) return 0, NOT null — stub
+  `thenReturn(null)` explicitly when a null-means-absent field (e.g. `Job.getParentTaskExecutionId`)
+  drives branching.
 - **Redis broker redelivery**: `RedisListenerEndpointRegistrar` reclaims consumer-group pending
   entries left by crashed consumers (XPENDING + XCLAIM sweep every 10s, min idle 60s) and
   redelivers them through the normal invoke-then-ack path — at-least-once semantics like amqp.
@@ -866,7 +908,17 @@ cd cli
   email alike. `EmailNotificationSender` and the EE
   `AiObservabilityNotificationDispatcher` both call `mailService.sendEmail(...)` — no inline
   `JavaMailSender` remains anywhere in notification delivery.
-- Consumers: CE `WebhookNotificationSender` (job-status webhook channel; settings keys `webhook` +
+- Consumers: all three CE senders (`Email|Webhook|SlackNotificationSender`) live in
+  platform-notification-delivery (so coordinator-app carries them). `EmailNotificationSender`
+  reaches mail through the `NotificationEmailGateway` port (platform-notification-api):
+  monolith/configuration-app bind it to MailService (`MailServiceNotificationEmailGateway`),
+  coordinator/webhook apps bind it to `RemoteNotificationEmailGatewayClient` which proxies to
+  configuration-app's `/remote/notification-email-gateway/send-email` — SMTP credentials stay in
+  one app; no gateway bean at all = the EMAIL channel warn-skips. In the distributed deployment
+  the coordinator resolves delivery targets through `configuration-app`'s
+  `/remote/notification-service` read endpoints (platform-notification-remote-rest + the
+  implemented `RemoteNotificationServiceClient` reads).
+  `WebhookNotificationSender` (job-status webhook channel; settings keys `webhook` +
   optional `webhookSecret`, `@Async`), payload shaped by `JobStatusWebhookNotificationHandler` in
   platform-coordinator; platform-coordinator's `WebhookJobStatusApplicationEventListener` delegates the
   Atlas job-callback delivery to `deliverEvent` with the `Job.Retry` schedule (defaults: 5 attempts,
