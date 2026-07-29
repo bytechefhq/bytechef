@@ -137,6 +137,102 @@ class CopilotApiControllerTest {
         verify(agUiService).runAgent(eq(agent), any());
     }
 
+    @Test
+    void testChatRoutesWorkflowEditorEmbeddedAsk() {
+        LocalAgent agent = localAgent("workflow_editor_embedded_ask");
+        CopilotApiController controller = controllerWith(agent);
+
+        when(agUiService.runAgent(eq(agent), any())).thenReturn(new SseEmitter());
+
+        controller.chat("workflow_editor_embedded", agUiParameters("ASK"));
+
+        verify(agUiService).runAgent(eq(agent), any());
+    }
+
+    @Test
+    void testChatRoutesWorkflowEditorEmbeddedBuild() {
+        LocalAgent agent = localAgent("workflow_editor_embedded_build");
+        CopilotApiController controller = controllerWith(agent);
+
+        when(agUiService.runAgent(eq(agent), any())).thenReturn(new SseEmitter());
+
+        controller.chat("workflow_editor_embedded", agUiParameters("BUILD"));
+
+        verify(agUiService).runAgent(eq(agent), any());
+    }
+
+    @Test
+    void testChatRoutesWorkflowExecutionEmbeddedAsk() {
+        LocalAgent agent = localAgent("workflow_execution_embedded_ask");
+        CopilotApiController controller = controllerWith(agent);
+
+        when(agUiService.runAgent(eq(agent), any())).thenReturn(new SseEmitter());
+
+        controller.chat("workflow_execution_embedded", agUiParameters("ASK"));
+
+        verify(agUiService).runAgent(eq(agent), any());
+    }
+
+    @Test
+    void testChatRoutesWorkflowExecutionEmbeddedBuild() {
+        LocalAgent agent = localAgent("workflow_execution_embedded_build");
+        CopilotApiController controller = controllerWith(agent);
+
+        when(agUiService.runAgent(eq(agent), any())).thenReturn(new SseEmitter());
+
+        controller.chat("workflow_execution_embedded", agUiParameters("BUILD"));
+
+        verify(agUiService).runAgent(eq(agent), any());
+    }
+
+    @Test
+    void testChatRoutesCodeWorkflowAsk() {
+        LocalAgent agent = localAgent("code_workflow_ask");
+        CopilotApiController controller = controllerWith(agent);
+
+        when(agUiService.runAgent(eq(agent), any())).thenReturn(new SseEmitter());
+
+        controller.chat("code_workflow", agUiParameters("ASK"));
+
+        verify(agUiService).runAgent(eq(agent), any());
+    }
+
+    @Test
+    void testChatRoutesCodeWorkflowBuild() {
+        LocalAgent agent = localAgent("code_workflow_build");
+        CopilotApiController controller = controllerWith(agent);
+
+        when(agUiService.runAgent(eq(agent), any())).thenReturn(new SseEmitter());
+
+        controller.chat("code_workflow", agUiParameters("BUILD"));
+
+        verify(agUiService).runAgent(eq(agent), any());
+    }
+
+    @Test
+    void testChatRoutesCodeWorkflowEmbeddedAsk() {
+        LocalAgent agent = localAgent("code_workflow_embedded_ask");
+        CopilotApiController controller = controllerWith(agent);
+
+        when(agUiService.runAgent(eq(agent), any())).thenReturn(new SseEmitter());
+
+        controller.chat("code_workflow_embedded", agUiParameters("ASK"));
+
+        verify(agUiService).runAgent(eq(agent), any());
+    }
+
+    @Test
+    void testChatRoutesCodeWorkflowEmbeddedBuild() {
+        LocalAgent agent = localAgent("code_workflow_embedded_build");
+        CopilotApiController controller = controllerWith(agent);
+
+        when(agUiService.runAgent(eq(agent), any())).thenReturn(new SseEmitter());
+
+        controller.chat("code_workflow_embedded", agUiParameters("BUILD"));
+
+        verify(agUiService).runAgent(eq(agent), any());
+    }
+
     private AgUiParameters agUiParameters(String mode) {
         return parameters(Map.<String, Object>of("mode", mode));
     }

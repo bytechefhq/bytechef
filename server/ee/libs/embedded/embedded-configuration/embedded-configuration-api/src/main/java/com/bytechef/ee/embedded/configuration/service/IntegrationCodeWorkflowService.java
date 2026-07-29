@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.configuration.service;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationCodeWorkflow;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -22,4 +23,6 @@ public interface IntegrationCodeWorkflowService {
     IntegrationCodeWorkflow create(CodeWorkflowContainer codeWorkflowContainer, Integration integration);
 
     Optional<IntegrationCodeWorkflow> fetchIntegrationCodeWorkflow(long integrationId);
+
+    List<Long> getCodeWorkflowIntegrationIds();
 }

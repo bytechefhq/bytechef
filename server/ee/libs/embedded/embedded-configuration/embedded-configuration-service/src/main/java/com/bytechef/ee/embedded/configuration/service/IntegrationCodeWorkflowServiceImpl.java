@@ -12,6 +12,7 @@ import com.bytechef.ee.embedded.configuration.domain.IntegrationCodeWorkflow;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationCodeWorkflowRepository;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,5 +47,10 @@ public class IntegrationCodeWorkflowServiceImpl implements IntegrationCodeWorkfl
     @Override
     public Optional<IntegrationCodeWorkflow> fetchIntegrationCodeWorkflow(long integrationId) {
         return integrationCodeWorkflowRepository.findFirstByIntegrationIdOrderByIdDesc(integrationId);
+    }
+
+    @Override
+    public List<Long> getCodeWorkflowIntegrationIds() {
+        return integrationCodeWorkflowRepository.findDistinctIntegrationIds();
     }
 }

@@ -38,6 +38,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.cache.CacheManager;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -151,6 +152,39 @@ public class IntegrationCodeWorkflowFacadeImpl implements IntegrationCodeWorkflo
     }
 
     /**
+     * Returns every integration that has at least one code workflow deployed, resolved from the distinct integration
+     * ids recorded on {@code integration_code_workflow}.
+     */
+    @Transactional(readOnly = true)
+    @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public List<Integration> getCodeWorkflowIntegrations() {
+        List<Long> integrationIds = integrationCodeWorkflowService.getCodeWorkflowIntegrationIds();
+
+        if (integrationIds.isEmpty()) {
+            return List.of();
+        }
+
+        return integrationService.getIntegrations(integrationIds);
+    }
+
+    /**
+     * Returns the language of the code workflow backing {@code integrationId}, if one exists. Mirrors the resolution
+     * chain {@code IntegrationFacadeImpl#toIntegrationDTO} uses to surface the language on integration DTOs, but
+     * exposed standalone here so callers that only need the language (rather than the whole DTO) are not forced to pull
+     * in the wider integration facade.
+     */
+    @Transactional(readOnly = true)
+    @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public Optional<String> getCodeWorkflowLanguage(long integrationId) {
+        return integrationCodeWorkflowService.fetchIntegrationCodeWorkflow(integrationId)
+            .flatMap(this::fetchCodeWorkflowContainer)
+            .map(codeWorkflowContainer -> codeWorkflowContainer.getLanguage()
+                .name());
+    }
+
+    /**
      * Returns the stored source text of the code workflow backing {@code integrationId}, so it can be shown in an
      * editor. Java-backed containers have no editable source (they are compiled jars), so those are rejected.
      */
@@ -247,6 +281,18 @@ public class IntegrationCodeWorkflowFacadeImpl implements IntegrationCodeWorkflo
 
         return codeWorkflowContainerService.getCodeWorkflowContainer(
             integrationCodeWorkflow.getCodeWorkflowContainerId());
+    }
+
+    private Optional<CodeWorkflowContainer> fetchCodeWorkflowContainer(
+        IntegrationCodeWorkflow integrationCodeWorkflow) {
+
+        try {
+            return Optional.of(
+                codeWorkflowContainerService.getCodeWorkflowContainer(
+                    integrationCodeWorkflow.getCodeWorkflowContainerId()));
+        } catch (IllegalArgumentException e) {
+            return Optional.empty();
+        }
     }
 
     private void deployInto(

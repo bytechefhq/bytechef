@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.configuration.repository;
 
 import com.bytechef.ee.embedded.configuration.domain.IntegrationCodeWorkflow;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
@@ -23,6 +24,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 @ConditionalOnEEVersion
 public interface IntegrationCodeWorkflowRepository extends ListCrudRepository<IntegrationCodeWorkflow, Long> {
+
+    @Query("SELECT DISTINCT integration_id FROM integration_code_workflow")
+    List<Long> findDistinctIntegrationIds();
 
     @Query("""
         SELECT * FROM integration_code_workflow

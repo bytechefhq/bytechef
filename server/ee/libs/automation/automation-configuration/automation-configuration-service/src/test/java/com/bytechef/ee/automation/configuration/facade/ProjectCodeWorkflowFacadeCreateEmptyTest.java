@@ -187,6 +187,16 @@ class ProjectCodeWorkflowFacadeCreateEmptyTest {
     }
 
     @Test
+    void testCreateEmptyCodeWorkflowRejectsNullName() {
+        assertNameRejected(null);
+    }
+
+    @Test
+    void testCreateEmptyCodeWorkflowRejectsNameContainingCarriageReturn() {
+        assertNameRejected("acme\rbad");
+    }
+
+    @Test
     void testCreateEmptyCodeWorkflowRejectsNameContainingQuote() {
         assertNameRejected("acme\", version: 9, x: (");
     }

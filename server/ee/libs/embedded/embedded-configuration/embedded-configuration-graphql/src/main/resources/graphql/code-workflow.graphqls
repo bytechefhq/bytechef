@@ -1,3 +1,6 @@
+# CodeWorkflowLanguage is defined in the automation module's schema
+# (automation-configuration-graphql/src/main/resources/graphql/code-workflow.graphqls). This module must be
+# co-deployed with it (server-app and configuration-app always are today).
 extend type Query {
     integrationCodeWorkflowSource(integrationId: ID!): String!
 }

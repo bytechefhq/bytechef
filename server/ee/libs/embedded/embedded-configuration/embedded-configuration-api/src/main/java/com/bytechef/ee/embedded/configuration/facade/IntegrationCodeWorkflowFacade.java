@@ -9,6 +9,8 @@ package com.bytechef.ee.embedded.configuration.facade;
 
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * @version ee
@@ -18,6 +20,10 @@ import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowCo
 public interface IntegrationCodeWorkflowFacade {
 
     Integration createEmptyCodeWorkflow(String componentName, Language language);
+
+    List<Integration> getCodeWorkflowIntegrations();
+
+    Optional<String> getCodeWorkflowLanguage(long integrationId);
 
     String getCodeWorkflowSource(long integrationId);
 

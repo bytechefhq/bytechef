@@ -15,6 +15,7 @@ import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationCodeWorkflow;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationCodeWorkflowRepository;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -91,5 +92,17 @@ class IntegrationCodeWorkflowServiceTest {
             integrationCodeWorkflowService.fetchIntegrationCodeWorkflow(1L);
 
         assertThat(fetchedIntegrationCodeWorkflow).contains(integrationCodeWorkflow);
+    }
+
+    @Test
+    void testGetCodeWorkflowIntegrationIds() {
+        IntegrationCodeWorkflowService integrationCodeWorkflowService =
+            new IntegrationCodeWorkflowServiceImpl(integrationCodeWorkflowRepository);
+
+        when(integrationCodeWorkflowRepository.findDistinctIntegrationIds()).thenReturn(List.of(1L, 2L));
+
+        List<Long> integrationIds = integrationCodeWorkflowService.getCodeWorkflowIntegrationIds();
+
+        assertThat(integrationIds).containsExactly(1L, 2L);
     }
 }

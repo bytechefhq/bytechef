@@ -88,11 +88,23 @@ public class CopilotApiController {
             } else {
                 agentId = "workflow_editor_ask";
             }
+        } else if (agentId.equals("workflow_editor_embedded")) {
+            if (Mode.valueOf((String) mode) == Mode.BUILD) {
+                agentId = "workflow_editor_embedded_build";
+            } else {
+                agentId = "workflow_editor_embedded_ask";
+            }
         } else if (agentId.equals("workflow_execution")) {
             if (Mode.valueOf((String) mode) == Mode.BUILD) {
                 agentId = "workflow_execution_build";
             } else {
                 agentId = "workflow_execution_ask";
+            }
+        } else if (agentId.equals("workflow_execution_embedded")) {
+            if (Mode.valueOf((String) mode) == Mode.BUILD) {
+                agentId = "workflow_execution_embedded_build";
+            } else {
+                agentId = "workflow_execution_embedded_ask";
             }
         } else if (agentId.equals("code_editor")) {
             if (Mode.valueOf((String) mode) == Mode.BUILD) {
@@ -105,6 +117,18 @@ public class CopilotApiController {
                 agentId = "workflow_code_editor_build";
             } else {
                 agentId = "workflow_code_editor_ask";
+            }
+        } else if (agentId.equals("code_workflow")) {
+            if (Mode.valueOf((String) mode) == Mode.BUILD) {
+                agentId = "code_workflow_build";
+            } else {
+                agentId = "code_workflow_ask";
+            }
+        } else if (agentId.equals("code_workflow_embedded")) {
+            if (Mode.valueOf((String) mode) == Mode.BUILD) {
+                agentId = "code_workflow_embedded_build";
+            } else {
+                agentId = "code_workflow_embedded_ask";
             }
         } else if (agentId.equals("cluster_element")) {
             if (Mode.valueOf((String) mode) == Mode.BUILD) {

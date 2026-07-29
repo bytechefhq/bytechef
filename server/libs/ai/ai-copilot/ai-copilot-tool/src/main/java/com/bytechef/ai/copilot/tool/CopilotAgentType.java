@@ -50,7 +50,19 @@ public enum CopilotAgentType implements AgentType {
     SAMPLE_OUTPUT("sample_output", true),
     SAMPLE_OUTPUT_AGENT("sample_output_agent", false),
     CUSTOM_COMPONENT_AGENT("custom_component_agent", false),
-    CODE_WORKFLOW_AGENT("code_workflow_agent", false);
+    CODE_WORKFLOW_AGENT("code_workflow_agent", false),
+    WORKFLOW_EDITOR_EMBEDDED_ASK("workflow_editor_embedded_ask", false),
+    WORKFLOW_EDITOR_EMBEDDED_BUILD("workflow_editor_embedded_build", false),
+    WORKFLOW_EDITOR_EMBEDDED("workflow_editor_embedded", true),
+    CODE_WORKFLOW_ASK("code_workflow_ask", false),
+    CODE_WORKFLOW_BUILD("code_workflow_build", false),
+    CODE_WORKFLOW("code_workflow", true),
+    CODE_WORKFLOW_EMBEDDED_ASK("code_workflow_embedded_ask", false),
+    CODE_WORKFLOW_EMBEDDED_BUILD("code_workflow_embedded_build", false),
+    CODE_WORKFLOW_EMBEDDED("code_workflow_embedded", true),
+    WORKFLOW_EXECUTION_EMBEDDED_ASK("workflow_execution_embedded_ask", false),
+    WORKFLOW_EXECUTION_EMBEDDED_BUILD("workflow_execution_embedded_build", false),
+    WORKFLOW_EXECUTION_EMBEDDED("workflow_execution_embedded", true);
 
     private final String key;
     private final boolean fallback;
