@@ -21,6 +21,9 @@ const McpComponentListItemDropdownMenu = ({mcpComponent, onEditClick}: McpCompon
             queryClient.invalidateQueries({
                 queryKey: ['mcpComponentsByServerId'],
             });
+            queryClient.invalidateQueries({
+                queryKey: ['workspaceMcpServers'],
+            });
             setShowDeleteDialog(false);
         },
     });
