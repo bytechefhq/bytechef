@@ -3,7 +3,7 @@ import {Locator, expect} from '@playwright/test';
 export async function clickAndExpectToBeVisible({
     autoClick = false,
     target,
-    timeout = 100,
+    timeout = 5000,
     trigger,
 }: {
     autoClick?: boolean;
@@ -12,14 +12,14 @@ export async function clickAndExpectToBeVisible({
     trigger: Locator;
 }) {
     await expect(async () => {
-        if (!(await target.isVisible()) && (await trigger.isVisible())) {
+        if (!(await target.isVisible())) {
             await trigger.click();
         }
 
-        await expect(target).toBeVisible({timeout});
+        await expect(target).toBeVisible({timeout: 1000});
 
         if (autoClick) {
             await target.click();
         }
-    }).toPass();
+    }).toPass({timeout});
 }

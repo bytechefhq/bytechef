@@ -131,8 +131,8 @@ export class WorkflowPage {
     async goToWorkflowEditor(projectId: string, workflowId: string): Promise<void> {
         await this.page.goto(`/automation/projects/${projectId}/project-workflows/${workflowId}`);
 
-        await this.page.waitForLoadState('domcontentloaded');
+        await this.page.waitForURL(`**/projects/${projectId}/project-workflows/${workflowId}`);
 
-        await this.page.waitForTimeout(2000);
+        await this.page.waitForLoadState('domcontentloaded');
     }
 }
