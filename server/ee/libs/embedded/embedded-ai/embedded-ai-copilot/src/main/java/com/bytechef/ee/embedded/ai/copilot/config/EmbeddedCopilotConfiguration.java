@@ -18,9 +18,11 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.embedded.ai.copilot.agent.EmbeddedCodeWorkflowSpringAIAgent;
 import com.bytechef.ee.embedded.ai.tool.IntegrationCodeWorkflowTools;
+import com.bytechef.ee.embedded.ai.tool.IntegrationTools;
 import com.bytechef.ee.embedded.ai.tool.IntegrationWorkflowExecutionTools;
 import com.bytechef.ee.embedded.ai.tool.IntegrationWorkflowTools;
 import com.bytechef.ee.embedded.ai.tool.ReadIntegrationCodeWorkflowTools;
+import com.bytechef.ee.embedded.ai.tool.ReadIntegrationTools;
 import com.bytechef.ee.embedded.ai.tool.ReadIntegrationWorkflowTools;
 import com.bytechef.platform.ai.tool.ComponentTools;
 import com.bytechef.platform.ai.tool.FirecrawlTools;
@@ -35,6 +37,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
@@ -111,16 +114,17 @@ public class EmbeddedCopilotConfiguration {
 
     @Bean
     WorkflowEditorSpringAIAgent workflowEditorEmbeddedAskSpringAIAgent(
-        ChatMemory chatMemory, ChatModel chatModel, ReadIntegrationWorkflowTools readIntegrationWorkflowTools,
-        ComponentTools componentTools, TaskTools taskTools, Optional<FirecrawlTools> firecrawlTools,
-        WorkflowService workflowService, WorkflowNodeOutputFacade workflowNodeOutputFacade,
+        ChatMemory chatMemory, ChatModel chatModel, ReadIntegrationTools readIntegrationTools,
+        ReadIntegrationWorkflowTools readIntegrationWorkflowTools, ComponentTools componentTools, TaskTools taskTools,
+        Optional<FirecrawlTools> firecrawlTools, WorkflowService workflowService,
+        WorkflowNodeOutputFacade workflowNodeOutputFacade,
         @Qualifier("questionAnswerAdvisor") Advisor questionAnswerAdvisor, PermissionService permissionService,
         SecurityContextRehydrator securityContextRehydrator,
         ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider) throws AGUIException {
 
         List<Object> tools = new ArrayList<>(
             List.of(
-                readIntegrationWorkflowTools, componentTools, taskTools, workflowValidatorTools,
+                readIntegrationTools, readIntegrationWorkflowTools, componentTools, taskTools, workflowValidatorTools,
                 workflowInstructionTools));
 
         firecrawlTools.ifPresent(tools::add);
@@ -143,15 +147,16 @@ public class EmbeddedCopilotConfiguration {
 
     @Bean
     WorkflowEditorSpringAIAgent workflowEditorEmbeddedBuildSpringAIAgent(
-        ChatMemory chatMemory, ChatModel chatModel, IntegrationWorkflowTools integrationWorkflowTools,
-        ComponentTools componentTools, TaskTools taskTools, WorkflowService workflowService,
-        WorkflowNodeOutputFacade workflowNodeOutputFacade, PermissionService permissionService,
-        SecurityContextRehydrator securityContextRehydrator,
+        ChatMemory chatMemory, ChatModel chatModel, IntegrationTools integrationTools,
+        IntegrationWorkflowTools integrationWorkflowTools, ComponentTools componentTools, TaskTools taskTools,
+        WorkflowService workflowService, WorkflowNodeOutputFacade workflowNodeOutputFacade,
+        PermissionService permissionService, SecurityContextRehydrator securityContextRehydrator,
         ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider) throws AGUIException {
 
         List<Object> tools = new ArrayList<>(
             List.of(
-                integrationWorkflowTools, componentTools, taskTools, workflowValidatorTools, workflowInstructionTools));
+                integrationTools, integrationWorkflowTools, componentTools, taskTools, workflowValidatorTools,
+                workflowInstructionTools));
 
         return WorkflowEditorSpringAIAgent.builder()
             .agentId("workflow_editor_embedded_build")
@@ -165,6 +170,26 @@ public class EmbeddedCopilotConfiguration {
             .permissionService(permissionService)
             .securityContextRehydrator(securityContextRehydrator)
             .overrideChatClientResolver(overrideChatClientResolverProvider.getIfAvailable())
+            .build();
+    }
+
+    /**
+     * Stateless embedded workflow-editor BUILD subagent {@link ChatClient} — the embedded mirror of
+     * {@code workflowEditorBuildSubAgentChatClient}, bound to the integration + integration-workflow tools and the
+     * embedded BUILD prompt. Contributed to the management MCP server (via
+     * {@code ToolCallbackContributorConfiguration}) as the {@code workflow_editor_embedded_agent} tool so MCP clients
+     * can build integration workflows; not wired into the AI-Hub routing agent.
+     */
+    @Bean
+    ChatClient workflowEditorEmbeddedBuildSubAgentChatClient(
+        ChatModel chatModel, IntegrationTools integrationTools, IntegrationWorkflowTools integrationWorkflowTools,
+        ComponentTools componentTools, TaskTools taskTools) {
+
+        return ChatClient.builder(chatModel)
+            .defaultSystem(getSystemPrompt(promptWorkflowEditorEmbeddedBuildResource))
+            .defaultTools(
+                integrationTools, integrationWorkflowTools, componentTools, taskTools, workflowValidatorTools,
+                workflowInstructionTools)
             .build();
     }
 

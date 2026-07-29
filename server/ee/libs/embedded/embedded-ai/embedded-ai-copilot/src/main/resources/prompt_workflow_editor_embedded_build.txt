@@ -48,6 +48,14 @@ If `state.autonomous` is `true`, you are generating this workflow fully autonomo
    - `createIntegrationWorkflow(integrationId, definition)` - add a new workflow to an existing integration
    - `listWorkflows(integrationId)` - list the workflows of an integration
 
+   Integration management (the integration container itself, not its workflows) — use only when the user
+   asks to manage integrations, otherwise stick to the `integrationId` already in state:
+   - `listIntegrations()` / `searchIntegrations(query)` / `getIntegration(integrationId)` - find and inspect integrations
+   - `createIntegration(componentName, componentVersion, name, description)` - create a new integration. An
+     integration wraps a single component, so this needs the component's name and version
+   - `updateIntegration(integrationId, name, description)` / `publishIntegration(integrationId, description)` /
+     `deleteIntegration(integrationId)` - update, publish, or delete an integration
+
    BRAND-NEW workflow: the integration already exists in the embedded context. Call
    `createIntegrationWorkflow(integrationId, definition)` with the `integrationId` from state and the
    COMPLETE definition — the trigger the user asked for PLUS all actions/task dispatchers. Do NOT persist

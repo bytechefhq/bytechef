@@ -1,0 +1,70 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the ByteChef Enterprise license (the "Enterprise License");
+ * you may not use this file except in compliance with the Enterprise License.
+ */
+
+package com.bytechef.ee.embedded.ai.copilot.config;
+
+import com.bytechef.ai.copilot.tool.CopilotAgentType;
+import com.bytechef.ai.copilot.tool.WorkflowEditorAgentToolCallback;
+import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
+import java.util.ArrayList;
+import java.util.List;
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.tool.ToolCallback;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+/**
+ * Contributes the embedded workflow-editor copilot subagent to the management MCP server through the
+ * {@link McpServerToolCallbackContributor} SPI — the same extension point the automation copilot specialists use (see
+ * {@code ToolCallbackContributorConfiguration}). It exposes the embedded integration-workflow editor as the
+ * {@code workflow_editor_embedded_agent} tool so external MCP clients can build and edit integration workflows, the
+ * embedded counterpart to the automation {@code workflow_editor_agent}.
+ *
+ * <p>
+ * The delegate reuses {@link WorkflowEditorAgentToolCallback} (parameterized with the embedded tool name, description,
+ * and {@link CopilotAgentType#WORKFLOW_EDITOR_EMBEDDED_AGENT}) wrapped around the embedded BUILD subagent
+ * {@link ChatClient}. A missing ChatClient bean (feature module absent) skips silently. Like the automation copilot
+ * contributor, the AG-UI {@code ProgressReportingToolCallback} wrapper is intentionally NOT applied on this surface.
+ * </p>
+ *
+ * @version ee
+ *
+ * @author Ivica Cardic
+ */
+@Configuration
+public class EmbeddedCopilotMcpContributorConfiguration {
+
+    private static final String DESCRIPTION =
+        """
+            Delegate a user request about whole embedded INTEGRATION workflows to the specialised Embedded
+            Workflow Editor subagent. Use this for requests that design, edit, debug, or explain an
+            integration's workflows (orchestration of tasks, triggers, conditions, loops). It also manages
+            the integrations themselves (list/create/update/delete/publish). Prefer calling it over
+            reasoning about integration-workflow shape directly. Returns the updated workflow JSON plus a
+            change rationale. This is the embedded counterpart of workflow_editor_agent (which targets
+            automation projects).""";
+
+    @Bean
+    McpServerToolCallbackContributor embeddedWorkflowEditorMcpToolCallbackContributor(
+        @Qualifier("workflowEditorEmbeddedBuildSubAgentChatClient") //
+        ObjectProvider<ChatClient> workflowEditorEmbeddedBuildSubAgentChatClientProvider) {
+
+        return () -> {
+            List<ToolCallback> toolCallbacks = new ArrayList<>();
+
+            workflowEditorEmbeddedBuildSubAgentChatClientProvider.ifAvailable(
+                chatClient -> toolCallbacks.add(
+                    new WorkflowEditorAgentToolCallback(
+                        chatClient, "workflow_editor_embedded_agent", DESCRIPTION,
+                        CopilotAgentType.WORKFLOW_EDITOR_EMBEDDED_AGENT)));
+
+            return toolCallbacks;
+        };
+    }
+}
