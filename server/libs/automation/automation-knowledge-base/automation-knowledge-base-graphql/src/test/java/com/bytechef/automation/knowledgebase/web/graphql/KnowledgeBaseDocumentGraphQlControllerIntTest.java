@@ -82,7 +82,7 @@ class KnowledgeBaseDocumentGraphQlControllerIntTest {
     }
 
     @Test
-    void testGetKnowledgeBaseDocumentChunks() {
+    void testDocumentChunksFieldLoadsWithoutContent() {
         Long documentId = 1L;
         KnowledgeBaseDocument mockDocument = createMockDocument(documentId, "Test Document");
 
@@ -91,7 +91,7 @@ class KnowledgeBaseDocumentGraphQlControllerIntTest {
             createMockChunk(2L));
 
         when(knowledgeBaseDocumentApiFacade.getKnowledgeBaseDocument(documentId)).thenReturn(mockDocument);
-        when(knowledgeBaseDocumentApiFacade.getKnowledgeBaseDocumentChunksByDocumentId(documentId))
+        when(knowledgeBaseDocumentApiFacade.getKnowledgeBaseDocumentChunksByDocumentIdWithoutContent(documentId))
             .thenReturn(mockChunks);
 
         this.graphQlTester
@@ -107,6 +107,34 @@ class KnowledgeBaseDocumentGraphQlControllerIntTest {
                 """)
             .execute()
             .path("knowledgeBaseDocument.chunks")
+            .entityList(Object.class)
+            .hasSize(2);
+
+        verify(knowledgeBaseDocumentApiFacade).getKnowledgeBaseDocumentChunksByDocumentIdWithoutContent(documentId);
+    }
+
+    @Test
+    void testGetKnowledgeBaseDocumentChunks() {
+        Long documentId = 1L;
+
+        List<KnowledgeBaseDocumentChunk> mockChunks = List.of(
+            createMockChunk(1L),
+            createMockChunk(2L));
+
+        when(knowledgeBaseDocumentApiFacade.getKnowledgeBaseDocumentChunksByDocumentId(documentId))
+            .thenReturn(mockChunks);
+
+        this.graphQlTester
+            .document("""
+                query {
+                    knowledgeBaseDocumentChunks(id: "1") {
+                        id
+                        knowledgeBaseDocumentId
+                    }
+                }
+                """)
+            .execute()
+            .path("knowledgeBaseDocumentChunks")
             .entityList(Object.class)
             .hasSize(2);
 

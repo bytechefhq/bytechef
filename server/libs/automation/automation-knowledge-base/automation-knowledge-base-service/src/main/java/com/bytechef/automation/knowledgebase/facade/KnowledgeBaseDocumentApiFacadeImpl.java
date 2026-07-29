@@ -83,6 +83,13 @@ class KnowledgeBaseDocumentApiFacadeImpl implements KnowledgeBaseDocumentApiFaca
     }
 
     @Override
+    public List<KnowledgeBaseDocumentChunk> getKnowledgeBaseDocumentChunksByDocumentIdWithoutContent(long documentId) {
+        checkDocumentRole(documentId, "VIEWER");
+
+        return knowledgeBaseDocumentChunkService.getKnowledgeBaseDocumentChunksByDocumentId(documentId);
+    }
+
+    @Override
     public void deleteKnowledgeBaseDocument(long id) {
         checkDocumentRole(id, "EDITOR");
 

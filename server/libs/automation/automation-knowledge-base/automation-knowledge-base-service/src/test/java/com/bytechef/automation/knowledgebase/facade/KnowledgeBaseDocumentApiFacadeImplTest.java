@@ -29,6 +29,7 @@ import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentChunkFaca
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentChunkService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -93,6 +94,34 @@ class KnowledgeBaseDocumentApiFacadeImplTest {
             .isInstanceOf(AccessDeniedException.class);
 
         verifyNoInteractions(permissionService);
+    }
+
+    @Test
+    void testGetKnowledgeBaseDocumentChunksByDocumentIdWithoutContentAllowsViewer() {
+        KnowledgeBaseDocumentChunk chunk = mockChunk(20L, 10L);
+
+        when(knowledgeBaseDocumentService.getKnowledgeBaseDocument(10L)).thenReturn(mockDocument(10L, 7L));
+        when(permissionService.hasResourceRole(7L, KNOWLEDGE_BASE, "VIEWER")).thenReturn(true);
+        when(knowledgeBaseDocumentChunkService.getKnowledgeBaseDocumentChunksByDocumentId(10L))
+            .thenReturn(List.of(chunk));
+
+        assertThat(knowledgeBaseDocumentApiFacade.getKnowledgeBaseDocumentChunksByDocumentIdWithoutContent(10L))
+            .containsExactly(chunk);
+
+        verifyNoInteractions(knowledgeBaseDocumentChunkFacade);
+    }
+
+    @Test
+    void testGetKnowledgeBaseDocumentChunksByDocumentIdWithoutContentDeniesNonViewer() {
+        when(knowledgeBaseDocumentService.getKnowledgeBaseDocument(10L)).thenReturn(mockDocument(10L, 7L));
+        when(permissionService.hasResourceRole(7L, KNOWLEDGE_BASE, "VIEWER")).thenReturn(false);
+
+        assertThatThrownBy(
+            () -> knowledgeBaseDocumentApiFacade.getKnowledgeBaseDocumentChunksByDocumentIdWithoutContent(10L))
+                .isInstanceOf(AccessDeniedException.class);
+
+        verifyNoInteractions(knowledgeBaseDocumentChunkService);
+        verifyNoInteractions(knowledgeBaseDocumentChunkFacade);
     }
 
     @Test

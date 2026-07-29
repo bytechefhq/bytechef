@@ -41,6 +41,8 @@ public interface KnowledgeBaseDocumentApiFacade {
 
     List<KnowledgeBaseDocumentChunk> getKnowledgeBaseDocumentChunksByDocumentId(long documentId);
 
+    List<KnowledgeBaseDocumentChunk> getKnowledgeBaseDocumentChunksByDocumentIdWithoutContent(long documentId);
+
     void deleteKnowledgeBaseDocument(long id);
 
     void updateKnowledgeBaseDocumentTags(long documentId, List<String> tagNames);
