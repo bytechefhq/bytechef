@@ -316,7 +316,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
     @Override
     public List<ConnectionDefinition> getConnectionDefinitions() {
-        return componentDefinitionRegistry.getComponentDefinitions()
+        return componentDefinitionRegistry.getStaticComponentDefinitions()
             .stream()
             .filter(componentDefinition -> componentDefinition.getConnection()
                 .isPresent())
@@ -396,7 +396,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
             componentName, componentVersion);
 
         if (componentDefinition instanceof ScriptComponentDefinition) {
-            return componentDefinitionRegistry.getComponentDefinitions()
+            return componentDefinitionRegistry.getStaticComponentDefinitions()
                 .stream()
                 .filter(curComponentDefinition -> curComponentDefinition.getConnection()
                     .isPresent())

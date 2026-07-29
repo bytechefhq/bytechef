@@ -112,6 +112,68 @@ class ListConnectionsForComponentToolCallbackTest {
     }
 
     @Test
+    void testCanonicalizesComponentNameCasingBeforeListingConnections() throws Exception {
+        // fetchComponentDefinition matches case-insensitively, so an LLM-supplied "openai" resolves the "openAi"
+        // component. Connections are stored and queried under the canonical "openAi" (case-sensitively), so the tool
+        // must adopt the definition's name — otherwise getConnections("openai", ...) returns zero rows even though
+        // the workspace has OpenAI connections.
+        ComponentDefinitionService componentDefinitionService = mock(ComponentDefinitionService.class);
+        ConnectionDefinitionService connectionDefinitionService = mock(ConnectionDefinitionService.class);
+        WorkspaceConnectionFacade workspaceConnectionFacade = mock(WorkspaceConnectionFacade.class);
+        UserService userService = mock(UserService.class);
+
+        ComponentDefinition openAi = mock(ComponentDefinition.class);
+
+        when(openAi.getName()).thenReturn("openAi");
+        when(componentDefinitionService.fetchComponentDefinition("openai", null)).thenReturn(Optional.of(openAi));
+        when(connectionDefinitionService.getConnectionDefinition("openAi", 1)).thenReturn(buildConnectionDefinition(1));
+
+        User user = mock(User.class);
+
+        when(user.getLogin()).thenReturn("user@localhost.com");
+        when(user.getAuthorityIds()).thenReturn(List.of());
+        when(userService.fetchUser(10L)).thenReturn(Optional.of(user));
+
+        ConnectionDTO connectionDTO = ConnectionDTO.builder()
+            .id(1051L)
+            .name("OpenAI")
+            .componentName("openAi")
+            .connectionVersion(1)
+            .environmentId(0)
+            .active(true)
+            .build();
+
+        when(workspaceConnectionFacade.getConnections(eq(1L), eq("openAi"), eq(1), eq(0L), eq(null)))
+            .thenReturn(List.of(connectionDTO));
+
+        PropertyOptionsResolver resolver =
+            new PropertyOptionsResolver(new SecurityContextRehydrator(userService, mock(AuthorityService.class)));
+
+        ListConnectionsForComponentToolCallback callback = new ListConnectionsForComponentToolCallback(
+            componentDefinitionService, connectionDefinitionService, mock(ToolStateVisibilityMetrics.class),
+            List.of(new WorkspaceCopilotConnectionLister(workspaceConnectionFacade, resolver)));
+
+        ToolContext toolContext = new ToolContext(
+            new AgentToolInvocationContext(1L, 10L, 0L, "thread-1", null).toToolContext());
+
+        String result = callback.call("{\"componentName\":\"openai\"}", toolContext);
+
+        JsonNode node = jsonMapper.readTree(result);
+
+        assertThat(node.has("error")).isFalse();
+        assertThat(node.get("componentName")
+            .asText()).isEqualTo("openAi");
+        assertThat(node.get("resolvedFromComponentName")
+            .asText()).isEqualTo("openai");
+        assertThat(node.get("connections")
+            .size()).isEqualTo(1);
+        assertThat(node.get("connections")
+            .get(0)
+            .get("id")
+            .asLong()).isEqualTo(1051L);
+    }
+
+    @Test
     void testReturnsEmptyEnvelopeWhenComponentExistsButHasNoConnectionDefinition() throws Exception {
         ComponentDefinitionService componentDefinitionService = mock(ComponentDefinitionService.class);
         ConnectionDefinitionService connectionDefinitionService = mock(ConnectionDefinitionService.class);

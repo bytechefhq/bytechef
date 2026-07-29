@@ -12,14 +12,20 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.ai.hub.util.AiHubStateKeys;
+import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.connection.service.ConnectionService;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.client.ChatClientRequest;
 import org.springframework.ai.chat.memory.ChatMemory;
@@ -45,62 +51,43 @@ class PinnedToolSearchToolCallingAdvisorTest {
     private final ToolCallingManager toolCallingManager = mock(ToolCallingManager.class);
 
     @Test
-    void testPinnedToolSurvivesSearchNarrowingOnCallPath() {
+    void testStaticToolsSurviveSearchNarrowingOnCallPath() {
         when(toolCallingManager.resolveToolDefinitions(any())).thenReturn(List.of());
 
-        ToolCallback pinned = toolCallback("workflow_editor_agent");
-        ToolCallback searchable = toolCallback("some_other_tool");
+        ToolCallback specialist = toolCallback("workflow_editor_agent");
+        ToolCallback resourceTool = toolCallback("listDataTables");
 
-        PinnedToolSearchToolCallingAdvisor advisor = newAdvisor(Set.of("workflow_editor_agent"));
+        PinnedToolSearchToolCallingAdvisor advisor = newAdvisor();
 
-        ChatClientRequest request = newRequest(pinned, searchable);
+        ChatClientRequest request = newRequest(specialist, resourceTool);
 
         // Drive the loop the way ToolCallingAdvisor does: initialize once (the full static tool list is on the
         // options here), then prepare the first iteration (the base class narrows the list to {searchTool}).
         ChatClientRequest afterInitialize = advisor.doInitializeLoop(request, null);
         ChatClientRequest afterBeforeCall = advisor.doBeforeCall(afterInitialize, null);
 
-        // The pinned specialist must reappear even though the base advisor dropped every static tool; the
-        // non-pinned tool must stay dropped (it is reachable only via a searchTool hit). Pre-fix, the pinned tool
-        // was also gone, so the model's direct call would fail with "No ToolCallback found".
-        assertThat(toolNames(afterBeforeCall)).contains("workflow_editor_agent")
-            .doesNotContain("some_other_tool");
+        // EVERY static tool on the agent's options list must reappear even though the base advisor dropped them all:
+        // each is resolvable only while on the options list and the prompt calls each directly by name. Pre-fix only a
+        // hand-listed subset was re-pinned, so a static tool the prompt named but the subset omitted (e.g.
+        // listDataTables) failed with "No ToolCallback found" on the model's direct call.
+        assertThat(toolNames(afterBeforeCall)).contains("workflow_editor_agent", "listDataTables");
     }
 
     @Test
-    void testPinnedToolSurvivesSearchNarrowingOnStreamPath() {
+    void testStaticToolsSurviveSearchNarrowingOnStreamPath() {
         when(toolCallingManager.resolveToolDefinitions(any())).thenReturn(List.of());
 
-        ToolCallback pinned = toolCallback("workflow_editor_agent");
-        ToolCallback searchable = toolCallback("some_other_tool");
+        ToolCallback specialist = toolCallback("workflow_editor_agent");
+        ToolCallback resourceTool = toolCallback("listDataTables");
 
-        PinnedToolSearchToolCallingAdvisor advisor = newAdvisor(Set.of("workflow_editor_agent"));
+        PinnedToolSearchToolCallingAdvisor advisor = newAdvisor();
 
-        ChatClientRequest request = newRequest(pinned, searchable);
+        ChatClientRequest request = newRequest(specialist, resourceTool);
 
         ChatClientRequest afterInitialize = advisor.doInitializeLoopStream(request, null);
         ChatClientRequest afterBeforeStream = advisor.doBeforeStream(afterInitialize, null);
 
-        assertThat(toolNames(afterBeforeStream)).contains("workflow_editor_agent")
-            .doesNotContain("some_other_tool");
-    }
-
-    @Test
-    void testNoPinnedToolPresentLeavesIterationUnchanged() {
-        when(toolCallingManager.resolveToolDefinitions(any())).thenReturn(List.of());
-
-        ToolCallback searchable = toolCallback("some_other_tool");
-
-        // None of the pinned names are registered for this run (e.g. the specialist's ChatClient bean is disabled),
-        // so pinning is a no-op and the search-only narrowing stands.
-        PinnedToolSearchToolCallingAdvisor advisor = newAdvisor(Set.of("workflow_editor_agent"));
-
-        ChatClientRequest request = newRequest(searchable);
-
-        ChatClientRequest afterInitialize = advisor.doInitializeLoop(request, null);
-        ChatClientRequest afterBeforeCall = advisor.doBeforeCall(afterInitialize, null);
-
-        assertThat(toolNames(afterBeforeCall)).doesNotContain("some_other_tool", "workflow_editor_agent");
+        assertThat(toolNames(afterBeforeStream)).contains("workflow_editor_agent", "listDataTables");
     }
 
     @Test
@@ -113,7 +100,7 @@ class PinnedToolSearchToolCallingAdvisorTest {
         // Catalog tool: registered with the tool-search resolver only, deliberately NOT on the agent options list.
         ToolCallback catalogTool = toolCallback("searchProjects");
 
-        PinnedToolSearchToolCallingAdvisor advisor = newAdvisor(Set.of(), List.of(catalogTool));
+        PinnedToolSearchToolCallingAdvisor advisor = newAdvisor(List.of(catalogTool));
 
         // A prior searchTool result that surfaced "searchProjects" — still present in the message window.
         ToolResponseMessage searchHit = ToolResponseMessage.builder()
@@ -154,7 +141,7 @@ class PinnedToolSearchToolCallingAdvisorTest {
         }).when(toolIndex)
             .indexTools(anyString(), any());
 
-        PinnedToolSearchToolCallingAdvisor advisor = newAdvisor(Set.of());
+        PinnedToolSearchToolCallingAdvisor advisor = newAdvisor();
 
         ChatClientRequest request = newRequestWithEnvironment(
             Environment.DEVELOPMENT.ordinal(), toolCallback("some_tool"));
@@ -181,7 +168,7 @@ class PinnedToolSearchToolCallingAdvisorTest {
         }).when(toolIndex)
             .indexTools(anyString(), any());
 
-        PinnedToolSearchToolCallingAdvisor advisor = newAdvisor(Set.of());
+        PinnedToolSearchToolCallingAdvisor advisor = newAdvisor();
 
         // No environmentId in the request context: the advisor must not fabricate a binding (the outer agent context
         // propagation still governs), so indexing runs under the unbound ThreadLocal.
@@ -193,15 +180,87 @@ class PinnedToolSearchToolCallingAdvisorTest {
         assertThat(EnvironmentContext.fetchCurrentEnvironment()).isNull();
     }
 
-    private PinnedToolSearchToolCallingAdvisor newAdvisor(Set<String> pinnedToolNames) {
-        return newAdvisor(pinnedToolNames, List.of());
+    @Test
+    void testCatalogSupplierIsNotResolvedUntilFirstLoopInitialization() {
+        when(toolCallingManager.resolveToolDefinitions(any())).thenReturn(List.of());
+
+        AtomicInteger catalogResolutions = new AtomicInteger();
+
+        // Mirrors the memoised supplier the config hands the advisor; the count records how many times the catalog
+        // (which forces the full component definition load) was materialised.
+        PinnedToolSearchToolCallingAdvisor advisor = new PinnedToolSearchToolCallingAdvisor(
+            toolCallingManager, toolIndex, 5, ChatMemory.CONVERSATION_ID,
+            () -> {
+                catalogResolutions.incrementAndGet();
+
+                return Map.of("searchProjects", toolCallback("searchProjects"));
+            },
+            () -> {});
+
+        // Construction must not touch the catalog — that is the whole point of the deferral, so boot stays lazy.
+        assertThat(catalogResolutions).hasValue(0);
+
+        advisor.doInitializeLoop(newRequest(toolCallback("askUserQuestion")), null);
+
+        // The first chat turn's loop initialization resolves it exactly once.
+        assertThat(catalogResolutions).hasValue(1);
     }
 
-    private PinnedToolSearchToolCallingAdvisor newAdvisor(
-        Set<String> pinnedToolNames, List<ToolCallback> catalogToolCallbacks) {
+    @Test
+    void testCatalogWarmUpRunsOnFirstLoopInitialization() {
+        when(toolCallingManager.resolveToolDefinitions(any())).thenReturn(List.of());
+
+        AtomicInteger warmUps = new AtomicInteger();
+
+        PinnedToolSearchToolCallingAdvisor advisor = new PinnedToolSearchToolCallingAdvisor(
+            toolCallingManager, toolIndex, 5, ChatMemory.CONVERSATION_ID, Map::of,
+            warmUps::incrementAndGet);
+
+        // The pgvector index warm-up must not run at construction (that would force the catalog load at startup)...
+        assertThat(warmUps).hasValue(0);
+
+        advisor.doInitializeLoop(newRequest(toolCallback("askUserQuestion")), null);
+
+        // ...but must run when the first chat turn initializes the loop, before the turn's first searchTool query.
+        assertThat(warmUps).hasValue(1);
+    }
+
+    @Test
+    void testSeedingCatalogDoesNotForceLazyToolSchemas() {
+        when(toolCallingManager.resolveToolDefinitions(any())).thenReturn(List.of());
+
+        ClusterElementDefinitionService clusterElementDefinitionService =
+            mock(ClusterElementDefinitionService.class);
+        ConnectionService connectionService = mock(ConnectionService.class);
+
+        ClusterElementToolCallback lazyCallback = new ClusterElementToolCallback(
+            "slack_sendMessage", "Send a Slack message", "slack", 1, "sendMessage",
+            clusterElementDefinitionService, connectionService);
+
+        PinnedToolSearchToolCallingAdvisor advisor = new PinnedToolSearchToolCallingAdvisor(
+            toolCallingManager, toolIndex, 5, ChatMemory.CONVERSATION_ID,
+            () -> Map.of("slack_sendMessage", lazyCallback), () -> {});
+
+        advisor.doInitializeLoop(newRequest(toolCallback("askUserQuestion")), null);
+
+        // Seeding the catalog into the base advisor's cache must key off the map, never resolve the lazy callback's
+        // component — verify the schema source (the definition service) was never touched.
+        verifyNoInteractions(clusterElementDefinitionService);
+    }
+
+    private PinnedToolSearchToolCallingAdvisor newAdvisor() {
+        return newAdvisor(List.of());
+    }
+
+    private PinnedToolSearchToolCallingAdvisor newAdvisor(List<ToolCallback> catalogToolCallbacks) {
+        Map<String, ToolCallback> catalogToolCallbacksByName = catalogToolCallbacks.stream()
+            .collect(Collectors.toMap(
+                toolCallback -> toolCallback.getToolDefinition()
+                    .name(),
+                toolCallback -> toolCallback, (first, second) -> first, LinkedHashMap::new));
 
         return new PinnedToolSearchToolCallingAdvisor(
-            toolCallingManager, toolIndex, 5, ChatMemory.CONVERSATION_ID, pinnedToolNames, catalogToolCallbacks);
+            toolCallingManager, toolIndex, 5, ChatMemory.CONVERSATION_ID, () -> catalogToolCallbacksByName, () -> {});
     }
 
     private static ChatClientRequest newRequest(ToolCallback... toolCallbacks) {

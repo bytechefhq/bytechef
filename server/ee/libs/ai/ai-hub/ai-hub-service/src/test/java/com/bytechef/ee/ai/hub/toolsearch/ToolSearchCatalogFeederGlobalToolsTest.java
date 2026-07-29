@@ -26,6 +26,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
+import org.springframework.ai.tool.toolsearch.ToolReference;
 import org.springframework.ai.tool.toolsearch.index.vectorstore.VectorToolIndex;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -95,8 +96,18 @@ class ToolSearchCatalogFeederGlobalToolsTest {
             "ai_hub_tool_catalog:global:build",
             List.of(toolCallback("listProjects", "List all projects"), toolCallback("blank", "  ")));
 
+        // Blank-summary tools are filtered out, and the survivors are embedded in a single batched indexTools call
+        // rather than one indexTool round-trip each.
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<List<ToolReference>> referencesCaptor = ArgumentCaptor.forClass(List.class);
+
         verify(vectorToolIndex).clearIndex("ai_hub_tool_catalog:global:build");
-        verify(vectorToolIndex, times(1)).indexTool(eq("ai_hub_tool_catalog:global:build"), any());
+        verify(vectorToolIndex, times(1)).indexTools(
+            eq("ai_hub_tool_catalog:global:build"), referencesCaptor.capture());
+
+        assertThat(referencesCaptor.getValue())
+            .extracting(ToolReference::toolName)
+            .containsExactly("listProjects");
     }
 
     @Test
@@ -122,7 +133,7 @@ class ToolSearchCatalogFeederGlobalToolsTest {
         feeder.populateGlobalTools(
             "ai_hub_tool_catalog:global:ask", List.of(toolCallback("listProjects", "List all projects")));
 
-        verify(vectorToolIndex, never()).indexTool(any(), any());
+        verify(vectorToolIndex, never()).indexTools(any(), any());
     }
 
     @Test

@@ -57,7 +57,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
  *
  * <p>
  * <b>Re-index semantics:</b> each populate call clears its target session's in-memory document-id map first via
- * {@link VectorToolIndex#clearIndex(String)}, then re-issues an {@code indexTool} call per entry. Two implications:
+ * {@link VectorToolIndex#clearIndex(String)}, then re-indexes the whole entry list in one batched {@code indexTools}
+ * call. Two implications:
  * </p>
  * <ul>
  * <li>After a JVM restart the in-memory id counter resets to {@code 0} but stale rows from the previous JVM still exist
@@ -111,11 +112,12 @@ public class ToolSearchCatalogFeeder {
     private static final String TASK_SESSION_PREFIX = CATALOG_SESSION_ID + ":task:";
 
     /**
-     * Per-session bookkeeping for the catalog-hash skip. Lives in the same pgvector schema/datasource as the
-     * vector-store tables (we already inject {@code pgVectorJdbcTemplate}, and co-locating keeps "all tool-search state
-     * in one schema" easy to reason about). Created on first {@link #populate()} via {@code CREATE TABLE IF NOT EXISTS}
-     * so deployments don't need a separate Liquibase migration plumbed into the pgvector datasource — same pattern
-     * Spring AI's {@code PgVectorStore} uses for its own table.
+     * Per-session bookkeeping for the catalog-hash skip. Explicitly schema-qualified to the same fixed schema the
+     * tool-search {@code PgVectorStore} writes to (see the constructor's {@code qualifiedMetaTableName}), so it stays
+     * co-located with the vector rows and, like them, lives in one shared schema for all tenants rather than following
+     * the connection's per-tenant search_path. Created on first {@link #populate()} via {@code CREATE TABLE IF NOT
+     * EXISTS} so deployments don't need a separate Liquibase migration plumbed into the pgvector datasource — same
+     * pattern Spring AI's {@code PgVectorStore} uses for its own table.
      */
     static final String META_TABLE_NAME = "ai_hub_tool_search_catalog_meta";
 
@@ -124,17 +126,25 @@ public class ToolSearchCatalogFeeder {
     private final ClusterElementDefinitionService clusterElementDefinitionService;
     private final VectorToolIndex vectorToolIndex;
     private final JdbcTemplate pgVectorJdbcTemplate;
+    private final String qualifiedMetaTableName;
 
     private volatile boolean metaTableEnsured;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public ToolSearchCatalogFeeder(
         ClusterElementDefinitionService clusterElementDefinitionService, VectorToolIndex vectorToolIndex,
-        JdbcTemplate pgVectorJdbcTemplate) {
+        JdbcTemplate pgVectorJdbcTemplate, String schemaName) {
 
         this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.vectorToolIndex = vectorToolIndex;
         this.pgVectorJdbcTemplate = pgVectorJdbcTemplate;
+
+        // Schema-qualify the bookkeeping table to the SAME fixed schema the tool-search PgVectorStore writes its vector
+        // rows to (default "public"). PgVectorStore always emits schema.table SQL, so its rows are tenant-independent;
+        // this table is referenced by bare name, which would otherwise resolve through the connection's per-tenant
+        // search_path and scatter the hash bookkeeping into per-tenant schemas. Qualifying it makes the whole catalog
+        // live in one shared schema for all tenants, by construction — independent of the caller's tenant binding.
+        this.qualifiedMetaTableName = schemaName + "." + META_TABLE_NAME;
     }
 
     /**
@@ -147,16 +157,18 @@ public class ToolSearchCatalogFeeder {
     }
 
     /**
-     * Re-populates the workspace-wide tool catalog. Skips the embedding-and-write loop entirely when the catalog's
-     * content hash matches the hash recorded by the previous successful populate — saving 90 seconds and several
-     * hundred embedding API calls on every cold start where the catalog is unchanged. Idempotent: every call either
-     * short-circuits on hash match, or clears the session's in-memory tool-id tracking and re-issues an
-     * {@code indexTool} per cluster element marked tool-eligible by its component author.
+     * Re-populates the global tool catalog — the platform-wide set of tool-eligible cluster elements, shared across all
+     * tenants under the single {@link #CATALOG_SESSION_ID} partition (not per-workspace or per-tenant). Skips the
+     * embedding-and-write loop entirely when the catalog's content hash matches the hash recorded by the previous
+     * successful populate — saving 90 seconds and several hundred embedding API calls on every cold start where the
+     * catalog is unchanged. Idempotent: every call either short-circuits on hash match, or clears the session's
+     * in-memory tool-id tracking and re-indexes every tool-eligible cluster element in one batched {@code indexTools}
+     * call.
      */
     @SuppressFBWarnings("UNSAFE_HASH_EQUALS")
     public void populate() {
         List<ClusterElementDefinition> toolDefinitions =
-            clusterElementDefinitionService.getClusterElementDefinitions(BaseToolFunction.TOOLS);
+            clusterElementDefinitionService.getClusterElementDefinitionStubs(BaseToolFunction.TOOLS);
 
         // Compute the canonical hash from (toolName, summary) pairs sorted by toolName. Skipping entries with no
         // summary mirrors the indexCatalog loop — they never make it into pgvector, so they must not influence the
@@ -367,26 +379,30 @@ public class ToolSearchCatalogFeeder {
     }
 
     /**
-     * Shared clear-then-index routine. Clears the target persistent session (restart-safe, by metadata) then issues one
-     * {@code indexTool} per entry. Used by the workspace catalog, per-task subset, and global tool paths.
+     * Shared clear-then-index routine. Clears the target persistent session (restart-safe, by metadata) then issues a
+     * single batched {@link VectorToolIndex#indexTools(String, List)} for the whole entry list. Batching matters: the
+     * underlying {@code VectorStore.add} runs its {@code BatchingStrategy} over the full document list and embeds each
+     * batch in one request, so a several-hundred-entry catalog collapses from one embedding HTTP round-trip per tool to
+     * a handful — cutting first-boot latency and embedding-endpoint request-rate pressure. Used by the workspace
+     * catalog, per-task subset, and global tool paths.
      */
     private int indexEntries(String sessionId, List<CatalogEntry> entries) {
         vectorToolIndex.clearIndex(sessionId);
 
-        int indexed = 0;
-
-        for (CatalogEntry entry : entries) {
-            ToolReference reference = ToolReference.builder()
-                .toolName(entry.toolName())
-                .summary(entry.summary())
-                .build();
-
-            vectorToolIndex.indexTool(sessionId, reference);
-
-            indexed++;
+        if (entries.isEmpty()) {
+            return 0;
         }
 
-        return indexed;
+        List<ToolReference> references = entries.stream()
+            .map(entry -> ToolReference.builder()
+                .toolName(entry.toolName())
+                .summary(entry.summary())
+                .build())
+            .toList();
+
+        vectorToolIndex.indexTools(sessionId, references);
+
+        return references.size();
     }
 
     /**
@@ -453,13 +469,16 @@ public class ToolSearchCatalogFeeder {
         }
     }
 
+    // qualifiedMetaTableName is derived from the trusted pgvector schema config, never user input, but the field
+    // concatenation trips the Spring-JDBC injection detector the way a constant did not.
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     private void ensureMetaTable() {
         if (metaTableEnsured) {
             return;
         }
 
         pgVectorJdbcTemplate.execute(
-            "CREATE TABLE IF NOT EXISTS " + META_TABLE_NAME + " ("
+            "CREATE TABLE IF NOT EXISTS " + qualifiedMetaTableName + " ("
                 + "session_id TEXT PRIMARY KEY,"
                 + "catalog_hash TEXT NOT NULL,"
                 + "tool_count INTEGER NOT NULL,"
@@ -468,10 +487,11 @@ public class ToolSearchCatalogFeeder {
         metaTableEnsured = true;
     }
 
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     private Optional<String> readStoredHash(String sessionId) {
         try {
             String hash = pgVectorJdbcTemplate.queryForObject(
-                "SELECT catalog_hash FROM " + META_TABLE_NAME + " WHERE session_id = ?",
+                "SELECT catalog_hash FROM " + qualifiedMetaTableName + " WHERE session_id = ?",
                 String.class, sessionId);
 
             return Optional.ofNullable(hash);
@@ -480,9 +500,10 @@ public class ToolSearchCatalogFeeder {
         }
     }
 
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     private void writeStoredHash(String sessionId, String hash, int toolCount) {
         pgVectorJdbcTemplate.update(
-            "INSERT INTO " + META_TABLE_NAME + " (session_id, catalog_hash, tool_count, last_indexed_at)"
+            "INSERT INTO " + qualifiedMetaTableName + " (session_id, catalog_hash, tool_count, last_indexed_at)"
                 + " VALUES (?, ?, ?, NOW())"
                 + " ON CONFLICT (session_id) DO UPDATE"
                 + " SET catalog_hash = EXCLUDED.catalog_hash,"

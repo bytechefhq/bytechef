@@ -123,7 +123,7 @@ public class AiHubTaskToolGraphQlController {
         // Page" or "Append Row" as if they were components. We resolve the parent definition lazily and
         // cache it per (name, version) to keep the catalog walk to one lookup per unique component.
         List<ClusterElementDefinition> toolDefinitions =
-            clusterElementDefinitionService.getClusterElementDefinitions(BaseToolFunction.TOOLS);
+            clusterElementDefinitionService.getClusterElementDefinitionStubs(BaseToolFunction.TOOLS);
 
         Map<String, ToolableComponent> byComponent = new HashMap<>();
         Map<String, ComponentDefinition> componentCache = new HashMap<>();
@@ -405,7 +405,7 @@ public class AiHubTaskToolGraphQlController {
         Map<String, List<ToolableClusterElement>> toolsByComponent = new HashMap<>();
 
         for (ClusterElementDefinition definition : clusterElementDefinitionService
-            .getClusterElementDefinitions(BaseToolFunction.TOOLS)) {
+            .getClusterElementDefinitionStubs(BaseToolFunction.TOOLS)) {
 
             String key = definition.getComponentName() + "#" + definition.getComponentVersion();
 

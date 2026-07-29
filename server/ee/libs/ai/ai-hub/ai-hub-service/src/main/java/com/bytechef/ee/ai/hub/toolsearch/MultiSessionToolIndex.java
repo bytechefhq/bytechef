@@ -84,6 +84,19 @@ public class MultiSessionToolIndex implements ToolIndex {
         delegate.indexTool(sessionId, toolReference);
     }
 
+    /**
+     * Delegates the whole batch to the wrapped index instead of inheriting the {@link ToolIndex} default, which loops
+     * {@link #indexTool} one reference at a time. The default turned the advisor's per-session loop-initialization
+     * indexing (the agent's full static tool list under a fresh conversation id) into one single-document
+     * {@code vectorStore.add} — and therefore one embedding HTTP request — per tool on the first turn of every new
+     * conversation. {@code VectorToolIndex.indexTools} builds all documents and issues one {@code vectorStore.add}, so
+     * the store's {@code BatchingStrategy} collapses the batch into a handful of embedding requests.
+     */
+    @Override
+    public void indexTools(String sessionId, List<ToolReference> toolReferences) {
+        delegate.indexTools(sessionId, toolReferences);
+    }
+
     @Override
     public void clearIndex(String sessionId) {
         delegate.clearIndex(sessionId);

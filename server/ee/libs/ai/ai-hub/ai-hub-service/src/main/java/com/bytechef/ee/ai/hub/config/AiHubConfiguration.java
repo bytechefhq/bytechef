@@ -76,6 +76,7 @@ import com.bytechef.ee.ai.hub.tool.CreateApiCollectionToolCallback;
 import com.bytechef.ee.ai.hub.tool.CreateAssetFileToolCallback;
 import com.bytechef.ee.ai.hub.tool.CreateContextStoreSourceToolCallback;
 import com.bytechef.ee.ai.hub.tool.CreateDataTableFromCsvToolCallback;
+import com.bytechef.ee.ai.hub.tool.CreateDataTableToolCallback;
 import com.bytechef.ee.ai.hub.tool.CreateMcpProjectToolCallback;
 import com.bytechef.ee.ai.hub.tool.CreateProjectDeploymentToolCallback;
 import com.bytechef.ee.ai.hub.tool.CreateWorkflowChatToolCallback;
@@ -356,8 +357,9 @@ public class AiHubConfiguration {
         toolSearchToolCallAdvisorProvider.ifAvailable(builder::advisor);
 
         // ASK mode gets the same DB-backed auto-memory as BUILD so it can recall (and record) memories while
-        // answering. The memory tool names are pinned in ALWAYS_ON_TOOL_NAMES so the tool-search narrowing doesn't
-        // strip them.
+        // answering. The memory tools are added to the agent's static tool list, which
+        // PinnedToolSearchToolCallingAdvisor
+        // pins in full, so the tool-search narrowing doesn't strip them.
         builder.advisor(
             AutoMemoryToolsAdvisor.builder()
                 .autoMemoryTools(
@@ -714,9 +716,9 @@ public class AiHubConfiguration {
     }
 
     /**
-     * Registers the data table write-mutation callbacks (add row, update row, delete row, add column, create from CSV,
-     * clone) on the supplied tool list. Extracted to keep the BUILD-agent bean method within Checkstyle's per-method
-     * line limit; logically a single block of related callbacks.
+     * Registers the data table write-mutation callbacks (add row, update row, delete row, add column, create empty,
+     * create from CSV, clone) on the supplied tool list. Extracted to keep the BUILD-agent bean method within
+     * Checkstyle's per-method line limit; logically a single block of related callbacks.
      */
     private static void registerDataTableMutationToolCallbacks(
         List<ToolCallback> toolCallbacks, DataTableRowService dataTableRowService,
@@ -731,6 +733,7 @@ public class AiHubConfiguration {
             new DeleteDataTableRowToolCallback(dataTableRowService, workspaceDataTableFacade, taskArtifactService));
         toolCallbacks.add(new AddDataTableColumnToolCallback(
             dataTableService, workspaceDataTableFacade, taskArtifactService));
+        toolCallbacks.add(new CreateDataTableToolCallback(workspaceDataTableFacade));
         toolCallbacks.add(
             new CreateDataTableFromCsvToolCallback(dataTableRowService, workspaceDataTableFacade));
         toolCallbacks.add(new CloneDataTableToolCallback(dataTableService, workspaceDataTableFacade));

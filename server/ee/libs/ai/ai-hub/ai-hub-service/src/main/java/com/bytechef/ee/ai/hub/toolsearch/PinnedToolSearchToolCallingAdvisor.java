@@ -36,27 +36,35 @@ import org.springframework.core.io.DefaultResourceLoader;
 import reactor.core.publisher.Flux;
 
 /**
- * A {@link ToolSearchToolCallingAdvisor} that keeps a fixed set of tools always callable, bypassing the search gate.
+ * A {@link ToolSearchToolCallingAdvisor} that keeps the agent's entire static tool list always callable, bypassing the
+ * search gate.
  *
  * <p>
  * The stock advisor replaces the model's per-iteration tool list with {@code {searchTool} ∪ {tools named in prior
  * searchTool responses present in the current message window}} — every other registered tool is invisible until a
  * {@code searchTool} call surfaces it. That is correct for the large searchable catalog (1000+ cluster-element / global
- * tools) but wrong for the handful of tools the system prompt instructs the model to call <b>directly by name</b>: the
- * specialist sub-agents ({@code workflow_editor_agent} et al.) and core interaction tools ({@code askUserQuestion},
- * {@code openWorkflowTab}). On a follow-up turn the model calls such a tool directly — it "knows" the name from the
- * prompt and prior conversation — but the prior {@code searchTool} response that once surfaced it is no longer in the
- * window (chat memory does not persist the intermediate search exchange), so the underlying tool-calling manager throws
+ * copilot tools), which is registered with the search-loop's {@code MapToolCallbackResolver} and NOT placed on the
+ * agent's options list. It is wrong for the AI Hub's own static tools — the specialist sub-agents
+ * ({@code workflow_editor_agent} et al.), core interaction tools ({@code askUserQuestion}, {@code openWorkflowTab}),
+ * the interactive pickers, the auto-memory tools, and every workspace-resource read/mutation tool
+ * ({@code listDataTables}, {@code queryKnowledgeBase}, {@code createAssetFile}, deployment / context-store /
+ * API-collection tools, …). Those are the tools placed directly on the agent's options list, are resolvable at
+ * execution time ONLY while on that list, and the system prompt instructs the model to call each of them directly by
+ * name. On a follow-up turn the model does so — it "knows" the name from the prompt and prior conversation — but the
+ * prior {@code searchTool} response that once surfaced it is no longer in the window (chat memory does not persist the
+ * intermediate search exchange), so the underlying tool-calling manager throws
  * {@code No ToolCallback found for tool name: ...}.
  * </p>
  *
  * <p>
  * This subclass closes that gap. {@code prepareIteration} (the method that performs the replacement) is {@code private}
- * in the base class, so the always-on union is applied around the {@code protected} hooks instead: the pinned callbacks
- * are captured once at loop initialization — while the full, already context-rehydration-wrapped static tool list is
- * still on the options — and re-injected before every model call after the base class has narrowed the list. Capture
- * and re-inject thread the pinned callbacks through the request context, mirroring how the base class threads its own
- * cached-callbacks map.
+ * in the base class, so the always-on union is applied around the {@code protected} hooks instead: the full static tool
+ * list is captured once at loop initialization — while it is still on the options, already context-rehydration-wrapped
+ * — and re-injected before every model call after the base class has narrowed the list. Because the searchable catalog
+ * is never on the options list, capturing the whole list pins exactly the direct-call set and nothing searchable; that
+ * is the invariant a hand-maintained pinned-name subset kept violating (any omitted static tool was silently
+ * uncallable). Capture and re-inject thread the callbacks through the request context, mirroring how the base class
+ * threads its own cached-callbacks map.
  * </p>
  *
  * @version ee
@@ -77,8 +85,8 @@ public final class PinnedToolSearchToolCallingAdvisor extends ToolSearchToolCall
     private static final String BASE_CACHED_TOOL_CALLBACKS_KEY =
         ToolSearchToolCallingAdvisor.class.getName() + ".cachedToolCallbacks";
 
-    private final Set<String> pinnedToolNames;
-    private final List<ToolCallback> catalogToolCallbacks;
+    private final Supplier<Map<String, ToolCallback>> catalogToolCallbacksSupplier;
+    private final Runnable catalogWarmUp;
 
     /**
      * Constructs the advisor with the search-loop collaborators {@code buildModeAdvisor} already owns. The remaining
@@ -89,25 +97,44 @@ public final class PinnedToolSearchToolCallingAdvisor extends ToolSearchToolCall
      * memory advisor INSIDE the tool loop (order greater than this advisor's), which persists and rehydrates the full
      * tool request/response transcript on every iteration — keeping the advisor's own history enabled on top of that
      * would inject the same intra-turn messages twice (see {@code buildModeAdvisor}).
+     *
+     * <p>
+     * The searchable catalog is supplied as a memoised {@link Supplier} of a name-keyed {@link Map}, not a materialised
+     * list, so the advisor can be constructed at Spring startup without forcing the full component definition catalog
+     * to load, and so seeding never needs to call {@link ToolCallback#getToolDefinition()} to learn a callback's name.
+     * The supplier is resolved lazily on the first {@code seedCatalogToolCallbacks} (i.e. the first chat turn); see
+     * {@code
+     * buildModeAdvisor} and {@link LazyToolCallingManager} for the matching lazy delegate the base manager wraps.
+     * </p>
+     *
+     * <p>
+     * {@code catalogWarmUp} is the one-shot {@link ToolSearchCatalogWarmup} — invoked on the first loop initialization
+     * (the first chat turn) to populate the pgvector search index synchronously before the turn's first {@code
+     * searchTool} query, replacing the former {@code ApplicationReadyEvent} population so startup stays lazy.
+     * </p>
      */
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public PinnedToolSearchToolCallingAdvisor(
         ToolCallingManager toolCallingManager, ToolIndex toolIndex, int maxResults, String sessionIdKeyName,
-        Set<String> pinnedToolNames, List<ToolCallback> catalogToolCallbacks) {
+        Supplier<Map<String, ToolCallback>> catalogToolCallbacksSupplier, Runnable catalogWarmUp) {
 
         super(
             toolCallingManager, DEFAULT_ORDER, DEFAULT_TOOL_EXECUTION_ELIGIBILITY_CHECKER, toolIndex,
             loadDefaultSystemMessageSuffix(), true, maxResults, false, sessionIdKeyName,
             new LruEvictionStrategy(1000));
 
-        this.pinnedToolNames = Set.copyOf(pinnedToolNames);
-        this.catalogToolCallbacks = List.copyOf(catalogToolCallbacks);
+        this.catalogToolCallbacksSupplier = catalogToolCallbacksSupplier;
+        this.catalogWarmUp = catalogWarmUp;
     }
 
     @Override
     protected ChatClientRequest doInitializeLoop(
         ChatClientRequest chatClientRequest,
         CallAdvisorChain callAdvisorChain) {
+
+        // First chat turn: populate the pgvector search index (once, synchronously) before the base class runs so the
+        // catalog is queryable for this turn's searchTool. No-op after the first successful warm-up.
+        catalogWarmUp.run();
 
         ChatClientRequest initialized = super.doInitializeLoop(chatClientRequest, callAdvisorChain);
 
@@ -120,6 +147,10 @@ public final class PinnedToolSearchToolCallingAdvisor extends ToolSearchToolCall
     protected ChatClientRequest doInitializeLoopStream(
         ChatClientRequest chatClientRequest,
         StreamAdvisorChain streamAdvisorChain) {
+
+        // First chat turn: populate the pgvector search index (once, synchronously) before the base class runs. Bound
+        // to the default tenant internally, independent of this request's environment/tenant. No-op after warm-up.
+        catalogWarmUp.run();
 
         // Session indexing (toolIndex.indexTools -> EmbeddingModel.embed) runs synchronously here on a
         // Schedulers.boundedElastic() worker where the ThreadLocal-bound EnvironmentContext is unset (the agent binds
@@ -230,8 +261,17 @@ public final class PinnedToolSearchToolCallingAdvisor extends ToolSearchToolCall
      * never overwriting an options-listed callback of the same name) reaches the same map {@code prepareIteration}
      * reads.
      * </p>
+     *
+     * <p>
+     * {@code catalogToolCallbacksSupplier} hands back the tool name pre-keyed (see {@code buildModeAdvisor}), so this
+     * merge never calls {@link ToolCallback#getToolDefinition()} — which, for a lazy
+     * {@link ClusterElementToolCallback}, would force its input schema (and component) to load on every seeding pass. A
+     * schema materializes only when the model actually invokes the tool.
+     * </p>
      */
     private void seedCatalogToolCallbacks(ChatClientRequest chatClientRequest) {
+        Map<String, ToolCallback> catalogToolCallbacks = catalogToolCallbacksSupplier.get();
+
         if (catalogToolCallbacks.isEmpty()) {
             return;
         }
@@ -246,35 +286,35 @@ public final class PinnedToolSearchToolCallingAdvisor extends ToolSearchToolCall
         @SuppressWarnings("unchecked")
         Map<String, ToolCallback> cachedToolCallbacks = (Map<String, ToolCallback>) cached;
 
-        for (ToolCallback toolCallback : catalogToolCallbacks) {
-            cachedToolCallbacks.putIfAbsent(
-                toolCallback.getToolDefinition()
-                    .name(),
-                toolCallback);
+        for (Map.Entry<String, ToolCallback> entry : catalogToolCallbacks.entrySet()) {
+            cachedToolCallbacks.putIfAbsent(entry.getKey(), entry.getValue());
         }
     }
 
     /**
-     * Snapshots the pinned callbacks from the full static tool list (present on the options at loop initialization,
-     * already wrapped for tenant + SecurityContext rehydration by the agent builder) into the request context, so they
-     * can be re-injected on every iteration after the base class narrows the list.
+     * Snapshots the ENTIRE static tool list into the request context so it can be re-injected on every iteration after
+     * the base class narrows the list.
+     *
+     * <p>
+     * At loop initialization the options carry exactly the agent's configured static tool list (already wrapped for
+     * tenant + SecurityContext rehydration by the agent builder) — the base advisor's search narrowing happens later,
+     * in {@code prepareIteration}. Every tool on that list is a "call directly by name" tool: the large searchable
+     * catalog (cluster elements + per-mode global copilot tools) is deliberately kept OFF the options list (registered
+     * with the search-loop's {@code MapToolCallbackResolver} instead — see {@code ToolSearchAdvisorConfiguration}), so
+     * a static tool is resolvable at execution time ONLY while it is on the options list. Capturing the whole list
+     * therefore pins exactly the set that must stay callable, and cannot accidentally un-hide a searchable catalog tool
+     * (none are on the list to capture). This is what a hand-maintained pinned-name subset kept getting wrong: any
+     * static tool the system prompt names but the subset omitted (a data-table / knowledge-base / asset-file /
+     * deployment / context-store tool, …) was silently uncallable and failed with "No ToolCallback found" the moment
+     * the model called it.
+     * </p>
      */
     private ChatClientRequest capturePinnedToolCallbacks(ChatClientRequest chatClientRequest) {
         if (chatClientRequest.prompt()
             .getOptions() instanceof ToolCallingChatOptions toolOptions) {
 
-            List<ToolCallback> pinnedToolCallbacks = new ArrayList<>();
-
-            for (ToolCallback toolCallback : toolOptions.getToolCallbacks()) {
-                if (pinnedToolNames.contains(toolCallback.getToolDefinition()
-                    .name())) {
-
-                    pinnedToolCallbacks.add(toolCallback);
-                }
-            }
-
             chatClientRequest.context()
-                .put(PINNED_TOOL_CALLBACKS_KEY, pinnedToolCallbacks);
+                .put(PINNED_TOOL_CALLBACKS_KEY, new ArrayList<>(toolOptions.getToolCallbacks()));
         }
 
         return chatClientRequest;

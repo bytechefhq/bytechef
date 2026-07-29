@@ -93,36 +93,6 @@ public class ToolSearchAdvisorConfiguration {
      */
     private static final int MAX_SEARCH_RESULTS = 5;
 
-    /**
-     * Tools the system prompt tells the model to call directly by name, so they must stay callable on every iteration
-     * rather than being hidden behind a {@code searchTool} hit: the specialist sub-agents (the {@code *_agent}
-     * delegates plus the research / data-analyst / image-generator / slide-builder ChatClient sub-agents), the core
-     * interaction tools {@code askUserQuestion} and {@code openWorkflowTab}, and the interactive picker tools that
-     * render UI in the chat panel ({@code selectConnection}, {@code createConnection}, {@code selectPropertyOption},
-     * {@code selectTriggerPropertyOption}). The pickers must be pinned like {@code askUserQuestion}: they render only
-     * off a tool-result event, and chat memory does not persist the intermediate {@code searchTool} exchange that once
-     * surfaced them, so on a follow-up turn an unpinned picker is not in the narrowed tool list — the model then
-     * narrates "I've rendered the picker above" without a real call and nothing renders. The auto-memory tools
-     * ({@code MemoryView}, {@code MemoryCreate}, {@code MemoryStrReplace}, {@code MemoryInsert}, {@code MemoryDelete},
-     * {@code MemoryRename}) are pinned for the same reason: {@code AutoMemoryToolsAdvisor} injects them (and the memory
-     * system prompt that instructs the model to use them) before the tool-search loop runs, so without pinning the
-     * narrowing strips them every iteration and the model can never recall or record memories. The read-only
-     * state-visibility tools of the tool-attach flow ({@code listTaskTools}, {@code listConnectionsForComponent},
-     * {@code lookupActionPropertyOptions}, {@code lookupTriggerPropertyOptions}) are pinned alongside their
-     * {@code select*} render siblings: the build system prompt tells the model to call each of them directly by name,
-     * so an unpinned one fails with "No ToolCallback found" the moment the model starts the attach flow. Names that are
-     * absent for a given mode (e.g. a specialist whose ChatClient bean is disabled, or memory tools in a mode that
-     * doesn't mount the advisor) are simply never captured — pinning a missing name is a no-op. Keep this list small;
-     * every entry is sent to the model on every turn, which is the cost the tool-search advisor otherwise avoids.
-     */
-    static final Set<String> ALWAYS_ON_TOOL_NAMES = Set.of(
-        "askUserQuestion", "cluster_element_agent", "code_editor_agent", "converter_agent", "createConnection",
-        "data_analyst", "image_generator", "listConnectionsForComponent", "listTaskTools",
-        "lookupActionPropertyOptions", "lookupTriggerPropertyOptions", "MemoryCreate", "MemoryDelete", "MemoryInsert",
-        "MemoryRename", "MemoryStrReplace", "MemoryView", "openWorkflowTab", "research", "selectConnection",
-        "selectPropertyOption", "selectTriggerPropertyOption", "skills_agent", "slide_builder",
-        "workflow_editor_agent", "workflow_execution_agent");
-
     private static final Logger log = LoggerFactory.getLogger(ToolSearchAdvisorConfiguration.class);
 
     @Bean
@@ -309,10 +279,12 @@ public class ToolSearchAdvisorConfiguration {
             () -> new DefaultToolCallingManager(
                 observationRegistry, new MapToolCallbackResolver(callbackMapSupplier.get()), exceptionProcessor));
 
-        // PinnedToolSearchToolCallingAdvisor pins ALWAYS_ON_TOOL_NAMES so they stay callable without a preceding
-        // searchTool hit — the system prompt instructs the model to call those specialists/core tools directly by name,
-        // but the stock advisor hides every static tool behind tool search and a follow-up turn calling one directly
-        // would fail with "No ToolCallback found". Its OWN in-loop conversation history is DISABLED: the AI Hub mounts
+        // PinnedToolSearchToolCallingAdvisor pins the agent's ENTIRE static tool list so those tools stay callable
+        // without a preceding searchTool hit — the system prompt instructs the model to call them directly by name, but
+        // the stock advisor hides every static tool behind tool search and a follow-up turn calling one directly would
+        // fail with "No ToolCallback found". The searchable catalog (callbackMap below) is registered with the resolver
+        // and never placed on the agent's options list, so pinning the whole options list pins exactly the direct-call
+        // set and nothing searchable. Its OWN in-loop conversation history is DISABLED: the AI Hub mounts
         // a session-backed memory advisor (SessionMemoryAdvisor, TOOL_MESSAGE_PERSISTENCE_ADVISOR_ORDER = MIN+400)
         // INSIDE the tool loop — downstream of this advisor (MIN+300) — so it re-participates on every iteration,
         // persisting and rehydrating the full [user, assistant(tool_calls), tool_result] transcript from the session
@@ -333,8 +305,8 @@ public class ToolSearchAdvisorConfiguration {
         // deliberately kept OFF that list (see the "Important asymmetry" note above). Without this, discovered catalog
         // tools resolve to nothing, the model can never call them, and it loops re-issuing searchTool until it bails.
         return new PinnedToolSearchToolCallingAdvisor(
-            toolCallingManager, searcher, MAX_SEARCH_RESULTS, ChatMemory.CONVERSATION_ID, ALWAYS_ON_TOOL_NAMES,
-            callbackMapSupplier, toolSearchCatalogWarmup::warmUp);
+            toolCallingManager, searcher, MAX_SEARCH_RESULTS, ChatMemory.CONVERSATION_ID, callbackMapSupplier,
+            toolSearchCatalogWarmup::warmUp);
     }
 
     private static @Nullable AiHubGlobalToolCatalog findCatalog(

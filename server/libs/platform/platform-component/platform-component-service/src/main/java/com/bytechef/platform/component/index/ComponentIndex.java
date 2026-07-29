@@ -33,6 +33,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinit
 import com.bytechef.component.definition.ComponentDsl.ModifiablePropertyGroup;
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -61,6 +62,7 @@ import tools.jackson.databind.json.JsonMapper;
  *
  * @author Ivica Cardic
  */
+@SuppressFBWarnings("EI")
 public record ComponentIndex(List<Entry> entries) {
 
     public static final String RESOURCE_PATH = "META-INF/bytechef/component-index.json";
@@ -254,6 +256,7 @@ public record ComponentIndex(List<Entry> entries) {
         return clusterElementDefinition;
     }
 
+    @SuppressFBWarnings("EI")
     public record Entry(
         String name, int version, @Nullable String title, @Nullable String description, @Nullable String icon,
         @Nullable List<CategorySummary> componentCategories, @Nullable List<String> tags,

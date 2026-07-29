@@ -8,9 +8,11 @@
 package com.bytechef.ee.ai.hub.toolsearch;
 
 import com.bytechef.ai.agent.tool.ToolErrors;
+import com.bytechef.commons.util.MemoizationUtils;
 import com.bytechef.ee.ai.hub.tool.AiHubToolInvocationContext;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
+import com.bytechef.platform.component.util.JsonSchemaGeneratorUtils;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
@@ -18,7 +20,10 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
@@ -61,10 +66,11 @@ import tools.jackson.databind.json.JsonMapper;
 public class ClusterElementToolCallback implements ToolCallback {
 
     private static final TypeReference<Map<String, Object>> MAP_TYPE = new TypeReference<>() {};
+    private static final Logger log = LoggerFactory.getLogger(ClusterElementToolCallback.class);
 
     private final String toolName;
     private final String description;
-    private final String inputSchema;
+    private final Supplier<String> inputSchemaSupplier;
     private final String componentName;
     private final int componentVersion;
     private final String clusterElementName;
@@ -103,7 +109,7 @@ public class ClusterElementToolCallback implements ToolCallback {
 
         this.toolName = toolName;
         this.description = description;
-        this.inputSchema = inputSchema;
+        this.inputSchemaSupplier = () -> inputSchema;
         this.componentName = componentName;
         this.componentVersion = componentVersion;
         this.clusterElementName = clusterElementName;
@@ -113,12 +119,60 @@ public class ClusterElementToolCallback implements ToolCallback {
         this.pinnedParameters = pinnedParameters == null ? Map.of() : Map.copyOf(pinnedParameters);
     }
 
+    /**
+     * Catalog-discovery constructor: the input schema is generated lazily on first {@link #getToolDefinition()} access
+     * by loading only this one component, and memoized. Keeps building the tool-search callback map free of component
+     * loads — the schema materializes only when the tool is actually surfaced to the model.
+     */
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
+    public ClusterElementToolCallback(
+        String toolName, String description, String componentName, int componentVersion, String clusterElementName,
+        ClusterElementDefinitionService clusterElementDefinitionService, ConnectionService connectionService) {
+
+        this.toolName = toolName;
+        this.description = description;
+        this.componentName = componentName;
+        this.componentVersion = componentVersion;
+        this.clusterElementName = clusterElementName;
+        this.clusterElementDefinitionService = clusterElementDefinitionService;
+        this.connectionService = connectionService;
+        this.pinnedConnectionId = null;
+        this.pinnedParameters = Map.of();
+        this.inputSchemaSupplier = MemoizationUtils.memoize(
+            () -> generateInputSchema(
+                clusterElementDefinitionService, componentName, componentVersion, clusterElementName));
+    }
+
+    /**
+     * Generates the tool's input JSON schema by loading only this one component. Relocates the former build-time
+     * malformed-tool guard (which used to skip a tool whose schema failed to generate) to the lazy point: a single tool
+     * with an unbuildable property tree degrades to an empty-object schema and is logged, rather than throwing and
+     * failing the chat turn when the tool is surfaced.
+     */
+    private static String generateInputSchema(
+        ClusterElementDefinitionService clusterElementDefinitionService, String componentName, int componentVersion,
+        String clusterElementName) {
+
+        try {
+            return JsonSchemaGeneratorUtils.generateInputSchema(
+                clusterElementDefinitionService
+                    .getClusterElementDefinition(componentName, componentVersion, clusterElementName)
+                    .getProperties());
+        } catch (RuntimeException exception) {
+            log.warn(
+                "Failed to generate input schema for tool '{}' (component {}@{}); surfacing with an empty schema",
+                clusterElementName, componentName, componentVersion, exception);
+
+            return "{\"type\":\"object\",\"properties\":{}}";
+        }
+    }
+
     @Override
     public ToolDefinition getToolDefinition() {
         return ToolDefinition.builder()
             .name(toolName)
             .description(description)
-            .inputSchema(inputSchema)
+            .inputSchema(inputSchemaSupplier.get())
             .build();
     }
 

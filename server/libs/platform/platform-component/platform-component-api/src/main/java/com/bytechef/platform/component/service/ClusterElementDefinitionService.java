@@ -120,6 +120,13 @@ public interface ClusterElementDefinitionService extends OperationDefinitionServ
 
     List<ClusterElementDefinition> getClusterElementDefinitions(ClusterElementType clusterElementType);
 
+    /**
+     * List-view variant of {@link #getClusterElementDefinitions(ClusterElementType)} that returns lightweight stubs
+     * (identity, texts, type — no property tree) sourced from the build-time component index without loading any
+     * component handler. Use for enumeration/population; use the full method when property trees are required.
+     */
+    List<ClusterElementDefinition> getClusterElementDefinitionStubs(ClusterElementType clusterElementType);
+
     List<ClusterElementDefinition> getClusterElementDefinitions(
         String componentName, int componentVersion, ClusterElementType clusterElementType);
 

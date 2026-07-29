@@ -143,6 +143,19 @@ public class ListConnectionsForComponentToolCallback implements ToolCallback {
 
                 resolvedFromComponentName = componentName;
                 componentName = resolvedComponentName;
+            } else {
+                String canonicalComponentName = componentDefinitionOptional.get()
+                    .getName();
+
+                // fetchComponentDefinition matches case-insensitively, so an LLM-supplied "openai" resolves the
+                // "openAi" component but leaves componentName lowercased. Connections are stored and queried under the
+                // canonical name (case-sensitively), so adopt it or the lookup silently returns zero connections.
+                if (canonicalComponentName != null && !canonicalComponentName.isBlank()
+                    && !canonicalComponentName.equals(componentName)) {
+
+                    resolvedFromComponentName = componentName;
+                    componentName = canonicalComponentName;
+                }
             }
 
             int componentVersion = input.componentVersion() == null ? 1 : input.componentVersion();

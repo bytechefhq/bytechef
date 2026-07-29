@@ -33,6 +33,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.ArgumentCaptor;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.ChatClient.CallResponseSpec;
 import org.springframework.ai.chat.client.ChatClient.ChatClientRequestSpec;
@@ -155,7 +156,13 @@ class WorkflowEditorAgentToolCallbackTest {
 
         callback.call("{\"request\":\"any\"}", parentToolContext);
 
-        verify(requestSpec).toolContext(parentContextMap);
+        ArgumentCaptor<Map<String, Object>> contextCaptor = ArgumentCaptor.captor();
+
+        verify(requestSpec).toolContext(contextCaptor.capture());
+
+        assertThat(contextCaptor.getValue())
+            .containsAllEntriesOf(parentContextMap)
+            .containsKey("bytechef.workflowEditor.persistedWorkflows");
     }
 
     @Test
@@ -173,7 +180,12 @@ class WorkflowEditorAgentToolCallbackTest {
 
         callback.call("{\"request\":\"any\"}", null);
 
-        verify(requestSpec).toolContext(Map.of());
+        ArgumentCaptor<Map<String, Object>> contextCaptor = ArgumentCaptor.captor();
+
+        verify(requestSpec).toolContext(contextCaptor.capture());
+
+        assertThat(contextCaptor.getValue())
+            .containsOnlyKeys("bytechef.workflowEditor.persistedWorkflows");
     }
 
     @Test
