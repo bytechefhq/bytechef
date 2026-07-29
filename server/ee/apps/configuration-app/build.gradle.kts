@@ -89,6 +89,7 @@ dependencies {
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))
     implementation(project(":server:ee:libs:core:tenant:tenant-multi-service"))
     implementation(project(":server:ee:libs:core:remote:remote-rest"))
+    implementation(project(":server:ee:libs:core:tenant:tenant-remote-rest"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-graphql"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-instance-impl"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-public-rest"))

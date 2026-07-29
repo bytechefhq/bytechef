@@ -205,4 +205,33 @@ public class FilesystemFileStorageServiceTest {
         assertThrows(FileStorageException.class,
             () -> fileStorageService.fileExists("data", malicious));
     }
+
+    @Test
+    public void testGetFileEntriesReturnsBareNamesRecursively() {
+        String directory = "entries_" + System.nanoTime();
+
+        fileStorageService.storeFileContent(directory, "top.json", TEST_STRING, false);
+        fileStorageService.storeFileContent(directory + "/nested", "deep.json", TEST_STRING, false);
+
+        Assertions.assertThat(fileStorageService.getFileEntries(directory))
+            .extracting(FileEntry::getName)
+            .containsExactlyInAnyOrder("top.json", "deep.json");
+    }
+
+    @Test
+    public void testGetFileEntriesRoundTripsDirectoryNeedingNormalization() {
+        String directory = "Auto-Memory-" + System.nanoTime();
+
+        fileStorageService.storeFileContent(directory, "memo.json", TEST_STRING, false);
+
+        Assertions.assertThat(fileStorageService.getFileEntries(directory))
+            .extracting(FileEntry::getName)
+            .containsExactly("memo.json");
+    }
+
+    @Test
+    public void testGetFileEntriesReturnsEmptySetForMissingDirectory() {
+        Assertions.assertThat(fileStorageService.getFileEntries("missing-" + System.nanoTime()))
+            .isEmpty();
+    }
 }

@@ -28,6 +28,9 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
+import software.amazon.awssdk.services.s3.model.S3Object;
 
 /**
  * @version ee
@@ -39,11 +42,13 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
     private static final Base64.Decoder MIME_DECODER = Base64.getMimeDecoder();
     private static final String URL_PREFIX = "s3://";
 
+    private final S3Client s3Client;
     private final S3Template s3Template;
     private final String bucketName;
 
     @SuppressFBWarnings("EI")
-    public AwsFileStorageServiceImpl(S3Template s3Template, String bucketName) {
+    public AwsFileStorageServiceImpl(S3Client s3Client, S3Template s3Template, String bucketName) {
+        this.s3Client = s3Client;
         this.s3Template = s3Template;
         this.bucketName = bucketName;
     }
@@ -93,12 +98,20 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
     public Set<FileEntry> getFileEntries(String directory) throws FileStorageException {
         String prefix = combinePaths(directory, null);
 
-        return s3Template.listObjects(bucketName, prefix)
+        // Paginated deliberately: S3Template.listObjects issues a single ListObjectsV2 call, which S3 caps at 1000
+        // keys, so it silently truncates larger directories.
+        ListObjectsV2Request listObjectsV2Request = ListObjectsV2Request.builder()
+            .bucket(bucketName)
+            .prefix(prefix)
+            .build();
+
+        return s3Client.listObjectsV2Paginator(listObjectsV2Request)
+            .contents()
             .stream()
-            .map(S3Resource::getFilename)
+            .map(S3Object::key)
             .filter(Objects::nonNull)
-            .map(filename -> new FileEntry(
-                filename.substring(filename.lastIndexOf('/')), URL_PREFIX + bucketName + "/" + filename))
+            .map(key -> new FileEntry(
+                key.substring(key.lastIndexOf('/') + 1), URL_PREFIX + bucketName + "/" + key))
             .collect(Collectors.toSet());
     }
 

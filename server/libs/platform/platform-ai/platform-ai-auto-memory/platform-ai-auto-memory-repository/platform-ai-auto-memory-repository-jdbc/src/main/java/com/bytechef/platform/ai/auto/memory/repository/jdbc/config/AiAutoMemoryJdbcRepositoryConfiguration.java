@@ -18,18 +18,23 @@ package com.bytechef.platform.ai.auto.memory.repository.jdbc.config;
 
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
 /**
  * Activates Spring Data JDBC repository scanning for the JDBC binding of the shared {@code ai_auto_memory} table.
  * Discovered via {@code AutoConfiguration.imports} when this module is on the classpath, gated on a
- * {@link AbstractJdbcConfiguration} bean so app variants without JDBC start cleanly.
+ * {@link AbstractJdbcConfiguration} bean so app variants without JDBC start cleanly, and on
+ * {@code bytechef.ai.auto-memory.provider} so exactly one storage binding is active. The property defaults to JDBC, so
+ * deployments that set nothing keep today's behavior.
  *
  * @author Ivica Cardic
  */
 @AutoConfiguration(afterName = "org.springframework.boot.data.jdbc.autoconfigure.DataJdbcRepositoriesAutoConfiguration")
 @ConditionalOnBean(AbstractJdbcConfiguration.class)
+@ConditionalOnProperty(
+    prefix = "bytechef.ai.auto-memory", name = "provider", havingValue = "JDBC", matchIfMissing = true)
 @EnableJdbcRepositories(basePackages = "com.bytechef.platform.ai.auto.memory.repository.jdbc")
 public class AiAutoMemoryJdbcRepositoryConfiguration {
 }
