@@ -17,6 +17,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.automation.ai.tool.datatable.DataTableQuerySupport;
 import com.bytechef.automation.assetfile.domain.AssetFileFormat;
 import com.bytechef.ee.ai.hub.artifact.ArtifactGeneratorRegistry;
 import com.bytechef.ee.ai.hub.artifact.GenerationRequest;
@@ -130,7 +131,7 @@ class QueryDataTableToolCallbackTest {
         DataTableService dataTableService = mock(DataTableService.class);
 
         when(dataTableService.getBaseNameById(dataTableId)).thenReturn("contacts");
-        when(dataTableRowService.listRows(anyString(), eq(QueryDataTableToolCallback.MAX_LIMIT), eq(0), eq(0L)))
+        when(dataTableRowService.listRows(anyString(), eq(DataTableQuerySupport.MAX_LIMIT), eq(0), eq(0L)))
             .thenReturn(List.of(new DataTableRow(1L, Map.of("name", "Alice"))));
 
         QueryDataTableToolCallback callback = new QueryDataTableToolCallback(
