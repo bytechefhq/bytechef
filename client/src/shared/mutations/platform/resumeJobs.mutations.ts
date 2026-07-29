@@ -16,7 +16,13 @@ export const useResumeJobMutation = () =>
             });
 
             if (!response.ok) {
-                throw new Error(`Submission failed: ${response.statusText}`);
+                if (response.status === 410) {
+                    throw new Error(
+                        'This approval has expired or was already resolved, and can no longer be submitted.'
+                    );
+                }
+
+                throw new Error(`Submission failed (HTTP ${response.status}).`);
             }
         },
     });

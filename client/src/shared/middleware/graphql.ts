@@ -394,6 +394,13 @@ export type DeleteApprovalTaskMutationVariables = Exact<{
 
 export type DeleteApprovalTaskMutation = { deleteApprovalTask: boolean | null };
 
+export type PendingApprovalsQueryVariables = Exact<{
+  environmentId?: number | null | undefined;
+}>;
+
+
+export type PendingApprovalsQuery = { pendingApprovals: Array<{ createdDate: string | null, expiresAt: string | null, formUrl: string | null, jobId: string, workflowLabel: string } | null> | null };
+
 export type UpdateApprovalTaskMutationVariables = Exact<{
   approvalTask: Types.ApprovalTaskInput;
 }>;
@@ -3544,6 +3551,34 @@ export const useDeleteApprovalTaskMutation = <
       {
     mutationKey: ['deleteApprovalTask'],
     mutationFn: (variables?: DeleteApprovalTaskMutationVariables) => fetcher<DeleteApprovalTaskMutation, DeleteApprovalTaskMutationVariables>(DeleteApprovalTaskDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const PendingApprovalsDocument = new TypedDocumentString(`
+    query pendingApprovals($environmentId: Int) {
+  pendingApprovals(environmentId: $environmentId) {
+    createdDate
+    expiresAt
+    formUrl
+    jobId
+    workflowLabel
+  }
+}
+    `);
+
+export const usePendingApprovalsQuery = <
+      TData = PendingApprovalsQuery,
+      TError = unknown
+    >(
+      variables?: PendingApprovalsQueryVariables,
+      options?: Omit<UseQueryOptions<PendingApprovalsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<PendingApprovalsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<PendingApprovalsQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['pendingApprovals'] : ['pendingApprovals', variables],
+    queryFn: fetcher<PendingApprovalsQuery, PendingApprovalsQueryVariables>(PendingApprovalsDocument, variables),
     ...options
   }
     )};

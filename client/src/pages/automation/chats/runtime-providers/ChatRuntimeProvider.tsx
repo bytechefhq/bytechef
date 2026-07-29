@@ -1,6 +1,8 @@
 import {useChatsStore} from '@/pages/automation/chats/stores/useChatsStore';
+import {ApprovalResolutionContext, ResumeError} from '@/shared/components/ai-chat/approvalResolutionContext';
 import {useSSE} from '@/shared/hooks/useSSE';
 import {
+    ApprovalRequestEventI,
     AskUserQuestionEventI,
     formatAskUserQuestionMessage,
     getResumeFailure,
@@ -46,6 +48,7 @@ export const ChatRuntimeProvider = memo(function ChatRuntimeProvider({
     } | null>(null);
 
     const awaitingStreamEventRef = useRef(false);
+    const pendingResumeRef = useRef<{reject: (error: Error) => void; resolve: () => void} | null>(null);
     const pendingResumeUrlRef = useRef<string | null>(null);
     const questionShownRef = useRef(false);
 
@@ -172,6 +175,39 @@ export const ChatRuntimeProvider = memo(function ChatRuntimeProvider({
         [setIsRunning, setLastAssistantMessageContent, setResumeUrl]
     );
 
+    const handleApprovalRequest = useCallback(
+        (data: unknown) => {
+            if (typeof data !== 'object' || data === null || !('resumeId' in data)) {
+                console.error('Received malformed approval_request event:', data);
+
+                return;
+            }
+
+            const approvalEvent = data as ApprovalRequestEventI;
+
+            setMessage({
+                content: [
+                    {
+                        data: {
+                            expiresAt: approvalEvent.expiresAt,
+                            formDescription: approvalEvent.formDescription,
+                            formTitle: approvalEvent.formTitle,
+                            formUrl: approvalEvent.formUrl,
+                            hasInputs: Array.isArray(approvalEvent.inputs) && approvalEvent.inputs.length > 0,
+                            kind: 'approval-request',
+                            resumeId: approvalEvent.resumeId,
+                        },
+                        type: 'data-approval-request',
+                    },
+                ],
+                role: 'assistant',
+            });
+            setIsRunning(false);
+            setStreamRequest(null);
+        },
+        [setIsRunning, setMessage]
+    );
+
     const handleSuspended = useCallback(() => {
         awaitingStreamEventRef.current = false;
 
@@ -185,13 +221,14 @@ export const ChatRuntimeProvider = memo(function ChatRuntimeProvider({
 
     const eventHandlers = useMemo(
         () => ({
+            approval_request: handleApprovalRequest,
             ask_user_question: handleAskUserQuestion,
             error: handleError,
             result: handleResult,
             stream: handleStream,
             suspended: handleSuspended,
         }),
-        [handleAskUserQuestion, handleError, handleResult, handleStream, handleSuspended]
+        [handleApprovalRequest, handleAskUserQuestion, handleError, handleResult, handleStream, handleSuspended]
     );
 
     const onNew = useCallback(
@@ -361,7 +398,44 @@ export const ChatRuntimeProvider = memo(function ChatRuntimeProvider({
         )
     );
 
-    const {connectionState, error, errorStatus} = useSSE(streamRequest, {eventHandlers});
+    const {connectionState, error, errorStatus} = useSSE(streamRequest, {
+        eventHandlers,
+        onRequestError: (status) => {
+            const pending = pendingResumeRef.current;
+
+            pendingResumeRef.current = null;
+
+            pending?.reject(new ResumeError(status));
+        },
+        onRequestSuccess: () => {
+            const pending = pendingResumeRef.current;
+
+            pendingResumeRef.current = null;
+
+            pending?.resolve();
+        },
+    });
+
+    const resolveApproval = useCallback(
+        (resumeId: string, payload: Record<string, unknown>) =>
+            new Promise<void>((resolve, reject) => {
+                pendingResumeRef.current = {reject, resolve};
+
+                setMessage({content: '', role: 'assistant'});
+                setIsRunning(true);
+                setStreamRequest({
+                    init: {
+                        body: JSON.stringify(payload),
+                        headers: {'Content-Type': 'application/json'},
+                        method: 'POST',
+                    },
+                    url: `/job/resume/${resumeId}`,
+                });
+            }),
+        [setIsRunning, setMessage]
+    );
+
+    const approvalResolution = useMemo(() => ({resolveApproval}), [resolveApproval]);
 
     useEffect(() => {
         if (connectionState === 'CONNECTED') {
@@ -416,5 +490,9 @@ export const ChatRuntimeProvider = memo(function ChatRuntimeProvider({
         };
     }, [setIsRunning]);
 
-    return <AssistantRuntimeProvider runtime={runtime}>{children}</AssistantRuntimeProvider>;
+    return (
+        <ApprovalResolutionContext.Provider value={approvalResolution}>
+            <AssistantRuntimeProvider runtime={runtime}>{children}</AssistantRuntimeProvider>
+        </ApprovalResolutionContext.Provider>
+    );
 });

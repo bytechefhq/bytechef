@@ -9,6 +9,10 @@ const SPACE = ' ';
 export type UseSSEOptionsType = {
     eventHandlers?: EventHandlersType;
     onClose?: () => void;
+
+    onRequestError?: (status: number | null) => void;
+
+    onRequestSuccess?: () => void;
 };
 
 export type SSERequestType = null | {
@@ -92,6 +96,8 @@ export const useSSE = <T = unknown>(request: SSERequestType, options: UseSSEOpti
     const abortControllerRef = useRef<AbortController | null>(null);
     const handlersRef = useRef<EventHandlersType | undefined>(options.eventHandlers);
     const onCloseRef = useRef<(() => void) | undefined>(options.onClose);
+    const onRequestErrorRef = useRef<UseSSEOptionsType['onRequestError']>(options.onRequestError);
+    const onRequestSuccessRef = useRef<UseSSEOptionsType['onRequestSuccess']>(options.onRequestSuccess);
 
     const stableRequest = useMemo(() => {
         if (request == null) {
@@ -110,7 +116,9 @@ export const useSSE = <T = unknown>(request: SSERequestType, options: UseSSEOpti
 
     useEffect(() => {
         handlersRef.current = options.eventHandlers;
-    }, [options.eventHandlers]);
+        onRequestErrorRef.current = options.onRequestError;
+        onRequestSuccessRef.current = options.onRequestSuccess;
+    }, [options.eventHandlers, options.onRequestError, options.onRequestSuccess]);
 
     useEffect(() => {
         onCloseRef.current = options.onClose;
@@ -154,10 +162,14 @@ export const useSSE = <T = unknown>(request: SSERequestType, options: UseSSEOpti
                     setErrorStatus(response.status);
                     setConnectionState('ERROR');
 
+                    onRequestErrorRef.current?.(response.status);
+
                     return;
                 }
 
                 setConnectionState('CONNECTED');
+
+                onRequestSuccessRef.current?.();
 
                 const reader = response.body.getReader();
                 const decoder = new TextDecoder('utf-8');
@@ -210,6 +222,8 @@ export const useSSE = <T = unknown>(request: SSERequestType, options: UseSSEOpti
                 if ((error as Error)?.name !== 'AbortError') {
                     setError('Connection error occurred');
                     setConnectionState('ERROR');
+
+                    onRequestErrorRef.current?.(null);
                 }
             }
         })();

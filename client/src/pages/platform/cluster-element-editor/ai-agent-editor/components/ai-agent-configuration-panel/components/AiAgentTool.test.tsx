@@ -21,6 +21,7 @@ const httpClientTool = {
     label: 'Get a random quote',
     name: 'httpClient_1',
     operationName: 'get',
+    requiresApproval: false,
     title: 'HTTP Client',
     type: 'httpClient/v1/get',
 };

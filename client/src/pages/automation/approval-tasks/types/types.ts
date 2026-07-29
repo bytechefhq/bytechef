@@ -1,4 +1,4 @@
-export type StatusFilterType = 'all' | 'open' | 'in-progress' | 'completed';
+export type StatusFilterType = 'all' | 'open' | 'in-progress' | 'completed' | 'expired';
 export type PriorityFilterType = 'all' | 'high' | 'medium' | 'low';
 export type AssigneeFilterType = 'all' | string;
 export type SortOptionType = 'created' | 'title' | 'priority' | 'status' | 'assignee' | 'dueDate';
@@ -32,7 +32,7 @@ export interface ApprovalTaskI {
     id?: string;
     jobResumeId?: string | null;
     priority: 'high' | 'medium' | 'low';
-    status: 'open' | 'in-progress' | 'completed';
+    status: 'open' | 'in-progress' | 'completed' | 'expired';
     title: string;
     version?: number;
 }
@@ -48,6 +48,7 @@ export interface ApprovalTaskCountsI {
     open: number;
     'in-progress': number;
     completed: number;
+    expired: number;
 }
 
 export interface PriorityCountsI {

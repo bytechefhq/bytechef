@@ -27,6 +27,8 @@ const cycleStatus = (status: ApprovalTaskI['status']): ApprovalTaskI['status'] =
             return 'in-progress';
         case 'in-progress':
             return 'open';
+        case 'expired':
+            return 'expired';
         default:
             return 'open';
     }
