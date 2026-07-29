@@ -6,9 +6,16 @@ import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import {mapHandlePosition} from '../utils/directionUtils';
 import styles from './NodeTypes.module.css';
 
+// Iteration rings flip their content to the TOP edge in LR (see
+// getRingContentSign in elkLayoutUtils): the rail returns into the bar's
+// bottom end and the body exits into its top end, so the side handles swap
+// ends — otherwise the ring connectors would cut diagonally across the body.
+const LR_FLIPPED_RING_BAR_PATTERN = /-(loop|each|map)-(top|bottom)-ghost$/;
+
 const TaskDispatcherBottomGhostNode = ({id}: {id: string}) => {
     const layoutDirection = useLayoutDirectionStore((state) => state.layoutDirection);
     const isHorizontal = layoutDirection === 'LR';
+    const isFlippedRingBar = isHorizontal && LR_FLIPPED_RING_BAR_PATTERN.test(id);
 
     return (
         <div
@@ -28,16 +35,16 @@ const TaskDispatcherBottomGhostNode = ({id}: {id: string}) => {
             />
 
             <Handle
-                className={twMerge(isHorizontal ? 'top-8' : 'left-8', styles.handle)}
+                className={twMerge(isHorizontal ? (isFlippedRingBar ? 'bottom-8' : 'top-8') : 'left-8', styles.handle)}
                 id={`${id}-left`}
-                position={mapHandlePosition(Position.Left, layoutDirection)}
+                position={mapHandlePosition(isFlippedRingBar ? Position.Right : Position.Left, layoutDirection)}
                 type="target"
             />
 
             <Handle
-                className={twMerge(isHorizontal ? 'bottom-8' : 'right-8', styles.handle)}
+                className={twMerge(isHorizontal ? (isFlippedRingBar ? 'top-8' : 'bottom-8') : 'right-8', styles.handle)}
                 id={`${id}-right`}
-                position={mapHandlePosition(Position.Right, layoutDirection)}
+                position={mapHandlePosition(isFlippedRingBar ? Position.Left : Position.Right, layoutDirection)}
                 type="target"
             />
 
