@@ -22,6 +22,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -39,7 +40,7 @@ public class ComponentIndexTest {
 
         Path indexPath = directoryPath.resolve(ComponentIndex.RESOURCE_PATH);
 
-        Files.createDirectories(indexPath.getParent());
+        Files.createDirectories(Objects.requireNonNull(indexPath.getParent()));
         Files.writeString(indexPath, json);
 
         return directoryPath;

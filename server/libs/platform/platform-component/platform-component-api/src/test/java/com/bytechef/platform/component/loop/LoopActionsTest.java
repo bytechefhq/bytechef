@@ -34,7 +34,6 @@ import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.ObjectMapper;
@@ -72,7 +71,7 @@ class LoopActionsTest {
             .getType(),
             "already-array properties should remain arrays (broadcast)");
         assertEquals(
-            Optional.of(true),
+            Boolean.TRUE,
             liftedProperties.get(0)
                 .getRequired(),
             "required flag on lifted scalar must propagate to the array wrapper");

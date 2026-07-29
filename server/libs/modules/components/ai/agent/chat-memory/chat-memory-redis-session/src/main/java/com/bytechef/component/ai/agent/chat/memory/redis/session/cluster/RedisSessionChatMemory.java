@@ -43,6 +43,7 @@ public class RedisSessionChatMemory {
     private RedisSessionChatMemory() {
     }
 
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     private static SessionRepository apply(
         Parameters inputParameters, Parameters connectionParameters, Parameters extensions,
         Map<String, ComponentConnection> componentConnections) {
