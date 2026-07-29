@@ -14,6 +14,7 @@ import AiSkillsCreateDropdown from '@/pages/automation/ai/skills/components/AiSk
 import AiSkillsLeftSidebar from '@/pages/automation/ai/skills/components/AiSkillsLeftSidebar';
 import useAiSkillDetailToolbarStore from '@/pages/automation/ai/skills/stores/useAiSkillDetailToolbarStore';
 import {useAiSkillsStore} from '@/pages/automation/ai/skills/stores/useAiSkillsStore';
+import invalidateSkillQueries from '@/pages/automation/ai/skills/utils/invalidateSkillQueries';
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
 import useCopilotStateContributorRegistry from '@/shared/components/copilot/stores/useCopilotStateContributorRegistry';
 import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
@@ -76,7 +77,7 @@ const AiSkills = () => {
 
     useEffect(() => {
         return useCopilotPostTurnRegistry.getState().register(Source.SKILLS, () => {
-            queryClient.invalidateQueries({queryKey: ['aiSkills']});
+            invalidateSkillQueries(queryClient);
         });
     }, [queryClient, skillsView]);
 

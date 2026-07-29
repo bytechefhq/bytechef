@@ -240,6 +240,10 @@ const AiSkillDetail = () => {
         return () => resetToolbar();
     }, [resetToolbar]);
 
+    useEffect(() => {
+        return () => setCopilotPanelOpen(false);
+    }, [setCopilotPanelOpen]);
+
     if (!skill) {
         return (
             <div className="flex flex-1 items-center justify-center">
