@@ -139,7 +139,13 @@ const A2aServerWorkflowDialog = ({
                 selectedWorkflowIds: existingA2aProject.workflowIds ?? [],
             });
         }
-    }, [open, existingA2aProject?.projectId, existingA2aProject?.projectVersion, existingA2aProject?.workflowIds, form]);
+    }, [
+        open,
+        existingA2aProject?.projectId,
+        existingA2aProject?.projectVersion,
+        existingA2aProject?.workflowIds,
+        form,
+    ]);
 
     return (
         <Dialog onOpenChange={setOpen} open={open}>
@@ -260,7 +266,9 @@ const A2aServerWorkflowDialog = ({
                                             {eligibleWorkflows.map((projectWorkflow) => (
                                                 <div className="flex items-center space-x-2" key={projectWorkflow.id}>
                                                     <Checkbox
-                                                        checked={field.value?.includes(projectWorkflow.workflow.id || '')}
+                                                        checked={field.value?.includes(
+                                                            projectWorkflow.workflow.id || ''
+                                                        )}
                                                         onCheckedChange={(checked) => {
                                                             const currentValues = field.value || [];
 
@@ -304,7 +312,9 @@ const A2aServerWorkflowDialog = ({
                             </DialogClose>
 
                             <Button
-                                disabled={hasNoEligibleWorkflows || !selectedWorkflowIds || selectedWorkflowIds.length === 0}
+                                disabled={
+                                    hasNoEligibleWorkflows || !selectedWorkflowIds || selectedWorkflowIds.length === 0
+                                }
                                 label={isEditMode ? 'Update' : 'Add'}
                                 type="submit"
                             />

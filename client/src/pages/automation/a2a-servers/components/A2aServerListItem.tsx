@@ -52,7 +52,9 @@ const A2aServerListItem = ({a2aServer}: A2aServerListItemProps) => {
                     {a2aServer.authenticationRequired && <Badge label="Auth required" styleType="secondary-outline" />}
                 </div>
 
-                {a2aServer.description && <span className="text-sm text-muted-foreground">{a2aServer.description}</span>}
+                {a2aServer.description && (
+                    <span className="text-sm text-muted-foreground">{a2aServer.description}</span>
+                )}
 
                 <span className="mt-1 font-mono text-xs break-all text-muted-foreground">{agentCardUrl}</span>
             </div>
@@ -82,11 +84,7 @@ const A2aServerListItem = ({a2aServer}: A2aServerListItemProps) => {
                 triggerNode={<span className="hidden" />}
             />
 
-            <A2aServerWorkflowDialog
-                a2aServer={a2aServer}
-                onOpenChange={setSkillsDialogOpen}
-                open={skillsDialogOpen}
-            />
+            <A2aServerWorkflowDialog a2aServer={a2aServer} onOpenChange={setSkillsDialogOpen} open={skillsDialogOpen} />
         </div>
     );
 };

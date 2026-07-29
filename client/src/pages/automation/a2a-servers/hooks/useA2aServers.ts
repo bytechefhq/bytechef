@@ -5,7 +5,11 @@ import {useMemo} from 'react';
 const useA2aServers = () => {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
-    const {data, error: a2aServersError, isLoading: a2aServersIsLoading} = useA2aServersQuery({
+    const {
+        data,
+        error: a2aServersError,
+        isLoading: a2aServersIsLoading,
+    } = useA2aServersQuery({
         type: PlatformType.Automation,
     });
 

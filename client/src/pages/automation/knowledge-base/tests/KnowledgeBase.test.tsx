@@ -18,10 +18,9 @@ vi.mock('../hooks/useKnowledgeBase', () => ({
 }));
 
 vi.mock('@/shared/components/copilot/stores/useCopilotStore', async () => {
-    const actual =
-        await vi.importActual<typeof import('@/shared/components/copilot/stores/useCopilotStore')>(
-            '@/shared/components/copilot/stores/useCopilotStore'
-        );
+    const actual = await vi.importActual<typeof import('@/shared/components/copilot/stores/useCopilotStore')>(
+        '@/shared/components/copilot/stores/useCopilotStore'
+    );
 
     return {
         ...actual,
