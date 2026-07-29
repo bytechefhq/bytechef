@@ -19,6 +19,8 @@ Name | Type
 `lastProjectVersion` | number
 `uuid` | string
 `category` | [Category](Category.md)
+`codeWorkflow` | boolean
+`codeWorkflowLanguage` | string
 `projectWorkflowIds` | Array&lt;number&gt;
 `tags` | [Array&lt;Tag&gt;](Tag.md)
 `workspaceId` | number
@@ -43,6 +45,8 @@ const example = {
   "lastProjectVersion": null,
   "uuid": null,
   "category": null,
+  "codeWorkflow": null,
+  "codeWorkflowLanguage": null,
   "projectWorkflowIds": null,
   "tags": null,
   "workspaceId": null,

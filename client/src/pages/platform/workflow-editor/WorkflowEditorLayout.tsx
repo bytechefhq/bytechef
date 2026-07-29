@@ -17,7 +17,7 @@ import useCopilotStateContributorRegistry from '@/shared/components/copilot/stor
 import {Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
 import {useQueryClient} from '@tanstack/react-query';
-import {Suspense, lazy, useEffect, useState} from 'react';
+import {Suspense, lazy, useEffect, useMemo, useState} from 'react';
 import {useParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/shallow';
@@ -37,10 +37,18 @@ import useWorkflowDataStore from './stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from './stores/useWorkflowNodeDetailsPanelStore';
 import {clearAllWorkflowMutations} from './utils/workflowMutationGuard';
 
+const IntegrationCodeWorkflowDetail = lazy(
+    () => import('@/pages/platform/code-workflow/IntegrationCodeWorkflowDetail')
+);
+const ProjectCodeWorkflowDetail = lazy(() => import('@/pages/platform/code-workflow/ProjectCodeWorkflowDetail'));
 const DataPillPanel = lazy(() => import('./components/datapills/DataPillPanel'));
 const WorkflowEditor = lazy(() => import('./components/WorkflowEditor'));
 const WorkflowRightSidebar = lazy(() => import('./components/WorkflowRightSidebar'));
 const WorkflowNodesSidebar = lazy(() => import('./components/WorkflowNodesSidebar'));
+
+// Polyglot code-workflow languages that get the Monaco source editor instead of the React Flow
+// canvas. Java-backed code workflows keep the visual editor since they still compile to a task graph.
+const POLYGLOT_CODE_WORKFLOW_LANGUAGES = ['JAVASCRIPT', 'PYTHON', 'RUBY'];
 
 interface WorkflowEditorLayoutProps {
     customCanvasWidth?: number;
@@ -114,11 +122,19 @@ const WorkflowEditorLayout = ({
         workflowTestConfiguration,
     } = useWorkflowLayout(includeComponents);
 
-    const {invalidateWorkflowQueries, updateWorkflowMutation} = useWorkflowEditor();
+    const {codeWorkflow, codeWorkflowLanguage, invalidateWorkflowQueries, updateWorkflowMutation} = useWorkflowEditor();
     const {handleClusterElementsCanvasOpenChange, isMainRootClusterElement} = useWorkflowEditorLayout();
 
     const queryClient = useQueryClient();
-    const {projectId, projectWorkflowId} = useParams();
+    const {integrationId, projectId, projectWorkflowId} = useParams();
+
+    const isCodeWorkflow = useMemo(
+        () =>
+            codeWorkflow === true &&
+            !!codeWorkflowLanguage &&
+            POLYGLOT_CODE_WORKFLOW_LANGUAGES.includes(codeWorkflowLanguage),
+        [codeWorkflow, codeWorkflowLanguage]
+    );
 
     useEffect(() => {
         return useCopilotStateContributorRegistry.getState().register(() => {
@@ -210,17 +226,36 @@ const WorkflowEditorLayout = ({
                     <ErrorsBanner />
                 </div>
 
-                {componentDefinitions && taskDispatcherDefinitions && (
+                {/*
+                    The right sidebar (components/flow-control drag panel), node details panel, cluster
+                    dialog, and data-pill/output/input sheets below stay mounted as-is for code workflows:
+                    they only render in response to ReactFlow node/cluster selection state, which never
+                    populates without a canvas, so they degrade to inert rather than throwing. Trimming
+                    that visual-only chrome for code workflows is left for a follow-up pass.
+                */}
+
+                {isCodeWorkflow && codeWorkflowLanguage && integrationId ? (
                     <Suspense>
-                        <WorkflowEditor
-                            componentDefinitions={componentDefinitions}
-                            customCanvasWidth={customCanvasWidth}
-                            enableUndoRedo={enableUndoRedo}
-                            fitViewOnWorkflowChange={fitViewOnWorkflowChange}
-                            leftSidebarOpen={leftSidebarOpen}
-                            taskDispatcherDefinitions={taskDispatcherDefinitions}
-                        />
+                        <IntegrationCodeWorkflowDetail integrationId={integrationId} language={codeWorkflowLanguage} />
                     </Suspense>
+                ) : isCodeWorkflow && codeWorkflowLanguage && projectId ? (
+                    <Suspense>
+                        <ProjectCodeWorkflowDetail language={codeWorkflowLanguage} projectId={projectId} />
+                    </Suspense>
+                ) : (
+                    componentDefinitions &&
+                    taskDispatcherDefinitions && (
+                        <Suspense>
+                            <WorkflowEditor
+                                componentDefinitions={componentDefinitions}
+                                customCanvasWidth={customCanvasWidth}
+                                enableUndoRedo={enableUndoRedo}
+                                fitViewOnWorkflowChange={fitViewOnWorkflowChange}
+                                leftSidebarOpen={leftSidebarOpen}
+                                taskDispatcherDefinitions={taskDispatcherDefinitions}
+                            />
+                        </Suspense>
+                    )
                 )}
 
                 {rightSidebarMounted && componentDefinitions && taskDispatcherDefinitions && (

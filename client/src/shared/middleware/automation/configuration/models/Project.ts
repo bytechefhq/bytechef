@@ -114,6 +114,18 @@ export interface Project {
      */
     category?: Category;
     /**
+     * Whether the project is backed by a code workflow.
+     * @type {boolean}
+     * @memberof Project
+     */
+    readonly codeWorkflow?: boolean;
+    /**
+     * The programming language of the code workflow, if the project is code-backed.
+     * @type {string}
+     * @memberof Project
+     */
+    readonly codeWorkflowLanguage?: string;
+    /**
      * The project workflow ids belonging to this project.
      * @type {Array<number>}
      * @memberof Project
@@ -172,6 +184,8 @@ export function ProjectFromJSONTyped(json: any, ignoreDiscriminator: boolean): P
         'lastProjectVersion': json['lastProjectVersion'] == null ? undefined : json['lastProjectVersion'],
         'uuid': json['uuid'] == null ? undefined : json['uuid'],
         'category': json['category'] == null ? undefined : CategoryFromJSON(json['category']),
+        'codeWorkflow': json['codeWorkflow'] == null ? undefined : json['codeWorkflow'],
+        'codeWorkflowLanguage': json['codeWorkflowLanguage'] == null ? undefined : json['codeWorkflowLanguage'],
         'projectWorkflowIds': json['projectWorkflowIds'] == null ? undefined : json['projectWorkflowIds'],
         'tags': json['tags'] == null ? undefined : ((json['tags'] as Array<any>).map(TagFromJSON)),
         'workspaceId': json['workspaceId'],
@@ -183,7 +197,7 @@ export function ProjectToJSON(json: any): Project {
     return ProjectToJSONTyped(json, false);
 }
 
-export function ProjectToJSONTyped(value?: Omit<Project, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastPublishedDate'|'lastProjectVersion'> | null, ignoreDiscriminator: boolean = false): any {
+export function ProjectToJSONTyped(value?: Omit<Project, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastPublishedDate'|'lastProjectVersion'|'codeWorkflow'|'codeWorkflowLanguage'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

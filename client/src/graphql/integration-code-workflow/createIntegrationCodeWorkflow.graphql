@@ -1,0 +1,3 @@
+mutation createIntegrationCodeWorkflow($componentName: String!, $language: CodeWorkflowLanguage!) {
+    createIntegrationCodeWorkflow(componentName: $componentName, language: $language)
+}

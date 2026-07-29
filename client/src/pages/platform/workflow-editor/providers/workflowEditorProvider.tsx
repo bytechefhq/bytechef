@@ -89,6 +89,10 @@ export interface WorkflowEditorStateI extends WorkflowReadOnlyStateI {
     ConnectionKeys: ConnectionKeysI;
     connectionTagsQueryKey: QueryKey;
     cancelWorkflowQueries: () => void;
+    // Whether the workflow's project is backed by a code workflow, and its language. Undefined outside the
+    // automation project flow (e.g. embedded integrations) until CW-B wires the embedded equivalent.
+    codeWorkflow?: boolean;
+    codeWorkflowLanguage?: string;
     deleteClusterElementParameterMutation: UseMutationResult<
         DeleteClusterElementParameter200Response,
         Error,

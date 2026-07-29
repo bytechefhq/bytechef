@@ -132,6 +132,18 @@ export interface Integration {
      */
     category?: Category;
     /**
+     * Whether the integration is backed by a code workflow.
+     * @type {boolean}
+     * @memberof Integration
+     */
+    readonly codeWorkflow?: boolean;
+    /**
+     * The programming language of the code workflow, if the integration is code-backed.
+     * @type {string}
+     * @memberof Integration
+     */
+    readonly codeWorkflowLanguage?: string;
+    /**
      * The integration workflow ids belonging to this integration.
      * @type {Array<number>}
      * @memberof Integration
@@ -187,6 +199,8 @@ export function IntegrationFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'name': json['name'] == null ? undefined : json['name'],
         'permissionExpression': json['permissionExpression'] == null ? undefined : json['permissionExpression'],
         'category': json['category'] == null ? undefined : CategoryFromJSON(json['category']),
+        'codeWorkflow': json['codeWorkflow'] == null ? undefined : json['codeWorkflow'],
+        'codeWorkflowLanguage': json['codeWorkflowLanguage'] == null ? undefined : json['codeWorkflowLanguage'],
         'integrationWorkflowIds': json['integrationWorkflowIds'] == null ? undefined : json['integrationWorkflowIds'],
         'tags': json['tags'] == null ? undefined : ((json['tags'] as Array<any>).map(TagFromJSON)),
         'version': json['__version'] == null ? undefined : json['__version'],
@@ -197,7 +211,7 @@ export function IntegrationToJSON(json: any): Integration {
     return IntegrationToJSONTyped(json, false);
 }
 
-export function IntegrationToJSONTyped(value?: Omit<Integration, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastPublishedDate'|'lastIntegrationVersion'> | null, ignoreDiscriminator: boolean = false): any {
+export function IntegrationToJSONTyped(value?: Omit<Integration, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastPublishedDate'|'lastIntegrationVersion'|'codeWorkflow'|'codeWorkflowLanguage'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

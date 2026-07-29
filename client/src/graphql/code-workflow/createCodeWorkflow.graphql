@@ -1,0 +1,3 @@
+mutation createCodeWorkflow($workspaceId: ID!, $name: String!, $language: CodeWorkflowLanguage!) {
+    createCodeWorkflow(workspaceId: $workspaceId, name: $name, language: $language)
+}
