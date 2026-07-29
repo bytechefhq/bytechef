@@ -18,11 +18,12 @@ import {
     useUpdateAutomationWorkflowProjectWorkflowPermissionExpressionMutation,
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {FolderIcon} from 'lucide-react';
+import {FolderIcon, UploadIcon} from 'lucide-react';
 import {ChangeEvent, useRef, useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 
 import AutomationWorkflowProjectsFilterTitle from './components/AutomationWorkflowProjectsFilterTitle';
+import DeployCodeWorkflowDialog from './components/DeployCodeWorkflowDialog';
 import AutomationWorkflowDialog, {
     AutomationWorkflowFormValuesI,
 } from './components/automation-workflow-dialog/AutomationWorkflowDialog';
@@ -42,6 +43,7 @@ const AutomationWorkflows = () => {
         AutomationWorkflowProjectType['workflowTemplates'][number] | undefined
     >();
     const [pendingWorkflowProjectId, setPendingWorkflowProjectId] = useState<string | null>(null);
+    const [showDeployDialog, setShowDeployDialog] = useState(false);
     const [showProjectDialog, setShowProjectDialog] = useState(false);
     const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
 
@@ -301,7 +303,19 @@ const AutomationWorkflows = () => {
                     <Header
                         centerTitle={true}
                         position="main"
-                        right={<Button aria-label="New Project" label="New Project" onClick={handleNewProject} />}
+                        right={
+                            <div className="flex items-center gap-2">
+                                <Button
+                                    aria-label="Deploy Code Workflow"
+                                    icon={<UploadIcon />}
+                                    label="Deploy Code Workflow"
+                                    onClick={() => setShowDeployDialog(true)}
+                                    variant="outline"
+                                />
+
+                                <Button aria-label="New Project" label="New Project" onClick={handleNewProject} />
+                            </div>
+                        }
                         title={
                             <AutomationWorkflowProjectsFilterTitle
                                 categories={categories}
@@ -342,6 +356,10 @@ const AutomationWorkflows = () => {
                     />
                 )}
             </PageLoader>
+
+            {showDeployDialog && (
+                <DeployCodeWorkflowDialog onClose={() => setShowDeployDialog(false)} onDeployed={invalidateProjects} />
+            )}
 
             {showProjectDialog && (
                 <AutomationWorkflowProjectDialog

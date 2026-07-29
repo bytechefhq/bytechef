@@ -1,0 +1,9 @@
+query connectedUserCodeWorkflowReferences($catalogWorkflowUuids: [ID!]!) {
+    connectedUserCodeWorkflowReferences(catalogWorkflowUuids: $catalogWorkflowUuids) {
+        catalogWorkflowUuid
+        externalUserId
+        enabled
+        dangling
+        danglingReason
+    }
+}

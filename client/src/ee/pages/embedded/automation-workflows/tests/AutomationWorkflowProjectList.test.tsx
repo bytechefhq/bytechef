@@ -26,6 +26,7 @@ const makeProject = (
     overrides: Partial<AutomationWorkflowProjectType> & Pick<AutomationWorkflowProjectType, 'id' | 'name'>
 ): AutomationWorkflowProjectType => ({
     categoryId: null,
+    codeWorkflowProject: false,
     description: null,
     lastPublishedVersion: null,
     permissionExpression: null,

@@ -9,6 +9,7 @@ query automationWorkflowProjects {
         version
         lastPublishedVersion
         permissionExpression
+        codeWorkflowProject
         workflowTemplates {
             workflowUuid
             label
