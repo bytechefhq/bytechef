@@ -81,6 +81,20 @@ public class SpaWebFilterIntTest {
     }
 
     @Test
+    void testFilterForwardsEmbeddedBuilderToWorkflowBuilderHtml() throws Exception {
+        mockMvc.perform(get("/embedded/builder/0199f000-aaaa-bbbb-cccc-000000000001"))
+            .andExpect(status().isOk())
+            .andExpect(forwardedUrl("/workflow-builder.html"));
+    }
+
+    @Test
+    void testFilterStillForwardsLegacyWorkflowBuilderToIndex() throws Exception {
+        mockMvc.perform(get("/embedded/workflow-builder/0199f000-aaaa-bbbb-cccc-000000000001"))
+            .andExpect(status().isOk())
+            .andExpect(forwardedUrl("/index.html"));
+    }
+
+    @Test
     void testFilterDoesNotForwardToIndexForApi() throws Exception {
         mockMvc.perform(get("/api/authenticate"))
             .andExpect(status().isOk())

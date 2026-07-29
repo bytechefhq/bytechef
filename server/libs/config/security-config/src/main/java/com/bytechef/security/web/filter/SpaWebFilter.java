@@ -77,6 +77,14 @@ public class SpaWebFilter extends OncePerRequestFilter {
 
         String path = requestURI.substring(contextPath.length());
 
+        if (path.startsWith("/embedded/builder/") && !path.contains(".")) {
+            RequestDispatcher requestDispatcher = request.getRequestDispatcher("/workflow-builder.html");
+
+            requestDispatcher.forward(request, response);
+
+            return;
+        }
+
         if (isNonSpaPath(path) && !path.contains(".") && path.matches("/(.*)")) {
             RequestDispatcher requestDispatcher = request.getRequestDispatcher("/index.html");
 
