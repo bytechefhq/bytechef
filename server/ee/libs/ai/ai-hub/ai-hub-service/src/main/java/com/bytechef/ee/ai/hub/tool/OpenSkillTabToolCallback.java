@@ -19,46 +19,45 @@ import tools.jackson.core.JacksonException;
 import tools.jackson.databind.json.JsonMapper;
 
 /**
- * Signaling-only Spring AI {@link ToolCallback} that lets the AI Hub agent request a knowledge base to be opened in the
- * client resource panel. The server-side implementation is a no-op that echoes the arguments back as a JSON result; the
- * AI Hub client subscriber intercepts the tool-call result event and updates the tabs store.
+ * Signaling-only Spring AI {@link ToolCallback} that lets the AI Hub agent request a skill to be opened in the client
+ * resource panel. The server-side implementation is a no-op that echoes the arguments back as a JSON result; the AI Hub
+ * client subscriber intercepts the tool-call result event and updates the tabs store.
  *
  * @version ee
  *
  * @author Ivica Cardic
  */
-public class OpenKnowledgeBaseTabToolCallback implements ToolCallback {
+public class OpenSkillTabToolCallback implements ToolCallback {
 
-    private static final Logger log = LoggerFactory.getLogger(OpenKnowledgeBaseTabToolCallback.class);
+    private static final Logger log = LoggerFactory.getLogger(OpenSkillTabToolCallback.class);
 
     private static final String DESCRIPTION = """
-        Open a knowledge base in the AI Hub resource panel so the user can see it.
-        Call this after creating a knowledge base or when referring to an existing knowledge base.
-        Use the knowledgeBaseId returned from createKnowledgeBase or listKnowledgeBases - never
-        invent knowledge base IDs.""";
+        Open an AI skill in the AI Hub resource panel so the user can see it.
+        Call this after creating a skill or when referring to an existing skill.
+        Use the skill id returned from createAiSkill or getAiSkills - never invent skill IDs.""";
 
     private static final String INPUT_SCHEMA = """
         {
             "type": "object",
             "properties": {
-                "knowledgeBaseId": {"type": "string", "description": "Knowledge base id"},
+                "skillId": {"type": "string", "description": "Skill id"},
                 "name": {"type": "string", "description": "Display name for the tab"}
             },
-            "required": ["knowledgeBaseId", "name"]
+            "required": ["skillId", "name"]
         }""";
 
     private final JsonMapper jsonMapper = new JsonMapper();
     private final @Nullable AiHubTaskArtifactRecorder artifactRecorder;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public OpenKnowledgeBaseTabToolCallback(@Nullable AiHubTaskArtifactRecorder artifactRecorder) {
+    public OpenSkillTabToolCallback(@Nullable AiHubTaskArtifactRecorder artifactRecorder) {
         this.artifactRecorder = artifactRecorder;
     }
 
     @Override
     public ToolDefinition getToolDefinition() {
         return ToolDefinition.builder()
-            .name("openKnowledgeBaseTab")
+            .name("openSkillTab")
             .description(DESCRIPTION)
             .inputSchema(INPUT_SCHEMA)
             .build();
@@ -72,11 +71,11 @@ public class OpenKnowledgeBaseTabToolCallback implements ToolCallback {
     @Override
     public String call(String toolInput, @Nullable ToolContext toolContext) {
         try {
-            OpenKnowledgeBaseTabInput input = jsonMapper.readValue(toolInput, OpenKnowledgeBaseTabInput.class);
+            OpenSkillTabInput input = jsonMapper.readValue(toolInput, OpenSkillTabInput.class);
 
-            if (input.knowledgeBaseId() == null || input.knowledgeBaseId()
+            if (input.skillId() == null || input.skillId()
                 .isBlank()) {
-                return toolError("knowledgeBaseId is required");
+                return toolError("skillId is required");
             }
 
             if (input.name() == null || input.name()
@@ -86,17 +85,15 @@ public class OpenKnowledgeBaseTabToolCallback implements ToolCallback {
 
             recordArtifact(toolContext, input);
 
-            return jsonMapper.writeValueAsString(
-                new OpenKnowledgeBaseTabOutput(true, input.knowledgeBaseId(), input.name()));
+            return jsonMapper.writeValueAsString(new OpenSkillTabOutput(true, input.skillId(), input.name()));
         } catch (JacksonException exception) {
             return toolError("Invalid tool input: " + exception.getMessage());
         } catch (RuntimeException exception) {
-            return ToolErrors.runtimeFailure(
-                jsonMapper, OpenKnowledgeBaseTabToolCallback.class, "openKnowledgeBaseTab", exception);
+            return ToolErrors.runtimeFailure(jsonMapper, OpenSkillTabToolCallback.class, "openSkillTab", exception);
         }
     }
 
-    private void recordArtifact(@Nullable ToolContext toolContext, OpenKnowledgeBaseTabInput input) {
+    private void recordArtifact(@Nullable ToolContext toolContext, OpenSkillTabInput input) {
         if (artifactRecorder == null) {
             return;
         }
@@ -109,12 +106,10 @@ public class OpenKnowledgeBaseTabToolCallback implements ToolCallback {
 
         try {
             artifactRecorder.recordReference(
-                invocationContext.threadId(), invocationContext.userId(), "KB_REFERENCED",
-                input.knowledgeBaseId(), input.name());
+                invocationContext.threadId(), invocationContext.userId(), "SKILL_REFERENCED", input.skillId(),
+                input.name());
         } catch (RuntimeException exception) {
-            log.warn(
-                "Failed to record knowledge base artifact for openKnowledgeBaseTab (knowledgeBaseId={})",
-                input.knowledgeBaseId(), exception);
+            log.warn("Failed to record skill artifact for openSkillTab (skillId={})", input.skillId(), exception);
         }
     }
 
@@ -122,9 +117,9 @@ public class OpenKnowledgeBaseTabToolCallback implements ToolCallback {
         return ToolErrors.toolError(jsonMapper, message);
     }
 
-    public record OpenKnowledgeBaseTabInput(String knowledgeBaseId, String name) {
+    public record OpenSkillTabInput(String skillId, String name) {
     }
 
-    public record OpenKnowledgeBaseTabOutput(boolean opened, String knowledgeBaseId, String name) {
+    public record OpenSkillTabOutput(boolean opened, String skillId, String name) {
     }
 }

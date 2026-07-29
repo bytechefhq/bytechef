@@ -280,6 +280,43 @@ public class AiHubTaskArtifactServiceImpl implements AiHubTaskArtifactService {
     }
 
     @Override
+    public @Nullable AiHubTaskArtifact recordReferenceByThread(
+        String threadId, @Nullable Long userId, AiHubTaskArtifactKind kind, String artifactId,
+        String artifactName) {
+
+        if (userId == null) {
+            return null;
+        }
+
+        Optional<AiHubTask> taskOptional = taskRepository.findByThreadIdAndUserId(threadId, userId);
+
+        if (taskOptional.isEmpty()) {
+            return null;
+        }
+
+        AiHubTask task = taskOptional.get();
+
+        Optional<AiHubTaskArtifact> existing = taskArtifactRepository.findFirstByTaskIdAndKindAndArtifactId(
+            task.getId(), kind.ordinal(), artifactId);
+
+        if (existing.isPresent()) {
+            return existing.get();
+        }
+
+        AiHubTaskArtifact artifact = new AiHubTaskArtifact();
+
+        artifact.setTaskId(task.getId());
+        artifact.setKind(kind);
+        artifact.setArtifactId(artifactId);
+        artifact.setArtifactName(artifactName);
+        artifact.setEnvironment(task.getEnvironment());
+        artifact.setCreatedAt(LocalDateTime.now(clock));
+        artifact.setStatus(AiHubTaskArtifactStatus.APPLIED);
+
+        return taskArtifactRepository.save(artifact);
+    }
+
+    @Override
     public void deleteReference(long artifactId, long requesterWorkspaceId, long requesterUserId) {
         Optional<AiHubTaskArtifact> artifactOptional = taskArtifactRepository.findById(artifactId);
 

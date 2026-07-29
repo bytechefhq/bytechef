@@ -53,5 +53,9 @@ public enum AiHubTaskArtifactKind {
     MCP_SERVER_REFERENCED,
     API_COLLECTION_REFERENCED,
     WORKFLOW_EXECUTION_REFERENCED,
-    TASK_REFERENCED
+    TASK_REFERENCED,
+
+    // Agent-opened / composer-referenced skill (SkillsTools archive). Appended at the END per the JDBC
+    // enum-storage convention so all earlier ordinals stay pinned.
+    SKILL_REFERENCED
 }

@@ -110,8 +110,8 @@ public class SkillsTools {
         }
     }
 
-//    @Tool(description = "Delete an AI skill by its ID.")
-    public void deleteAiSkill(
+    @Tool(description = "Delete an AI skill by its ID. Returns a confirmation message.")
+    public String deleteAiSkill(
         @ToolParam(description = "The ID of the skill to delete") long id) {
 
         try {
@@ -120,6 +120,8 @@ public class SkillsTools {
             if (log.isDebugEnabled()) {
                 log.debug("deleteAiSkill({}): Deleted skill", id);
             }
+
+            return "Deleted skill " + id + ".";
         } catch (Exception e) {
             log.error("deleteAiSkill({}): Failed to delete skill", id, e);
 

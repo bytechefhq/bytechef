@@ -104,4 +104,13 @@ public class AiHubTaskArtifactRecorderImpl implements AiHubTaskArtifactRecorder 
             threadId, userId, AiHubTaskArtifactKind.WORKFLOW_REFERENCED, workflowId, projectId, projectWorkflowId,
             workflowName);
     }
+
+    @Override
+    public void recordReference(
+        String threadId, @Nullable Long userId, String artifactKind, String artifactId, String artifactName) {
+
+        AiHubTaskArtifactKind kind = AiHubTaskArtifactKind.valueOf(artifactKind);
+
+        taskArtifactService.recordReferenceByThread(threadId, userId, kind, artifactId, artifactName);
+    }
 }

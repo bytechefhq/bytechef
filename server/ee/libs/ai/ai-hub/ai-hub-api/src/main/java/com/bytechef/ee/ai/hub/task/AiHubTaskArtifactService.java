@@ -149,4 +149,24 @@ public interface AiHubTaskArtifactService {
     void recordWorkflowArtifact(
         String threadId, @Nullable Long userId, AiHubTaskArtifactKind kind,
         String workflowId, long projectId, @Nullable Long projectWorkflowId, String workflowName);
+
+    /**
+     * Server robustness layer for reference-kind artifacts recorded from tool callbacks. Resolves the task by
+     * {@code (threadId, userId)} — unlike
+     * {@link #recordReference(long, long, long, AiHubTaskArtifactKind, String, String, Map)}, which is keyed by a
+     * caller-known {@code taskId} — and dedups on {@code (task, kind, artifactId)} via
+     * {@code findFirstByTaskIdAndKindAndArtifactId}, so it collapses onto an existing row instead of duplicating.
+     * Returns {@code null} (no-op) when {@code userId} is {@code null} or no task is found for the thread.
+     *
+     * @param threadId     the AG-UI thread id identifying the active task
+     * @param userId       the owner of the task; {@code null} is treated as "no binding" and skips recording
+     * @param kind         the artifact kind
+     * @param artifactId   the string id of the referenced entity
+     * @param artifactName display name snapshot taken at reference time
+     * @return the existing or newly-saved artifact, or {@code null} when the recording was skipped
+     */
+    @Nullable
+    AiHubTaskArtifact recordReferenceByThread(
+        String threadId, @Nullable Long userId, AiHubTaskArtifactKind kind, String artifactId,
+        String artifactName);
 }

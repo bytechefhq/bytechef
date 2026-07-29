@@ -59,4 +59,11 @@ public interface AiHubTaskArtifactRecorder {
     void recordWorkflowReference(
         String threadId, @Nullable Long userId, String workflowId, long projectId,
         @Nullable Long projectWorkflowId, String workflowName);
+
+    /**
+     * Server robustness layer for reference-kind artifacts. Resolves the task by (threadId, userId) and dedups on
+     * (task, kind, artifactId) so it collapses onto the client hook's row instead of duplicating.
+     */
+    void recordReference(
+        String threadId, @Nullable Long userId, String artifactKind, String artifactId, String artifactName);
 }

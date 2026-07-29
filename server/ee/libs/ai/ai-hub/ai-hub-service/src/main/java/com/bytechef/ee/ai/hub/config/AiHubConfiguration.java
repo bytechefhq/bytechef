@@ -104,6 +104,7 @@ import com.bytechef.ee.ai.hub.tool.OpenAiHubPersonalAgentTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenDataTableTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenFileTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenKnowledgeBaseTabToolCallback;
+import com.bytechef.ee.ai.hub.tool.OpenSkillTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenWorkflowChatTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenWorkflowTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.PromoteWorkflowToolCallback;
@@ -282,8 +283,9 @@ public class AiHubConfiguration {
         // the client still records the reference when the tab opens.
         toolCallbacks.add(new OpenWorkflowTabToolCallback(null));
         toolCallbacks.add(new OpenWorkflowChatTabToolCallback());
-        toolCallbacks.add(new OpenDataTableTabToolCallback());
-        toolCallbacks.add(new OpenKnowledgeBaseTabToolCallback());
+        toolCallbacks.add(new OpenDataTableTabToolCallback(null));
+        toolCallbacks.add(new OpenKnowledgeBaseTabToolCallback(null));
+        toolCallbacks.add(new OpenSkillTabToolCallback(null));
         toolCallbacks.add(new ListDataTablesToolCallback(workspaceDataTableFacade));
         toolCallbacks.add(
             new QueryDataTableToolCallback(
@@ -451,8 +453,9 @@ public class AiHubConfiguration {
         toolCallbacks.add(new OpenFileTabToolCallback());
         toolCallbacks.add(new OpenWorkflowTabToolCallback(aiHubTaskArtifactRecorder));
         toolCallbacks.add(new OpenWorkflowChatTabToolCallback());
-        toolCallbacks.add(new OpenDataTableTabToolCallback());
-        toolCallbacks.add(new OpenKnowledgeBaseTabToolCallback());
+        toolCallbacks.add(new OpenDataTableTabToolCallback(aiHubTaskArtifactRecorder));
+        toolCallbacks.add(new OpenKnowledgeBaseTabToolCallback(aiHubTaskArtifactRecorder));
+        toolCallbacks.add(new OpenSkillTabToolCallback(aiHubTaskArtifactRecorder));
         toolCallbacks.add(new ListDataTablesToolCallback(workspaceDataTableFacade));
         toolCallbacks.add(
             new QueryDataTableToolCallback(

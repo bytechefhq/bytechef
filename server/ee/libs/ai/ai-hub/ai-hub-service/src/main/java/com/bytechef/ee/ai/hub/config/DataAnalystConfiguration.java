@@ -65,7 +65,9 @@ public class DataAnalystConfiguration {
             new QueryDataTableToolCallback(dataTableRowService, dataTableService);
         AggregateDataTableToolCallback aggregateDataTable =
             new AggregateDataTableToolCallback(dataTableRowService, dataTableService);
-        OpenDataTableTabToolCallback openDataTableTab = new OpenDataTableTabToolCallback();
+        // No server-side artifact recorder: this specialist path relies on the client tab-watching hook to
+        // record the reference, same as the ASK mode registration in AiHubConfiguration.
+        OpenDataTableTabToolCallback openDataTableTab = new OpenDataTableTabToolCallback(null);
 
         return ChatClient.builder(chatModel)
             .defaultSystem(systemPrompt)

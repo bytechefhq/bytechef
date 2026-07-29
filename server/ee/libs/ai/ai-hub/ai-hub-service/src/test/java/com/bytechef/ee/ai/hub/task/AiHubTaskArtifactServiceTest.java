@@ -14,6 +14,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -303,6 +304,53 @@ class AiHubTaskArtifactServiceTest {
         // The client-driven WORKFLOW_REFERENCED record must return the existing server-side WORKFLOW_CREATED
         // row rather than inserting a second sidebar entry for the same workflow.
         assertThat(result).isSameAs(existing);
+
+        verify(taskArtifactRepository, never()).save(any());
+    }
+
+    @Test
+    void testRecordReferenceByThreadDedupsOnThreadKindArtifactId() {
+        AiHubTask task = buildTask(TASK_ID, USER_ID, THREAD_ID);
+        AiHubTaskArtifact existing = buildArtifact(500L, "SKILL_REFERENCED", "5");
+
+        when(taskRepository.findByThreadIdAndUserId(THREAD_ID, USER_ID)).thenReturn(Optional.of(task));
+        when(
+            taskArtifactRepository.findFirstByTaskIdAndKindAndArtifactId(
+                TASK_ID, AiHubTaskArtifactKind.SKILL_REFERENCED.ordinal(), "5"))
+                    .thenReturn(Optional.empty())
+                    .thenReturn(Optional.of(existing));
+        when(taskArtifactRepository.save(any())).thenReturn(existing);
+
+        AiHubTaskArtifact firstResult = taskArtifactService.recordReferenceByThread(
+            THREAD_ID, USER_ID, AiHubTaskArtifactKind.SKILL_REFERENCED, "5", "My Skill");
+        AiHubTaskArtifact secondResult = taskArtifactService.recordReferenceByThread(
+            THREAD_ID, USER_ID, AiHubTaskArtifactKind.SKILL_REFERENCED, "5", "My Skill");
+
+        // The second call must collapse onto the row saved by the first call rather than inserting a duplicate.
+        assertThat(firstResult).isSameAs(existing);
+        assertThat(secondResult).isSameAs(existing);
+        verify(taskArtifactRepository, times(1)).save(any());
+    }
+
+    @Test
+    void testRecordReferenceByThreadReturnsNullWhenUserIdNull() {
+        AiHubTaskArtifact result = taskArtifactService.recordReferenceByThread(
+            THREAD_ID, null, AiHubTaskArtifactKind.SKILL_REFERENCED, "5", "My Skill");
+
+        assertThat(result).isNull();
+
+        verify(taskRepository, never()).findByThreadIdAndUserId(anyString(), anyLong());
+        verify(taskArtifactRepository, never()).save(any());
+    }
+
+    @Test
+    void testRecordReferenceByThreadReturnsNullWhenTaskNotFound() {
+        when(taskRepository.findByThreadIdAndUserId(THREAD_ID, USER_ID)).thenReturn(Optional.empty());
+
+        AiHubTaskArtifact result = taskArtifactService.recordReferenceByThread(
+            THREAD_ID, USER_ID, AiHubTaskArtifactKind.SKILL_REFERENCED, "5", "My Skill");
+
+        assertThat(result).isNull();
 
         verify(taskArtifactRepository, never()).save(any());
     }

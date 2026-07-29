@@ -8,8 +8,11 @@
 package com.bytechef.ee.ai.hub.tool;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
@@ -25,7 +28,7 @@ class OpenDataTableTabToolCallbackTest {
 
     @Test
     void testToolDefinitionExposesOpenDataTableTabName() {
-        OpenDataTableTabToolCallback callback = new OpenDataTableTabToolCallback();
+        OpenDataTableTabToolCallback callback = new OpenDataTableTabToolCallback(null);
 
         ToolDefinition definition = callback.getToolDefinition();
 
@@ -37,7 +40,7 @@ class OpenDataTableTabToolCallbackTest {
 
     @Test
     void testCallEchoesArgumentsAsOpenedPayload() throws Exception {
-        OpenDataTableTabToolCallback callback = new OpenDataTableTabToolCallback();
+        OpenDataTableTabToolCallback callback = new OpenDataTableTabToolCallback(null);
 
         String result = callback.call("{\"dataTableId\":\"42\",\"name\":\"Customer Records\"}");
 
@@ -52,8 +55,23 @@ class OpenDataTableTabToolCallbackTest {
     }
 
     @Test
+    void testCallRecordsDataTableReferenceWhenRecorderPresent() {
+        AiHubTaskArtifactRecorder artifactRecorder = mock(AiHubTaskArtifactRecorder.class);
+
+        OpenDataTableTabToolCallback callback = new OpenDataTableTabToolCallback(artifactRecorder);
+
+        ToolContext toolContext = new ToolContext(
+            new AiHubToolInvocationContext(7L, 42L, null, null, 0L, "thread-9").toToolContext());
+
+        callback.call("{\"dataTableId\":\"42\",\"name\":\"Customer Records\"}", toolContext);
+
+        verify(artifactRecorder).recordReference(
+            "thread-9", 42L, "DATA_TABLE_REFERENCED", "42", "Customer Records");
+    }
+
+    @Test
     void testCallReturnsErrorOnInvalidJson() throws Exception {
-        OpenDataTableTabToolCallback callback = new OpenDataTableTabToolCallback();
+        OpenDataTableTabToolCallback callback = new OpenDataTableTabToolCallback(null);
 
         String result = callback.call("not-json");
 
@@ -64,7 +82,7 @@ class OpenDataTableTabToolCallbackTest {
 
     @Test
     void testCallReturnsErrorWhenDataTableIdMissing() throws Exception {
-        OpenDataTableTabToolCallback callback = new OpenDataTableTabToolCallback();
+        OpenDataTableTabToolCallback callback = new OpenDataTableTabToolCallback(null);
 
         String result = callback.call("{\"name\":\"Customer Records\"}");
 

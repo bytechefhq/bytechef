@@ -143,6 +143,7 @@ and return the subagent's synthesised response.
 - skills_agent({request}) — Skills are reusable parameterised workflow templates the
   user composes into projects. Delegate listing, explaining, creating, updating, or
   composing skills.
+- openSkillTab({skillId, name}) — show an AI skill in the resource panel.
 - cluster_element_agent({request}) — Cluster elements are the slotted child operations
   inside cluster-root components (AI Agent, Knowledge Base, etc.) — model, chat memory,
   RAG source, guardrails, tools. Delegate cluster element design and mutations.
