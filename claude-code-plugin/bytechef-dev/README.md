@@ -1,6 +1,15 @@
 # bytechef-dev Plugin
 
-Development tools for ByteChef — component scaffolding, patterns, and API reference.
+Development tools for ByteChef — one plugin, four capabilities:
+
+| Skill | What it does |
+|---|---|
+| **ByteChef Component Builder** | Scaffold in-repo platform components (Java, `server/libs/modules/components/`) |
+| **ByteChef Custom Component Builder** | Author single-file (JS/Python/Ruby) or JAR (Java) custom components and **upload** them to a running instance |
+| **ByteChef Code Workflow Builder** | Author whole projects (automation) and integrations (embedded) as code and **deploy** them |
+| **ByteChef Management MCP Setup** | Connect Claude to a running instance's Management MCP server so it can build workflows live |
+
+The upload/deploy/MCP skills use a configured instance: set `BYTECHEF_BASE_URL` and `BYTECHEF_API_KEY` (admin API key) in the environment, or the skill will ask.
 
 ## Skills
 
@@ -29,6 +38,24 @@ Start a new Claude Code session and ask:
 - "Create a connection definition with API key auth"
 
 The skill activates automatically when it detects component-building intent.
+
+### ByteChef Custom Component Builder
+
+Single-file JS/Python/Ruby components (bare object-literal / `SimpleNamespace` / `Struct` contracts, `name` + Integer `version` + `actions[{name,title,description,perform}]`) and Java JARs (SDK `component-api` + `META-INF/services/com.bytechef.component.ComponentHandler`), uploaded via `POST /api/platform/v1/custom-components/deploy` (multipart `componentFile`; extension picks the language; admin-gated; `.jar` requires `java-enabled` on the server).
+
+Ask: "Create a custom ByteChef component in Python and upload it" / "Deploy this .js component to my ByteChef".
+
+### ByteChef Code Workflow Builder
+
+Whole projects/integrations as one artifact. Automation projects key on `name` (locked after first deploy) with `workflows[{name,label,tasks[{name,label,perform}]}]`; embedded integrations key on `componentName`. Deploys: `POST /api/automation/v1/projects/deploy` (`projectFile` + optional `workspaceId`) and `POST /api/embedded/internal/integrations/deploy` (`integrationFile`). Java via `ProjectHandler`/`IntegrationHandler` SDK JARs.
+
+Ask: "Write a code workflow that pings an API daily and deploy it" / "Create an embedded integration as code".
+
+### ByteChef Management MCP Setup
+
+Configures `.mcp.json` for the instance's Management MCP server (`{PUBLIC_URL}/api/management/{SECRET_KEY}/mcp`, streamable HTTP; SSE variant available; optional `Authorization: Bearer <admin key>` + `X-ENVIRONMENT`). Gives Claude live project/workflow/component tools against the connected ByteChef.
+
+Ask: "Connect Claude to my ByteChef instance" / "Set up the ByteChef MCP server".
 
 ## Installation
 

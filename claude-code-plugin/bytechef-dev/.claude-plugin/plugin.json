@@ -1,6 +1,6 @@
 {
   "name": "bytechef-dev",
-  "version": "0.1.0",
-  "description": "Development tools for ByteChef — component scaffolding, patterns, and API reference",
+  "version": "0.2.0",
+  "description": "ByteChef development tools — platform component scaffolding, custom component authoring + upload, code workflows (projects & integrations) authoring + deploy, and Management MCP server setup",
   "author": "ByteChef Team"
 }
