@@ -17,9 +17,12 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
+import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.model.tool.ToolCallingChatOptions;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
@@ -53,6 +56,18 @@ public class CatalogChatModel implements ChatModel {
     }
 
     @Override
+    public ChatOptions getOptions() {
+        ChatOptions delegateOptions = resolveDelegateOptions();
+
+        if (delegateOptions != null) {
+            return delegateOptions;
+        }
+
+        return ToolCallingChatOptions.builder()
+            .build();
+    }
+
+    @Override
     public ChatResponse call(Prompt prompt) {
         return resolveDelegate().call(prompt);
     }
@@ -60,6 +75,16 @@ public class CatalogChatModel implements ChatModel {
     @Override
     public Flux<ChatResponse> stream(Prompt prompt) {
         return resolveDelegate().stream(prompt);
+    }
+
+    private @Nullable ChatOptions resolveDelegateOptions() {
+        try {
+            ChatModel delegate = resolveDelegate();
+
+            return delegate.getOptions();
+        } catch (RuntimeException exception) {
+            return null;
+        }
     }
 
     private ChatModel resolveDelegate() {

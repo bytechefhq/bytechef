@@ -7,6 +7,11 @@
 
 package com.bytechef.ee.ai.hub.toolsearch;
 
+import com.bytechef.commons.util.NumberUtils;
+import com.bytechef.ee.ai.hub.util.AiHubStateKeys;
+import com.bytechef.platform.configuration.context.EnvironmentContext;
+import com.bytechef.platform.configuration.context.EnvironmentContextThreadLocalAccessor;
+import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -15,7 +20,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
+import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.client.ChatClientRequest;
+import org.springframework.ai.chat.client.ChatClientResponse;
 import org.springframework.ai.chat.client.advisor.api.CallAdvisorChain;
 import org.springframework.ai.chat.client.advisor.api.StreamAdvisorChain;
 import org.springframework.ai.chat.client.advisor.toolsearch.ToolSearchToolCallingAdvisor;
@@ -25,6 +33,7 @@ import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.toolsearch.ToolIndex;
 import org.springframework.ai.tool.toolsearch.eviction.LruEvictionStrategy;
 import org.springframework.core.io.DefaultResourceLoader;
+import reactor.core.publisher.Flux;
 
 /**
  * A {@link ToolSearchToolCallingAdvisor} that keeps a fixed set of tools always callable, bypassing the search gate.
@@ -109,11 +118,87 @@ public final class PinnedToolSearchToolCallingAdvisor extends ToolSearchToolCall
         ChatClientRequest chatClientRequest,
         StreamAdvisorChain streamAdvisorChain) {
 
-        ChatClientRequest initialized = super.doInitializeLoopStream(chatClientRequest, streamAdvisorChain);
+        // Session indexing (toolIndex.indexTools -> EmbeddingModel.embed) runs synchronously here on a
+        // Schedulers.boundedElastic() worker where the ThreadLocal-bound EnvironmentContext is unset (the agent binds
+        // it on the HTTP handler thread, which this hook does not inherit). Bind it deterministically from the advisor
+        // request context so the environment-scoped embedding provider resolves; the searchTool query embedding on the
+        // stream path is covered separately by adviseStream's contextWrite.
+        ChatClientRequest initialized = runWithEnvironment(
+            chatClientRequest, () -> super.doInitializeLoopStream(chatClientRequest, streamAdvisorChain));
 
         seedCatalogToolCallbacks(initialized);
 
         return capturePinnedToolCallbacks(initialized);
+    }
+
+    /**
+     * Propagates the environment across the whole streaming pipeline so the {@code searchTool} query embedding — which
+     * executes later in the tool-calling loop on a {@code Schedulers.boundedElastic()} worker, outside the synchronous
+     * init hook — resolves the environment-scoped provider. Writing the {@link EnvironmentContextThreadLocalAccessor}
+     * key into the Reactor Context (with automatic context propagation already enabled globally) rebinds
+     * {@link EnvironmentContext} on every downstream worker.
+     */
+    @Override
+    public Flux<ChatClientResponse> adviseStream(
+        ChatClientRequest chatClientRequest, StreamAdvisorChain streamAdvisorChain) {
+
+        Environment environment = resolveEnvironment(chatClientRequest);
+
+        Flux<ChatClientResponse> responseFlux = super.adviseStream(chatClientRequest, streamAdvisorChain);
+
+        if (environment == null) {
+            return responseFlux;
+        }
+
+        return responseFlux.contextWrite(
+            context -> context.put(EnvironmentContextThreadLocalAccessor.KEY, environment));
+    }
+
+    /**
+     * Blocking counterpart of {@link #adviseStream}: session indexing and the {@code searchTool} query embedding both
+     * run synchronously within this call, so binding {@link EnvironmentContext} for its duration covers both.
+     */
+    @Override
+    public ChatClientResponse adviseCall(ChatClientRequest chatClientRequest, CallAdvisorChain callAdvisorChain) {
+        return runWithEnvironment(chatClientRequest, () -> super.adviseCall(chatClientRequest, callAdvisorChain));
+    }
+
+    /**
+     * Runs {@code action} with {@link EnvironmentContext} bound to the request's environment (restoring the prior
+     * binding afterward), or unchanged when the request carries no resolvable environment.
+     */
+    private <T> T runWithEnvironment(ChatClientRequest chatClientRequest, Supplier<T> action) {
+        Environment environment = resolveEnvironment(chatClientRequest);
+
+        if (environment == null) {
+            return action.get();
+        }
+
+        Environment previousEnvironment = EnvironmentContext.fetchCurrentEnvironment();
+
+        EnvironmentContext.set(environment);
+
+        try {
+            return action.get();
+        } finally {
+            if (previousEnvironment == null) {
+                EnvironmentContext.clear();
+            } else {
+                EnvironmentContext.set(previousEnvironment);
+            }
+        }
+    }
+
+    private @Nullable Environment resolveEnvironment(ChatClientRequest chatClientRequest) {
+        Long environmentId = NumberUtils.asLong(
+            chatClientRequest.context()
+                .get(AiHubStateKeys.ENVIRONMENT_ID));
+
+        if (environmentId == null || environmentId < 0 || environmentId >= Environment.values().length) {
+            return null;
+        }
+
+        return Environment.values()[environmentId.intValue()];
     }
 
     @Override

@@ -23,7 +23,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.model.tool.ToolCallingChatOptions;
 
 /**
  * @version ee
@@ -108,5 +110,29 @@ class CatalogChatModelTest {
 
         verify(catalogChatModelFactory, times(1))
             .createChatModel(Provider.ANTHROPIC, ANTHROPIC_MODEL, "sk-anthropic", null);
+    }
+
+    @Test
+    void testOptionsReturnDelegateProviderTypedOptions() {
+        ChatModel delegate = mock(ChatModel.class);
+        ChatOptions delegateOptions = ToolCallingChatOptions.builder()
+            .model(ANTHROPIC_MODEL)
+            .build();
+
+        when(delegate.getOptions()).thenReturn(delegateOptions);
+        when(aiProviderFacade.getAiDefaultChatModelApiKey(Environment.PRODUCTION.ordinal()))
+            .thenReturn(ANTHROPIC_DEFAULT_MODEL);
+        when(catalogChatModelFactory.createChatModel(Provider.ANTHROPIC, ANTHROPIC_MODEL, "sk-anthropic", null))
+            .thenReturn(delegate);
+
+        assertThat(catalogChatModel.getOptions()).isSameAs(delegateOptions);
+    }
+
+    @Test
+    void testOptionsFallBackToToolCallingCapableWhenNoProviderActivated() {
+        when(aiProviderFacade.getAiDefaultChatModelApiKey(Environment.PRODUCTION.ordinal()))
+            .thenReturn(null);
+
+        assertThat(catalogChatModel.getOptions()).isInstanceOf(ToolCallingChatOptions.class);
     }
 }

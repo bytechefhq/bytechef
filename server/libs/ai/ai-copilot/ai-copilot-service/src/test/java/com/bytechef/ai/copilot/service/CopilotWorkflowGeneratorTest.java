@@ -48,11 +48,27 @@ class CopilotWorkflowGeneratorTest {
 
         CopilotWorkflowGeneratorImpl generator = new CopilotWorkflowGeneratorImpl(List.of(localAgent));
 
-        generator.generateWorkflow("wf-1", "Build it", "Prefer Slack.", Set.of("slack"));
+        generator.generateWorkflow("wf-1", "Build it", "Prefer Slack.", Set.of("slack"), 0);
 
         Map<String, Object> stateMap = captureState(localAgent);
 
         assertThat(stateMap).containsEntry(CopilotConstants.STATE_ADDITIONAL_SYSTEM_PROMPT, "Prefer Slack.");
+    }
+
+    @Test
+    void testSeedsEnvironmentIntoState() {
+        LocalAgent localAgent = newCompletingAgent();
+
+        CopilotWorkflowGeneratorImpl generator = new CopilotWorkflowGeneratorImpl(List.of(localAgent));
+
+        // Non-default ordinal (STAGING) proves the caller-supplied environment is threaded into the agent state as a
+        // Long, so CopilotSpringAIAgent.runWithEnvironment and WorkflowEditorSpringAIAgent.advisorParams bind it rather
+        // than falling back to PRODUCTION.
+        generator.generateWorkflow("wf-1", "Build it", null, Set.of(), 1);
+
+        Map<String, Object> stateMap = captureState(localAgent);
+
+        assertThat(stateMap).containsEntry(CopilotConstants.STATE_ENVIRONMENT_ID, 1L);
     }
 
     @Test
@@ -61,7 +77,7 @@ class CopilotWorkflowGeneratorTest {
 
         CopilotWorkflowGeneratorImpl generator = new CopilotWorkflowGeneratorImpl(List.of(localAgent));
 
-        generator.generateWorkflow("wf-1", "Build it", "   ", Set.of("slack"));
+        generator.generateWorkflow("wf-1", "Build it", "   ", Set.of("slack"), 0);
 
         Map<String, Object> stateMap = captureState(localAgent);
 
@@ -111,7 +127,7 @@ class CopilotWorkflowGeneratorTest {
         CopilotWorkflowGeneratorImpl generator = new CopilotWorkflowGeneratorImpl(List.of(stubAgent));
 
         TenantContext.runWithTenantId("acme",
-            () -> generator.generateWorkflow("wf-1", "build a thing", null, Set.of()));
+            () -> generator.generateWorkflow("wf-1", "build a thing", null, Set.of(), 0));
 
         assertThat(capturedState.get()).containsEntry(CopilotConstants.STATE_TENANT_ID, "acme");
     }

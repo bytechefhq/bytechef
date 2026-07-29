@@ -70,7 +70,9 @@ public class CopilotWorkflowGeneratorImpl implements CopilotWorkflowGenerator {
 
     @Override
     public void generateWorkflow(
-        String workflowId, String prompt, @Nullable String systemPrompt, Set<String> allowedComponentNames) {
+        String workflowId, String prompt, @Nullable String systemPrompt, Set<String> allowedComponentNames,
+        int environmentId) {
+
         String agentId = (Source.WORKFLOW_EDITOR.name() + "_" + Mode.BUILD.name()).toLowerCase();
 
         LocalAgent localAgent = localAgentMap.get(agentId);
@@ -84,6 +86,11 @@ public class CopilotWorkflowGeneratorImpl implements CopilotWorkflowGenerator {
         stateMap.put("workflowId", workflowId);
         stateMap.put("mode", Mode.BUILD.name());
         stateMap.put("autonomous", true);
+
+        // Scopes the agent's AI provider resolution (CopilotSpringAIAgent.runWithEnvironment binds the chat model,
+        // WorkflowEditorSpringAIAgent.advisorParams feeds the RAG embedding advisor). Without it the agent's own state
+        // carries no environment and both fall back to PRODUCTION on their Schedulers.boundedElastic() hops.
+        stateMap.put(CopilotConstants.STATE_ENVIRONMENT_ID, (long) environmentId);
 
         stateMap.put(CopilotConstants.STATE_TENANT_ID, TenantContext.getCurrentTenantId());
 

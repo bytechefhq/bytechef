@@ -117,6 +117,24 @@ public final class AiHubStateKeys {
      */
     public static final String ENVIRONMENT_ID = "environmentId";
 
+    /**
+     * Plain AG-UI state alias for the workspace id. The controller overwrites this with the server-verified value (see
+     * {@link #VERIFIED_WORKSPACE_ID}) so code reading either key form sees consistent, server-controlled data.
+     */
+    public static final String WORKSPACE_ID = "workspaceId";
+
+    /**
+     * Plain AG-UI state alias for the user id. The controller overwrites this with the server-verified value (see
+     * {@link #AUTHENTICATED_USER_ID}) so code reading either key form sees consistent, server-controlled data.
+     */
+    public static final String USER_ID = "userId";
+
+    /**
+     * Plain AG-UI state alias for the thread id. The controller overwrites this with the server-verified value (see
+     * {@link #VERIFIED_THREAD_ID}) so code reading either key form sees consistent, server-controlled data.
+     */
+    public static final String THREAD_ID = "threadId";
+
     private AiHubStateKeys() {
     }
 }

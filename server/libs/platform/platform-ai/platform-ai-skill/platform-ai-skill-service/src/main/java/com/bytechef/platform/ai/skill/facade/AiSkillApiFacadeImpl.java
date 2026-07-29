@@ -18,6 +18,7 @@ package com.bytechef.platform.ai.skill.facade;
 
 import com.bytechef.ai.copilot.service.CopilotSkillGenerator;
 import com.bytechef.platform.ai.skill.domain.AiSkill;
+import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.util.SecurityUtils;
 import java.util.List;
@@ -81,7 +82,13 @@ class AiSkillApiFacadeImpl implements AiSkillApiFacade {
         AiSkill aiSkill = aiSkillFacade.createAiSkillFromInstructions(
             derivePlaceholderName(prompt), null, "Skill is being generated.");
 
-        copilotSkillGenerator.generateSkill(aiSkill.getId(), prompt.strip());
+        // Design-time generation carries no request-supplied environment; resolve the AI provider under the ambient
+        // EnvironmentContext (bound by the request boundary, PRODUCTION when unset) rather than defaulting silently
+        // inside the agent.
+        int environmentId = EnvironmentContext.getCurrentEnvironment()
+            .ordinal();
+
+        copilotSkillGenerator.generateSkill(aiSkill.getId(), prompt.strip(), environmentId);
 
         return aiSkillFacade.getAiSkill(aiSkill.getId());
     }

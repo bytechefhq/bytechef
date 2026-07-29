@@ -24,11 +24,13 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.ai.copilot.service.CopilotSkillGenerator;
 import com.bytechef.platform.ai.skill.domain.AiSkill;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -40,7 +42,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 class AiSkillApiFacadeImplTest {
 
     private final AiSkillFacade aiSkillFacade = Mockito.mock(AiSkillFacade.class);
-    private final AiSkillApiFacadeImpl aiSkillApiFacade = new AiSkillApiFacadeImpl(aiSkillFacade);
+
+    @SuppressWarnings("unchecked")
+    private final ObjectProvider<CopilotSkillGenerator> copilotSkillGeneratorProvider =
+        Mockito.mock(ObjectProvider.class);
+    private final AiSkillApiFacadeImpl aiSkillApiFacade =
+        new AiSkillApiFacadeImpl(aiSkillFacade, copilotSkillGeneratorProvider);
 
     @AfterEach
     void tearDown() {

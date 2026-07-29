@@ -24,5 +24,11 @@ package com.bytechef.ai.copilot.service;
  */
 public interface CopilotSkillGenerator {
 
-    void generateSkill(long skillId, String prompt);
+    /**
+     * Drives the {@code skills_build} agent to fill the skill. {@code environmentId} is the {@code Environment} ordinal
+     * under which the agent's AI provider (chat + RAG embedding) is resolved; callers must supply the environment their
+     * AI providers are activated in, otherwise the agent falls back to {@code Environment.PRODUCTION} and fails when
+     * only a non-prod provider is configured.
+     */
+    void generateSkill(long skillId, String prompt, int environmentId);
 }

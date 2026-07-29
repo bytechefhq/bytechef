@@ -231,7 +231,7 @@ public class AiHubApiController {
      * access to.
      */
     private long enforceWorkspaceAccess(AgUiParameters agUiParameters, long userId) {
-        Long requestedWorkspaceId = readLong(agUiParameters, "workspaceId");
+        Long requestedWorkspaceId = readLong(agUiParameters, AiHubStateKeys.WORKSPACE_ID);
 
         if (requestedWorkspaceId == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Missing workspaceId in request state");
@@ -254,7 +254,7 @@ public class AiHubApiController {
         String threadId = agUiParameters.getThreadId();
 
         if (threadId == null || threadId.isBlank()) {
-            threadId = readString(agUiParameters, "threadId");
+            threadId = readString(agUiParameters, AiHubStateKeys.THREAD_ID);
         }
 
         if (threadId == null || threadId.isBlank()) {
@@ -301,22 +301,23 @@ public class AiHubApiController {
 
         // Defensively overwrite the unverified key paths with verified values so a future regression that reads
         // state.workspaceId or state.userId still gets server-controlled data.
-        state.set("workspaceId", workspaceId);
-        state.set("userId", userId);
+        state.set(AiHubStateKeys.WORKSPACE_ID, workspaceId);
+        state.set(AiHubStateKeys.USER_ID, userId);
 
         if (verifiedThreadId != null) {
             state.set(AiHubStateKeys.VERIFIED_THREAD_ID, verifiedThreadId);
-            state.set("threadId", verifiedThreadId);
+            state.set(AiHubStateKeys.THREAD_ID, verifiedThreadId);
         }
 
-        Long environmentId = readLong(agUiParameters, "environmentId");
+        Long rawEnvironmentId = readLong(agUiParameters, AiHubStateKeys.ENVIRONMENT_ID);
 
-        if (environmentId != null && environmentId >= 0 && environmentId < Environment.values().length) {
-            state.set(AiHubStateKeys.VERIFIED_ENVIRONMENT_ID, environmentId);
+        long environmentId =
+            rawEnvironmentId != null && rawEnvironmentId >= 0 && rawEnvironmentId < Environment.values().length
+                ? rawEnvironmentId
+                : 0L;
 
-            // Overwrite the unverified path so downstream reads of state.environmentId get the validated value.
-            state.set("environmentId", environmentId);
-        }
+        state.set(AiHubStateKeys.VERIFIED_ENVIRONMENT_ID, environmentId);
+        state.set(AiHubStateKeys.ENVIRONMENT_ID, environmentId);
 
         state.set(AiHubStateKeys.VERIFIED_TENANT_ID, TenantContext.getCurrentTenantId());
     }

@@ -24,6 +24,13 @@ import org.jspecify.annotations.Nullable;
  */
 public interface CopilotWorkflowGenerator {
 
+    /**
+     * Drives the workflow-editor BUILD agent to fill {@code workflowId}. {@code environmentId} is the
+     * {@code Environment} ordinal under which the agent's AI provider (chat + RAG embedding) is resolved; callers must
+     * supply the environment their AI providers are activated in, otherwise the agent falls back to
+     * {@code Environment.PRODUCTION} and fails when only a non-prod provider is configured.
+     */
     void generateWorkflow(
-        String workflowId, String prompt, @Nullable String systemPrompt, Set<String> allowedComponentNames);
+        String workflowId, String prompt, @Nullable String systemPrompt, Set<String> allowedComponentNames,
+        int environmentId);
 }

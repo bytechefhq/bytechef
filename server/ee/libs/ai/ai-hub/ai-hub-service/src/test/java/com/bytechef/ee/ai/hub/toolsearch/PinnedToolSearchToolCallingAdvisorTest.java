@@ -9,11 +9,17 @@ package com.bytechef.ee.ai.hub.toolsearch;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.ee.ai.hub.util.AiHubStateKeys;
+import com.bytechef.platform.configuration.context.EnvironmentContext;
+import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.client.ChatClientRequest;
 import org.springframework.ai.chat.memory.ChatMemory;
@@ -133,6 +139,60 @@ class PinnedToolSearchToolCallingAdvisorTest {
         assertThat(toolNames(afterBeforeCall)).contains("searchProjects");
     }
 
+    @Test
+    void testStreamInitBindsRequestEnvironmentForEmbedding() {
+        when(toolCallingManager.resolveToolDefinitions(any())).thenReturn(List.of());
+
+        AtomicReference<Environment> environmentDuringIndexing = new AtomicReference<>();
+
+        // toolIndex.indexTools() stands in for the embedding call — capture the environment the ThreadLocal exposes at
+        // the moment it runs, which is what CatalogEmbeddingModel.resolveDelegate() reads to pick the provider.
+        doAnswer(invocation -> {
+            environmentDuringIndexing.set(EnvironmentContext.fetchCurrentEnvironment());
+
+            return null;
+        }).when(toolIndex)
+            .indexTools(anyString(), any());
+
+        PinnedToolSearchToolCallingAdvisor advisor = newAdvisor(Set.of());
+
+        ChatClientRequest request = newRequestWithEnvironment(
+            Environment.DEVELOPMENT.ordinal(), toolCallback("some_tool"));
+
+        advisor.doInitializeLoopStream(request, null);
+
+        // Bound from the advisor request context for the duration of the indexing (embedding) call...
+        assertThat(environmentDuringIndexing.get()).isEqualTo(Environment.DEVELOPMENT);
+
+        // ...and restored to the prior (unbound) state once the hook returns, so it never leaks to the pooled worker.
+        assertThat(EnvironmentContext.fetchCurrentEnvironment()).isNull();
+    }
+
+    @Test
+    void testStreamInitWithoutRequestEnvironmentLeavesBindingUntouched() {
+        when(toolCallingManager.resolveToolDefinitions(any())).thenReturn(List.of());
+
+        AtomicReference<Environment> environmentDuringIndexing = new AtomicReference<>();
+
+        doAnswer(invocation -> {
+            environmentDuringIndexing.set(EnvironmentContext.fetchCurrentEnvironment());
+
+            return null;
+        }).when(toolIndex)
+            .indexTools(anyString(), any());
+
+        PinnedToolSearchToolCallingAdvisor advisor = newAdvisor(Set.of());
+
+        // No environmentId in the request context: the advisor must not fabricate a binding (the outer agent context
+        // propagation still governs), so indexing runs under the unbound ThreadLocal.
+        ChatClientRequest request = newRequest(toolCallback("some_tool"));
+
+        advisor.doInitializeLoopStream(request, null);
+
+        assertThat(environmentDuringIndexing.get()).isNull();
+        assertThat(EnvironmentContext.fetchCurrentEnvironment()).isNull();
+    }
+
     private PinnedToolSearchToolCallingAdvisor newAdvisor(Set<String> pinnedToolNames) {
         return newAdvisor(pinnedToolNames, List.of());
     }
@@ -154,6 +214,20 @@ class PinnedToolSearchToolCallingAdvisorTest {
         return ChatClientRequest.builder()
             .prompt(prompt)
             .context(ChatMemory.CONVERSATION_ID, "conv-1")
+            .build();
+    }
+
+    private static ChatClientRequest newRequestWithEnvironment(int environmentOrdinal, ToolCallback... toolCallbacks) {
+        Prompt prompt = new Prompt(
+            List.of(new SystemMessage("base system"), new UserMessage("hi")),
+            ToolCallingChatOptions.builder()
+                .toolCallbacks(toolCallbacks)
+                .build());
+
+        return ChatClientRequest.builder()
+            .prompt(prompt)
+            .context(ChatMemory.CONVERSATION_ID, "conv-1")
+            .context(AiHubStateKeys.ENVIRONMENT_ID, (long) environmentOrdinal)
             .build();
     }
 
