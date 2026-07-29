@@ -731,6 +731,72 @@ cd cli
 - Use `gh api graphql` with `resolveReviewThread` mutation to close threads programmatically
 - Get thread IDs via: `gh api graphql -f query='{ repository(owner: "X", name: "Y") { pullRequest(number: N) { reviewThreads(first: 20) { nodes { id isResolved path } } } }'`
 
+## Plan limits (placeholders)
+
+- `server/libs/platform/platform-plan` (`-api`/`-service`, CE) holds the plan-tier policy layer:
+  `PlanTier` (SELF_HOSTED default + FREE/PRO/TEAM/ENTERPRISE), `PlanLimits` record (every limit
+  nullable, **null = unlimited — never zero**), and the `PlanLimitsProvider` SPI. The default
+  `PropertiesPlanLimitsProvider` resolves `bytechef.plan.tier` (unset = SELF_HOSTED = unlimited,
+  the pre-plan behavior) with per-field `bytechef.plan.limits.*` overrides; a billing integration
+  replaces the bean (`@ConditionalOnMissingBean`). Tier tables in `DefaultPlanLimits` are
+  Sim-modeled placeholders pinned by `DefaultPlanLimitsTest` — nothing enforces them yet.
+  Design + phased plan (cost calculation, alert rules, Bucket4j rate limiting, Atlas admission
+  gate): `docs/superpowers/specs/2026-07-20-plan-limits-cost-alerts-design.md`.
+
+## Notification delivery (central point)
+
+- **`platform-notification` is THE central registry for notifications AND channels.** All channel
+  types are first-class on `Notification.Type` — `EMAIL, WEBHOOK, SLACK` (INT ordinal, append-only) —
+  with settings keys `email` / `webhook` + `webhookSecret` / `slackWebhookUrl` and a sender + handler
+  pair per type (`Email|Webhook|SlackNotificationSender`, `JobStatus*NotificationHandler`). New
+  notification surfaces and alert rules must reference `Notification` rows for delivery targets
+  instead of defining their own channel entities. Workspace scoping is EE-side via the
+  `workspace_notification` membership table (`platform-notification-workspace`; no membership row =
+  global). The former EE `AiObservabilityNotificationChannel` table is GONE — a Liquibase data
+  migration (`20260720000004`) converted channels into `Notification` + `workspace_notification`
+  rows and repointed `ai_observability_alert_rule_channel.notification_id`.
+
+- Webhook + Slack transports live in CE `server/libs/platform/platform-notification/platform-notification-delivery`:
+  `WebhookNotificationClient` is THE single outbound-webhook transport (one `RestTemplate`, one Spring
+  core `RetryTemplate`/`ExponentialBackOff` retry mechanism). Two entry points: `deliver(request[, retry])`
+  for admin-configured notification webhooks — SSRF-validated via commons-util `UrlValidator`
+  (loopback/private hosts rejected, so tests can't use a local HTTP server), standard
+  `X-ByteChef-Event/Timestamp/Delivery` headers, optional HMAC
+  `X-ByteChef-Signature: t=<ts>,v1=hex(HMAC-SHA256(secret, "<ts>.<body>"))` — and
+  `deliverEvent(url, payload, retry)` for Atlas per-job callback webhooks (`Job.getWebhooks()`), which
+  keeps the pre-existing contract: NO SSRF validation (authenticated API callers may target internal
+  hosts) and message-converter payload serialization. Non-2xx / exhausted retries →
+  `WebhookDeliveryException`. `SlackNotificationClient` (incoming-webhook transport) owns the
+  `{"text": ...}` payload shape and delegates to the webhook client.
+- Email: there is NO separate email transport — `MailService` (platform-mail, `@Async`, warn-skips when
+  no mail host configured) is the single email path for everything, user-account mail and notification
+  email alike. `EmailNotificationSender` and the EE
+  `AiObservabilityNotificationDispatcher` both call `mailService.sendEmail(...)` — no inline
+  `JavaMailSender` remains anywhere in notification delivery.
+- Consumers: CE `WebhookNotificationSender` (job-status webhook channel; settings keys `webhook` +
+  optional `webhookSecret`, `@Async`), payload shaped by `JobStatusWebhookNotificationHandler` in
+  platform-coordinator; platform-coordinator's `WebhookJobStatusApplicationEventListener` delegates the
+  Atlas job-callback delivery to `deliverEvent` with the `Job.Retry` schedule (defaults: 5 attempts,
+  2s initial interval, 2.0 multiplier); EE `AiObservabilityNotificationDispatcher` (post-migration: reads `Notification` rows,
+  delivers via MailService + the shared clients; per-channel lastError bookkeeping is gone with the
+  channel entity).
+- The job-status trigger path is unchanged: `JobStatusApplicationEvent` → platform-coordinator
+  `NotificationJobStatusApplicationEventListener` → sender/handler registries. Never add notification
+  logic under `server/libs/atlas/` — the engine stays notification-agnostic (hard requirement).
+- The listener warn-skips event/channel combos with no sender or handler (don't NPE the fan-out).
+  JOB_CANCELLED fires when a job is stopped while still CREATED (never started) — `Job.Status.CANCELLED`
+  is appended at the enum end (INT-ordinal persisted); STOPPED remains the mid-run interruption status.
+- **Workflow alert rules (EE, Sim model)**: `server/ee/libs/automation/automation-workflow-alert` —
+  workspace-scoped `workflow_alert_rule` rows (7 `WorkflowAlertRuleType`s, INT ordinal append-only)
+  whose delivery targets are `Notification` ids (join table, FK CASCADE — rules own WHEN, the
+  notification registry owns WHERE/HOW). Evaluation state lives ON the rule row (consecutive counter,
+  tumbling-window counters, EWMA latency, lastActivity) — updated per terminal job event by
+  `WorkflowAlertApplicationEventListener` (`@Order(200)`, after the cost listener's `@Order(100)` so
+  COST_THRESHOLD sees the cost row); NO_ACTIVITY fires from a 5-min scheduled monitor; fixed cooldown
+  (default 60 min). `WorkflowAlertDispatcher` delivers via MailService / WebhookNotificationClient
+  (`workflow.alert` eventType) / SlackNotificationClient. Semantics pinned by
+  `WorkflowAlertEvaluatorTest`.
+
 ## Public URL Signing
 
 - `/file-entries/{id}/content` is intentionally unauthenticated (serves webhook outputs to anonymous callers). As of the 2026-05-18 signing rollout, the preferred form is an HMAC-SHA256 signed token (`v1.<exp>.<payload>.<sig>`) minted via `FileEntryTokens.toSignedToken`. Legacy unsigned `FileEntry.toId()` IDs are still accepted while `bytechef.file-storage.signed-url.required=false` (default).
