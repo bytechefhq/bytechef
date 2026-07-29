@@ -66,6 +66,25 @@ public class AiHubPgVectorConfiguration {
         ObjectProvider<VectorStoreObservationConvention> customObservationConvention,
         BatchingStrategy batchingStrategy) {
 
+        return buildToolSearchVectorStore(
+            pgVectorJdbcTemplate, embeddingModel, properties, observationRegistry, customObservationConvention,
+            batchingStrategy);
+    }
+
+    /**
+     * Builds a pgvector store over the {@code ai_hub_tool_search_*} table for the given embedding model. Shared so the
+     * <b>loader</b> path ({@code ToolSearchCatalogFeeder}, which indexes with the fixed-key
+     * {@code copilotEmbeddingModel}) and the <b>reader</b> path (the search advisors, which query with the
+     * {@code @Primary}/per-environment {@code CatalogEmbeddingModel}) build over the identical table, dimensions, and
+     * {@code TEXT} id type — only the embedding model differs. Public so {@code ToolSearchAdvisorConfiguration} can
+     * construct the loader store without duplicating the builder.
+     */
+    public static VectorStore buildToolSearchVectorStore(
+        JdbcTemplate pgVectorJdbcTemplate, EmbeddingModel embeddingModel, PgVectorStoreProperties properties,
+        ObjectProvider<ObservationRegistry> observationRegistry,
+        ObjectProvider<VectorStoreObservationConvention> customObservationConvention,
+        BatchingStrategy batchingStrategy) {
+
         return PgVectorStore.builder(pgVectorJdbcTemplate, embeddingModel)
             .schemaName(properties.getSchemaName())
             .idType(PgVectorStore.PgIdType.TEXT)

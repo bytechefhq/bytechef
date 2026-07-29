@@ -205,13 +205,14 @@ public class ToolSearchAdvisorConfiguration {
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     ToolSearchToolCallingAdvisor aiHubAskToolSearchToolCallAdvisor(
         VectorToolIndex toolSearchVectorToolIndex,
+        @Qualifier("toolSearchPgVectorStore") VectorStore toolSearchPgVectorStore,
         AiHubClusterElementToolCallbacks clusterElementToolCallbacks, ObservationRegistry observationRegistry,
         ObjectProvider<AiHubGlobalToolCatalog> globalToolCatalogProvider,
         SecurityContextRehydrator securityContextRehydrator) {
 
         return buildModeAdvisor(
-            toolSearchVectorToolIndex, clusterElementToolCallbacks.callbacks(), observationRegistry,
-            findCatalog(globalToolCatalogProvider, ToolSearchCatalogFeeder.GLOBAL_ASK_SESSION_ID),
+            toolSearchVectorToolIndex, toolSearchPgVectorStore, clusterElementToolCallbacks.callbacks(),
+            observationRegistry, findCatalog(globalToolCatalogProvider, ToolSearchCatalogFeeder.GLOBAL_ASK_SESSION_ID),
             securityContextRehydrator);
     }
 
@@ -219,18 +220,21 @@ public class ToolSearchAdvisorConfiguration {
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     ToolSearchToolCallingAdvisor aiHubBuildToolSearchToolCallAdvisor(
         VectorToolIndex toolSearchVectorToolIndex,
+        @Qualifier("toolSearchPgVectorStore") VectorStore toolSearchPgVectorStore,
         AiHubClusterElementToolCallbacks clusterElementToolCallbacks, ObservationRegistry observationRegistry,
         ObjectProvider<AiHubGlobalToolCatalog> globalToolCatalogProvider,
         SecurityContextRehydrator securityContextRehydrator) {
 
         return buildModeAdvisor(
-            toolSearchVectorToolIndex, clusterElementToolCallbacks.callbacks(), observationRegistry,
+            toolSearchVectorToolIndex, toolSearchPgVectorStore, clusterElementToolCallbacks.callbacks(),
+            observationRegistry,
             findCatalog(globalToolCatalogProvider, ToolSearchCatalogFeeder.GLOBAL_BUILD_SESSION_ID),
             securityContextRehydrator);
     }
 
     private static ToolSearchToolCallingAdvisor buildModeAdvisor(
-        VectorToolIndex vectorToolIndex, List<ToolCallback> clusterElementCallbacks,
+        VectorToolIndex vectorToolIndex, VectorStore toolSearchPgVectorStore,
+        List<ToolCallback> clusterElementCallbacks,
         ObservationRegistry observationRegistry, @Nullable AiHubGlobalToolCatalog globalToolCatalog,
         SecurityContextRehydrator securityContextRehydrator) {
 
@@ -239,8 +243,10 @@ public class ToolSearchAdvisorConfiguration {
             : Set.of(ToolSearchCatalogFeeder.CATALOG_SESSION_ID, globalToolCatalog.sessionId());
 
         // RC1's VectorToolIndex scopes each search to one session; MultiSessionToolIndex restores the vendored
-        // multi-session union (catalog + per-mode global tools) on top of the shared index.
-        ToolIndex searcher = new MultiSessionToolIndex(vectorToolIndex, additionalSessionIds);
+        // multi-session union (catalog + per-mode global tools) on top of the shared index. It queries the underlying
+        // store directly with a sessionId IN (...) filter so the query is embedded once, not once per session.
+        ToolIndex searcher = new MultiSessionToolIndex(
+            vectorToolIndex, toolSearchPgVectorStore, additionalSessionIds);
 
         List<ToolCallback> callbackList = new ArrayList<>(clusterElementCallbacks);
 

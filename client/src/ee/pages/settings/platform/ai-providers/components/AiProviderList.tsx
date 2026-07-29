@@ -112,11 +112,7 @@ const AiProviderList = ({aiProviders, environment}: {aiProviders: AiProvider[]; 
                                             )}
 
                                             {aiProvider.copilotDocsProvider && (
-                                                <Badge
-                                                    label="Copilot Docs"
-                                                    styleType="primary-outline"
-                                                    weight="semibold"
-                                                />
+                                                <Badge label="Copilot" styleType="primary-outline" weight="semibold" />
                                             )}
                                         </span>
 

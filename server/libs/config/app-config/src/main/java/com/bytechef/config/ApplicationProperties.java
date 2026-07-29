@@ -933,9 +933,9 @@ public class ApplicationProperties {
             private boolean enabled;
 
             /**
-             * Copilot documentation configuration
+             * Copilot embedding configuration
              */
-            private Docs docs = new Docs();
+            private Embedding embedding = new Embedding();
 
             /**
              * Explicit chat-model provider to prefer for Copilot — accepts the short provider name (e.g. openAi) or the
@@ -955,12 +955,12 @@ public class ApplicationProperties {
                 this.enabled = enabled;
             }
 
-            public Docs getDocs() {
-                return docs;
+            public Embedding getEmbedding() {
+                return embedding;
             }
 
-            public void setDocs(Docs docs) {
-                this.docs = docs;
+            public void setEmbedding(Embedding embedding) {
+                this.embedding = embedding;
             }
 
             public String getProvider() {
@@ -972,58 +972,39 @@ public class ApplicationProperties {
             }
 
             /**
-             * Copilot documentation configuration.
+             * Copilot embedding configuration.
              */
-            public static class Docs {
+            public static class Embedding {
 
-                /**
-                 * Copilot documentation embedding configuration
-                 */
-                private Embedding embedding = new Embedding();
-
-                public Embedding getEmbedding() {
-                    return embedding;
-                }
-
-                public void setEmbedding(Embedding embedding) {
-                    this.embedding = embedding;
+                public enum Provider {
+                    OLLAMA, OPENAI
                 }
 
                 /**
-                 * Copilot documentation embedding configuration.
+                 * The embedding provider key (e.g. openAi).
                  */
-                public static class Embedding {
+                private Provider provider;
 
-                    public enum Provider {
-                        OLLAMA, OPENAI
-                    }
+                /**
+                 * The API key used to authenticate with the Copilot embedding provider. Applies only to the OpenAI
+                 * provider; Ollama runs locally and does not require a key.
+                 */
+                private String apiKey;
 
-                    /**
-                     * The embedding provider key (e.g. openAi).
-                     */
-                    private Provider provider;
+                public Provider getProvider() {
+                    return provider;
+                }
 
-                    /**
-                     * The API key used to authenticate with the Copilot documentation embedding provider. Applies only
-                     * to the OpenAI provider; Ollama runs locally and does not require a key.
-                     */
-                    private String apiKey;
+                public String getApiKey() {
+                    return apiKey;
+                }
 
-                    public Provider getProvider() {
-                        return provider;
-                    }
+                public void setProvider(Provider provider) {
+                    this.provider = provider;
+                }
 
-                    public String getApiKey() {
-                        return apiKey;
-                    }
-
-                    public void setProvider(Provider provider) {
-                        this.provider = provider;
-                    }
-
-                    public void setApiKey(String apiKey) {
-                        this.apiKey = apiKey;
-                    }
+                public void setApiKey(String apiKey) {
+                    this.apiKey = apiKey;
                 }
             }
         }

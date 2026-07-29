@@ -302,9 +302,8 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
     }
 
     private boolean isCopilotDocsProvider(Provider provider) {
-        ApplicationProperties.Ai.Copilot.Docs.Embedding.Provider docsProvider = applicationProperties.getAi()
+        ApplicationProperties.Ai.Copilot.Embedding.Provider docsProvider = applicationProperties.getAi()
             .getCopilot()
-            .getDocs()
             .getEmbedding()
             .getProvider();
 
