@@ -290,6 +290,21 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
     }
 
     @Override
+    public List<TaskExecution> findAllByStatusAndLastModifiedDateBefore(int status, Instant lastModifiedDate) {
+        return findAll()
+            .stream()
+            .filter(taskExecution -> {
+                TaskExecution.Status taskExecutionStatus = taskExecution.getStatus();
+
+                return taskExecutionStatus != null && taskExecutionStatus.ordinal() == status &&
+                    taskExecution.getLastModifiedDate() != null &&
+                    taskExecution.getLastModifiedDate()
+                        .isBefore(lastModifiedDate);
+            })
+            .toList();
+    }
+
+    @Override
     public List<TaskExecution> findAllByJobIdOrderByCreatedDate(long jobId) {
         Store store = Objects.requireNonNull(cache.computeIfAbsent(getStoreKey(), (key1) -> new Store()));
 

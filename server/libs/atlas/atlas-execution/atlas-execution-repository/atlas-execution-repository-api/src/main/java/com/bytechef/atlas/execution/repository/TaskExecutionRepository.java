@@ -49,6 +49,8 @@ public interface TaskExecutionRepository {
      */
     List<TaskExecution> findAll();
 
+    List<TaskExecution> findAllByStatusAndLastModifiedDateBefore(int status, Instant lastModifiedDate);
+
     /**
      * Returns the execution steps of the given job
      *

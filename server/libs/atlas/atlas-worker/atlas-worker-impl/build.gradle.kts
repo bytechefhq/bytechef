@@ -8,6 +8,7 @@ dependencies {
     implementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-api"))
     implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:core:commons:commons-util"))
+    implementation(project(":server:libs:core:tenant:tenant-api"))
 
     testImplementation("io.micrometer:micrometer-tracing")
     testImplementation("org.awaitility:awaitility")

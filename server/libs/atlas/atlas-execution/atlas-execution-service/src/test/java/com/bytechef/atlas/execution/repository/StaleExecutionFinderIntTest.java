@@ -20,7 +20,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.atlas.configuration.converter.StringToWorkflowTaskConverter;
 import com.bytechef.atlas.configuration.converter.WorkflowTaskToStringConverter;
+import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.repository.jdbc.converter.StringToWebhooksConverter;
 import com.bytechef.atlas.execution.repository.jdbc.converter.WebhooksToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.ExecutionErrorToStringConverter;
@@ -36,7 +38,9 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,8 +73,11 @@ public class StaleExecutionFinderIntTest {
     @Autowired
     private JobRepository jobRepository;
 
+    @Autowired
+    private TaskExecutionRepository taskExecutionRepository;
+
     @Test
-    public void testStaleJobFinderMatchesOnlyMatchingStatusRowsPastCutoff() {
+    public void testStaleFindersMatchOnlyMatchingStatusRowsPastCutoff() {
         Instant staleInstant = Instant.now()
             .minus(Duration.ofMinutes(10));
         Instant cutoff = Instant.now()
@@ -89,6 +96,64 @@ public class StaleExecutionFinderIntTest {
         assertThat(staleJobs).extracting(Job::getId)
             .contains(staleStartedJobId)
             .doesNotContain(freshStartedJobId, staleCompletedJobId);
+
+        long staleTaskExecutionId = saveTaskExecution(staleStartedJobId, TaskExecution.Status.STARTED);
+        long freshTaskExecutionId = saveTaskExecution(freshStartedJobId, TaskExecution.Status.STARTED);
+
+        jdbcTemplate.update(
+            "UPDATE task_execution SET last_modified_date = ? WHERE id = ?",
+            java.sql.Timestamp.from(staleInstant), staleTaskExecutionId);
+
+        List<TaskExecution> staleTaskExecutions = taskExecutionRepository.findAllByStatusAndLastModifiedDateBefore(
+            TaskExecution.Status.STARTED.ordinal(), cutoff);
+
+        assertThat(staleTaskExecutions).extracting(TaskExecution::getId)
+            .contains(staleTaskExecutionId)
+            .doesNotContain(freshTaskExecutionId);
+    }
+
+    @Test
+    public void testLongRunningFinderMatchesOnlyStartedJobsPastCutoff() {
+        Instant longAgoInstant = Instant.now()
+            .minus(Duration.ofHours(3));
+        Instant cutoff = Instant.now()
+            .minus(Duration.ofHours(1));
+
+        long longRunningJobId = saveJob(Job.Status.STARTED);
+        long freshStartedJobId = saveJob(Job.Status.STARTED);
+        long longCompletedJobId = saveJob(Job.Status.COMPLETED);
+
+        backdateJobStartDate(longRunningJobId, longAgoInstant);
+        backdateJobStartDate(freshStartedJobId, Instant.now());
+        backdateJobStartDate(longCompletedJobId, longAgoInstant);
+
+        List<Job> longRunningJobs = jobRepository.findAllByStatusAndStartDateBefore(
+            Job.Status.STARTED.ordinal(), cutoff);
+
+        assertThat(longRunningJobs).extracting(Job::getId)
+            .contains(longRunningJobId)
+            .doesNotContain(freshStartedJobId, longCompletedJobId);
+    }
+
+    @Test
+    public void testEndedFinderMatchesOnlyJobsEndedBeforeCutoff() {
+        Instant longAgoInstant = Instant.now()
+            .minus(Duration.ofDays(40));
+        Instant cutoff = Instant.now()
+            .minus(Duration.ofDays(30));
+
+        long expiredJobId = saveJob(Job.Status.COMPLETED);
+        long recentJobId = saveJob(Job.Status.COMPLETED);
+        long runningJobId = saveJob(Job.Status.STARTED);
+
+        backdateJobEndDate(expiredJobId, longAgoInstant);
+        backdateJobEndDate(recentJobId, Instant.now());
+
+        List<Job> endedJobs = jobRepository.findAllByEndDateBefore(cutoff);
+
+        assertThat(endedJobs).extracting(Job::getId)
+            .contains(expiredJobId)
+            .doesNotContain(recentJobId, runningJobId);
     }
 
     private long saveJob(Job.Status status) {
@@ -102,9 +167,38 @@ public class StaleExecutionFinderIntTest {
         return Objects.requireNonNull(job.getId());
     }
 
+    private long saveTaskExecution(long jobId, TaskExecution.Status status) {
+        Map<String, Object> taskMap = new HashMap<>();
+
+        taskMap.put("name", "task1");
+        taskMap.put("type", "test/v1/noop");
+
+        TaskExecution taskExecution = TaskExecution.builder()
+            .workflowTask(new WorkflowTask(taskMap))
+            .build();
+
+        taskExecution.setJobId(jobId);
+        taskExecution.setStatus(status);
+        taskExecution.setTaskNumber(1);
+
+        taskExecution = taskExecutionRepository.save(taskExecution);
+
+        return Objects.requireNonNull(taskExecution.getId());
+    }
+
     private void backdateJobLastModifiedDate(long jobId, Instant instant) {
         jdbcTemplate.update(
             "UPDATE job SET last_modified_date = ? WHERE id = ?", java.sql.Timestamp.from(instant), jobId);
+    }
+
+    private void backdateJobStartDate(long jobId, Instant instant) {
+        jdbcTemplate.update(
+            "UPDATE job SET start_date = ? WHERE id = ?", java.sql.Timestamp.from(instant), jobId);
+    }
+
+    private void backdateJobEndDate(long jobId, Instant instant) {
+        jdbcTemplate.update(
+            "UPDATE job SET end_date = ? WHERE id = ?", java.sql.Timestamp.from(instant), jobId);
     }
 
     @ComponentScan(basePackages = {

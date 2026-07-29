@@ -38,8 +38,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.Assert;
 
 /**
@@ -56,18 +58,24 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
     private final JobService jobService;
     private final TaskExecutionService taskExecutionService;
     private final TaskFileStorage taskFileStorage;
+
+    @Nullable
+    private final TransactionTemplate transactionTemplate;
+
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public DefaultTaskCompletionHandler(
         ContextService contextService, JobExecutor jobExecutor, JobService jobService,
-        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage, WorkflowService workflowService) {
+        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage,
+        @Nullable TransactionTemplate transactionTemplate, WorkflowService workflowService) {
 
         this.contextService = contextService;
         this.jobExecutor = jobExecutor;
         this.jobService = jobService;
         this.taskExecutionService = taskExecutionService;
         this.taskFileStorage = taskFileStorage;
+        this.transactionTemplate = transactionTemplate;
         this.workflowService = workflowService;
     }
 
@@ -85,6 +93,14 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
             log.trace("handle: taskExecution={}", taskExecution);
         }
 
+        if (transactionTemplate == null) {
+            doHandle(taskExecution);
+        } else {
+            transactionTemplate.executeWithoutResult(transactionStatus -> doHandle(taskExecution));
+        }
+    }
+
+    private void doHandle(TaskExecution taskExecution) {
         Job job = jobService.getTaskExecutionJob(Validate.notNull(taskExecution.getId(), "id"));
 
         if (job == null) {

@@ -142,6 +142,17 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
+    public List<Job> getLongRunningJobs(Job.Status status, Instant startDateBefore) {
+        return jobRepository.findAllByStatusAndStartDateBefore(status.ordinal(), startDateBefore);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Job> getEndedJobs(Instant endDateBefore) {
+        return jobRepository.findAllByEndDateBefore(endDateBefore);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public Page<Job> getJobsPage(int pageNumber) {
         return jobRepository.findAll(PageRequest.of(pageNumber, DEFAULT_PAGE_SIZE));

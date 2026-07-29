@@ -55,6 +55,10 @@ public interface JobRepository {
 
     List<Job> findAllByStatusAndLastModifiedDateBefore(int status, Instant lastModifiedDate);
 
+    List<Job> findAllByStatusAndStartDateBefore(int status, Instant startDate);
+
+    List<Job> findAllByEndDateBefore(Instant endDate);
+
     Optional<Job> findById(Long id);
 
     int updateStatusAndClearEndDateIfCurrentStatus(long id, int currentStatus, int newStatus);

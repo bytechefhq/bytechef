@@ -59,6 +59,10 @@ public interface JobService {
 
     List<Job> getStaleJobs(Job.Status status, java.time.Instant lastModifiedDateBefore);
 
+    List<Job> getLongRunningJobs(Job.Status status, java.time.Instant startDateBefore);
+
+    List<Job> getEndedJobs(java.time.Instant endDateBefore);
+
     Page<Job> getJobsPage(int pageNumber);
 
     Job getTaskExecutionJob(long taskExecutionId);

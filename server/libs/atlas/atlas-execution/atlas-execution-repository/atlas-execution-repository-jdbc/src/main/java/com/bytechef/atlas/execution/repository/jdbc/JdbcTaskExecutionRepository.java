@@ -174,6 +174,9 @@ public interface JdbcTaskExecutionRepository
         @Param("offset") long offset);
 
     @Override
+    List<TaskExecution> findAllByStatusAndLastModifiedDateBefore(int status, Instant lastModifiedDate);
+
+    @Override
     List<TaskExecution> findAllByJobIdOrderByCreatedDate(long jobId);
 
     @Override

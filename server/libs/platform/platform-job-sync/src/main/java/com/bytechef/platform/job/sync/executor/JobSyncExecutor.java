@@ -226,7 +226,7 @@ public class JobSyncExecutor {
             taskFileStorage, workflowService);
 
         DefaultTaskCompletionHandler defaultTaskCompletionHandler = new DefaultTaskCompletionHandler(
-            contextService, jobExecutor, jobService, taskExecutionService, taskFileStorage, workflowService);
+            contextService, jobExecutor, jobService, taskExecutionService, taskFileStorage, null, workflowService);
 
         TaskCompletionHandlerChain taskCompletionHandlerChain = new TaskCompletionHandlerChain();
 
