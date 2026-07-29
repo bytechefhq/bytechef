@@ -39,6 +39,8 @@ public interface AiSkillApiFacade {
 
     AiSkill createAiSkillFromInstructions(String name, @Nullable String description, String instructions);
 
+    AiSkill generateAiSkill(String prompt);
+
     void deleteAiSkill(long id);
 
     AiSkill getAiSkill(long id);

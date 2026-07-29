@@ -16,11 +16,14 @@
 
 package com.bytechef.platform.ai.skill.facade;
 
+import com.bytechef.ai.copilot.service.CopilotSkillGenerator;
 import com.bytechef.platform.ai.skill.domain.AiSkill;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.util.SecurityUtils;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 
 /**
@@ -34,10 +37,16 @@ import org.springframework.stereotype.Service;
 @Service
 class AiSkillApiFacadeImpl implements AiSkillApiFacade {
 
-    private final AiSkillFacade aiSkillFacade;
+    private static final int MAX_NAME_LENGTH = 60;
 
-    AiSkillApiFacadeImpl(AiSkillFacade aiSkillFacade) {
+    private final AiSkillFacade aiSkillFacade;
+    private final ObjectProvider<CopilotSkillGenerator> copilotSkillGeneratorProvider;
+
+    AiSkillApiFacadeImpl(
+        AiSkillFacade aiSkillFacade, ObjectProvider<CopilotSkillGenerator> copilotSkillGeneratorProvider) {
+
         this.aiSkillFacade = aiSkillFacade;
+        this.copilotSkillGeneratorProvider = copilotSkillGeneratorProvider;
     }
 
     @Override
@@ -48,6 +57,44 @@ class AiSkillApiFacadeImpl implements AiSkillApiFacade {
     @Override
     public AiSkill createAiSkillFromInstructions(String name, @Nullable String description, String instructions) {
         return aiSkillFacade.createAiSkillFromInstructions(name, description, instructions);
+    }
+
+    /**
+     * Not transactional: {@code CopilotSkillGenerator.generateSkill} drives the autonomous agent synchronously (up to
+     * ~10 minutes), so it must not hold a database transaction. The placeholder skill is created first (a separate
+     * transaction that commits through the shared facade) so the agent can update the row it fills. The name is re-read
+     * afterward since the agent renames it.
+     */
+    @Override
+    public AiSkill generateAiSkill(String prompt) {
+        if (StringUtils.isBlank(prompt)) {
+            throw new IllegalArgumentException("prompt must not be blank");
+        }
+
+        CopilotSkillGenerator copilotSkillGenerator = copilotSkillGeneratorProvider.getIfAvailable();
+
+        if (copilotSkillGenerator == null) {
+            throw new IllegalStateException(
+                "AI Copilot is not enabled. Set bytechef.ai.copilot.enabled=true to use skill generation.");
+        }
+
+        AiSkill aiSkill = aiSkillFacade.createAiSkillFromInstructions(
+            derivePlaceholderName(prompt), null, "Skill is being generated.");
+
+        copilotSkillGenerator.generateSkill(aiSkill.getId(), prompt.strip());
+
+        return aiSkillFacade.getAiSkill(aiSkill.getId());
+    }
+
+    private static String derivePlaceholderName(String prompt) {
+        String name = prompt.strip();
+
+        if (name.length() > MAX_NAME_LENGTH) {
+            name = name.substring(0, MAX_NAME_LENGTH)
+                .strip();
+        }
+
+        return name;
     }
 
     @Override
