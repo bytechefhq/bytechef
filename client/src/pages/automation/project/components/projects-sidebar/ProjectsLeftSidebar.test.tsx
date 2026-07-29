@@ -249,10 +249,10 @@ describe('ProjectsLeftSidebar', () => {
         renderWithProviders(<ProjectsLeftSidebar {...baseProps} projectId={9} />);
 
         // Button visible
-        expect(screen.getByText('Workflow')).toBeInTheDocument();
+        expect(screen.getByText('New Workflow')).toBeInTheDocument();
 
         // Click primary button to open dialog
-        fireEvent.click(screen.getByText('Workflow'));
+        fireEvent.click(screen.getByText('New Workflow'));
 
         expect(await screen.findByRole('dialog')).toBeInTheDocument();
     });

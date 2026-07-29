@@ -223,7 +223,7 @@ const ProjectsLeftSidebar = ({
                     <Button
                         className="flex-1 [&_svg]:size-5"
                         icon={<PlusIcon />}
-                        label="Workflow"
+                        label="New Workflow"
                         onClick={() => setShowWorkflowDialog(true)}
                         variant="secondary"
                     />
