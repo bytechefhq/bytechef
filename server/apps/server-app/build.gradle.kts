@@ -9,20 +9,27 @@ springBoot {
 // =============================================================================
 // FAST STARTUP CONFIGURATION FOR INTELLIJ
 // =============================================================================
-// When useComponentJars=true, use pre-built JARs instead of project dependencies
-// for component modules. This significantly speeds up IntelliJ startup because
-// ServiceLoader reads from JAR manifests (fast) instead of scanning directories (slow).
+// When fastStartup=true, ALL bytechef library + component modules are presented to IntelliJ as
+// pre-built JARs (via the fastStartupRuntime configuration below) instead of exploded module output
+// directories. This significantly speeds up IntelliJ startup because ServiceLoader reads from JAR
+// manifests (fast) instead of scanning hundreds of directories (slow), and it keeps every module in a
+// single base classloader so Spring DevTools does not split them across its base/restart classloaders
+// (which otherwise breaks cross-module ServiceLoader/bean wiring).
 //
 // Usage:
-//   1. Build all component JARs first: ./gradlew jar --parallel
-//   2. Refresh Gradle in IntelliJ
-//   3. Run the application - it will use the pre-built JARs
+//   1. Set fastStartup=true in gradle.properties (or pass -PfastStartup=true)
+//   2. Build JARs first: ./gradlew -PfastStartup=true :server:apps:server-app:buildModuleJars --parallel
+//   3. Refresh Gradle in IntelliJ, then run the application
 //
-// To switch back to project dependencies (for active component development):
-//   Set useComponentJars=false in gradle.properties or remove the property
+// To switch back to project dependencies (for active library/component development with DevTools
+// hot-reload): set fastStartup=false in gradle.properties or remove the property.
+//
+// `useComponentJars` is kept as a deprecated alias for `fastStartup`.
 // =============================================================================
 
-val useComponentJars = project.findProperty("useComponentJars")?.toString()?.toBoolean() ?: false
+val fastStartup = (project.findProperty("fastStartup") ?: project.findProperty("useComponentJars"))
+    ?.toString()
+    ?.toBoolean() ?: false
 
 // =============================================================================
 // COMPONENT FILTERING - Include/exclude specific components at build time
@@ -232,25 +239,15 @@ dependencies {
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-impl"))
 
-    // CE Components - filtered by includeComponents/excludeComponents properties
-    // Use pre-built JARs when useComponentJars=true for faster IntelliJ startup
-    if (useComponentJars) {
-        rootProject.subprojects
-            .asSequence()
-            .filter { it.path.startsWith(":server:libs:modules:components") }
-            .filter { shouldIncludeComponent(it.path) }
-            .sortedBy { it.path }
-            .forEach {
-                implementation(files(it.tasks.named<Jar>("jar").flatMap { jar -> jar.archiveFile }))
-            }
-    } else {
-        rootProject.subprojects
-            .asSequence()
-            .filter { it.path.startsWith(":server:libs:modules:components") }
-            .filter { shouldIncludeComponent(it.path) }
-            .sortedBy { it.path }
-            .forEach { implementation(project(it.path)) }
-    }
+    // CE Components - filtered by includeComponents/excludeComponents properties.
+    // When fastStartup=true these project deps are relocated to pre-built JARs below (see
+    // fastStartupRuntime); declared as plain project deps here so both modes share one code path.
+    rootProject.subprojects
+        .asSequence()
+        .filter { it.path.startsWith(":server:libs:modules:components") }
+        .filter { shouldIncludeComponent(it.path) }
+        .sortedBy { it.path }
+        .forEach { implementation(project(it.path)) }
 
     implementation(project(":server:libs:modules:task-dispatchers:approval"))
     implementation(project(":server:libs:modules:task-dispatchers:branch"))
@@ -393,25 +390,15 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-user:platform-user-scim"))
     implementation(project(":server:ee:libs:platform:platform-user:platform-user-service"))
 
-    // EE Components - filtered by includeComponents/excludeComponents properties
-    // Use pre-built JARs when useComponentJars=true for faster IntelliJ startup
-    if (useComponentJars) {
-        rootProject.subprojects
-            .asSequence()
-            .filter { it.path.startsWith(":server:ee:libs:modules:components") }
-            .filter { shouldIncludeComponent(it.path) }
-            .sortedBy { it.path }
-            .forEach {
-                implementation(files(it.tasks.named<Jar>("jar").flatMap { jar -> jar.archiveFile }))
-            }
-    } else {
-        rootProject.subprojects
-            .asSequence()
-            .filter { it.path.startsWith(":server:ee:libs:modules:components") }
-            .filter { shouldIncludeComponent(it.path) }
-            .sortedBy { it.path }
-            .forEach { implementation(project(it.path)) }
-    }
+    // EE Components - filtered by includeComponents/excludeComponents properties.
+    // When fastStartup=true these project deps are relocated to pre-built JARs below (see
+    // fastStartupRuntime); declared as plain project deps here so both modes share one code path.
+    rootProject.subprojects
+        .asSequence()
+        .filter { it.path.startsWith(":server:ee:libs:modules:components") }
+        .filter { shouldIncludeComponent(it.path) }
+        .sortedBy { it.path }
+        .forEach { implementation(project(it.path)) }
 
     runtimeOnly("com.h2database:h2")
     runtimeOnly("com.zaxxer:HikariCP")
@@ -428,6 +415,54 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter")
 }
 
+// =============================================================================
+// FAST STARTUP - relocate bytechef project deps to pre-built JARs (see the flag near the top)
+// =============================================================================
+// Resolvable configuration that forces the runtime-JAR variant and therefore carries each module's FULL
+// transitive closure (bytechef JARs + third-party JARs) - unlike a bare files(jarTask), which drops
+// transitives and is why the old component-only jar swap broke with classloader errors.
+val fastStartupRuntime: Configuration = configurations.create("fastStartupRuntime") {
+    isCanBeResolved = true
+    isCanBeConsumed = false
+    isVisible = false
+
+    attributes {
+        attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage::class.java, Usage.JAVA_RUNTIME))
+        attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category::class.java, Category.LIBRARY))
+        attribute(
+            LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE,
+            objects.named(LibraryElements::class.java, LibraryElements.JAR))
+        attribute(Bundling.BUNDLING_ATTRIBUTE, objects.named(Bundling::class.java, Bundling.EXTERNAL))
+    }
+
+    // Mirror the java-common-conventions exclude so the closure matches the normal runtimeClasspath.
+    exclude(mapOf("group" to "org.slf4j", "module" to "slf4j-simple"))
+}
+
+// When fastStartup=true, move every bytechef project(...) dependency off implementation/runtimeOnly onto
+// fastStartupRuntime, then feed the resolved transitive JAR closure back as a single file dependency.
+// IntelliJ then models the bytechef modules as external JAR libraries (single base classloader), which is
+// what speeds up startup and avoids the DevTools base/restart classloader split. Third-party deps (declared
+// as string coordinates, not project(...)) are left untouched. Normal mode leaves everything as-is.
+if (fastStartup) {
+    listOf("implementation", "runtimeOnly").forEach { configurationName ->
+        val configuration = configurations.getByName(configurationName)
+
+        configuration.dependencies.withType(ProjectDependency::class.java)
+            .toList()
+            .forEach { projectDependency ->
+                fastStartupRuntime.dependencies.add(
+                    project.dependencies.project(mapOf("path" to projectDependency.path)))
+
+                configuration.dependencies.remove(projectDependency)
+            }
+    }
+
+    dependencies {
+        implementation(files(fastStartupRuntime))
+    }
+}
+
 configure<com.gorylenko.GitPropertiesPluginExtension> {
     dotGitDirectory = project.rootProject.layout.projectDirectory.dir(".git")
 }
@@ -436,24 +471,31 @@ tasks.named<Test>("testIntegration") {
     maxHeapSize = "1g"
 }
 
-// Task to build component JARs for the fast IntelliJ startup (respects includeComponents/excludeComponents)
-val buildComponentJars by tasks.registering {
+// Task to build all bytechef library + component JARs for the fast IntelliJ startup. Run with
+// -PfastStartup=true so fastStartupRuntime is populated and only the exact transitive JAR closure is built;
+// without the flag it falls back to building just the component JARs (respects includeComponents/excludeComponents).
+val buildModuleJars by tasks.registering {
     group = "build"
-    description = "Build component JARs for fast IntelliJ startup (respects includeComponents/excludeComponents filters)"
+    description = "Build the bytechef module JARs used by fastStartup (respects includeComponents/excludeComponents filters)"
 
-    val filteredComponents = rootProject.subprojects
-        .filter { it.path.startsWith(":server:libs:modules:components") || it.path.startsWith(":server:ee:libs:modules:components") }
-        .filter { shouldIncludeComponent(it.path) }
+    if (fastStartup) {
+        // Building fastStartupRuntime's artifacts builds every module JAR in the resolved transitive closure.
+        dependsOn(fastStartupRuntime)
+    } else {
+        val filteredComponents = rootProject.subprojects
+            .filter { it.path.startsWith(":server:libs:modules:components") || it.path.startsWith(":server:ee:libs:modules:components") }
+            .filter { shouldIncludeComponent(it.path) }
 
-    dependsOn(filteredComponents.map { "${it.path}:jar" })
+        dependsOn(filteredComponents.map { "${it.path}:jar" })
+    }
 
     doLast {
-        val totalComponents = rootProject.subprojects
-            .filter { it.path.startsWith(":server:libs:modules:components") || it.path.startsWith(":server:ee:libs:modules:components") }
-            .filterNot { it.path.contains("example") }
-            .count()
-
-        println("\n✅ Built ${filteredComponents.size} / $totalComponents component JARs")
+        if (fastStartup) {
+            println("\n✅ Built the bytechef module JAR closure for fastStartup. Refresh Gradle in IntelliJ, then run server-app.")
+        } else {
+            println("\n⚠️  fastStartup is off - built only component JARs. Re-run with -PfastStartup=true (and set")
+            println("    fastStartup=true in gradle.properties) to build the full module JAR set and speed up IntelliJ startup.")
+        }
 
         if (includeComponents.isNotEmpty()) {
             println("📋 Whitelist (includeComponents): ${includeComponents.joinToString(", ")}")
@@ -462,9 +504,15 @@ val buildComponentJars by tasks.registering {
         if (excludeComponents.isNotEmpty()) {
             println("🚫 Blacklist (excludeComponents): ${excludeComponents.joinToString(", ")}")
         }
-
-        println("📝 Now set useComponentJars=true in gradle.properties and refresh Gradle in IntelliJ")
     }
+}
+
+// Deprecated alias for buildModuleJars (kept for back-compat).
+val buildComponentJars by tasks.registering {
+    group = "build"
+    description = "Deprecated alias for buildModuleJars"
+
+    dependsOn(buildModuleJars)
 }
 
 // Generates the build-time component index (META-INF/bytechef/component-index.json) consumed by
