@@ -3,6 +3,8 @@ import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {NodeDataType} from '@/shared/types';
 import {Edge, Node} from '@xyflow/react';
 
+import {nestedBottomGhostIdForDispatcherTask} from './nestedBottomGhostId';
+
 /**
  * Creates edges for the left ghost node in a fork-join task
  */
@@ -111,7 +113,7 @@ function createForkJoinTaskEdges(
             TASK_DISPATCHER_NAMES.includes(sourceTaskComponentName) &&
             !CHILDLESS_TASK_DISPATCHER_NAMES.includes(sourceTaskComponentName)
         ) {
-            const nestedBottomGhostId = `${sourceTaskId}-${sourceTaskComponentName}-bottom-ghost`;
+            const nestedBottomGhostId = nestedBottomGhostIdForDispatcherTask(sourceTaskId);
 
             const edgeFromNestedGhostToNextTask = {
                 id: `${nestedBottomGhostId}=>${targetTaskId}`,
@@ -136,17 +138,13 @@ function createForkJoinTaskEdges(
     });
 
     const lastTaskId = branch[branch.length - 1].name;
-    let lastTaskComponentName = lastTaskId.split('_')[0];
+    const lastTaskComponentName = lastTaskId.split('_')[0];
 
     if (
         TASK_DISPATCHER_NAMES.includes(lastTaskComponentName) &&
         !CHILDLESS_TASK_DISPATCHER_NAMES.includes(lastTaskComponentName)
     ) {
-        if (lastTaskComponentName === 'fork-join') {
-            lastTaskComponentName = 'forkJoin';
-        }
-
-        const nestedBottomGhostId = `${lastTaskId}-${lastTaskComponentName}-bottom-ghost`;
+        const nestedBottomGhostId = nestedBottomGhostIdForDispatcherTask(lastTaskId);
 
         const edgeFromNestedGhostToBottomGhost = {
             id: `${nestedBottomGhostId}=>${bottomGhostId}`,

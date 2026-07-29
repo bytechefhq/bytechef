@@ -21,7 +21,7 @@ import {
 import {BranchCaseType, NodeDataType} from '@/shared/types';
 import {Edge, Node} from '@xyflow/react';
 import {ComponentIcon} from 'lucide-react';
-import {useEffect, useMemo, useRef} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 import {useStoreWithEqualityFn} from 'zustand/traditional';
 
@@ -53,6 +53,7 @@ import createParallelNode from '../utils/createParallelNode';
 import {getElkLayoutElements} from '../utils/elkLayoutUtils';
 import extractDefinitionPositions from '../utils/extractDefinitionPositions';
 import isElkLayoutSupported from '../utils/isElkLayoutSupported';
+import {createLayoutRetryState, onLayoutFailure, onLayoutSuccess} from '../utils/layoutRetryController';
 import {
     buildTriggerNodes,
     collectTaskDispatcherData,
@@ -189,7 +190,13 @@ export default function useLayout({
     const rightSidebarOpen = useRightSidebarStore((state) => state.rightSidebarOpen);
     const layoutResetCounter = useWorkflowDataStore((state) => state.layoutResetCounter);
 
+    // Bumped to re-run the layout effect after a silent bail (node drag in
+    // progress) or a failed layout computation — without it either path left
+    // the canvas stale until an unrelated dependency changed.
+    const [layoutRetryNonce, setLayoutRetryNonce] = useState(0);
+
     const cancelAnimationRef = useRef<(() => void) | null>(null);
+    const layoutRetryStateRef = useRef(createLayoutRetryState());
     const isInitialLayoutRef = useRef(true);
     const initialCanvasCrossDimRef = useRef<number | undefined>(undefined);
     const initialDirectionRef = useRef<LayoutDirectionType | undefined>(undefined);
@@ -800,7 +807,21 @@ export default function useLayout({
 
     useEffect(() => {
         if (useWorkflowDataStore.getState().isNodeDragging) {
-            return;
+            if (process.env.NODE_ENV === 'development') {
+                console.warn('useLayout: deferring relayout until node drag ends');
+            }
+
+            // Re-run once the drag ends; bailing without a re-trigger would
+            // leave the canvas laid out for the previous direction/engine.
+            const unsubscribe = useWorkflowDataStore.subscribe((state) => {
+                if (!state.isNodeDragging) {
+                    unsubscribe();
+
+                    setLayoutRetryNonce((nonce) => nonce + 1);
+                }
+            });
+
+            return () => unsubscribe();
         }
 
         if (!isWorkflowLoaded && !readOnlyWorkflow) {
@@ -963,43 +984,71 @@ export default function useLayout({
             edges,
             nodes: layoutNodes,
             savedPositionCrossAxisShift,
-        }).then((elements) => {
-            if (isCancelled) {
-                return;
-            }
+        })
+            .then((elements) => {
+                if (isCancelled) {
+                    return;
+                }
 
-            const targetNodes: Node[] = [...elements.nodes, ...buildCurrentStickyNoteNodes()];
+                const targetNodes: Node[] = [...elements.nodes, ...buildCurrentStickyNoteNodes()];
 
-            if (isInitialLayoutRef.current || readOnlyWorkflow) {
-                setNodes(targetNodes);
-                setEdges(elements.edges);
-                isInitialLayoutRef.current = false;
-            } else {
-                const structureChanged = frozenNodes.length !== targetNodes.length;
-
-                if (structureChanged) {
-                    // Snap immediately when nodes are added or removed — animating
-                    // a large centering shift looks like a visual jump
+                if (isInitialLayoutRef.current || readOnlyWorkflow) {
                     setNodes(targetNodes);
                     setEdges(elements.edges);
+                    isInitialLayoutRef.current = false;
                 } else {
-                    const previousPositionMap = new Map(frozenNodes.map((node) => [node.id, node.position]));
+                    const structureChanged = frozenNodes.length !== targetNodes.length;
 
-                    // Place surviving nodes at their frozen positions so they can animate to targets
-                    const nodesWithCurrentPositions = targetNodes.map((targetNode) => {
-                        const previousPosition = previousPositionMap.get(targetNode.id);
+                    if (structureChanged) {
+                        // Snap immediately when nodes are added or removed — animating
+                        // a large centering shift looks like a visual jump
+                        setNodes(targetNodes);
+                        setEdges(elements.edges);
+                    } else {
+                        const previousPositionMap = new Map(frozenNodes.map((node) => [node.id, node.position]));
 
-                        return previousPosition ? {...targetNode, position: previousPosition} : targetNode;
-                    });
+                        // Place surviving nodes at their frozen positions so they can animate to targets
+                        const nodesWithCurrentPositions = targetNodes.map((targetNode) => {
+                            const previousPosition = previousPositionMap.get(targetNode.id);
 
-                    // Set final nodes (at frozen positions) and final edges immediately
-                    setNodes(nodesWithCurrentPositions);
-                    setEdges(elements.edges);
+                            return previousPosition ? {...targetNode, position: previousPosition} : targetNode;
+                        });
 
-                    cancelAnimationRef.current = animateNodePositions(frozenNodes, targetNodes, setNodes);
+                        // Set final nodes (at frozen positions) and final edges immediately
+                        setNodes(nodesWithCurrentPositions);
+                        setEdges(elements.edges);
+
+                        // Each tween frame re-renders the whole canvas, so big
+                        // workflows manage only a few frames per second — scale the
+                        // duration with node count so the motion still reads there
+                        // while small canvases stay snappy
+                        const animationDuration = Math.min(300 + targetNodes.length * 3, 800);
+
+                        cancelAnimationRef.current = animateNodePositions(frozenNodes, targetNodes, setNodes, {
+                            duration: animationDuration,
+                        });
+                    }
                 }
-            }
-        });
+
+                // Cleared only after the nodes are applied without throwing, so a
+                // throw from the body above (not just a rejected layout promise)
+                // still re-arms the retry guard rather than looping forever.
+                onLayoutSuccess(layoutRetryStateRef.current);
+            })
+            .catch((error) => {
+                if (isCancelled) {
+                    return;
+                }
+
+                // A rejected layout (or a throw applying its result) otherwise
+                // leaves the canvas silently frozen at the previous
+                // direction/engine — surface it and retry at most once.
+                console.error('Workflow layout failed', error);
+
+                if (onLayoutFailure(layoutRetryStateRef.current)) {
+                    setLayoutRetryNonce((nonce) => nonce + 1);
+                }
+            });
 
         return () => {
             isCancelled = true;
@@ -1010,7 +1059,7 @@ export default function useLayout({
         };
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [layoutDirection, layoutEngine, layoutResetCounter, tasks, triggers, isWorkflowLoaded]);
+    }, [layoutDirection, layoutEngine, layoutResetCounter, layoutRetryNonce, tasks, triggers, isWorkflowLoaded]);
 
     useEffect(() => {
         if (canvasWidth > 0 && !isWorkflowLoaded && !readOnlyWorkflow) {

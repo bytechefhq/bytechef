@@ -128,7 +128,6 @@ function getRecursivelyUpdatedRootTaskDispatcherNodeData(
 interface UseBranchCaseLabelProps {
     caseKey: string | number;
     edgeId: string;
-    hasEdgeButton?: boolean;
     layoutDirection: LayoutDirectionType;
     sourceX: number;
     sourceY: number;
@@ -153,7 +152,6 @@ function parseCaseKeyValue(value: string): string | number {
 export default function useBranchCaseLabel({
     caseKey,
     edgeId,
-    hasEdgeButton,
     layoutDirection,
     sourceX,
     sourceY,
@@ -167,8 +165,8 @@ export default function useBranchCaseLabel({
     const inputRef = useRef<HTMLInputElement>(null);
 
     const labelPosition = useMemo(
-        () => computeBranchCaseLabelPosition({hasEdgeButton, layoutDirection, sourceX, sourceY, targetX, targetY}),
-        [hasEdgeButton, layoutDirection, sourceX, sourceY, targetX, targetY]
+        () => computeBranchCaseLabelPosition({layoutDirection, sourceX, sourceY, targetX, targetY}),
+        [layoutDirection, sourceX, sourceY, targetX, targetY]
     );
 
     const {nodes, workflow} = useWorkflowDataStore(

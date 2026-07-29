@@ -59,7 +59,12 @@ export default function LabeledBranchCaseEdge({
 
     return (
         <>
-            <BaseEdge className="fill-none stroke-gray-300 stroke-2" id={id} path={edgePath} style={style} />
+            <BaseEdge
+                className="fill-none stroke-stroke-neutral-tertiary stroke-2"
+                id={id}
+                path={edgePath}
+                style={style}
+            />
 
             {caseKey && (
                 <BranchCaseLabel

@@ -18,6 +18,7 @@ import pasteNode from '../utils/pasteNode';
 import BranchCaseLabel from './BranchCaseLabel';
 import computeEdgeButtonPosition from './computeEdgeButtonPosition';
 import computeEdgeCorrectedCoordinates from './computeEdgeCorrectedCoordinates';
+import computeExitEdgeJogCenter from './computeExitEdgeJogCenter';
 
 export default function WorkflowEdge({
     data,
@@ -89,9 +90,20 @@ export default function WorkflowEdge({
               ? {centerX: correctedSourceX + TRIGGER_FAN_IN_BUS_OFFSET}
               : {};
 
+    const exitJogCenter = computeExitEdgeJogCenter({
+        correctedSourceX,
+        correctedSourceY,
+        correctedTargetX,
+        correctedTargetY,
+        isHorizontal,
+        isTriggerFanIn,
+        targetNodeType: targetNode?.type,
+    });
+
     const [edgePath, edgeCenterX, edgeCenterY] = getSmoothStepPath({
         borderRadius: 10,
         ...busCenter,
+        ...exitJogCenter,
         sourcePosition: correctedSourcePosition,
         sourceX: correctedSourceX,
         sourceY: correctedSourceY,
@@ -257,7 +269,6 @@ export default function WorkflowEdge({
                 <BranchCaseLabel
                     caseKey={caseKey}
                     edgeId={id}
-                    hasEdgeButton
                     layoutDirection={layoutDirection}
                     sourceX={sourceX}
                     sourceY={sourceY}

@@ -729,6 +729,14 @@ function getGhostOrPlaceholderMainAxisSize(nodeType: string | undefined, mainAxi
  * fork-join, parallel) because they all follow the same edge pattern:
  *   sourceGhost → placeholder → targetGhost
  */
+// Short branches and empty-branch placeholders float centered between their
+// frame's bars — but only while the leftover interior slack stays modest. In
+// deeply nested frames the interior can be thousands of pixels tall, and a
+// centered one-node chain becomes a floating island between two huge voids;
+// past this slack the chain keeps its layout position at the entry instead,
+// reading as a short branch plus one long merge line. Shared by both engines.
+export const CHAIN_CENTERING_MAX_SLACK = 600;
+
 export function centerDispatcherPlaceholdersOnMainAxis(allNodes: Node[], edges: Edge[], mainAxis: 'x' | 'y'): void {
     allNodes.forEach((node) => {
         if (node.type !== 'placeholder') {
@@ -762,6 +770,10 @@ export function centerDispatcherPlaceholdersOnMainAxis(allNodes: Node[], edges: 
         const sourceGhostCenter = sourceGhost.position[mainAxis] + sourceGhostSize / 2;
         const targetGhostCenter = targetGhost.position[mainAxis] + targetGhostSize / 2;
         const midpointOfCenters = (sourceGhostCenter + targetGhostCenter) / 2;
+
+        if (targetGhostCenter - sourceGhostCenter - placeholderSize > CHAIN_CENTERING_MAX_SLACK) {
+            return;
+        }
 
         node.position = {
             ...node.position,
@@ -2832,6 +2844,12 @@ export function centerDispatcherChildrenOnMainAxis(allNodes: Node[], edges: Edge
             }
 
             if (!isFinite(chainMin)) {
+                continue;
+            }
+
+            const chainSlack = availableBottom - availableTop - (chainMax - chainMin);
+
+            if (chainSlack > CHAIN_CENTERING_MAX_SLACK) {
                 continue;
             }
 

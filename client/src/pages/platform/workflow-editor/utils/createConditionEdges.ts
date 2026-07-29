@@ -3,6 +3,8 @@ import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {NodeDataType} from '@/shared/types';
 import {Edge, Node} from '@xyflow/react';
 
+import {nestedBottomGhostIdForDispatcherTask} from './nestedBottomGhostId';
+
 /**
  * Creates placeholder edges for an empty condition branch (top ghost -> placeholder -> bottom ghost).
  */
@@ -114,7 +116,7 @@ function connectSequentialTasks(branchSubtasks: WorkflowTask[]): Edge[] {
             const sourceTaskComponentName = task.name.split('_')[0];
 
             if (TASK_DISPATCHER_NAMES.includes(sourceTaskComponentName)) {
-                const nestedBottomGhostId = `${sourceTaskNodeId}-${sourceTaskComponentName}-bottom-ghost`;
+                const nestedBottomGhostId = nestedBottomGhostIdForDispatcherTask(sourceTaskNodeId);
 
                 const edgeFromNestedBottomGhostToNextSubtask = {
                     id: `${nestedBottomGhostId}=>${targetTaskNodeId}`,
@@ -164,7 +166,7 @@ function createBranchExitEdge(
         const lastTaskComponentName = lastTaskNodeId.split('_')[0];
 
         if (lastTaskNode?.data.taskDispatcher && !CHILDLESS_TASK_DISPATCHER_NAMES.includes(lastTaskComponentName)) {
-            const nestedBottomGhostId = `${lastTaskNodeId}-${lastTaskComponentName}-bottom-ghost`;
+            const nestedBottomGhostId = nestedBottomGhostIdForDispatcherTask(lastTaskNodeId);
 
             if (nestedBottomGhostId) {
                 const nestedGhostToParentGhostEdge = {

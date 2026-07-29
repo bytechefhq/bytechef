@@ -9,15 +9,17 @@ interface LayoutEngineStateI {
 }
 
 /**
- * Selects the workflow editor layout engine. 'elk' is the experimental engine
- * (phase 1: plain tasks + condition dispatchers only); 'dagre' is the default.
+ * Selects the workflow editor layout engine. 'elk' is the default: it packs
+ * band-aware with a strict no-crossing contract and supports every current
+ * workflow shape (unsupported future shapes fall back to dagre per layout via
+ * isElkLayoutSupported). 'dagre' remains selectable as a comparison engine.
  * Global (not per-workflow) on purpose — this is a development comparison switch.
  */
 const useLayoutEngineStore = create<LayoutEngineStateI>()(
     devtools(
         persist(
             (set) => ({
-                layoutEngine: 'dagre',
+                layoutEngine: 'elk',
 
                 setLayoutEngine: (layoutEngine) => set({layoutEngine}),
             }),

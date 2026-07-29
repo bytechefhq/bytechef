@@ -30,6 +30,38 @@ function positionsAreEqual(previousNodes: Node[], targetNodes: Node[]): boolean 
     });
 }
 
+/**
+ * Largest per-node travel (px, either axis) that still animates. Beyond this the tween snaps to the
+ * target instead: a long tween sweeps nodes across a big stretch of canvas while every frame
+ * re-renders the whole flow, and under heavy main-thread load (e.g. an AI Hub chat streaming next to
+ * the embedded editor) Chrome's compositor has been observed leaving paint trails — one stale
+ * afterimage of the moving node per painted frame. A large centering shift also just reads better as
+ * a snap (the same reasoning useLayout applies when the node count changes).
+ */
+const MAX_ANIMATED_DISPLACEMENT = 800;
+
+function maxDisplacement(previousNodes: Node[], targetNodes: Node[]): number {
+    const previousPositionMap = new Map(previousNodes.map((node) => [node.id, node.position]));
+
+    let largestDisplacement = 0;
+
+    for (const targetNode of targetNodes) {
+        const previousPosition = previousPositionMap.get(targetNode.id);
+
+        if (!previousPosition) {
+            continue;
+        }
+
+        largestDisplacement = Math.max(
+            largestDisplacement,
+            Math.abs(previousPosition.x - targetNode.position.x),
+            Math.abs(previousPosition.y - targetNode.position.y)
+        );
+    }
+
+    return largestDisplacement;
+}
+
 const GHOST_AND_PLACEHOLDER_TYPES = new Set([
     'placeholder',
     'taskDispatcherBottomGhostNode',
@@ -123,14 +155,29 @@ export default function animateNodePositions(
         return () => {};
     }
 
+    if (maxDisplacement(previousNodes, targetNodes) > MAX_ANIMATED_DISPLACEMENT) {
+        setNodes(targetNodes);
+
+        return () => {};
+    }
+
     const duration = options?.duration ?? 300;
     const previousPositionMap = new Map(previousNodes.map((node) => [node.id, node.position]));
     const parentOffsets = buildParentOffsets(targetNodes);
 
     let animationFrameId: number | null = null;
-    const startTime = performance.now();
+
+    // The clock starts at the FIRST frame, not at call time: the caller
+    // typically triggers an expensive full-canvas render right after this
+    // call, and counting that blocking time against the tween made layout
+    // switches finish the animation before a single frame was painted.
+    let startTime: number | null = null;
 
     function tick(currentTime: number) {
+        if (startTime === null) {
+            startTime = currentTime;
+        }
+
         const elapsed = currentTime - startTime;
         const rawProgress = Math.min(elapsed / duration, 1);
         const progress = easeOutCubic(rawProgress);

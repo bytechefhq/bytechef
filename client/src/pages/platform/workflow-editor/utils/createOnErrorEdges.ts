@@ -9,19 +9,7 @@ import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {NodeDataType} from '@/shared/types';
 import {Edge, Node} from '@xyflow/react';
 
-function nestedBottomGhostIdForDispatcherTask(taskNodeId: string): string {
-    const componentName = taskNodeId.split('_')[0];
-
-    if (componentName === 'fork-join') {
-        return `${taskNodeId}-forkJoin-bottom-ghost`;
-    }
-
-    if (componentName === 'on-error') {
-        return `${taskNodeId}-onError-bottom-ghost`;
-    }
-
-    return `${taskNodeId}-${componentName}-bottom-ghost`;
-}
+import {nestedBottomGhostIdForDispatcherTask} from './nestedBottomGhostId';
 
 /**
  * Creates placeholder edges for an empty on-error branch (top ghost -> placeholder -> bottom ghost).
