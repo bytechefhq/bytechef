@@ -23,6 +23,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
@@ -32,27 +33,33 @@ import org.springframework.stereotype.Service;
  * {@code MailService} (the single email path), {@code WebhookNotificationClient} (SSRF-validated, signed when
  * {@code webhookSecret} is configured), and {@code SlackNotificationClient}. Per-target failures are logged and never
  * abort the fan-out to the remaining targets.
+ * <p>
+ * {@code MailService} is resolved lazily: deployments that host the AI gateway without SMTP configured have no
+ * {@code JavaMailSender}, hence no {@code MailService} bean. Mirroring {@code EmailNotificationSender}, the EMAIL
+ * channel then warn-skips instead of making the whole dispatcher — and with it the alert evaluator — unconstructable.
  *
  * @version ee
  */
 @Service
 @ConditionalOnEEVersion
 @ConditionalOnProperty(prefix = "bytechef.ai.gateway", name = "enabled", havingValue = "true")
-@SuppressFBWarnings("EI")
+@SuppressFBWarnings({
+    "EI", "EI2"
+})
 public class AiObservabilityNotificationDispatcher {
 
     private static final Logger log = LoggerFactory.getLogger(AiObservabilityNotificationDispatcher.class);
 
-    private final MailService mailService;
+    private final ObjectProvider<MailService> mailServiceObjectProvider;
     private final NotificationService notificationService;
     private final SlackNotificationClient slackNotificationClient;
     private final WebhookNotificationClient webhookNotificationClient;
 
     AiObservabilityNotificationDispatcher(
-        MailService mailService, NotificationService notificationService,
+        ObjectProvider<MailService> mailServiceObjectProvider, NotificationService notificationService,
         SlackNotificationClient slackNotificationClient, WebhookNotificationClient webhookNotificationClient) {
 
-        this.mailService = mailService;
+        this.mailServiceObjectProvider = mailServiceObjectProvider;
         this.notificationService = notificationService;
         this.slackNotificationClient = slackNotificationClient;
         this.webhookNotificationClient = webhookNotificationClient;
@@ -90,6 +97,16 @@ public class AiObservabilityNotificationDispatcher {
 
         if (email == null || email.isBlank()) {
             log.warn("Notification {} has no email address configured; skipping alert delivery", notification.getId());
+
+            return;
+        }
+
+        MailService mailService = mailServiceObjectProvider.getIfAvailable();
+
+        if (mailService == null) {
+            log.warn(
+                "No mail service is available in this deployment; skipping email alert delivery for notification {}",
+                notification.getId());
 
             return;
         }

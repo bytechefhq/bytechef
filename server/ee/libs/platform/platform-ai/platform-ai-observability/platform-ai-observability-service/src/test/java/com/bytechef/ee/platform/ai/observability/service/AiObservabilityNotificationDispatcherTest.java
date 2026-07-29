@@ -12,6 +12,8 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -34,6 +36,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * Pins the post-migration dispatch behavior: alerts deliver through the central platform-notification registry via the
@@ -63,7 +66,8 @@ class AiObservabilityNotificationDispatcherTest {
     @BeforeEach
     void setUp() {
         dispatcher = new AiObservabilityNotificationDispatcher(
-            mailService, notificationService, slackNotificationClient, webhookNotificationClient);
+            mailServiceObjectProvider(mailService), notificationService, slackNotificationClient,
+            webhookNotificationClient);
     }
 
     @Test
@@ -117,6 +121,31 @@ class AiObservabilityNotificationDispatcherTest {
         dispatcher.dispatch(rule, event());
 
         verify(slackNotificationClient).send(any(), anyString());
+    }
+
+    @Test
+    void testEmailIsSkippedWhenNoMailServiceIsAvailable() {
+        Notification notification = notification(Notification.Type.EMAIL, Map.of("email", "ops@example.com"));
+
+        when(notificationService.getNotification(15L)).thenReturn(notification);
+
+        AiObservabilityNotificationDispatcher mailLessDispatcher = new AiObservabilityNotificationDispatcher(
+            mailServiceObjectProvider(null), notificationService, slackNotificationClient, webhookNotificationClient);
+
+        mailLessDispatcher.dispatch(rule(15L), event());
+
+        verify(mailService, never()).sendEmail(anyString(), anyString(), anyString(), anyBoolean(), anyBoolean());
+    }
+
+    @SuppressWarnings("unchecked")
+    private static ObjectProvider<MailService> mailServiceObjectProvider(MailService mailService) {
+        ObjectProvider<MailService> objectProvider = mock(ObjectProvider.class);
+
+        lenient()
+            .when(objectProvider.getIfAvailable())
+            .thenReturn(mailService);
+
+        return objectProvider;
     }
 
     private static AiObservabilityAlertRule rule(long notificationId) {
