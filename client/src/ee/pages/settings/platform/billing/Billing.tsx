@@ -153,9 +153,9 @@ const Billing = () => {
             ? {
                   cancelAtPeriodEnd: subscription.cancelAtPeriodEnd ?? false,
                   planName: subscription.planName ?? 'Active',
+                  productUnitLimit: subscription.productUnitLimit ?? TRIAL_TASK_LIMIT,
                   renewalDate,
                   scheduledPlanName: subscription.scheduledPlanName,
-                  taskLimit: subscription.taskLimit ?? TRIAL_TASK_LIMIT,
                   tasksUsed: subscription.tasksUsed ?? 0,
                   trialDaysRemaining: undefined,
                   trialExpired: undefined,
@@ -163,9 +163,9 @@ const Billing = () => {
             : {
                   cancelAtPeriodEnd: false,
                   planName: 'Trial',
+                  productUnitLimit: subscription?.productUnitLimit ?? TRIAL_TASK_LIMIT,
                   renewalDate: undefined,
                   scheduledPlanName: undefined,
-                  taskLimit: subscription?.taskLimit ?? TRIAL_TASK_LIMIT,
                   tasksUsed: subscription?.tasksUsed ?? 0,
                   trialDaysRemaining,
                   trialExpired: isTrialExpired,
