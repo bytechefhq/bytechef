@@ -20,6 +20,12 @@ import org.springframework.data.domain.Page;
  */
 public interface ConnectedUserFacade {
 
+    /**
+     * Tenant-admin-gated passthrough for the management REST surface so the gate is on the facade, not the controller,
+     * and the runtime-shared {@code ConnectedUserService.deleteConnectedUser(long)} stays ungated.
+     */
+    void deleteConnectedUser(long id);
+
     void enableConnectedUser(long id, boolean enable);
 
     ConnectedUserDTO getConnectedUser(long id);

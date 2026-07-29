@@ -15,6 +15,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,6 +45,7 @@ class McpIntegrationInstanceWorkflowFacadeImpl implements McpIntegrationInstance
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public void enableMcpIntegrationInstanceWorkflow(
         long integrationInstanceId, String workflowUuid, boolean enable) {
 
@@ -68,6 +70,7 @@ class McpIntegrationInstanceWorkflowFacadeImpl implements McpIntegrationInstance
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public void updateMcpIntegrationInstanceWorkflow(
         long integrationInstanceId, String workflowUuid, Map<String, Object> inputs) {
 

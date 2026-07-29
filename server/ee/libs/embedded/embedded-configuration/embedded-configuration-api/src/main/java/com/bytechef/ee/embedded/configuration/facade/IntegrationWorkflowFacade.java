@@ -39,5 +39,12 @@ public interface IntegrationWorkflowFacade {
 
     List<IntegrationWorkflowDTO> getIntegrationWorkflows(long integrationId);
 
+    /**
+     * Tenant-admin-gated passthrough for the management GraphQL surface so the gate is on the facade, not the
+     * controller, and the runtime-shared {@code IntegrationWorkflowService.updatePermissionExpression(long, String)}
+     * stays ungated.
+     */
+    void updatePermissionExpression(long integrationWorkflowId, String permissionExpression);
+
     IntegrationWorkflowDTO updateWorkflow(String workflowId, String definition, int version);
 }

@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -63,6 +64,7 @@ public class McpIntegrationInstanceConfigurationFacadeImpl implements McpIntegra
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public McpIntegrationInstanceConfiguration createMcpIntegrationInstanceConfiguration(
         long mcpServerId, long integrationInstanceConfigurationId, List<String> selectedWorkflowIds) {
 
@@ -110,6 +112,7 @@ public class McpIntegrationInstanceConfigurationFacadeImpl implements McpIntegra
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public void deleteMcpIntegrationInstanceConfiguration(long mcpIntegrationInstanceConfigurationId) {
         mcpIntegrationInstanceConfigurationService
             .fetchMcpIntegrationInstanceConfiguration(mcpIntegrationInstanceConfigurationId)
@@ -139,6 +142,7 @@ public class McpIntegrationInstanceConfigurationFacadeImpl implements McpIntegra
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public McpIntegrationInstanceConfiguration updateMcpIntegrationInstanceConfiguration(
         long mcpIntegrationInstanceConfigurationId, List<String> selectedWorkflowIds) {
 
@@ -236,6 +240,7 @@ public class McpIntegrationInstanceConfigurationFacadeImpl implements McpIntegra
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public void updateMcpIntegrationInstanceConfigurationVersion(
         long mcpIntegrationInstanceConfigurationId, int integrationVersion, List<String> workflowUuids) {
 
@@ -309,5 +314,26 @@ public class McpIntegrationInstanceConfigurationFacadeImpl implements McpIntegra
                     mcpIntegrationInstanceConfigurationId, integrationInstanceConfigurationWorkflow.getId());
             }
         }
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
+    public McpIntegrationInstanceConfiguration getMcpIntegrationInstanceConfiguration(long id) {
+        return mcpIntegrationInstanceConfigurationService.fetchMcpIntegrationInstanceConfiguration(id)
+            .orElse(null);
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
+    public List<McpIntegrationInstanceConfiguration> getMcpIntegrationInstanceConfigurations() {
+        return mcpIntegrationInstanceConfigurationService.getMcpIntegrationInstanceConfigurations();
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
+    public List<McpIntegrationInstanceConfiguration> getMcpServerMcpIntegrationInstanceConfigurations(
+        long mcpServerId) {
+
+        return mcpIntegrationInstanceConfigurationService.getMcpServerMcpIntegrationInstanceConfigurations(mcpServerId);
     }
 }

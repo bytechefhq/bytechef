@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.configuration.web.rest;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.ee.embedded.configuration.domain.AppEvent;
+import com.bytechef.ee.embedded.configuration.facade.AppEventFacade;
 import com.bytechef.ee.embedded.configuration.service.AppEventService;
 import com.bytechef.ee.embedded.configuration.web.rest.model.AppEventModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -31,11 +32,15 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnEEVersion
 public class AppEventApiController implements AppEventApi {
 
+    private final AppEventFacade appEventFacade;
     private final AppEventService appEventService;
     private final ConversionService conversionService;
 
     @SuppressFBWarnings("EI")
-    public AppEventApiController(AppEventService appEventService, ConversionService conversionService) {
+    public AppEventApiController(
+        AppEventFacade appEventFacade, AppEventService appEventService, ConversionService conversionService) {
+
+        this.appEventFacade = appEventFacade;
         this.appEventService = appEventService;
         this.conversionService = conversionService;
     }
@@ -57,14 +62,14 @@ public class AppEventApiController implements AppEventApi {
 
     @Override
     public ResponseEntity<AppEventModel> getAppEvent(Long id) {
-        return ResponseEntity.ok(conversionService.convert(appEventService.getAppEvent(id), AppEventModel.class));
+        return ResponseEntity.ok(conversionService.convert(appEventFacade.getAppEvent(id), AppEventModel.class));
     }
 
     @Override
     public ResponseEntity<List<AppEventModel>> getAppEvents() {
         return ResponseEntity.ok(
             CollectionUtils.map(
-                appEventService.getAppEvents(), appEvent -> conversionService.convert(appEvent, AppEventModel.class)));
+                appEventFacade.getAppEvents(), appEvent -> conversionService.convert(appEvent, AppEventModel.class)));
     }
 
     @Override

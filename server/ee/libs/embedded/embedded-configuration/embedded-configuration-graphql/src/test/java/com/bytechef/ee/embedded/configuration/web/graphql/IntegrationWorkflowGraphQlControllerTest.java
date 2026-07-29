@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.configuration.web.graphql;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.embedded.configuration.dto.IntegrationWorkflowDTO;
@@ -44,7 +45,10 @@ class IntegrationWorkflowGraphQlControllerTest {
         // selected sub-fields. Returning the domain object triggers a Spring GraphQL source-type mismatch.
         assertThat(result).isSameAs(integrationWorkflowDTO);
 
-        verify(integrationWorkflowService).updatePermissionExpression(42L, "metadata['tier'] == 'pro'");
+        // The update must go through the facade, not the runtime-shared service: the tenant-admin gate lives on
+        // IntegrationWorkflowFacade.updatePermissionExpression so the service stays ungated for its other callers.
+        verify(integrationWorkflowFacade).updatePermissionExpression(42L, "metadata['tier'] == 'pro'");
         verify(integrationWorkflowFacade).getIntegrationWorkflow(42L);
+        verifyNoInteractions(integrationWorkflowService);
     }
 }

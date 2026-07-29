@@ -146,6 +146,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public long createIntegrationInstanceConfiguration(
         IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO) {
 
@@ -212,6 +213,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
     @Override
     @Transactional(propagation = Propagation.NEVER)
+    @PreAuthorize("isTenantAdmin()")
     public long createIntegrationInstanceConfigurationWorkflowJob(Long id, String workflowId) {
         IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
             integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(id, workflowId);
@@ -222,6 +224,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public void deleteIntegrationInstanceConfiguration(long id) {
         IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationService
             .getIntegrationInstanceConfiguration(id);
@@ -269,6 +272,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public void enableIntegrationInstanceConfiguration(long integrationInstanceConfigurationId, boolean enable) {
         List<IntegrationInstance> integrationInstances = integrationInstanceService.getIntegrationInstances(
             integrationInstanceConfigurationId);
@@ -291,6 +295,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public void enableIntegrationInstanceConfigurationWorkflow(
         long integrationInstanceConfigurationId, String workflowId, boolean enable) {
 
@@ -303,6 +308,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("isTenantAdmin()")
     public IntegrationInstanceConfigurationDTO getIntegrationInstanceConfigurationIntegration(
         long integrationId, boolean enabled, Environment environment) {
 
@@ -321,6 +327,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("isTenantAdmin()")
     public List<IntegrationInstanceConfigurationDTO> getIntegrationInstanceConfigurationIntegrations(
         boolean enabled, Environment environment) {
 
@@ -359,6 +366,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("isTenantAdmin()")
     public IntegrationInstanceConfigurationDTO getIntegrationInstanceConfiguration(long id) {
         IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationService
             .getIntegrationInstanceConfiguration(id);
@@ -395,6 +403,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("isTenantAdmin()")
     public List<IntegrationInstanceConfigurationDTO> getIntegrationInstanceConfigurations(
         Long environmentId, Long integrationId, Long tagId, boolean includeAllFields) {
 
@@ -459,6 +468,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public void updateIntegrationInstanceConfiguration(
         IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO) {
 
@@ -492,6 +502,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public void updateIntegrationInstanceConfigurationWorkflow(
         IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow) {
 

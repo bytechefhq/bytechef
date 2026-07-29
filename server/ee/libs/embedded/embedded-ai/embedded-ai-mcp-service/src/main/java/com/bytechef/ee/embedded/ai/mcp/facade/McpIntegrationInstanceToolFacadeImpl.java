@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.ai.mcp.facade;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +34,7 @@ class McpIntegrationInstanceToolFacadeImpl implements McpIntegrationInstanceTool
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public void enableMcpIntegrationInstanceTool(long integrationInstanceId, long mcpToolId, boolean enable) {
         mcpIntegrationInstanceToolService
             .fetchMcpIntegrationInstanceTool(integrationInstanceId, mcpToolId)

@@ -31,6 +31,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -78,6 +79,7 @@ public class IntegrationWorkflowFacadeImpl implements IntegrationWorkflowFacade 
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public long addWorkflow(long integrationId, String definition) {
         workflowValidatorFacade.validateNoDuplicateNodeNames(definition);
 
@@ -92,6 +94,7 @@ public class IntegrationWorkflowFacadeImpl implements IntegrationWorkflowFacade 
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public void deleteWorkflow(String workflowId) {
         Integration integration = integrationService.getWorkflowIntegration(workflowId);
 
@@ -128,7 +131,14 @@ public class IntegrationWorkflowFacadeImpl implements IntegrationWorkflowFacade 
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
+    public void updatePermissionExpression(long integrationWorkflowId, String permissionExpression) {
+        integrationWorkflowService.updatePermissionExpression(integrationWorkflowId, permissionExpression);
+    }
+
+    @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("isTenantAdmin()")
     public IntegrationWorkflowDTO getIntegrationWorkflow(String workflowId) {
         IntegrationWorkflow integrationWorkflow = integrationWorkflowService.getWorkflowIntegrationWorkflow(workflowId);
 
@@ -137,6 +147,7 @@ public class IntegrationWorkflowFacadeImpl implements IntegrationWorkflowFacade 
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("isTenantAdmin()")
     public IntegrationWorkflowDTO getIntegrationWorkflow(long integrationWorkflowId) {
         IntegrationWorkflow integrationWorkflow = integrationWorkflowService.getIntegrationWorkflow(
             integrationWorkflowId);
@@ -147,6 +158,7 @@ public class IntegrationWorkflowFacadeImpl implements IntegrationWorkflowFacade 
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("isTenantAdmin()")
     public List<IntegrationWorkflowDTO> getIntegrationWorkflows() {
         return integrationWorkflowService.getIntegrationWorkflows()
             .stream()
@@ -159,6 +171,7 @@ public class IntegrationWorkflowFacadeImpl implements IntegrationWorkflowFacade 
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("isTenantAdmin()")
     public List<IntegrationWorkflowDTO> getIntegrationWorkflows(long integrationId) {
         Integration integration = integrationService.getIntegration(integrationId);
 
@@ -178,6 +191,7 @@ public class IntegrationWorkflowFacadeImpl implements IntegrationWorkflowFacade 
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public List<IntegrationWorkflowDTO> getIntegrationVersionWorkflows(
         long id, int integrationVersion, boolean includeAllFields) {
 
@@ -198,6 +212,7 @@ public class IntegrationWorkflowFacadeImpl implements IntegrationWorkflowFacade 
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public IntegrationWorkflowDTO updateWorkflow(String workflowId, String definition, int version) {
         workflowFacade.update(workflowId, definition, version);
 

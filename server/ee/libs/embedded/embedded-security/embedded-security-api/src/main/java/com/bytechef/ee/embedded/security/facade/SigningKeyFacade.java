@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.security.facade;
 
 import com.bytechef.ee.embedded.security.domain.SigningKey;
 import com.bytechef.platform.constant.PlatformType;
+import java.util.List;
 
 /**
  * @version ee
@@ -18,4 +19,10 @@ import com.bytechef.platform.constant.PlatformType;
 public interface SigningKeyFacade {
 
     String create(SigningKey signingKey, PlatformType type);
+
+    /**
+     * Tenant-admin-gated passthrough for the management REST surface so the gate is on the facade, not the controller,
+     * and the runtime-shared {@code SigningKeyService.getSigningKeys(...)} stays ungated.
+     */
+    List<SigningKey> getSigningKeys(PlatformType type, long environmentId);
 }

@@ -12,7 +12,7 @@ import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectCateg
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectTagDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectVersionDTO;
-import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectFacade;
+import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectAdminFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -22,6 +22,10 @@ import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
 /**
+ * The embedded admin console's workflow-project-template surface. Authorization is enforced at the facade layer:
+ * {@link AutomationWorkflowProjectAdminFacade} wraps the shared, {@code @SkipAutomationAuthorization}-carrying facade
+ * behind {@code isTenantAdmin()}, so this controller needs no controller-layer gate.
+ *
  * @version ee
  *
  * @author Ivica Cardic
@@ -31,10 +35,12 @@ import org.springframework.stereotype.Controller;
 @ConditionalOnEEVersion
 public class AutomationWorkflowProjectGraphQlController {
 
-    private final AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
+    private final AutomationWorkflowProjectAdminFacade automationWorkflowProjectFacade;
 
     @SuppressFBWarnings("EI")
-    public AutomationWorkflowProjectGraphQlController(AutomationWorkflowProjectFacade automationWorkflowProjectFacade) {
+    public AutomationWorkflowProjectGraphQlController(
+        AutomationWorkflowProjectAdminFacade automationWorkflowProjectFacade) {
+
         this.automationWorkflowProjectFacade = automationWorkflowProjectFacade;
     }
 

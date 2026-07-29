@@ -17,7 +17,7 @@ import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectTagDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectVersionDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateDTO;
-import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectFacade;
+import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectAdminFacade;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +30,8 @@ class AutomationWorkflowProjectGraphQlControllerTest {
 
     @Test
     void testAutomationWorkflowProjectsReturnsListFromFacade() {
-        AutomationWorkflowProjectFacade automationWorkflowProjectFacade = mock(AutomationWorkflowProjectFacade.class);
+        AutomationWorkflowProjectAdminFacade automationWorkflowProjectFacade =
+            mock(AutomationWorkflowProjectAdminFacade.class);
 
         ConnectedUserWorkflowTemplateDTO workflowTemplateOne = new ConnectedUserWorkflowTemplateDTO(
             "wf-uuid-1", "Workflow One", "First workflow", "2026-05-22T10:00:00Z",
@@ -90,7 +91,8 @@ class AutomationWorkflowProjectGraphQlControllerTest {
 
     @Test
     void testCreateAutomationWorkflowProjectDelegatesToFacade() {
-        AutomationWorkflowProjectFacade automationWorkflowProjectFacade = mock(AutomationWorkflowProjectFacade.class);
+        AutomationWorkflowProjectAdminFacade automationWorkflowProjectFacade =
+            mock(AutomationWorkflowProjectAdminFacade.class);
 
         when(automationWorkflowProjectFacade.createProject("My Project", "desc", null, List.of(), null))
             .thenReturn(42L);
@@ -106,7 +108,8 @@ class AutomationWorkflowProjectGraphQlControllerTest {
 
     @Test
     void testCreateAutomationWorkflowProjectWithCategoryAndTags() {
-        AutomationWorkflowProjectFacade automationWorkflowProjectFacade = mock(AutomationWorkflowProjectFacade.class);
+        AutomationWorkflowProjectAdminFacade automationWorkflowProjectFacade =
+            mock(AutomationWorkflowProjectAdminFacade.class);
 
         when(automationWorkflowProjectFacade.createProject("P", null, "Electronics", List.of("java", "spring"), null))
             .thenReturn(99L);
@@ -124,7 +127,8 @@ class AutomationWorkflowProjectGraphQlControllerTest {
 
     @Test
     void testUpdateAutomationWorkflowProjectDelegatesToFacadeAndReturnsTrue() {
-        AutomationWorkflowProjectFacade automationWorkflowProjectFacade = mock(AutomationWorkflowProjectFacade.class);
+        AutomationWorkflowProjectAdminFacade automationWorkflowProjectFacade =
+            mock(AutomationWorkflowProjectAdminFacade.class);
 
         AutomationWorkflowProjectGraphQlController controller =
             new AutomationWorkflowProjectGraphQlController(automationWorkflowProjectFacade);
@@ -139,7 +143,8 @@ class AutomationWorkflowProjectGraphQlControllerTest {
 
     @Test
     void testDeleteAutomationWorkflowProjectDelegatesToFacadeAndReturnsTrue() {
-        AutomationWorkflowProjectFacade automationWorkflowProjectFacade = mock(AutomationWorkflowProjectFacade.class);
+        AutomationWorkflowProjectAdminFacade automationWorkflowProjectFacade =
+            mock(AutomationWorkflowProjectAdminFacade.class);
 
         AutomationWorkflowProjectGraphQlController controller = new AutomationWorkflowProjectGraphQlController(
             automationWorkflowProjectFacade);
@@ -152,7 +157,8 @@ class AutomationWorkflowProjectGraphQlControllerTest {
 
     @Test
     void testCreateAutomationWorkflowProjectWorkflowDelegatesToFacade() {
-        AutomationWorkflowProjectFacade automationWorkflowProjectFacade = mock(AutomationWorkflowProjectFacade.class);
+        AutomationWorkflowProjectAdminFacade automationWorkflowProjectFacade =
+            mock(AutomationWorkflowProjectAdminFacade.class);
 
         when(automationWorkflowProjectFacade.createProjectWorkflow(3L, "{\"tasks\":[]}", null))
             .thenReturn("new-wf-uuid");
@@ -168,7 +174,8 @@ class AutomationWorkflowProjectGraphQlControllerTest {
 
     @Test
     void testDeleteAutomationWorkflowProjectWorkflowDelegatesToFacadeAndReturnsTrue() {
-        AutomationWorkflowProjectFacade automationWorkflowProjectFacade = mock(AutomationWorkflowProjectFacade.class);
+        AutomationWorkflowProjectAdminFacade automationWorkflowProjectFacade =
+            mock(AutomationWorkflowProjectAdminFacade.class);
 
         AutomationWorkflowProjectGraphQlController controller = new AutomationWorkflowProjectGraphQlController(
             automationWorkflowProjectFacade);
@@ -181,7 +188,8 @@ class AutomationWorkflowProjectGraphQlControllerTest {
 
     @Test
     void testPublishAutomationWorkflowProjectDelegatesToFacadeAndReturnsTrue() {
-        AutomationWorkflowProjectFacade automationWorkflowProjectFacade = mock(AutomationWorkflowProjectFacade.class);
+        AutomationWorkflowProjectAdminFacade automationWorkflowProjectFacade =
+            mock(AutomationWorkflowProjectAdminFacade.class);
 
         AutomationWorkflowProjectGraphQlController controller =
             new AutomationWorkflowProjectGraphQlController(automationWorkflowProjectFacade);
@@ -194,7 +202,8 @@ class AutomationWorkflowProjectGraphQlControllerTest {
 
     @Test
     void testAutomationWorkflowProjectCategoriesReturnsCategoriesFromFacade() {
-        AutomationWorkflowProjectFacade automationWorkflowProjectFacade = mock(AutomationWorkflowProjectFacade.class);
+        AutomationWorkflowProjectAdminFacade automationWorkflowProjectFacade =
+            mock(AutomationWorkflowProjectAdminFacade.class);
 
         AutomationWorkflowProjectCategoryDTO categoryOne = new AutomationWorkflowProjectCategoryDTO(1L, "Finance");
         AutomationWorkflowProjectCategoryDTO categoryTwo = new AutomationWorkflowProjectCategoryDTO(2L, "Marketing");
@@ -221,7 +230,8 @@ class AutomationWorkflowProjectGraphQlControllerTest {
 
     @Test
     void testAutomationWorkflowProjectTagsReturnsTagsFromFacade() {
-        AutomationWorkflowProjectFacade automationWorkflowProjectFacade = mock(AutomationWorkflowProjectFacade.class);
+        AutomationWorkflowProjectAdminFacade automationWorkflowProjectFacade =
+            mock(AutomationWorkflowProjectAdminFacade.class);
 
         AutomationWorkflowProjectTagDTO tagOne = new AutomationWorkflowProjectTagDTO(10L, "java");
         AutomationWorkflowProjectTagDTO tagTwo = new AutomationWorkflowProjectTagDTO(20L, "spring");
@@ -247,7 +257,8 @@ class AutomationWorkflowProjectGraphQlControllerTest {
 
     @Test
     void testAutomationWorkflowProjectVersionsReturnsVersionsFromFacade() {
-        AutomationWorkflowProjectFacade automationWorkflowProjectFacade = mock(AutomationWorkflowProjectFacade.class);
+        AutomationWorkflowProjectAdminFacade automationWorkflowProjectFacade =
+            mock(AutomationWorkflowProjectAdminFacade.class);
 
         AutomationWorkflowProjectVersionDTO versionOne = new AutomationWorkflowProjectVersionDTO(
             1, "PUBLISHED", "2026-01-01T10:00:00Z");
@@ -278,7 +289,8 @@ class AutomationWorkflowProjectGraphQlControllerTest {
 
     @Test
     void testDuplicateAutomationWorkflowProjectWorkflowDelegatesToFacade() {
-        AutomationWorkflowProjectFacade automationWorkflowProjectFacade = mock(AutomationWorkflowProjectFacade.class);
+        AutomationWorkflowProjectAdminFacade automationWorkflowProjectFacade =
+            mock(AutomationWorkflowProjectAdminFacade.class);
 
         when(automationWorkflowProjectFacade.duplicateProjectWorkflow("source-wf-id")).thenReturn("new-wf-id");
 
@@ -293,7 +305,8 @@ class AutomationWorkflowProjectGraphQlControllerTest {
 
     @Test
     void testDuplicateAutomationWorkflowProjectDelegatesToFacade() {
-        AutomationWorkflowProjectFacade automationWorkflowProjectFacade = mock(AutomationWorkflowProjectFacade.class);
+        AutomationWorkflowProjectAdminFacade automationWorkflowProjectFacade =
+            mock(AutomationWorkflowProjectAdminFacade.class);
 
         when(automationWorkflowProjectFacade.duplicateProject(3L)).thenReturn(99L);
 

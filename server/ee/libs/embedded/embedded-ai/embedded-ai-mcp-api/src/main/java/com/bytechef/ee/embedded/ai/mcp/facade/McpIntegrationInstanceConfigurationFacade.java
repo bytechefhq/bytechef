@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.ai.mcp.facade;
 
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfiguration;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Facade for managing MCP Integration operations that involve multiple services.
@@ -63,4 +64,15 @@ public interface McpIntegrationInstanceConfigurationFacade {
      */
     void updateMcpIntegrationInstanceConfigurationVersion(
         long mcpIntegrationInstanceConfigurationId, int integrationVersion, List<String> workflowUuids);
+
+    /**
+     * Tenant-admin-gated read for the management GraphQL surface so the gate is on the facade, not the controller, and
+     * the runtime-shared {@code McpIntegrationInstanceConfigurationService} reads stay ungated.
+     */
+    @Nullable
+    McpIntegrationInstanceConfiguration getMcpIntegrationInstanceConfiguration(long id);
+
+    List<McpIntegrationInstanceConfiguration> getMcpIntegrationInstanceConfigurations();
+
+    List<McpIntegrationInstanceConfiguration> getMcpServerMcpIntegrationInstanceConfigurations(long mcpServerId);
 }

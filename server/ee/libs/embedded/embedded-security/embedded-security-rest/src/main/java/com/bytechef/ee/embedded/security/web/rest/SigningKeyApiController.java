@@ -71,7 +71,7 @@ public class SigningKeyApiController implements SigningKeyApi {
     @Override
     public ResponseEntity<List<SigningKeyModel>> getSigningKeys(Long environmentId) {
         return ResponseEntity.ok(
-            CollectionUtils.map(signingKeyService.getSigningKeys(
+            CollectionUtils.map(signingKeyFacade.getSigningKeys(
                 PlatformType.EMBEDDED, environmentId), this::getSigningKeyModel));
     }
 

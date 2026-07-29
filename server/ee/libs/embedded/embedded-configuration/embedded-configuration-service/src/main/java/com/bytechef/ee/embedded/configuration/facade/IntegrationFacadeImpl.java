@@ -13,6 +13,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationCodeWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationVersion;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationVersion.Status;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationDTO;
@@ -39,6 +40,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -92,6 +94,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public long createIntegration(IntegrationDTO integrationDTO) {
         Integration integration = integrationDTO.toIntegration();
         Category category = integrationDTO.category();
@@ -114,6 +117,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public void deleteIntegration(long id) {
         List<IntegrationInstanceConfiguration> integrationInstanceConfigurations =
             integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(id);
@@ -149,6 +153,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("isTenantAdmin()")
     public IntegrationDTO getIntegration(long id) {
         Integration integration = integrationService.getIntegration(id);
 
@@ -157,6 +162,14 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("isTenantAdmin()")
+    public List<IntegrationVersion> getIntegrationVersions(long id) {
+        return integrationService.getIntegrationVersions(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("isTenantAdmin()")
     public List<IntegrationDTO> getIntegrations(
         Long categoryId, boolean integrationInstanceConfigurations, Long tagId, Status status,
         boolean includeAllFields) {
@@ -209,6 +222,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public void publishIntegration(long id, String description) {
         Integration integration = integrationService.getIntegration(id);
 
@@ -236,6 +250,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public void updateIntegration(IntegrationDTO integrationDTO) {
         List<Tag> tags = CollectionUtils.isEmpty(integrationDTO.tags())
             ? Collections.emptyList()

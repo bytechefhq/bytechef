@@ -11,7 +11,6 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfigurationWorkflow;
 import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceConfigurationFacade;
-import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
@@ -40,7 +39,6 @@ class McpIntegrationInstanceConfigurationGraphQlController {
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
     private final IntegrationService integrationService;
     private final McpIntegrationInstanceConfigurationFacade mcpIntegrationInstanceConfigurationFacade;
-    private final McpIntegrationInstanceConfigurationService mcpIntegrationInstanceConfigurationService;
     private final McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService;
 
     @SuppressFBWarnings("EI")
@@ -48,13 +46,11 @@ class McpIntegrationInstanceConfigurationGraphQlController {
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationService integrationService,
         McpIntegrationInstanceConfigurationFacade mcpIntegrationInstanceConfigurationFacade,
-        McpIntegrationInstanceConfigurationService mcpIntegrationInstanceConfigurationService,
         McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService) {
 
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.integrationService = integrationService;
         this.mcpIntegrationInstanceConfigurationFacade = mcpIntegrationInstanceConfigurationFacade;
-        this.mcpIntegrationInstanceConfigurationService = mcpIntegrationInstanceConfigurationService;
         this.mcpIntegrationInstanceConfigurationWorkflowService = mcpIntegrationInstanceConfigurationWorkflowService;
     }
 
@@ -90,19 +86,18 @@ class McpIntegrationInstanceConfigurationGraphQlController {
 
     @QueryMapping
     McpIntegrationInstanceConfiguration mcpIntegrationInstanceConfiguration(@Argument long id) {
-        return mcpIntegrationInstanceConfigurationService.fetchMcpIntegrationInstanceConfiguration(id)
-            .orElse(null);
+        return mcpIntegrationInstanceConfigurationFacade.getMcpIntegrationInstanceConfiguration(id);
     }
 
     @QueryMapping
     List<McpIntegrationInstanceConfiguration> mcpIntegrationInstanceConfigurations() {
-        return mcpIntegrationInstanceConfigurationService.getMcpIntegrationInstanceConfigurations();
+        return mcpIntegrationInstanceConfigurationFacade.getMcpIntegrationInstanceConfigurations();
     }
 
     @QueryMapping
     List<McpIntegrationInstanceConfiguration>
         mcpIntegrationInstanceConfigurationsByServerId(@Argument long mcpServerId) {
-        return mcpIntegrationInstanceConfigurationService.getMcpServerMcpIntegrationInstanceConfigurations(mcpServerId);
+        return mcpIntegrationInstanceConfigurationFacade.getMcpServerMcpIntegrationInstanceConfigurations(mcpServerId);
     }
 
     @SchemaMapping

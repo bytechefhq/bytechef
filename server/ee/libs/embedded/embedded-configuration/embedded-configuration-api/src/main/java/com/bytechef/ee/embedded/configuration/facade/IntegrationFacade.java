@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.embedded.configuration.facade;
 
+import com.bytechef.ee.embedded.configuration.domain.IntegrationVersion;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationVersion.Status;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationDTO;
 import java.util.List;
@@ -24,6 +25,12 @@ public interface IntegrationFacade {
     void deleteIntegration(long id);
 
     IntegrationDTO getIntegration(long id);
+
+    /**
+     * Tenant-admin-gated passthrough for the management REST surface so the gate is on the facade, not the controller,
+     * and the runtime-shared {@code IntegrationService.getIntegrationVersions(Long)} stays ungated.
+     */
+    List<IntegrationVersion> getIntegrationVersions(long id);
 
     List<IntegrationDTO> getIntegrations(
         @Nullable Long categoryId, boolean integrationInstanceConfigurations, @Nullable Long tagId,

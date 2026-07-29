@@ -47,6 +47,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -103,6 +104,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public void deleteIntegrationInstance(long integrationInstanceId) {
         IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(
             integrationInstanceId);
@@ -117,6 +119,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public void enableIntegrationInstance(long integrationInstanceId, boolean enable) {
         IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(
             integrationInstanceId);
@@ -132,6 +135,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public void enableIntegrationInstanceWorkflow(long integrationInstanceId, String workflowId, boolean enable) {
         IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(
             integrationInstanceId);
@@ -163,6 +167,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public void enableIntegrationInstanceWorkflowTriggers(long integrationInstanceId, boolean enable) {
         List<IntegrationInstanceWorkflow> integrationInstanceWorkflows = integrationInstanceWorkflowService
             .getIntegrationInstanceWorkflows(integrationInstanceId);
@@ -185,6 +190,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public long enableIntegrationInstanceWorkflowTriggers(
         long integrationInstanceId, String workflowId, boolean enable) {
 
@@ -216,6 +222,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("isTenantAdmin()")
     public IntegrationInstanceDTO getIntegrationInstance(long id) {
         IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(id);
 
@@ -243,6 +250,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public void updateIntegrationInstanceWorkflow(
         long integrationInstanceId, String workflowId, Map<String, Object> inputs) {
 

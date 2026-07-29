@@ -72,6 +72,12 @@ public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
 
     @Override
     @PreAuthorize("isTenantAdmin()")
+    public void deleteConnectedUser(long id) {
+        connectedUserService.deleteConnectedUser(id);
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
     public void enableConnectedUser(long id, boolean enable) {
         List<IntegrationInstance> integrationInstances = integrationInstanceService
             .getConnectedUserIntegrationInstances(id);

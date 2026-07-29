@@ -27,6 +27,7 @@ import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationWorkflowDTO;
+import com.bytechef.ee.embedded.configuration.facade.AppEventFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationInstanceConfigurationFacade;
@@ -77,6 +78,9 @@ public class WorkflowApiControllerIntTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @MockitoBean
+    private AppEventFacade appEventFacade;
 
     @MockitoBean
     private AppEventService appEventService;

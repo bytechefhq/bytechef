@@ -62,6 +62,10 @@ public class WorkflowApiController extends AbstractWorkflowApiController impleme
     @GetMapping("/workflows/{id}/export")
     @ResponseBody
     public ResponseEntity<Resource> exportWorkflow(@PathVariable("id") String id) {
+        // Authorize through the tenant-admin-gated facade before exporting — the base class doExportWorkflow reads the
+        // shared platform WorkflowService directly, which carries no gate of its own.
+        integrationWorkflowFacade.getIntegrationWorkflow(id);
+
         return doExportWorkflow(id);
     }
 

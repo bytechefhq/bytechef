@@ -9,7 +9,7 @@ package com.bytechef.ee.embedded.configuration.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectDTO;
-import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
+import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectAdminFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -20,6 +20,11 @@ import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
 /**
+ * The embedded admin console's connected-user-projects surface — an admin acts across connected users, so its methods
+ * take a row id and derive the owning user from the row. Authorization is enforced at the facade layer:
+ * {@link ConnectedUserProjectAdminFacade} wraps the shared, {@code @SkipAutomationAuthorization}-carrying facade behind
+ * {@code isTenantAdmin()}, so this controller needs no controller-layer gate.
+ *
  * @version ee
  *
  * @author Ivica Cardic
@@ -29,12 +34,12 @@ import org.springframework.stereotype.Controller;
 @ConditionalOnEEVersion
 public class ConnectedUserProjectGraphQlController {
 
-    private final ConnectedUserProjectFacade connectedUserProjectFacade;
+    private final ConnectedUserProjectAdminFacade connectedUserProjectFacade;
     private final EnvironmentService environmentService;
 
     @SuppressFBWarnings("EI")
     public ConnectedUserProjectGraphQlController(
-        ConnectedUserProjectFacade connectedUserProjectFacade, EnvironmentService environmentService) {
+        ConnectedUserProjectAdminFacade connectedUserProjectFacade, EnvironmentService environmentService) {
 
         this.connectedUserProjectFacade = connectedUserProjectFacade;
         this.environmentService = environmentService;

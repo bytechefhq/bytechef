@@ -9,7 +9,6 @@ package com.bytechef.ee.embedded.connected.user.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.embedded.connected.user.facade.ConnectedUserFacade;
-import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.ee.embedded.connected.user.web.rest.model.ConnectedUserModel;
 import com.bytechef.ee.embedded.connected.user.web.rest.model.CredentialStatusModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -34,22 +33,17 @@ import org.springframework.web.bind.annotation.RestController;
 public class ConnectedUserApiController implements ConnectedUserApi {
 
     private final ConnectedUserFacade connectedUserFacade;
-    private final ConnectedUserService connectedUserService;
     private final ConversionService conversionService;
 
     @SuppressFBWarnings("EI")
-    public ConnectedUserApiController(
-        ConnectedUserFacade connectedUserFacade, ConnectedUserService connectedUserService,
-        ConversionService conversionService) {
-
+    public ConnectedUserApiController(ConnectedUserFacade connectedUserFacade, ConversionService conversionService) {
         this.connectedUserFacade = connectedUserFacade;
-        this.connectedUserService = connectedUserService;
         this.conversionService = conversionService;
     }
 
     @Override
     public ResponseEntity<Void> deleteConnectedUser(Long id) {
-        connectedUserService.deleteConnectedUser(id);
+        connectedUserFacade.deleteConnectedUser(id);
 
         return ResponseEntity.noContent()
             .build();

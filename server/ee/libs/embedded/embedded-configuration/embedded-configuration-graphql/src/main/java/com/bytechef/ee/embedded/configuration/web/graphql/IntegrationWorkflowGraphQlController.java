@@ -80,7 +80,7 @@ public class IntegrationWorkflowGraphQlController {
     public IntegrationWorkflowDTO updateIntegrationWorkflowPermissionExpression(
         @Argument long integrationWorkflowId, @Argument String permissionExpression) {
 
-        integrationWorkflowService.updatePermissionExpression(integrationWorkflowId, permissionExpression);
+        integrationWorkflowFacade.updatePermissionExpression(integrationWorkflowId, permissionExpression);
 
         // Return the DTO (not the domain object) so the IntegrationWorkflow type's @SchemaMapping field resolvers,
         // which declare IntegrationWorkflowDTO as their source, can resolve the selected sub-fields.
