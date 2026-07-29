@@ -61,5 +61,9 @@ public enum AiHubTaskArtifactKind {
 
     // Agent-referenced custom component (custom component source). Appended at the END per the JDBC
     // enum-storage convention so all earlier ordinals stay pinned.
-    CUSTOM_COMPONENT_REFERENCED
+    CUSTOM_COMPONENT_REFERENCED,
+
+    // Agent-referenced code workflow (code workflow source). Appended at the END per the JDBC
+    // enum-storage convention so all earlier ordinals stay pinned.
+    CODE_WORKFLOW_REFERENCED
 }

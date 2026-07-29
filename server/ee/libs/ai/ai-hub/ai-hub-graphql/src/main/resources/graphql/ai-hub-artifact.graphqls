@@ -42,6 +42,7 @@ enum AiHubTaskArtifactKind {
     TASK_REFERENCED
     SKILL_REFERENCED
     CUSTOM_COMPONENT_REFERENCED
+    CODE_WORKFLOW_REFERENCED
 }
 
 enum AiHubTaskArtifactStatus {

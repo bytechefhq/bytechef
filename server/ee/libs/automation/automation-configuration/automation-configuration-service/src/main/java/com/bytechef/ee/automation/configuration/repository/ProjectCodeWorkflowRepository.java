@@ -9,6 +9,7 @@ package com.bytechef.ee.automation.configuration.repository;
 
 import com.bytechef.ee.automation.configuration.domain.ProjectCodeWorkflow;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
@@ -23,6 +24,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 @ConditionalOnEEVersion
 public interface ProjectCodeWorkflowRepository extends ListCrudRepository<ProjectCodeWorkflow, Long> {
+
+    @Query("SELECT DISTINCT project_id FROM project_code_workflow")
+    List<Long> findDistinctProjectIds();
 
     @Query("""
         SELECT * FROM project_code_workflow

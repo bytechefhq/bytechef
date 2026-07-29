@@ -12,6 +12,7 @@ import com.bytechef.ee.automation.configuration.domain.ProjectCodeWorkflow;
 import com.bytechef.ee.automation.configuration.repository.ProjectCodeWorkflowRepository;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +41,11 @@ public class ProjectCodeWorkflowServiceImpl implements ProjectCodeWorkflowServic
         projectCodeWorkflow.setProjectVersion(project.getLastProjectVersion());
 
         return projectCodeWorkflowRepository.save(projectCodeWorkflow);
+    }
+
+    @Override
+    public List<Long> getCodeWorkflowProjectIds() {
+        return projectCodeWorkflowRepository.findDistinctProjectIds();
     }
 
     @Override

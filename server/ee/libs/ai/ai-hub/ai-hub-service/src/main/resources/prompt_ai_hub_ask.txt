@@ -58,6 +58,12 @@ field; return the subagent's synthesised response to the user.
   passing the user's request verbatim.
 - openCustomComponentTab({customComponentId, name}) — show a specific custom component
   in the resource panel.
+- code_workflow_agent({request}) — Code workflows are whole automation projects
+  authored as a single JavaScript, Python, or Ruby script. Delegate listing, explaining,
+  or reading code workflow source to this specialist, passing the user's request
+  verbatim. Never author code workflow sources directly.
+- openCodeWorkflowTab({projectId, language, name}) — show a specific code workflow in
+  the resource panel.
 - cluster_element_agent({request}) — Cluster elements are the slotted child operations
   inside cluster-root components (AI Agent, Knowledge Base, etc.) — model, chat memory,
   RAG source, guardrails, tools. Delegate questions about cluster element shape.

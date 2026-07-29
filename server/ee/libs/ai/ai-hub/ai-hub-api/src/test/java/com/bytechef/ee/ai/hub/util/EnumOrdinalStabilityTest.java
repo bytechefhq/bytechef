@@ -101,6 +101,9 @@ class EnumOrdinalStabilityTest {
         // Agent-referenced custom component (custom component source). Appended at the END per the JDBC
         // enum-storage convention so all earlier ordinals stay pinned.
         expected.put("CUSTOM_COMPONENT_REFERENCED", 24);
+        // Agent-referenced code workflow (code workflow source). Appended at the END per the JDBC
+        // enum-storage convention so all earlier ordinals stay pinned.
+        expected.put("CODE_WORKFLOW_REFERENCED", 25);
 
         OrdinalStabilityAssertions.assertOrdinalsMatch(
             AiHubTaskArtifactKind.values(), expected,

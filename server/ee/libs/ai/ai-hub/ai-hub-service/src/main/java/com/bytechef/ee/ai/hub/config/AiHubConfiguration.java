@@ -12,6 +12,7 @@ import com.agui.core.state.State;
 import com.bytechef.ai.copilot.tool.AskUserQuestionToolCallback;
 import com.bytechef.ai.copilot.tool.ClusterElementAgentToolCallback;
 import com.bytechef.ai.copilot.tool.CodeEditorAgentToolCallback;
+import com.bytechef.ai.copilot.tool.CodeWorkflowAgentToolCallback;
 import com.bytechef.ai.copilot.tool.ConverterAgentToolCallback;
 import com.bytechef.ai.copilot.tool.CreateConnectionToolCallback;
 import com.bytechef.ai.copilot.tool.CustomComponentAgentToolCallback;
@@ -102,6 +103,7 @@ import com.bytechef.ee.ai.hub.tool.ListMcpServersToolCallback;
 import com.bytechef.ee.ai.hub.tool.ListProjectDeploymentsToolCallback;
 import com.bytechef.ee.ai.hub.tool.ListTaskToolsToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenAiHubPersonalAgentTabToolCallback;
+import com.bytechef.ee.ai.hub.tool.OpenCodeWorkflowTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenCustomComponentTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenDataTableTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenFileTabToolCallback;
@@ -242,6 +244,8 @@ public class AiHubConfiguration {
         ObjectProvider<ChatClient> workflowExecutionAskSubAgentChatClientProvider,
         @Qualifier("customComponentAskSubAgentChatClient") //
         ObjectProvider<ChatClient> customComponentAskSubAgentChatClientProvider,
+        @Qualifier("codeWorkflowAskSubAgentChatClient") //
+        ObjectProvider<ChatClient> codeWorkflowAskSubAgentChatClientProvider,
         ArtifactGeneratorRegistry artifactGeneratorRegistry, AiHubTaskService taskService,
         AiAutoMemoryService aiHubMemoryService,
         DataTableService dataTableService,
@@ -291,6 +295,7 @@ public class AiHubConfiguration {
         toolCallbacks.add(new OpenKnowledgeBaseTabToolCallback(null));
         toolCallbacks.add(new OpenSkillTabToolCallback(null));
         toolCallbacks.add(new OpenCustomComponentTabToolCallback(null));
+        toolCallbacks.add(new OpenCodeWorkflowTabToolCallback(null));
         toolCallbacks.add(new ListDataTablesToolCallback(workspaceDataTableFacade));
         toolCallbacks.add(
             new QueryDataTableToolCallback(
@@ -335,7 +340,8 @@ public class AiHubConfiguration {
         registerCopilotSubAgentToolCallbacks(
             toolCallbacks, skillsAskSubAgentChatClientProvider, clusterElementAskSubAgentChatClientProvider,
             codeEditorAskSubAgentChatClientProvider, workflowEditorAskSubAgentChatClientProvider, null,
-            workflowExecutionAskSubAgentChatClientProvider, customComponentAskSubAgentChatClientProvider);
+            workflowExecutionAskSubAgentChatClientProvider, customComponentAskSubAgentChatClientProvider,
+            codeWorkflowAskSubAgentChatClientProvider);
 
         // Context Store consume + discovery — read-only; safe on the ASK agent. Define-side callbacks
         // (create/update/delete/refresh/setEnabled) are mutations and live on the BUILD agent only.
@@ -408,6 +414,8 @@ public class AiHubConfiguration {
         ObjectProvider<Supplier<ChatClient>> converterBuildSubAgentChatClientSupplierProvider,
         @Qualifier("customComponentBuildSubAgentChatClient") //
         ObjectProvider<ChatClient> customComponentBuildSubAgentChatClientProvider,
+        @Qualifier("codeWorkflowBuildSubAgentChatClient") //
+        ObjectProvider<ChatClient> codeWorkflowBuildSubAgentChatClientProvider,
         ArtifactGeneratorRegistry artifactGeneratorRegistry,
         AssetFileFacade assetFileFacade, AiHubTaskArtifactService taskArtifactService,
         AiHubTaskArtifactRecorder aiHubTaskArtifactRecorder,
@@ -464,6 +472,7 @@ public class AiHubConfiguration {
         toolCallbacks.add(new OpenKnowledgeBaseTabToolCallback(aiHubTaskArtifactRecorder));
         toolCallbacks.add(new OpenSkillTabToolCallback(aiHubTaskArtifactRecorder));
         toolCallbacks.add(new OpenCustomComponentTabToolCallback(aiHubTaskArtifactRecorder));
+        toolCallbacks.add(new OpenCodeWorkflowTabToolCallback(aiHubTaskArtifactRecorder));
         toolCallbacks.add(new ListDataTablesToolCallback(workspaceDataTableFacade));
         toolCallbacks.add(
             new QueryDataTableToolCallback(
@@ -510,7 +519,7 @@ public class AiHubConfiguration {
             toolCallbacks, skillsBuildSubAgentChatClientProvider, clusterElementBuildSubAgentChatClientProvider,
             codeEditorBuildSubAgentChatClientProvider, workflowEditorBuildSubAgentChatClientProvider,
             converterBuildSubAgentChatClientSupplierProvider, workflowExecutionBuildSubAgentChatClientProvider,
-            customComponentBuildSubAgentChatClientProvider);
+            customComponentBuildSubAgentChatClientProvider, codeWorkflowBuildSubAgentChatClientProvider);
         toolCallbacks.add(new CreateConnectionToolCallback(componentDefinitionService));
         toolCallbacks.add(new SelectConnectionToolCallback(componentDefinitionService));
         toolCallbacks.add(new ListProjectDeploymentsToolCallback(projectDeploymentFacade));
@@ -771,7 +780,8 @@ public class AiHubConfiguration {
         ObjectProvider<ChatClient> workflowEditorSubAgentChatClientProvider,
         @Nullable ObjectProvider<Supplier<ChatClient>> converterSubAgentChatClientSupplierProvider,
         ObjectProvider<ChatClient> workflowExecutionSubAgentChatClientProvider,
-        ObjectProvider<ChatClient> customComponentSubAgentChatClientProvider) {
+        ObjectProvider<ChatClient> customComponentSubAgentChatClientProvider,
+        ObjectProvider<ChatClient> codeWorkflowSubAgentChatClientProvider) {
 
         skillsSubAgentChatClientProvider.ifAvailable(
             chatClient -> toolCallbacks.add(
@@ -808,6 +818,11 @@ public class AiHubConfiguration {
             chatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
                     new CustomComponentAgentToolCallback(chatClient), "custom_component_agent")));
+
+        codeWorkflowSubAgentChatClientProvider.ifAvailable(
+            chatClient -> toolCallbacks.add(
+                new ProgressReportingToolCallback(
+                    new CodeWorkflowAgentToolCallback(chatClient), "code_workflow_agent")));
     }
 
     /**

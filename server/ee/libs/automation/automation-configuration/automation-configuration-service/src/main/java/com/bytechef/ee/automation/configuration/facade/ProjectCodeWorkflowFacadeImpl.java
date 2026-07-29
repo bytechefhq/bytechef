@@ -34,6 +34,7 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -141,6 +142,23 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
             .orElseThrow(() -> new ConfigurationException(
                 "Failed to create code workflow project '" + name + "'",
                 CodeWorkflowErrorType.SOURCE_LOAD_FAILED));
+    }
+
+    /**
+     * Returns every project that has at least one code workflow deployed, resolved from the distinct project ids
+     * recorded on {@code project_code_workflow}.
+     */
+    @Transactional(readOnly = true)
+    @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public List<Project> getCodeWorkflowProjects() {
+        List<Long> projectIds = projectCodeWorkflowService.getCodeWorkflowProjectIds();
+
+        if (projectIds.isEmpty()) {
+            return List.of();
+        }
+
+        return projectService.getProjects(projectIds);
     }
 
     /**

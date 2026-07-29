@@ -10,6 +10,7 @@ package com.bytechef.ee.automation.configuration.service;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.ee.automation.configuration.domain.ProjectCodeWorkflow;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer;
+import java.util.List;
 
 /**
  * @version ee
@@ -19,6 +20,8 @@ import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowCo
 public interface ProjectCodeWorkflowService {
 
     ProjectCodeWorkflow create(CodeWorkflowContainer codeWorkflowContainer, Project projectCodeWorkflow);
+
+    List<Long> getCodeWorkflowProjectIds();
 
     ProjectCodeWorkflow getProjectCodeWorkflow(long projectId);
 }

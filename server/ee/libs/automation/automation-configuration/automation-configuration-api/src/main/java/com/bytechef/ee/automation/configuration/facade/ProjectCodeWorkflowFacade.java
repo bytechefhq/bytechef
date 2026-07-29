@@ -9,6 +9,7 @@ package com.bytechef.ee.automation.configuration.facade;
 
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
+import java.util.List;
 
 /**
  * @version ee
@@ -18,6 +19,8 @@ import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowCo
 public interface ProjectCodeWorkflowFacade {
 
     Project createEmptyCodeWorkflow(long workspaceId, String name, Language language);
+
+    List<Project> getCodeWorkflowProjects();
 
     String getCodeWorkflowSource(long projectId);
 
