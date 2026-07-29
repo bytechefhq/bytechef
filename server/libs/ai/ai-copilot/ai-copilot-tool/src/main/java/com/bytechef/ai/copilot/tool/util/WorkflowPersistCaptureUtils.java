@@ -87,8 +87,8 @@ public final class WorkflowPersistCaptureUtils {
 
             ---
             [WORKFLOW PERSISTED — authoritative identifiers. Use these EXACT values; do NOT infer, reformat, or \
-            transpose them.] The workflow was saved. To open it for the user, call openWorkflowTab with \
-            workflowId="%s", projectId=%s, projectWorkflowId=%s, name="%s".""".formatted(
+            transpose them.] The workflow was saved. To open it for the user, call openResourceTab with \
+            type="WORKFLOW", workflowId="%s", projectId=%s, projectWorkflowId=%s, name="%s".""".formatted(
             workflowId, projectId, projectWorkflowId, name == null ? "" : name);
     }
 }

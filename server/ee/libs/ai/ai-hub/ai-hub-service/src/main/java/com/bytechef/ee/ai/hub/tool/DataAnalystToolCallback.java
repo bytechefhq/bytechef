@@ -73,8 +73,8 @@ public class DataAnalystToolCallback implements ToolCallback {
             user's question verbatim as the 'question' field. Optionally supply 'dataTableId'
             when the user has already identified a specific table.
 
-            After the report returns, save it via createAssetFile and open it with openFileTab;
-            summarise findings in one paragraph in chat.""";
+            After the report returns, save it via createAssetFile and open it with
+            openResourceTab (type FILE); summarise findings in one paragraph in chat.""";
 
     private static final String INPUT_SCHEMA =
         """

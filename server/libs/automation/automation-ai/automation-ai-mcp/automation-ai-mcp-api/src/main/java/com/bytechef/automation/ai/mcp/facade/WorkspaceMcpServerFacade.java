@@ -70,6 +70,16 @@ public interface WorkspaceMcpServerFacade {
         String name, PlatformType type, Environment environment, Boolean enabled, Long workspaceId);
 
     /**
+     * Updates the name and/or enabled state of an MCP server belonging to a workspace.
+     *
+     * @param mcpServerId the ID of the MCP server to update
+     * @param name        the new name (null to leave unchanged)
+     * @param enabled     the new enabled state (null to leave unchanged)
+     * @return the updated MCP server
+     */
+    McpServer updateWorkspaceMcpServer(Long mcpServerId, String name, Boolean enabled);
+
+    /**
      * Deletes an MCP server and removes it from all workspaces.
      *
      * @param mcpServerId the ID of the MCP server to delete

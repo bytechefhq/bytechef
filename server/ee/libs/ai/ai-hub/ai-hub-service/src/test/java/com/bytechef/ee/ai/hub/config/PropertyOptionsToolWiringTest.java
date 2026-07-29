@@ -69,8 +69,10 @@ class PropertyOptionsToolWiringTest {
                 .name())
             .toList();
 
-        assertThat(toolNames).contains(
-            "listConnectionsForComponent", "lookupActionPropertyOptions", "lookupTriggerPropertyOptions",
-            "selectPropertyOption", "selectTriggerPropertyOption");
+        assertThat(toolNames).contains("listConnectionsForComponent", "lookupPropertyOptions", "selectPropertyOption");
+        // The action/trigger twins were consolidated into the kind-keyed pair above — the twins must NOT
+        // reappear on the pinned list.
+        assertThat(toolNames).doesNotContain(
+            "lookupActionPropertyOptions", "lookupTriggerPropertyOptions", "selectTriggerPropertyOption");
     }
 }
