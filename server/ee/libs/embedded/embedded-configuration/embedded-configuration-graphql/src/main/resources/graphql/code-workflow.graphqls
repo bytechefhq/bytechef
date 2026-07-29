@@ -1,0 +1,8 @@
+extend type Query {
+    integrationCodeWorkflowSource(integrationId: ID!): String!
+}
+
+extend type Mutation {
+    updateIntegrationCodeWorkflowSource(integrationId: ID!, content: String!): Boolean!
+    createIntegrationCodeWorkflow(componentName: String!, language: CodeWorkflowLanguage!): ID!
+}

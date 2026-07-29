@@ -20,6 +20,8 @@ import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowServi
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
 import com.bytechef.ee.platform.codeworkflow.configuration.facade.CodeWorkflowContainerFacade;
+import com.bytechef.ee.platform.codeworkflow.configuration.service.CodeWorkflowContainerService;
+import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorage;
 import com.bytechef.exception.ConfigurationException;
 import org.junit.jupiter.api.Test;
 import org.springframework.cache.CacheManager;
@@ -44,7 +46,8 @@ class ProjectCodeWorkflowFacadeUploadDisabledTest {
 
         ProjectCodeWorkflowFacadeImpl projectCodeWorkflowFacade = new ProjectCodeWorkflowFacadeImpl(
             applicationProperties(false), mock(CacheManager.class), projectService, projectWorkflowService,
-            codeWorkflowContainerFacade, projectCodeWorkflowService);
+            codeWorkflowContainerFacade, projectCodeWorkflowService, mock(CodeWorkflowContainerService.class),
+            mock(CodeWorkflowFileStorage.class));
 
         assertThatThrownBy(() -> projectCodeWorkflowFacade.save(1L, new byte[0], Language.JAVA))
             .isInstanceOf(ConfigurationException.class)
@@ -68,7 +71,8 @@ class ProjectCodeWorkflowFacadeUploadDisabledTest {
 
         ProjectCodeWorkflowFacadeImpl projectCodeWorkflowFacade = new ProjectCodeWorkflowFacadeImpl(
             applicationProperties(false), mock(CacheManager.class), projectService, projectWorkflowService,
-            codeWorkflowContainerFacade, projectCodeWorkflowService);
+            codeWorkflowContainerFacade, projectCodeWorkflowService, mock(CodeWorkflowContainerService.class),
+            mock(CodeWorkflowFileStorage.class));
 
         // A JavaScript upload gets past the Java-only disable guard; it may still fail downstream on the empty payload,
         // but never with the disabled ConfigurationException.

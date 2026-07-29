@@ -41,4 +41,11 @@ public class ProjectCodeWorkflowServiceImpl implements ProjectCodeWorkflowServic
 
         return projectCodeWorkflowRepository.save(projectCodeWorkflow);
     }
+
+    @Override
+    public ProjectCodeWorkflow getProjectCodeWorkflow(long projectId) {
+        return projectCodeWorkflowRepository.findFirstByProjectIdOrderByIdDesc(projectId)
+            .orElseThrow(
+                () -> new IllegalArgumentException("No code workflow found for project id=" + projectId));
+    }
 }

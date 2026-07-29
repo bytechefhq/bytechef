@@ -18,5 +18,7 @@ public interface CodeWorkflowContainerService {
 
     CodeWorkflowContainer create(CodeWorkflowContainer codeWorkflowContainer);
 
+    CodeWorkflowContainer getCodeWorkflowContainer(Long id);
+
     CodeWorkflowContainer getCodeWorkflowContainer(String codeWorkflowContainerUuid);
 }

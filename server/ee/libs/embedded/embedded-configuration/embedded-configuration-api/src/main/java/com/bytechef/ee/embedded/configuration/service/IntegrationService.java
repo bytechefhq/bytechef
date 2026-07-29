@@ -11,6 +11,7 @@ import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationVersion;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationVersion.Status;
 import java.util.List;
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -23,6 +24,8 @@ public interface IntegrationService {
     Integration create(Integration integration);
 
     void delete(long id);
+
+    Optional<Integration> fetchIntegration(String componentName);
 
     Integration getIntegration(long id);
 

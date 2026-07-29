@@ -1,0 +1,335 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the ByteChef Enterprise license (the "Enterprise License");
+ * you may not use this file except in compliance with the Enterprise License.
+ */
+
+package com.bytechef.ee.embedded.configuration.facade;
+
+import com.bytechef.config.ApplicationProperties;
+import com.bytechef.config.ApplicationProperties.Workflow.CodeWorkflow;
+import com.bytechef.ee.embedded.codeworkflow.loader.IntegrationHandlerLoader;
+import com.bytechef.ee.embedded.configuration.domain.Integration;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationCodeWorkflow;
+import com.bytechef.ee.embedded.configuration.exception.CodeWorkflowErrorType;
+import com.bytechef.ee.embedded.configuration.service.IntegrationCodeWorkflowService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
+import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer;
+import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
+import com.bytechef.ee.platform.codeworkflow.configuration.facade.CodeWorkflowContainerFacade;
+import com.bytechef.ee.platform.codeworkflow.configuration.service.CodeWorkflowContainerService;
+import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorage;
+import com.bytechef.embedded.integration.IntegrationHandler;
+import com.bytechef.embedded.integration.definition.IntegrationDefinition;
+import com.bytechef.exception.ConfigurationException;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.workflow.definition.WorkflowDefinition;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
+import org.springframework.cache.CacheManager;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * Deploys code-backed integrations for the embedded surface. The embedded mirror of the automation
+ * {@code ProjectCodeWorkflowFacadeImpl}: integrations are keyed globally by component name rather than scoped to a
+ * workspace.
+ *
+ * @version ee
+ *
+ * @author Ivica Cardic
+ */
+@Service
+@Transactional
+@ConditionalOnEEVersion
+public class IntegrationCodeWorkflowFacadeImpl implements IntegrationCodeWorkflowFacade {
+
+    private final CacheManager cacheManager;
+    private final CodeWorkflowContainerFacade codeWorkflowContainerFacade;
+    private final IntegrationCodeWorkflowService integrationCodeWorkflowService;
+    private final IntegrationService integrationService;
+    private final IntegrationWorkflowService integrationWorkflowService;
+    private final CodeWorkflowContainerService codeWorkflowContainerService;
+    private final CodeWorkflowFileStorage codeWorkflowFileStorage;
+    private final boolean javaEnabled;
+    private final IntegrationHandlerLoader.JavaLoader javaLoader;
+
+    @SuppressFBWarnings("EI")
+    public IntegrationCodeWorkflowFacadeImpl(
+        ApplicationProperties applicationProperties, CacheManager cacheManager,
+        CodeWorkflowContainerFacade codeWorkflowContainerFacade,
+        IntegrationCodeWorkflowService integrationCodeWorkflowService, IntegrationService integrationService,
+        IntegrationWorkflowService integrationWorkflowService,
+        CodeWorkflowContainerService codeWorkflowContainerService,
+        CodeWorkflowFileStorage codeWorkflowFileStorage) {
+
+        this.cacheManager = cacheManager;
+        this.codeWorkflowContainerFacade = codeWorkflowContainerFacade;
+        this.integrationCodeWorkflowService = integrationCodeWorkflowService;
+        this.integrationService = integrationService;
+        this.integrationWorkflowService = integrationWorkflowService;
+        this.codeWorkflowContainerService = codeWorkflowContainerService;
+        this.codeWorkflowFileStorage = codeWorkflowFileStorage;
+        this.javaEnabled = applicationProperties.getWorkflow()
+            .getCodeWorkflow()
+            .isJavaEnabled();
+        this.javaLoader = toLoaderJavaLoader(applicationProperties);
+    }
+
+    private static IntegrationHandlerLoader.JavaLoader toLoaderJavaLoader(ApplicationProperties applicationProperties) {
+        ApplicationProperties.Workflow workflow = applicationProperties.getWorkflow();
+
+        CodeWorkflow codeWorkflow = workflow.getCodeWorkflow();
+
+        return codeWorkflow.getJavaLoader() == CodeWorkflow.JavaLoader.ESPRESSO
+            ? IntegrationHandlerLoader.JavaLoader.ESPRESSO
+            : IntegrationHandlerLoader.JavaLoader.CLASS_LOADER;
+    }
+
+    /**
+     * Creates a code-backed integration from scratch by rendering the language starter template (substituting the
+     * requested component name) and deploying it through the regular {@link #save} path, which creates the integration
+     * of that component name. Restricted to administrators, mirroring {@link #save}, because deployment loads the
+     * rendered script on the server.
+     *
+     * <p>
+     * This method is create-only: {@link #save} resolves the target integration via a global
+     * {@link IntegrationService#fetchIntegration(String)} lookup, so if an integration for that component name already
+     * exists, {@link #save} would redeploy the starter onto it instead of creating a new one. The guard below rejects
+     * that case up front rather than allowing an existing integration to be reused or overwritten.
+     */
+    @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public Integration createEmptyCodeWorkflow(String componentName, Language language) {
+        if (componentName == null || componentName.isBlank() || componentName.indexOf('"') >= 0
+            || componentName.indexOf('\\') >= 0 || componentName.indexOf('\n') >= 0
+            || componentName.indexOf('\r') >= 0) {
+
+            throw new ConfigurationException(
+                "Invalid code workflow name: must not be blank or contain quotes, backslashes, or newlines",
+                CodeWorkflowErrorType.INVALID_CODE_WORKFLOW_NAME);
+        }
+
+        if (language != Language.JAVASCRIPT && language != Language.PYTHON && language != Language.RUBY) {
+            throw new ConfigurationException(
+                "Create-empty supports JavaScript, Python and Ruby only",
+                CodeWorkflowErrorType.LANGUAGE_NOT_SUPPORTED);
+        }
+
+        if (integrationService.fetchIntegration(componentName)
+            .isPresent()) {
+
+            throw new ConfigurationException(
+                "An integration for component '" + componentName + "' already exists",
+                CodeWorkflowErrorType.CODE_WORKFLOW_ALREADY_EXISTS);
+        }
+
+        String template = readTemplate(language).replace("__NAME__", componentName);
+
+        byte[] bytes = template.getBytes(StandardCharsets.UTF_8);
+
+        save(bytes, language);
+
+        return integrationService.fetchIntegration(componentName)
+            .orElseThrow(() -> new ConfigurationException(
+                "Failed to create code workflow integration '" + componentName + "'",
+                CodeWorkflowErrorType.SOURCE_LOAD_FAILED));
+    }
+
+    /**
+     * Returns the stored source text of the code workflow backing {@code integrationId}, so it can be shown in an
+     * editor. Java-backed containers have no editable source (they are compiled jars), so those are rejected.
+     */
+    @Transactional(readOnly = true)
+    @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public String getCodeWorkflowSource(long integrationId) {
+        CodeWorkflowContainer codeWorkflowContainer = getCodeWorkflowContainer(integrationId);
+
+        if (codeWorkflowContainer.getLanguage() == Language.JAVA) {
+            throw new ConfigurationException(
+                "Java code workflows have no editable source", CodeWorkflowErrorType.LANGUAGE_NOT_SUPPORTED);
+        }
+
+        return codeWorkflowFileStorage.readCodeWorkflowFileContent(codeWorkflowContainer.getWorkflows());
+    }
+
+    /**
+     * Deploying a code workflow loads and executes the uploaded artifact (a JAR or polyglot script) on the server, so
+     * it is restricted to administrators. The guard lives here on the facade so it protects every caller, not only the
+     * REST entry point.
+     */
+    @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public void save(byte[] bytes, Language language) {
+        if (!javaEnabled && language == Language.JAVA) {
+            throw new ConfigurationException(
+                "Uploading of Java code workflows is disabled",
+                CodeWorkflowErrorType.JAVA_CODE_WORKFLOW_UPLOAD_DISABLED);
+        }
+
+        IntegrationDefinition integrationDefinition;
+
+        try {
+            integrationDefinition = loadIntegrationDefinition(language, bytes);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        Integration integration = integrationService.fetchIntegration(integrationDefinition.getComponentName())
+            .map(curIntegration -> updateIntegration(curIntegration, integrationDefinition))
+            .orElseGet(() -> createIntegration(integrationDefinition));
+
+        deployInto(integration, integrationDefinition, bytes, language);
+    }
+
+    /**
+     * Re-deploys new source onto an already-resolved integration rather than resolving the target integration by
+     * component name (as {@link #save} does for uploads). Renaming an integration's component by editing its source is
+     * not supported, so the incoming {@link IntegrationDefinition#getComponentName()} must match the integration's
+     * current component name.
+     */
+    @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public void updateCodeWorkflowSource(long integrationId, String content) {
+        CodeWorkflowContainer codeWorkflowContainer = getCodeWorkflowContainer(integrationId);
+
+        Language language = codeWorkflowContainer.getLanguage();
+
+        if (language == Language.JAVA) {
+            throw new ConfigurationException(
+                "Java code workflows have no editable source", CodeWorkflowErrorType.LANGUAGE_NOT_SUPPORTED);
+        }
+
+        Integration integration = integrationService.getIntegration(integrationId);
+
+        byte[] bytes = content.getBytes(StandardCharsets.UTF_8);
+
+        IntegrationDefinition integrationDefinition;
+
+        try {
+            integrationDefinition = loadIntegrationDefinition(language, bytes);
+        } catch (Exception e) {
+            throw new ConfigurationException(
+                "Failed to load code workflow source: " + e.getMessage(), CodeWorkflowErrorType.SOURCE_LOAD_FAILED);
+        }
+
+        if (!Objects.equals(integrationDefinition.getComponentName(), integration.getComponentName())) {
+            throw new ConfigurationException(
+                "Renaming a code workflow by editing its source is not supported (expected component name '"
+                    + integration.getComponentName() + "')",
+                CodeWorkflowErrorType.CODE_WORKFLOW_NAME_MISMATCH);
+        }
+
+        deployInto(integration, integrationDefinition, bytes, language);
+    }
+
+    private CodeWorkflowContainer getCodeWorkflowContainer(long integrationId) {
+        IntegrationCodeWorkflow integrationCodeWorkflow = integrationCodeWorkflowService
+            .fetchIntegrationCodeWorkflow(integrationId)
+            .orElseThrow(() -> new ConfigurationException(
+                "No code workflow exists for integration " + integrationId,
+                CodeWorkflowErrorType.SOURCE_LOAD_FAILED));
+
+        return codeWorkflowContainerService.getCodeWorkflowContainer(
+            integrationCodeWorkflow.getCodeWorkflowContainerId());
+    }
+
+    private void deployInto(
+        Integration integration, IntegrationDefinition integrationDefinition, byte[] bytes, Language language) {
+
+        List<WorkflowDefinition> workflowDefinitions = integrationDefinition.getWorkflows()
+            .orElseGet(List::of);
+
+        CodeWorkflowContainer codeWorkflowContainer = codeWorkflowContainerFacade.create(
+            integrationDefinition.getComponentName(), integrationDefinition.getVersion(), workflowDefinitions, language,
+            bytes, PlatformType.EMBEDDED);
+
+        integrationCodeWorkflowService.create(codeWorkflowContainer, integration);
+
+        Map<String, String> workflowNameIds = codeWorkflowContainer.getWorkflowNameIds();
+
+        for (Map.Entry<String, String> entry : workflowNameIds.entrySet()) {
+            integrationWorkflowService.addWorkflow(
+                integration.getId(), integration.getLastIntegrationVersion(), entry.getValue());
+        }
+
+        integrationService.publishIntegration(integration.getId(), null);
+    }
+
+    private Integration createIntegration(IntegrationDefinition integrationDefinition) {
+        Integration integration = new Integration();
+
+        integration.setComponentName(integrationDefinition.getComponentName());
+        integration.setComponentVersion(integrationDefinition.getComponentVersion());
+        integration.setDescription(
+            integrationDefinition.getDescription()
+                .orElse(null));
+        integration.setName(integrationDefinition.getComponentName());
+
+        return integrationService.create(integration);
+    }
+
+    /**
+     * Security Note: PATH_TRAVERSAL_IN - Temporary files are created with system-generated names in the temp directory,
+     * not user-controlled paths. Access is restricted to administrators.
+     */
+    @SuppressFBWarnings("PATH_TRAVERSAL_IN")
+    private IntegrationDefinition loadIntegrationDefinition(Language language, byte[] bytes) throws IOException {
+        Path path = Files.createTempFile("code_workflow_integration", language.getExtension());
+
+        Files.write(path, bytes);
+
+        URI uri = path.toUri();
+
+        try {
+            IntegrationHandler integrationHandler = IntegrationHandlerLoader.loadIntegrationHandler(
+                uri.toURL(), language, javaLoader, uri + UUID.randomUUID()
+                    .toString(),
+                cacheManager);
+
+            return integrationHandler.getDefinition();
+        } finally {
+            Files.delete(path);
+        }
+    }
+
+    private Integration updateIntegration(Integration integration, IntegrationDefinition integrationDefinition) {
+        integration.setComponentVersion(integrationDefinition.getComponentVersion());
+        integration.setDescription(
+            integrationDefinition.getDescription()
+                .orElse(null));
+
+        return integrationService.update(integration);
+    }
+
+    private static String readTemplate(Language language) {
+        String resource = "integration-code-workflow-templates/starter." + language.getExtension();
+
+        try (InputStream inputStream = IntegrationCodeWorkflowFacadeImpl.class.getClassLoader()
+            .getResourceAsStream(resource)) {
+
+            if (inputStream == null) {
+                throw new IllegalStateException("Missing starter template: " + resource);
+            }
+
+            return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+}

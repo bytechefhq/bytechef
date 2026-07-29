@@ -19,6 +19,7 @@ import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -74,6 +75,12 @@ public class IntegrationServiceImpl implements IntegrationService {
         integrationRepository.deleteById(id);
 
         integrationAuditPublisher.publish(IntegrationAuditEvent.INTEGRATION_DELETED, id, null);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Integration> fetchIntegration(String componentName) {
+        return integrationRepository.findByComponentNameIgnoreCase(componentName);
     }
 
     @Override

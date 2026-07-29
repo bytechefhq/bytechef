@@ -25,6 +25,8 @@ public interface IntegrationRepository
     extends ListPagingAndSortingRepository<Integration, Long>, ListCrudRepository<Integration, Long>,
     CustomIntegrationRepository {
 
+    Optional<Integration> findByComponentNameIgnoreCase(String componentName);
+
     @Query("""
         SELECT integration.* FROM integration
         JOIN integration_instance_configuration ON integration.id = integration_instance_configuration.integration_id

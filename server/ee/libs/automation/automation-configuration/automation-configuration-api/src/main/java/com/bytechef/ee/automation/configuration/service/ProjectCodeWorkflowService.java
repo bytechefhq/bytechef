@@ -19,4 +19,6 @@ import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowCo
 public interface ProjectCodeWorkflowService {
 
     ProjectCodeWorkflow create(CodeWorkflowContainer codeWorkflowContainer, Project projectCodeWorkflow);
+
+    ProjectCodeWorkflow getProjectCodeWorkflow(long projectId);
 }

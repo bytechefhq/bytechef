@@ -11,13 +11,17 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationCodeWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationVersion.Status;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationDTO;
+import com.bytechef.ee.embedded.configuration.service.IntegrationCodeWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
+import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer;
+import com.bytechef.ee.platform.codeworkflow.configuration.service.CodeWorkflowContainerService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.service.CategoryService;
@@ -32,6 +36,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
@@ -48,7 +53,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class IntegrationFacadeImpl implements IntegrationFacade {
 
     private final CategoryService categoryService;
+    private final CodeWorkflowContainerService codeWorkflowContainerService;
     private final ComponentDefinitionService componentDefinitionService;
+    private final IntegrationCodeWorkflowService integrationCodeWorkflowService;
     private final IntegrationService integrationService;
     private final IntegrationWorkflowService integrationWorkflowService;
     private final IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade;
@@ -60,8 +67,10 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
 
     @SuppressFBWarnings("EI2")
     public IntegrationFacadeImpl(
-        CategoryService categoryService, ComponentDefinitionService componentDefinitionService,
-        IntegrationService integrationService, IntegrationWorkflowService integrationWorkflowService,
+        CategoryService categoryService, CodeWorkflowContainerService codeWorkflowContainerService,
+        ComponentDefinitionService componentDefinitionService,
+        IntegrationCodeWorkflowService integrationCodeWorkflowService, IntegrationService integrationService,
+        IntegrationWorkflowService integrationWorkflowService,
         IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         TagService tagService, WorkflowService workflowService,
@@ -69,7 +78,9 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
         WorkflowNodeTestOutputService workflowNodeTestOutputService) {
 
         this.categoryService = categoryService;
+        this.codeWorkflowContainerService = codeWorkflowContainerService;
         this.componentDefinitionService = componentDefinitionService;
+        this.integrationCodeWorkflowService = integrationCodeWorkflowService;
         this.integrationService = integrationService;
         this.integrationWorkflowService = integrationWorkflowService;
         this.integrationInstanceConfigurationFacade = integrationInstanceConfigurationFacade;
@@ -254,10 +265,29 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     private IntegrationDTO toIntegrationDTO(Integration integration) {
+        Optional<CodeWorkflowContainer> codeWorkflowContainer = integrationCodeWorkflowService
+            .fetchIntegrationCodeWorkflow(integration.getId())
+            .flatMap(this::fetchCodeWorkflowContainer);
+
         return new IntegrationDTO(
             getCategory(integration),
             componentDefinitionService.getComponentDefinition(integration.getComponentName(), null),
             integration, getIntegrationWorkflowIds(integration),
-            tagService.getTags(integration.getTagIds()));
+            tagService.getTags(integration.getTagIds()), codeWorkflowContainer.isPresent(),
+            codeWorkflowContainer.map(container -> container.getLanguage()
+                .name())
+                .orElse(null));
+    }
+
+    private Optional<CodeWorkflowContainer> fetchCodeWorkflowContainer(
+        IntegrationCodeWorkflow integrationCodeWorkflow) {
+
+        try {
+            return Optional.of(
+                codeWorkflowContainerService.getCodeWorkflowContainer(
+                    integrationCodeWorkflow.getCodeWorkflowContainerId()));
+        } catch (IllegalArgumentException e) {
+            return Optional.empty();
+        }
     }
 }

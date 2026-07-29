@@ -15,6 +15,7 @@ import com.bytechef.ee.remote.client.LoadBalancedRestClient;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 
@@ -44,6 +45,11 @@ public class RemoteIntegrationServiceClient implements IntegrationService {
 
     @Override
     public void delete(long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Optional<Integration> fetchIntegration(String componentName) {
         throw new UnsupportedOperationException();
     }
 
