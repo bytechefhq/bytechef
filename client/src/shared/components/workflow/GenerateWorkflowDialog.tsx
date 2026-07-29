@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/dialog';
 import {Textarea} from '@/components/ui/textarea';
 import {useGenerateProjectWorkflowMutation} from '@/shared/mutations/automation/workflows.mutations';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {Loader2Icon, SparklesIcon} from 'lucide-react';
 import {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
@@ -20,6 +21,8 @@ interface GenerateWorkflowDialogProps {
 
 const GenerateWorkflowDialog = ({onClose, projectId}: GenerateWorkflowDialogProps) => {
     const [prompt, setPrompt] = useState('');
+
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const navigate = useNavigate();
 
@@ -40,7 +43,7 @@ const GenerateWorkflowDialog = ({onClose, projectId}: GenerateWorkflowDialogProp
             return;
         }
 
-        mutate({id: projectId, prompt: trimmedPrompt});
+        mutate({environmentId: currentEnvironmentId, id: projectId, prompt: trimmedPrompt});
     };
 
     return (

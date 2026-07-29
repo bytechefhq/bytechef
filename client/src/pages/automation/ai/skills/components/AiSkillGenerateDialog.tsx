@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/dialog';
 import {Textarea} from '@/components/ui/textarea';
 import {useGenerateAiSkillMutation} from '@/shared/middleware/graphql';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {Loader2Icon, SparklesIcon} from 'lucide-react';
 import {useState} from 'react';
 
@@ -20,6 +21,8 @@ interface AiSkillGenerateDialogProps {
 
 const AiSkillGenerateDialog = ({onCreated, onOpenChange, open}: AiSkillGenerateDialogProps) => {
     const [prompt, setPrompt] = useState('');
+
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const generateAiSkillMutation = useGenerateAiSkillMutation({
         onSuccess: (data) => {
@@ -37,7 +40,7 @@ const AiSkillGenerateDialog = ({onCreated, onOpenChange, open}: AiSkillGenerateD
             return;
         }
 
-        generateAiSkillMutation.mutate({prompt: trimmedPrompt});
+        generateAiSkillMutation.mutate({environmentId: currentEnvironmentId, prompt: trimmedPrompt});
     };
 
     return (

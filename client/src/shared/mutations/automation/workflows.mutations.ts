@@ -26,6 +26,7 @@ export const useCreateProjectWorkflowMutation = (mutationProps?: CreateProjectWo
 };
 
 export interface GenerateProjectWorkflowRequestI {
+    environmentId: number;
     id: number;
     prompt: string;
 }
@@ -39,7 +40,7 @@ export const useGenerateProjectWorkflowMutation = (mutationProps?: GenerateProje
     useMutation({
         mutationFn: async (request: GenerateProjectWorkflowRequestI): Promise<CreateProjectWorkflow200Response> => {
             const response = await fetch(`/api/automation/internal/projects/${request.id}/workflows/generate`, {
-                body: JSON.stringify({prompt: request.prompt}),
+                body: JSON.stringify({environmentId: request.environmentId, prompt: request.prompt}),
                 headers: {'Content-Type': 'application/json'},
                 method: 'POST',
             });
