@@ -16,6 +16,7 @@ import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCo
 import useCopilotStateContributorRegistry from '@/shared/components/copilot/stores/useCopilotStateContributorRegistry';
 import {Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
+import {WorkflowKeys} from '@/shared/queries/automation/workflows.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {Suspense, lazy, useEffect, useMemo, useState} from 'react';
 import {useParams} from 'react-router-dom';
@@ -154,12 +155,25 @@ const WorkflowEditorLayout = ({
     }, []);
 
     useEffect(() => {
+        // The workflow editor is shared: when opened for an integration (embedded) the Copilot uses the
+        // WORKFLOW_EDITOR_EMBEDDED source, so the post-turn refresh must register for that source and invalidate the
+        // integration's workflow-by-id (there is no project/projectWorkflow to invalidate).
+        if (integrationId) {
+            return useCopilotPostTurnRegistry.getState().register(Source.WORKFLOW_EDITOR_EMBEDDED, () => {
+                const workflowId = useWorkflowDataStore.getState().workflow?.id;
+
+                if (workflowId) {
+                    queryClient.invalidateQueries({queryKey: WorkflowKeys.workflow(workflowId)});
+                }
+            });
+        }
+
         return useCopilotPostTurnRegistry.getState().register(Source.WORKFLOW_EDITOR, () => {
             queryClient.invalidateQueries({
                 queryKey: ProjectWorkflowKeys.projectWorkflow(+projectId!, +projectWorkflowId!),
             });
         });
-    }, [projectId, projectWorkflowId, queryClient]);
+    }, [integrationId, projectId, projectWorkflowId, queryClient]);
 
     useEffect(() => {
         let outerRafId: number | undefined;
