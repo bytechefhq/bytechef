@@ -510,6 +510,46 @@ trigger + post-turn query invalidation.
   `docs/superpowers/specs/2026-07-19-expose-ai-agent-a2a-server-design.md`; user docs:
   `docs/content/docs/automation/a2a-servers.mdx`.
 
+### Agentic AI component (Embabel GOAP, opt-in)
+
+- `server/libs/modules/components/ai/agentic-ai` wraps Embabel **1.0.0**'s GOAP planner
+  (`EmbabelAgentRunner.kt`, the repo's only Kotlin production code). The component is OFF by
+  default and opt-in via the `agentic` Spring profile — no provider API key needed:
+  `AgentPlatformAutoConfiguration` sits in the default `spring.autoconfigure.exclude`
+  (server-app, worker-app, and the liquibase profile) and `application-agentic.yml` re-enables it
+  (the profile file mirrors the default exclude list minus the Embabel entry — profile property
+  values replace wholesale, keep them in sync) plus sets `embabel.models.default-llm:
+  bytechef-canvas`, the inert placeholder `SpringAiLlmService` registered by
+  `AgenticAiPlatformConfiguration` purely so Embabel's `ConfigurableModelProvider` (which
+  hard-fails with zero models) can boot. The handler stays `@ConditionalOnBean(AgentPlatform.class)`.
+- **All LLM calls use the canvas-selected MODEL cluster element** (required, with its ByteChef
+  connection): action prompts run via `ChatClient.create(chatModel)` with the step's Spring AI
+  ToolCallbacks (client-side tool loop), and smart-goal evaluation is `CanvasSmartGoalCondition`
+  (an Embabel `Condition` backed by the same ChatModel) instead of Embabel's `PromptCondition`.
+  Embabel's model registry/LLM layer is never invoked, so its token/cost budget can't observe
+  usage — the action-count budget is the effective planner cap. ByteChef cost tracking DOES see
+  agentic runs: a thread-safe `TokenUsageAccumulator` aggregates ChatResponse usage across all
+  calls (Embabel may execute actions off-thread) and flushes once into the thread-local
+  `TokenUsageHolder` on the perform thread, even when the plan fails.
+- **Mid-plan crash resume**: after every completed GOAP action, produced bindings are
+  checkpointed (fingerprint-guarded, fail-open) to CURRENT_EXECUTION data storage
+  (`agenticAiBlackboardCheckpoint`; untyped values as content strings, typed as tagged maps); a
+  crash-resumed job reseeds them so the planner skips completed actions. Cleared on success;
+  editor/job-less runs skip checkpointing.
+- Blackboard carriers: untyped bindings use the `Binding(content)` data class; bindings whose
+  producers declare an `outputSchema` on the ACTION cluster element become **typed** — an Embabel
+  `DynamicType` named after the binding (PascalCase), carried as a `_typeName`-tagged map.
+  Typed/untyped actions are built as `DynamicTransformationAction` (custom `AbstractAction` with
+  string-typed `IoBinding`s, since Embabel ships no `DynamicType`-aware action factory);
+  fully-untyped actions keep the stock `promptedTransformer<Binding, Binding>` path.
+- Execution-time `getValue` type matching is STRICT (a tagged map only satisfies its `_typeName`,
+  a `Binding` only the Binding class) even though the planner's world-state determiner
+  short-circuits maps — so all producers of one binding name must agree on typed-ness and schema;
+  the runner validates this up front (also: no `:` in binding names, no schema on `userGoal`).
+  A typed goal binding makes the run action return the parsed object (tag keys stripped) instead
+  of a string. Analysis + implementation status:
+  `docs/superpowers/specs/2026-07-20-embabel-koog-goap-domain-model-analysis.md` §4.
+
 ### AI Gateway content guardrails (EE)
 
 - `AiGatewayGuardrails` runs in `AiGatewayFacadeImpl` on sync + streaming paths after prompt
@@ -739,9 +779,62 @@ cd cli
   `PropertiesPlanLimitsProvider` resolves `bytechef.plan.tier` (unset = SELF_HOSTED = unlimited,
   the pre-plan behavior) with per-field `bytechef.plan.limits.*` overrides; a billing integration
   replaces the bean (`@ConditionalOnMissingBean`). Tier tables in `DefaultPlanLimits` are
-  Sim-modeled placeholders pinned by `DefaultPlanLimitsTest` — nothing enforces them yet.
+  Sim-modeled placeholders pinned by `DefaultPlanLimitsTest`.
   Design + phased plan (cost calculation, alert rules, Bucket4j rate limiting, Atlas admission
   gate): `docs/superpowers/specs/2026-07-20-plan-limits-cost-alerts-design.md`.
+- **Enforcement** lives in CE `server/libs/platform/platform-rate-limit`
+  (`bytechef.plan.enforcement.enabled`, default on — SELF_HOSTED's all-null limits make it a
+  no-op): `Bucket4jRateLimiter` (local buckets in Caffeine; per-node default — set
+  `bytechef.plan.enforcement.provider=redis` for strict global limits via `RedisRateLimiter`
+  (Lua token bucket) + `RedisConcurrentExecutionGate` (bounded INCR/DECR, 24h self-healing
+  TTL); both Redis impls fail open on Redis outages — pinned against a real Redis by
+  `RedisPlanEnforcementIntTest` (Testcontainers)), `PlanRateLimitFilter`
+  (order 0, after the security chain: login 10/min/IP, webhooks → sync tier/tenant, public
+  APIs → api tier/tenant, anonymous `/api/**` → per-IP; reject = 429 + Retry-After), and
+  the two async-admission gates in `PrincipalJobFacadeImpl.createJob` (async only; sync
+  `createJobWithoutDispatch` is deliberately ungated to avoid slot leaks): the
+  `async:<tenant>` submissions-per-minute bucket (checked FIRST so a rate reject never
+  leaks a slot) then `ConcurrentExecutionGate` slots, released by platform-coordinator's
+  `ConcurrencySlotReleaseApplicationEventListener`
+  on terminal job status (floors at zero; restart over-admits, never wrongly blocks). Never
+  gate inside `server/libs/atlas/` — admission and release both live outside the engine.
+
+## Crash recovery (orphaned jobs)
+
+- Workers publish `TaskHeartbeatApplicationEvent` every 30s per in-flight task (scheduler inside
+  `TaskWorker`, tenant captured at task receipt); the coordinator-side
+  `TaskHeartbeatApplicationEventListener` re-saves the STARTED row, bumping `lastModifiedDate`.
+  `OrphanedJobRecoveryMonitor` (platform-coordinator, every minute) then treats a job as orphaned
+  only when the job row AND all its non-terminal task executions are stale
+  (`bytechef.workflow.execution.recovery.staleness-threshold`, default PT5M) — children's
+  heartbeats keep control-flow parent tasks alive transitively. Recovery marks tasks + job FAILED
+  (normal job-status fan-out fires) making the job resumable via the existing
+  `resumeToStatusStarted` path; `bytechef.workflow.execution.recovery.auto-resume=true` (default
+  false) also publishes `ResumeJobEvent` — at-least-once semantics, the interrupted task re-runs
+  from the last completed node — capped by `max-auto-resume-attempts` (default 3) tracked in job
+  metadata. Disable the whole monitor with `bytechef.workflow.execution.recovery.enabled=false`.
+  Stale-row finders are `getStaleTaskExecutions`/`getStaleJobs` (EE remote clients throw
+  `UnsupportedOperationException`; the monitor warn-skips, so orphan detection is monolith-only
+  for now). Detection lives OUTSIDE `server/libs/atlas/` except the engine-owned heartbeat
+  primitives; semantics pinned by `OrphanedJobRecoveryMonitorTest`.
+- **Redis broker redelivery**: `RedisListenerEndpointRegistrar` reclaims consumer-group pending
+  entries left by crashed consumers (XPENDING + XCLAIM sweep every 10s, min idle 60s) and
+  redelivers them through the normal invoke-then-ack path — at-least-once semantics like amqp.
+- **Transactional completion**: `DefaultTaskCompletionHandler` takes an optional
+  `TransactionTemplate` (coordinator config wires it from `ObjectProvider<PlatformTransactionManager>`)
+  and runs update-task + push-context + advance-job (+ next-task create/dispatch) in ONE
+  transaction — closing the half-advanced coordinator-crash window. Dispatch stays correct because
+  `TaskExecutionEvent`/`JobStatusApplicationEvent` are `MessageEvent`s and `MessageEventListener`
+  is `@TransactionalEventListener(AFTER_COMMIT, fallbackExecution = true)` — deferred under a
+  transaction, immediate without one. `JobSyncExecutor` passes null (in-memory sync path,
+  unchanged). Pinned by `DefaultTaskCompletionHandlerTest`.
+- **Agent-loop checkpoints**: `SuspendableToolCallingManager` takes an optional per-tool-round
+  checkpointer; the AI Agent writes `AiAgentConversationCheckpoint` (SHA-256 input-parameter
+  fingerprint + `ConversationState`) to `Data.Scope.CURRENT_EXECUTION` after each completed
+  round, `AiAgentChatAction.perform` restores it on a crash-resumed job (fingerprint must match
+  — protects against a different agent node in the same job) and clears it on success. Editor /
+  job-less runs skip it; all checkpoint I/O is fail-open (a storage failure never fails the
+  turn). Fingerprint computation is deliberately lazy (inside the write lambda).
 
 ## Notification delivery (central point)
 
