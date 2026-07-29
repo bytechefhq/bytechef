@@ -5,6 +5,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework.data:spring-data-jdbc")
     implementation("org.springframework.security:spring-security-core")
+    implementation(project(":server:libs:ai:ai-copilot:ai-copilot-api"))
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-api"))
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-api"))
     implementation(project(":server:libs:automation:automation-search:automation-search-api"))

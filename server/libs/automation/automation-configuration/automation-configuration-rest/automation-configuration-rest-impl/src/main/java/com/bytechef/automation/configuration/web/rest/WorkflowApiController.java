@@ -19,6 +19,7 @@ package com.bytechef.automation.configuration.web.rest;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
+import com.bytechef.automation.configuration.facade.AiWorkflowGeneratorFacade;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.web.rest.model.CreateProjectWorkflow200ResponseModel;
 import com.bytechef.automation.configuration.web.rest.model.DuplicateWorkflow200ResponseModel;
@@ -33,6 +34,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -45,18 +48,34 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnCoordinator
 public class WorkflowApiController extends AbstractWorkflowApiController implements WorkflowApi {
 
+    private final AiWorkflowGeneratorFacade aiWorkflowGeneratorFacade;
     private final ConversionService conversionService;
     private final ProjectWorkflowFacade projectWorkflowFacade;
 
     @SuppressFBWarnings("EI2")
     public WorkflowApiController(
-        ConversionService conversionService, ProjectWorkflowFacade projectWorkflowFacade,
-        WorkflowService workflowService) {
+        AiWorkflowGeneratorFacade aiWorkflowGeneratorFacade, ConversionService conversionService,
+        ProjectWorkflowFacade projectWorkflowFacade, WorkflowService workflowService) {
 
         super(workflowService);
 
+        this.aiWorkflowGeneratorFacade = aiWorkflowGeneratorFacade;
         this.conversionService = conversionService;
         this.projectWorkflowFacade = projectWorkflowFacade;
+    }
+
+    @PostMapping("/projects/{projectId}/workflows/generate")
+    @ResponseBody
+    public ResponseEntity<CreateProjectWorkflow200ResponseModel> generateProjectWorkflow(
+        @PathVariable("projectId") Long projectId, @RequestBody GenerateProjectWorkflowRequest request) {
+
+        ProjectWorkflow projectWorkflow = aiWorkflowGeneratorFacade.generateWorkflow(projectId, request.prompt());
+
+        return ResponseEntity.ok(
+            new CreateProjectWorkflow200ResponseModel().projectWorkflowId(projectWorkflow.getId()));
+    }
+
+    public record GenerateProjectWorkflowRequest(String prompt) {
     }
 
     @Override
