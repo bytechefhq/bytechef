@@ -32,6 +32,8 @@
             <column name="knowledge_base_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
+            <!-- Nullable on purpose: a source belongs to at most one workspace, and null means none applies. -->
+            <column name="workspace_id" type="BIGINT"/>
             <column name="cadence" type="VARCHAR(64)">
                 <constraints nullable="false"/>
             </column>

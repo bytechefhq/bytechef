@@ -16,11 +16,8 @@
 
 package com.bytechef.platform.ai.auto.memory.repository.jdbc;
 
-import com.bytechef.platform.ai.auto.memory.AiAutoMemory;
-import com.bytechef.platform.ai.auto.memory.WorkspaceAiAutoMemory;
 import com.bytechef.platform.ai.auto.memory.repository.AiAutoMemoryRepository;
 import com.bytechef.platform.ai.auto.memory.repository.AiAutoMemoryRepositoryContractTests;
-import com.bytechef.platform.ai.auto.memory.repository.WorkspaceAiAutoMemoryRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import org.junit.jupiter.api.AfterEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,30 +39,13 @@ public class JdbcAiAutoMemoryRepositoryContractIntTest extends AiAutoMemoryRepos
     @Autowired
     private AiAutoMemoryRepository aiAutoMemoryRepository;
 
-    @Autowired
-    private WorkspaceAiAutoMemoryRepository workspaceAiAutoMemoryRepository;
-
     @AfterEach
     void afterEach() {
-        workspaceAiAutoMemoryRepository.deleteAll();
         aiAutoMemoryRepository.deleteAll();
     }
 
     @Override
     protected AiAutoMemoryRepository getAiAutoMemoryRepository() {
         return aiAutoMemoryRepository;
-    }
-
-    @Override
-    protected AiAutoMemory saveInWorkspace(AiAutoMemory aiAutoMemory, long workspaceId) {
-        boolean isNew = aiAutoMemory.getId() == null;
-
-        AiAutoMemory saved = aiAutoMemoryRepository.save(aiAutoMemory);
-
-        if (isNew) {
-            workspaceAiAutoMemoryRepository.save(new WorkspaceAiAutoMemory(workspaceId, saved.getId()));
-        }
-
-        return saved;
     }
 }

@@ -7,7 +7,7 @@
 
 package com.bytechef.ee.automation.ai.observability.service;
 
-import com.bytechef.ee.automation.ai.observability.repository.WorkspaceAiObservabilityAlertRuleRepository;
+import com.bytechef.ee.platform.ai.observability.repository.AiObservabilityAlertEventRepository;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
@@ -26,12 +26,12 @@ import org.springframework.transaction.annotation.Transactional;
 @SuppressFBWarnings("EI")
 class WorkspaceAiObservabilityAlertEventServiceImpl implements WorkspaceAiObservabilityAlertEventService {
 
-    private final WorkspaceAiObservabilityAlertRuleRepository workspaceAiObservabilityAlertRuleRepository;
+    private final AiObservabilityAlertEventRepository aiObservabilityAlertEventRepository;
 
     WorkspaceAiObservabilityAlertEventServiceImpl(
-        WorkspaceAiObservabilityAlertRuleRepository workspaceAiObservabilityAlertRuleRepository) {
+        AiObservabilityAlertEventRepository aiObservabilityAlertEventRepository) {
 
-        this.workspaceAiObservabilityAlertRuleRepository = workspaceAiObservabilityAlertRuleRepository;
+        this.aiObservabilityAlertEventRepository = aiObservabilityAlertEventRepository;
     }
 
     @Override
@@ -39,7 +39,6 @@ class WorkspaceAiObservabilityAlertEventServiceImpl implements WorkspaceAiObserv
         Validate.notNull(date, "date must not be null");
         Validate.notNull(workspaceId, "workspaceId must not be null");
 
-        workspaceAiObservabilityAlertRuleRepository.deleteAllAlertEventsByWorkspaceIdAndCreatedDateBefore(
-            workspaceId, date);
+        aiObservabilityAlertEventRepository.deleteAllByWorkspaceIdAndCreatedDateBefore(workspaceId, date);
     }
 }

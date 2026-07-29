@@ -250,9 +250,8 @@ class AiExternalScoreFacadeTest {
         AiObservabilityTrace trace = new AiObservabilityTrace(AiObservabilityTraceSource.API);
 
         ReflectionTestUtils.setField(trace, "id", 7L);
-        // Trace exists but has no workspace membership row — mirrors a hypothetical orphaned trace.
-        // Variant A: workspace lives on workspace_ai_observability_trace, so an absent membership row surfaces
-        // as getWorkspaceId(...) returning null. The facade must fail-closed on that path.
+        // Trace exists but its workspace_id is null — mirrors a hypothetical orphaned trace. getWorkspaceId(...)
+        // returns null for that row, and the facade must fail-closed on that path.
 
         when(traceService.getTrace(7L)).thenReturn(trace);
         when(workspaceTraceService.getWorkspaceId(7L)).thenReturn(null);

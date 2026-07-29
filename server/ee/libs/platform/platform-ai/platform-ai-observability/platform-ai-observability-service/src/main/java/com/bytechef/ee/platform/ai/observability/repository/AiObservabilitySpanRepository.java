@@ -19,8 +19,7 @@ import org.springframework.data.repository.query.Param;
 
 /**
  * Workspace-agnostic span queries. Tenant-scoped span deletion (used by per-workspace retention loops) lives on
- * {@code WorkspaceAiObservabilityTraceRepository} since spans are scoped via their parent trace's workspace
- * association.
+ * {@link AiObservabilityTraceRepository} since spans are scoped via their parent trace's {@code workspace_id}.
  *
  * @author Ivica Cardic
  * @version ee

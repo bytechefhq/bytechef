@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
  * Hourly rollup of raw {@code ai_llm_usage} rows into {@code ai_gateway_spend_summary} — the writer the budget checker
  * and spend dashboards read from (the read stack existed without any producer before this job). Each run aggregates the
  * previous full hour per workspace, grouped by (provider, model, apiKeyId, projectId), and writes through
- * {@link WorkspaceAiGatewaySpendService#createInWorkspace} so the mandatory workspace membership row exists.
+ * {@link WorkspaceAiGatewaySpendService#createInWorkspace} so the summary carries its owning workspace.
  *
  * <p>
  * Idempotency: a workspace-hour that already has a summary row with the same period start is skipped, so restarts don't

@@ -7,8 +7,6 @@
 
 package com.bytechef.ee.automation.ai.gateway.service;
 
-import com.bytechef.ee.automation.ai.gateway.domain.WorkspaceAiGatewaySpendSummary;
-import com.bytechef.ee.automation.ai.gateway.repository.WorkspaceAiGatewaySpendSummaryRepository;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewaySpendSummary;
 import com.bytechef.ee.platform.ai.gateway.service.AiGatewaySpendService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -28,24 +26,16 @@ import org.springframework.transaction.annotation.Transactional;
 class WorkspaceAiGatewaySpendServiceImpl implements WorkspaceAiGatewaySpendService {
 
     private final AiGatewaySpendService aiGatewaySpendService;
-    private final WorkspaceAiGatewaySpendSummaryRepository workspaceAiGatewaySpendSummaryRepository;
 
-    public WorkspaceAiGatewaySpendServiceImpl(
-        AiGatewaySpendService aiGatewaySpendService,
-        WorkspaceAiGatewaySpendSummaryRepository workspaceAiGatewaySpendSummaryRepository) {
-
+    public WorkspaceAiGatewaySpendServiceImpl(AiGatewaySpendService aiGatewaySpendService) {
         this.aiGatewaySpendService = aiGatewaySpendService;
-        this.workspaceAiGatewaySpendSummaryRepository = workspaceAiGatewaySpendSummaryRepository;
     }
 
     @Override
     public AiGatewaySpendSummary createInWorkspace(AiGatewaySpendSummary summary, long workspaceId) {
-        AiGatewaySpendSummary savedSummary = aiGatewaySpendService.create(summary);
+        summary.setWorkspaceId(workspaceId);
 
-        workspaceAiGatewaySpendSummaryRepository.save(
-            new WorkspaceAiGatewaySpendSummary(savedSummary.getId(), workspaceId));
-
-        return savedSummary;
+        return aiGatewaySpendService.create(summary);
     }
 
     @Override
@@ -53,7 +43,6 @@ class WorkspaceAiGatewaySpendServiceImpl implements WorkspaceAiGatewaySpendServi
     public List<AiGatewaySpendSummary> getSpendSummariesByWorkspaceId(
         long workspaceId, Instant start, Instant end) {
 
-        return workspaceAiGatewaySpendSummaryRepository.findSpendSummariesByWorkspaceIdAndPeriodStartBetween(
-            workspaceId, start, end);
+        return aiGatewaySpendService.getSpendSummariesByWorkspaceId(workspaceId, start, end);
     }
 }

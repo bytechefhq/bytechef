@@ -10,6 +10,7 @@ package com.bytechef.ee.automation.workflow.execution.cost.domain;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
@@ -19,7 +20,8 @@ import org.springframework.data.relational.core.mapping.Table;
 /**
  * One row per terminal workflow execution: {@code totalCost = baseRunCharge + aiCost} in USD (Sim-modeled cost formula;
  * tool cost joins the sum once workflow tool metering exists). Written by the terminal-status listener, idempotent per
- * {@code jobId}.
+ * {@code jobId}. A cost row belongs to at most one workspace, carried by the nullable {@link #workspaceId} column; the
+ * column is null for runs that have no workspace (editor runs, embedded executions).
  *
  * @version ee
  *
@@ -36,6 +38,14 @@ public class WorkflowExecutionCost {
 
     @Column("job_id")
     private Long jobId;
+
+    /**
+     * Workspace that owns this cost row, or {@code null} for an execution that has none — editor runs and embedded
+     * executions. Boxed on purpose: a primitive would collapse "no workspace" into workspace 0, which is a real
+     * workspace id.
+     */
+    @Column("workspace_id")
+    private @Nullable Long workspaceId;
 
     @Column("base_run_charge")
     private BigDecimal baseRunCharge;
@@ -69,6 +79,14 @@ public class WorkflowExecutionCost {
 
     public Long getJobId() {
         return jobId;
+    }
+
+    public @Nullable Long getWorkspaceId() {
+        return workspaceId;
+    }
+
+    public void setWorkspaceId(@Nullable Long workspaceId) {
+        this.workspaceId = workspaceId;
     }
 
     public BigDecimal getBaseRunCharge() {
@@ -111,6 +129,7 @@ public class WorkflowExecutionCost {
 
     @Override
     public String toString() {
-        return "WorkflowExecutionCost{id=%s, jobId=%s, totalCost=%s %s}".formatted(id, jobId, totalCost, currency);
+        return "WorkflowExecutionCost{id=%s, jobId=%s, workspaceId=%s, totalCost=%s %s}".formatted(
+            id, jobId, workspaceId, totalCost, currency);
     }
 }

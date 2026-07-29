@@ -12,9 +12,9 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Workspace scoping for the CE notification registry. A notification without a membership row is global; consumers that
- * present a workspace-scoped picker should offer {@link #getNotifications(long)} — the workspace's own notifications
- * plus the globals.
+ * Workspace scoping for the CE notification registry. A notification whose {@code workspace_id} is null is global;
+ * consumers that present a workspace-scoped picker should offer {@link #getNotifications(long)} — the workspace's own
+ * notifications plus the globals.
  *
  * @version ee
  *

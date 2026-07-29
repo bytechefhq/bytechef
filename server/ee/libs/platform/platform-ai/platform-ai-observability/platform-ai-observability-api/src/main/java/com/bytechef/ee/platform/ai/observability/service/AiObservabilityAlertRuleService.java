@@ -12,9 +12,9 @@ import java.time.Instant;
 import java.util.List;
 
 /**
- * Workspace-agnostic CRUD + lifecycle for {@link AiObservabilityAlertRule}. Workspace association lives on
- * {@code workspace_ai_observability_alert_rule}; see automation-side {@code WorkspaceAiObservabilityAlertRuleService}
- * for {@code createInWorkspace} / {@code getWorkspaceId} / {@code getAlertRulesByWorkspace}.
+ * Workspace-agnostic CRUD + lifecycle for {@link AiObservabilityAlertRule}. The workspace association is the rule's
+ * nullable {@code workspace_id} column; see automation-side {@code WorkspaceAiObservabilityAlertRuleService} for
+ * {@code createInWorkspace} / {@code getWorkspaceId} / {@code getAlertRulesByWorkspace}.
  *
  * @version ee
  */

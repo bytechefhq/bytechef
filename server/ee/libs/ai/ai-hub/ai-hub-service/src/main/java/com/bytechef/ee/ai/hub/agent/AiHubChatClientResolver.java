@@ -11,11 +11,9 @@ import com.agui.core.state.State;
 import com.bytechef.ee.ai.hub.util.AiHubStateKeys;
 import com.bytechef.ee.platform.ai.agent.catalog.CatalogChatClientResolver;
 // Gateway resolver path disabled for now — see the commented block at the bottom of this class.
-// import com.bytechef.ee.automation.ai.gateway.domain.WorkspaceAiGatewayProvider;
 // import com.bytechef.ee.automation.ai.gateway.service.WorkspaceAiGatewayProviderService;
 // import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayProvider;
 // import com.bytechef.ee.platform.ai.gateway.provider.AiGatewayChatModelFactory;
-// import com.bytechef.ee.platform.ai.gateway.service.AiGatewayProviderService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jspecify.annotations.Nullable;
@@ -162,7 +160,6 @@ public class AiHubChatClientResolver implements AiHubSpringAIAgent.OverrideChatC
     // ---------------------------------------------------------------------------------------------------------------
     //
     // private final WorkspaceAiGatewayProviderService workspaceAiGatewayProviderService;
-    // private final AiGatewayProviderService aiGatewayProviderService;
     // private final AiGatewayChatModelFactory aiGatewayChatModelFactory;
     //
     // AiGatewayProvider provider = resolveProvider(workspaceId, llmProvider);
@@ -192,11 +189,7 @@ public class AiHubChatClientResolver implements AiHubSpringAIAgent.OverrideChatC
     // .build();
     //
     // private @Nullable AiGatewayProvider resolveProvider(long workspaceId, String llmProvider) {
-    // for (WorkspaceAiGatewayProvider workspaceProvider : workspaceAiGatewayProviderService
-    // .getWorkspaceProviders(workspaceId)) {
-    //
-    // AiGatewayProvider provider = aiGatewayProviderService.getProvider(workspaceProvider.getProviderId());
-    //
+    // for (AiGatewayProvider provider : workspaceAiGatewayProviderService.getWorkspaceProviders(workspaceId)) {
     // if (provider == null || !provider.isEnabled()) {
     // continue;
     // }

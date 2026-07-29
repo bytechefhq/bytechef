@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import org.apache.commons.lang3.Validate;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -80,6 +81,13 @@ public class AiObservabilityAlertRule {
 
     @Column("window_minutes")
     private int windowMinutes;
+
+    /**
+     * The owning workspace, or {@code null} when the rule belongs to no workspace. Boxed on purpose — a primitive would
+     * coerce the "no workspace" case into workspace {@code 0}, which is a real workspace id.
+     */
+    @Column("workspace_id")
+    private @Nullable Long workspaceId;
 
     private AiObservabilityAlertRule() {
     }
@@ -207,6 +215,10 @@ public class AiObservabilityAlertRule {
         return windowMinutes;
     }
 
+    public @Nullable Long getWorkspaceId() {
+        return workspaceId;
+    }
+
     public boolean isEnabled() {
         return enabled;
     }
@@ -308,10 +320,15 @@ public class AiObservabilityAlertRule {
         this.windowMinutes = windowMinutes;
     }
 
+    public void setWorkspaceId(@Nullable Long workspaceId) {
+        this.workspaceId = workspaceId;
+    }
+
     @Override
     public String toString() {
         return "AiObservabilityAlertRule{" +
             "id=" + id +
+            ", workspaceId=" + workspaceId +
             ", name='" + name + '\'' +
             ", metric=" + getMetric() +
             ", enabled=" + enabled +

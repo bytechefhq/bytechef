@@ -11,8 +11,10 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 /**
@@ -25,8 +27,9 @@ import org.springframework.data.relational.core.mapping.Table;
  * {@code (dataType, value, stringValue)} by calling the raw setters.
  *
  * <p>
- * Workspace association lives on {@link WorkspaceAiEvalScore} — the entity is workspace-agnostic. Callers go through
- * {@code AiEvalScoreService.getWorkspaceId(id)} (Variant A).
+ * A score belongs to at most one workspace, carried by the nullable {@code workspaceId} column; it is null where no
+ * workspace applies. Writing the binding and every workspace-scoped query stay with {@code WorkspaceAiEvalScoreService}
+ * in automation-ai-eval, so the platform service itself remains workspace-agnostic.
  *
  * @author Ivica Cardic
  * @version ee
@@ -63,6 +66,13 @@ public class AiEvalScore {
     private Long traceId;
 
     private BigDecimal value;
+
+    /**
+     * The owning workspace, or {@code null} when the score belongs to no workspace. Boxed on purpose — a primitive
+     * would coerce the "no workspace" case into workspace {@code 0}, which is a real workspace id.
+     */
+    @Column("workspace_id")
+    private @Nullable Long workspaceId;
 
     private AiEvalScore() {
     }
@@ -282,6 +292,10 @@ public class AiEvalScore {
         return AiEvalScoreValue.fromColumns(id, getDataType(), value, stringValue);
     }
 
+    public @Nullable Long getWorkspaceId() {
+        return workspaceId;
+    }
+
     public void setComment(String comment) {
         this.comment = comment;
     }
@@ -304,6 +318,10 @@ public class AiEvalScore {
 
     public void setSpanId(Long spanId) {
         this.spanId = spanId;
+    }
+
+    public void setWorkspaceId(@Nullable Long workspaceId) {
+        this.workspaceId = workspaceId;
     }
 
     /**
@@ -333,6 +351,7 @@ public class AiEvalScore {
     public String toString() {
         return "AiEvalScore{" +
             "id=" + id +
+            ", workspaceId=" + workspaceId +
             ", traceId=" + traceId +
             ", name='" + name + '\'' +
             ", source=" + getSource() +

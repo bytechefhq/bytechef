@@ -1,3 +1,2 @@
 com.bytechef.ee.automation.ai.eval.experiment.config.AiEvalExperimentAsyncConfiguration
-com.bytechef.ee.automation.ai.eval.experiment.config.WorkspaceAiEvalExperimentJdbcRepositoryConfiguration
 com.bytechef.ee.automation.ai.eval.experiment.config.AiEvalExperimentRetryConfiguration

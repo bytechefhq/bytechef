@@ -66,7 +66,7 @@ class FileStorageAiAutoMemoryRepositoryTest {
 
     @Test
     void testSaveAndFindByIdRoundTripsEveryField() {
-        AiAutoMemory saved = aiAutoMemoryRepository.save(
+        AiAutoMemory saved = save(
             buildMemory("preferred_tone", "Preferred tone", "How the user likes replies", "concise"), WORKSPACE_ID);
 
         AiAutoMemory found = aiAutoMemoryRepository.findById(saved.getId())
@@ -94,8 +94,8 @@ class FileStorageAiAutoMemoryRepositoryTest {
         first.setUpdatedAt(BASE_TIME.plusMinutes(10));
         second.setUpdatedAt(BASE_TIME);
 
-        aiAutoMemoryRepository.save(second, WORKSPACE_ID);
-        aiAutoMemoryRepository.save(first, WORKSPACE_ID);
+        save(second, WORKSPACE_ID);
+        save(first, WORKSPACE_ID);
 
         List<AiAutoMemory> memories =
             aiAutoMemoryRepository.findByWorkspaceIdAndPrincipalTypeAndPrincipalIdAndEnvironmentOrderByUpdatedAtDesc(
@@ -107,8 +107,8 @@ class FileStorageAiAutoMemoryRepositoryTest {
 
     @Test
     void testWorkspaceQueryExcludesOtherWorkspaces() {
-        aiAutoMemoryRepository.save(buildMemory("mine", "Mine", null, "1"), WORKSPACE_ID);
-        aiAutoMemoryRepository.save(buildMemory("theirs", "Theirs", null, "2"), OTHER_WORKSPACE_ID);
+        save(buildMemory("mine", "Mine", null, "1"), WORKSPACE_ID);
+        save(buildMemory("theirs", "Theirs", null, "2"), OTHER_WORKSPACE_ID);
 
         assertThat(
             aiAutoMemoryRepository.findByWorkspaceIdAndPrincipalTypeAndPrincipalIdAndEnvironmentOrderByUpdatedAtDesc(
@@ -119,13 +119,13 @@ class FileStorageAiAutoMemoryRepositoryTest {
 
     @Test
     void testWorkspaceQueryNarrowsByMemoryType() {
-        aiAutoMemoryRepository.save(buildMemory("user_memory", "User", null, "1"), WORKSPACE_ID);
+        save(buildMemory("user_memory", "User", null, "1"), WORKSPACE_ID);
 
         AiAutoMemory feedback = buildMemory("feedback_memory", "Feedback", null, "2");
 
         feedback.setMemoryType(AiAutoMemoryType.FEEDBACK);
 
-        aiAutoMemoryRepository.save(feedback, WORKSPACE_ID);
+        save(feedback, WORKSPACE_ID);
 
         assertThat(
             aiAutoMemoryRepository
@@ -137,8 +137,8 @@ class FileStorageAiAutoMemoryRepositoryTest {
 
     @Test
     void testFindAllByNameReturnsEveryMatch() {
-        aiAutoMemoryRepository.save(buildMemory("duplicate", "One", null, "1"), WORKSPACE_ID);
-        aiAutoMemoryRepository.save(buildMemory("duplicate", "Two", null, "2"), WORKSPACE_ID);
+        save(buildMemory("duplicate", "One", null, "1"), WORKSPACE_ID);
+        save(buildMemory("duplicate", "Two", null, "2"), WORKSPACE_ID);
 
         assertThat(
             aiAutoMemoryRepository.findAllByWorkspaceIdAndPrincipalTypeAndPrincipalIdAndEnvironmentAndName(
@@ -148,8 +148,8 @@ class FileStorageAiAutoMemoryRepositoryTest {
 
     @Test
     void testDeleteRemovesOnlyTheTarget() {
-        AiAutoMemory kept = aiAutoMemoryRepository.save(buildMemory("kept", "Kept", null, "1"), WORKSPACE_ID);
-        AiAutoMemory removed = aiAutoMemoryRepository.save(buildMemory("removed", "Removed", null, "2"), WORKSPACE_ID);
+        AiAutoMemory kept = save(buildMemory("kept", "Kept", null, "1"), WORKSPACE_ID);
+        AiAutoMemory removed = save(buildMemory("removed", "Removed", null, "2"), WORKSPACE_ID);
 
         aiAutoMemoryRepository.delete(removed);
 
@@ -163,6 +163,33 @@ class FileStorageAiAutoMemoryRepositoryTest {
             aiAutoMemoryRepository.findByWorkspaceIdAndPrincipalTypeAndPrincipalIdAndEnvironmentOrderByUpdatedAtDesc(
                 WORKSPACE_ID, PRINCIPAL_TYPE, 999, ENVIRONMENT))
                     .isEmpty();
+    }
+
+    @Test
+    void testMemoryWithoutWorkspaceDoesNotCollapseIntoWorkspaceZero() {
+        AiAutoMemory workspaceLess = aiAutoMemoryRepository.save(buildMemory("no_workspace", "None", null, "1"));
+        AiAutoMemory workspaceZero = save(buildMemory("workspace_zero", "Zero", null, "2"), 0);
+
+        // The null workspace gets its own path segment, so workspace 0 — a legitimate workspace id — sees only its
+        // own memory.
+        assertThat(
+            aiAutoMemoryRepository.findByWorkspaceIdAndPrincipalTypeAndPrincipalIdAndEnvironmentOrderByUpdatedAtDesc(
+                0, PRINCIPAL_TYPE, PRINCIPAL_ID, ENVIRONMENT))
+                    .extracting(AiAutoMemory::getName)
+                    .containsExactly("workspace_zero");
+
+        assertThat(aiAutoMemoryRepository.findById(workspaceLess.getId())
+            .orElseThrow()
+            .getWorkspaceId()).isNull();
+        assertThat(aiAutoMemoryRepository.findById(workspaceZero.getId())
+            .orElseThrow()
+            .getWorkspaceId()).isZero();
+    }
+
+    private AiAutoMemory save(AiAutoMemory aiAutoMemory, long workspaceId) {
+        aiAutoMemory.setWorkspaceId(workspaceId);
+
+        return aiAutoMemoryRepository.save(aiAutoMemory);
     }
 
     private static AiAutoMemory buildMemory(String name, String title, String description, String content) {

@@ -12,15 +12,18 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.Version;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 /**
- * Workspace association lives on {@link WorkspaceAiEvalRule} — the entity is workspace-agnostic. Callers go through
- * {@code AiEvalRuleService.getWorkspaceId(id)} (Variant A).
+ * A rule belongs to at most one workspace, carried by the nullable {@code workspaceId} column; it is null where no
+ * workspace applies. Writing the binding and every workspace-scoped query stay with {@code WorkspaceAiEvalRuleService}
+ * in automation-ai-eval, so the platform service itself remains workspace-agnostic.
  *
  * <p>
  * {@code CT_CONSTRUCTOR_THROW} is suppressed: the public constructor intentionally validates its arguments with
@@ -67,6 +70,13 @@ public class AiEvalRule {
 
     @Version
     private int version;
+
+    /**
+     * The owning workspace, or {@code null} when the rule belongs to no workspace. Boxed on purpose — a primitive would
+     * coerce the "no workspace" case into workspace {@code 0}, which is a real workspace id.
+     */
+    @Column("workspace_id")
+    private @Nullable Long workspaceId;
 
     private AiEvalRule() {
     }
@@ -172,6 +182,10 @@ public class AiEvalRule {
         return version;
     }
 
+    public @Nullable Long getWorkspaceId() {
+        return workspaceId;
+    }
+
     public boolean isEnabled() {
         return enabled;
     }
@@ -233,10 +247,15 @@ public class AiEvalRule {
         this.target = target.ordinal();
     }
 
+    public void setWorkspaceId(@Nullable Long workspaceId) {
+        this.workspaceId = workspaceId;
+    }
+
     @Override
     public String toString() {
         return "AiEvalRule{" +
             "id=" + id +
+            ", workspaceId=" + workspaceId +
             ", name='" + name + '\'' +
             ", model='" + model + '\'' +
             ", enabled=" + enabled +

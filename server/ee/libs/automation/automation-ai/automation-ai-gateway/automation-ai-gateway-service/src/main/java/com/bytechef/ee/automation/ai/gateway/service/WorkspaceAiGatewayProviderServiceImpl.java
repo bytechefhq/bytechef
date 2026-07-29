@@ -7,8 +7,8 @@
 
 package com.bytechef.ee.automation.ai.gateway.service;
 
-import com.bytechef.ee.automation.ai.gateway.domain.WorkspaceAiGatewayProvider;
-import com.bytechef.ee.automation.ai.gateway.repository.WorkspaceAiGatewayProviderRepository;
+import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayProvider;
+import com.bytechef.ee.platform.ai.gateway.service.AiGatewayProviderService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.List;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -28,40 +28,25 @@ import org.springframework.transaction.annotation.Transactional;
 @ConditionalOnProperty(prefix = "bytechef.ai.gateway", name = "enabled", havingValue = "true")
 class WorkspaceAiGatewayProviderServiceImpl implements WorkspaceAiGatewayProviderService {
 
-    private final WorkspaceAiGatewayProviderRepository workspaceAiGatewayProviderRepository;
+    private final AiGatewayProviderService aiGatewayProviderService;
 
-    public WorkspaceAiGatewayProviderServiceImpl(
-        WorkspaceAiGatewayProviderRepository workspaceAiGatewayProviderRepository) {
-
-        this.workspaceAiGatewayProviderRepository = workspaceAiGatewayProviderRepository;
+    public WorkspaceAiGatewayProviderServiceImpl(AiGatewayProviderService aiGatewayProviderService) {
+        this.aiGatewayProviderService = aiGatewayProviderService;
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<WorkspaceAiGatewayProvider> getWorkspaceProviders(Long workspaceId) {
-        return workspaceAiGatewayProviderRepository.findAllByWorkspaceId(workspaceId);
+    public List<AiGatewayProvider> getWorkspaceProviders(Long workspaceId) {
+        return aiGatewayProviderService.getProvidersByWorkspaceId(workspaceId);
     }
 
     @Override
     public void assignProviderToWorkspace(Long providerId, Long workspaceId) {
-        WorkspaceAiGatewayProvider existing =
-            workspaceAiGatewayProviderRepository.findByWorkspaceIdAndProviderId(workspaceId, providerId);
-
-        if (existing == null) {
-            WorkspaceAiGatewayProvider workspaceAiGatewayProvider =
-                new WorkspaceAiGatewayProvider(providerId, workspaceId);
-
-            workspaceAiGatewayProviderRepository.save(workspaceAiGatewayProvider);
-        }
+        aiGatewayProviderService.updateWorkspaceId(providerId, workspaceId);
     }
 
     @Override
     public void removeProviderFromWorkspace(Long providerId) {
-        List<WorkspaceAiGatewayProvider> existingRelationships =
-            workspaceAiGatewayProviderRepository.findByProviderId(providerId);
-
-        if (!existingRelationships.isEmpty()) {
-            workspaceAiGatewayProviderRepository.deleteAll(existingRelationships);
-        }
+        aiGatewayProviderService.updateWorkspaceId(providerId, null);
     }
 }

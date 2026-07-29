@@ -20,6 +20,8 @@
             <column name="environment" type="INT" defaultValueNumeric="0">
                 <constraints nullable="false"/>
             </column>
+            <!-- Nullable on purpose: an agent belongs to at most one workspace, and null means none applies. -->
+            <column name="workspace_id" type="BIGINT"/>
             <column name="created_at" type="TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
@@ -30,7 +32,7 @@
 
         <!--
             Sidebar lookup index. The Personal Agents sidebar query is "all agents the user owns in this
-            (workspace, environment)" — the workspace dimension is resolved through workspace_ai_hub_personal_agent;
+            (workspace, environment)" — the workspace dimension is the ai_hub_personal_agent.workspace_id column;
             on the entity itself we only need (user_id, environment) sorted by updated_at DESC.
         -->
         <createIndex tableName="ai_hub_personal_agent"
@@ -51,60 +53,7 @@
             CHECK (name ~ '^[a-z0-9_-]{1,64}$')
         </sql>
 
-        <!--
-            Workspace ↔ personal agent relation. Mirrors the workspace_mcp_server / workspace_connection /
-            workspace_asset_file pattern: the entity table is workspace-agnostic and the (workspace_id, agent_id)
-            membership lives here. The unique constraint on (workspace_id, ai_hub_personal_agent_id) prevents
-            duplicate memberships; cascading the FK on the agent side ensures the relation row is cleared when an
-            agent is deleted.
-        -->
-        <createTable tableName="workspace_ai_hub_personal_agent">
-            <column name="id" type="BIGINT" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="workspace_id" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="ai_hub_personal_agent_id" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="created_date" type="TIMESTAMP">
-                <constraints nullable="false"/>
-            </column>
-            <column name="created_by" type="VARCHAR(50)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="last_modified_date" type="TIMESTAMP">
-                <constraints nullable="false"/>
-            </column>
-            <column name="last_modified_by" type="VARCHAR(50)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="version" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-
-        <addUniqueConstraint
-            constraintName="uk_workspace_ai_hub_personal_agent"
-            tableName="workspace_ai_hub_personal_agent"
-            columnNames="workspace_id, ai_hub_personal_agent_id"/>
-
-        <createIndex tableName="workspace_ai_hub_personal_agent"
-                     indexName="idx_workspace_ai_hub_personal_agent_workspace">
-            <column name="workspace_id"/>
-        </createIndex>
-
-        <addForeignKeyConstraint
-            baseTableName="workspace_ai_hub_personal_agent"
-            baseColumnNames="ai_hub_personal_agent_id"
-            constraintName="fk_workspace_ai_hub_personal_agent_agent"
-            referencedTableName="ai_hub_personal_agent"
-            referencedColumnNames="id"
-            onDelete="CASCADE"/>
-
         <rollback>
-            <dropTable tableName="workspace_ai_hub_personal_agent"/>
             <sql>ALTER TABLE ai_hub_personal_agent DROP CONSTRAINT IF EXISTS ck_ai_hub_personal_agent_name_slug;</sql>
             <dropIndex tableName="ai_hub_personal_agent" indexName="idx_ai_hub_personal_agent_user_env"/>
             <dropTable tableName="ai_hub_personal_agent"/>

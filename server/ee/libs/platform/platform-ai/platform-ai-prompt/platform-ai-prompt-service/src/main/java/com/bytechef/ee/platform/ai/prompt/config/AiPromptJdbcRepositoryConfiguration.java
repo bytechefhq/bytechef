@@ -13,11 +13,9 @@ import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
 /**
- * Activates Spring Data JDBC repository scanning for the {@code ai_prompt} and {@code ai_prompt_version} tables. The
- * {@code workspace_ai_prompt} membership table is owned by automation-ai-prompt's
- * {@code WorkspaceAiPromptJdbcRepositoryConfiguration}. Discovered via {@code AutoConfiguration.imports} when this
- * module is on the classpath, gated on a {@link AbstractJdbcConfiguration} bean so app variants without JDBC start
- * cleanly.
+ * Activates Spring Data JDBC repository scanning for the {@code ai_prompt} and {@code ai_prompt_version} tables.
+ * Discovered via {@code AutoConfiguration.imports} when this module is on the classpath, gated on a
+ * {@link AbstractJdbcConfiguration} bean so app variants without JDBC start cleanly.
  *
  * @author Ivica Cardic
  * @version ee

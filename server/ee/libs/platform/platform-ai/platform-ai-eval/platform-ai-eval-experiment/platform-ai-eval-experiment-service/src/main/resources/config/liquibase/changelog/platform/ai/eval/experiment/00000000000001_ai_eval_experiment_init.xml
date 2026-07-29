@@ -8,8 +8,8 @@
     <!--
         ai_eval_experiment + ai_eval_experiment_run — extracted from automation/ai_gateway/00000000000007 as part of
         the platform/automation split (mirrors ai_eval_dataset). Tables were renamed from ai_experiment* to
-        ai_eval_experiment* to scope them under the platform-ai-eval module. The workspace_ai_eval_experiment
-        membership table is in automation/ai/eval/experiment/00000000000001_workspace_ai_eval_experiment_init.xml.
+        ai_eval_experiment* to scope them under the platform-ai-eval module. The owning workspace is the nullable
+        workspace_id column below; there is no workspace_ai_eval_experiment relation table.
     -->
     <changeSet id="20260423000005" author="ivicac">
         <createTable tableName="ai_eval_experiment">
@@ -22,6 +22,8 @@
                              references="ai_eval_dataset_version(id)"/>
             </column>
             <column name="prompt_version_id" type="BIGINT"/>
+            <!-- Nullable: an experiment that belongs to no workspace is invisible to every workspace-scoped query. -->
+            <column name="workspace_id" type="BIGINT"/>
             <column name="model" type="VARCHAR(256)"/>
             <column name="status" type="INT" defaultValueNumeric="0">
                 <constraints nullable="false"/>
@@ -39,6 +41,11 @@
 
         <createIndex tableName="ai_eval_experiment" indexName="idx_ai_eval_experiment_dataset_version">
             <column name="dataset_version_id"/>
+        </createIndex>
+
+        <!-- Replaces idx_ws_ai_eval_experiment_workspace on the removed relation table. -->
+        <createIndex tableName="ai_eval_experiment" indexName="idx_ai_eval_experiment_workspace">
+            <column name="workspace_id"/>
         </createIndex>
     </changeSet>
 

@@ -19,7 +19,6 @@ package com.bytechef.automation.knowledgebase.service;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.automation.knowledgebase.config.AutomationKnowledgeBaseIntTestConfiguration;
-import com.bytechef.automation.knowledgebase.repository.WorkspaceKnowledgeBaseSourceRepository;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseSource;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseSourceStatus;
@@ -28,6 +27,7 @@ import com.bytechef.platform.knowledgebase.repository.KnowledgeBaseSourceReposit
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,8 +36,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 
 /**
- * Integration test for {@link WorkspaceKnowledgeBaseSourceService}. Verifies the relation-table CRUD + workspace-scoped
- * lookups that join through to the platform-side {@code KnowledgeBaseSourceService}.
+ * Integration test for {@link WorkspaceKnowledgeBaseSourceService}. Verifies the workspace-scoped lookups over the
+ * nullable {@code knowledge_base_source.workspace_id} column, delegating to the platform-side
+ * {@code KnowledgeBaseSourceService}.
  *
  * @author Ivica Cardic
  */
@@ -52,16 +53,12 @@ class WorkspaceKnowledgeBaseSourceServiceIntTest {
     private KnowledgeBaseSourceRepository knowledgeBaseSourceRepository;
 
     @Autowired
-    private WorkspaceKnowledgeBaseSourceRepository workspaceKnowledgeBaseSourceRepository;
-
-    @Autowired
     private WorkspaceKnowledgeBaseSourceService workspaceKnowledgeBaseSourceService;
 
     private KnowledgeBase knowledgeBase;
 
     @BeforeEach
     void beforeEach() {
-        workspaceKnowledgeBaseSourceRepository.deleteAll();
         knowledgeBaseSourceRepository.deleteAll();
         knowledgeBaseRepository.deleteAll();
 
@@ -74,41 +71,13 @@ class WorkspaceKnowledgeBaseSourceServiceIntTest {
 
     @AfterEach
     void afterEach() {
-        workspaceKnowledgeBaseSourceRepository.deleteAll();
         knowledgeBaseSourceRepository.deleteAll();
         knowledgeBaseRepository.deleteAll();
     }
 
     @Test
-    void testRegisterSourceForWorkspaceInsertsRow() {
-        KnowledgeBaseSource source = persistSource("HubSpot");
-
-        workspaceKnowledgeBaseSourceService.registerSourceForWorkspace(source.getId(), 7L);
-
-        assertThat(workspaceKnowledgeBaseSourceRepository.findByKnowledgeBaseSourceId(source.getId()))
-            .isPresent()
-            .map(relation -> relation.getWorkspaceId())
-            .hasValue(7L);
-    }
-
-    @Test
-    void testUnregisterSourceDeletesRow() {
-        KnowledgeBaseSource source = persistSource("HubSpot");
-
-        workspaceKnowledgeBaseSourceService.registerSourceForWorkspace(source.getId(), 7L);
-
-        assertThat(workspaceKnowledgeBaseSourceRepository.findByKnowledgeBaseSourceId(source.getId())).isPresent();
-
-        workspaceKnowledgeBaseSourceService.unregisterSource(source.getId());
-
-        assertThat(workspaceKnowledgeBaseSourceRepository.findByKnowledgeBaseSourceId(source.getId())).isEmpty();
-    }
-
-    @Test
     void testFetchWorkspaceIdByKnowledgeBaseSourceIdReturnsCorrectWorkspace() {
-        KnowledgeBaseSource source = persistSource("HubSpot");
-
-        workspaceKnowledgeBaseSourceService.registerSourceForWorkspace(source.getId(), 42L);
+        KnowledgeBaseSource source = persistSource("HubSpot", 42L);
 
         Optional<Long> workspaceId =
             workspaceKnowledgeBaseSourceService.fetchWorkspaceIdByKnowledgeBaseSourceId(source.getId());
@@ -118,7 +87,7 @@ class WorkspaceKnowledgeBaseSourceServiceIntTest {
 
     @Test
     void testFetchWorkspaceIdReturnsEmptyForOrphanSource() {
-        KnowledgeBaseSource source = persistSource("Orphan");
+        KnowledgeBaseSource source = persistSource("Orphan", null);
 
         Optional<Long> workspaceId =
             workspaceKnowledgeBaseSourceService.fetchWorkspaceIdByKnowledgeBaseSourceId(source.getId());
@@ -127,14 +96,10 @@ class WorkspaceKnowledgeBaseSourceServiceIntTest {
     }
 
     @Test
-    void testGetAllSourcesByWorkspaceIdJoinsThroughToPlatformSources() {
-        KnowledgeBaseSource hubspot = persistSource("HubSpot");
-        KnowledgeBaseSource salesforce = persistSource("Salesforce");
-        KnowledgeBaseSource otherWorkspaceSource = persistSource("Other");
-
-        workspaceKnowledgeBaseSourceService.registerSourceForWorkspace(hubspot.getId(), 1L);
-        workspaceKnowledgeBaseSourceService.registerSourceForWorkspace(salesforce.getId(), 1L);
-        workspaceKnowledgeBaseSourceService.registerSourceForWorkspace(otherWorkspaceSource.getId(), 2L);
+    void testGetAllSourcesByWorkspaceIdIsScopedToThatWorkspace() {
+        persistSource("HubSpot", 1L);
+        persistSource("Salesforce", 1L);
+        persistSource("Other", 2L);
 
         List<KnowledgeBaseSource> sources = workspaceKnowledgeBaseSourceService.getAllSourcesByWorkspaceId(1L);
 
@@ -145,15 +110,25 @@ class WorkspaceKnowledgeBaseSourceServiceIntTest {
     }
 
     @Test
+    void testGetAllSourcesByWorkspaceIdIgnoresWorkspaceLessSources() {
+        persistSource("HubSpot", 1L);
+        persistSource("Orphan", null);
+
+        List<KnowledgeBaseSource> sources = workspaceKnowledgeBaseSourceService.getAllSourcesByWorkspaceId(1L);
+
+        assertThat(sources)
+            .extracting(KnowledgeBaseSource::getName)
+            .containsExactly("HubSpot");
+    }
+
+    @Test
     void testGetAllEnabledSourcesByWorkspaceIdFiltersDisabled() {
-        KnowledgeBaseSource enabled = persistSource("Enabled");
-        KnowledgeBaseSource disabled = persistSource("Disabled");
+        persistSource("Enabled", 1L);
+
+        KnowledgeBaseSource disabled = persistSource("Disabled", 1L);
 
         disabled.setEnabled(false);
         knowledgeBaseSourceRepository.save(disabled);
-
-        workspaceKnowledgeBaseSourceService.registerSourceForWorkspace(enabled.getId(), 1L);
-        workspaceKnowledgeBaseSourceService.registerSourceForWorkspace(disabled.getId(), 1L);
 
         List<KnowledgeBaseSource> sources = workspaceKnowledgeBaseSourceService.getAllEnabledSourcesByWorkspaceId(1L);
 
@@ -163,7 +138,7 @@ class WorkspaceKnowledgeBaseSourceServiceIntTest {
             .containsExactly("Enabled");
     }
 
-    private KnowledgeBaseSource persistSource(String name) {
+    private KnowledgeBaseSource persistSource(String name, @Nullable Long workspaceId) {
         KnowledgeBaseSource source = new KnowledgeBaseSource();
 
         source.setName(name);
@@ -173,6 +148,7 @@ class WorkspaceKnowledgeBaseSourceServiceIntTest {
         source.setKnowledgeBaseId(knowledgeBase.getId());
         source.setCadence("@hourly");
         source.setStatus(KnowledgeBaseSourceStatus.BUILDING_PREVIEW);
+        source.setWorkspaceId(workspaceId);
 
         return knowledgeBaseSourceRepository.save(source);
     }

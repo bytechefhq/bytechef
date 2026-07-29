@@ -67,6 +67,11 @@ public class AiGatewayProvider {
     @Version
     private int version;
 
+    // A provider belongs to at most one workspace. Null means no workspace applies — a boxed Long is required so that
+    // "no workspace" cannot collapse into workspace 0, which is a real workspace id.
+    @Column("workspace_id")
+    private @Nullable Long workspaceId;
+
     private AiGatewayProvider() {
     }
 
@@ -163,6 +168,10 @@ public class AiGatewayProvider {
         return version;
     }
 
+    public @Nullable Long getWorkspaceId() {
+        return workspaceId;
+    }
+
     /**
      * @deprecated Use {@link #setApiKey(ApiKey)} to keep the {@code ApiKey} type-safe wrapper end-to-end. The raw
      *             {@code String} overload exists only so in-flight callers that still construct providers from REST
@@ -217,6 +226,10 @@ public class AiGatewayProvider {
         this.name = name;
     }
 
+    public void setWorkspaceId(@Nullable Long workspaceId) {
+        this.workspaceId = workspaceId;
+    }
+
     @Override
     public String toString() {
         return "AiGatewayProvider{" +
@@ -229,6 +242,7 @@ public class AiGatewayProvider {
             ", lastModifiedBy='" + lastModifiedBy + '\'' +
             ", lastModifiedDate=" + lastModifiedDate +
             ", version=" + version +
+            ", workspaceId=" + workspaceId +
             '}';
     }
 }

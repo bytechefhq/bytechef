@@ -18,7 +18,6 @@ import com.bytechef.ee.ai.hub.exception.ConflictException;
 import com.bytechef.ee.ai.hub.personalagent.repository.AiHubPersonalAgentRepository;
 import com.bytechef.ee.ai.hub.personalagent.repository.AiHubPersonalAgentResourceRepository;
 import com.bytechef.ee.ai.hub.personalagent.repository.AiHubPersonalAgentToolRepository;
-import com.bytechef.ee.ai.hub.personalagent.repository.WorkspaceAiHubPersonalAgentRepository;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -27,7 +26,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.dao.DataIntegrityViolationException;
 
 /**
  * Unit tests for {@link AiHubPersonalAgentServiceImpl}. Pin the contract surface other layers depend on:
@@ -48,6 +46,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 class AiHubPersonalAgentServiceTest {
 
     private static final long WORKSPACE_ID = 1L;
+    private static final long OTHER_WORKSPACE_ID = 2L;
     private static final long USER_ID = 10L;
     private static final long OTHER_USER_ID = 99L;
     private static final int ENVIRONMENT = 0;
@@ -60,9 +59,6 @@ class AiHubPersonalAgentServiceTest {
 
     @Mock
     private AiHubPersonalAgentResourceRepository aiHubPersonalAgentResourceRepository;
-
-    @Mock
-    private WorkspaceAiHubPersonalAgentRepository workspaceAiHubPersonalAgentRepository;
 
     // Note: AiHubPersonalAgentServiceImpl uses Clock.systemUTC() internally (no Clock injection). The tests
     // below
@@ -146,32 +142,6 @@ class AiHubPersonalAgentServiceTest {
     }
 
     @Test
-    void testCreateMapsDataIntegrityViolationToConflictException() {
-        AiHubPersonalAgentServiceImpl service = newService();
-
-        // TOCTOU race: lookup says no row exists, but a concurrent insert wins between findByWorkspace... and
-        // save(). The DB throws DataIntegrityViolationException; the service maps it to ConflictException so
-        // the LLM tool sees a uniform error regardless of which path detected the duplicate.
-        when(aiHubPersonalAgentRepository.findAllByWorkspaceUserEnvironmentAndName(
-            WORKSPACE_ID, USER_ID, ENVIRONMENT, "research-bot"))
-                .thenReturn(List.of());
-        when(aiHubPersonalAgentRepository.save(any(AiHubPersonalAgent.class)))
-            .thenAnswer(invocation -> {
-                AiHubPersonalAgent arg = invocation.getArgument(0);
-
-                arg.setId(42L);
-
-                return arg;
-            });
-        when(workspaceAiHubPersonalAgentRepository.save(any(WorkspaceAiHubPersonalAgent.class)))
-            .thenThrow(new DataIntegrityViolationException("uk_workspace_ai_hub_personal_agent violated"));
-
-        assertThatThrownBy(() -> service.create(
-            WORKSPACE_ID, USER_ID, ENVIRONMENT, "research-bot", null, null, null, null, null))
-                .isInstanceOf(ConflictException.class);
-    }
-
-    @Test
     void testFindOwnedReturnsEmptyForCrossUserAccess() {
         AiHubPersonalAgentServiceImpl service = newService();
 
@@ -180,6 +150,7 @@ class AiHubPersonalAgentServiceTest {
         AiHubPersonalAgent otherUsersAgent = new AiHubPersonalAgent(OTHER_USER_ID);
 
         otherUsersAgent.setId(7L);
+        otherUsersAgent.setWorkspaceId(WORKSPACE_ID);
 
         when(aiHubPersonalAgentRepository.findById(7L)).thenReturn(Optional.of(otherUsersAgent));
 
@@ -195,6 +166,7 @@ class AiHubPersonalAgentServiceTest {
         AiHubPersonalAgent otherWorkspace = new AiHubPersonalAgent(USER_ID);
 
         otherWorkspace.setId(7L);
+        otherWorkspace.setWorkspaceId(OTHER_WORKSPACE_ID);
 
         when(aiHubPersonalAgentRepository.findById(7L)).thenReturn(Optional.of(otherWorkspace));
 
@@ -213,10 +185,9 @@ class AiHubPersonalAgentServiceTest {
         existing.setDescription("Old description");
         existing.setInstructions("Old instructions");
 
+        existing.setWorkspaceId(WORKSPACE_ID);
+
         when(aiHubPersonalAgentRepository.findById(42L)).thenReturn(Optional.of(existing));
-        when(workspaceAiHubPersonalAgentRepository.findByWorkspaceIdAndAiHubPersonalAgentId(
-            WORKSPACE_ID, 42L))
-                .thenReturn(Optional.of(new WorkspaceAiHubPersonalAgent(WORKSPACE_ID, 42L)));
         when(aiHubPersonalAgentRepository.save(any(AiHubPersonalAgent.class)))
             .thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -239,6 +210,7 @@ class AiHubPersonalAgentServiceTest {
 
         otherUsersAgent.setId(7L);
         otherUsersAgent.setName("research-bot");
+        otherUsersAgent.setWorkspaceId(WORKSPACE_ID);
 
         when(aiHubPersonalAgentRepository.findById(7L)).thenReturn(Optional.of(otherUsersAgent));
 
@@ -275,6 +247,7 @@ class AiHubPersonalAgentServiceTest {
 
         otherUsersAgent.setId(7L);
         otherUsersAgent.setName("research-bot");
+        otherUsersAgent.setWorkspaceId(WORKSPACE_ID);
 
         when(aiHubPersonalAgentRepository.findById(7L)).thenReturn(Optional.of(otherUsersAgent));
 
@@ -292,11 +265,9 @@ class AiHubPersonalAgentServiceTest {
         AiHubPersonalAgent agent = new AiHubPersonalAgent(USER_ID);
 
         agent.setId(5L);
+        agent.setWorkspaceId(WORKSPACE_ID);
 
         when(aiHubPersonalAgentRepository.findById(5L)).thenReturn(Optional.of(agent));
-        when(workspaceAiHubPersonalAgentRepository
-            .findByWorkspaceIdAndAiHubPersonalAgentId(WORKSPACE_ID, 5L))
-                .thenReturn(Optional.of(new WorkspaceAiHubPersonalAgent(WORKSPACE_ID, 5L)));
 
         AiHubPersonalAgentResource existing = new AiHubPersonalAgentResource(
             5L, AiHubPersonalAgentResourceKind.WORKFLOW, "wf-1", "Daily standup");
@@ -319,6 +290,7 @@ class AiHubPersonalAgentServiceTest {
         AiHubPersonalAgent agent = new AiHubPersonalAgent(OTHER_USER_ID);
 
         agent.setId(5L);
+        agent.setWorkspaceId(WORKSPACE_ID);
 
         when(aiHubPersonalAgentRepository.findById(5L)).thenReturn(Optional.of(agent));
 
@@ -352,6 +324,7 @@ class AiHubPersonalAgentServiceTest {
         AiHubPersonalAgent agent = new AiHubPersonalAgent(OTHER_USER_ID);
 
         agent.setId(5L);
+        agent.setWorkspaceId(WORKSPACE_ID);
 
         when(aiHubPersonalAgentResourceRepository.findById(7L)).thenReturn(Optional.of(resource));
         when(aiHubPersonalAgentRepository.findById(5L)).thenReturn(Optional.of(agent));
@@ -369,11 +342,9 @@ class AiHubPersonalAgentServiceTest {
         AiHubPersonalAgent agent = new AiHubPersonalAgent(USER_ID);
 
         agent.setId(5L);
+        agent.setWorkspaceId(WORKSPACE_ID);
 
         when(aiHubPersonalAgentRepository.findById(5L)).thenReturn(Optional.of(agent));
-        when(workspaceAiHubPersonalAgentRepository
-            .findByWorkspaceIdAndAiHubPersonalAgentId(WORKSPACE_ID, 5L))
-                .thenReturn(Optional.of(new WorkspaceAiHubPersonalAgent(WORKSPACE_ID, 5L)));
 
         // No existing row — addResource must call save.
         when(aiHubPersonalAgentResourceRepository.findByAiHubPersonalAgentIdAndKindAndResourceId(
@@ -439,6 +410,6 @@ class AiHubPersonalAgentServiceTest {
 
         return new AiHubPersonalAgentServiceImpl(
             aiHubPersonalAgentRepository, aiHubPersonalAgentToolRepository, aiHubPersonalAgentResourceRepository,
-            workspaceAiHubPersonalAgentRepository, emptyValidatorProvider);
+            emptyValidatorProvider);
     }
 }

@@ -11,9 +11,8 @@ import com.bytechef.ee.platform.ai.observability.domain.AiObservabilitySession;
 import java.util.List;
 
 /**
- * Workspace-scoped operations on {@link AiObservabilitySession}. Owns the {@code workspace_ai_observability_session}
- * membership row plus tenant-aware queries; entity-table CRUD belongs to the platform-side
- * {@code AiObservabilitySessionService}.
+ * Workspace-scoped operations on {@link AiObservabilitySession}. Owns the session's {@code workspace_id} binding plus
+ * the tenant-aware queries; entity-table CRUD belongs to the platform-side {@code AiObservabilitySessionService}.
  *
  * @version ee
  */

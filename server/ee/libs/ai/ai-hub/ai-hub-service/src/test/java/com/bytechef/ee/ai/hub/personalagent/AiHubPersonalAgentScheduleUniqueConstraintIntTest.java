@@ -12,7 +12,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.ee.ai.hub.personalagent.repository.AiHubPersonalAgentRepository;
 import com.bytechef.ee.ai.hub.personalagent.repository.AiHubPersonalAgentScheduleRepository;
-import com.bytechef.ee.ai.hub.personalagent.repository.WorkspaceAiHubPersonalAgentRepository;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
@@ -50,13 +49,9 @@ public class AiHubPersonalAgentScheduleUniqueConstraintIntTest {
     @Autowired
     private AiHubPersonalAgentScheduleRepository scheduleRepository;
 
-    @Autowired
-    private WorkspaceAiHubPersonalAgentRepository workspaceAgentRepository;
-
     @AfterEach
     public void afterEach() {
         scheduleRepository.deleteAll();
-        workspaceAgentRepository.deleteAll();
         agentRepository.deleteAll();
     }
 
@@ -94,10 +89,9 @@ public class AiHubPersonalAgentScheduleUniqueConstraintIntTest {
         agent.setEnvironment(Environment.DEVELOPMENT);
         agent.setCreatedAt(LocalDateTime.now());
         agent.setUpdatedAt(LocalDateTime.now());
+        agent.setWorkspaceId(workspaceId);
 
         AiHubPersonalAgent saved = agentRepository.save(agent);
-
-        workspaceAgentRepository.save(new WorkspaceAiHubPersonalAgent(workspaceId, saved.getId()));
 
         return saved.getId();
     }

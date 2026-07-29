@@ -14,6 +14,7 @@
             <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
+            <column name="workspace_id" type="BIGINT"/>
             <column name="project_id" type="BIGINT"/>
             <column name="name" type="VARCHAR(256)"/>
             <column name="external_session_id" type="VARCHAR(256)"/>
@@ -33,59 +34,31 @@
             <column name="project_id"/>
         </createIndex>
 
-        <createIndex tableName="ai_observability_session" indexName="idx_ai_obs_session_user">
+        <!--
+            Every session query is workspace-scoped, so both indexes lead with workspace_id. The (workspace_id,
+            user_id) form replaces the former standalone user_id index (nothing filters on user_id alone) and its
+            leading column also serves the plain by-workspace listing, so no separate workspace-only index is needed.
+            The (workspace_id, external_session_id) form serves getOrCreateSessionByExternalId. Both were impossible
+            while workspace_id lived on a relation table.
+
+            Deliberately NOT unique: getOrCreateSessionByExternalId is a find-then-create, so a lost race would raise
+            DuplicateKeyException, which no caller handles — a duplicate session row is far cheaper than a 500.
+        -->
+        <createIndex tableName="ai_observability_session" indexName="idx_ai_obs_session_workspace_user">
+            <column name="workspace_id"/>
             <column name="user_id"/>
         </createIndex>
 
-        <createTable tableName="workspace_ai_observability_session">
-            <column name="id" type="BIGINT" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="workspace_id" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="ai_observability_session_id" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="created_date" type="TIMESTAMP">
-                <constraints nullable="false"/>
-            </column>
-            <column name="created_by" type="VARCHAR(50)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="last_modified_date" type="TIMESTAMP">
-                <constraints nullable="false"/>
-            </column>
-            <column name="last_modified_by" type="VARCHAR(50)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="version" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-
-        <addUniqueConstraint
-            constraintName="uk_workspace_ai_observability_session"
-            tableName="workspace_ai_observability_session"
-            columnNames="workspace_id, ai_observability_session_id"/>
-
-        <createIndex tableName="workspace_ai_observability_session"
-                     indexName="idx_workspace_ai_obs_session_workspace">
+        <createIndex tableName="ai_observability_session" indexName="idx_ai_obs_session_workspace_external">
             <column name="workspace_id"/>
+            <column name="external_session_id"/>
         </createIndex>
-
-        <addForeignKeyConstraint
-            baseTableName="workspace_ai_observability_session"
-            baseColumnNames="ai_observability_session_id"
-            constraintName="fk_workspace_ai_obs_session_session"
-            referencedTableName="ai_observability_session"
-            referencedColumnNames="id"
-            onDelete="CASCADE"/>
 
         <createTable tableName="ai_observability_trace">
             <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
+            <column name="workspace_id" type="BIGINT"/>
             <column name="external_trace_id" type="VARCHAR(256)"/>
             <column name="project_id" type="BIGINT"/>
             <column name="session_id" type="BIGINT">
@@ -142,61 +115,31 @@
         </createIndex>
 
         <!--
-            OTLP race-detection dedup index on external_trace_id. When workspace_id was on the trace table this
-            was scoped to (workspace_id, external_trace_id); now that workspace_id lives on workspace_ai_observability_trace
-            the constraint is global, which is acceptable because OTLP trace IDs are 16-byte hex strings (UUID-like),
-            so cross-workspace collision probability is ~2^-64 per pair. AiGatewayFacade and AiObservabilityOtlpIngestFacadeImpl
-            still narrow on this index name (TRACE_DEDUP_INDEX = "uq_ai_obs_trace_ext_trace_id") to convert
-            DuplicateKeyException into the "winner re-fetch" path.
+            Workspace-scoped listing / retention index. Leading workspace_id with created_date because every
+            tenant-facing trace query filters the workspace and then a created_date range.
+        -->
+        <createIndex tableName="ai_observability_trace" indexName="idx_ai_obs_trace_workspace_created">
+            <column name="workspace_id"/>
+            <column name="created_date"/>
+        </createIndex>
+
+        <!--
+            OTLP race-detection dedup index, scoped to (workspace_id, external_trace_id) — the scope the ingest code
+            has always assumed (AiObservabilityOtlpIngestFacadeImpl re-fetches the race winner with
+            findByExternalTraceId(workspaceId, ...) and its IllegalStateException message names this exact pair).
+            While workspace_id lived on the relation table the index had to be global on external_trace_id alone,
+            which meant a cross-workspace collision rejected the insert and then failed the re-fetch. AiGatewayFacade
+            and AiObservabilityOtlpIngestFacadeImpl narrow on the index NAME
+            (TRACE_DEDUP_INDEX = "uq_ai_obs_trace_ext_trace_id"), so the name is kept unchanged.
+
+            Postgres treats NULLs as distinct here, so traces with no workspace are not deduplicated. That is
+            acceptable: every OTLP ingest goes through createInWorkspace with a non-null workspace, and a
+            workspace-less trace is unreachable from findByExternalTraceId anyway.
         -->
         <createIndex tableName="ai_observability_trace" indexName="uq_ai_obs_trace_ext_trace_id" unique="true">
+            <column name="workspace_id"/>
             <column name="external_trace_id"/>
         </createIndex>
-
-        <createTable tableName="workspace_ai_observability_trace">
-            <column name="id" type="BIGINT" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="workspace_id" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="ai_observability_trace_id" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="created_date" type="TIMESTAMP">
-                <constraints nullable="false"/>
-            </column>
-            <column name="created_by" type="VARCHAR(50)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="last_modified_date" type="TIMESTAMP">
-                <constraints nullable="false"/>
-            </column>
-            <column name="last_modified_by" type="VARCHAR(50)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="version" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-
-        <addUniqueConstraint
-            constraintName="uk_workspace_ai_observability_trace"
-            tableName="workspace_ai_observability_trace"
-            columnNames="workspace_id, ai_observability_trace_id"/>
-
-        <createIndex tableName="workspace_ai_observability_trace"
-                     indexName="idx_workspace_ai_obs_trace_workspace">
-            <column name="workspace_id"/>
-        </createIndex>
-
-        <addForeignKeyConstraint
-            baseTableName="workspace_ai_observability_trace"
-            baseColumnNames="ai_observability_trace_id"
-            constraintName="fk_workspace_ai_obs_trace_trace"
-            referencedTableName="ai_observability_trace"
-            referencedColumnNames="id"
-            onDelete="CASCADE"/>
 
         <createTable tableName="ai_observability_trace_tag">
             <column name="ai_observability_trace" type="BIGINT">
@@ -291,6 +234,7 @@
             <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
+            <column name="workspace_id" type="BIGINT"/>
             <column name="project_id" type="BIGINT"/>
             <column name="name" type="VARCHAR(256)">
                 <constraints nullable="false"/>
@@ -330,36 +274,7 @@
             <column name="enabled"/>
         </createIndex>
 
-        <createTable tableName="workspace_ai_observability_alert_rule">
-            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="ai_observability_alert_rule_id" type="BIGINT">
-                <constraints nullable="false" foreignKeyName="fk_ws_ai_obs_alert_rule" references="ai_observability_alert_rule(id)"/>
-            </column>
-            <column name="workspace_id" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="created_by" type="VARCHAR(50)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="created_date" type="TIMESTAMP">
-                <constraints nullable="false"/>
-            </column>
-            <column name="last_modified_by" type="VARCHAR(50)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="last_modified_date" type="TIMESTAMP">
-                <constraints nullable="false"/>
-            </column>
-            <column name="version" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-
-        <addUniqueConstraint constraintName="uk_ws_ai_obs_alert_rule" tableName="workspace_ai_observability_alert_rule" columnNames="workspace_id,ai_observability_alert_rule_id"/>
-
-        <createIndex tableName="workspace_ai_observability_alert_rule" indexName="idx_ws_ai_obs_alert_rule_workspace">
+        <createIndex tableName="ai_observability_alert_rule" indexName="idx_ai_obs_alert_rule_workspace">
             <column name="workspace_id"/>
         </createIndex>
     </changeSet>
@@ -508,6 +423,7 @@
             <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
+            <column name="workspace_id" type="BIGINT"/>
             <column name="project_id" type="BIGINT"/>
             <column name="type" type="INT">
                 <constraints nullable="false"/>
@@ -543,43 +459,18 @@
             <column name="created_date"/>
         </createIndex>
 
-        <createTable tableName="workspace_ai_observability_export_job">
-            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="ai_observability_export_job_id" type="BIGINT">
-                <constraints nullable="false" foreignKeyName="fk_ws_ai_obs_export_job" references="ai_observability_export_job(id)"/>
-            </column>
-            <column name="workspace_id" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="created_by" type="VARCHAR(50)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="created_date" type="TIMESTAMP">
-                <constraints nullable="false"/>
-            </column>
-            <column name="last_modified_by" type="VARCHAR(50)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="last_modified_date" type="TIMESTAMP">
-                <constraints nullable="false"/>
-            </column>
-            <column name="version" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-
-        <addUniqueConstraint constraintName="uk_ws_ai_obs_export_job" tableName="workspace_ai_observability_export_job" columnNames="workspace_id,ai_observability_export_job_id"/>
-
-        <createIndex tableName="workspace_ai_observability_export_job" indexName="idx_ws_ai_obs_export_job_workspace">
+        <!-- Leading workspace_id with created_date so the by-workspace listing is index-ordered (it always sorts
+             newest first) instead of re-sorting the workspace's whole export history. -->
+        <createIndex tableName="ai_observability_export_job" indexName="idx_ai_obs_export_job_workspace_created">
             <column name="workspace_id"/>
+            <column name="created_date"/>
         </createIndex>
 
         <createTable tableName="ai_observability_webhook_subscription">
             <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
+            <column name="workspace_id" type="BIGINT"/>
             <column name="project_id" type="BIGINT"/>
             <column name="name" type="VARCHAR(256)">
                 <constraints nullable="false"/>
@@ -610,37 +501,12 @@
             <column name="enabled"/>
         </createIndex>
 
-        <createTable tableName="workspace_ai_observability_webhook_subscription">
-            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="ai_observability_webhook_subscription_id" type="BIGINT">
-                <constraints nullable="false" foreignKeyName="fk_ws_ai_obs_webhook_sub" references="ai_observability_webhook_subscription(id)"/>
-            </column>
-            <column name="workspace_id" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="created_by" type="VARCHAR(50)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="created_date" type="TIMESTAMP">
-                <constraints nullable="false"/>
-            </column>
-            <column name="last_modified_by" type="VARCHAR(50)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="last_modified_date" type="TIMESTAMP">
-                <constraints nullable="false"/>
-            </column>
-            <column name="version" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-
-        <addUniqueConstraint constraintName="uk_ws_ai_obs_webhook_sub" tableName="workspace_ai_observability_webhook_subscription" columnNames="workspace_id,ai_observability_webhook_subscription_id"/>
-
-        <createIndex tableName="workspace_ai_observability_webhook_subscription" indexName="idx_ws_ai_obs_webhook_sub_workspace">
+        <!-- Leading workspace_id with enabled: the delivery path lists a workspace's ENABLED subscriptions, so the
+             compound form serves both that and the plain by-workspace listing. -->
+        <createIndex tableName="ai_observability_webhook_subscription"
+                     indexName="idx_ai_obs_webhook_sub_workspace_enabled">
             <column name="workspace_id"/>
+            <column name="enabled"/>
         </createIndex>
     </changeSet>
 

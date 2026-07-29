@@ -17,6 +17,9 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
+ * Workspace-scoped reads filter {@code workflow_execution_cost.workspace_id} directly; a workspace-less cost row (an
+ * editor run or an embedded execution) is invisible to them, which is the intended behavior.
+ *
  * @version ee
  *
  * @author Ivica Cardic
@@ -32,4 +35,12 @@ public interface WorkflowExecutionCostRepository extends ListCrudRepository<Work
         WHERE workflow_execution_cost.created_date >= :since
         """)
     BigDecimal sumTotalCostSince(@Param("since") Instant since);
+
+    @Query("""
+        SELECT COALESCE(SUM(workflow_execution_cost.total_cost), 0)
+        FROM workflow_execution_cost
+        WHERE workflow_execution_cost.workspace_id = :workspaceId
+            AND workflow_execution_cost.created_date >= :since
+        """)
+    BigDecimal sumTotalCostByWorkspaceIdSince(@Param("workspaceId") long workspaceId, @Param("since") Instant since);
 }

@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
@@ -68,6 +69,11 @@ public class AiGatewaySpendSummary {
 
     @Version
     private int version;
+
+    // A spend summary belongs to at most one workspace. Null means no workspace applies — a boxed Long is required so
+    // that "no workspace" cannot collapse into workspace 0, which is a real workspace id.
+    @Column("workspace_id")
+    private @Nullable Long workspaceId;
 
     private AiGatewaySpendSummary() {
     }
@@ -165,6 +171,10 @@ public class AiGatewaySpendSummary {
         return totalOutputTokens;
     }
 
+    public @Nullable Long getWorkspaceId() {
+        return workspaceId;
+    }
+
     public void setApiKeyId(Long apiKeyId) {
         this.apiKeyId = apiKeyId;
     }
@@ -214,6 +224,10 @@ public class AiGatewaySpendSummary {
         this.totalOutputTokens = totalOutputTokens;
     }
 
+    public void setWorkspaceId(@Nullable Long workspaceId) {
+        this.workspaceId = workspaceId;
+    }
+
     @Override
     public String toString() {
         return "AiGatewaySpendSummary{" +
@@ -225,6 +239,7 @@ public class AiGatewaySpendSummary {
             ", requestCount=" + requestCount +
             ", totalCost=" + totalCost +
             ", createdDate=" + createdDate +
+            ", workspaceId=" + workspaceId +
             '}';
     }
 }

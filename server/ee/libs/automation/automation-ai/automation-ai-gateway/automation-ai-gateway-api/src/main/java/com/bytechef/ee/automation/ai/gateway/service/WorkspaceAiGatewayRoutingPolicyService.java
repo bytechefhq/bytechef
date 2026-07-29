@@ -7,11 +7,12 @@
 
 package com.bytechef.ee.automation.ai.gateway.service;
 
-import com.bytechef.ee.automation.ai.gateway.domain.WorkspaceAiGatewayRoutingPolicy;
+import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayRoutingPolicy;
 import java.util.List;
 
 /**
- * Service interface for managing workspace AI LLM Gateway routing policy relationships.
+ * Service interface for the workspace scoping of AI LLM Gateway routing policies. A routing policy belongs to at most
+ * one workspace, recorded in its own nullable {@code workspace_id} column.
  *
  * @version ee
  *
@@ -23,9 +24,9 @@ public interface WorkspaceAiGatewayRoutingPolicyService {
      * Gets AI LLM Gateway routing policies filtered by workspace ID.
      *
      * @param workspaceId the workspace ID to filter by
-     * @return a list of workspace AI LLM Gateway routing policy relationships in the specified workspace
+     * @return a list of AI LLM Gateway routing policies in the specified workspace
      */
-    List<WorkspaceAiGatewayRoutingPolicy> getWorkspaceRoutingPolicies(Long workspaceId);
+    List<AiGatewayRoutingPolicy> getWorkspaceRoutingPolicies(Long workspaceId);
 
     /**
      * Assigns an AI LLM Gateway routing policy to a workspace.
@@ -36,7 +37,7 @@ public interface WorkspaceAiGatewayRoutingPolicyService {
     void assignRoutingPolicyToWorkspace(Long routingPolicyId, Long workspaceId);
 
     /**
-     * Removes an AI LLM Gateway routing policy from all workspaces.
+     * Removes an AI LLM Gateway routing policy from its workspace.
      *
      * @param routingPolicyId the routing policy ID
      */

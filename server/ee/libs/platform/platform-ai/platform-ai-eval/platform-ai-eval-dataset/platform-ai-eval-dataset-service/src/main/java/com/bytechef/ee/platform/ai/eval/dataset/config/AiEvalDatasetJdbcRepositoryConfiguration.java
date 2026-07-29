@@ -15,10 +15,8 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
 /**
  * Activates Spring Data JDBC repository scanning for {@code ai_eval_dataset}, {@code ai_eval_dataset_version}, and
- * {@code ai_eval_dataset_item}. The {@code workspace_ai_eval_dataset} membership table is owned by
- * automation-ai-eval-dataset's {@code WorkspaceAiEvalDatasetJdbcRepositoryConfiguration}. Discovered via
- * {@code AutoConfiguration.imports} when this module is on the classpath, gated on a {@link AbstractJdbcConfiguration}
- * bean so app variants without JDBC start cleanly.
+ * {@code ai_eval_dataset_item}. Discovered via {@code AutoConfiguration.imports} when this module is on the classpath,
+ * gated on a {@link AbstractJdbcConfiguration} bean so app variants without JDBC start cleanly.
  *
  * @author Ivica Cardic
  * @version ee

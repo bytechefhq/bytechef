@@ -10,13 +10,13 @@ package com.bytechef.ee.ai.hub.task;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.ee.ai.hub.task.repository.AiHubTaskRepository;
-import com.bytechef.ee.ai.hub.task.repository.WorkspaceAiHubTaskRepository;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +28,8 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 import org.springframework.test.context.ActiveProfiles;
 
 /**
- * Integration test for {@link AiHubTaskRepository}. Workspace dimension comes from {@code workspace_ai_hub_task} via
- * the JOIN-based queries; the entity itself is workspace-agnostic.
+ * Integration test for {@link AiHubTaskRepository}. The workspace dimension is the nullable
+ * {@code ai_hub_task.workspace_id} column that the listing queries filter on.
  *
  * @version ee
  *
@@ -43,18 +43,14 @@ public class AiHubTaskRepositoryIntTest {
     @Autowired
     private AiHubTaskRepository taskRepository;
 
-    @Autowired
-    private WorkspaceAiHubTaskRepository workspaceTaskRepository;
-
     @AfterEach
     public void afterEach() {
-        workspaceTaskRepository.deleteAll();
         taskRepository.deleteAll();
     }
 
     @Test
     public void testSaveAndFindById() {
-        long taskId = saveTaskWithMembership(1L, 10L, "thread-1", AiHubTaskStatus.ACTIVE);
+        long taskId = saveTaskInWorkspace(1L, 10L, "thread-1", AiHubTaskStatus.ACTIVE);
 
         Optional<AiHubTask> found = taskRepository.findById(taskId);
 
@@ -67,7 +63,7 @@ public class AiHubTaskRepositoryIntTest {
 
     @Test
     public void testFindByThreadIdAndUserId() {
-        saveTaskWithMembership(1L, 10L, "thread-abc", AiHubTaskStatus.ACTIVE);
+        saveTaskInWorkspace(1L, 10L, "thread-abc", AiHubTaskStatus.ACTIVE);
 
         Optional<AiHubTask> found = taskRepository.findByThreadIdAndUserId("thread-abc", 10L);
 
@@ -91,9 +87,9 @@ public class AiHubTaskRepositoryIntTest {
 
         AiHubTask archived = buildTask(10L, "thread-arch", AiHubTaskStatus.ARCHIVED);
 
-        saveWithMembership(active1, 1L);
-        saveWithMembership(active2, 1L);
-        saveWithMembership(archived, 1L);
+        saveInWorkspace(active1, 1L);
+        saveInWorkspace(active2, 1L);
+        saveInWorkspace(archived, 1L);
 
         List<AiHubTask> activeTasks = taskRepository
             .findByWorkspaceIdAndUserIdAndEnvironmentAndStatusOrderByUpdatedAtDesc(1L, 10L, 0,
@@ -118,7 +114,7 @@ public class AiHubTaskRepositoryIntTest {
         task.setCreatedAt(LocalDateTime.now());
         task.setUpdatedAt(LocalDateTime.now());
 
-        long taskId = saveWithMembership(task, 1L);
+        long taskId = saveInWorkspace(task, 1L);
 
         AiHubTask reloaded = taskRepository.findById(taskId)
             .orElseThrow();
@@ -130,8 +126,8 @@ public class AiHubTaskRepositoryIntTest {
 
     @Test
     public void testFindByWorkspaceIdAndUserIdAndStatusFiltersOtherUsers() {
-        saveWithMembership(buildTask(10L, "thread-user10", AiHubTaskStatus.ACTIVE), 1L);
-        saveWithMembership(buildTask(20L, "thread-user20", AiHubTaskStatus.ACTIVE), 1L);
+        saveInWorkspace(buildTask(10L, "thread-user10", AiHubTaskStatus.ACTIVE), 1L);
+        saveInWorkspace(buildTask(20L, "thread-user20", AiHubTaskStatus.ACTIVE), 1L);
 
         List<AiHubTask> tasks = taskRepository
             .findByWorkspaceIdAndUserIdAndEnvironmentAndStatusOrderByUpdatedAtDesc(1L, 10L, 0,
@@ -143,15 +139,29 @@ public class AiHubTaskRepositoryIntTest {
             .getUserId()).isEqualTo(10L);
     }
 
-    private long saveTaskWithMembership(
-        long workspaceId, long userId, String threadId, AiHubTaskStatus status) {
-        return saveWithMembership(buildTask(userId, threadId, status), workspaceId);
+    @Test
+    public void testWorkspaceScopedQueriesIgnoreWorkspaceLessTasks() {
+        saveInWorkspace(buildTask(10L, "thread-orphan", AiHubTaskStatus.ACTIVE), null);
+
+        // SQL equality never matches NULL, so a workspace-less task is correctly invisible to every workspace query —
+        // including workspace 0, which a primitive long field would have collapsed it into.
+        assertThat(taskRepository.findByWorkspaceIdAndUserIdAndEnvironmentOrderByUpdatedAtDesc(1L, 10L, 0, 100))
+            .isEmpty();
+        assertThat(taskRepository.findByWorkspaceIdAndUserIdAndEnvironmentOrderByUpdatedAtDesc(0L, 10L, 0, 100))
+            .isEmpty();
+        assertThat(taskRepository.findByWorkspaceIdAndUserIdAndEnvironmentAndStatusOrderByUpdatedAtDesc(
+            1L, 10L, 0, AiHubTaskStatus.ACTIVE.ordinal(), 100)).isEmpty();
     }
 
-    private long saveWithMembership(AiHubTask task, long workspaceId) {
-        AiHubTask saved = taskRepository.save(task);
+    private long saveTaskInWorkspace(
+        long workspaceId, long userId, String threadId, AiHubTaskStatus status) {
+        return saveInWorkspace(buildTask(userId, threadId, status), workspaceId);
+    }
 
-        workspaceTaskRepository.save(new WorkspaceAiHubTask(workspaceId, saved.getId()));
+    private long saveInWorkspace(AiHubTask task, @Nullable Long workspaceId) {
+        task.setWorkspaceId(workspaceId);
+
+        AiHubTask saved = taskRepository.save(task);
 
         return saved.getId();
     }

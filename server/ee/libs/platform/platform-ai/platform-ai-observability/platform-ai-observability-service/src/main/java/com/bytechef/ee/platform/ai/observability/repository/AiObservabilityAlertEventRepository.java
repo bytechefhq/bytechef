@@ -11,12 +11,14 @@ import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityAlertEven
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.jdbc.repository.query.Modifying;
+import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
+import org.springframework.data.repository.query.Param;
 
 /**
- * Workspace-agnostic alert-event queries. Per-workspace retention deletes (which need to JOIN to
- * workspace_ai_observability_alert_rule) live on the automation-side
- * {@code WorkspaceAiObservabilityAlertRuleRepository}.
+ * Alert-event queries. Alert events carry no workspace column of their own; they are scoped through their parent alert
+ * rule's {@code workspace_id}.
  *
  * @version ee
  */
@@ -30,4 +32,20 @@ public interface AiObservabilityAlertEventRepository extends ListCrudRepository<
         Long alertRuleId, Instant after);
 
     void deleteAllByCreatedDateBefore(Instant date);
+
+    /**
+     * Workspace-scoped retention delete. Events have no workspace column, so the scope comes from the parent rule's
+     * {@code workspace_id}; rules with a null workspace are never matched.
+     */
+    @Modifying
+    @Query("""
+        DELETE FROM ai_observability_alert_event
+        WHERE created_date < :date
+          AND alert_rule_id IN (
+            SELECT id
+            FROM ai_observability_alert_rule
+            WHERE workspace_id = :workspaceId)
+        """)
+    void deleteAllByWorkspaceIdAndCreatedDateBefore(
+        @Param("workspaceId") Long workspaceId, @Param("date") Instant date);
 }

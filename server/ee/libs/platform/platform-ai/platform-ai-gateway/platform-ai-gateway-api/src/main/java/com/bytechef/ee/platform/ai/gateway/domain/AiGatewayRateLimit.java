@@ -10,6 +10,7 @@ package com.bytechef.ee.platform.ai.gateway.domain;
 import java.time.Instant;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -60,6 +61,11 @@ public class AiGatewayRateLimit {
 
     @Column("window_seconds")
     private int windowSeconds;
+
+    // A rate limit belongs to at most one workspace. Null means no workspace applies — a boxed Long is required so
+    // that "no workspace" cannot collapse into workspace 0, which is a real workspace id.
+    @Column("workspace_id")
+    private @Nullable Long workspaceId;
 
     private AiGatewayRateLimit() {
     }
@@ -166,6 +172,10 @@ public class AiGatewayRateLimit {
         return windowSeconds;
     }
 
+    public @Nullable Long getWorkspaceId() {
+        return workspaceId;
+    }
+
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
@@ -234,6 +244,10 @@ public class AiGatewayRateLimit {
         this.windowSeconds = windowSeconds;
     }
 
+    public void setWorkspaceId(@Nullable Long workspaceId) {
+        this.workspaceId = workspaceId;
+    }
+
     @Override
     public String toString() {
         return "AiGatewayRateLimit{" +
@@ -247,6 +261,7 @@ public class AiGatewayRateLimit {
             ", createdDate=" + createdDate +
             ", lastModifiedDate=" + lastModifiedDate +
             ", version=" + version +
+            ", workspaceId=" + workspaceId +
             '}';
     }
 }

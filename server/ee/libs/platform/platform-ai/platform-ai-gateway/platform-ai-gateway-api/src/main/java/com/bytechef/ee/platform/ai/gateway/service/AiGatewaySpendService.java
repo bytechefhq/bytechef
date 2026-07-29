@@ -12,6 +12,9 @@ import java.time.Instant;
 import java.util.List;
 
 /**
+ * CRUD for {@link AiGatewaySpendSummary}. A summary carries its owning workspace in its nullable {@code workspace_id}
+ * column; the workspace-facing policy layer is {@code WorkspaceAiGatewaySpendService} in automation.
+ *
  * @version ee
  */
 public interface AiGatewaySpendService {
@@ -19,4 +22,6 @@ public interface AiGatewaySpendService {
     AiGatewaySpendSummary create(AiGatewaySpendSummary summary);
 
     List<AiGatewaySpendSummary> getSpendSummaries(Instant start, Instant end);
+
+    List<AiGatewaySpendSummary> getSpendSummariesByWorkspaceId(long workspaceId, Instant start, Instant end);
 }

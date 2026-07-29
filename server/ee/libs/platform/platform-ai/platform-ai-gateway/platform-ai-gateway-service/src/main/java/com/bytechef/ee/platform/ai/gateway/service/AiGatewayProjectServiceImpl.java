@@ -11,6 +11,7 @@ import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayProject;
 import com.bytechef.ee.platform.ai.gateway.repository.AiGatewayProjectRepository;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.List;
+import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
@@ -46,8 +47,26 @@ class AiGatewayProjectServiceImpl implements AiGatewayProjectService {
 
     @Override
     @Transactional(readOnly = true)
+    public Optional<AiGatewayProject> fetchProject(long id) {
+        return aiGatewayProjectRepository.findById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<AiGatewayProject> fetchProjectByWorkspaceIdAndSlug(long workspaceId, String slug) {
+        return aiGatewayProjectRepository.findByWorkspaceIdAndSlug(workspaceId, slug);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<AiGatewayProject> getProjects() {
         return aiGatewayProjectRepository.findAll();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<AiGatewayProject> getProjectsByWorkspaceId(long workspaceId) {
+        return aiGatewayProjectRepository.findAllByWorkspaceId(workspaceId);
     }
 
     @Override

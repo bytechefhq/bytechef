@@ -7,9 +7,8 @@
 
 package com.bytechef.ee.automation.ai.eval.experiment.service;
 
-import com.bytechef.ee.automation.ai.eval.experiment.domain.WorkspaceAiEvalExperiment;
-import com.bytechef.ee.automation.ai.eval.experiment.repository.WorkspaceAiEvalExperimentRepository;
 import com.bytechef.ee.platform.ai.eval.experiment.domain.AiEvalExperiment;
+import com.bytechef.ee.platform.ai.eval.experiment.repository.AiEvalExperimentRepository;
 import com.bytechef.ee.platform.ai.eval.experiment.service.AiEvalExperimentService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -20,8 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Workspace-aware operations on {@link AiEvalExperiment}. Delegates entity-level CRUD + lifecycle to the platform
- * {@link AiEvalExperimentService}; owns the workspace membership row in {@code workspace_ai_eval_experiment} and
- * workspace-scoped queries that join through it. Mirrors {@code WorkspaceAiEvalDatasetServiceImpl}.
+ * {@link AiEvalExperimentService}; owns the experiment's {@code workspace_id} binding and the workspace-scoped queries
+ * over it. Mirrors {@code WorkspaceAiEvalDatasetServiceImpl}.
  *
  * @author Ivica Cardic
  * @version ee
@@ -32,15 +31,14 @@ import org.springframework.transaction.annotation.Transactional;
 @SuppressFBWarnings("EI")
 class WorkspaceAiEvalExperimentServiceImpl implements WorkspaceAiEvalExperimentService {
 
+    private final AiEvalExperimentRepository aiEvalExperimentRepository;
     private final AiEvalExperimentService aiEvalExperimentService;
-    private final WorkspaceAiEvalExperimentRepository workspaceAiEvalExperimentRepository;
 
     WorkspaceAiEvalExperimentServiceImpl(
-        AiEvalExperimentService aiEvalExperimentService,
-        WorkspaceAiEvalExperimentRepository workspaceAiEvalExperimentRepository) {
+        AiEvalExperimentRepository aiEvalExperimentRepository, AiEvalExperimentService aiEvalExperimentService) {
 
+        this.aiEvalExperimentRepository = aiEvalExperimentRepository;
         this.aiEvalExperimentService = aiEvalExperimentService;
-        this.workspaceAiEvalExperimentRepository = workspaceAiEvalExperimentRepository;
     }
 
     @Override
@@ -48,18 +46,18 @@ class WorkspaceAiEvalExperimentServiceImpl implements WorkspaceAiEvalExperimentS
         Validate.notNull(experiment, "experiment must not be null");
         Validate.isTrue(experiment.getId() == null, "experiment id must be null for creation");
 
-        AiEvalExperiment saved = aiEvalExperimentService.create(experiment);
+        experiment.setWorkspaceId(workspaceId);
 
-        workspaceAiEvalExperimentRepository.save(new WorkspaceAiEvalExperiment(saved.getId(), workspaceId));
-
-        return saved;
+        return aiEvalExperimentService.create(experiment);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Long getWorkspaceId(long experimentId) {
-        return workspaceAiEvalExperimentRepository.findByAiEvalExperimentId(experimentId)
-            .map(WorkspaceAiEvalExperiment::getWorkspaceId)
+        // findById rather than the platform service's getExperiment: an unknown id must still yield null (the
+        // pre-collapse "no membership row" answer) because callers use this as an authorization probe, not a fetch.
+        return aiEvalExperimentRepository.findById(experimentId)
+            .map(AiEvalExperiment::getWorkspaceId)
             .orElse(null);
     }
 
@@ -68,6 +66,6 @@ class WorkspaceAiEvalExperimentServiceImpl implements WorkspaceAiEvalExperimentS
     public List<AiEvalExperiment> findAllByWorkspace(Long workspaceId) {
         Validate.notNull(workspaceId, "workspaceId must not be null");
 
-        return workspaceAiEvalExperimentRepository.findAllExperimentsByWorkspaceId(workspaceId);
+        return aiEvalExperimentRepository.findAllByWorkspaceId(workspaceId);
     }
 }

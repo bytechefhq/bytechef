@@ -7,9 +7,8 @@
 
 package com.bytechef.ee.automation.ai.eval.dataset.service;
 
-import com.bytechef.ee.automation.ai.eval.dataset.domain.WorkspaceAiEvalDataset;
-import com.bytechef.ee.automation.ai.eval.dataset.repository.WorkspaceAiEvalDatasetRepository;
 import com.bytechef.ee.platform.ai.eval.dataset.domain.AiEvalDataset;
+import com.bytechef.ee.platform.ai.eval.dataset.repository.AiEvalDatasetRepository;
 import com.bytechef.ee.platform.ai.eval.dataset.service.AiEvalDatasetService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -21,8 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Workspace-aware operations on {@link AiEvalDataset}. Delegates entity-level CRUD to the platform
- * {@link AiEvalDatasetService}; owns the workspace membership row in {@code workspace_ai_eval_dataset} and
- * workspace-scoped queries that join through it.
+ * {@link AiEvalDatasetService}; owns the dataset's {@code workspace_id} binding and the workspace-scoped queries over
+ * it. Keeping the workspace binding here leaves the platform service workspace-agnostic.
  *
  * @author Ivica Cardic
  * @version ee
@@ -33,15 +32,14 @@ import org.springframework.transaction.annotation.Transactional;
 @SuppressFBWarnings("EI")
 class WorkspaceAiEvalDatasetServiceImpl implements WorkspaceAiEvalDatasetService {
 
+    private final AiEvalDatasetRepository aiEvalDatasetRepository;
     private final AiEvalDatasetService aiEvalDatasetService;
-    private final WorkspaceAiEvalDatasetRepository workspaceAiEvalDatasetRepository;
 
     WorkspaceAiEvalDatasetServiceImpl(
-        AiEvalDatasetService aiEvalDatasetService,
-        WorkspaceAiEvalDatasetRepository workspaceAiEvalDatasetRepository) {
+        AiEvalDatasetRepository aiEvalDatasetRepository, AiEvalDatasetService aiEvalDatasetService) {
 
+        this.aiEvalDatasetRepository = aiEvalDatasetRepository;
         this.aiEvalDatasetService = aiEvalDatasetService;
-        this.workspaceAiEvalDatasetRepository = workspaceAiEvalDatasetRepository;
     }
 
     @Override
@@ -49,18 +47,18 @@ class WorkspaceAiEvalDatasetServiceImpl implements WorkspaceAiEvalDatasetService
         Validate.notNull(dataset, "dataset must not be null");
         Validate.isTrue(dataset.getId() == null, "dataset id must be null for creation");
 
-        AiEvalDataset saved = aiEvalDatasetService.create(dataset);
+        dataset.setWorkspaceId(workspaceId);
 
-        workspaceAiEvalDatasetRepository.save(new WorkspaceAiEvalDataset(saved.getId(), workspaceId));
-
-        return saved;
+        return aiEvalDatasetService.create(dataset);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Long getWorkspaceId(long datasetId) {
-        return workspaceAiEvalDatasetRepository.findByAiEvalDatasetId(datasetId)
-            .map(WorkspaceAiEvalDataset::getWorkspaceId)
+        // findById rather than the service's getDataset: an unknown id must still yield null (the pre-collapse
+        // "no membership row" answer) because callers use this as an authorization probe, not as a fetch.
+        return aiEvalDatasetRepository.findById(datasetId)
+            .map(AiEvalDataset::getWorkspaceId)
             .orElse(null);
     }
 
@@ -69,7 +67,7 @@ class WorkspaceAiEvalDatasetServiceImpl implements WorkspaceAiEvalDatasetService
     public List<AiEvalDataset> findAllByWorkspace(Long workspaceId) {
         Validate.notNull(workspaceId, "workspaceId must not be null");
 
-        return workspaceAiEvalDatasetRepository.findAllDatasetsByWorkspaceId(workspaceId);
+        return aiEvalDatasetRepository.findAllByWorkspaceId(workspaceId);
     }
 
     @Override
@@ -78,6 +76,6 @@ class WorkspaceAiEvalDatasetServiceImpl implements WorkspaceAiEvalDatasetService
         Validate.notNull(workspaceId, "workspaceId must not be null");
         Validate.notBlank(name, "name must not be blank");
 
-        return workspaceAiEvalDatasetRepository.findDatasetByWorkspaceIdAndName(workspaceId, name);
+        return aiEvalDatasetRepository.findByWorkspaceIdAndName(workspaceId, name);
     }
 }

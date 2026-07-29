@@ -9,11 +9,10 @@ package com.bytechef.ee.automation.ai.gateway.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.ee.automation.ai.gateway.domain.WorkspaceAiGatewaySpendSummary;
-import com.bytechef.ee.automation.ai.gateway.repository.WorkspaceAiGatewaySpendSummaryRepository;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewaySpendSummary;
 import com.bytechef.ee.platform.ai.gateway.service.AiGatewaySpendService;
 import java.time.Instant;
@@ -21,14 +20,15 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
  * Unit tests for {@link WorkspaceAiGatewaySpendServiceImpl}. The behaviors worth locking down are (a) that
- * {@code createInWorkspace} delegates to the platform CRUD service AND inserts the workspace membership row in the same
- * call, and (b) that the per-workspace query routes through the workspace JOIN finder rather than the cross-workspace
- * platform finder — a tenant-isolation regression that static typing would not catch because both finders share the
+ * {@code createInWorkspace} stamps the owning workspace onto the summary before delegating to the platform CRUD
+ * service, and (b) that the per-workspace query routes through the workspace-scoped finder rather than the
+ * cross-workspace one — a tenant-isolation regression that static typing would not catch because both finders share the
  * same return type.
  *
  * @version ee
@@ -39,19 +39,15 @@ class WorkspaceAiGatewaySpendServiceTest {
     @Mock
     private AiGatewaySpendService aiGatewaySpendService;
 
-    @Mock
-    private WorkspaceAiGatewaySpendSummaryRepository workspaceAiGatewaySpendSummaryRepository;
-
     private WorkspaceAiGatewaySpendService workspaceAiGatewaySpendService;
 
     @BeforeEach
     void setUp() {
-        workspaceAiGatewaySpendService = new WorkspaceAiGatewaySpendServiceImpl(
-            aiGatewaySpendService, workspaceAiGatewaySpendSummaryRepository);
+        workspaceAiGatewaySpendService = new WorkspaceAiGatewaySpendServiceImpl(aiGatewaySpendService);
     }
 
     @Test
-    void testCreateInWorkspaceDelegatesAndInsertsMembership() {
+    void testCreateInWorkspaceDelegatesAndStampsWorkspaceId() {
         Instant now = Instant.now();
         AiGatewaySpendSummary summary = new AiGatewaySpendSummary(now.minusSeconds(3600), now);
         AiGatewaySpendSummary persisted = new AiGatewaySpendSummary(now.minusSeconds(3600), now);
@@ -64,8 +60,18 @@ class WorkspaceAiGatewaySpendServiceTest {
 
         assertThat(result).isSameAs(persisted);
 
-        verify(aiGatewaySpendService).create(summary);
-        verify(workspaceAiGatewaySpendSummaryRepository).save(any(WorkspaceAiGatewaySpendSummary.class));
+        ArgumentCaptor<AiGatewaySpendSummary> summaryArgumentCaptor =
+            ArgumentCaptor.forClass(AiGatewaySpendSummary.class);
+
+        verify(aiGatewaySpendService).create(summaryArgumentCaptor.capture());
+
+        AiGatewaySpendSummary createdSummary = summaryArgumentCaptor.getValue();
+
+        assertThat(createdSummary).isSameAs(summary);
+        assertThat(createdSummary.getWorkspaceId())
+            .as("the owning workspace must be stamped on the row before it is inserted — it is the only record of " +
+                "the association now that the membership table is gone")
+            .isEqualTo(7L);
     }
 
     @Test
@@ -76,16 +82,15 @@ class WorkspaceAiGatewaySpendServiceTest {
 
         AiGatewaySpendSummary summary = new AiGatewaySpendSummary(start, end);
 
-        when(workspaceAiGatewaySpendSummaryRepository.findSpendSummariesByWorkspaceIdAndPeriodStartBetween(
-            workspaceId, start, end))
-                .thenReturn(List.of(summary));
+        when(aiGatewaySpendService.getSpendSummariesByWorkspaceId(workspaceId, start, end))
+            .thenReturn(List.of(summary));
 
         List<AiGatewaySpendSummary> summaries =
             workspaceAiGatewaySpendService.getSpendSummariesByWorkspaceId(workspaceId, start, end);
 
         assertThat(summaries).containsExactly(summary);
 
-        verify(workspaceAiGatewaySpendSummaryRepository).findSpendSummariesByWorkspaceIdAndPeriodStartBetween(
-            workspaceId, start, end);
+        verify(aiGatewaySpendService).getSpendSummariesByWorkspaceId(workspaceId, start, end);
+        verify(aiGatewaySpendService, never()).getSpendSummaries(start, end);
     }
 }

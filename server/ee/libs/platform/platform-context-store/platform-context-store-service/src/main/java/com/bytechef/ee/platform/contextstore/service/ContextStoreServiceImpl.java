@@ -67,4 +67,10 @@ public class ContextStoreServiceImpl implements ContextStoreService {
 
         return contextStoreRepository.findAllByIdIn(ids);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ContextStore> getAllByWorkspaceId(long workspaceId) {
+        return contextStoreRepository.findAllByWorkspaceId(workspaceId);
+    }
 }

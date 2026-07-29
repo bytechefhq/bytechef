@@ -14,8 +14,7 @@ import java.util.Optional;
 /**
  * Workspace-scoped operations on {@link AiEvalDataset}. Mirrors {@code WorkspaceAiEvalRuleService} in
  * automation-ai-eval — the platform service ({@code AiEvalDatasetService}) handles workspace-agnostic CRUD; this
- * service owns the workspace membership row and workspace-scoped queries that join through
- * {@code workspace_ai_eval_dataset}.
+ * service owns the dataset's {@code workspace_id} binding and the workspace-scoped queries over it.
  *
  * @author Ivica Cardic
  * @version ee

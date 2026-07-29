@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- Workspace scoping for notifications: NULL = global (deployment-wide, the pre-scoping behavior that every
+         existing row keeps), a workspace id scopes the notification to that workspace. Nullable and with no default,
+         so the released notification table gains the column without changing the meaning of any existing row.
+
+         The column lives in the CE changelog even though only the EE platform-notification-workspace module reads and
+         writes it: the Notification entity is CE, so a CE-only deployment must still have the column or Spring Data
+         JDBC would map a field with no backing column. -->
+    <changeSet id="20260720000003-1" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="notification" columnName="workspace_id"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="notification">
+            <column name="workspace_id" type="BIGINT"/>
+        </addColumn>
+
+        <createIndex tableName="notification" indexName="idx_notification_workspace">
+            <column name="workspace_id"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

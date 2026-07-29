@@ -14,10 +14,10 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
 /**
- * Spring Data JDBC repository for {@link ContextStoreSource}. Workspace scoping has been moved out of the source row
- * itself — workspace membership is enforced by the {@code workspace_context_store_source} relation table managed by the
- * automation-side {@code WorkspaceContextStoreSourceRepository}. This repository owns only the source-level lifecycle
- * queries (e.g. all enabled sources across workspaces, used by the background sync scheduler).
+ * Spring Data JDBC repository for {@link ContextStoreSource}. Workspace membership is the nullable
+ * {@code context_store_source.workspace_id} column; a source with a null workspace matches no workspace-scoped query.
+ * The repository also owns the workspace-agnostic lifecycle queries (e.g. all enabled sources across workspaces, used
+ * by the background sync scheduler).
  *
  * @author Ivica Cardic
  * @version ee
@@ -33,4 +33,8 @@ public interface ContextStoreSourceRepository
     List<ContextStoreSource> findAllByIdInAndEnabled(List<Long> ids, boolean enabled);
 
     List<ContextStoreSource> findAllByContextStoreId(Long contextStoreId);
+
+    List<ContextStoreSource> findAllByWorkspaceId(long workspaceId);
+
+    List<ContextStoreSource> findAllByWorkspaceIdAndEnabled(long workspaceId, boolean enabled);
 }

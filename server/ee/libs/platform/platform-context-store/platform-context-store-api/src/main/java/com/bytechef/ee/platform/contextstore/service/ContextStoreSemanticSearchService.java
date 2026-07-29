@@ -26,8 +26,8 @@ import java.util.List;
  *
  * <p>
  * Workspace authorization is the caller's responsibility — the platform-side service treats the {@code sourceId} as the
- * authoritative scope and assumes the caller has already verified ownership through the
- * {@code workspace_context_store_source} relation.
+ * authoritative scope and assumes the caller has already verified ownership through
+ * {@code context_store_source.workspace_id}.
  * </p>
  *
  * @author Ivica Cardic

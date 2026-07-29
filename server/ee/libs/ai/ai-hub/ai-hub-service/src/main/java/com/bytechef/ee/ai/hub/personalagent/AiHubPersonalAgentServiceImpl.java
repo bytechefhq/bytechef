@@ -14,7 +14,6 @@ import com.bytechef.ee.ai.hub.exception.NotFoundException;
 import com.bytechef.ee.ai.hub.personalagent.repository.AiHubPersonalAgentRepository;
 import com.bytechef.ee.ai.hub.personalagent.repository.AiHubPersonalAgentResourceRepository;
 import com.bytechef.ee.ai.hub.personalagent.repository.AiHubPersonalAgentToolRepository;
-import com.bytechef.ee.ai.hub.personalagent.repository.WorkspaceAiHubPersonalAgentRepository;
 import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Clock;
@@ -22,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -36,10 +36,9 @@ import org.springframework.transaction.annotation.Transactional;
  * Spring Data JDBC backed {@link AiHubPersonalAgentService}.
  *
  * <p>
- * <b>Workspace association via the relation table.</b> The {@code ai_hub_personal_agent} entity is workspace-agnostic;
- * {@code workspace_ai_hub_personal_agent} carries the (workspace, agent) link. Every {@code create}, {@code findOwned},
- * and listing path goes through that table — the entity-side queries only see the (user, environment) dimension.
- * Mirrors {@code WorkspaceMcpServer} / {@code WorkspaceConnection} / {@code WorkspaceAssetFile}.
+ * <b>Workspace association via a column.</b> The {@code ai_hub_personal_agent} row carries its own nullable
+ * {@code workspace_id}. Every {@code create}, {@code findOwned}, and listing path filters on it alongside the (user,
+ * environment) dimension.
  * </p>
  *
  * <p>
@@ -68,7 +67,6 @@ public class AiHubPersonalAgentServiceImpl implements AiHubPersonalAgentService 
     private final AiHubPersonalAgentRepository aiHubPersonalAgentRepository;
     private final AiHubPersonalAgentToolRepository aiHubPersonalAgentToolRepository;
     private final AiHubPersonalAgentResourceRepository aiHubPersonalAgentResourceRepository;
-    private final WorkspaceAiHubPersonalAgentRepository workspaceAiHubPersonalAgentRepository;
     private final ObjectProvider<PersonalAgentSaveValidator> saveValidatorProvider;
     private final Clock clock;
 
@@ -77,13 +75,11 @@ public class AiHubPersonalAgentServiceImpl implements AiHubPersonalAgentService 
         AiHubPersonalAgentRepository aiHubPersonalAgentRepository,
         AiHubPersonalAgentToolRepository aiHubPersonalAgentToolRepository,
         AiHubPersonalAgentResourceRepository aiHubPersonalAgentResourceRepository,
-        WorkspaceAiHubPersonalAgentRepository workspaceAiHubPersonalAgentRepository,
         ObjectProvider<PersonalAgentSaveValidator> saveValidatorProvider) {
 
         this.aiHubPersonalAgentRepository = aiHubPersonalAgentRepository;
         this.aiHubPersonalAgentToolRepository = aiHubPersonalAgentToolRepository;
         this.aiHubPersonalAgentResourceRepository = aiHubPersonalAgentResourceRepository;
-        this.workspaceAiHubPersonalAgentRepository = workspaceAiHubPersonalAgentRepository;
         this.saveValidatorProvider = saveValidatorProvider;
         this.clock = Clock.systemUTC();
     }
@@ -99,9 +95,7 @@ public class AiHubPersonalAgentServiceImpl implements AiHubPersonalAgentService 
     public Optional<AiHubPersonalAgent> findOwned(long agentId, long workspaceId, long userId) {
         return aiHubPersonalAgentRepository.findById(agentId)
             .filter(agent -> agent.getUserId() == userId)
-            .filter(agent -> workspaceAiHubPersonalAgentRepository
-                .findByWorkspaceIdAndAiHubPersonalAgentId(workspaceId, agent.getId())
-                .isPresent());
+            .filter(agent -> Objects.equals(agent.getWorkspaceId(), workspaceId));
     }
 
     @Override
@@ -165,21 +159,9 @@ public class AiHubPersonalAgentServiceImpl implements AiHubPersonalAgentService 
         agent.setLlmModel(llmModel);
         agent.setCreatedAt(now);
         agent.setUpdatedAt(now);
+        agent.setWorkspaceId(workspaceId);
 
-        AiHubPersonalAgent saved = aiHubPersonalAgentRepository.save(agent);
-
-        try {
-            workspaceAiHubPersonalAgentRepository.save(
-                new WorkspaceAiHubPersonalAgent(workspaceId, saved.getId()));
-        } catch (DataIntegrityViolationException exception) {
-            // The unique constraint on (workspace_id, ai_hub_personal_agent_id) is the only DB-level
-            // duplicate gate now. A concurrent create CAN race here (two requests slip past the service-layer
-            // duplicate check and both insert the agent row, but only one wins the membership). Surface as
-            // ConflictException for uniform error handling.
-            throw new ConflictException("Personal agent with name '" + slug + "' already exists", exception);
-        }
-
-        return saved;
+        return aiHubPersonalAgentRepository.save(agent);
     }
 
     @AuditAiHub(
@@ -252,7 +234,7 @@ public class AiHubPersonalAgentServiceImpl implements AiHubPersonalAgentService 
         // but their ai_hub_personal_agent_id FK becomes a dangling reference. The runtime treats a dangling
         // id as "agent deleted, fall back to plain LLM system prompt" rather than refusing the task, so the user
         // can still read past messages even after deletion. A future cleanup job can archive the tasks explicitly.
-        // The workspace_ai_hub_personal_agent membership row clears via ON DELETE CASCADE.
+        // The workspace association goes with the row itself — it is a column, not a separate membership row.
         aiHubPersonalAgentRepository.delete(agent);
 
         if (log.isDebugEnabled()) {
@@ -525,18 +507,9 @@ public class AiHubPersonalAgentServiceImpl implements AiHubPersonalAgentService 
         clone.setEnvironment(Environment.values()[targetEnvironment]);
         clone.setCreatedAt(now);
         clone.setUpdatedAt(now);
+        clone.setWorkspaceId(workspaceId);
 
         AiHubPersonalAgent saved = aiHubPersonalAgentRepository.save(clone);
-
-        try {
-            workspaceAiHubPersonalAgentRepository.save(
-                new WorkspaceAiHubPersonalAgent(workspaceId, saved.getId()));
-        } catch (DataIntegrityViolationException exception) {
-            // TOCTOU race — another concurrent clone inserted the same slug between the pre-flight check and save.
-            // Surface as the same ConflictException for uniform error handling on the caller side.
-            throw new ConflictException(
-                "Personal agent with name '" + slug + "' already exists in target environment", exception);
-        }
 
         // Deep-clone the source agent's tool template entries. Tools are tiny (a triple per row) so deep-cloning
         // is cheap; cloning without them defeats the point of "promote my agent" (the LLM-visible tool surface

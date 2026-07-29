@@ -29,15 +29,14 @@ import org.junit.jupiter.api.Test;
  *
  * <p>
  * The repository interface documents a filter shape and an ordering that consumers depend on, but each backend
- * implements them differently — the JDBC binding JOINs through {@code workspace_ai_auto_memory} while file backends
- * read and sort stored documents. Running one suite against every binding is what keeps them from drifting apart; a
- * backend that cannot satisfy a case here is a real divergence, not a reason to weaken the case.
+ * implements them differently — the JDBC binding filters on a column while file backends read and sort stored
+ * documents. Running one suite against every binding is what keeps them from drifting apart; a backend that cannot
+ * satisfy a case here is a real divergence, not a reason to weaken the case.
  * </p>
  *
  * <p>
- * Subclasses supply the binding under test and a way to persist a memory into a workspace. That second hook exists
- * because establishing workspace membership is genuinely backend-specific: relational backends insert a membership row,
- * document backends carry the workspace on the memory itself.
+ * Subclasses supply only the binding under test. Placing a memory in a workspace is no longer backend-specific — it is
+ * a field on the memory for every backend — so this class does it.
  * </p>
  *
  * @author Ivica Cardic
@@ -59,9 +58,13 @@ public abstract class AiAutoMemoryRepositoryContractTests {
     protected abstract AiAutoMemoryRepository getAiAutoMemoryRepository();
 
     /**
-     * Persists the memory and makes it a member of the given workspace, however this backend represents that.
+     * Persists the memory into the given workspace.
      */
-    protected abstract AiAutoMemory saveInWorkspace(AiAutoMemory aiAutoMemory, long workspaceId);
+    protected AiAutoMemory saveInWorkspace(AiAutoMemory aiAutoMemory, long workspaceId) {
+        aiAutoMemory.setWorkspaceId(workspaceId);
+
+        return getAiAutoMemoryRepository().save(aiAutoMemory);
+    }
 
     @Test
     void testFindByWorkspaceReturnsOnlyThatWorkspacesMemories() {

@@ -30,13 +30,13 @@ import org.springframework.stereotype.Component;
  * call, otherwise caching is silently bypassed and a new HTTP client is created per request.
  *
  * <p>
- * <b>Cross-tenant safety:</b> {@link AiGatewayProvider} is a <i>global</i> row (not workspace-scoped); each provider
- * carries a single encrypted API key shared by all workspaces linked to it via {@code WorkspaceAiGatewayProvider}.
- * Caching by {@code provider.id} alone is therefore correct — there is no per-workspace API-key variance to preserve.
+ * <b>Cross-tenant safety:</b> a {@link AiGatewayProvider} row belongs to at most one workspace (its nullable
+ * {@code workspace_id} column) and carries a single encrypted API key. Caching by {@code provider.id} alone is
+ * therefore correct — one provider id resolves to exactly one key, with no per-workspace variance to preserve.
  * Workspace-isolation is enforced upstream in {@code AiGatewayFacade.validateWorkspaceAccess}: a request tag-spoofing
- * another workspace's id is rejected before it ever reaches this factory. If provider-ownership ever becomes
- * per-workspace, the cache key must be widened to {@code workspaceId + ":" + provider.id} in the same commit that makes
- * that change.
+ * another workspace's id is rejected before it ever reaches this factory. If a provider ever becomes shareable across
+ * workspaces again, the cache key must be widened to {@code workspaceId + ":" + provider.id} in the same commit that
+ * makes that change.
  * </p>
  *
  * @version ee

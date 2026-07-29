@@ -80,7 +80,7 @@ class PersistedEnumOrdinalContractTest {
     void testAiGatewayProviderTypeOrdinalContract() {
         // The enum's own Javadoc carries an explicit APPEND-ONLY comment and exposes fromOrdinal(int) — both
         // strong indicators of ordinal-based persistence. An IDE alphabetize-refactor on this enum would silently
-        // flip the provider attribution of every historical workspace_ai_gateway_provider row.
+        // flip the provider attribution of every historical ai_gateway_provider row.
         assertThat(AiGatewayProviderType.values()).containsExactly(
             AiGatewayProviderType.ANTHROPIC,
             AiGatewayProviderType.AZURE_OPENAI,

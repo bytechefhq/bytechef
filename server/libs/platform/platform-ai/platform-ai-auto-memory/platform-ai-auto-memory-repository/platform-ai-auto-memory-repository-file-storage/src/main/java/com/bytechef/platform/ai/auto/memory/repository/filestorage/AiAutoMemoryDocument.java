@@ -27,9 +27,8 @@ import org.jspecify.annotations.Nullable;
  * The persisted form of an {@link AiAutoMemory} on a file-storage backend: one JSON object per memory.
  *
  * <p>
- * Workspace membership is carried here rather than in a second collection. The relational backend needs a
- * {@code workspace_ai_auto_memory} join table, but a document store does not, and folding it in keeps every mutation a
- * single-object write — which is what makes the documented last-write-wins semantics coherent.
+ * The owning workspace is a field on this document, exactly as it is a column on the relational row. It is nullable for
+ * the same reason: a memory belongs to at most one workspace, and null means none applies.
  * </p>
  *
  * <p>
@@ -40,11 +39,11 @@ import org.jspecify.annotations.Nullable;
  * @author Ivica Cardic
  */
 public record AiAutoMemoryDocument(
-    long id, long workspaceId, long principalId, int principalType, @Nullable String name, @Nullable String title,
-    @Nullable String description, int memoryType, int environment, @Nullable String content,
+    long id, @Nullable Long workspaceId, long principalId, int principalType, @Nullable String name,
+    @Nullable String title, @Nullable String description, int memoryType, int environment, @Nullable String content,
     @Nullable String createdAt, @Nullable String updatedAt) {
 
-    public static AiAutoMemoryDocument fromDomain(AiAutoMemory aiAutoMemory, long workspaceId) {
+    public static AiAutoMemoryDocument fromDomain(AiAutoMemory aiAutoMemory) {
         Long id = aiAutoMemory.getId();
 
         AiAutoMemoryType memoryType = aiAutoMemory.getMemoryType();
@@ -54,7 +53,7 @@ public record AiAutoMemoryDocument(
         LocalDateTime updatedAt = aiAutoMemory.getUpdatedAt();
 
         return new AiAutoMemoryDocument(
-            id == null ? 0 : id, workspaceId, aiAutoMemory.getPrincipalId(),
+            id == null ? 0 : id, aiAutoMemory.getWorkspaceId(), aiAutoMemory.getPrincipalId(),
             principalType == null ? 0 : principalType.ordinal(), aiAutoMemory.getName(), aiAutoMemory.getTitle(),
             aiAutoMemory.getDescription(), memoryType == null ? 0 : memoryType.ordinal(),
             (int) aiAutoMemory.getEnvironmentId(), aiAutoMemory.getContent(),
@@ -66,6 +65,7 @@ public record AiAutoMemoryDocument(
             AiAutoMemoryPrincipalType.values()[principalType], principalId);
 
         aiAutoMemory.setId(id);
+        aiAutoMemory.setWorkspaceId(workspaceId);
         aiAutoMemory.setName(name);
         aiAutoMemory.setTitle(title);
         aiAutoMemory.setDescription(description);

@@ -24,10 +24,11 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 /**
- * Domain class representing a Context Store source — a configured binding of a workspace, a source component, an
- * {@code ItemReader} cluster element on that component, an optional connection, a sync cadence, a lifecycle status, and
- * the record-shape metadata (id field, indexed fields, semantic-index fields, stored fields) that drives both record
- * persistence and retrieval. The configured source is periodically synced into the Context Store replica.
+ * Domain class representing a Context Store source — a configured binding of a workspace (the nullable
+ * {@code workspace_id} column), a source component, an {@code ItemReader} cluster element on that component, an
+ * optional connection, a sync cadence, a lifecycle status, and the record-shape metadata (id field, indexed fields,
+ * semantic-index fields, stored fields) that drives both record persistence and retrieval. The configured source is
+ * periodically synced into the Context Store replica.
  *
  * <p>
  * Source absorbs what used to be {@code ContextStoreEntity} — the multi-entity-per-source design was over-promised (the
@@ -164,6 +165,13 @@ public class ContextStoreSource {
 
     @Version
     private int version;
+
+    /**
+     * Workspace the source belongs to. Nullable: a source belongs to at most one workspace, and null means none
+     * applies. Workspace-scoped queries never match a null, so a workspace-less source is invisible to them.
+     */
+    @Column("workspace_id")
+    private @Nullable Long workspaceId;
 
     public ContextStoreSource() {
     }
@@ -382,6 +390,14 @@ public class ContextStoreSource {
 
     public int getVersion() {
         return version;
+    }
+
+    public @Nullable Long getWorkspaceId() {
+        return workspaceId;
+    }
+
+    public void setWorkspaceId(@Nullable Long workspaceId) {
+        this.workspaceId = workspaceId;
     }
 
     @Override

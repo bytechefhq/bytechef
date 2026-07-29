@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
 import org.apache.commons.lang3.Validate;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -22,8 +23,10 @@ import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 
 /**
- * Workspace association lives on {@link WorkspaceAiObservabilityTrace} — the entity is workspace-agnostic. Callers go
- * through {@code AiObservabilityTraceService.getWorkspaceId(id)} (Variant A).
+ * A trace belongs to at most one workspace: the association is the nullable {@code workspace_id} column, which is null
+ * where no workspace applies. It is also the leading column of the OTLP dedup index
+ * {@code uq_ai_obs_trace_ext_trace_id}, so external trace ids are unique per workspace rather than globally. Callers
+ * that only hold an id go through {@code WorkspaceAiObservabilityTraceService.getWorkspaceId(id)}.
  *
  * @version ee
  */
@@ -81,6 +84,12 @@ public class AiObservabilityTrace {
 
     @Version
     private int version;
+
+    /**
+     * The owning workspace, or {@code null} when the trace belongs to no workspace. Boxed on purpose — a primitive
+     * would coerce the "no workspace" case into workspace {@code 0}, which is a real workspace id.
+     */
+    private @Nullable Long workspaceId;
 
     private AiObservabilityTrace() {
     }
@@ -194,6 +203,10 @@ public class AiObservabilityTrace {
         return version;
     }
 
+    public @Nullable Long getWorkspaceId() {
+        return workspaceId;
+    }
+
     public void setExternalTraceId(String externalTraceId) {
         this.externalTraceId = externalTraceId;
     }
@@ -285,10 +298,15 @@ public class AiObservabilityTrace {
         this.userId = userId;
     }
 
+    public void setWorkspaceId(@Nullable Long workspaceId) {
+        this.workspaceId = workspaceId;
+    }
+
     @Override
     public String toString() {
         return "AiObservabilityTrace{" +
             "id=" + id +
+            ", workspaceId=" + workspaceId +
             ", name='" + name + '\'' +
             ", source=" + getSource() +
             ", status=" + getStatus() +

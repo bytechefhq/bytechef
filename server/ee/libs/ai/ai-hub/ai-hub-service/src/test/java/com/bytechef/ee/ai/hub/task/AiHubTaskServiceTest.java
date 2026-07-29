@@ -60,9 +60,6 @@ class AiHubTaskServiceTest {
     private AiHubTaskRepository taskRepository;
 
     @Mock
-    private com.bytechef.ee.ai.hub.task.repository.WorkspaceAiHubTaskRepository workspaceTaskRepository;
-
-    @Mock
     private ObjectProvider<com.bytechef.ee.ai.hub.memory.AiHubSessionMemory> aiHubSessionMemoryProvider;
 
     @Mock
@@ -97,8 +94,8 @@ class AiHubTaskServiceTest {
         // The optional ObjectProvider dependencies are left null (copyAgentToolTemplate and the tool-search /
         // artifact paths guard on null) — the same shape the previous @InjectMocks wiring produced.
         taskService = new AiHubTaskServiceImpl(
-            taskRepository, workspaceTaskRepository, jobFacade, jobRegistry, inFlightRunRegistry, null, null, null,
-            null, aiHubSessionMemoryProvider, null);
+            taskRepository, jobFacade, jobRegistry, inFlightRunRegistry, null, null, null, null,
+            aiHubSessionMemoryProvider, null);
     }
 
     private static org.springframework.ai.session.SessionEvent sessionEvent(
@@ -121,19 +118,6 @@ class AiHubTaskServiceTest {
         return event;
     }
 
-    /**
-     * Stubs the workspace-membership lookup for {@code taskId} with the given owning workspace. Tests on the happy path
-     * call this with {@code WORKSPACE_ID}; cross-workspace failure paths use this with {@code OTHER_WORKSPACE_ID} (or
-     * skip the stub, which Mockito returns as empty by default — same effect as "this workspace doesn't claim the
-     * task").
-     */
-    private void stubWorkspaceMembership(long workspaceId, long taskId) {
-        // lenient() so cross-workspace failure-path tests can call this without a strict-stubbing complaint
-        // when the service ends up looking up (OTHER_WORKSPACE_ID, taskId).
-        lenient().when(workspaceTaskRepository.findByWorkspaceIdAndAiHubTaskId(workspaceId, taskId))
-            .thenReturn(Optional.of(new WorkspaceAiHubTask(workspaceId, taskId)));
-    }
-
     @Test
     void testCreateInsertsNewTask() {
         when(taskRepository.findByThreadId(THREAD_ID)).thenReturn(Optional.empty());
@@ -152,7 +136,7 @@ class AiHubTaskServiceTest {
 
         assertThat(result.getId()).isEqualTo(42L);
         assertThat(result.getUserId()).isEqualTo(USER_ID);
-        verify(workspaceTaskRepository).save(any(WorkspaceAiHubTask.class));
+        assertThat(result.getWorkspaceId()).isEqualTo(WORKSPACE_ID);
         assertThat(result.getThreadId()).isEqualTo(THREAD_ID);
         assertThat(result.getStatus()).isEqualTo(AiHubTaskStatus.ACTIVE);
         assertThat(result.getMessageCount()).isZero();
@@ -166,7 +150,6 @@ class AiHubTaskServiceTest {
             buildTask(7L, USER_ID, THREAD_ID, AiHubTaskStatus.ACTIVE);
 
         when(taskRepository.findByThreadId(THREAD_ID)).thenReturn(Optional.of(existing));
-        stubWorkspaceMembership(WORKSPACE_ID, 7L);
 
         AiHubTask result = taskService.create(WORKSPACE_ID, USER_ID, 0, THREAD_ID);
 
@@ -203,7 +186,6 @@ class AiHubTaskServiceTest {
             buildTask(1L, USER_ID, THREAD_ID, AiHubTaskStatus.ACTIVE);
 
         when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
-        stubWorkspaceMembership(WORKSPACE_ID, 1L);
 
         assertThatThrownBy(() -> taskService.loadMessages(1L, WORKSPACE_ID, OTHER_USER_ID))
             .isInstanceOf(NotFoundException.class)
@@ -217,7 +199,6 @@ class AiHubTaskServiceTest {
             buildTask(1L, USER_ID, THREAD_ID, AiHubTaskStatus.ACTIVE);
 
         when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
-        stubWorkspaceMembership(WORKSPACE_ID, 1L);
 
         assertThatThrownBy(() -> taskService.loadMessages(1L, OTHER_WORKSPACE_ID, USER_ID))
             .isInstanceOf(NotFoundException.class)
@@ -231,7 +212,6 @@ class AiHubTaskServiceTest {
             buildTask(1L, USER_ID, THREAD_ID, AiHubTaskStatus.ACTIVE);
 
         when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
-        stubWorkspaceMembership(WORKSPACE_ID, 1L);
 
         Instant now = Instant.parse("2026-04-23T10:00:00Z");
 
@@ -258,7 +238,6 @@ class AiHubTaskServiceTest {
         task.setMessageCount(3);
 
         when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
-        stubWorkspaceMembership(WORKSPACE_ID, 1L);
         when(taskRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
         AiHubTaskPatch patch = new AiHubTaskPatch("New title", null, null, null);
@@ -278,7 +257,6 @@ class AiHubTaskServiceTest {
             buildTask(1L, USER_ID, THREAD_ID, AiHubTaskStatus.ACTIVE);
 
         when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
-        stubWorkspaceMembership(WORKSPACE_ID, 1L);
 
         assertThatThrownBy(
             () -> taskService.patch(
@@ -293,7 +271,6 @@ class AiHubTaskServiceTest {
             buildTask(1L, USER_ID, THREAD_ID, AiHubTaskStatus.ACTIVE);
 
         when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
-        stubWorkspaceMembership(WORKSPACE_ID, 1L);
 
         assertThatThrownBy(
             () -> taskService.patch(
@@ -308,7 +285,6 @@ class AiHubTaskServiceTest {
             buildTask(1L, USER_ID, THREAD_ID, AiHubTaskStatus.ACTIVE);
 
         when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
-        stubWorkspaceMembership(WORKSPACE_ID, 1L);
 
         taskService.delete(1L, WORKSPACE_ID, USER_ID);
 
@@ -323,7 +299,6 @@ class AiHubTaskServiceTest {
             buildTask(1L, USER_ID, THREAD_ID, AiHubTaskStatus.ACTIVE);
 
         when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
-        stubWorkspaceMembership(WORKSPACE_ID, 1L);
 
         assertThatThrownBy(() -> taskService.delete(1L, WORKSPACE_ID, OTHER_USER_ID))
             .isInstanceOf(NotFoundException.class)
@@ -339,7 +314,6 @@ class AiHubTaskServiceTest {
             buildTask(1L, USER_ID, THREAD_ID, AiHubTaskStatus.ACTIVE);
 
         when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
-        stubWorkspaceMembership(WORKSPACE_ID, 1L);
 
         assertThatThrownBy(() -> taskService.delete(1L, OTHER_WORKSPACE_ID, USER_ID))
             .isInstanceOf(NotFoundException.class)
@@ -353,6 +327,10 @@ class AiHubTaskServiceTest {
     void testCreateThrowsConflictWhenThreadIdBoundToDifferentWorkspace() {
         AiHubTask existing =
             buildTask(7L, USER_ID, THREAD_ID, AiHubTaskStatus.ACTIVE);
+
+        // The threadId is already claimed by a row living in another workspace, so the create must collide rather
+        // than return the existing row idempotently.
+        existing.setWorkspaceId(OTHER_WORKSPACE_ID);
 
         when(taskRepository.findByThreadId(THREAD_ID)).thenReturn(Optional.of(existing));
 
@@ -445,6 +423,9 @@ class AiHubTaskServiceTest {
         task.setMessageCount(0);
         task.setCreatedAt(LocalDateTime.now());
         task.setUpdatedAt(LocalDateTime.now());
+        // Fixtures live in WORKSPACE_ID; cross-workspace tests pass OTHER_WORKSPACE_ID as the REQUESTER, which is
+        // what the ownership check compares the row's column against.
+        task.setWorkspaceId(WORKSPACE_ID);
 
         return task;
     }
@@ -454,7 +435,6 @@ class AiHubTaskServiceTest {
         AiHubTask task = buildTask(1L, USER_ID, THREAD_ID, AiHubTaskStatus.ACTIVE);
 
         when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
-        stubWorkspaceMembership(WORKSPACE_ID, 1L);
 
         when(inFlightRunRegistry.cancel(THREAD_ID, null)).thenReturn(true);
 
@@ -471,7 +451,6 @@ class AiHubTaskServiceTest {
         AiHubTask task = buildTask(1L, USER_ID, THREAD_ID, AiHubTaskStatus.ACTIVE);
 
         when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
-        stubWorkspaceMembership(WORKSPACE_ID, 1L);
 
         when(inFlightRunRegistry.cancel(THREAD_ID, null)).thenReturn(false);
 
@@ -486,7 +465,6 @@ class AiHubTaskServiceTest {
         AiHubTask task = buildTask(1L, USER_ID, THREAD_ID, AiHubTaskStatus.ACTIVE);
 
         when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
-        stubWorkspaceMembership(WORKSPACE_ID, 1L);
 
         long otherUserId = USER_ID + 1;
 
@@ -505,7 +483,6 @@ class AiHubTaskServiceTest {
             buildTask(1L, USER_ID, THREAD_ID, AiHubTaskStatus.ACTIVE);
 
         when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
-        stubWorkspaceMembership(WORKSPACE_ID, 1L);
 
         List<org.springframework.ai.session.SessionEvent> events = List.of(
             sessionEvent(org.springframework.ai.chat.messages.MessageType.USER, "one", Instant.ofEpochMilli(100)),
@@ -541,7 +518,6 @@ class AiHubTaskServiceTest {
             buildTask(1L, USER_ID, THREAD_ID, AiHubTaskStatus.ACTIVE);
 
         when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
-        stubWorkspaceMembership(WORKSPACE_ID, 1L);
 
         List<org.springframework.ai.session.SessionEvent> events = List.of(
             sessionEvent(org.springframework.ai.chat.messages.MessageType.USER, "one", Instant.ofEpochMilli(100)),
@@ -568,7 +544,6 @@ class AiHubTaskServiceTest {
             buildTask(1L, USER_ID, THREAD_ID, AiHubTaskStatus.ACTIVE);
 
         when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
-        stubWorkspaceMembership(WORKSPACE_ID, 1L);
 
         assertThatThrownBy(() -> taskService.truncateMessagesFrom(1L, WORKSPACE_ID, USER_ID, -1))
             .isInstanceOf(IllegalArgumentException.class)
@@ -584,7 +559,6 @@ class AiHubTaskServiceTest {
             buildTask(1L, USER_ID, THREAD_ID, AiHubTaskStatus.ACTIVE);
 
         when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
-        stubWorkspaceMembership(WORKSPACE_ID, 1L);
 
         assertThatThrownBy(() -> taskService.truncateMessagesFrom(1L, WORKSPACE_ID, OTHER_USER_ID, 0))
             .isInstanceOf(NotFoundException.class);
@@ -743,7 +717,7 @@ class AiHubTaskServiceTest {
             .thenReturn(artifactService);
 
         return new AiHubTaskServiceImpl(
-            taskRepository, workspaceTaskRepository, jobFacade, jobRegistry, inFlightRunRegistry,
+            taskRepository, jobFacade, jobRegistry, inFlightRunRegistry,
             personalAgentServiceProvider, taskToolFacadeProvider, toolSearchCatalogFeederProvider,
             taskArtifactServiceProvider, aiHubSessionMemoryProvider, mock(AiHubAuditPublisher.class));
     }

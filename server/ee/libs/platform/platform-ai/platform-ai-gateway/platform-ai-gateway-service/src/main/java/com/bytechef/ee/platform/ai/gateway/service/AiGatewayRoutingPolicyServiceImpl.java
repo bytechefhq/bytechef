@@ -14,6 +14,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collection;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
+import org.jspecify.annotations.Nullable;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -81,6 +82,12 @@ class AiGatewayRoutingPolicyServiceImpl implements AiGatewayRoutingPolicyService
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<AiGatewayRoutingPolicy> getRoutingPoliciesByWorkspaceId(long workspaceId) {
+        return aiGatewayRoutingPolicyRepository.findAllByWorkspaceId(workspaceId);
+    }
+
+    @Override
     public AiGatewayRoutingPolicy update(AiGatewayRoutingPolicy policy) {
         Validate.notNull(policy, "'policy' must not be null");
 
@@ -93,5 +100,14 @@ class AiGatewayRoutingPolicyServiceImpl implements AiGatewayRoutingPolicyService
         existingPolicy.setStrategy(policy.getStrategy());
 
         return aiGatewayRoutingPolicyRepository.save(existingPolicy);
+    }
+
+    @Override
+    public void updateWorkspaceId(long id, @Nullable Long workspaceId) {
+        AiGatewayRoutingPolicy policy = getRoutingPolicy(id);
+
+        policy.setWorkspaceId(workspaceId);
+
+        aiGatewayRoutingPolicyRepository.save(policy);
     }
 }

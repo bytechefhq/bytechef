@@ -25,8 +25,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Implements {@link WorkspaceContextStoreFacade}. Wraps {@link ContextStoreService} (platform-side) with the workspace
- * ↔ store relation, and enforces app-layer uniqueness of {@code (workspace, environment, name)}.
+ * Implements {@link WorkspaceContextStoreFacade}. Wraps {@link ContextStoreService} (platform-side) with workspace
+ * scoping, and enforces app-layer uniqueness of {@code (workspace, environment, name)}.
  *
  * @author Ivica Cardic
  * @version ee
@@ -64,8 +64,8 @@ public class WorkspaceContextStoreFacadeImpl implements WorkspaceContextStoreFac
 
         contextStore.setEnvironment(environment);
 
-        // App-layer uniqueness check on (workspace, environment, name): the relation row holds workspace_id but the
-        // name lives on context_store, so a SQL UNIQUE can't span the two tables. Enforce before saving.
+        // App-layer uniqueness check on (workspace, environment, name): workspace_id is nullable, so a SQL UNIQUE over
+        // the three columns would let unlimited workspace-less duplicates through. Enforce before saving.
         boolean nameTaken = workspaceContextStoreService.getAllStoresByWorkspaceIdAndEnvironment(
             workspaceId, environment)
             .stream()
@@ -77,11 +77,9 @@ public class WorkspaceContextStoreFacadeImpl implements WorkspaceContextStoreFac
                     contextStore.getName(), environment.name()));
         }
 
-        ContextStore created = contextStoreService.create(contextStore);
+        contextStore.setWorkspaceId(workspaceId);
 
-        workspaceContextStoreService.create(created.getId(), workspaceId);
-
-        return created;
+        return contextStoreService.create(contextStore);
     }
 
     @Override
@@ -110,7 +108,6 @@ public class WorkspaceContextStoreFacadeImpl implements WorkspaceContextStoreFac
                 "Context Store " + contextStoreId + " is not in workspace " + workspaceId);
         }
 
-        workspaceContextStoreService.deleteByContextStoreId(contextStoreId);
         contextStoreService.delete(contextStoreId);
     }
 
@@ -121,7 +118,7 @@ public class WorkspaceContextStoreFacadeImpl implements WorkspaceContextStoreFac
 
         // App-layer name uniqueness within (workspace, environment) is enforced on create/update, so at most one
         // match is possible. Reusing getAllStoresByWorkspaceIdAndEnvironment keeps the lookup honest with whatever
-        // scoping the parent facade applies (relation-table join, environment ordinal coercion, etc.).
+        // scoping the parent facade applies (workspace column filter, environment ordinal coercion, etc.).
         return workspaceContextStoreService.getAllStoresByWorkspaceIdAndEnvironment(workspaceId, environment)
             .stream()
             .filter(store -> Objects.equals(store.getName(), name))

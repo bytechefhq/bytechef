@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Workspace-scoped operations on {@link AiEvalExperiment}. Mirrors {@code WorkspaceAiEvalDatasetService} — the platform
  * service ({@code AiEvalExperimentService}) handles workspace-agnostic CRUD + lifecycle; this service owns the
- * workspace membership row and workspace-scoped queries that join through {@code workspace_ai_eval_experiment}.
+ * experiment's {@code workspace_id} binding and the workspace-scoped queries over it.
  *
  * @author Ivica Cardic
  * @version ee

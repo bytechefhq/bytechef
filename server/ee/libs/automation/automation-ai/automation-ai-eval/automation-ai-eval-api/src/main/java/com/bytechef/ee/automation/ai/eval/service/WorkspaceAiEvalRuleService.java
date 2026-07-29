@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * Workspace-scoped operations on eval rules. Mirrors the {@code platform-connection.ConnectionService} /
  * {@code automation-configuration.WorkspaceConnectionService} split: the platform module owns the entity + CRUD, the
- * automation module owns the workspace association and any workspace-scoped query.
+ * automation module owns the rule's {@code workspace_id} binding and any workspace-scoped query.
  *
  * @author Ivica Cardic
  * @version ee
@@ -22,7 +22,7 @@ import java.util.List;
 public interface WorkspaceAiEvalRuleService {
 
     /**
-     * Creates the {@link AiEvalRule} (via the platform service) and the workspace membership row in one transaction.
+     * Binds the {@link AiEvalRule} to {@code workspaceId} and creates it via the platform service.
      *
      * @return the persisted rule (with id assigned)
      */

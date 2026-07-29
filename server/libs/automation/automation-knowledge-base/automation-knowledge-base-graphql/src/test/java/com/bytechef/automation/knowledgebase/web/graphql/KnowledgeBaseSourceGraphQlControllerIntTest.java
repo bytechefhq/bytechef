@@ -407,7 +407,10 @@ class KnowledgeBaseSourceGraphQlControllerIntTest {
         source.setCadence("0 0 * * * *");
         source.setStatus(KnowledgeBaseSourceStatus.READY);
         source.setEnabled(true);
+        source.setWorkspaceId(workspaceId);
 
+        // The mutation resolvers still resolve the acting workspace from the service; the workspaceId GraphQL field
+        // is read straight off the entity column.
         when(workspaceKnowledgeBaseSourceService.fetchWorkspaceIdByKnowledgeBaseSourceId(id))
             .thenReturn(Optional.of(workspaceId));
 

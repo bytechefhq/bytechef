@@ -11,9 +11,8 @@ import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityAlertRule
 import java.util.List;
 
 /**
- * Workspace-scoped operations on {@link AiObservabilityAlertRule}. Owns the
- * {@code workspace_ai_observability_alert_rule} membership row that pairs each rule with its workspace; entity-table
- * CRUD belongs to the platform-side {@code AiObservabilityAlertRuleService}.
+ * Workspace-scoped operations on {@link AiObservabilityAlertRule}. Owns the rule's {@code workspace_id} binding;
+ * entity-table CRUD belongs to the platform-side {@code AiObservabilityAlertRuleService}.
  *
  * @version ee
  */

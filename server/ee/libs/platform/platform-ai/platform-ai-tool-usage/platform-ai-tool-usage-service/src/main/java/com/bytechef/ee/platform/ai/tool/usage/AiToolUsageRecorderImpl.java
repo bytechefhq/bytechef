@@ -17,7 +17,6 @@
 package com.bytechef.ee.platform.ai.tool.usage;
 
 import com.bytechef.ee.platform.ai.tool.usage.repository.AiToolUsageRepository;
-import com.bytechef.ee.platform.ai.tool.usage.repository.WorkspaceAiToolUsageRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -66,7 +65,6 @@ public class AiToolUsageRecorderImpl implements ToolUsageRecorder {
     private static final String FAILURE_REASON_PROXY_UNAVAILABLE = "proxy_unavailable";
 
     private final AiToolUsageRepository repository;
-    private final WorkspaceAiToolUsageRepository workspaceRepository;
     private final ToolCostEstimator costEstimator;
     private final Clock clock;
     private final JsonMapper jsonMapper;
@@ -80,12 +78,10 @@ public class AiToolUsageRecorderImpl implements ToolUsageRecorder {
         "EI_EXPOSE_REP2", "CT_CONSTRUCTOR_THROW"
     })
     public AiToolUsageRecorderImpl(
-        AiToolUsageRepository repository, WorkspaceAiToolUsageRepository workspaceRepository,
-        ToolCostEstimator costEstimator, JsonMapper jsonMapper,
+        AiToolUsageRepository repository, ToolCostEstimator costEstimator, JsonMapper jsonMapper,
         ObjectProvider<MeterRegistry> meterRegistryProvider, ObjectProvider<AiToolUsageRecorderImpl> selfProvider) {
 
         this.repository = repository;
-        this.workspaceRepository = workspaceRepository;
         this.costEstimator = costEstimator;
         this.clock = Clock.systemUTC();
         this.jsonMapper = jsonMapper;
@@ -133,6 +129,7 @@ public class AiToolUsageRecorderImpl implements ToolUsageRecorder {
 
         AiToolUsage usage = new AiToolUsage();
 
+        usage.setWorkspaceId(context.workspaceId());
         usage.setUserId(context.userId());
         usage.setOwnerId(context.ownerId());
         usage.setToolName(toolName != null ? toolName : "");
@@ -143,9 +140,7 @@ public class AiToolUsageRecorderImpl implements ToolUsageRecorder {
         usage.setEnvironment(context.environment());
         usage.setCreatedAt(LocalDateTime.now(clock));
 
-        AiToolUsage saved = repository.save(usage);
-
-        workspaceRepository.save(new WorkspaceAiToolUsage(context.workspaceId(), saved.getId()));
+        repository.save(usage);
     }
 
     private AiToolUsageRecorderImpl self() {

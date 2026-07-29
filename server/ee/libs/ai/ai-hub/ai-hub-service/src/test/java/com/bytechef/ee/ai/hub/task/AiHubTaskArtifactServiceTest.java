@@ -61,9 +61,6 @@ class AiHubTaskArtifactServiceTest {
     private AiHubTaskRepository taskRepository;
 
     @Mock
-    private com.bytechef.ee.ai.hub.task.repository.WorkspaceAiHubTaskRepository workspaceTaskRepository;
-
-    @Mock
     private JsonMapper jsonMapper;
 
     @InjectMocks
@@ -148,9 +145,6 @@ class AiHubTaskArtifactServiceTest {
         List<AiHubTaskArtifact> expectedArtifacts = List.of(secondArtifact, firstArtifact);
 
         when(taskRepository.findById(TASK_ID)).thenReturn(Optional.of(task));
-        when(workspaceTaskRepository.findByWorkspaceIdAndAiHubTaskId(WORKSPACE_ID, TASK_ID))
-            .thenReturn(Optional.of(
-                new WorkspaceAiHubTask(WORKSPACE_ID, TASK_ID)));
         when(
             taskArtifactRepository.findByTaskIdOrderByCreatedAtDesc(
                 eq(TASK_ID), any(org.springframework.data.domain.Limit.class)))
@@ -190,9 +184,7 @@ class AiHubTaskArtifactServiceTest {
         AiHubTask task = buildTask(TASK_ID, USER_ID, THREAD_ID);
 
         when(taskRepository.findById(TASK_ID)).thenReturn(Optional.of(task));
-        // Membership lookup returns empty → workspace doesn't claim this task → ownership-check rejects.
-        when(workspaceTaskRepository.findByWorkspaceIdAndAiHubTaskId(OTHER_WORKSPACE_ID, TASK_ID))
-            .thenReturn(Optional.empty());
+        // The task's workspace_id column is WORKSPACE_ID, so a request from OTHER_WORKSPACE_ID is rejected.
 
         assertThatThrownBy(
             () -> taskArtifactService.listByTask(TASK_ID, OTHER_WORKSPACE_ID, USER_ID))
@@ -291,8 +283,6 @@ class AiHubTaskArtifactServiceTest {
         AiHubTaskArtifact existing = buildArtifact(500L, "WORKFLOW_CREATED", "wf-1");
 
         when(taskRepository.findById(TASK_ID)).thenReturn(Optional.of(task));
-        when(workspaceTaskRepository.findByWorkspaceIdAndAiHubTaskId(WORKSPACE_ID, TASK_ID))
-            .thenReturn(Optional.of(new WorkspaceAiHubTask(WORKSPACE_ID, TASK_ID)));
         // Cross-kind workflow lookup finds the row already written server-side by createProjectWorkflow.
         when(taskArtifactRepository.findFirstByTaskIdAndArtifactIdAndKindIn(eq(TASK_ID), eq("wf-1"), any()))
             .thenReturn(Optional.of(existing));
@@ -362,6 +352,8 @@ class AiHubTaskArtifactServiceTest {
         task.setUserId(userId);
         task.setThreadId(threadId);
         task.setStatus(AiHubTaskStatus.ACTIVE);
+        // Fixtures live in WORKSPACE_ID; the ownership check compares the requester's workspace against this column.
+        task.setWorkspaceId(WORKSPACE_ID);
 
         return task;
     }

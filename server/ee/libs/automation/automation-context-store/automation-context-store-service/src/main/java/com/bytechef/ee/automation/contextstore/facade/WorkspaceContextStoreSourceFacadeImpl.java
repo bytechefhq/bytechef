@@ -26,7 +26,6 @@ import com.bytechef.ee.automation.contextstore.audit.ContextStoreSourceAuditPubl
 import com.bytechef.ee.automation.contextstore.dto.CreateContextStoreSourceInput;
 import com.bytechef.ee.automation.contextstore.dto.UpdateContextStoreSourceInput;
 import com.bytechef.ee.automation.contextstore.service.WorkspaceContextStoreService;
-import com.bytechef.ee.automation.contextstore.service.WorkspaceContextStoreSourceService;
 import com.bytechef.ee.automation.contextstore.util.ContextStoreWorkflowGenerator;
 import com.bytechef.ee.platform.contextstore.clickhouse.ClickHouseTableProvisioner;
 import com.bytechef.ee.platform.contextstore.domain.ContextStoreSource;
@@ -98,7 +97,6 @@ public class WorkspaceContextStoreSourceFacadeImpl implements WorkspaceContextSt
     private final TaskExecutor taskExecutor;
     private final WorkflowService workflowService;
     private final WorkspaceContextStoreService workspaceContextStoreService;
-    private final WorkspaceContextStoreSourceService workspaceContextStoreSourceService;
 
     @SuppressFBWarnings("EI2")
     public WorkspaceContextStoreSourceFacadeImpl(
@@ -110,8 +108,7 @@ public class WorkspaceContextStoreSourceFacadeImpl implements WorkspaceContextSt
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectService projectService,
         ProjectWorkflowService projectWorkflowService,
         TaskExecutor taskExecutor, WorkflowService workflowService,
-        WorkspaceContextStoreService workspaceContextStoreService,
-        WorkspaceContextStoreSourceService workspaceContextStoreSourceService) {
+        WorkspaceContextStoreService workspaceContextStoreService) {
 
         this.clickHouseTableProvisionerProvider = clickHouseTableProvisionerProvider;
         this.componentDefinitionService = componentDefinitionService;
@@ -126,7 +123,6 @@ public class WorkspaceContextStoreSourceFacadeImpl implements WorkspaceContextSt
         this.taskExecutor = taskExecutor;
         this.workflowService = workflowService;
         this.workspaceContextStoreService = workspaceContextStoreService;
-        this.workspaceContextStoreSourceService = workspaceContextStoreSourceService;
     }
 
     @Override
@@ -135,8 +131,8 @@ public class WorkspaceContextStoreSourceFacadeImpl implements WorkspaceContextSt
         Objects.requireNonNull(input, "input");
 
         // Defense in depth: the parent ContextStore must belong to this workspace. WorkspaceContextStoreService
-        // owns the workspace ↔ store relation table; this is the same membership check pattern used by the KB
-        // clone flow.
+        // owns the workspace scoping rules over context_store.workspace_id; this is the same ownership check pattern
+        // used by the KB clone flow.
         if (!workspaceContextStoreService.isStoreInWorkspace(workspaceId, input.contextStoreId())) {
             throw new IllegalArgumentException(
                 "Context Store " + input.contextStoreId() + " is not in workspace " + workspaceId);
@@ -181,9 +177,9 @@ public class WorkspaceContextStoreSourceFacadeImpl implements WorkspaceContextSt
         // bean is absent and records live in Postgres only.
         ClickHouseTableProvisioner provisioner = clickHouseTableProvisionerProvider.getIfAvailable();
 
-        ContextStoreSource source = contextStoreSourceService.create(sourceToInsert);
+        sourceToInsert.setWorkspaceId(workspaceId);
 
-        workspaceContextStoreSourceService.create(source.getId(), workspaceId);
+        ContextStoreSource source = contextStoreSourceService.create(sourceToInsert);
 
         if (provisioner != null) {
             // Provision the ClickHouse table BEFORE the workflow setup so a DDL failure rolls back the source insert
@@ -385,7 +381,6 @@ public class WorkspaceContextStoreSourceFacadeImpl implements WorkspaceContextSt
             workflowService.delete(workflowId);
         }
 
-        workspaceContextStoreSourceService.deleteByContextStoreSourceId(sourceId);
         contextStoreSourceService.delete(sourceId);
 
         contextStoreSourceAuditPublisher.publish(

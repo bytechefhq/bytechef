@@ -27,6 +27,8 @@
             <column name="environment" type="INT" defaultValueNumeric="0">
                 <constraints nullable="false"/>
             </column>
+            <!-- Nullable on purpose: a memory belongs to at most one workspace, and null means none applies. -->
+            <column name="workspace_id" type="BIGINT"/>
             <column name="created_at" type="TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
@@ -35,7 +37,7 @@
             </column>
         </createTable>
 
-        <!-- Sidebar lookup index. Workspace dimension joins through workspace_ai_auto_memory. -->
+        <!-- Sidebar lookup index. The workspace dimension is the ai_auto_memory.workspace_id column. -->
         <createIndex tableName="ai_auto_memory"
                      indexName="idx_ai_auto_memory_user_env">
             <column name="user_id"/>
@@ -53,50 +55,5 @@
             ADD CONSTRAINT ck_ai_auto_memory_name_slug
             CHECK (name ~ '^[a-z0-9_-]{1,64}$')
         </sql>
-
-        <createTable tableName="workspace_ai_auto_memory">
-            <column name="id" type="BIGINT" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="workspace_id" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="ai_auto_memory_id" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="created_date" type="TIMESTAMP">
-                <constraints nullable="false"/>
-            </column>
-            <column name="created_by" type="VARCHAR(50)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="last_modified_date" type="TIMESTAMP">
-                <constraints nullable="false"/>
-            </column>
-            <column name="last_modified_by" type="VARCHAR(50)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="version" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-
-        <addUniqueConstraint
-            constraintName="uk_workspace_ai_auto_memory"
-            tableName="workspace_ai_auto_memory"
-            columnNames="workspace_id, ai_auto_memory_id"/>
-
-        <createIndex tableName="workspace_ai_auto_memory"
-                     indexName="idx_workspace_ai_auto_memory_workspace">
-            <column name="workspace_id"/>
-        </createIndex>
-
-        <addForeignKeyConstraint
-            baseTableName="workspace_ai_auto_memory"
-            baseColumnNames="ai_auto_memory_id"
-            constraintName="fk_workspace_ai_auto_memory_memory"
-            referencedTableName="ai_auto_memory"
-            referencedColumnNames="id"
-            onDelete="CASCADE"/>
     </changeSet>
 </databaseChangeLog>

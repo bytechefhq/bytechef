@@ -24,9 +24,9 @@ import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 
 /**
- * CRUD service for {@link KnowledgeBaseSource}. Workspace scoping is enforced by the
- * {@code workspace_knowledge_base_source} relation table owned by the automation-side service; this platform service
- * only sees workspace-agnostic source rows. Lifecycle helpers ({@link #updateStatus}, {@link #updateLastSyncMetadata},
+ * CRUD service for {@link KnowledgeBaseSource}. Workspace scoping is the nullable
+ * {@code knowledge_base_source.workspace_id} column; the automation-side service is the one that decides which
+ * workspace a caller may see. Lifecycle helpers ({@link #updateStatus}, {@link #updateLastSyncMetadata},
  * {@link #setEnabled}) wrap a load + mutate + save round-trip so callers don't have to reach for the repository
  * directly to flip a status flag.
  *
@@ -47,6 +47,10 @@ public interface KnowledgeBaseSourceService {
     List<KnowledgeBaseSource> getAllByIds(List<Long> ids);
 
     List<KnowledgeBaseSource> getAllEnabledByIds(List<Long> ids);
+
+    List<KnowledgeBaseSource> getAllByWorkspaceId(long workspaceId);
+
+    List<KnowledgeBaseSource> getAllEnabledByWorkspaceId(long workspaceId);
 
     List<KnowledgeBaseSource> findAllByKnowledgeBaseId(Long knowledgeBaseId);
 

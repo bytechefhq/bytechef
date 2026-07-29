@@ -80,11 +80,11 @@ public class AiObservabilityOtlpIngestFacadeImpl implements AiObservabilityOtlpI
     // Names of the unique indexes that legitimately produce DuplicateKeyException on the idempotency path.
     // SPAN_DEDUP_INDEX is a partial unique index (scoped via WHERE external_span_id IS NOT NULL); see
     // 00000000000012_ai_observability_span_add_external_span_id.xml. TRACE_DEDUP_INDEX is a plain (non-partial)
-    // unique index on ai_observability_trace.external_trace_id; the uq_ prefix follows the standard naming
-    // convention so operators triaging constraint-violation incidents can locate it via the uq_ / ux_ prefix
-    // scan. Any DuplicateKeyException whose message references a different index/constraint is a real schema
-    // violation (e.g., a future NOT-NULL or FK addition) and must propagate as REJECTED_PERSIST_FAILED rather
-    // than being silently bucketed as DEDUPLICATED.
+    // unique index on ai_observability_trace (workspace_id, external_trace_id); the uq_ prefix follows the
+    // standard naming convention so operators triaging constraint-violation incidents can locate it via the
+    // uq_ / ux_ prefix scan. Any DuplicateKeyException whose message references a different index/constraint
+    // is a real schema violation (e.g., a future NOT-NULL or FK addition) and must propagate as
+    // REJECTED_PERSIST_FAILED rather than being silently bucketed as DEDUPLICATED.
     private static final String SPAN_DEDUP_INDEX = "uq_ai_obs_span_trace_external";
     private static final String TRACE_DEDUP_INDEX = "uq_ai_obs_trace_ext_trace_id";
 

@@ -17,4 +17,10 @@ import org.springframework.data.repository.ListCrudRepository;
 public interface AiGatewayProviderRepository extends ListCrudRepository<AiGatewayProvider, Long> {
 
     List<AiGatewayProvider> findAllByEnabled(boolean enabled);
+
+    /**
+     * Returns the providers owned by the given workspace. A provider with a null {@code workspace_id} belongs to no
+     * workspace and is therefore never returned here — SQL equality never matches NULL.
+     */
+    List<AiGatewayProvider> findAllByWorkspaceId(long workspaceId);
 }

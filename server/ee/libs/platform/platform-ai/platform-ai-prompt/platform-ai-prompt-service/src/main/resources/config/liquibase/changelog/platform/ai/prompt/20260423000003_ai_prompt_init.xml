@@ -6,11 +6,11 @@
     <!--
         Author note: ai_prompt + ai_prompt_version were extracted from
         automation/ai_gateway/00000000000003_ai_prompt_init.xml so non-gateway agent surfaces (e.g. command center)
-        can reuse the same prompt store. The workspace_ai_prompt membership table lives in
-        automation/ai/prompt/00000000000001_workspace_ai_prompt_init.xml (mirrors the workspace_ai_eval_* split
-        between platform-ai-eval and automation-ai-eval). The gateway-only ai_observability_span FKs targeting these
-        tables remain in automation/ai_gateway/00000000000003_ai_prompt_init.xml — they're loaded after this file
-        because master.xml orders platform/ai/prompt before automation/ai_gateway.
+        can reuse the same prompt store. A prompt belongs to at most one workspace, carried by the nullable
+        workspace_id column on ai_prompt; the column is null only for a prompt that belongs to no workspace. The
+        gateway-only ai_observability_span FKs targeting these tables remain in
+        automation/ai_gateway/00000000000003_ai_prompt_init.xml — they're loaded after this file because master.xml
+        orders platform/ai/prompt before automation/ai_gateway.
     -->
     <changeSet id="20260423000003" author="Ivica Cardic">
         <preConditions onFail="MARK_RAN">
@@ -24,6 +24,7 @@
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="project_id" type="BIGINT"/>
+            <column name="workspace_id" type="BIGINT"/>
             <column name="name" type="VARCHAR(256)">
                 <constraints nullable="false"/>
             </column>
@@ -41,6 +42,10 @@
 
         <createIndex tableName="ai_prompt" indexName="idx_ai_obs_prompt_project">
             <column name="project_id"/>
+        </createIndex>
+
+        <createIndex tableName="ai_prompt" indexName="idx_ai_prompt_workspace">
+            <column name="workspace_id"/>
         </createIndex>
 
         <createTable tableName="ai_prompt_version">

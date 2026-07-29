@@ -10,6 +10,7 @@ package com.bytechef.ee.platform.ai.observability.domain;
 import java.time.Instant;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
@@ -60,6 +61,13 @@ public class AiObservabilityExportJob {
 
     @Column
     private int type;
+
+    /**
+     * The owning workspace, or {@code null} when the job belongs to no workspace. Boxed on purpose — a primitive would
+     * coerce the "no workspace" case into workspace {@code 0}, which is a real workspace id.
+     */
+    @Column("workspace_id")
+    private @Nullable Long workspaceId;
 
     private AiObservabilityExportJob() {
     }
@@ -163,6 +171,10 @@ public class AiObservabilityExportJob {
         return AiObservabilityExportJobType.values()[type];
     }
 
+    public @Nullable Long getWorkspaceId() {
+        return workspaceId;
+    }
+
     public void setCronExpression(String cronExpression) {
         this.cronExpression = cronExpression;
     }
@@ -203,10 +215,15 @@ public class AiObservabilityExportJob {
         this.status = status.ordinal();
     }
 
+    public void setWorkspaceId(@Nullable Long workspaceId) {
+        this.workspaceId = workspaceId;
+    }
+
     @Override
     public String toString() {
         return "AiObservabilityExportJob{" +
             "id=" + id +
+            ", workspaceId=" + workspaceId +
             ", type=" + getType() +
             ", format=" + getFormat() +
             ", scope=" + getScope() +

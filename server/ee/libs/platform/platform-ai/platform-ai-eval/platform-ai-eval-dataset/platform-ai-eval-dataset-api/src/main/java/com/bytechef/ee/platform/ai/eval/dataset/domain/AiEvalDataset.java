@@ -11,6 +11,7 @@ import java.time.Instant;
 import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -63,6 +64,13 @@ public class AiEvalDataset {
 
     @Version
     private int version;
+
+    /**
+     * The owning workspace, or {@code null} when the dataset belongs to no workspace. Boxed on purpose — a primitive
+     * would coerce the "no workspace" case into workspace {@code 0}, which is a real workspace id.
+     */
+    @Column("workspace_id")
+    private @Nullable Long workspaceId;
 
     private AiEvalDataset() {
     }
@@ -135,6 +143,10 @@ public class AiEvalDataset {
         return version;
     }
 
+    public @Nullable Long getWorkspaceId() {
+        return workspaceId;
+    }
+
     public void setDescription(String description) {
         this.description = description;
     }
@@ -151,6 +163,10 @@ public class AiEvalDataset {
 
     public void setTags(String tags) {
         this.tags = tags;
+    }
+
+    public void setWorkspaceId(@Nullable Long workspaceId) {
+        this.workspaceId = workspaceId;
     }
 
     /**
@@ -197,6 +213,7 @@ public class AiEvalDataset {
     public String toString() {
         return "AiEvalDataset{" +
             "id=" + id +
+            ", workspaceId=" + workspaceId +
             ", projectId=" + projectId +
             ", name='" + name + '\'' +
             ", archivedDate=" + archivedDate +

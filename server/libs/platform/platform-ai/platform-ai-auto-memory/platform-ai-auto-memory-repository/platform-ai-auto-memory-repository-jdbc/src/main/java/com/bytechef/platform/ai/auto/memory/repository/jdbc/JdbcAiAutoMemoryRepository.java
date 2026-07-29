@@ -24,8 +24,8 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 /**
- * Spring Data JDBC binding for the {@code ai_auto_memory} table. Workspace-aware queries JOIN through
- * {@code workspace_ai_auto_memory}; the entity itself is workspace-agnostic.
+ * Spring Data JDBC binding for the {@code ai_auto_memory} table. The workspace dimension is the table's own nullable
+ * {@code workspace_id} column, so a workspace-scoped query never matches a memory that has no workspace.
  *
  * @author Ivica Cardic
  */
@@ -35,8 +35,7 @@ public interface JdbcAiAutoMemoryRepository extends CrudRepository<AiAutoMemory,
     @Override
     @Query("""
         SELECT m.* FROM ai_auto_memory m
-        JOIN workspace_ai_auto_memory wam ON wam.ai_auto_memory_id = m.id
-        WHERE wam.workspace_id = :workspaceId
+        WHERE m.workspace_id = :workspaceId
           AND m.principal_type = :principalType
           AND m.principal_id = :principalId
           AND m.environment = :environment
@@ -48,8 +47,7 @@ public interface JdbcAiAutoMemoryRepository extends CrudRepository<AiAutoMemory,
     @Override
     @Query("""
         SELECT m.* FROM ai_auto_memory m
-        JOIN workspace_ai_auto_memory wam ON wam.ai_auto_memory_id = m.id
-        WHERE wam.workspace_id = :workspaceId
+        WHERE m.workspace_id = :workspaceId
           AND m.principal_type = :principalType
           AND m.principal_id = :principalId
           AND m.environment = :environment
@@ -62,8 +60,7 @@ public interface JdbcAiAutoMemoryRepository extends CrudRepository<AiAutoMemory,
     @Override
     @Query("""
         SELECT m.* FROM ai_auto_memory m
-        JOIN workspace_ai_auto_memory wam ON wam.ai_auto_memory_id = m.id
-        WHERE wam.workspace_id = :workspaceId
+        WHERE m.workspace_id = :workspaceId
           AND m.principal_type = :principalType
           AND m.principal_id = :principalId
           AND m.environment = :environment

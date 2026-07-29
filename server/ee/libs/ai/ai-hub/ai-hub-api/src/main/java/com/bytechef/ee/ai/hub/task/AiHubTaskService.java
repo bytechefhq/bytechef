@@ -215,10 +215,9 @@ public interface AiHubTaskService {
     Optional<AiHubTask> findByThreadId(String threadId);
 
     /**
-     * Returns the workspace id from the {@code workspace_ai_hub_task} membership row for the given task. The task
-     * entity itself is workspace-agnostic (mirrors Connection / WorkspaceConnection); callers that need the workspace
-     * and only have a task in scope ({@code AiHubRoutingAgent}, metrics tags) call this helper rather than reading from
-     * the entity. Throws {@code NotFoundException} if no membership row exists.
+     * Returns the workspace id from the given task's {@code workspace_id} column. Callers that need the workspace and
+     * only have a task id in scope ({@code AiHubRoutingAgent}, metrics tags) call this helper rather than loading the
+     * entity themselves. Throws {@code NotFoundException} if the task does not exist or its workspace is null.
      */
     long getWorkspaceId(long taskId);
 

@@ -17,8 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Workspace-agnostic CRUD on {@link AiPrompt}. The workspace membership row in {@code workspace_ai_prompt} and any
- * workspace-scoped query is owned by {@code com.bytechef.ee.automation.ai.prompt.service.WorkspaceAiPromptServiceImpl}.
+ * Workspace-agnostic CRUD on {@link AiPrompt}. Setting the {@code workspace_id} column and every workspace-scoped query
+ * are owned by {@code com.bytechef.ee.automation.ai.prompt.service.WorkspaceAiPromptServiceImpl}.
  *
  * @author Ivica Cardic
  * @version ee

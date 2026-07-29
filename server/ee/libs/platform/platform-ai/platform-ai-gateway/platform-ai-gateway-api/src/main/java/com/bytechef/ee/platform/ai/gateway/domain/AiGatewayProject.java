@@ -10,6 +10,7 @@ package com.bytechef.ee.platform.ai.gateway.domain;
 import java.time.Instant;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -66,6 +67,11 @@ public class AiGatewayProject {
 
     @Version
     private int version;
+
+    // A project belongs to at most one workspace. Null means no workspace applies — a boxed Long is required so that
+    // "no workspace" cannot collapse into workspace 0, which is a real workspace id.
+    @Column("workspace_id")
+    private @Nullable Long workspaceId;
 
     private AiGatewayProject() {
     }
@@ -152,6 +158,10 @@ public class AiGatewayProject {
         return version;
     }
 
+    public @Nullable Long getWorkspaceId() {
+        return workspaceId;
+    }
+
     public void setCachingEnabled(Boolean cachingEnabled) {
         this.cachingEnabled = cachingEnabled;
     }
@@ -196,6 +206,10 @@ public class AiGatewayProject {
         this.timeoutSeconds = timeoutSeconds;
     }
 
+    public void setWorkspaceId(@Nullable Long workspaceId) {
+        this.workspaceId = workspaceId;
+    }
+
     @Override
     public String toString() {
         return "AiGatewayProject{" +
@@ -207,6 +221,7 @@ public class AiGatewayProject {
             ", createdDate=" + createdDate +
             ", lastModifiedDate=" + lastModifiedDate +
             ", version=" + version +
+            ", workspaceId=" + workspaceId +
             '}';
     }
 }

@@ -21,7 +21,6 @@ import com.bytechef.config.ApplicationProperties.Ai.AutoMemory;
 import com.bytechef.file.storage.FileStorageServiceRegistry;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.ai.auto.memory.repository.filestorage.FileStorageAiAutoMemoryRepository;
-import com.bytechef.platform.ai.auto.memory.repository.filestorage.FileStorageWorkspaceAiAutoMemoryRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -54,13 +53,6 @@ public class AiAutoMemoryFileStorageConfiguration {
 
             return createRepository(applicationProperties, fileStorageServiceRegistry);
         }
-
-        @Bean
-        FileStorageWorkspaceAiAutoMemoryRepository fileStorageWorkspaceAiAutoMemoryRepository(
-            FileStorageAiAutoMemoryRepository fileStorageAiAutoMemoryRepository) {
-
-            return new FileStorageWorkspaceAiAutoMemoryRepository(fileStorageAiAutoMemoryRepository);
-        }
     }
 
     @Configuration
@@ -72,13 +64,6 @@ public class AiAutoMemoryFileStorageConfiguration {
             ApplicationProperties applicationProperties, FileStorageServiceRegistry fileStorageServiceRegistry) {
 
             return createRepository(applicationProperties, fileStorageServiceRegistry);
-        }
-
-        @Bean
-        FileStorageWorkspaceAiAutoMemoryRepository fileStorageWorkspaceAiAutoMemoryRepository(
-            FileStorageAiAutoMemoryRepository fileStorageAiAutoMemoryRepository) {
-
-            return new FileStorageWorkspaceAiAutoMemoryRepository(fileStorageAiAutoMemoryRepository);
         }
     }
 

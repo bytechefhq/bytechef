@@ -9,9 +9,7 @@ package com.bytechef.ee.automation.workflow.alert.service;
 
 import com.bytechef.ee.automation.workflow.alert.domain.WorkflowAlertRule;
 import com.bytechef.ee.automation.workflow.alert.domain.WorkflowAlertRuleType;
-import com.bytechef.ee.automation.workflow.alert.domain.WorkspaceWorkflowAlertRule;
 import com.bytechef.ee.automation.workflow.alert.repository.WorkflowAlertRuleRepository;
-import com.bytechef.ee.automation.workflow.alert.repository.WorkspaceWorkflowAlertRuleRepository;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Comparator;
@@ -31,38 +29,34 @@ import org.springframework.transaction.annotation.Transactional;
 public class WorkflowAlertRuleServiceImpl implements WorkflowAlertRuleService {
 
     private final WorkflowAlertRuleRepository workflowAlertRuleRepository;
-    private final WorkspaceWorkflowAlertRuleRepository workspaceWorkflowAlertRuleRepository;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public WorkflowAlertRuleServiceImpl(
-        WorkflowAlertRuleRepository workflowAlertRuleRepository,
-        WorkspaceWorkflowAlertRuleRepository workspaceWorkflowAlertRuleRepository) {
-
+    public WorkflowAlertRuleServiceImpl(WorkflowAlertRuleRepository workflowAlertRuleRepository) {
         this.workflowAlertRuleRepository = workflowAlertRuleRepository;
-        this.workspaceWorkflowAlertRuleRepository = workspaceWorkflowAlertRuleRepository;
     }
 
     @Override
     public WorkflowAlertRule createInWorkspace(WorkflowAlertRule workflowAlertRule, long workspaceId) {
-        WorkflowAlertRule savedWorkflowAlertRule = workflowAlertRuleRepository.save(workflowAlertRule);
+        workflowAlertRule.setWorkspaceId(workspaceId);
 
-        workspaceWorkflowAlertRuleRepository.save(
-            new WorkspaceWorkflowAlertRule(savedWorkflowAlertRule.getId(), workspaceId));
-
-        return savedWorkflowAlertRule;
+        return workflowAlertRuleRepository.save(workflowAlertRule);
     }
 
     @Override
     public void delete(long id) {
-        // The workspace_workflow_alert_rule membership row cascades with the rule (FK ON DELETE CASCADE).
         workflowAlertRuleRepository.deleteById(id);
     }
 
+    /**
+     * Reads the owning workspace straight off the rule row. An unknown id and a workspace-less rule both answer
+     * {@link Optional#empty()} — the same result the missing membership row used to give — because callers treat this
+     * as a probe rather than a lookup that must succeed.
+     */
     @Override
     @Transactional(readOnly = true)
     public Optional<Long> fetchWorkspaceId(long workflowAlertRuleId) {
-        return workspaceWorkflowAlertRuleRepository.findByWorkflowAlertRuleId(workflowAlertRuleId)
-            .map(WorkspaceWorkflowAlertRule::getWorkspaceId);
+        return workflowAlertRuleRepository.findById(workflowAlertRuleId)
+            .map(WorkflowAlertRule::getWorkspaceId);
     }
 
     @Override
@@ -75,7 +69,7 @@ public class WorkflowAlertRuleServiceImpl implements WorkflowAlertRuleService {
     @Override
     @Transactional(readOnly = true)
     public List<WorkflowAlertRule> getWorkflowAlertRules(long workspaceId) {
-        return workflowAlertRuleRepository.findAllById(getWorkflowAlertRuleIds(workspaceId))
+        return workflowAlertRuleRepository.findAllByWorkspaceId(workspaceId)
             .stream()
             .sorted(Comparator.comparing(WorkflowAlertRule::getName, String.CASE_INSENSITIVE_ORDER))
             .toList();
@@ -84,16 +78,13 @@ public class WorkflowAlertRuleServiceImpl implements WorkflowAlertRuleService {
     @Override
     @Transactional(readOnly = true)
     public List<Long> getWorkflowAlertRuleIds(long workspaceId) {
-        return workspaceWorkflowAlertRuleRepository.findAllByWorkspaceId(workspaceId)
-            .stream()
-            .map(WorkspaceWorkflowAlertRule::getWorkflowAlertRuleId)
-            .toList();
+        return workflowAlertRuleRepository.findAllIdsByWorkspaceId(workspaceId);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<WorkflowAlertRule> getEnabledWorkflowAlertRules(long workspaceId) {
-        return workflowAlertRuleRepository.findAllById(getWorkflowAlertRuleIds(workspaceId))
+        return workflowAlertRuleRepository.findAllByWorkspaceId(workspaceId)
             .stream()
             .filter(WorkflowAlertRule::isEnabled)
             .toList();

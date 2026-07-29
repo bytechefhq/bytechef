@@ -17,4 +17,10 @@ import org.springframework.data.repository.ListCrudRepository;
 public interface AiObservabilityAlertRuleRepository extends ListCrudRepository<AiObservabilityAlertRule, Long> {
 
     List<AiObservabilityAlertRule> findAllByEnabled(boolean enabled);
+
+    /**
+     * Rules owned by one workspace. A rule whose {@code workspace_id} is null belongs to no workspace and is invisible
+     * here, which is the intended behavior for a workspace-scoped listing.
+     */
+    List<AiObservabilityAlertRule> findAllByWorkspaceId(Long workspaceId);
 }

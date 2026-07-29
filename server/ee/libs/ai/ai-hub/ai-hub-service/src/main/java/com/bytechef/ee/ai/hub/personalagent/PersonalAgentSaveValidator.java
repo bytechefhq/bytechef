@@ -8,12 +8,10 @@
 package com.bytechef.ee.ai.hub.personalagent;
 
 // Gateway-based validation disabled for now — see the commented block at the bottom of this class.
-// import com.bytechef.ee.automation.ai.gateway.domain.WorkspaceAiGatewayProvider;
 // import com.bytechef.ee.automation.ai.gateway.facade.WorkspaceAiGatewayModelFacade;
 // import com.bytechef.ee.automation.ai.gateway.service.WorkspaceAiGatewayProviderService;
 // import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayModel;
 // import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayProvider;
-// import com.bytechef.ee.platform.ai.gateway.service.AiGatewayProviderService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
@@ -60,7 +58,6 @@ public class PersonalAgentSaveValidator {
     //
     // private final WorkspaceAiGatewayProviderService workspaceAiGatewayProviderService;
     // private final WorkspaceAiGatewayModelFacade workspaceAiGatewayModelFacade;
-    // private final AiGatewayProviderService aiGatewayProviderService;
     //
     // AiGatewayProvider provider = resolveProvider(workspaceId, llmProvider);
     //
@@ -91,11 +88,7 @@ public class PersonalAgentSaveValidator {
     // }
     //
     // private @Nullable AiGatewayProvider resolveProvider(long workspaceId, String llmProvider) {
-    // for (WorkspaceAiGatewayProvider workspaceProvider : workspaceAiGatewayProviderService
-    // .getWorkspaceProviders(workspaceId)) {
-    //
-    // AiGatewayProvider provider = aiGatewayProviderService.getProvider(workspaceProvider.getProviderId());
-    //
+    // for (AiGatewayProvider provider : workspaceAiGatewayProviderService.getWorkspaceProviders(workspaceId)) {
     // if (provider == null || !provider.isEnabled()) {
     // continue;
     // }

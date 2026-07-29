@@ -38,8 +38,9 @@ import org.springframework.context.annotation.Import;
 
 /**
  * Integration test for {@link KnowledgeBaseSourceService} against a real Postgres instance via Testcontainers. The
- * platform-side service is workspace-agnostic; workspace-scoped reads flow through the automation-side
- * {@code WorkspaceKnowledgeBaseSourceService}.
+ * platform-side service applies no workspace rules of its own; workspace-scoped reads flow through the automation-side
+ * {@code WorkspaceKnowledgeBaseSourceService}, which filters on the nullable {@code knowledge_base_source.workspace_id}
+ * column.
  *
  * @author Ivica Cardic
  */

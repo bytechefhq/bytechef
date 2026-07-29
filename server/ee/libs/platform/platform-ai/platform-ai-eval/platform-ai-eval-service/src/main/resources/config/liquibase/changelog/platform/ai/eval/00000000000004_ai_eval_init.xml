@@ -16,6 +16,8 @@
             <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
+            <!-- Nullable: a config that belongs to no workspace is invisible to every workspace-scoped query. -->
+            <column name="workspace_id" type="BIGINT"/>
             <column name="name" type="VARCHAR(256)">
                 <constraints nullable="false"/>
             </column>
@@ -35,11 +37,27 @@
             </column>
         </createTable>
 
+        <!--
+            Restores the (workspace_id, name) uniqueness the table shipped with before workspace_id was moved onto a
+            relation table. fetchScoreConfigByWorkspaceIdAndName returns an Optional, so a second config with the same
+            name in the same workspace does not shadow the first — it makes every subsequent score write in that
+            workspace fail on an incorrect-result-size read. Failing the duplicate INSERT is the cheaper failure.
+            Postgres treats NULLs as distinct in a unique index, so workspace-less configs are not deduplicated by
+            name; that is acceptable because every config is created through createInWorkspace with a non-null
+            workspace and a workspace-less config is unreachable from that lookup anyway. The constraint's index also
+            serves the plain by-workspace listing on its leading column, so no separate index is added.
+        -->
+        <addUniqueConstraint tableName="ai_eval_score_config"
+                             columnNames="workspace_id, name"
+                             constraintName="uk_ai_eval_score_config_workspace_name"/>
+
         <createTable tableName="ai_eval_rule">
             <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="project_id" type="BIGINT"/>
+            <!-- Nullable: a rule that belongs to no workspace is invisible to every workspace-scoped query. -->
+            <column name="workspace_id" type="BIGINT"/>
             <column name="name" type="VARCHAR(256)">
                 <constraints nullable="false"/>
             </column>
@@ -75,10 +93,23 @@
                                  baseTableName="ai_eval_rule" baseColumnNames="score_config_id"
                                  referencedTableName="ai_eval_score_config" referencedColumnNames="id"/>
 
+        <!--
+            Replaces idx_workspace_ai_eval_rule_workspace on the removed relation table. Compound rather than
+            workspace_id alone because the hot read is the evaluator's "enabled rules of this workspace"
+            (optionally narrowed by target); the leading column still serves the plain by-workspace listing.
+            The relation table could not carry this index — enabled lived on the other table.
+        -->
+        <createIndex tableName="ai_eval_rule" indexName="idx_ai_eval_rule_workspace_enabled">
+            <column name="workspace_id"/>
+            <column name="enabled"/>
+        </createIndex>
+
         <createTable tableName="ai_eval_score">
             <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
+            <!-- Nullable: a score that belongs to no workspace is invisible to every workspace-scoped query. -->
+            <column name="workspace_id" type="BIGINT"/>
             <column name="trace_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
@@ -127,6 +158,19 @@
         </createIndex>
 
         <createIndex tableName="ai_eval_score" indexName="idx_ai_eval_score_created">
+            <column name="created_date"/>
+        </createIndex>
+
+        <!--
+            Replaces idx_workspace_ai_eval_score_workspace on the removed relation table. All three workspace-scoped
+            reads filter workspace_id, two of them also name, and the day-bucketed trend aggregation additionally
+            ranges over created_date — so the triple serves every one of them, with the leading columns covering the
+            narrower two. The relation table could not carry this index: name and created_date lived on the other
+            table, which is exactly why the trend query had to aggregate across a JOIN.
+        -->
+        <createIndex tableName="ai_eval_score" indexName="idx_ai_eval_score_workspace_name_created">
+            <column name="workspace_id"/>
+            <column name="name"/>
             <column name="created_date"/>
         </createIndex>
 

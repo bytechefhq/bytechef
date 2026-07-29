@@ -7,17 +7,15 @@
 
 package com.bytechef.ee.platform.notification.workspace.service;
 
-import com.bytechef.ee.platform.notification.workspace.domain.WorkspaceNotification;
-import com.bytechef.ee.platform.notification.workspace.repository.WorkspaceNotificationRepository;
+import com.bytechef.ee.platform.notification.workspace.repository.NotificationWorkspaceRepository;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.notification.domain.Notification;
 import com.bytechef.platform.notification.service.NotificationService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,65 +30,44 @@ import org.springframework.transaction.annotation.Transactional;
 public class WorkspaceNotificationServiceImpl implements WorkspaceNotificationService {
 
     private final NotificationService notificationService;
-    private final WorkspaceNotificationRepository workspaceNotificationRepository;
+    private final NotificationWorkspaceRepository notificationWorkspaceRepository;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public WorkspaceNotificationServiceImpl(
-        NotificationService notificationService, WorkspaceNotificationRepository workspaceNotificationRepository) {
+        NotificationService notificationService, NotificationWorkspaceRepository notificationWorkspaceRepository) {
 
         this.notificationService = notificationService;
-        this.workspaceNotificationRepository = workspaceNotificationRepository;
+        this.notificationWorkspaceRepository = notificationWorkspaceRepository;
     }
 
     @Override
     public void assignNotificationToWorkspace(long notificationId, long workspaceId) {
-        Optional<WorkspaceNotification> existingWorkspaceNotification =
-            workspaceNotificationRepository.findByNotificationId(notificationId);
-
-        if (existingWorkspaceNotification.isPresent()) {
-            WorkspaceNotification workspaceNotification = existingWorkspaceNotification.get();
-
-            if (workspaceNotification.getWorkspaceId() == workspaceId) {
-                return;
-            }
-
-            workspaceNotificationRepository.delete(workspaceNotification);
-        }
-
-        workspaceNotificationRepository.save(new WorkspaceNotification(notificationId, workspaceId));
+        notificationWorkspaceRepository.updateWorkspaceId(notificationId, workspaceId);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Optional<Long> fetchWorkspaceIdByNotificationId(long notificationId) {
-        return workspaceNotificationRepository.findByNotificationId(notificationId)
-            .map(WorkspaceNotification::getWorkspaceId);
+        return notificationWorkspaceRepository.findWorkspaceIdByNotificationId(notificationId);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<Notification> getNotifications(long workspaceId) {
-        Set<Long> workspaceNotificationIds = workspaceNotificationRepository.findAllByWorkspaceId(workspaceId)
-            .stream()
-            .map(WorkspaceNotification::getNotificationId)
-            .collect(Collectors.toSet());
-
-        Set<Long> allAssignedNotificationIds = workspaceNotificationRepository.findAll()
-            .stream()
-            .map(WorkspaceNotification::getNotificationId)
-            .collect(Collectors.toSet());
-
+        // A null workspace_id means global — the pre-scoping behavior, and what every notification created before
+        // scoping existed still is. This IS-NULL branch is load-bearing: drop it and global notifications stop
+        // being offered anywhere; widen it and they get offered to workspaces that never opted in.
         return notificationService.getNotifications()
             .stream()
             .filter(
-                notification -> workspaceNotificationIds.contains(notification.getId()) ||
-                    !allAssignedNotificationIds.contains(notification.getId()))
+                notification -> notification.getWorkspaceId() == null ||
+                    Objects.equals(notification.getWorkspaceId(), workspaceId))
             .sorted(Comparator.comparing(Notification::getName, String.CASE_INSENSITIVE_ORDER))
             .toList();
     }
 
     @Override
     public void unassignNotification(long notificationId) {
-        workspaceNotificationRepository.deleteByNotificationId(notificationId);
+        notificationWorkspaceRepository.updateWorkspaceId(notificationId, null);
     }
 }

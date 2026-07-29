@@ -10,6 +10,8 @@ package com.bytechef.ee.platform.ai.gateway.service;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayRateLimit;
 import com.bytechef.ee.platform.ai.gateway.repository.AiGatewayRateLimitRepository;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import java.util.List;
+import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
@@ -45,9 +47,27 @@ class AiGatewayRateLimitServiceImpl implements AiGatewayRateLimitService {
 
     @Override
     @Transactional(readOnly = true)
+    public Optional<AiGatewayRateLimit> fetchRateLimit(long id) {
+        return aiGatewayRateLimitRepository.findById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<AiGatewayRateLimit> getEnabledRateLimitsByWorkspaceId(long workspaceId) {
+        return aiGatewayRateLimitRepository.findAllByWorkspaceIdAndEnabledTrue(workspaceId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public AiGatewayRateLimit getRateLimit(long id) {
         return aiGatewayRateLimitRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Rate limit not found: " + id));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<AiGatewayRateLimit> getRateLimitsByWorkspaceId(long workspaceId) {
+        return aiGatewayRateLimitRepository.findAllByWorkspaceId(workspaceId);
     }
 
     @Override

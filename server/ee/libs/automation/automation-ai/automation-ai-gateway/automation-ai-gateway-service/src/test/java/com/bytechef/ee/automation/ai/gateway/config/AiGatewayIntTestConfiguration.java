@@ -54,7 +54,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
         // modules: AiLlmUsageServiceImpl (llm-usage), AiPromptServiceImpl + AiPromptVersionServiceImpl (prompt),
         // and the workspace-agnostic platform-ai-gateway services + cross-cutting helpers (cache, compression,
         // cost, metrics, provider factories, retry handler, routing strategies, in-memory rate limiter). Also
-        // pulls in the automation-side workspace_*-membership services for eval + prompt that gateway facades
+        // pulls in the automation-side workspace-scoping services for eval + prompt that gateway facades
         // collaborate with (AiExternalScoreFacadeImpl, AiGatewayFacade).
         // Without these the integration context fails to start with NoSuchBeanDefinitionException because
         // @SpringBootTest(classes = ...) does not anchor scanning at an application package.

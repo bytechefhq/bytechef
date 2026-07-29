@@ -7,8 +7,6 @@
 
 package com.bytechef.ee.automation.ai.gateway.service;
 
-import com.bytechef.ee.automation.ai.gateway.domain.WorkspaceAiGatewayProject;
-import com.bytechef.ee.automation.ai.gateway.repository.WorkspaceAiGatewayProjectRepository;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayProject;
 import com.bytechef.ee.platform.ai.gateway.service.AiGatewayProjectService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -30,29 +28,22 @@ import org.springframework.transaction.annotation.Transactional;
 class WorkspaceAiGatewayProjectServiceImpl implements WorkspaceAiGatewayProjectService {
 
     private final AiGatewayProjectService aiGatewayProjectService;
-    private final WorkspaceAiGatewayProjectRepository workspaceAiGatewayProjectRepository;
 
-    public WorkspaceAiGatewayProjectServiceImpl(
-        AiGatewayProjectService aiGatewayProjectService,
-        WorkspaceAiGatewayProjectRepository workspaceAiGatewayProjectRepository) {
-
+    public WorkspaceAiGatewayProjectServiceImpl(AiGatewayProjectService aiGatewayProjectService) {
         this.aiGatewayProjectService = aiGatewayProjectService;
-        this.workspaceAiGatewayProjectRepository = workspaceAiGatewayProjectRepository;
     }
 
     @Override
     public AiGatewayProject createInWorkspace(AiGatewayProject project, long workspaceId) {
-        AiGatewayProject savedProject = aiGatewayProjectService.create(project);
+        project.setWorkspaceId(workspaceId);
 
-        workspaceAiGatewayProjectRepository.save(new WorkspaceAiGatewayProject(savedProject.getId(), workspaceId));
-
-        return savedProject;
+        return aiGatewayProjectService.create(project);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Optional<AiGatewayProject> fetchProjectByWorkspaceIdAndSlug(long workspaceId, String slug) {
-        return workspaceAiGatewayProjectRepository.findProjectByWorkspaceIdAndSlug(workspaceId, slug);
+        return aiGatewayProjectService.fetchProjectByWorkspaceIdAndSlug(workspaceId, slug);
     }
 
     @Override
@@ -60,8 +51,14 @@ class WorkspaceAiGatewayProjectServiceImpl implements WorkspaceAiGatewayProjectS
     public Map<Long, Long> getProjectWorkspaceMap() {
         Map<Long, Long> projectWorkspaceMap = new HashMap<>();
 
-        for (WorkspaceAiGatewayProject membership : workspaceAiGatewayProjectRepository.findAll()) {
-            projectWorkspaceMap.put(membership.getAiGatewayProjectId(), membership.getWorkspaceId());
+        for (AiGatewayProject project : aiGatewayProjectService.getProjects()) {
+            Long workspaceId = project.getWorkspaceId();
+
+            // A project with no workspace was previously represented by the absence of a membership row, so it stays
+            // absent from the map rather than mapping to a null value.
+            if (workspaceId != null) {
+                projectWorkspaceMap.put(project.getId(), workspaceId);
+            }
         }
 
         return projectWorkspaceMap;
@@ -70,14 +67,14 @@ class WorkspaceAiGatewayProjectServiceImpl implements WorkspaceAiGatewayProjectS
     @Override
     @Transactional(readOnly = true)
     public List<AiGatewayProject> getProjectsByWorkspaceId(long workspaceId) {
-        return workspaceAiGatewayProjectRepository.findProjectsByWorkspaceId(workspaceId);
+        return aiGatewayProjectService.getProjectsByWorkspaceId(workspaceId);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Long getWorkspaceId(long projectId) {
-        return workspaceAiGatewayProjectRepository.findByAiGatewayProjectId(projectId)
-            .map(WorkspaceAiGatewayProject::getWorkspaceId)
+        return aiGatewayProjectService.fetchProject(projectId)
+            .map(AiGatewayProject::getWorkspaceId)
             .orElse(null);
     }
 }

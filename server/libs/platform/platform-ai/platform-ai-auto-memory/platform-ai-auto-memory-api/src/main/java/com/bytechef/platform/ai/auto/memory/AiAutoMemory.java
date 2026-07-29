@@ -20,16 +20,17 @@ import com.bytechef.platform.configuration.domain.Environment;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.regex.Pattern;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * Persistent long-term memory entry for the agent. Owned by a principal — either a user or a deployment, discriminated
- * by {@code principal_type}/{@code principal_id}; the workspace association lives on {@code workspace_ai_auto_memory}
- * (mirrors workspace_mcp_server / workspace_ai_hub_personal_agent), so the same memory row can in principle be shared
- * across workspaces. The DB does NOT enforce a (user, env, name) unique constraint — the slug regex on {@link #name} is
- * the only entity-level shape gate; a service-layer duplicate-name check in create() is the policy gate.
+ * by {@code principal_type}/{@code principal_id}. A memory belongs to at most one workspace: the association is the
+ * nullable {@code workspace_id} column, which is null where no workspace applies. The DB does NOT enforce a (user, env,
+ * name) unique constraint — the slug regex on {@link #name} is the only entity-level shape gate; a service-layer
+ * duplicate-name check in create() is the policy gate.
  *
  * <p>
  * This is a Spring Data JDBC row-mapper entity. Setters mostly exist for the construct-then-save flow. The load-bearing
@@ -70,6 +71,13 @@ public class AiAutoMemory {
     @Id
     private Long id;
 
+    /**
+     * The owning workspace, or {@code null} when no workspace applies. Boxed on purpose — a primitive would coerce the
+     * "no workspace" case into workspace {@code 0}, which is a real workspace id.
+     */
+    @Column("workspace_id")
+    private @Nullable Long workspaceId;
+
     @Column("principal_id")
     private long principalId;
 
@@ -105,8 +113,8 @@ public class AiAutoMemory {
 
     /**
      * Bind-once constructor for new (unpersisted) rows. The per-field setters for {@code principalId} and
-     * {@code principalType} are package-private so a loaded row cannot be retargeted by mistake. Workspace association
-     * lives on {@code workspace_ai_auto_memory} and is set independently when the membership row is created.
+     * {@code principalType} are package-private so a loaded row cannot be retargeted by mistake. The workspace is set
+     * separately through {@link #setWorkspaceId(Long)} because it is optional.
      */
     public AiAutoMemory(AiAutoMemoryPrincipalType principalType, long principalId) {
         this.principalType = Objects.requireNonNull(principalType, "principalType")
@@ -120,6 +128,14 @@ public class AiAutoMemory {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public @Nullable Long getWorkspaceId() {
+        return workspaceId;
+    }
+
+    public void setWorkspaceId(@Nullable Long workspaceId) {
+        this.workspaceId = workspaceId;
     }
 
     public long getPrincipalId() {
@@ -313,15 +329,16 @@ public class AiAutoMemory {
      * Excludes {@code name}, {@code title}, {@code description}, and {@code content} on purpose. Memory rows hold
      * user-authored prompt content / preferences that may carry PII. Spring Data JDBC trace logging and any
      * {@code logger.warn(memory)} call site would otherwise persist that content to log aggregators. The remaining
-     * fields (id, principalType, principalId, memoryType, timestamps) are sufficient for ops to correlate a row with a
-     * database record. Note: the redaction policy is unique to {@code AiAutoMemory} — sibling entities like
-     * {@link AiHubUsage} log all numeric fields (token counts, model names, costs) because none of them carry PII; if
-     * that ever changes, this Javadoc and the matching {@code toString} should be revisited together.
+     * fields (id, workspaceId, principalType, principalId, memoryType, timestamps) are sufficient for ops to correlate
+     * a row with a database record. Note: the redaction policy is unique to {@code AiAutoMemory} — sibling entities
+     * like {@link AiHubUsage} log all numeric fields (token counts, model names, costs) because none of them carry PII;
+     * if that ever changes, this Javadoc and the matching {@code toString} should be revisited together.
      */
     @Override
     public String toString() {
         return "AiAutoMemory{" +
             "id=" + id +
+            ", workspaceId=" + workspaceId +
             ", principalType=" + principalType +
             ", principalId=" + principalId +
             ", memoryType=" + memoryType +

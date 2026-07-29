@@ -7,8 +7,6 @@
 
 package com.bytechef.ee.automation.contextstore.service;
 
-import com.bytechef.ee.automation.contextstore.domain.WorkspaceContextStore;
-import com.bytechef.ee.automation.contextstore.repository.WorkspaceContextStoreRepository;
 import com.bytechef.ee.platform.contextstore.domain.ContextStore;
 import com.bytechef.ee.platform.contextstore.service.ContextStoreService;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -21,9 +19,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Implements {@link WorkspaceContextStoreService} on top of the workspace ↔ context store relation table. Env-scoped
- * lookups read {@link ContextStore#getEnvironment()} on the parent rows; the relation table itself does not carry
- * environment.
+ * Implements {@link WorkspaceContextStoreService} on top of the nullable {@code context_store.workspace_id} column.
+ * Env-scoped lookups read {@link ContextStore#getEnvironment()} on the same rows; environment and workspace are
+ * independent columns on the store.
  *
  * @author Ivica Cardic
  * @version ee
@@ -34,36 +32,16 @@ import org.springframework.transaction.annotation.Transactional;
 public class WorkspaceContextStoreServiceImpl implements WorkspaceContextStoreService {
 
     private final ContextStoreService contextStoreService;
-    private final WorkspaceContextStoreRepository workspaceContextStoreRepository;
 
     @SuppressFBWarnings("EI2")
-    public WorkspaceContextStoreServiceImpl(
-        ContextStoreService contextStoreService, WorkspaceContextStoreRepository workspaceContextStoreRepository) {
-
+    public WorkspaceContextStoreServiceImpl(ContextStoreService contextStoreService) {
         this.contextStoreService = contextStoreService;
-        this.workspaceContextStoreRepository = workspaceContextStoreRepository;
-    }
-
-    @Override
-    public WorkspaceContextStore create(Long contextStoreId, Long workspaceId) {
-        return workspaceContextStoreRepository.save(new WorkspaceContextStore(contextStoreId, workspaceId));
-    }
-
-    @Override
-    public void deleteByContextStoreId(Long contextStoreId) {
-        workspaceContextStoreRepository.findByContextStoreId(contextStoreId)
-            .ifPresent(relation -> workspaceContextStoreRepository.deleteById(relation.getId()));
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<ContextStore> getAllStoresByWorkspaceId(Long workspaceId) {
-        List<Long> storeIds = workspaceContextStoreRepository.findAllByWorkspaceId(workspaceId)
-            .stream()
-            .map(WorkspaceContextStore::getContextStoreId)
-            .toList();
-
-        return contextStoreService.getAllByIds(storeIds);
+        return contextStoreService.getAllByWorkspaceId(workspaceId);
     }
 
     @Override
@@ -79,14 +57,16 @@ public class WorkspaceContextStoreServiceImpl implements WorkspaceContextStoreSe
     @Override
     @Transactional(readOnly = true)
     public Optional<Long> fetchWorkspaceIdByContextStoreId(Long contextStoreId) {
-        return workspaceContextStoreRepository.findByContextStoreId(contextStoreId)
-            .map(WorkspaceContextStore::getWorkspaceId);
+        return contextStoreService.fetch(contextStoreId)
+            .map(ContextStore::getWorkspaceId);
     }
 
     @Override
     @Transactional(readOnly = true)
     public boolean isStoreInWorkspace(Long workspaceId, Long contextStoreId) {
-        return workspaceContextStoreRepository.findByWorkspaceIdAndContextStoreId(workspaceId, contextStoreId)
+        return contextStoreService.fetch(contextStoreId)
+            .map(ContextStore::getWorkspaceId)
+            .filter(storeWorkspaceId -> Objects.equals(storeWorkspaceId, workspaceId))
             .isPresent();
     }
 }

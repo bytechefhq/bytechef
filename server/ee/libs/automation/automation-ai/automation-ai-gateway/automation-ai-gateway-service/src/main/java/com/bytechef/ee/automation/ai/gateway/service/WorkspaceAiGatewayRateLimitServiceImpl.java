@@ -7,8 +7,6 @@
 
 package com.bytechef.ee.automation.ai.gateway.service;
 
-import com.bytechef.ee.automation.ai.gateway.domain.WorkspaceAiGatewayRateLimit;
-import com.bytechef.ee.automation.ai.gateway.repository.WorkspaceAiGatewayRateLimitRepository;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayRateLimit;
 import com.bytechef.ee.platform.ai.gateway.service.AiGatewayRateLimitService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -28,45 +26,37 @@ import org.springframework.transaction.annotation.Transactional;
 class WorkspaceAiGatewayRateLimitServiceImpl implements WorkspaceAiGatewayRateLimitService {
 
     private final AiGatewayRateLimitService aiGatewayRateLimitService;
-    private final WorkspaceAiGatewayRateLimitRepository workspaceAiGatewayRateLimitRepository;
 
-    public WorkspaceAiGatewayRateLimitServiceImpl(
-        AiGatewayRateLimitService aiGatewayRateLimitService,
-        WorkspaceAiGatewayRateLimitRepository workspaceAiGatewayRateLimitRepository) {
-
+    public WorkspaceAiGatewayRateLimitServiceImpl(AiGatewayRateLimitService aiGatewayRateLimitService) {
         this.aiGatewayRateLimitService = aiGatewayRateLimitService;
-        this.workspaceAiGatewayRateLimitRepository = workspaceAiGatewayRateLimitRepository;
     }
 
     @Override
     public AiGatewayRateLimit createInWorkspace(AiGatewayRateLimit rateLimit, long workspaceId) {
         Validate.notNull(rateLimit, "'rateLimit' must not be null");
 
-        AiGatewayRateLimit savedRateLimit = aiGatewayRateLimitService.create(rateLimit);
+        rateLimit.setWorkspaceId(workspaceId);
 
-        workspaceAiGatewayRateLimitRepository.save(
-            new WorkspaceAiGatewayRateLimit(savedRateLimit.getId(), workspaceId));
-
-        return savedRateLimit;
+        return aiGatewayRateLimitService.create(rateLimit);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<AiGatewayRateLimit> getRateLimitsByWorkspaceId(long workspaceId) {
-        return workspaceAiGatewayRateLimitRepository.findRateLimitsByWorkspaceId(workspaceId);
+        return aiGatewayRateLimitService.getRateLimitsByWorkspaceId(workspaceId);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<AiGatewayRateLimit> getEnabledRateLimitsByWorkspaceId(long workspaceId) {
-        return workspaceAiGatewayRateLimitRepository.findEnabledRateLimitsByWorkspaceId(workspaceId);
+        return aiGatewayRateLimitService.getEnabledRateLimitsByWorkspaceId(workspaceId);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Long getWorkspaceId(long rateLimitId) {
-        return workspaceAiGatewayRateLimitRepository.findByAiGatewayRateLimitId(rateLimitId)
-            .map(WorkspaceAiGatewayRateLimit::getWorkspaceId)
+        return aiGatewayRateLimitService.fetchRateLimit(rateLimitId)
+            .map(AiGatewayRateLimit::getWorkspaceId)
             .orElse(null);
     }
 }

@@ -36,10 +36,9 @@ import org.springframework.stereotype.Controller;
  * GraphQL controller for the Knowledge Base source surface. Mutations route through
  * {@link WorkspaceKnowledgeBaseSourceFacade} — the same code path used by the AI Hub chat-define tools and the future
  * UI, so there is no parallel implementation to maintain. Workspace-scoped reads flow through
- * {@link WorkspaceKnowledgeBaseSourceService} which joins the {@code workspace_knowledge_base_source} relation table
- * with the platform-side source service. The {@code workspaceId} GraphQL field on {@link KnowledgeBaseSource} is
- * resolved via {@link SchemaMapping} since the entity itself no longer carries {@code workspace_id} after the
- * KB-to-platform pivot.
+ * {@link WorkspaceKnowledgeBaseSourceService}, which filters on the nullable {@code knowledge_base_source.workspace_id}
+ * column. The {@code workspaceId} GraphQL field on {@link KnowledgeBaseSource} is resolved via {@link SchemaMapping}
+ * straight off that column, so listing sources costs no extra query per row.
  *
  * @author Ivica Cardic
  */
@@ -82,8 +81,7 @@ class KnowledgeBaseSourceGraphQlController {
 
     @SchemaMapping(typeName = "KnowledgeBaseSource", field = "workspaceId")
     public Long workspaceId(KnowledgeBaseSource source) {
-        return workspaceKnowledgeBaseSourceService.fetchWorkspaceIdByKnowledgeBaseSourceId(source.getId())
-            .orElse(null);
+        return source.getWorkspaceId();
     }
 
     @MutationMapping

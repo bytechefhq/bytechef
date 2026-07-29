@@ -19,6 +19,7 @@ package com.bytechef.ee.platform.ai.prompt;
 import java.time.Instant;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -27,6 +28,9 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 /**
+ * A reusable prompt definition. A prompt belongs to at most one workspace, carried by the nullable {@link #workspaceId}
+ * column; the column is null only for a prompt that belongs to no workspace.
+ *
  * @author Ivica Cardic
  */
 @Table("ai_prompt")
@@ -54,6 +58,13 @@ public class AiPrompt {
 
     @Version
     private int version;
+
+    /**
+     * Workspace that owns this prompt, or {@code null} when it belongs to no workspace. Boxed on purpose: a primitive
+     * would collapse "no workspace" into workspace 0, which is a real workspace id.
+     */
+    @Column("workspace_id")
+    private @Nullable Long workspaceId;
 
     private AiPrompt() {
     }
@@ -110,6 +121,10 @@ public class AiPrompt {
         return version;
     }
 
+    public @Nullable Long getWorkspaceId() {
+        return workspaceId;
+    }
+
     public void setDescription(String description) {
         this.description = description;
     }
@@ -124,11 +139,16 @@ public class AiPrompt {
         this.projectId = projectId;
     }
 
+    public void setWorkspaceId(@Nullable Long workspaceId) {
+        this.workspaceId = workspaceId;
+    }
+
     @Override
     public String toString() {
         return "AiPrompt{" +
             "id=" + id +
             ", name='" + name + '\'' +
+            ", workspaceId=" + workspaceId +
             ", createdDate=" + createdDate +
             '}';
     }

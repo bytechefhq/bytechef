@@ -19,7 +19,6 @@ import com.bytechef.ee.ai.hub.personalagent.AiHubPersonalAgentResource;
 import com.bytechef.ee.ai.hub.personalagent.AiHubPersonalAgentService;
 import com.bytechef.ee.ai.hub.personalagent.AiHubPersonalAgentTool;
 import com.bytechef.ee.ai.hub.task.repository.AiHubTaskRepository;
-import com.bytechef.ee.ai.hub.task.repository.WorkspaceAiHubTaskRepository;
 import com.bytechef.ee.ai.hub.toolsearch.ToolSearchCatalogFeeder;
 import com.bytechef.ee.ai.hub.toolsearch.ToolSearchCatalogFeeder.TaskToolReference;
 import com.bytechef.ee.ai.hub.util.EnumOrdinals;
@@ -31,6 +30,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import org.jspecify.annotations.Nullable;
@@ -75,7 +75,6 @@ public class AiHubTaskServiceImpl implements AiHubTaskService {
     private static final int MESSAGE_LIMIT = 500;
 
     private final AiHubTaskRepository taskRepository;
-    private final WorkspaceAiHubTaskRepository workspaceTaskRepository;
     private final Clock clock;
     private final JobFacade jobFacade;
     private final WorkflowChatJobRegistry jobRegistry;
@@ -89,8 +88,7 @@ public class AiHubTaskServiceImpl implements AiHubTaskService {
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public AiHubTaskServiceImpl(
-        AiHubTaskRepository taskRepository, WorkspaceAiHubTaskRepository workspaceTaskRepository,
-        JobFacade jobFacade, WorkflowChatJobRegistry jobRegistry,
+        AiHubTaskRepository taskRepository, JobFacade jobFacade, WorkflowChatJobRegistry jobRegistry,
         InFlightAiHubRunRegistry inFlightRunRegistry,
         ObjectProvider<AiHubPersonalAgentService> aiHubPersonalAgentServiceProvider,
         ObjectProvider<AiHubTaskToolFacade> taskToolFacadeProvider,
@@ -100,7 +98,6 @@ public class AiHubTaskServiceImpl implements AiHubTaskService {
         @Nullable AiHubAuditPublisher auditPublisher) {
 
         this.taskRepository = taskRepository;
-        this.workspaceTaskRepository = workspaceTaskRepository;
         this.clock = Clock.systemUTC();
         this.jobFacade = jobFacade;
         this.jobRegistry = jobRegistry;
@@ -164,34 +161,31 @@ public class AiHubTaskServiceImpl implements AiHubTaskService {
     }
 
     /**
-     * Saves a freshly-built task and its workspace membership in one transactional unit. Mirrors the Connection /
-     * WorkspaceConnection model: the entity is workspace-agnostic, the membership row is the single place a workspace
-     * claims a task.
+     * Stamps a freshly-built task with its owning workspace and saves it. The workspace is a column on the row, so
+     * there is nothing else to write.
      */
     private AiHubTask saveNew(AiHubTask task, long workspaceId) {
-        AiHubTask saved = taskRepository.save(task);
+        task.setWorkspaceId(workspaceId);
 
-        workspaceTaskRepository.save(new WorkspaceAiHubTask(workspaceId, saved.getId()));
-
-        return saved;
+        return taskRepository.save(task);
     }
 
     /**
-     * Returns true when {@code workspaceId} claims {@code taskId} via {@code workspace_ai_hub_task}. Used by
-     * ownership-check paths that previously read {@code task.getWorkspaceId()} directly.
+     * Returns true when {@code workspaceId} owns the given task, per its {@code workspace_id} column. A task with a
+     * null workspace is owned by nobody, so every check fails closed.
      */
-    private boolean workspaceClaimsTask(long workspaceId, long taskId) {
-        return workspaceTaskRepository.findByWorkspaceIdAndAiHubTaskId(workspaceId, taskId)
-            .isPresent();
+    private static boolean workspaceOwnsTask(long workspaceId, AiHubTask task) {
+        return Objects.equals(task.getWorkspaceId(), workspaceId);
     }
 
     @Override
     @Transactional(readOnly = true)
     public long getWorkspaceId(long taskId) {
-        return workspaceTaskRepository.findByAiHubTaskId(taskId)
-            .orElseThrow(() -> new NotFoundException(
-                "No workspace membership row for ai_hub_task id=" + taskId))
-            .getWorkspaceId();
+        // A null workspace_id is the same data-integrity state a missing membership row used to represent: the task
+        // is unreachable through every workspace-scoped path, so fail loudly rather than return a sentinel.
+        return taskRepository.findById(taskId)
+            .map(AiHubTask::getWorkspaceId)
+            .orElseThrow(() -> new NotFoundException("No workspace for ai_hub_task id=" + taskId));
     }
 
     @Override
@@ -213,7 +207,7 @@ public class AiHubTaskServiceImpl implements AiHubTaskService {
         if (existing.isPresent()) {
             AiHubTask found = existing.get();
 
-            if (found.getUserId() == userId && workspaceClaimsTask(workspaceId, found.getId())) {
+            if (found.getUserId() == userId && workspaceOwnsTask(workspaceId, found)) {
                 // Idempotent return — but we deliberately do NOT update `environment` on the existing row. A
                 // task's environment is an immutable property of its origin: re-running create() from a
                 // different environment must not retroactively reassign the row, otherwise audit + usage analytics
@@ -704,11 +698,11 @@ public class AiHubTaskServiceImpl implements AiHubTaskService {
         int archived = 0;
 
         for (AiHubTask task : activeWorkflowChats) {
-            // Defensive: re-check ownership in the loop. The repository query already filters by userId AND joins on
-            // workspace; if a future change relaxes that filter (or someone discovers a query-level bypass), the
-            // ownership check here is the authoritative gate. Membership lookup is cheap (PK-indexed on the
-            // (workspace_id, ai_hub_task_id) unique constraint).
-            if (task.getUserId() != userId || !workspaceClaimsTask(workspaceId, task.getId())) {
+            // Defensive: re-check ownership in the loop. The repository query already filters by userId AND
+            // workspace_id; if a future change relaxes that filter (or someone discovers a query-level bypass), the
+            // ownership check here is the authoritative gate. It reads the loaded row's own column, so it costs
+            // nothing.
+            if (task.getUserId() != userId || !workspaceOwnsTask(workspaceId, task)) {
                 continue;
             }
 
@@ -935,7 +929,7 @@ public class AiHubTaskServiceImpl implements AiHubTaskService {
 
         AiHubTask task = taskOptional.get();
 
-        if (task.getUserId() != requesterUserId || !workspaceClaimsTask(requesterWorkspaceId, task.getId())) {
+        if (task.getUserId() != requesterUserId || !workspaceOwnsTask(requesterWorkspaceId, task)) {
             log.warn(
                 "AiHubTask ownership mismatch: requester userId={} workspaceId={} attempted to access "
                     + "threadId={} owned by userId={}. Returning 404 to avoid leaking existence.",
@@ -969,7 +963,7 @@ public class AiHubTaskServiceImpl implements AiHubTaskService {
 
         AiHubTask task = taskOptional.get();
 
-        if (task.getUserId() != requesterUserId || !workspaceClaimsTask(requesterWorkspaceId, task.getId())) {
+        if (task.getUserId() != requesterUserId || !workspaceOwnsTask(requesterWorkspaceId, task)) {
             log.warn(
                 "AiHubTask ownership mismatch: requester userId={} workspaceId={} attempted to access "
                     + "taskId={} owned by userId={}. Returning 404 to avoid leaking "

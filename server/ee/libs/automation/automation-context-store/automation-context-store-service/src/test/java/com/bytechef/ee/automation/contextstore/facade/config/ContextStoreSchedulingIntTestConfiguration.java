@@ -28,7 +28,6 @@ import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.automation.contextstore.audit.ContextStoreSourceAuditPublisher;
 import com.bytechef.ee.automation.contextstore.facade.WorkspaceContextStoreSourceFacadeImpl;
 import com.bytechef.ee.automation.contextstore.service.WorkspaceContextStoreService;
-import com.bytechef.ee.automation.contextstore.service.WorkspaceContextStoreSourceService;
 import com.bytechef.ee.platform.contextstore.clickhouse.ClickHouseTableProvisioner;
 import com.bytechef.ee.platform.contextstore.service.ContextStoreSourceService;
 import com.bytechef.evaluator.Evaluator;
@@ -163,11 +162,6 @@ public class ContextStoreSchedulingIntTestConfiguration {
     }
 
     @Bean
-    WorkspaceContextStoreSourceService workspaceContextStoreSourceService() {
-        return mock(WorkspaceContextStoreSourceService.class);
-    }
-
-    @Bean
     WorkspaceContextStoreSourceFacadeImpl workspaceContextStoreSourceFacade(
         ObjectProvider<ClickHouseTableProvisioner> clickHouseTableProvisionerProvider,
         ContextStoreSourceAuditPublisher contextStoreSourceAuditPublisher,
@@ -175,14 +169,13 @@ public class ContextStoreSchedulingIntTestConfiguration {
         ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectService projectService,
         ProjectWorkflowService projectWorkflowService, WorkflowService workflowService,
-        WorkspaceContextStoreService workspaceContextStoreService,
-        WorkspaceContextStoreSourceService workspaceContextStoreSourceService) {
+        WorkspaceContextStoreService workspaceContextStoreService) {
 
         return new WorkspaceContextStoreSourceFacadeImpl(
             clickHouseTableProvisionerProvider, componentDefinitionService, contextStoreSourceAuditPublisher,
             contextStoreSourceService, principalJobFacade, projectDeploymentFacade, projectDeploymentService,
             projectDeploymentWorkflowService, projectService, projectWorkflowService, new SyncTaskExecutor(),
-            workflowService, workspaceContextStoreService, workspaceContextStoreSourceService);
+            workflowService, workspaceContextStoreService);
     }
 
     @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")

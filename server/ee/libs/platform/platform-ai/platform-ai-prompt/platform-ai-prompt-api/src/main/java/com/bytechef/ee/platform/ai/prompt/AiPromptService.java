@@ -10,7 +10,9 @@ package com.bytechef.ee.platform.ai.prompt;
 /**
  * Workspace-agnostic CRUD on {@link AiPrompt}. Workspace-aware queries (by workspace, by-workspace+project+name) live
  * in {@code com.bytechef.ee.automation.ai.prompt.service.WorkspaceAiPromptService} — mirrors the
- * {@code platform-connection.ConnectionService} / {@code automation-configuration.WorkspaceConnectionService} split.
+ * {@code platform-connection.ConnectionService} / {@code automation-configuration.WorkspaceConnectionService} split. A
+ * prompt created through this service alone carries no workspace; {@code WorkspaceAiPromptService.createInWorkspace} is
+ * what sets the column.
  *
  * @author Ivica Cardic
  * @version ee

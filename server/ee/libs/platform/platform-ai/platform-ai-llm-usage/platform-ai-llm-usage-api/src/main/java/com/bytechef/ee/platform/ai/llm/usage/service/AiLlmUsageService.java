@@ -33,9 +33,8 @@ import java.util.Map;
 public interface AiLlmUsageService {
 
     /**
-     * Persists the usage row and inserts the {@code workspace_ai_llm_usage} membership row in the same transaction. The
-     * membership row is the only place a workspace claims a usage row — every cost-dashboard query JOINs through it for
-     * the workspace dimension. Failing to insert a membership row would silently lose the usage from analytics.
+     * Persists the usage row with its owning workspace. The workspace is required: every cost-dashboard query filters
+     * {@code ai_llm_usage.workspace_id}, so a row saved without one would silently disappear from analytics.
      */
     void create(AiLlmUsage usage, Long workspaceId);
 

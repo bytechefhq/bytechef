@@ -14,11 +14,9 @@ import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
 /**
- * Activates Spring Data JDBC repository scanning for {@code ai_eval_experiment} and {@code ai_eval_experiment_run}. The
- * {@code workspace_ai_eval_experiment} membership table is owned by automation-ai-eval-experiment's
- * {@code WorkspaceAiEvalExperimentJdbcRepositoryConfiguration}. Discovered via {@code AutoConfiguration.imports} when
- * this module is on the classpath, gated on a {@link AbstractJdbcConfiguration} bean so app variants without JDBC start
- * cleanly.
+ * Activates Spring Data JDBC repository scanning for {@code ai_eval_experiment} and {@code ai_eval_experiment_run}.
+ * Discovered via {@code AutoConfiguration.imports} when this module is on the classpath, gated on a
+ * {@link AbstractJdbcConfiguration} bean so app variants without JDBC start cleanly.
  *
  * @author Ivica Cardic
  * @version ee

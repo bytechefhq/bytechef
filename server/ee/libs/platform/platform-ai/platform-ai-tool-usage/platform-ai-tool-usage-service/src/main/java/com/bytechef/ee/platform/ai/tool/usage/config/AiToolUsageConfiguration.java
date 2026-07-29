@@ -57,13 +57,11 @@ public class AiToolUsageConfiguration {
     @Bean
     @ConditionalOnMissingBean(ToolUsageRecorder.class)
     ToolUsageRecorder aiToolUsageRecorder(
-        AiToolUsageRepository repository,
-        com.bytechef.ee.platform.ai.tool.usage.repository.WorkspaceAiToolUsageRepository workspaceRepository,
-        ToolCostEstimator costEstimator, JsonMapper jsonMapper,
+        AiToolUsageRepository repository, ToolCostEstimator costEstimator, JsonMapper jsonMapper,
         ObjectProvider<MeterRegistry> meterRegistryProvider,
         ObjectProvider<AiToolUsageRecorderImpl> selfProvider) {
 
         return new AiToolUsageRecorderImpl(
-            repository, workspaceRepository, costEstimator, jsonMapper, meterRegistryProvider, selfProvider);
+            repository, costEstimator, jsonMapper, meterRegistryProvider, selfProvider);
     }
 }

@@ -22,6 +22,8 @@
             <column name="status" type="INT">
                 <constraints nullable="false"/>
             </column>
+            <!-- Nullable on purpose: a task belongs to at most one workspace, and null means none applies. -->
+            <column name="workspace_id" type="BIGINT"/>
             <column name="created_at" type="TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
@@ -30,57 +32,12 @@
             </column>
         </createTable>
 
-        <!-- Sidebar list query — workspace dimension joins through workspace_ai_hub_task. -->
+        <!-- Sidebar list query — the workspace dimension is the ai_hub_task.workspace_id column. -->
         <createIndex tableName="ai_hub_task"
                      indexName="idx_ai_hub_task_user_status">
             <column name="user_id"/>
             <column name="status"/>
             <column name="updated_at" descending="true"/>
         </createIndex>
-
-        <createTable tableName="workspace_ai_hub_task">
-            <column name="id" type="BIGINT" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="workspace_id" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="ai_hub_task_id" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="created_date" type="TIMESTAMP">
-                <constraints nullable="false"/>
-            </column>
-            <column name="created_by" type="VARCHAR(50)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="last_modified_date" type="TIMESTAMP">
-                <constraints nullable="false"/>
-            </column>
-            <column name="last_modified_by" type="VARCHAR(50)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="version" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-
-        <addUniqueConstraint
-            constraintName="uk_workspace_ai_hub_task"
-            tableName="workspace_ai_hub_task"
-            columnNames="workspace_id, ai_hub_task_id"/>
-
-        <createIndex tableName="workspace_ai_hub_task"
-                     indexName="idx_workspace_ai_hub_task_workspace">
-            <column name="workspace_id"/>
-        </createIndex>
-
-        <addForeignKeyConstraint
-            baseTableName="workspace_ai_hub_task"
-            baseColumnNames="ai_hub_task_id"
-            constraintName="fk_workspace_ai_hub_task_task"
-            referencedTableName="ai_hub_task"
-            referencedColumnNames="id"
-            onDelete="CASCADE"/>
     </changeSet>
 </databaseChangeLog>

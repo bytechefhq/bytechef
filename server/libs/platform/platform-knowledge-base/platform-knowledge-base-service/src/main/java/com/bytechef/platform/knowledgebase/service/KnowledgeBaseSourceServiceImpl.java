@@ -91,6 +91,18 @@ class KnowledgeBaseSourceServiceImpl implements KnowledgeBaseSourceService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<KnowledgeBaseSource> getAllByWorkspaceId(long workspaceId) {
+        return knowledgeBaseSourceRepository.findAllByWorkspaceId(workspaceId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<KnowledgeBaseSource> getAllEnabledByWorkspaceId(long workspaceId) {
+        return knowledgeBaseSourceRepository.findAllByWorkspaceIdAndEnabled(workspaceId, true);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<KnowledgeBaseSource> findAllByKnowledgeBaseId(Long knowledgeBaseId) {
         return knowledgeBaseSourceRepository.findAllByKnowledgeBaseId(knowledgeBaseId);
     }

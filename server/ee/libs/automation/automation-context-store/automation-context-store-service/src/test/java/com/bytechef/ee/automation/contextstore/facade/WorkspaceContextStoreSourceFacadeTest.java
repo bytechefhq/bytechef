@@ -22,7 +22,6 @@ import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.ee.automation.contextstore.audit.ContextStoreSourceAuditPublisher;
 import com.bytechef.ee.automation.contextstore.service.WorkspaceContextStoreService;
-import com.bytechef.ee.automation.contextstore.service.WorkspaceContextStoreSourceService;
 import com.bytechef.ee.platform.contextstore.clickhouse.ClickHouseTableProvisioner;
 import com.bytechef.ee.platform.contextstore.domain.ContextStoreSource;
 import com.bytechef.ee.platform.contextstore.service.ContextStoreSourceService;
@@ -81,8 +80,6 @@ class WorkspaceContextStoreSourceFacadeTest {
     @Mock
     private WorkspaceContextStoreService workspaceContextStoreService;
     @Mock
-    private WorkspaceContextStoreSourceService workspaceContextStoreSourceService;
-    @Mock
     private Project project;
     @Mock
     private ProjectDeployment projectDeployment;
@@ -95,7 +92,7 @@ class WorkspaceContextStoreSourceFacadeTest {
             clickHouseTableProvisionerProvider, componentDefinitionService, contextStoreSourceAuditPublisher,
             contextStoreSourceService, principalJobFacade, projectDeploymentFacade, projectDeploymentService,
             projectDeploymentWorkflowService, projectService, projectWorkflowService, taskExecutor,
-            workflowService, workspaceContextStoreService, workspaceContextStoreSourceService);
+            workflowService, workspaceContextStoreService);
 
         when(project.getId()).thenReturn(PROJECT_ID);
         when(project.getLastProjectVersion()).thenReturn(PROJECT_VERSION);

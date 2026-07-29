@@ -23,12 +23,13 @@
             <!--
                 Environment ordinal: 0 = DEVELOPMENT, 1 = STAGING, 2 = PRODUCTION. Stored as INT for ordinal stability
                 (see com.bytechef.platform.configuration.domain.Environment). Uniqueness of (workspace_id, environment,
-                name) is enforced at the application layer in WorkspaceContextStoreFacade — cross-table unique with the
-                workspace_context_store relation row can't be expressed in SQL.
+                name) is enforced at the application layer in WorkspaceContextStoreFacade.
             -->
             <column name="environment" type="INT">
                 <constraints nullable="false"/>
             </column>
+            <!-- Nullable on purpose: a store belongs to at most one workspace, and null means none applies. -->
+            <column name="workspace_id" type="BIGINT"/>
             <column name="created_by" type="VARCHAR(256)"/>
             <column name="created_date" type="TIMESTAMP WITH TIME ZONE"/>
             <column name="last_modified_by" type="VARCHAR(256)"/>
@@ -81,6 +82,8 @@
             <column name="context_store_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
+            <!-- Nullable on purpose: a source belongs to at most one workspace, and null means none applies. -->
+            <column name="workspace_id" type="BIGINT"/>
             <column name="name" type="VARCHAR(256)">
                 <constraints nullable="false"/>
             </column>

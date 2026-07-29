@@ -24,7 +24,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.platform.ai.auto.memory.repository.AiAutoMemoryRepository;
-import com.bytechef.platform.ai.auto.memory.repository.WorkspaceAiAutoMemoryRepository;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -51,9 +50,6 @@ class AiAutoMemoryServiceTest {
 
     @Mock
     private AiAutoMemoryRepository aiMemoryRepository;
-
-    @Mock
-    private WorkspaceAiAutoMemoryRepository workspaceAiMemoryRepository;
 
     private final Clock clock = Clock.fixed(Instant.parse("2026-04-24T10:00:00Z"), ZoneId.of("UTC"));
 
@@ -83,7 +79,7 @@ class AiAutoMemoryServiceTest {
         assertThat(created.getCreatedAt()).isEqualTo(LocalDateTime.now(clock));
         assertThat(created.getUpdatedAt()).isEqualTo(LocalDateTime.now(clock));
 
-        verify(workspaceAiMemoryRepository).save(any(WorkspaceAiAutoMemory.class));
+        assertThat(created.getWorkspaceId()).isEqualTo(WORKSPACE_ID);
     }
 
     @Test
@@ -247,8 +243,35 @@ class AiAutoMemoryServiceTest {
         assertThat(result).isEmpty();
     }
 
+    @Test
+    void testFindByIdReturnsEmptyWhenMemoryBelongsToAnotherWorkspace() {
+        AiAutoMemoryServiceImpl realService = newService();
+
+        AiAutoMemory otherWorkspaces = buildMemory("mine", AiAutoMemoryType.USER);
+
+        otherWorkspaces.setId(8L);
+        otherWorkspaces.setWorkspaceId(WORKSPACE_ID + 1);
+
+        when(aiMemoryRepository.findById(8L)).thenReturn(Optional.of(otherWorkspaces));
+
+        assertThat(realService.findById(WORKSPACE_ID, AiAutoMemoryPrincipalType.USER, PRINCIPAL_ID, 8L)).isEmpty();
+    }
+
+    @Test
+    void testFindByIdReturnsEmptyWhenMemoryHasNoWorkspace() {
+        AiAutoMemoryServiceImpl realService = newService();
+
+        AiAutoMemory workspaceLess = buildMemory("mine", AiAutoMemoryType.USER);
+
+        workspaceLess.setId(9L);
+
+        when(aiMemoryRepository.findById(9L)).thenReturn(Optional.of(workspaceLess));
+
+        assertThat(realService.findById(WORKSPACE_ID, AiAutoMemoryPrincipalType.USER, PRINCIPAL_ID, 9L)).isEmpty();
+    }
+
     private AiAutoMemoryServiceImpl newService() {
-        return new AiAutoMemoryServiceImpl(aiMemoryRepository, workspaceAiMemoryRepository, clock);
+        return new AiAutoMemoryServiceImpl(aiMemoryRepository, clock);
     }
 
     private AiAutoMemory buildMemory(String name, AiAutoMemoryType memoryType) {

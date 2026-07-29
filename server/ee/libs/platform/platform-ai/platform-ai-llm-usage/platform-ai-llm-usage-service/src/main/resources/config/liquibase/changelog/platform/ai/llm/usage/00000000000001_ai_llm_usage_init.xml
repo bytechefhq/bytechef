@@ -6,12 +6,13 @@
 
     <!--
         Shared ai_llm_usage table — single canonical LLM bookkeeping store for every agent surface (AI Gateway,
-        AI Hub, future ad-hoc AI agents). The entity is workspace-agnostic; workspace association lives on
-        workspace_ai_llm_usage. Cost-dashboard queries (SUM(cost) GROUP BY workspace) JOIN through the relation —
-        index on workspace_ai_llm_usage.workspace_id keeps the JOIN index-only.
+        AI Hub, future ad-hoc AI agents). A usage row belongs to at most one workspace, carried by the nullable
+        workspace_id column; the column is null only for a row recorded outside any workspace. Cost-dashboard
+        queries (SUM(cost) GROUP BY workspace) filter the column directly, served by
+        idx_ai_llm_usage_workspace_created.
 
-        Insert-path semantics: every recorded LLM call MUST insert both rows in the same transaction so a half-write
-        (entity row but no membership) doesn't orphan a usage row from analytics.
+        Insert-path semantics: a recorded LLM call is now a single insert, so a usage row can no longer be orphaned
+        from analytics by a half-written membership.
     -->
     <changeSet id="00000000000001-ai-llm-usage" author="Ivica Cardic">
         <createTable tableName="ai_llm_usage">
@@ -35,6 +36,7 @@
             <column name="error_message" type="TEXT"/>
             <column name="cache_hit" type="BOOLEAN" defaultValueBoolean="false"/>
             <column name="project_id" type="BIGINT"/>
+            <column name="workspace_id" type="BIGINT"/>
             <!-- AI Hub attribution dims (null on gateway rows) -->
             <column name="user_id" type="BIGINT"/>
             <column name="owner_id" type="BIGINT"/>
@@ -72,48 +74,9 @@
             <column name="created_date" descending="true"/>
         </createIndex>
 
-        <createTable tableName="workspace_ai_llm_usage">
-            <column name="id" type="BIGINT" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="workspace_id" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="ai_llm_usage_id" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="created_date" type="TIMESTAMP">
-                <constraints nullable="false"/>
-            </column>
-            <column name="created_by" type="VARCHAR(50)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="last_modified_date" type="TIMESTAMP">
-                <constraints nullable="false"/>
-            </column>
-            <column name="last_modified_by" type="VARCHAR(50)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="version" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-
-        <addUniqueConstraint
-            constraintName="uk_workspace_ai_llm_usage"
-            tableName="workspace_ai_llm_usage"
-            columnNames="workspace_id, ai_llm_usage_id"/>
-
-        <createIndex tableName="workspace_ai_llm_usage" indexName="idx_workspace_ai_llm_usage_workspace">
+        <createIndex tableName="ai_llm_usage" indexName="idx_ai_llm_usage_workspace_created">
             <column name="workspace_id"/>
+            <column name="created_date"/>
         </createIndex>
-
-        <addForeignKeyConstraint
-            baseTableName="workspace_ai_llm_usage"
-            baseColumnNames="ai_llm_usage_id"
-            constraintName="fk_workspace_ai_llm_usage_usage"
-            referencedTableName="ai_llm_usage"
-            referencedColumnNames="id"
-            onDelete="CASCADE"/>
     </changeSet>
 </databaseChangeLog>

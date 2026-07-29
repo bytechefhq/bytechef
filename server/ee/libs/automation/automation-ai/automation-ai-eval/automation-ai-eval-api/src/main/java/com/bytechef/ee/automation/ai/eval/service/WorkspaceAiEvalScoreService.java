@@ -21,8 +21,8 @@ import java.util.List;
 public interface WorkspaceAiEvalScoreService {
 
     /**
-     * Resolves the workspace-scoped {@code AiEvalScoreConfig} (if one exists) and creates the score via the platform
-     * service, then writes the workspace membership row in the same transaction.
+     * Resolves the workspace-scoped {@code AiEvalScoreConfig} (if one exists), binds the score to {@code workspaceId},
+     * and creates it via the platform service.
      */
     AiEvalScore createInWorkspace(AiEvalScore score, long workspaceId);
 

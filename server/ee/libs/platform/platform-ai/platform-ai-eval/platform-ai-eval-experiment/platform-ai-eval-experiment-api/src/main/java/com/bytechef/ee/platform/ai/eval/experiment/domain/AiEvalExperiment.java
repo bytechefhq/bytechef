@@ -10,6 +10,7 @@ package com.bytechef.ee.platform.ai.eval.experiment.domain;
 import java.time.Instant;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -63,6 +64,13 @@ public class AiEvalExperiment {
 
     @Column("stop_requested_date")
     private Instant stopRequestedDate;
+
+    /**
+     * The owning workspace, or {@code null} when the experiment belongs to no workspace. Boxed on purpose — a primitive
+     * would coerce the "no workspace" case into workspace {@code 0}, which is a real workspace id.
+     */
+    @Column("workspace_id")
+    private @Nullable Long workspaceId;
 
     private AiEvalExperiment() {
     }
@@ -148,6 +156,10 @@ public class AiEvalExperiment {
         return stopRequestedDate;
     }
 
+    public @Nullable Long getWorkspaceId() {
+        return workspaceId;
+    }
+
     public boolean isStopRequested() {
         return stopRequested;
     }
@@ -174,6 +186,14 @@ public class AiEvalExperiment {
         assertPending("promptVersionId");
 
         this.promptVersionId = promptVersionId;
+    }
+
+    /**
+     * Deliberately not guarded by {@link #assertPending(String)}: the owning workspace is not experiment configuration,
+     * so rebinding it does not invalidate already-recorded {@link AiEvalExperimentRun} rows.
+     */
+    public void setWorkspaceId(@Nullable Long workspaceId) {
+        this.workspaceId = workspaceId;
     }
 
     /**
@@ -312,6 +332,7 @@ public class AiEvalExperiment {
     public String toString() {
         return "AiEvalExperiment{" +
             "id=" + id +
+            ", workspaceId=" + workspaceId +
             ", datasetVersionId=" + datasetVersionId +
             ", promptVersionId=" + promptVersionId +
             ", model='" + model + '\'' +

@@ -20,4 +20,10 @@ public interface AiGatewayRoutingPolicyRepository extends ListCrudRepository<AiG
     Optional<AiGatewayRoutingPolicy> findByName(String name);
 
     List<AiGatewayRoutingPolicy> findAllByEnabled(boolean enabled);
+
+    /**
+     * Returns the routing policies owned by the given workspace. A policy with a null {@code workspace_id} belongs to
+     * no workspace and is therefore never returned here — SQL equality never matches NULL.
+     */
+    List<AiGatewayRoutingPolicy> findAllByWorkspaceId(long workspaceId);
 }

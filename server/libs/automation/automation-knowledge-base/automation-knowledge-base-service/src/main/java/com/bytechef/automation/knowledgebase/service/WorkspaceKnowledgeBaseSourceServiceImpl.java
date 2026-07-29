@@ -16,8 +16,6 @@
 
 package com.bytechef.automation.knowledgebase.service;
 
-import com.bytechef.automation.knowledgebase.domain.WorkspaceKnowledgeBaseSource;
-import com.bytechef.automation.knowledgebase.repository.WorkspaceKnowledgeBaseSourceRepository;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseSource;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseSourceService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -28,9 +26,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Implements {@link WorkspaceKnowledgeBaseSourceService} on top of the workspace ↔ KB source relation table. Mirrors
- * the post-platform-pivot {@code WorkspaceContextStoreSourceServiceImpl} shape: relation-table CRUD here + delegation
- * to the platform-side {@link KnowledgeBaseSourceService} for the actual source rows.
+ * Implements {@link WorkspaceKnowledgeBaseSourceService} on top of the nullable
+ * {@code knowledge_base_source.workspace_id} column. Mirrors the {@code WorkspaceContextStoreSourceServiceImpl} shape:
+ * workspace rules here + delegation to the platform-side {@link KnowledgeBaseSourceService} for the actual source rows.
  *
  * @author Ivica Cardic
  */
@@ -40,51 +38,29 @@ import org.springframework.transaction.annotation.Transactional;
 public class WorkspaceKnowledgeBaseSourceServiceImpl implements WorkspaceKnowledgeBaseSourceService {
 
     private final KnowledgeBaseSourceService knowledgeBaseSourceService;
-    private final WorkspaceKnowledgeBaseSourceRepository workspaceKnowledgeBaseSourceRepository;
 
     @SuppressFBWarnings("EI2")
-    public WorkspaceKnowledgeBaseSourceServiceImpl(
-        KnowledgeBaseSourceService knowledgeBaseSourceService,
-        WorkspaceKnowledgeBaseSourceRepository workspaceKnowledgeBaseSourceRepository) {
-
+    public WorkspaceKnowledgeBaseSourceServiceImpl(KnowledgeBaseSourceService knowledgeBaseSourceService) {
         this.knowledgeBaseSourceService = knowledgeBaseSourceService;
-        this.workspaceKnowledgeBaseSourceRepository = workspaceKnowledgeBaseSourceRepository;
-    }
-
-    @Override
-    public WorkspaceKnowledgeBaseSource registerSourceForWorkspace(Long knowledgeBaseSourceId, Long workspaceId) {
-        return workspaceKnowledgeBaseSourceRepository.save(
-            new WorkspaceKnowledgeBaseSource(knowledgeBaseSourceId, workspaceId));
-    }
-
-    @Override
-    public void unregisterSource(Long knowledgeBaseSourceId) {
-        workspaceKnowledgeBaseSourceRepository.findByKnowledgeBaseSourceId(knowledgeBaseSourceId)
-            .ifPresent(relation -> workspaceKnowledgeBaseSourceRepository.deleteById(relation.getId()));
     }
 
     @Override
     @Transactional(readOnly = true)
     public Optional<Long> fetchWorkspaceIdByKnowledgeBaseSourceId(Long knowledgeBaseSourceId) {
-        return workspaceKnowledgeBaseSourceRepository.findByKnowledgeBaseSourceId(knowledgeBaseSourceId)
-            .map(WorkspaceKnowledgeBaseSource::getWorkspaceId);
+        return knowledgeBaseSourceService.fetch(knowledgeBaseSourceId)
+            .map(KnowledgeBaseSource::getWorkspaceId);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<KnowledgeBaseSource> getAllSourcesByWorkspaceId(Long workspaceId) {
-        List<Long> sourceIds = workspaceKnowledgeBaseSourceRepository.findAllByWorkspaceId(workspaceId)
-            .stream()
-            .map(WorkspaceKnowledgeBaseSource::getKnowledgeBaseSourceId)
-            .toList();
-
-        return knowledgeBaseSourceService.getAllByIds(sourceIds);
+        return knowledgeBaseSourceService.getAllByWorkspaceId(workspaceId);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<KnowledgeBaseSource> getAllSourcesByWorkspaceId(Long workspaceId, Long environmentId) {
-        // environmentId is accepted for forward compatibility (see service Javadoc); the relation table does not yet
+        // environmentId is accepted for forward compatibility (see service Javadoc); the source row does not yet
         // carry an environment column, so the lookup is workspace-only today.
         return getAllSourcesByWorkspaceId(workspaceId);
     }
@@ -92,18 +68,13 @@ public class WorkspaceKnowledgeBaseSourceServiceImpl implements WorkspaceKnowled
     @Override
     @Transactional(readOnly = true)
     public List<KnowledgeBaseSource> getAllEnabledSourcesByWorkspaceId(Long workspaceId) {
-        List<Long> sourceIds = workspaceKnowledgeBaseSourceRepository.findAllByWorkspaceId(workspaceId)
-            .stream()
-            .map(WorkspaceKnowledgeBaseSource::getKnowledgeBaseSourceId)
-            .toList();
-
-        return knowledgeBaseSourceService.getAllEnabledByIds(sourceIds);
+        return knowledgeBaseSourceService.getAllEnabledByWorkspaceId(workspaceId);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<KnowledgeBaseSource> getAllEnabledSourcesByWorkspaceId(Long workspaceId, Long environmentId) {
-        // environmentId is accepted for forward compatibility (see service Javadoc); the relation table does not yet
+        // environmentId is accepted for forward compatibility (see service Javadoc); the source row does not yet
         // carry an environment column, so the lookup is workspace-only today.
         return getAllEnabledSourcesByWorkspaceId(workspaceId);
     }

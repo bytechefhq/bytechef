@@ -7,8 +7,6 @@
 
 package com.bytechef.ee.automation.ai.gateway.service;
 
-import com.bytechef.ee.automation.ai.gateway.domain.WorkspaceAiGatewayBudget;
-import com.bytechef.ee.automation.ai.gateway.repository.WorkspaceAiGatewayBudgetRepository;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayBudget;
 import com.bytechef.ee.platform.ai.gateway.service.AiGatewayBudgetService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -32,23 +30,19 @@ class WorkspaceAiGatewayBudgetServiceImpl implements WorkspaceAiGatewayBudgetSer
 
     private final AiGatewayBudgetService aiGatewayBudgetService;
     private final CacheManager cacheManager;
-    private final WorkspaceAiGatewayBudgetRepository workspaceAiGatewayBudgetRepository;
 
     public WorkspaceAiGatewayBudgetServiceImpl(
-        AiGatewayBudgetService aiGatewayBudgetService,
-        CacheManager cacheManager,
-        WorkspaceAiGatewayBudgetRepository workspaceAiGatewayBudgetRepository) {
+        AiGatewayBudgetService aiGatewayBudgetService, CacheManager cacheManager) {
 
         this.aiGatewayBudgetService = aiGatewayBudgetService;
         this.cacheManager = cacheManager;
-        this.workspaceAiGatewayBudgetRepository = workspaceAiGatewayBudgetRepository;
     }
 
     @Override
     public AiGatewayBudget createInWorkspace(AiGatewayBudget budget, long workspaceId) {
-        AiGatewayBudget savedBudget = aiGatewayBudgetService.create(budget);
+        budget.setWorkspaceId(workspaceId);
 
-        workspaceAiGatewayBudgetRepository.save(new WorkspaceAiGatewayBudget(savedBudget.getId(), workspaceId));
+        AiGatewayBudget savedBudget = aiGatewayBudgetService.create(budget);
 
         evictHardBlockedCache(workspaceId);
 
@@ -58,14 +52,14 @@ class WorkspaceAiGatewayBudgetServiceImpl implements WorkspaceAiGatewayBudgetSer
     @Override
     @Transactional(readOnly = true)
     public Optional<AiGatewayBudget> getBudgetByWorkspaceId(long workspaceId) {
-        return workspaceAiGatewayBudgetRepository.findBudgetByWorkspaceId(workspaceId);
+        return aiGatewayBudgetService.fetchBudgetByWorkspaceId(workspaceId);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Long getWorkspaceId(long budgetId) {
-        return workspaceAiGatewayBudgetRepository.findByAiGatewayBudgetId(budgetId)
-            .map(WorkspaceAiGatewayBudget::getWorkspaceId)
+        return aiGatewayBudgetService.fetchBudget(budgetId)
+            .map(AiGatewayBudget::getWorkspaceId)
             .orElse(null);
     }
 

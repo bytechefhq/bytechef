@@ -18,12 +18,12 @@ import org.jspecify.annotations.Nullable;
  * race directly.
  *
  * <p>
- * <b>Ownership invariant:</b> every read and write requires both {@code workspaceId} and {@code userId}. The agent row
- * itself is workspace-agnostic; workspace association lives on {@link WorkspaceAiHubPersonalAgent} and the service
- * joins through it for every query and re-validates membership on every mutation so a forged id from the client cannot
- * reach an agent attached to another workspace or owned by another user. {@code (user, environment, name)} is no longer
- * DB-unique — the service-layer duplicate-name check in {@code create} is the only gate, and a concurrent same-name
- * create CAN race; the resulting redundant row is harmless and removable from the UI.
+ * <b>Ownership invariant:</b> every read and write requires both {@code workspaceId} and {@code userId}. The agent's
+ * workspace association is its nullable {@code workspace_id} column, and the service filters on it for every query and
+ * re-validates ownership on every mutation so a forged id from the client cannot reach an agent attached to another
+ * workspace or owned by another user. {@code (user, environment, name)} is no longer DB-unique — the service-layer
+ * duplicate-name check in {@code create} is the only gate, and a concurrent same-name create CAN race; the resulting
+ * redundant row is harmless and removable from the UI.
  * </p>
  *
  * @version ee

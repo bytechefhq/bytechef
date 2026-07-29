@@ -17,21 +17,17 @@
 package com.bytechef.platform.ai.auto.memory.repository.jdbc;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemory;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryPrincipalType;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryType;
-import com.bytechef.platform.ai.auto.memory.WorkspaceAiAutoMemory;
 import com.bytechef.platform.ai.auto.memory.repository.AiAutoMemoryRepository;
-import com.bytechef.platform.ai.auto.memory.repository.WorkspaceAiAutoMemoryRepository;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,14 +36,13 @@ import org.springframework.boot.data.jdbc.autoconfigure.DataJdbcRepositoriesAuto
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 import org.springframework.test.context.ActiveProfiles;
 
 /**
- * Integration test for {@link AiAutoMemoryRepository} via the JDBC binding {@link JdbcAiAutoMemoryRepository}.
- * Workspace dimension comes from {@code workspace_ai_auto_memory} via the JOIN-based queries; the entity itself is
- * workspace-agnostic. Rows are owned by a principal discriminated by {@code principal_type}/{@code principal_id}.
+ * Integration test for {@link AiAutoMemoryRepository} via the JDBC binding {@link JdbcAiAutoMemoryRepository}. The
+ * workspace dimension is the {@code ai_auto_memory.workspace_id} column the queries filter on. Rows are owned by a
+ * principal discriminated by {@code principal_type}/{@code principal_id}.
  *
  * @author Ivica Cardic
  */
@@ -63,18 +58,14 @@ public class AiAutoMemoryRepositoryIntTest {
     @Autowired
     private AiAutoMemoryRepository aiMemoryRepository;
 
-    @Autowired
-    private WorkspaceAiAutoMemoryRepository workspaceAiMemoryRepository;
-
     @AfterEach
     public void afterEach() {
-        workspaceAiMemoryRepository.deleteAll();
         aiMemoryRepository.deleteAll();
     }
 
     @Test
     public void testSaveAndFindByName() {
-        long memoryId = saveMemoryWithMembership(1L, 10L, "user_profile", AiAutoMemoryType.USER, DEV);
+        long memoryId = saveMemoryInWorkspace(1L, 10L, "user_profile", AiAutoMemoryType.USER, DEV);
 
         assertThat(memoryId).isPositive();
 
@@ -95,16 +86,15 @@ public class AiAutoMemoryRepositoryIntTest {
 
         older.setUpdatedAt(LocalDateTime.now()
             .minusMinutes(10));
+        older.setWorkspaceId(1L);
 
         AiAutoMemory newer = buildMemory(10L, "newer", AiAutoMemoryType.FEEDBACK);
 
         newer.setUpdatedAt(LocalDateTime.now());
+        newer.setWorkspaceId(1L);
 
-        AiAutoMemory savedOlder = aiMemoryRepository.save(older);
-        AiAutoMemory savedNewer = aiMemoryRepository.save(newer);
-
-        workspaceAiMemoryRepository.save(new WorkspaceAiAutoMemory(1L, savedOlder.getId()));
-        workspaceAiMemoryRepository.save(new WorkspaceAiAutoMemory(1L, savedNewer.getId()));
+        aiMemoryRepository.save(older);
+        aiMemoryRepository.save(newer);
 
         List<AiAutoMemory> all = aiMemoryRepository
             .findByWorkspaceIdAndPrincipalTypeAndPrincipalIdAndEnvironmentOrderByUpdatedAtDesc(1L, USER, 10L, DEV);
@@ -118,9 +108,9 @@ public class AiAutoMemoryRepositoryIntTest {
 
     @Test
     public void testFindByMemoryTypeFiltersCorrectly() {
-        saveMemoryWithMembership(1L, 10L, "a", AiAutoMemoryType.USER, DEV);
-        saveMemoryWithMembership(1L, 10L, "b", AiAutoMemoryType.FEEDBACK, DEV);
-        saveMemoryWithMembership(1L, 10L, "c", AiAutoMemoryType.USER, DEV);
+        saveMemoryInWorkspace(1L, 10L, "a", AiAutoMemoryType.USER, DEV);
+        saveMemoryInWorkspace(1L, 10L, "b", AiAutoMemoryType.FEEDBACK, DEV);
+        saveMemoryInWorkspace(1L, 10L, "c", AiAutoMemoryType.USER, DEV);
 
         List<AiAutoMemory> userTyped = aiMemoryRepository
             .findByWorkspaceIdAndPrincipalTypeAndPrincipalIdAndEnvironmentAndMemoryTypeOrderByUpdatedAtDesc(
@@ -133,13 +123,19 @@ public class AiAutoMemoryRepositoryIntTest {
     }
 
     @Test
-    public void testRelationUniqueConstraintOnWorkspaceAndMemory() {
-        long memoryId = saveMemoryWithMembership(1L, 10L, "shared", AiAutoMemoryType.USER, DEV);
+    public void testMemoryWithoutWorkspaceIsNotReturnedByWorkspaceQueries() {
+        AiAutoMemory workspaceLess = buildMemory(10L, "no_workspace", AiAutoMemoryType.USER);
 
-        // Same (workspace_id, ai_auto_memory_id) pair → DB rejects the second insert. The unique constraint on the
-        // relation prevents the same workspace from claiming the same memory twice.
-        assertThatThrownBy(() -> workspaceAiMemoryRepository.save(new WorkspaceAiAutoMemory(1L, memoryId)))
-            .isInstanceOf(DataIntegrityViolationException.class);
+        // workspaceId left null: SQL equality never matches NULL, so no workspace can see the row — in particular
+        // workspace 0, which a primitive-typed column would have collapsed it into.
+        aiMemoryRepository.save(workspaceLess);
+
+        assertThat(aiMemoryRepository
+            .findByWorkspaceIdAndPrincipalTypeAndPrincipalIdAndEnvironmentOrderByUpdatedAtDesc(0L, USER, 10L, DEV))
+                .isEmpty();
+        assertThat(aiMemoryRepository
+            .findByWorkspaceIdAndPrincipalTypeAndPrincipalIdAndEnvironmentOrderByUpdatedAtDesc(1L, USER, 10L, DEV))
+                .isEmpty();
     }
 
     @Test
@@ -149,11 +145,11 @@ public class AiAutoMemoryRepositoryIntTest {
 
         staging.setEnvironment(Environment.STAGING);
 
-        AiAutoMemory savedDev = aiMemoryRepository.save(dev);
-        AiAutoMemory savedStaging = aiMemoryRepository.save(staging);
+        dev.setWorkspaceId(1L);
+        staging.setWorkspaceId(1L);
 
-        workspaceAiMemoryRepository.save(new WorkspaceAiAutoMemory(1L, savedDev.getId()));
-        workspaceAiMemoryRepository.save(new WorkspaceAiAutoMemory(1L, savedStaging.getId()));
+        aiMemoryRepository.save(dev);
+        aiMemoryRepository.save(staging);
 
         List<AiAutoMemory> devRows = aiMemoryRepository
             .findAllByWorkspaceIdAndPrincipalTypeAndPrincipalIdAndEnvironmentAndName(1L, USER, 10L, DEV, "shared");
@@ -169,8 +165,8 @@ public class AiAutoMemoryRepositoryIntTest {
 
     @Test
     public void testFindByWorkspaceIdAndPrincipalIdFiltersOtherPrincipals() {
-        saveMemoryWithMembership(1L, 10L, "alice_profile", AiAutoMemoryType.USER, DEV);
-        saveMemoryWithMembership(1L, 20L, "bob_profile", AiAutoMemoryType.USER, DEV);
+        saveMemoryInWorkspace(1L, 10L, "alice_profile", AiAutoMemoryType.USER, DEV);
+        saveMemoryInWorkspace(1L, 20L, "bob_profile", AiAutoMemoryType.USER, DEV);
 
         List<AiAutoMemory> aliceMemories = aiMemoryRepository
             .findByWorkspaceIdAndPrincipalTypeAndPrincipalIdAndEnvironmentOrderByUpdatedAtDesc(1L, USER, 10L, DEV);
@@ -181,26 +177,24 @@ public class AiAutoMemoryRepositoryIntTest {
     }
 
     @Test
-    public void testRelationCascadeDeletesMembershipWhenMemoryRemoved() {
-        long memoryId = saveMemoryWithMembership(1L, 10L, "to-delete", AiAutoMemoryType.USER, DEV);
+    public void testDeleteRemovesTheRowFromItsWorkspace() {
+        long memoryId = saveMemoryInWorkspace(1L, 10L, "to-delete", AiAutoMemoryType.USER, DEV);
 
-        Optional<WorkspaceAiAutoMemory> beforeDelete = workspaceAiMemoryRepository
-            .findByWorkspaceIdAndAiAutoMemoryId(1L, memoryId);
-
-        assertThat(beforeDelete).isPresent();
+        assertThat(aiMemoryRepository.findById(memoryId)).isPresent();
 
         aiMemoryRepository.deleteById(memoryId);
 
-        Optional<WorkspaceAiAutoMemory> afterDelete = workspaceAiMemoryRepository
-            .findByWorkspaceIdAndAiAutoMemoryId(1L, memoryId);
-
-        assertThat(afterDelete).isEmpty();
+        assertThat(aiMemoryRepository.findById(memoryId)).isEmpty();
+        assertThat(aiMemoryRepository
+            .findByWorkspaceIdAndPrincipalTypeAndPrincipalIdAndEnvironmentOrderByUpdatedAtDesc(1L, USER, 10L, DEV))
+                .isEmpty();
     }
 
     @Test
     public void testPrincipalTypeIsolatesRows() {
         AiAutoMemory userRow = new AiAutoMemory(AiAutoMemoryPrincipalType.USER, 100L);
 
+        userRow.setWorkspaceId(1L);
         userRow.setName("shared-name");
         userRow.setTitle("u");
         userRow.setContent("user-content");
@@ -209,12 +203,11 @@ public class AiAutoMemoryRepositoryIntTest {
         userRow.setCreatedAt(LocalDateTime.now());
         userRow.setUpdatedAt(LocalDateTime.now());
 
-        userRow = aiMemoryRepository.save(userRow);
-
-        workspaceAiMemoryRepository.save(new WorkspaceAiAutoMemory(1L, userRow.getId()));
+        aiMemoryRepository.save(userRow);
 
         AiAutoMemory deploymentRow = new AiAutoMemory(AiAutoMemoryPrincipalType.DEPLOYMENT, 100L);
 
+        deploymentRow.setWorkspaceId(1L);
         deploymentRow.setName("shared-name");
         deploymentRow.setTitle("d");
         deploymentRow.setContent("deployment-content");
@@ -223,9 +216,7 @@ public class AiAutoMemoryRepositoryIntTest {
         deploymentRow.setCreatedAt(LocalDateTime.now());
         deploymentRow.setUpdatedAt(LocalDateTime.now());
 
-        deploymentRow = aiMemoryRepository.save(deploymentRow);
-
-        workspaceAiMemoryRepository.save(new WorkspaceAiAutoMemory(1L, deploymentRow.getId()));
+        aiMemoryRepository.save(deploymentRow);
 
         List<AiAutoMemory> userHits = aiMemoryRepository
             .findAllByWorkspaceIdAndPrincipalTypeAndPrincipalIdAndEnvironmentAndName(
@@ -236,16 +227,15 @@ public class AiAutoMemoryRepositoryIntTest {
             .getContent()).isEqualTo("user-content");
     }
 
-    private long saveMemoryWithMembership(
+    private long saveMemoryInWorkspace(
         long workspaceId, long principalId, String name, AiAutoMemoryType memoryType, int environmentOrdinal) {
 
         AiAutoMemory memory = buildMemory(principalId, name, memoryType);
 
         memory.setEnvironment(Environment.values()[environmentOrdinal]);
+        memory.setWorkspaceId(workspaceId);
 
         AiAutoMemory saved = aiMemoryRepository.save(memory);
-
-        workspaceAiMemoryRepository.save(new WorkspaceAiAutoMemory(workspaceId, saved.getId()));
 
         return saved.getId();
     }

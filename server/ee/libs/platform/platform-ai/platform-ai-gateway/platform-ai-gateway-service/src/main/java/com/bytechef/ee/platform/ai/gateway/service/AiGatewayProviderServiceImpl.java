@@ -18,6 +18,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collection;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
+import org.jspecify.annotations.Nullable;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -97,6 +98,12 @@ class AiGatewayProviderServiceImpl implements AiGatewayProviderService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<AiGatewayProvider> getProvidersByWorkspaceId(long workspaceId) {
+        return aiGatewayProviderRepository.findAllByWorkspaceId(workspaceId);
+    }
+
+    @Override
     public AiGatewayProvider update(AiGatewayProvider provider) {
         Validate.notNull(provider, "'provider' must not be null");
 
@@ -119,5 +126,14 @@ class AiGatewayProviderServiceImpl implements AiGatewayProviderService {
         aiGatewayEmbeddingModelFactory.evict(existingProvider.getId());
 
         return savedProvider;
+    }
+
+    @Override
+    public void updateWorkspaceId(long id, @Nullable Long workspaceId) {
+        AiGatewayProvider provider = getProvider(id);
+
+        provider.setWorkspaceId(workspaceId);
+
+        aiGatewayProviderRepository.save(provider);
     }
 }

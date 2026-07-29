@@ -7,8 +7,6 @@
 
 package com.bytechef.ee.automation.contextstore.service;
 
-import com.bytechef.ee.automation.contextstore.domain.WorkspaceContextStoreSource;
-import com.bytechef.ee.automation.contextstore.repository.WorkspaceContextStoreSourceRepository;
 import com.bytechef.ee.platform.contextstore.domain.ContextStoreSource;
 import com.bytechef.ee.platform.contextstore.service.ContextStoreSourceService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -19,10 +17,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Implements {@link WorkspaceContextStoreSourceService} on top of the workspace ↔ context store source relation table.
- * After the SPI removal this is the single workspace-aware service over the relation; the platform-CS facade no longer
- * exists, and the new {@code WorkspaceContextStoreSourceFacade} (in this same module) calls into this service directly
- * for membership lookups and registration.
+ * Implements {@link WorkspaceContextStoreSourceService} on top of the nullable
+ * {@code context_store_source.workspace_id} column. This is the single workspace-aware service over that column; the
+ * {@code WorkspaceContextStoreSourceFacade} (in this same module) calls into it directly for ownership lookups.
  *
  * @author Ivica Cardic
  * @version ee
@@ -33,44 +30,22 @@ import org.springframework.transaction.annotation.Transactional;
 public class WorkspaceContextStoreSourceServiceImpl implements WorkspaceContextStoreSourceService {
 
     private final ContextStoreSourceService contextStoreSourceService;
-    private final WorkspaceContextStoreSourceRepository workspaceContextStoreSourceRepository;
 
     @SuppressFBWarnings("EI2")
-    public WorkspaceContextStoreSourceServiceImpl(
-        ContextStoreSourceService contextStoreSourceService,
-        WorkspaceContextStoreSourceRepository workspaceContextStoreSourceRepository) {
-
+    public WorkspaceContextStoreSourceServiceImpl(ContextStoreSourceService contextStoreSourceService) {
         this.contextStoreSourceService = contextStoreSourceService;
-        this.workspaceContextStoreSourceRepository = workspaceContextStoreSourceRepository;
-    }
-
-    @Override
-    public WorkspaceContextStoreSource create(Long contextStoreSourceId, Long workspaceId) {
-        return workspaceContextStoreSourceRepository.save(
-            new WorkspaceContextStoreSource(contextStoreSourceId, workspaceId));
-    }
-
-    @Override
-    public void deleteByContextStoreSourceId(Long contextStoreSourceId) {
-        workspaceContextStoreSourceRepository.findByContextStoreSourceId(contextStoreSourceId)
-            .ifPresent(relation -> workspaceContextStoreSourceRepository.deleteById(relation.getId()));
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<ContextStoreSource> getAllSourcesByWorkspaceId(Long workspaceId) {
-        List<Long> sourceIds = workspaceContextStoreSourceRepository.findAllByWorkspaceId(workspaceId)
-            .stream()
-            .map(WorkspaceContextStoreSource::getContextStoreSourceId)
-            .toList();
-
-        return contextStoreSourceService.getAllByIds(sourceIds);
+        return contextStoreSourceService.getAllByWorkspaceId(workspaceId);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<ContextStoreSource> getAllSourcesByWorkspaceId(Long workspaceId, Long environmentId) {
-        // environmentId is accepted for forward compatibility (see service Javadoc); the relation table does not yet
+        // environmentId is accepted for forward compatibility (see service Javadoc); the source row does not yet
         // carry an environment column, so the lookup is workspace-only today.
         return getAllSourcesByWorkspaceId(workspaceId);
     }
@@ -78,18 +53,13 @@ public class WorkspaceContextStoreSourceServiceImpl implements WorkspaceContextS
     @Override
     @Transactional(readOnly = true)
     public List<ContextStoreSource> getAllEnabledSourcesByWorkspaceId(Long workspaceId) {
-        List<Long> sourceIds = workspaceContextStoreSourceRepository.findAllByWorkspaceId(workspaceId)
-            .stream()
-            .map(WorkspaceContextStoreSource::getContextStoreSourceId)
-            .toList();
-
-        return contextStoreSourceService.getAllEnabledByIds(sourceIds);
+        return contextStoreSourceService.getAllEnabledByWorkspaceId(workspaceId);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<ContextStoreSource> getAllEnabledSourcesByWorkspaceId(Long workspaceId, Long environmentId) {
-        // environmentId is accepted for forward compatibility (see service Javadoc); the relation table does not yet
+        // environmentId is accepted for forward compatibility (see service Javadoc); the source row does not yet
         // carry an environment column, so the lookup is workspace-only today.
         return getAllEnabledSourcesByWorkspaceId(workspaceId);
     }
@@ -97,7 +67,7 @@ public class WorkspaceContextStoreSourceServiceImpl implements WorkspaceContextS
     @Override
     @Transactional(readOnly = true)
     public Optional<Long> fetchWorkspaceIdByContextStoreSourceId(Long contextStoreSourceId) {
-        return workspaceContextStoreSourceRepository.findByContextStoreSourceId(contextStoreSourceId)
-            .map(WorkspaceContextStoreSource::getWorkspaceId);
+        return contextStoreSourceService.fetch(contextStoreSourceId)
+            .map(ContextStoreSource::getWorkspaceId);
     }
 }

@@ -7,9 +7,8 @@
 
 package com.bytechef.ee.automation.ai.eval.service;
 
-import com.bytechef.ee.automation.ai.eval.domain.WorkspaceAiEvalScoreConfig;
-import com.bytechef.ee.automation.ai.eval.repository.WorkspaceAiEvalScoreConfigRepository;
 import com.bytechef.ee.platform.ai.eval.domain.AiEvalScoreConfig;
+import com.bytechef.ee.platform.ai.eval.repository.AiEvalScoreConfigRepository;
 import com.bytechef.ee.platform.ai.eval.service.AiEvalScoreConfigService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -31,53 +30,50 @@ import org.springframework.transaction.annotation.Transactional;
 @SuppressFBWarnings("EI")
 class WorkspaceAiEvalScoreConfigServiceImpl implements WorkspaceAiEvalScoreConfigService {
 
+    private final AiEvalScoreConfigRepository aiEvalScoreConfigRepository;
     private final AiEvalScoreConfigService aiEvalScoreConfigService;
-    private final WorkspaceAiEvalScoreConfigRepository workspaceAiEvalScoreConfigRepository;
 
     WorkspaceAiEvalScoreConfigServiceImpl(
-        AiEvalScoreConfigService aiEvalScoreConfigService,
-        WorkspaceAiEvalScoreConfigRepository workspaceAiEvalScoreConfigRepository) {
+        AiEvalScoreConfigRepository aiEvalScoreConfigRepository,
+        AiEvalScoreConfigService aiEvalScoreConfigService) {
 
+        this.aiEvalScoreConfigRepository = aiEvalScoreConfigRepository;
         this.aiEvalScoreConfigService = aiEvalScoreConfigService;
-        this.workspaceAiEvalScoreConfigRepository = workspaceAiEvalScoreConfigRepository;
     }
 
     @Override
     public AiEvalScoreConfig createInWorkspace(AiEvalScoreConfig scoreConfig, long workspaceId) {
         Validate.notNull(scoreConfig, "scoreConfig must not be null");
 
-        AiEvalScoreConfig saved = aiEvalScoreConfigService.create(scoreConfig);
+        scoreConfig.setWorkspaceId(workspaceId);
 
-        workspaceAiEvalScoreConfigRepository.save(new WorkspaceAiEvalScoreConfig(saved.getId(), workspaceId));
-
-        return saved;
+        return aiEvalScoreConfigService.create(scoreConfig);
     }
 
     @Override
     public void deleteInWorkspace(long scoreConfigId) {
-        workspaceAiEvalScoreConfigRepository.findByAiEvalScoreConfigId(scoreConfigId)
-            .ifPresent(membership -> workspaceAiEvalScoreConfigRepository.deleteById(membership.getId()));
-
         aiEvalScoreConfigService.delete(scoreConfigId);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Optional<AiEvalScoreConfig> fetchScoreConfigByWorkspaceIdAndName(Long workspaceId, String name) {
-        return workspaceAiEvalScoreConfigRepository.findConfigByWorkspaceIdAndName(workspaceId, name);
+        return aiEvalScoreConfigRepository.findByWorkspaceIdAndName(workspaceId, name);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Long getWorkspaceId(long scoreConfigId) {
-        return workspaceAiEvalScoreConfigRepository.findByAiEvalScoreConfigId(scoreConfigId)
-            .map(WorkspaceAiEvalScoreConfig::getWorkspaceId)
+        // findById rather than the platform service's getScoreConfig: an unknown id must still yield null (the
+        // pre-collapse "no membership row" answer) because callers use this as an authorization probe, not a fetch.
+        return aiEvalScoreConfigRepository.findById(scoreConfigId)
+            .map(AiEvalScoreConfig::getWorkspaceId)
             .orElse(null);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<AiEvalScoreConfig> getScoreConfigsByWorkspace(Long workspaceId) {
-        return workspaceAiEvalScoreConfigRepository.findAllConfigsByWorkspaceId(workspaceId);
+        return aiEvalScoreConfigRepository.findAllByWorkspaceId(workspaceId);
     }
 }

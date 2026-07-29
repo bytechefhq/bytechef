@@ -21,9 +21,7 @@ import com.bytechef.ee.platform.ai.llm.usage.LlmCostEstimator;
 import com.bytechef.ee.platform.ai.llm.usage.LlmUsageContext;
 import com.bytechef.ee.platform.ai.llm.usage.LlmUsageRecorder;
 import com.bytechef.ee.platform.ai.llm.usage.LlmUsageSource;
-import com.bytechef.ee.platform.ai.llm.usage.WorkspaceAiLlmUsage;
 import com.bytechef.ee.platform.ai.llm.usage.repository.AiLlmUsageRepository;
-import com.bytechef.ee.platform.ai.llm.usage.repository.WorkspaceAiLlmUsageRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -59,25 +57,21 @@ class AiLlmUsageServiceImpl implements AiLlmUsageService, LlmUsageRecorder {
     private static final Logger log = LoggerFactory.getLogger(AiLlmUsageServiceImpl.class);
 
     private final AiLlmUsageRepository repository;
-    private final WorkspaceAiLlmUsageRepository workspaceRepository;
     private final LlmCostEstimator costEstimator;
 
-    public AiLlmUsageServiceImpl(
-        AiLlmUsageRepository repository, WorkspaceAiLlmUsageRepository workspaceRepository,
-        LlmCostEstimator costEstimator) {
+    public AiLlmUsageServiceImpl(AiLlmUsageRepository repository, LlmCostEstimator costEstimator) {
         this.repository = repository;
-        this.workspaceRepository = workspaceRepository;
         this.costEstimator = costEstimator;
     }
 
     @Override
     public void create(AiLlmUsage usage, Long workspaceId) {
-        Validate.notNull(workspaceId, "workspaceId must not be null — every usage row must claim a workspace via "
-            + "workspace_ai_llm_usage so analytics queries (SUM(cost) GROUP BY workspace) see it");
+        Validate.notNull(workspaceId, "workspaceId must not be null — every usage row must claim a workspace so "
+            + "analytics queries (SUM(cost) GROUP BY workspace) see it");
 
-        AiLlmUsage saved = repository.save(usage);
+        usage.setWorkspaceId(workspaceId);
 
-        workspaceRepository.save(new WorkspaceAiLlmUsage(workspaceId, saved.getId()));
+        repository.save(usage);
     }
 
     @Override

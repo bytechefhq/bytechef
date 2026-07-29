@@ -83,6 +83,18 @@ public class ContextStoreSourceServiceImpl implements ContextStoreSourceService 
 
     @Override
     @Transactional(readOnly = true)
+    public List<ContextStoreSource> getAllByWorkspaceId(long workspaceId) {
+        return contextStoreSourceRepository.findAllByWorkspaceId(workspaceId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ContextStoreSource> getAllEnabledByWorkspaceId(long workspaceId) {
+        return contextStoreSourceRepository.findAllByWorkspaceIdAndEnabled(workspaceId, true);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<ContextStoreSource> findAllActiveAcrossWorkspaces() {
         return contextStoreSourceRepository.findAllByEnabled(true);
     }

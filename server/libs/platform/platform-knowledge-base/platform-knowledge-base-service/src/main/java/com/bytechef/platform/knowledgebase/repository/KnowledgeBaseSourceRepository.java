@@ -23,10 +23,10 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
 /**
- * Spring Data JDBC repository for {@link KnowledgeBaseSource}. Workspace scoping has been moved out of the source row
- * itself — workspace membership is enforced by the {@code workspace_knowledge_base_source} relation table managed by
- * the automation-side {@code WorkspaceKnowledgeBaseSourceRepository}. This repository owns only the source-level
- * lifecycle queries (e.g. all enabled sources across knowledge bases, used by the background sync scheduler).
+ * Spring Data JDBC repository for {@link KnowledgeBaseSource}. Workspace membership is the nullable
+ * {@code knowledge_base_source.workspace_id} column; a source with a null workspace matches no workspace-scoped query.
+ * The repository also owns the workspace-agnostic lifecycle queries (e.g. all enabled sources across knowledge bases,
+ * used by the background sync scheduler).
  *
  * @author Ivica Cardic
  */
@@ -41,4 +41,8 @@ public interface KnowledgeBaseSourceRepository
     List<KnowledgeBaseSource> findAllByIdIn(List<Long> ids);
 
     List<KnowledgeBaseSource> findAllByIdInAndEnabled(List<Long> ids, boolean enabled);
+
+    List<KnowledgeBaseSource> findAllByWorkspaceId(long workspaceId);
+
+    List<KnowledgeBaseSource> findAllByWorkspaceIdAndEnabled(long workspaceId, boolean enabled);
 }

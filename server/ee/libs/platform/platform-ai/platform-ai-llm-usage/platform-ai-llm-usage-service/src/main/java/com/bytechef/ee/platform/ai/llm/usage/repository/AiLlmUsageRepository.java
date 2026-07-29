@@ -19,15 +19,14 @@ package com.bytechef.ee.platform.ai.llm.usage.repository;
 import com.bytechef.ee.platform.ai.llm.usage.AiLlmUsage;
 import java.time.Instant;
 import java.util.List;
-import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
-import org.springframework.data.repository.query.Param;
 
 /**
  * Spring Data JDBC repository for {@link AiLlmUsage}. Insert-only on the hot path; read methods power the gateway's
- * request-log dashboard, the alert evaluator, and AI Hub's spend-by-agent analytics. The entity is workspace-agnostic —
- * workspace-aware queries JOIN through {@code workspace_ai_llm_usage}.
+ * request-log dashboard, the alert evaluator, and AI Hub's spend-by-agent analytics. Workspace-aware queries filter
+ * {@code ai_llm_usage.workspace_id} directly; a workspace-less row (null column) is invisible to every one of them,
+ * which is the intended behavior.
  *
  * @author Ivica Cardic
  */
@@ -37,32 +36,14 @@ public interface AiLlmUsageRepository extends ListCrudRepository<AiLlmUsage, Lon
 
     List<AiLlmUsage> findAllBySourceAndOwnerId(Integer source, Long ownerId);
 
-    @Query("""
-        SELECT r.* FROM ai_llm_usage r
-        JOIN workspace_ai_llm_usage wr ON wr.ai_llm_usage_id = r.id
-        WHERE wr.workspace_id = :workspaceId
-          AND r.created_date BETWEEN :start AND :end
-        """)
-    List<AiLlmUsage> findAllByWorkspaceIdAndCreatedDateBetween(
-        @Param("workspaceId") Long workspaceId, @Param("start") Instant start, @Param("end") Instant end);
+    List<AiLlmUsage> findAllByWorkspaceIdAndCreatedDateBetween(Long workspaceId, Instant start, Instant end);
 
     List<AiLlmUsage> findAllByStatusAndCreatedDateAfter(Integer status, Instant after);
 
     void deleteAllByCreatedDateBefore(Instant date);
 
-    @Modifying
-    @Query("""
-        DELETE FROM ai_llm_usage
-        WHERE id IN (
-            SELECT r.id FROM ai_llm_usage r
-            JOIN workspace_ai_llm_usage wr ON wr.ai_llm_usage_id = r.id
-            WHERE wr.workspace_id = :workspaceId
-              AND r.created_date < :date
-        )
-        """)
-    void deleteAllByWorkspaceIdAndCreatedDateBefore(
-        @Param("workspaceId") Long workspaceId, @Param("date") Instant date);
+    void deleteAllByWorkspaceIdAndCreatedDateBefore(Long workspaceId, Instant date);
 
-    @Query("SELECT DISTINCT workspace_id FROM workspace_ai_llm_usage")
+    @Query("SELECT DISTINCT workspace_id FROM ai_llm_usage WHERE workspace_id IS NOT NULL")
     List<Long> findDistinctWorkspaceIds();
 }

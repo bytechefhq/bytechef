@@ -7,9 +7,8 @@
 
 package com.bytechef.ee.automation.ai.observability.service;
 
-import com.bytechef.ee.automation.ai.observability.domain.WorkspaceAiObservabilityAlertRule;
-import com.bytechef.ee.automation.ai.observability.repository.WorkspaceAiObservabilityAlertRuleRepository;
 import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityAlertRule;
+import com.bytechef.ee.platform.ai.observability.repository.AiObservabilityAlertRuleRepository;
 import com.bytechef.ee.platform.ai.observability.service.AiObservabilityAlertRuleService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -20,8 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Workspace-aware delegate that pairs the platform-side {@link AiObservabilityAlertRuleService} (entity CRUD +
- * scheduler) with writes to the {@code workspace_ai_observability_alert_rule} membership table. Owning workspace ↔ rule
- * pairing here keeps the platform service workspace-agnostic so non-tenant agent surfaces can reuse it.
+ * scheduler) with the rule's {@code workspace_id} column. Keeping the workspace binding here leaves the platform
+ * service workspace-agnostic so non-tenant agent surfaces can reuse it.
  *
  * @version ee
  */
@@ -32,46 +31,42 @@ import org.springframework.transaction.annotation.Transactional;
 @SuppressFBWarnings("EI")
 class WorkspaceAiObservabilityAlertRuleServiceImpl implements WorkspaceAiObservabilityAlertRuleService {
 
+    private final AiObservabilityAlertRuleRepository aiObservabilityAlertRuleRepository;
     private final AiObservabilityAlertRuleService aiObservabilityAlertRuleService;
-    private final WorkspaceAiObservabilityAlertRuleRepository workspaceAiObservabilityAlertRuleRepository;
 
     WorkspaceAiObservabilityAlertRuleServiceImpl(
-        AiObservabilityAlertRuleService aiObservabilityAlertRuleService,
-        WorkspaceAiObservabilityAlertRuleRepository workspaceAiObservabilityAlertRuleRepository) {
+        AiObservabilityAlertRuleRepository aiObservabilityAlertRuleRepository,
+        AiObservabilityAlertRuleService aiObservabilityAlertRuleService) {
 
+        this.aiObservabilityAlertRuleRepository = aiObservabilityAlertRuleRepository;
         this.aiObservabilityAlertRuleService = aiObservabilityAlertRuleService;
-        this.workspaceAiObservabilityAlertRuleRepository = workspaceAiObservabilityAlertRuleRepository;
     }
 
     @Override
     public AiObservabilityAlertRule createInWorkspace(AiObservabilityAlertRule alertRule, long workspaceId) {
-        AiObservabilityAlertRule savedAlertRule = aiObservabilityAlertRuleService.create(alertRule);
+        alertRule.setWorkspaceId(workspaceId);
 
-        workspaceAiObservabilityAlertRuleRepository.save(
-            new WorkspaceAiObservabilityAlertRule(savedAlertRule.getId(), workspaceId));
-
-        return savedAlertRule;
+        return aiObservabilityAlertRuleService.create(alertRule);
     }
 
     @Override
     public void delete(long id) {
-        workspaceAiObservabilityAlertRuleRepository.findByAiObservabilityAlertRuleId(id)
-            .ifPresent(membership -> workspaceAiObservabilityAlertRuleRepository.deleteById(membership.getId()));
-
         aiObservabilityAlertRuleService.delete(id);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<AiObservabilityAlertRule> getAlertRulesByWorkspace(Long workspaceId) {
-        return workspaceAiObservabilityAlertRuleRepository.findAllAlertRulesByWorkspaceId(workspaceId);
+        return aiObservabilityAlertRuleRepository.findAllByWorkspaceId(workspaceId);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Long getWorkspaceId(long alertRuleId) {
-        return workspaceAiObservabilityAlertRuleRepository.findByAiObservabilityAlertRuleId(alertRuleId)
-            .map(WorkspaceAiObservabilityAlertRule::getWorkspaceId)
+        // findById rather than the service's getAlertRule: an unknown id must still yield null (the pre-collapse
+        // "no membership row" answer) because callers use this as an authorization probe, not as a fetch.
+        return aiObservabilityAlertRuleRepository.findById(alertRuleId)
+            .map(AiObservabilityAlertRule::getWorkspaceId)
             .orElse(null);
     }
 }

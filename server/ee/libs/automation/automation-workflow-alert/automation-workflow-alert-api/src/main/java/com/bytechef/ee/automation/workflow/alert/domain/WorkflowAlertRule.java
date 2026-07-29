@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -22,9 +23,10 @@ import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 
 /**
- * Workspace-scoped alert rule over terminal workflow-run events (Sim alerts model). Delivery targets are
- * {@code Notification} rows referenced through the {@code workflow_alert_rule_notification} join table — the rule owns
- * WHEN to alert, the platform-notification registry owns WHERE and HOW the alert is delivered.
+ * Workspace-scoped alert rule over terminal workflow-run events (Sim alerts model). A rule belongs to at most one
+ * workspace, carried by the nullable {@link #workspaceId} column. Delivery targets are {@code Notification} rows
+ * referenced through the {@code workflow_alert_rule_notification} join table — the rule owns WHEN to alert, the
+ * platform-notification registry owns WHERE and HOW the alert is delivered.
  *
  * <p>
  * The {@code consecutiveFailures} / window counters / {@code ewmaLatencyMs} / {@code lastActivityDate} columns are the
@@ -44,6 +46,13 @@ public class WorkflowAlertRule {
 
     @Version
     private int version;
+
+    /**
+     * Workspace that owns this rule, or {@code null} when it belongs to no workspace. Boxed on purpose: a primitive
+     * would collapse "no workspace" into workspace 0, which is a real workspace id.
+     */
+    @Column("workspace_id")
+    private @Nullable Long workspaceId;
 
     @Column
     private String name;
@@ -101,6 +110,10 @@ public class WorkflowAlertRule {
 
     public Long getId() {
         return id;
+    }
+
+    public @Nullable Long getWorkspaceId() {
+        return workspaceId;
     }
 
     public String getName() {
@@ -175,6 +188,10 @@ public class WorkflowAlertRule {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public void setWorkspaceId(@Nullable Long workspaceId) {
+        this.workspaceId = workspaceId;
     }
 
     public void setName(String name) {

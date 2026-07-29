@@ -298,14 +298,20 @@ public class AiHubTaskGraphQlController {
     }
 
     /**
-     * Resolves the owning workspace id for a task. The entity is workspace-agnostic by design (the relation lives in
-     * {@code workspace_ai_hub_task}), so we cannot resolve via property access on the entity and have to consult the
-     * service. One round-trip per row is acceptable for the chat-task sidebar, which lists at most a few dozen rows;
-     * switch to {@code @BatchMapping} if that ever changes.
+     * Resolves the owning workspace id for a task, read straight off the loaded row's {@code workspace_id} column, so
+     * the sidebar listing costs no extra query per row. The schema declares the field non-null and a task with no
+     * workspace is unreachable through every workspace-scoped path, so a null fails loudly here — the same contract
+     * {@code AiHubTaskService.getWorkspaceId} enforces for callers that only have a task id.
      */
     @SchemaMapping(typeName = "AiHubTask", field = "workspaceId")
     public long taskWorkspaceId(AiHubTask task) {
-        return taskService.getWorkspaceId(task.getId());
+        Long workspaceId = task.getWorkspaceId();
+
+        if (workspaceId == null) {
+            throw new NotFoundException("No workspace for ai_hub_task id=" + task.getId());
+        }
+
+        return workspaceId;
     }
 
     @SchemaMapping(typeName = "AiHubTask", field = "status")

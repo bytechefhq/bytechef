@@ -39,6 +39,7 @@
                 <constraints nullable="false"/>
             </column>
             <column name="config" type="TEXT"/>
+            <column name="workspace_id" type="BIGINT"/>
             <column name="created_by" type="VARCHAR(50)">
                 <constraints nullable="false"/>
             </column>
@@ -106,6 +107,7 @@
             <column name="week_starts_on" type="INT" defaultValueNumeric="1">
                 <constraints nullable="false"/>
             </column>
+            <column name="workspace_id" type="BIGINT"/>
             <column name="enabled" type="BOOLEAN" defaultValueBoolean="true">
                 <constraints nullable="false"/>
             </column>
@@ -132,6 +134,7 @@
             </column>
             <column name="fallback_model" type="VARCHAR(256)"/>
             <column name="config" type="TEXT"/>
+            <column name="workspace_id" type="BIGINT"/>
             <column name="enabled" type="BOOLEAN" defaultValueBoolean="true">
                 <constraints nullable="false"/>
             </column>
@@ -198,6 +201,7 @@
             <column name="currency" type="VARCHAR(3)" defaultValue="USD">
                 <constraints nullable="false"/>
             </column>
+            <column name="workspace_id" type="BIGINT"/>
             <column name="created_date" type="TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
@@ -232,6 +236,7 @@
             <column name="caching_enabled" type="BOOLEAN"/>
             <column name="cache_ttl_minutes" type="INT"/>
             <column name="log_retention_days" type="INT"/>
+            <column name="workspace_id" type="BIGINT"/>
             <column name="created_date" type="TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
@@ -309,6 +314,7 @@
             <column name="window_seconds" type="INT">
                 <constraints nullable="false"/>
             </column>
+            <column name="workspace_id" type="BIGINT"/>
             <column name="enabled" type="BOOLEAN" defaultValueBoolean="true">
                 <constraints nullable="false"/>
             </column>

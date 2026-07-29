@@ -44,6 +44,15 @@ import org.jspecify.annotations.Nullable;
  * </pre>
  *
  * <p>
+ * A memory with no workspace uses the literal segment {@value #NO_WORKSPACE_DIRECTORY} in place of the id. It has to be
+ * a segment of its own rather than an omitted one, otherwise the path would shift by a level and the workspace queries
+ * would read the wrong directory; and it has to be non-numeric so it cannot collide with workspace {@code 0}, which is
+ * a legitimate workspace id. Nothing lists that directory today — the repository interface exposes only
+ * workspace-scoped queries, which take a primitive {@code long} and therefore never ask for it — but the rows stay
+ * addressable and separable for whatever does.
+ * </p>
+ *
+ * <p>
  * Path segments deliberately use only lowercase alphanumerics and {@code _}: the filesystem backend normalizes
  * directories to that alphabet, so a hyphen would be stripped and two distinct names could collide. Tenant isolation is
  * applied by the {@code FileStorageService} itself, so it is not repeated here.
@@ -61,6 +70,12 @@ public class FileStorageAiAutoMemoryRepository implements AiAutoMemoryRepository
 
     static final String ROOT_DIRECTORY = "ai_auto_memory";
 
+    /**
+     * Directory segment standing in for the workspace id of a memory that has none. Non-numeric on purpose so it cannot
+     * be confused with workspace {@code 0}.
+     */
+    static final String NO_WORKSPACE_DIRECTORY = "none";
+
     private final FileStorageService fileStorageService;
 
     @SuppressFBWarnings("EI")
@@ -70,14 +85,6 @@ public class FileStorageAiAutoMemoryRepository implements AiAutoMemoryRepository
 
     @Override
     public AiAutoMemory save(AiAutoMemory memory) {
-        return save(memory, resolveWorkspaceId(memory));
-    }
-
-    /**
-     * Persists the memory under the given workspace. The workspace is part of the storage path, so it must be known at
-     * write time; {@link #save(AiAutoMemory)} reuses the membership already recorded for an existing memory.
-     */
-    public AiAutoMemory save(AiAutoMemory memory, long workspaceId) {
         // Timestamps are deliberately NOT assigned here: AiAutoMemoryServiceImpl owns createdAt/updatedAt (from an
         // injected Clock), exactly as it does for the JDBC binding. Assigning them here would overwrite the
         // service's values and make this backend behave differently from JDBC.
@@ -85,10 +92,11 @@ public class FileStorageAiAutoMemoryRepository implements AiAutoMemoryRepository
             memory.setId(generateId());
         }
 
-        AiAutoMemoryDocument document = AiAutoMemoryDocument.fromDomain(memory, workspaceId);
+        AiAutoMemoryDocument document = AiAutoMemoryDocument.fromDomain(memory);
 
         fileStorageService.storeFileContent(
-            buildDirectory(workspaceId, document.principalType(), document.principalId(), document.environment()),
+            buildDirectory(
+                document.workspaceId(), document.principalType(), document.principalId(), document.environment()),
             document.id() + ".json", JsonUtils.write(document), false);
 
         return memory;
@@ -152,20 +160,6 @@ public class FileStorageAiAutoMemoryRepository implements AiAutoMemoryRepository
         return query(workspaceId, principalType, principalId, environment, null, name);
     }
 
-    List<AiAutoMemoryDocument> findDocumentsByWorkspaceId(long workspaceId) {
-        return listAll().stream()
-            .map(DocumentEntry::document)
-            .filter(document -> document.workspaceId() == workspaceId)
-            .toList();
-    }
-
-    Optional<AiAutoMemoryDocument> findDocumentByAiAutoMemoryId(long aiAutoMemoryId) {
-        return listAll().stream()
-            .map(DocumentEntry::document)
-            .filter(document -> document.id() == aiAutoMemoryId)
-            .findFirst();
-    }
-
     private List<AiAutoMemory> query(
         long workspaceId, int principalType, long principalId, int environment, @Nullable Integer memoryType,
         @Nullable String name) {
@@ -213,21 +207,12 @@ public class FileStorageAiAutoMemoryRepository implements AiAutoMemoryRepository
             fileStorageService.readFileToString(directory, fileEntry), AiAutoMemoryDocument.class);
     }
 
-    private long resolveWorkspaceId(AiAutoMemory memory) {
-        Long id = memory.getId();
+    private static String buildDirectory(
+        @Nullable Long workspaceId, int principalType, long principalId, int environment) {
 
-        if (id == null) {
-            throw new IllegalStateException(
-                "A new auto-memory must be saved with its workspace: use save(memory, workspaceId)");
-        }
+        String workspaceDirectory = workspaceId == null ? NO_WORKSPACE_DIRECTORY : String.valueOf(workspaceId);
 
-        return findDocumentByAiAutoMemoryId(id)
-            .map(AiAutoMemoryDocument::workspaceId)
-            .orElseThrow(() -> new IllegalStateException("Unknown auto-memory: " + id));
-    }
-
-    private static String buildDirectory(long workspaceId, int principalType, long principalId, int environment) {
-        return ROOT_DIRECTORY + "/" + workspaceId + "/" + principalType + "_" + principalId + "/" + environment;
+        return ROOT_DIRECTORY + "/" + workspaceDirectory + "/" + principalType + "_" + principalId + "/" + environment;
     }
 
     /**

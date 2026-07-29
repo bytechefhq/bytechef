@@ -15,6 +15,7 @@ import com.bytechef.platform.security.constant.AuthorityConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
@@ -54,8 +55,7 @@ class WorkspaceAiGatewayModelFacadeImpl implements WorkspaceAiGatewayModelFacade
 
         workspaceAiGatewayProviderService.getWorkspaceProviders(workspaceId)
             .stream()
-            .filter(workspaceProvider -> workspaceProvider.getProviderId()
-                .equals(providerId))
+            .filter(workspaceProvider -> Objects.equals(workspaceProvider.getId(), providerId))
             .findFirst()
             .orElseThrow(
                 () -> new IllegalArgumentException(
@@ -94,8 +94,7 @@ class WorkspaceAiGatewayModelFacadeImpl implements WorkspaceAiGatewayModelFacade
         return workspaceAiGatewayProviderService.getWorkspaceProviders(workspaceId)
             .stream()
             .flatMap(
-                workspaceProvider -> aiGatewayModelService.getModelsByProviderId(
-                    workspaceProvider.getProviderId())
+                workspaceProvider -> aiGatewayModelService.getModelsByProviderId(workspaceProvider.getId())
                     .stream())
             .toList();
     }
@@ -149,9 +148,7 @@ class WorkspaceAiGatewayModelFacadeImpl implements WorkspaceAiGatewayModelFacade
 
         boolean owned = workspaceAiGatewayProviderService.getWorkspaceProviders(workspaceId)
             .stream()
-            .anyMatch(
-                workspaceProvider -> workspaceProvider.getProviderId()
-                    .equals(model.getProviderId()));
+            .anyMatch(workspaceProvider -> Objects.equals(workspaceProvider.getId(), model.getProviderId()));
 
         if (!owned) {
             throw new IllegalArgumentException(

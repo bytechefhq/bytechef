@@ -11,7 +11,6 @@ import com.bytechef.ee.ai.hub.exception.ForbiddenException;
 import com.bytechef.ee.ai.hub.exception.NotFoundException;
 import com.bytechef.ee.ai.hub.task.repository.AiHubTaskArtifactRepository;
 import com.bytechef.ee.ai.hub.task.repository.AiHubTaskRepository;
-import com.bytechef.ee.ai.hub.task.repository.WorkspaceAiHubTaskRepository;
 import com.bytechef.ee.ai.hub.util.EnumOrdinals;
 import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -21,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -80,7 +80,6 @@ public class AiHubTaskArtifactServiceImpl implements AiHubTaskArtifactService {
 
     private final AiHubTaskArtifactRepository taskArtifactRepository;
     private final AiHubTaskRepository taskRepository;
-    private final WorkspaceAiHubTaskRepository workspaceTaskRepository;
     private final Clock clock;
     private final JdbcTemplate jdbcTemplate;
     private final JsonMapper jsonMapper;
@@ -91,13 +90,11 @@ public class AiHubTaskArtifactServiceImpl implements AiHubTaskArtifactService {
     public AiHubTaskArtifactServiceImpl(
         AiHubTaskArtifactRepository taskArtifactRepository,
         AiHubTaskRepository taskRepository,
-        WorkspaceAiHubTaskRepository workspaceTaskRepository,
         JdbcTemplate jdbcTemplate,
         JsonMapper jsonMapper) {
 
         this.taskArtifactRepository = taskArtifactRepository;
         this.taskRepository = taskRepository;
-        this.workspaceTaskRepository = workspaceTaskRepository;
         this.clock = Clock.systemUTC();
         this.jdbcTemplate = jdbcTemplate;
         this.jsonMapper = jsonMapper;
@@ -231,8 +228,7 @@ public class AiHubTaskArtifactServiceImpl implements AiHubTaskArtifactService {
                 "User " + requesterUserId + " does not own task " + taskId);
         }
 
-        if (!workspaceTaskRepository.findByWorkspaceIdAndAiHubTaskId(requesterWorkspaceId, task.getId())
-            .isPresent()) {
+        if (!Objects.equals(task.getWorkspaceId(), requesterWorkspaceId)) {
             throw new ForbiddenException(
                 "AiHubTask " + taskId + " does not live in workspace " + requesterWorkspaceId);
         }
@@ -349,9 +345,7 @@ public class AiHubTaskArtifactServiceImpl implements AiHubTaskArtifactService {
             throw new ForbiddenException("User " + requesterUserId + " does not own task " + task.getId());
         }
 
-        if (!workspaceTaskRepository.findByWorkspaceIdAndAiHubTaskId(requesterWorkspaceId, task.getId())
-            .isPresent()) {
-
+        if (!Objects.equals(task.getWorkspaceId(), requesterWorkspaceId)) {
             throw new ForbiddenException(
                 "AiHubTask " + task.getId() + " does not live in workspace " + requesterWorkspaceId);
         }
@@ -372,8 +366,7 @@ public class AiHubTaskArtifactServiceImpl implements AiHubTaskArtifactService {
                 "User " + requesterUserId + " does not own task " + taskId);
         }
 
-        if (!workspaceTaskRepository.findByWorkspaceIdAndAiHubTaskId(requesterWorkspaceId, task.getId())
-            .isPresent()) {
+        if (!Objects.equals(task.getWorkspaceId(), requesterWorkspaceId)) {
             throw new ForbiddenException(
                 "AiHubTask " + taskId + " is not in workspace " + requesterWorkspaceId);
         }
@@ -400,8 +393,7 @@ public class AiHubTaskArtifactServiceImpl implements AiHubTaskArtifactService {
                 "a.metadata_json, a.status, a.environment, a.created_at " +
                 "FROM ai_hub_task_artifact a " +
                 "JOIN ai_hub_task c ON c.id = a.task_id " +
-                "JOIN workspace_ai_hub_task w ON w.ai_hub_task_id = c.id " +
-                "WHERE w.workspace_id = ?");
+                "WHERE c.workspace_id = ?");
 
         List<Object> params = new ArrayList<>();
 
@@ -427,8 +419,7 @@ public class AiHubTaskArtifactServiceImpl implements AiHubTaskArtifactService {
             "SELECT COUNT(*) " +
                 "FROM ai_hub_task_artifact a " +
                 "JOIN ai_hub_task c ON c.id = a.task_id " +
-                "JOIN workspace_ai_hub_task w ON w.ai_hub_task_id = c.id " +
-                "WHERE w.workspace_id = ?");
+                "WHERE c.workspace_id = ?");
 
         List<Object> params = new ArrayList<>();
 

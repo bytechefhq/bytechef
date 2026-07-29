@@ -15,9 +15,9 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Workspace-scoped operations on {@link AiObservabilityTrace}. Owns the {@code workspace_ai_observability_trace}
- * membership row plus all tenant-aware queries (per-tenant retention, cross-tenant-leak-safe by-session lookups,
- * filtered listings). Entity-table CRUD belongs to the platform-side {@code AiObservabilityTraceService}.
+ * Workspace-scoped operations on {@link AiObservabilityTrace}. Owns the trace's {@code workspace_id} binding plus all
+ * tenant-aware queries (per-tenant retention, cross-tenant-leak-safe by-session lookups, filtered listings).
+ * Entity-table CRUD belongs to the platform-side {@code AiObservabilityTraceService}.
  *
  * @version ee
  */

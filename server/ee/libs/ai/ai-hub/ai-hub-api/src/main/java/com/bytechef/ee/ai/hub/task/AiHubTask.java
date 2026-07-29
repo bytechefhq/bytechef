@@ -23,8 +23,8 @@ import org.springframework.data.relational.core.mapping.Table;
  * <p>
  * This is a Spring Data JDBC row-mapper entity. Setters are intentionally permissive — Spring Data JDBC reflects
  * directly on fields on load, so they exist for the application-side construct-then-save flow. Ownership and
- * authorization invariants (workspace membership, user ownership, status transitions) are enforced in
- * {@code AiHubTaskServiceImpl}, not on this type. Do not call {@link #setUserId(long)} or {@link #setWorkspaceId(long)}
+ * authorization invariants (workspace ownership, user ownership, status transitions) are enforced in
+ * {@code AiHubTaskServiceImpl}, not on this type. Do not call {@link #setUserId(long)} or {@link #setWorkspaceId(Long)}
  * on a loaded row to "retarget" it; use a service.
  * </p>
  *
@@ -109,14 +109,20 @@ public class AiHubTask {
     @Column("updated_at")
     private LocalDateTime updatedAt;
 
+    /**
+     * Workspace the task belongs to. Nullable: a task belongs to at most one workspace, and null means none applies.
+     * Workspace-scoped queries never match a null, so a workspace-less task is invisible to them.
+     */
+    @Column("workspace_id")
+    private @Nullable Long workspaceId;
+
     public AiHubTask() {
     }
 
     /**
      * Bind-once constructor for new (unpersisted) rows. The per-field setter for {@code userId} is package-private so a
-     * loaded row cannot be retargeted by mistake. Workspace association lives on {@code workspace_ai_hub_task} and is
-     * set independently when the membership row is created — callers that need the workspace for a task ID query the
-     * relation via {@code WorkspaceAiHubTaskRepository.findByAiHubTaskId(...)} or the service helper
+     * loaded row cannot be retargeted by mistake. The workspace association is the separately settable
+     * {@link #workspaceId} column — callers that only have a task ID still go through the service helper
      * {@code AiHubTaskService.getWorkspaceId(taskId)}.
      */
     public AiHubTask(long userId) {
@@ -293,6 +299,14 @@ public class AiHubTask {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public @Nullable Long getWorkspaceId() {
+        return workspaceId;
+    }
+
+    public void setWorkspaceId(@Nullable Long workspaceId) {
+        this.workspaceId = workspaceId;
     }
 
     @Override

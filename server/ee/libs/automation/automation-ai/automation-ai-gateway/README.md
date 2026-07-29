@@ -137,7 +137,7 @@ use logs or traces for per-workspace breakdowns.
 - **Retention** is handled by `AiObservabilityDataCleanupService` on a fixed schedule. Per-workspace
   retention days are planned as part of workspace settings but not yet enforced.
 - **Encryption-at-rest** is provided by PostgreSQL-level disk encryption (deployment-specific) plus
-  encryption of `workspace_ai_gateway_provider.api_key` (platform `EncryptedMapWrapper`). Request
+  encryption of `ai_gateway_provider.api_key` (platform `EncryptedMapWrapper`). Request
   payloads are currently stored unencrypted in TEXT columns.
 - **GDPR / workspace deletion** — workspace-scoped FK cascades clean up the `ai_gateway_*` and
   `ai_observability_*` rows when a workspace is removed; the platform `Property`-store rows
@@ -181,15 +181,13 @@ Tables are grouped by feature prefix:
 - `ai_gateway_model` (includes `default_routing_policy_id` override)
 - `ai_gateway_model_deployment`
 - `ai_gateway_project`
-- `ai_gateway_provider`
+- `ai_gateway_provider` (carries its owning workspace in a nullable `workspace_id` column)
 - `ai_gateway_rate_limit`
 - `ai_gateway_request_log`
-- `ai_gateway_routing_policy`
+- `ai_gateway_routing_policy` (carries its owning workspace in a nullable `workspace_id` column)
 - `ai_gateway_routing_policy_tag`
 - `ai_gateway_spend_summary`
 - `ai_gateway_tag` — workspace-scoped tags with color metadata
-- `workspace_ai_gateway_provider`
-- `workspace_ai_gateway_routing_policy`
 
 Workspace-level AI Gateway settings overrides are persisted as rows in the
 platform `property` table (scope=`WORKSPACE`, key=`ai_gateway_workspace_settings`)

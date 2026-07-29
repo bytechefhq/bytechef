@@ -38,8 +38,8 @@ public interface ContextStoreQueryService {
 
     /**
      * Convenience by-key fetch. Returns at most one record — the {@code (sourceId, sourceRecordId)} tuple is unique.
-     * Workspace scoping is enforced by the caller via the {@code workspace_context_store_source} relation; the
-     * {@code sourceId} alone is sufficient because a source belongs to at most one workspace.
+     * Workspace scoping is enforced by the caller via {@code context_store_source.workspace_id}; the {@code sourceId}
+     * alone is sufficient because a source belongs to at most one workspace.
      */
     Optional<ContextStoreRecord> get(Long sourceId, String sourceRecordId);
 

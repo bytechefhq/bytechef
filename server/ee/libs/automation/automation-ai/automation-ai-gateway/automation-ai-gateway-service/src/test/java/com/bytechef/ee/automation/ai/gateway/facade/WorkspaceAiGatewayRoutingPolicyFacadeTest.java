@@ -14,7 +14,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.ee.automation.ai.gateway.domain.WorkspaceAiGatewayRoutingPolicy;
 import com.bytechef.ee.automation.ai.gateway.service.WorkspaceAiGatewayRoutingPolicyService;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayRoutingPolicy;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayRoutingStrategyType;
@@ -26,6 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * Unit tests for {@link WorkspaceAiGatewayRoutingPolicyFacadeImpl}. Focus on the workspace-ownership guard — the rest
@@ -56,7 +56,7 @@ class WorkspaceAiGatewayRoutingPolicyFacadeTest {
     void testDeleteWorkspaceRoutingPolicyRejectsPolicyInDifferentWorkspace() {
         // Workspace 1 owns policy 5 only; attempt to delete policy 999 must fail before delete() is invoked.
         when(workspaceAiGatewayRoutingPolicyService.getWorkspaceRoutingPolicies(1L))
-            .thenReturn(List.of(new WorkspaceAiGatewayRoutingPolicy(5L, 1L)));
+            .thenReturn(List.of(workspaceRoutingPolicy()));
 
         assertThatThrownBy(() -> workspaceAiGatewayRoutingPolicyFacade.deleteWorkspaceRoutingPolicy(1L, 999L))
             .isInstanceOf(IllegalArgumentException.class)
@@ -70,8 +70,9 @@ class WorkspaceAiGatewayRoutingPolicyFacadeTest {
     void testUpdateWorkspaceRoutingPolicyDelegatesOnlyAfterOwnershipCheckPasses() {
         AiGatewayRoutingPolicy policy = new AiGatewayRoutingPolicy("p", AiGatewayRoutingStrategyType.SIMPLE);
 
-        when(workspaceAiGatewayRoutingPolicyService.getWorkspaceRoutingPolicies(1L))
-            .thenReturn(List.of(new WorkspaceAiGatewayRoutingPolicy(5L, 1L)));
+        ReflectionTestUtils.setField(policy, "id", 5L);
+
+        when(workspaceAiGatewayRoutingPolicyService.getWorkspaceRoutingPolicies(1L)).thenReturn(List.of(policy));
         when(aiGatewayRoutingPolicyService.getRoutingPolicy(5L)).thenReturn(policy);
         when(aiGatewayRoutingPolicyService.update(policy)).thenReturn(policy);
 
@@ -98,7 +99,23 @@ class WorkspaceAiGatewayRoutingPolicyFacadeTest {
 
         assertThat(policies).isEmpty();
 
-        // Avoid firing an empty-id SELECT against the underlying repository.
+        // The workspace service now returns the policies themselves (they carry their own workspace_id), so the
+        // facade must pass them straight through — never re-fetch them by id, which for an empty workspace would
+        // fire an empty-id SELECT against the underlying repository.
         verify(aiGatewayRoutingPolicyService, never()).getRoutingPolicies(any());
+    }
+
+    /**
+     * A routing policy owned by workspace 1, id 5. Ownership is now carried by the policy's own {@code workspace_id}
+     * column, so the workspace service hands back the policies themselves rather than membership rows.
+     */
+    private static AiGatewayRoutingPolicy workspaceRoutingPolicy() {
+        AiGatewayRoutingPolicy policy = new AiGatewayRoutingPolicy("p", AiGatewayRoutingStrategyType.SIMPLE);
+
+        ReflectionTestUtils.setField(policy, "id", 5L);
+
+        policy.setWorkspaceId(1L);
+
+        return policy;
     }
 }

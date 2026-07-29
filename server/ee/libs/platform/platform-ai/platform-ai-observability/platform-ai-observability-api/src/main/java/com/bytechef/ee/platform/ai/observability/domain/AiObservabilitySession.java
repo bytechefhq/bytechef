@@ -9,6 +9,7 @@ package com.bytechef.ee.platform.ai.observability.domain;
 
 import java.time.Instant;
 import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -16,8 +17,9 @@ import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.Table;
 
 /**
- * Workspace association lives on {@link WorkspaceAiObservabilitySession} — the entity is workspace-agnostic. Callers go
- * through {@code AiObservabilitySessionService.getWorkspaceId(id)} (Variant A).
+ * A session belongs to at most one workspace: the association is the nullable {@code workspace_id} column, which is
+ * null where no workspace applies. Callers that only hold an id go through
+ * {@code WorkspaceAiObservabilitySessionService.getWorkspaceId(id)}.
  *
  * @version ee
  */
@@ -43,6 +45,12 @@ public class AiObservabilitySession {
 
     @Version
     private int version;
+
+    /**
+     * The owning workspace, or {@code null} when the session belongs to no workspace. Boxed on purpose — a primitive
+     * would coerce the "no workspace" case into workspace {@code 0}, which is a real workspace id.
+     */
+    private @Nullable Long workspaceId;
 
     public AiObservabilitySession() {
     }
@@ -97,6 +105,10 @@ public class AiObservabilitySession {
         return version;
     }
 
+    public @Nullable Long getWorkspaceId() {
+        return workspaceId;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -113,10 +125,15 @@ public class AiObservabilitySession {
         this.userId = userId;
     }
 
+    public void setWorkspaceId(@Nullable Long workspaceId) {
+        this.workspaceId = workspaceId;
+    }
+
     @Override
     public String toString() {
         return "AiObservabilitySession{" +
             "id=" + id +
+            ", workspaceId=" + workspaceId +
             ", name='" + name + '\'' +
             ", userId='" + userId + '\'' +
             ", createdDate=" + createdDate +

@@ -7,9 +7,8 @@
 
 package com.bytechef.ee.automation.ai.observability.service;
 
-import com.bytechef.ee.automation.ai.observability.domain.WorkspaceAiObservabilityWebhookSubscription;
-import com.bytechef.ee.automation.ai.observability.repository.WorkspaceAiObservabilityWebhookSubscriptionRepository;
 import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityWebhookSubscription;
+import com.bytechef.ee.platform.ai.observability.repository.AiObservabilityWebhookSubscriptionRepository;
 import com.bytechef.ee.platform.ai.observability.service.AiObservabilityWebhookSubscriptionService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -29,58 +28,50 @@ import org.springframework.transaction.annotation.Transactional;
 class WorkspaceAiObservabilityWebhookSubscriptionServiceImpl
     implements WorkspaceAiObservabilityWebhookSubscriptionService {
 
+    private final AiObservabilityWebhookSubscriptionRepository aiObservabilityWebhookSubscriptionRepository;
     private final AiObservabilityWebhookSubscriptionService aiObservabilityWebhookSubscriptionService;
-    private final WorkspaceAiObservabilityWebhookSubscriptionRepository workspaceAiObservabilityWebhookSubscriptionRepository;
 
     public WorkspaceAiObservabilityWebhookSubscriptionServiceImpl(
-        AiObservabilityWebhookSubscriptionService aiObservabilityWebhookSubscriptionService,
-        WorkspaceAiObservabilityWebhookSubscriptionRepository workspaceAiObservabilityWebhookSubscriptionRepository) {
+        AiObservabilityWebhookSubscriptionRepository aiObservabilityWebhookSubscriptionRepository,
+        AiObservabilityWebhookSubscriptionService aiObservabilityWebhookSubscriptionService) {
 
+        this.aiObservabilityWebhookSubscriptionRepository = aiObservabilityWebhookSubscriptionRepository;
         this.aiObservabilityWebhookSubscriptionService = aiObservabilityWebhookSubscriptionService;
-        this.workspaceAiObservabilityWebhookSubscriptionRepository =
-            workspaceAiObservabilityWebhookSubscriptionRepository;
     }
 
     @Override
     public AiObservabilityWebhookSubscription createInWorkspace(
         AiObservabilityWebhookSubscription subscription, long workspaceId) {
 
-        AiObservabilityWebhookSubscription saved = aiObservabilityWebhookSubscriptionService.create(subscription);
+        subscription.setWorkspaceId(workspaceId);
 
-        workspaceAiObservabilityWebhookSubscriptionRepository.save(
-            new WorkspaceAiObservabilityWebhookSubscription(saved.getId(), workspaceId));
-
-        return saved;
+        return aiObservabilityWebhookSubscriptionService.create(subscription);
     }
 
     @Override
     public void delete(long id) {
-        workspaceAiObservabilityWebhookSubscriptionRepository.findByAiObservabilityWebhookSubscriptionId(id)
-            .ifPresent(membership -> workspaceAiObservabilityWebhookSubscriptionRepository.deleteById(
-                membership.getId()));
-
         aiObservabilityWebhookSubscriptionService.delete(id);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<AiObservabilityWebhookSubscription> getEnabledWebhookSubscriptionsByWorkspace(Long workspaceId) {
-        return workspaceAiObservabilityWebhookSubscriptionRepository
-            .findAllSubscriptionsByWorkspaceIdAndEnabled(workspaceId, true);
+        return aiObservabilityWebhookSubscriptionRepository.findAllByWorkspaceIdAndEnabled(workspaceId, true);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<AiObservabilityWebhookSubscription> getWebhookSubscriptionsByWorkspace(Long workspaceId) {
-        return workspaceAiObservabilityWebhookSubscriptionRepository.findAllSubscriptionsByWorkspaceId(workspaceId);
+        return aiObservabilityWebhookSubscriptionRepository.findAllByWorkspaceId(workspaceId);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Long getWorkspaceId(long subscriptionId) {
-        return workspaceAiObservabilityWebhookSubscriptionRepository
-            .findByAiObservabilityWebhookSubscriptionId(subscriptionId)
-            .map(WorkspaceAiObservabilityWebhookSubscription::getWorkspaceId)
+        // findById rather than the service's getWebhookSubscription: an unknown id must still yield null (the
+        // pre-collapse "no membership row" answer) because callers use this as an authorization probe.
+        return aiObservabilityWebhookSubscriptionRepository.findById(subscriptionId)
+            .map(AiObservabilityWebhookSubscription::getWorkspaceId)
             .orElse(null);
     }
 }

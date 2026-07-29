@@ -29,17 +29,16 @@ public interface AiEvalExecutionRepository extends ListCrudRepository<AiEvalExec
     void deleteAllByCreatedDateBefore(Instant date);
 
     /**
-     * Workspace-scoped deletion: deletes executions older than {@code date} whose owning eval rule is associated with
-     * {@code workspaceId} via the {@code workspace_ai_eval_rule} relation. The relation table lives in
-     * automation-ai-eval but the SQL is a string here — table names work at runtime regardless of which Gradle module
-     * declares the relation entity.
+     * Workspace-scoped deletion: deletes executions older than {@code date} whose owning eval rule belongs to
+     * {@code workspaceId}. Stays a set-based statement rather than a derived delete because it is a retention sweep
+     * over a table that grows with every evaluated trace.
      */
     @Modifying
     @Query("""
         DELETE FROM ai_eval_execution
         WHERE created_date < :date
           AND eval_rule_id IN (
-            SELECT ai_eval_rule_id FROM workspace_ai_eval_rule WHERE workspace_id = :workspaceId
+            SELECT id FROM ai_eval_rule WHERE workspace_id = :workspaceId
           )
         """)
     void deleteAllByWorkspaceIdAndCreatedDateBefore(

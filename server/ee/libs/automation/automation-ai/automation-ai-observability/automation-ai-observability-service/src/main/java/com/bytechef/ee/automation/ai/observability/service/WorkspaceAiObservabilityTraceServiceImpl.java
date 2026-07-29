@@ -7,11 +7,10 @@
 
 package com.bytechef.ee.automation.ai.observability.service;
 
-import com.bytechef.ee.automation.ai.observability.domain.WorkspaceAiObservabilityTrace;
-import com.bytechef.ee.automation.ai.observability.repository.WorkspaceAiObservabilityTraceRepository;
 import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityTrace;
 import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityTraceSource;
 import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityTraceStatus;
+import com.bytechef.ee.platform.ai.observability.repository.AiObservabilityTraceRepository;
 import com.bytechef.ee.platform.ai.observability.service.AiObservabilityTraceService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -33,24 +32,22 @@ import org.springframework.transaction.annotation.Transactional;
 @SuppressFBWarnings("EI")
 class WorkspaceAiObservabilityTraceServiceImpl implements WorkspaceAiObservabilityTraceService {
 
+    private final AiObservabilityTraceRepository aiObservabilityTraceRepository;
     private final AiObservabilityTraceService aiObservabilityTraceService;
-    private final WorkspaceAiObservabilityTraceRepository workspaceAiObservabilityTraceRepository;
 
     WorkspaceAiObservabilityTraceServiceImpl(
-        AiObservabilityTraceService aiObservabilityTraceService,
-        WorkspaceAiObservabilityTraceRepository workspaceAiObservabilityTraceRepository) {
+        AiObservabilityTraceRepository aiObservabilityTraceRepository,
+        AiObservabilityTraceService aiObservabilityTraceService) {
 
+        this.aiObservabilityTraceRepository = aiObservabilityTraceRepository;
         this.aiObservabilityTraceService = aiObservabilityTraceService;
-        this.workspaceAiObservabilityTraceRepository = workspaceAiObservabilityTraceRepository;
     }
 
     @Override
     public AiObservabilityTrace createInWorkspace(AiObservabilityTrace trace, long workspaceId) {
-        AiObservabilityTrace saved = aiObservabilityTraceService.create(trace);
+        trace.setWorkspaceId(workspaceId);
 
-        workspaceAiObservabilityTraceRepository.save(new WorkspaceAiObservabilityTrace(saved.getId(), workspaceId));
-
-        return saved;
+        return aiObservabilityTraceService.create(trace);
     }
 
     @Override
@@ -58,12 +55,11 @@ class WorkspaceAiObservabilityTraceServiceImpl implements WorkspaceAiObservabili
         Validate.notNull(date, "date must not be null");
         Validate.notNull(workspaceId, "workspaceId must not be null");
 
-        // Spans must be deleted BEFORE the parent traces so the FK CASCADE on workspace_ai_observability_trace
-        // doesn't wipe spans first; mirrors the original platform impl ordering.
-        workspaceAiObservabilityTraceRepository
-            .deleteAllSpansByWorkspaceIdAndTraceCreatedDateBefore(workspaceId, date);
+        // Spans must be deleted BEFORE the parent traces so the span FK doesn't reject the trace delete; mirrors
+        // the original platform impl ordering.
+        aiObservabilityTraceRepository.deleteAllSpansByWorkspaceIdAndTraceCreatedDateBefore(workspaceId, date);
 
-        workspaceAiObservabilityTraceRepository.deleteAllByWorkspaceIdAndTraceCreatedDateBefore(workspaceId, date);
+        aiObservabilityTraceRepository.deleteAllByWorkspaceIdAndTraceCreatedDateBefore(workspaceId, date);
     }
 
     @Override
@@ -72,15 +68,16 @@ class WorkspaceAiObservabilityTraceServiceImpl implements WorkspaceAiObservabili
         Validate.notNull(workspaceId, "workspaceId must not be null");
         Validate.notNull(externalTraceId, "externalTraceId must not be null");
 
-        return workspaceAiObservabilityTraceRepository.findByWorkspaceIdAndExternalTraceId(workspaceId,
-            externalTraceId);
+        return aiObservabilityTraceRepository.findByWorkspaceIdAndExternalTraceId(workspaceId, externalTraceId);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Long getWorkspaceId(long traceId) {
-        return workspaceAiObservabilityTraceRepository.findByAiObservabilityTraceId(traceId)
-            .map(WorkspaceAiObservabilityTrace::getWorkspaceId)
+        // findById rather than the service's getTrace: an unknown id must still yield null (the pre-collapse
+        // "no membership row" answer) because callers use this as an authorization probe, not as a fetch.
+        return aiObservabilityTraceRepository.findById(traceId)
+            .map(AiObservabilityTrace::getWorkspaceId)
             .orElse(null);
     }
 
@@ -91,8 +88,7 @@ class WorkspaceAiObservabilityTraceServiceImpl implements WorkspaceAiObservabili
         Validate.notNull(start, "start must not be null");
         Validate.notNull(end, "end must not be null");
 
-        return workspaceAiObservabilityTraceRepository.findAllByWorkspaceIdAndCreatedDateBetween(
-            workspaceId, start, end);
+        return aiObservabilityTraceRepository.findAllByWorkspaceIdAndCreatedDateBetween(workspaceId, start, end);
     }
 
     @Override
@@ -103,7 +99,7 @@ class WorkspaceAiObservabilityTraceServiceImpl implements WorkspaceAiObservabili
         Validate.notNull(workspaceId, "workspaceId must not be null");
         Validate.notNull(source, "source must not be null");
 
-        return workspaceAiObservabilityTraceRepository.findAllByWorkspaceIdAndSourceAndCreatedDateBetween(
+        return aiObservabilityTraceRepository.findAllByWorkspaceIdAndSourceAndCreatedDateBetween(
             workspaceId, source.ordinal(), start, end);
     }
 
@@ -113,7 +109,7 @@ class WorkspaceAiObservabilityTraceServiceImpl implements WorkspaceAiObservabili
         Validate.notNull(sessionId, "sessionId must not be null");
         Validate.notNull(workspaceId, "workspaceId must not be null");
 
-        return workspaceAiObservabilityTraceRepository.findAllBySessionIdAndWorkspaceId(sessionId, workspaceId);
+        return aiObservabilityTraceRepository.findAllBySessionIdAndWorkspaceId(sessionId, workspaceId);
     }
 
     @Override
@@ -125,7 +121,7 @@ class WorkspaceAiObservabilityTraceServiceImpl implements WorkspaceAiObservabili
 
         Validate.notNull(workspaceId, "workspaceId must not be null");
 
-        return workspaceAiObservabilityTraceRepository.findAllByFilters(
+        return aiObservabilityTraceRepository.findAllByFilters(
             workspaceId, start, end, userId,
             status != null ? status.ordinal() : null,
             source != null ? source.ordinal() : null,

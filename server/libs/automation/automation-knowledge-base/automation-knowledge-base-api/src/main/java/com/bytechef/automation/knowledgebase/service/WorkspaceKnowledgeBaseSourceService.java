@@ -16,29 +16,24 @@
 
 package com.bytechef.automation.knowledgebase.service;
 
-import com.bytechef.automation.knowledgebase.domain.WorkspaceKnowledgeBaseSource;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseSource;
 import java.util.List;
 import java.util.Optional;
 
 /**
- * Workspace-scoped service over the {@link WorkspaceKnowledgeBaseSource} relation table. Provides the workspace-aware
- * lookups for KB sources — the platform-side source service no longer carries any workspace knowledge after the
- * platform-relation refactor.
+ * Workspace-scoped service over {@link KnowledgeBaseSource}. A source carries its workspace in the nullable
+ * {@code knowledge_base_source.workspace_id} column; this is the single workspace-aware service over that column, so
+ * the platform-side source service stays free of workspace rules.
  *
  * <p>
  * Environment scoping: the {@code environmentId} overloads accept an environment for forward compatibility with the
- * Phase 15 UI. The relation table does not carry an environment column today (sources own a single
+ * Phase 15 UI. The source row does not carry an environment column today (sources own a single
  * {@code ProjectDeploymentWorkflow} pinned to {@code DEVELOPMENT}); the parameter is reserved so callers can pass the
  * active environment without further GraphQL surface changes when per-environment scoping lands.
  *
  * @author Ivica Cardic
  */
 public interface WorkspaceKnowledgeBaseSourceService {
-
-    WorkspaceKnowledgeBaseSource registerSourceForWorkspace(Long knowledgeBaseSourceId, Long workspaceId);
-
-    void unregisterSource(Long knowledgeBaseSourceId);
 
     Optional<Long> fetchWorkspaceIdByKnowledgeBaseSourceId(Long knowledgeBaseSourceId);
 

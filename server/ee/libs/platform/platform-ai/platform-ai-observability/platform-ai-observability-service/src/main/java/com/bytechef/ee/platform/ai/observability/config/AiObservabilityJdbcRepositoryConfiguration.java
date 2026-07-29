@@ -15,12 +15,11 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
 /**
  * Activates Spring Data JDBC repository scanning for the ai_observability_* family — sessions, traces, spans, alert
- * rules + events, notification channels, export jobs, webhook subscriptions + deliveries — plus the
- * workspace_ai_observability_* relation tables. All entity tables and their workspace membership tables are owned by
- * platform-ai-observability so the gateway-side OTLP ingest, alerting, exporter, dispatcher, cleanup, and GraphQL
- * surfaces can depend on a single CRUD layer rather than reach across modules. Discovered via
- * {@code AutoConfiguration.imports} when this module is on the classpath, gated on a {@link AbstractJdbcConfiguration}
- * bean so app variants without JDBC start cleanly.
+ * rules + events, export jobs, webhook subscriptions + deliveries. Every table, including its {@code workspace_id}
+ * scoping column, is owned by platform-ai-observability so the gateway-side OTLP ingest, alerting, exporter,
+ * dispatcher, cleanup, and GraphQL surfaces can depend on a single CRUD layer rather than reach across modules.
+ * Discovered via {@code AutoConfiguration.imports} when this module is on the classpath, gated on a
+ * {@link AbstractJdbcConfiguration} bean so app variants without JDBC start cleanly.
  *
  * @author Ivica Cardic
  * @version ee

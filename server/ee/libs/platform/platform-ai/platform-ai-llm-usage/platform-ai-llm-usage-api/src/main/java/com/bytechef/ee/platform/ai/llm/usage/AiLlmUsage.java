@@ -37,7 +37,8 @@ import org.springframework.data.relational.core.mapping.Table;
  * Hub's separate {@code ai_hub_usage} table — {@code user_id}, {@code owner_id} (the task / run id),
  * {@code agent_name}, {@code parent_agent} — so spend-by-agent dashboards keep working against the unified table. The
  * {@link #source} discriminator (a {@link LlmUsageSource} ordinal) lets analytics queries split the table by surface
- * even though every row sits in one schema.
+ * even though every row sits in one schema. A row belongs to at most one workspace, carried by the nullable
+ * {@link #workspaceId} column.
  *
  * <p>
  * Two write APIs land into the same row:
@@ -76,6 +77,13 @@ public class AiLlmUsage {
 
     @Column("project_id")
     private Long projectId;
+
+    /**
+     * Workspace that owns this usage row, or {@code null} when the call was recorded outside any workspace. Boxed on
+     * purpose: a primitive would collapse "no workspace" into workspace 0, which is a real workspace id.
+     */
+    @Column("workspace_id")
+    private @Nullable Long workspaceId;
 
     @Column("request_id")
     private String requestId;
@@ -315,6 +323,10 @@ public class AiLlmUsage {
         return parentAgent;
     }
 
+    public @Nullable Long getWorkspaceId() {
+        return workspaceId;
+    }
+
     public void setApiKeyId(Long apiKeyId) {
         this.apiKeyId = apiKeyId;
     }
@@ -417,6 +429,10 @@ public class AiLlmUsage {
 
     public void setParentAgent(@Nullable String parentAgent) {
         this.parentAgent = parentAgent;
+    }
+
+    public void setWorkspaceId(@Nullable Long workspaceId) {
+        this.workspaceId = workspaceId;
     }
 
     @Override

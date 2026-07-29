@@ -16,9 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Workspace-agnostic CRUD on {@link AiEvalDataset}. The workspace membership row in {@code workspace_ai_eval_dataset}
- * and any workspace-scoped query is owned by
- * {@code com.bytechef.ee.automation.ai.eval.dataset.service.WorkspaceAiEvalDatasetServiceImpl}.
+ * Workspace-agnostic CRUD on {@link AiEvalDataset}. Setting the dataset's {@code workspaceId} and any workspace-scoped
+ * query is owned by {@code com.bytechef.ee.automation.ai.eval.dataset.service.WorkspaceAiEvalDatasetServiceImpl}.
  *
  * @author Ivica Cardic
  * @version ee

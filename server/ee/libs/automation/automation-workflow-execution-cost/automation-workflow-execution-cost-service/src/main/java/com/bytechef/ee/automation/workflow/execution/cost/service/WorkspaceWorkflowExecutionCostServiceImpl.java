@@ -8,8 +8,7 @@
 package com.bytechef.ee.automation.workflow.execution.cost.service;
 
 import com.bytechef.ee.automation.workflow.execution.cost.domain.WorkflowExecutionCost;
-import com.bytechef.ee.automation.workflow.execution.cost.domain.WorkspaceWorkflowExecutionCost;
-import com.bytechef.ee.automation.workflow.execution.cost.repository.WorkspaceWorkflowExecutionCostRepository;
+import com.bytechef.ee.automation.workflow.execution.cost.repository.WorkflowExecutionCostRepository;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.math.BigDecimal;
@@ -29,43 +28,42 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class WorkspaceWorkflowExecutionCostServiceImpl implements WorkspaceWorkflowExecutionCostService {
 
+    private final WorkflowExecutionCostRepository workflowExecutionCostRepository;
     private final WorkflowExecutionCostService workflowExecutionCostService;
-    private final WorkspaceWorkflowExecutionCostRepository workspaceWorkflowExecutionCostRepository;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public WorkspaceWorkflowExecutionCostServiceImpl(
-        WorkflowExecutionCostService workflowExecutionCostService,
-        WorkspaceWorkflowExecutionCostRepository workspaceWorkflowExecutionCostRepository) {
+        WorkflowExecutionCostRepository workflowExecutionCostRepository,
+        WorkflowExecutionCostService workflowExecutionCostService) {
 
+        this.workflowExecutionCostRepository = workflowExecutionCostRepository;
         this.workflowExecutionCostService = workflowExecutionCostService;
-        this.workspaceWorkflowExecutionCostRepository = workspaceWorkflowExecutionCostRepository;
     }
 
     @Override
     public WorkflowExecutionCost createInWorkspace(
         WorkflowExecutionCost workflowExecutionCost, @Nullable Long workspaceId) {
 
-        WorkflowExecutionCost savedWorkflowExecutionCost = workflowExecutionCostService.create(workflowExecutionCost);
+        workflowExecutionCost.setWorkspaceId(workspaceId);
 
-        if (workspaceId != null) {
-            workspaceWorkflowExecutionCostRepository.save(
-                new WorkspaceWorkflowExecutionCost(savedWorkflowExecutionCost.getId(), workspaceId));
-        }
-
-        return savedWorkflowExecutionCost;
+        return workflowExecutionCostService.create(workflowExecutionCost);
     }
 
+    /**
+     * Reads the owning workspace straight off the cost row. An unknown id and a workspace-less row both answer
+     * {@link Optional#empty()} — the same result the missing membership row used to give.
+     */
     @Override
     @Transactional(readOnly = true)
     public Optional<Long> fetchWorkspaceIdByWorkflowExecutionCostId(long workflowExecutionCostId) {
-        return workspaceWorkflowExecutionCostRepository.findByWorkflowExecutionCostId(workflowExecutionCostId)
-            .map(WorkspaceWorkflowExecutionCost::getWorkspaceId);
+        return workflowExecutionCostRepository.findById(workflowExecutionCostId)
+            .map(WorkflowExecutionCost::getWorkspaceId);
     }
 
     @Override
     @Transactional(readOnly = true)
     public BigDecimal sumTotalCostByWorkspaceSince(long workspaceId, Instant since) {
-        BigDecimal sum = workspaceWorkflowExecutionCostRepository.sumTotalCostByWorkspaceIdSince(workspaceId, since);
+        BigDecimal sum = workflowExecutionCostRepository.sumTotalCostByWorkspaceIdSince(workspaceId, since);
 
         return sum == null ? BigDecimal.ZERO : sum;
     }

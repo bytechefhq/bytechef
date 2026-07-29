@@ -7,7 +7,6 @@
 
 package com.bytechef.ee.automation.ai.gateway.facade;
 
-import com.bytechef.ee.automation.ai.gateway.domain.WorkspaceAiGatewayProvider;
 import com.bytechef.ee.automation.ai.gateway.service.WorkspaceAiGatewayProviderService;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayProvider;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayProviderType;
@@ -28,6 +27,7 @@ import java.net.http.HttpResponse;
 import java.net.http.HttpTimeoutException;
 import java.time.Duration;
 import java.util.List;
+import java.util.Objects;
 import javax.net.ssl.SSLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,16 +104,7 @@ class WorkspaceAiGatewayProviderFacadeImpl implements WorkspaceAiGatewayProvider
     @Transactional(readOnly = true)
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.USER + "\")")
     public List<AiGatewayProvider> getWorkspaceProviders(Long workspaceId) {
-        List<Long> providerIds = workspaceAiGatewayProviderService.getWorkspaceProviders(workspaceId)
-            .stream()
-            .map(WorkspaceAiGatewayProvider::getProviderId)
-            .toList();
-
-        if (providerIds.isEmpty()) {
-            return List.of();
-        }
-
-        return aiGatewayProviderService.getProviders(providerIds);
+        return workspaceAiGatewayProviderService.getWorkspaceProviders(workspaceId);
     }
 
     @Override
@@ -307,8 +298,7 @@ class WorkspaceAiGatewayProviderFacadeImpl implements WorkspaceAiGatewayProvider
     private void verifyWorkspaceOwnership(Long workspaceId, Long providerId) {
         boolean owned = workspaceAiGatewayProviderService.getWorkspaceProviders(workspaceId)
             .stream()
-            .anyMatch(workspaceProvider -> workspaceProvider.getProviderId()
-                .equals(providerId));
+            .anyMatch(workspaceProvider -> Objects.equals(workspaceProvider.getId(), providerId));
 
         if (!owned) {
             throw new IllegalArgumentException(

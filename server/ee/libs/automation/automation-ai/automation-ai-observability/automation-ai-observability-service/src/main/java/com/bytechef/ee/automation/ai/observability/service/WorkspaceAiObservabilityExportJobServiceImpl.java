@@ -7,9 +7,8 @@
 
 package com.bytechef.ee.automation.ai.observability.service;
 
-import com.bytechef.ee.automation.ai.observability.domain.WorkspaceAiObservabilityExportJob;
-import com.bytechef.ee.automation.ai.observability.repository.WorkspaceAiObservabilityExportJobRepository;
 import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityExportJob;
+import com.bytechef.ee.platform.ai.observability.repository.AiObservabilityExportJobRepository;
 import com.bytechef.ee.platform.ai.observability.service.AiObservabilityExportJobService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -28,39 +27,37 @@ import org.springframework.transaction.annotation.Transactional;
 @SuppressFBWarnings("EI")
 class WorkspaceAiObservabilityExportJobServiceImpl implements WorkspaceAiObservabilityExportJobService {
 
+    private final AiObservabilityExportJobRepository aiObservabilityExportJobRepository;
     private final AiObservabilityExportJobService aiObservabilityExportJobService;
-    private final WorkspaceAiObservabilityExportJobRepository workspaceAiObservabilityExportJobRepository;
 
     WorkspaceAiObservabilityExportJobServiceImpl(
-        AiObservabilityExportJobService aiObservabilityExportJobService,
-        WorkspaceAiObservabilityExportJobRepository workspaceAiObservabilityExportJobRepository) {
+        AiObservabilityExportJobRepository aiObservabilityExportJobRepository,
+        AiObservabilityExportJobService aiObservabilityExportJobService) {
 
+        this.aiObservabilityExportJobRepository = aiObservabilityExportJobRepository;
         this.aiObservabilityExportJobService = aiObservabilityExportJobService;
-        this.workspaceAiObservabilityExportJobRepository = workspaceAiObservabilityExportJobRepository;
     }
 
     @Override
     public AiObservabilityExportJob createInWorkspace(AiObservabilityExportJob exportJob, long workspaceId) {
-        AiObservabilityExportJob saved = aiObservabilityExportJobService.create(exportJob);
+        exportJob.setWorkspaceId(workspaceId);
 
-        workspaceAiObservabilityExportJobRepository.save(
-            new WorkspaceAiObservabilityExportJob(saved.getId(), workspaceId));
-
-        return saved;
+        return aiObservabilityExportJobService.create(exportJob);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<AiObservabilityExportJob> getExportJobsByWorkspace(Long workspaceId) {
-        return workspaceAiObservabilityExportJobRepository.findAllExportJobsByWorkspaceIdOrderByCreatedDateDesc(
-            workspaceId);
+        return aiObservabilityExportJobRepository.findAllByWorkspaceIdOrderByCreatedDateDesc(workspaceId);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Long getWorkspaceId(long exportJobId) {
-        return workspaceAiObservabilityExportJobRepository.findByAiObservabilityExportJobId(exportJobId)
-            .map(WorkspaceAiObservabilityExportJob::getWorkspaceId)
+        // findById rather than the service's getExportJob: an unknown id must still yield null (the pre-collapse
+        // "no membership row" answer) because callers use this as an authorization probe, not as a fetch.
+        return aiObservabilityExportJobRepository.findById(exportJobId)
+            .map(AiObservabilityExportJob::getWorkspaceId)
             .orElse(null);
     }
 }

@@ -41,4 +41,10 @@ class AiGatewaySpendServiceImpl implements AiGatewaySpendService {
     public List<AiGatewaySpendSummary> getSpendSummaries(Instant start, Instant end) {
         return aiGatewaySpendSummaryRepository.findAllByPeriodStartBetween(start, end);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<AiGatewaySpendSummary> getSpendSummariesByWorkspaceId(long workspaceId, Instant start, Instant end) {
+        return aiGatewaySpendSummaryRepository.findAllByWorkspaceIdAndPeriodStartBetween(workspaceId, start, end);
+    }
 }

@@ -12,9 +12,9 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * CRUD service for {@link ContextStore} parent entities. Workspace scoping is enforced by the
- * {@code workspace_context_store} relation table owned by the automation-side service; this platform service only sees
- * workspace-agnostic store rows.
+ * CRUD service for {@link ContextStore} parent entities. Workspace scoping is the nullable
+ * {@code context_store.workspace_id} column; the automation-side service is the one that decides which workspace a
+ * caller may see.
  *
  * @author Ivica Cardic
  * @version ee
@@ -32,4 +32,6 @@ public interface ContextStoreService {
     Optional<ContextStore> fetch(Long id);
 
     List<ContextStore> getAllByIds(List<Long> ids);
+
+    List<ContextStore> getAllByWorkspaceId(long workspaceId);
 }

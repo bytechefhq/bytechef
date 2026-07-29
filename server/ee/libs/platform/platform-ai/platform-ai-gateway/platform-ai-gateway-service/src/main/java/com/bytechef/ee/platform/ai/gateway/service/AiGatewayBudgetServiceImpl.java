@@ -10,6 +10,7 @@ package com.bytechef.ee.platform.ai.gateway.service;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayBudget;
 import com.bytechef.ee.platform.ai.gateway.repository.AiGatewayBudgetRepository;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
@@ -41,6 +42,18 @@ class AiGatewayBudgetServiceImpl implements AiGatewayBudgetService {
     @Override
     public void delete(long id) {
         aiGatewayBudgetRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<AiGatewayBudget> fetchBudget(long id) {
+        return aiGatewayBudgetRepository.findById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<AiGatewayBudget> fetchBudgetByWorkspaceId(long workspaceId) {
+        return aiGatewayBudgetRepository.findByWorkspaceId(workspaceId);
     }
 
     @Override

@@ -477,22 +477,12 @@ class ContextStoreQueryServiceIntTest {
         source.setSourceClusterElementName("contactsReader");
         source.setCadence("@hourly");
         source.setStatus(ContextStoreSourceStatus.READY);
+        // Workspace scoping for the search() path is the nullable context_store_source.workspace_id column, so the
+        // source is stamped with its workspace on the way in. (Production code paths do the same under the facade.)
+        source.setWorkspaceId(WORKSPACE_ID);
 
-        Long sourceId = contextStoreSourceService.create(source)
+        return contextStoreSourceService.create(source)
             .getId();
-
-        // Workspace scoping for the search() path now flows through the workspace_context_store_source relation
-        // table; insert the membership row directly so the platform-side IntTest doesn't need the automation-side
-        // service. (Production code paths use WorkspaceContextStoreSourceService.create(...) under the facade.)
-        Timestamp now = Timestamp.from(Instant.now());
-
-        jdbcTemplate.update(
-            "INSERT INTO workspace_context_store_source " +
-                "(workspace_id, context_store_source_id, created_date, last_modified_date, version) " +
-                "VALUES (?, ?, ?, ?, 0)",
-            WORKSPACE_ID, sourceId, now, now);
-
-        return sourceId;
     }
 
     /**

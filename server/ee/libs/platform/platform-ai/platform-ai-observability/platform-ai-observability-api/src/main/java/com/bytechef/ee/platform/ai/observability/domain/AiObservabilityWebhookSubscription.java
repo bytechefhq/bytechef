@@ -13,6 +13,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -92,6 +93,13 @@ public class AiObservabilityWebhookSubscription {
 
     @Version
     private int version;
+
+    /**
+     * The owning workspace, or {@code null} when the subscription belongs to no workspace. Boxed on purpose — a
+     * primitive would coerce the "no workspace" case into workspace {@code 0}, which is a real workspace id.
+     */
+    @Column("workspace_id")
+    private @Nullable Long workspaceId;
 
     private AiObservabilityWebhookSubscription() {
     }
@@ -195,6 +203,10 @@ public class AiObservabilityWebhookSubscription {
         return version;
     }
 
+    public @Nullable Long getWorkspaceId() {
+        return workspaceId;
+    }
+
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
@@ -253,10 +265,15 @@ public class AiObservabilityWebhookSubscription {
         this.url = url;
     }
 
+    public void setWorkspaceId(@Nullable Long workspaceId) {
+        this.workspaceId = workspaceId;
+    }
+
     @Override
     public String toString() {
         return "AiObservabilityWebhookSubscription{" +
             "id=" + id +
+            ", workspaceId=" + workspaceId +
             ", name='" + name + '\'' +
             ", url='" + url + '\'' +
             ", enabled=" + enabled +

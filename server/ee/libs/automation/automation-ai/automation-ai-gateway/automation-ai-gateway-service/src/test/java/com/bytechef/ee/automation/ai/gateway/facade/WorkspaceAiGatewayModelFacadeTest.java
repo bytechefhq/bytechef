@@ -16,9 +16,10 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.ee.automation.ai.gateway.domain.WorkspaceAiGatewayProvider;
 import com.bytechef.ee.automation.ai.gateway.service.WorkspaceAiGatewayProviderService;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayModel;
+import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayProvider;
+import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayProviderType;
 import com.bytechef.ee.platform.ai.gateway.service.AiGatewayModelService;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,7 +51,7 @@ class WorkspaceAiGatewayModelFacadeTest {
 
     @Test
     void testCreateWorkspaceModelSucceedsWhenProviderBelongsToWorkspace() {
-        WorkspaceAiGatewayProvider workspaceProvider = new WorkspaceAiGatewayProvider(5L, 1L);
+        AiGatewayProvider workspaceProvider = workspaceProvider();
         AiGatewayModel createdModel = new AiGatewayModel(5L, "gpt-4");
 
         ReflectionTestUtils.setField(createdModel, "id", 100L);
@@ -70,7 +71,7 @@ class WorkspaceAiGatewayModelFacadeTest {
 
     @Test
     void testCreateWorkspaceModelRejectsProviderFromDifferentWorkspace() {
-        WorkspaceAiGatewayProvider workspaceProvider = new WorkspaceAiGatewayProvider(5L, 1L);
+        AiGatewayProvider workspaceProvider = workspaceProvider();
 
         when(workspaceAiGatewayProviderService.getWorkspaceProviders(1L))
             .thenReturn(List.of(workspaceProvider));
@@ -88,7 +89,7 @@ class WorkspaceAiGatewayModelFacadeTest {
 
     @Test
     void testDeleteWorkspaceModelSucceedsWhenModelBelongsToWorkspace() {
-        WorkspaceAiGatewayProvider workspaceProvider = new WorkspaceAiGatewayProvider(5L, 1L);
+        AiGatewayProvider workspaceProvider = workspaceProvider();
         AiGatewayModel model = new AiGatewayModel(5L, "gpt-4");
 
         ReflectionTestUtils.setField(model, "id", 100L);
@@ -104,7 +105,7 @@ class WorkspaceAiGatewayModelFacadeTest {
 
     @Test
     void testDeleteWorkspaceModelRejectsModelFromDifferentWorkspace() {
-        WorkspaceAiGatewayProvider workspaceProvider = new WorkspaceAiGatewayProvider(5L, 1L);
+        AiGatewayProvider workspaceProvider = workspaceProvider();
         AiGatewayModel model = new AiGatewayModel(999L, "gpt-4");
 
         ReflectionTestUtils.setField(model, "id", 100L);
@@ -125,7 +126,7 @@ class WorkspaceAiGatewayModelFacadeTest {
 
     @Test
     void testGetWorkspaceModelsReturnsOnlyModelsFromWorkspaceProviders() {
-        WorkspaceAiGatewayProvider workspaceProvider = new WorkspaceAiGatewayProvider(5L, 1L);
+        AiGatewayProvider workspaceProvider = workspaceProvider();
         AiGatewayModel model1 = new AiGatewayModel(5L, "gpt-4");
         AiGatewayModel model2 = new AiGatewayModel(5L, "gpt-3.5");
 
@@ -147,5 +148,19 @@ class WorkspaceAiGatewayModelFacadeTest {
         List<AiGatewayModel> models = workspaceModelFacade.getWorkspaceModels(1L);
 
         assertTrue(models.isEmpty());
+    }
+
+    /**
+     * A provider owned by workspace 1, id 5. Ownership is now carried by the provider's own {@code workspace_id}
+     * column, so the workspace service hands back the providers themselves rather than membership rows.
+     */
+    private static AiGatewayProvider workspaceProvider() {
+        AiGatewayProvider provider = new AiGatewayProvider("openai", AiGatewayProviderType.OPENAI, "sk-123");
+
+        ReflectionTestUtils.setField(provider, "id", 5L);
+
+        provider.setWorkspaceId(1L);
+
+        return provider;
     }
 }

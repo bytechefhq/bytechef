@@ -14,8 +14,9 @@ import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Workspace-membership write/read side for execution cost rows. {@code createInWorkspace} with a {@code null} workspace
- * persists the cost row without a membership row (editor runs and embedded executions have no workspace).
+ * Workspace-scoped write/read side for execution cost rows. {@code createInWorkspace} with a {@code null} workspace
+ * persists the cost row with a null {@code workspace_id} (editor runs and embedded executions have no workspace), which
+ * keeps it out of every workspace-scoped read.
  *
  * @version ee
  *

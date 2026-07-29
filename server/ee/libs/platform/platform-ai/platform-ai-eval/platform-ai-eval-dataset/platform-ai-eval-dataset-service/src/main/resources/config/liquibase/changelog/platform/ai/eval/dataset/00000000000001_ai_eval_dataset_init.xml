@@ -9,8 +9,8 @@
         ai_eval_dataset + ai_eval_dataset_version + ai_eval_dataset_item — extracted from
         automation/ai_gateway/00000000000006_ai_dataset_init.xml as part of the platform/automation split (mirrors
         ai_eval_rule and ai_prompt). Tables were renamed from ai_dataset* to ai_eval_dataset* to scope them under the
-        platform-ai-eval module. The workspace_ai_eval_dataset membership table is in
-        automation/ai/eval/dataset/00000000000001_workspace_ai_eval_dataset_init.xml.
+        platform-ai-eval module. The owning workspace is the nullable workspace_id column below; there is no
+        workspace_ai_eval_dataset relation table.
     -->
     <changeSet id="20260423000002" author="ivicac">
         <createTable tableName="ai_eval_dataset">
@@ -18,6 +18,8 @@
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="project_id" type="BIGINT"/>
+            <!-- Nullable: a dataset that belongs to no workspace is invisible to every workspace-scoped query. -->
+            <column name="workspace_id" type="BIGINT"/>
             <column name="name" type="VARCHAR(256)">
                 <constraints nullable="false"/>
             </column>
@@ -38,6 +40,17 @@
             </column>
             <column name="version" type="BIGINT" defaultValueNumeric="0"/>
         </createTable>
+
+        <!--
+            Replaces idx_ws_ai_eval_dataset_workspace on the removed relation table. Compound rather than
+            workspace_id alone because both workspace-scoped reads are "all datasets of a workspace" and
+            "the dataset of a workspace with this name"; the leading column serves the first, the pair the
+            second. The relation table could not carry this index — name lived on the other table.
+        -->
+        <createIndex tableName="ai_eval_dataset" indexName="idx_ai_eval_dataset_workspace_name">
+            <column name="workspace_id"/>
+            <column name="name"/>
+        </createIndex>
     </changeSet>
 
     <changeSet id="20260423000003" author="ivicac">

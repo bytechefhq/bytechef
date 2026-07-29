@@ -7,11 +7,12 @@
 
 package com.bytechef.ee.automation.ai.gateway.service;
 
-import com.bytechef.ee.automation.ai.gateway.domain.WorkspaceAiGatewayProvider;
+import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayProvider;
 import java.util.List;
 
 /**
- * Service interface for managing workspace AI LLM Gateway provider relationships.
+ * Service interface for the workspace scoping of AI LLM Gateway providers. A provider belongs to at most one workspace,
+ * recorded in its own nullable {@code workspace_id} column.
  *
  * @version ee
  *
@@ -23,9 +24,9 @@ public interface WorkspaceAiGatewayProviderService {
      * Gets AI LLM Gateway providers filtered by workspace ID.
      *
      * @param workspaceId the workspace ID to filter by
-     * @return a list of workspace AI LLM Gateway provider relationships in the specified workspace
+     * @return a list of AI LLM Gateway providers in the specified workspace
      */
-    List<WorkspaceAiGatewayProvider> getWorkspaceProviders(Long workspaceId);
+    List<AiGatewayProvider> getWorkspaceProviders(Long workspaceId);
 
     /**
      * Assigns an AI LLM Gateway provider to a workspace.
@@ -36,7 +37,7 @@ public interface WorkspaceAiGatewayProviderService {
     void assignProviderToWorkspace(Long providerId, Long workspaceId);
 
     /**
-     * Removes an AI LLM Gateway provider from all workspaces.
+     * Removes an AI LLM Gateway provider from its workspace.
      *
      * @param providerId the provider ID
      */

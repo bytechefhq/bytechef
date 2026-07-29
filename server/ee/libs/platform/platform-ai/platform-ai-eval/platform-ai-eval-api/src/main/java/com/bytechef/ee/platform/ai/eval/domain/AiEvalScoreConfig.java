@@ -11,15 +11,21 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.Version;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 /**
- * Workspace association lives on {@link WorkspaceAiEvalScoreConfig} — the entity is workspace-agnostic. Callers go
- * through {@code AiEvalScoreConfigService.getWorkspaceId(id)} (Variant A).
+ * A score config belongs to at most one workspace, carried by the nullable {@code workspaceId} column; it is null where
+ * no workspace applies. {@code (workspaceId, name)} is unique in the database, which is the invariant
+ * {@code WorkspaceAiEvalScoreConfigService.fetchScoreConfigByWorkspaceIdAndName} depends on to return an
+ * {@link java.util.Optional}. Writing the binding and every workspace-scoped query stay with
+ * {@code WorkspaceAiEvalScoreConfigService} in automation-ai-eval, so the platform service itself remains
+ * workspace-agnostic.
  *
  * @version ee
  */
@@ -49,6 +55,13 @@ public class AiEvalScoreConfig {
 
     @Version
     private int version;
+
+    /**
+     * The owning workspace, or {@code null} when the config belongs to no workspace. Boxed on purpose — a primitive
+     * would coerce the "no workspace" case into workspace {@code 0}, which is a real workspace id.
+     */
+    @Column("workspace_id")
+    private @Nullable Long workspaceId;
 
     private AiEvalScoreConfig() {
     }
@@ -121,6 +134,10 @@ public class AiEvalScoreConfig {
         return version;
     }
 
+    public @Nullable Long getWorkspaceId() {
+        return workspaceId;
+    }
+
     public void setCategories(String categories) {
         this.categories = categories;
     }
@@ -160,10 +177,15 @@ public class AiEvalScoreConfig {
         this.name = name;
     }
 
+    public void setWorkspaceId(@Nullable Long workspaceId) {
+        this.workspaceId = workspaceId;
+    }
+
     @Override
     public String toString() {
         return "AiEvalScoreConfig{" +
             "id=" + id +
+            ", workspaceId=" + workspaceId +
             ", name='" + name + '\'' +
             ", dataType=" + getDataType() +
             '}';

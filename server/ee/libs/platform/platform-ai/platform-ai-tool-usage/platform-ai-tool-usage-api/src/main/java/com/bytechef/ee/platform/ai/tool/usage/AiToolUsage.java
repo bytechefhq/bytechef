@@ -34,7 +34,8 @@ import org.springframework.data.relational.core.mapping.Table;
  * recorded so we can track agent reach. {@code metadataJson} is a free-form sidecar (e.g. {@code {"urls": [...]}} or
  * {@code {"imageSize": "1024x1024"}}). The optional {@code ownerId} carries whatever container the agent platform
  * attaches the call to (a AI Hub task id, an AI agent run id, etc.); it is intentionally NOT a foreign key so this
- * table can outlive any specific owner table and remain reusable across agent surfaces.
+ * table can outlive any specific owner table and remain reusable across agent surfaces. A row belongs to at most one
+ * workspace, carried by the nullable {@code workspaceId} column.
  *
  * <p>
  * Setters are package-private — only the metering implementation in {@code com.bytechef.ee.platform.ai.tool.usage} (and
@@ -47,6 +48,13 @@ public class AiToolUsage {
 
     @Id
     private Long id;
+
+    /**
+     * Workspace that owns this usage row, or {@code null} when the call was recorded outside any workspace. Boxed on
+     * purpose: a primitive would collapse "no workspace" into workspace 0, which is a real workspace id.
+     */
+    @Column("workspace_id")
+    private @Nullable Long workspaceId;
 
     @Column("user_id")
     private long userId;
@@ -84,6 +92,14 @@ public class AiToolUsage {
 
     void setId(Long id) {
         this.id = id;
+    }
+
+    public @Nullable Long getWorkspaceId() {
+        return workspaceId;
+    }
+
+    void setWorkspaceId(@Nullable Long workspaceId) {
+        this.workspaceId = workspaceId;
     }
 
     public long getUserId() {
@@ -211,6 +227,7 @@ public class AiToolUsage {
     public String toString() {
         return "AiToolUsage{" +
             "id=" + id +
+            ", workspaceId=" + workspaceId +
             ", userId=" + userId +
             ", ownerId=" + ownerId +
             ", toolName='" + toolName + '\'' +

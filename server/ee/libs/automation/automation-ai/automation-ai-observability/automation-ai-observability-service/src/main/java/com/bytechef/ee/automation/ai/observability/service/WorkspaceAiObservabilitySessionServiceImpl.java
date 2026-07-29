@@ -7,9 +7,8 @@
 
 package com.bytechef.ee.automation.ai.observability.service;
 
-import com.bytechef.ee.automation.ai.observability.domain.WorkspaceAiObservabilitySession;
-import com.bytechef.ee.automation.ai.observability.repository.WorkspaceAiObservabilitySessionRepository;
 import com.bytechef.ee.platform.ai.observability.domain.AiObservabilitySession;
+import com.bytechef.ee.platform.ai.observability.repository.AiObservabilitySessionRepository;
 import com.bytechef.ee.platform.ai.observability.service.AiObservabilitySessionService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -29,24 +28,22 @@ import org.springframework.transaction.annotation.Transactional;
 @SuppressFBWarnings("EI")
 class WorkspaceAiObservabilitySessionServiceImpl implements WorkspaceAiObservabilitySessionService {
 
+    private final AiObservabilitySessionRepository aiObservabilitySessionRepository;
     private final AiObservabilitySessionService aiObservabilitySessionService;
-    private final WorkspaceAiObservabilitySessionRepository workspaceAiObservabilitySessionRepository;
 
     WorkspaceAiObservabilitySessionServiceImpl(
-        AiObservabilitySessionService aiObservabilitySessionService,
-        WorkspaceAiObservabilitySessionRepository workspaceAiObservabilitySessionRepository) {
+        AiObservabilitySessionRepository aiObservabilitySessionRepository,
+        AiObservabilitySessionService aiObservabilitySessionService) {
 
+        this.aiObservabilitySessionRepository = aiObservabilitySessionRepository;
         this.aiObservabilitySessionService = aiObservabilitySessionService;
-        this.workspaceAiObservabilitySessionRepository = workspaceAiObservabilitySessionRepository;
     }
 
     @Override
     public AiObservabilitySession createInWorkspace(AiObservabilitySession session, long workspaceId) {
-        AiObservabilitySession saved = aiObservabilitySessionService.create(session);
+        session.setWorkspaceId(workspaceId);
 
-        workspaceAiObservabilitySessionRepository.save(new WorkspaceAiObservabilitySession(saved.getId(), workspaceId));
-
-        return saved;
+        return aiObservabilitySessionService.create(session);
     }
 
     @Override
@@ -68,7 +65,7 @@ class WorkspaceAiObservabilitySessionServiceImpl implements WorkspaceAiObservabi
         Validate.notNull(workspaceId, "workspaceId must not be null");
         Validate.notBlank(externalSessionId, "externalSessionId must not be blank");
 
-        return workspaceAiObservabilitySessionRepository
+        return aiObservabilitySessionRepository
             .findByWorkspaceIdAndExternalSessionId(workspaceId, externalSessionId)
             .orElseGet(() -> {
                 AiObservabilitySession session = new AiObservabilitySession();
@@ -86,7 +83,7 @@ class WorkspaceAiObservabilitySessionServiceImpl implements WorkspaceAiObservabi
     public List<AiObservabilitySession> getSessionsByWorkspace(Long workspaceId) {
         Validate.notNull(workspaceId, "workspaceId must not be null");
 
-        return workspaceAiObservabilitySessionRepository.findAllSessionsByWorkspaceId(workspaceId);
+        return aiObservabilitySessionRepository.findAllByWorkspaceId(workspaceId);
     }
 
     @Override
@@ -95,14 +92,16 @@ class WorkspaceAiObservabilitySessionServiceImpl implements WorkspaceAiObservabi
         Validate.notNull(workspaceId, "workspaceId must not be null");
         Validate.notNull(userId, "userId must not be null");
 
-        return workspaceAiObservabilitySessionRepository.findAllSessionsByWorkspaceIdAndUserId(workspaceId, userId);
+        return aiObservabilitySessionRepository.findAllByWorkspaceIdAndUserId(workspaceId, userId);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Long getWorkspaceId(long sessionId) {
-        return workspaceAiObservabilitySessionRepository.findByAiObservabilitySessionId(sessionId)
-            .map(WorkspaceAiObservabilitySession::getWorkspaceId)
+        // findById rather than the service's getSession: an unknown id must still yield null (the pre-collapse
+        // "no membership row" answer) because callers use this as an authorization probe, not as a fetch.
+        return aiObservabilitySessionRepository.findById(sessionId)
+            .map(AiObservabilitySession::getWorkspaceId)
             .orElse(null);
     }
 }

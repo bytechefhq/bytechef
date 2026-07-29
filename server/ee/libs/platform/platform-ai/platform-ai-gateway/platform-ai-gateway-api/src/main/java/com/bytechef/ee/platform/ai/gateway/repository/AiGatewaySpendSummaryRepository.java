@@ -18,4 +18,12 @@ import org.springframework.data.repository.ListCrudRepository;
 public interface AiGatewaySpendSummaryRepository extends ListCrudRepository<AiGatewaySpendSummary, Long> {
 
     List<AiGatewaySpendSummary> findAllByPeriodStartBetween(Instant start, Instant end);
+
+    /**
+     * Returns the spend summaries owned by the given workspace whose period starts inside the range. A summary with a
+     * null {@code workspace_id} belongs to no workspace and is therefore never returned here — SQL equality never
+     * matches NULL.
+     */
+    List<AiGatewaySpendSummary> findAllByWorkspaceIdAndPeriodStartBetween(
+        long workspaceId, Instant start, Instant end);
 }

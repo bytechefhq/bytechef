@@ -178,7 +178,7 @@ class WorkspaceKnowledgeBaseSourceFacadeImplTest {
     }
 
     @Test
-    void testCreateInsertsSourceAndRelationAndAutoGeneratesWorkflow() {
+    void testCreateInsertsSourceStampedWithWorkspaceAndAutoGeneratesWorkflow() {
         CreateKnowledgeBaseSourceInput input = newCreateInput("HubSpot", "@hourly", "searchContacts");
 
         KnowledgeBaseSource result = facade.create(WORKSPACE_ID, input);
@@ -188,11 +188,14 @@ class WorkspaceKnowledgeBaseSourceFacadeImplTest {
         assertThat(result.getStatus()).isEqualTo(KnowledgeBaseSourceStatus.BUILDING_PREVIEW);
 
         // Source row inserted with status=BUILDING_PREVIEW + initial nulls, then updated with workflow id.
-        verify(knowledgeBaseSourceService).create(any(KnowledgeBaseSource.class));
+        ArgumentCaptor<KnowledgeBaseSource> createCaptor = ArgumentCaptor.forClass(KnowledgeBaseSource.class);
+
+        verify(knowledgeBaseSourceService).create(createCaptor.capture());
         verify(knowledgeBaseSourceService).update(any(KnowledgeBaseSource.class));
 
-        // Workspace-relation row registered.
-        verify(workspaceKnowledgeBaseSourceService).registerSourceForWorkspace(SOURCE_ID, WORKSPACE_ID);
+        // Workspace ownership is stamped onto the inserted source row itself.
+        assertThat(createCaptor.getValue()
+            .getWorkspaceId()).isEqualTo(WORKSPACE_ID);
 
         // Workflow definition was generated and persisted.
         ArgumentCaptor<String> definitionCaptor = ArgumentCaptor.forClass(String.class);
@@ -417,11 +420,10 @@ class WorkspaceKnowledgeBaseSourceFacadeImplTest {
             .hasMessageContaining(String.valueOf(SOURCE_ID));
 
         verify(knowledgeBaseSourceService, never()).delete(anyLong());
-        verify(workspaceKnowledgeBaseSourceService, never()).unregisterSource(anyLong());
     }
 
     @Test
-    void testDeleteRemovesProjectDeploymentWorkflowAndWorkflowAndRelationAndSource() {
+    void testDeleteRemovesProjectDeploymentWorkflowAndWorkflowAndSource() {
         when(workspaceKnowledgeBaseSourceService.fetchWorkspaceIdByKnowledgeBaseSourceId(SOURCE_ID))
             .thenReturn(Optional.of(WORKSPACE_ID));
 
@@ -455,7 +457,6 @@ class WorkspaceKnowledgeBaseSourceFacadeImplTest {
         verify(projectDeploymentWorkflowService).delete(PROJECT_DEPLOYMENT_WORKFLOW_ID);
         verify(projectWorkflowService).delete(eq(PROJECT_ID), anyInt(), eq(WORKFLOW_ID));
         verify(workflowService).delete(WORKFLOW_ID);
-        verify(workspaceKnowledgeBaseSourceService).unregisterSource(SOURCE_ID);
         verify(knowledgeBaseSourceService).delete(SOURCE_ID);
     }
 

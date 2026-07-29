@@ -7,19 +7,18 @@
 
 package com.bytechef.ee.automation.contextstore.service;
 
-import com.bytechef.ee.automation.contextstore.domain.WorkspaceContextStoreSource;
 import com.bytechef.ee.platform.contextstore.domain.ContextStoreSource;
 import java.util.List;
 import java.util.Optional;
 
 /**
- * Workspace-scoped service over the {@link WorkspaceContextStoreSource} relation table. Provides the workspace-aware
- * lookups that used to live on {@code ContextStoreSourceRepository.findAllByWorkspaceId(...)} — the platform-side
- * source service no longer carries any workspace knowledge after the platform-relation refactor.
+ * Workspace-scoped service over {@link ContextStoreSource}. A source carries its workspace in the nullable
+ * {@code context_store_source.workspace_id} column; this is the single workspace-aware service over that column, so the
+ * platform-side source service stays free of workspace rules.
  *
  * <p>
  * Environment scoping: the {@code environmentId} overloads accept an environment for forward compatibility with the
- * Phase 15 UI. The relation table does not carry an environment column today (sources own a single
+ * Phase 15 UI. The source row does not carry an environment column today (sources own a single
  * {@code ProjectDeploymentWorkflow} pinned to {@code DEVELOPMENT}); the parameter is reserved so callers can pass the
  * active environment without further GraphQL surface changes when per-environment scoping lands.
  *
@@ -27,10 +26,6 @@ import java.util.Optional;
  * @version ee
  */
 public interface WorkspaceContextStoreSourceService {
-
-    WorkspaceContextStoreSource create(Long contextStoreSourceId, Long workspaceId);
-
-    void deleteByContextStoreSourceId(Long contextStoreSourceId);
 
     List<ContextStoreSource> getAllSourcesByWorkspaceId(Long workspaceId);
 

@@ -14,11 +14,10 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 /**
- * Spring Data JDBC repository for {@link AiHubPersonalAgent}. Sidebar lookups join through
- * {@code workspace_ai_hub_personal_agent} for the workspace dimension; this repository only sees the workspace-agnostic
- * entity surface (user_id + environment). The {@link #findAllByWorkspaceUserEnvironment} query is the single
- * workspace-aware exception — it does the JOIN inline so callers can fetch the agent rows ordered by
- * {@code updated_at DESC} in one round trip.
+ * Spring Data JDBC repository for {@link AiHubPersonalAgent}. The workspace dimension is the nullable
+ * {@code ai_hub_personal_agent.workspace_id} column, so the sidebar lookups filter on it alongside user_id and
+ * environment and fetch the agent rows ordered by {@code updated_at DESC} in one round trip. An agent with a null
+ * workspace matches no workspace-scoped query.
  *
  * @version ee
  *
@@ -35,9 +34,7 @@ public interface AiHubPersonalAgentRepository extends CrudRepository<AiHubPerson
      */
     @Query("""
         SELECT cca.* FROM ai_hub_personal_agent cca
-        JOIN workspace_ai_hub_personal_agent wcca
-          ON wcca.ai_hub_personal_agent_id = cca.id
-        WHERE wcca.workspace_id = :workspaceId
+        WHERE cca.workspace_id = :workspaceId
           AND cca.user_id = :userId
           AND cca.environment = :environment
         ORDER BY cca.updated_at DESC
@@ -49,13 +46,11 @@ public interface AiHubPersonalAgentRepository extends CrudRepository<AiHubPerson
      * Resolve an agent by name within a (workspace, user, environment). Used by the LLM create-or-resolve tool flow:
      * names are not enforced unique at the DB layer, so multiple matches are theoretically possible — the service layer
      * guards against that by failing the create when a row already exists for the (workspace, user, env, name) tuple.
-     * The JOIN through workspace_ai_hub_personal_agent keeps the lookup workspace-scoped.
+     * The workspace_id predicate keeps the lookup workspace-scoped.
      */
     @Query("""
         SELECT cca.* FROM ai_hub_personal_agent cca
-        JOIN workspace_ai_hub_personal_agent wcca
-          ON wcca.ai_hub_personal_agent_id = cca.id
-        WHERE wcca.workspace_id = :workspaceId
+        WHERE cca.workspace_id = :workspaceId
           AND cca.user_id = :userId
           AND cca.environment = :environment
           AND cca.name = :name

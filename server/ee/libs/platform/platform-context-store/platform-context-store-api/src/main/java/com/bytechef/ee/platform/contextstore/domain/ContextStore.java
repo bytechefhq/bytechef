@@ -32,9 +32,9 @@ import org.springframework.util.CollectionUtils;
  * {@link com.bytechef.platform.knowledgebase.domain.KnowledgeBase}'s parent role over Knowledge Base Sources.
  *
  * <p>
- * Uniqueness of {@code (workspace_id, environment, name)} is enforced at the application layer in
- * {@code WorkspaceContextStoreFacade} — cross-table unique with the {@code workspace_context_store} relation row can't
- * be expressed in SQL.
+ * A store belongs to at most one workspace, carried by the nullable {@code workspace_id} column. Uniqueness of
+ * {@code (workspace_id, environment, name)} is enforced at the application layer in {@code WorkspaceContextStoreFacade}
+ * rather than by a SQL UNIQUE, because a null workspace must not participate in it.
  * </p>
  *
  * @author Ivica Cardic
@@ -75,6 +75,9 @@ public class ContextStore {
 
     @Version
     private int version;
+
+    @Column("workspace_id")
+    private @Nullable Long workspaceId;
 
     public ContextStore() {
     }
@@ -173,6 +176,14 @@ public class ContextStore {
 
     public void setVersion(int version) {
         this.version = version;
+    }
+
+    public @Nullable Long getWorkspaceId() {
+        return workspaceId;
+    }
+
+    public void setWorkspaceId(@Nullable Long workspaceId) {
+        this.workspaceId = workspaceId;
     }
 
     @Override

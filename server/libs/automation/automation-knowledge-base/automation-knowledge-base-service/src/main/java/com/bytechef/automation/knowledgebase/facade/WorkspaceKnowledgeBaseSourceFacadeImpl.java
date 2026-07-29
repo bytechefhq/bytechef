@@ -150,9 +150,9 @@ public class WorkspaceKnowledgeBaseSourceFacadeImpl implements WorkspaceKnowledg
         sourceToInsert.setTombstoneStrategy(
             input.tombstoneStrategy() == null ? TombstoneStrategy.PERIODIC_FULL_REPLACE : input.tombstoneStrategy());
 
-        KnowledgeBaseSource source = knowledgeBaseSourceService.create(sourceToInsert);
+        sourceToInsert.setWorkspaceId(workspaceId);
 
-        workspaceKnowledgeBaseSourceService.registerSourceForWorkspace(source.getId(), workspaceId);
+        KnowledgeBaseSource source = knowledgeBaseSourceService.create(sourceToInsert);
 
         String workflowDefinition = KnowledgeBaseSourceWorkflowGenerator.generate(source);
 
@@ -344,7 +344,6 @@ public class WorkspaceKnowledgeBaseSourceFacadeImpl implements WorkspaceKnowledg
             workflowService.delete(workflowId);
         }
 
-        workspaceKnowledgeBaseSourceService.unregisterSource(sourceId);
         knowledgeBaseSourceService.delete(sourceId);
     }
 

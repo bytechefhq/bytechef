@@ -17,18 +17,17 @@
 package com.bytechef.platform.ai.auto.memory;
 
 import com.bytechef.platform.ai.auto.memory.repository.AiAutoMemoryRepository;
-import com.bytechef.platform.ai.auto.memory.repository.WorkspaceAiAutoMemoryRepository;
 import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,9 +35,9 @@ import org.springframework.transaction.annotation.Transactional;
  * Default implementation of {@link AiAutoMemoryService}.
  *
  * <p>
- * <b>Workspace association via the relation table.</b> The {@code ai_auto_memory} entity is workspace-agnostic;
- * {@code workspace_ai_auto_memory} carries the (workspace, memory) link. {@code create} writes both rows; ownership
- * checks JOIN through the relation. Mirrors {@code WorkspaceAiHubPersonalAgent}.
+ * <b>Workspace association via a column.</b> A memory belongs to at most one workspace, carried by the nullable
+ * {@code ai_auto_memory.workspace_id} column. {@code create} sets it; ownership checks compare it against the caller's
+ * workspace, so a memory with no workspace is never reachable through a workspace-scoped call.
  *
  * @author Ivica Cardic
  */
@@ -49,21 +48,16 @@ public class AiAutoMemoryServiceImpl implements AiAutoMemoryService {
     private static final Logger log = LoggerFactory.getLogger(AiAutoMemoryServiceImpl.class);
 
     private final AiAutoMemoryRepository aiMemoryRepository;
-    private final WorkspaceAiAutoMemoryRepository workspaceAiMemoryRepository;
     private final Clock clock;
 
     @Autowired
-    public AiAutoMemoryServiceImpl(
-        AiAutoMemoryRepository aiMemoryRepository, WorkspaceAiAutoMemoryRepository workspaceAiMemoryRepository) {
-        this(aiMemoryRepository, workspaceAiMemoryRepository, Clock.systemUTC());
+    public AiAutoMemoryServiceImpl(AiAutoMemoryRepository aiMemoryRepository) {
+        this(aiMemoryRepository, Clock.systemUTC());
     }
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public AiAutoMemoryServiceImpl(
-        AiAutoMemoryRepository aiMemoryRepository, WorkspaceAiAutoMemoryRepository workspaceAiMemoryRepository,
-        Clock clock) {
+    public AiAutoMemoryServiceImpl(AiAutoMemoryRepository aiMemoryRepository, Clock clock) {
         this.aiMemoryRepository = aiMemoryRepository;
-        this.workspaceAiMemoryRepository = workspaceAiMemoryRepository;
         this.clock = clock;
     }
 
@@ -93,6 +87,7 @@ public class AiAutoMemoryServiceImpl implements AiAutoMemoryService {
 
         AiAutoMemory memory = new AiAutoMemory(principalType, principalId);
 
+        memory.setWorkspaceId(workspaceId);
         memory.setName(name);
         memory.setTitle(title);
         memory.setDescription(description);
@@ -102,18 +97,10 @@ public class AiAutoMemoryServiceImpl implements AiAutoMemoryService {
         memory.setCreatedAt(now);
         memory.setUpdatedAt(now);
 
-        AiAutoMemory saved = aiMemoryRepository.save(memory);
-
-        try {
-            workspaceAiMemoryRepository.save(new WorkspaceAiAutoMemory(workspaceId, saved.getId()));
-        } catch (DataIntegrityViolationException exception) {
-            // The (workspace_id, ai_auto_memory_id) unique constraint is the only DB-level dup gate. Concurrent
-            // creates that slipped past the service-layer check but lost the membership race surface as a
-            // dup-name error for uniform caller experience.
-            throw new DuplicateAiAutoMemoryNameException(name, exception);
-        }
-
-        return saved;
+        // No DataIntegrityViolationException translation here: the insert can no longer raise one. The (workspace,
+        // memory) unique constraint that used to lose a concurrent-create race is gone with the relation table, and
+        // ai_auto_memory carries no unique index — only the name-slug CHECK, which setName(...) has already enforced.
+        return aiMemoryRepository.save(memory);
     }
 
     @Override
@@ -232,9 +219,7 @@ public class AiAutoMemoryServiceImpl implements AiAutoMemoryService {
         return aiMemoryRepository.findById(memoryId)
             .filter(memory -> memory.getPrincipalType() == principalType)
             .filter(memory -> memory.getPrincipalId() == principalId)
-            .filter(memory -> workspaceAiMemoryRepository
-                .findByWorkspaceIdAndAiAutoMemoryId(workspaceId, memory.getId())
-                .isPresent());
+            .filter(memory -> belongsToWorkspace(memory, workspaceId));
     }
 
     @Override
@@ -304,9 +289,7 @@ public class AiAutoMemoryServiceImpl implements AiAutoMemoryService {
         AiAutoMemory memory = memoryOptional.get();
 
         boolean principalOwns = memory.getPrincipalType() == principalType && memory.getPrincipalId() == principalId;
-        boolean workspaceClaims = workspaceAiMemoryRepository
-            .findByWorkspaceIdAndAiAutoMemoryId(workspaceId, memoryId)
-            .isPresent();
+        boolean workspaceClaims = belongsToWorkspace(memory, workspaceId);
 
         if (!principalOwns || !workspaceClaims) {
             log.warn(
@@ -320,6 +303,14 @@ public class AiAutoMemoryServiceImpl implements AiAutoMemoryService {
         }
 
         return memory;
+    }
+
+    /**
+     * A memory with no workspace ({@code workspaceId == null}) belongs to no workspace and is therefore claimed by none
+     * of them — never by the caller's.
+     */
+    private static boolean belongsToWorkspace(AiAutoMemory memory, long workspaceId) {
+        return Objects.equals(memory.getWorkspaceId(), workspaceId);
     }
 
     private static void validateName(String name) {

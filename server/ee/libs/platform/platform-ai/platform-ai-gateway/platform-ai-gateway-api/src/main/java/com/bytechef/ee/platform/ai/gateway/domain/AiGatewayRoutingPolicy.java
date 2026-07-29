@@ -59,6 +59,11 @@ public class AiGatewayRoutingPolicy {
     @Version
     private int version;
 
+    // A routing policy belongs to at most one workspace. Null means no workspace applies — a boxed Long is required so
+    // that "no workspace" cannot collapse into workspace 0, which is a real workspace id.
+    @Column("workspace_id")
+    private @Nullable Long workspaceId;
+
     private AiGatewayRoutingPolicy() {
     }
 
@@ -175,6 +180,10 @@ public class AiGatewayRoutingPolicy {
         return version;
     }
 
+    public @Nullable Long getWorkspaceId() {
+        return workspaceId;
+    }
+
     /**
      * Raw setter for the strategy config JSON column. Prefer {@link #applyStrategyConfig} which atomically updates the
      * {@code strategy}, {@code config}, and {@code fallbackModel} columns together. The config JSON is parsed against
@@ -215,6 +224,10 @@ public class AiGatewayRoutingPolicy {
         this.tags = new HashSet<>(tags);
     }
 
+    public void setWorkspaceId(@Nullable Long workspaceId) {
+        this.workspaceId = workspaceId;
+    }
+
     @Override
     public String toString() {
         return "AiGatewayRoutingPolicy{" +
@@ -225,6 +238,7 @@ public class AiGatewayRoutingPolicy {
             ", createdDate=" + createdDate +
             ", lastModifiedDate=" + lastModifiedDate +
             ", version=" + version +
+            ", workspaceId=" + workspaceId +
             '}';
     }
 }

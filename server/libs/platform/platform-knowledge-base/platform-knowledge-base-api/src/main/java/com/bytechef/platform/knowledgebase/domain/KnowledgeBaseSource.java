@@ -35,8 +35,8 @@ import org.springframework.data.relational.core.mapping.Table;
 /**
  * Domain class representing a Knowledge Base source — a configured binding of a Knowledge Base, a source component, an
  * optional connection, a sync cadence, and a lifecycle status. Periodically pulls document-shaped content from the
- * source into the target Knowledge Base via the auto-generated DataStream sync workflow. Workspace ownership is via the
- * {@code workspace_knowledge_base_source} relation table.
+ * source into the target Knowledge Base via the auto-generated DataStream sync workflow. Workspace ownership is the
+ * nullable {@code workspace_id} column — a source belongs to at most one workspace.
  *
  * @author Ivica Cardic
  */
@@ -126,6 +126,13 @@ public class KnowledgeBaseSource {
 
     @Version
     private int version;
+
+    /**
+     * Workspace the source belongs to. Nullable: a source belongs to at most one workspace, and null means none
+     * applies. Workspace-scoped queries never match a null, so a workspace-less source is invisible to them.
+     */
+    @Column("workspace_id")
+    private @Nullable Long workspaceId;
 
     public KnowledgeBaseSource() {
     }
@@ -304,6 +311,14 @@ public class KnowledgeBaseSource {
 
     public int getVersion() {
         return version;
+    }
+
+    public @Nullable Long getWorkspaceId() {
+        return workspaceId;
+    }
+
+    public void setWorkspaceId(@Nullable Long workspaceId) {
+        this.workspaceId = workspaceId;
     }
 
     @Override

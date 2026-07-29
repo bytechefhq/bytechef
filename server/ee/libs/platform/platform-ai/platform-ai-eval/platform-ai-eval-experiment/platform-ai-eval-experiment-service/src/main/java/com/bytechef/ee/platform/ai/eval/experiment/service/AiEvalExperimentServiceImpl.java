@@ -19,8 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Workspace-agnostic CRUD + lifecycle implementation for {@link AiEvalExperiment}. The workspace membership row in
- * {@code workspace_ai_eval_experiment} and any workspace-scoped query is owned by
+ * Workspace-agnostic CRUD + lifecycle implementation for {@link AiEvalExperiment}. Setting the experiment's
+ * {@code workspaceId} and any workspace-scoped query is owned by
  * {@code com.bytechef.ee.automation.ai.eval.experiment.service.WorkspaceAiEvalExperimentServiceImpl}.
  *
  * @author Ivica Cardic

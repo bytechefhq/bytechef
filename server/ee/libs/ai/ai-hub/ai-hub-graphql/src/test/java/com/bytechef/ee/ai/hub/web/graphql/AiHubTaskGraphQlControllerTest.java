@@ -22,6 +22,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.ee.ai.hub.exception.ForbiddenException;
+import com.bytechef.ee.ai.hub.exception.NotFoundException;
 import com.bytechef.ee.ai.hub.task.AiHubTask;
 import com.bytechef.ee.ai.hub.task.AiHubTaskArtifactService;
 import com.bytechef.ee.ai.hub.task.AiHubTaskService;
@@ -308,21 +309,20 @@ class AiHubTaskGraphQlControllerTest {
     }
 
     @Test
-    void testTaskWorkspaceIdResolvesViaService() {
-        // Schema declares AiHubTask.workspaceId: Long! but the entity is workspace-agnostic
-        // (the relation lives in workspace_ai_hub_task). The @SchemaMapping resolver must
-        // delegate to AiHubTaskService.getWorkspaceId(taskId), otherwise GraphQL returns null
-        // and trips the non-null contract on every list/create/update response.
+    void testTaskWorkspaceIdResolvesFromTheEntityColumn() {
+        // Schema declares AiHubTask.workspaceId: Long!. The @SchemaMapping resolver reads the loaded row's own
+        // workspace_id column, otherwise GraphQL returns null and trips the non-null contract on every
+        // list/create/update response.
         UserService userService = mock(UserService.class);
         AiHubTaskArtifactService artifactService = mock(AiHubTaskArtifactService.class);
         AiHubTaskService taskService = mock(AiHubTaskService.class);
         TitleGenerationService titleGenerationService = mock(TitleGenerationService.class);
         WorkspaceFacade workspaceFacade = mock(WorkspaceFacade.class);
 
-        AiHubTask task = mock(AiHubTask.class);
+        AiHubTask task = new AiHubTask(10L);
 
-        when(task.getId()).thenReturn(42L);
-        when(taskService.getWorkspaceId(42L)).thenReturn(7L);
+        task.setId(42L);
+        task.setWorkspaceId(7L);
 
         AiHubTaskGraphQlController controller = new AiHubTaskGraphQlController(
             artifactService, taskService, titleGenerationService, userService, workspaceFacade);
@@ -330,7 +330,27 @@ class AiHubTaskGraphQlControllerTest {
         long workspaceId = controller.taskWorkspaceId(task);
 
         assertThat(workspaceId).isEqualTo(7L);
-        verify(taskService).getWorkspaceId(42L);
+    }
+
+    @Test
+    void testTaskWorkspaceIdFailsLoudlyForWorkspaceLessTask() {
+        // A null workspace_id is the state the missing membership row used to represent: the task is unreachable
+        // through every workspace-scoped path, so the resolver must fail rather than break the non-null contract.
+        UserService userService = mock(UserService.class);
+        AiHubTaskArtifactService artifactService = mock(AiHubTaskArtifactService.class);
+        AiHubTaskService taskService = mock(AiHubTaskService.class);
+        TitleGenerationService titleGenerationService = mock(TitleGenerationService.class);
+        WorkspaceFacade workspaceFacade = mock(WorkspaceFacade.class);
+
+        AiHubTask task = new AiHubTask(10L);
+
+        task.setId(42L);
+
+        AiHubTaskGraphQlController controller = new AiHubTaskGraphQlController(
+            artifactService, taskService, titleGenerationService, userService, workspaceFacade);
+
+        assertThatThrownBy(() -> controller.taskWorkspaceId(task))
+            .isInstanceOf(NotFoundException.class);
     }
 
     private static Workspace buildWorkspace(long id) {

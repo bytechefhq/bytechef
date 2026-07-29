@@ -13,7 +13,6 @@ import static org.mockito.Mockito.when;
 import com.bytechef.ee.automation.ai.gateway.public_.config.AiGatewayPublicRestIntTestConfiguration;
 import com.bytechef.ee.automation.ai.gateway.public_.config.AiGatewayPublicRestIntTestSharedMocks;
 import com.bytechef.ee.automation.ai.gateway.public_.workspace.AiGatewayWorkspaceHeaderResolver;
-import com.bytechef.ee.automation.ai.observability.repository.WorkspaceAiObservabilityTraceRepository;
 import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityTrace;
 import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityTraceSource;
 import com.bytechef.ee.platform.ai.observability.repository.AiObservabilityTraceRepository;
@@ -80,9 +79,6 @@ public class AiGatewayOtlpControllerIntTest {
     private AiObservabilityTraceRepository aiObservabilityTraceRepository;
 
     @Autowired
-    private WorkspaceAiObservabilityTraceRepository workspaceAiObservabilityTraceRepository;
-
-    @Autowired
     private AiGatewayWorkspaceHeaderResolver workspaceHeaderResolver;
 
     @BeforeEach
@@ -133,16 +129,13 @@ public class AiGatewayOtlpControllerIntTest {
             .contains("\"acceptedSpans\":1")
             .contains("\"rejectedSpans\":0");
 
-        Optional<AiObservabilityTrace> persisted = workspaceAiObservabilityTraceRepository
+        Optional<AiObservabilityTrace> persisted = aiObservabilityTraceRepository
             .findByWorkspaceIdAndExternalTraceId(WORKSPACE_ID, externalTraceIdHex);
 
-        // workspaceId is no longer a field on AiObservabilityTrace — it lives on the WorkspaceAiObservabilityTrace
-        // membership row, which the repository's JOIN finder above already scoped by. Asserting the entity-level
-        // fields is sufficient: a non-empty Optional from findByWorkspaceIdAndExternalTraceId means the trace IS
-        // bound to WORKSPACE_ID via the workspace_ai_observability_trace row.
         assertThat(persisted)
             .isPresent()
             .get()
+            .hasFieldOrPropertyWithValue("workspaceId", WORKSPACE_ID)
             .hasFieldOrPropertyWithValue("externalTraceId", externalTraceIdHex)
             .hasFieldOrPropertyWithValue("source", AiObservabilityTraceSource.OTLP);
     }

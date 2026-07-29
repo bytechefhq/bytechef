@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Workspace resolution goes through the {@code workspace_workflow_alert_rule} membership table — workspace is an
- * automation-configuration-owned concept, so rules carry no workspace column of their own.
+ * Read/write service for {@link WorkflowAlertRule}. A rule belongs to at most one workspace, carried by the nullable
+ * {@code workflow_alert_rule.workspace_id} column, and every workspace-scoped read here filters that column.
  *
  * @version ee
  *
@@ -26,6 +26,10 @@ public interface WorkflowAlertRuleService {
 
     void delete(long id);
 
+    /**
+     * The owning workspace of {@code workflowAlertRuleId}. Empty when the rule has no workspace or does not exist —
+     * callers use it as a probe, so an unknown id does not throw.
+     */
     Optional<Long> fetchWorkspaceId(long workflowAlertRuleId);
 
     WorkflowAlertRule getWorkflowAlertRule(long id);

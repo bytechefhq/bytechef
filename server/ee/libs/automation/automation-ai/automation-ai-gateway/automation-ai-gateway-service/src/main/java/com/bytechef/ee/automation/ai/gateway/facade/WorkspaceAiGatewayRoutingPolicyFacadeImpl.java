@@ -7,7 +7,6 @@
 
 package com.bytechef.ee.automation.ai.gateway.facade;
 
-import com.bytechef.ee.automation.ai.gateway.domain.WorkspaceAiGatewayRoutingPolicy;
 import com.bytechef.ee.automation.ai.gateway.service.WorkspaceAiGatewayRoutingPolicyService;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayRoutingPolicy;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayRoutingStrategyType;
@@ -16,6 +15,7 @@ import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Objects;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
@@ -79,17 +79,7 @@ class WorkspaceAiGatewayRoutingPolicyFacadeImpl implements WorkspaceAiGatewayRou
     @Transactional(readOnly = true)
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.USER + "\")")
     public List<AiGatewayRoutingPolicy> getWorkspaceRoutingPolicies(Long workspaceId) {
-        List<Long> routingPolicyIds =
-            workspaceAiGatewayRoutingPolicyService.getWorkspaceRoutingPolicies(workspaceId)
-                .stream()
-                .map(WorkspaceAiGatewayRoutingPolicy::getRoutingPolicyId)
-                .toList();
-
-        if (routingPolicyIds.isEmpty()) {
-            return List.of();
-        }
-
-        return aiGatewayRoutingPolicyService.getRoutingPolicies(routingPolicyIds);
+        return workspaceAiGatewayRoutingPolicyService.getWorkspaceRoutingPolicies(workspaceId);
     }
 
     @Override
@@ -128,8 +118,7 @@ class WorkspaceAiGatewayRoutingPolicyFacadeImpl implements WorkspaceAiGatewayRou
     private void verifyWorkspaceOwnership(Long workspaceId, Long routingPolicyId) {
         boolean owned = workspaceAiGatewayRoutingPolicyService.getWorkspaceRoutingPolicies(workspaceId)
             .stream()
-            .anyMatch(workspaceRoutingPolicy -> workspaceRoutingPolicy.getRoutingPolicyId()
-                .equals(routingPolicyId));
+            .anyMatch(workspaceRoutingPolicy -> Objects.equals(workspaceRoutingPolicy.getId(), routingPolicyId));
 
         if (!owned) {
             throw new IllegalArgumentException(

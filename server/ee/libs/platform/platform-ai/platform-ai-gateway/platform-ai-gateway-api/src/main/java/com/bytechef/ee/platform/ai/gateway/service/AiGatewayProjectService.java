@@ -9,10 +9,11 @@ package com.bytechef.ee.platform.ai.gateway.service;
 
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayProject;
 import java.util.List;
+import java.util.Optional;
 
 /**
- * Workspace-agnostic CRUD for {@link AiGatewayProject}. Workspace association + by-workspace lookups live on
- * {@code WorkspaceAiGatewayProjectService} in automation.
+ * CRUD for {@link AiGatewayProject}. A project carries its owning workspace in its nullable {@code workspace_id}
+ * column; the workspace-facing policy layer is {@code WorkspaceAiGatewayProjectService} in automation.
  *
  * @version ee
  */
@@ -22,7 +23,13 @@ public interface AiGatewayProjectService {
 
     void delete(long id);
 
+    Optional<AiGatewayProject> fetchProject(long id);
+
+    Optional<AiGatewayProject> fetchProjectByWorkspaceIdAndSlug(long workspaceId, String slug);
+
     List<AiGatewayProject> getProjects();
+
+    List<AiGatewayProject> getProjectsByWorkspaceId(long workspaceId);
 
     AiGatewayProject getProject(long id);
 

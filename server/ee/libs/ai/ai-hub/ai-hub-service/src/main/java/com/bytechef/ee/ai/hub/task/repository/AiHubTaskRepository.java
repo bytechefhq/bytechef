@@ -14,9 +14,9 @@ import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
 
 /**
- * Spring Data JDBC repository for {@link AiHubTask} metadata rows. Workspace-aware queries JOIN through
- * {@code workspace_ai_hub_task}; the entity itself is workspace-agnostic. Service consumers must populate
- * {@code task.workspaceId} from {@link WorkspaceAiHubTaskRepository} after load.
+ * Spring Data JDBC repository for {@link AiHubTask} metadata rows. Workspace-aware queries filter on the nullable
+ * {@code ai_hub_task.workspace_id} column, which loaded rows carry directly. A task with a null workspace matches no
+ * workspace-scoped query.
  *
  * <p>
  * Message contents remain in Spring AI's {@code SPRING_AI_CHAT_MEMORY} table and are not managed here.
@@ -29,8 +29,7 @@ public interface AiHubTaskRepository extends CrudRepository<AiHubTask, Long> {
 
     @Query("""
         SELECT cct.* FROM ai_hub_task cct
-        JOIN workspace_ai_hub_task wcct ON wcct.ai_hub_task_id = cct.id
-        WHERE wcct.workspace_id = :workspaceId
+        WHERE cct.workspace_id = :workspaceId
           AND cct.user_id = :userId
           AND cct.environment = :environment
           AND cct.status = :status
@@ -46,8 +45,7 @@ public interface AiHubTaskRepository extends CrudRepository<AiHubTask, Long> {
      */
     @Query("""
         SELECT cct.* FROM ai_hub_task cct
-        JOIN workspace_ai_hub_task wcct ON wcct.ai_hub_task_id = cct.id
-        WHERE wcct.workspace_id = :workspaceId
+        WHERE cct.workspace_id = :workspaceId
           AND cct.user_id = :userId
           AND cct.environment = :environment
         ORDER BY cct.updated_at DESC
@@ -74,8 +72,7 @@ public interface AiHubTaskRepository extends CrudRepository<AiHubTask, Long> {
      */
     @Query("""
         SELECT cct.* FROM ai_hub_task cct
-        JOIN workspace_ai_hub_task wcct ON wcct.ai_hub_task_id = cct.id
-        WHERE wcct.workspace_id = :workspaceId
+        WHERE cct.workspace_id = :workspaceId
           AND cct.user_id = :userId
           AND cct.environment = :environment
           AND cct.kind = :kind

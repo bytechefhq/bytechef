@@ -18,7 +18,6 @@ package com.bytechef.platform.ai.auto.memory.repository.filestorage;
 
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService;
-import com.bytechef.platform.ai.auto.memory.AiAutoMemory;
 import com.bytechef.platform.ai.auto.memory.repository.AiAutoMemoryRepository;
 import com.bytechef.platform.ai.auto.memory.repository.AiAutoMemoryRepositoryContractTests;
 import java.nio.file.Path;
@@ -56,10 +55,5 @@ class FileStorageAiAutoMemoryRepositoryContractTest extends AiAutoMemoryReposito
     @Override
     protected AiAutoMemoryRepository getAiAutoMemoryRepository() {
         return fileStorageAiAutoMemoryRepository;
-    }
-
-    @Override
-    protected AiAutoMemory saveInWorkspace(AiAutoMemory aiAutoMemory, long workspaceId) {
-        return fileStorageAiAutoMemoryRepository.save(aiAutoMemory, workspaceId);
     }
 }

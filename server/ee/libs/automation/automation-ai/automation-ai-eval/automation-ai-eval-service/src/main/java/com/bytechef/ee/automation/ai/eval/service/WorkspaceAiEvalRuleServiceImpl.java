@@ -7,10 +7,9 @@
 
 package com.bytechef.ee.automation.ai.eval.service;
 
-import com.bytechef.ee.automation.ai.eval.domain.WorkspaceAiEvalRule;
-import com.bytechef.ee.automation.ai.eval.repository.WorkspaceAiEvalRuleRepository;
 import com.bytechef.ee.platform.ai.eval.domain.AiEvalRule;
 import com.bytechef.ee.platform.ai.eval.domain.AiEvalRuleTarget;
+import com.bytechef.ee.platform.ai.eval.repository.AiEvalRuleRepository;
 import com.bytechef.ee.platform.ai.eval.service.AiEvalRuleService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -31,54 +30,48 @@ import org.springframework.transaction.annotation.Transactional;
 @SuppressFBWarnings("EI")
 class WorkspaceAiEvalRuleServiceImpl implements WorkspaceAiEvalRuleService {
 
+    private final AiEvalRuleRepository aiEvalRuleRepository;
     private final AiEvalRuleService aiEvalRuleService;
-    private final WorkspaceAiEvalRuleRepository workspaceAiEvalRuleRepository;
 
-    WorkspaceAiEvalRuleServiceImpl(
-        AiEvalRuleService aiEvalRuleService,
-        WorkspaceAiEvalRuleRepository workspaceAiEvalRuleRepository) {
-
+    WorkspaceAiEvalRuleServiceImpl(AiEvalRuleRepository aiEvalRuleRepository, AiEvalRuleService aiEvalRuleService) {
+        this.aiEvalRuleRepository = aiEvalRuleRepository;
         this.aiEvalRuleService = aiEvalRuleService;
-        this.workspaceAiEvalRuleRepository = workspaceAiEvalRuleRepository;
     }
 
     @Override
     public AiEvalRule createInWorkspace(AiEvalRule evalRule, long workspaceId) {
         Validate.notNull(evalRule, "evalRule must not be null");
 
-        AiEvalRule saved = aiEvalRuleService.create(evalRule);
+        evalRule.setWorkspaceId(workspaceId);
 
-        workspaceAiEvalRuleRepository.save(new WorkspaceAiEvalRule(saved.getId(), workspaceId));
-
-        return saved;
+        return aiEvalRuleService.create(evalRule);
     }
 
     @Override
     public void deleteInWorkspace(long evalRuleId) {
-        workspaceAiEvalRuleRepository.findByAiEvalRuleId(evalRuleId)
-            .ifPresent(membership -> workspaceAiEvalRuleRepository.deleteById(membership.getId()));
-
         aiEvalRuleService.delete(evalRuleId);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Long getWorkspaceId(long evalRuleId) {
-        return workspaceAiEvalRuleRepository.findByAiEvalRuleId(evalRuleId)
-            .map(WorkspaceAiEvalRule::getWorkspaceId)
+        // findById rather than the platform service's getEvalRule: an unknown id must still yield null (the
+        // pre-collapse "no membership row" answer) because callers use this as an authorization probe, not a fetch.
+        return aiEvalRuleRepository.findById(evalRuleId)
+            .map(AiEvalRule::getWorkspaceId)
             .orElse(null);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<AiEvalRule> getEvalRulesByWorkspace(Long workspaceId) {
-        return workspaceAiEvalRuleRepository.findAllRulesByWorkspaceId(workspaceId);
+        return aiEvalRuleRepository.findAllByWorkspaceId(workspaceId);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<AiEvalRule> getEnabledEvalRulesByWorkspace(Long workspaceId) {
-        return workspaceAiEvalRuleRepository.findAllRulesByWorkspaceIdAndEnabled(workspaceId, true);
+        return aiEvalRuleRepository.findAllByWorkspaceIdAndEnabled(workspaceId, true);
     }
 
     @Override
@@ -86,7 +79,6 @@ class WorkspaceAiEvalRuleServiceImpl implements WorkspaceAiEvalRuleService {
     public List<AiEvalRule> getEnabledEvalRulesByWorkspaceAndTarget(Long workspaceId, AiEvalRuleTarget target) {
         Validate.notNull(target, "target must not be null");
 
-        return workspaceAiEvalRuleRepository.findAllRulesByWorkspaceIdAndEnabledTrueAndTarget(
-            workspaceId, target.ordinal());
+        return aiEvalRuleRepository.findAllByWorkspaceIdAndEnabledTrueAndTarget(workspaceId, target.ordinal());
     }
 }

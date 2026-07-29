@@ -18,11 +18,10 @@ import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * Persistent definition of a user-created Personal Agent. Owned by a user within an environment; the workspace
- * association lives on {@code workspace_ai_hub_personal_agent} (mirrors the workspace_mcp_server / workspace_connection
- * / workspace_asset_file pattern), so the same agent row can in principle be shared with multiple workspaces — today
- * the relation is 1-to-1 but the schema allows future cross-workspace sharing without a migration. The slug regex on
- * {@link #name} is the only entity-level uniqueness gate: the DB does NOT enforce a (user, environment, name) unique
- * constraint, so two agents with the same name and user/env coexist as distinct rows distinguished by id.
+ * association is the nullable {@link #workspaceId} column, so an agent belongs to at most one workspace and null means
+ * none applies. The slug regex on {@link #name} is the only entity-level uniqueness gate: the DB does NOT enforce a
+ * (user, environment, name) unique constraint, so two agents with the same name and user/env coexist as distinct rows
+ * distinguished by id.
  *
  * <p>
  * <b>Why a slugified name plus a separate title:</b> the name is the stable identifier the LLM tools and the URL
@@ -107,13 +106,20 @@ public class AiHubPersonalAgent {
     @Column("updated_at")
     private LocalDateTime updatedAt;
 
+    /**
+     * Workspace the agent belongs to. Nullable: an agent belongs to at most one workspace, and null means none applies.
+     * Workspace-scoped queries never match a null, so a workspace-less agent is invisible to them.
+     */
+    @Column("workspace_id")
+    private @Nullable Long workspaceId;
+
     public AiHubPersonalAgent() {
     }
 
     /**
      * Bind-once constructor for new (unpersisted) rows. The per-field setter for {@code userId} is package-private so a
-     * loaded row cannot be retargeted by mistake; workspace association lives on
-     * {@code workspace_ai_hub_personal_agent} and is set independently when the membership row is created.
+     * loaded row cannot be retargeted by mistake; the workspace association is the separately settable
+     * {@link #workspaceId} column.
      */
     public AiHubPersonalAgent(long userId) {
         this.userId = userId;
@@ -265,6 +271,14 @@ public class AiHubPersonalAgent {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public @Nullable Long getWorkspaceId() {
+        return workspaceId;
+    }
+
+    public void setWorkspaceId(@Nullable Long workspaceId) {
+        this.workspaceId = workspaceId;
     }
 
     @Override

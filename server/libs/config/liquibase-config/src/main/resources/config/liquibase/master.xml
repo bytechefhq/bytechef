@@ -58,25 +58,26 @@
     <!--
         platform/ai/prompt holds ai_prompt + ai_prompt_version — extracted from automation/ai_gateway so non-gateway
         agent surfaces can reuse the same prompt store. Loaded BEFORE automation/ai_gateway/ because the gateway's
-        ai_observability_span FKs target these tables. The workspace_ai_prompt membership table lives in
-        automation/ai/prompt (mirrors the workspace_ai_eval_* split between platform-ai-eval and automation-ai-eval).
+        ai_observability_span FKs target these tables. A prompt's owning workspace is the nullable
+        ai_prompt.workspace_id column.
     -->
     <includeAll path="classpath:config/liquibase/changelog/platform/ai/prompt" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />
     <!--
         platform/ai/observability holds ai_observability_session + ai_observability_trace + ai_observability_span +
         ai_observability_trace_tag + ai_observability_alert_rule (+ events + channels) + ai_observability_export_job +
-        ai_observability_webhook_subscription (+ deliveries), plus the workspace_ai_observability_* relation tables.
-        Extracted from automation/ai_gateway. Loaded BEFORE platform/ai/eval because ai_eval_score has FKs to
+        ai_observability_webhook_subscription (+ deliveries). Each of those carries its own nullable workspace_id
+        column; there are no workspace_ai_observability_* relation tables. Extracted from automation/ai_gateway. Loaded BEFORE platform/ai/eval because ai_eval_score has FKs to
         ai_observability_trace + ai_observability_span; loaded BEFORE automation/ai_gateway/ because the gateway's
         later custom-property table FKs reference ai_llm_usage and span-eval rows reference these observability
         tables.
     -->
     <includeAll path="classpath:config/liquibase/changelog/platform/ai/observability" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />
     <!--
-        platform/ai/eval holds ai_eval_rule + ai_eval_score + ai_eval_score_config + ai_eval_execution. Loaded
-        AFTER platform/ai/observability (because ai_eval_score FKs to ai_observability_trace + ai_observability_span)
-        and BEFORE automation/ai_gateway/ (which has ai_observability_span FKs to ai_eval_score) AND BEFORE
-        automation/ai/eval/ (which holds the workspace_ai_eval_* relation tables that FK to ai_eval_*).
+        platform/ai/eval holds ai_eval_rule + ai_eval_score + ai_eval_score_config + ai_eval_execution. Each of
+        the first three carries its own nullable workspace_id column; there are no workspace_ai_eval_* relation
+        tables. Loaded AFTER platform/ai/observability (because ai_eval_score FKs to ai_observability_trace +
+        ai_observability_span) and BEFORE automation/ai_gateway/ (which has ai_observability_span FKs to
+        ai_eval_score).
 
         maxDepth="1" stops liquibase from recursing into platform/ai/eval/dataset and platform/ai/eval/experiment.
         Those subdirectories ship in their own modules and have explicit includeAll lines below; without the
@@ -86,46 +87,28 @@
     <includeAll path="classpath:config/liquibase/changelog/platform/ai/eval" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" maxDepth="1" contextFilter="mono or configuration or multitenant" />
     <!--
         platform/ai/eval/dataset holds ai_eval_dataset + ai_eval_dataset_version + ai_eval_dataset_item — extracted
-        from automation/ai_gateway. Loaded BEFORE automation/ai_gateway/ because the experiment changeset's
-        ai_experiment.dataset_version_id and ai_experiment_run.dataset_item_id FKs reference these tables.
+        from automation/ai_gateway. ai_eval_dataset carries its own nullable workspace_id column; there is no
+        workspace_ai_eval_dataset relation table. Loaded BEFORE automation/ai_gateway/ because the experiment
+        changeset's ai_experiment.dataset_version_id and ai_experiment_run.dataset_item_id FKs reference these tables.
     -->
     <includeAll path="classpath:config/liquibase/changelog/platform/ai/eval/dataset" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />
     <!--
         platform/ai/eval/experiment holds ai_eval_experiment + ai_eval_experiment_run — extracted from
-        automation/ai_gateway. Loaded AFTER platform/ai/eval/dataset because the experiment FKs target
-        ai_eval_dataset_version + ai_eval_dataset_item, and BEFORE automation/ai_gateway/ for symmetry with the rest
-        of the platform/ai/eval/* split.
+        automation/ai_gateway. ai_eval_experiment carries its own nullable workspace_id column; there is no
+        workspace_ai_eval_experiment relation table. Loaded AFTER platform/ai/eval/dataset because the experiment
+        FKs target ai_eval_dataset_version + ai_eval_dataset_item, and BEFORE automation/ai_gateway/ for symmetry
+        with the rest of the platform/ai/eval/* split.
     -->
     <includeAll path="classpath:config/liquibase/changelog/platform/ai/eval/experiment" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />
     <!--
-        platform/ai/gateway holds the workspace-agnostic ai_gateway_* family (provider, model, budget,
-        routing_policy, model_deployment, spend_summary, project, routing_policy_tag, rate_limit). Extracted from
-        the original monolithic automation/ai_gateway init changeset so the platform tier owns the entity tables;
-        the workspace_ai_gateway_* relation tables stay in automation/ai_gateway/. Loaded BEFORE automation/
-        ai_gateway/ because the workspace_*-table FKs reference these entity tables.
+        platform/ai/gateway holds the ai_gateway_* family (provider, model, budget, routing_policy,
+        model_deployment, spend_summary, project, routing_policy_tag, rate_limit). Extracted from the original
+        monolithic automation/ai_gateway init changeset so the platform tier owns the entity tables. Workspace
+        scoping is a nullable workspace_id column on each entity — there are no workspace_ai_gateway_* relation
+        tables left. Loaded BEFORE automation/ai_gateway/, which still adds gateway-specific FKs onto these tables.
     -->
     <includeAll path="classpath:config/liquibase/changelog/platform/ai/gateway" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />
     <includeAll path="classpath:config/liquibase/changelog/automation/ai_gateway/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />
-    <!--
-        automation/ai/eval holds workspace_ai_eval_rule + workspace_ai_eval_score + workspace_ai_eval_score_config —
-        the relation tables that FK to ai_eval_* (in platform/ai/eval).
-    -->
-    <includeAll path="classpath:config/liquibase/changelog/automation/ai/eval" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" maxDepth="1" contextFilter="mono or configuration or multitenant" />
-    <!--
-        automation/ai/eval/dataset holds workspace_ai_eval_dataset — the membership table that FKs to ai_eval_dataset
-        (in platform/ai/eval/dataset). Mirrors the workspace_ai_eval_rule split.
-    -->
-    <includeAll path="classpath:config/liquibase/changelog/automation/ai/eval/dataset" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />
-    <!--
-        automation/ai/eval/experiment holds workspace_ai_eval_experiment — the membership table that FKs to
-        ai_eval_experiment (in platform/ai/eval/experiment). Mirrors the workspace_ai_eval_dataset split.
-    -->
-    <includeAll path="classpath:config/liquibase/changelog/automation/ai/eval/experiment" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />
-    <!--
-        automation/ai/prompt holds workspace_ai_prompt — the membership table that FKs to ai_prompt (in
-        platform/ai/prompt). Mirrors the platform/ai/eval ↔ automation/ai/eval split.
-    -->
-    <includeAll path="classpath:config/liquibase/changelog/automation/ai/prompt" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />
     <includeAll path="classpath:config/liquibase/changelog/automation/task" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />
     <includeAll path="classpath:config/liquibase/changelog/embedded/configuration/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />
     <includeAll path="classpath:config/liquibase/changelog/embedded/security/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />

@@ -260,11 +260,10 @@ class AiHubPersonalAgentGraphQlControllerTest {
 
     @Test
     void testWorkspaceIdResolvesViaWorkspaceRelationService() {
-        // Schema declares AiHubPersonalAgent.workspaceId: Long! but the entity is workspace-agnostic
-        // (the relation lives in workspace_ai_hub_personal_agent). The @SchemaMapping resolver must
-        // delegate to the automation-side WorkspaceAiHubPersonalAgentService — not the platform-side
-        // AiHubPersonalAgentService, which is intentionally workspace-agnostic. Otherwise GraphQL
-        // returns null and trips the non-null contract on every list/create/update response.
+        // Schema declares AiHubPersonalAgent.workspaceId: Long!. The @SchemaMapping resolver must delegate to the
+        // automation-side WorkspaceAiHubPersonalAgentService — not the platform-side AiHubPersonalAgentService, which
+        // applies no workspace rules of its own. Otherwise GraphQL returns null and trips the non-null contract on
+        // every list/create/update response.
         UserService userService = mock(UserService.class);
         WorkspaceFacade workspaceFacade = mock(WorkspaceFacade.class);
         AiHubPersonalAgentService aiHubPersonalAgentService =

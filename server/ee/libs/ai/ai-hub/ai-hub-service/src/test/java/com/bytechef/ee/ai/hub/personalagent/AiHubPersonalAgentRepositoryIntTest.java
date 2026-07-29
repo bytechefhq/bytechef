@@ -8,10 +8,8 @@
 package com.bytechef.ee.ai.hub.personalagent;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.ee.ai.hub.personalagent.repository.AiHubPersonalAgentRepository;
-import com.bytechef.ee.ai.hub.personalagent.repository.WorkspaceAiHubPersonalAgentRepository;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
@@ -25,7 +23,6 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -34,10 +31,10 @@ import org.springframework.test.context.ActiveProfiles;
  * with a mocked repository:
  *
  * <ul>
- * <li>The JOIN through {@code workspace_ai_hub_personal_agent} actually returns the right rows scoped to (workspace,
- * user, environment) and ordered by {@code updated_at DESC} — sidebar render depends on that order.</li>
- * <li>The unique constraint on {@code (workspace_id, ai_hub_personal_agent_id)} on the relation table fires at the DB
- * level — service-layer pre-flight checks are belt; this is suspenders.</li>
+ * <li>The {@code workspace_id} predicate actually returns the right rows scoped to (workspace, user, environment) and
+ * ordered by {@code updated_at DESC} — sidebar render depends on that order.</li>
+ * <li>An agent with a null {@code workspace_id} is invisible to every workspace-scoped query — the nullable column
+ * admits a state the relation table made structurally impossible.</li>
  * <li>The {@code ck_ai_hub_personal_agent_name_slug} CHECK constraint rejects malformed names that bypass the entity
  * setter (Spring Data JDBC reflection during hydration).</li>
  * </ul>
@@ -56,20 +53,14 @@ public class AiHubPersonalAgentRepositoryIntTest {
     @Autowired
     private AiHubPersonalAgentRepository aiHubPersonalAgentRepository;
 
-    @Autowired
-    private WorkspaceAiHubPersonalAgentRepository workspaceAiHubPersonalAgentRepository;
-
     @AfterEach
     public void afterEach() {
-        // Order matters: the relation has a CASCADE on the agent FK, so dropping agents first nukes the relation
-        // rows, but doing both explicitly leaves the test deterministic regardless of cascade timing.
-        workspaceAiHubPersonalAgentRepository.deleteAll();
         aiHubPersonalAgentRepository.deleteAll();
     }
 
     @Test
     public void testSaveAndFindByWorkspaceUserEnvironmentAndName() {
-        long agentId = saveAgentWithMembership(1L, 10L, "research-bot");
+        long agentId = saveAgentInWorkspace(1L, 10L, "research-bot");
 
         assertThat(agentId).isPositive();
 
@@ -92,13 +83,11 @@ public class AiHubPersonalAgentRepositoryIntTest {
 
         newer.setUpdatedAt(LocalDateTime.now());
 
-        AiHubPersonalAgent savedOlder = aiHubPersonalAgentRepository.save(older);
-        AiHubPersonalAgent savedNewer = aiHubPersonalAgentRepository.save(newer);
+        older.setWorkspaceId(1L);
+        newer.setWorkspaceId(1L);
 
-        workspaceAiHubPersonalAgentRepository.save(
-            new WorkspaceAiHubPersonalAgent(1L, savedOlder.getId()));
-        workspaceAiHubPersonalAgentRepository.save(
-            new WorkspaceAiHubPersonalAgent(1L, savedNewer.getId()));
+        aiHubPersonalAgentRepository.save(older);
+        aiHubPersonalAgentRepository.save(newer);
 
         List<AiHubPersonalAgent> all =
             aiHubPersonalAgentRepository.findAllByWorkspaceUserEnvironment(1L, 10L, DEV);
@@ -112,28 +101,28 @@ public class AiHubPersonalAgentRepositoryIntTest {
     }
 
     @Test
-    public void testRelationUniqueOnWorkspaceAndAgent() {
-        long agentId = saveAgentWithMembership(1L, 10L, "research-bot");
+    public void testWorkspaceScopedQueriesIgnoreWorkspaceLessAgents() {
+        AiHubPersonalAgent orphan = buildAgent(10L, "orphan-bot");
 
-        // Same (workspace_id, ai_hub_personal_agent_id) pair → DB rejects the second insert. The unique
-        // constraint on the relation prevents the same workspace from claiming the same agent twice; without it,
-        // a concurrent create-or-attach could fan out duplicate memberships.
-        assertThatThrownBy(() -> workspaceAiHubPersonalAgentRepository.save(
-            new WorkspaceAiHubPersonalAgent(1L, agentId)))
-                .isInstanceOf(DataIntegrityViolationException.class);
+        orphan.setWorkspaceId(null);
+
+        aiHubPersonalAgentRepository.save(orphan);
+
+        // SQL equality never matches NULL, so a workspace-less agent is correctly invisible to every workspace
+        // query — including workspace 0, which a primitive long field would have collapsed it into.
+        assertThat(aiHubPersonalAgentRepository.findAllByWorkspaceUserEnvironment(1L, 10L, DEV)).isEmpty();
+        assertThat(aiHubPersonalAgentRepository.findAllByWorkspaceUserEnvironment(0L, 10L, DEV)).isEmpty();
+        assertThat(aiHubPersonalAgentRepository.findAllByWorkspaceUserEnvironmentAndName(1L, 10L, DEV, "orphan-bot"))
+            .isEmpty();
     }
 
     @Test
-    public void testRelationCascadeDeletesMembershipWhenAgentRemoved() {
-        long agentId = saveAgentWithMembership(1L, 10L, "research-bot");
-
-        assertThat(workspaceAiHubPersonalAgentRepository.findAllByWorkspaceId(1L)).hasSize(1);
+    public void testDeleteRemovesAgentRow() {
+        long agentId = saveAgentInWorkspace(1L, 10L, "research-bot");
 
         aiHubPersonalAgentRepository.deleteById(agentId);
 
-        // ON DELETE CASCADE on the agent FK clears the membership row automatically — without it, deleting an
-        // agent would leave the relation row dangling with a broken FK reference.
-        assertThat(workspaceAiHubPersonalAgentRepository.findAllByWorkspaceId(1L)).isEmpty();
+        assertThat(aiHubPersonalAgentRepository.findAllByWorkspaceUserEnvironment(1L, 10L, DEV)).isEmpty();
     }
 
     @Test
@@ -156,11 +145,12 @@ public class AiHubPersonalAgentRepositoryIntTest {
         assertThat(saved.getName()).matches(AiHubPersonalAgent.NAME_PATTERN);
     }
 
-    private long saveAgentWithMembership(long workspaceId, long userId, String name) {
-        AiHubPersonalAgent saved = aiHubPersonalAgentRepository.save(buildAgent(userId, name));
+    private long saveAgentInWorkspace(long workspaceId, long userId, String name) {
+        AiHubPersonalAgent agent = buildAgent(userId, name);
 
-        workspaceAiHubPersonalAgentRepository.save(
-            new WorkspaceAiHubPersonalAgent(workspaceId, saved.getId()));
+        agent.setWorkspaceId(workspaceId);
+
+        AiHubPersonalAgent saved = aiHubPersonalAgentRepository.save(agent);
 
         return saved.getId();
     }

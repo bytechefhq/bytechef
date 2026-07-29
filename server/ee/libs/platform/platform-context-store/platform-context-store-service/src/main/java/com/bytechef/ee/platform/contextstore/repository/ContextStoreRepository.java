@@ -13,8 +13,8 @@ import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.stereotype.Repository;
 
 /**
- * Spring Data JDBC repository for {@link ContextStore}. Workspace membership is held by the
- * {@code workspace_context_store} relation table; this repository owns store-level lifecycle only.
+ * Spring Data JDBC repository for {@link ContextStore}. Workspace membership is the nullable
+ * {@code context_store.workspace_id} column; a store with a null workspace matches no workspace-scoped query.
  *
  * @author Ivica Cardic
  * @version ee
@@ -23,4 +23,6 @@ import org.springframework.stereotype.Repository;
 public interface ContextStoreRepository extends ListCrudRepository<ContextStore, Long> {
 
     List<ContextStore> findAllByIdIn(List<Long> ids);
+
+    List<ContextStore> findAllByWorkspaceId(long workspaceId);
 }

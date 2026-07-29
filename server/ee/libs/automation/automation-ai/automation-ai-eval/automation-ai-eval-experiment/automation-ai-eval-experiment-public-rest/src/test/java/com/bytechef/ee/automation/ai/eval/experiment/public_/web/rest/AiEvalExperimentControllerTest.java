@@ -431,9 +431,8 @@ class AiEvalExperimentControllerTest {
 
         setField(experiment, "id", id);
 
-        // Workspace assignment lives on workspace_ai_eval_experiment now; stub the service helper that the boundary
-        // check
-        // queries.
+        // Workspace assignment lives on ai_eval_experiment.workspace_id; stub the service helper that the
+        // boundary check queries.
         org.mockito.Mockito.lenient()
             .when(workspaceAiEvalExperimentService.getWorkspaceId(id))
             .thenReturn(workspaceId);

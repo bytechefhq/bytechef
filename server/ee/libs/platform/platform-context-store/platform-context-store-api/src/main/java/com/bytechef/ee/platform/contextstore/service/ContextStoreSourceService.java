@@ -15,11 +15,11 @@ import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 
 /**
- * CRUD service for {@link ContextStoreSource}. Workspace scoping is enforced by the
- * {@code workspace_context_store_source} relation table owned by the automation-side service; this platform service
- * only sees workspace-agnostic source rows. Lifecycle helpers ({@link #updateStatus}, {@link #updateLastSyncMetadata},
- * {@link #setEnabled}) wrap a load + mutate + save round-trip so callers don't have to reach for the repository
- * directly to flip a status flag.
+ * CRUD service for {@link ContextStoreSource}. Workspace scoping is the nullable
+ * {@code context_store_source.workspace_id} column; the automation-side service is the one that decides which workspace
+ * a caller may see. Lifecycle helpers ({@link #updateStatus}, {@link #updateLastSyncMetadata}, {@link #setEnabled})
+ * wrap a load + mutate + save round-trip so callers don't have to reach for the repository directly to flip a status
+ * flag.
  *
  * @author Ivica Cardic
  * @version ee
@@ -39,6 +39,10 @@ public interface ContextStoreSourceService {
     List<ContextStoreSource> getAllByIds(List<Long> ids);
 
     List<ContextStoreSource> getAllEnabledByIds(List<Long> ids);
+
+    List<ContextStoreSource> getAllByWorkspaceId(long workspaceId);
+
+    List<ContextStoreSource> getAllEnabledByWorkspaceId(long workspaceId);
 
     List<ContextStoreSource> findAllActiveAcrossWorkspaces();
 

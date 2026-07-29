@@ -16,7 +16,6 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import com.bytechef.ee.automation.ai.gateway.domain.WorkspaceAiGatewayProvider;
 import com.bytechef.ee.automation.ai.gateway.service.WorkspaceAiGatewayProviderService;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayProvider;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayProviderType;
@@ -29,6 +28,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.LoggerFactory;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.SimpleTransactionStatus;
 
@@ -73,8 +73,11 @@ class WorkspaceAiGatewayProviderFacadeTest {
         // leaking cross-workspace provider existence and breaking the documented "always returns a structured
         // ProviderConnectionResult" UI contract. The facade catches the IAE inline and returns a coarse
         // non-disambiguating failure result.
-        when(workspaceAiGatewayProviderService.getWorkspaceProviders(1L))
-            .thenReturn(List.of(new WorkspaceAiGatewayProvider(5L, 1L)));
+        AiGatewayProvider ownedProvider = new AiGatewayProvider("openai", AiGatewayProviderType.OPENAI, "sk-123");
+
+        ReflectionTestUtils.setField(ownedProvider, "id", 5L);
+
+        when(workspaceAiGatewayProviderService.getWorkspaceProviders(1L)).thenReturn(List.of(ownedProvider));
 
         ProviderConnectionResult result = workspaceAiGatewayProviderFacade.testWorkspaceProviderConnection(1L, 999L);
 
@@ -88,8 +91,9 @@ class WorkspaceAiGatewayProviderFacadeTest {
 
         // baseUrl intentionally left null.
 
-        when(workspaceAiGatewayProviderService.getWorkspaceProviders(1L))
-            .thenReturn(List.of(new WorkspaceAiGatewayProvider(5L, 1L)));
+        ReflectionTestUtils.setField(provider, "id", 5L);
+
+        when(workspaceAiGatewayProviderService.getWorkspaceProviders(1L)).thenReturn(List.of(provider));
         when(aiGatewayProviderService.getProvider(5L)).thenReturn(provider);
 
         ProviderConnectionResult result = workspaceAiGatewayProviderFacade.testWorkspaceProviderConnection(1L, 5L);
@@ -109,8 +113,9 @@ class WorkspaceAiGatewayProviderFacadeTest {
 
         provider.setBaseUrl("http://127.0.0.1");
 
-        when(workspaceAiGatewayProviderService.getWorkspaceProviders(1L))
-            .thenReturn(List.of(new WorkspaceAiGatewayProvider(5L, 1L)));
+        ReflectionTestUtils.setField(provider, "id", 5L);
+
+        when(workspaceAiGatewayProviderService.getWorkspaceProviders(1L)).thenReturn(List.of(provider));
         when(aiGatewayProviderService.getProvider(5L)).thenReturn(provider);
 
         ListAppender<ILoggingEvent> appender = attachListAppender(WorkspaceAiGatewayProviderFacadeImpl.class);
@@ -161,8 +166,9 @@ class WorkspaceAiGatewayProviderFacadeTest {
 
         provider.setBaseUrl("http://127.0.0.1");
 
-        when(workspaceAiGatewayProviderService.getWorkspaceProviders(1L))
-            .thenReturn(List.of(new WorkspaceAiGatewayProvider(5L, 1L)));
+        ReflectionTestUtils.setField(provider, "id", 5L);
+
+        when(workspaceAiGatewayProviderService.getWorkspaceProviders(1L)).thenReturn(List.of(provider));
         when(aiGatewayProviderService.getProvider(5L)).thenReturn(provider);
 
         ProviderConnectionResult result = workspaceAiGatewayProviderFacade.testWorkspaceProviderConnection(1L, 5L);
