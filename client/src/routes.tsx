@@ -98,6 +98,9 @@ const AutomationWorkflow = lazy(() => import('@/ee/pages/embedded/automation-wor
 const ConnectedUsers = lazy(() => import('@/ee/pages/embedded/connected-users/ConnectedUsers'));
 const ComponentPolicies = lazy(() => import('@/ee/pages/settings/platform/component-policies/ComponentPolicies'));
 const CustomComponents = lazy(() => import('@/ee/pages/settings/platform/custom-components/CustomComponents'));
+const CustomComponentDetail = lazy(
+    () => import('@/ee/pages/settings/platform/custom-components/CustomComponentDetail')
+);
 const EmbeddedConnections = lazy(() =>
     import('@/ee/pages/embedded/connections/Connections').then((module) => ({default: module.Connections}))
 );
@@ -311,15 +314,32 @@ const platformSettingsRoutes = {
             path: 'component-policies',
         },
         {
-            element: (
-                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                    <EEVersion>
-                        <LazyLoadWrapper>
-                            <CustomComponents />
-                        </LazyLoadWrapper>
-                    </EEVersion>
-                </PrivateRoute>
-            ),
+            children: [
+                {
+                    element: (
+                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                            <EEVersion>
+                                <LazyLoadWrapper>
+                                    <CustomComponents />
+                                </LazyLoadWrapper>
+                            </EEVersion>
+                        </PrivateRoute>
+                    ),
+                    index: true,
+                },
+                {
+                    element: (
+                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                            <EEVersion>
+                                <LazyLoadWrapper>
+                                    <CustomComponentDetail />
+                                </LazyLoadWrapper>
+                            </EEVersion>
+                        </PrivateRoute>
+                    ),
+                    path: ':id',
+                },
+            ],
             path: 'custom-components',
         },
         {

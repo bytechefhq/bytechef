@@ -1,0 +1,3 @@
+mutation updateCustomComponentSource($id: ID!, $content: String!) {
+    updateCustomComponentSource(id: $id, content: $content)
+}

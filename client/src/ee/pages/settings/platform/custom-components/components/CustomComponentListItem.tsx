@@ -8,6 +8,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import CustomComponentDeleteAlertDialog from '@/ee/pages/settings/platform/custom-components/components/CustomComponentDeleteAlertDialog';
 import {
     CustomComponent,
+    CustomComponentLanguage,
     useCustomComponentDefinitionQuery,
     useDeleteCustomComponentMutation,
     useEnableCustomComponentMutation,
@@ -15,6 +16,8 @@ import {
 import {useQueryClient} from '@tanstack/react-query';
 import {ChevronDownIcon, ChevronRightIcon, EllipsisVerticalIcon, ZapIcon} from 'lucide-react';
 import {useState} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {twMerge} from 'tailwind-merge';
 
 interface CustomComponentItemProps {
     customComponent: CustomComponent;
@@ -45,7 +48,10 @@ const CustomComponentListItem = ({customComponent}: CustomComponentItemProps) =>
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
 
+    const navigate = useNavigate();
     const queryClient = useQueryClient();
+
+    const isJavaComponent = customComponent.language === CustomComponentLanguage.Java;
 
     const deleteCustomComponentMutation = useDeleteCustomComponentMutation({
         onSuccess: () => {
@@ -66,7 +72,7 @@ const CustomComponentListItem = ({customComponent}: CustomComponentItemProps) =>
     const {data: definitionData, isLoading: isLoadingDefinition} = useCustomComponentDefinitionQuery(
         {id: customComponent.id},
         {
-            enabled: isExpanded,
+            enabled: isExpanded && isJavaComponent,
         }
     );
 
@@ -85,6 +91,19 @@ const CustomComponentListItem = ({customComponent}: CustomComponentItemProps) =>
         });
     };
 
+    const handleRowClick = () => {
+        if (!isJavaComponent) {
+            navigate(String(customComponent.id));
+        }
+    };
+
+    const handleRowKeyDown = (event: React.KeyboardEvent) => {
+        if ((event.key === 'Enter' || event.key === ' ') && !isJavaComponent) {
+            event.preventDefault();
+            handleRowClick();
+        }
+    };
+
     const actions = definitionData?.customComponentDefinition?.actions ?? [];
     const triggers = definitionData?.customComponentDefinition?.triggers ?? [];
 
@@ -92,21 +111,35 @@ const CustomComponentListItem = ({customComponent}: CustomComponentItemProps) =>
         <Collapsible onOpenChange={setIsExpanded} open={isExpanded}>
             <div className="w-full rounded-md px-2 py-5 hover:bg-gray-50">
                 <div className="flex items-center justify-between">
-                    <div className="flex flex-1 items-center gap-x-2">
-                        <CollapsibleTrigger asChild>
-                            <Button
-                                className="size-6 p-0"
-                                icon={
-                                    isExpanded ? (
-                                        <ChevronDownIcon className="size-4 text-content-neutral-secondary" />
-                                    ) : (
-                                        <ChevronRightIcon className="size-4 text-content-neutral-secondary" />
-                                    )
-                                }
-                                size="icon"
-                                variant="ghost"
-                            />
-                        </CollapsibleTrigger>
+                    <div
+                        className={twMerge(
+                            'flex flex-1 items-center gap-x-2',
+                            !isJavaComponent &&
+                                'cursor-pointer rounded focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:outline-none'
+                        )}
+                        onClick={isJavaComponent ? undefined : handleRowClick}
+                        onKeyDown={handleRowKeyDown}
+                        role={!isJavaComponent ? 'button' : undefined}
+                        tabIndex={!isJavaComponent ? 0 : undefined}
+                    >
+                        {isJavaComponent ? (
+                            <CollapsibleTrigger asChild>
+                                <Button
+                                    className="size-6 p-0"
+                                    icon={
+                                        isExpanded ? (
+                                            <ChevronDownIcon className="size-4 text-content-neutral-secondary" />
+                                        ) : (
+                                            <ChevronRightIcon className="size-4 text-content-neutral-secondary" />
+                                        )
+                                    }
+                                    size="icon"
+                                    variant="ghost"
+                                />
+                            </CollapsibleTrigger>
+                        ) : (
+                            <ChevronRightIcon className="size-4 shrink-0 text-content-neutral-secondary" />
+                        )}
 
                         <div className="flex-1">
                             <div className="flex items-center justify-between">
@@ -180,82 +213,86 @@ const CustomComponentListItem = ({customComponent}: CustomComponentItemProps) =>
                     </div>
                 </div>
 
-                <CollapsibleContent>
-                    <div className="mt-4 ml-8 border-t pt-4">
-                        {isLoadingDefinition ? (
-                            <div className="flex items-center gap-2 text-sm text-content-neutral-secondary">
-                                <LoadingIcon className="size-4" />
-                                Loading component definition...
-                            </div>
-                        ) : (
-                            <div className="grid grid-cols-2 gap-6">
-                                <div>
-                                    <h4 className="mb-2 flex items-center gap-1 text-sm font-semibold text-gray-700">
-                                        <ZapIcon className="size-4" />
-
-                                        <span>Actions ({actions.length})</span>
-                                    </h4>
-
-                                    {actions.length > 0 ? (
-                                        <ul className="space-y-2">
-                                            {actions.map((action) => (
-                                                <li className="rounded bg-gray-50 p-2" key={action.name}>
-                                                    <div className="text-sm font-medium">
-                                                        {action.title || action.name}
-                                                    </div>
-
-                                                    <div className="text-xs text-content-neutral-secondary">
-                                                        {action.name}
-                                                    </div>
-
-                                                    {action.description && (
-                                                        <div className="mt-1 text-xs text-gray-600">
-                                                            {action.description}
-                                                        </div>
-                                                    )}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    ) : (
-                                        <p className="text-sm text-content-neutral-secondary">No actions defined</p>
-                                    )}
+                {isJavaComponent && (
+                    <CollapsibleContent>
+                        <div className="mt-4 ml-8 border-t pt-4">
+                            {isLoadingDefinition ? (
+                                <div className="flex items-center gap-2 text-sm text-content-neutral-secondary">
+                                    <LoadingIcon className="size-4" />
+                                    Loading component definition...
                                 </div>
+                            ) : (
+                                <div className="grid grid-cols-2 gap-6">
+                                    <div>
+                                        <h4 className="mb-2 flex items-center gap-1 text-sm font-semibold text-gray-700">
+                                            <ZapIcon className="size-4" />
 
-                                <div>
-                                    <h4 className="mb-2 flex items-center gap-1 text-sm font-semibold text-gray-700">
-                                        <ZapIcon className="size-4" />
+                                            <span>Actions ({actions.length})</span>
+                                        </h4>
 
-                                        <span>Triggers ({triggers.length})</span>
-                                    </h4>
-
-                                    {triggers.length > 0 ? (
-                                        <ul className="space-y-2">
-                                            {triggers.map((trigger) => (
-                                                <li className="rounded bg-gray-50 p-2" key={trigger.name}>
-                                                    <div className="text-sm font-medium">
-                                                        {trigger.title || trigger.name}
-                                                    </div>
-
-                                                    <div className="text-xs text-content-neutral-secondary">
-                                                        {trigger.name}
-                                                    </div>
-
-                                                    {trigger.description && (
-                                                        <div className="mt-1 text-xs text-gray-600">
-                                                            {trigger.description}
+                                        {actions.length > 0 ? (
+                                            <ul className="space-y-2">
+                                                {actions.map((action) => (
+                                                    <li className="rounded bg-gray-50 p-2" key={action.name}>
+                                                        <div className="text-sm font-medium">
+                                                            {action.title || action.name}
                                                         </div>
-                                                    )}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    ) : (
-                                        <p className="text-sm text-content-neutral-secondary">No triggers defined</p>
-                                    )}
+
+                                                        <div className="text-xs text-content-neutral-secondary">
+                                                            {action.name}
+                                                        </div>
+
+                                                        {action.description && (
+                                                            <div className="mt-1 text-xs text-gray-600">
+                                                                {action.description}
+                                                            </div>
+                                                        )}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        ) : (
+                                            <p className="text-sm text-content-neutral-secondary">No actions defined</p>
+                                        )}
+                                    </div>
+
+                                    <div>
+                                        <h4 className="mb-2 flex items-center gap-1 text-sm font-semibold text-gray-700">
+                                            <ZapIcon className="size-4" />
+
+                                            <span>Triggers ({triggers.length})</span>
+                                        </h4>
+
+                                        {triggers.length > 0 ? (
+                                            <ul className="space-y-2">
+                                                {triggers.map((trigger) => (
+                                                    <li className="rounded bg-gray-50 p-2" key={trigger.name}>
+                                                        <div className="text-sm font-medium">
+                                                            {trigger.title || trigger.name}
+                                                        </div>
+
+                                                        <div className="text-xs text-content-neutral-secondary">
+                                                            {trigger.name}
+                                                        </div>
+
+                                                        {trigger.description && (
+                                                            <div className="mt-1 text-xs text-gray-600">
+                                                                {trigger.description}
+                                                            </div>
+                                                        )}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        ) : (
+                                            <p className="text-sm text-content-neutral-secondary">
+                                                No triggers defined
+                                            </p>
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
-                        )}
-                    </div>
-                </CollapsibleContent>
+                            )}
+                        </div>
+                    </CollapsibleContent>
+                )}
 
                 {showDeleteDialog && (
                     <CustomComponentDeleteAlertDialog
