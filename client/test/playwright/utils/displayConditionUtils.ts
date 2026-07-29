@@ -6,6 +6,20 @@ import {propertyTestingParametersSavePromise} from './propertyValidationUtils';
 export const BOOLEAN_PROPERTY_LABEL = 'bool property';
 export const CONDITIONAL_PROPERTY_LABEL = 'displayCondition property';
 
+export async function waitForDisplayConditionsToSettle(page: Page, quietMs = 750): Promise<void> {
+    let settled = false;
+
+    while (!settled) {
+        try {
+            await page.waitForResponse((response) => response.url().includes('/display-conditions'), {
+                timeout: quietMs,
+            });
+        } catch {
+            settled = true;
+        }
+    }
+}
+
 interface SetBooleanPropertyValueProps {
     configurationPanel: Locator;
     page: Page;
@@ -42,6 +56,8 @@ export async function setBooleanPropertyValueAndWaitForSave({
     await setBooleanPropertyValue({configurationPanel, page, value});
 
     await saveResponsePromise;
+
+    await waitForDisplayConditionsToSettle(page);
 }
 
 export function getConditionalProperty(configurationPanel: Locator): Locator {
