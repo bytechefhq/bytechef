@@ -1,18 +1,64 @@
+import Button from '@/components/Button/Button';
 import PageLoader from '@/components/PageLoader';
 import KnowledgeBaseHeader from '@/pages/automation/knowledge-base/components/KnowledgeBaseHeader';
 import KnowledgeBaseInfoCard from '@/pages/automation/knowledge-base/components/KnowledgeBaseInfoCard';
 import KnowledgeBaseLeftSidebarNav from '@/pages/automation/knowledge-base/components/KnowledgeBaseLeftSidebarNav';
 import KnowledgeBaseTabs from '@/pages/automation/knowledge-base/components/KnowledgeBaseTabs';
 import useKnowledgeBase from '@/pages/automation/knowledge-base/hooks/useKnowledgeBase';
+import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
+import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
+import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
+import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
+import {useQueryClient} from '@tanstack/react-query';
+import {useEffect} from 'react';
 
 const KnowledgeBase = () => {
     const {documents, error, handleBackClick, isLoading, knowledgeBase, knowledgeBaseId} = useKnowledgeBase();
 
+    const copilotEnabled = useApplicationInfoStore((state) => state.ai.copilot.enabled);
+
+    const setContext = useCopilotStore((state) => state.setContext);
+    const setCopilotPanelOpen = useCopilotPanelStore((state) => state.setCopilotPanelOpen);
+    const registerPostTurn = useCopilotPostTurnRegistry((state) => state.register);
+
+    const queryClient = useQueryClient();
+
+    const openCopilot = () => {
+        setContext({
+            mode: MODE.ASK,
+            parameters: {knowledgeBaseId},
+            source: Source.KNOWLEDGE_BASE,
+        });
+
+        setCopilotPanelOpen(true);
+    };
+
+    // Refresh this knowledge base's data + the knowledge base list after a BUILD-mode copilot turn mutates data
+    // (e.g. uploading a document), so the page reflects the change without a manual reload.
+    useEffect(() => {
+        return registerPostTurn(Source.KNOWLEDGE_BASE, () => {
+            queryClient.invalidateQueries({queryKey: ['knowledgeBase']});
+            queryClient.invalidateQueries({queryKey: ['knowledgeBases']});
+        });
+    }, [queryClient, registerPostTurn]);
+
     return (
         <LayoutContainer
-            header={<KnowledgeBaseHeader knowledgeBaseName={knowledgeBase?.name} onBackClick={handleBackClick} />}
+            header={
+                <KnowledgeBaseHeader
+                    knowledgeBaseName={knowledgeBase?.name}
+                    onBackClick={handleBackClick}
+                    right={
+                        copilotEnabled && (
+                            <Button onClick={openCopilot} variant="outline">
+                                Ask Copilot
+                            </Button>
+                        )
+                    }
+                />
+            }
             leftSidebarBody={<KnowledgeBaseLeftSidebarNav />}
             leftSidebarHeader={<Header position="sidebar" title="Knowledge Base" />}
             leftSidebarWidth="64"

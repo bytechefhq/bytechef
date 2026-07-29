@@ -7,7 +7,11 @@ import useDataTableHeader from '../hooks/useDataTableHeader';
 import {useCurrentDataTableStore} from '../stores/useCurrentDataTableStore';
 import DataTableActionsMenu from './DataTableActionsMenu';
 
-const DataTableHeader = () => {
+interface DataTableHeaderPropsI {
+    onAskCopilot?: () => void;
+}
+
+const DataTableHeader = ({onAskCopilot}: DataTableHeaderPropsI) => {
     const {dataTable} = useCurrentDataTableStore();
 
     const {handleOpenDeleteRowsDialog, selectedRowsCount} = useDataTableHeader();
@@ -24,6 +28,12 @@ const DataTableHeader = () => {
                     {selectedRowsCount > 0 && (
                         <Button onClick={handleOpenDeleteRowsDialog} variant="destructive">
                             <Trash2 className="size-4" /> Delete ({selectedRowsCount})
+                        </Button>
+                    )}
+
+                    {onAskCopilot && (
+                        <Button onClick={onAskCopilot} variant="outline">
+                            Ask Copilot
                         </Button>
                     )}
 

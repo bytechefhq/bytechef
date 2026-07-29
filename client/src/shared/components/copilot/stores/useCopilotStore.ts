@@ -27,6 +27,9 @@ export enum Source {
     CODE_WORKFLOW_EMBEDDED = 'code_workflow_embedded',
     WORKFLOW_EDITOR_EMBEDDED = 'workflow_editor_embedded',
     WORKFLOW_EXECUTION_EMBEDDED = 'workflow_execution_embedded',
+    CONTEXT_STORE = 'CONTEXT_STORE',
+    KNOWLEDGE_BASE = 'KNOWLEDGE_BASE',
+    DATA_TABLE = 'DATA_TABLE',
 }
 
 export type ContextType = {

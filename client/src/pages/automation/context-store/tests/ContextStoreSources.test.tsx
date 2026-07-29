@@ -1,4 +1,5 @@
-import {fireEvent, render, resetAll, screen, windowResizeObserver} from '@/shared/util/test-utils';
+import {MODE, Source} from '@/shared/components/copilot/stores/useCopilotStore';
+import {fireEvent, render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import ContextStoreSources from '../ContextStoreSources';
@@ -6,12 +7,43 @@ import ContextStoreSources from '../ContextStoreSources';
 const hoisted = vi.hoisted(() => {
     return {
         accountAuthorities: ['ROLE_ADMIN'],
+        mockRegisterPostTurn: vi.fn(),
+        mockSetContext: vi.fn(),
+        mockSetCopilotPanelOpen: vi.fn(),
         mockUseContextStoreSources: vi.fn(),
     };
 });
 
 vi.mock('../components/hooks/useContextStoreSources', () => ({
     default: hoisted.mockUseContextStoreSources,
+}));
+
+vi.mock('@/shared/components/copilot/stores/useCopilotStore', async () => {
+    const actual =
+        await vi.importActual<typeof import('@/shared/components/copilot/stores/useCopilotStore')>(
+            '@/shared/components/copilot/stores/useCopilotStore'
+        );
+
+    return {
+        ...actual,
+        useCopilotStore: (selector: (state: {setContext: typeof hoisted.mockSetContext}) => unknown) =>
+            selector({setContext: hoisted.mockSetContext}),
+    };
+});
+
+vi.mock('@/shared/components/copilot/stores/useCopilotPanelStore', () => ({
+    default: (selector: (state: {setCopilotPanelOpen: typeof hoisted.mockSetCopilotPanelOpen}) => unknown) =>
+        selector({setCopilotPanelOpen: hoisted.mockSetCopilotPanelOpen}),
+}));
+
+vi.mock('@/shared/components/copilot/stores/useCopilotPostTurnRegistry', () => ({
+    default: (selector: (state: {register: typeof hoisted.mockRegisterPostTurn}) => unknown) =>
+        selector({register: hoisted.mockRegisterPostTurn}),
+}));
+
+vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
+    useApplicationInfoStore: (selector: (state: {ai: {copilot: {enabled: boolean}}}) => unknown) =>
+        selector({ai: {copilot: {enabled: true}}}),
 }));
 
 vi.mock('@/shared/stores/useAuthenticationStore', () => ({
@@ -44,7 +76,11 @@ vi.mock('@/components/EmptyList', () => ({
 }));
 
 vi.mock('@/components/Button/Button', () => ({
-    default: ({children}: {children: React.ReactNode}) => <button data-testid="button">{children}</button>,
+    default: ({children, onClick}: {children: React.ReactNode; onClick?: () => void}) => (
+        <button data-testid="button" onClick={onClick}>
+            {children}
+        </button>
+    ),
 }));
 
 vi.mock('@/shared/components/EnvironmentSelect', () => ({
@@ -211,6 +247,21 @@ describe('ContextStoreSources', () => {
 
         expect(screen.getByTestId('empty-list')).toBeInTheDocument();
         expect(screen.getByText('No Sources')).toBeInTheDocument();
+    });
+
+    it('opens copilot scoped to the current context store', async () => {
+        render(<ContextStoreSources />);
+
+        await userEvent.click(screen.getByRole('button', {name: /ask copilot/i}));
+
+        expect(hoisted.mockSetContext).toHaveBeenCalledWith(
+            expect.objectContaining({
+                mode: MODE.ASK,
+                parameters: expect.objectContaining({contextStoreId: 'store-1'}),
+                source: Source.CONTEXT_STORE,
+            })
+        );
+        expect(hoisted.mockSetCopilotPanelOpen).toHaveBeenCalledWith(true);
     });
 
     it('opens the detail dialog for the clicked row instead of navigating', () => {

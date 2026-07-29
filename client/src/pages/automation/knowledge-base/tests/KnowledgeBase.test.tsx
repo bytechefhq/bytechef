@@ -1,16 +1,48 @@
-import {render, resetAll, screen, windowResizeObserver} from '@/shared/util/test-utils';
+import {MODE, Source} from '@/shared/components/copilot/stores/useCopilotStore';
+import {render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import KnowledgeBase from '../KnowledgeBase';
 
 const hoisted = vi.hoisted(() => {
     return {
+        mockRegisterPostTurn: vi.fn(),
+        mockSetContext: vi.fn(),
+        mockSetCopilotPanelOpen: vi.fn(),
         mockUseKnowledgeBase: vi.fn(),
     };
 });
 
 vi.mock('../hooks/useKnowledgeBase', () => ({
     default: hoisted.mockUseKnowledgeBase,
+}));
+
+vi.mock('@/shared/components/copilot/stores/useCopilotStore', async () => {
+    const actual =
+        await vi.importActual<typeof import('@/shared/components/copilot/stores/useCopilotStore')>(
+            '@/shared/components/copilot/stores/useCopilotStore'
+        );
+
+    return {
+        ...actual,
+        useCopilotStore: (selector: (state: {setContext: typeof hoisted.mockSetContext}) => unknown) =>
+            selector({setContext: hoisted.mockSetContext}),
+    };
+});
+
+vi.mock('@/shared/components/copilot/stores/useCopilotPanelStore', () => ({
+    default: (selector: (state: {setCopilotPanelOpen: typeof hoisted.mockSetCopilotPanelOpen}) => unknown) =>
+        selector({setCopilotPanelOpen: hoisted.mockSetCopilotPanelOpen}),
+}));
+
+vi.mock('@/shared/components/copilot/stores/useCopilotPostTurnRegistry', () => ({
+    default: (selector: (state: {register: typeof hoisted.mockRegisterPostTurn}) => unknown) =>
+        selector({register: hoisted.mockRegisterPostTurn}),
+}));
+
+vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
+    useApplicationInfoStore: (selector: (state: {ai: {copilot: {enabled: boolean}}}) => unknown) =>
+        selector({ai: {copilot: {enabled: true}}}),
 }));
 
 vi.mock('@/components/PageLoader', () => ({
@@ -25,8 +57,19 @@ vi.mock('@/components/PageLoader', () => ({
 }));
 
 vi.mock('../components/KnowledgeBaseHeader', () => ({
-    default: ({knowledgeBaseName}: {knowledgeBaseName?: string; onBackClick: () => void}) => (
-        <header data-testid="knowledge-base-header">{knowledgeBaseName || 'Loading...'}</header>
+    default: ({
+        knowledgeBaseName,
+        right,
+    }: {
+        knowledgeBaseName?: string;
+        onBackClick: () => void;
+        right?: React.ReactNode;
+    }) => (
+        <header data-testid="knowledge-base-header">
+            {knowledgeBaseName || 'Loading...'}
+
+            {right}
+        </header>
     ),
 }));
 
@@ -184,5 +227,20 @@ describe('KnowledgeBase', () => {
 
         expect(screen.queryByTestId('knowledge-base-info-card')).not.toBeInTheDocument();
         expect(screen.queryByTestId('knowledge-base-tabs')).not.toBeInTheDocument();
+    });
+
+    it('opens copilot scoped to the current knowledge base', async () => {
+        render(<KnowledgeBase />);
+
+        await userEvent.click(screen.getByRole('button', {name: /ask copilot/i}));
+
+        expect(hoisted.mockSetContext).toHaveBeenCalledWith(
+            expect.objectContaining({
+                mode: MODE.ASK,
+                parameters: expect.objectContaining({knowledgeBaseId: 'kb-1'}),
+                source: Source.KNOWLEDGE_BASE,
+            })
+        );
+        expect(hoisted.mockSetCopilotPanelOpen).toHaveBeenCalledWith(true);
     });
 });

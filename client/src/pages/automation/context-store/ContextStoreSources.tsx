@@ -10,15 +10,20 @@ import useContextStoreSources from '@/pages/automation/context-store/components/
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import SyncSourceStatusBadge from '@/shared/components/SyncSourceStatusBadge';
+import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
+import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
+import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {AUTHORITIES} from '@/shared/constants';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useContextStoresQuery} from '@/shared/middleware/graphql';
+import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
+import {useQueryClient} from '@tanstack/react-query';
 import {formatDistanceToNow} from 'date-fns';
 import {BoxesIcon} from 'lucide-react';
-import {useMemo, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {useParams} from 'react-router-dom';
 
 /**
@@ -33,6 +38,14 @@ const ContextStoreSources = () => {
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const copilotEnabled = useApplicationInfoStore((state) => state.ai.copilot.enabled);
+
+    const setContext = useCopilotStore((state) => state.setContext);
+    const setCopilotPanelOpen = useCopilotPanelStore((state) => state.setCopilotPanelOpen);
+    const registerPostTurn = useCopilotPostTurnRegistry((state) => state.register);
+
+    const queryClient = useQueryClient();
 
     const [selectedSourceId, setSelectedSourceId] = useState<string | null>(null);
 
@@ -49,6 +62,25 @@ const ContextStoreSources = () => {
         () => (contextStoresData?.contextStores ?? []).find((store) => String(store.id) === contextStoreIdParam),
         [contextStoresData?.contextStores, contextStoreIdParam]
     );
+
+    const openCopilot = () => {
+        setContext({
+            mode: MODE.ASK,
+            parameters: {contextStoreId: contextStoreIdParam},
+            source: Source.CONTEXT_STORE,
+        });
+
+        setCopilotPanelOpen(true);
+    };
+
+    // Refresh this store's sources + the store list after a BUILD-mode copilot turn mutates data (e.g. adding or
+    // syncing a source), so the page reflects the change without a manual reload.
+    useEffect(() => {
+        return registerPostTurn(Source.CONTEXT_STORE, () => {
+            queryClient.invalidateQueries({queryKey: ['contextStoreSources']});
+            queryClient.invalidateQueries({queryKey: ['contextStores']});
+        });
+    }, [queryClient, registerPostTurn]);
 
     // Scope to this store's sources only. The hook returns every source in the workspace+env; filter client-side
     // rather than threading a contextStoreId arg through the GraphQL query — the list is bounded and already
@@ -74,6 +106,12 @@ const ContextStoreSources = () => {
                     right={
                         <div className="flex items-center gap-4">
                             <EnvironmentSelect />
+
+                            {copilotEnabled && (
+                                <Button onClick={openCopilot} variant="outline">
+                                    Ask Copilot
+                                </Button>
+                            )}
 
                             {/* Hidden when there are no sources — the "No Sources" empty state already
                              * renders its own "Add Source" button, so a second one in the header would be
