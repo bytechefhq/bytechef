@@ -17,7 +17,9 @@
 package com.bytechef.ee.tenant.repository;
 
 import com.bytechef.ee.tenant.util.TenantUtils;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.tenant.TenantIdValidator;
+import com.bytechef.tenant.annotation.ConditionalOnMultiTenant;
 import com.bytechef.tenant.constant.TenantConstants;
 import com.bytechef.tenant.domain.Tenant;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -37,10 +39,16 @@ import org.springframework.stereotype.Repository;
 /**
  * Repository for multi-tenant operations. Uses parameterized queries for user input to prevent SQL injection. Schema
  * names cannot be parameterized in PostgreSQL, so tenant ID validation is used for DDL operations.
+ * <p>
+ * Registered under the same conditions as its only consumer, {@code MultiTenantService}. Without them this
+ * datasource-bound bean is created in every app carrying the module on its classpath — including the datasource-less
+ * distributed apps, which then fail to start on a driver that was never meant to be there.
  *
  * @author Ivica Cardic
  */
 @Repository
+@ConditionalOnEEVersion
+@ConditionalOnMultiTenant
 public class TenantRepository {
 
     private final DataSource dataSource;

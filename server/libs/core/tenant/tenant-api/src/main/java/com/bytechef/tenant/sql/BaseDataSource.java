@@ -25,6 +25,7 @@ import java.sql.ConnectionBuilder;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
+import java.util.Objects;
 import javax.sql.DataSource;
 
 /**
@@ -138,14 +139,20 @@ public abstract class BaseDataSource implements DataSource {
     }
 
     /**
-     * Builds the value used in the {@code SET search_path TO} statement for the given tenant schema. Subclasses may
-     * append additional schemas (such as {@code public}) that hold shared objects like PostgreSQL extensions.
+     * Builds the value used in the {@code SET search_path TO} statement for the given tenant schema. The {@code public}
+     * schema is appended as a fallback for every tenant schema so that shared objects installed there (PostgreSQL
+     * extensions such as pgvector's {@code vector} type and its {@code <=>} operator) stay resolvable without explicit
+     * schema qualification. For the default tenant the schema already is {@code public}, so nothing is appended.
      *
      * @param currentDatabaseSchema the validated tenant schema
      * @return the search path value
      */
     protected String getSearchPath(String currentDatabaseSchema) {
-        return currentDatabaseSchema;
+        if (Objects.equals(currentDatabaseSchema, TenantContext.DEFAULT_TENANT_ID)) {
+            return currentDatabaseSchema;
+        }
+
+        return currentDatabaseSchema + ", " + TenantContext.DEFAULT_TENANT_ID;
     }
 
     /**
