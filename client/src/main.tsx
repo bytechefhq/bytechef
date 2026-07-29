@@ -15,7 +15,6 @@ import {StrictMode} from 'react';
 import {RouterProvider} from 'react-router-dom';
 
 import {initUserGuiding} from './hooks/useUserGuiding';
-import {getRouter as getMainRouter} from './routes';
 
 if (process.env.NODE_ENV === 'mock') {
     import('./mocks/server').then(({worker}) => {
@@ -45,7 +44,7 @@ async function renderApp() {
 
     const router = isEmbeddedWorkflowBuilder
         ? (await import('@/embeddedWorkflowBuilderRoutes')).getRouter()
-        : getMainRouter(queryClient);
+        : (await import('./routes')).getRouter(queryClient);
 
     await applicationInfoStore.getState().getApplicationInfo();
 
