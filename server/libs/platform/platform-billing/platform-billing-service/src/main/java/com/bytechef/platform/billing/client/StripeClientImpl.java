@@ -306,6 +306,7 @@ public class StripeClientImpl implements StripeClient {
                         .setPrice(usagePriceId)
                         .build())
                 .putMetadata("planName", planName)
+                .putMetadata("tenantId", tenantId)
                 .setClientReferenceId(tenantId)
                 .setSubscriptionData(
                     SessionCreateParams.SubscriptionData.builder()
