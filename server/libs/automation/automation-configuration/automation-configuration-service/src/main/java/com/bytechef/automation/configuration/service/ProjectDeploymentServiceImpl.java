@@ -149,6 +149,17 @@ public class ProjectDeploymentServiceImpl implements ProjectDeploymentService {
     }
 
     @Override
+    public void disableAllProjectDeployments() {
+        List<ProjectDeployment> deployments = getProjectDeployments();
+
+        for (ProjectDeployment deployment : deployments) {
+            if (deployment.isEnabled()) {
+                updateEnabled(deployment.getId(), false);
+            }
+        }
+    }
+
+    @Override
     public void updateEnabled(long id, boolean enabled) {
         ProjectDeployment projectDeployment = getProjectDeployment(id);
 
