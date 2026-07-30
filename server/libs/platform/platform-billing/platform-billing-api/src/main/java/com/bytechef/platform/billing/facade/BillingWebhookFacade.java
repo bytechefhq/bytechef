@@ -16,21 +16,14 @@
 
 package com.bytechef.platform.billing.facade;
 
-import com.bytechef.platform.billing.dto.BillingSubscriptionDTO;
-import java.util.Optional;
-
 /**
  * @author Matija Petanjek
  */
-public interface BillingSubscriptionFacade {
+public interface BillingWebhookFacade {
 
-    void cancelSubscription();
-
-    String createCheckoutSession(String planName);
-
-    void reactivateSubscription();
-
-    void updateSubscription(String planName);
-
-    Optional<BillingSubscriptionDTO> fetchCurrentSubscription();
+    /**
+     * Verifies the Stripe signature, resolves the tenant the event belongs to and processes it, all in one call. Throws
+     * {@link com.bytechef.platform.billing.exception.InvalidWebhookSignatureException} if the signature is invalid.
+     */
+    void processWebhookEvent(String payload, String stripeSignatureHeader);
 }

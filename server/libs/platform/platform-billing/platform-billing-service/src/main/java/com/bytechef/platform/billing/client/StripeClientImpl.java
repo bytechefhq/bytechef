@@ -222,7 +222,7 @@ public class StripeClientImpl implements StripeClient {
     @Override
     public Optional<String> fetchScheduledPlanName(String subscriptionId) {
         try {
-            if(subscriptionId == null) {
+            if (subscriptionId == null) {
                 return Optional.empty();
             }
 

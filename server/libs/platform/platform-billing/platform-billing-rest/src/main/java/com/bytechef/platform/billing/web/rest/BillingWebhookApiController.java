@@ -17,8 +17,7 @@
 package com.bytechef.platform.billing.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.platform.billing.facade.BillingSubscriptionFacade;
-import com.bytechef.tenant.TenantContext;
+import com.bytechef.platform.billing.facade.BillingWebhookFacade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -37,22 +36,17 @@ public class BillingWebhookApiController implements BillingWebhookApi {
 
     private static final Logger log = LoggerFactory.getLogger(BillingWebhookApiController.class);
 
-    private final BillingSubscriptionFacade billingSubscriptionFacade;
+    private final BillingWebhookFacade billingWebhookFacade;
 
-    public BillingWebhookApiController(BillingSubscriptionFacade billingSubscriptionFacade) {
-        this.billingSubscriptionFacade = billingSubscriptionFacade;
+    public BillingWebhookApiController(BillingWebhookFacade billingWebhookFacade) {
+        this.billingWebhookFacade = billingWebhookFacade;
     }
 
     @Override
     public ResponseEntity<Void> handleWebhook(String stripeSignature, String body) {
         log.info("Received Stripe webhook event");
 
-        billingSubscriptionFacade.verifyWebhookSignature(body, stripeSignature);
-
-        String tenantId = billingSubscriptionFacade.extractTenantId(body);
-
-        TenantContext.runWithTenantId(
-            tenantId, () -> billingSubscriptionFacade.handleWebhookEvent(body, stripeSignature));
+        billingWebhookFacade.processWebhookEvent(body, stripeSignature);
 
         return ResponseEntity.ok()
             .build();
