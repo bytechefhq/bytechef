@@ -30,6 +30,8 @@ import com.stripe.model.checkout.Session;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -75,11 +77,11 @@ class BillingWebhookEventHandler {
 
         BillingSubscription savedSubscription = null;
 
-        if ("checkout.session.completed".equals(event.getType())) {
+        if (Objects.equals(event.getType(), StripeWebhookEvent.CHECKOUT_SESSION_COMPLETED.getType())) {
             savedSubscription = handleCheckoutSessionCompleted(event);
-        } else if ("customer.subscription.updated".equals(event.getType())) {
+        } else if (Objects.equals(event.getType(), StripeWebhookEvent.CUSTOMER_SUBSCRIPTION_UPDATED.getType())) {
             savedSubscription = handleSubscriptionUpdated(event);
-        } else if ("customer.subscription.deleted".equals(event.getType())) {
+        } else if (Objects.equals(event.getType(), StripeWebhookEvent.CUSTOMER_SUBSCRIPTION_DELETED.getType())) {
             savedSubscription = handleSubscriptionDeleted(event);
         }
 

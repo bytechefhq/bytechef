@@ -58,33 +58,15 @@ public class BillingWebhookFacadeImpl implements BillingWebhookFacade {
             .path("data")
             .path("object");
 
-        if ("checkout.session.completed".equals(eventType)) {
-            String clientReferenceId = dataObject.path("client_reference_id")
-                .textValue();
+        String tenantId = dataObject.path("metadata")
+            .path("tenantId")
+            .stringValue(null);
 
-            if (clientReferenceId == null) {
-                throw new IllegalStateException(
-                    "Missing client_reference_id in checkout.session.completed webhook event");
-            }
-
-            return clientReferenceId;
+        if (tenantId == null) {
+            throw new IllegalStateException(
+                "Missing tenantId metadata in " + eventType + " webhook event");
         }
 
-        if ("customer.subscription.updated".equals(eventType) ||
-            "customer.subscription.deleted".equals(eventType)) {
-
-            String tenantId = dataObject.path("metadata")
-                .path("tenantId")
-                .textValue();
-
-            if (tenantId == null) {
-                throw new IllegalStateException(
-                    "Missing tenantId metadata in " + eventType + " webhook event");
-            }
-
-            return tenantId;
-        }
-
-        throw new IllegalArgumentException("Unhandled webhook event type: " + eventType);
+        return tenantId;
     }
 }
