@@ -89,7 +89,7 @@ public class AwsSchedulerConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "bytechef.billing", name = "enabled", havingValue = "true")
+    @ConditionalOnProperty(prefix = "billing", name = "enabled", havingValue = "true")
     AwsStripeUsageReportScheduler awsStripeUsageReportScheduler(SchedulerClient schedulerClient) {
         return new AwsStripeUsageReportScheduler(applicationProperties, schedulerClient);
     }
@@ -144,7 +144,7 @@ public class AwsSchedulerConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "bytechef.billing", name = "enabled", havingValue = "true")
+    @ConditionalOnProperty(prefix = "billing", name = "enabled", havingValue = "true")
     StripeUsageReportListener stripeUsageReportListener(BillingUsageService billingUsageService) {
         return new StripeUsageReportListener(billingUsageService);
     }

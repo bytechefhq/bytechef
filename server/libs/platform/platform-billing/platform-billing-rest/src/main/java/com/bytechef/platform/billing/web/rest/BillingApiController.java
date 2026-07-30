@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.platform:}/internal")
 @ConditionalOnCoordinator
-@ConditionalOnProperty(prefix = "bytechef.billing", name = "enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "billing", name = "enabled", havingValue = "true")
 public class BillingApiController implements BillingApi {
 
     private final BillingSubscriptionFacade billingSubscriptionFacade;

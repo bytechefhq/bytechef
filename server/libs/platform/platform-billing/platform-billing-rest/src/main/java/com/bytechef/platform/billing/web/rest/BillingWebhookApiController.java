@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.platform:}")
 @ConditionalOnCoordinator
-@ConditionalOnProperty(prefix = "bytechef.billing", name = "enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "billing", name = "enabled", havingValue = "true")
 public class BillingWebhookApiController implements BillingWebhookApi {
 
     private static final Logger log = LoggerFactory.getLogger(BillingWebhookApiController.class);

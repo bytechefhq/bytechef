@@ -30,7 +30,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Matija Petanjek
  */
 @Configuration
-@ConditionalOnExpression("${bytechef.billing.enabled:false} " +
+@ConditionalOnExpression("${billing.enabled:false} " +
     "and '${bytechef.coordinator.trigger.scheduler.provider:quartz}'.equals('quartz')")
 public class BillingSchedulingConfiguration {
 
