@@ -17,17 +17,11 @@
 package com.bytechef.platform.billing.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
 
-import com.bytechef.platform.billing.facade.BillingSubscriptionFacade;
-import com.bytechef.tenant.TenantContext;
-import org.junit.jupiter.api.AfterEach;
+import com.bytechef.platform.billing.facade.BillingWebhookFacade;
 import org.junit.jupiter.api.Test;
-import org.mockito.InOrder;
 import org.springframework.http.ResponseEntity;
 
 /**
@@ -37,54 +31,18 @@ class BillingWebhookApiControllerTest {
 
     private static final String PAYLOAD = "{\"id\":\"evt_test\"}";
     private static final String STRIPE_SIGNATURE = "t=1,v1=test-signature";
-    private static final String TENANT_ID = "acme";
 
-    private final BillingSubscriptionFacade billingSubscriptionFacade = mock(BillingSubscriptionFacade.class);
+    private final BillingWebhookFacade billingWebhookFacade =
+        mock(BillingWebhookFacade.class);
 
     private final BillingWebhookApiController controller =
-        new BillingWebhookApiController(billingSubscriptionFacade);
-
-    @AfterEach
-    void tearDown() {
-        TenantContext.resetCurrentTenantId();
-    }
+        new BillingWebhookApiController(billingWebhookFacade);
 
     @Test
-    void testHandleWebhookVerifiesSignatureBeforeReadingPayload() {
-        when(billingSubscriptionFacade.extractTenantId(PAYLOAD)).thenReturn(TENANT_ID);
-
-        controller.handleWebhook(STRIPE_SIGNATURE, PAYLOAD);
-
-        InOrder inOrder = inOrder(billingSubscriptionFacade);
-
-        inOrder.verify(billingSubscriptionFacade)
-            .verifyWebhookSignature(PAYLOAD, STRIPE_SIGNATURE);
-        inOrder.verify(billingSubscriptionFacade)
-            .extractTenantId(PAYLOAD);
-        inOrder.verify(billingSubscriptionFacade)
-            .handleWebhookEvent(PAYLOAD, STRIPE_SIGNATURE);
-    }
-
-    @Test
-    void testHandleWebhookEstablishesTenantContextBeforeHandlingEvent() {
-        when(billingSubscriptionFacade.extractTenantId(PAYLOAD)).thenReturn(TENANT_ID);
-
-        String[] tenantIdDuringHandling = new String[1];
-
-        doAnswer(invocation -> {
-            tenantIdDuringHandling[0] = TenantContext.getCurrentTenantId();
-
-            return null;
-        }).when(billingSubscriptionFacade)
-            .handleWebhookEvent(eq(PAYLOAD), eq(STRIPE_SIGNATURE));
-
+    void testHandleWebhookDelegatesToFacadeAndReturnsOk() {
         ResponseEntity<Void> response = controller.handleWebhook(STRIPE_SIGNATURE, PAYLOAD);
 
-        assertThat(tenantIdDuringHandling[0])
-            .as("tenant must already be resolved in TenantContext before handleWebhookEvent is invoked, since "
-                + "handleWebhookEvent is @Transactional and acquires its database connection as soon as it is "
-                + "entered")
-            .isEqualTo(TENANT_ID);
+        verify(billingWebhookFacade).processWebhookEvent(PAYLOAD, STRIPE_SIGNATURE);
         assertThat(response.getStatusCode()
             .is2xxSuccessful()).isTrue();
     }
