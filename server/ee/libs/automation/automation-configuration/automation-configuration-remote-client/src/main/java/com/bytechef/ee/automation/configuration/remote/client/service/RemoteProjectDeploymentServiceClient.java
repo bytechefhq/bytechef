@@ -109,6 +109,11 @@ public class RemoteProjectDeploymentServiceClient implements ProjectDeploymentSe
     }
 
     @Override
+    public void disableAllProjectDeployments() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void updateEnabled(long id, boolean enabled) {
         throw new UnsupportedOperationException();
     }

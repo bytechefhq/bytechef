@@ -53,5 +53,7 @@ public interface ProjectDeploymentService {
 
     ProjectDeployment update(ProjectDeployment projectDeployment);
 
+    void disableAllProjectDeployments();
+
     void updateEnabled(long id, boolean enabled);
 }
