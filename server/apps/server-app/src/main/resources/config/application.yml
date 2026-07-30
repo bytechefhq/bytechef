@@ -10,6 +10,18 @@ springdoc:
   swagger-ui:
     enabled: false
 ---
+billing:
+  enabled: false
+  stripe:
+    customer-portal-url: https://billing.stripe.com/p/login/test_8x214mfs66RX9fP6BV3Je00
+    secret-key:
+    product-starter-id: prod_UQkzkfmlljRg3J
+    product-usage-id: prod_UQlAqLdV50vcMc
+    product-growth-id: prod_UQl6ZIubWx3VS4
+    meter-event-name: tenant_task_executions
+    webhook-secret:
+    success-url: http://localhost:5173/automation/settings/billing?checkout=success
+    cancel-url: http://localhost:5173/automation/settings/billing
 
 github-proxy:
   baseUrl: https://github-proxy.bytechef.io/
@@ -26,7 +38,7 @@ info:
       apiKey: ${post-hog.api-key:}
       host: ${post-hog.host:}
   billing:
-    enabled: ${bytechef.billing.enabled}
+    enabled: ${billing.enabled}
   application:
     edition: ${bytechef.edition:}
   featureFlags: ${bytechef.feature-flags}
@@ -232,7 +244,7 @@ spring:
     contexts: mono, #spring.profiles.active#
     enabled: ${bytechef.upgrade.enabled:true}
     parameters:
-      bytechef.billing.enabled: ${bytechef.billing.enabled:false}
+      billing.enabled: ${billing.enabled:false}
   output:
     ansi:
       enabled: always
