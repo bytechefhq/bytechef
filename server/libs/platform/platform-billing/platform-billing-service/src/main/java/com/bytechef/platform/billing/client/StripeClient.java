@@ -42,6 +42,8 @@ public interface StripeClient {
 
     void releaseSubscriptionScheduleIfPresent(Subscription subscription);
 
+    Optional<String> fetchScheduledPlanName(String subscriptionId);
+
     Optional<String> fetchCustomerId(String email, String tenantId);
 
     String createCustomer(String email, String tenantId);
