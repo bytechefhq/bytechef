@@ -144,13 +144,31 @@ class BillingWebhookFacadeImplTest {
     }
 
     @Test
-    void testProcessWebhookEventThrowsForUnknownEventType() throws Exception {
+    void testProcessWebhookEventThrowsWhenTenantIdMetadataMissing() throws Exception {
         String payload = unknownEventPayload();
 
         assertThatThrownBy(
             () -> billingWebhookFacade.processWebhookEvent(payload, signPayload(payload, WEBHOOK_SECRET)))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Unhandled webhook event type: invoice.payment_succeeded");
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Missing tenantId metadata in invoice.payment_succeeded webhook event");
+    }
+
+    @Test
+    void testProcessWebhookEventHandlesUnrecognizedEventTypeWhenTenantIdPresent() throws Exception {
+        String payload = unknownEventPayloadWithTenantId("acme");
+
+        String[] tenantIdDuringHandling = new String[1];
+
+        doAnswer(invocation -> {
+            tenantIdDuringHandling[0] = TenantContext.getCurrentTenantId();
+
+            return null;
+        }).when(billingWebhookEventHandler)
+            .handle(any());
+
+        billingWebhookFacade.processWebhookEvent(payload, signPayload(payload, WEBHOOK_SECRET));
+
+        assertThat(tenantIdDuringHandling[0]).isEqualTo("acme");
     }
 
     @Test
@@ -167,7 +185,7 @@ class BillingWebhookFacadeImplTest {
     }
 
     @SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
-    private String checkoutSessionCompletedPayload(String clientReferenceId) {
+    private String checkoutSessionCompletedPayload(String tenantId) {
         return """
             {
               "id": "evt_checkout_completed",
@@ -181,11 +199,11 @@ class BillingWebhookFacadeImplTest {
                   "client_reference_id": "%s",
                   "customer": "cus_checkout",
                   "subscription": "sub_checkout_test",
-                  "metadata": { "planName": "STARTER" }
+                  "metadata": { "planName": "STARTER", "tenantId": "%s" }
                 }
               }
             }
-            """.formatted(clientReferenceId);
+            """.formatted(tenantId, tenantId);
     }
 
     @SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
@@ -224,6 +242,25 @@ class BillingWebhookFacadeImplTest {
               }
             }
             """;
+    }
+
+    @SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
+    private String unknownEventPayloadWithTenantId(String tenantId) {
+        return """
+            {
+              "id": "evt_invoice_paid",
+              "object": "event",
+              "api_version": "2026-04-22.dahlia",
+              "type": "invoice.payment_succeeded",
+              "data": {
+                "object": {
+                  "id": "in_test123",
+                  "object": "invoice",
+                  "metadata": { "tenantId": "%s" }
+                }
+              }
+            }
+            """.formatted(tenantId);
     }
 
     private String signPayload(String payload, String secret) throws Exception {
