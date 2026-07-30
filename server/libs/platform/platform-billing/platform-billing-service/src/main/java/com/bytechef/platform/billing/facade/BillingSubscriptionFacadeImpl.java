@@ -193,8 +193,6 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
         if (isUpgrade(currentSubscription.getPlanName(), newPlanName)) {
             stripeClient.upgradeSubscriptionNow(
                 subscriptionId, currentSubscription.getProductId(), newFlatPriceId, newPlanName, tenantId);
-
-            currentSubscription.setScheduledPlanName(null);
         } else {
             String newMeteredPriceId =
                 stripeClient.fetchProductDefaultPriceId(billingProperties.stripe()
@@ -205,11 +203,7 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
                 currentSubscription.getUsageProductId(), newFlatPriceId, newMeteredPriceId, newPlanName,
                 tenantId, currentSubscription.getCurrentPeriodEnd()
                     .getEpochSecond());
-
-            currentSubscription.setScheduledPlanName(newPlanName);
         }
-
-        billingSubscriptionService.save(currentSubscription);
     }
 
     @Override
@@ -219,7 +213,10 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
                 int tasksUsed = billingUsageService.countTaskExecutionsSince(
                     subscription.getCurrentPeriodStart(), Instant.now());
 
-                return new BillingSubscriptionDTO(subscription, tasksUsed);
+                String scheduledPlanName = stripeClient.fetchScheduledPlanName(subscription.getSubscriptionId())
+                    .orElse(null);
+
+                return new BillingSubscriptionDTO(subscription, tasksUsed, scheduledPlanName);
             });
     }
 
@@ -284,10 +281,6 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
 
                 subscription.setCancelAtPeriodEnd(Boolean.TRUE.equals(stripeSubscription.getCancelAtPeriodEnd()));
 
-                if (subscription.isCancelAtPeriodEnd()) {
-                    subscription.setScheduledPlanName(null);
-                }
-
                 List<SubscriptionItem> items = stripeSubscription.getItems()
                     .getData();
 
@@ -309,10 +302,6 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
                             .productGrowthId()
                             .equals(productId)) {
                             newPlanName = "GROWTH";
-                        }
-
-                        if (newPlanName != null && !newPlanName.equalsIgnoreCase(subscription.getPlanName())) {
-                            subscription.setScheduledPlanName(null);
                         }
 
                         if (newPlanName != null) {

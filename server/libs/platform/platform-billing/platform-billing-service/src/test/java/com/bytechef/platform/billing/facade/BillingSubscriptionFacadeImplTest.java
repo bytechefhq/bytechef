@@ -104,6 +104,7 @@ class BillingSubscriptionFacadeImplTest {
 
         when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.of(subscription));
         when(billingUsageService.countTaskExecutionsSince(eq(periodStart), any(Instant.class))).thenReturn(42);
+        when(stripeClient.fetchScheduledPlanName(any())).thenReturn(Optional.of("GROWTH"));
 
         Optional<com.bytechef.platform.billing.dto.BillingSubscriptionDTO> result =
             facade.fetchCurrentSubscription();
@@ -113,6 +114,8 @@ class BillingSubscriptionFacadeImplTest {
             .tasksUsed()).isEqualTo(42);
         assertThat(result.get()
             .subscription()).isSameAs(subscription);
+        assertThat(result.get()
+            .scheduledPlanName()).isEqualTo("GROWTH");
     }
 
     @Test
@@ -288,37 +291,10 @@ class BillingSubscriptionFacadeImplTest {
     }
 
     @Test
-    void testHandleSubscriptionUpdatedClearsScheduledPlanNameOnPlanChange() throws Exception {
-        BillingSubscription subscription = new BillingSubscription();
-
-        subscription.setPlanName("GROWTH");
-        subscription.setScheduledPlanName("STARTER");
-        subscription.setStatus(BillingSubscription.Status.ACTIVE);
-        subscription.setSubscriptionId(SUBSCRIPTION_ID);
-
-        when(billingWebhookEventService.isEventProcessed(any())).thenReturn(false);
-        when(billingSubscriptionService.fetchSubscriptionBySubscriptionId(SUBSCRIPTION_ID))
-            .thenReturn(Optional.of(subscription));
-        when(billingSubscriptionService.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
-        when(stripeClient.retrievePrice(any())).thenReturn(priceWithProductUnitLimit(100L));
-
-        String payload = subscriptionUpdatedPayloadWithProduct(SUBSCRIPTION_ID, PRODUCT_STARTER_ID);
-
-        facade.handleWebhookEvent(payload, signPayload(payload, WEBHOOK_SECRET));
-
-        ArgumentCaptor<BillingSubscription> captor = ArgumentCaptor.forClass(BillingSubscription.class);
-
-        verify(billingSubscriptionService).save(captor.capture());
-        assertThat(captor.getValue()
-            .getScheduledPlanName()).isNull();
-    }
-
-    @Test
     void testHandleSubscriptionUpdatedUpdatesCancelAtPeriodEnd() throws Exception {
         BillingSubscription subscription = starterSubscription();
 
         subscription.setSubscriptionId(SUBSCRIPTION_ID);
-        subscription.setScheduledPlanName("GROWTH");
 
         when(billingWebhookEventService.isEventProcessed(any())).thenReturn(false);
         when(billingSubscriptionService.fetchSubscriptionBySubscriptionId(SUBSCRIPTION_ID))
@@ -334,8 +310,6 @@ class BillingSubscriptionFacadeImplTest {
         verify(billingSubscriptionService).save(captor.capture());
         assertThat(captor.getValue()
             .isCancelAtPeriodEnd()).isTrue();
-        assertThat(captor.getValue()
-            .getScheduledPlanName()).isNull();
     }
 
     private BillingSubscription starterSubscription() {

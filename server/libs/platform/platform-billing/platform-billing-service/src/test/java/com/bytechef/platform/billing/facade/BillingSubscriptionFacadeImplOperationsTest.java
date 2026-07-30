@@ -181,7 +181,6 @@ class BillingSubscriptionFacadeImplOperationsTest {
         when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.of(currentSubscription));
         when(stripeClient.retrieveSubscription("sub_starter")).thenReturn(mockStripeSubscription);
         when(stripeClient.fetchProductDefaultPriceId(PRODUCT_GROWTH_ID)).thenReturn("price_growth");
-        when(billingSubscriptionService.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
         facade.updateSubscription("GROWTH");
 
@@ -191,47 +190,34 @@ class BillingSubscriptionFacadeImplOperationsTest {
     }
 
     @Test
-    void testUpdateSubscriptionSchedulesDowngradeAndSetsPlanName() {
+    void testUpdateSubscriptionSchedulesDowngrade() {
         BillingSubscription currentSubscription = growthSubscription();
 
         when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.of(currentSubscription));
         when(stripeClient.retrieveSubscription("sub_growth")).thenReturn(mockStripeSubscription);
         when(stripeClient.fetchProductDefaultPriceId(PRODUCT_STARTER_ID)).thenReturn("price_starter");
         when(stripeClient.fetchProductDefaultPriceId(PRODUCT_USAGE_ID)).thenReturn("price_usage");
-        when(billingSubscriptionService.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
         facade.updateSubscription("STARTER");
 
         verify(stripeClient).scheduleDowngrade(
             eq("sub_growth"), eq("si_flat_growth"), eq("si_usage_growth"),
             eq("price_starter"), eq("price_usage"), eq("STARTER"), any(), anyLong());
-
-        ArgumentCaptor<BillingSubscription> captor = ArgumentCaptor.forClass(BillingSubscription.class);
-
-        verify(billingSubscriptionService).save(captor.capture());
-        assertThat(captor.getValue()
-            .getScheduledPlanName()).isEqualTo("STARTER");
         verify(stripeClient, never()).upgradeSubscriptionNow(any(), any(), any(), any(), any());
     }
 
     @Test
-    void testUpgradeSubscriptionClearsScheduledPlanNameOnUpdate() {
+    void testUpgradeSubscriptionReleasesExistingScheduleBeforeUpgrading() {
         BillingSubscription currentSubscription = starterSubscription();
-
-        currentSubscription.setScheduledPlanName("GROWTH");
 
         when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.of(currentSubscription));
         when(stripeClient.retrieveSubscription(any())).thenReturn(mockStripeSubscription);
         when(stripeClient.fetchProductDefaultPriceId(PRODUCT_GROWTH_ID)).thenReturn("price_growth");
-        when(billingSubscriptionService.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
         facade.updateSubscription("GROWTH");
 
-        ArgumentCaptor<BillingSubscription> captor = ArgumentCaptor.forClass(BillingSubscription.class);
-
-        verify(billingSubscriptionService).save(captor.capture());
-        assertThat(captor.getValue()
-            .getScheduledPlanName()).isNull();
+        verify(stripeClient).releaseSubscriptionScheduleIfPresent(mockStripeSubscription);
+        verify(stripeClient).upgradeSubscriptionNow(any(), any(), eq("price_growth"), eq("GROWTH"), any());
     }
 
     @Test
