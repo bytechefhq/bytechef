@@ -19,9 +19,8 @@ package com.bytechef.platform.billing.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -29,27 +28,17 @@ import static org.mockito.Mockito.when;
 import com.bytechef.platform.billing.client.StripeClient;
 import com.bytechef.platform.billing.config.BillingProperties;
 import com.bytechef.platform.billing.domain.BillingSubscription;
-import com.bytechef.platform.billing.exception.InvalidWebhookSignatureException;
+import com.bytechef.platform.billing.dto.BillingSubscriptionDTO;
 import com.bytechef.platform.billing.service.BillingSubscriptionService;
 import com.bytechef.platform.billing.service.BillingUsageService;
-import com.bytechef.platform.billing.service.BillingWebhookEventService;
-import com.stripe.model.Price;
-import com.stripe.net.Webhook;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.nio.charset.StandardCharsets;
+import com.stripe.model.Subscription;
 import java.time.Instant;
-import java.util.HexFormat;
-import java.util.List;
 import java.util.Optional;
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Matija Petanjek
@@ -57,9 +46,6 @@ import tools.jackson.databind.ObjectMapper;
 @ExtendWith(MockitoExtension.class)
 class BillingSubscriptionFacadeImplTest {
 
-    private static final String WEBHOOK_SECRET = "whsec_test_webhook_secret";
-    private static final String STRIPE_API_KEY = "sk_test_abc123";
-    private static final String SUBSCRIPTION_ID = "sub_test123";
     private static final String PRODUCT_STARTER_ID = "prod_starter_test";
     private static final String PRODUCT_GROWTH_ID = "prod_growth_test";
     private static final String PRODUCT_USAGE_ID = "prod_usage_test";
@@ -71,10 +57,10 @@ class BillingSubscriptionFacadeImplTest {
     private BillingUsageService billingUsageService;
 
     @Mock
-    private BillingWebhookEventService billingWebhookEventService;
+    private StripeClient stripeClient;
 
     @Mock
-    private StripeClient stripeClient;
+    private Subscription mockStripeSubscription;
 
     private BillingSubscriptionFacadeImpl facade;
 
@@ -82,16 +68,11 @@ class BillingSubscriptionFacadeImplTest {
     void setUp() {
         BillingProperties billingProperties = new BillingProperties(
             new BillingProperties.Stripe(
-                STRIPE_API_KEY, null, PRODUCT_STARTER_ID, PRODUCT_GROWTH_ID, PRODUCT_USAGE_ID, null, WEBHOOK_SECRET,
+                "sk_test_abc", null, PRODUCT_STARTER_ID, PRODUCT_GROWTH_ID, PRODUCT_USAGE_ID, null, "whsec_test",
                 null, null));
 
         facade = new BillingSubscriptionFacadeImpl(
-            billingProperties, billingSubscriptionService, billingUsageService, billingWebhookEventService,
-            new ObjectMapper(), stripeClient);
-
-        lenient().when(stripeClient.verifyWebhookSignature(any(), any()))
-            .thenAnswer(invocation -> Webhook.constructEvent(
-                invocation.getArgument(0), invocation.getArgument(1), WEBHOOK_SECRET));
+            billingProperties, billingSubscriptionService, billingUsageService, stripeClient);
     }
 
     @Test
@@ -106,8 +87,7 @@ class BillingSubscriptionFacadeImplTest {
         when(billingUsageService.countTaskExecutionsSince(eq(periodStart), any(Instant.class))).thenReturn(42);
         when(stripeClient.fetchScheduledPlanName(any())).thenReturn(Optional.of("GROWTH"));
 
-        Optional<com.bytechef.platform.billing.dto.BillingSubscriptionDTO> result =
-            facade.fetchCurrentSubscription();
+        Optional<BillingSubscriptionDTO> result = facade.fetchCurrentSubscription();
 
         assertThat(result).isPresent();
         assertThat(result.get()
@@ -119,432 +99,102 @@ class BillingSubscriptionFacadeImplTest {
     }
 
     @Test
-    void testExtractTenantIdReturnsClientReferenceIdForCheckoutSessionCompleted() {
-        String payload = checkoutSessionCompletedPayload("acme");
+    void testUpgradeSubscriptionCallsUpgradeNowForUpdatePath() {
+        BillingSubscription currentSubscription = starterSubscription();
 
-        String tenantId = facade.extractTenantId(payload);
+        when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.of(currentSubscription));
+        when(stripeClient.retrieveSubscription("sub_starter")).thenReturn(mockStripeSubscription);
+        when(stripeClient.fetchProductDefaultPriceId(PRODUCT_GROWTH_ID)).thenReturn("price_growth");
 
-        assertThat(tenantId).isEqualTo("acme");
+        facade.updateSubscription("GROWTH");
+
+        verify(stripeClient).upgradeSubscriptionNow(
+            eq("sub_starter"), eq("si_flat_starter"), eq("price_growth"), eq("GROWTH"), any());
+        verify(stripeClient, never()).scheduleDowngrade(any(), any(), any(), any(), any(), any(), any(), anyLong());
     }
 
     @Test
-    void testExtractTenantIdReturnsMetadataTenantIdForSubscriptionUpdated() {
-        String payload = subscriptionUpdatedPayload(SUBSCRIPTION_ID, "STARTER");
+    void testUpdateSubscriptionSchedulesDowngrade() {
+        BillingSubscription currentSubscription = growthSubscription();
 
-        String tenantId = facade.extractTenantId(payload);
+        when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.of(currentSubscription));
+        when(stripeClient.retrieveSubscription("sub_growth")).thenReturn(mockStripeSubscription);
+        when(stripeClient.fetchProductDefaultPriceId(PRODUCT_STARTER_ID)).thenReturn("price_starter");
+        when(stripeClient.fetchProductDefaultPriceId(PRODUCT_USAGE_ID)).thenReturn("price_usage");
 
-        assertThat(tenantId).isEqualTo("public");
+        facade.updateSubscription("STARTER");
+
+        verify(stripeClient).scheduleDowngrade(
+            eq("sub_growth"), eq("si_flat_growth"), eq("si_usage_growth"),
+            eq("price_starter"), eq("price_usage"), eq("STARTER"), any(), anyLong());
+        verify(stripeClient, never()).upgradeSubscriptionNow(any(), any(), any(), any(), any());
     }
 
     @Test
-    void testVerifyWebhookSignaturePropagatesStripeClientFailure() {
-        String payload = subscriptionUpdatedPayload(SUBSCRIPTION_ID, "STARTER");
+    void testUpgradeSubscriptionReleasesExistingScheduleBeforeUpgrading() {
+        BillingSubscription currentSubscription = starterSubscription();
 
-        doThrow(new InvalidWebhookSignatureException("Invalid Stripe signature", null))
-            .when(stripeClient)
-            .verifyWebhookSignature(payload, "t=1,v1=invalid");
+        when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.of(currentSubscription));
+        when(stripeClient.retrieveSubscription(any())).thenReturn(mockStripeSubscription);
+        when(stripeClient.fetchProductDefaultPriceId(PRODUCT_GROWTH_ID)).thenReturn("price_growth");
 
-        assertThatThrownBy(() -> facade.verifyWebhookSignature(payload, "t=1,v1=invalid"))
-            .isInstanceOf(InvalidWebhookSignatureException.class)
-            .hasMessage("Invalid Stripe signature");
+        facade.updateSubscription("GROWTH");
+
+        verify(stripeClient).releaseSubscriptionScheduleIfPresent(mockStripeSubscription);
+        verify(stripeClient).upgradeSubscriptionNow(any(), any(), eq("price_growth"), eq("GROWTH"), any());
     }
 
     @Test
-    void testHandleSubscriptionUpdatedResetsLastReportedAtOnPeriodRollover() throws Exception {
-        BillingSubscription subscription = starterSubscription();
+    void testCancelSubscriptionThrowsWhenNoActiveSubscription() {
+        when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.empty());
 
-        subscription.setSubscriptionId(SUBSCRIPTION_ID);
-        subscription.setCurrentPeriodStart(Instant.ofEpochSecond(1777593600L));
-        subscription.setLastReportedAt(Instant.parse("2026-05-15T10:00:00Z"));
-
-        when(billingWebhookEventService.isEventProcessed(any())).thenReturn(false);
-        when(billingSubscriptionService.fetchSubscriptionBySubscriptionId(SUBSCRIPTION_ID))
-            .thenReturn(Optional.of(subscription));
-        when(billingSubscriptionService.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
-        when(stripeClient.retrievePrice(any())).thenReturn(priceWithProductUnitLimit(100L));
-
-        String payload = subscriptionUpdatedPayloadWithPeriodRollover(
-            SUBSCRIPTION_ID, 1780272000L, 1782864000L);
-
-        facade.handleWebhookEvent(payload, signPayload(payload, WEBHOOK_SECRET));
-
-        ArgumentCaptor<BillingSubscription> captor = ArgumentCaptor.forClass(BillingSubscription.class);
-
-        verify(billingSubscriptionService).save(captor.capture());
-        assertThat(captor.getValue()
-            .getLastReportedAt()).isNull();
-        assertThat(captor.getValue()
-            .getCurrentPeriodStart()).isEqualTo(Instant.ofEpochSecond(1780272000L));
-        assertThat(captor.getValue()
-            .getCurrentPeriodEnd()).isEqualTo(Instant.ofEpochSecond(1782864000L));
+        assertThatThrownBy(() -> facade.cancelSubscription())
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessage("No active subscription found");
     }
 
     @Test
-    void testHandleSubscriptionUpdatedDoesNotUpdatePlanName() throws Exception {
-        when(billingWebhookEventService.isEventProcessed(any())).thenReturn(false);
-        when(billingSubscriptionService.fetchSubscriptionBySubscriptionId(SUBSCRIPTION_ID))
-            .thenReturn(Optional.of(starterSubscription()));
-        when(billingSubscriptionService.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+    void testReactivateSubscriptionThrowsWhenNoActiveSubscription() {
+        when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.empty());
 
-        String payload = subscriptionUpdatedPayload(SUBSCRIPTION_ID, "GROWTH");
-        facade.handleWebhookEvent(payload, signPayload(payload, WEBHOOK_SECRET));
-
-        ArgumentCaptor<BillingSubscription> captor = ArgumentCaptor.forClass(BillingSubscription.class);
-
-        verify(billingSubscriptionService).save(captor.capture());
-        assertThat(captor.getValue()
-            .getPlanName()).isEqualTo("Starter");
+        assertThatThrownBy(() -> facade.reactivateSubscription())
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessage("No active subscription found");
     }
 
     @Test
-    void testHandleWebhookEventSkipsDuplicateEvent() throws Exception {
-        when(billingWebhookEventService.isEventProcessed(any())).thenReturn(true);
+    void testUpdateSubscriptionThrowsForUnknownPlanName() {
+        when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.of(starterSubscription()));
+        when(stripeClient.retrieveSubscription(any())).thenReturn(mockStripeSubscription);
 
-        String payload = subscriptionUpdatedPayload(SUBSCRIPTION_ID, "STARTER");
-
-        facade.handleWebhookEvent(payload, signPayload(payload, WEBHOOK_SECRET));
-
-        verify(billingSubscriptionService, never()).fetchSubscriptionBySubscriptionId(any());
-        verify(billingSubscriptionService, never()).save(any());
-        verify(billingWebhookEventService, never()).save(any());
-    }
-
-    @Test
-    void testHandleSubscriptionDeletedSetsStatusToCanceled() throws Exception {
-        BillingSubscription subscription = starterSubscription();
-
-        subscription.setSubscriptionId(SUBSCRIPTION_ID);
-
-        when(billingWebhookEventService.isEventProcessed(any())).thenReturn(false);
-        when(billingSubscriptionService.fetchSubscriptionBySubscriptionId(SUBSCRIPTION_ID))
-            .thenReturn(Optional.of(subscription));
-        when(billingSubscriptionService.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
-
-        String payload = subscriptionDeletedPayload(SUBSCRIPTION_ID);
-
-        facade.handleWebhookEvent(payload, signPayload(payload, WEBHOOK_SECRET));
-
-        ArgumentCaptor<BillingSubscription> captor = ArgumentCaptor.forClass(BillingSubscription.class);
-
-        verify(billingSubscriptionService).save(captor.capture());
-        assertThat(captor.getValue()
-            .getStatus()).isEqualTo(BillingSubscription.Status.CANCELED);
-    }
-
-    @Test
-    void testExtractTenantIdThrowsIllegalArgumentExceptionForUnknownEventType() {
-        String payload = unknownEventPayload();
-
-        assertThatThrownBy(() -> facade.extractTenantId(payload))
+        assertThatThrownBy(() -> facade.updateSubscription("ENTERPRISE"))
             .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("Unhandled webhook event type: invoice.payment_succeeded");
-    }
-
-    @Test
-    void testHandleSubscriptionUpdatedSetsStarterPlanName() throws Exception {
-        BillingSubscription subscription = new BillingSubscription();
-
-        subscription.setPlanName("GROWTH");
-        subscription.setStatus(BillingSubscription.Status.ACTIVE);
-        subscription.setSubscriptionId(SUBSCRIPTION_ID);
-
-        when(billingWebhookEventService.isEventProcessed(any())).thenReturn(false);
-        when(billingSubscriptionService.fetchSubscriptionBySubscriptionId(SUBSCRIPTION_ID))
-            .thenReturn(Optional.of(subscription));
-        when(billingSubscriptionService.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
-        when(stripeClient.retrievePrice(any())).thenReturn(priceWithProductUnitLimit(100L));
-
-        String payload = subscriptionUpdatedPayloadWithProduct(SUBSCRIPTION_ID, PRODUCT_STARTER_ID);
-
-        facade.handleWebhookEvent(payload, signPayload(payload, WEBHOOK_SECRET));
-
-        ArgumentCaptor<BillingSubscription> captor = ArgumentCaptor.forClass(BillingSubscription.class);
-
-        verify(billingSubscriptionService).save(captor.capture());
-        assertThat(captor.getValue()
-            .getPlanName()).isEqualTo("STARTER");
-    }
-
-    @Test
-    void testHandleSubscriptionUpdatedSetsGrowthPlanName() throws Exception {
-        BillingSubscription subscription = new BillingSubscription();
-
-        subscription.setPlanName("STARTER");
-        subscription.setStatus(BillingSubscription.Status.ACTIVE);
-        subscription.setSubscriptionId(SUBSCRIPTION_ID);
-
-        when(billingWebhookEventService.isEventProcessed(any())).thenReturn(false);
-        when(billingSubscriptionService.fetchSubscriptionBySubscriptionId(SUBSCRIPTION_ID))
-            .thenReturn(Optional.of(subscription));
-        when(billingSubscriptionService.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
-        when(stripeClient.retrievePrice(any())).thenReturn(priceWithProductUnitLimit(100L));
-
-        String payload = subscriptionUpdatedPayloadWithProduct(SUBSCRIPTION_ID, PRODUCT_GROWTH_ID);
-
-        facade.handleWebhookEvent(payload, signPayload(payload, WEBHOOK_SECRET));
-
-        ArgumentCaptor<BillingSubscription> captor = ArgumentCaptor.forClass(BillingSubscription.class);
-
-        verify(billingSubscriptionService).save(captor.capture());
-        assertThat(captor.getValue()
-            .getPlanName()).isEqualTo("GROWTH");
-    }
-
-    @Test
-    void testHandleSubscriptionUpdatedUpdatesCancelAtPeriodEnd() throws Exception {
-        BillingSubscription subscription = starterSubscription();
-
-        subscription.setSubscriptionId(SUBSCRIPTION_ID);
-
-        when(billingWebhookEventService.isEventProcessed(any())).thenReturn(false);
-        when(billingSubscriptionService.fetchSubscriptionBySubscriptionId(SUBSCRIPTION_ID))
-            .thenReturn(Optional.of(subscription));
-        when(billingSubscriptionService.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
-
-        String payload = subscriptionUpdatedPayloadCancelAtPeriodEnd(SUBSCRIPTION_ID);
-
-        facade.handleWebhookEvent(payload, signPayload(payload, WEBHOOK_SECRET));
-
-        ArgumentCaptor<BillingSubscription> captor = ArgumentCaptor.forClass(BillingSubscription.class);
-
-        verify(billingSubscriptionService).save(captor.capture());
-        assertThat(captor.getValue()
-            .isCancelAtPeriodEnd()).isTrue();
+            .hasMessage("Unknown plan: ENTERPRISE");
     }
 
     private BillingSubscription starterSubscription() {
         BillingSubscription subscription = new BillingSubscription();
 
-        subscription.setPlanName("Starter");
+        subscription.setSubscriptionId("sub_starter");
+        subscription.setProductId("si_flat_starter");
+        subscription.setUsageProductId("si_usage_starter");
+        subscription.setPlanName("STARTER");
         subscription.setStatus(BillingSubscription.Status.ACTIVE);
+        subscription.setCurrentPeriodEnd(Instant.parse("2026-07-01T00:00:00Z"));
 
         return subscription;
     }
 
-    private Price priceWithProductUnitLimit(long upTo) {
-        Price.Tier tier = new Price.Tier();
+    private BillingSubscription growthSubscription() {
+        BillingSubscription subscription = new BillingSubscription();
 
-        tier.setUpTo(upTo);
+        subscription.setSubscriptionId("sub_growth");
+        subscription.setProductId("si_flat_growth");
+        subscription.setUsageProductId("si_usage_growth");
+        subscription.setPlanName("GROWTH");
+        subscription.setStatus(BillingSubscription.Status.ACTIVE);
+        subscription.setCurrentPeriodEnd(Instant.parse("2026-07-01T00:00:00Z"));
 
-        Price price = new Price();
-
-        price.setTiers(List.of(tier));
-
-        return price;
-    }
-
-    @SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
-    private String subscriptionUpdatedPayloadWithPeriodRollover(
-        String subscriptionId, long periodStartEpoch, long periodEndEpoch) {
-
-        return """
-            {
-              "id": "evt_sub_rollover",
-              "object": "event",
-              "api_version": "2026-04-22.dahlia",
-              "type": "customer.subscription.updated",
-              "data": {
-                "object": {
-                  "id": "%s",
-                  "object": "subscription",
-                  "status": "active",
-                  "metadata": { "planName": "Starter", "tenantId": "public" },
-                  "items": {
-                    "object": "list",
-                    "has_more": false,
-                    "url": "/v1/subscription_items",
-                    "data": [
-                      {
-                        "id": "si_flat_item",
-                        "object": "subscription_item",
-                        "current_period_start": %d,
-                        "current_period_end": %d,
-                        "price": {
-                          "id": "price_flat",
-                          "object": "price",
-                          "product": "prod_unknown",
-                          "recurring": {
-                            "interval": "month",
-                            "usage_type": "licensed"
-                          }
-                        }
-                      }
-                    ]
-                  }
-                }
-              }
-            }
-            """.formatted(subscriptionId, periodStartEpoch, periodEndEpoch);
-    }
-
-    @SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
-    private String subscriptionUpdatedPayload(String subscriptionId, String planName) {
-        return """
-            {
-              "id": "evt_sub_updated",
-              "object": "event",
-              "api_version": "2026-04-22.dahlia",
-              "type": "customer.subscription.updated",
-              "data": {
-                "object": {
-                  "id": "%s",
-                  "object": "subscription",
-                  "status": "active",
-                  "metadata": { "planName": "%s", "tenantId": "public" },
-                  "items": { "object": "list", "data": [], "has_more": false, "url": "/v1/subscription_items" }
-                }
-              }
-            }
-            """.formatted(subscriptionId, planName);
-    }
-
-    @SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
-    private String subscriptionDeletedPayload(String subscriptionId) {
-        return """
-            {
-              "id": "evt_sub_deleted",
-              "object": "event",
-              "api_version": "2026-04-22.dahlia",
-              "type": "customer.subscription.deleted",
-              "data": {
-                "object": {
-                  "id": "%s",
-                  "object": "subscription",
-                  "status": "canceled",
-                  "metadata": { "tenantId": "public" },
-                  "items": {
-                    "object": "list",
-                    "data": [],
-                    "has_more": false,
-                    "url": "/v1/subscription_items"
-                  }
-                }
-              }
-            }
-            """.formatted(subscriptionId);
-    }
-
-    @SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
-    private String checkoutSessionCompletedPayload(String clientReferenceId) {
-        return """
-            {
-              "id": "evt_checkout_completed",
-              "object": "event",
-              "api_version": "2026-04-22.dahlia",
-              "type": "checkout.session.completed",
-              "data": {
-                "object": {
-                  "id": "cs_test_checkout",
-                  "object": "checkout.session",
-                  "client_reference_id": "%s",
-                  "customer": "cus_checkout",
-                  "subscription": "sub_checkout_test",
-                  "metadata": { "planName": "STARTER" }
-                }
-              }
-            }
-            """.formatted(clientReferenceId);
-    }
-
-    private String unknownEventPayload() {
-        return """
-            {
-              "id": "evt_invoice_paid",
-              "object": "event",
-              "api_version": "2026-04-22.dahlia",
-              "type": "invoice.payment_succeeded",
-              "data": {
-                "object": {
-                  "id": "in_test123",
-                  "object": "invoice"
-                }
-              }
-            }
-            """;
-    }
-
-    @SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
-    private String subscriptionUpdatedPayloadWithProduct(String subscriptionId, String productId) {
-        return """
-            {
-              "id": "evt_sub_updated_product",
-              "object": "event",
-              "api_version": "2026-04-22.dahlia",
-              "type": "customer.subscription.updated",
-              "data": {
-                "object": {
-                  "id": "%s",
-                  "object": "subscription",
-                  "status": "active",
-                  "cancel_at_period_end": false,
-                  "metadata": { "tenantId": "public" },
-                  "items": {
-                    "object": "list",
-                    "has_more": false,
-                    "url": "/v1/subscription_items",
-                    "data": [
-                      {
-                        "id": "si_flat_item",
-                        "object": "subscription_item",
-                        "current_period_start": 1780272000,
-                        "current_period_end": 1782864000,
-                        "price": {
-                          "id": "price_flat",
-                          "object": "price",
-                          "product": "%s",
-                          "recurring": {
-                            "interval": "month",
-                            "usage_type": "licensed"
-                          }
-                        }
-                      }
-                    ]
-                  }
-                }
-              }
-            }
-            """.formatted(subscriptionId, productId);
-    }
-
-    @SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
-    private String subscriptionUpdatedPayloadCancelAtPeriodEnd(String subscriptionId) {
-        return """
-            {
-              "id": "evt_sub_cancel_at_period_end",
-              "object": "event",
-              "api_version": "2026-04-22.dahlia",
-              "type": "customer.subscription.updated",
-              "data": {
-                "object": {
-                  "id": "%s",
-                  "object": "subscription",
-                  "status": "active",
-                  "cancel_at_period_end": true,
-                  "metadata": { "tenantId": "public" },
-                  "items": {
-                    "object": "list",
-                    "data": [],
-                    "has_more": false,
-                    "url": "/v1/subscription_items"
-                  }
-                }
-              }
-            }
-            """.formatted(subscriptionId);
-    }
-
-    private String signPayload(String payload, String secret) throws Exception {
-        long timestamp = Instant.now()
-            .getEpochSecond();
-        String signedPayload = timestamp + "." + payload;
-
-        Mac mac = Mac.getInstance("HmacSHA256");
-
-        mac.init(new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "HmacSHA256"));
-
-        String signature = HexFormat.of()
-            .formatHex(mac.doFinal(signedPayload.getBytes(StandardCharsets.UTF_8)));
-
-        return "t=" + timestamp + ",v1=" + signature;
+        return subscription;
     }
 }
