@@ -35,7 +35,7 @@ public interface BillingMapper extends Converter<BillingSubscriptionDTO, Billing
     @Mapping(source = "subscription.productUnitLimit", target = "productUnitLimit")
     @Mapping(source = "subscription.currentPeriodEnd", target = "currentPeriodEnd")
     @Mapping(source = "subscription.cancelAtPeriodEnd", target = "cancelAtPeriodEnd")
-    @Mapping(source = "subscription.scheduledPlanName", target = "scheduledPlanName")
+    @Mapping(source = "scheduledPlanName", target = "scheduledPlanName")
     @Mapping(source = "tasksUsed", target = "tasksUsed")
     BillingSubscriptionModel convert(BillingSubscriptionDTO dto);
 }

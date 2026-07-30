@@ -220,6 +220,36 @@ public class StripeClientImpl implements StripeClient {
     }
 
     @Override
+    public Optional<String> fetchScheduledPlanName(String subscriptionId) {
+        try {
+            if(subscriptionId == null) {
+                return Optional.empty();
+            }
+
+            Subscription subscription = Subscription.retrieve(subscriptionId);
+
+            String scheduleId = subscription.getSchedule();
+
+            if (scheduleId == null || scheduleId.isBlank()) {
+                return Optional.empty();
+            }
+
+            SubscriptionSchedule schedule = SubscriptionSchedule.retrieve(scheduleId);
+
+            if (!"active".equals(schedule.getStatus()) && !"not_started".equals(schedule.getStatus())) {
+                return Optional.empty();
+            }
+
+            return Optional.ofNullable(schedule.getMetadata()
+                .get("planName"));
+        } catch (StripeException stripeException) {
+            log.error("Failed to fetch scheduled plan name for subscription " + subscriptionId, stripeException);
+
+            return Optional.empty();
+        }
+    }
+
+    @Override
     public Optional<String> fetchCustomerId(String email, String tenantId) {
         try {
             CustomerListParams params = CustomerListParams.builder()

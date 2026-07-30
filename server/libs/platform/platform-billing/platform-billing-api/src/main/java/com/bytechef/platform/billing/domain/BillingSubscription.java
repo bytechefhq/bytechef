@@ -66,9 +66,6 @@ public class BillingSubscription {
     @Column("plan_name")
     private String planName;
 
-    @Column("scheduled_plan_name")
-    private String scheduledPlanName;
-
     @Column
     private String status;
 
@@ -132,10 +129,6 @@ public class BillingSubscription {
         return planName;
     }
 
-    public String getScheduledPlanName() {
-        return scheduledPlanName;
-    }
-
     public Status getStatus() {
         return Status.valueOf(status);
     }
@@ -186,10 +179,6 @@ public class BillingSubscription {
 
     public void setPlanName(String planName) {
         this.planName = planName;
-    }
-
-    public void setScheduledPlanName(String scheduledPlanName) {
-        this.scheduledPlanName = scheduledPlanName;
     }
 
     public void setStatus(Status status) {

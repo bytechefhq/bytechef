@@ -19,7 +19,6 @@
                 <constraints nullable="false"/>
             </column>
             <column name="plan_name" type="VARCHAR(50)"/>
-            <column name="scheduled_plan_name" type="VARCHAR(50)"/>
             <column name="product_unit_limit" type="INTEGER">
                 <constraints nullable="false"/>
             </column>
