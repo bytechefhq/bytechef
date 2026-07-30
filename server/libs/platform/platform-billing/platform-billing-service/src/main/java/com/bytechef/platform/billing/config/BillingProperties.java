@@ -21,7 +21,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 /**
  * @author Matija Petanjek
  */
-@ConfigurationProperties("bytechef.billing")
+@ConfigurationProperties("billing")
 public record BillingProperties(Stripe stripe) {
 
     public record Stripe(
