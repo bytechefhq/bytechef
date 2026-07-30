@@ -19,30 +19,19 @@ package com.bytechef.platform.billing.facade;
 import com.bytechef.platform.billing.client.StripeClient;
 import com.bytechef.platform.billing.config.BillingProperties;
 import com.bytechef.platform.billing.domain.BillingSubscription;
-import com.bytechef.platform.billing.domain.BillingSubscriptionWebhookEvent;
 import com.bytechef.platform.billing.dto.BillingSubscriptionDTO;
 import com.bytechef.platform.billing.service.BillingSubscriptionService;
 import com.bytechef.platform.billing.service.BillingUsageService;
-import com.bytechef.platform.billing.service.BillingWebhookEventService;
 import com.bytechef.tenant.TenantContext;
-import com.stripe.model.Event;
-import com.stripe.model.Price;
 import com.stripe.model.Subscription;
-import com.stripe.model.SubscriptionItem;
 import com.stripe.model.checkout.Session;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Matija Petanjek
@@ -55,8 +44,6 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
     private final BillingProperties billingProperties;
     private final BillingSubscriptionService billingSubscriptionService;
     private final BillingUsageService billingUsageService;
-    private final BillingWebhookEventService billingWebhookEventService;
-    private final ObjectMapper objectMapper;
     private final StripeClient stripeClient;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
@@ -64,15 +51,11 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
         BillingProperties billingProperties,
         BillingSubscriptionService billingSubscriptionService,
         BillingUsageService billingUsageService,
-        BillingWebhookEventService billingWebhookEventService,
-        ObjectMapper objectMapper,
         StripeClient stripeClient) {
 
         this.billingProperties = billingProperties;
         this.billingSubscriptionService = billingSubscriptionService;
         this.billingUsageService = billingUsageService;
-        this.billingWebhookEventService = billingWebhookEventService;
-        this.objectMapper = objectMapper;
         this.stripeClient = stripeClient;
     }
 
@@ -116,55 +99,6 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
 
                 return stripeClient.createCustomer(userEmail, tenantId);
             });
-    }
-
-    @Override
-    public void verifyWebhookSignature(String payload, String stripeSignatureHeader) {
-        stripeClient.verifyWebhookSignature(payload, stripeSignatureHeader);
-    }
-
-    @Override
-    public String extractTenantId(String payload) {
-        String eventType = objectMapper.readTree(payload)
-            .path("type")
-            .textValue();
-
-        return extractTenantId(payload, eventType);
-    }
-
-    @Override
-    @Transactional
-    public void handleWebhookEvent(String payload, String stripeSignatureHeader) {
-        Event event = stripeClient.verifyWebhookSignature(payload, stripeSignatureHeader);
-
-        if (billingWebhookEventService.isEventProcessed(event.getId())) {
-            log.info("Ignoring already processed webhook event: {}", event.getId());
-
-            return;
-        }
-
-        log.info("Processing webhook event: {}", event);
-
-        BillingSubscription savedSubscription = null;
-
-        if ("checkout.session.completed".equals(event.getType())) {
-            savedSubscription = handleCheckoutSessionCompleted(event);
-        } else if ("customer.subscription.updated".equals(event.getType())) {
-            savedSubscription = handleSubscriptionUpdated(event);
-        } else if ("customer.subscription.deleted".equals(event.getType())) {
-            savedSubscription = handleSubscriptionDeleted(event);
-        }
-
-        BillingSubscriptionWebhookEvent webhookEvent = new BillingSubscriptionWebhookEvent();
-
-        webhookEvent.setEventId(event.getId());
-        webhookEvent.setEventType(event.getType());
-
-        if (savedSubscription != null) {
-            webhookEvent.setSubscriptionId(savedSubscription.getId());
-        }
-
-        billingWebhookEventService.save(webhookEvent);
     }
 
     @Override
@@ -234,131 +168,6 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
         return 0;
     }
 
-    private String extractTenantId(String payload, String eventType) {
-        JsonNode dataObject = objectMapper.readTree(payload)
-            .path("data")
-            .path("object");
-
-        if ("checkout.session.completed".equals(eventType)) {
-            String clientReferenceId = dataObject.path("client_reference_id")
-                .textValue();
-
-            if (clientReferenceId == null) {
-                throw new IllegalStateException(
-                    "Missing client_reference_id in checkout.session.completed webhook event");
-            }
-
-            return clientReferenceId;
-        }
-
-        if ("customer.subscription.updated".equals(eventType) ||
-            "customer.subscription.deleted".equals(eventType)) {
-
-            String tenantId = dataObject.path("metadata")
-                .path("tenantId")
-                .textValue();
-
-            if (tenantId == null) {
-                throw new IllegalStateException(
-                    "Missing tenantId metadata in " + eventType + " webhook event");
-            }
-
-            return tenantId;
-        }
-
-        throw new IllegalArgumentException("Unhandled webhook event type: " + eventType);
-    }
-
-    private BillingSubscription handleSubscriptionUpdated(Event event) {
-        Subscription stripeSubscription = (Subscription) event.getDataObjectDeserializer()
-            .getObject()
-            .orElseThrow(() -> new RuntimeException("Failed to deserialize subscription"));
-
-        return billingSubscriptionService.fetchSubscriptionBySubscriptionId(stripeSubscription.getId())
-            .map(subscription -> {
-                subscription.setStatus(
-                    BillingSubscription.Status.fromProviderStatus(stripeSubscription.getStatus()));
-
-                subscription.setCancelAtPeriodEnd(Boolean.TRUE.equals(stripeSubscription.getCancelAtPeriodEnd()));
-
-                List<SubscriptionItem> items = stripeSubscription.getItems()
-                    .getData();
-
-                items.stream()
-                    .filter(item -> !isMeteredItem(item))
-                    .findFirst()
-                    .ifPresent(flatItem -> {
-                        subscription.setProductId(flatItem.getId());
-
-                        String productId = flatItem.getPrice()
-                            .getProduct();
-                        String newPlanName = null;
-
-                        if (billingProperties.stripe()
-                            .productStarterId()
-                            .equals(productId)) {
-                            newPlanName = "STARTER";
-                        } else if (billingProperties.stripe()
-                            .productGrowthId()
-                            .equals(productId)) {
-                            newPlanName = "GROWTH";
-                        }
-
-                        if (newPlanName != null) {
-                            subscription.setPlanName(newPlanName);
-                        }
-
-                        Instant newPeriodStart = Instant.ofEpochSecond(flatItem.getCurrentPeriodStart());
-
-                        if (!newPeriodStart.equals(subscription.getCurrentPeriodStart())) {
-                            subscription.setProductUnitLimit(getProductUnitLimit(flatItem));
-                            subscription.setCurrentPeriodStart(newPeriodStart);
-                            subscription.setCurrentPeriodEnd(
-                                Instant.ofEpochSecond(flatItem.getCurrentPeriodEnd()));
-                            subscription.setLastReportedAt(null);
-                        }
-                    });
-
-                items.stream()
-                    .filter(this::isMeteredItem)
-                    .findFirst()
-                    .ifPresent(usageItem -> subscription.setUsageProductId(usageItem.getId()));
-
-                return billingSubscriptionService.save(subscription);
-            })
-            .orElse(null);
-    }
-
-    private boolean isMeteredItem(SubscriptionItem item) {
-        Price price = item.getPrice();
-
-        if (price == null) {
-            return false;
-        }
-
-        Price.Recurring recurring = price.getRecurring();
-
-        if (recurring == null) {
-            return false;
-        }
-
-        return "metered".equals(recurring.getUsageType()) || recurring.getMeter() != null;
-    }
-
-    private BillingSubscription handleSubscriptionDeleted(Event event) {
-        Subscription stripeSubscription = (Subscription) event.getDataObjectDeserializer()
-            .getObject()
-            .orElseThrow(() -> new RuntimeException("Failed to deserialize subscription"));
-
-        return billingSubscriptionService.fetchSubscriptionBySubscriptionId(stripeSubscription.getId())
-            .map(subscription -> {
-                subscription.setStatus(BillingSubscription.Status.CANCELED);
-
-                return billingSubscriptionService.save(subscription);
-            })
-            .orElse(null);
-    }
-
     private String resolveFlatProductId(String planName) {
         if ("STARTER".equalsIgnoreCase(planName)) {
             return billingProperties.stripe()
@@ -369,69 +178,5 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
         }
 
         throw new IllegalArgumentException("Unknown plan: " + planName);
-    }
-
-    private BillingSubscription handleCheckoutSessionCompleted(Event event) {
-        cancelTrialSubscription();
-
-        Session session = (Session) event.getDataObjectDeserializer()
-            .getObject()
-            .orElseThrow(() -> new RuntimeException("Failed to deserialize checkout session"));
-
-        Subscription stripeSubscription = stripeClient.retrieveSubscription(session.getSubscription());
-
-        List<SubscriptionItem> subscriptionItems = stripeSubscription.getItems()
-            .getData();
-
-        SubscriptionItem flatItem = subscriptionItems.stream()
-            .filter(item -> !isMeteredItem(item))
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException("No flat subscription item found"));
-
-        SubscriptionItem usageItem = subscriptionItems.stream()
-            .filter(this::isMeteredItem)
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException("No metered subscription item found"));
-
-        Map<String, String> metadata = session.getMetadata();
-
-        String planName = metadata != null ? metadata.getOrDefault("planName", "Starter") : "Starter";
-
-        BillingSubscription billingSubscription = new BillingSubscription();
-
-        billingSubscription.setCustomerId(session.getCustomer());
-        billingSubscription.setSubscriptionId(stripeSubscription.getId());
-        billingSubscription.setProductId(flatItem.getId());
-        billingSubscription.setUsageProductId(usageItem.getId());
-        billingSubscription.setPlanName(planName);
-        billingSubscription.setStatus(
-            BillingSubscription.Status.fromProviderStatus(stripeSubscription.getStatus()));
-        billingSubscription.setProductUnitLimit(getProductUnitLimit(usageItem));
-        billingSubscription.setCurrentPeriodStart(Instant.ofEpochSecond(flatItem.getCurrentPeriodStart()));
-        billingSubscription.setCurrentPeriodEnd(Instant.ofEpochSecond(flatItem.getCurrentPeriodEnd()));
-        billingSubscription.setCancelAtPeriodEnd(stripeSubscription.getCancelAtPeriodEnd());
-
-        return billingSubscriptionService.save(billingSubscription);
-    }
-
-    private void cancelTrialSubscription() {
-        billingSubscriptionService.fetchCurrentSubscription()
-            .filter(subscription -> "TRIAL".equals(subscription.getPlanName()))
-            .filter(subscription -> subscription.getStatus() != BillingSubscription.Status.CANCELED)
-            .ifPresent(trialSubscription -> {
-                trialSubscription.setStatus(BillingSubscription.Status.CANCELED);
-
-                billingSubscriptionService.save(trialSubscription);
-            });
-    }
-
-    private int getProductUnitLimit(SubscriptionItem usageItem) {
-        Price usagePrice = stripeClient.retrievePrice(usageItem.getPrice()
-            .getId());
-
-        return usagePrice.getTiers()
-            .getFirst()
-            .getUpTo()
-            .intValue();
     }
 }
