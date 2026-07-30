@@ -34,7 +34,7 @@ import org.springframework.stereotype.Component;
  * @author Matija Petanjek
  */
 @Component
-@ConditionalOnProperty(prefix = "bytechef.billing", name = "enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "billing", name = "enabled", havingValue = "true")
 public class TrialFilterSecurityConfigurerContributor implements SecurityConfigurerContributor {
 
     private final TrialService trialService;
