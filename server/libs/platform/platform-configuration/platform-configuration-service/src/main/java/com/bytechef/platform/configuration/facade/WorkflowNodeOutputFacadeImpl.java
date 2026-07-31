@@ -269,6 +269,58 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             .anyMatch(workflowTask -> Objects.equals(workflowTask.getName(), workflowNodeName));
     }
 
+    /**
+     * Returns the immediate child tasks a dispatcher task can autocomplete against, so
+     * {@link #containsWorkflowTask(List, String)} can decide whether the node currently being resolved is nested inside
+     * this dispatcher (self-reference) or a sibling of it.
+     */
+    private static List<WorkflowTask> getChildWorkflowTasks(
+        WorkflowTask workflowTask, WorkflowNodeType workflowNodeType) {
+
+        if (Objects.equals(workflowNodeType.name(), "each")) {
+            Map<String, ?> iterateeMap = MapUtils.getMap(workflowTask.getParameters(), "iteratee", Map.of());
+
+            return iterateeMap.isEmpty() ? List.of() : List.of(new WorkflowTask(iterateeMap));
+        } else if (Objects.equals(workflowNodeType.name(), "condition")) {
+            List<WorkflowTask> childWorkflowTasks = new ArrayList<>();
+
+            childWorkflowTasks.addAll(getWorkflowTaskList(workflowTask.getParameters(), "caseTrue"));
+            childWorkflowTasks.addAll(getWorkflowTaskList(workflowTask.getParameters(), "caseFalse"));
+
+            return childWorkflowTasks;
+        } else if (Objects.equals(workflowNodeType.name(), "branch")) {
+            List<WorkflowTask> childWorkflowTasks = new ArrayList<>();
+
+            List<Map<String, ?>> cases = MapUtils.getList(
+                workflowTask.getParameters(), "cases", new TypeReference<Map<String, ?>>() {}, List.of());
+
+            for (Map<String, ?> branchCase : cases) {
+                childWorkflowTasks.addAll(getWorkflowTaskList(branchCase, "tasks"));
+            }
+
+            childWorkflowTasks.addAll(getWorkflowTaskList(workflowTask.getParameters(), "default"));
+
+            return childWorkflowTasks;
+        } else if (Objects.equals(workflowNodeType.name(), "fork-join")) {
+            List<List<Map<String, ?>>> branches = MapUtils.getList(
+                workflowTask.getParameters(), "branches", new TypeReference<>() {}, List.of());
+
+            return branches.stream()
+                .flatMap(List::stream)
+                .map(WorkflowTask::new)
+                .toList();
+        } else {
+            return getWorkflowTaskList(workflowTask.getParameters(), "iteratee");
+        }
+    }
+
+    private static List<WorkflowTask> getWorkflowTaskList(Map<String, ?> parameters, String key) {
+        return MapUtils.getList(parameters, key, new TypeReference<Map<String, ?>>() {}, List.of())
+            .stream()
+            .map(WorkflowTask::new)
+            .toList();
+    }
+
     private List<WorkflowNodeOutputDTO> doGetPreviousWorkflowNodeOutputs(
         String workflowId, String lastWorkflowNodeName, long environmentId,
         Map<String, Map<String, ?>> sampleOutputsCache) {
@@ -297,22 +349,12 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
             if (Objects.equals(workflowNodeType.name(), "loop") || Objects.equals(workflowNodeType.name(), "each") ||
-                Objects.equals(workflowNodeType.name(), "map")) {
+                Objects.equals(workflowNodeType.name(), "map") ||
+                Objects.equals(workflowNodeType.name(), "condition") ||
+                Objects.equals(workflowNodeType.name(), "branch") ||
+                Objects.equals(workflowNodeType.name(), "fork-join")) {
 
-                List<WorkflowTask> childWorkflowTasks;
-
-                if (Objects.equals(workflowNodeType.name(), "each")) {
-                    Map<String, ?> iterateeMap = MapUtils.getMap(workflowTask.getParameters(), "iteratee", Map.of());
-
-                    childWorkflowTasks = iterateeMap.isEmpty() ? List.of() : List.of(new WorkflowTask(iterateeMap));
-                } else {
-                    childWorkflowTasks = MapUtils
-                        .getList(
-                            workflowTask.getParameters(), "iteratee", new TypeReference<Map<String, ?>>() {}, List.of())
-                        .stream()
-                        .map(WorkflowTask::new)
-                        .toList();
-                }
+                List<WorkflowTask> childWorkflowTasks = getChildWorkflowTasks(workflowTask, workflowNodeType);
 
                 if (containsWorkflowTask(childWorkflowTasks, lastWorkflowNodeName)) {
                     workflowNodeOutputDTOs.add(

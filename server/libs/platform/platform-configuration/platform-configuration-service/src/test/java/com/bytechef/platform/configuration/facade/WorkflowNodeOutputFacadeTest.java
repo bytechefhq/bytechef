@@ -18,6 +18,7 @@ package com.bytechef.platform.configuration.facade;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -27,6 +28,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -222,6 +224,171 @@ class WorkflowNodeOutputFacadeTest {
             assertNotNull(result.getFirst()
                 .taskDispatcherDefinition());
         }
+    }
+
+    @Test
+    void testGetPreviousWorkflowNodeOutputsExcludesBranchAggregateOutputForNestedTask() {
+        WorkflowTask branchTask = new WorkflowTask(
+            Map.of(
+                "name", "branch1", "type", "branch/v1", "parameters",
+                Map.of(
+                    "cases", List.of(
+                        Map.of(
+                            "key", "k1",
+                            "tasks", List.of(Map.of("name", "nested1", "type", "component/v1/action1")))),
+                    "default", List.of())));
+
+        Workflow workflow = mock(Workflow.class);
+
+        when(workflowService.getWorkflow(WORKFLOW_ID)).thenReturn(workflow);
+        when(workflow.getTasks(eq("nested1"))).thenReturn(List.of(branchTask));
+        when(workflow.getTasks(eq("branch1"))).thenReturn(List.of());
+
+        TaskDispatcherDefinition taskDispatcherDefinition = mock(TaskDispatcherDefinition.class);
+
+        when(workflowNodeTestOutputService.fetchWorkflowTestNodeOutput(WORKFLOW_ID, "branch1", ENVIRONMENT_ID))
+            .thenReturn(Optional.empty());
+        when(taskDispatcherDefinitionService.getTaskDispatcherDefinition("branch", 1))
+            .thenReturn(taskDispatcherDefinition);
+        when(taskDispatcherDefinitionService.isDynamicOutputDefined("branch", 1)).thenReturn(true);
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(WORKFLOW_ID, ENVIRONMENT_ID))
+            .thenReturn(Map.of());
+        when(evaluator.evaluate(any(), any(), anyBoolean()))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+
+        OutputResponse variableOutputResponse = new OutputResponse(null, Map.of("item", "value"), null);
+
+        when(taskDispatcherDefinitionService.executeVariableProperties(eq("branch"), eq(1), any()))
+            .thenReturn(variableOutputResponse);
+
+        try (MockedStatic<WorkflowTrigger> workflowTriggerStatic = mockStatic(WorkflowTrigger.class)) {
+            workflowTriggerStatic.when(() -> WorkflowTrigger.of(workflow))
+                .thenReturn(List.of());
+
+            List<WorkflowNodeOutputDTO> result = workflowNodeOutputFacade.getPreviousWorkflowNodeOutputs(
+                WORKFLOW_ID, "nested1", ENVIRONMENT_ID);
+
+            assertEquals(1, result.size());
+            assertEquals("branch1", result.getFirst()
+                .workflowNodeName());
+            assertEquals(variableOutputResponse, result.getFirst()
+                .variableOutputResponse());
+            assertNull(result.getFirst()
+                .outputResponse());
+        }
+
+        // A task nested inside a branch case must not see the enclosing branch's own aggregate output, since
+        // the branch has not completed from that nested task's vantage point.
+        verify(taskDispatcherDefinitionService, never()).executeOutput(eq("branch"), eq(1), any());
+        verify(taskDispatcherDefinitionService, times(1)).executeVariableProperties(eq("branch"), eq(1), any());
+    }
+
+    @Test
+    void testGetPreviousWorkflowNodeOutputsExcludesConditionAggregateOutputForNestedTask() {
+        WorkflowTask conditionTask = new WorkflowTask(
+            Map.of(
+                "name", "condition1", "type", "condition/v1", "parameters",
+                Map.of(
+                    "caseTrue", List.of(Map.of("name", "nested1", "type", "component/v1/action1")),
+                    "caseFalse", List.of())));
+
+        Workflow workflow = mock(Workflow.class);
+
+        when(workflowService.getWorkflow(WORKFLOW_ID)).thenReturn(workflow);
+        when(workflow.getTasks(eq("nested1"))).thenReturn(List.of(conditionTask));
+        when(workflow.getTasks(eq("condition1"))).thenReturn(List.of());
+
+        TaskDispatcherDefinition taskDispatcherDefinition = mock(TaskDispatcherDefinition.class);
+
+        when(workflowNodeTestOutputService.fetchWorkflowTestNodeOutput(WORKFLOW_ID, "condition1", ENVIRONMENT_ID))
+            .thenReturn(Optional.empty());
+        when(taskDispatcherDefinitionService.getTaskDispatcherDefinition("condition", 1))
+            .thenReturn(taskDispatcherDefinition);
+        when(taskDispatcherDefinitionService.isDynamicOutputDefined("condition", 1)).thenReturn(true);
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(WORKFLOW_ID, ENVIRONMENT_ID))
+            .thenReturn(Map.of());
+        when(evaluator.evaluate(any(), any(), anyBoolean()))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+
+        OutputResponse variableOutputResponse = new OutputResponse(null, Map.of("item", "value"), null);
+
+        when(taskDispatcherDefinitionService.executeVariableProperties(eq("condition"), eq(1), any()))
+            .thenReturn(variableOutputResponse);
+
+        try (MockedStatic<WorkflowTrigger> workflowTriggerStatic = mockStatic(WorkflowTrigger.class)) {
+            workflowTriggerStatic.when(() -> WorkflowTrigger.of(workflow))
+                .thenReturn(List.of());
+
+            List<WorkflowNodeOutputDTO> result = workflowNodeOutputFacade.getPreviousWorkflowNodeOutputs(
+                WORKFLOW_ID, "nested1", ENVIRONMENT_ID);
+
+            assertEquals(1, result.size());
+            assertEquals("condition1", result.getFirst()
+                .workflowNodeName());
+            assertEquals(variableOutputResponse, result.getFirst()
+                .variableOutputResponse());
+            assertNull(result.getFirst()
+                .outputResponse());
+        }
+
+        // A task nested inside a condition case must not see the enclosing condition's own aggregate output, since
+        // the condition has not completed from that nested task's vantage point.
+        verify(taskDispatcherDefinitionService, never()).executeOutput(eq("condition"), eq(1), any());
+        verify(taskDispatcherDefinitionService, times(1)).executeVariableProperties(eq("condition"), eq(1), any());
+    }
+
+    @Test
+    void testGetPreviousWorkflowNodeOutputsExcludesForkJoinAggregateOutputForNestedTask() {
+        WorkflowTask forkJoinTask = new WorkflowTask(
+            Map.of(
+                "name", "forkJoin1", "type", "fork-join/v1", "parameters",
+                Map.of(
+                    "branches", List.of(
+                        List.of(Map.of("name", "nested1", "type", "component/v1/action1"))))));
+
+        Workflow workflow = mock(Workflow.class);
+
+        when(workflowService.getWorkflow(WORKFLOW_ID)).thenReturn(workflow);
+        when(workflow.getTasks(eq("nested1"))).thenReturn(List.of(forkJoinTask));
+        when(workflow.getTasks(eq("forkJoin1"))).thenReturn(List.of());
+
+        TaskDispatcherDefinition taskDispatcherDefinition = mock(TaskDispatcherDefinition.class);
+
+        when(workflowNodeTestOutputService.fetchWorkflowTestNodeOutput(WORKFLOW_ID, "forkJoin1", ENVIRONMENT_ID))
+            .thenReturn(Optional.empty());
+        when(taskDispatcherDefinitionService.getTaskDispatcherDefinition("fork-join", 1))
+            .thenReturn(taskDispatcherDefinition);
+        when(taskDispatcherDefinitionService.isDynamicOutputDefined("fork-join", 1)).thenReturn(true);
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(WORKFLOW_ID, ENVIRONMENT_ID))
+            .thenReturn(Map.of());
+        when(evaluator.evaluate(any(), any(), anyBoolean()))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+
+        OutputResponse variableOutputResponse = new OutputResponse(null, Map.of("item", "value"), null);
+
+        when(taskDispatcherDefinitionService.executeVariableProperties(eq("fork-join"), eq(1), any()))
+            .thenReturn(variableOutputResponse);
+
+        try (MockedStatic<WorkflowTrigger> workflowTriggerStatic = mockStatic(WorkflowTrigger.class)) {
+            workflowTriggerStatic.when(() -> WorkflowTrigger.of(workflow))
+                .thenReturn(List.of());
+
+            List<WorkflowNodeOutputDTO> result = workflowNodeOutputFacade.getPreviousWorkflowNodeOutputs(
+                WORKFLOW_ID, "nested1", ENVIRONMENT_ID);
+
+            assertEquals(1, result.size());
+            assertEquals("forkJoin1", result.getFirst()
+                .workflowNodeName());
+            assertEquals(variableOutputResponse, result.getFirst()
+                .variableOutputResponse());
+            assertNull(result.getFirst()
+                .outputResponse());
+        }
+
+        // A task nested inside a fork-join branch must not see the enclosing fork-join's own aggregate output, since
+        // the fork-join has not completed from that nested task's vantage point.
+        verify(taskDispatcherDefinitionService, never()).executeOutput(eq("fork-join"), eq(1), any());
+        verify(taskDispatcherDefinitionService, times(1)).executeVariableProperties(eq("fork-join"), eq(1), any());
     }
 
     @Test
