@@ -13,14 +13,16 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.automation.ai.gateway.service.AiGatewayProjectSettingsService;
-import com.bytechef.ee.automation.ai.gateway.service.AiGatewayWorkspaceSettingsService;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayProjectSettings;
-import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayWorkspaceSettings;
 import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayChatCompletionRequest;
 import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayChatCompletionResponse;
 import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayChatMessage;
 import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayChatRole;
 import com.bytechef.ee.platform.ai.gateway.exception.AiGatewayGuardrailException;
+import com.bytechef.ee.platform.ai.guardrails.AiGuardrailMetrics;
+import com.bytechef.ee.platform.ai.guardrails.AiGuardrails;
+import com.bytechef.ee.platform.ai.guardrails.domain.AiGuardrailsWorkspaceSettings;
+import com.bytechef.ee.platform.ai.guardrails.service.AiGuardrailsWorkspaceSettingsService;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.util.List;
 import java.util.Optional;
@@ -33,11 +35,12 @@ import org.junit.jupiter.api.Test;
  */
 class AiGatewayGuardrailsTest {
 
-    private final AiGatewayWorkspaceSettingsService settingsService = mock(AiGatewayWorkspaceSettingsService.class);
+    private final AiGuardrailsWorkspaceSettingsService settingsService =
+        mock(AiGuardrailsWorkspaceSettingsService.class);
     private final AiGatewayProjectSettingsService projectSettingsService =
         mock(AiGatewayProjectSettingsService.class);
     private final SimpleMeterRegistry meterRegistry = new SimpleMeterRegistry();
-    private final AiGatewayGuardrailMetrics metrics = new AiGatewayGuardrailMetrics(meterRegistry);
+    private final AiGuardrailMetrics metrics = new AiGuardrailMetrics(meterRegistry, "gateway");
 
     @Test
     void testRedactPiiReplacesCommonPatterns() {
@@ -118,7 +121,7 @@ class AiGatewayGuardrailsTest {
     void testApplyRedactsSecretsWhenWorkspaceSettingEnablesIt() {
         AiGatewayGuardrails guardrails = guardrails(null, null, false, false, "", false, false, false);
 
-        when(settingsService.findByWorkspaceId(7L))
+        when(settingsService.fetchSettings(7L))
             .thenReturn(Optional.of(settings(null, null, null, true, null, null)));
 
         AiGatewayChatCompletionRequest result =
@@ -133,7 +136,7 @@ class AiGatewayGuardrailsTest {
     void testApplyRedactsWhenWorkspaceSettingEnablesIt() {
         AiGatewayGuardrails guardrails = guardrails(null, null, false, false, "", false, false, false);
 
-        when(settingsService.findByWorkspaceId(7L))
+        when(settingsService.fetchSettings(7L))
             .thenReturn(Optional.of(settings(true, null, null, null, null, null)));
 
         AiGatewayChatCompletionRequest result = guardrails.apply(requestOf("Contact bob@acme.io"), 7L);
@@ -156,7 +159,7 @@ class AiGatewayGuardrailsTest {
     void testApplyRejectsWorkspaceBlockedTerm() {
         AiGatewayGuardrails guardrails = guardrails(null, null, false, false, "", false, false, false);
 
-        when(settingsService.findByWorkspaceId(7L))
+        when(settingsService.fetchSettings(7L))
             .thenReturn(Optional.of(settings(null, "classified", null, null, null, null)));
 
         assertThatExceptionOfType(AiGatewayGuardrailException.class).isThrownBy(
@@ -167,7 +170,7 @@ class AiGatewayGuardrailsTest {
     void testApplyRejectsContentFlaggedByModeration() {
         AiGatewayGuardrails guardrails = guardrails(content -> true, null, false, false, "", false, false, false);
 
-        when(settingsService.findByWorkspaceId(7L))
+        when(settingsService.fetchSettings(7L))
             .thenReturn(Optional.of(settings(null, null, true, null, null, null)));
 
         assertThatExceptionOfType(AiGatewayGuardrailException.class).isThrownBy(
@@ -186,7 +189,7 @@ class AiGatewayGuardrailsTest {
     void testApplyRejectsInjectionWhenWorkspaceSettingEnablesIt() {
         AiGatewayGuardrails guardrails = guardrails(null, content -> true, false, false, "", false, false, false);
 
-        when(settingsService.findByWorkspaceId(7L))
+        when(settingsService.fetchSettings(7L))
             .thenReturn(Optional.of(settings(null, null, null, null, true, null)));
 
         assertThatExceptionOfType(AiGatewayGuardrailException.class).isThrownBy(
@@ -242,7 +245,7 @@ class AiGatewayGuardrailsTest {
     void testRedactResponseScansWhenWorkspaceSettingEnablesIt() {
         AiGatewayGuardrails guardrails = guardrails(null, null, false, false, "", false, false, false);
 
-        when(settingsService.findByWorkspaceId(7L))
+        when(settingsService.fetchSettings(7L))
             .thenReturn(Optional.of(settings(null, null, null, null, null, true)));
 
         AiGatewayChatCompletionResponse redacted =
@@ -348,7 +351,7 @@ class AiGatewayGuardrailsTest {
     void testProjectOverlayUnionsWithWorkspace() {
         AiGatewayGuardrails guardrails = guardrails(null, null, false, false, "", false, false, false);
 
-        when(settingsService.findByWorkspaceId(7L))
+        when(settingsService.fetchSettings(7L))
             .thenReturn(Optional.of(settings(true, null, null, null, null, null)));
         when(projectSettingsService.findByProjectId(3L))
             .thenReturn(Optional.of(projectSettings(null, true, null, null, null, null)));
@@ -437,7 +440,10 @@ class AiGatewayGuardrailsTest {
     }
 
     private double counter(String event) {
-        return meterRegistry.counter(AiGatewayGuardrailMetrics.COUNTER_NAME, "event", event)
+        // Metric name/tags changed with the guardrail-engine extraction (bytechef_ai_gateway_guardrail{event} ->
+        // bytechef_ai_guardrail{event,surface}) — this is the one permitted metric-literal update; every assertion
+        // value above (the counts) is unchanged from before the extraction.
+        return meterRegistry.counter(AiGuardrailMetrics.COUNTER_NAME, "event", event, "surface", "gateway")
             .count();
     }
 
@@ -458,19 +464,28 @@ class AiGatewayGuardrailsTest {
         boolean piiRedactionEnabled, boolean secretRedactionEnabled, String blockedTerms, boolean moderationEnabled,
         boolean injectionDetectionEnabled, boolean responseScanEnabled, boolean streamingResponseScanEnabled) {
 
+        // The engine now owns pii/secret/blocked-term/injection/response-scan resolution for the global+workspace
+        // layer; this adapter only adds moderation (via its own classifier wiring, never through the engine's
+        // checkInputs/checkAndRedact -- the engine's own moderation support only runs on the advisor's non-throwing
+        // checkInputs path, not this throwing applyToInputs path the gateway uses) and the project overlay on top.
+        // The engine constructor is still given a null moderation classifier / false moderation-enabled here so this
+        // adapter's own moderation resolution is the only one in play, pinning the no-double-moderation contract.
+        AiGuardrails aiGuardrails = new AiGuardrails(
+            settingsService, injectionClassifier, null, metrics, piiRedactionEnabled, secretRedactionEnabled,
+            blockedTerms, injectionDetectionEnabled, false, responseScanEnabled, streamingResponseScanEnabled);
+
         return new AiGatewayGuardrails(
-            settingsService, projectSettingsService, moderationClassifier, injectionClassifier, metrics,
-            piiRedactionEnabled, secretRedactionEnabled, blockedTerms, moderationEnabled, injectionDetectionEnabled,
-            responseScanEnabled, streamingResponseScanEnabled);
+            aiGuardrails, projectSettingsService, settingsService, moderationClassifier, injectionClassifier, metrics,
+            moderationEnabled, streamingResponseScanEnabled);
     }
 
-    private static AiGatewayWorkspaceSettings settings(
+    private static AiGuardrailsWorkspaceSettings settings(
         Boolean redactPii, String blockedTerms, Boolean moderationEnabled, Boolean redactSecrets,
         Boolean injectionDetectionEnabled, Boolean scanResponses) {
 
-        return new AiGatewayWorkspaceSettings(
-            7L, null, null, null, null, null, null, null, redactPii, blockedTerms, moderationEnabled, redactSecrets,
-            injectionDetectionEnabled, scanResponses);
+        return new AiGuardrailsWorkspaceSettings(
+            7L, redactPii, redactSecrets, blockedTerms, moderationEnabled, injectionDetectionEnabled, scanResponses,
+            null);
     }
 
     private static AiGatewayProjectSettings projectSettings(

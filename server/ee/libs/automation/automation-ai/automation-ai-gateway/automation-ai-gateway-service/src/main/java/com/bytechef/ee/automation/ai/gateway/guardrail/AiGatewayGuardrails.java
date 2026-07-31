@@ -8,24 +8,24 @@
 package com.bytechef.ee.automation.ai.gateway.guardrail;
 
 import com.bytechef.ee.automation.ai.gateway.service.AiGatewayProjectSettingsService;
-import com.bytechef.ee.automation.ai.gateway.service.AiGatewayWorkspaceSettingsService;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayProjectSettings;
-import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayWorkspaceSettings;
 import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayChatCompletionRequest;
 import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayChatCompletionResponse;
 import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayChatMessage;
 import com.bytechef.ee.platform.ai.gateway.exception.AiGatewayGuardrailException;
 import com.bytechef.ee.platform.ai.gateway.guardrail.AiGatewayInjectionClassifier;
 import com.bytechef.ee.platform.ai.gateway.guardrail.AiGatewayModerationClassifier;
+import com.bytechef.ee.platform.ai.guardrails.AiGuardrailMetrics;
+import com.bytechef.ee.platform.ai.guardrails.AiGuardrails;
+import com.bytechef.ee.platform.ai.guardrails.StreamingResponseRedactor;
+import com.bytechef.ee.platform.ai.guardrails.domain.AiGuardrailsWorkspaceSettings;
+import com.bytechef.ee.platform.ai.guardrails.service.AiGuardrailsWorkspaceSettingsService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -35,32 +35,25 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 /**
- * Applies inline content guardrails to AI Gateway traffic before it is routed upstream and, optionally, to the model
- * output before it is returned. All guardrails are off by default; effective policy per request is the union of global
- * {@code bytechef.ai.gateway.guardrails.*} properties and the request workspace's {@link AiGatewayWorkspaceSettings}.
- *
- * <ul>
- * <li><b>PII redaction</b> — {@code pii-redaction-enabled} / workspace {@code redactPii}. Email, US SSN, credit-card,
- * phone, and IPv4 matches are replaced with {@code [REDACTED_*]} placeholders.</li>
- * <li><b>Secret redaction</b> — {@code secret-redaction-enabled} / workspace {@code redactSecrets}. High-signal
- * developer-secret shapes (cloud/provider API keys, tokens, JWTs, PEM private keys) are replaced with
- * {@code [REDACTED_SECRET]}.</li>
- * <li><b>Blocked terms</b> — union of the global {@code blocked-terms} list and the workspace's {@code blockedTerms}
- * (both comma-separated). A request whose content contains any term (case-insensitive) is rejected.</li>
- * <li><b>Model-based moderation</b> — {@code moderation-enabled} / workspace {@code moderationEnabled}, when an
- * {@link AiGatewayModerationClassifier} bean is present. Flagged content is rejected. Fails open.</li>
- * <li><b>Prompt-injection detection</b> — {@code injection-detection-enabled} / workspace
- * {@code injectionDetectionEnabled}, when an {@link AiGatewayInjectionClassifier} bean is present. Content the
- * classifier judges to be a jailbreak / instruction-override / exfiltration attempt is rejected. Fails open.</li>
- * <li><b>Response scanning</b> — {@code response-scan-enabled} / workspace {@code scanResponses}. Model output is
- * redacted for PII and secrets before it is returned (redaction only, never blocking) so internal data does not leak
- * back through completions. Applies to the non-streaming completion path; see {@link #redactResponse}.</li>
- * </ul>
+ * AI Gateway adapter over the standalone {@link AiGuardrails} engine (extracted to {@code platform-ai-guardrails}).
+ * Preserves the exact pre-extraction public surface — chat/embedding DTO methods, {@code projectId} overloads, and the
+ * static redaction helpers — so every caller of this class (the gateway facade, and this module's own tests) keeps
+ * working unchanged.
  *
  * <p>
- * Redaction runs before the blocked-term check, moderation, and injection detection, so those checks all evaluate the
- * redacted text. The redactors are deterministic and side-effect-free, so they are safe to run on every message of
- * every request. Regexes deliberately avoid nested optional quantifiers (no catastrophic backtracking / ReDoS).
+ * The engine resolves the global-property + workspace-settings union for plain text; this adapter owns everything the
+ * engine deliberately does not: gateway DTO shapes (chat messages, completion responses), model-based moderation (never
+ * moved — it is a gateway/chat-only concept), and the project-level guardrail overlay. The overlay is additive (a
+ * project can only enable a guardrail or add blocked terms, never turn one off) — for each call, this adapter first
+ * delegates the text to the engine (global + workspace policy), then layers any project-only additions on top using the
+ * engine's static redactors and its own moderation/injection classifiers.
+ * </p>
+ *
+ * <p>
+ * The gateway does not consult {@link AiGuardrailsWorkspaceSettings#blockingMode()} — a blocked request always throws
+ * {@link AiGatewayGuardrailException}, which the gateway's exception handling turns into an HTTP 422.
+ * Redact-and-continue blocking mode is a concept for other (non-gateway) surfaces that consume the standalone engine
+ * directly.
  * </p>
  *
  * @version ee
@@ -74,82 +67,36 @@ public class AiGatewayGuardrails {
 
     private static final Logger log = LoggerFactory.getLogger(AiGatewayGuardrails.class);
 
-    private static final String SECRET_PLACEHOLDER = "[REDACTED_SECRET]";
-
-    private static final Pattern EMAIL_PATTERN = Pattern.compile("[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}");
-    private static final Pattern SSN_PATTERN = Pattern.compile("\\b\\d{3}-\\d{2}-\\d{4}\\b");
-    private static final Pattern CREDIT_CARD_PATTERN = Pattern.compile("\\b(?:\\d{4}[ -]?){3}\\d{4}\\b");
-    // Linear, backtracking-safe: a 3-3-4 grouping with a single required separator between groups (no nested optional
-    // quantifiers, so no catastrophic backtracking / ReDoS).
-    private static final Pattern PHONE_PATTERN = Pattern.compile("\\b\\d{3}[-.\\s]\\d{3}[-.\\s]\\d{4}\\b");
-    private static final Pattern IPV4_PATTERN = Pattern.compile(
-        "\\b(?:(?:25[0-5]|2[0-4]\\d|1?\\d?\\d)\\.){3}(?:25[0-5]|2[0-4]\\d|1?\\d?\\d)\\b");
-
-    // Developer-secret shapes. Each is anchored, fixed-length, or bounded by a single quantifier / literal terminator —
-    // no nested optional quantifiers, so all are ReDoS-safe. This is the high-signal subset; entropy/random-string
-    // detection lives in the workflow-layer SecretKeyDetectorUtils for callers who want it.
-    private static final List<Pattern> SECRET_PATTERNS = List.of(
-        // PEM private-key block (redact the whole block, not just the marker)
-        Pattern.compile("-----BEGIN [A-Z ]*PRIVATE KEY-----[\\s\\S]*?-----END [A-Z ]*PRIVATE KEY-----"),
-        // AWS access key id
-        Pattern.compile("\\bAKIA[0-9A-Z]{16}\\b"),
-        // GitHub personal/OAuth/app tokens (classic) and fine-grained PATs
-        Pattern.compile("\\bgh[pousr]_[A-Za-z0-9]{36}\\b"),
-        Pattern.compile("\\bgithub_pat_[A-Za-z0-9_]{22,}\\b"),
-        // OpenAI API keys (incl. project-scoped)
-        Pattern.compile("\\bsk-(?:proj-)?[A-Za-z0-9_-]{20,}\\b"),
-        // Slack tokens
-        Pattern.compile("\\bxox[baprs]-[A-Za-z0-9-]{10,}\\b"),
-        // Stripe secret / restricted live keys
-        Pattern.compile("\\b[sr]k_live_[0-9a-zA-Z]{24}\\b"),
-        // Google API keys
-        Pattern.compile("\\bAIza[0-9A-Za-z_-]{35}\\b"),
-        // JSON Web Tokens (three base64url segments)
-        Pattern.compile("\\beyJ[A-Za-z0-9_-]+\\.eyJ[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+"));
-
-    // Every PII + secret pattern, used by the streaming redactor to locate matched spans so it never emits across the
-    // middle of one.
-    private static final List<Pattern> ALL_SENSITIVE_PATTERNS = buildAllSensitivePatterns();
-
-    private final AiGatewayWorkspaceSettingsService aiGatewayWorkspaceSettingsService;
+    private final AiGuardrails aiGuardrails;
     private final @Nullable AiGatewayProjectSettingsService aiGatewayProjectSettingsService;
-    private final List<String> globalBlockedTerms;
-    private final boolean globalInjectionDetectionEnabled;
-    private final boolean globalModerationEnabled;
-    private final boolean globalPiiRedactionEnabled;
-    private final boolean globalResponseScanEnabled;
-    private final boolean globalSecretRedactionEnabled;
-    private final boolean globalStreamingResponseScanEnabled;
-    private final @Nullable AiGatewayInjectionClassifier injectionClassifier;
-    private final @Nullable AiGatewayGuardrailMetrics metrics;
+    private final AiGuardrailsWorkspaceSettingsService aiGuardrailsWorkspaceSettingsService;
     private final @Nullable AiGatewayModerationClassifier moderationClassifier;
+    private final @Nullable AiGatewayInjectionClassifier injectionClassifier;
+    private final @Nullable AiGuardrailMetrics metrics;
+    private final boolean globalModerationEnabled;
+    private final boolean globalStreamingResponseScanEnabled;
 
     public AiGatewayGuardrails(
-        AiGatewayWorkspaceSettingsService aiGatewayWorkspaceSettingsService,
+        AiGuardrails aiGuardrails,
         @Nullable AiGatewayProjectSettingsService aiGatewayProjectSettingsService,
+        AiGuardrailsWorkspaceSettingsService aiGuardrailsWorkspaceSettingsService,
         @Nullable AiGatewayModerationClassifier moderationClassifier,
         @Nullable AiGatewayInjectionClassifier injectionClassifier,
-        @Nullable AiGatewayGuardrailMetrics metrics,
-        @Value("${bytechef.ai.gateway.guardrails.pii-redaction-enabled:false}") boolean piiRedactionEnabled,
-        @Value("${bytechef.ai.gateway.guardrails.secret-redaction-enabled:false}") boolean secretRedactionEnabled,
-        @Value("${bytechef.ai.gateway.guardrails.blocked-terms:}") String blockedTerms,
+        @Nullable AiGuardrailMetrics metrics,
+        // Property names kept for compatibility with the pre-extraction AiGatewayGuardrails — moderation and the
+        // streaming operator gate are gateway-only concerns that never moved into the engine, so this adapter reads
+        // them directly rather than asking the engine for them.
         @Value("${bytechef.ai.gateway.guardrails.moderation-enabled:false}") boolean moderationEnabled,
-        @Value("${bytechef.ai.gateway.guardrails.injection-detection-enabled:false}") boolean injectionDetectionEnabled,
-        @Value("${bytechef.ai.gateway.guardrails.response-scan-enabled:false}") boolean responseScanEnabled,
         @Value("${bytechef.ai.gateway.guardrails.response-scan-streaming-enabled:false}") boolean streamingResponseScanEnabled) {
 
-        this.aiGatewayWorkspaceSettingsService = aiGatewayWorkspaceSettingsService;
+        this.aiGuardrails = aiGuardrails;
         this.aiGatewayProjectSettingsService = aiGatewayProjectSettingsService;
-        this.globalBlockedTerms = parseBlockedTerms(blockedTerms);
-        this.globalInjectionDetectionEnabled = injectionDetectionEnabled;
-        this.globalModerationEnabled = moderationEnabled;
-        this.globalPiiRedactionEnabled = piiRedactionEnabled;
-        this.globalResponseScanEnabled = responseScanEnabled;
-        this.globalSecretRedactionEnabled = secretRedactionEnabled;
-        this.globalStreamingResponseScanEnabled = streamingResponseScanEnabled;
+        this.aiGuardrailsWorkspaceSettingsService = aiGuardrailsWorkspaceSettingsService;
+        this.moderationClassifier = moderationClassifier;
         this.injectionClassifier = injectionClassifier;
         this.metrics = metrics;
-        this.moderationClassifier = moderationClassifier;
+        this.globalModerationEnabled = moderationEnabled;
+        this.globalStreamingResponseScanEnabled = streamingResponseScanEnabled;
     }
 
     /**
@@ -184,20 +131,41 @@ public class AiGatewayGuardrails {
     public AiGatewayChatCompletionRequest apply(
         AiGatewayChatCompletionRequest request, @Nullable Long workspaceId, @Nullable Long projectId) {
 
-        EffectivePolicy policy = resolvePolicy(workspaceId, projectId);
-
-        if (!policy.anyChatGuardrailActive()) {
-            return request;
-        }
+        AiGatewayProjectSettings projectSettings = findProjectSettings(projectId);
+        boolean moderate = moderationClassifier != null && resolveModerationEnabled(workspaceId, projectSettings);
 
         List<AiGatewayChatMessage> guardrailedMessages = new ArrayList<>();
+        boolean changed = false;
 
         for (AiGatewayChatMessage message : request.messages()) {
-            String content = checkAndRedact(message.content(), policy);
+            String content = message.content();
+            String processed = content;
+
+            if (content != null) {
+                processed = aiGuardrails.applyToInputs(List.of(content), workspaceId)
+                    .getFirst();
+                processed = applyProjectOverlay(processed, projectSettings);
+            }
+
+            if (moderate && processed != null && moderationClassifier.isFlagged(processed)) {
+                record("moderation_flagged");
+
+                log.warn("AI Gateway request rejected by moderation classifier");
+
+                throw new AiGatewayGuardrailException("Request rejected by content moderation");
+            }
+
+            if (!Objects.equals(processed, content)) {
+                changed = true;
+            }
 
             guardrailedMessages.add(
                 new AiGatewayChatMessage(
-                    message.role(), content, message.contentBlocks(), message.toolCalls(), message.toolCallId()));
+                    message.role(), processed, message.contentBlocks(), message.toolCalls(), message.toolCallId()));
+        }
+
+        if (!changed) {
+            return request;
         }
 
         return new AiGatewayChatCompletionRequest(
@@ -235,19 +203,27 @@ public class AiGatewayGuardrails {
             return inputs;
         }
 
-        EffectivePolicy policy = resolvePolicy(workspaceId, projectId);
+        List<String> engineProcessed = aiGuardrails.applyToInputs(inputs, workspaceId);
+        AiGatewayProjectSettings projectSettings = findProjectSettings(projectId);
 
-        if (!policy.anyInputGuardrailActive()) {
-            return inputs;
+        if (projectSettings == null) {
+            return engineProcessed;
         }
 
-        List<String> guardrailedInputs = new ArrayList<>(inputs.size());
+        List<String> guardrailedInputs = new ArrayList<>(engineProcessed.size());
+        boolean changed = false;
 
-        for (String input : inputs) {
-            guardrailedInputs.add(checkAndRedact(input, policy, false));
+        for (String input : engineProcessed) {
+            String processed = applyProjectOverlay(input, projectSettings);
+
+            if (!processed.equals(input)) {
+                changed = true;
+            }
+
+            guardrailedInputs.add(processed);
         }
 
-        return guardrailedInputs;
+        return changed ? guardrailedInputs : engineProcessed;
     }
 
     /**
@@ -286,11 +262,8 @@ public class AiGatewayGuardrails {
             return response;
         }
 
-        EffectivePolicy policy = resolvePolicy(workspaceId, projectId);
-
-        if (!policy.scanResponses()) {
-            return response;
-        }
+        AiGatewayProjectSettings projectSettings = findProjectSettings(projectId);
+        boolean projectScanResponses = projectSettings != null && Boolean.TRUE.equals(projectSettings.scanResponses());
 
         List<AiGatewayChatCompletionResponse.Choice> choices = response.choices();
         List<AiGatewayChatCompletionResponse.Choice> redactedChoices = new ArrayList<>(choices.size());
@@ -306,9 +279,13 @@ public class AiGatewayGuardrails {
                 continue;
             }
 
-            String redacted = redactAll(content);
+            String scanned = aiGuardrails.scanResponseText(content, workspaceId);
 
-            if (redacted.equals(content)) {
+            if (projectScanResponses) {
+                scanned = AiGuardrails.redactAll(scanned);
+            }
+
+            if (scanned.equals(content)) {
                 redactedChoices.add(choice);
 
                 continue;
@@ -317,7 +294,7 @@ public class AiGatewayGuardrails {
             changed = true;
 
             AiGatewayChatMessage redactedMessage = new AiGatewayChatMessage(
-                message.role(), redacted, message.contentBlocks(), message.toolCalls(), message.toolCallId());
+                message.role(), scanned, message.contentBlocks(), message.toolCalls(), message.toolCallId());
 
             redactedChoices.add(
                 new AiGatewayChatCompletionResponse.Choice(choice.index(), redactedMessage, choice.finishReason()));
@@ -359,40 +336,30 @@ public class AiGatewayGuardrails {
     public @Nullable StreamingResponseRedactor newStreamingResponseRedactor(
         @Nullable Long workspaceId, @Nullable Long projectId) {
 
+        StreamingResponseRedactor redactor = aiGuardrails.newStreamingResponseRedactor(workspaceId);
+
+        if (redactor != null) {
+            return redactor;
+        }
+
         if (!globalStreamingResponseScanEnabled) {
             return null;
         }
 
-        EffectivePolicy policy = resolvePolicy(workspaceId, projectId);
+        AiGatewayProjectSettings projectSettings = findProjectSettings(projectId);
 
-        if (!policy.scanResponses()) {
-            return null;
+        if (projectSettings != null && Boolean.TRUE.equals(projectSettings.scanResponses())) {
+            return new StreamingResponseRedactor();
         }
 
-        return new StreamingResponseRedactor();
+        return null;
     }
 
     /**
      * Replaces common PII patterns in {@code content} with {@code [REDACTED_*]} placeholders.
      */
     public static String redactPii(@Nullable String content) {
-        if (content == null || content.isEmpty()) {
-            return content;
-        }
-
-        String redacted = EMAIL_PATTERN.matcher(content)
-            .replaceAll("[REDACTED_EMAIL]");
-
-        redacted = SSN_PATTERN.matcher(redacted)
-            .replaceAll("[REDACTED_SSN]");
-        redacted = CREDIT_CARD_PATTERN.matcher(redacted)
-            .replaceAll("[REDACTED_CC]");
-        redacted = PHONE_PATTERN.matcher(redacted)
-            .replaceAll("[REDACTED_PHONE]");
-        redacted = IPV4_PATTERN.matcher(redacted)
-            .replaceAll("[REDACTED_IP]");
-
-        return redacted;
+        return AiGuardrails.redactPii(content);
     }
 
     /**
@@ -400,18 +367,7 @@ public class AiGatewayGuardrails {
      * {@code content} with a {@code [REDACTED_SECRET]} placeholder.
      */
     public static String redactSecrets(@Nullable String content) {
-        if (content == null || content.isEmpty()) {
-            return content;
-        }
-
-        String redacted = content;
-
-        for (Pattern secretPattern : SECRET_PATTERNS) {
-            redacted = secretPattern.matcher(redacted)
-                .replaceAll(SECRET_PLACEHOLDER);
-        }
-
-        return redacted;
+        return AiGuardrails.redactSecrets(content);
     }
 
     /**
@@ -419,90 +375,57 @@ public class AiGatewayGuardrails {
      * categories are masked regardless of the request-direction toggles.
      */
     public static String redactAll(String content) {
-        return redactSecrets(redactPii(content));
+        return AiGuardrails.redactAll(content);
     }
 
     /**
-     * Returns the {@code [start, end)} character spans of every PII/secret match in {@code content}, so the streaming
-     * redactor can avoid emitting across the middle of a match. Order is unspecified and spans may overlap.
+     * Records a single {@code response_redacted} guardrail metric. Used by the streaming path to emit one metric per
+     * stream (via {@link StreamingResponseRedactor#isRedacted()}) rather than one per chunk; the non-streaming path
+     * records inline in {@link #redactResponse}.
      */
-    static List<int[]> sensitiveMatchRanges(String content) {
-        List<int[]> ranges = new ArrayList<>();
+    public void recordResponseRedacted() {
+        record("response_redacted");
+    }
 
-        for (Pattern sensitivePattern : ALL_SENSITIVE_PATTERNS) {
-            Matcher matcher = sensitivePattern.matcher(content);
-
-            while (matcher.find()) {
-                ranges.add(new int[] {
-                    matcher.start(), matcher.end()
-                });
-            }
+    /**
+     * Applies the project's ADDITIVE guardrail overrides to {@code text} on top of whatever the engine already did for
+     * the workspace/global policy: extra PII/secret redaction, extra blocked terms, and injection detection if the
+     * project enables it and the workspace/global policy did not. A project can only enable a guardrail or add blocked
+     * terms — it never turns one off — so it is safe to always layer this on top, regardless of what the engine already
+     * applied.
+     */
+    private String applyProjectOverlay(String text, @Nullable AiGatewayProjectSettings projectSettings) {
+        if (projectSettings == null) {
+            return text;
         }
 
-        return ranges;
-    }
+        String result = text;
 
-    private static List<Pattern> buildAllSensitivePatterns() {
-        List<Pattern> patterns = new ArrayList<>();
+        if (Boolean.TRUE.equals(projectSettings.redactPii())) {
+            String redacted = AiGuardrails.redactPii(result);
 
-        patterns.add(EMAIL_PATTERN);
-        patterns.add(SSN_PATTERN);
-        patterns.add(CREDIT_CARD_PATTERN);
-        patterns.add(PHONE_PATTERN);
-        patterns.add(IPV4_PATTERN);
-        patterns.addAll(SECRET_PATTERNS);
-
-        return List.copyOf(patterns);
-    }
-
-    private String checkAndRedact(@Nullable String content, EffectivePolicy policy) {
-        return checkAndRedact(content, policy, policy.moderate());
-    }
-
-    private String checkAndRedact(@Nullable String content, EffectivePolicy policy, boolean moderate) {
-        if (content == null) {
-            return null;
-        }
-
-        String redacted = content;
-
-        if (policy.redactPii()) {
-            String piiRedacted = redactPii(redacted);
-
-            if (!piiRedacted.equals(redacted)) {
+            if (!redacted.equals(result)) {
                 record("pii_redacted");
             }
 
-            redacted = piiRedacted;
+            result = redacted;
         }
 
-        if (policy.redactSecrets()) {
-            String secretRedacted = redactSecrets(redacted);
+        if (Boolean.TRUE.equals(projectSettings.redactSecrets())) {
+            String redacted = AiGuardrails.redactSecrets(result);
 
-            if (!secretRedacted.equals(redacted)) {
+            if (!redacted.equals(result)) {
                 record("secret_redacted");
             }
 
-            redacted = secretRedacted;
+            result = redacted;
         }
 
-        try {
-            checkBlockedTerms(redacted, policy.blockedTerms());
-        } catch (AiGatewayGuardrailException exception) {
-            record("blocked_term");
+        checkAdditionalBlockedTerms(result, projectSettings.blockedTerms());
 
-            throw exception;
-        }
+        if (Boolean.TRUE.equals(projectSettings.injectionDetectionEnabled()) && injectionClassifier != null
+            && injectionClassifier.isInjection(result)) {
 
-        if (moderate && moderationClassifier != null && moderationClassifier.isFlagged(redacted)) {
-            record("moderation_flagged");
-
-            log.warn("AI Gateway request rejected by moderation classifier");
-
-            throw new AiGatewayGuardrailException("Request rejected by content moderation");
-        }
-
-        if (policy.detectInjection() && injectionClassifier != null && injectionClassifier.isInjection(redacted)) {
             record("injection_flagged");
 
             log.warn("AI Gateway request rejected by injection detection");
@@ -510,62 +433,58 @@ public class AiGatewayGuardrails {
             throw new AiGatewayGuardrailException("Request rejected by prompt-injection detection");
         }
 
-        return redacted;
+        return result;
     }
 
-    private EffectivePolicy resolvePolicy(@Nullable Long workspaceId, @Nullable Long projectId) {
-        AiGatewayWorkspaceSettings settings = findSettings(workspaceId);
-        AiGatewayProjectSettings projectSettings = findProjectSettings(projectId);
+    private void checkAdditionalBlockedTerms(String content, @Nullable String blockedTermsCsv) {
+        List<String> terms = parseBlockedTerms(blockedTermsCsv);
 
-        // Union semantics across global -> workspace -> project: a level can enable a guardrail (or add blocked terms)
-        // but never turn one off. null = inherit.
-        boolean redactPii = globalPiiRedactionEnabled ||
-            (settings != null && Boolean.TRUE.equals(settings.redactPii())) ||
-            (projectSettings != null && Boolean.TRUE.equals(projectSettings.redactPii()));
-        boolean redactSecrets = globalSecretRedactionEnabled ||
-            (settings != null && Boolean.TRUE.equals(settings.redactSecrets())) ||
-            (projectSettings != null && Boolean.TRUE.equals(projectSettings.redactSecrets()));
-
-        Set<String> blockedTerms = new LinkedHashSet<>(globalBlockedTerms);
-
-        if (settings != null && settings.blockedTerms() != null) {
-            blockedTerms.addAll(parseBlockedTerms(settings.blockedTerms()));
+        if (terms.isEmpty()) {
+            return;
         }
 
-        if (projectSettings != null && projectSettings.blockedTerms() != null) {
-            blockedTerms.addAll(parseBlockedTerms(projectSettings.blockedTerms()));
+        String lowerContent = content.toLowerCase(Locale.ROOT);
+
+        for (String term : terms) {
+            if (lowerContent.contains(term)) {
+                record("blocked_term");
+
+                log.warn("AI Gateway request rejected by content guardrail (blocked term matched)");
+
+                throw new AiGatewayGuardrailException(
+                    "Request rejected by content guardrail: matched a blocked term");
+            }
         }
-
-        boolean moderate = moderationClassifier != null &&
-            (globalModerationEnabled || (settings != null && Boolean.TRUE.equals(settings.moderationEnabled())) ||
-                (projectSettings != null && Boolean.TRUE.equals(projectSettings.moderationEnabled())));
-        boolean detectInjection = injectionClassifier != null &&
-            (globalInjectionDetectionEnabled ||
-                (settings != null && Boolean.TRUE.equals(settings.injectionDetectionEnabled())) ||
-                (projectSettings != null && Boolean.TRUE.equals(projectSettings.injectionDetectionEnabled())));
-        boolean scanResponses = globalResponseScanEnabled ||
-            (settings != null && Boolean.TRUE.equals(settings.scanResponses())) ||
-            (projectSettings != null && Boolean.TRUE.equals(projectSettings.scanResponses()));
-
-        return new EffectivePolicy(
-            redactPii, redactSecrets, blockedTerms, moderate, detectInjection, scanResponses);
     }
 
-    private @Nullable AiGatewayWorkspaceSettings findSettings(@Nullable Long workspaceId) {
-        if (workspaceId == null) {
-            return null;
+    private boolean resolveModerationEnabled(
+        @Nullable Long workspaceId, @Nullable AiGatewayProjectSettings projectSettings) {
+
+        if (globalModerationEnabled) {
+            return true;
         }
 
+        AiGuardrailsWorkspaceSettings settings = fetchWorkspaceSettings(workspaceId);
+
+        if (settings != null && Boolean.TRUE.equals(settings.moderationEnabled())) {
+            return true;
+        }
+
+        return projectSettings != null && Boolean.TRUE.equals(projectSettings.moderationEnabled());
+    }
+
+    private @Nullable AiGuardrailsWorkspaceSettings fetchWorkspaceSettings(@Nullable Long workspaceId) {
         try {
-            Optional<AiGatewayWorkspaceSettings> settingsOptional =
-                aiGatewayWorkspaceSettingsService.findByWorkspaceId(workspaceId);
+            Optional<AiGuardrailsWorkspaceSettings> settingsOptional =
+                aiGuardrailsWorkspaceSettingsService.fetchSettings(workspaceId);
 
             return settingsOptional.orElse(null);
         } catch (Exception exception) {
-            // A settings lookup failure must not take the request path down; global guardrails still apply.
+            // A settings lookup failure must not take the request path down; global/project moderation policy still
+            // applies.
             log.warn(
-                "Failed to load AI Gateway workspace settings for workspace {}: {}", workspaceId,
-                exception.getMessage());
+                "Failed to load AI guardrails workspace settings for workspace {} while resolving moderation: {}",
+                workspaceId, exception.getMessage());
 
             return null;
         }
@@ -590,39 +509,13 @@ public class AiGatewayGuardrails {
         }
     }
 
-    /**
-     * Records a single {@code response_redacted} guardrail metric. Used by the streaming path to emit one metric per
-     * stream (via {@link StreamingResponseRedactor#isRedacted()}) rather than one per chunk; the non-streaming path
-     * records inline in {@link #redactResponse}.
-     */
-    public void recordResponseRedacted() {
-        record("response_redacted");
-    }
-
     private void record(String event) {
         if (metrics != null) {
             metrics.record(event);
         }
     }
 
-    private static void checkBlockedTerms(String content, Set<String> blockedTerms) {
-        if (blockedTerms.isEmpty()) {
-            return;
-        }
-
-        String lowerContent = content.toLowerCase(Locale.ROOT);
-
-        for (String blockedTerm : blockedTerms) {
-            if (lowerContent.contains(blockedTerm)) {
-                log.warn("AI Gateway request rejected by content guardrail (blocked term matched)");
-
-                throw new AiGatewayGuardrailException(
-                    "Request rejected by content guardrail: matched a blocked term");
-            }
-        }
-    }
-
-    private static List<String> parseBlockedTerms(String blockedTerms) {
+    private static List<String> parseBlockedTerms(@Nullable String blockedTerms) {
         if (StringUtils.isBlank(blockedTerms)) {
             return List.of();
         }
@@ -638,21 +531,5 @@ public class AiGatewayGuardrails {
         }
 
         return terms;
-    }
-
-    /**
-     * The guardrail policy resolved for one request from the union of global properties and workspace settings.
-     */
-    private record EffectivePolicy(
-        boolean redactPii, boolean redactSecrets, Set<String> blockedTerms, boolean moderate, boolean detectInjection,
-        boolean scanResponses) {
-
-        boolean anyChatGuardrailActive() {
-            return redactPii || redactSecrets || !blockedTerms.isEmpty() || moderate || detectInjection;
-        }
-
-        boolean anyInputGuardrailActive() {
-            return redactPii || redactSecrets || !blockedTerms.isEmpty() || detectInjection;
-        }
     }
 }

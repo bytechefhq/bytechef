@@ -15,6 +15,8 @@ dependencies {
     implementation("org.springframework.data:spring-data-jdbc")
     implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-gateway:automation-ai-gateway-api"))
     implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-gateway:platform-ai-gateway-api"))
+    // The standalone guardrail engine that AiGatewayGuardrails now delegates to.
+    implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-guardrails:platform-ai-guardrails-service"))
     implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-llm-usage:platform-ai-llm-usage-api"))
     implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-prompt:platform-ai-prompt-api"))
     implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-eval:platform-ai-eval-api"))

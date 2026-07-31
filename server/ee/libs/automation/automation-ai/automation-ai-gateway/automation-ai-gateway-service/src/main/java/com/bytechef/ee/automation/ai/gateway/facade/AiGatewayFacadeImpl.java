@@ -11,7 +11,6 @@ import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.automation.ai.gateway.budget.AiGatewayBudgetChecker;
 import com.bytechef.ee.automation.ai.gateway.evaluation.AiEvalExecutor;
 import com.bytechef.ee.automation.ai.gateway.guardrail.AiGatewayGuardrails;
-import com.bytechef.ee.automation.ai.gateway.guardrail.StreamingResponseRedactor;
 import com.bytechef.ee.automation.ai.gateway.ratelimit.AiGatewayRateLimitChecker;
 import com.bytechef.ee.automation.ai.gateway.service.AiGatewayWorkspaceSettingsService;
 import com.bytechef.ee.automation.ai.gateway.service.WorkspaceAiGatewayProjectService;
@@ -49,6 +48,7 @@ import com.bytechef.ee.platform.ai.gateway.service.AiGatewayModelService;
 import com.bytechef.ee.platform.ai.gateway.service.AiGatewayProviderService;
 import com.bytechef.ee.platform.ai.gateway.service.AiGatewayRoutingPolicyService;
 import com.bytechef.ee.platform.ai.gateway.util.AiGatewayConstraintMatchers;
+import com.bytechef.ee.platform.ai.guardrails.StreamingResponseRedactor;
 import com.bytechef.ee.platform.ai.llm.usage.AiLlmUsage;
 import com.bytechef.ee.platform.ai.llm.usage.Money;
 import com.bytechef.ee.platform.ai.llm.usage.service.AiLlmUsageService;
@@ -184,6 +184,7 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
     private final WorkspaceAiObservabilityTraceService workspaceAiObservabilityTraceService;
     private final com.bytechef.platform.tag.service.TagService tagService;
     private final AiGatewayWorkspaceSettingsService aiGatewayWorkspaceSettingsService;
+    private final com.bytechef.ee.platform.ai.guardrails.service.AiGuardrailsWorkspaceSettingsService aiGuardrailsWorkspaceSettingsService;
     private final AiObservabilitySpanService aiObservabilitySpanService;
     private final AiObservabilityTraceService aiObservabilityTraceService;
     // Optional so lightweight app variants without actuator (no MeterRegistry bean) still start. Resolved via
@@ -222,6 +223,7 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
         AiObservabilityTraceService aiObservabilityTraceService,
         com.bytechef.platform.tag.service.TagService tagService,
         AiGatewayWorkspaceSettingsService aiGatewayWorkspaceSettingsService,
+        com.bytechef.ee.platform.ai.guardrails.service.AiGuardrailsWorkspaceSettingsService aiGuardrailsWorkspaceSettingsService,
         ObjectProvider<AiGatewayMetrics> aiGatewayMetricsProvider,
         ApplicationEventPublisher applicationEventPublisher,
         @Nullable PermissionService permissionService,
@@ -254,6 +256,7 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
         this.aiObservabilityTraceService = aiObservabilityTraceService;
         this.tagService = tagService;
         this.aiGatewayWorkspaceSettingsService = aiGatewayWorkspaceSettingsService;
+        this.aiGuardrailsWorkspaceSettingsService = aiGuardrailsWorkspaceSettingsService;
         this.aiGatewayMetricsProvider = aiGatewayMetricsProvider;
         this.applicationEventPublisher = applicationEventPublisher;
         this.permissionService = permissionService;
@@ -2397,15 +2400,18 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
     }
 
     /**
-     * Reads the workspace's {@code redactPii} setting (defaults to false). A missing workspace id is treated as "don't
-     * redact" — workspace-unattributed traces are already at the edge of the observability contract.
+     * Reads the workspace's guardrails {@code redactPii} setting (defaults to false). A missing workspace id is treated
+     * as "don't redact" — workspace-unattributed traces are already at the edge of the observability contract. The
+     * guardrail fields moved off {@link AiGatewayWorkspaceSettings} onto the standalone
+     * {@code AiGuardrailsWorkspaceSettings} with the guardrail-engine extraction, so this reads through that service
+     * directly rather than {@link #aiGatewayWorkspaceSettingsService}.
      */
     private boolean isPiiRedactionEnabled(@Nullable Long workspaceId) {
         if (workspaceId == null) {
             return false;
         }
 
-        return aiGatewayWorkspaceSettingsService.findByWorkspaceId(workspaceId)
+        return aiGuardrailsWorkspaceSettingsService.fetchSettings(workspaceId)
             .map(settings -> Boolean.TRUE.equals(settings.redactPii()))
             .orElse(false);
     }

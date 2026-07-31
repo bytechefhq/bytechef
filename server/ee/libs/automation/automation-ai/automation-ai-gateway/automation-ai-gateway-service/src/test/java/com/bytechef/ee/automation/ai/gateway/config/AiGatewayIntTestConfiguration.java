@@ -50,6 +50,9 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
         // AiGatewayGuardrails is a mandatory collaborator. Mirror production wiring by scanning the package rather
         // than registering a stub, so the guardrail chain the facade runs in production is the one under test.
         "com.bytechef.ee.automation.ai.gateway.guardrail",
+        // The standalone guardrail engine (platform-ai-guardrails) that the adapter above delegates to — AiGuardrails,
+        // AiGuardrailMetrics, and the prompt-based classifiers.
+        "com.bytechef.ee.platform.ai.guardrails",
         // Pulls in AiObservabilityExportExecutor's collaborators that live in the moved/extracted EE platform
         // modules: AiLlmUsageServiceImpl (llm-usage), AiPromptServiceImpl + AiPromptVersionServiceImpl (prompt),
         // and the workspace-agnostic platform-ai-gateway services + cross-cutting helpers (cache, compression,

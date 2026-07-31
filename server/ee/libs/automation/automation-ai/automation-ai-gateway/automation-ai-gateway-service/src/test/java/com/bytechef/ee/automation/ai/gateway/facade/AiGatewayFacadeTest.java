@@ -223,6 +223,7 @@ class AiGatewayFacadeTest {
             aiObservabilitySpanService, aiObservabilityTraceService,
             mock(com.bytechef.platform.tag.service.TagService.class),
             mock(com.bytechef.ee.automation.ai.gateway.service.AiGatewayWorkspaceSettingsService.class),
+            mock(com.bytechef.ee.platform.ai.guardrails.service.AiGuardrailsWorkspaceSettingsService.class),
             emptyMetricsProvider(),
             new org.springframework.context.support.GenericApplicationContext(),
             permissionService,
@@ -232,9 +233,15 @@ class AiGatewayFacadeTest {
     private static com.bytechef.ee.automation.ai.gateway.guardrail.AiGatewayGuardrails guardrails(
         boolean responseScanEnabled) {
 
+        com.bytechef.ee.platform.ai.guardrails.service.AiGuardrailsWorkspaceSettingsService settingsService =
+            mock(com.bytechef.ee.platform.ai.guardrails.service.AiGuardrailsWorkspaceSettingsService.class);
+
+        com.bytechef.ee.platform.ai.guardrails.AiGuardrails aiGuardrails =
+            new com.bytechef.ee.platform.ai.guardrails.AiGuardrails(
+                settingsService, null, null, null, false, false, "", false, false, responseScanEnabled, false);
+
         return new com.bytechef.ee.automation.ai.gateway.guardrail.AiGatewayGuardrails(
-            mock(com.bytechef.ee.automation.ai.gateway.service.AiGatewayWorkspaceSettingsService.class), null, null,
-            null, null, false, false, "", false, false, responseScanEnabled, false);
+            aiGuardrails, null, settingsService, null, null, null, false, false);
     }
 
     @AfterEach
