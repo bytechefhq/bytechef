@@ -32,7 +32,9 @@ Data tables:
 Knowledge bases:
 - listKnowledgeBases — list KBs in the current workspace.
 - queryKnowledgeBase({knowledgeBaseId, question, limit?}) — run a RAG search and return
-  up to 20 hits with excerpts and scores.
+  up to 20 hits with docId, docTitle, excerpts, and scores. The chat UI renders the hits
+  as source chips automatically; answer from the excerpts and reference the docTitle
+  values in your prose when it helps.
 - openResourceTab({type: "KNOWLEDGE_BASE", knowledgeBaseId, name}) — show a KB in the resource panel.
 
 Research (read-only; public web):

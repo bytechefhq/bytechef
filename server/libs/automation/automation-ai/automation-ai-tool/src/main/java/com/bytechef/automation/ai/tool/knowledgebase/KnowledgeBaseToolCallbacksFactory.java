@@ -64,7 +64,9 @@ public class KnowledgeBaseToolCallbacksFactory {
         List<ToolCallback> toolCallbacks = new ArrayList<>();
 
         toolCallbacks.add(new ListKnowledgeBasesToolCallback(workspaceKnowledgeBaseFacade));
-        toolCallbacks.add(new QueryKnowledgeBaseToolCallback(knowledgeBaseFacade, knowledgeBaseService));
+        toolCallbacks.add(
+            new QueryKnowledgeBaseToolCallback(knowledgeBaseFacade, knowledgeBaseService,
+                knowledgeBaseDocumentService));
 
         return toolCallbacks;
     }
