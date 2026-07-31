@@ -16,6 +16,8 @@
 
 package com.bytechef.task.dispatcher.forkjoin;
 
+import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.evaluator.Evaluator;
@@ -23,10 +25,12 @@ import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.platform.workflow.task.dispatcher.test.annotation.TaskDispatcherIntTest;
 import com.bytechef.platform.workflow.task.dispatcher.test.task.handler.TestVarTaskHandler;
 import com.bytechef.platform.workflow.task.dispatcher.test.workflow.TaskDispatcherJobTestExecutor;
+import com.bytechef.platform.workflow.task.dispatcher.test.workflow.TaskDispatcherJobTestExecutor.TaskDispatcherJobExecution;
 import com.bytechef.task.dispatcher.fork.join.ForkJoinTaskDispatcher;
 import com.bytechef.task.dispatcher.fork.join.completion.ForkJoinTaskCompletionHandler;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -71,5 +75,70 @@ public class ForkJoinTaskDispatcherIntTest {
 
         Assertions.assertEquals(85, testVarTaskHandler.get("sumVar1"));
         Assertions.assertEquals(112, testVarTaskHandler.get("sumVar2"));
+    }
+
+    @Test
+    public void testDispatchOutputTwoBranches() {
+        TaskDispatcherJobExecution jobExecution = taskDispatcherJobTestExecutor.execute(
+            EncodingUtils.base64EncodeToString("fork-join_v1-output-twoBranches"),
+            (
+                contextService, counterService, taskExecutionService) -> List.of(
+                    (taskCompletionHandler, taskDispatcher) -> new ForkJoinTaskCompletionHandler(
+                        contextService, counterService, EVALUATOR, taskExecutionService,
+                        taskCompletionHandler, taskDispatcher, taskFileStorage)),
+            (
+                eventPublisher, contextService, counterService, taskExecutionService) -> List.of(
+                    (taskDispatcher) -> new ForkJoinTaskDispatcher(
+                        contextService, counterService, EVALUATOR, eventPublisher, taskDispatcher,
+                        taskExecutionService, taskFileStorage)),
+            () -> Map.of("var/v1/set", testVarTaskHandler));
+
+        Job job = jobExecution.job();
+
+        Map<String, ?> outputs = taskFileStorage.readJobOutputs(job.getOutputs());
+
+        Assertions.assertEquals("branch zero output", outputs.get("branch0Result"));
+        Assertions.assertEquals("branch one output", outputs.get("branch1Result"));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testDispatchOutputNoOutputBranchKeyPresentWithNullValue() {
+        // ConcurrentHashMap-backed TestVarTaskHandler cannot store a null value, so the last task of the
+        // second branch (no "value" parameter) is handled by a null-tolerant consumer instead of the
+        // shared testVarTaskHandler field.
+        TestVarTaskHandler<Object, Object> nullTolerantVarTaskHandler = new TestVarTaskHandler<>(
+            (valueMap, name, value) -> {
+                if (value != null) {
+                    valueMap.put(name, value);
+                }
+            });
+
+        TaskDispatcherJobExecution jobExecution = taskDispatcherJobTestExecutor.execute(
+            EncodingUtils.base64EncodeToString("fork-join_v1-output-noOutputBranch"),
+            (
+                contextService, counterService, taskExecutionService) -> List.of(
+                    (taskCompletionHandler, taskDispatcher) -> new ForkJoinTaskCompletionHandler(
+                        contextService, counterService, EVALUATOR, taskExecutionService,
+                        taskCompletionHandler, taskDispatcher, taskFileStorage)),
+            (
+                eventPublisher, contextService, counterService, taskExecutionService) -> List.of(
+                    (taskDispatcher) -> new ForkJoinTaskDispatcher(
+                        contextService, counterService, EVALUATOR, eventPublisher, taskDispatcher,
+                        taskExecutionService, taskFileStorage)),
+            () -> Map.of("var/v1/set", nullTolerantVarTaskHandler));
+
+        TaskExecution forkJoinTaskExecution = jobExecution.taskExecutions()
+            .stream()
+            .filter(taskExecution -> "forkJoin_1".equals(taskExecution.getName()))
+            .findFirst()
+            .orElseThrow();
+
+        Map<String, Object> branchOutputs = (Map<String, Object>) taskFileStorage.readTaskExecutionOutput(
+            Objects.requireNonNull(forkJoinTaskExecution.getOutput()));
+
+        Assertions.assertEquals("branch zero output", branchOutputs.get("branch_0"));
+        Assertions.assertTrue(branchOutputs.containsKey("branch_1"));
+        Assertions.assertNull(branchOutputs.get("branch_1"));
     }
 }

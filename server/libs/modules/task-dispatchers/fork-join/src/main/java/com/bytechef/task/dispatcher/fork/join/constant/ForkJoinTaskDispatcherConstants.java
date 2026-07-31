@@ -24,4 +24,5 @@ public class ForkJoinTaskDispatcherConstants {
     public static final String FORK_JOIN = "fork-join";
     public static final String BRANCHES = "branches";
     public static final String BRANCH = "__branch";
+    public static final String BRANCH_OUTPUT_KEY_PREFIX = "branch_";
 }
