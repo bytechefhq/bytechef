@@ -29,9 +29,10 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
  * @author Ivica Cardic
  */
 @AutoConfiguration
-@EnableJdbcRepositories(basePackages = "com.bytechef.automation.assetfile.repository")
+@EnableJdbcRepositories(basePackages = "com.bytechef.automation.assetfile")
 @EnableConfigurationProperties({
-    AutomationAssetFileQuotaProperties.class, AutomationAssetFileOrphanCleanupProperties.class
+    AutomationAssetFileQuotaProperties.class, AutomationAssetFileOrphanCleanupProperties.class,
+    AutomationAssetFileSharingProperties.class
 })
 @ConditionalOnBean(AbstractJdbcConfiguration.class)
 public class AutomationAssetFileJdbcRepositoryConfiguration {

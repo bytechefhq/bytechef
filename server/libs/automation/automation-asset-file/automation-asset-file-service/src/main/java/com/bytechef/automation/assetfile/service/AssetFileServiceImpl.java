@@ -55,6 +55,16 @@ public class AssetFileServiceImpl implements AssetFileService {
 
     @Override
     @Transactional(readOnly = true)
+    public Optional<AssetFile> fetchByPublicLinkToken(String publicLinkToken) {
+        if (publicLinkToken == null || publicLinkToken.isBlank()) {
+            return Optional.empty();
+        }
+
+        return assetFileRepository.findByPublicLinkToken(publicLinkToken);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Optional<AssetFile> fetchByWorkspaceIdAndEnvironmentAndName(
         Long workspaceId, int environment, String name) {
 
@@ -81,6 +91,16 @@ public class AssetFileServiceImpl implements AssetFileService {
     public AssetFile findById(Long id) {
         return assetFileRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("AssetFile %d not found".formatted(id)));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<AssetFile> searchByName(String query, int limit) {
+        if (query == null || query.isBlank() || limit <= 0) {
+            return List.of();
+        }
+
+        return assetFileRepository.findAllByNameContainingIgnoreCase(query, limit);
     }
 
     @Override

@@ -20,12 +20,12 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.bind.DefaultValue;
 
 /**
+ * Operator switch for asset-file public links. When {@code publicLinkEnabled} is false, enabling a link is rejected AND
+ * already-enabled links stop resolving — flipping the property is an immediate kill-switch for external sharing, not
+ * merely a guard on new links.
+ *
  * @author Ivica Cardic
  */
-@ConfigurationProperties(prefix = "bytechef.asset-file")
-public record AutomationAssetFileQuotaProperties(
-    @DefaultValue("26214400") long maxFileSizeBytes,
-    @DefaultValue("1073741824") long perWorkspaceTotalBytes,
-    @DefaultValue("1048576") long maxTextEditBytes,
-    @DefaultValue("10") int maxVersionsPerFile) {
+@ConfigurationProperties(prefix = "bytechef.asset-file.sharing")
+public record AutomationAssetFileSharingProperties(@DefaultValue("true") boolean publicLinkEnabled) {
 }

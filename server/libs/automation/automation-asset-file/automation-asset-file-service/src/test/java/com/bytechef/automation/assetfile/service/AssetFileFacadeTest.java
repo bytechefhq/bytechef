@@ -24,21 +24,28 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.automation.assetfile.cleanup.AssetFileOrphanBlobRecorder;
 import com.bytechef.automation.assetfile.config.AutomationAssetFileQuotaProperties;
+import com.bytechef.automation.assetfile.config.AutomationAssetFileSharingProperties;
 import com.bytechef.automation.assetfile.domain.AssetFile;
 import com.bytechef.automation.assetfile.domain.AssetFileSource;
+import com.bytechef.automation.assetfile.domain.AssetFileVersion;
 import com.bytechef.automation.assetfile.exception.AssetFileQuotaExceededException;
 import com.bytechef.automation.assetfile.file.storage.AssetFileFileStorage;
 import com.bytechef.automation.assetfile.metric.AssetFileMetrics;
+import com.bytechef.automation.assetfile.repository.AssetFileVersionRepository;
 import com.bytechef.exception.QuotaLimitExceededException;
 import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.file.storage.token.FileEntryTokens;
 import com.bytechef.platform.plan.domain.PlanLimits;
 import com.bytechef.platform.plan.domain.PlanTier;
 import com.bytechef.platform.plan.provider.PlanLimitsProvider;
@@ -74,6 +81,15 @@ class AssetFileFacadeTest {
     private AssetFileMetrics metrics;
 
     @Mock
+    private AssetFileOrphanBlobRecorder orphanBlobRecorder;
+
+    @Mock
+    private AssetFileVersionRepository versionRepository;
+
+    @Mock
+    private ObjectProvider<FileEntryTokens> fileEntryTokensObjectProvider;
+
+    @Mock
     private ObjectProvider<PlanLimitRejectionCounter> planLimitRejectionCounterObjectProvider;
 
     @Mock
@@ -83,15 +99,21 @@ class AssetFileFacadeTest {
 
     private AutomationAssetFileQuotaProperties quota;
 
+    private AutomationAssetFileSharingProperties sharingProperties =
+        new AutomationAssetFileSharingProperties(true);
+
     @BeforeEach
     void setUp() {
-        quota = new AutomationAssetFileQuotaProperties(26_214_400L, 1_073_741_824L, 1_048_576L);
+        quota = new AutomationAssetFileQuotaProperties(26_214_400L, 1_073_741_824L, 1_048_576L, 10);
 
-        facade =
-            new AssetFileFacadeImpl(
-                service, fileStorage, metrics, planLimitRejectionCounterObjectProvider,
-                planLimitsProviderObjectProvider,
-                quota, new Tika());
+        facade = newFacade();
+    }
+
+    private AssetFileFacade newFacade() {
+        return new AssetFileFacadeImpl(
+            service, fileStorage, metrics, orphanBlobRecorder, versionRepository, fileEntryTokensObjectProvider,
+            planLimitRejectionCounterObjectProvider, planLimitsProviderObjectProvider, quota, sharingProperties,
+            new Tika());
     }
 
     @Test
@@ -127,13 +149,9 @@ class AssetFileFacadeTest {
 
     @Test
     void testCreateFromUploadRejectsWhenSingleFileOverLimit() {
-        quota = new AutomationAssetFileQuotaProperties(1024L, 1_073_741_824L, 1_048_576L);
+        quota = new AutomationAssetFileQuotaProperties(1024L, 1_073_741_824L, 1_048_576L, 10);
 
-        facade =
-            new AssetFileFacadeImpl(
-                service, fileStorage, metrics, planLimitRejectionCounterObjectProvider,
-                planLimitsProviderObjectProvider,
-                quota, new Tika());
+        facade = newFacade();
 
         byte[] bytes = new byte[2048];
 
@@ -151,13 +169,9 @@ class AssetFileFacadeTest {
 
     @Test
     void testCreateFromUploadRejectsWhenWorkspaceTotalOver() {
-        quota = new AutomationAssetFileQuotaProperties(1_000_000L, 10_000L, 1_048_576L);
+        quota = new AutomationAssetFileQuotaProperties(1_000_000L, 10_000L, 1_048_576L, 10);
 
-        facade =
-            new AssetFileFacadeImpl(
-                service, fileStorage, metrics, planLimitRejectionCounterObjectProvider,
-                planLimitsProviderObjectProvider,
-                quota, new Tika());
+        facade = newFacade();
 
         byte[] bytes = new byte[2];
 
@@ -310,13 +324,9 @@ class AssetFileFacadeTest {
 
     @Test
     void testUpdateContentEnforcesDeltaQuota() {
-        quota = new AutomationAssetFileQuotaProperties(1_000_000L, 10_000L, 1_048_576L);
+        quota = new AutomationAssetFileQuotaProperties(1_000_000L, 10_000L, 1_048_576L, 10);
 
-        facade =
-            new AssetFileFacadeImpl(
-                service, fileStorage, metrics, planLimitRejectionCounterObjectProvider,
-                planLimitsProviderObjectProvider,
-                quota, new Tika());
+        facade = newFacade();
 
         AssetFile existing = new AssetFile();
 
@@ -433,5 +443,276 @@ class AssetFileFacadeTest {
         assertThatThrownBy(() -> facade.getOwningWorkspaceId(42L))
             .isInstanceOf(com.bytechef.automation.assetfile.exception.AssetFileNotFoundException.class)
             .hasMessageContaining("42");
+    }
+
+    @Test
+    void testUpdateContentSnapshotsPreviousContentAsVersion() {
+        FileEntry previousFile = new FileEntry("note.md", "asset-files/old.md");
+        AssetFile existing = new AssetFile();
+
+        existing.setId(5L);
+        existing.setName("note.md");
+        existing.setMimeType("text/markdown");
+        existing.setSizeBytes(100);
+        existing.setFile(previousFile);
+        existing.setWorkspaceId(1L);
+
+        FileEntry stored = new FileEntry("note.md", "asset-files/new.md");
+
+        when(service.findById(5L)).thenReturn(existing);
+        when(fileStorage.storeFile(eq("note.md"), any(InputStream.class))).thenReturn(stored);
+        when(service.update(any(AssetFile.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(versionRepository.findFirstByAssetFileIdOrderByVersionNumberDesc(5L)).thenReturn(Optional.empty());
+        when(versionRepository.findAllByAssetFileIdOrderByVersionNumberDesc(5L)).thenReturn(List.of());
+
+        byte[] newBytes = "new content".getBytes(StandardCharsets.UTF_8);
+
+        AssetFile result = facade.updateContent(5L, "text/markdown", new ByteArrayInputStream(newBytes));
+
+        assertThat(result.getFile()).isEqualTo(stored);
+
+        ArgumentCaptor<AssetFileVersion> versionCaptor = ArgumentCaptor.forClass(AssetFileVersion.class);
+
+        verify(versionRepository).save(versionCaptor.capture());
+
+        AssetFileVersion snapshot = versionCaptor.getValue();
+
+        assertThat(snapshot.getAssetFileId()).isEqualTo(5L);
+        assertThat(snapshot.getVersionNumber()).isEqualTo(1);
+        assertThat(snapshot.getFile()).isEqualTo(previousFile);
+        assertThat(snapshot.getMimeType()).isEqualTo("text/markdown");
+        assertThat(snapshot.getSizeBytes()).isEqualTo(100);
+
+        // The prior blob now belongs to the version row — it must NOT be deleted on a content update.
+        verify(fileStorage, never()).deleteFile(previousFile);
+    }
+
+    @Test
+    void testUpdateContentPrunesVersionsBeyondCap() {
+        quota = new AutomationAssetFileQuotaProperties(26_214_400L, 1_073_741_824L, 1_048_576L, 1);
+
+        facade = newFacade();
+
+        FileEntry previousFile = new FileEntry("note.md", "asset-files/old.md");
+        AssetFile existing = new AssetFile();
+
+        existing.setId(5L);
+        existing.setName("note.md");
+        existing.setSizeBytes(100);
+        existing.setFile(previousFile);
+        existing.setWorkspaceId(1L);
+
+        AssetFileVersion newest = new AssetFileVersion();
+
+        newest.setId(200L);
+        newest.setAssetFileId(5L);
+        newest.setVersionNumber(2);
+        newest.setFile(previousFile);
+
+        AssetFileVersion oldest = new AssetFileVersion();
+
+        oldest.setId(100L);
+        oldest.setAssetFileId(5L);
+        oldest.setVersionNumber(1);
+        oldest.setFile(new FileEntry("note.md", "asset-files/ancient.md"));
+
+        when(service.findById(5L)).thenReturn(existing);
+        when(fileStorage.storeFile(eq("note.md"), any(InputStream.class)))
+            .thenReturn(new FileEntry("note.md", "asset-files/new.md"));
+        when(service.update(any(AssetFile.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(versionRepository.findFirstByAssetFileIdOrderByVersionNumberDesc(5L))
+            .thenReturn(Optional.of(oldest));
+        when(versionRepository.findAllByAssetFileIdOrderByVersionNumberDesc(5L))
+            .thenReturn(List.of(newest, oldest));
+
+        facade.updateContent(5L, "text/markdown", new ByteArrayInputStream("x".getBytes(StandardCharsets.UTF_8)));
+
+        verify(versionRepository).deleteById(100L);
+        verify(fileStorage).deleteFile(oldest.getFile());
+    }
+
+    @Test
+    void testRestoreVersionCopiesBytesAndSnapshotsCurrent() {
+        FileEntry currentFile = new FileEntry("note.md", "asset-files/current.md");
+        FileEntry versionFile = new FileEntry("note.md", "asset-files/v1.md");
+
+        AssetFile existing = new AssetFile();
+
+        existing.setId(5L);
+        existing.setName("note.md");
+        existing.setMimeType("text/markdown");
+        existing.setSizeBytes(3);
+        existing.setFile(currentFile);
+        existing.setWorkspaceId(1L);
+
+        AssetFileVersion version = new AssetFileVersion();
+
+        version.setId(77L);
+        version.setAssetFileId(5L);
+        version.setVersionNumber(1);
+        version.setFile(versionFile);
+        version.setMimeType("text/markdown");
+        version.setSizeBytes(9);
+
+        when(service.findById(5L)).thenReturn(existing);
+        when(versionRepository.findById(77L)).thenReturn(Optional.of(version));
+        when(fileStorage.getInputStream(versionFile))
+            .thenReturn(new ByteArrayInputStream("old bytes".getBytes(StandardCharsets.UTF_8)));
+        when(service.sumSizeBytesByWorkspaceIdAndEnvironment(1L, 0)).thenReturn(3L);
+        when(fileStorage.storeFile(eq("note.md"), any(InputStream.class)))
+            .thenReturn(new FileEntry("note.md", "asset-files/restored.md"));
+        when(service.update(any(AssetFile.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(versionRepository.findFirstByAssetFileIdOrderByVersionNumberDesc(5L))
+            .thenReturn(Optional.of(version));
+        when(versionRepository.findAllByAssetFileIdOrderByVersionNumberDesc(5L)).thenReturn(List.of());
+
+        AssetFile result = facade.restoreVersion(5L, 77L);
+
+        assertThat(result.getSizeBytes()).isEqualTo("old bytes".length());
+        assertThat(result.getMimeType()).isEqualTo("text/markdown");
+
+        // The restored version's own blob must remain untouched — restore copies, never re-parents.
+        verify(fileStorage, never()).deleteFile(versionFile);
+
+        ArgumentCaptor<AssetFileVersion> versionCaptor = ArgumentCaptor.forClass(AssetFileVersion.class);
+
+        verify(versionRepository).save(versionCaptor.capture());
+
+        assertThat(versionCaptor.getValue()
+            .getFile()).isEqualTo(currentFile);
+        assertThat(versionCaptor.getValue()
+            .getVersionNumber()).isEqualTo(2);
+    }
+
+    @Test
+    void testRestoreVersionRejectsForeignVersion() {
+        AssetFile existing = new AssetFile();
+
+        existing.setId(5L);
+        existing.setWorkspaceId(1L);
+
+        AssetFileVersion foreignVersion = new AssetFileVersion();
+
+        foreignVersion.setId(77L);
+        foreignVersion.setAssetFileId(999L);
+
+        when(service.findById(5L)).thenReturn(existing);
+        when(versionRepository.findById(77L)).thenReturn(Optional.of(foreignVersion));
+
+        assertThatThrownBy(() -> facade.restoreVersion(5L, 77L))
+            .isInstanceOf(com.bytechef.automation.assetfile.exception.AssetFileNotFoundException.class);
+    }
+
+    @Test
+    void testDeleteSchedulesVersionBlobDeletes() {
+        FileEntry fileEntry = new FileEntry("x.txt", "asset-files/x.txt");
+        FileEntry versionFileEntry = new FileEntry("x.txt", "asset-files/x-v1.txt");
+
+        AssetFile existing = new AssetFile();
+
+        existing.setId(11L);
+        existing.setFile(fileEntry);
+
+        AssetFileVersion version = new AssetFileVersion();
+
+        version.setId(1L);
+        version.setAssetFileId(11L);
+        version.setFile(versionFileEntry);
+
+        when(service.findById(11L)).thenReturn(existing);
+        when(versionRepository.findAllByAssetFileIdOrderByVersionNumberDesc(11L)).thenReturn(List.of(version));
+
+        facade.delete(11L);
+
+        verify(fileStorage).deleteFile(fileEntry);
+        verify(fileStorage).deleteFile(versionFileEntry);
+    }
+
+    @Test
+    void testDeleteEnqueuesOrphanWhenBlobDeleteFails() {
+        FileEntry fileEntry = new FileEntry("x.txt", "asset-files/x.txt");
+        AssetFile existing = new AssetFile();
+
+        existing.setId(11L);
+        existing.setFile(fileEntry);
+
+        when(service.findById(11L)).thenReturn(existing);
+        when(versionRepository.findAllByAssetFileIdOrderByVersionNumberDesc(11L)).thenReturn(List.of());
+        doThrow(new RuntimeException("storage down"))
+            .when(fileStorage)
+            .deleteFile(fileEntry);
+
+        facade.delete(11L);
+
+        verify(orphanBlobRecorder).record(fileEntry);
+        verify(metrics).recordBlobOrphan("RuntimeException");
+    }
+
+    @Test
+    void testEnablePublicLinkGeneratesTokenOnceAndIsIdempotent() {
+        AssetFile existing = new AssetFile();
+
+        existing.setId(5L);
+        existing.setWorkspaceId(1L);
+
+        when(service.findById(5L)).thenReturn(existing);
+        when(service.update(any(AssetFile.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        String token = facade.enablePublicLink(5L);
+
+        assertThat(token).isNotBlank();
+        assertThat(existing.getPublicLinkToken()).isEqualTo(token);
+
+        // Second call returns the SAME token without regenerating.
+        assertThat(facade.enablePublicLink(5L)).isEqualTo(token);
+
+        verify(service, times(1)).update(any(AssetFile.class));
+    }
+
+    @Test
+    void testEnablePublicLinkRejectedWhenKillSwitchOff() {
+        sharingProperties = new AutomationAssetFileSharingProperties(false);
+
+        facade = newFacade();
+
+        assertThatThrownBy(() -> facade.enablePublicLink(5L))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessageContaining("disabled");
+    }
+
+    @Test
+    void testFetchByPublicLinkTokenEmptyWhenKillSwitchOff() {
+        sharingProperties = new AutomationAssetFileSharingProperties(false);
+
+        facade = newFacade();
+
+        assertThat(facade.fetchByPublicLinkToken("some-token")).isEmpty();
+
+        verifyNoInteractions(service);
+    }
+
+    @Test
+    void testCreateSignedDownloadTokenDelegatesToFileEntryTokens() {
+        FileEntry fileEntry = new FileEntry("x.txt", "asset-files/x.txt");
+        AssetFile existing = new AssetFile();
+
+        existing.setId(5L);
+        existing.setFile(fileEntry);
+
+        FileEntryTokens fileEntryTokens = mock(FileEntryTokens.class);
+
+        when(fileEntryTokensObjectProvider.getIfAvailable()).thenReturn(fileEntryTokens);
+        when(service.findById(5L)).thenReturn(existing);
+        when(fileEntryTokens.toSignedToken(fileEntry)).thenReturn("v1.123.payload.sig");
+
+        assertThat(facade.createSignedDownloadToken(5L)).isEqualTo("v1.123.payload.sig");
+    }
+
+    @Test
+    void testCreateSignedDownloadTokenThrowsWithoutBean() {
+        when(fileEntryTokensObjectProvider.getIfAvailable()).thenReturn(null);
+
+        assertThatThrownBy(() -> facade.createSignedDownloadToken(5L))
+            .isInstanceOf(IllegalStateException.class);
     }
 }

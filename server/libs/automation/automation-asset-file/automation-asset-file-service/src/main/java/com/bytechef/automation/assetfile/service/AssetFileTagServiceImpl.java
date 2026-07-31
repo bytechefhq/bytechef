@@ -22,10 +22,8 @@ import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -66,24 +64,6 @@ public class AssetFileTagServiceImpl implements AssetFileTagService {
         }
 
         return tagService.getTags(new ArrayList<>(tagIdSet));
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Map<String, List<Tag>> getTagsByFileName() {
-        Map<String, List<Tag>> tagsByFileName = new HashMap<>();
-
-        for (AssetFile assetFile : assetFileRepository.findAll()) {
-            List<Long> tagIds = assetFile.getTagIds();
-
-            if (tagIds == null || tagIds.isEmpty()) {
-                tagsByFileName.put(assetFile.getName(), List.of());
-            } else {
-                tagsByFileName.put(assetFile.getName(), tagService.getTags(tagIds));
-            }
-        }
-
-        return tagsByFileName;
     }
 
     @Override

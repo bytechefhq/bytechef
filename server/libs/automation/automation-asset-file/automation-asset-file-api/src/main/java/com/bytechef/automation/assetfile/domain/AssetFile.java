@@ -69,6 +69,9 @@ public class AssetFile {
     @Column("workspace_id")
     private Long workspaceId;
 
+    @Column("public_link_token")
+    private String publicLinkToken;
+
     @MappedCollection(idColumn = "asset_file_id")
     private Set<AssetFileTag> assetFileTags = new HashSet<>();
 
@@ -237,6 +240,19 @@ public class AssetFile {
         this.workspaceId = workspaceId;
     }
 
+    /**
+     * Returns the durable public-link token, or {@code null} when the file has no public link. The token is the whole
+     * capability — anyone who knows it can download the content anonymously while the operator-level sharing switch is
+     * on — so it is generated from a CSPRNG and never derived from row data.
+     */
+    public String getPublicLinkToken() {
+        return publicLinkToken;
+    }
+
+    public void setPublicLinkToken(String publicLinkToken) {
+        this.publicLinkToken = publicLinkToken;
+    }
+
     public Instant getCreatedDate() {
         return createdDate;
     }
@@ -368,6 +384,7 @@ public class AssetFile {
             ", metadataJson='" + metadataJson + '\'' +
             ", environment=" + environment +
             ", workspaceId=" + workspaceId +
+            ", publicLinkToken='" + (publicLinkToken == null ? null : "***") + '\'' +
             ", assetFileTags=" + assetFileTags +
             ", createdDate=" + createdDate +
             ", createdBy='" + createdBy + '\'' +

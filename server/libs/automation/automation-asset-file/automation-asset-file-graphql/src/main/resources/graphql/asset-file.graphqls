@@ -16,6 +16,16 @@ type AssetFile {
     lastModifiedBy: String
     lastModifiedDate: Long
     downloadUrl: String!
+    publicLinkUrl: String
+}
+
+type AssetFileVersion {
+    id: ID!
+    versionNumber: Int!
+    mimeType: String!
+    sizeBytes: Long!
+    createdBy: String
+    createdDate: Long
 }
 
 enum AssetFileSource {
@@ -28,6 +38,8 @@ extend type Query {
     assetFiles(workspaceId: ID!, environment: Int, tagIds: [ID!], mimeTypePrefix: String): [AssetFile!]!
     assetFileTags(workspaceId: ID!): [Tag!]!
     assetFileTextContent(id: ID!): String
+    assetFileVersions(id: ID!): [AssetFileVersion!]!
+    assetFileSignedDownloadUrl(id: ID!): String!
 }
 
 extend type Mutation {
@@ -35,6 +47,9 @@ extend type Mutation {
     updateAssetFileTextContent(id: ID!, content: String!): AssetFile!
     deleteAssetFile(id: ID!): Boolean!
     updateAssetFileTags(input: UpdateAssetFileTagsInput!): AssetFile!
+    restoreAssetFileVersion(id: ID!, versionId: ID!): AssetFile!
+    enableAssetFilePublicLink(id: ID!): AssetFile!
+    disableAssetFilePublicLink(id: ID!): AssetFile!
 }
 
 input UpdateAssetFileInput {

@@ -50,6 +50,16 @@ public interface AssetFileRepository extends ListCrudRepository<AssetFile, Long>
 
     Optional<AssetFile> findFirstByName(String name);
 
+    Optional<AssetFile> findByPublicLinkToken(String publicLinkToken);
+
+    @Query("""
+        SELECT * FROM asset_file
+        WHERE LOWER(name) LIKE LOWER(CONCAT('%', :query, '%'))
+        ORDER BY last_modified_date DESC
+        LIMIT :limit
+        """)
+    List<AssetFile> findAllByNameContainingIgnoreCase(@Param("query") String query, @Param("limit") int limit);
+
     @Query("""
         SELECT COALESCE(SUM(size_bytes), 0) FROM asset_file
         WHERE workspace_id = :workspaceId AND environment = :environment

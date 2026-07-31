@@ -9,10 +9,12 @@ package com.bytechef.ee.automation.assetfile.remote.client.service;
 
 import com.bytechef.automation.assetfile.domain.AssetFile;
 import com.bytechef.automation.assetfile.domain.AssetFileFormat;
+import com.bytechef.automation.assetfile.domain.AssetFileVersion;
 import com.bytechef.automation.assetfile.service.AssetFileFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
@@ -94,6 +96,41 @@ public class RemoteAssetFileFacadeClient implements AssetFileFacade {
 
     @Override
     public AssetFile cloneToEnvironment(Long id, Long workspaceId, int targetEnvironmentId, @Nullable String newName) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public AssetFile updateDescription(Long id, @Nullable String description) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<AssetFileVersion> getVersions(Long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public AssetFile restoreVersion(Long id, Long versionId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String enablePublicLink(Long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void disablePublicLink(Long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Optional<AssetFile> fetchByPublicLinkToken(String token) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String createSignedDownloadToken(Long id) {
         throw new UnsupportedOperationException();
     }
 }

@@ -8,6 +8,8 @@ dependencies {
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-web")
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
+    implementation(project(":server:libs:core:file-storage:file-storage-api"))
+    implementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
 
     testImplementation("org.springframework:spring-webflux")

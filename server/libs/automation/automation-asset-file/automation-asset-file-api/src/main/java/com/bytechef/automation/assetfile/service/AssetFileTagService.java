@@ -18,7 +18,6 @@ package com.bytechef.automation.assetfile.service;
 
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Service for accessing tags associated with Workspace Files.
@@ -34,13 +33,6 @@ public interface AssetFileTagService {
      * @return a list of Tag objects assigned to the workspace's asset files
      */
     List<Tag> getAllTags(long workspaceId);
-
-    /**
-     * Retrieves a mapping from workspace file name to list of tags assigned to that file.
-     *
-     * @return a map where keys are workspace file names and values are lists of Tag objects assigned to each file
-     */
-    Map<String, List<Tag>> getTagsByFileName();
 
     /**
      * Updates the tags associated with a specific workspace file.

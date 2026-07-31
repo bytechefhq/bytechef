@@ -18,8 +18,10 @@ package com.bytechef.automation.assetfile.service;
 
 import com.bytechef.automation.assetfile.domain.AssetFile;
 import com.bytechef.automation.assetfile.domain.AssetFileFormat;
+import com.bytechef.automation.assetfile.domain.AssetFileVersion;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -82,6 +84,52 @@ public interface AssetFileFacade {
     Long getOwningWorkspaceId(Long id);
 
     AssetFile rename(Long id, String newName);
+
+    /**
+     * Updates the free-text description of an asset file. A {@code null} value clears the description.
+     */
+    AssetFile updateDescription(Long id, @Nullable String description);
+
+    /**
+     * Lists the content versions of an asset file, newest first. Versions are snapshots of PRIOR content — the current
+     * content lives on the {@link AssetFile} row itself and is not represented as a version.
+     */
+    List<AssetFileVersion> getVersions(Long id);
+
+    /**
+     * Restores a previous content version: the current content is snapshotted as a new version (so a restore is itself
+     * undoable) and the version's bytes are copied into a fresh blob that becomes the current content. The version row
+     * being restored is left untouched.
+     *
+     * @throws com.bytechef.automation.assetfile.exception.AssetFileNotFoundException when the version does not exist or
+     *                                                                                belongs to a different file
+     */
+    AssetFile restoreVersion(Long id, Long versionId);
+
+    /**
+     * Enables (or returns the existing) durable public link for the file. The returned token grants anonymous download
+     * of the file's content for as long as the link stays enabled and the operator-level
+     * {@code bytechef.asset-file.sharing.public-link-enabled} switch is on.
+     *
+     * @throws IllegalStateException when public-link sharing is disabled by the operator
+     */
+    String enablePublicLink(Long id);
+
+    void disablePublicLink(Long id);
+
+    /**
+     * Resolves a public-link token to its asset file. Returns empty when the token is unknown OR when the operator has
+     * switched public sharing off — an existing link stops resolving the moment the kill-switch flips.
+     */
+    Optional<AssetFile> fetchByPublicLinkToken(String token);
+
+    /**
+     * Mints a short-lived HMAC-signed download token for the file's current content, redeemable anonymously at the
+     * signed asset-file download endpoint. TTL comes from the platform-wide signed-URL configuration.
+     *
+     * @throws IllegalStateException when no signing infrastructure is configured
+     */
+    String createSignedDownloadToken(Long id);
 
     AssetFile updateContent(Long id, String contentType, InputStream data);
 

@@ -34,6 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.bytechef.automation.assetfile.domain.AssetFile;
 import com.bytechef.automation.assetfile.domain.AssetFileSource;
 import com.bytechef.automation.assetfile.exception.AssetFileQuotaExceededException;
+import com.bytechef.automation.assetfile.file.storage.AssetFileFileStorage;
 import com.bytechef.automation.assetfile.metric.AssetFileMetrics;
 import com.bytechef.automation.assetfile.service.AssetFileFacade;
 import com.bytechef.automation.assetfile.web.rest.config.AutomationAssetFileRestTestConfiguration;
@@ -76,6 +77,11 @@ class AssetFileRestControllerIntTest {
 
     @MockitoBean
     private AssetFileFacade assetFileFacade;
+
+    // Not exercised here, but the test configuration's component scan also constructs
+    // AssetFilePublicDownloadController, which requires this bean.
+    @MockitoBean
+    private AssetFileFileStorage assetFileFileStorage;
 
     @MockitoBean
     private AssetFileMetrics assetFileMetrics;

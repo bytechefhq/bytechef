@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="20260731120000-1" author="Ivica Cardic">
+        <addColumn tableName="asset_file">
+            <column name="public_link_token" type="VARCHAR(64)"/>
+        </addColumn>
+
+        <!-- Unique so a token resolves to exactly one file; nullable columns admit any number of NULL rows, so files
+             without a public link are unaffected. -->
+        <createIndex tableName="asset_file" indexName="uk_asset_file_public_link_token" unique="true">
+            <column name="public_link_token"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

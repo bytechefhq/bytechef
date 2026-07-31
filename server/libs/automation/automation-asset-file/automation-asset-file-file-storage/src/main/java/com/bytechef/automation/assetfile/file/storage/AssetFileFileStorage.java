@@ -26,6 +26,8 @@ public interface AssetFileFileStorage {
 
     void deleteFile(FileEntry fileEntry);
 
+    boolean fileExists(FileEntry fileEntry);
+
     InputStream getInputStream(FileEntry fileEntry);
 
     FileEntry storeFile(String filename, InputStream data);

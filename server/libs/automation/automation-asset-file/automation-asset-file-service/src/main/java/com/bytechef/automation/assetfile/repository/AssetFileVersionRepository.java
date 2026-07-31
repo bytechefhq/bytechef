@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.assetfile.config;
+package com.bytechef.automation.assetfile.repository;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.bind.DefaultValue;
+import com.bytechef.automation.assetfile.domain.AssetFileVersion;
+import java.util.List;
+import java.util.Optional;
+import org.springframework.data.repository.ListCrudRepository;
 
 /**
  * @author Ivica Cardic
  */
-@ConfigurationProperties(prefix = "bytechef.asset-file")
-public record AutomationAssetFileQuotaProperties(
-    @DefaultValue("26214400") long maxFileSizeBytes,
-    @DefaultValue("1073741824") long perWorkspaceTotalBytes,
-    @DefaultValue("1048576") long maxTextEditBytes,
-    @DefaultValue("10") int maxVersionsPerFile) {
+public interface AssetFileVersionRepository extends ListCrudRepository<AssetFileVersion, Long> {
+
+    List<AssetFileVersion> findAllByAssetFileIdOrderByVersionNumberDesc(Long assetFileId);
+
+    Optional<AssetFileVersion> findFirstByAssetFileIdOrderByVersionNumberDesc(Long assetFileId);
 }

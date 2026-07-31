@@ -29,11 +29,21 @@ public interface AssetFileService {
 
     void delete(Long id);
 
+    Optional<AssetFile> fetchByPublicLinkToken(String publicLinkToken);
+
     Optional<AssetFile> fetchByWorkspaceIdAndEnvironmentAndName(Long workspaceId, int environment, String name);
 
     List<AssetFile> findAllByWorkspaceIdAndEnvironment(Long workspaceId, int environment, List<Long> tagIds);
 
     AssetFile findById(Long id);
+
+    /**
+     * Case-insensitive substring search on {@code name} across every workspace and environment of the current tenant.
+     * Callers are responsible for filtering the results down to the workspaces the requesting user can access — the
+     * automation search facade does this by comparing each result's {@code workspaceId} against the caller's
+     * memberships.
+     */
+    List<AssetFile> searchByName(String query, int limit);
 
     /**
      * Total asset-file bytes across the whole tenant (all workspaces, all environments) — the quantity the plan's

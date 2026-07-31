@@ -20,7 +20,6 @@ import com.bytechef.automation.assetfile.service.AssetFileService;
 import com.bytechef.automation.search.SearchAssetProvider;
 import com.bytechef.automation.search.SearchAssetType;
 import java.util.List;
-import java.util.Locale;
 import org.springframework.stereotype.Component;
 
 /**
@@ -37,30 +36,19 @@ class AssetFileSearchAssetProvider implements SearchAssetProvider {
 
     @Override
     public List<AssetFileSearchResult> search(String query, int limit) {
-        String queryLower = query.toLowerCase(Locale.ROOT);
-
-        // Workspace and environment are placeholders here — the SearchAssetProvider contract does not
-        // currently thread either through. Tracking parity with the existing hardcoded workspaceId=1L until
-        // the search infrastructure carries a request-scoped workspace + environment context.
-        return assetFileService.findAllByWorkspaceIdAndEnvironment(1L, 0, null)
+        // The query spans every workspace and environment of the current tenant; each result carries its real owning
+        // workspaceId so AutomationSearchFacade can drop hits from workspaces the caller is not a member of. The
+        // access decision deliberately lives in the facade (which resolves the caller's memberships on the
+        // authenticated request thread) because this provider runs on a fan-out pool with no SecurityContext.
+        return assetFileService.searchByName(query, limit)
             .stream()
-            .filter(assetFile -> containsIgnoreCase(assetFile.getName(), queryLower))
-            .limit(limit)
-            .map(assetFile -> new AssetFileSearchResult(assetFile.getId(), assetFile.getName(), 1L))
+            .map(assetFile -> new AssetFileSearchResult(
+                assetFile.getId(), assetFile.getName(), assetFile.getDescription(), assetFile.getWorkspaceId()))
             .toList();
     }
 
     @Override
     public SearchAssetType getAssetType() {
         return SearchAssetType.ASSET_FILE;
-    }
-
-    private boolean containsIgnoreCase(String text, String query) {
-        if (text == null) {
-            return false;
-        }
-
-        return text.toLowerCase(Locale.ROOT)
-            .contains(query);
     }
 }

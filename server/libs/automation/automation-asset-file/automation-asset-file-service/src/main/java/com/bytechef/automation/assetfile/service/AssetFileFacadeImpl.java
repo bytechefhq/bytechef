@@ -16,17 +16,22 @@
 
 package com.bytechef.automation.assetfile.service;
 
+import com.bytechef.automation.assetfile.cleanup.AssetFileOrphanBlobRecorder;
 import com.bytechef.automation.assetfile.config.AutomationAssetFileQuotaProperties;
+import com.bytechef.automation.assetfile.config.AutomationAssetFileSharingProperties;
 import com.bytechef.automation.assetfile.domain.AssetFile;
 import com.bytechef.automation.assetfile.domain.AssetFileFormat;
 import com.bytechef.automation.assetfile.domain.AssetFileSource;
+import com.bytechef.automation.assetfile.domain.AssetFileVersion;
 import com.bytechef.automation.assetfile.exception.AssetFileNotFoundException;
 import com.bytechef.automation.assetfile.exception.AssetFileQuotaExceededException;
 import com.bytechef.automation.assetfile.file.storage.AssetFileFileStorage;
 import com.bytechef.automation.assetfile.metric.AssetFileMetrics;
+import com.bytechef.automation.assetfile.repository.AssetFileVersionRepository;
 import com.bytechef.automation.assetfile.util.AssetFileNameSanitizer;
 import com.bytechef.exception.QuotaLimitExceededException;
 import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.file.storage.token.FileEntryTokens;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.plan.provider.PlanLimitsProvider;
 import com.bytechef.platform.ratelimit.PlanLimitRejectionCounter;
@@ -38,7 +43,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
+import java.util.Base64;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import org.apache.tika.Tika;
 import org.slf4j.Logger;
@@ -59,29 +67,44 @@ public class AssetFileFacadeImpl implements AssetFileFacade {
 
     private static final Logger log = LoggerFactory.getLogger(AssetFileFacadeImpl.class);
 
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+
     private final AssetFileService service;
     private final AssetFileFileStorage fileStorage;
     private final AssetFileMetrics metrics;
+    private final AssetFileOrphanBlobRecorder orphanBlobRecorder;
+    private final AssetFileVersionRepository versionRepository;
+    private final ObjectProvider<FileEntryTokens> fileEntryTokensObjectProvider;
     private final ObjectProvider<PlanLimitRejectionCounter> planLimitRejectionCounterObjectProvider;
     private final ObjectProvider<PlanLimitsProvider> planLimitsProviderObjectProvider;
     private final AutomationAssetFileQuotaProperties quota;
+    private final AutomationAssetFileSharingProperties sharingProperties;
     private final Tika tika;
 
+    @SuppressFBWarnings("EI")
     public AssetFileFacadeImpl(
         AssetFileService service,
         AssetFileFileStorage fileStorage,
         AssetFileMetrics metrics,
+        AssetFileOrphanBlobRecorder orphanBlobRecorder,
+        AssetFileVersionRepository versionRepository,
+        ObjectProvider<FileEntryTokens> fileEntryTokensObjectProvider,
         ObjectProvider<PlanLimitRejectionCounter> planLimitRejectionCounterObjectProvider,
         ObjectProvider<PlanLimitsProvider> planLimitsProviderObjectProvider,
         AutomationAssetFileQuotaProperties quota,
+        AutomationAssetFileSharingProperties sharingProperties,
         Tika tika) {
 
         this.service = service;
         this.fileStorage = fileStorage;
         this.metrics = metrics;
+        this.orphanBlobRecorder = orphanBlobRecorder;
+        this.versionRepository = versionRepository;
+        this.fileEntryTokensObjectProvider = fileEntryTokensObjectProvider;
         this.planLimitRejectionCounterObjectProvider = planLimitRejectionCounterObjectProvider;
         this.planLimitsProviderObjectProvider = planLimitsProviderObjectProvider;
         this.quota = quota;
+        this.sharingProperties = sharingProperties;
         this.tika = tika;
     }
 
@@ -209,31 +232,29 @@ public class AssetFileFacadeImpl implements AssetFileFacade {
         AssetFile assetFile = service.findById(id);
         FileEntry fileEntry = assetFile.getFile();
 
+        // Version rows go away via the FK cascade, but their blobs must be enumerated BEFORE the row delete —
+        // afterwards there is nothing left to enumerate from.
+        List<AssetFileVersion> versions = versionRepository.findAllByAssetFileIdOrderByVersionNumberDesc(id);
+
         // Delete the DB row first; only after the transaction commits do we drop the blob. If we deleted the blob
         // first and the DB delete (or any later operation in the same transaction) failed, the rollback would
         // restore the row pointing at a blob that is permanently gone — every download would 500. Reversing the
-        // order means a failed blob delete leaves an orphan (handled by a background GC), but the data the user
-        // sees is always consistent.
+        // order means a failed blob delete leaves an orphan (retried by the orphan-blob cleaner), but the data the
+        // user sees is always consistent.
         service.delete(id);
 
         if (fileEntry != null) {
             scheduleBlobDeleteAfterCommit(id, fileEntry);
         }
+
+        for (AssetFileVersion version : versions) {
+            scheduleBlobDeleteAfterCommit(id, version.getFile());
+        }
     }
 
     private void scheduleBlobDeleteAfterCommit(Long id, FileEntry fileEntry) {
         if (!TransactionSynchronizationManager.isSynchronizationActive()) {
-            try {
-                fileStorage.deleteFile(fileEntry);
-            } catch (RuntimeException exception) {
-                // The DB row is already deleted but the blob is not. Without the counter increment ops would have
-                // no signal that storage is leaking — the leak only becomes visible when a workspace quota rejects
-                // a new upload. Tag the simple class name so a sudden spike in one failure mode is identifiable in
-                // dashboards without needing the full WARN log line.
-                log.warn("Failed to delete blob for workspace file {}", id, exception);
-                metrics.recordBlobOrphan(exception.getClass()
-                    .getSimpleName());
-            }
+            deleteBlobOrEnqueueOrphan(id, fileEntry);
 
             return;
         }
@@ -242,15 +263,25 @@ public class AssetFileFacadeImpl implements AssetFileFacade {
 
             @Override
             public void afterCommit() {
-                try {
-                    fileStorage.deleteFile(fileEntry);
-                } catch (RuntimeException exception) {
-                    log.warn("Failed to delete blob for workspace file {}", id, exception);
-                    metrics.recordBlobOrphan(exception.getClass()
-                        .getSimpleName());
-                }
+                deleteBlobOrEnqueueOrphan(id, fileEntry);
             }
         });
+    }
+
+    private void deleteBlobOrEnqueueOrphan(Long id, FileEntry fileEntry) {
+        try {
+            fileStorage.deleteFile(fileEntry);
+        } catch (RuntimeException exception) {
+            // The DB row is already deleted but the blob is not. Without the counter increment ops would have
+            // no signal that storage is leaking — the leak only becomes visible when a workspace quota rejects
+            // a new upload. Tag the simple class name so a sudden spike in one failure mode is identifiable in
+            // dashboards without needing the full WARN log line. The orphan-blob queue row is what turns the
+            // leak from permanent into transient: the cleaner retries the delete on its next sweep.
+            log.warn("Failed to delete blob for workspace file {}", id, exception);
+            metrics.recordBlobOrphan(exception.getClass()
+                .getSimpleName());
+            orphanBlobRecorder.record(fileEntry);
+        }
     }
 
     @Override
@@ -336,6 +367,15 @@ public class AssetFileFacadeImpl implements AssetFileFacade {
     }
 
     @Override
+    public AssetFile updateDescription(Long id, String description) {
+        AssetFile assetFile = service.findById(id);
+
+        assetFile.setDescription(description);
+
+        return service.update(assetFile);
+    }
+
+    @Override
     public AssetFile cloneToEnvironment(
         Long id, Long workspaceId, int targetEnvironmentId, String newName) {
 
@@ -357,22 +397,7 @@ public class AssetFileFacadeImpl implements AssetFileFacade {
         // Materialise bytes via the file storage abstraction so this method works under any storage backend (JDBC,
         // S3, file system) without exposing the source FileEntry to the caller. Reading inside the same transaction
         // keeps the read consistent with the source row's view at this point in time.
-        byte[] bytes;
-
-        try (InputStream inputStream = fileStorage.getInputStream(source.getFile());
-            ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
-
-            byte[] chunk = new byte[8192];
-            int read;
-
-            while ((read = inputStream.read(chunk)) >= 0) {
-                buffer.write(chunk, 0, read);
-            }
-
-            bytes = buffer.toByteArray();
-        } catch (IOException exception) {
-            throw new UncheckedIOException(exception);
-        }
+        byte[] bytes = readAllFromStorage(source.getFile());
 
         enforceSingleFileQuota(bytes.length);
         enforceWorkspaceQuota(workspaceId, targetEnvironmentId, bytes.length);
@@ -410,10 +435,48 @@ public class AssetFileFacadeImpl implements AssetFileFacade {
     @Override
     public AssetFile updateContent(Long id, String contentType, InputStream data) {
         AssetFile assetFile = service.findById(id);
-        Long workspaceId = resolveWorkspaceIdForFile(assetFile);
-        int environment = (int) assetFile.getEnvironmentId();
 
         byte[] bytes = readAllBoundedByPerFileQuota(data);
+
+        return updateContentInternal(assetFile, tika.detect(bytes, assetFile.getName()), bytes);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<AssetFileVersion> getVersions(Long id) {
+        // findById throws for an unknown id so callers get a 404-shaped error instead of a silently empty history.
+        service.findById(id);
+
+        return versionRepository.findAllByAssetFileIdOrderByVersionNumberDesc(id);
+    }
+
+    @Override
+    public AssetFile restoreVersion(Long id, Long versionId) {
+        AssetFile assetFile = service.findById(id);
+
+        AssetFileVersion version = versionRepository.findById(versionId)
+            .filter(candidate -> Objects.equals(candidate.getAssetFileId(), id))
+            .orElseThrow(() -> new AssetFileNotFoundException(
+                "Asset file version %d not found for asset file %d".formatted(versionId, id)));
+
+        // Copy-not-share: the restored content gets a fresh blob so the version row keeps sole ownership of its own
+        // blob and either row can later be deleted without consulting the other.
+        byte[] bytes = readAllFromStorage(version.getFile());
+
+        enforceSingleFileQuota(bytes.length);
+
+        return updateContentInternal(assetFile, version.getMimeType(), bytes);
+    }
+
+    /**
+     * Replaces the current content of {@code assetFile} with {@code bytes}, snapshotting the PRIOR content as a new
+     * {@link AssetFileVersion} in the same transaction. The prior blob is handed to the version row instead of being
+     * deleted; pruning (bounded by {@code bytechef.asset-file.max-versions-per-file}) deletes the oldest snapshots'
+     * blobs after commit.
+     */
+    private AssetFile updateContentInternal(AssetFile assetFile, String mimeType, byte[] bytes) {
+        Long workspaceId = resolveWorkspaceIdForFile(assetFile);
+        int environment = (int) assetFile.getEnvironmentId();
 
         long delta = bytes.length - assetFile.getSizeBytes();
 
@@ -421,33 +484,136 @@ public class AssetFileFacadeImpl implements AssetFileFacade {
             enforceWorkspaceQuota(workspaceId, environment, delta);
         }
 
-        String sniffedMime = tika.detect(bytes, assetFile.getName());
-        FileEntry oldFile = assetFile.getFile();
+        FileEntry previousFile = assetFile.getFile();
+        String previousMimeType = assetFile.getMimeType();
+        long previousSizeBytes = assetFile.getSizeBytes();
+
         FileEntry stored = fileStorage.storeFile(assetFile.getName(), new ByteArrayInputStream(bytes));
 
         assetFile.setFile(stored);
-        assetFile.setMimeType(sniffedMime);
+        assetFile.setMimeType(mimeType);
         assetFile.setSizeBytes(bytes.length);
 
         AssetFile saved;
 
         try {
             saved = service.update(assetFile);
+
+            if (previousFile != null) {
+                snapshotVersion(saved.getId(), previousFile, previousMimeType, previousSizeBytes);
+                pruneVersions(saved.getId());
+            }
         } catch (RuntimeException exception) {
             safeDeleteAfterRollback(stored, exception);
 
             throw exception;
         }
 
-        if (oldFile != null) {
-            try {
-                fileStorage.deleteFile(oldFile);
-            } catch (RuntimeException exception) {
-                log.warn("Failed to delete previous blob for workspace file {}", id, exception);
-            }
+        return saved;
+    }
+
+    private void snapshotVersion(Long assetFileId, FileEntry file, String mimeType, long sizeBytes) {
+        int nextVersionNumber = versionRepository.findFirstByAssetFileIdOrderByVersionNumberDesc(assetFileId)
+            .map(latest -> latest.getVersionNumber() + 1)
+            .orElse(1);
+
+        AssetFileVersion version = new AssetFileVersion();
+
+        version.setAssetFileId(assetFileId);
+        version.setVersionNumber(nextVersionNumber);
+        version.setFile(file);
+        version.setMimeType(mimeType);
+        version.setSizeBytes(sizeBytes);
+
+        versionRepository.save(version);
+    }
+
+    private void pruneVersions(Long assetFileId) {
+        int maxVersions = quota.maxVersionsPerFile();
+
+        if (maxVersions < 0) {
+            return;
         }
 
-        return saved;
+        List<AssetFileVersion> versions = versionRepository.findAllByAssetFileIdOrderByVersionNumberDesc(assetFileId);
+
+        if (versions.size() <= maxVersions) {
+            return;
+        }
+
+        for (AssetFileVersion excess : versions.subList(maxVersions, versions.size())) {
+            versionRepository.deleteById(excess.getId());
+
+            scheduleBlobDeleteAfterCommit(assetFileId, excess.getFile());
+        }
+    }
+
+    @Override
+    public String enablePublicLink(Long id) {
+        if (!sharingProperties.publicLinkEnabled()) {
+            throw new IllegalStateException("Public link sharing is disabled by the operator");
+        }
+
+        AssetFile assetFile = service.findById(id);
+
+        String existingToken = assetFile.getPublicLinkToken();
+
+        if (existingToken != null) {
+            return existingToken;
+        }
+
+        byte[] tokenBytes = new byte[32];
+
+        SECURE_RANDOM.nextBytes(tokenBytes);
+
+        Base64.Encoder encoder = Base64.getUrlEncoder()
+            .withoutPadding();
+
+        String token = encoder.encodeToString(tokenBytes);
+
+        assetFile.setPublicLinkToken(token);
+
+        service.update(assetFile);
+
+        return token;
+    }
+
+    @Override
+    public void disablePublicLink(Long id) {
+        AssetFile assetFile = service.findById(id);
+
+        if (assetFile.getPublicLinkToken() == null) {
+            return;
+        }
+
+        assetFile.setPublicLinkToken(null);
+
+        service.update(assetFile);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<AssetFile> fetchByPublicLinkToken(String token) {
+        if (!sharingProperties.publicLinkEnabled()) {
+            return Optional.empty();
+        }
+
+        return service.fetchByPublicLinkToken(token);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public String createSignedDownloadToken(Long id) {
+        FileEntryTokens fileEntryTokens = fileEntryTokensObjectProvider.getIfAvailable();
+
+        if (fileEntryTokens == null) {
+            throw new IllegalStateException(
+                "Signed download URLs are unavailable: no FileEntryTokens bean is configured");
+        }
+
+        AssetFile assetFile = service.findById(id);
+
+        return fileEntryTokens.toSignedToken(assetFile.getFile());
     }
 
     private String appendSuffix(String name, int suffix) {
@@ -578,6 +744,23 @@ public class AssetFileFacadeImpl implements AssetFileFacade {
         }
     }
 
+    private byte[] readAllFromStorage(FileEntry fileEntry) {
+        try (InputStream inputStream = fileStorage.getInputStream(fileEntry);
+            ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
+
+            byte[] chunk = new byte[8192];
+            int read;
+
+            while ((read = inputStream.read(chunk)) >= 0) {
+                buffer.write(chunk, 0, read);
+            }
+
+            return buffer.toByteArray();
+        } catch (IOException exception) {
+            throw new UncheckedIOException(exception);
+        }
+    }
+
     private Long resolveWorkspaceIdForFile(AssetFile assetFile) {
         Long workspaceId = assetFile.getWorkspaceId();
 
@@ -604,6 +787,10 @@ public class AssetFileFacadeImpl implements AssetFileFacade {
                 originalCause.toString(), cleanupException);
 
             originalCause.addSuppressed(cleanupException);
+
+            // The recorder commits in its own transaction (REQUIRES_NEW), so the queue row survives the rollback
+            // of the surrounding transaction that is already in flight here.
+            orphanBlobRecorder.record(stored);
         }
     }
 }

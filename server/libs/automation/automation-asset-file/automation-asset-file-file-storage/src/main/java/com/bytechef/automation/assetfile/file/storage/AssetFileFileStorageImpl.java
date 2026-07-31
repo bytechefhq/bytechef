@@ -41,6 +41,11 @@ public class AssetFileFileStorageImpl implements AssetFileFileStorage {
     }
 
     @Override
+    public boolean fileExists(FileEntry fileEntry) {
+        return fileStorageService.fileExists(DIRECTORY, fileEntry);
+    }
+
+    @Override
     public InputStream getInputStream(FileEntry fileEntry) {
         return fileStorageService.getInputStream(DIRECTORY, fileEntry);
     }

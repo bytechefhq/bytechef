@@ -22,12 +22,8 @@ import com.bytechef.automation.search.SearchResult;
 /**
  * @author Ivica Cardic
  */
-public record AssetFileSearchResult(Long id, String name, Long workspaceId) implements SearchResult<Long> {
-
-    @Override
-    public String description() {
-        return null;
-    }
+public record AssetFileSearchResult(Long id, String name, String description, Long workspaceId)
+    implements SearchResult<Long> {
 
     @Override
     public SearchAssetType type() {

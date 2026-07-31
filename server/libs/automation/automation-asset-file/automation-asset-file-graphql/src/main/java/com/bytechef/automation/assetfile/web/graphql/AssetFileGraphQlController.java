@@ -17,7 +17,9 @@
 package com.bytechef.automation.assetfile.web.graphql;
 
 import com.bytechef.automation.assetfile.config.AutomationAssetFileQuotaProperties;
+import com.bytechef.automation.assetfile.config.AutomationAssetFileSharingProperties;
 import com.bytechef.automation.assetfile.domain.AssetFile;
+import com.bytechef.automation.assetfile.domain.AssetFileVersion;
 import com.bytechef.automation.assetfile.service.AssetFileFacade;
 import com.bytechef.automation.assetfile.service.AssetFileTagService;
 import com.bytechef.platform.tag.domain.Tag;
@@ -45,17 +47,22 @@ import org.springframework.stereotype.Controller;
 @SuppressFBWarnings("EI")
 public class AssetFileGraphQlController {
 
+    private final AssetFileGraphQlAccessGuard accessGuard;
     private final AutomationAssetFileQuotaProperties quotaProperties;
+    private final AutomationAssetFileSharingProperties sharingProperties;
     private final TagService tagService;
     private final AssetFileFacade assetFileFacade;
     private final AssetFileTagService assetFileTagService;
 
     @SuppressFBWarnings("EI")
     public AssetFileGraphQlController(
-        AutomationAssetFileQuotaProperties quotaProperties, TagService tagService,
+        AssetFileGraphQlAccessGuard accessGuard, AutomationAssetFileQuotaProperties quotaProperties,
+        AutomationAssetFileSharingProperties sharingProperties, TagService tagService,
         AssetFileFacade assetFileFacade, AssetFileTagService assetFileTagService) {
 
+        this.accessGuard = accessGuard;
         this.quotaProperties = quotaProperties;
+        this.sharingProperties = sharingProperties;
         this.tagService = tagService;
         this.assetFileFacade = assetFileFacade;
         this.assetFileTagService = assetFileTagService;
@@ -63,6 +70,8 @@ public class AssetFileGraphQlController {
 
     @QueryMapping
     public AssetFile assetFile(@Argument Long id) {
+        accessGuard.verifyFileAccess(id);
+
         return assetFileFacade.findById(id);
     }
 
@@ -70,6 +79,8 @@ public class AssetFileGraphQlController {
     public List<AssetFile> assetFiles(
         @Argument Long workspaceId, @Argument Integer environment, @Argument List<Long> tagIds,
         @Argument String mimeTypePrefix) {
+
+        accessGuard.verifyWorkspaceAccess(workspaceId);
 
         // Default to DEVELOPMENT (ordinal 0) when the client did not pass environment so legacy callers do not
         // suddenly receive an empty list. Once every consumer is updated this default can become a hard error.
@@ -96,6 +107,8 @@ public class AssetFileGraphQlController {
 
     @QueryMapping
     public String assetFileTextContent(@Argument Long id) {
+        accessGuard.verifyFileAccess(id);
+
         AssetFile assetFile = assetFileFacade.findById(id);
 
         if (assetFile.getSizeBytes() > quotaProperties.maxTextEditBytes()) {
@@ -111,8 +124,16 @@ public class AssetFileGraphQlController {
 
     @MutationMapping
     public AssetFile updateAssetFile(@Argument UpdateAssetFileInput input) {
+        accessGuard.verifyFileAccess(input.id());
+
         if (input.name() != null) {
             assetFileFacade.rename(input.id(), input.name());
+        }
+
+        // A null description means "leave unchanged" (the client omits the field on rename-only updates); clearing a
+        // description is expressed as an empty string.
+        if (input.description() != null) {
+            assetFileFacade.updateDescription(input.id(), input.description());
         }
 
         return assetFileFacade.findById(input.id());
@@ -120,19 +141,64 @@ public class AssetFileGraphQlController {
 
     @MutationMapping
     public AssetFile updateAssetFileTextContent(@Argument Long id, @Argument String content) {
+        accessGuard.verifyFileAccess(id);
+
         return assetFileFacade.updateContent(
             id, "text/plain", new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8)));
     }
 
     @MutationMapping
     public boolean deleteAssetFile(@Argument Long id) {
+        accessGuard.verifyFileAccess(id);
+
         assetFileFacade.delete(id);
 
         return true;
     }
 
+    @QueryMapping
+    public List<AssetFileVersion> assetFileVersions(@Argument Long id) {
+        accessGuard.verifyFileAccess(id);
+
+        return assetFileFacade.getVersions(id);
+    }
+
+    @QueryMapping
+    public String assetFileSignedDownloadUrl(@Argument Long id) {
+        accessGuard.verifyFileAccess(id);
+
+        return "/api/automation/asset-files/signed/%s".formatted(assetFileFacade.createSignedDownloadToken(id));
+    }
+
+    @MutationMapping
+    public AssetFile restoreAssetFileVersion(@Argument Long id, @Argument Long versionId) {
+        accessGuard.verifyFileAccess(id);
+
+        return assetFileFacade.restoreVersion(id, versionId);
+    }
+
+    @MutationMapping
+    public AssetFile enableAssetFilePublicLink(@Argument Long id) {
+        accessGuard.verifyFileAccess(id);
+
+        assetFileFacade.enablePublicLink(id);
+
+        return assetFileFacade.findById(id);
+    }
+
+    @MutationMapping
+    public AssetFile disableAssetFilePublicLink(@Argument Long id) {
+        accessGuard.verifyFileAccess(id);
+
+        assetFileFacade.disablePublicLink(id);
+
+        return assetFileFacade.findById(id);
+    }
+
     @MutationMapping
     public AssetFile updateAssetFileTags(@Argument UpdateAssetFileTagsInput input) {
+        accessGuard.verifyFileAccess(input.id());
+
         List<Tag> tags = input.tags() == null
             ? List.of()
             : input.tags()
@@ -158,6 +224,24 @@ public class AssetFileGraphQlController {
     @SchemaMapping(typeName = "AssetFile", field = "downloadUrl")
     public String downloadUrl(AssetFile assetFile) {
         return "/api/automation/internal/asset-files/%d/content".formatted(assetFile.getId());
+    }
+
+    @SchemaMapping(typeName = "AssetFile", field = "publicLinkUrl")
+    public String publicLinkUrl(AssetFile assetFile) {
+        // Hidden while the operator kill-switch is off: the link would 404 anyway, and showing it would suggest the
+        // file is still shared externally when it is not.
+        if (!sharingProperties.publicLinkEnabled() || assetFile.getPublicLinkToken() == null) {
+            return null;
+        }
+
+        return "/api/automation/asset-files/public/%s".formatted(assetFile.getPublicLinkToken());
+    }
+
+    @SchemaMapping(typeName = "AssetFileVersion", field = "createdDate")
+    public Long assetFileVersionCreatedDate(AssetFileVersion assetFileVersion) {
+        Instant createdDate = assetFileVersion.getCreatedDate();
+
+        return createdDate == null ? null : createdDate.toEpochMilli();
     }
 
     @SchemaMapping(typeName = "AssetFile", field = "source")
