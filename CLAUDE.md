@@ -667,14 +667,103 @@ never surfaces as a 500. Spec:
   of a string. Analysis + implementation status:
   `docs/superpowers/specs/2026-07-20-embabel-koog-goap-domain-model-analysis.md` §4.
 
+### AI Guardrails (EE, standalone across surfaces)
+
+Content guardrails (PII/secret redaction, blocked terms, moderation, injection detection, response/streaming
+redaction) live in the standalone EE module `platform-ai-guardrails` (`-api`/`-service`/`-graphql`, under
+`server/ee/libs/platform/platform-ai/`) — not inside the gateway. This is an extraction from the earlier
+gateway-only implementation; see "AI Gateway content guardrails" below for the gateway's own adapter.
+
+- **Engine**: `AiGuardrails` (`@Component @ConditionalOnEEVersion`) is registered UNCONDITIONALLY —
+  decoupled from `bytechef.ai.gateway.enabled` (default false); it is inert when no workspace has anything
+  enabled, so registering it unconditionally costs nothing and lets the agent surfaces work even with the
+  gateway toggled off.
+- **Settings**: `AiGuardrailsWorkspaceSettings` is PROPERTY-BACKED, not a dedicated table — one
+  `PropertyService` row per workspace (`Property.Scope.WORKSPACE`); the tenant default (null `workspaceId`)
+  uses `Property.Scope.PLATFORM` with a null `scopeId`, the same convention as
+  `AiProviderConnectionSourceImpl` / the `"mcp.server"` property. Five boolean toggles (`redactPii`,
+  `redactSecrets`, `moderationEnabled`, `injectionDetectionEnabled`, `scanResponses`) plus a `blockedTerms`
+  editor and `blockingMode` (`BLOCK` default | `REDACT_AND_CONTINUE`, INT-ordinal enum — governs only the
+  blocking guardrails; redaction guardrails always redact-and-continue). GraphQL:
+  `aiGuardrailsWorkspaceSettings(workspaceId)` returns `null` on a missing row (client synthesizes defaults),
+  `isAuthenticated()`-gated; `updateAiGuardrailsWorkspaceSettings` is `ROLE_ADMIN`-gated on the controller
+  itself (A2A precedent — no facade layer owns the check here). Settings UI: Workspace Settings → "AI" group
+  → Guardrails page (`/automation/settings/ai/guardrails`, admin + EE gated).
+- **Agent surfaces**: `AiGuardrailsAdvisor` (Spring AI `CallAdvisor`/`StreamAdvisor`,
+  `platform-ai-guardrails-service`) registers at `HIGHEST_PRECEDENCE`, ahead of per-node canvas guardrail
+  cluster elements — the workspace policy is a floor, node elements only add restrictions. The canvas AI
+  Agent component (CE, `server/libs/modules/components/ai/agent`) reaches it through a CE SPI seam,
+  `AiGuardrailsAdvisorProvider` (`platform-ai-api`, same idiom as `ToolExecutionRecorder` — optional bean,
+  no-op on CE). AI Hub wires the advisor at the ChatClient-construction seam in `AiHubSpringAIAgent`,
+  covering ASK/BUILD agents and personal-agent override clients.
+- **Subagent delegate LLM calls (F3, ticket 732)**: closed. `SubAgentGuardrailedChatClient`
+  (`ee.ai.hub.guardrails`, ai-hub-service) is a hand-written `ChatClient` decorator that wraps a delegate's
+  own inner `ChatClient` so its one-shot `.call()`/`.stream()` attaches a fresh, workspace-scoped
+  `AiGuardrailsAdvisor` before delegating (`chatClient.mutate().defaultAdvisors(...)`'s per-request shape,
+  deferred to request time since the delegate `ChatClient` bean is a singleton shared by every workspace).
+  It resolves the workspace id from the SAME forwarded `ToolContext` map every hand-rolled delegate
+  `ToolCallback` (`SkillsAgentToolCallback`, `ManagerSubAgentToolCallback`, `ResearchToolCallback`, etc.)
+  already builds and passes to `.toolContext(Map)` — via `AgentToolInvocationContext
+  .TOOL_CONTEXT_WORKSPACE_ID_KEY` — so no delegate class needed to change. One seam in
+  `AiHubConfiguration` (wrapping the `ChatClient` at the point each is handed to its
+  `createXToolCallback`/`new XAgentToolCallback` call) covers all three delegate families: Copilot
+  specialists, the AI-hub-owned subagents (research/data_analyst/image_generator/slide_builder), and the
+  manager specialists (mcp_manager/personal_agent_manager/deployment_manager/api_collection_manager). A
+  BLOCK-mode violation inside a delegate call throws `AiGuardrailViolationException` synchronously out of
+  `.call()`; every delegate's pre-existing `catch (RuntimeException)` arm converts it to a tool-error string
+  via `ToolErrors.runtimeFailure(...)` (class-name only, not `getMessage()`) rather than crashing the turn.
+  **Still uncovered, inherent to the advisor approach**: a delegate's completion still returns to the
+  *parent* as a tool message (skips the parent's own input scan) and streams to the client as tool-result
+  events (skips the parent's response scan) — the delegate's OWN advisor now redacts/blocks its own
+  request+response, but the parent agent never re-scans tool outputs. MCP-surface manager subagents
+  (`AiHubManagerMcpContributorConfiguration` et al.) remain a different, out-of-scope surface — they
+  construct their own `ManagerSubAgentToolCallback` from the same `ChatClient` beans on a different `@Bean`
+  method that F3 does not wrap.
+- **Model-based moderation (F2, ticket 732)**: covers every advisor-fronted surface, not just the gateway.
+  `AiGuardrails#checkInputs` (the advisor's non-throwing entry point) takes an optional
+  `AiGatewayModerationClassifier` (same SPI the gateway adapter's own classifier already implements — no
+  cycle, the module already depended on `platform-ai-gateway-api`) and checks it when `moderation-enabled` /
+  workspace `moderationEnabled` is active, fail-open on a classifier error like injection. The throwing
+  `AiGuardrails#applyToInputs` (the gateway adapter's own path) deliberately never moderates — the gateway
+  already moderates its own DTO pipeline with its own classifier + project overlay, so running it a second
+  time here would double-moderate. `isActive` now also counts moderation as an activation reason. Because a
+  moderation verdict has no locatable span (unlike a blocked term), a `REDACT_AND_CONTINUE` downgrade
+  replaces the WHOLE message with `[REDACTED_MODERATED]` (category/metric `moderation_flagged`) rather than
+  masking a substring — a deliberate departure from injection's existing downgrade (which still forwards
+  only the pii/secret-redacted original text, unchanged by this work). The settings UI's old "currently
+  applies to AI Gateway traffic only" caveat on the moderation toggle is gone; it now names the
+  `bytechef.ai.gateway.guardrails.moderation-model` property required for the toggle to take effect. See
+  the design spec's decisions log for why REDACT_AND_CONTINUE was implemented as whole-message masking
+  rather than "moderation never downgrades."
+- **Metric**: `bytechef_ai_guardrail{event, surface}` (`surface = gateway | ai_agent | ai_hub`), generalized
+  from the old gateway-only counter; wired via `ObjectProvider<MeterRegistry>`. The per-surface split is
+  clean for EVERY event on the advisor path, including request-direction ones: `AiGuardrails#checkInputs`
+  (the advisor's non-throwing entry point) takes an `AiGuardrailMetrics` parameter and records
+  `pii_redacted`/`secret_redacted`/`blocked_term`/`injection_flagged`/`moderation_flagged` through whatever instance
+  `AiGuardrailsAdvisor` passes in — its own per-request, surface-tagged instance — not through the engine's
+  own bean. Only `AiGuardrails#applyToInputs` (the gateway adapter's throwing entry point) still records
+  through the engine's own internal `AiGuardrailMetrics` bean, gated on `bytechef.ai.gateway.enabled` and
+  tagged `surface=gateway`. See `docs/agents/ai-guardrails.md` for the full breakdown.
+- Spec: `docs/superpowers/specs/2026-07-31-ai-guardrails-standalone-design.md`. Agent docs:
+  `docs/agents/ai-guardrails.md` (engine, advisor, surfaces) and `docs/agents/ai-gateway-guardrails.md`
+  (gateway adapter specifics, project overlay).
+
 ### AI Gateway content guardrails (EE)
 
-`AiGatewayGuardrails` runs in `AiGatewayFacadeImpl` on the chat and embeddings paths. Effective policy is
-global properties unioned with per-workspace settings and a per-project overlay — **additive**, so a narrower
-scope can enable a guardrail or add blocked terms but never turn one off. The request path covers PII and
-secret redaction, blocked terms, moderation, and injection detection; response and streaming redaction are
-opt-in. Violations throw `AiGatewayGuardrailException` → HTTP 422 and never echo the offending content.
-See `docs/agents/ai-gateway-guardrails.md`.
+`AiGatewayGuardrails` (`automation-ai-gateway-service`) is now a thin adapter over the shared
+`platform-ai-guardrails` engine described above, gated by its OWN `bytechef.ai.gateway.enabled` toggle
+(unchanged pre-extraction behavior — the engine's unconditional registration does not change when the
+gateway itself runs). It layers the gateway's project-level overlay (`AiGatewayProjectSettings`,
+additive-only — a project can enable a guardrail or add blocked terms, never turn one off) and
+its own moderation/injection classifier instances (same SPIs the shared engine also takes, wired separately
+for the adapter's own DTO/project-overlay checks — moderation is no longer gateway-exclusive overall, see
+"Model-based moderation" above) on top of the engine's global+workspace union, and preserves
+the exact pre-extraction public surface (chat/embedding DTO methods, `projectId` overloads). The gateway
+does not read `blockingMode` — a block always throws `AiGatewayGuardrailException` → HTTP 422, never
+echoing the offending content. The gateway's own trace-privacy check
+(`AiGatewayFacadeImpl.isPiiRedactionEnabled`) reads the workspace-level `AiGuardrailsWorkspaceSettingsService`
+directly rather than through this adapter — deliberately workspace-scoped only, no project overlay, matching
+pre-extraction semantics. See `docs/agents/ai-gateway-guardrails.md`.
 
 ### Workspace scoping for platform entities
 
