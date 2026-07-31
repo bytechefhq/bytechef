@@ -26,6 +26,7 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.automation.assetfile.domain.AssetFile;
 import com.bytechef.automation.assetfile.service.AssetFileFacade;
+import com.bytechef.component.assetfile.util.AssetFileContextResolver;
 import com.bytechef.component.assetfile.util.AssetFileUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
@@ -33,21 +34,25 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 
 /**
- * Rename Asset File: Rename an asset file.
+ * Rename Asset File: Rename an asset file. The file must belong to the workspace owning the executing workflow.
  *
  * @author Ivica Cardic
  */
 public class AssetFileRenameAction {
 
     private final AssetFileFacade assetFileFacade;
+    private final AssetFileContextResolver contextResolver;
 
     @SuppressFBWarnings("EI")
-    public static ModifiableActionDefinition of(AssetFileFacade assetFileFacade) {
-        return new AssetFileRenameAction(assetFileFacade).build();
+    public static ModifiableActionDefinition of(
+        AssetFileFacade assetFileFacade, AssetFileContextResolver contextResolver) {
+
+        return new AssetFileRenameAction(assetFileFacade, contextResolver).build();
     }
 
-    private AssetFileRenameAction(AssetFileFacade assetFileFacade) {
+    private AssetFileRenameAction(AssetFileFacade assetFileFacade, AssetFileContextResolver contextResolver) {
         this.assetFileFacade = assetFileFacade;
+        this.contextResolver = contextResolver;
     }
 
     private ModifiableActionDefinition build() {
@@ -71,8 +76,11 @@ public class AssetFileRenameAction {
     private Map<String, Object> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
+        long workspaceId = contextResolver.resolveWorkspaceId(actionContext);
         long assetFileId = inputParameters.getRequiredLong(ASSET_FILE_ID);
         String newName = inputParameters.getRequiredString(NEW_NAME);
+
+        assetFileFacade.findByIdInWorkspace(assetFileId, workspaceId);
 
         AssetFile assetFile = assetFileFacade.rename(assetFileId, newName);
 

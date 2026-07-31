@@ -24,6 +24,7 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 
 import com.bytechef.automation.assetfile.domain.AssetFile;
 import com.bytechef.automation.assetfile.service.AssetFileFacade;
+import com.bytechef.component.assetfile.util.AssetFileContextResolver;
 import com.bytechef.component.assetfile.util.AssetFileUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
@@ -31,21 +32,26 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 
 /**
- * Get Asset File: Fetch metadata for a single asset file by id.
+ * Get Asset File: Fetch metadata for a single asset file by id. The file must belong to the workspace owning the
+ * executing workflow.
  *
  * @author Ivica Cardic
  */
 public class AssetFileGetAction {
 
     private final AssetFileFacade assetFileFacade;
+    private final AssetFileContextResolver contextResolver;
 
     @SuppressFBWarnings("EI")
-    public static ModifiableActionDefinition of(AssetFileFacade assetFileFacade) {
-        return new AssetFileGetAction(assetFileFacade).build();
+    public static ModifiableActionDefinition of(
+        AssetFileFacade assetFileFacade, AssetFileContextResolver contextResolver) {
+
+        return new AssetFileGetAction(assetFileFacade, contextResolver).build();
     }
 
-    private AssetFileGetAction(AssetFileFacade assetFileFacade) {
+    private AssetFileGetAction(AssetFileFacade assetFileFacade, AssetFileContextResolver contextResolver) {
         this.assetFileFacade = assetFileFacade;
+        this.contextResolver = contextResolver;
     }
 
     private ModifiableActionDefinition build() {
@@ -65,7 +71,10 @@ public class AssetFileGetAction {
     private Map<String, Object> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        AssetFile assetFile = assetFileFacade.findById(inputParameters.getRequiredLong(ASSET_FILE_ID));
+        long workspaceId = contextResolver.resolveWorkspaceId(actionContext);
+
+        AssetFile assetFile = assetFileFacade.findByIdInWorkspace(
+            inputParameters.getRequiredLong(ASSET_FILE_ID), workspaceId);
 
         return AssetFileUtils.toMap(assetFile);
     }

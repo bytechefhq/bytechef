@@ -17,19 +17,17 @@
 package com.bytechef.component.assetfile.action;
 
 import static com.bytechef.component.assetfile.constant.AssetFileConstants.CONTENT_TYPE;
-import static com.bytechef.component.assetfile.constant.AssetFileConstants.ENVIRONMENT;
 import static com.bytechef.component.assetfile.constant.AssetFileConstants.FILE;
 import static com.bytechef.component.assetfile.constant.AssetFileConstants.FILENAME;
-import static com.bytechef.component.assetfile.constant.AssetFileConstants.WORKSPACE_ID;
 import static com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.fileEntry;
-import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.automation.assetfile.domain.AssetFile;
 import com.bytechef.automation.assetfile.service.AssetFileFacade;
+import com.bytechef.component.assetfile.util.AssetFileContextResolver;
 import com.bytechef.component.assetfile.util.AssetFileUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.FileEntry;
@@ -39,40 +37,35 @@ import java.io.InputStream;
 import java.util.Map;
 
 /**
- * Upload Asset File: Upload a workflow file entry into the workspace asset file storage.
+ * Upload Asset File: Upload a workflow file entry into the workspace asset file storage. The target workspace and
+ * environment come from the executing workflow's project, never from action inputs.
  *
  * @author Ivica Cardic
  */
 public class AssetFileUploadAction {
 
     private final AssetFileFacade assetFileFacade;
+    private final AssetFileContextResolver contextResolver;
 
     @SuppressFBWarnings("EI")
-    public static ModifiableActionDefinition of(AssetFileFacade assetFileFacade) {
-        return new AssetFileUploadAction(assetFileFacade).build();
+    public static ModifiableActionDefinition of(
+        AssetFileFacade assetFileFacade, AssetFileContextResolver contextResolver) {
+
+        return new AssetFileUploadAction(assetFileFacade, contextResolver).build();
     }
 
-    private AssetFileUploadAction(AssetFileFacade assetFileFacade) {
+    private AssetFileUploadAction(AssetFileFacade assetFileFacade, AssetFileContextResolver contextResolver) {
         this.assetFileFacade = assetFileFacade;
+        this.contextResolver = contextResolver;
     }
 
     private ModifiableActionDefinition build() {
         return action("uploadAssetFile")
             .title("Upload Asset File")
-            .description("Upload a workflow file entry into a workspace's asset file storage.")
+            .description(
+                "Upload a workflow file entry into the asset file storage of the workspace owning this workflow. " +
+                    "The file is stored in the environment the workflow runs in.")
             .properties(
-                integer(WORKSPACE_ID)
-                    .label("Workspace ID")
-                    .description("Workspace into which the file should be uploaded.")
-                    .required(true),
-                integer(ENVIRONMENT)
-                    .label("Environment")
-                    .description(
-                        "Environment ordinal (0 = DEVELOPMENT, 1 = STAGING, 2 = PRODUCTION) the uploaded file should "
-                            + "belong to. Defaults to DEVELOPMENT when omitted, matching the legacy single-environment "
-                            + "behaviour for workflows that have not been updated.")
-                    .defaultValue(0)
-                    .required(false),
                 fileEntry(FILE)
                     .label("File")
                     .description("File entry to upload.")
@@ -91,8 +84,9 @@ public class AssetFileUploadAction {
     private Map<String, Object> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        long workspaceId = inputParameters.getRequiredLong(WORKSPACE_ID);
-        int environment = inputParameters.getInteger(ENVIRONMENT, 0);
+        long workspaceId = contextResolver.resolveWorkspaceId(actionContext);
+        int environment = contextResolver.resolveEnvironment(actionContext);
+
         FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE);
 
         String filename = inputParameters.getString(FILENAME, fileEntry.getName());

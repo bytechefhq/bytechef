@@ -25,6 +25,7 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 
 import com.bytechef.automation.assetfile.domain.AssetFile;
 import com.bytechef.automation.assetfile.service.AssetFileFacade;
+import com.bytechef.component.assetfile.util.AssetFileContextResolver;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
@@ -32,21 +33,26 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.InputStream;
 
 /**
- * Download Asset File: Download the binary content of an asset file as a workflow file entry.
+ * Download Asset File: Download the binary content of an asset file as a workflow file entry. The file must belong to
+ * the workspace owning the executing workflow.
  *
  * @author Ivica Cardic
  */
 public class AssetFileDownloadAction {
 
     private final AssetFileFacade assetFileFacade;
+    private final AssetFileContextResolver contextResolver;
 
     @SuppressFBWarnings("EI")
-    public static ModifiableActionDefinition of(AssetFileFacade assetFileFacade) {
-        return new AssetFileDownloadAction(assetFileFacade).build();
+    public static ModifiableActionDefinition of(
+        AssetFileFacade assetFileFacade, AssetFileContextResolver contextResolver) {
+
+        return new AssetFileDownloadAction(assetFileFacade, contextResolver).build();
     }
 
-    private AssetFileDownloadAction(AssetFileFacade assetFileFacade) {
+    private AssetFileDownloadAction(AssetFileFacade assetFileFacade, AssetFileContextResolver contextResolver) {
         this.assetFileFacade = assetFileFacade;
+        this.contextResolver = contextResolver;
     }
 
     private ModifiableActionDefinition build() {
@@ -66,9 +72,10 @@ public class AssetFileDownloadAction {
     private FileEntry perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws Exception {
 
+        long workspaceId = contextResolver.resolveWorkspaceId(actionContext);
         long assetFileId = inputParameters.getRequiredLong(ASSET_FILE_ID);
 
-        AssetFile assetFile = assetFileFacade.findById(assetFileId);
+        AssetFile assetFile = assetFileFacade.findByIdInWorkspace(assetFileId, workspaceId);
 
         try (InputStream inputStream = assetFileFacade.downloadContent(assetFileId)) {
             return actionContext.file(file -> file.storeContent(assetFile.getName(), inputStream));

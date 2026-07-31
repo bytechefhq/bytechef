@@ -21,6 +21,8 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.automation.assetfile.service.AssetFileFacade;
+import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.assetfile.action.AssetFileDeleteAction;
 import com.bytechef.component.assetfile.action.AssetFileDownloadAction;
@@ -29,6 +31,7 @@ import com.bytechef.component.assetfile.action.AssetFileGetAction;
 import com.bytechef.component.assetfile.action.AssetFileRenameAction;
 import com.bytechef.component.assetfile.action.AssetFileUpdateContentAction;
 import com.bytechef.component.assetfile.action.AssetFileUploadAction;
+import com.bytechef.component.assetfile.util.AssetFileContextResolver;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -36,7 +39,9 @@ import com.bytechef.platform.component.definition.AbstractComponentDefinitionWra
 import org.springframework.stereotype.Component;
 
 /**
- * Asset File component providing actions and AI agent tools for working with workspace asset file storage.
+ * Asset File component providing actions and AI agent tools for working with workspace asset file storage. The owning
+ * workspace and environment are always derived from the executing workflow's project — never from action inputs — so a
+ * workflow can only ever touch the asset files of its own workspace.
  *
  * @author Ivica Cardic
  */
@@ -45,8 +50,12 @@ public class AssetFileComponentHandler implements ComponentHandler {
 
     private final ComponentDefinition componentDefinition;
 
-    public AssetFileComponentHandler(AssetFileFacade assetFileFacade) {
-        this.componentDefinition = new AssetFileComponentDefinitionImpl(assetFileFacade);
+    public AssetFileComponentHandler(
+        AssetFileFacade assetFileFacade, ProjectService projectService,
+        ProjectWorkflowService projectWorkflowService) {
+
+        this.componentDefinition = new AssetFileComponentDefinitionImpl(
+            assetFileFacade, new AssetFileContextResolver(projectService, projectWorkflowService));
     }
 
     @Override
@@ -56,18 +65,22 @@ public class AssetFileComponentHandler implements ComponentHandler {
 
     private static class AssetFileComponentDefinitionImpl extends AbstractComponentDefinitionWrapper {
 
-        public AssetFileComponentDefinitionImpl(AssetFileFacade assetFileFacade) {
-            super(buildDefinition(assetFileFacade));
+        public AssetFileComponentDefinitionImpl(
+            AssetFileFacade assetFileFacade, AssetFileContextResolver contextResolver) {
+
+            super(buildDefinition(assetFileFacade, contextResolver));
         }
 
-        private static ComponentDefinition buildDefinition(AssetFileFacade assetFileFacade) {
-            ActionDefinition uploadAction = AssetFileUploadAction.of(assetFileFacade);
-            ActionDefinition downloadAction = AssetFileDownloadAction.of(assetFileFacade);
-            ActionDefinition getAction = AssetFileGetAction.of(assetFileFacade);
-            ActionDefinition findAction = AssetFileFindAction.of(assetFileFacade);
-            ActionDefinition updateContentAction = AssetFileUpdateContentAction.of(assetFileFacade);
-            ActionDefinition renameAction = AssetFileRenameAction.of(assetFileFacade);
-            ActionDefinition deleteAction = AssetFileDeleteAction.of(assetFileFacade);
+        private static ComponentDefinition buildDefinition(
+            AssetFileFacade assetFileFacade, AssetFileContextResolver contextResolver) {
+
+            ActionDefinition uploadAction = AssetFileUploadAction.of(assetFileFacade, contextResolver);
+            ActionDefinition downloadAction = AssetFileDownloadAction.of(assetFileFacade, contextResolver);
+            ActionDefinition getAction = AssetFileGetAction.of(assetFileFacade, contextResolver);
+            ActionDefinition findAction = AssetFileFindAction.of(assetFileFacade, contextResolver);
+            ActionDefinition updateContentAction = AssetFileUpdateContentAction.of(assetFileFacade, contextResolver);
+            ActionDefinition renameAction = AssetFileRenameAction.of(assetFileFacade, contextResolver);
+            ActionDefinition deleteAction = AssetFileDeleteAction.of(assetFileFacade, contextResolver);
 
             return component(ASSET_FILE)
                 .title("Asset File")

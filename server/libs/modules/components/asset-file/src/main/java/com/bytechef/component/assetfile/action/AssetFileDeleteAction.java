@@ -25,27 +25,32 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 
 import com.bytechef.automation.assetfile.service.AssetFileFacade;
+import com.bytechef.component.assetfile.util.AssetFileContextResolver;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 
 /**
- * Delete Asset File: Delete an asset file by id.
+ * Delete Asset File: Delete an asset file by id. The file must belong to the workspace owning the executing workflow.
  *
  * @author Ivica Cardic
  */
 public class AssetFileDeleteAction {
 
     private final AssetFileFacade assetFileFacade;
+    private final AssetFileContextResolver contextResolver;
 
     @SuppressFBWarnings("EI")
-    public static ModifiableActionDefinition of(AssetFileFacade assetFileFacade) {
-        return new AssetFileDeleteAction(assetFileFacade).build();
+    public static ModifiableActionDefinition of(
+        AssetFileFacade assetFileFacade, AssetFileContextResolver contextResolver) {
+
+        return new AssetFileDeleteAction(assetFileFacade, contextResolver).build();
     }
 
-    private AssetFileDeleteAction(AssetFileFacade assetFileFacade) {
+    private AssetFileDeleteAction(AssetFileFacade assetFileFacade, AssetFileContextResolver contextResolver) {
         this.assetFileFacade = assetFileFacade;
+        this.contextResolver = contextResolver;
     }
 
     private ModifiableActionDefinition build() {
@@ -72,7 +77,10 @@ public class AssetFileDeleteAction {
     private Map<String, Object> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
+        long workspaceId = contextResolver.resolveWorkspaceId(actionContext);
         long assetFileId = inputParameters.getRequiredLong(ASSET_FILE_ID);
+
+        assetFileFacade.findByIdInWorkspace(assetFileId, workspaceId);
 
         assetFileFacade.delete(assetFileId);
 

@@ -28,6 +28,7 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.automation.assetfile.domain.AssetFile;
 import com.bytechef.automation.assetfile.service.AssetFileFacade;
+import com.bytechef.component.assetfile.util.AssetFileContextResolver;
 import com.bytechef.component.assetfile.util.AssetFileUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.FileEntry;
@@ -37,21 +38,28 @@ import java.io.InputStream;
 import java.util.Map;
 
 /**
- * Update Asset File Content: Replace the binary content of an existing asset file.
+ * Update Asset File Content: Replace the binary content of an existing asset file. The file must belong to the
+ * workspace owning the executing workflow.
  *
  * @author Ivica Cardic
  */
 public class AssetFileUpdateContentAction {
 
     private final AssetFileFacade assetFileFacade;
+    private final AssetFileContextResolver contextResolver;
 
     @SuppressFBWarnings("EI")
-    public static ModifiableActionDefinition of(AssetFileFacade assetFileFacade) {
-        return new AssetFileUpdateContentAction(assetFileFacade).build();
+    public static ModifiableActionDefinition of(
+        AssetFileFacade assetFileFacade, AssetFileContextResolver contextResolver) {
+
+        return new AssetFileUpdateContentAction(assetFileFacade, contextResolver).build();
     }
 
-    private AssetFileUpdateContentAction(AssetFileFacade assetFileFacade) {
+    private AssetFileUpdateContentAction(
+        AssetFileFacade assetFileFacade, AssetFileContextResolver contextResolver) {
+
         this.assetFileFacade = assetFileFacade;
+        this.contextResolver = contextResolver;
     }
 
     private ModifiableActionDefinition build() {
@@ -78,8 +86,13 @@ public class AssetFileUpdateContentAction {
     private Map<String, Object> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
+        long workspaceId = contextResolver.resolveWorkspaceId(actionContext);
         long assetFileId = inputParameters.getRequiredLong(ASSET_FILE_ID);
+
+        assetFileFacade.findByIdInWorkspace(assetFileId, workspaceId);
+
         FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE);
+
         String contentType = inputParameters.getString(CONTENT_TYPE, fileEntry.getMimeType());
 
         InputStream inputStream = actionContext.file(file -> file.getInputStream(fileEntry));

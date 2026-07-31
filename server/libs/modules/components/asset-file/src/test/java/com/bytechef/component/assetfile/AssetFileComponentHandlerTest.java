@@ -27,6 +27,6 @@ class AssetFileComponentHandlerTest {
     @Test
     void testGetDefinition() {
         JsonFileAssert.assertEquals(
-            "definition/assetFile_v1.json", new AssetFileComponentHandler(null).getDefinition());
+            "definition/assetFile_v1.json", new AssetFileComponentHandler(null, null, null).getDefinition());
     }
 }
