@@ -94,6 +94,56 @@ describe('toToolResultDataPart', () => {
         }
     });
 
+    it('maps knowledge-base-citations', () => {
+        const r = toToolResultDataPart(
+            'queryKnowledgeBase',
+            JSON.stringify({
+                hits: [
+                    {
+                        docId: '7',
+                        docTitle: 'Onboarding Guide',
+                        excerpt: 'Spring AI supports vector stores.',
+                        knowledgeBaseId: '42',
+                        knowledgeBaseName: 'Company Docs',
+                        score: 0.92,
+                    },
+                ],
+                kind: 'knowledge-base-citations',
+            })
+        );
+
+        expect(r?.ok).toBe(true);
+
+        if (r?.ok) {
+            expect(r.type).toBe('data-knowledge-base-citations');
+            expect(r.data).toEqual({
+                hits: [
+                    {
+                        docId: '7',
+                        docTitle: 'Onboarding Guide',
+                        excerpt: 'Spring AI supports vector stores.',
+                        knowledgeBaseId: '42',
+                        knowledgeBaseName: 'Company Docs',
+                        score: 0.92,
+                    },
+                ],
+                kind: 'knowledge-base-citations',
+            });
+        }
+    });
+
+    it('returns undefined for queryKnowledgeBase results without renderable hits', () => {
+        // Empty hits mean "nothing to cite", and an {"error": ...} payload is handled by the model in prose —
+        // neither should produce a data part (unlike the interactive tools, which surface an error result).
+        expect(
+            toToolResultDataPart('queryKnowledgeBase', JSON.stringify({hits: [], kind: 'knowledge-base-citations'}))
+        ).toBeUndefined();
+        expect(
+            toToolResultDataPart('queryKnowledgeBase', JSON.stringify({error: 'question is required'}))
+        ).toBeUndefined();
+        expect(toToolResultDataPart('queryKnowledgeBase', 'not json{')).toBeUndefined();
+    });
+
     it('returns an error result for a malformed payload (unparseable JSON)', () => {
         const r = toToolResultDataPart('selectPropertyOption', 'not json{');
 

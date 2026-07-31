@@ -6,7 +6,8 @@
  * Returns:
  *   - `{ok: true, data, type}` — payload was parsed and validated successfully.
  *   - `{ok: false, errorMessage, toolName}` — payload was unparseable or failed kind/shape validation.
- *   - `undefined` — `toolCallName` is not one of the four interactive tool names handled here.
+ *   - `undefined` — `toolCallName` is not one of the tool names handled here, or the payload carries
+ *     nothing renderable (e.g. a queryKnowledgeBase result with no hits).
  */
 
 export type ToolResultDataPartType =
@@ -62,6 +63,18 @@ interface AskUserQuestionResultI {
         options: Array<{description?: string; label: string}>;
         question: string;
     }>;
+}
+
+interface KnowledgeBaseCitationsResultI {
+    hits: Array<{
+        docId?: string;
+        docTitle?: string;
+        excerpt?: string;
+        knowledgeBaseId?: string;
+        knowledgeBaseName?: string;
+        score?: number;
+    }>;
+    kind: 'knowledge-base-citations';
 }
 
 export function toToolResultDataPart(toolCallName: string, eventContent: string): ToolResultDataPartType | undefined {
@@ -131,6 +144,31 @@ export function toToolResultDataPart(toolCallName: string, eventContent: string)
             },
             ok: true,
             type: 'data-select-property-option',
+        };
+    }
+
+    if (toolCallName === 'queryKnowledgeBase') {
+        const parsed = parseJson<KnowledgeBaseCitationsResultI>(eventContent, 'queryKnowledgeBase result');
+
+        // Unlike the interactive tools above, a non-citation payload here is not an error worth surfacing:
+        // the tool legitimately returns {"error": ...} for bad input, and empty hits mean "nothing to cite" —
+        // in both cases the assistant's text answer flows through without a citations block.
+        if (
+            !parsed ||
+            parsed.kind !== 'knowledge-base-citations' ||
+            !Array.isArray(parsed.hits) ||
+            parsed.hits.length === 0
+        ) {
+            return undefined;
+        }
+
+        return {
+            data: {
+                hits: parsed.hits,
+                kind: parsed.kind,
+            },
+            ok: true,
+            type: 'data-knowledge-base-citations',
         };
     }
 
