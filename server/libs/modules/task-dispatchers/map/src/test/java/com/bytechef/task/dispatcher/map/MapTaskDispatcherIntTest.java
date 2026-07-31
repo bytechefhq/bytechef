@@ -118,7 +118,16 @@ public class MapTaskDispatcherIntTest {
 
         Map<String, ?> outputs = taskFileStorage.readJobOutputs(job.getOutputs());
 
-        Assertions.assertNull(outputs.get("map"));
+        // The iteratee's last task is a nested condition/v1 dispatcher, whose own output is now the
+        // executed case's last-task output ("sumVar2") instead of always null, so it composes into the
+        // map's aggregate list. "sumVar1" is never set in this workflow, so the "=sumVar1 +/- 2"
+        // expressions are left unevaluated and stored as-is.
+        List<?> expected = IntStream.rangeClosed(1, 10)
+            .boxed()
+            .map(item -> item > 5 ? "=sumVar1 - 2" : "=sumVar1 + 2")
+            .collect(Collectors.toList());
+
+        Assertions.assertEquals(expected, outputs.get("map"));
     }
 
     @SuppressWarnings("PMD")

@@ -18,6 +18,7 @@ package com.bytechef.task.dispatcher.condition;
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
+import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
@@ -29,6 +30,7 @@ import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.platform.workflow.task.dispatcher.test.annotation.TaskDispatcherIntTest;
 import com.bytechef.platform.workflow.task.dispatcher.test.task.handler.TestVarTaskHandler;
 import com.bytechef.platform.workflow.task.dispatcher.test.workflow.TaskDispatcherJobTestExecutor;
+import com.bytechef.platform.workflow.task.dispatcher.test.workflow.TaskDispatcherJobTestExecutor.TaskDispatcherJobExecution;
 import com.bytechef.task.dispatcher.condition.completion.ConditionTaskCompletionHandler;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -155,6 +157,38 @@ public class ConditionTaskDispatcherIntTest {
             this::getTaskHandlerMap);
 
         Assertions.assertEquals("true branch", testVarTaskHandler.get("equalsResult"));
+    }
+
+    @Test
+    public void testDispatchOutputCaseTrue() {
+        TaskDispatcherJobExecution jobExecution = taskDispatcherJobTestExecutor.execute(
+            EncodingUtils.base64EncodeToString("condition_v1-output-caseTrue".getBytes(StandardCharsets.UTF_8)),
+            Map.of(),
+            this::getTaskCompletionHandlerFactories,
+            this::getTaskDispatcherResolverFactories,
+            this::getTaskHandlerMap);
+
+        Job job = jobExecution.job();
+
+        Map<String, ?> outputs = taskFileStorage.readJobOutputs(job.getOutputs());
+
+        Assertions.assertEquals("last task output", outputs.get("result"));
+    }
+
+    @Test
+    public void testDispatchOutputEmptyCase() {
+        TaskDispatcherJobExecution jobExecution = taskDispatcherJobTestExecutor.execute(
+            EncodingUtils.base64EncodeToString("condition_v1-output-emptyCase".getBytes(StandardCharsets.UTF_8)),
+            Map.of(),
+            this::getTaskCompletionHandlerFactories,
+            this::getTaskDispatcherResolverFactories,
+            this::getTaskHandlerMap);
+
+        Job job = jobExecution.job();
+
+        Map<String, ?> outputs = taskFileStorage.readJobOutputs(job.getOutputs());
+
+        Assertions.assertNull(outputs.get("result"));
     }
 
     @SuppressWarnings("PMD")
