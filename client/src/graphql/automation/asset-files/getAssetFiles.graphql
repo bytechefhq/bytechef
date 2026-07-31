@@ -19,6 +19,7 @@ query GetAssetFiles($workspaceId: ID!, $environment: Int, $tagIds: [ID!], $mimeT
         metadataJson
         mimeType
         name
+        publicLinkUrl
         sizeBytes
         source
         tags {

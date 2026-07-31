@@ -14,6 +14,7 @@ query GetAssetFile($id: ID!) {
         metadataJson
         mimeType
         name
+        publicLinkUrl
         sizeBytes
         source
         tags {

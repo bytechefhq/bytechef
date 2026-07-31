@@ -1,0 +1,10 @@
+query GetAssetFileVersions($id: ID!) {
+    assetFileVersions(id: $id) {
+        createdBy
+        createdDate
+        id
+        mimeType
+        sizeBytes
+        versionNumber
+    }
+}
