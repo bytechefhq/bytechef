@@ -27,6 +27,9 @@ import com.bytechef.ee.ai.hub.progress.SubagentProgressEmitter;
 import com.bytechef.ee.ai.hub.tool.AiHubToolInvocationContext;
 import com.bytechef.ee.ai.hub.util.AiHubStateKeys;
 import com.bytechef.ee.ai.hub.util.Source;
+import com.bytechef.ee.platform.ai.guardrails.AiGuardrailMetrics;
+import com.bytechef.ee.platform.ai.guardrails.AiGuardrails;
+import com.bytechef.ee.platform.ai.guardrails.advisor.AiGuardrailsAdvisor;
 import com.bytechef.ee.platform.ai.llm.usage.LlmUsageRecorder;
 import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -131,6 +134,8 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
     private final TaskToolBindingResolver taskToolBindingResolver;
     private final @Nullable OverrideChatClientResolver overrideChatClientResolver;
     private final @Nullable SecurityContextRehydrator securityContextRehydrator;
+    private final @Nullable AiGuardrails aiGuardrails;
+    private final @Nullable AiGuardrailMetrics aiGuardrailMetrics;
 
     protected AiHubSpringAIAgent(final Builder builder) throws AGUIException {
         super(builder);
@@ -140,6 +145,8 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
         this.taskToolBindingResolver = builder.taskToolBindingResolver;
         this.overrideChatClientResolver = builder.overrideChatClientResolver;
         this.securityContextRehydrator = builder.securityContextRehydrator;
+        this.aiGuardrails = builder.aiGuardrails;
+        this.aiGuardrailMetrics = builder.aiGuardrailMetrics;
     }
 
     public static Builder builder() {
@@ -257,10 +264,39 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
      * Returns the per-request {@link ChatClient}. Tries the override resolver first (used for per-personal-agent model
      * selection — see {@link AiHubStateKeys#PERSONAL_AGENT_LLM_PROVIDER_KEY} /
      * {@link AiHubStateKeys#PERSONAL_AGENT_LLM_MODEL_KEY}); falls back to the builder-time default whenever the
-     * resolver is absent, returns null, or throws.
+     * resolver is absent, returns null, or throws. Either way, the returned client always has the workspace's
+     * {@link AiGuardrailsAdvisor} attached — see {@link #attachGuardrailsAdvisor}.
+     *
+     * <p>
+     * This single method is the seam every AI Hub LLM turn passes through before the request spec is built (the
+     * vendored {@code SpringAIAgent.getChatRequest} calls {@code resolveChatClient(input).prompt(...)} first thing), so
+     * attaching the guardrail here covers every conversation kind that reaches the model: COPILOT (default client),
+     * PERSONAL_AGENT including its model-override clients (override branch above), and any future kind routed through
+     * this same {@code run()}. WORKFLOW_CHAT is exempt by construction, not by a check here — it never calls this agent
+     * at all, it is dispatched through {@code WebhookBridgeAgent} instead.
+     * </p>
+     *
+     * <p>
+     * Subagent one-shot delegate calls do NOT go through this method — each specialist owns its own {@link ChatClient},
+     * constructed once in {@code AiHubConfiguration} and invoked directly by its hand-rolled {@code ToolCallback}
+     * ({@code SkillsAgentToolCallback}, {@code ManagerSubAgentToolCallback}, {@code ResearchToolCallback}, etc.), never
+     * through {@code resolveChatClient}. That gap is closed separately: every delegate {@link ChatClient} handed to a
+     * {@code ToolCallback} constructor in {@code AiHubConfiguration} is wrapped with
+     * {@code com.bytechef.ee.ai.hub.guardrails.SubAgentGuardrailedChatClient#wrap}, which attaches a fresh,
+     * workspace-scoped {@link AiGuardrailsAdvisor} to the delegate's own {@code .call()}/{@code .stream()} — the
+     * workspace id is resolved per call from the {@code ToolContext} the delegate forwards via
+     * {@code .toolContext(Map)}, since the delegate {@link ChatClient} bean is a singleton shared by every workspace
+     * and cannot have the id baked in at construction time the way this method's builder-time default can. See that
+     * class's javadoc for the full mechanism, and the AI Guardrails spec's decisions log for what remains uncovered
+     * even after that fix (a delegate's completion still reaches the PARENT as an unscanned tool message).
+     * </p>
      */
     @Override
     protected ChatClient resolveChatClient(RunAgentInput input) {
+        return attachGuardrailsAdvisor(resolveConfiguredChatClient(input), input);
+    }
+
+    private ChatClient resolveConfiguredChatClient(RunAgentInput input) {
         if (overrideChatClientResolver == null) {
             return super.resolveChatClient(input);
         }
@@ -281,6 +317,50 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
         }
 
         return super.resolveChatClient(input);
+    }
+
+    /**
+     * Registers a fresh, workspace-bound {@link AiGuardrailsAdvisor} as a default advisor on {@code chatClient} so it
+     * runs on this turn's outbound request and inbound completion (self-orders at
+     * {@link org.springframework.core.Ordered#HIGHEST_PRECEDENCE} regardless of where in the advisor list it lands —
+     * see {@code DefaultAroundAdvisorChain}, which sorts the merged default + request advisors before dispatch).
+     * Constructing the advisor per request is cheap (it holds only field references); the workspace id can only be
+     * known per request, so the advisor cannot be attached once at builder time the way the other static advisors are.
+     * A missing {@link AiGuardrails} bean (guardrails module absent) or an inactive policy for this workspace (every
+     * guardrail disabled, the common case) both skip the {@code mutate()} call entirely so the no-op case pays no
+     * per-turn overhead.
+     *
+     * <p>
+     * <b>Block-mode UX:</b> a BLOCK-mode violation makes the advisor raise {@code AiGuardrailViolationException} whose
+     * message carries only the violation category, never the offending content (see the exception's own javadoc). On
+     * the streaming path (the only path this agent uses — see {@code SpringAIAgent.run}'s {@code .stream()} call) the
+     * advisor reports this as {@code Flux.error(...)}, which reaches this class's inherited {@code run()} through the
+     * ordinary model-call-failure branch it already has: the stream's {@code err} consumer logs and calls
+     * {@code onError(input, err.getMessage(), subscriber)}, emitting a {@code RunErrorEvent} instead of any tool
+     * response. The AI Hub client renders {@code RunErrorEvent} as an inline chat notice (red banner, alert icon — see
+     * {@code RunErrorMessage.tsx}), through {@code humanizeAgentErrorMessage} which passes the already-safe,
+     * category-only guardrail message through unchanged. No raw exception class name, HTTP status, or offending content
+     * ever reaches the transcript — the same path an upstream model-provider error (e.g. Anthropic 400) takes today, so
+     * no separate exception-to-chat-notice mapping is needed here.
+     * </p>
+     */
+    private ChatClient attachGuardrailsAdvisor(ChatClient chatClient, RunAgentInput input) {
+        if (aiGuardrails == null || aiGuardrailMetrics == null) {
+            return chatClient;
+        }
+
+        State state = input.state();
+        Long workspaceId = state == null ? null : NumberUtils.asLong(state.get(AiHubStateKeys.VERIFIED_WORKSPACE_ID));
+
+        if (!aiGuardrails.isActive(workspaceId)) {
+            return chatClient;
+        }
+
+        AiGuardrailsAdvisor advisor = new AiGuardrailsAdvisor(aiGuardrails, workspaceId, aiGuardrailMetrics);
+
+        return chatClient.mutate()
+            .defaultAdvisors(advisor)
+            .build();
     }
 
     @Override
@@ -561,6 +641,8 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
         private @Nullable OverrideChatClientResolver overrideChatClientResolver;
         private @Nullable SecurityContextRehydrator securityContextRehydrator;
         private @Nullable LlmUsageRecorder llmUsageRecorder;
+        private @Nullable AiGuardrails aiGuardrails;
+        private @Nullable AiGuardrailMetrics aiGuardrailMetrics;
         // Captured from agentId() so the usage advisor can tag ai_llm_usage rows with the agent that served the turn.
         private @Nullable String usageAgentName;
         // Holds the unwrapped tool callbacks the caller registers via toolCallbacks/toolCallback. Deferred
@@ -641,6 +723,23 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
 
         public Builder llmUsageRecorder(@Nullable LlmUsageRecorder llmUsageRecorder) {
             this.llmUsageRecorder = llmUsageRecorder;
+
+            return this;
+        }
+
+        /**
+         * Wires the workspace content-guardrails engine into every LLM turn this agent resolves a {@link ChatClient}
+         * for — see {@link #attachGuardrailsAdvisor}. Both arguments are expected together: {@code aiGuardrails} is the
+         * standalone engine bean (absent when the EE guardrails module isn't on the classpath), and
+         * {@code aiGuardrailMetrics} is a caller-owned {@code AiGuardrailMetrics} instance fixed to the {@code ai_hub}
+         * surface — deliberately NOT the shared engine-internal metrics bean, which is tagged with a single
+         * deployment-wide surface property and conditional on the AI Gateway being enabled (this agent must record
+         * under {@code ai_hub} regardless of that flag).
+         */
+        public Builder
+            aiGuardrails(@Nullable AiGuardrails aiGuardrails, @Nullable AiGuardrailMetrics aiGuardrailMetrics) {
+            this.aiGuardrails = aiGuardrails;
+            this.aiGuardrailMetrics = aiGuardrailMetrics;
 
             return this;
         }

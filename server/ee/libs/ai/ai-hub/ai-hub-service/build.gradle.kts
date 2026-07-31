@@ -86,6 +86,9 @@ dependencies {
     implementation(project(":server:ee:libs:ai:ai-hub:ai-hub-api"))
     implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-agent:platform-ai-agent-api"))
     implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-agent:platform-ai-agent-service"))
+    // AiGuardrails / AiGuardrailsAdvisor / AiGuardrailMetrics — enforces workspace content guardrails on every AI
+    // Hub LLM turn (AiHubSpringAIAgent#resolveChatClient).
+    implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-guardrails:platform-ai-guardrails-service"))
     implementation(project(":server:ee:libs:automation:automation-context-store:automation-context-store-api"))
     implementation(project(":server:ee:libs:platform:platform-audit:platform-audit-api"))
     implementation(project(":server:ee:libs:platform:platform-context-store:platform-context-store-api"))
@@ -100,6 +103,9 @@ dependencies {
     testImplementation("org.springframework:spring-webflux")
     testImplementation("org.springframework.boot:spring-boot-autoconfigure")
     testImplementation("org.springframework.data:spring-data-jdbc")
+    // AiGatewayInjectionClassifier — referenced by AiHubSpringAIAgentGuardrailsTest to build AiGuardrails directly
+    // (the same constructor argument AiGuardrailsAdvisorProviderImpl leaves unset in production).
+    testImplementation(project(":server:ee:libs:platform:platform-ai:platform-ai-gateway:platform-ai-gateway-api"))
     testImplementation(project(":server:ee:libs:platform:platform-audit:platform-audit-service"))
     testImplementation(project(":server:libs:automation:automation-asset-file:automation-asset-file-service"))
     testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-service"))

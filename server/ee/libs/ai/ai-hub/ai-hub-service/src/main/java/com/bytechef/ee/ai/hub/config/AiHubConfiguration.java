@@ -56,6 +56,7 @@ import com.bytechef.ee.ai.hub.agent.WebhookBridgeAgent;
 import com.bytechef.ee.ai.hub.agent.WebhookResumeRegistry;
 import com.bytechef.ee.ai.hub.agent.WorkflowChatGuard;
 import com.bytechef.ee.ai.hub.agent.WorkflowChatJobRegistry;
+import com.bytechef.ee.ai.hub.guardrails.SubAgentGuardrailedChatClient;
 import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.ee.ai.hub.metric.AiHubToolAttachMetrics;
 import com.bytechef.ee.ai.hub.metric.WorkflowChatMetrics;
@@ -87,6 +88,8 @@ import com.bytechef.ee.ai.hub.util.Source;
 import com.bytechef.ee.automation.ai.tool.ApiCollectionManagerConfiguration;
 import com.bytechef.ee.automation.ai.tool.ListApiCollectionsToolCallback;
 import com.bytechef.ee.automation.apiplatform.configuration.facade.ApiCollectionFacade;
+import com.bytechef.ee.platform.ai.guardrails.AiGuardrailMetrics;
+import com.bytechef.ee.platform.ai.guardrails.AiGuardrails;
 import com.bytechef.ee.platform.ai.llm.usage.LlmUsageRecorder;
 import com.bytechef.platform.ai.agent.memory.AutoMemoryTools;
 import com.bytechef.platform.ai.agent.memory.AutoMemoryToolsAdvisor;
@@ -104,6 +107,7 @@ import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -217,6 +221,7 @@ public class AiHubConfiguration {
         ObjectProvider<AiHubTaskBindingToolCallbackResolver> taskBindingToolCallbackResolverProvider,
         ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider,
         ObjectProvider<LlmUsageRecorder> llmUsageRecorderProvider,
+        ObjectProvider<AiGuardrails> aiGuardrailsProvider, ObjectProvider<MeterRegistry> meterRegistryProvider,
         AiHubToolAttachMetrics aiHubToolAttachMetrics, JsonMapper jsonMapper)
         throws AGUIException {
 
@@ -225,10 +230,23 @@ public class AiHubConfiguration {
         List<ToolCallback> toolCallbacks = new ArrayList<>(toolCallbackProvider.orderedStream()
             .toList());
 
+        // Resolved once and reused for BOTH the top-level agent's own advisor (attached below via
+        // builder.aiGuardrails(...)) and every subagent delegate's ChatClient (wrapped via
+        // SubAgentGuardrailedChatClient.wrap in the registration helpers below) — see SubAgentGuardrailedChatClient's
+        // javadoc for why delegate calls need their own, per-call workspace resolution instead of a builder-time
+        // advisor. Absent AiGuardrails bean (EE guardrails module not on the classpath) → every wrap call below is a
+        // no-op, unchanged behaviour.
+        AiGuardrails aiGuardrails = aiGuardrailsProvider.getIfAvailable();
+        AiGuardrailMetrics aiGuardrailMetrics = aiGuardrails == null
+            ? null
+            : new AiGuardrailMetrics(meterRegistryProvider.getIfAvailable(), "ai_hub");
+
         researchChatClientProvider.ifAvailable(
             researchChatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
-                    ResearchConfiguration.createResearchToolCallback(researchChatClient), "research")));
+                    ResearchConfiguration.createResearchToolCallback(
+                        SubAgentGuardrailedChatClient.wrap(researchChatClient, aiGuardrails, aiGuardrailMetrics)),
+                    "research")));
 
         // Consolidated open-tab tool (type-keyed) replaces the seven per-resource variants on the pinned
         // list. ASK mode is read-only (never builds workflows), so no server-side artifact recorder is
@@ -279,7 +297,7 @@ public class AiHubConfiguration {
             clusterElementAskSubAgentChatClientProvider,
             codeEditorAskSubAgentChatClientProvider, workflowEditorAskSubAgentChatClientProvider, null,
             workflowExecutionAskSubAgentChatClientProvider, customComponentAskSubAgentChatClientProvider,
-            codeWorkflowAskSubAgentChatClientProvider);
+            codeWorkflowAskSubAgentChatClientProvider, aiGuardrails, aiGuardrailMetrics);
 
         AiHubSpringAIAgent.Builder builder = AiHubSpringAIAgent.builder()
             .agentId(name.toLowerCase())
@@ -320,6 +338,13 @@ public class AiHubConfiguration {
 
         // Per-turn token metering into ai_llm_usage (source = AI_HUB). Absent recorder → advisor logs only.
         llmUsageRecorderProvider.ifAvailable(builder::llmUsageRecorder);
+
+        // Workspace content guardrails on every LLM turn this agent resolves a ChatClient for — see
+        // AiHubSpringAIAgent#attachGuardrailsAdvisor. Absent AiGuardrails bean (EE guardrails module not on the
+        // classpath) → no-op, unchanged behaviour. Reuses the same (aiGuardrails, aiGuardrailMetrics) pair the
+        // subagent delegate registrations above were wrapped with, so the top-level agent and every delegate share
+        // one "ai_hub"-tagged AiGuardrailMetrics instance for this bean.
+        attachAiGuardrails(builder, aiGuardrails, aiGuardrailMetrics);
 
         return builder.build();
     }
@@ -384,6 +409,7 @@ public class AiHubConfiguration {
         ObjectProvider<AiHubTaskBindingToolCallbackResolver> taskBindingToolCallbackResolverProvider,
         ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider,
         ObjectProvider<LlmUsageRecorder> llmUsageRecorderProvider,
+        ObjectProvider<AiGuardrails> aiGuardrailsProvider, ObjectProvider<MeterRegistry> meterRegistryProvider,
         AiHubToolAttachMetrics aiHubToolAttachMetrics, JsonMapper jsonMapper)
         throws AGUIException {
 
@@ -392,13 +418,23 @@ public class AiHubConfiguration {
         List<ToolCallback> toolCallbacks = new ArrayList<>(toolCallbackProvider.orderedStream()
             .toList());
 
+        // Resolved once and reused for BOTH the top-level agent's own advisor (attached below via
+        // attachAiGuardrails) and every subagent delegate's ChatClient (wrapped via
+        // SubAgentGuardrailedChatClient.wrap in the registration helpers below) — mirrors aiHubAskSpringAIAgent.
+        AiGuardrails aiGuardrails = aiGuardrailsProvider.getIfAvailable();
+        AiGuardrailMetrics aiGuardrailMetrics = aiGuardrails == null
+            ? null
+            : new AiGuardrailMetrics(meterRegistryProvider.getIfAvailable(), "ai_hub");
+
         registerSubAgentToolCallbacks(
             toolCallbacks, researchChatClientProvider, dataAnalystChatClientProvider,
-            imageGeneratorChatClientProvider, slideBuilderChatClientProvider, assetFileFacade);
+            imageGeneratorChatClientProvider, slideBuilderChatClientProvider, assetFileFacade, aiGuardrails,
+            aiGuardrailMetrics);
 
         registerManagerSubAgentToolCallbacks(
             toolCallbacks, mcpManagerChatClientProvider, personalAgentManagerChatClientProvider,
-            deploymentManagerChatClientProvider, apiCollectionManagerChatClientProvider);
+            deploymentManagerChatClientProvider, apiCollectionManagerChatClientProvider, aiGuardrails,
+            aiGuardrailMetrics);
 
         // Consolidated open-tab tool (type-keyed) replaces the seven per-resource variants on the pinned list.
         toolCallbacks.add(new OpenResourceTabToolCallback(aiHubTaskArtifactRecorder));
@@ -428,7 +464,8 @@ public class AiHubConfiguration {
             clusterElementBuildSubAgentChatClientProvider,
             codeEditorBuildSubAgentChatClientProvider, workflowEditorBuildSubAgentChatClientProvider,
             converterBuildSubAgentChatClientSupplierProvider, workflowExecutionBuildSubAgentChatClientProvider,
-            customComponentBuildSubAgentChatClientProvider, codeWorkflowBuildSubAgentChatClientProvider);
+            customComponentBuildSubAgentChatClientProvider, codeWorkflowBuildSubAgentChatClientProvider, aiGuardrails,
+            aiGuardrailMetrics);
         toolCallbacks.add(new CreateConnectionToolCallback(componentDefinitionService));
         toolCallbacks.add(new SelectConnectionToolCallback(componentDefinitionService));
 
@@ -496,7 +533,33 @@ public class AiHubConfiguration {
         // Per-turn token metering into ai_llm_usage (source = AI_HUB). Absent recorder → advisor logs only.
         llmUsageRecorderProvider.ifAvailable(buildBuilder::llmUsageRecorder);
 
+        // Workspace content guardrails on every LLM turn this agent resolves a ChatClient for — mirrors
+        // aiHubAskSpringAIAgent, including personal-agent model-override turns (see
+        // AiHubSpringAIAgent#attachGuardrailsAdvisor). Reuses the same (aiGuardrails, aiGuardrailMetrics) pair the
+        // subagent delegate registrations above were wrapped with.
+        attachAiGuardrails(buildBuilder, aiGuardrails, aiGuardrailMetrics);
+
         return buildBuilder.build();
+    }
+
+    /**
+     * Shared wiring for both the ASK and BUILD agents: when {@code aiGuardrails} is non-null, attaches it (together
+     * with {@code aiGuardrailMetrics}, fixed to the {@code ai_hub} surface — deliberately not the shared
+     * engine-internal metrics bean, which is conditional on the AI Gateway being enabled and tagged with a single
+     * deployment-wide surface property, see {@link AiGuardrailMetrics}'s own javadoc) to {@code builder}. Absent
+     * {@code aiGuardrails} (EE guardrails module not on the classpath) is a no-op — both agents fall back to their
+     * pre-existing, unguarded behaviour. Callers resolve the pair once per bean method and pass the SAME instances here
+     * and into the subagent registration helpers ({@link #registerCopilotSubAgentToolCallbacks},
+     * {@link #registerSubAgentToolCallbacks}, {@link #registerManagerSubAgentToolCallbacks}) so the top-level agent and
+     * every delegate share one {@code ai_hub}-tagged {@link AiGuardrailMetrics} instance.
+     */
+    private static void attachAiGuardrails(
+        AiHubSpringAIAgent.Builder builder, @Nullable AiGuardrails aiGuardrails,
+        @Nullable AiGuardrailMetrics aiGuardrailMetrics) {
+
+        if (aiGuardrails != null) {
+            builder.aiGuardrails(aiGuardrails, aiGuardrailMetrics);
+        }
     }
 
     /**
@@ -615,35 +678,51 @@ public class AiHubConfiguration {
      * {@link #registerCopilotSubAgentToolCallbacks}. The Copilot specialist persists workflows internally via
      * {@code ProjectWorkflowTools}, eliminating the JSON round-trip {@code workflow_builder} required.
      * </p>
+     *
+     * <p>
+     * Each delegate's {@code ChatClient} is wrapped with {@link SubAgentGuardrailedChatClient#wrap} before being handed
+     * to its {@code createXToolCallback} factory, so the delegate's own one-shot LLM call runs under the workspace's
+     * {@code AiGuardrailsAdvisor} — see that class's javadoc for why this seam covers every delegate without touching
+     * the individual {@code *ToolCallback}/{@code *Configuration} classes. {@code aiGuardrails}/{@code
+     * aiGuardrailMetrics} are {@code null} when the EE guardrails module isn't wired, in which case wrapping is a
+     * no-op.
+     * </p>
      */
     private static void registerSubAgentToolCallbacks(
         List<ToolCallback> toolCallbacks, ObjectProvider<ChatClient> researchChatClientProvider,
         ObjectProvider<ChatClient> dataAnalystChatClientProvider,
         ObjectProvider<ChatClient> imageGeneratorChatClientProvider,
-        ObjectProvider<ChatClient> slideBuilderChatClientProvider, AssetFileFacade assetFileFacade) {
+        ObjectProvider<ChatClient> slideBuilderChatClientProvider, AssetFileFacade assetFileFacade,
+        @Nullable AiGuardrails aiGuardrails, @Nullable AiGuardrailMetrics aiGuardrailMetrics) {
 
         researchChatClientProvider.ifAvailable(
             researchChatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
-                    ResearchConfiguration.createResearchToolCallback(researchChatClient), "research")));
+                    ResearchConfiguration.createResearchToolCallback(
+                        SubAgentGuardrailedChatClient.wrap(researchChatClient, aiGuardrails, aiGuardrailMetrics)),
+                    "research")));
 
         dataAnalystChatClientProvider.ifAvailable(
             dataAnalystChatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
                     DataAnalystConfiguration.createDataAnalystToolCallback(
-                        dataAnalystChatClient, assetFileFacade),
+                        SubAgentGuardrailedChatClient.wrap(dataAnalystChatClient, aiGuardrails, aiGuardrailMetrics),
+                        assetFileFacade),
                     "data_analyst")));
 
         imageGeneratorChatClientProvider.ifAvailable(
             imageGeneratorChatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
-                    ImageGeneratorConfiguration.createImageGeneratorToolCallback(imageGeneratorChatClient),
+                    ImageGeneratorConfiguration.createImageGeneratorToolCallback(
+                        SubAgentGuardrailedChatClient.wrap(imageGeneratorChatClient, aiGuardrails,
+                            aiGuardrailMetrics)),
                     "image_generator")));
 
         slideBuilderChatClientProvider.ifAvailable(
             slideBuilderChatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
-                    SlideBuilderConfiguration.createSlideBuilderToolCallback(slideBuilderChatClient),
+                    SlideBuilderConfiguration.createSlideBuilderToolCallback(
+                        SubAgentGuardrailedChatClient.wrap(slideBuilderChatClient, aiGuardrails, aiGuardrailMetrics)),
                     "slide_builder")));
     }
 
@@ -651,37 +730,49 @@ public class AiHubConfiguration {
      * Registers the AI-hub-owned "manager" specialist sub-agent ToolCallbacks (MCP servers, personal agents, project
      * deployments, API collections) on the supplied tool list. Each is only added when its backing ChatClient bean is
      * present — a missing facade (feature module not on the classpath) means the specialist's ChatClient bean was not
-     * created and the registration is silently skipped. Mirrors {@link #registerSubAgentToolCallbacks}.
+     * created and the registration is silently skipped. Mirrors {@link #registerSubAgentToolCallbacks}, including the
+     * {@link SubAgentGuardrailedChatClient#wrap} guardrail wrapping. This wiring covers only the AI Hub chat surface —
+     * the separate MCP-surface manager contributions ({@code AiHubManagerMcpContributorConfiguration},
+     * {@code ManagerMcpContributorConfiguration}, {@code ApiCollectionManagerMcpContributorConfiguration}) construct
+     * their own {@code ManagerSubAgentToolCallback} instances directly from the same underlying {@code ChatClient}
+     * beans and are NOT wrapped here — left out of scope, see the AI Guardrails spec's decisions log.
      */
     private static void registerManagerSubAgentToolCallbacks(
         List<ToolCallback> toolCallbacks, ObjectProvider<ChatClient> mcpManagerChatClientProvider,
         ObjectProvider<ChatClient> personalAgentManagerChatClientProvider,
         ObjectProvider<ChatClient> deploymentManagerChatClientProvider,
-        ObjectProvider<ChatClient> apiCollectionManagerChatClientProvider) {
+        ObjectProvider<ChatClient> apiCollectionManagerChatClientProvider, @Nullable AiGuardrails aiGuardrails,
+        @Nullable AiGuardrailMetrics aiGuardrailMetrics) {
 
         mcpManagerChatClientProvider.ifAvailable(
             mcpManagerChatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
-                    McpManagerConfiguration.createMcpManagerToolCallback(mcpManagerChatClient), "mcp_manager")));
+                    McpManagerConfiguration.createMcpManagerToolCallback(
+                        SubAgentGuardrailedChatClient.wrap(mcpManagerChatClient, aiGuardrails, aiGuardrailMetrics)),
+                    "mcp_manager")));
 
         personalAgentManagerChatClientProvider.ifAvailable(
             personalAgentManagerChatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
                     PersonalAgentManagerConfiguration.createPersonalAgentManagerToolCallback(
-                        personalAgentManagerChatClient),
+                        SubAgentGuardrailedChatClient.wrap(personalAgentManagerChatClient, aiGuardrails,
+                            aiGuardrailMetrics)),
                     "personal_agent_manager")));
 
         deploymentManagerChatClientProvider.ifAvailable(
             deploymentManagerChatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
-                    DeploymentManagerConfiguration.createDeploymentManagerToolCallback(deploymentManagerChatClient),
+                    DeploymentManagerConfiguration.createDeploymentManagerToolCallback(
+                        SubAgentGuardrailedChatClient.wrap(deploymentManagerChatClient, aiGuardrails,
+                            aiGuardrailMetrics)),
                     "deployment_manager")));
 
         apiCollectionManagerChatClientProvider.ifAvailable(
             apiCollectionManagerChatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
                     ApiCollectionManagerConfiguration.createApiCollectionManagerToolCallback(
-                        apiCollectionManagerChatClient),
+                        SubAgentGuardrailedChatClient.wrap(apiCollectionManagerChatClient, aiGuardrails,
+                            aiGuardrailMetrics)),
                     "api_collection_manager")));
     }
 
@@ -710,63 +801,88 @@ public class AiHubConfiguration {
         @Nullable ObjectProvider<Supplier<ChatClient>> converterSubAgentChatClientSupplierProvider,
         ObjectProvider<ChatClient> workflowExecutionSubAgentChatClientProvider,
         ObjectProvider<ChatClient> customComponentSubAgentChatClientProvider,
-        ObjectProvider<ChatClient> codeWorkflowSubAgentChatClientProvider) {
+        ObjectProvider<ChatClient> codeWorkflowSubAgentChatClientProvider, @Nullable AiGuardrails aiGuardrails,
+        @Nullable AiGuardrailMetrics aiGuardrailMetrics) {
 
         skillsSubAgentChatClientProvider.ifAvailable(
             chatClient -> toolCallbacks.add(
-                new ProgressReportingToolCallback(new SkillsAgentToolCallback(chatClient), "skills_agent")));
+                new ProgressReportingToolCallback(
+                    new SkillsAgentToolCallback(
+                        SubAgentGuardrailedChatClient.wrap(chatClient, aiGuardrails, aiGuardrailMetrics)),
+                    "skills_agent")));
 
         contextStoreSubAgentChatClientProvider.ifAvailable(
             chatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
-                    new ContextStoreAgentToolCallback(chatClient), "context_store_agent")));
+                    new ContextStoreAgentToolCallback(
+                        SubAgentGuardrailedChatClient.wrap(chatClient, aiGuardrails, aiGuardrailMetrics)),
+                    "context_store_agent")));
 
         knowledgeBaseSubAgentChatClientProvider.ifAvailable(
             chatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
-                    new KnowledgeBaseAgentToolCallback(chatClient), "knowledge_base_agent")));
+                    new KnowledgeBaseAgentToolCallback(
+                        SubAgentGuardrailedChatClient.wrap(chatClient, aiGuardrails, aiGuardrailMetrics)),
+                    "knowledge_base_agent")));
 
         dataTableSubAgentChatClientProvider.ifAvailable(
             chatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
-                    new DataTableAgentToolCallback(chatClient), "data_table_agent")));
+                    new DataTableAgentToolCallback(
+                        SubAgentGuardrailedChatClient.wrap(chatClient, aiGuardrails, aiGuardrailMetrics)),
+                    "data_table_agent")));
 
         clusterElementSubAgentChatClientProvider.ifAvailable(
             chatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
-                    new ClusterElementAgentToolCallback(chatClient), "cluster_element_agent")));
+                    new ClusterElementAgentToolCallback(
+                        SubAgentGuardrailedChatClient.wrap(chatClient, aiGuardrails, aiGuardrailMetrics)),
+                    "cluster_element_agent")));
 
         codeEditorSubAgentChatClientProvider.ifAvailable(
             chatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
-                    new CodeEditorAgentToolCallback(chatClient), "code_editor_agent")));
+                    new CodeEditorAgentToolCallback(
+                        SubAgentGuardrailedChatClient.wrap(chatClient, aiGuardrails, aiGuardrailMetrics)),
+                    "code_editor_agent")));
 
         workflowEditorSubAgentChatClientProvider.ifAvailable(
             chatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
-                    new WorkflowEditorAgentToolCallback(chatClient), "workflow_editor_agent")));
+                    new WorkflowEditorAgentToolCallback(
+                        SubAgentGuardrailedChatClient.wrap(chatClient, aiGuardrails, aiGuardrailMetrics)),
+                    "workflow_editor_agent")));
 
         workflowExecutionSubAgentChatClientProvider.ifAvailable(
             chatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
-                    new WorkflowExecutionAgentToolCallback(chatClient), "workflow_execution_agent")));
+                    new WorkflowExecutionAgentToolCallback(
+                        SubAgentGuardrailedChatClient.wrap(chatClient, aiGuardrails, aiGuardrailMetrics)),
+                    "workflow_execution_agent")));
 
         if (converterSubAgentChatClientSupplierProvider != null) {
             converterSubAgentChatClientSupplierProvider.ifAvailable(
                 converterChatClientSupplier -> toolCallbacks.add(
                     new ProgressReportingToolCallback(
-                        new ConverterAgentToolCallback(converterChatClientSupplier), "converter_agent")));
+                        new ConverterAgentToolCallback(
+                            () -> SubAgentGuardrailedChatClient.wrap(
+                                converterChatClientSupplier.get(), aiGuardrails, aiGuardrailMetrics)),
+                        "converter_agent")));
         }
 
         customComponentSubAgentChatClientProvider.ifAvailable(
             chatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
-                    new CustomComponentAgentToolCallback(chatClient), "custom_component_agent")));
+                    new CustomComponentAgentToolCallback(
+                        SubAgentGuardrailedChatClient.wrap(chatClient, aiGuardrails, aiGuardrailMetrics)),
+                    "custom_component_agent")));
 
         codeWorkflowSubAgentChatClientProvider.ifAvailable(
             chatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
-                    new CodeWorkflowAgentToolCallback(chatClient), "code_workflow_agent")));
+                    new CodeWorkflowAgentToolCallback(
+                        SubAgentGuardrailedChatClient.wrap(chatClient, aiGuardrails, aiGuardrailMetrics)),
+                    "code_workflow_agent")));
     }
 
     /**
