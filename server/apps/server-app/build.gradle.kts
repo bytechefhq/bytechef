@@ -301,6 +301,7 @@ dependencies {
     implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-gateway:automation-ai-gateway-public-rest"))
     implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-gateway:automation-ai-gateway-service"))
     implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-gateway:platform-ai-gateway-service"))
+    implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-guardrails:platform-ai-guardrails-graphql"))
     implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-llm-usage:platform-ai-llm-usage-service"))
     implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-eval:platform-ai-eval-service"))
     implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-eval:automation-ai-eval-dataset:automation-ai-eval-dataset-api"))
@@ -414,8 +415,8 @@ dependencies {
     runtimeOnly("com.h2database:h2")
     runtimeOnly("com.zaxxer:HikariCP")
     runtimeOnly("org.postgresql:postgresql")
-    implementation(project(":server:libs:platform:platform-ai:platform-ai-stt-service"))
-    runtimeOnly(project(":server:libs:platform:platform-ai:platform-ai-stt-openai"))
+    implementation(project(":server:libs:platform:platform-ai:platform-ai-stt:platform-ai-stt-service"))
+    runtimeOnly(project(":server:libs:platform:platform-ai:platform-ai-stt:platform-ai-stt-openai"))
 
     testImplementation(project(":server:libs:test:test-int-support"))
     testImplementation(project(":server:libs:core:tenant:tenant-api"))
