@@ -277,6 +277,68 @@ public class ForkJoinTaskDispatcherIntTest {
         Assertions.assertEquals(112, testVarTaskHandler.get("sumVar2"));
     }
 
+    @Test
+    public void testDispatchOutputTwoBranches() {
+        TaskDispatcherJobExecution jobExecution = taskDispatcherJobTestExecutor.execute(
+            EncodingUtils.base64EncodeToString("fork-join_v1-output-twoBranches"),
+            (
+                contextService, counterService, taskExecutionService) -> List.of(
+                    (taskCompletionHandler, taskDispatcher) -> new ForkJoinTaskCompletionHandler(
+                        contextService, counterService, EVALUATOR, taskExecutionService,
+                        taskCompletionHandler, taskDispatcher, taskFileStorage)),
+            (
+                eventPublisher, contextService, counterService, taskExecutionService) -> List.of(
+                    (taskDispatcher) -> new ForkJoinTaskDispatcher(
+                        contextService, counterService, EVALUATOR, eventPublisher, taskDispatcher,
+                        taskExecutionService, taskFileStorage)),
+            () -> Map.of("var/v1/set", testVarTaskHandler));
+
+        Job job = jobExecution.job();
+
+        Map<String, ?> outputs = taskFileStorage.readJobOutputs(job.getOutputs());
+
+        Assertions.assertEquals("branch zero output", outputs.get("branch0Result"));
+        Assertions.assertEquals("branch one output", outputs.get("branch1Result"));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testDispatchOutputNoOutputBranchKeyPresentWithNullValue() {
+        TestVarTaskHandler<Object, Object> nullTolerantVarTaskHandler = new TestVarTaskHandler<>(
+            (valueMap, name, value) -> {
+                if (value != null) {
+                    valueMap.put(name, value);
+                }
+            });
+
+        TaskDispatcherJobExecution jobExecution = taskDispatcherJobTestExecutor.execute(
+            EncodingUtils.base64EncodeToString("fork-join_v1-output-noOutputBranch"),
+            (
+                contextService, counterService, taskExecutionService) -> List.of(
+                    (taskCompletionHandler, taskDispatcher) -> new ForkJoinTaskCompletionHandler(
+                        contextService, counterService, EVALUATOR, taskExecutionService,
+                        taskCompletionHandler, taskDispatcher, taskFileStorage)),
+            (
+                eventPublisher, contextService, counterService, taskExecutionService) -> List.of(
+                    (taskDispatcher) -> new ForkJoinTaskDispatcher(
+                        contextService, counterService, EVALUATOR, eventPublisher, taskDispatcher,
+                        taskExecutionService, taskFileStorage)),
+            () -> Map.of("var/v1/set", nullTolerantVarTaskHandler));
+
+        TaskExecution forkJoinTaskExecution = jobExecution.taskExecutions()
+            .stream()
+            .filter(taskExecution -> "forkJoin_1".equals(taskExecution.getName()))
+            .findFirst()
+            .orElseThrow();
+
+        Map<String, Object> branchOutputs = (Map<String, Object>) taskFileStorage.readTaskExecutionOutput(
+            Objects.requireNonNull(forkJoinTaskExecution.getOutput()));
+
+        Assertions.assertEquals("branch zero output", branchOutputs.get("branch_0"));
+        Assertions.assertTrue(branchOutputs.containsKey("branch_1"));
+        Assertions.assertNull(branchOutputs.get("branch_1"));
+    }
+
     @Nested
     class SuspendingBranch {
 
