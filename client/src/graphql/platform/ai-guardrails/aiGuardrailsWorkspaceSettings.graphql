@@ -1,0 +1,25 @@
+query aiGuardrailsWorkspaceSettings($workspaceId: ID) {
+    aiGuardrailsWorkspaceSettings(workspaceId: $workspaceId) {
+        blockedTerms
+        blockingMode
+        injectionDetectionEnabled
+        moderationEnabled
+        redactPii
+        redactSecrets
+        scanResponses
+        workspaceId
+    }
+}
+
+mutation updateAiGuardrailsWorkspaceSettings($input: AiGuardrailsWorkspaceSettingsInput!) {
+    updateAiGuardrailsWorkspaceSettings(input: $input) {
+        blockedTerms
+        blockingMode
+        injectionDetectionEnabled
+        moderationEnabled
+        redactPii
+        redactSecrets
+        scanResponses
+        workspaceId
+    }
+}

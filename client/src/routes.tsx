@@ -130,6 +130,7 @@ const IntegrationInstanceConfigurations = lazy(
 const Integration = lazy(() => import('@/ee/pages/embedded/integration/Integration'));
 const Integrations = lazy(() => import('@/ee/pages/embedded/integrations/Integrations'));
 const SigningKeys = lazy(() => import('@/ee/pages/settings/embedded/signing-keys/SigningKeys'));
+const AiGuardrails = lazy(() => import('@/ee/pages/settings/automation/ai/guardrails/AiGuardrails'));
 const WorkspaceApiKeys = lazy(() => import('@/ee/pages/settings/automation/workspace-api-keys/WorkspaceApiKeys'));
 const Workspaces = lazy(() => import('@/ee/pages/settings/automation/workspaces/Workspaces'));
 const OrganizationConnections = lazy(
@@ -231,6 +232,18 @@ const currentWorkspaceSettingsRoutes = {
             ),
             path: 'ai-hub/connectors',
         },
+        {
+            element: (
+                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                    <EEVersion>
+                        <LazyLoadWrapper>
+                            <AiGuardrails />
+                        </LazyLoadWrapper>
+                    </EEVersion>
+                </PrivateRoute>
+            ),
+            path: 'ai/guardrails',
+        },
     ],
     navItems: [
         {
@@ -251,6 +264,14 @@ const currentWorkspaceSettingsRoutes = {
         {
             href: 'ai-hub/connectors',
             title: 'Connectors',
+        },
+        {
+            subgroup: true,
+            title: 'AI',
+        },
+        {
+            href: 'ai/guardrails',
+            title: 'Guardrails',
         },
     ],
 };

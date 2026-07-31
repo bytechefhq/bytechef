@@ -7,34 +7,23 @@ import {
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {useEffect, useState} from 'react';
+import {Link} from 'react-router-dom';
 import {toast} from 'sonner';
 
 interface SettingsFormI {
-    blockedTerms: string;
     cacheEnabled: boolean;
     cacheTtlSeconds: string;
-    injectionDetectionEnabled: boolean;
     logRetentionDays: string;
-    moderationEnabled: boolean;
-    redactPii: boolean;
-    redactSecrets: boolean;
     retryCount: string;
-    scanResponses: boolean;
     softBudgetWarningPct: string;
     timeoutMs: string;
 }
 
 const EMPTY_FORM: SettingsFormI = {
-    blockedTerms: '',
     cacheEnabled: false,
     cacheTtlSeconds: '',
-    injectionDetectionEnabled: false,
     logRetentionDays: '',
-    moderationEnabled: false,
-    redactPii: false,
-    redactSecrets: false,
     retryCount: '',
-    scanResponses: false,
     softBudgetWarningPct: '',
     timeoutMs: '',
 };
@@ -75,16 +64,10 @@ const AiGatewaySettings = () => {
 
         if (settings) {
             setForm({
-                blockedTerms: settings.blockedTerms ?? '',
                 cacheEnabled: settings.cacheEnabled ?? false,
                 cacheTtlSeconds: settings.cacheTtlSeconds != null ? String(settings.cacheTtlSeconds) : '',
-                injectionDetectionEnabled: settings.injectionDetectionEnabled ?? false,
                 logRetentionDays: settings.logRetentionDays != null ? String(settings.logRetentionDays) : '',
-                moderationEnabled: settings.moderationEnabled ?? false,
-                redactPii: settings.redactPii ?? false,
-                redactSecrets: settings.redactSecrets ?? false,
                 retryCount: settings.retryCount != null ? String(settings.retryCount) : '',
-                scanResponses: settings.scanResponses ?? false,
                 softBudgetWarningPct:
                     settings.softBudgetWarningPct != null ? String(settings.softBudgetWarningPct) : '',
                 timeoutMs: settings.timeoutMs != null ? String(settings.timeoutMs) : '',
@@ -99,16 +82,10 @@ const AiGatewaySettings = () => {
 
         updateMutation.mutate({
             input: {
-                blockedTerms: form.blockedTerms || undefined,
                 cacheEnabled: form.cacheEnabled,
                 cacheTtlSeconds: toOptionalInt(form.cacheTtlSeconds),
-                injectionDetectionEnabled: form.injectionDetectionEnabled,
                 logRetentionDays: toOptionalInt(form.logRetentionDays),
-                moderationEnabled: form.moderationEnabled,
-                redactPii: form.redactPii,
-                redactSecrets: form.redactSecrets,
                 retryCount: toOptionalInt(form.retryCount),
-                scanResponses: form.scanResponses,
                 softBudgetWarningPct: toOptionalInt(form.softBudgetWarningPct),
                 timeoutMs: toOptionalInt(form.timeoutMs),
                 workspaceId: String(currentWorkspaceId),
@@ -128,6 +105,19 @@ const AiGatewaySettings = () => {
                 <p className="mt-1 text-sm text-muted-foreground">
                     Workspace-level overrides. Leave a field empty to inherit the system default.
                 </p>
+
+                <div className="mt-1 flex flex-wrap items-center gap-1 text-sm text-muted-foreground">
+                    <span>Workspace-level guardrails moved to</span>
+
+                    <Link className="underline" to="/automation/settings/ai/guardrails">
+                        Settings &rarr; AI &rarr; Guardrails
+                    </Link>
+
+                    <span>
+                        . Per-project guardrail overlays are still configured here, on each project&apos;s AI Gateway
+                        tab.
+                    </span>
+                </div>
 
                 <fieldset className="mt-6 space-y-4 border-0 p-0">
                     <div className="grid grid-cols-2 gap-4">
@@ -196,65 +186,6 @@ const AiGatewaySettings = () => {
                             type="checkbox"
                         />
                         Response caching enabled
-                    </label>
-
-                    <label className="flex items-center gap-2 text-sm">
-                        <input
-                            checked={form.redactPii}
-                            onChange={(event) => setForm({...form, redactPii: event.target.checked})}
-                            type="checkbox"
-                        />
-                        Redact PII (mask emails, phone numbers, SSNs, cards, and IPs in prompts before they leave
-                        ByteChef; traces store a SHA-256 digest instead of payloads)
-                    </label>
-
-                    <label className="flex items-center gap-2 text-sm">
-                        <input
-                            checked={form.redactSecrets}
-                            onChange={(event) => setForm({...form, redactSecrets: event.target.checked})}
-                            type="checkbox"
-                        />
-                        Redact secrets (mask API keys, tokens, JWTs, and private keys in prompts before they leave
-                        ByteChef)
-                    </label>
-
-                    <label className="flex items-center gap-2 text-sm">
-                        <input
-                            checked={form.scanResponses}
-                            onChange={(event) => setForm({...form, scanResponses: event.target.checked})}
-                            type="checkbox"
-                        />
-                        Scan responses (redact PII and secrets from model output before returning it; non-streaming
-                        completions only)
-                    </label>
-
-                    <label className="flex items-center gap-2 text-sm">
-                        <input
-                            checked={form.moderationEnabled}
-                            onChange={(event) => setForm({...form, moderationEnabled: event.target.checked})}
-                            type="checkbox"
-                        />
-                        Model-based moderation (reject unsafe prompts; requires a configured moderation model)
-                    </label>
-
-                    <label className="flex items-center gap-2 text-sm">
-                        <input
-                            checked={form.injectionDetectionEnabled}
-                            onChange={(event) => setForm({...form, injectionDetectionEnabled: event.target.checked})}
-                            type="checkbox"
-                        />
-                        Prompt-injection detection (reject jailbreak / instruction-override attempts; requires a
-                        configured injection model)
-                    </label>
-
-                    <label className="flex flex-col gap-1 text-sm">
-                        Blocked terms (comma-separated; requests containing one are rejected)
-                        <input
-                            className="rounded-md border px-3 py-2 text-sm"
-                            onChange={(event) => setForm({...form, blockedTerms: event.target.value})}
-                            placeholder="none"
-                            value={form.blockedTerms}
-                        />
                     </label>
                 </fieldset>
 
