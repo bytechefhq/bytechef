@@ -9,7 +9,14 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {useAssetFilesStore} from '@/pages/automation/asset-files/stores/useAssetFilesStore';
 import TagList from '@/shared/components/TagList';
-import {AssetFile, AssetFileSource, Tag, useUpdateAssetFileTagsMutation} from '@/shared/middleware/graphql';
+import {
+    AssetFile,
+    AssetFileSource,
+    Tag,
+    useDisableAssetFilePublicLinkMutation,
+    useEnableAssetFilePublicLinkMutation,
+    useUpdateAssetFileTagsMutation,
+} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {
     DownloadIcon,
@@ -18,10 +25,13 @@ import {
     FileIcon,
     FileImageIcon,
     FileTextIcon,
+    Link2OffIcon,
+    LinkIcon,
     SparklesIcon,
     Trash2Icon,
 } from 'lucide-react';
 import {MouseEvent} from 'react';
+import {toast} from 'sonner';
 
 interface AssetFileListItemPropsI {
     file: AssetFile;
@@ -83,6 +93,38 @@ const AssetFileListItem = ({file, onDelete, onRename, remainingTags}: AssetFileL
             void queryClient.invalidateQueries({queryKey: ['GetAssetFileTags']});
         },
     });
+
+    const enablePublicLinkMutation = useEnableAssetFilePublicLinkMutation({
+        onSuccess: (data) => {
+            const publicLinkUrl = data.enableAssetFilePublicLink.publicLinkUrl;
+
+            if (publicLinkUrl) {
+                void navigator.clipboard.writeText(`${window.location.origin}${publicLinkUrl}`);
+
+                toast.success('Public link enabled and copied to clipboard');
+            }
+
+            void queryClient.invalidateQueries({queryKey: ['GetAssetFiles']});
+            void queryClient.invalidateQueries({queryKey: ['GetAssetFile', {id: file.id}]});
+        },
+    });
+
+    const disablePublicLinkMutation = useDisableAssetFilePublicLinkMutation({
+        onSuccess: () => {
+            toast.success('Public link disabled');
+
+            void queryClient.invalidateQueries({queryKey: ['GetAssetFiles']});
+            void queryClient.invalidateQueries({queryKey: ['GetAssetFile', {id: file.id}]});
+        },
+    });
+
+    const handleCopyPublicLinkClick = () => {
+        if (file.publicLinkUrl) {
+            void navigator.clipboard.writeText(`${window.location.origin}${file.publicLinkUrl}`);
+
+            toast.success('Public link copied to clipboard');
+        }
+    };
 
     const convertedTags = (file.tags ?? []).map((tag) => ({id: Number(tag.id), name: tag.name}));
 
@@ -180,6 +222,31 @@ const AssetFileListItem = ({file, onDelete, onRename, remainingTags}: AssetFileL
                                 >
                                     <EditIcon /> Rename
                                 </DropdownMenuItem>
+
+                                {file.publicLinkUrl ? (
+                                    <>
+                                        <DropdownMenuItem
+                                            className="dropdown-menu-item"
+                                            onClick={handleCopyPublicLinkClick}
+                                        >
+                                            <LinkIcon /> Copy public link
+                                        </DropdownMenuItem>
+
+                                        <DropdownMenuItem
+                                            className="dropdown-menu-item"
+                                            onClick={() => disablePublicLinkMutation.mutate({id: file.id})}
+                                        >
+                                            <Link2OffIcon /> Disable public link
+                                        </DropdownMenuItem>
+                                    </>
+                                ) : (
+                                    <DropdownMenuItem
+                                        className="dropdown-menu-item"
+                                        onClick={() => enablePublicLinkMutation.mutate({id: file.id})}
+                                    >
+                                        <LinkIcon /> Enable public link
+                                    </DropdownMenuItem>
+                                )}
 
                                 <DropdownMenuSeparator className="m-0" />
 

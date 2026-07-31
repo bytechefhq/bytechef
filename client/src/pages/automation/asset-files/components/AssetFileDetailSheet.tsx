@@ -2,17 +2,19 @@ import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import {Sheet, SheetCloseButton, SheetContent, SheetTitle} from '@/components/ui/sheet';
 import {useAssetFilesStore} from '@/pages/automation/asset-files/stores/useAssetFilesStore';
-import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
+import AssetFileViewer, {type AssetFileViewerModeType} from '@/shared/components/asset-file-viewer/AssetFileViewer';
 import {
     useGetAssetFileQuery,
     useGetAssetFileTextContentQuery,
+    useGetAssetFileVersionsQuery,
+    useRestoreAssetFileVersionMutation,
     useUpdateAssetFileTextContentMutation,
 } from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
-import {DownloadIcon, FileTextIcon, SaveIcon} from 'lucide-react';
+import {FileTextIcon, HistoryIcon, SaveIcon} from 'lucide-react';
 import {VisuallyHidden} from 'radix-ui';
-import {Suspense, lazy, useEffect, useMemo, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {toast} from 'sonner';
 
 /**
@@ -34,64 +36,61 @@ const environmentLabel = (environmentId: number): string => {
     }
 };
 
-const MonacoEditor = lazy(() => import('@/shared/components/MonacoEditorWrapper'));
-
 const isTextMime = (mimeType: string): boolean => mimeType.startsWith('text/') || mimeType === 'application/json';
 
-const isImageMime = (mimeType: string): boolean => mimeType.startsWith('image/');
-
-const isPdfMime = (mimeType: string): boolean => mimeType === 'application/pdf';
-
-const inferLanguage = (fileName: string, mimeType: string): string => {
-    const extension = fileName.includes('.') ? fileName.split('.').pop()?.toLowerCase() : undefined;
-
-    switch (extension) {
-        case 'js':
-        case 'mjs':
-        case 'cjs':
-            return 'javascript';
-        case 'ts':
-        case 'tsx':
-            return 'typescript';
-        case 'json':
-            return 'json';
-        case 'md':
-        case 'markdown':
-            return 'markdown';
-        case 'py':
-            return 'python';
-        case 'rb':
-            return 'ruby';
-        case 'yml':
-        case 'yaml':
-            return 'yaml';
-        case 'html':
-        case 'htm':
-            return 'html';
-        case 'css':
-            return 'css';
-        case 'sql':
-            return 'sql';
-        case 'xml':
-            return 'xml';
-        case 'sh':
-        case 'bash':
-            return 'shell';
-        default:
-            if (mimeType === 'application/json') {
-                return 'json';
-            }
-
-            if (mimeType === 'text/markdown') {
-                return 'markdown';
-            }
-
-            return 'plaintext';
+/**
+ * True when the shared viewer has a rendered (non-editor) representation for the file — either through the
+ * format column (AI-generated artifacts) or through mime/extension sniffing. Drives the default view mode:
+ * renderable files open in Preview, plain text/code files open straight in the editor.
+ */
+const hasRenderedPreview = (fileName: string, mimeType: string, format: string | null | undefined): boolean => {
+    if (format === 'CHART' || format === 'CSV' || format === 'HTML' || format === 'MARKDOWN') {
+        return true;
     }
+
+    if (mimeType === 'text/markdown' || mimeType === 'text/csv' || mimeType === 'text/html') {
+        return true;
+    }
+
+    return (
+        fileName.endsWith('.md') ||
+        fileName.endsWith('.markdown') ||
+        fileName.endsWith('.csv') ||
+        fileName.endsWith('.html') ||
+        fileName.endsWith('.htm')
+    );
+};
+
+const formatBytes = (bytes: number): string => {
+    if (!bytes) {
+        return '0 B';
+    }
+
+    const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+    const exponent = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
+    const value = bytes / Math.pow(1024, exponent);
+
+    return `${value.toFixed(value >= 10 || exponent === 0 ? 0 : 1)} ${units[exponent]}`;
+};
+
+const formatDate = (value: number | string | null | undefined): string => {
+    if (value == null) {
+        return '';
+    }
+
+    const millis = typeof value === 'number' ? value : Number(value);
+
+    if (Number.isNaN(millis)) {
+        return '';
+    }
+
+    return new Date(millis).toLocaleString();
 };
 
 const AssetFileDetailSheet = () => {
     const [editorValue, setEditorValue] = useState<string>('');
+    const [showVersions, setShowVersions] = useState(false);
+    const [viewMode, setViewMode] = useState<AssetFileViewerModeType>('preview');
 
     const selectedFileId = useAssetFilesStore((state) => state.selectedFileId);
     const setSelectedFileId = useAssetFilesStore((state) => state.setSelectedFileId);
@@ -107,27 +106,43 @@ const AssetFileDetailSheet = () => {
     const file = fileData?.assetFile ?? null;
 
     const isText = file ? isTextMime(file.mimeType) : false;
-    const isImage = file ? isImageMime(file.mimeType) : false;
-    const isPdf = file ? isPdfMime(file.mimeType) : false;
+    const isRenderable = file ? hasRenderedPreview(file.name, file.mimeType, file.format) : false;
 
     const {data: textContentData} = useGetAssetFileTextContentQuery({id: fileIdAsString}, {enabled: enabled && isText});
 
+    const {data: versionsData} = useGetAssetFileVersionsQuery({id: fileIdAsString}, {enabled: enabled && showVersions});
+
+    const invalidateFileQueries = () => {
+        void queryClient.invalidateQueries({queryKey: ['GetAssetFiles']});
+        void queryClient.invalidateQueries({queryKey: ['GetAssetFile', {id: fileIdAsString}]});
+        void queryClient.invalidateQueries({queryKey: ['GetAssetFileTextContent', {id: fileIdAsString}]});
+        void queryClient.invalidateQueries({queryKey: ['GetAssetFileVersions', {id: fileIdAsString}]});
+    };
+
     const updateTextContentMutation = useUpdateAssetFileTextContentMutation({
         onSuccess: () => {
-            void queryClient.invalidateQueries({queryKey: ['GetAssetFiles']});
-            void queryClient.invalidateQueries({queryKey: ['GetAssetFile', {id: fileIdAsString}]});
-            void queryClient.invalidateQueries({queryKey: ['GetAssetFileTextContent', {id: fileIdAsString}]});
+            invalidateFileQueries();
 
             toast.success('File saved');
         },
     });
 
-    const language = useMemo(() => (file ? inferLanguage(file.name, file.mimeType) : 'plaintext'), [file]);
+    const restoreVersionMutation = useRestoreAssetFileVersionMutation({
+        onSuccess: () => {
+            invalidateFileQueries();
+
+            toast.success('Version restored');
+        },
+    });
+
+    const versions = versionsData?.assetFileVersions ?? [];
 
     const handleOpenChange = (open: boolean) => {
         if (!open) {
             setSelectedFileId(null);
             setEditorValue('');
+            setShowVersions(false);
+            setViewMode('preview');
         }
     };
 
@@ -139,11 +154,35 @@ const AssetFileDetailSheet = () => {
         updateTextContentMutation.mutate({content: editorValue, id: file.id});
     };
 
+    const handleRestoreVersionClick = (versionId: string) => {
+        if (!file) {
+            return;
+        }
+
+        restoreVersionMutation.mutate({id: file.id, versionId});
+    };
+
     useEffect(() => {
         if (textContentData?.assetFileTextContent != null) {
             setEditorValue(textContentData.assetFileTextContent);
         }
     }, [textContentData?.assetFileTextContent]);
+
+    useEffect(() => {
+        setShowVersions(false);
+    }, [selectedFileId]);
+
+    // Plain text/code files open straight in the editor (there is nothing to render), everything with a
+    // rendered representation opens in Preview. Runs when the file row loads because the decision needs the
+    // file's mime/format, which arrive async.
+    useEffect(() => {
+        if (!file) {
+            return;
+        }
+
+        setViewMode(isText && !isRenderable ? 'editor' : 'preview');
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [file?.id]);
 
     return (
         <Sheet onOpenChange={handleOpenChange} open={selectedFileId !== null}>
@@ -193,6 +232,43 @@ const AssetFileDetailSheet = () => {
 
                             <div className="flex items-center gap-x-2">
                                 {isText && (
+                                    <div className="flex items-center rounded-md border border-border/50">
+                                        <Button
+                                            data-testid="asset-file-preview-toggle"
+                                            label="Preview"
+                                            onClick={() => setViewMode('preview')}
+                                            size="sm"
+                                            variant={viewMode === 'preview' ? 'secondary' : 'ghost'}
+                                        />
+
+                                        <Button
+                                            data-testid="asset-file-split-toggle"
+                                            label="Split"
+                                            onClick={() => setViewMode('split')}
+                                            size="sm"
+                                            variant={viewMode === 'split' ? 'secondary' : 'ghost'}
+                                        />
+
+                                        <Button
+                                            data-testid="asset-file-edit-toggle"
+                                            label="Edit"
+                                            onClick={() => setViewMode('editor')}
+                                            size="sm"
+                                            variant={viewMode === 'editor' ? 'secondary' : 'ghost'}
+                                        />
+                                    </div>
+                                )}
+
+                                <Button
+                                    data-testid="asset-file-history-toggle"
+                                    icon={<HistoryIcon />}
+                                    onClick={() => setShowVersions((previousShowVersions) => !previousShowVersions)}
+                                    size="iconSm"
+                                    title="Version history"
+                                    variant={showVersions ? 'secondary' : 'ghost'}
+                                />
+
+                                {isText && (
                                     <Button
                                         disabled={updateTextContentMutation.isPending}
                                         icon={<SaveIcon />}
@@ -221,63 +297,65 @@ const AssetFileDetailSheet = () => {
                             </div>
                         )}
 
+                        {showVersions && (
+                            <div
+                                className="max-h-48 shrink-0 overflow-auto border-b border-b-border/50 bg-surface-neutral-primary"
+                                data-testid="asset-file-versions"
+                            >
+                                {versions.length === 0 ? (
+                                    <p className="p-3 text-xs text-muted-foreground">
+                                        No previous versions. A version is captured every time the file&apos;s content
+                                        changes.
+                                    </p>
+                                ) : (
+                                    <ul>
+                                        {versions.map((version) => (
+                                            <li
+                                                className="flex items-center justify-between border-b border-b-border/30 px-3 py-2 text-xs"
+                                                data-testid={`asset-file-version-${version.id}`}
+                                                key={version.id}
+                                            >
+                                                <span className="flex items-center gap-3">
+                                                    <span className="font-semibold">v{version.versionNumber}</span>
+
+                                                    <span className="text-muted-foreground">
+                                                        {formatBytes(Number(version.sizeBytes))}
+                                                    </span>
+
+                                                    <span className="text-muted-foreground">
+                                                        {formatDate(version.createdDate)}
+                                                    </span>
+
+                                                    {version.createdBy && (
+                                                        <span className="text-muted-foreground">
+                                                            {version.createdBy}
+                                                        </span>
+                                                    )}
+                                                </span>
+
+                                                <Button
+                                                    disabled={restoreVersionMutation.isPending}
+                                                    label="Restore"
+                                                    onClick={() => handleRestoreVersionClick(version.id)}
+                                                    size="sm"
+                                                    variant="outline"
+                                                />
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </div>
+                        )}
+
                         <div className="flex min-h-0 flex-1 p-3">
                             <div className="flex min-w-0 flex-1 flex-col overflow-hidden rounded-md bg-surface-neutral-primary">
-                                {isText && (
-                                    <div className="flex-1" data-testid="asset-file-monaco">
-                                        <Suspense fallback={<MonacoEditorLoader />}>
-                                            <MonacoEditor
-                                                defaultLanguage={language}
-                                                onChange={(value) => setEditorValue(value ?? '')}
-                                                onMount={() => {}}
-                                                options={{
-                                                    automaticLayout: true,
-                                                    fontSize: 12,
-                                                    minimap: {enabled: false},
-                                                    scrollBeyondLastLine: false,
-                                                    wordWrap: 'on',
-                                                }}
-                                                value={editorValue}
-                                            />
-                                        </Suspense>
-                                    </div>
-                                )}
-
-                                {isImage && (
-                                    <div className="flex flex-1 items-center justify-center overflow-auto p-4">
-                                        <img
-                                            alt={file.name}
-                                            className="max-h-full max-w-full"
-                                            data-testid="asset-file-image"
-                                            src={file.downloadUrl}
-                                        />
-                                    </div>
-                                )}
-
-                                {isPdf && (
-                                    <iframe
-                                        className="flex-1 rounded-md"
-                                        data-testid="asset-file-iframe"
-                                        src={`${file.downloadUrl}?disposition=inline`}
-                                        title={file.name}
-                                    />
-                                )}
-
-                                {!isText && !isImage && !isPdf && (
-                                    <div className="flex flex-1 flex-col items-center justify-center gap-4 p-8">
-                                        <p className="text-sm text-muted-foreground">Preview not available</p>
-
-                                        <a
-                                            className="inline-flex h-9 items-center justify-center gap-2 rounded-md bg-surface-brand-primary px-4 py-2 text-sm font-medium text-content-onsurface-primary hover:bg-surface-brand-primary-hover"
-                                            data-testid="asset-file-download"
-                                            download={file.name}
-                                            href={file.downloadUrl}
-                                            rel="noreferrer"
-                                        >
-                                            <DownloadIcon className="size-4" /> Download
-                                        </a>
-                                    </div>
-                                )}
+                                <AssetFileViewer
+                                    editorContent={isText ? editorValue : undefined}
+                                    fileId={fileIdAsString}
+                                    name={file.name}
+                                    onEditorContentChange={isText ? setEditorValue : undefined}
+                                    viewMode={viewMode}
+                                />
                             </div>
                         </div>
                     </>

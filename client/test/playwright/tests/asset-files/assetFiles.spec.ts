@@ -31,7 +31,10 @@ test.describe('Workspace Files', () => {
                 name: fileName,
             });
 
-            const uploadedRow = page.locator('[data-testid^="asset-file-row-"]').filter({hasText: fileName}).first();
+            const uploadedRow = page
+                .locator('[data-testid^="asset-file-list-item-"]')
+                .filter({hasText: fileName})
+                .first();
 
             await expect(uploadedRow).toBeVisible({timeout: 15000});
 
@@ -49,11 +52,10 @@ test.describe('Workspace Files', () => {
 
             await expect(sheet).toBeVisible({timeout: 10000});
 
-            const monacoContainer = page.getByTestId('asset-file-monaco');
+            // Markdown files open in the rendered Preview mode by default — switch to the editor first.
+            await page.getByTestId('asset-file-edit-toggle').click();
 
-            await expect(monacoContainer).toBeVisible({timeout: 15000});
-
-            const editor = monacoContainer.locator('.monaco-editor textarea').first();
+            const editor = sheet.locator('.monaco-editor textarea').first();
 
             await expect(editor).toBeAttached({timeout: 15000});
 
@@ -81,11 +83,12 @@ test.describe('Workspace Files', () => {
 
             await persistedRow.click();
 
-            const monacoContainer = page.getByTestId('asset-file-monaco');
+            // Markdown opens in the rendered Preview mode; the persisted edit shows as a rendered heading.
+            const markdownPreview = page.getByTestId('asset-file-markdown-preview');
 
-            await expect(monacoContainer).toBeVisible({timeout: 15000});
+            await expect(markdownPreview).toBeVisible({timeout: 15000});
 
-            await expect(monacoContainer).toContainText(editedContent, {timeout: 15000});
+            await expect(markdownPreview).toContainText('e2e edited', {timeout: 15000});
         });
     });
 });
