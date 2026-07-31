@@ -1,0 +1,13 @@
+---
+label: "Branch Task Output Literal Value"
+outputs:
+- name: "result"
+  value: "${branch_1}"
+tasks:
+- name: "branch_1"
+  type: "branch/v1"
+  parameters:
+    expression: "k1"
+    cases:
+    - key: "k1"
+      value: "literal value"

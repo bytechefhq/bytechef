@@ -148,6 +148,15 @@ public class BranchTaskCompletionHandler implements TaskCompletionHandler {
         }
         // no more tasks to execute -- complete the branch
         else {
+            if (taskExecution.getOutput() != null) {
+                long jobId = Objects.requireNonNull(branchTaskExecution.getJobId());
+
+                Object outputValue = taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput());
+
+                branchTaskExecution.setOutput(
+                    taskFileStorage.storeTaskExecutionOutput(jobId, branchTaskExecutionId, outputValue));
+            }
+
             branchTaskExecution.setEndDate(Instant.now());
 
             branchTaskExecution = taskExecutionService.update(branchTaskExecution);
