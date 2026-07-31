@@ -120,7 +120,13 @@ public class BranchTaskCompletionHandler implements TaskCompletionHandler {
         Map<String, ?> context = taskFileStorage.readContextValue(
             contextService.peek(branchTaskExecutionId, Classname.TASK_EXECUTION));
 
-        List<WorkflowTask> subWorkflowTasks = resolveCase(branchTaskExecution, context);
+        Map<String, ?> selectedCase = resolveCase(branchTaskExecution, context);
+
+        List<WorkflowTask> subWorkflowTasks = MapUtils
+            .getList(selectedCase, TASKS, new TypeReference<Map<String, ?>>() {}, List.of())
+            .stream()
+            .map(WorkflowTask::new)
+            .toList();
 
         if (taskExecution.getTaskNumber() < subWorkflowTasks.size()) {
             WorkflowTask workflowTask = subWorkflowTasks.get(taskExecution.getTaskNumber());
@@ -148,6 +154,15 @@ public class BranchTaskCompletionHandler implements TaskCompletionHandler {
         }
         // no more tasks to execute -- complete the branch
         else {
+            if (taskExecution.getOutput() != null) {
+                long jobId = Objects.requireNonNull(branchTaskExecution.getJobId());
+
+                branchTaskExecution.setOutput(
+                    taskFileStorage.storeTaskExecutionOutput(
+                        jobId, branchTaskExecutionId,
+                        taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput())));
+            }
+
             branchTaskExecution.setEndDate(Instant.now());
 
             branchTaskExecution = taskExecutionService.update(branchTaskExecution);
@@ -156,7 +171,7 @@ public class BranchTaskCompletionHandler implements TaskCompletionHandler {
         }
     }
 
-    private List<WorkflowTask> resolveCase(TaskExecution taskExecution, Map<String, ?> context) {
+    private Map<String, ?> resolveCase(TaskExecution taskExecution, Map<String, ?> context) {
         Object expression = MapUtils.getRequired(taskExecution.getParameters(), EXPRESSION);
         List<Map<String, ?>> branchCases = MapUtils.getList(
             taskExecution.getParameters(), CASES, new TypeReference<>() {}, Collections.emptyList());
@@ -170,19 +185,13 @@ public class BranchTaskCompletionHandler implements TaskCompletionHandler {
             Object key = keyMap.get(KEY);
 
             if (key.equals(expression)) {
-                return MapUtils
-                    .getList(branchCase, TASKS, new TypeReference<Map<String, ?>>() {}, List.of())
-                    .stream()
-                    .map(WorkflowTask::new)
-                    .toList();
+                return branchCase;
             }
         }
 
-        return MapUtils
-            .getList(
-                taskExecution.getParameters(), DEFAULT, new TypeReference<Map<String, ?>>() {}, List.of())
-            .stream()
-            .map(WorkflowTask::new)
-            .toList();
+        return Map.of(
+            TASKS,
+            MapUtils.getList(taskExecution.getParameters(), DEFAULT, new TypeReference<Map<String, ?>>() {},
+                List.of()));
     }
 }

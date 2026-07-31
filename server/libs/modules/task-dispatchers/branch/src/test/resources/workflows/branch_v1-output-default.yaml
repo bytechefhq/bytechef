@@ -1,0 +1,22 @@
+---
+label: "Branch Task Output Default"
+outputs:
+- name: "result"
+  value: "${branch_1}"
+tasks:
+- name: "branch_1"
+  type: "branch/v1"
+  parameters:
+    expression: "no-match"
+    cases:
+    - key: "k1"
+      tasks:
+      - name: "lastTask"
+        type: "var/v1/set"
+        parameters:
+          value: "case output"
+    default:
+    - name: "defaultTask"
+      type: "var/v1/set"
+      parameters:
+        value: "default output"
