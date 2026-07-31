@@ -50,6 +50,7 @@ import com.bytechef.component.definition.ai.agent.BaseToolFunction;
 import com.bytechef.component.definition.approval.ApprovalChannelFunction;
 import com.bytechef.platform.ai.constant.AiAgentToolContextKey;
 import com.bytechef.platform.ai.constant.ToolSuspendConstants;
+import com.bytechef.platform.ai.guardrails.AiGuardrailsAdvisorProvider;
 import com.bytechef.platform.ai.tool.constant.ToolConstants;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ActionContextAware;
@@ -120,6 +121,7 @@ public abstract class AbstractAiAgentChatAction {
     private final ToolCallingManager toolCallingManager;
 
     private final @Nullable ObjectProvider<ToolExecutionRecorder> toolExecutionRecorderObjectProvider;
+    private final @Nullable ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider;
 
     protected AbstractAiAgentChatAction(
         AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
@@ -133,10 +135,21 @@ public abstract class AbstractAiAgentChatAction {
         ToolCallingManager toolCallingManager,
         @Nullable ObjectProvider<ToolExecutionRecorder> toolExecutionRecorderObjectProvider) {
 
+        this(aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager,
+            toolExecutionRecorderObjectProvider, null);
+    }
+
+    protected AbstractAiAgentChatAction(
+        AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
+        ToolCallingManager toolCallingManager,
+        @Nullable ObjectProvider<ToolExecutionRecorder> toolExecutionRecorderObjectProvider,
+        @Nullable ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider) {
+
         this.aiAgentToolFacade = aiAgentToolFacade;
         this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.toolCallingManager = toolCallingManager;
         this.toolExecutionRecorderObjectProvider = toolExecutionRecorderObjectProvider;
+        this.aiGuardrailsAdvisorProviderObjectProvider = aiGuardrailsAdvisorProviderObjectProvider;
     }
 
     /**
@@ -238,7 +251,24 @@ public abstract class AbstractAiAgentChatAction {
         ChatClient chatClient = ChatClient.builder(chatModel)
             .build();
 
+        // Workspace-bound content guardrails, resolved through the optional CE SPI so this component never depends on
+        // the EE guardrails module directly (see AiGuardrailsAdvisorProvider). Registered ahead of the rest of the
+        // advisor chain — the returned advisor self-orders at HIGHEST_PRECEDENCE, but listing it first here documents
+        // that it is meant to run before every other advisor, including the per-node GUARDRAILS cluster elements added
+        // by getAdvisors below.
+        List<Advisor> guardrailsAdvisors = new ArrayList<>();
+
+        if (aiGuardrailsAdvisorProviderObjectProvider != null
+            && context instanceof ActionContextAware actionContextAware) {
+            aiGuardrailsAdvisorProviderObjectProvider.ifAvailable(
+                provider -> provider
+                    .getAdvisor(actionContextAware.getPlatformType(), actionContextAware.getJobPrincipalId(),
+                        "ai_agent")
+                    .ifPresent(guardrailsAdvisors::add));
+        }
+
         ChatClient.ChatClientRequestSpec chatClientRequestSpec = createPrompt(chatClient, inputParameters, context)
+            .advisors(guardrailsAdvisors)
             .advisors(
                 getAdvisors(
                     clusterElementMap, connectionParameters, chatModel, context, chatMemoryResult,

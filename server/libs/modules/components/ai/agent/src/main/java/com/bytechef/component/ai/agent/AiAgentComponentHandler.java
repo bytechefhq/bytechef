@@ -28,6 +28,7 @@ import com.bytechef.component.ai.agent.tool.AiAgentChatTool;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.platform.ai.guardrails.AiGuardrailsAdvisorProvider;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.AiAgentComponentDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -47,12 +48,13 @@ public class AiAgentComponentHandler implements ComponentHandler {
     public AiAgentComponentHandler(
         AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
         ToolCallingManager toolCallingManager,
-        ObjectProvider<ToolExecutionRecorder> toolExecutionRecorderObjectProvider) {
+        ObjectProvider<ToolExecutionRecorder> toolExecutionRecorderObjectProvider,
+        ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider) {
 
         final ActionDefinition aiAgentChatActionDefinition =
             AiAgentChatAction.of(
                 aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager,
-                toolExecutionRecorderObjectProvider);
+                toolExecutionRecorderObjectProvider, aiGuardrailsAdvisorProviderObjectProvider);
 
         this.componentDefinition = new AiAgentComponentDefinitionImpl(
             component(AI_AGENT)
@@ -64,10 +66,10 @@ public class AiAgentComponentHandler implements ComponentHandler {
                     aiAgentChatActionDefinition,
                     AiAgentStreamChatAction.of(
                         aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager,
-                        toolExecutionRecorderObjectProvider),
+                        toolExecutionRecorderObjectProvider, aiGuardrailsAdvisorProviderObjectProvider),
                     AiAgentRealtimeChatAction.of(
                         aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager,
-                        toolExecutionRecorderObjectProvider))
+                        toolExecutionRecorderObjectProvider, aiGuardrailsAdvisorProviderObjectProvider))
                 .clusterElements(AiAgentChatTool.of(aiAgentChatActionDefinition)));
     }
 
