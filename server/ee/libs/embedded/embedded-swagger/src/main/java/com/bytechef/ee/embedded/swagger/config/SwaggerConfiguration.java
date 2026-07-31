@@ -22,15 +22,6 @@ import org.springframework.context.annotation.Profile;
 public class SwaggerConfiguration {
 
     @Bean
-    public GroupedOpenApi embeddedByConnectedUserTokeOpenApi() {
-        return GroupedOpenApi.builder()
-            .group("embedded-frontend")
-            .displayName("Embedded Frontend V1 API")
-            .pathsToMatch("/api/embedded/frontend/v1/**")
-            .build();
-    }
-
-    @Bean
     public GroupedOpenApi embeddedInternalOpenApi() {
         return GroupedOpenApi.builder()
             .group("embedded-internal")
