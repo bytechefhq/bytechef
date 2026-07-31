@@ -334,6 +334,44 @@ class KnowledgeBaseDocumentServiceIntTest {
     }
 
     @Test
+    void testGetTombstonedDocumentsReturnsOnlyTombstonedRowsOfSource() {
+        KnowledgeBaseDocumentServiceImpl impl = (KnowledgeBaseDocumentServiceImpl) knowledgeBaseDocumentService;
+        KnowledgeBaseSource source = persistSource("HubSpot");
+        KnowledgeBaseSource otherSource = persistSource("Airtable");
+
+        when(knowledgeBaseFileStorage.storeDocument(anyString(), any(InputStream.class)))
+            .thenAnswer(
+                invocation -> new FileEntry(invocation.getArgument(0), "file://stored/" + invocation.getArgument(0)));
+
+        Instant initial = Instant.parse("2026-05-08T10:00:00Z");
+
+        impl.createSyncedDocument(
+            knowledgeBase.getId(), source.getId(), "rec-A", "Record A", "Body A", Map.of(), null, "hash-A", initial);
+        KnowledgeBaseDocument tombstoned = impl.createSyncedDocument(
+            knowledgeBase.getId(), source.getId(), "rec-B", "Record B", "Body B", Map.of(), null, "hash-B", initial);
+        KnowledgeBaseDocument otherSourceTombstoned = impl.createSyncedDocument(
+            knowledgeBase.getId(), otherSource.getId(), "rec-C", "Record C", "Body C", Map.of(), null, "hash-C",
+            initial);
+
+        Instant runEnd = Instant.parse("2026-05-08T12:00:00Z");
+
+        knowledgeBaseDocumentRepository.tombstoneUnseen(source.getId(), List.of("rec-A"), runEnd);
+        knowledgeBaseDocumentRepository.tombstoneUnseen(otherSource.getId(), List.of("__never_matches__"), runEnd);
+
+        List<KnowledgeBaseDocument> tombstonedDocuments = knowledgeBaseDocumentService.getTombstonedDocuments(
+            source.getId());
+
+        assertThat(tombstonedDocuments).extracting(KnowledgeBaseDocument::getId)
+            .containsExactly(tombstoned.getId());
+
+        List<KnowledgeBaseDocument> otherTombstonedDocuments = knowledgeBaseDocumentService.getTombstonedDocuments(
+            otherSource.getId());
+
+        assertThat(otherTombstonedDocuments).extracting(KnowledgeBaseDocument::getId)
+            .containsExactly(otherSourceTombstoned.getId());
+    }
+
+    @Test
     void testTombstoneUnseenIgnoresManualUploads() {
         KnowledgeBaseDocumentServiceImpl impl = (KnowledgeBaseDocumentServiceImpl) knowledgeBaseDocumentService;
         KnowledgeBaseSource source = persistSource("HubSpot");

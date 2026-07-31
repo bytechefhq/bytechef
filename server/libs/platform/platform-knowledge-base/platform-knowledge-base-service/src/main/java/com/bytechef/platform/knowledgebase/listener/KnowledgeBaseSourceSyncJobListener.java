@@ -18,6 +18,7 @@ package com.bytechef.platform.knowledgebase.listener;
 
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseSource;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseSourceStatus;
+import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseSourceService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -48,8 +49,11 @@ import org.springframework.stereotype.Component;
  * <ul>
  * <li>{@code FULL_REPLACE}: aggregates {@code seenRecordIds} from each step's {@code ExecutionContext} (populated by
  * {@code KnowledgeBaseItemWriter} under the key {@code "knowledgeBaseSource.seenRecordIds"}), calls
- * {@link KnowledgeBaseDocumentService#tombstoneUnseen}, then flips status to {@code READY} along with
- * {@code lastSyncRunAt} and {@code lastSyncJobExecutionId}.</li>
+ * {@link KnowledgeBaseDocumentService#tombstoneUnseen}, evicts the tombstoned documents' chunks, chunk content files,
+ * and vector-store rows via {@link KnowledgeBaseDocumentFacade#sweepTombstonedDocumentChunks} (best-effort — a sweep
+ * failure never fails the structured sync; the next FULL_REPLACE run retries because tombstoned rows keep their
+ * {@code deleted_at}), then flips status to {@code READY} along with {@code lastSyncRunAt} and
+ * {@code lastSyncJobExecutionId}.</li>
  * <li>{@code PARTIAL}: skips the tombstone sweep entirely and updates {@code lastSyncRunAt} +
  * {@code lastSyncJobExecutionId} without touching status — a {@code BUILDING_PREVIEW} source stays
  * {@code BUILDING_PREVIEW} until a {@code FULL_REPLACE} run completes; a {@code READY} source stays {@code READY}.</li>
@@ -92,14 +96,17 @@ public class KnowledgeBaseSourceSyncJobListener implements JobExecutionListener 
      */
     private static final String SEEN_RECORD_IDS_KEY = "knowledgeBaseSource.seenRecordIds";
 
+    private final KnowledgeBaseDocumentFacade knowledgeBaseDocumentFacade;
     private final KnowledgeBaseDocumentService knowledgeBaseDocumentService;
     private final KnowledgeBaseSourceService knowledgeBaseSourceService;
 
     @SuppressFBWarnings("EI2")
     public KnowledgeBaseSourceSyncJobListener(
+        KnowledgeBaseDocumentFacade knowledgeBaseDocumentFacade,
         KnowledgeBaseDocumentService knowledgeBaseDocumentService,
         KnowledgeBaseSourceService knowledgeBaseSourceService) {
 
+        this.knowledgeBaseDocumentFacade = knowledgeBaseDocumentFacade;
         this.knowledgeBaseDocumentService = knowledgeBaseDocumentService;
         this.knowledgeBaseSourceService = knowledgeBaseSourceService;
     }
@@ -127,9 +134,12 @@ public class KnowledgeBaseSourceSyncJobListener implements JobExecutionListener 
 
                 int tombstoned = knowledgeBaseDocumentService.tombstoneUnseen(sourceId, seenRecordIds, now);
 
+                int sweptChunks = sweepTombstonedDocumentChunks(sourceId);
+
                 log.info(
-                    "Knowledge Base sync completed in FULL_REPLACE mode: source={} seen={} tombstoned={}",
-                    sourceId, seenRecordIds.size(), tombstoned);
+                    "Knowledge Base sync completed in FULL_REPLACE mode: source={} seen={} tombstoned={} " +
+                        "sweptChunks={}",
+                    sourceId, seenRecordIds.size(), tombstoned, sweptChunks);
 
                 knowledgeBaseSourceService.updateStatus(
                     sourceId, KnowledgeBaseSourceStatus.READY, now, jobExecution.getId());
@@ -156,6 +166,23 @@ public class KnowledgeBaseSourceSyncJobListener implements JobExecutionListener 
                 // last-sync timestamp without flipping the user-visible status badge.
                 knowledgeBaseSourceService.updateLastSyncMetadata(sourceId, null, jobExecution.getId());
             }
+        }
+    }
+
+    /**
+     * Best-effort eviction of tombstoned documents' chunks and vector-store rows. A failure here must not fail the
+     * structured sync or block the status flip to {@code READY} — the tombstoned document rows keep their
+     * {@code deleted_at}, so the next FULL_REPLACE run retries the sweep.
+     */
+    private int sweepTombstonedDocumentChunks(Long sourceId) {
+        try {
+            return knowledgeBaseDocumentFacade.sweepTombstonedDocumentChunks(sourceId);
+        } catch (RuntimeException exception) {
+            log.warn(
+                "Knowledge Base tombstone chunk sweep failed: source={} — structured sync remains intact",
+                sourceId, exception);
+
+            return 0;
         }
     }
 

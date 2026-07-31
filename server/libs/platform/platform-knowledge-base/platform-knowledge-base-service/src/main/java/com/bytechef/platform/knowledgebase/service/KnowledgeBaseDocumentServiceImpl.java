@@ -206,6 +206,12 @@ class KnowledgeBaseDocumentServiceImpl implements KnowledgeBaseDocumentService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<KnowledgeBaseDocument> getTombstonedDocuments(long sourceId) {
+        return knowledgeBaseDocumentRepository.findAllBySourceIdAndDeletedAtIsNotNull(sourceId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Optional<KnowledgeBaseDocument> findSyncedDocument(long sourceId, String sourceRecordId) {
         return knowledgeBaseDocumentRepository.findBySourceIdAndSourceRecordId(sourceId, sourceRecordId);
     }

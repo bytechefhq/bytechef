@@ -64,6 +64,14 @@ public interface KnowledgeBaseDocumentChunkService {
     List<KnowledgeBaseDocumentChunk> getKnowledgeBaseDocumentChunksByDocumentId(Long documentId);
 
     /**
+     * Retrieves a list of {@code KnowledgeBaseDocumentChunk} objects associated with any of the specified document IDs.
+     *
+     * @param documentIds the unique identifiers of the knowledge base documents whose chunks are to be retrieved
+     * @return a list of {@code KnowledgeBaseDocumentChunk} objects corresponding to the given document IDs
+     */
+    List<KnowledgeBaseDocumentChunk> getKnowledgeBaseDocumentChunksByDocumentIds(List<Long> documentIds);
+
+    /**
      * Persists the given {@code KnowledgeBaseDocumentChunk} into the storage system.
      *
      * @param knowledgeBaseDocumentChunk the {@code KnowledgeBaseDocumentChunk} instance to be saved

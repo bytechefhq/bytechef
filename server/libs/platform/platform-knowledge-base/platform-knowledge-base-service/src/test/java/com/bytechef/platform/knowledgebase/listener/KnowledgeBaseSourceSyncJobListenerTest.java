@@ -29,6 +29,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseSource;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseSourceStatus;
+import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseSourceService;
 import java.time.Instant;
@@ -64,16 +65,19 @@ class KnowledgeBaseSourceSyncJobListenerTest {
     private static final long JOB_EXECUTION_ID_BOXED = JOB_EXECUTION_ID;
     private static final String SEEN_RECORD_IDS_KEY = "knowledgeBaseSource.seenRecordIds";
 
+    private KnowledgeBaseDocumentFacade knowledgeBaseDocumentFacade;
     private KnowledgeBaseDocumentService knowledgeBaseDocumentService;
     private KnowledgeBaseSourceService knowledgeBaseSourceService;
     private KnowledgeBaseSourceSyncJobListener listener;
 
     @BeforeEach
     void setUp() {
+        knowledgeBaseDocumentFacade = mock(KnowledgeBaseDocumentFacade.class);
         knowledgeBaseDocumentService = mock(KnowledgeBaseDocumentService.class);
         knowledgeBaseSourceService = mock(KnowledgeBaseSourceService.class);
 
-        listener = new KnowledgeBaseSourceSyncJobListener(knowledgeBaseDocumentService, knowledgeBaseSourceService);
+        listener = new KnowledgeBaseSourceSyncJobListener(
+            knowledgeBaseDocumentFacade, knowledgeBaseDocumentService, knowledgeBaseSourceService);
     }
 
     @Test
@@ -106,7 +110,28 @@ class KnowledgeBaseSourceSyncJobListenerTest {
 
         assertThat(statusInstantCaptor.getValue()).isEqualTo(deletedAtCaptor.getValue());
 
+        verify(knowledgeBaseDocumentFacade, times(1)).sweepTombstonedDocumentChunks(SOURCE_ID);
         verify(knowledgeBaseSourceService, never()).updateLastSyncMetadata(anyLong(), any(), any());
+    }
+
+    @Test
+    void testAfterJobOnCompletedFullReplaceSweepFailureStillFlipsToReady() {
+        Map<String, Object> destination = newKnowledgeBaseDestination("FULL_REPLACE");
+
+        JobExecution jobExecution = newJobExecution(BatchStatus.COMPLETED, jobParametersWithDestination(destination));
+
+        jobExecution.addStepExecution(newStepExecution(jobExecution, List.of("rec1")));
+
+        when(knowledgeBaseDocumentFacade.sweepTombstonedDocumentChunks(SOURCE_ID))
+            .thenThrow(new RuntimeException("vector store unavailable"));
+
+        listener.afterJob(jobExecution);
+
+        // The chunk sweep is best-effort — its failure must not prevent the tombstone bookkeeping or the READY flip.
+        verify(knowledgeBaseDocumentService, times(1)).tombstoneUnseen(eq(SOURCE_ID), any(), any(Instant.class));
+        verify(knowledgeBaseSourceService, times(1))
+            .updateStatus(eq(SOURCE_ID), eq(KnowledgeBaseSourceStatus.READY), any(Instant.class),
+                eq(JOB_EXECUTION_ID_BOXED));
     }
 
     @Test
@@ -122,6 +147,7 @@ class KnowledgeBaseSourceSyncJobListenerTest {
         listener.afterJob(jobExecution);
 
         verify(knowledgeBaseDocumentService, never()).tombstoneUnseen(anyLong(), any(), any());
+        verify(knowledgeBaseDocumentFacade, never()).sweepTombstonedDocumentChunks(anyLong());
         verify(knowledgeBaseSourceService, never())
             .updateStatus(anyLong(), any(KnowledgeBaseSourceStatus.class), any(), any());
 
@@ -186,6 +212,7 @@ class KnowledgeBaseSourceSyncJobListenerTest {
         verify(knowledgeBaseSourceService, times(1))
             .updateLastSyncMetadata(eq(SOURCE_ID), isNull(), eq(JOB_EXECUTION_ID_BOXED));
         verify(knowledgeBaseDocumentService, never()).tombstoneUnseen(anyLong(), any(), any());
+        verify(knowledgeBaseDocumentFacade, never()).sweepTombstonedDocumentChunks(anyLong());
     }
 
     @Test

@@ -144,6 +144,58 @@ class KnowledgeBaseDocumentFacadeImpl implements KnowledgeBaseDocumentFacade {
     }
 
     @Override
+    public int sweepTombstonedDocumentChunks(long sourceId) {
+        List<KnowledgeBaseDocument> tombstonedDocuments = knowledgeBaseDocumentService.getTombstonedDocuments(sourceId);
+
+        if (tombstonedDocuments.isEmpty()) {
+            return 0;
+        }
+
+        List<Long> documentIds = tombstonedDocuments.stream()
+            .map(KnowledgeBaseDocument::getId)
+            .toList();
+
+        List<KnowledgeBaseDocumentChunk> knowledgeBaseDocumentChunks =
+            knowledgeBaseDocumentChunkService.getKnowledgeBaseDocumentChunksByDocumentIds(documentIds);
+
+        if (knowledgeBaseDocumentChunks.isEmpty()) {
+            return 0;
+        }
+
+        List<String> vectorStoreIds = knowledgeBaseDocumentChunks.stream()
+            .map(KnowledgeBaseDocumentChunk::getVectorStoreId)
+            .filter(vectorStoreId -> vectorStoreId != null)
+            .toList();
+
+        if (!vectorStoreIds.isEmpty()) {
+            KnowledgeBaseDocument firstDocument = tombstonedDocuments.get(0);
+
+            KnowledgeBase knowledgeBase = knowledgeBaseService.getKnowledgeBase(firstDocument.getKnowledgeBaseId());
+            Environment environment = knowledgeBase.getEnvironment();
+
+            EnvironmentContext.set(environment);
+
+            try {
+                vectorStore.delete(vectorStoreIds);
+            } finally {
+                EnvironmentContext.clear();
+            }
+        }
+
+        for (KnowledgeBaseDocumentChunk chunk : knowledgeBaseDocumentChunks) {
+            FileEntry contentFileEntry = chunk.getContent();
+
+            if (contentFileEntry != null) {
+                knowledgeBaseFileStorage.deleteChunkContent(contentFileEntry);
+            }
+        }
+
+        knowledgeBaseDocumentChunkService.deleteKnowledgeBaseDocumentChunks(knowledgeBaseDocumentChunks);
+
+        return knowledgeBaseDocumentChunks.size();
+    }
+
+    @Override
     public void updateKnowledgeBaseDocumentTags(long knowledgeBaseDocumentId, List<String> tagNames) {
         knowledgeBaseDocumentTagService.updateTagNames(knowledgeBaseDocumentId, tagNames);
 

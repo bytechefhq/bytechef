@@ -112,6 +112,13 @@ public interface KnowledgeBaseDocumentService {
     int tombstoneUnseen(long sourceId, Set<String> seenSourceRecordIds, Instant now);
 
     /**
+     * Returns every tombstoned synced document ({@code deleted_at IS NOT NULL}) tied to the given source. Used by the
+     * post-tombstone chunk sweep to locate documents whose chunk rows, chunk content files, and vector-store entries
+     * must be evicted so semantic search stops serving content that no longer exists upstream.
+     */
+    List<KnowledgeBaseDocument> getTombstonedDocuments(long sourceId);
+
+    /**
      * Looks up an existing synced document by its {@code (source_id, source_record_id)} sync key. Used by the
      * DESTINATION cluster element writer (Phase 13 Task 31) to decide between create / unchanged-fast-path / replace
      * paths per record.

@@ -54,4 +54,17 @@ public interface KnowledgeBaseDocumentFacade {
      * @param tagNames                the new list of tag name strings
      */
     void updateKnowledgeBaseDocumentTags(long knowledgeBaseDocumentId, List<String> tagNames);
+
+    /**
+     * Evicts the derived resources of every tombstoned document tied to the given source: vector-store rows, chunk
+     * content files, and chunk rows. The document rows themselves stay tombstoned — they are the resurrect anchor for
+     * records that reappear upstream ({@code replaceSyncedDocument} clears {@code deleted_at} and re-runs the chunker).
+     * Without this sweep, semantic search keeps serving chunks of documents that no longer exist upstream. Idempotent:
+     * documents whose chunks were already evicted contribute nothing, so sweeping all tombstoned documents of a source
+     * on every FULL_REPLACE run also self-heals rows tombstoned before a previously failed sweep.
+     *
+     * @param sourceId the knowledge base source whose tombstoned documents should be swept
+     * @return the number of chunks removed
+     */
+    int sweepTombstonedDocumentChunks(long sourceId);
 }

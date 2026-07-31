@@ -66,6 +66,16 @@ public class KnowledgeBaseDocumentChunkServiceImpl implements KnowledgeBaseDocum
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<KnowledgeBaseDocumentChunk> getKnowledgeBaseDocumentChunksByDocumentIds(List<Long> documentIds) {
+        if (documentIds.isEmpty()) {
+            return List.of();
+        }
+
+        return knowledgeBaseDocumentChunkRepository.findAllByKnowledgeBaseDocumentIdIn(documentIds);
+    }
+
+    @Override
     public KnowledgeBaseDocumentChunk saveKnowledgeBaseDocumentChunk(
         KnowledgeBaseDocumentChunk knowledgeBaseDocumentChunk) {
 

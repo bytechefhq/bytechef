@@ -34,6 +34,8 @@ public interface KnowledgeBaseDocumentRepository
 
     List<KnowledgeBaseDocument> findAllByKnowledgeBaseId(Long knowledgeBaseId);
 
+    List<KnowledgeBaseDocument> findAllBySourceIdAndDeletedAtIsNotNull(Long sourceId);
+
     Optional<KnowledgeBaseDocument> findBySourceIdAndSourceRecordId(Long sourceId, String sourceRecordId);
 
     /**
