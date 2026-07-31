@@ -3,7 +3,12 @@
   "help": null,
   "icon": "path:assets/branch.svg",
   "name": "branch",
-  "outputDefinition": null,
+  "outputDefinition": {
+    "output": { },
+    "outputResponse": null,
+    "outputSchema": null,
+    "sampleOutput": null
+  },
   "properties": [ {
     "advancedOption": null,
     "controlType": "FORMULA_MODE",

@@ -3,7 +3,12 @@
   "help": null,
   "icon": "path:assets/condition.svg",
   "name": "condition",
-  "outputDefinition": null,
+  "outputDefinition": {
+    "output": { },
+    "outputResponse": null,
+    "outputSchema": null,
+    "sampleOutput": null
+  },
   "properties": [ {
     "advancedOption": null,
     "controlType": "SELECT",
