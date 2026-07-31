@@ -633,6 +633,101 @@ class WorkflowNodeOutputFacadeIntTest {
         assertThat(workflowNodeOutputDTO.getSampleOutput()).isEqualTo(List.of(1, 2));
     }
 
+    @Test
+    void testGetPreviousWorkflowNodeOutputsExcludesBranchAggregateOutputForNestedTask() {
+        String workflowId = createWorkflow(
+            """
+                {
+                    "tasks": [
+                        {
+                            "name": "branch1",
+                            "type": "branch/v1",
+                            "parameters": {
+                                "cases": [
+                                    {
+                                        "key": "k1",
+                                        "tasks": [{"name": "nested1", "type": "component/v1/action1"}]
+                                    }
+                                ],
+                                "default": []
+                            }
+                        }
+                    ]
+                }
+                """);
+
+        assertTaskDispatcherAggregateOutputExcludedForNestedTask(workflowId, "branch1", "branch");
+    }
+
+    @Test
+    void testGetPreviousWorkflowNodeOutputsExcludesConditionAggregateOutputForNestedTask() {
+        String workflowId = createWorkflow(
+            """
+                {
+                    "tasks": [
+                        {
+                            "name": "condition1",
+                            "type": "condition/v1",
+                            "parameters": {
+                                "caseTrue": [{"name": "nested1", "type": "component/v1/action1"}],
+                                "caseFalse": []
+                            }
+                        }
+                    ]
+                }
+                """);
+
+        assertTaskDispatcherAggregateOutputExcludedForNestedTask(workflowId, "condition1", "condition");
+    }
+
+    @Test
+    void testGetPreviousWorkflowNodeOutputsExcludesForkJoinAggregateOutputForNestedTask() {
+        String workflowId = createWorkflow(
+            """
+                {
+                    "tasks": [
+                        {
+                            "name": "forkJoin1",
+                            "type": "fork-join/v1",
+                            "parameters": {
+                                "branches": [[{"name": "nested1", "type": "component/v1/action1"}]]
+                            }
+                        }
+                    ]
+                }
+                """);
+
+        assertTaskDispatcherAggregateOutputExcludedForNestedTask(workflowId, "forkJoin1", "fork-join");
+    }
+
+    private void assertTaskDispatcherAggregateOutputExcludedForNestedTask(
+        String workflowId, String taskDispatcherName, String taskDispatcherType) {
+
+        when(taskDispatcherDefinitionService.getTaskDispatcherDefinition(taskDispatcherType, 1))
+            .thenReturn(mock(TaskDispatcherDefinition.class));
+        when(taskDispatcherDefinitionService.isDynamicOutputDefined(taskDispatcherType, 1)).thenReturn(true);
+
+        OutputResponse variableOutputResponse = new OutputResponse(null, Map.of("item", "value"), null);
+
+        when(taskDispatcherDefinitionService.executeVariableProperties(eq(taskDispatcherType), eq(1), anyMap()))
+            .thenReturn(variableOutputResponse);
+
+        List<WorkflowNodeOutputDTO> workflowNodeOutputDTOs = workflowNodeOutputFacade.getPreviousWorkflowNodeOutputs(
+            workflowId, "nested1", ENVIRONMENT_ID);
+
+        assertThat(workflowNodeOutputDTOs).hasSize(1);
+
+        WorkflowNodeOutputDTO workflowNodeOutputDTO = workflowNodeOutputDTOs.getFirst();
+
+        assertThat(workflowNodeOutputDTO.workflowNodeName()).isEqualTo(taskDispatcherName);
+        assertThat(workflowNodeOutputDTO.variableOutputResponse()).isEqualTo(variableOutputResponse);
+        assertThat(workflowNodeOutputDTO.outputResponse()).isNull();
+
+        verify(taskDispatcherDefinitionService, never()).executeOutput(eq(taskDispatcherType), eq(1), anyMap());
+        verify(taskDispatcherDefinitionService, times(1))
+            .executeVariableProperties(eq(taskDispatcherType), eq(1), anyMap());
+    }
+
     private String createWorkflow(String definition) {
         Workflow workflow = workflowService.create(definition, Format.JSON, Workflow.SourceType.JDBC);
 

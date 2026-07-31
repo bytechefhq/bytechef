@@ -16,8 +16,10 @@
 
 package com.bytechef.task.dispatcher.forkjoin;
 
+import com.bytechef.platform.workflow.task.dispatcher.output.TaskListOutputDataSource;
 import com.bytechef.task.dispatcher.fork.join.ForkJoinTaskDispatcherDefinitionFactory;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -27,7 +29,10 @@ public class ForkJoinTaskDispatcherDefinitionFactoryTest {
 
     @Test
     public void testGetTaskDispatcherDefinition() {
+        TaskListOutputDataSource stubDataSource = (workflowId, lastTaskName, lastTaskType, environmentId) -> null;
+
         JsonFileAssert.assertEquals(
-            "definition/fork-join_v1.json", new ForkJoinTaskDispatcherDefinitionFactory().getDefinition());
+            "definition/fork-join_v1.json",
+            new ForkJoinTaskDispatcherDefinitionFactory(Optional.of(stubDataSource)).getDefinition());
     }
 }
