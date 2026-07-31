@@ -117,7 +117,12 @@ public class MapTaskDispatcherIntTest {
 
         Map<String, ?> outputs = taskFileStorage.readJobOutputs(job.getOutputs());
 
-        Assertions.assertNull(outputs.get("map"));
+        List<?> expected = IntStream.rangeClosed(1, 10)
+            .boxed()
+            .map(item -> item > 5 ? "=sumVar1 - 2" : "=sumVar1 + 2")
+            .toList();
+
+        Assertions.assertEquals(expected, outputs.get("map"));
     }
 
     @Test
