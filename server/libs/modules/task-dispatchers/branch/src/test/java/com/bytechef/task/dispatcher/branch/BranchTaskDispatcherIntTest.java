@@ -16,14 +16,114 @@
 
 package com.bytechef.task.dispatcher.branch;
 
-import org.junit.jupiter.api.Disabled;
+import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
+import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
+import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.service.ContextService;
+import com.bytechef.atlas.execution.service.CounterService;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
+import com.bytechef.atlas.worker.task.handler.TaskHandler;
+import com.bytechef.commons.util.EncodingUtils;
+import com.bytechef.evaluator.Evaluator;
+import com.bytechef.evaluator.SpelEvaluator;
+import com.bytechef.platform.workflow.task.dispatcher.test.annotation.TaskDispatcherIntTest;
+import com.bytechef.platform.workflow.task.dispatcher.test.task.handler.TestVarTaskHandler;
+import com.bytechef.platform.workflow.task.dispatcher.test.workflow.TaskDispatcherJobTestExecutor;
+import com.bytechef.platform.workflow.task.dispatcher.test.workflow.TaskDispatcherJobTestExecutor.TaskDispatcherJobExecution;
+import com.bytechef.task.dispatcher.branch.completion.BranchTaskCompletionHandler;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 
+/**
+ * @author Ivica Cardic
+ */
+@TaskDispatcherIntTest
 public class BranchTaskDispatcherIntTest {
 
-    @Disabled
+    private static final Evaluator EVALUATOR = SpelEvaluator.create();
+
+    @Autowired
+    private TaskDispatcherJobTestExecutor taskDispatcherJobTestExecutor;
+
+    @Autowired
+    private TaskFileStorage taskFileStorage;
+
     @Test
-    public void testSwitch() {
-        // TODO
+    public void testDispatchOutputCaseMatch() {
+        TaskDispatcherJobExecution jobExecution = taskDispatcherJobTestExecutor.execute(
+            EncodingUtils.base64EncodeToString("branch_v1-output-caseMatch".getBytes(StandardCharsets.UTF_8)),
+            Map.of(),
+            this::getTaskCompletionHandlerFactories,
+            this::getTaskDispatcherResolverFactories,
+            this::getTaskHandlerMap);
+
+        Job job = jobExecution.job();
+
+        Map<String, ?> outputs = taskFileStorage.readJobOutputs(job.getOutputs());
+
+        Assertions.assertEquals("last task output", outputs.get("result"));
+    }
+
+    @Test
+    public void testDispatchOutputLiteralValue() {
+        TaskDispatcherJobExecution jobExecution = taskDispatcherJobTestExecutor.execute(
+            EncodingUtils.base64EncodeToString("branch_v1-output-literalValue".getBytes(StandardCharsets.UTF_8)),
+            Map.of(),
+            this::getTaskCompletionHandlerFactories,
+            this::getTaskDispatcherResolverFactories,
+            this::getTaskHandlerMap);
+
+        Job job = jobExecution.job();
+
+        Map<String, ?> outputs = taskFileStorage.readJobOutputs(job.getOutputs());
+
+        Assertions.assertEquals("literal value", outputs.get("result"));
+    }
+
+    @Test
+    public void testDispatchOutputDefault() {
+        TaskDispatcherJobExecution jobExecution = taskDispatcherJobTestExecutor.execute(
+            EncodingUtils.base64EncodeToString("branch_v1-output-default".getBytes(StandardCharsets.UTF_8)),
+            Map.of(),
+            this::getTaskCompletionHandlerFactories,
+            this::getTaskDispatcherResolverFactories,
+            this::getTaskHandlerMap);
+
+        Job job = jobExecution.job();
+
+        Map<String, ?> outputs = taskFileStorage.readJobOutputs(job.getOutputs());
+
+        Assertions.assertEquals("default output", outputs.get("result"));
+    }
+
+    @SuppressWarnings("PMD")
+    private List<TaskCompletionHandlerFactory> getTaskCompletionHandlerFactories(
+        ContextService contextService, CounterService counterService, TaskExecutionService taskExecutionService) {
+
+        return List.of(
+            (taskCompletionHandler, taskDispatcher) -> new BranchTaskCompletionHandler(
+                contextService, EVALUATOR, taskCompletionHandler, taskDispatcher, taskExecutionService,
+                taskFileStorage));
+    }
+
+    @SuppressWarnings("PMD")
+    private List<TaskDispatcherResolverFactory> getTaskDispatcherResolverFactories(
+        ApplicationEventPublisher eventPublisher, ContextService contextService,
+        CounterService counterService, TaskExecutionService taskExecutionService) {
+
+        return List.of(
+            (taskDispatcher) -> new BranchTaskDispatcher(
+                contextService, EVALUATOR, eventPublisher, taskDispatcher, taskExecutionService,
+                taskFileStorage));
+    }
+
+    private Map<String, TaskHandler<?>> getTaskHandlerMap() {
+        return Map.of("var/v1/set", new TestVarTaskHandler<>(Map::put));
     }
 }
