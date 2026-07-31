@@ -1,0 +1,13 @@
+---
+label: "Fork Join Task Output With No-Output Branch"
+tasks:
+- name: "forkJoin_1"
+  type: "fork-join/v1"
+  parameters:
+    branches:
+    - - name: "lastTask0"
+        type: "var/v1/set"
+        parameters:
+          value: "branch zero output"
+    - - name: "lastTask1"
+        type: "var/v1/set"
