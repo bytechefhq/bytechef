@@ -37,6 +37,7 @@ import com.bytechef.platform.workflow.task.dispatcher.definition.PropertyFactory
 import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.ModifiableValueProperty;
 import com.bytechef.platform.workflow.task.dispatcher.map.MapDataSource;
+import com.bytechef.platform.workflow.task.dispatcher.output.TaskListOutputDataSource;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -84,11 +85,11 @@ public class MapTaskDispatcherDefinitionFactory implements TaskDispatcherDefinit
         List<Map<String, ?>> iterateeTasks = MapUtils.getList(
             inputParameters, ITERATEE, new TypeReference<>() {}, List.of());
 
-        if (iterateeTasks.isEmpty()) {
+        Map<String, ?> lastTask = TaskListOutputDataSource.getLastEnabledTask(iterateeTasks);
+
+        if (lastTask == null) {
             return null;
         }
-
-        Map<String, ?> lastTask = iterateeTasks.getLast();
 
         String lastTaskName = MapUtils.getString(lastTask, "name");
         String lastTaskType = MapUtils.getString(lastTask, "type");
