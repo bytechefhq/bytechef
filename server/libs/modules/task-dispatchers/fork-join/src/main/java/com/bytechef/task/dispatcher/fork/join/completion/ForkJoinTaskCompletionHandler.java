@@ -34,6 +34,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.evaluator.Evaluator;
+import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.task.dispatcher.fork.join.constant.ForkJoinTaskDispatcherConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
@@ -164,15 +165,45 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
 
             taskDispatcher.dispatch(branchTaskExecution);
         } else {
+            TaskExecution forkJoinTaskExecutionForUpdate =
+                taskExecutionService.getTaskExecutionForUpdate(taskExecutionParentId);
+
+            int branch = MapUtils.getInteger(taskExecution.getParameters(), BRANCH);
+            long jobId = Objects.requireNonNull(forkJoinTaskExecutionForUpdate.getJobId());
+
+            Map<String, Object> branchOutputs;
+
+            if (forkJoinTaskExecutionForUpdate.getOutput() != null) {
+                branchOutputs = new HashMap<>(readBranchOutputs(forkJoinTaskExecutionForUpdate.getOutput()));
+            } else {
+                branchOutputs = new HashMap<>();
+            }
+
+            Object branchValue = taskExecution.getOutput() == null
+                ? null
+                : taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput());
+
+            branchOutputs.put(ForkJoinTaskDispatcherConstants.BRANCH_OUTPUT_KEY_PREFIX + branch, branchValue);
+
+            forkJoinTaskExecutionForUpdate.setOutput(
+                taskFileStorage.storeTaskExecutionOutput(jobId, taskExecutionParentId, branchOutputs));
+
             long branchesLeft = counterService.decrement(taskExecutionParentId);
 
             if (branchesLeft == 0) {
-                forkJoinTaskExecution.setEndDate(Instant.now());
+                forkJoinTaskExecutionForUpdate.setEndDate(Instant.now());
 
-                forkJoinTaskExecution = taskExecutionService.update(forkJoinTaskExecution);
+                forkJoinTaskExecutionForUpdate = taskExecutionService.update(forkJoinTaskExecutionForUpdate);
 
-                taskCompletionHandler.handle(forkJoinTaskExecution);
+                taskCompletionHandler.handle(forkJoinTaskExecutionForUpdate);
+            } else {
+                taskExecutionService.update(forkJoinTaskExecutionForUpdate);
             }
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> readBranchOutputs(FileEntry fileEntry) {
+        return (Map<String, Object>) taskFileStorage.readTaskExecutionOutput(fileEntry);
     }
 }
