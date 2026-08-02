@@ -1,0 +1,26 @@
+---
+label: "Graph Inside Fork Join Branch"
+outputs:
+- name: "branch0Result"
+  value: "${forkJoin_1.branch_0}"
+- name: "branch1Result"
+  value: "${forkJoin_1.branch_1}"
+tasks:
+- name: "forkJoin_1"
+  type: "fork-join/v1"
+  parameters:
+    branches:
+    - - name: "graph_1"
+        type: "graph/v1"
+        parameters:
+          nodes:
+          - name: "A"
+            tasks:
+            - name: "graphTask"
+              type: "var/v1/set"
+              parameters:
+                value: "graph branch output"
+    - - name: "lastTask1"
+        type: "var/v1/set"
+        parameters:
+          value: "plain branch output"

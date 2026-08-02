@@ -1,0 +1,23 @@
+---
+label: "Graph Forward Flow"
+outputs:
+- name: "result"
+  value: "${graph_1}"
+tasks:
+- name: "graph_1"
+  type: "graph/v1"
+  parameters:
+    nodes:
+    - name: "A"
+      tasks:
+      - name: "aTask"
+        type: "var/v1/set"
+        parameters:
+          value: "A output"
+      next: "B"
+    - name: "B"
+      tasks:
+      - name: "bTask"
+        type: "var/v1/set"
+        parameters:
+          value: "B output"
