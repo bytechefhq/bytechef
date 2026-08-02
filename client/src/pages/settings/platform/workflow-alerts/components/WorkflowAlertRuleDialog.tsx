@@ -1,4 +1,9 @@
 import Button from '@/components/Button/Button';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
+import {Checkbox} from '@/components/ui/checkbox';
+import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle} from '@/components/ui/dialog';
+import {Input} from '@/components/ui/input';
+import {Label} from '@/components/ui/label';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {
     WorkflowAlertRuleType,
@@ -8,7 +13,6 @@ import {
     useWorkspaceNotificationsQuery,
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {XIcon} from 'lucide-react';
 import {useCallback, useState} from 'react';
 
 type WorkflowAlertRuleItemType = WorkflowAlertRulesQuery['workflowAlertRules'][number];
@@ -123,22 +127,27 @@ const WorkflowAlertRuleDialog = ({onClose, rule}: WorkflowAlertRuleDialogProps) 
     ]);
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-            <div className="w-full max-w-md rounded-lg bg-background p-6 shadow-lg">
-                <div className="mb-4 flex items-center justify-between">
-                    <h3 className="text-lg font-medium">{isEditMode ? 'Edit Alert Rule' : 'New Alert Rule'}</h3>
-
-                    <button onClick={onClose}>
-                        <XIcon className="size-4" />
-                    </button>
-                </div>
+        <Dialog
+            onOpenChange={(open) => {
+                if (!open) {
+                    onClose();
+                }
+            }}
+            open
+        >
+            <DialogContent aria-describedby={undefined} className="max-w-md">
+                <DialogHeader>
+                    <DialogTitle>{isEditMode ? 'Edit Alert Rule' : 'New Alert Rule'}</DialogTitle>
+                </DialogHeader>
 
                 <div className="max-h-[70vh] space-y-4 overflow-y-auto">
                     <fieldset className="border-0">
-                        <label className="mb-1 block text-sm font-medium">Name</label>
+                        <Label className="mb-1 block" htmlFor="workflowAlertRuleName">
+                            Name
+                        </Label>
 
-                        <input
-                            className="w-full rounded-md border px-3 py-2 text-sm"
+                        <Input
+                            id="workflowAlertRuleName"
                             onChange={(event) => setName(event.target.value)}
                             placeholder="Consecutive failures on order sync"
                             value={name}
@@ -146,29 +155,33 @@ const WorkflowAlertRuleDialog = ({onClose, rule}: WorkflowAlertRuleDialogProps) 
                     </fieldset>
 
                     <fieldset className="border-0">
-                        <label className="mb-1 block text-sm font-medium">Rule Type</label>
+                        <Label className="mb-1 block" htmlFor="workflowAlertRuleType">
+                            Rule Type
+                        </Label>
 
-                        <select
-                            className="w-full rounded-md border px-3 py-2 text-sm"
-                            onChange={(event) => setRuleType(event.target.value as WorkflowAlertRuleType)}
-                            value={ruleType}
-                        >
-                            {RULE_TYPE_OPTIONS.map((ruleTypeOption) => (
-                                <option key={ruleTypeOption.value} value={ruleTypeOption.value}>
-                                    {ruleTypeOption.label}
-                                </option>
-                            ))}
-                        </select>
+                        <Select onValueChange={(value) => setRuleType(value as WorkflowAlertRuleType)} value={ruleType}>
+                            <SelectTrigger id="workflowAlertRuleType">
+                                <SelectValue />
+                            </SelectTrigger>
+
+                            <SelectContent>
+                                {RULE_TYPE_OPTIONS.map((ruleTypeOption) => (
+                                    <SelectItem key={ruleTypeOption.value} value={ruleTypeOption.value}>
+                                        {ruleTypeOption.label}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </fieldset>
 
                     {ruleType !== WorkflowAlertRuleType.NoActivity && (
                         <fieldset className="border-0">
-                            <label className="mb-1 block text-sm font-medium">
+                            <Label className="mb-1 block" htmlFor="workflowAlertRuleThreshold">
                                 {selectedRuleTypeOption?.thresholdLabel || 'Threshold'}
-                            </label>
+                            </Label>
 
-                            <input
-                                className="w-full rounded-md border px-3 py-2 text-sm"
+                            <Input
+                                id="workflowAlertRuleThreshold"
                                 onChange={(event) => setThreshold(parseFloat(event.target.value) || 0)}
                                 step="any"
                                 type="number"
@@ -179,14 +192,14 @@ const WorkflowAlertRuleDialog = ({onClose, rule}: WorkflowAlertRuleDialogProps) 
 
                     {ruleType !== WorkflowAlertRuleType.UsageThreshold && (
                         <fieldset className="border-0">
-                            <label className="mb-1 block text-sm font-medium">
+                            <Label className="mb-1 block" htmlFor="workflowAlertRuleWindowMinutes">
                                 {ruleType === WorkflowAlertRuleType.NoActivity
                                     ? 'Maximum silence (minutes)'
                                     : 'Window (minutes)'}
-                            </label>
+                            </Label>
 
-                            <input
-                                className="w-full rounded-md border px-3 py-2 text-sm"
+                            <Input
+                                id="workflowAlertRuleWindowMinutes"
                                 min="1"
                                 onChange={(event) => setWindowMinutes(parseInt(event.target.value, 10) || 1)}
                                 type="number"
@@ -196,10 +209,12 @@ const WorkflowAlertRuleDialog = ({onClose, rule}: WorkflowAlertRuleDialogProps) 
                     )}
 
                     <fieldset className="border-0">
-                        <label className="mb-1 block text-sm font-medium">Cooldown (minutes)</label>
+                        <Label className="mb-1 block" htmlFor="workflowAlertRuleCooldownMinutes">
+                            Cooldown (minutes)
+                        </Label>
 
-                        <input
-                            className="w-full rounded-md border px-3 py-2 text-sm"
+                        <Input
+                            id="workflowAlertRuleCooldownMinutes"
                             min="1"
                             onChange={(event) => setCooldownMinutes(parseInt(event.target.value, 10) || 1)}
                             type="number"
@@ -208,29 +223,30 @@ const WorkflowAlertRuleDialog = ({onClose, rule}: WorkflowAlertRuleDialogProps) 
                     </fieldset>
 
                     <fieldset className="border-0">
-                        <label className="mb-1 block text-sm font-medium">Workflow Id (optional)</label>
+                        <Label className="mb-1 block" htmlFor="workflowAlertRuleWorkflowId">
+                            Workflow Id (optional)
+                        </Label>
 
-                        <input
-                            className="w-full rounded-md border px-3 py-2 text-sm"
+                        <Input
+                            id="workflowAlertRuleWorkflowId"
                             onChange={(event) => setWorkflowId(event.target.value)}
                             placeholder="Leave empty to match every workflow in the workspace"
                             value={workflowId}
                         />
                     </fieldset>
 
-                    <fieldset className="border-0">
-                        <label className="mb-1 flex items-center gap-2 text-sm font-medium">
-                            <input
-                                checked={enabled}
-                                onChange={(event) => setEnabled(event.target.checked)}
-                                type="checkbox"
-                            />
-                            Enabled
-                        </label>
+                    <fieldset className="flex items-center gap-2 border-0">
+                        <Checkbox
+                            checked={enabled}
+                            id="workflowAlertRuleEnabled"
+                            onCheckedChange={(checked) => setEnabled(checked === true)}
+                        />
+
+                        <Label htmlFor="workflowAlertRuleEnabled">Enabled</Label>
                     </fieldset>
 
                     <fieldset className="border-0">
-                        <label className="mb-1 block text-sm font-medium">Notifications</label>
+                        <legend className="mb-1 block text-sm font-medium">Notifications</legend>
 
                         {!notifications || notifications.length === 0 ? (
                             <p className="text-sm text-muted-foreground">
@@ -244,17 +260,17 @@ const WorkflowAlertRuleDialog = ({onClose, rule}: WorkflowAlertRuleDialogProps) 
                                         const notificationId = String(notification.id);
 
                                         return (
-                                            <label className="flex items-center gap-2 text-sm" key={notificationId}>
-                                                <input
+                                            <div className="flex items-center gap-2" key={notificationId}>
+                                                <Checkbox
                                                     checked={notificationIds.includes(notificationId)}
-                                                    onChange={() => handleNotificationToggle(notificationId)}
-                                                    type="checkbox"
+                                                    id={`workflowAlertRuleNotification-${notificationId}`}
+                                                    onCheckedChange={() => handleNotificationToggle(notificationId)}
                                                 />
 
-                                                <span>
+                                                <Label htmlFor={`workflowAlertRuleNotification-${notificationId}`}>
                                                     {notification.name} ({notification.type})
-                                                </span>
-                                            </label>
+                                                </Label>
+                                            </div>
                                         );
                                     })}
                             </div>
@@ -262,7 +278,7 @@ const WorkflowAlertRuleDialog = ({onClose, rule}: WorkflowAlertRuleDialogProps) 
                     </fieldset>
                 </div>
 
-                <div className="mt-6 flex justify-end gap-2">
+                <DialogFooter>
                     <Button label="Cancel" onClick={onClose} variant="outline" />
 
                     <Button
@@ -270,9 +286,9 @@ const WorkflowAlertRuleDialog = ({onClose, rule}: WorkflowAlertRuleDialogProps) 
                         label={isEditMode ? 'Save' : 'Create'}
                         onClick={handleSubmit}
                     />
-                </div>
-            </div>
-        </div>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     );
 };
 
