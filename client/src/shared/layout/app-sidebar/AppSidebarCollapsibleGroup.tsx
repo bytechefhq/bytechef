@@ -32,7 +32,7 @@ const AppSidebarCollapsibleGroup = ({group, isActive, items, onOpenChange, open}
             <SidebarMenuItem className="group/collapsible">
                 <CollapsibleTrigger asChild>
                     <SidebarMenuButton
-                        className="h-10 gap-3 text-sm data-[active=true]:font-medium data-[active=true]:text-sidebar-active-foreground [&>svg]:size-6 [&>svg:last-child]:size-4"
+                        className="h-10 gap-3 text-sm data-[active=true]:font-medium data-[active=true]:text-content-brand-primary [&>svg]:size-6 [&>svg:last-child]:size-4"
                         isActive={!!activeItem && !open}
                     >
                         <group.icon aria-hidden="true" />
@@ -52,7 +52,7 @@ const AppSidebarCollapsibleGroup = ({group, isActive, items, onOpenChange, open}
                             <SidebarMenuSubItem key={item.name}>
                                 <SidebarMenuSubButton
                                     asChild
-                                    className="h-9 pl-9 data-[active=true]:font-medium data-[active=true]:text-sidebar-active-foreground [&>svg]:size-5"
+                                    className="h-9 pl-9 data-[active=true]:font-medium data-[active=true]:text-content-brand-primary [&>svg]:size-5"
                                     isActive={isActive(item.href)}
                                 >
                                     <Link to={item.href}>

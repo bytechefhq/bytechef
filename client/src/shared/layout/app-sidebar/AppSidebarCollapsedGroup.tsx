@@ -30,7 +30,7 @@ const AppSidebarCollapsedGroup = ({group, isActive, items, onOpenChange, open}: 
                     <div className="flex w-full justify-center">
                         <SidebarMenuButton
                             aria-label={group.name}
-                            className="h-10 gap-3 text-sm group-data-[collapsible=icon]:!size-10 data-[active=true]:font-medium data-[active=true]:text-sidebar-active-foreground [&>svg]:size-6"
+                            className="h-10 gap-3 text-sm group-data-[collapsible=icon]:!size-10 data-[active=true]:font-medium data-[active=true]:text-content-brand-primary [&>svg]:size-6"
                             isActive={!!activeItem}
                         >
                             <TriggerIcon aria-hidden="true" />
@@ -47,7 +47,7 @@ const AppSidebarCollapsedGroup = ({group, isActive, items, onOpenChange, open}: 
                         {items.map((item) => (
                             <Link
                                 aria-current={isActive(item.href) ? 'page' : undefined}
-                                className="flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent aria-[current=page]:font-medium aria-[current=page]:text-sidebar-active-foreground"
+                                className="flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent aria-[current=page]:font-medium aria-[current=page]:text-content-brand-primary"
                                 key={item.name}
                                 to={item.href}
                             >
