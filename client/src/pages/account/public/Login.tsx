@@ -286,7 +286,7 @@ const Login = () => {
 
                                 {ssoRedirect && (
                                     <div className="rounded-lg border border-blue-200 bg-surface-brand-secondary p-3">
-                                        <p className="mb-2 text-sm text-blue-800">
+                                        <p className="mb-2 text-sm text-content-brand-primary">
                                             Your organization uses SSO for authentication.
                                         </p>
 
