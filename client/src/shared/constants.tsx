@@ -120,6 +120,12 @@ export const EDGE_STYLES = {
     strokeWidth: 2,
 };
 
+// Muted indigo, deliberately distinct from EDGE_STYLES' neutral gray so `graphTransition`
+// overlay edges (cyclic/self next-expression transitions rendered on top of the stable lane
+// layout) read as a separate visual layer from the structural lane-chain edges underneath.
+export const GRAPH_TRANSITION_EDGE_COLOR = '#8B7FE8';
+export const GRAPH_TRANSITION_EDGE_SELECTED_COLOR = '#5B4FC7';
+
 export const PATH_SPACE_REPLACEMENT = '_SPACE_';
 export const PATH_DIGIT_PREFIX = '_DIGIT_';
 export const PATH_DASH_REPLACEMENT = '_DASH_';
@@ -134,6 +140,7 @@ export const NODE_WIDTH = 240;
 export const NODE_HEIGHT = 100;
 export const PLACEHOLDER_NODE_HEIGHT = 28;
 export const PLACEHOLDER_NODE_WIDTH = 28;
+export const TRIGGER_PLACEHOLDER_NODE_SIZE = 48;
 export const CLUSTER_ELEMENT_TYPE_TOOLS = 'tools';
 export const CLUSTER_ELEMENT_NODE_WIDTH = 72;
 export const ALIGNED_SIDE_CASE_THRESHOLD = 15;
@@ -152,6 +159,7 @@ export const TASK_DISPATCHER_NAMES = [
     'condition',
     'each',
     'fork-join',
+    'graph',
     'loop',
     'loopBreak',
     'map',
@@ -190,6 +198,7 @@ export const TASK_DISPATCHER_SUBTASK_COLLECTIONS = {
     condition: ['caseTrue', 'caseFalse'],
     each: ['iteratee'],
     'fork-join': ['branches'],
+    graph: ['nodes'],
     loop: ['iteratee'],
     'on-error': ['main-branch', 'on-error-branch'],
     parallel: ['tasks'],
@@ -222,6 +231,7 @@ export const TASK_DISPATCHER_DATA_KEY_MAP = {
     condition: 'conditionData',
     each: 'eachData',
     'fork-join': 'forkJoinData',
+    graph: 'graphData',
     loop: 'loopData',
     loopBreak: 'loopBreakData',
     map: 'mapData',
