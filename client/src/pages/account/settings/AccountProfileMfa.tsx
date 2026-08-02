@@ -36,7 +36,9 @@ const AccountProfileMfa = () => {
 
     return (
         <div className="py-12">
-            <h2 className="text-base leading-7 font-semibold text-gray-900">Two-Factor Authentication</h2>
+            <h2 className="text-base leading-7 font-semibold text-content-neutral-primary">
+                Two-Factor Authentication
+            </h2>
 
             <p className="mt-1 text-sm leading-6 text-content-neutral-secondary">
                 Add an extra layer of security to your account using an authenticator app.
@@ -55,7 +57,7 @@ const AccountProfileMfa = () => {
 
                 {mfaState === 'setup' && (
                     <div className="space-y-4">
-                        <p className="text-sm text-gray-700">
+                        <p className="text-sm text-content-neutral-secondary">
                             Scan this QR code with your authenticator app (Google Authenticator, Authy, etc.):
                         </p>
 
@@ -107,10 +109,12 @@ const AccountProfileMfa = () => {
 
                 {mfaState === 'enabled' && (
                     <div className="space-y-4">
-                        <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 p-3">
-                            <ShieldCheckIcon className="size-4 text-green-600" />
+                        <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-surface-success-secondary p-3">
+                            <ShieldCheckIcon className="size-4 text-content-success-primary" />
 
-                            <p className="text-sm text-green-700">Two-factor authentication is enabled.</p>
+                            <p className="text-sm text-content-success-primary">
+                                Two-factor authentication is enabled.
+                            </p>
                         </div>
 
                         <AlertDialog>

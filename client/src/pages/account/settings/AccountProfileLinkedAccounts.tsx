@@ -62,7 +62,7 @@ const AccountProfileLinkedAccounts = () => {
 
     return (
         <div className="py-12">
-            <h2 className="text-base leading-7 font-semibold text-gray-900">Linked Accounts</h2>
+            <h2 className="text-base leading-7 font-semibold text-content-neutral-primary">Linked Accounts</h2>
 
             <p className="mt-1 text-sm leading-6 text-content-neutral-secondary">
                 Manage external identity providers linked to your account.
@@ -137,10 +137,10 @@ const AccountProfileLinkedAccounts = () => {
                 )}
 
                 {isLinked && !linkedAccount.hasPassword && (
-                    <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3">
-                        <UnlinkIcon className="size-4 text-amber-600" />
+                    <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-surface-warning-secondary p-3">
+                        <UnlinkIcon className="size-4 text-content-warning-primary" />
 
-                        <p className="text-sm text-amber-700">
+                        <p className="text-sm text-content-warning-primary">
                             Set a password before unlinking your provider to maintain account access.
                         </p>
                     </div>

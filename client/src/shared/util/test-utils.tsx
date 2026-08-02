@@ -1,3 +1,4 @@
+import {ThemeProvider} from '@/shared/providers/theme-provider';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {cleanup, render} from '@testing-library/react';
 import {ReactElement, ReactNode} from 'react';
@@ -31,7 +32,11 @@ const customRender = (ui: ReactElement, options = {}) => {
     const testQueryClient = createTestQueryClient();
 
     return render(ui, {
-        wrapper: ({children}) => <QueryClientProvider client={testQueryClient}>{children}</QueryClientProvider>,
+        wrapper: ({children}) => (
+            <ThemeProvider>
+                <QueryClientProvider client={testQueryClient}>{children}</QueryClientProvider>
+            </ThemeProvider>
+        ),
         ...options,
     });
 };

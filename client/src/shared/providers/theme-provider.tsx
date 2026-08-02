@@ -13,16 +13,11 @@ interface ThemeProviderStateI {
     setTheme: (theme: ThemeType) => void;
 }
 
-const initialState: ThemeProviderStateI = {
-    setTheme: () => null,
-    theme: 'system',
-};
-
-const ThemeProviderContext = createContext<ThemeProviderStateI>(initialState);
+const ThemeProviderContext = createContext<ThemeProviderStateI | undefined>(undefined);
 
 export function ThemeProvider({
     children,
-    defaultTheme = 'system',
+    defaultTheme = 'light',
     storageKey = 'bytechef.ui-theme',
     ...props
 }: ThemeProviderProps) {
@@ -32,18 +27,27 @@ export function ThemeProvider({
 
     useEffect(() => {
         const root = window.document.documentElement;
+        const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
-        root.classList.remove('light', 'dark');
+        const applyTheme = () => {
+            root.classList.remove('light', 'dark');
 
-        if (theme === 'system') {
-            const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            if (theme === 'system') {
+                root.classList.add(darkModeQuery.matches ? 'dark' : 'light');
+            } else {
+                root.classList.add(theme);
+            }
+        };
 
-            root.classList.add(systemTheme);
+        applyTheme();
 
+        if (theme !== 'system') {
             return;
         }
 
-        root.classList.add(theme);
+        darkModeQuery.addEventListener('change', applyTheme);
+
+        return () => darkModeQuery.removeEventListener('change', applyTheme);
     }, [theme]);
 
     const value = {
