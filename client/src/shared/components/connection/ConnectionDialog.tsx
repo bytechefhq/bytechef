@@ -481,7 +481,7 @@ const ConnectionDialog = ({
             {triggerNode && <DialogTrigger asChild>{triggerNode}</DialogTrigger>}
 
             <DialogContent
-                className={twMerge('gap-0 p-0', wizardStep === 'oauth_step' && 'max-w-xl')}
+                className={twMerge('gap-0 p-0', wizardStep === 'oauth_step' && 'sm:max-w-xl')}
                 onInteractOutside={(event) => event.preventDefault()}
             >
                 <Form {...form}>

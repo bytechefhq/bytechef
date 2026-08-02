@@ -49,7 +49,7 @@ const EndpointForm = ({endpoint, onClose, onSave, open}: EndpointFormProps) => {
 
     return (
         <Dialog onOpenChange={(isOpen) => !isOpen && onClose()} open={open}>
-            <DialogContent className="max-h-[90vh] max-w-2xl overflow-hidden">
+            <DialogContent className="max-h-[90vh] overflow-hidden sm:max-w-2xl">
                 <form className="flex flex-col gap-4" onSubmit={handleSubmit(handleSaveEndpoint)}>
                     <DialogHeader className="flex flex-row items-center justify-between space-y-0">
                         <DialogTitle>{endpoint ? 'Edit' : 'Add'} Endpoint</DialogTitle>

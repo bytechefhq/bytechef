@@ -89,7 +89,7 @@ const WorkspaceUsersDialog = ({onClose, open, workspaceId}: WorkspaceUsersDialog
 
     return (
         <Dialog onOpenChange={onClose} open={open}>
-            <DialogContent className="max-w-2xl">
+            <DialogContent className="sm:max-w-2xl">
                 <DialogHeader>
                     <DialogTitle>Workspace Members</DialogTitle>
                 </DialogHeader>

@@ -99,7 +99,7 @@ const ConnectionReassignmentDialog = ({onClose, open, userLogin, workspaceId}: C
 
     return (
         <Dialog onOpenChange={(isOpen) => !isOpen && onClose()} open={open}>
-            <DialogContent className="max-w-2xl">
+            <DialogContent className="sm:max-w-2xl">
                 <div className="flex flex-col gap-4">
                     <DialogHeader className="flex flex-row items-center justify-between space-y-0">
                         <div className="flex flex-col space-y-1">

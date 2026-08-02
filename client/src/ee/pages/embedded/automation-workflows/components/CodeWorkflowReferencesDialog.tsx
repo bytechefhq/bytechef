@@ -37,7 +37,7 @@ const CodeWorkflowReferencesDialog = ({onClose, projectName, workflowTemplates}:
 
     return (
         <Dialog onOpenChange={onClose} open={true}>
-            <DialogContent className="max-w-2xl">
+            <DialogContent className="sm:max-w-2xl">
                 <DialogHeader className="flex flex-row items-center justify-between space-y-0">
                     <div className="flex flex-col space-y-1">
                         <DialogTitle>References — {projectName}</DialogTitle>

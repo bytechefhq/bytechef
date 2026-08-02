@@ -199,7 +199,7 @@ const WorkflowExecutionsTabsPanel = ({
                                 <Button icon={<ExpandIcon />} size="iconXs" variant="ghost" />
                             </DialogTrigger>
 
-                            <DialogContent className="max-w-workflow-execution-content-width">
+                            <DialogContent className="sm:max-w-workflow-execution-content-width">
                                 <DialogHeader className="flex flex-row items-center justify-between space-y-0">
                                     <DialogTitle>{activeTab.toUpperCase()}</DialogTitle>
 
