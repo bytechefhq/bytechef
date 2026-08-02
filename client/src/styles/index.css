@@ -49,6 +49,7 @@
 @layer base {
     :root {
         @apply h-full;
+        color-scheme: light;
 
         --accent: 220 14.3% 95.9%;
         --accent-foreground: 220.9 39.3% 11%;
@@ -68,7 +69,7 @@
         --content-brand-secondary: 217 92% 28%;
         --content-destructive: 0 74% 42%;
         --content-destructive-primary: 0 74% 42%;
-        --content-destructive-secondary: 0 94% 82%;
+        --content-destructive-primary-hover: 0 70% 35%;
         --content-disabled: 0 0% 64%;
         --content-neutral-primary: 229 84% 5%;
         --content-neutral-secondary: 215 19% 35%;
@@ -84,8 +85,6 @@
         --destructive: 0 84.2% 60.2%;
         --destructive-foreground: 210 20% 98%;
         --foreground: 224 71.4% 4.1%;
-        --info: 214, 100%, 97%;
-        --info-foreground: 224, 76%, 48%;
         --input: 220 13% 91%;
         --muted: 220 14.3% 95.9%;
         --muted-foreground: 220 8.9% 46.1%;
@@ -97,7 +96,6 @@
         --ring: 217 61% 60%;
         --secondary: 220 14.3% 95.9%;
         --secondary-foreground: 220.9 39.3% 11%;
-        --skeleton: 220 9% 93%;
         --stroke-branch-primary: 239 84% 67%;
         --stroke-branch-secondary: 243 75% 59%;
         --stroke-branch-tertiary: 245 58% 51%;
@@ -105,7 +103,6 @@
         --stroke-brand-primary: 217 91% 40%;
         --stroke-brand-primary-hover: 217 91% 36%;
         --stroke-brand-primary-active: 217 92% 28%;
-        --stroke-brand-primary-pressed: 213 87% 34%;
         --stroke-brand-secondary: 217 62% 82%;
         --stroke-brand-secondary-hover: 217 61% 73%;
         --stroke-brand-secondary-active: 217 61% 52%;
@@ -134,7 +131,6 @@
         --stroke-map-secondary: 271 81% 56%;
         --stroke-map-tertiary: 272 72% 47%;
         --stroke-neutral-primary: 210 40% 96%;
-        --stroke-neutral-primary-hover: 215 20% 65%;
         --stroke-neutral-secondary: 214 32% 91%;
         --stroke-neutral-tertiary: 213, 27%, 84%;
         --stroke-onsurface-primary: 0 0% 100%;
@@ -179,7 +175,6 @@
         --surface-neutral-tertiary: 214 32% 91%;
         --surface-neutral-tertiary-hover: 213 27% 84%;
         --surface-neutral-transparent: 0 0% 100% / 0%;
-        --surface-overlay-primary: 222 47% 11%;
         --surface-popover-canvas: 210 40% 98%;
         --surface-success-primary: 142 72% 29%;
         --surface-success-primary-hover: 143 64% 24%;
@@ -204,6 +199,8 @@
     }
 
     .dark {
+        color-scheme: dark;
+
         --accent: 215 27.9% 16.9%;
         --accent-foreground: 210 20% 98%;
         --background: 224 71.4% 4.1%;
@@ -216,12 +213,13 @@
         --chart-4: 280 65% 60%;
         --chart-5: 340 75% 55%;
         --content-brand-primary: 217 61% 73%;
-        --content-brand-primary-hover: 217 91% 36%;
-        --content-brand-primary-active: 217 92% 28%;
+        --content-brand-primary-hover: 217 62% 82%;
+        --content-brand-primary-active: 217 61% 90%;
         --content-brand-secondary: 217 91% 40%;
         --content-canvas_dot: 217 33% 17%;
+        --content-destructive: 0 84% 60%;
         --content-destructive-primary: 0 84% 60%;
-        --content-destructive-secondary: 0 0% 100%;
+        --content-destructive-primary-hover: 0 84% 67%;
         --content-disabled: 0 0% 64%;
         --content-neutral-primary: 210 40% 98%;
         --content-neutral-secondary: 215 20% 65%;
@@ -230,13 +228,13 @@
         --content-onsurface-primary: 210 40% 98%;
         --content-onsurface-secondary: 214 32% 91%;
         --content-onwarning: 229 84% 5%;
+        --content-success: 142 71% 45%;
         --content-success-primary: 142 71% 45%;
+        --content-warning: 45 93% 47%;
         --content-warning-primary: 45 93% 47%;
         --destructive: 0 62.8% 30.6%;
         --destructive-foreground: 210 20% 98%;
         --foreground: 210 20% 98%;
-        --info: 214, 100%, 97%;
-        --info-foreground: 224, 76%, 48%;
         --input: 215 27.9% 16.9%;
         --muted: 215 27.9% 16.9%;
         --muted-foreground: 217.9 10.6% 64.9%;
@@ -281,6 +279,9 @@
         --stroke-map-primary: 0 0% 100%;
         --stroke-map-secondary: 0 0% 100%;
         --stroke-map-tertiary: 0 0% 100%;
+        --stroke-neutral-primary: 217 33% 17%;
+        --stroke-neutral-secondary: 215 25% 27%;
+        --stroke-neutral-tertiary: 215 19% 35%;
         --stroke-onsurface-primary: 0 0% 100%;
         --stroke-onsurface-primary-hover: 0 0% 100%;
         --stroke-parallel-primary: 0 0% 100%;
@@ -296,6 +297,7 @@
         --stroke-warning-primary: 48 96% 53%;
         --stroke-warning-primary-hover: 48 96% 53%;
         --stroke-warning-primary-active: 48 96% 53%;
+        --stroke-warning-secondary: 45 80% 30%;
         --success: 142, 69%, 58%;
         --success-foreground: 144, 61%, 20%;
         --surface-brand-primary: 217 62% 82%;
@@ -303,13 +305,14 @@
         --surface-brand-primary-active: 217 61% 60%;
         --surface-brand-primary-disabled: 217 62% 82%;
         --surface-brand-secondary: 217 91% 22%;
+        --surface-brand-secondary-hover: 217 91% 28%;
         --surface-brand-tertiary: 217 91% 22%;
         --surface-destructive-primary: 0 72% 51%;
         --surface-destructive-primary-hover: 0 72% 51%;
         --surface-destructive-primary-active: 0 72% 51%;
-        --surface-destructive-secondary: 0 93% 94%;
-        --surface-destructive-secondary-hover: 0 93% 94%;
-        --surface-destructive-secondary-active: 0 93% 94%;
+        --surface-destructive-secondary: 0 63% 13%;
+        --surface-destructive-secondary-hover: 0 63% 19%;
+        --surface-destructive-secondary-active: 0 63% 25%;
         --surface-disabled: 0 0% 83%;
         --surface-main: 229 84% 5%;
         --surface-neutral-primary: 229 84% 5%;
@@ -321,18 +324,17 @@
         --surface-neutral-tertiary: 215 25% 27%;
         --surface-neutral-tertiary-hover: 215 19% 35%;
         --surface-neutral-transparent: 0 0% 100% / 0%;
-        --surface-overlay-primary: 0 0% 83%;
         --surface-popover-canvas: 229 84% 5%;
         --surface-success-primary: 142 71% 45%;
         --surface-success-primary-hover: 143 64% 24%;
         --surface-success-primary-active: 144 61% 20%;
-        --surface-success-secondary: 142 72% 29%;
-        --surface-success-secondary-hover: 142 72% 29%;
+        --surface-success-secondary: 142 72% 16%;
+        --surface-success-secondary-hover: 142 72% 22%;
         --surface-tooltip: 210 40% 98%;
         --surface-warning-primary: 45 93% 47%;
-        --surface-warning-secondary: 45 93% 47%;
-        --surface-warning-secondary-hover: 45 93% 47%;
-        --surface-warning-secondary-active: 45 93% 47%;
+        --surface-warning-secondary: 45 80% 16%;
+        --surface-warning-secondary-hover: 45 80% 22%;
+        --surface-warning-secondary-active: 45 80% 28%;
         --rdg-color-scheme: dark;
     }
 

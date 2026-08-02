@@ -2,7 +2,7 @@
 
 module.exports = {
     content: ['./src/**/*.{js,ts,jsx,tsx}', './*.html'],
-    darkMode: ['class', 'class'],
+    darkMode: ['class', '.dark'],
     important: true,
     plugins: [require('@tailwindcss/forms'), require('@tailwindcss/typography')],
     theme: {
@@ -31,7 +31,6 @@ module.exports = {
                 },
                 background: 'hsl(var(--background))',
                 border: 'hsl(var(--border))',
-                button: 'hsl(var(--brand-500))',
                 card: {
                     DEFAULT: 'hsl(var(--card))',
                     foreground: 'hsl(var(--card-foreground))',
@@ -54,7 +53,7 @@ module.exports = {
                     destructive: {
                         DEFAULT: 'hsl(var(--content-destructive))',
                         primary: 'hsl(var(--content-destructive-primary))',
-                        secondary: 'hsl(var(--content-destructive-secondary))',
+                        'primary-hover': 'hsl(var(--content-destructive-primary-hover))',
                     },
                     disabled: 'hsl(var(--content-disabled))',
                     neutral: {
@@ -82,10 +81,6 @@ module.exports = {
                     foreground: 'hsl(var(--destructive-foreground))',
                 },
                 foreground: 'hsl(var(--foreground))',
-                info: {
-                    DEFAULT: 'hsl(var(--info))',
-                    foreground: 'hsl(var(--info-foreground))',
-                },
                 input: 'hsl(var(--input))',
                 muted: {
                     DEFAULT: 'hsl(var(--muted))',
@@ -114,7 +109,6 @@ module.exports = {
                     'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
                     ring: 'hsl(var(--sidebar-ring))',
                 },
-                skeleton: 'hsl(var(--skeleton))',
                 stroke: {
                     branch: {
                         primary: 'hsl(var(--stroke-branch-primary))',
@@ -126,7 +120,6 @@ module.exports = {
                         primary: 'hsl(var(--stroke-brand-primary))',
                         'primary-active': 'hsl(var(--stroke-brand-primary-active))',
                         'primary-hover': 'hsl(var(--stroke-brand-primary-hover))',
-                        'primary-pressed': 'hsl(var(--stroke-brand-primary-pressed))',
                         secondary: 'hsl(var(--stroke-brand-secondary))',
                         'secondary-active': 'hsl(var(--stroke-brand-secondary-active))',
                         'secondary-hover': 'hsl(var(--stroke-brand-secondary-hover))',
@@ -169,7 +162,6 @@ module.exports = {
                     },
                     neutral: {
                         primary: 'hsl(var(--stroke-neutral-primary))',
-                        'primary-hover': 'hsl(var(--stroke-neutral-primary-hover))',
                         secondary: 'hsl(var(--stroke-neutral-secondary))',
                         tertiary: 'hsl(var(--stroke-neutral-tertiary))',
                     },
@@ -234,9 +226,6 @@ module.exports = {
                         tertiary: 'hsl(var(--surface-neutral-tertiary))',
                         'tertiary-hover': 'hsl(var(--surface-neutral-tertiary-hover))',
                         transparent: 'hsl(var(--surface-neutral-transparent))',
-                    },
-                    overlay: {
-                        primary: 'hsl(var(--surface-overlay-primary))',
                     },
                     popover: {
                         canvas: 'hsl(var(--surface-popover-canvas))',
