@@ -392,6 +392,62 @@ class WorkflowNodeOutputFacadeTest {
     }
 
     @Test
+    void testGetPreviousWorkflowNodeOutputsExcludesGraphAggregateOutputForNestedTask() {
+        WorkflowTask graphTask = new WorkflowTask(
+            Map.of(
+                "name", "graph1", "type", "graph/v1", "parameters",
+                Map.of(
+                    "nodes", List.of(
+                        Map.of(
+                            "name", "node1",
+                            "tasks", List.of(Map.of("name", "nested1", "type", "component/v1/action1")))))));
+
+        Workflow workflow = mock(Workflow.class);
+
+        when(workflowService.getWorkflow(WORKFLOW_ID)).thenReturn(workflow);
+        when(workflow.getTasks(eq("nested1"))).thenReturn(List.of(graphTask));
+        when(workflow.getTasks(eq("graph1"))).thenReturn(List.of());
+
+        TaskDispatcherDefinition taskDispatcherDefinition = mock(TaskDispatcherDefinition.class);
+
+        when(workflowNodeTestOutputService.fetchWorkflowTestNodeOutput(WORKFLOW_ID, "graph1", ENVIRONMENT_ID))
+            .thenReturn(Optional.empty());
+        when(taskDispatcherDefinitionService.getTaskDispatcherDefinition("graph", 1))
+            .thenReturn(taskDispatcherDefinition);
+        when(taskDispatcherDefinitionService.isDynamicOutputDefined("graph", 1)).thenReturn(true);
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(WORKFLOW_ID, ENVIRONMENT_ID))
+            .thenReturn(Map.of());
+        when(evaluator.evaluate(any(), any(), anyBoolean()))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+
+        OutputResponse variableOutputResponse = new OutputResponse(null, Map.of("item", "value"), null);
+
+        when(taskDispatcherDefinitionService.executeVariableProperties(eq("graph"), eq(1), any()))
+            .thenReturn(variableOutputResponse);
+
+        try (MockedStatic<WorkflowTrigger> workflowTriggerStatic = mockStatic(WorkflowTrigger.class)) {
+            workflowTriggerStatic.when(() -> WorkflowTrigger.of(workflow))
+                .thenReturn(List.of());
+
+            List<WorkflowNodeOutputDTO> result = workflowNodeOutputFacade.getPreviousWorkflowNodeOutputs(
+                WORKFLOW_ID, "nested1", ENVIRONMENT_ID);
+
+            assertEquals(1, result.size());
+            assertEquals("graph1", result.getFirst()
+                .workflowNodeName());
+            assertEquals(variableOutputResponse, result.getFirst()
+                .variableOutputResponse());
+            assertNull(result.getFirst()
+                .outputResponse());
+        }
+
+        // A task nested inside a graph node must not see the enclosing graph's own aggregate output, since
+        // the graph has not completed from that nested task's vantage point.
+        verify(taskDispatcherDefinitionService, never()).executeOutput(eq("graph"), eq(1), any());
+        verify(taskDispatcherDefinitionService, times(1)).executeVariableProperties(eq("graph"), eq(1), any());
+    }
+
+    @Test
     void testSampleOutputsCachePreventsDuplicateComputation() {
         WorkflowTask task1 = new WorkflowTask(
             Map.of("name", "action1", "type", "component/v1/action1"));
