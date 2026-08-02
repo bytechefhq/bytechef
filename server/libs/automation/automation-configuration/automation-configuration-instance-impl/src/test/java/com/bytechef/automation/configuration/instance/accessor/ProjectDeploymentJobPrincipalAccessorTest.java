@@ -20,6 +20,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
@@ -147,5 +149,36 @@ class ProjectDeploymentJobPrincipalAccessorTest {
                     "projectDeploymentId", jobPrincipalId,
                     "workflowId", workflowId,
                     "connectionStatus", "PENDING_REASSIGNMENT"))));
+    }
+
+    /**
+     * A webhook URL carries {@code jobPrincipalId} as a plain, unsigned field (see
+     * {@code WorkflowExecutionId#toString()}, which is base64 of a colon-joined string, not a signed token), so anyone
+     * holding a webhook URL can edit that field to a deployment that does not exist — including {@code -1}, the
+     * test-mode sentinel whose branch in {@code WebhookWorkflowExecutorImpl#getWorkflowId} resolves a workflow by uuid
+     * alone and would therefore bypass the deployment's pinned workflow version.
+     *
+     * <p>
+     * That branch is unreachable from the public {@code /webhooks/{id}} path only because this method reports "not
+     * enabled" for an unknown principal, which makes the controller answer 410 GONE before it ever resolves a workflow.
+     * Two implementation details carry that guarantee, and neither is stated anywhere else: the deployment lookup
+     * returns {@code false} for a missing row rather than throwing, and {@code &&} short-circuits so the throwing
+     * uuid-resolution is never evaluated. Reordering the operands or making the lookup throw would turn a clean deny
+     * into a 500 that has already reached workflow resolution.
+     */
+    @Test
+    void testIsWorkflowEnabledFailsClosedForUnknownJobPrincipal() {
+        ProjectDeploymentJobPrincipalAccessor accessor = new ProjectDeploymentJobPrincipalAccessor(
+            applicationEventPublisher, connectionService, projectDeploymentService, projectDeploymentWorkflowService,
+            projectWorkflowService);
+
+        long unknownJobPrincipalId = -1L;
+
+        when(projectDeploymentService.isProjectDeploymentEnabled(unknownJobPrincipalId)).thenReturn(false);
+
+        assertThat(accessor.isWorkflowEnabled(unknownJobPrincipalId, "uuid-abc")).isFalse();
+
+        verify(projectWorkflowService, never()).getProjectWorkflowWorkflowId(anyLong(), anyString());
+        verify(projectDeploymentWorkflowService, never()).isProjectDeploymentWorkflowEnabled(anyLong(), anyString());
     }
 }
