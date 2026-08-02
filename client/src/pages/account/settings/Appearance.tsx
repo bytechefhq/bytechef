@@ -53,7 +53,7 @@ export default function Appearance() {
                                     }}
                                 >
                                     <FormItem>
-                                        <FormLabel className="[&:has([data-state=checked])>div]:border-primary">
+                                        <FormLabel className="flex-col items-stretch gap-0 [&:has([data-state=checked])>div]:border-primary">
                                             <FormControl>
                                                 <RadioGroupItem className="sr-only" value="light" />
                                             </FormControl>
@@ -85,7 +85,7 @@ export default function Appearance() {
                                     </FormItem>
 
                                     <FormItem>
-                                        <FormLabel className="[&:has([data-state=checked])>div]:border-primary">
+                                        <FormLabel className="flex-col items-stretch gap-0 [&:has([data-state=checked])>div]:border-primary">
                                             <FormControl>
                                                 <RadioGroupItem className="sr-only" value="dark" />
                                             </FormControl>
@@ -117,7 +117,7 @@ export default function Appearance() {
                                     </FormItem>
 
                                     <FormItem>
-                                        <FormLabel className="[&:has([data-state=checked])>div]:border-primary">
+                                        <FormLabel className="flex-col items-stretch gap-0 [&:has([data-state=checked])>div]:border-primary">
                                             <FormControl>
                                                 <RadioGroupItem className="sr-only" value="system" />
                                             </FormControl>

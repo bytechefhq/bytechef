@@ -6,6 +6,29 @@
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>ByteChef</title>
+        <script>
+            (function () {
+                try {
+                    var stored = localStorage.getItem('bytechef.ui-theme') || 'system';
+                    var resolved =
+                        stored === 'system'
+                            ? window.matchMedia('(prefers-color-scheme: dark)').matches
+                                ? 'dark'
+                                : 'light'
+                            : stored;
+
+                    document.documentElement.classList.add(resolved);
+
+                    var themeColorMeta = document.querySelector('meta[name="theme-color"]');
+
+                    if (themeColorMeta) {
+                        themeColorMeta.setAttribute('content', resolved === 'dark' ? '#030712' : '#ffffff');
+                    }
+                } catch (error) {
+                    document.documentElement.classList.add('light');
+                }
+            })();
+        </script>
     </head>
     <body>
         <script type="module">
