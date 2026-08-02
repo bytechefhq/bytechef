@@ -17,6 +17,7 @@ import {
     ROOT_CLUSTER_WIDTH,
     TASK_DISPATCHER_NAMES,
     TRIGGER_PLACEHOLDER_NODE_ID,
+    TRIGGER_PLACEHOLDER_NODE_SIZE,
 } from '@/shared/constants';
 import {
     ComponentDefinitionBasic,
@@ -44,7 +45,7 @@ import InlineSVG from 'react-inlinesvg';
 import {calculateNodeWidth, getHandlePosition} from '../../cluster-element-editor/utils/clusterElementsUtils';
 import {getConditionBranchSide} from './createConditionEdges';
 import {getForkJoinBranchSide} from './createForkJoinEdges';
-import {getGraphNodeSide} from './createGraphEdges';
+import createGraphEdges, {getGraphNodeSide} from './createGraphEdges';
 import {getOnErrorBranchSide} from './createOnErrorEdges';
 import {getCrossAxis, getCrossAxisNodeSize} from './directionUtils';
 import {
@@ -286,7 +287,7 @@ export const positionTriggerPlaceholder = (nodes: Node[], direction: LayoutDirec
             // above the trigger row is clear — a slot-sized gap above the topmost
             // trigger keeps the add-trigger "+" readable as the next trigger
             // position without crossing any label.
-            y: highestTrigger.position.y - TRIGGER_PLACEHOLDER_GAP - PLACEHOLDER_NODE_HEIGHT,
+            y: highestTrigger.position.y - TRIGGER_PLACEHOLDER_GAP - TRIGGER_PLACEHOLDER_NODE_SIZE,
         };
     } else {
         const rightmostTrigger = triggerNodes.reduce((rightmost, node) =>
@@ -297,9 +298,9 @@ export const positionTriggerPlaceholder = (nodes: Node[], direction: LayoutDirec
             // A full NODE_WIDTH clears the trigger's icon and its overflowing label lines, so the
             // "+" reads as the next trigger slot instead of crossing the label text.
             x: rightmostTrigger.position.x + NODE_WIDTH + TRIGGER_PLACEHOLDER_GAP,
-            // Vertically center the 28px "+" on the 72px icon box (node content is center-aligned,
+            // Vertically center the "+" box on the 72px icon box (node content is center-aligned,
             // so the box starts at the node's y position).
-            y: rightmostTrigger.position.y + (TRIGGER_NODE_BOX_SIZE - PLACEHOLDER_NODE_HEIGHT) / 2,
+            y: rightmostTrigger.position.y + (TRIGGER_NODE_BOX_SIZE - TRIGGER_PLACEHOLDER_NODE_SIZE) / 2,
         };
     }
 };
@@ -810,6 +811,44 @@ export function filterAndDedupeLayoutEdges(allNodes: Node[], edges: Edge[]): Edg
     return dedupedEdges.filter((edge) => nodeIds.has(edge.source) && nodeIds.has(edge.target));
 }
 
+/**
+ * getElkLayoutElements's error-fallback branch (see the `graphTransition` filter's comment in
+ * `getLayoutElements` immediately below) re-invokes this function with the SAME edges array ELK
+ * was given. Beyond the `graphTransition` overlay edges themselves, those edges' STRUCTURAL
+ * handles are also tainted: they were built with `orderLanesByVisualPosition: true` (see
+ * `CreateGraphEdgesOptionsI`, threaded from `useLayout.tsx`'s `isElkLayoutActive` check), so every
+ * graph dispatcher's shared top/bottom-ghost handle (left/middle/right, see
+ * `distributeGraphNodeIndexes`) — including a nested dispatcher's own bottom-ghost edge into that
+ * same handle, via `getGraphNodeSide` — follows the VISUAL lane permutation. Dagre always lays
+ * lanes out in DECLARATION order, so reusing those edges verbatim reproduces the exact
+ * boxy-staircase / apparent-empty-column regression the visual lane ordering feature was written
+ * around: a lane's edges leave from a handle that no longer matches its physical column.
+ *
+ * Each graph dispatcher's own edges are regenerated in declaration order (`createGraphEdges` with
+ * no options) and spliced back in by id — ids are derived from node ids alone (never from lane
+ * position, per the no-visual-position-in-ids invariant), so they are stable regardless of which
+ * order produced the edge being replaced. This mirrors the `graphTransition` filter immediately
+ * below: closing the gap at this one seam covers every downstream consumer, including a bare call
+ * into `getLayoutElements` that happens to be handed ELK-ordered edges for any other reason.
+ */
+export function realignGraphLaneHandlesToDeclarationOrder(nodes: Node[], edges: Edge[]): Edge[] {
+    const graphDispatcherNodes = nodes.filter((node) => (node.data as NodeDataType).componentName === 'graph');
+
+    if (graphDispatcherNodes.length === 0) {
+        return edges;
+    }
+
+    const declarationOrderEdgesById = new Map<string, Edge>();
+
+    graphDispatcherNodes.forEach((graphDispatcherNode) => {
+        createGraphEdges(graphDispatcherNode).forEach((declarationOrderEdge) => {
+            declarationOrderEdgesById.set(declarationOrderEdge.id, declarationOrderEdge);
+        });
+    });
+
+    return edges.map((edge) => declarationOrderEdgesById.get(edge.id) ?? edge);
+}
+
 export const getLayoutElements = async ({
     canvasHeight,
     canvasWidth,
@@ -828,6 +867,9 @@ export const getLayoutElements = async ({
     // including dagre's own ranking (a cyclic pair would corrupt it exactly like the
     // ELK case).
     edges = edges.filter((edge) => edge.type !== 'graphTransition');
+
+    // Closes the handle-side half of the same gap — see the function's own doc comment.
+    edges = realignGraphLaneHandlesToDeclarationOrder(nodes, edges);
 
     const dagreModule = await loadDagre();
 
@@ -982,6 +1024,10 @@ interface CreateEdgeFromTaskDispatcherBottomGhostNodeProps {
     allNodes?: Node[];
     index?: number;
     node: Node;
+    // ELK-only, forwarded straight to `getGraphNodeSide` (see that function's doc comment) — this
+    // is the shared edge path both dagre and ELK call, so the flag must default to off and only
+    // be passed true from the ELK call site.
+    orderLanesByVisualPosition?: boolean;
     tasks?: WorkflowTask[];
 }
 
@@ -989,6 +1035,7 @@ export const createEdgeFromTaskDispatcherBottomGhostNode = ({
     allNodes = [],
     index = 0,
     node,
+    orderLanesByVisualPosition = false,
     tasks = [],
 }: CreateEdgeFromTaskDispatcherBottomGhostNodeProps): Edge | null => {
     const nodeData = node.data as NodeDataType;
@@ -1134,7 +1181,12 @@ export const createEdgeFromTaskDispatcherBottomGhostNode = ({
 
             targetHandle = `${parentTaskDispatcherBottomGhostId}-${branchSide}`;
         } else if (componentName === 'graph') {
-            const branchSide = getGraphNodeSide(taskDispatcherId, tasks, parentTaskDispatcher.name);
+            const branchSide = getGraphNodeSide(
+                taskDispatcherId,
+                tasks,
+                parentTaskDispatcher.name,
+                orderLanesByVisualPosition
+            );
 
             targetHandle = `${parentTaskDispatcherBottomGhostId}-${branchSide}`;
         } else if (componentName === 'branch') {

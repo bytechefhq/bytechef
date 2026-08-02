@@ -8,6 +8,7 @@ import {
     BranchCaseType,
     ClusterElementItemType,
     ClusterElementsType,
+    GraphNodeType,
     NodeDataType,
     TaskDispatcherContextType,
     UpdateWorkflowMutationType,
@@ -196,6 +197,12 @@ function renameNestedTasks({
         case 'fork-join':
             if (Array.isArray(parameters.branches)) {
                 (parameters.branches as WorkflowTask[][]).forEach((branch) => branch.forEach(renameTask));
+            }
+
+            break;
+        case 'graph':
+            if (Array.isArray(parameters.nodes)) {
+                (parameters.nodes as GraphNodeType[]).forEach((graphNode) => graphNode.tasks?.forEach(renameTask));
             }
 
             break;

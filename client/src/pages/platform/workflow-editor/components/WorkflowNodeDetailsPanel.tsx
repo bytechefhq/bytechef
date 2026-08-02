@@ -9,6 +9,7 @@ import DescriptionTab from '@/pages/platform/workflow-editor/components/node-det
 import ConnectionTab from '@/pages/platform/workflow-editor/components/node-details-tabs/connection-tab/ConnectionTab';
 import OutputTab from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/OutputTab';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
+import GraphStatesPanel from '@/pages/platform/workflow-editor/components/properties/graph/GraphStatesPanel';
 import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilotLayoutShifted';
 import {
     ActionDefinition,
@@ -321,6 +322,14 @@ const WorkflowNodeDetailsPanel = ({
                                                 workflowTestConfigurationConnections={
                                                     workflowTestConfigurationConnections
                                                 }
+                                            />
+                                        )}
+
+                                    {activeTab === 'properties' &&
+                                        currentNode?.taskDispatcher &&
+                                        currentNode.componentName === 'graph' && (
+                                            <GraphStatesPanel
+                                                taskDispatcherDefinition={currentTaskDispatcherDefinition}
                                             />
                                         )}
 

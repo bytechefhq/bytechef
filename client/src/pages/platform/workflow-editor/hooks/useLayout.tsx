@@ -92,6 +92,36 @@ export function toReadOnlyLayoutEdges(edges: Edge[]): Edge[] {
         }));
 }
 
+/**
+ * Collects every graph node `next` expression found under any `nodes` array in the given value. The
+ * `next` expressions ARE structural for graph dispatchers — they define the rendered transition
+ * overlay edges — so the fingerprint must change when one is edited, or the canvas keeps showing the
+ * transitions from the last full layout until a page reload.
+ */
+function collectGraphNextExpressions(value: unknown, sink: string[]): void {
+    if (Array.isArray(value)) {
+        value.forEach((item) => collectGraphNextExpressions(item, sink));
+
+        return;
+    }
+
+    if (!value || typeof value !== 'object') {
+        return;
+    }
+
+    const record = value as Record<string, unknown>;
+
+    if (Array.isArray(record.nodes)) {
+        for (const graphNode of record.nodes as Array<{next?: unknown}>) {
+            if (graphNode && typeof graphNode === 'object') {
+                sink.push(typeof graphNode.next === 'string' ? graphNode.next : '');
+            }
+        }
+    }
+
+    Object.values(record).forEach((nested) => collectGraphNextExpressions(nested, sink));
+}
+
 export function getTasksStructuralFingerprint(tasks: WorkflowTask[]): string {
     return tasks
         .map((task) => {
@@ -116,6 +146,14 @@ export function getTasksStructuralFingerprint(tasks: WorkflowTask[]): string {
 
                 for (const [key, counts] of keyCounts) {
                     parts.push(counts.length === 1 ? `${key}${counts[0]}` : `${key}${counts.join('-')}`);
+                }
+
+                const graphNextExpressions: string[] = [];
+
+                collectGraphNextExpressions(task.parameters, graphNextExpressions);
+
+                if (graphNextExpressions.length > 0) {
+                    parts.push(`next:${graphNextExpressions.join(';')}`);
                 }
             }
 
@@ -550,7 +588,9 @@ export default function useLayout({
 
         // Create initial edges for the Graph node
         if (isGraphNode) {
-            const graphEdges = createGraphEdges(node, {includeTransitionEdges: usesElkGraphTransitionOverlay});
+            const graphEdges = createGraphEdges(node, {
+                orderLanesByVisualPosition: usesElkGraphTransitionOverlay,
+            });
 
             taskEdges.push(...graphEdges);
 
@@ -569,6 +609,7 @@ export default function useLayout({
                     allNodes,
                     index,
                     node,
+                    orderLanesByVisualPosition: usesElkGraphTransitionOverlay,
                     tasks,
                 });
 

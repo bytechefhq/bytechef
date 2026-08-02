@@ -96,27 +96,44 @@ const WorkflowCodeEditorSheet = ({
             >
                 <div className="flex w-[60vw] min-w-0 flex-col">
                     <header className="flex w-full shrink-0 items-center justify-between gap-x-3 rounded-t-md border-b border-stroke-neutral-primary bg-surface-neutral-primary p-3">
-                        <div className="flex items-center gap-2">
-                            <CodeXmlIcon />
+                        <div className="flex min-w-0 flex-1 items-center gap-2">
+                            <CodeXmlIcon className="shrink-0" />
 
-                            <div className="flex items-center justify-center gap-1 text-sm font-semibold">
-                                <span>Edit</span>
+                            {/* Long project names and workflow labels truncate rather than wrapping the header
+                                onto a second line; the tooltip keeps the full text reachable. */}
 
-                                <span className="font-normal text-content-neutral-secondary">{projectName} /</span>
+                            <div className="flex min-w-0 items-center gap-1 text-sm font-semibold">
+                                <span className="shrink-0">Edit</span>
 
-                                <span>{workflow.label}</span>
+                                <Tooltip>
+                                    <TooltipTrigger className="flex min-w-0 items-center gap-1">
+                                        {/* The project name caps out first so the workflow label — the more
+                                            identifying half — keeps whatever width is left. */}
+
+                                        <span className="max-w-40 shrink-0 truncate font-normal text-content-neutral-secondary">
+                                            {projectName} /
+                                        </span>
+
+                                        <span className="truncate">{workflow.label}</span>
+                                    </TooltipTrigger>
+
+                                    <TooltipContent className="max-w-md break-words">
+                                        {projectName} / {workflow.label}
+                                    </TooltipContent>
+                                </Tooltip>
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-2">
+                        <div className="flex shrink-0 items-center gap-2">
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <span tabIndex={0}>
                                         <Button
+                                            aria-label="Test Configuration"
                                             disabled={testConfigurationDisabled}
                                             icon={<Settings2Icon />}
-                                            label="Test Configuration"
                                             onClick={() => handleWorkflowTestConfigurationDialog(true)}
+                                            size="iconSm"
                                             variant="secondary"
                                         />
                                     </span>

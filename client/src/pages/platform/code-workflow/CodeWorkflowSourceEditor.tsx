@@ -2,12 +2,15 @@ import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import PageLoader from '@/components/PageLoader';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import useCodeWorkflowHeaderStore from '@/pages/platform/code-workflow/stores/useCodeWorkflowHeaderStore';
 import MonacoEditorWrapper from '@/shared/components/MonacoEditorWrapper';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {CodeWorkflowLanguage} from '@/shared/middleware/graphql';
+import getCodeWorkflowLanguageLabel from '@/shared/util/codeWorkflowLanguage-utils';
 import {Settings2Icon} from 'lucide-react';
 import {useEffect, useRef, useState} from 'react';
+import {useShallow} from 'zustand/shallow';
 
 const MONACO_LANGUAGE_BY_CODE_WORKFLOW_LANGUAGE: Record<CodeWorkflowLanguage, string> = {
     [CodeWorkflowLanguage.Javascript]: 'javascript',
@@ -17,6 +20,7 @@ const MONACO_LANGUAGE_BY_CODE_WORKFLOW_LANGUAGE: Record<CodeWorkflowLanguage, st
 
 export interface CodeWorkflowSourceEditorProps {
     error?: unknown;
+    headerless?: boolean;
     isLoading: boolean;
     isSaving: boolean;
     language: string;
@@ -47,17 +51,18 @@ const CodeWorkflowSourceEditorHeader = ({
         centerTitle
         position="main"
         right={
-            <div className="flex items-center gap-2">
+            // pr-12 keeps the buttons clear of the workflow editor's right sidebar, which overlays this row.
+            <div className="flex items-center gap-2 pr-12">
                 {onTestConfigurationClick && (
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <span tabIndex={0}>
                                 <Button
+                                    aria-label="Test Configuration"
                                     disabled={testConfigurationDisabled}
                                     icon={<Settings2Icon />}
-                                    label="Test Configuration"
                                     onClick={onTestConfigurationClick}
-                                    size="sm"
+                                    size="iconSm"
                                     variant="secondary"
                                 />
                             </span>
@@ -78,7 +83,7 @@ const CodeWorkflowSourceEditorHeader = ({
             <div className="flex items-center gap-2">
                 <span>Code Workflow</span>
 
-                <Badge label={language} styleType="secondary-filled" weight="semibold" />
+                <Badge label={getCodeWorkflowLanguageLabel(language)!} styleType="secondary-filled" weight="semibold" />
             </div>
         }
     />
@@ -86,6 +91,7 @@ const CodeWorkflowSourceEditorHeader = ({
 
 const CodeWorkflowSourceEditor = ({
     error,
+    headerless,
     isLoading,
     isSaving,
     language,
@@ -97,6 +103,13 @@ const CodeWorkflowSourceEditor = ({
     const [isSourceDirty, setIsSourceDirty] = useState(false);
 
     const latestSourceRef = useRef(source ?? '');
+
+    const {reset, setCodeWorkflowHeaderState} = useCodeWorkflowHeaderStore(
+        useShallow((state) => ({
+            reset: state.reset,
+            setCodeWorkflowHeaderState: state.setCodeWorkflowHeaderState,
+        }))
+    );
 
     const monacoLanguage = MONACO_LANGUAGE_BY_CODE_WORKFLOW_LANGUAGE[language as CodeWorkflowLanguage];
 
@@ -121,23 +134,46 @@ const CodeWorkflowSourceEditor = ({
         setIsSourceDirty(false);
     }, [source]);
 
+    useEffect(() => {
+        if (!headerless) {
+            return;
+        }
+
+        setCodeWorkflowHeaderState({
+            dirty: isSourceDirty,
+            language,
+            onSaveClick: handleSave,
+            onTestConfigurationClick,
+            saving: isSaving,
+            testConfigurationDisabled: testConfigurationDisabled ?? true,
+        });
+
+        return () => reset();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [headerless, isSourceDirty, isSaving, language, onTestConfigurationClick, testConfigurationDisabled]);
+
     return (
         <LayoutContainer
             header={
-                <CodeWorkflowSourceEditorHeader
-                    isSaveDisabled={!isSourceDirty || isSaving}
-                    isSaving={isSaving}
-                    language={language}
-                    onSave={handleSave}
-                    onTestConfigurationClick={onTestConfigurationClick}
-                    testConfigurationDisabled={testConfigurationDisabled}
-                />
+                headerless ? undefined : (
+                    <CodeWorkflowSourceEditorHeader
+                        isSaveDisabled={!isSourceDirty || isSaving}
+                        isSaving={isSaving}
+                        language={language}
+                        onSave={handleSave}
+                        onTestConfigurationClick={onTestConfigurationClick}
+                        testConfigurationDisabled={testConfigurationDisabled}
+                    />
+                )
             }
             leftSidebarOpen={false}
         >
             <PageLoader errors={[error]} loading={isLoading}>
                 {monacoLanguage && (
-                    <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+                    // Only a left gutter: without a header row above it the editor would sit flush against the app
+                    // sidebar, while its right edge must still reach the same edge the header does (the workflow
+                    // editor's right sidebar floats over that edge rather than reserving space).
+                    <div className="flex min-h-0 flex-1 flex-col overflow-hidden pl-3">
                         <div className="relative min-h-0 flex-1">
                             <div className="absolute inset-0">
                                 <MonacoEditorWrapper

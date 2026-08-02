@@ -100,6 +100,48 @@ describe('forEachNestedTaskGroup', () => {
         ]);
     });
 
+    it('should visit graph nodes individually', () => {
+        const visited: Array<{key: string; names: string[]}> = [];
+        const parameters = {
+            maxTransitions: 100,
+            nodes: [
+                {name: 'node_0', next: 'node_1', tasks: [makeTask('node0Task1'), makeTask('node0Task2')]},
+                {name: 'node_1', tasks: [makeTask('node1Task1')]},
+            ],
+        };
+
+        forEachNestedTaskGroup(parameters, (tasks, key) => {
+            visited.push({key, names: tasks.map((task) => task.name)});
+        });
+
+        expect(visited).toEqual([
+            {key: 'nodes', names: ['node0Task1', 'node0Task2']},
+            {key: 'nodes', names: ['node1Task1']},
+        ]);
+    });
+
+    it('should still visit an empty graph node (survives task deletion, contributes no subtasks)', () => {
+        const visited: Array<{key: string; names: string[]}> = [];
+        const parameters = {
+            nodes: [
+                {name: 'node_0', tasks: []},
+                {name: 'node_1', tasks: [makeTask('node1Task1')]},
+            ],
+        };
+
+        forEachNestedTaskGroup(parameters, (tasks, key) => {
+            visited.push({key, names: tasks.map((task) => task.name)});
+        });
+
+        // Mirrors fork-join's 'branches' handling: every array-typed node group is visited
+        // regardless of length, so an empty node (survives last-task deletion) is included
+        // with zero names rather than being filtered out.
+        expect(visited).toEqual([
+            {key: 'nodes', names: []},
+            {key: 'nodes', names: ['node1Task1']},
+        ]);
+    });
+
     it('should skip empty arrays and non-task arrays', () => {
         const visited: string[] = [];
         const parameters = {

@@ -100,6 +100,12 @@ export default async function handleTaskDispatcherClick({
                 forkJoinId: taskDispatcherContext.forkJoinId as string,
                 index: (taskDispatcherContext.index ?? 0) as number,
             };
+        } else if (taskDispatcherContext.graphId) {
+            newNodeData.graphData = {
+                graphId: taskDispatcherContext.graphId as string,
+                index: (taskDispatcherContext.index ?? 0) as number,
+                nodeIndex: (taskDispatcherContext.nodeIndex ?? 0) as number,
+            };
         } else if (taskDispatcherContext.terminateId) {
             newNodeData.terminateData = {
                 terminateId: taskDispatcherContext.terminateId as string,

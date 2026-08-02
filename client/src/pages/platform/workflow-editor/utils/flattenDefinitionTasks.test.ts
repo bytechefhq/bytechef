@@ -90,6 +90,28 @@ describe('flattenDefinitionTasks', () => {
         expect(result.map((task) => task.name)).toEqual(['forkJoin_1', 'branch_a_1', 'branch_a_2', 'branch_b_1']);
     });
 
+    // Pins the research finding that flattenDefinitionTasks needs no graph-specific handling:
+    // a `{name, tasks}` graph node already matches the generic "list of objects with a 'tasks'
+    // key" branch used for branch.cases.
+    it('should flatten graph nodes (list of objects with a tasks key)', () => {
+        const graphTask = task('graph_1', 'graph/v1', {
+            maxTransitions: 100,
+            nodes: [
+                {name: 'node_0', next: 'node_1', tasks: [task('node_0_action')]},
+                {name: 'node_1', tasks: [task('node_1_action_1'), task('node_1_action_2')]},
+            ],
+        });
+
+        const result = flattenDefinitionTasks([graphTask]);
+
+        expect(result.map((task) => task.name)).toEqual([
+            'graph_1',
+            'node_0_action',
+            'node_1_action_1',
+            'node_1_action_2',
+        ]);
+    });
+
     it('should recursively flatten nested task dispatchers', () => {
         const innerCondition = task('inner_condition', 'condition/v1', {
             caseFalse: [task('inner_false')],

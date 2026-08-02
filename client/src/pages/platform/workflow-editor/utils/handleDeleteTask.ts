@@ -4,6 +4,7 @@ import {Workflow, WorkflowTask} from '@/shared/middleware/platform/configuration
 import {invalidatePreviousWorkflowNodeOutputsForWorkflow} from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {
     BranchCaseType,
+    GraphNodeType,
     NodeDataType,
     UpdateWorkflowMutationType,
     WorkflowDefinitionType,
@@ -224,6 +225,54 @@ export default function handleDeleteTask({
             }
 
             return parentForkJoinTask;
+        }) as Array<WorkflowTaskType>;
+    } else if (data.graphData) {
+        const parentGraphTask = TASK_DISPATCHER_CONFIG.graph.getTask({
+            taskDispatcherId: data.graphData.graphId,
+            tasks: workflowTasks,
+        });
+
+        if (!parentGraphTask?.parameters) {
+            return;
+        }
+
+        const graphNodes = parentGraphTask.parameters.nodes as Array<GraphNodeType>;
+
+        const updatedGraphNodes = graphNodes.map((graphNode) => ({
+            ...graphNode,
+            tasks: (graphNode.tasks || []).filter((childTask) => childTask.name !== data.name),
+        }));
+
+        // The node this deletion emptied is pruned when it is inert — no tasks left, no `next`
+        // expression of its own, and not referenced by any other node's `next` — so adding a task
+        // to an empty graph and removing it returns to the initial empty-graph state. A router
+        // node (only a `next` expression) or a referenced node SURVIVES its last task deletion;
+        // removing such a node stays a separate, explicit chip action.
+        const emptiedGraphNode = graphNodes.find((graphNode) =>
+            (graphNode.tasks || []).some((childTask) => childTask.name === data.name)
+        );
+
+        const emptiedGraphNodeIsInert =
+            emptiedGraphNode &&
+            !emptiedGraphNode.next &&
+            updatedGraphNodes.every(
+                (graphNode) =>
+                    graphNode.name === emptiedGraphNode.name ||
+                    !graphNode.next ||
+                    !graphNode.next.includes(emptiedGraphNode.name)
+            ) &&
+            (updatedGraphNodes.find((graphNode) => graphNode.name === emptiedGraphNode.name)?.tasks ?? []).length === 0;
+
+        parentGraphTask.parameters.nodes = emptiedGraphNodeIsInert
+            ? updatedGraphNodes.filter((graphNode) => graphNode.name !== emptiedGraphNode.name)
+            : updatedGraphNodes;
+
+        updatedTasks = workflowTasks.map((task) => {
+            if (task.name !== parentGraphTask.name) {
+                return task;
+            }
+
+            return parentGraphTask;
         }) as Array<WorkflowTaskType>;
     } else if (data.onErrorData) {
         const parentOnErrorTask = TASK_DISPATCHER_CONFIG['on-error'].getTask({

@@ -92,6 +92,7 @@ const ConnectionTab = ({
             currentNode.parallelData ||
             currentNode.eachData ||
             currentNode.forkJoinData ||
+            currentNode.graphData ||
             currentNode.onErrorData
         ) {
             saveTaskDispatcherSubtaskFieldChange({

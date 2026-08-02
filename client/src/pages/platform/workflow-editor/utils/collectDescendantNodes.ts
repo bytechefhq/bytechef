@@ -19,6 +19,7 @@ export function isChildNodeOfDispatcher(node: Node, dispatcherId: string): boole
             nodeData.eachData?.eachId === dispatcherId ||
             nodeData.parallelData?.parallelId === dispatcherId ||
             nodeData.forkJoinData?.forkJoinId === dispatcherId ||
+            nodeData.graphData?.graphId === dispatcherId ||
             nodeData.onErrorData?.onErrorId === dispatcherId)
     );
 }
@@ -73,10 +74,18 @@ export function collectChainSuccessorNodes(
     const successorPositions = new Map<string, XYPosition>();
     const nodeMap = new Map(allNodes.map((node) => [node.id, node]));
 
-    // Build edge lookup: source → target IDs
+    // Build edge lookup: source → target IDs. `graphTransition` overlay edges (see
+    // createGraphTransitionEdges) are excluded — they are a paint-time decoration anchored on a
+    // graph lane's first task, not a structural chain link, so they must never be
+    // walked as one (a back/self transition would otherwise look like a real
+    // successor of that lane's entry task).
     const edgesBySource = new Map<string, string[]>();
 
     for (const edge of allEdges) {
+        if (edge.type === 'graphTransition') {
+            continue;
+        }
+
         if (!edgesBySource.has(edge.source)) {
             edgesBySource.set(edge.source, []);
         }

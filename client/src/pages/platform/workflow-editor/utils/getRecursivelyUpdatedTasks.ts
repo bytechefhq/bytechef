@@ -1,6 +1,6 @@
 import {ON_ERROR_WIRE_KEY_ERROR_BRANCH, ON_ERROR_WIRE_KEY_MAIN_BRANCH} from '@/shared/constants';
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
-import {BranchCaseType} from '@/shared/types';
+import {BranchCaseType, GraphNodeType} from '@/shared/types';
 
 function updateTaskParameter(task: WorkflowTask, parameterKey: string, parameterValue: unknown): WorkflowTask {
     return {
@@ -104,6 +104,15 @@ export default function getRecursivelyUpdatedTasks(
             );
 
             return updateTaskParameter(task, 'branches', updatedBranches);
+        }
+
+        if (task.parameters?.nodes) {
+            const updatedNodes = ((task.parameters?.nodes as GraphNodeType[]) || []).map((graphNode) => ({
+                ...graphNode,
+                tasks: graphNode.tasks ? getRecursivelyUpdatedTasks(graphNode.tasks, taskToReplace) : graphNode.tasks,
+            }));
+
+            return updateTaskParameter(task, 'nodes', updatedNodes);
         }
 
         return task;

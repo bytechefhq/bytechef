@@ -104,6 +104,10 @@ function getDirectParentDispatcherId(node: Node): string | null {
         return data.forkJoinData.forkJoinId;
     }
 
+    if (data.graphData?.graphId) {
+        return data.graphData.graphId;
+    }
+
     return null;
 }
 

@@ -483,14 +483,21 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                         id={`${id}-graph-transition-target`}
                         isConnectable={false}
                         position={Position.Top}
+                        style={effectiveDirection === 'TB' ? {left: '36px'} : undefined}
                         type="target"
                     />
 
+                    {/* In TB the source sits on TOP alongside the target, because arcs travel in a
+                        band ABOVE the lanes — leaving from the bottom would make every arc double
+                        back up past its own node before it could climb. LR has no such band (its
+                        lanes stack vertically, so arcs bow out past the frame's side instead), so
+                        it keeps the original bottom source. */}
                     <Handle
                         className={styles.handle}
                         id={`${id}-graph-transition-source`}
                         isConnectable={false}
-                        position={Position.Bottom}
+                        position={effectiveDirection === 'TB' ? Position.Top : Position.Bottom}
+                        style={effectiveDirection === 'TB' ? {left: '36px'} : undefined}
                         type="source"
                     />
                 </>

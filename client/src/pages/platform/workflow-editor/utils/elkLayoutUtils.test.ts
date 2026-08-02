@@ -2242,6 +2242,95 @@ describe('getElkLayoutElements with graph', () => {
         type: 'workflow',
     });
 
+    const graphNodeWithParameters = (id: string, parameterNodes: Array<{name: string; next?: string}>): Node => ({
+        data: {
+            componentName: 'graph',
+            parameters: {maxTransitions: 100, nodes: parameterNodes.map((node) => ({...node, tasks: []}))},
+            taskDispatcher: true,
+            taskDispatcherId: id,
+            workflowNodeName: id,
+        },
+        id,
+        position: {x: 0, y: 0},
+        type: 'workflow',
+    });
+
+    it('orders graph node lanes by transition topology, keeping the trailing add-node placeholder last', async () => {
+        // Declaration order is n0..n3, but the transitions form the chain
+        // n0 -> n3 -> n2 -> n1 (with n1 -> n0 closing the cycle), so the lanes
+        // should render in that chain order rather than n0, n1, n2, n3.
+        const nodes: Node[] = [
+            graphNodeWithParameters('graph_1', [
+                {name: 'node_0', next: "'node_3'"},
+                {name: 'node_1', next: "'node_0'"},
+                {name: 'node_2', next: "'node_1'"},
+                {name: 'node_3', next: "'node_2'"},
+            ]),
+            ...graphAuxNodes('graph_1'),
+            graphNodePlaceholderNode('graph_1', 4),
+            graphChildTaskNode('n0', 'graph_1', 0, 0),
+            graphChildTaskNode('n1', 'graph_1', 1, 0),
+            graphChildTaskNode('n2', 'graph_1', 2, 0),
+            graphChildTaskNode('n3', 'graph_1', 3, 0),
+        ];
+
+        const edges: Edge[] = [
+            edge('graph_1', 'graph_1-graph-top-ghost'),
+            edge('graph_1-graph-top-ghost', 'n0'),
+            edge('n0', 'graph_1-graph-bottom-ghost'),
+            edge('graph_1-graph-top-ghost', 'n1'),
+            edge('n1', 'graph_1-graph-bottom-ghost'),
+            edge('graph_1-graph-top-ghost', 'n2'),
+            edge('n2', 'graph_1-graph-bottom-ghost'),
+            edge('graph_1-graph-top-ghost', 'n3'),
+            edge('n3', 'graph_1-graph-bottom-ghost'),
+            edge('graph_1-graph-top-ghost', 'graph_1-graph-node-4-placeholder-0'),
+            edge('graph_1-graph-node-4-placeholder-0', 'graph_1-graph-bottom-ghost'),
+        ];
+
+        expect(collectScopeEdgeViolations(buildElkGraph(nodes, edges, 'TB'))).toEqual([]);
+
+        const result = await getElkLayoutElements({canvasWidth: 2000, direction: 'TB', edges, nodes});
+
+        const laneCenterOf = (id: string): number => positionOf(result.nodes, id).x + 36;
+
+        expect(laneCenterOf('n0')).toBeLessThan(laneCenterOf('n3'));
+        expect(laneCenterOf('n3')).toBeLessThan(laneCenterOf('n2'));
+        expect(laneCenterOf('n2')).toBeLessThan(laneCenterOf('n1'));
+        expect(laneCenterOf('n1')).toBeLessThan(laneCenterOf('graph_1-graph-node-4-placeholder-0'));
+    });
+
+    it('keeps declaration lane order when the graph declares no transitions', async () => {
+        const nodes: Node[] = [
+            graphNodeWithParameters('graph_1', [{name: 'node_0'}, {name: 'node_1'}, {name: 'node_2'}]),
+            ...graphAuxNodes('graph_1'),
+            graphNodePlaceholderNode('graph_1', 3),
+            graphChildTaskNode('n0', 'graph_1', 0, 0),
+            graphChildTaskNode('n1', 'graph_1', 1, 0),
+            graphChildTaskNode('n2', 'graph_1', 2, 0),
+        ];
+
+        const edges: Edge[] = [
+            edge('graph_1', 'graph_1-graph-top-ghost'),
+            edge('graph_1-graph-top-ghost', 'n0'),
+            edge('n0', 'graph_1-graph-bottom-ghost'),
+            edge('graph_1-graph-top-ghost', 'n1'),
+            edge('n1', 'graph_1-graph-bottom-ghost'),
+            edge('graph_1-graph-top-ghost', 'n2'),
+            edge('n2', 'graph_1-graph-bottom-ghost'),
+            edge('graph_1-graph-top-ghost', 'graph_1-graph-node-3-placeholder-0'),
+            edge('graph_1-graph-node-3-placeholder-0', 'graph_1-graph-bottom-ghost'),
+        ];
+
+        const result = await getElkLayoutElements({canvasWidth: 2000, direction: 'TB', edges, nodes});
+
+        const laneCenterOf = (id: string): number => positionOf(result.nodes, id).x + 36;
+
+        expect(laneCenterOf('n0')).toBeLessThan(laneCenterOf('n1'));
+        expect(laneCenterOf('n1')).toBeLessThan(laneCenterOf('n2'));
+        expect(laneCenterOf('n2')).toBeLessThan(laneCenterOf('graph_1-graph-node-3-placeholder-0'));
+    });
+
     it('orders graph node lanes by declared nodeIndex, keeping the empty lane in place and the trailing add-node placeholder last', async () => {
         // Lane 0 and lane 2 are populated, lane 1 is an empty router lane (its own
         // placeholder — graph lanes are name/index-addressed, so an empty one is

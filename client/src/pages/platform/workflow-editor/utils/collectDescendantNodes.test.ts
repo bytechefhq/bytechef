@@ -491,4 +491,52 @@ describe('collectChainSuccessorNodes', () => {
 
         expect(successors.size).toBe(0);
     });
+
+    // Task 3 (graph transition isolation): a `graphTransition` overlay edge (see
+    // createGraphTransitionEdges) is never a real chain successor — it is a paint-time
+    // decoration anchored on a graph lane's first task. If the walk ever revisits an
+    // already-collected descendant that also happens to be a `graphTransition` source
+    // (e.g. a graph lane's entry task), it must keep following only the REAL structural
+    // continuation and never treat the overlay's target as a successor.
+    it('should not follow a graphTransition edge as a chain successor, even for a cyclic two-lane graph', () => {
+        const nodes: Node[] = [
+            makeNode('graph_1', undefined, {taskDispatcher: true, taskDispatcherId: 'graph_1'}),
+            makeGhostNode('graph_1', 'bottom-ghost'),
+            makeNode('n0'),
+            makeNode('n1'),
+            makeNode('decoyTransitionTarget'),
+        ];
+
+        const edgesWithTransitions: Edge[] = [
+            makeEdge('graph_1-condition-bottom-ghost', 'n0'),
+            makeEdge('n0', 'n1'),
+            // A mutual back-and-forth (n0 -> n1 real successor edge above, n1 -> n0
+            // below) plus a decoy target — mirrors the cyclic two-lane shape from
+            // deriveGraphTransitionEdges, but as `graphTransition` edges these must
+            // never be walked as real chain links.
+            {id: 'graph_1-transition-0-1', source: 'n0', target: 'decoyTransitionTarget', type: 'graphTransition'},
+            {id: 'graph_1-transition-1-0', source: 'n1', target: 'n0', type: 'graphTransition'},
+        ];
+
+        const edgesWithoutTransitions = edgesWithTransitions.filter((edge) => edge.type !== 'graphTransition');
+
+        const descendantIds = new Set(['graph_1-condition-bottom-ghost', 'n0']);
+
+        const successorsWithTransitions = collectChainSuccessorNodes(
+            'graph_1',
+            nodes,
+            edgesWithTransitions,
+            descendantIds
+        );
+        const successorsWithoutTransitions = collectChainSuccessorNodes(
+            'graph_1',
+            nodes,
+            edgesWithoutTransitions,
+            descendantIds
+        );
+
+        expect([...successorsWithTransitions.keys()].sort()).toEqual([...successorsWithoutTransitions.keys()].sort());
+        expect(successorsWithTransitions.has('n1')).toBe(true);
+        expect(successorsWithTransitions.has('decoyTransitionTarget')).toBe(false);
+    });
 });
