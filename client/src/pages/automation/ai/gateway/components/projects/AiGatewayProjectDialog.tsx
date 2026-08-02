@@ -21,6 +21,7 @@ const AiGatewayProjectDialog = ({onClose, project, workspaceId}: AiGatewayProjec
     const [cachingEnabled, setCachingEnabled] = useState(project?.cachingEnabled ?? false);
     const [compressionEnabled, setCompressionEnabled] = useState(project?.compressionEnabled ?? false);
     const [description, setDescription] = useState(project?.description ?? '');
+    const [guardrailsDirty, setGuardrailsDirty] = useState(false);
     const [logRetentionDays, setLogRetentionDays] = useState<number | undefined>(
         project?.logRetentionDays ?? undefined
     );
@@ -109,7 +110,20 @@ const AiGatewayProjectDialog = ({onClose, project, workspaceId}: AiGatewayProjec
             }}
             open
         >
-            <DialogContent aria-describedby={undefined} className="max-w-md">
+            <DialogContent
+                aria-describedby={undefined}
+                className="max-w-md"
+                onEscapeKeyDown={(event) => {
+                    if (guardrailsDirty) {
+                        event.preventDefault();
+                    }
+                }}
+                onInteractOutside={(event) => {
+                    if (guardrailsDirty) {
+                        event.preventDefault();
+                    }
+                }}
+            >
                 <DialogHeader>
                     <DialogTitle>{isEditMode ? 'Edit Project' : 'Add Project'}</DialogTitle>
                 </DialogHeader>
@@ -255,9 +269,7 @@ const AiGatewayProjectDialog = ({onClose, project, workspaceId}: AiGatewayProjec
                     </fieldset>
 
                     {isEditMode && project?.id && (
-                        <div className="border-t pt-4">
-                            <AiGatewayProjectGuardrailsSection projectId={project.id} />
-                        </div>
+                        <AiGatewayProjectGuardrailsSection onDirtyChange={setGuardrailsDirty} projectId={project.id} />
                     )}
                 </div>
 
