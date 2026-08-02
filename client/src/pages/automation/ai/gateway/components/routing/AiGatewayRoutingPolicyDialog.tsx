@@ -1,11 +1,14 @@
 import Button from '@/components/Button/Button';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
+import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle} from '@/components/ui/dialog';
+import {Input} from '@/components/ui/input';
+import {Label} from '@/components/ui/label';
 import {
     AiGatewayRoutingStrategyType,
     useCreateWorkspaceAiGatewayRoutingPolicyMutation,
     useUpdateWorkspaceAiGatewayRoutingPolicyMutation,
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {XIcon} from 'lucide-react';
 import {useCallback, useState} from 'react';
 
 import {AiGatewayRoutingPolicyType} from '../../types';
@@ -79,22 +82,27 @@ const AiGatewayRoutingPolicyDialog = ({onClose, routingPolicy, workspaceId}: AiG
     }, [createMutation, fallbackModel, isEditMode, name, routingPolicy, strategy, updateMutation, workspaceId]);
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-            <div className="w-full max-w-md rounded-lg bg-background p-6 shadow-lg">
-                <div className="mb-4 flex items-center justify-between">
-                    <h3 className="text-lg font-medium">{isEditMode ? 'Edit Routing Policy' : 'Add Routing Policy'}</h3>
-
-                    <button onClick={onClose}>
-                        <XIcon className="size-4" />
-                    </button>
-                </div>
+        <Dialog
+            onOpenChange={(open) => {
+                if (!open) {
+                    onClose();
+                }
+            }}
+            open
+        >
+            <DialogContent aria-describedby={undefined} className="max-w-md">
+                <DialogHeader>
+                    <DialogTitle>{isEditMode ? 'Edit Routing Policy' : 'Add Routing Policy'}</DialogTitle>
+                </DialogHeader>
 
                 <div className="space-y-4">
                     <fieldset className="border-0">
-                        <label className="mb-1 block text-sm font-medium">Name</label>
+                        <Label className="mb-1 block" htmlFor="ai-gateway-routing-policy-name">
+                            Name
+                        </Label>
 
-                        <input
-                            className="w-full rounded-md border px-3 py-2 text-sm"
+                        <Input
+                            id="ai-gateway-routing-policy-name"
                             onChange={(event) => setName(event.target.value)}
                             placeholder="My Routing Policy"
                             value={name}
@@ -102,26 +110,35 @@ const AiGatewayRoutingPolicyDialog = ({onClose, routingPolicy, workspaceId}: AiG
                     </fieldset>
 
                     <fieldset className="border-0">
-                        <label className="mb-1 block text-sm font-medium">Strategy</label>
+                        <Label className="mb-1 block" htmlFor="ai-gateway-routing-policy-strategy">
+                            Strategy
+                        </Label>
 
-                        <select
-                            className="w-full rounded-md border px-3 py-2 text-sm"
-                            onChange={(event) => setStrategy(event.target.value as AiGatewayRoutingStrategyType)}
+                        <Select
+                            onValueChange={(value) => setStrategy(value as AiGatewayRoutingStrategyType)}
                             value={strategy}
                         >
-                            {STRATEGY_TYPES.map((strategyType) => (
-                                <option key={strategyType} value={strategyType}>
-                                    {strategyType}
-                                </option>
-                            ))}
-                        </select>
+                            <SelectTrigger id="ai-gateway-routing-policy-strategy">
+                                <SelectValue />
+                            </SelectTrigger>
+
+                            <SelectContent>
+                                {STRATEGY_TYPES.map((strategyType) => (
+                                    <SelectItem key={strategyType} value={strategyType}>
+                                        {strategyType}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </fieldset>
 
                     <fieldset className="border-0">
-                        <label className="mb-1 block text-sm font-medium">Fallback Model (optional)</label>
+                        <Label className="mb-1 block" htmlFor="ai-gateway-routing-policy-fallback-model">
+                            Fallback Model (optional)
+                        </Label>
 
-                        <input
-                            className="w-full rounded-md border px-3 py-2 text-sm"
+                        <Input
+                            id="ai-gateway-routing-policy-fallback-model"
                             onChange={(event) => setFallbackModel(event.target.value)}
                             placeholder="gpt-4o"
                             value={fallbackModel}
@@ -129,7 +146,7 @@ const AiGatewayRoutingPolicyDialog = ({onClose, routingPolicy, workspaceId}: AiG
                     </fieldset>
                 </div>
 
-                <div className="mt-6 flex justify-end gap-2">
+                <DialogFooter>
                     <Button label="Cancel" onClick={onClose} variant="outline" />
 
                     <Button
@@ -137,9 +154,9 @@ const AiGatewayRoutingPolicyDialog = ({onClose, routingPolicy, workspaceId}: AiG
                         label={isEditMode ? 'Save' : 'Create'}
                         onClick={handleSubmit}
                     />
-                </div>
-            </div>
-        </div>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     );
 };
 

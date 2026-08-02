@@ -1,8 +1,11 @@
 import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
+import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle} from '@/components/ui/dialog';
+import {Input} from '@/components/ui/input';
+import {Label} from '@/components/ui/label';
 import {useRunAiEvalRuleOnHistoricalTracesMutation} from '@/shared/middleware/graphql';
-import {BrainCircuitIcon, HistoryIcon, XIcon} from 'lucide-react';
+import {BrainCircuitIcon, HistoryIcon} from 'lucide-react';
 import {useCallback, useState} from 'react';
 import {toast} from 'sonner';
 
@@ -119,22 +122,27 @@ const AiEvalRules = ({evalRules, isLoading}: AiEvalRulesProps) => {
             </table>
 
             {historyRule && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-                    <div className="w-full max-w-md rounded-lg bg-background p-6 shadow-lg">
-                        <div className="mb-4 flex items-center justify-between">
-                            <h3 className="text-lg font-medium">Run {historyRule.name} on History</h3>
-
-                            <button onClick={() => setHistoryRule(undefined)}>
-                                <XIcon className="size-4" />
-                            </button>
-                        </div>
+                <Dialog
+                    onOpenChange={(open) => {
+                        if (!open) {
+                            setHistoryRule(undefined);
+                        }
+                    }}
+                    open
+                >
+                    <DialogContent aria-describedby={undefined} className="max-w-md">
+                        <DialogHeader>
+                            <DialogTitle>Run {historyRule.name} on History</DialogTitle>
+                        </DialogHeader>
 
                         <div className="space-y-4">
                             <fieldset className="border-0">
-                                <label className="mb-1 block text-sm font-medium">Start Date</label>
+                                <Label className="mb-1 block" htmlFor="ai-eval-rule-history-start-date">
+                                    Start Date
+                                </Label>
 
-                                <input
-                                    className="w-full rounded-md border px-3 py-2 text-sm"
+                                <Input
+                                    id="ai-eval-rule-history-start-date"
                                     onChange={(event) => setStartDate(event.target.value)}
                                     type="datetime-local"
                                     value={startDate}
@@ -142,10 +150,12 @@ const AiEvalRules = ({evalRules, isLoading}: AiEvalRulesProps) => {
                             </fieldset>
 
                             <fieldset className="border-0">
-                                <label className="mb-1 block text-sm font-medium">End Date</label>
+                                <Label className="mb-1 block" htmlFor="ai-eval-rule-history-end-date">
+                                    End Date
+                                </Label>
 
-                                <input
-                                    className="w-full rounded-md border px-3 py-2 text-sm"
+                                <Input
+                                    id="ai-eval-rule-history-end-date"
                                     onChange={(event) => setEndDate(event.target.value)}
                                     type="datetime-local"
                                     value={endDate}
@@ -153,7 +163,7 @@ const AiEvalRules = ({evalRules, isLoading}: AiEvalRulesProps) => {
                             </fieldset>
                         </div>
 
-                        <div className="mt-6 flex justify-end gap-2">
+                        <DialogFooter>
                             <Button label="Cancel" onClick={() => setHistoryRule(undefined)} variant="outline" />
 
                             <Button
@@ -161,9 +171,9 @@ const AiEvalRules = ({evalRules, isLoading}: AiEvalRulesProps) => {
                                 label={runHistoricalMutation.isPending ? 'Queuing...' : 'Run'}
                                 onClick={handleRun}
                             />
-                        </div>
-                    </div>
-                </div>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
             )}
         </div>
     );

@@ -1,3 +1,10 @@
+import Button from '@/components/Button/Button';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
+import {Checkbox} from '@/components/ui/checkbox';
+import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle} from '@/components/ui/dialog';
+import {Input} from '@/components/ui/input';
+import {Label} from '@/components/ui/label';
+import {Textarea} from '@/components/ui/textarea';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {useCreateAiEvalRuleMutation} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
@@ -45,18 +52,26 @@ const AiEvalRuleDialog = ({onClose, scoreConfigs}: AiEvalRuleDialogProps) => {
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-            <div className="w-full max-w-lg rounded-lg bg-background p-6 shadow-lg">
-                <h3 className="mb-4 text-lg font-semibold">New Eval Rule</h3>
+        <Dialog
+            onOpenChange={(open) => {
+                if (!open) {
+                    onClose();
+                }
+            }}
+            open
+        >
+            <DialogContent aria-describedby={undefined} className="max-w-lg">
+                <DialogHeader>
+                    <DialogTitle>New Eval Rule</DialogTitle>
+                </DialogHeader>
 
                 <fieldset className="space-y-4 border-0">
                     <div>
-                        <label className="mb-1 block text-sm font-medium" htmlFor="evalRuleName">
+                        <Label className="mb-1 block" htmlFor="evalRuleName">
                             Name
-                        </label>
+                        </Label>
 
-                        <input
-                            className="w-full rounded-md border px-3 py-2 text-sm"
+                        <Input
                             id="evalRuleName"
                             onChange={(event) => setName(event.target.value)}
                             placeholder="e.g., Relevance check on production"
@@ -65,33 +80,31 @@ const AiEvalRuleDialog = ({onClose, scoreConfigs}: AiEvalRuleDialogProps) => {
                     </div>
 
                     <div>
-                        <label className="mb-1 block text-sm font-medium" htmlFor="evalRuleScoreConfig">
+                        <Label className="mb-1 block" htmlFor="evalRuleScoreConfig">
                             Score Config
-                        </label>
+                        </Label>
 
-                        <select
-                            className="w-full rounded-md border px-3 py-2 text-sm"
-                            id="evalRuleScoreConfig"
-                            onChange={(event) => setScoreConfigId(event.target.value)}
-                            value={scoreConfigId}
-                        >
-                            <option value="">Select a score config...</option>
+                        <Select onValueChange={setScoreConfigId} value={scoreConfigId}>
+                            <SelectTrigger id="evalRuleScoreConfig">
+                                <SelectValue placeholder="Select a score config..." />
+                            </SelectTrigger>
 
-                            {scoreConfigs.map((config) => (
-                                <option key={config.id} value={config.id}>
-                                    {config.name}
-                                </option>
-                            ))}
-                        </select>
+                            <SelectContent>
+                                {scoreConfigs.map((config) => (
+                                    <SelectItem key={config.id} value={config.id}>
+                                        {config.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
 
                     <div>
-                        <label className="mb-1 block text-sm font-medium" htmlFor="evalRuleModel">
+                        <Label className="mb-1 block" htmlFor="evalRuleModel">
                             Model
-                        </label>
+                        </Label>
 
-                        <input
-                            className="w-full rounded-md border px-3 py-2 text-sm"
+                        <Input
                             id="evalRuleModel"
                             onChange={(event) => setModel(event.target.value)}
                             placeholder="e.g., openai/gpt-4o-mini"
@@ -100,12 +113,12 @@ const AiEvalRuleDialog = ({onClose, scoreConfigs}: AiEvalRuleDialogProps) => {
                     </div>
 
                     <div>
-                        <label className="mb-1 block text-sm font-medium" htmlFor="evalRulePromptTemplate">
+                        <Label className="mb-1 block" htmlFor="evalRulePromptTemplate">
                             Prompt Template
-                        </label>
+                        </Label>
 
-                        <textarea
-                            className="w-full rounded-md border px-3 py-2 font-mono text-sm"
+                        <Textarea
+                            className="font-mono"
                             id="evalRulePromptTemplate"
                             onChange={(event) => setPromptTemplate(event.target.value)}
                             rows={5}
@@ -119,12 +132,11 @@ const AiEvalRuleDialog = ({onClose, scoreConfigs}: AiEvalRuleDialogProps) => {
 
                     <div className="flex gap-4">
                         <div className="flex-1">
-                            <label className="mb-1 block text-sm font-medium" htmlFor="evalRuleSamplingRate">
+                            <Label className="mb-1 block" htmlFor="evalRuleSamplingRate">
                                 Sampling Rate (0.0 - 1.0)
-                            </label>
+                            </Label>
 
-                            <input
-                                className="w-full rounded-md border px-3 py-2 text-sm"
+                            <Input
                                 id="evalRuleSamplingRate"
                                 max="1"
                                 min="0"
@@ -136,12 +148,11 @@ const AiEvalRuleDialog = ({onClose, scoreConfigs}: AiEvalRuleDialogProps) => {
                         </div>
 
                         <div className="flex-1">
-                            <label className="mb-1 block text-sm font-medium" htmlFor="evalRuleDelaySeconds">
+                            <Label className="mb-1 block" htmlFor="evalRuleDelaySeconds">
                                 Delay (seconds)
-                            </label>
+                            </Label>
 
-                            <input
-                                className="w-full rounded-md border px-3 py-2 text-sm"
+                            <Input
                                 id="evalRuleDelaySeconds"
                                 min="0"
                                 onChange={(event) => setDelaySeconds(event.target.value)}
@@ -152,37 +163,27 @@ const AiEvalRuleDialog = ({onClose, scoreConfigs}: AiEvalRuleDialogProps) => {
                     </div>
 
                     <div className="flex items-center gap-2">
-                        <input
+                        <Checkbox
                             checked={enabled}
                             id="evalRuleEnabled"
-                            onChange={(event) => setEnabled(event.target.checked)}
-                            type="checkbox"
+                            onCheckedChange={(checked) => setEnabled(checked === true)}
                         />
 
-                        <label className="text-sm font-medium" htmlFor="evalRuleEnabled">
-                            Enable immediately
-                        </label>
+                        <Label htmlFor="evalRuleEnabled">Enable immediately</Label>
                     </div>
                 </fieldset>
 
-                <div className="mt-6 flex justify-end gap-2">
-                    <button
-                        className="rounded-md px-3 py-1.5 text-sm text-muted-foreground hover:bg-muted"
-                        onClick={onClose}
-                    >
-                        Cancel
-                    </button>
+                <DialogFooter>
+                    <Button label="Cancel" onClick={onClose} variant="outline" />
 
-                    <button
-                        className="rounded-md bg-primary px-3 py-1.5 text-sm text-primary-foreground hover:bg-primary/90"
-                        disabled={!name || !model || !scoreConfigId || !promptTemplate}
+                    <Button
+                        disabled={!name || !model || !scoreConfigId || !promptTemplate || createMutation.isPending}
+                        label="Create"
                         onClick={handleSubmit}
-                    >
-                        Create
-                    </button>
-                </div>
-            </div>
-        </div>
+                    />
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     );
 };
 

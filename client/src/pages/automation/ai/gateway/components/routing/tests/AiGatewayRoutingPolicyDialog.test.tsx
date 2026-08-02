@@ -30,21 +30,54 @@ vi.mock('@/shared/middleware/graphql', () => ({
     }),
 }));
 
+const renderDialog = (onClose = vi.fn()) => {
+    render(<AiGatewayRoutingPolicyDialog onClose={onClose} workspaceId="1" />);
+
+    return onClose;
+};
+
 describe('AiGatewayRoutingPolicyDialog', () => {
     beforeEach(() => {
         hoisted.createMutate.mockReset();
         hoisted.updateMutate.mockReset();
     });
 
-    it('renders the create form when no routingPolicy is passed', () => {
-        render(<AiGatewayRoutingPolicyDialog onClose={vi.fn()} workspaceId="1" />);
+    it('renders with the dialog role', () => {
+        renderDialog();
 
-        expect(screen.getByRole('heading', {name: 'Add Routing Policy'})).toBeInTheDocument();
-        expect(screen.getByRole('button', {name: 'Create'})).toBeDisabled();
+        expect(screen.getByRole('dialog')).toBeInTheDocument();
+    });
+
+    it('names the dialog by its title', () => {
+        renderDialog();
+
+        expect(screen.getByRole('dialog', {name: 'Add Routing Policy'})).toBeInTheDocument();
+    });
+
+    it('closes on Escape', () => {
+        const onClose = renderDialog();
+
+        fireEvent.keyDown(screen.getByRole('dialog'), {key: 'Escape'});
+
+        expect(onClose).toHaveBeenCalledTimes(1);
+    });
+
+    it('associates every label with its control', () => {
+        renderDialog();
+
+        expect(screen.getByLabelText('Name')).toBeInTheDocument();
+        expect(screen.getByLabelText('Strategy')).toBeInTheDocument();
+        expect(screen.getByLabelText('Fallback Model (optional)')).toBeInTheDocument();
+    });
+
+    it('renders the strategy control as a Radix select trigger', () => {
+        renderDialog();
+
+        expect(screen.getByLabelText('Strategy')).toHaveAttribute('data-slot', 'select-trigger');
     });
 
     it('enables the Create button once name is entered and submits through the create mutation', () => {
-        render(<AiGatewayRoutingPolicyDialog onClose={vi.fn()} workspaceId="42" />);
+        renderDialog();
 
         const nameInput = screen.getByPlaceholderText('My Routing Policy');
 
@@ -62,7 +95,7 @@ describe('AiGatewayRoutingPolicyDialog', () => {
                 fallbackModel: undefined,
                 name: 'Production traffic',
                 strategy: 'SIMPLE',
-                workspaceId: '42',
+                workspaceId: '1',
             },
         });
         expect(hoisted.updateMutate).not.toHaveBeenCalled();
@@ -76,9 +109,9 @@ describe('AiGatewayRoutingPolicyDialog', () => {
             strategy: 'PRIORITY_FALLBACK',
         } as never;
 
-        render(<AiGatewayRoutingPolicyDialog onClose={vi.fn()} routingPolicy={existingPolicy} workspaceId="42" />);
+        render(<AiGatewayRoutingPolicyDialog onClose={vi.fn()} routingPolicy={existingPolicy} workspaceId="1" />);
 
-        expect(screen.getByRole('heading', {name: 'Edit Routing Policy'})).toBeInTheDocument();
+        expect(screen.getByRole('dialog', {name: 'Edit Routing Policy'})).toBeInTheDocument();
 
         const saveButton = screen.getByRole('button', {name: 'Save'});
 

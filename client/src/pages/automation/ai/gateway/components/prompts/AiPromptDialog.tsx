@@ -1,7 +1,10 @@
 import Button from '@/components/Button/Button';
+import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle} from '@/components/ui/dialog';
+import {Input} from '@/components/ui/input';
+import {Label} from '@/components/ui/label';
+import {Textarea} from '@/components/ui/textarea';
 import {useCreateAiPromptMutation, useUpdateAiPromptMutation} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {XIcon} from 'lucide-react';
 import {useCallback, useState} from 'react';
 
 import {AiPromptType} from '../../types';
@@ -57,22 +60,27 @@ const AiPromptDialog = ({onClose, prompt, workspaceId}: AiPromptDialogProps) => 
     }, [createMutation, description, isEditMode, name, prompt, updateMutation, workspaceId]);
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-            <div className="w-full max-w-md rounded-lg bg-background p-6 shadow-lg">
-                <div className="mb-4 flex items-center justify-between">
-                    <h3 className="text-lg font-medium">{isEditMode ? 'Edit Prompt' : 'Create Prompt'}</h3>
-
-                    <button onClick={onClose}>
-                        <XIcon className="size-4" />
-                    </button>
-                </div>
+        <Dialog
+            onOpenChange={(open) => {
+                if (!open) {
+                    onClose();
+                }
+            }}
+            open
+        >
+            <DialogContent aria-describedby={undefined} className="max-w-md">
+                <DialogHeader>
+                    <DialogTitle>{isEditMode ? 'Edit Prompt' : 'Create Prompt'}</DialogTitle>
+                </DialogHeader>
 
                 <div className="space-y-4">
                     <fieldset className="border-0">
-                        <label className="mb-1 block text-sm font-medium">Name</label>
+                        <Label className="mb-1 block" htmlFor="ai-prompt-name">
+                            Name
+                        </Label>
 
-                        <input
-                            className="w-full rounded-md border px-3 py-2 text-sm"
+                        <Input
+                            id="ai-prompt-name"
                             onChange={(event) => setName(event.target.value)}
                             placeholder="My Prompt Template"
                             value={name}
@@ -80,10 +88,12 @@ const AiPromptDialog = ({onClose, prompt, workspaceId}: AiPromptDialogProps) => 
                     </fieldset>
 
                     <fieldset className="border-0">
-                        <label className="mb-1 block text-sm font-medium">Description (optional)</label>
+                        <Label className="mb-1 block" htmlFor="ai-prompt-description">
+                            Description (optional)
+                        </Label>
 
-                        <textarea
-                            className="w-full rounded-md border px-3 py-2 text-sm"
+                        <Textarea
+                            id="ai-prompt-description"
                             onChange={(event) => setDescription(event.target.value)}
                             placeholder="Describe what this prompt does..."
                             rows={3}
@@ -92,7 +102,7 @@ const AiPromptDialog = ({onClose, prompt, workspaceId}: AiPromptDialogProps) => 
                     </fieldset>
                 </div>
 
-                <div className="mt-6 flex justify-end gap-2">
+                <DialogFooter>
                     <Button label="Cancel" onClick={onClose} variant="outline" />
 
                     <Button
@@ -100,9 +110,9 @@ const AiPromptDialog = ({onClose, prompt, workspaceId}: AiPromptDialogProps) => 
                         label={isEditMode ? 'Save' : 'Create'}
                         onClick={handleSubmit}
                     />
-                </div>
-            </div>
-        </div>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     );
 };
 

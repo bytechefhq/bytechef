@@ -1,4 +1,7 @@
 import Button from '@/components/Button/Button';
+import {Checkbox} from '@/components/ui/checkbox';
+import {Input} from '@/components/ui/input';
+import {Label} from '@/components/ui/label';
 import {useAiGatewayProjectSettingsQuery, useUpdateAiGatewayProjectSettingsMutation} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {useEffect, useState} from 'react';
@@ -78,60 +81,78 @@ const AiGatewayProjectGuardrailsSection = ({projectId}: AiGatewayProjectGuardrai
                 Project overrides layer on top of the workspace guardrails — they can add protection, never remove it.
             </p>
 
-            <label className="flex items-center gap-2 text-sm">
-                <input
+            <div className="flex items-center gap-2">
+                <Checkbox
                     checked={form.redactPii}
-                    onChange={(event) => setForm({...form, redactPii: event.target.checked})}
-                    type="checkbox"
+                    id="aiGatewayProjectGuardrailsRedactPii"
+                    onCheckedChange={(checked) => setForm({...form, redactPii: checked === true})}
                 />
-                Redact PII (emails, SSNs, cards, phones, IPs)
-            </label>
 
-            <label className="flex items-center gap-2 text-sm">
-                <input
+                <Label htmlFor="aiGatewayProjectGuardrailsRedactPii">
+                    Redact PII (emails, SSNs, cards, phones, IPs)
+                </Label>
+            </div>
+
+            <div className="flex items-center gap-2">
+                <Checkbox
                     checked={form.redactSecrets}
-                    onChange={(event) => setForm({...form, redactSecrets: event.target.checked})}
-                    type="checkbox"
+                    id="aiGatewayProjectGuardrailsRedactSecrets"
+                    onCheckedChange={(checked) => setForm({...form, redactSecrets: checked === true})}
                 />
-                Redact secrets (API keys, tokens, JWTs, private keys)
-            </label>
 
-            <label className="flex items-center gap-2 text-sm">
-                <input
+                <Label htmlFor="aiGatewayProjectGuardrailsRedactSecrets">
+                    Redact secrets (API keys, tokens, JWTs, private keys)
+                </Label>
+            </div>
+
+            <div className="flex items-center gap-2">
+                <Checkbox
                     checked={form.scanResponses}
-                    onChange={(event) => setForm({...form, scanResponses: event.target.checked})}
-                    type="checkbox"
+                    id="aiGatewayProjectGuardrailsScanResponses"
+                    onCheckedChange={(checked) => setForm({...form, scanResponses: checked === true})}
                 />
-                Scan responses (redact PII/secrets from non-streaming output)
-            </label>
 
-            <label className="flex items-center gap-2 text-sm">
-                <input
+                <Label htmlFor="aiGatewayProjectGuardrailsScanResponses">
+                    Scan responses (redact PII/secrets from non-streaming output)
+                </Label>
+            </div>
+
+            <div className="flex items-center gap-2">
+                <Checkbox
                     checked={form.moderationEnabled}
-                    onChange={(event) => setForm({...form, moderationEnabled: event.target.checked})}
-                    type="checkbox"
+                    id="aiGatewayProjectGuardrailsModerationEnabled"
+                    onCheckedChange={(checked) => setForm({...form, moderationEnabled: checked === true})}
                 />
-                Model-based moderation (requires a configured moderation model)
-            </label>
 
-            <label className="flex items-center gap-2 text-sm">
-                <input
+                <Label htmlFor="aiGatewayProjectGuardrailsModerationEnabled">
+                    Model-based moderation (requires a configured moderation model)
+                </Label>
+            </div>
+
+            <div className="flex items-center gap-2">
+                <Checkbox
                     checked={form.injectionDetectionEnabled}
-                    onChange={(event) => setForm({...form, injectionDetectionEnabled: event.target.checked})}
-                    type="checkbox"
+                    id="aiGatewayProjectGuardrailsInjectionDetectionEnabled"
+                    onCheckedChange={(checked) => setForm({...form, injectionDetectionEnabled: checked === true})}
                 />
-                Prompt-injection detection (requires a configured injection model)
-            </label>
 
-            <label className="flex flex-col gap-1 text-sm">
-                Blocked terms (comma-separated; added to the workspace list)
-                <input
-                    className="rounded-md border px-3 py-2 text-sm"
+                <Label htmlFor="aiGatewayProjectGuardrailsInjectionDetectionEnabled">
+                    Prompt-injection detection (requires a configured injection model)
+                </Label>
+            </div>
+
+            <div className="flex flex-col gap-1">
+                <Label htmlFor="aiGatewayProjectGuardrailsBlockedTerms">
+                    Blocked terms (comma-separated; added to the workspace list)
+                </Label>
+
+                <Input
+                    id="aiGatewayProjectGuardrailsBlockedTerms"
                     onChange={(event) => setForm({...form, blockedTerms: event.target.value})}
                     placeholder="none"
                     value={form.blockedTerms}
                 />
-            </label>
+            </div>
 
             <div className="flex justify-end">
                 <Button

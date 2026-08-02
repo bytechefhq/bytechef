@@ -1,10 +1,13 @@
+import Button from '@/components/Button/Button';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
+import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle} from '@/components/ui/dialog';
+import {Label} from '@/components/ui/label';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {
     AiObservabilityExportFormat,
     AiObservabilityExportScope,
     useCreateAiObservabilityExportJobMutation,
 } from '@/shared/middleware/graphql';
-import {XIcon} from 'lucide-react';
 import {useState} from 'react';
 
 interface AiObservabilityExportJobDialogProps {
@@ -48,66 +51,70 @@ const AiObservabilityExportJobDialog = ({onClose}: AiObservabilityExportJobDialo
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-            <div className="w-full max-w-md rounded-lg bg-background p-6 shadow-lg">
-                <div className="mb-4 flex items-center justify-between">
-                    <h3 className="text-lg font-semibold">New Export</h3>
+        <Dialog
+            onOpenChange={(open) => {
+                if (!open) {
+                    onClose();
+                }
+            }}
+            open
+        >
+            <DialogContent aria-describedby={undefined} className="max-w-md">
+                <DialogHeader>
+                    <DialogTitle>New Export</DialogTitle>
+                </DialogHeader>
 
-                    <button className="text-muted-foreground hover:text-foreground" onClick={onClose}>
-                        <XIcon className="size-5" />
-                    </button>
-                </div>
+                <fieldset className="border-0">
+                    <Label className="mb-1 block" htmlFor="ai-observability-export-job-scope">
+                        Scope
+                    </Label>
 
-                <fieldset className="mb-4 border-0 p-0">
-                    <label className="mb-1 block text-sm font-medium">Scope</label>
+                    <Select onValueChange={(value) => setScope(value as AiObservabilityExportScope)} value={scope}>
+                        <SelectTrigger id="ai-observability-export-job-scope">
+                            <SelectValue placeholder="Select a scope" />
+                        </SelectTrigger>
 
-                    <select
-                        className="w-full rounded-md border bg-background px-3 py-2 text-sm"
-                        onChange={(event) => setScope(event.target.value as AiObservabilityExportScope)}
-                        value={scope}
-                    >
-                        {SCOPE_OPTIONS.map((option) => (
-                            <option key={option.value} value={option.value}>
-                                {option.label}
-                            </option>
-                        ))}
-                    </select>
+                        <SelectContent>
+                            {SCOPE_OPTIONS.map((option) => (
+                                <SelectItem key={option.value} value={option.value}>
+                                    {option.label}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
                 </fieldset>
 
-                <fieldset className="mb-6 border-0 p-0">
-                    <label className="mb-1 block text-sm font-medium">Format</label>
+                <fieldset className="border-0">
+                    <Label className="mb-1 block" htmlFor="ai-observability-export-job-format">
+                        Format
+                    </Label>
 
-                    <select
-                        className="w-full rounded-md border bg-background px-3 py-2 text-sm"
-                        onChange={(event) => setFormat(event.target.value as AiObservabilityExportFormat)}
-                        value={format}
-                    >
-                        {FORMAT_OPTIONS.map((option) => (
-                            <option key={option.value} value={option.value}>
-                                {option.label}
-                            </option>
-                        ))}
-                    </select>
+                    <Select onValueChange={(value) => setFormat(value as AiObservabilityExportFormat)} value={format}>
+                        <SelectTrigger id="ai-observability-export-job-format">
+                            <SelectValue placeholder="Select a format" />
+                        </SelectTrigger>
+
+                        <SelectContent>
+                            {FORMAT_OPTIONS.map((option) => (
+                                <SelectItem key={option.value} value={option.value}>
+                                    {option.label}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
                 </fieldset>
 
-                <div className="flex justify-end gap-2">
-                    <button
-                        className="rounded-md bg-muted px-4 py-2 text-sm text-muted-foreground hover:bg-muted/80"
-                        onClick={onClose}
-                    >
-                        Cancel
-                    </button>
+                <DialogFooter>
+                    <Button label="Cancel" onClick={onClose} variant="outline" />
 
-                    <button
-                        className="rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+                    <Button
                         disabled={createExportJobMutation.isPending}
+                        label={createExportJobMutation.isPending ? 'Creating...' : 'Create Export'}
                         onClick={handleCreate}
-                    >
-                        {createExportJobMutation.isPending ? 'Creating...' : 'Create Export'}
-                    </button>
-                </div>
-            </div>
-        </div>
+                    />
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     );
 };
 

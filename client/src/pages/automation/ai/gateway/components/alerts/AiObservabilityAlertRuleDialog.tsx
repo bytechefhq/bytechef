@@ -1,4 +1,9 @@
 import Button from '@/components/Button/Button';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
+import {Checkbox} from '@/components/ui/checkbox';
+import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle} from '@/components/ui/dialog';
+import {Input} from '@/components/ui/input';
+import {Label} from '@/components/ui/label';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {
     AiObservabilityAlertCondition,
@@ -9,7 +14,6 @@ import {
     useWorkspaceNotificationsQuery,
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {XIcon} from 'lucide-react';
 import {useCallback, useState} from 'react';
 import {toast} from 'sonner';
 
@@ -143,22 +147,27 @@ const AiObservabilityAlertRuleDialog = ({onClose, rule, workspaceId}: AiObservab
     ]);
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-            <div className="w-full max-w-md rounded-lg bg-background p-6 shadow-lg">
-                <div className="mb-4 flex items-center justify-between">
-                    <h3 className="text-lg font-medium">{isEditMode ? 'Edit Alert Rule' : 'Add Alert Rule'}</h3>
-
-                    <button onClick={onClose}>
-                        <XIcon className="size-4" />
-                    </button>
-                </div>
+        <Dialog
+            onOpenChange={(open) => {
+                if (!open) {
+                    onClose();
+                }
+            }}
+            open
+        >
+            <DialogContent aria-describedby={undefined} className="max-w-md">
+                <DialogHeader>
+                    <DialogTitle>{isEditMode ? 'Edit Alert Rule' : 'Add Alert Rule'}</DialogTitle>
+                </DialogHeader>
 
                 <div className="max-h-[70vh] space-y-4 overflow-y-auto">
                     <fieldset className="border-0">
-                        <label className="mb-1 block text-sm font-medium">Name</label>
+                        <Label className="mb-1 block" htmlFor="alertRuleName">
+                            Name
+                        </Label>
 
-                        <input
-                            className="w-full rounded-md border px-3 py-2 text-sm"
+                        <Input
+                            id="alertRuleName"
                             onChange={(event) => setName(event.target.value)}
                             placeholder="High Error Rate Alert"
                             value={name}
@@ -166,42 +175,58 @@ const AiObservabilityAlertRuleDialog = ({onClose, rule, workspaceId}: AiObservab
                     </fieldset>
 
                     <fieldset className="border-0">
-                        <label className="mb-1 block text-sm font-medium">Metric</label>
+                        <Label className="mb-1 block" htmlFor="alertRuleMetric">
+                            Metric
+                        </Label>
 
-                        <select
-                            className="w-full rounded-md border px-3 py-2 text-sm"
-                            onChange={(event) => setMetric(event.target.value as AiObservabilityAlertMetric)}
+                        <Select
+                            onValueChange={(value) => setMetric(value as AiObservabilityAlertMetric)}
                             value={metric}
                         >
-                            {METRIC_OPTIONS.map((metricOption) => (
-                                <option key={metricOption} value={metricOption}>
-                                    {metricOption}
-                                </option>
-                            ))}
-                        </select>
+                            <SelectTrigger id="alertRuleMetric">
+                                <SelectValue />
+                            </SelectTrigger>
+
+                            <SelectContent>
+                                {METRIC_OPTIONS.map((metricOption) => (
+                                    <SelectItem key={metricOption} value={metricOption}>
+                                        {metricOption}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </fieldset>
 
                     <fieldset className="border-0">
-                        <label className="mb-1 block text-sm font-medium">Condition</label>
+                        <Label className="mb-1 block" htmlFor="alertRuleCondition">
+                            Condition
+                        </Label>
 
-                        <select
-                            className="w-full rounded-md border px-3 py-2 text-sm"
-                            onChange={(event) => setCondition(event.target.value as AiObservabilityAlertCondition)}
+                        <Select
+                            onValueChange={(value) => setCondition(value as AiObservabilityAlertCondition)}
                             value={condition}
                         >
-                            {CONDITION_OPTIONS.map((conditionOption) => (
-                                <option key={conditionOption} value={conditionOption}>
-                                    {CONDITION_LABELS[conditionOption] || conditionOption}
-                                </option>
-                            ))}
-                        </select>
+                            <SelectTrigger id="alertRuleCondition">
+                                <SelectValue />
+                            </SelectTrigger>
+
+                            <SelectContent>
+                                {CONDITION_OPTIONS.map((conditionOption) => (
+                                    <SelectItem key={conditionOption} value={conditionOption}>
+                                        {CONDITION_LABELS[conditionOption] || conditionOption}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </fieldset>
 
                     <fieldset className="border-0">
-                        <label className="mb-1 block text-sm font-medium">Threshold</label>
+                        <Label className="mb-1 block" htmlFor="alertRuleThreshold">
+                            Threshold
+                        </Label>
 
-                        <input
-                            className="w-full rounded-md border px-3 py-2 text-sm"
+                        <Input
+                            id="alertRuleThreshold"
                             onChange={(event) => setThreshold(parseFloat(event.target.value) || 0)}
                             step="any"
                             type="number"
@@ -210,10 +235,12 @@ const AiObservabilityAlertRuleDialog = ({onClose, rule, workspaceId}: AiObservab
                     </fieldset>
 
                     <fieldset className="border-0">
-                        <label className="mb-1 block text-sm font-medium">Window (minutes)</label>
+                        <Label className="mb-1 block" htmlFor="alertRuleWindowMinutes">
+                            Window (minutes)
+                        </Label>
 
-                        <input
-                            className="w-full rounded-md border px-3 py-2 text-sm"
+                        <Input
+                            id="alertRuleWindowMinutes"
                             min="1"
                             onChange={(event) => setWindowMinutes(parseInt(event.target.value, 10) || 1)}
                             type="number"
@@ -222,10 +249,12 @@ const AiObservabilityAlertRuleDialog = ({onClose, rule, workspaceId}: AiObservab
                     </fieldset>
 
                     <fieldset className="border-0">
-                        <label className="mb-1 block text-sm font-medium">Cooldown (minutes)</label>
+                        <Label className="mb-1 block" htmlFor="alertRuleCooldownMinutes">
+                            Cooldown (minutes)
+                        </Label>
 
-                        <input
-                            className="w-full rounded-md border px-3 py-2 text-sm"
+                        <Input
+                            id="alertRuleCooldownMinutes"
                             min="1"
                             onChange={(event) => setCooldownMinutes(parseInt(event.target.value, 10) || 1)}
                             type="number"
@@ -233,19 +262,18 @@ const AiObservabilityAlertRuleDialog = ({onClose, rule, workspaceId}: AiObservab
                         />
                     </fieldset>
 
-                    <fieldset className="border-0">
-                        <label className="mb-1 flex items-center gap-2 text-sm font-medium">
-                            <input
-                                checked={enabled}
-                                onChange={(event) => setEnabled(event.target.checked)}
-                                type="checkbox"
-                            />
-                            Enabled
-                        </label>
+                    <fieldset className="flex items-center gap-2 border-0">
+                        <Checkbox
+                            checked={enabled}
+                            id="alertRuleEnabled"
+                            onCheckedChange={(checked) => setEnabled(checked === true)}
+                        />
+
+                        <Label htmlFor="alertRuleEnabled">Enabled</Label>
                     </fieldset>
 
                     <fieldset className="border-0">
-                        <label className="mb-1 block text-sm font-medium">Notifications</label>
+                        <legend className="mb-1 block text-sm font-medium">Notifications</legend>
 
                         {availableNotifications.length === 0 ? (
                             <p className="text-sm text-muted-foreground">
@@ -255,17 +283,17 @@ const AiObservabilityAlertRuleDialog = ({onClose, rule, workspaceId}: AiObservab
                             <div className="space-y-2">
                                 {availableNotifications.map((notification) =>
                                     notification ? (
-                                        <label className="flex items-center gap-2 text-sm" key={notification.id}>
-                                            <input
+                                        <div className="flex items-center gap-2" key={notification.id}>
+                                            <Checkbox
                                                 checked={notificationIds.includes(notification.id)}
-                                                onChange={() => handleNotificationToggle(notification.id)}
-                                                type="checkbox"
+                                                id={`alertRuleNotification-${notification.id}`}
+                                                onCheckedChange={() => handleNotificationToggle(notification.id)}
                                             />
 
-                                            <span>
+                                            <Label htmlFor={`alertRuleNotification-${notification.id}`}>
                                                 {notification.name} ({notification.type})
-                                            </span>
-                                        </label>
+                                            </Label>
+                                        </div>
                                     ) : null
                                 )}
                             </div>
@@ -273,7 +301,7 @@ const AiObservabilityAlertRuleDialog = ({onClose, rule, workspaceId}: AiObservab
                     </fieldset>
                 </div>
 
-                <div className="mt-6 flex justify-end gap-2">
+                <DialogFooter>
                     <Button label="Cancel" onClick={onClose} variant="outline" />
 
                     {isEditMode && rule && (
@@ -290,9 +318,9 @@ const AiObservabilityAlertRuleDialog = ({onClose, rule, workspaceId}: AiObservab
                         label={isEditMode ? 'Save' : 'Create'}
                         onClick={handleSubmit}
                     />
-                </div>
-            </div>
-        </div>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     );
 };
 

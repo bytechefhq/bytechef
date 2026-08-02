@@ -1,8 +1,9 @@
 import Button from '@/components/Button/Button';
 import PageLoader from '@/components/PageLoader';
+import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle} from '@/components/ui/dialog';
 import {useAiPromptQuery, useSetActiveAiPromptVersionMutation} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {ArrowLeftIcon, GitCompareIcon, PlusIcon, RocketIcon, XIcon} from 'lucide-react';
+import {ArrowLeftIcon, GitCompareIcon, PlusIcon, RocketIcon} from 'lucide-react';
 import {useCallback, useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -339,17 +340,20 @@ const AiPromptDetail = ({onBack, promptId}: AiPromptDetailProps) => {
             )}
 
             {showCompareDialog && compareVersions && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-                    <div className="flex max-h-[85vh] w-full max-w-4xl flex-col rounded-lg bg-background p-6 shadow-lg">
-                        <div className="mb-4 flex items-center justify-between">
-                            <h3 className="text-lg font-medium">
+                <Dialog
+                    onOpenChange={(open) => {
+                        if (!open) {
+                            setShowCompareDialog(false);
+                        }
+                    }}
+                    open
+                >
+                    <DialogContent aria-describedby={undefined} className="flex max-h-[85vh] flex-col sm:max-w-4xl">
+                        <DialogHeader>
+                            <DialogTitle>
                                 {`Compare v${compareVersions.left.versionNumber} \u2192 v${compareVersions.right.versionNumber}`}
-                            </h3>
-
-                            <button onClick={() => setShowCompareDialog(false)}>
-                                <XIcon className="size-4" />
-                            </button>
-                        </div>
+                            </DialogTitle>
+                        </DialogHeader>
 
                         <div className="flex-1 overflow-auto rounded border bg-muted/20 font-mono text-xs">
                             {compareVersions.diff.map((diffLine, diffIndex) => (
@@ -370,11 +374,11 @@ const AiPromptDetail = ({onBack, promptId}: AiPromptDetailProps) => {
                             ))}
                         </div>
 
-                        <div className="mt-4 flex justify-end">
+                        <DialogFooter>
                             <Button label="Close" onClick={() => setShowCompareDialog(false)} variant="outline" />
-                        </div>
-                    </div>
-                </div>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
             )}
         </div>
     );

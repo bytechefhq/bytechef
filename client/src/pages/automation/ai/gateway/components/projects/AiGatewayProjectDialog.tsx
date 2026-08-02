@@ -1,7 +1,10 @@
 import Button from '@/components/Button/Button';
+import {Checkbox} from '@/components/ui/checkbox';
+import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle} from '@/components/ui/dialog';
+import {Input} from '@/components/ui/input';
+import {Label} from '@/components/ui/label';
 import {useCreateAiGatewayProjectMutation, useUpdateAiGatewayProjectMutation} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {XIcon} from 'lucide-react';
 import {useCallback, useState} from 'react';
 
 import {AiGatewayProjectType} from '../../types';
@@ -98,22 +101,27 @@ const AiGatewayProjectDialog = ({onClose, project, workspaceId}: AiGatewayProjec
     ]);
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-            <div className="w-full max-w-md rounded-lg bg-background p-6 shadow-lg">
-                <div className="mb-4 flex items-center justify-between">
-                    <h3 className="text-lg font-medium">{isEditMode ? 'Edit Project' : 'Add Project'}</h3>
-
-                    <button onClick={onClose}>
-                        <XIcon className="size-4" />
-                    </button>
-                </div>
+        <Dialog
+            onOpenChange={(open) => {
+                if (!open) {
+                    onClose();
+                }
+            }}
+            open
+        >
+            <DialogContent aria-describedby={undefined} className="max-w-md">
+                <DialogHeader>
+                    <DialogTitle>{isEditMode ? 'Edit Project' : 'Add Project'}</DialogTitle>
+                </DialogHeader>
 
                 <div className="max-h-[60vh] space-y-4 overflow-y-auto">
                     <fieldset className="border-0">
-                        <label className="mb-1 block text-sm font-medium">Name</label>
+                        <Label className="mb-1 block" htmlFor="aiGatewayProjectName">
+                            Name
+                        </Label>
 
-                        <input
-                            className="w-full rounded-md border px-3 py-2 text-sm"
+                        <Input
+                            id="aiGatewayProjectName"
                             onChange={(event) => setName(event.target.value)}
                             placeholder="My Project"
                             value={name}
@@ -121,10 +129,12 @@ const AiGatewayProjectDialog = ({onClose, project, workspaceId}: AiGatewayProjec
                     </fieldset>
 
                     <fieldset className="border-0">
-                        <label className="mb-1 block text-sm font-medium">Slug</label>
+                        <Label className="mb-1 block" htmlFor="aiGatewayProjectSlug">
+                            Slug
+                        </Label>
 
-                        <input
-                            className="w-full rounded-md border px-3 py-2 text-sm"
+                        <Input
+                            id="aiGatewayProjectSlug"
                             onChange={(event) => setSlug(event.target.value)}
                             placeholder="my-project"
                             value={slug}
@@ -132,10 +142,12 @@ const AiGatewayProjectDialog = ({onClose, project, workspaceId}: AiGatewayProjec
                     </fieldset>
 
                     <fieldset className="border-0">
-                        <label className="mb-1 block text-sm font-medium">Description (optional)</label>
+                        <Label className="mb-1 block" htmlFor="aiGatewayProjectDescription">
+                            Description (optional)
+                        </Label>
 
-                        <input
-                            className="w-full rounded-md border px-3 py-2 text-sm"
+                        <Input
+                            id="aiGatewayProjectDescription"
                             onChange={(event) => setDescription(event.target.value)}
                             placeholder="Project description"
                             value={description}
@@ -143,31 +155,34 @@ const AiGatewayProjectDialog = ({onClose, project, workspaceId}: AiGatewayProjec
                     </fieldset>
 
                     <fieldset className="border-0">
-                        <label className="mb-1 block text-sm font-medium">Routing Policy ID (optional)</label>
+                        <Label className="mb-1 block" htmlFor="aiGatewayProjectRoutingPolicyId">
+                            Routing Policy ID (optional)
+                        </Label>
 
-                        <input
-                            className="w-full rounded-md border px-3 py-2 text-sm"
+                        <Input
                             disabled={true}
+                            id="aiGatewayProjectRoutingPolicyId"
                             placeholder="Select from Routing Policies"
                         />
                     </fieldset>
 
-                    <fieldset className="border-0">
-                        <label className="flex items-center gap-2 text-sm font-medium">
-                            <input
-                                checked={compressionEnabled}
-                                onChange={(event) => setCompressionEnabled(event.target.checked)}
-                                type="checkbox"
-                            />
-                            Compression Enabled
-                        </label>
+                    <fieldset className="flex items-center gap-2 border-0">
+                        <Checkbox
+                            checked={compressionEnabled}
+                            id="aiGatewayProjectCompressionEnabled"
+                            onCheckedChange={(checked) => setCompressionEnabled(checked === true)}
+                        />
+
+                        <Label htmlFor="aiGatewayProjectCompressionEnabled">Compression Enabled</Label>
                     </fieldset>
 
                     <fieldset className="border-0">
-                        <label className="mb-1 block text-sm font-medium">Retry Max Attempts (optional)</label>
+                        <Label className="mb-1 block" htmlFor="aiGatewayProjectRetryMaxAttempts">
+                            Retry Max Attempts (optional)
+                        </Label>
 
-                        <input
-                            className="w-full rounded-md border px-3 py-2 text-sm"
+                        <Input
+                            id="aiGatewayProjectRetryMaxAttempts"
                             min={0}
                             onChange={(event) =>
                                 setRetryMaxAttempts(event.target.value ? Number(event.target.value) : undefined)
@@ -179,10 +194,12 @@ const AiGatewayProjectDialog = ({onClose, project, workspaceId}: AiGatewayProjec
                     </fieldset>
 
                     <fieldset className="border-0">
-                        <label className="mb-1 block text-sm font-medium">Timeout Seconds (optional)</label>
+                        <Label className="mb-1 block" htmlFor="aiGatewayProjectTimeoutSeconds">
+                            Timeout Seconds (optional)
+                        </Label>
 
-                        <input
-                            className="w-full rounded-md border px-3 py-2 text-sm"
+                        <Input
+                            id="aiGatewayProjectTimeoutSeconds"
                             min={0}
                             onChange={(event) =>
                                 setTimeoutSeconds(event.target.value ? Number(event.target.value) : undefined)
@@ -193,22 +210,23 @@ const AiGatewayProjectDialog = ({onClose, project, workspaceId}: AiGatewayProjec
                         />
                     </fieldset>
 
-                    <fieldset className="border-0">
-                        <label className="flex items-center gap-2 text-sm font-medium">
-                            <input
-                                checked={cachingEnabled}
-                                onChange={(event) => setCachingEnabled(event.target.checked)}
-                                type="checkbox"
-                            />
-                            Caching Enabled
-                        </label>
+                    <fieldset className="flex items-center gap-2 border-0">
+                        <Checkbox
+                            checked={cachingEnabled}
+                            id="aiGatewayProjectCachingEnabled"
+                            onCheckedChange={(checked) => setCachingEnabled(checked === true)}
+                        />
+
+                        <Label htmlFor="aiGatewayProjectCachingEnabled">Caching Enabled</Label>
                     </fieldset>
 
                     <fieldset className="border-0">
-                        <label className="mb-1 block text-sm font-medium">Cache TTL Minutes (optional)</label>
+                        <Label className="mb-1 block" htmlFor="aiGatewayProjectCacheTtlMinutes">
+                            Cache TTL Minutes (optional)
+                        </Label>
 
-                        <input
-                            className="w-full rounded-md border px-3 py-2 text-sm"
+                        <Input
+                            id="aiGatewayProjectCacheTtlMinutes"
                             min={0}
                             onChange={(event) =>
                                 setCacheTtlMinutes(event.target.value ? Number(event.target.value) : undefined)
@@ -220,10 +238,12 @@ const AiGatewayProjectDialog = ({onClose, project, workspaceId}: AiGatewayProjec
                     </fieldset>
 
                     <fieldset className="border-0">
-                        <label className="mb-1 block text-sm font-medium">Log Retention Days (optional)</label>
+                        <Label className="mb-1 block" htmlFor="aiGatewayProjectLogRetentionDays">
+                            Log Retention Days (optional)
+                        </Label>
 
-                        <input
-                            className="w-full rounded-md border px-3 py-2 text-sm"
+                        <Input
+                            id="aiGatewayProjectLogRetentionDays"
                             min={0}
                             onChange={(event) =>
                                 setLogRetentionDays(event.target.value ? Number(event.target.value) : undefined)
@@ -241,7 +261,7 @@ const AiGatewayProjectDialog = ({onClose, project, workspaceId}: AiGatewayProjec
                     )}
                 </div>
 
-                <div className="mt-6 flex justify-end gap-2">
+                <DialogFooter>
                     <Button label="Cancel" onClick={onClose} variant="outline" />
 
                     <Button
@@ -249,9 +269,9 @@ const AiGatewayProjectDialog = ({onClose, project, workspaceId}: AiGatewayProjec
                         label={isEditMode ? 'Save' : 'Create'}
                         onClick={handleSubmit}
                     />
-                </div>
-            </div>
-        </div>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     );
 };
 

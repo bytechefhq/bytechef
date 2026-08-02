@@ -1,9 +1,13 @@
+import Button from '@/components/Button/Button';
+import {Checkbox} from '@/components/ui/checkbox';
+import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle} from '@/components/ui/dialog';
+import {Input} from '@/components/ui/input';
+import {Label} from '@/components/ui/label';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {
     useCreateAiObservabilityWebhookSubscriptionMutation,
     useUpdateAiObservabilityWebhookSubscriptionMutation,
 } from '@/shared/middleware/graphql';
-import {XIcon} from 'lucide-react';
 import {useState} from 'react';
 
 import {AiObservabilityWebhookSubscriptionType} from '../../types';
@@ -81,21 +85,26 @@ const AiObservabilityWebhookSubscriptionDialog = ({
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-            <div className="w-full max-w-md rounded-lg bg-background p-6 shadow-lg">
-                <div className="mb-4 flex items-center justify-between">
-                    <h3 className="text-lg font-semibold">{isEditing ? 'Edit Webhook' : 'New Webhook Subscription'}</h3>
-
-                    <button className="text-muted-foreground hover:text-foreground" onClick={onClose}>
-                        <XIcon className="size-5" />
-                    </button>
-                </div>
+        <Dialog
+            onOpenChange={(open) => {
+                if (!open) {
+                    onClose();
+                }
+            }}
+            open
+        >
+            <DialogContent aria-describedby={undefined} className="max-w-md">
+                <DialogHeader>
+                    <DialogTitle>{isEditing ? 'Edit Webhook' : 'New Webhook Subscription'}</DialogTitle>
+                </DialogHeader>
 
                 <fieldset className="mb-3 border-0 p-0">
-                    <label className="mb-1 block text-sm font-medium">Name</label>
+                    <Label className="mb-1 block" htmlFor="ai-observability-webhook-subscription-name">
+                        Name
+                    </Label>
 
-                    <input
-                        className="w-full rounded-md border bg-background px-3 py-2 text-sm"
+                    <Input
+                        id="ai-observability-webhook-subscription-name"
                         onChange={(event) => setName(event.target.value)}
                         placeholder="My Webhook"
                         value={name}
@@ -103,10 +112,12 @@ const AiObservabilityWebhookSubscriptionDialog = ({
                 </fieldset>
 
                 <fieldset className="mb-3 border-0 p-0">
-                    <label className="mb-1 block text-sm font-medium">URL</label>
+                    <Label className="mb-1 block" htmlFor="ai-observability-webhook-subscription-url">
+                        URL
+                    </Label>
 
-                    <input
-                        className="w-full rounded-md border bg-background px-3 py-2 text-sm"
+                    <Input
+                        id="ai-observability-webhook-subscription-url"
                         onChange={(event) => setUrl(event.target.value)}
                         placeholder="https://example.com/webhook"
                         value={url}
@@ -114,10 +125,12 @@ const AiObservabilityWebhookSubscriptionDialog = ({
                 </fieldset>
 
                 <fieldset className="mb-3 border-0 p-0">
-                    <label className="mb-1 block text-sm font-medium">Secret (HMAC-SHA256)</label>
+                    <Label className="mb-1 block" htmlFor="ai-observability-webhook-subscription-secret">
+                        Secret (HMAC-SHA256)
+                    </Label>
 
-                    <input
-                        className="w-full rounded-md border bg-background px-3 py-2 text-sm"
+                    <Input
+                        id="ai-observability-webhook-subscription-secret"
                         onChange={(event) => setSecret(event.target.value)}
                         placeholder={isEditing ? 'Leave empty to keep existing' : 'Optional signing secret'}
                         type="password"
@@ -126,52 +139,51 @@ const AiObservabilityWebhookSubscriptionDialog = ({
                 </fieldset>
 
                 <fieldset className="mb-3 border-0 p-0">
-                    <label className="mb-1 block text-sm font-medium">Events</label>
+                    <legend className="mb-1 block text-sm font-medium">Events</legend>
 
                     <div className="flex flex-wrap gap-2">
                         {AVAILABLE_EVENTS.map((event) => (
-                            <label className="flex items-center gap-1.5 text-sm" key={event}>
-                                <input
+                            <div className="flex items-center gap-1.5" key={event}>
+                                <Checkbox
                                     checked={selectedEvents.includes(event)}
-                                    onChange={() => handleEventToggle(event)}
-                                    type="checkbox"
+                                    id={`ai-observability-webhook-subscription-event-${event.replace(/\./g, '-')}`}
+                                    onCheckedChange={() => handleEventToggle(event)}
                                 />
 
-                                {event}
-                            </label>
+                                <Label
+                                    className="font-normal"
+                                    htmlFor={`ai-observability-webhook-subscription-event-${event.replace(/\./g, '-')}`}
+                                >
+                                    {event}
+                                </Label>
+                            </div>
                         ))}
                     </div>
                 </fieldset>
 
                 <fieldset className="mb-6 border-0 p-0">
-                    <label className="flex items-center gap-2 text-sm">
-                        <input
+                    <div className="flex items-center gap-2">
+                        <Checkbox
                             checked={enabled}
-                            onChange={(event) => setEnabled(event.target.checked)}
-                            type="checkbox"
+                            id="ai-observability-webhook-subscription-enabled"
+                            onCheckedChange={(checked) => setEnabled(checked === true)}
                         />
-                        Enabled
-                    </label>
+
+                        <Label htmlFor="ai-observability-webhook-subscription-enabled">Enabled</Label>
+                    </div>
                 </fieldset>
 
-                <div className="flex justify-end gap-2">
-                    <button
-                        className="rounded-md bg-muted px-4 py-2 text-sm text-muted-foreground hover:bg-muted/80"
-                        onClick={onClose}
-                    >
-                        Cancel
-                    </button>
+                <DialogFooter>
+                    <Button label="Cancel" onClick={onClose} variant="outline" />
 
-                    <button
-                        className="rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+                    <Button
                         disabled={isPending || !name || !url || selectedEvents.length === 0}
+                        label={isPending ? 'Saving...' : isEditing ? 'Update' : 'Create'}
                         onClick={handleSave}
-                    >
-                        {isPending ? 'Saving...' : isEditing ? 'Update' : 'Create'}
-                    </button>
-                </div>
-            </div>
-        </div>
+                    />
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     );
 };
 

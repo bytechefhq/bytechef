@@ -1,10 +1,15 @@
 import Button from '@/components/Button/Button';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
+import {Checkbox} from '@/components/ui/checkbox';
+import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle} from '@/components/ui/dialog';
+import {Input} from '@/components/ui/input';
+import {Label} from '@/components/ui/label';
+import {Textarea} from '@/components/ui/textarea';
 import {
     AiPromptVersionType as AiPromptVersionTypeEnum,
     useCreateAiPromptVersionMutation,
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {XIcon} from 'lucide-react';
 import {useCallback, useMemo, useState} from 'react';
 
 interface AiPromptVersionDialogProps {
@@ -57,22 +62,28 @@ const AiPromptVersionDialog = ({onClose, promptId}: AiPromptVersionDialogProps) 
     }, [active, commitMessage, content, createVersionMutation, detectedVariables, environment, promptId, type]);
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-            <div className="w-full max-w-lg rounded-lg bg-background p-6 shadow-lg">
-                <div className="mb-4 flex items-center justify-between">
-                    <h3 className="text-lg font-medium">New Version</h3>
-
-                    <button onClick={onClose}>
-                        <XIcon className="size-4" />
-                    </button>
-                </div>
+        <Dialog
+            onOpenChange={(open) => {
+                if (!open) {
+                    onClose();
+                }
+            }}
+            open
+        >
+            <DialogContent aria-describedby={undefined} className="max-w-lg">
+                <DialogHeader>
+                    <DialogTitle>New Version</DialogTitle>
+                </DialogHeader>
 
                 <div className="space-y-4">
                     <fieldset className="border-0">
-                        <label className="mb-1 block text-sm font-medium">Content</label>
+                        <Label className="mb-1 block" htmlFor="ai-prompt-version-content">
+                            Content
+                        </Label>
 
-                        <textarea
-                            className="w-full rounded-md border px-3 py-2 font-mono text-sm"
+                        <Textarea
+                            className="font-mono"
+                            id="ai-prompt-version-content"
                             onChange={(event) => setContent(event.target.value)}
                             placeholder="Enter your prompt template... Use {{variable}} for variables."
                             rows={6}
@@ -82,7 +93,7 @@ const AiPromptVersionDialog = ({onClose, promptId}: AiPromptVersionDialogProps) 
 
                     {detectedVariables.length > 0 && (
                         <fieldset className="border-0">
-                            <label className="mb-1 block text-sm font-medium">Detected Variables</label>
+                            <legend className="mb-1 block text-sm font-medium">Detected Variables</legend>
 
                             <div className="flex flex-wrap gap-1">
                                 {detectedVariables.map((variable) => (
@@ -98,40 +109,50 @@ const AiPromptVersionDialog = ({onClose, promptId}: AiPromptVersionDialogProps) 
                     )}
 
                     <fieldset className="border-0">
-                        <label className="mb-1 block text-sm font-medium">Type</label>
+                        <Label className="mb-1 block" htmlFor="ai-prompt-version-type">
+                            Type
+                        </Label>
 
-                        <select
-                            className="w-full rounded-md border px-3 py-2 text-sm"
-                            onChange={(event) => setType(event.target.value as AiPromptVersionTypeEnum)}
-                            value={type}
-                        >
-                            <option value={AiPromptVersionTypeEnum.Text}>TEXT</option>
+                        <Select onValueChange={(value) => setType(value as AiPromptVersionTypeEnum)} value={type}>
+                            <SelectTrigger id="ai-prompt-version-type">
+                                <SelectValue />
+                            </SelectTrigger>
 
-                            <option value={AiPromptVersionTypeEnum.Chat}>CHAT</option>
-                        </select>
+                            <SelectContent>
+                                <SelectItem value={AiPromptVersionTypeEnum.Text}>TEXT</SelectItem>
+
+                                <SelectItem value={AiPromptVersionTypeEnum.Chat}>CHAT</SelectItem>
+                            </SelectContent>
+                        </Select>
                     </fieldset>
 
                     <fieldset className="border-0">
-                        <label className="mb-1 block text-sm font-medium">Environment</label>
+                        <Label className="mb-1 block" htmlFor="ai-prompt-version-environment">
+                            Environment
+                        </Label>
 
-                        <select
-                            className="w-full rounded-md border px-3 py-2 text-sm"
-                            onChange={(event) => setEnvironment(event.target.value)}
-                            value={environment}
-                        >
-                            {ENVIRONMENTS.map((env) => (
-                                <option key={env} value={env}>
-                                    {env.charAt(0).toUpperCase() + env.slice(1)}
-                                </option>
-                            ))}
-                        </select>
+                        <Select onValueChange={setEnvironment} value={environment}>
+                            <SelectTrigger id="ai-prompt-version-environment">
+                                <SelectValue />
+                            </SelectTrigger>
+
+                            <SelectContent>
+                                {ENVIRONMENTS.map((env) => (
+                                    <SelectItem key={env} value={env}>
+                                        {env.charAt(0).toUpperCase() + env.slice(1)}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </fieldset>
 
                     <fieldset className="border-0">
-                        <label className="mb-1 block text-sm font-medium">Commit Message</label>
+                        <Label className="mb-1 block" htmlFor="ai-prompt-version-commit-message">
+                            Commit Message
+                        </Label>
 
-                        <input
-                            className="w-full rounded-md border px-3 py-2 text-sm"
+                        <Input
+                            id="ai-prompt-version-commit-message"
                             onChange={(event) => setCommitMessage(event.target.value)}
                             placeholder="Describe what changed in this version..."
                             value={commitMessage}
@@ -139,18 +160,19 @@ const AiPromptVersionDialog = ({onClose, promptId}: AiPromptVersionDialogProps) 
                     </fieldset>
 
                     <fieldset className="border-0">
-                        <label className="flex items-center gap-2 text-sm font-medium">
-                            <input
+                        <div className="flex items-center gap-2">
+                            <Checkbox
                                 checked={active}
-                                onChange={(event) => setActive(event.target.checked)}
-                                type="checkbox"
+                                id="ai-prompt-version-active"
+                                onCheckedChange={(checked) => setActive(checked === true)}
                             />
-                            Set as active for this environment
-                        </label>
+
+                            <Label htmlFor="ai-prompt-version-active">Set as active for this environment</Label>
+                        </div>
                     </fieldset>
                 </div>
 
-                <div className="mt-6 flex justify-end gap-2">
+                <DialogFooter>
                     <Button label="Cancel" onClick={onClose} variant="outline" />
 
                     <Button
@@ -158,9 +180,9 @@ const AiPromptVersionDialog = ({onClose, promptId}: AiPromptVersionDialogProps) 
                         label="Create Version"
                         onClick={handleSubmit}
                     />
-                </div>
-            </div>
-        </div>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     );
 };
 

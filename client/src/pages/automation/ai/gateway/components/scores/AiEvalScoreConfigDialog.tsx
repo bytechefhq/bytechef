@@ -1,3 +1,19 @@
+import Button from '@/components/Button/Button';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle} from '@/components/ui/dialog';
+import {Input} from '@/components/ui/input';
+import {Label} from '@/components/ui/label';
+import {Textarea} from '@/components/ui/textarea';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {
     AiEvalScoreDataType,
@@ -21,6 +37,7 @@ const AiEvalScoreConfigDialog = ({editingConfig, onClose}: AiEvalScoreConfigDial
 
     const [categories, setCategories] = useState(editingConfig?.categories || '');
     const [dataType, setDataType] = useState(editingConfig?.dataType || 'NUMERIC');
+    const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
     const [description, setDescription] = useState(editingConfig?.description || '');
     const [maxValue, setMaxValue] = useState(editingConfig?.maxValue?.toString() || '1');
     const [minValue, setMinValue] = useState(editingConfig?.minValue?.toString() || '0');
@@ -72,141 +89,165 @@ const AiEvalScoreConfigDialog = ({editingConfig, onClose}: AiEvalScoreConfigDial
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-            <div className="w-full max-w-md rounded-lg bg-background p-6 shadow-lg">
-                <h3 className="mb-4 text-lg font-semibold">
-                    {editingConfig ? 'Edit Score Config' : 'New Score Config'}
-                </h3>
+        <>
+            <Dialog
+                onOpenChange={(open) => {
+                    if (!open) {
+                        onClose();
+                    }
+                }}
+                open
+            >
+                <DialogContent aria-describedby={undefined} className="max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>{editingConfig ? 'Edit Score Config' : 'New Score Config'}</DialogTitle>
+                    </DialogHeader>
 
-                <fieldset className="space-y-4 border-0">
-                    <div>
-                        <label className="mb-1 block text-sm font-medium" htmlFor="scoreConfigName">
-                            Name
-                        </label>
-
-                        <input
-                            className="w-full rounded-md border px-3 py-2 text-sm"
-                            id="scoreConfigName"
-                            onChange={(event) => setName(event.target.value)}
-                            placeholder="e.g., relevance, helpfulness, safety"
-                            value={name}
-                        />
-                    </div>
-
-                    <div>
-                        <label className="mb-1 block text-sm font-medium" htmlFor="scoreConfigDataType">
-                            Data Type
-                        </label>
-
-                        <select
-                            className="w-full rounded-md border px-3 py-2 text-sm"
-                            id="scoreConfigDataType"
-                            onChange={(event) => setDataType(event.target.value)}
-                            value={dataType}
-                        >
-                            <option value="NUMERIC">Numeric</option>
-
-                            <option value="BOOLEAN">Boolean</option>
-
-                            <option value="CATEGORICAL">Categorical</option>
-                        </select>
-                    </div>
-
-                    {dataType === 'NUMERIC' && (
-                        <div className="flex gap-4">
-                            <div className="flex-1">
-                                <label className="mb-1 block text-sm font-medium" htmlFor="scoreConfigMinValue">
-                                    Min Value
-                                </label>
-
-                                <input
-                                    className="w-full rounded-md border px-3 py-2 text-sm"
-                                    id="scoreConfigMinValue"
-                                    onChange={(event) => setMinValue(event.target.value)}
-                                    type="number"
-                                    value={minValue}
-                                />
-                            </div>
-
-                            <div className="flex-1">
-                                <label className="mb-1 block text-sm font-medium" htmlFor="scoreConfigMaxValue">
-                                    Max Value
-                                </label>
-
-                                <input
-                                    className="w-full rounded-md border px-3 py-2 text-sm"
-                                    id="scoreConfigMaxValue"
-                                    onChange={(event) => setMaxValue(event.target.value)}
-                                    type="number"
-                                    value={maxValue}
-                                />
-                            </div>
-                        </div>
-                    )}
-
-                    {dataType === 'CATEGORICAL' && (
+                    <fieldset className="space-y-4 border-0">
                         <div>
-                            <label className="mb-1 block text-sm font-medium" htmlFor="scoreConfigCategories">
-                                Categories (JSON array)
-                            </label>
+                            <Label className="mb-1 block" htmlFor="scoreConfigName">
+                                Name
+                            </Label>
 
-                            <input
-                                className="w-full rounded-md border px-3 py-2 text-sm"
-                                id="scoreConfigCategories"
-                                onChange={(event) => setCategories(event.target.value)}
-                                placeholder='["good", "bad", "neutral"]'
-                                value={categories}
+                            <Input
+                                id="scoreConfigName"
+                                onChange={(event) => setName(event.target.value)}
+                                placeholder="e.g., relevance, helpfulness, safety"
+                                value={name}
                             />
                         </div>
-                    )}
 
-                    <div>
-                        <label className="mb-1 block text-sm font-medium" htmlFor="scoreConfigDescription">
-                            Description
-                        </label>
+                        <div>
+                            <Label className="mb-1 block" htmlFor="scoreConfigDataType">
+                                Data Type
+                            </Label>
 
-                        <textarea
-                            className="w-full rounded-md border px-3 py-2 text-sm"
-                            id="scoreConfigDescription"
-                            onChange={(event) => setDescription(event.target.value)}
-                            placeholder="What does this score measure?"
-                            rows={2}
-                            value={description}
-                        />
-                    </div>
-                </fieldset>
+                            <Select onValueChange={setDataType} value={dataType}>
+                                <SelectTrigger id="scoreConfigDataType">
+                                    <SelectValue />
+                                </SelectTrigger>
 
-                <div className="mt-6 flex justify-between">
-                    <div>
-                        {editingConfig && (
-                            <button
-                                className="rounded-md px-3 py-1.5 text-sm text-red-600 hover:bg-red-50"
+                                <SelectContent>
+                                    <SelectItem value="NUMERIC">Numeric</SelectItem>
+
+                                    <SelectItem value="BOOLEAN">Boolean</SelectItem>
+
+                                    <SelectItem value="CATEGORICAL">Categorical</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        {dataType === 'NUMERIC' && (
+                            <div className="flex gap-4">
+                                <div className="flex-1">
+                                    <Label className="mb-1 block" htmlFor="scoreConfigMinValue">
+                                        Min Value
+                                    </Label>
+
+                                    <Input
+                                        id="scoreConfigMinValue"
+                                        onChange={(event) => setMinValue(event.target.value)}
+                                        type="number"
+                                        value={minValue}
+                                    />
+                                </div>
+
+                                <div className="flex-1">
+                                    <Label className="mb-1 block" htmlFor="scoreConfigMaxValue">
+                                        Max Value
+                                    </Label>
+
+                                    <Input
+                                        id="scoreConfigMaxValue"
+                                        onChange={(event) => setMaxValue(event.target.value)}
+                                        type="number"
+                                        value={maxValue}
+                                    />
+                                </div>
+                            </div>
+                        )}
+
+                        {dataType === 'CATEGORICAL' && (
+                            <div>
+                                <Label className="mb-1 block" htmlFor="scoreConfigCategories">
+                                    Categories (JSON array)
+                                </Label>
+
+                                <Input
+                                    id="scoreConfigCategories"
+                                    onChange={(event) => setCategories(event.target.value)}
+                                    placeholder='["good", "bad", "neutral"]'
+                                    value={categories}
+                                />
+                            </div>
+                        )}
+
+                        <div>
+                            <Label className="mb-1 block" htmlFor="scoreConfigDescription">
+                                Description
+                            </Label>
+
+                            <Textarea
+                                id="scoreConfigDescription"
+                                onChange={(event) => setDescription(event.target.value)}
+                                placeholder="What does this score measure?"
+                                rows={2}
+                                value={description}
+                            />
+                        </div>
+                    </fieldset>
+
+                    <DialogFooter className="sm:justify-between">
+                        <div>
+                            {editingConfig && (
+                                <Button
+                                    disabled={deleteMutation.isPending}
+                                    label="Delete"
+                                    onClick={() => setDeleteConfirmationOpen(true)}
+                                    variant="destructiveGhost"
+                                />
+                            )}
+                        </div>
+
+                        <div className="flex gap-2">
+                            <Button label="Cancel" onClick={onClose} variant="outline" />
+
+                            <Button
+                                disabled={!name || createMutation.isPending || updateMutation.isPending}
+                                label={editingConfig ? 'Update' : 'Create'}
+                                onClick={handleSubmit}
+                            />
+                        </div>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {editingConfig && (
+                <AlertDialog open={deleteConfirmationOpen}>
+                    <AlertDialogContent onEscapeKeyDown={() => setDeleteConfirmationOpen(false)}>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>{`Delete ${editingConfig.name} score config?`}</AlertDialogTitle>
+
+                            <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
+                        </AlertDialogHeader>
+
+                        <AlertDialogFooter>
+                            <AlertDialogCancel onClick={() => setDeleteConfirmationOpen(false)}>
+                                Cancel
+                            </AlertDialogCancel>
+
+                            <AlertDialogAction
+                                className="bg-surface-destructive-primary hover:bg-surface-destructive-primary-hover"
+                                disabled={deleteMutation.isPending}
                                 onClick={() => deleteMutation.mutate({id: editingConfig.id})}
                             >
                                 Delete
-                            </button>
-                        )}
-                    </div>
-
-                    <div className="flex gap-2">
-                        <button
-                            className="rounded-md px-3 py-1.5 text-sm text-muted-foreground hover:bg-muted"
-                            onClick={onClose}
-                        >
-                            Cancel
-                        </button>
-
-                        <button
-                            className="rounded-md bg-primary px-3 py-1.5 text-sm text-primary-foreground hover:bg-primary/90"
-                            disabled={!name}
-                            onClick={handleSubmit}
-                        >
-                            {editingConfig ? 'Update' : 'Create'}
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
+            )}
+        </>
     );
 };
 

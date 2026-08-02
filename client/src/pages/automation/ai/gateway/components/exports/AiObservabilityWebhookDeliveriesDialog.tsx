@@ -1,5 +1,5 @@
+import {Dialog, DialogContent, DialogHeader, DialogTitle} from '@/components/ui/dialog';
 import {useAiObservabilityWebhookDeliveriesQuery} from '@/shared/middleware/graphql';
-import {XIcon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';
 
 interface AiObservabilityWebhookDeliveriesDialogPropsI {
@@ -25,15 +25,18 @@ const AiObservabilityWebhookDeliveriesDialog = ({
     const deliveries = data?.aiObservabilityWebhookDeliveries ?? [];
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-            <div className="w-full max-w-4xl rounded-lg bg-background p-6 shadow-lg">
-                <div className="mb-4 flex items-center justify-between">
-                    <h3 className="text-lg font-medium">Deliveries for {subscriptionName}</h3>
-
-                    <button onClick={onClose}>
-                        <XIcon className="size-4" />
-                    </button>
-                </div>
+        <Dialog
+            onOpenChange={(open) => {
+                if (!open) {
+                    onClose();
+                }
+            }}
+            open
+        >
+            <DialogContent aria-describedby={undefined} className="sm:max-w-4xl" showCloseButton>
+                <DialogHeader>
+                    <DialogTitle>Deliveries for {subscriptionName}</DialogTitle>
+                </DialogHeader>
 
                 {isLoading ? (
                     <div className="py-6 text-center text-sm text-muted-foreground">Loading...</div>
@@ -95,8 +98,8 @@ const AiObservabilityWebhookDeliveriesDialog = ({
                         </table>
                     </div>
                 )}
-            </div>
-        </div>
+            </DialogContent>
+        </Dialog>
     );
 };
 

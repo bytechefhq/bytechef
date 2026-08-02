@@ -1,4 +1,8 @@
 import Button from '@/components/Button/Button';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
+import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle} from '@/components/ui/dialog';
+import {Input} from '@/components/ui/input';
+import {Label} from '@/components/ui/label';
 import {
     AiGatewayProviderType as AiGatewayProviderTypeEnum,
     useCreateWorkspaceAiGatewayProviderMutation,
@@ -6,7 +10,6 @@ import {
     useUpdateWorkspaceAiGatewayProviderMutation,
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {XIcon} from 'lucide-react';
 import {useCallback, useState} from 'react';
 import {toast} from 'sonner';
 
@@ -106,22 +109,27 @@ const AiGatewayProviderDialog = ({onClose, provider, workspaceId}: AiGatewayProv
     }, [apiKey, baseUrl, createMutation, isEditMode, name, provider, type, updateMutation, workspaceId]);
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-            <div className="w-full max-w-md rounded-lg bg-background p-6 shadow-lg">
-                <div className="mb-4 flex items-center justify-between">
-                    <h3 className="text-lg font-medium">{isEditMode ? 'Edit Provider' : 'Add Provider'}</h3>
-
-                    <button onClick={onClose}>
-                        <XIcon className="size-4" />
-                    </button>
-                </div>
+        <Dialog
+            onOpenChange={(open) => {
+                if (!open) {
+                    onClose();
+                }
+            }}
+            open
+        >
+            <DialogContent aria-describedby={undefined} className="max-w-md">
+                <DialogHeader>
+                    <DialogTitle>{isEditMode ? 'Edit Provider' : 'Add Provider'}</DialogTitle>
+                </DialogHeader>
 
                 <div className="space-y-4">
                     <fieldset className="border-0">
-                        <label className="mb-1 block text-sm font-medium">Name</label>
+                        <Label className="mb-1 block" htmlFor="ai-gateway-provider-name">
+                            Name
+                        </Label>
 
-                        <input
-                            className="w-full rounded-md border px-3 py-2 text-sm"
+                        <Input
+                            id="ai-gateway-provider-name"
                             onChange={(event) => setName(event.target.value)}
                             placeholder="My OpenAI Provider"
                             value={name}
@@ -129,26 +137,32 @@ const AiGatewayProviderDialog = ({onClose, provider, workspaceId}: AiGatewayProv
                     </fieldset>
 
                     <fieldset className="border-0">
-                        <label className="mb-1 block text-sm font-medium">Type</label>
+                        <Label className="mb-1 block" htmlFor="ai-gateway-provider-type">
+                            Type
+                        </Label>
 
-                        <select
-                            className="w-full rounded-md border px-3 py-2 text-sm"
-                            onChange={(event) => setType(event.target.value as AiGatewayProviderTypeEnum)}
-                            value={type}
-                        >
-                            {PROVIDER_TYPES.map((providerType) => (
-                                <option key={providerType} value={providerType}>
-                                    {providerType}
-                                </option>
-                            ))}
-                        </select>
+                        <Select onValueChange={(value) => setType(value as AiGatewayProviderTypeEnum)} value={type}>
+                            <SelectTrigger id="ai-gateway-provider-type">
+                                <SelectValue />
+                            </SelectTrigger>
+
+                            <SelectContent>
+                                {PROVIDER_TYPES.map((providerType) => (
+                                    <SelectItem key={providerType} value={providerType}>
+                                        {providerType}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </fieldset>
 
                     <fieldset className="border-0">
-                        <label className="mb-1 block text-sm font-medium">API Key</label>
+                        <Label className="mb-1 block" htmlFor="ai-gateway-provider-api-key">
+                            API Key
+                        </Label>
 
-                        <input
-                            className="w-full rounded-md border px-3 py-2 text-sm"
+                        <Input
+                            id="ai-gateway-provider-api-key"
                             onChange={(event) => setApiKey(event.target.value)}
                             placeholder={isEditMode ? 'Leave empty to keep current' : 'sk-...'}
                             type="password"
@@ -157,10 +171,12 @@ const AiGatewayProviderDialog = ({onClose, provider, workspaceId}: AiGatewayProv
                     </fieldset>
 
                     <fieldset className="border-0">
-                        <label className="mb-1 block text-sm font-medium">Base URL (optional)</label>
+                        <Label className="mb-1 block" htmlFor="ai-gateway-provider-base-url">
+                            Base URL (optional)
+                        </Label>
 
-                        <input
-                            className="w-full rounded-md border px-3 py-2 text-sm"
+                        <Input
+                            id="ai-gateway-provider-base-url"
                             onChange={(event) => setBaseUrl(event.target.value)}
                             placeholder="https://api.openai.com"
                             value={baseUrl}
@@ -168,7 +184,7 @@ const AiGatewayProviderDialog = ({onClose, provider, workspaceId}: AiGatewayProv
                     </fieldset>
                 </div>
 
-                <div className="mt-6 flex justify-end gap-2">
+                <DialogFooter>
                     {isEditMode && (
                         <Button
                             disabled={testConnectionMutation.isPending}
@@ -187,9 +203,9 @@ const AiGatewayProviderDialog = ({onClose, provider, workspaceId}: AiGatewayProv
                         label={isEditMode ? 'Save' : 'Create'}
                         onClick={handleSubmit}
                     />
-                </div>
-            </div>
-        </div>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     );
 };
 

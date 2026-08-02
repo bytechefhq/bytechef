@@ -1,4 +1,8 @@
 import Button from '@/components/Button/Button';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
+import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle} from '@/components/ui/dialog';
+import {Input} from '@/components/ui/input';
+import {Label} from '@/components/ui/label';
 import {
     useCreateWorkspaceAiGatewayModelMutation,
     useUpdateWorkspaceAiGatewayModelMutation,
@@ -6,7 +10,6 @@ import {
     useWorkspaceAiGatewayRoutingPoliciesQuery,
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {XIcon} from 'lucide-react';
 import {useCallback, useState} from 'react';
 
 import {AiGatewayModelType} from '../../types';
@@ -16,6 +19,13 @@ interface AiGatewayModelDialogProps {
     onClose: () => void;
     workspaceId: string;
 }
+
+/**
+ * Sentinel value for the "Inherit from workspace/system default" row. Radix's `SelectItem` rejects an
+ * empty string as a value, and a `SelectValue` placeholder is not a selectable row — so a model that
+ * already has a routing policy could not otherwise be put back on the inherited default.
+ */
+const INHERIT_ROUTING_POLICY_VALUE = '__INHERIT__';
 
 const AiGatewayModelDialog = ({model, onClose, workspaceId}: AiGatewayModelDialogProps) => {
     const [alias, setAlias] = useState(model?.alias ?? '');
@@ -53,7 +63,15 @@ const AiGatewayModelDialog = ({model, onClose, workspaceId}: AiGatewayModelDialo
         },
     });
 
+    const handleDefaultRoutingPolicyChange = useCallback((value: string) => {
+        setDefaultRoutingPolicyId(value === INHERIT_ROUTING_POLICY_VALUE ? '' : value);
+    }, []);
+
     const handleSubmit = useCallback(() => {
+        // Null, not undefined: an omitted field leaves the stored routing policy in place, so
+        // "Inherit from workspace/system default" has to be sent explicitly to clear it.
+        const defaultRoutingPolicyIdInput = defaultRoutingPolicyId || null;
+
         if (isEditMode) {
             updateMutation.mutate({
                 id: model.id,
@@ -61,7 +79,7 @@ const AiGatewayModelDialog = ({model, onClose, workspaceId}: AiGatewayModelDialo
                     alias: alias || undefined,
                     capabilities: capabilities || undefined,
                     contextWindow: contextWindow ? parseInt(contextWindow, 10) : undefined,
-                    defaultRoutingPolicyId: defaultRoutingPolicyId || undefined,
+                    defaultRoutingPolicyId: defaultRoutingPolicyIdInput,
                     inputCostPerMTokens: inputCostPerMTokens ? parseFloat(inputCostPerMTokens) : undefined,
                     name,
                     outputCostPerMTokens: outputCostPerMTokens ? parseFloat(outputCostPerMTokens) : undefined,
@@ -73,7 +91,7 @@ const AiGatewayModelDialog = ({model, onClose, workspaceId}: AiGatewayModelDialo
                     alias: alias || undefined,
                     capabilities: capabilities || undefined,
                     contextWindow: contextWindow ? parseInt(contextWindow, 10) : undefined,
-                    defaultRoutingPolicyId: defaultRoutingPolicyId || undefined,
+                    defaultRoutingPolicyId: defaultRoutingPolicyIdInput,
                     inputCostPerMTokens: inputCostPerMTokens ? parseFloat(inputCostPerMTokens) : undefined,
                     name,
                     outputCostPerMTokens: outputCostPerMTokens ? parseFloat(outputCostPerMTokens) : undefined,
@@ -99,41 +117,47 @@ const AiGatewayModelDialog = ({model, onClose, workspaceId}: AiGatewayModelDialo
     ]);
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-            <div className="w-full max-w-md rounded-lg bg-background p-6 shadow-lg">
-                <div className="mb-4 flex items-center justify-between">
-                    <h3 className="text-lg font-medium">{isEditMode ? 'Edit Model' : 'Add Model'}</h3>
-
-                    <button onClick={onClose}>
-                        <XIcon className="size-4" />
-                    </button>
-                </div>
+        <Dialog
+            onOpenChange={(open) => {
+                if (!open) {
+                    onClose();
+                }
+            }}
+            open
+        >
+            <DialogContent aria-describedby={undefined} className="max-w-md">
+                <DialogHeader>
+                    <DialogTitle>{isEditMode ? 'Edit Model' : 'Add Model'}</DialogTitle>
+                </DialogHeader>
 
                 <div className="space-y-4">
                     <fieldset className="border-0">
-                        <label className="mb-1 block text-sm font-medium">Provider</label>
+                        <Label className="mb-1 block" htmlFor="aiGatewayModelProvider">
+                            Provider
+                        </Label>
 
-                        <select
-                            className="w-full rounded-md border px-3 py-2 text-sm"
-                            disabled={isEditMode}
-                            onChange={(event) => setProviderId(event.target.value)}
-                            value={providerId}
-                        >
-                            <option value="">Select a provider</option>
+                        <Select disabled={isEditMode} onValueChange={setProviderId} value={providerId}>
+                            <SelectTrigger id="aiGatewayModelProvider">
+                                <SelectValue placeholder="Select a provider" />
+                            </SelectTrigger>
 
-                            {providers.filter(Boolean).map((provider) => (
-                                <option key={provider!.id} value={provider!.id}>
-                                    {provider!.name}
-                                </option>
-                            ))}
-                        </select>
+                            <SelectContent>
+                                {providers.filter(Boolean).map((provider) => (
+                                    <SelectItem key={provider!.id} value={provider!.id}>
+                                        {provider!.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </fieldset>
 
                     <fieldset className="border-0">
-                        <label className="mb-1 block text-sm font-medium">Name</label>
+                        <Label className="mb-1 block" htmlFor="aiGatewayModelName">
+                            Name
+                        </Label>
 
-                        <input
-                            className="w-full rounded-md border px-3 py-2 text-sm"
+                        <Input
+                            id="aiGatewayModelName"
                             onChange={(event) => setName(event.target.value)}
                             placeholder="gpt-4o"
                             value={name}
@@ -141,10 +165,12 @@ const AiGatewayModelDialog = ({model, onClose, workspaceId}: AiGatewayModelDialo
                     </fieldset>
 
                     <fieldset className="border-0">
-                        <label className="mb-1 block text-sm font-medium">Alias (optional)</label>
+                        <Label className="mb-1 block" htmlFor="aiGatewayModelAlias">
+                            Alias (optional)
+                        </Label>
 
-                        <input
-                            className="w-full rounded-md border px-3 py-2 text-sm"
+                        <Input
+                            id="aiGatewayModelAlias"
                             onChange={(event) => setAlias(event.target.value)}
                             placeholder="my-gpt4"
                             value={alias}
@@ -152,10 +178,12 @@ const AiGatewayModelDialog = ({model, onClose, workspaceId}: AiGatewayModelDialo
                     </fieldset>
 
                     <fieldset className="border-0">
-                        <label className="mb-1 block text-sm font-medium">Context Window (optional)</label>
+                        <Label className="mb-1 block" htmlFor="aiGatewayModelContextWindow">
+                            Context Window (optional)
+                        </Label>
 
-                        <input
-                            className="w-full rounded-md border px-3 py-2 text-sm"
+                        <Input
+                            id="aiGatewayModelContextWindow"
                             onChange={(event) => setContextWindow(event.target.value)}
                             placeholder="128000"
                             type="number"
@@ -164,10 +192,12 @@ const AiGatewayModelDialog = ({model, onClose, workspaceId}: AiGatewayModelDialo
                     </fieldset>
 
                     <fieldset className="border-0">
-                        <label className="mb-1 block text-sm font-medium">Input Cost per 1M Tokens (optional)</label>
+                        <Label className="mb-1 block" htmlFor="aiGatewayModelInputCostPerMTokens">
+                            Input Cost per 1M Tokens (optional)
+                        </Label>
 
-                        <input
-                            className="w-full rounded-md border px-3 py-2 text-sm"
+                        <Input
+                            id="aiGatewayModelInputCostPerMTokens"
                             onChange={(event) => setInputCostPerMTokens(event.target.value)}
                             placeholder="2.50"
                             step="0.01"
@@ -177,10 +207,12 @@ const AiGatewayModelDialog = ({model, onClose, workspaceId}: AiGatewayModelDialo
                     </fieldset>
 
                     <fieldset className="border-0">
-                        <label className="mb-1 block text-sm font-medium">Output Cost per 1M Tokens (optional)</label>
+                        <Label className="mb-1 block" htmlFor="aiGatewayModelOutputCostPerMTokens">
+                            Output Cost per 1M Tokens (optional)
+                        </Label>
 
-                        <input
-                            className="w-full rounded-md border px-3 py-2 text-sm"
+                        <Input
+                            id="aiGatewayModelOutputCostPerMTokens"
                             onChange={(event) => setOutputCostPerMTokens(event.target.value)}
                             placeholder="10.00"
                             step="0.01"
@@ -190,10 +222,12 @@ const AiGatewayModelDialog = ({model, onClose, workspaceId}: AiGatewayModelDialo
                     </fieldset>
 
                     <fieldset className="border-0">
-                        <label className="mb-1 block text-sm font-medium">Capabilities (optional)</label>
+                        <Label className="mb-1 block" htmlFor="aiGatewayModelCapabilities">
+                            Capabilities (optional)
+                        </Label>
 
-                        <input
-                            className="w-full rounded-md border px-3 py-2 text-sm"
+                        <Input
+                            id="aiGatewayModelCapabilities"
                             onChange={(event) => setCapabilities(event.target.value)}
                             placeholder="CHAT,EMBEDDINGS"
                             value={capabilities}
@@ -201,25 +235,34 @@ const AiGatewayModelDialog = ({model, onClose, workspaceId}: AiGatewayModelDialo
                     </fieldset>
 
                     <fieldset className="border-0">
-                        <label className="mb-1 block text-sm font-medium">Default Routing Policy (optional)</label>
+                        <Label className="mb-1 block" htmlFor="aiGatewayModelDefaultRoutingPolicy">
+                            Default Routing Policy (optional)
+                        </Label>
 
-                        <select
-                            className="w-full rounded-md border px-3 py-2 text-sm"
-                            onChange={(event) => setDefaultRoutingPolicyId(event.target.value)}
-                            value={String(defaultRoutingPolicyId ?? '')}
+                        <Select
+                            onValueChange={handleDefaultRoutingPolicyChange}
+                            value={defaultRoutingPolicyId || INHERIT_ROUTING_POLICY_VALUE}
                         >
-                            <option value="">Inherit from workspace/system default</option>
+                            <SelectTrigger id="aiGatewayModelDefaultRoutingPolicy">
+                                <SelectValue placeholder="Inherit from workspace/system default" />
+                            </SelectTrigger>
 
-                            {policies.filter(Boolean).map((policy) => (
-                                <option key={policy!.id} value={policy!.id}>
-                                    {policy!.name}
-                                </option>
-                            ))}
-                        </select>
+                            <SelectContent>
+                                <SelectItem value={INHERIT_ROUTING_POLICY_VALUE}>
+                                    Inherit from workspace/system default
+                                </SelectItem>
+
+                                {policies.filter(Boolean).map((policy) => (
+                                    <SelectItem key={policy!.id} value={policy!.id}>
+                                        {policy!.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </fieldset>
                 </div>
 
-                <div className="mt-6 flex justify-end gap-2">
+                <DialogFooter>
                     <Button label="Cancel" onClick={onClose} variant="outline" />
 
                     <Button
@@ -232,9 +275,9 @@ const AiGatewayModelDialog = ({model, onClose, workspaceId}: AiGatewayModelDialo
                         label={isEditMode ? 'Save' : 'Create'}
                         onClick={handleSubmit}
                     />
-                </div>
-            </div>
-        </div>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     );
 };
 
