@@ -23,19 +23,21 @@ public interface WorkspaceAiGatewayModelFacade {
     /**
      * Creates a new AI LLM Gateway model and verifies the provider belongs to the specified workspace.
      *
-     * @param workspaceId          the workspace ID to verify provider ownership
-     * @param providerId           the provider ID for the model
-     * @param name                 the name of the model
-     * @param alias                the alias for the model
-     * @param contextWindow        the context window size
-     * @param inputCostPerMTokens  the input cost per million tokens
-     * @param outputCostPerMTokens the output cost per million tokens
-     * @param capabilities         the model capabilities
+     * @param workspaceId            the workspace ID to verify provider ownership
+     * @param providerId             the provider ID for the model
+     * @param name                   the name of the model
+     * @param alias                  the alias for the model
+     * @param contextWindow          the context window size
+     * @param inputCostPerMTokens    the input cost per million tokens
+     * @param outputCostPerMTokens   the output cost per million tokens
+     * @param capabilities           the model capabilities
+     * @param defaultRoutingPolicyId the ID of the default routing policy, or {@code null} to inherit the
+     *                               workspace/system default
      * @return the created model
      */
     AiGatewayModel createWorkspaceModel(
         Long workspaceId, Long providerId, String name, String alias, Integer contextWindow,
-        Double inputCostPerMTokens, Double outputCostPerMTokens, String capabilities);
+        Double inputCostPerMTokens, Double outputCostPerMTokens, String capabilities, Long defaultRoutingPolicyId);
 
     /**
      * Deletes an AI LLM Gateway model after verifying workspace ownership through the provider relationship.

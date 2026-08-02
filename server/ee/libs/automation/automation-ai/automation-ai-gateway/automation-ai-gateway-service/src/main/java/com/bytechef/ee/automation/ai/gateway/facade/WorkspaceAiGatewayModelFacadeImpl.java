@@ -51,7 +51,8 @@ class WorkspaceAiGatewayModelFacadeImpl implements WorkspaceAiGatewayModelFacade
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.USER + "\")")
     public AiGatewayModel createWorkspaceModel(
         Long workspaceId, Long providerId, String name, String alias, Integer contextWindow,
-        Double inputCostPerMTokens, Double outputCostPerMTokens, String capabilities) {
+        Double inputCostPerMTokens, Double outputCostPerMTokens, String capabilities,
+        Long defaultRoutingPolicyId) {
 
         workspaceAiGatewayProviderService.getWorkspaceProviders(workspaceId)
             .stream()
@@ -75,6 +76,9 @@ class WorkspaceAiGatewayModelFacadeImpl implements WorkspaceAiGatewayModelFacade
         }
 
         model.setCapabilities(capabilities);
+
+        // Null is a valid value meaning "inherit from workspace/system default", same as the update path.
+        model.setDefaultRoutingPolicyId(defaultRoutingPolicyId);
 
         return aiGatewayModelService.create(model);
     }

@@ -9,6 +9,7 @@ package com.bytechef.ee.automation.ai.gateway.facade;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -61,7 +62,7 @@ class WorkspaceAiGatewayModelFacadeTest {
         when(aiGatewayModelService.create(any())).thenReturn(createdModel);
 
         AiGatewayModel result = workspaceModelFacade.createWorkspaceModel(
-            1L, 5L, "gpt-4", null, 128000, null, null, null);
+            1L, 5L, "gpt-4", null, 128000, null, null, null, null);
 
         assertNotNull(result);
         assertEquals("gpt-4", result.getName());
@@ -79,12 +80,46 @@ class WorkspaceAiGatewayModelFacadeTest {
         IllegalArgumentException exception = assertThrows(
             IllegalArgumentException.class,
             () -> workspaceModelFacade.createWorkspaceModel(
-                1L, 999L, "gpt-4", null, null, null, null, null));
+                1L, 999L, "gpt-4", null, null, null, null, null, null));
 
         assertTrue(exception.getMessage()
             .contains("does not belong to workspace"));
 
         verify(aiGatewayModelService, never()).create(any());
+    }
+
+    @Test
+    void testCreateWorkspaceModelRetainsRoutingPolicyWhenProvided() {
+        AiGatewayProvider workspaceProvider = workspaceProvider();
+
+        when(workspaceAiGatewayProviderService.getWorkspaceProviders(1L))
+            .thenReturn(List.of(workspaceProvider));
+        when(aiGatewayModelService.create(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        AiGatewayModel result = workspaceModelFacade.createWorkspaceModel(
+            1L, 5L, "gpt-4", null, 128000, null, null, null, 42L);
+
+        assertNotNull(result);
+        assertEquals(42L, result.getDefaultRoutingPolicyId());
+
+        verify(aiGatewayModelService).create(any());
+    }
+
+    @Test
+    void testCreateWorkspaceModelAcceptsNullRoutingPolicy() {
+        AiGatewayProvider workspaceProvider = workspaceProvider();
+
+        when(workspaceAiGatewayProviderService.getWorkspaceProviders(1L))
+            .thenReturn(List.of(workspaceProvider));
+        when(aiGatewayModelService.create(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        AiGatewayModel result = workspaceModelFacade.createWorkspaceModel(
+            1L, 5L, "gpt-4", null, 128000, null, null, null, null);
+
+        assertNotNull(result);
+        assertNull(result.getDefaultRoutingPolicyId());
+
+        verify(aiGatewayModelService).create(any());
     }
 
     @Test

@@ -62,7 +62,8 @@ class WorkspaceAiGatewayModelGraphQlController {
             input.contextWindow(),
             input.inputCostPerMTokens(),
             input.outputCostPerMTokens(),
-            input.capabilities());
+            input.capabilities(),
+            input.defaultRoutingPolicyId());
     }
 
     @MutationMapping
@@ -90,8 +91,8 @@ class WorkspaceAiGatewayModelGraphQlController {
 
     @SuppressFBWarnings("EI")
     public record CreateWorkspaceAiGatewayModelInput(
-        String alias, String capabilities, Integer contextWindow, Double inputCostPerMTokens, String name,
-        Double outputCostPerMTokens, Long providerId, Long workspaceId) {
+        String alias, String capabilities, Integer contextWindow, Long defaultRoutingPolicyId,
+        Double inputCostPerMTokens, String name, Double outputCostPerMTokens, Long providerId, Long workspaceId) {
     }
 
     @SuppressFBWarnings("EI")
