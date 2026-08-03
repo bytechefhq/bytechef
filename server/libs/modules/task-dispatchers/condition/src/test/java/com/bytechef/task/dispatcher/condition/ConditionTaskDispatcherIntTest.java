@@ -191,6 +191,43 @@ public class ConditionTaskDispatcherIntTest {
         Assertions.assertNull(outputs.get("result"));
     }
 
+    /**
+     * Pins the {@code condition/v1} deferred-evaluation contract through the real atlas engine, the way
+     * {@code GraphTaskDispatcherIntTest#testDispatchBackJumpCycle} pins {@code graph/v1}'s. Without
+     * {@code ConditionTaskDispatcherConfiguration}'s static {@code DeferredEvaluationParameterKeys.register(...)} call
+     * for {@code caseTrue}/{@code caseFalse}, the condition task's own {@code TaskExecution#evaluate} would eagerly
+     * resolve {@code caseTrue}'s {@code "=redirectExpression"} formula BEFORE the branch is even selected, using
+     * whatever context exists at that point -- freezing it to {@code redirectExpression}'s raw value,
+     * {@code "${payload}"}. {@link com.bytechef.task.dispatcher.condition.ConditionTaskDispatcher#doDispatch} then
+     * evaluates the (already frozen) sub-task a second time before dispatching it: with deferred evaluation disabled,
+     * this second pass re-interprets the frozen {@code "${payload}"} string as a brand new accessor expression and
+     * resolves it to {@code payload}'s value -- a double-evaluation corruption that silently substitutes the wrong
+     * value. With deferred evaluation correctly registered, {@code caseTrue} is untouched by the first pass, so the
+     * dispatcher's own evaluate is the only one that ever runs, and {@code "=redirectExpression"} resolves exactly once
+     * to the raw, unreinterpreted string {@code "${payload}"}.
+     */
+    @Test
+    public void testDispatchDeferredEvaluationDoesNotDoubleEvaluateCaseTrue() {
+        TaskDispatcherJobExecution jobExecution = taskDispatcherJobTestExecutor.execute(
+            EncodingUtils.base64EncodeToString(
+                "condition_v1-deferredEvaluation".getBytes(StandardCharsets.UTF_8)),
+            Map.of("redirectExpression", "${payload}", "payload", "resolved-by-mistake"),
+            this::getTaskCompletionHandlerFactories,
+            this::getTaskDispatcherResolverFactories,
+            this::getTaskHandlerMap);
+
+        Assertions.assertEquals(
+            "${payload}", testVarTaskHandler.get("lastTask"),
+            "caseTrue's formula expression must resolve exactly once, to redirectExpression's raw value, "
+                + "not be re-interpreted as a second, accessor-style expression");
+
+        Job job = jobExecution.job();
+
+        Map<String, ?> outputs = taskFileStorage.readJobOutputs(job.getOutputs());
+
+        Assertions.assertEquals("${payload}", outputs.get("result"));
+    }
+
     @SuppressWarnings("PMD")
     private List<TaskCompletionHandlerFactory> getTaskCompletionHandlerFactories(
         ContextService contextService, CounterService counterService, TaskExecutionService taskExecutionService) {

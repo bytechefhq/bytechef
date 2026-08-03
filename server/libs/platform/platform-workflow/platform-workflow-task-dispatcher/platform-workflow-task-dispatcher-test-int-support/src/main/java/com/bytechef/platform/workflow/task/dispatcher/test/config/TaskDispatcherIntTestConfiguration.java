@@ -56,6 +56,16 @@ import tools.jackson.databind.ObjectMapper;
 @Import(JacksonConfiguration.class)
 public class TaskDispatcherIntTestConfiguration {
 
+    static {
+        // TaskDispatcherJobTestExecutor constructs every dispatcher/completion handler directly (see its
+        // TaskCompletionHandlerFactoriesFunction/TaskDispatcherResolverFactoriesFunction parameters), so a task
+        // dispatcher module's own *TaskDispatcherConfiguration class -- where
+        // DeferredEvaluationParameterKeys.register(...)
+        // lives -- is never loaded by this harness on its own. Force it here instead of duplicating each module's
+        // registration call in every *TaskDispatcherIntTest.
+        DeferredEvaluationParameterKeysLoader.loadAll();
+    }
+
     @Bean
     ClassPathResourceWorkflowRepository classPathResourceWorkflowRepository(
         ResourcePatternResolver resourcePatternResolver) {

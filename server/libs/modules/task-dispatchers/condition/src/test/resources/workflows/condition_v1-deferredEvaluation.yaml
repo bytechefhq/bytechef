@@ -1,0 +1,31 @@
+---
+label: "If Deferred Evaluation Guard"
+inputs:
+- name: "redirectExpression"
+  type: "string"
+  required: true
+- name: "payload"
+  type: "string"
+  required: true
+outputs:
+- name: "result"
+  value: "${condition_1}"
+tasks:
+- name: "condition_1"
+  type: "condition/v1"
+  parameters:
+    conditions:
+    - - type: "boolean"
+        value1: "true"
+        operation: "EQUALS"
+        value2: "true"
+    caseTrue:
+    - name: "lastTask"
+      type: "var/v1/set"
+      parameters:
+        value: "=redirectExpression"
+    caseFalse:
+    - name: "lastTask"
+      type: "var/v1/set"
+      parameters:
+        value: "unreached"
