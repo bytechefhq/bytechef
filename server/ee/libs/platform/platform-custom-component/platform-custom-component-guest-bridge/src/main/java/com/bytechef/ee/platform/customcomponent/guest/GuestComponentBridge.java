@@ -75,8 +75,8 @@ public final class GuestComponentBridge {
                 unsupported.add("connection");
             }
 
-            if (componentDefinition.getClusterElements()
-                .isPresent()) {
+            if (!componentDefinition.getClusterElements()
+                .isEmpty()) {
 
                 unsupported.add("clusterElements");
             }
@@ -89,8 +89,7 @@ public final class GuestComponentBridge {
 
             List<Map<String, Object>> actions = new ArrayList<>();
 
-            for (ActionDefinition actionDefinition : componentDefinition.getActions()
-                .orElse(List.of())) {
+            for (ActionDefinition actionDefinition : componentDefinition.getActions()) {
 
                 Map<String, Object> action = new LinkedHashMap<>();
 
@@ -102,8 +101,7 @@ public final class GuestComponentBridge {
                 action.put(
                     "properties",
                     toPropertyMaps(
-                        actionDefinition.getProperties()
-                            .orElse(List.of()),
+                        actionDefinition.getProperties(),
                         unsupported, "action " + actionDefinition.getName()));
 
                 actions.add(action);
@@ -113,8 +111,7 @@ public final class GuestComponentBridge {
 
             List<Map<String, Object>> triggers = new ArrayList<>();
 
-            for (TriggerDefinition triggerDefinition : componentDefinition.getTriggers()
-                .orElse(List.of())) {
+            for (TriggerDefinition triggerDefinition : componentDefinition.getTriggers()) {
 
                 Map<String, Object> trigger = new LinkedHashMap<>();
 
@@ -130,8 +127,7 @@ public final class GuestComponentBridge {
                 trigger.put(
                     "properties",
                     toPropertyMaps(
-                        triggerDefinition.getProperties()
-                            .orElse(List.of()),
+                        triggerDefinition.getProperties(),
                         unsupported, "trigger " + triggerDefinition.getName()));
 
                 triggers.add(trigger);
@@ -158,7 +154,6 @@ public final class GuestComponentBridge {
             ComponentDefinition componentDefinition = loadDefinition(implClassName);
 
             ActionDefinition actionDefinition = componentDefinition.getActions()
-                .orElse(List.of())
                 .stream()
                 .filter(action -> actionName.equals(action.getName()))
                 .findFirst()
@@ -295,18 +290,11 @@ public final class GuestComponentBridge {
         property.getDisplayCondition()
             .ifPresent(displayCondition -> propertyMap.put("displayCondition", displayCondition));
 
-        Boolean required = property.getRequired();
+        propertyMap.put("required", property.getRequired());
 
-        if (required != null) {
-            propertyMap.put("required", required);
-        }
-
-        property.getAdvancedOption()
-            .ifPresent(advancedOption -> propertyMap.put("advancedOption", advancedOption));
-        property.getHidden()
-            .ifPresent(hidden -> propertyMap.put("hidden", hidden));
-        property.getExpressionEnabled()
-            .ifPresent(expressionEnabled -> propertyMap.put("expressionEnabled", expressionEnabled));
+        propertyMap.put("advancedOption", property.getAdvancedOption());
+        propertyMap.put("hidden", property.getHidden());
+        propertyMap.put("expressionEnabled", property.getExpressionEnabled());
 
         if (property instanceof Property.ValueProperty<?> valueProperty) {
             valueProperty.getLabel()
@@ -326,8 +314,11 @@ public final class GuestComponentBridge {
         }
 
         if (property instanceof OptionsProperty<?> optionsProperty) {
-            optionsProperty.getOptions()
-                .ifPresent(options -> propertyMap.put("options", toOptionMaps(options)));
+            var options = optionsProperty.getOptions();
+
+            if (!options.isEmpty()) {
+                propertyMap.put("options", toOptionMaps(options));
+            }
         }
 
         if (property instanceof DynamicOptionsProperty<?> dynamicOptionsProperty
@@ -357,20 +348,29 @@ public final class GuestComponentBridge {
             numberProperty.getMaxValue()
                 .ifPresent(maxValue -> propertyMap.put("maxValue", maxValue));
         } else if (property instanceof Property.ObjectProperty objectProperty) {
-            objectProperty.getProperties()
-                .ifPresent(children -> propertyMap.put("properties", toPropertyMaps(children, unsupported, owner)));
-            objectProperty.getAdditionalProperties()
-                .ifPresent(children -> propertyMap.put(
-                    "additionalProperties", toPropertyMaps(children, unsupported, owner)));
+            List<? extends Property.ValueProperty<?>> properties = objectProperty.getProperties();
+
+            if (!properties.isEmpty()) {
+                propertyMap.put("properties", toPropertyMaps(properties, unsupported, owner));
+            }
+
+            List<? extends Property.ValueProperty<?>> additionalProperties = objectProperty.getAdditionalProperties();
+
+            if (!additionalProperties.isEmpty()) {
+                propertyMap.put("additionalProperties", toPropertyMaps(additionalProperties, unsupported, owner));
+            }
         } else if (property instanceof Property.ArrayProperty arrayProperty) {
-            arrayProperty.getItems()
-                .ifPresent(items -> propertyMap.put("items", toPropertyMaps(items, unsupported, owner)));
+            List<? extends Property.ValueProperty<?>> items = arrayProperty.getItems();
+
+            if (!items.isEmpty()) {
+                propertyMap.put("items", toPropertyMaps(items, unsupported, owner));
+            }
+
             arrayProperty.getMinItems()
                 .ifPresent(minItems -> propertyMap.put("minItems", minItems));
             arrayProperty.getMaxItems()
                 .ifPresent(maxItems -> propertyMap.put("maxItems", maxItems));
-            arrayProperty.getMultipleValues()
-                .ifPresent(multipleValues -> propertyMap.put("multipleValues", multipleValues));
+            propertyMap.put("multipleValues", arrayProperty.getMultipleValues());
         } else if (property instanceof Property.FileEntryProperty fileEntryProperty) {
             propertyMap.put("properties", toPropertyMaps(fileEntryProperty.getProperties(), unsupported, owner));
         }

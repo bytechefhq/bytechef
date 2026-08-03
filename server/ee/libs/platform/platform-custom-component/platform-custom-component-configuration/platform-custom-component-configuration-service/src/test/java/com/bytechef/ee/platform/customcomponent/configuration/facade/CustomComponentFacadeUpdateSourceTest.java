@@ -9,6 +9,7 @@ package com.bytechef.ee.platform.customcomponent.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -25,6 +26,7 @@ import com.bytechef.exception.ConfigurationException;
 import com.bytechef.file.storage.domain.FileEntry;
 import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.cache.CacheManager;
 
 /**
@@ -74,6 +76,42 @@ class CustomComponentFacadeUpdateSourceTest {
         assertThat(customComponent.getComponent()).isEqualTo(newComponentFile);
         assertThat(customComponent.getTitle()).isEqualTo("Example");
         assertThat(customComponent.getDescription()).isEqualTo("An example");
+    }
+
+    @Test
+    void testStoredFileNameContainsPlainVersionNumber() {
+        FileEntry existingComponentFile = new FileEntry("example_1.js", "file:///example_1.js");
+
+        CustomComponent customComponent = new CustomComponent();
+
+        customComponent.setLanguage(Language.JAVASCRIPT);
+        customComponent.setName("example");
+        customComponent.setComponent(existingComponentFile);
+
+        CustomComponentService customComponentService = mock(CustomComponentService.class);
+
+        when(customComponentService.getCustomComponent(42L)).thenReturn(customComponent);
+
+        FileEntry newComponentFile = new FileEntry("example_1.js", "file:///example_1_new.js");
+
+        CustomComponentFileStorage customComponentFileStorage = mock(CustomComponentFileStorage.class);
+
+        when(customComponentFileStorage.storeCustomComponentFile(anyString(), any()))
+            .thenReturn(newComponentFile);
+
+        CustomComponentFacadeImpl customComponentFacade = new CustomComponentFacadeImpl(
+            applicationProperties(true), mock(CacheManager.class), customComponentService,
+            customComponentFileStorage);
+
+        String content = "({name: 'example', title: 'Example', description: 'An example', version: 1, actions: []})";
+
+        ArgumentCaptor<String> fileNameCaptor = ArgumentCaptor.forClass(String.class);
+
+        customComponentFacade.updateCustomComponentSource(42L, content);
+
+        verify(customComponentFileStorage).storeCustomComponentFile(fileNameCaptor.capture(), any());
+
+        assertEquals("example_1.js", fileNameCaptor.getValue());
     }
 
     @Test

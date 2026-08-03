@@ -98,8 +98,7 @@ class ComponentHandlerEspressoEngineDslAssemblyTest {
         assertEquals("<svg/>", componentDefinition.getIcon()
             .orElse(null));
 
-        List<? extends ActionDefinition> actions = componentDefinition.getActions()
-            .orElseThrow();
+        List<? extends ActionDefinition> actions = componentDefinition.getActions();
 
         assertEquals(1, actions.size());
 
@@ -109,8 +108,7 @@ class ComponentHandlerEspressoEngineDslAssemblyTest {
         assertTrue(actionDefinition.getPerform()
             .isPresent());
 
-        List<? extends Property> properties = actionDefinition.getProperties()
-            .orElseThrow();
+        List<? extends Property> properties = actionDefinition.getProperties();
 
         assertEquals(4, properties.size());
 
@@ -124,8 +122,7 @@ class ComponentHandlerEspressoEngineDslAssemblyTest {
 
         Property.StringProperty modeProperty = (Property.StringProperty) properties.get(1);
 
-        List<? extends Option<String>> options = modeProperty.getOptions()
-            .orElseThrow();
+        List<? extends Option<String>> options = modeProperty.getOptions();
 
         assertEquals(2, options.size());
         assertEquals("formal", options.getFirst()
@@ -140,14 +137,12 @@ class ComponentHandlerEspressoEngineDslAssemblyTest {
 
         Property.ObjectProperty addressProperty = (Property.ObjectProperty) properties.get(3);
 
-        List<? extends Property.ValueProperty<?>> addressChildren = addressProperty.getProperties()
-            .orElseThrow();
+        List<? extends Property.ValueProperty<?>> addressChildren = addressProperty.getProperties();
 
         assertEquals("city", addressChildren.getFirst()
             .getName());
 
-        List<? extends TriggerDefinition> triggers = componentDefinition.getTriggers()
-            .orElseThrow();
+        List<? extends TriggerDefinition> triggers = componentDefinition.getTriggers();
 
         assertEquals(1, triggers.size());
 

@@ -121,8 +121,8 @@ class ComponentHandlerPolyglotEngine {
         String name, String title, String description, String languageId, String script) implements ActionDefinition {
 
         @Override
-        public Optional<Boolean> getBatch() {
-            return Optional.empty();
+        public boolean getBatch() {
+            return false;
         }
 
         @Override
@@ -141,8 +141,8 @@ class ComponentHandlerPolyglotEngine {
         }
 
         @Override
-        public Optional<Boolean> getDeprecated() {
-            return Optional.empty();
+        public boolean getDeprecated() {
+            return false;
         }
 
         @Override
@@ -168,8 +168,8 @@ class ComponentHandlerPolyglotEngine {
         }
 
         @Override
-        public Optional<Map<String, Object>> getMetadata() {
-            return Optional.empty();
+        public Map<String, Object> getMetadata() {
+            return Map.of();
         }
 
         @Override
@@ -183,8 +183,8 @@ class ComponentHandlerPolyglotEngine {
         }
 
         @Override
-        public Optional<List<? extends Property>> getProperties() {
-            return Optional.empty();
+        public List<? extends Property> getProperties() {
+            return List.of();
         }
 
         @Override
@@ -208,18 +208,18 @@ class ComponentHandlerPolyglotEngine {
         implements ComponentDefinition {
 
         @Override
-        public Optional<List<ActionDefinition>> getActions() {
-            return Optional.ofNullable(actions);
+        public List<ActionDefinition> getActions() {
+            return actions == null ? List.of() : actions;
         }
 
         @Override
-        public Optional<List<ComponentCategory>> getComponentCategories() {
-            return Optional.empty();
+        public List<ComponentCategory> getComponentCategories() {
+            return List.of();
         }
 
         @Override
-        public Optional<List<ClusterElementDefinition<?>>> getClusterElements() {
-            return Optional.empty();
+        public List<ClusterElementDefinition<?>> getClusterElements() {
+            return List.of();
         }
 
         @Override
@@ -228,8 +228,8 @@ class ComponentHandlerPolyglotEngine {
         }
 
         @Override
-        public Optional<Boolean> getCustomAction() {
-            return Optional.empty();
+        public boolean getCustomAction() {
+            return false;
         }
 
         @Override
@@ -248,13 +248,13 @@ class ComponentHandlerPolyglotEngine {
         }
 
         @Override
-        public Optional<List<? extends PropertyGroup>> getInputs() {
-            return Optional.empty();
+        public List<? extends PropertyGroup> getInputs() {
+            return List.of();
         }
 
         @Override
-        public Optional<Map<String, Object>> getMetadata() {
-            return Optional.empty();
+        public Map<String, Object> getMetadata() {
+            return Map.of();
         }
 
         @Override
@@ -268,8 +268,8 @@ class ComponentHandlerPolyglotEngine {
         }
 
         @Override
-        public Optional<List<String>> getTags() {
-            return Optional.empty();
+        public List<String> getTags() {
+            return List.of();
         }
 
         @Override
@@ -278,8 +278,8 @@ class ComponentHandlerPolyglotEngine {
         }
 
         @Override
-        public Optional<List<TriggerDefinition>> getTriggers() {
-            return Optional.empty();
+        public List<TriggerDefinition> getTriggers() {
+            return List.of();
         }
 
         @Override

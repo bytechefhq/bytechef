@@ -112,14 +112,12 @@ class ComponentHandlerEspressoEngineTest {
         assertEquals("<svg>icon</svg>", componentDefinition.getIcon()
             .orElse(null));
 
-        List<? extends ActionDefinition> actions = componentDefinition.getActions()
-            .orElseThrow();
+        List<? extends ActionDefinition> actions = componentDefinition.getActions();
 
         ActionDefinition actionDefinition = actions.getFirst();
 
         assertEquals("greet", actionDefinition.getName());
         assertEquals("Name", actionDefinition.getProperties()
-            .orElseThrow()
             .getFirst()
             .getName()
             .equals("name") ? "Name" : "unexpected");
