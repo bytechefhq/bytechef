@@ -21,6 +21,7 @@ import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.ConnectionDefinition;
+import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.PropertyGroup;
 import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.UnifiedApiDefinition;
@@ -138,7 +139,7 @@ public class ComponentIndexGenerator {
     private static ConnectionSummary toConnectionSummary(ConnectionDefinition connectionDefinition) {
         boolean anyPropertyRequired = connectionDefinition.getProperties()
             .stream()
-            .anyMatch(property -> Boolean.TRUE.equals(property.getRequired()));
+            .anyMatch(Property::getRequired);
 
         boolean authorizationRequired = connectionDefinition.getAuthorizationRequired();
 
