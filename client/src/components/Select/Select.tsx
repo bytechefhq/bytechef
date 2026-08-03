@@ -39,13 +39,29 @@ function SelectContent({className, position = 'popper', ...props}: SelectContent
 SelectContent.displayName = 'SelectContent';
 
 /**
- * Wrapper around the shadcn SelectTrigger that overrides the base `shadow-xs` with `shadow-none`.
+ * Wrapper around the shadcn SelectTrigger that overrides the base `shadow-xs` with `shadow-none`,
+ * and replaces the base's `dark:hover:bg-input/50` with the semantic hover token.
  *
  * The shadcn base applies `shadow-xs`, which is inconsistent with the flat inputs used across the
  * property panels. `shadow-none` wins the twMerge cascade, and can still be overridden per usage.
+ *
+ * The base also carries `dark:hover:bg-input/50`, which compiles to `:is(.dark *)` at specificity
+ * (0,3,0) — higher than a call site's own `hover:bg-surface-neutral-primary-hover:hover` at (0,2,0).
+ * Because that call-site class has no `dark:` prefix, tailwind-merge does not see it and the base's
+ * `dark:hover:` class as the same conflict group, so both compile and the base wins dark-mode hover
+ * on every `SelectTrigger` regardless of what a call site asks for. Adding
+ * `dark:hover:bg-surface-neutral-primary-hover` here — same `dark:hover:` variant, same `bg-color`
+ * group — puts tailwind-merge's own conflict detection to work instead: it dedupes against the
+ * base's `dark:hover:bg-input/50` and drops it from the rendered class list entirely, so there is no
+ * specificity contest left to win at runtime.
  */
 function SelectTrigger({className, ...props}: SelectTriggerPropsType) {
-    return <ShadcnSelectTrigger className={twMerge('shadow-none', className)} {...props} />;
+    return (
+        <ShadcnSelectTrigger
+            className={twMerge('shadow-none dark:hover:bg-surface-neutral-primary-hover', className)}
+            {...props}
+        />
+    );
 }
 
 SelectTrigger.displayName = 'SelectTrigger';

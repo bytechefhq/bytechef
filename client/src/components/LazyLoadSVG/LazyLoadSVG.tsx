@@ -49,7 +49,7 @@ const LazyLoadSVG: FC<LazyLoadSVGProps> = memo(({className, preloader, src, ...p
                 <InlineSVG className={className} src={src} {...props} />
             ) : (
                 // Show a placeholder until the SVG is loaded
-                preloader || <div className={`${className} animate-pulse bg-gray-100`} />
+                preloader || <div className={`${className} animate-pulse bg-surface-neutral-secondary`} />
             )}
         </div>
     );
