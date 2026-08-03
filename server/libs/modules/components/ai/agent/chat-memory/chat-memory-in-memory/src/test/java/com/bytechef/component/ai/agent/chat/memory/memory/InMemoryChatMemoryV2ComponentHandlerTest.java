@@ -63,8 +63,8 @@ class InMemoryChatMemoryV2ComponentHandlerTest {
         ComponentDefinition componentDefinition =
             new InMemoryChatMemoryV2ComponentHandler(clusterElementDefinitionService).getDefinition();
 
-        List<? extends ClusterElementDefinition<?>> clusterElementDefinitions = componentDefinition.getClusterElements()
-            .orElseThrow();
+        List<? extends ClusterElementDefinition<?>> clusterElementDefinitions =
+            componentDefinition.getClusterElements();
 
         ChatMemoryFunction chatMemoryFunction = (ChatMemoryFunction) clusterElementDefinitions.getFirst()
             .getElement();
@@ -150,8 +150,7 @@ class InMemoryChatMemoryV2ComponentHandlerTest {
     private static PerformFunction getPerformFunction(ComponentHandler componentHandler, String actionName) {
         ComponentDefinition componentDefinition = componentHandler.getDefinition();
 
-        List<? extends ActionDefinition> actionDefinitions = componentDefinition.getActions()
-            .orElseThrow();
+        List<? extends ActionDefinition> actionDefinitions = componentDefinition.getActions();
 
         return actionDefinitions.stream()
             .filter(actionDefinition -> actionName.equals(actionDefinition.getName()))
