@@ -48,7 +48,7 @@ const Notifications = () => {
                         button={
                             <Button icon={<PlusIcon />} label="New Notification" onClick={() => openEditDialog()} />
                         }
-                        icon={<Link2Icon className="size-12 text-gray-400" />}
+                        icon={<Link2Icon className="size-12 text-content-neutral-tertiary" />}
                         message="You do not have any Notifications created yet."
                         title="No Notifications"
                     />

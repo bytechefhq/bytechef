@@ -146,7 +146,10 @@ const AiAgentEvalTestCard = ({
 
                                 <DropdownMenuSeparator />
 
-                                <DropdownMenuItem className="text-red-600" onClick={() => setShowDeleteDialog(true)}>
+                                <DropdownMenuItem
+                                    className="text-red-600 focus:text-red-700 dark:text-red-400 dark:focus:text-red-400"
+                                    onClick={() => setShowDeleteDialog(true)}
+                                >
                                     <TrashIcon className="mr-2 size-4" />
                                     Delete
                                 </DropdownMenuItem>

@@ -127,7 +127,7 @@ const OrganizationConnections = () => {
                                 onClick={() => setIsCreateDialogOpen(true)}
                             />
                         }
-                        icon={<Link2Icon className="size-12 text-gray-400" />}
+                        icon={<Link2Icon className="size-12 text-content-neutral-tertiary" />}
                         message="No organization connections have been created yet."
                         title="No Organization Connections"
                     />

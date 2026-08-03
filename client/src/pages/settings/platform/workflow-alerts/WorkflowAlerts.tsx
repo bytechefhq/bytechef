@@ -169,7 +169,7 @@ const WorkflowAlerts = () => {
                         button={
                             <Button icon={<PlusIcon />} label="New Alert Rule" onClick={() => handleOpenDialog()} />
                         }
-                        icon={<BellRingIcon className="size-12 text-gray-400" />}
+                        icon={<BellRingIcon className="size-12 text-content-neutral-tertiary" />}
                         message="Alert rules watch workflow runs and deliver through your configured Notifications."
                         title="No Alert Rules"
                     />

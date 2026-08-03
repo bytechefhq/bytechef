@@ -163,7 +163,10 @@ const AiAgentJudgeCard = ({judge, onDelete, onEdit}: AiAgentJudgeCardProps) => {
 
                         <DropdownMenuSeparator />
 
-                        <DropdownMenuItem className="text-red-600" onClick={() => onDelete(judge.id)}>
+                        <DropdownMenuItem
+                            className="text-red-600 focus:text-red-700 dark:text-red-400 dark:focus:text-red-400"
+                            onClick={() => onDelete(judge.id)}
+                        >
                             <TrashIcon className="mr-2 size-4" />
                             Delete
                         </DropdownMenuItem>
