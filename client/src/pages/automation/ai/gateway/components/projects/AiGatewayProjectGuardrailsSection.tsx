@@ -1,11 +1,9 @@
-import Button from '@/components/Button/Button';
 import {Checkbox} from '@/components/ui/checkbox';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {useAiGatewayProjectSettingsQuery, useUpdateAiGatewayProjectSettingsMutation} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {useEffect, useMemo, useState} from 'react';
-import {toast} from 'sonner';
+import {forwardRef, useEffect, useImperativeHandle, useMemo, useState} from 'react';
 
 interface GuardrailsFormI {
     blockedTerms: string;
@@ -33,12 +31,20 @@ const areGuardrailsFormsEqual = (firstForm: GuardrailsFormI, secondForm: Guardra
     firstForm.redactSecrets === secondForm.redactSecrets &&
     firstForm.scanResponses === secondForm.scanResponses;
 
+export interface AiGatewayProjectGuardrailsSectionHandleI {
+    // Resolves true when there was nothing to save or the save succeeded, false on failure.
+    // Never rejects, so the dialog can await it unconditionally.
+    save: () => Promise<boolean>;
+}
+
 interface AiGatewayProjectGuardrailsSectionProps {
-    onDirtyChange?: (dirty: boolean) => void;
     projectId: string;
 }
 
-const AiGatewayProjectGuardrailsSection = ({onDirtyChange, projectId}: AiGatewayProjectGuardrailsSectionProps) => {
+const AiGatewayProjectGuardrailsSection = forwardRef<
+    AiGatewayProjectGuardrailsSectionHandleI,
+    AiGatewayProjectGuardrailsSectionProps
+>(({projectId}, ref) => {
     const [form, setForm] = useState<GuardrailsFormI>(EMPTY_FORM);
     const [savedForm, setSavedForm] = useState<GuardrailsFormI>(EMPTY_FORM);
 
@@ -48,13 +54,43 @@ const AiGatewayProjectGuardrailsSection = ({onDirtyChange, projectId}: AiGateway
 
     const updateMutation = useUpdateAiGatewayProjectSettingsMutation({
         onSuccess: () => {
-            toast.success('Project guardrails saved');
-
             queryClient.invalidateQueries({queryKey: ['aiGatewayProjectSettings']});
         },
     });
 
     const isDirty = useMemo(() => !areGuardrailsFormsEqual(form, savedForm), [form, savedForm]);
+
+    useImperativeHandle(
+        ref,
+        () => ({
+            save: async () => {
+                if (!isDirty) {
+                    return true;
+                }
+
+                try {
+                    await updateMutation.mutateAsync({
+                        input: {
+                            blockedTerms: form.blockedTerms || undefined,
+                            injectionDetectionEnabled: form.injectionDetectionEnabled,
+                            moderationEnabled: form.moderationEnabled,
+                            projectId,
+                            redactPii: form.redactPii,
+                            redactSecrets: form.redactSecrets,
+                            scanResponses: form.scanResponses,
+                        },
+                    });
+
+                    setSavedForm(form);
+
+                    return true;
+                } catch {
+                    return false;
+                }
+            },
+        }),
+        [form, isDirty, projectId, updateMutation]
+    );
 
     useEffect(() => {
         const settings = data?.aiGatewayProjectSettings;
@@ -74,44 +110,14 @@ const AiGatewayProjectGuardrailsSection = ({onDirtyChange, projectId}: AiGateway
         }
     }, [data]);
 
-    useEffect(() => {
-        onDirtyChange?.(isDirty);
-    }, [isDirty, onDirtyChange]);
-
-    const handleSave = () => {
-        const submittedForm = form;
-
-        updateMutation.mutate(
-            {
-                input: {
-                    blockedTerms: submittedForm.blockedTerms || undefined,
-                    injectionDetectionEnabled: submittedForm.injectionDetectionEnabled,
-                    moderationEnabled: submittedForm.moderationEnabled,
-                    projectId,
-                    redactPii: submittedForm.redactPii,
-                    redactSecrets: submittedForm.redactSecrets,
-                    scanResponses: submittedForm.scanResponses,
-                },
-            },
-            {
-                onSuccess: () => setSavedForm(submittedForm),
-            }
-        );
-    };
-
     return (
         <div className="rounded-md border border-stroke-neutral-secondary bg-surface-neutral-secondary p-4">
             <fieldset className="space-y-3 border-0">
                 <div className="text-sm font-medium">Guardrails</div>
 
                 <p className="text-xs text-content-neutral-secondary">
-                    This panel saves independently of the dialog&apos;s Save button — use &quot;Save guardrails&quot;
-                    below to persist changes made here.
-                </p>
-
-                <p className="text-xs text-content-neutral-secondary">
                     Project overrides layer on top of the workspace guardrails — they can add protection, never remove
-                    it.
+                    it. Saved together with the rest of the project when you click Save below.
                 </p>
 
                 <div className="flex items-center gap-2">
@@ -186,23 +192,11 @@ const AiGatewayProjectGuardrailsSection = ({onDirtyChange, projectId}: AiGateway
                         value={form.blockedTerms}
                     />
                 </div>
-
-                <div className="flex items-center justify-end gap-3">
-                    {isDirty && (
-                        <span className="text-xs text-content-neutral-secondary">
-                            You have unsaved guardrail changes.
-                        </span>
-                    )}
-
-                    <Button
-                        disabled={updateMutation.isPending}
-                        label={updateMutation.isPending ? 'Saving...' : 'Save guardrails'}
-                        onClick={handleSave}
-                    />
-                </div>
             </fieldset>
         </div>
     );
-};
+});
+
+AiGatewayProjectGuardrailsSection.displayName = 'AiGatewayProjectGuardrailsSection';
 
 export default AiGatewayProjectGuardrailsSection;

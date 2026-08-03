@@ -1,5 +1,5 @@
-import {fireEvent, render, screen} from '@/shared/util/test-utils';
-import {describe, expect, it, vi} from 'vitest';
+import {fireEvent, render, screen, waitFor} from '@/shared/util/test-utils';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import AiGatewayProjectDialog from '../AiGatewayProjectDialog';
 
@@ -8,7 +8,13 @@ import type {AiGatewayProjectType} from '../../../types';
 // The settings query result must keep a stable object identity across renders — otherwise the
 // section's `useEffect(() => {...}, [data])` (which loads settings into state) fires on every
 // render, since a fresh literal would be a new reference each call, causing a render loop.
-const {guardrailsSettingsQueryData} = vi.hoisted(() => ({
+const {
+    createProjectMutateMock,
+    guardrailsSettingsQueryData,
+    updateProjectMutateAsyncMock,
+    updateProjectSettingsMutateAsyncMock,
+} = vi.hoisted(() => ({
+    createProjectMutateMock: vi.fn(),
     guardrailsSettingsQueryData: {
         aiGatewayProjectSettings: {
             blockedTerms: '',
@@ -20,14 +26,28 @@ const {guardrailsSettingsQueryData} = vi.hoisted(() => ({
             scanResponses: false,
         },
     },
+    updateProjectMutateAsyncMock: vi.fn(),
+    updateProjectSettingsMutateAsyncMock: vi.fn(),
 }));
 
 vi.mock('@/shared/middleware/graphql', () => ({
     useAiGatewayProjectSettingsQuery: () => ({data: guardrailsSettingsQueryData}),
-    useCreateAiGatewayProjectMutation: () => ({isPending: false, mutate: vi.fn()}),
-    useUpdateAiGatewayProjectMutation: () => ({isPending: false, mutate: vi.fn()}),
-    useUpdateAiGatewayProjectSettingsMutation: () => ({isPending: false, mutate: vi.fn()}),
+    useCreateAiGatewayProjectMutation: () => ({isPending: false, mutate: createProjectMutateMock}),
+    useUpdateAiGatewayProjectMutation: () => ({isPending: false, mutateAsync: updateProjectMutateAsyncMock}),
+    useUpdateAiGatewayProjectSettingsMutation: () => ({
+        isPending: false,
+        mutateAsync: updateProjectSettingsMutateAsyncMock,
+    }),
 }));
+
+vi.mock('sonner', () => ({
+    toast: {
+        error: vi.fn(),
+        success: vi.fn(),
+    },
+}));
+
+const {toast} = await import('sonner');
 
 const project: AiGatewayProjectType = {
     cacheTtlMinutes: null,
@@ -61,6 +81,23 @@ const renderDialogInEditMode = (onClose = vi.fn()) => {
 const makeGuardrailsDirty = () => {
     fireEvent.click(screen.getByLabelText('Redact PII (emails, SSNs, cards, phones, IPs)'));
 };
+
+const clickSave = () => {
+    fireEvent.click(screen.getByRole('button', {name: 'Save'}));
+};
+
+beforeEach(() => {
+    vi.mocked(toast.error).mockClear();
+    vi.mocked(toast.success).mockClear();
+
+    createProjectMutateMock.mockClear();
+
+    updateProjectMutateAsyncMock.mockReset();
+    updateProjectMutateAsyncMock.mockResolvedValue({});
+
+    updateProjectSettingsMutateAsyncMock.mockReset();
+    updateProjectSettingsMutateAsyncMock.mockResolvedValue({});
+});
 
 describe('AiGatewayProjectDialog', () => {
     it('renders with the dialog role', () => {
@@ -99,21 +136,12 @@ describe('AiGatewayProjectDialog', () => {
     });
 });
 
-describe('AiGatewayProjectDialog guardrails dismissal guard', () => {
-    it('does not show the unsaved guardrails affordance before any edit', () => {
-        renderDialogInEditMode();
-
-        expect(screen.queryByText('You have unsaved guardrail changes.')).not.toBeInTheDocument();
-    });
-
-    it('shows the unsaved guardrails affordance once a guardrail control is toggled', () => {
-        renderDialogInEditMode();
-
-        makeGuardrailsDirty();
-
-        expect(screen.getByText('You have unsaved guardrail changes.')).toBeInTheDocument();
-    });
-
+// Folding the guardrails save into the single footer Save (see AiGatewayProjectDialog.tsx) removed
+// the earlier Escape/overlay dismissal guard: since one Save now persists both halves, there is no
+// longer a scenario where the guardrails section holds edits the footer Save would silently skip,
+// so blocking dismissal only for that section (and not, say, an edited project name) would be an
+// inconsistent half-guard. These tests pin the new, uniform behavior.
+describe('AiGatewayProjectDialog dismissal after the guardrails Save button was removed', () => {
     it('closes on Escape when the guardrails section is untouched', () => {
         const onClose = renderDialogInEditMode();
 
@@ -122,17 +150,17 @@ describe('AiGatewayProjectDialog guardrails dismissal guard', () => {
         expect(onClose).toHaveBeenCalledTimes(1);
     });
 
-    it('does not close on Escape while the guardrails section has unsaved edits', () => {
+    it('also closes on Escape while the guardrails section has unsaved edits', () => {
         const onClose = renderDialogInEditMode();
 
         makeGuardrailsDirty();
 
         fireEvent.keyDown(screen.getByRole('dialog'), {key: 'Escape'});
 
-        expect(onClose).not.toHaveBeenCalled();
+        expect(onClose).toHaveBeenCalledTimes(1);
     });
 
-    it('closes on Cancel even while the guardrails section has unsaved edits', () => {
+    it('closes on Cancel while the guardrails section has unsaved edits', () => {
         const onClose = renderDialogInEditMode();
 
         makeGuardrailsDirty();
@@ -140,5 +168,99 @@ describe('AiGatewayProjectDialog guardrails dismissal guard', () => {
         fireEvent.click(screen.getByRole('button', {name: 'Cancel'}));
 
         expect(onClose).toHaveBeenCalledTimes(1);
+    });
+});
+
+describe('AiGatewayProjectDialog footer Save persists both resources', () => {
+    it('sends the project update and the guardrail settings, project first, when Save is clicked', async () => {
+        const callOrder: string[] = [];
+
+        updateProjectMutateAsyncMock.mockImplementation(async () => {
+            callOrder.push('project');
+
+            return {};
+        });
+
+        updateProjectSettingsMutateAsyncMock.mockImplementation(async () => {
+            callOrder.push('guardrails');
+
+            return {};
+        });
+
+        const onClose = renderDialogInEditMode();
+
+        fireEvent.change(screen.getByLabelText('Name'), {target: {value: 'Renamed Project'}});
+
+        makeGuardrailsDirty();
+
+        clickSave();
+
+        await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
+
+        expect(updateProjectMutateAsyncMock).toHaveBeenCalledWith({
+            id: '1',
+            input: expect.objectContaining({name: 'Renamed Project'}),
+        });
+
+        expect(updateProjectSettingsMutateAsyncMock).toHaveBeenCalledWith({
+            input: expect.objectContaining({projectId: '1', redactPii: true}),
+        });
+
+        // Discriminates against an implementation that fires both requests concurrently (e.g.
+        // Promise.all) instead of the deliberate project-then-guardrails sequencing.
+        expect(callOrder).toEqual(['project', 'guardrails']);
+    });
+
+    it('does not call the guardrails mutation when the guardrails section has no changes', async () => {
+        const onClose = renderDialogInEditMode();
+
+        fireEvent.change(screen.getByLabelText('Name'), {target: {value: 'Renamed Project'}});
+
+        clickSave();
+
+        await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
+
+        expect(updateProjectMutateAsyncMock).toHaveBeenCalled();
+        expect(updateProjectSettingsMutateAsyncMock).not.toHaveBeenCalled();
+    });
+});
+
+describe('AiGatewayProjectDialog partial-failure handling', () => {
+    it('saves the project, keeps the dialog open, and reports a partial failure when the guardrails save fails', async () => {
+        updateProjectSettingsMutateAsyncMock.mockRejectedValueOnce(new Error('guardrails endpoint down'));
+
+        const onClose = renderDialogInEditMode();
+
+        makeGuardrailsDirty();
+
+        clickSave();
+
+        await waitFor(() => expect(updateProjectSettingsMutateAsyncMock).toHaveBeenCalled());
+
+        // The project half genuinely persisted — this is not a generic "save failed" state.
+        expect(updateProjectMutateAsyncMock).toHaveBeenCalled();
+
+        // Closing here would discard the still-unsaved guardrail edits, so the dialog must stay
+        // open.
+        expect(onClose).not.toHaveBeenCalled();
+
+        expect(toast.error).toHaveBeenCalledWith(expect.stringContaining('guardrail'));
+    });
+
+    it('does not attempt the guardrails save when the project update itself fails', async () => {
+        updateProjectMutateAsyncMock.mockRejectedValueOnce(new Error('project endpoint down'));
+
+        const onClose = renderDialogInEditMode();
+
+        makeGuardrailsDirty();
+
+        clickSave();
+
+        await waitFor(() => expect(updateProjectMutateAsyncMock).toHaveBeenCalled());
+
+        // Nothing has been sent to the guardrails endpoint yet, so there is no partial state to
+        // reconcile — retrying Save is safe.
+        expect(updateProjectSettingsMutateAsyncMock).not.toHaveBeenCalled();
+        expect(onClose).not.toHaveBeenCalled();
     });
 });

@@ -5,10 +5,13 @@ import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {useCreateAiGatewayProjectMutation, useUpdateAiGatewayProjectMutation} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {useCallback, useState} from 'react';
+import {useCallback, useRef, useState} from 'react';
+import {toast} from 'sonner';
 
 import {AiGatewayProjectType} from '../../types';
-import AiGatewayProjectGuardrailsSection from './AiGatewayProjectGuardrailsSection';
+import AiGatewayProjectGuardrailsSection, {
+    AiGatewayProjectGuardrailsSectionHandleI,
+} from './AiGatewayProjectGuardrailsSection';
 
 interface AiGatewayProjectDialogProps {
     onClose: () => void;
@@ -21,7 +24,7 @@ const AiGatewayProjectDialog = ({onClose, project, workspaceId}: AiGatewayProjec
     const [cachingEnabled, setCachingEnabled] = useState(project?.cachingEnabled ?? false);
     const [compressionEnabled, setCompressionEnabled] = useState(project?.compressionEnabled ?? false);
     const [description, setDescription] = useState(project?.description ?? '');
-    const [guardrailsDirty, setGuardrailsDirty] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [logRetentionDays, setLogRetentionDays] = useState<number | undefined>(
         project?.logRetentionDays ?? undefined
     );
@@ -31,6 +34,8 @@ const AiGatewayProjectDialog = ({onClose, project, workspaceId}: AiGatewayProjec
     );
     const [slug, setSlug] = useState(project?.slug ?? '');
     const [timeoutSeconds, setTimeoutSeconds] = useState<number | undefined>(project?.timeoutSeconds ?? undefined);
+
+    const guardrailsSectionRef = useRef<AiGatewayProjectGuardrailsSectionHandleI>(null);
 
     const queryClient = useQueryClient();
 
@@ -44,31 +49,12 @@ const AiGatewayProjectDialog = ({onClose, project, workspaceId}: AiGatewayProjec
         },
     });
 
-    const updateMutation = useUpdateAiGatewayProjectMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['aiGatewayProjects']});
+    // No onSuccess here: closing the dialog and invalidating the list must wait until the
+    // guardrails half (if any) has also been attempted — see handleSubmit.
+    const updateMutation = useUpdateAiGatewayProjectMutation();
 
-            onClose();
-        },
-    });
-
-    const handleSubmit = useCallback(() => {
-        if (isEditMode) {
-            updateMutation.mutate({
-                id: project.id,
-                input: {
-                    cacheTtlMinutes: cacheTtlMinutes || undefined,
-                    cachingEnabled,
-                    compressionEnabled,
-                    description: description || undefined,
-                    logRetentionDays: logRetentionDays || undefined,
-                    name,
-                    retryMaxAttempts: retryMaxAttempts || undefined,
-                    slug,
-                    timeoutSeconds: timeoutSeconds || undefined,
-                },
-            });
-        } else {
+    const handleSubmit = useCallback(async () => {
+        if (!isEditMode) {
             createMutation.mutate({
                 input: {
                     cacheTtlMinutes: cacheTtlMinutes || undefined,
@@ -83,6 +69,50 @@ const AiGatewayProjectDialog = ({onClose, project, workspaceId}: AiGatewayProjec
                     workspaceId,
                 },
             });
+
+            return;
+        }
+
+        setIsSubmitting(true);
+
+        try {
+            await updateMutation.mutateAsync({
+                id: project.id,
+                input: {
+                    cacheTtlMinutes: cacheTtlMinutes || undefined,
+                    cachingEnabled,
+                    compressionEnabled,
+                    description: description || undefined,
+                    logRetentionDays: logRetentionDays || undefined,
+                    name,
+                    retryMaxAttempts: retryMaxAttempts || undefined,
+                    slug,
+                    timeoutSeconds: timeoutSeconds || undefined,
+                },
+            });
+
+            // The project row is now persisted. If the guardrails half fails from here on, that
+            // is a genuine partial-success state that must be surfaced honestly and must not
+            // close the dialog, since closing would discard the still-unsaved guardrail edits.
+            const guardrailsSaved = (await guardrailsSectionRef.current?.save()) ?? true;
+
+            if (!guardrailsSaved) {
+                toast.error(
+                    'Project details were saved, but the guardrail changes failed to save. Click Save again to retry.'
+                );
+
+                return;
+            }
+
+            queryClient.invalidateQueries({queryKey: ['aiGatewayProjects']});
+
+            onClose();
+        } catch {
+            // The project update itself failed before anything was sent to the guardrails
+            // endpoint, so no partial state exists yet — the fetch interceptor already surfaced
+            // the error toast, and it is safe for the user to just retry Save.
+        } finally {
+            setIsSubmitting(false);
         }
     }, [
         cacheTtlMinutes,
@@ -93,7 +123,9 @@ const AiGatewayProjectDialog = ({onClose, project, workspaceId}: AiGatewayProjec
         isEditMode,
         logRetentionDays,
         name,
+        onClose,
         project,
+        queryClient,
         retryMaxAttempts,
         slug,
         timeoutSeconds,
@@ -110,20 +142,7 @@ const AiGatewayProjectDialog = ({onClose, project, workspaceId}: AiGatewayProjec
             }}
             open
         >
-            <DialogContent
-                aria-describedby={undefined}
-                className="max-w-md"
-                onEscapeKeyDown={(event) => {
-                    if (guardrailsDirty) {
-                        event.preventDefault();
-                    }
-                }}
-                onInteractOutside={(event) => {
-                    if (guardrailsDirty) {
-                        event.preventDefault();
-                    }
-                }}
-            >
+            <DialogContent aria-describedby={undefined} className="max-w-md">
                 <DialogHeader>
                     <DialogTitle>{isEditMode ? 'Edit Project' : 'Add Project'}</DialogTitle>
                 </DialogHeader>
@@ -269,7 +288,7 @@ const AiGatewayProjectDialog = ({onClose, project, workspaceId}: AiGatewayProjec
                     </fieldset>
 
                     {isEditMode && project?.id && (
-                        <AiGatewayProjectGuardrailsSection onDirtyChange={setGuardrailsDirty} projectId={project.id} />
+                        <AiGatewayProjectGuardrailsSection projectId={project.id} ref={guardrailsSectionRef} />
                     )}
                 </div>
 
@@ -277,7 +296,7 @@ const AiGatewayProjectDialog = ({onClose, project, workspaceId}: AiGatewayProjec
                     <Button label="Cancel" onClick={onClose} variant="outline" />
 
                     <Button
-                        disabled={!name || !slug || createMutation.isPending || updateMutation.isPending}
+                        disabled={!name || !slug || createMutation.isPending || isSubmitting}
                         label={isEditMode ? 'Save' : 'Create'}
                         onClick={handleSubmit}
                     />
