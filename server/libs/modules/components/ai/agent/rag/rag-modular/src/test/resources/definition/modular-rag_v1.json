@@ -40,7 +40,7 @@
     "help": null,
     "outputDefinition": null,
     "processErrorResponse": null,
-    "properties": null,
+    "properties": [ ],
     "title": "Moduler RAG",
     "type": {
       "name": "RAG",
@@ -56,17 +56,17 @@
     "label": "Artificial Intelligence"
   } ],
   "connection": null,
-  "customAction": null,
+  "customAction": false,
   "customActionHelp": null,
   "description": "A modular RAG (Retrieval-Augmented Generation) component that provides a flexible and customizable approach to building RAG systems. It allows you to combine different retrieval, augmentation, and generation strategies into a cohesive pipeline for enhanced AI-driven information processing and response generation.",
   "icon": "path:assets/modular-rag.svg",
-  "inputs": null,
-  "metadata": null,
+  "inputs": [ ],
+  "metadata": { },
   "name": "modularRag",
   "resources": null,
-  "tags": null,
+  "tags": [ ],
   "title": "Modular RAG",
-  "triggers": null,
+  "triggers": [ ],
   "unifiedApi": null,
   "version": 1
 }
