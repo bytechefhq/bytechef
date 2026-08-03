@@ -252,7 +252,7 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
                                 <div className="flex items-center justify-between">
                                     <CircleXIcon
                                         aria-label="clear-all"
-                                        className="mr-1 cursor-pointer fill-content-neutral-secondary text-white hover:fill-destructive"
+                                        className="mr-1 cursor-pointer fill-content-neutral-secondary text-content-onsurface-primary hover:fill-destructive"
                                         onClick={(event) => {
                                             event.stopPropagation();
                                             handleClear();
