@@ -1,22 +1,22 @@
 {
   "actionClusterElementTypes": { },
   "actions": [ {
-    "batch": null,
+    "batch": false,
     "beforeResume": null,
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
-    "deprecated": null,
+    "deprecated": false,
     "description": "Stream large volume of data between source and destination applications.",
     "help": {
       "body": "",
       "learnMoreUrl": "https://docs.bytechef.io/reference/components/data-stream_v1#stream-data"
     },
-    "metadata": null,
+    "metadata": { },
     "name": "stream",
     "outputDefinition": null,
     "perform": { },
     "processErrorResponse": null,
-    "properties": null,
+    "properties": [ ],
     "resumePerform": null,
     "title": "Stream Data",
     "workflowNodeDescription": null
@@ -41,23 +41,23 @@
     "multipleElements": false,
     "required": false
   } ],
-  "clusterElements": null,
+  "clusterElements": [ ],
   "componentCategories": [ {
     "name": "helpers",
     "label": "Helpers"
   } ],
   "connection": null,
-  "customAction": null,
+  "customAction": false,
   "customActionHelp": null,
   "description": "With the Data Stream, you can transfer large amounts of data efficiently.",
   "icon": "path:assets/data-stream.svg",
-  "inputs": null,
-  "metadata": null,
+  "inputs": [ ],
+  "metadata": { },
   "name": "dataStream",
   "resources": null,
-  "tags": null,
+  "tags": [ ],
   "title": "Data Stream",
-  "triggers": null,
+  "triggers": [ ],
   "unifiedApi": null,
   "version": 1
 }

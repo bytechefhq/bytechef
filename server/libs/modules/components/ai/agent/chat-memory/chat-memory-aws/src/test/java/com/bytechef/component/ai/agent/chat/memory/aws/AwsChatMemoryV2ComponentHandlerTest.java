@@ -58,8 +58,8 @@ class AwsChatMemoryV2ComponentHandlerTest {
         ComponentDefinition componentDefinition =
             new AwsChatMemoryV2ComponentHandler(clusterElementDefinitionService).getDefinition();
 
-        List<? extends ClusterElementDefinition<?>> clusterElementDefinitions = componentDefinition.getClusterElements()
-            .orElseThrow();
+        List<? extends ClusterElementDefinition<?>> clusterElementDefinitions =
+            componentDefinition.getClusterElements();
 
         ChatMemoryFunction chatMemoryFunction = (ChatMemoryFunction) clusterElementDefinitions.getFirst()
             .getElement();

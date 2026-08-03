@@ -45,7 +45,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * @author Monika Domiter
@@ -74,9 +73,7 @@ public class DiscordComponentHandler extends AbstractDiscordComponentHandler {
 
         for (ModifiableActionDefinition modifiableActionDefinition : actionDefinitions) {
             if (Objects.equals(modifiableActionDefinition.getName(), "sendChannelMessage")) {
-                Optional<List<? extends Property>> propertiesOptional = modifiableActionDefinition.getProperties();
-
-                List<Property> properties = new ArrayList<>(propertiesOptional.orElse(List.of()));
+                List<Property> properties = new ArrayList<>(modifiableActionDefinition.getProperties());
 
                 properties.addFirst(GUILD_ID_PROPERTY);
 
@@ -99,11 +96,9 @@ public class DiscordComponentHandler extends AbstractDiscordComponentHandler {
     public ModifiableConnectionDefinition modifyConnection(
         ModifiableConnectionDefinition modifiableConnectionDefinition) {
 
-        Optional<List<? extends Authorization>> optionalAuthorizations =
-            modifiableConnectionDefinition.getAuthorizations();
+        List<? extends Authorization> authorizations = modifiableConnectionDefinition.getAuthorizations();
 
-        if (optionalAuthorizations.isPresent()) {
-            List<? extends Authorization> authorizations = optionalAuthorizations.get();
+        if (!authorizations.isEmpty()) {
             ModifiableAuthorization modifiableAuthorization = (ModifiableAuthorization) authorizations.getFirst();
 
             modifiableAuthorization.apply((connectionParameters, context) -> ofHeaders(
