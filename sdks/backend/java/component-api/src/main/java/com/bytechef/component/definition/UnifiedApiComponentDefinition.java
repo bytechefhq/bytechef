@@ -27,5 +27,7 @@ public interface UnifiedApiComponentDefinition {
      *
      * @return
      */
-    Optional<UnifiedApiDefinition> getUnifiedApi();
+    default Optional<UnifiedApiDefinition> getUnifiedApi() {
+        return Optional.empty();
+    }
 }
