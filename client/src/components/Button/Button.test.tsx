@@ -216,6 +216,29 @@ describe('Button variants', () => {
     });
 });
 
+describe('Button call sites requesting no hover highlight', () => {
+    it('suppresses the ghost variant dark-mode hover when the call site asks for hover:bg-transparent', () => {
+        render(<Button className="hover:bg-transparent" label="Button" variant="ghost" />);
+
+        expect(screen.getByText('Button')).toHaveClass('hover:bg-transparent dark:hover:bg-transparent');
+        expect(screen.getByText('Button')).not.toHaveClass('dark:hover:bg-surface-neutral-primary-hover');
+    });
+
+    it('suppresses the outline variant dark-mode hover when the call site asks for hover:bg-transparent', () => {
+        render(<Button className="hover:bg-transparent" label="Button" variant="outline" />);
+
+        expect(screen.getByText('Button')).toHaveClass('hover:bg-transparent dark:hover:bg-transparent');
+        expect(screen.getByText('Button')).not.toHaveClass('dark:hover:bg-surface-neutral-primary-hover');
+    });
+
+    it('leaves the ghost variant dark-mode hover in place when the call site does not ask for hover:bg-transparent', () => {
+        render(<Button label="Button" variant="ghost" />);
+
+        expect(screen.getByText('Button')).toHaveClass('dark:hover:bg-surface-neutral-primary-hover');
+        expect(screen.getByText('Button')).not.toHaveClass('dark:hover:bg-transparent');
+    });
+});
+
 describe('TypeScript tests', () => {
     it('should render a button with custom content if the children are set and no label is set', () => {
         render(

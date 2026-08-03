@@ -48,7 +48,7 @@ const CreatableSelect = <
 }: CreatableSelectProps<Option, IsMulti, Group, TFieldValues, TName>) => (
     <fieldset className={twMerge(label && 'mb-3', fieldsetClassName)}>
         {label && (
-            <label className="text-sm font-medium text-gray-700" htmlFor={name || field?.name}>
+            <label className="text-sm font-medium text-content-neutral-secondary" htmlFor={name || field?.name}>
                 {label}
             </label>
         )}
