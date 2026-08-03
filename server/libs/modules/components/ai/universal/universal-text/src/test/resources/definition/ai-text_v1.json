@@ -643,11 +643,11 @@
         },
         "placeholder": null,
         "sampleOutput": {
+          "text": "Hello, my name is [REDACTED_1] and my email is [EMAIL_1].",
           "maskMap": {
             "[EMAIL_1]": "john@example.com",
             "[REDACTED_1]": "John Doe"
-          },
-          "text": "Hello, my name is [REDACTED_1] and my email is [EMAIL_1]."
+          }
         }
       },
       "outputSchema": {
@@ -736,11 +736,11 @@
         "type": "OBJECT"
       },
       "sampleOutput": {
+        "text": "Hello, my name is [REDACTED_1] and my email is [EMAIL_1].",
         "maskMap": {
           "[EMAIL_1]": "john@example.com",
           "[REDACTED_1]": "John Doe"
-        },
-        "text": "Hello, my name is [REDACTED_1] and my email is [EMAIL_1]."
+        }
       }
     },
     "perform": { },
