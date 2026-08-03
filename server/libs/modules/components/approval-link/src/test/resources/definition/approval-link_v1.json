@@ -1,13 +1,13 @@
 {
   "actions": [ {
-    "batch": null,
+    "batch": false,
     "beforeResume": null,
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
-    "deprecated": null,
+    "deprecated": false,
     "description": "Creates approval/disapproval links.",
     "help": null,
-    "metadata": null,
+    "metadata": { },
     "name": "createApprovalLinks",
     "outputDefinition": {
       "output": { },
@@ -22,7 +22,7 @@
     "title": "Create Approval Links",
     "workflowNodeDescription": null
   } ],
-  "clusterElements": null,
+  "clusterElements": [ ],
   "componentCategories": [ {
     "name": "developer-tools",
     "label": "Developer Tools"
@@ -31,17 +31,17 @@
     "label": "File Storage"
   } ],
   "connection": null,
-  "customAction": null,
+  "customAction": false,
   "customActionHelp": null,
   "description": "The Approval Link component that create approval/disapproval links.",
   "icon": "path:assets/approval-link.svg",
-  "inputs": null,
-  "metadata": null,
+  "inputs": [ ],
+  "metadata": { },
   "name": "approvalLink",
   "resources": null,
-  "tags": null,
+  "tags": [ ],
   "title": "Approval Link",
-  "triggers": null,
+  "triggers": [ ],
   "unifiedApi": null,
   "version": 1
 }

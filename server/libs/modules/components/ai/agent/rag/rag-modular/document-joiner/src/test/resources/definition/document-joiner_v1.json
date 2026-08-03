@@ -1,5 +1,5 @@
 {
-  "actions": null,
+  "actions": [ ],
   "clusterElements": [ {
     "name": "concatenationDocumentJoiner",
     "description": "Combines documents retrieved based on multiple queries and from multiple data sources\nby concatenating them into a single collection of documents. In case of duplicate\ndocuments, the first occurrence is kept. The score of each document is kept as is.\n",
@@ -7,7 +7,7 @@
     "help": null,
     "outputDefinition": null,
     "processErrorResponse": null,
-    "properties": null,
+    "properties": [ ],
     "title": "Concatenation Document Joiner",
     "type": {
       "name": "DOCUMENT_JOINER",
@@ -23,17 +23,17 @@
     "label": "Artificial Intelligence"
   } ],
   "connection": null,
-  "customAction": null,
+  "customAction": false,
   "customActionHelp": null,
   "description": "Document Joiner.",
   "icon": "path:assets/document-joiner.svg",
-  "inputs": null,
-  "metadata": null,
+  "inputs": [ ],
+  "metadata": { },
   "name": "documentJoiner",
   "resources": null,
-  "tags": null,
+  "tags": [ ],
   "title": "Document Joiner",
-  "triggers": null,
+  "triggers": [ ],
   "unifiedApi": null,
   "version": 1
 }

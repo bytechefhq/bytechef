@@ -1,0 +1,39 @@
+{
+  "actions": [ ],
+  "clusterElements": [ {
+    "name": "sessionRepository",
+    "description": "Stores session events in memory; cleared on restart.",
+    "element": { },
+    "help": null,
+    "outputDefinition": null,
+    "processErrorResponse": null,
+    "properties": [ ],
+    "title": "In-memory Session Repository",
+    "type": {
+      "name": "SESSION_REPOSITORY",
+      "key": "sessionRepository",
+      "label": "Session Repository",
+      "multipleElements": false,
+      "required": true
+    },
+    "workflowNodeDescription": null
+  } ],
+  "componentCategories": [ {
+    "name": "artificial-intelligence",
+    "label": "Artificial Intelligence"
+  } ],
+  "connection": null,
+  "customAction": false,
+  "customActionHelp": null,
+  "description": "In-memory storage backend for Session Chat Memory.",
+  "icon": "path:assets/in-memory-session-chat-memory.svg",
+  "inputs": [ ],
+  "metadata": { },
+  "name": "inMemorySessionChatMemory",
+  "resources": null,
+  "tags": [ ],
+  "title": "In-memory Session Repository",
+  "triggers": [ ],
+  "unifiedApi": null,
+  "version": 1
+}

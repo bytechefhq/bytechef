@@ -1,0 +1,48 @@
+{
+  "actionClusterElementTypes": { },
+  "actions": [ ],
+  "clusterElementClusterElementTypes": { },
+  "clusterElementTypes": [ {
+    "name": "DATA_SOURCE",
+    "key": "dataSource",
+    "label": "Data Source",
+    "multipleElements": false,
+    "required": true
+  } ],
+  "clusterElements": [ {
+    "name": "sessionRepository",
+    "description": "Stores session events in a relational database.",
+    "element": { },
+    "help": null,
+    "outputDefinition": null,
+    "processErrorResponse": null,
+    "properties": [ ],
+    "title": "JDBC Session Repository",
+    "type": {
+      "name": "SESSION_REPOSITORY",
+      "key": "sessionRepository",
+      "label": "Session Repository",
+      "multipleElements": false,
+      "required": true
+    },
+    "workflowNodeDescription": null
+  } ],
+  "componentCategories": [ {
+    "name": "artificial-intelligence",
+    "label": "Artificial Intelligence"
+  } ],
+  "connection": null,
+  "customAction": false,
+  "customActionHelp": null,
+  "description": "JDBC storage backend for Session Chat Memory.",
+  "icon": "path:assets/jdbc-session-chat-memory.svg",
+  "inputs": [ ],
+  "metadata": { },
+  "name": "jdbcSessionChatMemory",
+  "resources": null,
+  "tags": [ ],
+  "title": "JDBC Session Repository",
+  "triggers": [ ],
+  "unifiedApi": null,
+  "version": 1
+}

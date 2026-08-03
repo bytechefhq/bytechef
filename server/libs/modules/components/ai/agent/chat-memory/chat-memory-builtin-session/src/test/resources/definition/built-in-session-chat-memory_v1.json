@@ -1,0 +1,39 @@
+{
+  "actions": [ ],
+  "clusterElements": [ {
+    "name": "sessionRepository",
+    "description": "Stores session events using the application's configured session backend.",
+    "element": { },
+    "help": null,
+    "outputDefinition": null,
+    "processErrorResponse": null,
+    "properties": [ ],
+    "title": "Built-in Session Repository",
+    "type": {
+      "name": "SESSION_REPOSITORY",
+      "key": "sessionRepository",
+      "label": "Session Repository",
+      "multipleElements": false,
+      "required": true
+    },
+    "workflowNodeDescription": null
+  } ],
+  "componentCategories": [ {
+    "name": "artificial-intelligence",
+    "label": "Artificial Intelligence"
+  } ],
+  "connection": null,
+  "customAction": false,
+  "customActionHelp": null,
+  "description": "Built-in storage backend for Session Chat Memory.",
+  "icon": "path:assets/built-in-session-chat-memory.svg",
+  "inputs": [ ],
+  "metadata": { },
+  "name": "builtInSessionChatMemory",
+  "resources": null,
+  "tags": [ ],
+  "title": "Built-in Session Repository",
+  "triggers": [ ],
+  "unifiedApi": null,
+  "version": 1
+}
