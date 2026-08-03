@@ -32,7 +32,6 @@ import com.bytechef.component.productboard.trigger.ProductboardUpdatedFeatureTri
 import com.google.auto.service.AutoService;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * @author Monika Kušter
@@ -64,11 +63,9 @@ public class ProductboardComponentHandler extends AbstractProductboardComponentH
     public ModifiableConnectionDefinition modifyConnection(
         ModifiableConnectionDefinition modifiableConnectionDefinition) {
 
-        Optional<List<? extends Authorization>> optionalAuthorizations =
-            modifiableConnectionDefinition.getAuthorizations();
+        List<? extends Authorization> authorizations = modifiableConnectionDefinition.getAuthorizations();
 
-        if (optionalAuthorizations.isPresent()) {
-            List<? extends Authorization> authorizations = optionalAuthorizations.get();
+        if (!authorizations.isEmpty()) {
 
             for (Authorization authorization : authorizations) {
                 ModifiableAuthorization modifiableAuthorization = (ModifiableAuthorization) authorization;

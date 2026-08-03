@@ -70,7 +70,7 @@ public class MicrosoftOneDriveNewFileTrigger {
     private static String getPollUrl(Parameters inputParameters) {
         String recursiveDefaultUrlSuffix = "children";
 
-        if (RECURSIVE_PROPERTY.getRequired() && inputParameters.getRequiredBoolean(RECURSIVE)) {
+        if (inputParameters.getBoolean(RECURSIVE, false)) {
             recursiveDefaultUrlSuffix = "delta";
         }
 
