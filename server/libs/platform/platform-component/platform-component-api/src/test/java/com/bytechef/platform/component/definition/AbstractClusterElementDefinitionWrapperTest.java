@@ -62,7 +62,6 @@ class AbstractClusterElementDefinitionWrapperTest {
             .orElse(null));
         assertNotNull(wrapper.getElement());
         assertEquals(2, wrapper.getProperties()
-            .orElse(List.of())
             .size());
     }
 
@@ -80,7 +79,6 @@ class AbstractClusterElementDefinitionWrapperTest {
         when(mockDefinition.getOutputDefinition()).thenReturn(Optional.empty());
         when(mockDefinition.getProcessErrorResponse()).thenReturn(Optional.empty());
         when(mockDefinition.getWorkflowNodeDescription()).thenReturn(Optional.empty());
-        when(mockDefinition.getProperties()).thenReturn(Optional.empty());
 
         TestWrapper wrapper = new TestWrapper(mockDefinition);
 
@@ -97,8 +95,8 @@ class AbstractClusterElementDefinitionWrapperTest {
             .isPresent());
         assertFalse(wrapper.getWorkflowNodeDescription()
             .isPresent());
-        assertFalse(wrapper.getProperties()
-            .isPresent());
+
+        assertEquals(List.of(), wrapper.getProperties());
     }
 
     @Test
@@ -116,7 +114,6 @@ class AbstractClusterElementDefinitionWrapperTest {
         when(mockDefinition.getOutputDefinition()).thenReturn(Optional.empty());
         when(mockDefinition.getProcessErrorResponse()).thenReturn(Optional.empty());
         when(mockDefinition.getWorkflowNodeDescription()).thenReturn(Optional.empty());
-        when(mockDefinition.getProperties()).thenReturn(Optional.empty());
 
         TestWrapper wrapper = new TestWrapper(mockDefinition);
 
@@ -166,7 +163,7 @@ class AbstractClusterElementDefinitionWrapperTest {
         when(mockDefinition.getOutputDefinition()).thenReturn(Optional.of(mockOutputDefinition));
         when(mockDefinition.getProcessErrorResponse()).thenReturn(Optional.of(mockProcessErrorResponse));
         when(mockDefinition.getWorkflowNodeDescription()).thenReturn(Optional.of(mockWorkflowNodeDescription));
-        when(mockDefinition.getProperties()).thenReturn(Optional.of(List.of(mockProperty1, mockProperty2)));
+        when(mockDefinition.getProperties()).thenReturn((List) List.of(mockProperty1, mockProperty2));
 
         return mockDefinition;
     }
