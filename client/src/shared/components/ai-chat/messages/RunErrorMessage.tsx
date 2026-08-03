@@ -21,7 +21,7 @@ export interface RunErrorDataI {
 const RunErrorMessage = ({data}: DataMessagePartProps<RunErrorDataI>) => {
     return (
         <div
-            className="my-2 flex items-start gap-2 rounded-md border-l-4 border-red-500 bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950/40 dark:text-red-300"
+            className="my-2 flex items-start gap-2 rounded-md border-l-4 border-red-500 bg-surface-destructive-secondary px-3 py-2 text-sm text-content-destructive"
             data-testid="ai-hub-run-error"
             role="alert"
         >

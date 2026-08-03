@@ -109,7 +109,7 @@ const LayoutContainer = ({
                     <div className="relative">
                         <div className="absolute right-0 p-1">
                             <button
-                                className="ml-1 items-center justify-center rounded-full p-2 focus:ring-2 focus:ring-white focus:outline-hidden focus:ring-inset"
+                                className="ml-1 items-center justify-center rounded-full p-2 focus:ring-2 focus:ring-stroke-onsurface-primary-hover focus:outline-hidden focus:ring-inset"
                                 onClick={() => setSidebarOpen(false)}
                                 type="button"
                             >

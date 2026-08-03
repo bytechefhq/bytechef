@@ -4,7 +4,7 @@ import {SidebarTrigger} from '@/components/ui/sidebar';
 export function MobileTopNavigation() {
     return (
         <div className="lg:hidden">
-            <div className="flex items-center justify-between bg-white px-4 py-2">
+            <div className="flex items-center justify-between border-b border-stroke-neutral-secondary bg-surface-neutral-primary px-4 py-2">
                 <div>
                     <img alt="ByteChef" className="h-8 w-auto" src={reactLogo} />
                 </div>

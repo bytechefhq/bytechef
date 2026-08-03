@@ -120,7 +120,7 @@ const SelectConnectionMessage = ({data}: DataMessagePartProps<SelectConnectionDa
     if (pickedConnection) {
         return (
             <div className="mt-2 flex items-center gap-2 text-sm">
-                <CheckIcon className="size-4 text-emerald-600" />
+                <CheckIcon className="size-4 text-content-success-primary" />
 
                 <span>
                     Picked: <span className="font-medium">{pickedConnection.name}</span>
@@ -165,7 +165,7 @@ const SelectConnectionMessage = ({data}: DataMessagePartProps<SelectConnectionDa
                                         <span>{connection.name}</span>
 
                                         {connection.tags && connection.tags.length > 0 && (
-                                            <span className="text-xs text-gray-500">
+                                            <span className="text-xs text-content-neutral-secondary">
                                                 {connection.tags.map((tag) => tag.name).join(', ')}
                                             </span>
                                         )}

@@ -14,15 +14,15 @@ interface WorkflowExecutionLogsContentProps {
 
 const LOG_LEVEL_BADGE_CONFIG = {
     [LogLevel.Trace]: {
-        className: 'bg-gray-100 text-gray-600',
+        className: 'bg-surface-neutral-secondary text-content-neutral-secondary',
         icon: <MessageSquareIcon className="size-3" />,
     },
     [LogLevel.Debug]: {
-        className: 'bg-purple-100 text-purple-600',
+        className: 'bg-purple-100 text-purple-600 dark:bg-purple-950 dark:text-purple-300',
         icon: <BugIcon className="size-3" />,
     },
     [LogLevel.Info]: {
-        className: 'bg-blue-100 text-blue-600',
+        className: 'bg-surface-brand-secondary text-content-brand-primary',
         icon: <InfoIcon className="size-3" />,
     },
     [LogLevel.Warn]: {
@@ -30,7 +30,7 @@ const LOG_LEVEL_BADGE_CONFIG = {
         icon: <AlertTriangleIcon className="size-3" />,
     },
     [LogLevel.Error]: {
-        className: 'bg-red-100 text-red-600',
+        className: 'bg-surface-destructive-secondary text-content-destructive',
         icon: <AlertCircleIcon className="size-3" />,
     },
 };

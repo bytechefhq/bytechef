@@ -419,7 +419,7 @@ const AnsweredSummary = ({persistedAnswer}: {persistedAnswer?: string}) => {
     if (!persistedAnswer) {
         return (
             <div className="mt-2 flex items-center gap-2 rounded-md border border-border bg-muted/30 p-3 text-sm">
-                <CheckIcon className="size-4 text-emerald-600" />
+                <CheckIcon className="size-4 text-content-success-primary" />
 
                 <span>
                     Picked: <span className="font-medium">(answered)</span>
@@ -435,7 +435,7 @@ const AnsweredSummary = ({persistedAnswer}: {persistedAnswer?: string}) => {
     if (!isMultiLine) {
         return (
             <div className="mt-2 flex items-center gap-2 rounded-md border border-border bg-muted/30 p-3 text-sm">
-                <CheckIcon className="size-4 text-emerald-600" />
+                <CheckIcon className="size-4 text-content-success-primary" />
 
                 <span>
                     Picked: <span className="font-medium">{persistedAnswer}</span>
@@ -446,7 +446,7 @@ const AnsweredSummary = ({persistedAnswer}: {persistedAnswer?: string}) => {
 
     return (
         <div className="mt-2 flex items-start gap-2 rounded-md border border-border bg-muted/30 p-3 text-sm">
-            <CheckIcon className="mt-0.5 size-4 shrink-0 text-emerald-600" />
+            <CheckIcon className="mt-0.5 size-4 shrink-0 text-content-success-primary" />
 
             <div className="flex flex-col gap-1">
                 <span className="font-medium">Picked:</span>

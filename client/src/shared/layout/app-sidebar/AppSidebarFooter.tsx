@@ -158,7 +158,7 @@ export function AppSidebarFooter() {
                     type="button"
                 >
                     <Avatar className="shrink-0">
-                        <AvatarFallback className="bg-white text-primary">
+                        <AvatarFallback className="bg-surface-neutral-primary text-primary">
                             <User2Icon className="size-7" />
                         </AvatarFallback>
                     </Avatar>

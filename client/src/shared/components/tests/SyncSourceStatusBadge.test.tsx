@@ -19,8 +19,8 @@ describe('SyncSourceStatusBadge', () => {
         const badge = screen.getByText('Disabled');
 
         expect(badge).toBeInTheDocument();
-        expect(badge.className).toContain('bg-gray-100');
-        expect(badge.className).toContain('text-gray-800');
+        expect(badge.className).toContain('bg-surface-neutral-secondary');
+        expect(badge.className).toContain('text-content-neutral-primary');
     });
 
     it('renders FAILED with red style and label "Failed"', () => {
@@ -29,8 +29,8 @@ describe('SyncSourceStatusBadge', () => {
         const badge = screen.getByText('Failed');
 
         expect(badge).toBeInTheDocument();
-        expect(badge.className).toContain('bg-red-100');
-        expect(badge.className).toContain('text-red-800');
+        expect(badge.className).toContain('bg-surface-destructive-secondary');
+        expect(badge.className).toContain('text-content-destructive');
     });
 
     it('renders PREVIEW with blue style and label "Preview"', () => {
@@ -39,8 +39,8 @@ describe('SyncSourceStatusBadge', () => {
         const badge = screen.getByText('Preview');
 
         expect(badge).toBeInTheDocument();
-        expect(badge.className).toContain('bg-blue-100');
-        expect(badge.className).toContain('text-blue-800');
+        expect(badge.className).toContain('bg-surface-brand-secondary');
+        expect(badge.className).toContain('text-content-brand-primary');
     });
 
     it('renders READY with green style and label "Ready"', () => {
@@ -49,8 +49,8 @@ describe('SyncSourceStatusBadge', () => {
         const badge = screen.getByText('Ready');
 
         expect(badge).toBeInTheDocument();
-        expect(badge.className).toContain('bg-green-100');
-        expect(badge.className).toContain('text-green-800');
+        expect(badge.className).toContain('bg-surface-success-secondary');
+        expect(badge.className).toContain('text-content-success-primary');
     });
 
     it('renders unknown status with gray fallback and the status string as label', () => {
@@ -59,6 +59,6 @@ describe('SyncSourceStatusBadge', () => {
         const badge = screen.getByText('UNKNOWN_STATE');
 
         expect(badge).toBeInTheDocument();
-        expect(badge.className).toContain('bg-gray-100');
+        expect(badge.className).toContain('bg-surface-neutral-secondary');
     });
 });

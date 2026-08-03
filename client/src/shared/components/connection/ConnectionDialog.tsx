@@ -512,18 +512,18 @@ const ConnectionDialog = ({
                                             <div className="relative flex grow items-stretch focus-within:z-10">
                                                 <Input
                                                     {...field}
-                                                    className="rounded-r-none bg-gray-50 text-gray-700"
+                                                    className="rounded-r-none bg-surface-neutral-secondary text-content-neutral-secondary"
                                                     readOnly
                                                     value={connection?.id}
                                                 />
                                             </div>
 
                                             <Button
-                                                className="-ml-px rounded-l-none rounded-r-md border border-gray-200 bg-gray-50 shadow-xs hover:bg-gray-100"
+                                                className="-ml-px rounded-l-none rounded-r-md border border-stroke-neutral-secondary bg-surface-neutral-secondary shadow-xs hover:bg-surface-neutral-primary-hover"
                                                 icon={
                                                     <ClipboardIcon
                                                         aria-hidden="true"
-                                                        className="size-4 text-gray-400"
+                                                        className="size-4 text-content-neutral-tertiary"
                                                     />
                                                 }
                                                 onClick={() => copyToClipboard(connection?.id?.toString() ?? '')}
@@ -862,7 +862,7 @@ const ConnectionDialog = ({
                                 {showOAuth2AppPredefined && (
                                     <div>
                                         <a
-                                            className="text-sm text-blue-600"
+                                            className="text-sm text-content-brand-primary"
                                             href="#"
                                             onClick={() => setUsePredefinedOAuthApp(!usePredefinedOAuthApp)}
                                         >
@@ -917,7 +917,7 @@ const ConnectionDialog = ({
 
                         {!oAuth2AuthorizationParametersLoading && wizardStep === 'oauth_step' && (
                             <>
-                                <Alert className="border-blue-50 bg-blue-50 text-blue-700">
+                                <Alert className="border-blue-50 bg-surface-brand-secondary text-content-brand-primary">
                                     <RocketIcon className="size-4" />
 
                                     <AlertTitle>Heads up!</AlertTitle>
@@ -1073,7 +1073,10 @@ const ConnectionDialog = ({
 const Errors = ({errors}: {errors: string[]}) => (
     <ul>
         {errors.map((error, index) => (
-            <li className="my-4 rounded-md bg-red-50 p-4 text-sm text-red-700" key={`error_${index}`}>
+            <li
+                className="my-4 rounded-md bg-surface-destructive-secondary p-4 text-sm text-content-destructive"
+                key={`error_${index}`}
+            >
                 An error has occurred: {error}
             </li>
         ))}
@@ -1091,8 +1094,8 @@ const RedirectUriInput = ({redirectUri}: {redirectUri?: string}) => {
             </div>
 
             <Button
-                className="-ml-px rounded-l-none rounded-r-md border border-gray-200 bg-gray-50 shadow-xs hover:bg-gray-100"
-                icon={<ClipboardIcon aria-hidden="true" className="size-4 text-gray-400" />}
+                className="-ml-px rounded-l-none rounded-r-md border border-stroke-neutral-secondary bg-surface-neutral-secondary shadow-xs hover:bg-surface-neutral-primary-hover"
+                icon={<ClipboardIcon aria-hidden="true" className="size-4 text-content-neutral-tertiary" />}
                 onClick={() => copyToClipboard(redirectUri ?? '')}
                 size="icon"
                 variant="ghost"

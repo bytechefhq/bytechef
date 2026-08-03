@@ -6,14 +6,17 @@ interface SyncSourceStatusBadgePropsI {
 
 const STATUS_STYLES: Record<string, {className: string; label: string}> = {
     BUILDING_PREVIEW: {className: 'bg-yellow-100 text-yellow-800', label: 'Building Preview'},
-    DISABLED: {className: 'bg-gray-100 text-gray-800', label: 'Disabled'},
-    FAILED: {className: 'bg-red-100 text-red-800', label: 'Failed'},
-    PREVIEW: {className: 'bg-blue-100 text-blue-800', label: 'Preview'},
-    READY: {className: 'bg-green-100 text-green-800', label: 'Ready'},
+    DISABLED: {className: 'bg-surface-neutral-secondary text-content-neutral-primary', label: 'Disabled'},
+    FAILED: {className: 'bg-surface-destructive-secondary text-content-destructive', label: 'Failed'},
+    PREVIEW: {className: 'bg-surface-brand-secondary text-content-brand-primary', label: 'Preview'},
+    READY: {className: 'bg-surface-success-secondary text-content-success-primary', label: 'Ready'},
 };
 
 const SyncSourceStatusBadge = ({status}: SyncSourceStatusBadgePropsI) => {
-    const style = STATUS_STYLES[status] || {className: 'bg-gray-100 text-gray-800', label: status};
+    const style = STATUS_STYLES[status] || {
+        className: 'bg-surface-neutral-secondary text-content-neutral-primary',
+        label: status,
+    };
 
     return (
         <span

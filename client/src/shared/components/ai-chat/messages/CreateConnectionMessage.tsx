@@ -108,7 +108,7 @@ const CreateConnectionMessage = ({data}: DataMessagePartProps<CreateConnectionDa
     if (createdConnection) {
         return (
             <div className="mt-2 flex items-center gap-2 text-sm">
-                <CheckIcon className="size-4 text-emerald-600" />
+                <CheckIcon className="size-4 text-content-success-primary" />
 
                 <span>
                     Connection ready: <span className="font-medium">{createdConnection.name}</span>
