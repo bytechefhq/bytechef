@@ -1,6 +1,5 @@
-import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import {fireEvent, render, screen} from '@testing-library/react';
-import {describe, expect, it, vi} from 'vitest';
+import {fireEvent, render, screen, stubMutation} from '@/shared/util/test-utils';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import AiPromptDetail from '../AiPromptDetail';
 
@@ -49,15 +48,19 @@ vi.mock('@/shared/middleware/graphql', () => ({
         },
         isLoading: false,
     }),
-    useSetActiveAiPromptVersionMutation: () => ({isPending: false, mutate: vi.fn()}),
+    useSetActiveAiPromptVersionMutation: vi.fn(),
 }));
 
+const {useSetActiveAiPromptVersionMutation} = await import('@/shared/middleware/graphql');
+
+const setActiveVersionMutation = stubMutation(vi.mocked(useSetActiveAiPromptVersionMutation));
+
+beforeEach(() => {
+    setActiveVersionMutation.mutate.mockClear();
+});
+
 const renderDetail = () => {
-    render(
-        <QueryClientProvider client={new QueryClient()}>
-            <AiPromptDetail onBack={vi.fn()} promptId="1" />
-        </QueryClientProvider>
-    );
+    render(<AiPromptDetail onBack={vi.fn()} promptId="1" />);
 };
 
 const openCompareDialog = () => {

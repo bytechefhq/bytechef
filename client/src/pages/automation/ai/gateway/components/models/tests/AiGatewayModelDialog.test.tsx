@@ -1,12 +1,12 @@
-import {fireEvent, render, screen, userEvent, within} from '@/shared/util/test-utils';
-import {beforeAll, describe, expect, it, vi} from 'vitest';
+import {fireEvent, render, screen, stubMutation, userEvent, within} from '@/shared/util/test-utils';
+import {beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {AiGatewayModelType} from '../../../types';
 import AiGatewayModelDialog from '../AiGatewayModelDialog';
 
 vi.mock('@/shared/middleware/graphql', () => ({
-    useCreateWorkspaceAiGatewayModelMutation: () => ({isPending: false, mutate: vi.fn()}),
-    useUpdateWorkspaceAiGatewayModelMutation: () => ({isPending: false, mutate: vi.fn()}),
+    useCreateWorkspaceAiGatewayModelMutation: vi.fn(),
+    useUpdateWorkspaceAiGatewayModelMutation: vi.fn(),
     useWorkspaceAiGatewayProvidersQuery: () => ({
         data: {
             workspaceAiGatewayProviders: [
@@ -45,6 +45,17 @@ vi.mock('@/shared/middleware/graphql', () => ({
         },
     }),
 }));
+
+const {useCreateWorkspaceAiGatewayModelMutation, useUpdateWorkspaceAiGatewayModelMutation} =
+    await import('@/shared/middleware/graphql');
+
+const createModelMutation = stubMutation(vi.mocked(useCreateWorkspaceAiGatewayModelMutation));
+const updateModelMutation = stubMutation(vi.mocked(useUpdateWorkspaceAiGatewayModelMutation));
+
+beforeEach(() => {
+    createModelMutation.mutate.mockClear();
+    updateModelMutation.mutate.mockClear();
+});
 
 const modelWithRoutingPolicy: AiGatewayModelType = {
     alias: null,

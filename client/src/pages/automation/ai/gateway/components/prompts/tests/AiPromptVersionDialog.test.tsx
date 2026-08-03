@@ -1,5 +1,5 @@
-import {fireEvent, render, screen} from '@/shared/util/test-utils';
-import {describe, expect, it, vi} from 'vitest';
+import {fireEvent, render, screen, stubMutation} from '@/shared/util/test-utils';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import AiPromptVersionDialog from '../AiPromptVersionDialog';
 
@@ -8,8 +8,16 @@ vi.mock('@/shared/middleware/graphql', () => ({
         Chat: 'CHAT',
         Text: 'TEXT',
     },
-    useCreateAiPromptVersionMutation: () => ({isPending: false, mutate: vi.fn()}),
+    useCreateAiPromptVersionMutation: vi.fn(),
 }));
+
+const {useCreateAiPromptVersionMutation} = await import('@/shared/middleware/graphql');
+
+const createPromptVersionMutation = stubMutation(vi.mocked(useCreateAiPromptVersionMutation));
+
+beforeEach(() => {
+    createPromptVersionMutation.mutate.mockClear();
+});
 
 const renderDialog = (onClose = vi.fn()) => {
     render(<AiPromptVersionDialog onClose={onClose} promptId="1" />);

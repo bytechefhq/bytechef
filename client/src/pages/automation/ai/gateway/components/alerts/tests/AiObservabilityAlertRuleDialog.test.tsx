@@ -1,5 +1,5 @@
-import {fireEvent, render, screen} from '@/shared/util/test-utils';
-import {describe, expect, it, vi} from 'vitest';
+import {fireEvent, render, screen, stubMutation} from '@/shared/util/test-utils';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import AiObservabilityAlertRuleDialog from '../AiObservabilityAlertRuleDialog';
 
@@ -16,15 +16,31 @@ vi.mock('@/shared/middleware/graphql', () => ({
         RequestVolume: 'REQUEST_VOLUME',
         TokenUsage: 'TOKEN_USAGE',
     },
-    useCreateAiObservabilityAlertRuleMutation: () => ({isPending: false, mutate: vi.fn()}),
-    useTestAiObservabilityAlertRuleMutation: () => ({isPending: false, mutate: vi.fn()}),
-    useUpdateAiObservabilityAlertRuleMutation: () => ({isPending: false, mutate: vi.fn()}),
+    useCreateAiObservabilityAlertRuleMutation: vi.fn(),
+    useTestAiObservabilityAlertRuleMutation: vi.fn(),
+    useUpdateAiObservabilityAlertRuleMutation: vi.fn(),
     useWorkspaceNotificationsQuery: () => ({
         data: {
             workspaceNotifications: [{id: '1', name: 'Ops Email', type: 'EMAIL'}],
         },
     }),
 }));
+
+const {
+    useCreateAiObservabilityAlertRuleMutation,
+    useTestAiObservabilityAlertRuleMutation,
+    useUpdateAiObservabilityAlertRuleMutation,
+} = await import('@/shared/middleware/graphql');
+
+const createAlertRuleMutation = stubMutation(vi.mocked(useCreateAiObservabilityAlertRuleMutation));
+const testAlertRuleMutation = stubMutation(vi.mocked(useTestAiObservabilityAlertRuleMutation));
+const updateAlertRuleMutation = stubMutation(vi.mocked(useUpdateAiObservabilityAlertRuleMutation));
+
+beforeEach(() => {
+    createAlertRuleMutation.mutate.mockClear();
+    testAlertRuleMutation.mutate.mockClear();
+    updateAlertRuleMutation.mutate.mockClear();
+});
 
 const renderDialog = (onClose = vi.fn()) => {
     render(<AiObservabilityAlertRuleDialog onClose={onClose} workspaceId="1" />);

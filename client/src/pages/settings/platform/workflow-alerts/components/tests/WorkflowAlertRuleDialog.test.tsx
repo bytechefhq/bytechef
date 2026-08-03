@@ -1,5 +1,5 @@
-import {fireEvent, render, screen} from '@/shared/util/test-utils';
-import {describe, expect, it, vi} from 'vitest';
+import {fireEvent, render, screen, stubMutation} from '@/shared/util/test-utils';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import WorkflowAlertRuleDialog from '../WorkflowAlertRuleDialog';
 
@@ -18,14 +18,25 @@ vi.mock('@/shared/middleware/graphql', () => ({
         NoActivity: 'NO_ACTIVITY',
         UsageThreshold: 'USAGE_THRESHOLD',
     },
-    useCreateWorkflowAlertRuleMutation: () => ({isPending: false, mutate: vi.fn()}),
-    useUpdateWorkflowAlertRuleMutation: () => ({isPending: false, mutate: vi.fn()}),
+    useCreateWorkflowAlertRuleMutation: vi.fn(),
+    useUpdateWorkflowAlertRuleMutation: vi.fn(),
     useWorkspaceNotificationsQuery: () => ({
         data: {
             workspaceNotifications: [{id: '1', name: 'Ops Email', type: 'EMAIL'}],
         },
     }),
 }));
+
+const {useCreateWorkflowAlertRuleMutation, useUpdateWorkflowAlertRuleMutation} =
+    await import('@/shared/middleware/graphql');
+
+const createRuleMutation = stubMutation(vi.mocked(useCreateWorkflowAlertRuleMutation));
+const updateRuleMutation = stubMutation(vi.mocked(useUpdateWorkflowAlertRuleMutation));
+
+beforeEach(() => {
+    createRuleMutation.mutate.mockClear();
+    updateRuleMutation.mutate.mockClear();
+});
 
 const renderDialog = (onClose = vi.fn()) => {
     render(<WorkflowAlertRuleDialog onClose={onClose} />);
@@ -77,5 +88,35 @@ describe('WorkflowAlertRuleDialog', () => {
         renderDialog();
 
         expect(screen.getByLabelText('Rule Type')).toHaveAttribute('data-slot', 'select-trigger');
+    });
+});
+
+describe('WorkflowAlertRuleDialog submit', () => {
+    it('sends the form input to the create mutation and closes the dialog once it succeeds', () => {
+        const onClose = renderDialog();
+
+        fireEvent.change(screen.getByLabelText('Name'), {target: {value: 'Consecutive failures on order sync'}});
+
+        fireEvent.click(screen.getByRole('button', {name: 'Create'}));
+
+        expect(createRuleMutation.mutate).toHaveBeenCalledWith({
+            input: {
+                cooldownMinutes: 60,
+                enabled: true,
+                name: 'Consecutive failures on order sync',
+                notificationIds: [],
+                ruleType: 'CONSECUTIVE_FAILURES',
+                threshold: 3,
+                windowMinutes: 60,
+                workflowId: null,
+            },
+            workspaceId: '1',
+        });
+
+        expect(onClose).not.toHaveBeenCalled();
+
+        createRuleMutation.triggerOnSuccess(undefined, undefined);
+
+        expect(onClose).toHaveBeenCalledTimes(1);
     });
 });

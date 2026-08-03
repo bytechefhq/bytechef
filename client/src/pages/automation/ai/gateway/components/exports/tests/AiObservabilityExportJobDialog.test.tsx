@@ -1,5 +1,5 @@
-import {fireEvent, render, screen} from '@/shared/util/test-utils';
-import {describe, expect, it, vi} from 'vitest';
+import {fireEvent, render, screen, stubMutation} from '@/shared/util/test-utils';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import AiObservabilityExportJobDialog from '../AiObservabilityExportJobDialog';
 
@@ -15,8 +15,16 @@ vi.mock('@/shared/middleware/graphql', () => ({
         Sessions: 'SESSIONS',
         Traces: 'TRACES',
     },
-    useCreateAiObservabilityExportJobMutation: () => ({isPending: false, mutate: vi.fn()}),
+    useCreateAiObservabilityExportJobMutation: vi.fn(),
 }));
+
+const {useCreateAiObservabilityExportJobMutation} = await import('@/shared/middleware/graphql');
+
+const createExportJobMutation = stubMutation(vi.mocked(useCreateAiObservabilityExportJobMutation));
+
+beforeEach(() => {
+    createExportJobMutation.mutate.mockClear();
+});
 
 const renderDialog = (onClose = vi.fn()) => {
     render(<AiObservabilityExportJobDialog onClose={onClose} />);

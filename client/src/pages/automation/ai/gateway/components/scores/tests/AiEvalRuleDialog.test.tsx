@@ -1,5 +1,5 @@
-import {fireEvent, render, screen} from '@/shared/util/test-utils';
-import {describe, expect, it, vi} from 'vitest';
+import {fireEvent, render, screen, stubMutation} from '@/shared/util/test-utils';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {AiEvalScoreConfigType} from '../../../types';
 import AiEvalRuleDialog from '../AiEvalRuleDialog';
@@ -9,8 +9,16 @@ vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({
 }));
 
 vi.mock('@/shared/middleware/graphql', () => ({
-    useCreateAiEvalRuleMutation: () => ({isPending: false, mutate: vi.fn()}),
+    useCreateAiEvalRuleMutation: vi.fn(),
 }));
+
+const {useCreateAiEvalRuleMutation} = await import('@/shared/middleware/graphql');
+
+const createRuleMutation = stubMutation(vi.mocked(useCreateAiEvalRuleMutation));
+
+beforeEach(() => {
+    createRuleMutation.mutate.mockClear();
+});
 
 const scoreConfigs: AiEvalScoreConfigType[] = [
     {

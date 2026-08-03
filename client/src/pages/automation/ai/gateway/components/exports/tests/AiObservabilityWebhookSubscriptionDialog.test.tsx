@@ -1,5 +1,5 @@
-import {fireEvent, render, screen} from '@/shared/util/test-utils';
-import {describe, expect, it, vi} from 'vitest';
+import {fireEvent, render, screen, stubMutation} from '@/shared/util/test-utils';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import AiObservabilityWebhookSubscriptionDialog from '../AiObservabilityWebhookSubscriptionDialog';
 
@@ -8,9 +8,20 @@ vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({
 }));
 
 vi.mock('@/shared/middleware/graphql', () => ({
-    useCreateAiObservabilityWebhookSubscriptionMutation: () => ({isPending: false, mutate: vi.fn()}),
-    useUpdateAiObservabilityWebhookSubscriptionMutation: () => ({isPending: false, mutate: vi.fn()}),
+    useCreateAiObservabilityWebhookSubscriptionMutation: vi.fn(),
+    useUpdateAiObservabilityWebhookSubscriptionMutation: vi.fn(),
 }));
+
+const {useCreateAiObservabilityWebhookSubscriptionMutation, useUpdateAiObservabilityWebhookSubscriptionMutation} =
+    await import('@/shared/middleware/graphql');
+
+const createWebhookSubscriptionMutation = stubMutation(vi.mocked(useCreateAiObservabilityWebhookSubscriptionMutation));
+const updateWebhookSubscriptionMutation = stubMutation(vi.mocked(useUpdateAiObservabilityWebhookSubscriptionMutation));
+
+beforeEach(() => {
+    createWebhookSubscriptionMutation.mutate.mockClear();
+    updateWebhookSubscriptionMutation.mutate.mockClear();
+});
 
 const renderDialog = (onClose = vi.fn()) => {
     render(<AiObservabilityWebhookSubscriptionDialog onClose={onClose} />);

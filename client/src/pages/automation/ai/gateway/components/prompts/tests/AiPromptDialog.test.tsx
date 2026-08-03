@@ -1,20 +1,25 @@
-import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import {fireEvent, render, screen} from '@testing-library/react';
-import {describe, expect, it, vi} from 'vitest';
+import {fireEvent, render, screen, stubMutation} from '@/shared/util/test-utils';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import AiPromptDialog from '../AiPromptDialog';
 
 vi.mock('@/shared/middleware/graphql', () => ({
-    useCreateAiPromptMutation: () => ({isPending: false, mutate: vi.fn()}),
-    useUpdateAiPromptMutation: () => ({isPending: false, mutate: vi.fn()}),
+    useCreateAiPromptMutation: vi.fn(),
+    useUpdateAiPromptMutation: vi.fn(),
 }));
 
+const {useCreateAiPromptMutation, useUpdateAiPromptMutation} = await import('@/shared/middleware/graphql');
+
+const createPromptMutation = stubMutation(vi.mocked(useCreateAiPromptMutation));
+const updatePromptMutation = stubMutation(vi.mocked(useUpdateAiPromptMutation));
+
+beforeEach(() => {
+    createPromptMutation.mutate.mockClear();
+    updatePromptMutation.mutate.mockClear();
+});
+
 const renderDialog = (onClose = vi.fn()) => {
-    render(
-        <QueryClientProvider client={new QueryClient()}>
-            <AiPromptDialog onClose={onClose} workspaceId="1" />
-        </QueryClientProvider>
-    );
+    render(<AiPromptDialog onClose={onClose} workspaceId="1" />);
 
     return onClose;
 };

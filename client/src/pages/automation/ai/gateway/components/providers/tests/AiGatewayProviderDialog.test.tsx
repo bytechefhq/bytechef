@@ -1,5 +1,5 @@
-import {fireEvent, render, screen} from '@/shared/util/test-utils';
-import {describe, expect, it, vi} from 'vitest';
+import {fireEvent, render, screen, stubMutation} from '@/shared/util/test-utils';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import AiGatewayProviderDialog from '../AiGatewayProviderDialog';
 
@@ -14,10 +14,26 @@ vi.mock('@/shared/middleware/graphql', () => ({
         Mistral: 'MISTRAL',
         Openai: 'OPENAI',
     },
-    useCreateWorkspaceAiGatewayProviderMutation: () => ({isPending: false, mutate: vi.fn()}),
-    useTestWorkspaceAiGatewayProviderConnectionMutation: () => ({isPending: false, mutate: vi.fn()}),
-    useUpdateWorkspaceAiGatewayProviderMutation: () => ({isPending: false, mutate: vi.fn()}),
+    useCreateWorkspaceAiGatewayProviderMutation: vi.fn(),
+    useTestWorkspaceAiGatewayProviderConnectionMutation: vi.fn(),
+    useUpdateWorkspaceAiGatewayProviderMutation: vi.fn(),
 }));
+
+const {
+    useCreateWorkspaceAiGatewayProviderMutation,
+    useTestWorkspaceAiGatewayProviderConnectionMutation,
+    useUpdateWorkspaceAiGatewayProviderMutation,
+} = await import('@/shared/middleware/graphql');
+
+const createProviderMutation = stubMutation(vi.mocked(useCreateWorkspaceAiGatewayProviderMutation));
+const testProviderConnectionMutation = stubMutation(vi.mocked(useTestWorkspaceAiGatewayProviderConnectionMutation));
+const updateProviderMutation = stubMutation(vi.mocked(useUpdateWorkspaceAiGatewayProviderMutation));
+
+beforeEach(() => {
+    createProviderMutation.mutate.mockClear();
+    testProviderConnectionMutation.mutate.mockClear();
+    updateProviderMutation.mutate.mockClear();
+});
 
 const renderDialog = (onClose = vi.fn()) => {
     render(<AiGatewayProviderDialog onClose={onClose} workspaceId="1" />);

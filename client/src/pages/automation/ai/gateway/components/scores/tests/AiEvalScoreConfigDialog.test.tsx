@@ -1,5 +1,5 @@
-import {fireEvent, render, screen} from '@/shared/util/test-utils';
-import {describe, expect, it, vi} from 'vitest';
+import {fireEvent, render, screen, stubMutation} from '@/shared/util/test-utils';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {AiEvalScoreConfigType} from '../../../types';
 import AiEvalScoreConfigDialog from '../AiEvalScoreConfigDialog';
@@ -10,10 +10,23 @@ vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({
 
 vi.mock('@/shared/middleware/graphql', () => ({
     AiEvalScoreDataType: {Boolean: 'BOOLEAN', Categorical: 'CATEGORICAL', Numeric: 'NUMERIC'},
-    useCreateAiEvalScoreConfigMutation: () => ({isPending: false, mutate: vi.fn()}),
-    useDeleteAiEvalScoreConfigMutation: () => ({isPending: false, mutate: vi.fn()}),
-    useUpdateAiEvalScoreConfigMutation: () => ({isPending: false, mutate: vi.fn()}),
+    useCreateAiEvalScoreConfigMutation: vi.fn(),
+    useDeleteAiEvalScoreConfigMutation: vi.fn(),
+    useUpdateAiEvalScoreConfigMutation: vi.fn(),
 }));
+
+const {useCreateAiEvalScoreConfigMutation, useDeleteAiEvalScoreConfigMutation, useUpdateAiEvalScoreConfigMutation} =
+    await import('@/shared/middleware/graphql');
+
+const createScoreConfigMutation = stubMutation(vi.mocked(useCreateAiEvalScoreConfigMutation));
+const deleteScoreConfigMutation = stubMutation(vi.mocked(useDeleteAiEvalScoreConfigMutation));
+const updateScoreConfigMutation = stubMutation(vi.mocked(useUpdateAiEvalScoreConfigMutation));
+
+beforeEach(() => {
+    createScoreConfigMutation.mutate.mockClear();
+    deleteScoreConfigMutation.mutate.mockClear();
+    updateScoreConfigMutation.mutate.mockClear();
+});
 
 const categoricalConfig: AiEvalScoreConfigType = {
     categories: '["good", "bad"]',

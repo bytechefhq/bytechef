@@ -1,12 +1,20 @@
-import {fireEvent, render, screen} from '@/shared/util/test-utils';
-import {describe, expect, it, vi} from 'vitest';
+import {fireEvent, render, screen, stubMutation} from '@/shared/util/test-utils';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {AiEvalRuleType} from '../../../types';
 import AiEvalRules from '../AiEvalRules';
 
 vi.mock('@/shared/middleware/graphql', () => ({
-    useRunAiEvalRuleOnHistoricalTracesMutation: () => ({isPending: false, mutate: vi.fn()}),
+    useRunAiEvalRuleOnHistoricalTracesMutation: vi.fn(),
 }));
+
+const {useRunAiEvalRuleOnHistoricalTracesMutation} = await import('@/shared/middleware/graphql');
+
+const runOnHistoryMutation = stubMutation(vi.mocked(useRunAiEvalRuleOnHistoricalTracesMutation));
+
+beforeEach(() => {
+    runOnHistoryMutation.mutate.mockClear();
+});
 
 const evalRule: AiEvalRuleType = {
     createdDate: '1700000000000',
