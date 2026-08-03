@@ -52,16 +52,16 @@ public class ClusterElementDefinition {
 
     public ClusterElementDefinition(
         com.bytechef.component.definition.ClusterElementDefinition<?> clusterElementDefinition, String componentName,
-        int componentVersion, String icon) {
+        Integer componentVersion, @Nullable String icon) {
 
-        this.componentName = componentName;
-        this.componentVersion = componentVersion;
+        this.componentName = Objects.requireNonNull(componentName, "componentName is required");
+        this.componentVersion = Objects.requireNonNull(componentVersion, "componentVersion is required");
         this.description = clusterElementDefinition.getDescription()
             .orElse(null);
         this.help = clusterElementDefinition.getHelp()
             .map(Help::new)
             .orElse(null);
-        this.name = clusterElementDefinition.getName();
+        this.name = Objects.requireNonNull(clusterElementDefinition.getName(), "name is required");
         this.icon = IconUtils.readIcon(icon);
         this.outputDefined = clusterElementDefinition.getOutputDefinition()
             .isPresent();
@@ -73,13 +73,14 @@ public class ClusterElementDefinition {
             .map(ClusterElementDefinition::toOutputResponse)
             .orElse(null);
         this.outputSchemaDefined = outputResponse != null && outputResponse.outputSchema() != null;
-        this.properties = CollectionUtils.map(
-            clusterElementDefinition.getProperties()
-                .orElse(List.of()),
-            Property::toProperty);
+
+        List<? extends com.bytechef.component.definition.Property> properties =
+            clusterElementDefinition.getProperties();
+
+        this.properties = CollectionUtils.map(properties, Property::toProperty);
         this.title = clusterElementDefinition.getTitle()
             .orElse(null);
-        this.type = clusterElementDefinition.getType();
+        this.type = Objects.requireNonNull(clusterElementDefinition.getType(), "type is required");
     }
 
     private ClusterElementDefinition(

@@ -34,8 +34,8 @@ public abstract class BaseOption {
 
     protected BaseOption(com.bytechef.definition.BaseOption<?> option) {
         this.description = OptionalUtils.orElse(option.getDescription(), null);
-        this.label = option.getLabel();
-        this.value = option.getValue();
+        this.label = Objects.requireNonNull(option.getLabel(), "label is required");
+        this.value = Objects.requireNonNull(option.getValue(), "value is required");
     }
 
     @Nullable

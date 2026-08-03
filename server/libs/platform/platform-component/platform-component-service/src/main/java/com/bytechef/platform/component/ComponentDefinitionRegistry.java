@@ -60,7 +60,6 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -283,7 +282,7 @@ public class ComponentDefinitionRegistry {
             componentDefinitions.add(componentDefinition);
         }
 
-        componentDefinitions.sort(Comparator.comparing(ComponentDefinition::getVersion));
+        componentDefinitions.sort(Comparator.comparingInt(ComponentDefinition::getVersion));
 
         if (log.isDebugEnabled() && !componentDefinitions.isEmpty()) {
             log.debug("Loaded component '{}' on demand ({} version(s))", name, componentDefinitions.size());
@@ -419,7 +418,7 @@ public class ComponentDefinitionRegistry {
         String componentName, int connectionVersion, AuthorizationType authorizationType) {
 
         return fetchConnectionDefinition(componentName, connectionVersion)
-            .flatMap(ConnectionDefinition::getAuthorizations)
+            .map(ConnectionDefinition::getAuthorizations)
             .orElse(List.of())
             .stream()
             .filter(authorization -> authorization.getType() == authorizationType)
@@ -442,7 +441,7 @@ public class ComponentDefinitionRegistry {
             if (componentIndexOptional.isPresent()) {
                 componentDefinition = getComponentDefinitionsFromIndex(name, componentIndexOptional.get())
                     .stream()
-                    .filter(curComponentDefinition -> curComponentDefinition.getVersion() == version)
+                    .filter(curComponentDefinition -> version.equals(curComponentDefinition.getVersion()))
                     .findFirst()
                     .orElse(null);
             } else {
@@ -508,7 +507,6 @@ public class ComponentDefinitionRegistry {
         ComponentDefinition componentDefinition = getComponentDefinition(componentName, componentVersion);
 
         return componentDefinition.getActions()
-            .orElse(Collections.emptyList())
             .stream()
             .filter(actionDefinition -> actionName.equalsIgnoreCase(actionDefinition.getName()))
             .findFirst()
@@ -520,8 +518,7 @@ public class ComponentDefinitionRegistry {
     public List<? extends ActionDefinition> getActionDefinitions(String componentName, int componentVersion) {
         ComponentDefinition componentDefinition = getComponentDefinition(componentName, componentVersion);
 
-        return componentDefinition.getActions()
-            .orElse(Collections.emptyList());
+        return componentDefinition.getActions();
     }
 
     public Property getActionProperty(
@@ -531,8 +528,7 @@ public class ComponentDefinitionRegistry {
 
         ActionDefinition actionDefinition = getActionDefinition(componentName, componentVersion, actionName);
 
-        List<? extends Property> properties = actionDefinition.getProperties()
-            .orElseThrow();
+        List<? extends Property> properties = actionDefinition.getProperties();
 
         return getProperty(
             propertyName, properties, inputParameters, connectionParameters, lookupDependsOnPaths, context);
@@ -544,7 +540,6 @@ public class ComponentDefinitionRegistry {
         ConnectionDefinition connectionDefinition = getConnectionDefinition(componentName, connectionVersion);
 
         return connectionDefinition.getAuthorizations()
-            .orElse(List.of())
             .stream()
             .filter(authorization -> {
                 AuthorizationType curAuthorizationType = authorization.getType();
@@ -561,7 +556,6 @@ public class ComponentDefinitionRegistry {
         ComponentDefinition componentDefinition = getComponentDefinition(componentName, componentVersion);
 
         return componentDefinition.getClusterElements()
-            .orElse(Collections.emptyList())
             .stream()
             .filter(clusterElementDefinition -> clusterElementName.equalsIgnoreCase(clusterElementDefinition.getName()))
             .findFirst()
@@ -578,7 +572,6 @@ public class ComponentDefinitionRegistry {
         ComponentDefinition componentDefinition = getComponentDefinition(componentName, componentVersion);
 
         return componentDefinition.getClusterElements()
-            .orElse(Collections.emptyList())
             .stream()
             .filter(clusterElementDefinition -> clusterElementName.equalsIgnoreCase(clusterElementDefinition.getName()))
             .filter(clusterElementDefinition -> clusterElementType.equals(clusterElementDefinition.getType()))
@@ -597,10 +590,7 @@ public class ComponentDefinitionRegistry {
         ClusterElementDefinition<?> clusterElementDefinition = getClusterElementDefinition(
             componentName, componentVersion, clusterElementName);
 
-        List<? extends Property> properties = clusterElementDefinition.getProperties()
-            .orElseThrow(() -> new IllegalArgumentException(
-                "The cluster element '%s' in component '%s' does not have any properties defined.".formatted(
-                    clusterElementName, componentName)));
+        List<? extends Property> properties = clusterElementDefinition.getProperties();
 
         return getProperty(
             propertyName, properties, inputParameters, connectionParameters, lookupDependsOnPaths, context);
@@ -649,9 +639,7 @@ public class ComponentDefinitionRegistry {
 
         ComponentDefinition componentDefinition = getComponentDefinition(componentName, componentVersion);
 
-        List<? extends PropertyGroup> inputs = componentDefinition.getInputs()
-            .orElseThrow(() -> new IllegalArgumentException(
-                "Component '%s' v%d defines no inputs.".formatted(componentName, componentVersion)));
+        List<? extends PropertyGroup> inputs = componentDefinition.getInputs();
 
         PropertyGroup propertyGroup = CollectionUtils.getFirst(
             inputs, group -> Objects.equals(group.getName(), groupName),
@@ -706,7 +694,6 @@ public class ComponentDefinitionRegistry {
         ComponentDefinition componentDefinition = getComponentDefinition(componentName, componentVersion);
 
         return componentDefinition.getTriggers()
-            .orElse(Collections.emptyList())
             .stream()
             .filter(triggerDefinition -> triggerName.equalsIgnoreCase(triggerDefinition.getName()))
             .findFirst()
@@ -719,8 +706,7 @@ public class ComponentDefinitionRegistry {
     public List<? extends TriggerDefinition> getTriggerDefinitions(String componentName, int componentVersion) {
         ComponentDefinition componentDefinition = getComponentDefinition(componentName, componentVersion);
 
-        return componentDefinition.getTriggers()
-            .orElse(Collections.emptyList());
+        return componentDefinition.getTriggers();
     }
 
     public Property getTriggerProperty(
@@ -730,8 +716,7 @@ public class ComponentDefinitionRegistry {
 
         TriggerDefinition triggerDefinition = getTriggerDefinition(componentName, componentVersion, triggerName);
 
-        List<? extends Property> properties = triggerDefinition.getProperties()
-            .orElseThrow();
+        List<? extends Property> properties = triggerDefinition.getProperties();
 
         return getProperty(
             propertyName, properties, inputParameters, connectionParameters, lookupDependsOnPaths, context);
@@ -741,7 +726,7 @@ public class ComponentDefinitionRegistry {
         List<ComponentDefinition> componentDefinitions = getComponentDefinitions(name);
 
         return componentDefinitions.stream()
-            .anyMatch(curComponentDefinition -> (version == null) || (version == curComponentDefinition.getVersion()));
+            .anyMatch(componentDefinition -> version == null || version == componentDefinition.getVersion());
     }
 
     private int compare(ComponentDefinition o1, ComponentDefinition o2) {
@@ -763,8 +748,7 @@ public class ComponentDefinitionRegistry {
                     curProperty -> Objects.equals(
                         curProperty.getName(), propertyName.substring(0, propertyName.length() - 3)));
 
-                List<? extends Property> items = arrayProperty.getItems()
-                    .orElseThrow();
+                List<? extends Property> items = arrayProperty.getItems();
 
                 return items.getFirst();
             } else {
@@ -804,12 +788,10 @@ public class ComponentDefinitionRegistry {
                     String.join(".", subProperties.subList(1, subProperties.size())),
                     dynamicPropertyProperties, inputParameters, connectionParameters, lookupDependsOnPaths, context);
             } else if (firstProperty instanceof ArrayProperty arrayProperty) {
-                List<? extends Property.ValueProperty<?>> items = arrayProperty.getItems()
-                    .orElseThrow();
+                List<? extends Property.ValueProperty<?>> items = arrayProperty.getItems();
 
                 if (items.getFirst() instanceof ObjectProperty objectProperty) {
-                    items = objectProperty.getProperties()
-                        .orElseThrow();
+                    items = objectProperty.getProperties();
                 }
 
                 return getProperty(
@@ -824,22 +806,19 @@ public class ComponentDefinitionRegistry {
 
                     if (subProperty.endsWith("]")) {
                         List<? extends Property.ValueProperty<?>> objectPropertyProperties = objectProperty
-                            .getProperties()
-                            .orElseThrow();
+                            .getProperties();
 
                         ArrayProperty arrayProperty = (ArrayProperty) CollectionUtils.getFirst(
                             objectPropertyProperties,
                             curProperty -> Objects.equals(
                                 curProperty.getName(), subProperty.substring(0, subProperty.length() - 3)));
 
-                        List<? extends Property> items = arrayProperty.getItems()
-                            .orElseThrow();
+                        List<? extends Property> items = arrayProperty.getItems();
 
                         objectProperty = (ObjectProperty) items.getFirst();
                     } else {
                         List<? extends Property.ValueProperty<?>> objectPropertyProperties = objectProperty
-                            .getProperties()
-                            .orElseThrow();
+                            .getProperties();
 
                         objectProperty = (ObjectProperty) CollectionUtils.getFirst(
                             objectPropertyProperties,
@@ -847,8 +826,7 @@ public class ComponentDefinitionRegistry {
                     }
                 }
 
-                List<? extends Property.ValueProperty<?>> objectPropertyProperties = objectProperty.getProperties()
-                    .orElseThrow();
+                List<? extends Property.ValueProperty<?>> objectPropertyProperties = objectProperty.getProperties();
 
                 return CollectionUtils.getFirst(
                     objectPropertyProperties,
@@ -868,16 +846,14 @@ public class ComponentDefinitionRegistry {
 
     private static void validate(List<ComponentDefinition> componentDefinitions) {
         for (ComponentDefinition componentDefinition : componentDefinitions) {
-            List<? extends ActionDefinition> actionDefinitions = componentDefinition.getActions()
-                .orElse(List.of());
+            List<? extends ActionDefinition> actionDefinitions = componentDefinition.getActions();
 
             for (ActionDefinition actionDefinition : actionDefinitions) {
                 if (log.isTraceEnabled()) {
                     log.trace("Validating %s.%s".formatted(componentDefinition.getName(), actionDefinition.getName()));
                 }
 
-                List<? extends Property> properties = actionDefinition.getProperties()
-                    .orElse(List.of());
+                List<? extends Property> properties = actionDefinition.getProperties();
 
                 PropertyUtils.checkInputProperties(properties);
                 PropertyUtils.checkOutputProperty(
@@ -886,16 +862,14 @@ public class ComponentDefinitionRegistry {
                         .orElse(null));
             }
 
-            List<? extends TriggerDefinition> triggerDefinitions = componentDefinition.getTriggers()
-                .orElse(List.of());
+            List<? extends TriggerDefinition> triggerDefinitions = componentDefinition.getTriggers();
 
             for (TriggerDefinition triggerDefinition : triggerDefinitions) {
                 if (log.isTraceEnabled()) {
                     log.trace("Validating %s.%s".formatted(componentDefinition.getName(), triggerDefinition.getName()));
                 }
 
-                List<? extends Property> properties = triggerDefinition.getProperties()
-                    .orElse(List.of());
+                List<? extends Property> properties = triggerDefinition.getProperties();
 
                 PropertyUtils.checkInputProperties(properties);
                 PropertyUtils.checkOutputProperty(

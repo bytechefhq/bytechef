@@ -224,7 +224,7 @@ class ClusterElementDefinitionServiceTest {
 
         ComponentDefinition componentDefinition = mock(ComponentDefinition.class);
 
-        when(componentDefinition.getClusterElements()).thenReturn(Optional.of(List.of(elementDefinition)));
+        when(componentDefinition.getClusterElements()).thenReturn(List.of(elementDefinition));
         when(componentDefinitionRegistry.getComponentDefinition(COMPONENT_NAME, COMPONENT_VERSION))
             .thenReturn(componentDefinition);
 
@@ -269,7 +269,7 @@ class ClusterElementDefinitionServiceTest {
 
         ComponentDefinition componentDefinition = mock(ComponentDefinition.class);
 
-        when(componentDefinition.getClusterElements()).thenReturn(Optional.of(List.of(elementDefinition)));
+        when(componentDefinition.getClusterElements()).thenReturn(List.of(elementDefinition));
         when(componentDefinitionRegistry.getComponentDefinition(COMPONENT_NAME, COMPONENT_VERSION))
             .thenReturn(componentDefinition);
 
@@ -309,7 +309,7 @@ class ClusterElementDefinitionServiceTest {
 
         ComponentDefinition componentDefinition = mock(ComponentDefinition.class);
 
-        when(componentDefinition.getClusterElements()).thenReturn(Optional.of(List.of(elementDefinition)));
+        when(componentDefinition.getClusterElements()).thenReturn(List.of(elementDefinition));
         when(componentDefinitionRegistry.getComponentDefinition(COMPONENT_NAME, COMPONENT_VERSION))
             .thenReturn(componentDefinition);
 
@@ -397,7 +397,7 @@ class ClusterElementDefinitionServiceTest {
         when(elementDefinition.getDescription()).thenReturn(Optional.empty());
         when(elementDefinition.getHelp()).thenReturn(Optional.empty());
         when(elementDefinition.getTitle()).thenReturn(Optional.of(clusterElementName));
-        when(elementDefinition.getProperties()).thenReturn(Optional.of(List.of(string("toolName"))));
+        when(elementDefinition.getProperties()).thenReturn((List) List.of(string("toolName")));
         when(elementDefinition.getOutputDefinition()).thenReturn(Optional.empty());
 
         ComponentDefinition componentDefinition = createComponentDefinitionForMatch(List.of(elementDefinition));
@@ -433,7 +433,7 @@ class ClusterElementDefinitionServiceTest {
         when(elementDefinition.getHelp()).thenReturn(Optional.empty());
         when(elementDefinition.getTitle()).thenReturn(Optional.of(clusterElementName));
         when(elementDefinition.getProperties())
-            .thenReturn(Optional.of(List.of(string("toolName"), string("toolDescription"), string("uri"))));
+            .thenReturn((List) List.of(string("toolName"), string("toolDescription"), string("uri")));
         when(elementDefinition.getOutputDefinition()).thenReturn(Optional.empty());
 
         ComponentDefinition componentDefinition = createComponentDefinitionForMatch(List.of(elementDefinition));
@@ -502,7 +502,7 @@ class ClusterElementDefinitionServiceTest {
         when(rootComponentDefinition.getName()).thenReturn("aiAgent");
         when(rootComponentDefinition.getVersion()).thenReturn(1);
         when(rootComponentDefinition.getIcon()).thenReturn(Optional.empty());
-        when(rootComponentDefinition.getClusterElements()).thenReturn(Optional.of(List.of(elementDefinition)));
+        when(rootComponentDefinition.getClusterElements()).thenReturn(List.of(elementDefinition));
         when(((ClusterRootComponentDefinition) rootComponentDefinition).getClusterElementTypes())
             .thenReturn(List.of(TOOLS));
 
@@ -527,7 +527,6 @@ class ClusterElementDefinitionServiceTest {
         when(elementDefinition.getDescription()).thenReturn(Optional.empty());
         when(elementDefinition.getHelp()).thenReturn(Optional.empty());
         when(elementDefinition.getTitle()).thenReturn(Optional.of(name));
-        when(elementDefinition.getProperties()).thenReturn(Optional.empty());
         when(elementDefinition.getOutputDefinition()).thenReturn(Optional.empty());
 
         return elementDefinition;
@@ -551,7 +550,7 @@ class ClusterElementDefinitionServiceTest {
         ComponentDefinition componentDefinition = mock(ComponentDefinition.class);
 
         when(componentDefinition.getName()).thenReturn(COMPONENT_NAME);
-        when(componentDefinition.getClusterElements()).thenReturn(Optional.of(clusterElementDefinitions));
+        when(componentDefinition.getClusterElements()).thenReturn(clusterElementDefinitions);
         when(componentDefinition.getIcon()).thenReturn(Optional.empty());
 
         return componentDefinition;
@@ -564,7 +563,7 @@ class ClusterElementDefinitionServiceTest {
 
         lenient().when(componentDefinition.getName())
             .thenReturn(COMPONENT_NAME);
-        when(componentDefinition.getClusterElements()).thenReturn(Optional.of(clusterElementDefinitions));
+        when(componentDefinition.getClusterElements()).thenReturn(clusterElementDefinitions);
 
         return componentDefinition;
     }

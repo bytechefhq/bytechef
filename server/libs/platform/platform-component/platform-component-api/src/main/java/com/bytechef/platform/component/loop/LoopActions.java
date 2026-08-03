@@ -97,8 +97,7 @@ public final class LoopActions {
         Objects.requireNonNull(wrapped, "wrapped");
         Objects.requireNonNull(name, "name");
 
-        List<? extends Property> originalProperties = wrapped.getProperties()
-            .orElse(List.of());
+        List<? extends Property> originalProperties = wrapped.getProperties();
 
         List<ValueProperty<?>> liftedProperties = LoopSchemaLifter.liftInputProperties(originalProperties);
         Set<String> scalarPropertyNames = LoopSchemaLifter.scalarPropertyNames(originalProperties);

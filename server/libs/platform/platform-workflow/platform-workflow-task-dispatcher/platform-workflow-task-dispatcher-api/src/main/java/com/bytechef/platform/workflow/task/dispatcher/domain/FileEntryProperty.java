@@ -34,8 +34,7 @@ public class FileEntryProperty extends ValueProperty<Map<String, ?>> {
         super(fileEntryProperty);
 
         this.properties = CollectionUtils.map(
-            fileEntryProperty.getProperties(),
-            valueProperty -> (ValueProperty<?>) toProperty(valueProperty));
+            fileEntryProperty.getProperties(), valueProperty -> (ValueProperty<?>) toProperty(valueProperty));
     }
 
     @Override

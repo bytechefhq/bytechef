@@ -19,6 +19,7 @@ package com.bytechef.platform.workflow.task.dispatcher.domain;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.workflow.task.dispatcher.definition.Property.ControlType;
 import edu.umd.cs.findbugs.annotations.Nullable;
+import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -40,7 +41,7 @@ public abstract class ValueProperty<V> extends Property {
 
         super(valueProperty);
 
-        this.controlType = valueProperty.getControlType();
+        this.controlType = Objects.requireNonNull(valueProperty.getControlType(), "controlType is required");
         this.defaultValue = OptionalUtils.orElse(valueProperty.getDefaultValue(), null);
         this.exampleValue = OptionalUtils.orElse(valueProperty.getExampleValue(), null);
         this.label = OptionalUtils.orElse(valueProperty.getLabel(), StringUtils.capitalize(valueProperty.getName()));

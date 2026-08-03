@@ -100,11 +100,7 @@ public final class LoopSchemaLifter {
         property.getDescription()
             .ifPresent(wrapper::description);
 
-        Boolean required = property.getRequired();
-
-        if (required != null) {
-            wrapper.required(required);
-        }
+        wrapper.required(property.getRequired());
 
         return wrapper.items(property);
     }

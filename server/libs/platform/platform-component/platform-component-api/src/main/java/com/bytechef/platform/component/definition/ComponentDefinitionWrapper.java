@@ -23,7 +23,6 @@ import com.bytechef.platform.component.util.CustomActionUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -36,8 +35,7 @@ public class ComponentDefinitionWrapper extends AbstractComponentDefinitionWrapp
     public ComponentDefinitionWrapper(
         ComponentDefinition componentDefinition, List<ActionDefinition> actionDefinitions) {
 
-        this(componentDefinition, actionDefinitions, componentDefinition.getClusterElements()
-            .orElse(null));
+        this(componentDefinition, actionDefinitions, componentDefinition.getClusterElements());
     }
 
     @SuppressFBWarnings("EI")
@@ -49,8 +47,7 @@ public class ComponentDefinitionWrapper extends AbstractComponentDefinitionWrapp
 
         // Custom Actions support
 
-        Boolean exists = componentDefinition.getCustomAction()
-            .orElse(false);
+        boolean exists = componentDefinition.getCustomAction();
 
         if (exists) {
             actionDefinitions = new ArrayList<>(actionDefinitions);
@@ -63,13 +60,13 @@ public class ComponentDefinitionWrapper extends AbstractComponentDefinitionWrapp
     }
 
     @Override
-    public Optional<List<ActionDefinition>> getActions() {
-        return Optional.ofNullable(actions == null ? null : new ArrayList<>(actions));
+    public List<ActionDefinition> getActions() {
+        return actions == null ? List.of() : new ArrayList<>(actions);
     }
 
     @Override
-    public Optional<List<ClusterElementDefinition<?>>> getClusterElements() {
-        return Optional.ofNullable(clusterElements == null ? null : new ArrayList<>(clusterElements));
+    public List<ClusterElementDefinition<?>> getClusterElements() {
+        return clusterElements == null ? List.of() : new ArrayList<>(clusterElements);
     }
 
     @Override

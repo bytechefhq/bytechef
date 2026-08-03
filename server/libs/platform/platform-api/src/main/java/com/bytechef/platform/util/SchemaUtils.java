@@ -119,8 +119,7 @@ public class SchemaUtils {
 
         return switch (definitionProperty) {
             case BaseArrayProperty<? extends BaseProperty> baseArrayProperty -> {
-                List<? extends BaseProperty> properties = baseArrayProperty.getItems()
-                    .orElse(List.of());
+                List<? extends BaseProperty> properties = baseArrayProperty.getItems();
                 List<Object> items = new ArrayList<>();
 
                 if (!properties.isEmpty()) {
@@ -140,8 +139,7 @@ public class SchemaUtils {
             case BaseNullProperty ignored -> null;
             case BaseNumberProperty ignored -> 23.34;
             case BaseObjectProperty<? extends BaseProperty> baseObjectProperty -> {
-                List<? extends BaseProperty> baseProperties = baseObjectProperty.getProperties()
-                    .orElse(List.of());
+                List<? extends BaseProperty> baseProperties = baseObjectProperty.getProperties();
                 Map<String, Object> map = new HashMap<>();
 
                 for (BaseProperty property : baseProperties) {

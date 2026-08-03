@@ -20,12 +20,11 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.IconUtils;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.component.definition.ComponentCategory;
+import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.UnifiedApiDefinition;
 import com.bytechef.component.definition.UnifiedApiDefinition.UnifiedApiCategory;
-import com.bytechef.definition.BaseProperty;
 import com.bytechef.platform.component.definition.ClusterRootComponentDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -76,7 +75,6 @@ public class ComponentDefinition {
         this.inputs = getInputs(componentDefinition);
 
         this.clusterElement = !componentDefinition.getClusterElements()
-            .orElse(List.of())
             .isEmpty();
         this.clusterElements = getClusterElements(componentDefinition);
 
@@ -90,29 +88,26 @@ public class ComponentDefinition {
         }
 
         this.clusterRoot = !clusterElementTypes.isEmpty();
-        this.componentCategories = componentDefinition.getComponentCategories()
-            .orElse(List.of());
+        this.componentCategories = componentDefinition.getComponentCategories();
         this.connection = getConnection(componentDefinition);
         this.connectionRequired = componentDefinition.getConnection()
-            .map(connectionDefinition -> CollectionUtils.anyMatch(
-                connectionDefinition.getProperties()
-                    .orElse(List.of()),
-                BaseProperty::getRequired)
-                ||
-                connectionDefinition.getAuthorizationRequired()
-                    .orElse(true))
+            .map(connectionDefinition -> {
+                List<? extends Property> properties = connectionDefinition.getProperties();
+                boolean authorizationRequired = connectionDefinition.getAuthorizationRequired();
+
+                return CollectionUtils.anyMatch(properties, Property::getRequired) || authorizationRequired;
+            })
             .orElse(false);
         this.description = componentDefinition.getDescription()
             .orElse(null);
         this.icon = componentDefinition.getIcon()
             .map(IconUtils::readIcon)
             .orElse(null);
-        this.name = componentDefinition.getName();
+        this.name = Objects.requireNonNull(componentDefinition.getName(), "name is required");
         this.resources = componentDefinition.getResources()
             .map(Resources::new)
             .orElse(null);
-        this.tags = componentDefinition.getTags()
-            .orElse(Collections.emptyList());
+        this.tags = componentDefinition.getTags();
         this.triggers = getTriggers(componentDefinition);
         this.title = getTitle(componentDefinition.getName(), componentDefinition.getTitle()
             .orElse(null));
@@ -285,31 +280,32 @@ public class ComponentDefinition {
     private static List<ActionDefinition> getActions(
         com.bytechef.component.definition.ComponentDefinition componentDefinition) {
 
-        return componentDefinition.getActions()
-            .map(actionDefinitions -> CollectionUtils.map(actionDefinitions, actionDefinition -> new ActionDefinition(
-                actionDefinition, componentDefinition.getName(), componentDefinition.getVersion())))
-            .orElse(Collections.emptyList());
+        return CollectionUtils.map(componentDefinition.getActions(), actionDefinition -> {
+            int componentVersion = componentDefinition.getVersion();
+
+            return new ActionDefinition(actionDefinition, componentDefinition.getName(), componentVersion);
+        });
     }
 
     private static List<ClusterElementDefinition> getClusterElements(
         com.bytechef.component.definition.ComponentDefinition componentDefinition) {
 
-        return componentDefinition.getClusterElements()
-            .map(clusterElementDefinitions -> CollectionUtils.map(
-                clusterElementDefinitions,
-                clusterElementDefinition -> new ClusterElementDefinition(
-                    clusterElementDefinition, componentDefinition.getName(), componentDefinition.getVersion(),
-                    componentDefinition.getIcon()
-                        .orElse(null))))
-            .orElse(Collections.emptyList());
+        return CollectionUtils.map(
+            componentDefinition.getClusterElements(),
+            clusterElementDefinition -> {
+                int componentVersion = componentDefinition.getVersion();
+                String icon = componentDefinition.getIcon()
+                    .orElse(null);
+
+                return new ClusterElementDefinition(
+                    clusterElementDefinition, componentDefinition.getName(), componentVersion, icon);
+            });
     }
 
     private static List<PropertyGroup> getInputs(
         com.bytechef.component.definition.ComponentDefinition componentDefinition) {
 
-        return componentDefinition.getInputs()
-            .map(inputs -> CollectionUtils.map(inputs, PropertyGroup::new))
-            .orElse(Collections.emptyList());
+        return CollectionUtils.map(componentDefinition.getInputs(), PropertyGroup::new);
     }
 
     private static ConnectionDefinition getConnection(
@@ -332,10 +328,11 @@ public class ComponentDefinition {
     private static List<TriggerDefinition> getTriggers(
         com.bytechef.component.definition.ComponentDefinition componentDefinition) {
 
-        return componentDefinition.getTriggers()
-            .map(triggerDefinitions -> CollectionUtils.map(triggerDefinitions,
-                triggerDefinition -> new TriggerDefinition(
-                    triggerDefinition, componentDefinition.getName(), componentDefinition.getVersion())))
-            .orElse(Collections.emptyList());
+        return CollectionUtils.map(componentDefinition.getTriggers(),
+            triggerDefinition -> {
+                int componentVersion = componentDefinition.getVersion();
+
+                return new TriggerDefinition(triggerDefinition, componentDefinition.getName(), componentVersion);
+            });
     }
 }

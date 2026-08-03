@@ -42,16 +42,13 @@ public class ObjectProperty extends ValueProperty<Map<String, ?>> implements Opt
         super(objectProperty);
 
         this.additionalProperties = CollectionUtils.map(
-            OptionalUtils.orElse(objectProperty.getAdditionalProperties(), List.of()),
-            valueProperty -> (ValueProperty<?>) toProperty(valueProperty));
-        this.multipleValues = OptionalUtils.orElse(objectProperty.getMultipleValues(), true);
-        this.options =
-            CollectionUtils.map(OptionalUtils.orElse(objectProperty.getOptions(), List.of()), Option::new);
+            objectProperty.getAdditionalProperties(), valueProperty -> (ValueProperty<?>) toProperty(valueProperty));
+        this.multipleValues = objectProperty.getMultipleValues();
+        this.options = CollectionUtils.map(objectProperty.getOptions(), Option::new);
         this.optionsDataSource = OptionalUtils.mapOrElse(
             objectProperty.getOptionsDataSource(), OptionsDataSource::new, null);
         this.properties = CollectionUtils.map(
-            OptionalUtils.orElse(objectProperty.getProperties(), List.of()),
-            valueProperty -> (ValueProperty<?>) toProperty(valueProperty));
+            objectProperty.getProperties(), valueProperty -> (ValueProperty<?>) toProperty(valueProperty));
     }
 
     @Override

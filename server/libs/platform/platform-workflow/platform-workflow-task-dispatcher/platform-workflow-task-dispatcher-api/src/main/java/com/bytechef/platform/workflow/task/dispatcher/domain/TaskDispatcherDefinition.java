@@ -61,7 +61,7 @@ public class TaskDispatcherDefinition {
         this.description = OptionalUtils.orElse(taskDispatcherDefinition.getDescription(), null);
         this.help = OptionalUtils.mapOrElse(taskDispatcherDefinition.getHelp(), Help::new, null);
         this.icon = OptionalUtils.mapOrElse(taskDispatcherDefinition.getIcon(), IconUtils::readIcon, null);
-        this.name = taskDispatcherDefinition.getName();
+        this.name = Objects.requireNonNull(taskDispatcherDefinition.getName(), "name is required");
         this.outputDefined = OptionalUtils.mapOrElse(
             taskDispatcherDefinition.getOutputDefinition(), outputDefinition -> true, false);
         this.outputFunctionDefined = OptionalUtils.mapOrElse(

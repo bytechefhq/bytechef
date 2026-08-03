@@ -21,6 +21,7 @@ import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.ConnectionDefinition;
+import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.PropertyGroup;
 import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.platform.component.handler.loader.ComponentHandlerLoader;
@@ -108,35 +109,29 @@ public class ComponentIndexGenerator {
             componentDefinition.getIcon()
                 .orElse(null),
             componentDefinition.getComponentCategories()
-                .map(categories -> categories.stream()
-                    .map(category -> new CategorySummary(category.name(), category.label()))
-                    .toList())
-                .orElse(null),
-            componentDefinition.getTags()
-                .orElse(null),
+                .stream()
+                .map(category -> new CategorySummary(category.name(), category.label()))
+                .toList(),
+            componentDefinition.getTags(),
             componentDefinition.getConnection()
                 .map(ComponentIndexGenerator::toConnectionSummary)
                 .orElse(null),
             componentDefinition.getActions()
-                .map(actions -> actions.stream()
-                    .map(ComponentIndexGenerator::toItemSummary)
-                    .toList())
-                .orElse(null),
+                .stream()
+                .map(ComponentIndexGenerator::toItemSummary)
+                .toList(),
             componentDefinition.getTriggers()
-                .map(triggers -> triggers.stream()
-                    .map(ComponentIndexGenerator::toTriggerSummary)
-                    .toList())
-                .orElse(null),
+                .stream()
+                .map(ComponentIndexGenerator::toTriggerSummary)
+                .toList(),
             componentDefinition.getClusterElements()
-                .map(clusterElements -> clusterElements.stream()
-                    .map(ComponentIndexGenerator::toClusterElementSummary)
-                    .toList())
-                .orElse(null),
+                .stream()
+                .map(ComponentIndexGenerator::toClusterElementSummary)
+                .toList(),
             componentDefinition.getInputs()
-                .map(inputs -> inputs.stream()
-                    .map(PropertyGroup::getName)
-                    .toList())
-                .orElse(null),
+                .stream()
+                .map(PropertyGroup::getName)
+                .toList(),
             providerClassName,
             loaderKind);
     }
@@ -149,12 +144,10 @@ public class ComponentIndexGenerator {
      */
     private static ConnectionSummary toConnectionSummary(ConnectionDefinition connectionDefinition) {
         boolean anyPropertyRequired = connectionDefinition.getProperties()
-            .orElse(List.of())
             .stream()
-            .anyMatch(property -> Boolean.TRUE.equals(property.getRequired()));
+            .anyMatch(Property::getRequired);
 
-        boolean authorizationRequired = connectionDefinition.getAuthorizationRequired()
-            .orElse(true);
+        boolean authorizationRequired = connectionDefinition.getAuthorizationRequired();
 
         return new ConnectionSummary(connectionDefinition.getVersion(), anyPropertyRequired || authorizationRequired);
     }

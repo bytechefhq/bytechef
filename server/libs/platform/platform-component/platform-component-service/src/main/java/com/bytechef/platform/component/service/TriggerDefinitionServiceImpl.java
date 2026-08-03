@@ -461,8 +461,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         com.bytechef.component.definition.TriggerDefinition triggerDefinition = doGetTriggerDefinition(
             componentName, componentVersion, triggerName);
 
-        List<? extends BaseProperty> properties = triggerDefinition.getProperties()
-            .orElse(List.of());
+        List<? extends BaseProperty> properties = triggerDefinition.getProperties();
 
         BaseProperty property = PropertyUtils.findPropertyByPath(properties, propertyName);
 
@@ -594,9 +593,9 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                 providerException.getMessage());
         }
 
-        Optional<Boolean> triggerDefinitionBatch = triggerDefinition.getBatch();
+        boolean triggerDefinitionBatch = triggerDefinition.getBatch();
 
-        return new TriggerOutput(records, closureParameters, triggerDefinitionBatch.orElse(false));
+        return new TriggerOutput(records, closureParameters, triggerDefinitionBatch);
     }
 
     @SuppressWarnings("unchecked")
@@ -751,9 +750,9 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                 e, inputParameters, TriggerDefinitionErrorType.DYNAMIC_WEBHOOK_TRIGGER_FAILED);
         }
 
-        Optional<Boolean> triggerDefinitionBatch = triggerDefinition.getBatch();
+        boolean triggerDefinitionBatch = triggerDefinition.getBatch();
 
-        return new TriggerOutput(webhookOutput, null, triggerDefinitionBatch.orElse(false));
+        return new TriggerOutput(webhookOutput, null, triggerDefinitionBatch);
     }
 
     private com.bytechef.component.definition.TriggerDefinition.OptionsFunction<?> getComponentOptionsFunction(

@@ -24,7 +24,6 @@ import com.bytechef.platform.util.SchemaUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
-import org.apache.commons.lang3.Validate;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -57,17 +56,16 @@ public class TriggerDefinition {
 
     public TriggerDefinition(
         com.bytechef.component.definition.TriggerDefinition triggerDefinition, String componentName,
-        int componentVersion) {
+        Integer componentVersion) {
 
-        this.batch = triggerDefinition.getBatch()
-            .orElse(false);
-        this.componentName = componentName;
-        this.componentVersion = componentVersion;
-        this.description = Validate.notNull(getDescription(triggerDefinition), "description");
+        this.batch = triggerDefinition.getBatch();
+        this.componentName = Objects.requireNonNull(componentName, "componentName is required");
+        this.componentVersion = Objects.requireNonNull(componentVersion, "componentVersion is required");
+        this.description = getDescription(triggerDefinition);
         this.help = triggerDefinition.getHelp()
             .map(Help::new)
             .orElse(null);
-        this.name = Validate.notNull(triggerDefinition.getName(), "name");
+        this.name = Objects.requireNonNull(triggerDefinition.getName(), "name is required");
         this.outputDefined = triggerDefinition.getOutputDefinition()
             .isPresent();
         this.outputFunctionDefined = triggerDefinition.getOutputDefinition()
@@ -78,18 +76,13 @@ public class TriggerDefinition {
             .map(TriggerDefinition::toOutputResponse)
             .orElse(null);
         this.outputSchemaDefined = outputResponse != null && outputResponse.outputSchema() != null;
-        this.properties = CollectionUtils.map(
-            triggerDefinition.getProperties()
-                .orElse(List.of()),
-            Property::toProperty);
-        this.title = Validate.notNull(getTitle(triggerDefinition), "title");
-        this.type = Validate.notNull(triggerDefinition.getType(), "type");
-        this.webhookRawBody = triggerDefinition.getWebhookRawBody()
-            .orElse(false);
+        this.properties = CollectionUtils.map(triggerDefinition.getProperties(), Property::toProperty);
+        this.title = getTitle(triggerDefinition);
+        this.type = Objects.requireNonNull(triggerDefinition.getType(), "type is required");
+        this.webhookRawBody = triggerDefinition.getWebhookRawBody();
         this.workflowNodeDescriptionDefined = triggerDefinition.getWorkflowNodeDescription()
             .isPresent();
-        this.workflowSyncExecution = triggerDefinition.getWorkflowSyncExecution()
-            .orElse(false);
+        this.workflowSyncExecution = triggerDefinition.getWorkflowSyncExecution();
         this.workflowSyncValidation = triggerDefinition.getWebhookValidate()
             .isPresent();
         this.workflowSyncOnEnableValidation = triggerDefinition.getWebhookValidateOnEnable()

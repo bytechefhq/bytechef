@@ -18,6 +18,7 @@ package com.bytechef.platform.component.domain;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.Property.ControlType;
+import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 
@@ -38,7 +39,7 @@ public abstract class ValueProperty<V> extends Property {
     public ValueProperty(com.bytechef.component.definition.Property.ValueProperty<V> valueProperty) {
         super(valueProperty);
 
-        this.controlType = valueProperty.getControlType();
+        this.controlType = Objects.requireNonNull(valueProperty.getControlType(), "controlType is required");
         this.defaultValue = OptionalUtils.orElse(valueProperty.getDefaultValue(), null);
         this.exampleValue = OptionalUtils.orElse(valueProperty.getExampleValue(), null);
         this.label = OptionalUtils.orElse(valueProperty.getLabel(), StringUtils.capitalize(valueProperty.getName()));

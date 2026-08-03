@@ -71,14 +71,11 @@ public record PropertyFactory() implements SchemaPropertyFactory {
         @Override
         public List<BaseProperty.BaseValueProperty<?>> getChildren(BaseProperty.BaseValueProperty<?> property) {
             if (property instanceof ModifiableArrayProperty modifiableArrayProperty) {
-                return (List<BaseProperty.BaseValueProperty<?>>) (List<?>) modifiableArrayProperty.getItems()
-                    .map(ArrayList::new)
-                    .orElseGet(ArrayList::new);
+                return (List<BaseProperty.BaseValueProperty<?>>) (List<?>) new ArrayList<>(
+                    modifiableArrayProperty.getItems());
             } else {
-                return (List<BaseProperty.BaseValueProperty<?>>) (List<?>) ((ModifiableObjectProperty) property)
-                    .getProperties()
-                    .map(ArrayList::new)
-                    .orElseGet(ArrayList::new);
+                return (List<BaseProperty.BaseValueProperty<?>>) (List<?>) new ArrayList<>(
+                    ((ModifiableObjectProperty) property).getProperties());
             }
         }
     };

@@ -52,7 +52,7 @@ public abstract class Property extends BaseProperty {
     public Property(com.bytechef.platform.workflow.task.dispatcher.definition.Property property) {
         super(property);
 
-        this.type = property.getType();
+        this.type = Objects.requireNonNull(property.getType(), "type is required");
     }
 
     @SuppressWarnings("unchecked")

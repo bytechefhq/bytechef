@@ -19,7 +19,6 @@ package com.bytechef.platform.component.domain;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
-import org.apache.commons.lang3.Validate;
 
 /**
  * @author Ivica Cardic
@@ -30,8 +29,7 @@ public class PropertiesDataSource {
     private final List<String> propertiesLookupDependsOn;
 
     public PropertiesDataSource(com.bytechef.component.definition.PropertiesDataSource<?> propertiesDataSource) {
-        this.propertiesLookupDependsOn = Validate.notNull(
-            propertiesDataSource.getPropertiesLookupDependsOn(), "propertiesLookupDependsOn");
+        this.propertiesLookupDependsOn = propertiesDataSource.getPropertiesLookupDependsOn();
     }
 
     public List<String> getPropertiesLookupDependsOn() {

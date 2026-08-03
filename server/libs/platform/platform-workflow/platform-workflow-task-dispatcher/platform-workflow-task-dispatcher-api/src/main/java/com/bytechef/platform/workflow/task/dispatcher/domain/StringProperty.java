@@ -45,10 +45,10 @@ public class StringProperty extends ValueProperty<String> {
         this.maxLength = OptionalUtils.orElse(stringProperty.getMaxLength(), null);
         this.minLength = OptionalUtils.orElse(stringProperty.getMinLength(), null);
         this.regex = OptionalUtils.orElse(stringProperty.getRegex(), null);
-        this.options = CollectionUtils.map(OptionalUtils.orElse(stringProperty.getOptions(), List.of()), Option::new);
+        this.options = CollectionUtils.map(stringProperty.getOptions(), Option::new);
         this.optionsDataSource = OptionalUtils.mapOrElse(
             stringProperty.getOptionsFunction(), optionsFunction -> new OptionsDataSource(), null);
-        this.optionsLoadedDynamically = OptionalUtils.orElse(stringProperty.getOptionsLoadedDynamically(), false);
+        this.optionsLoadedDynamically = stringProperty.getOptionsLoadedDynamically();
     }
 
     @Override

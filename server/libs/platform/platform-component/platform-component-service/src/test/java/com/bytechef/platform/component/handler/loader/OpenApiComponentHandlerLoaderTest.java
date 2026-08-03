@@ -24,7 +24,6 @@ import static com.bytechef.component.definition.ComponentDsl.tool;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ActionDefinition.PerformFunction;
@@ -35,7 +34,6 @@ import com.bytechef.component.definition.ai.agent.ToolFunction;
 import com.bytechef.platform.component.definition.ActionDefinitionWrapper;
 import com.bytechef.platform.component.oas.handler.loader.OpenApiComponentHandlerLoader;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -111,12 +109,7 @@ class OpenApiComponentHandlerLoaderTest {
 
         ClusterElementDefinition<ToolFunction> toolDefinition = tool(wrappedAction);
 
-        Optional<List<? extends Property>> propertiesOptional =
-            toolDefinition.getProperties();
-
-        assertTrue(propertiesOptional.isPresent());
-
-        List<? extends Property> properties = propertiesOptional.get();
+        List<? extends Property> properties = toolDefinition.getProperties();
 
         assertEquals(2, properties.size());
     }
@@ -133,10 +126,7 @@ class OpenApiComponentHandlerLoaderTest {
             .actions(actionDefinition)
             .clusterElements(tool(actionDefinition));
 
-        Optional<List<ClusterElementDefinition<?>>> clusterElementsOptional = componentDefinition.getClusterElements();
-
-        assertTrue(clusterElementsOptional.isPresent());
-        List<ClusterElementDefinition<?>> clusterElementDefinitions = clusterElementsOptional.get();
+        List<ClusterElementDefinition<?>> clusterElementDefinitions = componentDefinition.getClusterElements();
 
         assertEquals(1, clusterElementDefinitions.size());
 
@@ -158,11 +148,7 @@ class OpenApiComponentHandlerLoaderTest {
             .actions(actionDefinition)
             .clusterElements(tool(actionDefinition));
 
-        Optional<List<ClusterElementDefinition<?>>> clusterElementsOptional = componentDefinition.getClusterElements();
-
-        assertTrue(clusterElementsOptional.isPresent());
-
-        List<ClusterElementDefinition<?>> clusterElements = clusterElementsOptional.get();
+        List<ClusterElementDefinition<?>> clusterElements = componentDefinition.getClusterElements();
 
         assertEquals(1, clusterElements.size());
 

@@ -31,8 +31,6 @@ import org.apache.commons.lang3.StringUtils;
 @SuppressFBWarnings("EI")
 public class Authorization {
 
-    public static final List<Object> DEFAULT_REFRESH_ON = List.of(401);
-
     private String description;
     private List<String> detectOn;
     private String name;
@@ -46,18 +44,18 @@ public class Authorization {
 
     public Authorization(com.bytechef.component.definition.Authorization authorization) {
         this.description = OptionalUtils.orElse(authorization.getDescription(), null);
-        this.detectOn = OptionalUtils.orElse(authorization.getDetectOn(), List.of());
+        this.detectOn = authorization.getDetectOn();
         this.properties = CollectionUtils.map(
-            OptionalUtils.orElse(authorization.getProperties(), List.of()),
+            authorization.getProperties(),
             valueProperty -> (ValueProperty<?>) Property.toProperty(valueProperty));
 
-        this.type = authorization.getType();
+        this.type = Objects.requireNonNull(authorization.getType(), "type is required");
 
         this.name = StringUtils.lowerCase(type.name());
 
         this.title = OptionalUtils.orElse(authorization.getTitle(), name);
 
-        this.refreshOn = OptionalUtils.orElse(authorization.getRefreshOn(), DEFAULT_REFRESH_ON);
+        this.refreshOn = authorization.getRefreshOn();
     }
 
     @Nullable

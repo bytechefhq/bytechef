@@ -59,8 +59,7 @@ class LoopActionsTest {
 
         assertEquals("appendRow__loop", looped.getName());
 
-        List<? extends Property> liftedProperties = looped.getProperties()
-            .orElseThrow();
+        List<? extends Property> liftedProperties = looped.getProperties();
 
         assertEquals(3, liftedProperties.size());
         assertEquals(Property.Type.ARRAY, liftedProperties.get(0)

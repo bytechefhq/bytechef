@@ -17,9 +17,7 @@
 package com.bytechef.platform.component.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.OptionalUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import org.jspecify.annotations.Nullable;
@@ -46,17 +44,16 @@ public class ConnectionDefinition {
         com.bytechef.component.definition.ConnectionDefinition connectionDefinition, String componentName,
         String componentTitle, String componentDescription) {
 
-        this.authorizationRequired = OptionalUtils.orElse(connectionDefinition.getAuthorizationRequired(), true);
-        this.authorizations = toAuthorizationDTOs(
-            OptionalUtils.orElse(connectionDefinition.getAuthorizations(), Collections.emptyList()));
+        this.authorizationRequired = connectionDefinition.getAuthorizationRequired();
+        this.authorizations = toAuthorizationDTOs(connectionDefinition.getAuthorizations());
         this.componentDescription = componentDescription;
-        this.componentName = componentName;
-        this.componentTitle = componentTitle;
+        this.componentName = Objects.requireNonNull(componentName, "componentName is required");
+        this.componentTitle = Objects.requireNonNull(componentTitle, "componentTitle is required");
         this.help = connectionDefinition.getHelp()
             .map(Help::new)
             .orElse(null);
         this.properties = CollectionUtils.map(
-            OptionalUtils.orElse(connectionDefinition.getProperties(), Collections.emptyList()),
+            connectionDefinition.getProperties(),
             valueProperty -> (ValueProperty<?>) Property.toProperty(valueProperty));
         this.version = connectionDefinition.getVersion();
     }

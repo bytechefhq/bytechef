@@ -106,22 +106,17 @@ public abstract class AbstractComponentHandlerLoader<T extends ComponentHandler>
     }
 
     private List<ActionDefinition> mapActionDefinitions(T componentHandler, ComponentDefinition componentDefinition) {
-        return componentDefinition.getActions()
-            .map(actionDefinitions -> CollectionUtils.map(
-                actionDefinitions,
-                actionDefinition -> actionDefinitionMapperFunction.apply(componentHandler, actionDefinition)))
-            .orElse(List.of());
+        return CollectionUtils.map(
+            componentDefinition.getActions(),
+            actionDefinition -> actionDefinitionMapperFunction.apply(componentHandler, actionDefinition));
     }
 
     private List<ClusterElementDefinition<?>> mapClusterElementDefinitions(
         T componentHandler, ComponentDefinition componentDefinition) {
 
-        return componentDefinition.getClusterElements()
-            .map(clusterElementDefinitions -> CollectionUtils
-                .<ClusterElementDefinition<?>, ClusterElementDefinition<?>>map(
-                    clusterElementDefinitions,
-                    clusterElementDefinition -> clusterElementDefinitionMapperFunction.apply(
-                        componentHandler, clusterElementDefinition)))
-            .orElse(List.of());
+        return CollectionUtils.<ClusterElementDefinition<?>, ClusterElementDefinition<?>>map(
+            componentDefinition.getClusterElements(),
+            clusterElementDefinition -> clusterElementDefinitionMapperFunction.apply(
+                componentHandler, clusterElementDefinition));
     }
 }

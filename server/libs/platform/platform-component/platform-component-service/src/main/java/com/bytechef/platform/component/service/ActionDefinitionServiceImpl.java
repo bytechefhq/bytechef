@@ -33,6 +33,7 @@ import com.bytechef.component.definition.ActionDefinition.OutputFunction;
 import com.bytechef.component.definition.ActionDefinition.PerformFunction;
 import com.bytechef.component.definition.ActionDefinition.PropertiesFunction;
 import com.bytechef.component.definition.ActionDefinition.ResumePerformFunction;
+import com.bytechef.component.definition.ActionDefinition.WebSocketPerformFunction;
 import com.bytechef.component.definition.ActionDefinition.WorkflowNodeDescriptionFunction;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.DynamicOptionsProperty;
@@ -59,6 +60,7 @@ import com.bytechef.platform.component.definition.MultipleConnectionsOutputFunct
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
 import com.bytechef.platform.component.definition.MultipleConnectionsSseStreamResponsePerformFunction;
 import com.bytechef.platform.component.definition.MultipleConnectionsStreamPerformFunction;
+import com.bytechef.platform.component.definition.MultipleConnectionsWebSocketPerformFunction;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.PropertyFactory;
 import com.bytechef.platform.component.domain.ActionDefinition;
@@ -276,6 +278,15 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
                 result = executeSingleConnectionPerform(
                     performFunction, inputParameters, firstComponentConnection, actionContext);
+            } else if (basePerformFunction instanceof WebSocketPerformFunction webSocketPerformFunction) {
+                ComponentConnection firstComponentConnection = getFirstComponentConnection(componentConnections);
+
+                actionContext = contextFactory.createActionContext(
+                    componentName, componentVersion, actionName, jobPrincipalId, jobPrincipalWorkflowId, jobId,
+                    taskExecutionId, workflowId, firstComponentConnection, environmentId, type, editorEnvironment);
+
+                result = executeWebSocketPerform(
+                    webSocketPerformFunction, inputParameters, firstComponentConnection, actionContext);
             } else {
                 actionContext = contextFactory.createActionContext(
                     componentName, componentVersion, actionName, jobPrincipalId, jobPrincipalWorkflowId, jobId,
@@ -286,6 +297,9 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                         performFunction, inputParameters, componentConnections, extensions, actionContext);
                 } else if (basePerformFunction instanceof MultipleConnectionsStreamPerformFunction performFunction) {
                     result = executeMultipleConnectionsStreamPerform(
+                        performFunction, inputParameters, componentConnections, extensions, actionContext);
+                } else if (basePerformFunction instanceof MultipleConnectionsWebSocketPerformFunction performFunction) {
+                    result = executeMultipleConnectionsWebSocketPerform(
                         performFunction, inputParameters, componentConnections, extensions, actionContext);
                 } else {
                     result = executeMultipleConnectionsSseStreamResponsePerform(
@@ -448,8 +462,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         com.bytechef.component.definition.ActionDefinition actionDefinition = doGetActionDefinition(
             componentName, componentVersion, actionName);
 
-        List<? extends BaseProperty> properties = actionDefinition.getProperties()
-            .orElse(List.of());
+        List<? extends BaseProperty> properties = actionDefinition.getProperties();
 
         BaseProperty property = PropertyUtils.findPropertyByPath(properties, propertyName);
 
@@ -535,6 +548,31 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
     private Object executeMultipleConnectionsSseStreamResponsePerform(
         MultipleConnectionsSseStreamResponsePerformFunction performFunction, Map<String, ?> inputParameters,
+        Map<String, ComponentConnection> componentConnections, Map<String, ?> extensions, ActionContext context) {
+
+        try {
+            return performFunction.apply(
+                ParametersFactory.create(inputParameters), componentConnections, ParametersFactory.create(extensions),
+                context);
+        } catch (Exception e) {
+            throw new ExecutionException(toUserFriendlyMessage(e), e, inputParameters, EXECUTE_PERFORM);
+        }
+    }
+
+    private Object executeWebSocketPerform(
+        WebSocketPerformFunction performFunction, Map<String, ?> inputParameters,
+        @Nullable ComponentConnection componentConnection, ActionContext context) {
+
+        try {
+            return performFunction.apply(
+                ParametersFactory.create(inputParameters), ParametersFactory.create(componentConnection), context);
+        } catch (Exception e) {
+            throw new ExecutionException(toUserFriendlyMessage(e), e, inputParameters, EXECUTE_PERFORM);
+        }
+    }
+
+    private Object executeMultipleConnectionsWebSocketPerform(
+        MultipleConnectionsWebSocketPerformFunction performFunction, Map<String, ?> inputParameters,
         Map<String, ComponentConnection> componentConnections, Map<String, ?> extensions, ActionContext context) {
 
         try {

@@ -17,7 +17,6 @@
 package com.bytechef.platform.workflow.task.dispatcher.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.workflow.task.dispatcher.definition.Property;
 import java.time.LocalDate;
 import java.util.Collections;
@@ -37,7 +36,7 @@ public class DateProperty extends ValueProperty<LocalDate> {
     public DateProperty(Property.DateProperty dateProperty) {
         super(dateProperty);
 
-        this.options = CollectionUtils.map(OptionalUtils.orElse(dateProperty.getOptions(), List.of()), Option::new);
+        this.options = CollectionUtils.map(dateProperty.getOptions(), Option::new);
     }
 
     @Override

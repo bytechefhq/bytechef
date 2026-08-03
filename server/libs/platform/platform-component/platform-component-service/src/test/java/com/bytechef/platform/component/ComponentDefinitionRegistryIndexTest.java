@@ -76,7 +76,6 @@ public class ComponentDefinitionRegistryIndexTest {
         ComponentDefinition slackComponentDefinition = slackComponentHandler.getDefinition();
 
         List<ComponentIndex.ItemSummary> actionSummaries = slackComponentDefinition.getActions()
-            .orElse(List.of())
             .stream()
             .map(actionDefinition -> new ComponentIndex.ItemSummary(
                 actionDefinition.getName(), actionDefinition.getTitle()
@@ -85,10 +84,12 @@ public class ComponentDefinitionRegistryIndexTest {
                     .orElse(null)))
             .toList();
 
+        int version = slackComponentDefinition.getVersion();
+
         return new ComponentIndex(
             List.of(
                 new ComponentIndex.Entry(
-                    "slack", slackComponentDefinition.getVersion(), "Slack",
+                    "slack", version, "Slack",
                     "Slack is a messaging platform for teams to communicate and collaborate.",
                     "path:assets/slack.svg", null, null,
                     new ComponentIndex.ConnectionSummary(1, true), actionSummaries, null, null,
@@ -112,16 +113,13 @@ public class ComponentDefinitionRegistryIndexTest {
 
         // The stub carries list-view metadata (identity, action summaries, connection presence)...
         assertThat(slackStub.getTitle()).contains("Slack");
-        assertThat(slackStub.getActions()
-            .orElse(List.of())).isNotEmpty();
+        assertThat(slackStub.getActions()).isNotEmpty();
         assertThat(slackStub.getConnection()).isPresent();
 
         // ...but no property trees — the stub never loaded the real handler.
         assertThat(slackStub.getActions()
-            .orElseThrow()
             .getFirst()
-            .getProperties()
-            .orElse(List.of())).isEmpty();
+            .getProperties()).isEmpty();
     }
 
     @Test
@@ -132,17 +130,14 @@ public class ComponentDefinitionRegistryIndexTest {
 
         // The on-demand load returns the real definition: actions carry their full property trees.
         assertThat(componentDefinition.getActions()
-            .orElseThrow()
             .stream()
             .anyMatch(actionDefinition -> !actionDefinition.getProperties()
-                .orElse(List.of())
                 .isEmpty()))
                     .isTrue();
 
         assertThat(componentDefinition.getConnection()
             .orElseThrow()
-            .getAuthorizations()
-            .orElse(List.of())).isNotEmpty();
+            .getAuthorizations()).isNotEmpty();
     }
 
     @Test
@@ -170,10 +165,8 @@ public class ComponentDefinitionRegistryIndexTest {
         // The deep-read list loads the real component on demand — actions carry full property trees, unlike the
         // stub list served by getStaticComponentDefinitions().
         assertThat(slackComponentDefinition.getActions()
-            .orElseThrow()
             .stream()
             .anyMatch(actionDefinition -> !actionDefinition.getProperties()
-                .orElse(List.of())
                 .isEmpty()))
                     .isTrue();
     }
@@ -258,7 +251,6 @@ public class ComponentDefinitionRegistryIndexTest {
         ComponentDefinition slackComponentDefinition = componentDefinitionRegistry.getComponentDefinition("slack", 1);
 
         String actionName = slackComponentDefinition.getActions()
-            .orElseThrow()
             .getFirst()
             .getName();
 
@@ -295,7 +287,6 @@ public class ComponentDefinitionRegistryIndexTest {
         assertThat(stub.getTitle()).contains("Fake");
         assertThat(stub.getIcon()).contains("path:assets/fake.svg");
         assertThat(stub.getComponentCategories()
-            .orElseThrow()
             .getFirst()
             .name()).isEqualTo("communication");
         assertThat(stub.getConnection()
@@ -303,20 +294,16 @@ public class ComponentDefinitionRegistryIndexTest {
             .getVersion()).isEqualTo(2);
         assertThat(stub.getConnection()
             .orElseThrow()
-            .getAuthorizationRequired()).contains(false);
-        assertThat(stub.getActions()
-            .orElseThrow()).hasSize(1);
+            .getAuthorizationRequired()).isFalse();
+        assertThat(stub.getActions()).hasSize(1);
         assertThat(stub.getTriggers()
-            .orElseThrow()
             .getFirst()
             .getType()).isEqualTo(com.bytechef.component.definition.TriggerDefinition.TriggerType.STATIC_WEBHOOK);
         assertThat(stub.getClusterElements()
-            .orElseThrow()
             .getFirst()
             .getType()
             .key()).isEqualTo("tools");
-        assertThat(stub.getInputs()
-            .orElseThrow()).hasSize(1);
+        assertThat(stub.getInputs()).hasSize(1);
     }
 
     @Test
@@ -340,10 +327,8 @@ public class ComponentDefinitionRegistryIndexTest {
             .orElseThrow();
 
         // The fallback serves the real, fully loaded definition — actions carry property trees, unlike stubs.
-        assertThat(slackComponentDefinition.getActions()
-            .orElse(List.of()))
-                .anySatisfy(actionDefinition -> assertThat(actionDefinition.getProperties()
-                    .orElse(List.of())).isNotEmpty());
+        assertThat(slackComponentDefinition.getActions())
+            .anySatisfy(actionDefinition -> assertThat(actionDefinition.getProperties()).isNotEmpty());
     }
 
     @Test

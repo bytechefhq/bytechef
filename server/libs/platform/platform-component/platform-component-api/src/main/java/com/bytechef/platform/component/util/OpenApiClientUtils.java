@@ -59,9 +59,15 @@ public class OpenApiClientUtils {
 
         BaseValueProperty<?> outputSchema = outputDefinition == null ? null : outputDefinition.getOutputSchema();
 
-        ResponseType responseType = outputSchema == null
-            ? MapUtils.get(metadata, "responseType", ResponseType.class)
-            : MapUtils.get(outputSchema.getMetadata(), "responseType", ResponseType.class);
+        ResponseType responseType;
+
+        if (outputSchema == null) {
+            responseType = MapUtils.get(metadata, "responseType", ResponseType.class);
+        } else {
+            Map<String, Object> outputSchemaMetadata = outputSchema.getMetadata();
+
+            responseType = MapUtils.get(outputSchemaMetadata, "responseType", ResponseType.class);
+        }
 
         Response response = context
             .http(http -> http.exchange(
@@ -100,7 +106,9 @@ public class OpenApiClientUtils {
         String path = (String) metadata.get("path");
 
         for (Property property : properties) {
-            if (MapUtils.get(property.getMetadata(), TYPE, PropertyType.class) == PropertyType.PATH) {
+            Map<String, Object> propertyMetadata = property.getMetadata();
+
+            if (MapUtils.get(propertyMetadata, TYPE, PropertyType.class) == PropertyType.PATH) {
                 path = path.replace(
                     "{" + property.getName() + "}",
                     URLEncoder.encode(
@@ -121,8 +129,11 @@ public class OpenApiClientUtils {
         }
 
         List<? extends Property> bodyProperties = properties.stream()
-            .filter(property -> Objects.equals(
-                MapUtils.get(property.getMetadata(), TYPE, PropertyType.class), PropertyType.BODY))
+            .filter(property -> {
+                Map<String, Object> propertyMetadata = property.getMetadata();
+
+                return Objects.equals(MapUtils.get(propertyMetadata, TYPE, PropertyType.class), PropertyType.BODY);
+            })
             .toList();
 
         if (bodyProperties.size() == 1) {
@@ -190,7 +201,9 @@ public class OpenApiClientUtils {
         Map<String, List<String>> valuesMap = new HashMap<>();
 
         for (Property property : properties) {
-            if (Objects.equals(MapUtils.get(property.getMetadata(), TYPE, PropertyType.class), propertyType)) {
+            Map<String, Object> metadata = property.getMetadata();
+
+            if (Objects.equals(MapUtils.get(metadata, TYPE, PropertyType.class), propertyType)) {
                 List<String> values;
 
                 if (property.getType() == Property.Type.ARRAY) {
