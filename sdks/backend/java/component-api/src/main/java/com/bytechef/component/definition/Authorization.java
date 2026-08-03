@@ -23,132 +23,143 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
+ * Defines an authorization scheme used by a {@link ConnectionDefinition} to authenticate outgoing requests. It captures
+ * the authorization type, the input properties collected from the user, and the functions that apply credentials,
+ * acquire and refresh tokens, and drive OAuth2 flows. The constants declared here are the well-known parameter keys
+ * used within connection and authorization parameter maps.
+ *
  * @author Ivica Cardic
  * @author Igor Beslic
  */
 public interface Authorization {
 
     /**
-     *
+     * The signals that trigger re-authorization when an authorization declares none of its own: an HTTP 401 response.
+     */
+    List<Object> DEFAULT_REFRESH_ON = List.of(401);
+
+    /**
+     * Parameter key under which an OAuth2 access token is stored.
      */
     String ACCESS_TOKEN = "access_token";
 
     /**
-     *
+     * Parameter key indicating where an API key should be added to the request (for example, as a header or query
+     * parameter).
      */
     String ADD_TO = "addTo";
 
     /**
-     *
+     * Parameter key under which an API token is stored.
      */
     String API_TOKEN = "api_token";
 
     /**
-     *
+     * Name of the standard HTTP {@code Authorization} header.
      */
     String AUTHORIZATION = "Authorization";
 
     /**
-     *
+     * Parameter key identifying the {@link AuthorizationType} of a connection.
      */
     String AUTHORIZATION_TYPE = "authorizationType";
 
     /**
-     *
+     * Parameter key holding the OAuth2 authorization endpoint URL.
      */
     String AUTHORIZATION_URL = "authorizationUrl";
 
     /**
-     *
+     * Parameter key holding the lifetime, in seconds, of an OAuth2 access token.
      */
     String EXPIRES_IN = "expires_in";
 
     /**
-     *
+     * Value of the {@code Bearer} authorization scheme prefix.
      */
     String BEARER = "Bearer";
 
     /**
-     *
+     * Parameter key holding the OAuth2 client identifier.
      */
     String CLIENT_ID = "clientId";
 
     /**
-     *
+     * Parameter key holding the OAuth2 client secret.
      */
     String CLIENT_SECRET = "clientSecret";
 
     /**
-     *
+     * Parameter key holding the authorization code returned by an OAuth2 authorization-code flow.
      */
     String CODE = "code";
 
     /**
-     *
+     * Parameter key holding the prefix prepended to an API key value placed in a header.
      */
     String HEADER_PREFIX = "headerPrefix";
 
     /**
-     *
+     * Parameter key holding the name of the header or query parameter under which an API key is sent.
      */
     String KEY = "key";
 
     /**
-     *
+     * Parameter key holding a password used for basic or resource-owner-password authentication.
      */
     String PASSWORD = "password";
 
     /**
-     *
+     * Parameter key under which an OAuth2 refresh token is stored.
      */
     String REFRESH_TOKEN = "refresh_token";
 
     /**
-     *
+     * Parameter key holding the OAuth2 token-refresh endpoint URL.
      */
     String REFRESH_URL = "refreshUrl";
 
     /**
-     *
+     * Parameter key holding the set of OAuth2 scopes requested for the connection.
      */
     String SCOPES = "scopes";
 
     /**
-     *
+     * Parameter key holding a generic token value.
      */
     String TOKEN = "token";
 
     /**
-     *
+     * Parameter key holding the OAuth2 token endpoint URL.
      */
     String TOKEN_URL = "tokenUrl";
 
     /**
-     *
+     * Parameter key holding a username used for basic or resource-owner-password authentication.
      */
     String USERNAME = "username";
 
     /**
-     *
+     * Parameter key holding the value of an API key.
      */
     String VALUE = "value";
 
     /**
-     *
+     * Enumerates the supported authorization schemes, each flagged with whether it requires periodic token refresh.
      */
     enum AuthorizationType {
         /**
-         *
+         * API key authentication, where a secret key is sent as a header or query parameter.
          */
         API_KEY(false),
 
         /**
-         *
+         * HTTP Basic authentication using a username and password.
          */
         BASIC_AUTH(false),
 
         /**
-         *
+         * Bearer token authentication, where a token is sent in the {@code Authorization} header.
          */
         BEARER_TOKEN(false),
 
@@ -158,32 +169,32 @@ public interface Authorization {
         CUSTOM(false),
 
         /**
-         *
+         * HTTP Digest authentication using a challenge-response mechanism.
          */
         DIGEST_AUTH(false),
 
         /**
-         *
+         * OAuth2 authorization-code grant, which exchanges an authorization code for tokens and supports token refresh.
          */
         OAUTH2_AUTHORIZATION_CODE(true),
 
         /**
-         *
+         * OAuth2 authorization-code grant with Proof Key for Code Exchange (PKCE), which supports token refresh.
          */
         OAUTH2_AUTHORIZATION_CODE_PKCE(true),
 
         /**
-         *
+         * OAuth2 client-credentials grant, which authenticates using client identifier and secret without a user.
          */
         OAUTH2_CLIENT_CREDENTIALS(false),
 
         /**
-         *
+         * OAuth2 implicit grant, which returns an access token directly from the authorization endpoint.
          */
         OAUTH2_IMPLICIT_CODE(false),
 
         /**
-         *
+         * OAuth2 resource-owner-password grant, which exchanges a username and password for tokens.
          */
         OAUTH2_RESOURCE_OWNER_PASSWORD(false);
 
@@ -208,17 +219,17 @@ public interface Authorization {
     }
 
     /**
-     *
+     * Enumerates the possible locations to which an API key can be added when authenticating a request.
      */
     enum ApiTokenLocation {
 
         /**
-         *
+         * The API key is sent as an HTTP request header.
          */
         HEADER,
 
         /**
-         *
+         * The API key is sent as a URL query parameter.
          */
         QUERY_PARAMETERS,
     }
@@ -226,37 +237,61 @@ public interface Authorization {
     /**
      * @return the implementation of {@link AcquireFunction} interface if defined
      */
-    Optional<AcquireFunction> getAcquire();
+    default Optional<AcquireFunction> getAcquire() {
+        return Optional.empty();
+    }
 
     /**
+     * Returns the optional function that applies the connection's credentials to an outgoing request by contributing
+     * headers or query parameters.
      *
-     * @return
+     * @return an {@code Optional} containing the {@link ApplyFunction} if defined, or an empty {@code Optional}
+     *         otherwise
      */
-    Optional<ApplyFunction> getApply();
+    default Optional<ApplyFunction> getApply() {
+        return Optional.empty();
+    }
 
     /**
+     * Returns the optional function invoked when the OAuth2 authorization callback is received, used to exchange the
+     * authorization code for tokens.
      *
-     * @return
+     * @return an {@code Optional} containing the {@link AuthorizationCallbackFunction} if defined, or an empty
+     *         {@code Optional} otherwise
      */
-    Optional<AuthorizationCallbackFunction> getAuthorizationCallback();
+    default Optional<AuthorizationCallbackFunction> getAuthorizationCallback() {
+        return Optional.empty();
+    }
 
     /**
+     * Returns the optional function that resolves the OAuth2 authorization endpoint URL.
      *
-     * @return
+     * @return an {@code Optional} containing the {@link AuthorizationUrlFunction} if defined, or an empty
+     *         {@code Optional} otherwise
      */
-    Optional<AuthorizationUrlFunction> getAuthorizationUrl();
+    default Optional<AuthorizationUrlFunction> getAuthorizationUrl() {
+        return Optional.empty();
+    }
 
     /**
+     * Returns the optional function that resolves the OAuth2 client identifier.
      *
-     * @return
+     * @return an {@code Optional} containing the {@link ClientIdFunction} if defined, or an empty {@code Optional}
+     *         otherwise
      */
-    Optional<ClientIdFunction> getClientId();
+    default Optional<ClientIdFunction> getClientId() {
+        return Optional.empty();
+    }
 
     /**
+     * Returns the optional function that resolves the OAuth2 client secret.
      *
-     * @return
+     * @return an {@code Optional} containing the {@link ClientSecretFunction} if defined, or an empty {@code Optional}
+     *         otherwise
      */
-    Optional<ClientSecretFunction> getClientSecret();
+    default Optional<ClientSecretFunction> getClientSecret() {
+        return Optional.empty();
+    }
 
     /**
      * This is an optional list of signals that identify when the system must raise the excpetion even if the response
@@ -275,35 +310,50 @@ public interface Authorization {
      *
      * @return the list of Regex expressions which are matched on the response body
      */
-    Optional<List<String>> getDetectOn();
+    default List<String> getDetectOn() {
+        return List.of();
+    }
 
     /**
+     * Returns the human-readable description of this authorization scheme.
      *
-     * @return
+     * @return an {@code Optional} containing the description if defined, or an empty {@code Optional} otherwise
      */
-    Optional<String> getDescription();
+    default Optional<String> getDescription() {
+        return Optional.empty();
+    }
 
     String getName();
 
-    Optional<OAuth2AuthorizationExtraQueryParametersFunction> getOauth2AuthorizationExtraQueryParameters();
+    default Optional<OAuth2AuthorizationExtraQueryParametersFunction> getOauth2AuthorizationExtraQueryParameters() {
+        return Optional.empty();
+    }
 
     /**
      * TODO
      *
      * @return
      */
-    Optional<PkceFunction> getPkce();
+    default Optional<PkceFunction> getPkce() {
+        return Optional.empty();
+    }
 
     /**
+     * Returns the input properties that define the credentials and settings collected from the user for this
+     * authorization.
      *
-     * @return
+     * @return the list of properties, or an empty list if none are declared
      */
-    Optional<List<? extends Property>> getProperties();
+    default List<? extends Property> getProperties() {
+        return List.of();
+    }
 
     /**
      * @return the implementation of {@link RefreshFunction} interface if defined
      */
-    Optional<RefreshFunction> getRefresh();
+    default Optional<RefreshFunction> getRefresh() {
+        return Optional.empty();
+    }
 
     /**
      * This is an optional array of signals that identify when the system must re-acquire credentials. When it receives
@@ -317,41 +367,63 @@ public interface Authorization {
      * @return the list of integers which are matched to HTTP response codes or Regex expressions which are matched on
      *         the response body
      */
-    Optional<List<Object>> getRefreshOn();
+    default List<Object> getRefreshOn() {
+        return DEFAULT_REFRESH_ON;
+    }
 
     /**
+     * Returns the optional function that resolves the OAuth2 token-refresh endpoint URL.
      *
-     * @return
+     * @return an {@code Optional} containing the {@link RefreshUrlFunction} if defined, or an empty {@code Optional}
+     *         otherwise
      */
-    Optional<RefreshUrlFunction> getRefreshUrl();
+    default Optional<RefreshUrlFunction> getRefreshUrl() {
+        return Optional.empty();
+    }
 
     /**
+     * Returns the optional function that extracts the refresh token value from the connection parameters.
      *
-     * @return
+     * @return an {@code Optional} containing the {@link RefreshTokenFunction} if defined, or an empty {@code Optional}
+     *         otherwise
      */
-    Optional<RefreshTokenFunction> getRefreshToken();
+    default Optional<RefreshTokenFunction> getRefreshToken() {
+        return Optional.empty();
+    }
 
     /**
+     * Returns the optional function that resolves the OAuth2 scopes requested for the connection.
      *
-     * @return
+     * @return an {@code Optional} containing the {@link ScopesFunction} if defined, or an empty {@code Optional}
+     *         otherwise
      */
-    Optional<ScopesFunction> getScopes();
+    default Optional<ScopesFunction> getScopes() {
+        return Optional.empty();
+    }
 
     /**
+     * Returns the human-readable title of this authorization displayed in the user interface.
      *
-     * @return
+     * @return an {@code Optional} containing the title if defined, or an empty {@code Optional} otherwise
      */
-    Optional<String> getTitle();
+    default Optional<String> getTitle() {
+        return Optional.empty();
+    }
 
     /**
+     * Returns the optional function that resolves the OAuth2 token endpoint URL.
      *
-     * @return
+     * @return an {@code Optional} containing the {@link TokenUrlFunction} if defined, or an empty {@code Optional}
+     *         otherwise
      */
-    Optional<TokenUrlFunction> getTokenUrl();
+    default Optional<TokenUrlFunction> getTokenUrl() {
+        return Optional.empty();
+    }
 
     /**
+     * Returns the {@link AuthorizationType} that identifies the authentication scheme of this authorization.
      *
-     * @return
+     * @return the authorization type
      */
     AuthorizationType getType();
 
@@ -373,32 +445,40 @@ public interface Authorization {
     }
 
     /**
-     *
+     * Functional interface that applies a connection's credentials to an outgoing request, producing the headers and
+     * query parameters that carry the authentication information.
      */
     @FunctionalInterface
     interface ApplyFunction {
 
         /**
-         * @param connectionParameters
-         * @param context
-         * @return
+         * Produces the authentication data to attach to a request based on the connection parameters.
+         *
+         * @param connectionParameters the parameters of the connection being authenticated
+         * @param context              the context for the current call
+         * @return the {@link ApplyResponse} describing the headers and query parameters to add to the request
+         * @throws Exception if the credentials cannot be applied
          */
         ApplyResponse apply(Parameters connectionParameters, Context context) throws Exception;
     }
 
     /**
-     *
+     * Functional interface invoked when an OAuth2 authorization callback is received, exchanging the returned
+     * authorization code for access and refresh tokens.
      */
     @FunctionalInterface
     interface AuthorizationCallbackFunction {
 
         /**
-         * @param connectionParameters
-         * @param code
-         * @param redirectUri
-         * @param codeVerifier
-         * @param context
-         * @return
+         * Exchanges the authorization code obtained from the OAuth2 callback for tokens.
+         *
+         * @param connectionParameters the parameters of the connection being authorized
+         * @param code                 the authorization code returned by the authorization server
+         * @param redirectUri          the redirect URI registered for the OAuth2 flow
+         * @param codeVerifier         the PKCE code verifier, or {@code null} if PKCE is not used
+         * @param context              the context for the current call
+         * @return the {@link AuthorizationCallbackResponse} containing the acquired tokens
+         * @throws Exception if the token exchange fails
          */
         AuthorizationCallbackResponse apply(
             Parameters connectionParameters, String code, String redirectUri, String codeVerifier,
@@ -406,74 +486,89 @@ public interface Authorization {
     }
 
     /**
-     *
+     * Functional interface that resolves the OAuth2 authorization endpoint URL for a connection.
      */
     @FunctionalInterface
     interface AuthorizationUrlFunction {
 
         /**
-         * @param connectionParameters
-         * @param context
-         * @return
+         * Resolves the OAuth2 authorization endpoint URL.
+         *
+         * @param connectionParameters the parameters of the connection being authorized
+         * @param context              the context for the current call
+         * @return the authorization endpoint URL
+         * @throws Exception if the URL cannot be resolved
          */
         String apply(Parameters connectionParameters, Context context) throws Exception;
     }
 
     /**
-     *
+     * Functional interface that resolves the OAuth2 client identifier for a connection.
      */
     @FunctionalInterface
     interface ClientIdFunction {
 
         /**
-         * @param connectionParameters
-         * @param context
-         * @return
+         * Resolves the OAuth2 client identifier.
+         *
+         * @param connectionParameters the parameters of the connection being authorized
+         * @param context              the context for the current call
+         * @return the client identifier
+         * @throws Exception if the client identifier cannot be resolved
          */
         String apply(Parameters connectionParameters, Context context) throws Exception;
     }
 
     /**
-     *
+     * Functional interface that resolves the OAuth2 client secret for a connection.
      */
     @FunctionalInterface
     interface ClientSecretFunction {
 
         /**
-         * @param connectionParameters
-         * @param context
-         * @return
+         * Resolves the OAuth2 client secret.
+         *
+         * @param connectionParameters the parameters of the connection being authorized
+         * @param context              the context for the current call
+         * @return the client secret
+         * @throws Exception if the client secret cannot be resolved
          */
         String apply(Parameters connectionParameters, Context context) throws Exception;
     }
 
     /**
-     *
+     * Functional interface that supplies extra query parameters appended to the OAuth2 authorization request.
      */
     @FunctionalInterface
     interface OAuth2AuthorizationExtraQueryParametersFunction {
 
         /**
-         * @param connectionParameters
-         * @param context
-         * @return
+         * Produces the additional query parameters to include in the OAuth2 authorization request.
+         *
+         * @param connectionParameters the parameters of the connection being authorized
+         * @param context              the context for the current call
+         * @return a map of extra query parameter names to values
+         * @throws Exception if the parameters cannot be produced
          */
         Map<String, String> apply(Parameters connectionParameters, Context context) throws Exception;
     }
 
     /**
-     *
+     * Functional interface that produces the Proof Key for Code Exchange (PKCE) values used to secure an OAuth2
+     * authorization-code flow.
      */
     @FunctionalInterface
     interface PkceFunction {
 
         /**
-         * @param verifier
-         * @param challenge
-         * @param challengeMethod
-         * @param context
-         * @return
-         * @throws Exception
+         * Produces the PKCE values for an OAuth2 authorization-code flow.
+         *
+         * @param verifier        the code verifier
+         * @param challenge       the code challenge derived from the verifier
+         * @param challengeMethod the method used to derive the challenge (for example, {@code S256})
+         * @param context         the context for the current call
+         * @return the {@link Pkce} record holding the verifier, challenge, and challenge method
+         * @throws Exception if the PKCE values cannot be produced
          */
         Pkce apply(String verifier, String challenge, String challengeMethod, Context context)
             throws Exception;
@@ -486,9 +581,12 @@ public interface Authorization {
     interface RefreshTokenFunction {
 
         /**
-         * @param connectionParameters
-         * @param context
-         * @return
+         * Extracts the refresh token value from the connection parameters.
+         *
+         * @param connectionParameters the parameters of the connection being refreshed
+         * @param context              the context for the current call
+         * @return the refresh token value
+         * @throws Exception if the refresh token cannot be resolved
          */
         String apply(Parameters connectionParameters, Context context) throws Exception;
 
@@ -514,49 +612,59 @@ public interface Authorization {
     }
 
     /**
-     *
+     * Functional interface that resolves the OAuth2 token-refresh endpoint URL for a connection.
      */
     @FunctionalInterface
     interface RefreshUrlFunction {
 
         /**
-         * @param connectionParameters
-         * @param context
-         * @return
+         * Resolves the OAuth2 token-refresh endpoint URL.
+         *
+         * @param connectionParameters the parameters of the connection being refreshed
+         * @param context              the context for the current call
+         * @return the token-refresh endpoint URL
+         * @throws Exception if the URL cannot be resolved
          */
         String apply(Parameters connectionParameters, Context context) throws Exception;
     }
 
     /**
-     *
+     * Functional interface that resolves the OAuth2 scopes requested for a connection.
      */
     @FunctionalInterface
     interface ScopesFunction {
 
         /**
-         * @param connectionParameters
-         * @param context
-         * @return
+         * Resolves the OAuth2 scopes to request for a connection.
+         *
+         * @param connectionParameters the parameters of the connection being authorized
+         * @param context              the context for the current call
+         * @return a map of scope names to a flag indicating whether each scope is enabled
+         * @throws Exception if the scopes cannot be resolved
          */
         Map<String, Boolean> apply(Parameters connectionParameters, Context context) throws Exception;
     }
 
     /**
-     *
+     * Functional interface that resolves the OAuth2 token endpoint URL for a connection.
      */
     @FunctionalInterface
     interface TokenUrlFunction {
 
         /**
-         * @param connectionParameters
-         * @param context
-         * @return
+         * Resolves the OAuth2 token endpoint URL.
+         *
+         * @param connectionParameters the parameters of the connection being authorized
+         * @param context              the context for the current call
+         * @return the token endpoint URL
+         * @throws Exception if the URL cannot be resolved
          */
         String apply(Parameters connectionParameters, Context context) throws Exception;
     }
 
     /**
-     *
+     * Holds the authentication data — HTTP headers and query parameters — contributed by an {@link ApplyFunction} to an
+     * outgoing request.
      */
     @SuppressFBWarnings("EI")
     class ApplyResponse {
@@ -564,9 +672,10 @@ public interface Authorization {
         private final Map<String, List<String>> queryParameters = new HashMap<>();
 
         /**
+         * Creates an {@link ApplyResponse} that contributes the given HTTP headers to a request.
          *
-         * @param headers
-         * @return
+         * @param headers the HTTP headers to add, keyed by header name, or {@code null} for none
+         * @return a new {@link ApplyResponse} carrying the given headers
          */
         public static ApplyResponse ofHeaders(Map<String, List<String>> headers) {
             ApplyResponse applyResponse = new ApplyResponse();
@@ -579,9 +688,10 @@ public interface Authorization {
         }
 
         /**
+         * Creates an {@link ApplyResponse} that contributes the given query parameters to a request.
          *
-         * @param queryParameters
-         * @return
+         * @param queryParameters the query parameters to add, keyed by parameter name, or {@code null} for none
+         * @return a new {@link ApplyResponse} carrying the given query parameters
          */
         public static ApplyResponse ofQueryParameters(Map<String, List<String>> queryParameters) {
             ApplyResponse applyResponse = new ApplyResponse();
@@ -594,16 +704,18 @@ public interface Authorization {
         }
 
         /**
+         * Returns the HTTP headers this response contributes to a request.
          *
-         * @return
+         * @return the map of header names to values
          */
         public Map<String, List<String>> getHeaders() {
             return headers;
         }
 
         /**
+         * Returns the query parameters this response contributes to a request.
          *
-         * @return
+         * @return the map of query parameter names to values
          */
         public Map<String, List<String>> getQueryParameters() {
             return queryParameters;
@@ -611,17 +723,21 @@ public interface Authorization {
     }
 
     /**
-     * @param result
+     * Holds the tokens and additional data produced by exchanging an OAuth2 authorization code, stored as a single
+     * result map.
+     *
+     * @param result the map of acquired token values keyed by their parameter names
      */
     @SuppressFBWarnings("EI")
     record AuthorizationCallbackResponse(Map<String, ?> result) {
 
         /**
+         * Creates a callback response from the acquired tokens and any additional parameters.
          *
-         * @param accessToken
-         * @param refreshToken
-         * @param expiresIn
-         * @param additionalParameters
+         * @param accessToken          the acquired OAuth2 access token
+         * @param refreshToken         the acquired OAuth2 refresh token, or {@code null} if none was issued
+         * @param expiresIn            the lifetime of the access token in seconds, or {@code null} if unknown
+         * @param additionalParameters additional token-related values to include in the result
          */
         public AuthorizationCallbackResponse(
             String accessToken, String refreshToken, Long expiresIn, Map<String, Object> additionalParameters) {
@@ -630,10 +746,11 @@ public interface Authorization {
         }
 
         /**
+         * Creates a callback response from the acquired tokens.
          *
-         * @param accessToken
-         * @param refreshToken
-         * @param expiresIn
+         * @param accessToken  the acquired OAuth2 access token
+         * @param refreshToken the acquired OAuth2 refresh token, or {@code null} if none was issued
+         * @param expiresIn    the lifetime of the access token in seconds, or {@code null} if unknown
          */
         public AuthorizationCallbackResponse(String accessToken, String refreshToken, Long expiresIn) {
             this(accessToken, refreshToken, expiresIn, Map.of());
@@ -655,18 +772,21 @@ public interface Authorization {
     }
 
     /**
+     * Holds the refreshed OAuth2 tokens returned by a {@link RefreshFunction}.
      *
-     * @param accessToken
-     * @param expiresIn
+     * @param accessToken  the refreshed access token
+     * @param refreshToken the refreshed refresh token, or {@code null} if unchanged
+     * @param expiresIn    the lifetime of the refreshed access token in seconds, or {@code null} if unknown
      */
     record RefreshTokenResponse(String accessToken, String refreshToken, Integer expiresIn) {
     }
 
     /**
+     * Holds the Proof Key for Code Exchange (PKCE) values used to secure an OAuth2 authorization-code flow.
      *
-     * @param verifier
-     * @param challenge
-     * @param challengeMethod
+     * @param verifier        the code verifier
+     * @param challenge       the code challenge derived from the verifier
+     * @param challengeMethod the method used to derive the challenge (for example, {@code S256})
      */
     record Pkce(String verifier, String challenge, String challengeMethod) {
     }

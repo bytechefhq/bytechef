@@ -33,5 +33,7 @@ public interface BaseHelp {
      *
      * @return
      */
-    Optional<String> getLearnMoreUrl();
+    default Optional<String> getLearnMoreUrl() {
+        return Optional.empty();
+    }
 }
