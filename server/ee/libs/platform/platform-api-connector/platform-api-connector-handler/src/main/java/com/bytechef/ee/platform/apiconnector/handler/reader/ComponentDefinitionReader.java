@@ -37,8 +37,6 @@ import com.bytechef.platform.component.util.OpenApiClientUtils;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.JacksonModule;
@@ -54,9 +52,9 @@ public class ComponentDefinitionReader {
 
     private static final Function<ActionDefinition, ActionDefinition.PerformFunction> PERFORM_FUNCTION_FUNCTION =
         actionDefinition -> (inputParameters, connectionParameters, context) -> OpenApiClientUtils.execute(
-            inputParameters, OptionalUtils.orElse(actionDefinition.getProperties(), List.of()),
+            inputParameters, actionDefinition.getProperties(),
             OptionalUtils.orElse(actionDefinition.getOutputDefinition(), null),
-            OptionalUtils.orElse(actionDefinition.getMetadata(), Map.of()),
+            actionDefinition.getMetadata(),
             OptionalUtils.orElse(actionDefinition.getProcessErrorResponse(), null), context);
 
     private final ApiConnectorFileStorage apiConnectorFileStorage;
@@ -86,11 +84,10 @@ public class ComponentDefinitionReader {
         return new ComponentDefinitionWrapper(
             componentDefinition,
             componentDefinition.getActions()
-                .map(actionDefinitions -> actionDefinitions.stream()
-                    .map(actionDefinition -> (ActionDefinition) new ActionDefinitionWrapper(
-                        actionDefinition, PERFORM_FUNCTION_FUNCTION.apply(actionDefinition)))
-                    .toList())
-                .orElse(List.of()));
+                .stream()
+                .map(actionDefinition -> (ActionDefinition) new ActionDefinitionWrapper(
+                    actionDefinition, PERFORM_FUNCTION_FUNCTION.apply(actionDefinition)))
+                .toList());
     }
 
     private <T> JacksonModule createModule(Class<T> abstractType, Class<? extends T> concreteType) {

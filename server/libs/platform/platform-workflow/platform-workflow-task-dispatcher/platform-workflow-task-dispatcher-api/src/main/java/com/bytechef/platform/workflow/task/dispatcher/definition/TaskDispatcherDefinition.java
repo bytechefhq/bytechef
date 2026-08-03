@@ -31,6 +31,8 @@ import java.util.Optional;
 @SuppressFBWarnings("EI")
 public interface TaskDispatcherDefinition {
 
+    int VERSION_1 = 1;
+
     /**
      * Tells whether the task dispatcher is deprecated and should be replaced in workflows that still use it.
      *
@@ -103,7 +105,9 @@ public interface TaskDispatcherDefinition {
      *
      * @return
      */
-    int getVersion();
+    default int getVersion() {
+        return VERSION_1;
+    }
 
     /**
      *
