@@ -509,7 +509,7 @@ export type AiHubTaskMessagesQueryVariables = Exact<{
 }>;
 
 
-export type AiHubTaskMessagesQuery = { aiHubTaskMessages: Array<{ role: string, content: string, timestamp: any }> };
+export type AiHubTaskMessagesQuery = { aiHubTaskMessages: Array<{ role: string, content: string, timestamp: any, toolEventsJson: string | null }> };
 
 export type AiHubTasksQueryVariables = Exact<{
   workspaceId: string | number;
@@ -624,22 +624,38 @@ export type AiAutoMemoriesQueryVariables = Exact<{
   workspaceId: string | number;
   environment: number;
   memoryType?: Types.AiAutoMemoryType | null | undefined;
+  principalType?: Types.AiAutoMemoryPrincipalType | null | undefined;
+  principalId?: any;
 }>;
 
 
-export type AiAutoMemoriesQuery = { aiAutoMemories: Array<{ id: string, workspaceId: any, userId: any, name: string, title: string, description: string | null, memoryType: Types.AiAutoMemoryType, content: string, environmentId: any, createdAt: any, updatedAt: any }> };
+export type AiAutoMemoriesQuery = { aiAutoMemories: Array<{ id: string, workspaceId: any, principalType: Types.AiAutoMemoryPrincipalType, principalId: any, name: string, title: string, description: string | null, memoryType: Types.AiAutoMemoryType, content: string, environmentId: any, createdAt: any, updatedAt: any }> };
 
 export type AiAutoMemoryQueryVariables = Exact<{
   workspaceId: string | number;
   id: string | number;
+  environment: number;
+  principalType?: Types.AiAutoMemoryPrincipalType | null | undefined;
+  principalId?: any;
 }>;
 
 
-export type AiAutoMemoryQuery = { aiAutoMemory: { id: string, workspaceId: any, userId: any, name: string, title: string, description: string | null, memoryType: Types.AiAutoMemoryType, content: string, environmentId: any, createdAt: any, updatedAt: any } | null };
+export type AiAutoMemoryQuery = { aiAutoMemory: { id: string, workspaceId: any, principalType: Types.AiAutoMemoryPrincipalType, principalId: any, name: string, title: string, description: string | null, memoryType: Types.AiAutoMemoryType, content: string, environmentId: any, createdAt: any, updatedAt: any } | null };
+
+export type AiAutoMemoryPrincipalsQueryVariables = Exact<{
+  workspaceId: string | number;
+  environment: number;
+}>;
+
+
+export type AiAutoMemoryPrincipalsQuery = { aiAutoMemoryPrincipals: Array<{ principalType: Types.AiAutoMemoryPrincipalType, principalId: any, label: string, memoryCount: number }> };
 
 export type DeleteAiAutoMemoryMutationVariables = Exact<{
   workspaceId: string | number;
   id: string | number;
+  environment: number;
+  principalType?: Types.AiAutoMemoryPrincipalType | null | undefined;
+  principalId?: any;
 }>;
 
 
@@ -650,7 +666,7 @@ export type UpdateAiAutoMemoryMutationVariables = Exact<{
 }>;
 
 
-export type UpdateAiAutoMemoryMutation = { updateAiAutoMemory: { id: string, workspaceId: any, userId: any, name: string, title: string, description: string | null, memoryType: Types.AiAutoMemoryType, content: string, environmentId: any, createdAt: any, updatedAt: any } };
+export type UpdateAiAutoMemoryMutation = { updateAiAutoMemory: { id: string, workspaceId: any, principalType: Types.AiAutoMemoryPrincipalType, principalId: any, name: string, title: string, description: string | null, memoryType: Types.AiAutoMemoryType, content: string, environmentId: any, createdAt: any, updatedAt: any } };
 
 export type AiSkillQueryVariables = Exact<{
   id: string | number;
@@ -674,10 +690,15 @@ export type AiSkillFilePathsQueryVariables = Exact<{
 
 export type AiSkillFilePathsQuery = { aiSkillFilePaths: Array<string> };
 
+export type AiSkillTagsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type AiSkillTagsQuery = { aiSkillTags: Array<{ id: string, name: string }> };
+
 export type AiSkillsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type AiSkillsQuery = { aiSkills: Array<{ id: string, name: string, description: string | null, createdDate: any, lastModifiedDate: any }> };
+export type AiSkillsQuery = { aiSkills: Array<{ id: string, name: string, description: string | null, createdDate: any, lastModifiedDate: any, tags: Array<{ id: string, name: string }> }> };
 
 export type CreateAdditionalFilesInSkillMutationVariables = Exact<{
   id: string | number;
@@ -746,6 +767,14 @@ export type UpdateAiSkillContentMutationVariables = Exact<{
 
 
 export type UpdateAiSkillContentMutation = { updateAiSkillContent: { description: string | null, id: string, lastModifiedDate: any, name: string } };
+
+export type UpdateAiSkillTagsMutationVariables = Exact<{
+  id: string | number;
+  tags?: Array<Types.AiSkillTagInput> | Types.AiSkillTagInput | null | undefined;
+}>;
+
+
+export type UpdateAiSkillTagsMutation = { updateAiSkillTags: { id: string } };
 
 export type AuditEventsQueryVariables = Exact<{
   principal?: string | null | undefined;
@@ -1016,21 +1045,21 @@ export type DeleteAiGatewayBudgetMutation = { deleteAiGatewayBudget: boolean | n
 export type AiGatewayModelsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type AiGatewayModelsQuery = { aiGatewayModels: Array<{ alias: string | null, capabilities: string | null, contextWindow: number | null, createdDate: any, enabled: boolean, id: string, inputCostPerMTokens: number | null, lastModifiedDate: any, name: string, outputCostPerMTokens: number | null, providerId: string, version: number | null } | null> | null };
+export type AiGatewayModelsQuery = { aiGatewayModels: Array<{ alias: string | null, capabilities: string | null, catalogManaged: boolean, catalogPinned: boolean, contextWindow: number | null, createdDate: any, enabled: boolean, id: string, inputCostPerMTokens: number | null, lastModifiedDate: any, name: string, outputCostPerMTokens: number | null, providerId: string, version: number | null } | null> | null };
 
 export type AiGatewayModelsByProviderQueryVariables = Exact<{
   providerId: string | number;
 }>;
 
 
-export type AiGatewayModelsByProviderQuery = { aiGatewayModelsByProvider: Array<{ alias: string | null, capabilities: string | null, contextWindow: number | null, createdDate: any, enabled: boolean, id: string, inputCostPerMTokens: number | null, lastModifiedDate: any, name: string, outputCostPerMTokens: number | null, providerId: string, version: number | null } | null> | null };
+export type AiGatewayModelsByProviderQuery = { aiGatewayModelsByProvider: Array<{ alias: string | null, capabilities: string | null, catalogManaged: boolean, catalogPinned: boolean, contextWindow: number | null, createdDate: any, enabled: boolean, id: string, inputCostPerMTokens: number | null, lastModifiedDate: any, name: string, outputCostPerMTokens: number | null, providerId: string, version: number | null } | null> | null };
 
 export type CreateAiGatewayModelMutationVariables = Exact<{
   input: Types.CreateAiGatewayModelInput;
 }>;
 
 
-export type CreateAiGatewayModelMutation = { createAiGatewayModel: { alias: string | null, capabilities: string | null, contextWindow: number | null, createdDate: any, enabled: boolean, id: string, inputCostPerMTokens: number | null, lastModifiedDate: any, name: string, outputCostPerMTokens: number | null, providerId: string, version: number | null } | null };
+export type CreateAiGatewayModelMutation = { createAiGatewayModel: { alias: string | null, capabilities: string | null, catalogManaged: boolean, catalogPinned: boolean, contextWindow: number | null, createdDate: any, enabled: boolean, id: string, inputCostPerMTokens: number | null, lastModifiedDate: any, name: string, outputCostPerMTokens: number | null, providerId: string, version: number | null } | null };
 
 export type UpdateAiGatewayModelMutationVariables = Exact<{
   id: string | number;
@@ -1038,7 +1067,7 @@ export type UpdateAiGatewayModelMutationVariables = Exact<{
 }>;
 
 
-export type UpdateAiGatewayModelMutation = { updateAiGatewayModel: { alias: string | null, capabilities: string | null, contextWindow: number | null, createdDate: any, enabled: boolean, id: string, inputCostPerMTokens: number | null, lastModifiedDate: any, name: string, outputCostPerMTokens: number | null, providerId: string, version: number | null } | null };
+export type UpdateAiGatewayModelMutation = { updateAiGatewayModel: { alias: string | null, capabilities: string | null, catalogManaged: boolean, catalogPinned: boolean, contextWindow: number | null, createdDate: any, enabled: boolean, id: string, inputCostPerMTokens: number | null, lastModifiedDate: any, name: string, outputCostPerMTokens: number | null, providerId: string, version: number | null } | null };
 
 export type DeleteAiGatewayModelMutationVariables = Exact<{
   id: string | number;
@@ -1046,6 +1075,13 @@ export type DeleteAiGatewayModelMutationVariables = Exact<{
 
 
 export type DeleteAiGatewayModelMutation = { deleteAiGatewayModel: boolean | null };
+
+export type UnpinAiGatewayModelMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type UnpinAiGatewayModelMutation = { unpinAiGatewayModel: { alias: string | null, capabilities: string | null, catalogManaged: boolean, catalogPinned: boolean, contextWindow: number | null, createdDate: any, enabled: boolean, id: string, inputCostPerMTokens: number | null, lastModifiedDate: any, name: string, outputCostPerMTokens: number | null, providerId: string, version: number | null } | null };
 
 export type PlaygroundChatCompletionMutationVariables = Exact<{
   input: Types.PlaygroundChatCompletionInput;
@@ -1480,14 +1516,14 @@ export type WorkspaceAiGatewayModelsQueryVariables = Exact<{
 }>;
 
 
-export type WorkspaceAiGatewayModelsQuery = { workspaceAiGatewayModels: Array<{ alias: string | null, capabilities: string | null, contextWindow: number | null, defaultRoutingPolicyId: string | null, createdDate: any, enabled: boolean, id: string, inputCostPerMTokens: number | null, lastModifiedDate: any, name: string, outputCostPerMTokens: number | null, providerId: string, version: number | null } | null> | null };
+export type WorkspaceAiGatewayModelsQuery = { workspaceAiGatewayModels: Array<{ alias: string | null, capabilities: string | null, catalogManaged: boolean, catalogPinned: boolean, contextWindow: number | null, defaultRoutingPolicyId: string | null, createdDate: any, enabled: boolean, id: string, inputCostPerMTokens: number | null, lastModifiedDate: any, name: string, outputCostPerMTokens: number | null, providerId: string, version: number | null } | null> | null };
 
 export type CreateWorkspaceAiGatewayModelMutationVariables = Exact<{
   input: Types.CreateWorkspaceAiGatewayModelInput;
 }>;
 
 
-export type CreateWorkspaceAiGatewayModelMutation = { createWorkspaceAiGatewayModel: { alias: string | null, capabilities: string | null, contextWindow: number | null, defaultRoutingPolicyId: string | null, createdDate: any, enabled: boolean, id: string, inputCostPerMTokens: number | null, lastModifiedDate: any, name: string, outputCostPerMTokens: number | null, providerId: string, version: number | null } | null };
+export type CreateWorkspaceAiGatewayModelMutation = { createWorkspaceAiGatewayModel: { alias: string | null, capabilities: string | null, catalogManaged: boolean, catalogPinned: boolean, contextWindow: number | null, defaultRoutingPolicyId: string | null, createdDate: any, enabled: boolean, id: string, inputCostPerMTokens: number | null, lastModifiedDate: any, name: string, outputCostPerMTokens: number | null, providerId: string, version: number | null } | null };
 
 export type DeleteWorkspaceAiGatewayModelMutationVariables = Exact<{
   workspaceId: string | number;
@@ -1497,13 +1533,22 @@ export type DeleteWorkspaceAiGatewayModelMutationVariables = Exact<{
 
 export type DeleteWorkspaceAiGatewayModelMutation = { deleteWorkspaceAiGatewayModel: boolean | null };
 
+export type UnpinWorkspaceAiGatewayModelMutationVariables = Exact<{
+  workspaceId: string | number;
+  modelId: string | number;
+}>;
+
+
+export type UnpinWorkspaceAiGatewayModelMutation = { unpinWorkspaceAiGatewayModel: { alias: string | null, capabilities: string | null, catalogManaged: boolean, catalogPinned: boolean, contextWindow: number | null, defaultRoutingPolicyId: string | null, createdDate: any, enabled: boolean, id: string, inputCostPerMTokens: number | null, lastModifiedDate: any, name: string, outputCostPerMTokens: number | null, providerId: string, version: number | null } | null };
+
 export type UpdateWorkspaceAiGatewayModelMutationVariables = Exact<{
+  workspaceId: string | number;
   id: string | number;
   input: Types.UpdateAiGatewayModelInput;
 }>;
 
 
-export type UpdateWorkspaceAiGatewayModelMutation = { updateWorkspaceAiGatewayModel: { alias: string | null, capabilities: string | null, contextWindow: number | null, defaultRoutingPolicyId: string | null, createdDate: any, enabled: boolean, id: string, inputCostPerMTokens: number | null, lastModifiedDate: any, name: string, outputCostPerMTokens: number | null, providerId: string, version: number | null } | null };
+export type UpdateWorkspaceAiGatewayModelMutation = { updateWorkspaceAiGatewayModel: { alias: string | null, capabilities: string | null, catalogManaged: boolean, catalogPinned: boolean, contextWindow: number | null, defaultRoutingPolicyId: string | null, createdDate: any, enabled: boolean, id: string, inputCostPerMTokens: number | null, lastModifiedDate: any, name: string, outputCostPerMTokens: number | null, providerId: string, version: number | null } | null };
 
 export type WorkspaceAiGatewayProvidersQueryVariables = Exact<{
   workspaceId: string | number;
@@ -1633,12 +1678,33 @@ export type DeleteAssetFileMutationVariables = Exact<{
 
 export type DeleteAssetFileMutation = { deleteAssetFile: boolean };
 
+export type DisableAssetFilePublicLinkMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type DisableAssetFilePublicLinkMutation = { disableAssetFilePublicLink: { id: string, publicLinkUrl: string | null } };
+
+export type EnableAssetFilePublicLinkMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type EnableAssetFilePublicLinkMutation = { enableAssetFilePublicLink: { id: string, publicLinkUrl: string | null } };
+
 export type GetAssetFileQueryVariables = Exact<{
   id: string | number;
 }>;
 
 
-export type GetAssetFileQuery = { assetFile: { createdBy: string | null, createdDate: any, description: string | null, downloadUrl: string, environmentId: any, format: string | null, generatedByAgentSource: number | null, generatedFromPrompt: string | null, id: string, lastModifiedBy: string | null, lastModifiedDate: any, metadataJson: string | null, mimeType: string, name: string, sizeBytes: any, source: Types.AssetFileSource, tags: Array<{ id: string, name: string }> } | null };
+export type GetAssetFileQuery = { assetFile: { createdBy: string | null, createdDate: any, description: string | null, downloadUrl: string, environmentId: any, format: string | null, generatedByAgentSource: number | null, generatedFromPrompt: string | null, id: string, lastModifiedBy: string | null, lastModifiedDate: any, metadataJson: string | null, mimeType: string, name: string, publicLinkUrl: string | null, sizeBytes: any, source: Types.AssetFileSource, tags: Array<{ id: string, name: string }> } | null };
+
+export type GetAssetFileSignedDownloadUrlQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type GetAssetFileSignedDownloadUrlQuery = { assetFileSignedDownloadUrl: string };
 
 export type GetAssetFileTagsQueryVariables = Exact<{
   workspaceId: string | number;
@@ -1654,6 +1720,13 @@ export type GetAssetFileTextContentQueryVariables = Exact<{
 
 export type GetAssetFileTextContentQuery = { assetFileTextContent: string | null };
 
+export type GetAssetFileVersionsQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type GetAssetFileVersionsQuery = { assetFileVersions: Array<{ createdBy: string | null, createdDate: any, id: string, mimeType: string, sizeBytes: any, versionNumber: number }> };
+
 export type GetAssetFilesQueryVariables = Exact<{
   workspaceId: string | number;
   environment?: number | null | undefined;
@@ -1662,7 +1735,15 @@ export type GetAssetFilesQueryVariables = Exact<{
 }>;
 
 
-export type GetAssetFilesQuery = { assetFiles: Array<{ createdBy: string | null, createdDate: any, description: string | null, downloadUrl: string, environmentId: any, format: string | null, generatedByAgentSource: number | null, generatedFromPrompt: string | null, id: string, lastModifiedBy: string | null, lastModifiedDate: any, metadataJson: string | null, mimeType: string, name: string, sizeBytes: any, source: Types.AssetFileSource, tags: Array<{ id: string, name: string }> }> };
+export type GetAssetFilesQuery = { assetFiles: Array<{ createdBy: string | null, createdDate: any, description: string | null, downloadUrl: string, environmentId: any, format: string | null, generatedByAgentSource: number | null, generatedFromPrompt: string | null, id: string, lastModifiedBy: string | null, lastModifiedDate: any, metadataJson: string | null, mimeType: string, name: string, publicLinkUrl: string | null, sizeBytes: any, source: Types.AssetFileSource, tags: Array<{ id: string, name: string }> }> };
+
+export type RestoreAssetFileVersionMutationVariables = Exact<{
+  id: string | number;
+  versionId: string | number;
+}>;
+
+
+export type RestoreAssetFileVersionMutation = { restoreAssetFileVersion: { id: string, lastModifiedDate: any, mimeType: string, name: string, sizeBytes: any } };
 
 export type UpdateAssetFileMutationVariables = Exact<{
   input: Types.UpdateAssetFileInput;
@@ -2204,6 +2285,13 @@ export type WorkspaceMcpServersQueryVariables = Exact<{
 
 export type WorkspaceMcpServersQuery = { workspaceMcpServers: Array<{ id: string, name: string, type: Types.PlatformType, environmentId: string, enabled: boolean, enforceToolAuthorization: boolean, authenticationRequired: boolean, url: string, lastModifiedDate: any, mcpComponents: Array<{ id: string, mcpServerId: string, componentName: string, componentVersion: number, title: string | null } | null> | null, tags: Array<{ id: string, name: string } | null> | null } | null> | null };
 
+export type WorkspaceProjectWorkflowsQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
+
+
+export type WorkspaceProjectWorkflowsQuery = { workspaceProjectWorkflows: Array<{ projectId: string, projectName: string, projectWorkflowId: string, workflowId: string, workflowLabel: string }> };
+
 export type WorkspaceUsersQueryVariables = Exact<{
   workspaceId: string | number;
 }>;
@@ -2722,6 +2810,9 @@ export type CreateCodeWorkflowMutationVariables = Exact<{
   workspaceId: string | number;
   name: string;
   language: Types.CodeWorkflowLanguage;
+  description?: string | null | undefined;
+  categoryId?: string | number | null | undefined;
+  tags?: Array<string> | string | null | undefined;
 }>;
 
 
@@ -3047,6 +3138,11 @@ export type UpdateMcpIntegrationInstanceConfigurationWorkflowMutation = { update
 export type CreateIntegrationCodeWorkflowMutationVariables = Exact<{
   componentName: string;
   language: Types.CodeWorkflowLanguage;
+  name?: string | null | undefined;
+  description?: string | null | undefined;
+  categoryId?: string | number | null | undefined;
+  tags?: Array<string> | string | null | undefined;
+  permissionExpression?: string | null | undefined;
 }>;
 
 
@@ -3222,10 +3318,27 @@ export type TaskExecutionFileLogsQueryVariables = Exact<{
 
 export type TaskExecutionFileLogsQuery = { taskExecutionFileLogs: Array<{ timestamp: string, level: Types.LogLevel, componentName: string, componentOperationName: string | null, taskExecutionId: string, message: string, exceptionType: string | null, exceptionMessage: string | null, stackTrace: string | null }> };
 
+export type ComponentOperationPoliciesQueryVariables = Exact<{
+  componentName: string;
+}>;
+
+
+export type ComponentOperationPoliciesQuery = { componentOperationPolicies: Array<{ componentName: string, operationType: Types.ComponentOperationType, operationName: string }> };
+
 export type ComponentPoliciesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type ComponentPoliciesQuery = { componentPolicies: Array<{ name: string, title: string | null, description: string | null, icon: string | null, version: number, enabled: boolean }> };
+
+export type UpdateComponentOperationPolicyMutationVariables = Exact<{
+  componentName: string;
+  operationType: Types.ComponentOperationType;
+  operationName: string;
+  enabled: boolean;
+}>;
+
+
+export type UpdateComponentOperationPolicyMutation = { updateComponentOperationPolicy: boolean };
 
 export type UpdateComponentPolicyMutationVariables = Exact<{
   name: string;
@@ -3684,7 +3797,7 @@ export type CustomComponentQueryVariables = Exact<{
 }>;
 
 
-export type CustomComponentQuery = { customComponent: { id: string, name: string, title: string | null, description: string | null, icon: string | null, componentVersion: number | null, enabled: boolean | null, language: Types.CustomComponentLanguage | null, createdBy: string | null, createdDate: any, lastModifiedBy: string | null, lastModifiedDate: any, version: number | null } | null };
+export type CustomComponentQuery = { customComponent: { id: string, name: string, title: string | null, description: string | null, icon: string | null, componentVersion: number | null, enabled: boolean | null, language: Types.CustomComponentLanguage | null, createdBy: string | null, createdDate: any, lastModifiedBy: string | null, lastModifiedDate: any, status: Types.CustomComponentStatus | null, publishedDate: any, version: number | null } | null };
 
 export type CustomComponentDefinitionQueryVariables = Exact<{
   id: string | number;
@@ -3703,7 +3816,7 @@ export type CustomComponentSourceQuery = { customComponentSource: string };
 export type CustomComponentsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type CustomComponentsQuery = { customComponents: Array<{ id: string, name: string, title: string | null, description: string | null, icon: string | null, componentVersion: number | null, enabled: boolean | null, language: Types.CustomComponentLanguage | null, createdBy: string | null, createdDate: any, lastModifiedBy: string | null, lastModifiedDate: any, version: number | null }> };
+export type CustomComponentsQuery = { customComponents: Array<{ id: string, name: string, title: string | null, description: string | null, icon: string | null, componentVersion: number | null, enabled: boolean | null, language: Types.CustomComponentLanguage | null, createdBy: string | null, createdDate: any, lastModifiedBy: string | null, lastModifiedDate: any, status: Types.CustomComponentStatus | null, publishedDate: any, version: number | null }> };
 
 export type DeleteCustomComponentMutationVariables = Exact<{
   id: string | number;
@@ -3720,13 +3833,20 @@ export type EnableCustomComponentMutationVariables = Exact<{
 
 export type EnableCustomComponentMutation = { enableCustomComponent: boolean };
 
+export type PublishCustomComponentMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type PublishCustomComponentMutation = { publishCustomComponent: { id: string, publishedDate: any, status: Types.CustomComponentStatus | null } };
+
 export type UpdateCustomComponentSourceMutationVariables = Exact<{
   id: string | number;
   content: string;
 }>;
 
 
-export type UpdateCustomComponentSourceMutation = { updateCustomComponentSource: boolean };
+export type UpdateCustomComponentSourceMutation = { updateCustomComponentSource: { id: string, componentVersion: number | null, status: Types.CustomComponentStatus | null } };
 
 export type DeleteLicenceMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -3834,6 +3954,20 @@ export type WorkspaceNotificationsQueryVariables = Exact<{
 
 
 export type WorkspaceNotificationsQuery = { workspaceNotifications: Array<{ id: string, name: string, type: string }> };
+
+export type WorkspaceSystemPromptQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
+
+
+export type WorkspaceSystemPromptQuery = { workspaceSystemPrompt: { prompt: string, workspaceId: string } | null };
+
+export type UpdateWorkspaceSystemPromptMutationVariables = Exact<{
+  input: Types.WorkspaceSystemPromptInput;
+}>;
+
+
+export type UpdateWorkspaceSystemPromptMutation = { updateWorkspaceSystemPrompt: { prompt: string, workspaceId: string } | null };
 
 export type ToolInvocationLogsQueryVariables = Exact<{
   surface?: string | null | undefined;
@@ -5697,6 +5831,7 @@ export const AiHubTaskMessagesDocument = new TypedDocumentString(`
     role
     content
     timestamp
+    toolEventsJson
   }
 }
     `);
@@ -6087,15 +6222,18 @@ export const useUpdateAiHubVoiceWebhookUrlMutation = <
     )};
 
 export const AiAutoMemoriesDocument = new TypedDocumentString(`
-    query aiAutoMemories($workspaceId: ID!, $environment: Int!, $memoryType: AiAutoMemoryType) {
+    query aiAutoMemories($workspaceId: ID!, $environment: Int!, $memoryType: AiAutoMemoryType, $principalType: AiAutoMemoryPrincipalType, $principalId: Long) {
   aiAutoMemories(
     workspaceId: $workspaceId
     environment: $environment
     memoryType: $memoryType
+    principalType: $principalType
+    principalId: $principalId
   ) {
     id
     workspaceId
-    userId
+    principalType
+    principalId
     name
     title
     description
@@ -6125,11 +6263,18 @@ export const useAiAutoMemoriesQuery = <
     )};
 
 export const AiAutoMemoryDocument = new TypedDocumentString(`
-    query aiAutoMemory($workspaceId: ID!, $id: ID!) {
-  aiAutoMemory(workspaceId: $workspaceId, id: $id) {
+    query aiAutoMemory($workspaceId: ID!, $id: ID!, $environment: Int!, $principalType: AiAutoMemoryPrincipalType, $principalId: Long) {
+  aiAutoMemory(
+    workspaceId: $workspaceId
+    id: $id
+    environment: $environment
+    principalType: $principalType
+    principalId: $principalId
+  ) {
     id
     workspaceId
-    userId
+    principalType
+    principalId
     name
     title
     description
@@ -6158,9 +6303,42 @@ export const useAiAutoMemoryQuery = <
   }
     )};
 
+export const AiAutoMemoryPrincipalsDocument = new TypedDocumentString(`
+    query aiAutoMemoryPrincipals($workspaceId: ID!, $environment: Int!) {
+  aiAutoMemoryPrincipals(workspaceId: $workspaceId, environment: $environment) {
+    principalType
+    principalId
+    label
+    memoryCount
+  }
+}
+    `);
+
+export const useAiAutoMemoryPrincipalsQuery = <
+      TData = AiAutoMemoryPrincipalsQuery,
+      TError = unknown
+    >(
+      variables: AiAutoMemoryPrincipalsQueryVariables,
+      options?: Omit<UseQueryOptions<AiAutoMemoryPrincipalsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiAutoMemoryPrincipalsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiAutoMemoryPrincipalsQuery, TError, TData>(
+      {
+    queryKey: ['aiAutoMemoryPrincipals', variables],
+    queryFn: fetcher<AiAutoMemoryPrincipalsQuery, AiAutoMemoryPrincipalsQueryVariables>(AiAutoMemoryPrincipalsDocument, variables),
+    ...options
+  }
+    )};
+
 export const DeleteAiAutoMemoryDocument = new TypedDocumentString(`
-    mutation deleteAiAutoMemory($workspaceId: ID!, $id: ID!) {
-  deleteAiAutoMemory(workspaceId: $workspaceId, id: $id)
+    mutation deleteAiAutoMemory($workspaceId: ID!, $id: ID!, $environment: Int!, $principalType: AiAutoMemoryPrincipalType, $principalId: Long) {
+  deleteAiAutoMemory(
+    workspaceId: $workspaceId
+    id: $id
+    environment: $environment
+    principalType: $principalType
+    principalId: $principalId
+  )
 }
     `);
 
@@ -6182,7 +6360,8 @@ export const UpdateAiAutoMemoryDocument = new TypedDocumentString(`
   updateAiAutoMemory(input: $input) {
     id
     workspaceId
-    userId
+    principalType
+    principalId
     name
     title
     description
@@ -6280,12 +6459,41 @@ export const useAiSkillFilePathsQuery = <
   }
     )};
 
+export const AiSkillTagsDocument = new TypedDocumentString(`
+    query aiSkillTags {
+  aiSkillTags {
+    id
+    name
+  }
+}
+    `);
+
+export const useAiSkillTagsQuery = <
+      TData = AiSkillTagsQuery,
+      TError = unknown
+    >(
+      variables?: AiSkillTagsQueryVariables,
+      options?: Omit<UseQueryOptions<AiSkillTagsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiSkillTagsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiSkillTagsQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['aiSkillTags'] : ['aiSkillTags', variables],
+    queryFn: fetcher<AiSkillTagsQuery, AiSkillTagsQueryVariables>(AiSkillTagsDocument, variables),
+    ...options
+  }
+    )};
+
 export const AiSkillsDocument = new TypedDocumentString(`
     query aiSkills {
   aiSkills {
     id
     name
     description
+    tags {
+      id
+      name
+    }
     createdDate
     lastModifiedDate
   }
@@ -6504,6 +6712,27 @@ export const useUpdateAiSkillContentMutation = <
       {
     mutationKey: ['updateAiSkillContent'],
     mutationFn: (variables?: UpdateAiSkillContentMutationVariables) => fetcher<UpdateAiSkillContentMutation, UpdateAiSkillContentMutationVariables>(UpdateAiSkillContentDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateAiSkillTagsDocument = new TypedDocumentString(`
+    mutation updateAiSkillTags($id: ID!, $tags: [AiSkillTagInput!]) {
+  updateAiSkillTags(id: $id, tags: $tags) {
+    id
+  }
+}
+    `);
+
+export const useUpdateAiSkillTagsMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateAiSkillTagsMutation, TError, UpdateAiSkillTagsMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateAiSkillTagsMutation, TError, UpdateAiSkillTagsMutationVariables, TContext>(
+      {
+    mutationKey: ['updateAiSkillTags'],
+    mutationFn: (variables?: UpdateAiSkillTagsMutationVariables) => fetcher<UpdateAiSkillTagsMutation, UpdateAiSkillTagsMutationVariables>(UpdateAiSkillTagsDocument, variables)(),
     ...options
   }
     )};
@@ -7484,6 +7713,8 @@ export const AiGatewayModelsDocument = new TypedDocumentString(`
   aiGatewayModels {
     alias
     capabilities
+    catalogManaged
+    catalogPinned
     contextWindow
     createdDate
     enabled
@@ -7519,6 +7750,8 @@ export const AiGatewayModelsByProviderDocument = new TypedDocumentString(`
   aiGatewayModelsByProvider(providerId: $providerId) {
     alias
     capabilities
+    catalogManaged
+    catalogPinned
     contextWindow
     createdDate
     enabled
@@ -7554,6 +7787,8 @@ export const CreateAiGatewayModelDocument = new TypedDocumentString(`
   createAiGatewayModel(input: $input) {
     alias
     capabilities
+    catalogManaged
+    catalogPinned
     contextWindow
     createdDate
     enabled
@@ -7586,6 +7821,8 @@ export const UpdateAiGatewayModelDocument = new TypedDocumentString(`
   updateAiGatewayModel(id: $id, input: $input) {
     alias
     capabilities
+    catalogManaged
+    catalogPinned
     contextWindow
     createdDate
     enabled
@@ -7628,6 +7865,40 @@ export const useDeleteAiGatewayModelMutation = <
       {
     mutationKey: ['deleteAiGatewayModel'],
     mutationFn: (variables?: DeleteAiGatewayModelMutationVariables) => fetcher<DeleteAiGatewayModelMutation, DeleteAiGatewayModelMutationVariables>(DeleteAiGatewayModelDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UnpinAiGatewayModelDocument = new TypedDocumentString(`
+    mutation unpinAiGatewayModel($id: ID!) {
+  unpinAiGatewayModel(id: $id) {
+    alias
+    capabilities
+    catalogManaged
+    catalogPinned
+    contextWindow
+    createdDate
+    enabled
+    id
+    inputCostPerMTokens
+    lastModifiedDate
+    name
+    outputCostPerMTokens
+    providerId
+    version
+  }
+}
+    `);
+
+export const useUnpinAiGatewayModelMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UnpinAiGatewayModelMutation, TError, UnpinAiGatewayModelMutationVariables, TContext>) => {
+    
+    return useMutation<UnpinAiGatewayModelMutation, TError, UnpinAiGatewayModelMutationVariables, TContext>(
+      {
+    mutationKey: ['unpinAiGatewayModel'],
+    mutationFn: (variables?: UnpinAiGatewayModelMutationVariables) => fetcher<UnpinAiGatewayModelMutation, UnpinAiGatewayModelMutationVariables>(UnpinAiGatewayModelDocument, variables)(),
     ...options
   }
     )};
@@ -9389,6 +9660,8 @@ export const WorkspaceAiGatewayModelsDocument = new TypedDocumentString(`
   workspaceAiGatewayModels(workspaceId: $workspaceId) {
     alias
     capabilities
+    catalogManaged
+    catalogPinned
     contextWindow
     defaultRoutingPolicyId
     createdDate
@@ -9425,6 +9698,8 @@ export const CreateWorkspaceAiGatewayModelDocument = new TypedDocumentString(`
   createWorkspaceAiGatewayModel(input: $input) {
     alias
     capabilities
+    catalogManaged
+    catalogPinned
     contextWindow
     defaultRoutingPolicyId
     createdDate
@@ -9472,11 +9747,48 @@ export const useDeleteWorkspaceAiGatewayModelMutation = <
   }
     )};
 
-export const UpdateWorkspaceAiGatewayModelDocument = new TypedDocumentString(`
-    mutation updateWorkspaceAiGatewayModel($id: ID!, $input: UpdateAiGatewayModelInput!) {
-  updateWorkspaceAiGatewayModel(id: $id, input: $input) {
+export const UnpinWorkspaceAiGatewayModelDocument = new TypedDocumentString(`
+    mutation unpinWorkspaceAiGatewayModel($workspaceId: ID!, $modelId: ID!) {
+  unpinWorkspaceAiGatewayModel(workspaceId: $workspaceId, modelId: $modelId) {
     alias
     capabilities
+    catalogManaged
+    catalogPinned
+    contextWindow
+    defaultRoutingPolicyId
+    createdDate
+    enabled
+    id
+    inputCostPerMTokens
+    lastModifiedDate
+    name
+    outputCostPerMTokens
+    providerId
+    version
+  }
+}
+    `);
+
+export const useUnpinWorkspaceAiGatewayModelMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UnpinWorkspaceAiGatewayModelMutation, TError, UnpinWorkspaceAiGatewayModelMutationVariables, TContext>) => {
+    
+    return useMutation<UnpinWorkspaceAiGatewayModelMutation, TError, UnpinWorkspaceAiGatewayModelMutationVariables, TContext>(
+      {
+    mutationKey: ['unpinWorkspaceAiGatewayModel'],
+    mutationFn: (variables?: UnpinWorkspaceAiGatewayModelMutationVariables) => fetcher<UnpinWorkspaceAiGatewayModelMutation, UnpinWorkspaceAiGatewayModelMutationVariables>(UnpinWorkspaceAiGatewayModelDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateWorkspaceAiGatewayModelDocument = new TypedDocumentString(`
+    mutation updateWorkspaceAiGatewayModel($workspaceId: ID!, $id: ID!, $input: UpdateAiGatewayModelInput!) {
+  updateWorkspaceAiGatewayModel(workspaceId: $workspaceId, id: $id, input: $input) {
+    alias
+    capabilities
+    catalogManaged
+    catalogPinned
     contextWindow
     defaultRoutingPolicyId
     createdDate
@@ -10014,6 +10326,50 @@ export const useDeleteAssetFileMutation = <
   }
     )};
 
+export const DisableAssetFilePublicLinkDocument = new TypedDocumentString(`
+    mutation DisableAssetFilePublicLink($id: ID!) {
+  disableAssetFilePublicLink(id: $id) {
+    id
+    publicLinkUrl
+  }
+}
+    `);
+
+export const useDisableAssetFilePublicLinkMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DisableAssetFilePublicLinkMutation, TError, DisableAssetFilePublicLinkMutationVariables, TContext>) => {
+    
+    return useMutation<DisableAssetFilePublicLinkMutation, TError, DisableAssetFilePublicLinkMutationVariables, TContext>(
+      {
+    mutationKey: ['DisableAssetFilePublicLink'],
+    mutationFn: (variables?: DisableAssetFilePublicLinkMutationVariables) => fetcher<DisableAssetFilePublicLinkMutation, DisableAssetFilePublicLinkMutationVariables>(DisableAssetFilePublicLinkDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const EnableAssetFilePublicLinkDocument = new TypedDocumentString(`
+    mutation EnableAssetFilePublicLink($id: ID!) {
+  enableAssetFilePublicLink(id: $id) {
+    id
+    publicLinkUrl
+  }
+}
+    `);
+
+export const useEnableAssetFilePublicLinkMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<EnableAssetFilePublicLinkMutation, TError, EnableAssetFilePublicLinkMutationVariables, TContext>) => {
+    
+    return useMutation<EnableAssetFilePublicLinkMutation, TError, EnableAssetFilePublicLinkMutationVariables, TContext>(
+      {
+    mutationKey: ['EnableAssetFilePublicLink'],
+    mutationFn: (variables?: EnableAssetFilePublicLinkMutationVariables) => fetcher<EnableAssetFilePublicLinkMutation, EnableAssetFilePublicLinkMutationVariables>(EnableAssetFilePublicLinkDocument, variables)(),
+    ...options
+  }
+    )};
+
 export const GetAssetFileDocument = new TypedDocumentString(`
     query GetAssetFile($id: ID!) {
   assetFile(id: $id) {
@@ -10031,6 +10387,7 @@ export const GetAssetFileDocument = new TypedDocumentString(`
     metadataJson
     mimeType
     name
+    publicLinkUrl
     sizeBytes
     source
     tags {
@@ -10053,6 +10410,28 @@ export const useGetAssetFileQuery = <
       {
     queryKey: ['GetAssetFile', variables],
     queryFn: fetcher<GetAssetFileQuery, GetAssetFileQueryVariables>(GetAssetFileDocument, variables),
+    ...options
+  }
+    )};
+
+export const GetAssetFileSignedDownloadUrlDocument = new TypedDocumentString(`
+    query GetAssetFileSignedDownloadUrl($id: ID!) {
+  assetFileSignedDownloadUrl(id: $id)
+}
+    `);
+
+export const useGetAssetFileSignedDownloadUrlQuery = <
+      TData = GetAssetFileSignedDownloadUrlQuery,
+      TError = unknown
+    >(
+      variables: GetAssetFileSignedDownloadUrlQueryVariables,
+      options?: Omit<UseQueryOptions<GetAssetFileSignedDownloadUrlQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetAssetFileSignedDownloadUrlQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<GetAssetFileSignedDownloadUrlQuery, TError, TData>(
+      {
+    queryKey: ['GetAssetFileSignedDownloadUrl', variables],
+    queryFn: fetcher<GetAssetFileSignedDownloadUrlQuery, GetAssetFileSignedDownloadUrlQueryVariables>(GetAssetFileSignedDownloadUrlDocument, variables),
     ...options
   }
     )};
@@ -10104,6 +10483,35 @@ export const useGetAssetFileTextContentQuery = <
   }
     )};
 
+export const GetAssetFileVersionsDocument = new TypedDocumentString(`
+    query GetAssetFileVersions($id: ID!) {
+  assetFileVersions(id: $id) {
+    createdBy
+    createdDate
+    id
+    mimeType
+    sizeBytes
+    versionNumber
+  }
+}
+    `);
+
+export const useGetAssetFileVersionsQuery = <
+      TData = GetAssetFileVersionsQuery,
+      TError = unknown
+    >(
+      variables: GetAssetFileVersionsQueryVariables,
+      options?: Omit<UseQueryOptions<GetAssetFileVersionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetAssetFileVersionsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<GetAssetFileVersionsQuery, TError, TData>(
+      {
+    queryKey: ['GetAssetFileVersions', variables],
+    queryFn: fetcher<GetAssetFileVersionsQuery, GetAssetFileVersionsQueryVariables>(GetAssetFileVersionsDocument, variables),
+    ...options
+  }
+    )};
+
 export const GetAssetFilesDocument = new TypedDocumentString(`
     query GetAssetFiles($workspaceId: ID!, $environment: Int, $tagIds: [ID!], $mimeTypePrefix: String) {
   assetFiles(
@@ -10126,6 +10534,7 @@ export const GetAssetFilesDocument = new TypedDocumentString(`
     metadataJson
     mimeType
     name
+    publicLinkUrl
     sizeBytes
     source
     tags {
@@ -10148,6 +10557,31 @@ export const useGetAssetFilesQuery = <
       {
     queryKey: ['GetAssetFiles', variables],
     queryFn: fetcher<GetAssetFilesQuery, GetAssetFilesQueryVariables>(GetAssetFilesDocument, variables),
+    ...options
+  }
+    )};
+
+export const RestoreAssetFileVersionDocument = new TypedDocumentString(`
+    mutation RestoreAssetFileVersion($id: ID!, $versionId: ID!) {
+  restoreAssetFileVersion(id: $id, versionId: $versionId) {
+    id
+    lastModifiedDate
+    mimeType
+    name
+    sizeBytes
+  }
+}
+    `);
+
+export const useRestoreAssetFileVersionMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<RestoreAssetFileVersionMutation, TError, RestoreAssetFileVersionMutationVariables, TContext>) => {
+    
+    return useMutation<RestoreAssetFileVersionMutation, TError, RestoreAssetFileVersionMutationVariables, TContext>(
+      {
+    mutationKey: ['RestoreAssetFileVersion'],
+    mutationFn: (variables?: RestoreAssetFileVersionMutationVariables) => fetcher<RestoreAssetFileVersionMutation, RestoreAssetFileVersionMutationVariables>(RestoreAssetFileVersionDocument, variables)(),
     ...options
   }
     )};
@@ -11989,6 +12423,34 @@ export const useWorkspaceMcpServersQuery = <
   }
     )};
 
+export const WorkspaceProjectWorkflowsDocument = new TypedDocumentString(`
+    query workspaceProjectWorkflows($workspaceId: ID!) {
+  workspaceProjectWorkflows(workspaceId: $workspaceId) {
+    projectId
+    projectName
+    projectWorkflowId
+    workflowId
+    workflowLabel
+  }
+}
+    `);
+
+export const useWorkspaceProjectWorkflowsQuery = <
+      TData = WorkspaceProjectWorkflowsQuery,
+      TError = unknown
+    >(
+      variables: WorkspaceProjectWorkflowsQueryVariables,
+      options?: Omit<UseQueryOptions<WorkspaceProjectWorkflowsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkspaceProjectWorkflowsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<WorkspaceProjectWorkflowsQuery, TError, TData>(
+      {
+    queryKey: ['workspaceProjectWorkflows', variables],
+    queryFn: fetcher<WorkspaceProjectWorkflowsQuery, WorkspaceProjectWorkflowsQueryVariables>(WorkspaceProjectWorkflowsDocument, variables),
+    ...options
+  }
+    )};
+
 export const WorkspaceUsersDocument = new TypedDocumentString(`
     query WorkspaceUsers($workspaceId: ID!) {
   workspaceUsers(workspaceId: $workspaceId) {
@@ -13732,8 +14194,15 @@ export const useCodeWorkflowSourceQuery = <
     )};
 
 export const CreateCodeWorkflowDocument = new TypedDocumentString(`
-    mutation createCodeWorkflow($workspaceId: ID!, $name: String!, $language: CodeWorkflowLanguage!) {
-  createCodeWorkflow(workspaceId: $workspaceId, name: $name, language: $language)
+    mutation createCodeWorkflow($workspaceId: ID!, $name: String!, $language: CodeWorkflowLanguage!, $description: String, $categoryId: ID, $tags: [String!]) {
+  createCodeWorkflow(
+    workspaceId: $workspaceId
+    name: $name
+    language: $language
+    description: $description
+    categoryId: $categoryId
+    tags: $tags
+  )
 }
     `);
 
@@ -14921,10 +15390,15 @@ export const useUpdateMcpIntegrationInstanceConfigurationWorkflowMutation = <
     )};
 
 export const CreateIntegrationCodeWorkflowDocument = new TypedDocumentString(`
-    mutation createIntegrationCodeWorkflow($componentName: String!, $language: CodeWorkflowLanguage!) {
+    mutation createIntegrationCodeWorkflow($componentName: String!, $language: CodeWorkflowLanguage!, $name: String, $description: String, $categoryId: ID, $tags: [String!], $permissionExpression: String) {
   createIntegrationCodeWorkflow(
     componentName: $componentName
     language: $language
+    name: $name
+    description: $description
+    categoryId: $categoryId
+    tags: $tags
+    permissionExpression: $permissionExpression
   )
 }
     `);
@@ -15630,6 +16104,32 @@ export const useTaskExecutionFileLogsQuery = <
   }
     )};
 
+export const ComponentOperationPoliciesDocument = new TypedDocumentString(`
+    query ComponentOperationPolicies($componentName: String!) {
+  componentOperationPolicies(componentName: $componentName) {
+    componentName
+    operationType
+    operationName
+  }
+}
+    `);
+
+export const useComponentOperationPoliciesQuery = <
+      TData = ComponentOperationPoliciesQuery,
+      TError = unknown
+    >(
+      variables: ComponentOperationPoliciesQueryVariables,
+      options?: Omit<UseQueryOptions<ComponentOperationPoliciesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ComponentOperationPoliciesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ComponentOperationPoliciesQuery, TError, TData>(
+      {
+    queryKey: ['ComponentOperationPolicies', variables],
+    queryFn: fetcher<ComponentOperationPoliciesQuery, ComponentOperationPoliciesQueryVariables>(ComponentOperationPoliciesDocument, variables),
+    ...options
+  }
+    )};
+
 export const ComponentPoliciesDocument = new TypedDocumentString(`
     query ComponentPolicies {
   componentPolicies {
@@ -15655,6 +16155,30 @@ export const useComponentPoliciesQuery = <
       {
     queryKey: variables === undefined ? ['ComponentPolicies'] : ['ComponentPolicies', variables],
     queryFn: fetcher<ComponentPoliciesQuery, ComponentPoliciesQueryVariables>(ComponentPoliciesDocument, variables),
+    ...options
+  }
+    )};
+
+export const UpdateComponentOperationPolicyDocument = new TypedDocumentString(`
+    mutation UpdateComponentOperationPolicy($componentName: String!, $operationType: ComponentOperationType!, $operationName: String!, $enabled: Boolean!) {
+  updateComponentOperationPolicy(
+    componentName: $componentName
+    operationType: $operationType
+    operationName: $operationName
+    enabled: $enabled
+  )
+}
+    `);
+
+export const useUpdateComponentOperationPolicyMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateComponentOperationPolicyMutation, TError, UpdateComponentOperationPolicyMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateComponentOperationPolicyMutation, TError, UpdateComponentOperationPolicyMutationVariables, TContext>(
+      {
+    mutationKey: ['UpdateComponentOperationPolicy'],
+    mutationFn: (variables?: UpdateComponentOperationPolicyMutationVariables) => fetcher<UpdateComponentOperationPolicyMutation, UpdateComponentOperationPolicyMutationVariables>(UpdateComponentOperationPolicyDocument, variables)(),
     ...options
   }
     )};
@@ -17477,6 +18001,8 @@ export const CustomComponentDocument = new TypedDocumentString(`
     createdDate
     lastModifiedBy
     lastModifiedDate
+    status
+    publishedDate
     version
   }
 }
@@ -17568,6 +18094,8 @@ export const CustomComponentsDocument = new TypedDocumentString(`
     createdDate
     lastModifiedBy
     lastModifiedDate
+    status
+    publishedDate
     version
   }
 }
@@ -17627,9 +18155,36 @@ export const useEnableCustomComponentMutation = <
   }
     )};
 
+export const PublishCustomComponentDocument = new TypedDocumentString(`
+    mutation publishCustomComponent($id: ID!) {
+  publishCustomComponent(id: $id) {
+    id
+    publishedDate
+    status
+  }
+}
+    `);
+
+export const usePublishCustomComponentMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<PublishCustomComponentMutation, TError, PublishCustomComponentMutationVariables, TContext>) => {
+    
+    return useMutation<PublishCustomComponentMutation, TError, PublishCustomComponentMutationVariables, TContext>(
+      {
+    mutationKey: ['publishCustomComponent'],
+    mutationFn: (variables?: PublishCustomComponentMutationVariables) => fetcher<PublishCustomComponentMutation, PublishCustomComponentMutationVariables>(PublishCustomComponentDocument, variables)(),
+    ...options
+  }
+    )};
+
 export const UpdateCustomComponentSourceDocument = new TypedDocumentString(`
     mutation updateCustomComponentSource($id: ID!, $content: String!) {
-  updateCustomComponentSource(id: $id, content: $content)
+  updateCustomComponentSource(id: $id, content: $content) {
+    id
+    componentVersion
+    status
+  }
 }
     `);
 
@@ -18143,6 +18698,53 @@ export const useWorkspaceNotificationsQuery = <
       {
     queryKey: ['workspaceNotifications', variables],
     queryFn: fetcher<WorkspaceNotificationsQuery, WorkspaceNotificationsQueryVariables>(WorkspaceNotificationsDocument, variables),
+    ...options
+  }
+    )};
+
+export const WorkspaceSystemPromptDocument = new TypedDocumentString(`
+    query workspaceSystemPrompt($workspaceId: ID!) {
+  workspaceSystemPrompt(workspaceId: $workspaceId) {
+    prompt
+    workspaceId
+  }
+}
+    `);
+
+export const useWorkspaceSystemPromptQuery = <
+      TData = WorkspaceSystemPromptQuery,
+      TError = unknown
+    >(
+      variables: WorkspaceSystemPromptQueryVariables,
+      options?: Omit<UseQueryOptions<WorkspaceSystemPromptQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkspaceSystemPromptQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<WorkspaceSystemPromptQuery, TError, TData>(
+      {
+    queryKey: ['workspaceSystemPrompt', variables],
+    queryFn: fetcher<WorkspaceSystemPromptQuery, WorkspaceSystemPromptQueryVariables>(WorkspaceSystemPromptDocument, variables),
+    ...options
+  }
+    )};
+
+export const UpdateWorkspaceSystemPromptDocument = new TypedDocumentString(`
+    mutation updateWorkspaceSystemPrompt($input: WorkspaceSystemPromptInput!) {
+  updateWorkspaceSystemPrompt(input: $input) {
+    prompt
+    workspaceId
+  }
+}
+    `);
+
+export const useUpdateWorkspaceSystemPromptMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateWorkspaceSystemPromptMutation, TError, UpdateWorkspaceSystemPromptMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateWorkspaceSystemPromptMutation, TError, UpdateWorkspaceSystemPromptMutationVariables, TContext>(
+      {
+    mutationKey: ['updateWorkspaceSystemPrompt'],
+    mutationFn: (variables?: UpdateWorkspaceSystemPromptMutationVariables) => fetcher<UpdateWorkspaceSystemPromptMutation, UpdateWorkspaceSystemPromptMutationVariables>(UpdateWorkspaceSystemPromptDocument, variables)(),
     ...options
   }
     )};

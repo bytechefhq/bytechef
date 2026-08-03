@@ -282,11 +282,30 @@ export type AiAutoMemory = {
   id: Scalars['ID']['output'];
   memoryType: AiAutoMemoryType;
   name: Scalars['String']['output'];
+  principalId: Scalars['Long']['output'];
+  principalType: AiAutoMemoryPrincipalType;
   title: Scalars['String']['output'];
   updatedAt?: Maybe<Scalars['Long']['output']>;
-  userId: Scalars['Long']['output'];
   workspaceId: Scalars['Long']['output'];
 };
+
+export type AiAutoMemoryPrincipal = {
+  __typename?: 'AiAutoMemoryPrincipal';
+  label: Scalars['String']['output'];
+  memoryCount: Scalars['Int']['output'];
+  principalId: Scalars['Long']['output'];
+  principalType: AiAutoMemoryPrincipalType;
+};
+
+/**
+ * The owner kind of a memory. User-owned (AI Hub) and deployment-owned (workflow agent) memory share one table,
+ * so the id alone does not identify an owner — it must be read together with this discriminator.
+ */
+export enum AiAutoMemoryPrincipalType {
+  IntegrationInstance = 'INTEGRATION_INSTANCE',
+  ProjectDeployment = 'PROJECT_DEPLOYMENT',
+  User = 'USER'
+}
 
 export enum AiAutoMemoryType {
   Feedback = 'FEEDBACK',
@@ -508,6 +527,8 @@ export type AiGatewayModel = {
   __typename?: 'AiGatewayModel';
   alias?: Maybe<Scalars['String']['output']>;
   capabilities?: Maybe<Scalars['String']['output']>;
+  catalogManaged: Scalars['Boolean']['output'];
+  catalogPinned: Scalars['Boolean']['output'];
   contextWindow?: Maybe<Scalars['Int']['output']>;
   createdDate?: Maybe<Scalars['Long']['output']>;
   defaultRoutingPolicyId?: Maybe<Scalars['ID']['output']>;
@@ -1013,6 +1034,12 @@ export type AiHubTaskMessage = {
   content: Scalars['String']['output'];
   role: Scalars['String']['output'];
   timestamp: Scalars['Long']['output'];
+  /**
+   * Nullable JSON array of the tool activity that followed this row before the next visible row — entries are
+   * {kind: "call", id, name, arguments} and {kind: "result", id, name, response}. The client rebuilds tool-call
+   * cards and interactive tool-result cards (askUserQuestion, etc.) from it on reload.
+   */
+  toolEventsJson?: Maybe<Scalars['String']['output']>;
 };
 
 export type AiHubTaskPatchInput = {
@@ -1377,6 +1404,12 @@ export type AiSkill = {
   /** Epoch milliseconds (UTC) */
   lastModifiedDate?: Maybe<Scalars['Long']['output']>;
   name: Scalars['String']['output'];
+  tags: Array<Tag>;
+};
+
+export type AiSkillTagInput = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+  name: Scalars['String']['input'];
 };
 
 export type ApiCollectionSearchResult = SearchResult & {
@@ -1523,6 +1556,7 @@ export type AssetFile = {
   metadataJson?: Maybe<Scalars['String']['output']>;
   mimeType: Scalars['String']['output'];
   name: Scalars['String']['output'];
+  publicLinkUrl?: Maybe<Scalars['String']['output']>;
   sizeBytes: Scalars['Long']['output'];
   source: AssetFileSource;
   tags: Array<Tag>;
@@ -1532,6 +1566,16 @@ export enum AssetFileSource {
   AiGenerated = 'AI_GENERATED',
   UserUpload = 'USER_UPLOAD'
 }
+
+export type AssetFileVersion = {
+  __typename?: 'AssetFileVersion';
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  id: Scalars['ID']['output'];
+  mimeType: Scalars['String']['output'];
+  sizeBytes: Scalars['Long']['output'];
+  versionNumber: Scalars['Int']['output'];
+};
 
 export type AttachAiHubTaskToolInput = {
   clusterElementName: Scalars['String']['input'];
@@ -1821,6 +1865,18 @@ export type ComponentDefinitionTuple = {
   key?: Maybe<Scalars['String']['output']>;
   value: Array<Maybe<ComponentDefinition>>;
 };
+
+export type ComponentOperationPolicy = {
+  __typename?: 'ComponentOperationPolicy';
+  componentName: Scalars['String']['output'];
+  operationName: Scalars['String']['output'];
+  operationType: ComponentOperationType;
+};
+
+export enum ComponentOperationType {
+  Action = 'ACTION',
+  Trigger = 'TRIGGER'
+}
 
 export type ComponentPolicy = {
   __typename?: 'ComponentPolicy';
@@ -2352,6 +2408,7 @@ export type CreateWorkspaceAiGatewayRoutingPolicyInput = {
 };
 
 export type CreateWorkspaceMcpServerInput = {
+  authenticationRequired?: InputMaybe<Scalars['Boolean']['input']>;
   enabled?: InputMaybe<Scalars['Boolean']['input']>;
   environmentId: Scalars['ID']['input'];
   name: Scalars['String']['input'];
@@ -2372,6 +2429,8 @@ export type CustomComponent = {
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Long']['output']>;
   name: Scalars['String']['output'];
+  publishedDate?: Maybe<Scalars['Long']['output']>;
+  status?: Maybe<CustomComponentStatus>;
   title?: Maybe<Scalars['String']['output']>;
   version?: Maybe<Scalars['Int']['output']>;
 };
@@ -2394,6 +2453,11 @@ export enum CustomComponentLanguage {
   Javascript = 'JAVASCRIPT',
   Python = 'PYTHON',
   Ruby = 'RUBY'
+}
+
+export enum CustomComponentStatus {
+  Draft = 'DRAFT',
+  Published = 'PUBLISHED'
 }
 
 export type CustomComponentTriggerDefinition = {
@@ -3511,8 +3575,9 @@ export type Mutation = {
   deleteAiAgentScenarioJudge: Scalars['Boolean']['output'];
   deleteAiAgentScenarioToolSimulation: Scalars['Boolean']['output'];
   /**
-   * Deletes a memory by primary key. Returns true on success; throws NotFound when the row does not exist or
-   * Forbidden when the row belongs to another user.
+   * Deletes a memory by primary key, resolved within the supplied environment. Returns true on success; throws
+   * NotFound when the row does not exist, lives in another environment, or is not addressable by the caller.
+   * Deleting a PROJECT_DEPLOYMENT-owned memory requires ROLE_ADMIN.
    */
   deleteAiAutoMemory: Scalars['Boolean']['output'];
   deleteAiEvalRule?: Maybe<Scalars['Boolean']['output']>;
@@ -3595,6 +3660,7 @@ export type Mutation = {
    * remove all of e.g. Slack's tools at once instead of one at a time.
    */
   detachAiHubTaskComponent: Scalars['Boolean']['output'];
+  disableAssetFilePublicLink: AssetFile;
   /** Unlink a connection from all deployed workflows and test configurations, without deleting the connection itself. */
   disconnectConnection: Scalars['Boolean']['output'];
   dropDataTable: Scalars['Boolean']['output'];
@@ -3602,6 +3668,7 @@ export type Mutation = {
   duplicateAutomationWorkflowProjectWorkflow: Scalars['ID']['output'];
   duplicateDataTable: Scalars['Boolean']['output'];
   enableApiConnector: Scalars['Boolean']['output'];
+  enableAssetFilePublicLink: AssetFile;
   enableConnectedUserMcpServer?: Maybe<Scalars['Boolean']['output']>;
   enableConnectedUserMcpTool?: Maybe<Scalars['Boolean']['output']>;
   enableConnectedUserProjectWorkflow?: Maybe<Scalars['Boolean']['output']>;
@@ -3636,10 +3703,12 @@ export type Mutation = {
   /** Promote a connection to WORKSPACE visibility, making it visible to all workspace members. (admin only, EE only) */
   promoteConnectionToWorkspace: Scalars['Boolean']['output'];
   publishAutomationWorkflowProject: Scalars['Boolean']['output'];
+  publishCustomComponent: CustomComponent;
   /** Reassign all of a user's unresolved connections to a new owner. (admin only) */
   reassignAllConnections: Scalars['Boolean']['output'];
   /** Reassign a single connection to a new owner. Resets status to ACTIVE if pending. (admin only) */
   reassignConnection: Scalars['Boolean']['output'];
+  reconcileAiGatewayModelCatalog?: Maybe<Scalars['Boolean']['output']>;
   /**
    * Records a user-attached reference (file / workflow / data table / knowledge base) as a task
    * artifact so it appears in the sidebar artifact list. Idempotent — re-attaching the same resource hits
@@ -3673,6 +3742,7 @@ export type Mutation = {
   removeWorkspaceUser: Scalars['Boolean']['output'];
   renameDataTable: Scalars['Boolean']['output'];
   renameDataTableColumn: Scalars['Boolean']['output'];
+  restoreAssetFileVersion: AssetFile;
   runAiEvalRuleOnHistoricalTraces?: Maybe<Scalars['Int']['output']>;
   saveClusterElementTestConfigurationConnection?: Maybe<Scalars['Boolean']['output']>;
   saveClusterElementTestOutput?: Maybe<WorkflowNodeTestOutputResult>;
@@ -3724,6 +3794,8 @@ export type Mutation = {
   truncateAiHubTaskMessages: Scalars['Int']['output'];
   /** Make a notification global again (visible to every workspace). */
   unassignNotificationFromWorkspace: Scalars['Boolean']['output'];
+  unpinAiGatewayModel?: Maybe<AiGatewayModel>;
+  unpinWorkspaceAiGatewayModel?: Maybe<AiGatewayModel>;
   unsnoozeAiObservabilityAlertRule?: Maybe<AiObservabilityAlertRule>;
   updateA2aProject?: Maybe<A2aProject>;
   updateA2aProjectWorkflowParameters?: Maybe<A2aProjectWorkflow>;
@@ -3734,8 +3806,10 @@ export type Mutation = {
   updateAiAgentScenarioJudge: AiAgentScenarioJudge;
   updateAiAgentScenarioToolSimulation: AiAgentScenarioToolSimulation;
   /**
-   * Partial update of a memory by primary key, scoped to (workspaceId, currentUserId). The memory's environment
-   * is immutable post-create so it does not appear in the patch input — environments do not move.
+   * Partial update of a memory by primary key, resolved within the supplied environment and scoped to the
+   * resolved principal. The environment identifies which row the key addresses, not a value to write — a memory's
+   * environment is immutable post-create, and a row in another environment throws NotFound. Updating a
+   * PROJECT_DEPLOYMENT-owned memory requires ROLE_ADMIN: it changes how a live agent behaves on its next run.
    */
   updateAiAutoMemory: AiAutoMemory;
   updateAiEvalRule?: Maybe<AiEvalRule>;
@@ -3779,6 +3853,7 @@ export type Mutation = {
   updateAiPrompt?: Maybe<AiPrompt>;
   updateAiSkill: AiSkill;
   updateAiSkillContent: AiSkill;
+  updateAiSkillTags: AiSkill;
   updateApiConnector: ApiConnector;
   updateApiKey: Scalars['Boolean']['output'];
   updateApprovalTask?: Maybe<ApprovalTask>;
@@ -3789,6 +3864,8 @@ export type Mutation = {
   updateAutomationWorkflowProjectWorkflow: Scalars['Boolean']['output'];
   updateAutomationWorkflowProjectWorkflowPermissionExpression: Scalars['Boolean']['output'];
   updateCodeWorkflowSource: Scalars['Boolean']['output'];
+  /** Disables (enabled: false) or re-enables (enabled: true) a single action or trigger tenant-wide. Admin-only. */
+  updateComponentOperationPolicy: Scalars['Boolean']['output'];
   /** Enables or disables a component tenant-wide. Admin-only. */
   updateComponentPolicy: ComponentPolicy;
   updateContextStore: ContextStore;
@@ -3799,7 +3876,7 @@ export type Mutation = {
    * so the client can refresh its remainingTags cache.
    */
   updateContextStoreTags: Array<Tag>;
-  updateCustomComponentSource: Scalars['Boolean']['output'];
+  updateCustomComponentSource: CustomComponent;
   /** Update an existing custom role. Requires tenant admin. */
   updateCustomRole: CustomRole;
   updateDataTableRow: DataTableRow;
@@ -3835,6 +3912,7 @@ export type Mutation = {
   updateWorkspaceAiGatewayProvider?: Maybe<AiGatewayProvider>;
   updateWorkspaceAiGatewayRoutingPolicy?: Maybe<AiGatewayRoutingPolicy>;
   updateWorkspaceApiKey: Scalars['Boolean']['output'];
+  updateWorkspaceSystemPrompt?: Maybe<WorkspaceSystemPrompt>;
   /** Update a workspace user's role. Requires ADMIN workspace role. */
   updateWorkspaceUserRole: WorkspaceUser;
   uploadLicence: LicenceType;
@@ -4170,8 +4248,11 @@ export type MutationCreateAutomationWorkflowProjectWorkflowArgs = {
 
 
 export type MutationCreateCodeWorkflowArgs = {
+  categoryId?: InputMaybe<Scalars['ID']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
   language: CodeWorkflowLanguage;
   name: Scalars['String']['input'];
+  tags?: InputMaybe<Array<Scalars['String']['input']>>;
   workspaceId: Scalars['ID']['input'];
 };
 
@@ -4215,8 +4296,13 @@ export type MutationCreateIdentityProviderArgs = {
 
 
 export type MutationCreateIntegrationCodeWorkflowArgs = {
+  categoryId?: InputMaybe<Scalars['ID']['input']>;
   componentName: Scalars['String']['input'];
+  description?: InputMaybe<Scalars['String']['input']>;
   language: CodeWorkflowLanguage;
+  name?: InputMaybe<Scalars['String']['input']>;
+  permissionExpression?: InputMaybe<Scalars['String']['input']>;
+  tags?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
@@ -4355,7 +4441,10 @@ export type MutationDeleteAiAgentScenarioToolSimulationArgs = {
 
 
 export type MutationDeleteAiAutoMemoryArgs = {
+  environment: Scalars['Int']['input'];
   id: Scalars['ID']['input'];
+  principalId?: InputMaybe<Scalars['Long']['input']>;
+  principalType?: InputMaybe<AiAutoMemoryPrincipalType>;
   workspaceId: Scalars['ID']['input'];
 };
 
@@ -4649,6 +4738,11 @@ export type MutationDetachAiHubTaskComponentArgs = {
 };
 
 
+export type MutationDisableAssetFilePublicLinkArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationDisconnectConnectionArgs = {
   connectionId: Scalars['ID']['input'];
 };
@@ -4676,6 +4770,11 @@ export type MutationDuplicateDataTableArgs = {
 
 export type MutationEnableApiConnectorArgs = {
   enable: Scalars['Boolean']['input'];
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationEnableAssetFilePublicLinkArgs = {
   id: Scalars['ID']['input'];
 };
 
@@ -4827,6 +4926,11 @@ export type MutationPublishAutomationWorkflowProjectArgs = {
 };
 
 
+export type MutationPublishCustomComponentArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationReassignAllConnectionsArgs = {
   newOwnerLogin: Scalars['String']['input'];
   userLogin: Scalars['String']['input'];
@@ -4915,6 +5019,12 @@ export type MutationRenameDataTableArgs = {
 
 export type MutationRenameDataTableColumnArgs = {
   input: RenameColumnInput;
+};
+
+
+export type MutationRestoreAssetFileVersionArgs = {
+  id: Scalars['ID']['input'];
+  versionId: Scalars['ID']['input'];
 };
 
 
@@ -5100,6 +5210,17 @@ export type MutationTruncateAiHubTaskMessagesArgs = {
 
 export type MutationUnassignNotificationFromWorkspaceArgs = {
   notificationId: Scalars['ID']['input'];
+};
+
+
+export type MutationUnpinAiGatewayModelArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationUnpinWorkspaceAiGatewayModelArgs = {
+  modelId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
 };
 
 
@@ -5309,6 +5430,12 @@ export type MutationUpdateAiSkillContentArgs = {
 };
 
 
+export type MutationUpdateAiSkillTagsArgs = {
+  id: Scalars['ID']['input'];
+  tags?: InputMaybe<Array<AiSkillTagInput>>;
+};
+
+
 export type MutationUpdateApiConnectorArgs = {
   id: Scalars['ID']['input'];
   input: UpdateApiConnectorInput;
@@ -5368,6 +5495,14 @@ export type MutationUpdateAutomationWorkflowProjectWorkflowPermissionExpressionA
 export type MutationUpdateCodeWorkflowSourceArgs = {
   content: Scalars['String']['input'];
   projectId: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateComponentOperationPolicyArgs = {
+  componentName: Scalars['String']['input'];
+  enabled: Scalars['Boolean']['input'];
+  operationName: Scalars['String']['input'];
+  operationType: ComponentOperationType;
 };
 
 
@@ -5572,6 +5707,7 @@ export type MutationUpdateWorkflowAlertRuleArgs = {
 export type MutationUpdateWorkspaceAiGatewayModelArgs = {
   id: Scalars['ID']['input'];
   input: UpdateAiGatewayModelInput;
+  workspaceId: Scalars['ID']['input'];
 };
 
 
@@ -5592,6 +5728,11 @@ export type MutationUpdateWorkspaceAiGatewayRoutingPolicyArgs = {
 export type MutationUpdateWorkspaceApiKeyArgs = {
   apiKeyId: Scalars['ID']['input'];
   name: Scalars['String']['input'];
+};
+
+
+export type MutationUpdateWorkspaceSystemPromptArgs = {
+  input: WorkspaceSystemPromptInput;
 };
 
 
@@ -5936,17 +6077,27 @@ export type Query = {
   aiAgentEvalTests: Array<AiAgentEvalTest>;
   aiAgentJudges: Array<AiAgentJudge>;
   /**
-   * Lists the current user's memories in the workspace, scoped to the supplied environment so DEVELOPMENT
-   * preferences do not bleed into PRODUCTION sessions and vice versa. The optional memoryType filter narrows
-   * results to a single category. Ordered by updatedAt DESC.
+   * Lists memories in the workspace, scoped to the supplied environment so DEVELOPMENT preferences do not bleed
+   * into PRODUCTION sessions and vice versa. The optional memoryType filter narrows results to a single category.
+   * Ordered by updatedAt DESC.
+   *
+   * principalType and principalId are supplied together or both omitted; omitting them means the signed-in user.
+   * A USER principal other than the caller returns an empty list rather than an error, so ids stay unenumerable.
+   * INTEGRATION_INSTANCE is not addressable — those rows are not workspace-isolated.
    */
   aiAutoMemories: Array<AiAutoMemory>;
   /**
-   * Returns a single memory by id, verifying ownership against (workspaceId, currentUserId). Returns null when
-   * missing or owned by another user — the same shape on both errors so a probe cannot enumerate ids across
-   * workspaces.
+   * Returns a single memory by id, resolved within the supplied environment and verified against the resolved
+   * principal. Returns null when missing, in another environment, or not addressable by the caller — the same
+   * shape on every one of those so a probe cannot enumerate ids across workspaces or environments.
    */
   aiAutoMemory?: Maybe<AiAutoMemory>;
+  /**
+   * The owners that actually hold memory in this workspace and environment, for the Memories page's owner picker.
+   * Applies the same per-principal rules as the read operations: only the caller's own USER entry, every
+   * PROJECT_DEPLOYMENT entry, and never INTEGRATION_INSTANCE.
+   */
+  aiAutoMemoryPrincipals: Array<AiAutoMemoryPrincipal>;
   aiDefaultModel?: Maybe<AiDefaultModel>;
   aiEvalDatasetItems: Array<AiEvalDatasetItemView>;
   aiEvalDatasetVersions: Array<AiEvalDatasetVersionView>;
@@ -6061,6 +6212,7 @@ export type Query = {
   aiSkill: AiSkill;
   aiSkillFileContent: Scalars['String']['output'];
   aiSkillFilePaths: Array<Scalars['String']['output']>;
+  aiSkillTags: Array<Tag>;
   aiSkills: Array<AiSkill>;
   apiConnector?: Maybe<ApiConnector>;
   apiConnectors: Array<ApiConnector>;
@@ -6070,8 +6222,10 @@ export type Query = {
   approvalTasks?: Maybe<Array<Maybe<ApprovalTask>>>;
   approvalTasksByIds?: Maybe<Array<Maybe<ApprovalTask>>>;
   assetFile?: Maybe<AssetFile>;
+  assetFileSignedDownloadUrl: Scalars['String']['output'];
   assetFileTags: Array<Tag>;
   assetFileTextContent?: Maybe<Scalars['String']['output']>;
+  assetFileVersions: Array<AssetFileVersion>;
   assetFiles: Array<AssetFile>;
   auditEventTypes: Array<Scalars['String']['output']>;
   auditEvents: AuditEventPageType;
@@ -6099,6 +6253,8 @@ export type Query = {
   componentDefinitionSearch: Array<ComponentDefinition>;
   componentDefinitionVersions: Array<ComponentDefinition>;
   componentDefinitions: Array<ComponentDefinition>;
+  /** Lists the disabled operations of a component (deny-list rows only). Admin-only. */
+  componentOperationPolicies: Array<ComponentOperationPolicy>;
   /**
    * Lists every registry component with its tenant-wide visibility flag. Components with no policy row are reported
    * enabled. Admin-only.
@@ -6275,6 +6431,8 @@ export type Query = {
    */
   workspaceNotifications: Array<WorkspaceScopedNotification>;
   workspaceProjectDeployments: Array<ProjectDeployment>;
+  workspaceProjectWorkflows: Array<WorkspaceProjectWorkflow>;
+  workspaceSystemPrompt?: Maybe<WorkspaceSystemPrompt>;
   /** List all users of a workspace. Requires at least VIEWER workspace role. */
   workspaceUsers: Array<WorkspaceUser>;
 };
@@ -6366,12 +6524,23 @@ export type QueryAiAgentJudgesArgs = {
 export type QueryAiAutoMemoriesArgs = {
   environment: Scalars['Int']['input'];
   memoryType?: InputMaybe<AiAutoMemoryType>;
+  principalId?: InputMaybe<Scalars['Long']['input']>;
+  principalType?: InputMaybe<AiAutoMemoryPrincipalType>;
   workspaceId: Scalars['ID']['input'];
 };
 
 
 export type QueryAiAutoMemoryArgs = {
+  environment: Scalars['Int']['input'];
   id: Scalars['ID']['input'];
+  principalId?: InputMaybe<Scalars['Long']['input']>;
+  principalType?: InputMaybe<AiAutoMemoryPrincipalType>;
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryAiAutoMemoryPrincipalsArgs = {
+  environment: Scalars['Int']['input'];
   workspaceId: Scalars['ID']['input'];
 };
 
@@ -6747,12 +6916,22 @@ export type QueryAssetFileArgs = {
 };
 
 
+export type QueryAssetFileSignedDownloadUrlArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type QueryAssetFileTagsArgs = {
   workspaceId: Scalars['ID']['input'];
 };
 
 
 export type QueryAssetFileTextContentArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryAssetFileVersionsArgs = {
   id: Scalars['ID']['input'];
 };
 
@@ -6885,6 +7064,11 @@ export type QueryComponentDefinitionsArgs = {
   connectionDefinitions?: InputMaybe<Scalars['Boolean']['input']>;
   include?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   triggerDefinitions?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+
+export type QueryComponentOperationPoliciesArgs = {
+  componentName: Scalars['String']['input'];
 };
 
 
@@ -7504,6 +7688,16 @@ export type QueryWorkspaceProjectDeploymentsArgs = {
 };
 
 
+export type QueryWorkspaceProjectWorkflowsArgs = {
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryWorkspaceSystemPromptArgs = {
+  workspaceId: Scalars['ID']['input'];
+};
+
+
 export type QueryWorkspaceUsersArgs = {
   workspaceId: Scalars['ID']['input'];
 };
@@ -7844,8 +8038,11 @@ export type UpdateA2aServerInput = {
 export type UpdateAiAutoMemoryInput = {
   content?: InputMaybe<Scalars['String']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
+  environment: Scalars['Int']['input'];
   id: Scalars['ID']['input'];
   memoryType?: InputMaybe<AiAutoMemoryType>;
+  principalId?: InputMaybe<Scalars['Long']['input']>;
+  principalType?: InputMaybe<AiAutoMemoryPrincipalType>;
   title?: InputMaybe<Scalars['String']['input']>;
   workspaceId: Scalars['ID']['input'];
 };
@@ -8190,6 +8387,20 @@ export type WorkflowValidationResult = {
   warnings: Array<Scalars['String']['output']>;
 };
 
+/**
+ * A flat, workspace-wide listing entry: one latest-version project workflow reduced to its label and ids.
+ * Deliberately excludes the workflow definition — this powers pickers that list every workflow in a workspace,
+ * where returning `ProjectWorkflow.workflow` per row would mean parsing every definition in the workspace.
+ */
+export type WorkspaceProjectWorkflow = {
+  __typename?: 'WorkspaceProjectWorkflow';
+  projectId: Scalars['ID']['output'];
+  projectName: Scalars['String']['output'];
+  projectWorkflowId: Scalars['ID']['output'];
+  workflowId: Scalars['String']['output'];
+  workflowLabel: Scalars['String']['output'];
+};
+
 export enum WorkspaceRole {
   Admin = 'ADMIN',
   Editor = 'EDITOR',
@@ -8202,6 +8413,17 @@ export type WorkspaceScopedNotification = {
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
   type: Scalars['String']['output'];
+};
+
+export type WorkspaceSystemPrompt = {
+  __typename?: 'WorkspaceSystemPrompt';
+  prompt: Scalars['String']['output'];
+  workspaceId: Scalars['ID']['output'];
+};
+
+export type WorkspaceSystemPromptInput = {
+  prompt?: InputMaybe<Scalars['String']['input']>;
+  workspaceId: Scalars['ID']['input'];
 };
 
 export type WorkspaceUser = {
