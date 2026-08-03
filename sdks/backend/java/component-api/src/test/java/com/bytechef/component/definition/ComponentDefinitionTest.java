@@ -40,7 +40,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {"batch":null,"beforeResume":null,"beforeSuspend":null,"beforeTimeoutResume":null,"deprecated":null,"description":"description","help":null,"metadata":null,"name":"name","outputDefinition":null,"properties":null,"title":"title","processErrorResponse":null,"workflowNodeDescription":null,"resumePerform":null,"perform":{}}
+                {"batch":false,"beforeResume":null,"beforeSuspend":null,"beforeTimeoutResume":null,"deprecated":false,"description":"description","help":null,"metadata":{},"name":"name","outputDefinition":null,"properties":[],"title":"title","processErrorResponse":null,"workflowNodeDescription":null,"resumePerform":null,"perform":{}}
                 """,
             action);
     }
@@ -57,7 +57,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {"advancedOption":null,"description":"description","displayCondition":null,"expressionEnabled":null,"hidden":null,"label":"label", "maxItems":null,"minItems":null,"metadata":{},"placeholder":"placeholder","required":true,"name":"name","type":"ARRAY","defaultValue":[1,2],"exampleValue":null,"items":[{"advancedOption":null,"description":null,"displayCondition":null,"expressionEnabled":null,"hidden":null,"label":null,"metadata":{},"placeholder":null,"required":false,"name":null,"type":"INTEGER","defaultValue":null,"exampleValue":null,"maxValue":null,"minValue":null,"options":null,"controlType":"INTEGER","optionsDataSource":null}],"multipleValues":null,"options":null,"controlType":"ARRAY_BUILDER","optionsDataSource":null}
+                {"advancedOption":false,"description":"description","displayCondition":null,"expressionEnabled":true,"hidden":false,"label":"label", "maxItems":null,"minItems":null,"metadata":{},"placeholder":"placeholder","required":true,"name":"name","type":"ARRAY","defaultValue":[1,2],"exampleValue":null,"items":[{"advancedOption":false,"description":null,"displayCondition":null,"expressionEnabled":true,"hidden":false,"label":null,"metadata":{},"placeholder":null,"required":false,"name":null,"type":"INTEGER","defaultValue":null,"exampleValue":null,"maxValue":null,"minValue":null,"options":[],"controlType":"INTEGER","optionsDataSource":null}],"multipleValues":true,"options":[],"controlType":"ARRAY_BUILDER","optionsDataSource":null}
                 """,
             property);
     }
@@ -73,7 +73,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {"advancedOption":null,"description":"description","displayCondition":null,"expressionEnabled":null,"hidden":null,"label":"label","metadata":{},"placeholder":"placeholder","required":true,"name":"name","type":"BOOLEAN","defaultValue":true,"exampleValue":null,"options":[{"description":null,"label":"True","value":true},{"description":null,"label":"False","value":false}],"controlType":"SELECT"}
+                {"advancedOption":false,"description":"description","displayCondition":null,"expressionEnabled":true,"hidden":false,"label":"label","metadata":{},"placeholder":"placeholder","required":true,"name":"name","type":"BOOLEAN","defaultValue":true,"exampleValue":null,"options":[{"description":null,"label":"True","value":true},{"description":null,"label":"False","value":false}],"controlType":"SELECT"}
                 """,
             property);
     }
@@ -88,7 +88,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {"componentCategories":null,"customAction":null,"customActionHelp":null,"description":"description","icon":"icon","tags":null,"metadata":null,"name":"name","resources":null,"version":1,"title":"title","connection":null,"actions":null,"triggers":null,"unifiedApi":null,"clusterElements":null,"inputs":null}
+                {"componentCategories":[],"customAction":false,"customActionHelp":null,"description":"description","icon":"icon","tags":[],"metadata":{},"name":"name","resources":null,"version":1,"title":"title","connection":null,"actions":[],"triggers":[],"unifiedApi":null,"clusterElements":[],"inputs":[]}
                 """,
             componentDefinition);
     }
@@ -104,7 +104,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {"advancedOption":null,"description":"description","displayCondition":null,"expressionEnabled":null,"hidden":null,"label":"label","metadata":{},"placeholder":"placeholder","required":true,"name":"name","type":"DATE","defaultValue":"-999999999-01-01","exampleValue":null,"options":null,"controlType":"DATE","optionsDataSource":null}
+                {"advancedOption":false,"description":"description","displayCondition":null,"expressionEnabled":true,"hidden":false,"label":"label","metadata":{},"placeholder":"placeholder","required":true,"name":"name","type":"DATE","defaultValue":"-999999999-01-01","exampleValue":null,"options":[],"controlType":"DATE","optionsDataSource":null}
                 """,
             property);
     }
@@ -120,7 +120,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {"advancedOption":null,"description":"description","displayCondition":null,"expressionEnabled":null,"hidden":null,"label":"label","metadata":{},"placeholder":"placeholder","required":true,"name":"name","type":"DATE_TIME","defaultValue":"-999999999-01-01T00:00:00","exampleValue":null,"options":null,"controlType":"DATE_TIME","optionsDataSource":null}
+                {"advancedOption":false,"description":"description","displayCondition":null,"expressionEnabled":true,"hidden":false,"label":"label","metadata":{},"placeholder":"placeholder","required":true,"name":"name","type":"DATE_TIME","defaultValue":"-999999999-01-01T00:00:00","exampleValue":null,"options":[],"controlType":"DATE_TIME","optionsDataSource":null}
                 """,
             property);
     }
@@ -136,7 +136,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {"advancedOption":null,"description":"description","displayCondition":null,"expressionEnabled":null,"hidden":null,"label":"label","metadata":{},"placeholder":"placeholder","required":true,"name":"name","type":"INTEGER","defaultValue":2,"exampleValue":null,"maxValue":null,"minValue":null,"options":null,"controlType":"INTEGER","optionsDataSource":null}
+                {"advancedOption":false,"description":"description","displayCondition":null,"expressionEnabled":true,"hidden":false,"label":"label","metadata":{},"placeholder":"placeholder","required":true,"name":"name","type":"INTEGER","defaultValue":2,"exampleValue":null,"maxValue":null,"minValue":null,"options":[],"controlType":"INTEGER","optionsDataSource":null}
                 """,
             property);
     }
@@ -153,7 +153,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {"advancedOption":null,"description":"description","displayCondition":null,"expressionEnabled":null,"hidden":null,"label":"label","maxNumberPrecision":null,"minNumberPrecision":null,"metadata":{},"placeholder":"placeholder","required":true,"name":"name","type":"NUMBER","defaultValue":2.0,"exampleValue":null,"maxValue":null,"minValue":null,"numberPrecision":null,"options":[{"description":null,"label":"option1","value":1.0},{"description":null,"label":"option2","value":2.0}],"controlType":"SELECT","optionsDataSource":null}
+                {"advancedOption":false,"description":"description","displayCondition":null,"expressionEnabled":true,"hidden":false,"label":"label","maxNumberPrecision":null,"minNumberPrecision":null,"metadata":{},"placeholder":"placeholder","required":true,"name":"name","type":"NUMBER","defaultValue":2.0,"exampleValue":null,"maxValue":null,"minValue":null,"numberPrecision":null,"options":[{"description":null,"label":"option1","value":1.0},{"description":null,"label":"option2","value":2.0}],"controlType":"SELECT","optionsDataSource":null}
                 """,
             property);
     }
@@ -169,7 +169,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {"advancedOption":null,"description":"description","displayCondition":null,"expressionEnabled":null,"hidden":null,"metadata":{},"required":true,"name":"name","type":"OBJECT","defaultValue":{"key":{"key1":"value1"}},"exampleValue":null,"label":"label","placeholder":"placeholder","additionalProperties":null,"multipleValues":null,"options":null,"properties":null,"optionsDataSource":null,"controlType":"OBJECT_BUILDER"}
+                {"advancedOption":false,"description":"description","displayCondition":null,"expressionEnabled":true,"hidden":false,"metadata":{},"required":true,"name":"name","type":"OBJECT","defaultValue":{"key":{"key1":"value1"}},"exampleValue":null,"label":"label","placeholder":"placeholder","additionalProperties":[],"multipleValues":true,"options":[],"properties":[],"optionsDataSource":null,"controlType":"OBJECT_BUILDER"}
                 """,
             property);
     }
@@ -185,7 +185,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {"advancedOption":null,"description":"description","displayCondition":null,"expressionEnabled":null,"hidden":null,"label":"label","languageId":null,"metadata":{},"maxLength":null,"minLength":null,"placeholder":"placeholder","regex":null,"required":true,"name":"name","type":"STRING","defaultValue":"defaultValue","exampleValue":null,"controlType":"TEXT","options":null,"optionsDataSource":null, "optionsLoadedDynamically":null}
+                {"advancedOption":false,"description":"description","displayCondition":null,"expressionEnabled":true,"hidden":false,"label":"label","languageId":null,"metadata":{},"maxLength":null,"minLength":null,"placeholder":"placeholder","regex":null,"required":true,"name":"name","type":"STRING","defaultValue":"defaultValue","exampleValue":null,"controlType":"TEXT","options":[],"optionsDataSource":null, "optionsLoadedDynamically":false}
                 """,
             property);
     }

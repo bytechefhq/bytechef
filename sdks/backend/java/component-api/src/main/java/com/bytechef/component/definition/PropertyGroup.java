@@ -34,7 +34,9 @@ public interface PropertyGroup {
      *
      * @return
      */
-    Optional<String> getLabel();
+    default Optional<String> getLabel() {
+        return Optional.empty();
+    }
 
     /**
      *

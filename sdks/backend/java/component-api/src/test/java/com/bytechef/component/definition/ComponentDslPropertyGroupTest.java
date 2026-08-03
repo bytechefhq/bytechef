@@ -20,7 +20,6 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.definition.ComponentDsl.propertyGroup;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import java.util.Optional;
@@ -36,11 +35,7 @@ class ComponentDslPropertyGroupTest {
         ComponentDefinition componentDefinition = component("sample")
             .inputs(string("spreadsheetId").label("Spreadsheet"));
 
-        Optional<List<? extends PropertyGroup>> inputs = componentDefinition.getInputs();
-
-        assertTrue(inputs.isPresent());
-
-        List<? extends PropertyGroup> inputList = inputs.get();
+        List<? extends PropertyGroup> inputList = componentDefinition.getInputs();
 
         assertEquals(1, inputList.size());
 
@@ -65,11 +60,7 @@ class ComponentDslPropertyGroupTest {
                         string("sheetName").label("Sheet")
                             .optionsLookupDependsOn("spreadsheetId")));
 
-        Optional<List<? extends PropertyGroup>> inputs = componentDefinition.getInputs();
-
-        assertTrue(inputs.isPresent());
-
-        List<? extends PropertyGroup> inputList = inputs.get();
+        List<? extends PropertyGroup> inputList = componentDefinition.getInputs();
 
         assertEquals(1, inputList.size());
 
