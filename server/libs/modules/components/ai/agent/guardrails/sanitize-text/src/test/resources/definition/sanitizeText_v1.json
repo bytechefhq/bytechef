@@ -22,7 +22,7 @@
     "help": null,
     "outputDefinition": null,
     "processErrorResponse": null,
-    "properties": null,
+    "properties": [ ],
     "title": "Sanitize Text",
     "type": {
       "name": "GUARDRAILS",
@@ -38,17 +38,17 @@
     "label": "Artificial Intelligence"
   } ],
   "connection": null,
-  "customAction": null,
+  "customAction": false,
   "customActionHelp": null,
   "description": "Runs configured sanitizers on the model response.",
   "icon": "path:assets/sanitize-text.svg",
-  "inputs": null,
-  "metadata": null,
+  "inputs": [ ],
+  "metadata": { },
   "name": "sanitizeText",
   "resources": null,
-  "tags": null,
+  "tags": [ ],
   "title": "Sanitize Text",
-  "triggers": null,
+  "triggers": [ ],
   "unifiedApi": null,
   "version": 1
 }

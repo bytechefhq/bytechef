@@ -37,7 +37,6 @@ import com.bytechef.definition.BaseProperty;
 import com.google.auto.service.AutoService;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -76,10 +75,10 @@ public class PipedriveComponentHandler extends AbstractPipedriveComponentHandler
         ActionDefinition actionDefinition, ModifiableProperty<?> modifiableProperty) {
 
         if (Objects.equals(modifiableProperty.getName(), "__item")) {
-            Optional<List<? extends ValueProperty<?>>> propertiesOptional =
+            List<? extends ValueProperty<?>> properties =
                 ((ModifiableObjectProperty) modifiableProperty).getProperties();
 
-            for (BaseProperty baseProperty : propertiesOptional.get()) {
+            for (BaseProperty baseProperty : properties) {
                 if (Objects.equals(baseProperty.getName(), "lost_reason")) {
                     ((ModifiableStringProperty) baseProperty)
                         .displayCondition("%s == '%s'".formatted("status", "lost"));

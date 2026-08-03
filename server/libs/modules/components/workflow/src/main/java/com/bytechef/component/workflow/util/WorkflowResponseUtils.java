@@ -75,8 +75,7 @@ public class WorkflowResponseUtils {
         }
 
         if (property instanceof ModifiableObjectProperty objectProperty) {
-            return objectProperty.getProperties()
-                .orElse(List.of());
+            return objectProperty.getProperties();
         }
 
         return List.of(property);

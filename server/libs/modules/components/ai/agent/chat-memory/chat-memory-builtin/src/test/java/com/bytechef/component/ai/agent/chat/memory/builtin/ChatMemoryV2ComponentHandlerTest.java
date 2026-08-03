@@ -91,8 +91,7 @@ class ChatMemoryV2ComponentHandlerTest {
     private static PerformFunction getPerformFunction(ComponentHandler componentHandler, String actionName) {
         ComponentDefinition componentDefinition = componentHandler.getDefinition();
 
-        List<? extends ActionDefinition> actionDefinitions = componentDefinition.getActions()
-            .orElseThrow();
+        List<? extends ActionDefinition> actionDefinitions = componentDefinition.getActions();
 
         return actionDefinitions.stream()
             .filter(actionDefinition -> actionName.equals(actionDefinition.getName()))

@@ -95,8 +95,7 @@ public class SubflowTaskDispatcherDefinitionFactory implements TaskDispatcherDef
             return List.of();
         }
 
-        return objectProperty.getProperties()
-            .orElse(List.of());
+        return objectProperty.getProperties();
     }
 
     private static OutputResponse output(Map<String, ?> inputParameters, SubflowDataSource subflowDataSource) {
