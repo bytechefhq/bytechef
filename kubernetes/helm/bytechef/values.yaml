@@ -14,6 +14,7 @@ env:
   normal:
     BYTECHEF_ENCRYPTION_PROVIDER: property
     BYTECHEF_FEATURE_FLAGS_0: ff-1057
+    BYTECHEF_FEATURE_FLAGS_1: ff-445
     BYTECHEF_PUBLIC_URL: "" ## Place your public endpoint here if using ingress
     BYTECHEF_SIGN_UP_ACTIVATION_REQUIRED: false
 
