@@ -66,9 +66,9 @@ const variants: Record<VariantType, string> = {
     destructiveOutline:
         'bg-transparent border border-stroke-onsurface-primary/70 text-content-onsurface-primary hover:border-stroke-onsurface-primary hover:bg-transparent',
     outline:
-        'bg-surface-neutral-primary border border-stroke-neutral-secondary text-content-neutral-primary hover:bg-surface-neutral-primary-hover hover:border-stroke-neutral-secondary hover:text-content-neutral-primary active:bg-surface-brand-secondary active:border-stroke-brand-secondary active:text-content-brand-primary',
+        'bg-surface-neutral-primary border border-stroke-neutral-secondary text-content-neutral-primary hover:bg-surface-neutral-primary-hover hover:border-stroke-neutral-secondary hover:text-content-neutral-primary dark:hover:bg-surface-neutral-primary-hover active:bg-surface-brand-secondary active:border-stroke-brand-secondary active:text-content-brand-primary',
     // eslint-disable-next-line sort-keys
-    ghost: 'bg-transparent text-content-neutral-primary hover:bg-surface-neutral-primary-hover hover:text-content-neutral-primary active:bg-surface-brand-secondary active:text-content-brand-primary',
+    ghost: 'bg-transparent text-content-neutral-primary hover:bg-surface-neutral-primary-hover hover:text-content-neutral-primary dark:hover:bg-surface-neutral-primary-hover active:bg-surface-brand-secondary active:text-content-brand-primary',
     link: 'bg-transparent hover:bg-transparent active:bg-transparent text-content-neutral-primary hover:text-content-neutral-primary active:text-content-brand-primary hover:underline active:underline',
 };
 
@@ -80,6 +80,11 @@ const ICON_SIZES: IconSizeType[] = ['icon', 'iconSm', 'iconXs', 'iconXxs'];
 
 const isIconSize = (size?: TextSizeType | IconSizeType): size is IconSizeType =>
     !!size && ICON_SIZES.includes(size as IconSizeType);
+
+const HOVER_TRANSPARENT_CLASS = 'hover:bg-transparent';
+
+const hasHoverTransparentOverride = (className?: string): boolean =>
+    !!className?.split(/\s+/).includes(HOVER_TRANSPARENT_CLASS);
 
 const Button = ({
     children,
@@ -103,7 +108,14 @@ const Button = ({
 
     return (
         <ShadcnButton
-            className={twMerge(basicStyles, iconSizeClass, sizeClass, variants[variant], className)}
+            className={twMerge(
+                basicStyles,
+                iconSizeClass,
+                sizeClass,
+                variants[variant],
+                className,
+                hasHoverTransparentOverride(className) && 'dark:hover:bg-transparent'
+            )}
             size={shadcnSize}
             {...props}
         >

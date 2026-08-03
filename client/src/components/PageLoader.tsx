@@ -25,8 +25,8 @@ const PageLoader = ({
             {errorExists || loading ? (
                 <div className={twMerge('flex min-h-screen min-w-full items-center justify-center p-5', className)}>
                     {errorExists ? (
-                        <div className="flex items-center text-red-700">
-                            <XCircleIcon aria-hidden="true" className="mr-1 size-5 text-red-400" />
+                        <div className="flex items-center text-content-destructive">
+                            <XCircleIcon aria-hidden="true" className="mr-1 size-5 text-content-destructive" />
 
                             <h1>Some error occurred.</h1>
                         </div>
