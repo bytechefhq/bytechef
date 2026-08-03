@@ -67,16 +67,16 @@ const UploadKnowledgeBaseDocumentDialog = ({knowledgeBaseId, trigger}: UploadKno
 
                         <div
                             className={twMerge(
-                                'flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-6 hover:bg-gray-50',
+                                'flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-stroke-neutral-tertiary p-6 hover:bg-surface-neutral-primary-hover',
                                 uploading && 'cursor-not-allowed opacity-50'
                             )}
                         >
                             <label className="flex cursor-pointer flex-col items-center" htmlFor="document-file-upload">
-                                <UploadIcon className="mb-2 size-8 text-gray-400" />
+                                <UploadIcon className="mb-2 size-8 text-content-neutral-tertiary" />
 
-                                <span className="text-sm text-gray-600">Click to browse files</span>
+                                <span className="text-sm text-content-neutral-secondary">Click to browse files</span>
 
-                                <span className="mt-1 text-xs text-gray-400">
+                                <span className="mt-1 text-xs text-content-neutral-tertiary">
                                     Supported: PDF, DOC, DOCX, TXT, CSV, XLS, XLSX, MD, PPT, PPTX, HTML
                                 </span>
                             </label>
@@ -103,7 +103,7 @@ const UploadKnowledgeBaseDocumentDialog = ({knowledgeBaseId, trigger}: UploadKno
                             >
                                 {selectedFiles.map((selectedFile, selectedFileIndex) => (
                                     <div
-                                        className="flex items-center justify-between rounded-md border border-gray-200 bg-gray-50 p-2 px-3"
+                                        className="flex items-center justify-between rounded-md border border-stroke-neutral-secondary bg-surface-neutral-secondary p-2 px-3"
                                         key={`${selectedFile.file.name}-${selectedFile.file.size}-${selectedFile.file.lastModified}`}
                                     >
                                         <div className="flex flex-1 items-center space-x-2 overflow-hidden">
@@ -111,7 +111,7 @@ const UploadKnowledgeBaseDocumentDialog = ({knowledgeBaseId, trigger}: UploadKno
                                                 {selectedFile.file.name}
                                             </span>
 
-                                            <span className="text-xs text-gray-400">
+                                            <span className="text-xs text-content-neutral-tertiary">
                                                 {formatFileSize(selectedFile.file.size)}
                                             </span>
                                         </div>
@@ -119,7 +119,9 @@ const UploadKnowledgeBaseDocumentDialog = ({knowledgeBaseId, trigger}: UploadKno
                                         <div className="ml-2 flex items-center space-x-2">
                                             {selectedFile.status === 'uploading' && (
                                                 <div className="flex items-center space-x-2">
-                                                    <span className="text-xs text-gray-400">Uploading...</span>
+                                                    <span className="text-xs text-content-neutral-tertiary">
+                                                        Uploading...
+                                                    </span>
 
                                                     <LoadingIcon />
                                                 </div>
@@ -128,7 +130,7 @@ const UploadKnowledgeBaseDocumentDialog = ({knowledgeBaseId, trigger}: UploadKno
                                             {selectedFile.status === 'completed' && (
                                                 <div className="flex size-4 items-center justify-center rounded-full bg-green-500">
                                                     <svg
-                                                        className="size-3 text-white"
+                                                        className="size-3 text-content-onsurface-primary"
                                                         fill="none"
                                                         stroke="currentColor"
                                                         viewBox="0 0 24 24"
@@ -145,7 +147,7 @@ const UploadKnowledgeBaseDocumentDialog = ({knowledgeBaseId, trigger}: UploadKno
 
                                             {selectedFile.status === 'error' && (
                                                 <div className="flex items-center space-x-2">
-                                                    <span className="text-xs text-red-500">
+                                                    <span className="text-xs text-content-destructive">
                                                         {selectedFile.statusMessage || 'Error'}
                                                     </span>
                                                 </div>
@@ -154,7 +156,7 @@ const UploadKnowledgeBaseDocumentDialog = ({knowledgeBaseId, trigger}: UploadKno
                                             {!uploading && (
                                                 <Button
                                                     aria-label={`Remove ${selectedFile.file.name}`}
-                                                    className="rounded-full hover:bg-gray-200"
+                                                    className="rounded-full hover:bg-surface-neutral-secondary-hover"
                                                     icon={<XIcon className="size-4 text-content-neutral-secondary" />}
                                                     onClick={(event) => {
                                                         event.stopPropagation();

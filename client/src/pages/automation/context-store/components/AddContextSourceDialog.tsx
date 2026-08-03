@@ -358,7 +358,7 @@ const AddContextSourceDialog = ({contextStoreId: presetContextStoreId, trigger}:
 
                                     {existingContextStores.length === 0 ? (
                                         <p
-                                            className="rounded-md border border-amber-200 bg-amber-50 p-2 text-xs text-amber-900"
+                                            className="rounded-md border border-amber-200 bg-surface-warning-secondary p-2 text-xs text-content-warning-primary"
                                             data-testid="no-context-stores-warning"
                                         >
                                             No Context Stores exist in this workspace at the active environment. Create
@@ -421,7 +421,7 @@ const AddContextSourceDialog = ({contextStoreId: presetContextStoreId, trigger}:
                                                             {component.icon ? (
                                                                 <InlineSVG className="size-12" src={component.icon} />
                                                             ) : (
-                                                                <PackageIcon className="size-12 text-gray-400" />
+                                                                <PackageIcon className="size-12 text-content-neutral-tertiary" />
                                                             )}
                                                         </div>
 
@@ -477,7 +477,7 @@ const AddContextSourceDialog = ({contextStoreId: presetContextStoreId, trigger}:
                                                         aria-pressed={isSelected}
                                                         className={
                                                             isSelected
-                                                                ? 'flex w-full items-center justify-between rounded-md bg-blue-50 px-3 py-2 text-left'
+                                                                ? 'flex w-full items-center justify-between rounded-md bg-surface-brand-secondary px-3 py-2 text-left'
                                                                 : 'flex w-full items-center justify-between rounded-md px-3 py-2 text-left hover:bg-muted'
                                                         }
                                                         data-testid={`connection-option-${connection.id}`}

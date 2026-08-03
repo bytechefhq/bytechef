@@ -72,7 +72,7 @@ export default function ApprovalTaskFilters() {
                         onClick={() => handleStatusChange('open')}
                     >
                         <div className="flex items-center">
-                            <CircleIcon className="mr-2 size-3 text-gray-400" />
+                            <CircleIcon className="mr-2 size-3 text-content-neutral-tertiary" />
 
                             <span>Open</span>
                         </div>
@@ -87,7 +87,7 @@ export default function ApprovalTaskFilters() {
                         onClick={() => handleStatusChange('in-progress')}
                     >
                         <div className="flex items-center">
-                            <ClockIcon className="mr-2 size-3 text-blue-600" />
+                            <ClockIcon className="mr-2 size-3 text-content-brand-primary" />
 
                             <span>In Progress</span>
                         </div>
@@ -104,7 +104,7 @@ export default function ApprovalTaskFilters() {
                         onClick={() => handleStatusChange('completed')}
                     >
                         <div className="flex items-center">
-                            <CheckCircle2Icon className="mr-2 size-3 text-green-600" />
+                            <CheckCircle2Icon className="mr-2 size-3 text-content-success-primary" />
 
                             <span>Completed</span>
                         </div>
@@ -119,7 +119,7 @@ export default function ApprovalTaskFilters() {
                         onClick={() => handleStatusChange('expired')}
                     >
                         <div className="flex items-center">
-                            <XCircleIcon className="mr-2 size-3 text-gray-400" />
+                            <XCircleIcon className="mr-2 size-3 text-content-neutral-tertiary" />
 
                             <span>Expired</span>
                         </div>
@@ -154,7 +154,7 @@ export default function ApprovalTaskFilters() {
                     >
                         <div className="flex items-center">
                             <Badge
-                                className="mr-2 h-3 border-red-200 bg-red-100 px-1 text-red-800"
+                                className="mr-2 h-3 border-red-200 bg-surface-destructive-secondary px-1 text-content-destructive"
                                 styleType="outline-outline"
                             >
                                 <span className="text-[10px]">High</span>
@@ -194,7 +194,7 @@ export default function ApprovalTaskFilters() {
                     >
                         <div className="flex items-center">
                             <Badge
-                                className="mr-2 h-3 border-green-200 bg-green-100 px-1 text-green-800"
+                                className="mr-2 h-3 border-green-200 bg-surface-success-secondary px-1 text-content-success-primary"
                                 styleType="outline-outline"
                             >
                                 <span className="text-[10px]">Low</span>

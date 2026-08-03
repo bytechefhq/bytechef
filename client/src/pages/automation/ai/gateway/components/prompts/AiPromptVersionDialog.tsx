@@ -98,7 +98,7 @@ const AiPromptVersionDialog = ({onClose, promptId}: AiPromptVersionDialogProps) 
                             <div className="flex flex-wrap gap-1">
                                 {detectedVariables.map((variable) => (
                                     <span
-                                        className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800"
+                                        className="rounded-full bg-surface-brand-secondary px-2 py-0.5 text-xs font-medium text-content-brand-primary"
                                         key={variable}
                                     >
                                         {`{{${variable}}}`}

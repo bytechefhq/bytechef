@@ -25,7 +25,7 @@ const ComponentRow = ({
                     <LazyLoadSVG className="size-5 flex-none" src={componentDefinition?.icon ?? ''} />
                 </div>
 
-                <span className="font-medium text-gray-900">{componentDefinition.title}</span>
+                <span className="font-medium text-content-neutral-primary">{componentDefinition.title}</span>
             </div>
 
             {

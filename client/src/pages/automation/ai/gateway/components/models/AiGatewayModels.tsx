@@ -162,8 +162,8 @@ const AiGatewayModels = () => {
                                                     className={twMerge(
                                                         'rounded-full px-2 py-0.5 text-xs font-medium',
                                                         model.enabled
-                                                            ? 'bg-green-100 text-green-800'
-                                                            : 'bg-gray-100 text-gray-800'
+                                                            ? 'bg-surface-success-secondary text-content-success-primary'
+                                                            : 'bg-surface-neutral-secondary text-content-neutral-primary'
                                                     )}
                                                 >
                                                     {model.enabled ? 'Active' : 'Disabled'}

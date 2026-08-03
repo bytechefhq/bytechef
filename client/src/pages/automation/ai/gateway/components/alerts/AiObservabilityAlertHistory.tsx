@@ -13,8 +13,8 @@ import {twMerge} from 'tailwind-merge';
 
 const STATUS_CLASSES: Record<string, string> = {
     ACKNOWLEDGED: 'bg-yellow-100 text-yellow-800',
-    RESOLVED: 'bg-green-100 text-green-800',
-    TRIGGERED: 'bg-red-100 text-red-800',
+    RESOLVED: 'bg-surface-success-secondary text-content-success-primary',
+    TRIGGERED: 'bg-surface-destructive-secondary text-content-destructive',
 };
 
 const AiObservabilityAlertHistory = () => {
@@ -151,7 +151,8 @@ const AiObservabilityAlertHistory = () => {
                                             <span
                                                 className={twMerge(
                                                     'rounded-full px-2 py-0.5 text-xs font-medium',
-                                                    STATUS_CLASSES[event.status] || 'bg-gray-100 text-gray-800'
+                                                    STATUS_CLASSES[event.status] ||
+                                                        'bg-surface-neutral-secondary text-content-neutral-primary'
                                                 )}
                                             >
                                                 {event.status}

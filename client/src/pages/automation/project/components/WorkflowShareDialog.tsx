@@ -217,24 +217,8 @@ export function WorkflowShareDialog({
                     <div className="space-y-2">
                         <div className="flex items-center justify-between">
                             <Label className="text-sm font-medium" htmlFor="description">
-                                Description <span className="text-red-500">*</span>
+                                Description <span className="text-content-destructive">*</span>
                             </Label>
-
-                            {/*<Button*/}
-
-                            {/*    className="h-auto p-1 text-purple-600 hover:bg-purple-50 hover:text-purple-700"*/}
-
-                            {/*    size="sm"*/}
-
-                            {/*    variant="ghost"*/}
-
-                            {/*>*/}
-
-                            {/*    <SparklesIcon className="mr-1 size-3" />*/}
-
-                            {/*    <span className="text-xs">Generate with AI</span>*/}
-
-                            {/*</Button>*/}
                         </div>
 
                         <Textarea

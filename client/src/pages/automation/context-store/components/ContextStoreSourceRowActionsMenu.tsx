@@ -84,7 +84,7 @@ const ContextStoreSourceRowActionsMenu = ({isAdmin, source}: ContextStoreSourceR
 
                     <DropdownMenuSeparator />
 
-                    <DropdownMenuItem className="text-red-600" onClick={() => setShowDeleteDialog(true)}>
+                    <DropdownMenuItem className="text-content-destructive" onClick={() => setShowDeleteDialog(true)}>
                         <TrashIcon className="mr-2 size-4" />
                         Delete
                     </DropdownMenuItem>

@@ -290,7 +290,7 @@ const AssetFileDetailSheet = () => {
                             // and leaves env-switching to the existing EnvironmentSelect on the page header rather
                             // than auto-mutating the user's selection.
                             <div
-                                className="shrink-0 border-b border-b-border/50 bg-amber-50 p-3 text-xs text-amber-900"
+                                className="shrink-0 border-b border-b-border/50 bg-surface-warning-secondary p-3 text-xs text-content-warning-primary"
                                 data-testid="asset-file-env-mismatch"
                             >
                                 {`This file lives in ${environmentLabel(Number(file.environmentId))}, but you are currently viewing the ${environmentLabel(currentEnvironmentId)} file list. Switch environments via the toolbar selector to see it alongside its peers.`}

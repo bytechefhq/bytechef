@@ -187,7 +187,7 @@ const ProjectDeploymentEditWorkflowDialog = ({
 
                                 <Tooltip>
                                     <TooltipTrigger asChild>
-                                        <InfoIcon className="size-4 cursor-default text-gray-400" />
+                                        <InfoIcon className="size-4 cursor-default text-content-neutral-tertiary" />
                                     </TooltipTrigger>
 
                                     <TooltipContent>Connections grouped by their app.</TooltipContent>

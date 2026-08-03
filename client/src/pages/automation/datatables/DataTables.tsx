@@ -66,7 +66,7 @@ const DataTables = () => {
                 ) : (
                     <EmptyList
                         button={<CreateDataTableDialog trigger={<Button>Create Table</Button>} />}
-                        icon={<Table2Icon className="size-24 text-gray-300" />}
+                        icon={<Table2Icon className="size-24 text-stroke-neutral-tertiary" />}
                         message={
                             tagId
                                 ? 'No data tables match the selected tag.'

@@ -225,7 +225,7 @@ export const Connections = () => {
                                 />
                             )
                         }
-                        icon={<Link2Icon className="size-24 text-gray-300" />}
+                        icon={<Link2Icon className="size-24 text-stroke-neutral-tertiary" />}
                         message="You do not have any Connections created yet."
                         title="No Connections"
                     />

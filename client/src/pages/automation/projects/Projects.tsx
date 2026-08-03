@@ -207,7 +207,7 @@ const Projects = () => {
                                 </DropdownMenu>
                             </ButtonGroup>
                         }
-                        icon={<FolderIcon className="size-24 text-gray-300" />}
+                        icon={<FolderIcon className="size-24 text-stroke-neutral-tertiary" />}
                         message="Get started by creating a new project."
                         title="No Projects"
                     />

@@ -19,7 +19,7 @@ const AiSkillsEmptyState = () => (
 
         <div className="mt-20 mb-8 grid max-w-2xl grid-cols-3 gap-6">
             <div className="flex flex-col items-center gap-2 text-center">
-                <BrainCircuitIcon className="size-5 text-gray-400" />
+                <BrainCircuitIcon className="size-5 text-content-neutral-tertiary" />
 
                 <h3 className="text-sm font-medium">Domain expertise</h3>
 
@@ -29,7 +29,7 @@ const AiSkillsEmptyState = () => (
             </div>
 
             <div className="flex flex-col items-center gap-2 text-center">
-                <RepeatIcon className="size-5 text-gray-400" />
+                <RepeatIcon className="size-5 text-content-neutral-tertiary" />
 
                 <h3 className="text-sm font-medium">Plug and play</h3>
 
@@ -39,7 +39,7 @@ const AiSkillsEmptyState = () => (
             </div>
 
             <div className="flex flex-col items-center gap-2 text-center">
-                <BookOpenIcon className="size-5 text-gray-400" />
+                <BookOpenIcon className="size-5 text-content-neutral-tertiary" />
 
                 <h3 className="text-sm font-medium">AI-powered creation</h3>
 

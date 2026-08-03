@@ -117,7 +117,7 @@ const ContextStoreSourceDetailDialog = ({onOpenChange, open, source}: ContextSto
 
                                 {source.workflowId ? (
                                     <Link
-                                        className="text-sm text-blue-600 hover:underline"
+                                        className="text-sm text-content-brand-primary hover:underline"
                                         to={`/automation/executions?workflowId=${source.workflowId}`}
                                     >
                                         View execution history

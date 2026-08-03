@@ -37,7 +37,7 @@ const FileTreeNode = ({node, onRemove, onSelect, selectedPath}: FileTreeNodeProp
     if (node.type === 'directory') {
         return (
             <div>
-                <div className="flex items-center gap-1.5 px-2 py-1 text-sm text-gray-600">
+                <div className="flex items-center gap-1.5 px-2 py-1 text-sm text-content-neutral-secondary">
                     <FolderIcon className="size-4" />
 
                     <span>{node.name}</span>
@@ -66,7 +66,7 @@ const FileTreeNode = ({node, onRemove, onSelect, selectedPath}: FileTreeNodeProp
                 className={twMerge(
                     'h-auto min-w-0 flex-1 justify-start gap-1.5 rounded px-2 py-1 text-left text-sm font-normal',
                     isSelected &&
-                        'bg-blue-50 text-blue-700 hover:bg-blue-50 hover:text-blue-700 active:bg-blue-50 active:text-blue-700'
+                        'bg-surface-brand-secondary text-content-brand-primary hover:bg-surface-brand-secondary hover:text-content-brand-primary active:bg-surface-brand-secondary active:text-content-brand-primary'
                 )}
                 onClick={() => onSelect(node.path)}
                 size="xs"
@@ -85,7 +85,7 @@ const FileTreeNode = ({node, onRemove, onSelect, selectedPath}: FileTreeNodeProp
             {!isSkillMd && onRemove && (
                 <Button
                     aria-label={`Remove ${node.name}`}
-                    className="h-auto shrink-0 rounded p-1 text-gray-400 opacity-0 group-hover:opacity-100 hover:text-red-600"
+                    className="h-auto shrink-0 rounded p-1 text-content-neutral-tertiary opacity-0 group-hover:opacity-100 hover:text-content-destructive"
                     onClick={(event) => {
                         event.stopPropagation();
 
@@ -107,9 +107,9 @@ const FrontmatterTable = ({frontmatter}: {frontmatter: Record<string, string>}) 
         <tbody>
             {Object.entries(frontmatter).map(([key, value]) => (
                 <tr className="border-b border-b-border/50" key={key}>
-                    <td className="py-2 pr-4 font-medium text-gray-600">{key}</td>
+                    <td className="py-2 pr-4 font-medium text-content-neutral-secondary">{key}</td>
 
-                    <td className="py-2 text-gray-900">{value}</td>
+                    <td className="py-2 text-content-neutral-primary">{value}</td>
                 </tr>
             ))}
         </tbody>
@@ -264,11 +264,11 @@ const AiSkillDetailRoute = () => {
             <div className="flex min-h-0 flex-1 overflow-hidden">
                 <div className="w-60 shrink-0 border-r border-r-border/50 py-2 pr-2">
                     <div className="mb-1 flex items-center justify-between px-2">
-                        <span className="text-xs font-medium text-gray-400 uppercase">Files</span>
+                        <span className="text-xs font-medium text-content-neutral-tertiary uppercase">Files</span>
 
                         <Button
                             aria-label="Add file"
-                            className="h-auto rounded p-1 text-gray-400 hover:text-gray-700"
+                            className="h-auto rounded p-1 text-content-neutral-tertiary hover:text-content-neutral-secondary-hover"
                             onClick={() => setShowAddFileDialog(true)}
                             size="xs"
                             type="button"
@@ -335,7 +335,7 @@ const AiSkillDetailRoute = () => {
                             )}
                         </div>
                     ) : (
-                        <div className="flex flex-1 items-center justify-center text-sm text-gray-400">
+                        <div className="flex flex-1 items-center justify-center text-sm text-content-neutral-tertiary">
                             Select a file to view its contents
                         </div>
                     )}
@@ -485,7 +485,7 @@ const AiSkillDetailEmbedded = ({skillId}: AiSkillDetailEmbeddedProps) => {
                         )}
                     </div>
                 ) : (
-                    <div className="flex flex-1 items-center justify-center text-sm text-gray-400">
+                    <div className="flex flex-1 items-center justify-center text-sm text-content-neutral-tertiary">
                         Select a file to view its contents
                     </div>
                 )}

@@ -155,7 +155,7 @@ export const ToolInvocations = ({basePath = '/automation/executions', mcpServerO
                     <ToolInvocationsTable toolInvocationLogs={toolInvocationLogs} />
                 ) : (
                     <EmptyList
-                        icon={<ActivityIcon className="size-24 text-gray-300" />}
+                        icon={<ActivityIcon className="size-24 text-stroke-neutral-tertiary" />}
                         message="No tool invocations have been recorded yet."
                         title="No Tool Invocations"
                     />

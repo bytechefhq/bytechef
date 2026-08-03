@@ -193,7 +193,7 @@ const ContextStores = () => {
                                 <ContextStoreFormDialog trigger={<Button>New Context Store</Button>} />
                             ) : undefined
                         }
-                        icon={<LayersIcon className="size-24 text-gray-300" />}
+                        icon={<LayersIcon className="size-24 text-stroke-neutral-tertiary" />}
                         message="Create a Context Store to group sources that share an environment."
                         title="No Context Stores"
                     />

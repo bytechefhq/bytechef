@@ -9,10 +9,10 @@ interface AiObservabilityWebhookDeliveriesDialogPropsI {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-    FAILED: 'bg-red-100 text-red-800',
-    PENDING: 'bg-gray-100 text-gray-800',
+    FAILED: 'bg-surface-destructive-secondary text-content-destructive',
+    PENDING: 'bg-surface-neutral-secondary text-content-neutral-primary',
     RETRYING: 'bg-yellow-100 text-yellow-800',
-    SUCCESS: 'bg-green-100 text-green-800',
+    SUCCESS: 'bg-surface-success-secondary text-content-success-primary',
 };
 
 const AiObservabilityWebhookDeliveriesDialog = ({
@@ -77,7 +77,8 @@ const AiObservabilityWebhookDeliveriesDialog = ({
                                                 <span
                                                     className={twMerge(
                                                         'rounded-full px-2 py-0.5 text-xs font-medium',
-                                                        STATUS_COLORS[delivery.status] || 'bg-gray-100 text-gray-800'
+                                                        STATUS_COLORS[delivery.status] ||
+                                                            'bg-surface-neutral-secondary text-content-neutral-primary'
                                                     )}
                                                 >
                                                     {delivery.status}

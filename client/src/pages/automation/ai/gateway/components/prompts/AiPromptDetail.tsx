@@ -156,7 +156,7 @@ const AiPromptDetail = ({onBack, promptId}: AiPromptDetailProps) => {
 
                             {activeVersion ? (
                                 <div className="flex items-center gap-2">
-                                    <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
+                                    <span className="rounded-full bg-surface-success-secondary px-2 py-0.5 text-xs font-medium text-content-success-primary">
                                         v{activeVersion.versionNumber}
                                     </span>
 
@@ -232,8 +232,8 @@ const AiPromptDetail = ({onBack, promptId}: AiPromptDetailProps) => {
                                                 className={twMerge(
                                                     'rounded-full px-2 py-0.5 text-xs font-medium',
                                                     version.active
-                                                        ? 'bg-green-100 text-green-800'
-                                                        : 'bg-gray-100 text-gray-800'
+                                                        ? 'bg-surface-success-secondary text-content-success-primary'
+                                                        : 'bg-surface-neutral-secondary text-content-neutral-primary'
                                                 )}
                                             >
                                                 {version.active ? 'Active' : 'Inactive'}
@@ -273,7 +273,7 @@ const AiPromptDetail = ({onBack, promptId}: AiPromptDetailProps) => {
 
                                                     {version.metrics.errorRate != null &&
                                                         version.metrics.errorRate > 0 && (
-                                                            <span className="text-red-600">
+                                                            <span className="text-content-destructive">
                                                                 {(version.metrics.errorRate * 100).toFixed(1)}% errors
                                                             </span>
                                                         )}
@@ -287,7 +287,7 @@ const AiPromptDetail = ({onBack, promptId}: AiPromptDetailProps) => {
                                             <div className="flex items-center gap-3">
                                                 {!version.active && version.environment && (
                                                     <button
-                                                        className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800"
+                                                        className="flex items-center gap-1 text-xs text-content-brand-primary"
                                                         disabled={setActiveMutation.isPending}
                                                         onClick={() =>
                                                             handleDeploy(
@@ -303,10 +303,10 @@ const AiPromptDetail = ({onBack, promptId}: AiPromptDetailProps) => {
 
                                                 <button
                                                     className={twMerge(
-                                                        'flex items-center gap-1 text-xs hover:text-blue-800',
+                                                        'flex items-center gap-1 text-xs',
                                                         compareSelection.includes(version.id)
-                                                            ? 'font-semibold text-blue-800'
-                                                            : 'text-blue-600'
+                                                            ? 'font-semibold text-content-brand-primary'
+                                                            : 'text-content-brand-primary'
                                                     )}
                                                     onClick={() => handleToggleCompare(version.id)}
                                                     title={
@@ -360,8 +360,10 @@ const AiPromptDetail = ({onBack, promptId}: AiPromptDetailProps) => {
                                 <div
                                     className={twMerge(
                                         'px-3 py-0.5 whitespace-pre-wrap',
-                                        diffLine.type === 'added' && 'bg-green-100 text-green-900',
-                                        diffLine.type === 'removed' && 'bg-red-100 text-red-900'
+                                        diffLine.type === 'added' &&
+                                            'bg-surface-success-secondary text-content-success-primary',
+                                        diffLine.type === 'removed' &&
+                                            'bg-surface-destructive-secondary text-content-destructive'
                                     )}
                                     key={diffIndex}
                                 >

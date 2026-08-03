@@ -225,7 +225,7 @@ const DatasetVersionList = ({dataset, onBack, onSelectVersion}: DatasetVersionLi
                                                     frozen
                                                 </span>
                                             ) : (
-                                                <span className="flex items-center gap-1 text-emerald-700 dark:text-emerald-300">
+                                                <span className="flex items-center gap-1 text-content-success-primary">
                                                     <UnlockIcon className="size-3" />
                                                     open
                                                 </span>

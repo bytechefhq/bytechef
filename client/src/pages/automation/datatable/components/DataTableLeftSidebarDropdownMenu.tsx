@@ -32,7 +32,7 @@ const DataTableLeftSidebarDropdownMenu = ({tableId, tableName}: Props) => {
                 </DropdownMenuItem>
 
                 <DropdownMenuItem
-                    className="text-red-600 focus:text-red-700"
+                    className="text-red-600 focus:text-red-700 dark:text-red-400 dark:focus:text-red-400"
                     onSelect={() => handleDeleteOpen(tableId, tableName)}
                 >
                     <Trash2 className="mr-2 size-4" /> Delete

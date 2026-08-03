@@ -167,7 +167,10 @@ const McpComponentDialogToolSelectionStep = ({
 
                     <div className="divide-y">
                         {toolElements.map((tool) => (
-                            <div className="flex items-center space-x-3 py-3 hover:bg-gray-50" key={tool.name}>
+                            <div
+                                className="flex items-center space-x-3 py-3 hover:bg-surface-neutral-primary-hover"
+                                key={tool.name}
+                            >
                                 <Checkbox
                                     checked={selectedTools.some((selectedTool) => selectedTool.name === tool.name)}
                                     id={tool.name}

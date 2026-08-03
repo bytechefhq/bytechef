@@ -101,7 +101,7 @@ const AiObservabilityWebhookSubscriptions = () => {
                                                     <div className="flex flex-wrap gap-1">
                                                         {malformed && (
                                                             <span
-                                                                className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-800"
+                                                                className="rounded-full bg-surface-destructive-secondary px-2 py-0.5 text-xs font-medium text-content-destructive"
                                                                 title="The events JSON for this subscription is malformed — it will not deliver any events. Edit the subscription to reset events."
                                                             >
                                                                 Malformed events
@@ -125,8 +125,8 @@ const AiObservabilityWebhookSubscriptions = () => {
                                             <span
                                                 className={`rounded-full px-2 py-0.5 text-xs font-medium ${
                                                     subscription.enabled
-                                                        ? 'bg-green-100 text-green-800'
-                                                        : 'bg-gray-100 text-gray-800'
+                                                        ? 'bg-surface-success-secondary text-content-success-primary'
+                                                        : 'bg-surface-neutral-secondary text-content-neutral-primary'
                                                 }`}
                                             >
                                                 {subscription.enabled ? 'Active' : 'Disabled'}
@@ -166,7 +166,7 @@ const AiObservabilityWebhookSubscriptions = () => {
                                                 </button>
 
                                                 <button
-                                                    className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-red-600"
+                                                    className="rounded p-1 text-muted-foreground hover:bg-surface-destructive-secondary hover:text-content-destructive"
                                                     onClick={() => handleDelete(subscription.id)}
                                                     title="Delete"
                                                 >

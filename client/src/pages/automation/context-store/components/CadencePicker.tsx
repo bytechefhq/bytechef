@@ -41,7 +41,7 @@ const CadencePicker = ({onChange, value}: CadencePickerPropsI) => {
                             className={twMerge(
                                 'rounded-full border px-3 py-1 text-sm',
                                 isSelected
-                                    ? 'border-blue-500 bg-blue-50 text-blue-700'
+                                    ? 'border-blue-500 bg-surface-brand-secondary text-content-brand-primary'
                                     : 'border-border bg-background hover:bg-muted'
                             )}
                             key={preset.value}
@@ -61,7 +61,7 @@ const CadencePicker = ({onChange, value}: CadencePickerPropsI) => {
                     className={twMerge(
                         'rounded-full border px-3 py-1 text-sm',
                         showCustomInput
-                            ? 'border-blue-500 bg-blue-50 text-blue-700'
+                            ? 'border-blue-500 bg-surface-brand-secondary text-content-brand-primary'
                             : 'border-border bg-background hover:bg-muted'
                     )}
                     data-testid="cadence-custom"

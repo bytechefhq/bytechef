@@ -59,7 +59,7 @@ const ContextStoreRowActionsMenu = ({contextStore, isAdmin}: ContextStoreRowActi
                     <DropdownMenuSeparator />
 
                     <DropdownMenuItem
-                        className="text-red-600"
+                        className="text-content-destructive"
                         onClick={() => {
                             if (
                                 window.confirm(

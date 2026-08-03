@@ -17,7 +17,7 @@ interface WaterfallRowI {
 }
 
 const SPAN_TYPE_COLORS: Record<string, string> = {
-    [AiObservabilitySpanTypeEnum.Event]: 'bg-purple-400',
+    [AiObservabilitySpanTypeEnum.Event]: 'bg-purple-400 dark:bg-purple-500',
     [AiObservabilitySpanTypeEnum.Generation]: 'bg-blue-500',
     [AiObservabilitySpanTypeEnum.Span]: 'bg-gray-400',
     [AiObservabilitySpanTypeEnum.ToolCall]: 'bg-orange-500',

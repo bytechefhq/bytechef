@@ -357,7 +357,9 @@ const AiGatewayDashboard = () => {
                     </div>
 
                     {budgetUsagePct >= 100 && (
-                        <p className="mt-2 text-xs text-red-600">Budget exhausted — new requests return HTTP 402.</p>
+                        <p className="mt-2 text-xs text-content-destructive">
+                            Budget exhausted — new requests return HTTP 402.
+                        </p>
                     )}
                 </div>
             )}

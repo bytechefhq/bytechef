@@ -41,7 +41,7 @@ const AiSkillListItem = ({deleteSkill, onDownload, onUpdate, skill}: AiSkillList
             >
                 <div className="flex min-w-0 flex-1 items-center gap-3">
                     <div className={`flex size-8 items-center justify-center rounded ${skillColor}`}>
-                        <ZapIcon className="size-4 text-white" />
+                        <ZapIcon className="size-4 text-content-onsurface-primary" />
                     </div>
 
                     <div className="min-w-0 flex-1">
@@ -90,8 +90,11 @@ const AiSkillListItem = ({deleteSkill, onDownload, onUpdate, skill}: AiSkillList
 
                             <DropdownMenuSeparator />
 
-                            <DropdownMenuItem className="text-red-600" onClick={() => setShowDeleteDialog(true)}>
-                                <TrashIcon className="mr-2 size-4 text-red-600" />
+                            <DropdownMenuItem
+                                className="text-content-destructive"
+                                onClick={() => setShowDeleteDialog(true)}
+                            >
+                                <TrashIcon className="mr-2 size-4 text-content-destructive" />
                                 Delete
                             </DropdownMenuItem>
                         </DropdownMenuContent>

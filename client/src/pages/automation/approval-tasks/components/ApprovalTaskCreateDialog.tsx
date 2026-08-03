@@ -70,7 +70,7 @@ export default function ApprovalTaskCreateDialog({trigger}: ApprovalTaskCreateDi
                             value={form.title}
                         />
 
-                        {errors.title && <p className="text-sm text-red-500">{errors.title}</p>}
+                        {errors.title && <p className="text-sm text-content-destructive">{errors.title}</p>}
                     </fieldset>
 
                     <fieldset className="space-y-2 border-0">
@@ -87,7 +87,7 @@ export default function ApprovalTaskCreateDialog({trigger}: ApprovalTaskCreateDi
                             value={form.description}
                         />
 
-                        {errors.description && <p className="text-sm text-red-500">{errors.description}</p>}
+                        {errors.description && <p className="text-sm text-content-destructive">{errors.description}</p>}
                     </fieldset>
 
                     <div className="grid grid-cols-2 gap-4">
@@ -102,14 +102,14 @@ export default function ApprovalTaskCreateDialog({trigger}: ApprovalTaskCreateDi
                                 <SelectContent>
                                     <SelectItem value="open">
                                         <span className="flex items-center gap-2">
-                                            <CircleIcon className="size-3 text-gray-400" />
+                                            <CircleIcon className="size-3 text-content-neutral-tertiary" />
                                             Open
                                         </span>
                                     </SelectItem>
 
                                     <SelectItem value="in-progress">
                                         <span className="flex items-center gap-2">
-                                            <ClockIcon className="size-3 text-blue-600" />
+                                            <ClockIcon className="size-3 text-content-brand-primary" />
                                             In Progress
                                         </span>
                                     </SelectItem>
@@ -131,7 +131,7 @@ export default function ApprovalTaskCreateDialog({trigger}: ApprovalTaskCreateDi
                                 <SelectContent>
                                     <SelectItem value="high">
                                         <Badge
-                                            className="border-red-200 bg-red-100 text-red-800"
+                                            className="border-red-200 bg-surface-destructive-secondary text-content-destructive"
                                             label="High"
                                             styleType="outline-outline"
                                         />
@@ -147,7 +147,7 @@ export default function ApprovalTaskCreateDialog({trigger}: ApprovalTaskCreateDi
 
                                     <SelectItem value="low">
                                         <Badge
-                                            className="border-green-200 bg-green-100 text-green-800"
+                                            className="border-green-200 bg-surface-success-secondary text-content-success-primary"
                                             label="Low"
                                             styleType="outline-outline"
                                         />
@@ -182,7 +182,7 @@ export default function ApprovalTaskCreateDialog({trigger}: ApprovalTaskCreateDi
                                 </SelectContent>
                             </Select>
 
-                            {errors.assignee && <p className="text-sm text-red-500">{errors.assignee}</p>}
+                            {errors.assignee && <p className="text-sm text-content-destructive">{errors.assignee}</p>}
                         </fieldset>
 
                         <fieldset className="space-y-2 border-0">

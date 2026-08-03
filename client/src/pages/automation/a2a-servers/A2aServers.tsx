@@ -41,7 +41,7 @@ const A2aServers = () => {
                 ) : (
                     <EmptyList
                         button={<A2aServerDialog triggerNode={<Button label="Create A2A Server" />} />}
-                        icon={<NetworkIcon className="size-24 text-gray-300" />}
+                        icon={<NetworkIcon className="size-24 text-stroke-neutral-tertiary" />}
                         message="Get started by creating a new A2A server to expose an agent-backed workflow."
                         title="No A2A Servers"
                     />

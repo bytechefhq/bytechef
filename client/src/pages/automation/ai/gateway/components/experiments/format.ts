@@ -56,7 +56,7 @@ const STATUS_BADGE_CLASSES: Record<string, string> = {
     COMPLETED: 'bg-emerald-100 text-emerald-900 dark:bg-emerald-900/30 dark:text-emerald-300',
     FAILED: 'bg-destructive/10 text-destructive',
     PENDING: 'bg-muted text-muted-foreground',
-    RUNNING: 'bg-blue-100 text-blue-900 dark:bg-blue-900/30 dark:text-blue-300',
+    RUNNING: 'bg-surface-brand-secondary text-content-brand-primary',
 };
 
 export const statusBadgeClass = (status: string): string =>

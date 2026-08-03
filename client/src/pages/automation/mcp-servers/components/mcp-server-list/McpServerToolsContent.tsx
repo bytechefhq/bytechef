@@ -39,7 +39,7 @@ const McpServerToolsContent = ({mcpServer}: {mcpServer: McpServer}) => {
                             />
                         </div>
                     }
-                    icon={<WrenchIcon className="size-24 text-gray-300" />}
+                    icon={<WrenchIcon className="size-24 text-stroke-neutral-tertiary" />}
                     message="No tools found for this server."
                     title="No Tools"
                 />

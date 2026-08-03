@@ -43,7 +43,7 @@ const KnowledgeBaseSearchInterface = ({knowledgeBaseId}: KnowledgeBaseSearchInte
     const renderSearchResults = () => {
         if (results.length === 0) {
             return (
-                <div className="rounded-lg border border-gray-200 bg-gray-50 p-8 text-center">
+                <div className="rounded-lg border border-stroke-neutral-secondary bg-surface-neutral-secondary p-8 text-center">
                     <p className="text-content-neutral-secondary">No results found for your query.</p>
                 </div>
             );
@@ -51,7 +51,7 @@ const KnowledgeBaseSearchInterface = ({knowledgeBaseId}: KnowledgeBaseSearchInte
 
         return resultsWithChunkIndex.map(({chunkIndex, documentName, index, result}) => (
             <div
-                className="rounded-lg border border-border/50 bg-white p-4 transition-shadow hover:shadow-md"
+                className="rounded-lg border border-border/50 bg-surface-neutral-primary p-4 transition-shadow hover:shadow-md"
                 key={result.id}
             >
                 <div className="mb-2 flex items-center justify-between">
@@ -70,7 +70,7 @@ const KnowledgeBaseSearchInterface = ({knowledgeBaseId}: KnowledgeBaseSearchInte
                             <>
                                 <span>•</span>
 
-                                <span className="font-medium text-blue-600">
+                                <span className="font-medium text-content-brand-primary">
                                     Score: {(result.score * 100).toFixed(1)}%
                                 </span>
                             </>
@@ -78,10 +78,10 @@ const KnowledgeBaseSearchInterface = ({knowledgeBaseId}: KnowledgeBaseSearchInte
                     </div>
                 </div>
 
-                <p className="text-sm leading-relaxed text-gray-700">{result.content}</p>
+                <p className="text-sm leading-relaxed text-content-neutral-secondary">{result.content}</p>
 
                 {result.metadata && (
-                    <div className="mt-3 rounded-md bg-gray-50 p-2 text-xs text-gray-600">
+                    <div className="mt-3 rounded-md bg-surface-neutral-secondary p-2 text-xs text-content-neutral-secondary">
                         <span className="font-medium">Metadata: </span>
 
                         <pre className="mt-1 overflow-x-auto">
@@ -95,7 +95,10 @@ const KnowledgeBaseSearchInterface = ({knowledgeBaseId}: KnowledgeBaseSearchInte
 
     return (
         <div className="space-y-4">
-            <form className="space-y-4 rounded-lg border border-border/50 bg-white p-4" onSubmit={handleSearch}>
+            <form
+                className="space-y-4 rounded-lg border border-border/50 bg-surface-neutral-primary p-4"
+                onSubmit={handleSearch}
+            >
                 <fieldset className="space-y-4 border-0">
                     <div className="space-y-2">
                         <Label htmlFor="query">Search Query</Label>
@@ -129,7 +132,7 @@ const KnowledgeBaseSearchInterface = ({knowledgeBaseId}: KnowledgeBaseSearchInte
                 </fieldset>
 
                 {searchQuery && (
-                    <div className="flex items-center justify-between border-t border-gray-200 pt-4">
+                    <div className="flex items-center justify-between border-t border-stroke-neutral-secondary pt-4">
                         <p className="text-sm text-content-neutral-secondary">
                             Found {results.length} result{results.length !== 1 ? 's' : ''}
                         </p>

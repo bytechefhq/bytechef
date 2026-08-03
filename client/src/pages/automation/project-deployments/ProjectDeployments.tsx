@@ -270,7 +270,7 @@ const ProjectDeployments = () => {
                                 triggerNode={<Button>Create Deployment</Button>}
                             />
                         }
-                        icon={<Layers3Icon className="size-24 text-gray-300" />}
+                        icon={<Layers3Icon className="size-24 text-stroke-neutral-tertiary" />}
                         message="Get started by creating a new project deployment."
                         title="No Project Deployments"
                     />

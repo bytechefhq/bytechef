@@ -11,8 +11,8 @@ const KnowledgeBaseDocumentChunkListSelectionBar = () => {
     }
 
     return (
-        <div className="flex items-center justify-between rounded-lg border border-blue-200 bg-blue-50 p-3">
-            <span className="text-sm font-medium text-blue-900">{selectedCount} chunk(s) selected</span>
+        <div className="flex items-center justify-between rounded-lg border border-blue-200 bg-surface-brand-secondary p-3">
+            <span className="text-sm font-medium text-content-brand-primary">{selectedCount} chunk(s) selected</span>
 
             <div className="flex space-x-2">
                 <Button onClick={handleDeleteSelected} size="sm" variant="destructive">

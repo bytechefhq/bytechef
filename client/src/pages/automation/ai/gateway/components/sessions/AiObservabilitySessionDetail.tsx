@@ -9,9 +9,9 @@ interface AiObservabilitySessionDetailProps {
 }
 
 const TRACE_STATUS_CLASSES: Record<string, string> = {
-    ACTIVE: 'bg-blue-100 text-blue-800',
-    COMPLETED: 'bg-green-100 text-green-800',
-    ERROR: 'bg-red-100 text-red-800',
+    ACTIVE: 'bg-surface-brand-secondary text-content-brand-primary',
+    COMPLETED: 'bg-surface-success-secondary text-content-success-primary',
+    ERROR: 'bg-surface-destructive-secondary text-content-destructive',
 };
 
 const AiObservabilitySessionDetail = ({onBack, sessionId}: AiObservabilitySessionDetailProps) => {
@@ -102,7 +102,8 @@ const AiObservabilitySessionDetail = ({onBack, sessionId}: AiObservabilitySessio
                                 <span
                                     className={twMerge(
                                         'rounded-full px-2 py-0.5 text-xs font-medium',
-                                        TRACE_STATUS_CLASSES[trace.status] || 'bg-gray-100 text-gray-800'
+                                        TRACE_STATUS_CLASSES[trace.status] ||
+                                            'bg-surface-neutral-secondary text-content-neutral-primary'
                                     )}
                                 >
                                     {trace.status}

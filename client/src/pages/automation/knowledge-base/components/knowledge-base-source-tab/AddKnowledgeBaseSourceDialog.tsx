@@ -269,7 +269,7 @@ const AddKnowledgeBaseSourceDialog = ({knowledgeBaseId, trigger}: AddKnowledgeBa
                                                     aria-pressed={isSelected}
                                                     className={
                                                         isSelected
-                                                            ? 'flex w-full items-center justify-between rounded-md bg-blue-50 px-3 py-2 text-left'
+                                                            ? 'flex w-full items-center justify-between rounded-md bg-surface-brand-secondary px-3 py-2 text-left'
                                                             : 'flex w-full items-center justify-between rounded-md px-3 py-2 text-left hover:bg-muted'
                                                     }
                                                     data-testid={`kbs-connection-option-${connection.id}`}

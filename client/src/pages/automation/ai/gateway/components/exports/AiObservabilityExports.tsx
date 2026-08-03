@@ -130,11 +130,11 @@ const AiObservabilityExports = () => {
                                                     <span
                                                         className={`rounded-full px-2 py-0.5 text-xs font-medium ${
                                                             exportJob.status === 'COMPLETED'
-                                                                ? 'bg-green-100 text-green-800'
+                                                                ? 'bg-surface-success-secondary text-content-success-primary'
                                                                 : exportJob.status === 'FAILED'
-                                                                  ? 'bg-red-100 text-red-800'
+                                                                  ? 'bg-surface-destructive-secondary text-content-destructive'
                                                                   : exportJob.status === 'PROCESSING'
-                                                                    ? 'bg-blue-100 text-blue-800'
+                                                                    ? 'bg-surface-brand-secondary text-content-brand-primary'
                                                                     : 'bg-yellow-100 text-yellow-800'
                                                         }`}
                                                     >
@@ -158,7 +158,7 @@ const AiObservabilityExports = () => {
                                                         </a>
                                                     ) : exportJob.status === 'FAILED' && exportJob.errorMessage ? (
                                                         <span
-                                                            className="text-xs text-red-600"
+                                                            className="text-xs text-content-destructive"
                                                             title={exportJob.errorMessage}
                                                         >
                                                             Error

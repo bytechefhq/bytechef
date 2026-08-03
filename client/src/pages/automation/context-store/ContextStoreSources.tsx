@@ -194,7 +194,7 @@ const ContextStoreSources = () => {
                                 />
                             ) : undefined
                         }
-                        icon={<BoxesIcon className="size-24 text-gray-300" />}
+                        icon={<BoxesIcon className="size-24 text-stroke-neutral-tertiary" />}
                         message={
                             contextStore
                                 ? `Add a source to "${contextStore.name}" to start syncing records into this Context Store.`

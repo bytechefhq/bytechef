@@ -36,7 +36,7 @@ const AiSkillsLeftSidebar = ({currentId}: AiSkillsLeftSidebarProps) => {
                                                 <div
                                                     className={`flex size-5 shrink-0 items-center justify-center rounded ${getSkillColor(skill.id)}`}
                                                 >
-                                                    <ZapIcon className="size-3 text-white" />
+                                                    <ZapIcon className="size-3 text-content-onsurface-primary" />
                                                 </div>
                                             }
                                             item={{current: active, name: skill.name}}

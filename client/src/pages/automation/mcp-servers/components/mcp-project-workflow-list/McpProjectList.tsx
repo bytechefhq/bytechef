@@ -51,7 +51,7 @@ const McpProjectList = ({mcpServer}: McpProjectListProps) => {
                 button={
                     <McpProjectWorkflowDialog mcpServer={mcpServer} triggerNode={<Button label="Add Workflows" />} />
                 }
-                icon={<WorkflowIcon className="size-24 text-gray-300" />}
+                icon={<WorkflowIcon className="size-24 text-stroke-neutral-tertiary" />}
                 message="No MCP projects found for this server."
                 title="No MCP Projects"
             />

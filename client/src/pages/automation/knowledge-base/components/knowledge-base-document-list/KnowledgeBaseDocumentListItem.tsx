@@ -66,7 +66,7 @@ const KnowledgeBaseDocumentListItem = ({document, remainingTags, tags}: Knowledg
 
                         {document.sourceId && (
                             <span
-                                className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700"
+                                className="inline-flex items-center gap-1 rounded-full bg-surface-brand-secondary px-2 py-0.5 text-xs font-medium text-content-brand-primary"
                                 data-testid={`document-source-badge-${document.id}`}
                                 title="Synced from a Knowledge Base Source"
                             >

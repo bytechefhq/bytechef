@@ -114,7 +114,7 @@ const KnowledgeBases = () => {
                                         workspaceId={currentWorkspaceId}
                                     />
                                 }
-                                icon={<DatabaseIcon className="size-24 text-gray-300" />}
+                                icon={<DatabaseIcon className="size-24 text-stroke-neutral-tertiary" />}
                                 message={
                                     tagId
                                         ? 'No knowledge bases match the selected tag.'

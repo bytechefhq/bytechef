@@ -16,19 +16,19 @@ const VISIBILITY_CONFIG: Record<
     {className: string; icon: typeof LockIcon; label: string; tooltip: string}
 > = {
     ORGANIZATION: {
-        className: 'text-purple-500',
+        className: 'text-purple-500 dark:text-purple-400',
         icon: GlobeIcon,
         label: 'Organization',
         tooltip: 'Visible to every member across all workspaces in the organization.',
     },
     PRIVATE: {
-        className: 'text-gray-500',
+        className: 'text-gray-500 dark:text-gray-400',
         icon: LockIcon,
         label: 'Private',
         tooltip: 'Visible only to you. Share it to give named colleagues access.',
     },
     WORKSPACE: {
-        className: 'text-green-500',
+        className: 'text-green-500 dark:text-green-400',
         icon: BuildingIcon,
         label: 'Workspace',
         tooltip: 'Visible to every member of the current workspace.',

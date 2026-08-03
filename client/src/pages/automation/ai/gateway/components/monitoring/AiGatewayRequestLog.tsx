@@ -62,8 +62,8 @@ const AiGatewayRequestLog = ({requestLogs}: AiGatewayRequestLogProps) => {
                                         className={twMerge(
                                             'rounded-full px-2 py-0.5 text-xs font-medium',
                                             log.status != null && log.status >= 200 && log.status < 300
-                                                ? 'bg-green-100 text-green-800'
-                                                : 'bg-red-100 text-red-800'
+                                                ? 'bg-surface-success-secondary text-content-success-primary'
+                                                : 'bg-surface-destructive-secondary text-content-destructive'
                                         )}
                                     >
                                         {log.status ?? 'N/A'}

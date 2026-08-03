@@ -107,7 +107,7 @@ const AiGatewayProjects = () => {
                                         <td className="py-3">
                                             <span
                                                 className={twMerge(
-                                                    'rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-800'
+                                                    'rounded-full bg-surface-neutral-secondary px-2 py-0.5 text-xs font-medium text-content-neutral-primary'
                                                 )}
                                             >
                                                 {project.slug}

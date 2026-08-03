@@ -387,7 +387,7 @@ const AssetFiles = () => {
                                         Upload a File
                                     </Button>
                                 }
-                                icon={<FileTextIcon className="size-24 text-gray-300" />}
+                                icon={<FileTextIcon className="size-24 text-stroke-neutral-tertiary" />}
                                 message="Upload a file or drop one here to get started."
                                 title="No Files"
                             />
@@ -401,7 +401,7 @@ const AssetFiles = () => {
                         />
                     ) : (
                         <EmptyList
-                            icon={<FileTextIcon className="size-24 text-gray-300" />}
+                            icon={<FileTextIcon className="size-24 text-stroke-neutral-tertiary" />}
                             message="No files match the current filters."
                             title="No Matching Files"
                         />

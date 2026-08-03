@@ -223,7 +223,7 @@ export function ProjectShareDialog({
                     <div className="space-y-2">
                         <div className="flex items-center justify-between">
                             <Label className="text-sm font-medium" htmlFor="description">
-                                Description <span className="text-red-500">*</span>
+                                Description <span className="text-content-destructive">*</span>
                             </Label>
                         </div>
 

@@ -114,7 +114,7 @@ const ConnectionReassignmentDialog = ({onClose, open, userLogin, workspaceId}: C
                     </DialogHeader>
 
                     {reassignmentError && (
-                        <div className="flex items-start gap-2 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800">
+                        <div className="flex items-start gap-2 rounded-md border border-red-200 bg-surface-destructive-secondary p-3 text-sm text-content-destructive">
                             <AlertTriangleIcon className="mt-0.5 size-4 shrink-0" />
 
                             <span>{reassignmentError}</span>
@@ -122,7 +122,7 @@ const ConnectionReassignmentDialog = ({onClose, open, userLogin, workspaceId}: C
                     )}
 
                     {affectedWorkflowCount > 0 && (
-                        <div className="flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+                        <div className="flex items-start gap-2 rounded-md border border-amber-200 bg-surface-warning-secondary p-3 text-sm text-content-warning-primary">
                             <AlertTriangleIcon className="mt-0.5 size-4 shrink-0" />
 
                             <span>
@@ -136,19 +136,19 @@ const ConnectionReassignmentDialog = ({onClose, open, userLogin, workspaceId}: C
                         <Table>
                             <TableHeader>
                                 <TableRow className="border-b-border/50">
-                                    <TableHead className="sticky top-0 z-10 bg-white px-3 py-2 text-left text-xs font-medium tracking-wide text-gray-500 uppercase">
+                                    <TableHead className="sticky top-0 z-10 bg-surface-neutral-primary px-3 py-2 text-left text-xs font-medium tracking-wide text-content-neutral-secondary uppercase">
                                         Connection
                                     </TableHead>
 
-                                    <TableHead className="sticky top-0 z-10 bg-white px-3 py-2 text-left text-xs font-medium tracking-wide text-gray-500 uppercase">
+                                    <TableHead className="sticky top-0 z-10 bg-surface-neutral-primary px-3 py-2 text-left text-xs font-medium tracking-wide text-content-neutral-secondary uppercase">
                                         Scope
                                     </TableHead>
 
-                                    <TableHead className="sticky top-0 z-10 bg-white px-3 py-2 text-left text-xs font-medium tracking-wide text-gray-500 uppercase">
+                                    <TableHead className="sticky top-0 z-10 bg-surface-neutral-primary px-3 py-2 text-left text-xs font-medium tracking-wide text-content-neutral-secondary uppercase">
                                         Environment
                                     </TableHead>
 
-                                    <TableHead className="sticky top-0 z-10 bg-white px-3 py-2 text-right text-xs font-medium tracking-wide text-gray-500 uppercase">
+                                    <TableHead className="sticky top-0 z-10 bg-surface-neutral-primary px-3 py-2 text-right text-xs font-medium tracking-wide text-content-neutral-secondary uppercase">
                                         Workflows
                                     </TableHead>
                                 </TableRow>
@@ -186,7 +186,7 @@ const ConnectionReassignmentDialog = ({onClose, open, userLogin, workspaceId}: C
                                                 className={twMerge(
                                                     'px-3 py-2 text-right text-sm',
                                                     connection.dependentWorkflowCount > 0
-                                                        ? 'font-medium text-amber-600'
+                                                        ? 'font-medium text-content-warning-primary'
                                                         : 'text-muted-foreground'
                                                 )}
                                             >

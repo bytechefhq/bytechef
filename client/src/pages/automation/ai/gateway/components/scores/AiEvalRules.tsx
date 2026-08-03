@@ -99,7 +99,9 @@ const AiEvalRules = ({evalRules, isLoading}: AiEvalRulesProps) => {
                             <td className="px-3 py-2">
                                 <span
                                     className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                                        rule.enabled ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                                        rule.enabled
+                                            ? 'bg-surface-success-secondary text-content-success-primary'
+                                            : 'bg-surface-neutral-secondary text-content-neutral-primary'
                                     }`}
                                 >
                                     {rule.enabled ? 'Enabled' : 'Disabled'}
@@ -108,7 +110,7 @@ const AiEvalRules = ({evalRules, isLoading}: AiEvalRulesProps) => {
 
                             <td className="px-3 py-2">
                                 <button
-                                    className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800"
+                                    className="flex items-center gap-1 text-xs text-content-brand-primary"
                                     onClick={() => setHistoryRule(rule)}
                                     title="Run on historical traces"
                                 >
