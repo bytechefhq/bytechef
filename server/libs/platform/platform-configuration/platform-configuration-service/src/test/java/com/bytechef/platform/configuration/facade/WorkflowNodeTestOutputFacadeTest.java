@@ -64,6 +64,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -356,7 +357,7 @@ class WorkflowNodeTestOutputFacadeTest {
 
         OutputResponse outputResponse = outputResponseArgumentCaptor.getValue();
 
-        Map<String, Object> sampleOutput = (Map<String, Object>) outputResponse.sampleOutput();
+        Map<String, Object> sampleOutput = (Map<String, Object>) Objects.requireNonNull(outputResponse.sampleOutput());
 
         List<Map<String, Object>> sampleRows = (List<Map<String, Object>>) sampleOutput.get("rows");
 

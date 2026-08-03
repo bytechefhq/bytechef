@@ -17,7 +17,6 @@
 package com.bytechef.platform.util;
 
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.definition.BaseProperty;
 import com.bytechef.definition.BaseProperty.BaseArrayProperty;
 import com.bytechef.definition.BaseProperty.BaseObjectProperty;
@@ -123,8 +122,7 @@ public class PropertyUtils {
                         return null;
                     }
 
-                    List<? extends BaseProperty> items = arrayProperty.getItems()
-                        .orElse(List.of());
+                    List<? extends BaseProperty> items = arrayProperty.getItems();
 
                     if (items.isEmpty()) {
                         return null;
@@ -133,8 +131,7 @@ public class PropertyUtils {
                     BaseProperty firstItem = items.getFirst();
 
                     if (firstItem instanceof BaseObjectProperty<? extends BaseProperty> objectItem) {
-                        currentProperties = objectItem.getProperties()
-                            .orElse(List.of());
+                        currentProperties = objectItem.getProperties();
                     } else {
                         // first item is itself a leaf - no further children to traverse
                         return null;
@@ -152,8 +149,7 @@ public class PropertyUtils {
                     return null;
                 }
 
-                List<? extends BaseProperty> items = arrayProperty.getItems()
-                    .orElse(List.of());
+                List<? extends BaseProperty> items = arrayProperty.getItems();
 
                 if (items.isEmpty()) {
                     return null;
@@ -168,19 +164,16 @@ public class PropertyUtils {
 
     private static @Nullable List<? extends BaseProperty> childPropertiesOf(BaseProperty property) {
         if (property instanceof BaseObjectProperty<? extends BaseProperty> objectProperty) {
-            return objectProperty.getProperties()
-                .orElse(List.of());
+            return objectProperty.getProperties();
         }
 
         if (property instanceof BaseArrayProperty<? extends BaseProperty> arrayProperty) {
             // implicit descent into array items - accept `arrayProp.child` when parent is an array of objects
-            List<? extends BaseProperty> items = arrayProperty.getItems()
-                .orElse(List.of());
+            List<? extends BaseProperty> items = arrayProperty.getItems();
 
             if (items.size() == 1
                 && items.getFirst() instanceof BaseObjectProperty<? extends BaseProperty> objectItem) {
-                return objectItem.getProperties()
-                    .orElse(List.of());
+                return objectItem.getProperties();
             }
         }
 
@@ -188,7 +181,7 @@ public class PropertyUtils {
     }
 
     private static void checkArrayProperty(BaseArrayProperty<? extends BaseProperty> arrayProperty, boolean checkName) {
-        List<? extends BaseProperty> itemProperties = OptionalUtils.orElse(arrayProperty.getItems(), List.of());
+        List<? extends BaseProperty> itemProperties = arrayProperty.getItems();
 
         for (BaseProperty itemProperty : itemProperties) {
             String name = itemProperty.getName();
@@ -209,8 +202,7 @@ public class PropertyUtils {
     }
 
     private static void checkObjectProperty(BaseObjectProperty<? extends BaseProperty> objectProperty) {
-        List<? extends BaseProperty> objectProperties = OptionalUtils.orElse(
-            objectProperty.getProperties(), List.of());
+        List<? extends BaseProperty> objectProperties = objectProperty.getProperties();
 
         for (BaseProperty property : objectProperties) {
             String name = property.getName();
@@ -230,8 +222,7 @@ public class PropertyUtils {
             }
         }
 
-        List<? extends BaseProperty> objectAdditionalProperties = OptionalUtils.orElse(
-            objectProperty.getAdditionalProperties(), List.of());
+        List<? extends BaseProperty> objectAdditionalProperties = objectProperty.getAdditionalProperties();
 
         for (BaseProperty itemProperty : objectAdditionalProperties) {
             String name = itemProperty.getName();
@@ -245,7 +236,7 @@ public class PropertyUtils {
             }
 
             if (itemProperty instanceof BaseObjectProperty<?> curObjectProperty &&
-                !CollectionUtils.isEmpty(OptionalUtils.orElse(curObjectProperty.getProperties(), List.of()))) {
+                !CollectionUtils.isEmpty(curObjectProperty.getProperties())) {
 
                 checkObjectProperty(curObjectProperty);
             }

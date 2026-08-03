@@ -17,7 +17,6 @@
 package com.bytechef.platform.workflow.task.dispatcher.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.OptionalUtils;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -42,12 +41,10 @@ public class ObjectProperty extends ValueProperty<Map<String, ?>> {
         super(objectProperty);
 
         this.additionalProperties = CollectionUtils.map(
-            OptionalUtils.orElse(objectProperty.getAdditionalProperties(), List.of()),
-            valueProperty -> (ValueProperty<?>) toProperty(valueProperty));
-        this.multipleValues = OptionalUtils.orElse(objectProperty.getMultipleValues(), true);
-        this.options = CollectionUtils.map(OptionalUtils.orElse(objectProperty.getOptions(), List.of()), Option::new);
-        this.properties = CollectionUtils.map(
-            OptionalUtils.orElse(objectProperty.getProperties(), List.of()), Property::toProperty);
+            objectProperty.getAdditionalProperties(), valueProperty -> (ValueProperty<?>) toProperty(valueProperty));
+        this.multipleValues = objectProperty.getMultipleValues();
+        this.options = CollectionUtils.map(objectProperty.getOptions(), Option::new);
+        this.properties = CollectionUtils.map(objectProperty.getProperties(), Property::toProperty);
     }
 
     @Override

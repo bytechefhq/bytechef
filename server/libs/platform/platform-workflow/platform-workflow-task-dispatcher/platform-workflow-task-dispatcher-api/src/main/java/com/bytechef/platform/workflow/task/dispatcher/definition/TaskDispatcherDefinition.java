@@ -31,6 +31,8 @@ import java.util.Optional;
 @SuppressFBWarnings("EI")
 public interface TaskDispatcherDefinition {
 
+    int VERSION_1 = 1;
+
     /**
      *
      * @return
@@ -96,7 +98,9 @@ public interface TaskDispatcherDefinition {
      *
      * @return
      */
-    int getVersion();
+    default int getVersion() {
+        return VERSION_1;
+    }
 
     /**
      *
