@@ -25,7 +25,6 @@ import com.bytechef.component.definition.ActionContext.Suspend;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableClusterElementDefinition;
-import com.bytechef.component.definition.Property;
 import com.bytechef.platform.ai.tool.ToolSuspension;
 import com.bytechef.platform.ai.tool.ToolSuspensionException;
 import com.bytechef.platform.component.constant.MetadataConstants;
@@ -35,9 +34,7 @@ import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunc
 import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * Adapts the {@link ApprovalRequestApprovalAction} into a {@link MultipleConnectionsToolFunction} so the AI agent can
@@ -82,13 +79,11 @@ public class ApprovalRequestApprovalTool {
             .getPerform()
             .orElseThrow();
 
-        Optional<List<? extends Property>> propertiesOptional = actionDefinition.getProperties();
-
         return ComponentDsl.<MultipleConnectionsToolFunction>clusterElement("requestApproval")
             .title("Request Approval")
             .description("Sends an approval request and waits for a human to approve or reject.")
             .type(TOOLS)
-            .properties(propertiesOptional.orElse(List.of()))
+            .properties(actionDefinition.getProperties())
             .object(() -> (inputParameters, connectionParameters, extensions, componentConnections, context) -> {
                 if (context.isEditorEnvironment()) {
                     return EDITOR_ENVIRONMENT_RESULT;
