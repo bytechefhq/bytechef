@@ -95,7 +95,9 @@ const CustomComponentMetadata = ({customComponent}: CustomComponentMetadataProps
             />
         </div>
 
-        {customComponent.description && <p className="mt-2 text-sm text-gray-600">{customComponent.description}</p>}
+        {customComponent.description && (
+            <p className="mt-2 text-sm text-content-neutral-secondary">{customComponent.description}</p>
+        )}
     </div>
 );
 
@@ -106,7 +108,7 @@ interface CustomComponentDefinitionListProps {
 
 const CustomComponentDefinitionList = ({items, title}: CustomComponentDefinitionListProps) => (
     <div>
-        <h4 className="mb-2 flex items-center gap-1 text-sm font-semibold text-gray-700">
+        <h4 className="mb-2 flex items-center gap-1 text-sm font-semibold text-content-neutral-secondary">
             <ZapIcon className="size-4" />
 
             <span>
@@ -117,12 +119,14 @@ const CustomComponentDefinitionList = ({items, title}: CustomComponentDefinition
         {items.length > 0 ? (
             <ul className="space-y-2">
                 {items.map((item) => (
-                    <li className="rounded bg-gray-50 p-2" key={item.name}>
+                    <li className="rounded bg-surface-neutral-secondary p-2" key={item.name}>
                         <div className="text-sm font-medium">{item.title || item.name}</div>
 
                         <div className="text-xs text-content-neutral-secondary">{item.name}</div>
 
-                        {item.description && <div className="mt-1 text-xs text-gray-600">{item.description}</div>}
+                        {item.description && (
+                            <div className="mt-1 text-xs text-content-neutral-secondary">{item.description}</div>
+                        )}
                     </li>
                 ))}
             </ul>

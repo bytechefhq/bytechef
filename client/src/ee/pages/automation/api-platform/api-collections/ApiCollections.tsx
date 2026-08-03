@@ -126,7 +126,7 @@ const ApiCollections = () => {
                 ) : (
                     <EmptyList
                         button={<ApiCollectionDialog triggerNode={<Button label="New API Collection" />} />}
-                        icon={<Link2Icon className="size-12 text-gray-400" />}
+                        icon={<Link2Icon className="size-12 text-content-neutral-tertiary" />}
                         message="You do not have any API Collections created yet."
                         title="No API Collections"
                     />

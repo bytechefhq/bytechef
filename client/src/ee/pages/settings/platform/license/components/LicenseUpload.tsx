@@ -14,16 +14,20 @@ const LicenseUpload = () => {
 
                 <div
                     className={twMerge(
-                        'flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-10',
-                        uploading ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:bg-gray-50'
+                        'flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-stroke-neutral-tertiary p-10',
+                        uploading
+                            ? 'cursor-not-allowed opacity-50'
+                            : 'cursor-pointer hover:bg-surface-neutral-primary-hover'
                     )}
                     onClick={() => !uploading && document.getElementById('license-file-upload')?.click()}
                 >
-                    <UploadIcon className="mb-2 size-8 text-gray-400" />
+                    <UploadIcon className="mb-2 size-8 text-content-neutral-tertiary" />
 
-                    <p className="text-sm text-gray-600">Drop your license file here or click to browse</p>
+                    <p className="text-sm text-content-neutral-secondary">
+                        Drop your license file here or click to browse
+                    </p>
 
-                    <p className="mt-1 text-xs text-gray-400">.lic files only</p>
+                    <p className="mt-1 text-xs text-content-neutral-tertiary">.lic files only</p>
 
                     <input
                         accept=".lic"
@@ -40,12 +44,12 @@ const LicenseUpload = () => {
                 <div className="space-y-2">
                     <Label>Selected File</Label>
 
-                    <div className="flex items-center justify-between rounded-md border border-gray-200 bg-gray-50 p-2 px-3">
+                    <div className="flex items-center justify-between rounded-md border border-stroke-neutral-secondary bg-surface-neutral-secondary p-2 px-3">
                         <span className="truncate text-sm font-medium">{selectedFile.name}</span>
 
                         {!uploading && (
                             <button
-                                className="ml-2 rounded-full p-1 hover:bg-gray-200"
+                                className="ml-2 rounded-full p-1 hover:bg-surface-neutral-secondary-hover"
                                 onClick={(event) => {
                                     event.stopPropagation();
                                     removeFile();

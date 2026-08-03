@@ -29,35 +29,35 @@ const IdentityProvidersTable = () => {
         <Table>
             <TableHeader>
                 <TableRow className="border-b-border/50">
-                    <TableHead className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium tracking-wide text-content-neutral-secondary uppercase">
+                    <TableHead className="sticky top-0 z-10 bg-surface-neutral-primary p-3 text-left text-xs font-medium tracking-wide text-content-neutral-secondary uppercase">
                         Name
                     </TableHead>
 
-                    <TableHead className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium tracking-wide text-content-neutral-secondary uppercase">
+                    <TableHead className="sticky top-0 z-10 bg-surface-neutral-primary p-3 text-left text-xs font-medium tracking-wide text-content-neutral-secondary uppercase">
                         Type
                     </TableHead>
 
-                    <TableHead className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium tracking-wide text-content-neutral-secondary uppercase">
+                    <TableHead className="sticky top-0 z-10 bg-surface-neutral-primary p-3 text-left text-xs font-medium tracking-wide text-content-neutral-secondary uppercase">
                         Issuer / Metadata URI
                     </TableHead>
 
-                    <TableHead className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium tracking-wide text-content-neutral-secondary uppercase">
+                    <TableHead className="sticky top-0 z-10 bg-surface-neutral-primary p-3 text-left text-xs font-medium tracking-wide text-content-neutral-secondary uppercase">
                         Domains
                     </TableHead>
 
-                    <TableHead className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium tracking-wide text-content-neutral-secondary uppercase">
+                    <TableHead className="sticky top-0 z-10 bg-surface-neutral-primary p-3 text-left text-xs font-medium tracking-wide text-content-neutral-secondary uppercase">
                         Status
                     </TableHead>
 
-                    <TableHead className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium tracking-wide text-content-neutral-secondary uppercase">
+                    <TableHead className="sticky top-0 z-10 bg-surface-neutral-primary p-3 text-left text-xs font-medium tracking-wide text-content-neutral-secondary uppercase">
                         Enforced
                     </TableHead>
 
-                    <TableHead className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium tracking-wide text-content-neutral-secondary uppercase">
+                    <TableHead className="sticky top-0 z-10 bg-surface-neutral-primary p-3 text-left text-xs font-medium tracking-wide text-content-neutral-secondary uppercase">
                         MCP
                     </TableHead>
 
-                    <TableHead className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium tracking-wide text-content-neutral-secondary uppercase" />
+                    <TableHead className="sticky top-0 z-10 bg-surface-neutral-primary p-3 text-left text-xs font-medium tracking-wide text-content-neutral-secondary uppercase" />
                 </TableRow>
             </TableHeader>
 

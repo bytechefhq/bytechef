@@ -40,7 +40,7 @@ const ApiConnectorWizardEndpointsStep = () => {
                     {endpoints.map((endpoint) => (
                         <li
                             aria-label={`Edit ${endpoint.operationId} endpoint`}
-                            className="flex cursor-pointer items-center justify-between p-3 hover:bg-gray-50 focus-visible:bg-gray-50 focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:outline-hidden focus-visible:ring-inset"
+                            className="flex cursor-pointer items-center justify-between p-3 hover:bg-surface-neutral-primary-hover focus-visible:bg-surface-neutral-primary-hover focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:outline-hidden focus-visible:ring-inset"
                             key={endpoint.id}
                             onClick={() => openEditDialog(endpoint)}
                             onKeyDown={(event) => {
@@ -65,7 +65,7 @@ const ApiConnectorWizardEndpointsStep = () => {
 
                                     <p className="text-xs text-content-neutral-secondary">{endpoint.path}</p>
 
-                                    <div className="mt-1 flex gap-2 text-xs text-gray-400">
+                                    <div className="mt-1 flex gap-2 text-xs text-content-neutral-tertiary">
                                         {endpoint.parameters.length > 0 && (
                                             <span>{endpoint.parameters.length} param(s)</span>
                                         )}

@@ -73,7 +73,10 @@ const WorkspaceListItem = ({workspace}: WorkspaceListItemProps) => {
     };
 
     return (
-        <li className="relative flex items-center justify-between px-2 py-5 hover:bg-gray-50" key={workspace.id}>
+        <li
+            className="relative flex items-center justify-between px-2 py-5 hover:bg-surface-neutral-primary-hover"
+            key={workspace.id}
+        >
             <div className="flex-1">
                 <span className="text-base">{workspace.name}</span>
             </div>

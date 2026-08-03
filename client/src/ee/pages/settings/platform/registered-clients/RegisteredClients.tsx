@@ -123,7 +123,7 @@ const RegisteredClients = () => {
                                     <TableRow className="border-b-border/50" key={headerGroup.id}>
                                         {headerGroup.headers.map((header) => (
                                             <TableHead
-                                                className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium tracking-wide text-content-neutral-secondary uppercase"
+                                                className="sticky top-0 z-10 bg-surface-neutral-primary p-3 text-left text-xs font-medium tracking-wide text-content-neutral-secondary uppercase"
                                                 key={header.id}
                                             >
                                                 {!header.isPlaceholder &&
@@ -156,7 +156,7 @@ const RegisteredClients = () => {
                     </div>
                 ) : (
                     <EmptyList
-                        icon={<KeyIcon className="size-24 text-gray-300" />}
+                        icon={<KeyIcon className="size-24 text-stroke-neutral-tertiary" />}
                         message="Clients registered through Dynamic Client Registration will appear here."
                         title="No OAuth2 Clients"
                     />

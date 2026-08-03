@@ -19,7 +19,7 @@ const ConnectedUserMcpServerListItemToolRow = ({tool}: {tool: ConnectedUserMcpSe
     });
 
     return (
-        <li className="flex items-center justify-between rounded-md p-2 py-1 hover:bg-gray-50">
+        <li className="flex items-center justify-between rounded-md p-2 py-1 hover:bg-surface-neutral-primary-hover">
             <div className="flex items-center gap-x-2 text-sm font-semibold">
                 {componentDefinition?.icon && (
                     <div className="flex items-center justify-center rounded-full border p-1">

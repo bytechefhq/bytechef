@@ -34,12 +34,12 @@ const ApiCollectionEndpointList = ({
             {apiCollectionEndpoints && apiCollectionEndpoints.length > 0 ? (
                 <>
                     <div className="mb-1 flex items-center justify-between">
-                        <h3 className="flex justify-start pl-3 text-sm font-semibold text-gray-400 uppercase">
+                        <h3 className="flex justify-start pl-3 text-sm font-semibold text-content-neutral-tertiary uppercase">
                             Endpoints
                         </h3>
                     </div>
 
-                    <ul className="divide-y divide-gray-100">
+                    <ul className="divide-y divide-stroke-neutral-primary">
                         {apiCollectionEndpoints?.map((apiCollectionEndpoint) => (
                             <li
                                 className="flex items-center justify-between rounded-md p-2 px-3 hover:bg-destructive-foreground"
@@ -83,7 +83,7 @@ const ApiCollectionEndpointList = ({
                                 triggerNode={<Button label="Create API Endpoint" />}
                             />
                         }
-                        icon={<WorkflowIcon className="size-24 text-gray-300" />}
+                        icon={<WorkflowIcon className="size-24 text-stroke-neutral-tertiary" />}
                         message="Get started by creating an API endpoint."
                         title="No API Endpoints"
                     />

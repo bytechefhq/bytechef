@@ -52,7 +52,7 @@ const ApiKeysContent = ({description, title}: {description: string; title: strin
                 ) : (
                     <EmptyList
                         button={<Button onClick={() => setShowEditDialog(true)}>New API Key</Button>}
-                        icon={<KeyIcon className="size-24 text-gray-300" />}
+                        icon={<KeyIcon className="size-24 text-stroke-neutral-tertiary" />}
                         message="Get started by creating a new API key."
                         title="No API Keys"
                     />

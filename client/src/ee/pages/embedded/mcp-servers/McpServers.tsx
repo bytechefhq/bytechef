@@ -83,7 +83,7 @@ const McpServers = () => {
                         button={
                             <McpServerDialog mcpServer={undefined} triggerNode={<Button label="Create MCP Server" />} />
                         }
-                        icon={<ServerIcon className="size-24 text-gray-300" />}
+                        icon={<ServerIcon className="size-24 text-stroke-neutral-tertiary" />}
                         message="Get started by creating a new MCP server."
                         title="No MCP Servers"
                     />

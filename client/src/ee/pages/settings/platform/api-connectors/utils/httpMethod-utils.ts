@@ -13,11 +13,11 @@ export const getHttpMethodBadgeColor = (method?: HttpMethod | null): string => {
         case HttpMethod.Put:
             return 'text-content-warning-primary';
         case HttpMethod.Patch:
-            return 'text-orange-700';
+            return 'text-orange-700 dark:text-orange-400';
         case HttpMethod.Delete:
             return 'text-content-destructive-primary';
         default:
-            return 'text-gray-700';
+            return 'text-content-neutral-secondary';
     }
 };
 
@@ -28,16 +28,16 @@ export const getHttpMethodBadgeColor = (method?: HttpMethod | null): string => {
 export const getHttpMethodPillColor = (method?: string | null): string => {
     switch (method?.toUpperCase()) {
         case 'GET':
-            return 'bg-green-100 text-green-800';
+            return 'bg-surface-success-secondary text-content-success-primary';
         case 'POST':
-            return 'bg-blue-100 text-blue-800';
+            return 'bg-surface-brand-secondary text-content-brand-primary';
         case 'PUT':
             return 'bg-yellow-100 text-yellow-800';
         case 'PATCH':
-            return 'bg-orange-100 text-orange-800';
+            return 'bg-surface-warning-secondary text-content-warning-primary';
         case 'DELETE':
-            return 'bg-red-100 text-red-800';
+            return 'bg-surface-destructive-secondary text-content-destructive';
         default:
-            return 'bg-gray-100 text-gray-800';
+            return 'bg-surface-neutral-secondary text-content-neutral-primary';
     }
 };

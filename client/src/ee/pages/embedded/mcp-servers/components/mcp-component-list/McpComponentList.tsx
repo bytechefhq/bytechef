@@ -62,7 +62,7 @@ const McpComponentList = ({mcpServer}: {mcpServer: McpServer}) => {
                 <div className="flex justify-center py-8">
                     <EmptyList
                         button={<Button label="Add Component" onClick={() => setShowAddDialog(true)} />}
-                        icon={<ComponentIcon className="size-24 text-gray-300" />}
+                        icon={<ComponentIcon className="size-24 text-stroke-neutral-tertiary" />}
                         message="Get started by creating a new component."
                         title="No Components"
                     />

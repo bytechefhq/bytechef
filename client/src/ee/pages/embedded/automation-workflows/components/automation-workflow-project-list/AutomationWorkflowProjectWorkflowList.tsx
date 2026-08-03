@@ -40,7 +40,7 @@ const AutomationWorkflowProjectWorkflowList = ({
                 <>
                     <h3 className="flex justify-start pl-3 text-sm heading-tertiary">Workflows</h3>
 
-                    <ul className="divide-y divide-gray-100">
+                    <ul className="divide-y divide-stroke-neutral-primary">
                         {workflows.map((workflow) => (
                             <AutomationWorkflowProjectWorkflowListItem
                                 key={workflow.workflowUuid}
@@ -65,7 +65,7 @@ const AutomationWorkflowProjectWorkflowList = ({
                                 }}
                             />
                         }
-                        icon={<WorkflowIcon className="size-24 text-gray-300" />}
+                        icon={<WorkflowIcon className="size-24 text-stroke-neutral-tertiary" />}
                         message="Get started by creating a new workflow."
                         title="No Workflows"
                     />

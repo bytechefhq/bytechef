@@ -96,31 +96,31 @@ const LicenseDetails = ({licence}: LicenseDetailsProps) => {
 
                 <dl className="grid grid-cols-2 gap-x-6 gap-y-4 text-sm">
                     <div>
-                        <dt className="font-medium text-gray-500">Holder Name</dt>
+                        <dt className="font-medium text-content-neutral-secondary">Holder Name</dt>
 
                         <dd className="mt-1">{licence.holderName || '—'}</dd>
                     </div>
 
                     <div>
-                        <dt className="font-medium text-gray-500">Holder Email</dt>
+                        <dt className="font-medium text-content-neutral-secondary">Holder Email</dt>
 
                         <dd className="mt-1">{licence.holderEmail || '—'}</dd>
                     </div>
 
                     <div>
-                        <dt className="font-medium text-gray-500">Issued At</dt>
+                        <dt className="font-medium text-content-neutral-secondary">Issued At</dt>
 
                         <dd className="mt-1">{formattedIssuedAt}</dd>
                     </div>
 
                     <div>
-                        <dt className="font-medium text-gray-500">Expires At</dt>
+                        <dt className="font-medium text-content-neutral-secondary">Expires At</dt>
 
                         <dd className="mt-1">{formattedExpiresAt}</dd>
                     </div>
 
                     <div>
-                        <dt className="font-medium text-gray-500">Allowed Jobs</dt>
+                        <dt className="font-medium text-content-neutral-secondary">Allowed Jobs</dt>
 
                         <dd className="mt-1">
                             {licence.allowedJobs == null ? 'Unlimited' : String(licence.allowedJobs)}
@@ -128,13 +128,13 @@ const LicenseDetails = ({licence}: LicenseDetailsProps) => {
                     </div>
 
                     <div>
-                        <dt className="font-medium text-gray-500">Jobs Used This Month</dt>
+                        <dt className="font-medium text-content-neutral-secondary">Jobs Used This Month</dt>
 
                         <dd className="mt-1">{String(licence.currentMonthJobUsage || 0)}</dd>
                     </div>
 
                     <div>
-                        <dt className="font-medium text-gray-500">Max Users</dt>
+                        <dt className="font-medium text-content-neutral-secondary">Max Users</dt>
 
                         <dd className="mt-1">{licence.maxUsers == null ? 'Unlimited' : String(licence.maxUsers)}</dd>
                     </div>
@@ -142,7 +142,7 @@ const LicenseDetails = ({licence}: LicenseDetailsProps) => {
 
                 {licence.features.length > 0 && (
                     <div className="mt-4">
-                        <p className="mb-2 text-sm font-medium text-gray-500">Features</p>
+                        <p className="mb-2 text-sm font-medium text-content-neutral-secondary">Features</p>
 
                         <div className="flex flex-wrap gap-2">
                             {licence.features.map((feature) => (

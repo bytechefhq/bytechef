@@ -52,7 +52,7 @@ const ApiClients = () => {
                 ) : (
                     <EmptyList
                         button={<Button onClick={() => setShowEditDialog(true)}>New API Client</Button>}
-                        icon={<KeyIcon className="size-24 text-gray-300" />}
+                        icon={<KeyIcon className="size-24 text-stroke-neutral-tertiary" />}
                         message="Get started by creating a new API client."
                         title="No API Clients"
                     />

@@ -62,7 +62,7 @@ const McpComponentToolList = ({
         <div className="flex justify-center py-4">
             <EmptyList
                 button={<Button label="Edit Tools" onClick={() => setShowEditDialog(true)} />}
-                icon={<ComponentIcon className="size-12 text-gray-300" />}
+                icon={<ComponentIcon className="size-12 text-stroke-neutral-tertiary" />}
                 message="This component has no selected tools."
                 title="No Tools"
             />

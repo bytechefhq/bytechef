@@ -153,7 +153,7 @@ const ApiCollectionListItem = ({apiCollection, tags}: ApiCollectionListItemProps
                         <div className="mt-2 sm:flex sm:items-center sm:justify-between">
                             <div className="flex items-center">
                                 <CollapsibleTrigger
-                                    className="group mr-4 flex text-xs font-semibold text-gray-700"
+                                    className="group mr-4 flex text-xs font-semibold text-content-neutral-secondary"
                                     ref={endpointsCollapsibleTriggerRef}
                                 >
                                     <span className="mr-1">

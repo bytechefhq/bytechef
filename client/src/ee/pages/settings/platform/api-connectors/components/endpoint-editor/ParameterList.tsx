@@ -73,7 +73,7 @@ const ParameterList = ({onChange, parameters}: ParameterListProps) => {
 
                         return (
                             <li
-                                className="flex cursor-pointer items-center justify-between p-2 hover:bg-gray-50"
+                                className="flex cursor-pointer items-center justify-between p-2 hover:bg-surface-neutral-primary-hover"
                                 key={parameter.id}
                                 onClick={() => handleEditDialog(parameter)}
                                 onKeyDown={(event) => handleKeyDown(event, parameter)}
@@ -81,13 +81,15 @@ const ParameterList = ({onChange, parameters}: ParameterListProps) => {
                                 tabIndex={0}
                             >
                                 <div className="flex items-center gap-2">
-                                    <span className="rounded bg-gray-100 px-1.5 py-0.5 text-xs">{locationLabel}</span>
+                                    <span className="rounded bg-surface-neutral-secondary px-1.5 py-0.5 text-xs">
+                                        {locationLabel}
+                                    </span>
 
                                     <span className="font-medium">{parameter.name}</span>
 
                                     <span className="text-xs text-content-neutral-secondary">({parameter.type})</span>
 
-                                    {parameter.required && <span className="text-xs text-red-500">*</span>}
+                                    {parameter.required && <span className="text-xs text-content-destructive">*</span>}
                                 </div>
 
                                 <Button

@@ -62,7 +62,7 @@ const ResponseEditor = ({onChange, responses}: ResponseEditorProps) => {
                 <ul className="divide-y rounded-md border text-sm">
                     {responsesWithIds.map((response) => (
                         <li
-                            className="flex cursor-pointer items-center justify-between p-2 hover:bg-gray-50"
+                            className="flex cursor-pointer items-center justify-between p-2 hover:bg-surface-neutral-primary-hover"
                             key={response.id}
                             onClick={() => handleEditDialog(response)}
                             onKeyDown={(event) => {
@@ -81,10 +81,12 @@ const ResponseEditor = ({onChange, responses}: ResponseEditorProps) => {
                                     {response.statusCode}
                                 </span>
 
-                                <span className="text-gray-600">{response.description}</span>
+                                <span className="text-content-neutral-secondary">{response.description}</span>
 
                                 {response.contentType && (
-                                    <span className="text-xs text-gray-400">({response.contentType})</span>
+                                    <span className="text-xs text-content-neutral-tertiary">
+                                        ({response.contentType})
+                                    </span>
                                 )}
                             </div>
 

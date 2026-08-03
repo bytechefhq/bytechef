@@ -44,7 +44,7 @@ const McpComponentDialogComponentSelectionStep = ({onComponentSelect, open}: Com
                                     {component.icon ? (
                                         <InlineSVG className="size-12" src={component.icon} />
                                     ) : (
-                                        <PackageIcon className="size-12 text-gray-400" />
+                                        <PackageIcon className="size-12 text-content-neutral-tertiary" />
                                     )}
                                 </div>
 

@@ -31,7 +31,7 @@ const Workspaces = () => {
                 ) : (
                     <EmptyList
                         button={<WorkspaceDialog triggerNode={<Button>New Workspace</Button>} />}
-                        icon={<ZapIcon className="size-24 text-gray-300" />}
+                        icon={<ZapIcon className="size-24 text-stroke-neutral-tertiary" />}
                         message="Get started by creating a workspace."
                         title="No Workspaces"
                     />

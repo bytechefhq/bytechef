@@ -57,7 +57,7 @@ const McpIntegrationInstanceConfigurationList = ({mcpServer}: McpIntegrationInst
                         triggerNode={<Button label="Add Workflows" />}
                     />
                 }
-                icon={<WorkflowIcon className="size-24 text-gray-300" />}
+                icon={<WorkflowIcon className="size-24 text-stroke-neutral-tertiary" />}
                 message="No MCP integrations found for this server."
                 title="No MCP Integrations"
             />

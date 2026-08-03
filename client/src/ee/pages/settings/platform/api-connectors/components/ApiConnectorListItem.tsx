@@ -33,7 +33,7 @@ const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
     } = useApiConnectorListItem({apiConnector});
 
     return (
-        <Collapsible className="w-full rounded-md px-2 py-5 hover:bg-gray-50">
+        <Collapsible className="w-full rounded-md px-2 py-5 hover:bg-surface-neutral-primary-hover">
             <div className="flex items-center justify-between">
                 <div className="flex-1">
                     <div className="flex items-center justify-between">
@@ -66,7 +66,7 @@ const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
 
                     <div className="mt-2 sm:flex sm:items-center sm:justify-between">
                         <div className="flex items-center">
-                            <CollapsibleTrigger className="group mr-4 flex text-xs font-semibold text-gray-700">
+                            <CollapsibleTrigger className="group mr-4 flex text-xs font-semibold text-content-neutral-secondary">
                                 <span className="mr-1">
                                     {apiConnector.endpoints?.length === 1
                                         ? `1 endpoint`
@@ -112,7 +112,10 @@ const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
 
                             <DropdownMenuSeparator />
 
-                            <DropdownMenuItem className="text-red-600" onClick={() => setShowDeleteDialog(true)}>
+                            <DropdownMenuItem
+                                className="text-content-destructive"
+                                onClick={() => setShowDeleteDialog(true)}
+                            >
                                 Delete
                             </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -125,7 +128,7 @@ const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
                     <ul className="space-y-1 border-t pt-4">
                         {apiConnector.endpoints.map((endpoint) => (
                             <li
-                                className="flex items-center justify-between rounded-md p-2 hover:bg-gray-50"
+                                className="flex items-center justify-between rounded-md p-2 hover:bg-surface-neutral-primary-hover"
                                 key={endpoint.id}
                             >
                                 <ApiConnectorEndpointListItem

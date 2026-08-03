@@ -142,7 +142,7 @@ const IntegrationInstanceConfigurationListItem = ({
                                         />
                                     )}
 
-                                    <span className="text-base font-semibold text-gray-900">
+                                    <span className="text-base font-semibold text-content-neutral-primary">
                                         {integrationInstanceConfiguration?.name}
                                     </span>
                                 </div>

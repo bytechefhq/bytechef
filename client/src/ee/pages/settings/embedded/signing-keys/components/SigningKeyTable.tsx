@@ -36,7 +36,7 @@ const SigningKeyTable = ({signingKeys}: SigningKeyTableProps) => {
 
                         <Button
                             className="invisible group-hover:visible"
-                            icon={<ClipboardIcon aria-hidden="true" className="size-4 text-gray-400" />}
+                            icon={<ClipboardIcon aria-hidden="true" className="size-4 text-content-neutral-tertiary" />}
                             onClick={() => copyToClipboard(info.getValue())}
                             size="icon"
                             variant="ghost"
@@ -111,7 +111,7 @@ const SigningKeyTable = ({signingKeys}: SigningKeyTableProps) => {
                         <TableRow className="border-b-border/50" key={headerGroup.id}>
                             {headerGroup.headers.map((header) => (
                                 <TableHead
-                                    className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium tracking-wide text-content-neutral-secondary uppercase"
+                                    className="sticky top-0 z-10 bg-surface-neutral-primary p-3 text-left text-xs font-medium tracking-wide text-content-neutral-secondary uppercase"
                                     key={header.id}
                                 >
                                     {!header.isPlaceholder &&

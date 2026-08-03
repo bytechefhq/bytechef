@@ -123,7 +123,7 @@ const ApiCollectionEndpointListItem = ({
             case 'PATCH':
                 return {
                     icon: <FolderSyncIcon className="size-3" />,
-                    textColor: 'text-orange-700',
+                    textColor: 'text-orange-700 dark:text-orange-400',
                 };
             case 'DELETE':
                 return {

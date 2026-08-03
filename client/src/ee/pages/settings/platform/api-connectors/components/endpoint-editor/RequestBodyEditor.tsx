@@ -78,9 +78,11 @@ const RequestBodyEditor = ({onChange, requestBody}: RequestBodyEditorProps) => {
             {requestBody ? (
                 <div className="rounded-md border p-2 text-sm">
                     <div className="flex items-center gap-2">
-                        <span className="rounded bg-gray-100 px-1.5 py-0.5 text-xs">{requestBody.contentType}</span>
+                        <span className="rounded bg-surface-neutral-secondary px-1.5 py-0.5 text-xs">
+                            {requestBody.contentType}
+                        </span>
 
-                        {requestBody.required && <span className="text-xs text-red-500">Required</span>}
+                        {requestBody.required && <span className="text-xs text-content-destructive">Required</span>}
                     </div>
 
                     {requestBody.description && (

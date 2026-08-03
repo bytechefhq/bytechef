@@ -140,7 +140,7 @@ const Integrations = () => {
                                 </DropdownMenu>
                             </ButtonGroup>
                         }
-                        icon={<SquareIcon className="size-24 text-gray-300" />}
+                        icon={<SquareIcon className="size-24 text-stroke-neutral-tertiary" />}
                         message="Get started by creating a new integrations."
                         title="No Integrations"
                     />

@@ -73,7 +73,7 @@ const Components = ({tab}: ComponentsProps) => {
                         ) : (
                             <EmptyList
                                 button={<NewComponentMenu />}
-                                icon={<Link2Icon className="size-12 text-gray-400" />}
+                                icon={<Link2Icon className="size-12 text-content-neutral-tertiary" />}
                                 message="You do not have any Custom Components created yet."
                                 title="No Custom Components"
                             />
@@ -87,7 +87,7 @@ const Components = ({tab}: ComponentsProps) => {
                             ) : (
                                 <EmptyList
                                     button={<NewComponentMenu />}
-                                    icon={<Link2Icon className="size-12 text-gray-400" />}
+                                    icon={<Link2Icon className="size-12 text-content-neutral-tertiary" />}
                                     message="You do not have any API Connectors created yet."
                                     title="No API Connectors"
                                 />

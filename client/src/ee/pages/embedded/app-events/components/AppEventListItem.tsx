@@ -54,7 +54,7 @@ const AppEventListItem = ({appEvent}: AppEventListItemProps) => {
 
     return (
         <li
-            className="relative mb-2 flex items-center justify-between rounded border border-border/50 px-3 py-3 hover:bg-gray-50"
+            className="relative mb-2 flex items-center justify-between rounded border border-border/50 px-3 py-3 hover:bg-surface-neutral-primary-hover"
             key={appEvent.id}
         >
             <div className="flex-1">
