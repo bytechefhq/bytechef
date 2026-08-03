@@ -1,7 +1,7 @@
 import {Node} from '@xyflow/react';
 import {describe, expect, it} from 'vitest';
 
-import isElkLayoutSupported from './isElkLayoutSupported';
+import isElkLayoutSupported, {isElkLayoutActive} from './isElkLayoutSupported';
 
 const taskNode = (id: string): Node => ({
     data: {componentName: 'mailchimp', workflowNodeName: id},
@@ -62,6 +62,15 @@ describe('isElkLayoutSupported', () => {
         }
     });
 
+    it('supports graph dispatchers — a graph-containing workflow is ELK-supported', () => {
+        // Regression pin: omitting 'graph' from ELK_FRAME_DISPATCHER_COMPONENT_NAMES
+        // would silently disable ELK for the WHOLE workflow (every node must pass,
+        // see isElkLayoutSupported's every() gate), not just fail to render the graph.
+        const nodes = [taskNode('task1'), dispatcherNode('graph_1', 'graph'), taskNode('task2')];
+
+        expect(isElkLayoutSupported(nodes)).toBe(true);
+    });
+
     it('supports each, map, and on-error dispatchers', () => {
         for (const componentName of ['each', 'map', 'on-error']) {
             expect(isElkLayoutSupported([taskNode('task1'), dispatcherNode('dispatcher_1', componentName)])).toBe(true);
@@ -87,5 +96,19 @@ describe('isElkLayoutSupported', () => {
 
     it('supports an empty node list', () => {
         expect(isElkLayoutSupported([])).toBe(true);
+    });
+});
+
+describe('isElkLayoutActive', () => {
+    it('is false when the layout engine is dagre, even for a fully-supported node set', () => {
+        expect(isElkLayoutActive('dagre', [taskNode('task1')])).toBe(false);
+    });
+
+    it('is false when the layout engine is elk but the node set is unsupported', () => {
+        expect(isElkLayoutActive('elk', [dispatcherNode('mystery_1', 'mystery-dispatcher')])).toBe(false);
+    });
+
+    it('is true when the layout engine is elk and the node set is supported', () => {
+        expect(isElkLayoutActive('elk', [taskNode('task1'), dispatcherNode('condition_1', 'condition')])).toBe(true);
     });
 });

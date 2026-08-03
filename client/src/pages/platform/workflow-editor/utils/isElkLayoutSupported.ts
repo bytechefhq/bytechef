@@ -2,6 +2,8 @@ import {CHILDLESS_TASK_DISPATCHER_NAMES} from '@/shared/constants';
 import {NodeDataType} from '@/shared/types';
 import {Node} from '@xyflow/react';
 
+import {LayoutEngineType} from '../stores/useLayoutEngineStore';
+
 // Dispatchers the ELK engine lays out as compound frames (every task
 // dispatcher with children). Childless dispatchers (loopBreak, subflow,
 // terminate) own no children and lay out as plain chain nodes, so they are
@@ -11,6 +13,7 @@ export const ELK_FRAME_DISPATCHER_COMPONENT_NAMES = [
     'condition',
     'each',
     'fork-join',
+    'graph',
     'loop',
     'map',
     'on-error',
@@ -43,4 +46,16 @@ export default function isElkLayoutSupported(nodes: Node[]): boolean {
 
         return true;
     });
+}
+
+/**
+ * Shared gate for "is the ELK engine actually in effect for this node set" — used both to
+ * decide the transition-overlay behavior and to pick the layout function. The predicate only
+ * inspects each node's taskDispatcher/componentName fields, so it is equivalent whether it is
+ * run over the full node array or a dispatcher-scoped subset; callers pass whichever array they
+ * already have on hand. Extracted so the two call sites can never diverge (previously each
+ * inlined `layoutEngine === 'elk' && isElkLayoutSupported(<nodes>)` separately).
+ */
+export function isElkLayoutActive(layoutEngine: LayoutEngineType, nodes: Node[]): boolean {
+    return layoutEngine === 'elk' && isElkLayoutSupported(nodes);
 }

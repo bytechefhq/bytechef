@@ -42,6 +42,8 @@ import createEachEdges from '../utils/createEachEdges';
 import createEachNode from '../utils/createEachNode';
 import createForkJoinEdges from '../utils/createForkJoinEdges';
 import createForkJoinNode from '../utils/createForkJoinNode';
+import createGraphEdges from '../utils/createGraphEdges';
+import createGraphNode from '../utils/createGraphNode';
 import createLoopEdges from '../utils/createLoopEdges';
 import createLoopNode from '../utils/createLoopNode';
 import createMapEdges from '../utils/createMapEdges';
@@ -52,7 +54,7 @@ import createParallelEdges from '../utils/createParallelEdges';
 import createParallelNode from '../utils/createParallelNode';
 import {getElkLayoutElements} from '../utils/elkLayoutUtils';
 import extractDefinitionPositions from '../utils/extractDefinitionPositions';
-import isElkLayoutSupported from '../utils/isElkLayoutSupported';
+import {isElkLayoutActive} from '../utils/isElkLayoutSupported';
 import {createLayoutRetryState, onLayoutFailure, onLayoutSuccess} from '../utils/layoutRetryController';
 import {
     buildTriggerNodes,
@@ -71,6 +73,25 @@ import {forEachNestedTaskGroup} from '../utils/taskTraversalUtils';
  * (task names, types, nested task counts) but NOT when parameter values change.
  * This prevents unnecessary dagre layout recalculations on every property save.
  */
+/**
+ * Rewrites edges for read-only rendering: all surviving edges become plain
+ * `smoothstep` connectors. `graphTransition` overlay edges are dropped
+ * entirely rather than rewritten — they anchor to hidden `-graph-transition-
+ * source`/`-graph-transition-target` handles that only `WorkflowNode` and
+ * `PlaceholderNode` expose (see createGraphTransitionEdges); read-only
+ * rendering swaps those node types for `ReadOnlyNode`/`ReadOnlyPlaceholderNode`,
+ * which carry no such handles, so keeping the edges (under any type) would
+ * reference connection points that do not exist on the read-only nodes.
+ */
+export function toReadOnlyLayoutEdges(edges: Edge[]): Edge[] {
+    return edges
+        .filter((edge) => edge.type !== 'graphTransition')
+        .map((edge) => ({
+            ...edge,
+            type: 'smoothstep',
+        }));
+}
+
 export function getTasksStructuralFingerprint(tasks: WorkflowTask[]): string {
     return tasks
         .map((task) => {
@@ -224,6 +245,7 @@ export default function useLayout({
         const conditionChildTasks = {};
         const eachChildTasks = {};
         const forkJoinChildTasks = {};
+        const graphChildTasks = {};
         const loopChildTasks = {};
         const mapChildTasks = {};
         const onErrorChildTasks = {};
@@ -237,6 +259,7 @@ export default function useLayout({
                 conditionChildTasks,
                 eachChildTasks,
                 forkJoinChildTasks,
+                graphChildTasks,
                 loopChildTasks,
                 mapChildTasks,
                 onErrorChildTasks,
@@ -280,6 +303,7 @@ export default function useLayout({
                 conditionChildTasks,
                 eachChildTasks,
                 forkJoinChildTasks,
+                graphChildTasks,
                 loopChildTasks,
                 mapChildTasks,
                 onErrorChildTasks,
@@ -396,6 +420,12 @@ export default function useLayout({
                         createLeftGhost: !hasSubtasks,
                     },
                 });
+            } else if (componentName === 'graph') {
+                allNodes = createGraphNode({
+                    allNodes: [...allNodes, taskNode],
+                    graphId: taskNode.id,
+                    isNested,
+                });
             } else {
                 allNodes.push(taskNode);
             }
@@ -411,6 +441,16 @@ export default function useLayout({
 
     const firstDownstreamNodeId = allNodes[0]?.id ?? FINAL_PLACEHOLDER_NODE_ID;
 
+    // `allNodes` is fully assembled by this point (the loop above only ever pushes/splices
+    // into it), so this mirrors exactly the engine choice `layoutFunction` makes further down
+    // from the same two inputs — ELK-only per the phase-3 spec: dagre keeps the phase-2 badges
+    // as its sole transition visualization, graphTransition overlay edges are never emitted on
+    // that path. Shared `isElkLayoutActive` keeps this gate and the `layoutFunction` gate below
+    // from ever diverging — `allNodes` here and `layoutNodes` there are different arrays, but
+    // the predicate only inspects each node's taskDispatcher/componentName, so it is equivalent
+    // over either one.
+    const usesElkGraphTransitionOverlay = isElkLayoutActive(layoutEngine, allNodes);
+
     const taskEdges: Array<Edge> = [];
 
     // Create edges based on nodes
@@ -424,6 +464,7 @@ export default function useLayout({
         const isMapNode = nodeData.componentName === 'map';
         const isParallellNode = nodeData.componentName === 'parallel';
         const isForkJoinNode = nodeData.componentName === 'fork-join';
+        const isGraphNode = nodeData.componentName === 'graph';
         const isOnErrorNode = nodeData.componentName === 'on-error';
 
         const isConditionPlaceholderNode = nodeData.conditionId && node.type === 'placeholder';
@@ -503,6 +544,15 @@ export default function useLayout({
             const forkJoinEdges = createForkJoinEdges(node);
 
             taskEdges.push(...forkJoinEdges);
+
+            return;
+        }
+
+        // Create initial edges for the Graph node
+        if (isGraphNode) {
+            const graphEdges = createGraphEdges(node, {includeTransitionEdges: usesElkGraphTransitionOverlay});
+
+            taskEdges.push(...graphEdges);
 
             return;
         }
@@ -861,10 +911,7 @@ export default function useLayout({
 
             layoutNodes.pop();
 
-            edges = taskEdges.map((edge) => ({
-                ...edge,
-                type: 'smoothstep',
-            }));
+            edges = toReadOnlyLayoutEdges(taskEdges);
 
             const lastEdge = edges[edges.length - 1];
             if (lastEdge && lastEdge.target === FINAL_PLACEHOLDER_NODE_ID) {
@@ -974,8 +1021,7 @@ export default function useLayout({
             setEdges(currentEdges.filter((edge) => newNodeIds.has(edge.source) && newNodeIds.has(edge.target)));
         }
 
-        const layoutFunction =
-            layoutEngine === 'elk' && isElkLayoutSupported(layoutNodes) ? getElkLayoutElements : getLayoutElements;
+        const layoutFunction = isElkLayoutActive(layoutEngine, layoutNodes) ? getElkLayoutElements : getLayoutElements;
 
         layoutFunction({
             canvasHeight: canvasHeightRef.current,
