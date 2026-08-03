@@ -28,6 +28,7 @@ import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.util.SchemaUtils;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -46,7 +47,7 @@ class PropertyFactoryTest {
 
         assertThat(outputResponse.outputSchema()).isInstanceOf(ObjectProperty.class);
 
-        Property bodyProperty = getProperty((ObjectProperty) outputResponse.outputSchema(), "body");
+        Property bodyProperty = getProperty(outputResponse, "body");
 
         assertThat(bodyProperty).isInstanceOf(FileEntryProperty.class);
         assertThat(((FileEntryProperty) bodyProperty).getProperties())
@@ -60,11 +61,9 @@ class PropertyFactoryTest {
             Map.of("method", WebhookMethod.POST, "headers", Map.of(), "body", FILE_ENTRY_MAP),
             PropertyFactory.OUTPUT_FACTORY_FUNCTION, PropertyFactory.PROPERTY_FACTORY);
 
-        ObjectProperty outputSchema = (ObjectProperty) outputResponse.outputSchema();
-
-        assertThat(getProperty(outputSchema, "method")).isInstanceOf(StringProperty.class);
-        assertThat(getProperty(outputSchema, "body")).isInstanceOf(FileEntryProperty.class);
-        assertThat(getProperty(outputSchema, "headers")).isInstanceOf(ObjectProperty.class);
+        assertThat(getProperty(outputResponse, "method")).isInstanceOf(StringProperty.class);
+        assertThat(getProperty(outputResponse, "body")).isInstanceOf(FileEntryProperty.class);
+        assertThat(getProperty(outputResponse, "headers")).isInstanceOf(ObjectProperty.class);
     }
 
     @Test
@@ -81,7 +80,7 @@ class PropertyFactoryTest {
             Map.of("files", List.of(FILE_ENTRY_MAP)), PropertyFactory.OUTPUT_FACTORY_FUNCTION,
             PropertyFactory.PROPERTY_FACTORY);
 
-        Property filesProperty = getProperty((ObjectProperty) outputResponse.outputSchema(), "files");
+        Property filesProperty = getProperty(outputResponse, "files");
 
         assertThat(filesProperty).isInstanceOf(ArrayProperty.class);
         assertThat(((ArrayProperty) filesProperty).getItems())
@@ -108,7 +107,7 @@ class PropertyFactoryTest {
             Map.of("method", "POST", "body", Map.of("invoiceId", "INV-1", "name", "Invoice")),
             PropertyFactory.OUTPUT_FACTORY_FUNCTION, PropertyFactory.PROPERTY_FACTORY);
 
-        Property bodyProperty = getProperty((ObjectProperty) outputResponse.outputSchema(), "body");
+        Property bodyProperty = getProperty(outputResponse, "body");
 
         assertThat(bodyProperty).isInstanceOf(ObjectProperty.class);
         assertThat(((ObjectProperty) bodyProperty).getProperties())
@@ -116,7 +115,9 @@ class PropertyFactoryTest {
             .containsExactlyInAnyOrder("invoiceId", "name");
     }
 
-    private static Property getProperty(ObjectProperty objectProperty, String name) {
+    private static Property getProperty(OutputResponse outputResponse, String name) {
+        ObjectProperty objectProperty = (ObjectProperty) Objects.requireNonNull(outputResponse.outputSchema());
+
         return objectProperty.getProperties()
             .stream()
             .filter(property -> name.equals(property.getName()))

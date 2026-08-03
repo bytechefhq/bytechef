@@ -40,6 +40,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
 import org.jspecify.annotations.NonNull;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -67,18 +68,18 @@ public class ConnectionIntTestConfiguration {
     ComponentHandler componentHandler() {
         return () -> new ComponentDefinition() {
             @Override
-            public Optional<List<ActionDefinition>> getActions() {
-                return Optional.empty();
+            public List<ActionDefinition> getActions() {
+                return List.of();
             }
 
             @Override
-            public Optional<List<ComponentCategory>> getComponentCategories() {
-                return Optional.empty();
+            public List<ComponentCategory> getComponentCategories() {
+                return List.of();
             }
 
             @Override
-            public Optional<List<ClusterElementDefinition<?>>> getClusterElements() {
-                return Optional.empty();
+            public List<ClusterElementDefinition<?>> getClusterElements() {
+                return List.of();
             }
 
             @Override
@@ -87,8 +88,8 @@ public class ConnectionIntTestConfiguration {
             }
 
             @Override
-            public Optional<Boolean> getCustomAction() {
-                return Optional.empty();
+            public boolean getCustomAction() {
+                return false;
             }
 
             @Override
@@ -97,8 +98,8 @@ public class ConnectionIntTestConfiguration {
             }
 
             @Override
-            public Optional<List<? extends com.bytechef.component.definition.PropertyGroup>> getInputs() {
-                return Optional.empty();
+            public List<? extends com.bytechef.component.definition.PropertyGroup> getInputs() {
+                return List.of();
             }
 
             @Override
@@ -112,8 +113,8 @@ public class ConnectionIntTestConfiguration {
             }
 
             @Override
-            public Optional<Map<String, Object>> getMetadata() {
-                return Optional.empty();
+            public Map<String, Object> getMetadata() {
+                return Map.of();
             }
 
             @Override
@@ -127,8 +128,8 @@ public class ConnectionIntTestConfiguration {
             }
 
             @Override
-            public Optional<List<String>> getTags() {
-                return Optional.empty();
+            public List<String> getTags() {
+                return List.of();
             }
 
             @Override
@@ -137,18 +138,13 @@ public class ConnectionIntTestConfiguration {
             }
 
             @Override
-            public Optional<List<TriggerDefinition>> getTriggers() {
-                return Optional.empty();
+            public List<TriggerDefinition> getTriggers() {
+                return List.of();
             }
 
             @Override
             public Optional<UnifiedApiDefinition> getUnifiedApi() {
                 return Optional.empty();
-            }
-
-            @Override
-            public int getVersion() {
-                return 1;
             }
         };
     }

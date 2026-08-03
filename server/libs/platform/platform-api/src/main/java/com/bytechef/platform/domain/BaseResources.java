@@ -16,11 +16,9 @@
 
 package com.bytechef.platform.domain;
 
-import com.bytechef.commons.util.OptionalUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import java.util.Objects;
-import org.apache.commons.lang3.Validate;
 
 /**
  * @author Ivica Cardic
@@ -36,8 +34,8 @@ public abstract class BaseResources {
 
     @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
     protected BaseResources(com.bytechef.definition.BaseResources resources) {
-        this.additionalUrls = OptionalUtils.orElse(resources.getAdditionalUrls(), Map.of());
-        this.documentationUrl = Validate.notNull(resources.documentationUrl(), "documentationUrl");
+        this.additionalUrls = resources.getAdditionalUrls();
+        this.documentationUrl = Objects.requireNonNull(resources.getDocumentationUrl(), "documentationUrl is required");
     }
 
     public Map<String, String> getAdditionalUrls() {

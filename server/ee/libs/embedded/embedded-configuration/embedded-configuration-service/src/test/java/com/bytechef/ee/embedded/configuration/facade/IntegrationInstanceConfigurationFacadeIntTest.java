@@ -100,7 +100,7 @@ class IntegrationInstanceConfigurationFacadeIntTest {
         when(componentDefinitionService.getComponentDefinition(anyString(), any()))
             .thenReturn(new ComponentDefinition("componentName"));
         when(connectionDefinitionService.getConnectionDefinition(anyString(), any()))
-            .thenReturn(new ConnectionDefinition(ComponentDsl.connection(), "componentName", null, null));
+            .thenReturn(new ConnectionDefinition(ComponentDsl.connection(), "componentName", "componentTitle", null));
     }
 
     @AfterEach

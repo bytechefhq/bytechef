@@ -39,8 +39,7 @@ public class DateTimeProperty extends ValueProperty<LocalDateTime> implements Op
     public DateTimeProperty(Property.DateTimeProperty dateTimeProperty) {
         super(dateTimeProperty);
 
-        this.options = CollectionUtils.map(
-            OptionalUtils.orElse(dateTimeProperty.getOptions(), List.of()), Option::new);
+        this.options = CollectionUtils.map(dateTimeProperty.getOptions(), Option::new);
         this.optionsDataSource = OptionalUtils.mapOrElse(
             dateTimeProperty.getOptionsDataSource(), OptionsDataSource::new, null);
     }

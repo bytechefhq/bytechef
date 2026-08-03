@@ -47,7 +47,7 @@ public class NumberProperty extends ValueProperty<Double> {
         this.minNumberPrecision = OptionalUtils.orElse(numberProperty.getMinNumberPrecision(), null);
         this.minValue = OptionalUtils.orElse(numberProperty.getMinValue(), null);
         this.numberPrecision = OptionalUtils.orElse(numberProperty.getNumberPrecision(), null);
-        this.options = CollectionUtils.map(OptionalUtils.orElse(numberProperty.getOptions(), List.of()), Option::new);
+        this.options = CollectionUtils.map(numberProperty.getOptions(), Option::new);
     }
 
     @Override

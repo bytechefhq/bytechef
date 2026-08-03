@@ -163,9 +163,18 @@ public class JdbcComponentDsl {
 
     private record ResourcesImpl(String documentationUrl, Map<String, String> additionalUrls) implements Resources {
 
+        private ResourcesImpl {
+            additionalUrls = additionalUrls == null ? Map.of() : additionalUrls;
+        }
+
         @Override
-        public Optional<Map<String, String>> getAdditionalUrls() {
-            return Optional.ofNullable(additionalUrls == null ? null : new HashMap<>(additionalUrls));
+        public Map<String, String> getAdditionalUrls() {
+            return new HashMap<>(additionalUrls);
+        }
+
+        @Override
+        public String getDocumentationUrl() {
+            return documentationUrl;
         }
     }
 }
