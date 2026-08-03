@@ -10,17 +10,12 @@ package com.bytechef.ee.platform.customcomponent.loader;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
-import com.bytechef.component.definition.ClusterElementDefinition;
-import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.ConnectionDefinition;
 import com.bytechef.component.definition.Help;
 import com.bytechef.component.definition.OutputDefinition;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
-import com.bytechef.component.definition.PropertyGroup;
 import com.bytechef.component.definition.Resources;
-import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.UnifiedApiDefinition;
 import java.util.List;
 import java.util.Map;
@@ -121,11 +116,6 @@ class ComponentHandlerPolyglotEngine {
         String name, String title, String description, String languageId, String script) implements ActionDefinition {
 
         @Override
-        public Optional<Boolean> getBatch() {
-            return Optional.empty();
-        }
-
-        @Override
         public Optional<BeforeResumeFunction> getBeforeResume() {
             return Optional.empty();
         }
@@ -137,11 +127,6 @@ class ComponentHandlerPolyglotEngine {
 
         @Override
         public Optional<BeforeTimeoutResumeFunction> getBeforeTimeoutResume() {
-            return Optional.empty();
-        }
-
-        @Override
-        public Optional<Boolean> getDeprecated() {
             return Optional.empty();
         }
 
@@ -168,22 +153,12 @@ class ComponentHandlerPolyglotEngine {
         }
 
         @Override
-        public Optional<Map<String, Object>> getMetadata() {
-            return Optional.empty();
-        }
-
-        @Override
         public String getName() {
             return name;
         }
 
         @Override
         public Optional<OutputDefinition> getOutputDefinition() {
-            return Optional.empty();
-        }
-
-        @Override
-        public Optional<List<? extends Property>> getProperties() {
             return Optional.empty();
         }
 
@@ -208,27 +183,12 @@ class ComponentHandlerPolyglotEngine {
         implements ComponentDefinition {
 
         @Override
-        public Optional<List<ActionDefinition>> getActions() {
-            return Optional.ofNullable(actions);
-        }
-
-        @Override
-        public Optional<List<ComponentCategory>> getComponentCategories() {
-            return Optional.empty();
-        }
-
-        @Override
-        public Optional<List<ClusterElementDefinition<?>>> getClusterElements() {
-            return Optional.empty();
+        public List<ActionDefinition> getActions() {
+            return actions == null ? List.of() : actions;
         }
 
         @Override
         public Optional<ConnectionDefinition> getConnection() {
-            return Optional.empty();
-        }
-
-        @Override
-        public Optional<Boolean> getCustomAction() {
             return Optional.empty();
         }
 
@@ -248,16 +208,6 @@ class ComponentHandlerPolyglotEngine {
         }
 
         @Override
-        public Optional<List<? extends PropertyGroup>> getInputs() {
-            return Optional.empty();
-        }
-
-        @Override
-        public Optional<Map<String, Object>> getMetadata() {
-            return Optional.empty();
-        }
-
-        @Override
         public String getName() {
             return name;
         }
@@ -268,18 +218,8 @@ class ComponentHandlerPolyglotEngine {
         }
 
         @Override
-        public Optional<List<String>> getTags() {
-            return Optional.empty();
-        }
-
-        @Override
         public Optional<String> getTitle() {
             return Optional.ofNullable(title);
-        }
-
-        @Override
-        public Optional<List<TriggerDefinition>> getTriggers() {
-            return Optional.empty();
         }
 
         @Override

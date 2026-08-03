@@ -16,10 +16,13 @@
 
 package com.bytechef.platform.domain;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * @author Ivica Cardic
  */
-public record OutputResponse(BaseProperty outputSchema, Object sampleOutput, Object placeholder) {
+public record OutputResponse(
+    @Nullable BaseProperty outputSchema, @Nullable Object sampleOutput, @Nullable Object placeholder) {
 
     public OutputResponse(BaseProperty outputSchema, Object sampleOutput) {
         this(outputSchema, sampleOutput, null);

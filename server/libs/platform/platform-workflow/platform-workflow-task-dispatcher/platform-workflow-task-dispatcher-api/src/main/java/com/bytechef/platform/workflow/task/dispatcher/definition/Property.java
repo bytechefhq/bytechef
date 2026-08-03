@@ -88,7 +88,7 @@ public interface Property extends BaseProperty {
          *
          * @return
          */
-        Optional<List<? extends Property>> getItems();
+        List<? extends Property> getItems();
     }
 
     /**
@@ -160,13 +160,13 @@ public interface Property extends BaseProperty {
          *
          * @return
          */
-        Optional<List<? extends Property>> getAdditionalProperties();
+        List<? extends Property> getAdditionalProperties();
 
         /**
          *
          * @return
          */
-        Optional<List<? extends Property>> getProperties();
+        List<? extends Property> getProperties();
     }
 
     /**

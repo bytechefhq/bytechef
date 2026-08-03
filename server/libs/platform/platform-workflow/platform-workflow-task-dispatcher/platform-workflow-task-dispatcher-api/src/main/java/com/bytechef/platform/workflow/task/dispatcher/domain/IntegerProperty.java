@@ -41,7 +41,7 @@ public class IntegerProperty extends ValueProperty<Long> {
 
         this.maxValue = OptionalUtils.orElse(integerProperty.getMaxValue(), null);
         this.minValue = OptionalUtils.orElse(integerProperty.getMinValue(), null);
-        this.options = CollectionUtils.map(OptionalUtils.orElse(integerProperty.getOptions(), List.of()), Option::new);
+        this.options = CollectionUtils.map(integerProperty.getOptions(), Option::new);
     }
 
     @Override

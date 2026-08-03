@@ -471,8 +471,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         com.bytechef.component.definition.ActionDefinition actionDefinition = doGetActionDefinition(
             componentName, componentVersion, actionName);
 
-        List<? extends BaseProperty> properties = actionDefinition.getProperties()
-            .orElse(List.of());
+        List<? extends BaseProperty> properties = actionDefinition.getProperties();
 
         BaseProperty property = PropertyUtils.findPropertyByPath(properties, propertyName);
 

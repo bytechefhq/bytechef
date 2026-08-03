@@ -52,8 +52,7 @@ public abstract class AbstractClusterElementDefinitionWrapper<T> implements Clus
             .orElse(null);
         this.processErrorResponseFunction = clusterElementDefinition.getProcessErrorResponse()
             .orElse(null);
-        this.properties = clusterElementDefinition.getProperties()
-            .orElse(null);
+        this.properties = clusterElementDefinition.getProperties();
         this.title = clusterElementDefinition.getTitle()
             .orElse(null);
         this.type = clusterElementDefinition.getType();
@@ -93,8 +92,8 @@ public abstract class AbstractClusterElementDefinitionWrapper<T> implements Clus
     }
 
     @Override
-    public Optional<List<? extends Property>> getProperties() {
-        return Optional.ofNullable(properties);
+    public List<? extends Property> getProperties() {
+        return properties == null ? List.of() : properties;
     }
 
     @Override

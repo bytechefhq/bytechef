@@ -142,9 +142,7 @@ class McpIntegrationInstanceConfigurationWorkflowGraphQlController {
         }
 
         if (inputProperty instanceof com.bytechef.component.definition.Property.ObjectProperty objectProperty) {
-            for (com.bytechef.component.definition.Property childProperty : objectProperty.getProperties()
-                .orElse(List.of())) {
-
+            for (com.bytechef.component.definition.Property childProperty : objectProperty.getProperties()) {
                 properties.add(Property.toProperty(childProperty));
             }
 

@@ -42,12 +42,11 @@ public class ArrayProperty extends ValueProperty<List<?>> implements OptionsData
         super(arrayProperty);
 
         this.items = CollectionUtils.map(
-            OptionalUtils.orElse(arrayProperty.getItems(), List.of()),
-            valueProperty -> (ValueProperty<?>) toProperty(valueProperty));
+            arrayProperty.getItems(), valueProperty -> (ValueProperty<?>) toProperty(valueProperty));
         this.maxItems = OptionalUtils.orElse(arrayProperty.getMaxItems(), null);
         this.minItems = OptionalUtils.orElse(arrayProperty.getMinItems(), null);
-        this.multipleValues = OptionalUtils.orElse(arrayProperty.getMultipleValues(), true);
-        this.options = CollectionUtils.map(OptionalUtils.orElse(arrayProperty.getOptions(), List.of()), Option::new);
+        this.multipleValues = arrayProperty.getMultipleValues();
+        this.options = CollectionUtils.map(arrayProperty.getOptions(), Option::new);
         this.optionsDataSource = OptionalUtils.mapOrElse(
             arrayProperty.getOptionsDataSource(), OptionsDataSource::new, null);
     }
