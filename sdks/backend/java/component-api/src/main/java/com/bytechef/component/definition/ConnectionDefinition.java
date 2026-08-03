@@ -28,6 +28,8 @@ import java.util.Optional;
  */
 public interface ConnectionDefinition {
 
+    int VERSION_1 = 1;
+
     /**
      * Parameter key holding the base URI used as the prefix for the connection's HTTP requests.
      */
@@ -36,18 +38,20 @@ public interface ConnectionDefinition {
     /**
      * Returns whether an authorization must be configured for this connection to be usable.
      *
-     * @return an {@code Optional} containing {@code true} if authorization is required, {@code false} if it is
-     *         optional, or an empty {@code Optional} if not specified
+     * @return {@code true} if authorization is required, {@code false} if it is optional
      */
-    Optional<Boolean> getAuthorizationRequired();
+    default boolean getAuthorizationRequired() {
+        return true;
+    }
 
     /**
      * Returns the authorization schemes supported by this connection.
      *
-     * @return an {@code Optional} containing the list of authorizations if defined, or an empty {@code Optional}
-     *         otherwise
+     * @return the list of authorizations, or an empty list if none are defined
      */
-    Optional<List<? extends Authorization>> getAuthorizations();
+    default List<? extends Authorization> getAuthorizations() {
+        return List.of();
+    }
 
     /**
      * Returns the optional function that resolves the base URI used as the prefix for the connection's HTTP requests.
@@ -55,14 +59,18 @@ public interface ConnectionDefinition {
      * @return an {@code Optional} containing the {@link BaseUriFunction} if defined, or an empty {@code Optional}
      *         otherwise
      */
-    Optional<BaseUriFunction> getBaseUri();
+    default Optional<BaseUriFunction> getBaseUri() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the optional {@link Help} content that provides additional guidance to users configuring the connection.
      *
      * @return an {@code Optional} containing the help content if defined, or an empty {@code Optional} otherwise
      */
-    Optional<Help> getHelp();
+    default Optional<Help> getHelp() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the optional function used to process HTTP error responses and map them to {@link ProviderException}
@@ -71,28 +79,36 @@ public interface ConnectionDefinition {
      *
      * @return an {@link Optional} containing the {@link ProcessErrorResponseFunction} if defined, or empty otherwise
      */
-    Optional<ProcessErrorResponseFunction> getProcessErrorResponse();
+    default Optional<ProcessErrorResponseFunction> getProcessErrorResponse() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the input properties that define the parameters collected from the user to configure the connection.
      *
-     * @return an {@code Optional} containing the list of properties if defined, or an empty {@code Optional} otherwise
+     * @return the list of properties, or an empty list if none are defined
      */
-    Optional<List<? extends Property>> getProperties();
+    default List<? extends Property> getProperties() {
+        return List.of();
+    }
 
     /**
      * TODO
      *
      * @return
      */
-    Optional<TestConsumer> getTest();
+    default Optional<TestConsumer> getTest() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the version of the connection definition, used to distinguish successive revisions.
      *
      * @return the connection version
      */
-    int getVersion();
+    default int getVersion() {
+        return VERSION_1;
+    }
 
     /**
      * Functional interface that resolves the base URI used as the prefix for a connection's HTTP requests, based on the

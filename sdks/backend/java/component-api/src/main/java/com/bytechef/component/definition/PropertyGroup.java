@@ -39,7 +39,9 @@ public interface PropertyGroup {
      *
      * @return an {@link Optional} containing the display label, or an empty {@link Optional} if none is set
      */
-    Optional<String> getLabel();
+    default Optional<String> getLabel() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the value properties that belong to this group.

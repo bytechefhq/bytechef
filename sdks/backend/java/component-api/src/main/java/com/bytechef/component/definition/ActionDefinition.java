@@ -48,7 +48,9 @@ public interface ActionDefinition {
      *
      * @return
      */
-    Optional<Boolean> getBatch();
+    default boolean getBatch() {
+        return false;
+    }
 
     /**
      * Retrieves an optional {@link BeforeResumeFunction}, which represents a custom operation to be executed before
@@ -58,7 +60,9 @@ public interface ActionDefinition {
      * @return an {@code Optional} containing the {@link BeforeResumeFunction} if defined, or an empty {@code Optional}
      *         if not present
      */
-    Optional<BeforeResumeFunction> getBeforeResume();
+    default Optional<BeforeResumeFunction> getBeforeResume() {
+        return Optional.empty();
+    }
 
     /**
      * Retrieves an optional {@link BeforeSuspendConsumer} that represents a custom operation to be executed before
@@ -68,7 +72,9 @@ public interface ActionDefinition {
      * @return an {@code Optional} containing the {@link BeforeSuspendConsumer} if defined, or an empty {@code Optional}
      *         if not present
      */
-    Optional<BeforeSuspendConsumer> getBeforeSuspend();
+    default Optional<BeforeSuspendConsumer> getBeforeSuspend() {
+        return Optional.empty();
+    }
 
     /**
      * Retrieves an optional {@link BeforeTimeoutResumeFunction}, which represents a custom operation to be executed
@@ -79,35 +85,45 @@ public interface ActionDefinition {
      * @return an {@code Optional} containing the {@link BeforeTimeoutResumeFunction} if defined, or an empty
      *         {@code Optional} if not present
      */
-    Optional<BeforeTimeoutResumeFunction> getBeforeTimeoutResume();
+    default Optional<BeforeTimeoutResumeFunction> getBeforeTimeoutResume() {
+        return Optional.empty();
+    }
 
     /**
      * TODO
      *
      * @return
      */
-    Optional<Boolean> getDeprecated();
+    default boolean getDeprecated() {
+        return false;
+    }
 
     /**
      * Returns the human-readable description of the action, explaining what it does.
      *
      * @return an {@code Optional} containing the description if defined, or an empty {@code Optional} otherwise
      */
-    Optional<String> getDescription();
+    default Optional<String> getDescription() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the optional {@link Help} content that provides additional guidance to users configuring the action.
      *
      * @return an {@code Optional} containing the help content if defined, or an empty {@code Optional} otherwise
      */
-    Optional<Help> getHelp();
+    default Optional<Help> getHelp() {
+        return Optional.empty();
+    }
 
     /**
      * Returns optional, implementation-specific metadata associated with the action.
      *
-     * @return an {@code Optional} containing the metadata map if defined, or an empty {@code Optional} otherwise
+     * @return the metadata map, or an empty map if none is defined
      */
-    Optional<Map<String, Object>> getMetadata();
+    default Map<String, Object> getMetadata() {
+        return Map.of();
+    }
 
     /**
      * Returns the unique name that identifies this action within its component.
@@ -121,14 +137,18 @@ public interface ActionDefinition {
      *
      * @return an {@code Optional} containing the output definition if defined, or an empty {@code Optional} otherwise
      */
-    Optional<OutputDefinition> getOutputDefinition();
+    default Optional<OutputDefinition> getOutputDefinition() {
+        return Optional.empty();
+    }
 
     /**
      * The code that should be executed when an action runs as a task inside the workflow engine.
      *
      * @return an optional execute function implementation
      */
-    Optional<? extends BasePerformFunction> getPerform();
+    default Optional<? extends BasePerformFunction> getPerform() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the optional function used to map an error response returned during the action's execution to a
@@ -137,14 +157,18 @@ public interface ActionDefinition {
      * @return an {@code Optional} containing the error-processing function if defined, or an empty {@code Optional}
      *         otherwise
      */
-    Optional<ProcessErrorResponseFunction> getProcessErrorResponse();
+    default Optional<ProcessErrorResponseFunction> getProcessErrorResponse() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the list of input properties that define the parameters the action accepts.
      *
-     * @return an {@code Optional} containing the list of properties if defined, or an empty {@code Optional} otherwise
+     * @return the list of properties, or an empty list if none are defined
      */
-    Optional<List<? extends Property>> getProperties();
+    default List<? extends Property> getProperties() {
+        return List.of();
+    }
 
     /**
      * Returns the optional function invoked to resume the action after it has been suspended.
@@ -152,14 +176,18 @@ public interface ActionDefinition {
      * @return an {@code Optional} containing the resume-perform function if defined, or an empty {@code Optional}
      *         otherwise
      */
-    Optional<? extends BaseResumePerformFunction> getResumePerform();
+    default Optional<? extends BaseResumePerformFunction> getResumePerform() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the human-readable title of the action displayed in the user interface.
      *
      * @return an {@code Optional} containing the title if defined, or an empty {@code Optional} otherwise
      */
-    Optional<String> getTitle();
+    default Optional<String> getTitle() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the optional function that dynamically produces the description shown for the action's node in the
@@ -168,7 +196,9 @@ public interface ActionDefinition {
      * @return an {@code Optional} containing the workflow-node-description function if defined, or an empty
      *         {@code Optional} otherwise
      */
-    Optional<WorkflowNodeDescriptionFunction> getWorkflowNodeDescription();
+    default Optional<WorkflowNodeDescriptionFunction> getWorkflowNodeDescription() {
+        return Optional.empty();
+    }
 
     /**
      * Represents a base interface for defining output functions within the system. This interface serves as a

@@ -29,7 +29,6 @@ import com.bytechef.component.definition.ClusterElementDefinition.ClusterElement
 import com.bytechef.component.definition.ComponentDsl.ModifiableClusterElementDefinition;
 import com.bytechef.component.definition.ai.agent.ToolFunction;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -104,11 +103,7 @@ class ComponentDslToolTest {
 
         ModifiableClusterElementDefinition<ToolFunction> toolDefinition = tool(actionDefinition);
 
-        Optional<List<? extends Property>> propertiesOptional = toolDefinition.getProperties();
-
-        assertTrue(propertiesOptional.isPresent());
-
-        List<? extends Property> properties = propertiesOptional.get();
+        List<? extends Property> properties = toolDefinition.getProperties();
 
         assertEquals(2, properties.size());
     }
@@ -119,11 +114,7 @@ class ComponentDslToolTest {
 
         ModifiableClusterElementDefinition<ToolFunction> toolDefinition = tool(actionDefinition);
 
-        Optional<List<? extends Property>> propertiesOptional = toolDefinition.getProperties();
-
-        assertTrue(propertiesOptional.isPresent());
-
-        List<? extends Property> properties = propertiesOptional.get();
+        List<? extends Property> properties = toolDefinition.getProperties();
 
         assertTrue(properties.isEmpty());
     }

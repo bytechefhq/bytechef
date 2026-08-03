@@ -66,21 +66,27 @@ public interface TriggerDefinition {
      *
      * @return
      */
-    Optional<Boolean> getBatch();
+    default boolean getBatch() {
+        return false;
+    }
 
     /**
      * TODO
      *
      * @return
      */
-    Optional<Boolean> getDeprecated();
+    default boolean getDeprecated() {
+        return false;
+    }
 
     /**
      * Returns the description of this trigger, shown to users to explain what the trigger does.
      *
      * @return an {@link Optional} containing the description, or an empty {@link Optional} if none is set
      */
-    Optional<String> getDescription();
+    default Optional<String> getDescription() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the function that refreshes a dynamic webhook subscription before it expires, when defined for a
@@ -88,21 +94,27 @@ public interface TriggerDefinition {
      *
      * @return an {@link Optional} containing the refresh function, or an empty {@link Optional} if none is set
      */
-    Optional<DynamicWebhookRefreshFunction> getDynamicWebhookRefresh();
+    default Optional<DynamicWebhookRefreshFunction> getDynamicWebhookRefresh() {
+        return Optional.empty();
+    }
 
     /**
      * TODO
      *
      * @return
      */
-    Optional<DeduplicateFunction> getDeduplicate();
+    default Optional<DeduplicateFunction> getDeduplicate() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the contextual help associated with this trigger.
      *
      * @return an {@link Optional} containing the trigger help, or an empty {@link Optional} if none is set
      */
-    Optional<Help> getHelp();
+    default Optional<Help> getHelp() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the consumer invoked to tear down a webhook subscription when the trigger is disabled, when defined for a
@@ -110,7 +122,9 @@ public interface TriggerDefinition {
      *
      * @return an {@link Optional} containing the webhook-disable consumer, or an empty {@link Optional} if none is set
      */
-    Optional<WebhookDisableConsumer> getWebhookDisable();
+    default Optional<WebhookDisableConsumer> getWebhookDisable() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the function invoked to register a webhook subscription when the trigger is enabled, when defined for a
@@ -118,7 +132,9 @@ public interface TriggerDefinition {
      *
      * @return an {@link Optional} containing the webhook-enable function, or an empty {@link Optional} if none is set
      */
-    Optional<WebhookEnableFunction> getWebhookEnable();
+    default Optional<WebhookEnableFunction> getWebhookEnable() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the function that processes an incoming webhook request and converts it into the trigger's output, when
@@ -126,7 +142,9 @@ public interface TriggerDefinition {
      *
      * @return an {@link Optional} containing the webhook-request function, or an empty {@link Optional} if none is set
      */
-    Optional<WebhookRequestFunction> getWebhookRequest();
+    default Optional<WebhookRequestFunction> getWebhookRequest() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the technical name that uniquely identifies this trigger within its component.
@@ -141,7 +159,9 @@ public interface TriggerDefinition {
      *
      * @return an {@link Optional} containing the listener-disable consumer, or an empty {@link Optional} if none is set
      */
-    Optional<ListenerDisableConsumer> getListenerDisable();
+    default Optional<ListenerDisableConsumer> getListenerDisable() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the consumer invoked to start an event listener when the trigger is enabled, when defined for a listener
@@ -149,42 +169,54 @@ public interface TriggerDefinition {
      *
      * @return an {@link Optional} containing the listener-enable consumer, or an empty {@link Optional} if none is set
      */
-    Optional<ListenerEnableConsumer> getListenerEnable();
+    default Optional<ListenerEnableConsumer> getListenerEnable() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the definition describing the shape of the data this trigger produces.
      *
      * @return an {@link Optional} containing the output definition, or an empty {@link Optional} if none is set
      */
-    Optional<OutputDefinition> getOutputDefinition();
+    default Optional<OutputDefinition> getOutputDefinition() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the function that polls the provider for new records, when defined for a polling trigger.
      *
      * @return an {@link Optional} containing the poll function, or an empty {@link Optional} if none is set
      */
-    Optional<PollFunction> getPoll();
+    default Optional<PollFunction> getPoll() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the function that translates a provider error response into a {@link ProviderException}, when defined.
      *
      * @return an {@link Optional} containing the error-response function, or an empty {@link Optional} if none is set
      */
-    Optional<TriggerDefinition.ProcessErrorResponseFunction> getProcessErrorResponse();
+    default Optional<TriggerDefinition.ProcessErrorResponseFunction> getProcessErrorResponse() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the input properties the user configures for this trigger.
      *
-     * @return an {@link Optional} containing the list of properties, or an empty {@link Optional} if none are defined
+     * @return the list of properties, or an empty list if none are defined
      */
-    Optional<List<? extends Property>> getProperties();
+    default List<? extends Property> getProperties() {
+        return List.of();
+    }
 
     /**
      * Returns the human-readable title of this trigger, displayed in the workflow editor.
      *
      * @return an {@link Optional} containing the title, or an empty {@link Optional} if none is set
      */
-    Optional<String> getTitle();
+    default Optional<String> getTitle() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the {@link TriggerType} that determines how this trigger receives events.
@@ -196,17 +228,20 @@ public interface TriggerDefinition {
     /**
      * Indicates whether the raw, unparsed request body should be preserved for webhook processing.
      *
-     * @return an {@link Optional} containing {@code true} to keep the raw body, or an empty {@link Optional} if not
-     *         specified
+     * @return {@code true} to keep the raw body, {@code false} otherwise
      */
-    Optional<Boolean> getWebhookRawBody();
+    default boolean getWebhookRawBody() {
+        return false;
+    }
 
     /**
      * Returns the function that validates each incoming webhook request, when defined for a webhook trigger.
      *
      * @return an {@link Optional} containing the webhook-validate function, or an empty {@link Optional} if none is set
      */
-    Optional<WebhookValidateFunction> getWebhookValidate();
+    default Optional<WebhookValidateFunction> getWebhookValidate() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the function that validates the webhook request received during the enable handshake, when defined for a
@@ -215,7 +250,9 @@ public interface TriggerDefinition {
      * @return an {@link Optional} containing the on-enable webhook-validate function, or an empty {@link Optional} if
      *         none is set
      */
-    Optional<WebhookValidateOnEnableFunction> getWebhookValidateOnEnable();
+    default Optional<WebhookValidateOnEnableFunction> getWebhookValidateOnEnable() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the function that computes a dynamic description for this trigger's workflow node based on its configured
@@ -223,15 +260,18 @@ public interface TriggerDefinition {
      *
      * @return an {@link Optional} containing the node-description function, or an empty {@link Optional} if none is set
      */
-    Optional<WorkflowNodeDescriptionFunction> getWorkflowNodeDescription();
+    default Optional<WorkflowNodeDescriptionFunction> getWorkflowNodeDescription() {
+        return Optional.empty();
+    }
 
     /**
      * Indicates whether the workflow started by this trigger should be executed synchronously.
      *
-     * @return an {@link Optional} containing {@code true} for synchronous execution, or an empty {@link Optional} if
-     *         not specified
+     * @return {@code true} for synchronous execution, {@code false} otherwise
      */
-    Optional<Boolean> getWorkflowSyncExecution();
+    default boolean getWorkflowSyncExecution() {
+        return false;
+    }
 
     /**
      * Computes a stable deduplication key for a polled record so that records already delivered are not emitted again.

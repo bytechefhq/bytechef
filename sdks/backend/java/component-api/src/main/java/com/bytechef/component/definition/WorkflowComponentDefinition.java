@@ -30,38 +30,46 @@ public interface WorkflowComponentDefinition {
     /**
      * Returns the actions this component contributes to workflows.
      *
-     * @return an {@link Optional} containing the list of actions, or an empty {@link Optional} if none are defined
+     * @return the list of actions, or an empty list if none are defined
      */
-    Optional<List<ActionDefinition>> getActions();
+    default List<ActionDefinition> getActions() {
+        return List.of();
+    }
 
     /**
      * Indicates whether this component supports user-defined custom actions.
      *
-     * @return an {@link Optional} containing {@code true} when custom actions are supported, or an empty
-     *         {@link Optional} if not specified
+     * @return {@code true} when custom actions are supported, {@code false} otherwise
      */
-    Optional<Boolean> getCustomAction();
+    default boolean getCustomAction() {
+        return false;
+    }
 
     /**
      * Returns the contextual help shown for this component's custom action.
      *
      * @return an {@link Optional} containing the custom-action help, or an empty {@link Optional} if none is set
      */
-    Optional<Help> getCustomActionHelp();
+    default Optional<Help> getCustomActionHelp() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the component-level workflow inputs, always modeled as property groups (a lone property is a group with
      * one property).
      *
-     * @return an {@link Optional} containing the list of input property groups, or an empty {@link Optional} if none
-     *         are defined
+     * @return the list of input property groups, or an empty list if none are defined
      */
-    Optional<List<? extends PropertyGroup>> getInputs();
+    default List<? extends PropertyGroup> getInputs() {
+        return List.of();
+    }
 
     /**
      * Returns the triggers this component contributes to workflows.
      *
-     * @return an {@link Optional} containing the list of triggers, or an empty {@link Optional} if none are defined
+     * @return the list of triggers, or an empty list if none are defined
      */
-    Optional<List<TriggerDefinition>> getTriggers();
+    default List<TriggerDefinition> getTriggers() {
+        return List.of();
+    }
 }

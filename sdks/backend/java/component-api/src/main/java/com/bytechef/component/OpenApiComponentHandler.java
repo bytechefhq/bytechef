@@ -84,7 +84,6 @@ public interface OpenApiComponentHandler extends ComponentHandler {
             .map(this::modifyAction)
             .map(actionDefinition -> {
                 Property[] properties = actionDefinition.getProperties()
-                    .orElse(List.of())
                     .stream()
                     .map(property -> (Property) modifyProperty(
                         actionDefinition, (ModifiableProperty<?>) property))

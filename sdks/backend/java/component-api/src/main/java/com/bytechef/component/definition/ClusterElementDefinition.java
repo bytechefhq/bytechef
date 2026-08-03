@@ -38,7 +38,9 @@ public interface ClusterElementDefinition<T> {
      *
      * @return an {@code Optional} containing the description if defined, or an empty {@code Optional} otherwise
      */
-    Optional<String> getDescription();
+    default Optional<String> getDescription() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the underlying element implementation this definition wraps.
@@ -53,7 +55,9 @@ public interface ClusterElementDefinition<T> {
      *
      * @return an {@code Optional} containing the help content if defined, or an empty {@code Optional} otherwise
      */
-    Optional<Help> getHelp();
+    default Optional<Help> getHelp() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the optional {@link OutputDefinition} that describes the schema and sample of the cluster element's
@@ -61,7 +65,9 @@ public interface ClusterElementDefinition<T> {
      *
      * @return an {@code Optional} containing the output definition if defined, or an empty {@code Optional} otherwise
      */
-    Optional<OutputDefinition> getOutputDefinition();
+    default Optional<OutputDefinition> getOutputDefinition() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the unique name that identifies this cluster element within its component.
@@ -77,21 +83,27 @@ public interface ClusterElementDefinition<T> {
      * @return an {@code Optional} containing the error-processing function if defined, or an empty {@code Optional}
      *         otherwise
      */
-    Optional<ProcessErrorResponseFunction> getProcessErrorResponse();
+    default Optional<ProcessErrorResponseFunction> getProcessErrorResponse() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the input properties that define the parameters the cluster element accepts.
      *
-     * @return an {@code Optional} containing the list of properties if defined, or an empty {@code Optional} otherwise
+     * @return the list of properties, or an empty list if none are defined
      */
-    Optional<List<? extends Property>> getProperties();
+    default List<? extends Property> getProperties() {
+        return List.of();
+    }
 
     /**
      * Returns the human-readable title of the cluster element displayed in the user interface.
      *
      * @return an {@code Optional} containing the title if defined, or an empty {@code Optional} otherwise
      */
-    Optional<String> getTitle();
+    default Optional<String> getTitle() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the {@link ClusterElementType} that classifies this cluster element and specifies how it plugs into a
@@ -108,7 +120,9 @@ public interface ClusterElementDefinition<T> {
      * @return an {@code Optional} containing the workflow-node-description function if defined, or an empty
      *         {@code Optional} otherwise
      */
-    Optional<WorkflowNodeDescriptionFunction> getWorkflowNodeDescription();
+    default Optional<WorkflowNodeDescriptionFunction> getWorkflowNodeDescription() {
+        return Optional.empty();
+    }
 
     /**
      * Functional interface that dynamically supplies the list of selectable options for a cluster element's property,

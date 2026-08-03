@@ -28,13 +28,16 @@ import java.util.Optional;
 public interface ComponentDefinition
     extends ClusterElementComponentDefinition, UnifiedApiComponentDefinition, WorkflowComponentDefinition {
 
+    int VERSION_1 = 1;
+
     /**
      * Returns the categories under which this component is classified.
      *
-     * @return an {@code Optional} containing the list of component categories if defined, or an empty {@code Optional}
-     *         otherwise
+     * @return the list of component categories, or an empty list if none are defined
      */
-    Optional<List<ComponentCategory>> getComponentCategories();
+    default List<ComponentCategory> getComponentCategories() {
+        return List.of();
+    }
 
     /**
      * Returns the connection definition that describes how this component authenticates with the external service.
@@ -42,14 +45,18 @@ public interface ComponentDefinition
      * @return an {@code Optional} containing the connection definition if defined, or an empty {@code Optional}
      *         otherwise
      */
-    Optional<ConnectionDefinition> getConnection();
+    default Optional<ConnectionDefinition> getConnection() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the human-readable description of the component, explaining what it does.
      *
      * @return an {@code Optional} containing the description if defined, or an empty {@code Optional} otherwise
      */
-    Optional<String> getDescription();
+    default Optional<String> getDescription() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the icon representing the component in the user interface, typically as SVG markup or a reference to an
@@ -57,14 +64,18 @@ public interface ComponentDefinition
      *
      * @return an {@code Optional} containing the icon if defined, or an empty {@code Optional} otherwise
      */
-    Optional<String> getIcon();
+    default Optional<String> getIcon() {
+        return Optional.empty();
+    }
 
     /**
      * Returns optional, implementation-specific metadata associated with the component.
      *
-     * @return an {@code Optional} containing the metadata map if defined, or an empty {@code Optional} otherwise
+     * @return the metadata map, or an empty map if none is defined
      */
-    Optional<Map<String, Object>> getMetadata();
+    default Map<String, Object> getMetadata() {
+        return Map.of();
+    }
 
     /**
      * Returns the unique name that identifies this component.
@@ -78,26 +89,34 @@ public interface ComponentDefinition
      *
      * @return
      */
-    Optional<Resources> getResources();
+    default Optional<Resources> getResources() {
+        return Optional.empty();
+    }
 
     /**
      * TODO
      *
      * @return
      */
-    Optional<List<String>> getTags();
+    default List<String> getTags() {
+        return List.of();
+    }
 
     /**
      * Returns the human-readable title of the component displayed in the user interface.
      *
      * @return an {@code Optional} containing the title if defined, or an empty {@code Optional} otherwise
      */
-    Optional<String> getTitle();
+    default Optional<String> getTitle() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the version of the component, used to distinguish successive revisions of its definition.
      *
      * @return the component version
      */
-    int getVersion();
+    default int getVersion() {
+        return VERSION_1;
+    }
 }

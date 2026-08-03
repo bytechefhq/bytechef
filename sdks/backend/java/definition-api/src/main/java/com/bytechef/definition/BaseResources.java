@@ -17,7 +17,6 @@
 package com.bytechef.definition;
 
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * Represents a collection of reference resources associated with a component, such as its primary documentation URL and
@@ -32,12 +31,14 @@ public interface BaseResources {
      *
      * @return the documentation URL
      */
-    String documentationUrl();
+    String getDocumentationUrl();
 
     /**
      * Returns the optional supplementary links, keyed by a descriptive label.
      *
-     * @return an {@link Optional} containing a map of labels to URLs, or an empty {@link Optional} if none are defined
+     * @return a map of labels to URLs, or an empty map if none are defined
      */
-    Optional<Map<String, String>> getAdditionalUrls();
+    default Map<String, String> getAdditionalUrls() {
+        return Map.of();
+    }
 }

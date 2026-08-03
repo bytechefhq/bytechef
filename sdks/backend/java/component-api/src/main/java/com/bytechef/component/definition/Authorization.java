@@ -34,6 +34,11 @@ import java.util.Optional;
 public interface Authorization {
 
     /**
+     * The signals that trigger re-authorization when an authorization declares none of its own: an HTTP 401 response.
+     */
+    List<Object> DEFAULT_REFRESH_ON = List.of(401);
+
+    /**
      * Parameter key under which an OAuth2 access token is stored.
      */
     String ACCESS_TOKEN = "access_token";
@@ -237,7 +242,9 @@ public interface Authorization {
     /**
      * @return the implementation of {@link AcquireFunction} interface if defined
      */
-    Optional<AcquireFunction> getAcquire();
+    default Optional<AcquireFunction> getAcquire() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the optional function that applies the connection's credentials to an outgoing request by contributing
@@ -246,7 +253,9 @@ public interface Authorization {
      * @return an {@code Optional} containing the {@link ApplyFunction} if defined, or an empty {@code Optional}
      *         otherwise
      */
-    Optional<ApplyFunction> getApply();
+    default Optional<ApplyFunction> getApply() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the optional function invoked when the OAuth2 authorization callback is received, used to exchange the
@@ -255,7 +264,9 @@ public interface Authorization {
      * @return an {@code Optional} containing the {@link AuthorizationCallbackFunction} if defined, or an empty
      *         {@code Optional} otherwise
      */
-    Optional<AuthorizationCallbackFunction> getAuthorizationCallback();
+    default Optional<AuthorizationCallbackFunction> getAuthorizationCallback() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the optional function that resolves the OAuth2 authorization endpoint URL.
@@ -263,7 +274,9 @@ public interface Authorization {
      * @return an {@code Optional} containing the {@link AuthorizationUrlFunction} if defined, or an empty
      *         {@code Optional} otherwise
      */
-    Optional<AuthorizationUrlFunction> getAuthorizationUrl();
+    default Optional<AuthorizationUrlFunction> getAuthorizationUrl() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the optional function that resolves the OAuth2 client identifier.
@@ -271,7 +284,9 @@ public interface Authorization {
      * @return an {@code Optional} containing the {@link ClientIdFunction} if defined, or an empty {@code Optional}
      *         otherwise
      */
-    Optional<ClientIdFunction> getClientId();
+    default Optional<ClientIdFunction> getClientId() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the optional function that resolves the OAuth2 client secret.
@@ -279,7 +294,9 @@ public interface Authorization {
      * @return an {@code Optional} containing the {@link ClientSecretFunction} if defined, or an empty {@code Optional}
      *         otherwise
      */
-    Optional<ClientSecretFunction> getClientSecret();
+    default Optional<ClientSecretFunction> getClientSecret() {
+        return Optional.empty();
+    }
 
     /**
      * This is an optional list of signals that identify when the system must raise the excpetion even if the response
@@ -298,14 +315,18 @@ public interface Authorization {
      *
      * @return the list of Regex expressions which are matched on the response body
      */
-    Optional<List<String>> getDetectOn();
+    default List<String> getDetectOn() {
+        return List.of();
+    }
 
     /**
      * Returns the human-readable description of this authorization scheme.
      *
      * @return an {@code Optional} containing the description if defined, or an empty {@code Optional} otherwise
      */
-    Optional<String> getDescription();
+    default Optional<String> getDescription() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the unique name that identifies this authorization within its connection.
@@ -320,27 +341,35 @@ public interface Authorization {
      * @return an {@code Optional} containing the {@link OAuth2AuthorizationExtraQueryParametersFunction} if defined, or
      *         an empty {@code Optional} otherwise
      */
-    Optional<OAuth2AuthorizationExtraQueryParametersFunction> getOauth2AuthorizationExtraQueryParameters();
+    default Optional<OAuth2AuthorizationExtraQueryParametersFunction> getOauth2AuthorizationExtraQueryParameters() {
+        return Optional.empty();
+    }
 
     /**
      * TODO
      *
      * @return
      */
-    Optional<PkceFunction> getPkce();
+    default Optional<PkceFunction> getPkce() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the input properties that define the credentials and settings collected from the user for this
      * authorization.
      *
-     * @return an {@code Optional} containing the list of properties if defined, or an empty {@code Optional} otherwise
+     * @return the list of properties, or an empty list if none are declared
      */
-    Optional<List<? extends Property>> getProperties();
+    default List<? extends Property> getProperties() {
+        return List.of();
+    }
 
     /**
      * @return the implementation of {@link RefreshFunction} interface if defined
      */
-    Optional<RefreshFunction> getRefresh();
+    default Optional<RefreshFunction> getRefresh() {
+        return Optional.empty();
+    }
 
     /**
      * This is an optional array of signals that identify when the system must re-acquire credentials. When it receives
@@ -354,7 +383,9 @@ public interface Authorization {
      * @return the list of integers which are matched to HTTP response codes or Regex expressions which are matched on
      *         the response body
      */
-    Optional<List<Object>> getRefreshOn();
+    default List<Object> getRefreshOn() {
+        return DEFAULT_REFRESH_ON;
+    }
 
     /**
      * Returns the optional function that resolves the OAuth2 token-refresh endpoint URL.
@@ -362,7 +393,9 @@ public interface Authorization {
      * @return an {@code Optional} containing the {@link RefreshUrlFunction} if defined, or an empty {@code Optional}
      *         otherwise
      */
-    Optional<RefreshUrlFunction> getRefreshUrl();
+    default Optional<RefreshUrlFunction> getRefreshUrl() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the optional function that extracts the refresh token value from the connection parameters.
@@ -370,7 +403,9 @@ public interface Authorization {
      * @return an {@code Optional} containing the {@link RefreshTokenFunction} if defined, or an empty {@code Optional}
      *         otherwise
      */
-    Optional<RefreshTokenFunction> getRefreshToken();
+    default Optional<RefreshTokenFunction> getRefreshToken() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the optional function that resolves the OAuth2 scopes requested for the connection.
@@ -378,14 +413,18 @@ public interface Authorization {
      * @return an {@code Optional} containing the {@link ScopesFunction} if defined, or an empty {@code Optional}
      *         otherwise
      */
-    Optional<ScopesFunction> getScopes();
+    default Optional<ScopesFunction> getScopes() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the human-readable title of this authorization displayed in the user interface.
      *
      * @return an {@code Optional} containing the title if defined, or an empty {@code Optional} otherwise
      */
-    Optional<String> getTitle();
+    default Optional<String> getTitle() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the optional function that resolves the OAuth2 token endpoint URL.
@@ -393,7 +432,9 @@ public interface Authorization {
      * @return an {@code Optional} containing the {@link TokenUrlFunction} if defined, or an empty {@code Optional}
      *         otherwise
      */
-    Optional<TokenUrlFunction> getTokenUrl();
+    default Optional<TokenUrlFunction> getTokenUrl() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the {@link AuthorizationType} that identifies the authentication scheme of this authorization.

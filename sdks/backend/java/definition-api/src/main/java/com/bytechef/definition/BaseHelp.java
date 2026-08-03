@@ -38,5 +38,7 @@ public interface BaseHelp {
      *
      * @return an {@link Optional} containing the "learn more" URL, or an empty {@link Optional} if none is set
      */
-    Optional<String> getLearnMoreUrl();
+    default Optional<String> getLearnMoreUrl() {
+        return Optional.empty();
+    }
 }

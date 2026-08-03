@@ -17,7 +17,6 @@
 package com.bytechef.component.definition;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Contract for a component that contributes cluster elements, which are the reusable building blocks (such as models,
@@ -30,8 +29,9 @@ public interface ClusterElementComponentDefinition {
     /**
      * Returns the cluster elements contributed by this component.
      *
-     * @return an {@code Optional} containing the list of cluster element definitions if any are defined, or an empty
-     *         {@code Optional} otherwise
+     * @return the list of cluster element definitions, or an empty list if none are defined
      */
-    Optional<List<ClusterElementDefinition<?>>> getClusterElements();
+    default List<ClusterElementDefinition<?>> getClusterElements() {
+        return List.of();
+    }
 }

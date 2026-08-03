@@ -18,7 +18,6 @@ package com.bytechef.component.definition;
 
 import com.bytechef.definition.BaseOptionsProperty;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Represents a property that exposes a set of selectable {@link Option} values. The type parameter {@code T} denotes
@@ -33,8 +32,7 @@ public interface OptionsProperty<T> extends BaseOptionsProperty<T, Option<T>> {
     /**
      * Retrieves the statically defined options available for this property.
      *
-     * @return an {@link Optional} containing the list of options when they are defined; otherwise an empty
-     *         {@link Optional}
+     * @return the list of options, or an empty list if none are defined
      */
-    Optional<List<? extends Option<T>>> getOptions();
+    List<? extends Option<T>> getOptions();
 }

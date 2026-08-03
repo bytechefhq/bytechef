@@ -96,10 +96,11 @@ public interface Property extends BaseProperty {
         /**
          * Returns the property definitions describing the allowed types of the array's elements.
          *
-         * @return an {@link Optional} containing the list of item properties, or an empty {@link Optional} if the
-         *         element type is unconstrained
+         * @return the list of item properties, or an empty list if the element type is unconstrained
          */
-        Optional<List<? extends Property.ValueProperty<?>>> getItems();
+        default List<? extends Property.ValueProperty<?>> getItems() {
+            return List.of();
+        }
     }
 
     /**
@@ -132,7 +133,9 @@ public interface Property extends BaseProperty {
          *
          * @return an {@link Optional} containing the header text, or an empty {@link Optional} if none is set
          */
-        Optional<String> getHeader();
+        default Optional<String> getHeader() {
+            return Optional.empty();
+        }
 
         /**
          * Returns the data source that resolves this property's nested properties at runtime.
@@ -182,18 +185,20 @@ public interface Property extends BaseProperty {
         /**
          * Returns the property definitions describing values allowed for keys beyond the explicitly declared ones.
          *
-         * @return an {@link Optional} containing the additional-property definitions, or an empty {@link Optional} if
-         *         additional properties are not permitted
+         * @return the additional-property definitions, or an empty list if additional properties are not permitted
          */
-        Optional<List<? extends Property.ValueProperty<?>>> getAdditionalProperties();
+        default List<? extends Property.ValueProperty<?>> getAdditionalProperties() {
+            return List.of();
+        }
 
         /**
          * Returns the property definitions describing the object's explicitly declared fields.
          *
-         * @return an {@link Optional} containing the list of properties, or an empty {@link Optional} if none are
-         *         declared
+         * @return the list of properties, or an empty list if none are declared
          */
-        Optional<List<? extends Property.ValueProperty<?>>> getProperties();
+        default List<? extends Property.ValueProperty<?>> getProperties() {
+            return List.of();
+        }
     }
 
     /**
@@ -207,7 +212,9 @@ public interface Property extends BaseProperty {
          *
          * @return an {@link Optional} containing the language identifier, or an empty {@link Optional} if none is set
          */
-        Optional<String> getLanguageId();
+        default Optional<String> getLanguageId() {
+            return Optional.empty();
+        }
     }
 
     /**

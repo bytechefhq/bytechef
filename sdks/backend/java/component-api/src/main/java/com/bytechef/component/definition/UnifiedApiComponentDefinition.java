@@ -32,5 +32,7 @@ public interface UnifiedApiComponentDefinition {
      * @return an {@link Optional} containing the unified API definition, or an empty {@link Optional} if the component
      *         does not provide one
      */
-    Optional<UnifiedApiDefinition> getUnifiedApi();
+    default Optional<UnifiedApiDefinition> getUnifiedApi() {
+        return Optional.empty();
+    }
 }

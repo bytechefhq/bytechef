@@ -34,14 +34,18 @@ public interface BaseOutputDefinition {
      * @return an {@link Optional} containing the output function, or an empty {@link Optional} if the output is
      *         declared statically
      */
-    Optional<? extends BaseOutputFunction> getOutput();
+    default Optional<? extends BaseOutputFunction> getOutput() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the statically declared output response containing the output schema and sample data, if one is defined.
      *
      * @return an {@link Optional} containing the output response, or an empty {@link Optional} if none is defined
      */
-    Optional<OutputResponse> getOutputResponse();
+    default Optional<OutputResponse> getOutputResponse() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the output schema from the declared {@link OutputResponse}, if present.

@@ -32,7 +32,9 @@ public interface BaseOption<T> {
      *
      * @return an {@link Optional} containing the description, or an empty {@link Optional} if none is set
      */
-    Optional<String> getDescription();
+    default Optional<String> getDescription() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the human-readable label displayed for this option.

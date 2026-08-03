@@ -34,17 +34,20 @@ public interface BaseProperty {
     /**
      * Returns whether this property is shown only when advanced options are revealed.
      *
-     * @return an {@link Optional} containing {@code true} if the property is an advanced option, or an empty
-     *         {@link Optional} if unspecified
+     * @return {@code true} if the property is an advanced option, {@code false} otherwise (the default)
      */
-    Optional<Boolean> getAdvancedOption();
+    default boolean getAdvancedOption() {
+        return false;
+    }
 
     /**
      * Returns the optional description explaining the purpose of this property.
      *
      * @return an {@link Optional} containing the description, or an empty {@link Optional} if none is set
      */
-    Optional<String> getDescription();
+    default Optional<String> getDescription() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the optional display condition expression that controls when this property is visible.
@@ -52,30 +55,36 @@ public interface BaseProperty {
      * @return an {@link Optional} containing the display condition expression, or an empty {@link Optional} if none is
      *         set
      */
-    Optional<String> getDisplayCondition();
+    default Optional<String> getDisplayCondition() {
+        return Optional.empty();
+    }
 
     /**
      * Returns whether expressions may be used to compute this property's value.
      *
-     * @return an {@link Optional} containing {@code true} if expressions are enabled, or an empty {@link Optional} if
-     *         unspecified
+     * @return {@code true} if expressions are enabled, {@code false} otherwise (the default is {@code true})
      */
-    Optional<Boolean> getExpressionEnabled();
+    default boolean getExpressionEnabled() {
+        return true;
+    }
 
     /**
      * Returns whether this property is hidden from the user interface.
      *
-     * @return an {@link Optional} containing {@code true} if the property is hidden, or an empty {@link Optional} if
-     *         unspecified
+     * @return {@code true} if the property is hidden, {@code false} otherwise (the default)
      */
-    Optional<Boolean> getHidden();
+    default boolean getHidden() {
+        return false;
+    }
 
     /**
      * Returns the additional metadata associated with this property.
      *
-     * @return a map of metadata keys to their values
+     * @return the metadata map, or an empty map if none is defined
      */
-    Map<String, Object> getMetadata();
+    default Map<String, Object> getMetadata() {
+        return Map.of();
+    }
 
     /**
      * Returns the unique name identifying this property.
@@ -87,11 +96,10 @@ public interface BaseProperty {
     /**
      * Returns whether a value for this property is required.
      *
-     * @return an {@link Optional} containing {@code true} if the property is required, or an empty {@link Optional} if
-     *         unspecified
+     * @return {@code true} if the property is required, {@code false} otherwise (the default)
      */
-    default Boolean getRequired() {
-        return Boolean.FALSE;
+    default boolean getRequired() {
+        return false;
     }
 
     /**
@@ -104,32 +112,38 @@ public interface BaseProperty {
         /**
          * Returns the property definitions describing the items allowed in the array.
          *
-         * @return an {@link Optional} containing the list of item property definitions, or an empty {@link Optional} if
-         *         none are defined
+         * @return the list of item property definitions, or an empty list if none are defined
          */
-        Optional<List<? extends I>> getItems();
+        default List<? extends I> getItems() {
+            return List.of();
+        }
 
         /**
          * Returns the maximum number of items permitted in the array.
          *
          * @return an {@link Optional} containing the maximum item count, or an empty {@link Optional} if unbounded
          */
-        Optional<Long> getMaxItems();
+        default Optional<Long> getMaxItems() {
+            return Optional.empty();
+        }
 
         /**
          * Returns the minimum number of items permitted in the array.
          *
          * @return an {@link Optional} containing the minimum item count, or an empty {@link Optional} if unbounded
          */
-        Optional<Long> getMinItems();
+        default Optional<Long> getMinItems() {
+            return Optional.empty();
+        }
 
         /**
          * Returns whether the array accepts multiple values.
          *
-         * @return an {@link Optional} containing {@code true} if multiple values are allowed, or an empty
-         *         {@link Optional} if unspecified
+         * @return {@code true} if multiple values are allowed, {@code false} otherwise (the default is {@code true})
          */
-        Optional<Boolean> getMultipleValues();
+        default boolean getMultipleValues() {
+            return true;
+        }
     }
 
     /**
@@ -175,14 +189,18 @@ public interface BaseProperty {
          *
          * @return an {@link Optional} containing the maximum value, or an empty {@link Optional} if unbounded
          */
-        Optional<Long> getMaxValue();
+        default Optional<Long> getMaxValue() {
+            return Optional.empty();
+        }
 
         /**
          * Returns the minimum value permitted for this property.
          *
          * @return an {@link Optional} containing the minimum value, or an empty {@link Optional} if unbounded
          */
-        Optional<Long> getMinValue();
+        default Optional<Long> getMinValue() {
+            return Optional.empty();
+        }
     }
 
     /**
@@ -201,35 +219,45 @@ public interface BaseProperty {
          *
          * @return an {@link Optional} containing the maximum precision, or an empty {@link Optional} if unspecified
          */
-        Optional<Integer> getMaxNumberPrecision();
+        default Optional<Integer> getMaxNumberPrecision() {
+            return Optional.empty();
+        }
 
         /**
          * Returns the maximum value permitted for this property.
          *
          * @return an {@link Optional} containing the maximum value, or an empty {@link Optional} if unbounded
          */
-        Optional<Double> getMaxValue();
+        default Optional<Double> getMaxValue() {
+            return Optional.empty();
+        }
 
         /**
          * Returns the minimum value permitted for this property.
          *
          * @return an {@link Optional} containing the minimum value, or an empty {@link Optional} if unbounded
          */
-        Optional<Double> getMinValue();
+        default Optional<Double> getMinValue() {
+            return Optional.empty();
+        }
 
         /**
          * Returns the minimum number of decimal places permitted for this property's value.
          *
          * @return an {@link Optional} containing the minimum precision, or an empty {@link Optional} if unspecified
          */
-        Optional<Integer> getMinNumberPrecision();
+        default Optional<Integer> getMinNumberPrecision() {
+            return Optional.empty();
+        }
 
         /**
          * Returns the number of decimal places used when displaying this property's value.
          *
          * @return an {@link Optional} containing the number precision, or an empty {@link Optional} if unspecified
          */
-        Optional<Integer> getNumberPrecision();
+        default Optional<Integer> getNumberPrecision() {
+            return Optional.empty();
+        }
     }
 
     /**
@@ -242,26 +270,29 @@ public interface BaseProperty {
         /**
          * Returns the property definitions describing dynamically added properties not covered by the fixed schema.
          *
-         * @return an {@link Optional} containing the list of additional property definitions, or an empty
-         *         {@link Optional} if none are defined
+         * @return the list of additional property definitions, or an empty list if none are defined
          */
-        Optional<List<? extends P>> getAdditionalProperties();
+        default List<? extends P> getAdditionalProperties() {
+            return List.of();
+        }
 
         /**
          * Returns whether the object accepts multiple values.
          *
-         * @return an {@link Optional} containing {@code true} if multiple values are allowed, or an empty
-         *         {@link Optional} if unspecified
+         * @return {@code true} if multiple values are allowed, {@code false} otherwise (the default is {@code true})
          */
-        Optional<Boolean> getMultipleValues();
+        default boolean getMultipleValues() {
+            return true;
+        }
 
         /**
          * Returns the fixed property definitions describing the fields of the object.
          *
-         * @return an {@link Optional} containing the list of nested property definitions, or an empty {@link Optional}
-         *         if none are defined
+         * @return the list of nested property definitions, or an empty list if none are defined
          */
-        Optional<List<? extends P>> getProperties();
+        default List<? extends P> getProperties() {
+            return List.of();
+        }
     }
 
     /**
@@ -274,29 +305,36 @@ public interface BaseProperty {
          *
          * @return an {@link Optional} containing the maximum length, or an empty {@link Optional} if unbounded
          */
-        Optional<Integer> getMaxLength();
+        default Optional<Integer> getMaxLength() {
+            return Optional.empty();
+        }
 
         /**
          * Returns the minimum length permitted for the string value.
          *
          * @return an {@link Optional} containing the minimum length, or an empty {@link Optional} if unbounded
          */
-        Optional<Integer> getMinLength();
+        default Optional<Integer> getMinLength() {
+            return Optional.empty();
+        }
 
         /**
          * Returns the regular expression that the string value must match.
          *
          * @return an {@link Optional} containing the validation regex, or an empty {@link Optional} if none is set
          */
-        Optional<String> getRegex();
+        default Optional<String> getRegex() {
+            return Optional.empty();
+        }
 
         /**
          * Returns whether the selectable options for this property are loaded dynamically at runtime.
          *
-         * @return an {@link Optional} containing {@code true} if options are loaded dynamically, or an empty
-         *         {@link Optional} if unspecified
+         * @return {@code true} if options are loaded dynamically, {@code false} otherwise (the default)
          */
-        Optional<Boolean> getOptionsLoadedDynamically();
+        default boolean getOptionsLoadedDynamically() {
+            return false;
+        }
     }
 
     /**
@@ -325,27 +363,35 @@ public interface BaseProperty {
          *
          * @return an {@link Optional} containing the default value, or an empty {@link Optional} if none is set
          */
-        Optional<V> getDefaultValue();
+        default Optional<V> getDefaultValue() {
+            return Optional.empty();
+        }
 
         /**
          * Returns an example value illustrating the expected input for this property.
          *
          * @return an {@link Optional} containing the example value, or an empty {@link Optional} if none is set
          */
-        Optional<V> getExampleValue();
+        default Optional<V> getExampleValue() {
+            return Optional.empty();
+        }
 
         /**
          * Returns the human-readable label displayed for this property.
          *
          * @return an {@link Optional} containing the label, or an empty {@link Optional} if none is set
          */
-        Optional<String> getLabel();
+        default Optional<String> getLabel() {
+            return Optional.empty();
+        }
 
         /**
          * Returns the placeholder text shown in the input control when no value is entered.
          *
          * @return an {@link Optional} containing the placeholder text, or an empty {@link Optional} if none is set
          */
-        Optional<String> getPlaceholder();
+        default Optional<String> getPlaceholder() {
+            return Optional.empty();
+        }
     }
 }

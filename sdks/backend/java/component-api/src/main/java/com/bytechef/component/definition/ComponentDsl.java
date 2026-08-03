@@ -53,8 +53,6 @@ import java.util.stream.Collectors;
  */
 public final class ComponentDsl {
 
-    private static final int VERSION_1 = 1;
-
     public static ModifiableActionDefinition action(String name) {
         return new ModifiableActionDefinition(name);
     }
@@ -252,7 +250,7 @@ public final class ComponentDsl {
 
         Optional<String> title = actionDefinition.getTitle();
         Optional<String> description = actionDefinition.getDescription();
-        Optional<List<? extends Property>> properties = actionDefinition.getProperties();
+        List<? extends Property> properties = actionDefinition.getProperties();
         Optional<OutputDefinition> outputDefinition = actionDefinition.getOutputDefinition();
 
         ModifiableClusterElementDefinition<ToolFunction> clusterElementDefinition =
@@ -260,7 +258,7 @@ public final class ComponentDsl {
                 .title(title.orElse(null))
                 .description(description.orElse(null))
                 .type(TOOLS)
-                .properties(properties.orElse(List.of()));
+                .properties(properties);
 
         outputDefinition.ifPresent(definition -> {
             Optional<? extends BaseOutputFunction> outputFunction = definition.getOutput();
@@ -299,19 +297,19 @@ public final class ComponentDsl {
 
     public static final class ModifiableActionDefinition implements ActionDefinition {
 
-        private Boolean batch;
+        private Boolean batch = Boolean.FALSE;
         private BeforeSuspendConsumer beforeSuspendConsumer;
         private BeforeResumeFunction beforeResumeFunction;
         private BeforeTimeoutResumeFunction beforeTimeoutResumeFunction;
-        private Boolean deprecated;
+        private Boolean deprecated = Boolean.FALSE;
         private String description;
         private Help help;
-        private Map<String, Object> metadata;
+        private Map<String, Object> metadata = new HashMap<>();
         private String name;
         private OutputDefinition outputDefinition;
         private BasePerformFunction performFunction;
         private ProcessErrorResponseFunction processErrorResponseFunction;
-        private List<? extends Property> properties;
+        private List<? extends Property> properties = List.of();
         private BaseResumePerformFunction resumePerformFunction;
         private String title;
         private WorkflowNodeDescriptionFunction workflowNodeDescriptionFunction;
@@ -347,7 +345,7 @@ public final class ComponentDsl {
             return this;
         }
 
-        public ModifiableActionDefinition deprecated(Boolean deprecated) {
+        public ModifiableActionDefinition deprecated(boolean deprecated) {
             this.deprecated = deprecated;
 
             return this;
@@ -543,8 +541,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<Boolean> getBatch() {
-            return Optional.ofNullable(batch);
+        public boolean getBatch() {
+            return batch;
         }
 
         @Override
@@ -563,8 +561,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<Boolean> getDeprecated() {
-            return Optional.ofNullable(deprecated);
+        public boolean getDeprecated() {
+            return deprecated;
         }
 
         @Override
@@ -578,8 +576,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<Map<String, Object>> getMetadata() {
-            return Optional.ofNullable(metadata == null ? null : new HashMap<>(metadata));
+        public Map<String, Object> getMetadata() {
+            return metadata == null ? Map.of() : new HashMap<>(metadata);
         }
 
         @Override
@@ -603,8 +601,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<List<? extends Property>> getProperties() {
-            return Optional.ofNullable(properties);
+        public List<? extends Property> getProperties() {
+            return properties == null ? List.of() : properties;
         }
 
         @Override
@@ -647,12 +645,12 @@ public final class ComponentDsl {
     public static final class ModifiableArrayProperty
         extends ModifiableValueProperty<List<?>, ModifiableArrayProperty> implements Property.ArrayProperty {
 
-        private List<? extends ValueProperty<?>> items;
-        private List<String> optionsLookupDependsOn;
+        private List<? extends ValueProperty<?>> items = List.of();
+        private List<String> optionsLookupDependsOn = List.of();
         private Long maxItems;
         private Long minItems;
-        private Boolean multipleValues;
-        private List<? extends Option<Object>> options;
+        private Boolean multipleValues = Boolean.TRUE;
+        private List<? extends Option<Object>> options = List.of();
         private BaseOptionsFunction optionsFunction;
 
         private ModifiableArrayProperty() {
@@ -812,7 +810,7 @@ public final class ComponentDsl {
 
         @Override
         public ControlType getControlType() {
-            if (options == null && optionsFunction == null) {
+            if ((options == null || options.isEmpty()) && optionsFunction == null) {
                 return ControlType.ARRAY_BUILDER;
             } else {
                 return ControlType.MULTI_SELECT;
@@ -820,8 +818,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<List<? extends ValueProperty<?>>> getItems() {
-            return Optional.ofNullable(items);
+        public List<? extends ValueProperty<?>> getItems() {
+            return List.copyOf(items);
         }
 
         @Override
@@ -835,13 +833,13 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<Boolean> getMultipleValues() {
-            return Optional.ofNullable(multipleValues);
+        public boolean getMultipleValues() {
+            return multipleValues;
         }
 
         @Override
-        public Optional<List<? extends Option<Object>>> getOptions() {
-            return Optional.ofNullable(options);
+        public List<? extends Option<Object>> getOptions() {
+            return List.copyOf(options);
         }
 
         void setOptions(List<ModifiableOption<Object>> options) {
@@ -906,14 +904,14 @@ public final class ComponentDsl {
         private ClientIdFunction clientIdFunction;
         private ClientSecretFunction clientSecretFunction;
         private RefreshTokenFunction refreshTokenFunction;
-        private List<String> detectOn;
+        private List<String> detectOn = List.of();
         private String description;
         private String name;
         private OAuth2AuthorizationExtraQueryParametersFunction oAuth2AuthorizationExtraQueryParametersFunction;
         private PkceFunction pkceFunction;
-        private List<? extends Property> properties;
+        private List<? extends Property> properties = List.of();
         private RefreshFunction refreshFunction;
-        private List<Object> refreshOn;
+        private List<Object> refreshOn = DEFAULT_REFRESH_ON;
         private RefreshUrlFunction refreshUrlFunction;
         private ScopesFunction scopesFunction;
         private String title;
@@ -1097,8 +1095,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<List<String>> getDetectOn() {
-            return Optional.ofNullable(detectOn);
+        public List<String> getDetectOn() {
+            return detectOn;
         }
 
         @Override
@@ -1122,8 +1120,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<List<? extends Property>> getProperties() {
-            return Optional.ofNullable(properties);
+        public List<? extends Property> getProperties() {
+            return properties;
         }
 
         @Override
@@ -1132,8 +1130,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<List<Object>> getRefreshOn() {
-            return Optional.ofNullable(refreshOn);
+        public List<Object> getRefreshOn() {
+            return List.copyOf(refreshOn);
         }
 
         @Override
@@ -1259,8 +1257,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<List<? extends Option<Boolean>>> getOptions() {
-            return Optional.of(options);
+        public List<? extends Option<Boolean>> getOptions() {
+            return List.copyOf(options);
         }
 
         void setOptions(List<ModifiableOption<Boolean>> options) {
@@ -1299,22 +1297,22 @@ public final class ComponentDsl {
 
     public static final class ModifiableComponentDefinition implements ComponentDefinition {
 
-        private List<ActionDefinition> actions;
-        private List<ComponentCategory> componentCategories;
+        private List<ActionDefinition> actions = List.of();
+        private List<ComponentCategory> componentCategories = List.of();
         private ConnectionDefinition connection;
-        private Boolean customAction;
+        private Boolean customAction = Boolean.FALSE;
         private Help customActionHelp;
-        private List<ClusterElementDefinition<?>> clusterElements;
+        private List<ClusterElementDefinition<?>> clusterElements = List.of();
         private String description;
         private String icon;
-        private List<String> tags;
-        private Map<String, Object> metadata;
+        private List<String> tags = List.of();
+        private Map<String, Object> metadata = new HashMap<>();
         private String name;
-        private List<ModifiablePropertyGroup> inputs;
+        private List<ModifiablePropertyGroup> inputs = List.of();
         private Resources resources;
         private int version = VERSION_1;
         private String title;
-        private List<TriggerDefinition> triggers;
+        private List<TriggerDefinition> triggers = List.of();
         private UnifiedApiDefinition unifiedApi;
 
         private ModifiableComponentDefinition() {
@@ -1481,18 +1479,18 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<List<ActionDefinition>> getActions() {
-            return Optional.ofNullable(actions == null ? null : actions);
+        public List<ActionDefinition> getActions() {
+            return actions == null ? List.of() : actions;
         }
 
         @Override
-        public Optional<List<? extends PropertyGroup>> getInputs() {
-            return Optional.ofNullable(inputs);
+        public List<? extends PropertyGroup> getInputs() {
+            return inputs == null ? List.of() : inputs;
         }
 
         @Override
-        public Optional<List<ComponentCategory>> getComponentCategories() {
-            return Optional.ofNullable(componentCategories);
+        public List<ComponentCategory> getComponentCategories() {
+            return componentCategories == null ? List.of() : componentCategories;
         }
 
         @Override
@@ -1501,8 +1499,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<Boolean> getCustomAction() {
-            return Optional.ofNullable(customAction);
+        public boolean getCustomAction() {
+            return customAction;
         }
 
         @Override
@@ -1511,8 +1509,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<List<ClusterElementDefinition<?>>> getClusterElements() {
-            return Optional.ofNullable(clusterElements);
+        public List<ClusterElementDefinition<?>> getClusterElements() {
+            return clusterElements == null ? List.of() : clusterElements;
         }
 
         @Override
@@ -1526,8 +1524,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<Map<String, Object>> getMetadata() {
-            return Optional.ofNullable(metadata == null ? null : new HashMap<>(metadata));
+        public Map<String, Object> getMetadata() {
+            return metadata == null ? Map.of() : new HashMap<>(metadata);
         }
 
         @Override
@@ -1541,8 +1539,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<List<String>> getTags() {
-            return Optional.ofNullable(tags == null ? null : Collections.unmodifiableList(tags));
+        public List<String> getTags() {
+            return tags == null ? List.of() : Collections.unmodifiableList(tags);
         }
 
         @Override
@@ -1551,8 +1549,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<List<TriggerDefinition>> getTriggers() {
-            return Optional.ofNullable(triggers == null ? null : triggers);
+        public List<TriggerDefinition> getTriggers() {
+            return triggers == null ? List.of() : triggers;
         }
 
         @Override
@@ -1680,13 +1678,13 @@ public final class ComponentDsl {
 
     public static final class ModifiableConnectionDefinition implements ConnectionDefinition {
 
-        private List<? extends ModifiableAuthorization> authorizations;
+        private List<? extends ModifiableAuthorization> authorizations = List.of();
         private BaseUriFunction baseUriFunction;
         private Help help;
-        private List<? extends Property> properties;
+        private List<? extends Property> properties = new ArrayList<>();
         private TestConsumer testConsumer;
-        private int version = 1;
-        private Boolean authorizationRequired;
+        private int version = VERSION_1;
+        private Boolean authorizationRequired = Boolean.TRUE;
         private ProcessErrorResponseFunction processErrorResponseFunction;
 
         private ModifiableConnectionDefinition() {
@@ -1787,13 +1785,13 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<Boolean> getAuthorizationRequired() {
-            return Optional.ofNullable(authorizationRequired);
+        public boolean getAuthorizationRequired() {
+            return authorizationRequired;
         }
 
         @Override
-        public Optional<List<? extends Authorization>> getAuthorizations() {
-            return Optional.ofNullable(authorizations == null ? null : new ArrayList<>(authorizations));
+        public List<? extends Authorization> getAuthorizations() {
+            return authorizations == null ? List.of() : new ArrayList<>(authorizations);
         }
 
         @Override
@@ -1812,8 +1810,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<List<? extends Property>> getProperties() {
-            return Optional.ofNullable(properties);
+        public List<? extends Property> getProperties() {
+            return properties == null ? List.of() : List.copyOf(properties);
         }
 
         @Override
@@ -1847,7 +1845,7 @@ public final class ComponentDsl {
         private final String name;
         private OutputDefinition outputDefinition;
         private ProcessErrorResponseFunction processErrorResponseFunction;
-        private List<? extends Property> properties;
+        private List<? extends Property> properties = List.of();
         private String title;
         private WorkflowNodeDescriptionFunction workflowNodeDescriptionFunction;
 
@@ -2037,8 +2035,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<List<? extends Property>> getProperties() {
-            return Optional.ofNullable(properties);
+        public List<? extends Property> getProperties() {
+            return properties == null ? List.of() : properties;
         }
 
         @Override
@@ -2082,8 +2080,8 @@ public final class ComponentDsl {
         extends ModifiableValueProperty<LocalDate, ModifiableDateProperty>
         implements Property.DateProperty {
 
-        private List<String> optionsLookupDependsOn;
-        private List<? extends Option<LocalDate>> options;
+        private List<String> optionsLookupDependsOn = List.of();
+        private List<? extends Option<LocalDate>> options = List.of();
         private BaseOptionsFunction optionsFunction;
 
         private ModifiableDateProperty() {
@@ -2154,7 +2152,7 @@ public final class ComponentDsl {
 
         @Override
         public ControlType getControlType() {
-            if (options == null && optionsFunction == null) {
+            if ((options == null || options.isEmpty()) && optionsFunction == null) {
                 return ControlType.DATE;
             } else {
                 return ControlType.SELECT;
@@ -2162,8 +2160,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<List<? extends Option<LocalDate>>> getOptions() {
-            return Optional.ofNullable(options);
+        public List<? extends Option<LocalDate>> getOptions() {
+            return List.copyOf(options);
         }
 
         void setOptions(List<ModifiableOption<LocalDate>> options) {
@@ -2192,8 +2190,8 @@ public final class ComponentDsl {
         extends ModifiableValueProperty<LocalDateTime, ModifiableDateTimeProperty>
         implements Property.DateTimeProperty {
 
-        private List<String> optionsLookupDependsOn;
-        private List<? extends Option<LocalDateTime>> options;
+        private List<String> optionsLookupDependsOn = List.of();
+        private List<? extends Option<LocalDateTime>> options = List.of();
         private BaseOptionsFunction optionsFunction;
 
         private ModifiableDateTimeProperty() {
@@ -2264,7 +2262,7 @@ public final class ComponentDsl {
 
         @Override
         public ControlType getControlType() {
-            if (options == null && optionsFunction == null) {
+            if ((options == null || options.isEmpty()) && optionsFunction == null) {
                 return ControlType.DATE_TIME;
             } else {
                 return ControlType.SELECT;
@@ -2272,8 +2270,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<List<? extends Option<LocalDateTime>>> getOptions() {
-            return Optional.ofNullable(options);
+        public List<? extends Option<LocalDateTime>> getOptions() {
+            return List.copyOf(options);
         }
 
         void setOptions(List<ModifiableOption<LocalDateTime>> options) {
@@ -2303,7 +2301,7 @@ public final class ComponentDsl {
         implements Property.DynamicPropertiesProperty {
 
         private String header;
-        private List<String> propertiesLookupDependsOn;
+        private List<String> propertiesLookupDependsOn = List.of();
         private PropertiesDataSource.BasePropertiesFunction propertiesFunction;
 
         public ModifiableDynamicPropertiesProperty(String name) {
@@ -2453,10 +2451,10 @@ public final class ComponentDsl {
         extends ModifiableValueProperty<Long, ModifiableIntegerProperty>
         implements Property.IntegerProperty {
 
-        private List<String> optionsLookupDependsOn;
+        private List<String> optionsLookupDependsOn = List.of();
         private Long maxValue;
         private Long minValue;
-        private List<? extends Option<Long>> options;
+        private List<? extends Option<Long>> options = List.of();
         private BaseOptionsFunction optionsFunction;
 
         private ModifiableIntegerProperty() {
@@ -2548,7 +2546,7 @@ public final class ComponentDsl {
 
         @Override
         public ControlType getControlType() {
-            if (options == null && optionsFunction == null) {
+            if ((options == null || options.isEmpty()) && optionsFunction == null) {
                 return ControlType.INTEGER;
             } else {
                 return ControlType.SELECT;
@@ -2566,8 +2564,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<List<? extends Option<Long>>> getOptions() {
-            return Optional.ofNullable(options);
+        public List<? extends Option<Long>> getOptions() {
+            return List.copyOf(options);
         }
 
         void setOptions(List<ModifiableOption<Long>> options) {
@@ -2621,13 +2619,13 @@ public final class ComponentDsl {
         extends ModifiableValueProperty<Double, ModifiableNumberProperty>
         implements Property.NumberProperty {
 
-        private List<String> optionsLookupDependsOn;
+        private List<String> optionsLookupDependsOn = List.of();
         private Integer maxNumberPrecision;
         private Double maxValue;
         private Integer minNumberPrecision;
         private Double minValue;
         private Integer numberPrecision;
-        private List<? extends Option<Double>> options;
+        private List<? extends Option<Double>> options = List.of();
         private BaseOptionsFunction optionsFunction;
 
         private ModifiableNumberProperty() {
@@ -2769,7 +2767,7 @@ public final class ComponentDsl {
 
         @Override
         public ControlType getControlType() {
-            if (options == null && optionsFunction == null) {
+            if ((options == null || options.isEmpty()) && optionsFunction == null) {
                 return ControlType.NUMBER;
             } else {
                 return ControlType.SELECT;
@@ -2802,8 +2800,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<List<? extends Option<Double>>> getOptions() {
-            return Optional.ofNullable(options);
+        public List<? extends Option<Double>> getOptions() {
+            return List.copyOf(options);
         }
 
         void setOptions(List<ModifiableOption<Double>> options) {
@@ -2837,12 +2835,12 @@ public final class ComponentDsl {
         extends ModifiableValueProperty<Map<String, ?>, ModifiableObjectProperty>
         implements ObjectProperty {
 
-        private List<? extends ValueProperty<?>> additionalProperties;
-        private List<String> optionsLookupDependsOn;
-        private Boolean multipleValues;
-        private List<? extends Option<Object>> options;
+        private List<? extends ValueProperty<?>> additionalProperties = List.of();
+        private List<String> optionsLookupDependsOn = List.of();
+        private Boolean multipleValues = Boolean.TRUE;
+        private List<? extends Option<Object>> options = List.of();
         private BaseOptionsFunction optionsFunction;
-        private List<? extends ValueProperty<?>> properties;
+        private List<? extends ValueProperty<?>> properties = List.of();
 
         private ModifiableObjectProperty() {
             this(null);
@@ -2958,26 +2956,26 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<List<? extends ValueProperty<?>>> getAdditionalProperties() {
-            return Optional.ofNullable(additionalProperties);
+        public List<? extends ValueProperty<?>> getAdditionalProperties() {
+            return List.copyOf(additionalProperties);
         }
 
         @Override
         public ControlType getControlType() {
-            if (options == null && optionsFunction == null) {
+            if ((options == null || options.isEmpty()) && optionsFunction == null) {
                 return ControlType.OBJECT_BUILDER;
             } else {
                 return ControlType.SELECT;
             }
         }
 
-        public Optional<Boolean> getMultipleValues() {
-            return Optional.ofNullable(multipleValues);
+        public boolean getMultipleValues() {
+            return multipleValues;
         }
 
         @Override
-        public Optional<List<? extends Option<Object>>> getOptions() {
-            return Optional.ofNullable(options);
+        public List<? extends Option<Object>> getOptions() {
+            return List.copyOf(options);
         }
 
         void setOptions(List<ModifiableOption<Object>> options) {
@@ -2993,8 +2991,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<List<? extends ValueProperty<?>>> getProperties() {
-            return Optional.ofNullable(properties);
+        public List<? extends ValueProperty<?>> getProperties() {
+            return properties;
         }
 
         @Override
@@ -3082,11 +3080,11 @@ public final class ComponentDsl {
 
     public abstract static class ModifiableProperty<M extends ModifiableProperty<M>> implements Property {
 
-        private Boolean advancedOption;
+        private Boolean advancedOption = Boolean.FALSE;
         private String description;
         private String displayCondition;
-        private Boolean expressionEnabled; // Defaults to true
-        private Boolean hidden;
+        private Boolean expressionEnabled = Boolean.TRUE; // Defaults to true
+        private Boolean hidden = Boolean.FALSE;
         private Map<String, Object> metadata = new HashMap<>();
         private Boolean required = Boolean.FALSE;
         private final String name;
@@ -3184,8 +3182,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<Boolean> getAdvancedOption() {
-            return Optional.ofNullable(advancedOption);
+        public boolean getAdvancedOption() {
+            return advancedOption;
         }
 
         @Override
@@ -3199,23 +3197,23 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<Boolean> getExpressionEnabled() {
-            return Optional.ofNullable(expressionEnabled);
+        public boolean getExpressionEnabled() {
+            return expressionEnabled;
         }
 
         @Override
-        public Optional<Boolean> getHidden() {
-            return Optional.ofNullable(hidden);
+        public boolean getHidden() {
+            return hidden;
         }
 
         @Override
-        public Boolean getRequired() {
+        public boolean getRequired() {
             return required;
         }
 
         @Override
         public Map<String, Object> getMetadata() {
-            return Collections.unmodifiableMap(metadata);
+            return new HashMap<>(metadata);
         }
 
         @Override
@@ -3250,13 +3248,13 @@ public final class ComponentDsl {
 
         private ControlType controlType;
         private String languageId;
-        private List<String> optionsLookupDependsOn;
+        private List<String> optionsLookupDependsOn = List.of();
         private Integer maxLength;
         private Integer minLength;
         private String regex;
-        private List<? extends Option<String>> options;
+        private List<? extends Option<String>> options = List.of();
         private BaseOptionsFunction optionsFunction;
-        private Boolean optionsLoadedDynamically;
+        private Boolean optionsLoadedDynamically = Boolean.FALSE;
 
         private ModifiableStringProperty() {
             this(null);
@@ -3375,7 +3373,7 @@ public final class ComponentDsl {
         @Override
         public ControlType getControlType() {
             if (this.controlType == null) {
-                if (options == null && optionsFunction == null) {
+                if ((options == null || options.isEmpty()) && optionsFunction == null) {
                     return ControlType.TEXT;
                 } else {
                     return ControlType.SELECT;
@@ -3406,8 +3404,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<List<? extends Option<String>>> getOptions() {
-            return Optional.ofNullable(options);
+        public List<? extends Option<String>> getOptions() {
+            return options == null ? List.of() : List.copyOf(options);
         }
 
         void setOptions(List<ModifiableOption<String>> options) {
@@ -3423,8 +3421,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<Boolean> getOptionsLoadedDynamically() {
-            return Optional.ofNullable(optionsLoadedDynamically);
+        public boolean getOptionsLoadedDynamically() {
+            return optionsLoadedDynamically;
         }
 
         @Override
@@ -3447,8 +3445,8 @@ public final class ComponentDsl {
         extends ModifiableValueProperty<LocalTime, ModifiableTimeProperty>
         implements Property.TimeProperty {
 
-        private List<String> optionsLookupDependsOn;
-        private List<? extends Option<LocalTime>> options;
+        private List<String> optionsLookupDependsOn = List.of();
+        private List<? extends Option<LocalTime>> options = List.of();
         private BaseOptionsFunction optionsFunction;
 
         private ModifiableTimeProperty() {
@@ -3523,8 +3521,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<List<? extends Option<LocalTime>>> getOptions() {
-            return Optional.ofNullable(options);
+        public List<? extends Option<LocalTime>> getOptions() {
+            return List.copyOf(options);
         }
 
         void setOptions(List<ModifiableOption<LocalTime>> options) {
@@ -3551,9 +3549,9 @@ public final class ComponentDsl {
 
     public static final class ModifiableTriggerDefinition implements TriggerDefinition {
 
-        private Boolean batch;
+        private Boolean batch = Boolean.FALSE;
         private DeduplicateFunction deduplicateFunction;
-        private Boolean deprecated;
+        private Boolean deprecated = Boolean.FALSE;
         private String description;
         private WebhookDisableConsumer webhookDisableConsumer;
         private WebhookEnableFunction webhookEnableFunction;
@@ -3566,14 +3564,14 @@ public final class ComponentDsl {
         private String name;
         private OutputDefinition outputDefinition;
         private PollFunction pollFunction;
-        private List<Property> properties;
+        private List<Property> properties = List.of();
         private String title;
         private TriggerType type;
-        private Boolean webhookRawBody;
+        private Boolean webhookRawBody = Boolean.FALSE;
         private WebhookValidateFunction webhookValidateFunction;
         private WebhookValidateOnEnableFunction webhookValidateOnEnableFunction;
         private WorkflowNodeDescriptionFunction workflowNodeDescriptionFunction;
-        private Boolean workflowSyncExecution;
+        private Boolean workflowSyncExecution = Boolean.FALSE;
 
         public ModifiableTriggerDefinition() {
         }
@@ -3594,7 +3592,7 @@ public final class ComponentDsl {
             return this;
         }
 
-        public ModifiableTriggerDefinition deprecated(Boolean deprecated) {
+        public ModifiableTriggerDefinition deprecated(boolean deprecated) {
             this.deprecated = deprecated;
 
             return this;
@@ -3808,13 +3806,13 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<Boolean> getBatch() {
-            return Optional.ofNullable(batch);
+        public boolean getBatch() {
+            return batch;
         }
 
         @Override
-        public Optional<Boolean> getDeprecated() {
-            return Optional.ofNullable(deprecated);
+        public boolean getDeprecated() {
+            return deprecated;
         }
 
         @Override
@@ -3878,8 +3876,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<List<? extends Property>> getProperties() {
-            return Optional.ofNullable(properties);
+        public List<? extends Property> getProperties() {
+            return properties == null ? List.of() : properties;
         }
 
         @Override
@@ -3893,8 +3891,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<Boolean> getWebhookRawBody() {
-            return Optional.ofNullable(webhookRawBody);
+        public boolean getWebhookRawBody() {
+            return webhookRawBody;
         }
 
         @Override
@@ -3918,8 +3916,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<Boolean> getWorkflowSyncExecution() {
-            return Optional.ofNullable(workflowSyncExecution);
+        public boolean getWorkflowSyncExecution() {
+            return workflowSyncExecution;
         }
 
         @Override
@@ -3944,8 +3942,8 @@ public final class ComponentDsl {
 
         private final UnifiedApiCategory category;
 
-        private List<? extends ProviderModelAdapter<?, ?>> providerAdapters;
-        private List<? extends ProviderModelMapper<?, ?, ?, ?>> providerMappers;
+        private List<? extends ProviderModelAdapter<?, ?>> providerAdapters = List.of();
+        private List<? extends ProviderModelMapper<?, ?, ?, ?>> providerMappers = List.of();
 
         public ModifiableUnifiedApiDefinition(UnifiedApiCategory category) {
             this.category = category;
@@ -4119,11 +4117,15 @@ public final class ComponentDsl {
         }
     }
 
-    private record ResourcesImpl(String documentationUrl, Map<String, String> additionalUrls) implements Resources {
+    private record ResourcesImpl(String getDocumentationUrl, Map<String, String> additionalUrls) implements Resources {
+
+        private ResourcesImpl {
+            additionalUrls = additionalUrls == null ? Map.of() : additionalUrls;
+        }
 
         @Override
-        public Optional<Map<String, String>> getAdditionalUrls() {
-            return Optional.ofNullable(additionalUrls == null ? null : new HashMap<>(additionalUrls));
+        public Map<String, String> getAdditionalUrls() {
+            return new HashMap<>(additionalUrls);
         }
     }
 
