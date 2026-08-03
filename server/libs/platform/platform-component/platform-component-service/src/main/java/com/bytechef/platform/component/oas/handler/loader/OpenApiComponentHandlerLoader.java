@@ -26,8 +26,6 @@ import com.bytechef.platform.component.handler.loader.AbstractComponentHandlerLo
 import com.bytechef.platform.component.handler.loader.ComponentHandlerLoaderKind;
 import com.bytechef.platform.component.oas.handler.OpenApiComponentTaskHandler;
 import com.bytechef.platform.component.util.OpenApiClientUtils;
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
@@ -40,12 +38,10 @@ public class OpenApiComponentHandlerLoader extends AbstractComponentHandlerLoade
     public static final Function<ActionDefinition, PerformFunction> PERFORM_FUNCTION_FUNCTION =
         actionDefinition -> (inputParameters, connectionParameters, context) -> OpenApiClientUtils.execute(
             inputParameters,
-            actionDefinition.getProperties()
-                .orElse(List.of()),
+            actionDefinition.getProperties(),
             actionDefinition.getOutputDefinition()
                 .orElse(null),
-            actionDefinition.getMetadata()
-                .orElse(Map.of()),
+            actionDefinition.getMetadata(),
             actionDefinition.getProcessErrorResponse()
                 .orElse(null),
             context);
@@ -69,7 +65,6 @@ public class OpenApiComponentHandlerLoader extends AbstractComponentHandlerLoade
 
                 ActionDefinition actionDefinition = componentHandler.getDefinition()
                     .getActions()
-                    .orElse(List.of())
                     .stream()
                     .filter(action -> Objects.equals(action.getName(), clusterElementDefinition.getName()))
                     .findFirst()
