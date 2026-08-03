@@ -18,7 +18,6 @@ package com.bytechef.platform.component.service;
 
 import static com.bytechef.component.definition.Authorization.CODE;
 import static com.bytechef.component.definition.ConnectionDefinition.BaseUriFunction;
-import static com.bytechef.platform.component.domain.Authorization.DEFAULT_REFRESH_ON;
 
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.commons.util.FormatUtils;
@@ -253,8 +252,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
             componentName, connectionVersion, authorizationType);
 
-        return authorization.getDetectOn()
-            .orElse(List.of());
+        return authorization.getDetectOn();
     }
 
     @Override
@@ -273,8 +271,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         }
 
         return authorizationOptional.get()
-            .getRefreshOn()
-            .orElse(DEFAULT_REFRESH_ON);
+            .getRefreshOn();
     }
 
     @Override
@@ -304,8 +301,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException(
                     String.format(
-                        "Could not find connection definition for component=%s, version=%d",
-                        componentName, connectionVersion))));
+                        "Could not find connection definition for component=%s, version=%d", componentName,
+                        connectionVersion))));
     }
 
     @Override

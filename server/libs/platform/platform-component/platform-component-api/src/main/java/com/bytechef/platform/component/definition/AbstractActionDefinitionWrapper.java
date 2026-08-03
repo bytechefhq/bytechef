@@ -31,11 +31,11 @@ import java.util.Optional;
  */
 public abstract class AbstractActionDefinitionWrapper implements ActionDefinition {
 
-    protected final Boolean batch;
+    protected final boolean batch;
     protected final BeforeResumeFunction beforeResumeFunction;
     protected final BeforeSuspendConsumer beforeSuspendConsumer;
     protected final BeforeTimeoutResumeFunction beforeTimeoutResumeFunction;
-    protected final Boolean deprecated;
+    protected final boolean deprecated;
     protected final String description;
     protected final ProcessErrorResponseFunction processErrorResponseFunction;
     protected final Help help;
@@ -49,22 +49,22 @@ public abstract class AbstractActionDefinitionWrapper implements ActionDefinitio
     protected final WorkflowNodeDescriptionFunction workflowNodeDescriptionFunction;
 
     public AbstractActionDefinitionWrapper(ActionDefinition actionDefinition) {
-        this.batch = OptionalUtils.orElse(actionDefinition.getBatch(), null);
+        this.batch = actionDefinition.getBatch();
         this.beforeResumeFunction = actionDefinition.getBeforeResume()
             .orElse(null);
         this.beforeSuspendConsumer = actionDefinition.getBeforeSuspend()
             .orElse(null);
         this.beforeTimeoutResumeFunction = actionDefinition.getBeforeTimeoutResume()
             .orElse(null);
-        this.deprecated = OptionalUtils.orElse(actionDefinition.getDeprecated(), null);
+        this.deprecated = actionDefinition.getDeprecated();
         this.description = OptionalUtils.orElse(actionDefinition.getDescription(), null);
         this.processErrorResponseFunction = OptionalUtils.orElse(actionDefinition.getProcessErrorResponse(), null);
         this.help = OptionalUtils.orElse(actionDefinition.getHelp(), null);
-        this.metadata = OptionalUtils.orElse(actionDefinition.getMetadata(), null);
+        this.metadata = actionDefinition.getMetadata();
         this.name = actionDefinition.getName();
         this.outputSchemaFunction = OptionalUtils.orElse(actionDefinition.getOutputDefinition(), null);
         this.performFunction = OptionalUtils.orElse(actionDefinition.getPerform(), null);
-        this.properties = OptionalUtils.orElse(actionDefinition.getProperties(), null);
+        this.properties = actionDefinition.getProperties();
         this.resumePerformFunction = actionDefinition.getResumePerform()
             .orElse(null);
         this.title = OptionalUtils.orElse(actionDefinition.getTitle(), null);
@@ -73,8 +73,8 @@ public abstract class AbstractActionDefinitionWrapper implements ActionDefinitio
     }
 
     @Override
-    public Optional<Boolean> getBatch() {
-        return Optional.ofNullable(batch);
+    public boolean getBatch() {
+        return batch;
     }
 
     @Override
@@ -93,8 +93,8 @@ public abstract class AbstractActionDefinitionWrapper implements ActionDefinitio
     }
 
     @Override
-    public Optional<Boolean> getDeprecated() {
-        return Optional.ofNullable(deprecated);
+    public boolean getDeprecated() {
+        return deprecated;
     }
 
     @Override
@@ -113,8 +113,8 @@ public abstract class AbstractActionDefinitionWrapper implements ActionDefinitio
     }
 
     @Override
-    public Optional<Map<String, Object>> getMetadata() {
-        return Optional.ofNullable(metadata == null ? null : new HashMap<>(metadata));
+    public Map<String, Object> getMetadata() {
+        return metadata == null ? Map.of() : new HashMap<>(metadata);
     }
 
     @Override
@@ -133,8 +133,8 @@ public abstract class AbstractActionDefinitionWrapper implements ActionDefinitio
     }
 
     @Override
-    public Optional<List<? extends Property>> getProperties() {
-        return Optional.ofNullable(properties);
+    public List<? extends Property> getProperties() {
+        return properties == null ? List.of() : properties;
     }
 
     @Override

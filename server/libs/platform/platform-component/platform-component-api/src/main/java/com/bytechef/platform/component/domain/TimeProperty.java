@@ -39,7 +39,7 @@ public class TimeProperty extends ValueProperty<LocalTime> implements OptionsDat
     public TimeProperty(Property.TimeProperty timeProperty) {
         super(timeProperty);
 
-        this.options = CollectionUtils.map(OptionalUtils.orElse(timeProperty.getOptions(), List.of()), Option::new);
+        this.options = CollectionUtils.map(timeProperty.getOptions(), Option::new);
         this.optionsDataSource = OptionalUtils.mapOrElse(
             timeProperty.getOptionsDataSource(), OptionsDataSource::new, null);
     }
