@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.component.service;
 
-import static com.bytechef.platform.component.domain.Authorization.DEFAULT_REFRESH_ON;
+import static com.bytechef.component.definition.Authorization.DEFAULT_REFRESH_ON;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;

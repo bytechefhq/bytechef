@@ -39,7 +39,7 @@ public class DateProperty extends ValueProperty<LocalDate> implements OptionsDat
     public DateProperty(Property.DateProperty dateProperty) {
         super(dateProperty);
 
-        this.options = CollectionUtils.map(OptionalUtils.orElse(dateProperty.getOptions(), List.of()), Option::new);
+        this.options = CollectionUtils.map(dateProperty.getOptions(), Option::new);
         this.optionsDataSource = OptionalUtils.mapOrElse(
             dateProperty.getOptionsDataSource(), OptionsDataSource::new, null);
     }

@@ -42,7 +42,7 @@ public abstract class AbstractComponentDefinitionWrapper implements ComponentDef
     protected final List<ActionDefinition> actions;
     protected final List<ComponentCategory> componentCategories;
     protected final ConnectionDefinition connection;
-    protected final Boolean customAction;
+    protected final boolean customAction;
     protected final Help customActionHelp;
     protected final List<ClusterElementDefinition<?>> clusterElements;
     protected final String description;
@@ -58,38 +58,38 @@ public abstract class AbstractComponentDefinitionWrapper implements ComponentDef
     protected final int version;
 
     public AbstractComponentDefinitionWrapper(ComponentDefinition componentDefinition) {
-        this.actions = OptionalUtils.orElse(componentDefinition.getActions(), List.of());
-        this.componentCategories = OptionalUtils.orElse(componentDefinition.getComponentCategories(), List.of());
+        this.actions = componentDefinition.getActions();
+        this.componentCategories = componentDefinition.getComponentCategories();
         this.connection = OptionalUtils.orElse(componentDefinition.getConnection(), null);
-        this.customAction = OptionalUtils.orElse(componentDefinition.getCustomAction(), null);
+        this.customAction = componentDefinition.getCustomAction();
         this.customActionHelp = OptionalUtils.orElse(componentDefinition.getCustomActionHelp(), null);
-        this.clusterElements = OptionalUtils.orElse(componentDefinition.getClusterElements(), null);
+        this.clusterElements = componentDefinition.getClusterElements();
         this.description = OptionalUtils.orElse(componentDefinition.getDescription(), null);
         this.icon = OptionalUtils.orElse(componentDefinition.getIcon(), null);
-        this.tags = OptionalUtils.orElse(componentDefinition.getTags(), null);
-        this.metadata = OptionalUtils.orElse(componentDefinition.getMetadata(), null);
+        this.tags = componentDefinition.getTags();
+        this.metadata = componentDefinition.getMetadata();
         this.name = componentDefinition.getName();
-        this.inputs = OptionalUtils.orElse(componentDefinition.getInputs(), null);
+        this.inputs = componentDefinition.getInputs();
         this.resources = OptionalUtils.orElse(componentDefinition.getResources(), null);
         this.title = OptionalUtils.orElse(componentDefinition.getTitle(), null);
-        this.triggers = OptionalUtils.orElse(componentDefinition.getTriggers(), null);
+        this.triggers = componentDefinition.getTriggers();
         this.unifiedApi = OptionalUtils.orElse(componentDefinition.getUnifiedApi(), null);
         this.version = componentDefinition.getVersion();
     }
 
     @Override
-    public Optional<List<ActionDefinition>> getActions() {
-        return Optional.ofNullable(actions == null ? null : new ArrayList<>(actions));
+    public List<ActionDefinition> getActions() {
+        return actions == null ? List.of() : new ArrayList<>(actions);
     }
 
     @Override
-    public Optional<List<ComponentCategory>> getComponentCategories() {
-        return Optional.ofNullable(componentCategories == null ? null : new ArrayList<>(componentCategories));
+    public List<ComponentCategory> getComponentCategories() {
+        return componentCategories == null ? List.of() : new ArrayList<>(componentCategories);
     }
 
     @Override
-    public Optional<List<ClusterElementDefinition<?>>> getClusterElements() {
-        return Optional.ofNullable(clusterElements);
+    public List<ClusterElementDefinition<?>> getClusterElements() {
+        return clusterElements == null ? List.of() : clusterElements;
     }
 
     @Override
@@ -98,8 +98,8 @@ public abstract class AbstractComponentDefinitionWrapper implements ComponentDef
     }
 
     @Override
-    public Optional<Boolean> getCustomAction() {
-        return Optional.ofNullable(customAction);
+    public boolean getCustomAction() {
+        return customAction;
     }
 
     @Override
@@ -118,8 +118,8 @@ public abstract class AbstractComponentDefinitionWrapper implements ComponentDef
     }
 
     @Override
-    public Optional<Map<String, Object>> getMetadata() {
-        return Optional.ofNullable(metadata == null ? null : new HashMap<>(metadata));
+    public Map<String, Object> getMetadata() {
+        return metadata == null ? Map.of() : new HashMap<>(metadata);
     }
 
     @Override
@@ -128,8 +128,8 @@ public abstract class AbstractComponentDefinitionWrapper implements ComponentDef
     }
 
     @Override
-    public Optional<List<? extends PropertyGroup>> getInputs() {
-        return Optional.ofNullable(inputs == null ? null : new ArrayList<>(inputs));
+    public List<? extends PropertyGroup> getInputs() {
+        return inputs == null ? List.of() : new ArrayList<>(inputs);
     }
 
     @Override
@@ -138,8 +138,8 @@ public abstract class AbstractComponentDefinitionWrapper implements ComponentDef
     }
 
     @Override
-    public Optional<List<String>> getTags() {
-        return Optional.ofNullable(tags == null ? null : Collections.unmodifiableList(tags));
+    public List<String> getTags() {
+        return tags == null ? List.of() : Collections.unmodifiableList(tags);
     }
 
     @Override
@@ -148,8 +148,8 @@ public abstract class AbstractComponentDefinitionWrapper implements ComponentDef
     }
 
     @Override
-    public Optional<List<TriggerDefinition>> getTriggers() {
-        return Optional.ofNullable(triggers == null ? null : new ArrayList<>(triggers));
+    public List<TriggerDefinition> getTriggers() {
+        return triggers == null ? List.of() : new ArrayList<>(triggers);
     }
 
     @Override

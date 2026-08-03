@@ -18,7 +18,6 @@ package com.bytechef.platform.component.trigger.handler;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.TriggerDefinition;
@@ -69,17 +68,18 @@ public final class ComponentTriggerHandlerProvider implements TriggerHandlerProv
     private Map<String, TriggerHandler> collect(
         ComponentDefinition componentDefinition, TriggerDefinitionFacade triggerDefinitionFacade) {
 
-        return OptionalUtils.orElse(componentDefinition.getTriggers(), List.of())
+        int componentVersion = componentDefinition.getVersion();
+
+        return componentDefinition.getTriggers()
             .stream()
             .filter(triggerDefinition -> triggerDefinition != null &&
                 triggerDefinition.getType() != TriggerDefinition.TriggerType.LISTENER)
             .collect(
                 Collectors.toMap(
                     (TriggerDefinition triggerDefinition) -> BeanUtils.getBeanName(
-                        componentDefinition.getName(), componentDefinition.getVersion(),
-                        triggerDefinition.getName()),
+                        componentDefinition.getName(), componentVersion, triggerDefinition.getName()),
                     triggerDefinition -> new ComponentTriggerHandler(
-                        componentDefinition.getName(), componentDefinition.getVersion(),
-                        triggerDefinition.getName(), triggerDefinitionFacade)));
+                        componentDefinition.getName(), componentVersion, triggerDefinition.getName(),
+                        triggerDefinitionFacade)));
     }
 }

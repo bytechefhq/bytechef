@@ -98,7 +98,7 @@ public class TriggerDefinitionServiceTest {
                 List.of("Test Record"), Map.of("lastPolledAt", System.currentTimeMillis()), false);
 
         when(mockTriggerDefinition.getPoll()).thenReturn(Optional.of(mockPollFunction));
-        when(mockTriggerDefinition.getBatch()).thenReturn(Optional.of(false));
+        when(mockTriggerDefinition.getBatch()).thenReturn(false);
 
         when(componentDefinitionRegistry.getTriggerDefinition("testComponent", 1, "testTrigger"))
             .thenReturn(mockTriggerDefinition);
@@ -178,7 +178,7 @@ public class TriggerDefinitionServiceTest {
         TriggerDefinition mockTriggerDefinition = mock(TriggerDefinition.class);
 
         when(mockTriggerDefinition.getType()).thenReturn(TriggerType.POLLING);
-        when(mockTriggerDefinition.getBatch()).thenReturn(Optional.of(false));
+        when(mockTriggerDefinition.getBatch()).thenReturn(false);
 
         // A transient provider failure must skip the cycle (no records, no exception) while preserving the prior
         // closure state so the next scheduled poll resumes from the same cursor.
@@ -230,7 +230,7 @@ public class TriggerDefinitionServiceTest {
         TriggerDefinition mockTriggerDefinition = mock(TriggerDefinition.class);
 
         when(mockTriggerDefinition.getType()).thenReturn(TriggerType.POLLING);
-        when(mockTriggerDefinition.getBatch()).thenReturn(Optional.of(false));
+        when(mockTriggerDefinition.getBatch()).thenReturn(false);
 
         AtomicInteger pollCount = new AtomicInteger();
 
@@ -285,7 +285,7 @@ public class TriggerDefinitionServiceTest {
             };
 
         when(mockTriggerDefinition.getPoll()).thenReturn(Optional.of(mockPollFunction));
-        when(mockTriggerDefinition.getBatch()).thenReturn(Optional.of(false));
+        when(mockTriggerDefinition.getBatch()).thenReturn(false);
 
         when(componentDefinitionRegistry.getTriggerDefinition("testComponent", 1, "testTrigger"))
             .thenReturn(mockTriggerDefinition);
@@ -336,7 +336,7 @@ public class TriggerDefinitionServiceTest {
             };
 
         when(mockTriggerDefinition.getPoll()).thenReturn(Optional.of(mockPollFunction));
-        when(mockTriggerDefinition.getBatch()).thenReturn(Optional.of(false));
+        when(mockTriggerDefinition.getBatch()).thenReturn(false);
 
         when(componentDefinitionRegistry.getTriggerDefinition("testComponent", 1, "testTrigger"))
             .thenReturn(mockTriggerDefinition);
@@ -363,7 +363,7 @@ public class TriggerDefinitionServiceTest {
         TriggerDefinition mockTriggerDefinition = mock(TriggerDefinition.class);
 
         when(mockTriggerDefinition.getType()).thenReturn(TriggerType.POLLING);
-        when(mockTriggerDefinition.getBatch()).thenReturn(Optional.of(false));
+        when(mockTriggerDefinition.getBatch()).thenReturn(false);
 
         AtomicInteger pollCount = new AtomicInteger();
 
@@ -414,7 +414,7 @@ public class TriggerDefinitionServiceTest {
                 List.of("record"), Map.of("cursor", System.nanoTime()), true);
 
         when(mockTriggerDefinition.getPoll()).thenReturn(Optional.of(mockPollFunction));
-        when(mockTriggerDefinition.getBatch()).thenReturn(Optional.of(false));
+        when(mockTriggerDefinition.getBatch()).thenReturn(false);
 
         when(componentDefinitionRegistry.getTriggerDefinition("testComponent", 1, "testTrigger"))
             .thenReturn(mockTriggerDefinition);
@@ -484,7 +484,7 @@ public class TriggerDefinitionServiceTest {
                 List.of(), Map.of(), false);
 
         when(mockTriggerDefinition.getPoll()).thenReturn(Optional.of(mockPollFunction));
-        when(mockTriggerDefinition.getBatch()).thenReturn(Optional.of(false));
+        when(mockTriggerDefinition.getBatch()).thenReturn(false);
         when(componentDefinitionRegistry.getTriggerDefinition("testComponent", 1, "testTrigger"))
             .thenReturn(mockTriggerDefinition);
 
@@ -560,7 +560,7 @@ public class TriggerDefinitionServiceTest {
         lenient().when(mockTriggerDefinition.getWebhookRequest())
             .thenReturn(Optional.of(webhookRequestFunction));
         lenient().when(mockTriggerDefinition.getBatch())
-            .thenReturn(Optional.of(false));
+            .thenReturn(false);
         when(componentDefinitionRegistry.getTriggerDefinition("testComponent", 1, "testTrigger"))
             .thenReturn(mockTriggerDefinition);
 

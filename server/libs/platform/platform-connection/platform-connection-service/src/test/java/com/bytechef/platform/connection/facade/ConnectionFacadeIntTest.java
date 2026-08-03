@@ -99,7 +99,8 @@ class ConnectionFacadeIntTest {
     @BeforeEach
     void beforeEach() {
         when(connectionDefinitionService.getConnectionConnectionDefinition("componentName", 1))
-            .thenReturn(new ConnectionDefinition(new MockConnectionDefinition(), "componentName", null, null));
+            .thenReturn(
+                new ConnectionDefinition(new MockConnectionDefinition(), "componentName", "componentTitle", null));
     }
 
     @Test
@@ -506,13 +507,13 @@ class ConnectionFacadeIntTest {
     private static class MockConnectionDefinition implements com.bytechef.component.definition.ConnectionDefinition {
 
         @Override
-        public Optional<Boolean> getAuthorizationRequired() {
-            return Optional.empty();
+        public boolean getAuthorizationRequired() {
+            return false;
         }
 
         @Override
-        public Optional<List<? extends Authorization>> getAuthorizations() {
-            return Optional.empty();
+        public List<? extends Authorization> getAuthorizations() {
+            return List.of();
         }
 
         @Override
@@ -531,18 +532,13 @@ class ConnectionFacadeIntTest {
         }
 
         @Override
-        public Optional<List<? extends Property>> getProperties() {
-            return Optional.empty();
+        public List<? extends Property> getProperties() {
+            return List.of();
         }
 
         @Override
         public Optional<TestConsumer> getTest() {
             return Optional.empty();
-        }
-
-        @Override
-        public int getVersion() {
-            return 0;
         }
     }
 }
