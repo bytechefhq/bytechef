@@ -1,6 +1,7 @@
 dependencies {
     implementation(libs.org.springaicommunity.spring.ai.agent.utils)
     implementation(project(":server:libs:core:commons:commons-util"))
+    implementation(project(":server:libs:core:tenant:tenant-api"))
     implementation(project(":server:libs:core:file-storage:file-storage-api"))
     implementation(project(":server:libs:modules:components:script"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-api"))
