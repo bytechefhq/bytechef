@@ -28,7 +28,6 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefini
 import com.google.auto.service.AutoService;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * @author Monika Kušter
@@ -50,11 +49,9 @@ public class DevtoComponentHandler extends AbstractDevtoComponentHandler {
     public ModifiableConnectionDefinition modifyConnection(
         ModifiableConnectionDefinition modifiableConnectionDefinition) {
 
-        Optional<List<? extends Authorization>> optionalAuthorizations =
-            modifiableConnectionDefinition.getAuthorizations();
+        List<? extends Authorization> authorizations = modifiableConnectionDefinition.getAuthorizations();
 
-        if (optionalAuthorizations.isPresent()) {
-            List<? extends Authorization> authorizations = optionalAuthorizations.get();
+        if (!authorizations.isEmpty()) {
             ModifiableAuthorization modifiableAuthorization = (ModifiableAuthorization) authorizations.getFirst();
 
             modifiableAuthorization.apply((connectionParameters, context) -> ApplyResponse.ofHeaders(

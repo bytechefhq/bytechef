@@ -38,7 +38,6 @@ import com.google.auto.service.AutoService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * @author Monika Domiter
@@ -59,15 +58,13 @@ public class ActiveCampaignComponentHandler extends AbstractActiveCampaignCompon
     public ModifiableConnectionDefinition modifyConnection(
         ModifiableConnectionDefinition modifiableConnectionDefinition) {
 
-        Optional<List<? extends Authorization>> optionalAuthorizations =
-            modifiableConnectionDefinition.getAuthorizations();
+        List<? extends Authorization> authorizations = modifiableConnectionDefinition.getAuthorizations();
 
-        if (optionalAuthorizations.isPresent()) {
-            List<? extends Authorization> authorizations = optionalAuthorizations.get();
+        if (!authorizations.isEmpty()) {
             ModifiableAuthorization modifiableAuthorization = (ModifiableAuthorization) authorizations.getFirst();
 
-            Optional<List<? extends Property>> optionalProperties = modifiableAuthorization.getProperties();
-            List<Property> properties = new ArrayList<>(optionalProperties.orElse(List.of()));
+            List<? extends Property> existingProperties = modifiableAuthorization.getProperties();
+            List<Property> properties = new ArrayList<>(existingProperties);
 
             properties.addFirst(
                 string(USERNAME)
@@ -90,14 +87,13 @@ public class ActiveCampaignComponentHandler extends AbstractActiveCampaignCompon
         ActionDefinition actionDefinition, ModifiableProperty<?> modifiableProperty) {
 
         if (Objects.equals(actionDefinition.getName(), "createTask")) {
-            for (BaseProperty baseProperty : ((ModifiableObjectProperty) modifiableProperty).getProperties()
-                .get()) {
+            for (BaseProperty baseProperty : ((ModifiableObjectProperty) modifiableProperty).getProperties()) {
 
                 if (Objects.equals(baseProperty.getName(), "task")) {
-                    Optional<List<? extends ValueProperty<?>>> propertiesOptional =
+                    List<? extends ValueProperty<?>> properties =
                         ((ModifiableObjectProperty) baseProperty).getProperties();
 
-                    for (BaseProperty baseProperty2 : propertiesOptional.get()) {
+                    for (BaseProperty baseProperty2 : properties) {
                         if (Objects.equals(baseProperty2.getName(), "relid")) {
                             ((ModifiableIntegerProperty) baseProperty2).options(
                                 (OptionsFunction<String>) ActiveCampaignUtils::getContactIdOptions);
