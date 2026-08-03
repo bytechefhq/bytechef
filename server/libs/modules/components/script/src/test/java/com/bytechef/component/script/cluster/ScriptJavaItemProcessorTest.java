@@ -49,11 +49,8 @@ class ScriptJavaItemProcessorTest {
 
         ScriptClusterElementDefinition definition = ScriptJavaItemProcessor.of(polyglotEngine);
 
-        assertThat(definition.getProperties()).isPresent();
+        assertThat(definition.getProperties()).hasSize(1);
         assertThat(definition.getProperties()
-            .orElseThrow()).hasSize(1);
-        assertThat(definition.getProperties()
-            .orElseThrow()
             .getFirst()
             .getName()).isEqualTo("script");
     }
@@ -64,11 +61,8 @@ class ScriptJavaItemProcessorTest {
 
         ScriptClusterElementDefinition definition = ScriptJavaItemProcessor.of(polyglotEngine);
 
-        assertThat(definition.getProperties()).isPresent();
+        assertThat(definition.getProperties()).isNotEmpty();
         assertThat(definition.getProperties()
-            .orElseThrow()).isNotEmpty();
-        assertThat(definition.getProperties()
-            .orElseThrow()
             .getFirst()
             .getName()).isEqualTo("script");
     }

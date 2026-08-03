@@ -28,10 +28,8 @@ import com.bytechef.component.definition.Property;
 import com.bytechef.component.nifty.trigger.NiftyNewTaskTrigger;
 import com.google.auto.service.AutoService;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * @author Monika Kušter
@@ -47,8 +45,7 @@ public class NiftyComponentHandler extends AbstractNiftyComponentHandler {
     @Override
     public List<ModifiableActionDefinition> modifyActions(ModifiableActionDefinition... actionDefinitions) {
         for (ModifiableActionDefinition modifiableActionDefinition : actionDefinitions) {
-            Optional<List<? extends Property>> propertiesOptional = modifiableActionDefinition.getProperties();
-            List<Property> properties = new ArrayList<>(propertiesOptional.orElse(Collections.emptyList()));
+            List<Property> properties = new ArrayList<>(modifiableActionDefinition.getProperties());
 
             if (Objects.equals(modifiableActionDefinition.getName(), "createTask")) {
                 properties.addFirst(PROJECT_PROPERTY);

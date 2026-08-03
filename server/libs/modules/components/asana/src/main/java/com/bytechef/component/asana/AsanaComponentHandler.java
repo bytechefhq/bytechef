@@ -67,11 +67,9 @@ public class AsanaComponentHandler extends AbstractAsanaComponentHandler {
     public ModifiableConnectionDefinition modifyConnection(
         ModifiableConnectionDefinition modifiableConnectionDefinition) {
 
-        Optional<List<? extends Authorization>> optionalAuthorizations =
-            modifiableConnectionDefinition.getAuthorizations();
+        List<? extends Authorization> authorizations = modifiableConnectionDefinition.getAuthorizations();
 
-        if (optionalAuthorizations.isPresent()) {
-            List<? extends Authorization> authorizations = optionalAuthorizations.get();
+        if (!authorizations.isEmpty()) {
 
             for (Authorization authorization : authorizations) {
                 AuthorizationType authorizationType = authorization.getType();
@@ -106,10 +104,10 @@ public class AsanaComponentHandler extends AbstractAsanaComponentHandler {
         String actionDefinitionName = actionDefinition.getName();
 
         if (actionDefinitionName.equals("createCustomField") && Objects.equals(modifiableProperty.getName(), "data")) {
-            Optional<List<? extends ValueProperty<?>>> propertiesOptional =
+            List<? extends ValueProperty<?>> properties =
                 ((ModifiableObjectProperty) modifiableProperty).getProperties();
 
-            for (BaseProperty baseProperty : propertiesOptional.get()) {
+            for (BaseProperty baseProperty : properties) {
                 if (Objects.equals(baseProperty.getName(), "text_value")) {
                     ((ModifiableStringProperty) baseProperty)
                         .displayCondition("%s == '%s'".formatted("data.resource_subtype", "text"));

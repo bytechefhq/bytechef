@@ -101,8 +101,7 @@ class LoopTaskDispatcherDefinitionFactoryVariablePropertiesTest {
         assertTrue(outputSchema instanceof ModifiableObjectProperty, "Output schema should be an ObjectProperty");
 
         ModifiableObjectProperty objectProperty = (ModifiableObjectProperty) outputSchema;
-        List<? extends BaseProperty> properties = objectProperty.getProperties()
-            .orElse(List.of());
+        List<? extends BaseProperty> properties = objectProperty.getProperties();
 
         assertEquals(2, properties.size(), "Should have 2 properties (item and index)");
         assertEquals(ITEM, properties.get(0)

@@ -49,8 +49,7 @@ public class KeapComponentHandler extends AbstractKeapComponentHandler {
 
         if (Objects.equals(actionDefinition.getName(), "createContact") &&
             Objects.equals(modifiableProperty.getName(), "company")) {
-            for (BaseProperty baseProperty : ((ModifiableObjectProperty) modifiableProperty).getProperties()
-                .get()) {
+            for (BaseProperty baseProperty : ((ModifiableObjectProperty) modifiableProperty).getProperties()) {
                 if (Objects.equals(baseProperty.getName(), "id")) {
                     ((ModifiableIntegerProperty) baseProperty).options(
                         (OptionsFunction<Long>) KeapUtils::getCompanyIdOptions);

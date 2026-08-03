@@ -232,8 +232,7 @@ public class WorkflowCallWorkflowTool {
 
             @SuppressWarnings("unchecked")
             List<? extends BaseValueProperty<?>> baseProperties =
-                (List<? extends BaseValueProperty<?>>) objectProperty.getProperties()
-                    .orElse(List.of());
+                (List<? extends BaseValueProperty<?>>) objectProperty.getProperties();
 
             List<ModifiableValueProperty<?, ?>> properties = new ArrayList<>();
 
@@ -256,15 +255,16 @@ public class WorkflowCallWorkflowTool {
         if (baseProperty instanceof BaseProperty.BaseArrayProperty<?> arrayProperty) {
             ComponentDsl.ModifiableArrayProperty newArrayProperty = ComponentDsl.array(name);
 
-            arrayProperty.getItems()
-                .ifPresent(items -> {
-                    List<ModifiableValueProperty<?, ?>> itemProperties =
-                        ((List<BaseValueProperty<?>>) items).stream()
-                            .<ModifiableValueProperty<?, ?>>map(WorkflowCallWorkflowTool::toComponentProperty)
-                            .toList();
+            List<? extends BaseProperty> items = arrayProperty.getItems();
 
-                    newArrayProperty.items(itemProperties);
-                });
+            if (!items.isEmpty()) {
+                List<ModifiableValueProperty<?, ?>> itemProperties =
+                    ((List<BaseValueProperty<?>>) items).stream()
+                        .<ModifiableValueProperty<?, ?>>map(WorkflowCallWorkflowTool::toComponentProperty)
+                        .toList();
+
+                newArrayProperty.items(itemProperties);
+            }
 
             property = newArrayProperty;
         } else if (baseProperty instanceof BaseProperty.BaseBooleanProperty) {
@@ -280,15 +280,16 @@ public class WorkflowCallWorkflowTool {
         } else if (baseProperty instanceof BaseProperty.BaseObjectProperty<?> objectProperty) {
             ComponentDsl.ModifiableObjectProperty newObjectProperty = ComponentDsl.object(name);
 
-            objectProperty.getProperties()
-                .ifPresent(childProperties -> {
-                    List<ModifiableValueProperty<?, ?>> childComponentProperties =
-                        ((List<BaseValueProperty<?>>) childProperties).stream()
-                            .<ModifiableValueProperty<?, ?>>map(WorkflowCallWorkflowTool::toComponentProperty)
-                            .toList();
+            List<? extends BaseProperty> childProperties = objectProperty.getProperties();
 
-                    newObjectProperty.properties(childComponentProperties);
-                });
+            if (!childProperties.isEmpty()) {
+                List<ModifiableValueProperty<?, ?>> childComponentProperties =
+                    ((List<BaseValueProperty<?>>) childProperties).stream()
+                        .<ModifiableValueProperty<?, ?>>map(WorkflowCallWorkflowTool::toComponentProperty)
+                        .toList();
+
+                newObjectProperty.properties(childComponentProperties);
+            }
 
             property = newObjectProperty;
         } else {
@@ -298,7 +299,7 @@ public class WorkflowCallWorkflowTool {
         baseProperty.getDescription()
             .ifPresent(property::description);
 
-        baseProperty.getRequired();
+        property.required(baseProperty.getRequired());
 
         return property;
     }

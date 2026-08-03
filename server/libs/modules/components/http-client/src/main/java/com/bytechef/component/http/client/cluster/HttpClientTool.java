@@ -53,8 +53,7 @@ public class HttpClientTool {
                 .expressionEnabled(false)
                 .required(true));
 
-        actionDefinition.getProperties()
-            .ifPresent(toolProperties::addAll);
+        toolProperties.addAll(actionDefinition.getProperties());
 
         return clusterElementDefinition.properties(toolProperties);
     }
