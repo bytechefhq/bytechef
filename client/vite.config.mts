@@ -21,9 +21,9 @@ export default ({mode}) => {
             manifest: true,
             rollupOptions: {
                 input: {
-                    connect: resolve(__dirname, 'connect.html'),
-                    main: resolve(__dirname, 'index.html'),
-                    workflowBuilder: resolve(__dirname, 'workflow-builder.html'),
+                    connect: resolve(import.meta.dirname, 'connect.html'),
+                    main: resolve(import.meta.dirname, 'index.html'),
+                    workflowBuilder: resolve(import.meta.dirname, 'workflow-builder.html'),
                 },
                 output: {
                     manualChunks(id) {
@@ -60,9 +60,9 @@ export default ({mode}) => {
             dedupe: ['react', 'react-dom'],
             tsconfigPaths: true,
             alias: {
-                '@': path.resolve(__dirname, './src'),
-                '@bytechef/embedded': path.resolve(__dirname, '../sdks/frontend/embedded/library/src/main.ts'),
-                '@dagrejs/dagre': path.resolve(__dirname, 'node_modules/@dagrejs/dagre/dist/dagre.cjs.js'),
+                '@': path.resolve(import.meta.dirname, './src'),
+                '@bytechef/embedded': path.resolve(import.meta.dirname, '../sdks/frontend/embedded/library/src/main.ts'),
+                '@dagrejs/dagre': path.resolve(import.meta.dirname, 'node_modules/@dagrejs/dagre/dist/dagre.cjs.js'),
             },
         },
         server: {
