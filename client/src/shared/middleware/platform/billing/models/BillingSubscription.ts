@@ -56,11 +56,11 @@ export interface BillingSubscription {
      */
     scheduledPlanName?: string;
     /**
-     * Number of task executions used in the current billing period.
+     * Number of job executions used in the current billing period.
      * @type {number}
      * @memberof BillingSubscription
      */
-    tasksUsed?: number;
+    jobsExecuted?: number;
 }
 
 /**
@@ -86,7 +86,7 @@ export function BillingSubscriptionFromJSONTyped(json: any, ignoreDiscriminator:
         'currentPeriodEnd': json['currentPeriodEnd'] == null ? undefined : (new Date(json['currentPeriodEnd'])),
         'cancelAtPeriodEnd': json['cancelAtPeriodEnd'] == null ? undefined : json['cancelAtPeriodEnd'],
         'scheduledPlanName': json['scheduledPlanName'] == null ? undefined : json['scheduledPlanName'],
-        'tasksUsed': json['tasksUsed'] == null ? undefined : json['tasksUsed'],
+        'jobsExecuted': json['jobsExecuted'] == null ? undefined : json['jobsExecuted'],
     };
 }
 
@@ -107,7 +107,7 @@ export function BillingSubscriptionToJSONTyped(value?: BillingSubscription | nul
         'currentPeriodEnd': value['currentPeriodEnd'] == null ? value['currentPeriodEnd'] : value['currentPeriodEnd'].toISOString(),
         'cancelAtPeriodEnd': value['cancelAtPeriodEnd'],
         'scheduledPlanName': value['scheduledPlanName'],
-        'tasksUsed': value['tasksUsed'],
+        'jobsExecuted': value['jobsExecuted'],
     };
 }
 
