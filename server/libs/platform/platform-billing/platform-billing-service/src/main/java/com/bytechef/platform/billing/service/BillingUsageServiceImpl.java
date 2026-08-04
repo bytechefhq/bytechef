@@ -81,7 +81,7 @@ public class BillingUsageServiceImpl implements BillingUsageService {
             ? subscription.getLastReportedAt()
             : subscription.getCurrentPeriodStart();
 
-        int count = countTaskExecutionsSince(lowerBound, scheduledFireTime);
+        int count = countJobExecutionsSince(lowerBound, scheduledFireTime);
 
         if (count > 0) {
             String idempotencyKey = subscription.getSubscriptionId() + "_" + scheduledFireTime.getEpochSecond();
@@ -95,7 +95,7 @@ public class BillingUsageServiceImpl implements BillingUsageService {
     }
 
     @Override
-    public int countTaskExecutionsSince(Instant from, Instant to) {
-        return billingSubscriptionRepository.countCompletedTaskExecutions(from, to);
+    public int countJobExecutionsSince(Instant from, Instant to) {
+        return billingSubscriptionRepository.countDeployedJobExecutions(from, to);
     }
 }
