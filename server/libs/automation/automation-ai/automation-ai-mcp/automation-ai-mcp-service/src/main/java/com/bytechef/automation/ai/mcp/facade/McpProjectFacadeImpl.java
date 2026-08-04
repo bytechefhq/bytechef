@@ -26,8 +26,8 @@ import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
-import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.mcp.domain.McpServer;
+import com.bytechef.platform.mcp.service.McpServerService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,18 +51,21 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
     private final McpProjectAuditPublisher mcpProjectAuditPublisher;
     private final McpProjectService mcpProjectService;
     private final McpProjectWorkflowService mcpProjectWorkflowService;
+    private final McpServerService mcpServerService;
     private final ProjectDeploymentService projectDeploymentService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
 
     @SuppressFBWarnings("EI")
     public McpProjectFacadeImpl(
         McpProjectAuditPublisher mcpProjectAuditPublisher, McpProjectService mcpProjectService,
-        McpProjectWorkflowService mcpProjectWorkflowService, ProjectDeploymentService projectDeploymentService,
+        McpProjectWorkflowService mcpProjectWorkflowService, McpServerService mcpServerService,
+        ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService) {
 
         this.mcpProjectAuditPublisher = mcpProjectAuditPublisher;
         this.mcpProjectService = mcpProjectService;
         this.mcpProjectWorkflowService = mcpProjectWorkflowService;
+        this.mcpServerService = mcpServerService;
         this.projectDeploymentService = projectDeploymentService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
     }
@@ -72,12 +75,14 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
     public McpProject createMcpProject(
         long mcpServerId, long projectId, int projectVersion, List<String> selectedWorkflowIds) {
 
+        McpServer mcpServer = mcpServerService.getMcpServer(mcpServerId);
+
         ProjectDeployment projectDeployment = new ProjectDeployment();
 
         projectDeployment.setName(McpServer.MCP_SERVER_NAME_PREFIX + projectId + "_v" + projectVersion);
         projectDeployment.setProjectId(projectId);
         projectDeployment.setProjectVersion(projectVersion);
-        projectDeployment.setEnvironment(Environment.DEVELOPMENT);
+        projectDeployment.setEnvironment(mcpServer.getEnvironment());
         projectDeployment.setEnabled(true);
 
         projectDeployment = projectDeploymentService.create(projectDeployment);

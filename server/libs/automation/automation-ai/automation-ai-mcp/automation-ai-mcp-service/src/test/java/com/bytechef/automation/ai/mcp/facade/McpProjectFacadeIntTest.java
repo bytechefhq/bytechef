@@ -141,6 +141,21 @@ public class McpProjectFacadeIntTest {
     }
 
     @Test
+    public void testCreateMcpProjectUsesMcpServerEnvironment() {
+        McpServer productionMcpServer = mcpServerRepository.save(
+            new McpServer("production-server", PlatformType.AUTOMATION, Environment.PRODUCTION));
+
+        McpProject mcpProject = mcpProjectFacade.createMcpProject(
+            productionMcpServer.getId(), project.getId(), 1, List.of("workflow1"));
+
+        ProjectDeployment mcpProjectDeployment = projectDeploymentRepository
+            .findById(mcpProject.getProjectDeploymentId())
+            .orElseThrow();
+
+        assertThat(mcpProjectDeployment.getEnvironment()).isEqualTo(Environment.PRODUCTION);
+    }
+
+    @Test
     public void testCreateMcpProjectEmptyWorkflowList() {
         List<String> selectedWorkflowIds = List.of();
 
