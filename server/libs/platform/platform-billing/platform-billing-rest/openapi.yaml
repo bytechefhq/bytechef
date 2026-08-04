@@ -105,8 +105,8 @@ components:
         scheduledPlanName:
           description: "The plan name scheduled to take effect at the next billing period (set when a downgrade is pending)."
           type: "string"
-        tasksUsed:
-          description: "Number of task executions used in the current billing period."
+        jobsExecuted:
+          description: "Number of job executions used in the current billing period."
           type: "integer"
           format: "int32"
     CheckoutSessionRequest:
