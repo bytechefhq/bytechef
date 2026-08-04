@@ -19,6 +19,7 @@ package com.bytechef.platform.billing.service;
 import com.bytechef.platform.billing.domain.BillingSubscription;
 import com.bytechef.platform.billing.repository.BillingSubscriptionRepository;
 import java.util.Optional;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Matija Petanjek
  */
 @Service
+@ConditionalOnProperty(prefix = "billing", name = "enabled", havingValue = "true")
 @Transactional
 class BillingSubscriptionServiceImpl implements BillingSubscriptionService {
 

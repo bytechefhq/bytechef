@@ -50,6 +50,7 @@ import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -57,6 +58,7 @@ import org.springframework.util.Assert;
  * @author Matija Petanjek
  */
 @Service
+@ConditionalOnProperty(prefix = "billing", name = "enabled", havingValue = "true")
 public class StripeClientImpl implements StripeClient {
 
     private static final Logger log = LoggerFactory.getLogger(StripeClientImpl.class);

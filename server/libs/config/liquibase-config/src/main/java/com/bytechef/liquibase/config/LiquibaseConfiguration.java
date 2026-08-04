@@ -41,6 +41,7 @@ public class LiquibaseConfiguration {
         liquibase.setDefaultSchema(liquibaseProperties.getDefaultSchema());
         liquibase.setDropFirst(liquibaseProperties.isDropFirst());
         liquibase.setShouldRun(liquibaseProperties.isEnabled());
+        liquibase.setChangeLogParameters(liquibaseProperties.getParameters());
 
         return liquibase;
     }

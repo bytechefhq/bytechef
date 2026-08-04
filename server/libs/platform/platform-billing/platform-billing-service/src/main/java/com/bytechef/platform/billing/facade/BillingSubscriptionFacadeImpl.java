@@ -30,6 +30,7 @@ import java.time.Instant;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +38,7 @@ import org.springframework.stereotype.Service;
  * @author Matija Petanjek
  */
 @Service
+@ConditionalOnProperty(prefix = "billing", name = "enabled", havingValue = "true")
 public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade {
 
     private static final Logger log = LoggerFactory.getLogger(BillingSubscriptionFacadeImpl.class);

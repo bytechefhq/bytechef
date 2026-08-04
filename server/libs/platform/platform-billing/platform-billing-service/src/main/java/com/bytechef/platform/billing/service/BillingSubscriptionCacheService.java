@@ -18,6 +18,7 @@ package com.bytechef.platform.billing.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  * @author Matija Petanjek
  */
 @Service
+@ConditionalOnProperty(prefix = "billing", name = "enabled", havingValue = "true")
 class BillingSubscriptionCacheService {
 
     private static final Logger log = LoggerFactory.getLogger(BillingSubscriptionCacheService.class);
