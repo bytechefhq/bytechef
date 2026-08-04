@@ -5,6 +5,7 @@ import {twMerge} from 'tailwind-merge';
 interface PlanTierCardPropsI {
     ctaLabel: string;
     description: string;
+    disabled?: boolean;
     features: string[];
     highlighted?: boolean;
     isCurrent?: boolean;
@@ -16,6 +17,7 @@ interface PlanTierCardPropsI {
 const PlanTierCard = ({
     ctaLabel,
     description,
+    disabled = false,
     features,
     highlighted = false,
     isCurrent = false,
@@ -53,8 +55,8 @@ const PlanTierCard = ({
 
             <Button
                 className="w-full"
-                disabled={isCurrent}
-                label={isCurrent ? 'Current Plan' : ctaLabel}
+                disabled={isCurrent || disabled}
+                label={disabled ? 'Coming Soon!' : isCurrent ? 'Current Plan' : ctaLabel}
                 onClick={onSelect}
                 variant={highlighted ? 'default' : 'outline'}
             />
