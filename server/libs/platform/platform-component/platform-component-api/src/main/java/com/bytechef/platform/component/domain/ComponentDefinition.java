@@ -70,6 +70,31 @@ public final class ComponentDefinition {
         this.triggers = List.of();
     }
 
+    public ComponentDefinition(
+        ComponentDefinition componentDefinition, List<ActionDefinition> actions, List<TriggerDefinition> triggers) {
+
+        this.actionClusterElementTypes = componentDefinition.actionClusterElementTypes;
+        this.actions = actions;
+        this.componentCategories = componentDefinition.componentCategories;
+        this.clusterElement = componentDefinition.clusterElement;
+        this.clusterElementClusterElementTypes = componentDefinition.clusterElementClusterElementTypes;
+        this.clusterElements = componentDefinition.clusterElements;
+        this.clusterElementTypes = componentDefinition.clusterElementTypes;
+        this.clusterRoot = componentDefinition.clusterRoot;
+        this.connection = componentDefinition.connection;
+        this.connectionRequired = componentDefinition.connectionRequired;
+        this.description = componentDefinition.description;
+        this.icon = componentDefinition.icon;
+        this.name = componentDefinition.name;
+        this.inputs = componentDefinition.inputs;
+        this.resources = componentDefinition.resources;
+        this.tags = componentDefinition.tags;
+        this.triggers = triggers;
+        this.title = componentDefinition.title;
+        this.unifiedApiCategory = componentDefinition.unifiedApiCategory;
+        this.version = componentDefinition.version;
+    }
+
     public ComponentDefinition(com.bytechef.component.definition.ComponentDefinition componentDefinition) {
         this.actions = getActions(componentDefinition);
         this.inputs = getInputs(componentDefinition);

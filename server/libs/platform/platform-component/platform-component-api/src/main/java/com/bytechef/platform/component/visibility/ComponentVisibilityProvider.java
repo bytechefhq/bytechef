@@ -22,4 +22,12 @@ package com.bytechef.platform.component.visibility;
 public interface ComponentVisibilityProvider {
 
     boolean isVisible(String componentName);
+
+    default boolean isActionVisible(String componentName, String actionName) {
+        return isVisible(componentName);
+    }
+
+    default boolean isTriggerVisible(String componentName, String triggerName) {
+        return isVisible(componentName);
+    }
 }

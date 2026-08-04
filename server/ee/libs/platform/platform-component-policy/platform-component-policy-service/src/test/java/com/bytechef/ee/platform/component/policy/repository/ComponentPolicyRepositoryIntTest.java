@@ -9,9 +9,11 @@ package com.bytechef.ee.platform.component.policy.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.bytechef.ee.platform.component.policy.ComponentOperationPolicy;
 import com.bytechef.ee.platform.component.policy.ComponentPolicy;
 import com.bytechef.ee.platform.component.policy.config.ComponentPolicyIntTestConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,10 +30,14 @@ import org.springframework.context.annotation.Import;
 public class ComponentPolicyRepositoryIntTest {
 
     @Autowired
+    private ComponentOperationPolicyRepository componentOperationPolicyRepository;
+
+    @Autowired
     private ComponentPolicyRepository componentPolicyRepository;
 
     @AfterEach
     public void afterEach() {
+        componentOperationPolicyRepository.deleteAll();
         componentPolicyRepository.deleteAll();
     }
 
@@ -55,5 +61,21 @@ public class ComponentPolicyRepositoryIntTest {
         componentPolicyRepository.save(reloaded);
 
         assertThat(componentPolicyRepository.findByEnabled(false)).isEmpty();
+    }
+
+    @Test
+    void testComponentOperationPolicyRoundTrip() {
+        componentOperationPolicyRepository.save(
+            new ComponentOperationPolicy(
+                "slack", ComponentOperationPolicy.OperationType.ACTION, "sendMessage"));
+
+        List<ComponentOperationPolicy> componentOperationPolicies =
+            componentOperationPolicyRepository.findAllByComponentName("slack");
+
+        assertThat(componentOperationPolicies).hasSize(1);
+        assertThat(componentOperationPolicies.getFirst()
+            .getOperationType()).isEqualTo(ComponentOperationPolicy.OperationType.ACTION);
+        assertThat(componentOperationPolicyRepository.findByComponentNameAndOperationTypeAndOperationName(
+            "slack", ComponentOperationPolicy.OperationType.ACTION.ordinal(), "sendMessage")).isPresent();
     }
 }
