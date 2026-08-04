@@ -4,7 +4,9 @@ import {devtools, persist} from 'zustand/middleware';
 export type LayoutEngineType = 'dagre' | 'elk';
 
 interface LayoutEngineStateI {
+    lastAppliedLayoutEngine: LayoutEngineType;
     layoutEngine: LayoutEngineType;
+    setLastAppliedLayoutEngine: (lastAppliedLayoutEngine: LayoutEngineType) => void;
     setLayoutEngine: (layoutEngine: LayoutEngineType) => void;
 }
 
@@ -19,7 +21,16 @@ const useLayoutEngineStore = create<LayoutEngineStateI>()(
     devtools(
         persist(
             (set) => ({
+                // The engine that produced the layout currently on the canvas. Selecting an
+                // engine does not guarantee it runs: ELK falls back to dagre for unsupported
+                // shapes (isElkLayoutSupported) and on layout errors, so geometry-coupled
+                // renderers (the LR ring-bar handle flip on loop/each/map ghost bars) must key
+                // on what actually ran, not on the selection.
+                lastAppliedLayoutEngine: 'elk',
+
                 layoutEngine: 'elk',
+
+                setLastAppliedLayoutEngine: (lastAppliedLayoutEngine) => set({lastAppliedLayoutEngine}),
 
                 setLayoutEngine: (layoutEngine) => set({layoutEngine}),
             }),

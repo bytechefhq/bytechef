@@ -12,6 +12,7 @@ import {getCrossAxis} from './directionUtils';
 import {ELK_FRAME_DISPATCHER_COMPONENT_NAMES} from './isElkLayoutSupported';
 import {
     GetLayoutElementsProps,
+    type LayoutElementsResultI,
     filterAndDedupeLayoutEdges,
     getDagreNodeSize,
     getLayoutElements,
@@ -341,9 +342,15 @@ function collectChainMainNodes(
             ? getGhostIds(currentNode).bottomGhostId
             : currentNode.id;
 
+        // `graphTransition` overlay edges must never be mistaken for the chain's real
+        // continuation — a graph lane's first task doubles as a `graphTransition`
+        // source (see createGraphTransitionEdges), and without this guard a stray
+        // match would divert the chain walk onto the overlay instead of the
+        // structural next-node edge.
         const continuationEdge = edges.find(
             (candidateEdge) =>
                 candidateEdge.source === continuationSourceId &&
+                candidateEdge.type !== 'graphTransition' &&
                 nodesById.get(candidateEdge.target)?.type !== 'placeholder'
         );
 
@@ -455,6 +462,7 @@ function getOwningDispatcherId(node: Node): string | undefined {
         nodeData.branchData?.branchId ||
         nodeData.parallelData?.parallelId ||
         nodeData.forkJoinData?.forkJoinId ||
+        nodeData.graphData?.graphId ||
         nodeData.eachData?.eachId ||
         nodeData.mapData?.mapId ||
         nodeData.onErrorData?.onErrorId
@@ -467,8 +475,7 @@ function getOwningDispatcherId(node: Node): string | undefined {
 // just a caseKey — the ordinal is not recoverable from the flat node list.
 function getBranchCaseOrdinals(branchNode: Node): string[] {
     const parameters = (branchNode.data as NodeDataType).parameters as
-        | {cases?: Array<{key?: string | number}>}
-        | undefined;
+        {cases?: Array<{key?: string | number}>} | undefined;
 
     return ['default', ...(parameters?.cases || []).map((caseItem) => String(caseItem.key))];
 }
@@ -591,6 +598,15 @@ export function buildElkGraph(nodes: Node[], edges: Edge[], direction: LayoutDir
             return;
         }
 
+        // `graphTransition` overlay edges (see createGraphTransitionEdges) are a
+        // paint-time decoration, not part of the structural flow — a back or self
+        // transition is a REAL CYCLE in graph node terms, and feeding it into ELK's
+        // layered ranking algorithm would corrupt the ranking of every other node.
+        // They must never enter the ELK graph, same as the left-ghost rail above.
+        if (currentEdge.type === 'graphTransition') {
+            return;
+        }
+
         const commonScope = getCommonScope(getScope(currentEdge.source), getScope(currentEdge.target));
 
         const sourceRepresentative = getRepresentativeInScope(currentEdge.source, commonScope);
@@ -666,6 +682,15 @@ export function buildElkGraph(nodes: Node[], edges: Edge[], direction: LayoutDir
             // carry an explicit branchIndex; the trailing add-a-branch
             // placeholder gets branchCount and so ranks last naturally
             return memberData.forkJoinData?.branchIndex ?? memberData.branchIndex ?? Number.MAX_SAFE_INTEGER;
+        }
+
+        if (scopeComponentName === 'graph') {
+            // Graph lanes are name/index-addressed (N-ary, unlike condition's
+            // intrinsic caseTrue/caseFalse binary), so — like fork-join —
+            // both children (graphData) and placeholders (top-level field)
+            // carry an explicit nodeIndex; the trailing add-a-node
+            // placeholder gets nodes.length and so ranks last naturally
+            return memberData.graphData?.nodeIndex ?? memberData.nodeIndex ?? Number.MAX_SAFE_INTEGER;
         }
 
         if (scopeComponentName === 'on-error') {
@@ -845,7 +870,7 @@ export const getElkLayoutElements = async ({
     edges,
     nodes,
     savedPositionCrossAxisShift = 0,
-}: GetLayoutElementsProps): Promise<{edges: Edge[]; nodes: Node[]}> => {
+}: GetLayoutElementsProps): Promise<LayoutElementsResultI> => {
     try {
         const elk = await loadElk();
 
@@ -1092,9 +1117,13 @@ export const getElkLayoutElements = async ({
                 node.position = {...node.position, [mainAxis]: footprintStart + renderedOffset};
             };
 
+            // Same guard as collectChainMainNodes above: a graph lane's first task is
+            // also a `graphTransition` source, so the overlay edge must be excluded
+            // here too or the main-axis compaction walk could follow it instead of
+            // the structural continuation edge.
             const findContinuationEdge = (sourceId: string): Edge | undefined =>
                 edges.find((candidateEdge) => {
-                    if (candidateEdge.source !== sourceId) {
+                    if (candidateEdge.source !== sourceId || candidateEdge.type === 'graphTransition') {
                         return false;
                     }
 
@@ -1981,7 +2010,7 @@ export const getElkLayoutElements = async ({
         // dispatcher with a saved position carries its whole frame rigidly with it.
         applySavedPositions(allNodes, crossAxis, savedPositionCrossAxisShift);
 
-        return {edges: filterAndDedupeLayoutEdges(allNodes, edges), nodes: allNodes};
+        return {edges: filterAndDedupeLayoutEdges(allNodes, edges), engine: 'elk' as const, nodes: allNodes};
     } catch (error) {
         console.error('ELK layout failed, falling back to dagre', error);
 

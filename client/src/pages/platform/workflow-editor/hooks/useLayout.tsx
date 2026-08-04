@@ -1036,6 +1036,11 @@ export default function useLayout({
                     return;
                 }
 
+                // Geometry-coupled renderers (LR ring-bar handle flip) key on the engine
+                // that actually ran — ELK silently falls back to dagre on unsupported
+                // shapes and layout errors, so the selection alone is not authoritative.
+                useLayoutEngineStore.getState().setLastAppliedLayoutEngine(elements.engine);
+
                 const targetNodes: Node[] = [...elements.nodes, ...buildCurrentStickyNoteNodes()];
 
                 if (isInitialLayoutRef.current || readOnlyWorkflow) {

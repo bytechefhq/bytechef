@@ -2,6 +2,7 @@ import {render} from '@testing-library/react';
 import {ReactFlowProvider} from '@xyflow/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
+import useLayoutEngineStore from '../stores/useLayoutEngineStore';
 import TaskDispatcherBottomGhostNode from './TaskDispatcherBottomGhostNode';
 import TaskDispatcherTopGhostNode from './TaskDispatcherTopGhostNode';
 
@@ -28,6 +29,10 @@ function renderGhost(component: 'top' | 'bottom', id: string) {
 describe('ghost bar side handles', () => {
     beforeEach(() => {
         directionStoreState.layoutDirection = 'TB';
+
+        // The ring-bar flip is ELK geometry (content above the main axis); the
+        // flip tests below assume an ELK-produced canvas.
+        useLayoutEngineStore.setState({lastAppliedLayoutEngine: 'elk'});
     });
 
     it('keeps TB side handles on the bar ends', () => {
@@ -82,6 +87,37 @@ describe('ghost bar side handles', () => {
         directionStoreState.layoutDirection = 'LR';
 
         const handle = renderGhost('bottom', 'parallel_1-parallel-bottom-ghost');
+
+        expect(handle('-left')?.className).toContain('react-flow__handle-top');
+        expect(handle('-left')?.className).toContain('top-8');
+        expect(handle('-right')?.className).toContain('react-flow__handle-bottom');
+        expect(handle('-right')?.className).toContain('bottom-8');
+    });
+
+    it('leaves an LR iteration-ring top bar unflipped when dagre produced the layout', () => {
+        // Dagre keeps the loop body BELOW the main axis in LR, so the plain LR
+        // mapping is already correct: body via -right from the bar's bottom
+        // end, rail via -left from its top end. Flipping here (the pre-fix
+        // behavior) made every ring connector double back in box-shaped
+        // detours across the canvas.
+        directionStoreState.layoutDirection = 'LR';
+
+        useLayoutEngineStore.setState({lastAppliedLayoutEngine: 'dagre'});
+
+        const handle = renderGhost('top', 'loop_1-loop-top-ghost');
+
+        expect(handle('-left')?.className).toContain('react-flow__handle-top');
+        expect(handle('-left')?.className).toContain('top-8');
+        expect(handle('-right')?.className).toContain('react-flow__handle-bottom');
+        expect(handle('-right')?.className).toContain('bottom-8');
+    });
+
+    it('leaves an LR iteration-ring bottom bar unflipped when dagre produced the layout', () => {
+        directionStoreState.layoutDirection = 'LR';
+
+        useLayoutEngineStore.setState({lastAppliedLayoutEngine: 'dagre'});
+
+        const handle = renderGhost('bottom', 'each_2-each-bottom-ghost');
 
         expect(handle('-left')?.className).toContain('react-flow__handle-top');
         expect(handle('-left')?.className).toContain('top-8');
