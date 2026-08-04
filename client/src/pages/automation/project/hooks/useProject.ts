@@ -11,6 +11,7 @@ import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useW
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
+import {Workflow} from '@/shared/middleware/automation/configuration';
 import {useUpdateWorkflowMutation} from '@/shared/mutations/automation/workflows.mutations';
 import {
     useDeleteClusterElementParameterMutation,
@@ -118,6 +119,19 @@ export const useProject = () => {
     const deleteClusterElementParameterMutation = useDeleteClusterElementParameterMutation();
 
     const updateWorkflowEditorMutation = useUpdatePlatformWorkflowMutation({
+        // Keep the cached project workflow list in sync with the version bumped by the save, so consumers relying on
+        // it, such as the Publish button, do not read a stale version.
+        onSuccess: (updatedWorkflow) => {
+            queryClient.setQueryData<Workflow[]>(
+                ProjectWorkflowKeys.projectWorkflows(+projectId!),
+                (projectWorkflows) =>
+                    projectWorkflows?.map((projectWorkflow) =>
+                        projectWorkflow.id === updatedWorkflow.id
+                            ? {...projectWorkflow, version: updatedWorkflow.version}
+                            : projectWorkflow
+                    )
+            );
+        },
         useUpdateWorkflowMutation,
         workflowId: workflow.id!,
         workflowKeys: WorkflowKeys,

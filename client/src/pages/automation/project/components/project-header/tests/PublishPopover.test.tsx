@@ -7,10 +7,10 @@ screen.debug();
 
 const mockOnPublishProjectSubmit = vi.fn();
 
-const renderPublishPopover = () => {
+const renderPublishPopover = (disabled = false) => {
     render(
         <TooltipProvider>
-            <PublishPopover isPending={false} onPublishProjectSubmit={mockOnPublishProjectSubmit} />
+            <PublishPopover disabled={disabled} isPending={false} onPublishProjectSubmit={mockOnPublishProjectSubmit} />
         </TooltipProvider>
     );
 };
@@ -46,4 +46,18 @@ it('should call the onPublishProjectSubmit function with the correct description
             onSuccess: expect.any(Function),
         });
     });
+});
+
+it('should disable the publish button when there is nothing to publish', () => {
+    renderPublishPopover(true);
+
+    expect(screen.getByRole('button', {name: 'Publish'})).toBeDisabled();
+});
+
+it('should not open the publish popover when the publish button is disabled', () => {
+    renderPublishPopover(true);
+
+    fireEvent.click(screen.getByText('Publish'));
+
+    expect(screen.queryByText('Publish Project')).not.toBeInTheDocument();
 });

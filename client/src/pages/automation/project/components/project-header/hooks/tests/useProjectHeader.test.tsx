@@ -31,6 +31,12 @@ const hoisted = vi.hoisted(() => {
     } as const;
 });
 
+// Mutable query results so individual tests can control project/workflow data
+const queryMocks = vi.hoisted(() => ({
+    projectQuery: {data: {id: 42}} as {data?: {id: number; lastPublishedDate?: Date}},
+    projectWorkflowsQuery: {data: []} as {data?: {version?: number}[]},
+}));
+
 // Mocks for Zustand stores used inside the hook
 vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowDataStore', () => {
     const state = {setProjectName: vi.fn(), workflow: {id: 'wf-1'}};
@@ -92,10 +98,10 @@ vi.mock('react-router-dom', () => ({
 // Queries and mutations used by the hook
 vi.mock('@/shared/queries/automation/projects.queries', () => ({
     ProjectKeys: {filteredProjects: (_: unknown) => ['filtered', _], project: (_: number) => ['project', _]},
-    useGetProjectQuery: () => ({data: {id: 42}}),
+    useGetProjectQuery: () => queryMocks.projectQuery,
 }));
 vi.mock('@/shared/queries/automation/projectWorkflows.queries', () => ({
-    useGetProjectWorkflowsQuery: () => ({data: []}),
+    useGetProjectWorkflowsQuery: () => queryMocks.projectWorkflowsQuery,
 }));
 vi.mock('@/shared/mutations/automation/projects.mutations', () => ({
     usePublishProjectMutation: () => ({isPending: false, mutate: vi.fn()}),
@@ -196,6 +202,9 @@ describe('useProjectHeader', () => {
         latest.handlers = undefined;
         latest.close.mockReset();
         document.cookie = '';
+
+        queryMocks.projectQuery = {data: {id: 42}};
+        queryMocks.projectWorkflowsQuery = {data: []};
     });
 
     afterEach(() => {
@@ -358,5 +367,38 @@ describe('useProjectHeader', () => {
         // Verify workflow stopped
         expect(hoisted.editorSpies.setWorkflowIsRunning).toHaveBeenCalledWith(false);
         expect(latest.close).toHaveBeenCalled();
+    });
+
+    it('reports unpublished changes when the project has never been published', () => {
+        queryMocks.projectQuery = {data: {id: 42}};
+        queryMocks.projectWorkflowsQuery = {data: [{version: 1}]};
+
+        const {result} = renderHook(() =>
+            useProjectHeader({bottomResizablePanelRef: makePanelRef(0), chatTrigger: false, projectId: 42})
+        );
+
+        expect(result.current.hasUnpublishedChanges).toBe(true);
+    });
+
+    it('reports no unpublished changes when every workflow is still at the version set by publishing', () => {
+        queryMocks.projectQuery = {data: {id: 42, lastPublishedDate: new Date()}};
+        queryMocks.projectWorkflowsQuery = {data: [{version: 1}, {version: 1}]};
+
+        const {result} = renderHook(() =>
+            useProjectHeader({bottomResizablePanelRef: makePanelRef(0), chatTrigger: false, projectId: 42})
+        );
+
+        expect(result.current.hasUnpublishedChanges).toBe(false);
+    });
+
+    it('reports unpublished changes when any workflow was edited after publishing', () => {
+        queryMocks.projectQuery = {data: {id: 42, lastPublishedDate: new Date()}};
+        queryMocks.projectWorkflowsQuery = {data: [{version: 1}, {version: 2}]};
+
+        const {result} = renderHook(() =>
+            useProjectHeader({bottomResizablePanelRef: makePanelRef(0), chatTrigger: false, projectId: 42})
+        );
+
+        expect(result.current.hasUnpublishedChanges).toBe(true);
     });
 });
