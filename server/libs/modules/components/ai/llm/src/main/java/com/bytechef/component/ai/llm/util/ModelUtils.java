@@ -175,6 +175,13 @@ public class ModelUtils {
         return new ChatActionResult(response, guardrailMetadata);
     }
 
+    /**
+     * Extracts a human-readable error message from a provider error body. Providers disagree on the error shape:
+     * OpenAI-compatible APIs wrap it as {@code {"error": {"message": ...}}} while Mistral returns a top-level
+     * {@code {"object": "error", "message": ...}} — so both shapes are tried, and any parse failure (the blob may not
+     * even be JSON) returns null so the caller falls back to the raw exception message instead of masking the real
+     * provider error with a parsing exception.
+     */
     private static @Nullable String extractProviderErrorMessage(String errorBody, Context context) {
         try {
             Object errorJson = context.json(json -> json.read(errorBody, new TypeReference<>() {}));

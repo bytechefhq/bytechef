@@ -36,6 +36,10 @@ import org.springframework.ai.chat.client.ChatClient.CallResponseSpec;
 import org.springframework.ai.retry.NonTransientAiException;
 
 /**
+ * Pins the provider-error extraction in {@link ModelUtils#getChatResponse}: provider APIs disagree on the error body
+ * shape, and a shape the extraction does not recognize must fall back to the raw exception message instead of dying
+ * with a JSON-path lookup error that masks the real failure.
+ *
  * @author Ivica Cardic
  */
 @ExtendWith(ObjectMapperSetupExtension.class)
