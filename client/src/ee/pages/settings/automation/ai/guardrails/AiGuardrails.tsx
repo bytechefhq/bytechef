@@ -103,7 +103,7 @@ const AiGuardrails = () => {
     return (
         <LayoutContainer header={<Header centerTitle position="main" title="Guardrails" />} leftSidebarOpen={false}>
             <PageLoader errors={[error]} loading={isLoading}>
-                <div className="w-full px-2 2xl:mx-auto 2xl:w-4/5">
+                <div className="w-full px-4 3xl:mx-auto 3xl:w-4/5">
                     <div className="space-y-6 py-6">
                         <p className="text-sm text-muted-foreground">
                             Workspace-level guardrails apply across every AI surface in this workspace: AI Gateway

@@ -87,8 +87,8 @@ const ProjectDeploymentListItem = ({projectDeployment, remainingTags}: ProjectDe
 
         const interactiveSelectors = [
             '[data-interactive]',
+            '[role="menuitem"]',
             '.dropdown-menu-item',
-            '[data-radix-dropdown-menu-item]',
             '[data-radix-dropdown-menu-trigger]',
             '[data-radix-collapsible-trigger]',
             'button',

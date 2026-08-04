@@ -1,6 +1,6 @@
-import AiSidebarNav from '@/pages/automation/ai/components/AiSidebarNav';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
+import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
 import {useSearchParams} from 'react-router-dom';
 
 import AiObservabilityAlerts from './components/alerts/AiObservabilityAlerts';
@@ -42,25 +42,28 @@ type AiGatewayPageType =
     | 'settings'
     | 'traces';
 
-const VALID_PAGES: ReadonlySet<AiGatewayPageType> = new Set([
-    'alerts',
-    'budget',
-    'datasets',
-    'experiments',
-    'exports',
-    'models',
-    'monitoring',
-    'playground',
-    'projects',
-    'prompts',
-    'providers',
-    'rateLimits',
-    'routing',
-    'scores',
-    'sessions',
-    'settings',
-    'traces',
-]);
+// Sidebar order — also the source for the per-section page title in the content header.
+const GATEWAY_SECTIONS: {id: AiGatewayPageType; label: string}[] = [
+    {id: 'providers', label: 'Providers'},
+    {id: 'models', label: 'Models'},
+    {id: 'projects', label: 'Projects'},
+    {id: 'routing', label: 'Routing Policies'},
+    {id: 'prompts', label: 'Prompts'},
+    {id: 'settings', label: 'Settings'},
+    {id: 'budget', label: 'Budget'},
+    {id: 'rateLimits', label: 'Rate Limits'},
+    {id: 'monitoring', label: 'Monitoring'},
+    {id: 'playground', label: 'Playground'},
+    {id: 'datasets', label: 'Datasets'},
+    {id: 'experiments', label: 'Experiments'},
+    {id: 'traces', label: 'Traces'},
+    {id: 'sessions', label: 'Sessions'},
+    {id: 'scores', label: 'Scores'},
+    {id: 'alerts', label: 'Alerts'},
+    {id: 'exports', label: 'Exports'},
+];
+
+const VALID_PAGES: ReadonlySet<AiGatewayPageType> = new Set(GATEWAY_SECTIONS.map((section) => section.id));
 
 const isValidPage = (value: string | null): value is AiGatewayPageType =>
     value !== null && VALID_PAGES.has(value as AiGatewayPageType);
@@ -91,11 +94,23 @@ const AiGateway = () => {
         );
     };
 
+    const activePageLabel = GATEWAY_SECTIONS.find((section) => section.id === activePage)?.label ?? 'AI Gateway';
+
     return (
         <LayoutContainer
-            header={<Header centerTitle={true} position="main" title="LLM Gateway" />}
-            leftSidebarBody={<AiSidebarNav currentSection={activePage} />}
-            leftSidebarHeader={<Header position="sidebar" title="AI" />}
+            header={<Header centerTitle={true} position="main" title={activePageLabel} />}
+            leftSidebarBody={
+                <LeftSidebarNav
+                    body={GATEWAY_SECTIONS.map((section) => (
+                        <LeftSidebarNavItem
+                            item={{current: activePage === section.id, name: section.label}}
+                            key={section.id}
+                            toLink={`/automation/ai/gateway?section=${section.id}`}
+                        />
+                    ))}
+                />
+            }
+            leftSidebarHeader={<Header position="sidebar" title="AI Gateway" />}
             leftSidebarWidth="64"
         >
             {activePage === 'providers' && <AiGatewayProviders />}

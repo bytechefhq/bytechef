@@ -154,7 +154,7 @@ export function AppSidebarFooter() {
             <DropdownMenuTrigger asChild>
                 <button
                     aria-label="User menu"
-                    className="flex h-12 w-full items-center gap-2 rounded-md px-[3px] py-2 text-left hover:bg-sidebar-accent"
+                    className="flex h-12 w-full items-center gap-2 rounded-md px-[3px] py-2 text-left group-data-[collapsible=icon]:size-8 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:rounded-full group-data-[collapsible=icon]:p-0 hover:bg-sidebar-accent"
                     type="button"
                 >
                     <Avatar className="shrink-0">

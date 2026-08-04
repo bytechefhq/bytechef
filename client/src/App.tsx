@@ -10,6 +10,7 @@ import {useHelpHub} from '@/shared/hooks/useHelpHub';
 import {MobileTopNavigation} from '@/shared/layout/MobileTopNavigation';
 import {TrialBanner} from '@/shared/layout/TrialBanner';
 import {AppSidebar} from '@/shared/layout/app-sidebar/AppSidebar';
+import useAppSidebarStore from '@/shared/stores/useAppSidebarStore';
 import {EditionType, useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
@@ -149,8 +150,8 @@ const embeddedNavigation: NavigationType[] = [
         icon: Settings2Icon,
         name: 'Integration Configurations',
     },
-    {group: 'Configure', href: '/embedded/mcp-servers', icon: ServerIcon, name: 'MCP Servers'},
     {group: 'Configure', href: '/embedded/app-events', icon: ZapIcon, name: 'App Events'},
+    {group: 'Configure', href: '/embedded/mcp-servers', icon: ServerIcon, name: 'MCP Servers'},
     {
         group: 'Monitor',
         href: '/embedded/executions',
@@ -175,6 +176,9 @@ const platformNavigation = [
 
 function App() {
     const [searchOpen, setSearchOpen] = useState(false);
+
+    const sidebarOpen = useAppSidebarStore((state) => state.open);
+    const setSidebarOpen = useAppSidebarStore((state) => state.setOpen);
 
     const {ai, billingEnabled, contextStoreEnabled, edition} = useApplicationInfoStore(
         useShallow((state) => ({
@@ -362,7 +366,11 @@ function App() {
                 block scoped to this element, so they render below the banner instead of
                 anchoring to the viewport top and overlapping it. */}
 
-            <SidebarProvider className="min-h-0 flex-1 transform-gpu" defaultOpen={false}>
+            <SidebarProvider
+                className="min-h-0 flex-1 transform-gpu"
+                onOpenChange={setSidebarOpen}
+                open={sidebarOpen}
+            >
                 <AppSidebar navigation={navigation} />
 
                 <SidebarInset className="flex h-full min-w-0 flex-col">

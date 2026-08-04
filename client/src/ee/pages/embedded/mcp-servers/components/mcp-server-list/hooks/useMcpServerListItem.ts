@@ -36,8 +36,11 @@ const useMcpServerListItem = (mcpServer: McpServer) => {
 
         const interactiveSelectors = [
             '[data-interactive]',
+            // Radix renders menu items as role="menuitem" divs, not buttons, and never emits a
+            // data-radix-dropdown-menu-item attribute. Matching the role covers every item,
+            // including the destructive variant whose class token `.dropdown-menu-item` misses.
+            '[role="menuitem"]',
             '.dropdown-menu-item',
-            '[data-radix-dropdown-menu-item]',
             '[data-radix-dropdown-menu-trigger]',
             '[data-radix-collapsible-trigger]',
             'button',
