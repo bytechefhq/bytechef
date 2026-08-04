@@ -31,7 +31,12 @@ const PLANS = [
     {
         ctaLabel: 'Get Started',
         description: 'Perfect for individuals and small businesses.',
-        features: ['5000 tasks / month, then $1/1000 tasks', '1 workspace', '1 user', '30-days long retention'],
+        features: [
+            '5000 job executions / month, then $1/1000 job executions',
+            '1 workspace',
+            '1 user',
+            '30-days long retention',
+        ],
         highlighted: false,
         name: 'Starter',
         planNameEnum: CheckoutSessionRequestPlanNameEnum.Starter,
@@ -43,7 +48,7 @@ const PLANS = [
         disabled: true,
         features: [
             'Everything in Starter',
-            '5000 tasks / month, then $1/1000 tasks',
+            '5000 job executions / month, then $1/1000 job executions',
             '3 workspaces',
             'Unlimited users',
             'Role-based access controls',
@@ -59,7 +64,7 @@ const PLANS = [
         description: 'For Enterprise-scale usage and flexible hosting.',
         features: [
             'Everything in Growth',
-            'Custom amount of tasks',
+            'Custom amount of job executions',
             'Unlimited workspace',
             'Self-hosting options',
             'API Platform',

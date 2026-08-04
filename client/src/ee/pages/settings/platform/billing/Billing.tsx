@@ -15,7 +15,6 @@ import PlanCard from './components/PlanCard';
 import ReactivatePlanDialog from './components/ReactivatePlanDialog';
 import SelectPlanDialog from './components/SelectPlanDialog';
 
-const TRIAL_TASK_LIMIT = 5000;
 const POLL_INTERVAL_MS = 3000;
 const MAX_POLL_ATTEMPTS = 5;
 
@@ -152,21 +151,21 @@ const Billing = () => {
         subscription && !isTrialSubscription
             ? {
                   cancelAtPeriodEnd: subscription.cancelAtPeriodEnd ?? false,
+                  jobsExecuted: subscription.jobsExecuted ?? 0,
                   planName: subscription.planName ?? 'Active',
-                  productUnitLimit: subscription.productUnitLimit ?? TRIAL_TASK_LIMIT,
+                  productUnitLimit: subscription.productUnitLimit ?? 0,
                   renewalDate,
                   scheduledPlanName: subscription.scheduledPlanName,
-                  tasksUsed: subscription.tasksUsed ?? 0,
                   trialDaysRemaining: undefined,
                   trialExpired: undefined,
               }
             : {
                   cancelAtPeriodEnd: false,
+                  jobsExecuted: subscription?.jobsExecuted ?? 0,
                   planName: 'Trial',
-                  productUnitLimit: subscription?.productUnitLimit ?? TRIAL_TASK_LIMIT,
+                  productUnitLimit: subscription?.productUnitLimit ?? 0,
                   renewalDate: undefined,
                   scheduledPlanName: undefined,
-                  tasksUsed: subscription?.tasksUsed ?? 0,
                   trialDaysRemaining,
                   trialExpired: isTrialExpired,
               };
