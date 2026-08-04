@@ -15,9 +15,11 @@ const formSchema = z.object({
 });
 
 const PublishPopover = ({
+    disabled,
     isPending,
     onPublishProjectSubmit,
 }: {
+    disabled?: boolean;
     isPending: boolean;
     onPublishProjectSubmit: ({description, onSuccess}: {description?: string; onSuccess: () => void}) => void;
 }) => {
@@ -38,6 +40,27 @@ const PublishPopover = ({
             },
         });
     };
+
+    if (disabled) {
+        return (
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <span className="inline-flex">
+                        <Button
+                            className="rounded-r-none"
+                            disabled
+                            icon={<SendIcon />}
+                            id="publish-button"
+                            label="Publish"
+                            variant="outline"
+                        />
+                    </span>
+                </TooltipTrigger>
+
+                <TooltipContent>No changes to publish</TooltipContent>
+            </Tooltip>
+        );
+    }
 
     return (
         <Popover onOpenChange={setOpen} open={open}>

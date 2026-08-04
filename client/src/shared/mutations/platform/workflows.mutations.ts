@@ -30,7 +30,7 @@ const useUpdatePlatformWorkflowMutation = ({
     workflowId: string;
     workflowKeys: WorkflowKeysI;
     onError?: () => void;
-    onSuccess?: () => void;
+    onSuccess?: (updatedWorkflow: Workflow) => void;
 }) => {
     const queryClient = useQueryClient();
 
@@ -44,13 +44,13 @@ const useUpdatePlatformWorkflowMutation = ({
                 onError();
             }
         },
-        onSuccess: () => {
+        onSuccess: (updatedWorkflow) => {
             queryClient.invalidateQueries({
                 queryKey: WorkflowTestConfigurationKeys.workflowTestConfiguration(workflowId),
             });
 
             if (onSuccess) {
-                onSuccess();
+                onSuccess(updatedWorkflow);
             }
         },
     });
