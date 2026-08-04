@@ -73,56 +73,62 @@ const WorkspaceListItem = ({workspace}: WorkspaceListItemProps) => {
     };
 
     return (
-        <li
-            className="relative flex items-center justify-between px-2 py-5 hover:bg-surface-neutral-primary-hover"
-            key={workspace.id}
-        >
-            <div className="flex-1">
-                <span className="text-base">{workspace.name}</span>
-            </div>
+        <li className="mb-2 rounded border border-border/50" key={workspace.id}>
+            <div className="flex items-center justify-between rounded-md bg-surface-neutral-primary px-3 py-3 hover:bg-destructive-foreground">
+                <div className="flex flex-1 flex-col items-start space-y-1">
+                    <span className="text-base font-semibold">{workspace.name}</span>
 
-            <div className="flex justify-end gap-x-6">
-                {workspace.createdDate && (
-                    <Tooltip>
-                        <TooltipTrigger className="flex items-center text-sm text-content-neutral-secondary">
-                            <span className="text-xs">
-                                {`Created at ${workspace.createdDate?.toLocaleDateString()} ${workspace.createdDate?.toLocaleTimeString()}`}
-                            </span>
-                        </TooltipTrigger>
+                    {workspace.description && (
+                        <span className="text-sm text-content-neutral-secondary">{workspace.description}</span>
+                    )}
+                </div>
 
-                        <TooltipContent>Created Date</TooltipContent>
-                    </Tooltip>
-                )}
+                <div className="flex items-center justify-end gap-x-6">
+                    {workspace.createdDate && (
+                        <Tooltip>
+                            <TooltipTrigger className="flex items-center text-sm text-content-neutral-secondary">
+                                <span className="text-xs">
+                                    {`Created at ${workspace.createdDate?.toLocaleDateString()} ${workspace.createdDate?.toLocaleTimeString()}`}
+                                </span>
+                            </TooltipTrigger>
 
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button
-                            icon={<EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />}
-                            size="icon"
-                            variant="ghost"
-                        />
-                    </DropdownMenuTrigger>
+                            <TooltipContent>Created Date</TooltipContent>
+                        </Tooltip>
+                    )}
 
-                    <DropdownMenuContent align="end">
-                        {canManageMembers && (
-                            <DropdownMenuItem onClick={() => setShowEditDialog(true)}>Edit</DropdownMenuItem>
-                        )}
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                icon={<EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />}
+                                size="icon"
+                                variant="ghost"
+                            />
+                        </DropdownMenuTrigger>
 
-                        {canViewMembers && (
-                            <DropdownMenuItem onClick={() => setShowWorkspaceUsersDialog(true)}>
-                                Members
-                            </DropdownMenuItem>
-                        )}
+                        <DropdownMenuContent align="end">
+                            {canManageMembers && (
+                                <DropdownMenuItem onClick={() => setShowEditDialog(true)}>Edit</DropdownMenuItem>
+                            )}
 
-                        {canManageMembers && <DropdownMenuSeparator />}
+                            {canViewMembers && (
+                                <DropdownMenuItem onClick={() => setShowWorkspaceUsersDialog(true)}>
+                                    Members
+                                </DropdownMenuItem>
+                            )}
 
-                        {canManageMembers && (
-                            <DropdownMenuItem className="text-destructive" onClick={() => setShowDeleteDialog(true)}>
-                                Delete
-                            </DropdownMenuItem>
-                        )}
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                            {canManageMembers && <DropdownMenuSeparator />}
+
+                            {canManageMembers && (
+                                <DropdownMenuItem
+                                    className="text-destructive"
+                                    onClick={() => setShowDeleteDialog(true)}
+                                >
+                                    Delete
+                                </DropdownMenuItem>
+                            )}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
             </div>
 
             {canManageMembers && showDeleteDialog && (

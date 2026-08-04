@@ -4,9 +4,9 @@ import ApiConnectorListItem from './ApiConnectorListItem';
 
 const ApiConnectorList = ({apiConnectors}: {apiConnectors: ApiConnector[]}) => {
     return (
-        <div className="w-full px-2 3xl:mx-auto 3xl:w-4/5">
+        <div className="w-full px-6 3xl:mx-auto 3xl:w-4/5">
             {apiConnectors.length > 0 && (
-                <div className="w-full divide-y divide-stroke-neutral-primary">
+                <div className="w-full">
                     {apiConnectors.map((apiConnector) => (
                         <ApiConnectorListItem apiConnector={apiConnector} key={apiConnector.id} />
                     ))}

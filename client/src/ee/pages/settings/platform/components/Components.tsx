@@ -51,7 +51,7 @@ const Components = ({tab}: ComponentsProps) => {
             header={<Header centerTitle={true} position="main" right={<NewComponentMenu />} title="Components" />}
             leftSidebarOpen={false}
         >
-            <div className="flex h-full flex-col">
+            <div className="flex size-full flex-col">
                 {showTabs && (
                     <Tabs
                         className="px-6 pt-2"
@@ -71,12 +71,14 @@ const Components = ({tab}: ComponentsProps) => {
                         {customComponents && customComponents.length > 0 ? (
                             <CustomComponentList customComponents={customComponents} />
                         ) : (
-                            <EmptyList
-                                button={<NewComponentMenu />}
-                                icon={<Link2Icon className="size-12 text-content-neutral-tertiary" />}
-                                message="You do not have any Custom Components created yet."
-                                title="No Custom Components"
-                            />
+                            <div className="flex flex-1 items-center justify-center">
+                                <EmptyList
+                                    button={<NewComponentMenu />}
+                                    icon={<Link2Icon className="size-12 text-content-neutral-tertiary" />}
+                                    message="You do not have any Custom Components created yet."
+                                    title="No Custom Components"
+                                />
+                            </div>
                         )}
                     </PageLoader>
                 ) : (
@@ -85,12 +87,14 @@ const Components = ({tab}: ComponentsProps) => {
                             {apiConnectors && apiConnectors.length > 0 ? (
                                 <ApiConnectorList apiConnectors={apiConnectors} />
                             ) : (
-                                <EmptyList
-                                    button={<NewComponentMenu />}
-                                    icon={<Link2Icon className="size-12 text-content-neutral-tertiary" />}
-                                    message="You do not have any API Connectors created yet."
-                                    title="No API Connectors"
-                                />
+                                <div className="flex flex-1 items-center justify-center">
+                                    <EmptyList
+                                        button={<NewComponentMenu />}
+                                        icon={<Link2Icon className="size-12 text-content-neutral-tertiary" />}
+                                        message="You do not have any API Connectors created yet."
+                                        title="No API Connectors"
+                                    />
+                                </div>
                             )}
                         </PageLoader>
 

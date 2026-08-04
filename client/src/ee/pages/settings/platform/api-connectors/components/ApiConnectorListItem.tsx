@@ -33,7 +33,7 @@ const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
     } = useApiConnectorListItem({apiConnector});
 
     return (
-        <Collapsible className="w-full rounded-md px-2 py-5 hover:bg-surface-neutral-primary-hover">
+        <Collapsible className="mb-2 w-full rounded border border-border/50 px-3 py-4 hover:bg-surface-neutral-primary-hover">
             <div className="flex items-center justify-between">
                 <div className="flex-1">
                     <div className="flex items-center justify-between">

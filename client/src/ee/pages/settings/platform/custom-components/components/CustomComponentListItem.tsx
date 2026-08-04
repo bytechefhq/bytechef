@@ -108,8 +108,12 @@ const CustomComponentListItem = ({customComponent}: CustomComponentItemProps) =>
     const triggers = definitionData?.customComponentDefinition?.triggers ?? [];
 
     return (
-        <Collapsible onOpenChange={setIsExpanded} open={isExpanded}>
-            <div className="w-full rounded-md px-2 py-5 hover:bg-surface-neutral-primary-hover">
+        <Collapsible
+            className="mb-2 w-full rounded border border-border/50"
+            onOpenChange={setIsExpanded}
+            open={isExpanded}
+        >
+            <div className="w-full rounded-md px-3 py-4 hover:bg-surface-neutral-primary-hover">
                 <div className="flex items-center justify-between">
                     <div
                         className={twMerge(
@@ -122,7 +126,7 @@ const CustomComponentListItem = ({customComponent}: CustomComponentItemProps) =>
                         role={!isJavaComponent ? 'button' : undefined}
                         tabIndex={!isJavaComponent ? 0 : undefined}
                     >
-                        {isJavaComponent ? (
+                        {isJavaComponent && (
                             <CollapsibleTrigger asChild>
                                 <Button
                                     className="size-6 p-0"
@@ -137,8 +141,6 @@ const CustomComponentListItem = ({customComponent}: CustomComponentItemProps) =>
                                     variant="ghost"
                                 />
                             </CollapsibleTrigger>
-                        ) : (
-                            <ChevronRightIcon className="size-4 shrink-0 text-content-neutral-secondary" />
                         )}
 
                         <div className="flex-1">
