@@ -23,5 +23,5 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * @author Matija Petanjek
  */
 @SuppressFBWarnings("EI")
-public record BillingSubscriptionDTO(BillingSubscription subscription, int tasksUsed, String scheduledPlanName) {
+public record BillingSubscriptionDTO(BillingSubscription subscription, int jobsExecuted, String scheduledPlanName) {
 }
