@@ -16,6 +16,7 @@
 
 package com.bytechef.tenant.single;
 
+import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.annotation.ConditionalOnSingleTenant;
 import com.bytechef.tenant.constant.Tenancy;
 import com.bytechef.tenant.service.TenantService;
@@ -62,7 +63,10 @@ public class SingleTenantService implements TenantService {
 
     @Override
     public List<String> getTenantIds() {
-        throw new UnsupportedOperationException();
+        // A single-tenant deployment has exactly one tenant — the default one. Every per-tenant scheduled sweep
+        // (job timeout/retention, approval monitors, asset-file orphan-blob cleanup, ...) enumerates tenants through
+        // this method, so it must answer rather than throw like the mutation methods above.
+        return List.of(TenantContext.DEFAULT_TENANT_ID);
     }
 
     @Override
