@@ -15,7 +15,7 @@ import {ProjectKeys, useGetProjectQuery} from '@/shared/queries/automation/proje
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {getTestWorkflowAttachRequest, getTestWorkflowStreamPostRequest} from '@/shared/util/testWorkflow-utils';
 import {useQueryClient} from '@tanstack/react-query';
-import {RefObject, useCallback, useEffect, useState} from 'react';
+import {RefObject, useCallback, useEffect, useMemo, useState} from 'react';
 import {PanelImperativeHandle} from 'react-resizable-panels';
 import {useLoaderData, useNavigate, useSearchParams} from 'react-router-dom';
 import {toast} from 'sonner';
@@ -109,6 +109,16 @@ export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectI
             toast('The project has been published.');
         },
     });
+
+    // Publishing duplicates every project workflow, so each draft workflow starts at version 1. Any workflow with a
+    // higher version has been edited since the last publish.
+    const hasUnpublishedChanges = useMemo(() => {
+        if (!project?.lastPublishedDate) {
+            return true;
+        }
+
+        return (projectWorkflows ?? []).some((projectWorkflow) => (projectWorkflow.version ?? 1) > 1);
+    }, [project?.lastPublishedDate, projectWorkflows]);
 
     const handleProjectWorkflowValueChange = useCallback(
         (projectWorkflowId: number) => {
@@ -305,6 +315,7 @@ export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectI
         handleRunClick,
         handleShowOutputClick,
         handleStopClick,
+        hasUnpublishedChanges,
         project,
         projectWorkflows,
         publishProjectMutationIsPending: publishProjectMutation.isPending,

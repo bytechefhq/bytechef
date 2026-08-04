@@ -65,6 +65,7 @@ const ProjectHeader = ({
         handleRunClick,
         handleShowOutputClick,
         handleStopClick,
+        hasUnpublishedChanges,
         project,
         projectWorkflows,
         publishProjectMutationIsPending,
@@ -121,6 +122,7 @@ const ProjectHeader = ({
 
                 <ButtonGroup>
                     <PublishPopover
+                        disabled={!hasUnpublishedChanges}
                         isPending={publishProjectMutationIsPending}
                         onPublishProjectSubmit={handlePublishProjectSubmit}
                     />
