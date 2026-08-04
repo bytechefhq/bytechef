@@ -17,6 +17,7 @@
 package com.bytechef.platform.billing.web.security.config;
 
 import com.bytechef.platform.security.web.config.SecurityConfigurerContributor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Component;
  * @author Matija Petanjek
  */
 @Component
+@ConditionalOnProperty(prefix = "billing", name = "enabled", havingValue = "true")
 public class BillingSecurityConfigurerContributor implements SecurityConfigurerContributor {
 
     @Override

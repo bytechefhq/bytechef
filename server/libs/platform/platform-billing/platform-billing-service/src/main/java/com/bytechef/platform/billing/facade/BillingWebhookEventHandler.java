@@ -34,6 +34,7 @@ import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,6 +47,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Matija Petanjek
  */
 @Service
+@ConditionalOnProperty(prefix = "billing", name = "enabled", havingValue = "true")
 class BillingWebhookEventHandler {
 
     private static final Logger log = LoggerFactory.getLogger(BillingWebhookEventHandler.class);
