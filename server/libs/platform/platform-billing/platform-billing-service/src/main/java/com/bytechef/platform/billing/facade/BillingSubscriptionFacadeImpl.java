@@ -146,7 +146,7 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
     public Optional<BillingSubscriptionDTO> fetchCurrentSubscription() {
         return billingSubscriptionService.fetchCurrentSubscription()
             .map(subscription -> {
-                int tasksUsed = billingUsageService.countTaskExecutionsSince(
+                int tasksUsed = billingUsageService.countJobExecutionsSince(
                     subscription.getCurrentPeriodStart(), Instant.now());
 
                 String scheduledPlanName = stripeClient.fetchScheduledPlanName(subscription.getSubscriptionId())
