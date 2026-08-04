@@ -20,6 +20,7 @@ import com.bytechef.platform.billing.client.StripeClient;
 import com.bytechef.tenant.TenantContext;
 import com.stripe.model.Event;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
@@ -28,6 +29,7 @@ import tools.jackson.databind.ObjectMapper;
  * @author Matija Petanjek
  */
 @Service
+@ConditionalOnProperty(prefix = "billing", name = "enabled", havingValue = "true")
 public class BillingWebhookFacadeImpl implements BillingWebhookFacade {
 
     private final BillingWebhookEventHandler billingWebhookEventHandler;
