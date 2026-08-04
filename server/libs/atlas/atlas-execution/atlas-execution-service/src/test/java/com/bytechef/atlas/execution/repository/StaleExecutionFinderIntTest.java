@@ -162,6 +162,30 @@ public class StaleExecutionFinderIntTest {
             .doesNotContain(recentJobId, runningJobId);
     }
 
+    @Test
+    public void testExecutionTimeLongerThanIntegerMillisRoundTrips() {
+        // The orphaned-job recovery sweep stamps endDate on executions orphaned weeks earlier, producing an
+        // executionTime (milliseconds) beyond Integer.MAX_VALUE — the column must be wide enough to hold it.
+        long jobId = saveJob(Job.Status.STARTED);
+        long taskExecutionId = saveTaskExecution(jobId, TaskExecution.Status.STARTED);
+
+        TaskExecution taskExecution = taskExecutionRepository.findById(taskExecutionId)
+            .orElseThrow();
+
+        Instant now = Instant.now();
+
+        taskExecution.setStartDate(now.minus(Duration.ofDays(40)));
+        taskExecution.setEndDate(now);
+        taskExecution.setStatus(TaskExecution.Status.FAILED);
+
+        taskExecutionRepository.save(taskExecution);
+
+        TaskExecution savedTaskExecution = taskExecutionRepository.findById(taskExecutionId)
+            .orElseThrow();
+
+        assertThat(savedTaskExecution.getExecutionTime()).isGreaterThan(Integer.MAX_VALUE);
+    }
+
     private long saveJob(Job.Status status) {
         Job job = new Job();
 

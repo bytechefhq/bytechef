@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <!-- TaskExecution.executionTime is a Java long holding endDate - startDate in milliseconds; an INT column
+         overflows once a task spans more than ~24.8 days, which the orphaned-job recovery sweep hits whenever it
+         stamps endDate on executions orphaned weeks earlier. -->
+    <changeSet id="20260804140000" author="Ivica Cardic">
+        <modifyDataType tableName="task_execution" columnName="execution_time" newDataType="BIGINT"/>
+    </changeSet>
+</databaseChangeLog>
