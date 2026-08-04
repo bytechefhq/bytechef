@@ -4,7 +4,7 @@
       <option name="executionName" />
       <option name="externalProjectPath" value="$PROJECT_DIR$/server/apps/server-app" />
       <option name="externalSystemIdString" value="GRADLE" />
-      <option name="scriptParameters" value="-Dspring.profiles.active=dev,local,intellij" />
+      <option name="scriptParameters" value="--args=--spring.profiles.active=dev,local,intellij" />
       <option name="taskDescriptions">
         <list />
       </option>
@@ -13,7 +13,7 @@
           <option value="bootRun" />
         </list>
       </option>
-      <option name="vmOptions" value="-Xms512m -Xmx2g -XX:+UseG1GC" />
+      <option name="vmOptions" value="" />
     </ExternalSystemSettings>
     <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
     <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>

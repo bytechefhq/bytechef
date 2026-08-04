@@ -40,7 +40,7 @@ class StartupTimingConfiguration {
 
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
-    BeanPostProcessor beanTimingPostProcessor() {
+    static BeanPostProcessor beanTimingPostProcessor() {
         return new BeanTimingPostProcessor();
     }
 
