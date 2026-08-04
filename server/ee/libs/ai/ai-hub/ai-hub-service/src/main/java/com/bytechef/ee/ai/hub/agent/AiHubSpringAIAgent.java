@@ -31,6 +31,8 @@ import com.bytechef.ee.platform.ai.guardrails.AiGuardrailMetrics;
 import com.bytechef.ee.platform.ai.guardrails.AiGuardrails;
 import com.bytechef.ee.platform.ai.guardrails.advisor.AiGuardrailsAdvisor;
 import com.bytechef.ee.platform.ai.llm.usage.LlmUsageRecorder;
+import com.bytechef.ee.platform.ai.workspaceprompt.WorkspaceSystemPrompts;
+import com.bytechef.ee.platform.ai.workspaceprompt.advisor.WorkspaceSystemPromptAdvisor;
 import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -136,6 +138,7 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
     private final @Nullable SecurityContextRehydrator securityContextRehydrator;
     private final @Nullable AiGuardrails aiGuardrails;
     private final @Nullable AiGuardrailMetrics aiGuardrailMetrics;
+    private final @Nullable WorkspaceSystemPrompts workspaceSystemPrompts;
 
     protected AiHubSpringAIAgent(final Builder builder) throws AGUIException {
         super(builder);
@@ -147,6 +150,7 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
         this.securityContextRehydrator = builder.securityContextRehydrator;
         this.aiGuardrails = builder.aiGuardrails;
         this.aiGuardrailMetrics = builder.aiGuardrailMetrics;
+        this.workspaceSystemPrompts = builder.workspaceSystemPrompts;
     }
 
     public static Builder builder() {
@@ -293,7 +297,9 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
      */
     @Override
     protected ChatClient resolveChatClient(RunAgentInput input) {
-        return attachGuardrailsAdvisor(resolveConfiguredChatClient(input), input);
+        ChatClient chatClient = attachGuardrailsAdvisor(resolveConfiguredChatClient(input), input);
+
+        return attachWorkspaceSystemPromptAdvisor(chatClient, input);
     }
 
     private ChatClient resolveConfiguredChatClient(RunAgentInput input) {
@@ -360,6 +366,30 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
 
         return chatClient.mutate()
             .defaultAdvisors(advisor)
+            .build();
+    }
+
+    /**
+     * Registers a fresh, workspace-bound {@link WorkspaceSystemPromptAdvisor} so the admin's standing instructions are
+     * appended to this turn's system message. Self-orders AFTER the guardrails advisor (HIGHEST_PRECEDENCE + 100), so
+     * the admin text is never redacted or blocked by the workspace's own guardrail policy. A missing engine bean
+     * (module absent) or a workspace without a prompt (the common case — {@code fetchPrompt} is memoized) skips the
+     * {@code mutate()} entirely so the no-op case pays no per-turn overhead.
+     */
+    private ChatClient attachWorkspaceSystemPromptAdvisor(ChatClient chatClient, RunAgentInput input) {
+        if (workspaceSystemPrompts == null) {
+            return chatClient;
+        }
+
+        State state = input.state();
+        Long workspaceId = state == null ? null : NumberUtils.asLong(state.get(AiHubStateKeys.VERIFIED_WORKSPACE_ID));
+
+        if (workspaceSystemPrompts.fetchPrompt(workspaceId) == null) {
+            return chatClient;
+        }
+
+        return chatClient.mutate()
+            .defaultAdvisors(new WorkspaceSystemPromptAdvisor(workspaceSystemPrompts, workspaceId))
             .build();
     }
 
@@ -643,6 +673,7 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
         private @Nullable LlmUsageRecorder llmUsageRecorder;
         private @Nullable AiGuardrails aiGuardrails;
         private @Nullable AiGuardrailMetrics aiGuardrailMetrics;
+        private @Nullable WorkspaceSystemPrompts workspaceSystemPrompts;
         // Captured from agentId() so the usage advisor can tag ai_llm_usage rows with the agent that served the turn.
         private @Nullable String usageAgentName;
         // Holds the unwrapped tool callbacks the caller registers via toolCallbacks/toolCallback. Deferred
@@ -740,6 +771,17 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
             aiGuardrails(@Nullable AiGuardrails aiGuardrails, @Nullable AiGuardrailMetrics aiGuardrailMetrics) {
             this.aiGuardrails = aiGuardrails;
             this.aiGuardrailMetrics = aiGuardrailMetrics;
+
+            return this;
+        }
+
+        /**
+         * Wires the workspace system prompt engine so {@link #resolveChatClient} appends the admin's standing
+         * instructions to every LLM turn — see {@link #attachWorkspaceSystemPromptAdvisor}. Null (module absent)
+         * disables the overlay.
+         */
+        public Builder workspaceSystemPrompts(@Nullable WorkspaceSystemPrompts workspaceSystemPrompts) {
+            this.workspaceSystemPrompts = workspaceSystemPrompts;
 
             return this;
         }

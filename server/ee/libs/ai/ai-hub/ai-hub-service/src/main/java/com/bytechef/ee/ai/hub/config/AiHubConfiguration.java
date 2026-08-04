@@ -91,6 +91,7 @@ import com.bytechef.ee.automation.apiplatform.configuration.facade.ApiCollection
 import com.bytechef.ee.platform.ai.guardrails.AiGuardrailMetrics;
 import com.bytechef.ee.platform.ai.guardrails.AiGuardrails;
 import com.bytechef.ee.platform.ai.llm.usage.LlmUsageRecorder;
+import com.bytechef.ee.platform.ai.workspaceprompt.WorkspaceSystemPrompts;
 import com.bytechef.platform.ai.agent.memory.AutoMemoryTools;
 import com.bytechef.platform.ai.agent.memory.AutoMemoryToolsAdvisor;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryService;
@@ -225,6 +226,7 @@ public class AiHubConfiguration {
         ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider,
         ObjectProvider<LlmUsageRecorder> llmUsageRecorderProvider,
         ObjectProvider<AiGuardrails> aiGuardrailsProvider, ObjectProvider<MeterRegistry> meterRegistryProvider,
+        ObjectProvider<WorkspaceSystemPrompts> workspaceSystemPromptsProvider,
         AiHubToolAttachMetrics aiHubToolAttachMetrics, JsonMapper jsonMapper)
         throws AGUIException {
 
@@ -244,6 +246,10 @@ public class AiHubConfiguration {
             ? null
             : new AiGuardrailMetrics(meterRegistryProvider.getIfAvailable(), "ai_hub");
 
+        // Absent (EE workspace-prompt module not on the classpath) → attachWorkspaceSystemPromptAdvisor below is a
+        // no-op, unchanged behaviour.
+        WorkspaceSystemPrompts workspaceSystemPrompts = workspaceSystemPromptsProvider.getIfAvailable();
+
         // Resolved to a flag (not ifAvailable) because availability also decides whether the system prompt keeps
         // its research section — documenting an unregistered tool makes the model call it and fail the turn with
         // "No ToolCallback found for tool name: research".
@@ -253,7 +259,8 @@ public class AiHubConfiguration {
             toolCallbacks.add(
                 new ProgressReportingToolCallback(
                     ResearchConfiguration.createResearchToolCallback(
-                        SubAgentGuardrailedChatClient.wrap(researchChatClient, aiGuardrails, aiGuardrailMetrics)),
+                        SubAgentGuardrailedChatClient.wrap(
+                            researchChatClient, aiGuardrails, aiGuardrailMetrics, workspaceSystemPrompts)),
                     "research"));
         }
 
@@ -306,7 +313,7 @@ public class AiHubConfiguration {
             clusterElementAskSubAgentChatClientProvider,
             codeEditorAskSubAgentChatClientProvider, workflowEditorAskSubAgentChatClientProvider, null,
             workflowExecutionAskSubAgentChatClientProvider, customComponentAskSubAgentChatClientProvider,
-            codeWorkflowAskSubAgentChatClientProvider, aiGuardrails, aiGuardrailMetrics);
+            codeWorkflowAskSubAgentChatClientProvider, aiGuardrails, aiGuardrailMetrics, workspaceSystemPrompts);
 
         AiHubSpringAIAgent.Builder builder = AiHubSpringAIAgent.builder()
             .agentId(name.toLowerCase())
@@ -354,6 +361,11 @@ public class AiHubConfiguration {
         // subagent delegate registrations above were wrapped with, so the top-level agent and every delegate share
         // one "ai_hub"-tagged AiGuardrailMetrics instance for this bean.
         attachAiGuardrails(builder, aiGuardrails, aiGuardrailMetrics);
+
+        // Appends the workspace admin's standing instructions to every LLM turn — see
+        // AiHubSpringAIAgent#attachWorkspaceSystemPromptAdvisor. Absent WorkspaceSystemPrompts bean (EE
+        // workspace-prompt module not on the classpath) → no-op, unchanged behaviour.
+        builder.workspaceSystemPrompts(workspaceSystemPrompts);
 
         return builder.build();
     }
@@ -419,6 +431,7 @@ public class AiHubConfiguration {
         ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider,
         ObjectProvider<LlmUsageRecorder> llmUsageRecorderProvider,
         ObjectProvider<AiGuardrails> aiGuardrailsProvider, ObjectProvider<MeterRegistry> meterRegistryProvider,
+        ObjectProvider<WorkspaceSystemPrompts> workspaceSystemPromptsProvider,
         AiHubToolAttachMetrics aiHubToolAttachMetrics, JsonMapper jsonMapper)
         throws AGUIException {
 
@@ -435,10 +448,14 @@ public class AiHubConfiguration {
             ? null
             : new AiGuardrailMetrics(meterRegistryProvider.getIfAvailable(), "ai_hub");
 
+        // Absent (EE workspace-prompt module not on the classpath) → attachWorkspaceSystemPromptAdvisor below is a
+        // no-op, unchanged behaviour.
+        WorkspaceSystemPrompts workspaceSystemPrompts = workspaceSystemPromptsProvider.getIfAvailable();
+
         registerSubAgentToolCallbacks(
             toolCallbacks, researchChatClientProvider, dataAnalystChatClientProvider,
             imageGeneratorChatClientProvider, slideBuilderChatClientProvider, assetFileFacade, aiGuardrails,
-            aiGuardrailMetrics);
+            aiGuardrailMetrics, workspaceSystemPrompts);
 
         // Mirrors aiHubAskSpringAIAgent: the research tool is conditionally registered (Firecrawl-gated), so the
         // system prompt's research section must be dropped when it is absent — otherwise the model calls the
@@ -448,7 +465,7 @@ public class AiHubConfiguration {
         registerManagerSubAgentToolCallbacks(
             toolCallbacks, mcpManagerChatClientProvider, personalAgentManagerChatClientProvider,
             deploymentManagerChatClientProvider, apiCollectionManagerChatClientProvider, aiGuardrails,
-            aiGuardrailMetrics);
+            aiGuardrailMetrics, workspaceSystemPrompts);
 
         // Consolidated open-tab tool (type-keyed) replaces the seven per-resource variants on the pinned list.
         toolCallbacks.add(new OpenResourceTabToolCallback(aiHubTaskArtifactRecorder));
@@ -479,7 +496,7 @@ public class AiHubConfiguration {
             codeEditorBuildSubAgentChatClientProvider, workflowEditorBuildSubAgentChatClientProvider,
             converterBuildSubAgentChatClientSupplierProvider, workflowExecutionBuildSubAgentChatClientProvider,
             customComponentBuildSubAgentChatClientProvider, codeWorkflowBuildSubAgentChatClientProvider, aiGuardrails,
-            aiGuardrailMetrics);
+            aiGuardrailMetrics, workspaceSystemPrompts);
         toolCallbacks.add(new CreateConnectionToolCallback(componentDefinitionService));
         toolCallbacks.add(new SelectConnectionToolCallback(componentDefinitionService));
 
@@ -552,6 +569,11 @@ public class AiHubConfiguration {
         // AiHubSpringAIAgent#attachGuardrailsAdvisor). Reuses the same (aiGuardrails, aiGuardrailMetrics) pair the
         // subagent delegate registrations above were wrapped with.
         attachAiGuardrails(buildBuilder, aiGuardrails, aiGuardrailMetrics);
+
+        // Appends the workspace admin's standing instructions to every LLM turn — see
+        // AiHubSpringAIAgent#attachWorkspaceSystemPromptAdvisor. Absent WorkspaceSystemPrompts bean (EE
+        // workspace-prompt module not on the classpath) → no-op, unchanged behaviour.
+        buildBuilder.workspaceSystemPrompts(workspaceSystemPrompts);
 
         return buildBuilder.build();
     }
@@ -696,10 +718,11 @@ public class AiHubConfiguration {
      * <p>
      * Each delegate's {@code ChatClient} is wrapped with {@link SubAgentGuardrailedChatClient#wrap} before being handed
      * to its {@code createXToolCallback} factory, so the delegate's own one-shot LLM call runs under the workspace's
-     * {@code AiGuardrailsAdvisor} — see that class's javadoc for why this seam covers every delegate without touching
-     * the individual {@code *ToolCallback}/{@code *Configuration} classes. {@code aiGuardrails}/{@code
-     * aiGuardrailMetrics} are {@code null} when the EE guardrails module isn't wired, in which case wrapping is a
-     * no-op.
+     * {@code AiGuardrailsAdvisor} and {@code WorkspaceSystemPromptAdvisor} — see that class's javadoc for why this seam
+     * covers every delegate without touching the individual {@code *ToolCallback}/{@code *Configuration} classes.
+     * {@code aiGuardrails}/{@code aiGuardrailMetrics} are {@code null} when the EE guardrails module isn't wired, and
+     * {@code workspaceSystemPrompts} is {@code null} when the EE workspace-prompt module isn't wired, in which case the
+     * corresponding wrapping is a no-op.
      * </p>
      */
     private static void registerSubAgentToolCallbacks(
@@ -707,20 +730,23 @@ public class AiHubConfiguration {
         ObjectProvider<ChatClient> dataAnalystChatClientProvider,
         ObjectProvider<ChatClient> imageGeneratorChatClientProvider,
         ObjectProvider<ChatClient> slideBuilderChatClientProvider, AssetFileFacade assetFileFacade,
-        @Nullable AiGuardrails aiGuardrails, @Nullable AiGuardrailMetrics aiGuardrailMetrics) {
+        @Nullable AiGuardrails aiGuardrails, @Nullable AiGuardrailMetrics aiGuardrailMetrics,
+        @Nullable WorkspaceSystemPrompts workspaceSystemPrompts) {
 
         researchChatClientProvider.ifAvailable(
             researchChatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
                     ResearchConfiguration.createResearchToolCallback(
-                        SubAgentGuardrailedChatClient.wrap(researchChatClient, aiGuardrails, aiGuardrailMetrics)),
+                        SubAgentGuardrailedChatClient.wrap(
+                            researchChatClient, aiGuardrails, aiGuardrailMetrics, workspaceSystemPrompts)),
                     "research")));
 
         dataAnalystChatClientProvider.ifAvailable(
             dataAnalystChatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
                     DataAnalystConfiguration.createDataAnalystToolCallback(
-                        SubAgentGuardrailedChatClient.wrap(dataAnalystChatClient, aiGuardrails, aiGuardrailMetrics),
+                        SubAgentGuardrailedChatClient.wrap(
+                            dataAnalystChatClient, aiGuardrails, aiGuardrailMetrics, workspaceSystemPrompts),
                         assetFileFacade),
                     "data_analyst")));
 
@@ -729,14 +755,15 @@ public class AiHubConfiguration {
                 new ProgressReportingToolCallback(
                     ImageGeneratorConfiguration.createImageGeneratorToolCallback(
                         SubAgentGuardrailedChatClient.wrap(imageGeneratorChatClient, aiGuardrails,
-                            aiGuardrailMetrics)),
+                            aiGuardrailMetrics, workspaceSystemPrompts)),
                     "image_generator")));
 
         slideBuilderChatClientProvider.ifAvailable(
             slideBuilderChatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
                     SlideBuilderConfiguration.createSlideBuilderToolCallback(
-                        SubAgentGuardrailedChatClient.wrap(slideBuilderChatClient, aiGuardrails, aiGuardrailMetrics)),
+                        SubAgentGuardrailedChatClient.wrap(
+                            slideBuilderChatClient, aiGuardrails, aiGuardrailMetrics, workspaceSystemPrompts)),
                     "slide_builder")));
     }
 
@@ -745,24 +772,26 @@ public class AiHubConfiguration {
      * deployments, API collections) on the supplied tool list. Each is only added when its backing ChatClient bean is
      * present — a missing facade (feature module not on the classpath) means the specialist's ChatClient bean was not
      * created and the registration is silently skipped. Mirrors {@link #registerSubAgentToolCallbacks}, including the
-     * {@link SubAgentGuardrailedChatClient#wrap} guardrail wrapping. This wiring covers only the AI Hub chat surface —
-     * the separate MCP-surface manager contributions ({@code AiHubManagerMcpContributorConfiguration},
-     * {@code ManagerMcpContributorConfiguration}, {@code ApiCollectionManagerMcpContributorConfiguration}) construct
-     * their own {@code ManagerSubAgentToolCallback} instances directly from the same underlying {@code ChatClient}
-     * beans and are NOT wrapped here — left out of scope, see the AI Guardrails spec's decisions log.
+     * {@link SubAgentGuardrailedChatClient#wrap} guardrail/workspace-prompt wrapping. This wiring covers only the AI
+     * Hub chat surface — the separate MCP-surface manager contributions
+     * ({@code AiHubManagerMcpContributorConfiguration}, {@code ManagerMcpContributorConfiguration},
+     * {@code ApiCollectionManagerMcpContributorConfiguration}) construct their own {@code ManagerSubAgentToolCallback}
+     * instances directly from the same underlying {@code ChatClient} beans and are NOT wrapped here — left out of
+     * scope, see the AI Guardrails spec's decisions log.
      */
     private static void registerManagerSubAgentToolCallbacks(
         List<ToolCallback> toolCallbacks, ObjectProvider<ChatClient> mcpManagerChatClientProvider,
         ObjectProvider<ChatClient> personalAgentManagerChatClientProvider,
         ObjectProvider<ChatClient> deploymentManagerChatClientProvider,
         ObjectProvider<ChatClient> apiCollectionManagerChatClientProvider, @Nullable AiGuardrails aiGuardrails,
-        @Nullable AiGuardrailMetrics aiGuardrailMetrics) {
+        @Nullable AiGuardrailMetrics aiGuardrailMetrics, @Nullable WorkspaceSystemPrompts workspaceSystemPrompts) {
 
         mcpManagerChatClientProvider.ifAvailable(
             mcpManagerChatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
                     McpManagerConfiguration.createMcpManagerToolCallback(
-                        SubAgentGuardrailedChatClient.wrap(mcpManagerChatClient, aiGuardrails, aiGuardrailMetrics)),
+                        SubAgentGuardrailedChatClient.wrap(
+                            mcpManagerChatClient, aiGuardrails, aiGuardrailMetrics, workspaceSystemPrompts)),
                     "mcp_manager")));
 
         personalAgentManagerChatClientProvider.ifAvailable(
@@ -770,7 +799,7 @@ public class AiHubConfiguration {
                 new ProgressReportingToolCallback(
                     PersonalAgentManagerConfiguration.createPersonalAgentManagerToolCallback(
                         SubAgentGuardrailedChatClient.wrap(personalAgentManagerChatClient, aiGuardrails,
-                            aiGuardrailMetrics)),
+                            aiGuardrailMetrics, workspaceSystemPrompts)),
                     "personal_agent_manager")));
 
         deploymentManagerChatClientProvider.ifAvailable(
@@ -778,7 +807,7 @@ public class AiHubConfiguration {
                 new ProgressReportingToolCallback(
                     DeploymentManagerConfiguration.createDeploymentManagerToolCallback(
                         SubAgentGuardrailedChatClient.wrap(deploymentManagerChatClient, aiGuardrails,
-                            aiGuardrailMetrics)),
+                            aiGuardrailMetrics, workspaceSystemPrompts)),
                     "deployment_manager")));
 
         apiCollectionManagerChatClientProvider.ifAvailable(
@@ -786,7 +815,7 @@ public class AiHubConfiguration {
                 new ProgressReportingToolCallback(
                     ApiCollectionManagerConfiguration.createApiCollectionManagerToolCallback(
                         SubAgentGuardrailedChatClient.wrap(apiCollectionManagerChatClient, aiGuardrails,
-                            aiGuardrailMetrics)),
+                            aiGuardrailMetrics, workspaceSystemPrompts)),
                     "api_collection_manager")));
     }
 
@@ -816,62 +845,70 @@ public class AiHubConfiguration {
         ObjectProvider<ChatClient> workflowExecutionSubAgentChatClientProvider,
         ObjectProvider<ChatClient> customComponentSubAgentChatClientProvider,
         ObjectProvider<ChatClient> codeWorkflowSubAgentChatClientProvider, @Nullable AiGuardrails aiGuardrails,
-        @Nullable AiGuardrailMetrics aiGuardrailMetrics) {
+        @Nullable AiGuardrailMetrics aiGuardrailMetrics, @Nullable WorkspaceSystemPrompts workspaceSystemPrompts) {
 
         skillsSubAgentChatClientProvider.ifAvailable(
             chatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
                     new SkillsAgentToolCallback(
-                        SubAgentGuardrailedChatClient.wrap(chatClient, aiGuardrails, aiGuardrailMetrics)),
+                        SubAgentGuardrailedChatClient.wrap(
+                            chatClient, aiGuardrails, aiGuardrailMetrics, workspaceSystemPrompts)),
                     "skills_agent")));
 
         contextStoreSubAgentChatClientProvider.ifAvailable(
             chatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
                     new ContextStoreAgentToolCallback(
-                        SubAgentGuardrailedChatClient.wrap(chatClient, aiGuardrails, aiGuardrailMetrics)),
+                        SubAgentGuardrailedChatClient.wrap(
+                            chatClient, aiGuardrails, aiGuardrailMetrics, workspaceSystemPrompts)),
                     "context_store_agent")));
 
         knowledgeBaseSubAgentChatClientProvider.ifAvailable(
             chatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
                     new KnowledgeBaseAgentToolCallback(
-                        SubAgentGuardrailedChatClient.wrap(chatClient, aiGuardrails, aiGuardrailMetrics)),
+                        SubAgentGuardrailedChatClient.wrap(
+                            chatClient, aiGuardrails, aiGuardrailMetrics, workspaceSystemPrompts)),
                     "knowledge_base_agent")));
 
         dataTableSubAgentChatClientProvider.ifAvailable(
             chatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
                     new DataTableAgentToolCallback(
-                        SubAgentGuardrailedChatClient.wrap(chatClient, aiGuardrails, aiGuardrailMetrics)),
+                        SubAgentGuardrailedChatClient.wrap(
+                            chatClient, aiGuardrails, aiGuardrailMetrics, workspaceSystemPrompts)),
                     "data_table_agent")));
 
         clusterElementSubAgentChatClientProvider.ifAvailable(
             chatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
                     new ClusterElementAgentToolCallback(
-                        SubAgentGuardrailedChatClient.wrap(chatClient, aiGuardrails, aiGuardrailMetrics)),
+                        SubAgentGuardrailedChatClient.wrap(
+                            chatClient, aiGuardrails, aiGuardrailMetrics, workspaceSystemPrompts)),
                     "cluster_element_agent")));
 
         codeEditorSubAgentChatClientProvider.ifAvailable(
             chatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
                     new CodeEditorAgentToolCallback(
-                        SubAgentGuardrailedChatClient.wrap(chatClient, aiGuardrails, aiGuardrailMetrics)),
+                        SubAgentGuardrailedChatClient.wrap(
+                            chatClient, aiGuardrails, aiGuardrailMetrics, workspaceSystemPrompts)),
                     "code_editor_agent")));
 
         workflowEditorSubAgentChatClientProvider.ifAvailable(
             chatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
                     new WorkflowEditorAgentToolCallback(
-                        SubAgentGuardrailedChatClient.wrap(chatClient, aiGuardrails, aiGuardrailMetrics)),
+                        SubAgentGuardrailedChatClient.wrap(
+                            chatClient, aiGuardrails, aiGuardrailMetrics, workspaceSystemPrompts)),
                     "workflow_editor_agent")));
 
         workflowExecutionSubAgentChatClientProvider.ifAvailable(
             chatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
                     new WorkflowExecutionAgentToolCallback(
-                        SubAgentGuardrailedChatClient.wrap(chatClient, aiGuardrails, aiGuardrailMetrics)),
+                        SubAgentGuardrailedChatClient.wrap(
+                            chatClient, aiGuardrails, aiGuardrailMetrics, workspaceSystemPrompts)),
                     "workflow_execution_agent")));
 
         if (converterSubAgentChatClientSupplierProvider != null) {
@@ -880,7 +917,8 @@ public class AiHubConfiguration {
                     new ProgressReportingToolCallback(
                         new ConverterAgentToolCallback(
                             () -> SubAgentGuardrailedChatClient.wrap(
-                                converterChatClientSupplier.get(), aiGuardrails, aiGuardrailMetrics)),
+                                converterChatClientSupplier.get(), aiGuardrails, aiGuardrailMetrics,
+                                workspaceSystemPrompts)),
                         "converter_agent")));
         }
 
@@ -888,14 +926,16 @@ public class AiHubConfiguration {
             chatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
                     new CustomComponentAgentToolCallback(
-                        SubAgentGuardrailedChatClient.wrap(chatClient, aiGuardrails, aiGuardrailMetrics)),
+                        SubAgentGuardrailedChatClient.wrap(
+                            chatClient, aiGuardrails, aiGuardrailMetrics, workspaceSystemPrompts)),
                     "custom_component_agent")));
 
         codeWorkflowSubAgentChatClientProvider.ifAvailable(
             chatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
                     new CodeWorkflowAgentToolCallback(
-                        SubAgentGuardrailedChatClient.wrap(chatClient, aiGuardrails, aiGuardrailMetrics)),
+                        SubAgentGuardrailedChatClient.wrap(
+                            chatClient, aiGuardrails, aiGuardrailMetrics, workspaceSystemPrompts)),
                     "code_workflow_agent")));
     }
 

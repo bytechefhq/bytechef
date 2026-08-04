@@ -11,6 +11,8 @@ import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.ee.platform.ai.guardrails.AiGuardrailMetrics;
 import com.bytechef.ee.platform.ai.guardrails.AiGuardrails;
 import com.bytechef.ee.platform.ai.guardrails.advisor.AiGuardrailsAdvisor;
+import com.bytechef.ee.platform.ai.workspaceprompt.WorkspaceSystemPrompts;
+import com.bytechef.ee.platform.ai.workspaceprompt.advisor.WorkspaceSystemPromptAdvisor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.charset.Charset;
 import java.util.List;
@@ -31,11 +33,17 @@ import org.springframework.core.io.Resource;
 
 /**
  * Wraps a subagent delegate's own {@link ChatClient} so its one-shot LLM call runs under the calling workspace's
- * {@link AiGuardrailsAdvisor} — closing the coverage gap documented on {@code AiHubSpringAIAgent#resolveChatClient}:
- * previously only the top-level AI Hub agent's own {@link ChatClient} carried a guardrails advisor, while every
- * delegate ChatClient (Copilot specialists, the AI-hub-owned research/data_analyst/image_generator/slide_builder
- * subagents, and the mcp_manager/personal_agent_manager/deployment_manager/api_collection_manager specialists) ran
- * completely unguarded.
+ * per-request advisors — {@link AiGuardrailsAdvisor} and {@link WorkspaceSystemPromptAdvisor} — closing the coverage
+ * gap documented on {@code AiHubSpringAIAgent#resolveChatClient}: previously only the top-level AI Hub agent's own
+ * {@link ChatClient} carried these advisors, while every delegate ChatClient (Copilot specialists, the AI-hub-owned
+ * research/data_analyst/image_generator/slide_builder subagents, and the
+ * mcp_manager/personal_agent_manager/deployment_manager/api_collection_manager specialists) ran completely unguarded
+ * and without the workspace's standing instructions.
+ *
+ * <p>
+ * The class keeps its guardrails-era name even though it now also carries the workspace system prompt — renaming would
+ * churn all ~18 call sites in {@code AiHubConfiguration} and the git history for no behavior gain.
+ * </p>
  *
  * <p>
  * The delegate {@link ChatClient} beans backing these specialists are process-wide singletons shared by every
@@ -86,32 +94,40 @@ import org.springframework.core.io.Resource;
 public final class SubAgentGuardrailedChatClient implements ChatClient {
 
     private final ChatClient delegate;
-    private final AiGuardrails aiGuardrails;
-    private final AiGuardrailMetrics aiGuardrailMetrics;
+    private final @Nullable AiGuardrails aiGuardrails;
+    private final @Nullable AiGuardrailMetrics aiGuardrailMetrics;
+    private final @Nullable WorkspaceSystemPrompts workspaceSystemPrompts;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     private SubAgentGuardrailedChatClient(
-        ChatClient delegate, AiGuardrails aiGuardrails, AiGuardrailMetrics aiGuardrailMetrics) {
+        ChatClient delegate, @Nullable AiGuardrails aiGuardrails, @Nullable AiGuardrailMetrics aiGuardrailMetrics,
+        @Nullable WorkspaceSystemPrompts workspaceSystemPrompts) {
 
         this.delegate = delegate;
         this.aiGuardrails = aiGuardrails;
         this.aiGuardrailMetrics = aiGuardrailMetrics;
+        this.workspaceSystemPrompts = workspaceSystemPrompts;
     }
 
     /**
-     * Returns {@code chatClient} wrapped so every call it serves runs under the workspace's
-     * {@link AiGuardrailsAdvisor}, or {@code chatClient} itself unchanged when {@code aiGuardrails} (or its paired
-     * {@code aiGuardrailMetrics}) is {@code null} — the EE guardrails module not being on the classpath, or the caller
-     * not having wired one.
+     * Returns {@code chatClient} wrapped so every call it serves runs under the workspace's {@link AiGuardrailsAdvisor}
+     * and {@link WorkspaceSystemPromptAdvisor}, or {@code chatClient} itself unchanged when neither engine is present —
+     * {@code aiGuardrails} (or its paired {@code aiGuardrailMetrics}) and {@code workspaceSystemPrompts} are both
+     * {@code null}, meaning the corresponding EE module isn't on the classpath, or the caller didn't wire one.
      */
     public static ChatClient wrap(
-        ChatClient chatClient, @Nullable AiGuardrails aiGuardrails, @Nullable AiGuardrailMetrics aiGuardrailMetrics) {
+        ChatClient chatClient, @Nullable AiGuardrails aiGuardrails, @Nullable AiGuardrailMetrics aiGuardrailMetrics,
+        @Nullable WorkspaceSystemPrompts workspaceSystemPrompts) {
 
-        if (aiGuardrails == null || aiGuardrailMetrics == null) {
+        boolean guardrailsPresent = aiGuardrails != null && aiGuardrailMetrics != null;
+
+        if (!guardrailsPresent && workspaceSystemPrompts == null) {
             return chatClient;
         }
 
-        return new SubAgentGuardrailedChatClient(chatClient, aiGuardrails, aiGuardrailMetrics);
+        return new SubAgentGuardrailedChatClient(
+            chatClient, guardrailsPresent ? aiGuardrails : null, guardrailsPresent ? aiGuardrailMetrics : null,
+            workspaceSystemPrompts);
     }
 
     @Override
@@ -315,24 +331,29 @@ public final class SubAgentGuardrailedChatClient implements ChatClient {
 
         @Override
         public CallResponseSpec call() {
-            attachGuardrailAdvisorIfActive();
+            attachWorkspaceAdvisorsIfActive();
 
             return delegateSpec.call();
         }
 
         @Override
         public StreamResponseSpec stream() {
-            attachGuardrailAdvisorIfActive();
+            attachWorkspaceAdvisorsIfActive();
 
             return delegateSpec.stream();
         }
 
-        private void attachGuardrailAdvisorIfActive() {
+        private void attachWorkspaceAdvisorsIfActive() {
             Long workspaceId = resolveWorkspaceId(capturedToolContext);
 
-            if (aiGuardrails.isActive(workspaceId)) {
+            if (aiGuardrails != null && aiGuardrailMetrics != null && aiGuardrails.isActive(workspaceId)) {
                 delegateSpec = delegateSpec.advisors(
                     new AiGuardrailsAdvisor(aiGuardrails, workspaceId, aiGuardrailMetrics));
+            }
+
+            if (workspaceSystemPrompts != null && workspaceSystemPrompts.fetchPrompt(workspaceId) != null) {
+                delegateSpec = delegateSpec.advisors(
+                    new WorkspaceSystemPromptAdvisor(workspaceSystemPrompts, workspaceId));
             }
         }
     }

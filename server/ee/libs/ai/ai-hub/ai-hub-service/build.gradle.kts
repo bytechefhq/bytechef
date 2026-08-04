@@ -89,6 +89,9 @@ dependencies {
     // AiGuardrails / AiGuardrailsAdvisor / AiGuardrailMetrics — enforces workspace content guardrails on every AI
     // Hub LLM turn (AiHubSpringAIAgent#resolveChatClient).
     implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-guardrails:platform-ai-guardrails-service"))
+    // WorkspaceSystemPrompts / WorkspaceSystemPromptAdvisor — appends the workspace admin's standing instructions
+    // to every AI Hub main-agent LLM turn (AiHubSpringAIAgent#resolveChatClient).
+    implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-workspace-prompt:platform-ai-workspace-prompt-service"))
     implementation(project(":server:ee:libs:automation:automation-context-store:automation-context-store-api"))
     implementation(project(":server:ee:libs:platform:platform-audit:platform-audit-api"))
     implementation(project(":server:ee:libs:platform:platform-context-store:platform-context-store-api"))

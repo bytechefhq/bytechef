@@ -21,6 +21,8 @@ import com.bytechef.ee.platform.ai.guardrails.AiGuardrailMetrics;
 import com.bytechef.ee.platform.ai.guardrails.AiGuardrails;
 import com.bytechef.ee.platform.ai.guardrails.exception.AiGuardrailViolationException;
 import com.bytechef.ee.platform.ai.guardrails.service.AiGuardrailsWorkspaceSettingsService;
+import com.bytechef.ee.platform.ai.workspaceprompt.WorkspaceSystemPrompts;
+import com.bytechef.ee.platform.ai.workspaceprompt.advisor.WorkspaceSystemPromptAdvisor;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +31,8 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.MessageType;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
@@ -61,7 +65,7 @@ class SubAgentGuardrailedChatClientTest {
 
         ChatClient inner = ChatClient.builder(unreachableChatModel())
             .build();
-        ChatClient guarded = SubAgentGuardrailedChatClient.wrap(inner, blockingGuardrails(), aiGuardrailMetrics);
+        ChatClient guarded = SubAgentGuardrailedChatClient.wrap(inner, blockingGuardrails(), aiGuardrailMetrics, null);
 
         Map<String, Object> forwardedContext =
             Map.of(AgentToolInvocationContext.TOOL_CONTEXT_WORKSPACE_ID_KEY, WORKSPACE_ID);
@@ -83,9 +87,88 @@ class SubAgentGuardrailedChatClientTest {
         ChatClient inner = ChatClient.builder(new CapturingChatModel())
             .build();
 
-        ChatClient guarded = SubAgentGuardrailedChatClient.wrap(inner, null, null);
+        ChatClient guarded = SubAgentGuardrailedChatClient.wrap(inner, null, null, null);
 
         assertThat(guarded).isSameAs(inner);
+    }
+
+    @Test
+    void testWrapAttachesWorkspaceSystemPromptAdvisorWhenPromptSet() {
+        WorkspaceSystemPrompts workspaceSystemPrompts = mock(WorkspaceSystemPrompts.class);
+
+        when(workspaceSystemPrompts.fetchPrompt(WORKSPACE_ID)).thenReturn("Always answer in German.");
+
+        CapturingChatModel capturingChatModel = new CapturingChatModel();
+        ChatClient inner = ChatClient.builder(capturingChatModel)
+            .build();
+
+        ChatClient guarded = SubAgentGuardrailedChatClient.wrap(inner, null, null, workspaceSystemPrompts);
+
+        Map<String, Object> forwardedContext =
+            Map.of(AgentToolInvocationContext.TOOL_CONTEXT_WORKSPACE_ID_KEY, WORKSPACE_ID);
+
+        String content = guarded.prompt()
+            .system("Base prompt.")
+            .user("hi")
+            .toolContext(forwardedContext)
+            .call()
+            .content();
+
+        assertThat(content).isEqualTo("OK");
+
+        String forwardedSystemText = capturingChatModel.receivedPrompts.getFirst()
+            .getInstructions()
+            .stream()
+            .filter(message -> message.getMessageType() == MessageType.SYSTEM)
+            .map(Message::getText)
+            .findFirst()
+            .orElseThrow();
+
+        assertThat(forwardedSystemText).contains(WorkspaceSystemPromptAdvisor.WORKSPACE_INSTRUCTIONS_HEADER);
+        assertThat(forwardedSystemText).endsWith("Always answer in German.");
+    }
+
+    @Test
+    void testWrapSkipsPromptAdvisorWhenWorkspaceHasNoPrompt() {
+        WorkspaceSystemPrompts workspaceSystemPrompts = mock(WorkspaceSystemPrompts.class);
+
+        when(workspaceSystemPrompts.fetchPrompt(WORKSPACE_ID)).thenReturn(null);
+
+        CapturingChatModel capturingChatModel = new CapturingChatModel();
+        ChatClient inner = ChatClient.builder(capturingChatModel)
+            .build();
+
+        ChatClient guarded = SubAgentGuardrailedChatClient.wrap(inner, null, null, workspaceSystemPrompts);
+
+        Map<String, Object> forwardedContext =
+            Map.of(AgentToolInvocationContext.TOOL_CONTEXT_WORKSPACE_ID_KEY, WORKSPACE_ID);
+
+        String content = guarded.prompt()
+            .system("Base prompt.")
+            .user("hi")
+            .toolContext(forwardedContext)
+            .call()
+            .content();
+
+        assertThat(content).isEqualTo("OK");
+
+        String forwardedSystemText = capturingChatModel.receivedPrompts.getFirst()
+            .getInstructions()
+            .stream()
+            .filter(message -> message.getMessageType() == MessageType.SYSTEM)
+            .map(Message::getText)
+            .findFirst()
+            .orElseThrow();
+
+        assertThat(forwardedSystemText).doesNotContain(WorkspaceSystemPromptAdvisor.WORKSPACE_INSTRUCTIONS_HEADER);
+    }
+
+    @Test
+    void testWrapReturnsUnwrappedWhenBothEnginesAbsent() {
+        ChatClient inner = ChatClient.builder(new CapturingChatModel())
+            .build();
+
+        assertThat(SubAgentGuardrailedChatClient.wrap(inner, null, null, null)).isSameAs(inner);
     }
 
     @Test
@@ -98,7 +181,7 @@ class SubAgentGuardrailedChatClientTest {
         ChatClient inner = ChatClient.builder(capturingChatModel)
             .build();
 
-        ChatClient guarded = SubAgentGuardrailedChatClient.wrap(inner, inactiveGuardrails, aiGuardrailMetrics);
+        ChatClient guarded = SubAgentGuardrailedChatClient.wrap(inner, inactiveGuardrails, aiGuardrailMetrics, null);
 
         Map<String, Object> forwardedContext =
             Map.of(AgentToolInvocationContext.TOOL_CONTEXT_WORKSPACE_ID_KEY, WORKSPACE_ID);
@@ -126,7 +209,7 @@ class SubAgentGuardrailedChatClientTest {
 
         ChatClient inner = ChatClient.builder(new CapturingChatModel())
             .build();
-        ChatClient guarded = SubAgentGuardrailedChatClient.wrap(inner, blockingGuardrails(), aiGuardrailMetrics);
+        ChatClient guarded = SubAgentGuardrailedChatClient.wrap(inner, blockingGuardrails(), aiGuardrailMetrics, null);
 
         Map<String, Object> forwardedContext =
             Map.of(AgentToolInvocationContext.TOOL_CONTEXT_WORKSPACE_ID_KEY, otherWorkspaceId);
@@ -150,7 +233,7 @@ class SubAgentGuardrailedChatClientTest {
 
         ChatClient inner = ChatClient.builder(new CapturingChatModel())
             .build();
-        ChatClient guarded = SubAgentGuardrailedChatClient.wrap(inner, blockingGuardrails(), aiGuardrailMetrics);
+        ChatClient guarded = SubAgentGuardrailedChatClient.wrap(inner, blockingGuardrails(), aiGuardrailMetrics, null);
 
         guarded.prompt("hello, nothing blocked here")
             .call()
@@ -171,7 +254,7 @@ class SubAgentGuardrailedChatClientTest {
 
         ChatClient inner = ChatClient.builder(unreachableChatModel())
             .build();
-        ChatClient guarded = SubAgentGuardrailedChatClient.wrap(inner, blockingGuardrails(), aiGuardrailMetrics);
+        ChatClient guarded = SubAgentGuardrailedChatClient.wrap(inner, blockingGuardrails(), aiGuardrailMetrics, null);
 
         Map<String, Object> forwardedContext =
             Map.of(AgentToolInvocationContext.TOOL_CONTEXT_WORKSPACE_ID_KEY, WORKSPACE_ID);
@@ -211,7 +294,7 @@ class SubAgentGuardrailedChatClientTest {
 
         ChatClient inner = ChatClient.builder(unreachableChatModel())
             .build();
-        ChatClient guarded = SubAgentGuardrailedChatClient.wrap(inner, blockingGuardrails(), aiGuardrailMetrics);
+        ChatClient guarded = SubAgentGuardrailedChatClient.wrap(inner, blockingGuardrails(), aiGuardrailMetrics, null);
 
         ManagerSubAgentToolCallback managerToolCallback =
             new ManagerSubAgentToolCallback(ManagerAgentType.MCP_MANAGER, guarded, "test manager");
