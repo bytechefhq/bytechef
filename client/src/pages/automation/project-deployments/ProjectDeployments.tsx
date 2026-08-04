@@ -237,9 +237,9 @@ const ProjectDeployments = () => {
                                             componentDefinitions={componentDefinitions}
                                             key={projectId}
                                             newlyCreatedDeploymentId={newlyCreatedDeploymentId}
-                                            project={
-                                                projects.find((currentProject) => currentProject.id === projectId)!
-                                            }
+                                            project={projects.find(
+                                                (currentProject) => currentProject.id === projectId
+                                            )!}
                                             projectDeployments={projectDeploymentMap.get(projectId)!}
                                             tags={tags}
                                             taskDispatcherDefinitions={taskDispatcherDefinitions}

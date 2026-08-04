@@ -12,7 +12,7 @@ import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import {useGetWorkspaceConnectionsQuery} from '@/shared/queries/automation/connections.queries';
 import {useGetConnectionDefinitionQuery} from '@/shared/queries/platform/connectionDefinitions.queries';
-import {DataMessagePartProps, useThreadRuntime} from '@assistant-ui/react';
+import {DataMessagePartProps, useAui} from '@assistant-ui/react';
 import {CheckIcon} from 'lucide-react';
 import {useMemo, useState} from 'react';
 
@@ -60,7 +60,7 @@ const SelectConnectionMessage = ({data}: DataMessagePartProps<SelectConnectionDa
 
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
-    const threadRuntime = useThreadRuntime();
+    const aui = useAui();
 
     // Fetch the connection definition's version separately from the component version — the two diverge
     // across releases (CLAUDE.md "Workflow editor connection dropdown" gotcha). Filtering existing
@@ -111,7 +111,7 @@ const SelectConnectionMessage = ({data}: DataMessagePartProps<SelectConnectionDa
 
         // Append as a system message so the transcript reads "User picked: <name>" rather than as if the
         // user typed the connection name literally — same convention AskUserQuestion uses for its answers.
-        threadRuntime.append({
+        aui.thread.append({
             content: [{text: `User picked: ${connection.name} (ID: ${connection.id})`, type: 'text'}],
             role: 'system',
         });

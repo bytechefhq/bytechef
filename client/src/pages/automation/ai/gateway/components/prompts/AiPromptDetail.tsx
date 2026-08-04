@@ -70,8 +70,7 @@ const AiPromptDetail = ({onBack, promptId}: AiPromptDetailProps) => {
 
         for (const env of ENVIRONMENTS) {
             result[env] = versions.find((version) => version && version.environment === env && version.active) as
-                | AiPromptVersionType
-                | undefined;
+                AiPromptVersionType | undefined;
         }
 
         return result;
@@ -108,8 +107,7 @@ const AiPromptDetail = ({onBack, promptId}: AiPromptDetailProps) => {
 
         const left = versions.find((version) => version?.id === compareSelection[0]) as AiPromptVersionType | undefined;
         const right = versions.find((version) => version?.id === compareSelection[1]) as
-            | AiPromptVersionType
-            | undefined;
+            AiPromptVersionType | undefined;
 
         if (!left || !right) {
             return null;

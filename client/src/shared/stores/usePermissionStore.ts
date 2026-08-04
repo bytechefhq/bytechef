@@ -14,9 +14,7 @@ export type WorkspaceScopePermissionStateType =
     | {readonly scopes: readonly string[]; readonly status: 'loaded'};
 
 export type WorkspacePermissionStateType =
-    | {readonly status: 'loading'}
-    | {readonly status: 'error'}
-    | {readonly role: string; readonly status: 'loaded'};
+    {readonly status: 'loading'} | {readonly status: 'error'} | {readonly role: string; readonly status: 'loaded'};
 
 interface PermissionStoreI {
     clearPermissions: () => void;

@@ -1,6 +1,5 @@
 {
     "compilerOptions": {
-        "baseUrl": "./src",
         "target": "esnext",
         "incremental": true,
         "lib": ["dom", "dom.iterable", "esnext"],
@@ -17,7 +16,7 @@
         "noEmit": true,
         "jsx": "react-jsx",
         "paths": {
-            "@/*": ["./*"]
+            "@/*": ["./src/*"]
         }
     },
     "include": ["src"],

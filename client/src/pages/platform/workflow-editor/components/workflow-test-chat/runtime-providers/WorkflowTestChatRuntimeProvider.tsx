@@ -190,7 +190,7 @@ export function WorkflowTestChatRuntimeProvider({
         onNew,
     });
 
-    const aui = useAui({suggestions: Suggestions(WORKFLOW_TEST_CHAT_SUGGESTIONS)}, {parent: null});
+    const aui = useAui({suggestions: Suggestions(WORKFLOW_TEST_CHAT_SUGGESTIONS)});
 
     return (
         <ApprovalResolutionContext.Provider value={approvalResolution}>

@@ -448,8 +448,7 @@ test.describe('Type change and subproperty cleanup', () => {
             const workflowDefinition = await getWorkflowDefinition(authenticatedPage, workflow.workflowId);
 
             const parameters = workflowDefinition.tasks?.[0]?.parameters as
-                | {type?: string; value?: unknown}
-                | undefined;
+                {type?: string; value?: unknown} | undefined;
 
             expect(parameters?.type).toBe('ARRAY');
             expect(parameters).not.toHaveProperty('value');

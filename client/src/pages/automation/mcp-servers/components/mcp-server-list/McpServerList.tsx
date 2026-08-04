@@ -1,10 +1,10 @@
 import {Collapsible, CollapsibleContent} from '@/components/ui/collapsible';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
+import McpServerListItem from '@/pages/automation/mcp-servers/components/mcp-server-list/McpServerListItem';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import McpServerConfiguration from '@/shared/components/mcp-server/McpServerConfiguration';
 import {McpServer, Tag, useMcpProjectsByServerIdQuery} from '@/shared/middleware/graphql';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
-import McpServerListItem from 'pages/automation/mcp-servers/components/mcp-server-list/McpServerListItem';
 import {useMemo} from 'react';
 
 import {McpProjectWorkflowItemType} from '../mcp-project-workflow-list/hooks/useMcpProjectList';

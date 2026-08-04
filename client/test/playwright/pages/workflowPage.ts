@@ -96,8 +96,7 @@ export class WorkflowPage {
             : [];
 
         this.dynamicPropertyTypes = WorkflowPage.varTask?.metadata?.ui?.dynamicPropertyTypes as
-            | Record<string, unknown>
-            | undefined;
+            Record<string, unknown> | undefined;
 
         this.subPropertyListItems = this.parentObjectSubPropertyList.locator(':scope > li');
 

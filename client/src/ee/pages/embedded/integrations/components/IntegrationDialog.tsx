@@ -1,5 +1,6 @@
 import Button from '@/components/Button/Button';
 import ComboBox from '@/components/ComboBox/ComboBox';
+import CreatableSelect from '@/components/CreatableSelect/CreatableSelect';
 import {Input} from '@/components/Input/Input';
 import {
     Dialog,
@@ -29,7 +30,6 @@ import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useQueryClient} from '@tanstack/react-query';
-import CreatableSelect from 'components/CreatableSelect/CreatableSelect';
 import {ReactNode, useState} from 'react';
 import {useForm} from 'react-hook-form';
 

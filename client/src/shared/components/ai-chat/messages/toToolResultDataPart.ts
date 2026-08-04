@@ -11,8 +11,7 @@
  */
 
 export type ToolResultDataPartType =
-    | {data: Record<string, unknown>; ok: true; type: string}
-    | {errorMessage: string; ok: false; toolName: string};
+    {data: Record<string, unknown>; ok: true; type: string} | {errorMessage: string; ok: false; toolName: string};
 
 /**
  * Parses a JSON string, returning the parsed value or `null` on failure. Logs a structured warning so

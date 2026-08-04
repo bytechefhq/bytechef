@@ -30,14 +30,7 @@ interface IconButtonProps extends BasicProps {
 type ButtonPropsType = LabelButtonProps | CustomContentButtonProps | IconButtonProps;
 
 type VariantType =
-    | 'default'
-    | 'secondary'
-    | 'destructive'
-    | 'destructiveGhost'
-    | 'destructiveOutline'
-    | 'outline'
-    | 'ghost'
-    | 'link';
+    'default' | 'secondary' | 'destructive' | 'destructiveGhost' | 'destructiveOutline' | 'outline' | 'ghost' | 'link';
 
 type TextSizeType = 'lg' | 'default' | 'sm' | 'xs' | 'xxs';
 type IconSizeType = 'icon' | 'iconSm' | 'iconXs' | 'iconXxs';

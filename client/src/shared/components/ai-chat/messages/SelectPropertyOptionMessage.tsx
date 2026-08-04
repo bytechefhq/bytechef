@@ -1,5 +1,5 @@
 import ComboBox from '@/components/ComboBox/ComboBox';
-import {DataMessagePartProps, useThreadRuntime} from '@assistant-ui/react';
+import {DataMessagePartProps, useAui} from '@assistant-ui/react';
 import {CheckIcon} from 'lucide-react';
 import {useState} from 'react';
 
@@ -27,7 +27,7 @@ export interface SelectPropertyOptionDataI {
 const SelectPropertyOptionMessage = ({data}: DataMessagePartProps<SelectPropertyOptionDataI>) => {
     const [picked, setPicked] = useState<SelectPropertyOptionItemI | undefined>();
 
-    const threadRuntime = useThreadRuntime();
+    const aui = useAui();
 
     if (picked) {
         return (
@@ -71,7 +71,7 @@ const SelectPropertyOptionMessage = ({data}: DataMessagePartProps<SelectProperty
 
                     setPicked(option);
 
-                    threadRuntime.append({
+                    aui.thread.append({
                         content: [{text: `User picked: ${option.label} (value: ${option.value})`, type: 'text'}],
                         role: 'system',
                     });
