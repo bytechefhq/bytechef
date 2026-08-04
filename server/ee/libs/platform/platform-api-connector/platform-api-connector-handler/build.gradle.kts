@@ -7,4 +7,7 @@ dependencies {
 
     implementation(project(":server:ee:libs:platform:platform-api-connector:platform-api-connector-configuration:platform-api-connector-configuration-api"))
     implementation(project(":server:ee:libs:platform:platform-api-connector:platform-api-connector-file-storage:platform-api-connector-file-storage-api"))
+
+    testImplementation("org.assertj:assertj-core")
+    testImplementation("org.mockito:mockito-core")
 }
