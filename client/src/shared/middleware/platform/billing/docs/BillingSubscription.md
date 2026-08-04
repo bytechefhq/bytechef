@@ -13,7 +13,7 @@ Name | Type
 `currentPeriodEnd` | Date
 `cancelAtPeriodEnd` | boolean
 `scheduledPlanName` | string
-`tasksUsed` | number
+`jobsExecuted` | number
 
 ## Example
 
@@ -28,7 +28,7 @@ const example = {
   "currentPeriodEnd": null,
   "cancelAtPeriodEnd": null,
   "scheduledPlanName": null,
-  "tasksUsed": null,
+  "jobsExecuted": null,
 } satisfies BillingSubscription
 
 console.log(example)
