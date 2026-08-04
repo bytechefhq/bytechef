@@ -52,6 +52,7 @@ import com.bytechef.platform.ai.constant.AiAgentToolContextKey;
 import com.bytechef.platform.ai.constant.ToolSuspendConstants;
 import com.bytechef.platform.ai.guardrails.AiGuardrailsAdvisorProvider;
 import com.bytechef.platform.ai.tool.constant.ToolConstants;
+import com.bytechef.platform.ai.workspaceprompt.WorkspaceSystemPromptAdvisorProvider;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.ParametersFactory;
@@ -122,6 +123,7 @@ public abstract class AbstractAiAgentChatAction {
 
     private final @Nullable ObjectProvider<ToolExecutionRecorder> toolExecutionRecorderObjectProvider;
     private final @Nullable ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider;
+    private final @Nullable ObjectProvider<WorkspaceSystemPromptAdvisorProvider> workspaceSystemPromptAdvisorProviderObjectProvider;
 
     protected AbstractAiAgentChatAction(
         AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
@@ -145,11 +147,23 @@ public abstract class AbstractAiAgentChatAction {
         @Nullable ObjectProvider<ToolExecutionRecorder> toolExecutionRecorderObjectProvider,
         @Nullable ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider) {
 
+        this(aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager,
+            toolExecutionRecorderObjectProvider, aiGuardrailsAdvisorProviderObjectProvider, null);
+    }
+
+    protected AbstractAiAgentChatAction(
+        AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
+        ToolCallingManager toolCallingManager,
+        @Nullable ObjectProvider<ToolExecutionRecorder> toolExecutionRecorderObjectProvider,
+        @Nullable ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider,
+        @Nullable ObjectProvider<WorkspaceSystemPromptAdvisorProvider> workspaceSystemPromptAdvisorProviderObjectProvider) {
+
         this.aiAgentToolFacade = aiAgentToolFacade;
         this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.toolCallingManager = toolCallingManager;
         this.toolExecutionRecorderObjectProvider = toolExecutionRecorderObjectProvider;
         this.aiGuardrailsAdvisorProviderObjectProvider = aiGuardrailsAdvisorProviderObjectProvider;
+        this.workspaceSystemPromptAdvisorProviderObjectProvider = workspaceSystemPromptAdvisorProviderObjectProvider;
     }
 
     /**
@@ -256,7 +270,7 @@ public abstract class AbstractAiAgentChatAction {
         // advisor chain — the returned advisor self-orders at HIGHEST_PRECEDENCE, but listing it first here documents
         // that it is meant to run before every other advisor, including the per-node GUARDRAILS cluster elements added
         // by getAdvisors below.
-        List<Advisor> guardrailsAdvisors = new ArrayList<>();
+        List<Advisor> workspaceAdvisors = new ArrayList<>();
 
         if (aiGuardrailsAdvisorProviderObjectProvider != null
             && context instanceof ActionContextAware actionContextAware) {
@@ -264,11 +278,23 @@ public abstract class AbstractAiAgentChatAction {
                 provider -> provider
                     .getAdvisor(actionContextAware.getPlatformType(), actionContextAware.getJobPrincipalId(),
                         "ai_agent")
-                    .ifPresent(guardrailsAdvisors::add));
+                    .ifPresent(workspaceAdvisors::add));
+        }
+
+        // Workspace-level system prompt, resolved through the same optional-CE-SPI idiom (see
+        // WorkspaceSystemPromptAdvisorProvider). The returned advisor self-orders AFTER the guardrails advisor above,
+        // so listing both in one list is order-safe regardless of which providers are present.
+        if (workspaceSystemPromptAdvisorProviderObjectProvider != null
+            && context instanceof ActionContextAware actionContextAware) {
+            workspaceSystemPromptAdvisorProviderObjectProvider.ifAvailable(
+                provider -> provider
+                    .getAdvisor(actionContextAware.getPlatformType(), actionContextAware.getJobPrincipalId(),
+                        "ai_agent")
+                    .ifPresent(workspaceAdvisors::add));
         }
 
         ChatClient.ChatClientRequestSpec chatClientRequestSpec = createPrompt(chatClient, inputParameters, context)
-            .advisors(guardrailsAdvisors)
+            .advisors(workspaceAdvisors)
             .advisors(
                 getAdvisors(
                     clusterElementMap, connectionParameters, chatModel, context, chatMemoryResult,
