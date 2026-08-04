@@ -95,6 +95,7 @@ const McpServerDialog = ({
             createMcpServerMutation.mutate(
                 {
                     input: {
+                        authenticationRequired: values.authenticationRequired,
                         enabled: values.enabled,
                         environmentId: currentEnvironmentId!.toString(),
                         name: values.name,
@@ -157,30 +158,27 @@ const McpServerDialog = ({
                             )}
                         />
 
-                        {mcpServer && (
-                            <FormField
-                                control={form.control}
-                                name="authenticationRequired"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <div className="flex items-center space-x-2">
-                                            <FormControl>
-                                                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                                            </FormControl>
+                        <FormField
+                            control={form.control}
+                            name="authenticationRequired"
+                            render={({field}) => (
+                                <FormItem>
+                                    <div className="flex items-center space-x-2">
+                                        <FormControl>
+                                            <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                                        </FormControl>
 
-                                            <FormLabel className="font-normal">Require authentication</FormLabel>
-                                        </div>
+                                        <FormLabel className="font-normal">Require authentication</FormLabel>
+                                    </div>
 
-                                        <FormDescription>
-                                            Require an API key or OAuth token in addition to the server URL. Existing
-                                            servers default to off.
-                                        </FormDescription>
+                                    <FormDescription>
+                                        Require an API key or OAuth token in addition to the server URL.
+                                    </FormDescription>
 
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        )}
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
 
                         {mcpServer && (
                             <FormField

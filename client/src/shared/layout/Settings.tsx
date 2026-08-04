@@ -19,6 +19,7 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
     const currentType = usePlatformTypeStore((state) => state.currentType);
 
     const billingEnabled = useApplicationInfoStore((state) => state.billing.enabled);
+    const mcpServerEnabled = useApplicationInfoStore((state) => state.ai.mcp.server.enabled);
     const isFeatureFlagEnabled = useFeatureFlagsStore();
 
     const location = useLocation();
@@ -64,6 +65,10 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
 
         if (navItem.href === 'billing') {
             return billingEnabled;
+        }
+
+        if (navItem.href === 'mcp-server') {
+            return mcpServerEnabled;
         }
 
         return true;

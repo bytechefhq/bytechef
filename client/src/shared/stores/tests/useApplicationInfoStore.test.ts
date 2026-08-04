@@ -12,6 +12,16 @@ describe('applicationInfoStore', () => {
             expect(ai.knowledgeBase.enabled).toBe(false);
         });
 
+        it('defaults the MCP server toggle to enabled before getApplicationInfo resolves', () => {
+            // Mirrors the server-side default: bytechef.ai.mcp.server.enabled uses
+            // matchIfMissing = true, so an absent property means the server runs and
+            // the settings menu entry should show.
+            const {ai} = applicationInfoStore.getState();
+
+            expect(ai.mcp.server.enabled).toBe(true);
+            expect(ai.mcp.server.sse.enabled).toBe(true);
+        });
+
         it('defaults custom component Java uploads to enabled before getApplicationInfo resolves', () => {
             const {component} = applicationInfoStore.getState();
 
