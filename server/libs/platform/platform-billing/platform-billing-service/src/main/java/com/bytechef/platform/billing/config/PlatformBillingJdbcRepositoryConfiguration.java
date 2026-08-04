@@ -18,6 +18,7 @@ package com.bytechef.platform.billing.config;
 
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
@@ -27,6 +28,7 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
  */
 @AutoConfiguration(afterName = "org.springframework.boot.data.jdbc.autoconfigure.DataJdbcRepositoriesAutoConfiguration")
 @ConditionalOnBean(AbstractJdbcConfiguration.class)
+@ConditionalOnProperty(prefix = "billing", name = "enabled", havingValue = "true")
 @EnableConfigurationProperties(BillingProperties.class)
 @EnableJdbcRepositories(basePackages = "com.bytechef.platform.billing.repository")
 class PlatformBillingJdbcRepositoryConfiguration {

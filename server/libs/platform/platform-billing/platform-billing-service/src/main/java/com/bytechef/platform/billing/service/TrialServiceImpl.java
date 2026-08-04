@@ -24,6 +24,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,7 @@ import org.springframework.stereotype.Service;
  * @author Matija Petanjek
  */
 @Service
+@ConditionalOnProperty(prefix = "billing", name = "enabled", havingValue = "true")
 public class TrialServiceImpl implements TrialService {
 
     static final String TRIAL_STATUS_CACHE = "trialStatus";

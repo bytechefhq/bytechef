@@ -18,12 +18,14 @@ package com.bytechef.platform.billing.web.security.config;
 
 import com.bytechef.platform.security.web.config.AuthorizeHttpRequestContributor;
 import java.util.List;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 /**
  * @author Matija Petanjek
  */
 @Component
+@ConditionalOnProperty(prefix = "billing", name = "enabled", havingValue = "true")
 public class BillingAuthorizeHttpRequestContributor implements AuthorizeHttpRequestContributor {
 
     @Override
