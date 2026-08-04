@@ -134,9 +134,11 @@ class AiProviderFacadeCatalogTest {
         ComponentDefinition anthropicDefinition = mock(ComponentDefinition.class);
         when(anthropicDefinition.getName()).thenReturn("anthropic");
         when(anthropicDefinition.getIcon()).thenReturn("anthropic-icon");
+        when(anthropicDefinition.getVersion()).thenReturn(1);
         when(anthropicDefinition.getActions()).thenReturn(List.of(chatAction));
 
         when(componentDefinitionService.getComponentDefinitions()).thenReturn(List.of(anthropicDefinition));
+        when(componentDefinitionService.getComponentDefinition("anthropic", 1)).thenReturn(anthropicDefinition);
         when(propertyService.getProperties(
             ArgumentMatchers.anyList(),
             ArgumentMatchers.eq(Scope.PLATFORM),
@@ -179,9 +181,11 @@ class AiProviderFacadeCatalogTest {
         ComponentDefinition groqDefinition = mock(ComponentDefinition.class);
         when(groqDefinition.getName()).thenReturn("groq");
         when(groqDefinition.getIcon()).thenReturn("groq-icon");
+        when(groqDefinition.getVersion()).thenReturn(1);
         when(groqDefinition.getActions()).thenReturn(List.of(chatAction));
 
         when(componentDefinitionService.getComponentDefinitions()).thenReturn(List.of(groqDefinition));
+        when(componentDefinitionService.getComponentDefinition("groq", 1)).thenReturn(groqDefinition);
         when(propertyService.getProperties(
             ArgumentMatchers.anyList(),
             ArgumentMatchers.eq(Scope.PLATFORM),
@@ -199,6 +203,60 @@ class AiProviderFacadeCatalogTest {
 
         assertThat(groq.models()).isEmpty();
         assertThat(groq.supportsModelById()).isTrue();
+    }
+
+    /**
+     * Reproduces the production wiring after the lazy component-index work: {@code getComponentDefinitions()} serves
+     * list-view stubs that carry NO action property trees, so the model options MUST be read from the per-component
+     * detail path ({@code getComponentDefinition(name, version)}), which loads the full definition on demand.
+     */
+    @Test
+    void testGetChatProviderCatalogReadsModelOptionsFromFullDefinitionNotListStubs() {
+        ComponentDefinition anthropicStub = buildEmptyActionComponentDefinition("anthropic");
+
+        lenient().when(anthropicStub.getVersion())
+            .thenReturn(1);
+
+        when(componentDefinitionService.getComponentDefinitions()).thenReturn(List.of(anthropicStub));
+        when(propertyService.getProperties(
+            ArgumentMatchers.anyList(),
+            ArgumentMatchers.eq(Scope.PLATFORM),
+            ArgumentMatchers.isNull(),
+            ArgumentMatchers.eq((long) ENVIRONMENT)))
+                .thenReturn(List.of());
+
+        Option option = mock(Option.class);
+        when(option.getValue()).thenReturn("claude-sonnet-4-6");
+        when(option.getLabel()).thenReturn("Claude Sonnet 4.6");
+
+        StringProperty modelProperty = mock(StringProperty.class);
+        when(modelProperty.getName()).thenReturn("model");
+        when(modelProperty.getOptions()).thenReturn(List.of(option));
+
+        ActionDefinition chatAction = mock(ActionDefinition.class);
+        when(chatAction.getName()).thenReturn("ask");
+        doReturn(List.of(modelProperty)).when(chatAction)
+            .getProperties();
+
+        ComponentDefinition anthropicFullDefinition = mock(ComponentDefinition.class);
+        when(anthropicFullDefinition.getActions()).thenReturn(List.of(chatAction));
+
+        lenient().when(componentDefinitionService.getComponentDefinition("anthropic", 1))
+            .thenReturn(anthropicFullDefinition);
+
+        List<AiProviderCatalogItemDTO> catalog = facade.getAiChatProviderCatalog(ENVIRONMENT);
+
+        AiProviderCatalogItemDTO anthropic = catalog.stream()
+            .filter(item -> item.key()
+                .equals("ai.provider.anthropic"))
+            .findFirst()
+            .orElseThrow();
+
+        assertThat(anthropic.models()).hasSize(1);
+        assertThat(anthropic.models()
+            .getFirst()
+            .name()).isEqualTo("claude-sonnet-4-6");
+        assertThat(anthropic.supportsModelById()).isFalse();
     }
 
     @Test

@@ -30,6 +30,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,6 +46,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @ConditionalOnEEVersion
 public class AiProviderFacadeImpl implements AiProviderFacade {
+
+    private static final Logger log = LoggerFactory.getLogger(AiProviderFacadeImpl.class);
 
     private final AiProviderConnectionSource aiProviderConnectionSource;
     private final ComponentDefinitionService componentDefinitionService;
@@ -108,7 +113,8 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
                         ? aiProviderConnectionSource.isEnabled(provider, environment)
                         : ((property != null && property.isEnabled()) || hasConfigApiKey(provider));
 
-                List<AiProviderCatalogItemDTO.Model> models = readChatModels(componentDefinition);
+                List<AiProviderCatalogItemDTO.Model> models = readChatModels(
+                    resolveFullComponentDefinition(componentDefinition));
 
                 return new AiProviderCatalogItemDTO(
                     provider.getKey(), provider.getLabel(), componentDefinition.getIcon(), enabled,
@@ -316,7 +322,32 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
             .equalsIgnoreCase(docsProvider.name());
     }
 
-    private static List<AiProviderCatalogItemDTO.Model> readChatModels(ComponentDefinition componentDefinition) {
+    /**
+     * Resolves the full definition backing a list-view entry. Since the lazy component-index work,
+     * {@code getComponentDefinitions()} serves list-view stubs that carry no action property trees, so the chat model
+     * options must be read from the per-component detail path, which loads the full definition on demand. Returns
+     * {@code null} (empty models) instead of failing the whole catalog when one component cannot be loaded.
+     */
+    private ComponentDefinition resolveFullComponentDefinition(ComponentDefinition componentDefinition) {
+        try {
+            return componentDefinitionService.getComponentDefinition(
+                componentDefinition.getName(), componentDefinition.getVersion());
+        } catch (RuntimeException exception) {
+            log.warn(
+                "Failed to load the full component definition for '{}' v{}; serving the provider without models",
+                componentDefinition.getName(), componentDefinition.getVersion(), exception);
+
+            return null;
+        }
+    }
+
+    private static List<AiProviderCatalogItemDTO.Model> readChatModels(
+        @Nullable ComponentDefinition componentDefinition) {
+
+        if (componentDefinition == null) {
+            return List.of();
+        }
+
         return componentDefinition.getActions()
             .stream()
             .filter(actionDefinition -> "ask".equals(actionDefinition.getName()))
