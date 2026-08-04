@@ -6,7 +6,13 @@ import {TrialBanner} from './TrialBanner';
 const hoisted = vi.hoisted(() => ({
     navigate: vi.fn(),
     subscription: undefined as
-        | {currentPeriodEnd?: Date; planName?: string; productUnitLimit?: number; status?: string; tasksUsed?: number}
+        | {
+              currentPeriodEnd?: Date;
+              jobsExecuted?: number;
+              planName?: string;
+              productUnitLimit?: number;
+              status?: string;
+          }
         | undefined,
 }));
 
@@ -41,16 +47,16 @@ describe('TrialBanner', () => {
     it('shows days remaining and task usage for an active trial', () => {
         hoisted.subscription = {
             currentPeriodEnd: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+            jobsExecuted: 120,
             planName: 'TRIAL',
             productUnitLimit: 5000,
             status: 'ACTIVE',
-            tasksUsed: 120,
         };
 
         render(<TrialBanner />);
 
         expect(screen.getByText(/3 days remaining/)).toBeInTheDocument();
-        expect(screen.getByText(/120\/5000 tasks used/)).toBeInTheDocument();
+        expect(screen.getByText(/120\/5000 job executions used/)).toBeInTheDocument();
     });
 
     it('shows an expired message when the trial subscription is canceled', () => {
