@@ -131,6 +131,9 @@ const Integration = lazy(() => import('@/ee/pages/embedded/integration/Integrati
 const Integrations = lazy(() => import('@/ee/pages/embedded/integrations/Integrations'));
 const SigningKeys = lazy(() => import('@/ee/pages/settings/embedded/signing-keys/SigningKeys'));
 const AiGuardrails = lazy(() => import('@/ee/pages/settings/automation/ai/guardrails/AiGuardrails'));
+const WorkspaceSystemPrompt = lazy(
+    () => import('@/ee/pages/settings/automation/ai/system-prompt/WorkspaceSystemPrompt')
+);
 const WorkspaceApiKeys = lazy(() => import('@/ee/pages/settings/automation/workspace-api-keys/WorkspaceApiKeys'));
 const Workspaces = lazy(() => import('@/ee/pages/settings/automation/workspaces/Workspaces'));
 const OrganizationConnections = lazy(
@@ -244,6 +247,18 @@ const currentWorkspaceSettingsRoutes = {
             ),
             path: 'ai/guardrails',
         },
+        {
+            element: (
+                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                    <EEVersion>
+                        <LazyLoadWrapper>
+                            <WorkspaceSystemPrompt />
+                        </LazyLoadWrapper>
+                    </EEVersion>
+                </PrivateRoute>
+            ),
+            path: 'ai/system-prompt',
+        },
     ],
     navItems: [
         {
@@ -258,20 +273,16 @@ const currentWorkspaceSettingsRoutes = {
             title: 'API Keys',
         },
         {
-            subgroup: true,
-            title: 'AI Hub',
-        },
-        {
             href: 'ai-hub/connectors',
-            title: 'Connectors',
-        },
-        {
-            subgroup: true,
-            title: 'AI',
+            title: 'AI Hub Connectors',
         },
         {
             href: 'ai/guardrails',
-            title: 'Guardrails',
+            title: 'AI Guardrails',
+        },
+        {
+            href: 'ai/system-prompt',
+            title: 'AI System Prompt',
         },
     ],
 };
@@ -1202,12 +1213,13 @@ export const getRouter = (queryClient: QueryClient) =>
                                     element: (
                                         <Settings
                                             sidebarNavItems={[
+                                                ...currentWorkspaceSettingsRoutes.navItems,
+                                                ...platformSettingsRoutes.navItems.slice(0, 1),
                                                 {
                                                     href: '/automation/settings/workspaces',
                                                     title: 'Workspaces',
                                                 },
-                                                ...currentWorkspaceSettingsRoutes.navItems,
-                                                ...platformSettingsRoutes.navItems,
+                                                ...platformSettingsRoutes.navItems.slice(1),
                                             ]}
                                         />
                                     ),
