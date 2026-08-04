@@ -1,5 +1,7 @@
+import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
 import PageLoader from '@/components/PageLoader';
 import Switch from '@/components/Switch/Switch';
+import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Input} from '@/components/ui/input';
 import {
     type ComponentPoliciesQuery,
@@ -7,13 +9,15 @@ import {
     useUpdateComponentPolicyMutation,
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {SearchIcon} from 'lucide-react';
+import {ChevronDownIcon, ChevronRightIcon, SearchIcon} from 'lucide-react';
 import {useMemo, useState} from 'react';
-import InlineSVG from 'react-inlinesvg';
+
+import ComponentOperationPolicyList from './ComponentOperationPolicyList';
 
 type ComponentPolicyItemType = ComponentPoliciesQuery['componentPolicies'][number];
 
 const ComponentVisibilityTab = () => {
+    const [expandedComponentNames, setExpandedComponentNames] = useState<Set<string>>(new Set());
     const [search, setSearch] = useState('');
 
     const queryClient = useQueryClient();
@@ -53,6 +57,19 @@ const ComponentVisibilityTab = () => {
         [data?.componentPolicies, search]
     );
 
+    const toggleComponentExpanded = (componentName: string, expanded: boolean) =>
+        setExpandedComponentNames((currentExpandedComponentNames) => {
+            const nextExpandedComponentNames = new Set(currentExpandedComponentNames);
+
+            if (expanded) {
+                nextExpandedComponentNames.add(componentName);
+            } else {
+                nextExpandedComponentNames.delete(componentName);
+            }
+
+            return nextExpandedComponentNames;
+        });
+
     return (
         <PageLoader errors={[error]} loading={isLoading}>
             <div className="mt-4 flex flex-col gap-4">
@@ -68,38 +85,70 @@ const ComponentVisibilityTab = () => {
                 </div>
 
                 <ul className="divide-y rounded-md border">
-                    {componentPolicies.map((componentPolicy: ComponentPolicyItemType) => (
-                        <li className="flex items-center justify-between gap-3 px-4 py-3" key={componentPolicy.name}>
-                            <div className="flex items-center gap-3">
-                                {componentPolicy.icon ? (
-                                    <InlineSVG className="size-6 flex-none" src={componentPolicy.icon} />
-                                ) : (
-                                    <span className="size-6 flex-none rounded bg-muted" />
-                                )}
+                    {componentPolicies.map((componentPolicy: ComponentPolicyItemType) => {
+                        const expanded = expandedComponentNames.has(componentPolicy.name);
 
-                                <div className="flex flex-col">
-                                    <span className="text-sm font-semibold">
-                                        {componentPolicy.title ?? componentPolicy.name}
-                                    </span>
+                        return (
+                            <li key={componentPolicy.name}>
+                                <Collapsible
+                                    onOpenChange={(open) => toggleComponentExpanded(componentPolicy.name, open)}
+                                    open={expanded}
+                                >
+                                    <div className="flex items-center justify-between gap-3 px-4 py-3">
+                                        <div className="flex items-center gap-3">
+                                            <CollapsibleTrigger
+                                                aria-label={`${expanded ? 'Collapse' : 'Expand'} ${componentPolicy.name} operations`}
+                                                className="flex-none text-muted-foreground hover:text-foreground"
+                                            >
+                                                {expanded ? (
+                                                    <ChevronDownIcon className="size-4" />
+                                                ) : (
+                                                    <ChevronRightIcon className="size-4" />
+                                                )}
+                                            </CollapsibleTrigger>
 
-                                    <span className="text-xs text-muted-foreground">
-                                        {componentPolicy.description ?? componentPolicy.name}
-                                    </span>
-                                </div>
-                            </div>
+                                            {componentPolicy.icon ? (
+                                                <LazyLoadSVG className="size-6 flex-none" src={componentPolicy.icon} />
+                                            ) : (
+                                                <span className="size-6 flex-none rounded bg-muted" />
+                                            )}
 
-                            <Switch
-                                aria-label={componentPolicy.title ?? componentPolicy.name}
-                                checked={componentPolicy.enabled}
-                                onCheckedChange={(checked) =>
-                                    updateComponentPolicyMutation.mutate({
-                                        enabled: checked,
-                                        name: componentPolicy.name,
-                                    })
-                                }
-                            />
-                        </li>
-                    ))}
+                                            <div className="flex flex-col">
+                                                <span className="text-sm font-semibold">
+                                                    {componentPolicy.title ?? componentPolicy.name}
+                                                </span>
+
+                                                <span className="text-xs text-muted-foreground">
+                                                    {componentPolicy.description ?? componentPolicy.name}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <Switch
+                                            aria-label={componentPolicy.title ?? componentPolicy.name}
+                                            checked={componentPolicy.enabled}
+                                            onCheckedChange={(checked) =>
+                                                updateComponentPolicyMutation.mutate({
+                                                    enabled: checked,
+                                                    name: componentPolicy.name,
+                                                })
+                                            }
+                                        />
+                                    </div>
+
+                                    <CollapsibleContent>
+                                        {expanded && (
+                                            <ComponentOperationPolicyList
+                                                componentEnabled={componentPolicy.enabled}
+                                                componentName={componentPolicy.name}
+                                                componentVersion={componentPolicy.version}
+                                            />
+                                        )}
+                                    </CollapsibleContent>
+                                </Collapsible>
+                            </li>
+                        );
+                    })}
                 </ul>
             </div>
         </PageLoader>
