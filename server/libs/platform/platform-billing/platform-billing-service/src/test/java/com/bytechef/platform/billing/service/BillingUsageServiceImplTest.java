@@ -85,7 +85,7 @@ class BillingUsageServiceImplTest {
 
         billingUsageService.reportUsage(Instant.now());
 
-        verify(billingSubscriptionRepository, never()).countCompletedTaskExecutions(any(), any());
+        verify(billingSubscriptionRepository, never()).countDeployedJobExecutions(any(), any());
         verify(stripeClient, never()).reportMeterEvent(anyString(), anyInt(), anyString());
         verify(billingSubscriptionService, never()).save(any());
     }
@@ -95,7 +95,7 @@ class BillingUsageServiceImplTest {
         BillingSubscription subscription = buildSubscription("cus_test", "sub_test", null);
 
         when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.of(subscription));
-        when(billingSubscriptionRepository.countCompletedTaskExecutions(any(), any())).thenReturn(0);
+        when(billingSubscriptionRepository.countDeployedJobExecutions(any(), any())).thenReturn(0);
 
         Instant scheduledFireTime = Instant.now();
 
@@ -113,7 +113,7 @@ class BillingUsageServiceImplTest {
         subscription.setCurrentPeriodStart(periodStart);
 
         when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.of(subscription));
-        when(billingSubscriptionRepository.countCompletedTaskExecutions(any(), any())).thenReturn(42);
+        when(billingSubscriptionRepository.countDeployedJobExecutions(any(), any())).thenReturn(42);
 
         Instant scheduledFireTime = Instant.parse("2026-06-01T01:00:00Z");
 
@@ -132,11 +132,11 @@ class BillingUsageServiceImplTest {
         subscription.setCurrentPeriodStart(periodStart);
 
         when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.of(subscription));
-        when(billingSubscriptionRepository.countCompletedTaskExecutions(eq(periodStart), any())).thenReturn(10);
+        when(billingSubscriptionRepository.countDeployedJobExecutions(eq(periodStart), any())).thenReturn(10);
 
         billingUsageService.reportUsage(Instant.parse("2026-06-01T01:00:00Z"));
 
-        verify(billingSubscriptionRepository).countCompletedTaskExecutions(eq(periodStart), any());
+        verify(billingSubscriptionRepository).countDeployedJobExecutions(eq(periodStart), any());
     }
 
     @Test
@@ -147,11 +147,11 @@ class BillingUsageServiceImplTest {
         subscription.setCurrentPeriodStart(Instant.parse("2026-06-01T00:00:00Z"));
 
         when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.of(subscription));
-        when(billingSubscriptionRepository.countCompletedTaskExecutions(eq(lastReportedAt), any())).thenReturn(5);
+        when(billingSubscriptionRepository.countDeployedJobExecutions(eq(lastReportedAt), any())).thenReturn(5);
 
         billingUsageService.reportUsage(Instant.parse("2026-06-01T03:00:00Z"));
 
-        verify(billingSubscriptionRepository).countCompletedTaskExecutions(eq(lastReportedAt), any());
+        verify(billingSubscriptionRepository).countDeployedJobExecutions(eq(lastReportedAt), any());
     }
 
     private BillingSubscription buildSubscription(String customerId, String subscriptionId, Instant lastReportedAt) {

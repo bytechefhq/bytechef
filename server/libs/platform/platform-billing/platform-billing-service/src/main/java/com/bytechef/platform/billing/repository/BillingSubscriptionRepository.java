@@ -29,9 +29,17 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface BillingSubscriptionRepository extends ListCrudRepository<BillingSubscription, Long> {
 
-    // Queries task_execution (atlas-execution) directly — intentional cross-module read for billing usage counting.
-    @Query("SELECT COUNT(*) FROM task_execution WHERE status = 2 AND end_date >= :from AND end_date < :to")
-    int countCompletedTaskExecutions(Instant from, Instant to);
+    // platform-billing queries job/principal_job (platform-workflow-execution) directly — intentional
+    // cross-module read for billing usage counting. The join to principal_job (any PlatformType, i.e.
+    // AUTOMATION or EMBEDDED) excludes editor test-run jobs, which never get a principal_job row.
+    // status IN (2, 3, 4) is Job.Status COMPLETED, FAILED, STOPPED — every terminal outcome, not just
+    // successful ones.
+    @Query("""
+        SELECT COUNT(*) FROM job j
+        JOIN principal_job pj ON pj.job_id = j.id
+        WHERE j.status IN (2, 3, 4) AND j.end_date >= :from AND j.end_date < :to
+        """)
+    int countDeployedJobExecutions(Instant from, Instant to);
 
     Optional<BillingSubscription> findFirstByOrderByCreatedDateDesc();
 
