@@ -158,6 +158,9 @@ import tools.jackson.databind.json.JsonMapper;
 @ConditionalOnProperty(prefix = "bytechef.ai.hub", name = "enabled", havingValue = "true")
 public class AiHubConfiguration {
 
+    static final String RESEARCH_SECTION_START_MARKER = "[[research:start]]";
+    static final String RESEARCH_SECTION_END_MARKER = "[[research:end]]";
+
     private final Resource promptAiHubAskResource;
     private final Resource promptAiHubAutoMemoryToolsResource;
     private final Resource promptAiHubBuildResource;
@@ -241,12 +244,18 @@ public class AiHubConfiguration {
             ? null
             : new AiGuardrailMetrics(meterRegistryProvider.getIfAvailable(), "ai_hub");
 
-        researchChatClientProvider.ifAvailable(
-            researchChatClient -> toolCallbacks.add(
+        // Resolved to a flag (not ifAvailable) because availability also decides whether the system prompt keeps
+        // its research section — documenting an unregistered tool makes the model call it and fail the turn with
+        // "No ToolCallback found for tool name: research".
+        ChatClient researchChatClient = researchChatClientProvider.getIfAvailable();
+
+        if (researchChatClient != null) {
+            toolCallbacks.add(
                 new ProgressReportingToolCallback(
                     ResearchConfiguration.createResearchToolCallback(
                         SubAgentGuardrailedChatClient.wrap(researchChatClient, aiGuardrails, aiGuardrailMetrics)),
-                    "research")));
+                    "research"));
+        }
 
         // Consolidated open-tab tool (type-keyed) replaces the seven per-resource variants on the pinned
         // list. ASK mode is read-only (never builds workflows), so no server-side artifact recorder is
@@ -302,7 +311,7 @@ public class AiHubConfiguration {
         AiHubSpringAIAgent.Builder builder = AiHubSpringAIAgent.builder()
             .agentId(name.toLowerCase())
             .chatModel(chatModel)
-            .systemMessage(getSystemPrompt(promptAiHubAskResource))
+            .systemMessage(getSystemPrompt(promptAiHubAskResource, researchChatClient != null))
             .toolCallbacks(toolCallbacks)
             .state(state)
             // Tenant + SecurityContext rehydration on Reactor scheduler threads so every tool runs under
@@ -431,6 +440,11 @@ public class AiHubConfiguration {
             imageGeneratorChatClientProvider, slideBuilderChatClientProvider, assetFileFacade, aiGuardrails,
             aiGuardrailMetrics);
 
+        // Mirrors aiHubAskSpringAIAgent: the research tool is conditionally registered (Firecrawl-gated), so the
+        // system prompt's research section must be dropped when it is absent — otherwise the model calls the
+        // documented-but-unregistered tool and the turn dies with "No ToolCallback found".
+        boolean researchToolAvailable = researchChatClientProvider.getIfAvailable() != null;
+
         registerManagerSubAgentToolCallbacks(
             toolCallbacks, mcpManagerChatClientProvider, personalAgentManagerChatClientProvider,
             deploymentManagerChatClientProvider, apiCollectionManagerChatClientProvider, aiGuardrails,
@@ -503,7 +517,7 @@ public class AiHubConfiguration {
         AiHubSpringAIAgent.Builder buildBuilder = AiHubSpringAIAgent.builder()
             .agentId(name.toLowerCase())
             .chatModel(chatModel)
-            .systemMessage(getSystemPrompt(promptAiHubBuildResource))
+            .systemMessage(getSystemPrompt(promptAiHubBuildResource, researchToolAvailable))
             .toolCallbacks(toolCallbacks)
             .threadUserIdResolver(threadId -> taskService.findByThreadId(threadId)
                 .map(AiHubTask::getUserId)
@@ -917,14 +931,63 @@ public class AiHubConfiguration {
                 propertyOptionsResolver, aiHubToolAttachMetrics));
     }
 
-    private String getSystemPrompt(Resource systemPromptResource) {
+    private String getSystemPrompt(Resource systemPromptResource, boolean researchToolAvailable) {
         try {
             InputStream inputStream = systemPromptResource.getInputStream();
 
-            return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+            return filterResearchSection(
+                new String(inputStream.readAllBytes(), StandardCharsets.UTF_8), researchToolAvailable);
         } catch (IOException exception) {
             throw new IllegalStateException(
                 "Failed to read system prompt resource: " + systemPromptResource.getDescription(), exception);
+        }
+    }
+
+    /**
+     * Keeps the prompt's research documentation in sync with the conditionally registered research tool: every section
+     * between {@code [[research:start]]} / {@code [[research:end]]} marker lines is kept (markers stripped) when the
+     * tool is registered and removed entirely when it is not, so the model is never told about a tool it cannot call. A
+     * prompt without markers passes through unchanged. Package-private for tests.
+     */
+    static String filterResearchSection(String systemPrompt, boolean researchToolAvailable) {
+        if (researchToolAvailable) {
+            return systemPrompt
+                .replace(RESEARCH_SECTION_START_MARKER + "\n", "")
+                .replace(RESEARCH_SECTION_END_MARKER + "\n", "")
+                .replace(RESEARCH_SECTION_START_MARKER, "")
+                .replace(RESEARCH_SECTION_END_MARKER, "");
+        }
+
+        String filteredSystemPrompt = systemPrompt;
+
+        while (true) {
+            int startIndex = filteredSystemPrompt.indexOf(RESEARCH_SECTION_START_MARKER);
+
+            if (startIndex < 0) {
+                return filteredSystemPrompt;
+            }
+
+            int endIndex = filteredSystemPrompt.indexOf(RESEARCH_SECTION_END_MARKER, startIndex);
+
+            if (endIndex < 0) {
+                return filteredSystemPrompt;
+            }
+
+            int afterEndIndex = endIndex + RESEARCH_SECTION_END_MARKER.length();
+
+            if (afterEndIndex < filteredSystemPrompt.length() && filteredSystemPrompt.charAt(afterEndIndex) == '\n') {
+                afterEndIndex++;
+
+                // The block is surrounded by blank lines; dropping one avoids leaving a double blank line behind.
+                if (afterEndIndex < filteredSystemPrompt.length()
+                    && filteredSystemPrompt.charAt(afterEndIndex) == '\n') {
+
+                    afterEndIndex++;
+                }
+            }
+
+            filteredSystemPrompt =
+                filteredSystemPrompt.substring(0, startIndex) + filteredSystemPrompt.substring(afterEndIndex);
         }
     }
 }

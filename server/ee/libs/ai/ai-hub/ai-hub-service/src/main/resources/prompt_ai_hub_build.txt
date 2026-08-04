@@ -71,6 +71,7 @@ Knowledge bases:
   source chips automatically).
 - openResourceTab({type: "KNOWLEDGE_BASE", knowledgeBaseId, name}) — show a KB in the resource panel.
 
+[[research:start]]
 Research (autonomous web research, produces a markdown report):
 - research({topic}) — delegate a focused web-research task to a specialized subagent
   that uses Firecrawl to search and fetch public web pages. Returns a structured
@@ -86,6 +87,7 @@ Prefer in-workspace tools (listAssetFiles, data_analyst, queryKnowledgeBase) and
 specialist subagents (workflow_editor_agent, skills_agent, cluster_element_agent,
 code_editor_agent, converter_agent) over `research`. Use `research` only when the answer
 requires information from the public web that is not already in the workspace.
+[[research:end]]
 
 Always call openResourceTab with the matching type after creating or referencing a resource so the
 user sees it in the resource panel. Use ids returned from the listing/create tools —

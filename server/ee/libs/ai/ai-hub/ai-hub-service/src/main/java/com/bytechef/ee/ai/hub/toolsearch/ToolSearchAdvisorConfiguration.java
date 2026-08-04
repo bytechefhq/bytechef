@@ -275,9 +275,12 @@ public class ToolSearchAdvisorConfiguration {
         // Lazy so constructing this advisor at startup does not build the resolver. MapToolCallbackResolver keys off
         // the
         // pre-known names, so building it never calls getToolDefinition() (unlike StaticToolCallbackResolver).
+        // UnknownToolRecoveringToolCallingManager turns a model call to an unregistered tool name (conditionally
+        // absent tool, adapted/truncated name) into a recoverable tool-error round instead of a dead SSE turn.
         ToolCallingManager toolCallingManager = new LazyToolCallingManager(
-            () -> new DefaultToolCallingManager(
-                observationRegistry, new MapToolCallbackResolver(callbackMapSupplier.get()), exceptionProcessor));
+            () -> new UnknownToolRecoveringToolCallingManager(
+                new DefaultToolCallingManager(
+                    observationRegistry, new MapToolCallbackResolver(callbackMapSupplier.get()), exceptionProcessor)));
 
         // PinnedToolSearchToolCallingAdvisor pins the agent's ENTIRE static tool list so those tools stay callable
         // without a preceding searchTool hit — the system prompt instructs the model to call them directly by name, but
