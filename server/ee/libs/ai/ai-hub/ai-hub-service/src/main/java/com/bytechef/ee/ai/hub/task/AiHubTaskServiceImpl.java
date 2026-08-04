@@ -8,6 +8,7 @@
 package com.bytechef.ee.ai.hub.task;
 
 import com.bytechef.atlas.execution.facade.JobFacade;
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.ee.ai.hub.agent.InFlightAiHubRunRegistry;
 import com.bytechef.ee.ai.hub.agent.WorkflowChatJobRegistry;
 import com.bytechef.ee.ai.hub.audit.AiHubAuditEvent;
@@ -36,8 +37,10 @@ import java.util.UUID;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.MessageType;
+import org.springframework.ai.chat.messages.ToolResponseMessage;
 import org.springframework.ai.session.SessionEvent;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -611,16 +614,81 @@ public class AiHubTaskServiceImpl implements AiHubTaskService {
             return List.of();
         }
 
-        return conversationEvents(sessionMemory, task.getThreadId())
-            .stream()
-            .limit(MESSAGE_LIMIT)
-            .map(event -> new AiHubTaskMessage(
+        List<SessionEvent> allEvents = sessionMemory.sessionService()
+            .getEvents(task.getThreadId());
+
+        // Visible rows stay exactly the rows truncateMessagesFrom indexes over. The tool activity between two
+        // visible rows (tool-calling assistant turns with blank text, tool responses) is attached to the PRECEDING
+        // visible row as a JSON blob instead of extra rows, so the client can rebuild tool cards on reload without
+        // shifting the truncation indexes. Activity before the first visible row attaches to that first row.
+        List<SessionEvent> visibleEvents = new ArrayList<>();
+        List<List<Map<String, String>>> toolEventsPerRow = new ArrayList<>();
+        List<Map<String, String>> leadingToolEvents = new ArrayList<>();
+
+        for (SessionEvent event : allEvents) {
+            if (isVisibleConversationEvent(event)) {
+                if (visibleEvents.size() >= MESSAGE_LIMIT) {
+                    break;
+                }
+
+                visibleEvents.add(event);
+
+                List<Map<String, String>> ownToolEvents = new ArrayList<>();
+
+                // A visible assistant row can itself carry tool calls alongside its text.
+                appendToolEvents(ownToolEvents, event);
+
+                toolEventsPerRow.add(ownToolEvents);
+            } else {
+                appendToolEvents(
+                    visibleEvents.isEmpty() ? leadingToolEvents : toolEventsPerRow.get(visibleEvents.size() - 1),
+                    event);
+            }
+        }
+
+        if (!leadingToolEvents.isEmpty() && !toolEventsPerRow.isEmpty()) {
+            toolEventsPerRow.get(0)
+                .addAll(0, leadingToolEvents);
+        }
+
+        List<AiHubTaskMessage> messages = new ArrayList<>();
+
+        for (int i = 0; i < visibleEvents.size(); i++) {
+            SessionEvent event = visibleEvents.get(i);
+            List<Map<String, String>> toolEvents = toolEventsPerRow.get(i);
+
+            messages.add(new AiHubTaskMessage(
                 event.getMessageType()
                     .name(),
                 event.getMessage()
                     .getText(),
-                event.getTimestamp()))
-            .toList();
+                event.getTimestamp(),
+                toolEvents.isEmpty() ? null : JsonUtils.write(toolEvents)));
+        }
+
+        return messages;
+    }
+
+    private static void appendToolEvents(List<Map<String, String>> target, SessionEvent event) {
+        Message message = event.getMessage();
+
+        if (message instanceof AssistantMessage assistantMessage) {
+            for (AssistantMessage.ToolCall toolCall : assistantMessage.getToolCalls()) {
+                target.add(Map.of(
+                    "arguments", Objects.requireNonNullElse(toolCall.arguments(), ""),
+                    "id", Objects.requireNonNullElse(toolCall.id(), ""),
+                    "kind", "call",
+                    "name", Objects.requireNonNullElse(toolCall.name(), "")));
+            }
+        } else if (message instanceof ToolResponseMessage toolResponseMessage) {
+            for (ToolResponseMessage.ToolResponse toolResponse : toolResponseMessage.getResponses()) {
+                target.add(Map.of(
+                    "id", Objects.requireNonNullElse(toolResponse.id(), ""),
+                    "kind", "result",
+                    "name", Objects.requireNonNullElse(toolResponse.name(), ""),
+                    "response", Objects.requireNonNullElse(toolResponse.responseData(), "")));
+            }
+        }
     }
 
     private static boolean isVisibleConversationEvent(SessionEvent event) {

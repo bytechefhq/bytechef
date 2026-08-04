@@ -286,8 +286,16 @@ public interface AiHubTaskService {
     }
 
     /**
-     * A single message row rehydrated from Spring AI's {@code SPRING_AI_CHAT_MEMORY} table.
+     * A single message row rehydrated from the session-memory transcript. {@code toolEventsJson} is a nullable JSON
+     * array of the tool activity (calls with their argument JSON, results with their response payload) that occurred
+     * after this row and before the next visible row — the client rebuilds tool-call cards and interactive tool-result
+     * cards (e.g. askUserQuestion) from it on reload. It is deliberately an attachment to an existing visible row
+     * rather than extra rows so the visible-row indexes that {@code truncateMessagesFrom} maps stay unchanged.
      */
-    record AiHubTaskMessage(String role, String content, Instant timestamp) {
+    record AiHubTaskMessage(String role, String content, Instant timestamp, String toolEventsJson) {
+
+        public AiHubTaskMessage(String role, String content, Instant timestamp) {
+            this(role, content, timestamp, null);
+        }
     }
 }

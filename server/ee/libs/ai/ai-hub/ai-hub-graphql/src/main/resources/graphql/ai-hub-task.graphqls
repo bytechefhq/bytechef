@@ -64,6 +64,12 @@ type AiHubTaskMessage {
     role: String!
     content: String!
     timestamp: Long!
+    """
+    Nullable JSON array of the tool activity that followed this row before the next visible row — entries are
+    {kind: "call", id, name, arguments} and {kind: "result", id, name, response}. The client rebuilds tool-call
+    cards and interactive tool-result cards (askUserQuestion, etc.) from it on reload.
+    """
+    toolEventsJson: String
 }
 
 input AiHubTaskPatchInput {
