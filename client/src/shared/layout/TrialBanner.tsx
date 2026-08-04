@@ -46,7 +46,7 @@ export function TrialBanner() {
             <span className="flex-1 text-sm font-medium text-content-neutral-primary">
                 {expired
                     ? 'Your trial has expired.'
-                    : `Trial: ${daysRemaining} ${daysRemaining === 1 ? 'day' : 'days'} remaining · ${subscription.tasksUsed ?? 0}/${subscription.productUnitLimit ?? 0} tasks used.`}
+                    : `Trial: ${daysRemaining} ${daysRemaining === 1 ? 'day' : 'days'} remaining · ${subscription.jobsExecuted ?? 0}/${subscription.productUnitLimit ?? 0} job executions used.`}
             </span>
 
             <Button
