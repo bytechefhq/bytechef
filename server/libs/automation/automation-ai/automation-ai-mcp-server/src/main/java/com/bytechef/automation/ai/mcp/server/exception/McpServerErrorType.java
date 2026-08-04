@@ -25,6 +25,7 @@ import com.bytechef.platform.mcp.domain.McpServer;
 public class McpServerErrorType extends AbstractErrorType {
 
     public static final McpServerErrorType MCP_SERVER_DISABLED = new McpServerErrorType(100);
+    public static final McpServerErrorType MCP_TOOL_DISABLED = new McpServerErrorType(101);
 
     private McpServerErrorType(int errorKey) {
         super(McpServer.class, errorKey);
