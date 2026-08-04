@@ -338,18 +338,22 @@ const AssetFiles = () => {
             <LeftSidebarNav
                 body={
                     <>
-                        {tags.map((tag) => (
-                            <LeftSidebarNavItem
-                                icon={<TagIcon className="mr-1 size-4" />}
-                                item={{
-                                    current: tagId === tag.id,
-                                    id: tag.id,
-                                    name: tag.name,
-                                }}
-                                key={tag.id}
-                                toLink={`?tagId=${tag.id}`}
-                            />
-                        ))}
+                        {!tags.length ? (
+                            <p className="px-3 text-xs">No tags.</p>
+                        ) : (
+                            tags.map((tag) => (
+                                <LeftSidebarNavItem
+                                    icon={<TagIcon className="mr-1 size-4" />}
+                                    item={{
+                                        current: tagId === tag.id,
+                                        id: tag.id,
+                                        name: tag.name,
+                                    }}
+                                    key={tag.id}
+                                    toLink={`?tagId=${tag.id}`}
+                                />
+                            ))
+                        )}
                     </>
                 }
                 title="Tags"
@@ -400,11 +404,13 @@ const AssetFiles = () => {
                             tags={tags}
                         />
                     ) : (
-                        <EmptyList
-                            icon={<FileTextIcon className="size-24 text-stroke-neutral-tertiary" />}
-                            message="No files match the current filters."
-                            title="No Matching Files"
-                        />
+                        <div className="flex size-full items-center justify-center">
+                            <EmptyList
+                                icon={<FileTextIcon className="size-24 text-stroke-neutral-tertiary" />}
+                                message="No files match the current filters."
+                                title="No Matching Files"
+                            />
+                        </div>
                     )}
                 </AssetFileUploadZone>
             </PageLoader>

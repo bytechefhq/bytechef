@@ -52,7 +52,7 @@ public abstract class AbstractComponentHandlerLoader<T extends ComponentHandler>
     public List<ComponentHandlerEntry> loadComponentHandlers() {
         List<ComponentHandlerEntry> componentHandlerEntries = new ArrayList<>();
 
-        for (T componentHandler : ServiceLoader.load(serviceClass)) {
+        for (T componentHandler : ServiceLoader.load(serviceClass, serviceClass.getClassLoader())) {
             componentHandlerEntries.add(wrap(componentHandler));
         }
 
@@ -64,7 +64,12 @@ public abstract class AbstractComponentHandlerLoader<T extends ComponentHandler>
         // ServiceLoader.Provider.type() loads the provider class WITHOUT initializing it, so scanning for the
         // requested class name is cheap; only the matching provider is instantiated (which triggers its static
         // initializer and definition construction).
-        return ServiceLoader.load(serviceClass)
+        // The lookup is anchored to serviceClass's own classloader instead of the default thread-context
+        // classloader: lazy loads can run on Reactor/virtual threads whose context classloader differs from the
+        // one that defined serviceClass (e.g. under Spring DevTools' restart classloader), and the TCCL then
+        // resolves providers against a different copy of the service interface, failing with
+        // "<provider> not a subtype".
+        return ServiceLoader.load(serviceClass, serviceClass.getClassLoader())
             .stream()
             .filter(provider -> {
                 Class<? extends T> type = provider.type();
@@ -79,7 +84,7 @@ public abstract class AbstractComponentHandlerLoader<T extends ComponentHandler>
     public List<ProviderEntry> loadProviderEntries() {
         List<ProviderEntry> providerEntries = new ArrayList<>();
 
-        for (ServiceLoader.Provider<T> provider : ServiceLoader.load(serviceClass)
+        for (ServiceLoader.Provider<T> provider : ServiceLoader.load(serviceClass, serviceClass.getClassLoader())
             .stream()
             .toList()) {
 

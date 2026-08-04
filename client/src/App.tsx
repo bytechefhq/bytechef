@@ -220,6 +220,10 @@ function App() {
             return ff_1023;
         }
 
+        // '/automation/chats' is deliberately not filtered: the Chats surface is CE functionality
+        // (workspaceChatWorkflows lives in automation-configuration-graphql), so the nav item stays
+        // visible in every edition.
+
         if (navItem.href === '/automation/knowledge-bases') {
             return ai.knowledgeBase.enabled;
         }
