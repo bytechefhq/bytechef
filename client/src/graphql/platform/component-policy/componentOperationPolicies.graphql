@@ -1,0 +1,7 @@
+query ComponentOperationPolicies($componentName: String!) {
+    componentOperationPolicies(componentName: $componentName) {
+        componentName
+        operationType
+        operationName
+    }
+}

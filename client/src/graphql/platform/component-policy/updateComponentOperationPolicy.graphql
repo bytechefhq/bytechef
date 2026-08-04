@@ -1,0 +1,13 @@
+mutation UpdateComponentOperationPolicy(
+    $componentName: String!
+    $operationType: ComponentOperationType!
+    $operationName: String!
+    $enabled: Boolean!
+) {
+    updateComponentOperationPolicy(
+        componentName: $componentName
+        operationType: $operationType
+        operationName: $operationName
+        enabled: $enabled
+    )
+}
