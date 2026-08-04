@@ -25,5 +25,5 @@ public interface BillingUsageService {
 
     void reportUsage(Instant scheduledFireTime);
 
-    int countTaskExecutionsSince(Instant from, Instant to);
+    int countJobExecutionsSince(Instant from, Instant to);
 }
