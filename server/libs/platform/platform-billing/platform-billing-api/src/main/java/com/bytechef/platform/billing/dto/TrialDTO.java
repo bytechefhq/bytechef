@@ -19,5 +19,5 @@ package com.bytechef.platform.billing.dto;
 /**
  * @author Matija Petanjek
  */
-public record TrialDTO(boolean expired, long daysRemaining, int tasksUsed, int productUnitLimit) {
+public record TrialDTO(boolean expired, long daysRemaining, int jobsExecuted, int productUnitLimit) {
 }
