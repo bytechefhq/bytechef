@@ -267,6 +267,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         PlatformType type, boolean editorEnvironment) {
 
         checkComponentVisible(componentName);
+        checkTriggerVisible(componentName, triggerName);
 
         TriggerContext triggerContext = contextFactory.createTriggerContext(
             componentName, componentVersion, triggerName, jobPrincipalId, workflowUuid, componentConnection,
@@ -393,6 +394,9 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     public List<TriggerDefinition> getTriggerDefinitions(String componentName, int componentVersion) {
         return componentDefinitionRegistry.getTriggerDefinitions(componentName, componentVersion)
             .stream()
+            .filter(triggerDefinition -> componentVisibilityProviders.stream()
+                .allMatch(componentVisibilityProvider -> componentVisibilityProvider.isTriggerVisible(
+                    componentName, triggerDefinition.getName())))
             .map(triggerDefinition -> new TriggerDefinition(triggerDefinition, componentName, componentVersion))
             .toList();
     }
@@ -906,6 +910,19 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             throw new ConfigurationException(
                 "Component '%s' is disabled by an administrator and cannot be executed.".formatted(componentName),
                 TriggerDefinitionErrorType.COMPONENT_DISABLED);
+        }
+    }
+
+    private void checkTriggerVisible(String componentName, String triggerName) {
+        boolean visible = componentVisibilityProviders.stream()
+            .allMatch(componentVisibilityProvider -> componentVisibilityProvider.isTriggerVisible(
+                componentName, triggerName));
+
+        if (!visible) {
+            throw new ConfigurationException(
+                "Trigger '%s' of component '%s' is disabled by an administrator and cannot be executed."
+                    .formatted(triggerName, componentName),
+                TriggerDefinitionErrorType.TRIGGER_DISABLED);
         }
     }
 

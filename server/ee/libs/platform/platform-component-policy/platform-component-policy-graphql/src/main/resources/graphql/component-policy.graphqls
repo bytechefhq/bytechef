@@ -7,12 +7,28 @@ type ComponentPolicy {
     enabled: Boolean!
 }
 
+enum ComponentOperationType {
+    ACTION
+    TRIGGER
+}
+
+type ComponentOperationPolicy {
+    componentName: String!
+    operationType: ComponentOperationType!
+    operationName: String!
+}
+
 extend type Query {
     """
     Lists every registry component with its tenant-wide visibility flag. Components with no policy row are reported
     enabled. Admin-only.
     """
     componentPolicies: [ComponentPolicy!]!
+
+    """
+    Lists the disabled operations of a component (deny-list rows only). Admin-only.
+    """
+    componentOperationPolicies(componentName: String!): [ComponentOperationPolicy!]!
 }
 
 extend type Mutation {
@@ -20,4 +36,11 @@ extend type Mutation {
     Enables or disables a component tenant-wide. Admin-only.
     """
     updateComponentPolicy(name: String!, enabled: Boolean!): ComponentPolicy!
+
+    """
+    Disables (enabled: false) or re-enables (enabled: true) a single action or trigger tenant-wide. Admin-only.
+    """
+    updateComponentOperationPolicy(
+        componentName: String!, operationType: ComponentOperationType!, operationName: String!,
+        enabled: Boolean!): Boolean!
 }

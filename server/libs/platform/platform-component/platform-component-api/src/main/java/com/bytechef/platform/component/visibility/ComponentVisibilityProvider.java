@@ -29,4 +29,20 @@ public interface ComponentVisibilityProvider {
      * @return {@code true} if the component is visible/enabled for the current tenant.
      */
     boolean isVisible(String componentName);
+
+    /**
+     * @return {@code true} if the action is visible/enabled for the current tenant. A disabled component implies all
+     *         its actions are invisible.
+     */
+    default boolean isActionVisible(String componentName, String actionName) {
+        return isVisible(componentName);
+    }
+
+    /**
+     * @return {@code true} if the trigger is visible/enabled for the current tenant. A disabled component implies all
+     *         its triggers are invisible.
+     */
+    default boolean isTriggerVisible(String componentName, String triggerName) {
+        return isVisible(componentName);
+    }
 }

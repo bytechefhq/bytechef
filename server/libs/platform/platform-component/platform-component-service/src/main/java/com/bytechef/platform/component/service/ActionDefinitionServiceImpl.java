@@ -256,6 +256,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         @Nullable Instant suspendExpiresAt) {
 
         checkComponentVisible(componentName);
+        checkActionVisible(componentName, actionName);
 
         com.bytechef.component.definition.ActionDefinition actionDefinition = componentDefinitionRegistry
             .getActionDefinition(componentName, componentVersion, actionName);
@@ -332,6 +333,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         @Nullable Long environmentId, ActionContext context) {
 
         checkComponentVisible(componentName);
+        checkActionVisible(componentName, actionName);
 
         PerformFunction performFunction =
             (PerformFunction) componentDefinitionRegistry
@@ -390,6 +392,9 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     public List<ActionDefinition> getActionDefinitions(String componentName, int componentVersion) {
         return componentDefinitionRegistry.getActionDefinitions(componentName, componentVersion)
             .stream()
+            .filter(actionDefinition -> componentVisibilityProviders.stream()
+                .allMatch(componentVisibilityProvider -> componentVisibilityProvider.isActionVisible(
+                    componentName, actionDefinition.getName())))
             .map(actionDefinition -> new ActionDefinition(actionDefinition, componentName, componentVersion))
             .toList();
     }
@@ -910,6 +915,19 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             throw new ConfigurationException(
                 "Component '%s' is disabled by an administrator and cannot be executed.".formatted(componentName),
                 ActionDefinitionErrorType.COMPONENT_DISABLED);
+        }
+    }
+
+    private void checkActionVisible(String componentName, String actionName) {
+        boolean visible = componentVisibilityProviders.stream()
+            .allMatch(componentVisibilityProvider -> componentVisibilityProvider.isActionVisible(
+                componentName, actionName));
+
+        if (!visible) {
+            throw new ConfigurationException(
+                "Action '%s' of component '%s' is disabled by an administrator and cannot be executed."
+                    .formatted(actionName, componentName),
+                ActionDefinitionErrorType.ACTION_DISABLED);
         }
     }
 

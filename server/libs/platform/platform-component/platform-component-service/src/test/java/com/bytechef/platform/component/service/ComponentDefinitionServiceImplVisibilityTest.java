@@ -18,13 +18,17 @@ package com.bytechef.platform.component.service;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.platform.component.ComponentDefinitionRegistry;
 import com.bytechef.platform.component.context.ContextFactory;
+import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
+import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.filter.ComponentDefinitionFilter;
 import com.bytechef.platform.component.visibility.ComponentVisibilityProvider;
 import com.bytechef.platform.constant.PlatformType;
@@ -106,5 +110,79 @@ class ComponentDefinitionServiceImplVisibilityTest {
             .as("enabled provider 'mailchimp' must appear in search results")
             .extracting(ComponentDefinition::getName)
             .containsExactly("mailchimp");
+    }
+
+    @Test
+    void testGetComponentDefinitionFiltersDisabledActionsAndTriggers() {
+        when(componentDefinitionRegistry.getComponentDefinition("slack", null))
+            .thenReturn(
+                (com.bytechef.component.definition.ComponentDefinition) component("slack")
+                    .title("Slack")
+                    .actions(
+                        action("sendMessage").title("Send Message"),
+                        action("deleteMessage").title("Delete Message"))
+                    .triggers(
+                        trigger("newMessage").title("New Message")
+                            .type(TriggerType.STATIC_WEBHOOK),
+                        trigger("newChannel").title("New Channel")
+                            .type(TriggerType.STATIC_WEBHOOK)));
+
+        ComponentVisibilityProvider disableSendMessageAndNewChannel = new ComponentVisibilityProvider() {
+            @Override
+            public boolean isVisible(String componentName) {
+                return true;
+            }
+
+            @Override
+            public boolean isActionVisible(String componentName, String actionName) {
+                return !actionName.equals("sendMessage");
+            }
+
+            @Override
+            public boolean isTriggerVisible(String componentName, String triggerName) {
+                return !triggerName.equals("newChannel");
+            }
+        };
+
+        ComponentDefinitionServiceImpl service = new ComponentDefinitionServiceImpl(
+            List.of(allowAllAutomationFilter), componentDefinitionRegistry, contextFactory,
+            List.of(disableSendMessageAndNewChannel));
+
+        ComponentDefinition componentDefinition = service.getComponentDefinition("slack", null);
+
+        assertThat(componentDefinition.getActions())
+            .extracting(ActionDefinition::getName)
+            .containsExactly("deleteMessage");
+
+        assertThat(componentDefinition.getTriggers())
+            .extracting(TriggerDefinition::getName)
+            .containsExactly("newMessage");
+    }
+
+    @Test
+    void testGetComponentDefinitionReturnsUnfilteredInstanceWhenNothingIsDisabled() {
+        when(componentDefinitionRegistry.getComponentDefinition("mailchimp", null))
+            .thenReturn(
+                (com.bytechef.component.definition.ComponentDefinition) component("mailchimp")
+                    .title("Mailchimp")
+                    .actions(action("addMember").title("Add Member"))
+                    .triggers(
+                        trigger("newMember").title("New Member")
+                            .type(TriggerType.STATIC_WEBHOOK)));
+
+        ComponentVisibilityProvider allowAll = componentName -> true;
+
+        ComponentDefinitionServiceImpl service = new ComponentDefinitionServiceImpl(
+            List.of(allowAllAutomationFilter), componentDefinitionRegistry, contextFactory, List.of(allowAll));
+
+        ComponentDefinition componentDefinition = service.getComponentDefinition("mailchimp", null);
+
+        assertThat(componentDefinition.getActions())
+            .extracting(ActionDefinition::getName)
+            .containsExactly("addMember");
+
+        assertThat(componentDefinition.getTriggers())
+            .extracting(TriggerDefinition::getName)
+            .containsExactly("newMember");
     }
 }

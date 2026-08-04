@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.platform.component.policy;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -23,4 +24,12 @@ public interface ComponentPolicyService {
     Set<String> getDisabledComponentNames();
 
     ComponentPolicy updateComponentPolicy(String componentName, boolean enabled);
+
+    Set<String> getDisabledOperationKeys();
+
+    List<ComponentOperationPolicy> getComponentOperationPolicies(String componentName);
+
+    void updateComponentOperationPolicy(
+        String componentName, ComponentOperationPolicy.OperationType operationType, String operationName,
+        boolean enabled);
 }

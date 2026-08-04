@@ -32,4 +32,23 @@ class ComponentPolicyVisibilityProviderTest {
         assertThat(componentPolicyVisibilityProvider.isVisible("slack")).isFalse();
         assertThat(componentPolicyVisibilityProvider.isVisible("mailchimp")).isTrue();
     }
+
+    @Test
+    void testActionInvisibleWhenOperationDisabled() {
+        when(componentPolicyService.getDisabledComponentNames()).thenReturn(Set.of());
+        when(componentPolicyService.getDisabledOperationKeys()).thenReturn(Set.of("slack#ACTION#sendMessage"));
+
+        assertThat(componentPolicyVisibilityProvider.isActionVisible("slack", "sendMessage")).isFalse();
+        assertThat(componentPolicyVisibilityProvider.isActionVisible("slack", "sendDirectMessage")).isTrue();
+        assertThat(componentPolicyVisibilityProvider.isTriggerVisible("slack", "sendMessage")).isTrue();
+    }
+
+    @Test
+    void testOperationInvisibleWhenWholeComponentDisabled() {
+        when(componentPolicyService.getDisabledComponentNames()).thenReturn(Set.of("slack"));
+        when(componentPolicyService.getDisabledOperationKeys()).thenReturn(Set.of());
+
+        assertThat(componentPolicyVisibilityProvider.isActionVisible("slack", "sendMessage")).isFalse();
+        assertThat(componentPolicyVisibilityProvider.isTriggerVisible("slack", "newMessage")).isFalse();
+    }
 }

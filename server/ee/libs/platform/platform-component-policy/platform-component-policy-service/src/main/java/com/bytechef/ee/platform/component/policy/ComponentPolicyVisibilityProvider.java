@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.platform.component.policy;
 
+import com.bytechef.ee.platform.component.policy.ComponentOperationPolicy.OperationType;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.visibility.ComponentVisibilityProvider;
 import com.bytechef.tenant.TenantContext;
@@ -29,7 +30,10 @@ import org.springframework.stereotype.Component;
 @ConditionalOnEEVersion
 public class ComponentPolicyVisibilityProvider implements ComponentVisibilityProvider {
 
-    private final Cache<String, Set<String>> disabledComponentNamesCache = Caffeine.newBuilder()
+    private record DisabledPolicies(Set<String> componentNames, Set<String> operationKeys) {
+    }
+
+    private final Cache<String, DisabledPolicies> disabledPoliciesCache = Caffeine.newBuilder()
         .expireAfterWrite(Duration.ofSeconds(10))
         .build();
     private final ComponentPolicyService componentPolicyService;
@@ -40,9 +44,41 @@ public class ComponentPolicyVisibilityProvider implements ComponentVisibilityPro
 
     @Override
     public boolean isVisible(String componentName) {
-        Set<String> disabledComponentNames = disabledComponentNamesCache.get(
-            TenantContext.getCurrentTenantId(), tenantId -> componentPolicyService.getDisabledComponentNames());
+        DisabledPolicies disabledPolicies = getDisabledPolicies();
 
-        return !disabledComponentNames.contains(componentName);
+        return !disabledPolicies.componentNames()
+            .contains(componentName);
+    }
+
+    @Override
+    public boolean isActionVisible(String componentName, String actionName) {
+        DisabledPolicies disabledPolicies = getDisabledPolicies();
+
+        return !disabledPolicies.componentNames()
+            .contains(componentName) &&
+            !disabledPolicies.operationKeys()
+                .contains(ComponentOperationPolicy.key(
+                    componentName, OperationType.ACTION, actionName));
+    }
+
+    @Override
+    public boolean isTriggerVisible(String componentName, String triggerName) {
+        DisabledPolicies disabledPolicies = getDisabledPolicies();
+
+        return !disabledPolicies.componentNames()
+            .contains(componentName) &&
+            !disabledPolicies.operationKeys()
+                .contains(ComponentOperationPolicy.key(
+                    componentName, OperationType.TRIGGER, triggerName));
+    }
+
+    private DisabledPolicies getDisabledPolicies() {
+        return disabledPoliciesCache.get(
+            TenantContext.getCurrentTenantId(), tenantId -> loadDisabledPolicies());
+    }
+
+    private DisabledPolicies loadDisabledPolicies() {
+        return new DisabledPolicies(
+            componentPolicyService.getDisabledComponentNames(), componentPolicyService.getDisabledOperationKeys());
     }
 }

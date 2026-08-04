@@ -130,7 +130,29 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
         com.bytechef.component.definition.ComponentDefinition componentDefinition =
             componentDefinitionRegistry.getComponentDefinition(name, version);
 
-        return new ComponentDefinition(componentDefinition);
+        ComponentDefinition componentDefinitionDTO = new ComponentDefinition(componentDefinition);
+
+        List<ActionDefinition> visibleActions = componentDefinitionDTO.getActions()
+            .stream()
+            .filter(actionDefinition -> componentVisibilityProviders.stream()
+                .allMatch(componentVisibilityProvider -> componentVisibilityProvider.isActionVisible(
+                    name, actionDefinition.getName())))
+            .toList();
+
+        List<TriggerDefinition> visibleTriggers = componentDefinitionDTO.getTriggers()
+            .stream()
+            .filter(triggerDefinition -> componentVisibilityProviders.stream()
+                .allMatch(componentVisibilityProvider -> componentVisibilityProvider.isTriggerVisible(
+                    name, triggerDefinition.getName())))
+            .toList();
+
+        if (visibleActions.size() == componentDefinitionDTO.getActionsCount()
+            && visibleTriggers.size() == componentDefinitionDTO.getTriggersCount()) {
+
+            return componentDefinitionDTO;
+        }
+
+        return new ComponentDefinition(componentDefinitionDTO, visibleActions, visibleTriggers);
     }
 
     @Override
