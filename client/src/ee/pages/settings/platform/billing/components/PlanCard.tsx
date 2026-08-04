@@ -4,6 +4,7 @@ import {useMemo} from 'react';
 
 interface PlanCardPropsI {
     cancelAtPeriodEnd: boolean;
+    jobsExecuted: number;
     onCancelPlan?: () => void;
     onChangePlan: () => void;
     onReactivatePlan?: () => void;
@@ -11,13 +12,13 @@ interface PlanCardPropsI {
     productUnitLimit: number;
     renewalDate?: string;
     scheduledPlanName?: string;
-    tasksUsed: number;
     trialDaysRemaining?: number;
     trialExpired?: boolean;
 }
 
 const PlanCard = ({
     cancelAtPeriodEnd,
+    jobsExecuted,
     onCancelPlan,
     onChangePlan,
     onReactivatePlan,
@@ -25,24 +26,23 @@ const PlanCard = ({
     productUnitLimit,
     renewalDate,
     scheduledPlanName,
-    tasksUsed,
     trialDaysRemaining,
     trialExpired,
 }: PlanCardPropsI) => {
     const isTrial = trialDaysRemaining !== undefined;
-    const tasksAvailable = productUnitLimit - tasksUsed;
-    const overageTasksCount = Math.max(0, tasksUsed - productUnitLimit);
+    const jobExecutionsAvailable = productUnitLimit - jobsExecuted;
+    const overageJobExecutionsCount = Math.max(0, jobsExecuted - productUnitLimit);
 
     const {blueFill, blueZoneWidth, orangeFill, orangeZoneWidth} = useMemo(() => {
-        const totalRange = Math.max(tasksUsed, productUnitLimit);
+        const totalRange = Math.max(jobsExecuted, productUnitLimit);
 
         return {
-            blueFill: Math.min(tasksUsed / productUnitLimit, 1) * 100,
+            blueFill: Math.min(jobsExecuted / productUnitLimit, 1) * 100,
             blueZoneWidth: (productUnitLimit / totalRange) * 100,
-            orangeFill: tasksUsed > productUnitLimit ? 100 : 0,
-            orangeZoneWidth: (Math.max(0, tasksUsed - productUnitLimit) / totalRange) * 100,
+            orangeFill: jobsExecuted > productUnitLimit ? 100 : 0,
+            orangeZoneWidth: (Math.max(0, jobsExecuted - productUnitLimit) / totalRange) * 100,
         };
-    }, [productUnitLimit, tasksUsed]);
+    }, [productUnitLimit, jobsExecuted]);
 
     return (
         <Card className="w-full max-w-3xl">
@@ -96,7 +96,7 @@ const PlanCard = ({
                                     {' or after '}
 
                                     <span className="font-semibold text-foreground">
-                                        {productUnitLimit.toLocaleString()} tasks
+                                        {productUnitLimit.toLocaleString()} job executions
                                     </span>
 
                                     {' are used'}
@@ -126,30 +126,30 @@ const PlanCard = ({
                     <div className="rounded-lg bg-muted/50 px-4 py-6">
                         <div className="mb-2">
                             <span className="text-xl font-bold">
-                                {isTrial ? tasksAvailable.toLocaleString() : tasksUsed.toLocaleString()}
+                                {isTrial ? jobExecutionsAvailable.toLocaleString() : jobsExecuted.toLocaleString()}
                             </span>
 
                             <span className="text-xl text-muted-foreground">
-                                {isTrial ? ' Tasks available' : ' Tasks used this period'}
+                                {isTrial ? ' Job executions available' : ' Job executions used this period'}
                             </span>
                         </div>
 
                         <div className="mb-2 flex justify-between text-sm font-medium">
                             {isTrial ? (
                                 <>
-                                    <span>Spent {tasksUsed.toLocaleString()}</span>
+                                    <span>Spent {jobsExecuted.toLocaleString()}</span>
 
                                     <span>Limit {productUnitLimit.toLocaleString()}</span>
                                 </>
-                            ) : overageTasksCount > 0 ? (
+                            ) : overageJobExecutionsCount > 0 ? (
                                 <>
                                     <span>{productUnitLimit.toLocaleString()} flat rate</span>
 
-                                    <span>{overageTasksCount.toLocaleString()} usage billed</span>
+                                    <span>{overageJobExecutionsCount.toLocaleString()} usage billed</span>
                                 </>
                             ) : (
                                 <>
-                                    <span>{tasksUsed.toLocaleString()} flat rate</span>
+                                    <span>{jobsExecuted.toLocaleString()} flat rate</span>
 
                                     <span>{productUnitLimit.toLocaleString()} included</span>
                                 </>
@@ -176,11 +176,11 @@ const PlanCard = ({
                                     <span>Flat rate (included)</span>
                                 </div>
 
-                                {overageTasksCount > 0 && (
+                                {overageJobExecutionsCount > 0 && (
                                     <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                                         <div className="size-2 rounded-full bg-orange-500" />
 
-                                        <span>Usage billed ($1 / 1,000 tasks)</span>
+                                        <span>Usage billed ($1 / 1,000 job executions)</span>
                                     </div>
                                 )}
                             </div>
