@@ -91,7 +91,7 @@ class TrialServiceImplTest {
             .plus(7, ChronoUnit.DAYS));
 
         when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.of(subscription));
-        when(billingUsageService.countTaskExecutionsSince(any(), any())).thenReturn(100);
+        when(billingUsageService.countJobExecutionsSince(any(), any())).thenReturn(100);
 
         TrialDTO status = trialService.validateTrial();
 
@@ -109,7 +109,7 @@ class TrialServiceImplTest {
             .minus(1, ChronoUnit.DAYS));
 
         when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.of(subscription));
-        when(billingUsageService.countTaskExecutionsSince(any(), any())).thenReturn(100);
+        when(billingUsageService.countJobExecutionsSince(any(), any())).thenReturn(100);
 
         TrialDTO status = trialService.validateTrial();
 
@@ -130,7 +130,7 @@ class TrialServiceImplTest {
             .plus(7, ChronoUnit.DAYS));
 
         when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.of(subscription));
-        when(billingUsageService.countTaskExecutionsSince(any(), any())).thenReturn(5000);
+        when(billingUsageService.countJobExecutionsSince(any(), any())).thenReturn(5000);
 
         TrialDTO status = trialService.validateTrial();
 
@@ -147,7 +147,7 @@ class TrialServiceImplTest {
         subscription.setStatus(BillingSubscription.Status.CANCELED);
 
         when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.of(subscription));
-        when(billingUsageService.countTaskExecutionsSince(any(), any())).thenReturn(100);
+        when(billingUsageService.countJobExecutionsSince(any(), any())).thenReturn(100);
 
         TrialDTO status = trialService.validateTrial();
 

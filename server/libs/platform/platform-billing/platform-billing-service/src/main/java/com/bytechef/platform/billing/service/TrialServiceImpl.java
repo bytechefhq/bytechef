@@ -69,7 +69,7 @@ public class TrialServiceImpl implements TrialService {
 
         Instant now = Instant.now();
 
-        int tasksUsed = billingUsageService.countTaskExecutionsSince(
+        int tasksUsed = billingUsageService.countJobExecutionsSince(
             subscription.getCurrentPeriodStart(), now);
 
         boolean timeExpired = now.isAfter(subscription.getCurrentPeriodEnd());
