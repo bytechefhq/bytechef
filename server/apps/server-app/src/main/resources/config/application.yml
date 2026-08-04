@@ -36,6 +36,9 @@ info:
       enabled: ${bytechef.ai.gateway.enabled:false}
     knowledgeBase:
       enabled: ${bytechef.ai.knowledge-base.enabled:false}
+    mcp:
+      server:
+        enabled: ${bytechef.ai.mcp.server.enabled:true}
   contextStore:
     enabled: ${bytechef.context-store.enabled:false}
   analytics:

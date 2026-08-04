@@ -110,9 +110,20 @@ public class WorkspaceMcpServerFacadeImpl implements WorkspaceMcpServerFacade {
     @Override
     @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'MCP_CREATE')")
     public McpServer createWorkspaceMcpServer(
-        String name, PlatformType type, Environment environment, Boolean enabled, Long workspaceId) {
+        String name, PlatformType type, Environment environment, Boolean enabled, Boolean authenticationRequired,
+        Long workspaceId) {
 
-        McpServer mcpServer = mcpServerService.create(name, type, environment, enabled);
+        McpServer mcpServer = new McpServer(name, type, environment);
+
+        if (enabled != null) {
+            mcpServer.setEnabled(enabled);
+        }
+
+        if (authenticationRequired != null) {
+            mcpServer.setAuthenticationRequired(authenticationRequired);
+        }
+
+        mcpServer = mcpServerService.create(mcpServer);
 
         workspaceMcpServerService.assignMcpServerToWorkspace(mcpServer.getId(), workspaceId);
 

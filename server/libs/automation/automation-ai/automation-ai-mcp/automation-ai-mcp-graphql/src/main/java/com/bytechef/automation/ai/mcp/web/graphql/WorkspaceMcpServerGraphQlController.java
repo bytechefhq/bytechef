@@ -62,6 +62,7 @@ public class WorkspaceMcpServerGraphQlController {
             input.type(),
             Environment.values()[(int) input.environmentId()],
             input.enabled(),
+            input.authenticationRequired(),
             input.workspaceId());
     }
 
@@ -73,6 +74,7 @@ public class WorkspaceMcpServerGraphQlController {
     }
 
     public record CreateWorkspaceMcpServerInput(
-        String name, PlatformType type, long environmentId, Boolean enabled, Long workspaceId) {
+        String name, PlatformType type, long environmentId, Boolean enabled, Boolean authenticationRequired,
+        Long workspaceId) {
     }
 }

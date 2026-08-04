@@ -18,6 +18,7 @@ package com.bytechef.automation.ai.tool;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -51,7 +52,7 @@ class CreateMcpServerToolCallbackTest {
         when(created.getEnvironment()).thenReturn(Environment.STAGING);
         when(created.isEnabled()).thenReturn(false);
         when(facade.createWorkspaceMcpServer(
-            eq("Support tools"), eq(PlatformType.AUTOMATION), eq(Environment.STAGING), eq(false), eq(99L)))
+            eq("Support tools"), eq(PlatformType.AUTOMATION), eq(Environment.STAGING), eq(false), isNull(), eq(99L)))
                 .thenReturn(created);
 
         CreateMcpServerToolCallback callback = new CreateMcpServerToolCallback(facade);
@@ -73,7 +74,7 @@ class CreateMcpServerToolCallbackTest {
             .asBoolean()).isFalse();
 
         verify(facade).createWorkspaceMcpServer(
-            eq("Support tools"), eq(PlatformType.AUTOMATION), eq(Environment.STAGING), eq(false), eq(99L));
+            eq("Support tools"), eq(PlatformType.AUTOMATION), eq(Environment.STAGING), eq(false), isNull(), eq(99L));
     }
 
     @Test
@@ -87,7 +88,7 @@ class CreateMcpServerToolCallbackTest {
         when(created.getEnvironment()).thenReturn(Environment.PRODUCTION);
         when(created.isEnabled()).thenReturn(true);
         when(facade.createWorkspaceMcpServer(
-            eq("Live tools"), eq(PlatformType.AUTOMATION), eq(Environment.PRODUCTION), eq(true), eq(99L)))
+            eq("Live tools"), eq(PlatformType.AUTOMATION), eq(Environment.PRODUCTION), eq(true), isNull(), eq(99L)))
                 .thenReturn(created);
 
         CreateMcpServerToolCallback callback = new CreateMcpServerToolCallback(facade);
@@ -104,7 +105,7 @@ class CreateMcpServerToolCallbackTest {
             .asBoolean()).isTrue();
 
         verify(facade).createWorkspaceMcpServer(
-            eq("Live tools"), eq(PlatformType.AUTOMATION), eq(Environment.PRODUCTION), eq(true), eq(99L));
+            eq("Live tools"), eq(PlatformType.AUTOMATION), eq(Environment.PRODUCTION), eq(true), isNull(), eq(99L));
     }
 
     @Test

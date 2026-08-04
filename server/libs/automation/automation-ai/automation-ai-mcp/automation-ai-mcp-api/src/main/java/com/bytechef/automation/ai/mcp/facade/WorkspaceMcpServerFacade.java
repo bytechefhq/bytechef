@@ -59,15 +59,18 @@ public interface WorkspaceMcpServerFacade {
     /**
      * Creates a new MCP server and assigns it to the specified workspace.
      *
-     * @param name        the name of the MCP server
-     * @param type        the type of the MCP server
-     * @param environment the environment of the MCP server
-     * @param enabled     whether the server is enabled (can be null for default value)
-     * @param workspaceId the workspace ID to assign the server to
+     * @param name                   the name of the MCP server
+     * @param type                   the type of the MCP server
+     * @param environment            the environment of the MCP server
+     * @param enabled                whether the server is enabled (can be null for default value)
+     * @param authenticationRequired whether callers must present an API key in addition to the server secret (can be
+     *                               null for the domain default, which is required)
+     * @param workspaceId            the workspace ID to assign the server to
      * @return the created MCP server
      */
     McpServer createWorkspaceMcpServer(
-        String name, PlatformType type, Environment environment, Boolean enabled, Long workspaceId);
+        String name, PlatformType type, Environment environment, Boolean enabled, Boolean authenticationRequired,
+        Long workspaceId);
 
     /**
      * Updates the name and/or enabled state of an MCP server belonging to a workspace.

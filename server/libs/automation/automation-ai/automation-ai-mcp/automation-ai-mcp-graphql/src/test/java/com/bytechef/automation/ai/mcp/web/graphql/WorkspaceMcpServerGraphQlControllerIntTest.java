@@ -101,7 +101,7 @@ class WorkspaceMcpServerGraphQlControllerIntTest {
 
         McpServer createdServer = createMockMcpServer(100L, name);
 
-        when(workspaceMcpServerFacade.createWorkspaceMcpServer(name, type, environment, enabled, workspaceId))
+        when(workspaceMcpServerFacade.createWorkspaceMcpServer(name, type, environment, enabled, null, workspaceId))
             .thenReturn(createdServer);
 
         // When & Then
@@ -130,7 +130,7 @@ class WorkspaceMcpServerGraphQlControllerIntTest {
             .entity(String.class)
             .isEqualTo("Test Server");
 
-        verify(workspaceMcpServerFacade).createWorkspaceMcpServer(name, type, environment, enabled, workspaceId);
+        verify(workspaceMcpServerFacade).createWorkspaceMcpServer(name, type, environment, enabled, null, workspaceId);
     }
 
     @Test
@@ -139,7 +139,7 @@ class WorkspaceMcpServerGraphQlControllerIntTest {
         McpServer createdServer = createMockMcpServer(200L, "Test Server");
 
         when(workspaceMcpServerFacade.createWorkspaceMcpServer(
-            anyString(), any(PlatformType.class), any(Environment.class), isNull(), anyLong()))
+            anyString(), any(PlatformType.class), any(Environment.class), isNull(), isNull(), anyLong()))
                 .thenReturn(createdServer);
 
         // When & Then
@@ -166,7 +166,7 @@ class WorkspaceMcpServerGraphQlControllerIntTest {
             .isEqualTo("Test Server");
 
         verify(workspaceMcpServerFacade).createWorkspaceMcpServer(
-            anyString(), any(PlatformType.class), any(Environment.class), isNull(), anyLong());
+            anyString(), any(PlatformType.class), any(Environment.class), isNull(), isNull(), anyLong());
     }
 
     @Test

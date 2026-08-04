@@ -94,9 +94,9 @@ public class WorkspaceMcpServerFacadeIntTest {
     void testGetWorkspaceMcpServers() {
         // Given - Create and assign servers to workspace
         McpServer createdServer1 = workspaceMcpServerFacade.createWorkspaceMcpServer(
-            "Test Server 1", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true, testWorkspaceId);
+            "Test Server 1", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true, null, testWorkspaceId);
         McpServer createdServer2 = workspaceMcpServerFacade.createWorkspaceMcpServer(
-            "Test Server 2", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true, testWorkspaceId);
+            "Test Server 2", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true, null, testWorkspaceId);
 
         // When
         List<McpServer> result = workspaceMcpServerFacade.getWorkspaceMcpServers(testWorkspaceId);
@@ -122,7 +122,7 @@ public class WorkspaceMcpServerFacadeIntTest {
 
         // When
         McpServer result = workspaceMcpServerFacade.createWorkspaceMcpServer(
-            name, type, environment, enabled, testWorkspaceId);
+            name, type, environment, enabled, null, testWorkspaceId);
 
         // Then
         assertNotNull(result);
@@ -150,7 +150,7 @@ public class WorkspaceMcpServerFacadeIntTest {
 
         // When
         McpServer result = workspaceMcpServerFacade.createWorkspaceMcpServer(
-            name, type, environment, enabled, testWorkspaceId);
+            name, type, environment, enabled, null, testWorkspaceId);
 
         // Then
         assertNotNull(result);
@@ -170,7 +170,7 @@ public class WorkspaceMcpServerFacadeIntTest {
     void testDeleteWorkspaceMcpServer() {
         // Given - Create server and assign to workspace
         McpServer createdServer = workspaceMcpServerFacade.createWorkspaceMcpServer(
-            "Test Server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true, testWorkspaceId);
+            "Test Server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true, null, testWorkspaceId);
 
         // Verify server exists
         assertEquals(1, workspaceMcpServerRepository.findAllByWorkspaceId(testWorkspaceId)
@@ -190,11 +190,11 @@ public class WorkspaceMcpServerFacadeIntTest {
     void testDeleteWorkspaceMcpServerButKeepIfUsedByOtherWorkspaces() {
         // Given - Create server and assign to two workspaces
         McpServer createdServer = workspaceMcpServerFacade.createWorkspaceMcpServer(
-            "Test Server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true, testWorkspaceId);
+            "Test Server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true, null, testWorkspaceId);
 
         Long otherWorkspaceId = 1050L;
         workspaceMcpServerFacade.createWorkspaceMcpServer(
-            "Test Server 2", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true, otherWorkspaceId);
+            "Test Server 2", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true, null, otherWorkspaceId);
 
         // Manually assign the first server to the second workspace to simulate shared usage
         WorkspaceMcpServer additionalAssignment = new WorkspaceMcpServer(createdServer.getId(), otherWorkspaceId);

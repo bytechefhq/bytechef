@@ -131,7 +131,7 @@ public class CreateMcpServerToolCallback implements ToolCallback {
             boolean enabled = input.enabled() != null && input.enabled();
 
             McpServer mcpServer = workspaceMcpServerFacade.createWorkspaceMcpServer(
-                input.name(), PlatformType.AUTOMATION, environment, enabled, context.workspaceId());
+                input.name(), PlatformType.AUTOMATION, environment, enabled, null, context.workspaceId());
 
             return jsonMapper.writeValueAsString(
                 new CreateMcpServerOutput(
