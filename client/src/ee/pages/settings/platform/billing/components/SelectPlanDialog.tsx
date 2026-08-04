@@ -40,6 +40,7 @@ const PLANS = [
     {
         ctaLabel: 'Get Started',
         description: 'Perfect for growing business.',
+        disabled: true,
         features: [
             'Everything in Starter',
             '5000 tasks / month, then $1/1000 tasks',
@@ -201,6 +202,7 @@ const SelectPlanDialog = ({
                             <PlanTierCard
                                 ctaLabel={loadingPlan === plan.name ? 'Loading…' : plan.ctaLabel}
                                 description={plan.description}
+                                disabled={'disabled' in plan && plan.disabled}
                                 features={plan.features}
                                 highlighted={plan.highlighted}
                                 isCurrent={plan.name?.toLocaleLowerCase() === currentPlanName?.toLocaleLowerCase()}
