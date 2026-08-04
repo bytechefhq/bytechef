@@ -76,7 +76,7 @@ class BillingSubscriptionFacadeImplTest {
     }
 
     @Test
-    void testFetchCurrentSubscriptionReturnsDtoWithTasksUsed() {
+    void testFetchCurrentSubscriptionReturnsDtoWithJobsExecuted() {
         BillingSubscription subscription = starterSubscription();
 
         Instant periodStart = Instant.parse("2026-06-01T00:00:00Z");
@@ -91,7 +91,7 @@ class BillingSubscriptionFacadeImplTest {
 
         assertThat(result).isPresent();
         assertThat(result.get()
-            .tasksUsed()).isEqualTo(42);
+            .jobsExecuted()).isEqualTo(42);
         assertThat(result.get()
             .subscription()).isSameAs(subscription);
         assertThat(result.get()
