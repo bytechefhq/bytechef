@@ -4,7 +4,9 @@ import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
+import {ReactNode} from 'react';
 import {Outlet, useLocation} from 'react-router-dom';
+import {twMerge} from 'tailwind-merge';
 
 interface SettingsProps {
     sidebarNavItems: {
@@ -74,38 +76,36 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
         return true;
     });
 
+    // A subgroup heading sits at the same level as a top-level one — same type scale, same
+    // indent — so a group reads consistently wherever it appears. `subgroup` only tightens the
+    // space above it, since a subgroup follows items it belongs with rather than opening a new
+    // section.
+    const navigationElements: ReactNode[] = sidebarNavItems.map((navItem) =>
+        navItem.href ? (
+            <LeftSidebarNavItem
+                item={{
+                    current: location.pathname.includes(navItem.href),
+                    name: navItem.title,
+                }}
+                key={navItem.href}
+                toLink={navItem.href}
+            />
+        ) : (
+            <h3
+                className={twMerge(
+                    'px-2 pb-1 text-sm font-semibold text-muted-foreground',
+                    navItem.subgroup ? 'pt-3' : 'pt-4'
+                )}
+                key={navItem.title}
+            >
+                {navItem.title}
+            </h3>
+        )
+    );
+
     return (
         <LayoutContainer
-            leftSidebarBody={
-                <LeftSidebarNav
-                    body={sidebarNavItems.map((navItem) =>
-                        navItem.href ? (
-                            <LeftSidebarNavItem
-                                item={{
-                                    current: location.pathname.includes(navItem.href),
-                                    name: navItem.title,
-                                }}
-                                key={navItem.href}
-                                toLink={navItem.href}
-                            />
-                        ) : navItem.subgroup ? (
-                            <h4
-                                className="px-2 pt-1 pb-1 text-sm font-medium text-muted-foreground"
-                                key={navItem.title}
-                            >
-                                {navItem.title}
-                            </h4>
-                        ) : (
-                            <h3
-                                className="px-2 pt-4 pb-1 text-sm font-semibold text-muted-foreground"
-                                key={navItem.title}
-                            >
-                                {navItem.title}
-                            </h3>
-                        )
-                    )}
-                />
-            }
+            leftSidebarBody={<LeftSidebarNav body={navigationElements} />}
             leftSidebarHeader={<Header position="sidebar" title={title} />}
         >
             <div className="size-full">

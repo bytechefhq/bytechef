@@ -270,16 +270,20 @@ const currentWorkspaceSettingsRoutes = {
             title: 'API Keys',
         },
         {
+            subgroup: true,
+            title: 'AI',
+        },
+        {
             href: 'ai-hub/connectors',
-            title: 'AI Hub Connectors',
+            title: 'Hub Connectors',
         },
         {
             href: 'ai/guardrails',
-            title: 'AI Guardrails',
+            title: 'Guardrails',
         },
         {
             href: 'ai/system-prompt',
-            title: 'AI System Prompt',
+            title: 'System Prompt',
         },
     ],
 };
