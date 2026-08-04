@@ -117,18 +117,18 @@ class TrialStatusCacheEvictionIntTest {
         BillingSubscription subscription = trialSubscription();
 
         when(repository.findFirstByOrderByCreatedDateDesc()).thenReturn(Optional.of(subscription));
-        when(billingUsageService.countTaskExecutionsSince(any(), any())).thenReturn(100);
+        when(billingUsageService.countJobExecutionsSince(any(), any())).thenReturn(100);
 
         trialService.validateTrial();
         trialService.validateTrial();
 
-        verify(billingUsageService, times(1)).countTaskExecutionsSince(any(), any());
+        verify(billingUsageService, times(1)).countJobExecutionsSince(any(), any());
 
         billingSubscriptionService.save(subscription);
 
         trialService.validateTrial();
 
-        verify(billingUsageService, times(2)).countTaskExecutionsSince(any(), any());
+        verify(billingUsageService, times(2)).countJobExecutionsSince(any(), any());
     }
 
     private static BillingSubscription trialSubscription() {

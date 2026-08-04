@@ -84,7 +84,7 @@ class BillingSubscriptionFacadeImplTest {
         subscription.setCurrentPeriodStart(periodStart);
 
         when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.of(subscription));
-        when(billingUsageService.countTaskExecutionsSince(eq(periodStart), any(Instant.class))).thenReturn(42);
+        when(billingUsageService.countJobExecutionsSince(eq(periodStart), any(Instant.class))).thenReturn(42);
         when(stripeClient.fetchScheduledPlanName(any())).thenReturn(Optional.of("GROWTH"));
 
         Optional<BillingSubscriptionDTO> result = facade.fetchCurrentSubscription();
