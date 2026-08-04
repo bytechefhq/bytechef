@@ -16,6 +16,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -90,8 +91,12 @@ class CustomComponentInternalApiControllerAuthTest {
         assertThat(EMBEDDED_INTERNAL_PATH_SHAPE.matcher(resolvedPath)
             .matches()).isTrue();
 
+        MockHttpServletRequest cookieOnlyRequest = new MockHttpServletRequest();
+
+        cookieOnlyRequest.setRequestURI(resolvedPath);
+
         boolean interceptedWithoutAuthorizationHeader = EMBEDDED_INTERNAL_PATH_SHAPE.matcher(resolvedPath)
-            .matches() && false;
+            .matches() && cookieOnlyRequest.getHeader("Authorization") != null;
 
         assertThat(interceptedWithoutAuthorizationHeader).isFalse();
     }

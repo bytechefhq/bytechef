@@ -129,6 +129,7 @@ class ErrorWorkflowIntTest {
      * dispatches exactly one new job, and that job carries {@code errorHandlerFor} set to the failed job's id.
      */
     @Test
+    @SuppressWarnings("PMD.UnusedLocalVariable")
     void testFailedRunDispatchesTheHandler() {
         HandlerSetup handlerSetup = givenFailedJobWithConfiguredHandler();
 

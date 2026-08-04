@@ -86,6 +86,7 @@ class ErrorWorkflowResolverTest {
     }
 
     @Test
+    @SuppressWarnings("PMD.UnusedLocalVariable")
     void testWorkflowOverrideWins() {
         ProjectWorkflow failing = projectWorkflow(10L, 99L, false);
 
@@ -105,6 +106,7 @@ class ErrorWorkflowResolverTest {
     }
 
     @Test
+    @SuppressWarnings("PMD.UnusedLocalVariable")
     void testFallsBackToProjectDefault() {
         Mockito.when(projectWorkflowService.getWorkflowProjectWorkflow("wf-1"))
             .thenReturn(projectWorkflow(10L, null, false));
@@ -152,6 +154,7 @@ class ErrorWorkflowResolverTest {
     }
 
     @Test
+    @SuppressWarnings("PMD.UnusedLocalVariable")
     void testDispatchCarriesRealEnvironmentFromProjectDeployment() {
         Mockito.when(projectWorkflowService.getWorkflowProjectWorkflow("wf-1"))
             .thenReturn(projectWorkflow(10L, 99L, false));
@@ -174,6 +177,7 @@ class ErrorWorkflowResolverTest {
      * the trigger's name off the handler workflow rather than inventing one.
      */
     @Test
+    @SuppressWarnings("PMD.UnusedLocalVariable")
     void testDispatchCarriesHandlerErrorTriggerName() {
         Mockito.when(projectWorkflowService.getWorkflowProjectWorkflow("wf-1"))
             .thenReturn(projectWorkflow(10L, 99L, false));

@@ -8,7 +8,6 @@
 package com.bytechef.ee.embedded.configuration.facade;
 
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
-import com.bytechef.ee.embedded.configuration.exception.MissingConnectionException;
 import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
 import java.util.Set;
@@ -38,9 +37,13 @@ public interface ConnectedUserCodeWorkflowReferenceFacade {
     List<ConnectedUserProjectWorkflow> getConnectedUserWorkflows(long connectedUserId);
 
     /**
-     * @throws MissingConnectionException if the reference cannot be auto-wired because a component it uses has no
-     *                                    matching connection for the connected user. The reference is still created,
-     *                                    left disabled.
+     * @throws com.bytechef.ee.embedded.configuration.exception.MissingConnectionException if the reference cannot be
+     *                                                                                     auto-wired because a
+     *                                                                                     component it uses has no
+     *                                                                                     matching connection for the
+     *                                                                                     connected user. The reference
+     *                                                                                     is still created, left
+     *                                                                                     disabled.
      */
     ConnectedUserProjectWorkflow getOrCreateReference(
         String externalUserId, String catalogWorkflowUuid, Environment environment);

@@ -49,7 +49,7 @@ class EmbeddedCodeWorkflowCommandTest {
             () -> command.codeWorkflowDeploy(
                 "/nonexistent/project.js", null, "default", "http://localhost:8080", "token", "PRODUCTION"));
 
-        org.junit.jupiter.api.Assertions.assertEquals(1, exception.exitCode());
+        assertEquals(1, exception.exitCode());
     }
 
     @Test
