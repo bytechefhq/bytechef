@@ -80,7 +80,7 @@ class TrialServiceImplTest {
                 + "requests with a 402 response whenever expired() is true")
             .isFalse();
         assertThat(status.daysRemaining()).isZero();
-        assertThat(status.tasksUsed()).isZero();
+        assertThat(status.jobsExecuted()).isZero();
         assertThat(status.productUnitLimit()).isZero();
         verify(billingSubscriptionService, never()).save(any());
     }
@@ -96,7 +96,7 @@ class TrialServiceImplTest {
         TrialDTO status = trialService.validateTrial();
 
         assertThat(status.expired()).isFalse();
-        assertThat(status.tasksUsed()).isEqualTo(100);
+        assertThat(status.jobsExecuted()).isEqualTo(100);
         assertThat(status.productUnitLimit()).isEqualTo(5000);
         assertThat(status.daysRemaining()).isGreaterThan(0);
         verify(billingSubscriptionService, never()).save(any());
