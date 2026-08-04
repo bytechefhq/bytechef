@@ -3,5 +3,6 @@ query aiHubTaskMessages($workspaceId: ID!, $id: ID!) {
         role
         content
         timestamp
+        toolEventsJson
     }
 }
