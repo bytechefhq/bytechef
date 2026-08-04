@@ -24,7 +24,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "BillingSubscription", description = "A billing subscription.")
 @JsonTypeName("BillingSubscription")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-29T13:00:37.518114+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-08-04T14:19:21.409801+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 public class BillingSubscriptionModel {
 
   private @Nullable String planName;
@@ -40,7 +40,7 @@ public class BillingSubscriptionModel {
 
   private @Nullable String scheduledPlanName;
 
-  private @Nullable Integer tasksUsed;
+  private @Nullable Integer jobsExecuted;
 
   public BillingSubscriptionModel planName(@Nullable String planName) {
     this.planName = planName;
@@ -168,25 +168,25 @@ public class BillingSubscriptionModel {
     this.scheduledPlanName = scheduledPlanName;
   }
 
-  public BillingSubscriptionModel tasksUsed(@Nullable Integer tasksUsed) {
-    this.tasksUsed = tasksUsed;
+  public BillingSubscriptionModel jobsExecuted(@Nullable Integer jobsExecuted) {
+    this.jobsExecuted = jobsExecuted;
     return this;
   }
 
   /**
-   * Number of task executions used in the current billing period.
-   * @return tasksUsed
+   * Number of job executions used in the current billing period.
+   * @return jobsExecuted
    */
   
-  @Schema(name = "tasksUsed", description = "Number of task executions used in the current billing period.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("tasksUsed")
-  public @Nullable Integer getTasksUsed() {
-    return tasksUsed;
+  @Schema(name = "jobsExecuted", description = "Number of job executions used in the current billing period.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("jobsExecuted")
+  public @Nullable Integer getJobsExecuted() {
+    return jobsExecuted;
   }
 
-  @JsonProperty("tasksUsed")
-  public void setTasksUsed(@Nullable Integer tasksUsed) {
-    this.tasksUsed = tasksUsed;
+  @JsonProperty("jobsExecuted")
+  public void setJobsExecuted(@Nullable Integer jobsExecuted) {
+    this.jobsExecuted = jobsExecuted;
   }
 
   @Override
@@ -204,12 +204,12 @@ public class BillingSubscriptionModel {
         Objects.equals(this.currentPeriodEnd, billingSubscription.currentPeriodEnd) &&
         Objects.equals(this.cancelAtPeriodEnd, billingSubscription.cancelAtPeriodEnd) &&
         Objects.equals(this.scheduledPlanName, billingSubscription.scheduledPlanName) &&
-        Objects.equals(this.tasksUsed, billingSubscription.tasksUsed);
+        Objects.equals(this.jobsExecuted, billingSubscription.jobsExecuted);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(planName, status, productUnitLimit, currentPeriodEnd, cancelAtPeriodEnd, scheduledPlanName, tasksUsed);
+    return Objects.hash(planName, status, productUnitLimit, currentPeriodEnd, cancelAtPeriodEnd, scheduledPlanName, jobsExecuted);
   }
 
   @Override
@@ -222,7 +222,7 @@ public class BillingSubscriptionModel {
     sb.append("    currentPeriodEnd: ").append(toIndentedString(currentPeriodEnd)).append("\n");
     sb.append("    cancelAtPeriodEnd: ").append(toIndentedString(cancelAtPeriodEnd)).append("\n");
     sb.append("    scheduledPlanName: ").append(toIndentedString(scheduledPlanName)).append("\n");
-    sb.append("    tasksUsed: ").append(toIndentedString(tasksUsed)).append("\n");
+    sb.append("    jobsExecuted: ").append(toIndentedString(jobsExecuted)).append("\n");
     sb.append("}");
     return sb.toString();
   }
