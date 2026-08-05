@@ -3,7 +3,6 @@ import {DropdownMenu, DropdownMenuContent, DropdownMenuTrigger} from '@/componen
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ErrorWorkflowDialog from '@/pages/automation/project/components/ErrorWorkflowDialog';
-import ProjectGitConfigurationDialog from '@/pages/automation/project/components/ProjectGitConfigurationDialog';
 import {ProjectShareDialog} from '@/pages/automation/project/components/ProjectShareDialog';
 import ProjectVersionHistorySheet from '@/pages/automation/project/components/ProjectVersionHistorySheet';
 import {WorkflowShareDialog} from '@/pages/automation/project/components/WorkflowShareDialog';
@@ -16,13 +15,14 @@ import ProjectDialog from '@/pages/automation/projects/components/ProjectDialog'
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import DeleteWorkflowAlertDialog from '@/shared/components/DeleteWorkflowAlertDialog';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
+import EEVersion from '@/shared/edition/EEVersion';
 import {Project, Workflow} from '@/shared/middleware/automation/configuration';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {UpdateWorkflowMutationType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
 import {SettingsIcon} from 'lucide-react';
-import {useState} from 'react';
+import {Suspense, lazy, useState} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 interface ProjectHeaderSettingsMenuProps {
@@ -30,6 +30,10 @@ interface ProjectHeaderSettingsMenuProps {
     updateWorkflowMutation: UpdateWorkflowMutationType;
     workflow: Workflow;
 }
+
+const ProjectGitConfigurationDialog = lazy(
+    () => import('@/ee/pages/automation/project/components/ProjectGitConfigurationDialog')
+);
 
 const SettingsMenu = ({project, updateWorkflowMutation, workflow}: ProjectHeaderSettingsMenuProps) => {
     const [openDropdownMenu, setOpenDropdownMenu] = useState(false);
@@ -175,12 +179,16 @@ const SettingsMenu = ({project, updateWorkflowMutation, workflow}: ProjectHeader
             )}
 
             {showProjectGitConfigurationDialog && (
-                <ProjectGitConfigurationDialog
-                    onClose={() => setShowProjectGitConfigurationDialog(false)}
-                    onUpdateProjectGitConfigurationSubmit={handleUpdateProjectGitConfigurationSubmit}
-                    projectGitConfiguration={projectGitConfiguration}
-                    projectId={project.id!}
-                />
+                <EEVersion hidden={true}>
+                    <Suspense fallback={null}>
+                        <ProjectGitConfigurationDialog
+                            onClose={() => setShowProjectGitConfigurationDialog(false)}
+                            onUpdateProjectGitConfigurationSubmit={handleUpdateProjectGitConfigurationSubmit}
+                            projectGitConfiguration={projectGitConfiguration}
+                            projectId={project.id!}
+                        />
+                    </Suspense>
+                </EEVersion>
             )}
 
             {showProjectShareDialog && (

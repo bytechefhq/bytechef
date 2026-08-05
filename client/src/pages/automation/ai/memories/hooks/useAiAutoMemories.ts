@@ -1,5 +1,4 @@
-import {useReportQueryError} from '@/pages/automation/ai-hub/hooks/useReportQueryError';
-import {reportMutationError} from '@/pages/automation/ai-hub/tasks/hooks/useTasks';
+import {reportMutationError, useReportQueryError} from '@/shared/error/useReportQueryError';
 import {
     AiAutoMemoriesQuery,
     AiAutoMemoryQuery,

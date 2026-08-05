@@ -13,10 +13,11 @@ export const ProjectGitConfigurationKeys = {
     ],
 };
 
-export const useGetProjectGitConfigurationQuery = (id: number) =>
+export const useGetProjectGitConfigurationQuery = (id: number, enabled: boolean = true) =>
     useQuery<ProjectGitConfiguration, Error>({
         queryKey: ProjectGitConfigurationKeys.projectGitConfiguration(id),
         queryFn: () => new ProjectGitApi().getProjectGitConfiguration({id}),
+        enabled,
         retry: false,
     });
 

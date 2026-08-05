@@ -40,36 +40,36 @@ async function renderApp() {
     const root = createRoot(container);
     const queryClient = new QueryClient();
 
-    const isEmbeddedWorkflowBuilder = window.location.pathname.includes('/embedded/workflow-builder');
-
-    const router = isEmbeddedWorkflowBuilder
-        ? (await import('@/embeddedWorkflowBuilderRoutes')).getRouter()
-        : (await import('./routes')).getRouter(queryClient);
+    const router = (await import('./routes')).getRouter(queryClient);
 
     await applicationInfoStore.getState().getApplicationInfo();
 
-    if (!isEmbeddedWorkflowBuilder) {
-        const {helpHub, userGuiding} = applicationInfoStore.getState();
+    if (applicationInfoStore.getState().application?.edition === 'EE') {
+        // Registers the EE implementations behind the CE edition seams (see shared/edition) before the first
+        // render, so the hook implementations CE surfaces resolve never change identity afterwards.
+        await import('@/ee/shared/edition/registerEditionModules');
+    }
 
-        if (helpHub.enabled && helpHub.commandBar.orgId) {
-            const {init} = await import('commandbar');
+    const {helpHub, userGuiding} = applicationInfoStore.getState();
 
-            init(helpHub.commandBar.orgId);
-        }
+    if (helpHub.enabled && helpHub.commandBar.orgId) {
+        const {init} = await import('commandbar');
 
-        if (userGuiding.enabled && userGuiding.containerId) {
-            initUserGuiding(userGuiding.containerId);
-        }
+        init(helpHub.commandBar.orgId);
+    }
 
-        if (
-            !publicRoutes.find((publicRoute) => window.location.pathname.startsWith(publicRoute)) &&
-            !authenticationStore.getState().sessionHasBeenFetched
-        ) {
-            const result = await authenticationStore.getState().getAccount();
+    if (userGuiding.enabled && userGuiding.containerId) {
+        initUserGuiding(userGuiding.containerId);
+    }
 
-            if (!result && window.location.pathname !== '/login') {
-                window.location.replace(buildLoginPath(window.location));
-            }
+    if (
+        !publicRoutes.find((publicRoute) => window.location.pathname.startsWith(publicRoute)) &&
+        !authenticationStore.getState().sessionHasBeenFetched
+    ) {
+        const result = await authenticationStore.getState().getAccount();
+
+        if (!result && window.location.pathname !== '/login') {
+            window.location.replace(buildLoginPath(window.location));
         }
     }
 

@@ -3,11 +3,11 @@ import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import {ButtonGroup} from '@/components/ui/button-group';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
-import {useGetWorkspaceProjectGitConfigurationsQuery} from '@/ee/shared/mutations/automation/projectGit.queries';
 import handleImportProject from '@/pages/automation/project/utils/handleImportProject';
 import ProjectsFilterTitle from '@/pages/automation/projects/components/ProjectsFilterTitle';
 import ProjectsLeftSidebarNav from '@/pages/automation/projects/components/ProjectsLeftSidebarNav';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {getProjectGitApi} from '@/shared/edition/project-git/projectGitApi';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useImportProjectMutation} from '@/shared/mutations/automation/projects.mutations';
@@ -16,7 +16,6 @@ import {useGetProjectCategoriesQuery} from '@/shared/queries/automation/projectC
 import {useGetProjectTagsQuery} from '@/shared/queries/automation/projectTags.queries';
 import {ProjectKeys, useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
-import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {ChevronDownIcon, CodeIcon, FolderIcon, LayoutTemplateIcon, UploadIcon} from 'lucide-react';
@@ -37,7 +36,6 @@ const Projects = () => {
     const [newlyCreatedProjectId, setNewlyCreatedProjectId] = useState<number | undefined>();
     const [showNewCodeWorkflowDialog, setShowNewCodeWorkflowDialog] = useState(false);
 
-    const application = useApplicationInfoStore((state) => state.application);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const [searchParams] = useSearchParams();
@@ -75,7 +73,7 @@ const Projects = () => {
         data: projectGitConfigurations,
         error: projectGitConfigurationsError,
         isLoading: projectGitConfigurationsIsLoading,
-    } = useGetWorkspaceProjectGitConfigurationsQuery(currentWorkspaceId!, ff_1039 && application?.edition === 'EE');
+    } = getProjectGitApi().useWorkspaceProjectGitConfigurationsQuery(currentWorkspaceId!, ff_1039);
 
     const {
         data: projects,

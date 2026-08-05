@@ -12,8 +12,11 @@ import {
 } from '@/components/ui/dialog';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {ApiClient} from '@/ee/shared/middleware/automation/api-platform';
-import {useCreateApiClientMutation, useUpdateApiClientMutation} from '@/shared/mutations/platform/apiClients.mutations';
-import {ApiClientKeys} from '@/shared/queries/platform/apiClients.queries';
+import {
+    useCreateApiClientMutation,
+    useUpdateApiClientMutation,
+} from '@/ee/shared/mutations/platform/apiClients.mutations';
+import {ApiClientKeys} from '@/ee/shared/queries/platform/apiClients.queries';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';

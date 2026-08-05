@@ -1,11 +1,4 @@
-import {
-    usePullProjectFromGitMutation,
-    useUpdateProjectGitConfigurationMutation,
-} from '@/ee/shared/mutations/automation/projectGit.mutations';
-import {
-    ProjectGitConfigurationKeys,
-    useGetProjectGitConfigurationQuery,
-} from '@/ee/shared/mutations/automation/projectGit.queries';
+import {getProjectGitApi} from '@/shared/edition/project-git/projectGitApi';
 import {Project, Workflow} from '@/shared/middleware/automation/configuration';
 import {useDeleteProjectMutation, useDuplicateProjectMutation} from '@/shared/mutations/automation/projects.mutations';
 import {
@@ -23,7 +16,8 @@ import {useNavigate, useSearchParams} from 'react-router-dom';
 import {toast} from 'sonner';
 
 export const useSettingsMenu = ({project, workflow}: {project: Project; workflow: Workflow}) => {
-    const {data: projectGitConfiguration} = useGetProjectGitConfigurationQuery(project.id!);
+    // Behind the edition seam: the CE default reports no configuration and never fetches.
+    const {data: projectGitConfiguration} = getProjectGitApi().useProjectGitConfigurationQuery(project.id!);
 
     const projectId = project.id;
 
@@ -72,7 +66,7 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
         },
     });
 
-    const pullProjectFromGitMutation = usePullProjectFromGitMutation({
+    const pullProjectFromGitMutation = getProjectGitApi().usePullProjectFromGitMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ProjectKeys.project(project.id!)});
 
@@ -84,13 +78,8 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
         },
     });
 
-    const updateProjectGitConfigurationMutation = useUpdateProjectGitConfigurationMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ProjectGitConfigurationKeys.projectGitConfiguration(project.id!),
-            });
-        },
-    });
+    // Git cache invalidation lives in the EE adapter behind the seam - CE does not know the EE cache keys.
+    const updateProjectGitConfigurationMutation = getProjectGitApi().useUpdateProjectGitConfigurationMutation({});
 
     const handleDeleteProjectAlertDialogClick = () => {
         if (project.id) {
