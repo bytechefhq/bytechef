@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Objects;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.client.ChatClientRequest;
 import org.springframework.ai.chat.messages.SystemMessage;
@@ -79,9 +80,12 @@ class AutoMemoryToolsAdvisorTest {
         assertThat(systemText).contains("base system");
         assertThat(systemText).contains("REMEMBER THINGS");
 
-        List<ToolCallback> toolCallbacks =
-            ((ToolCallingChatOptions) result.prompt()
-                .getOptions()).getToolCallbacks();
+        ToolCallingChatOptions toolCallingChatOptions = (ToolCallingChatOptions) Objects.requireNonNull(
+            result.prompt()
+                .getOptions(),
+            "options");
+
+        List<ToolCallback> toolCallbacks = toolCallingChatOptions.getToolCallbacks();
 
         assertThat(toolCallbacks)
             .extracting(toolCallback -> toolCallback.getToolDefinition()

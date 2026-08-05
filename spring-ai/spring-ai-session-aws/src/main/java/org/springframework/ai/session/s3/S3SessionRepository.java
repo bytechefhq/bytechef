@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.messages.MessageType;
 import org.springframework.ai.session.EventFilter;
@@ -238,16 +239,22 @@ public final class S3SessionRepository implements SessionRepository {
         matched.sort((left, right) -> left.getTimestamp()
             .compareTo(right.getTimestamp()));
 
-        if (filter.lastN() != null) {
-            int from = Math.max(0, matched.size() - filter.lastN());
+        Integer lastN = filter.lastN();
+
+        if (lastN != null) {
+            int from = Math.max(0, matched.size() - lastN);
 
             return Collections.unmodifiableList(new ArrayList<>(matched.subList(from, matched.size())));
         }
 
-        if (filter.pageSize() != null) {
-            int page = filter.page() != null ? filter.page() : 0;
-            int from = Math.min(page * filter.pageSize(), matched.size());
-            int to = Math.min(from + filter.pageSize(), matched.size());
+        Integer pageSize = filter.pageSize();
+
+        if (pageSize != null) {
+            Integer pageNumber = filter.page();
+
+            int page = pageNumber != null ? pageNumber : 0;
+            int from = Math.min(page * pageSize, matched.size());
+            int to = Math.min(from + pageSize, matched.size());
 
             return Collections.unmodifiableList(new ArrayList<>(matched.subList(from, to)));
         }
@@ -258,20 +265,25 @@ public final class S3SessionRepository implements SessionRepository {
     private boolean matches(SessionEvent event, EventFilter filter) {
         Instant timestamp = event.getTimestamp();
 
-        if (filter.from() != null && timestamp.isBefore(filter.from())) {
+        Instant from = filter.from();
+
+        if (from != null && timestamp.isBefore(from)) {
             return false;
         }
 
-        if (filter.to() != null && timestamp.isAfter(filter.to())) {
+        Instant to = filter.to();
+
+        if (to != null && timestamp.isAfter(to)) {
             return false;
         }
 
-        if (filter.messageTypes() != null) {
+        Set<MessageType> messageTypes = filter.messageTypes();
+
+        if (messageTypes != null) {
             MessageType type = event.getMessage()
                 .getMessageType();
 
-            if (!filter.messageTypes()
-                .contains(type)) {
+            if (!messageTypes.contains(type)) {
                 return false;
             }
         }
@@ -280,16 +292,20 @@ public final class S3SessionRepository implements SessionRepository {
             return false;
         }
 
-        if (filter.branch() != null && !branchVisible(event.getBranch(), filter.branch())) {
+        String branch = filter.branch();
+
+        if (branch != null && !branchVisible(event.getBranch(), branch)) {
             return false;
         }
 
-        if (filter.keyword() != null) {
+        String keyword = filter.keyword();
+
+        if (keyword != null) {
             String text = event.getMessage()
                 .getText();
 
             if (text == null || !text.toLowerCase()
-                .contains(filter.keyword())) {
+                .contains(keyword)) {
                 return false;
             }
         }
