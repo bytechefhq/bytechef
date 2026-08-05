@@ -108,16 +108,17 @@ public class PptxArtifactGenerator implements ArtifactGenerator {
             request.generatedFromPrompt());
 
         boolean linked = false;
+        Long taskId = request.taskId();
 
-        if (request.taskId() != null) {
+        if (taskId != null) {
             try {
-                taskAssetFileService.recordAuthorship(request.taskId(), saved.getId());
+                taskAssetFileService.recordAuthorship(taskId, saved.getId());
                 linked = true;
             } catch (AuthorshipAlreadyAssignedException exception) {
                 log.warn(
                     "Generated PPTX asset_file {} already authored by another task; skipping AUTHORED join "
                         + "for task {}",
-                    saved.getId(), request.taskId(), exception);
+                    saved.getId(), taskId, exception);
             }
         }
 
@@ -143,7 +144,8 @@ public class PptxArtifactGenerator implements ArtifactGenerator {
         try (XMLSlideShow ppt = new XMLSlideShow();
             ByteArrayOutputStream output = new ByteArrayOutputStream()) {
 
-            List<PptxSlide> slides = spec.slides() == null ? List.of() : spec.slides();
+            List<PptxSlide> specSlides = spec.slides();
+            List<PptxSlide> slides = specSlides == null ? List.of() : specSlides;
 
             if (slides.isEmpty()) {
                 // Empty deck still produces a valid file with one blank slide. A zero-slide pptx is technically
@@ -158,8 +160,9 @@ public class PptxArtifactGenerator implements ArtifactGenerator {
 
                     XSLFSlide xslfSlide = ppt.createSlide();
 
-                    if (slide.title() != null && !slide.title()
-                        .isBlank()) {
+                    String slideTitle = slide.title();
+
+                    if (slideTitle != null && !slideTitle.isBlank()) {
                         XSLFTextBox titleBox = xslfSlide.createTextBox();
 
                         titleBox.setAnchor(new Rectangle(SIDE_PADDING, SIDE_PADDING,
@@ -171,11 +174,12 @@ public class PptxArtifactGenerator implements ArtifactGenerator {
 
                         titleRun.setBold(true);
                         titleRun.setFontSize(28d);
-                        titleRun.setText(slide.title());
+                        titleRun.setText(slideTitle);
                     }
 
-                    if (slide.bullets() != null && !slide.bullets()
-                        .isEmpty()) {
+                    List<String> bullets = slide.bullets();
+
+                    if (bullets != null && !bullets.isEmpty()) {
                         XSLFTextBox bulletsBox = xslfSlide.createTextBox();
 
                         int bulletsTop = SIDE_PADDING + TITLE_HEIGHT + SIDE_PADDING;
@@ -183,7 +187,7 @@ public class PptxArtifactGenerator implements ArtifactGenerator {
                         bulletsBox.setAnchor(new Rectangle(SIDE_PADDING, bulletsTop,
                             SLIDE_WIDTH - 2 * SIDE_PADDING, SLIDE_HEIGHT - bulletsTop - SIDE_PADDING));
 
-                        for (String bullet : slide.bullets()) {
+                        for (String bullet : bullets) {
                             if (bullet == null) {
                                 continue;
                             }

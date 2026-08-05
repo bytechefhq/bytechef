@@ -67,10 +67,11 @@ public abstract class AbstractTextArtifactGenerator implements ArtifactGenerator
             request.generatedFromPrompt());
 
         boolean linked = false;
+        Long taskId = request.taskId();
 
-        if (request.taskId() != null) {
+        if (taskId != null) {
             try {
-                taskAssetFileService.recordAuthorship(request.taskId(), saved.getId());
+                taskAssetFileService.recordAuthorship(taskId, saved.getId());
                 linked = true;
             } catch (AuthorshipAlreadyAssignedException exception) {
                 // The asset_file is already authored by a *different* task. The generator-supplied filename
@@ -80,7 +81,7 @@ public abstract class AbstractTextArtifactGenerator implements ArtifactGenerator
                 log.warn(
                     "Generated asset_file {} already has a different authoring task; skipping AUTHORED join "
                         + "for task {}",
-                    saved.getId(), request.taskId(), exception);
+                    saved.getId(), taskId, exception);
             }
         }
 

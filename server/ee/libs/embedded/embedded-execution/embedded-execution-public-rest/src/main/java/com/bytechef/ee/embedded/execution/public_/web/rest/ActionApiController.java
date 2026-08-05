@@ -112,7 +112,7 @@ public class ActionApiController implements ActionApi {
         dataBinder.registerCustomEditor(EnvironmentModel.class, new CaseInsensitiveEnumPropertyEditorSupport());
     }
 
-    private static class FileEntryImpl implements com.bytechef.component.definition.FileEntry {
+    private static final class FileEntryImpl implements com.bytechef.component.definition.FileEntry {
 
         @Nullable
         private String extension;

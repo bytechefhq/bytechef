@@ -11,6 +11,7 @@ import com.bytechef.ee.discovery.metadata.ServiceMetadataRegistry;
 import com.bytechef.ee.discovery.redis.registry.RedisRegistration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -31,7 +32,8 @@ public class RedisServiceMetadataRegistry implements ServiceMetadataRegistry {
 
     @Override
     public void registerMetadata(Map<String, String> metadata) {
-        Map<String, String> curMetadataMap = redisRegistration.getMetadata();
+        Map<String, String> curMetadataMap = Objects.requireNonNull(
+            redisRegistration.getMetadata(), "metadata");
 
         Set<Map.Entry<String, String>> curMetadataEntry = curMetadataMap.entrySet();
         Set<Map.Entry<String, String>> metadataEntry = metadata.entrySet();

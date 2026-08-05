@@ -77,12 +77,13 @@ public record AutomationToolInvocationContext(
      * absent or carries no {@code environmentId} — mirroring the legacy silent dev-bucketing behaviour.
      */
     public static int resolveEnvironmentOrDefault(@Nullable AutomationToolInvocationContext context) {
-        if (context == null || context.environmentId() == null) {
+        Long environmentId = context == null ? null : context.environmentId();
+
+        if (environmentId == null) {
             return 0;
         }
 
-        return context.environmentId()
-            .intValue();
+        return environmentId.intValue();
     }
 
     private static @Nullable Long asLong(@Nullable Object value) {

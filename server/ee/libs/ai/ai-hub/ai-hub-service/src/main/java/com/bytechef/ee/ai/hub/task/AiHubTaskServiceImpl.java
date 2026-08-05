@@ -694,18 +694,15 @@ public class AiHubTaskServiceImpl implements AiHubTaskService {
     private static boolean isVisibleConversationEvent(SessionEvent event) {
         Message message = event.getMessage();
 
-        return message != null
-            && (event.getMessageType() == MessageType.USER || event.getMessageType() == MessageType.ASSISTANT)
-            && message.getText() != null && !message.getText()
-                .isBlank();
-    }
+        if (message == null
+            || (event.getMessageType() != MessageType.USER && event.getMessageType() != MessageType.ASSISTANT)) {
 
-    private static List<SessionEvent> conversationEvents(AiHubSessionMemory sessionMemory, String threadId) {
-        return sessionMemory.sessionService()
-            .getEvents(threadId)
-            .stream()
-            .filter(AiHubTaskServiceImpl::isVisibleConversationEvent)
-            .toList();
+            return false;
+        }
+
+        String text = message.getText();
+
+        return text != null && !text.isBlank();
     }
 
     @Override
@@ -866,7 +863,7 @@ public class AiHubTaskServiceImpl implements AiHubTaskService {
             .appendEvent(
                 SessionEvent.builder()
                     .sessionId(threadId)
-                    .message(new org.springframework.ai.chat.messages.AssistantMessage(content))
+                    .message(new AssistantMessage(content))
                     .build());
 
         task.setUpdatedAt(LocalDateTime.now(clock));

@@ -146,7 +146,9 @@ public class LookupComponentPropertyOptionsToolCallback implements ToolCallback 
                 return toolError("Invocation context unavailable.");
             }
 
-            int componentVersion = input.componentVersion() == null ? 1 : input.componentVersion();
+            Integer inputComponentVersion = input.componentVersion();
+
+            int componentVersion = inputComponentVersion == null ? 1 : inputComponentVersion;
 
             PropertyOptionsResolver.OptionsLookupResult result = kind.equals("ACTION")
                 ? resolver.resolveActionPropertyOptions(

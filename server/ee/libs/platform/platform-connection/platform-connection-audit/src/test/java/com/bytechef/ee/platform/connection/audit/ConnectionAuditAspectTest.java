@@ -288,7 +288,7 @@ class ConnectionAuditAspectTest {
 
             @Override
             public AuditConnection.AuditData[] data() {
-                return data;
+                return data.clone();
             }
 
             @Override

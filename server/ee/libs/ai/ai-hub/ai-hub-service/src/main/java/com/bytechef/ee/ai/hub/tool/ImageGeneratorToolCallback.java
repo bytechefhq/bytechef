@@ -111,29 +111,33 @@ public class ImageGeneratorToolCallback implements ToolCallback {
         try {
             ImageGeneratorInput input = jsonMapper.readValue(toolInput, ImageGeneratorInput.class);
 
-            if (input.prompt() == null || input.prompt()
-                .isBlank()) {
+            String prompt = input.prompt();
+
+            if (prompt == null || prompt.isBlank()) {
                 return toolError("prompt is required and must not be blank");
             }
 
-            StringBuilder promptBuilder = new StringBuilder(input.prompt());
+            StringBuilder promptBuilder = new StringBuilder(prompt);
 
-            if (input.size() != null && !input.size()
-                .isBlank()) {
+            String size = input.size();
+
+            if (size != null && !size.isBlank()) {
                 promptBuilder.append("\n\nRequested size: ")
-                    .append(input.size());
+                    .append(size);
             }
 
-            if (input.style() != null && !input.style()
-                .isBlank()) {
+            String style = input.style();
+
+            if (style != null && !style.isBlank()) {
                 promptBuilder.append("\nRequested style: ")
-                    .append(input.style());
+                    .append(style);
             }
 
-            if (input.filename() != null && !input.filename()
-                .isBlank()) {
+            String filename = input.filename();
+
+            if (filename != null && !filename.isBlank()) {
                 promptBuilder.append("\nSave as filename: ")
-                    .append(input.filename());
+                    .append(filename);
             }
 
             AgentBinding parent = CurrentAgentContext.current();

@@ -30,7 +30,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @author Ivica Cardic
  */
 @Table("ai_prompt_version")
-public class AiPromptVersion {
+public final class AiPromptVersion {
 
     @Column
     private boolean active;

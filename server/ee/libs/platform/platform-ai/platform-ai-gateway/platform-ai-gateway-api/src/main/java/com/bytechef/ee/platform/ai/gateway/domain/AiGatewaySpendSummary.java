@@ -23,7 +23,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @version ee
  */
 @Table("ai_gateway_spend_summary")
-public class AiGatewaySpendSummary {
+public final class AiGatewaySpendSummary {
 
     @Column("api_key_id")
     private Long apiKeyId;

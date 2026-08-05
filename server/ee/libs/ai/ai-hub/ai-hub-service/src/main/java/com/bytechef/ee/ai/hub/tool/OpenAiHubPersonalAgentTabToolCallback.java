@@ -89,14 +89,19 @@ public class OpenAiHubPersonalAgentTabToolCallback implements ToolCallback {
             OpenAiHubPersonalAgentTabInput input =
                 jsonMapper.readValue(toolInput, OpenAiHubPersonalAgentTabInput.class);
 
-            if (input.aiHubPersonalAgentId() == null) {
+            Long aiHubPersonalAgentId = input.aiHubPersonalAgentId();
+
+            if (aiHubPersonalAgentId == null) {
                 return ToolErrors.toolError(jsonMapper, "aiHubPersonalAgentId is required");
             }
 
             AiHubToolInvocationContext context =
                 AiHubToolInvocationContext.fromToolContext(toolContext);
 
-            if (context == null || context.workspaceId() == null || context.userId() == null) {
+            Long workspaceId = context == null ? null : context.workspaceId();
+            Long userId = context == null ? null : context.userId();
+
+            if (workspaceId == null || userId == null) {
                 return ToolErrors.toolError(jsonMapper,
                     "Workspace context unavailable — open this chat from the AI Hub of a workspace.");
             }
@@ -109,18 +114,19 @@ public class OpenAiHubPersonalAgentTabToolCallback implements ToolCallback {
             // against
             // an injected id from a malicious prompt.
             Optional<AiHubPersonalAgent> agentOptional = aiHubPersonalAgentService.findOwned(
-                input.aiHubPersonalAgentId(), context.workspaceId(), context.userId());
+                aiHubPersonalAgentId, workspaceId, userId);
 
             if (agentOptional.isEmpty()) {
                 return ToolErrors.toolError(jsonMapper,
-                    "Personal agent " + input.aiHubPersonalAgentId() + " not found in this workspace");
+                    "Personal agent " + aiHubPersonalAgentId + " not found in this workspace");
             }
 
             AiHubPersonalAgent agent = agentOptional.get();
-            String defaultTitle = agent.getTitle() != null ? agent.getTitle() : agent.getName();
+            String agentTitle = agent.getTitle();
+            String defaultTitle = agentTitle != null ? agentTitle : agent.getName();
 
             AiHubTask task = taskService.createAiHubPersonalAgentChat(
-                context.workspaceId(), context.userId(), environment, agent.getId(), defaultTitle);
+                workspaceId, userId, environment, agent.getId(), defaultTitle);
 
             return jsonMapper.writeValueAsString(
                 new OpenAiHubPersonalAgentTabOutput(

@@ -224,8 +224,10 @@ public class AiHubPersonalAgentScheduleServiceImpl implements AiHubPersonalAgent
         schedule.setLastRunAt(LocalDateTime.now());
         schedule.setConsecutiveFailures(0);
 
-        if (schedule.getRemainingRuns() != null) {
-            int remaining = schedule.getRemainingRuns() - 1;
+        Integer remainingRuns = schedule.getRemainingRuns();
+
+        if (remainingRuns != null) {
+            int remaining = remainingRuns - 1;
 
             schedule.setRemainingRuns(remaining);
 
@@ -362,11 +364,13 @@ public class AiHubPersonalAgentScheduleServiceImpl implements AiHubPersonalAgent
     }
 
     private @Nullable Instant startAtInstant(AiHubPersonalAgentSchedule schedule) {
-        if (schedule.getStartDate() == null) {
+        LocalDateTime startDate = schedule.getStartDate();
+
+        if (startDate == null) {
             return null;
         }
 
-        return schedule.getStartDate()
+        return startDate
             .atZone(ZoneId.of(schedule.getZoneId()))
             .toInstant();
     }

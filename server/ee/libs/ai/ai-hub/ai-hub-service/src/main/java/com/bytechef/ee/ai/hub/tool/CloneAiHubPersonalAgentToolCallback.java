@@ -98,38 +98,44 @@ public class CloneAiHubPersonalAgentToolCallback implements ToolCallback {
             CloneAiHubPersonalAgentInput input =
                 jsonMapper.readValue(toolInput, CloneAiHubPersonalAgentInput.class);
 
-            if (input.agentId() == null) {
+            Long agentId = input.agentId();
+
+            if (agentId == null) {
                 return ToolErrors.toolError(jsonMapper, "agentId is required");
             }
 
-            if (input.targetEnvironment() == null || input.targetEnvironment()
-                .isBlank()) {
+            String targetEnvironment = input.targetEnvironment();
+
+            if (targetEnvironment == null || targetEnvironment.isBlank()) {
                 return ToolErrors.toolError(jsonMapper, "targetEnvironment is required");
             }
 
             int targetEnvironmentOrdinal;
 
             try {
-                targetEnvironmentOrdinal = Environment.valueOf(input.targetEnvironment())
+                targetEnvironmentOrdinal = Environment.valueOf(targetEnvironment)
                     .ordinal();
             } catch (IllegalArgumentException invalidEnv) {
                 return ToolErrors.toolError(
                     jsonMapper,
                     "targetEnvironment must be one of DEVELOPMENT, STAGING, PRODUCTION (got: "
-                        + input.targetEnvironment() + ")");
+                        + targetEnvironment + ")");
             }
 
             AiHubToolInvocationContext context =
                 AiHubToolInvocationContext.fromToolContext(toolContext);
 
-            if (context == null || context.workspaceId() == null || context.userId() == null) {
+            Long workspaceId = context == null ? null : context.workspaceId();
+            Long userId = context == null ? null : context.userId();
+
+            if (workspaceId == null || userId == null) {
                 return ToolErrors.toolError(jsonMapper,
                     "Workspace context unavailable — open this chat from the AI Hub of a workspace.");
             }
 
             try {
                 AiHubPersonalAgent clone = aiHubPersonalAgentService.cloneToEnvironment(
-                    input.agentId(), context.workspaceId(), context.userId(), targetEnvironmentOrdinal,
+                    agentId, workspaceId, userId, targetEnvironmentOrdinal,
                     input.newName());
 
                 return jsonMapper.writeValueAsString(

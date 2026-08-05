@@ -15,6 +15,7 @@ import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfigura
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflowConnection;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.util.Objects;
 import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -316,25 +317,29 @@ public class ConnectedUserProjectWorkflowReferenceColumnsIntTest {
     }
 
     private long insertWorkspace() {
-        return jdbcTemplate.queryForObject(
-            """
-                INSERT INTO workspace (name, created_date, created_by, last_modified_date, last_modified_by, version)
-                VALUES ('test', now(), 'test', now(), 'test', 0)
-                RETURNING id
-                """,
-            Long.class);
+        return Objects.requireNonNull(
+            jdbcTemplate.queryForObject(
+                """
+                    INSERT INTO workspace (name, created_date, created_by, last_modified_date, last_modified_by, version)
+                    VALUES ('test', now(), 'test', now(), 'test', 0)
+                    RETURNING id
+                    """,
+                Long.class),
+            "workspace id");
     }
 
     private long insertProject(long workspaceId) {
-        return jdbcTemplate.queryForObject(
-            """
-                INSERT INTO project
-                    (name, uuid, workspace_id, created_date, created_by, last_modified_date, last_modified_by,
-                     version)
-                VALUES ('test', gen_random_uuid(), ?, now(), 'test', now(), 'test', 0)
-                RETURNING id
-                """,
-            Long.class, workspaceId);
+        return Objects.requireNonNull(
+            jdbcTemplate.queryForObject(
+                """
+                    INSERT INTO project
+                        (name, uuid, workspace_id, created_date, created_by, last_modified_date, last_modified_by,
+                         version)
+                    VALUES ('test', gen_random_uuid(), ?, now(), 'test', now(), 'test', 0)
+                    RETURNING id
+                    """,
+                Long.class, workspaceId),
+            "project id");
     }
 
     private long insertProjectWorkflow(long projectId) {
@@ -342,20 +347,24 @@ public class ConnectedUserProjectWorkflowReferenceColumnsIntTest {
     }
 
     private long insertProjectWorkflow(long projectId, String workflowId) {
-        return jdbcTemplate.queryForObject(
-            """
-                INSERT INTO project_workflow
-                    (project_id, workflow_id, uuid, project_version, created_date, created_by, last_modified_date,
-                     last_modified_by, version)
-                VALUES (?, ?, gen_random_uuid(), 1, now(), 'test', now(), 'test', 0)
-                RETURNING id
-                """,
-            Long.class, projectId, workflowId);
+        return Objects.requireNonNull(
+            jdbcTemplate.queryForObject(
+                """
+                    INSERT INTO project_workflow
+                        (project_id, workflow_id, uuid, project_version, created_date, created_by, last_modified_date,
+                         last_modified_by, version)
+                    VALUES (?, ?, gen_random_uuid(), 1, now(), 'test', now(), 'test', 0)
+                    RETURNING id
+                    """,
+                Long.class, projectId, workflowId),
+            "project workflow id");
     }
 
     private long insertConnectedUserProject(long projectId) {
-        return jdbcTemplate.queryForObject(
-            "INSERT INTO connected_user_project (connected_user_id, project_id) VALUES (1, ?) RETURNING id",
-            Long.class, projectId);
+        return Objects.requireNonNull(
+            jdbcTemplate.queryForObject(
+                "INSERT INTO connected_user_project (connected_user_id, project_id) VALUES (1, ?) RETURNING id",
+                Long.class, projectId),
+            "connected user project id");
     }
 }

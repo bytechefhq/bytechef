@@ -13,6 +13,7 @@ import com.bytechef.ee.automation.contextstore.service.WorkspaceContextStoreSour
 import com.bytechef.ee.platform.contextstore.domain.ContextStoreRecord;
 import com.bytechef.ee.platform.contextstore.service.ContextStoreQueryService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -124,10 +125,14 @@ public class GetContextStoreRecordToolCallback implements ToolCallback {
             response.put("id", record.getId());
             response.put("sourceRecordId", record.getSourceRecordId());
             response.put("payload", record.getPayload());
-            response.put("lastSeenAt", record.getLastSeenAt() == null ? null : record.getLastSeenAt()
-                .toString());
-            response.put("deletedAt", record.getDeletedAt() == null ? null : record.getDeletedAt()
-                .toString());
+
+            Instant lastSeenAt = record.getLastSeenAt();
+
+            response.put("lastSeenAt", lastSeenAt == null ? null : lastSeenAt.toString());
+
+            Instant deletedAt = record.getDeletedAt();
+
+            response.put("deletedAt", deletedAt == null ? null : deletedAt.toString());
 
             return jsonMapper.writeValueAsString(response);
         } catch (JacksonException exception) {

@@ -13,6 +13,7 @@ import com.bytechef.ee.platform.contextstore.service.ContextStoreSourceService;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.coordinator.trigger.jobparameter.TriggerJobParameterContributor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -70,14 +71,18 @@ public class ContextStoreTriggerJobParameterContributor implements TriggerJobPar
             return Map.of();
         }
 
-        if (sourceOptional.isEmpty() || sourceOptional.get()
-            .getLastSyncRunAt() == null) {
+        if (sourceOptional.isEmpty()) {
             return Map.of();
         }
 
-        return Map.of(ItemReader.SINCE_KEY, sourceOptional.get()
-            .getLastSyncRunAt()
-            .toEpochMilli());
+        Instant lastSyncRunAt = sourceOptional.get()
+            .getLastSyncRunAt();
+
+        if (lastSyncRunAt == null) {
+            return Map.of();
+        }
+
+        return Map.of(ItemReader.SINCE_KEY, lastSyncRunAt.toEpochMilli());
     }
 
     private static long toLong(Object value) {

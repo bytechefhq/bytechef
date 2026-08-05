@@ -77,7 +77,9 @@ public class UpdateAiHubPersonalAgentToolCallback implements ToolCallback {
             UpdateAiHubPersonalAgentInput input =
                 jsonMapper.readValue(toolInput, UpdateAiHubPersonalAgentInput.class);
 
-            if (input.aiHubPersonalAgentId() == null) {
+            Long aiHubPersonalAgentId = input.aiHubPersonalAgentId();
+
+            if (aiHubPersonalAgentId == null) {
                 return ToolErrors.toolError(jsonMapper, "aiHubPersonalAgentId is required");
             }
 
@@ -89,7 +91,10 @@ public class UpdateAiHubPersonalAgentToolCallback implements ToolCallback {
             AiHubToolInvocationContext context =
                 AiHubToolInvocationContext.fromToolContext(toolContext);
 
-            if (context == null || context.workspaceId() == null || context.userId() == null) {
+            Long workspaceId = context == null ? null : context.workspaceId();
+            Long userId = context == null ? null : context.userId();
+
+            if (workspaceId == null || userId == null) {
                 return ToolErrors.toolError(jsonMapper,
                     "Workspace context unavailable — open this chat from the AI Hub of a workspace.");
             }
@@ -98,7 +103,7 @@ public class UpdateAiHubPersonalAgentToolCallback implements ToolCallback {
                 // The agent-update tool callback doesn't expose per-agent LLM model selection (admin-only via UI).
                 // Pass null/null to leave the override fields untouched.
                 AiHubPersonalAgent agent = aiHubPersonalAgentService.update(
-                    input.aiHubPersonalAgentId(), context.workspaceId(), context.userId(), input.title(),
+                    aiHubPersonalAgentId, workspaceId, userId, input.title(),
                     input.description(), input.instructions(), null, null);
 
                 return jsonMapper.writeValueAsString(

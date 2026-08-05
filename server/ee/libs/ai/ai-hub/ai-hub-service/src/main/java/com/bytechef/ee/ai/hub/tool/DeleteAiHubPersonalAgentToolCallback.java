@@ -75,24 +75,28 @@ public class DeleteAiHubPersonalAgentToolCallback implements ToolCallback {
             DeleteAiHubPersonalAgentInput input =
                 jsonMapper.readValue(toolInput, DeleteAiHubPersonalAgentInput.class);
 
-            if (input.aiHubPersonalAgentId() == null) {
+            Long aiHubPersonalAgentId = input.aiHubPersonalAgentId();
+
+            if (aiHubPersonalAgentId == null) {
                 return ToolErrors.toolError(jsonMapper, "aiHubPersonalAgentId is required");
             }
 
             AiHubToolInvocationContext context =
                 AiHubToolInvocationContext.fromToolContext(toolContext);
 
-            if (context == null || context.workspaceId() == null || context.userId() == null) {
+            Long workspaceId = context == null ? null : context.workspaceId();
+            Long userId = context == null ? null : context.userId();
+
+            if (workspaceId == null || userId == null) {
                 return ToolErrors.toolError(jsonMapper,
                     "Workspace context unavailable — open this chat from the AI Hub of a workspace.");
             }
 
             try {
-                aiHubPersonalAgentService.delete(input.aiHubPersonalAgentId(), context.workspaceId(),
-                    context.userId());
+                aiHubPersonalAgentService.delete(aiHubPersonalAgentId, workspaceId, userId);
 
                 return jsonMapper.writeValueAsString(
-                    new DeleteAiHubPersonalAgentOutput(true, input.aiHubPersonalAgentId()));
+                    new DeleteAiHubPersonalAgentOutput(true, aiHubPersonalAgentId));
             } catch (IllegalArgumentException invalid) {
                 return ToolErrors.toolError(jsonMapper, invalid.getMessage());
             }

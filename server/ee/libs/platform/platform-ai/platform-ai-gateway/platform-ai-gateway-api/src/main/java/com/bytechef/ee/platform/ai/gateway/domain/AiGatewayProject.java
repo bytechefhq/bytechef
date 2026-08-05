@@ -22,7 +22,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @version ee
  */
 @Table("ai_gateway_project")
-public class AiGatewayProject {
+public final class AiGatewayProject {
 
     @Column("caching_enabled")
     private Boolean cachingEnabled;

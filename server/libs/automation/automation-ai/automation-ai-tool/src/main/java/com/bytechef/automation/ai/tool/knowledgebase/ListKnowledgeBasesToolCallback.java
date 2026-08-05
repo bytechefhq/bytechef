@@ -88,7 +88,7 @@ public class ListKnowledgeBasesToolCallback implements ToolCallback {
             AgentToolInvocationContext invocationContext =
                 AgentToolInvocationContext.fromToolContext(toolContext);
 
-            Long workspaceId = invocationContext.workspaceId();
+            Long workspaceId = invocationContext == null ? null : invocationContext.workspaceId();
 
             if (workspaceId == null) {
                 return toolError(

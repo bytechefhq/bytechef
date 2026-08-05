@@ -35,7 +35,7 @@ public class WorkerDiscoveryUtils {
         for (ServiceInstance serviceInstance : serviceInstances) {
             Map<String, String> metadataMap = serviceInstance.getMetadata();
 
-            List<String> componentNames = getComponentNames(metadataMap);
+            List<String> componentNames = metadataMap == null ? List.of() : getComponentNames(metadataMap);
 
             for (String curComponentName : componentNames) {
                 if (curComponentName.equalsIgnoreCase(componentName)) {
@@ -79,7 +79,7 @@ public class WorkerDiscoveryUtils {
         for (ServiceInstance serviceInstance : serviceInstances) {
             Map<String, String> metadataMap = serviceInstance.getMetadata();
 
-            List<String> componentNames = getComponentNames(metadataMap);
+            List<String> componentNames = metadataMap == null ? List.of() : getComponentNames(metadataMap);
 
             for (String componentName : componentNames) {
                 componentNameInstanceIds.compute(componentName, (key, instanceIds) -> {

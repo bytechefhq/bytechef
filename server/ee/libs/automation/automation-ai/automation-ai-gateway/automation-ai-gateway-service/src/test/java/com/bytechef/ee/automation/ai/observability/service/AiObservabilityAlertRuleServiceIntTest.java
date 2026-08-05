@@ -66,14 +66,16 @@ public class AiObservabilityAlertRuleServiceIntTest {
     public void testCreateAlertRuleWithChannelAndSnoozeUnsnooze() {
         // Delivery targets are platform Notification rows post channel migration; insert one directly since the
         // gateway test context does not wire the CE notification service stack.
-        Long notificationId = jdbcTemplate.queryForObject(
-            """
-                INSERT INTO notification (
-                    name, type, settings, created_by, created_date, last_modified_by, last_modified_date, version)
-                VALUES ('ops-email', 0, '{"email": "ops@example.com"}', 'system', now(), 'system', now(), 1)
-                RETURNING id
-                """,
-            Long.class);
+        Long notificationId = Validate.notNull(
+            jdbcTemplate.queryForObject(
+                """
+                    INSERT INTO notification (
+                        name, type, settings, created_by, created_date, last_modified_by, last_modified_date, version)
+                    VALUES ('ops-email', 0, '{"email": "ops@example.com"}', 'system', now(), 'system', now(), 1)
+                    RETURNING id
+                    """,
+                Long.class),
+            "notificationId");
 
         AiObservabilityAlertRule rule = new AiObservabilityAlertRule(
             "high-error-rate",

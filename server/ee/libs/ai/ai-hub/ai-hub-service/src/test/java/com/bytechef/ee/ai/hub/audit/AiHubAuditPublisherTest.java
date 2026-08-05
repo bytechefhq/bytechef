@@ -14,6 +14,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.util.Map;
@@ -85,8 +86,10 @@ class AiHubAuditPublisherTest {
 
         publisher.publish(AiHubAuditEvent.AI_HUB_PERSONAL_AGENT_CREATED, Map.of("workspaceId", "1"));
 
-        assertThat(meterRegistry.find("bytechef_ai_hub_audit_failed")
-            .counter()
-            .count()).isEqualTo(1.0);
+        Counter counter = meterRegistry.find("bytechef_ai_hub_audit_failed")
+            .counter();
+
+        assertThat(counter).isNotNull();
+        assertThat(counter.count()).isEqualTo(1.0);
     }
 }

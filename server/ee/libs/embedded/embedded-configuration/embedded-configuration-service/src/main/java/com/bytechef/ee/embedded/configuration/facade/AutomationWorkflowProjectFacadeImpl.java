@@ -384,7 +384,8 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         return categoryService.getCategories()
             .stream()
             .filter(category -> categoryIds.contains(category.getId()))
-            .map(category -> new AutomationWorkflowProjectCategoryDTO(category.getId(), category.getName()))
+            .map(category -> new AutomationWorkflowProjectCategoryDTO(
+                Objects.requireNonNull(category.getId(), "category id"), category.getName()))
             .toList();
     }
 
@@ -398,7 +399,8 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         return tagService.getTags()
             .stream()
             .filter(tag -> tagIds.contains(tag.getId()))
-            .map(tag -> new AutomationWorkflowProjectTagDTO(tag.getId(), tag.getName()))
+            .map(tag -> new AutomationWorkflowProjectTagDTO(
+                Objects.requireNonNull(tag.getId(), "tag id"), tag.getName()))
             .toList();
     }
 

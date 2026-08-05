@@ -22,6 +22,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.platform.security.web.mcp.McpApiKeyCredentials;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.Objects;
 import org.junit.jupiter.api.Test;
 import org.springaicommunity.mcp.security.server.apikey.authentication.ApiKeyAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -58,8 +59,10 @@ class A2aApiKeyAuthenticationConverterTest {
 
         when(request.getServletPath()).thenReturn("/api/automation/a2a/SECRET123");
 
-        McpApiKeyCredentials credentials = (McpApiKeyCredentials) converter.convert(request)
-            .getCredentials();
+        Authentication authentication = Objects.requireNonNull(converter.convert(request), "authentication");
+
+        McpApiKeyCredentials credentials = (McpApiKeyCredentials) Objects.requireNonNull(
+            authentication.getCredentials(), "credentials");
 
         assertThat(credentials.getSecret()).isNull();
     }
@@ -71,8 +74,10 @@ class A2aApiKeyAuthenticationConverterTest {
         when(request.getServletPath()).thenReturn("/api/automation/a2a/SECRET123");
         when(request.getHeader("Authorization")).thenReturn("Bearer the-api-key");
 
-        McpApiKeyCredentials credentials = (McpApiKeyCredentials) converter.convert(request)
-            .getCredentials();
+        Authentication authentication = Objects.requireNonNull(converter.convert(request), "authentication");
+
+        McpApiKeyCredentials credentials = (McpApiKeyCredentials) Objects.requireNonNull(
+            authentication.getCredentials(), "credentials");
 
         assertThat(credentials.getSecret()).isEqualTo("the-api-key");
     }
@@ -80,7 +85,8 @@ class A2aApiKeyAuthenticationConverterTest {
     private static String serverSecretKey(Authentication authentication) {
         ApiKeyAuthenticationToken apiKeyAuthenticationToken = (ApiKeyAuthenticationToken) authentication;
 
-        McpApiKeyCredentials credentials = (McpApiKeyCredentials) apiKeyAuthenticationToken.getCredentials();
+        McpApiKeyCredentials credentials = (McpApiKeyCredentials) Objects.requireNonNull(
+            apiKeyAuthenticationToken.getCredentials(), "credentials");
 
         return credentials.getMcpServerSecretKey();
     }

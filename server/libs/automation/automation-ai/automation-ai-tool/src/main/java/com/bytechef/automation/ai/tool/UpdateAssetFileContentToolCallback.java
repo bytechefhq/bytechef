@@ -110,18 +110,21 @@ public class UpdateAssetFileContentToolCallback implements ToolCallback {
         try {
             UpdateAssetFileContentInput input = jsonMapper.readValue(toolInput, UpdateAssetFileContentInput.class);
 
-            if (input.assetFileId() == null) {
+            Long assetFileId = input.assetFileId();
+
+            if (assetFileId == null) {
                 return toolError("assetFileId is required");
             }
 
-            if (input.content() == null) {
+            String content = input.content();
+
+            if (content == null) {
                 return toolError("content is required");
             }
 
             // Same pre-encode allocation cap as createAssetFile: reject a runaway multi-GB payload before
             // getBytes(UTF_8) can allocate it.
-            long estimatedEncodedBytes = (long) input.content()
-                .length() * UTF8_MAX_BYTES_PER_CHAR;
+            long estimatedEncodedBytes = (long) content.length() * UTF8_MAX_BYTES_PER_CHAR;
 
             if (estimatedEncodedBytes > maxContentBytes) {
                 return toolError(
@@ -141,23 +144,24 @@ public class UpdateAssetFileContentToolCallback implements ToolCallback {
             AssetFile existingAssetFile;
 
             try {
-                existingAssetFile = facade.findByIdInWorkspace(input.assetFileId(), workspaceId);
+                existingAssetFile = facade.findByIdInWorkspace(assetFileId, workspaceId);
             } catch (AssetFileNotFoundException exception) {
-                return toolError("File %d not found in the current workspace.".formatted(input.assetFileId()));
+                return toolError("File %d not found in the current workspace.".formatted(assetFileId));
             }
 
-            String contentType = input.mimeType() != null && !input.mimeType()
-                .isBlank() ? input.mimeType() : existingAssetFile.getMimeType();
+            String mimeType = input.mimeType();
+            String contentType = mimeType != null && !mimeType.isBlank() ? mimeType : existingAssetFile.getMimeType();
 
-            byte[] contentBytes = input.content()
-                .getBytes(StandardCharsets.UTF_8);
+            byte[] contentBytes = content.getBytes(StandardCharsets.UTF_8);
 
             AssetFile updated = facade.updateContent(
-                input.assetFileId(), contentType, new ByteArrayInputStream(contentBytes));
+                assetFileId, contentType, new ByteArrayInputStream(contentBytes));
 
-            if (artifactRecorder != null && invocationContext.threadId() != null) {
+            String threadId = invocationContext.threadId();
+
+            if (artifactRecorder != null && threadId != null) {
                 artifactRecorder.record(
-                    invocationContext.threadId(), invocationContext.userId(), "FILE_UPDATED",
+                    threadId, invocationContext.userId(), "FILE_UPDATED",
                     String.valueOf(updated.getId()), updated.getName());
             }
 

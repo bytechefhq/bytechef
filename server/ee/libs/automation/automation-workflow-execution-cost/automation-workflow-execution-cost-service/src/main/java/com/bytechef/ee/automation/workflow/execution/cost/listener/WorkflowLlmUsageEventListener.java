@@ -87,14 +87,13 @@ public class WorkflowLlmUsageEventListener {
     }
 
     private Long resolveWorkspaceId(WorkflowLlmUsageEvent workflowLlmUsageEvent) {
-        if (workflowLlmUsageEvent.type() != PlatformType.AUTOMATION ||
-            workflowLlmUsageEvent.jobPrincipalId() == null) {
+        Long jobPrincipalId = workflowLlmUsageEvent.jobPrincipalId();
 
+        if (workflowLlmUsageEvent.type() != PlatformType.AUTOMATION || jobPrincipalId == null) {
             return null;
         }
 
-        ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(
-            workflowLlmUsageEvent.jobPrincipalId());
+        ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(jobPrincipalId);
 
         Project project = projectService.getProject(projectDeployment.getProjectId());
 

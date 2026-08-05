@@ -107,13 +107,15 @@ public class AddDataTableRowToolCallback implements ToolCallback {
         try {
             AddDataTableRowInput input = jsonMapper.readValue(toolInput, AddDataTableRowInput.class);
 
-            if (input.dataTableId() == null || input.dataTableId()
-                .isBlank()) {
+            String dataTableIdString = input.dataTableId();
+
+            if (dataTableIdString == null || dataTableIdString.isBlank()) {
                 return toolError("dataTableId is required");
             }
 
-            if (input.values() == null || input.values()
-                .isEmpty()) {
+            Map<String, Object> values = input.values();
+
+            if (values == null || values.isEmpty()) {
                 return toolError("values must not be empty");
             }
 
@@ -130,7 +132,7 @@ public class AddDataTableRowToolCallback implements ToolCallback {
             long dataTableId;
 
             try {
-                dataTableId = Long.parseLong(input.dataTableId());
+                dataTableId = Long.parseLong(dataTableIdString);
             } catch (NumberFormatException exception) {
                 return toolError("Invalid dataTableId - must be a numeric id obtained from listDataTables");
             }
@@ -141,10 +143,10 @@ public class AddDataTableRowToolCallback implements ToolCallback {
 
             if (tableInfo == null) {
                 return toolError(
-                    "Data table " + input.dataTableId() + " not found in the current workspace.");
+                    "Data table " + dataTableIdString + " not found in the current workspace.");
             }
 
-            DataTableRow inserted = dataTableRowService.insertRow(tableInfo.baseName(), input.values(), environmentId);
+            DataTableRow inserted = dataTableRowService.insertRow(tableInfo.baseName(), values, environmentId);
 
             recordArtifact(invocationContext, tableInfo.baseName(), inserted.id());
 

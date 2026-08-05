@@ -161,7 +161,7 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
 
     private record PerformRequest(
         String componentName, int componentVersion, String actionName, PlatformType type, Long jobPrincipalId,
-        Long jobPrincipalWorkflowId, long jobId, Long taskExecutionId, String workflowId,
+        Long jobPrincipalWorkflowId, Long jobId, Long taskExecutionId, String workflowId,
         Map<String, ?> inputParameters, Map<String, Long> connectionIds, Map<String, Long> extensions,
         Long environmentId) {
     }

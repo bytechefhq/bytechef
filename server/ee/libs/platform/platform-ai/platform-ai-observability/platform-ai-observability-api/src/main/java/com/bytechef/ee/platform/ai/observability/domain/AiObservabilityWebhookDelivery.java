@@ -19,7 +19,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @version ee
  */
 @Table("ai_observability_webhook_delivery")
-public class AiObservabilityWebhookDelivery {
+public final class AiObservabilityWebhookDelivery {
 
     @Column("attempt_count")
     private int attemptCount;

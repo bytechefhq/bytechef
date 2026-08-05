@@ -23,7 +23,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @version ee
  */
 @Table("ai_gateway_model")
-public class AiGatewayModel {
+public final class AiGatewayModel {
 
     @Column
     private String alias;

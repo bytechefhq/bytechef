@@ -33,7 +33,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @version ee
  */
 @Table("ai_observability_webhook_subscription")
-public class AiObservabilityWebhookSubscription {
+public final class AiObservabilityWebhookSubscription {
 
     /**
      * Maximum stored length of {@link #lastDeliveryError} — must match the {@code VARCHAR} cap in the Liquibase

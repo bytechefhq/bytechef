@@ -25,7 +25,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @version ee
  */
 @Table("ai_eval_dataset_item")
-public class AiEvalDatasetItem {
+public final class AiEvalDatasetItem {
 
     @CreatedDate
     @Column("created_date")

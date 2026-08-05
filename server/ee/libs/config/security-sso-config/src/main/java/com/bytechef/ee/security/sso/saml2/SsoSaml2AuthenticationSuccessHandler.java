@@ -20,6 +20,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.saml2.provider.service.authentication.Saml2AuthenticatedPrincipal;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -53,7 +54,8 @@ public class SsoSaml2AuthenticationSuccessHandler implements AuthenticationSucce
         HttpServletRequest request, HttpServletResponse response, Authentication authentication)
         throws IOException {
 
-        Saml2AuthenticatedPrincipal principal = (Saml2AuthenticatedPrincipal) authentication.getPrincipal();
+        Saml2AuthenticatedPrincipal principal = (Saml2AuthenticatedPrincipal) Objects.requireNonNull(
+            authentication.getPrincipal(), "principal");
 
         String email = extractEmail(principal);
         String firstName = extractFirstAttribute(principal,

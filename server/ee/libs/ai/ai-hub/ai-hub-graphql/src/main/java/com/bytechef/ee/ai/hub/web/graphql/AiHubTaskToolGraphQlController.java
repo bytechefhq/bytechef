@@ -170,7 +170,9 @@ public class AiHubTaskToolGraphQlController {
         AiHubTask task = taskService.getByThreadId(
             input.taskId(), input.workspaceId(), userId);
 
-        int componentVersion = input.componentVersion() == null ? DEFAULT_COMPONENT_VERSION : input.componentVersion();
+        Integer inputComponentVersion = input.componentVersion();
+
+        int componentVersion = inputComponentVersion == null ? DEFAULT_COMPONENT_VERSION : inputComponentVersion;
 
         long taskComponentId = taskToolFacade.attachComponent(
             task.getId(), input.componentName(), componentVersion, input.connectionId(),

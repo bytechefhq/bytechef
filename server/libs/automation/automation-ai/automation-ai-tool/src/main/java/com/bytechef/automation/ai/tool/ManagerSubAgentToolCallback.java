@@ -97,8 +97,9 @@ public class ManagerSubAgentToolCallback implements ToolCallback {
         try {
             ManagerSubAgentInput input = jsonMapper.readValue(toolInput, ManagerSubAgentInput.class);
 
-            if (input.request() == null || input.request()
-                .isBlank()) {
+            String request = input.request();
+
+            if (request == null || request.isBlank()) {
                 return ToolErrors.toolError(jsonMapper, "request is required and must not be blank");
             }
 
@@ -111,13 +112,13 @@ public class ManagerSubAgentToolCallback implements ToolCallback {
             Map<String, Object> forwardedContext = toolContext == null ? Map.of() : toolContext.getContext();
 
             String response = CurrentAgentContext.callWith(agentType, parentAgent,
-                () -> chatClient.prompt(input.request())
+                () -> chatClient.prompt(request)
                     .toolContext(forwardedContext)
                     .call()
                     .content());
 
             if (response == null) {
-                log.warn("{} subagent returned null for request='{}'", agentType.key(), input.request());
+                log.warn("{} subagent returned null for request='{}'", agentType.key(), request);
 
                 return ToolErrors.toolError(jsonMapper, agentType.key() + " subagent returned null");
             }

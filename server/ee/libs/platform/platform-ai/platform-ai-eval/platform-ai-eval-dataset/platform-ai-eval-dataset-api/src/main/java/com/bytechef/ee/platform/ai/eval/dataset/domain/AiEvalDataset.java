@@ -29,7 +29,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @version ee
  */
 @Table("ai_eval_dataset")
-public class AiEvalDataset {
+public final class AiEvalDataset {
 
     @Column("archived_date")
     private Instant archivedDate;

@@ -18,7 +18,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @version ee
  */
 @Table("ai_gateway_model_deployment")
-public class AiGatewayModelDeployment {
+public final class AiGatewayModelDeployment {
 
     @Column
     private boolean enabled;

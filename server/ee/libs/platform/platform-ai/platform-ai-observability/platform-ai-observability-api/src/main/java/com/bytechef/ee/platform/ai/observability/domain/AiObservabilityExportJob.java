@@ -20,7 +20,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @version ee
  */
 @Table("ai_observability_export_job")
-public class AiObservabilityExportJob {
+public final class AiObservabilityExportJob {
 
     @Column("created_by")
     private String createdBy;

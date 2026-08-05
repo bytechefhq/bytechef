@@ -99,16 +99,17 @@ public class DocxArtifactGenerator implements ArtifactGenerator {
             request.generatedFromPrompt());
 
         boolean linked = false;
+        Long taskId = request.taskId();
 
-        if (request.taskId() != null) {
+        if (taskId != null) {
             try {
-                taskAssetFileService.recordAuthorship(request.taskId(), saved.getId());
+                taskAssetFileService.recordAuthorship(taskId, saved.getId());
                 linked = true;
             } catch (AuthorshipAlreadyAssignedException exception) {
                 log.warn(
                     "Generated DOCX asset_file {} already authored by another task; skipping AUTHORED join "
                         + "for task {}",
-                    saved.getId(), request.taskId(), exception);
+                    saved.getId(), taskId, exception);
             }
         }
 
@@ -140,8 +141,9 @@ public class DocxArtifactGenerator implements ArtifactGenerator {
         try (XWPFDocument doc = new XWPFDocument();
             ByteArrayOutputStream output = new ByteArrayOutputStream()) {
 
-            if (spec.title() != null && !spec.title()
-                .isBlank()) {
+            String title = spec.title();
+
+            if (title != null && !title.isBlank()) {
                 XWPFParagraph titleParagraph = doc.createParagraph();
 
                 titleParagraph.setAlignment(ParagraphAlignment.CENTER);
@@ -150,27 +152,32 @@ public class DocxArtifactGenerator implements ArtifactGenerator {
 
                 titleRun.setBold(true);
                 titleRun.setFontSize(20);
-                titleRun.setText(spec.title());
+                titleRun.setText(title);
             }
 
-            if (spec.sections() != null) {
-                for (DocxSection section : spec.sections()) {
+            List<DocxSection> sections = spec.sections();
+
+            if (sections != null) {
+                for (DocxSection section : sections) {
                     if (section == null) {
                         continue;
                     }
 
-                    if (section.heading() != null && !section.heading()
-                        .isBlank()) {
+                    String heading = section.heading();
+
+                    if (heading != null && !heading.isBlank()) {
                         XWPFParagraph headingParagraph = doc.createParagraph();
                         XWPFRun headingRun = headingParagraph.createRun();
 
                         headingRun.setBold(true);
                         headingRun.setFontSize(14);
-                        headingRun.setText(section.heading());
+                        headingRun.setText(heading);
                     }
 
-                    if (section.paragraphs() != null) {
-                        for (String paragraph : section.paragraphs()) {
+                    List<String> paragraphs = section.paragraphs();
+
+                    if (paragraphs != null) {
+                        for (String paragraph : paragraphs) {
                             if (paragraph == null) {
                                 continue;
                             }

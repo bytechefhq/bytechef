@@ -35,7 +35,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @version ee
  */
 @Table("ai_eval_score")
-public class AiEvalScore {
+public final class AiEvalScore {
 
     private String comment;
 

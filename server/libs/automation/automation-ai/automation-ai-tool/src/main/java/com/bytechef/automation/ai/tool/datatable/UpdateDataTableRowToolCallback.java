@@ -110,18 +110,21 @@ public class UpdateDataTableRowToolCallback implements ToolCallback {
         try {
             UpdateDataTableRowInput input = jsonMapper.readValue(toolInput, UpdateDataTableRowInput.class);
 
-            if (input.dataTableId() == null || input.dataTableId()
-                .isBlank()) {
+            String dataTableIdString = input.dataTableId();
+
+            if (dataTableIdString == null || dataTableIdString.isBlank()) {
                 return toolError("dataTableId is required");
             }
 
-            if (input.rowId() == null || input.rowId()
-                .isBlank()) {
+            String rowIdString = input.rowId();
+
+            if (rowIdString == null || rowIdString.isBlank()) {
                 return toolError("rowId is required");
             }
 
-            if (input.values() == null || input.values()
-                .isEmpty()) {
+            Map<String, Object> values = input.values();
+
+            if (values == null || values.isEmpty()) {
                 return toolError("values must not be empty");
             }
 
@@ -138,7 +141,7 @@ public class UpdateDataTableRowToolCallback implements ToolCallback {
             long dataTableId;
 
             try {
-                dataTableId = Long.parseLong(input.dataTableId());
+                dataTableId = Long.parseLong(dataTableIdString);
             } catch (NumberFormatException exception) {
                 return toolError("Invalid dataTableId - must be a numeric id obtained from listDataTables");
             }
@@ -146,7 +149,7 @@ public class UpdateDataTableRowToolCallback implements ToolCallback {
             long rowId;
 
             try {
-                rowId = Long.parseLong(input.rowId());
+                rowId = Long.parseLong(rowIdString);
             } catch (NumberFormatException exception) {
                 return toolError("Invalid rowId - must be a numeric id");
             }
@@ -157,16 +160,16 @@ public class UpdateDataTableRowToolCallback implements ToolCallback {
 
             if (tableInfo == null) {
                 return toolError(
-                    "Data table " + input.dataTableId() + " not found in the current workspace.");
+                    "Data table " + dataTableIdString + " not found in the current workspace.");
             }
 
             String baseName = tableInfo.baseName();
 
             DataTableRow priorRow = dataTableRowService.getRow(baseName, rowId, environmentId);
 
-            DataTableRow updated = dataTableRowService.updateRow(baseName, rowId, input.values(), environmentId);
+            DataTableRow updated = dataTableRowService.updateRow(baseName, rowId, values, environmentId);
 
-            recordArtifact(invocationContext, baseName, input.dataTableId(), environmentId, priorRow, updated.id());
+            recordArtifact(invocationContext, baseName, dataTableIdString, environmentId, priorRow, updated.id());
 
             return jsonMapper.writeValueAsString(new UpdateDataTableRowOutput(true, updated.id()));
         } catch (JacksonException exception) {

@@ -25,7 +25,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @version ee
  */
 @Table("ai_eval_experiment_run")
-public class AiEvalExperimentRun {
+public final class AiEvalExperimentRun {
 
     private static final AiEvalExperimentRunStatus[] STATUS_VALUES = AiEvalExperimentRunStatus.values();
 

@@ -22,7 +22,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @version ee
  */
 @Table("ai_gateway_rate_limit")
-public class AiGatewayRateLimit {
+public final class AiGatewayRateLimit {
 
     @Column("created_date")
     @CreatedDate

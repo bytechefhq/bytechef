@@ -153,13 +153,15 @@ public class CreateContextStoreSourceToolCallback implements ToolCallback {
                 return toolError("contextStoreId is required");
             }
 
+            Integer sourceComponentVersion = input.sourceComponentVersion();
+
             CreateContextStoreSourceInput facadeInput = new CreateContextStoreSourceInput(
                 input.contextStoreId(),
                 input.name(),
                 input.entityName(),
                 input.description(),
                 input.sourceComponentName(),
-                input.sourceComponentVersion() == null ? 1 : input.sourceComponentVersion(),
+                sourceComponentVersion == null ? 1 : sourceComponentVersion,
                 input.sourceClusterElementName(),
                 input.connectionId(),
                 input.cadence(),

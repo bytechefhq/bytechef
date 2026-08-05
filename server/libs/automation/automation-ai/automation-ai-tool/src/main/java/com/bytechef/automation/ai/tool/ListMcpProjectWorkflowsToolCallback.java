@@ -117,13 +117,15 @@ public class ListMcpProjectWorkflowsToolCallback implements ToolCallback {
         try {
             ListMcpProjectWorkflowsInput input = jsonMapper.readValue(toolInput, ListMcpProjectWorkflowsInput.class);
 
-            if (input.mcpServerId() == null) {
+            Long mcpServerId = input.mcpServerId();
+
+            if (mcpServerId == null) {
                 return ToolErrors.toolError(jsonMapper, "mcpServerId is required");
             }
 
             List<McpProjectWorkflowSummary> summaries = new ArrayList<>();
 
-            for (McpProject mcpProject : mcpProjectService.getMcpServerMcpProjects(input.mcpServerId())) {
+            for (McpProject mcpProject : mcpProjectService.getMcpServerMcpProjects(mcpServerId)) {
                 for (McpProjectWorkflow mcpProjectWorkflow : mcpProjectWorkflowService.getMcpProjectMcpProjectWorkflows(
                     mcpProject.getId())) {
 

@@ -26,7 +26,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @version ee
  */
 @Table("ai_gateway_routing_policy")
-public class AiGatewayRoutingPolicy {
+public final class AiGatewayRoutingPolicy {
 
     @Column
     private String config;

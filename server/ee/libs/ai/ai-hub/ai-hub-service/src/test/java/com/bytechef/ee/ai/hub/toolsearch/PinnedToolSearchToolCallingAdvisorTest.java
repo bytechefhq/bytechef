@@ -23,6 +23,7 @@ import com.bytechef.platform.connection.service.ConnectionService;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -291,12 +292,18 @@ class PinnedToolSearchToolCallingAdvisorTest {
     }
 
     private static List<String> toolNames(ChatClientRequest chatClientRequest) {
-        return ((ToolCallingChatOptions) chatClientRequest.prompt()
-            .getOptions()).getToolCallbacks()
-                .stream()
-                .map(toolCallback -> toolCallback.getToolDefinition()
-                    .name())
-                .toList();
+        Prompt prompt = chatClientRequest.prompt();
+
+        ToolCallingChatOptions toolCallingChatOptions = (ToolCallingChatOptions) Objects.requireNonNull(
+            prompt.getOptions(), "prompt options");
+
+        List<ToolCallback> toolCallbacks = Objects.requireNonNull(
+            toolCallingChatOptions.getToolCallbacks(), "tool callbacks");
+
+        return toolCallbacks.stream()
+            .map(toolCallback -> toolCallback.getToolDefinition()
+                .name())
+            .toList();
     }
 
     private static ToolCallback toolCallback(String name) {

@@ -40,6 +40,7 @@ import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.workflow.execution.dto.WorkflowExecutionDTO;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.evaluator.Evaluator;
+import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -356,15 +357,17 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
             TriggerExecution triggerExecution =
                 deploymentId == null ? null : triggerExecutionByJobIdMap.get(jobId);
 
-            Map<String, ?> outputs = job.getOutputs() == null
+            FileEntry jobOutputs = job.getOutputs();
+
+            Map<String, ?> outputs = jobOutputs == null
                 ? null
-                : taskFileStorage.readJobOutputs(job.getOutputs());
+                : taskFileStorage.readJobOutputs(jobOutputs);
 
             workflowExecutionDTOs.add(new WorkflowExecutionDTO(
                 Validate.notNull(job.getId(), "id"),
                 projectOptional.get(),
                 jobProjectDeployment,
-                new JobDTO(job, outputs, getSubflowJobTaskExecutions(job.getId())),
+                new JobDTO(job, outputs, getSubflowJobTaskExecutions(jobId)),
                 workflowOptional.get(),
                 getTriggerExecutionDTO(deploymentId, triggerExecution, job)));
         }

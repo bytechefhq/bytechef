@@ -16,6 +16,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.platform.audit.AuditCaptureFailedException;
+import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.lang.reflect.Method;
@@ -95,9 +96,11 @@ class AiHubAuditAspectTest {
         assertThatThrownBy(() -> aspect.audit(joinPoint, annotation, null))
             .isInstanceOf(AuditCaptureFailedException.class);
 
-        assertThat(meterRegistry.find("bytechef_ai_hub_audit_failed")
-            .counter()
-            .count()).isEqualTo(1.0);
+        Counter counter = meterRegistry.find("bytechef_ai_hub_audit_failed")
+            .counter();
+
+        assertThat(counter).isNotNull();
+        assertThat(counter.count()).isEqualTo(1.0);
     }
 
     @Test
@@ -120,9 +123,11 @@ class AiHubAuditAspectTest {
 
         verify(publisher, org.mockito.Mockito.never()).publish(any(), any());
 
-        assertThat(meterRegistry.find("bytechef_ai_hub_audit_failed")
-            .counter()
-            .count()).isEqualTo(1.0);
+        Counter counter = meterRegistry.find("bytechef_ai_hub_audit_failed")
+            .counter();
+
+        assertThat(counter).isNotNull();
+        assertThat(counter.count()).isEqualTo(1.0);
     }
 
     private JoinPoint joinPointFor(Class<?> type, String name, Class<?>[] paramTypes, Object[] args)

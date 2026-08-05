@@ -17,6 +17,8 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -88,12 +90,24 @@ public class ApiConnectorAiServiceImpl implements ApiConnectorAiService {
 
         Prompt prompt = new Prompt(SYSTEM_PROMPT + "\n\nUser: " + userPrompt);
 
-        String response = chatModel.call(prompt)
-            .getResult()
-            .getOutput()
-            .getText();
+        String response = extractResponseText(chatModel.call(prompt));
 
         return cleanOpenApiResponse(response);
+    }
+
+    private static String extractResponseText(ChatResponse chatResponse) {
+        Generation generation = chatResponse.getResult();
+
+        String text = generation == null ? null
+            : generation.getOutput()
+                .getText();
+
+        if (text == null) {
+            throw new ConfigurationException(
+                "AI model returned an empty response", ApiConnectorErrorType.INVALID_API_CONNECTOR_DEFINITION);
+        }
+
+        return text;
     }
 
     private String fetchDocumentation(String documentationUrl) {
@@ -184,10 +198,7 @@ public class ApiConnectorAiServiceImpl implements ApiConnectorAiService {
 
             Prompt prompt = new Prompt(SYSTEM_PROMPT + "\n\nUser: " + promptMessage);
 
-            String response = chatModel.call(prompt)
-                .getResult()
-                .getOutput()
-                .getText();
+            String response = extractResponseText(chatModel.call(prompt));
 
             if (apiConnectorGenerationJobService.isCancellationRequested(jobId)) {
                 log.debug("Job {} was cancelled after AI generation", jobId);

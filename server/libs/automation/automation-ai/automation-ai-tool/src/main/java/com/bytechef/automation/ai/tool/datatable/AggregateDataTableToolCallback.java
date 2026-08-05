@@ -141,25 +141,28 @@ public class AggregateDataTableToolCallback implements ToolCallback {
         try {
             AggregateDataTableInput input = jsonMapper.readValue(toolInput, AggregateDataTableInput.class);
 
-            if (input.dataTableId() == null || input.dataTableId()
-                .isBlank()) {
+            String dataTableIdString = input.dataTableId();
+
+            if (dataTableIdString == null || dataTableIdString.isBlank()) {
                 return toolError("dataTableId is required");
             }
 
-            if (input.aggregations() == null || input.aggregations()
-                .isEmpty()) {
+            List<AggregationSpec> aggregations = input.aggregations();
+
+            if (aggregations == null || aggregations.isEmpty()) {
                 return toolError("aggregations is required and must contain at least one entry");
             }
 
-            for (AggregationSpec aggregationSpec : input.aggregations()) {
+            for (AggregationSpec aggregationSpec : aggregations) {
                 if (!VALID_AGGREGATION_FUNCTIONS.contains(aggregationSpec.fn())) {
                     return toolError(
                         "Unknown aggregation function: '" + aggregationSpec.fn()
                             + "'. Valid values: sum, avg, count, min, max");
                 }
 
-                if (aggregationSpec.column() == null || aggregationSpec.column()
-                    .isBlank()) {
+                String aggregationColumn = aggregationSpec.column();
+
+                if (aggregationColumn == null || aggregationColumn.isBlank()) {
                     return toolError("aggregation column must not be blank (use \"*\" for count-all)");
                 }
             }
@@ -167,7 +170,7 @@ public class AggregateDataTableToolCallback implements ToolCallback {
             AgentToolInvocationContext invocationContext =
                 AgentToolInvocationContext.fromToolContext(toolContext);
 
-            Long workspaceId = invocationContext.workspaceId();
+            Long workspaceId = invocationContext == null ? null : invocationContext.workspaceId();
 
             if (workspaceId == null) {
                 return toolError(
@@ -177,7 +180,7 @@ public class AggregateDataTableToolCallback implements ToolCallback {
             long dataTableId;
 
             try {
-                dataTableId = Long.parseLong(input.dataTableId());
+                dataTableId = Long.parseLong(dataTableIdString);
             } catch (NumberFormatException exception) {
                 return toolError("Invalid dataTableId - must be a numeric id obtained from listDataTables");
             }
@@ -185,7 +188,7 @@ public class AggregateDataTableToolCallback implements ToolCallback {
             String baseName = dataTableService.getBaseNameById(dataTableId);
 
             if (baseName == null || baseName.isBlank()) {
-                return toolError("Data table not found: " + input.dataTableId());
+                return toolError("Data table not found: " + dataTableIdString);
             }
 
             long environmentId = resolveEnvironmentId(invocationContext);
@@ -199,7 +202,7 @@ public class AggregateDataTableToolCallback implements ToolCallback {
                 .map(DataTableRow::values)
                 .toList();
 
-            List<Map<String, Object>> results = computeAggregations(rowValues, input.groupBy(), input.aggregations());
+            List<Map<String, Object>> results = computeAggregations(rowValues, input.groupBy(), aggregations);
 
             for (Map<String, Object> resultRow : results) {
                 resultRow.put("scannedRows", scannedRows);

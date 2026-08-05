@@ -66,7 +66,7 @@ class OtlpCostResolverTest {
 
         // The MODEL_NOT_REGISTERED reason tag is the operational signal — confirm the counter is wired so a
         // future regression that silently drops the increment is caught.
-        assertThat(registry.find("bytechef_ai_otlp_cost_unresolved")
+        assertThat(registry.get("bytechef_ai_otlp_cost_unresolved")
             .tag("reason", "MODEL_NOT_REGISTERED")
             .counter()
             .count()).isEqualTo(1.0);
@@ -81,7 +81,7 @@ class OtlpCostResolverTest {
 
         assertThat(resolver.computeCost("gpt-4o", null, null)).isNull();
 
-        assertThat(registry.find("bytechef_ai_otlp_cost_unresolved")
+        assertThat(registry.get("bytechef_ai_otlp_cost_unresolved")
             .tag("reason", "MISSING_TOKENS")
             .counter()
             .count()).isEqualTo(1.0);
@@ -98,11 +98,11 @@ class OtlpCostResolverTest {
         assertThat(resolver.computeCost("gpt-4o", null, 100)).isNull();
         assertThat(resolver.computeCost("gpt-4o", 100, null)).isNull();
 
-        assertThat(registry.find("bytechef_ai_otlp_cost_unresolved")
+        assertThat(registry.get("bytechef_ai_otlp_cost_unresolved")
             .tag("reason", "MISSING_INPUT_TOKENS")
             .counter()
             .count()).isEqualTo(1.0);
-        assertThat(registry.find("bytechef_ai_otlp_cost_unresolved")
+        assertThat(registry.get("bytechef_ai_otlp_cost_unresolved")
             .tag("reason", "MISSING_OUTPUT_TOKENS")
             .counter()
             .count()).isEqualTo(1.0);
@@ -164,7 +164,7 @@ class OtlpCostResolverTest {
 
             // Counter must still increment for every span — dashboards see true volume independent of log
             // dedup.
-            assertThat(registry.find("bytechef_ai_otlp_cost_unresolved")
+            assertThat(registry.get("bytechef_ai_otlp_cost_unresolved")
                 .tag("reason", "MODEL_NOT_REGISTERED")
                 .counter()
                 .count()).isEqualTo(50.0);
@@ -207,7 +207,7 @@ class OtlpCostResolverTest {
 
         assertThat(resolver.computeCost("unpriced-model", 100, 100)).isNull();
 
-        assertThat(registry.find("bytechef_ai_otlp_cost_unresolved")
+        assertThat(registry.get("bytechef_ai_otlp_cost_unresolved")
             .tag("reason", "RATES_MISSING")
             .counter()
             .count()).isEqualTo(1.0);
@@ -224,7 +224,7 @@ class OtlpCostResolverTest {
 
         assertThat(resolver.computeCost(null, 100, 100)).isNull();
 
-        assertThat(registry.find("bytechef_ai_otlp_cost_unresolved")
+        assertThat(registry.get("bytechef_ai_otlp_cost_unresolved")
             .tag("reason", "MODEL_IDENTIFIER_MISSING")
             .counter()
             .count()).isEqualTo(1.0);
@@ -254,7 +254,7 @@ class OtlpCostResolverTest {
 
         assertThat(resolver.computeCost("typo-priced-model", 100, 100)).isNull();
 
-        assertThat(registry.find("bytechef_ai_otlp_cost_unresolved")
+        assertThat(registry.get("bytechef_ai_otlp_cost_unresolved")
             .tag("reason", "RATES_INVALID")
             .counter()
             .count()).isEqualTo(1.0);
@@ -314,7 +314,7 @@ class OtlpCostResolverTest {
         // PARTIAL_FREE_TIER counter MUST fire: a misconfigured catalog row producing half-attributed cost
         // across the board is operator-actionable. A regression dropping the counter (e.g., during a refactor
         // that consolidates "any-zero" into the free-tier short-circuit) would silently kill the alarm.
-        assertThat(registry.find("bytechef_ai_otlp_cost_unresolved")
+        assertThat(registry.get("bytechef_ai_otlp_cost_unresolved")
             .tag("reason", "PARTIAL_FREE_TIER")
             .counter()
             .count()).isEqualTo(1.0);
@@ -334,7 +334,7 @@ class OtlpCostResolverTest {
 
         assertThat(resolver.computeCost("gpt-4o", -100, 200)).isNull();
 
-        assertThat(registry.find("bytechef_ai_otlp_cost_unresolved")
+        assertThat(registry.get("bytechef_ai_otlp_cost_unresolved")
             .tag("reason", "TOKENS_INVALID")
             .counter()
             .count()).isEqualTo(1.0);
@@ -354,7 +354,7 @@ class OtlpCostResolverTest {
 
         assertThat(resolver.computeCost("gpt-4o", 100, -200)).isNull();
 
-        assertThat(registry.find("bytechef_ai_otlp_cost_unresolved")
+        assertThat(registry.get("bytechef_ai_otlp_cost_unresolved")
             .tag("reason", "TOKENS_INVALID")
             .counter()
             .count()).isEqualTo(1.0);
@@ -372,7 +372,7 @@ class OtlpCostResolverTest {
         assertThat(resolver.computeCost("gpt-4o", -100, -200)).isNull();
 
         // Single counter increment, not double — both-negative is one corruption event, not two.
-        assertThat(registry.find("bytechef_ai_otlp_cost_unresolved")
+        assertThat(registry.get("bytechef_ai_otlp_cost_unresolved")
             .tag("reason", "TOKENS_INVALID")
             .counter()
             .count()).isEqualTo(1.0);

@@ -103,25 +103,27 @@ public class CloneAssetFileToolCallback implements ToolCallback {
         try {
             CloneAssetFileInput input = jsonMapper.readValue(toolInput, CloneAssetFileInput.class);
 
-            if (input.assetFileId() == null) {
+            Long assetFileId = input.assetFileId();
+
+            if (assetFileId == null) {
                 return toolError("assetFileId is required");
             }
 
-            if (input.targetEnvironment() == null || input.targetEnvironment()
-                .isBlank()) {
+            String targetEnvironment = input.targetEnvironment();
+
+            if (targetEnvironment == null || targetEnvironment.isBlank()) {
                 return toolError("targetEnvironment is required");
             }
 
             int targetEnvironmentOrdinal;
 
             try {
-                targetEnvironmentOrdinal = Environment.valueOf(input.targetEnvironment()
-                    .toUpperCase())
+                targetEnvironmentOrdinal = Environment.valueOf(targetEnvironment.toUpperCase())
                     .ordinal();
             } catch (IllegalArgumentException invalidEnv) {
                 return toolError(
                     "targetEnvironment must be one of DEVELOPMENT, STAGING, PRODUCTION (got: "
-                        + input.targetEnvironment() + ")");
+                        + targetEnvironment + ")");
             }
 
             AutomationToolInvocationContext invocationContext =
@@ -136,7 +138,7 @@ public class CloneAssetFileToolCallback implements ToolCallback {
 
             try {
                 AssetFile clone = facade.cloneToEnvironment(
-                    input.assetFileId(), workspaceId, targetEnvironmentOrdinal, input.newName());
+                    assetFileId, workspaceId, targetEnvironmentOrdinal, input.newName());
 
                 return jsonMapper.writeValueAsString(
                     new CloneAssetFileOutput(

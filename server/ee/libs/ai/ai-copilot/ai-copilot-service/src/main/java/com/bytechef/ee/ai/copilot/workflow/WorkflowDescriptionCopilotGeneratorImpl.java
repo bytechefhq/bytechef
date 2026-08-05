@@ -13,7 +13,10 @@ import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
+import java.util.Objects;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -59,9 +62,11 @@ public class WorkflowDescriptionCopilotGeneratorImpl implements WorkflowDescript
     }
 
     private String call(String promptText) {
-        return chatModel.call(new Prompt(promptText))
-            .getResult()
-            .getOutput()
+        ChatResponse chatResponse = chatModel.call(new Prompt(promptText));
+
+        Generation generation = Objects.requireNonNull(chatResponse.getResult(), "generation is required");
+
+        return generation.getOutput()
             .getText();
     }
 

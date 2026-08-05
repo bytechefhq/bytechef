@@ -120,20 +120,22 @@ public class QueryKnowledgeBaseToolCallback implements ToolCallback {
         try {
             QueryKnowledgeBaseInput input = jsonMapper.readValue(toolInput, QueryKnowledgeBaseInput.class);
 
-            if (input.knowledgeBaseId() == null || input.knowledgeBaseId()
-                .isBlank()) {
+            String knowledgeBaseIdString = input.knowledgeBaseId();
+
+            if (knowledgeBaseIdString == null || knowledgeBaseIdString.isBlank()) {
                 return toolError("knowledgeBaseId is required");
             }
 
-            if (input.question() == null || input.question()
-                .isBlank()) {
+            String question = input.question();
+
+            if (question == null || question.isBlank()) {
                 return toolError("question is required and must not be blank");
             }
 
             AgentToolInvocationContext invocationContext =
                 AgentToolInvocationContext.fromToolContext(toolContext);
 
-            Long workspaceId = invocationContext.workspaceId();
+            Long workspaceId = invocationContext == null ? null : invocationContext.workspaceId();
 
             if (workspaceId == null) {
                 return toolError(
@@ -143,7 +145,7 @@ public class QueryKnowledgeBaseToolCallback implements ToolCallback {
             long knowledgeBaseId;
 
             try {
-                knowledgeBaseId = Long.parseLong(input.knowledgeBaseId());
+                knowledgeBaseId = Long.parseLong(knowledgeBaseIdString);
             } catch (NumberFormatException exception) {
                 return toolError("Invalid knowledgeBaseId - must be a numeric id obtained from listKnowledgeBases");
             }
@@ -166,7 +168,7 @@ public class QueryKnowledgeBaseToolCallback implements ToolCallback {
             int fetchLimit = resolveLimit(input.limit());
 
             List<KnowledgeBaseDocumentChunk> chunks = knowledgeBaseFacade.searchKnowledgeBase(
-                knowledgeBaseId, input.question(), null);
+                knowledgeBaseId, question, null);
 
             List<KnowledgeBaseDocumentChunk> limitedChunks = chunks.stream()
                 .limit(fetchLimit)

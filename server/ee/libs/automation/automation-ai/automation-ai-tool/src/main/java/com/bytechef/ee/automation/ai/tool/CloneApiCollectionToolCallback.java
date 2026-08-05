@@ -105,46 +105,50 @@ public class CloneApiCollectionToolCallback implements ToolCallback {
         try {
             CloneApiCollectionInput input = jsonMapper.readValue(toolInput, CloneApiCollectionInput.class);
 
-            if (input.apiCollectionId() == null) {
+            Long apiCollectionId = input.apiCollectionId();
+
+            if (apiCollectionId == null) {
                 return toolError("apiCollectionId is required");
             }
 
-            if (input.targetEnvironment() == null || input.targetEnvironment()
-                .isBlank()) {
+            String targetEnvironmentName = input.targetEnvironment();
+
+            if (targetEnvironmentName == null || targetEnvironmentName.isBlank()) {
                 return toolError("targetEnvironment is required (one of: " + SUPPORTED_ENVIRONMENTS + ")");
             }
 
-            if (input.newContextPath() == null || input.newContextPath()
-                .isBlank()) {
+            String newContextPath = input.newContextPath();
+
+            if (newContextPath == null || newContextPath.isBlank()) {
                 return toolError("newContextPath is required — context paths must be unique per environment");
             }
 
             Environment targetEnvironment;
 
             try {
-                targetEnvironment = Environment.valueOf(input.targetEnvironment()
-                    .toUpperCase());
+                targetEnvironment = Environment.valueOf(targetEnvironmentName.toUpperCase());
             } catch (IllegalArgumentException exception) {
                 return toolError(
-                    "Unknown targetEnvironment '" + input.targetEnvironment() + "'. Supported: "
+                    "Unknown targetEnvironment '" + targetEnvironmentName + "'. Supported: "
                         + SUPPORTED_ENVIRONMENTS);
             }
 
-            ApiCollectionDTO source = apiCollectionFacade.getApiCollection(input.apiCollectionId());
+            ApiCollectionDTO source = apiCollectionFacade.getApiCollection(apiCollectionId);
 
             if (source == null) {
-                return toolError("API collection " + input.apiCollectionId() + " not found");
+                return toolError("API collection " + apiCollectionId + " not found");
             }
 
-            String resolvedName = input.newName() != null && !input.newName()
-                .isBlank() ? input.newName() : source.name();
+            String newName = input.newName();
+
+            String resolvedName = newName != null && !newName.isBlank() ? newName : source.name();
 
             // Reuse all slow-changing fields verbatim. Endpoints are intentionally List.of() — the LLM should add
             // them deliberately via createApiCollectionEndpoint after the clone is created. Tags are dropped on the
             // clone so the destination doesn't inherit env-specific labels (e.g. "needs-review-DEV") that would be
             // wrong in the target.
             ApiCollectionDTO cloneDto = new ApiCollectionDTO(
-                source.collectionVersion(), input.newContextPath(), null, null, source.description(), false,
+                source.collectionVersion(), newContextPath, null, null, source.description(), false,
                 List.of(), targetEnvironment, null, null, null, resolvedName, null, source.projectId(), null, 0,
                 source.projectVersion(), List.of(), 0);
 

@@ -178,11 +178,13 @@ public class WorkspaceKnowledgeBaseSourceFacadeImpl implements WorkspaceKnowledg
         // bind it to the cluster element at perform time. workflowConnectionKey must equal the source cluster
         // element's name (e.g. "hubspot_1"); the surrounding task is named "sync" — see
         // KnowledgeBaseSourceWorkflowGenerator. Without this row the source reader sees `componentConnection = null`.
-        if (input.connectionId() != null) {
+        Long connectionId = input.connectionId();
+
+        if (connectionId != null) {
             String sourceNodeName = input.sourceComponentName() + "_1";
 
             projectDeploymentWorkflow.setConnections(List.of(
-                new ProjectDeploymentWorkflowConnection(input.connectionId(), sourceNodeName, "sync")));
+                new ProjectDeploymentWorkflowConnection(connectionId, sourceNodeName, "sync")));
         }
 
         projectDeploymentWorkflowService.create(projectDeploymentWorkflow);
@@ -252,14 +254,16 @@ public class WorkspaceKnowledgeBaseSourceFacadeImpl implements WorkspaceKnowledg
 
         KnowledgeBaseSource source = knowledgeBaseSourceService.get(sourceId);
 
-        if (input.name() != null) {
-            source.setName(input.name());
+        String name = input.name();
+
+        if (name != null) {
+            source.setName(name);
         }
 
-        if (input.cadence() != null && !input.cadence()
-            .equals(source.getCadence())) {
+        String cadence = input.cadence();
 
-            source.setCadence(input.cadence());
+        if (cadence != null && !cadence.equals(source.getCadence())) {
+            source.setCadence(cadence);
 
             String workflowId = source.getWorkflowId();
 
@@ -267,30 +271,34 @@ public class WorkspaceKnowledgeBaseSourceFacadeImpl implements WorkspaceKnowledg
                 Workflow workflow = workflowService.getWorkflow(workflowId);
 
                 String mutatedDefinition = KnowledgeBaseSourceWorkflowGenerator.updateCadence(
-                    workflow.getDefinition(), input.cadence());
+                    workflow.getDefinition(), cadence);
 
                 workflowService.update(workflowId, mutatedDefinition, workflow.getVersion());
             }
         }
 
-        if (input.enabled() != null && input.enabled() != source.isEnabled()) {
-            source.setEnabled(input.enabled());
+        Boolean enabled = input.enabled();
 
-            toggleProjectDeploymentWorkflow(workspaceId, source, input.enabled());
+        if (enabled != null && enabled != source.isEnabled()) {
+            source.setEnabled(enabled);
+
+            toggleProjectDeploymentWorkflow(workspaceId, source, enabled);
         }
 
-        if (input.metadataFields() != null) {
+        Map<String, ?> metadataFields = input.metadataFields();
+
+        if (metadataFields != null) {
             // Empty map => "clear the whitelist (revert to full-flatten)"; non-empty => replace.
             // Distinguished from "leave unchanged" by null at the DTO level.
-            source.setMetadataFields(input.metadataFields()
-                .isEmpty() ? null : input.metadataFields());
+            source.setMetadataFields(metadataFields.isEmpty() ? null : metadataFields);
         }
 
-        if (input.fullReplaceCadence() != null) {
+        String fullReplaceCadence = input.fullReplaceCadence();
+
+        if (fullReplaceCadence != null) {
             // Empty string sentinel means "clear" (drop back to single-trigger); any non-empty value replaces.
             // Null at the DTO level stays "leave unchanged" — already filtered out by the outer condition.
-            String resolvedFullReplaceCadence = input.fullReplaceCadence()
-                .isEmpty() ? null : input.fullReplaceCadence();
+            String resolvedFullReplaceCadence = fullReplaceCadence.isEmpty() ? null : fullReplaceCadence;
 
             source.setFullReplaceCadence(resolvedFullReplaceCadence);
 
@@ -306,8 +314,10 @@ public class WorkspaceKnowledgeBaseSourceFacadeImpl implements WorkspaceKnowledg
             }
         }
 
-        if (input.tombstoneStrategy() != null) {
-            source.setTombstoneStrategy(input.tombstoneStrategy());
+        TombstoneStrategy tombstoneStrategy = input.tombstoneStrategy();
+
+        if (tombstoneStrategy != null) {
+            source.setTombstoneStrategy(tombstoneStrategy);
         }
 
         return knowledgeBaseSourceService.update(source);

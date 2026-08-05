@@ -316,7 +316,9 @@ public class AutomationA2AServerFacade implements A2AAgentExecutor {
             return null;
         }
 
-        return pollRun(job.getId());
+        Long jobId = Objects.requireNonNull(job.getId(), "job id");
+
+        return pollRun(jobId);
     }
 
     /**

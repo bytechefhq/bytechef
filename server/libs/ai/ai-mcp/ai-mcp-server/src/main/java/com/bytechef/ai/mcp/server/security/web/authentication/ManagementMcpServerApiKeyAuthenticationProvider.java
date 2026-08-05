@@ -64,6 +64,10 @@ public class ManagementMcpServerApiKeyAuthenticationProvider implements Authenti
 
         McpApiKeyCredentials mcpApiKeyCredentials = (McpApiKeyCredentials) apiKeyAuthenticationToken.getCredentials();
 
+        if (mcpApiKeyCredentials == null) {
+            throw new BadCredentialsException("Authorization credentials do not exist");
+        }
+
         Property property = propertyService.getProperty("mcp.server", Property.Scope.PLATFORM, null);
 
         if (!Objects.equals(property.get("secretKey"), mcpApiKeyCredentials.getMcpServerSecretKey())) {
@@ -85,6 +89,10 @@ public class ManagementMcpServerApiKeyAuthenticationProvider implements Authenti
         }
 
         McpApiKeyEntity mcpApiKeyEntity = (McpApiKeyEntity) authenticatedAuthentication.getPrincipal();
+
+        if (mcpApiKeyEntity == null) {
+            throw new BadCredentialsException("Invalid API key");
+        }
 
         if (mcpApiKeyEntity.getType() != null) {
             throw new BadCredentialsException("Invalid API key");

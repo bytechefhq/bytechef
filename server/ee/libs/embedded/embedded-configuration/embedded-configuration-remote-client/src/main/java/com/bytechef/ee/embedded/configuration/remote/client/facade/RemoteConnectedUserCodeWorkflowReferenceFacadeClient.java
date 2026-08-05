@@ -82,7 +82,9 @@ public class RemoteConnectedUserCodeWorkflowReferenceFacadeClient implements Con
         } catch (HttpClientErrorException.Conflict conflict) {
             Map<String, String> body = conflict.getResponseBodyAs(new ParameterizedTypeReference<>() {});
 
-            throw new MissingConnectionException(body.get("missingConnectionComponentName"));
+            String missingConnectionComponentName = body == null ? null : body.get("missingConnectionComponentName");
+
+            throw new MissingConnectionException(missingConnectionComponentName);
         }
     }
 

@@ -155,13 +155,15 @@ public class OpenResourceTabToolCallback implements ToolCallback {
     }
 
     private String openWorkflow(OpenResourceTabInput input, @Nullable ToolContext toolContext) {
-        if (input.workflowId() == null || input.workflowId()
-            .isBlank()) {
+        String workflowId = input.workflowId();
+
+        if (workflowId == null || workflowId.isBlank()) {
             return toolError("workflowId is required for type WORKFLOW");
         }
 
-        if (input.projectId() == null || input.projectId()
-            .isBlank()) {
+        String projectId = input.projectId();
+
+        if (projectId == null || projectId.isBlank()) {
             return toolError("projectId is required for type WORKFLOW");
         }
 
@@ -173,30 +175,32 @@ public class OpenResourceTabToolCallback implements ToolCallback {
 
         Map<String, Object> output = baseOutput(input.type(), input.name());
 
-        output.put("workflowId", input.workflowId());
-        output.put("projectId", input.projectId());
+        output.put("workflowId", workflowId);
+        output.put("projectId", projectId);
         output.put("projectWorkflowId", input.projectWorkflowId());
 
         return writeOutput(output);
     }
 
     private String openCodeWorkflow(OpenResourceTabInput input, @Nullable ToolContext toolContext) {
-        if (input.projectId() == null || input.projectId()
-            .isBlank()) {
+        String projectId = input.projectId();
+
+        if (projectId == null || projectId.isBlank()) {
             return toolError("projectId is required for type CODE_WORKFLOW");
         }
 
-        if (input.language() == null || input.language()
-            .isBlank()) {
+        String language = input.language();
+
+        if (language == null || language.isBlank()) {
             return toolError("language is required for type CODE_WORKFLOW");
         }
 
-        recordReference(toolContext, "CODE_WORKFLOW_REFERENCED", input.projectId(), input.name());
+        recordReference(toolContext, "CODE_WORKFLOW_REFERENCED", projectId, input.name());
 
         Map<String, Object> output = baseOutput(input.type(), input.name());
 
-        output.put("projectId", input.projectId());
-        output.put("language", input.language());
+        output.put("projectId", projectId);
+        output.put("language", language);
 
         return writeOutput(output);
     }

@@ -31,7 +31,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @version ee
  */
 @Table("ai_observability_trace")
-public class AiObservabilityTrace {
+public final class AiObservabilityTrace {
 
     private static final AiObservabilityTraceSource[] SOURCE_VALUES = AiObservabilityTraceSource.values();
     private static final AiObservabilityTraceStatus[] STATUS_VALUES = AiObservabilityTraceStatus.values();

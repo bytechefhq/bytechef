@@ -89,9 +89,11 @@ final class DbMemoryResource extends AbstractResource implements WritableResourc
     private void persist(String text) throws IOException {
         AutoMemoryFrontmatter.Parsed parsed = AutoMemoryFrontmatter.parse(text);
 
-        AiAutoMemoryType memoryType = parsed.memoryType() != null ? parsed.memoryType() : AiAutoMemoryType.PROJECT;
-        String title = parsed.title() != null && !parsed.title()
-            .isBlank() ? parsed.title() : name;
+        AiAutoMemoryType parsedMemoryType = parsed.memoryType();
+        String parsedTitle = parsed.title();
+
+        AiAutoMemoryType memoryType = parsedMemoryType != null ? parsedMemoryType : AiAutoMemoryType.PROJECT;
+        String title = parsedTitle != null && !parsedTitle.isBlank() ? parsedTitle : name;
 
         Optional<AiAutoMemory> existing =
             aiAutoMemoryService.read(workspaceId, AiAutoMemoryPrincipalType.USER, userId, environment, name);

@@ -118,8 +118,9 @@ public class GenerateImageToolCallback implements ToolCallback {
         try {
             GenerateImageInput input = jsonMapper.readValue(toolInput, GenerateImageInput.class);
 
-            if (input.prompt() == null || input.prompt()
-                .isBlank()) {
+            String prompt = input.prompt();
+
+            if (prompt == null || prompt.isBlank()) {
                 return toolError("prompt is required and must not be blank");
             }
 
@@ -127,12 +128,14 @@ public class GenerateImageToolCallback implements ToolCallback {
                 return toolError("OpenAI API key not configured");
             }
 
-            String effectiveSize = input.size() != null ? input.size() : "1024x1024";
+            String size = input.size();
+
+            String effectiveSize = size != null ? size : "1024x1024";
             int[] dimensions = parseDimensions(effectiveSize);
 
-            String effectivePrompt = input.style() != null
-                ? input.prompt() + " \u2014 " + input.style()
-                : input.prompt();
+            String style = input.style();
+
+            String effectivePrompt = style != null ? prompt + " \u2014 " + style : prompt;
 
             OpenAiImageOptions options = OpenAiImageOptions.builder()
                 .model(imageModelName)
@@ -146,6 +149,11 @@ public class GenerateImageToolCallback implements ToolCallback {
 
             ImageResponse response = imageModel.call(imagePrompt);
             ImageGeneration result = response.getResult();
+
+            if (result == null) {
+                return toolError("Image generation returned no result");
+            }
+
             Image output = result.getOutput();
 
             String b64Json = output.getB64Json();
@@ -154,7 +162,7 @@ public class GenerateImageToolCallback implements ToolCallback {
 
             resultMap.put("imageBytes", b64Json != null ? b64Json : "");
             resultMap.put("mimeType", "image/png");
-            resultMap.put("prompt", input.prompt());
+            resultMap.put("prompt", prompt);
             resultMap.put("size", effectiveSize);
 
             return jsonMapper.writeValueAsString(resultMap);

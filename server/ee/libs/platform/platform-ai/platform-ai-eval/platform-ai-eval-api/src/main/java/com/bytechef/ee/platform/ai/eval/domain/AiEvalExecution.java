@@ -19,7 +19,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @version ee
  */
 @Table("ai_eval_execution")
-public class AiEvalExecution {
+public final class AiEvalExecution {
 
     @CreatedDate
     private Instant createdDate;

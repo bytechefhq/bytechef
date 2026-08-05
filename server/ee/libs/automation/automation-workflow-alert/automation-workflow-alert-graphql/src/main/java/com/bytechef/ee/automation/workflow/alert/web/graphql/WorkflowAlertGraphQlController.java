@@ -144,12 +144,16 @@ public class WorkflowAlertGraphQlController {
         workflowAlertRule.setWindowMinutes(input.windowMinutes());
         workflowAlertRule.setNotificationIds(input.notificationIds());
 
-        if (input.cooldownMinutes() != null) {
-            workflowAlertRule.setCooldownMinutes(input.cooldownMinutes());
+        Integer cooldownMinutes = input.cooldownMinutes();
+
+        if (cooldownMinutes != null) {
+            workflowAlertRule.setCooldownMinutes(cooldownMinutes);
         }
 
-        if (input.enabled() != null) {
-            workflowAlertRule.setEnabled(input.enabled());
+        Boolean enabled = input.enabled();
+
+        if (enabled != null) {
+            workflowAlertRule.setEnabled(enabled);
         }
     }
 }

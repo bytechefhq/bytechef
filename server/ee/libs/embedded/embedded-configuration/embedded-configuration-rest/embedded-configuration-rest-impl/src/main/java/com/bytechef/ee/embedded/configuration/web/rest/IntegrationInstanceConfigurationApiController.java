@@ -142,14 +142,14 @@ public class IntegrationInstanceConfigurationApiController implements Integratio
     private IntegrationInstanceConfigurationModel toIntegrationInstanceConfigurationModel(
         IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO) {
 
-        IntegrationInstanceConfigurationModel integrationInstanceConfigurationModel = conversionService.convert(
-            integrationInstanceConfigurationDTO, IntegrationInstanceConfigurationModel.class);
+        IntegrationInstanceConfigurationModel integrationInstanceConfigurationModel = Validate.notNull(
+            conversionService.convert(integrationInstanceConfigurationDTO, IntegrationInstanceConfigurationModel.class),
+            "integrationInstanceConfigurationModel");
 
         integrationInstanceConfigurationModel.connectionAuthorizationParameters(
             ObfuscateUtils.toObfuscatedMap(
                 integrationInstanceConfigurationModel.getConnectionAuthorizationParameters(), 28, 8));
 
-        return Validate.notNull(integrationInstanceConfigurationModel, "integrationInstanceConfigurationModel")
-            .connectionParameters(null);
+        return integrationInstanceConfigurationModel.connectionParameters(null);
     }
 }

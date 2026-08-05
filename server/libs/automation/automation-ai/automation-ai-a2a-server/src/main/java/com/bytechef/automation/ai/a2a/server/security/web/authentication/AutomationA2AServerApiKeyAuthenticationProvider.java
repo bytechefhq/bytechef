@@ -64,6 +64,10 @@ public class AutomationA2AServerApiKeyAuthenticationProvider implements Authenti
 
         McpApiKeyCredentials mcpApiKeyCredentials = (McpApiKeyCredentials) apiKeyAuthenticationToken.getCredentials();
 
+        if (mcpApiKeyCredentials == null) {
+            throw new BadCredentialsException("Authorization credentials do not exist");
+        }
+
         A2aServer a2aServer = getA2aServer(mcpApiKeyCredentials.getMcpServerSecretKey());
 
         if (!a2aServer.isAuthenticationRequired()) {
@@ -80,7 +84,9 @@ public class AutomationA2AServerApiKeyAuthenticationProvider implements Authenti
             return null;
         }
 
-        McpApiKeyEntity mcpApiKeyEntity = (McpApiKeyEntity) authenticatedAuthentication.getPrincipal();
+        if (!(authenticatedAuthentication.getPrincipal() instanceof McpApiKeyEntity mcpApiKeyEntity)) {
+            throw new BadCredentialsException("Invalid API key");
+        }
 
         if (mcpApiKeyEntity.getType() != PlatformType.AUTOMATION) {
             throw new BadCredentialsException("Invalid API key");

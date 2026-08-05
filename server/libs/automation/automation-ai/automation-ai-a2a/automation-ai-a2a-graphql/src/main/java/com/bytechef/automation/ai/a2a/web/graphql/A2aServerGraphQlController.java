@@ -66,8 +66,10 @@ public class A2aServerGraphQlController {
         A2aServer a2aServer = new A2aServer(
             input.name(), input.description(), input.type(), Environment.values()[(int) input.environmentId()]);
 
-        if (input.authenticationRequired() != null) {
-            a2aServer.setAuthenticationRequired(input.authenticationRequired());
+        Boolean authenticationRequired = input.authenticationRequired();
+
+        if (authenticationRequired != null) {
+            a2aServer.setAuthenticationRequired(authenticationRequired);
         }
 
         return a2aServerService.create(a2aServer);
@@ -86,12 +88,16 @@ public class A2aServerGraphQlController {
             a2aServer.setDescription(input.description());
         }
 
-        if (input.enabled() != null) {
-            a2aServer.setEnabled(input.enabled());
+        Boolean enabled = input.enabled();
+
+        if (enabled != null) {
+            a2aServer.setEnabled(enabled);
         }
 
-        if (input.authenticationRequired() != null) {
-            a2aServer.setAuthenticationRequired(input.authenticationRequired());
+        Boolean authenticationRequired = input.authenticationRequired();
+
+        if (authenticationRequired != null) {
+            a2aServer.setAuthenticationRequired(authenticationRequired);
         }
 
         return a2aServerService.update(a2aServer);

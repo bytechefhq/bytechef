@@ -51,6 +51,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -486,6 +487,7 @@ public class AiEvalExecutor {
             .collect(Collectors.joining("\n\n"));
     }
 
+    @SuppressFBWarnings("REC_CATCH_EXCEPTION")
     private void executeEvaluation(
         AiEvalExecution evalExecution, AiEvalRule evalRule, AiObservabilityTrace trace) {
 
@@ -526,9 +528,20 @@ public class AiEvalExecutor {
 
             ChatResponse chatResponse = chatModel.call(new Prompt(promptText));
 
-            String responseContent = chatResponse.getResult()
-                .getOutput()
+            Generation generation = chatResponse.getResult();
+
+            if (generation == null) {
+                throw new IllegalStateException(
+                    "Evaluation model returned no result for rule " + evalRule.getId());
+            }
+
+            String responseContent = generation.getOutput()
                 .getText();
+
+            if (responseContent == null) {
+                throw new IllegalStateException(
+                    "Evaluation model returned no text for rule " + evalRule.getId());
+            }
 
             // Wrap the repository's generic "AiEvalScoreConfig not found" IllegalArgumentException in a typed
             // sentinel so classifyEvaluationFailure routes the failure to SCORE_CONFIG_NOT_FOUND via

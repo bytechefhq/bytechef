@@ -107,32 +107,36 @@ public class CloneKnowledgeBaseToolCallback implements ToolCallback {
         try {
             CloneKnowledgeBaseInput input = jsonMapper.readValue(toolInput, CloneKnowledgeBaseInput.class);
 
-            if (input.knowledgeBaseId() == null) {
+            Long knowledgeBaseId = input.knowledgeBaseId();
+
+            if (knowledgeBaseId == null) {
                 return ToolErrors.toolError(jsonMapper, "knowledgeBaseId is required");
             }
 
-            if (input.targetEnvironment() == null || input.targetEnvironment()
-                .isBlank()) {
+            String targetEnvironment = input.targetEnvironment();
+
+            if (targetEnvironment == null || targetEnvironment.isBlank()) {
                 return ToolErrors.toolError(jsonMapper, "targetEnvironment is required");
             }
 
             int targetEnvironmentOrdinal;
 
             try {
-                targetEnvironmentOrdinal = Environment.valueOf(input.targetEnvironment()
-                    .toUpperCase())
+                targetEnvironmentOrdinal = Environment.valueOf(targetEnvironment.toUpperCase())
                     .ordinal();
             } catch (IllegalArgumentException invalidEnv) {
                 return ToolErrors.toolError(
                     jsonMapper,
                     "targetEnvironment must be one of DEVELOPMENT, STAGING, PRODUCTION (got: "
-                        + input.targetEnvironment() + ")");
+                        + targetEnvironment + ")");
             }
 
             AgentToolInvocationContext context =
                 AgentToolInvocationContext.fromToolContext(toolContext);
 
-            if (context == null || context.workspaceId() == null) {
+            Long workspaceId = context == null ? null : context.workspaceId();
+
+            if (workspaceId == null) {
                 return ToolErrors.toolError(
                     jsonMapper,
                     "Workspace context unavailable — open this chat from the AI Hub of a workspace.");
@@ -140,7 +144,7 @@ public class CloneKnowledgeBaseToolCallback implements ToolCallback {
 
             try {
                 KnowledgeBase clone = workspaceKnowledgeBaseFacade.cloneWorkspaceKnowledgeBase(
-                    input.knowledgeBaseId(), context.workspaceId(), targetEnvironmentOrdinal, input.newName());
+                    knowledgeBaseId, workspaceId, targetEnvironmentOrdinal, input.newName());
 
                 return jsonMapper.writeValueAsString(
                     new CloneKnowledgeBaseOutput(

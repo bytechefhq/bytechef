@@ -25,7 +25,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @version ee
  */
 @Table("ai_gateway_provider")
-public class AiGatewayProvider {
+public final class AiGatewayProvider {
 
     @Column("api_key")
     private EncryptedStringWrapper apiKey;

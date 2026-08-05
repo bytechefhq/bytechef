@@ -9,7 +9,7 @@ package com.bytechef.ee.ai.hub.personalagent;
 
 import java.text.ParseException;
 import java.time.LocalTime;
-import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 import org.quartz.CronExpression;
 
 /**
@@ -56,13 +56,15 @@ final class ScheduleCronNormalizer {
         return "0 " + minute + " * * * ?";
     }
 
-    private static String daily(LocalTime time) {
-        require(time != null, "timeOfDay required for DAILY");
+    private static String daily(@Nullable LocalTime time) {
+        if (time == null) {
+            throw new IllegalArgumentException("timeOfDay required for DAILY");
+        }
 
         return "0 " + time.getMinute() + " " + time.getHour() + " * * ?";
     }
 
-    private static String weekly(LocalTime time, Integer isoDayOfWeek) {
+    private static String weekly(@Nullable LocalTime time, @Nullable Integer isoDayOfWeek) {
         if (time == null) {
             throw new IllegalArgumentException("timeOfDay required for WEEKLY");
         }
@@ -76,19 +78,23 @@ final class ScheduleCronNormalizer {
         return "0 " + time.getMinute() + " " + time.getHour() + " ? * " + quartzDay;
     }
 
-    private static String monthly(LocalTime time, Integer dayOfMonth) {
-        require(time != null, "timeOfDay required for MONTHLY");
+    private static String monthly(@Nullable LocalTime time, @Nullable Integer dayOfMonth) {
+        if (time == null) {
+            throw new IllegalArgumentException("timeOfDay required for MONTHLY");
+        }
+
         require(dayOfMonth != null && dayOfMonth >= 1 && dayOfMonth <= 31,
             "dayOfMonth must be 1..31");
 
         return "0 " + time.getMinute() + " " + time.getHour() + " " + dayOfMonth + " * ?";
     }
 
-    private static String customCron(String expression) {
-        require(expression != null && !expression.isBlank(), "cronExpression required for CUSTOM_CRON");
+    private static String customCron(@Nullable String expression) {
+        if (expression == null || expression.isBlank()) {
+            throw new IllegalArgumentException("cronExpression required for CUSTOM_CRON");
+        }
 
-        return Objects.requireNonNull(expression)
-            .trim();
+        return expression.trim();
     }
 
     private static void validate(String cron) {

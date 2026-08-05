@@ -14,6 +14,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
@@ -76,10 +78,13 @@ public class TitleGenerationService {
         String response;
 
         try {
-            response = chatModel.call(new Prompt(promptText))
-                .getResult()
-                .getOutput()
-                .getText();
+            ChatResponse chatResponse = chatModel.call(new Prompt(promptText));
+
+            Generation generation = chatResponse == null ? null : chatResponse.getResult();
+
+            response = generation == null ? null
+                : generation.getOutput()
+                    .getText();
         } catch (RuntimeException exception) {
             // Surface the failure with a typed exception so the controller can return 503 — silently swallowing
             // and returning "" leaves the user with a permanent "Untitled" and no signal that the upstream

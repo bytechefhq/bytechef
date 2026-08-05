@@ -22,11 +22,13 @@ import static org.mockito.Mockito.when;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
+import java.util.Objects;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 @ExtendWith(MockitoExtension.class)
@@ -50,9 +52,14 @@ class SecurityContextRehydratorTest {
         SecurityContextRehydrator rehydrator = new SecurityContextRehydrator(userService, authorityService);
 
         String principal = rehydrator.withUserSecurityContext(
-            7L, () -> (String) SecurityContextHolder.getContext()
-                .getAuthentication()
-                .getPrincipal());
+            7L, () -> {
+                Authentication authentication = Objects.requireNonNull(
+                    SecurityContextHolder.getContext()
+                        .getAuthentication(),
+                    "authentication");
+
+                return (String) authentication.getPrincipal();
+            });
 
         assertThat(principal).isEqualTo("user@localhost.com");
     }

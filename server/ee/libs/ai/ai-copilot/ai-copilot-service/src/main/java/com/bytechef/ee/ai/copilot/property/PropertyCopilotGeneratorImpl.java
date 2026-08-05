@@ -21,10 +21,13 @@ import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
@@ -201,9 +204,11 @@ public class PropertyCopilotGeneratorImpl implements PropertyCopilotGenerator {
                 .content();
         }
 
-        return chatModel.call(new Prompt(promptText))
-            .getResult()
-            .getOutput()
+        ChatResponse chatResponse = chatModel.call(new Prompt(promptText));
+
+        Generation generation = Objects.requireNonNull(chatResponse.getResult(), "generation is required");
+
+        return generation.getOutput()
             .getText();
     }
 

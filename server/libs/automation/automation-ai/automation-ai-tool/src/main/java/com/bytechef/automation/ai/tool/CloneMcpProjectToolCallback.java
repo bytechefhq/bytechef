@@ -94,24 +94,27 @@ public class CloneMcpProjectToolCallback implements ToolCallback {
         try {
             CloneMcpProjectInput input = jsonMapper.readValue(toolInput, CloneMcpProjectInput.class);
 
-            if (input.mcpProjectId() == null) {
+            Long mcpProjectId = input.mcpProjectId();
+
+            if (mcpProjectId == null) {
                 return toolError("mcpProjectId is required");
             }
 
-            if (input.targetMcpServerId() == null || input.targetMcpServerId()
-                .isBlank()) {
+            String targetMcpServerIdString = input.targetMcpServerId();
+
+            if (targetMcpServerIdString == null || targetMcpServerIdString.isBlank()) {
                 return toolError("targetMcpServerId is required");
             }
 
             long targetMcpServerId;
 
             try {
-                targetMcpServerId = Long.parseLong(input.targetMcpServerId());
+                targetMcpServerId = Long.parseLong(targetMcpServerIdString);
             } catch (NumberFormatException exception) {
                 return toolError("Invalid targetMcpServerId — must be a numeric id");
             }
 
-            McpProject clone = mcpProjectFacade.cloneMcpProject(input.mcpProjectId(), targetMcpServerId);
+            McpProject clone = mcpProjectFacade.cloneMcpProject(mcpProjectId, targetMcpServerId);
 
             // The clone's exposed-workflow count is identical to the source's since the facade walks the source set
             // and re-creates each binding. Surfacing the count helps the LLM communicate the impact of the clone in

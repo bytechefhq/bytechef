@@ -23,7 +23,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @version ee
  */
 @Table("ai_observability_span")
-public class AiObservabilitySpan {
+public final class AiObservabilitySpan {
 
     private static final AiObservabilitySpanLevel[] LEVEL_VALUES = AiObservabilitySpanLevel.values();
     private static final AiObservabilitySpanStatus[] STATUS_VALUES = AiObservabilitySpanStatus.values();

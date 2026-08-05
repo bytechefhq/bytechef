@@ -183,31 +183,37 @@ public class SetAiHubPersonalAgentScheduleToolCallback implements ToolCallback {
     }
 
     private @Nullable String validateScheduleFields(SetScheduleInput input) {
-        if (input.title() == null || input.title()
-            .isBlank()) {
+        String title = input.title();
+
+        if (title == null || title.isBlank()) {
             return "title is required when setting a schedule";
         }
 
-        if (input.prompt() == null || input.prompt()
-            .isBlank()) {
+        String prompt = input.prompt();
+
+        if (prompt == null || prompt.isBlank()) {
             return "prompt is required when setting a schedule";
         }
 
-        if (input.frequencyKind() == null) {
+        ScheduleFrequencyKind frequencyKind = input.frequencyKind();
+
+        if (frequencyKind == null) {
             return "frequencyKind is required when setting a schedule";
         }
 
-        if (input.zoneId() != null && !input.zoneId()
-            .isBlank()) {
+        String zoneId = input.zoneId();
 
+        if (zoneId != null && !zoneId.isBlank()) {
             try {
-                ZoneId.of(input.zoneId());
+                ZoneId.of(zoneId);
             } catch (RuntimeException exception) {
-                return "Unknown zoneId '%s' — use an IANA id like Europe/Zagreb".formatted(input.zoneId());
+                return "Unknown zoneId '%s' — use an IANA id like Europe/Zagreb".formatted(zoneId);
             }
         }
 
-        return switch (input.frequencyKind()) {
+        String cronExpression = input.cronExpression();
+
+        return switch (frequencyKind) {
             case EVERY_X_MINUTES -> input.intervalMinutes() == null
                 ? "intervalMinutes is required for EVERY_X_MINUTES" : null;
             case HOURLY -> input.minuteOfHour() == null ? "minuteOfHour is required for HOURLY" : null;
@@ -216,17 +222,21 @@ public class SetAiHubPersonalAgentScheduleToolCallback implements ToolCallback {
                 ? "dayOfWeek and timeOfDay are required for WEEKLY" : null;
             case MONTHLY -> input.dayOfMonth() == null || input.timeOfDay() == null
                 ? "dayOfMonth and timeOfDay are required for MONTHLY" : null;
-            case CUSTOM_CRON -> input.cronExpression() == null || input.cronExpression()
-                .isBlank() ? "cronExpression is required for CUSTOM_CRON" : null;
+            case CUSTOM_CRON -> cronExpression == null || cronExpression.isBlank()
+                ? "cronExpression is required for CUSTOM_CRON" : null;
         };
     }
 
     private ScheduleInput toServiceInput(SetScheduleInput input) {
-        String zoneId = input.zoneId() == null || input.zoneId()
-            .isBlank() ? DEFAULT_ZONE_ID : input.zoneId();
+        String inputZoneId = input.zoneId();
+
+        String zoneId = inputZoneId == null || inputZoneId.isBlank() ? DEFAULT_ZONE_ID : inputZoneId;
 
         ScheduleLifecycleKind lifecycleKind =
             input.maxRuns() == null ? ScheduleLifecycleKind.RECURRING : ScheduleLifecycleKind.NUMBER_OF_RUNS;
+
+        String timeOfDay = input.timeOfDay();
+        String startDate = input.startDate();
 
         return new ScheduleInput(
             true,
@@ -235,12 +245,12 @@ public class SetAiHubPersonalAgentScheduleToolCallback implements ToolCallback {
             input.frequencyKind(),
             input.intervalMinutes(),
             input.minuteOfHour(),
-            input.timeOfDay() == null ? null : LocalTime.parse(input.timeOfDay()),
+            timeOfDay == null ? null : LocalTime.parse(timeOfDay),
             input.dayOfWeek(),
             input.dayOfMonth(),
             input.cronExpression(),
             zoneId,
-            input.startDate() == null ? null : LocalDateTime.parse(input.startDate()),
+            startDate == null ? null : LocalDateTime.parse(startDate),
             lifecycleKind,
             input.maxRuns());
     }

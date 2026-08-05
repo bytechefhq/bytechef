@@ -113,23 +113,26 @@ public class SlideBuilderToolCallback implements ToolCallback {
         try {
             SlideBuilderInput input = jsonMapper.readValue(toolInput, SlideBuilderInput.class);
 
-            if (input.topic() == null || input.topic()
-                .isBlank()) {
+            String topic = input.topic();
+
+            if (topic == null || topic.isBlank()) {
                 return toolError("topic is required and must not be blank");
             }
 
-            StringBuilder promptBuilder = new StringBuilder(input.topic());
+            StringBuilder promptBuilder = new StringBuilder(topic);
 
-            if (input.outlineOrSourceFileId() != null && !input.outlineOrSourceFileId()
-                .isBlank()) {
+            String outlineOrSourceFileId = input.outlineOrSourceFileId();
+
+            if (outlineOrSourceFileId != null && !outlineOrSourceFileId.isBlank()) {
                 promptBuilder.append("\n\nSource file id for outline/material: ")
-                    .append(input.outlineOrSourceFileId());
+                    .append(outlineOrSourceFileId);
             }
 
-            if (input.filename() != null && !input.filename()
-                .isBlank()) {
+            String filename = input.filename();
+
+            if (filename != null && !filename.isBlank()) {
                 promptBuilder.append("\nSave as filename: ")
-                    .append(input.filename());
+                    .append(filename);
             }
 
             if (input.slideCount() != null) {

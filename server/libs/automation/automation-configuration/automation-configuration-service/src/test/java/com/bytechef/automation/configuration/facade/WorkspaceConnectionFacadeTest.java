@@ -50,6 +50,7 @@ import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -252,10 +253,13 @@ class WorkspaceConnectionFacadeTest {
 
             facadeWithMetrics.create(WORKSPACE_ID, dto);
 
-            assertThat(registry.find("bytechef_connection_create")
-                .tag("visibility", "WORKSPACE")
-                .counter()
-                .count()).isEqualTo(1.0);
+            io.micrometer.core.instrument.Counter workspaceCounter = Objects.requireNonNull(
+                registry.find("bytechef_connection_create")
+                    .tag("visibility", "WORKSPACE")
+                    .counter(),
+                "counter is required");
+
+            assertThat(workspaceCounter.count()).isEqualTo(1.0);
 
             // CE no longer audits directly — it publishes a plain domain event that an EE listener audits.
             // The event carries the PERSISTED visibility (WORKSPACE here), matching the metric tag.
@@ -300,10 +304,13 @@ class WorkspaceConnectionFacadeTest {
 
             facadeWithMetrics.create(WORKSPACE_ID, requestDto);
 
-            assertThat(registry.find("bytechef_connection_create")
-                .tag("visibility", "PRIVATE")
-                .counter()
-                .count()).isEqualTo(1.0);
+            io.micrometer.core.instrument.Counter privateCounter = Objects.requireNonNull(
+                registry.find("bytechef_connection_create")
+                    .tag("visibility", "PRIVATE")
+                    .counter(),
+                "counter is required");
+
+            assertThat(privateCounter.count()).isEqualTo(1.0);
 
             assertThat(registry.find("bytechef_connection_create")
                 .tag("visibility", "WORKSPACE")
@@ -342,10 +349,13 @@ class WorkspaceConnectionFacadeTest {
 
             facadeWithMetrics.create(WORKSPACE_ID, dto);
 
-            assertThat(registry.find("bytechef_connection_create")
-                .tag("visibility", "PRIVATE")
-                .counter()
-                .count()).isEqualTo(1.0);
+            io.micrometer.core.instrument.Counter privateCounter = Objects.requireNonNull(
+                registry.find("bytechef_connection_create")
+                    .tag("visibility", "PRIVATE")
+                    .counter(),
+                "counter is required");
+
+            assertThat(privateCounter.count()).isEqualTo(1.0);
         }
     }
 
@@ -465,7 +475,7 @@ class WorkspaceConnectionFacadeTest {
                     oAuth2Service, localTagService, testConfigService, emptyProvider);
 
             // Capture the Connection passed to the persistence layer — that's the moment of truth.
-            // The real ConnectionFacadeImpl.create call path writes connection.setVisibility(WORKSPACE)
+            // The real ConnectionFacadeImpl.create call path writes connection.setVisibility(PRIVATE)
             // BEFORE connectionService.create(connection), so the captured instance reflects the final
             // state. After this short-circuit throw the workspace facade's subsequent getConnection()
             // never runs, which keeps the test from having to stub the full toConnectionDTO chain
@@ -488,7 +498,7 @@ class WorkspaceConnectionFacadeTest {
             ConnectionDTO requestDto = ConnectionDTO.builder()
                 .componentName("dummy")
                 .name("my-conn")
-                .visibility(ResourceVisibility.WORKSPACE)
+                .visibility(ResourceVisibility.PRIVATE)
                 .build();
 
             assertThatThrownBy(() -> workspaceFacadeWithRealChain.create(WORKSPACE_ID, requestDto))

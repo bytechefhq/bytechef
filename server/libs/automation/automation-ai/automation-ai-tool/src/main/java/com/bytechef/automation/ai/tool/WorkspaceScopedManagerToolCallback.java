@@ -98,8 +98,9 @@ public class WorkspaceScopedManagerToolCallback implements ToolCallback {
         try {
             WorkspaceScopedInput input = jsonMapper.readValue(toolInput, WorkspaceScopedInput.class);
 
-            if (input.request() == null || input.request()
-                .isBlank()) {
+            String request = input.request();
+
+            if (request == null || request.isBlank()) {
                 return ToolErrors.toolError(jsonMapper, "request is required and must not be blank");
             }
 
@@ -133,7 +134,7 @@ public class WorkspaceScopedManagerToolCallback implements ToolCallback {
 
             forwardedContext.put(AutomationToolInvocationContext.TOOL_CONTEXT_WORKSPACE_ID_KEY, workspaceId);
 
-            String delegateInput = jsonMapper.writeValueAsString(Map.of("request", input.request()));
+            String delegateInput = jsonMapper.writeValueAsString(Map.of("request", request));
 
             return delegate.call(delegateInput, new ToolContext(forwardedContext));
         } catch (JacksonException exception) {

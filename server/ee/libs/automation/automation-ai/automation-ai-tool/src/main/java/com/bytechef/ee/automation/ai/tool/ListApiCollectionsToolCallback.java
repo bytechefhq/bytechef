@@ -87,7 +87,9 @@ public class ListApiCollectionsToolCallback implements ToolCallback {
             AutomationToolInvocationContext context =
                 AutomationToolInvocationContext.fromToolContext(toolContext);
 
-            if (context == null || context.workspaceId() == null) {
+            Long workspaceId = context == null ? null : context.workspaceId();
+
+            if (workspaceId == null) {
                 return ToolErrors.toolError(
                     jsonMapper,
                     "Workspace context unavailable — open this chat from the AI Hub of a workspace.");
@@ -99,7 +101,7 @@ public class ListApiCollectionsToolCallback implements ToolCallback {
             // PROD-bound collections rather than every collection across every environment. tagId left null
             // — surfaces aren't tag-scoping API collections via the LLM today; can be added later.
             List<ApiCollectionDTO> collections = apiCollectionFacade.getApiCollections(
-                context.workspaceId(), context.environmentId(), input.projectId(), null);
+                workspaceId, context.environmentId(), input.projectId(), null);
 
             return jsonMapper.writeValueAsString(collections.stream()
                 .map(ListApiCollectionsToolCallback::toSummary)

@@ -54,6 +54,7 @@ import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -150,7 +151,9 @@ public class ProjectWorkflowExecutionFacadeTest {
         assertThat(taskExecutionDTO.output())
             .isEqualTo("output-value");
 
-        verify(contextService).peek(taskExecution.getId(), Context.Classname.TASK_EXECUTION);
+        Long taskExecutionId = Objects.requireNonNull(taskExecution.getId(), "taskExecution.id");
+
+        verify(contextService).peek(taskExecutionId, Context.Classname.TASK_EXECUTION);
         verify(taskFileStorage).readTaskExecutionOutput(any());
     }
 

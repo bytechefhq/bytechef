@@ -24,7 +24,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @version ee
  */
 @Table("ai_eval_dataset_version")
-public class AiEvalDatasetVersion {
+public final class AiEvalDatasetVersion {
 
     @CreatedBy
     @Column("created_by")

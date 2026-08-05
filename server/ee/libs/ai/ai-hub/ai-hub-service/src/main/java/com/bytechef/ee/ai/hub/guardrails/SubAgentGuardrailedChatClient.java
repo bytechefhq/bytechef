@@ -15,6 +15,7 @@ import com.bytechef.ee.platform.ai.workspaceprompt.WorkspaceSystemPrompts;
 import com.bytechef.ee.platform.ai.workspaceprompt.advisor.WorkspaceSystemPromptAdvisor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -259,7 +260,7 @@ public final class SubAgentGuardrailedChatClient implements ChatClient {
 
         @Override
         public ChatClientRequestSpec toolContext(Map<String, Object> toolContext) {
-            this.capturedToolContext = toolContext;
+            this.capturedToolContext = new HashMap<>(toolContext);
 
             delegateSpec = delegateSpec.toolContext(toolContext);
 

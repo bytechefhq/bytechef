@@ -20,7 +20,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @version ee
  */
 @Table("ai_observability_alert_event")
-public class AiObservabilityAlertEvent {
+public final class AiObservabilityAlertEvent {
 
     @Column("alert_rule_id")
     private Long alertRuleId;

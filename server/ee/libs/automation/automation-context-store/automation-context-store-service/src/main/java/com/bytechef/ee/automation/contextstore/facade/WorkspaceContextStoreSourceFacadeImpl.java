@@ -215,11 +215,13 @@ public class WorkspaceContextStoreSourceFacadeImpl implements WorkspaceContextSt
         // DataStreamStreamActionDefinition.getValue resolves via clusterElement.getWorkflowNodeName); workflowNodeName
         // is the surrounding task name ("sync") emitted by ContextStoreWorkflowGenerator. Without this row the
         // dispatcher's CONNECTION_IDS metadata is empty and the reader hits "URI with undefined scheme".
-        if (input.connectionId() != null) {
+        Long connectionId = input.connectionId();
+
+        if (connectionId != null) {
             String sourceNodeName = input.sourceComponentName() + "_1";
 
             projectDeploymentWorkflow.setConnections(List.of(
-                new ProjectDeploymentWorkflowConnection(input.connectionId(), sourceNodeName, "sync")));
+                new ProjectDeploymentWorkflowConnection(connectionId, sourceNodeName, "sync")));
         }
 
         projectDeploymentWorkflowService.create(projectDeploymentWorkflow);
@@ -298,14 +300,16 @@ public class WorkspaceContextStoreSourceFacadeImpl implements WorkspaceContextSt
 
         ContextStoreSource source = contextStoreSourceService.get(sourceId);
 
-        if (input.name() != null) {
-            source.setName(input.name());
+        String name = input.name();
+
+        if (name != null) {
+            source.setName(name);
         }
 
-        if (input.cadence() != null && !input.cadence()
-            .equals(source.getCadence())) {
+        String cadence = input.cadence();
 
-            source.setCadence(input.cadence());
+        if (cadence != null && !cadence.equals(source.getCadence())) {
+            source.setCadence(cadence);
 
             String workflowId = source.getWorkflowId();
 
@@ -313,35 +317,40 @@ public class WorkspaceContextStoreSourceFacadeImpl implements WorkspaceContextSt
                 Workflow workflow = workflowService.getWorkflow(workflowId);
 
                 String mutatedDefinition = ContextStoreWorkflowGenerator.updateCadence(
-                    workflow.getDefinition(), input.cadence());
+                    workflow.getDefinition(), cadence);
 
                 workflowService.update(workflowId, mutatedDefinition, workflow.getVersion());
             }
         }
 
-        boolean enabledChanged = input.enabled() != null && input.enabled() != source.isEnabled();
+        Boolean enabled = input.enabled();
+
+        boolean enabledChanged = enabled != null && enabled != source.isEnabled();
 
         if (enabledChanged) {
-            source.setEnabled(input.enabled());
+            source.setEnabled(enabled);
 
-            toggleProjectDeploymentWorkflow(workspaceId, source, input.enabled());
+            toggleProjectDeploymentWorkflow(workspaceId, source, enabled);
         }
 
-        if (input.fullReplaceCadence() != null) {
+        String fullReplaceCadence = input.fullReplaceCadence();
+
+        if (fullReplaceCadence != null) {
             // Empty string sentinel means "clear" (drop back to single-trigger); any non-empty value replaces.
             // Null at the DTO level stays "leave unchanged" — already filtered out by the outer condition.
-            source.setFullReplaceCadence(input.fullReplaceCadence()
-                .isEmpty() ? null : input.fullReplaceCadence());
+            source.setFullReplaceCadence(fullReplaceCadence.isEmpty() ? null : fullReplaceCadence);
         }
 
-        if (input.tombstoneStrategy() != null) {
-            source.setTombstoneStrategy(input.tombstoneStrategy());
+        TombstoneStrategy tombstoneStrategy = input.tombstoneStrategy();
+
+        if (tombstoneStrategy != null) {
+            source.setTombstoneStrategy(tombstoneStrategy);
         }
 
         ContextStoreSource updated = contextStoreSourceService.update(source);
 
         if (enabledChanged) {
-            ContextStoreSourceAuditEvent eventType = input.enabled()
+            ContextStoreSourceAuditEvent eventType = enabled
                 ? ContextStoreSourceAuditEvent.CONTEXT_STORE_SOURCE_ENABLED
                 : ContextStoreSourceAuditEvent.CONTEXT_STORE_SOURCE_DISABLED;
 

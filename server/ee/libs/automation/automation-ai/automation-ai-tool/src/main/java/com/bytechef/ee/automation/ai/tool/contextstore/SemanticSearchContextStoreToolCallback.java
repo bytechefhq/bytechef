@@ -135,7 +135,9 @@ public class SemanticSearchContextStoreToolCallback implements ToolCallback {
                 return toolError("Context Store source " + input.sourceId() + " not found in the current workspace.");
             }
 
-            int k = input.k() == null ? DEFAULT_TOP_K : input.k();
+            Integer inputK = input.k();
+
+            int k = inputK == null ? DEFAULT_TOP_K : inputK;
 
             if (k <= 0) {
                 k = DEFAULT_TOP_K;

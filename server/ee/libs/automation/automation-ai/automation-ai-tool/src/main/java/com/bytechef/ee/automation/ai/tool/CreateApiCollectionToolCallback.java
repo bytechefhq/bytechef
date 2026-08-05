@@ -141,7 +141,9 @@ public class CreateApiCollectionToolCallback implements ToolCallback {
                     "Unknown environment '" + input.environment() + "'. Supported: " + SUPPORTED_ENVIRONMENTS);
             }
 
-            int collectionVersion = input.collectionVersion() == null ? 1 : input.collectionVersion();
+            Integer inputCollectionVersion = input.collectionVersion();
+
+            int collectionVersion = inputCollectionVersion == null ? 1 : inputCollectionVersion;
 
             ApiCollectionDTO dto = new ApiCollectionDTO(
                 collectionVersion, input.contextPath(), null, null, input.description(), false, List.of(),

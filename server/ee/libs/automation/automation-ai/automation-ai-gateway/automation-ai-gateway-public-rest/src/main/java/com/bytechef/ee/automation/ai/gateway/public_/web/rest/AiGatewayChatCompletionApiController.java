@@ -12,7 +12,10 @@ import com.bytechef.ee.automation.ai.gateway.public_.web.rest.model.ChatCompleti
 import com.bytechef.ee.automation.ai.gateway.public_.web.rest.model.ChatCompletionResponseModel;
 import com.bytechef.ee.automation.ai.gateway.public_.web.rest.model.ChatMessageModel;
 import com.bytechef.ee.automation.ai.gateway.public_.web.rest.model.ChoiceModel;
+import com.bytechef.ee.automation.ai.gateway.public_.web.rest.model.ContentBlockImageUrlModel;
+import com.bytechef.ee.automation.ai.gateway.public_.web.rest.model.ToolCallFunctionModel;
 import com.bytechef.ee.automation.ai.gateway.public_.web.rest.model.ToolCallModel;
+import com.bytechef.ee.automation.ai.gateway.public_.web.rest.model.ToolFunctionModel;
 import com.bytechef.ee.automation.ai.gateway.public_.web.rest.model.UsageModel;
 import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayChatCompletionRequest;
 import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayChatCompletionResponse;
@@ -264,17 +267,17 @@ class AiGatewayChatCompletionApiController implements ChatCompletionApi {
             ? null
             : model.getTools()
                 .stream()
-                .map(toolModel -> new AiGatewayTool(
-                    toolModel.getType(),
-                    toolModel.getFunction() == null
-                        ? null
-                        : new AiGatewayTool.AiGatewayToolFunction(
-                            toolModel.getFunction()
-                                .getName(),
-                            toolModel.getFunction()
-                                .getDescription(),
-                            toParametersMap(toolModel.getFunction()
-                                .getParameters()))))
+                .map(toolModel -> {
+                    ToolFunctionModel toolFunctionModel = toolModel.getFunction();
+
+                    return new AiGatewayTool(
+                        toolModel.getType(),
+                        toolFunctionModel == null
+                            ? null
+                            : new AiGatewayTool.AiGatewayToolFunction(
+                                toolFunctionModel.getName(), toolFunctionModel.getDescription(),
+                                toParametersMap(toolFunctionModel.getParameters())));
+                })
                 .toList();
 
         Map<String, String> tags = model.getTags() == null
@@ -304,13 +307,11 @@ class AiGatewayChatCompletionApiController implements ChatCompletionApi {
             contentBlocks = messageModel.getContentBlocks()
                 .stream()
                 .map(blockModel -> {
-                    AiGatewayContentBlock.ImageUrl imageUrl = blockModel.getImageUrl() == null
+                    ContentBlockImageUrlModel imageUrlModel = blockModel.getImageUrl();
+
+                    AiGatewayContentBlock.ImageUrl imageUrl = imageUrlModel == null
                         ? null
-                        : new AiGatewayContentBlock.ImageUrl(
-                            blockModel.getImageUrl()
-                                .getUrl(),
-                            blockModel.getImageUrl()
-                                .getDetail());
+                        : new AiGatewayContentBlock.ImageUrl(imageUrlModel.getUrl(), imageUrlModel.getDetail());
 
                     return new AiGatewayContentBlock(
                         AiGatewayContentBlockType.fromValue(blockModel.getType()),
@@ -325,15 +326,14 @@ class AiGatewayChatCompletionApiController implements ChatCompletionApi {
     }
 
     private AiGatewayChatMessage.ToolCall toDomainToolCall(ToolCallModel toolCallModel) {
+        ToolCallFunctionModel toolCallFunctionModel = toolCallModel.getFunction();
+
         return new AiGatewayChatMessage.ToolCall(
             toolCallModel.getId(), toolCallModel.getType(),
-            toolCallModel.getFunction() == null
+            toolCallFunctionModel == null
                 ? null
                 : new AiGatewayChatMessage.ToolCallFunction(
-                    toolCallModel.getFunction()
-                        .getName(),
-                    toolCallModel.getFunction()
-                        .getArguments()));
+                    toolCallFunctionModel.getName(), toolCallFunctionModel.getArguments()));
     }
 
     private ChatCompletionResponseModel toResponseModel(AiGatewayChatCompletionResponse domainResponse) {
@@ -448,8 +448,7 @@ class AiGatewayChatCompletionApiController implements ChatCompletionApi {
         toolCallModel.setType(toolCall.type());
 
         if (toolCall.function() != null) {
-            com.bytechef.ee.automation.ai.gateway.public_.web.rest.model.ToolCallFunctionModel functionModel =
-                new com.bytechef.ee.automation.ai.gateway.public_.web.rest.model.ToolCallFunctionModel();
+            ToolCallFunctionModel functionModel = new ToolCallFunctionModel();
 
             functionModel.setName(toolCall.function()
                 .name());

@@ -139,7 +139,8 @@ public class AttachTaskToolToolCallback implements ToolCallback {
             }
 
             Long connectionId = parseConnectionId(input.connectionId());
-            int componentVersion = input.componentVersion() == null ? 1 : input.componentVersion();
+            Integer inputComponentVersion = input.componentVersion();
+            int componentVersion = inputComponentVersion == null ? 1 : inputComponentVersion;
             int environment = AiHubToolInvocationContext.resolveEnvironmentOrDefault(invocationContext);
 
             // Defense-in-depth: reject a cross-environment connection. listConnectionsForComponent filters by env,

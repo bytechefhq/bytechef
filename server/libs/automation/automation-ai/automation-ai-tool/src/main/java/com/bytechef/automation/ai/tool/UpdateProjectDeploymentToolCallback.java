@@ -93,13 +93,15 @@ public class UpdateProjectDeploymentToolCallback implements ToolCallback {
             UpdateProjectDeploymentInput input = jsonMapper.readValue(
                 toolInput, UpdateProjectDeploymentInput.class);
 
-            if (input.projectDeploymentId() == null || input.projectDeploymentId()
-                .isBlank()) {
+            String projectDeploymentIdString = input.projectDeploymentId();
+
+            if (projectDeploymentIdString == null || projectDeploymentIdString.isBlank()) {
                 return toolError("projectDeploymentId is required");
             }
 
-            boolean nameSupplied = input.name() != null && !input.name()
-                .isBlank();
+            String name = input.name();
+
+            boolean nameSupplied = name != null && !name.isBlank();
             boolean descriptionSupplied = input.description() != null;
 
             if (!nameSupplied && !descriptionSupplied) {
@@ -109,7 +111,7 @@ public class UpdateProjectDeploymentToolCallback implements ToolCallback {
             long projectDeploymentId;
 
             try {
-                projectDeploymentId = Long.parseLong(input.projectDeploymentId());
+                projectDeploymentId = Long.parseLong(projectDeploymentIdString);
             } catch (NumberFormatException exception) {
                 return toolError("Invalid projectDeploymentId — must be a numeric id");
             }
@@ -123,7 +125,7 @@ public class UpdateProjectDeploymentToolCallback implements ToolCallback {
                 .enabled(existing.enabled())
                 .environment(existing.environment())
                 .id(existing.id())
-                .name(nameSupplied ? input.name() : existing.name())
+                .name(nameSupplied ? name : existing.name())
                 .lastModifiedBy(existing.lastModifiedBy())
                 .lastModifiedDate(existing.lastModifiedDate())
                 .project(existing.project())

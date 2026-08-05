@@ -24,7 +24,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @version ee
  */
 @Table("ai_gateway_budget")
-public class AiGatewayBudget {
+public final class AiGatewayBudget {
 
     // Enum.values() allocates a fresh array per call. These domain objects are hot on read (budget check happens per
     // request); caching the immutable snapshots avoids the allocation and matches the pattern already used by

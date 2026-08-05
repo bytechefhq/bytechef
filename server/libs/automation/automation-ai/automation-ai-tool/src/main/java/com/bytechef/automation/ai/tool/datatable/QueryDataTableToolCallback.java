@@ -104,8 +104,9 @@ public class QueryDataTableToolCallback implements ToolCallback {
         try {
             QueryDataTableInput input = jsonMapper.readValue(toolInput, QueryDataTableInput.class);
 
-            if (input.dataTableId() == null || input.dataTableId()
-                .isBlank()) {
+            String dataTableIdString = input.dataTableId();
+
+            if (dataTableIdString == null || dataTableIdString.isBlank()) {
                 return toolError("dataTableId is required");
             }
 
@@ -117,7 +118,7 @@ public class QueryDataTableToolCallback implements ToolCallback {
             AgentToolInvocationContext invocationContext =
                 AgentToolInvocationContext.fromToolContext(toolContext);
 
-            if (invocationContext.workspaceId() == null) {
+            if (invocationContext == null || invocationContext.workspaceId() == null) {
                 return toolError(
                     "Workspace context unavailable - open this chat from the AI Hub of a workspace.");
             }
@@ -125,7 +126,7 @@ public class QueryDataTableToolCallback implements ToolCallback {
             long dataTableId;
 
             try {
-                dataTableId = Long.parseLong(input.dataTableId());
+                dataTableId = Long.parseLong(dataTableIdString);
             } catch (NumberFormatException exception) {
                 return toolError("Invalid dataTableId - must be a numeric id obtained from listDataTables");
             }
@@ -135,7 +136,7 @@ public class QueryDataTableToolCallback implements ToolCallback {
             try {
                 baseName = DataTableQuerySupport.resolveBaseName(dataTableService, dataTableId);
             } catch (DataTableNotFoundException exception) {
-                return toolError("Data table not found: " + input.dataTableId());
+                return toolError("Data table not found: " + dataTableIdString);
             }
 
             int fetchLimit = DataTableQuerySupport.resolveLimit(input.limit());

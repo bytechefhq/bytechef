@@ -173,9 +173,10 @@ public interface ConnectedUserIntegrationMapper {
 
                     PropertyGroup propertyGroup = resolvedGroups.get(input.getName());
 
-                    if (propertyGroup != null && inputModel.getComponentReference() != null) {
-                        inputModel.getComponentReference()
-                            .group(map(propertyGroup));
+                    ComponentInputReferenceModel componentReference = inputModel.getComponentReference();
+
+                    if (propertyGroup != null && componentReference != null) {
+                        componentReference.group(map(propertyGroup));
                     }
 
                     return inputModel;

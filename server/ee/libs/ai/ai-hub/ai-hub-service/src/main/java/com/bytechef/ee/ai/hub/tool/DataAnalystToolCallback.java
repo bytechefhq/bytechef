@@ -122,15 +122,17 @@ public class DataAnalystToolCallback implements ToolCallback {
         try {
             DataAnalystInput input = jsonMapper.readValue(toolInput, DataAnalystInput.class);
 
-            if (input.question() == null || input.question()
-                .isBlank()) {
+            String question = input.question();
+
+            if (question == null || question.isBlank()) {
                 return toolError("question is required and must not be blank");
             }
 
-            String prompt = input.dataTableId() != null && !input.dataTableId()
-                .isBlank()
-                    ? input.question() + "\n\nFocus on data table id: " + input.dataTableId()
-                    : input.question();
+            String dataTableId = input.dataTableId();
+
+            String prompt = dataTableId != null && !dataTableId.isBlank()
+                ? question + "\n\nFocus on data table id: " + dataTableId
+                : question;
 
             AgentBinding parent = CurrentAgentContext.current();
             AgentType parentAgent = parent != null ? parent.agentName() : null;

@@ -313,8 +313,12 @@ public final class PinnedToolSearchToolCallingAdvisor extends ToolSearchToolCall
         if (chatClientRequest.prompt()
             .getOptions() instanceof ToolCallingChatOptions toolOptions) {
 
-            chatClientRequest.context()
-                .put(PINNED_TOOL_CALLBACKS_KEY, new ArrayList<>(toolOptions.getToolCallbacks()));
+            List<ToolCallback> configuredToolCallbacks = toolOptions.getToolCallbacks();
+
+            if (configuredToolCallbacks != null) {
+                chatClientRequest.context()
+                    .put(PINNED_TOOL_CALLBACKS_KEY, new ArrayList<>(configuredToolCallbacks));
+            }
         }
 
         return chatClientRequest;
@@ -339,7 +343,10 @@ public final class PinnedToolSearchToolCallingAdvisor extends ToolSearchToolCall
             return chatClientRequest;
         }
 
-        List<ToolCallback> toolCallbacks = new ArrayList<>(toolOptions.getToolCallbacks());
+        List<ToolCallback> currentToolCallbacks = toolOptions.getToolCallbacks();
+
+        List<ToolCallback> toolCallbacks =
+            currentToolCallbacks == null ? new ArrayList<>() : new ArrayList<>(currentToolCallbacks);
 
         Set<String> presentToolNames = new HashSet<>();
 

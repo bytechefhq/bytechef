@@ -63,6 +63,10 @@ public class AutomationMcpServerApiKeyAuthenticationProvider implements Authenti
 
         McpApiKeyCredentials mcpApiKeyCredentials = (McpApiKeyCredentials) apiKeyAuthenticationToken.getCredentials();
 
+        if (mcpApiKeyCredentials == null) {
+            throw new BadCredentialsException("Credentials do not exist");
+        }
+
         McpServer mcpServer = getMcpServer(mcpApiKeyCredentials.getMcpServerSecretKey());
 
         if (!mcpServer.isAuthenticationRequired()) {
@@ -80,6 +84,10 @@ public class AutomationMcpServerApiKeyAuthenticationProvider implements Authenti
         }
 
         McpApiKeyEntity mcpApiKeyEntity = (McpApiKeyEntity) authenticatedAuthentication.getPrincipal();
+
+        if (mcpApiKeyEntity == null) {
+            throw new BadCredentialsException("Invalid API key");
+        }
 
         if (mcpApiKeyEntity.getType() != PlatformType.AUTOMATION) {
             throw new BadCredentialsException("Invalid API key");

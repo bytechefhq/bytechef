@@ -87,8 +87,9 @@ public class CreateKnowledgeBaseToolCallback implements ToolCallback {
         try {
             CreateKnowledgeBaseInput input = jsonMapper.readValue(toolInput, CreateKnowledgeBaseInput.class);
 
-            if (input.name() == null || input.name()
-                .isBlank()) {
+            String name = input.name();
+
+            if (name == null || name.isBlank()) {
                 return toolError("name is required");
             }
 
@@ -104,11 +105,12 @@ public class CreateKnowledgeBaseToolCallback implements ToolCallback {
 
             KnowledgeBase knowledgeBase = new KnowledgeBase();
 
-            knowledgeBase.setName(input.name());
+            knowledgeBase.setName(name);
 
-            if (input.description() != null && !input.description()
-                .isBlank()) {
-                knowledgeBase.setDescription(input.description());
+            String description = input.description();
+
+            if (description != null && !description.isBlank()) {
+                knowledgeBase.setDescription(description);
             }
 
             KnowledgeBase createdKnowledgeBase = workspaceKnowledgeBaseFacade.createWorkspaceKnowledgeBase(

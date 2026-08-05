@@ -34,6 +34,7 @@ import java.math.BigInteger;
 import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -222,8 +223,11 @@ public final class GraphQLScalarTypes {
                         return parseObjectValue(objectValue);
                     }
 
-                    if (input instanceof StringValue) {
-                        return parseValue(((StringValue) input).getValue());
+                    if (input instanceof StringValue stringValue) {
+                        String value = Objects.requireNonNull(stringValue.getValue(), "string literal value");
+
+                        return Objects.requireNonNull(
+                            parseValue(value), "parseValue returned null for a string literal");
                     }
 
                     throw new CoercingParseLiteralException("Expected an ObjectValue or StringValue");

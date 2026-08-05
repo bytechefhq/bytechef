@@ -141,7 +141,9 @@ public class SearchContextStoreToolCallback implements ToolCallback {
                 return toolError("Context Store source " + input.sourceId() + " not found in the current workspace.");
             }
 
-            int limit = input.limit() == null ? ContextStoreQuery.DEFAULT_LIMIT : input.limit();
+            Integer inputLimit = input.limit();
+
+            int limit = inputLimit == null ? ContextStoreQuery.DEFAULT_LIMIT : inputLimit;
 
             if (limit <= 0) {
                 limit = ContextStoreQuery.DEFAULT_LIMIT;

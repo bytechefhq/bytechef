@@ -22,6 +22,7 @@ import com.bytechef.platform.knowledgebase.service.KnowledgeBaseSourceService;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.coordinator.trigger.jobparameter.TriggerJobParameterContributor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -89,14 +90,14 @@ public class KnowledgeBaseSourceTriggerJobParameterContributor implements Trigge
             return Map.of();
         }
 
-        if (sourceOptional.isEmpty() || sourceOptional.get()
-            .getLastSyncRunAt() == null) {
+        Instant lastSyncRunAt = sourceOptional.map(KnowledgeBaseSource::getLastSyncRunAt)
+            .orElse(null);
+
+        if (lastSyncRunAt == null) {
             return Map.of();
         }
 
-        return Map.of(ItemReader.SINCE_KEY, sourceOptional.get()
-            .getLastSyncRunAt()
-            .toEpochMilli());
+        return Map.of(ItemReader.SINCE_KEY, lastSyncRunAt.toEpochMilli());
     }
 
     private static long toLong(Object value) {

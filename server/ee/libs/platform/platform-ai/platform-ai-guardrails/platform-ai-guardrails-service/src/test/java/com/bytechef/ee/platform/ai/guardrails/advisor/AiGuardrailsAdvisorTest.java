@@ -23,6 +23,7 @@ import com.bytechef.ee.platform.ai.guardrails.service.AiGuardrailsWorkspaceSetti
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
@@ -174,15 +175,21 @@ class AiGuardrailsAdvisorTest {
 
         when(chain.nextStream(any())).thenReturn(Flux.just(chunk1, chunk2));
 
-        List<ChatClientResponse> emitted = advisor.adviseStream(request, chain)
-            .collectList()
-            .block();
+        List<ChatClientResponse> emitted = Objects.requireNonNull(
+            advisor.adviseStream(request, chain)
+                .collectList()
+                .block(),
+            "emitted");
 
         String combinedText = emitted.stream()
-            .map(response -> response.chatResponse()
-                .getResult()
-                .getOutput()
-                .getText())
+            .map(response -> {
+                ChatResponse chatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+
+                Generation generation = Objects.requireNonNull(chatResponse.getResult(), "generation");
+
+                return generation.getOutput()
+                    .getText();
+            })
             .collect(Collectors.joining());
 
         assertThat(combinedText).contains("[REDACTED_SECRET]");
@@ -212,9 +219,11 @@ class AiGuardrailsAdvisorTest {
 
         ChatClientResponse response = advisor.adviseCall(request, chain);
 
-        String responseText = response.chatResponse()
-            .getResult()
-            .getOutput()
+        ChatResponse chatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+
+        Generation generation = Objects.requireNonNull(chatResponse.getResult(), "generation");
+
+        String responseText = generation.getOutput()
             .getText();
 
         assertThat(responseText).contains("[REDACTED_EMAIL]");
