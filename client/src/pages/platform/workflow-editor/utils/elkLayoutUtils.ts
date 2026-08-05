@@ -3,6 +3,7 @@ import {
     NODE_HEIGHT,
     PLACEHOLDER_NODE_HEIGHT,
     PLACEHOLDER_NODE_WIDTH,
+    TRIGGER_FAN_IN_BUS_OFFSET,
     TRIGGER_PLACEHOLDER_NODE_ID,
     TRIGGER_PLACEHOLDER_NODE_SIZE,
 } from '@/shared/constants';
@@ -16,6 +17,7 @@ import {
     type LayoutElementsResultI,
     filterAndDedupeLayoutEdges,
     getDagreNodeSize,
+    getLabelCrossOverhang,
     getLayoutElements,
     positionTriggerPlaceholder,
 } from './layoutUtils';
@@ -102,36 +104,109 @@ const CASE_PLACEHOLDER_CROSS_FOOTPRINT = 160;
 // sibling content is ever packed onto a drawn edge.
 const COLUMN_SPINE_HALF_WIDTH = 45;
 
-// In TB a node's title/description block renders to the RIGHT of its 72px
-// icon, reaching up to ~236px past the icon's center (measured 272px DOM on
-// long labels) — while the dagre footprint models the node as 240px CENTERED
-// on the icon (±120). Packing against the centered footprint under-reserves
-// the label side by ~116px, so a neighbour's vertical edge run placed at the
-// exact 50px gap sliced straight through the label text. The overhang is
-// estimated PER NODE from its label texts so short-labelled columns don't pay
-// the worst case: the title truncates at max-w-48 (192px) + the 8px icon
-// margin, which caps the estimate at 200.
-const NODE_LABEL_MAX_CROSS_OVERHANG = 200;
-
-// Generous per-character upper bound for the 14px label text (semibold title,
-// monospace operation name), plus the icon→label margin.
-const LABEL_CHAR_WIDTH = 9;
-const LABEL_BLOCK_MARGIN = 16;
-
-function getLabelCrossOverhang(memberNode: Node): number {
-    const nodeData = memberNode.data as NodeDataType;
-
-    const longestLabelLength = Math.max(
-        String(nodeData.title || nodeData.label || '').length,
-        String(nodeData.operationName || '').length,
-        String(nodeData.workflowNodeName || nodeData.name || '').length
-    );
-
-    return Math.min(NODE_LABEL_MAX_CROSS_OVERHANG, LABEL_BLOCK_MARGIN + longestLabelLength * LABEL_CHAR_WIDTH);
-}
+// Packing against the centered dagre footprint under-reserves the label side by ~116px, so a
+// neighbour's vertical edge run placed at the exact 50px gap sliced straight through the label
+// text. getLabelCrossOverhang (layoutUtils) estimates that overhang per node; positionTriggerPlaceholder
+// measures the add-trigger slot against the same reach.
 
 // Air between a trigger's estimated label end and the next trigger's icon.
 const TRIGGER_LABEL_CLEARANCE = 30;
+// Distance from the trigger row's far edge to the first task. Matches a plain node-to-node gap
+// exactly — ELK_LAYER_SPACING plus the slack an anchor's footprint leaves around its icon — so the
+// first edge reads the same length as every edge after it.
+// How much taller a cluster root's box gets once it holds an elements row beneath its icon:
+// the chips themselves plus the gap separating them from the icon.
+const CLUSTER_ROOT_ELEMENTS_ROW_HEIGHT = 44;
+
+const TRIGGER_FIRST_NODE_CLEARANCE = ELK_LAYER_SPACING + (ANCHOR_MAIN_FOOTPRINT - NODE_ANCHOR_SIZE);
+
+/**
+ * Pushes everything below the trigger row far enough away that the fan-in bus and the first
+ * edge's add button have room, instead of being pressed against the first task. ELK lays the
+ * first task out at the plain layer spacing, which does not account for the chrome that renders
+ * into that gap.
+ *
+ * Shifts the whole non-trigger subgraph by one deficit, so every other relationship the layout
+ * established is preserved — only the trigger-to-first-task distance grows.
+ */
+function clearFirstNodeOfTriggerRow(allNodes: Node[], direction: LayoutDirectionType): void {
+    const mainAxis = direction === 'LR' ? 'x' : 'y';
+
+    const triggerNodes = allNodes.filter(
+        (node) => (node.data as NodeDataType).trigger === true && node.id !== TRIGGER_PLACEHOLDER_NODE_ID
+    );
+
+    // Parent-relative nodes (cluster elements) travel with their parent, so shifting them here
+    // as well would move them twice.
+    const otherNodes = allNodes.filter(
+        (node) =>
+            (node.data as NodeDataType).trigger !== true && node.id !== TRIGGER_PLACEHOLDER_NODE_ID && !node.parentId
+    );
+
+    if (triggerNodes.length === 0 || otherNodes.length === 0) {
+        return;
+    }
+
+    // A trigger occupies only its icon box along the main axis: TB stacks its label to the side,
+    // LR stacks it across the cross axis.
+    const triggerFarEdge = Math.max(...triggerNodes.map((node) => node.position[mainAxis])) + NODE_ANCHOR_SIZE;
+
+    const firstOtherEdge = Math.min(...otherNodes.map((node) => node.position[mainAxis]));
+
+    // With more than one trigger the gap carries TWO segments: the fan-in bus is pinned partway
+    // into it, and the first edge's leg runs from the bus to the task. One standard gap leaves the
+    // leg at half length, with the add button crammed into it.
+    const requiredClearance =
+        triggerNodes.length > 1
+            ? TRIGGER_FAN_IN_BUS_OFFSET + TRIGGER_FIRST_NODE_CLEARANCE
+            : TRIGGER_FIRST_NODE_CLEARANCE;
+
+    const deficit = triggerFarEdge + requiredClearance - firstOtherEdge;
+
+    if (deficit <= 0) {
+        return;
+    }
+
+    otherNodes.forEach((node) => {
+        node.position = {...node.position, [mainAxis]: node.position[mainAxis] + deficit};
+    });
+}
+
+/**
+ * Lifts a cluster root so its box straddles the chain's line rather than hanging below it.
+ *
+ * ELK top-aligns nodes on the cross axis, which is identical to centring while every node is the
+ * same 72px icon. A cluster root is not: its box grows downward by an elements row to hold the
+ * elements beneath its icon, so top-aligning leaves its centre — and therefore the handles
+ * ReactFlow places there — below the row its neighbours connect on. Lifting it by half the growth
+ * puts its centre back on that row.
+ *
+ * Prefers the height ReactFlow measured; nodes rebuilt from the workflow definition carry no
+ * measurement, so the elements-row constant covers the common case until one exists.
+ */
+function centerClusterRootsOnChain(allNodes: Node[], direction: LayoutDirectionType): void {
+    if (direction !== 'LR') {
+        return;
+    }
+
+    allNodes.forEach((node) => {
+        if (node.type !== 'clusterRoot') {
+            return;
+        }
+
+        const renderedHeight =
+            node.measured?.height ??
+            (hasConfiguredClusterElements(node)
+                ? NODE_ANCHOR_SIZE + CLUSTER_ROOT_ELEMENTS_ROW_HEIGHT
+                : NODE_ANCHOR_SIZE);
+
+        if (renderedHeight <= NODE_ANCHOR_SIZE) {
+            return;
+        }
+
+        node.position = {...node.position, y: node.position.y - (renderedHeight - NODE_ANCHOR_SIZE) / 2};
+    });
+}
 
 /**
  * Triggers keep a deliberately tight 160px cross footprint so the trigger row
@@ -142,19 +217,22 @@ const TRIGGER_LABEL_CLEARANCE = 30;
  * the main axis, so they cannot collide.
  */
 function separateTriggerRow(allNodes: Node[], edges: Edge[], direction: LayoutDirectionType): void {
-    if (direction !== 'TB') {
-        return;
-    }
+    clearFirstNodeOfTriggerRow(allNodes, direction);
+
+    // The row spreads along the cross axis: left-to-right in TB, top-to-bottom in LR.
+    const rowAxis = direction === 'LR' ? 'y' : 'x';
 
     const triggerNodes = allNodes
         .filter((node) => (node.data as NodeDataType).trigger === true && node.id !== TRIGGER_PLACEHOLDER_NODE_ID)
-        .sort((firstNode, secondNode) => firstNode.position.x - secondNode.position.x);
+        .sort((firstNode, secondNode) => firstNode.position[rowAxis] - secondNode.position[rowAxis]);
 
     if (triggerNodes.length < 2) {
         return;
     }
 
-    for (let index = 1; index < triggerNodes.length; index++) {
+    // Label repacking is TB-only: in LR the row stacks on the cross axis while labels extend
+    // along the main axis, so they cannot collide.
+    for (let index = 1; direction === 'TB' && index < triggerNodes.length; index++) {
         const previousNode = triggerNodes[index - 1];
         const currentNode = triggerNodes[index];
 
@@ -179,12 +257,12 @@ function separateTriggerRow(allNodes: Node[], edges: Edge[], direction: LayoutDi
         return;
     }
 
-    const rowMean = triggerNodes.reduce((sum, node) => sum + node.position.x, 0) / triggerNodes.length;
-    const rowShift = fanInTargetNode.position.x - rowMean;
+    const rowMean = triggerNodes.reduce((sum, node) => sum + node.position[rowAxis], 0) / triggerNodes.length;
+    const rowShift = fanInTargetNode.position[rowAxis] - rowMean;
 
     if (Math.abs(rowShift) >= 1) {
         triggerNodes.forEach((triggerNode) => {
-            triggerNode.position = {...triggerNode.position, x: triggerNode.position.x + rowShift};
+            triggerNode.position = {...triggerNode.position, [rowAxis]: triggerNode.position[rowAxis] + rowShift};
         });
     }
 }
@@ -2058,6 +2136,8 @@ export const getElkLayoutElements = async ({
         });
 
         separateTriggerRow(allNodes, edges, direction);
+
+        centerClusterRootsOnChain(allNodes, direction);
 
         positionTriggerPlaceholder(allNodes, direction);
 

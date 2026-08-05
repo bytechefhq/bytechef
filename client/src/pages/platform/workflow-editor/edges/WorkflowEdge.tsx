@@ -83,15 +83,15 @@ export default function WorkflowEdge({
     // trigger row (matching RoundedSmoothStepEdge) so the bend aligns with the side
     // connectors and the "+" sits on the lower leg above the first task.
     const isTriggerFanIn = !!(data as Record<string, unknown>)?.triggerFanIn;
-    const isVerticalFanIn =
-        Math.abs(correctedTargetY - correctedSourceY) >= Math.abs(correctedTargetX - correctedSourceX);
-
-    const busCenter =
-        isTriggerFanIn && isVerticalFanIn
-            ? {centerY: correctedSourceY + TRIGGER_FAN_IN_BUS_OFFSET}
-            : isTriggerFanIn
-              ? {centerX: correctedSourceX + TRIGGER_FAN_IN_BUS_OFFSET}
-              : {};
+    // Orientation comes from the layout direction, never from this edge's own Δx/Δy. A trigger
+    // far down the column has a dominant Δy even in LR, so per-edge geometry gave sibling fan-in
+    // edges different bus orientations — and disagreed with the "+" placement below, which has
+    // always keyed off the direction. The button then landed on the corner instead of the leg.
+    const busCenter = isTriggerFanIn
+        ? isHorizontal
+            ? {centerX: correctedSourceX + TRIGGER_FAN_IN_BUS_OFFSET}
+            : {centerY: correctedSourceY + TRIGGER_FAN_IN_BUS_OFFSET}
+        : {};
 
     const exitJogCenter = computeExitEdgeJogCenter({
         correctedSourceX,

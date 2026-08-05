@@ -13,7 +13,7 @@ import {
     useSetContextStoreSourceEnabledMutation,
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {MoreHorizontalIcon, PowerIcon, RefreshCwIcon, TrashIcon} from 'lucide-react';
+import {MoreVerticalIcon, PowerIcon, RefreshCwIcon, TrashIcon} from 'lucide-react';
 import {useState} from 'react';
 import {toast} from 'sonner';
 
@@ -64,7 +64,7 @@ const ContextStoreSourceRowActionsMenu = ({isAdmin, source}: ContextStoreSourceR
                         className="rounded-md p-1 hover:bg-muted"
                         data-testid={`context-store-source-actions-${source.id}`}
                     >
-                        <MoreHorizontalIcon className="size-4" />
+                        <MoreVerticalIcon className="size-4" />
                     </button>
                 </DropdownMenuTrigger>
 
@@ -84,7 +84,7 @@ const ContextStoreSourceRowActionsMenu = ({isAdmin, source}: ContextStoreSourceR
 
                     <DropdownMenuSeparator />
 
-                    <DropdownMenuItem className="text-content-destructive" onClick={() => setShowDeleteDialog(true)}>
+                    <DropdownMenuItem onClick={() => setShowDeleteDialog(true)} variant="destructive">
                         <TrashIcon className="mr-2 size-4" />
                         Delete
                     </DropdownMenuItem>

@@ -88,3 +88,26 @@ describe('getTasksStructuralFingerprint', () => {
         expect(getTasksStructuralFingerprint(withNullValues)).toBe(getTasksStructuralFingerprint(withoutElements));
     });
 });
+
+describe('graph next expressions', () => {
+    it('changes the fingerprint when a graph node next expression changes', () => {
+        const makeGraphTask = (next?: string) =>
+            ({
+                name: 'graph_1',
+                parameters: {
+                    nodes: [
+                        {name: 'node_0', tasks: []},
+                        {name: 'node_1', next, tasks: []},
+                    ],
+                },
+                type: 'graph/v1',
+            }) as unknown as WorkflowTask;
+
+        const before = getTasksStructuralFingerprint([makeGraphTask(undefined)]);
+        const after = getTasksStructuralFingerprint([makeGraphTask("'node_0'")]);
+        const edited = getTasksStructuralFingerprint([makeGraphTask("'node_2'")]);
+
+        expect(before).not.toBe(after);
+        expect(after).not.toBe(edited);
+    });
+});

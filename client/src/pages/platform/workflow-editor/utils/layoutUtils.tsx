@@ -90,6 +90,41 @@ const TRIGGER_NODE_DAGRE_WIDTH = 160;
 // The visible trigger box is a 72px icon square (w-18/min-h-18). Used to vertically
 // center the small add-trigger "+" slot on that square.
 const TRIGGER_NODE_BOX_SIZE = 72;
+// The add-trigger slot's visible box is inset from its node by this horizontal margin
+const TRIGGER_PLACEHOLDER_BOX_MARGIN = 8;
+// A trigger's three RENDERED label lines (title, operation, name). Distinct from the layout
+// footprint TRIGGER_NODE_DAGRE_WIDTH reserves, which is larger — placing against the reservation
+// leaves visibly empty space below the label in LR, where the label stacks under the icon.
+const TRIGGER_LABEL_BLOCK_HEIGHT = 64;
+
+// In TB a node's title/description block renders to the RIGHT of its 72px icon, reaching up to
+// ~236px past the icon's center (measured 272px DOM on long labels) — while the dagre footprint
+// models the node as 240px CENTERED on the icon (±120). The overhang is estimated PER NODE from
+// its label texts so short-labelled nodes don't pay the worst case: the title truncates at
+// max-w-48 (192px) + the 8px icon margin, which caps the estimate at 200.
+const NODE_LABEL_MAX_CROSS_OVERHANG = 200;
+
+// Generous per-character upper bound for the 14px label text (semibold title, monospace operation
+// name), plus the icon→label margin.
+const LABEL_CHAR_WIDTH = 9;
+const LABEL_BLOCK_MARGIN = 16;
+
+/**
+ * How far a node's label block reaches past its icon in TB, estimated from the label texts
+ * themselves. Deliberately an estimate rather than a measurement: nodes rebuilt from the workflow
+ * definition carry no ReactFlow `measured` size, so anything keyed off one silently never runs.
+ */
+export function getLabelCrossOverhang(node: Node): number {
+    const nodeData = node.data as NodeDataType;
+
+    const longestLabelLength = Math.max(
+        String(nodeData.title || nodeData.label || '').length,
+        String(nodeData.operationName || '').length,
+        String(nodeData.workflowNodeName || nodeData.name || '').length
+    );
+
+    return Math.min(NODE_LABEL_MAX_CROSS_OVERHANG, LABEL_BLOCK_MARGIN + longestLabelLength * LABEL_CHAR_WIDTH);
+}
 
 let dagre: typeof import('@dagrejs/dagre') | null = null;
 
@@ -274,33 +309,42 @@ export const positionTriggerPlaceholder = (nodes: Node[], direction: LayoutDirec
         return;
     }
 
-    // The add-trigger "+" slot sits past the trigger's icon box AND its overflowing label
-    // so it never crosses the label text, and is vertically centered on the icon box.
-    if (direction === 'LR') {
-        const highestTrigger = triggerNodes.reduce((highest, node) =>
-            node.position.y < highest.position.y ? node : highest
-        );
+    // The slot sits one gap past what the trigger occupies, in both directions, so its connector
+    // is the same short length either way. Matching the wider interval the triggers sit apart
+    // stretched the LR connector to roughly twice its TB counterpart.
+    const isVertical = direction === 'LR';
 
+    const lastTrigger = triggerNodes.reduce((furthest, node) =>
+        (isVertical ? node.position.y > furthest.position.y : node.position.x > furthest.position.x) ? node : furthest
+    );
+
+    // What a trigger visually occupies along the row's axis. In LR that is the icon box plus the
+    // label lines stacked beneath it — a fixed three-line block, since the label wraps under the
+    // icon there. In TB the label runs to the RIGHT of the icon and its length is the trigger's
+    // own, so the extent is estimated from its label texts. No layout constant can stand in for
+    // it: the label's container is min-w-max with visible overflow, so nothing clips it to a
+    // footprint. This is the same reach separateTriggerRow keeps the NEXT trigger clear of, so the
+    // slot sits where a following trigger would.
+    const triggerExtent = isVertical
+        ? TRIGGER_NODE_BOX_SIZE + TRIGGER_LABEL_BLOCK_HEIGHT
+        : TRIGGER_NODE_BOX_SIZE + getLabelCrossOverhang(lastTrigger);
+
+    if (isVertical) {
         placeholderNode.position = {
-            x: highestTrigger.position.x,
-            // The trigger's label lines render BELOW its icon in LR, so the space
-            // above the trigger row is clear — a slot-sized gap above the topmost
-            // trigger keeps the add-trigger "+" readable as the next trigger
-            // position without crossing any label.
-            y: highestTrigger.position.y - TRIGGER_PLACEHOLDER_GAP - TRIGGER_PLACEHOLDER_NODE_SIZE,
+            // Centred on the trigger's icon box. The slot's own box is inset by its horizontal
+            // margin, so centring has to account for that as well as the size difference.
+            x:
+                lastTrigger.position.x +
+                (TRIGGER_NODE_BOX_SIZE - TRIGGER_PLACEHOLDER_NODE_SIZE) / 2 -
+                TRIGGER_PLACEHOLDER_BOX_MARGIN,
+            y: lastTrigger.position.y + triggerExtent + TRIGGER_PLACEHOLDER_GAP,
         };
     } else {
-        const rightmostTrigger = triggerNodes.reduce((rightmost, node) =>
-            node.position.x > rightmost.position.x ? node : rightmost
-        );
-
         placeholderNode.position = {
-            // A full NODE_WIDTH clears the trigger's icon and its overflowing label lines, so the
-            // "+" reads as the next trigger slot instead of crossing the label text.
-            x: rightmostTrigger.position.x + NODE_WIDTH + TRIGGER_PLACEHOLDER_GAP,
+            x: lastTrigger.position.x + triggerExtent + TRIGGER_PLACEHOLDER_GAP,
             // Vertically center the "+" box on the 72px icon box (node content is center-aligned,
             // so the box starts at the node's y position).
-            y: rightmostTrigger.position.y + (TRIGGER_NODE_BOX_SIZE - TRIGGER_PLACEHOLDER_NODE_SIZE) / 2,
+            y: lastTrigger.position.y + (TRIGGER_NODE_BOX_SIZE - TRIGGER_PLACEHOLDER_NODE_SIZE) / 2,
         };
     }
 };
@@ -592,6 +636,100 @@ export const getClusterElementsLayoutElements = ({
                 if (!containsNodePosition(sibling.data.metadata)) {
                     sibling.position = {...sibling.position, x: sibling.position.x - leftShift};
                 }
+            }
+        }
+    }
+
+    // Resolve overlaps ACROSS subtrees. The pass above only compares nodes sharing a parent, but two nested cluster
+    // roots sitting side by side each position their own children independently, so a child of one can land on top of
+    // a child of the other. Positions are parent-relative, so the comparison has to happen in absolute coordinates.
+    // Rows are processed top-down: by the time a row is swept, every ancestor row has already settled, so a parent's
+    // shift is included in its children's absolute positions and the whole subtree moves with it.
+    const getNodeWidth = (node: Node): number =>
+        node.data.clusterElementTypesCount
+            ? calculateNodeWidth(node.data.clusterElementTypesCount as number) || ROOT_CLUSTER_WIDTH
+            : CLUSTER_ELEMENT_NODE_WIDTH;
+
+    const getAbsolutePoint = (node: Node): {x: number; y: number} => {
+        let absoluteX = node.position.x;
+        let absoluteY = node.position.y;
+        let ancestorId = node.parentId;
+
+        while (ancestorId) {
+            const ancestor = positionedNodes.find((positioned) => positioned.id === ancestorId);
+
+            if (!ancestor) {
+                break;
+            }
+
+            absoluteX += ancestor.position.x;
+            absoluteY += ancestor.position.y;
+            ancestorId = ancestor.parentId;
+        }
+
+        return {x: absoluteX, y: absoluteY};
+    };
+
+    const getAbsoluteX = (node: Node): number => getAbsolutePoint(node).x;
+
+    // Rows are keyed by ABSOLUTE y. Every node's relative y is the same childBaseY regardless of depth, so keying by
+    // the relative value would collapse every depth into a single row and compare nodes that never share a line.
+    const nodesByRow = new Map<number, Node[]>();
+
+    for (const node of positionedNodes) {
+        if (!node.parentId) {
+            continue;
+        }
+
+        const row = Math.round(getAbsolutePoint(node).y);
+
+        if (!nodesByRow.has(row)) {
+            nodesByRow.set(row, []);
+        }
+
+        nodesByRow.get(row)!.push(node);
+    }
+
+    for (const row of [...nodesByRow.keys()].sort((rowA, rowB) => rowA - rowB)) {
+        const rowNodes = nodesByRow.get(row)!;
+
+        if (rowNodes.length < 2) {
+            continue;
+        }
+
+        const placements = rowNodes
+            .map((node) => ({absoluteX: getAbsoluteX(node), node, width: getNodeWidth(node)}))
+            .sort((placementA, placementB) => placementA.absoluteX - placementB.absoluteX);
+
+        for (let index = 1; index < placements.length; index++) {
+            const previous = placements[index - 1];
+            const current = placements[index];
+
+            if (current.node.parentId === previous.node.parentId) {
+                continue;
+            }
+
+            if (containsNodePosition(current.node.data.metadata)) {
+                continue;
+            }
+
+            const previousLabelPadding = previous.node.data.clusterElementTypesCount
+                ? 0
+                : CLUSTER_ELEMENT_LABEL_PADDING;
+            const currentLabelPadding = current.node.data.clusterElementTypesCount ? 0 : CLUSTER_ELEMENT_LABEL_PADDING;
+            const minGap =
+                previous.node.data.clusterElementTypesCount && current.node.data.clusterElementTypesCount
+                    ? CLUSTER_ROOT_GAP
+                    : overlapPadding;
+
+            const minAbsoluteX =
+                previous.absoluteX + previous.width + previousLabelPadding + currentLabelPadding + minGap;
+
+            if (current.absoluteX < minAbsoluteX) {
+                const shift = minAbsoluteX - current.absoluteX;
+
+                current.node.position = {...current.node.position, x: current.node.position.x + shift};
+                current.absoluteX = minAbsoluteX;
             }
         }
     }

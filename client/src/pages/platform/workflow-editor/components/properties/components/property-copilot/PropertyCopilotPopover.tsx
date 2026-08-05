@@ -32,7 +32,10 @@ const PropertyCopilotPopover = ({
                     value={prompt}
                 />
 
-                <div className="flex justify-end">
+                {/* pr-1/pb-1 on top of the box's p-1 lands the button 8px from the edge, matching the
+                    result box below (p-2) so the generate and insert buttons right-align. */}
+
+                <div className="flex justify-end pr-1 pb-1">
                     <Button
                         aria-label={pending ? 'Generating' : generatedValue !== null ? 'Regenerate' : 'Generate'}
                         disabled={pending}

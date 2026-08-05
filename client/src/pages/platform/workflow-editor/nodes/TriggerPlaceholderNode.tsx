@@ -25,6 +25,24 @@ const TriggerPlaceholderNode = ({id}: {data: NodeDataType; id: string}) => {
                 )}
                 title="Click to add a trigger"
             >
+                {/* Connector back to the trigger row, so the slot reads as the next trigger rather
+                    than as a stray box. Drawn here rather than as an edge because this node is
+                    positioned by hand after layout (positionTriggerPlaceholder), so no layout edge
+                    reaches it.
+
+                    Spans the single gap positionTriggerPlaceholder leaves past what the trigger
+                    occupies — plus this box's own margin in TB, where the margin is horizontal. */}
+
+                <div
+                    aria-hidden
+                    className={twMerge(
+                        'pointer-events-none absolute border-dashed border-stroke-neutral-tertiary',
+                        layoutDirection === 'LR'
+                            ? 'bottom-full left-1/2 h-10 -translate-x-1/2 border-l-2'
+                            : 'top-1/2 right-full w-12 -translate-y-1/2 border-t-2'
+                    )}
+                />
+
                 {/* A glyph "+" sits off true center (font metrics) and cannot grow past its line box; the icon
                     centers exactly in the flex box and scales freely. */}
 

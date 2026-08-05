@@ -3561,6 +3561,89 @@ describe('LR entry gap', () => {
     });
 });
 
+describe('cluster root chain alignment', () => {
+    const measuredClusterRoot = (id: string, height: number): Node =>
+        ({
+            data: {clusterElements: {model: {name: 'model_1'}}, componentName: 'aiAgent', workflowNodeName: id},
+            id,
+            measured: {height, width: 292},
+            position: {x: 0, y: 0},
+            type: 'clusterRoot',
+        }) as unknown as Node;
+
+    it('lifts a cluster root so its centre sits on the chain in LR', async () => {
+        const nodes: Node[] = [taskNode('before'), measuredClusterRoot('agent', 116), taskNode('after')];
+
+        const edges: Edge[] = [edge('before', 'agent'), edge('agent', 'after')];
+
+        const result = await getElkLayoutElements({
+            canvasHeight: 900,
+            canvasWidth: 1600,
+            direction: 'LR',
+            edges,
+            nodes,
+        });
+
+        const neighbourCenter = positionOf(result.nodes, 'before').y + 36;
+        const agentCenter = positionOf(result.nodes, 'agent').y + 116 / 2;
+
+        // ELK top-aligns, which only coincides with centring while every node is a 72px icon. A
+        // cluster root grows downward, so its centre — and the handles ReactFlow puts there —
+        // would otherwise hang below the row its neighbours connect on.
+        expect(Math.abs(agentCenter - neighbourCenter)).toBeLessThanOrEqual(1);
+    });
+
+    it('centres an unmeasured cluster root on its elements-row growth', async () => {
+        const nodes: Node[] = [
+            taskNode('before'),
+            {
+                data: {clusterElements: {model: {name: 'model_1'}}, componentName: 'aiAgent'},
+                id: 'agent',
+                position: {x: 0, y: 0},
+                type: 'clusterRoot',
+            } as unknown as Node,
+        ];
+
+        const edges: Edge[] = [edge('before', 'agent')];
+
+        const result = await getElkLayoutElements({
+            canvasHeight: 900,
+            canvasWidth: 1600,
+            direction: 'LR',
+            edges,
+            nodes,
+        });
+
+        // Nodes rebuilt from the workflow definition carry no measurement, so the shift comes from
+        // how much an elements row grows the box (44) — half of it, lifting the centre onto the row
+        expect(positionOf(result.nodes, 'agent').y).toBe(positionOf(result.nodes, 'before').y - 22);
+    });
+
+    it('leaves a cluster root with no elements alone, since it is already icon-sized', async () => {
+        const nodes: Node[] = [
+            taskNode('before'),
+            {
+                data: {componentName: 'aiAgent'},
+                id: 'agent',
+                position: {x: 0, y: 0},
+                type: 'clusterRoot',
+            } as unknown as Node,
+        ];
+
+        const edges: Edge[] = [edge('before', 'agent')];
+
+        const result = await getElkLayoutElements({
+            canvasHeight: 900,
+            canvasWidth: 1600,
+            direction: 'LR',
+            edges,
+            nodes,
+        });
+
+        expect(positionOf(result.nodes, 'agent').y).toBe(positionOf(result.nodes, 'before').y);
+    });
+});
+
 describe('trigger row label separation', () => {
     const triggerNode = (id: string, title: string): Node => ({
         data: {componentName: 'schedule', title, trigger: true, workflowNodeName: id},
@@ -3594,6 +3677,48 @@ describe('trigger row label separation', () => {
         const taskCenter = positionOf(result.nodes, 'task1').x + 36;
 
         expect(Math.abs((firstX + secondX) / 2 + 36 - taskCenter)).toBeLessThanOrEqual(1);
+    });
+
+    it('leaves room below the trigger row for the fan-in bus and the first edge add button', async () => {
+        const nodes: Node[] = [triggerNode('trigger_1', 'Run'), triggerNode('trigger_2', 'Go'), taskNode('task1')];
+
+        const edges: Edge[] = [edge('trigger_1', 'task1'), edge('trigger_2', 'task1')];
+
+        const result = await getElkLayoutElements({canvasWidth: 1400, direction: 'TB', edges, nodes});
+
+        const triggerBottom =
+            Math.max(positionOf(result.nodes, 'trigger_1').y, positionOf(result.nodes, 'trigger_2').y) + 72;
+
+        // Two triggers fan in, so the gap carries TWO segments: the bus is pinned 40px into it
+        // and the first edge's leg runs from there to the task at a full 80px node-to-node gap.
+        // One gap total left the leg at half length with the add button crammed inside it.
+        expect(positionOf(result.nodes, 'task1').y - triggerBottom).toBe(120);
+    });
+
+    it('leaves the same room to the right of the trigger column in LR', async () => {
+        const nodes: Node[] = [triggerNode('trigger_1', 'Run'), triggerNode('trigger_2', 'Go'), taskNode('task1')];
+
+        const edges: Edge[] = [edge('trigger_1', 'task1'), edge('trigger_2', 'task1')];
+
+        const result = await getElkLayoutElements({canvasWidth: 1400, direction: 'LR', edges, nodes});
+
+        const triggerRight =
+            Math.max(positionOf(result.nodes, 'trigger_1').x, positionOf(result.nodes, 'trigger_2').x) + 72;
+
+        expect(positionOf(result.nodes, 'task1').x - triggerRight).toBe(120);
+    });
+
+    it('uses a single node-to-node gap when one trigger means no fan-in bus', async () => {
+        const nodes: Node[] = [triggerNode('trigger_1', 'Run'), taskNode('task1')];
+
+        const edges: Edge[] = [edge('trigger_1', 'task1')];
+
+        const result = await getElkLayoutElements({canvasWidth: 1400, direction: 'TB', edges, nodes});
+
+        const triggerBottom = positionOf(result.nodes, 'trigger_1').y + 72;
+
+        // No bus to accommodate, so the first edge is simply a normal edge
+        expect(positionOf(result.nodes, 'task1').y - triggerBottom).toBe(80);
     });
 
     it('keeps the tight trigger pitch when labels fit', async () => {

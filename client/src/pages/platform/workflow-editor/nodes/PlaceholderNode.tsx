@@ -1,8 +1,9 @@
 import '@/shared/styles/dropdownMenu.css';
 import {ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger} from '@/components/ui/context-menu';
+import {FINAL_PLACEHOLDER_NODE_ID} from '@/shared/constants';
 import {NodeDataType} from '@/shared/types';
 import {Handle, Position} from '@xyflow/react';
-import {ClipboardPlusIcon} from 'lucide-react';
+import {ClipboardPlusIcon, PlusIcon} from 'lucide-react';
 import {DragEvent, memo, useCallback, useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
@@ -41,6 +42,10 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
     const nodeIndex = nodes.findIndex((node) => node.id === id);
     const isClusterElement = !!data.clusterElementType;
+    // The slot that ends the chain reads as "add the next step" rather than as a gap between two
+    // existing ones, so it takes the add-trigger slot's dashed outline instead of the solid chip
+    // the in-chain and lane placeholders use.
+    const isFinalPlaceholder = id === FINAL_PLACEHOLDER_NODE_ID;
     const rootClusterElementId = id.split('-')[0];
     const effectiveDirection = isClusterElement ? 'TB' : layoutDirection;
 
@@ -112,7 +117,13 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
                                 isDropzoneActive
                                     ? 'absolute ml-2 size-16 scale-150 cursor-pointer bg-blue-100'
                                     : 'size-7 bg-gray-300',
-                                isClusterElement && 'mx-0 size-6'
+                                isClusterElement && 'mx-0 size-6',
+                                // mx-3 around the 48px box keeps the node's DOM footprint at the 72px
+                                // getRenderedNodeSize assumes for a placeholder, so widening the box
+                                // does not shift the chain it sits under.
+                                isFinalPlaceholder &&
+                                    !isDropzoneActive &&
+                                    'mx-3 size-12 border-2 border-dashed border-stroke-neutral-tertiary bg-surface-neutral-primary hover:scale-105 hover:border-stroke-brand-secondary-hover hover:bg-surface-neutral-primary hover:text-content-neutral-primary'
                             )}
                             onDragEnter={handleDragEnter}
                             onDragLeave={handleDragLeave}
@@ -120,7 +131,10 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
                             onDrop={handleDrop}
                             title="Click to add a node"
                         >
-                            {data.label}
+                            {/* A glyph "+" sits off true center (font metrics) and cannot grow past its
+                                line box; the icon centers exactly in the flex box and scales freely. */}
+
+                            {isFinalPlaceholder ? <PlusIcon className="size-6" /> : data.label}
 
                             <Handle
                                 className={styles.handle}

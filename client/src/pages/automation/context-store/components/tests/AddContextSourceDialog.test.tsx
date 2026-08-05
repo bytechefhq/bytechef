@@ -260,7 +260,7 @@ describe('AddContextSourceDialog', () => {
 
         await openWizardAndAdvanceToEntities(user);
 
-        await user.type(screen.getByLabelText('Entity Name'), 'contacts');
+        await user.type(screen.getByLabelText(/Entity Name/), 'contacts');
         await user.type(screen.getByLabelText('ID Field'), 'id');
 
         await user.click(screen.getByRole('button', {name: /add field/i}));

@@ -1,4 +1,6 @@
 import Button from '@/components/Button/Button';
+import LoadingIcon from '@/components/LoadingIcon';
+import RequiredMark from '@/components/RequiredMark';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
 import {
@@ -398,7 +400,9 @@ const AddContextSourceDialog = ({contextStoreId: presetContextStoreId, trigger}:
                                     <Label>Pick a Component</Label>
 
                                     {connectionsLoading ? (
-                                        <p className="text-sm text-muted-foreground">Loading components...</p>
+                                        <p className="flex items-center gap-2 text-sm text-muted-foreground">
+                                            <LoadingIcon /> Loading components...
+                                        </p>
                                     ) : availableComponents.length === 0 ? (
                                         <p className="text-sm text-muted-foreground">
                                             No data-stream-compatible connections found in this workspace. Create one on
@@ -505,7 +509,10 @@ const AddContextSourceDialog = ({contextStoreId: presetContextStoreId, trigger}:
                     {step === 1 && selectedConnection && (
                         <fieldset className="space-y-4 border-0 p-0" data-testid="record-shape-step">
                             <fieldset className="space-y-1 border-0 p-0">
-                                <Label htmlFor="entityName">Entity Name</Label>
+                                <Label htmlFor="entityName">
+                                    Entity Name
+                                    <RequiredMark />
+                                </Label>
 
                                 <Input
                                     id="entityName"

@@ -59,7 +59,6 @@ const ContextStoreRowActionsMenu = ({contextStore, isAdmin}: ContextStoreRowActi
                     <DropdownMenuSeparator />
 
                     <DropdownMenuItem
-                        className="text-content-destructive"
                         onClick={() => {
                             if (
                                 window.confirm(
@@ -73,6 +72,7 @@ const ContextStoreRowActionsMenu = ({contextStore, isAdmin}: ContextStoreRowActi
                                 });
                             }
                         }}
+                        variant="destructive"
                     >
                         <TrashIcon className="mr-2 size-4" />
                         Delete

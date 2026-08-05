@@ -536,7 +536,10 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                             ? hasValidClusterElements
                                 ? {left: '120px'}
                                 : {left: '36px'}
-                            : undefined
+                            : // LR: ReactFlow's default centres these on the box, and
+                              // centerClusterRootsOnChain puts that centre on the chain's line —
+                              // so an edge meets the box at its middle and still runs straight.
+                              undefined
                     }
                     type="target"
                 />
@@ -553,7 +556,10 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                             ? hasValidClusterElements
                                 ? {left: '120px'}
                                 : {left: '36px'}
-                            : undefined
+                            : // LR: ReactFlow's default centres these on the box, and
+                              // centerClusterRootsOnChain puts that centre on the chain's line —
+                              // so an edge meets the box at its middle and still runs straight.
+                              undefined
                     }
                     type="source"
                 />
