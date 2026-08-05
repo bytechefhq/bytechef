@@ -488,15 +488,75 @@ check stays the service layer's job as it already is for JDBC; ordering comes fr
 `updatedAt` because `FileEntry` carries no modification time; and there is **no migration path between
 providers** — switching does not move existing memories.
 
+### Copilot domain agent module map (revised 2026-08-05)
+
+Copilot domain agents live one-config-per-activation-profile, per edition — NOT in ai-hub-service
+(which holds only hub-owned agents: personal_agent_manager, research, data_analyst, image_generator,
+slide_builder, managers):
+
+- CE `ai-copilot-service`: `CopilotConfiguration` (copilot-only: workflow_editor, code_editor,
+  cluster_element, skills, workflow_execution, converter, json_schema_builder, sample_output),
+  `DataTableAgentConfiguration` (copilot∨hub), `KnowledgeBaseAgentConfiguration` (copilot∨hub ∧
+  `bytechef.ai.knowledge-base.enabled`).
+- EE `automation-ai-copilot`: `AutomationCopilotConfiguration` (copilot∨hub: custom_component +
+  code_workflow — panel `*SpringAIAgent`s AND one-shot `*SubAgentChatClient`s in one class),
+  `ContextStoreAgentConfiguration` (copilot∨hub ∧ `bytechef.context-store.enabled`).
+
+Per domain and mode there is ONE prompt file shared by the panel agent and the subagent client (no
+`_copilot_` prompt twins). `*AskSubAgentChatClient` beans feed only the hub ASK agent;
+`*BuildSubAgentChatClient` beans feed the hub BUILD agent AND the management MCP surface. MCP
+contributors follow the beans' edition: CE `ToolCallbackContributorConfiguration` (ai-copilot-service)
+contributes CE-bean domains; EE `AutomationCopilotMcpContributorConfiguration` (automation-ai-copilot)
+contributes context_store/custom_component/code_workflow. A CE class must not hold `@Qualifier`
+references to EE bean names. Panel agents are dispatched by `CopilotApiController` collecting every
+`LocalAgent` bean by agentId (`<source>_<mode>`); adding a domain needs a controller branch + a client
+`Source` enum entry (lowercase value = URL segment) + an editor trigger + post-turn invalidation via
+`useCopilotPostTurnRegistry`. Manager subagents (api_collection_manager etc.) deliberately have no
+ask/build split — reads are flat tools on the hub ASK agent.
+
 ### Domain copilot slice pattern (context store / knowledge base / data table)
 
 Each domain slice follows the same shape (see `docs/superpowers/plans/` for the slice plans):
 shared tool callbacks + a `*ToolCallbacksFactory` (read list feeds ASK, write list feeds BUILD)
-in `automation-ai-tool`; an EE `<Domain>AgentConfiguration` in ai-hub-service defining the
+in `automation-ai-tool`; a `<Domain>AgentConfiguration` (module per the map above) defining the
 source-panel agents and the ask/build subagent ChatClients; a `<domain>_agent` delegate callback
 in `ai-copilot-tool`; a source enum entry on both surfaces; AI Hub delegates the domain to the
 specialist instead of registering flat mutation tools; the client detail page gets a copilot
 trigger + post-turn query invalidation.
+
+### Editor draft/publish (custom components & code workflows, 2026-08-05)
+
+Published artifacts are immutable via the editor paths; at most one mutable draft exists at a time.
+Spec: `docs/superpowers/specs/2026-08-05-draft-publish-editors-design.md`.
+
+- **Custom components**: `custom_component.status` (INT ordinal `Status {DRAFT, PUBLISHED}`, pinned)
+  + `published_date`. Editor save updates a DRAFT in place (componentVersion re-read from the
+  compiled definition); saving a PUBLISHED row spawns a new DRAFT row (the source-declared version must be
+  strictly above the max; typed errors VERSION_NOT_BUMPED / DRAFT_ALREADY_EXISTS /
+  VERSION_ALREADY_EXISTS). `publishCustomComponent` (facade + GraphQL mutation + agent/MCP tool)
+  flips the draft. The handler registry filters `status == PUBLISHED` on BOTH list and fetch paths.
+  One-draft-per-name is facade-enforced only — a concurrent-save race can create two drafts, after
+  which `findByNameAndStatus` throws until one is deleted.
+- **Code workflows** (automation + embedded mirror): editor save reconciles a mutable draft
+  `code_workflow_container` in place via `CodeWorkflowContainerFacade.update`/7-arg `create`
+  (returns `CodeWorkflowReconciliation`); after a publish, the next save mints a new container
+  adopting the draft version's duplicated workflows through the ProjectWorkflow-uuid chain, so
+  workflowIds (and test configurations) survive. Publish happens ONLY via the project/integration
+  header publish. Editor-path saves never call `publishProject`/`publishIntegration`.
+- **Upload/deploy paths publish immediately, by design** (CLI/REST deploy, embedded bridge): custom
+  component uploads write PUBLISHED rows (rejected if a draft owns the version); project/integration
+  deploys keep `deployInto`'s deploy-and-publish shape.
+- **Bridge exclusion**: `__EMBEDDED_AUTOMATION__` catalog projects are filtered from
+  `getCodeWorkflowProjects` and `updateCodeWorkflowSource` rejects them
+  (EMBEDDED_BRIDGE_PROJECT_NOT_EDITABLE) — editor drafts would poison the bridge's one-deploy-back
+  uuid carry-forward.
+- **File-storage gotcha**: every `storeFile` writes a NEW physical blob even under an identical
+  logical filename (`generateFilename=true`) — replaced-blob deletion must compare FileEntry URLs,
+  never names.
+- **Management MCP**: read viewers (`CodeCustomComponentViewerMcpContributorConfiguration`) plus
+  flat WRITE tools (`CodeCustomComponentWriteMcpContributorConfiguration`: create/update/publish/
+  delete custom component, create/update code workflow) — MCP clients author code directly,
+  draft-safe; `publishProject` comes from the core management tool set.
 
 ### MCP servers and workflows-as-tools (fromAi mapping)
 

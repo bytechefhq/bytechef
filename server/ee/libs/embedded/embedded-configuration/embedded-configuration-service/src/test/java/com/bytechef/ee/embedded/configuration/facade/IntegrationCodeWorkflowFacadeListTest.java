@@ -14,6 +14,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationCodeWorkflow;
@@ -167,7 +168,7 @@ class IntegrationCodeWorkflowFacadeListTest {
         return new IntegrationCodeWorkflowFacadeImpl(
             applicationProperties(true), mock(CacheManager.class), mock(CodeWorkflowContainerFacade.class),
             integrationCodeWorkflowService, integrationService, mock(IntegrationWorkflowService.class),
-            codeWorkflowContainerService, mock(CodeWorkflowFileStorage.class));
+            codeWorkflowContainerService, mock(CodeWorkflowFileStorage.class), mock(WorkflowService.class));
     }
 
     private static ApplicationProperties applicationProperties(boolean javaEnabled) {

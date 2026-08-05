@@ -10,12 +10,16 @@ package com.bytechef.ee.automation.configuration.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
@@ -26,13 +30,15 @@ import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowServi
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
 import com.bytechef.ee.platform.codeworkflow.configuration.facade.CodeWorkflowContainerFacade;
+import com.bytechef.ee.platform.codeworkflow.configuration.facade.CodeWorkflowContainerFacade.CodeWorkflowReconciliation;
 import com.bytechef.ee.platform.codeworkflow.configuration.service.CodeWorkflowContainerService;
 import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorage;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.platform.constant.PlatformType;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
-import java.util.UUID;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.cache.CacheManager;
@@ -81,7 +87,8 @@ class ProjectCodeWorkflowFacadeSourceTest {
 
         ProjectCodeWorkflowFacadeImpl projectCodeWorkflowFacade = newFacade(
             mock(ProjectService.class), mock(ProjectWorkflowService.class), mock(CodeWorkflowContainerFacade.class),
-            projectCodeWorkflowService, codeWorkflowContainerService, codeWorkflowFileStorage);
+            projectCodeWorkflowService, codeWorkflowContainerService, codeWorkflowFileStorage,
+            mock(WorkflowService.class));
 
         String source = projectCodeWorkflowFacade.getCodeWorkflowSource(42L);
 
@@ -110,7 +117,8 @@ class ProjectCodeWorkflowFacadeSourceTest {
 
         ProjectCodeWorkflowFacadeImpl projectCodeWorkflowFacade = newFacade(
             mock(ProjectService.class), mock(ProjectWorkflowService.class), mock(CodeWorkflowContainerFacade.class),
-            projectCodeWorkflowService, codeWorkflowContainerService, codeWorkflowFileStorage);
+            projectCodeWorkflowService, codeWorkflowContainerService, codeWorkflowFileStorage,
+            mock(WorkflowService.class));
 
         assertThatThrownBy(() -> projectCodeWorkflowFacade.getCodeWorkflowSource(42L))
             .isInstanceOf(ConfigurationException.class)
@@ -125,6 +133,7 @@ class ProjectCodeWorkflowFacadeSourceTest {
         ProjectCodeWorkflow projectCodeWorkflow = mock(ProjectCodeWorkflow.class);
 
         when(projectCodeWorkflow.getCodeWorkflowContainerId()).thenReturn(5L);
+        when(projectCodeWorkflow.getProjectVersion()).thenReturn(1);
 
         CodeWorkflowContainer existingCodeWorkflowContainer = mock(CodeWorkflowContainer.class);
 
@@ -133,6 +142,7 @@ class ProjectCodeWorkflowFacadeSourceTest {
         ProjectCodeWorkflowService projectCodeWorkflowService = mock(ProjectCodeWorkflowService.class);
 
         when(projectCodeWorkflowService.getProjectCodeWorkflow(1L)).thenReturn(projectCodeWorkflow);
+        when(projectCodeWorkflowService.fetchProjectCodeWorkflow(1L)).thenReturn(Optional.of(projectCodeWorkflow));
 
         CodeWorkflowContainerService codeWorkflowContainerService = mock(CodeWorkflowContainerService.class);
 
@@ -151,33 +161,35 @@ class ProjectCodeWorkflowFacadeSourceTest {
 
         CodeWorkflowContainer redeployedCodeWorkflowContainer = mock(CodeWorkflowContainer.class);
 
-        when(redeployedCodeWorkflowContainer.getWorkflowNameIds())
-            .thenReturn(Map.of("my-workflow", UUID.randomUUID()
-                .toString()));
+        CodeWorkflowReconciliation reconciliation = new CodeWorkflowReconciliation(
+            redeployedCodeWorkflowContainer, Map.of(), Map.of());
 
         CodeWorkflowContainerFacade codeWorkflowContainerFacade = mock(CodeWorkflowContainerFacade.class);
 
-        when(codeWorkflowContainerFacade.create(any(), any(), any(), eq(Language.JAVASCRIPT), any(), any()))
-            .thenReturn(redeployedCodeWorkflowContainer);
+        when(codeWorkflowContainerFacade.update(
+            eq(existingCodeWorkflowContainer), any(), any(), any(), eq(PlatformType.AUTOMATION)))
+                .thenReturn(reconciliation);
 
         CodeWorkflowFileStorage codeWorkflowFileStorage = mock(CodeWorkflowFileStorage.class);
 
         ProjectCodeWorkflowFacadeImpl projectCodeWorkflowFacade = newFacade(
             projectService, projectWorkflowService, codeWorkflowContainerFacade, projectCodeWorkflowService,
-            codeWorkflowContainerService, codeWorkflowFileStorage);
+            codeWorkflowContainerService, codeWorkflowFileStorage, mock(WorkflowService.class));
 
         projectCodeWorkflowFacade.updateCodeWorkflowSource(1L, jsScript("my-code-project"));
 
         ArgumentCaptor<byte[]> bytesCaptor = ArgumentCaptor.forClass(byte[].class);
 
-        verify(codeWorkflowContainerFacade).create(
-            eq("my-code-project"), eq("1"), any(), eq(Language.JAVASCRIPT), bytesCaptor.capture(), any());
+        verify(codeWorkflowContainerFacade).update(
+            eq(existingCodeWorkflowContainer), eq("1"), any(), bytesCaptor.capture(), eq(PlatformType.AUTOMATION));
 
         assertThat(new String(bytesCaptor.getValue(), StandardCharsets.UTF_8))
             .isEqualTo(jsScript("my-code-project"));
 
-        verify(projectCodeWorkflowService).create(redeployedCodeWorkflowContainer, project);
-        verify(projectService).publishProject(1L, null, false);
+        verify(codeWorkflowContainerFacade, never()).create(any(), any(), any(), any(), any(), any());
+        verify(codeWorkflowContainerFacade, never()).create(any(), any(), any(), any(), any(), any(), any());
+        verify(projectCodeWorkflowService, never()).create(any(), any());
+        verify(projectService, never()).publishProject(anyLong(), any(), anyBoolean());
     }
 
     @Test
@@ -211,13 +223,57 @@ class ProjectCodeWorkflowFacadeSourceTest {
 
         ProjectCodeWorkflowFacadeImpl projectCodeWorkflowFacade = newFacade(
             projectService, mock(ProjectWorkflowService.class), codeWorkflowContainerFacade,
-            projectCodeWorkflowService, codeWorkflowContainerService, mock(CodeWorkflowFileStorage.class));
+            projectCodeWorkflowService, codeWorkflowContainerService, mock(CodeWorkflowFileStorage.class),
+            mock(WorkflowService.class));
 
         assertThatThrownBy(
             () -> projectCodeWorkflowFacade.updateCodeWorkflowSource(1L, "this is not { valid javascript ("))
                 .isInstanceOf(ConfigurationException.class)
                 .extracting(thrown -> ((ConfigurationException) thrown).getErrorKey())
                 .isEqualTo(CodeWorkflowErrorType.SOURCE_LOAD_FAILED.getErrorKey());
+
+        verifyNoInteractions(codeWorkflowContainerFacade);
+    }
+
+    @Test
+    void testUpdateCodeWorkflowSourceOnEmbeddedBridgeProjectIsRejected() {
+        ProjectCodeWorkflow projectCodeWorkflow = mock(ProjectCodeWorkflow.class);
+
+        when(projectCodeWorkflow.getCodeWorkflowContainerId()).thenReturn(5L);
+
+        CodeWorkflowContainer existingCodeWorkflowContainer = mock(CodeWorkflowContainer.class);
+
+        when(existingCodeWorkflowContainer.getLanguage()).thenReturn(Language.JAVASCRIPT);
+
+        ProjectCodeWorkflowService projectCodeWorkflowService = mock(ProjectCodeWorkflowService.class);
+
+        when(projectCodeWorkflowService.getProjectCodeWorkflow(1L)).thenReturn(projectCodeWorkflow);
+
+        CodeWorkflowContainerService codeWorkflowContainerService = mock(CodeWorkflowContainerService.class);
+
+        when(codeWorkflowContainerService.getCodeWorkflowContainer(5L)).thenReturn(existingCodeWorkflowContainer);
+
+        Project project = new Project();
+
+        project.setId(1L);
+        project.setName("__EMBEDDED_AUTOMATION__catalog-project");
+
+        ProjectService projectService = mock(ProjectService.class);
+
+        when(projectService.getProject(1L)).thenReturn(project);
+
+        CodeWorkflowContainerFacade codeWorkflowContainerFacade = mock(CodeWorkflowContainerFacade.class);
+
+        ProjectCodeWorkflowFacadeImpl projectCodeWorkflowFacade = newFacade(
+            projectService, mock(ProjectWorkflowService.class), codeWorkflowContainerFacade,
+            projectCodeWorkflowService, codeWorkflowContainerService, mock(CodeWorkflowFileStorage.class),
+            mock(WorkflowService.class));
+
+        assertThatThrownBy(() -> projectCodeWorkflowFacade.updateCodeWorkflowSource(
+            1L, jsScript("catalog-project")))
+                .isInstanceOf(ConfigurationException.class)
+                .extracting(thrown -> ((ConfigurationException) thrown).getErrorKey())
+                .isEqualTo(CodeWorkflowErrorType.EMBEDDED_BRIDGE_PROJECT_NOT_EDITABLE.getErrorKey());
 
         verifyNoInteractions(codeWorkflowContainerFacade);
     }
@@ -253,7 +309,8 @@ class ProjectCodeWorkflowFacadeSourceTest {
 
         ProjectCodeWorkflowFacadeImpl projectCodeWorkflowFacade = newFacade(
             projectService, mock(ProjectWorkflowService.class), codeWorkflowContainerFacade,
-            projectCodeWorkflowService, codeWorkflowContainerService, mock(CodeWorkflowFileStorage.class));
+            projectCodeWorkflowService, codeWorkflowContainerService, mock(CodeWorkflowFileStorage.class),
+            mock(WorkflowService.class));
 
         assertThatThrownBy(() -> projectCodeWorkflowFacade.updateCodeWorkflowSource(
             1L, jsScript("a-completely-different-name")))
@@ -274,12 +331,13 @@ class ProjectCodeWorkflowFacadeSourceTest {
         ProjectService projectService, ProjectWorkflowService projectWorkflowService,
         CodeWorkflowContainerFacade codeWorkflowContainerFacade,
         ProjectCodeWorkflowService projectCodeWorkflowService,
-        CodeWorkflowContainerService codeWorkflowContainerService, CodeWorkflowFileStorage codeWorkflowFileStorage) {
+        CodeWorkflowContainerService codeWorkflowContainerService, CodeWorkflowFileStorage codeWorkflowFileStorage,
+        WorkflowService workflowService) {
 
         return new ProjectCodeWorkflowFacadeImpl(
             applicationProperties(true), mock(CacheManager.class), projectService, projectWorkflowService,
             codeWorkflowContainerFacade, projectCodeWorkflowService, codeWorkflowContainerService,
-            codeWorkflowFileStorage);
+            codeWorkflowFileStorage, workflowService);
     }
 
     private static ApplicationProperties applicationProperties(boolean javaEnabled) {

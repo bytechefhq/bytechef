@@ -30,6 +30,14 @@ public class CustomComponentErrorType extends AbstractErrorType {
 
     public static final CustomComponentErrorType INVALID_COMPONENT_NAME = new CustomComponentErrorType(105);
 
+    public static final CustomComponentErrorType VERSION_NOT_BUMPED = new CustomComponentErrorType(106);
+
+    public static final CustomComponentErrorType DRAFT_ALREADY_EXISTS = new CustomComponentErrorType(107);
+
+    public static final CustomComponentErrorType VERSION_ALREADY_EXISTS = new CustomComponentErrorType(108);
+
+    public static final CustomComponentErrorType COMPONENT_NOT_DRAFT = new CustomComponentErrorType(109);
+
     private CustomComponentErrorType(int errorKey) {
         super(CustomComponent.class, errorKey);
     }

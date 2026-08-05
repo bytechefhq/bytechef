@@ -77,6 +77,36 @@ class CustomComponentFacadeCreateEmptyTest {
         assertThat(customComponent.getName()).isEqualTo("acme");
     }
 
+    @Test
+    void testCreateEmptyCustomComponentStartsAsDraft() {
+        CustomComponentService customComponentService = mock(CustomComponentService.class);
+
+        when(customComponentService.fetchCustomComponent("acme", 1))
+            .thenReturn(Optional.empty());
+        when(customComponentService.create(any()))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+
+        CustomComponentFileStorage customComponentFileStorage = mock(CustomComponentFileStorage.class);
+
+        when(customComponentFileStorage.storeCustomComponentFile(anyString(), any()))
+            .thenReturn(new FileEntry("acme_1.js", "file:///acme_1.js"));
+
+        CustomComponentFacadeImpl customComponentFacade = new CustomComponentFacadeImpl(
+            applicationProperties(true), mock(CacheManager.class), customComponentService,
+            customComponentFileStorage);
+
+        customComponentFacade.createEmptyCustomComponent("acme", Language.JAVASCRIPT);
+
+        ArgumentCaptor<CustomComponent> customComponentCaptor = ArgumentCaptor.forClass(CustomComponent.class);
+
+        verify(customComponentService).create(customComponentCaptor.capture());
+
+        CustomComponent createdCustomComponent = customComponentCaptor.getValue();
+
+        assertThat(createdCustomComponent.getStatus()).isEqualTo(CustomComponent.Status.DRAFT);
+        assertThat(createdCustomComponent.getPublishedDate()).isNull();
+    }
+
     @ParameterizedTest
     @EnumSource(value = Language.class, names = "JAVASCRIPT", mode = EnumSource.Mode.EXCLUDE)
     void testCreateEmptyCustomComponentRejectsNonJavascriptLanguages(Language language) {

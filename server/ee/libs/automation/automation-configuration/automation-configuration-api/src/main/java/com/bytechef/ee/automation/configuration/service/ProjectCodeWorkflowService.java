@@ -11,6 +11,7 @@ import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.ee.automation.configuration.domain.ProjectCodeWorkflow;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @version ee
@@ -22,6 +23,8 @@ public interface ProjectCodeWorkflowService {
     ProjectCodeWorkflow create(CodeWorkflowContainer codeWorkflowContainer, Project projectCodeWorkflow);
 
     void deleteProjectCodeWorkflows(long projectId);
+
+    Optional<ProjectCodeWorkflow> fetchProjectCodeWorkflow(long projectId);
 
     List<Long> getCodeWorkflowProjectIds();
 

@@ -14,6 +14,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
@@ -63,6 +64,33 @@ class ProjectCodeWorkflowFacadeListTest {
     }
 
     @Test
+    void testGetCodeWorkflowProjectsExcludesEmbeddedBridgeCatalogProjects() {
+        ProjectCodeWorkflowService projectCodeWorkflowService = mock(ProjectCodeWorkflowService.class);
+
+        when(projectCodeWorkflowService.getCodeWorkflowProjectIds()).thenReturn(List.of(1L, 2L));
+
+        Project editorProject = new Project();
+
+        editorProject.setId(1L);
+        editorProject.setName("first-code-project");
+
+        Project bridgeCatalogProject = new Project();
+
+        bridgeCatalogProject.setId(2L);
+        bridgeCatalogProject.setName("__EMBEDDED_AUTOMATION__catalog-project");
+
+        ProjectService projectService = mock(ProjectService.class);
+
+        when(projectService.getProjects(List.of(1L, 2L))).thenReturn(List.of(editorProject, bridgeCatalogProject));
+
+        ProjectCodeWorkflowFacadeImpl projectCodeWorkflowFacade = newFacade(projectService, projectCodeWorkflowService);
+
+        List<Project> projects = projectCodeWorkflowFacade.getCodeWorkflowProjects();
+
+        assertThat(projects).containsExactly(editorProject);
+    }
+
+    @Test
     void testGetCodeWorkflowProjectsReturnsEmptyListWhenNoCodeWorkflowsExist() {
         ProjectCodeWorkflowService projectCodeWorkflowService = mock(ProjectCodeWorkflowService.class);
 
@@ -85,7 +113,8 @@ class ProjectCodeWorkflowFacadeListTest {
         return new ProjectCodeWorkflowFacadeImpl(
             applicationProperties(true), mock(CacheManager.class), projectService, mock(ProjectWorkflowService.class),
             mock(CodeWorkflowContainerFacade.class), projectCodeWorkflowService,
-            mock(CodeWorkflowContainerService.class), mock(CodeWorkflowFileStorage.class));
+            mock(CodeWorkflowContainerService.class), mock(CodeWorkflowFileStorage.class),
+            mock(WorkflowService.class));
     }
 
     private static ApplicationProperties applicationProperties(boolean javaEnabled) {

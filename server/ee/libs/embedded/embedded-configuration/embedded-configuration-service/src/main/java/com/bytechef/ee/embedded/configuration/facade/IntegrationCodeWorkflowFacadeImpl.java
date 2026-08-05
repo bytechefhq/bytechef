@@ -7,11 +7,13 @@
 
 package com.bytechef.ee.embedded.configuration.facade;
 
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.Workflow.CodeWorkflow;
 import com.bytechef.ee.embedded.codeworkflow.loader.IntegrationHandlerLoader;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationCodeWorkflow;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.ee.embedded.configuration.exception.CodeWorkflowErrorType;
 import com.bytechef.ee.embedded.configuration.service.IntegrationCodeWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
@@ -35,11 +37,13 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.springframework.cache.CacheManager;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -66,6 +70,7 @@ public class IntegrationCodeWorkflowFacadeImpl implements IntegrationCodeWorkflo
     private final IntegrationWorkflowService integrationWorkflowService;
     private final CodeWorkflowContainerService codeWorkflowContainerService;
     private final CodeWorkflowFileStorage codeWorkflowFileStorage;
+    private final WorkflowService workflowService;
     private final boolean javaEnabled;
     private final IntegrationHandlerLoader.JavaLoader javaLoader;
 
@@ -76,7 +81,7 @@ public class IntegrationCodeWorkflowFacadeImpl implements IntegrationCodeWorkflo
         IntegrationCodeWorkflowService integrationCodeWorkflowService, IntegrationService integrationService,
         IntegrationWorkflowService integrationWorkflowService,
         CodeWorkflowContainerService codeWorkflowContainerService,
-        CodeWorkflowFileStorage codeWorkflowFileStorage) {
+        CodeWorkflowFileStorage codeWorkflowFileStorage, WorkflowService workflowService) {
 
         this.cacheManager = cacheManager;
         this.codeWorkflowContainerFacade = codeWorkflowContainerFacade;
@@ -85,6 +90,7 @@ public class IntegrationCodeWorkflowFacadeImpl implements IntegrationCodeWorkflo
         this.integrationWorkflowService = integrationWorkflowService;
         this.codeWorkflowContainerService = codeWorkflowContainerService;
         this.codeWorkflowFileStorage = codeWorkflowFileStorage;
+        this.workflowService = workflowService;
         this.javaEnabled = applicationProperties.getWorkflow()
             .getCodeWorkflow()
             .isJavaEnabled();
@@ -103,15 +109,14 @@ public class IntegrationCodeWorkflowFacadeImpl implements IntegrationCodeWorkflo
 
     /**
      * Creates a code-backed integration from scratch by rendering the language starter template (substituting the
-     * requested component name) and deploying it through the regular {@link #save} path, which creates the integration
-     * of that component name. Restricted to administrators, mirroring {@link #save}, because deployment loads the
-     * rendered script on the server.
+     * requested component name), creating the integration, and saving the rendered script as a draft (never publishing
+     * it). Restricted to administrators, mirroring {@link #save}, because loading the rendered script runs it on the
+     * server.
      *
      * <p>
-     * This method is create-only: {@link #save} resolves the target integration via a global
-     * {@link IntegrationService#fetchIntegration(String)} lookup, so if an integration for that component name already
-     * exists, {@link #save} would redeploy the starter onto it instead of creating a new one. The guard below rejects
-     * that case up front rather than allowing an existing integration to be reused or overwritten.
+     * This method is create-only: an integration for the requested component name is rejected up front via a global
+     * {@link IntegrationService#fetchIntegration(String)} lookup, so an existing integration is never reused or
+     * overwritten.
      */
     @Override
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
@@ -143,12 +148,22 @@ public class IntegrationCodeWorkflowFacadeImpl implements IntegrationCodeWorkflo
 
         byte[] bytes = template.getBytes(StandardCharsets.UTF_8);
 
-        save(bytes, language);
+        IntegrationDefinition integrationDefinition;
 
-        return integrationService.fetchIntegration(componentName)
-            .orElseThrow(() -> new ConfigurationException(
-                "Failed to create code workflow integration '" + componentName + "'",
-                CodeWorkflowErrorType.SOURCE_LOAD_FAILED));
+        try {
+            integrationDefinition = loadIntegrationDefinition(language, bytes);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        Integration integration = createIntegration(integrationDefinition);
+
+        List<WorkflowDefinition> workflowDefinitions = integrationDefinition.getWorkflows()
+            .orElseGet(List::of);
+
+        saveDraft(integration, integrationDefinition, workflowDefinitions, bytes, language);
+
+        return integration;
     }
 
     /**
@@ -269,7 +284,97 @@ public class IntegrationCodeWorkflowFacadeImpl implements IntegrationCodeWorkflo
                 CodeWorkflowErrorType.CODE_WORKFLOW_NAME_MISMATCH);
         }
 
-        deployInto(integration, integrationDefinition, bytes, language);
+        List<WorkflowDefinition> workflowDefinitions = integrationDefinition.getWorkflows()
+            .orElseGet(List::of);
+
+        saveDraft(integration, integrationDefinition, workflowDefinitions, bytes, language);
+    }
+
+    private void saveDraft(
+        Integration integration, IntegrationDefinition integrationDefinition,
+        List<WorkflowDefinition> workflowDefinitions, byte[] bytes, Language language) {
+
+        long integrationId = Objects.requireNonNull(integration.getId());
+        int draftIntegrationVersion = integration.getLastIntegrationVersion();
+
+        IntegrationCodeWorkflow latestIntegrationCodeWorkflow = integrationCodeWorkflowService
+            .fetchIntegrationCodeWorkflow(integrationId)
+            .orElse(null);
+
+        CodeWorkflowContainerFacade.CodeWorkflowReconciliation reconciliation;
+
+        if (latestIntegrationCodeWorkflow != null
+            && latestIntegrationCodeWorkflow.getIntegrationVersion() == draftIntegrationVersion) {
+
+            CodeWorkflowContainer codeWorkflowContainer = codeWorkflowContainerService.getCodeWorkflowContainer(
+                latestIntegrationCodeWorkflow.getCodeWorkflowContainerId());
+
+            reconciliation = codeWorkflowContainerFacade.update(
+                codeWorkflowContainer, integrationDefinition.getVersion(), workflowDefinitions, bytes,
+                PlatformType.EMBEDDED);
+        } else {
+            Map<String, String> reusableWorkflowNameIds = latestIntegrationCodeWorkflow == null
+                ? Map.of()
+                : resolveDraftWorkflowNameIds(latestIntegrationCodeWorkflow, integrationId, draftIntegrationVersion);
+
+            reconciliation = codeWorkflowContainerFacade.create(
+                integrationDefinition.getComponentName(), integrationDefinition.getVersion(), workflowDefinitions,
+                language, bytes, PlatformType.EMBEDDED, reusableWorkflowNameIds);
+
+            integrationCodeWorkflowService.create(reconciliation.codeWorkflowContainer(), integration);
+        }
+
+        for (String workflowId : reconciliation.addedWorkflowNameIds()
+            .values()) {
+
+            integrationWorkflowService.addWorkflow(integrationId, draftIntegrationVersion, workflowId);
+        }
+
+        for (String workflowId : reconciliation.removedWorkflowNameIds()
+            .values()) {
+
+            integrationWorkflowService.delete(integrationId, draftIntegrationVersion, workflowId);
+            workflowService.delete(workflowId);
+        }
+    }
+
+    /**
+     * Maps the published container's workflow names onto the current draft version's workflow ids. The facade publish
+     * duplicates each workflow into the new draft version under a new workflow id but preserves the IntegrationWorkflow
+     * uuid across both rows, so the chain is: published container name -> published workflow id -> row uuid at the
+     * container's (published) version -> draft-version row with the same uuid -> draft workflow id.
+     */
+    private Map<String, String> resolveDraftWorkflowNameIds(
+        IntegrationCodeWorkflow publishedIntegrationCodeWorkflow, long integrationId, int draftIntegrationVersion) {
+
+        CodeWorkflowContainer publishedCodeWorkflowContainer = codeWorkflowContainerService.getCodeWorkflowContainer(
+            publishedIntegrationCodeWorkflow.getCodeWorkflowContainerId());
+
+        Map<String, String> publishedWorkflowNameIds = publishedCodeWorkflowContainer.getWorkflowNameIds();
+
+        Map<String, String> workflowIdUuids = integrationWorkflowService.getIntegrationWorkflows(
+            integrationId, publishedIntegrationCodeWorkflow.getIntegrationVersion())
+            .stream()
+            .collect(Collectors.toMap(IntegrationWorkflow::getWorkflowId, IntegrationWorkflow::getUuidAsString));
+
+        Map<String, String> uuidDraftWorkflowIds = integrationWorkflowService.getIntegrationWorkflows(
+            integrationId, draftIntegrationVersion)
+            .stream()
+            .collect(Collectors.toMap(IntegrationWorkflow::getUuidAsString, IntegrationWorkflow::getWorkflowId));
+
+        Map<String, String> draftWorkflowNameIds = new HashMap<>();
+
+        for (Map.Entry<String, String> entry : publishedWorkflowNameIds.entrySet()) {
+            String uuid = workflowIdUuids.get(entry.getValue());
+
+            String draftWorkflowId = uuid == null ? null : uuidDraftWorkflowIds.get(uuid);
+
+            if (draftWorkflowId != null) {
+                draftWorkflowNameIds.put(entry.getKey(), draftWorkflowId);
+            }
+        }
+
+        return draftWorkflowNameIds;
     }
 
     private CodeWorkflowContainer getCodeWorkflowContainer(long integrationId) {

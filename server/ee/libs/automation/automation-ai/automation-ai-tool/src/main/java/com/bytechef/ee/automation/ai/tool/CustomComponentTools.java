@@ -62,7 +62,7 @@ public class CustomComponentTools {
 
     @Tool(
         description = "Update the source code of an existing custom component. Saving updates a DRAFT: editing a " +
-            "PUBLISHED component spawns a new draft row (the source must bump .version() above the published one), " +
+            "PUBLISHED component spawns a new draft row (the source must declare a version above the published one), " +
             "so the returned row id may differ from the requested id. Returns the resulting row's id, version and " +
             "status; use publishCustomComponent to make a draft live.")
     public String updateCustomComponentSource(

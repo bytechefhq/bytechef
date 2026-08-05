@@ -28,9 +28,11 @@ public interface CustomComponentFacade {
 
     String getCustomComponentSource(long id);
 
+    CustomComponent publishCustomComponent(long id);
+
     void save(byte[] bytes, CustomComponent.Language language);
 
-    void updateCustomComponentSource(long id, String content);
+    CustomComponent updateCustomComponentSource(long id, String content);
 
     @SuppressFBWarnings("EI")
     record CustomComponentDefinitionRecord(

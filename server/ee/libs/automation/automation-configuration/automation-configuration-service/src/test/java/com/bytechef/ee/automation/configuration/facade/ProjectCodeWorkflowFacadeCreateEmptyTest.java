@@ -10,12 +10,15 @@ package com.bytechef.ee.automation.configuration.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
@@ -27,6 +30,7 @@ import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowServi
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
 import com.bytechef.ee.platform.codeworkflow.configuration.facade.CodeWorkflowContainerFacade;
+import com.bytechef.ee.platform.codeworkflow.configuration.facade.CodeWorkflowContainerFacade.CodeWorkflowReconciliation;
 import com.bytechef.ee.platform.codeworkflow.configuration.service.CodeWorkflowContainerService;
 import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorage;
 import com.bytechef.exception.ConfigurationException;
@@ -99,23 +103,24 @@ class ProjectCodeWorkflowFacadeCreateEmptyTest {
         createdProject.setId(1L);
         createdProject.setName("my-code-project");
 
-        when(projectService.fetchProject("my-code-project"))
-            .thenReturn(Optional.empty(), Optional.empty(), Optional.of(createdProject));
+        when(projectService.fetchProject("my-code-project")).thenReturn(Optional.empty());
         when(projectService.create(any()))
             .thenReturn(createdProject);
 
+        when(projectCodeWorkflowService.fetchProjectCodeWorkflow(1L)).thenReturn(Optional.empty());
+
         CodeWorkflowContainer codeWorkflowContainer = mock(CodeWorkflowContainer.class);
 
-        when(codeWorkflowContainer.getWorkflowNameIds())
-            .thenReturn(Map.of("my-workflow", UUID.randomUUID()
-                .toString()));
-        when(codeWorkflowContainerFacade.create(any(), any(), any(), eq(Language.JAVASCRIPT), any(), any()))
-            .thenReturn(codeWorkflowContainer);
+        CodeWorkflowReconciliation reconciliation = new CodeWorkflowReconciliation(
+            codeWorkflowContainer, Map.of(), Map.of());
+
+        when(codeWorkflowContainerFacade.create(any(), any(), any(), eq(Language.JAVASCRIPT), any(), any(), any()))
+            .thenReturn(reconciliation);
 
         ProjectCodeWorkflowFacadeImpl projectCodeWorkflowFacade = new ProjectCodeWorkflowFacadeImpl(
             applicationProperties(true), mock(CacheManager.class), projectService, projectWorkflowService,
             codeWorkflowContainerFacade, projectCodeWorkflowService, mock(CodeWorkflowContainerService.class),
-            mock(CodeWorkflowFileStorage.class));
+            mock(CodeWorkflowFileStorage.class), mock(WorkflowService.class));
 
         Project project = projectCodeWorkflowFacade.createEmptyCodeWorkflow(1L, "my-code-project", Language.JAVASCRIPT);
 
@@ -128,6 +133,9 @@ class ProjectCodeWorkflowFacadeCreateEmptyTest {
 
         assertThat(projectCaptor.getValue()
             .getName()).isEqualTo("my-code-project");
+
+        verify(projectCodeWorkflowService).create(codeWorkflowContainer, createdProject);
+        verify(projectService, never()).publishProject(anyLong(), any(), anyBoolean());
     }
 
     @ParameterizedTest
@@ -141,7 +149,7 @@ class ProjectCodeWorkflowFacadeCreateEmptyTest {
         ProjectCodeWorkflowFacadeImpl projectCodeWorkflowFacade = new ProjectCodeWorkflowFacadeImpl(
             applicationProperties(true), mock(CacheManager.class), projectService, projectWorkflowService,
             codeWorkflowContainerFacade, projectCodeWorkflowService, mock(CodeWorkflowContainerService.class),
-            mock(CodeWorkflowFileStorage.class));
+            mock(CodeWorkflowFileStorage.class), mock(WorkflowService.class));
 
         assertThatThrownBy(() -> projectCodeWorkflowFacade.createEmptyCodeWorkflow(1L, "my-code-project", language))
             .isInstanceOf(ConfigurationException.class)
@@ -169,7 +177,7 @@ class ProjectCodeWorkflowFacadeCreateEmptyTest {
         ProjectCodeWorkflowFacadeImpl projectCodeWorkflowFacade = new ProjectCodeWorkflowFacadeImpl(
             applicationProperties(true), mock(CacheManager.class), projectService, projectWorkflowService,
             codeWorkflowContainerFacade, projectCodeWorkflowService, mock(CodeWorkflowContainerService.class),
-            mock(CodeWorkflowFileStorage.class));
+            mock(CodeWorkflowFileStorage.class), mock(WorkflowService.class));
 
         assertThatThrownBy(() -> projectCodeWorkflowFacade.createEmptyCodeWorkflow(
             1L, "my-code-project", Language.JAVASCRIPT))
@@ -220,7 +228,7 @@ class ProjectCodeWorkflowFacadeCreateEmptyTest {
         ProjectCodeWorkflowFacadeImpl projectCodeWorkflowFacade = new ProjectCodeWorkflowFacadeImpl(
             applicationProperties(true), mock(CacheManager.class), projectService, projectWorkflowService,
             codeWorkflowContainerFacade, projectCodeWorkflowService, mock(CodeWorkflowContainerService.class),
-            mock(CodeWorkflowFileStorage.class));
+            mock(CodeWorkflowFileStorage.class), mock(WorkflowService.class));
 
         assertThatThrownBy(() -> projectCodeWorkflowFacade.createEmptyCodeWorkflow(1L, name, Language.JAVASCRIPT))
             .isInstanceOf(ConfigurationException.class)

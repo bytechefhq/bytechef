@@ -41,5 +41,10 @@ public enum CustomComponentAuditEvent {
     /**
      * A custom component was disabled. Payload: {@code customComponentId}.
      */
-    CUSTOM_COMPONENT_DISABLED
+    CUSTOM_COMPONENT_DISABLED,
+
+    /**
+     * A draft custom component was published. Payload: {@code customComponentId}, {@code name}.
+     */
+    CUSTOM_COMPONENT_PUBLISHED
 }

@@ -69,6 +69,7 @@ public class CustomComponentDynamicComponentHandlerRegistry implements DynamicCo
         return customComponentService.getCustomComponents()
             .stream()
             .filter(CustomComponent::isEnabled)
+            .filter(customComponent -> customComponent.getStatus() == CustomComponent.Status.PUBLISHED)
             .map(customComponent -> loadComponentHandler(customComponent, customComponent.getComponentVersion()))
             .toList();
     }
@@ -76,6 +77,7 @@ public class CustomComponentDynamicComponentHandlerRegistry implements DynamicCo
     @Override
     public Optional<ComponentHandler> fetchComponentHandler(String name, int componentVersion) {
         return customComponentService.fetchCustomComponent(name, componentVersion)
+            .filter(customComponent -> customComponent.getStatus() == CustomComponent.Status.PUBLISHED)
             .map(customComponent -> loadComponentHandler(customComponent, componentVersion));
     }
 

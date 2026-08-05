@@ -20,9 +20,13 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.workflow.definition.TaskDefinition;
 import com.bytechef.workflow.definition.WorkflowDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.ObjectMapper;
@@ -60,33 +64,136 @@ public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFac
         String name, String externalVersion, List<WorkflowDefinition> workflowDefinitions, Language language,
         byte[] bytes, PlatformType type) {
 
-        try {
-            UUID codeWorkflowContainerId = UUID.randomUUID();
+        return create(name, externalVersion, workflowDefinitions, language, bytes, type, Map.of())
+            .codeWorkflowContainer();
+    }
 
-            CodeWorkflowContainer codeWorkflowContainer = new CodeWorkflowContainer(codeWorkflowContainerId);
+    @Override
+    public CodeWorkflowReconciliation create(
+        String name, String externalVersion, List<WorkflowDefinition> workflowDefinitions, Language language,
+        byte[] bytes, PlatformType type, Map<String, String> reusableWorkflowNameIds) {
+
+        try {
+            UUID codeWorkflowContainerUuid = UUID.randomUUID();
+
+            CodeWorkflowContainer codeWorkflowContainer = new CodeWorkflowContainer(codeWorkflowContainerUuid);
+
+            Map<String, String> addedWorkflowNameIds = new HashMap<>();
 
             for (WorkflowDefinition workflowDefinition : workflowDefinitions) {
-                String definition = getDefinition(String.valueOf(codeWorkflowContainerId), workflowDefinition, type);
+                String definition = getDefinition(String.valueOf(codeWorkflowContainerUuid), workflowDefinition, type);
 
-                Workflow workflow = workflowService.create(definition, Workflow.Format.JSON, Workflow.SourceType.JDBC);
+                String reusableWorkflowId = reusableWorkflowNameIds.get(workflowDefinition.getName());
 
-                codeWorkflowContainer.addCodeWorkflow(
-                    UUID.fromString(Objects.requireNonNull(workflow.getId())), workflowDefinition.getName());
+                if (reusableWorkflowId == null) {
+                    Workflow workflow = workflowService.create(
+                        definition, Workflow.Format.JSON, Workflow.SourceType.JDBC);
+
+                    addedWorkflowNameIds.put(workflowDefinition.getName(), workflow.getId());
+                    codeWorkflowContainer.addCodeWorkflow(
+                        UUID.fromString(Objects.requireNonNull(workflow.getId())), workflowDefinition.getName());
+                } else {
+                    Workflow workflow = workflowService.getWorkflow(reusableWorkflowId);
+
+                    workflowService.update(reusableWorkflowId, definition, workflow.getVersion());
+
+                    codeWorkflowContainer.addCodeWorkflow(
+                        UUID.fromString(reusableWorkflowId), workflowDefinition.getName());
+                }
             }
+
+            Map<String, String> removedWorkflowNameIds = removedFrom(reusableWorkflowNameIds, workflowDefinitions);
 
             codeWorkflowContainer.setExternalVersion(externalVersion);
             codeWorkflowContainer.setLanguage(language);
             codeWorkflowContainer.setName(name);
 
             FileEntry workflowsFileEntry = codeWorkflowFileStorage.storeCodeWorkflowFile(
-                codeWorkflowContainerId + "." + language.getExtension(), bytes);
+                codeWorkflowContainerUuid + "." + language.getExtension(), bytes);
 
             codeWorkflowContainer.setWorkflows(workflowsFileEntry);
 
-            return codeWorkflowContainerService.create(codeWorkflowContainer);
+            return new CodeWorkflowReconciliation(
+                codeWorkflowContainerService.create(codeWorkflowContainer), addedWorkflowNameIds,
+                removedWorkflowNameIds);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public CodeWorkflowReconciliation update(
+        CodeWorkflowContainer codeWorkflowContainer, String externalVersion,
+        List<WorkflowDefinition> workflowDefinitions, byte[] bytes, PlatformType type) {
+
+        try {
+            Map<String, String> existingWorkflowNameIds = codeWorkflowContainer.getWorkflowNameIds();
+            Map<String, String> addedWorkflowNameIds = new HashMap<>();
+
+            for (WorkflowDefinition workflowDefinition : workflowDefinitions) {
+                String definition = getDefinition(
+                    String.valueOf(codeWorkflowContainer.getUuid()), workflowDefinition, type);
+
+                String existingWorkflowId = existingWorkflowNameIds.get(workflowDefinition.getName());
+
+                if (existingWorkflowId == null) {
+                    Workflow workflow = workflowService.create(
+                        definition, Workflow.Format.JSON, Workflow.SourceType.JDBC);
+
+                    addedWorkflowNameIds.put(workflowDefinition.getName(), workflow.getId());
+                    codeWorkflowContainer.addCodeWorkflow(
+                        UUID.fromString(Objects.requireNonNull(workflow.getId())), workflowDefinition.getName());
+                } else {
+                    Workflow workflow = workflowService.getWorkflow(existingWorkflowId);
+
+                    workflowService.update(existingWorkflowId, definition, workflow.getVersion());
+                }
+            }
+
+            Map<String, String> removedWorkflowNameIds = removedFrom(existingWorkflowNameIds, workflowDefinitions);
+
+            for (String workflowName : removedWorkflowNameIds.keySet()) {
+                codeWorkflowContainer.removeCodeWorkflow(workflowName);
+            }
+
+            codeWorkflowContainer.setExternalVersion(externalVersion);
+
+            FileEntry oldWorkflowsFileEntry = codeWorkflowContainer.getWorkflows();
+
+            FileEntry workflowsFileEntry = codeWorkflowFileStorage.storeCodeWorkflowFile(
+                codeWorkflowContainer.getUuid() + "." + codeWorkflowContainer.getLanguage()
+                    .getExtension(),
+                bytes);
+
+            codeWorkflowContainer.setWorkflows(workflowsFileEntry);
+
+            CodeWorkflowContainer updatedCodeWorkflowContainer = codeWorkflowContainerService.update(
+                codeWorkflowContainer);
+
+            if (oldWorkflowsFileEntry != null &&
+                !Objects.equals(oldWorkflowsFileEntry.getUrl(), workflowsFileEntry.getUrl())) {
+
+                codeWorkflowFileStorage.deleteCodeWorkflowFile(oldWorkflowsFileEntry);
+            }
+
+            return new CodeWorkflowReconciliation(
+                updatedCodeWorkflowContainer, addedWorkflowNameIds, removedWorkflowNameIds);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static Map<String, String> removedFrom(
+        Map<String, String> knownWorkflowNameIds, List<WorkflowDefinition> workflowDefinitions) {
+
+        Set<String> incomingNames = workflowDefinitions.stream()
+            .map(WorkflowDefinition::getName)
+            .collect(Collectors.toSet());
+
+        return knownWorkflowNameIds.entrySet()
+            .stream()
+            .filter(entry -> !incomingNames.contains(entry.getKey()))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     private ArrayNode toArrayNode(

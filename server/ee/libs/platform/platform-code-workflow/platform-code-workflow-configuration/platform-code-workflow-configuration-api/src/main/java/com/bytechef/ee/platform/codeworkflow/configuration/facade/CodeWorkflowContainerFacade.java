@@ -12,6 +12,7 @@ import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowCo
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.workflow.definition.WorkflowDefinition;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @version ee
@@ -20,7 +21,21 @@ import java.util.List;
  */
 public interface CodeWorkflowContainerFacade {
 
+    record CodeWorkflowReconciliation(
+        CodeWorkflowContainer codeWorkflowContainer,
+        Map<String, String> addedWorkflowNameIds,
+        Map<String, String> removedWorkflowNameIds) {
+    }
+
     CodeWorkflowContainer create(
         String name, String externalVersion, List<WorkflowDefinition> workflowDefinitions, Language language,
         byte[] bytes, PlatformType type);
+
+    CodeWorkflowReconciliation create(
+        String name, String externalVersion, List<WorkflowDefinition> workflowDefinitions, Language language,
+        byte[] bytes, PlatformType type, Map<String, String> reusableWorkflowNameIds);
+
+    CodeWorkflowReconciliation update(
+        CodeWorkflowContainer codeWorkflowContainer, String externalVersion,
+        List<WorkflowDefinition> workflowDefinitions, byte[] bytes, PlatformType type);
 }

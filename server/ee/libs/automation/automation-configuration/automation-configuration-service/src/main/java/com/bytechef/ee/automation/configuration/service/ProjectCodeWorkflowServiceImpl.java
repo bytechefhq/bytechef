@@ -13,6 +13,7 @@ import com.bytechef.ee.automation.configuration.repository.ProjectCodeWorkflowRe
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,6 +47,11 @@ public class ProjectCodeWorkflowServiceImpl implements ProjectCodeWorkflowServic
     @Override
     public void deleteProjectCodeWorkflows(long projectId) {
         projectCodeWorkflowRepository.deleteByProjectId(projectId);
+    }
+
+    @Override
+    public Optional<ProjectCodeWorkflow> fetchProjectCodeWorkflow(long projectId) {
+        return projectCodeWorkflowRepository.findFirstByProjectIdOrderByIdDesc(projectId);
     }
 
     @Override

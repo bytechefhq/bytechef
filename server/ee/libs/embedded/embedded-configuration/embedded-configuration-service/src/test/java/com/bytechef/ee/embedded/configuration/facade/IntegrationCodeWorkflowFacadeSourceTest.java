@@ -10,12 +10,15 @@ package com.bytechef.ee.embedded.configuration.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationCodeWorkflow;
@@ -26,14 +29,15 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
 import com.bytechef.ee.platform.codeworkflow.configuration.facade.CodeWorkflowContainerFacade;
+import com.bytechef.ee.platform.codeworkflow.configuration.facade.CodeWorkflowContainerFacade.CodeWorkflowReconciliation;
 import com.bytechef.ee.platform.codeworkflow.configuration.service.CodeWorkflowContainerService;
 import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorage;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.platform.constant.PlatformType;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.cache.CacheManager;
@@ -84,7 +88,7 @@ class IntegrationCodeWorkflowFacadeSourceTest {
         IntegrationCodeWorkflowFacadeImpl integrationCodeWorkflowFacade = newFacade(
             mock(IntegrationService.class), mock(IntegrationWorkflowService.class),
             mock(CodeWorkflowContainerFacade.class), integrationCodeWorkflowService, codeWorkflowContainerService,
-            codeWorkflowFileStorage);
+            codeWorkflowFileStorage, mock(WorkflowService.class));
 
         String source = integrationCodeWorkflowFacade.getCodeWorkflowSource(42L);
 
@@ -115,7 +119,7 @@ class IntegrationCodeWorkflowFacadeSourceTest {
         IntegrationCodeWorkflowFacadeImpl integrationCodeWorkflowFacade = newFacade(
             mock(IntegrationService.class), mock(IntegrationWorkflowService.class),
             mock(CodeWorkflowContainerFacade.class), integrationCodeWorkflowService, codeWorkflowContainerService,
-            codeWorkflowFileStorage);
+            codeWorkflowFileStorage, mock(WorkflowService.class));
 
         assertThatThrownBy(() -> integrationCodeWorkflowFacade.getCodeWorkflowSource(42L))
             .isInstanceOf(ConfigurationException.class)
@@ -137,7 +141,7 @@ class IntegrationCodeWorkflowFacadeSourceTest {
         IntegrationCodeWorkflowFacadeImpl integrationCodeWorkflowFacade = newFacade(
             mock(IntegrationService.class), mock(IntegrationWorkflowService.class),
             mock(CodeWorkflowContainerFacade.class), integrationCodeWorkflowService, codeWorkflowContainerService,
-            codeWorkflowFileStorage);
+            codeWorkflowFileStorage, mock(WorkflowService.class));
 
         assertThatThrownBy(() -> integrationCodeWorkflowFacade.getCodeWorkflowSource(42L))
             .isInstanceOf(ConfigurationException.class)
@@ -152,6 +156,7 @@ class IntegrationCodeWorkflowFacadeSourceTest {
         IntegrationCodeWorkflow integrationCodeWorkflow = mock(IntegrationCodeWorkflow.class);
 
         when(integrationCodeWorkflow.getCodeWorkflowContainerId()).thenReturn(5L);
+        when(integrationCodeWorkflow.getIntegrationVersion()).thenReturn(1);
 
         CodeWorkflowContainer existingCodeWorkflowContainer = mock(CodeWorkflowContainer.class);
 
@@ -180,33 +185,36 @@ class IntegrationCodeWorkflowFacadeSourceTest {
 
         CodeWorkflowContainer redeployedCodeWorkflowContainer = mock(CodeWorkflowContainer.class);
 
-        when(redeployedCodeWorkflowContainer.getWorkflowNameIds())
-            .thenReturn(Map.of("my-workflow", UUID.randomUUID()
-                .toString()));
+        CodeWorkflowReconciliation reconciliation = new CodeWorkflowReconciliation(
+            redeployedCodeWorkflowContainer, Map.of(), Map.of());
 
         CodeWorkflowContainerFacade codeWorkflowContainerFacade = mock(CodeWorkflowContainerFacade.class);
 
-        when(codeWorkflowContainerFacade.create(any(), any(), any(), eq(Language.JAVASCRIPT), any(), any()))
-            .thenReturn(redeployedCodeWorkflowContainer);
+        when(codeWorkflowContainerFacade.update(
+            eq(existingCodeWorkflowContainer), any(), any(), any(), eq(PlatformType.EMBEDDED)))
+                .thenReturn(reconciliation);
 
         CodeWorkflowFileStorage codeWorkflowFileStorage = mock(CodeWorkflowFileStorage.class);
 
         IntegrationCodeWorkflowFacadeImpl integrationCodeWorkflowFacade = newFacade(
             integrationService, integrationWorkflowService, codeWorkflowContainerFacade,
-            integrationCodeWorkflowService, codeWorkflowContainerService, codeWorkflowFileStorage);
+            integrationCodeWorkflowService, codeWorkflowContainerService, codeWorkflowFileStorage,
+            mock(WorkflowService.class));
 
         integrationCodeWorkflowFacade.updateCodeWorkflowSource(1L, integrationScript("my-integration"));
 
         ArgumentCaptor<byte[]> bytesCaptor = ArgumentCaptor.forClass(byte[].class);
 
-        verify(codeWorkflowContainerFacade).create(
-            eq("my-integration"), any(), any(), eq(Language.JAVASCRIPT), bytesCaptor.capture(), any());
+        verify(codeWorkflowContainerFacade).update(
+            eq(existingCodeWorkflowContainer), any(), any(), bytesCaptor.capture(), eq(PlatformType.EMBEDDED));
 
         assertThat(new String(bytesCaptor.getValue(), StandardCharsets.UTF_8))
             .isEqualTo(integrationScript("my-integration"));
 
-        verify(integrationCodeWorkflowService).create(redeployedCodeWorkflowContainer, integration);
-        verify(integrationService).publishIntegration(1L, null);
+        verify(codeWorkflowContainerFacade, never()).create(any(), any(), any(), any(), any(), any());
+        verify(codeWorkflowContainerFacade, never()).create(any(), any(), any(), any(), any(), any(), any());
+        verify(integrationCodeWorkflowService, never()).create(any(), any());
+        verify(integrationService, never()).publishIntegration(anyLong(), any());
     }
 
     @Test
@@ -242,7 +250,8 @@ class IntegrationCodeWorkflowFacadeSourceTest {
 
         IntegrationCodeWorkflowFacadeImpl integrationCodeWorkflowFacade = newFacade(
             integrationService, mock(IntegrationWorkflowService.class), codeWorkflowContainerFacade,
-            integrationCodeWorkflowService, codeWorkflowContainerService, mock(CodeWorkflowFileStorage.class));
+            integrationCodeWorkflowService, codeWorkflowContainerService, mock(CodeWorkflowFileStorage.class),
+            mock(WorkflowService.class));
 
         assertThatThrownBy(
             () -> integrationCodeWorkflowFacade.updateCodeWorkflowSource(1L, "this is not { valid javascript ("))
@@ -286,7 +295,8 @@ class IntegrationCodeWorkflowFacadeSourceTest {
 
         IntegrationCodeWorkflowFacadeImpl integrationCodeWorkflowFacade = newFacade(
             integrationService, mock(IntegrationWorkflowService.class), codeWorkflowContainerFacade,
-            integrationCodeWorkflowService, codeWorkflowContainerService, mock(CodeWorkflowFileStorage.class));
+            integrationCodeWorkflowService, codeWorkflowContainerService, mock(CodeWorkflowFileStorage.class),
+            mock(WorkflowService.class));
 
         assertThatThrownBy(() -> integrationCodeWorkflowFacade.updateCodeWorkflowSource(
             1L, integrationScript("a-completely-different-name")))
@@ -307,12 +317,13 @@ class IntegrationCodeWorkflowFacadeSourceTest {
         IntegrationService integrationService, IntegrationWorkflowService integrationWorkflowService,
         CodeWorkflowContainerFacade codeWorkflowContainerFacade,
         IntegrationCodeWorkflowService integrationCodeWorkflowService,
-        CodeWorkflowContainerService codeWorkflowContainerService, CodeWorkflowFileStorage codeWorkflowFileStorage) {
+        CodeWorkflowContainerService codeWorkflowContainerService, CodeWorkflowFileStorage codeWorkflowFileStorage,
+        WorkflowService workflowService) {
 
         return new IntegrationCodeWorkflowFacadeImpl(
             applicationProperties(true), mock(CacheManager.class), codeWorkflowContainerFacade,
             integrationCodeWorkflowService, integrationService, integrationWorkflowService,
-            codeWorkflowContainerService, codeWorkflowFileStorage);
+            codeWorkflowContainerService, codeWorkflowFileStorage, workflowService);
     }
 
     private static ApplicationProperties applicationProperties(boolean javaEnabled) {

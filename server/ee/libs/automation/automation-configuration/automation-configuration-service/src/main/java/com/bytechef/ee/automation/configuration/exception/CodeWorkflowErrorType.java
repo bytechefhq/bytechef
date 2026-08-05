@@ -29,6 +29,8 @@ public class CodeWorkflowErrorType extends AbstractErrorType {
 
     public static final CodeWorkflowErrorType CODE_WORKFLOW_ALREADY_EXISTS = new CodeWorkflowErrorType(105);
 
+    public static final CodeWorkflowErrorType EMBEDDED_BRIDGE_PROJECT_NOT_EDITABLE = new CodeWorkflowErrorType(106);
+
     private CodeWorkflowErrorType(int errorKey) {
         super(CodeWorkflowContainer.class, errorKey);
     }

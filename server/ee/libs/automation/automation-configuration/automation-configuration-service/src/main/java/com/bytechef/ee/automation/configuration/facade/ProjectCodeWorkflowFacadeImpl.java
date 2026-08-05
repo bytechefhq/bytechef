@@ -7,7 +7,9 @@
 
 package com.bytechef.ee.automation.configuration.facade;
 
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.project.ProjectHandler;
@@ -34,10 +36,12 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.springframework.cache.CacheManager;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -53,6 +57,15 @@ import org.springframework.transaction.annotation.Transactional;
 @ConditionalOnEEVersion
 public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade {
 
+    /**
+     * Embedded-bridge catalog projects are name-prefixed with this marker (owned by the embedded module's
+     * {@code AutomationWorkflowProjectFacadeImpl}). They are deliberately kept out of the code editor: editor draft
+     * saves would interleave containers into the same {@code project_code_workflow} table the bridge's one-deploy-back
+     * uuid carry-forward reads, minting new workflow uuids on the next bridge redeploy and permanently dangling
+     * connected-user references.
+     */
+    private static final String EMBEDDED_AUTOMATION_MARKER = "__EMBEDDED_AUTOMATION__";
+
     private final CacheManager cacheManager;
     private final ProjectService projectService;
     private final ProjectWorkflowService projectWorkflowService;
@@ -60,6 +73,7 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
     private final ProjectCodeWorkflowService projectCodeWorkflowService;
     private final CodeWorkflowContainerService codeWorkflowContainerService;
     private final CodeWorkflowFileStorage codeWorkflowFileStorage;
+    private final WorkflowService workflowService;
     private final boolean javaEnabled;
     private final ProjectHandlerLoader.JavaLoader javaLoader;
 
@@ -69,7 +83,7 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
         ProjectWorkflowService projectWorkflowService, CodeWorkflowContainerFacade codeWorkflowContainerFacade,
         ProjectCodeWorkflowService projectCodeWorkflowService,
         CodeWorkflowContainerService codeWorkflowContainerService,
-        CodeWorkflowFileStorage codeWorkflowFileStorage) {
+        CodeWorkflowFileStorage codeWorkflowFileStorage, WorkflowService workflowService) {
 
         this.cacheManager = cacheManager;
         this.projectService = projectService;
@@ -78,6 +92,7 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
         this.projectCodeWorkflowService = projectCodeWorkflowService;
         this.codeWorkflowContainerService = codeWorkflowContainerService;
         this.codeWorkflowFileStorage = codeWorkflowFileStorage;
+        this.workflowService = workflowService;
         this.javaEnabled = applicationProperties.getWorkflow()
             .getCodeWorkflow()
             .isJavaEnabled();
@@ -96,16 +111,13 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
 
     /**
      * Creates a code-backed project from scratch by rendering the language starter template (substituting the requested
-     * project name) and deploying it through the regular {@link #save} path, which creates the project of that name.
-     * Restricted to administrators, mirroring {@link #save}, because deployment loads the rendered script on the
-     * server.
+     * project name), creating the project, and saving the rendered script as a draft (never publishing it). Restricted
+     * to administrators, mirroring {@link #save}, because loading the rendered script runs it on the server.
      *
      * <p>
-     * This method is create-only: {@link #save} resolves the target project via a global, case-insensitive
-     * {@link ProjectService#fetchProject(String)} lookup, so if a project of that name already exists anywhere (in any
-     * workspace, code- or visual-backed), {@link #save} would silently redeploy the starter onto it instead of creating
-     * a new project. The guard below rejects that case up front rather than allowing an existing project to be reused
-     * or overwritten.
+     * This method is create-only: a project of the requested name is rejected up front via a global, case-insensitive
+     * {@link ProjectService#fetchProject(String)} lookup, so an existing project (in any workspace, code- or
+     * visual-backed) is never reused or overwritten.
      */
     @Override
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
@@ -136,12 +148,19 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
 
         byte[] bytes = template.getBytes(StandardCharsets.UTF_8);
 
-        save(workspaceId, bytes, language);
+        ProjectDefinition projectDefinition;
 
-        return projectService.fetchProject(name)
-            .orElseThrow(() -> new ConfigurationException(
-                "Failed to create code workflow project '" + name + "'",
-                CodeWorkflowErrorType.SOURCE_LOAD_FAILED));
+        try {
+            projectDefinition = loadProjectDefinition(language, bytes);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        Project project = createProject(workspaceId, projectDefinition);
+
+        saveDraft(project, projectDefinition, bytes, language);
+
+        return project;
     }
 
     /**
@@ -158,7 +177,10 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
             return List.of();
         }
 
-        return projectService.getProjects(projectIds);
+        return projectService.getProjects(projectIds)
+            .stream()
+            .filter(project -> !isEmbeddedBridgeProject(project))
+            .toList();
     }
 
     /**
@@ -227,6 +249,13 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
 
         Project project = projectService.getProject(projectId);
 
+        if (isEmbeddedBridgeProject(project)) {
+            throw new ConfigurationException(
+                "Embedded-bridge catalog projects cannot be edited in the code editor; redeploy them through the " +
+                    "embedded deploy endpoint instead",
+                CodeWorkflowErrorType.EMBEDDED_BRIDGE_PROJECT_NOT_EDITABLE);
+        }
+
         byte[] bytes = content.getBytes(StandardCharsets.UTF_8);
 
         ProjectDefinition projectDefinition;
@@ -245,7 +274,88 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
                 CodeWorkflowErrorType.CODE_WORKFLOW_NAME_MISMATCH);
         }
 
-        deployInto(project, projectDefinition, bytes, language);
+        saveDraft(project, projectDefinition, bytes, language);
+    }
+
+    private void saveDraft(Project project, ProjectDefinition projectDefinition, byte[] bytes, Language language) {
+        long projectId = Objects.requireNonNull(project.getId());
+        int draftProjectVersion = project.getLastProjectVersion();
+
+        ProjectCodeWorkflow latestProjectCodeWorkflow = projectCodeWorkflowService.fetchProjectCodeWorkflow(projectId)
+            .orElse(null);
+
+        CodeWorkflowContainerFacade.CodeWorkflowReconciliation reconciliation;
+
+        if (latestProjectCodeWorkflow != null && latestProjectCodeWorkflow.getProjectVersion() == draftProjectVersion) {
+            CodeWorkflowContainer codeWorkflowContainer = codeWorkflowContainerService.getCodeWorkflowContainer(
+                latestProjectCodeWorkflow.getCodeWorkflowContainerId());
+
+            reconciliation = codeWorkflowContainerFacade.update(
+                codeWorkflowContainer, projectDefinition.getVersion(), projectDefinition.getWorkflows(), bytes,
+                PlatformType.AUTOMATION);
+        } else {
+            Map<String, String> reusableWorkflowNameIds = latestProjectCodeWorkflow == null
+                ? Map.of()
+                : resolveDraftWorkflowNameIds(latestProjectCodeWorkflow, projectId, draftProjectVersion);
+
+            reconciliation = codeWorkflowContainerFacade.create(
+                projectDefinition.getName(), projectDefinition.getVersion(), projectDefinition.getWorkflows(),
+                language, bytes, PlatformType.AUTOMATION, reusableWorkflowNameIds);
+
+            projectCodeWorkflowService.create(reconciliation.codeWorkflowContainer(), project);
+        }
+
+        for (String workflowId : reconciliation.addedWorkflowNameIds()
+            .values()) {
+
+            projectWorkflowService.addWorkflow(projectId, draftProjectVersion, workflowId);
+        }
+
+        for (String workflowId : reconciliation.removedWorkflowNameIds()
+            .values()) {
+
+            projectWorkflowService.delete(projectId, draftProjectVersion, workflowId);
+            workflowService.delete(workflowId);
+        }
+    }
+
+    /**
+     * Maps the published container's workflow names onto the current draft version's workflow ids. The facade publish
+     * duplicates each workflow into the new draft version under a new workflow id but preserves the ProjectWorkflow
+     * uuid across both rows, so the chain is: published container name -> published workflow id -> row uuid at the
+     * container's (published) version -> draft-version row with the same uuid -> draft workflow id.
+     */
+    private Map<String, String> resolveDraftWorkflowNameIds(
+        ProjectCodeWorkflow publishedProjectCodeWorkflow, long projectId, int draftProjectVersion) {
+
+        CodeWorkflowContainer publishedCodeWorkflowContainer = codeWorkflowContainerService.getCodeWorkflowContainer(
+            publishedProjectCodeWorkflow.getCodeWorkflowContainerId());
+
+        Map<String, String> publishedWorkflowNameIds = publishedCodeWorkflowContainer.getWorkflowNameIds();
+
+        Map<String, String> workflowIdUuids = projectWorkflowService.getProjectWorkflows(
+            projectId, publishedProjectCodeWorkflow.getProjectVersion())
+            .stream()
+            .collect(Collectors.toMap(ProjectWorkflow::getWorkflowId, ProjectWorkflow::getUuidAsString));
+
+        Map<String, String> uuidDraftWorkflowIds = projectWorkflowService.getProjectWorkflows(
+            projectId, draftProjectVersion)
+            .stream()
+            .collect(Collectors.toMap(ProjectWorkflow::getUuidAsString, ProjectWorkflow::getWorkflowId));
+
+        Map<String, String> draftWorkflowNameIds = new HashMap<>();
+
+        for (Map.Entry<String, String> entry : publishedWorkflowNameIds.entrySet()) {
+            String uuid = workflowIdUuids.get(entry.getValue());
+
+            String draftWorkflowId = uuid == null ? null : uuidDraftWorkflowIds.get(uuid);
+
+            if (draftWorkflowId != null) {
+                draftWorkflowNameIds.put(entry.getKey(), draftWorkflowId);
+            }
+        }
+
+        return draftWorkflowNameIds;
     }
 
     private void deployInto(Project project, ProjectDefinition projectDefinition, byte[] bytes, Language language) {
@@ -268,6 +378,12 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
         ProjectCodeWorkflow projectCodeWorkflow = projectCodeWorkflowService.getProjectCodeWorkflow(projectId);
 
         return codeWorkflowContainerService.getCodeWorkflowContainer(projectCodeWorkflow.getCodeWorkflowContainerId());
+    }
+
+    private static boolean isEmbeddedBridgeProject(Project project) {
+        String name = project.getName();
+
+        return name != null && name.startsWith(EMBEDDED_AUTOMATION_MARKER);
     }
 
     private Project createProject(long workspaceId, ProjectDefinition projectDefinition) {

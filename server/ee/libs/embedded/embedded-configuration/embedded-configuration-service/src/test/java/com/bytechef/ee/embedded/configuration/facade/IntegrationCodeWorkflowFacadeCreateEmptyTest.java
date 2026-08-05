@@ -10,12 +10,14 @@ package com.bytechef.ee.embedded.configuration.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.embedded.codeworkflow.loader.IntegrationHandlerLoader;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
@@ -26,6 +28,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
 import com.bytechef.ee.platform.codeworkflow.configuration.facade.CodeWorkflowContainerFacade;
+import com.bytechef.ee.platform.codeworkflow.configuration.facade.CodeWorkflowContainerFacade.CodeWorkflowReconciliation;
 import com.bytechef.ee.platform.codeworkflow.configuration.service.CodeWorkflowContainerService;
 import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorage;
 import com.bytechef.embedded.integration.IntegrationHandler;
@@ -100,23 +103,25 @@ class IntegrationCodeWorkflowFacadeCreateEmptyTest {
         createdIntegration.setComponentName("my-integration");
         createdIntegration.setName("my-integration");
 
-        when(integrationService.fetchIntegration("my-integration"))
-            .thenReturn(Optional.empty(), Optional.empty(), Optional.of(createdIntegration));
+        when(integrationService.fetchIntegration("my-integration")).thenReturn(Optional.empty());
         when(integrationService.create(any()))
             .thenReturn(createdIntegration);
 
+        when(integrationCodeWorkflowService.fetchIntegrationCodeWorkflow(1L)).thenReturn(Optional.empty());
+
         CodeWorkflowContainer codeWorkflowContainer = mock(CodeWorkflowContainer.class);
 
-        when(codeWorkflowContainer.getWorkflowNameIds())
-            .thenReturn(Map.of("my-workflow", UUID.randomUUID()
-                .toString()));
-        when(codeWorkflowContainerFacade.create(any(), any(), any(), eq(Language.JAVASCRIPT), any(), any()))
-            .thenReturn(codeWorkflowContainer);
+        CodeWorkflowReconciliation reconciliation = new CodeWorkflowReconciliation(
+            codeWorkflowContainer, Map.of(), Map.of());
+
+        when(codeWorkflowContainerFacade.create(any(), any(), any(), eq(Language.JAVASCRIPT), any(), any(), any()))
+            .thenReturn(reconciliation);
 
         IntegrationCodeWorkflowFacadeImpl integrationCodeWorkflowFacade = new IntegrationCodeWorkflowFacadeImpl(
             applicationProperties(true), mock(CacheManager.class), codeWorkflowContainerFacade,
             integrationCodeWorkflowService, integrationService, integrationWorkflowService,
-            mock(CodeWorkflowContainerService.class), mock(CodeWorkflowFileStorage.class));
+            mock(CodeWorkflowContainerService.class), mock(CodeWorkflowFileStorage.class),
+            mock(WorkflowService.class));
 
         Integration integration = integrationCodeWorkflowFacade.createEmptyCodeWorkflow(
             "my-integration", Language.JAVASCRIPT);
@@ -132,6 +137,7 @@ class IntegrationCodeWorkflowFacadeCreateEmptyTest {
             .getComponentName()).isEqualTo("my-integration");
 
         verify(integrationCodeWorkflowService).create(eq(codeWorkflowContainer), any());
+        verify(integrationService, never()).publishIntegration(anyLong(), any());
     }
 
     @ParameterizedTest
@@ -145,7 +151,8 @@ class IntegrationCodeWorkflowFacadeCreateEmptyTest {
         IntegrationCodeWorkflowFacadeImpl integrationCodeWorkflowFacade = new IntegrationCodeWorkflowFacadeImpl(
             applicationProperties(true), mock(CacheManager.class), codeWorkflowContainerFacade,
             integrationCodeWorkflowService, integrationService, integrationWorkflowService,
-            mock(CodeWorkflowContainerService.class), mock(CodeWorkflowFileStorage.class));
+            mock(CodeWorkflowContainerService.class), mock(CodeWorkflowFileStorage.class),
+            mock(WorkflowService.class));
 
         assertThatThrownBy(
             () -> integrationCodeWorkflowFacade.createEmptyCodeWorkflow("my-integration", language))
@@ -174,7 +181,8 @@ class IntegrationCodeWorkflowFacadeCreateEmptyTest {
         IntegrationCodeWorkflowFacadeImpl integrationCodeWorkflowFacade = new IntegrationCodeWorkflowFacadeImpl(
             applicationProperties(true), mock(CacheManager.class), codeWorkflowContainerFacade,
             integrationCodeWorkflowService, integrationService, integrationWorkflowService,
-            mock(CodeWorkflowContainerService.class), mock(CodeWorkflowFileStorage.class));
+            mock(CodeWorkflowContainerService.class), mock(CodeWorkflowFileStorage.class),
+            mock(WorkflowService.class));
 
         assertThatThrownBy(
             () -> integrationCodeWorkflowFacade.createEmptyCodeWorkflow("my-integration", Language.JAVASCRIPT))
@@ -215,7 +223,8 @@ class IntegrationCodeWorkflowFacadeCreateEmptyTest {
         IntegrationCodeWorkflowFacadeImpl integrationCodeWorkflowFacade = new IntegrationCodeWorkflowFacadeImpl(
             applicationProperties(true), mock(CacheManager.class), codeWorkflowContainerFacade,
             integrationCodeWorkflowService, integrationService, integrationWorkflowService,
-            mock(CodeWorkflowContainerService.class), mock(CodeWorkflowFileStorage.class));
+            mock(CodeWorkflowContainerService.class), mock(CodeWorkflowFileStorage.class),
+            mock(WorkflowService.class));
 
         assertThatThrownBy(
             () -> integrationCodeWorkflowFacade.createEmptyCodeWorkflow(componentName, Language.JAVASCRIPT))

@@ -9,7 +9,8 @@ extend type Mutation {
     createCustomComponent(name: String!, language: CustomComponentLanguage!): CustomComponent!
     deleteCustomComponent(id: ID!): Boolean!
     enableCustomComponent(id: ID!, enable: Boolean!): Boolean!
-    updateCustomComponentSource(id: ID!, content: String!): Boolean!
+    publishCustomComponent(id: ID!): CustomComponent!
+    updateCustomComponentSource(id: ID!, content: String!): CustomComponent!
 }
 
 type CustomComponent {
@@ -25,6 +26,8 @@ type CustomComponent {
     createdDate: Long
     lastModifiedBy: String
     lastModifiedDate: Long
+    status: CustomComponentStatus
+    publishedDate: Long
     version: Int
 }
 
@@ -33,6 +36,11 @@ enum CustomComponentLanguage {
     JAVASCRIPT
     PYTHON
     RUBY
+}
+
+enum CustomComponentStatus {
+    DRAFT
+    PUBLISHED
 }
 
 type CustomComponentDefinition {
