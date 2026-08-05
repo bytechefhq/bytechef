@@ -1,10 +1,11 @@
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
-import LoadingIcon from '@/components/LoadingIcon';
 import PageLoader from '@/components/PageLoader';
+import MonacoEditorWrapper from '@/shared/components/MonacoEditorWrapper';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
 import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
+import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {
@@ -21,11 +22,9 @@ import {
 } from '@/shared/middleware/graphql';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useQueryClient} from '@tanstack/react-query';
-import {ArrowLeftIcon, SparklesIcon, ZapIcon} from 'lucide-react';
-import {Suspense, lazy, useEffect, useRef, useState} from 'react';
+import {ArrowLeftIcon, SendIcon, SparklesIcon, ZapIcon} from 'lucide-react';
+import {useEffect, useRef, useState} from 'react';
 import {useLocation, useNavigate, useParams} from 'react-router-dom';
-
-const MonacoEditorWrapper = lazy(() => import('@/shared/components/MonacoEditorWrapper'));
 
 const MONACO_LANGUAGE_BY_CUSTOM_COMPONENT_LANGUAGE: Record<CustomComponentLanguage, string> = {
     [CustomComponentLanguage.Java]: 'java',
@@ -67,19 +66,14 @@ const CustomComponentDetailHeader = ({
         right={
             showSaveButton && (
                 <div className="flex items-center gap-2">
-                    <Button
-                        disabled={isPublishDisabled}
-                        label={isPublishing ? 'Publishing...' : 'Publish'}
-                        onClick={onPublish}
-                        size="sm"
-                        variant="outline"
-                    />
+                    <Button disabled={isSaveDisabled} label={isSaving ? 'Saving...' : 'Save'} onClick={onSave} />
 
                     <Button
-                        disabled={isSaveDisabled}
-                        label={isSaving ? 'Saving...' : 'Save'}
-                        onClick={onSave}
-                        size="sm"
+                        disabled={isPublishDisabled}
+                        icon={<SendIcon />}
+                        label={isPublishing ? 'Publishing...' : 'Publish'}
+                        onClick={onPublish}
+                        variant="outline"
                     />
 
                     {onAskCopilot && (
@@ -87,7 +81,7 @@ const CustomComponentDetailHeader = ({
                             aria-label="Ask Copilot"
                             icon={<SparklesIcon />}
                             onClick={onAskCopilot}
-                            size="iconSm"
+                            size="icon"
                             variant="ghost"
                         />
                     )}
@@ -213,28 +207,20 @@ const CustomComponentSourceEditor = ({monacoLanguage, onChange, value}: CustomCo
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
         <div className="relative min-h-0 flex-1">
             <div className="absolute inset-0">
-                <Suspense
-                    fallback={
-                        <div className="flex items-center justify-center p-8">
-                            <LoadingIcon />
-                        </div>
-                    }
-                >
-                    <MonacoEditorWrapper
-                        defaultLanguage={monacoLanguage}
-                        onChange={onChange}
-                        onMount={() => {}}
-                        options={{
-                            automaticLayout: true,
-                            folding: true,
-                            lineNumbers: 'on',
-                            minimap: {enabled: false},
-                            scrollBeyondLastLine: false,
-                            wordWrap: 'on',
-                        }}
-                        value={value}
-                    />
-                </Suspense>
+                <MonacoEditorWrapper
+                    defaultLanguage={monacoLanguage}
+                    onChange={onChange}
+                    onMount={() => {}}
+                    options={{
+                        automaticLayout: true,
+                        folding: true,
+                        lineNumbers: 'on',
+                        minimap: {enabled: false},
+                        scrollBeyondLastLine: false,
+                        wordWrap: 'on',
+                    }}
+                    value={value}
+                />
             </div>
         </div>
     </div>
@@ -332,7 +318,10 @@ const CustomComponentDetail = ({customComponentId: customComponentIdProp}: Custo
     const handleAskCopilot =
         copilotEnabled && !customComponentIdProp
             ? () => {
+                  // Settings pages are not environment-scoped; pin the copilot to DEVELOPMENT so provider
+                  // resolution does not depend on an invisible, persisted environment selection.
                   setContext({
+                      environmentId: DEVELOPMENT_ENVIRONMENT,
                       mode: MODE.ASK,
                       parameters: {customComponentId: id},
                       source: Source.CUSTOM_COMPONENT,

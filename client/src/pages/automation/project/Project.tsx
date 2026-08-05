@@ -8,6 +8,7 @@ import WorkflowExecutionsTestOutput from '@/pages/platform/workflow-editor/compo
 import {useRun} from '@/pages/platform/workflow-editor/hooks/useRun';
 import {WorkflowEditorProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
+import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import WorkflowTestRunLeaveDialog from '@/shared/components/WorkflowTestRunLeaveDialog';
 import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilotLayoutShifted';
@@ -35,6 +36,7 @@ const Project = () => {
         }))
     );
 
+    const showBottomPanel = useWorkflowEditorStore((state) => state.showBottomPanel);
     const workflowTestChatPanelOpen = useWorkflowTestChatStore((state) => state.workflowTestChatPanelOpen);
 
     const {cancelLeave, confirmLeave, showLeaveDialog, workflowIsRunning, workflowTestExecution} =
@@ -153,7 +155,10 @@ const Project = () => {
                             defaultSize={0}
                             panelRef={bottomResizablePanelRef}
                         >
-                            {(workflowIsRunning || workflowTestExecution || workflowTestChatPanelOpen) && (
+                            {(showBottomPanel ||
+                                workflowIsRunning ||
+                                workflowTestExecution ||
+                                workflowTestChatPanelOpen) && (
                                 <WorkflowExecutionsTestOutput
                                     onCloseClick={handleWorkflowExecutionsTestOutputCloseClick}
                                     onEditSubflowClick={handleEditSubflowClick}

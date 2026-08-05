@@ -34,6 +34,7 @@ export enum Source {
 }
 
 export type ContextType = {
+    environmentId?: number;
     source: Source;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     parameters: Record<string, any>;

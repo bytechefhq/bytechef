@@ -30,13 +30,14 @@ export const useWorkflowBuilderHeader = ({bottomResizablePanelRef, chatTrigger, 
     const setDataPillPanelOpen = useDataPillPanelStore((state) => state.setDataPillPanelOpen);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const workflow = useWorkflowDataStore((state) => state.workflow);
-    const {setShowBottomPanelOpen, setWorkflowIsRunning, setWorkflowTestExecution, showBottomPanel} =
+    const {setShowBottomPanelOpen, setWorkflowIsRunning, setWorkflowTestExecution, showBottomPanel, workflowIsRunning} =
         useWorkflowEditorStore(
             useShallow((state) => ({
                 setShowBottomPanelOpen: state.setShowBottomPanelOpen,
                 setWorkflowIsRunning: state.setWorkflowIsRunning,
                 setWorkflowTestExecution: state.setWorkflowTestExecution,
                 showBottomPanel: state.showBottomPanel,
+                workflowIsRunning: state.workflowIsRunning,
             }))
         );
     const {setCurrentNode, setWorkflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore(
@@ -228,11 +229,13 @@ export const useWorkflowBuilderHeader = ({bottomResizablePanelRef, chatTrigger, 
 
     // Stop the workflow execution when:
     // - We are in chat mode (`chatTrigger` is true) and the chat panel is not open (`!workflowTestChatPanelOpen`)
+    // Only while a run is in progress — handleStopClick also closes the bottom panel, so firing it while idle
+    // makes the header Output button a no-op on chat-trigger workflows.
     useEffect(() => {
-        if (chatTrigger && !workflowTestChatPanelOpen) {
+        if (chatTrigger && !workflowTestChatPanelOpen && workflowIsRunning) {
             handleStopClick();
         }
-    }, [chatTrigger, handleStopClick, workflowTestChatPanelOpen]);
+    }, [chatTrigger, handleStopClick, workflowIsRunning, workflowTestChatPanelOpen]);
 
     useEffect(() => {
         if (workflowTestStreamError) {

@@ -8,6 +8,7 @@ import WorkflowExecutionsTestOutput from '@/pages/platform/workflow-editor/compo
 import {useRun} from '@/pages/platform/workflow-editor/hooks/useRun';
 import {RequestI, WorkflowEditorProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
+import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import WorkflowTestRunLeaveDialog from '@/shared/components/WorkflowTestRunLeaveDialog';
 import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilotLayoutShifted';
 import {useWorkflowTestRunGuard} from '@/shared/hooks/useWorkflowTestRunGuard';
@@ -51,6 +52,7 @@ const AutomationWorkflow = () => {
     );
 
     const leftSidebarOpen = useAutomationWorkflowEditorSidebarStore((state) => state.leftSidebarOpen);
+    const showBottomPanel = useWorkflowEditorStore((state) => state.showBottomPanel);
 
     const bottomResizablePanelRef = useRef<PanelImperativeHandle>(null);
 
@@ -191,7 +193,7 @@ const AutomationWorkflow = () => {
                         <ResizableHandle className="bg-muted" />
 
                         <ResizablePanel className="flex" defaultSize={0} panelRef={bottomResizablePanelRef}>
-                            {(workflowIsRunning || workflowTestExecution) && (
+                            {(showBottomPanel || workflowIsRunning || workflowTestExecution) && (
                                 <div
                                     className={twMerge(
                                         'm-3 flex flex-1 overflow-hidden rounded-lg bg-background',
