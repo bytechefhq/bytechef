@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
@@ -91,10 +92,11 @@ class CheckForViolationsAdvisorCriticalFixesTest {
 
         ChatClientResponse response = advisor.adviseCall(requestWithUser("hello"), chain);
 
+        ChatResponse chatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+
         // 2 invocations: one on the input pass with "hello", one on the output pass with "".
         assertThat(invocations.get()).isEqualTo(2);
-        assertThat(response.chatResponse()
-            .getMetadata()
+        assertThat(chatResponse.getMetadata()
             .containsKey(VIOLATIONS_METADATA_KEY))
                 .as("empty assistant text + non-throwing output check → forwarded without blocking")
                 .isFalse();
@@ -128,8 +130,9 @@ class CheckForViolationsAdvisorCriticalFixesTest {
 
         ChatClientResponse response = advisor.adviseCall(request, chain);
 
-        assertThat(response.chatResponse()
-            .getMetadata()
+        ChatResponse chatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+
+        assertThat(chatResponse.getMetadata()
             .containsKey(VIOLATIONS_METADATA_KEY))
                 .as("no structured content + no output checks → forwarded without blocking")
                 .isFalse();
@@ -222,9 +225,11 @@ class CheckForViolationsAdvisorCriticalFixesTest {
         ChatClientResponse response = advisor.adviseCall(request, chain);
 
         verify(chain).nextCall(any());
-        assertThat(response.chatResponse()
-            .getResult()
-            .getOutput()
+
+        ChatResponse chatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+        Generation result = Objects.requireNonNull(chatResponse.getResult(), "result");
+
+        assertThat(result.getOutput()
             .getText())
                 .as("output-only configuration must allow empty user text through")
                 .isEqualTo("ok");
@@ -241,15 +246,20 @@ class CheckForViolationsAdvisorCriticalFixesTest {
         StreamAdvisorChain streamChain = mock(StreamAdvisorChain.class);
         when(streamChain.nextStream(any())).thenReturn(Flux.error(new RuntimeException("upstream blew up")));
 
-        List<ChatClientResponse> responses = advisor.adviseStream(requestWithUser("hello"), streamChain)
-            .collectList()
-            .block();
+        List<ChatClientResponse> responses = Objects.requireNonNull(
+            advisor.adviseStream(requestWithUser("hello"), streamChain)
+                .collectList()
+                .block(),
+            "responses");
 
         assertThat(responses).hasSize(1);
-        assertThat(responses.get(0)
-            .chatResponse()
-            .getResult()
-            .getOutput()
+
+        ChatClientResponse blocked = responses.get(0);
+
+        ChatResponse chatResponse = Objects.requireNonNull(blocked.chatResponse(), "chatResponse");
+        Generation result = Objects.requireNonNull(chatResponse.getResult(), "result");
+
+        assertThat(result.getOutput()
             .getText())
                 .as("upstream stream error converts to a blocked response, never propagating raw error")
                 .isEqualTo("BLOCKED");
@@ -284,25 +294,31 @@ class CheckForViolationsAdvisorCriticalFixesTest {
 
         when(streamChain.nextStream(any())).thenReturn(Flux.just(chunk1, chunk2, chunk3));
 
-        List<ChatClientResponse> responses = advisor.adviseStream(requestWithUser("hi"), streamChain)
-            .collectList()
-            .block();
+        List<ChatClientResponse> responses = Objects.requireNonNull(
+            advisor.adviseStream(requestWithUser("hi"), streamChain)
+                .collectList()
+                .block(),
+            "responses");
 
         assertThat(responses)
             .as("only chunk1 (passed) and the blocked placeholder must emit — chunk3 must never reach the caller")
             .hasSize(2);
-        assertThat(responses.get(0)
-            .chatResponse()
-            .getResult()
-            .getOutput()
+
+        ChatClientResponse first = responses.get(0);
+
+        ChatResponse firstChatResponse = Objects.requireNonNull(first.chatResponse(), "chatResponse");
+        Generation firstResult = Objects.requireNonNull(firstChatResponse.getResult(), "result");
+
+        assertThat(firstResult.getOutput()
             .getText())
                 .isEqualTo("ok-chunk-1");
 
         ChatClientResponse blocked = responses.get(1);
 
-        assertThat(blocked.chatResponse()
-            .getResult()
-            .getOutput()
+        ChatResponse blockedChatResponse = Objects.requireNonNull(blocked.chatResponse(), "chatResponse");
+        Generation blockedResult = Objects.requireNonNull(blockedChatResponse.getResult(), "result");
+
+        assertThat(blockedResult.getOutput()
             .getText())
                 .isEqualTo("BLOCKED");
         assertThat(checkInvocations.get())
@@ -334,10 +350,13 @@ class CheckForViolationsAdvisorCriticalFixesTest {
 
         ChatClientResponse response = advisor.adviseCall(requestWithUser("hello"), mock(CallAdvisorChain.class));
 
+        ChatResponse chatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+
         @SuppressWarnings("unchecked")
-        List<Map<String, Object>> violations = (List<Map<String, Object>>) response.chatResponse()
-            .getMetadata()
-            .get(VIOLATIONS_METADATA_KEY);
+        List<Map<String, Object>> violations = Objects.requireNonNull(
+            (List<Map<String, Object>>) chatResponse.getMetadata()
+                .get(VIOLATIONS_METADATA_KEY),
+            "violations");
 
         assertThat(violations).hasSize(1);
 
@@ -373,9 +392,10 @@ class CheckForViolationsAdvisorCriticalFixesTest {
 
         ChatClientResponse response = advisor.adviseCall(requestWithUser("hello"), chain);
 
-        assertThat(response.chatResponse()
-            .getResult()
-            .getOutput()
+        ChatResponse chatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+        Generation result = Objects.requireNonNull(chatResponse.getResult(), "result");
+
+        assertThat(result.getOutput()
             .getText())
                 .as("malformed (null) chatResponse on output path must fail closed")
                 .isEqualTo("BLOCKED");

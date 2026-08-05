@@ -248,7 +248,9 @@ class AgentSubflowBridgeIntTest {
         // Seed the failure cause that production wiring would have set on a FAILED job, then re-dispatch the
         // terminal event with FAILED status -- exercising the S2 message-propagation path through the bridge.
 
-        bridgeRun.injectSubflowErrorAndDispatchFailedEvent("approval task threw", subflowJob.getId());
+        Long subflowJobId = Objects.requireNonNull(subflowJob.getId(), "subflow job id");
+
+        bridgeRun.injectSubflowErrorAndDispatchFailedEvent("approval task threw", subflowJobId);
 
         Map<String, ?> resumeData = bridgeRun.resumeData();
 

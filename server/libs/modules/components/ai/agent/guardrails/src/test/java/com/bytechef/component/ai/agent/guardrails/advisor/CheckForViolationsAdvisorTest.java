@@ -33,6 +33,7 @@ import com.bytechef.platform.component.definition.ai.agent.guardrails.PreflightM
 import com.bytechef.platform.component.definition.ai.agent.guardrails.Violation;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -107,9 +108,10 @@ class CheckForViolationsAdvisorTest {
 
         ChatClientResponse response = advisor.adviseCall(request, chain);
 
-        assertThat(response.chatResponse()
-            .getResult()
-            .getOutput()
+        ChatResponse blockedChatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+        Generation result = Objects.requireNonNull(blockedChatResponse.getResult(), "result");
+
+        assertThat(result.getOutput()
             .getText()).isEqualTo("BLOCKED");
         verify(chain, never()).nextCall(any());
     }
@@ -159,9 +161,10 @@ class CheckForViolationsAdvisorTest {
 
         ChatClientResponse response = advisor.adviseCall(request, chain);
 
-        assertThat(response.chatResponse()
-            .getResult()
-            .getOutput()
+        ChatResponse blockedChatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+        Generation result = Objects.requireNonNull(blockedChatResponse.getResult(), "result");
+
+        assertThat(result.getOutput()
             .getText()).isEqualTo("BLOCKED");
         verify(chain, never()).nextCall(any());
     }
@@ -183,9 +186,10 @@ class CheckForViolationsAdvisorTest {
 
         ChatClientResponse response = advisor.adviseCall(request, chain);
 
-        assertThat(response.chatResponse()
-            .getResult()
-            .getOutput()
+        ChatResponse blockedChatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+        Generation result = Objects.requireNonNull(blockedChatResponse.getResult(), "result");
+
+        assertThat(result.getOutput()
             .getText()).isEqualTo("BLOCKED");
         verify(chain, never()).nextCall(any());
     }
@@ -208,9 +212,10 @@ class CheckForViolationsAdvisorTest {
         try {
             ChatClientResponse response = advisor.adviseCall(request, chain);
 
-            assertThat(response.chatResponse()
-                .getResult()
-                .getOutput()
+            ChatResponse blockedChatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+            Generation result = Objects.requireNonNull(blockedChatResponse.getResult(), "result");
+
+            assertThat(result.getOutput()
                 .getText()).isEqualTo("BLOCKED");
             assertThat(Thread.currentThread()
                 .isInterrupted()).isTrue();
@@ -250,9 +255,10 @@ class CheckForViolationsAdvisorTest {
         try {
             ChatClientResponse response = advisor.adviseCall(request, chain);
 
-            assertThat(response.chatResponse()
-                .getResult()
-                .getOutput()
+            ChatResponse blockedChatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+            Generation result = Objects.requireNonNull(blockedChatResponse.getResult(), "result");
+
+            assertThat(result.getOutput()
                 .getText()).isEqualTo("BLOCKED");
             assertThat(Thread.currentThread()
                 .isInterrupted()).isTrue();
@@ -291,13 +297,14 @@ class CheckForViolationsAdvisorTest {
 
         ChatClientResponse response = advisor.adviseCall(requestWithUser(""), chain);
 
+        ChatResponse forwardedChatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+        Generation result = Objects.requireNonNull(forwardedChatResponse.getResult(), "result");
+
         // Default validateInput=true AND validateOutput=true: invoked once on input ("") and once on output.
         assertThat(invocations.get())
             .as("check should be invoked twice — once per pass — when both directions default to enabled")
             .isEqualTo(2);
-        assertThat(response.chatResponse()
-            .getResult()
-            .getOutput()
+        assertThat(result.getOutput()
             .getText())
                 .as("non-throwing check on empty text produces no violation; upstream response is forwarded")
                 .isEqualTo("upstream-text");
@@ -321,16 +328,21 @@ class CheckForViolationsAdvisorTest {
 
         Flux<ChatClientResponse> flux = advisor.adviseStream(request, streamChain);
 
-        List<ChatClientResponse> responses = flux.collectList()
-            .block();
+        List<ChatClientResponse> responses = Objects.requireNonNull(
+            flux.collectList()
+                .block(),
+            "responses");
 
         assertThat(responses).hasSize(1);
-        assertThat(
+
+        ChatResponse blockedChatResponse = Objects.requireNonNull(
             responses.getFirst()
-                .chatResponse()
-                .getResult()
-                .getOutput()
-                .getText()).isEqualTo("BLOCKED");
+                .chatResponse(),
+            "chatResponse");
+        Generation result = Objects.requireNonNull(blockedChatResponse.getResult(), "result");
+
+        assertThat(result.getOutput()
+            .getText()).isEqualTo("BLOCKED");
 
         verify(streamChain, never()).nextStream(any());
     }
@@ -392,17 +404,22 @@ class CheckForViolationsAdvisorTest {
         StreamAdvisorChain streamChain = mock(StreamAdvisorChain.class);
         ChatClientRequest request = requestWithUser("hello");
 
-        List<ChatClientResponse> responses = advisor.adviseStream(request, streamChain)
-            .collectList()
-            .block();
+        List<ChatClientResponse> responses = Objects.requireNonNull(
+            advisor.adviseStream(request, streamChain)
+                .collectList()
+                .block(),
+            "responses");
 
         assertThat(responses).hasSize(1);
-        assertThat(
+
+        ChatResponse blockedChatResponse = Objects.requireNonNull(
             responses.getFirst()
-                .chatResponse()
-                .getResult()
-                .getOutput()
-                .getText()).isEqualTo("BLOCKED");
+                .chatResponse(),
+            "chatResponse");
+        Generation result = Objects.requireNonNull(blockedChatResponse.getResult(), "result");
+
+        assertThat(result.getOutput()
+            .getText()).isEqualTo("BLOCKED");
 
         verify(streamChain, never()).nextStream(any());
     }
@@ -433,15 +450,21 @@ class CheckForViolationsAdvisorTest {
         StreamAdvisorChain streamChain = mock(StreamAdvisorChain.class);
         ChatClientRequest request = requestWithUser("hello");
 
-        List<ChatClientResponse> responses = advisor.adviseStream(request, streamChain)
-            .collectList()
-            .block();
+        List<ChatClientResponse> responses = Objects.requireNonNull(
+            advisor.adviseStream(request, streamChain)
+                .collectList()
+                .block(),
+            "responses");
 
         assertThat(responses).hasSize(1);
-        assertThat(responses.get(0)
-            .chatResponse()
-            .getResult()
-            .getOutput()
+
+        ChatResponse blockedChatResponse = Objects.requireNonNull(
+            responses.get(0)
+                .chatResponse(),
+            "chatResponse");
+        Generation result = Objects.requireNonNull(blockedChatResponse.getResult(), "result");
+
+        assertThat(result.getOutput()
             .getText()).isEqualTo("BLOCKED");
 
         verify(streamChain, never()).nextStream(any());
@@ -567,13 +590,13 @@ class CheckForViolationsAdvisorTest {
 
         ChatClientResponse response = advisor.adviseCall(request, chain);
 
-        assertThat(
-            response.chatResponse()
-                .getResult()
-                .getOutput()
-                .getText())
-                    .as("multi-turn bypass: payload in an earlier USER message must still trip the keyword check")
-                    .isEqualTo("BLOCKED");
+        ChatResponse blockedChatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+        Generation result = Objects.requireNonNull(blockedChatResponse.getResult(), "result");
+
+        assertThat(result.getOutput()
+            .getText())
+                .as("multi-turn bypass: payload in an earlier USER message must still trip the keyword check")
+                .isEqualTo("BLOCKED");
         verify(chain, never()).nextCall(any());
     }
 

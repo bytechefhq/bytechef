@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.Context;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailSanitizerFunction;
 import java.util.List;
+import java.util.Objects;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.client.ChatClientRequest;
 import org.springframework.ai.chat.client.ChatClientResponse;
@@ -65,26 +66,34 @@ class SanitizeTextAdvisorPartialLeakStreamTest {
         when(streamChain.nextStream(any(ChatClientRequest.class)))
             .thenReturn(Flux.just(assistantResponse("first chunk"), assistantResponse("second chunk")));
 
-        List<ChatClientResponse> responses = advisor.adviseStream(request, streamChain)
-            .collectList()
-            .block();
+        List<ChatClientResponse> responses = Objects.requireNonNull(
+            advisor.adviseStream(request, streamChain)
+                .collectList()
+                .block(),
+            "responses");
 
         assertThat(responses)
             .as("first chunk reached the caller before the failure; remainder must be swapped to a withheld placeholder")
             .hasSize(2);
 
-        assertThat(responses.get(0)
-            .chatResponse()
-            .getResult()
-            .getOutput()
+        ChatResponse firstChatResponse = Objects.requireNonNull(
+            responses.get(0)
+                .chatResponse(),
+            "chatResponse");
+        Generation firstResult = Objects.requireNonNull(firstChatResponse.getResult(), "result");
+
+        assertThat(firstResult.getOutput()
             .getText())
                 .as("chunk 1 already shipped — it cannot be recalled, so it survives unchanged")
                 .isEqualTo("first chunk");
 
-        assertThat(responses.get(1)
-            .chatResponse()
-            .getResult()
-            .getOutput()
+        ChatResponse secondChatResponse = Objects.requireNonNull(
+            responses.get(1)
+                .chatResponse(),
+            "chatResponse");
+        Generation secondResult = Objects.requireNonNull(secondChatResponse.getResult(), "result");
+
+        assertThat(secondResult.getOutput()
             .getText())
                 .as("chunk 2 triggered the sanitizer failure → remainder becomes the withheld placeholder, " +
                     "never the raw upstream text")
@@ -109,22 +118,32 @@ class SanitizeTextAdvisorPartialLeakStreamTest {
                 Flux.just(assistantResponse("ok chunk")),
                 Flux.error(new RuntimeException("upstream stream reset"))));
 
-        List<ChatClientResponse> responses = advisor.adviseStream(request, streamChain)
-            .collectList()
-            .block();
+        List<ChatClientResponse> responses = Objects.requireNonNull(
+            advisor.adviseStream(request, streamChain)
+                .collectList()
+                .block(),
+            "responses");
 
         // Distinct branch from the sanitizer-throws case above: symmetric ERROR-level telemetry is expected, but the
         // cause is upstream rather than local. Both branches emit the withheld placeholder as the last chunk.
         assertThat(responses).hasSize(2);
-        assertThat(responses.get(0)
-            .chatResponse()
-            .getResult()
-            .getOutput()
+
+        ChatResponse firstChatResponse = Objects.requireNonNull(
+            responses.get(0)
+                .chatResponse(),
+            "chatResponse");
+        Generation firstResult = Objects.requireNonNull(firstChatResponse.getResult(), "result");
+
+        assertThat(firstResult.getOutput()
             .getText()).isEqualTo("ok chunk");
-        assertThat(responses.get(1)
-            .chatResponse()
-            .getResult()
-            .getOutput()
+
+        ChatResponse secondChatResponse = Objects.requireNonNull(
+            responses.get(1)
+                .chatResponse(),
+            "chatResponse");
+        Generation secondResult = Objects.requireNonNull(secondChatResponse.getResult(), "result");
+
+        assertThat(secondResult.getOutput()
             .getText())
                 .contains("sanitizer failed")
                 .doesNotContain("upstream stream reset");
@@ -150,9 +169,10 @@ class SanitizeTextAdvisorPartialLeakStreamTest {
 
         ChatClientResponse response = advisor.adviseCall(request, chain);
 
-        assertThat(response.chatResponse()
-            .getResult()
-            .getOutput()
+        ChatResponse withheldChatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+        Generation result = Objects.requireNonNull(withheldChatResponse.getResult(), "result");
+
+        assertThat(result.getOutput()
             .getText())
                 .contains("sanitizer failed")
                 .doesNotContain("upstream 503");

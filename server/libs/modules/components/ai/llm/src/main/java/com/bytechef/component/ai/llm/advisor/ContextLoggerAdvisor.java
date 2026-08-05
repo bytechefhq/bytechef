@@ -59,6 +59,10 @@ public class ContextLoggerAdvisor extends SimpleLoggerAdvisor {
     protected void logResponse(ChatClientResponse chatClientResponse) {
         ChatResponse chatResponse = chatClientResponse.chatResponse();
 
+        if (chatResponse == null) {
+            return;
+        }
+
         Map<String, @Nullable Object> responseLogEntry = new LinkedHashMap<>();
 
         responseLogEntry.put("metadata", chatResponse.getMetadata());

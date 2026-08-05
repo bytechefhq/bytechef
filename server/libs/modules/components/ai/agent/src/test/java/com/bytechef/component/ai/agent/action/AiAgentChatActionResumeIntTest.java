@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.ai.chat.messages.AssistantMessage;
@@ -261,7 +262,11 @@ class AiAgentChatActionResumeIntTest {
             }
 
             @Override
-            public String call(String toolInput, ToolContext toolContext) {
+            public String call(String toolInput, @Nullable ToolContext toolContext) {
+                if (toolContext == null) {
+                    throw new IllegalStateException("toolContext is required");
+                }
+
                 ActionContext context =
                     (ActionContext) toolContext.getContext()
                         .get(AiAgentToolContextKey.ACTION_CONTEXT);

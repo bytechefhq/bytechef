@@ -154,6 +154,10 @@ public class NanoGptImageModel implements ImageModel {
             .retrieve()
             .body(new ParameterizedTypeReference<>() {});
 
+        if (response == null) {
+            throw new IllegalStateException("Image generation request returned an empty response");
+        }
+
         return buildResponse(response);
     }
 

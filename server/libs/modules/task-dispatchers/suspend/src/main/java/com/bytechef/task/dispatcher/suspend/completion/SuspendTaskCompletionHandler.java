@@ -124,7 +124,7 @@ public class SuspendTaskCompletionHandler implements TaskCompletionHandler {
         jobMetadata.put(MetadataConstants.JOB_RESUME_ID, jobResumeIdString);
         jobMetadata.put(MetadataConstants.TASK_EXECUTION_RESUME_ID, taskExecution.getId());
 
-        job = jobService.getJob(job.getId());
+        job = jobService.getJob(jobId);
 
         job.setMetadata(jobMetadata);
 

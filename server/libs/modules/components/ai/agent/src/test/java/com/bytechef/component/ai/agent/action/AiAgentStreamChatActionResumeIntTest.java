@@ -351,7 +351,11 @@ class AiAgentStreamChatActionResumeIntTest {
             }
 
             @Override
-            public String call(String toolInput, ToolContext toolContext) {
+            public String call(String toolInput, @Nullable ToolContext toolContext) {
+                if (toolContext == null) {
+                    throw new IllegalStateException("toolContext is required");
+                }
+
                 ActionContext context =
                     (ActionContext) toolContext.getContext()
                         .get(AiAgentToolContextKey.ACTION_CONTEXT);

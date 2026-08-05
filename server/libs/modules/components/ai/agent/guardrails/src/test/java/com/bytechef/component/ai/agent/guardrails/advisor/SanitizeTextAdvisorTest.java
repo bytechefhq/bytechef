@@ -27,6 +27,7 @@ import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailSanitizerFunction;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.IntStream;
@@ -149,9 +150,10 @@ class SanitizeTextAdvisorTest {
 
         ChatClientResponse response = advisor.adviseCall(request, chain);
 
-        assertThat(response.chatResponse()
-            .getResult()
-            .getOutput()
+        ChatResponse sanitizedChatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+        Generation result = Objects.requireNonNull(sanitizedChatResponse.getResult(), "result");
+
+        assertThat(result.getOutput()
             .getText()).isEqualTo("has [redacted] here");
     }
 
@@ -194,9 +196,10 @@ class SanitizeTextAdvisorTest {
 
         ChatClientResponse response = advisor.adviseCall(request, chain);
 
-        String text = response.chatResponse()
-            .getResult()
-            .getOutput()
+        ChatResponse withheldChatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+        Generation result = Objects.requireNonNull(withheldChatResponse.getResult(), "result");
+
+        String text = result.getOutput()
             .getText();
 
         // Sanitizer failures aggregate into SanitizerExecutionFailureException, which the advisor converts to the
@@ -221,15 +224,21 @@ class SanitizeTextAdvisorTest {
 
         when(streamChain.nextStream(request)).thenReturn(Flux.just(modelResponse));
 
-        List<ChatClientResponse> responses = advisor.adviseStream(request, streamChain)
-            .collectList()
-            .block();
+        List<ChatClientResponse> responses = Objects.requireNonNull(
+            advisor.adviseStream(request, streamChain)
+                .collectList()
+                .block(),
+            "responses");
 
         assertThat(responses).hasSize(1);
-        assertThat(responses.get(0)
-            .chatResponse()
-            .getResult()
-            .getOutput()
+
+        ChatResponse sanitizedChatResponse = Objects.requireNonNull(
+            responses.get(0)
+                .chatResponse(),
+            "chatResponse");
+        Generation result = Objects.requireNonNull(sanitizedChatResponse.getResult(), "result");
+
+        assertThat(result.getOutput()
             .getText()).isEqualTo("has [redacted] here");
     }
 
@@ -248,15 +257,21 @@ class SanitizeTextAdvisorTest {
         when(streamChain.nextStream(request))
             .thenReturn(Flux.error(new RuntimeException("upstream exploded")));
 
-        List<ChatClientResponse> responses = advisor.adviseStream(request, streamChain)
-            .collectList()
-            .block();
+        List<ChatClientResponse> responses = Objects.requireNonNull(
+            advisor.adviseStream(request, streamChain)
+                .collectList()
+                .block(),
+            "responses");
 
         assertThat(responses).hasSize(1);
-        assertThat(responses.get(0)
-            .chatResponse()
-            .getResult()
-            .getOutput()
+
+        ChatResponse withheldChatResponse = Objects.requireNonNull(
+            responses.get(0)
+                .chatResponse(),
+            "chatResponse");
+        Generation result = Objects.requireNonNull(withheldChatResponse.getResult(), "result");
+
+        assertThat(result.getOutput()
             .getText()).contains("sanitizer failed");
     }
 
@@ -289,9 +304,10 @@ class SanitizeTextAdvisorTest {
 
         ChatClientResponse response = advisor.adviseCall(request, chain);
 
-        AssistantMessage result = response.chatResponse()
-            .getResult()
-            .getOutput();
+        ChatResponse sanitizedChatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+        Generation sanitizedGeneration = Objects.requireNonNull(sanitizedChatResponse.getResult(), "result");
+
+        AssistantMessage result = sanitizedGeneration.getOutput();
 
         assertThat(result.getText()).isEqualTo("contains <X>");
         assertThat(result.getToolCalls()).containsExactly(toolCall);
@@ -325,9 +341,10 @@ class SanitizeTextAdvisorTest {
 
         ChatClientResponse response = advisor.adviseCall(request, chain);
 
-        AssistantMessage result = response.chatResponse()
-            .getResult()
-            .getOutput();
+        ChatResponse sanitizedChatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+        Generation sanitizedGeneration = Objects.requireNonNull(sanitizedChatResponse.getResult(), "result");
+
+        AssistantMessage result = sanitizedGeneration.getOutput();
 
         assertThat(result.getText()).isEqualTo("contains <X>");
         assertThat(result.getMetadata()).containsEntry("custom-key", "custom-value");

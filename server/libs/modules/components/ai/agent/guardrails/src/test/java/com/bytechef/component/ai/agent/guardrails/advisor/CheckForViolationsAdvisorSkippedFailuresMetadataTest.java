@@ -33,6 +33,7 @@ import com.bytechef.platform.component.definition.ai.agent.guardrails.Violation;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -86,16 +87,16 @@ class CheckForViolationsAdvisorSkippedFailuresMetadataTest {
 
         ChatClientResponse response = advisor.adviseCall(request, chain);
 
-        assertThat(response.chatResponse()
-            .getResult()
-            .getOutput()
+        ChatResponse blockedChatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+        Generation result = Objects.requireNonNull(blockedChatResponse.getResult(), "result");
+
+        assertThat(result.getOutput()
             .getText())
                 .as("GuardrailUnavailableException must block the request (fail-closed)")
                 .isEqualTo("blocked");
 
         @SuppressWarnings("unchecked")
-        List<Map<String, Object>> violations = (List<Map<String, Object>>) response.chatResponse()
-            .getMetadata()
+        List<Map<String, Object>> violations = (List<Map<String, Object>>) blockedChatResponse.getMetadata()
             .get(VIOLATIONS_METADATA_KEY);
 
         assertThat(violations)
@@ -111,8 +112,7 @@ class CheckForViolationsAdvisorSkippedFailuresMetadataTest {
                     .doesNotContainKey("exception");
             });
 
-        Object skipped = response.chatResponse()
-            .getMetadata()
+        Object skipped = blockedChatResponse.getMetadata()
             .get("guardrail.skippedFailures");
 
         assertThat(skipped)
@@ -144,10 +144,13 @@ class CheckForViolationsAdvisorSkippedFailuresMetadataTest {
 
         ChatClientResponse response = advisor.adviseCall(request, chain);
 
+        ChatResponse blockedChatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+
         @SuppressWarnings("unchecked")
-        List<Map<String, Object>> violations = (List<Map<String, Object>>) response.chatResponse()
-            .getMetadata()
-            .get(VIOLATIONS_METADATA_KEY);
+        List<Map<String, Object>> violations = Objects.requireNonNull(
+            (List<Map<String, Object>>) blockedChatResponse.getMetadata()
+                .get(VIOLATIONS_METADATA_KEY),
+            "violations");
 
         assertThat(violations)
             .as("both the execution failure and the real violation must appear in violations (all fail-closed)")
@@ -166,8 +169,7 @@ class CheckForViolationsAdvisorSkippedFailuresMetadataTest {
         assertThat(violations.get(1)
             .get("failureKind")).isEqualTo("UPSTREAM_UNAVAILABLE");
 
-        Object skipped = response.chatResponse()
-            .getMetadata()
+        Object skipped = blockedChatResponse.getMetadata()
             .get("guardrail.skippedFailures");
 
         assertThat(skipped)
@@ -195,8 +197,9 @@ class CheckForViolationsAdvisorSkippedFailuresMetadataTest {
 
         ChatClientResponse response = advisor.adviseCall(request, chain);
 
-        Object skipped = response.chatResponse()
-            .getMetadata()
+        ChatResponse cleanChatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+
+        Object skipped = cleanChatResponse.getMetadata()
             .get("guardrail.skippedFailures");
 
         assertThat(skipped)

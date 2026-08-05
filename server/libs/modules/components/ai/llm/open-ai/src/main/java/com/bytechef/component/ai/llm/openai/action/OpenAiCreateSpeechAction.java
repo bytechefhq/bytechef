@@ -125,6 +125,10 @@ public class OpenAiCreateSpeechAction {
 
         Speech result = response.getResult();
 
+        if (result == null) {
+            throw new IllegalStateException("Text-to-speech call returned no result");
+        }
+
         byte[] output = result.getOutput();
 
         return context.file(

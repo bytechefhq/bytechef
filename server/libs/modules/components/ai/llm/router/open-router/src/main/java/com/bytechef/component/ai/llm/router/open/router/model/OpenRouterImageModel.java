@@ -70,6 +70,10 @@ public class OpenRouterImageModel implements ImageModel {
             .retrieve()
             .body(new ParameterizedTypeReference<>() {});
 
+        if (response == null) {
+            throw new IllegalStateException("Image generation response body is missing");
+        }
+
         return buildResponse(response);
     }
 

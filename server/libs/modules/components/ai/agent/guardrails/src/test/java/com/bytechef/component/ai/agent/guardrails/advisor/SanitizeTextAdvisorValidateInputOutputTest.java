@@ -32,6 +32,7 @@ import com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailS
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -158,9 +159,10 @@ class SanitizeTextAdvisorValidateInputOutputTest {
 
         ChatClientResponse response = advisor.adviseCall(request, chain);
 
-        assertThat(response.chatResponse()
-            .getResult()
-            .getOutput()
+        ChatResponse chatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+        Generation result = Objects.requireNonNull(chatResponse.getResult(), "result");
+
+        assertThat(result.getOutput()
             .getText()).isEqualTo("[sanitizer failed — response withheld]");
         verify(chain, never()).nextCall(any());
     }
@@ -228,9 +230,10 @@ class SanitizeTextAdvisorValidateInputOutputTest {
 
         ChatClientResponse response = advisor.adviseCall(request, chain);
 
-        assertThat(response.chatResponse()
-            .getResult()
-            .getOutput()
+        ChatResponse chatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+        Generation result = Objects.requireNonNull(chatResponse.getResult(), "result");
+
+        assertThat(result.getOutput()
             .getText()).isEqualTo("here is your sensitive data");
     }
 
@@ -259,9 +262,10 @@ class SanitizeTextAdvisorValidateInputOutputTest {
 
         ChatClientResponse response = advisor.adviseCall(request, chain);
 
-        assertThat(response.chatResponse()
-            .getResult()
-            .getOutput()
+        ChatResponse chatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+        Generation result = Objects.requireNonNull(chatResponse.getResult(), "result");
+
+        assertThat(result.getOutput()
             .getText()).isEqualTo("x and y data");
     }
 
@@ -284,9 +288,10 @@ class SanitizeTextAdvisorValidateInputOutputTest {
 
         ChatClientResponse response = advisor.adviseCall(request, chain);
 
-        assertThat(response.chatResponse()
-            .getResult()
-            .getOutput()
+        ChatResponse chatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+        Generation result = Objects.requireNonNull(chatResponse.getResult(), "result");
+
+        assertThat(result.getOutput()
             .getText()).isEqualTo("here is your <REDACTED> data");
     }
 
@@ -314,9 +319,10 @@ class SanitizeTextAdvisorValidateInputOutputTest {
         ChatClientResponse response = advisor.adviseCall(request, chain);
 
         // maskA skipped (VALIDATE_OUTPUT=false) → "alpha" unchanged; maskB runs → "beta" masked.
-        assertThat(response.chatResponse()
-            .getResult()
-            .getOutput()
+        ChatResponse chatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+        Generation result = Objects.requireNonNull(chatResponse.getResult(), "result");
+
+        assertThat(result.getOutput()
             .getText()).isEqualTo("alpha and <B> secrets");
     }
 
@@ -353,9 +359,10 @@ class SanitizeTextAdvisorValidateInputOutputTest {
 
         // Input was sanitized before chain: model received "my <REDACTED> password"
         // Response was sanitized after chain: "secret" in model response also masked
-        assertThat(response.chatResponse()
-            .getResult()
-            .getOutput()
+        ChatResponse chatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+        Generation result = Objects.requireNonNull(chatResponse.getResult(), "result");
+
+        assertThat(result.getOutput()
             .getText()).isEqualTo("you said: my <REDACTED> password and another <REDACTED>");
     }
 
@@ -412,16 +419,22 @@ class SanitizeTextAdvisorValidateInputOutputTest {
 
         StreamAdvisorChain streamChain = mock(StreamAdvisorChain.class);
 
-        List<ChatClientResponse> responses = advisor
-            .adviseStream(requestWithUser("my secret"), streamChain)
-            .collectList()
-            .block();
+        List<ChatClientResponse> responses = Objects.requireNonNull(
+            advisor
+                .adviseStream(requestWithUser("my secret"), streamChain)
+                .collectList()
+                .block(),
+            "responses");
 
         assertThat(responses).hasSize(1);
-        assertThat(responses.get(0)
-            .chatResponse()
-            .getResult()
-            .getOutput()
+
+        ChatResponse chatResponse = Objects.requireNonNull(
+            responses.get(0)
+                .chatResponse(),
+            "chatResponse");
+        Generation result = Objects.requireNonNull(chatResponse.getResult(), "result");
+
+        assertThat(result.getOutput()
             .getText()).isEqualTo("[sanitizer failed — response withheld]");
         verify(streamChain, never()).nextStream(any());
     }

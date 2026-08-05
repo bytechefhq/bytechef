@@ -66,9 +66,10 @@ class BuiltInSessionRepositoryFactoryTest {
             assertInstanceOf(RedisSessionRepository.class, builtInSessionRepository.sessionRepository());
             assertInstanceOf(JedisPooled.class, builtInSessionRepository.closeable());
         } finally {
-            if (builtInSessionRepository.closeable() != null) {
-                builtInSessionRepository.closeable()
-                    .close();
+            AutoCloseable closeable = builtInSessionRepository.closeable();
+
+            if (closeable != null) {
+                closeable.close();
             }
         }
     }
@@ -97,9 +98,10 @@ class BuiltInSessionRepositoryFactoryTest {
             assertInstanceOf(TenantRoutingS3SessionRepository.class, builtInSessionRepository.sessionRepository());
             assertInstanceOf(S3Client.class, builtInSessionRepository.closeable());
         } finally {
-            if (builtInSessionRepository.closeable() != null) {
-                builtInSessionRepository.closeable()
-                    .close();
+            AutoCloseable closeable = builtInSessionRepository.closeable();
+
+            if (closeable != null) {
+                closeable.close();
             }
         }
     }

@@ -83,12 +83,13 @@ public class DataTableClearTableAction {
 
         String baseName = inputParameters.getRequiredString(TABLE);
 
-        List<DataTableRow> dataTableRows = dataTableRowService.listRows(
-            baseName, Integer.MAX_VALUE, 0, Objects.requireNonNull(actionContextAware.getEnvironmentId()));
+        Long environmentId = Objects.requireNonNull(actionContextAware.getEnvironmentId(), "environmentId is required");
+
+        List<DataTableRow> dataTableRows = dataTableRowService.listRows(baseName, Integer.MAX_VALUE, 0, environmentId);
         int count = 0;
 
         for (DataTableRow dataTableRow : dataTableRows) {
-            if (dataTableRowService.deleteRow(baseName, dataTableRow.id(), actionContextAware.getEnvironmentId())) {
+            if (dataTableRowService.deleteRow(baseName, dataTableRow.id(), environmentId)) {
                 count++;
             }
         }

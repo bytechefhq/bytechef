@@ -98,6 +98,10 @@ public class NanoGptCreateTranscriptionAction {
             .retrieve()
             .body(new ParameterizedTypeReference<>() {});
 
+        if (response == null) {
+            throw new IllegalStateException("Transcription request returned an empty response");
+        }
+
         return (String) response.get("transcription");
     }
 }
