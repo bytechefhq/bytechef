@@ -130,6 +130,12 @@ public class CopilotApiController {
             } else {
                 agentId = "code_workflow_embedded_ask";
             }
+        } else if (agentId.equals("custom_component")) {
+            if (Mode.valueOf((String) mode) == Mode.BUILD) {
+                agentId = "custom_component_build";
+            } else {
+                agentId = "custom_component_ask";
+            }
         } else if (agentId.equals("cluster_element")) {
             if (Mode.valueOf((String) mode) == Mode.BUILD) {
                 agentId = "cluster_element_build";

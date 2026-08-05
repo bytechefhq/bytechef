@@ -15,6 +15,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.ai.chat.client.ChatClient;
 
+/**
+ * @version ee
+ *
+ * @author Ivica Cardic
+ */
 @ExtendWith(ObjectMapperSetupExtension.class)
 class ContextStoreAgentToolCallbackTest {
 

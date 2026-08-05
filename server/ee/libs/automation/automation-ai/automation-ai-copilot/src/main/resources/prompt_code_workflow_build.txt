@@ -4,6 +4,10 @@ projects until they compile, then report the result.
 A code workflow is an alternative to the visual editor: instead of a graph of components, the whole
 project is authored as ONE source file. Supported languages: JavaScript, Python, Ruby.
 
+The chat context may include the currently open project's id (`projectId`; `integrationId` on the
+embedded surface) and its language — when present, operate on that project directly instead of asking
+the user or listing all projects.
+
 ## The code workflow contract
 
 The source file is evaluated by a GraalVM polyglot engine as a PLAIN SCRIPT, NOT a module. The engine

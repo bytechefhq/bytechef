@@ -12,6 +12,7 @@ import com.agui.core.state.State;
 import com.bytechef.ai.copilot.tool.RehydrateContextToolCallback;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
 import com.bytechef.ee.automation.ai.copilot.agent.CodeWorkflowSpringAIAgent;
+import com.bytechef.ee.automation.ai.copilot.agent.CustomComponentSpringAIAgent;
 import com.bytechef.ee.automation.ai.tool.CodeWorkflowTools;
 import com.bytechef.ee.automation.ai.tool.CustomComponentTools;
 import com.bytechef.ee.automation.ai.tool.ReadCodeWorkflowTools;
@@ -127,6 +128,38 @@ public class AutomationCopilotConfiguration {
         return ChatClient.builder(chatModel)
             .defaultSystem(readPrompt(promptCodeWorkflowBuildResource))
             .defaultTools(codeWorkflowTools, readCodeWorkflowTools)
+            .build();
+    }
+
+    @Bean
+    CustomComponentSpringAIAgent customComponentAskSpringAIAgent(
+        ChatMemory chatMemory, ChatModel chatModel, ReadCustomComponentTools readCustomComponentTools,
+        SecurityContextRehydrator securityContextRehydrator) throws AGUIException {
+
+        return CustomComponentSpringAIAgent.builder()
+            .agentId("custom_component_ask")
+            .chatMemory(chatMemory)
+            .chatModel(chatModel)
+            .systemMessage(readPrompt(promptCustomComponentAskResource))
+            .state(state)
+            .toolCallbacks(wrapTools(securityContextRehydrator, List.of(readCustomComponentTools)))
+            .build();
+    }
+
+    @Bean
+    CustomComponentSpringAIAgent customComponentBuildSpringAIAgent(
+        ChatMemory chatMemory, ChatModel chatModel, CustomComponentTools customComponentTools,
+        ReadCustomComponentTools readCustomComponentTools, SecurityContextRehydrator securityContextRehydrator)
+        throws AGUIException {
+
+        return CustomComponentSpringAIAgent.builder()
+            .agentId("custom_component_build")
+            .chatMemory(chatMemory)
+            .chatModel(chatModel)
+            .systemMessage(readPrompt(promptCustomComponentBuildResource))
+            .state(state)
+            .toolCallbacks(
+                wrapTools(securityContextRehydrator, List.of(customComponentTools, readCustomComponentTools)))
             .build();
     }
 

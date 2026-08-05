@@ -7,10 +7,10 @@
 
 package com.bytechef.ee.automation.ai.copilot.config;
 
+import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
 import com.bytechef.ee.automation.ai.copilot.tool.CodeWorkflowAgentToolCallback;
 import com.bytechef.ee.automation.ai.copilot.tool.ContextStoreAgentToolCallback;
 import com.bytechef.ee.automation.ai.copilot.tool.CustomComponentAgentToolCallback;
-import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.ai.chat.client.ChatClient;

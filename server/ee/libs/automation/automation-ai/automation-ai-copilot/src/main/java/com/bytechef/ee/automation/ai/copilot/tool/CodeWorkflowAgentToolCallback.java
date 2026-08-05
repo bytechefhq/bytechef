@@ -8,10 +8,10 @@
 package com.bytechef.ee.automation.ai.copilot.tool;
 
 import com.bytechef.ai.agent.tool.AgentType;
-import com.bytechef.ai.copilot.tool.CopilotAgentType;
 import com.bytechef.ai.agent.tool.CurrentAgentContext;
 import com.bytechef.ai.agent.tool.CurrentAgentContext.AgentBinding;
 import com.bytechef.ai.agent.tool.ToolErrors;
+import com.bytechef.ai.copilot.tool.CopilotAgentType;
 import com.bytechef.commons.util.JsonUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
