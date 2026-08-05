@@ -292,18 +292,6 @@ public class GoogleSheetsUtils {
         return valuesMap;
     }
 
-    public static List<Map<String, Object>> getMapOfValuesForRowAndColumn(
-        Parameters inputParameters, Sheets sheets, List<List<Object>> values, int currentRowNum, int newRowNum) {
-
-        List<Map<String, Object>> list = new ArrayList<>();
-
-        for (int i = currentRowNum; i < newRowNum; i++) {
-            list.add(getMapOfValuesForRow(inputParameters, sheets, values.get(i)));
-        }
-
-        return list;
-    }
-
     public static List<Object> getRowValues(Parameters inputParameters) {
         List<Object> row = new ArrayList<>();
 
