@@ -5,6 +5,7 @@ import {afterEach, describe, expect, it, vi} from 'vitest';
 
 import {useWorkflowTestStream} from '../useWorkflowTestStream';
 
+const mockRemoveWorkflowTestNodeState = vi.fn();
 const mockResetWorkflowTestNodeStates = vi.fn();
 const mockSetWorkflowIsRunning = vi.fn();
 const mockSetWorkflowTestExecution = vi.fn();
@@ -12,16 +13,19 @@ const mockSetWorkflowTestNodeState = vi.fn();
 
 let mockWorkflowIsRunning = false;
 let mockWorkflowTestExecution: {job?: {status?: string}} | undefined;
+let mockWorkflowTestNodeStates: Record<string, {status: 'RUNNING' | 'COMPLETED' | 'FAILED'}> = {};
 
 vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowEditorStore', () => {
     // Lazy: the mock* consts are hoisted below this factory, so they must only be dereferenced at call time.
     const getStoreState = () => ({
+        removeWorkflowTestNodeState: mockRemoveWorkflowTestNodeState,
         resetWorkflowTestNodeStates: mockResetWorkflowTestNodeStates,
         setWorkflowIsRunning: mockSetWorkflowIsRunning,
         setWorkflowTestExecution: mockSetWorkflowTestExecution,
         setWorkflowTestNodeState: mockSetWorkflowTestNodeState,
         workflowIsRunning: mockWorkflowIsRunning,
         workflowTestExecution: mockWorkflowTestExecution,
+        workflowTestNodeStates: mockWorkflowTestNodeStates,
     });
 
     const useStoreMock = Object.assign(
@@ -65,6 +69,7 @@ describe('useWorkflowTestStream', () => {
     afterEach(() => {
         mockWorkflowIsRunning = false;
         mockWorkflowTestExecution = undefined;
+        mockWorkflowTestNodeStates = {};
 
         vi.clearAllMocks();
     });
@@ -458,6 +463,29 @@ describe('useWorkflowTestStream', () => {
         expect(mockSetWorkflowTestNodeState).toHaveBeenCalledWith('task_1', {error: 'Boom', status: 'FAILED'});
     });
 
+    it('should compute duration for task_failed event with dates', () => {
+        renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
+
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        const eventHandlers = (useSSE as any).mock.calls[0][1].eventHandlers;
+
+        act(() => {
+            eventHandlers.task_failed({
+                endDate: '2026-07-20T10:00:02.500Z',
+                error: 'Boom',
+                name: 'task_1',
+                startDate: '2026-07-20T10:00:00.000Z',
+                taskExecutionId: '10',
+            });
+        });
+
+        expect(mockSetWorkflowTestNodeState).toHaveBeenCalledWith('task_1', {
+            durationMillis: 2500,
+            error: 'Boom',
+            status: 'FAILED',
+        });
+    });
+
     it('should handle task_started event with string data', () => {
         renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
 
@@ -482,6 +510,39 @@ describe('useWorkflowTestStream', () => {
         });
 
         expect(mockSetWorkflowTestNodeState).not.toHaveBeenCalled();
+    });
+
+    it('should clear nodes left running when the job failed', () => {
+        mockWorkflowTestNodeStates = {firecrawl_6: {status: 'RUNNING'}, firecrawl_7: {status: 'FAILED'}};
+
+        renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
+
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        const eventHandlers = (useSSE as any).mock.calls[0][1].eventHandlers;
+
+        act(() => {
+            eventHandlers.result({job: {status: 'FAILED'}});
+        });
+
+        expect(mockRemoveWorkflowTestNodeState).toHaveBeenCalledWith('firecrawl_6');
+        expect(mockRemoveWorkflowTestNodeState).not.toHaveBeenCalledWith('firecrawl_7');
+        expect(mockSetWorkflowTestNodeState).not.toHaveBeenCalledWith('firecrawl_6', expect.anything());
+    });
+
+    it('should mark nodes left running as completed when the job completed', () => {
+        mockWorkflowTestNodeStates = {task_1: {status: 'RUNNING'}};
+
+        renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
+
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        const eventHandlers = (useSSE as any).mock.calls[0][1].eventHandlers;
+
+        act(() => {
+            eventHandlers.result({job: {status: 'COMPLETED'}});
+        });
+
+        expect(mockSetWorkflowTestNodeState).toHaveBeenCalledWith('task_1', {status: 'COMPLETED'});
+        expect(mockRemoveWorkflowTestNodeState).not.toHaveBeenCalled();
     });
 
     it('should show a progress snapshot while the workflow is running', () => {

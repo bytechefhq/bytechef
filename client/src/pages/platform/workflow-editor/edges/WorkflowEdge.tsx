@@ -18,12 +18,14 @@ import pasteNode from '../utils/pasteNode';
 import AddBranchChip from './AddBranchChip';
 import BinaryCaseLabel from './BinaryCaseLabel';
 import BranchCaseLabel from './BranchCaseLabel';
+import GraphNodeLabel from './GraphNodeLabel';
 import styles from './WorkflowEdge.module.css';
 import computeBinaryCaseLabel from './computeBinaryCaseLabel';
 import computeEdgeButtonPosition from './computeEdgeButtonPosition';
 import computeEdgeCorrectedCoordinates from './computeEdgeCorrectedCoordinates';
 import computeExitEdgeJogCenter from './computeExitEdgeJogCenter';
 import {getTriggerFanInBusCenter, getTriggerFanInButtonPosition} from './computeTriggerFanIn';
+import getExecutedEdgeStatus from './getExecutedEdgeStatus';
 
 export default function WorkflowEdge({
     data,
@@ -120,6 +122,7 @@ export default function WorkflowEdge({
     });
 
     const caseKey = (targetNode?.data as NodeDataType)?.branchData?.caseKey;
+    const graphNodeIndex = (targetNode?.data as NodeDataType)?.graphData?.nodeIndex;
 
     const binaryCaseLabel = computeBinaryCaseLabel({
         layoutDirection,
@@ -174,6 +177,9 @@ export default function WorkflowEdge({
 
     const clusterElementsCanvasOpen = useWorkflowEditorStore((state) => state.clusterElementsCanvasOpen);
     const workflowIsRunning = useWorkflowEditorStore((state) => state.workflowIsRunning);
+    const workflowTestNodeStates = useWorkflowEditorStore((state) => state.workflowTestNodeStates);
+
+    const executedEdgeStatus = getExecutedEdgeStatus(sourceNode, targetNode, workflowTestNodeStates);
 
     const canPaste = useMemo(
         () => !clusterElementsCanvasOpen && !!copiedNode && copiedWorkflowId === workflow.id,
@@ -226,7 +232,9 @@ export default function WorkflowEdge({
             <BaseEdge
                 className={twMerge(
                     'fill-none stroke-stroke-neutral-tertiary stroke-2',
-                    workflowIsRunning && styles.runningPath
+                    workflowIsRunning && styles.runningPath,
+                    executedEdgeStatus === 'COMPLETED' && 'stroke-green-500',
+                    executedEdgeStatus === 'FAILED' && 'stroke-red-500'
                 )}
                 id={id}
                 markerEnd={markerEnd}
@@ -247,6 +255,18 @@ export default function WorkflowEdge({
             )}
 
             {binaryCaseLabel && <BinaryCaseLabel edgeId={id} label={binaryCaseLabel} />}
+
+            {typeof graphNodeIndex === 'number' && isSourceTaskDispatcherTopGhostNode && (
+                <GraphNodeLabel
+                    edgeId={id}
+                    layoutDirection={layoutDirection}
+                    nodeIndex={graphNodeIndex}
+                    sourceX={sourceX}
+                    sourceY={sourceY}
+                    targetX={targetX}
+                    targetY={targetY}
+                />
+            )}
 
             {addBranchPlaceholderId && (
                 <AddBranchChip

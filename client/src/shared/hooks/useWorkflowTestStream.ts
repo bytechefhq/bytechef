@@ -56,6 +56,70 @@ function clearProgressSnapshot() {
     }
 }
 
+/**
+ * Backfills node states from the final execution result. Task dispatcher executions (condition, loop, ...)
+ * complete coordinator-side and never emit worker task lifecycle SSE events, so without this pass their nodes
+ * would stay uncolored after a run even though they executed. Streamed states win — only missing (or
+ * still-RUNNING) entries are filled in.
+ */
+function backfillNodeStatesFromResult(workflowTestExecution: WorkflowTestExecution) {
+    const {setWorkflowTestNodeState, workflowTestNodeStates} = useWorkflowEditorStore.getState();
+
+    for (const taskExecution of workflowTestExecution.job?.taskExecutions ?? []) {
+        const name = taskExecution.workflowTask?.name;
+
+        if (!name) {
+            continue;
+        }
+
+        const existingStatus = workflowTestNodeStates[name]?.status;
+
+        if (existingStatus === 'COMPLETED' || existingStatus === 'FAILED') {
+            continue;
+        }
+
+        const status =
+            taskExecution.status === 'COMPLETED' ? 'COMPLETED' : taskExecution.status === 'FAILED' ? 'FAILED' : null;
+
+        if (status == null) {
+            continue;
+        }
+
+        setWorkflowTestNodeState(name, {
+            durationMillis: computeDurationMillis(
+                taskExecution.startDate?.toISOString(),
+                taskExecution.endDate?.toISOString()
+            ),
+            status,
+        });
+    }
+
+    // The result payload only carries top-level task executions, so a nested child (condition case, loop
+    // iteratee) whose task_completed SSE event was missed has no backfill source. A COMPLETED job proves
+    // every started task finished — sweep any node still marked RUNNING to COMPLETED so no spinner outlives
+    // the run.
+    const jobStatus = workflowTestExecution.job?.status;
+
+    if (jobStatus === 'COMPLETED') {
+        const currentNodeStates = useWorkflowEditorStore.getState().workflowTestNodeStates;
+
+        for (const [name, nodeState] of Object.entries(currentNodeStates)) {
+            if (nodeState.status === 'RUNNING') {
+                setWorkflowTestNodeState(name, {...nodeState, status: 'COMPLETED'});
+            }
+        }
+    } else if (jobStatus === 'FAILED' || jobStatus === 'STOPPED' || jobStatus === 'CANCELLED') {
+        const {removeWorkflowTestNodeState, workflowTestNodeStates: currentNodeStates} =
+            useWorkflowEditorStore.getState();
+
+        for (const [name, nodeState] of Object.entries(currentNodeStates)) {
+            if (nodeState.status === 'RUNNING') {
+                removeWorkflowTestNodeState(name);
+            }
+        }
+    }
+}
+
 function parseTaskLifecyclePayload(data: unknown): TaskLifecyclePayloadI | undefined {
     try {
         const payload = typeof data === 'string' ? JSON.parse(data) : data;
@@ -181,6 +245,7 @@ export function useWorkflowTestStream({
                     }
 
                     setWorkflowTestExecution(workflowTestExecution);
+                    backfillNodeStatesFromResult(workflowTestExecution);
 
                     if (onResult) {
                         onResult(workflowTestExecution);
@@ -244,7 +309,13 @@ export function useWorkflowTestStream({
                 const payload = parseTaskLifecyclePayload(data);
 
                 if (payload?.name) {
-                    setWorkflowTestNodeState(payload.name, {error: payload.error, status: 'FAILED'});
+                    const durationMillis = computeDurationMillis(payload.startDate, payload.endDate);
+
+                    setWorkflowTestNodeState(payload.name, {
+                        ...(durationMillis != null && {durationMillis}),
+                        error: payload.error,
+                        status: 'FAILED',
+                    });
                 }
             },
             task_started: (data) => {
