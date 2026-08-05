@@ -5,14 +5,23 @@ import {twMerge} from 'tailwind-merge';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import {mapHandlePosition} from '../utils/directionUtils';
 import styles from './NodeTypes.module.css';
+import useTaskDispatcherGhostStatus from './useTaskDispatcherGhostStatus';
 
-const TaskDispatcherLeftGhostNode = ({id}: {id: string}) => {
+const TaskDispatcherLeftGhostNode = ({data, id}: {data?: unknown; id: string}) => {
     const layoutDirection = useLayoutDirectionStore((state) => state.layoutDirection);
     const isHorizontal = layoutDirection === 'LR';
 
+    const dispatcherStatus = useTaskDispatcherGhostStatus(data);
+
     return (
         <div
-            className={twMerge('nodrag', isHorizontal ? 'h-0.5 w-4' : 'h-4 w-0.5', 'bg-stroke-neutral-tertiary')}
+            className={twMerge(
+                'nodrag',
+                isHorizontal ? 'h-0.5 w-4' : 'h-4 w-0.5',
+                'bg-stroke-neutral-tertiary',
+                dispatcherStatus === 'COMPLETED' && 'bg-green-500',
+                dispatcherStatus === 'FAILED' && 'bg-red-500'
+            )}
             data-nodetype="taskDispatcherLeftGhostNode"
             key={id}
         >
