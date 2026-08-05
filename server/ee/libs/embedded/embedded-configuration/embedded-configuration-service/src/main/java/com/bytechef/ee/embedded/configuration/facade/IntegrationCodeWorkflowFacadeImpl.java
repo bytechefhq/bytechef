@@ -27,8 +27,11 @@ import com.bytechef.embedded.integration.IntegrationHandler;
 import com.bytechef.embedded.integration.definition.IntegrationDefinition;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.tag.domain.Tag;
+import com.bytechef.platform.tag.service.TagService;
 import com.bytechef.workflow.definition.WorkflowDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
@@ -44,6 +47,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.Nullable;
 import org.springframework.cache.CacheManager;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -70,6 +74,7 @@ public class IntegrationCodeWorkflowFacadeImpl implements IntegrationCodeWorkflo
     private final IntegrationWorkflowService integrationWorkflowService;
     private final CodeWorkflowContainerService codeWorkflowContainerService;
     private final CodeWorkflowFileStorage codeWorkflowFileStorage;
+    private final TagService tagService;
     private final WorkflowService workflowService;
     private final boolean javaEnabled;
     private final IntegrationHandlerLoader.JavaLoader javaLoader;
@@ -81,7 +86,7 @@ public class IntegrationCodeWorkflowFacadeImpl implements IntegrationCodeWorkflo
         IntegrationCodeWorkflowService integrationCodeWorkflowService, IntegrationService integrationService,
         IntegrationWorkflowService integrationWorkflowService,
         CodeWorkflowContainerService codeWorkflowContainerService,
-        CodeWorkflowFileStorage codeWorkflowFileStorage, WorkflowService workflowService) {
+        CodeWorkflowFileStorage codeWorkflowFileStorage, TagService tagService, WorkflowService workflowService) {
 
         this.cacheManager = cacheManager;
         this.codeWorkflowContainerFacade = codeWorkflowContainerFacade;
@@ -90,6 +95,7 @@ public class IntegrationCodeWorkflowFacadeImpl implements IntegrationCodeWorkflo
         this.integrationWorkflowService = integrationWorkflowService;
         this.codeWorkflowContainerService = codeWorkflowContainerService;
         this.codeWorkflowFileStorage = codeWorkflowFileStorage;
+        this.tagService = tagService;
         this.workflowService = workflowService;
         this.javaEnabled = applicationProperties.getWorkflow()
             .getCodeWorkflow()
@@ -114,13 +120,20 @@ public class IntegrationCodeWorkflowFacadeImpl implements IntegrationCodeWorkflo
      * server.
      *
      * <p>
-     * This method is create-only: an integration for the requested component name is rejected up front via a global
-     * {@link IntegrationService#fetchIntegration(String)} lookup, so an existing integration is never reused or
-     * overwritten.
+     * A component may back several integrations, told apart by name, so a second one on the same component is allowed —
+     * this method always creates, never reuses or overwrites an existing integration.
      */
     @Override
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public Integration createEmptyCodeWorkflow(String componentName, Language language) {
+        return createEmptyCodeWorkflow(componentName, language, null, null, null, null, null);
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public Integration createEmptyCodeWorkflow(
+        String componentName, Language language, @Nullable String name, @Nullable String description,
+        @Nullable Long categoryId, @Nullable List<String> tags, @Nullable String permissionExpression) {
         if (componentName == null || componentName.isBlank() || componentName.indexOf('"') >= 0
             || componentName.indexOf('\\') >= 0 || componentName.indexOf('\n') >= 0
             || componentName.indexOf('\r') >= 0) {
@@ -136,14 +149,6 @@ public class IntegrationCodeWorkflowFacadeImpl implements IntegrationCodeWorkflo
                 CodeWorkflowErrorType.LANGUAGE_NOT_SUPPORTED);
         }
 
-        if (integrationService.fetchIntegration(componentName)
-            .isPresent()) {
-
-            throw new ConfigurationException(
-                "An integration for component '" + componentName + "' already exists",
-                CodeWorkflowErrorType.CODE_WORKFLOW_ALREADY_EXISTS);
-        }
-
         String template = readTemplate(language).replace("__NAME__", componentName);
 
         byte[] bytes = template.getBytes(StandardCharsets.UTF_8);
@@ -156,7 +161,8 @@ public class IntegrationCodeWorkflowFacadeImpl implements IntegrationCodeWorkflo
             throw new RuntimeException(e);
         }
 
-        Integration integration = createIntegration(integrationDefinition);
+        Integration integration = createIntegration(
+            integrationDefinition, name, description, categoryId, tags, permissionExpression);
 
         List<WorkflowDefinition> workflowDefinitions = integrationDefinition.getWorkflows()
             .orElseGet(List::of);
@@ -239,9 +245,7 @@ public class IntegrationCodeWorkflowFacadeImpl implements IntegrationCodeWorkflo
             throw new RuntimeException(e);
         }
 
-        Integration integration = integrationService.fetchIntegration(integrationDefinition.getComponentName())
-            .map(curIntegration -> updateIntegration(curIntegration, integrationDefinition))
-            .orElseGet(() -> createIntegration(integrationDefinition));
+        Integration integration = resolveUploadTarget(integrationDefinition);
 
         deployInto(integration, integrationDefinition, bytes, language);
     }
@@ -422,15 +426,68 @@ public class IntegrationCodeWorkflowFacadeImpl implements IntegrationCodeWorkflo
         integrationService.publishIntegration(integration.getId(), null);
     }
 
-    private Integration createIntegration(IntegrationDefinition integrationDefinition) {
+    /**
+     * Picks which integration an uploaded artifact redeploys into. The artifact carries only a component name, and a
+     * component can now back several integrations, so a second code-backed one on the same component makes the upload
+     * genuinely ambiguous — it fails rather than guessing. Visual integrations on the component are ignored: a code
+     * artifact is not a redeploy of one.
+     */
+    private Integration resolveUploadTarget(IntegrationDefinition integrationDefinition) {
+        String componentName = integrationDefinition.getComponentName();
+
+        List<Integration> integrations = integrationService.getIntegrations(componentName)
+            .stream()
+            .filter(integration -> integrationCodeWorkflowService.fetchIntegrationCodeWorkflow(integration.getId())
+                .isPresent())
+            .toList();
+
+        if (integrations.size() > 1) {
+            throw new ConfigurationException(
+                "Component '" + componentName + "' backs more than one code integration, so an upload cannot tell "
+                    + "which to redeploy; edit the one you mean in the source editor instead",
+                CodeWorkflowErrorType.CODE_WORKFLOW_ALREADY_EXISTS);
+        }
+
+        if (integrations.isEmpty()) {
+            return createIntegration(integrationDefinition, null, null, null, null, null);
+        }
+
+        return updateIntegration(integrations.getFirst(), integrationDefinition);
+    }
+
+    /**
+     * The caller's metadata wins over the starter template's: a description typed at creation is what the user meant,
+     * while the template's is boilerplate. A blank name falls back to the component name, which is what the integration
+     * was called before it could be named at all.
+     */
+    private Integration createIntegration(
+        IntegrationDefinition integrationDefinition, @Nullable String name, @Nullable String description,
+        @Nullable Long categoryId, @Nullable List<String> tags, @Nullable String permissionExpression) {
+
         Integration integration = new Integration();
 
         integration.setComponentName(integrationDefinition.getComponentName());
         integration.setComponentVersion(integrationDefinition.getComponentVersion());
         integration.setDescription(
-            integrationDefinition.getDescription()
-                .orElse(null));
-        integration.setName(integrationDefinition.getComponentName());
+            description == null || description.isBlank()
+                ? integrationDefinition.getDescription()
+                    .orElse(null)
+                : description);
+        integration.setName(
+            name == null || name.isBlank() ? integrationDefinition.getComponentName() : name);
+        integration.setPermissionExpression(permissionExpression);
+
+        if (categoryId != null) {
+            integration.setCategory(new Category(categoryId));
+        }
+
+        if (tags != null && !tags.isEmpty()) {
+            integration.setTags(
+                tagService.save(
+                    tags.stream()
+                        .map(Tag::new)
+                        .toList()));
+        }
 
         return integrationService.create(integration);
     }

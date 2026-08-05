@@ -32,6 +32,7 @@ import com.bytechef.automation.configuration.dto.SharedProjectDTO;
 import com.bytechef.automation.configuration.service.PreBuiltTemplateService;
 import com.bytechef.automation.configuration.service.ProjectCodeWorkflowInfoSupplier;
 import com.bytechef.automation.configuration.service.ProjectCodeWorkflowInfoSupplier.CodeWorkflowInfo;
+import com.bytechef.automation.configuration.service.ProjectCodeWorkflowInfoSupplier.CodeWorkflowSource;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
@@ -59,6 +60,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -82,6 +84,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProjectFacadeImpl implements ProjectFacade {
 
     private static final Logger log = LoggerFactory.getLogger(ProjectFacadeImpl.class);
+
+    /**
+     * Zip entry naming the exported code workflow source; the suffix is the language, so an import knows how to load it
+     * back without a separate descriptor.
+     */
+    private static final String CODE_WORKFLOW_ENTRY_PREFIX = "code-workflow.";
 
     private final CategoryService categoryService;
     private final ComponentDefinitionHelper componentDefinitionHelper;
@@ -216,6 +224,23 @@ public class ProjectFacadeImpl implements ProjectFacade {
         newProject.setName(generateName(project.getName()));
         newProject.setTagIds(project.getTagIds());
         newProject.setWorkspaceId(project.getWorkspaceId());
+
+        Optional<CodeWorkflowSource> codeWorkflowSource = fetchCodeWorkflowSource(id);
+
+        if (codeWorkflowSource.isPresent()) {
+            // A code project's workflows are generated from its source and carry the source container's uuid, so
+            // copying the workflow rows would leave the copy pointing at the original's code. Deploy the source into
+            // the new project instead and let it generate its own.
+            newProject = projectService.create(newProject);
+
+            CodeWorkflowSource source = codeWorkflowSource.get();
+
+            long newProjectId = Objects.requireNonNull(newProject.getId());
+
+            deployCodeWorkflowSource(newProjectId, source.language(), source.source());
+
+            return toProjectDTO(projectService.getProject(newProjectId));
+        }
 
         List<String> workflowIds = copyWorkflowIds(
             projectWorkflowService.getProjectWorkflowIds(project.getId(), project.getLastProjectVersion()));
@@ -541,6 +566,21 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
             zipOutputStream.closeEntry();
 
+            Optional<CodeWorkflowSource> codeWorkflowSource = fetchCodeWorkflowSource(id);
+
+            if (codeWorkflowSource.isPresent()) {
+                CodeWorkflowSource source = codeWorkflowSource.get();
+
+                ZipEntry codeWorkflowZipEntry = new ZipEntry(CODE_WORKFLOW_ENTRY_PREFIX + source.language());
+
+                zipOutputStream.putNextEntry(codeWorkflowZipEntry);
+
+                zipOutputStream.write(source.source()
+                    .getBytes(StandardCharsets.UTF_8));
+
+                zipOutputStream.closeEntry();
+            }
+
             for (ProjectWorkflow projectWorkflow : projectWorkflows) {
                 Workflow workflow = workflowService.getWorkflow(projectWorkflow.getWorkflowId());
 
@@ -615,6 +655,10 @@ public class ProjectFacadeImpl implements ProjectFacade {
                 ? Set.of()
                 : Set.copyOf(projectCodeWorkflowInfoSupplier.getCodeWorkflowProjectIds());
 
+            Map<Long, String> codeWorkflowLanguages = projectCodeWorkflowInfoSupplier == null
+                ? Map.of()
+                : projectCodeWorkflowInfoSupplier.getCodeWorkflowLanguages();
+
             return CollectionUtils.map(
                 projects,
                 project -> new ProjectDTO(
@@ -631,7 +675,8 @@ public class ProjectFacadeImpl implements ProjectFacade {
                     CollectionUtils.filter(
                         allTags,
                         tag -> CollectionUtils.contains(project.getTagIds(), tag.getId())),
-                    codeWorkflowProjectIds.contains(project.getId()), null));
+                    codeWorkflowProjectIds.contains(project.getId()),
+                    codeWorkflowLanguages.get(project.getId())));
         } else {
             return CollectionUtils.map(projects, ProjectDTO::new);
         }
@@ -678,6 +723,14 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
         long projectId = createProject(projectDTO);
 
+        // A code-backed export carries its source rather than workflow definitions: deploying it regenerates the
+        // workflows against this project's own code workflow container.
+        if (templateFiles.codeWorkflowLanguage != null) {
+            deployCodeWorkflowSource(projectId, templateFiles.codeWorkflowLanguage, templateFiles.codeWorkflowSource);
+
+            return projectId;
+        }
+
         for (String workflowJson : templateFiles.workflowJsons) {
             String definition = JsonUtils.read(workflowJson, String.class);
 
@@ -694,6 +747,12 @@ public class ProjectFacadeImpl implements ProjectFacade {
         String[] templateJson = {
             null
         };
+        String[] codeWorkflowLanguage = {
+            null
+        };
+        String[] codeWorkflowSource = {
+            null
+        };
         List<String> workflowJsons = new ArrayList<>();
 
         try {
@@ -702,6 +761,9 @@ public class ProjectFacadeImpl implements ProjectFacade {
                     projectJson[0] = new String(entryData, StandardCharsets.UTF_8);
                 } else if ("template.json".equals(name)) {
                     templateJson[0] = new String(entryData, StandardCharsets.UTF_8);
+                } else if (name.startsWith(CODE_WORKFLOW_ENTRY_PREFIX)) {
+                    codeWorkflowLanguage[0] = name.substring(CODE_WORKFLOW_ENTRY_PREFIX.length());
+                    codeWorkflowSource[0] = new String(entryData, StandardCharsets.UTF_8);
                 } else if (name.startsWith("workflow-") && name.endsWith(".json")) {
                     workflowJsons.add(new String(entryData, StandardCharsets.UTF_8));
                 }
@@ -710,11 +772,35 @@ public class ProjectFacadeImpl implements ProjectFacade {
             throw new RuntimeException("Failed to read shared project", e);
         }
 
-        if (projectJson[0] == null || sharedTemplate && (templateJson[0] == null) || workflowJsons.isEmpty()) {
+        // A code-backed export needs no workflow definitions — its source generates them on import.
+        if (projectJson[0] == null || sharedTemplate && (templateJson[0] == null)
+            || workflowJsons.isEmpty() && codeWorkflowSource[0] == null) {
+
             throw new RuntimeException("Missing files in a shared project file");
         }
 
-        return new TemplateFiles(templateJson[0], projectJson[0], workflowJsons);
+        return new TemplateFiles(
+            templateJson[0], projectJson[0], workflowJsons, codeWorkflowLanguage[0], codeWorkflowSource[0]);
+    }
+
+    private Optional<CodeWorkflowSource> fetchCodeWorkflowSource(long projectId) {
+        ProjectCodeWorkflowInfoSupplier projectCodeWorkflowInfoSupplier =
+            projectCodeWorkflowInfoSupplierProvider.getIfAvailable();
+
+        return projectCodeWorkflowInfoSupplier == null
+            ? Optional.empty()
+            : projectCodeWorkflowInfoSupplier.fetchCodeWorkflowSource(projectId);
+    }
+
+    private void deployCodeWorkflowSource(long projectId, String language, String source) {
+        ProjectCodeWorkflowInfoSupplier projectCodeWorkflowInfoSupplier =
+            projectCodeWorkflowInfoSupplierProvider.getIfAvailable();
+
+        if (projectCodeWorkflowInfoSupplier == null) {
+            throw new IllegalStateException("Code workflows are not available in this edition");
+        }
+
+        projectCodeWorkflowInfoSupplier.deployCodeWorkflowSource(projectId, language, source);
     }
 
     private ProjectDTO toProjectDTO(Project project) {
@@ -749,6 +835,8 @@ public class ProjectFacadeImpl implements ProjectFacade {
         }
     }
 
-    private record TemplateFiles(String templateJson, String projectJson, List<String> workflowJsons) {
+    private record TemplateFiles(
+        String templateJson, String projectJson, List<String> workflowJsons, String codeWorkflowLanguage,
+        String codeWorkflowSource) {
     }
 }

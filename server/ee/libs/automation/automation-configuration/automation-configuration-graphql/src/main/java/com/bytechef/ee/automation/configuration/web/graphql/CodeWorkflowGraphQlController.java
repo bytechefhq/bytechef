@@ -13,6 +13,7 @@ import com.bytechef.ee.automation.configuration.facade.ProjectCodeWorkflowFacade
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -49,9 +50,11 @@ public class CodeWorkflowGraphQlController {
 
     @MutationMapping
     public String createCodeWorkflow(
-        @Argument long workspaceId, @Argument String name, @Argument Language language) {
+        @Argument long workspaceId, @Argument String name, @Argument Language language,
+        @Argument String description, @Argument Long categoryId, @Argument List<String> tags) {
 
-        Project project = projectCodeWorkflowFacade.createEmptyCodeWorkflow(workspaceId, name, language);
+        Project project = projectCodeWorkflowFacade.createEmptyCodeWorkflow(
+            workspaceId, name, language, description, categoryId, tags);
 
         return String.valueOf(project.getId());
     }

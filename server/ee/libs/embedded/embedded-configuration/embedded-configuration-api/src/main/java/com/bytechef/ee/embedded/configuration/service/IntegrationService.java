@@ -27,6 +27,12 @@ public interface IntegrationService {
 
     Optional<Integration> fetchIntegration(String componentName);
 
+    /**
+     * Every integration built on {@code componentName}. A component can back more than one integration, so use this
+     * rather than {@link #fetchIntegration(String)} wherever a second one is not an error.
+     */
+    List<Integration> getIntegrations(String componentName);
+
     Integration getIntegration(long id);
 
     Integration getIntegrationInstanceIntegration(long integrationInstanceId);

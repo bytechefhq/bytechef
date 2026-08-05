@@ -34,12 +34,12 @@ import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.Set;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -198,13 +198,40 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
                     .filter(Objects::nonNull)
                     .toList());
 
-            Map<String, ComponentDefinition> componentDefinitionMap = integrations.stream()
+            // An integration whose component this instance does not have (uninstalled, or a name that never
+            // resolved) maps with a null definition rather than failing the whole list.
+            Map<String, ComponentDefinition> componentDefinitionMap = new HashMap<>();
+
+            for (String componentName : integrations.stream()
                 .map(Integration::getComponentName)
                 .distinct()
-                .collect(
-                    Collectors.toMap(
-                        Function.identity(),
-                        componentName -> componentDefinitionService.getComponentDefinition(componentName, null)));
+                .toList()) {
+
+                componentDefinitionService.fetchComponentDefinition(componentName, null)
+                    .ifPresent(componentDefinition -> componentDefinitionMap.put(componentName, componentDefinition));
+            }
+
+            Set<Long> codeWorkflowIntegrationIds =
+                Set.copyOf(integrationCodeWorkflowService.getCodeWorkflowIntegrationIds());
+
+            // Resolved for the listed code integrations only. Without it the list reports every
+            // code integration with a null language, and the client's badge falls back to a bare
+            // "Code" instead of naming the language.
+            Map<Long, String> codeWorkflowLanguages = new HashMap<>();
+
+            for (Integration integration : integrations) {
+                Long integrationId = integration.getId();
+
+                if (!codeWorkflowIntegrationIds.contains(integrationId)) {
+                    continue;
+                }
+
+                integrationCodeWorkflowService.fetchIntegrationCodeWorkflow(integrationId)
+                    .flatMap(this::fetchCodeWorkflowContainer)
+                    .ifPresent(codeWorkflowContainer -> codeWorkflowLanguages.put(
+                        integrationId, codeWorkflowContainer.getLanguage()
+                            .name()));
+            }
 
             return CollectionUtils.map(
                 integrations,
@@ -215,7 +242,9 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
                     integration,
                     getIntegrationWorkflowIds(integration),
                     CollectionUtils.filter(
-                        tags, tag -> CollectionUtils.contains(integration.getTagIds(), tag.getId()))));
+                        tags, tag -> CollectionUtils.contains(integration.getTagIds(), tag.getId())),
+                    codeWorkflowIntegrationIds.contains(integration.getId()),
+                    codeWorkflowLanguages.get(integration.getId())));
         } else {
             return CollectionUtils.map(integrations, IntegrationDTO::new);
         }
@@ -286,7 +315,8 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
 
         return new IntegrationDTO(
             getCategory(integration),
-            componentDefinitionService.getComponentDefinition(integration.getComponentName(), null),
+            componentDefinitionService.fetchComponentDefinition(integration.getComponentName(), null)
+                .orElse(null),
             integration, getIntegrationWorkflowIds(integration),
             tagService.getTags(integration.getTagIds()), codeWorkflowContainer.isPresent(),
             codeWorkflowContainer.map(container -> container.getLanguage()

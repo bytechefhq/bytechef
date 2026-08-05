@@ -17,6 +17,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @version ee
@@ -50,18 +51,26 @@ public record IntegrationDTO(
         this(category, componentDefinition, integration, integrationWorkflowIds, tags, false, null);
     }
 
+    /**
+     * A {@code componentDefinition} of {@code null} means the integration names a component this instance does not have
+     * — an artifact of a deleted or never-installed component. The row still maps, showing its own name and no icon, so
+     * one such integration does not fail the whole list.
+     */
     public IntegrationDTO(
-        Category category, ComponentDefinition componentDefinition, Integration integration,
+        Category category, @Nullable ComponentDefinition componentDefinition, Integration integration,
         List<Long> integrationWorkflowIds, List<Tag> tags, boolean codeWorkflow, String codeWorkflowLanguage) {
 
         this(
             category, codeWorkflow, codeWorkflowLanguage, integration.getComponentName(),
             integration.getComponentVersion(), integration.getCreatedBy(), integration.getCreatedDate(),
-            getDescription(componentDefinition, integration), componentDefinition.getIcon(), integration.getId(),
+            getDescription(componentDefinition, integration),
+            componentDefinition == null ? null : componentDefinition.getIcon(), integration.getId(),
             integration.getIntegrationVersions(), integrationWorkflowIds, integration.getLastModifiedBy(),
             integration.getLastModifiedDate(), integration.getLastPublishedDate(), integration.getLastStatus(),
             integration.getLastIntegrationVersion(), integration.isMultipleInstances(), integration.getName(),
-            integration.getPermissionExpression(), tags, componentDefinition.getTitle(), integration.getVersion());
+            integration.getPermissionExpression(), tags,
+            componentDefinition == null ? integration.getComponentName() : componentDefinition.getTitle(),
+            integration.getVersion());
     }
 
     public static Builder builder() {
@@ -250,8 +259,12 @@ public record IntegrationDTO(
     }
 
     private static String getDescription(
-        ComponentDefinition componentDefinition, Integration integration) {
-        return StringUtils.isEmpty(integration.getDescription())
-            ? componentDefinition.getDescription() : integration.getDescription();
+        @Nullable ComponentDefinition componentDefinition, Integration integration) {
+
+        if (!StringUtils.isEmpty(integration.getDescription())) {
+            return integration.getDescription();
+        }
+
+        return componentDefinition == null ? null : componentDefinition.getDescription();
     }
 }

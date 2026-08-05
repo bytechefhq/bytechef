@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -104,8 +105,12 @@ class IntegrationFacadeImplCodeWorkflowFlagTest {
 
         ComponentDefinition componentDefinition = mock(ComponentDefinition.class);
 
-        when(integrationService.getIntegration(INTEGRATION_ID)).thenReturn(integration);
-        when(componentDefinitionService.getComponentDefinition("slack", null)).thenReturn(componentDefinition);
+        // Shared setup: the list-path test exercises getIntegrations instead, so this stub is
+        // lenient rather than duplicated into each by-id test
+        lenient().when(integrationService.getIntegration(INTEGRATION_ID))
+            .thenReturn(integration);
+        when(componentDefinitionService.fetchComponentDefinition("slack", null))
+            .thenReturn(Optional.of(componentDefinition));
         when(integrationWorkflowService.getIntegrationWorkflowIds(anyLong(), anyInt())).thenReturn(List.of());
         when(tagService.getTags(any())).thenReturn(List.of());
     }
@@ -136,6 +141,29 @@ class IntegrationFacadeImplCodeWorkflowFlagTest {
 
         assertThat(integrationDTO.codeWorkflow()).isTrue();
         assertThat(integrationDTO.codeWorkflowLanguage()).isEqualTo("PYTHON");
+    }
+
+    @Test
+    void testGetIntegrationsReturnsLanguageForCodeIntegrations() {
+        IntegrationCodeWorkflow integrationCodeWorkflow = mock(IntegrationCodeWorkflow.class);
+        CodeWorkflowContainer codeWorkflowContainer = mock(CodeWorkflowContainer.class);
+
+        when(integrationService.getIntegrations(null, List.of(), null, null)).thenReturn(List.of(integration));
+        when(integrationCodeWorkflowService.getCodeWorkflowIntegrationIds()).thenReturn(List.of(INTEGRATION_ID));
+        when(integrationCodeWorkflowService.fetchIntegrationCodeWorkflow(INTEGRATION_ID))
+            .thenReturn(Optional.of(integrationCodeWorkflow));
+        when(integrationCodeWorkflow.getCodeWorkflowContainerId()).thenReturn(7L);
+        when(codeWorkflowContainerService.getCodeWorkflowContainer(7L)).thenReturn(codeWorkflowContainer);
+        when(codeWorkflowContainer.getLanguage()).thenReturn(CodeWorkflowContainer.Language.JAVASCRIPT);
+        when(categoryService.getCategories(List.of())).thenReturn(List.of());
+
+        List<IntegrationDTO> integrationDTOs = integrationFacade.getIntegrations(null, false, null, null, true);
+
+        // The list path used to report a null language, so the client's badge fell back to a bare
+        // "Code" rather than naming the language
+        assertThat(integrationDTOs).hasSize(1);
+        assertThat(integrationDTOs.getFirst()
+            .codeWorkflowLanguage()).isEqualTo("JAVASCRIPT");
     }
 
     @Test

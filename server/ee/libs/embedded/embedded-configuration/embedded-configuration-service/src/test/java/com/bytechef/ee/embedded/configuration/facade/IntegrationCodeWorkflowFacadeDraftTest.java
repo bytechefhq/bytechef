@@ -32,6 +32,7 @@ import com.bytechef.ee.platform.codeworkflow.configuration.facade.CodeWorkflowCo
 import com.bytechef.ee.platform.codeworkflow.configuration.service.CodeWorkflowContainerService;
 import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorage;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.tag.service.TagService;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
@@ -350,7 +351,7 @@ class IntegrationCodeWorkflowFacadeDraftTest {
         return new IntegrationCodeWorkflowFacadeImpl(
             applicationProperties(true), mock(CacheManager.class), codeWorkflowContainerFacade,
             integrationCodeWorkflowService, integrationService, integrationWorkflowService,
-            codeWorkflowContainerService, codeWorkflowFileStorage, workflowService);
+            codeWorkflowContainerService, codeWorkflowFileStorage, mock(TagService.class), workflowService);
     }
 
     private static ApplicationProperties applicationProperties(boolean javaEnabled) {

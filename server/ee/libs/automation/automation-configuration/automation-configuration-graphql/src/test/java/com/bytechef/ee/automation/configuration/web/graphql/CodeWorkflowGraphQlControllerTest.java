@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -56,14 +57,16 @@ class CodeWorkflowGraphQlControllerTest {
         project.setId(123L);
         project.setName("my-code-project");
 
-        when(projectCodeWorkflowFacade.createEmptyCodeWorkflow(eq(7L), eq("my-code-project"), eq(Language.JAVASCRIPT)))
-            .thenReturn(project);
+        when(projectCodeWorkflowFacade.createEmptyCodeWorkflow(eq(7L), eq("my-code-project"), eq(Language.JAVASCRIPT),
+            isNull(), isNull(), isNull()))
+                .thenReturn(project);
 
-        String projectId = controller.createCodeWorkflow(7L, "my-code-project", Language.JAVASCRIPT);
+        String projectId = controller.createCodeWorkflow(7L, "my-code-project", Language.JAVASCRIPT, null, null, null);
 
         assertThat(projectId).isEqualTo("123");
 
-        verify(projectCodeWorkflowFacade).createEmptyCodeWorkflow(7L, "my-code-project", Language.JAVASCRIPT);
+        verify(projectCodeWorkflowFacade).createEmptyCodeWorkflow(7L, "my-code-project", Language.JAVASCRIPT, null,
+            null, null);
     }
 
     @Test
@@ -72,12 +75,15 @@ class CodeWorkflowGraphQlControllerTest {
 
         project.setId(1L);
 
-        when(projectCodeWorkflowFacade.createEmptyCodeWorkflow(anyLong(), anyString(), eq(Language.PYTHON)))
-            .thenReturn(project);
-        when(projectCodeWorkflowFacade.createEmptyCodeWorkflow(anyLong(), anyString(), eq(Language.RUBY)))
-            .thenReturn(project);
+        when(projectCodeWorkflowFacade.createEmptyCodeWorkflow(anyLong(), anyString(), eq(Language.PYTHON), isNull(),
+            isNull(), isNull()))
+                .thenReturn(project);
+        when(projectCodeWorkflowFacade.createEmptyCodeWorkflow(anyLong(), anyString(), eq(Language.RUBY), isNull(),
+            isNull(), isNull()))
+                .thenReturn(project);
 
-        assertThat(controller.createCodeWorkflow(1L, "python-project", Language.PYTHON)).isEqualTo("1");
-        assertThat(controller.createCodeWorkflow(1L, "ruby-project", Language.RUBY)).isEqualTo("1");
+        assertThat(controller.createCodeWorkflow(1L, "python-project", Language.PYTHON, null, null, null))
+            .isEqualTo("1");
+        assertThat(controller.createCodeWorkflow(1L, "ruby-project", Language.RUBY, null, null, null)).isEqualTo("1");
     }
 }

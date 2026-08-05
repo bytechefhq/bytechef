@@ -24,6 +24,7 @@ import com.bytechef.ee.platform.codeworkflow.configuration.facade.CodeWorkflowCo
 import com.bytechef.ee.platform.codeworkflow.configuration.service.CodeWorkflowContainerService;
 import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorage;
 import com.bytechef.exception.ConfigurationException;
+import com.bytechef.platform.tag.service.TagService;
 import org.junit.jupiter.api.Test;
 import org.springframework.cache.CacheManager;
 
@@ -48,7 +49,7 @@ class ProjectCodeWorkflowFacadeUploadDisabledTest {
         ProjectCodeWorkflowFacadeImpl projectCodeWorkflowFacade = new ProjectCodeWorkflowFacadeImpl(
             applicationProperties(false), mock(CacheManager.class), projectService, projectWorkflowService,
             codeWorkflowContainerFacade, projectCodeWorkflowService, mock(CodeWorkflowContainerService.class),
-            mock(CodeWorkflowFileStorage.class), mock(WorkflowService.class));
+            mock(CodeWorkflowFileStorage.class), mock(TagService.class), mock(WorkflowService.class));
 
         assertThatThrownBy(() -> projectCodeWorkflowFacade.save(1L, new byte[0], Language.JAVA))
             .isInstanceOf(ConfigurationException.class)
@@ -73,7 +74,7 @@ class ProjectCodeWorkflowFacadeUploadDisabledTest {
         ProjectCodeWorkflowFacadeImpl projectCodeWorkflowFacade = new ProjectCodeWorkflowFacadeImpl(
             applicationProperties(false), mock(CacheManager.class), projectService, projectWorkflowService,
             codeWorkflowContainerFacade, projectCodeWorkflowService, mock(CodeWorkflowContainerService.class),
-            mock(CodeWorkflowFileStorage.class), mock(WorkflowService.class));
+            mock(CodeWorkflowFileStorage.class), mock(TagService.class), mock(WorkflowService.class));
 
         // A JavaScript upload gets past the Java-only disable guard; it may still fail downstream on the empty payload,
         // but never with the disabled ConfigurationException.

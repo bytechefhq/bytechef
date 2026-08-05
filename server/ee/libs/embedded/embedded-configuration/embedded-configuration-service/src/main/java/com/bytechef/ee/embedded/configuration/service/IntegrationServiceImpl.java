@@ -85,6 +85,12 @@ public class IntegrationServiceImpl implements IntegrationService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<Integration> getIntegrations(String componentName) {
+        return integrationRepository.findAllByComponentNameIgnoreCase(componentName);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Integration getIntegration(long id) {
         return OptionalUtils.get(integrationRepository.findById(id));
     }

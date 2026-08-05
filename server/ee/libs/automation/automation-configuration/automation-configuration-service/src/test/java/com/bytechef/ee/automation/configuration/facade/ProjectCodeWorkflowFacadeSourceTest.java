@@ -36,6 +36,7 @@ import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorag
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.tag.service.TagService;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Optional;
@@ -321,6 +322,75 @@ class ProjectCodeWorkflowFacadeSourceTest {
         verifyNoInteractions(codeWorkflowContainerFacade);
     }
 
+    @Test
+    void testDeployCodeWorkflowSourceRewritesTheDeclaredNameToTheProjectName() {
+        ProjectCodeWorkflowService projectCodeWorkflowService = mock(ProjectCodeWorkflowService.class);
+
+        when(projectCodeWorkflowService.fetchProjectCodeWorkflow(2L)).thenReturn(Optional.empty());
+
+        Project project = new Project();
+
+        project.setId(2L);
+        project.setName("my-code-project (2)");
+
+        ProjectService projectService = mock(ProjectService.class);
+
+        when(projectService.getProject(2L)).thenReturn(project);
+
+        CodeWorkflowContainer newCodeWorkflowContainer = mock(CodeWorkflowContainer.class);
+
+        CodeWorkflowReconciliation reconciliation = new CodeWorkflowReconciliation(
+            newCodeWorkflowContainer, Map.of(), Map.of());
+
+        CodeWorkflowContainerFacade codeWorkflowContainerFacade = mock(CodeWorkflowContainerFacade.class);
+
+        when(codeWorkflowContainerFacade.create(
+            any(), any(), any(), any(), any(), eq(PlatformType.AUTOMATION), any()))
+                .thenReturn(reconciliation);
+
+        ProjectCodeWorkflowFacadeImpl projectCodeWorkflowFacade = newFacade(
+            projectService, mock(ProjectWorkflowService.class), codeWorkflowContainerFacade, projectCodeWorkflowService,
+            mock(CodeWorkflowContainerService.class), mock(CodeWorkflowFileStorage.class), mock(WorkflowService.class));
+
+        projectCodeWorkflowFacade.deployCodeWorkflowSource(
+            2L, Language.JAVASCRIPT, jsScript("my-code-project"));
+
+        ArgumentCaptor<byte[]> bytesCaptor = ArgumentCaptor.forClass(byte[].class);
+
+        verify(codeWorkflowContainerFacade).create(
+            eq("my-code-project (2)"), eq("1"), any(), eq(Language.JAVASCRIPT), bytesCaptor.capture(),
+            eq(PlatformType.AUTOMATION), any());
+
+        // The copy must declare its own name: an upload resolves the target project by the declared name, so a copy
+        // still declaring the original's name would redeploy over the original.
+        assertThat(new String(bytesCaptor.getValue(), StandardCharsets.UTF_8))
+            .isEqualTo(jsScript("my-code-project (2)"));
+    }
+
+    @Test
+    void testDeployCodeWorkflowSourceThrowsWhenTheNameIsNotAStringLiteral() {
+        Project project = new Project();
+
+        project.setId(2L);
+        project.setName("renamed");
+
+        ProjectService projectService = mock(ProjectService.class);
+
+        when(projectService.getProject(2L)).thenReturn(project);
+
+        ProjectCodeWorkflowFacadeImpl projectCodeWorkflowFacade = newFacade(
+            projectService, mock(ProjectWorkflowService.class), mock(CodeWorkflowContainerFacade.class),
+            mock(ProjectCodeWorkflowService.class), mock(CodeWorkflowContainerService.class),
+            mock(CodeWorkflowFileStorage.class), mock(WorkflowService.class));
+
+        String computedNameScript = "({name: [\"my\", \"code\"].join(\"-\"), version: \"1\", workflows: []})";
+
+        assertThatThrownBy(
+            () -> projectCodeWorkflowFacade.deployCodeWorkflowSource(2L, Language.JAVASCRIPT, computedNameScript))
+                .isInstanceOf(ConfigurationException.class)
+                .hasMessageContaining("plain string literal");
+    }
+
     private static String jsScript(String name) {
         return "({name: \"" + name + "\", version: \"1\", workflows: [{name: \"my-workflow\", "
             + "label: \"My Workflow\", tasks: [{name: \"my-task\", label: \"My Task\", "
@@ -337,7 +407,7 @@ class ProjectCodeWorkflowFacadeSourceTest {
         return new ProjectCodeWorkflowFacadeImpl(
             applicationProperties(true), mock(CacheManager.class), projectService, projectWorkflowService,
             codeWorkflowContainerFacade, projectCodeWorkflowService, codeWorkflowContainerService,
-            codeWorkflowFileStorage, workflowService);
+            codeWorkflowFileStorage, mock(TagService.class), workflowService);
     }
 
     private static ApplicationProperties applicationProperties(boolean javaEnabled) {

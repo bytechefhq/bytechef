@@ -7,5 +7,5 @@ extend type Query {
 
 extend type Mutation {
     updateIntegrationCodeWorkflowSource(integrationId: ID!, content: String!): Boolean!
-    createIntegrationCodeWorkflow(componentName: String!, language: CodeWorkflowLanguage!): ID!
+    createIntegrationCodeWorkflow(componentName: String!, language: CodeWorkflowLanguage!, name: String, description: String, categoryId: ID, tags: [String!], permissionExpression: String): ID!
 }

@@ -23,6 +23,7 @@ import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowServi
 import com.bytechef.ee.platform.codeworkflow.configuration.facade.CodeWorkflowContainerFacade;
 import com.bytechef.ee.platform.codeworkflow.configuration.service.CodeWorkflowContainerService;
 import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorage;
+import com.bytechef.platform.tag.service.TagService;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.cache.CacheManager;
@@ -114,7 +115,7 @@ class ProjectCodeWorkflowFacadeListTest {
             applicationProperties(true), mock(CacheManager.class), projectService, mock(ProjectWorkflowService.class),
             mock(CodeWorkflowContainerFacade.class), projectCodeWorkflowService,
             mock(CodeWorkflowContainerService.class), mock(CodeWorkflowFileStorage.class),
-            mock(WorkflowService.class));
+            mock(TagService.class), mock(WorkflowService.class));
     }
 
     private static ApplicationProperties applicationProperties(boolean javaEnabled) {

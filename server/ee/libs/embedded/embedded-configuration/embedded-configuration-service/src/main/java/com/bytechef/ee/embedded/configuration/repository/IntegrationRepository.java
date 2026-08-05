@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.configuration.repository;
 
 import com.bytechef.ee.embedded.configuration.domain.Integration;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
@@ -26,6 +27,12 @@ public interface IntegrationRepository
     CustomIntegrationRepository {
 
     Optional<Integration> findByComponentNameIgnoreCase(String componentName);
+
+    /**
+     * Every integration built on the component. More than one is legitimate — a component can back several
+     * integrations, told apart by name — so callers that must pick one cannot use the singular finder.
+     */
+    List<Integration> findAllByComponentNameIgnoreCase(String componentName);
 
     @Query("""
         SELECT integration.* FROM integration

@@ -21,6 +21,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
@@ -29,6 +31,7 @@ import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.service.PreBuiltTemplateService;
 import com.bytechef.automation.configuration.service.ProjectCodeWorkflowInfoSupplier;
 import com.bytechef.automation.configuration.service.ProjectCodeWorkflowInfoSupplier.CodeWorkflowInfo;
+import com.bytechef.automation.configuration.service.ProjectCodeWorkflowInfoSupplier.CodeWorkflowSource;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
@@ -40,19 +43,28 @@ import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.file.storage.SharedTemplateFileStorage;
 import com.bytechef.platform.tag.service.TagService;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * @author Ivica Cardic
  */
-@ExtendWith(MockitoExtension.class)
+@ExtendWith({
+    MockitoExtension.class, ObjectMapperSetupExtension.class
+})
 class ProjectFacadeImplCodeWorkflowFlagTest {
 
     private static final long PROJECT_ID = 42L;
@@ -98,6 +110,69 @@ class ProjectFacadeImplCodeWorkflowFlagTest {
         when(projectService.getProject(PROJECT_ID)).thenReturn(project);
         when(projectWorkflowService.getProjectProjectWorkflowIds(anyLong(), anyInt())).thenReturn(List.of());
         when(tagService.getTags(any())).thenReturn(List.of());
+    }
+
+    @Test
+    @MockitoSettings(strictness = Strictness.LENIENT)
+    void testDuplicateProjectDeploysTheSourceInsteadOfCopyingWorkflowIds() {
+        ProjectCodeWorkflowInfoSupplier supplier = mock(ProjectCodeWorkflowInfoSupplier.class);
+
+        Project duplicatedProject = mock(Project.class);
+
+        when(duplicatedProject.getId()).thenReturn(43L);
+        when(projectCodeWorkflowInfoSupplierProvider.getIfAvailable()).thenReturn(supplier);
+        when(supplier.fetchCodeWorkflowSource(PROJECT_ID))
+            .thenReturn(Optional.of(new CodeWorkflowSource("JAVASCRIPT", "({name: 'p'})")));
+        when(projectService.create(any(Project.class))).thenReturn(duplicatedProject);
+        when(projectService.getProject(43L)).thenReturn(duplicatedProject);
+
+        projectFacade.duplicateProject(PROJECT_ID);
+
+        verify(supplier).deployCodeWorkflowSource(43L, "JAVASCRIPT", "({name: 'p'})");
+        verify(projectWorkflowService, never()).addWorkflow(anyLong(), anyInt(), any());
+    }
+
+    @Test
+    @MockitoSettings(strictness = Strictness.LENIENT)
+    void testImportProjectDeploysACodeBackedExportsSource() throws Exception {
+        ProjectCodeWorkflowInfoSupplier supplier = mock(ProjectCodeWorkflowInfoSupplier.class);
+
+        Project importedProject = mock(Project.class);
+
+        when(importedProject.getId()).thenReturn(44L);
+        when(projectCodeWorkflowInfoSupplierProvider.getIfAvailable()).thenReturn(supplier);
+        when(projectService.create(any(Project.class))).thenReturn(importedProject);
+
+        byte[] projectData = codeWorkflowExport();
+
+        long projectId = projectFacade.importProject(projectData, 1L);
+
+        assertThat(projectId).isEqualTo(44L);
+
+        // A code-backed export carries no workflow-*.json entries, so the import must not fall through to the
+        // definition-adding path.
+        verify(supplier).deployCodeWorkflowSource(44L, "JAVASCRIPT", "({name: 'imported'})");
+    }
+
+    /**
+     * A minimal export of a code-backed project: project.json plus the source entry, no workflow definitions.
+     */
+    private static byte[] codeWorkflowExport() throws Exception {
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream)) {
+
+            zipOutputStream.putNextEntry(new ZipEntry("project.json"));
+            zipOutputStream.write("{\"name\":\"imported\"}".getBytes(StandardCharsets.UTF_8));
+            zipOutputStream.closeEntry();
+
+            zipOutputStream.putNextEntry(new ZipEntry("code-workflow.JAVASCRIPT"));
+            zipOutputStream.write("({name: 'imported'})".getBytes(StandardCharsets.UTF_8));
+            zipOutputStream.closeEntry();
+
+            zipOutputStream.finish();
+
+            return byteArrayOutputStream.toByteArray();
+        }
     }
 
     @Test

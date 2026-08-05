@@ -10,5 +10,5 @@ extend type Query {
 
 extend type Mutation {
     updateCodeWorkflowSource(projectId: ID!, content: String!): Boolean!
-    createCodeWorkflow(workspaceId: ID!, name: String!, language: CodeWorkflowLanguage!): ID!
+    createCodeWorkflow(workspaceId: ID!, name: String!, language: CodeWorkflowLanguage!, description: String, categoryId: ID, tags: [String!]): ID!
 }

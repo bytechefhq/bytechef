@@ -13,6 +13,7 @@ import com.bytechef.ee.embedded.configuration.facade.IntegrationCodeWorkflowFaca
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -48,8 +49,13 @@ public class IntegrationCodeWorkflowGraphQlController {
     }
 
     @MutationMapping
-    public String createIntegrationCodeWorkflow(@Argument String componentName, @Argument Language language) {
-        Integration integration = integrationCodeWorkflowFacade.createEmptyCodeWorkflow(componentName, language);
+    public String createIntegrationCodeWorkflow(
+        @Argument String componentName, @Argument Language language, @Argument String name,
+        @Argument String description, @Argument Long categoryId, @Argument List<String> tags,
+        @Argument String permissionExpression) {
+
+        Integration integration = integrationCodeWorkflowFacade.createEmptyCodeWorkflow(
+            componentName, language, name, description, categoryId, tags, permissionExpression);
 
         return String.valueOf(integration.getId());
     }

@@ -34,6 +34,7 @@ import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorag
 import com.bytechef.embedded.integration.IntegrationHandler;
 import com.bytechef.embedded.integration.definition.IntegrationDefinition;
 import com.bytechef.exception.ConfigurationException;
+import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.InputStream;
@@ -121,7 +122,7 @@ class IntegrationCodeWorkflowFacadeCreateEmptyTest {
             applicationProperties(true), mock(CacheManager.class), codeWorkflowContainerFacade,
             integrationCodeWorkflowService, integrationService, integrationWorkflowService,
             mock(CodeWorkflowContainerService.class), mock(CodeWorkflowFileStorage.class),
-            mock(WorkflowService.class));
+            mock(TagService.class), mock(WorkflowService.class));
 
         Integration integration = integrationCodeWorkflowFacade.createEmptyCodeWorkflow(
             "my-integration", Language.JAVASCRIPT);
@@ -152,7 +153,7 @@ class IntegrationCodeWorkflowFacadeCreateEmptyTest {
             applicationProperties(true), mock(CacheManager.class), codeWorkflowContainerFacade,
             integrationCodeWorkflowService, integrationService, integrationWorkflowService,
             mock(CodeWorkflowContainerService.class), mock(CodeWorkflowFileStorage.class),
-            mock(WorkflowService.class));
+            mock(TagService.class), mock(WorkflowService.class));
 
         assertThatThrownBy(
             () -> integrationCodeWorkflowFacade.createEmptyCodeWorkflow("my-integration", language))
@@ -164,7 +165,7 @@ class IntegrationCodeWorkflowFacadeCreateEmptyTest {
     }
 
     @Test
-    void testCreateEmptyCodeWorkflowRejectsExistingComponentName() {
+    void testCreateEmptyCodeWorkflowAllowsASecondIntegrationOnTheSameComponent() {
         CodeWorkflowContainerFacade codeWorkflowContainerFacade = mock(CodeWorkflowContainerFacade.class);
         IntegrationCodeWorkflowService integrationCodeWorkflowService = mock(IntegrationCodeWorkflowService.class);
         IntegrationService integrationService = mock(IntegrationService.class);
@@ -175,23 +176,32 @@ class IntegrationCodeWorkflowFacadeCreateEmptyTest {
         existingIntegration.setId(2L);
         existingIntegration.setComponentName("my-integration");
 
-        when(integrationService.fetchIntegration("my-integration"))
-            .thenReturn(Optional.of(existingIntegration));
+        Integration createdIntegration = new Integration();
+
+        createdIntegration.setId(3L);
+        createdIntegration.setComponentName("my-integration");
+
+        when(integrationService.fetchIntegration("my-integration")).thenReturn(Optional.of(existingIntegration));
+        when(integrationService.create(any())).thenReturn(createdIntegration);
+        when(
+            codeWorkflowContainerFacade.create(any(), any(), any(), any(), any(), any(), any()))
+                .thenReturn(
+                    new CodeWorkflowContainerFacade.CodeWorkflowReconciliation(
+                        mock(CodeWorkflowContainer.class), Map.of(), Map.of()));
 
         IntegrationCodeWorkflowFacadeImpl integrationCodeWorkflowFacade = new IntegrationCodeWorkflowFacadeImpl(
             applicationProperties(true), mock(CacheManager.class), codeWorkflowContainerFacade,
             integrationCodeWorkflowService, integrationService, integrationWorkflowService,
             mock(CodeWorkflowContainerService.class), mock(CodeWorkflowFileStorage.class),
-            mock(WorkflowService.class));
+            mock(TagService.class), mock(WorkflowService.class));
 
-        assertThatThrownBy(
-            () -> integrationCodeWorkflowFacade.createEmptyCodeWorkflow("my-integration", Language.JAVASCRIPT))
-                .isInstanceOf(ConfigurationException.class)
-                .extracting(thrown -> ((ConfigurationException) thrown).getErrorKey())
-                .isEqualTo(CodeWorkflowErrorType.CODE_WORKFLOW_ALREADY_EXISTS.getErrorKey());
+        // A component backs as many integrations as the user wants; they are told apart by name.
+        Integration integration = integrationCodeWorkflowFacade.createEmptyCodeWorkflow(
+            "my-integration", Language.JAVASCRIPT);
 
-        verify(integrationService, never()).create(any());
-        verify(codeWorkflowContainerFacade, never()).create(any(), any(), any(), any(), any(), any());
+        assertThat(integration.getId()).isEqualTo(3L);
+
+        verify(integrationService).create(any());
     }
 
     @Test
@@ -224,7 +234,7 @@ class IntegrationCodeWorkflowFacadeCreateEmptyTest {
             applicationProperties(true), mock(CacheManager.class), codeWorkflowContainerFacade,
             integrationCodeWorkflowService, integrationService, integrationWorkflowService,
             mock(CodeWorkflowContainerService.class), mock(CodeWorkflowFileStorage.class),
-            mock(WorkflowService.class));
+            mock(TagService.class), mock(WorkflowService.class));
 
         assertThatThrownBy(
             () -> integrationCodeWorkflowFacade.createEmptyCodeWorkflow(componentName, Language.JAVASCRIPT))

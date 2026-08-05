@@ -49,6 +49,11 @@ public class RemoteIntegrationServiceClient implements IntegrationService {
     }
 
     @Override
+    public List<Integration> getIntegrations(String componentName) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Optional<Integration> fetchIntegration(String componentName) {
         throw new UnsupportedOperationException();
     }

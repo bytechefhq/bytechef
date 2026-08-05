@@ -26,9 +26,12 @@ import com.bytechef.ee.platform.codeworkflow.configuration.service.CodeWorkflowC
 import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorage;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.codeworkflow.loader.automation.ProjectHandlerLoader;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.tag.domain.Tag;
+import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,6 +45,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.Nullable;
 import org.springframework.cache.CacheManager;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -73,6 +77,7 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
     private final ProjectCodeWorkflowService projectCodeWorkflowService;
     private final CodeWorkflowContainerService codeWorkflowContainerService;
     private final CodeWorkflowFileStorage codeWorkflowFileStorage;
+    private final TagService tagService;
     private final WorkflowService workflowService;
     private final boolean javaEnabled;
     private final ProjectHandlerLoader.JavaLoader javaLoader;
@@ -83,7 +88,7 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
         ProjectWorkflowService projectWorkflowService, CodeWorkflowContainerFacade codeWorkflowContainerFacade,
         ProjectCodeWorkflowService projectCodeWorkflowService,
         CodeWorkflowContainerService codeWorkflowContainerService,
-        CodeWorkflowFileStorage codeWorkflowFileStorage, WorkflowService workflowService) {
+        CodeWorkflowFileStorage codeWorkflowFileStorage, TagService tagService, WorkflowService workflowService) {
 
         this.cacheManager = cacheManager;
         this.projectService = projectService;
@@ -92,6 +97,7 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
         this.projectCodeWorkflowService = projectCodeWorkflowService;
         this.codeWorkflowContainerService = codeWorkflowContainerService;
         this.codeWorkflowFileStorage = codeWorkflowFileStorage;
+        this.tagService = tagService;
         this.workflowService = workflowService;
         this.javaEnabled = applicationProperties.getWorkflow()
             .getCodeWorkflow()
@@ -122,13 +128,15 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
     @Override
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public Project createEmptyCodeWorkflow(long workspaceId, String name, Language language) {
-        if (name == null || name.isBlank() || name.indexOf('"') >= 0 || name.indexOf('\\') >= 0
-            || name.indexOf('\n') >= 0 || name.indexOf('\r') >= 0) {
+        return createEmptyCodeWorkflow(workspaceId, name, language, null, null, null);
+    }
 
-            throw new ConfigurationException(
-                "Invalid code workflow name: must not be blank or contain quotes, backslashes, or newlines",
-                CodeWorkflowErrorType.INVALID_CODE_WORKFLOW_NAME);
-        }
+    @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public Project createEmptyCodeWorkflow(
+        long workspaceId, String name, Language language, @Nullable String description, @Nullable Long categoryId,
+        @Nullable List<String> tags) {
+        validateName(name);
 
         if (language != Language.JAVASCRIPT && language != Language.PYTHON && language != Language.RUBY) {
             throw new ConfigurationException(
@@ -156,7 +164,7 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
             throw new RuntimeException(e);
         }
 
-        Project project = createProject(workspaceId, projectDefinition);
+        Project project = createProject(workspaceId, projectDefinition, description, categoryId, tags);
 
         saveDraft(project, projectDefinition, bytes, language);
 
@@ -277,6 +285,87 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
         saveDraft(project, projectDefinition, bytes, language);
     }
 
+    /**
+     * Deploys source into an existing project whose name differs from the one the source declares (a duplicate, an
+     * import). The declared name is rewritten in the source text rather than left to diverge: the name is what an
+     * upload through the CLI or the deploy endpoint resolves a project by, so a copy still declaring the original's
+     * name would silently redeploy over the original.
+     */
+    @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public void deployCodeWorkflowSource(long projectId, Language language, String content) {
+        if (language == Language.JAVA) {
+            throw new ConfigurationException(
+                "Java code workflows have no editable source", CodeWorkflowErrorType.LANGUAGE_NOT_SUPPORTED);
+        }
+
+        Project project = projectService.getProject(projectId);
+
+        String projectName = project.getName();
+
+        validateName(projectName);
+
+        byte[] bytes = content.getBytes(StandardCharsets.UTF_8);
+
+        ProjectDefinition projectDefinition = readProjectDefinition(language, bytes);
+
+        if (!Objects.equals(projectDefinition.getName(), projectName)) {
+            content = rewriteDeclaredName(content, projectDefinition.getName(), projectName);
+
+            bytes = content.getBytes(StandardCharsets.UTF_8);
+
+            projectDefinition = readProjectDefinition(language, bytes);
+
+            if (!Objects.equals(projectDefinition.getName(), projectName)) {
+                throw new ConfigurationException(
+                    "Could not rename the code workflow to '" + projectName +
+                        "'; declare the project name as a plain string literal",
+                    CodeWorkflowErrorType.CODE_WORKFLOW_NAME_MISMATCH);
+            }
+        }
+
+        saveDraft(project, projectDefinition, bytes, language);
+    }
+
+    private static void validateName(String name) {
+        if (name == null || name.isBlank() || name.indexOf('"') >= 0 || name.indexOf('\\') >= 0
+            || name.indexOf('\n') >= 0 || name.indexOf('\r') >= 0) {
+
+            throw new ConfigurationException(
+                "Invalid code workflow name: must not be blank or contain quotes, backslashes, or newlines",
+                CodeWorkflowErrorType.INVALID_CODE_WORKFLOW_NAME);
+        }
+    }
+
+    private ProjectDefinition readProjectDefinition(Language language, byte[] bytes) {
+        try {
+            return loadProjectDefinition(language, bytes);
+        } catch (Exception e) {
+            throw new ConfigurationException(
+                "Failed to load code workflow source: " + e.getMessage(), CodeWorkflowErrorType.SOURCE_LOAD_FAILED);
+        }
+    }
+
+    /**
+     * Replaces the first quoted occurrence of the declared name with {@code newName}. Every starter and generated
+     * source declares the name as a plain string literal, and the caller re-loads the rewritten source to confirm the
+     * rename took, so a computed name fails loudly instead of deploying under the wrong identity.
+     */
+    private static String rewriteDeclaredName(String content, String declaredName, String newName) {
+        for (String quote : List.of("\"", "'")) {
+            String literal = quote + declaredName + quote;
+
+            int index = content.indexOf(literal);
+
+            if (index >= 0) {
+                return content.substring(0, index) + quote + newName + quote +
+                    content.substring(index + literal.length());
+            }
+        }
+
+        return content;
+    }
+
     private void saveDraft(Project project, ProjectDefinition projectDefinition, byte[] bytes, Language language) {
         long projectId = Objects.requireNonNull(project.getId());
         int draftProjectVersion = project.getLastProjectVersion();
@@ -387,13 +476,38 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
     }
 
     private Project createProject(long workspaceId, ProjectDefinition projectDefinition) {
+        return createProject(workspaceId, projectDefinition, null, null, null);
+    }
+
+    /**
+     * The caller's description wins over the starter template's, which is boilerplate. Category and tags have no place
+     * in the source contract at all, so they only ever come from the caller.
+     */
+    private Project createProject(
+        long workspaceId, ProjectDefinition projectDefinition, @Nullable String description,
+        @Nullable Long categoryId, @Nullable List<String> tags) {
+
         Project project = new Project();
 
         project.setDescription(
-            projectDefinition.getDescription()
-                .orElse(null));
+            description == null || description.isBlank()
+                ? projectDefinition.getDescription()
+                    .orElse(null)
+                : description);
         project.setName(projectDefinition.getName());
         project.setWorkspaceId(workspaceId);
+
+        if (categoryId != null) {
+            project.setCategory(new Category(categoryId));
+        }
+
+        if (tags != null && !tags.isEmpty()) {
+            project.setTags(
+                tagService.save(
+                    tags.stream()
+                        .map(Tag::new)
+                        .toList()));
+        }
 
         return projectService.create(project);
     }
