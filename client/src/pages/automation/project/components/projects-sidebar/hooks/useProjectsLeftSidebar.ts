@@ -100,7 +100,7 @@ export const useProjectsLeftSidebar = ({
         const days = Math.floor(hours / 24);
 
         if (days > 7) {
-            return `Edited on ${workflowLastModifiedDate.toLocaleDateString()}`;
+            return `on ${workflowLastModifiedDate.toLocaleDateString()}`;
         }
 
         if (days > 0) {
