@@ -18,11 +18,14 @@ package org.springframework.ai.session.redis;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -91,10 +94,10 @@ class RedisSessionRepositoryIntTest {
     void testSaveAndFindById() {
         newSession("s-find");
 
-        assertTrue(repository.findById("s-find")
-            .isPresent());
-        assertEquals("user-1", repository.findById("s-find")
-            .get()
+        Session foundSession = repository.findById("s-find");
+
+        assertNotNull(foundSession);
+        assertEquals("user-1", Objects.requireNonNull(foundSession)
             .userId());
     }
 
@@ -147,15 +150,15 @@ class RedisSessionRepositoryIntTest {
     }
 
     @Test
-    void testReplaceEventsCasSucceedsThenFailsOnStaleVersion() {
+    void testCompactEventsCasSucceedsThenFailsOnStaleVersion() {
         newSession("s-cas");
 
         repository.appendEvent(event("s-cas", "v1"));
 
         long version = repository.getEventVersion("s-cas");
 
-        assertTrue(repository.replaceEvents("s-cas", List.of(event("s-cas", "compacted")), version));
-        assertFalse(repository.replaceEvents("s-cas", List.of(event("s-cas", "again")), version));
+        assertTrue(repository.compactEvents("s-cas", List.of(), List.of(event("s-cas", "compacted")), version));
+        assertFalse(repository.compactEvents("s-cas", List.of(), List.of(event("s-cas", "again")), version));
     }
 
     @Test
@@ -167,8 +170,7 @@ class RedisSessionRepositoryIntTest {
 
         repository.delete("s-del");
 
-        assertTrue(repository.findById("s-del")
-            .isEmpty());
+        assertNull(repository.findById("s-del"));
     }
 
     @Test

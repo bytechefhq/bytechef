@@ -42,7 +42,7 @@ import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Mocked unit tests for the CAS (compare-and-swap) paths of
- * {@link S3SessionRepository#replaceEvents(String, List, long)}.
+ * {@link S3SessionRepository#compactEvents(String, List, List, long)}.
  *
  * <p>
  * LocalStack 3.5 does not enforce S3 {@code If-Match} conditional writes, so the 412-PreconditionFailed branch cannot
@@ -79,7 +79,7 @@ class S3SessionRepositoryCasTest {
     }
 
     @Test
-    void testReplaceEventsReturnsFalseWhenPutThrows412() {
+    void testCompactEventsReturnsFalseWhenPutThrows412() {
         when(s3Client.getObjectAsBytes(any(GetObjectRequest.class)))
             .thenReturn(ResponseBytes.fromByteArray(
                 GetObjectResponse.builder()
@@ -98,13 +98,13 @@ class S3SessionRepositoryCasTest {
             .message(new UserMessage("x"))
             .build());
 
-        boolean result = repository.replaceEvents(SESSION_ID, events, VERSION);
+        boolean result = repository.compactEvents(SESSION_ID, List.of(), events, VERSION);
 
         assertFalse(result);
     }
 
     @Test
-    void testReplaceEventsReturnsTrueWhenPutSucceeds() {
+    void testCompactEventsReturnsTrueWhenPutSucceeds() {
         when(s3Client.getObjectAsBytes(any(GetObjectRequest.class)))
             .thenReturn(ResponseBytes.fromByteArray(
                 GetObjectResponse.builder()
@@ -121,13 +121,13 @@ class S3SessionRepositoryCasTest {
             .message(new UserMessage("x"))
             .build());
 
-        boolean result = repository.replaceEvents(SESSION_ID, events, VERSION);
+        boolean result = repository.compactEvents(SESSION_ID, List.of(), events, VERSION);
 
         assertTrue(result);
     }
 
     @Test
-    void testReplaceEventsReturnsFalseOnStaleVersionWithoutInvokingPut() {
+    void testCompactEventsReturnsFalseOnStaleVersionWithoutInvokingPut() {
         when(s3Client.getObjectAsBytes(any(GetObjectRequest.class)))
             .thenReturn(ResponseBytes.fromByteArray(
                 GetObjectResponse.builder()
@@ -142,7 +142,7 @@ class S3SessionRepositoryCasTest {
 
         long staleVersion = VERSION - 1L;
 
-        boolean result = repository.replaceEvents(SESSION_ID, events, staleVersion);
+        boolean result = repository.compactEvents(SESSION_ID, List.of(), events, staleVersion);
 
         assertFalse(result);
 

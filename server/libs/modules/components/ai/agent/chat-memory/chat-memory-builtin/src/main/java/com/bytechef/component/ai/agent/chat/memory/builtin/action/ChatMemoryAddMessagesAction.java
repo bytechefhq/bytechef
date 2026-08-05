@@ -35,6 +35,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Parameters;
 import java.time.Instant;
 import java.util.Map;
+import java.util.Optional;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.UserMessage;
@@ -93,7 +94,7 @@ public class ChatMemoryAddMessagesAction {
         String conversationId = inputParameters.getRequiredString(CONVERSATION_ID);
         Object[] messagesArray = inputParameters.getRequiredArray(MESSAGES);
 
-        if (sessionRepository.findById(conversationId)
+        if (Optional.ofNullable(sessionRepository.findById(conversationId))
             .isEmpty()) {
 
             sessionRepository.save(Session.builder()

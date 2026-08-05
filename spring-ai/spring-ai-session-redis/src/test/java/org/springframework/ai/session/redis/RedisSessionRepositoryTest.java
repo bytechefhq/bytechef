@@ -19,6 +19,8 @@ package org.springframework.ai.session.redis;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -30,6 +32,7 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.messages.AssistantMessage;
@@ -143,10 +146,10 @@ class RedisSessionRepositoryTest {
     void testSaveAndFindById() {
         newSession("s-find");
 
-        assertTrue(repository.findById("s-find")
-            .isPresent());
-        assertEquals("user-1", repository.findById("s-find")
-            .get()
+        Session foundSession = repository.findById("s-find");
+
+        assertNotNull(foundSession);
+        assertEquals("user-1", Objects.requireNonNull(foundSession)
             .userId());
     }
 
@@ -163,8 +166,11 @@ class RedisSessionRepositoryTest {
             .build());
 
         assertEquals(1L, repository.getEventVersion("s-resave"));
-        assertEquals("user-2", repository.findById("s-resave")
-            .get()
+
+        Session resavedSession = repository.findById("s-resave");
+
+        assertNotNull(resavedSession);
+        assertEquals("user-2", Objects.requireNonNull(resavedSession)
             .userId());
         assertEquals(1, repository.findEvents("s-resave", EventFilter.all())
             .size());
@@ -261,24 +267,27 @@ class RedisSessionRepositoryTest {
     }
 
     @Test
-    void testReplaceEventsCasSucceedsThenFailsOnStaleVersion() {
+    void testCompactEventsCasSucceedsThenFailsOnStaleVersion() {
         newSession("s-cas");
 
         repository.appendEvent(event("s-cas", "v1"));
 
         long version = repository.getEventVersion("s-cas");
 
-        assertTrue(repository.replaceEvents("s-cas", List.of(event("s-cas", "compacted")), version));
-        assertFalse(repository.replaceEvents("s-cas", List.of(event("s-cas", "again")), version));
+        assertTrue(repository.compactEvents("s-cas", List.of(), List.of(event("s-cas", "compacted")), version));
+        assertFalse(repository.compactEvents("s-cas", List.of(), List.of(event("s-cas", "again")), version));
     }
 
     @Test
-    void testReplaceEventsWithoutVersionOverwritesUnconditionally() {
+    void testCompactEventsAtCurrentVersionReplacesEvents() {
         newSession("s-replace");
 
         repository.appendEvent(event("s-replace", "old"));
 
-        repository.replaceEvents("s-replace", List.of(event("s-replace", "new")));
+        long currentVersion = repository.getEventVersion("s-replace");
+
+        assertTrue(
+            repository.compactEvents("s-replace", List.of(), List.of(event("s-replace", "new")), currentVersion));
 
         List<SessionEvent> events = repository.findEvents("s-replace", EventFilter.all());
 
@@ -297,8 +306,7 @@ class RedisSessionRepositoryTest {
 
         repository.delete("s-del");
 
-        assertTrue(repository.findById("s-del")
-            .isEmpty());
+        assertNull(repository.findById("s-del"));
     }
 
     @Test

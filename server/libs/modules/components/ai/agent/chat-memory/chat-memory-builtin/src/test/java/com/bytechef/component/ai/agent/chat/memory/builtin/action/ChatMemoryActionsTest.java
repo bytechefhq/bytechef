@@ -17,6 +17,7 @@
 package com.bytechef.component.ai.agent.chat.memory.builtin.action;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.bytechef.component.test.definition.MockParametersFactory;
@@ -123,8 +124,7 @@ class ChatMemoryActionsTest {
             MockParametersFactory.create(Map.of("conversationId", "conversation-5")), sessionRepository);
 
         assertEquals(true, deletedResult.get("deleted"));
-        assertTrue(sessionRepository.findById("conversation-5")
-            .isEmpty());
+        assertNull(sessionRepository.findById("conversation-5"));
 
         Map<String, Object> missingResult = (Map<String, Object>) ChatMemoryDeleteAction.perform(
             MockParametersFactory.create(Map.of("conversationId", "conversation-5")), sessionRepository);

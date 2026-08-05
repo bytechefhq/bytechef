@@ -21,10 +21,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import org.jspecify.annotations.Nullable;
-import org.springframework.ai.chat.messages.MessageType;
 import org.springframework.ai.session.EventFilter;
 import org.springframework.ai.session.Session;
 import org.springframework.ai.session.SessionEvent;
@@ -40,7 +37,7 @@ import tools.jackson.databind.json.JsonMapper;
  * <p>
  * Each session is stored as a single JSON string at {@code {keyPrefix}{sessionId}}. The document contains the session
  * metadata, a monotonically increasing version counter, and the full ordered event log — the same document shape as the
- * S3 variant. Compare-and-swap semantics for {@link #replaceEvents(String, List, long)} (and the internal
+ * S3 variant. Compare-and-swap semantics for {@link #compactEvents(String, List, List, long)} (and the internal
  * read-modify-write loops) are enforced atomically on the Redis server via a Lua script that compares the stored
  * document's version field before overwriting.
  *
@@ -105,12 +102,13 @@ public final class RedisSessionRepository implements SessionRepository {
     }
 
     @Override
-    public Optional<Session> findById(String sessionId) {
+    @Nullable
+    public Session findById(String sessionId) {
         Assert.hasText(sessionId, "sessionId must not be null or empty");
 
         StoredSession document = load(sessionId);
 
-        return document == null ? Optional.empty() : Optional.of(document.toSession());
+        return document == null ? null : document.toSession();
     }
 
     @Override
@@ -177,22 +175,13 @@ public final class RedisSessionRepository implements SessionRepository {
     }
 
     @Override
-    public void replaceEvents(String sessionId, List<SessionEvent> events) {
+    public boolean compactEvents(
+        String sessionId, List<SessionEvent> archivedEvents, List<SessionEvent> retainedEvents,
+        long expectedVersion) {
+
         Assert.hasText(sessionId, "sessionId must not be null or empty");
-        Assert.notNull(events, "events must not be null");
-
-        StoredSession document = requireSession(sessionId);
-
-        StoredSession next = withEvents(
-            document, StoredSession.toStoredEvents(events, jsonMapper), document.version() + 1);
-
-        put(next);
-    }
-
-    @Override
-    public boolean replaceEvents(String sessionId, List<SessionEvent> events, long expectedVersion) {
-        Assert.hasText(sessionId, "sessionId must not be null or empty");
-        Assert.notNull(events, "events must not be null");
+        Assert.notNull(archivedEvents, "archivedEvents must not be null");
+        Assert.notNull(retainedEvents, "retainedEvents must not be null");
 
         StoredSession document = requireSession(sessionId);
 
@@ -200,8 +189,27 @@ public final class RedisSessionRepository implements SessionRepository {
             return false;
         }
 
+        // Mirror the reference repositories: previously-archived events keep their position as the oldest
+        // prefix, the newly-compacted events follow marked archived, and the retained list becomes the new
+        // active window. Any other previously-active event (e.g. a superseded synthetic summary) is dropped.
+        List<SessionEvent> newEvents = new ArrayList<>();
+
+        for (StoredEvent storedEvent : document.events()) {
+            SessionEvent event = storedEvent.toEvent(jsonMapper);
+
+            if (event.isArchived()) {
+                newEvents.add(event);
+            }
+        }
+
+        for (SessionEvent archivedEvent : archivedEvents) {
+            newEvents.add(archivedEvent.asArchived());
+        }
+
+        newEvents.addAll(retainedEvents);
+
         StoredSession next = withEvents(
-            document, StoredSession.toStoredEvents(events, jsonMapper), document.version() + 1);
+            document, StoredSession.toStoredEvents(newEvents, jsonMapper), document.version() + 1);
 
         return tryPut(next, document.version());
     }
@@ -239,7 +247,7 @@ public final class RedisSessionRepository implements SessionRepository {
         List<SessionEvent> matched = new ArrayList<>();
 
         for (SessionEvent event : events) {
-            if (matches(event, filter)) {
+            if (filter.matches(event)) {
                 matched.add(event);
             }
         }
@@ -268,61 +276,6 @@ public final class RedisSessionRepository implements SessionRepository {
         }
 
         return Collections.unmodifiableList(matched);
-    }
-
-    private boolean matches(SessionEvent event, EventFilter filter) {
-        Instant timestamp = event.getTimestamp();
-
-        Instant from = filter.from();
-
-        if (from != null && timestamp.isBefore(from)) {
-            return false;
-        }
-
-        Instant to = filter.to();
-
-        if (to != null && timestamp.isAfter(to)) {
-            return false;
-        }
-
-        Set<MessageType> messageTypes = filter.messageTypes();
-
-        if (messageTypes != null) {
-            MessageType type = event.getMessage()
-                .getMessageType();
-
-            if (!messageTypes.contains(type)) {
-                return false;
-            }
-        }
-
-        if (filter.excludeSynthetic() && event.isSynthetic()) {
-            return false;
-        }
-
-        String branch = filter.branch();
-
-        if (branch != null && !branchVisible(event.getBranch(), branch)) {
-            return false;
-        }
-
-        String keyword = filter.keyword();
-
-        if (keyword != null) {
-            String text = event.getMessage()
-                .getText();
-
-            if (text == null || !text.toLowerCase()
-                .contains(keyword)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    private boolean branchVisible(@Nullable String eventBranch, String filterBranch) {
-        return eventBranch == null || eventBranch.equals(filterBranch) || filterBranch.startsWith(eventBranch + ".");
     }
 
     private StoredSession withEvents(StoredSession document, List<StoredEvent> events, long version) {

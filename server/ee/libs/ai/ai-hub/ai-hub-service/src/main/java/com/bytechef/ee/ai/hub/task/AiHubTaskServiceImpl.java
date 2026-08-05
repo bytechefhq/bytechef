@@ -804,6 +804,12 @@ public class AiHubTaskServiceImpl implements AiHubTaskService {
 
         String threadId = task.getThreadId();
 
+        // Read the version BEFORE the events (the safe ordering for compactEvents' CAS): the version is then
+        // guaranteed to be <= the version of the events read next, so a concurrent append between the two reads
+        // fails the CAS instead of silently losing the appended event.
+        long eventVersion = sessionMemory.sessionRepository()
+            .getEventVersion(threadId);
+
         List<SessionEvent> allEvents = sessionMemory.sessionService()
             .getEvents(threadId);
 
@@ -831,8 +837,15 @@ public class AiHubTaskServiceImpl implements AiHubTaskService {
 
         int deleted = allEvents.size() - cutoffEventIndex;
 
-        sessionMemory.sessionRepository()
-            .replaceEvents(threadId, new ArrayList<>(allEvents.subList(0, cutoffEventIndex)));
+        // Truncation keeps the prefix as the active window and archives nothing — dropped events are gone, not
+        // compacted. A false return means a concurrent writer appended mid-truncate; surface it as a conflict
+        // rather than silently discarding whichever side lost.
+        boolean truncated = sessionMemory.sessionRepository()
+            .compactEvents(threadId, List.of(), new ArrayList<>(allEvents.subList(0, cutoffEventIndex)), eventVersion);
+
+        if (!truncated) {
+            throw new ConflictException("The conversation changed while truncating; retry");
+        }
 
         // Bump the task's updatedAt so the sidebar re-sorts to the top — same convention every other
         // mutation here uses. messageCount is not authoritative for chat-memory rows (it tracks user-perceived

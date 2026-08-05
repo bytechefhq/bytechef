@@ -21,10 +21,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import org.jspecify.annotations.Nullable;
-import org.springframework.ai.chat.messages.MessageType;
 import org.springframework.ai.session.EventFilter;
 import org.springframework.ai.session.Session;
 import org.springframework.ai.session.SessionEvent;
@@ -50,9 +47,9 @@ import tools.jackson.databind.json.JsonMapper;
  * <p>
  * Each session is stored as a single JSON object at {@code {keyPrefix}{sessionId}.json}. The object contains the
  * session metadata, a monotonically increasing version counter, and the full ordered event log. Compare-and-swap
- * semantics for {@link #replaceEvents(String, List, long)} are enforced via the stored version field; S3 conditional
- * writes (If-Match ETag) are attempted first for stronger isolation, but the in-document version check is the
- * authoritative guard.
+ * semantics for {@link #compactEvents(String, List, List, long)} are enforced via the stored version field; S3
+ * conditional writes (If-Match ETag) are attempted first for stronger isolation, but the in-document version check is
+ * the authoritative guard.
  *
  * @author Ivica Cardic
  */
@@ -94,12 +91,13 @@ public final class S3SessionRepository implements SessionRepository {
     }
 
     @Override
-    public Optional<Session> findById(String sessionId) {
+    @Nullable
+    public Session findById(String sessionId) {
         Assert.hasText(sessionId, "sessionId must not be null or empty");
 
         Loaded loaded = load(sessionId);
 
-        return loaded == null ? Optional.empty() : Optional.of(loaded.document.toSession());
+        return loaded == null ? null : loaded.document.toSession();
     }
 
     @Override
@@ -169,22 +167,13 @@ public final class S3SessionRepository implements SessionRepository {
     }
 
     @Override
-    public void replaceEvents(String sessionId, List<SessionEvent> events) {
+    public boolean compactEvents(
+        String sessionId, List<SessionEvent> archivedEvents, List<SessionEvent> retainedEvents,
+        long expectedVersion) {
+
         Assert.hasText(sessionId, "sessionId must not be null or empty");
-        Assert.notNull(events, "events must not be null");
-
-        Loaded loaded = requireSession(sessionId);
-
-        StoredSession next = withEvents(
-            loaded.document, StoredSession.toStoredEvents(events, jsonMapper), loaded.document.version() + 1);
-
-        put(next, null);
-    }
-
-    @Override
-    public boolean replaceEvents(String sessionId, List<SessionEvent> events, long expectedVersion) {
-        Assert.hasText(sessionId, "sessionId must not be null or empty");
-        Assert.notNull(events, "events must not be null");
+        Assert.notNull(archivedEvents, "archivedEvents must not be null");
+        Assert.notNull(retainedEvents, "retainedEvents must not be null");
 
         Loaded loaded = requireSession(sessionId);
 
@@ -192,8 +181,27 @@ public final class S3SessionRepository implements SessionRepository {
             return false;
         }
 
+        // Mirror the reference repositories: previously-archived events keep their position as the oldest
+        // prefix, the newly-compacted events follow marked archived, and the retained list becomes the new
+        // active window. Any other previously-active event (e.g. a superseded synthetic summary) is dropped.
+        List<SessionEvent> newEvents = new ArrayList<>();
+
+        for (StoredEvent storedEvent : loaded.document.events()) {
+            SessionEvent event = storedEvent.toEvent(jsonMapper);
+
+            if (event.isArchived()) {
+                newEvents.add(event);
+            }
+        }
+
+        for (SessionEvent archivedEvent : archivedEvents) {
+            newEvents.add(archivedEvent.asArchived());
+        }
+
+        newEvents.addAll(retainedEvents);
+
         StoredSession next = withEvents(
-            loaded.document, StoredSession.toStoredEvents(events, jsonMapper), loaded.document.version() + 1);
+            loaded.document, StoredSession.toStoredEvents(newEvents, jsonMapper), loaded.document.version() + 1);
 
         return tryPut(next, loaded.etag);
     }
@@ -231,7 +239,7 @@ public final class S3SessionRepository implements SessionRepository {
         List<SessionEvent> matched = new ArrayList<>();
 
         for (SessionEvent event : events) {
-            if (matches(event, filter)) {
+            if (filter.matches(event)) {
                 matched.add(event);
             }
         }
@@ -260,61 +268,6 @@ public final class S3SessionRepository implements SessionRepository {
         }
 
         return Collections.unmodifiableList(matched);
-    }
-
-    private boolean matches(SessionEvent event, EventFilter filter) {
-        Instant timestamp = event.getTimestamp();
-
-        Instant from = filter.from();
-
-        if (from != null && timestamp.isBefore(from)) {
-            return false;
-        }
-
-        Instant to = filter.to();
-
-        if (to != null && timestamp.isAfter(to)) {
-            return false;
-        }
-
-        Set<MessageType> messageTypes = filter.messageTypes();
-
-        if (messageTypes != null) {
-            MessageType type = event.getMessage()
-                .getMessageType();
-
-            if (!messageTypes.contains(type)) {
-                return false;
-            }
-        }
-
-        if (filter.excludeSynthetic() && event.isSynthetic()) {
-            return false;
-        }
-
-        String branch = filter.branch();
-
-        if (branch != null && !branchVisible(event.getBranch(), branch)) {
-            return false;
-        }
-
-        String keyword = filter.keyword();
-
-        if (keyword != null) {
-            String text = event.getMessage()
-                .getText();
-
-            if (text == null || !text.toLowerCase()
-                .contains(keyword)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    private boolean branchVisible(@Nullable String eventBranch, String filterBranch) {
-        return eventBranch == null || eventBranch.equals(filterBranch) || filterBranch.startsWith(eventBranch + ".");
     }
 
     private StoredSession withEvents(StoredSession document, List<StoredEvent> events, long version) {

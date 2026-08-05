@@ -11,7 +11,7 @@ dependencies {
 
     compileOnly("org.jspecify:jspecify")
 
-    implementation(libs.findLibrary("org.springaicommunity.spring.ai.session.management").get())
+    implementation(libs.findLibrary("org.springaicommunity.spring.ai.session").get())
     implementation("org.springframework.ai:spring-ai-model")
     implementation("redis.clients:jedis")
     implementation("tools.jackson.core:jackson-databind")

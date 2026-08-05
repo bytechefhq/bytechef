@@ -1,5 +1,5 @@
 dependencies {
-    implementation(libs.org.springaicommunity.spring.ai.session.management)
+    implementation(libs.org.springaicommunity.spring.ai.session)
     implementation("jakarta.annotation:jakarta.annotation-api")
     implementation("org.slf4j:slf4j-api")
     implementation("org.springframework:spring-jdbc")

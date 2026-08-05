@@ -28,6 +28,7 @@ import com.bytechef.component.definition.ActionDefinition.PerformFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import java.util.Map;
+import java.util.Optional;
 import org.springframework.ai.session.SessionRepository;
 
 /**
@@ -61,7 +62,7 @@ public class ChatMemoryDeleteAction {
     protected static Object perform(Parameters inputParameters, SessionRepository sessionRepository) {
         String conversationId = inputParameters.getRequiredString(CONVERSATION_ID);
 
-        boolean existed = sessionRepository.findById(conversationId)
+        boolean existed = Optional.ofNullable(sessionRepository.findById(conversationId))
             .isPresent();
 
         sessionRepository.delete(conversationId);

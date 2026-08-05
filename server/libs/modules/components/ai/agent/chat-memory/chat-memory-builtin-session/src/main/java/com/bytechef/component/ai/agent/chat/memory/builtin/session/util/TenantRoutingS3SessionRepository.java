@@ -23,7 +23,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 import org.springframework.ai.session.EventFilter;
 import org.springframework.ai.session.Session;
 import org.springframework.ai.session.SessionEvent;
@@ -70,7 +70,8 @@ public final class TenantRoutingS3SessionRepository implements SessionRepository
     }
 
     @Override
-    public Optional<Session> findById(String sessionId) {
+    @Nullable
+    public Session findById(String sessionId) {
         return resolve().findById(sessionId);
     }
 
@@ -95,13 +96,11 @@ public final class TenantRoutingS3SessionRepository implements SessionRepository
     }
 
     @Override
-    public void replaceEvents(String sessionId, List<SessionEvent> events) {
-        resolve().replaceEvents(sessionId, events);
-    }
+    public boolean compactEvents(
+        String sessionId, List<SessionEvent> archivedEvents, List<SessionEvent> retainedEvents,
+        long expectedVersion) {
 
-    @Override
-    public boolean replaceEvents(String sessionId, List<SessionEvent> events, long expectedVersion) {
-        return resolve().replaceEvents(sessionId, events, expectedVersion);
+        return resolve().compactEvents(sessionId, archivedEvents, retainedEvents, expectedVersion);
     }
 
     @Override

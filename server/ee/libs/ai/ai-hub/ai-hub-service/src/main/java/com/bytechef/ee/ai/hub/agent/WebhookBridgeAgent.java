@@ -830,7 +830,7 @@ public class WebhookBridgeAgent extends LocalAgent {
         try {
             SessionRepository sessionRepository = sessionMemory.sessionRepository();
 
-            if (sessionRepository.findById(threadId)
+            if (Optional.ofNullable(sessionRepository.findById(threadId))
                 .isEmpty()) {
 
                 sessionRepository.save(Session.builder()

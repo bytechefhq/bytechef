@@ -70,7 +70,7 @@ record StoredSession(
 
     record StoredEvent(
         String id, String sessionId, long timestampEpochMilli, String messageType, String messageContent,
-        @Nullable String messageData, boolean synthetic, @Nullable String branch,
+        @Nullable String messageData, boolean synthetic, boolean archived, @Nullable String branch,
         Map<String, Object> metadata) {
 
         private static final TypeReference<List<ToolCall>> TOOL_CALL_LIST_TYPE =
@@ -94,7 +94,7 @@ record StoredSession(
                     .toEpochMilli(),
                 message.getMessageType()
                     .name(),
-                message.getText(), messageData, event.isSynthetic(),
+                message.getText(), messageData, event.isSynthetic(), event.isArchived(),
                 event.getBranch(), new HashMap<>(event.getMetadata()));
         }
 
@@ -111,6 +111,7 @@ record StoredSession(
                 .timestamp(Instant.ofEpochMilli(timestampEpochMilli))
                 .message(toMessage(jsonMapper))
                 .branch(branch)
+                .archived(archived)
                 .metadata(mergedMetadata)
                 .build();
         }

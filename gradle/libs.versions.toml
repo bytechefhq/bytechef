@@ -84,8 +84,8 @@ org-springaicommunity-mcp-authorization-server = { module = "org.springaicommuni
 org-springaicommunity-mcp-server-security = { module = "org.springaicommunity:mcp-server-security", version.ref = "springaicommunity-mcp-security" }
 org-springaicommunity-spring-ai-agent-utils = { module = "org.springaicommunity:spring-ai-agent-utils", version.ref = "springaicommunity-agent-utils" }
 org-springaicommunity-spring-ai-agent-utils-common = { module = "org.springaicommunity:spring-ai-agent-utils-common", version.ref = "springaicommunity-agent-utils" }
+org-springaicommunity-spring-ai-session = { module = "org.springaicommunity:spring-ai-session", version.ref = "springaicommunity-spring-ai-session" }
 org-springaicommunity-spring-ai-session-jdbc = { module = "org.springaicommunity:spring-ai-session-jdbc", version.ref = "springaicommunity-spring-ai-session" }
-org-springaicommunity-spring-ai-session-management = "org.springaicommunity:spring-ai-session-management:0.5.0"
 org-springdoc-springdoc-openapi-starter-common = { module = "org.springdoc:springdoc-openapi-starter-common", version.ref = "org-springdoc" }
 org-springdoc-springdoc-openapi-starter-webmvc-ui = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "org-springdoc" }
 org-springframework-grpc-spring-grpc-server-spring-boot-starter = { module = "org.springframework.grpc:spring-grpc-server-spring-boot-starter", version.ref = "spring-grpc" }

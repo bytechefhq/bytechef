@@ -1,7 +1,7 @@
 dependencies {
     api("org.springframework.ai:spring-ai-client-chat")
     api("org.springframework.ai:spring-ai-rag")
-    api(libs.org.springaicommunity.spring.ai.session.management)
+    api(libs.org.springaicommunity.spring.ai.session)
     api(project(":server:libs:platform:platform-api"))
     api(project(":sdks:backend:java:component-api"))
     api(project(":server:libs:core:exception:exception-api"))
@@ -11,4 +11,6 @@ dependencies {
     implementation("org.springframework:spring-core")
     implementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
+
+    testImplementation("org.assertj:assertj-core")
 }

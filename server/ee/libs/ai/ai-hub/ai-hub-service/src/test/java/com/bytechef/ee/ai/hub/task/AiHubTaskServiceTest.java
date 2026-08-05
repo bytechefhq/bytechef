@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.lenient;
@@ -490,6 +491,7 @@ class AiHubTaskServiceTest {
             sessionEvent(org.springframework.ai.chat.messages.MessageType.USER, "three", Instant.ofEpochMilli(300)));
 
         when(sessionService.getEvents(THREAD_ID)).thenReturn(events);
+        when(sessionRepository.compactEvents(eq(THREAD_ID), eq(List.of()), any(), anyLong())).thenReturn(true);
 
         when(taskRepository.save(any(AiHubTask.class)))
             .thenAnswer(invocation -> invocation.getArgument(0));
@@ -503,7 +505,7 @@ class AiHubTaskServiceTest {
         ArgumentCaptor<List<org.springframework.ai.session.SessionEvent>> keptCaptor =
             ArgumentCaptor.forClass(List.class);
 
-        verify(sessionRepository).replaceEvents(eq(THREAD_ID), keptCaptor.capture());
+        verify(sessionRepository).compactEvents(eq(THREAD_ID), eq(List.of()), keptCaptor.capture(), eq(0L));
 
         assertThat(keptCaptor.getValue()).hasSize(1);
     }
@@ -531,7 +533,7 @@ class AiHubTaskServiceTest {
 
         // Nothing replaced and no save() either — the task row's updatedAt is preserved when nothing
         // changed, so the sidebar doesn't re-sort for an effectively-no-op call.
-        verify(sessionRepository, never()).replaceEvents(any(), any());
+        verify(sessionRepository, never()).compactEvents(any(), any(), any(), anyLong());
         verify(taskRepository, never()).save(any());
     }
 
