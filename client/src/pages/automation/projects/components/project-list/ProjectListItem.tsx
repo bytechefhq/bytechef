@@ -11,18 +11,11 @@ import {
 import {ButtonGroup} from '@/components/ui/button-group';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {ProjectGitConfiguration} from '@/ee/shared/middleware/automation/configuration';
-import {
-    usePullProjectFromGitMutation,
-    useUpdateProjectGitConfigurationMutation,
-} from '@/ee/shared/mutations/automation/projectGit.mutations';
-import {ProjectGitConfigurationKeys} from '@/ee/shared/mutations/automation/projectGit.queries';
 import ProjectDeploymentDialog from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialog';
 import useOpenSavedProjectDeployment from '@/pages/automation/project-deployments/hooks/useOpenSavedProjectDeployment';
 import ProjectDeploymentsSheet, {
     ProjectDeploymentsSheetStateI,
 } from '@/pages/automation/project/components/ProjectDeploymentsSheet';
-import ProjectGitConfigurationDialog from '@/pages/automation/project/components/ProjectGitConfigurationDialog';
 import {ProjectShareDialog} from '@/pages/automation/project/components/ProjectShareDialog';
 import ProjectDeploymentsButton from '@/pages/automation/project/components/project-header/components/ProjectDeploymentsButton';
 import {useConvertN8nToWorkflow} from '@/pages/automation/project/hooks/useConverterN8nToWorkflow';
@@ -34,6 +27,7 @@ import ProjectListItemPublishMenuItem from '@/pages/automation/projects/componen
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import EEVersion from '@/shared/edition/EEVersion';
+import {ProjectGitConfigurationI, getProjectGitApi} from '@/shared/edition/project-git/projectGitApi';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useHasEnabledAiProvider} from '@/shared/hooks/useHasEnabledAiProvider';
 import {Project, Tag} from '@/shared/middleware/automation/configuration';
@@ -64,7 +58,7 @@ import {
     UploadIcon,
     WorkflowIcon,
 } from 'lucide-react';
-import {MouseEvent, useCallback, useRef, useState} from 'react';
+import {MouseEvent, Suspense, lazy, useCallback, useRef, useState} from 'react';
 import {Link, useNavigate, useSearchParams} from 'react-router-dom';
 import {toast} from 'sonner';
 
@@ -73,9 +67,13 @@ import ProjectDialog from '../ProjectDialog';
 
 interface ProjectItemProps {
     project: Project;
-    projectGitConfiguration?: ProjectGitConfiguration;
+    projectGitConfiguration?: ProjectGitConfigurationI;
     remainingTags?: Tag[];
 }
+
+const ProjectGitConfigurationDialog = lazy(
+    () => import('@/ee/pages/automation/project/components/ProjectGitConfigurationDialog')
+);
 
 const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: ProjectItemProps) => {
     const [projectDeploymentsSheetState, setProjectDeploymentsSheetState] = useState<
@@ -179,7 +177,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
         },
     });
 
-    const pullProjectFromGitMutation = usePullProjectFromGitMutation({
+    const pullProjectFromGitMutation = getProjectGitApi().usePullProjectFromGitMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
 
@@ -187,13 +185,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
         },
     });
 
-    const updateProjectGitConfigurationMutation = useUpdateProjectGitConfigurationMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ProjectGitConfigurationKeys.projectGitConfigurations,
-            });
-        },
-    });
+    const updateProjectGitConfigurationMutation = getProjectGitApi().useUpdateProjectGitConfigurationMutation({});
 
     const updateProjectTagsMutation = useUpdateProjectTagsMutation({
         onSuccess: () => {
@@ -633,12 +625,16 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
             )}
 
             {showProjectGitConfigurationDialog && (
-                <ProjectGitConfigurationDialog
-                    onClose={() => setShowProjectGitConfigurationDialog(false)}
-                    onUpdateProjectGitConfigurationSubmit={handleUpdateProjectGitConfigurationSubmit}
-                    projectGitConfiguration={projectGitConfiguration}
-                    projectId={project.id!}
-                />
+                <EEVersion hidden={true}>
+                    <Suspense fallback={null}>
+                        <ProjectGitConfigurationDialog
+                            onClose={() => setShowProjectGitConfigurationDialog(false)}
+                            onUpdateProjectGitConfigurationSubmit={handleUpdateProjectGitConfigurationSubmit}
+                            projectGitConfiguration={projectGitConfiguration}
+                            projectId={project.id!}
+                        />
+                    </Suspense>
+                </EEVersion>
             )}
 
             {showProjectShareDialog && (
