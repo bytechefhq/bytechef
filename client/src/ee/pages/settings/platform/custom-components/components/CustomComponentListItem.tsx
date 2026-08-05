@@ -9,6 +9,7 @@ import CustomComponentDeleteAlertDialog from '@/ee/pages/settings/platform/custo
 import {
     CustomComponent,
     CustomComponentLanguage,
+    CustomComponentStatus,
     useCustomComponentDefinitionQuery,
     useDeleteCustomComponentMutation,
     useEnableCustomComponentMutation,
@@ -171,6 +172,23 @@ const CustomComponentListItem = ({customComponent}: CustomComponentItemProps) =>
                                     className="flex w-24 items-center justify-center"
                                     label={customComponent.language}
                                     styleType="secondary-filled"
+                                    weight="semibold"
+                                />
+                            )}
+                        </div>
+
+                        <div>
+                            {customComponent.status && (
+                                <Badge
+                                    className="flex w-24 items-center justify-center"
+                                    label={
+                                        customComponent.status === CustomComponentStatus.Draft ? 'Draft' : 'Published'
+                                    }
+                                    styleType={
+                                        customComponent.status === CustomComponentStatus.Draft
+                                            ? 'secondary-filled'
+                                            : 'success-filled'
+                                    }
                                     weight="semibold"
                                 />
                             )}

@@ -1,13 +1,11 @@
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
-import LoadingIcon from '@/components/LoadingIcon';
 import PageLoader from '@/components/PageLoader';
+import MonacoEditorWrapper from '@/shared/components/MonacoEditorWrapper';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {CodeWorkflowLanguage} from '@/shared/middleware/graphql';
-import {Suspense, lazy, useEffect, useRef, useState} from 'react';
-
-const MonacoEditorWrapper = lazy(() => import('@/shared/components/MonacoEditorWrapper'));
+import {useEffect, useRef, useState} from 'react';
 
 const MONACO_LANGUAGE_BY_CODE_WORKFLOW_LANGUAGE: Record<CodeWorkflowLanguage, string> = {
     [CodeWorkflowLanguage.Javascript]: 'javascript',
@@ -103,28 +101,20 @@ const CodeWorkflowSourceEditor = ({
                     <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
                         <div className="relative min-h-0 flex-1">
                             <div className="absolute inset-0">
-                                <Suspense
-                                    fallback={
-                                        <div className="flex items-center justify-center p-8">
-                                            <LoadingIcon />
-                                        </div>
-                                    }
-                                >
-                                    <MonacoEditorWrapper
-                                        defaultLanguage={monacoLanguage}
-                                        onChange={handleSourceChange}
-                                        onMount={() => {}}
-                                        options={{
-                                            automaticLayout: true,
-                                            folding: true,
-                                            lineNumbers: 'on',
-                                            minimap: {enabled: false},
-                                            scrollBeyondLastLine: false,
-                                            wordWrap: 'on',
-                                        }}
-                                        value={isSourceDirty ? latestSourceRef.current : (source ?? '')}
-                                    />
-                                </Suspense>
+                                <MonacoEditorWrapper
+                                    defaultLanguage={monacoLanguage}
+                                    onChange={handleSourceChange}
+                                    onMount={() => {}}
+                                    options={{
+                                        automaticLayout: true,
+                                        folding: true,
+                                        lineNumbers: 'on',
+                                        minimap: {enabled: false},
+                                        scrollBeyondLastLine: false,
+                                        wordWrap: 'on',
+                                    }}
+                                    value={isSourceDirty ? latestSourceRef.current : (source ?? '')}
+                                />
                             </div>
                         </div>
                     </div>

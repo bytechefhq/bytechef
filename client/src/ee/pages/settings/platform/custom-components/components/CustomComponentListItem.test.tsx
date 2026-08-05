@@ -1,5 +1,5 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
-import {CustomComponent, CustomComponentLanguage} from '@/shared/middleware/graphql';
+import {CustomComponent, CustomComponentLanguage, CustomComponentStatus} from '@/shared/middleware/graphql';
 import {fireEvent, render, resetAll, screen} from '@/shared/util/test-utils';
 import {MemoryRouter, Route, Routes} from 'react-router-dom';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
@@ -33,7 +33,10 @@ vi.mock('@/shared/middleware/graphql', async () => {
     };
 });
 
-const createCustomComponent = (language: CustomComponentLanguage): CustomComponent => ({
+const createCustomComponent = (
+    language: CustomComponentLanguage,
+    status: CustomComponentStatus = CustomComponentStatus.Draft
+): CustomComponent => ({
     componentVersion: 1,
     createdBy: null,
     createdDate: null,
@@ -45,6 +48,7 @@ const createCustomComponent = (language: CustomComponentLanguage): CustomCompone
     lastModifiedBy: null,
     lastModifiedDate: null,
     name: 'my-component',
+    status,
     title: 'My Component',
     version: 1,
 });
@@ -135,5 +139,29 @@ describe('CustomComponentListItem', () => {
         fireEvent.keyDown(rowElement!, {key: ' '});
 
         expect(hoisted.mockNavigate).toHaveBeenCalledWith('1');
+    });
+
+    it('renders a Draft badge for draft components and a Published badge otherwise', () => {
+        const draftCustomComponent = createCustomComponent(
+            CustomComponentLanguage.Javascript,
+            CustomComponentStatus.Draft
+        );
+
+        const {unmount} = renderListItem(draftCustomComponent);
+
+        expect(screen.getByText('Draft')).toBeInTheDocument();
+        expect(screen.queryByText('Published')).not.toBeInTheDocument();
+
+        unmount();
+
+        const publishedCustomComponent = createCustomComponent(
+            CustomComponentLanguage.Javascript,
+            CustomComponentStatus.Published
+        );
+
+        renderListItem(publishedCustomComponent);
+
+        expect(screen.getByText('Published')).toBeInTheDocument();
+        expect(screen.queryByText('Draft')).not.toBeInTheDocument();
     });
 });
