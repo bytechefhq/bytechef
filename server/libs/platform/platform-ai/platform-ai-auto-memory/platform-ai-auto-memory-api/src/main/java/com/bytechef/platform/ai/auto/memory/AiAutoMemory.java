@@ -45,7 +45,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @author Ivica Cardic
  */
 @Table("ai_auto_memory")
-public class AiAutoMemory {
+public final class AiAutoMemory {
 
     /**
      * Slugified-name format. Lowercase letters, digits, hyphens, and underscores; non-empty; max 64 chars.

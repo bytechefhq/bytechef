@@ -47,7 +47,7 @@ import org.jspecify.annotations.Nullable;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public class InMemoryTaskFileStorage implements TaskFileStorage {
+public final class InMemoryTaskFileStorage implements TaskFileStorage {
 
     private final Cache<String, Object> jobDataStorage = Caffeine.newBuilder()
         .expireAfterAccess(30, TimeUnit.MINUTES)

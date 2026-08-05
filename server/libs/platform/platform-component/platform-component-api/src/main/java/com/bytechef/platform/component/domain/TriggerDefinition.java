@@ -30,7 +30,7 @@ import org.jspecify.annotations.Nullable;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public class TriggerDefinition {
+public final class TriggerDefinition {
 
     protected boolean batch;
     protected String description;

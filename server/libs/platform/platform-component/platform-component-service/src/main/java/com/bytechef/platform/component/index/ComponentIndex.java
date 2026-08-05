@@ -133,67 +133,66 @@ public record ComponentIndex(List<Entry> entries) {
             componentDefinition.icon(entry.icon());
         }
 
-        if (entry.componentCategories() != null && !entry.componentCategories()
-            .isEmpty()) {
+        List<CategorySummary> componentCategories = entry.componentCategories();
 
+        if (componentCategories != null && !componentCategories.isEmpty()) {
             componentDefinition.categories(
-                entry.componentCategories()
+                componentCategories
                     .stream()
                     .map(category -> new ComponentCategory(category.name(), category.label()))
                     .toList());
         }
 
-        if (entry.tags() != null && !entry.tags()
-            .isEmpty()) {
+        List<String> tags = entry.tags();
 
-            componentDefinition.tags(entry.tags()
-                .toArray(String[]::new));
+        if (tags != null && !tags.isEmpty()) {
+            componentDefinition.tags(tags.toArray(String[]::new));
         }
 
-        if (entry.connection() != null) {
+        ConnectionSummary connectionSummary = entry.connection();
+
+        if (connectionSummary != null) {
             componentDefinition.connection(
                 connection()
-                    .version(entry.connection()
-                        .version())
-                    .authorizationRequired(entry.connection()
-                        .authorizationRequired()));
+                    .version(connectionSummary.version())
+                    .authorizationRequired(connectionSummary.authorizationRequired()));
         }
 
-        if (entry.actions() != null && !entry.actions()
-            .isEmpty()) {
+        List<ItemSummary> actions = entry.actions();
 
+        if (actions != null && !actions.isEmpty()) {
             componentDefinition.actions(
-                entry.actions()
+                actions
                     .stream()
                     .map(ComponentIndex::toStubActionDefinition)
                     .toList());
         }
 
-        if (entry.triggers() != null && !entry.triggers()
-            .isEmpty()) {
+        List<TriggerSummary> triggers = entry.triggers();
 
+        if (triggers != null && !triggers.isEmpty()) {
             componentDefinition.triggers(
-                entry.triggers()
+                triggers
                     .stream()
                     .map(ComponentIndex::toStubTriggerDefinition)
                     .toList());
         }
 
-        if (entry.clusterElements() != null && !entry.clusterElements()
-            .isEmpty()) {
+        List<ClusterElementSummary> clusterElements = entry.clusterElements();
 
+        if (clusterElements != null && !clusterElements.isEmpty()) {
             componentDefinition.clusterElements(
-                entry.clusterElements()
+                clusterElements
                     .stream()
                     .map(ComponentIndex::toStubClusterElementDefinition)
                     .toArray(ClusterElementDefinition<?>[]::new));
         }
 
-        if (entry.inputs() != null && !entry.inputs()
-            .isEmpty()) {
+        List<String> inputs = entry.inputs();
 
+        if (inputs != null && !inputs.isEmpty()) {
             componentDefinition.inputs(
-                entry.inputs()
+                inputs
                     .stream()
                     .map(ComponentDsl::propertyGroup)
                     .toArray(ModifiablePropertyGroup[]::new));

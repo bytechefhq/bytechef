@@ -128,14 +128,16 @@ public class TaskCoordinator {
 
         Map<String, ?> data = resumeJobEvent.getData();
 
-        if (resumeJobEvent.getTaskExecutionId() == null) {
+        Long taskExecutionId = resumeJobEvent.getTaskExecutionId();
+
+        if (taskExecutionId == null) {
             try {
                 jobExecutor.execute(job);
             } catch (Exception exception) {
                 handleJobExecutionException(job, exception);
             }
         } else {
-            TaskExecution taskExecution = taskExecutionService.getTaskExecution(resumeJobEvent.getTaskExecutionId());
+            TaskExecution taskExecution = taskExecutionService.getTaskExecution(taskExecutionId);
 
             if (data != null) {
                 Map<String, Object> jobMetadata = new HashMap<>(job.getMetadata());

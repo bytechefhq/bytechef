@@ -19,6 +19,7 @@ package com.bytechef.platform.workflow.task.dispatcher.domain;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.workflow.task.dispatcher.definition.Property.ControlType;
 import edu.umd.cs.findbugs.annotations.Nullable;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 
@@ -36,6 +37,7 @@ public abstract class ValueProperty<V> extends Property {
     protected ValueProperty() {
     }
 
+    @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
     public ValueProperty(
         com.bytechef.platform.workflow.task.dispatcher.definition.Property.ValueProperty<V> valueProperty) {
 

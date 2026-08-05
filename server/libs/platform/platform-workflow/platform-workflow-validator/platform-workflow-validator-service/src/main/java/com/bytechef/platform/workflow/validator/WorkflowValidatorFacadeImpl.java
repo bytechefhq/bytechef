@@ -209,8 +209,10 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
                 outputResponse = taskDispatcherDefinition.getOutputResponse();
             }
 
-            if (outputResponse != null && outputResponse.outputSchema() != null) {
-                return toPropertyInfo(outputResponse.outputSchema());
+            BaseProperty outputSchema = outputResponse == null ? null : outputResponse.outputSchema();
+
+            if (outputSchema != null) {
+                return toPropertyInfo(outputSchema);
             }
 
             return null;
@@ -282,8 +284,10 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
                 return null;
             }
 
-            if (outputResponse != null && outputResponse.outputSchema() != null) {
-                return toPropertyInfo(outputResponse.outputSchema());
+            BaseProperty outputSchema = outputResponse == null ? null : outputResponse.outputSchema();
+
+            if (outputSchema != null) {
+                return toPropertyInfo(outputSchema);
             }
         } catch (Exception e) {
             // Best-effort: connection-needed or otherwise unresolvable dynamic output → fall back to the static path.

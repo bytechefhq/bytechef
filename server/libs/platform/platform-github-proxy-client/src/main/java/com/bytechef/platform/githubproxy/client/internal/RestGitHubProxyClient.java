@@ -31,7 +31,7 @@ import org.springframework.web.util.UriBuilder;
 /**
  * @author Ivica Cardic
  */
-public class RestGitHubProxyClient implements GitHubProxyClient {
+public final class RestGitHubProxyClient implements GitHubProxyClient {
 
     private final RestClient restClient;
 

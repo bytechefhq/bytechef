@@ -79,10 +79,9 @@ public class SseStreamBridgeRegistry {
             }
 
             case SseStreamEvent.EVENT_TYPE_ERROR -> {
-                String errorMessage = sseStreamEvent.getPayload() != null
-                    ? sseStreamEvent.getPayload()
-                        .toString()
-                    : "Unknown error";
+                Object payload = sseStreamEvent.getPayload();
+
+                String errorMessage = payload != null ? payload.toString() : "Unknown error";
 
                 for (SseStreamBridge sseStreamBridge : sseStreamBridges) {
                     try {

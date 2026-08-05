@@ -361,7 +361,7 @@ public class TaskWorker {
         return DEFAULT_TIME_OUT;
     }
 
-    private static class TaskExecutionFuture<T> implements Future<T> {
+    private static final class TaskExecutionFuture<T> implements Future<T> {
 
         private final Future<T> future;
         private final TaskExecution taskExecution;

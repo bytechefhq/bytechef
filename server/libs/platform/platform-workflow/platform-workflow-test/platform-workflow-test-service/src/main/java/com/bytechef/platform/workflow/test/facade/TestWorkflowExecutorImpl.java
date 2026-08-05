@@ -225,8 +225,10 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
         List<TaskExecutionDTO> taskExecutionDTOs = CollectionUtils.map(
             taskExecutionService.getJobTaskExecutions(jobId),
             taskExecution -> {
+                long taskExecutionId = Validate.notNull(taskExecution.getId(), "id");
+
                 Map<String, ?> context = taskFileStorage.readContextValue(
-                    contextService.peek(taskExecution.getId(), Context.Classname.TASK_EXECUTION));
+                    contextService.peek(taskExecutionId, Context.Classname.TASK_EXECUTION));
 
                 DefinitionResult definitionResult = getDefinition(taskExecution.getType());
                 WorkflowTask workflowTask = taskExecution.getWorkflowTask();
@@ -250,7 +252,7 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
 
         return new JobDTO(
             job, CollectionUtils.asMap(job.getOutputs(), taskFileStorage::readJobOutputs),
-            getJobTaskExecutions(job.getId()));
+            getJobTaskExecutions(Validate.notNull(job.getId(), "id")));
     }
 
     private JobDTO execute(JobParametersDTO jobParametersDTO) {
@@ -385,7 +387,7 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
                 .map(WorkflowTestConfiguration::getInputs)
                 .orElse(Map.of());
 
-            Object sampleOutput = workflowNodeOutputDTO.getSampleOutput();
+            Object sampleOutput = workflowNodeOutputDTO == null ? null : workflowNodeOutputDTO.getSampleOutput();
 
             if (sampleOutput == null) {
                 sampleOutput = Map.of();

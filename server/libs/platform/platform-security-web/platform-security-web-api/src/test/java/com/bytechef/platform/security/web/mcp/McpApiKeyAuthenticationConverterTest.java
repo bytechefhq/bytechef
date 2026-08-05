@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import com.bytechef.platform.configuration.domain.Environment;
+import java.util.Objects;
 import org.junit.jupiter.api.Test;
 import org.springaicommunity.mcp.security.server.apikey.authentication.ApiKeyAuthenticationToken;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -39,8 +40,7 @@ class McpApiKeyAuthenticationConverterTest {
 
         mockHttpServletRequest.addHeader("Authorization", "Bearer api-secret");
 
-        ApiKeyAuthenticationToken apiKeyAuthenticationToken =
-            (ApiKeyAuthenticationToken) mcpApiKeyAuthenticationConverter.convert(mockHttpServletRequest);
+        ApiKeyAuthenticationToken apiKeyAuthenticationToken = convertToApiKeyToken(mockHttpServletRequest);
 
         McpApiKeyCredentials mcpApiKeyCredentials =
             (McpApiKeyCredentials) apiKeyAuthenticationToken.getCredentials();
@@ -59,8 +59,7 @@ class McpApiKeyAuthenticationConverterTest {
         mockHttpServletRequest.addHeader("Authorization", "Bearer api-secret");
         mockHttpServletRequest.addHeader("X-ENVIRONMENT", "staging");
 
-        ApiKeyAuthenticationToken apiKeyAuthenticationToken =
-            (ApiKeyAuthenticationToken) mcpApiKeyAuthenticationConverter.convert(mockHttpServletRequest);
+        ApiKeyAuthenticationToken apiKeyAuthenticationToken = convertToApiKeyToken(mockHttpServletRequest);
 
         McpApiKeyCredentials mcpApiKeyCredentials =
             (McpApiKeyCredentials) apiKeyAuthenticationToken.getCredentials();
@@ -72,8 +71,7 @@ class McpApiKeyAuthenticationConverterTest {
     void testConvertWithoutAuthorizationHeaderProducesNullSecretToken() {
         MockHttpServletRequest mockHttpServletRequest = getMockHttpServletRequest();
 
-        ApiKeyAuthenticationToken apiKeyAuthenticationToken =
-            (ApiKeyAuthenticationToken) mcpApiKeyAuthenticationConverter.convert(mockHttpServletRequest);
+        ApiKeyAuthenticationToken apiKeyAuthenticationToken = convertToApiKeyToken(mockHttpServletRequest);
 
         McpApiKeyCredentials mcpApiKeyCredentials =
             (McpApiKeyCredentials) apiKeyAuthenticationToken.getCredentials();
@@ -88,8 +86,7 @@ class McpApiKeyAuthenticationConverterTest {
 
         mockHttpServletRequest.addHeader("Authorization", "Basic api-secret");
 
-        ApiKeyAuthenticationToken apiKeyAuthenticationToken =
-            (ApiKeyAuthenticationToken) mcpApiKeyAuthenticationConverter.convert(mockHttpServletRequest);
+        ApiKeyAuthenticationToken apiKeyAuthenticationToken = convertToApiKeyToken(mockHttpServletRequest);
 
         McpApiKeyCredentials mcpApiKeyCredentials =
             (McpApiKeyCredentials) apiKeyAuthenticationToken.getCredentials();
@@ -107,6 +104,11 @@ class McpApiKeyAuthenticationConverterTest {
 
         assertThatExceptionOfType(BadCredentialsException.class)
             .isThrownBy(() -> mcpApiKeyAuthenticationConverter.convert(mockHttpServletRequest));
+    }
+
+    private ApiKeyAuthenticationToken convertToApiKeyToken(MockHttpServletRequest mockHttpServletRequest) {
+        return (ApiKeyAuthenticationToken) Objects.requireNonNull(
+            mcpApiKeyAuthenticationConverter.convert(mockHttpServletRequest), "authentication is required");
     }
 
     private MockHttpServletRequest getMockHttpServletRequest() {

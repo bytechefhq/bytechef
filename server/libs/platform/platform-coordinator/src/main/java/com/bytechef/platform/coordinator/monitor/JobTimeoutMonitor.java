@@ -119,10 +119,16 @@ public class JobTimeoutMonitor {
         }
 
         for (Job job : longRunningJobs) {
+            Long jobId = job.getId();
+
+            if (jobId == null) {
+                continue;
+            }
+
             try {
-                timeOutJob(job.getId(), cutoff, timeout);
+                timeOutJob(jobId, cutoff, timeout);
             } catch (RuntimeException exception) {
-                log.warn("Failed to time out job {}", job.getId(), exception);
+                log.warn("Failed to time out job {}", jobId, exception);
             }
         }
     }

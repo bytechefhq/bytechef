@@ -639,11 +639,11 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         Map<String, ?> dynamicPropertyTypesMap, BaseProperty property, boolean removeParameters,
         Map<String, ?> previousOutputs) {
 
-        if (property.getDisplayCondition() == null) {
+        String displayCondition = property.getDisplayCondition();
+
+        if (displayCondition == null) {
             return;
         }
-
-        String displayCondition = property.getDisplayCondition();
 
         if (operationType == WorkflowNodeStructure.OperationType.CLUSTER_ELEMENT ||
             operationType == WorkflowNodeStructure.OperationType.TASK ||

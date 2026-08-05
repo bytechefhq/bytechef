@@ -26,7 +26,7 @@ import org.springframework.web.client.RestClient;
 /**
  * @author Ivica Cardic
  */
-public class RestWorkflowTemplateProxyClient implements WorkflowTemplateProxyClient {
+public final class RestWorkflowTemplateProxyClient implements WorkflowTemplateProxyClient {
 
     private final RestClient restClient;
 

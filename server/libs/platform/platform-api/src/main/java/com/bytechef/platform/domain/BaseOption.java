@@ -17,6 +17,7 @@
 package com.bytechef.platform.domain;
 
 import com.bytechef.commons.util.OptionalUtils;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 
@@ -32,6 +33,7 @@ public abstract class BaseOption {
     protected BaseOption() {
     }
 
+    @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
     protected BaseOption(com.bytechef.definition.BaseOption<?> option) {
         this.description = OptionalUtils.orElse(option.getDescription(), null);
         this.label = Objects.requireNonNull(option.getLabel(), "label is required");

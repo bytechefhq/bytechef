@@ -462,7 +462,7 @@ public final class ToolUtils {
     /**
      * Record to hold match information for a task.
      */
-    static class PropertyDecorator {
+    static final class PropertyDecorator {
 
         public enum Location {
             COMPONENT,

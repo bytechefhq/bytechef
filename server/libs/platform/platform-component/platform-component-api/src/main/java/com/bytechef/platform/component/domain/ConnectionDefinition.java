@@ -26,7 +26,7 @@ import org.jspecify.annotations.Nullable;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public class ConnectionDefinition {
+public final class ConnectionDefinition {
 
     private boolean authorizationRequired;
     private List<Authorization> authorizations;

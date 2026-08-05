@@ -32,6 +32,7 @@ public abstract class BaseResources {
     protected BaseResources() {
     }
 
+    @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
     protected BaseResources(com.bytechef.definition.BaseResources resources) {
         this.additionalUrls = resources.getAdditionalUrls();
         this.documentationUrl = Objects.requireNonNull(resources.getDocumentationUrl(), "documentationUrl is required");

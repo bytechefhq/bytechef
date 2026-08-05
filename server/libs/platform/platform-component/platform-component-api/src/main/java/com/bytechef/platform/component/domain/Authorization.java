@@ -29,7 +29,7 @@ import org.apache.commons.lang3.StringUtils;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public class Authorization {
+public final class Authorization {
 
     private String description;
     private List<String> detectOn;

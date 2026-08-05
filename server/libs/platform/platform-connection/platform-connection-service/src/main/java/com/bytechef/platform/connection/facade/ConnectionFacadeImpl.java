@@ -160,11 +160,12 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
                 Map<String, ?> predefinedParameters = oAuth2Service.checkPredefinedParameters(
                     connection.getComponentName(), connection.getParameters());
 
-                AuthorizationCallbackResponse authorizationCallbackResponse =
+                AuthorizationCallbackResponse authorizationCallbackResponse = Objects.requireNonNull(
                     connectionDefinitionService.executeAuthorizationCallback(
                         connection.getComponentName(), connection.getConnectionVersion(),
                         connection.getAuthorizationType(), predefinedParameters,
-                        oAuth2Service.getRedirectUri());
+                        oAuth2Service.getRedirectUri()),
+                    "Authorization callback returned no response for component " + connection.getComponentName());
 
                 connection.putAllParameters(authorizationCallbackResponse.result());
 

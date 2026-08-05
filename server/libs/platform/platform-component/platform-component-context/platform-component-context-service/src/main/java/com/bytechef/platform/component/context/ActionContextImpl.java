@@ -401,6 +401,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     }
 
     @Override
+    @SuppressFBWarnings("EI_EXPOSE_REP")
     public Map<String, Object> getJobMetadata() {
         if (jobMetadata != null) {
             return jobMetadata;

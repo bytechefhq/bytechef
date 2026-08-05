@@ -33,7 +33,7 @@ import java.util.Objects;
  *
  * @author Ivica Cardic
  */
-public class GraphQlBadRequestException extends RuntimeException {
+public final class GraphQlBadRequestException extends RuntimeException {
 
     public static final String DEFAULT_CODE = "BAD_REQUEST";
 

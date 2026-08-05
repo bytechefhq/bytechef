@@ -44,6 +44,8 @@ public class PropertiesPlanLimitsProvider implements PlanLimitsProvider {
             return tierDefaults;
         }
 
+        Integer burstMultiplierOverride = overrides.burstMultiplier();
+
         return new PlanLimits(
             tierDefaults.tier(),
             overrides.includedMonthlyCostUsd() != null
@@ -54,7 +56,7 @@ public class PropertiesPlanLimitsProvider implements PlanLimitsProvider {
                 ? overrides.asyncRequestsPerMinute() : tierDefaults.asyncRequestsPerMinute(),
             overrides.apiRequestsPerMinute() != null
                 ? overrides.apiRequestsPerMinute() : tierDefaults.apiRequestsPerMinute(),
-            overrides.burstMultiplier() != null ? overrides.burstMultiplier() : tierDefaults.burstMultiplier(),
+            burstMultiplierOverride != null ? burstMultiplierOverride : tierDefaults.burstMultiplier(),
             overrides.maxConcurrentExecutions() != null
                 ? overrides.maxConcurrentExecutions() : tierDefaults.maxConcurrentExecutions(),
             overrides.syncRunTimeout() != null ? overrides.syncRunTimeout() : tierDefaults.syncRunTimeout(),

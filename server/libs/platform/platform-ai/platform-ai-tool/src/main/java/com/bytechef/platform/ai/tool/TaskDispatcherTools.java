@@ -155,7 +155,9 @@ public class TaskDispatcherTools {
                 }
             }
 
-            if (outputResponse == null || outputResponse.outputSchema() == null) {
+            BaseProperty outputSchema = outputResponse == null ? null : outputResponse.outputSchema();
+
+            if (outputSchema == null) {
                 return null;
             }
 
@@ -165,7 +167,7 @@ public class TaskDispatcherTools {
                     version, name);
             }
 
-            return ToolUtils.convertToPropertyInfo(outputResponse.outputSchema());
+            return ToolUtils.convertToPropertyInfo(outputSchema);
         } catch (Exception e) {
             log.error(
                 "getTaskDispatcherOutput({}, {}): Failed to get output properties for task dispatcher '{}'", name,

@@ -66,8 +66,20 @@ class MapScalarConfiguration {
 
                 @Override
                 public Map<String, Object> parseLiteral(Object input) throws CoercingParseLiteralException {
-                    if (input instanceof StringValue) {
-                        return parseValue(((StringValue) input).getValue());
+                    if (input instanceof StringValue stringValue) {
+                        String value = stringValue.getValue();
+
+                        if (value == null) {
+                            throw new CoercingParseLiteralException("Expected a Map object");
+                        }
+
+                        Map<String, Object> map = parseValue(value);
+
+                        if (map == null) {
+                            throw new CoercingParseLiteralException("Expected a Map object");
+                        }
+
+                        return map;
                     }
 
                     throw new CoercingParseLiteralException("Expected a StringValue");

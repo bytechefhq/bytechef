@@ -33,7 +33,7 @@ import org.jspecify.annotations.Nullable;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public class ActionDefinition {
+public final class ActionDefinition {
 
     private boolean batch;
     private String componentName;
