@@ -501,7 +501,18 @@ public class JobSyncExecutor {
 
     private static ApplicationEventPublisher createEventPublisher(MessageBroker messageBroker) {
         return event -> {
-            MessageEvent<?> messageEvent = (MessageEvent<?>) event;
+            // Only broker-routable events flow through the sync executor's in-memory broker. Plain in-process
+            // application events (e.g. DeleteJobEvent, published by JobFacadeImpl.deleteJob when a finished editor
+            // test run is cleaned up) have no route and no listeners in the sync world - casting them used to fail
+            // the whole test run with a ClassCastException AFTER the job had completed, so the client received an
+            // error event instead of the result.
+            if (!(event instanceof MessageEvent<?> messageEvent)) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Skipping non-broker application event {} in sync executor", event.getClass());
+                }
+
+                return;
+            }
 
             messageEvent.putMetadata(CURRENT_TENANT_ID, TenantContext.getCurrentTenantId());
 
