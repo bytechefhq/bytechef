@@ -1,0 +1,7 @@
+mutation publishCustomComponent($id: ID!) {
+    publishCustomComponent(id: $id) {
+        id
+        publishedDate
+        status
+    }
+}
