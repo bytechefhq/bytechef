@@ -14,8 +14,11 @@ dependencies {
     implementation(project(":server:libs:core:class-loader:class-loader-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
+    implementation(project(":server:libs:platform:platform-component:platform-component-polyglot"))
 
     guestBridge(project(":server:ee:libs:platform:platform-custom-component:platform-custom-component-guest-bridge"))
+
+    testImplementation("org.mockito:mockito-core")
 }
 
 tasks.test {

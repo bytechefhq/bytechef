@@ -1,5 +1,8 @@
 import types
 
+# The task perform receives a context:
+#   context.component.httpClient.get({"uri": "https://api.example.com/items"}, "my-connection")
+#   context.log("info", "my-task ran")
 types.SimpleNamespace(
     componentName="__NAME__",
     componentVersion=1,
@@ -15,7 +18,7 @@ types.SimpleNamespace(
                     "name": "my-task",
                     "label": "My Task",
                     "description": "An example task.",
-                    "perform": lambda *args: "hello",
+                    "perform": lambda context: "hello",
                 }
             ],
         }

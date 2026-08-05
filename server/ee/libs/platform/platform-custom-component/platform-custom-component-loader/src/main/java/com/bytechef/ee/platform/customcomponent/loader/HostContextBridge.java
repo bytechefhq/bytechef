@@ -89,13 +89,13 @@ public final class HostContextBridge {
 
         Http.Executor executor = http.exchange(url, requestMethod);
 
-        Map<String, List<String>> headers = (Map<String, List<String>>) request.get("headers");
+        Map<String, List<String>> headers = toStringListMap(request.get("headers"));
 
         if (headers != null && !headers.isEmpty()) {
             executor = executor.headers(headers);
         }
 
-        Map<String, List<String>> queryParameters = (Map<String, List<String>>) request.get("queryParameters");
+        Map<String, List<String>> queryParameters = toStringListMap(request.get("queryParameters"));
 
         if (queryParameters != null && !queryParameters.isEmpty()) {
             executor = executor.queryParameters(queryParameters);
@@ -114,6 +114,39 @@ public final class HostContextBridge {
         }
 
         return executor.execute();
+    }
+
+    /**
+     * Coerces a guest-supplied {@code headers}/{@code queryParameters} value into the {@code Map<String, List<String>>}
+     * shape {@link Http.Executor#headers} and {@link Http.Executor#queryParameters} require. Script authors naturally
+     * write scalar values (e.g. {@code {'X-Foo': 'bar'}}), which would otherwise pass the unchecked cast here only to
+     * blow up with a {@link ClassCastException} deep inside the HTTP client. A single value is wrapped into a
+     * one-element list; a list has each element stringified; a {@code null} value is skipped.
+     */
+    private static Map<String, List<String>> toStringListMap(Object value) {
+        if (!(value instanceof Map<?, ?> map)) {
+            return null;
+        }
+
+        Map<String, List<String>> result = new LinkedHashMap<>();
+
+        for (Map.Entry<?, ?> entry : map.entrySet()) {
+            Object entryValue = entry.getValue();
+
+            if (entryValue == null) {
+                continue;
+            }
+
+            List<String> values = entryValue instanceof List<?> list
+                ? list.stream()
+                    .map(String::valueOf)
+                    .toList()
+                : List.of(String.valueOf(entryValue));
+
+            result.put((String) entry.getKey(), values);
+        }
+
+        return result;
     }
 
     @SuppressWarnings("unchecked")

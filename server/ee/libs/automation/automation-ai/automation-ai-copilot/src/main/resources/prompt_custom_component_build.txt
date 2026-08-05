@@ -18,6 +18,7 @@ The evaluated result must be an object exposing these members:
 - version     (Integer, REQUIRED) — start at 1.
 - title       (String) — human-readable title.
 - description (String) — short description.
+- icon        (String, optional) — an inline SVG shown in component lists and on the canvas.
 - connection  (object, optional) — declares the component's connection like built-in components do;
               the Connections page can then create connections of this type and perform receives the
               values as connectionParameters. Shape:
@@ -37,9 +38,19 @@ The evaluated result must be an object exposing these members:
     - title       (String)
     - description (String)
     - properties  (list, optional) — the action's input fields: [{name, type, label, required, ...}],
+                  a property's `options` may be a static list OR a function
+                  (inputParameters, connectionParameters, searchText) => [{label, value}] evaluated when the
+                  editor opens the dropdown (STRING, INTEGER, NUMBER only) — use it for API-driven choices.
                   same property shape the connection uses. These are what the workflow user fills in
                   and what arrives in inputParameters — an action with no properties always receives
                   an empty inputParameters map, so declare them whenever the action takes input.
+    - output      (property, optional) — the action's output schema, usually
+                  {type: "OBJECT", properties: [...]}. WITHOUT it downstream workflow steps see no data
+                  pills for this action's result, so declare it whenever the action returns structured data.
+    - sampleOutput (any, optional) — an example result shown in the editor.
+    - tool        (boolean, optional) — when true the action ALSO becomes an AI Agent tool (a TOOLS
+                  cluster element) while staying a normal action. Write `description` for the model,
+                  since that is what it reads to decide when to call the tool.
     - perform     (function) — invoked as perform(inputParameters, connectionParameters, context)
                   and must return the action's output.
         - inputParameters      — the values configured for the action in the workflow.

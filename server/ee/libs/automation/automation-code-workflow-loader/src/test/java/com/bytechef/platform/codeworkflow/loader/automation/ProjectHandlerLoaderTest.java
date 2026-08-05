@@ -21,6 +21,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
@@ -72,8 +73,63 @@ class ProjectHandlerLoaderTest {
         }
         """;
 
+    private static final String CONTEXT_JAVA_SOURCE = """
+        import com.bytechef.automation.project.ProjectHandler;
+        import com.bytechef.automation.project.definition.ProjectDefinition;
+        import com.bytechef.automation.project.definition.ProjectDsl;
+        import com.bytechef.workflow.definition.WorkflowDsl;
+        import java.util.Map;
+
+        public class ContextLoaderTestProjectHandler implements ProjectHandler {
+
+            @Override
+            public ProjectDefinition getDefinition() {
+                return ProjectDsl.project("context-loader-test-project")
+                    .version("2.0.0")
+                    .workflows(
+                        WorkflowDsl.workflow("loader-workflow")
+                            .tasks(
+                                WorkflowDsl.task("loader-task")
+                                    .perform(context -> context.component(
+                                        "mock", "doIt", Map.of("x", 1), "conn"))));
+            }
+        }
+        """;
+
     @TempDir
     private Path tempDir;
+
+    @Test
+    void testLoadProjectHandlerFromJavaJarWithClassLoaderThreadsTaskContext() throws Exception {
+        Path jarPath = ProjectHandlerPolyglotEngineTest.buildFixtureJar(
+            tempDir, CONTEXT_JAVA_SOURCE, "ContextLoaderTestProjectHandler");
+
+        ProjectHandler projectHandler = ProjectHandlerLoader.loadProjectHandler(
+            toUrl(jarPath), Language.JAVA, ProjectHandlerLoader.JavaLoader.CLASS_LOADER, "context-cache-key",
+            new ConcurrentMapCacheManager());
+
+        ProjectDefinition projectDefinition = projectHandler.getDefinition();
+
+        List<WorkflowDefinition> workflows = projectDefinition.getWorkflows();
+
+        WorkflowDefinition workflowDefinition = workflows.getFirst();
+
+        List<? extends TaskDefinition> tasks = workflowDefinition.getTasks()
+            .orElseThrow();
+
+        TaskDefinition taskDefinition = tasks.getFirst();
+
+        RecordingTaskContext taskContext = new RecordingTaskContext("context result");
+
+        Object result = taskDefinition.getPerform()
+            .apply(taskContext);
+
+        assertEquals("context result", result);
+        assertEquals("mock", taskContext.getComponentName());
+        assertEquals("doIt", taskContext.getActionName());
+        assertEquals(Map.of("x", 1), taskContext.getInput());
+        assertEquals("conn", taskContext.getConnectionName());
+    }
 
     @Test
     void testLoadProjectHandlerFromJavaScript() throws IOException {

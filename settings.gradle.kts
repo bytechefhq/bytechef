@@ -217,6 +217,7 @@ include("server:libs:platform:platform-component:platform-component-context:plat
 include("server:libs:platform:platform-component:platform-component-log:platform-component-log-api")
 include("server:libs:platform:platform-component:platform-component-log:platform-component-log-graphql")
 include("server:libs:platform:platform-component:platform-component-log:platform-component-log-service")
+include("server:libs:platform:platform-component:platform-component-polyglot")
 include("server:libs:platform:platform-component:platform-component-service")
 include("server:libs:platform:platform-component:platform-component-test-int-support")
 include("server:libs:platform:platform-configuration:platform-configuration-api")
@@ -610,6 +611,7 @@ include("sdks:backend:java:component-api")
 include("sdks:backend:java:component-test")
 include("sdks:backend:java:definition-api")
 include("sdks:backend:java:workflow-api")
+include("sdks:backend:java:workflow-guest-bridge")
 
 include("sdks:backend:automation:project-api")
 

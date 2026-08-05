@@ -21,14 +21,20 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ActionDefinition.PerformFunction;
 import com.bytechef.component.definition.Authorization;
+import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.ConnectionDefinition;
 import com.bytechef.component.definition.Context.ContextConsumer;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Log;
+import com.bytechef.component.definition.DynamicOptionsProperty;
+import com.bytechef.component.definition.Option;
+import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.definition.OutputDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.ai.agent.BaseToolFunction;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import java.util.List;
 import java.util.Map;
@@ -313,6 +319,193 @@ class ComponentHandlerPolyglotEngineTest {
 
         assertTrue(actionDefinition.getProperties()
             .isEmpty());
+    }
+
+    @Test
+    void testLoadParsesActionOutputSchemaAndSample() {
+        String script = """
+            ({
+                name: 'test-component',
+                version: 1,
+                actions: [
+                    {
+                        name: 'echo',
+                        output: {
+                            type: 'OBJECT',
+                            properties: [
+                                {name: 'id', type: 'STRING'},
+                                {name: 'count', type: 'INTEGER'}
+                            ]
+                        },
+                        sampleOutput: {id: 'abc', count: 2},
+                        perform: function(input, connection, context) { return {}; }
+                    }
+                ]
+            })
+            """;
+
+        ComponentHandler componentHandler = ComponentHandlerPolyglotEngine.load("js", script);
+
+        ComponentDefinition componentDefinition = componentHandler.getDefinition();
+
+        ActionDefinition actionDefinition = componentDefinition.getActions()
+            .getFirst();
+
+        OutputDefinition outputDefinition = actionDefinition.getOutputDefinition()
+            .orElseThrow();
+
+        Property outputSchema = (Property) outputDefinition.getOutputSchema();
+
+        assertEquals(Property.Type.OBJECT, outputSchema.getType());
+        assertEquals(Map.of("id", "abc", "count", 2), outputDefinition.getSampleOutput());
+    }
+
+    @Test
+    void testLoadWithoutActionOutputKeepsOutputDefinitionEmpty() {
+        String script = """
+            ({
+                name: 'test-component',
+                version: 1,
+                actions: [
+                    {name: 'echo', perform: function(input, connection, context) { return 'x'; }}
+                ]
+            })
+            """;
+
+        ComponentHandler componentHandler = ComponentHandlerPolyglotEngine.load("js", script);
+
+        ComponentDefinition componentDefinition = componentHandler.getDefinition();
+
+        ActionDefinition actionDefinition = componentDefinition.getActions()
+            .getFirst();
+
+        assertTrue(actionDefinition.getOutputDefinition()
+            .isEmpty());
+    }
+
+    @Test
+    void testLoadParsesIconAndToolClusterElements() {
+        String script = """
+            ({
+                name: 'test-component',
+                version: 1,
+                icon: '<svg viewBox="0 0 24 24"></svg>',
+                actions: [
+                    {
+                        name: 'lookupCustomer',
+                        title: 'Lookup Customer',
+                        description: 'Finds a customer by email.',
+                        tool: true,
+                        properties: [{name: 'email', type: 'STRING', required: true}],
+                        perform: function(input, connection, context) { return {}; }
+                    },
+                    {
+                        name: 'plainAction',
+                        perform: function(input, connection, context) { return {}; }
+                    }
+                ]
+            })
+            """;
+
+        ComponentHandler componentHandler = ComponentHandlerPolyglotEngine.load("js", script);
+
+        ComponentDefinition componentDefinition = componentHandler.getDefinition();
+
+        assertEquals(
+            "<svg viewBox=\"0 0 24 24\"></svg>", componentDefinition.getIcon()
+                .orElseThrow());
+
+        List<? extends ClusterElementDefinition<?>> clusterElements = componentDefinition.getClusterElements();
+
+        assertEquals(1, clusterElements.size());
+
+        ClusterElementDefinition<?> clusterElementDefinition = clusterElements.getFirst();
+
+        assertEquals("lookupCustomer", clusterElementDefinition.getName());
+        assertEquals(BaseToolFunction.TOOLS, clusterElementDefinition.getType());
+        assertEquals(1, clusterElementDefinition.getProperties()
+            .size());
+
+        // Both actions stay callable as actions; the tool flag only adds a cluster element.
+        assertEquals(2, componentDefinition.getActions()
+            .size());
+    }
+
+    @Test
+    void testLoadWithoutIconOrToolsKeepsThemEmpty() {
+        String script = """
+            ({
+                name: 'test-component',
+                version: 1,
+                actions: [{name: 'echo', perform: function(input, connection, context) { return 'x'; }}]
+            })
+            """;
+
+        ComponentHandler componentHandler = ComponentHandlerPolyglotEngine.load("js", script);
+
+        ComponentDefinition componentDefinition = componentHandler.getDefinition();
+
+        assertTrue(componentDefinition.getIcon()
+            .isEmpty());
+        assertTrue(componentDefinition.getClusterElements()
+            .isEmpty());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testLoadSupportsDynamicPropertyOptions() throws Exception {
+        String script = """
+            ({
+                name: 'test-component',
+                version: 1,
+                actions: [
+                    {
+                        name: 'pick',
+                        properties: [
+                            {
+                                name: 'region',
+                                type: 'STRING',
+                                options: function (inputParameters, connectionParameters, searchText) {
+                                    return [
+                                        {label: 'EU ' + searchText, value: 'eu'},
+                                        {label: 'US ' + inputParameters.tenant, value: 'us'}
+                                    ];
+                                }
+                            }
+                        ],
+                        perform: function(input, connection, context) { return {}; }
+                    }
+                ]
+            })
+            """;
+
+        ComponentHandler componentHandler = ComponentHandlerPolyglotEngine.load("js", script);
+
+        ComponentDefinition componentDefinition = componentHandler.getDefinition();
+
+        ActionDefinition actionDefinition = componentDefinition.getActions()
+            .getFirst();
+
+        DynamicOptionsProperty<?> property = (DynamicOptionsProperty<?>) actionDefinition.getProperties()
+            .getFirst();
+
+        OptionsDataSource<?> optionsDataSource = property.getOptionsDataSource()
+            .orElseThrow();
+
+        ActionDefinition.OptionsFunction<String> optionsFunction =
+            (ActionDefinition.OptionsFunction<String>) optionsDataSource.getOptions();
+
+        List<? extends Option<String>> options = optionsFunction.apply(
+            ParametersFactory.create(Map.of("tenant", "acme")), ParametersFactory.create(Map.of()), Map.of(), "x",
+            mock(ActionContext.class));
+
+        assertEquals(2, options.size());
+        assertEquals("EU x", options.getFirst()
+            .getLabel());
+        assertEquals("eu", options.getFirst()
+            .getValue());
+        assertEquals("US acme", options.get(1)
+            .getLabel());
     }
 
     @Test

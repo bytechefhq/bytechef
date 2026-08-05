@@ -18,8 +18,13 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.ComponentDsl.ModifiableAuthorization;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableIntegerProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableNumberProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
 import com.bytechef.component.definition.ConnectionDefinition;
 import com.bytechef.component.definition.Help;
+import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.OutputDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
@@ -78,10 +83,23 @@ class ComponentHandlerPolyglotEngine {
             String name = Objects.requireNonNull(getMember(value, "name", String.class));
             String title = getMember(value, "title", String.class);
             String description = getMember(value, "description", String.class);
+            String icon = getMember(value, "icon", String.class);
             int version = Objects.requireNonNull(getMember(value, "version", Integer.class));
             List<Map<String, Object>> actions = getMember(value, "actions", new TypeLiteral<>() {});
 
             List<ActionDefinition> actionDefinitions = toActionDefinitions(actions, languageId, script);
+
+            // A tool IS an action — same properties, output and perform — so an action opts in with `tool: true`
+            // and ComponentDsl.tool(...) adapts it into a TOOLS cluster element the AI Agent can call.
+            List<ClusterElementDefinition<?>> clusterElementDefinitions = new ArrayList<>();
+
+            for (ActionDefinition actionDefinition : actionDefinitions) {
+                if (actionDefinition instanceof PolyglotActionDefinition polyglotActionDefinition &&
+                    polyglotActionDefinition.tool()) {
+
+                    clusterElementDefinitions.add(ComponentDsl.tool(actionDefinition));
+                }
+            }
 
             Map<String, Object> connectionMap = getMember(value, "connection", new TypeLiteral<>() {});
 
@@ -89,7 +107,8 @@ class ComponentHandlerPolyglotEngine {
                 ? null : toConnectionDefinition(connectionMap, languageId, script);
 
             return () -> new PolyglotComponentDefinition(
-                name, title, description, version, actionDefinitions, connectionDefinition);
+                name, title, description, icon, version, actionDefinitions, clusterElementDefinitions,
+                connectionDefinition);
         }
     }
 
@@ -427,14 +446,159 @@ class ComponentHandlerPolyglotEngine {
         return actions.stream()
             .map(task -> (ActionDefinition) new PolyglotActionDefinition(
                 (String) task.get("name"), (String) task.get("title"), (String) task.get("description"),
-                ComponentHandlerEspressoEngine.toProperties((List<Map<String, ?>>) task.get("properties")), languageId,
-                script))
+                toActionProperties(
+                    (String) task.get("name"), (List<Map<String, ?>>) task.get("properties"), languageId, script),
+                toOutputDefinition((Map<String, ?>) task.get("output"), task.get("sampleOutput")),
+                Boolean.TRUE.equals(task.get("tool")), languageId, script))
             .toList();
+    }
+
+    /**
+     * Builds an action's input properties. A property whose {@code options} member is a guest FUNCTION rather than a
+     * static list gets a host options function that re-evaluates the script per lookup — the same pattern the
+     * connection's url/apply seams use — so a dropdown can be populated from a live API call.
+     */
+    @SuppressWarnings("unchecked")
+    private static List<Property> toActionProperties(
+        String actionName, List<Map<String, ?>> propertyMaps, String languageId, String script) {
+
+        if (propertyMaps == null) {
+            return List.of();
+        }
+
+        List<Property> properties = new ArrayList<>();
+
+        for (Map<String, ?> propertyMap : propertyMaps) {
+            Object options = propertyMap.get("options");
+
+            if (options == null || options instanceof List) {
+                properties.add(ComponentHandlerEspressoEngine.toValueProperty(propertyMap));
+
+                continue;
+            }
+
+            Map<String, Object> staticPropertyMap = new LinkedHashMap<>(propertyMap);
+
+            staticPropertyMap.remove("options");
+
+            properties.add(
+                withDynamicOptions(
+                    ComponentHandlerEspressoEngine.toValueProperty(staticPropertyMap), actionName,
+                    (String) propertyMap.get("name"), languageId, script));
+        }
+
+        return properties;
+    }
+
+    private static Property withDynamicOptions(
+        ModifiableValueProperty<?, ?> property, String actionName, String propertyName, String languageId,
+        String script) {
+
+        ActionDefinition.OptionsFunction<String> optionsFunction =
+            (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> executeOptionsSeam(
+                languageId, script, actionName, propertyName, inputParameters, connectionParameters, searchText);
+
+        if (property instanceof ModifiableStringProperty stringProperty) {
+            return stringProperty.options(optionsFunction);
+        }
+
+        if (property instanceof ModifiableIntegerProperty integerProperty) {
+            return integerProperty.options(optionsFunction);
+        }
+
+        if (property instanceof ModifiableNumberProperty numberProperty) {
+            return numberProperty.options(optionsFunction);
+        }
+
+        throw new IllegalArgumentException(
+            "Property %s of action %s declares an options function, which only STRING, INTEGER and NUMBER properties "
+                .formatted(propertyName, actionName) + "support");
+    }
+
+    @SuppressWarnings("unchecked")
+    private static List<Option<String>> executeOptionsSeam(
+        String languageId, String script, String actionName, String propertyName, Parameters inputParameters,
+        Parameters connectionParameters, String searchText) {
+
+        if (performEngine == null) {
+            performEngine = Engine.create();
+        }
+
+        try (Context polyglotContext = PolyglotSandbox.newContext(performEngine, languageId)) {
+            Value value = polyglotContext.eval(languageId, script);
+
+            List<Map<String, Object>> actions = getMember(value, "actions", new TypeLiteral<>() {});
+
+            Map<String, Object> action = actions.stream()
+                .filter(curAction -> Objects.equals(curAction.get("name"), actionName))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Action name=%s not found".formatted(actionName)));
+
+            Map<String, Object> property = ((List<Map<String, Object>>) action.get("properties")).stream()
+                .filter(curProperty -> Objects.equals(curProperty.get("name"), propertyName))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Property name=%s not found".formatted(propertyName)));
+
+            Function<Object[], Object> optionsFunction = (Function<Object[], Object>) property.get("options");
+
+            Object result = optionsFunction.apply(new Object[] {
+                PolyglotValues.copyToGuestValue(inputParameters.toMap(), languageId),
+                PolyglotValues.copyToGuestValue(connectionParameters.toMap(), languageId), searchText
+            });
+
+            Object options = PolyglotValues.copyFromPolyglotContext(result);
+
+            if (!(options instanceof List)) {
+                throw new IllegalStateException(
+                    "The options function of property %s must return a list, got: %s".formatted(propertyName, options));
+            }
+
+            List<Option<String>> optionList = new ArrayList<>();
+
+            for (Object option : (List<?>) options) {
+                if (option instanceof Map<?, ?> optionMap) {
+                    Object optionValue = optionMap.get("value");
+
+                    optionList.add(
+                        ComponentDsl.option(
+                            String.valueOf(optionMap.get("label")),
+                            optionValue == null ? null : String.valueOf(optionValue)));
+                } else {
+                    optionList.add(ComponentDsl.option(String.valueOf(option), String.valueOf(option)));
+                }
+            }
+
+            return optionList;
+        }
+    }
+
+    /**
+     * Builds an action's output definition from the declarative {@code output} property map (the shape downstream nodes
+     * read for their data pills) and/or a {@code sampleOutput} value. Without either, the action publishes no output
+     * schema, exactly as before.
+     */
+    private static OutputDefinition toOutputDefinition(Map<String, ?> outputMap, Object sampleOutput) {
+        if (outputMap == null && sampleOutput == null) {
+            return null;
+        }
+
+        if (outputMap == null) {
+            return OutputDefinition.of(PolyglotValues.copyFromPolyglotContext(sampleOutput));
+        }
+
+        ModifiableValueProperty<?, ?> outputSchema = ComponentHandlerEspressoEngine.toValueProperty(outputMap);
+
+        if (sampleOutput == null) {
+            return OutputDefinition.of(outputSchema);
+        }
+
+        return OutputDefinition.of(outputSchema, PolyglotValues.copyFromPolyglotContext(sampleOutput));
     }
 
     @SuppressFBWarnings("EI")
     private record PolyglotActionDefinition(
-        String name, String title, String description, List<Property> properties, String languageId, String script)
+        String name, String title, String description, List<Property> properties,
+        OutputDefinition outputDefinition, boolean tool, String languageId, String script)
         implements ActionDefinition {
 
         @Override
@@ -496,7 +660,7 @@ class ComponentHandlerPolyglotEngine {
 
         @Override
         public Optional<OutputDefinition> getOutputDefinition() {
-            return Optional.empty();
+            return Optional.ofNullable(outputDefinition);
         }
 
         @Override
@@ -521,8 +685,8 @@ class ComponentHandlerPolyglotEngine {
     }
 
     private record PolyglotComponentDefinition(
-        String name, String title, String description, int version, List<ActionDefinition> actions,
-        ConnectionDefinition connectionDefinition)
+        String name, String title, String description, String icon, int version, List<ActionDefinition> actions,
+        List<ClusterElementDefinition<?>> clusterElements, ConnectionDefinition connectionDefinition)
         implements ComponentDefinition {
 
         @Override
@@ -537,7 +701,7 @@ class ComponentHandlerPolyglotEngine {
 
         @Override
         public List<ClusterElementDefinition<?>> getClusterElements() {
-            return List.of();
+            return clusterElements == null ? List.of() : clusterElements;
         }
 
         @Override
@@ -562,7 +726,7 @@ class ComponentHandlerPolyglotEngine {
 
         @Override
         public Optional<String> getIcon() {
-            return Optional.empty();
+            return Optional.ofNullable(icon);
         }
 
         @Override
