@@ -1,7 +1,7 @@
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
+import LoadingIcon from '@/components/LoadingIcon';
 import PageLoader from '@/components/PageLoader';
-import MonacoEditorWrapper from '@/shared/components/MonacoEditorWrapper';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
 import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
@@ -22,8 +22,10 @@ import {
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {ArrowLeftIcon, SparklesIcon, ZapIcon} from 'lucide-react';
-import {useEffect, useRef, useState} from 'react';
+import {Suspense, lazy, useEffect, useRef, useState} from 'react';
 import {useLocation, useNavigate, useParams} from 'react-router-dom';
+
+const MonacoEditorWrapper = lazy(() => import('@/shared/components/MonacoEditorWrapper'));
 
 const MONACO_LANGUAGE_BY_CUSTOM_COMPONENT_LANGUAGE: Record<CustomComponentLanguage, string> = {
     [CustomComponentLanguage.Java]: 'java',
@@ -66,18 +68,18 @@ const CustomComponentDetailHeader = ({
             showSaveButton && (
                 <div className="flex items-center gap-2">
                     <Button
-                        disabled={isSaveDisabled}
-                        label={isSaving ? 'Saving...' : 'Save'}
-                        onClick={onSave}
-                        size="sm"
-                    />
-
-                    <Button
                         disabled={isPublishDisabled}
                         label={isPublishing ? 'Publishing...' : 'Publish'}
                         onClick={onPublish}
                         size="sm"
                         variant="outline"
+                    />
+
+                    <Button
+                        disabled={isSaveDisabled}
+                        label={isSaving ? 'Saving...' : 'Save'}
+                        onClick={onSave}
+                        size="sm"
                     />
 
                     {onAskCopilot && (
@@ -211,20 +213,28 @@ const CustomComponentSourceEditor = ({monacoLanguage, onChange, value}: CustomCo
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
         <div className="relative min-h-0 flex-1">
             <div className="absolute inset-0">
-                <MonacoEditorWrapper
-                    defaultLanguage={monacoLanguage}
-                    onChange={onChange}
-                    onMount={() => {}}
-                    options={{
-                        automaticLayout: true,
-                        folding: true,
-                        lineNumbers: 'on',
-                        minimap: {enabled: false},
-                        scrollBeyondLastLine: false,
-                        wordWrap: 'on',
-                    }}
-                    value={value}
-                />
+                <Suspense
+                    fallback={
+                        <div className="flex items-center justify-center p-8">
+                            <LoadingIcon />
+                        </div>
+                    }
+                >
+                    <MonacoEditorWrapper
+                        defaultLanguage={monacoLanguage}
+                        onChange={onChange}
+                        onMount={() => {}}
+                        options={{
+                            automaticLayout: true,
+                            folding: true,
+                            lineNumbers: 'on',
+                            minimap: {enabled: false},
+                            scrollBeyondLastLine: false,
+                            wordWrap: 'on',
+                        }}
+                        value={value}
+                    />
+                </Suspense>
             </div>
         </div>
     </div>

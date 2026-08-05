@@ -25,6 +25,7 @@ export enum Source {
     // the `/api/platform/internal/ai/chat/{source}` URL segment.
     CODE_WORKFLOW = 'code_workflow',
     CODE_WORKFLOW_EMBEDDED = 'code_workflow_embedded',
+    CUSTOM_COMPONENT = 'custom_component',
     WORKFLOW_EDITOR_EMBEDDED = 'workflow_editor_embedded',
     WORKFLOW_EXECUTION_EMBEDDED = 'workflow_execution_embedded',
     CONTEXT_STORE = 'CONTEXT_STORE',

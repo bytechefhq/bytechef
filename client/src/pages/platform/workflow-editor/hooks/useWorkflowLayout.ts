@@ -79,7 +79,7 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
     }, [workflow]);
 
     const {codeWorkflow, codeWorkflowLanguage, useGetComponentDefinitionsQuery} = useWorkflowEditor();
-    const {integrationId} = useParams();
+    const {integrationId, projectId} = useParams();
 
     const componentDefinitionsQueryParameters: object = {
         actionDefinitions: true,
@@ -158,6 +158,7 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
             parameters: {
                 ...(integrationId ? {integrationId} : {}),
                 ...(isCodeWorkflow ? {language: codeWorkflowLanguage} : {}),
+                ...(isCodeWorkflow && !integrationId && projectId ? {projectId} : {}),
             },
             source,
         });
