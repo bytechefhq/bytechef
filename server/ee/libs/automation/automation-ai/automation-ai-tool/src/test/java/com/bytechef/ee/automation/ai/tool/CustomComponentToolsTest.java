@@ -65,14 +65,53 @@ class CustomComponentToolsTest {
     }
 
     @Test
-    void testUpdateCustomComponentSourceReturnsConfirmationMessage() {
+    void testUpdateCustomComponentSourceReturnsResultingRowDetails() {
         CustomComponentTools tools = new CustomComponentTools(customComponentFacade);
+
+        CustomComponent draftCustomComponent = new CustomComponent();
+
+        draftCustomComponent.setId(12L);
+        draftCustomComponent.setComponentVersion(2);
+        draftCustomComponent.setStatus(CustomComponent.Status.DRAFT);
+
+        when(customComponentFacade.updateCustomComponentSource(5L, "console.log('hi');"))
+            .thenReturn(draftCustomComponent);
 
         String result = tools.updateCustomComponentSource(5L, "console.log('hi');");
 
         verify(customComponentFacade).updateCustomComponentSource(5L, "console.log('hi');");
-        assertThat(result).isNotBlank()
-            .contains("5");
+        assertThat(result).contains("12")
+            .contains("2")
+            .contains("DRAFT");
+    }
+
+    @Test
+    void testPublishCustomComponentReturnsConfirmationMessage() {
+        CustomComponentTools tools = new CustomComponentTools(customComponentFacade);
+
+        CustomComponent publishedCustomComponent = new CustomComponent();
+
+        publishedCustomComponent.setId(12L);
+        publishedCustomComponent.setComponentVersion(2);
+        publishedCustomComponent.setName("myComponent");
+
+        when(customComponentFacade.publishCustomComponent(12L)).thenReturn(publishedCustomComponent);
+
+        String result = tools.publishCustomComponent(12L);
+
+        verify(customComponentFacade).publishCustomComponent(12L);
+        assertThat(result).contains("12")
+            .contains("myComponent");
+    }
+
+    @Test
+    void testPublishCustomComponentThrowsExecutionExceptionOnFacadeFailure() {
+        CustomComponentTools tools = new CustomComponentTools(customComponentFacade);
+
+        when(customComponentFacade.publishCustomComponent(12L)).thenThrow(new RuntimeException("boom"));
+
+        assertThatThrownBy(() -> tools.publishCustomComponent(12L))
+            .isInstanceOf(ExecutionException.class);
     }
 
     @Test

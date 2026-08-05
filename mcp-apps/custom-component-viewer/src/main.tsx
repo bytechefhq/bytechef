@@ -19,15 +19,16 @@ declare global {
 }
 
 const FIXTURE_DATA: CodeDataI = {
-    language: 'java',
-    name: 'ExampleComponentHandler.java',
-    source: 'public class ExampleComponentHandler {\n    // custom component source\n}\n',
+    name: 'example.js',
+    source: "const component = definition('example').version(1);\n",
 };
 
 const fixtureMode =
     new URLSearchParams(window.location.search).has('fixture') || (import.meta.env.DEV && window.parent === window);
 
-// getCustomComponentSource results are shaped into structuredContent.source + language ("java").
+// getCustomComponentSource results are shaped into structuredContent.source; the source is polyglot
+// (JavaScript/Python/Ruby), so when no language is provided the CodeView falls back to highlight.js
+// auto-detection.
 function extractData(structuredContent: unknown): CodeDataI | undefined {
     if (!structuredContent || typeof structuredContent !== 'object') {
         return undefined;
@@ -43,7 +44,7 @@ function extractData(structuredContent: unknown): CodeDataI | undefined {
     const language = (structuredContent as Record<string, unknown>).language;
 
     return {
-        language: typeof language === 'string' ? language : 'java',
+        language: typeof language === 'string' ? language : undefined,
         name: typeof name === 'string' ? name : undefined,
         source,
     };

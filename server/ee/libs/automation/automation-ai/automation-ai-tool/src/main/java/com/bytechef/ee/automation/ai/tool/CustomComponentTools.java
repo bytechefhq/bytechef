@@ -60,25 +60,53 @@ public class CustomComponentTools {
         }
     }
 
-    @Tool(description = "Update the source code of an existing custom component. Returns a confirmation message.")
+    @Tool(
+        description = "Update the source code of an existing custom component. Saving updates a DRAFT: editing a " +
+            "PUBLISHED component spawns a new draft row (the source must bump .version() above the published one), " +
+            "so the returned row id may differ from the requested id. Returns the resulting row's id, version and " +
+            "status; use publishCustomComponent to make a draft live.")
     public String updateCustomComponentSource(
         @ToolParam(description = "The ID of the custom component to update") long id,
         @ToolParam(description = "The new source code content of the custom component") String content) {
 
         try {
-            customComponentFacade.updateCustomComponentSource(id, content);
+            CustomComponent customComponent = customComponentFacade.updateCustomComponentSource(id, content);
 
             if (log.isDebugEnabled()) {
                 log.debug("updateCustomComponentSource({}): Updated custom component source", id);
             }
 
-            return "Updated custom component " + id + ".";
+            return "Updated custom component source; resulting row id " + customComponent.getId() + ", version " +
+                customComponent.getComponentVersion() + ", status " + customComponent.getStatus() + ".";
         } catch (Exception e) {
             log.error("updateCustomComponentSource({}): Failed to update custom component source", id, e);
 
             throw new ExecutionException(
                 "Failed to update custom component source: " + e.getMessage(), e,
                 CustomComponentToolErrorType.UPDATE_SOURCE);
+        }
+    }
+
+    @Tool(
+        description = "Publish a DRAFT custom component so it becomes available to workflows. Only draft components " +
+            "can be published; published versions are immutable. Returns a confirmation message.")
+    public String publishCustomComponent(
+        @ToolParam(description = "The ID of the draft custom component to publish") long id) {
+
+        try {
+            CustomComponent customComponent = customComponentFacade.publishCustomComponent(id);
+
+            if (log.isDebugEnabled()) {
+                log.debug("publishCustomComponent({}): Published custom component", id);
+            }
+
+            return "Published custom component " + customComponent.getId() + " (" + customComponent.getName() +
+                ", version " + customComponent.getComponentVersion() + ").";
+        } catch (Exception e) {
+            log.error("publishCustomComponent({}): Failed to publish custom component", id, e);
+
+            throw new ExecutionException(
+                "Failed to publish custom component: " + e.getMessage(), e, CustomComponentToolErrorType.PUBLISH);
         }
     }
 

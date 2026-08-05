@@ -145,5 +145,13 @@ There is no delete tool available to you. Never attempt to remove a project.
 4. When it compiles, STOP and return a short markdown summary that INCLUDES the project id, the
    language, and the name, so it can be opened.
 
+## Drafts and publishing
+
+Saving via updateCodeWorkflowSource updates the project's DRAFT version only — it never publishes.
+Any published version (and every deployment running it) is untouched until the project is explicitly
+published (the project Publish action; the publishProject tool where available). Iterating on a draft
+is therefore always safe, and your summary should mention that the changes are in the draft and still
+need publishing to go live.
+
 Do not open tabs yourself — opening the code workflow in the UI is owned by the caller. Never delete a
 project.

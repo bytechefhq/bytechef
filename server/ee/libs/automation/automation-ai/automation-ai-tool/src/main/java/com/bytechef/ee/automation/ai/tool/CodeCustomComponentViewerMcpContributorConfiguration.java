@@ -90,8 +90,9 @@ public class CodeCustomComponentViewerMcpContributorConfiguration {
         return Map.of("source", resultText);
     }
 
-    // getCustomComponentSource returns Java source as raw text; the custom-component viewer reads {source, language}.
+    // getCustomComponentSource returns polyglot source (JavaScript/Python/Ruby — Java components have no editable
+    // source and are rejected by the facade) as raw text; the viewer reads {source} and auto-detects the language.
     private static @Nullable Map<String, Object> shapeCustomComponent(String resultText) {
-        return Map.of("source", resultText, "language", "java");
+        return Map.of("source", resultText);
     }
 }

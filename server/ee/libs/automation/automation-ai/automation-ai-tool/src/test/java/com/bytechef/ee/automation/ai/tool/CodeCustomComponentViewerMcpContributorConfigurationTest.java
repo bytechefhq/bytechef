@@ -55,17 +55,17 @@ class CodeCustomComponentViewerMcpContributorConfigurationTest {
     }
 
     @Test
-    void testCustomComponentShaperTagsJavaLanguage() {
+    void testCustomComponentShaperOmitsLanguageForViewerAutoDetection() {
         McpServerToolCallbackContributor contributor = configuration.codeCustomComponentViewerMcpContributor(
             absent(), absent(), present(mock(CustomComponentFacade.class)));
 
         Map<String, Object> structuredContent = contributor.getMcpAppUiDescriptors()
             .get("getCustomComponentSource")
             .structuredContentShaper()
-            .apply("public class Foo {}");
+            .apply("const component = definition();");
 
-        assertThat(structuredContent).containsEntry("source", "public class Foo {}")
-            .containsEntry("language", "java");
+        assertThat(structuredContent).containsEntry("source", "const component = definition();")
+            .doesNotContainKey("language");
     }
 
     @Test
