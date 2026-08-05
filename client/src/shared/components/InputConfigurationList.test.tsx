@@ -1,7 +1,12 @@
 import {ControlType, PropertyType, WorkflowInput} from '@/shared/middleware/platform/configuration';
+import {render, screen} from '@testing-library/react';
+import {useForm} from 'react-hook-form';
 import {describe, expect, it} from 'vitest';
 
-import {resolveBackingWorkflowNodeName, resolveComponentInputGroup} from './InputConfigurationList';
+import InputConfigurationList, {
+    resolveBackingWorkflowNodeName,
+    resolveComponentInputGroup,
+} from './InputConfigurationList';
 
 import type {ComponentConnection} from '@/shared/middleware/automation/configuration';
 import type {ComponentDefinition} from '@/shared/middleware/platform/configuration';
@@ -144,5 +149,39 @@ describe('resolveBackingWorkflowNodeName', () => {
 
     it('returns undefined when the component has no connection nodes', () => {
         expect(resolveBackingWorkflowNodeName('absent', componentConnections, [10, 11, 20])).toBeUndefined();
+    });
+});
+
+describe('InputConfigurationList empty state', () => {
+    const Harness = ({emptyStateMessage, onOpenInputs}: {emptyStateMessage?: string; onOpenInputs?: () => void}) => {
+        const {control, formState} = useForm();
+
+        return (
+            <InputConfigurationList
+                control={control}
+                controlPath="inputs"
+                emptyStateMessage={emptyStateMessage}
+                formState={formState}
+                inputs={[]}
+                onOpenInputs={onOpenInputs}
+            />
+        );
+    };
+
+    it('offers to open the inputs sheet when the workflow owns its inputs', () => {
+        render(<Harness onOpenInputs={() => {}} />);
+
+        expect(screen.getByRole('button', {name: /open inputs/i})).toBeInTheDocument();
+        expect(screen.getByText(/discard the current configuration/i)).toBeInTheDocument();
+    });
+
+    it('explains where inputs come from instead of a dead-end button when a message is given', () => {
+        render(<Harness emptyStateMessage="Declare them in the workflow's source." onOpenInputs={() => {}} />);
+
+        expect(screen.getByText("Declare them in the workflow's source.")).toBeInTheDocument();
+
+        // The sheet behind that button can only repeat this message, and the discard warning is beside the point.
+        expect(screen.queryByRole('button', {name: /open inputs/i})).not.toBeInTheDocument();
+        expect(screen.queryByText(/discard the current configuration/i)).not.toBeInTheDocument();
     });
 });

@@ -1,3 +1,17 @@
-mutation createCodeWorkflow($workspaceId: ID!, $name: String!, $language: CodeWorkflowLanguage!) {
-    createCodeWorkflow(workspaceId: $workspaceId, name: $name, language: $language)
+mutation createCodeWorkflow(
+    $workspaceId: ID!
+    $name: String!
+    $language: CodeWorkflowLanguage!
+    $description: String
+    $categoryId: ID
+    $tags: [String!]
+) {
+    createCodeWorkflow(
+        workspaceId: $workspaceId
+        name: $name
+        language: $language
+        description: $description
+        categoryId: $categoryId
+        tags: $tags
+    )
 }

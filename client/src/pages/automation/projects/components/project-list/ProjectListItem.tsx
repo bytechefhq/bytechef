@@ -1,3 +1,5 @@
+import getCodeWorkflowLanguageLabel, {isJavaCodeWorkflow} from '@/shared/util/codeWorkflowLanguage-utils';
+
 import '@/shared/styles/dropdownMenu.css';
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
@@ -83,6 +85,8 @@ const ProjectGitConfigurationDialog = lazy(
 );
 
 const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: ProjectItemProps) => {
+    const javaCodeWorkflow = isJavaCodeWorkflow(project.codeWorkflow, project.codeWorkflowLanguage);
+
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showProjectGitConfigurationDialog, setShowProjectGitConfigurationDialog] = useState(false);
@@ -237,8 +241,8 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
 
             const interactiveSelectors = [
                 '[data-interactive]',
+                '[role="menuitem"]',
                 '.dropdown-menu-item',
-                '[data-radix-dropdown-menu-item]',
                 '[data-radix-dropdown-menu-trigger]',
                 '[data-radix-collapsible-trigger]',
             ].join(', ');
@@ -266,7 +270,9 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                         data-testid="project-item"
                     >
                         <div className="flex items-center gap-2">
-                            {project.projectWorkflowIds && project.projectWorkflowIds.length > 0 ? (
+                            {project.projectWorkflowIds &&
+                            project.projectWorkflowIds.length > 0 &&
+                            !javaCodeWorkflow ? (
                                 <Link
                                     onClick={(event) => event.stopPropagation()}
                                     to={`/automation/projects/${project?.id}/project-workflows/${project?.projectWorkflowIds![0]}?${searchParams}`}
@@ -296,10 +302,21 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                     {project.name}
                                 </CollapsibleTrigger>
                             )}
+
+                            {project.codeWorkflow && (
+                                <Badge
+                                    label={getCodeWorkflowLanguageLabel(project.codeWorkflowLanguage) ?? 'Code'}
+                                    styleType="secondary-filled"
+                                    weight="semibold"
+                                />
+                            )}
                         </div>
 
                         <div className="relative mt-2 sm:flex sm:items-center sm:justify-between">
-                            <div className="flex items-center gap-2">
+                            {/* min-h matches the xs workflow-creation button so code-project rows (which hide it)
+                                keep the same row height and vertical alignment as visual-project rows. */}
+
+                            <div className="flex min-h-6 items-center gap-2">
                                 <CollapsibleTrigger
                                     className="group flex min-w-28 items-center text-xs font-semibold text-muted-foreground"
                                     ref={workflowsCollapsibleTriggerRef}
@@ -313,105 +330,107 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                     <ChevronDownIcon className="size-4 duration-300 group-data-[state=open]:rotate-180" />
                                 </CollapsibleTrigger>
 
-                                <ButtonGroup aria-label="Workflow Creation Actions">
-                                    <Button
-                                        aria-label="Create Workflow"
-                                        onClick={(event) => {
-                                            event.stopPropagation();
+                                {!project.codeWorkflow && (
+                                    <ButtonGroup aria-label="Workflow Creation Actions">
+                                        <Button
+                                            aria-label="Create Workflow"
+                                            onClick={(event) => {
+                                                event.stopPropagation();
 
-                                            setShowWorkflowDialog(true);
-                                        }}
-                                        size="xs"
-                                        variant="outline"
-                                    >
-                                        <PlusIcon />
-                                        Workflow
-                                    </Button>
+                                                setShowWorkflowDialog(true);
+                                            }}
+                                            size="xs"
+                                            variant="outline"
+                                        >
+                                            <PlusIcon />
+                                            Workflow
+                                        </Button>
 
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button
-                                                aria-label="More Workflow Creation Actions"
-                                                icon={
-                                                    isImportingN8nWorkflow ? (
-                                                        <LoaderCircleIcon className="animate-spin text-primary" />
-                                                    ) : (
-                                                        <ChevronDownIcon />
-                                                    )
-                                                }
-                                                size="xs"
-                                                variant="outline"
-                                            >
-                                                <> </>
-                                            </Button>
-                                        </DropdownMenuTrigger>
-
-                                        <DropdownMenuContent align="end" className="p-0">
-                                            <DropdownMenuItem
-                                                aria-label="Generate Workflow with AI"
-                                                className="dropdown-menu-item"
-                                                onClick={(event) => {
-                                                    event.stopPropagation();
-
-                                                    setShowGenerateWorkflowDialog(true);
-                                                }}
-                                            >
-                                                <SparklesIcon /> Generate with AI
-                                            </DropdownMenuItem>
-
-                                            <DropdownMenuItem
-                                                aria-label="Create Workflow from Template"
-                                                className="dropdown-menu-item"
-                                                onClick={(event) => {
-                                                    event.stopPropagation();
-
-                                                    navigate(`./${project.id}/templates`);
-                                                }}
-                                            >
-                                                <LayoutTemplateIcon /> From Template
-                                            </DropdownMenuItem>
-
-                                            <DropdownMenuItem
-                                                aria-label="Import Workflow"
-                                                className="dropdown-menu-item"
-                                                onClick={(event) => {
-                                                    event.stopPropagation();
-
-                                                    if (hiddenFileInputRef.current) {
-                                                        hiddenFileInputRef.current.click();
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button
+                                                    aria-label="More Workflow Creation Actions"
+                                                    icon={
+                                                        isImportingN8nWorkflow ? (
+                                                            <LoaderCircleIcon className="animate-spin text-primary" />
+                                                        ) : (
+                                                            <ChevronDownIcon />
+                                                        )
                                                     }
-                                                }}
-                                            >
-                                                <UploadIcon /> Import Workflow
-                                            </DropdownMenuItem>
+                                                    size="xs"
+                                                    variant="outline"
+                                                >
+                                                    <> </>
+                                                </Button>
+                                            </DropdownMenuTrigger>
 
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <span className="block">
-                                                        <DropdownMenuItem
-                                                            aria-label="Import n8n Workflow"
-                                                            className="dropdown-menu-item"
-                                                            disabled={importN8nWorkflowDisabled}
-                                                            onClick={() => {
-                                                                if (converterHiddenFileInputRef.current) {
-                                                                    converterHiddenFileInputRef.current.click();
-                                                                }
-                                                            }}
-                                                        >
-                                                            <UploadIcon /> Import n8n Workflow
-                                                        </DropdownMenuItem>
-                                                    </span>
-                                                </TooltipTrigger>
+                                            <DropdownMenuContent align="end" className="p-0">
+                                                <DropdownMenuItem
+                                                    aria-label="Generate Workflow with AI"
+                                                    className="dropdown-menu-item"
+                                                    onClick={(event) => {
+                                                        event.stopPropagation();
 
-                                                {importN8nWorkflowDisabled && (
-                                                    <TooltipContent>
-                                                        Enable an AI provider to import n8n workflows.
-                                                    </TooltipContent>
-                                                )}
-                                            </Tooltip>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
-                                </ButtonGroup>
+                                                        setShowGenerateWorkflowDialog(true);
+                                                    }}
+                                                >
+                                                    <SparklesIcon /> Generate with AI
+                                                </DropdownMenuItem>
+
+                                                <DropdownMenuItem
+                                                    aria-label="Create Workflow from Template"
+                                                    className="dropdown-menu-item"
+                                                    onClick={(event) => {
+                                                        event.stopPropagation();
+
+                                                        navigate(`./${project.id}/templates`);
+                                                    }}
+                                                >
+                                                    <LayoutTemplateIcon /> From Template
+                                                </DropdownMenuItem>
+
+                                                <DropdownMenuItem
+                                                    aria-label="Import Workflow"
+                                                    className="dropdown-menu-item"
+                                                    onClick={(event) => {
+                                                        event.stopPropagation();
+
+                                                        if (hiddenFileInputRef.current) {
+                                                            hiddenFileInputRef.current.click();
+                                                        }
+                                                    }}
+                                                >
+                                                    <UploadIcon /> Import Workflow
+                                                </DropdownMenuItem>
+
+                                                <Tooltip>
+                                                    <TooltipTrigger asChild>
+                                                        <span className="block">
+                                                            <DropdownMenuItem
+                                                                aria-label="Import n8n Workflow"
+                                                                className="dropdown-menu-item"
+                                                                disabled={importN8nWorkflowDisabled}
+                                                                onClick={() => {
+                                                                    if (converterHiddenFileInputRef.current) {
+                                                                        converterHiddenFileInputRef.current.click();
+                                                                    }
+                                                                }}
+                                                            >
+                                                                <UploadIcon /> Import n8n Workflow
+                                                            </DropdownMenuItem>
+                                                        </span>
+                                                    </TooltipTrigger>
+
+                                                    {importN8nWorkflowDisabled && (
+                                                        <TooltipContent>
+                                                            Enable an AI provider to import n8n workflows.
+                                                        </TooltipContent>
+                                                    )}
+                                                </Tooltip>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </ButtonGroup>
+                                )}
 
                                 <div onClick={(event) => event.stopPropagation()}>
                                     {project.tags && (

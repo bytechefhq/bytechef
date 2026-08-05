@@ -1,3 +1,5 @@
+import getCodeWorkflowLanguageLabel, {isJavaCodeWorkflow} from '@/shared/util/codeWorkflowLanguage-utils';
+
 import '@/shared/styles/dropdownMenu.css';
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
@@ -48,6 +50,8 @@ interface IntegrationItemProps {
 }
 
 const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps) => {
+    const javaCodeWorkflow = isJavaCodeWorkflow(integration.codeWorkflow, integration.codeWorkflowLanguage);
+
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showPublishIntegrationDialog, setShowPublishIntegrationDialog] = useState(false);
@@ -78,6 +82,10 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
 
     const deleteIntegrationMutation = useDeleteIntegrationMutation({
         onSuccess: () => {
+            queryClient.removeQueries({
+                queryKey: IntegrationKeys.integration(integration.id!),
+            });
+
             queryClient.invalidateQueries({
                 queryKey: IntegrationKeys.integrations,
             });
@@ -135,8 +143,8 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
 
         const interactiveSelectors = [
             '[data-interactive]',
+            '[role="menuitem"]',
             '.dropdown-menu-item',
-            '[data-radix-dropdown-menu-item]',
             '[data-radix-dropdown-menu-trigger]',
             '[data-radix-collapsible-trigger]',
             'button',
@@ -166,7 +174,8 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
                         <div className="flex items-center justify-between">
                             <div className="relative flex items-center gap-2">
                                 {integration?.integrationWorkflowIds &&
-                                integration?.integrationWorkflowIds.length > 0 ? (
+                                integration?.integrationWorkflowIds.length > 0 &&
+                                !javaCodeWorkflow ? (
                                     <Link
                                         className="flex items-center gap-1"
                                         to={`/embedded/integrations/${integration?.id}/integration-workflows/${integration?.integrationWorkflowIds![0]}?${searchParams}`}
@@ -191,6 +200,14 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
                                             </span>
                                         </div>
                                     </CollapsibleTrigger>
+                                )}
+
+                                {integration.codeWorkflow && (
+                                    <Badge
+                                        label={getCodeWorkflowLanguageLabel(integration.codeWorkflowLanguage) ?? 'Code'}
+                                        styleType="secondary-filled"
+                                        weight="semibold"
+                                    />
                                 )}
                             </div>
                         </div>

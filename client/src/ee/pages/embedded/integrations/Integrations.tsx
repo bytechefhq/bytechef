@@ -90,7 +90,7 @@ const Integrations = () => {
                                         <DropdownMenuContent align="end">
                                             <DropdownMenuItem onClick={() => setShowNewCodeWorkflowDialog(true)}>
                                                 <CodeIcon className="mr-2 size-4" />
-                                                New Code Workflow
+                                                New Code Integration
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
@@ -134,7 +134,7 @@ const Integrations = () => {
                                     <DropdownMenuContent align="end">
                                         <DropdownMenuItem onClick={() => setShowNewCodeWorkflowDialog(true)}>
                                             <CodeIcon className="mr-2 size-4" />
-                                            New Code Workflow
+                                            New Code Integration
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>

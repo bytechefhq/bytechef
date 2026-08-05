@@ -7,8 +7,9 @@ import {beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import WorkflowInputsEditDialog from './WorkflowInputsEditDialog';
 
-const {useGetComponentDefinitionQueryMock} = vi.hoisted(() => ({
+const {useGetComponentDefinitionQueryMock, workflowEditorState} = vi.hoisted(() => ({
     useGetComponentDefinitionQueryMock: vi.fn(),
+    workflowEditorState: {codeWorkflow: false},
 }));
 
 vi.mock('@/shared/queries/platform/componentDefinitions.queries', () => ({
@@ -17,6 +18,7 @@ vi.mock('@/shared/queries/platform/componentDefinitions.queries', () => ({
 
 vi.mock('@/pages/platform/workflow-editor/providers/workflowEditorProvider', () => ({
     useWorkflowEditor: () => ({
+        codeWorkflow: workflowEditorState.codeWorkflow,
         useGetComponentDefinitionsQuery: () => ({
             // googleSheets declares inputs but is NOT used in the workflow, so it must be excluded.
             data: [
@@ -92,6 +94,8 @@ describe('WorkflowInputsEditDialog', () => {
     });
 
     beforeEach(() => {
+        workflowEditorState.codeWorkflow = false;
+
         saveWorkflowInputMock.mockClear();
         useGetComponentDefinitionQueryMock.mockReturnValue({
             data: {
@@ -252,5 +256,54 @@ describe('WorkflowInputsEditDialog', () => {
 
         expect(nameInput).toHaveValue('channelId');
         expect(nameInput).toHaveAttribute('readonly');
+    });
+
+    it('locks a code workflow input declaration but leaves its test value editable', () => {
+        workflowEditorState.codeWorkflow = true;
+
+        render(
+            <EditHarness
+                defaultValues={
+                    {label: 'Order ID', name: 'orderId', required: true, type: 'string'} as WorkflowInputType
+                }
+            />
+        );
+
+        // The source owns the declaration, so editing it here would only be undone by the next save.
+        expect(screen.getByPlaceholderText('Input name (will be used as a dynamic value key)')).toHaveAttribute(
+            'readonly'
+        );
+        expect(screen.getByPlaceholderText('Input label')).toHaveAttribute('readonly');
+        expect(screen.getByRole('checkbox', {name: 'Required'})).toBeDisabled();
+
+        // The test value is NOT source-owned — it is the whole reason to open this dialog for a code workflow.
+        expect(screen.getByPlaceholderText('Enter value')).not.toHaveAttribute('readonly');
+    });
+
+    it('says where a code workflow input comes from', () => {
+        workflowEditorState.codeWorkflow = true;
+
+        render(
+            <EditHarness
+                defaultValues={
+                    {label: 'Order ID', name: 'orderId', required: false, type: 'string'} as WorkflowInputType
+                }
+            />
+        );
+
+        expect(screen.getByText(/declared in the workflow's source/i)).toBeInTheDocument();
+    });
+
+    it('leaves the declaration editable for a visually built workflow', () => {
+        render(
+            <EditHarness
+                defaultValues={
+                    {label: 'Order ID', name: 'orderId', required: false, type: 'string'} as WorkflowInputType
+                }
+            />
+        );
+
+        expect(screen.getByPlaceholderText('Input label')).not.toHaveAttribute('readonly');
+        expect(screen.getByRole('checkbox', {name: 'Required'})).not.toBeDisabled();
     });
 });

@@ -1,3 +1,19 @@
-mutation createIntegrationCodeWorkflow($componentName: String!, $language: CodeWorkflowLanguage!) {
-    createIntegrationCodeWorkflow(componentName: $componentName, language: $language)
+mutation createIntegrationCodeWorkflow(
+    $componentName: String!
+    $language: CodeWorkflowLanguage!
+    $name: String
+    $description: String
+    $categoryId: ID
+    $tags: [String!]
+    $permissionExpression: String
+) {
+    createIntegrationCodeWorkflow(
+        componentName: $componentName
+        language: $language
+        name: $name
+        description: $description
+        categoryId: $categoryId
+        tags: $tags
+        permissionExpression: $permissionExpression
+    )
 }

@@ -9,6 +9,7 @@ export interface IntegrationBreadcrumbProps {
     integrationWorkflowId: number;
     integrationWorkflows: Workflow[];
     onIntegrationWorkflowValueChange: (integrationWorkflowId: number) => void;
+    showWorkflowSelect?: boolean;
 }
 
 const IntegrationBreadcrumb = ({
@@ -17,6 +18,7 @@ const IntegrationBreadcrumb = ({
     integrationWorkflowId,
     integrationWorkflows,
     onIntegrationWorkflowValueChange,
+    showWorkflowSelect = true,
 }: IntegrationBreadcrumbProps) => (
     <Breadcrumb>
         <BreadcrumbList>
@@ -24,17 +26,21 @@ const IntegrationBreadcrumb = ({
                 <IntegrationTitle integration={integration} />
             </BreadcrumbItem>
 
-            <BreadcrumbSeparator />
+            {showWorkflowSelect && (
+                <>
+                    <BreadcrumbSeparator />
 
-            <BreadcrumbItem>
-                <WorkflowSelect
-                    currentWorkflowLabel={currentWorkflow.label}
-                    integrationId={integration.id!}
-                    integrationWorkflowId={integrationWorkflowId}
-                    integrationWorkflows={integrationWorkflows}
-                    onValueChange={onIntegrationWorkflowValueChange}
-                />
-            </BreadcrumbItem>
+                    <BreadcrumbItem>
+                        <WorkflowSelect
+                            currentWorkflowLabel={currentWorkflow.label}
+                            integrationId={integration.id!}
+                            integrationWorkflowId={integrationWorkflowId}
+                            integrationWorkflows={integrationWorkflows}
+                            onValueChange={onIntegrationWorkflowValueChange}
+                        />
+                    </BreadcrumbItem>
+                </>
+            )}
         </BreadcrumbList>
     </Breadcrumb>
 );

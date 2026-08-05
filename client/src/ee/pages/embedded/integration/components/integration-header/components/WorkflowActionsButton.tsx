@@ -1,9 +1,12 @@
 import Button from '@/components/Button/Button';
+import {ButtonGroup, ButtonGroupSeparator} from '@/components/ui/button-group';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {MessageCircleMoreIcon, PlayIcon, SquareIcon} from 'lucide-react';
+import {ReactNode} from 'react';
 
 interface IntegrationHeaderWorkflowActionsButtonProps {
     chatTrigger: boolean;
+    leadingAction?: ReactNode;
     onRunClick: () => void;
     onStopClick: () => void;
     runDisabled: boolean;
@@ -12,6 +15,7 @@ interface IntegrationHeaderWorkflowActionsButtonProps {
 
 const WorkflowActionsButton = ({
     chatTrigger,
+    leadingAction,
     onRunClick,
     onStopClick,
     runDisabled,
@@ -19,23 +23,43 @@ const WorkflowActionsButton = ({
 }: IntegrationHeaderWorkflowActionsButtonProps) => (
     <Tooltip>
         <TooltipTrigger asChild>
-            <div className="mx-2 w-20">
-                {workflowIsRunning ? (
-                    <Button
-                        className="w-full"
-                        icon={<SquareIcon />}
-                        label="Stop"
-                        onClick={onStopClick}
-                        variant="destructive"
-                    />
+            <div className="mx-2 flex items-center">
+                {/* A code workflow's Save joins this group, mirroring the workflow JSON editor's save+run pair. */}
+
+                {leadingAction && !workflowIsRunning ? (
+                    <ButtonGroup>
+                        {leadingAction}
+
+                        <ButtonGroupSeparator className="bg-stroke-brand-secondary" />
+
+                        <Button
+                            className="w-20 rounded-l-none"
+                            disabled={runDisabled}
+                            icon={chatTrigger ? <MessageCircleMoreIcon /> : <PlayIcon />}
+                            label={chatTrigger ? 'Chat' : 'Test'}
+                            onClick={() => onRunClick()}
+                        />
+                    </ButtonGroup>
                 ) : (
-                    <Button
-                        className="w-full"
-                        disabled={runDisabled}
-                        icon={chatTrigger ? <MessageCircleMoreIcon /> : <PlayIcon />}
-                        label={chatTrigger ? 'Chat' : 'Test'}
-                        onClick={() => onRunClick()}
-                    />
+                    <div className="w-20">
+                        {workflowIsRunning ? (
+                            <Button
+                                className="w-full"
+                                icon={<SquareIcon />}
+                                label="Stop"
+                                onClick={onStopClick}
+                                variant="destructive"
+                            />
+                        ) : (
+                            <Button
+                                className="w-full"
+                                disabled={runDisabled}
+                                icon={chatTrigger ? <MessageCircleMoreIcon /> : <PlayIcon />}
+                                label={chatTrigger ? 'Chat' : 'Test'}
+                                onClick={() => onRunClick()}
+                            />
+                        )}
+                    </div>
                 )}
             </div>
         </TooltipTrigger>

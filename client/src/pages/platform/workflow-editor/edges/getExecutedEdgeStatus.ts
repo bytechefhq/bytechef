@@ -23,31 +23,46 @@ export function resolveTestStateNodeName(node?: Node): string | undefined {
  *
  * Returns 'FAILED' when the traversal reached a failed node so the incoming edge can match the node's red state.
  */
+function resolveNodeStatus(
+    node: Node | undefined,
+    workflowTestNodeStates: Record<string, WorkflowTestNodeStateI>
+): WorkflowTestNodeStateI['status'] | undefined {
+    const name = resolveTestStateNodeName(node);
+
+    if (!name) {
+        return undefined;
+    }
+
+    const nodeState = workflowTestNodeStates[name];
+
+    if (nodeState) {
+        return nodeState.status;
+    }
+
+    // Triggers never produce a task execution of their own, but if anything ran at all the trigger
+    // necessarily fired — treat it as completed so the trigger's outgoing edge joins the executed path.
+    if ((node?.data as {trigger?: boolean} | undefined)?.trigger && Object.keys(workflowTestNodeStates).length > 0) {
+        return 'COMPLETED';
+    }
+
+    return undefined;
+}
+
 export default function getExecutedEdgeStatus(
     sourceNode: Node | undefined,
     targetNode: Node | undefined,
     workflowTestNodeStates: Record<string, WorkflowTestNodeStateI>
 ): 'COMPLETED' | 'FAILED' | undefined {
-    const sourceName = resolveTestStateNodeName(sourceNode);
-    const targetName = resolveTestStateNodeName(targetNode);
+    const sourceStatus = resolveNodeStatus(sourceNode, workflowTestNodeStates);
 
-    if (!sourceName || !targetName) {
+    if (sourceStatus !== 'COMPLETED') {
         return undefined;
     }
 
-    const sourceState = workflowTestNodeStates[sourceName];
-    const targetState = workflowTestNodeStates[targetName];
+    const targetStatus = resolveNodeStatus(targetNode, workflowTestNodeStates);
 
-    if (sourceState?.status !== 'COMPLETED') {
-        return undefined;
-    }
-
-    if (targetState?.status === 'COMPLETED') {
-        return 'COMPLETED';
-    }
-
-    if (targetState?.status === 'FAILED') {
-        return 'FAILED';
+    if (targetStatus === 'COMPLETED' || targetStatus === 'FAILED') {
+        return targetStatus;
     }
 
     return undefined;

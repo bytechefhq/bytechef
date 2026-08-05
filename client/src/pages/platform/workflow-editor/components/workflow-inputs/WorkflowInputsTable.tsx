@@ -4,6 +4,9 @@ import {WorkflowInput, WorkflowTestConfiguration} from '@/shared/middleware/plat
 import {EditIcon, Trash2Icon} from 'lucide-react';
 
 interface WorkflowInputsTableProps {
+    // A code workflow's inputs come from its source, so a deletion here would reappear on the next save. Edit stays:
+    // it is how a test value is set.
+    codeWorkflow?: boolean;
     internalOnlyVisible: boolean;
     openDeleteDialog: (index: number) => void;
     openEditDialog: (index?: number) => void;
@@ -29,6 +32,7 @@ const formatTestValue = (value: unknown): string => {
 };
 
 const WorkflowInputsTable = ({
+    codeWorkflow,
     internalOnlyVisible,
     openDeleteDialog,
     openEditDialog,
@@ -70,14 +74,23 @@ const WorkflowInputsTable = ({
                     <TableCell>{formatTestValue(workflowTestConfigurationInputs?.[input.name])}</TableCell>
 
                     <TableCell className="flex justify-end">
-                        <Button icon={<EditIcon />} onClick={() => openEditDialog(index)} size="icon" variant="ghost" />
-
                         <Button
-                            icon={<Trash2Icon className="text-destructive" />}
-                            onClick={() => openDeleteDialog(index)}
+                            aria-label="Edit input"
+                            icon={<EditIcon />}
+                            onClick={() => openEditDialog(index)}
                             size="icon"
                             variant="ghost"
                         />
+
+                        {!codeWorkflow && (
+                            <Button
+                                aria-label="Delete input"
+                                icon={<Trash2Icon className="text-destructive" />}
+                                onClick={() => openDeleteDialog(index)}
+                                size="icon"
+                                variant="ghost"
+                            />
+                        )}
                     </TableCell>
                 </TableRow>
             ))}

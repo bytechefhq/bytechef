@@ -50,6 +50,13 @@ const IntegrationsLeftSidebar = ({
         refetch: refetchIntegrations,
     } = useGetIntegrationsQuery();
 
+    // A code integration's workflows come from its source file, so there is nothing to create here.
+    const selectedIntegrationIsCodeWorkflow = (integrations ?? []).some(
+        (integration) =>
+            integration.id === (selectedIntegrationId === 0 ? integrationId : selectedIntegrationId) &&
+            integration.codeWorkflow
+    );
+
     const {data: selectedIntegrationWorkflows, isLoading: integrationWorkflowsLoading} =
         useGetIntegrationWorkflowsQuery(selectedIntegrationId, selectedIntegrationId !== 0);
 
@@ -160,13 +167,15 @@ const IntegrationsLeftSidebar = ({
                     sortBy={sortBy}
                 />
 
-                <Button
-                    className="w-full [&_svg]:size-5"
-                    icon={<PlusIcon />}
-                    label="New Workflow"
-                    onClick={() => setShowWorkflowDialog(true)}
-                    variant="secondary"
-                />
+                {!selectedIntegrationIsCodeWorkflow && (
+                    <Button
+                        className="w-full [&_svg]:size-5"
+                        icon={<PlusIcon />}
+                        label="New Workflow"
+                        onClick={() => setShowWorkflowDialog(true)}
+                        variant="secondary"
+                    />
+                )}
             </div>
 
             <ScrollArea className="mb-3 min-h-0 w-full flex-1">

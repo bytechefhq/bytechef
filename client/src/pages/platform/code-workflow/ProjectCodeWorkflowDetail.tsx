@@ -6,6 +6,7 @@ import {useQueryClient} from '@tanstack/react-query';
 import {useEffect} from 'react';
 
 interface ProjectCodeWorkflowDetailProps {
+    headerless?: boolean;
     invalidateWorkflowQueries?: () => void;
     language: string;
     onTestConfigurationClick?: () => void;
@@ -14,6 +15,7 @@ interface ProjectCodeWorkflowDetailProps {
 }
 
 const ProjectCodeWorkflowDetail = ({
+    headerless,
     invalidateWorkflowQueries,
     language,
     onTestConfigurationClick,
@@ -50,6 +52,7 @@ const ProjectCodeWorkflowDetail = ({
     return (
         <CodeWorkflowSourceEditor
             error={sourceError}
+            headerless={headerless}
             isLoading={sourceLoading}
             isSaving={updateCodeWorkflowSourceMutation.isPending}
             language={language}

@@ -60,4 +60,18 @@ describe('getExecutedEdgeStatus', () => {
         expect(getExecutedEdgeStatus(taskNode('var_1'), taskNode('logger_1'), states)).toBeUndefined();
         expect(getExecutedEdgeStatus(taskNode('var_1'), taskNode('missing'), states)).toBeUndefined();
     });
+
+    it('treats the trigger as completed once anything ran, so its outgoing edge colors', () => {
+        const triggerNode: Node = {
+            data: {trigger: true, workflowNodeName: 'trigger_1'},
+            id: 'trigger_1',
+            position: {x: 0, y: 0},
+        };
+
+        const states = {var_1: {status: 'COMPLETED' as const}};
+
+        expect(getExecutedEdgeStatus(triggerNode, taskNode('var_1'), states)).toBe('COMPLETED');
+
+        expect(getExecutedEdgeStatus(triggerNode, taskNode('var_1'), {})).toBeUndefined();
+    });
 });

@@ -84,13 +84,16 @@ describe('NewCodeWorkflowDialog', () => {
 
         renderDialog();
 
-        await user.type(screen.getByLabelText('Name'), 'my-code-workflow');
+        await user.type(screen.getByLabelText('Project Name'), 'my-code-workflow');
 
         await user.click(screen.getByRole('button', {name: /create/i}));
 
         expect(hoisted.mockMutate).toHaveBeenCalledWith({
+            categoryId: undefined,
+            description: undefined,
             language: CodeWorkflowLanguage.Javascript,
             name: 'my-code-workflow',
+            tags: [],
             workspaceId: 100,
         });
 
@@ -113,19 +116,22 @@ describe('NewCodeWorkflowDialog', () => {
 
         renderDialog();
 
-        await user.type(screen.getByLabelText('Name'), 'duplicate-name');
+        await user.type(screen.getByLabelText('Project Name'), 'duplicate-name');
 
         await user.click(screen.getByRole('button', {name: /create/i}));
 
         expect(hoisted.mockMutate).toHaveBeenCalledWith({
+            categoryId: undefined,
+            description: undefined,
             language: CodeWorkflowLanguage.Javascript,
             name: 'duplicate-name',
+            tags: [],
             workspaceId: 100,
         });
 
         expect(hoisted.mockNavigate).not.toHaveBeenCalled();
         expect(hoisted.mockOnClose).not.toHaveBeenCalled();
-        expect(screen.getByLabelText('Name')).toBeInTheDocument();
+        expect(screen.getByLabelText('Project Name')).toBeInTheDocument();
     });
 
     it('disables the Cancel button while the mutation is pending', () => {

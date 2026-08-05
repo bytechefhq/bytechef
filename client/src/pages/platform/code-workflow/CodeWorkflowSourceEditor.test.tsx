@@ -1,3 +1,4 @@
+import useCodeWorkflowHeaderStore from '@/pages/platform/code-workflow/stores/useCodeWorkflowHeaderStore';
 import {CodeWorkflowLanguage} from '@/shared/middleware/graphql';
 import {fireEvent, render, resetAll, screen, waitFor} from '@/shared/util/test-utils';
 import {afterEach, describe, expect, it, vi} from 'vitest';
@@ -245,5 +246,27 @@ describe('CodeWorkflowSourceEditor', () => {
         await waitFor(() => expect(onSaveMock).toHaveBeenCalled());
 
         expect(saveButton).not.toBeDisabled();
+    });
+
+    it('publishes its test configuration handler so the project header can render it', async () => {
+        const onTestConfigurationClick = vi.fn();
+
+        render(
+            <CodeWorkflowSourceEditor
+                headerless
+                isLoading={false}
+                isSaving={false}
+                language={CodeWorkflowLanguage.Javascript}
+                onSave={vi.fn()}
+                onTestConfigurationClick={onTestConfigurationClick}
+                source="({})"
+            />
+        );
+
+        // The header lives outside this subtree and renders whatever landed in the store, so a handler that never
+        // gets published is a button that never appears.
+        await waitFor(() => {
+            expect(useCodeWorkflowHeaderStore.getState().onTestConfigurationClick).toBe(onTestConfigurationClick);
+        });
     });
 });

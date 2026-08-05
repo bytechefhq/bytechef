@@ -86,6 +86,11 @@ const ProjectsLeftSidebar = ({
 
     const findProjectIdByWorkflow = getWorkflowsProjectId(projects || []);
 
+    // A code project's workflows come from its source file, so there is nothing to create here.
+    const selectedProjectIsCodeWorkflow = (projects ?? []).some(
+        (project) => project.id === (selectedProjectId === 0 ? projectId : selectedProjectId) && project.codeWorkflow
+    );
+
     const filteredWorkflowsList = useMemo(
         () => getFilteredWorkflows(workflows, sortBy, searchValue),
         [workflows, sortBy, searchValue, getFilteredWorkflows]
@@ -219,74 +224,76 @@ const ProjectsLeftSidebar = ({
                     sortBy={sortBy}
                 />
 
-                <ButtonGroup className="w-full">
-                    <Button
-                        className="flex-1 [&_svg]:size-5"
-                        icon={<PlusIcon />}
-                        label="New Workflow"
-                        onClick={() => setShowWorkflowDialog(true)}
-                        variant="secondary"
-                    />
+                {!selectedProjectIsCodeWorkflow && (
+                    <ButtonGroup className="w-full">
+                        <Button
+                            className="flex-1 [&_svg]:size-5"
+                            icon={<PlusIcon />}
+                            label="New Workflow"
+                            onClick={() => setShowWorkflowDialog(true)}
+                            variant="secondary"
+                        />
 
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button
-                                className="data-[state=open]:border-stroke-brand-secondary data-[state=open]:bg-surface-brand-secondary data-[state=open]:text-content-brand-primary [&_svg]:size-5"
-                                icon={
-                                    isImportingN8nWorkflow ? (
-                                        <LoaderCircleIcon className="animate-spin text-primary" />
-                                    ) : (
-                                        <ChevronDownIcon />
-                                    )
-                                }
-                                size="icon"
-                                variant="secondary"
-                            />
-                        </DropdownMenuTrigger>
-
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuItem
-                                className="cursor-pointer"
-                                onClick={() => navigate(`./../../../${selectedProjectId}/templates`)}
-                            >
-                                <LayoutTemplateIcon /> From Template
-                            </DropdownMenuItem>
-
-                            <DropdownMenuItem
-                                className="cursor-pointer"
-                                onClick={() => {
-                                    if (workflowHiddenFileInputRef.current) {
-                                        workflowHiddenFileInputRef.current.click();
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button
+                                    className="data-[state=open]:border-stroke-brand-secondary data-[state=open]:bg-surface-brand-secondary data-[state=open]:text-content-brand-primary [&_svg]:size-5"
+                                    icon={
+                                        isImportingN8nWorkflow ? (
+                                            <LoaderCircleIcon className="animate-spin text-primary" />
+                                        ) : (
+                                            <ChevronDownIcon />
+                                        )
                                     }
-                                }}
-                            >
-                                <UploadIcon /> Import Workflow
-                            </DropdownMenuItem>
+                                    size="icon"
+                                    variant="secondary"
+                                />
+                            </DropdownMenuTrigger>
 
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <span className="block">
-                                        <DropdownMenuItem
-                                            className="cursor-pointer"
-                                            disabled={importN8nWorkflowDisabled}
-                                            onClick={() => {
-                                                if (converterHiddenFileInputRef.current) {
-                                                    converterHiddenFileInputRef.current.click();
-                                                }
-                                            }}
-                                        >
-                                            <UploadIcon /> Import n8n Workflow
-                                        </DropdownMenuItem>
-                                    </span>
-                                </TooltipTrigger>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuItem
+                                    className="cursor-pointer"
+                                    onClick={() => navigate(`./../../../${selectedProjectId}/templates`)}
+                                >
+                                    <LayoutTemplateIcon /> From Template
+                                </DropdownMenuItem>
 
-                                {importN8nWorkflowDisabled && (
-                                    <TooltipContent>Enable an AI provider to import n8n workflows.</TooltipContent>
-                                )}
-                            </Tooltip>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                </ButtonGroup>
+                                <DropdownMenuItem
+                                    className="cursor-pointer"
+                                    onClick={() => {
+                                        if (workflowHiddenFileInputRef.current) {
+                                            workflowHiddenFileInputRef.current.click();
+                                        }
+                                    }}
+                                >
+                                    <UploadIcon /> Import Workflow
+                                </DropdownMenuItem>
+
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <span className="block">
+                                            <DropdownMenuItem
+                                                className="cursor-pointer"
+                                                disabled={importN8nWorkflowDisabled}
+                                                onClick={() => {
+                                                    if (converterHiddenFileInputRef.current) {
+                                                        converterHiddenFileInputRef.current.click();
+                                                    }
+                                                }}
+                                            >
+                                                <UploadIcon /> Import n8n Workflow
+                                            </DropdownMenuItem>
+                                        </span>
+                                    </TooltipTrigger>
+
+                                    {importN8nWorkflowDisabled && (
+                                        <TooltipContent>Enable an AI provider to import n8n workflows.</TooltipContent>
+                                    )}
+                                </Tooltip>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </ButtonGroup>
+                )}
             </div>
 
             <ScrollArea className="mb-3 min-h-0 w-full flex-1">

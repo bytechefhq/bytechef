@@ -101,6 +101,7 @@ const Project = () => {
                             workflow.triggers &&
                             workflow.triggers.findIndex((trigger) => trigger.type.includes('chat/')) !== -1
                         }
+                        codeWorkflow={project?.codeWorkflow}
                         projectId={projectId}
                         projectWorkflowId={projectWorkflowId}
                         runDisabled={runDisabled}

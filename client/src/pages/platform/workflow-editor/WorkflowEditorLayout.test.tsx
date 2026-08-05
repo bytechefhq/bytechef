@@ -150,12 +150,14 @@ describe('WorkflowEditorLayout - code-backed project branching', () => {
         expect(screen.queryByTestId('integration-code-workflow-detail')).not.toBeInTheDocument();
     });
 
-    it('renders the visual editor (not the source editor) for a Java-backed code workflow', async () => {
+    it('renders neither editor for a Java-backed code workflow', async () => {
         mockUseWorkflowEditor(true, 'JAVA');
 
         renderLayout();
 
-        expect(await screen.findByTestId('workflow-editor')).toBeInTheDocument();
+        // A JAR has no source to edit, and the canvas would open on a definition the next deploy regenerates.
+        expect(await screen.findByText(/compiled Java artifact/i)).toBeInTheDocument();
+        expect(screen.queryByTestId('workflow-editor')).not.toBeInTheDocument();
         expect(screen.queryByTestId('code-workflow-detail')).not.toBeInTheDocument();
         expect(screen.queryByTestId('integration-code-workflow-detail')).not.toBeInTheDocument();
     });

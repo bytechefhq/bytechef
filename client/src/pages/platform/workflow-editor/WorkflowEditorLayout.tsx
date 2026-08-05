@@ -149,6 +149,11 @@ const WorkflowEditorLayout = ({
         [codeWorkflow, codeWorkflowLanguage]
     );
 
+    const isJavaCodeWorkflow = useMemo(
+        () => codeWorkflow === true && codeWorkflowLanguage === 'JAVA',
+        [codeWorkflow, codeWorkflowLanguage]
+    );
+
     useEffect(() => {
         return useCopilotStateContributorRegistry.getState().register(() => {
             const activeWorkflow = useWorkflowDataStore.getState().workflow;
@@ -260,9 +265,17 @@ const WorkflowEditorLayout = ({
                     that visual-only chrome for code workflows is left for a follow-up pass.
                 */}
 
-                {isCodeWorkflow && codeWorkflowLanguage && integrationId ? (
+                {isJavaCodeWorkflow ? (
+                    <div className="flex flex-1 items-center justify-center bg-surface-main p-8">
+                        <div className="max-w-md text-center text-sm text-content-neutral-secondary">
+                            This project&apos;s workflows are defined in a compiled Java artifact. There is no source to
+                            edit here — rebuild the JAR and deploy it again to change them.
+                        </div>
+                    </div>
+                ) : isCodeWorkflow && codeWorkflowLanguage && integrationId ? (
                     <Suspense>
                         <IntegrationCodeWorkflowDetail
+                            headerless
                             integrationId={integrationId}
                             invalidateWorkflowQueries={invalidateWorkflowQueries}
                             language={codeWorkflowLanguage}
@@ -273,6 +286,7 @@ const WorkflowEditorLayout = ({
                 ) : isCodeWorkflow && codeWorkflowLanguage && projectId ? (
                     <Suspense>
                         <ProjectCodeWorkflowDetail
+                            headerless
                             invalidateWorkflowQueries={invalidateWorkflowQueries}
                             language={codeWorkflowLanguage}
                             onTestConfigurationClick={() => setShowCodeWorkflowTestConfigurationDialog(true)}

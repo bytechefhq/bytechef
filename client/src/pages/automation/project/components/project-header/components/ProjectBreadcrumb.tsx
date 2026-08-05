@@ -9,6 +9,7 @@ export interface ProjectBreadcrumbProps {
     project: Project;
     projectWorkflowId: number;
     projectWorkflows: Workflow[];
+    showWorkflowSelect?: boolean;
 }
 const ProjectBreadcrumb = ({
     currentWorkflow,
@@ -16,6 +17,7 @@ const ProjectBreadcrumb = ({
     project,
     projectWorkflowId,
     projectWorkflows,
+    showWorkflowSelect = true,
 }: ProjectBreadcrumbProps) => (
     <Breadcrumb>
         <BreadcrumbList>
@@ -23,17 +25,21 @@ const ProjectBreadcrumb = ({
                 <ProjectTitle project={project} />
             </BreadcrumbItem>
 
-            <BreadcrumbSeparator />
+            {showWorkflowSelect && (
+                <>
+                    <BreadcrumbSeparator />
 
-            <BreadcrumbItem>
-                <WorkflowSelect
-                    currentWorkflowLabel={currentWorkflow.label}
-                    onValueChange={onProjectWorkflowValueChange}
-                    projectId={project.id!}
-                    projectWorkflowId={projectWorkflowId}
-                    projectWorkflows={projectWorkflows}
-                />
-            </BreadcrumbItem>
+                    <BreadcrumbItem>
+                        <WorkflowSelect
+                            currentWorkflowLabel={currentWorkflow.label}
+                            onValueChange={onProjectWorkflowValueChange}
+                            projectId={project.id!}
+                            projectWorkflowId={projectWorkflowId}
+                            projectWorkflows={projectWorkflows}
+                        />
+                    </BreadcrumbItem>
+                </>
+            )}
         </BreadcrumbList>
     </Breadcrumb>
 );

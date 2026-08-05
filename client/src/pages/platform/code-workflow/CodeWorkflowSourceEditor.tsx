@@ -170,10 +170,10 @@ const CodeWorkflowSourceEditor = ({
         >
             <PageLoader errors={[error]} loading={isLoading}>
                 {monacoLanguage && (
-                    // Only a left gutter: without a header row above it the editor would sit flush against the app
-                    // sidebar, while its right edge must still reach the same edge the header does (the workflow
-                    // editor's right sidebar floats over that edge rather than reserving space).
-                    <div className="flex min-h-0 flex-1 flex-col overflow-hidden pl-3">
+                    // Same container treatment as the visual editor's canvas (WorkflowEditor's root), so a code
+                    // workflow sits exactly where a visually built one does inside WorkflowEditorLayout's wrapper —
+                    // an inset card rather than a slab pushed 12px further right than its neighbour.
+                    <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg bg-background">
                         <div className="relative min-h-0 flex-1">
                             <div className="absolute inset-0">
                                 <MonacoEditorWrapper

@@ -7,6 +7,7 @@ import {useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 export interface WorkflowRightSidebarProps {
+    copilotOnly?: boolean;
     copilotPanelOpen: boolean;
     onComponentsAndFlowControlsClick: () => void;
     onCopilotClick: () => void;
@@ -18,6 +19,7 @@ export interface WorkflowRightSidebarProps {
     showWorkflowInputs?: boolean;
 }
 const WorkflowRightSidebar = ({
+    copilotOnly = false,
     copilotPanelOpen,
     onComponentsAndFlowControlsClick,
     onCopilotClick,
@@ -76,6 +78,13 @@ const WorkflowRightSidebar = ({
                     return showCopilot && copilotEnabled;
                 }
 
+                // copilotOnly is a code workflow: its tasks come from source, so the canvas entries (node palette,
+                // outputs panel, code sheet) have nothing to act on. Inputs still do — the source declares them and
+                // this is where their test values get set.
+                if (copilotOnly) {
+                    return item.name === 'Workflow Inputs';
+                }
+
                 if (item.name === 'Workflow Outputs') {
                     return ff_1840;
                 }
@@ -83,11 +92,15 @@ const WorkflowRightSidebar = ({
                 return true;
             }),
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [copilotEnabled, copilotPanelOpen, ff_1840, rightSidebarOpen, showCopilot]
+        [copilotEnabled, copilotOnly, copilotPanelOpen, ff_1840, rightSidebarOpen, showCopilot]
     );
 
     const activeItemStyling =
         'bg-surface-brand-secondary text-content-brand-primary hover:bg-surface-brand-secondary-hover hover:text-content-brand-primary';
+
+    if (rightSidebarNavigation.length === 0) {
+        return null;
+    }
 
     return (
         <aside className="absolute right-0 m-2 flex flex-col items-center gap-1 rounded-md border border-stroke-neutral-secondary bg-background p-1">

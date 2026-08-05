@@ -34,6 +34,9 @@ interface InputConfigurationListProps {
     control: Control<FieldValues>;
     controlPath: string;
     duplicateSubflowStubs?: SubflowDuplicateStubI[];
+    // Replaces the "Open Inputs" affordance when the caller knows that sheet cannot add an input — a code workflow's
+    // inputs come from its source, so sending the user there would only repeat this message.
+    emptyStateMessage?: string;
     formState: FormState<FieldValues>;
     inputs?: WorkflowInput[];
     onOpenInputs?: () => void;
@@ -641,6 +644,7 @@ const InputConfigurationList = ({
     control,
     controlPath,
     duplicateSubflowStubs,
+    emptyStateMessage,
     formState,
     inputs,
     onOpenInputs,
@@ -729,6 +733,16 @@ const InputConfigurationList = ({
     }, [inputs, duplicateSubflowStubs]);
 
     if (!referenceInputs.length && !regularInputs.length && !subflowInputTree.size && !topLevelStubs.length) {
+        if (emptyStateMessage) {
+            return (
+                <div className="flex flex-col items-center gap-2">
+                    <h3 className="font-medium text-content-neutral-primary">No Inputs yet</h3>
+
+                    <p className="text-sm text-content-neutral-secondary">{emptyStateMessage}</p>
+                </div>
+            );
+        }
+
         if (!onOpenInputs) {
             return <p className="text-sm">No Inputs yet</p>;
         }

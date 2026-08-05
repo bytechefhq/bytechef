@@ -9,6 +9,7 @@ import {useQueryClient} from '@tanstack/react-query';
 import {useEffect} from 'react';
 
 interface IntegrationCodeWorkflowDetailProps {
+    headerless?: boolean;
     integrationId: string;
     invalidateWorkflowQueries?: () => void;
     language: string;
@@ -17,6 +18,7 @@ interface IntegrationCodeWorkflowDetailProps {
 }
 
 const IntegrationCodeWorkflowDetail = ({
+    headerless,
     integrationId,
     invalidateWorkflowQueries,
     language,
@@ -53,6 +55,7 @@ const IntegrationCodeWorkflowDetail = ({
     return (
         <CodeWorkflowSourceEditor
             error={sourceError}
+            headerless={headerless}
             isLoading={sourceLoading}
             isSaving={updateIntegrationCodeWorkflowSourceMutation.isPending}
             language={language}

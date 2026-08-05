@@ -21,8 +21,8 @@ describe('positionTriggerPlaceholder', () => {
         // Placed a full node-width past the rightmost trigger (300) so it clears the label.
         expect(slot.position.x).toBeGreaterThan(300 + 240);
 
-        // Vertically centered on the 72px icon box: triggerY (50) + (72 - 28) / 2 = 72.
-        expect(slot.position.y).toBe(72);
+        // Vertically centered on the 72px icon box: triggerY (50) + (72 - 48) / 2 = 62.
+        expect(slot.position.y).toBe(62);
     });
 
     it('is a no-op when there is no placeholder', () => {

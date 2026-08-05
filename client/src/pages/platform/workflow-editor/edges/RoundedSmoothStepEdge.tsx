@@ -1,8 +1,10 @@
 import {TRIGGER_FAN_IN_BUS_OFFSET} from '@/shared/constants';
 import {BaseEdge, EdgeProps, getSmoothStepPath} from '@xyflow/react';
+import {twMerge} from 'tailwind-merge';
 
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import computeExitEdgeJogCenter from './computeExitEdgeJogCenter';
+import useExecutedEdgeStatus from './useExecutedEdgeStatus';
 
 export default function RoundedSmoothStepEdge({
     data,
@@ -17,6 +19,8 @@ export default function RoundedSmoothStepEdge({
     targetY,
 }: EdgeProps) {
     const layoutDirection = useLayoutDirectionStore((state) => state.layoutDirection);
+
+    const executedEdgeStatus = useExecutedEdgeStatus(id);
 
     // For trigger fan-in edges, pin the bus (the step's bend) a fixed short distance
     // below the trigger row so the trigger→bus drop stays short. The cross-axis
@@ -59,6 +63,15 @@ export default function RoundedSmoothStepEdge({
     });
 
     return (
-        <BaseEdge className="fill-none stroke-stroke-neutral-tertiary stroke-2" id={id} path={edgePath} style={style} />
+        <BaseEdge
+            className={twMerge(
+                'fill-none stroke-stroke-neutral-tertiary stroke-2',
+                executedEdgeStatus === 'COMPLETED' && 'stroke-green-500',
+                executedEdgeStatus === 'FAILED' && 'stroke-red-500'
+            )}
+            id={id}
+            path={edgePath}
+            style={style}
+        />
     );
 }

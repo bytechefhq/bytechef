@@ -28,6 +28,7 @@ import DeleteWorkflowAlertDialog from '@/shared/components/DeleteWorkflowAlertDi
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
+import {isJavaCodeWorkflow} from '@/shared/util/codeWorkflowLanguage-utils';
 import {useQueryClient} from '@tanstack/react-query';
 import {
     ComponentIcon,
@@ -38,7 +39,7 @@ import {
     Share2Icon,
     Trash2Icon,
 } from 'lucide-react';
-import {useMemo, useState} from 'react';
+import {ReactNode, useMemo, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {Link, useSearchParams} from 'react-router-dom';
 import {toast} from 'sonner';
@@ -48,6 +49,41 @@ type TriggerDataType = {
     description: string;
     iconSrc: string;
     label: string;
+};
+
+/**
+ * The row's clickable area. A disabled row keeps the same layout but is inert, so a Java code project's rows line up
+ * with everything else instead of becoming a differently shaped row.
+ */
+const WorkflowRowLink = ({
+    children,
+    disabled,
+    projectId,
+    projectWorkflowId,
+    searchParams,
+    workflowLabel,
+}: {
+    children: ReactNode;
+    disabled: boolean;
+    projectId?: number;
+    projectWorkflowId?: number;
+    searchParams: URLSearchParams;
+    workflowLabel?: string;
+}) => {
+    if (disabled) {
+        return <div className="flex min-w-0 flex-1 items-center gap-2">{children}</div>;
+    }
+
+    return (
+        <Link
+            aria-label={`Link to workflow ${workflowLabel}`}
+            className="flex min-w-0 flex-1 items-center gap-2"
+            data-testid={`${projectWorkflowId}-link`}
+            to={`/automation/projects/${projectId}/project-workflows/${projectWorkflowId}?${searchParams}`}
+        >
+            {children}
+        </Link>
+    );
 };
 
 const ProjectWorkflowListItem = ({
@@ -178,11 +214,13 @@ const ProjectWorkflowListItem = ({
             className="flex items-center justify-between rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover"
             key={workflow.id}
         >
-            <Link
-                aria-label={`Link to workflow ${workflow.label}`}
-                className="flex min-w-0 flex-1 items-center gap-2"
-                data-testid={`${workflow.projectWorkflowId}-link`}
-                to={`/automation/projects/${project.id}/project-workflows/${workflow.projectWorkflowId}?${searchParams}`}
+            <WorkflowRowLink
+                // A Java code project's workflows come from a compiled JAR: there is nothing to open for them.
+                disabled={isJavaCodeWorkflow(project.codeWorkflow, project.codeWorkflowLanguage)}
+                projectId={project.id}
+                projectWorkflowId={workflow.projectWorkflowId}
+                searchParams={searchParams}
+                workflowLabel={workflow.label}
             >
                 <div className="flex w-80 min-w-0 shrink-0 flex-col gap-1 pr-1 text-sm font-semibold">
                     <Tooltip>
@@ -262,7 +300,7 @@ const ProjectWorkflowListItem = ({
                         workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
                     />
                 </div>
-            </Link>
+            </WorkflowRowLink>
 
             <div className="flex justify-end gap-x-6">
                 <Tooltip>
@@ -275,79 +313,85 @@ const ProjectWorkflowListItem = ({
                     <TooltipContent>Last Modified Date</TooltipContent>
                 </Tooltip>
 
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button icon={<EllipsisVerticalIcon />} size="icon" variant="ghost" />
-                    </DropdownMenuTrigger>
+                {project.codeWorkflow ? (
+                    // Code-project workflows carry no per-workflow actions, but the row must still reserve the
+                    // action button's width so the Modified-at column lines up with the visual projects' rows.
+                    <div aria-hidden className="size-9 shrink-0" />
+                ) : (
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button icon={<EllipsisVerticalIcon />} size="icon" variant="ghost" />
+                        </DropdownMenuTrigger>
 
-                    <DropdownMenuContent align="end" className="p-0">
-                        <DropdownMenuItem
-                            className="dropdown-menu-item"
-                            onClick={() => {
-                                setShowEditDialog(true);
-                            }}
-                        >
-                            <EditIcon /> Edit
-                        </DropdownMenuItem>
-
-                        {project && workflow && (
-                            <DropdownMenuItem
-                                className="dropdown-menu-item"
-                                onClick={() =>
-                                    duplicateWorkflowMutation.mutate({
-                                        id: project.id!,
-                                        workflowId: workflow.id!,
-                                    })
-                                }
-                            >
-                                <CopyIcon /> Duplicate
-                            </DropdownMenuItem>
-                        )}
-
-                        {ff_1042 && (
-                            <DropdownMenuItem
-                                className="dropdown-menu-item"
-                                onClick={() => setShowWorkflowShareDialog(true)}
-                            >
-                                <Share2Icon /> Share
-                            </DropdownMenuItem>
-                        )}
-
-                        {ff_2939 && (
+                        <DropdownMenuContent align="end" className="p-0">
                             <DropdownMenuItem
                                 className="dropdown-menu-item"
                                 onClick={() => {
-                                    if (templatesSubmissionForm) {
-                                        window.open(templatesSubmissionForm, '_blank');
-                                    }
+                                    setShowEditDialog(true);
                                 }}
                             >
-                                <Share2Icon /> Share with Community
+                                <EditIcon /> Edit
                             </DropdownMenuItem>
-                        )}
 
-                        <DropdownMenuItem
-                            className="dropdown-menu-item"
-                            onClick={() =>
-                                (window.location.href = `/api/automation/internal/workflows/${workflow.id}/export`)
-                            }
-                        >
-                            <DownloadIcon /> Export
-                        </DropdownMenuItem>
+                            {project && workflow && (
+                                <DropdownMenuItem
+                                    className="dropdown-menu-item"
+                                    onClick={() =>
+                                        duplicateWorkflowMutation.mutate({
+                                            id: project.id!,
+                                            workflowId: workflow.id!,
+                                        })
+                                    }
+                                >
+                                    <CopyIcon /> Duplicate
+                                </DropdownMenuItem>
+                            )}
 
-                        <DropdownMenuSeparator className="m-0" />
+                            {ff_1042 && (
+                                <DropdownMenuItem
+                                    className="dropdown-menu-item"
+                                    onClick={() => setShowWorkflowShareDialog(true)}
+                                >
+                                    <Share2Icon /> Share
+                                </DropdownMenuItem>
+                            )}
 
-                        <DropdownMenuItem
-                            className="dropdown-menu-item-destructive"
-                            onClick={() => {
-                                setShowDeleteDialog(true);
-                            }}
-                            variant="destructive"
-                        >
-                            <Trash2Icon /> Delete
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                            {ff_2939 && (
+                                <DropdownMenuItem
+                                    className="dropdown-menu-item"
+                                    onClick={() => {
+                                        if (templatesSubmissionForm) {
+                                            window.open(templatesSubmissionForm, '_blank');
+                                        }
+                                    }}
+                                >
+                                    <Share2Icon /> Share with Community
+                                </DropdownMenuItem>
+                            )}
+
+                            <DropdownMenuItem
+                                className="dropdown-menu-item"
+                                onClick={() =>
+                                    (window.location.href = `/api/automation/internal/workflows/${workflow.id}/export`)
+                                }
+                            >
+                                <DownloadIcon /> Export
+                            </DropdownMenuItem>
+
+                            <DropdownMenuSeparator className="m-0" />
+
+                            <DropdownMenuItem
+                                className="dropdown-menu-item-destructive"
+                                onClick={() => {
+                                    setShowDeleteDialog(true);
+                                }}
+                                variant="destructive"
+                            >
+                                <Trash2Icon /> Delete
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                )}
             </div>
 
             {showDeleteDialog && (

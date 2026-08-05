@@ -63,6 +63,9 @@ const Integration = () => {
         <div className="flex w-full">
             <WorkflowTestRunLeaveDialog onCancel={cancelLeave} onConfirm={confirmLeave} open={showLeaveDialog} />
 
+            {/* A code workflow has no editable workflow tree, but the sidebar still lists its generated workflows
+             * and its sibling integrations, so it stays mounted — only workflow creation is hidden inside it. */}
+
             <div className="h-full shrink-0 overflow-hidden">
                 <div
                     className={twMerge(
