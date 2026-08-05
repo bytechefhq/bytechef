@@ -23,7 +23,7 @@ import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstant
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.IS_THE_FIRST_ROW_HEADER_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
-import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.getMapOfValuesForRowAndColumn;
+import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.getMapOfValuesForRow;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -42,16 +42,21 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.Channel;
 import com.google.api.services.sheets.v4.Sheets;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 /**
  * @author Marko Kriskovic
  */
 public class GoogleSheetsNewRowTrigger {
+
+    private static final String KNOWN_ROW_HASHES = "knownRowHashes";
 
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newRow")
         .title("New Row")
@@ -134,20 +139,51 @@ public class GoogleSheetsNewRowTrigger {
 
         Sheets sheets = GoogleServices.getSheets(connectionParameters);
 
-        Optional<Object> currentRowNumOptional = context.data(data -> data.fetch(WORKFLOW, "currentRow"));
-
-        int currentRowNum = currentRowNumOptional.map(o -> Integer.parseInt(o.toString()))
-            .orElse(0);
-
         List<List<Object>> values = GoogleSheetsUtils.getSpreadsheetValues(
             sheets, inputParameters.getRequiredString(SPREADSHEET_ID), inputParameters.getRequiredString(SHEET_NAME));
 
         if (values == null) {
             return Collections.emptyList();
-        } else {
-            context.data(data -> data.put(WORKFLOW, "currentRow", values.size()));
-
-            return getMapOfValuesForRowAndColumn(inputParameters, sheets, values, currentRowNum, values.size());
         }
+
+        Optional<Object> knownRowHashesOptional = context.data(data -> data.fetch(WORKFLOW, KNOWN_ROW_HASHES));
+
+        Set<Integer> knownRowHashes = knownRowHashesOptional
+            .map(GoogleSheetsNewRowTrigger::toRowHashSet)
+            .orElseGet(Set::of);
+
+        List<Integer> currentRowHashes = new ArrayList<>();
+        List<Map<String, Object>> newRows = new ArrayList<>();
+
+        // Rows are matched by content hash rather than position so that a row inserted in the
+        // middle of the sheet is still detected as new, instead of being confused with whichever
+        // row happens to shift into the last position (see #4362).
+        for (List<Object> row : values) {
+            int rowHash = row.hashCode();
+
+            currentRowHashes.add(rowHash);
+
+            if (!knownRowHashes.contains(rowHash)) {
+                newRows.add(getMapOfValuesForRow(inputParameters, sheets, row));
+            }
+        }
+
+        context.data(data -> data.put(WORKFLOW, KNOWN_ROW_HASHES, currentRowHashes));
+
+        return newRows;
+    }
+
+    private static Set<Integer> toRowHashSet(Object storedRowHashes) {
+        Set<Integer> rowHashes = new HashSet<>();
+
+        if (storedRowHashes instanceof List<?> list) {
+            for (Object rowHash : list) {
+                if (rowHash instanceof Number number) {
+                    rowHashes.add(number.intValue());
+                }
+            }
+        }
+
+        return rowHashes;
     }
 }
