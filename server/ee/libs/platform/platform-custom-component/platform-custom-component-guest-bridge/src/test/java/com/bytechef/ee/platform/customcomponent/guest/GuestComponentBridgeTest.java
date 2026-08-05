@@ -19,7 +19,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ActionDefinition.PerformFunction;
+import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -124,6 +126,103 @@ class GuestComponentBridgeTest {
         assertEquals("Hello World x2", result.get("greeting"));
         assertEquals("trace-42", result.get("traceId"));
         assertEquals(List.of("INFO|greeting World|null"), hostBridge.logEntries);
+    }
+
+    @Test
+    void testDescribeComponentSerializesStaticConnection() throws Exception {
+        String json = GuestComponentBridge.describeComponent(ConnectionSampleComponentHandler.class.getName());
+
+        Map<String, ?> component = OBJECT_MAPPER.readValue(json, Map.class);
+
+        Map<String, ?> connection = (Map<String, ?>) component.get("connection");
+
+        assertEquals("https://api.example.com", connection.get("baseUri"));
+
+        List<Map<String, ?>> authorizations = (List<Map<String, ?>>) connection.get("authorizations");
+
+        assertEquals(1, authorizations.size());
+
+        Map<String, ?> authorization = authorizations.getFirst();
+
+        assertEquals("OAUTH2_AUTHORIZATION_CODE", authorization.get("type"));
+        assertEquals("https://example.com/oauth/authorize", authorization.get("authorizationUrl"));
+        assertEquals("https://example.com/oauth/token", authorization.get("tokenUrl"));
+        assertEquals(List.of("read", "write"), authorization.get("scopes"));
+
+        List<Map<String, ?>> properties = (List<Map<String, ?>>) authorization.get("properties");
+
+        assertEquals("clientId", properties.getFirst()
+            .get("name"));
+
+        List<String> unsupported = (List<String>) component.get("unsupported");
+
+        assertTrue(unsupported.stream()
+            .noneMatch(entry -> entry.equals("connection")));
+    }
+
+    @Test
+    void testDescribeComponentReportsDynamicConnectionUnsupported() throws Exception {
+        String json = GuestComponentBridge.describeComponent(DynamicConnectionComponentHandler.class.getName());
+
+        Map<String, ?> component = OBJECT_MAPPER.readValue(json, Map.class);
+
+        assertEquals(null, component.get("connection"));
+
+        List<String> unsupported = (List<String>) component.get("unsupported");
+
+        assertTrue(unsupported.contains("connection"));
+    }
+
+    public static class ConnectionSampleComponentHandler implements ComponentHandler {
+
+        @Override
+        public ComponentDefinition getDefinition() {
+            return component("connection-sample")
+                .title("Connection Sample")
+                .version(1)
+                .connection(
+                    ComponentDsl.connection()
+                        .baseUri((connectionParameters, context) -> "https://api.example.com")
+                        .authorizations(
+                            ComponentDsl.authorization(Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
+                                .authorizationUrl(
+                                    (connectionParameters, context) -> "https://example.com/oauth/authorize")
+                                .tokenUrl((connectionParameters, context) -> "https://example.com/oauth/token")
+                                .scopes((connectionParameters, context) -> {
+                                    Map<String, Boolean> scopes = new java.util.LinkedHashMap<>();
+
+                                    scopes.put("read", true);
+                                    scopes.put("write", true);
+
+                                    return scopes;
+                                })
+                                .properties(
+                                    string("clientId")
+                                        .label("Client Id")
+                                        .required(true))))
+                .actions(
+                    action("noop")
+                        .title("Noop"));
+        }
+    }
+
+    public static class DynamicConnectionComponentHandler implements ComponentHandler {
+
+        @Override
+        public ComponentDefinition getDefinition() {
+            return component("dynamic-connection-sample")
+                .title("Dynamic Connection Sample")
+                .version(1)
+                .connection(
+                    ComponentDsl.connection()
+                        .authorizations(
+                            ComponentDsl.authorization(Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
+                                .tokenUrl((connectionParameters, context) -> "https://"
+                                    + connectionParameters.getRequiredString("region") + ".example.com/oauth/token")))
+                .actions(
+                    action("noop")
+                        .title("Noop"));
+        }
     }
 
     public static class SampleComponentHandler implements ComponentHandler {

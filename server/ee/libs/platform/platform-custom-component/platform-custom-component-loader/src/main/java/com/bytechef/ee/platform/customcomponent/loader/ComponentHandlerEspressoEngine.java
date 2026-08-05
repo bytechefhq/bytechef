@@ -10,6 +10,7 @@ package com.bytechef.ee.platform.customcomponent.loader;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -21,6 +22,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
+import com.bytechef.component.definition.ConnectionDefinition;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
@@ -34,6 +36,7 @@ import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -147,7 +150,84 @@ class ComponentHandlerEspressoEngine {
         componentDefinition.actions(actionDefinitions);
         componentDefinition.triggers(triggerDefinitions);
 
+        Map<String, ?> connectionMap = (Map<String, ?>) component.get("connection");
+
+        if (connectionMap != null) {
+            componentDefinition.connection(toConnectionDefinition(connectionMap));
+        }
+
         return new IconComponentDefinitionWrapper(componentDefinition, icon);
+    }
+
+    /**
+     * Rebuilds a {@link ConnectionDefinition} from the static shape the guest bridge serialized. Only constants cross
+     * the boundary — every seam becomes a constant-returning function; connection definitions carrying real lambdas
+     * (dynamic URLs, custom apply/acquire) never reach this method, the guest reports them unsupported instead.
+     */
+    @SuppressWarnings("unchecked")
+    static ConnectionDefinition toConnectionDefinition(Map<String, ?> connectionMap) {
+        ComponentDsl.ModifiableConnectionDefinition connectionDefinition = ComponentDsl.connection();
+
+        if (connectionMap.get("baseUri") instanceof String baseUri) {
+            connectionDefinition.baseUri((connectionParameters, context) -> baseUri);
+        }
+
+        List<Property> connectionProperties = toProperties((List<Map<String, ?>>) connectionMap.get("properties"));
+
+        List<Map<String, ?>> authorizationMaps = (List<Map<String, ?>>) connectionMap.get("authorizations");
+
+        List<ComponentDsl.ModifiableAuthorization> authorizations = new ArrayList<>();
+
+        if (authorizationMaps != null) {
+            for (Map<String, ?> authorizationMap : authorizationMaps) {
+                String type = (String) authorizationMap.get("type");
+
+                ComponentDsl.ModifiableAuthorization authorization = ComponentDsl.authorization(
+                    Authorization.AuthorizationType.valueOf(type));
+
+                if (authorizationMap.get("authorizationUrl") instanceof String authorizationUrl) {
+                    authorization.authorizationUrl((connectionParameters, context) -> authorizationUrl);
+                }
+
+                if (authorizationMap.get("tokenUrl") instanceof String tokenUrl) {
+                    authorization.tokenUrl((connectionParameters, context) -> tokenUrl);
+                }
+
+                if (authorizationMap.get("refreshUrl") instanceof String refreshUrl) {
+                    authorization.refreshUrl((connectionParameters, context) -> refreshUrl);
+                }
+
+                List<String> scopes = (List<String>) authorizationMap.get("scopes");
+
+                if (scopes != null) {
+                    Map<String, Boolean> scopeMap = new LinkedHashMap<>();
+
+                    for (String scope : scopes) {
+                        scopeMap.put(scope, true);
+                    }
+
+                    authorization.scopes((connectionParameters, context) -> scopeMap);
+                }
+
+                List<Property> authorizationProperties = toProperties(
+                    (List<Map<String, ?>>) authorizationMap.get("properties"));
+
+                if (!authorizationProperties.isEmpty()) {
+                    authorization.properties(authorizationProperties);
+                } else if (!connectionProperties.isEmpty()) {
+                    authorization.properties(connectionProperties);
+                }
+
+                authorizations.add(authorization);
+            }
+        }
+
+        if (!authorizations.isEmpty()) {
+            connectionDefinition.authorizations(
+                authorizations.toArray(ComponentDsl.ModifiableAuthorization[]::new));
+        }
+
+        return connectionDefinition;
     }
 
     private static Object executePerform(
@@ -180,7 +260,7 @@ class ComponentHandlerEspressoEngine {
     }
 
     @SuppressWarnings("unchecked")
-    private static List<Property> toProperties(List<Map<String, ?>> propertyMaps) {
+    static List<Property> toProperties(List<Map<String, ?>> propertyMaps) {
         List<Property> properties = new ArrayList<>();
 
         if (propertyMaps == null) {

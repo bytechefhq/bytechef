@@ -29,7 +29,28 @@ The completion value must expose these members:
     - tasks   (list) — each entry is also a raw map/dict/hash with:
         - name    (String) — task key.
         - label   (String) — human-readable label.
-        - perform (zero-arg callable) — invoked with NO arguments and must return the task's output.
+        - connections (list, optional) — declares the connections the perform uses:
+          [{componentName, componentVersion?, name}] (a map keyed by connection name,
+          {"<name>": {componentName, componentVersion?}}, is accepted too). The `name` is the SAME value the
+          perform passes as connectionName. Declaring makes the connection appear in the workflow's
+          Test Configuration and deployment wiring, where the user picks the actual connection per
+          environment. ALWAYS declare every connection your perform code uses — an undeclared name
+          cannot be wired, so the call fails at run time.
+        - perform (callable) — invoked with ONE argument, the task context, and must return the
+          task's output. (Legacy zero-arg performs still run; new code should take the context.)
+            - context.component.<componentName>.<actionName>(input, connectionName) — invokes any
+              built-in component action. `input` is the action's input parameters map;
+              `connectionName` (optional) names the connection to use — it must match a name
+              declared in the task's `connections` and wired by the user. Example:
+              context.component.httpClient.get({uri: "https://api.example.com/items"}, "my-conn")
+            - context.connection(connectionName) — returns a declared connection's
+              parameters map, for building a request yourself (region, tenant id, base URL). Prefer
+              context.component when a component action already does the job; the map contains
+              credentials, so never log it.
+            - context.log(level, message) — writes to the task's execution log
+              ("trace" | "debug" | "info" | "warn" | "error").
+          NEVER use fromAi(...) expressions or workflow expression syntax inside a perform — it is
+          plain code; reach other components ONLY through context.component.
 
 CRITICAL: this dual shape is intentional and verified against the real loader. The OUTER project object
 must be a typed/member-bearing value (so the engine can read `name`/`version`/`description`/`workflows`
@@ -56,8 +77,10 @@ parser treats it as an expression, not a block. Never use `export default`, `exp
                 {
                     name: "fetch-and-sync",
                     label: "Fetch And Sync",
-                    perform: function () {
+                    perform: function (context) {
                         // do the work, then return the task output
+                        // const response = context.component.httpClient.get(
+                        //     {uri: "https://api.example.com/items"}, "my-connection");
                         return "hello";
                     }
                 }
@@ -86,7 +109,7 @@ types.SimpleNamespace(
             "name": "sync-invoices",
             "label": "Sync Invoices",
             "tasks": [
-                {"name": "fetch-and-sync", "label": "Fetch And Sync", "perform": lambda *args: "hello"}
+                {"name": "fetch-and-sync", "label": "Fetch And Sync", "perform": lambda context: "hello"}
             ]
         }
     ]
@@ -111,7 +134,7 @@ Struct.new(:name, :version, :description, :workflows).new(
       "name" => "sync-invoices",
       "label" => "Sync Invoices",
       "tasks" => [
-        { "name" => "fetch-and-sync", "label" => "Fetch And Sync", "perform" => lambda { |*args| "hello" } }
+        { "name" => "fetch-and-sync", "label" => "Fetch And Sync", "perform" => lambda { |context| "hello" } }
       ]
     }
   ]

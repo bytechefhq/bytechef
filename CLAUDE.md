@@ -558,6 +558,67 @@ Spec: `docs/superpowers/specs/2026-08-05-draft-publish-editors-design.md`.
   delete custom component, create/update code workflow) — MCP clients author code directly,
   draft-safe; `publishProject` comes from the core management tool set.
 
+### Perform context (custom components & code workflows, 2026-08-06)
+
+- **Shared polyglot module**: CE `platform-component-polyglot` holds the strict sandbox
+  (`PolyglotSandbox.newContext` — pinned restrictions with ONE carve-out: `allowCreateThread(true)`
+  iff ruby is permitted, because TruffleRuby backs host-side hash iteration with fiber-based
+  Enumerators), guest↔host marshalling (`PolyglotValues`), and the `context.component` proxy chain
+  (`ContextProxyObject`/`ComponentProxyObject`/`ActionProxyObject` over the `ComponentActionInvoker`
+  + `ComponentCatalog` seams). The script component, custom-component loader, and both code workflow
+  loaders all consume it. Perform-path guest contexts use a SEPARATE `performEngine` per engine
+  class — mixing strict and permissive contexts on one GraalVM engine corrupts its interop cache.
+- **Script custom components**: `perform(inputParameters, connectionParameters, context)` where
+  context = `{http, log}` ONLY — deliberately no component invocation. HTTP crosses the
+  `HostContextBridge` as JSON.
+- **Code workflow tasks**: `perform(context)` with
+  `context.component.<componentName>.<actionName>(input, connectionName)` + `context.log`.
+  Connection-by-name resolves from the task's wired connections first, then
+  `CodeWorkflowConnectionResolver` against the connection store; dispatch is
+  `ActionDefinitionService.executePerformForPolyglot` via `CodeWorkflowTaskContext` (which also
+  implements `ComponentActionInvoker`). SDK: `TaskDefinition.PerformFunction.apply(TaskContext)`
+  default-delegates to the zero-arg `apply()`, so legacy performs (JS `function () {}`, py/rb
+  splats) keep working — engines always pass exactly one argument. Java classloader path hands the
+  host `CodeWorkflowTaskContext` straight to user code; the Espresso path crosses a
+  `CodeWorkflowHostBridge` (host, per loader module) ↔ `GuestTaskContext` (guest, SDK module
+  `sdks/backend/java/workflow-guest-bridge`, on the guest classpath via the loaders' `guestSdk`
+  configuration) as JSON, binding name `byteChefCodeWorkflowHostBridge`.
+- Spec: `docs/superpowers/specs/2026-08-05-code-perform-context-design.md`.
+
+### Declared connections (code workflows & custom components, 2026-08-06)
+
+- **Code workflow tasks** declare connections in the SDK (`WorkflowDsl.task(...).connections(
+  connection(componentName[, componentVersion], name))`) or script contract (task member
+  `connections: [{componentName, componentVersion?, name}]`); both loader engines parse them and
+  `CodeWorkflowContainerFacadeImpl` emits them into the task's **`extensions.connections` map**,
+  keyed by the declared name (unpinned versions resolve to latest at save time). They then ride
+  the platform's EXISTING connection machinery — do not invent a parallel path:
+  `CodeWorkflowComponentConnectionFactory` (mirrors `ScriptComponentConnectionFactory`, resolves
+  on the `codeWorkflow` component) → `ComponentConnectionFacade` → `WorkflowTask.connections` in
+  the REST model → editor/test-configuration/deployment wiring → the perform action's
+  `componentConnections` map, which `CodeWorkflowTaskContext` looks the name up in. There is NO
+  by-name connection-store lookup (an earlier self-wiring resolver was removed): a name that is
+  not wired fails exactly like the script component's. `CodeWorkflowTaskContext` reads
+  `environmentId` from `ActionContextAware` and forwards it into `executePerformForPolyglot`.
+  `TaskContext.connection(name)` returns a wired connection's parameters (all four
+  execution paths; Espresso crosses it as JSON) for tasks that build requests themselves.
+  Sources may declare `connections` as a LIST of `{componentName, componentVersion?, name}` or as a MAP
+  keyed by connection name — both parse (the map mirrors the emitted definition's shape).
+  Client: the code workflow source editor's header carries a **Test Configuration** button
+  (`CodeWorkflowSourceEditor` → optional props from `WorkflowEditorLayout`, which owns the
+  `WorkflowTestConfigurationDialog`), disabled via the same `testConfigurationDisabled` derivation
+  the visual editor uses.
+- **Custom components** declare connections via the single-file contract's `connection` member
+  (`{baseUri?, authorizations?: [{type, authorizationUrl?, tokenUrl?, refreshUrl?, scopes?,
+  apply?, properties?}], properties?}`), materialized host-side into a real `ConnectionDefinition`
+  — all authorization types including OAuth2 (platform runs the flow). URL seams and `apply`
+  accept guest functions, wrapped via the perform path's re-eval pattern; `apply` runs per
+  outbound request (opt-in cost). Espresso `describeComponent` serializes a connection's static
+  shape by invoking seams with null args — a dynamic lambda throws and the connection is reported
+  `unsupported` (functions can't cross the guest boundary). Connection-level `properties` attach
+  to each authorization (or an implicit CUSTOM authorization when none declared).
+- Spec: `docs/superpowers/specs/2026-08-06-code-artifact-connections-design.md`.
+
 ### MCP servers and workflows-as-tools (fromAi mapping)
 
 - Per-server secret-key URLs: `/api/automation/{secretKey}/mcp` (AI Hub / workspace),

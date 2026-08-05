@@ -16,14 +16,14 @@ import com.bytechef.ee.platform.codeworkflow.configuration.service.CodeWorkflowC
 import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorage;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import com.bytechef.platform.connection.domain.Connection;
-import com.bytechef.platform.connection.service.ConnectionService;
+import com.bytechef.platform.component.domain.ComponentDefinition;
+import com.bytechef.platform.component.service.ComponentDefinitionService;
+import com.bytechef.platform.configuration.constant.WorkflowExtConstants;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.workflow.definition.ConnectionRequirement;
 import com.bytechef.workflow.definition.TaskDefinition;
 import com.bytechef.workflow.definition.WorkflowDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,8 +33,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,11 +50,9 @@ import tools.jackson.databind.node.ObjectNode;
 @ConditionalOnEEVersion
 public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFacade {
 
-    private static final Logger log = LoggerFactory.getLogger(CodeWorkflowContainerFacadeImpl.class);
-
     private final CodeWorkflowContainerService codeWorkflowContainerService;
     private final CodeWorkflowFileStorage codeWorkflowFileStorage;
-    private final @Nullable ConnectionService connectionService;
+    private final @Nullable ComponentDefinitionService componentDefinitionService;
     private final ObjectMapper objectMapper;
     private final WorkflowService workflowService;
 
@@ -65,12 +61,12 @@ public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFac
     })
     public CodeWorkflowContainerFacadeImpl(
         CodeWorkflowContainerService codeWorkflowContainerService, CodeWorkflowFileStorage codeWorkflowFileStorage,
-        ObjectProvider<ConnectionService> connectionServiceProvider, ObjectMapper objectMapper,
+        ObjectProvider<ComponentDefinitionService> componentDefinitionServiceProvider, ObjectMapper objectMapper,
         WorkflowService workflowService) {
 
         this.codeWorkflowContainerService = codeWorkflowContainerService;
         this.codeWorkflowFileStorage = codeWorkflowFileStorage;
-        this.connectionService = connectionServiceProvider.getIfAvailable();
+        this.componentDefinitionService = componentDefinitionServiceProvider.getIfAvailable();
         this.objectMapper = objectMapper;
         this.workflowService = workflowService;
     }
@@ -88,8 +84,6 @@ public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFac
     public CodeWorkflowReconciliation create(
         String name, String externalVersion, List<WorkflowDefinition> workflowDefinitions, Language language,
         byte[] bytes, PlatformType type, Map<String, String> reusableWorkflowNameIds) {
-
-        warnOnMissingDeclaredConnections(workflowDefinitions, type);
 
         try {
             UUID codeWorkflowContainerUuid = UUID.randomUUID();
@@ -143,8 +137,6 @@ public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFac
     public CodeWorkflowReconciliation update(
         CodeWorkflowContainer codeWorkflowContainer, String externalVersion,
         List<WorkflowDefinition> workflowDefinitions, byte[] bytes, PlatformType type) {
-
-        warnOnMissingDeclaredConnections(workflowDefinitions, type);
 
         try {
             Map<String, String> existingWorkflowNameIds = codeWorkflowContainer.getWorkflowNameIds();
@@ -229,9 +221,12 @@ public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFac
                 .put("name", taskDefinition.getName())
                 .put("type", "codeWorkflow/v1/perform");
 
+            // A task property the workflow mapper does not recognize lands in WorkflowTask.extensions, which is
+            // where ComponentConnection.of(...) reads the connections map from — so this is emitted at the task's
+            // top level, NOT nested under an "extensions" key (that would fail reserved-word validation).
             OptionalUtils.ifPresent(
-                taskDefinition.getConnections(), connections -> taskNode.set("connections", toConnectionsNode(
-                    connections)));
+                taskDefinition.getConnections(),
+                connections -> taskNode.set(WorkflowExtConstants.CONNECTIONS, toConnectionsNode(connections)));
 
             // TODO taskDefinition.getParameters()
             taskNode.set(
@@ -249,71 +244,41 @@ public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFac
     }
 
     /**
-     * Returns a human-readable entry for every declared task connection whose name has no matching connection in the
-     * store (any environment — declared names bind per environment at run time, so save/deploy can only check
-     * existence, not the concrete environment binding). Empty when no {@link ConnectionService} bean is available.
+     * Builds the {@code extensions.connections} map the platform's {@code ComponentConnectionFactory} chain reads:
+     * keyed by the declared connection name (which is also the {@code connectionName} the task's perform passes), each
+     * entry carrying the component name and version. An unpinned declaration resolves to the component's latest version
+     * at save time, mirroring how a visual workflow node pins its component version in its type.
      */
-    List<String> findMissingDeclaredConnections(List<WorkflowDefinition> workflowDefinitions, PlatformType type) {
-        if (connectionService == null) {
-            return List.of();
-        }
-
-        List<String> missingConnections = new ArrayList<>();
-
-        for (WorkflowDefinition workflowDefinition : workflowDefinitions) {
-            List<? extends TaskDefinition> tasks = OptionalUtils.orElse(workflowDefinition.getTasks(), List.of());
-
-            for (TaskDefinition taskDefinition : tasks) {
-                List<? extends ConnectionRequirement> connections = OptionalUtils.orElse(
-                    taskDefinition.getConnections(), List.of());
-
-                for (ConnectionRequirement connectionRequirement : connections) {
-                    if (!declaredConnectionExists(connectionRequirement, type)) {
-                        missingConnections.add(
-                            "workflow=%s, task=%s, component=%s, connection=%s".formatted(
-                                workflowDefinition.getName(), taskDefinition.getName(),
-                                connectionRequirement.getComponentName(), connectionRequirement.getName()));
-                    }
-                }
-            }
-        }
-
-        return missingConnections;
-    }
-
-    private boolean declaredConnectionExists(ConnectionRequirement connectionRequirement, PlatformType type) {
-        OptionalInt componentVersion = connectionRequirement.getComponentVersion();
-
-        List<Connection> connections = connectionService.getConnections(
-            connectionRequirement.getComponentName(),
-            componentVersion.isPresent() ? componentVersion.getAsInt() : null, null, null, type);
-
-        return connections.stream()
-            .anyMatch(connection -> Objects.equals(connection.getName(), connectionRequirement.getName()));
-    }
-
-    private void warnOnMissingDeclaredConnections(List<WorkflowDefinition> workflowDefinitions, PlatformType type) {
-        for (String missingConnection : findMissingDeclaredConnections(workflowDefinitions, type)) {
-            log.warn("Declared code workflow connection has no matching store connection: {}", missingConnection);
-        }
-    }
-
-    private ArrayNode toConnectionsNode(List<? extends ConnectionRequirement> connections) {
-        ArrayNode connectionsNode = objectMapper.createArrayNode();
+    private ObjectNode toConnectionsNode(List<? extends ConnectionRequirement> connections) {
+        ObjectNode connectionsNode = objectMapper.createObjectNode();
 
         for (ConnectionRequirement connectionRequirement : connections) {
-            ObjectNode connectionNode = objectMapper.createObjectNode()
-                .put("componentName", connectionRequirement.getComponentName())
-                .put("name", connectionRequirement.getName());
+            String componentName = connectionRequirement.getComponentName();
 
             OptionalInt componentVersion = connectionRequirement.getComponentVersion();
 
-            componentVersion.ifPresent(version -> connectionNode.put("componentVersion", version));
-
-            connectionsNode.add(connectionNode);
+            connectionsNode.set(
+                connectionRequirement.getName(),
+                objectMapper.createObjectNode()
+                    .put(WorkflowExtConstants.COMPONENT_NAME, componentName)
+                    .put(
+                        WorkflowExtConstants.COMPONENT_VERSION,
+                        componentVersion.isPresent() ? componentVersion.getAsInt()
+                            : resolveLatestComponentVersion(componentName)));
         }
 
         return connectionsNode;
+    }
+
+    private int resolveLatestComponentVersion(String componentName) {
+        if (componentDefinitionService == null) {
+            return 1;
+        }
+
+        ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
+            componentName, null);
+
+        return componentDefinition.getVersion();
     }
 
     private String getDefinition(

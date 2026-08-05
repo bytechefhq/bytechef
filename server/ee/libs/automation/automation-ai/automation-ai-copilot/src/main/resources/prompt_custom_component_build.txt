@@ -18,12 +18,40 @@ The evaluated result must be an object exposing these members:
 - version     (Integer, REQUIRED) — start at 1.
 - title       (String) — human-readable title.
 - description (String) — short description.
+- connection  (object, optional) — declares the component's connection like built-in components do;
+              the Connections page can then create connections of this type and perform receives the
+              values as connectionParameters. Shape:
+                {baseUri?, authorizations?: [{type, authorizationUrl?, tokenUrl?, refreshUrl?,
+                 scopes?, apply?, properties?}], properties?: [property...]}
+              - type: API_KEY | BEARER_TOKEN | BASIC_AUTH | CUSTOM | OAUTH2_AUTHORIZATION_CODE |
+                OAUTH2_AUTHORIZATION_CODE_PKCE | OAUTH2_CLIENT_CREDENTIALS. The platform runs the
+                whole OAuth flow; the component only declares endpoints and scopes.
+              - authorizationUrl/tokenUrl/refreshUrl: a string constant OR a function
+                (connectionParameters) => string for region/tenant-dependent endpoints.
+              - apply (function, optional): (connectionParameters) => ({headers, queryParameters})
+                overrides how credentials decorate outgoing requests; it runs on EVERY request, so
+                prefer the type default unless a custom signing scheme is required.
+              - properties: [{name, type, label, required, ...}] — the connection's input fields.
 - actions     (list of objects, each with):
     - name        (String, REQUIRED) — action key, e.g. "getWeather".
     - title       (String)
     - description (String)
-    - perform     (function) — receives the action's input parameters and connection/context and
-                  returns the action's output.
+    - properties  (list, optional) — the action's input fields: [{name, type, label, required, ...}],
+                  same property shape the connection uses. These are what the workflow user fills in
+                  and what arrives in inputParameters — an action with no properties always receives
+                  an empty inputParameters map, so declare them whenever the action takes input.
+    - perform     (function) — invoked as perform(inputParameters, connectionParameters, context)
+                  and must return the action's output.
+        - inputParameters      — the values configured for the action in the workflow.
+        - connectionParameters — the selected connection's parameters (empty when none).
+        - context              — exactly two capabilities:
+            - context.http({method, url, headers, queryParameters, body}) — executes an HTTP call
+              through the platform HTTP client; returns {statusCode, headers, body}.
+            - context.log(level, message) — writes to the task's execution log
+              ("trace" | "debug" | "info" | "warn" | "error").
+          Custom components CANNOT invoke other components — there is NO context.component here;
+          that capability exists only in code workflow tasks. Scripts run in a strict sandbox: no
+          filesystem, no environment, no network besides context.http.
 
 ### JavaScript shape (the language you create in)
 
@@ -41,9 +69,19 @@ of any `export`/module syntax:
             name: "doThing",
             title: "Do Thing",
             description: "Performs the thing.",
+            properties: [
+                {name: "thingId", type: "STRING", label: "Thing Id", required: true}
+            ],
             perform: function (inputParameters, connectionParameters, context) {
-                // return the action output
-                return {result: "ok"};
+                const response = context.http({
+                    method: "GET",
+                    url: "https://api.example.com/things/" + inputParameters.thingId,
+                    headers: {"Authorization": "Bearer " + connectionParameters.accessToken}
+                });
+
+                context.log("info", "fetched thing " + inputParameters.thingId);
+
+                return response.body;
             }
         }
     ]

@@ -9,6 +9,8 @@ package com.bytechef.ee.component.codeworkflow.task;
 
 import com.bytechef.automation.project.ProjectHandler;
 import com.bytechef.commons.util.EncodingUtils;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.Workflow.CodeWorkflow;
 import com.bytechef.ee.embedded.codeworkflow.loader.IntegrationHandlerLoader;
@@ -18,11 +20,15 @@ import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorag
 import com.bytechef.embedded.integration.IntegrationHandler;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.codeworkflow.loader.automation.ProjectHandlerLoader;
+import com.bytechef.platform.component.ComponentConnection;
+import com.bytechef.platform.component.service.ActionDefinitionService;
+import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.workflow.definition.TaskDefinition.PerformFunction;
 import com.bytechef.workflow.definition.WorkflowDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Component;
@@ -36,19 +42,26 @@ import org.springframework.stereotype.Component;
 @ConditionalOnEEVersion
 public class CodeWorkflowTaskExecutor {
 
+    private final ActionDefinitionService actionDefinitionService;
     private final CacheManager cacheManager;
-    private final CodeWorkflowFileStorage codeWorkflowFileStorage;
     private final CodeWorkflowContainerService codeWorkflowContainerService;
+    private final CodeWorkflowFileStorage codeWorkflowFileStorage;
+    private final ComponentDefinitionService componentDefinitionService;
     private final CodeWorkflow.JavaLoader javaLoader;
 
-    @SuppressFBWarnings("EI")
+    @SuppressFBWarnings({
+        "EI", "CT_CONSTRUCTOR_THROW"
+    })
     public CodeWorkflowTaskExecutor(
-        ApplicationProperties applicationProperties, CacheManager cacheManager,
-        CodeWorkflowFileStorage codeWorkflowFileStorage, CodeWorkflowContainerService codeWorkflowContainerService) {
+        ActionDefinitionService actionDefinitionService, ApplicationProperties applicationProperties,
+        CacheManager cacheManager, CodeWorkflowContainerService codeWorkflowContainerService,
+        CodeWorkflowFileStorage codeWorkflowFileStorage, ComponentDefinitionService componentDefinitionService) {
 
+        this.actionDefinitionService = actionDefinitionService;
         this.cacheManager = cacheManager;
-        this.codeWorkflowFileStorage = codeWorkflowFileStorage;
         this.codeWorkflowContainerService = codeWorkflowContainerService;
+        this.codeWorkflowFileStorage = codeWorkflowFileStorage;
+        this.componentDefinitionService = componentDefinitionService;
 
         ApplicationProperties.Workflow workflow = applicationProperties.getWorkflow();
 
@@ -57,8 +70,11 @@ public class CodeWorkflowTaskExecutor {
         this.javaLoader = codeWorkflow.getJavaLoader();
     }
 
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     public Object executePerform(
-        String codeWorkflowContainerUuid, String workflowName, String taskName, PlatformType type) {
+        String codeWorkflowContainerUuid, String workflowName, String taskName, PlatformType type,
+        Parameters inputParameters, Map<String, ? extends ComponentConnection> componentConnections,
+        ActionContext actionContext) throws Exception {
 
         CodeWorkflowContainer codeWorkflowContainer = codeWorkflowContainerService.getCodeWorkflowContainer(
             codeWorkflowContainerUuid);
@@ -78,7 +94,16 @@ public class CodeWorkflowTaskExecutor {
             .orElseThrow()
             .getPerform();
 
-        return performFunction.apply();
+        CodeWorkflowTaskContext taskContext = createTaskContext(componentConnections, actionContext);
+
+        return performFunction.apply(taskContext);
+    }
+
+    CodeWorkflowTaskContext createTaskContext(
+        Map<String, ? extends ComponentConnection> componentConnections, ActionContext actionContext) {
+
+        return new CodeWorkflowTaskContext(
+            actionContext, actionDefinitionService, componentConnections, componentDefinitionService);
     }
 
     private List<WorkflowDefinition> getWorkflowDefinitions(

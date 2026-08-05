@@ -13,7 +13,13 @@
                     name: "my-task",
                     label: "My Task",
                     description: "An example task.",
-                    perform: function () {
+                    // connections: [{componentName: "httpClient", name: "my-connection"}],
+                    perform: function (context) {
+                        // const response = context.component.httpClient.get(
+                        //     {uri: "https://api.example.com/items"}, "my-connection");
+                        //
+                        // context.log("info", "my-task ran");
+
                         return "hello";
                     }
                 }

@@ -17,6 +17,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
@@ -24,7 +25,9 @@ import com.bytechef.ee.platform.codeworkflow.configuration.facade.CodeWorkflowCo
 import com.bytechef.ee.platform.codeworkflow.configuration.service.CodeWorkflowContainerService;
 import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorage;
 import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import com.bytechef.workflow.definition.WorkflowDefinition;
 import com.bytechef.workflow.definition.WorkflowDsl;
 import java.util.List;
@@ -33,8 +36,10 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.ObjectProvider;
 import tools.jackson.databind.ObjectMapper;
 
 /**
@@ -42,7 +47,9 @@ import tools.jackson.databind.ObjectMapper;
  *
  * @author Ivica Cardic
  */
-@ExtendWith(MockitoExtension.class)
+@ExtendWith({
+    MockitoExtension.class, ObjectMapperSetupExtension.class
+})
 class CodeWorkflowContainerFacadeTest {
 
     @Mock
@@ -52,6 +59,12 @@ class CodeWorkflowContainerFacadeTest {
     private CodeWorkflowFileStorage codeWorkflowFileStorage;
 
     @Mock
+    private ComponentDefinitionService componentDefinitionService;
+
+    @Mock
+    private ObjectProvider<ComponentDefinitionService> componentDefinitionServiceProvider;
+
+    @Mock
     private WorkflowService workflowService;
 
     private CodeWorkflowContainerFacadeImpl codeWorkflowContainerFacade;
@@ -59,7 +72,9 @@ class CodeWorkflowContainerFacadeTest {
     @BeforeEach
     void beforeEach() {
         codeWorkflowContainerFacade = new CodeWorkflowContainerFacadeImpl(
-            codeWorkflowContainerService, codeWorkflowFileStorage, new ObjectMapper(), workflowService);
+            codeWorkflowContainerService, codeWorkflowFileStorage, componentDefinitionServiceProvider,
+            new ObjectMapper(),
+            workflowService);
     }
 
     @Test
@@ -262,6 +277,72 @@ class CodeWorkflowContainerFacadeTest {
 
         assertThat(codeWorkflowContainer.getWorkflowNameIds()).containsExactlyInAnyOrderEntriesOf(
             Map.of("wf-a", workflowAId.toString(), "wf-b", workflowBId.toString()));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testUpdateEmitsDeclaredTaskConnectionsIntoDefinition() throws Exception {
+        UUID containerUuid = UUID.randomUUID();
+        UUID workflowAId = UUID.randomUUID();
+
+        CodeWorkflowContainer codeWorkflowContainer = new CodeWorkflowContainer(containerUuid);
+
+        codeWorkflowContainer.addCodeWorkflow(workflowAId, "wf-a");
+        codeWorkflowContainer.setLanguage(Language.JAVASCRIPT);
+        codeWorkflowContainer.setName("container");
+        codeWorkflowContainer.setExternalVersion("v1");
+
+        Workflow existingWorkflow = mock(Workflow.class);
+
+        when(existingWorkflow.getVersion()).thenReturn(3);
+        when(workflowService.getWorkflow(workflowAId.toString())).thenReturn(existingWorkflow);
+        when(codeWorkflowFileStorage.storeCodeWorkflowFile(anyString(), any()))
+            .thenReturn(new FileEntry("container.js", "file://container.js"));
+        when(codeWorkflowContainerService.update(codeWorkflowContainer)).thenReturn(codeWorkflowContainer);
+
+        List<WorkflowDefinition> workflowDefinitions = List.of(
+            WorkflowDsl.workflow("wf-a")
+                .tasks(
+                    WorkflowDsl.task("my-task")
+                        .connections(
+                            WorkflowDsl.connection("slack", "slack-prod"),
+                            WorkflowDsl.connection("httpClient", 2, "billing-api"))
+                        .perform(() -> "x")));
+
+        codeWorkflowContainerFacade.update(
+            codeWorkflowContainer, "v2", workflowDefinitions, "content".getBytes(), PlatformType.AUTOMATION);
+
+        ArgumentCaptor<String> definitionCaptor = ArgumentCaptor.forClass(String.class);
+
+        verify(workflowService).update(eq(workflowAId.toString()), definitionCaptor.capture(), eq(3));
+
+        String definition = definitionCaptor.getValue();
+
+        assertThat(definition)
+            .doesNotContain("\"extensions\"")
+            .contains("\"connections\"")
+            .contains("\"slack-prod\"")
+            .contains("\"componentName\":\"slack\"")
+            .contains("\"componentVersion\":1")
+            .contains("\"billing-api\"")
+            .contains("\"componentVersion\":2");
+
+        // The emitted definition must survive the real workflow mapper: connections is a task-level property
+        // the mapper collects into WorkflowTask.extensions, which is where ComponentConnection.of reads it.
+        Workflow parsedWorkflow = new Workflow(definition, Workflow.Format.JSON);
+
+        WorkflowTask workflowTask = parsedWorkflow.getTasks()
+            .getFirst();
+
+        Map<String, ?> extensions = workflowTask.getExtensions();
+
+        assertThat(extensions).containsKey("connections");
+
+        Map<String, Map<String, Object>> connections = (Map<String, Map<String, Object>>) extensions.get("connections");
+
+        assertThat(connections).containsOnlyKeys("slack-prod", "billing-api");
+        assertThat(connections.get("slack-prod")).containsEntry("componentName", "slack");
+        assertThat(connections.get("billing-api")).containsEntry("componentVersion", 2);
     }
 
     private static WorkflowDefinition workflowDefinition(String name) {

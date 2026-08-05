@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.bytechef.automation.project.ProjectHandler;
 import com.bytechef.automation.project.definition.ProjectDefinition;
+import com.bytechef.workflow.definition.ConnectionRequirement;
 import com.bytechef.workflow.definition.TaskDefinition;
 import com.bytechef.workflow.definition.WorkflowDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -26,6 +27,8 @@ import java.nio.file.Paths;
 import java.security.CodeSource;
 import java.security.ProtectionDomain;
 import java.util.List;
+import java.util.Map;
+import java.util.OptionalInt;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.stream.Collectors;
@@ -65,13 +68,373 @@ class ProjectHandlerPolyglotEngineTest {
                             .tasks(
                                 WorkflowDsl.task("my-task")
                                     .label("My Task")
+                                    .connections(WorkflowDsl.connection("slack", "slack-prod"))
                                     .perform(() -> "hello")));
             }
         }
         """;
 
+    private static final String CONTEXT_JAVASCRIPT_SOURCE = """
+        ({
+            name: 'test-project',
+            workflows: [
+                {
+                    name: 'my-workflow',
+                    tasks: [
+                        {
+                            name: 'my-task',
+                            perform: (context) => {
+                                const result = context.component.mock.doIt({x: 1}, 'conn');
+
+                                return result.y;
+                            }
+                        }
+                    ]
+                }
+            ]
+        })
+        """;
+
+    private static final String CONTEXT_PYTHON_SOURCE = """
+        import types
+
+        types.SimpleNamespace(
+            name="test-project",
+            workflows=[
+                {
+                    "name": "my-workflow",
+                    "tasks": [
+                        {
+                            "name": "my-task",
+                            "perform": lambda *args: args[0].component.mock.doIt({"x": 1}, "conn")
+                        }
+                    ]
+                }
+            ]
+        )
+        """;
+
+    private static final String CONTEXT_RUBY_SOURCE = """
+        Struct.new(:name, :workflows).new(
+          "test-project",
+          [
+            {
+              "name" => "my-workflow",
+              "tasks" => [
+                {
+                  "name" => "my-task",
+                  "perform" => lambda { |context| context.component.mock.doIt({ "x" => 1 }, "conn") }
+                }
+              ]
+            }
+          ]
+        )
+        """;
+
+    private static final String LOG_JAVASCRIPT_SOURCE = """
+        ({
+            name: 'test-project',
+            workflows: [
+                {
+                    name: 'my-workflow',
+                    tasks: [
+                        {
+                            name: 'my-task',
+                            perform: (context) => {
+                                context.log('warn', 'log message');
+
+                                return 'logged';
+                            }
+                        }
+                    ]
+                }
+            ]
+        })
+        """;
+
+    private static final String ZERO_ARG_JAVASCRIPT_SOURCE = """
+        ({
+            name: 'test-project',
+            workflows: [
+                {
+                    name: 'my-workflow',
+                    tasks: [
+                        {
+                            name: 'my-task',
+                            perform: () => 'legacy'
+                        }
+                    ]
+                }
+            ]
+        })
+        """;
+
     @TempDir
     private Path tempDir;
+
+    @Test
+    void testPerformReceivesComponentCapableContextForJavaScript() throws Exception {
+        TaskDefinition taskDefinition = loadSingleTask("js", CONTEXT_JAVASCRIPT_SOURCE);
+
+        RecordingTaskContext taskContext = new RecordingTaskContext(Map.of("y", 2));
+
+        Object result = taskDefinition.getPerform()
+            .apply(taskContext);
+
+        assertEquals("mock", taskContext.getComponentName());
+        assertEquals("doIt", taskContext.getActionName());
+        assertEquals("conn", taskContext.getConnectionName());
+
+        Map<String, ?> input = taskContext.getInput();
+
+        assertEquals(1, ((Number) input.get("x")).intValue());
+        assertEquals(2, ((Number) result).intValue());
+    }
+
+    @Test
+    void testPerformReceivesComponentCapableContextForPython() throws Exception {
+        TaskDefinition taskDefinition = loadSingleTask("python", CONTEXT_PYTHON_SOURCE);
+
+        RecordingTaskContext taskContext = new RecordingTaskContext("python result");
+
+        Object result = taskDefinition.getPerform()
+            .apply(taskContext);
+
+        assertEquals("mock", taskContext.getComponentName());
+        assertEquals("doIt", taskContext.getActionName());
+        assertEquals("conn", taskContext.getConnectionName());
+
+        Map<String, ?> input = taskContext.getInput();
+
+        assertEquals(1, ((Number) input.get("x")).intValue());
+        assertEquals("python result", result);
+    }
+
+    @Test
+    void testPerformReceivesComponentCapableContextForRuby() throws Exception {
+        TaskDefinition taskDefinition = loadSingleTask("ruby", CONTEXT_RUBY_SOURCE);
+
+        RecordingTaskContext taskContext = new RecordingTaskContext("ruby result");
+
+        Object result = taskDefinition.getPerform()
+            .apply(taskContext);
+
+        assertEquals("mock", taskContext.getComponentName());
+        assertEquals("doIt", taskContext.getActionName());
+        assertEquals("conn", taskContext.getConnectionName());
+
+        Map<String, ?> input = taskContext.getInput();
+
+        assertEquals(1, ((Number) input.get("x")).intValue());
+        assertEquals("ruby result", result);
+    }
+
+    @Test
+    void testPerformLogDelegatesToTaskContext() throws Exception {
+        TaskDefinition taskDefinition = loadSingleTask("js", LOG_JAVASCRIPT_SOURCE);
+
+        RecordingTaskContext taskContext = new RecordingTaskContext(null);
+
+        Object result = taskDefinition.getPerform()
+            .apply(taskContext);
+
+        assertEquals("warn", taskContext.getLogLevel());
+        assertEquals("log message", taskContext.getLogMessage());
+        assertEquals("logged", result);
+    }
+
+    @Test
+    void testZeroArgPerformStillRunsWithTaskContext() throws Exception {
+        TaskDefinition taskDefinition = loadSingleTask("js", ZERO_ARG_JAVASCRIPT_SOURCE);
+
+        RecordingTaskContext taskContext = new RecordingTaskContext(null);
+
+        Object result = taskDefinition.getPerform()
+            .apply(taskContext);
+
+        assertEquals("legacy", result);
+    }
+
+    @Test
+    void testPerformReadsConnectionParametersFromContext() throws Exception {
+        String source = """
+            ({
+                name: 'test-project',
+                workflows: [
+                    {
+                        name: 'my-workflow',
+                        tasks: [
+                            {
+                                name: 'my-task',
+                                connections: [{componentName: 'slack', name: 'slack-prod'}],
+                                perform: (context) => context.connection('slack-prod').region
+                            }
+                        ]
+                    }
+                ]
+            })
+            """;
+
+        TaskDefinition taskDefinition = loadSingleTask("js", source);
+
+        RecordingTaskContext taskContext = new RecordingTaskContext(null, Map.of("region", "eu"));
+
+        Object result = taskDefinition.getPerform()
+            .apply(taskContext);
+
+        assertEquals("slack-prod", taskContext.getConnectionName());
+        assertEquals("eu", result);
+    }
+
+    @Test
+    void testLoadParsesDeclaredTaskConnectionsForJavaScript() {
+        String connectionsSource = """
+            ({
+                name: 'test-project',
+                workflows: [
+                    {
+                        name: 'my-workflow',
+                        tasks: [
+                            {
+                                name: 'my-task',
+                                connections: [
+                                    {componentName: 'slack', name: 'slack-prod'},
+                                    {componentName: 'httpClient', componentVersion: 2, name: 'billing-api'}
+                                ],
+                                perform: () => 'x'
+                            }
+                        ]
+                    }
+                ]
+            })
+            """;
+
+        TaskDefinition taskDefinition = loadSingleTask("js", connectionsSource);
+
+        List<? extends ConnectionRequirement> connections = taskDefinition.getConnections()
+            .orElseThrow();
+
+        assertEquals(2, connections.size());
+
+        ConnectionRequirement first = connections.getFirst();
+
+        assertEquals("slack", first.getComponentName());
+        assertEquals(OptionalInt.empty(), first.getComponentVersion());
+        assertEquals("slack-prod", first.getName());
+
+        ConnectionRequirement second = connections.get(1);
+
+        assertEquals("httpClient", second.getComponentName());
+        assertEquals(OptionalInt.of(2), second.getComponentVersion());
+        assertEquals("billing-api", second.getName());
+    }
+
+    @Test
+    void testLoadParsesDeclaredTaskConnectionsForPython() {
+        String connectionsSource = """
+            import types
+
+            types.SimpleNamespace(
+                name="test-project",
+                workflows=[
+                    {
+                        "name": "my-workflow",
+                        "tasks": [
+                            {
+                                "name": "my-task",
+                                "connections": [
+                                    {"componentName": "slack", "name": "slack-prod"}
+                                ],
+                                "perform": lambda context: "x"
+                            }
+                        ]
+                    }
+                ]
+            )
+            """;
+
+        TaskDefinition taskDefinition = loadSingleTask("python", connectionsSource);
+
+        List<? extends ConnectionRequirement> connections = taskDefinition.getConnections()
+            .orElseThrow();
+
+        assertEquals(1, connections.size());
+
+        ConnectionRequirement connectionRequirement = connections.getFirst();
+
+        assertEquals("slack", connectionRequirement.getComponentName());
+        assertEquals("slack-prod", connectionRequirement.getName());
+    }
+
+    @Test
+    void testLoadParsesDeclaredTaskConnectionsDeclaredAsMap() {
+        String connectionsSource = """
+            ({
+                name: 'test-project',
+                workflows: [
+                    {
+                        name: 'my-workflow',
+                        tasks: [
+                            {
+                                name: 'my-task',
+                                connections: {
+                                    'slack-prod': {componentName: 'slack'},
+                                    'billing-api': {componentName: 'httpClient', componentVersion: 2}
+                                },
+                                perform: () => 'x'
+                            }
+                        ]
+                    }
+                ]
+            })
+            """;
+
+        TaskDefinition taskDefinition = loadSingleTask("js", connectionsSource);
+
+        List<? extends ConnectionRequirement> connections = taskDefinition.getConnections()
+            .orElseThrow();
+
+        assertEquals(2, connections.size());
+
+        ConnectionRequirement slackConnection = connections.stream()
+            .filter(connection -> "slack-prod".equals(connection.getName()))
+            .findFirst()
+            .orElseThrow();
+
+        assertEquals("slack", slackConnection.getComponentName());
+        assertEquals(OptionalInt.empty(), slackConnection.getComponentVersion());
+
+        ConnectionRequirement billingConnection = connections.stream()
+            .filter(connection -> "billing-api".equals(connection.getName()))
+            .findFirst()
+            .orElseThrow();
+
+        assertEquals("httpClient", billingConnection.getComponentName());
+        assertEquals(OptionalInt.of(2), billingConnection.getComponentVersion());
+    }
+
+    @Test
+    void testLoadWithoutConnectionsKeepsGetConnectionsEmpty() {
+        TaskDefinition taskDefinition = loadSingleTask("js", ZERO_ARG_JAVASCRIPT_SOURCE);
+
+        assertTrue(taskDefinition.getConnections()
+            .isEmpty());
+    }
+
+    private static TaskDefinition loadSingleTask(String languageId, String source) {
+        ProjectHandler projectHandler = ProjectHandlerPolyglotEngine.load(languageId, source);
+
+        ProjectDefinition projectDefinition = projectHandler.getDefinition();
+
+        List<WorkflowDefinition> workflows = projectDefinition.getWorkflows();
+
+        WorkflowDefinition workflowDefinition = workflows.getFirst();
+
+        List<? extends TaskDefinition> tasks = workflowDefinition.getTasks()
+            .orElseThrow();
+
+        return tasks.getFirst();
+    }
 
     @Test
     void testLoadJava() throws IOException {
@@ -108,6 +471,71 @@ class ProjectHandlerPolyglotEngineTest {
         assertEquals("my-task", taskDefinition.getName());
         assertEquals("hello", taskDefinition.getPerform()
             .apply());
+
+        List<? extends ConnectionRequirement> connections = taskDefinition.getConnections()
+            .orElseThrow();
+
+        assertEquals(1, connections.size());
+
+        ConnectionRequirement connectionRequirement = connections.getFirst();
+
+        assertEquals("slack", connectionRequirement.getComponentName());
+        assertEquals(OptionalInt.empty(), connectionRequirement.getComponentVersion());
+        assertEquals("slack-prod", connectionRequirement.getName());
+    }
+
+    @Test
+    void testExecuteJavaPerformThreadsTaskContextThroughEspressoBridge() throws Exception {
+        assumeEspressoAvailable();
+
+        String contextFixtureSource = """
+            import com.bytechef.automation.project.ProjectHandler;
+            import com.bytechef.automation.project.definition.ProjectDefinition;
+            import com.bytechef.automation.project.definition.ProjectDsl;
+            import com.bytechef.workflow.definition.WorkflowDsl;
+            import java.util.Map;
+
+            public class ContextEspressoProjectHandler implements ProjectHandler {
+
+                @Override
+                public ProjectDefinition getDefinition() {
+                    return ProjectDsl.project("context-espresso-project")
+                        .version("1.0.0")
+                        .workflows(
+                            WorkflowDsl.workflow("my-workflow")
+                                .tasks(
+                                    WorkflowDsl.task("my-task")
+                                        .perform(context -> context.component(
+                                            "mock", "doIt", Map.of("x", 1), "conn"))));
+                }
+            }
+            """;
+
+        Path jarPath = buildFixtureJar(tempDir, contextFixtureSource, "ContextEspressoProjectHandler");
+
+        ProjectHandler projectHandler = ProjectHandlerPolyglotEngine.loadJava(jarPath);
+
+        ProjectDefinition projectDefinition = projectHandler.getDefinition();
+
+        List<WorkflowDefinition> workflows = projectDefinition.getWorkflows();
+
+        WorkflowDefinition workflowDefinition = workflows.getFirst();
+
+        List<? extends TaskDefinition> tasks = workflowDefinition.getTasks()
+            .orElseThrow();
+
+        TaskDefinition taskDefinition = tasks.getFirst();
+
+        RecordingTaskContext taskContext = new RecordingTaskContext("espresso result");
+
+        Object result = taskDefinition.getPerform()
+            .apply(taskContext);
+
+        assertEquals("espresso result", result);
+        assertEquals("mock", taskContext.getComponentName());
+        assertEquals("doIt", taskContext.getActionName());
+        assertEquals(Map.of("x", 1), taskContext.getInput());
+        assertEquals("conn", taskContext.getConnectionName());
     }
 
     @Test
