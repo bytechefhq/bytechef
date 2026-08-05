@@ -18,9 +18,11 @@ import {useQueryClient} from '@tanstack/react-query';
 import {
     ActivityIcon,
     BoxesIcon,
+    BrainIcon,
     CircleIcon,
     FileTextIcon,
     FolderIcon,
+    GraduationCapIcon,
     Layers3Icon,
     LayoutTemplateIcon,
     Link2Icon,
@@ -28,9 +30,9 @@ import {
     MessageSquareIcon,
     MessagesSquareIcon,
     NetworkIcon,
+    RouterIcon,
     ServerIcon,
     Settings2Icon,
-    SparklesIcon,
     SquareIcon,
     Table2Icon,
     UnplugIcon,
@@ -62,46 +64,43 @@ const automationNavigation: NavigationType[] = [
     {href: '/automation/chats', icon: MessageSquareIcon, name: 'Chats'},
     {href: '/automation/approval-tasks', icon: CircleIcon, name: 'Approval Tasks'},
     {
+        group: 'Build',
         href: '/automation/projects',
         icon: FolderIcon,
         name: 'Projects',
     },
+    {group: 'Build', href: '/automation/connections', icon: Link2Icon, name: 'Connections'},
     {
-        group: 'Deployments',
+        group: 'Deploy',
         href: '/automation/deployments',
         icon: Layers3Icon,
         name: 'Project Deployments',
     },
     {
-        group: 'Deployments',
+        group: 'Deploy',
         href: '/automation/api-platform',
         icon: LayoutTemplateIcon,
         name: 'API Collections',
     },
     {
-        group: 'Deployments',
+        group: 'Deploy',
         href: '/automation/mcp-servers',
         icon: ServerIcon,
         name: 'MCP Servers',
     },
     {
-        group: 'Deployments',
+        group: 'Deploy',
         href: '/automation/a2a-servers',
         icon: NetworkIcon,
         name: 'A2A Servers',
     },
+    {group: 'Deploy', href: '/automation/ai/gateway', icon: RouterIcon, name: 'AI Gateway'},
     {
-        group: 'Deployments',
-        href: '/automation/context-stores',
-        icon: BoxesIcon,
-        name: 'Context Store',
-    },
-    {
+        group: 'Monitor',
         href: '/automation/executions',
         icon: ActivityIcon,
         name: 'Executions',
     },
-    {href: '/automation/connections', icon: Link2Icon, name: 'Connections'},
     {
         group: 'Data',
         href: '/automation/datatables',
@@ -116,43 +115,54 @@ const automationNavigation: NavigationType[] = [
     },
     {
         group: 'Data',
+        href: '/automation/context-stores',
+        icon: BoxesIcon,
+        name: 'Context Store',
+    },
+    {
+        group: 'Data',
         href: '/automation/asset-files',
         icon: FileTextIcon,
         name: 'Files',
     },
-    {href: '/automation/ai', icon: SparklesIcon, name: 'AI'},
+    {group: 'AI', href: '/automation/ai/skills', icon: GraduationCapIcon, name: 'Skills'},
+    {group: 'AI', href: '/automation/ai/memories', icon: BrainIcon, name: 'Memories'},
 ];
 
 const embeddedNavigation: NavigationType[] = [
     {
+        group: 'Build',
         href: '/embedded/integrations',
         icon: SquareIcon,
         name: 'Integrations',
     },
     {
-        group: 'Configurations',
-        href: '/embedded/configurations',
-        icon: Settings2Icon,
-        name: 'Integration Configurations',
-    },
-    {group: 'Configurations', href: '/embedded/mcp-servers', icon: ServerIcon, name: 'MCP Servers'},
-    {href: '/embedded/app-events', icon: ZapIcon, name: 'App Events'},
-    {
+        group: 'Build',
         href: '/embedded/automation-workflows',
         icon: Workflow,
         name: 'Automations',
     },
+    {group: 'Build', href: '/embedded/connections', icon: Link2Icon, name: 'Connections'},
     {
-        href: '/embedded/connected-users',
-        icon: UsersIcon,
-        name: 'Connected Users',
+        group: 'Configure',
+        href: '/embedded/configurations',
+        icon: Settings2Icon,
+        name: 'Integration Configurations',
     },
+    {group: 'Configure', href: '/embedded/mcp-servers', icon: ServerIcon, name: 'MCP Servers'},
+    {group: 'Configure', href: '/embedded/app-events', icon: ZapIcon, name: 'App Events'},
     {
+        group: 'Monitor',
         href: '/embedded/executions',
         icon: ActivityIcon,
         name: 'Executions',
     },
-    {href: '/embedded/connections', icon: Link2Icon, name: 'Connections'},
+    {
+        group: 'Monitor',
+        href: '/embedded/connected-users',
+        icon: UsersIcon,
+        name: 'Connected Users',
+    },
 ];
 
 const platformNavigation = [
@@ -220,9 +230,12 @@ function App() {
             return ff_1023;
         }
 
-        // '/automation/chats' is deliberately not filtered: the Chats surface is CE functionality
-        // (workspaceChatWorkflows lives in automation-configuration-graphql), so the nav item stays
-        // visible in every edition.
+        // The standalone Chats page is the CE chat surface; in EE that role belongs to AI Hub
+        // (whose own gate below is the mirror of this one), so the two nav items are mutually
+        // exclusive per edition.
+        if (navItem.href === '/automation/chats') {
+            return edition === EditionType.CE;
+        }
 
         if (navItem.href === '/automation/knowledge-bases') {
             return ai.knowledgeBase.enabled;
@@ -234,6 +247,12 @@ function App() {
 
         if (navItem.href === '/automation/ai-hub') {
             return edition === EditionType.EE && ai.hub.enabled;
+        }
+
+        // The Gateway pages exist only in EE with the gateway toggle on; Skills and
+        // Memories stay visible like the old "AI" item.
+        if (navItem.href === '/automation/ai/gateway') {
+            return edition === EditionType.EE && ai.gateway.enabled;
         }
 
         return true;

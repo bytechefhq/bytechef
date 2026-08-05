@@ -13,12 +13,12 @@ interface ContextStoreListProps {
 }
 
 /**
- * Divider-style list of {@link ContextStore} rows. Mirrors {@code KnowledgeBaseList}: clicking a row drills into the
+ * Bordered-row list of {@link ContextStore} rows. Mirrors {@code KnowledgeBaseList}: clicking a row drills into the
  * single-store sources page. The previous {@code <Table>} layout is gone — same content, less visual chrome.
  */
 const ContextStoreList = ({allTags, contextStores, isAdmin}: ContextStoreListProps) => {
     return (
-        <div className="w-full divide-y divide-border/50 px-4 3xl:mx-auto 3xl:w-4/5">
+        <div className="w-full px-4 3xl:mx-auto 3xl:w-4/5">
             {contextStores.map((contextStore) => {
                 const currentTagIds = new Set(contextStore.tagIds.map((id) => Number(id)));
 

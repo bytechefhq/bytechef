@@ -34,11 +34,11 @@ const ContextStoreListItem = ({contextStore, isAdmin, remainingTags, tags}: Cont
 
     return (
         <div
-            className="flex w-full cursor-pointer items-center justify-between rounded-md px-2 hover:bg-muted/50"
+            className="mb-2 flex w-full cursor-pointer items-center justify-between rounded border border-border/50 px-3 hover:bg-muted/50"
             data-testid={`context-store-row-${contextStore.id}`}
             onClick={handleRowClick}
         >
-            <div className="flex flex-1 items-center py-5">
+            <div className="flex flex-1 items-center py-3">
                 <div className="flex-1">
                     <div className="flex items-center gap-2">
                         <LayersIcon className="size-5 text-muted-foreground" />
