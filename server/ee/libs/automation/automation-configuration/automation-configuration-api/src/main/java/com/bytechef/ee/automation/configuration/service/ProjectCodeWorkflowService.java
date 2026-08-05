@@ -21,6 +21,8 @@ public interface ProjectCodeWorkflowService {
 
     ProjectCodeWorkflow create(CodeWorkflowContainer codeWorkflowContainer, Project projectCodeWorkflow);
 
+    void deleteProjectCodeWorkflows(long projectId);
+
     List<Long> getCodeWorkflowProjectIds();
 
     ProjectCodeWorkflow getProjectCodeWorkflow(long projectId);

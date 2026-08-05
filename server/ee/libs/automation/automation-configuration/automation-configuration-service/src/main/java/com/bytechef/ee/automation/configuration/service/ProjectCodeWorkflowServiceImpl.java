@@ -44,6 +44,11 @@ public class ProjectCodeWorkflowServiceImpl implements ProjectCodeWorkflowServic
     }
 
     @Override
+    public void deleteProjectCodeWorkflows(long projectId) {
+        projectCodeWorkflowRepository.deleteByProjectId(projectId);
+    }
+
+    @Override
     public List<Long> getCodeWorkflowProjectIds() {
         return projectCodeWorkflowRepository.findDistinctProjectIds();
     }

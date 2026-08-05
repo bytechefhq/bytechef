@@ -8,6 +8,7 @@
 package com.bytechef.ee.automation.configuration.event;
 
 import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowService;
 import com.bytechef.ee.automation.configuration.service.ProjectGitConfigurationService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -25,10 +26,15 @@ import org.springframework.stereotype.Component;
 @ConditionalOnEEVersion
 public class ProjectBeforeDeleteEventListener extends AbstractRelationalEventListener<Project> {
 
+    private final ProjectCodeWorkflowService projectCodeWorkflowService;
     private final ProjectGitConfigurationService projectGitConfigurationService;
 
     @SuppressFBWarnings("EI")
-    public ProjectBeforeDeleteEventListener(ProjectGitConfigurationService projectGitConfigurationService) {
+    public ProjectBeforeDeleteEventListener(
+        ProjectCodeWorkflowService projectCodeWorkflowService,
+        ProjectGitConfigurationService projectGitConfigurationService) {
+
+        this.projectCodeWorkflowService = projectCodeWorkflowService;
         this.projectGitConfigurationService = projectGitConfigurationService;
     }
 
@@ -36,6 +42,9 @@ public class ProjectBeforeDeleteEventListener extends AbstractRelationalEventLis
     protected void onBeforeDelete(BeforeDeleteEvent<Project> event) {
         Identifier identifier = event.getId();
 
-        projectGitConfigurationService.delete((Long) identifier.getValue());
+        long projectId = (Long) identifier.getValue();
+
+        projectCodeWorkflowService.deleteProjectCodeWorkflows(projectId);
+        projectGitConfigurationService.delete(projectId);
     }
 }
