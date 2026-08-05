@@ -6,6 +6,7 @@ import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useLayoutEngineStore from '../stores/useLayoutEngineStore';
 import {mapHandlePosition} from '../utils/directionUtils';
 import styles from './NodeTypes.module.css';
+import useTaskDispatcherGhostStatus from './useTaskDispatcherGhostStatus';
 
 // ELK's iteration rings flip their content to the TOP edge in LR (see
 // getRingContentSign in elkLayoutUtils): the rail returns into the bar's
@@ -16,18 +17,22 @@ import styles from './NodeTypes.module.css';
 // dagre make every ring connector double back in box-shaped detours.
 const LR_FLIPPED_RING_BAR_PATTERN = /-(loop|each|map)-(top|bottom)-ghost$/;
 
-const TaskDispatcherBottomGhostNode = ({id}: {id: string}) => {
+const TaskDispatcherBottomGhostNode = ({data, id}: {data?: unknown; id: string}) => {
     const layoutDirection = useLayoutDirectionStore((state) => state.layoutDirection);
     const lastAppliedLayoutEngine = useLayoutEngineStore((state) => state.lastAppliedLayoutEngine);
     const isHorizontal = layoutDirection === 'LR';
     const isFlippedRingBar = isHorizontal && lastAppliedLayoutEngine === 'elk' && LR_FLIPPED_RING_BAR_PATTERN.test(id);
+
+    const dispatcherStatus = useTaskDispatcherGhostStatus(data);
 
     return (
         <div
             className={twMerge(
                 'nodrag',
                 isHorizontal ? 'h-[72px] w-0.5' : 'h-0.5 w-[72px]',
-                'bg-stroke-neutral-tertiary'
+                'bg-stroke-neutral-tertiary',
+                dispatcherStatus === 'COMPLETED' && 'bg-green-500',
+                dispatcherStatus === 'FAILED' && 'bg-red-500'
             )}
             data-nodetype="taskDispatcherBottomGhostNode"
             key={id}

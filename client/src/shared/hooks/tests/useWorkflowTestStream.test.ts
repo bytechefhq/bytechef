@@ -9,24 +9,26 @@ const mockSetWorkflowIsRunning = vi.fn();
 const mockSetWorkflowTestExecution = vi.fn();
 const mockSetWorkflowTestNodeState = vi.fn();
 
-vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowEditorStore', () => ({
-    default: vi.fn((selector) =>
-        selector({
-            resetWorkflowTestNodeStates: mockResetWorkflowTestNodeStates,
-            setWorkflowIsRunning: mockSetWorkflowIsRunning,
-            setWorkflowTestExecution: mockSetWorkflowTestExecution,
-            setWorkflowTestNodeState: mockSetWorkflowTestNodeState,
-        })
-    ),
-    useWorkflowEditorStore: vi.fn((selector) =>
-        selector({
-            resetWorkflowTestNodeStates: mockResetWorkflowTestNodeStates,
-            setWorkflowIsRunning: mockSetWorkflowIsRunning,
-            setWorkflowTestExecution: mockSetWorkflowTestExecution,
-            setWorkflowTestNodeState: mockSetWorkflowTestNodeState,
-        })
-    ),
-}));
+vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowEditorStore', () => {
+    // Lazy: the mock* consts are hoisted below this factory, so they must only be dereferenced at call time.
+    const getStoreState = () => ({
+        resetWorkflowTestNodeStates: mockResetWorkflowTestNodeStates,
+        setWorkflowIsRunning: mockSetWorkflowIsRunning,
+        setWorkflowTestExecution: mockSetWorkflowTestExecution,
+        setWorkflowTestNodeState: mockSetWorkflowTestNodeState,
+        workflowTestNodeStates: {},
+    });
+
+    const useStoreMock = Object.assign(
+        vi.fn((selector) => selector(getStoreState())),
+        {getState: getStoreState}
+    );
+
+    return {
+        default: useStoreMock,
+        useWorkflowEditorStore: useStoreMock,
+    };
+});
 
 const mockPersistJobId = vi.fn();
 const usePersistJobId = vi.fn();
