@@ -80,6 +80,7 @@ dependencies {
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-api"))
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-service"))
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-tool"))
+    implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-copilot"))
 
     implementation(project(":server:ee:libs:automation:automation-api-platform:automation-api-platform-configuration:automation-api-platform-configuration-api"))
     implementation(project(":server:ee:libs:ai:ai-copilot:ai-copilot-api"))

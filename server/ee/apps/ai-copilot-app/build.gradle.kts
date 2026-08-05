@@ -26,6 +26,7 @@ dependencies {
     implementation(project(":server:ee:libs:ai:ai-hub:ai-hub-graphql"))
     implementation(project(":server:ee:libs:ai:ai-hub:ai-hub-rest"))
     implementation(project(":server:ee:libs:ai:ai-hub:ai-hub-service"))
+    implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-copilot"))
     implementation(project(":server:ee:libs:config:observability-config"))
 
     runtimeOnly("com.zaxxer:HikariCP")
