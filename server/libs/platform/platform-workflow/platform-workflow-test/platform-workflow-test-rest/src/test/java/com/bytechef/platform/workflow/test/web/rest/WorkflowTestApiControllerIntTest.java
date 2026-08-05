@@ -19,6 +19,7 @@ package com.bytechef.platform.workflow.test.web.rest;
 import static com.bytechef.platform.workflow.test.dto.TaskStatusEventDTO.Status.COMPLETED;
 import static com.bytechef.platform.workflow.test.dto.TaskStatusEventDTO.Status.STARTED;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -46,6 +47,7 @@ import com.bytechef.platform.workflow.test.dto.TaskStatusEventDTO;
 import com.bytechef.platform.workflow.test.dto.WorkflowTestExecutionDTO;
 import com.bytechef.platform.workflow.test.facade.TestWorkflowExecutor;
 import com.bytechef.platform.workflow.test.web.rest.model.WorkflowTestExecutionModel;
+import com.bytechef.tenant.util.TenantCacheKeyUtils;
 import com.github.benmanes.caffeine.cache.Cache;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -489,6 +491,90 @@ class WorkflowTestApiControllerIntTest {
         assertThat(normalized).isNotEmpty();
 
         // Ensure start request finished cleanly
+        startFuture.get(3, TimeUnit.SECONDS);
+    }
+
+    @Test
+    void testAttachCompletesReplacedEmitter() throws Exception {
+        long jobId = 890L;
+        CountDownLatch executionLatch = new CountDownLatch(1);
+
+        doAnswer(inv -> {
+            Consumer<String> afterStartCallback = inv.getArgument(3);
+            BiConsumer<String, CompletableFuture<WorkflowTestExecutionDTO>> afterFutureCallback = inv.getArgument(5);
+            Consumer<String> whenCompleteCallback = inv.getArgument(6);
+
+            String key = TenantCacheKeyUtils.getKey(jobId);
+
+            afterStartCallback.accept(key);
+
+            CompletableFuture<WorkflowTestExecutionDTO> future = CompletableFuture.supplyAsync(() -> {
+                try {
+                    executionLatch.await(2, TimeUnit.SECONDS);
+                } catch (InterruptedException ignored) {
+                }
+
+                return new WorkflowTestExecutionDTO(new JobDTO(new Job()), null);
+            });
+
+            future.whenComplete((result, throwable) -> whenCompleteCallback.accept(key));
+            afterFutureCallback.accept(key, future);
+
+            return null;
+        }).when(testWorkflowExecutor)
+            .executeAsync(eq("wf-6"), any(), eq(1L), any(), any(), any(), any());
+
+        CompletableFuture<Void> startFuture = CompletableFuture.runAsync(() -> {
+            try {
+                mockMvc.perform(
+                    post("/internal/workflows/{id}/tests", "wf-6")
+                        .queryParam("environmentId", "1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.TEXT_EVENT_STREAM)
+                        .content("{}"))
+                    .andExpect(status().isOk());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        String key = TenantCacheKeyUtils.getKey(jobId);
+
+        Object emitterField = ReflectionTestUtils.getField(controller, "emitter");
+
+        assert emitterField != null;
+
+        @SuppressWarnings("unchecked")
+        Cache<String, SseEmitter> emitterCache = (Cache<String, SseEmitter>) emitterField;
+
+        SseEmitter initialEmitter = emitterCache.getIfPresent(key);
+
+        long deadline = System.currentTimeMillis() + 1000;
+
+        while (initialEmitter == null && System.currentTimeMillis() < deadline) {
+            Thread.sleep(10);
+
+            initialEmitter = emitterCache.getIfPresent(key);
+        }
+
+        assertThat(initialEmitter).isNotNull();
+
+        mockMvc.perform(get("/internal/workflow-tests/{jobId}/attach", jobId)
+            .accept(MediaType.TEXT_EVENT_STREAM))
+            .andExpect(status().isOk());
+
+        assertThat(emitterCache.getIfPresent(key)).isNotSameAs(initialEmitter);
+
+        // The replaced emitter must be completed so its async request is released immediately;
+        // a completed emitter rejects further sends
+        SseEmitter replacedEmitter = initialEmitter;
+
+        assertThatThrownBy(() -> replacedEmitter.send(SseEmitter.event()
+            .name("ping")
+            .data("ignored")))
+                .isInstanceOf(IllegalStateException.class);
+
+        executionLatch.countDown();
         startFuture.get(3, TimeUnit.SECONDS);
     }
 

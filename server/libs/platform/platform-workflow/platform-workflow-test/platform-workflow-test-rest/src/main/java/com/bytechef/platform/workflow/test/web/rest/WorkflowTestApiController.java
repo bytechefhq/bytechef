@@ -293,7 +293,18 @@ public class WorkflowTestApiController implements WorkflowTestApi {
     }
 
     private void registerEmitter(String key, SseEmitter emitter) {
-        this.emitter.put(key, emitter);
+        SseEmitter previousEmitter = this.emitter.asMap()
+            .put(key, emitter);
+
+        if (previousEmitter != null && previousEmitter != emitter) {
+            try {
+                previousEmitter.complete();
+            } catch (Exception exception) {
+                if (log.isTraceEnabled()) {
+                    log.trace(exception.getMessage(), exception);
+                }
+            }
+        }
 
         List<SseEmitter.SseEventBuilder> bufferedEvents = pendingEvents.getIfPresent(key);
 
