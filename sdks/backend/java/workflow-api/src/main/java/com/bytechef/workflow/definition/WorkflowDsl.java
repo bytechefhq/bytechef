@@ -18,6 +18,7 @@ package com.bytechef.workflow.definition;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalInt;
 
 /**
  * @author Ivica Cardic
@@ -44,6 +45,43 @@ public class WorkflowDsl {
         return new ModifiableOutput();
     }
 
+    public static ModifiableConnectionRequirement connection(String componentName, String name) {
+        return new ModifiableConnectionRequirement(componentName, null, name);
+    }
+
+    public static ModifiableConnectionRequirement connection(String componentName, int componentVersion, String name) {
+        return new ModifiableConnectionRequirement(componentName, componentVersion, name);
+    }
+
+    public static class ModifiableConnectionRequirement implements ConnectionRequirement {
+
+        private final String componentName;
+        private final Integer componentVersion;
+        private final String name;
+
+        private ModifiableConnectionRequirement(String componentName, Integer componentVersion, String name) {
+            this.componentName = componentName;
+            this.componentVersion = componentVersion;
+            this.name = name;
+        }
+
+        @Override
+        public String getComponentName() {
+            return componentName;
+        }
+
+        @Override
+        public OptionalInt getComponentVersion() {
+            return componentVersion == null ? OptionalInt.empty() : OptionalInt.of(componentVersion);
+        }
+
+        @Override
+        public String getName() {
+            return name;
+        }
+
+    }
+
     public static class ModifiableInput implements Input {
 
     }
@@ -58,6 +96,7 @@ public class WorkflowDsl {
 
     public static class ModifiableTaskDefinition implements TaskDefinition {
 
+        private List<ModifiableConnectionRequirement> connections;
         private String description;
 
         private String label;
@@ -67,6 +106,12 @@ public class WorkflowDsl {
 
         public ModifiableTaskDefinition(String name) {
             this.name = name;
+        }
+
+        public ModifiableTaskDefinition connections(ModifiableConnectionRequirement... connections) {
+            this.connections = List.of(connections);
+
+            return this;
         }
 
         public ModifiableTaskDefinition description(String description) {
@@ -91,6 +136,28 @@ public class WorkflowDsl {
             this.performFunction = perform;
 
             return this;
+        }
+
+        public ModifiableTaskDefinition perform(ContextPerformFunction perform) {
+            this.performFunction = new PerformFunction() {
+
+                @Override
+                public Object apply() {
+                    return null;
+                }
+
+                @Override
+                public Object apply(TaskContext context) throws Exception {
+                    return perform.apply(context);
+                }
+            };
+
+            return this;
+        }
+
+        @Override
+        public Optional<List<? extends ConnectionRequirement>> getConnections() {
+            return Optional.ofNullable(connections);
         }
 
         @Override

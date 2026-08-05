@@ -53,6 +53,18 @@ public interface TaskDefinition {
     String getName();
 
     /**
+     * Returns the connections this task's perform uses when invoking component actions, if any have been declared. The
+     * default implementation returns an empty {@link Optional}, so implementations that predate connection declarations
+     * keep working unchanged.
+     *
+     * @return an {@link Optional} containing the declared connection requirements, or an empty {@link Optional} if none
+     *         are declared
+     */
+    default Optional<List<? extends ConnectionRequirement>> getConnections() {
+        return Optional.empty();
+    }
+
+    /**
      * Returns the parameters that configure the behavior of this task, if any have been declared.
      *
      * @return an {@link Optional} containing the list of configuration parameters, or an empty {@link Optional} if none
@@ -78,5 +90,41 @@ public interface TaskDefinition {
          * @return the value produced by executing the task, or {@code null} if the task yields no result
          */
         Object apply();
+
+        /**
+         * Executes the task's logic with access to the engine's {@link TaskContext} and returns its result.
+         *
+         * <p>
+         * Engines invoke this method rather than {@link #apply()}. The default implementation delegates to
+         * {@link #apply()}, so implementations that only override the zero-argument method keep working unchanged.
+         *
+         * @param context the context through which the task can reach the surrounding execution engine
+         * @return the value produced by executing the task, or {@code null} if the task yields no result
+         * @throws Exception if the task fails while executing
+         */
+        default Object apply(TaskContext context) throws Exception {
+            return apply();
+        }
+    }
+
+    /**
+     * Encapsulates the logic executed when a {@link TaskDefinition} runs, for implementations that need access to the
+     * engine's {@link TaskContext}.
+     *
+     * <p>
+     * This is a separate functional interface (rather than a lambda target for {@link PerformFunction}) so that
+     * context-consuming task logic can still be supplied as a lambda, disambiguated from a zero-argument
+     * {@link PerformFunction} lambda by arity.
+     */
+    interface ContextPerformFunction {
+
+        /**
+         * Executes the task's logic with access to the engine's {@link TaskContext} and returns its result.
+         *
+         * @param context the context through which the task can reach the surrounding execution engine
+         * @return the value produced by executing the task, or {@code null} if the task yields no result
+         * @throws Exception if the task fails while executing
+         */
+        Object apply(TaskContext context) throws Exception;
     }
 }
