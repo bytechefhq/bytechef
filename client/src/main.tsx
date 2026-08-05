@@ -50,6 +50,10 @@ async function renderApp() {
 
     await applicationInfoStore.getState().getApplicationInfo();
 
+    if (applicationInfoStore.getState().application?.edition === 'EE') {
+        await import('@/ee/shared/edition/registerEditionModules');
+    }
+
     const {helpHub, userGuiding} = applicationInfoStore.getState();
 
     if (helpHub.enabled && helpHub.commandBar.orgId) {

@@ -1,6 +1,4 @@
 import ImportApp from '@/ImportApp';
-import {IntegrationApi} from '@/ee/shared/middleware/embedded/configuration';
-import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries';
 import AccountErrorPage from '@/pages/account/public/AccountErrorPage';
 import Login from '@/pages/account/public/Login';
 import OAuth2Redirect from '@/pages/account/public/OAuth2Redirect';
@@ -919,16 +917,28 @@ export const getRouter = (queryClient: QueryClient) =>
                                             </LazyLoadWrapper>
                                         </PrivateRoute>
                                     ),
-                                    loader: async ({params}) =>
-                                        redirectOutsideDevelopmentEnvironment('/embedded/configurations') ??
-                                        queryClient.query({
+                                    loader: async ({params}) => {
+                                        const redirectResponse =
+                                            redirectOutsideDevelopmentEnvironment('/embedded/configurations');
+
+                                        if (redirectResponse) {
+                                            return redirectResponse;
+                                        }
+
+                                        const [{IntegrationApi}, {IntegrationKeys}] = await Promise.all([
+                                            import('@/ee/shared/middleware/embedded/configuration'),
+                                            import('@/ee/shared/queries/embedded/integrations.queries'),
+                                        ]);
+
+                                        return queryClient.query({
                                             queryFn: () =>
                                                 new IntegrationApi().getIntegration({
                                                     id: parseInt(params.integrationId!),
                                                 }),
                                             queryKey: IntegrationKeys.integration(parseInt(params.integrationId!)),
                                             staleTime: 'static',
-                                        }),
+                                        });
+                                    },
                                     path: 'integrations/:integrationId/integration-workflows/:integrationWorkflowId',
                                 },
                                 {
