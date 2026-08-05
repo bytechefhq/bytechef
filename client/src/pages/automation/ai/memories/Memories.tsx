@@ -1,7 +1,9 @@
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
+import EmptyList from '@/components/EmptyList';
+import PageLoader from '@/components/PageLoader';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {Input} from '@/components/ui/input';
-import AiSidebarNav from '@/pages/automation/ai/components/AiSidebarNav';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import Header from '@/shared/layout/Header';
@@ -9,7 +11,7 @@ import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {formatDistanceToNow} from 'date-fns';
-import {EyeIcon, PencilIcon, SearchIcon, Trash2Icon} from 'lucide-react';
+import {BrainIcon, EyeIcon, PencilIcon, SearchIcon, Trash2Icon} from 'lucide-react';
 import {type ReactNode, useMemo, useState} from 'react';
 
 import MemoryDeleteDialog from './dialogs/MemoryDeleteDialog';
@@ -107,21 +109,21 @@ const MemoriesTableRow = ({memory, onDelete, onEdit, onView}: MemoriesTableRowPr
 };
 
 const MemoriesEmptyState = () => (
-    <div className="mx-auto flex max-w-md flex-col items-center gap-2 py-16 text-center">
-        <h3 className="text-lg font-semibold">No memories yet</h3>
-
-        <p className="text-sm text-muted-foreground">
-            The agent stores facts here as you chat with it - user preferences, project decisions, corrections, and
-            external reference pointers. Once the agent learns something worth keeping, it will show up on this page and
-            you can inspect, edit, or delete it.
-        </p>
-    </div>
+    <EmptyList
+        // EmptyList's own px-2 is sized for short messages; this one runs edge to edge without a
+        // readable measure to hold it in.
+        className="mx-auto max-w-2xl px-6"
+        icon={<BrainIcon className="size-24 text-stroke-neutral-tertiary" />}
+        message="The agent stores facts here as you chat with it - user preferences, project decisions, corrections, and external reference pointers. Once the agent learns something worth keeping, it will show up on this page and you can inspect, edit, or delete it."
+        title="No memories yet"
+    />
 );
 
 interface MemoriesProps {
-    // The left-sidebar nav rendered above the Type filter. Defaults to the automation "AI" section nav; the
-    // AI Hub > Context > Memories page passes the AI Hub tasks sidebar so Memories renders inside the AI Hub
-    // shell (Context nav visible) rather than redirecting to the standalone /automation/ai/memories page.
+    // The left-sidebar nav. The standalone /automation/ai/memories page renders its own sidebar with the
+    // Type filter (matching the other automation pages); the AI Hub > Context > Memories page passes the
+    // AI Hub tasks sidebar so Memories renders inside the AI Hub shell (Context nav visible) — the Type
+    // filter then stays in the header, since the sidebar slot is taken.
     renderSidebarNav?: () => ReactNode;
     sidebarTitle?: string;
 }
@@ -161,31 +163,14 @@ const Memories = ({renderSidebarNav, sidebarTitle = 'AI'}: MemoriesProps = {}) =
         });
     }, [memories, searchTerm]);
 
-    const filterSidebar = (
-        <LeftSidebarNav
-            body={FILTER_ITEMS.map((item) => (
-                <LeftSidebarNavItem
-                    item={{
-                        current: activeFilter === item.value,
-                        name: item.label,
-                        onItemClick: () => setActiveFilter(item.value),
-                    }}
-                    key={item.value}
-                    toLink=""
-                />
-            ))}
-            title="Type"
-        />
-    );
-
     const totalCount = memories?.length ?? 0;
 
     return (
         <LayoutContainer
-            // The header surfaces the active filter as the page title (echoes the sidebar selection so the
-            // user can confirm what's being shown), with the env selector and search input on the right —
-            // matching the AssetFiles toolbar order so the search affordance lives in the same screen
-            // region across automation pages.
+            // The header surfaces the active filter as the page title (echoes the Type select so the
+            // user can confirm what's being shown), with the type filter, env selector and search input
+            // on the right — matching the AssetFiles toolbar order so the search affordance lives in the
+            // same screen region across automation pages.
             header={
                 <div className="flex w-full items-center gap-2 px-6 py-3">
                     <h1 className="text-base font-semibold">{activeFilterLabel}</h1>
@@ -197,6 +182,25 @@ const Memories = ({renderSidebarNav, sidebarTitle = 'AI'}: MemoriesProps = {}) =
                     )}
 
                     <div className="ml-auto flex items-center gap-2">
+                        {renderSidebarNav && (
+                            <Select
+                                onValueChange={(value) => setActiveFilter(value as FilterValueType)}
+                                value={activeFilter}
+                            >
+                                <SelectTrigger aria-label="Filter by type" className="w-36">
+                                    <SelectValue />
+                                </SelectTrigger>
+
+                                <SelectContent>
+                                    {FILTER_ITEMS.map((item) => (
+                                        <SelectItem key={item.value} value={item.value}>
+                                            {item.label}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        )}
+
                         <EnvironmentSelect />
 
                         <div className="relative w-64">
@@ -213,64 +217,85 @@ const Memories = ({renderSidebarNav, sidebarTitle = 'AI'}: MemoriesProps = {}) =
                 </div>
             }
             leftSidebarBody={
-                <>
-                    {renderSidebarNav ? renderSidebarNav() : <AiSidebarNav currentSection="memories" />}
-
-                    {filterSidebar}
-                </>
+                renderSidebarNav ? (
+                    renderSidebarNav()
+                ) : (
+                    <LeftSidebarNav
+                        body={FILTER_ITEMS.map((item) => (
+                            <LeftSidebarNavItem
+                                item={{
+                                    current: activeFilter === item.value,
+                                    id: item.value,
+                                    name: item.label,
+                                    onItemClick: (id) => setActiveFilter(id as FilterValueType),
+                                }}
+                                key={item.value}
+                            />
+                        ))}
+                        title="Type"
+                    />
+                )
             }
-            leftSidebarHeader={<Header position="sidebar" title={sidebarTitle} />}
+            leftSidebarHeader={<Header position="sidebar" title={renderSidebarNav ? sidebarTitle : 'Memories'} />}
+            leftSidebarOpen
             leftSidebarWidth="64"
         >
-            <div className="flex w-full flex-1 flex-col gap-4 p-6">
-                {isLoading ? (
-                    <p className="p-8 text-center text-sm text-muted-foreground">Loading...</p>
-                ) : totalCount === 0 ? (
+            <PageLoader className="min-h-full" loading={isLoading}>
+                {/* EmptyList centers on its parent's CROSS axis, so it only lands mid-page as a direct child
+                    of the layout's flex ROW; inside the padded flex COLUMN below it would pin to the top. */}
+
+                {totalCount === 0 ? (
                     <MemoriesEmptyState />
-                ) : filteredMemories.length === 0 ? (
-                    <p className="p-8 text-center text-sm text-muted-foreground">No memories match your search.</p>
                 ) : (
-                    <div className="overflow-x-auto rounded-md border">
-                        <table className="w-full">
-                            <thead>
-                                <tr className="border-b bg-muted/50 text-left">
-                                    <th className="px-4 py-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-                                        Title
-                                    </th>
+                    <div className="flex w-full flex-1 flex-col gap-4 p-6">
+                        {filteredMemories.length === 0 ? (
+                            <p className="p-8 text-center text-sm text-muted-foreground">
+                                No memories match your search.
+                            </p>
+                        ) : (
+                            <div className="overflow-x-auto rounded-md border">
+                                <table className="w-full">
+                                    <thead>
+                                        <tr className="border-b bg-muted/50 text-left">
+                                            <th className="px-4 py-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+                                                Title
+                                            </th>
 
-                                    <th className="px-4 py-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-                                        Type
-                                    </th>
+                                            <th className="px-4 py-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+                                                Type
+                                            </th>
 
-                                    <th className="px-4 py-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-                                        Description
-                                    </th>
+                                            <th className="px-4 py-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+                                                Description
+                                            </th>
 
-                                    <th className="px-4 py-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-                                        Updated
-                                    </th>
+                                            <th className="px-4 py-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+                                                Updated
+                                            </th>
 
-                                    <th className="px-4 py-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-                                        Actions
-                                    </th>
-                                </tr>
-                            </thead>
+                                            <th className="px-4 py-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+                                                Actions
+                                            </th>
+                                        </tr>
+                                    </thead>
 
-                            <tbody>
-                                {filteredMemories.map((memory) => (
-                                    <MemoriesTableRow
-                                        key={memory.id}
-                                        memory={memory}
-                                        onDelete={setDeleteTarget}
-                                        onEdit={setEditTarget}
-                                        onView={setViewTarget}
-                                    />
-                                ))}
-                            </tbody>
-                        </table>
+                                    <tbody>
+                                        {filteredMemories.map((memory) => (
+                                            <MemoriesTableRow
+                                                key={memory.id}
+                                                memory={memory}
+                                                onDelete={setDeleteTarget}
+                                                onEdit={setEditTarget}
+                                                onView={setViewTarget}
+                                            />
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
                     </div>
                 )}
-            </div>
+            </PageLoader>
 
             <MemoryDetailDialog memory={viewTarget} onClose={() => setViewTarget(null)} open={viewTarget !== null} />
 

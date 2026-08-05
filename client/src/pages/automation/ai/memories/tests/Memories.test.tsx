@@ -1,5 +1,5 @@
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import {render, screen} from '@testing-library/react';
+import {fireEvent, render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {ReactNode} from 'react';
 import {MemoryRouter} from 'react-router-dom';
@@ -182,9 +182,15 @@ describe('Memories page', () => {
     it('invokes the memories query with the selected memoryType filter', async () => {
         mockUseMemoriesQuery.mockReturnValue(makeQueryResult({data: []}));
 
-        wrap(<Memories />);
+        // The standalone page filters via its own left sidebar; the header select only renders in the
+        // AI-Hub-embedded variant (sidebar slot taken), so drive that variant here.
+        wrap(<Memories renderSidebarNav={() => <div />} />);
 
-        await userEvent.click(screen.getByRole('link', {name: /^feedback$/i}));
+        // fireEvent instead of userEvent: Radix Select's pointer-capture calls are not
+        // implemented in jsdom (same idiom as SelectFieldRenderer.test.tsx).
+        fireEvent.click(screen.getByRole('combobox', {name: /filter by type/i}));
+
+        fireEvent.click(await screen.findByRole('option', {name: /^feedback$/i}));
 
         const lastCall = mockUseMemoriesQuery.mock.lastCall;
 
