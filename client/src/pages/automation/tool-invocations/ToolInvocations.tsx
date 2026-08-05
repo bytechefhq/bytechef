@@ -147,7 +147,7 @@ export const ToolInvocations = ({basePath = '/automation/executions', mcpServerO
                     </div>
                 </div>
             }
-            leftSidebarHeader={<Header position="sidebar" title="Executions" />}
+            leftSidebarHeader={<Header position="sidebar" title="Tool Invocations" />}
             leftSidebarWidth="64"
         >
             <PageLoader errors={[toolInvocationLogsError]} loading={toolInvocationLogsIsLoading}>

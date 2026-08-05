@@ -20,7 +20,7 @@ const TriggerPlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) =>
         >
             <div
                 className={twMerge(
-                    'nodrag relative mx-[22px] flex size-9 cursor-pointer items-center justify-center rounded-md bg-gray-300 text-xl text-content-neutral-secondary shadow-none hover:scale-110 hover:bg-gray-500 hover:text-white'
+                    'nodrag relative mx-[22px] flex size-12 cursor-pointer items-center justify-center rounded-md border-2 border-dashed border-stroke-neutral-tertiary bg-surface-neutral-primary text-2xl text-content-neutral-secondary shadow-none hover:scale-110 hover:border-stroke-brand-secondary-hover hover:text-content-neutral-primary'
                 )}
                 title="Click to add a trigger"
             >
