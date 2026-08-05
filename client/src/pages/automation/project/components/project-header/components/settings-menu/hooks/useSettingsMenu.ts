@@ -1,13 +1,6 @@
-import {
-    usePullProjectFromGitMutation,
-    useUpdateProjectGitConfigurationMutation,
-} from '@/ee/shared/mutations/automation/projectGit.mutations';
-import {
-    ProjectGitConfigurationKeys,
-    useGetProjectGitConfigurationQuery,
-} from '@/ee/shared/mutations/automation/projectGit.queries';
 import {clearWorkflowHistory} from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import {getProjectGitApi} from '@/shared/edition/project-git/projectGitApi';
 import {Project, ProjectApi, Workflow} from '@/shared/middleware/automation/configuration';
 import {
     useDeleteProjectMutation,
@@ -30,7 +23,7 @@ import {useNavigate, useSearchParams} from 'react-router-dom';
 import {toast} from 'sonner';
 
 export const useSettingsMenu = ({project, workflow}: {project: Project; workflow: Workflow}) => {
-    const {data: projectGitConfiguration} = useGetProjectGitConfigurationQuery(project.id!);
+    const {data: projectGitConfiguration} = getProjectGitApi().useProjectGitConfigurationQuery(project.id!);
 
     const projectId = project.id;
 
@@ -79,7 +72,7 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
         },
     });
 
-    const pullProjectFromGitMutation = usePullProjectFromGitMutation({
+    const pullProjectFromGitMutation = getProjectGitApi().usePullProjectFromGitMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ProjectKeys.project(project.id!)});
 
@@ -91,13 +84,7 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
         },
     });
 
-    const updateProjectGitConfigurationMutation = useUpdateProjectGitConfigurationMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ProjectGitConfigurationKeys.projectGitConfiguration(project.id!),
-            });
-        },
-    });
+    const updateProjectGitConfigurationMutation = getProjectGitApi().useUpdateProjectGitConfigurationMutation({});
 
     const deleteProjectVersionMutation = useDeleteProjectVersionMutation({
         onSuccess: (_, {projectVersion}) => {

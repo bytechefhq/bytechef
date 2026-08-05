@@ -5,11 +5,11 @@ import ApiPlatformLeftSidebarNav from '@/ee/pages/automation/api-platform/ApiPla
 import ApiClientDialog from '@/ee/pages/automation/api-platform/api-clients/components/ApiClientDialog';
 import ApiClientTable from '@/ee/pages/automation/api-platform/api-clients/components/ApiClientTable';
 import {useGetApiCollectionTagsQuery} from '@/ee/shared/mutations/automation/apiCollectionTags.queries';
+import {useGetApiClientsQuery} from '@/ee/shared/queries/platform/apiClients.queries';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
-import {useGetApiClientsQuery} from '@/shared/queries/platform/apiClients.queries';
 import {KeyIcon} from 'lucide-react';
 import {useState} from 'react';
 

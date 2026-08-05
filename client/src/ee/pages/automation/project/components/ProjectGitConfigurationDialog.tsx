@@ -11,8 +11,8 @@ import {
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import Switch from '@/components/Switch/Switch';
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
-import {ProjectGitConfiguration} from '@/ee/shared/middleware/automation/configuration';
 import {useGetProjectRemoteBranchesQuery} from '@/ee/shared/mutations/automation/projectGit.queries';
+import {ProjectGitConfigurationI} from '@/shared/edition/project-git/projectGitApi';
 import {zodResolver} from '@hookform/resolvers/zod';
 import React from 'react';
 import {useForm} from 'react-hook-form';
@@ -39,7 +39,7 @@ const ProjectGitConfigurationDialog = ({
         projectGitConfiguration: z.infer<typeof formSchema>;
         onSuccess: () => void;
     }) => void;
-    projectGitConfiguration?: ProjectGitConfiguration;
+    projectGitConfiguration?: ProjectGitConfigurationI;
     projectId: number;
 }) => {
     const form = useForm<z.infer<typeof formSchema>>({

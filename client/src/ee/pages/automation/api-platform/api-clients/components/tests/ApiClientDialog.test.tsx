@@ -9,7 +9,7 @@ const hoisted = vi.hoisted(() => ({
     updateMutate: vi.fn(),
 }));
 
-vi.mock('@/shared/mutations/platform/apiClients.mutations', () => ({
+vi.mock('@/ee/shared/mutations/platform/apiClients.mutations', () => ({
     // The dialog only reaches its reveal screen through the create mutation's onSuccess, so the mock hands that
     // callback back to the test instead of discarding it.
     useCreateApiClientMutation: (options: {onSuccess: (result: {secretKey?: string}) => void}) => {
@@ -20,7 +20,7 @@ vi.mock('@/shared/mutations/platform/apiClients.mutations', () => ({
     useUpdateApiClientMutation: () => ({mutate: hoisted.updateMutate, reset: vi.fn()}),
 }));
 
-vi.mock('@/shared/queries/platform/apiClients.queries', () => ({
+vi.mock('@/ee/shared/queries/platform/apiClients.queries', () => ({
     ApiClientKeys: {apiClients: ['apiClients']},
 }));
 

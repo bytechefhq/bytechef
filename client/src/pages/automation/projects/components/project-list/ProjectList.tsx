@@ -1,6 +1,6 @@
 import {Collapsible, CollapsibleContent} from '@/components/ui/collapsible';
-import {ProjectGitConfiguration} from '@/ee/shared/middleware/automation/configuration';
 import ProjectListItem from '@/pages/automation/projects/components/project-list/ProjectListItem';
+import {ProjectGitConfigurationI} from '@/shared/edition/project-git/projectGitApi';
 import {Project, Tag} from '@/shared/middleware/automation/configuration';
 import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
 import {useEffect, useState} from 'react';
@@ -19,7 +19,7 @@ const ProjectList = ({
     componentDefinitions?: ComponentDefinitionBasic[];
     isRefetchingProjects?: boolean;
     newlyCreatedProjectId?: number;
-    projectGitConfigurations: ProjectGitConfiguration[];
+    projectGitConfigurations: ProjectGitConfigurationI[];
     projects: Project[];
     tags: Tag[];
     taskDispatcherDefinitions?: TaskDispatcherDefinition[];
