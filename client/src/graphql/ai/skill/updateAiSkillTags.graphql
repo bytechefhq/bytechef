@@ -1,0 +1,5 @@
+mutation updateAiSkillTags($id: ID!, $tags: [AiSkillTagInput!]) {
+    updateAiSkillTags(id: $id, tags: $tags) {
+        id
+    }
+}

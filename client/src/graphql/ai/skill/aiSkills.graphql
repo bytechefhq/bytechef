@@ -3,6 +3,10 @@ query aiSkills {
         id
         name
         description
+        tags {
+            id
+            name
+        }
         createdDate
         lastModifiedDate
     }
