@@ -60,14 +60,21 @@ public final class ActionProxyObject implements ProxyObject {
                 inputParameters = (Map<String, ?>) PolyglotValues.copyToJavaValue(arguments[0]);
             }
 
-            String connectionName = arguments.length > 1 ? arguments[1].asString() : null;
+            String connectionName = arguments.length > 1 && !arguments[1].isNull() ? arguments[1].asString() : null;
+
+            Map<String, ?> clusterElements = null;
+
+            if (arguments.length > 2 && !arguments[2].isNull()) {
+                clusterElements = (Map<String, ?>) PolyglotValues.copyFromPolyglotContext(
+                    PolyglotValues.copyToJavaValue(arguments[2]));
+            }
 
             Object result;
 
             try {
                 result = componentActionInvoker.invoke(
                     componentName, actionName, (Map) PolyglotValues.copyFromPolyglotContext(inputParameters),
-                    connectionName);
+                    connectionName, clusterElements);
             } catch (RuntimeException e) {
                 throw e;
             } catch (Exception e) {

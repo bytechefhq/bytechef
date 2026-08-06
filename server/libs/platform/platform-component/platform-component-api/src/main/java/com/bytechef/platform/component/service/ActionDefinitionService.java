@@ -172,19 +172,27 @@ public interface ActionDefinitionService extends OperationDefinitionService {
      * method processes the given action within a specific execution context and establishes a connection to an external
      * component if needed.
      *
-     * @param componentName       the name of the component to execute
-     * @param componentVersion    the version of the component
-     * @param actionName          the name of the action to be performed
-     * @param inputParameters     a map of input parameters required for processing
-     * @param componentConnection an instance of {@link ComponentConnection} used for external interactions
-     * @param environmentId       the environment ID
-     * @param context             the context in which the action is executed
+     * @param componentName        the name of the component to execute
+     * @param componentVersion     the version of the component
+     * @param actionName           the name of the action to be performed
+     * @param inputParameters      a map of input parameters required for processing
+     * @param componentConnection  an instance of {@link ComponentConnection} used for external interactions
+     * @param componentConnections every connection the caller has wired, keyed by the name it wired them under, for an
+     *                             action whose perform takes several
+     * @param extensions           the node state an action's perform reads beside its input — above all the
+     *                             {@code clusterElements} map an AI agent resolves its model, tools, memory and RAG
+     *                             from; composed by the caller, since a code workflow task has no workflow node to
+     *                             carry it
+     * @param environmentId        the environment ID
+     * @param context              the context in which the action is executed
      * @return an object representing the result of the performed action
      */
     @Nullable
     Object executePerformForPolyglot(
         String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
-        @Nullable ComponentConnection componentConnection, @Nullable Long environmentId, ActionContext context);
+        @Nullable ComponentConnection componentConnection,
+        Map<String, ? extends ComponentConnection> componentConnections, Map<String, ?> extensions,
+        @Nullable Long environmentId, ActionContext context);
 
     /**
      * Processes the error response for a given component and action and returns a ProviderException.

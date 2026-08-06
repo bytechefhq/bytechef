@@ -58,7 +58,18 @@ class ScriptComponentActionInvoker implements ComponentActionInvoker {
     @SuppressWarnings({
         "rawtypes", "unchecked"
     })
-    public Object invoke(String componentName, String actionName, Map<String, ?> input, String connectionName) {
+    public Object invoke(
+        String componentName, String actionName, Map<String, ?> input, String connectionName,
+        Map<String, ?> clusterElements) {
+
+        if (clusterElements != null && !clusterElements.isEmpty()) {
+            // Elements name one of the caller's declared connections, and a script task declares none — it resolves a
+            // connection by matching the target component instead. Say so rather than dropping them silently.
+            throw new IllegalArgumentException(
+                "Cluster elements can only be composed by a code workflow task, which declares the connections they "
+                    + "name; a script task declares none");
+        }
+
         ComponentDefinition componentDefinition = componentCatalog.getComponentDefinition(componentName);
 
         ComponentConnection componentConnection = null;
@@ -84,7 +95,7 @@ class ScriptComponentActionInvoker implements ComponentActionInvoker {
 
         return actionDefinitionService.executePerformForPolyglot(
             componentDefinition.getName(), componentDefinition.getVersion(), actionName, (Map) input,
-            componentConnection, jobContextAware.getEnvironmentId(), newActionContext);
+            componentConnection, componentConnections, Map.of(), jobContextAware.getEnvironmentId(), newActionContext);
     }
 
     private Map.Entry<String, ComponentConnection> getComponentConnectionEntry(String connectionName) {

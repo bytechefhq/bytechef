@@ -52,6 +52,21 @@ class CodeWorkflowHostBridgeTest {
     }
 
     @Test
+    void testComponentExecuteCarriesClusterElementsAcrossTheSandboxBoundary() {
+        RecordingTaskContext taskContext = new RecordingTaskContext(null);
+
+        CodeWorkflowHostBridge codeWorkflowHostBridge = new CodeWorkflowHostBridge(taskContext);
+
+        codeWorkflowHostBridge.componentExecute(
+            "{\"componentName\": \"aiAgent\", \"actionName\": \"chat\", \"clusterElements\": " +
+                "{\"model\": {\"type\": \"openAi/v1/model\", \"connection\": \"openai-prod\"}}}");
+
+        assertEquals(
+            Map.of("model", Map.of("type", "openAi/v1/model", "connection", "openai-prod")),
+            taskContext.getClusterElements());
+    }
+
+    @Test
     void testComponentExecuteWithoutTaskContextThrows() {
         CodeWorkflowHostBridge codeWorkflowHostBridge = new CodeWorkflowHostBridge(null);
 
@@ -87,7 +102,7 @@ class CodeWorkflowHostBridgeTest {
 
         codeWorkflowHostBridge.log("warn", "log message");
 
-        assertEquals("warn", taskContext.getLogLevel());
+        assertEquals("WARN", taskContext.getLogLevel());
         assertEquals("log message", taskContext.getLogMessage());
     }
 

@@ -330,18 +330,42 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     public Object executePerformForPolyglot(
         @ComponentNameParam String componentName, int componentVersion, String actionName,
         Map<String, ?> inputParameters, @ConnectionParam @Nullable ComponentConnection componentConnection,
+        Map<String, ? extends ComponentConnection> componentConnections, Map<String, ?> extensions,
         @Nullable Long environmentId, ActionContext context) {
 
         checkComponentVisible(componentName);
         checkActionVisible(componentName, actionName);
 
-        PerformFunction performFunction =
-            (PerformFunction) componentDefinitionRegistry
-                .getActionDefinition(componentName, componentVersion, actionName)
-                .getPerform()
-                .orElseThrow(() -> new IllegalArgumentException("Perform function is not defined."));
+        BasePerformFunction basePerformFunction = componentDefinitionRegistry
+            .getActionDefinition(componentName, componentVersion, actionName)
+            .getPerform()
+            .orElseThrow(() -> new IllegalArgumentException("Perform function is not defined."));
 
-        return executeSingleConnectionPerform(performFunction, inputParameters, componentConnection, context);
+        if (basePerformFunction instanceof PerformFunction performFunction) {
+            return executeSingleConnectionPerform(performFunction, inputParameters, componentConnection, context);
+        }
+
+        if (basePerformFunction instanceof MultipleConnectionsPerformFunction performFunction) {
+            // A multi-connection action reads its connections by the name they were wired under, so the caller's
+            // whole wiring is handed over; the connection it named for this call is added under the component name
+            // too, for an action that takes exactly one through this shape.
+            Map<String, ComponentConnection> connections = new HashMap<>(componentConnections);
+
+            if (componentConnection != null) {
+                connections.putIfAbsent(componentName, componentConnection);
+            }
+
+            // Cluster elements ride along in the extensions the caller composed, so an AI agent resolves its model
+            // through the same code path a visual node uses.
+            return executeMultipleConnectionsPerform(
+                performFunction, inputParameters, connections, extensions, context);
+        }
+
+        // What is left is the streaming shapes, which read a sink the caller has no way to describe. Say so, rather
+        // than failing on a cast.
+        throw new IllegalArgumentException(
+            ("Action %s of component %s cannot be invoked from code: its perform streams its result to a sink that "
+                + "only a workflow node provides").formatted(actionName, componentName));
     }
 
     @Override

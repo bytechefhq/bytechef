@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.codeworkflow.loader;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.bytechef.embedded.integration.IntegrationHandler;
@@ -15,6 +16,7 @@ import com.bytechef.embedded.integration.definition.IntegrationDefinition;
 import com.bytechef.workflow.definition.ConnectionRequirement;
 import com.bytechef.workflow.definition.TaskDefinition;
 import com.bytechef.workflow.definition.WorkflowDefinition;
+import com.bytechef.workflow.definition.WorkflowTaskDefinition;
 import java.util.List;
 import java.util.Map;
 import java.util.OptionalInt;
@@ -127,6 +129,55 @@ class IntegrationHandlerPolyglotEngineTest {
         })
         """;
 
+    private static final String CLUSTER_ELEMENTS_JAVASCRIPT_SOURCE = """
+        ({
+            componentName: 'test-component',
+            componentVersion: 1,
+            workflows: [
+                {
+                    name: 'my-workflow',
+                    tasks: [
+                        {
+                            name: 'my-task',
+                            perform: (context) => context.component.aiAgent.chat({messages: []}, null, {
+                                model: {
+                                    type: 'openAi/v1/model',
+                                    connection: 'openai-prod',
+                                    parameters: {model: 'gpt-4o'}
+                                },
+                                tools: [
+                                    {type: 'slack/v1/sendMessage', connection: 'slack-prod', name: 'post_to_slack'}
+                                ]
+                            })
+                        }
+                    ]
+                }
+            ]
+        })
+        """;
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testPerformPassesClusterElementsComposedAtTheCallSite() throws Exception {
+        TaskDefinition taskDefinition = loadSingleTask("js", CLUSTER_ELEMENTS_JAVASCRIPT_SOURCE);
+
+        RecordingTaskContext taskContext = new RecordingTaskContext("answer");
+
+        taskDefinition.getPerform()
+            .apply(taskContext);
+
+        Map<String, ?> clusterElements = taskContext.getClusterElements();
+
+        // A null connection name still has to reach the host as null rather than failing the third argument's arity.
+        assertNull(taskContext.getConnectionName());
+        assertEquals(
+            Map.of("type", "openAi/v1/model", "connection", "openai-prod", "parameters", Map.of("model", "gpt-4o")),
+            clusterElements.get("model"));
+        assertEquals(
+            List.of(Map.of("type", "slack/v1/sendMessage", "connection", "slack-prod", "name", "post_to_slack")),
+            (List<Map<String, ?>>) clusterElements.get("tools"));
+    }
+
     @Test
     void testPerformReceivesComponentCapableContextForJavaScript() throws Exception {
         TaskDefinition taskDefinition = loadSingleTask("js", CONTEXT_JAVASCRIPT_SOURCE);
@@ -193,7 +244,7 @@ class IntegrationHandlerPolyglotEngineTest {
         Object result = taskDefinition.getPerform()
             .apply(taskContext);
 
-        assertEquals("warn", taskContext.getLogLevel());
+        assertEquals("WARN", taskContext.getLogLevel());
         assertEquals("log message", taskContext.getLogMessage());
         assertEquals("logged", result);
     }
@@ -240,6 +291,38 @@ class IntegrationHandlerPolyglotEngineTest {
 
         assertEquals("slack-prod", taskContext.getConnectionName());
         assertEquals("eu", result);
+    }
+
+    @Test
+    void testPerformReadsWorkflowInputsAndPriorTaskOutputsFromContext() throws Exception {
+        String source = """
+            ({
+                componentName: 'test-component',
+                componentVersion: 1,
+                workflows: [
+                    {
+                        name: 'my-workflow',
+                        tasks: [
+                            {
+                                name: 'my-task',
+                                perform: (context) =>
+                                    context.input('my-task1').id + ':' + context.input().input.email
+                            }
+                        ]
+                    }
+                ]
+            })
+            """;
+
+        TaskDefinition taskDefinition = loadSingleTask("js", source);
+
+        RecordingTaskContext taskContext = new RecordingTaskContext(
+            null, Map.of(), Map.of("input", Map.of("email", "a@b.com"), "my-task1", Map.of("id", "3")));
+
+        Object result = taskDefinition.getPerform()
+            .apply(taskContext);
+
+        assertEquals("3:a@b.com", result);
     }
 
     @Test
@@ -352,9 +435,9 @@ class IntegrationHandlerPolyglotEngineTest {
 
         WorkflowDefinition workflowDefinition = workflows.getFirst();
 
-        List<? extends TaskDefinition> tasks = workflowDefinition.getTasks()
+        List<? extends WorkflowTaskDefinition> tasks = workflowDefinition.getTasks()
             .orElseThrow();
 
-        return tasks.getFirst();
+        return (TaskDefinition) tasks.getFirst();
     }
 }

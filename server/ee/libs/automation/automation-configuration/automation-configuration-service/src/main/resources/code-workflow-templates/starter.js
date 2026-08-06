@@ -11,9 +11,26 @@
                     name: "my-task",
                     label: "My Task",
                     // connections: [{componentName: "httpClient", name: "my-connection"}],
+                    //
+                    // Independent tasks can run at the same time — wrap them in a group:
+                    //   {name: "fan-out", type: "parallel", tasks: [ ... ]}
+                    //   {name: "branches", type: "forkJoin", branches: [[ ... ], [ ... ]]}
                     perform: function (context) {
+                        // context.input() holds the workflow inputs and the output of every task that
+                        // already ran, each under its own name.
+                        //
                         // const response = context.component.httpClient.get(
                         //     {uri: "https://api.example.com/items"}, "my-connection");
+                        //
+                        // An action that reads cluster elements — the AI Agent above all — takes
+                        // them as a third argument. An element NAMES a declared connection:
+                        //
+                        // const answer = context.component.aiAgent.chat({messages: messages}, null, {
+                        //     model: {type: "openAi/v1/model", connection: "openai-prod",
+                        //             parameters: {model: "gpt-4o"}},
+                        //     tools: [{type: "slack/v1/sendMessage", connection: "slack-prod",
+                        //              name: "post_to_slack"}]
+                        // });
                         //
                         // context.log("info", "my-task ran");
 

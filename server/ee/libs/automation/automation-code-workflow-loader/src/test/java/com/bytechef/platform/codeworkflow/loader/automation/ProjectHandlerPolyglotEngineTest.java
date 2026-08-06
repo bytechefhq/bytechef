@@ -8,14 +8,19 @@
 package com.bytechef.platform.codeworkflow.loader.automation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.bytechef.automation.project.ProjectHandler;
 import com.bytechef.automation.project.definition.ProjectDefinition;
+import com.bytechef.workflow.definition.CompositeTaskDefinition;
 import com.bytechef.workflow.definition.ConnectionRequirement;
+import com.bytechef.workflow.definition.Input;
+import com.bytechef.workflow.definition.Output;
 import com.bytechef.workflow.definition.TaskDefinition;
 import com.bytechef.workflow.definition.WorkflowDefinition;
+import com.bytechef.workflow.definition.WorkflowTaskDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.io.IOException;
@@ -169,8 +174,56 @@ class ProjectHandlerPolyglotEngineTest {
         })
         """;
 
+    private static final String CLUSTER_ELEMENTS_JAVASCRIPT_SOURCE = """
+        ({
+            name: 'test-project',
+            workflows: [
+                {
+                    name: 'my-workflow',
+                    tasks: [
+                        {
+                            name: 'my-task',
+                            perform: (context) => context.component.aiAgent.chat({messages: []}, null, {
+                                model: {
+                                    type: 'openAi/v1/model',
+                                    connection: 'openai-prod',
+                                    parameters: {model: 'gpt-4o'}
+                                },
+                                tools: [
+                                    {type: 'slack/v1/sendMessage', connection: 'slack-prod', name: 'post_to_slack'}
+                                ]
+                            })
+                        }
+                    ]
+                }
+            ]
+        })
+        """;
+
     @TempDir
     private Path tempDir;
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testPerformPassesClusterElementsComposedAtTheCallSite() throws Exception {
+        TaskDefinition taskDefinition = loadSingleTask("js", CLUSTER_ELEMENTS_JAVASCRIPT_SOURCE);
+
+        RecordingTaskContext taskContext = new RecordingTaskContext("answer");
+
+        taskDefinition.getPerform()
+            .apply(taskContext);
+
+        Map<String, ?> clusterElements = taskContext.getClusterElements();
+
+        // A null connection name still has to reach the host as null rather than failing the third argument's arity.
+        assertNull(taskContext.getConnectionName());
+        assertEquals(
+            Map.of("type", "openAi/v1/model", "connection", "openai-prod", "parameters", Map.of("model", "gpt-4o")),
+            clusterElements.get("model"));
+        assertEquals(
+            List.of(Map.of("type", "slack/v1/sendMessage", "connection", "slack-prod", "name", "post_to_slack")),
+            (List<Map<String, ?>>) clusterElements.get("tools"));
+    }
 
     @Test
     void testPerformReceivesComponentCapableContextForJavaScript() throws Exception {
@@ -238,7 +291,7 @@ class ProjectHandlerPolyglotEngineTest {
         Object result = taskDefinition.getPerform()
             .apply(taskContext);
 
-        assertEquals("warn", taskContext.getLogLevel());
+        assertEquals("WARN", taskContext.getLogLevel());
         assertEquals("log message", taskContext.getLogMessage());
         assertEquals("logged", result);
     }
@@ -284,6 +337,65 @@ class ProjectHandlerPolyglotEngineTest {
 
         assertEquals("slack-prod", taskContext.getConnectionName());
         assertEquals("eu", result);
+    }
+
+    @Test
+    void testPerformRejectsAnUnknownLogLevel() {
+        String source = """
+            ({
+                name: 'test-project',
+                workflows: [
+                    {
+                        name: 'my-workflow',
+                        tasks: [
+                            {
+                                name: 'my-task',
+                                perform: (context) => context.log('warning', 'log message')
+                            }
+                        ]
+                    }
+                ]
+            })
+            """;
+
+        TaskDefinition taskDefinition = loadSingleTask("js", source);
+
+        RecordingTaskContext taskContext = new RecordingTaskContext(null);
+
+        assertThrows(
+            Exception.class, () -> taskDefinition.getPerform()
+                .apply(taskContext));
+    }
+
+    @Test
+    void testPerformReadsWorkflowInputsAndPriorTaskOutputsFromContext() throws Exception {
+        String source = """
+            ({
+                name: 'test-project',
+                workflows: [
+                    {
+                        name: 'my-workflow',
+                        tasks: [
+                            {
+                                name: 'my-task',
+                                perform: (context) =>
+                                    context.input('my-task1').id + ':' + context.input().input.email
+                            }
+                        ]
+                    }
+                ]
+            })
+            """;
+
+        TaskDefinition taskDefinition = loadSingleTask("js", source);
+
+        RecordingTaskContext taskContext = new RecordingTaskContext(
+            null, Map.of(), Map.of("input", Map.of("email", "a@b.com"), "my-task1", Map.of("id", "3")));
+
+        Object result = taskDefinition.getPerform()
+            .apply(taskContext);
+
+        assertEquals("3:a@b.com", result);
     }
 
     @Test
@@ -421,6 +533,218 @@ class ProjectHandlerPolyglotEngineTest {
             .isEmpty());
     }
 
+    @Test
+    void testLoadParsesDeclaredInputsAndOutputs() {
+        String source = """
+            ({
+                name: 'test-project',
+                workflows: [
+                    {
+                        name: 'my-workflow',
+                        inputs: [{name: 'orderId', label: 'Order ID', type: 'STRING', required: true}],
+                        outputs: [{name: 'customer', task: 'fetch-customer'}, {name: 'ok', value: true}],
+                        tasks: [{name: 'fetch-customer', perform: () => 'c'}]
+                    }
+                ]
+            })
+            """;
+
+        ProjectHandler projectHandler = ProjectHandlerPolyglotEngine.load("js", source);
+
+        ProjectDefinition projectDefinition = projectHandler.getDefinition();
+
+        WorkflowDefinition workflowDefinition = projectDefinition.getWorkflows()
+            .getFirst();
+
+        Input input = workflowDefinition.getInputs()
+            .orElseThrow()
+            .getFirst();
+
+        assertEquals("orderId", input.getName());
+        assertEquals("Order ID", input.getLabel());
+        assertEquals("STRING", input.getType());
+        assertTrue(input.isRequired());
+
+        List<? extends Output> outputs = workflowDefinition.getOutputs()
+            .orElseThrow();
+
+        assertEquals("fetch-customer", outputs.getFirst()
+            .getTask());
+        assertEquals(Boolean.TRUE, outputs.get(1)
+            .getValue());
+    }
+
+    @Test
+    void testLoadParsesDeclaredTriggers() {
+        String source = """
+            ({
+                name: 'test-project',
+                workflows: [
+                    {
+                        name: 'my-workflow',
+                        triggers: [
+                            {name: 'daily', type: 'schedule/v1/interval', parameters: {interval: 1, unit: 'DAY'}}
+                        ],
+                        tasks: [{name: 'my-task', perform: () => 'x'}]
+                    }
+                ]
+            })
+            """;
+
+        ProjectHandler projectHandler = ProjectHandlerPolyglotEngine.load("js", source);
+
+        ProjectDefinition projectDefinition = projectHandler.getDefinition();
+
+        WorkflowDefinition workflowDefinition = projectDefinition.getWorkflows()
+            .getFirst();
+
+        // A trigger names a component the platform already provides, so only its type and parameters cross.
+        com.bytechef.workflow.definition.TriggerDefinition triggerDefinition = workflowDefinition.getTriggers()
+            .orElseThrow()
+            .getFirst();
+
+        assertEquals("daily", triggerDefinition.getName());
+        assertEquals("schedule/v1/interval", triggerDefinition.getType());
+        assertEquals("DAY", triggerDefinition.getParameters()
+            .get("unit"));
+    }
+
+    @Test
+    void testLoadParsesParallelAndForkJoinGroups() {
+        String source = """
+            ({
+                name: 'test-project',
+                workflows: [
+                    {
+                        name: 'my-workflow',
+                        tasks: [
+                            {name: 'fetch', perform: () => 'fetched'},
+                            {
+                                name: 'enrich',
+                                type: 'parallel',
+                                tasks: [
+                                    {name: 'customer', perform: () => 'c'},
+                                    {name: 'inventory', perform: () => 'i'}
+                                ]
+                            },
+                            {
+                                name: 'notify',
+                                type: 'forkJoin',
+                                branches: [
+                                    [{name: 'slack', perform: () => 's'}, {name: 'record', perform: () => 'r'}],
+                                    [{name: 'email', perform: () => 'e'}]
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            })
+            """;
+
+        List<? extends WorkflowTaskDefinition> tasks = loadTasks("js", source);
+
+        assertEquals(3, tasks.size());
+
+        CompositeTaskDefinition parallelTask = (CompositeTaskDefinition) tasks.get(1);
+
+        assertEquals(CompositeTaskDefinition.Type.PARALLEL, parallelTask.getType());
+        assertEquals(
+            List.of("customer", "inventory"), parallelTask.getTasks()
+                .stream()
+                .map(TaskDefinition::getName)
+                .toList());
+
+        CompositeTaskDefinition forkJoinTask = (CompositeTaskDefinition) tasks.get(2);
+
+        assertEquals(CompositeTaskDefinition.Type.FORK_JOIN, forkJoinTask.getType());
+        assertEquals(2, forkJoinTask.getBranches()
+            .size());
+        assertEquals(
+            List.of("slack", "record"), forkJoinTask.getBranches()
+                .getFirst()
+                .stream()
+                .map(TaskDefinition::getName)
+                .toList());
+    }
+
+    @Test
+    void testPerformResolvesATaskNestedInAGroup() throws Exception {
+        String source = """
+            ({
+                name: 'test-project',
+                workflows: [
+                    {
+                        name: 'my-workflow',
+                        tasks: [
+                            {
+                                name: 'notify',
+                                type: 'forkJoin',
+                                branches: [[{name: 'slack', perform: (context) => 'posted'}]]
+                            }
+                        ]
+                    }
+                ]
+            })
+            """;
+
+        CompositeTaskDefinition forkJoinTask = (CompositeTaskDefinition) loadTasks("js", source).getFirst();
+
+        TaskDefinition nestedTask = forkJoinTask.getBranches()
+            .getFirst()
+            .getFirst();
+
+        assertEquals("posted", nestedTask.getPerform()
+            .apply(new RecordingTaskContext(null)));
+    }
+
+    @Test
+    void testLoadRejectsInvalidGroups() {
+        // A duplicate name would make one task's output unreachable through context.input(name).
+        assertGroupRejected(
+            "{name: 'a', type: 'parallel', tasks: [{name: 'x', perform: () => 1}, {name: 'x', perform: () => 2}]}",
+            "declared more than once");
+
+        assertGroupRejected(
+            "{name: 'a', type: 'parallel', perform: () => 1, tasks: [{name: 'x', perform: () => 2}]}",
+            "cannot declare a perform of its own");
+
+        assertGroupRejected(
+            "{name: 'a', type: 'parallel', tasks: [{name: 'b', type: 'parallel', tasks: []}]}",
+            "a group inside a group is not supported");
+
+        assertGroupRejected("{name: 'a', type: 'sequence', tasks: []}", "may only be parallel or forkJoin");
+
+        assertGroupRejected("{name: 'a', type: 'parallel', tasks: []}", "non-empty tasks list");
+
+        assertGroupRejected("{name: 'a', type: 'forkJoin', branches: [[]]}", "non-empty list of tasks");
+    }
+
+    private static void assertGroupRejected(String taskSource, String expectedMessage) {
+        String source = "({name: 'test-project', workflows: [{name: 'my-workflow', tasks: [" + taskSource
+            + "]}]})";
+
+        IllegalArgumentException exception = assertThrows(
+            IllegalArgumentException.class, () -> loadTasks("js", source));
+
+        assertTrue(
+            exception.getMessage()
+                .contains(expectedMessage),
+            exception.getMessage());
+    }
+
+    private static List<? extends WorkflowTaskDefinition> loadTasks(String languageId, String source) {
+        ProjectHandler projectHandler = ProjectHandlerPolyglotEngine.load(languageId, source);
+
+        ProjectDefinition projectDefinition = projectHandler.getDefinition();
+
+        List<WorkflowDefinition> workflows = projectDefinition.getWorkflows();
+
+        WorkflowDefinition workflowDefinition = workflows.getFirst();
+
+        return workflowDefinition.getTasks()
+            .orElseThrow();
+    }
+
     private static TaskDefinition loadSingleTask(String languageId, String source) {
         ProjectHandler projectHandler = ProjectHandlerPolyglotEngine.load(languageId, source);
 
@@ -430,10 +754,10 @@ class ProjectHandlerPolyglotEngineTest {
 
         WorkflowDefinition workflowDefinition = workflows.getFirst();
 
-        List<? extends TaskDefinition> tasks = workflowDefinition.getTasks()
+        List<? extends WorkflowTaskDefinition> tasks = workflowDefinition.getTasks()
             .orElseThrow();
 
-        return tasks.getFirst();
+        return (TaskDefinition) tasks.getFirst();
     }
 
     @Test
@@ -461,12 +785,12 @@ class ProjectHandlerPolyglotEngineTest {
         assertEquals("My Workflow", workflowDefinition.getLabel()
             .orElse(null));
 
-        List<? extends TaskDefinition> tasks = workflowDefinition.getTasks()
+        List<? extends WorkflowTaskDefinition> tasks = workflowDefinition.getTasks()
             .orElseThrow();
 
         assertEquals(1, tasks.size());
 
-        TaskDefinition taskDefinition = tasks.getFirst();
+        TaskDefinition taskDefinition = (TaskDefinition) tasks.getFirst();
 
         assertEquals("my-task", taskDefinition.getName());
         assertEquals("hello", taskDefinition.getPerform()
@@ -521,10 +845,10 @@ class ProjectHandlerPolyglotEngineTest {
 
         WorkflowDefinition workflowDefinition = workflows.getFirst();
 
-        List<? extends TaskDefinition> tasks = workflowDefinition.getTasks()
+        List<? extends WorkflowTaskDefinition> tasks = workflowDefinition.getTasks()
             .orElseThrow();
 
-        TaskDefinition taskDefinition = tasks.getFirst();
+        TaskDefinition taskDefinition = (TaskDefinition) tasks.getFirst();
 
         RecordingTaskContext taskContext = new RecordingTaskContext("espresso result");
 

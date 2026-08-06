@@ -17,6 +17,7 @@
 package com.bytechef.platform.component.polyglot;
 
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Generalization seam consumed by {@link ActionProxyObject}: dispatches a component action invocation coming from a
@@ -30,13 +31,23 @@ public interface ComponentActionInvoker {
     /**
      * Invokes the named action of the named component with the given (already host-side) input parameters.
      *
-     * @param componentName  the name of the component owning the action
-     * @param actionName     the name of the action to invoke
-     * @param input          the action's input parameters, already converted to host-native values
-     * @param connectionName the name of the connection to use, or {@code null} when none was supplied by the guest call
+     * <p>
+     * {@code clusterElements} carries the guest's own literal — keyed by cluster element type, each value one element
+     * map or a list of them — rather than a host shape, because what an element's {@code connection} name resolves
+     * against is the implementation's business: a code workflow task resolves it against the connections it declared,
+     * while a surface with no such contract may refuse elements outright.
+     *
+     * @param componentName   the name of the component owning the action
+     * @param actionName      the name of the action to invoke
+     * @param input           the action's input parameters, already converted to host-native values
+     * @param connectionName  the name of the connection to use, or {@code null} when none was supplied by the guest
+     *                        call
+     * @param clusterElements the cluster elements the guest composed for this call, or {@code null} when it supplied
+     *                        none
      * @return the result of the action's perform execution, or {@code null}
      * @throws Exception if the invocation fails
      */
-    Object invoke(String componentName, String actionName, Map<String, ?> input, String connectionName)
-        throws Exception;
+    Object invoke(
+        String componentName, String actionName, Map<String, ?> input, @Nullable String connectionName,
+        @Nullable Map<String, ?> clusterElements) throws Exception;
 }

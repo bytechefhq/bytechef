@@ -48,12 +48,58 @@ final class CodeWorkflowHostBridge {
             Map<String, ?> request = OBJECT_MAPPER.readValue(requestJson, Map.class);
 
             Map<String, ?> input = (Map<String, ?>) request.get("input");
+            Map<String, ?> clusterElements = (Map<String, ?>) request.get("clusterElements");
 
             Object result = taskContext.component(
                 (String) request.get("componentName"), (String) request.get("actionName"),
-                input == null ? Map.of() : input, (String) request.get("connectionName"));
+                input == null ? Map.of() : input, (String) request.get("connectionName"), clusterElements);
 
             return OBJECT_MAPPER.writeValueAsString(result);
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @HostAccess.Export
+    public String input() {
+        if (taskContext == null) {
+            throw new IllegalStateException("A TaskContext is not available");
+        }
+
+        try {
+            return OBJECT_MAPPER.writeValueAsString(taskContext.input());
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @HostAccess.Export
+    public String input(String name) {
+        if (taskContext == null) {
+            throw new IllegalStateException("A TaskContext is not available");
+        }
+
+        try {
+            return OBJECT_MAPPER.writeValueAsString(taskContext.input(name));
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @HostAccess.Export
+    public String parameters() {
+        if (taskContext == null) {
+            throw new IllegalStateException("A TaskContext is not available");
+        }
+
+        try {
+            return OBJECT_MAPPER.writeValueAsString(taskContext.parameters());
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
@@ -82,6 +128,6 @@ final class CodeWorkflowHostBridge {
             throw new IllegalStateException("A TaskContext is not available");
         }
 
-        taskContext.log(level, message);
+        taskContext.log(TaskContext.LogLevel.of(level), message);
     }
 }

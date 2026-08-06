@@ -59,7 +59,7 @@ class ActionDefinitionServiceImplVisibilityTest {
 
         assertThatThrownBy(
             () -> service.executePerformForPolyglot(
-                "slack", 1, "sendMessage", Map.of(), null, null, mock(ActionContext.class)))
+                "slack", 1, "sendMessage", Map.of(), null, Map.of(), Map.of(), null, mock(ActionContext.class)))
                     .isInstanceOf(ConfigurationException.class)
                     .hasMessageContaining("disabled");
     }

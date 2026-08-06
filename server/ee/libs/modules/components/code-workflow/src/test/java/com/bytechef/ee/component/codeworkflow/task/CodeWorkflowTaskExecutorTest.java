@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -84,6 +85,37 @@ class CodeWorkflowTaskExecutorTest {
 
     private final ActionDefinitionService actionDefinitionService = mock(ActionDefinitionService.class);
     private final ComponentDefinitionService componentDefinitionService = mock(ComponentDefinitionService.class);
+
+    @Test
+    void testExecutePerformResolvesATaskNestedInAGroup() throws Exception {
+        String source = """
+            ({
+                name: 'test-project',
+                workflows: [
+                    {
+                        name: 'my-workflow',
+                        tasks: [
+                            {
+                                name: 'notify',
+                                type: 'parallel',
+                                tasks: [{name: 'slack', perform: () => 'posted'}]
+                            }
+                        ]
+                    }
+                ]
+            })
+            """;
+
+        CodeWorkflowTaskExecutor codeWorkflowTaskExecutor = createExecutor("grouped.js", source);
+
+        // The engine dispatches a nested leaf as its own perform node, so the executor must find it by name even
+        // though it is not a top-level entry.
+        Object result = codeWorkflowTaskExecutor.executePerform(
+            "code-workflow-container-uuid", "my-workflow", "slack", PlatformType.AUTOMATION,
+            ParametersFactory.create(Map.of()), Map.of(), mock(ActionContext.class));
+
+        assertEquals("posted", result);
+    }
 
     @Test
     void testExecutePerformForAutomation() throws Exception {
@@ -139,8 +171,8 @@ class CodeWorkflowTaskExecutorTest {
             .thenReturn(new ComponentDefinition("component1"));
         when(
             actionDefinitionService.executePerformForPolyglot(
-                eq("component1"), eq(0), eq("action1"), eq(Map.of("x", 1)), eq(componentConnection), isNull(),
-                eq(actionContext)))
+                eq("component1"), eq(0), eq("action1"), eq(Map.of("x", 1)), eq(componentConnection), any(), any(),
+                isNull(), eq(actionContext)))
                     .thenReturn("component result");
 
         Object result = codeWorkflowTaskExecutor.executePerform(
@@ -165,12 +197,13 @@ class CodeWorkflowTaskExecutorTest {
             .thenReturn(new ComponentDefinition("component1"));
 
         CodeWorkflowTaskContext taskContext =
-            codeWorkflowTaskExecutor.createTaskContext(componentConnections, actionContext);
+            codeWorkflowTaskExecutor.createTaskContext(componentConnections, actionContext, Map.of(), List.of(),
+                Map.of());
 
         taskContext.component("component1", "action1", Map.of(), "connection1");
 
         verify(actionDefinitionService).executePerformForPolyglot(
-            eq("component1"), eq(0), eq("action1"), eq(Map.of()), eq(componentConnection), isNull(),
+            eq("component1"), eq(0), eq("action1"), eq(Map.of()), eq(componentConnection), any(), any(), isNull(),
             eq(actionContext));
     }
 

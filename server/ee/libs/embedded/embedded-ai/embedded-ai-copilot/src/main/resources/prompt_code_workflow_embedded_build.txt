@@ -37,17 +37,63 @@ The completion value must expose these members:
         - description  (String) — short description.
         - perform     (callable) — invoked with ONE argument, the task context, and must return the
           task's output. (Legacy zero-arg performs still run; new code should take the context.)
-            - context.component.<componentName>.<actionName>(input, connectionName) — invokes any
-              built-in component action. `input` is the action's input parameters map;
+            - context.component.<componentName>.<actionName>(input, connectionName, clusterElements)
+              — invokes any built-in component action. `input` is the action's input parameters map;
               `connectionName` (optional) names the connection to use — it must match a name
               declared in the task's `connections` and wired by the user. Example:
               context.component.httpClient.get({uri: "https://api.example.com/items"}, "my-conn")
+              `clusterElements` (optional, THIRD argument) wires an action that reads cluster
+              elements — in practice the AI Agent's chat, which resolves its model, tools, memory and
+              RAG from them. Keyed by cluster element type; a type taking several elements takes a
+              list. Each element is {type, connection?, name?, parameters?} where `type` is
+              "<componentName>/v<version>/<elementName>". Example:
+                  context.component.aiAgent.chat({messages: messages}, null, {
+                      model: {type: "openAi/v1/model", connection: "openai-prod",
+                              parameters: {model: "gpt-4o"}},
+                      tools: [{type: "slack/v1/sendMessage", connection: "slack-prod",
+                               name: "post_to_slack"}]
+                  })
+              CRITICAL rules for elements: an element's `connection` NAMES one of the task's declared
+              connections — never describe a connection inline, and always add it to the task's
+              `connections` list. ALWAYS give a tool a `name`: without one the model sees a generated
+              name like SLACK_SendMessage, and two tools become hard for it to tell apart. Pass null
+              for `connectionName` when the agent itself needs no connection — the elements carry
+              theirs. Compose elements per CALL, not per task: one task may call several agents (draft
+              with one model, review with another) and that is the point of writing it as code.
+              Nothing about an element is validated at save time, so a wrong type or parameter name
+              only fails at run time — be exact.
+            - context.input() — the workflow's inputs plus the output of every task that already
+              ran, each under its own name in ONE namespace (an input named x and a task named x
+              would collide). context.input(name) reads one entry and THROWS on an unknown name; use
+              context.input()[name] when the value may legitimately be absent. This is the ONLY way
+              to read prior task output — a ${...} expression cannot reach a task name that is not a
+              plain identifier, so never generate one.
+            - context.parameters() — the task's own declared `parameters`, with ${...} already
+              evaluated. NOT part of context.input(): configuration, not run data.
             - context.connection(connectionName) — returns a declared connection's
               parameters map, for building a request yourself (region, tenant id, base URL). Prefer
               context.component when a component action already does the job; the map contains
               credentials, so never log it.
-            - context.log(level, message) — writes to the task's execution log
-              ("trace" | "debug" | "info" | "warn" | "error").
+            - context.log(level, message) — writes to the task's execution log. The level is one of
+              "trace" | "debug" | "info" | "warn" | "error" (case-insensitive); any other string
+              throws, so never invent a level name.
+          A workflow may also declare, alongside `tasks`:
+            - inputs: [{name, label?, type?, required?}] — what a caller passes; each arrives in
+              context.input() under its own name
+            - outputs: [{name, task}] or [{name, value}] — the workflow's result. Prefer the `task`
+              form for a task's output: a hyphenated task name cannot be written as ${...}
+            - triggers: [{name, type, parameters}] — NOT code. Name a component trigger the platform
+              provides, e.g. "schedule/v1/interval" or "workflow/v1/newWorkflowCall". Without a
+              trigger the workflow only runs when something calls it.
+          To run independent tasks at the same time, group them instead of writing a task per step:
+            - {name, type: "parallel", tasks: [...]} dispatches its tasks all at once
+            - {name, type: "forkJoin", branches: [[...], [...]]} runs branches concurrently, each
+              branch's tasks in order
+          A group declares NO perform of its own. Task names are flat and must be unique across the
+          whole workflow, nesting included, and a group may not contain another group — both are
+          rejected at save time. CRITICAL: tasks in one parallel group cannot read each other's
+          output (context.input(sibling) throws) because they start together; put anything they
+          share before the group. Never spawn threads inside a perform — the sandbox forbids it.
           NEVER use fromAi(...) expressions or workflow expression syntax inside a perform — it is
           plain code; reach other components ONLY through context.component.
 
