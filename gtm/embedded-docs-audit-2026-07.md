@@ -30,9 +30,15 @@ The documented lifecycle matches the code end to end:
 2. ~~**Quickstart step 2 is wrong about API keys.**~~ **FIXED on this branch (2026-07-28).** It said to use the API key on `/api/embedded/internal` endpoints; the security code makes that impossible (internal paths never match the API-key converter's `/v{n}/{externalUserId}/` pattern, and even on success the principal has zero authorities). Corrected in `quickstart.mdx` step 2 and in `settings/index.md`'s "Using the key" example — both now point at the public `/api/embedded/v1/{externalUserId}/…` routes and state the internal-endpoint restriction. The auto-provisioning callout for Connected Users was added to quickstart step 5 in the same pass.
 3. ~~**Branding "next step" points at nothing.**~~ **FIXED on this branch (2026-07-28).** The quickstart's branding next-step now says branding customization is on the roadmap, and `white-label-execution.mdx` + `configuration-api.mdx` each carry a "Roadmap notice" callout separating shipped mechanics (connect dialog, workflow builder, public API, core resources) from planned conveniences (theme tokens, emails/webhooks from your domain, idempotency keys, cursor pagination). Decide separately whether to keep them in the nav for design partners.
 
-## Strategic decision required (blocks outreach copy)
+## Strategic decision — RESOLVED (2026-08-06)
 
-**Embedded is entirely EE-gated** — every embedded module lives under `server/ee/`, and the docs' own callout says the CE build doesn't expose the embedded UI or APIs. This collides with the Track B pillar "open source — validate everything before paying." Honest framing is "source-visible, open-core." Recommended fix is packaging, not code: the design-partner offer includes a free full-featured dev/trial license so "validate before paying" stays true in practice. Decide before the landing page and first outreach email are written (strategy §7.1/§7.3 depend on it).
+**Embedded stays EE.** Confirmed: every embedded module lives under `server/ee/` and there are none outside it, so the CE build genuinely does not contain the embedded iPaaS. The decision is to keep it that way and fix the *copy*, not the packaging boundary.
+
+This collided with the Track B pillar "open source — validate everything before paying," which appeared in five places (strategy §3.2 pillar 1, §3.3 Track B statement, and Appendix A's hero, social-proof strip, and pillar 1). All five are now reworded: they lead with the four claims that remain true under EE — read the engine, run it yourself, validate before paying, no vendor-death risk — instead of leaning on the "open source" label for Track B. "Open source" is still used for Track A, where it is literally true.
+
+"Validate before paying" is kept honest by a **free evaluation licence**, which needs no new code: `LicenceFileParser` already parses an `expiry` instant and a `features` list from the `.lic` file, so a time-limited full-featured licence is issuable today.
+
+**Still open (pricing call, not a copy one):** the evaluation term — how long, and full-featured or capped. Appendix A's hero and its licensing FAQ both need it in one sentence; the placeholder is marked `[DECIDE: evaluation term …]` in the strategy doc.
 
 ## Engineering side-findings (file as tickets, not sprint work)
 

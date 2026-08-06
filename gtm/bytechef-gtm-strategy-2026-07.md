@@ -52,7 +52,7 @@ The same engine powers two things:
 
 ### 3.2 Positioning pillars (shared by both tracks)
 
-1. **Open source, actually.** Validate fully before paying anything. Inspect the engine. Extend any of 190+ connectors or write your own. No proprietary black box wired into your stack — and for embedded buyers, no vendor-death risk inside *your* product.
+1. **No black box, no lock-in.** Inspect the engine. Extend any of 190+ connectors or write your own. Nothing proprietary wired into your stack — and for embedded buyers, no vendor-death risk inside *your* product. The automation platform is open core; the embedded iPaaS ships under EE, source-available, with a free evaluation licence — so on either track you validate fully before you pay. (Say "open source" for Track A, where it is literally true; say "source-available, validate free" for Track B. Never claim CE contains embedded — it does not, and a prospect will check.)
 2. **Your infrastructure, your data.** Self-host in your VPC. Data residency and compliance by construction, not by enterprise addendum. (Strong EU resonance.)
 3. **Pricing that doesn't punish growth.** Self-hosted execution is unmetered — no task meter, no instance meter, no per-connected-user meter watching your success. Cloud tiers are a low-friction on-ramp, not a trap (overage is $1 per 1,000 tasks; see §5).
 4. **AI-native.** Agent orchestration, MCP servers, A2A, AI copilot — not a legacy workflow tool with an AI feature bolted on.
@@ -63,7 +63,7 @@ The same engine powers two things:
 > For engineering and ops teams who want automation and AI agents without SaaS meters or data leaving their infrastructure, ByteChef is an open-source automation platform that runs anywhere. Unlike n8n or Zapier, it unifies agents and workflows in one engine, with an Apache-style open core and transparent pricing.
 
 **Track B:**
-> For B2B SaaS teams that need to ship native, customer-facing integrations, ByteChef is an open-source embedded iPaaS with white-label UX and flat, adoption-independent pricing. Unlike Paragon, Prismatic, or Appmixer, it's open source and never meters your customers' usage — validate for free, embed from your own VPC, and stop paying a tax on your own growth.
+> For B2B SaaS teams that need to ship native, customer-facing integrations, ByteChef is a source-available embedded iPaaS with white-label UX and flat, adoption-independent pricing. Unlike Paragon, Prismatic, or Appmixer, you can read the engine you're embedding, run it in your own VPC, and validate the whole thing on a free evaluation licence before paying — and it never meters your customers' usage.
 
 ---
 
@@ -255,17 +255,17 @@ Both founders split their part-time GTM hours between content and outbound. Duri
 
 **Hero:**
 > ## Ship native integrations inside your SaaS — without the success tax
-> ByteChef is the open-source embedded iPaaS. Give your customers the integrations they're asking for, white-labeled in your product, running on your infrastructure. Flat pricing. No task meters. No per-customer fees. No black box.
+> ByteChef is the embedded iPaaS you can read, run, and self-host. Give your customers the integrations they're asking for, white-labeled in your product, running on your infrastructure. Flat pricing. No task meters. No per-customer fees. No black box.
 >
 > [Read the quickstart] [Become a design partner]
 
-**Social-proof strip:** 190+ connectors · Open source · Self-host or cloud · AI-native
+**Social-proof strip:** 190+ connectors · Source-available · Self-host or cloud · AI-native
 
 **Problem block:**
 > Your customers keep asking for integrations. Building each one in-house costs weeks of engineering. The embedded iPaaS vendors will happily do it for a five-figure annual contract — priced per task, per instance, or per connected user, so the bill grows every time your customers actually use what you shipped.
 
 **Three pillars:**
-> **Open source, actually.** Evaluate the entire platform before paying anything. Inspect the engine you're wiring into your product. Extend any of 190+ connectors — or write your own. No vendor-death risk inside your product.
+> **No black box, no lock-in.** Read the engine you're wiring into your product. Run the whole thing on a free evaluation licence before you pay. Extend any of 190+ connectors — or write your own. Source-available and self-hostable, so there's no vendor-death risk inside your product.
 >
 > **Runs in your VPC.** White-label integration UX embedded in your app; engine on your infrastructure. Data residency and compliance by construction. (Cloud option when you'd rather not host.)
 >
@@ -276,7 +276,9 @@ Both founders split their part-time GTM hours between content and outbound. Duri
 **Design-partner CTA:**
 > We're onboarding 5 design partners this quarter. We'll build your first three integrations with you, you get direct roadmap influence and founder-level support, and a first-year partner price. [Book 15 minutes]
 
-**FAQ seeds:** How is this different from Paragon/Prismatic? · What does self-hosting require? · What's not supported yet? (honest list) · What does the sample app show? · License?
+**FAQ seeds:** How is this different from Paragon/Prismatic? · What does self-hosting require? · What's not supported yet? (honest list) · What does the sample app show? · Licensing — what's open source, what's EE, and what do I get for free?
+
+> **Licensing answer (must be one short paragraph, no hedging).** The automation platform is open source. The embedded iPaaS is an EE feature: the source is in the repo and you can read it, but running it needs a licence — and the evaluation licence is free. **[DECIDE: evaluation term — how long, and full-featured or capped.]** Say this plainly here and in the quickstart; a prospect who discovers it by cloning the repo instead of reading it here has been surprised rather than informed, which §7.1 explicitly warns against.
 
 ---
 
