@@ -72,7 +72,16 @@ public class ScriptPythonTool {
                         .description("Custom Python code to execute as a tool.")
                         .controlType(CODE_EDITOR)
                         .languageId("python")
-                        .defaultValue("def perform(input, context):\n\treturn None")
+                        .defaultValue(
+                            """
+                                def perform(input, context):
+                                    # input holds the values declared above under Input.
+                                    #
+                                    # Reach another component's action through the context:
+                                    # response = context.component.httpClient.get(
+                                    #     {"uri": "https://api.example.com/items"}, "my-connection")
+
+                                    return None""")
                         .required(true)),
             "python", polyglotEngine);
     }

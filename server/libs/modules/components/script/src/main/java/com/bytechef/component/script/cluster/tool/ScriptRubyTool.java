@@ -72,7 +72,17 @@ public class ScriptRubyTool {
                         .description("Custom Ruby code to execute as a tool.")
                         .controlType(CODE_EDITOR)
                         .languageId("ruby")
-                        .defaultValue("def perform(input, context)\n\treturn nil;\nend")
+                        .defaultValue(
+                            """
+                                def perform(input, context)
+                                  # input holds the values declared above under Input.
+                                  #
+                                  # Reach another component's action through the context:
+                                  # response = context.component.httpClient.get(
+                                  #   { "uri" => "https://api.example.com/items" }, "my-connection")
+
+                                  return nil
+                                end""")
                         .required(true)),
             "ruby", polyglotEngine);
     }

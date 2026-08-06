@@ -33,6 +33,21 @@ The evaluated result must be an object exposing these members:
                 overrides how credentials decorate outgoing requests; it runs on EVERY request, so
                 prefer the type default unless a custom signing scheme is required.
               - properties: [{name, type, label, required, ...}] — the connection's input fields.
+- triggers    (list, optional) — POLLING triggers only. Each: {name, title?, description?,
+              type: "POLLING", properties?, output?, sampleOutput?, poll}. `poll` is
+              (inputParameters, connectionParameters, closureParameters) => ({records, closureParameters,
+              pollImmediately?}); each record starts a workflow run and closureParameters is handed back on
+              the next poll (use it for a cursor). A STATIC_WEBHOOK trigger instead declares
+              webhookRequest(inputParameters, connectionParameters, request) where request is
+              {headers, parameters, body, method}; its return value is the trigger output.
+              A DYNAMIC_WEBHOOK adds webhookEnable(inputParameters, connectionParameters, args)
+              — args.webhookUrl is the minted URL, and whatever it returns is handed back to
+              webhookDisable — plus webhookDisable. LISTENER is REJECTED at save time: it holds a
+              live listener a per-invocation sandbox cannot keep. A property may declare
+              optionsLookupDependsOn: ["otherProperty"] so its options reload when that changes.
+              A property of type DYNAMIC_PROPERTIES declares properties(inputParameters,
+              connectionParameters) returning a list of property maps, plus optional
+              propertiesLookupDependsOn — use it when the form's SHAPE depends on an earlier value.
 - actions     (list of objects, each with):
     - name        (String, REQUIRED) — action key, e.g. "getWeather".
     - title       (String)

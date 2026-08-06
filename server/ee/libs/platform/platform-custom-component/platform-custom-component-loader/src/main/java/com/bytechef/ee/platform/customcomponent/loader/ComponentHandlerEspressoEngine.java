@@ -387,8 +387,55 @@ class ComponentHandlerEspressoEngine {
             propertyMap, "displayCondition",
             displayCondition -> property.displayCondition((String) displayCondition));
         applyIfPresent(propertyMap, "hidden", hidden -> property.hidden((Boolean) hidden));
+        applyIfPresent(
+            propertyMap, "expressionEnabled",
+            expressionEnabled -> property.expressionEnabled((Boolean) expressionEnabled));
+
+        // The control the editor renders — a TEXT_AREA rather than a one-line input, a PASSWORD, a SELECT. Only the
+        // types that offer alternatives accept one; the rest have a single sensible control.
+        applyIfPresent(
+            propertyMap, "controlType", controlType -> applyControlType(property, (String) controlType));
+
+        // Names the properties whose value the options lookup reads, so the editor reloads the list when one of them
+        // changes — the difference between a static dropdown and one that narrows as the user fills the form.
+        applyIfPresent(
+            propertyMap, "optionsLookupDependsOn",
+            optionsLookupDependsOn -> applyOptionsLookupDependsOn(property, optionsLookupDependsOn));
 
         return property;
+    }
+
+    private static void applyControlType(ModifiableValueProperty<?, ?> property, String controlType) {
+        Property.ControlType type = Property.ControlType.valueOf(controlType);
+
+        if (property instanceof ModifiableStringProperty stringProperty) {
+            stringProperty.controlType(type);
+        }
+
+        // Only STRING offers a choice — TEXT, TEXT_AREA, PASSWORD, EMAIL and the rest. The other types render one
+        // way, so there is no alternative control to name.
+    }
+
+    private static void applyOptionsLookupDependsOn(
+        ModifiableValueProperty<?, ?> property, Object optionsLookupDependsOn) {
+
+        if (!(optionsLookupDependsOn instanceof List<?> dependsOnList)) {
+            return;
+        }
+
+        String[] dependsOn = dependsOnList.stream()
+            .map(String::valueOf)
+            .toArray(String[]::new);
+
+        switch (property) {
+            case ModifiableStringProperty stringProperty -> stringProperty.optionsLookupDependsOn(dependsOn);
+            case ModifiableIntegerProperty integerProperty -> integerProperty.optionsLookupDependsOn(dependsOn);
+            case ModifiableNumberProperty numberProperty -> numberProperty.optionsLookupDependsOn(dependsOn);
+            case ModifiableArrayProperty arrayProperty -> arrayProperty.optionsLookupDependsOn(dependsOn);
+            default -> {
+                // The remaining types carry no options list, so there is nothing for a lookup to depend on.
+            }
+        }
     }
 
     private static List<ModifiableValueProperty<?, ?>> toValueProperties(List<Map<String, ?>> propertyMaps) {

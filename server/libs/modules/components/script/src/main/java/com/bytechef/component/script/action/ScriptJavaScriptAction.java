@@ -58,7 +58,17 @@ public class ScriptJavaScriptAction {
                         .description("Add your JavaScript custom logic here.")
                         .controlType(Property.ControlType.CODE_EDITOR)
                         .languageId("javascript")
-                        .defaultValue("function perform(input, context) {\n\treturn null;\n}")
+                        .defaultValue(
+                            """
+                                function perform(input, context) {
+                                    // input holds the values declared above under Input.
+                                    //
+                                    // Reach another component's action through the context:
+                                    // const response = context.component.httpClient.get(
+                                    //     {uri: "https://api.example.com/items"}, "my-connection");
+
+                                    return null;
+                                }""")
                         .required(true))
                 .output(),
             "js", polyglotEngine);

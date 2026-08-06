@@ -58,7 +58,16 @@ public class ScriptPythonAction {
                         .description("Add your Python custom logic here.")
                         .controlType(Property.ControlType.CODE_EDITOR)
                         .languageId("python")
-                        .defaultValue("def perform(input, context):\n\treturn None")
+                        .defaultValue(
+                            """
+                                def perform(input, context):
+                                    # input holds the values declared above under Input.
+                                    #
+                                    # Reach another component's action through the context:
+                                    # response = context.component.httpClient.get(
+                                    #     {"uri": "https://api.example.com/items"}, "my-connection")
+
+                                    return None""")
                         .required(true))
                 .output(),
             "python", polyglotEngine);

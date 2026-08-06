@@ -34,6 +34,8 @@ import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.definition.OutputDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.TriggerContext;
+import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.ai.agent.BaseToolFunction;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import java.util.List;
@@ -506,6 +508,162 @@ class ComponentHandlerPolyglotEngineTest {
             .getValue());
         assertEquals("US acme", options.get(1)
             .getLabel());
+    }
+
+    @Test
+    void testLoadRegistersPollingTriggerAndExecutesPoll() throws Exception {
+        String script = """
+            ({
+                name: 'test-component',
+                version: 1,
+                triggers: [
+                    {
+                        name: 'newItem',
+                        title: 'New Item',
+                        type: 'POLLING',
+                        properties: [{name: 'folder', type: 'STRING'}],
+                        output: {type: 'OBJECT', properties: [{name: 'id', type: 'STRING'}]},
+                        poll: function (inputParameters, connectionParameters, closureParameters) {
+                            return {
+                                records: [{id: inputParameters.folder + '-1'}],
+                                closureParameters: {cursor: (closureParameters.cursor || 0) + 1}
+                            };
+                        }
+                    }
+                ],
+                actions: []
+            })
+            """;
+
+        ComponentHandler componentHandler = ComponentHandlerPolyglotEngine.load("js", script);
+
+        ComponentDefinition componentDefinition = componentHandler.getDefinition();
+
+        TriggerDefinition triggerDefinition = componentDefinition.getTriggers()
+            .getFirst();
+
+        assertEquals("newItem", triggerDefinition.getName());
+        assertEquals(TriggerDefinition.TriggerType.POLLING, triggerDefinition.getType());
+        assertEquals(1, triggerDefinition.getProperties()
+            .size());
+        assertTrue(triggerDefinition.getOutputDefinition()
+            .isPresent());
+
+        TriggerDefinition.PollFunction pollFunction = (TriggerDefinition.PollFunction) triggerDefinition.getPoll()
+            .orElseThrow();
+
+        TriggerDefinition.PollOutput pollOutput = pollFunction.apply(
+            ParametersFactory.create(Map.of("folder", "inbox")), ParametersFactory.create(Map.of()),
+            ParametersFactory.create(Map.of("cursor", 4)), mock(TriggerContext.class));
+
+        assertEquals(List.of(Map.of("id", "inbox-1")), pollOutput.records());
+        assertEquals(5, ((Number) pollOutput.closureParameters()
+            .get("cursor")).intValue());
+    }
+
+    @Test
+    void testLoadRegistersStaticWebhookTriggerAndExecutesTheRequest() throws Exception {
+        String script = """
+            ({
+                name: 'test-component',
+                version: 1,
+                triggers: [
+                    {
+                        name: 'onPush',
+                        type: 'STATIC_WEBHOOK',
+                        webhookRequest: function (inputParameters, connectionParameters, request) {
+                            return {event: request.body.event, method: request.method};
+                        }
+                    }
+                ],
+                actions: []
+            })
+            """;
+
+        ComponentHandler componentHandler = ComponentHandlerPolyglotEngine.load("js", script);
+
+        TriggerDefinition triggerDefinition = componentHandler.getDefinition()
+            .getTriggers()
+            .getFirst();
+
+        assertEquals(TriggerDefinition.TriggerType.STATIC_WEBHOOK, triggerDefinition.getType());
+
+        TriggerDefinition.WebhookRequestFunction webhookRequestFunction =
+            triggerDefinition.getWebhookRequest()
+                .orElseThrow();
+
+        TriggerDefinition.WebhookBody body = mock(TriggerDefinition.WebhookBody.class);
+
+        when(body.getContent()).thenReturn(Map.of("event", "push"));
+
+        // The guest sees one request object rather than the host's four arguments.
+        Object output = webhookRequestFunction.apply(
+            ParametersFactory.create(Map.of()), ParametersFactory.create(Map.of()),
+            mock(TriggerDefinition.HttpHeaders.class), mock(TriggerDefinition.HttpParameters.class), body,
+            TriggerDefinition.WebhookMethod.POST, ParametersFactory.create(Map.of()), mock(TriggerContext.class));
+
+        assertEquals(Map.of("event", "push", "method", "POST"), output);
+    }
+
+    @Test
+    void testLoadRegistersDynamicWebhookTriggerAndRunsEnable() throws Exception {
+        String script = """
+            ({
+                name: 'test-component',
+                version: 1,
+                triggers: [
+                    {
+                        name: 'onPush',
+                        type: 'DYNAMIC_WEBHOOK',
+                        webhookEnable: function (inputParameters, connectionParameters, args) {
+                            return {subscriptionId: 'sub-for-' + args.webhookUrl};
+                        },
+                        webhookDisable: function () {},
+                        webhookRequest: function (inputParameters, connectionParameters, request) {
+                            return request.body;
+                        }
+                    }
+                ],
+                actions: []
+            })
+            """;
+
+        TriggerDefinition triggerDefinition = ComponentHandlerPolyglotEngine.load("js", script)
+            .getDefinition()
+            .getTriggers()
+            .getFirst();
+
+        assertEquals(TriggerDefinition.TriggerType.DYNAMIC_WEBHOOK, triggerDefinition.getType());
+
+        TriggerDefinition.WebhookEnableFunction webhookEnableFunction = triggerDefinition.getWebhookEnable()
+            .orElseThrow();
+
+        // Whatever enable returns is what the platform hands back on each request and on disable.
+        TriggerDefinition.WebhookEnableOutput output = webhookEnableFunction.apply(
+            ParametersFactory.create(Map.of()), ParametersFactory.create(Map.of()), "https://hook.test/1",
+            "execution-1", mock(TriggerContext.class));
+
+        assertEquals(Map.of("subscriptionId", "sub-for-https://hook.test/1"), output.parameters());
+        assertTrue(triggerDefinition.getWebhookRequest()
+            .isPresent());
+    }
+
+    @Test
+    void testLoadRejectsTriggerTypesNeedingAnEnableLifecycle() {
+        String script = """
+            ({
+                name: 'test-component',
+                version: 1,
+                triggers: [{name: 'onPush', type: 'LISTENER'}],
+                actions: []
+            })
+            """;
+
+        IllegalArgumentException exception = assertThrows(
+            IllegalArgumentException.class, () -> ComponentHandlerPolyglotEngine.load("js", script));
+
+        assertTrue(exception.getMessage()
+            .contains("LISTENER"));
     }
 
     @Test

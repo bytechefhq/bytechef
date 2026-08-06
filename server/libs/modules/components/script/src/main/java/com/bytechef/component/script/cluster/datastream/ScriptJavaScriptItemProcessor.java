@@ -43,7 +43,17 @@ public class ScriptJavaScriptItemProcessor {
                             "Custom JavaScript code to process items. The item is available as 'item' parameter.")
                         .controlType(Property.ControlType.CODE_EDITOR)
                         .languageId("javascript")
-                        .defaultValue("function perform(input, context) {\n\treturn null;\n}")
+                        .defaultValue(
+                            """
+                                function perform(input, context) {
+                                    // input holds the values declared above under Input.
+                                    //
+                                    // Reach another component's action through the context:
+                                    // const response = context.component.httpClient.get(
+                                    //     {uri: "https://api.example.com/items"}, "my-connection");
+
+                                    return null;
+                                }""")
                         .required(true)),
             "js", polyglotEngine);
     }

@@ -21,6 +21,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefini
 import com.bytechef.component.definition.ComponentDsl.ModifiableIntegerProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableNumberProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
 import com.bytechef.component.definition.ConnectionDefinition;
 import com.bytechef.component.definition.Help;
@@ -31,6 +32,13 @@ import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.PropertyGroup;
 import com.bytechef.component.definition.Resources;
 import com.bytechef.component.definition.TriggerDefinition;
+import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
+import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
+import com.bytechef.component.definition.TriggerDefinition.PollOutput;
+import com.bytechef.component.definition.TriggerDefinition.TriggerType;
+import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
+import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.definition.UnifiedApiDefinition;
 import com.bytechef.platform.component.polyglot.PolyglotSandbox;
 import com.bytechef.platform.component.polyglot.PolyglotValues;
@@ -101,6 +109,10 @@ class ComponentHandlerPolyglotEngine {
                 }
             }
 
+            List<Map<String, Object>> triggers = getMember(value, "triggers", new TypeLiteral<>() {});
+
+            List<TriggerDefinition> triggerDefinitions = toTriggerDefinitions(triggers, languageId, script);
+
             Map<String, Object> connectionMap = getMember(value, "connection", new TypeLiteral<>() {});
 
             ConnectionDefinition connectionDefinition = connectionMap == null
@@ -108,7 +120,7 @@ class ComponentHandlerPolyglotEngine {
 
             return () -> new PolyglotComponentDefinition(
                 name, title, description, icon, version, actionDefinitions, clusterElementDefinitions,
-                connectionDefinition);
+                triggerDefinitions, connectionDefinition);
         }
     }
 
@@ -454,6 +466,249 @@ class ComponentHandlerPolyglotEngine {
     }
 
     /**
+     * Builds the component's triggers. {@code POLLING} and {@code STATIC_WEBHOOK} are supported: each has a single
+     * execution function — {@code poll} and {@code webhookRequest} — which fits the same re-evaluate-per-invocation
+     * pattern the action perform uses.
+     *
+     * <p>
+     * {@code DYNAMIC_WEBHOOK} adds {@code webhookEnable} and {@code webhookDisable}: the platform hands the enable
+     * function the webhook URL, keeps whatever parameters it returns, and passes them back on every request and on
+     * disable. Each is still one function, so all three re-evaluate the script the same way.
+     *
+     * <p>
+     * {@code LISTENER} remains rejected: enabling one opens a live, long-lived listener rather than making a call, and
+     * a per-invocation sandbox has nowhere to keep it.
+     */
+    private static TriggerType toTriggerType(String triggerName, String type) {
+        if (type == null || Objects.equals(type, TriggerType.POLLING.name())) {
+            return TriggerType.POLLING;
+        }
+
+        if (Objects.equals(type, TriggerType.STATIC_WEBHOOK.name())) {
+            return TriggerType.STATIC_WEBHOOK;
+        }
+
+        if (Objects.equals(type, TriggerType.DYNAMIC_WEBHOOK.name())) {
+            return TriggerType.DYNAMIC_WEBHOOK;
+        }
+
+        throw new IllegalArgumentException(
+            ("Trigger %s declares type %s; script components support POLLING, STATIC_WEBHOOK and DYNAMIC_WEBHOOK "
+                + "triggers only — a LISTENER holds a live listener a per-invocation sandbox cannot keep")
+                    .formatted(triggerName, type));
+    }
+
+    @SuppressWarnings("unchecked")
+    private static List<TriggerDefinition> toTriggerDefinitions(
+        List<Map<String, Object>> triggers, String languageId, String script) {
+
+        if (triggers == null) {
+            return List.of();
+        }
+
+        List<TriggerDefinition> triggerDefinitions = new ArrayList<>();
+
+        for (Map<String, Object> trigger : triggers) {
+            String triggerName = (String) trigger.get("name");
+            String type = (String) trigger.get("type");
+
+            TriggerType triggerType = toTriggerType(triggerName, type);
+
+            ModifiableTriggerDefinition triggerDefinition = ComponentDsl.trigger(triggerName)
+                .title((String) trigger.get("title"))
+                .description((String) trigger.get("description"))
+                .type(triggerType)
+                .properties(
+                    ComponentHandlerEspressoEngine
+                        .toProperties((List<Map<String, ?>>) trigger.get("properties"))
+                        .toArray(Property[]::new));
+
+            if (triggerType == TriggerType.DYNAMIC_WEBHOOK) {
+                triggerDefinition
+                    .webhookEnable(
+                        (inputParameters, connectionParameters, webhookUrl, workflowExecutionId, context) -> {
+                            Object result = executeTriggerFunction(
+                                languageId, script, triggerName, "webhookEnable", inputParameters,
+                                connectionParameters, Map.of("webhookUrl", webhookUrl));
+
+                            Map<String, ?> enableOutput = result instanceof Map<?, ?> resultMap
+                                ? (Map<String, ?>) resultMap : Map.of();
+
+                            return new WebhookEnableOutput(enableOutput, null);
+                        })
+                    .webhookDisable(
+                        (
+                            inputParameters, connectionParameters, webhookEnableOutputParameters, workflowExecutionId,
+                            context) -> executeTriggerFunction(
+                                languageId, script, triggerName, "webhookDisable", inputParameters,
+                                connectionParameters, webhookEnableOutputParameters.toMap()));
+            }
+
+            if (triggerType == TriggerType.STATIC_WEBHOOK || triggerType == TriggerType.DYNAMIC_WEBHOOK) {
+                triggerDefinition.webhookRequest(
+                    (
+                        inputParameters, connectionParameters, headers, parameters, body, method,
+                        webhookEnableOutputParameters, context) -> executeWebhookRequest(
+                            languageId, script, triggerName, inputParameters, connectionParameters, headers,
+                            parameters, body, method));
+            } else {
+                triggerDefinition.poll(
+                    (inputParameters, connectionParameters, closureParameters, context) -> executePoll(
+                        languageId, script, triggerName, inputParameters, connectionParameters, closureParameters));
+            }
+
+            Map<String, ?> outputMap = (Map<String, ?>) trigger.get("output");
+            Object sampleOutput = trigger.get("sampleOutput");
+
+            if (outputMap != null && sampleOutput != null) {
+                triggerDefinition.output(
+                    ComponentDsl.outputSchema(ComponentHandlerEspressoEngine.toValueProperty(outputMap)),
+                    ComponentDsl.sampleOutput(PolyglotValues.copyFromPolyglotContext(sampleOutput)));
+            } else if (outputMap != null) {
+                triggerDefinition.output(
+                    ComponentDsl.outputSchema(ComponentHandlerEspressoEngine.toValueProperty(outputMap)));
+            } else if (sampleOutput != null) {
+                triggerDefinition.output(
+                    ComponentDsl.sampleOutput(PolyglotValues.copyFromPolyglotContext(sampleOutput)));
+            }
+
+            triggerDefinitions.add(triggerDefinition);
+        }
+
+        return triggerDefinitions;
+    }
+
+    /**
+     * Runs a named guest function on a trigger — the webhook enable/disable pair — with the third argument carrying
+     * whatever that call needs: the webhook URL on enable, the parameters enable returned on disable.
+     */
+    @SuppressWarnings("unchecked")
+    private static Object executeTriggerFunction(
+        String languageId, String script, String triggerName, String functionName, Parameters inputParameters,
+        Parameters connectionParameters, Map<String, ?> arguments) {
+
+        if (performEngine == null) {
+            performEngine = Engine.create();
+        }
+
+        try (Context polyglotContext = PolyglotSandbox.newContext(performEngine, languageId)) {
+            Value value = polyglotContext.eval(languageId, script);
+
+            Map<String, Object> trigger = findTrigger(value, triggerName);
+
+            Function<Object[], Object> function = (Function<Object[], Object>) trigger.get(functionName);
+
+            if (function == null) {
+                throw new IllegalArgumentException(
+                    "Trigger %s is a DYNAMIC_WEBHOOK but declares no %s function".formatted(triggerName, functionName));
+            }
+
+            Object result = function.apply(new Object[] {
+                PolyglotValues.copyToGuestValue(inputParameters.toMap(), languageId),
+                PolyglotValues.copyToGuestValue(
+                    connectionParameters == null ? Map.of() : connectionParameters.toMap(), languageId),
+                PolyglotValues.copyToGuestValue(arguments, languageId)
+            });
+
+            return PolyglotValues.copyFromPolyglotContext(result);
+        }
+    }
+
+    private static Map<String, Object> findTrigger(Value value, String triggerName) {
+        List<Map<String, Object>> triggers = getMember(value, "triggers", new TypeLiteral<>() {});
+
+        return triggers.stream()
+            .filter(trigger -> Objects.equals(trigger.get("name"), triggerName))
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("Trigger name=%s not found".formatted(triggerName)));
+    }
+
+    /**
+     * Runs a STATIC_WEBHOOK trigger's {@code webhookRequest}. The guest sees the request as one plain object —
+     * {@code {headers, parameters, body, method}} — rather than the host's four separate arguments, so a script reads
+     * it the way it would any other map. Whatever it returns becomes the trigger's output.
+     */
+    @SuppressWarnings("unchecked")
+    private static Object executeWebhookRequest(
+        String languageId, String script, String triggerName, Parameters inputParameters,
+        Parameters connectionParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
+        WebhookMethod method) {
+
+        if (performEngine == null) {
+            performEngine = Engine.create();
+        }
+
+        try (Context polyglotContext = PolyglotSandbox.newContext(performEngine, languageId)) {
+            Value value = polyglotContext.eval(languageId, script);
+
+            Map<String, Object> triggerMap = findTrigger(value, triggerName);
+
+            Function<Object[], Object> webhookRequest =
+                (Function<Object[], Object>) triggerMap.get("webhookRequest");
+
+            if (webhookRequest == null) {
+                throw new IllegalArgumentException(
+                    "Trigger %s is a STATIC_WEBHOOK but declares no webhookRequest function".formatted(triggerName));
+            }
+
+            Map<String, Object> request = new LinkedHashMap<>();
+
+            request.put("headers", headers == null ? Map.of() : headers.toMap());
+            request.put("parameters", parameters == null ? Map.of() : parameters.toMap());
+            request.put("body", body == null ? null : body.getContent());
+            request.put("method", method == null ? null : method.name());
+
+            Object result = webhookRequest.apply(new Object[] {
+                PolyglotValues.copyToGuestValue(inputParameters.toMap(), languageId),
+                PolyglotValues.copyToGuestValue(
+                    connectionParameters == null ? Map.of() : connectionParameters.toMap(), languageId),
+                PolyglotValues.copyToGuestValue(request, languageId)
+            });
+
+            return PolyglotValues.copyFromPolyglotContext(result);
+        }
+    }
+
+    private static PollOutput executePoll(
+        String languageId, String script, String triggerName, Parameters inputParameters,
+        Parameters connectionParameters, Parameters closureParameters) {
+
+        if (performEngine == null) {
+            performEngine = Engine.create();
+        }
+
+        try (Context polyglotContext = PolyglotSandbox.newContext(performEngine, languageId)) {
+            Value value = polyglotContext.eval(languageId, script);
+
+            Map<String, Object> trigger = findTrigger(value, triggerName);
+
+            Function<Object[], Object> poll = (Function<Object[], Object>) trigger.get("poll");
+
+            Object result = poll.apply(new Object[] {
+                PolyglotValues.copyToGuestValue(inputParameters.toMap(), languageId),
+                PolyglotValues.copyToGuestValue(connectionParameters.toMap(), languageId),
+                PolyglotValues.copyToGuestValue(closureParameters.toMap(), languageId)
+            });
+
+            Object pollOutput = PolyglotValues.copyFromPolyglotContext(result);
+
+            if (!(pollOutput instanceof Map<?, ?> pollOutputMap)) {
+                throw new IllegalStateException(
+                    "The poll function of trigger %s must return an object with a records member, got: %s"
+                        .formatted(triggerName, pollOutput));
+            }
+
+            Object records = pollOutputMap.get("records");
+            Object nextClosureParameters = pollOutputMap.get("closureParameters");
+
+            return new PollOutput(
+                records instanceof List<?> recordList ? recordList : List.of(),
+                nextClosureParameters instanceof Map<?, ?> ? (Map<String, ?>) nextClosureParameters : Map.of(),
+                Boolean.TRUE.equals(pollOutputMap.get("pollImmediately")));
+        }
+    }
+
+    /**
      * Builds an action's input properties. A property whose {@code options} member is a guest FUNCTION rather than a
      * static list gets a host options function that re-evaluates the script per lookup — the same pattern the
      * connection's url/apply seams use — so a dropdown can be populated from a live API call.
@@ -469,6 +724,14 @@ class ComponentHandlerPolyglotEngine {
         List<Property> properties = new ArrayList<>();
 
         for (Map<String, ?> propertyMap : propertyMaps) {
+            // A DYNAMIC_PROPERTIES property produces its whole property list at edit time, so the shape of the form
+            // can depend on what the user picked — a record type, a board, a custom-field set.
+            if (Objects.equals(propertyMap.get("type"), "DYNAMIC_PROPERTIES")) {
+                properties.add(toDynamicProperties(actionName, propertyMap, languageId, script));
+
+                continue;
+            }
+
             Object options = propertyMap.get("options");
 
             if (options == null || options instanceof List) {
@@ -488,6 +751,38 @@ class ComponentHandlerPolyglotEngine {
         }
 
         return properties;
+    }
+
+    /**
+     * Builds a DYNAMIC_PROPERTIES property whose {@code properties} function runs in a fresh strict sandbox and returns
+     * ordinary property maps, which are then materialized the same way static ones are.
+     */
+    @SuppressWarnings("unchecked")
+    private static Property toDynamicProperties(
+        String actionName, Map<String, ?> propertyMap, String languageId, String script) {
+
+        String propertyName = (String) propertyMap.get("name");
+
+        ComponentDsl.ModifiableDynamicPropertiesProperty property = ComponentDsl.dynamicProperties(propertyName)
+            .properties(
+                (ActionDefinition.PropertiesFunction) (
+                    inputParameters, connectionParameters, lookupDependsOnPaths,
+                    context) -> ComponentHandlerEspressoEngine.toProperties(
+                        (List<Map<String, ?>>) executePropertySeam(
+                            languageId, script, actionName, propertyName, "properties", inputParameters,
+                            connectionParameters))
+                        .stream()
+                        .map(curProperty -> (Property.ValueProperty<?>) curProperty)
+                        .toList());
+
+        if (propertyMap.get("propertiesLookupDependsOn") instanceof List<?> dependsOn) {
+            property.propertiesLookupDependsOn(
+                dependsOn.stream()
+                    .map(String::valueOf)
+                    .toArray(String[]::new));
+        }
+
+        return property;
     }
 
     private static Property withDynamicOptions(
@@ -515,7 +810,52 @@ class ComponentHandlerPolyglotEngine {
                 .formatted(propertyName, actionName) + "support");
     }
 
+    /**
+     * Runs a property's named guest function — the DYNAMIC_PROPERTIES {@code properties} seam — in a fresh strict
+     * sandbox, returning whatever it produced as plain Java collections.
+     */
     @SuppressWarnings("unchecked")
+    private static Object executePropertySeam(
+        String languageId, String script, String actionName, String propertyName, String functionName,
+        Parameters inputParameters, Parameters connectionParameters) {
+
+        if (performEngine == null) {
+            performEngine = Engine.create();
+        }
+
+        try (Context polyglotContext = PolyglotSandbox.newContext(performEngine, languageId)) {
+            Value value = polyglotContext.eval(languageId, script);
+
+            List<Map<String, Object>> actions = getMember(value, "actions", new TypeLiteral<>() {});
+
+            Map<String, Object> action = actions.stream()
+                .filter(curAction -> Objects.equals(curAction.get("name"), actionName))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Action name=%s not found".formatted(actionName)));
+
+            Map<String, Object> property = ((List<Map<String, Object>>) action.get("properties")).stream()
+                .filter(curProperty -> Objects.equals(curProperty.get("name"), propertyName))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Property name=%s not found".formatted(propertyName)));
+
+            Function<Object[], Object> function = (Function<Object[], Object>) property.get(functionName);
+
+            if (function == null) {
+                throw new IllegalArgumentException(
+                    "Property %s declares type DYNAMIC_PROPERTIES but no %s function"
+                        .formatted(propertyName, functionName));
+            }
+
+            Object result = function.apply(new Object[] {
+                PolyglotValues.copyToGuestValue(inputParameters.toMap(), languageId),
+                PolyglotValues.copyToGuestValue(
+                    connectionParameters == null ? Map.of() : connectionParameters.toMap(), languageId)
+            });
+
+            return PolyglotValues.copyFromPolyglotContext(result);
+        }
+    }
+
     private static List<Option<String>> executeOptionsSeam(
         String languageId, String script, String actionName, String propertyName, Parameters inputParameters,
         Parameters connectionParameters, String searchText) {
@@ -686,7 +1026,8 @@ class ComponentHandlerPolyglotEngine {
 
     private record PolyglotComponentDefinition(
         String name, String title, String description, String icon, int version, List<ActionDefinition> actions,
-        List<ClusterElementDefinition<?>> clusterElements, ConnectionDefinition connectionDefinition)
+        List<ClusterElementDefinition<?>> clusterElements, List<TriggerDefinition> triggers,
+        ConnectionDefinition connectionDefinition)
         implements ComponentDefinition {
 
         @Override
@@ -761,7 +1102,7 @@ class ComponentHandlerPolyglotEngine {
 
         @Override
         public List<TriggerDefinition> getTriggers() {
-            return List.of();
+            return triggers == null ? List.of() : triggers;
         }
 
         @Override
