@@ -12,6 +12,7 @@ import com.bytechef.ee.automation.configuration.domain.ProjectCodeWorkflow;
 import com.bytechef.ee.automation.configuration.repository.ProjectCodeWorkflowRepository;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,7 @@ public class ProjectCodeWorkflowServiceImpl implements ProjectCodeWorkflowServic
 
     private final ProjectCodeWorkflowRepository projectCodeWorkflowRepository;
 
+    @SuppressFBWarnings("EI")
     public ProjectCodeWorkflowServiceImpl(ProjectCodeWorkflowRepository projectCodeWorkflowRepository) {
         this.projectCodeWorkflowRepository = projectCodeWorkflowRepository;
     }

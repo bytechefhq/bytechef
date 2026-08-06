@@ -72,7 +72,14 @@ public final class GuestComponentBridge {
             if (componentDefinition.getConnection()
                 .isPresent()) {
 
-                unsupported.add("connection");
+                Map<String, Object> connection = toConnectionMap(
+                    componentDefinition.getConnection()
+                        .get(),
+                    unsupported);
+
+                if (connection != null) {
+                    component.put("connection", connection);
+                }
             }
 
             if (!componentDefinition.getClusterElements()
@@ -181,6 +188,125 @@ public final class GuestComponentBridge {
             throw e;
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Serializes a connection definition's STATIC shape. Seam functions are invoked with {@code null} arguments to
+     * extract their constants — a lambda that actually reads its parameters (a dynamic URL) throws, and the whole
+     * connection is reported unsupported instead: functions cannot cross the guest boundary as data. Custom
+     * {@code apply}/{@code acquire} functions are unsupported for the same reason. The broad catch is that fallback
+     * contract — ANY extraction failure downgrades to unsupported rather than failing the describe.
+     */
+    @SuppressFBWarnings("REC_CATCH_EXCEPTION")
+    private static Map<String, Object> toConnectionMap(
+        com.bytechef.component.definition.ConnectionDefinition connectionDefinition, List<String> unsupported) {
+
+        try {
+            Map<String, Object> connection = new LinkedHashMap<>();
+
+            if (connectionDefinition.getBaseUri()
+                .isPresent()) {
+
+                connection.put(
+                    "baseUri",
+                    connectionDefinition.getBaseUri()
+                        .get()
+                        .apply(null, null));
+            }
+
+            List<Map<String, Object>> authorizations = new ArrayList<>();
+
+            for (com.bytechef.component.definition.Authorization authorization : connectionDefinition
+                .getAuthorizations()) {
+
+                if (authorization.getApply()
+                    .isPresent()
+                    || authorization.getAcquire()
+                        .isPresent()) {
+
+                    throw new UnsupportedOperationException(
+                        "Custom apply/acquire functions cannot cross the guest boundary");
+                }
+
+                Map<String, Object> authorizationMap = new LinkedHashMap<>();
+
+                com.bytechef.component.definition.Authorization.AuthorizationType authorizationType =
+                    authorization.getType();
+
+                authorizationMap.put("type", authorizationType.name());
+
+                if (authorization.getAuthorizationUrl()
+                    .isPresent()) {
+
+                    authorizationMap.put(
+                        "authorizationUrl",
+                        authorization.getAuthorizationUrl()
+                            .get()
+                            .apply(null, null));
+                }
+
+                if (authorization.getTokenUrl()
+                    .isPresent()) {
+
+                    authorizationMap.put(
+                        "tokenUrl",
+                        authorization.getTokenUrl()
+                            .get()
+                            .apply(null, null));
+                }
+
+                if (authorization.getRefreshUrl()
+                    .isPresent()) {
+
+                    authorizationMap.put(
+                        "refreshUrl",
+                        authorization.getRefreshUrl()
+                            .get()
+                            .apply(null, null));
+                }
+
+                if (authorization.getScopes()
+                    .isPresent()) {
+
+                    Map<String, Boolean> scopes = authorization.getScopes()
+                        .get()
+                        .apply(null, null);
+
+                    authorizationMap.put(
+                        "scopes",
+                        scopes.entrySet()
+                            .stream()
+                            .filter(Map.Entry::getValue)
+                            .map(Map.Entry::getKey)
+                            .toList());
+                }
+
+                List<Map<String, Object>> propertyMaps = toPropertyMaps(
+                    authorization.getProperties(), unsupported,
+                    "connection authorization " + authorizationType.name());
+
+                if (!propertyMaps.isEmpty()) {
+                    authorizationMap.put("properties", propertyMaps);
+                }
+
+                authorizations.add(authorizationMap);
+            }
+
+            connection.put("authorizations", authorizations);
+
+            List<Map<String, Object>> connectionPropertyMaps = toPropertyMaps(
+                connectionDefinition.getProperties(), unsupported, "connection");
+
+            if (!connectionPropertyMaps.isEmpty()) {
+                connection.put("properties", connectionPropertyMaps);
+            }
+
+            return connection;
+        } catch (Exception e) {
+            unsupported.add("connection");
+
+            return null;
         }
     }
 

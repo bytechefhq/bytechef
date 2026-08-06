@@ -326,10 +326,6 @@ public final class RedisSessionRepository implements SessionRepository {
         return documents;
     }
 
-    private void put(StoredSession document) {
-        jedis.set(key(document.id()), jsonMapper.writeValueAsString(document));
-    }
-
     private boolean tryPut(StoredSession document, long expectedVersion) {
         Object result = jedis.eval(
             CAS_SCRIPT, List.of(key(document.id())),

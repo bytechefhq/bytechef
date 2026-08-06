@@ -61,6 +61,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -607,6 +608,13 @@ public class ProjectFacadeImpl implements ProjectFacade {
                     .filter(Objects::nonNull)
                     .toList());
 
+            ProjectCodeWorkflowInfoSupplier projectCodeWorkflowInfoSupplier =
+                projectCodeWorkflowInfoSupplierProvider.getIfAvailable();
+
+            Set<Long> codeWorkflowProjectIds = projectCodeWorkflowInfoSupplier == null
+                ? Set.of()
+                : Set.copyOf(projectCodeWorkflowInfoSupplier.getCodeWorkflowProjectIds());
+
             return CollectionUtils.map(
                 projects,
                 project -> new ProjectDTO(
@@ -622,7 +630,8 @@ public class ProjectFacadeImpl implements ProjectFacade {
                         .toList(),
                     CollectionUtils.filter(
                         allTags,
-                        tag -> CollectionUtils.contains(project.getTagIds(), tag.getId()))));
+                        tag -> CollectionUtils.contains(project.getTagIds(), tag.getId())),
+                    codeWorkflowProjectIds.contains(project.getId()), null));
         } else {
             return CollectionUtils.map(projects, ProjectDTO::new);
         }

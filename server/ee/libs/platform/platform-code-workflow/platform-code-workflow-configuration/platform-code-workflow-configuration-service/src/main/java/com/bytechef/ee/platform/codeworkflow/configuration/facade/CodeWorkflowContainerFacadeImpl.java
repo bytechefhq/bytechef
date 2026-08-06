@@ -16,17 +16,26 @@ import com.bytechef.ee.platform.codeworkflow.configuration.service.CodeWorkflowC
 import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorage;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.workflow.definition.ConnectionRequirement;
 import com.bytechef.workflow.definition.TaskDefinition;
 import com.bytechef.workflow.definition.WorkflowDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.OptionalInt;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.ObjectMapper;
@@ -43,18 +52,25 @@ import tools.jackson.databind.node.ObjectNode;
 @ConditionalOnEEVersion
 public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFacade {
 
+    private static final Logger log = LoggerFactory.getLogger(CodeWorkflowContainerFacadeImpl.class);
+
     private final CodeWorkflowContainerService codeWorkflowContainerService;
     private final CodeWorkflowFileStorage codeWorkflowFileStorage;
+    private final @Nullable ConnectionService connectionService;
     private final ObjectMapper objectMapper;
     private final WorkflowService workflowService;
 
-    @SuppressFBWarnings("EI")
+    @SuppressFBWarnings({
+        "CT_CONSTRUCTOR_THROW", "EI"
+    })
     public CodeWorkflowContainerFacadeImpl(
         CodeWorkflowContainerService codeWorkflowContainerService, CodeWorkflowFileStorage codeWorkflowFileStorage,
-        ObjectMapper objectMapper, WorkflowService workflowService) {
+        ObjectProvider<ConnectionService> connectionServiceProvider, ObjectMapper objectMapper,
+        WorkflowService workflowService) {
 
         this.codeWorkflowContainerService = codeWorkflowContainerService;
         this.codeWorkflowFileStorage = codeWorkflowFileStorage;
+        this.connectionService = connectionServiceProvider.getIfAvailable();
         this.objectMapper = objectMapper;
         this.workflowService = workflowService;
     }
@@ -72,6 +88,8 @@ public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFac
     public CodeWorkflowReconciliation create(
         String name, String externalVersion, List<WorkflowDefinition> workflowDefinitions, Language language,
         byte[] bytes, PlatformType type, Map<String, String> reusableWorkflowNameIds) {
+
+        warnOnMissingDeclaredConnections(workflowDefinitions, type);
 
         try {
             UUID codeWorkflowContainerUuid = UUID.randomUUID();
@@ -125,6 +143,8 @@ public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFac
     public CodeWorkflowReconciliation update(
         CodeWorkflowContainer codeWorkflowContainer, String externalVersion,
         List<WorkflowDefinition> workflowDefinitions, byte[] bytes, PlatformType type) {
+
+        warnOnMissingDeclaredConnections(workflowDefinitions, type);
 
         try {
             Map<String, String> existingWorkflowNameIds = codeWorkflowContainer.getWorkflowNameIds();
@@ -203,23 +223,97 @@ public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFac
         ArrayNode arrayNode = objectMapper.createArrayNode();
 
         for (TaskDefinition taskDefinition : tasks) {
-            arrayNode.add(
+            ObjectNode taskNode = objectMapper.createObjectNode()
+                .put("description", OptionalUtils.orElse(taskDefinition.getDescription(), null))
+                .put("label", OptionalUtils.orElse(taskDefinition.getLabel(), null))
+                .put("name", taskDefinition.getName())
+                .put("type", "codeWorkflow/v1/perform");
+
+            OptionalUtils.ifPresent(
+                taskDefinition.getConnections(), connections -> taskNode.set("connections", toConnectionsNode(
+                    connections)));
+
+            // TODO taskDefinition.getParameters()
+            taskNode.set(
+                "parameters",
                 objectMapper.createObjectNode()
-                    .put("description", OptionalUtils.orElse(taskDefinition.getDescription(), null))
-                    .put("label", OptionalUtils.orElse(taskDefinition.getLabel(), null))
-                    .put("name", taskDefinition.getName())
-                    .put("type", "codeWorkflow/v1/perform")
-                    // TODO taskDefinition.getParameters()
-                    .set(
-                        "parameters",
-                        objectMapper.createObjectNode()
-                            .put("codeWorkflowContainerUuid", codeWorkflowContainerUuid)
-                            .put("workflowName", workflowDefinition.getName())
-                            .put("taskName", taskDefinition.getName())
-                            .put("type", type.ordinal())));
+                    .put("codeWorkflowContainerUuid", codeWorkflowContainerUuid)
+                    .put("workflowName", workflowDefinition.getName())
+                    .put("taskName", taskDefinition.getName())
+                    .put("type", type.ordinal()));
+
+            arrayNode.add(taskNode);
         }
 
         return arrayNode;
+    }
+
+    /**
+     * Returns a human-readable entry for every declared task connection whose name has no matching connection in the
+     * store (any environment — declared names bind per environment at run time, so save/deploy can only check
+     * existence, not the concrete environment binding). Empty when no {@link ConnectionService} bean is available.
+     */
+    List<String> findMissingDeclaredConnections(List<WorkflowDefinition> workflowDefinitions, PlatformType type) {
+        if (connectionService == null) {
+            return List.of();
+        }
+
+        List<String> missingConnections = new ArrayList<>();
+
+        for (WorkflowDefinition workflowDefinition : workflowDefinitions) {
+            List<? extends TaskDefinition> tasks = OptionalUtils.orElse(workflowDefinition.getTasks(), List.of());
+
+            for (TaskDefinition taskDefinition : tasks) {
+                List<? extends ConnectionRequirement> connections = OptionalUtils.orElse(
+                    taskDefinition.getConnections(), List.of());
+
+                for (ConnectionRequirement connectionRequirement : connections) {
+                    if (!declaredConnectionExists(connectionRequirement, type)) {
+                        missingConnections.add(
+                            "workflow=%s, task=%s, component=%s, connection=%s".formatted(
+                                workflowDefinition.getName(), taskDefinition.getName(),
+                                connectionRequirement.getComponentName(), connectionRequirement.getName()));
+                    }
+                }
+            }
+        }
+
+        return missingConnections;
+    }
+
+    private boolean declaredConnectionExists(ConnectionRequirement connectionRequirement, PlatformType type) {
+        OptionalInt componentVersion = connectionRequirement.getComponentVersion();
+
+        List<Connection> connections = connectionService.getConnections(
+            connectionRequirement.getComponentName(),
+            componentVersion.isPresent() ? componentVersion.getAsInt() : null, null, null, type);
+
+        return connections.stream()
+            .anyMatch(connection -> Objects.equals(connection.getName(), connectionRequirement.getName()));
+    }
+
+    private void warnOnMissingDeclaredConnections(List<WorkflowDefinition> workflowDefinitions, PlatformType type) {
+        for (String missingConnection : findMissingDeclaredConnections(workflowDefinitions, type)) {
+            log.warn("Declared code workflow connection has no matching store connection: {}", missingConnection);
+        }
+    }
+
+    private ArrayNode toConnectionsNode(List<? extends ConnectionRequirement> connections) {
+        ArrayNode connectionsNode = objectMapper.createArrayNode();
+
+        for (ConnectionRequirement connectionRequirement : connections) {
+            ObjectNode connectionNode = objectMapper.createObjectNode()
+                .put("componentName", connectionRequirement.getComponentName())
+                .put("name", connectionRequirement.getName());
+
+            OptionalInt componentVersion = connectionRequirement.getComponentVersion();
+
+            componentVersion.ifPresent(version -> connectionNode.put("componentVersion", version));
+
+            connectionsNode.add(connectionNode);
+        }
+
+        return connectionsNode;
     }
 
     private String getDefinition(

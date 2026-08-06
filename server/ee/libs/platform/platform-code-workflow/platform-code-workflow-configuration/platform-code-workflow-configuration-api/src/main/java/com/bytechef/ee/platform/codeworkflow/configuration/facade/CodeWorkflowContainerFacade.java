@@ -11,6 +11,7 @@ import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowCo
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.workflow.definition.WorkflowDefinition;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 
@@ -21,6 +22,7 @@ import java.util.Map;
  */
 public interface CodeWorkflowContainerFacade {
 
+    @SuppressFBWarnings("EI")
     record CodeWorkflowReconciliation(
         CodeWorkflowContainer codeWorkflowContainer,
         Map<String, String> addedWorkflowNameIds,

@@ -12,6 +12,8 @@ import com.bytechef.ee.automation.configuration.domain.ProjectCodeWorkflow;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer;
 import com.bytechef.ee.platform.codeworkflow.configuration.service.CodeWorkflowContainerService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Component;
 
@@ -31,6 +33,7 @@ public class ProjectCodeWorkflowInfoSupplierImpl implements ProjectCodeWorkflowI
     private final CodeWorkflowContainerService codeWorkflowContainerService;
     private final ProjectCodeWorkflowService projectCodeWorkflowService;
 
+    @SuppressFBWarnings("EI")
     public ProjectCodeWorkflowInfoSupplierImpl(
         CodeWorkflowContainerService codeWorkflowContainerService,
         ProjectCodeWorkflowService projectCodeWorkflowService) {
@@ -54,5 +57,10 @@ public class ProjectCodeWorkflowInfoSupplierImpl implements ProjectCodeWorkflowI
 
         return Optional.of(new CodeWorkflowInfo(codeWorkflowContainer.getLanguage()
             .name()));
+    }
+
+    @Override
+    public List<Long> getCodeWorkflowProjectIds() {
+        return projectCodeWorkflowService.getCodeWorkflowProjectIds();
     }
 }
