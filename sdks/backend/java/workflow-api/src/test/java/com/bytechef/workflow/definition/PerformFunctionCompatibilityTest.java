@@ -83,8 +83,26 @@ class PerformFunctionCompatibilityTest {
     private static class StubTaskContext implements TaskContext {
 
         @Override
-        public Object component(String componentName, String actionName, Map<String, ?> input, String connectionName) {
+        public Object component(
+            String componentName, String actionName, Map<String, ?> input, String connectionName,
+            Map<String, ?> clusterElements) {
+
             return "result";
+        }
+
+        @Override
+        public Map<String, ?> input() {
+            return Map.of();
+        }
+
+        @Override
+        public Object input(String name) {
+            return null;
+        }
+
+        @Override
+        public Map<String, ?> parameters() {
+            return Map.of();
         }
 
         @Override
@@ -93,7 +111,7 @@ class PerformFunctionCompatibilityTest {
         }
 
         @Override
-        public void log(String level, String message) {
+        public void log(LogLevel level, String message) {
         }
     }
 }

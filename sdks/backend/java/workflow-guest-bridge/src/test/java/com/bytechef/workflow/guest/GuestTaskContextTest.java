@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+import com.bytechef.workflow.definition.TaskContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -46,6 +47,24 @@ class GuestTaskContextTest {
         assertEquals(Map.of("x", 1), request.get("input"));
         assertEquals("conn", request.get("connectionName"));
         assertEquals(Map.of("y", 2), result);
+    }
+
+    @Test
+    void testComponentSendsClusterElementsAndOmitsThemWhenThereAreNone() throws Exception {
+        RecordingHostBridge hostBridge = new RecordingHostBridge("null");
+
+        GuestTaskContext guestTaskContext = new GuestTaskContext(hostBridge);
+
+        Map<String, ?> clusterElements = Map.of("model", Map.of("type", "openAi/v1/model"));
+
+        guestTaskContext.component("aiAgent", "chat", Map.of(), null, clusterElements);
+
+        assertEquals(clusterElements, readMap(hostBridge.requestJson).get("clusterElements"));
+
+        // The four-argument call is every existing task's call, so it must not start sending an empty map.
+        guestTaskContext.component("mock", "doIt", Map.of(), "conn");
+
+        assertFalse(readMap(hostBridge.requestJson).containsKey("clusterElements"));
     }
 
     @Test
@@ -81,10 +100,27 @@ class GuestTaskContextTest {
 
         GuestTaskContext guestTaskContext = new GuestTaskContext(hostBridge);
 
-        guestTaskContext.log("warn", "log message");
+        guestTaskContext.log(TaskContext.LogLevel.WARN, "log message");
 
-        assertEquals("warn", hostBridge.logLevel);
+        assertEquals("WARN", hostBridge.logLevel);
         assertEquals("log message", hostBridge.logMessage);
+    }
+
+    @Test
+    void testInputReadsTheHostSnapshotAndFailsOnAnUnknownName() {
+        RecordingHostBridge hostBridge = new RecordingHostBridge(null);
+
+        hostBridge.inputJson = "{\"input\":{\"email\":\"a@b.com\"},\"my-task1\":{\"id\":3}}";
+
+        GuestTaskContext guestTaskContext = new GuestTaskContext(hostBridge);
+
+        assertEquals(Map.of("email", "a@b.com"), guestTaskContext.input()
+            .get("input"));
+        // input(name) resolves on the host, so the host's explanation of a missing name reaches the guest.
+        hostBridge.inputNamedJson = "{\"id\":3}";
+
+        assertEquals(Map.of("id", 3), guestTaskContext.input("my-task1"));
+        assertEquals("my-task1", hostBridge.inputNamedName);
     }
 
     @SuppressWarnings("unchecked")
@@ -99,6 +135,9 @@ class GuestTaskContextTest {
         private String requestJson;
         private String connectionName;
         private String connectionParametersJson;
+        private String inputJson;
+        private String inputNamedJson;
+        private String inputNamedName;
         private String logLevel;
         private String logMessage;
 
@@ -111,6 +150,23 @@ class GuestTaskContextTest {
             this.requestJson = requestJson;
 
             return resultJson;
+        }
+
+        @Override
+        public String input() {
+            return inputJson;
+        }
+
+        @Override
+        public String input(String name) {
+            this.inputNamedName = name;
+
+            return inputNamedJson;
+        }
+
+        @Override
+        public String parameters() {
+            return null;
         }
 
         @Override

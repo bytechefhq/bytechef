@@ -48,8 +48,9 @@ public final class GuestTaskContext implements TaskContext {
     }
 
     @Override
-    public Object component(String componentName, String actionName, Map<String, ?> input, String connectionName)
-        throws Exception {
+    public Object component(
+        String componentName, String actionName, Map<String, ?> input, String connectionName,
+        Map<String, ?> clusterElements) throws Exception {
 
         Map<String, Object> request = new LinkedHashMap<>();
 
@@ -61,6 +62,10 @@ public final class GuestTaskContext implements TaskContext {
             request.put("connectionName", connectionName);
         }
 
+        if (clusterElements != null && !clusterElements.isEmpty()) {
+            request.put("clusterElements", clusterElements);
+        }
+
         String resultJson = hostBridge.componentExecute(OBJECT_MAPPER.writeValueAsString(request));
 
         if (resultJson == null) {
@@ -68,6 +73,55 @@ public final class GuestTaskContext implements TaskContext {
         }
 
         return OBJECT_MAPPER.readValue(resultJson, Object.class);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Map<String, ?> input() {
+        String inputJson = hostBridge.input();
+
+        if (inputJson == null) {
+            return Map.of();
+        }
+
+        try {
+            return OBJECT_MAPPER.readValue(inputJson, Map.class);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public Object input(String name) {
+        // Resolved on the host rather than against the snapshot read above, so a missing name gets the host's
+        // explanation — including that the task runs concurrently with this one.
+        String valueJson = hostBridge.input(name);
+
+        if (valueJson == null) {
+            return null;
+        }
+
+        try {
+            return OBJECT_MAPPER.readValue(valueJson, Object.class);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Map<String, ?> parameters() {
+        String parametersJson = hostBridge.parameters();
+
+        if (parametersJson == null) {
+            return Map.of();
+        }
+
+        try {
+            return OBJECT_MAPPER.readValue(parametersJson, Map.class);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -83,8 +137,8 @@ public final class GuestTaskContext implements TaskContext {
     }
 
     @Override
-    public void log(String level, String message) {
-        hostBridge.log(level, message);
+    public void log(LogLevel level, String message) {
+        hostBridge.log(level.name(), message);
     }
 
     private static HostBridge resolveHostBridge() {
@@ -104,6 +158,41 @@ public final class GuestTaskContext implements TaskContext {
             try {
                 Object result = com.oracle.truffle.espresso.polyglot.Interop.invokeMember(
                     foreignObject, "componentExecute", requestJson);
+
+                return com.oracle.truffle.espresso.polyglot.Interop.asString(result);
+            } catch (com.oracle.truffle.espresso.polyglot.InteropException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        @Override
+        public String input() {
+            try {
+                Object result = com.oracle.truffle.espresso.polyglot.Interop.invokeMember(foreignObject, "input");
+
+                return com.oracle.truffle.espresso.polyglot.Interop.asString(result);
+            } catch (com.oracle.truffle.espresso.polyglot.InteropException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        @Override
+        public String input(String name) {
+            try {
+                // The host exports input() and input(String); interop selects between them by arity.
+                Object result = com.oracle.truffle.espresso.polyglot.Interop.invokeMember(
+                    foreignObject, "input", name);
+
+                return com.oracle.truffle.espresso.polyglot.Interop.asString(result);
+            } catch (com.oracle.truffle.espresso.polyglot.InteropException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        @Override
+        public String parameters() {
+            try {
+                Object result = com.oracle.truffle.espresso.polyglot.Interop.invokeMember(foreignObject, "parameters");
 
                 return com.oracle.truffle.espresso.polyglot.Interop.asString(result);
             } catch (com.oracle.truffle.espresso.polyglot.InteropException e) {
