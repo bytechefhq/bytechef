@@ -9,6 +9,7 @@ import {
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import AiSkillDeleteAlertDialog from '@/pages/automation/ai/skills/components/AiSkillDeleteAlertDialog';
 import AiSkillEditDialog from '@/pages/automation/ai/skills/components/AiSkillEditDialog';
+import AiSkillListItemTagList from '@/pages/automation/ai/skills/components/AiSkillListItemTagList';
 import useAiSkillListItem from '@/pages/automation/ai/skills/hooks/useAiSkillListItem';
 import {AiSkill} from '@/shared/middleware/graphql';
 import {DownloadIcon, EllipsisVerticalIcon, PencilIcon, TrashIcon, ZapIcon} from 'lucide-react';
@@ -52,6 +53,10 @@ const AiSkillListItem = ({deleteSkill, onDownload, onUpdate, skill}: AiSkillList
                                 {skill.description}
                             </div>
                         )}
+
+                        <div className="mt-2 flex items-center" onClick={(event) => event.stopPropagation()}>
+                            <AiSkillListItemTagList skillId={skill.id} tags={skill.tags ?? []} />
+                        </div>
                     </div>
                 </div>
 

@@ -3,16 +3,23 @@ import downloadAiSkill from '@/pages/automation/ai/skills/utils/downloadAiSkill'
 import {AiSkill, useDeleteAiSkillMutation, useUpdateAiSkillMutation} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCallback, useMemo} from 'react';
+import {useSearchParams} from 'react-router-dom';
 import {toast} from 'sonner';
 
 export default function useAiSkillsList(skills: AiSkill[]) {
     const searchQuery = useAiSkillsStore((state) => state.searchQuery);
 
+    const [searchParams] = useSearchParams();
+    const tagId = searchParams.get('tagId');
+
     const queryClient = useQueryClient();
 
     const filteredSkills = useMemo(
-        () => skills.filter((skill) => skill.name.toLowerCase().includes(searchQuery.toLowerCase())),
-        [searchQuery, skills]
+        () =>
+            skills
+                .filter((skill) => skill.name.toLowerCase().includes(searchQuery.toLowerCase()))
+                .filter((skill) => !tagId || (skill.tags ?? []).some((tag) => String(tag.id) === tagId)),
+        [searchQuery, skills, tagId]
     );
 
     const deleteAiSkillMutation = useDeleteAiSkillMutation({

@@ -26,7 +26,7 @@ const AiSkillsPanel = () => {
     }
 
     return (
-        <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+        <div className="flex min-w-0 flex-1 flex-col overflow-y-auto">
             {currentView === 'empty' && <AiSkillsEmptyState />}
 
             {currentView === 'list' && <AiSkillsList skills={skills} />}

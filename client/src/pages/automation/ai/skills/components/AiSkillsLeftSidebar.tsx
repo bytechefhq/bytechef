@@ -1,5 +1,6 @@
 import {Input} from '@/components/Input/Input';
 import PageLoader from '@/components/PageLoader';
+import AiSkillsTagsNav from '@/pages/automation/ai/skills/components/AiSkillsTagsNav';
 import useAiSkillsLeftSidebar from '@/pages/automation/ai/skills/hooks/useAiSkillsLeftSidebar';
 import getSkillColor from '@/pages/automation/ai/skills/utils/getSkillColor';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
@@ -52,6 +53,8 @@ const AiSkillsLeftSidebar = ({currentId}: AiSkillsLeftSidebarProps) => {
                             </>
                         }
                     />
+
+                    <AiSkillsTagsNav />
                 </PageLoader>
             </div>
         </div>

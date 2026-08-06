@@ -8,10 +8,10 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import AiSidebarNav from '@/pages/automation/ai/components/AiSidebarNav';
 import AiSkillsPanel from '@/pages/automation/ai/skills/AiSkillsPanel';
 import AiSkillsCreateDropdown from '@/pages/automation/ai/skills/components/AiSkillsCreateDropdown';
 import AiSkillsLeftSidebar from '@/pages/automation/ai/skills/components/AiSkillsLeftSidebar';
+import AiSkillsTagsNav from '@/pages/automation/ai/skills/components/AiSkillsTagsNav';
 import useAiSkillDetailToolbarStore from '@/pages/automation/ai/skills/stores/useAiSkillDetailToolbarStore';
 import {useAiSkillsStore} from '@/pages/automation/ai/skills/stores/useAiSkillsStore';
 import invalidateSkillQueries from '@/pages/automation/ai/skills/utils/invalidateSkillQueries';
@@ -205,13 +205,12 @@ const AiSkills = () => {
     }
 
     const isDetailView = route === 'detail';
+
+    // The detail view keeps the full skills-list sidebar for switching between skills; the list
+    // view renders a slimmer sidebar carrying just the Tags filter (the data-tables idiom).
     const showSkillsSidebar = isDetailView;
 
-    const leftSidebarBody = showSkillsSidebar ? (
-        <AiSkillsLeftSidebar currentId={skillId} />
-    ) : (
-        <AiSidebarNav currentSection="skills" />
-    );
+    const leftSidebarBody = showSkillsSidebar ? <AiSkillsLeftSidebar currentId={skillId} /> : <AiSkillsTagsNav />;
 
     const leftSidebarHeader = showSkillsSidebar ? (
         <Header
@@ -231,7 +230,7 @@ const AiSkills = () => {
             title="Skills"
         />
     ) : (
-        <Header position="sidebar" title="AI" />
+        <Header position="sidebar" title="Skills" />
     );
 
     return (
@@ -239,6 +238,7 @@ const AiSkills = () => {
             header={<Header centerTitle position="main" right={toolbarRight} title={headerTitle} />}
             leftSidebarBody={leftSidebarBody}
             leftSidebarHeader={leftSidebarHeader}
+            leftSidebarOpen
             leftSidebarWidth="64"
         >
             <div className="flex min-h-0 w-full flex-col px-4 3xl:mx-auto 3xl:w-4/5">
