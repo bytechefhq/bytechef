@@ -6,11 +6,20 @@ import {useQueryClient} from '@tanstack/react-query';
 import {useEffect} from 'react';
 
 interface ProjectCodeWorkflowDetailProps {
+    invalidateWorkflowQueries?: () => void;
     language: string;
+    onTestConfigurationClick?: () => void;
     projectId: string;
+    testConfigurationDisabled?: boolean;
 }
 
-const ProjectCodeWorkflowDetail = ({language, projectId}: ProjectCodeWorkflowDetailProps) => {
+const ProjectCodeWorkflowDetail = ({
+    invalidateWorkflowQueries,
+    language,
+    onTestConfigurationClick,
+    projectId,
+    testConfigurationDisabled,
+}: ProjectCodeWorkflowDetailProps) => {
     const queryClient = useQueryClient();
 
     const {
@@ -22,6 +31,11 @@ const ProjectCodeWorkflowDetail = ({language, projectId}: ProjectCodeWorkflowDet
     const updateCodeWorkflowSourceMutation = useUpdateCodeWorkflowSourceMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ['codeWorkflowSource', {projectId}]});
+
+            // The saved source changes the generated workflow definition (declared connections, task list),
+            // which the editor chrome reads from the workflow queries — refresh them so e.g. Test
+            // Configuration enables without a page reload.
+            invalidateWorkflowQueries?.();
         },
     });
 
@@ -40,7 +54,9 @@ const ProjectCodeWorkflowDetail = ({language, projectId}: ProjectCodeWorkflowDet
             isSaving={updateCodeWorkflowSourceMutation.isPending}
             language={language}
             onSave={(content) => updateCodeWorkflowSourceMutation.mutateAsync({content, projectId})}
+            onTestConfigurationClick={onTestConfigurationClick}
             source={sourceData?.codeWorkflowSource ?? undefined}
+            testConfigurationDisabled={testConfigurationDisabled}
         />
     );
 };

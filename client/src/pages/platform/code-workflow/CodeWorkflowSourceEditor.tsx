@@ -1,10 +1,12 @@
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import PageLoader from '@/components/PageLoader';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import MonacoEditorWrapper from '@/shared/components/MonacoEditorWrapper';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {CodeWorkflowLanguage} from '@/shared/middleware/graphql';
+import {Settings2Icon} from 'lucide-react';
 import {useEffect, useRef, useState} from 'react';
 
 const MONACO_LANGUAGE_BY_CODE_WORKFLOW_LANGUAGE: Record<CodeWorkflowLanguage, string> = {
@@ -19,7 +21,9 @@ export interface CodeWorkflowSourceEditorProps {
     isSaving: boolean;
     language: string;
     onSave: (content: string) => Promise<unknown>;
+    onTestConfigurationClick?: () => void;
     source?: string;
+    testConfigurationDisabled?: boolean;
 }
 
 interface CodeWorkflowSourceEditorHeaderProps {
@@ -27,6 +31,8 @@ interface CodeWorkflowSourceEditorHeaderProps {
     isSaving: boolean;
     language: string;
     onSave: () => void;
+    onTestConfigurationClick?: () => void;
+    testConfigurationDisabled?: boolean;
 }
 
 const CodeWorkflowSourceEditorHeader = ({
@@ -34,11 +40,40 @@ const CodeWorkflowSourceEditorHeader = ({
     isSaving,
     language,
     onSave,
+    onTestConfigurationClick,
+    testConfigurationDisabled,
 }: CodeWorkflowSourceEditorHeaderProps) => (
     <Header
         centerTitle
         position="main"
-        right={<Button disabled={isSaveDisabled} label={isSaving ? 'Saving...' : 'Save'} onClick={onSave} size="sm" />}
+        right={
+            <div className="flex items-center gap-2">
+                {onTestConfigurationClick && (
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <span tabIndex={0}>
+                                <Button
+                                    disabled={testConfigurationDisabled}
+                                    icon={<Settings2Icon />}
+                                    label="Test Configuration"
+                                    onClick={onTestConfigurationClick}
+                                    size="sm"
+                                    variant="secondary"
+                                />
+                            </span>
+                        </TooltipTrigger>
+
+                        <TooltipContent>
+                            {testConfigurationDisabled
+                                ? 'Declare a connection or an input in the source to enable test configuration.'
+                                : 'Set the workflow test configuration.'}
+                        </TooltipContent>
+                    </Tooltip>
+                )}
+
+                <Button disabled={isSaveDisabled} label={isSaving ? 'Saving...' : 'Save'} onClick={onSave} size="sm" />
+            </div>
+        }
         title={
             <div className="flex items-center gap-2">
                 <span>Code Workflow</span>
@@ -55,7 +90,9 @@ const CodeWorkflowSourceEditor = ({
     isSaving,
     language,
     onSave,
+    onTestConfigurationClick,
     source,
+    testConfigurationDisabled,
 }: CodeWorkflowSourceEditorProps) => {
     const [isSourceDirty, setIsSourceDirty] = useState(false);
 
@@ -92,6 +129,8 @@ const CodeWorkflowSourceEditor = ({
                     isSaving={isSaving}
                     language={language}
                     onSave={handleSave}
+                    onTestConfigurationClick={onTestConfigurationClick}
+                    testConfigurationDisabled={testConfigurationDisabled}
                 />
             }
             leftSidebarOpen={false}

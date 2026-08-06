@@ -10,10 +10,19 @@ import {useEffect} from 'react';
 
 interface IntegrationCodeWorkflowDetailProps {
     integrationId: string;
+    invalidateWorkflowQueries?: () => void;
     language: string;
+    onTestConfigurationClick?: () => void;
+    testConfigurationDisabled?: boolean;
 }
 
-const IntegrationCodeWorkflowDetail = ({integrationId, language}: IntegrationCodeWorkflowDetailProps) => {
+const IntegrationCodeWorkflowDetail = ({
+    integrationId,
+    invalidateWorkflowQueries,
+    language,
+    onTestConfigurationClick,
+    testConfigurationDisabled,
+}: IntegrationCodeWorkflowDetailProps) => {
     const queryClient = useQueryClient();
 
     const {
@@ -25,6 +34,11 @@ const IntegrationCodeWorkflowDetail = ({integrationId, language}: IntegrationCod
     const updateIntegrationCodeWorkflowSourceMutation = useUpdateIntegrationCodeWorkflowSourceMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ['integrationCodeWorkflowSource', {integrationId}]});
+
+            // The saved source changes the generated workflow definition (declared connections, task list),
+            // which the editor chrome reads from the workflow queries — refresh them so e.g. Test
+            // Configuration enables without a page reload.
+            invalidateWorkflowQueries?.();
         },
     });
 
@@ -43,7 +57,9 @@ const IntegrationCodeWorkflowDetail = ({integrationId, language}: IntegrationCod
             isSaving={updateIntegrationCodeWorkflowSourceMutation.isPending}
             language={language}
             onSave={(content) => updateIntegrationCodeWorkflowSourceMutation.mutateAsync({content, integrationId})}
+            onTestConfigurationClick={onTestConfigurationClick}
             source={sourceData?.integrationCodeWorkflowSource ?? undefined}
+            testConfigurationDisabled={testConfigurationDisabled}
         />
     );
 };
