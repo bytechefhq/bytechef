@@ -18,9 +18,33 @@ declare global {
     }
 }
 
+// A real single-file custom component, so the standalone dev render shows the contract someone will
+// actually see: a completion value exposing members, an action with declared properties, and a
+// connection the platform wires.
 const FIXTURE_DATA: CodeDataI = {
+    language: 'javascript',
     name: 'example.js',
-    source: "const component = definition('example').version(1);\n",
+    source: `({
+    name: "example",
+    title: "Example",
+    version: 1,
+    connection: {
+        baseUri: "https://api.example.com",
+        authorizations: [{type: "BEARER_TOKEN"}]
+    },
+    actions: [
+        {
+            name: "getItem",
+            title: "Get Item",
+            properties: [{name: "itemId", type: "STRING", label: "Item ID", required: true}],
+            output: {type: "OBJECT", properties: [{name: "id", type: "STRING"}]},
+            perform: function (inputParameters, connectionParameters, context) {
+                return context.http.get("/items/" + inputParameters.itemId);
+            }
+        }
+    ]
+})
+`,
 };
 
 const fixtureMode =

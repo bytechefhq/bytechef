@@ -18,10 +18,42 @@ declare global {
     }
 }
 
+// A real single-file code workflow, so the standalone dev render shows the contract someone will
+// actually see: a completion value exposing members, tasks whose perform takes a context, and a
+// group for the work that runs concurrently.
 const FIXTURE_DATA: CodeDataI = {
-    language: 'python',
-    name: 'sample_workflow.py',
-    source: 'def handler(input):\n    return {"greeting": f"Hello, {input[\'name\']}!"}\n',
+    language: 'javascript',
+    name: 'sample-workflow.js',
+    source: `({
+    name: "sample-workflow",
+    version: "1",
+    workflows: [
+        {
+            name: "orders",
+            label: "Orders",
+            tasks: [
+                {
+                    name: "fetch-order",
+                    connections: [{componentName: "httpClient", name: "orders-api"}],
+                    perform: function (context) {
+                        return context.component.httpClient.get(
+                            {uri: "https://api.example.com/orders/" + context.input().input.orderId},
+                            "orders-api");
+                    }
+                },
+                {
+                    name: "enrich",
+                    type: "parallel",
+                    tasks: [
+                        {name: "fetch-customer", perform: (context) => context.input("fetch-order").body.customer},
+                        {name: "fetch-inventory", perform: (context) => context.input("fetch-order").body.items}
+                    ]
+                }
+            ]
+        }
+    ]
+})
+`,
 };
 
 const fixtureMode =
