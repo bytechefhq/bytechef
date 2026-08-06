@@ -691,4 +691,16 @@ public class SpelEvaluatorTest {
             () -> EVALUATOR.evaluate(Map.of("key", "${" + accessor + "}"), Collections.emptyMap()),
             accessor);
     }
+
+    @Test
+    void testRootFormulaYieldsTheWholeContext() {
+        Map<String, ?> context = Map.of("my-task1", Map.of("value", 3), "input", Map.of("a", 1));
+
+        // Code workflow tasks are handed the whole job context through this formula: a task name is free-form there,
+        // and a hyphen makes it unreachable as a ${...} accessor, so there is no per-name expression to generate.
+        Map<String, ?> result = EVALUATOR.evaluate(Map.of("input", "=#root"), context);
+
+        assertEquals(context, result.get("input"));
+    }
+
 }

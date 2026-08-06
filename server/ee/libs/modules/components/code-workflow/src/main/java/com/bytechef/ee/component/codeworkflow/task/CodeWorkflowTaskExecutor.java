@@ -13,6 +13,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.Workflow.CodeWorkflow;
+import com.bytechef.ee.component.codeworkflow.constant.CodeWorkflowConstants;
 import com.bytechef.ee.embedded.codeworkflow.loader.IntegrationHandlerLoader;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer;
 import com.bytechef.ee.platform.codeworkflow.configuration.service.CodeWorkflowContainerService;
@@ -24,9 +25,13 @@ import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.service.ActionDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.workflow.definition.CompositeTaskDefinition;
+import com.bytechef.workflow.definition.TaskDefinition;
 import com.bytechef.workflow.definition.TaskDefinition.PerformFunction;
 import com.bytechef.workflow.definition.WorkflowDefinition;
+import com.bytechef.workflow.definition.WorkflowTaskDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -86,24 +91,73 @@ public class CodeWorkflowTaskExecutor {
             .findFirst()
             .orElseThrow(() -> new IllegalArgumentException("Workflow not found"));
 
-        PerformFunction performFunction = workflowDefinition.getTasks()
-            .orElseThrow()
-            .stream()
-            .filter(task -> Objects.equals(task.getName(), taskName))
-            .findFirst()
-            .orElseThrow()
-            .getPerform();
+        TaskDefinition taskDefinition = findTaskDefinition(workflowDefinition.getTasks()
+            .orElseThrow(), taskName);
 
-        CodeWorkflowTaskContext taskContext = createTaskContext(componentConnections, actionContext);
+        if (taskDefinition == null) {
+            throw new IllegalArgumentException("Task name=%s not found".formatted(taskName));
+        }
+
+        PerformFunction performFunction = taskDefinition.getPerform();
+
+        CodeWorkflowTaskContext taskContext = createTaskContext(
+            componentConnections, actionContext, inputParameters.getMap(CodeWorkflowConstants.INPUT, Map.of()),
+            inputParameters.getList(CodeWorkflowConstants.CONCURRENT_TASK_NAMES, String.class, List.of()),
+            toDeclaredParameters(inputParameters));
 
         return performFunction.apply(taskContext);
     }
 
+    /**
+     * Resolves a task by name, descending into the groups that run tasks concurrently. Names are flat across a workflow
+     * — nesting does not namespace them — so a single name identifies one task wherever it sits.
+     */
+    private static TaskDefinition findTaskDefinition(
+        List<? extends WorkflowTaskDefinition> tasks, String taskName) {
+
+        for (WorkflowTaskDefinition task : tasks) {
+            if (task instanceof CompositeTaskDefinition compositeTask) {
+                TaskDefinition nestedTask = findTaskDefinition(compositeTask.getTasks(), taskName);
+
+                if (nestedTask != null) {
+                    return nestedTask;
+                }
+
+                for (List<? extends TaskDefinition> branch : compositeTask.getBranches()) {
+                    TaskDefinition branchTask = findTaskDefinition(branch, taskName);
+
+                    if (branchTask != null) {
+                        return branchTask;
+                    }
+                }
+            } else if (Objects.equals(task.getName(), taskName)) {
+                return (TaskDefinition) task;
+            }
+        }
+
+        return null;
+    }
+
     CodeWorkflowTaskContext createTaskContext(
-        Map<String, ? extends ComponentConnection> componentConnections, ActionContext actionContext) {
+        Map<String, ? extends ComponentConnection> componentConnections, ActionContext actionContext,
+        Map<String, ?> input, List<String> concurrentTaskNames, Map<String, ?> parameters) {
 
         return new CodeWorkflowTaskContext(
-            actionContext, actionDefinitionService, componentConnections, componentDefinitionService);
+            actionContext, actionDefinitionService, componentConnections, componentDefinitionService, input,
+            concurrentTaskNames, parameters);
+    }
+
+    /**
+     * The task's own parameters: everything on the node except the keys the platform writes to dispatch it. The two
+     * share one map in the definition, but only the declared half is the task's business.
+     */
+    private static Map<String, ?> toDeclaredParameters(Parameters inputParameters) {
+        Map<String, ?> parameters = new LinkedHashMap<>(inputParameters.toMap());
+
+        parameters.keySet()
+            .removeAll(CodeWorkflowConstants.DISPATCH_PARAMETERS);
+
+        return parameters;
     }
 
     private List<WorkflowDefinition> getWorkflowDefinitions(

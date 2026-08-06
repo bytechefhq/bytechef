@@ -25,14 +25,86 @@ The file is evaluated by a GraalVM polyglot engine as a **plain script** (NOT a 
 | `version` | **Integer** | yes |
 | `title` | String | no |
 | `description` | String | no |
-| `actions` | list of entries with `name`, `title`, `description`, `perform` | yes (to be useful) |
+| `icon` | String — an inline SVG, shown in the editor | no |
+| `connection` | object — see *Declaring a connection* | no |
+| `actions` | list of entries with `name`, `title`, `description`, `properties`, `output`, `sampleOutput`, `tool`, `perform` | yes (to be useful) |
+| `triggers` | list of **polling** triggers — see *Polling triggers* | no |
 
 Notes that prevent every common failure:
 - Action entries use **`title`, not `label`**.
 - `perform` is a function `(inputParameters, connectionParameters, context)`; the engine may invoke it with no arguments, so accept-and-default liberally (`*args` in Python, `|*args|` in Ruby).
+- The perform `context` carries **`http` and `log` only** — deliberately no component invocation. A custom component is a leaf: it calls APIs itself.
 - The **top-level value must expose polyglot members**: a JavaScript bare parenthesized object literal `({...})` works; a raw Python dict or Ruby hash does **NOT** (dict keys are not members). Use `types.SimpleNamespace(...)` in Python and core `Struct` in Ruby (NOT `OpenStruct` — `require 'ostruct'` is blocked by the sandbox).
 - **Nested action entries stay raw** dicts/hashes/objects — they are consumed as maps.
 - No `export default`, no `module.exports`, no `require` of stdlib beyond what the sandbox allows.
+
+### Declaring inputs, output and options
+
+An action without `properties` renders no inputs in the editor, so declare them:
+
+```js
+{
+    name: "myAction",
+    title: "My Action",
+    tool: true,                                  // also expose this action as an AI agent tool
+    properties: [
+        {name: "email", type: "STRING", label: "Email", required: true},
+        {name: "listId", type: "STRING", label: "List",
+         options: function (inputParameters, connectionParameters) {   // dynamic options
+             return [{label: "Main", value: "1"}];
+         }}
+    ],
+    output: {type: "OBJECT", properties: [{name: "id", type: "STRING"}]},
+    sampleOutput: {id: "42"},
+    perform: function (inputParameters, connectionParameters, context) { ... }
+}
+```
+
+An `options` function is re-evaluated in a fresh sandbox each time the editor asks, so it may call
+`context.http`. `output`/`sampleOutput` give downstream nodes a schema to bind against.
+
+### Declaring a connection
+
+```js
+connection: {
+    baseUri: "https://api.example.com",
+    authorizations: [
+        {type: "BEARER_TOKEN"},
+        {type: "OAUTH2_AUTHORIZATION_CODE",
+         authorizationUrl: "https://example.com/oauth/authorize",
+         tokenUrl: "https://example.com/oauth/token",
+         scopes: ["read", "write"]}
+    ],
+    properties: [{name: "region", type: "STRING", label: "Region"}]
+}
+```
+
+Every authorization type works, OAuth2 included — the platform runs the flow, refresh and callback.
+The URL seams and `apply` may be functions; `apply` then runs per outbound request, so declare it
+only when the credential placement is not standard. A function-valued seam cannot cross the Java
+(Espresso) boundary, so a Java-loaded component reports such a connection as unsupported.
+
+### Polling triggers
+
+```js
+triggers: [
+    {
+        name: "newItem", title: "New Item", type: "POLLING",
+        properties: [{name: "folder", type: "STRING"}],
+        output: {type: "OBJECT", properties: [{name: "id", type: "STRING"}]},
+        poll: function (inputParameters, connectionParameters, closureParameters) {
+            const since = closureParameters.cursor ?? 0;
+
+            return {records: [{id: "1"}], closureParameters: {cursor: since + 1}};
+        }
+    }
+]
+```
+
+Each record starts a workflow run; `closureParameters` comes back on the next poll, so use it for a
+cursor. `pollImmediately: true` polls again at once instead of waiting for the next tick. **Only
+`POLLING` is supported** — a webhook or listener trigger is rejected at save time rather than
+registered as one that would silently never fire.
 
 ### JavaScript (the canonical shape)
 
@@ -118,6 +190,13 @@ curl -sf -X POST "$BYTECHEF_BASE_URL/api/platform/v1/custom-components/deploy" \
   -H "Authorization: Bearer $BYTECHEF_API_KEY" \
   -F "componentFile=@my-component.js"
 ```
+
+## Draft vs published
+
+Uploads publish immediately. The **editor** in the UI works on a draft instead: saving a published
+component spawns a new draft row (its declared `version` must be strictly above the current maximum),
+and `publishCustomComponent` flips it. Only published rows are visible to workflows. At most one
+draft exists at a time.
 
 The component's identity is **`name` + the `version` member together**: re-uploading with the same name and same `version` updates that entry in place; **bump the `version` member to create a new version** alongside the old one.
 

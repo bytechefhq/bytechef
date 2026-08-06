@@ -345,6 +345,205 @@ class CodeWorkflowContainerFacadeTest {
         assertThat(connections.get("billing-api")).containsEntry("componentVersion", 2);
     }
 
+    @Test
+    @SuppressWarnings("unchecked")
+    void testUpdateEmitsTheJobContextFormulaAsTheTaskInputParameter() {
+        UUID containerUuid = UUID.randomUUID();
+        UUID workflowAId = UUID.randomUUID();
+
+        CodeWorkflowContainer codeWorkflowContainer = new CodeWorkflowContainer(containerUuid);
+
+        codeWorkflowContainer.addCodeWorkflow(workflowAId, "wf-a");
+        codeWorkflowContainer.setLanguage(Language.JAVASCRIPT);
+        codeWorkflowContainer.setName("container");
+        codeWorkflowContainer.setExternalVersion("v1");
+
+        Workflow existingWorkflow = mock(Workflow.class);
+
+        when(existingWorkflow.getVersion()).thenReturn(3);
+        when(workflowService.getWorkflow(workflowAId.toString())).thenReturn(existingWorkflow);
+        when(codeWorkflowFileStorage.storeCodeWorkflowFile(anyString(), any()))
+            .thenReturn(new FileEntry("container.js", "file://container.js"));
+        when(codeWorkflowContainerService.update(codeWorkflowContainer)).thenReturn(codeWorkflowContainer);
+
+        List<WorkflowDefinition> workflowDefinitions = List.of(
+            WorkflowDsl.workflow("wf-a")
+                .tasks(WorkflowDsl.task("my-task")
+                    .parameters(Map.of("retries", 3))
+                    .perform(() -> "x")));
+
+        codeWorkflowContainerFacade.update(
+            codeWorkflowContainer, "v2", workflowDefinitions, "content".getBytes(), PlatformType.AUTOMATION);
+
+        ArgumentCaptor<String> definitionCaptor = ArgumentCaptor.forClass(String.class);
+
+        verify(workflowService).update(eq(workflowAId.toString()), definitionCaptor.capture(), eq(3));
+
+        Workflow parsedWorkflow = new Workflow(definitionCaptor.getValue(), Workflow.Format.JSON);
+
+        WorkflowTask workflowTask = parsedWorkflow.getTasks()
+            .getFirst();
+
+        Map<String, Object> parameters = (Map<String, Object>) workflowTask.getParameters();
+
+        // The engine evaluates this formula against the job context before dispatch, so the task's input parameter
+        // arrives as the workflow's inputs plus every prior task's output — see TaskContext.input().
+        assertThat(parameters).containsEntry("input", "=#root");
+
+        // A task's own declared parameters ride alongside the platform's, which win on a clash.
+        assertThat(parameters).containsEntry("retries", 3);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testUpdateEmitsTheEngineDispatchersForTaskGroups() {
+        UUID containerUuid = UUID.randomUUID();
+        UUID workflowAId = UUID.randomUUID();
+
+        CodeWorkflowContainer codeWorkflowContainer = new CodeWorkflowContainer(containerUuid);
+
+        codeWorkflowContainer.addCodeWorkflow(workflowAId, "wf-a");
+        codeWorkflowContainer.setLanguage(Language.JAVASCRIPT);
+        codeWorkflowContainer.setName("container");
+        codeWorkflowContainer.setExternalVersion("v1");
+
+        Workflow existingWorkflow = mock(Workflow.class);
+
+        when(existingWorkflow.getVersion()).thenReturn(3);
+        when(workflowService.getWorkflow(workflowAId.toString())).thenReturn(existingWorkflow);
+        when(codeWorkflowFileStorage.storeCodeWorkflowFile(anyString(), any()))
+            .thenReturn(new FileEntry("container.js", "file://container.js"));
+        when(codeWorkflowContainerService.update(codeWorkflowContainer)).thenReturn(codeWorkflowContainer);
+
+        List<WorkflowDefinition> workflowDefinitions = List.of(
+            WorkflowDsl.workflow("wf-a")
+                .tasks(
+                    WorkflowDsl.parallel("enrich")
+                        .tasks(
+                            WorkflowDsl.task("customer")
+                                .perform(() -> "c"),
+                            WorkflowDsl.task("inventory")
+                                .perform(() -> "i")),
+                    WorkflowDsl.forkJoin("notify")
+                        .branches(
+                            WorkflowDsl.branch(
+                                WorkflowDsl.task("slack")
+                                    .perform(() -> "s")),
+                            WorkflowDsl.branch(
+                                WorkflowDsl.task("email")
+                                    .perform(() -> "e")))));
+
+        codeWorkflowContainerFacade.update(
+            codeWorkflowContainer, "v2", workflowDefinitions, "content".getBytes(), PlatformType.AUTOMATION);
+
+        ArgumentCaptor<String> definitionCaptor = ArgumentCaptor.forClass(String.class);
+
+        verify(workflowService).update(eq(workflowAId.toString()), definitionCaptor.capture(), eq(3));
+
+        Workflow parsedWorkflow = new Workflow(definitionCaptor.getValue(), Workflow.Format.JSON);
+
+        List<WorkflowTask> workflowTasks = parsedWorkflow.getTasks();
+
+        WorkflowTask parallelTask = workflowTasks.getFirst();
+
+        assertThat(parallelTask.getType()).isEqualTo("parallel/v1");
+
+        List<Map<String, Object>> parallelTasks =
+            (List<Map<String, Object>>) parallelTask.getParameters()
+                .get("tasks");
+
+        assertThat(parallelTasks).hasSize(2);
+        assertThat(parallelTasks.getFirst()).containsEntry("type", "codeWorkflow/v1/perform");
+
+        // Each nested leaf stays an ordinary perform node, carrying its own task name and its own job-context
+        // formula, so nesting changes nothing about how a task resolves or what it sees.
+        assertThat((Map<String, Object>) parallelTasks.getFirst()
+            .get("parameters")).containsEntry("taskName", "customer")
+                .containsEntry("input", "=#root")
+                // Recorded so a read of a sibling fails with "runs at the same time as this task" rather than
+                // "no task output named customer", which reads like a typo.
+                .containsEntry("concurrentTaskNames", List.of("inventory"));
+
+        WorkflowTask forkJoinTask = workflowTasks.get(1);
+
+        assertThat(forkJoinTask.getType()).isEqualTo("fork-join/v1");
+
+        List<List<Map<String, Object>>> branches =
+            (List<List<Map<String, Object>>>) forkJoinTask.getParameters()
+                .get("branches");
+
+        assertThat(branches).hasSize(2);
+        assertThat(branches.getFirst()).hasSize(1);
+
+        // Only the other branches are concurrent — a branch runs its own tasks in sequence.
+        assertThat((Map<String, Object>) branches.getFirst()
+            .getFirst()
+            .get("parameters")).containsEntry("concurrentTaskNames", List.of("email"));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testUpdateEmitsDeclaredInputsOutputsAndTriggers() {
+        UUID containerUuid = UUID.randomUUID();
+        UUID workflowAId = UUID.randomUUID();
+
+        CodeWorkflowContainer codeWorkflowContainer = new CodeWorkflowContainer(containerUuid);
+
+        codeWorkflowContainer.addCodeWorkflow(workflowAId, "wf-a");
+        codeWorkflowContainer.setLanguage(Language.JAVASCRIPT);
+        codeWorkflowContainer.setName("container");
+        codeWorkflowContainer.setExternalVersion("v1");
+
+        Workflow existingWorkflow = mock(Workflow.class);
+
+        when(existingWorkflow.getVersion()).thenReturn(3);
+        when(workflowService.getWorkflow(workflowAId.toString())).thenReturn(existingWorkflow);
+        when(codeWorkflowFileStorage.storeCodeWorkflowFile(anyString(), any()))
+            .thenReturn(new FileEntry("container.js", "file://container.js"));
+        when(codeWorkflowContainerService.update(codeWorkflowContainer)).thenReturn(codeWorkflowContainer);
+
+        List<WorkflowDefinition> workflowDefinitions = List.of(
+            WorkflowDsl.workflow("wf-a")
+                .inputs(
+                    WorkflowDsl.input("orderId")
+                        .label("Order ID")
+                        .required(true))
+                .outputs(
+                    WorkflowDsl.output("customer")
+                        .task("fetch-customer"))
+                .triggers(
+                    WorkflowDsl.trigger("daily", "schedule/v1/interval")
+                        .parameters(Map.of("unit", "DAY")))
+                .tasks(
+                    WorkflowDsl.task("fetch-customer")
+                        .perform(() -> "c")));
+
+        codeWorkflowContainerFacade.update(
+            codeWorkflowContainer, "v2", workflowDefinitions, "content".getBytes(), PlatformType.AUTOMATION);
+
+        ArgumentCaptor<String> definitionCaptor = ArgumentCaptor.forClass(String.class);
+
+        verify(workflowService).update(eq(workflowAId.toString()), definitionCaptor.capture(), eq(3));
+
+        Workflow parsedWorkflow = new Workflow(definitionCaptor.getValue(), Workflow.Format.JSON);
+
+        Workflow.Input input = parsedWorkflow.getInputs()
+            .getFirst();
+
+        assertThat(input.name()).isEqualTo("orderId");
+        assertThat(input.required()).isTrue();
+
+        // Naming a task emits the formula, since a task name here can be one no ${...} reference could reach.
+        assertThat(parsedWorkflow.getOutputs()
+            .getFirst()
+            .value()).isEqualTo("=#root['fetch-customer']");
+
+        Map<String, Object> trigger = ((List<Map<String, Object>>) parsedWorkflow.getExtensions()
+            .get("triggers")).getFirst();
+
+        assertThat(trigger).containsEntry("type", "schedule/v1/interval");
+    }
+
     private static WorkflowDefinition workflowDefinition(String name) {
         return WorkflowDsl.workflow(name);
     }

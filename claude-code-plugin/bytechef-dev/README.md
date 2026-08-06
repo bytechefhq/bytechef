@@ -41,13 +41,13 @@ The skill activates automatically when it detects component-building intent.
 
 ### ByteChef Custom Component Builder
 
-Single-file JS/Python/Ruby components (bare object-literal / `SimpleNamespace` / `Struct` contracts, `name` + Integer `version` + `actions[{name,title,description,perform}]`) and Java JARs (SDK `component-api` + `META-INF/services/com.bytechef.component.ComponentHandler`), uploaded via `POST /api/platform/v1/custom-components/deploy` (multipart `componentFile`; extension picks the language; admin-gated; `.jar` requires `java-enabled` on the server).
+Single-file JS/Python/Ruby components (bare object-literal / `SimpleNamespace` / `Struct` contracts, `name` + Integer `version` + `actions[{name,title,properties,output,tool,perform}]`, plus an optional `connection` — every authorization type including OAuth2 — `icon`, dynamic property `options`, and `POLLING` `triggers`) and Java JARs (SDK `component-api` + `META-INF/services/com.bytechef.component.ComponentHandler`), uploaded via `POST /api/platform/v1/custom-components/deploy` (multipart `componentFile`; extension picks the language; admin-gated; `.jar` requires `java-enabled` on the server). Uploads publish; the UI editor saves a draft.
 
 Ask: "Create a custom ByteChef component in Python and upload it" / "Deploy this .js component to my ByteChef".
 
 ### ByteChef Code Workflow Builder
 
-Whole projects/integrations as one artifact. Automation projects key on `name` (locked after first deploy) with `workflows[{name,label,tasks[{name,label,perform}]}]`; embedded integrations key on `componentName`. Deploys: `POST /api/automation/v1/projects/deploy` (`projectFile` + optional `workspaceId`) and `POST /api/embedded/internal/integrations/deploy` (`integrationFile`). Java via `ProjectHandler`/`IntegrationHandler` SDK JARs.
+Whole projects/integrations as one artifact. Automation projects key on `name` (locked after first deploy) with `workflows[{name,label,tasks[{name,label,connections,perform}]}]`; embedded integrations key on `componentName`. A task's `perform(context)` invokes other components (`context.component.<name>.<action>`), reads the workflow's inputs and prior task outputs (`context.input()`), reads a wired connection (`context.connection(name)`) and logs; `parallel` / `forkJoin` task groups run work concurrently. Deploys: `POST /api/automation/v1/projects/deploy` (`projectFile` + optional `workspaceId`) and `POST /api/embedded/internal/integrations/deploy` (`integrationFile`). Java via `ProjectHandler`/`IntegrationHandler` SDK JARs.
 
 Ask: "Write a code workflow that pings an API daily and deploy it" / "Create an embedded integration as code".
 

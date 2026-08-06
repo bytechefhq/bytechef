@@ -14,6 +14,7 @@ import com.bytechef.automation.project.definition.ProjectDefinition;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
 import com.bytechef.workflow.definition.TaskDefinition;
 import com.bytechef.workflow.definition.WorkflowDefinition;
+import com.bytechef.workflow.definition.WorkflowTaskDefinition;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -114,10 +115,10 @@ class ProjectHandlerLoaderTest {
 
         WorkflowDefinition workflowDefinition = workflows.getFirst();
 
-        List<? extends TaskDefinition> tasks = workflowDefinition.getTasks()
+        List<? extends WorkflowTaskDefinition> tasks = workflowDefinition.getTasks()
             .orElseThrow();
 
-        TaskDefinition taskDefinition = tasks.getFirst();
+        TaskDefinition taskDefinition = (TaskDefinition) tasks.getFirst();
 
         RecordingTaskContext taskContext = new RecordingTaskContext("context result");
 
@@ -152,10 +153,10 @@ class ProjectHandlerLoaderTest {
 
         WorkflowDefinition workflowDefinition = workflows.getFirst();
 
-        List<? extends TaskDefinition> tasks = workflowDefinition.getTasks()
+        List<? extends WorkflowTaskDefinition> tasks = workflowDefinition.getTasks()
             .orElseThrow();
 
-        TaskDefinition taskDefinition = tasks.getFirst();
+        TaskDefinition taskDefinition = (TaskDefinition) tasks.getFirst();
 
         assertEquals("hello from js", taskDefinition.getPerform()
             .apply());
@@ -181,10 +182,10 @@ class ProjectHandlerLoaderTest {
 
         WorkflowDefinition workflowDefinition = workflows.getFirst();
 
-        List<? extends TaskDefinition> tasks = workflowDefinition.getTasks()
+        List<? extends WorkflowTaskDefinition> tasks = workflowDefinition.getTasks()
             .orElseThrow();
 
-        TaskDefinition taskDefinition = tasks.getFirst();
+        TaskDefinition taskDefinition = (TaskDefinition) tasks.getFirst();
 
         assertEquals("hello from java", taskDefinition.getPerform()
             .apply());
@@ -208,10 +209,10 @@ class ProjectHandlerLoaderTest {
 
         WorkflowDefinition workflowDefinition = workflows.getFirst();
 
-        List<? extends TaskDefinition> tasks = workflowDefinition.getTasks()
+        List<? extends WorkflowTaskDefinition> tasks = workflowDefinition.getTasks()
             .orElseThrow();
 
-        TaskDefinition taskDefinition = tasks.getFirst();
+        TaskDefinition taskDefinition = (TaskDefinition) tasks.getFirst();
 
         assertEquals("hello from java", taskDefinition.getPerform()
             .apply());

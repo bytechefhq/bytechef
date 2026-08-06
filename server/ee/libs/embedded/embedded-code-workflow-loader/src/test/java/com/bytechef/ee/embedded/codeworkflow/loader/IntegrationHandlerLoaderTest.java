@@ -14,6 +14,7 @@ import com.bytechef.embedded.integration.IntegrationHandler;
 import com.bytechef.embedded.integration.definition.IntegrationDefinition;
 import com.bytechef.workflow.definition.TaskDefinition;
 import com.bytechef.workflow.definition.WorkflowDefinition;
+import com.bytechef.workflow.definition.WorkflowTaskDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.io.IOException;
@@ -133,10 +134,10 @@ class IntegrationHandlerLoaderTest {
 
         WorkflowDefinition workflowDefinition = workflows.getFirst();
 
-        List<? extends TaskDefinition> tasks = workflowDefinition.getTasks()
+        List<? extends WorkflowTaskDefinition> tasks = workflowDefinition.getTasks()
             .orElseThrow();
 
-        TaskDefinition taskDefinition = tasks.getFirst();
+        TaskDefinition taskDefinition = (TaskDefinition) tasks.getFirst();
 
         RecordingTaskContext taskContext = new RecordingTaskContext("context result");
 
@@ -175,10 +176,10 @@ class IntegrationHandlerLoaderTest {
 
         assertEquals("my-workflow", workflowDefinition.getName());
 
-        List<? extends TaskDefinition> tasks = workflowDefinition.getTasks()
+        List<? extends WorkflowTaskDefinition> tasks = workflowDefinition.getTasks()
             .orElseThrow();
 
-        TaskDefinition taskDefinition = tasks.getFirst();
+        TaskDefinition taskDefinition = (TaskDefinition) tasks.getFirst();
 
         assertEquals("hello from js", taskDefinition.getPerform()
             .apply());
@@ -206,10 +207,10 @@ class IntegrationHandlerLoaderTest {
 
         WorkflowDefinition workflowDefinition = workflows.getFirst();
 
-        List<? extends TaskDefinition> tasks = workflowDefinition.getTasks()
+        List<? extends WorkflowTaskDefinition> tasks = workflowDefinition.getTasks()
             .orElseThrow();
 
-        TaskDefinition taskDefinition = tasks.getFirst();
+        TaskDefinition taskDefinition = (TaskDefinition) tasks.getFirst();
 
         assertEquals("hello from java", taskDefinition.getPerform()
             .apply());
@@ -255,10 +256,10 @@ class IntegrationHandlerLoaderTest {
 
         WorkflowDefinition workflowDefinition = workflows.getFirst();
 
-        List<? extends TaskDefinition> tasks = workflowDefinition.getTasks()
+        List<? extends WorkflowTaskDefinition> tasks = workflowDefinition.getTasks()
             .orElseThrow();
 
-        TaskDefinition taskDefinition = tasks.getFirst();
+        TaskDefinition taskDefinition = (TaskDefinition) tasks.getFirst();
 
         RecordingTaskContext taskContext = new RecordingTaskContext("espresso result");
 
@@ -290,10 +291,10 @@ class IntegrationHandlerLoaderTest {
 
         WorkflowDefinition workflowDefinition = workflows.getFirst();
 
-        List<? extends TaskDefinition> tasks = workflowDefinition.getTasks()
+        List<? extends WorkflowTaskDefinition> tasks = workflowDefinition.getTasks()
             .orElseThrow();
 
-        TaskDefinition taskDefinition = tasks.getFirst();
+        TaskDefinition taskDefinition = (TaskDefinition) tasks.getFirst();
 
         assertEquals("hello from java", taskDefinition.getPerform()
             .apply());

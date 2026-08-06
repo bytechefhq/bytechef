@@ -28,7 +28,47 @@ Deploy resolves the target by the identity member (case-insensitive): an existin
 
 ## The single-file contract (JavaScript / Python / Ruby)
 
-Plain-script evaluation; the **completion value** must expose **members** (same rules as custom components: JS bare `({...})`; Python `types.SimpleNamespace` — NOT a raw dict; Ruby core `Struct` — NOT a hash, NOT OpenStruct). `workflows` is a list of raw map entries: `{name, label, description, tasks: [{name, label, description, perform}]}` — **workflow/task entries stay raw dicts/hashes**, and `perform` is a zero-arg-callable returning the task output.
+Plain-script evaluation; the **completion value** must expose **members** (same rules as custom components: JS bare `({...})`; Python `types.SimpleNamespace` — NOT a raw dict; Ruby core `Struct` — NOT a hash, NOT OpenStruct). `workflows` is a list of raw map entries: `{name, label, description, tasks: [{name, label, description, connections, perform}]}` — **workflow/task entries stay raw dicts/hashes**.
+
+`perform` is called with a **context** (a legacy zero-arg perform still works — the engine always passes exactly one argument and the SDK's default ignores it):
+
+- `context.component.<componentName>.<actionName>(input, connectionName)` — invoke any built-in component action.
+- `context.input()` — the workflow's inputs plus every completed task's output, each under its own name in ONE namespace (so an input and a task cannot share a name). `context.input(name)` reads one entry and **throws** on an unknown name; use `context.input()[name]` when absence is legitimate. This is the only way to read prior output — a `${...}` expression cannot reach a task name that is not a plain identifier.
+- `context.parameters()` — the task's own declared `parameters`, `${...}` already evaluated; separate from `input()`.
+- `context.connection(name)` — a wired connection's parameters, for building a request yourself. It carries credentials; never log it.
+- `context.log(level, message)` — `"trace" | "debug" | "info" | "warn" | "error"`, case-insensitive; any other string throws. Java tasks pass the `TaskContext.LogLevel` enum.
+
+### Declaring connections
+
+A task declares the connections its perform uses, so the platform can wire them and the editor can prompt for them:
+
+```js
+{
+    name: "my-task",
+    connections: [
+        {componentName: "httpClient", name: "billing-api"},
+        {componentName: "slack", componentVersion: 1, name: "slack-prod"}
+    ],
+    perform: function (context) { ... }
+}
+```
+
+A map keyed by connection name parses too. In Java: `.connections(connection("slack", "slack-prod"))`. A name that is not wired fails at run time exactly like the script component's.
+
+### Running tasks concurrently
+
+Tasks run in order. Group them to run at the same time — `type: "parallel"` with a `tasks` list dispatches them all at once, `type: "forkJoin"` with a `branches` list of task lists runs the branches concurrently and each branch in order:
+
+```js
+{name: "enrich", type: "parallel", tasks: [
+    {name: "fetch-customer", perform: (context) => ...},
+    {name: "fetch-inventory", perform: (context) => ...}
+]}
+```
+
+In Java: `parallel("enrich").tasks(...)` and `forkJoin("notify").branches(branch(...), branch(...))`.
+
+A group declares no `perform` of its own. Task names are flat and must be unique across the whole workflow, nesting included; a group inside a group is rejected. Both are checked at save time. **Tasks in one parallel group cannot read each other** — they start together, so `context.input(sibling)` throws; put shared work before the group. Never spawn threads inside a `perform`: the sandbox forbids it, and self-spawned work is invisible to the engine.
 
 ### Automation project (JavaScript)
 
@@ -42,7 +82,7 @@ Plain-script evaluation; the **completion value** must expose **members** (same 
             name: "my-workflow",
             label: "My Workflow",
             tasks: [
-                { name: "my-task", label: "My Task", perform: function () { return "hello"; } }
+                { name: "my-task", label: "My Task", perform: function (context) { return "hello"; } }
             ]
         }
     ]
@@ -65,7 +105,7 @@ Ruby: `Struct.new(:name, :version, :description, :workflows).new("my-code-projec
             name: "my-workflow",
             label: "My Workflow",
             tasks: [
-                { name: "my-task", label: "My Task", perform: function () { return "hello"; } }
+                { name: "my-task", label: "My Task", perform: function (context) { return "hello"; } }
             ]
         }
     ]
@@ -86,7 +126,7 @@ public class MyProjectHandler implements ProjectHandler {
             .workflows(
                 WorkflowDsl.workflow("my-workflow")
                     .label("My Workflow")
-                    .tasks(WorkflowDsl.task("my-task").label("My Task").perform(() -> "hello")));
+                    .tasks(WorkflowDsl.task("my-task").label("My Task").perform(context -> "hello")));
     }
 }
 ```
@@ -180,4 +220,6 @@ the docs site.
 
 ## Editing after deploy
 
-Code-backed projects/integrations open a **source editor** (Monaco) instead of the visual canvas in the ByteChef UI, with compile-gated saves: an edit that fails to load, or that changes the identity member, is rejected. Iterate locally, redeploy, or edit in the UI — both paths re-register the workflows and publish.
+Code-backed projects/integrations open a **source editor** (Monaco) instead of the visual canvas in the ByteChef UI, with compile-gated saves: an edit that fails to load, or that changes the identity member, is rejected. An editor save updates a **draft** — publishing stays the project/integration header's publish action — while an upload or deploy publishes immediately. The editor header carries Test Configuration for wiring the declared connections before a test run.
+
+Duplicating, exporting and importing a code-backed project all travel the **source**, not the generated workflow definitions: an export is a zip carrying `code-workflow.<LANGUAGE>`, and an import or duplicate redeploys it. The declared project name is rewritten to the new project's name, since an upload resolves its target by that name — so declare the name as a plain string literal, or the rename is rejected.

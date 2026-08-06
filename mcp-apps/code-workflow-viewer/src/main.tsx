@@ -37,7 +37,7 @@ const FIXTURE_DATA: CodeDataI = {
                     connections: [{componentName: "httpClient", name: "orders-api"}],
                     perform: function (context) {
                         return context.component.httpClient.get(
-                            {uri: "https://api.example.com/orders/" + context.input().input.orderId},
+                            {uri: "https://api.example.com/orders/" + context.input().orderId},
                             "orders-api");
                     }
                 },

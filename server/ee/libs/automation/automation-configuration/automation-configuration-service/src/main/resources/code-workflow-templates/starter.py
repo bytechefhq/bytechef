@@ -9,6 +9,11 @@ import types
 #                 "parameters": {"model": "gpt-4o"}}
 #   })
 #   context.input()  # the workflow's inputs and every prior task's output, each under its own name
+# Without a trigger a workflow only runs when something calls it. A trigger names a component the
+# platform provides, it is not code; declare it on the workflow alongside "tasks":
+#   "triggers": [{"name": "onCall", "type": "workflow/v1/newWorkflowCall"}]
+#   "inputs": [{"name": "orderId", "label": "Order ID", "type": "STRING", "required": True}]
+#   "outputs": [{"name": "result", "task": "my-task"}]
 # Tasks can run at the same time in a group:
 #   {"name": "fan-out", "type": "parallel", "tasks": [...]}
 #   {"name": "branches", "type": "forkJoin", "branches": [[...], [...]]}

@@ -6,6 +6,14 @@
         {
             name: "my-workflow",
             label: "My Workflow",
+            // Without a trigger a workflow only runs when something calls it. Declare one to start it
+            // on its own — a trigger names a component the platform provides, it is not code:
+            //   triggers: [{name: "onCall", type: "workflow/v1/newWorkflowCall"}]
+            //   triggers: [{name: "daily", type: "schedule/v1/interval",
+            //               parameters: {interval: 1, unit: "DAY"}}]
+            //
+            // inputs: [{name: "orderId", label: "Order ID", type: "STRING", required: true}]
+            // outputs: [{name: "result", task: "my-task"}]
             tasks: [
                 {
                     name: "my-task",
