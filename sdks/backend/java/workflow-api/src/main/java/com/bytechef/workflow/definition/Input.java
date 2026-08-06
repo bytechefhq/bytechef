@@ -17,14 +17,34 @@
 package com.bytechef.workflow.definition;
 
 /**
- * Marker interface for an input declared by a {@link WorkflowDefinition}.
+ * An input a {@link WorkflowDefinition} accepts when it is executed.
  *
  * <p>
- * An input describes a value that a workflow expects to receive when it is executed, such as a user-provided argument
- * or a value fed in by a trigger. The interface is intentionally empty so that concrete definition backends can supply
- * their own input representations while exposing them uniformly through the workflow definition API.
+ * A declared input is what the platform prompts for in test configuration and what a caller's payload is checked
+ * against; at run time it arrives under {@code input} in {@link TaskContext#input()}.
  *
  * @author Ivica Cardic
  */
 public interface Input {
+
+    /**
+     * Returns the display label, or {@code null} to fall back to the name.
+     */
+    String getLabel();
+
+    /**
+     * Returns the name the value is passed under.
+     */
+    String getName();
+
+    /**
+     * Returns whether the workflow refuses to run without this input.
+     */
+    boolean isRequired();
+
+    /**
+     * Returns the input's type — {@code STRING}, {@code INTEGER}, {@code BOOLEAN}, {@code ARRAY}, {@code OBJECT} and
+     * the rest of the platform's property types.
+     */
+    String getType();
 }

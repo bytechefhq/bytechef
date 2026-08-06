@@ -17,14 +17,31 @@
 package com.bytechef.workflow.definition;
 
 /**
- * Marker interface for an output produced by a {@link WorkflowDefinition}.
+ * An output a {@link WorkflowDefinition} produces once it completes.
  *
  * <p>
- * An output describes a value that a workflow yields once its tasks have completed. The interface is intentionally
- * empty so that concrete definition backends can supply their own output representations while exposing them uniformly
- * through the workflow definition API.
+ * The value is evaluated against the job context at completion and becomes the job's outputs — the body a synchronous
+ * caller receives, and what {@code GET /workflow-executions/{id}} reports for an asynchronous run.
  *
  * @author Ivica Cardic
  */
 public interface Output {
+
+    /**
+     * Returns the name the value is reported under.
+     */
+    String getName();
+
+    /**
+     * Returns the name of the task whose output is the value, or {@code null} when {@link #getValue()} carries an
+     * expression instead. Naming the task is the only way to reach one whose name is not a plain identifier, since a
+     * {@code ${...}} reference cannot express a hyphen.
+     */
+    String getTask();
+
+    /**
+     * Returns the value, either a literal or a {@code ${...}} expression evaluated against the job context. Null when
+     * {@link #getTask()} names a task instead.
+     */
+    Object getValue();
 }
