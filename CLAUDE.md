@@ -1027,7 +1027,7 @@ check. When adding a method, add it to BOTH interfaces, not just the shared one.
 
 ### Default Ports
 - **Server**: 9555 in the `dev` profile, 8080 in `prod` — one app, not two services
-- **Client**: 3000 (development server)
+- **Client**: 5173 (Vite dev server — `vite.config.ts` sets no `server.port`, so it takes Vite's default)
 - **PostgreSQL**: 5432
 - **Redis**: 6379
 - **Mailpit**: 1025 (`axllent/mailpit`; the compose service is `mailpit`, not mailhog)
