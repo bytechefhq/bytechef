@@ -23,6 +23,8 @@ import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.ai.skill.domain.AiSkill;
 import com.bytechef.platform.ai.skill.file.storage.AiSkillFileStorage;
 import com.bytechef.platform.ai.skill.service.AiSkillService;
+import com.bytechef.platform.tag.domain.Tag;
+import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -72,12 +74,14 @@ class AiSkillFacadeImpl implements AiSkillFacade {
 
     private final AiSkillFileStorage aiSkillFileStorage;
     private final AiSkillService aiSkillService;
+    private final TagService tagService;
 
     AiSkillFacadeImpl(
-        AiSkillFileStorage aiSkillFileStorage, AiSkillService aiSkillService) {
+        AiSkillFileStorage aiSkillFileStorage, AiSkillService aiSkillService, TagService tagService) {
 
         this.aiSkillFileStorage = aiSkillFileStorage;
         this.aiSkillService = aiSkillService;
+        this.tagService = tagService;
     }
 
     @Override
@@ -322,6 +326,46 @@ class AiSkillFacadeImpl implements AiSkillFacade {
     @Transactional(readOnly = true)
     public List<AiSkill> getAiSkills() {
         return aiSkillService.getAiSkills();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Tag> getTags(List<Long> tagIds) {
+        if (tagIds.isEmpty()) {
+            return List.of();
+        }
+
+        return tagService.getTags(tagIds);
+    }
+
+    @Override
+    public AiSkill updateAiSkillTags(long id, List<Tag> tags) {
+        List<Tag> tagsToCreate = tags.stream()
+            .filter(tag -> tag.getId() == null)
+            .toList();
+
+        List<Tag> resolvedTags = new ArrayList<>(tags);
+
+        if (!tagsToCreate.isEmpty()) {
+            List<Tag> savedTags = tagService.save(tagsToCreate);
+
+            int savedTagIndex = 0;
+
+            for (int index = 0; index < resolvedTags.size(); index++) {
+                Tag tag = resolvedTags.get(index);
+
+                if (tag.getId() == null) {
+                    resolvedTags.set(index, savedTags.get(savedTagIndex++));
+                }
+            }
+        }
+
+        return aiSkillService.updateAiSkillTags(
+            id,
+            resolvedTags.stream()
+                .map(Tag::getId)
+                .distinct()
+                .toList());
     }
 
     @Override

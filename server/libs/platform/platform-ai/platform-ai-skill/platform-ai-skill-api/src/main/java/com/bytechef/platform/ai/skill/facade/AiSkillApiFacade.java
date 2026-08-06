@@ -18,6 +18,7 @@ package com.bytechef.platform.ai.skill.facade;
 
 import com.bytechef.platform.ai.skill.domain.AiSkill;
 import com.bytechef.platform.ai.skill.facade.AiSkillFacade.AiSkillDownload;
+import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
@@ -56,9 +57,17 @@ public interface AiSkillApiFacade {
 
     List<AiSkill> getAiSkills();
 
+    /** Distinct tags across the caller's own skills — feeds the tag filter sidebar. */
+    List<Tag> getAiSkillTags();
+
+    /** Resolves {@link Tag} entities for tag ids already read from an authorized skill. */
+    List<Tag> getTags(List<Long> tagIds);
+
     AiSkill removeFileInSkill(long id, String path);
 
     AiSkill updateAiSkill(long id, String name, @Nullable String description);
+
+    AiSkill updateAiSkillTags(long id, List<Tag> tags);
 
     AiSkill updateAiSkillContent(long id, @Nullable String path, String content);
 }

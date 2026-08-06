@@ -18,6 +18,7 @@ package com.bytechef.platform.ai.skill.web.graphql;
 
 import com.bytechef.platform.ai.skill.domain.AiSkill;
 import com.bytechef.platform.ai.skill.facade.AiSkillApiFacade;
+import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Base64;
 import java.util.List;
@@ -26,6 +27,7 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -119,5 +121,39 @@ class AiSkillGraphQlController {
         aiSkillApiFacade.deleteAiSkill(id);
 
         return true;
+    }
+
+    @QueryMapping
+    List<Tag> aiSkillTags() {
+        return aiSkillApiFacade.getAiSkillTags();
+    }
+
+    @MutationMapping
+    AiSkill updateAiSkillTags(@Argument long id, @Argument @Nullable List<TagInput> tags) {
+        List<Tag> resolvedTags = tags == null ? List.of() : tags.stream()
+            .map(tagInput -> {
+                Tag tag = new Tag();
+
+                if (tagInput.id() != null) {
+                    tag.setId(tagInput.id());
+                }
+
+                tag.setName(tagInput.name());
+
+                return tag;
+            })
+            .toList();
+
+        return aiSkillApiFacade.updateAiSkillTags(id, resolvedTags);
+    }
+
+    @SchemaMapping(field = "tags", typeName = "AiSkill")
+    List<Tag> tags(AiSkill aiSkill) {
+        // The parent skill was already authorized by whichever query produced it; resolving its tag ids
+        // needs no additional per-skill check.
+        return aiSkillApiFacade.getTags(aiSkill.getTagIds());
+    }
+
+    record TagInput(@Nullable Long id, String name) {
     }
 }

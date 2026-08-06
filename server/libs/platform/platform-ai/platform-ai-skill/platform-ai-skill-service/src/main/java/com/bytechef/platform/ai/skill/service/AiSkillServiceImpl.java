@@ -77,6 +77,15 @@ class AiSkillServiceImpl implements AiSkillService {
     }
 
     @Override
+    public AiSkill updateAiSkillTags(long id, List<Long> tagIds) {
+        AiSkill existingAiSkill = getAiSkill(id);
+
+        existingAiSkill.setTagIds(tagIds);
+
+        return aiSkillRepository.save(existingAiSkill);
+    }
+
+    @Override
     public AiSkill updateAiSkillFile(long id, FileEntry fileEntry) {
         AiSkill existingAiSkill = getAiSkill(id);
 

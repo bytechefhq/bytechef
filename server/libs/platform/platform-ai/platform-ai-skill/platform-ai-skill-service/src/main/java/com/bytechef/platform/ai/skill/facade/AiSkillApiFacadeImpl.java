@@ -20,6 +20,7 @@ import com.bytechef.ai.copilot.service.CopilotSkillGenerator;
 import com.bytechef.platform.ai.skill.domain.AiSkill;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.util.SecurityUtils;
+import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
@@ -160,6 +161,22 @@ class AiSkillApiFacadeImpl implements AiSkillApiFacade {
     }
 
     @Override
+    public List<Tag> getAiSkillTags() {
+        return aiSkillFacade.getTags(
+            getAiSkills()
+                .stream()
+                .flatMap(aiSkill -> aiSkill.getTagIds()
+                    .stream())
+                .distinct()
+                .toList());
+    }
+
+    @Override
+    public List<Tag> getTags(List<Long> tagIds) {
+        return aiSkillFacade.getTags(tagIds);
+    }
+
+    @Override
     public AiSkill removeFileInSkill(long id, String path) {
         checkOwnerOrAdmin(id);
 
@@ -171,6 +188,13 @@ class AiSkillApiFacadeImpl implements AiSkillApiFacade {
         checkOwnerOrAdmin(id);
 
         return aiSkillFacade.updateAiSkill(id, name, description);
+    }
+
+    @Override
+    public AiSkill updateAiSkillTags(long id, List<Tag> tags) {
+        checkOwnerOrAdmin(id);
+
+        return aiSkillFacade.updateAiSkillTags(id, tags);
     }
 
     @Override

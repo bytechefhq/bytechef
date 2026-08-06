@@ -3,6 +3,7 @@ extend type Query {
     aiSkill(id: ID!): AiSkill!
     aiSkillFilePaths(id: ID!): [String!]!
     aiSkillFileContent(id: ID!, path: String!): String!
+    aiSkillTags: [Tag!]!
 }
 
 extend type Mutation {
@@ -15,12 +16,19 @@ extend type Mutation {
     createAdditionalFilesInSkill(id: ID!, additionalFiles: Map!): AiSkill!
     removeFileInSkill(id: ID!, path: String!): AiSkill!
     deleteAiSkill(id: ID!): Boolean!
+    updateAiSkillTags(id: ID!, tags: [AiSkillTagInput!]): AiSkill!
+}
+
+input AiSkillTagInput {
+    id: ID
+    name: String!
 }
 
 type AiSkill {
     id: ID!
     name: String!
     description: String
+    tags: [Tag!]!
     "Epoch milliseconds (UTC)"
     createdDate: Long
     "Epoch milliseconds (UTC)"

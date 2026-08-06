@@ -38,5 +38,7 @@ public interface AiSkillService {
 
     AiSkill updateAiSkill(long id, String name, @Nullable String description);
 
+    AiSkill updateAiSkillTags(long id, List<Long> tagIds);
+
     AiSkill updateAiSkillFile(long id, FileEntry fileEntry);
 }
