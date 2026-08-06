@@ -17,6 +17,7 @@
 package com.bytechef.workflow.definition;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -29,28 +30,7 @@ import java.util.Optional;
  *
  * @author Ivica Cardic
  */
-public interface TaskDefinition {
-
-    /**
-     * Returns the human-readable description of the task, if one has been provided.
-     *
-     * @return an {@link Optional} containing the task description, or an empty {@link Optional} if none is set
-     */
-    Optional<String> getDescription();
-
-    /**
-     * Returns the display label of the task, if one has been provided.
-     *
-     * @return an {@link Optional} containing the task label, or an empty {@link Optional} if none is set
-     */
-    Optional<String> getLabel();
-
-    /**
-     * Returns the name that uniquely identifies this task within its workflow.
-     *
-     * @return the task name
-     */
-    String getName();
+public interface TaskDefinition extends WorkflowTaskDefinition {
 
     /**
      * Returns the connections this task's perform uses when invoking component actions, if any have been declared. The
@@ -65,12 +45,13 @@ public interface TaskDefinition {
     }
 
     /**
-     * Returns the parameters that configure the behavior of this task, if any have been declared.
+     * Returns the parameters that configure the task, keyed by parameter name, if any have been declared. They are
+     * emitted onto the task node and evaluated against the job context before the task runs, so a value may be a
+     * {@code ${...}} expression — which is what makes them worth declaring over a literal in the perform.
      *
-     * @return an {@link Optional} containing the list of configuration parameters, or an empty {@link Optional} if none
-     *         are declared
+     * @return an {@link Optional} containing the parameters, or an empty {@link Optional} if none are declared
      */
-    Optional<List<? extends Parameter>> getParameters();
+    Optional<Map<String, ?>> getParameters();
 
     /**
      * Returns the function that performs the task's work when the task is executed.

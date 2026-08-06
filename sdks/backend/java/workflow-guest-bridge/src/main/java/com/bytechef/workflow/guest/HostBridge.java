@@ -34,6 +34,29 @@ public interface HostBridge {
     String componentExecute(String requestJson);
 
     /**
+     * Returns the job context snapshot — the workflow's inputs plus every prior task's output — serialized as JSON.
+     *
+     * @return the workflow inputs and prior task outputs as a JSON object
+     */
+    String input();
+
+    /**
+     * Returns one entry of the job context snapshot by name, serialized as JSON. Resolution happens on the host so an
+     * unknown name fails there, with the host's explanation of why it is missing.
+     *
+     * @param name the task or workflow input name
+     * @return the value as JSON
+     */
+    String input(String name);
+
+    /**
+     * Returns the task's own declared parameters, serialized as JSON.
+     *
+     * @return the task's parameters as a JSON object
+     */
+    String parameters();
+
+    /**
      * Returns a wired connection's parameters, serialized as JSON.
      *
      * @param connectionName the name of the connection, as declared on the task

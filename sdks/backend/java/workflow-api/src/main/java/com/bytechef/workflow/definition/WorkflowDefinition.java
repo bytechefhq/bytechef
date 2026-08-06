@@ -70,12 +70,12 @@ public interface WorkflowDefinition {
     Optional<List<? extends Output>> getOutputs();
 
     /**
-     * Returns the tasks that make up the workflow's body, if any have been declared.
+     * Returns the entries that make up the workflow's body, if any have been declared — {@link TaskDefinition}s that
+     * perform work and {@link CompositeTaskDefinition}s that group tasks for concurrent execution.
      *
-     * @return an {@link Optional} containing the list of task definitions, or an empty {@link Optional} if none are
-     *         declared
+     * @return an {@link Optional} containing the list of entries, or an empty {@link Optional} if none are declared
      */
-    Optional<List<? extends TaskDefinition>> getTasks();
+    Optional<List<? extends WorkflowTaskDefinition>> getTasks();
 
     /**
      * Returns the triggers that can initiate execution of the workflow, if any have been declared.

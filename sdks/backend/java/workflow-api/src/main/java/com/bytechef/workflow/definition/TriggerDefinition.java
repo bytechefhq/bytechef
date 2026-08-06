@@ -16,23 +16,26 @@
 
 package com.bytechef.workflow.definition;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * Defines a trigger that can initiate the execution of a {@link WorkflowDefinition}.
  *
  * <p>
- * A trigger binds a workflow to a specific event source (for example a webhook, a schedule, or a polling component
- * operation), identified by its {@link #getType() type}, and carries the {@link Parameter parameters} that configure
- * how that event source behaves.
+ * A trigger binds a workflow to a specific event source — a webhook, a schedule, a polling component operation —
+ * identified by its {@link #getType() type}, and carries the parameters that configure how that event source behaves.
+ *
+ * <p>
+ * The trigger itself is not code: it names a component trigger the platform already provides, so a code workflow starts
+ * the same way a visually built one does.
  *
  * @author Ivica Cardic
  */
 public interface TriggerDefinition {
 
     /**
-     * Returns the type of the trigger, typically referencing the component and trigger operation that provides it (for
-     * example {@code "webhook/newWebhook"}).
+     * Returns the type of the trigger, naming the component and trigger operation that provides it — for example
+     * {@code "schedule/v1/interval"} or {@code "workflow/v1/newWorkflowCall"}.
      *
      * @return the trigger type
      */
@@ -46,9 +49,10 @@ public interface TriggerDefinition {
     String getName();
 
     /**
-     * Returns the parameters that configure the behavior of this trigger.
+     * Returns the parameters that configure the trigger, keyed by parameter name — the same values a visual workflow
+     * sets on the trigger node.
      *
-     * @return the list of configuration parameters for the trigger
+     * @return the trigger's parameters
      */
-    List<? extends Parameter> getParameters();
+    Map<String, ?> getParameters();
 }
