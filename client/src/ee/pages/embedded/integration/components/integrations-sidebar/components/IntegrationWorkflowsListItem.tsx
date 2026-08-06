@@ -80,6 +80,7 @@ const IntegrationWorkflowsListItem = ({
         >
             <div className="flex flex-col gap-3 overflow-hidden">
                 <WorkflowComponentsList
+                    collapseOnSmallViewport={false}
                     filteredComponentNames={filteredComponentNames}
                     workflowComponentDefinitions={workflowComponentDefinitions}
                     workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
