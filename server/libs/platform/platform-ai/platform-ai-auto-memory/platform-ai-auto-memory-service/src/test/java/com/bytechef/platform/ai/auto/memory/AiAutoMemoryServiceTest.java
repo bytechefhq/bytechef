@@ -24,6 +24,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.platform.ai.auto.memory.repository.AiAutoMemoryRepository;
+import com.bytechef.platform.configuration.domain.Environment;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -46,6 +47,7 @@ class AiAutoMemoryServiceTest {
     private static final long WORKSPACE_ID = 1L;
     private static final long PRINCIPAL_ID = 10L;
     private static final long OTHER_PRINCIPAL_ID = 99L;
+    private static final long MEMORY_ID = 11L;
     private static final int ENVIRONMENT = 0;
 
     @Mock
@@ -115,14 +117,14 @@ class AiAutoMemoryServiceTest {
     }
 
     @Test
-    void testUserAndDeploymentMemoriesDoNotCollide() {
+    void testUserAndProjectDeploymentMemoriesDoNotCollide() {
         AiAutoMemoryServiceImpl realService = newService();
 
         when(aiMemoryRepository.findAllByWorkspaceIdAndPrincipalTypeAndPrincipalIdAndEnvironmentAndName(
             WORKSPACE_ID, AiAutoMemoryPrincipalType.USER.ordinal(), PRINCIPAL_ID, ENVIRONMENT, "notes"))
                 .thenReturn(List.of());
         when(aiMemoryRepository.findAllByWorkspaceIdAndPrincipalTypeAndPrincipalIdAndEnvironmentAndName(
-            WORKSPACE_ID, AiAutoMemoryPrincipalType.DEPLOYMENT.ordinal(), PRINCIPAL_ID, ENVIRONMENT, "notes"))
+            WORKSPACE_ID, AiAutoMemoryPrincipalType.PROJECT_DEPLOYMENT.ordinal(), PRINCIPAL_ID, ENVIRONMENT, "notes"))
                 .thenReturn(List.of());
         when(aiMemoryRepository.save(any(AiAutoMemory.class)))
             .thenAnswer(invocation -> invocation.getArgument(0));
@@ -132,7 +134,7 @@ class AiAutoMemoryServiceTest {
             "notes", "t", null, AiAutoMemoryType.USER, "user-body");
 
         realService.create(
-            WORKSPACE_ID, AiAutoMemoryPrincipalType.DEPLOYMENT, PRINCIPAL_ID, ENVIRONMENT,
+            WORKSPACE_ID, AiAutoMemoryPrincipalType.PROJECT_DEPLOYMENT, PRINCIPAL_ID, ENVIRONMENT,
             "notes", "t", null, AiAutoMemoryType.USER, "deployment-body");
 
         // The USER read query only sees the USER-owned row, proving the two principals don't read each other.
@@ -189,7 +191,7 @@ class AiAutoMemoryServiceTest {
         when(aiMemoryRepository.findById(5L)).thenReturn(Optional.of(owned));
 
         assertThatThrownBy(
-            () -> realService.deleteById(WORKSPACE_ID, AiAutoMemoryPrincipalType.USER, PRINCIPAL_ID, 5L))
+            () -> realService.deleteById(WORKSPACE_ID, AiAutoMemoryPrincipalType.USER, PRINCIPAL_ID, 5L, ENVIRONMENT))
                 .isInstanceOf(AiAutoMemoryNotFoundException.class)
                 .hasMessageContaining("Memory not found");
 
@@ -238,7 +240,7 @@ class AiAutoMemoryServiceTest {
         when(aiMemoryRepository.findById(7L)).thenReturn(Optional.of(otherPrincipals));
 
         Optional<AiAutoMemory> result = realService.findById(
-            WORKSPACE_ID, AiAutoMemoryPrincipalType.USER, PRINCIPAL_ID, 7L);
+            WORKSPACE_ID, AiAutoMemoryPrincipalType.USER, PRINCIPAL_ID, 7L, ENVIRONMENT);
 
         assertThat(result).isEmpty();
     }
@@ -254,7 +256,8 @@ class AiAutoMemoryServiceTest {
 
         when(aiMemoryRepository.findById(8L)).thenReturn(Optional.of(otherWorkspaces));
 
-        assertThat(realService.findById(WORKSPACE_ID, AiAutoMemoryPrincipalType.USER, PRINCIPAL_ID, 8L)).isEmpty();
+        assertThat(realService.findById(WORKSPACE_ID, AiAutoMemoryPrincipalType.USER, PRINCIPAL_ID, 8L, ENVIRONMENT))
+            .isEmpty();
     }
 
     @Test
@@ -267,7 +270,74 @@ class AiAutoMemoryServiceTest {
 
         when(aiMemoryRepository.findById(9L)).thenReturn(Optional.of(workspaceLess));
 
-        assertThat(realService.findById(WORKSPACE_ID, AiAutoMemoryPrincipalType.USER, PRINCIPAL_ID, 9L)).isEmpty();
+        assertThat(realService.findById(WORKSPACE_ID, AiAutoMemoryPrincipalType.USER, PRINCIPAL_ID, 9L, ENVIRONMENT))
+            .isEmpty();
+    }
+
+    /**
+     * The primary key pins the row, but a row belongs to an environment: a DEVELOPMENT memory must be invisible to a
+     * PRODUCTION session, exactly as it already is on the list path.
+     */
+    @Test
+    void testFindByIdReturnsEmptyForAnotherEnvironment() {
+        AiAutoMemoryServiceImpl realService = newService();
+
+        AiAutoMemory memory = buildMemoryInEnvironment(ENVIRONMENT);
+
+        when(aiMemoryRepository.findById(MEMORY_ID)).thenReturn(Optional.of(memory));
+
+        assertThat(
+            realService.findById(
+                WORKSPACE_ID, AiAutoMemoryPrincipalType.USER, PRINCIPAL_ID, MEMORY_ID, ENVIRONMENT + 1))
+                    .isEmpty();
+    }
+
+    @Test
+    void testFindByIdReturnsTheRowForItsOwnEnvironment() {
+        AiAutoMemoryServiceImpl realService = newService();
+
+        AiAutoMemory memory = buildMemoryInEnvironment(ENVIRONMENT);
+
+        when(aiMemoryRepository.findById(MEMORY_ID)).thenReturn(Optional.of(memory));
+
+        assertThat(
+            realService.findById(
+                WORKSPACE_ID, AiAutoMemoryPrincipalType.USER, PRINCIPAL_ID, MEMORY_ID, ENVIRONMENT))
+                    .isPresent();
+    }
+
+    /**
+     * A row in another environment is treated as missing, not as forbidden — the same not-found shape a genuinely
+     * absent row produces — and it is never deleted.
+     */
+    @Test
+    void testDeleteByIdThrowsNotFoundForAnotherEnvironment() {
+        AiAutoMemoryServiceImpl realService = newService();
+
+        AiAutoMemory memory = buildMemoryInEnvironment(ENVIRONMENT);
+
+        when(aiMemoryRepository.findById(MEMORY_ID)).thenReturn(Optional.of(memory));
+
+        assertThatThrownBy(
+            () -> realService.deleteById(
+                WORKSPACE_ID, AiAutoMemoryPrincipalType.USER, PRINCIPAL_ID, MEMORY_ID, ENVIRONMENT + 1))
+                    .isInstanceOf(AiAutoMemoryNotFoundException.class)
+                    .hasMessageContaining("Memory not found");
+
+        verify(aiMemoryRepository, never()).delete(any(AiAutoMemory.class));
+    }
+
+    @Test
+    void testDeleteByIdDeletesTheRowForItsOwnEnvironment() {
+        AiAutoMemoryServiceImpl realService = newService();
+
+        AiAutoMemory memory = buildMemoryInEnvironment(ENVIRONMENT);
+
+        when(aiMemoryRepository.findById(MEMORY_ID)).thenReturn(Optional.of(memory));
+
+        realService.deleteById(WORKSPACE_ID, AiAutoMemoryPrincipalType.USER, PRINCIPAL_ID, MEMORY_ID, ENVIRONMENT);
+
+        verify(aiMemoryRepository).delete(memory);
     }
 
     private AiAutoMemoryServiceImpl newService() {
@@ -287,6 +357,20 @@ class AiAutoMemoryServiceTest {
         memory.setContent("body: " + name);
         memory.setCreatedAt(LocalDateTime.now(clock));
         memory.setUpdatedAt(LocalDateTime.now(clock));
+
+        return memory;
+    }
+
+    /**
+     * A memory the caller owns in {@link #WORKSPACE_ID}, differing from the other helpers only in the environment it
+     * lives in — the one dimension the by-id paths did not previously check.
+     */
+    private AiAutoMemory buildMemoryInEnvironment(int environment) {
+        AiAutoMemory memory = buildMemory("scoped", AiAutoMemoryType.USER);
+
+        memory.setId(MEMORY_ID);
+        memory.setWorkspaceId(WORKSPACE_ID);
+        memory.setEnvironment(Environment.values()[environment]);
 
         return memory;
     }

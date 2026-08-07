@@ -20,14 +20,18 @@ import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemory;
+import com.bytechef.platform.ai.auto.memory.AiAutoMemoryPrincipalCount;
+import com.bytechef.platform.ai.auto.memory.AiAutoMemoryPrincipalType;
 import com.bytechef.platform.ai.auto.memory.repository.AiAutoMemoryRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -154,10 +158,57 @@ public class FileStorageAiAutoMemoryRepository implements AiAutoMemoryRepository
     }
 
     @Override
+    public List<AiAutoMemory> findByWorkspaceIdAndEnvironmentOrderByUpdatedAtDesc(long workspaceId, int environment) {
+        return queryWorkspace(workspaceId, environment, null);
+    }
+
+    @Override
+    public List<AiAutoMemory> findByWorkspaceIdAndEnvironmentAndMemoryTypeOrderByUpdatedAtDesc(
+        long workspaceId, int environment, int memoryType) {
+
+        return queryWorkspace(workspaceId, environment, memoryType);
+    }
+
+    @Override
     public List<AiAutoMemory> findAllByWorkspaceIdAndPrincipalTypeAndPrincipalIdAndEnvironmentAndName(
         long workspaceId, int principalType, long principalId, int environment, String name) {
 
         return query(workspaceId, principalType, principalId, environment, null, name);
+    }
+
+    /**
+     * There is no directory holding exactly one workspace and environment — environment sits below the principal
+     * segment, so the workspace's directory is the narrowest one that holds every principal. It is listed in full and
+     * the environment is matched on the stored document, which is also how the other filters that a directory cannot
+     * express (memoryType, name) are applied. Ordered by principal type then id so this backend and the relational one
+     * agree on more than set equality.
+     */
+    @Override
+    public List<AiAutoMemoryPrincipalCount> listPrincipals(long workspaceId, int environment) {
+        Map<PrincipalKey, Long> memoryCountsByPrincipal = readDocuments(buildWorkspaceDirectory(workspaceId)).stream()
+            .filter(document -> document.environment() == environment)
+            .collect(
+                Collectors.groupingBy(
+                    document -> new PrincipalKey(document.principalType(), document.principalId()),
+                    Collectors.counting()));
+
+        List<AiAutoMemoryPrincipalCount> principalCounts = new ArrayList<>();
+
+        for (Map.Entry<PrincipalKey, Long> memoryCountEntry : memoryCountsByPrincipal.entrySet()) {
+            PrincipalKey principalKey = memoryCountEntry.getKey();
+            long memoryCount = memoryCountEntry.getValue();
+
+            principalCounts.add(
+                new AiAutoMemoryPrincipalCount(
+                    AiAutoMemoryPrincipalType.values()[principalKey.principalType()], principalKey.principalId(),
+                    Math.toIntExact(memoryCount)));
+        }
+
+        principalCounts.sort(
+            Comparator.comparing(AiAutoMemoryPrincipalCount::principalType)
+                .thenComparingLong(AiAutoMemoryPrincipalCount::principalId));
+
+        return principalCounts;
     }
 
     private List<AiAutoMemory> query(
@@ -169,6 +220,21 @@ public class FileStorageAiAutoMemoryRepository implements AiAutoMemoryRepository
         return readDocuments(directory).stream()
             .filter(document -> memoryType == null || document.memoryType() == memoryType)
             .filter(document -> name == null || Objects.equals(document.name(), name))
+            .sorted(Comparator.comparing(AiAutoMemoryDocument::updatedAt, Comparator.nullsLast(
+                Comparator.reverseOrder())))
+            .map(AiAutoMemoryDocument::toDomain)
+            .toList();
+    }
+
+    /**
+     * The owner-agnostic counterpart of {@link #query}: reads the whole workspace directory rather than one
+     * principal's, so it spans every owner. Environment is filtered in memory because it is a document field here, not
+     * a path segment.
+     */
+    private List<AiAutoMemory> queryWorkspace(long workspaceId, int environment, @Nullable Integer memoryType) {
+        return readDocuments(buildWorkspaceDirectory(workspaceId)).stream()
+            .filter(document -> document.environment() == environment)
+            .filter(document -> memoryType == null || document.memoryType() == memoryType)
             .sorted(Comparator.comparing(AiAutoMemoryDocument::updatedAt, Comparator.nullsLast(
                 Comparator.reverseOrder())))
             .map(AiAutoMemoryDocument::toDomain)
@@ -210,9 +276,13 @@ public class FileStorageAiAutoMemoryRepository implements AiAutoMemoryRepository
     private static String buildDirectory(
         @Nullable Long workspaceId, int principalType, long principalId, int environment) {
 
+        return buildWorkspaceDirectory(workspaceId) + "/" + principalType + "_" + principalId + "/" + environment;
+    }
+
+    private static String buildWorkspaceDirectory(@Nullable Long workspaceId) {
         String workspaceDirectory = workspaceId == null ? NO_WORKSPACE_DIRECTORY : String.valueOf(workspaceId);
 
-        return ROOT_DIRECTORY + "/" + workspaceDirectory + "/" + principalType + "_" + principalId + "/" + environment;
+        return ROOT_DIRECTORY + "/" + workspaceDirectory;
     }
 
     /**
@@ -226,5 +296,11 @@ public class FileStorageAiAutoMemoryRepository implements AiAutoMemoryRepository
     }
 
     private record DocumentEntry(String directory, FileEntry fileEntry, AiAutoMemoryDocument document) {
+    }
+
+    /**
+     * Grouping key for {@link #listPrincipals(long, int)}: the pair that identifies an owner, in its persisted form.
+     */
+    private record PrincipalKey(int principalType, long principalId) {
     }
 }

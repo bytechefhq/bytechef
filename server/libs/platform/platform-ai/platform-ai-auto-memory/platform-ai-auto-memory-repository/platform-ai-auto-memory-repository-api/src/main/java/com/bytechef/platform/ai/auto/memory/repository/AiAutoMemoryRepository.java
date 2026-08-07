@@ -17,6 +17,7 @@
 package com.bytechef.platform.ai.auto.memory.repository;
 
 import com.bytechef.platform.ai.auto.memory.AiAutoMemory;
+import com.bytechef.platform.ai.auto.memory.AiAutoMemoryPrincipalCount;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,10 +58,32 @@ public interface AiAutoMemoryRepository {
         long workspaceId, int principalType, long principalId, int environment, int memoryType);
 
     /**
+     * Every memory in the workspace + environment regardless of owner, newest first by {@code updatedAt}. Backs the
+     * Memories page's "All" owner scope. Carries NO authorization of its own — the caller is responsible for dropping
+     * principals it may not address, which is why nothing but the GraphQL controller (with its
+     * resolvePrincipalForListing decision table) should call it.
+     */
+    List<AiAutoMemory> findByWorkspaceIdAndEnvironmentOrderByUpdatedAtDesc(long workspaceId, int environment);
+
+    /**
+     * Same shape as {@link #findByWorkspaceIdAndEnvironmentOrderByUpdatedAtDesc} narrowed by
+     * {@link AiAutoMemory#getMemoryType() memoryType} (the persisted INT ordinal — see
+     * {@link com.bytechef.platform.ai.auto.memory.AiAutoMemoryType}). Same authorization caveat.
+     */
+    List<AiAutoMemory> findByWorkspaceIdAndEnvironmentAndMemoryTypeOrderByUpdatedAtDesc(
+        long workspaceId, int environment, int memoryType);
+
+    /**
      * Returns rows matching the (workspace, principalType, principalId, environment, name) tuple. The DB no longer
      * enforces uniqueness on name — the service layer's duplicate-name check in {@code create()} is the policy gate;
      * multiple matches theoretically possible.
      */
     List<AiAutoMemory> findAllByWorkspaceIdAndPrincipalTypeAndPrincipalIdAndEnvironmentAndName(
         long workspaceId, int principalType, long principalId, int environment, String name);
+
+    /**
+     * The distinct {@code (principalType, principalId)} pairs holding memory in this workspace and environment, with
+     * per-principal counts.
+     */
+    List<AiAutoMemoryPrincipalCount> listPrincipals(long workspaceId, int environment);
 }

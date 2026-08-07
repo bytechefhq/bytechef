@@ -23,8 +23,8 @@ import org.jspecify.annotations.Nullable;
 /**
  * Manages per-principal, per-workspace long-term memories that outlive a single agent turn. All operations are scoped
  * to {@code (workspaceId, principalType, principalId)} — there is no cross-principal read or write path. The
- * {@code principalType} discriminator keeps USER-owned (AI Hub) and DEPLOYMENT-owned (workflow agent) memory from
- * colliding even when they share a {@code principalId} value.
+ * {@code principalType} discriminator keeps USER-owned (AI Hub) and PROJECT_DEPLOYMENT-owned (workflow agent) memory
+ * from colliding even when they share a {@code principalId} value.
  *
  * <p>
  * Ownership is enforced in the service layer: callers supply the requesting principal's type and id and the service
@@ -65,14 +65,15 @@ public interface AiAutoMemoryService {
 
     /**
      * Updates the fields of the memory identified by its primary key, scoped to
-     * {@code (workspaceId, principalType, principalId)}. Used by the REST/GraphQL management endpoints. Partial update
-     * — only non-null fields are applied. Environment is not threaded because the row's environment is immutable
-     * post-create and the primary key already pins the partition.
+     * {@code (workspaceId, principalType, principalId, environment)}. Used by the REST/GraphQL management endpoints.
+     * Partial update — only non-null fields are applied. The primary key pins the row, but a row belongs to an
+     * environment, and a session in one environment must not reach another's rows: a row in a different environment
+     * raises the same {@link AiAutoMemoryNotFoundException} a missing row does.
      */
     AiAutoMemory updateById(
         long workspaceId, AiAutoMemoryPrincipalType principalType, long principalId, long memoryId,
         @Nullable String title, @Nullable String description,
-        @Nullable AiAutoMemoryType memoryType, @Nullable String content);
+        @Nullable AiAutoMemoryType memoryType, @Nullable String content, int environment);
 
     /**
      * Deletes the memory row identified by {@code name}. Returns the deleted row so the tool callback layer can capture
@@ -82,12 +83,13 @@ public interface AiAutoMemoryService {
         long workspaceId, AiAutoMemoryPrincipalType principalType, long principalId, int environment, String name);
 
     /**
-     * Deletes the memory identified by its primary key, scoped to {@code (workspaceId, principalType, principalId)}.
-     * Used by the REST/GraphQL management endpoints. Environment is not threaded for the same reason as
-     * {@link #updateById}.
+     * Deletes the memory identified by its primary key, scoped to
+     * {@code (workspaceId, principalType, principalId, environment)}. Used by the REST/GraphQL management endpoints.
+     * Environment is threaded for the same reason as {@link #updateById} — a row in another environment is
+     * indistinguishable from a missing one and is never deleted.
      */
     AiAutoMemory deleteById(
-        long workspaceId, AiAutoMemoryPrincipalType principalType, long principalId, long memoryId);
+        long workspaceId, AiAutoMemoryPrincipalType principalType, long principalId, long memoryId, int environment);
 
     /**
      * Renames a memory. Throws {@link DuplicateAiAutoMemoryNameException} when the target name already exists and
@@ -107,13 +109,24 @@ public interface AiAutoMemoryService {
         @Nullable AiAutoMemoryType memoryType);
 
     /**
+     * Lists every memory in the workspace + environment regardless of owner, optionally filtered by type. Ordered by
+     * {@code updated_at DESC}. Backs the Memories page's "All" owner scope.
+     *
+     * <p>
+     * Applies NO per-owner authorization — the caller must drop principals it may not address. Only the GraphQL
+     * controller should call it, since it holds the resolvePrincipalForListing decision table that decides which owners
+     * a given caller can see.
+     */
+    List<AiAutoMemory> listAllOwners(long workspaceId, int environment, @Nullable AiAutoMemoryType memoryType);
+
+    /**
      * Loads a single memory by its primary key, verifying ownership against
-     * {@code (workspaceId, principalType, principalId)}. Returns empty when no row matches or the row belongs to
-     * another principal — the REST/GraphQL layer surfaces this as 404. Environment is not threaded because the
-     * primary-key lookup already targets a single row.
+     * {@code (workspaceId, principalType, principalId, environment)}. Returns empty when no row matches or the row
+     * belongs to another principal or environment — the REST/GraphQL layer surfaces this as 404. The primary key pins
+     * the row, but a row belongs to an environment, and a session in one environment must not read another's rows.
      */
     Optional<AiAutoMemory> findById(
-        long workspaceId, AiAutoMemoryPrincipalType principalType, long principalId, long memoryId);
+        long workspaceId, AiAutoMemoryPrincipalType principalType, long principalId, long memoryId, int environment);
 
     /**
      * Returns the memories for the given {@code (workspaceId, principalType, principalId, environment)}. Intended for
@@ -123,4 +136,10 @@ public interface AiAutoMemoryService {
      */
     List<AiAutoMemory> listByPrincipalAndWorkspace(
         long workspaceId, AiAutoMemoryPrincipalType principalType, long principalId, int environment);
+
+    /**
+     * The owners holding memory in this workspace and environment. Unfiltered — the GraphQL layer applies the same
+     * per-principal authorization it applies to reads.
+     */
+    List<AiAutoMemoryPrincipalCount> listPrincipals(long workspaceId, int environment);
 }

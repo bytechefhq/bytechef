@@ -1,7 +1,8 @@
 type AiAutoMemory {
     id: ID!
     workspaceId: Long!
-    userId: Long!
+    principalType: AiAutoMemoryPrincipalType!
+    principalId: Long!
     name: String!
     title: String!
     description: String
@@ -19,45 +20,96 @@ enum AiAutoMemoryType {
     REFERENCE
 }
 
+"""
+The owner kind of a memory. User-owned (AI Hub) and deployment-owned (workflow agent) memory share one table,
+so the id alone does not identify an owner — it must be read together with this discriminator.
+"""
+enum AiAutoMemoryPrincipalType {
+    USER
+    PROJECT_DEPLOYMENT
+    INTEGRATION_INSTANCE
+}
+
+type AiAutoMemoryPrincipal {
+    principalType: AiAutoMemoryPrincipalType!
+    principalId: Long!
+    label: String!
+    memoryCount: Int!
+}
+
 extend type Query {
     """
-    Lists the current user's memories in the workspace, scoped to the supplied environment so DEVELOPMENT
-    preferences do not bleed into PRODUCTION sessions and vice versa. The optional memoryType filter narrows
-    results to a single category. Ordered by updatedAt DESC.
+    Lists memories in the workspace, scoped to the supplied environment so DEVELOPMENT preferences do not bleed
+    into PRODUCTION sessions and vice versa. The optional memoryType filter narrows results to a single category.
+    Ordered by updatedAt DESC.
+
+    principalType and principalId are supplied together or both omitted. Omitting them is the All scope: every
+    owner the caller may address, which for a non-admin is just their own memories. Note this is the OPPOSITE
+    default to aiAutoMemory and the mutations, where omitting them means the signed-in user — there the principal
+    decides authorization for one row rather than the breadth of a listing.
+    A USER principal other than the caller returns an empty list rather than an error, so ids stay unenumerable.
+    INTEGRATION_INSTANCE is not addressable — those rows are not workspace-isolated.
     """
     aiAutoMemories(
         workspaceId: ID!,
         environment: Int!,
-        memoryType: AiAutoMemoryType
+        memoryType: AiAutoMemoryType,
+        principalType: AiAutoMemoryPrincipalType,
+        principalId: Long
     ): [AiAutoMemory!]!
 
     """
-    Returns a single memory by id, verifying ownership against (workspaceId, currentUserId). Returns null when
-    missing or owned by another user — the same shape on both errors so a probe cannot enumerate ids across
-    workspaces.
+    Returns a single memory by id, resolved within the supplied environment and verified against the resolved
+    principal. Returns null when missing, in another environment, or not addressable by the caller — the same
+    shape on every one of those so a probe cannot enumerate ids across workspaces or environments.
     """
-    aiAutoMemory(workspaceId: ID!, id: ID!): AiAutoMemory
+    aiAutoMemory(
+        workspaceId: ID!,
+        id: ID!,
+        environment: Int!,
+        principalType: AiAutoMemoryPrincipalType,
+        principalId: Long
+    ): AiAutoMemory
+
+    """
+    The owners that actually hold memory in this workspace and environment, for the Memories page's owner picker.
+    Applies the same per-principal rules as the read operations: only the caller's own USER entry, every
+    PROJECT_DEPLOYMENT entry, and never INTEGRATION_INSTANCE.
+    """
+    aiAutoMemoryPrincipals(workspaceId: ID!, environment: Int!): [AiAutoMemoryPrincipal!]!
 }
 
 extend type Mutation {
     """
-    Partial update of a memory by primary key, scoped to (workspaceId, currentUserId). The memory's environment
-    is immutable post-create so it does not appear in the patch input — environments do not move.
+    Partial update of a memory by primary key, resolved within the supplied environment and scoped to the
+    resolved principal. The environment identifies which row the key addresses, not a value to write — a memory's
+    environment is immutable post-create, and a row in another environment throws NotFound. Updating a
+    PROJECT_DEPLOYMENT-owned memory requires ROLE_ADMIN: it changes how a live agent behaves on its next run.
     """
     updateAiAutoMemory(input: UpdateAiAutoMemoryInput!): AiAutoMemory!
 
     """
-    Deletes a memory by primary key. Returns true on success; throws NotFound when the row does not exist or
-    Forbidden when the row belongs to another user.
+    Deletes a memory by primary key, resolved within the supplied environment. Returns true on success; throws
+    NotFound when the row does not exist, lives in another environment, or is not addressable by the caller.
+    Deleting a PROJECT_DEPLOYMENT-owned memory requires ROLE_ADMIN.
     """
-    deleteAiAutoMemory(workspaceId: ID!, id: ID!): Boolean!
+    deleteAiAutoMemory(
+        workspaceId: ID!,
+        id: ID!,
+        environment: Int!,
+        principalType: AiAutoMemoryPrincipalType,
+        principalId: Long
+    ): Boolean!
 }
 
 input UpdateAiAutoMemoryInput {
     id: ID!
     workspaceId: ID!
+    environment: Int!
     title: String
     description: String
     memoryType: AiAutoMemoryType
     content: String
+    principalType: AiAutoMemoryPrincipalType
+    principalId: Long
 }

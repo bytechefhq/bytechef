@@ -8,6 +8,7 @@
 package com.bytechef.ee.platform.ai.auto.memory.remote.client.service;
 
 import com.bytechef.platform.ai.auto.memory.AiAutoMemory;
+import com.bytechef.platform.ai.auto.memory.AiAutoMemoryPrincipalCount;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryPrincipalType;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryService;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryType;
@@ -54,7 +55,7 @@ public class RemoteAiAutoMemoryServiceClient implements AiAutoMemoryService {
     public AiAutoMemory updateById(
         long workspaceId, AiAutoMemoryPrincipalType principalType, long principalId, long memoryId,
         @Nullable String title, @Nullable String description, @Nullable AiAutoMemoryType memoryType,
-        @Nullable String content) {
+        @Nullable String content, int environment) {
 
         throw new UnsupportedOperationException();
     }
@@ -68,7 +69,7 @@ public class RemoteAiAutoMemoryServiceClient implements AiAutoMemoryService {
 
     @Override
     public AiAutoMemory deleteById(
-        long workspaceId, AiAutoMemoryPrincipalType principalType, long principalId, long memoryId) {
+        long workspaceId, AiAutoMemoryPrincipalType principalType, long principalId, long memoryId, int environment) {
 
         throw new UnsupportedOperationException();
     }
@@ -90,8 +91,15 @@ public class RemoteAiAutoMemoryServiceClient implements AiAutoMemoryService {
     }
 
     @Override
+    public List<AiAutoMemory> listAllOwners(
+        long workspaceId, int environment, @Nullable AiAutoMemoryType memoryType) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Optional<AiAutoMemory> findById(
-        long workspaceId, AiAutoMemoryPrincipalType principalType, long principalId, long memoryId) {
+        long workspaceId, AiAutoMemoryPrincipalType principalType, long principalId, long memoryId, int environment) {
 
         throw new UnsupportedOperationException();
     }
@@ -100,6 +108,11 @@ public class RemoteAiAutoMemoryServiceClient implements AiAutoMemoryService {
     public List<AiAutoMemory> listByPrincipalAndWorkspace(
         long workspaceId, AiAutoMemoryPrincipalType principalType, long principalId, int environment) {
 
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<AiAutoMemoryPrincipalCount> listPrincipals(long workspaceId, int environment) {
         throw new UnsupportedOperationException();
     }
 }

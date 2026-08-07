@@ -17,6 +17,7 @@
 package com.bytechef.platform.ai.auto.memory.repository.jdbc;
 
 import com.bytechef.platform.ai.auto.memory.AiAutoMemory;
+import com.bytechef.platform.ai.auto.memory.AiAutoMemoryPrincipalCount;
 import com.bytechef.platform.ai.auto.memory.repository.AiAutoMemoryRepository;
 import java.util.List;
 import org.springframework.data.jdbc.repository.query.Query;
@@ -31,6 +32,26 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface JdbcAiAutoMemoryRepository extends CrudRepository<AiAutoMemory, Long>, AiAutoMemoryRepository {
+
+    @Override
+    @Query("""
+        SELECT m.* FROM ai_auto_memory m
+        WHERE m.workspace_id = :workspaceId
+          AND m.environment = :environment
+        ORDER BY m.updated_at DESC
+        """)
+    List<AiAutoMemory> findByWorkspaceIdAndEnvironmentOrderByUpdatedAtDesc(long workspaceId, int environment);
+
+    @Override
+    @Query("""
+        SELECT m.* FROM ai_auto_memory m
+        WHERE m.workspace_id = :workspaceId
+          AND m.environment = :environment
+          AND m.memory_type = :memoryType
+        ORDER BY m.updated_at DESC
+        """)
+    List<AiAutoMemory> findByWorkspaceIdAndEnvironmentAndMemoryTypeOrderByUpdatedAtDesc(
+        long workspaceId, int environment, int memoryType);
 
     @Override
     @Query("""
@@ -68,4 +89,26 @@ public interface JdbcAiAutoMemoryRepository extends CrudRepository<AiAutoMemory,
         """)
     List<AiAutoMemory> findAllByWorkspaceIdAndPrincipalTypeAndPrincipalIdAndEnvironmentAndName(
         long workspaceId, int principalType, long principalId, int environment, String name);
+
+    /**
+     * Grouped over the same {@code (principal_type, principal_id)} pair the per-principal finders filter on, so an
+     * owner appears here exactly when one of those finders would return something for it. Ordered so the two backends
+     * agree on more than set equality.
+     */
+    @Query("""
+        SELECT m.principal_type, m.principal_id, CAST(COUNT(*) AS INT) AS memory_count
+        FROM ai_auto_memory m
+        WHERE m.workspace_id = :workspaceId
+          AND m.environment = :environment
+        GROUP BY m.principal_type, m.principal_id
+        ORDER BY m.principal_type, m.principal_id
+        """)
+    List<AiAutoMemoryPrincipalCountRow> findPrincipalCounts(long workspaceId, int environment);
+
+    @Override
+    default List<AiAutoMemoryPrincipalCount> listPrincipals(long workspaceId, int environment) {
+        return findPrincipalCounts(workspaceId, environment).stream()
+            .map(AiAutoMemoryPrincipalCountRow::toAiAutoMemoryPrincipalCount)
+            .toList();
+    }
 }

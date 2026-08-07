@@ -17,21 +17,11 @@
 package com.bytechef.platform.ai.auto.memory;
 
 /**
- * Discriminates the owner kind of an {@link AiAutoMemory} row so user-owned (AI Hub) and deployment-owned (workflow
- * agent) memory can share the {@code ai_auto_memory} table without colliding.
- *
- * <p>
- * <b>Append-only.</b> Persisted as an INT ordinal in {@code ai_auto_memory.principal_type}; reordering or removing a
- * value would silently re-map historical rows. New values MUST be appended at the end. Pinned by
- * {@code EnumOrdinalStabilityTest#testAiAutoMemoryPrincipalTypeOrdinalsAreStable}.
- * </p>
+ * One owner that holds memory in a workspace and environment, with how many rows it holds. Drives the Memories page's
+ * owner picker so it never offers an owner with nothing to show.
  *
  * @author Ivica Cardic
  */
-public enum AiAutoMemoryPrincipalType {
-
-    // append-only
-    USER,
-    PROJECT_DEPLOYMENT,
-    INTEGRATION_INSTANCE
+public record AiAutoMemoryPrincipalCount(
+    AiAutoMemoryPrincipalType principalType, long principalId, int memoryCount) {
 }

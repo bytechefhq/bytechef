@@ -37,38 +37,40 @@ class DbBackedAutoMemoryDirectoryOpsTest {
     private static final int ENVIRONMENT = 0;
 
     @Test
-    void testListUsesFixedDeploymentScoping() {
+    void testListUsesFixedProjectDeploymentScoping() {
         AiAutoMemoryService aiAutoMemoryService = mock(AiAutoMemoryService.class);
 
         when(
             aiAutoMemoryService.listByPrincipalAndWorkspace(
-                WORKSPACE_ID, AiAutoMemoryPrincipalType.DEPLOYMENT, PRINCIPAL_ID, ENVIRONMENT))
+                WORKSPACE_ID, AiAutoMemoryPrincipalType.PROJECT_DEPLOYMENT, PRINCIPAL_ID, ENVIRONMENT))
                     .thenReturn(List.<AiAutoMemory>of());
 
         DbBackedAutoMemoryDirectoryOps directoryOps =
             new DbBackedAutoMemoryDirectoryOps(
-                aiAutoMemoryService, WORKSPACE_ID, AiAutoMemoryPrincipalType.DEPLOYMENT, PRINCIPAL_ID, ENVIRONMENT);
+                aiAutoMemoryService, WORKSPACE_ID, AiAutoMemoryPrincipalType.PROJECT_DEPLOYMENT, PRINCIPAL_ID,
+                ENVIRONMENT);
 
         String index = directoryOps.list("MEMORY.md", null);
 
         assertThat(index).isEqualTo("MEMORY index is empty. Create entries with MemoryCreate.");
 
         verify(aiAutoMemoryService).listByPrincipalAndWorkspace(
-            WORKSPACE_ID, AiAutoMemoryPrincipalType.DEPLOYMENT, PRINCIPAL_ID, ENVIRONMENT);
+            WORKSPACE_ID, AiAutoMemoryPrincipalType.PROJECT_DEPLOYMENT, PRINCIPAL_ID, ENVIRONMENT);
     }
 
     @Test
-    void testDeleteSlugifiesNameAndUsesFixedDeploymentScoping() {
+    void testDeleteSlugifiesNameAndUsesFixedProjectDeploymentScoping() {
         AiAutoMemoryService aiAutoMemoryService = mock(AiAutoMemoryService.class);
 
         DbBackedAutoMemoryDirectoryOps directoryOps =
             new DbBackedAutoMemoryDirectoryOps(
-                aiAutoMemoryService, WORKSPACE_ID, AiAutoMemoryPrincipalType.DEPLOYMENT, PRINCIPAL_ID, ENVIRONMENT);
+                aiAutoMemoryService, WORKSPACE_ID, AiAutoMemoryPrincipalType.PROJECT_DEPLOYMENT, PRINCIPAL_ID,
+                ENVIRONMENT);
 
         directoryOps.delete("foo", null);
 
         verify(aiAutoMemoryService).delete(
-            WORKSPACE_ID, AiAutoMemoryPrincipalType.DEPLOYMENT, PRINCIPAL_ID, ENVIRONMENT, "foo");
+            WORKSPACE_ID, AiAutoMemoryPrincipalType.PROJECT_DEPLOYMENT, PRINCIPAL_ID, ENVIRONMENT, "foo");
     }
 
     @Test

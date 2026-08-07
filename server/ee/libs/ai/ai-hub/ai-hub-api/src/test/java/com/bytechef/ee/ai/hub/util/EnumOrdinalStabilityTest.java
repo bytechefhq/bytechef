@@ -145,7 +145,7 @@ class EnumOrdinalStabilityTest {
         Map<String, Integer> expected = new LinkedHashMap<>();
 
         expected.put("USER", 0);
-        expected.put("DEPLOYMENT", 1);
+        expected.put("PROJECT_DEPLOYMENT", 1);
         expected.put("INTEGRATION_INSTANCE", 2);
 
         OrdinalStabilityAssertions.assertOrdinalsMatch(

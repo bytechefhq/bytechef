@@ -205,7 +205,7 @@ public class AiAutoMemoryRepositoryIntTest {
 
         aiMemoryRepository.save(userRow);
 
-        AiAutoMemory deploymentRow = new AiAutoMemory(AiAutoMemoryPrincipalType.DEPLOYMENT, 100L);
+        AiAutoMemory deploymentRow = new AiAutoMemory(AiAutoMemoryPrincipalType.PROJECT_DEPLOYMENT, 100L);
 
         deploymentRow.setWorkspaceId(1L);
         deploymentRow.setName("shared-name");

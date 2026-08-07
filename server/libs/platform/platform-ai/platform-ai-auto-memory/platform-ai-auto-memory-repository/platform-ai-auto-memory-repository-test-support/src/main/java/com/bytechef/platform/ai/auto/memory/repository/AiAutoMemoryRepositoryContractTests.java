@@ -17,8 +17,10 @@
 package com.bytechef.platform.ai.auto.memory.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import com.bytechef.platform.ai.auto.memory.AiAutoMemory;
+import com.bytechef.platform.ai.auto.memory.AiAutoMemoryPrincipalCount;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryPrincipalType;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryType;
 import java.util.List;
@@ -152,6 +154,94 @@ public abstract class AiAutoMemoryRepositoryContractTests {
                         .isEmpty();
     }
 
+    @Test
+    void testListPrincipalsReturnsDistinctOwnersWithCounts() {
+        saveInWorkspace(
+            buildMemory("a", AiAutoMemoryType.USER, AiAutoMemoryPrincipalType.USER, 1, ENVIRONMENT), WORKSPACE_ID);
+        saveInWorkspace(
+            buildMemory("b", AiAutoMemoryType.USER, AiAutoMemoryPrincipalType.USER, 1, ENVIRONMENT), WORKSPACE_ID);
+        saveInWorkspace(
+            buildMemory("c", AiAutoMemoryType.USER, AiAutoMemoryPrincipalType.PROJECT_DEPLOYMENT, 5, ENVIRONMENT),
+            WORKSPACE_ID);
+
+        List<AiAutoMemoryPrincipalCount> principals = getAiAutoMemoryRepository()
+            .listPrincipals(WORKSPACE_ID, ENVIRONMENT);
+
+        assertThat(principals)
+            .extracting(
+                AiAutoMemoryPrincipalCount::principalType, AiAutoMemoryPrincipalCount::principalId,
+                AiAutoMemoryPrincipalCount::memoryCount)
+            .containsExactlyInAnyOrder(
+                tuple(AiAutoMemoryPrincipalType.USER, 1L, 2),
+                tuple(AiAutoMemoryPrincipalType.PROJECT_DEPLOYMENT, 5L, 1));
+    }
+
+    @Test
+    void testListPrincipalsExcludesOtherWorkspacesAndEnvironments() {
+        saveInWorkspace(
+            buildMemory("a", AiAutoMemoryType.USER, AiAutoMemoryPrincipalType.USER, 1, ENVIRONMENT), WORKSPACE_ID);
+        saveInWorkspace(
+            buildMemory("b", AiAutoMemoryType.USER, AiAutoMemoryPrincipalType.USER, 2, ENVIRONMENT),
+            OTHER_WORKSPACE_ID);
+        saveInWorkspace(
+            buildMemory("c", AiAutoMemoryType.USER, AiAutoMemoryPrincipalType.USER, 3, ENVIRONMENT + 1), WORKSPACE_ID);
+
+        List<AiAutoMemoryPrincipalCount> principals = getAiAutoMemoryRepository()
+            .listPrincipals(WORKSPACE_ID, ENVIRONMENT);
+
+        assertThat(principals)
+            .extracting(AiAutoMemoryPrincipalCount::principalId)
+            .containsExactly(1L);
+    }
+
+    @Test
+    void testFindByWorkspaceAndEnvironmentSpansEveryOwner() {
+        saveInWorkspace(
+            buildMemory("a", AiAutoMemoryType.USER, AiAutoMemoryPrincipalType.USER, 1, ENVIRONMENT), WORKSPACE_ID);
+        saveInWorkspace(
+            buildMemory("b", AiAutoMemoryType.PROJECT, AiAutoMemoryPrincipalType.PROJECT_DEPLOYMENT, 5, ENVIRONMENT),
+            WORKSPACE_ID);
+
+        assertThat(
+            getAiAutoMemoryRepository()
+                .findByWorkspaceIdAndEnvironmentOrderByUpdatedAtDesc(WORKSPACE_ID, ENVIRONMENT))
+                    .extracting(AiAutoMemory::getName)
+                    .containsExactlyInAnyOrder("a", "b");
+    }
+
+    @Test
+    void testFindByWorkspaceAndEnvironmentExcludesOtherWorkspacesAndEnvironments() {
+        saveInWorkspace(
+            buildMemory("a", AiAutoMemoryType.USER, AiAutoMemoryPrincipalType.USER, 1, ENVIRONMENT), WORKSPACE_ID);
+        saveInWorkspace(
+            buildMemory("b", AiAutoMemoryType.USER, AiAutoMemoryPrincipalType.USER, 2, ENVIRONMENT),
+            OTHER_WORKSPACE_ID);
+        saveInWorkspace(
+            buildMemory("c", AiAutoMemoryType.USER, AiAutoMemoryPrincipalType.USER, 3, ENVIRONMENT + 1), WORKSPACE_ID);
+
+        assertThat(
+            getAiAutoMemoryRepository()
+                .findByWorkspaceIdAndEnvironmentOrderByUpdatedAtDesc(WORKSPACE_ID, ENVIRONMENT))
+                    .extracting(AiAutoMemory::getName)
+                    .containsExactly("a");
+    }
+
+    @Test
+    void testFindByWorkspaceAndEnvironmentNarrowsByMemoryType() {
+        saveInWorkspace(
+            buildMemory("a", AiAutoMemoryType.USER, AiAutoMemoryPrincipalType.USER, 1, ENVIRONMENT), WORKSPACE_ID);
+        saveInWorkspace(
+            buildMemory("b", AiAutoMemoryType.PROJECT, AiAutoMemoryPrincipalType.PROJECT_DEPLOYMENT, 5, ENVIRONMENT),
+            WORKSPACE_ID);
+
+        assertThat(
+            getAiAutoMemoryRepository()
+                .findByWorkspaceIdAndEnvironmentAndMemoryTypeOrderByUpdatedAtDesc(
+                    WORKSPACE_ID, ENVIRONMENT, AiAutoMemoryType.PROJECT.ordinal()))
+                        .extracting(AiAutoMemory::getName)
+                        .containsExactly("b");
+    }
+
     private List<AiAutoMemory> findByWorkspace(long workspaceId) {
         return getAiAutoMemoryRepository()
             .findByWorkspaceIdAndPrincipalTypeAndPrincipalIdAndEnvironmentOrderByUpdatedAtDesc(
@@ -159,13 +249,25 @@ public abstract class AiAutoMemoryRepositoryContractTests {
     }
 
     protected AiAutoMemory buildMemory(String name, AiAutoMemoryType memoryType) {
-        AiAutoMemory aiAutoMemory = new AiAutoMemory(AiAutoMemoryPrincipalType.USER, PRINCIPAL_ID);
+        return buildMemory(name, memoryType, AiAutoMemoryPrincipalType.USER, PRINCIPAL_ID, ENVIRONMENT);
+    }
+
+    /**
+     * Builds a memory owned by an explicit principal in an explicit environment. The per-field setters for the
+     * principal are package-private on the entity, so a memory targeting another principal has to be constructed rather
+     * than retargeted after the fact.
+     */
+    protected AiAutoMemory buildMemory(
+        String name, AiAutoMemoryType memoryType, AiAutoMemoryPrincipalType principalType, long principalId,
+        int environment) {
+
+        AiAutoMemory aiAutoMemory = new AiAutoMemory(principalType, principalId);
 
         aiAutoMemory.setName(name);
         aiAutoMemory.setTitle("Title");
         aiAutoMemory.setContent("content");
         aiAutoMemory.setMemoryType(memoryType);
-        aiAutoMemory.setEnvironment(resolveEnvironment());
+        aiAutoMemory.setEnvironment(resolveEnvironment(environment));
 
         // The service layer owns timestamps for every backend, so the contract supplies them rather than expecting
         // a repository to invent them.
@@ -175,7 +277,7 @@ public abstract class AiAutoMemoryRepositoryContractTests {
         return aiAutoMemory;
     }
 
-    private static com.bytechef.platform.configuration.domain.Environment resolveEnvironment() {
-        return com.bytechef.platform.configuration.domain.Environment.values()[ENVIRONMENT];
+    private static com.bytechef.platform.configuration.domain.Environment resolveEnvironment(int environment) {
+        return com.bytechef.platform.configuration.domain.Environment.values()[environment];
     }
 }

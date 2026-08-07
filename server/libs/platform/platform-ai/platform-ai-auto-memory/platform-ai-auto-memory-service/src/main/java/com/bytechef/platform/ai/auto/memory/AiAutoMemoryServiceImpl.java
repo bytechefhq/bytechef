@@ -137,9 +137,9 @@ public class AiAutoMemoryServiceImpl implements AiAutoMemoryService {
     public AiAutoMemory updateById(
         long workspaceId, AiAutoMemoryPrincipalType principalType, long principalId, long memoryId,
         @Nullable String title, @Nullable String description,
-        @Nullable AiAutoMemoryType memoryType, @Nullable String content) {
+        @Nullable AiAutoMemoryType memoryType, @Nullable String content, int environment) {
 
-        AiAutoMemory memory = loadAndCheckOwnership(workspaceId, principalType, principalId, memoryId);
+        AiAutoMemory memory = loadAndCheckOwnership(workspaceId, principalType, principalId, memoryId, environment);
 
         applyPartial(memory, title, description, memoryType, content);
 
@@ -159,9 +159,9 @@ public class AiAutoMemoryServiceImpl implements AiAutoMemoryService {
 
     @Override
     public AiAutoMemory deleteById(
-        long workspaceId, AiAutoMemoryPrincipalType principalType, long principalId, long memoryId) {
+        long workspaceId, AiAutoMemoryPrincipalType principalType, long principalId, long memoryId, int environment) {
 
-        AiAutoMemory memory = loadAndCheckOwnership(workspaceId, principalType, principalId, memoryId);
+        AiAutoMemory memory = loadAndCheckOwnership(workspaceId, principalType, principalId, memoryId, environment);
 
         aiMemoryRepository.delete(memory);
 
@@ -213,13 +213,27 @@ public class AiAutoMemoryServiceImpl implements AiAutoMemoryService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<AiAutoMemory> listAllOwners(
+        long workspaceId, int environment, @Nullable AiAutoMemoryType memoryType) {
+
+        if (memoryType == null) {
+            return aiMemoryRepository.findByWorkspaceIdAndEnvironmentOrderByUpdatedAtDesc(workspaceId, environment);
+        }
+
+        return aiMemoryRepository.findByWorkspaceIdAndEnvironmentAndMemoryTypeOrderByUpdatedAtDesc(
+            workspaceId, environment, memoryType.ordinal());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Optional<AiAutoMemory> findById(
-        long workspaceId, AiAutoMemoryPrincipalType principalType, long principalId, long memoryId) {
+        long workspaceId, AiAutoMemoryPrincipalType principalType, long principalId, long memoryId, int environment) {
 
         return aiMemoryRepository.findById(memoryId)
             .filter(memory -> memory.getPrincipalType() == principalType)
             .filter(memory -> memory.getPrincipalId() == principalId)
-            .filter(memory -> belongsToWorkspace(memory, workspaceId));
+            .filter(memory -> belongsToWorkspace(memory, workspaceId))
+            .filter(memory -> memory.getEnvironmentId() == environment);
     }
 
     @Override
@@ -230,6 +244,12 @@ public class AiAutoMemoryServiceImpl implements AiAutoMemoryService {
         return aiMemoryRepository
             .findByWorkspaceIdAndPrincipalTypeAndPrincipalIdAndEnvironmentOrderByUpdatedAtDesc(
                 workspaceId, principalType.ordinal(), principalId, environment);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<AiAutoMemoryPrincipalCount> listPrincipals(long workspaceId, int environment) {
+        return aiMemoryRepository.listPrincipals(workspaceId, environment);
     }
 
     private AiAutoMemory loadByName(
@@ -276,10 +296,11 @@ public class AiAutoMemoryServiceImpl implements AiAutoMemoryService {
     }
 
     private AiAutoMemory loadAndCheckOwnership(
-        long workspaceId, AiAutoMemoryPrincipalType principalType, long principalId, long memoryId) {
+        long workspaceId, AiAutoMemoryPrincipalType principalType, long principalId, long memoryId, int environment) {
 
-        // Probe-oracle defense: collapse "does not exist" and "exists for another workspace/principal" into the SAME
-        // 404 response so an authenticated attacker cannot enumerate memory ids across workspaces.
+        // Probe-oracle defense: collapse "does not exist" and "exists for another workspace/principal/environment"
+        // into the SAME 404 response so an authenticated attacker cannot enumerate memory ids across workspaces or
+        // environments.
         Optional<AiAutoMemory> memoryOptional = aiMemoryRepository.findById(memoryId);
 
         if (memoryOptional.isEmpty()) {
@@ -290,14 +311,15 @@ public class AiAutoMemoryServiceImpl implements AiAutoMemoryService {
 
         boolean principalOwns = memory.getPrincipalType() == principalType && memory.getPrincipalId() == principalId;
         boolean workspaceClaims = belongsToWorkspace(memory, workspaceId);
+        boolean environmentMatches = memory.getEnvironmentId() == environment;
 
-        if (!principalOwns || !workspaceClaims) {
+        if (!principalOwns || !workspaceClaims || !environmentMatches) {
             log.warn(
-                "Memory ownership mismatch: requester principalType={} principalId={} workspaceId={} attempted to "
-                    + "access memoryId={} owned by principalType={} principalId={}. Returning 404 to avoid leaking "
-                    + "existence.",
-                principalType, principalId, workspaceId, memoryId, memory.getPrincipalType(),
-                memory.getPrincipalId());
+                "Memory ownership mismatch: requester principalType={} principalId={} workspaceId={} environment={} "
+                    + "attempted to access memoryId={} owned by principalType={} principalId={} environment={}. "
+                    + "Returning 404 to avoid leaking existence.",
+                principalType, principalId, workspaceId, environment, memoryId, memory.getPrincipalType(),
+                memory.getPrincipalId(), memory.getEnvironmentId());
 
             throw new AiAutoMemoryNotFoundException("Memory not found");
         }

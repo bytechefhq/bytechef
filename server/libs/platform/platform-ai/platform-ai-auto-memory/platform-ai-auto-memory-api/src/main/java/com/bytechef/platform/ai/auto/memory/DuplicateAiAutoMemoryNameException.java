@@ -18,7 +18,8 @@ package com.bytechef.platform.ai.auto.memory;
 
 /**
  * Thrown when an attempt is made to create or rename a {@link AiAutoMemory} using a name that already exists for the
- * same (workspaceId, userId) pair.
+ * same (workspaceId, principalType, principalId, environment) scope — the owner is a principal, not necessarily a user,
+ * and the same name may legitimately exist in another environment.
  *
  * @author Ivica Cardic
  */

@@ -42,10 +42,10 @@ import org.springframework.ai.tool.method.MethodToolCallbackProvider;
  * Provides persistent long-term memory scoped to the running workflow's principal. The memory is backed by
  * {@link AiAutoMemoryService} and the scope is resolved per agent run from the action context, by platform type:
  * <ul>
- * <li>{@link PlatformType#AUTOMATION} — owned by the project deployment ({@link AiAutoMemoryPrincipalType#DEPLOYMENT});
- * the principal id is the job principal (deployment) id and the workspace id is read from the trigger-injected
- * {@code __jobParameters.contextStore.workspaceId} job metadata entry. Connected-user embedded workflows run under
- * AUTOMATION too, so they are covered here.</li>
+ * <li>{@link PlatformType#AUTOMATION} — owned by the project deployment
+ * ({@link AiAutoMemoryPrincipalType#PROJECT_DEPLOYMENT}); the principal id is the job principal (deployment) id and the
+ * workspace id is read from the trigger-injected {@code __jobParameters.contextStore.workspaceId} job metadata entry.
+ * Connected-user embedded workflows run under AUTOMATION too, so they are covered here.</li>
  * <li>{@link PlatformType#EMBEDDED} — owned by the integration instance
  * ({@link AiAutoMemoryPrincipalType#INTEGRATION_INSTANCE}); the principal id is the job principal (integration
  * instance) id and the workspace is the {@link Workspace#DEFAULT_WORKSPACE_ID} bucket. Embedded iPaaS has no
@@ -101,7 +101,7 @@ public class AiAgentUtilsAutoMemoryTool {
         Long workspaceId = null;
 
         if (platformType == PlatformType.AUTOMATION) {
-            principalType = AiAutoMemoryPrincipalType.DEPLOYMENT;
+            principalType = AiAutoMemoryPrincipalType.PROJECT_DEPLOYMENT;
             workspaceId = extractWorkspaceId(aware.getJobMetadata());
         } else if (platformType == PlatformType.EMBEDDED) {
             principalType = AiAutoMemoryPrincipalType.INTEGRATION_INSTANCE;
