@@ -13,15 +13,17 @@ import useClusterElementsLayout from '../hooks/useClusterElementsLayout';
 import useClusterElementsDataStore from '../stores/useClusterElementsDataStore';
 
 const useClusterElementsWorkflowEditor = () => {
-    const {edges, nodes, onNodesChange, setDraggingNodeId, setIsNodeDragging} = useClusterElementsDataStore(
-        useShallow((state) => ({
-            edges: state.edges,
-            nodes: state.nodes,
-            onNodesChange: state.onNodesChange,
-            setDraggingNodeId: state.setDraggingNodeId,
-            setIsNodeDragging: state.setIsNodeDragging,
-        }))
-    );
+    const {edges, incrementLayoutResetCounter, nodes, onNodesChange, setDraggingNodeId, setIsNodeDragging} =
+        useClusterElementsDataStore(
+            useShallow((state) => ({
+                edges: state.edges,
+                incrementLayoutResetCounter: state.incrementLayoutResetCounter,
+                nodes: state.nodes,
+                onNodesChange: state.onNodesChange,
+                setDraggingNodeId: state.setDraggingNodeId,
+                setIsNodeDragging: state.setIsNodeDragging,
+            }))
+        );
     const workflow = useWorkflowDataStore((state) => state.workflow);
 
     const {updateWorkflowMutation} = useWorkflowEditor();
@@ -109,10 +111,12 @@ const useClusterElementsWorkflowEditor = () => {
 
         resetPendingRef.current = true;
 
+        incrementLayoutResetCounter();
+
         clearAllClusterElementPositions({
             updateWorkflowMutation,
         });
-    }, [updateWorkflowMutation]);
+    }, [incrementLayoutResetCounter, updateWorkflowMutation]);
 
     useClusterElementsLayout();
 

@@ -28,6 +28,16 @@ import {getFilteredClusterElementTypes, isPlainObject} from '../utils/clusterEle
 import createClusterElementsEdges from '../utils/createClusterElementsEdges';
 import createClusterElementsNodes from '../utils/createClusterElementsNodes';
 
+const hasNodeSetChanged = (currentNodes: Array<Node>, layoutNodes: Array<Node>) => {
+    if (currentNodes.length !== layoutNodes.length) {
+        return true;
+    }
+
+    const currentNodeIds = new Set(currentNodes.map((node) => node.id));
+
+    return layoutNodes.some((node) => !currentNodeIds.has(node.id));
+};
+
 const useClusterElementsLayout = () => {
     const {
         mainClusterRootComponentDefinition,
@@ -49,10 +59,12 @@ const useClusterElementsLayout = () => {
             workflow: state.workflow,
         }))
     );
-    const {isNodeDragging, isPositionSaving} = useClusterElementsDataStore(
+    const {isNodeDragging, isPositionSaving, layoutResetCounter, nodesLocked} = useClusterElementsDataStore(
         useShallow((state) => ({
             isNodeDragging: state.isNodeDragging,
             isPositionSaving: state.isPositionSaving,
+            layoutResetCounter: state.layoutResetCounter,
+            nodesLocked: state.nodesLocked,
         }))
     );
     const {workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore(
@@ -128,6 +140,7 @@ const useClusterElementsLayout = () => {
     const previousCanvasWidthRef = useRef(canvasWidth);
     const cancelAnimationRef = useRef<(() => void) | null>(null);
     const animationTargetNodesRef = useRef<Node[] | null>(null);
+    const laidOutLayoutResetCounterRef = useRef(layoutResetCounter);
 
     const workflowDefinitionTasks = useMemo(() => {
         if (!workflow.definition) {
@@ -212,29 +225,21 @@ const useClusterElementsLayout = () => {
         (elements: ClusterElementsType): Array<{componentName: string; componentVersion: number}> =>
             Object.values(elements).flatMap((value) => {
                 if (Array.isArray(value)) {
-                    return value.flatMap((item: ClusterElementItemType) => {
-                        if (item.clusterElements) {
-                            return [
-                                {
-                                    componentName: item.type.split('/')[0],
-                                    componentVersion: Number(item.type?.split('/')[1]?.replace(/^v/, '')) || 1,
-                                },
-                                ...getClusterRootQueryParameters(item.clusterElements),
-                            ];
-                        }
-
-                        return [];
-                    });
+                    return value.flatMap((item: ClusterElementItemType) => [
+                        {
+                            componentName: item.type.split('/')[0],
+                            componentVersion: Number(item.type?.split('/')[1]?.replace(/^v/, '')) || 1,
+                        },
+                        ...getClusterRootQueryParameters(item.clusterElements ?? {}),
+                    ]);
                 } else if (isPlainObject(value)) {
-                    if (value.clusterElements) {
-                        return [
-                            {
-                                componentName: value.type.split('/')[0],
-                                componentVersion: Number(value.type?.split('/')[1]?.replace(/^v/, '')) || 1,
-                            },
-                            ...getClusterRootQueryParameters(value.clusterElements),
-                        ];
-                    }
+                    return [
+                        {
+                            componentName: value.type.split('/')[0],
+                            componentVersion: Number(value.type?.split('/')[1]?.replace(/^v/, '')) || 1,
+                        },
+                        ...getClusterRootQueryParameters(value.clusterElements ?? {}),
+                    ];
                 }
 
                 return [];
@@ -368,6 +373,22 @@ const useClusterElementsLayout = () => {
 
         animationTargetNodesRef.current = null;
 
+        const layoutResetRequested = layoutResetCounter !== laidOutLayoutResetCounterRef.current;
+
+        if (!nodesLocked && !layoutResetRequested && !hasNodeSetChanged(currentNodes, layoutNodes)) {
+            const layoutNodesById = new Map(layoutNodes.map((node) => [node.id, node]));
+
+            setNodes(
+                currentNodes.map((node) => {
+                    const layoutNode = layoutNodesById.get(node.id);
+
+                    return layoutNode ? {...node, data: layoutNode.data} : node;
+                })
+            );
+
+            return;
+        }
+
         const currentRootNode = currentNodes.find((node) => node.id === rootClusterElementNodeData?.workflowNodeName);
 
         const elements = getClusterElementsLayoutElements({
@@ -378,11 +399,13 @@ const useClusterElementsLayout = () => {
             nodes: layoutNodes,
         });
 
+        laidOutLayoutResetCounterRef.current = layoutResetCounter;
+
         setNodes(elements.nodes);
         setEdges(elements.edges);
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [rootClusterElementNodeData, allNodes]);
+    }, [rootClusterElementNodeData, allNodes, layoutResetCounter]);
 
     // Panel toggle animation: shift nodes horizontally when canvas width changes
     useEffect(() => {
