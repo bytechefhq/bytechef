@@ -54,15 +54,17 @@ export default function createClusterElementNodes({
                     const filteredClusterElementTypes = getFilteredClusterElementTypes({
                         clusterRootComponentDefinition: nestedClusterRootsDefinitions[element.type?.split('/')[0]],
                         currentClusterElementsType: element.type?.split('/')[2] || '',
-                        isNestedClusterRoot: !!element.clusterElements,
+                        isNestedClusterRoot: true,
                     });
+
+                    const isNestedClusterRoot = filteredClusterElementTypes.length > 0;
 
                     // Create the multiple element node
                     const multipleElementsNode = createMultipleElementsNode({
                         clusterElementTypeIndex,
                         clusterElementTypeName,
                         clusterRootId,
-                        currentNestedRootElementTypesCount: element.clusterElements
+                        currentNestedRootElementTypesCount: isNestedClusterRoot
                             ? filteredClusterElementTypes.length
                             : undefined,
                         element,
@@ -72,19 +74,19 @@ export default function createClusterElementNodes({
 
                     // Set root parent/child relationship
                     multipleElementsNode.data.parentClusterRootId = clusterRootId;
-                    multipleElementsNode.data.isNestedClusterRoot = !!element.clusterElements;
+                    multipleElementsNode.data.isNestedClusterRoot = isNestedClusterRoot;
 
                     createdNodes.push(multipleElementsNode);
 
                     // Process nested roots
-                    if (element.clusterElements) {
+                    if (isNestedClusterRoot) {
                         const componentName = element.type?.split('/')[0];
 
                         const nestedClusterRootDefinition = nestedClusterRootsDefinitions[componentName];
 
                         if (nestedClusterRootDefinition) {
                             const nestedClusterElementNodes = createClusterElementNodes({
-                                clusterElements: element.clusterElements,
+                                clusterElements: element.clusterElements ?? {},
                                 clusterRootId: element.name,
                                 currentRootComponentDefinition: nestedClusterRootDefinition,
                                 nestedClusterRootElementType: element.type?.split('/')[2] || clusterElementTypeName,
@@ -114,8 +116,10 @@ export default function createClusterElementNodes({
                     clusterRootComponentDefinition:
                         nestedClusterRootsDefinitions[clusterElementValue.type?.split('/')[0]],
                     currentClusterElementsType: clusterElementValue.type?.split('/')[2] || '',
-                    isNestedClusterRoot: !!clusterElementValue.clusterElements,
+                    isNestedClusterRoot: true,
                 });
+
+                const isNestedClusterRoot = filteredClusterElementTypes.length > 0;
 
                 // Create the single element node
                 const singleElementNode = createSingleElementsNode({
@@ -124,7 +128,7 @@ export default function createClusterElementNodes({
                     clusterElementTypeLabel,
                     clusterElementTypeName,
                     clusterRootId,
-                    currentNestedRootElementTypesCount: clusterElementValue.clusterElements
+                    currentNestedRootElementTypesCount: isNestedClusterRoot
                         ? filteredClusterElementTypes.length
                         : undefined,
                     parentClusterRootElementsTypeCount,
@@ -132,19 +136,19 @@ export default function createClusterElementNodes({
 
                 // Set root parent/child relationship
                 singleElementNode.data.parentClusterRootId = clusterRootId;
-                singleElementNode.data.isNestedClusterRoot = !!clusterElementValue.clusterElements;
+                singleElementNode.data.isNestedClusterRoot = isNestedClusterRoot;
 
                 createdNodes.push(singleElementNode);
 
                 // Process nested roots
-                if (clusterElementValue.clusterElements) {
+                if (isNestedClusterRoot) {
                     const componentName = clusterElementValue.type?.split('/')[0];
 
                     const nestedClusterRootDefinition = nestedClusterRootsDefinitions[componentName];
 
                     if (nestedClusterRootDefinition) {
                         const nestedClusterElementNodes = createClusterElementNodes({
-                            clusterElements: clusterElementValue.clusterElements,
+                            clusterElements: clusterElementValue.clusterElements ?? {},
                             clusterRootId: clusterElementValue.name,
                             currentRootComponentDefinition: nestedClusterRootDefinition,
                             nestedClusterRootElementType:
