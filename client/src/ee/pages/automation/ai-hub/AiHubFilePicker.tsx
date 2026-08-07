@@ -1,8 +1,13 @@
 import Button from '@/components/Button/Button';
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from '@/components/ui/command';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
+import {getArtifactIcon} from '@/ee/pages/automation/ai-hub/artifacts/artifactIcons';
+import {handleArtifactQuickOpen, isArtifactClickable} from '@/ee/pages/automation/ai-hub/artifacts/artifactOpen';
 import {groupWorkflowsByProject} from '@/ee/pages/automation/ai-hub/resource-picker/groupWorkflowsByProject';
 import {useAiHubTabsStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
+import {AiHubTaskArtifactI} from '@/ee/pages/automation/ai-hub/tasks/api/tasks.api';
+import {useAiHubTaskArtifactsQuery} from '@/ee/pages/automation/ai-hub/tasks/hooks/useTasks';
+import {useAiHubTasksStore} from '@/ee/pages/automation/ai-hub/tasks/stores/useAiHubTasksStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {Workflow, WorkflowApi} from '@/shared/middleware/automation/configuration';
@@ -18,6 +23,7 @@ import {
     DatabaseIcon,
     FileTextIcon,
     HistoryIcon,
+    PackageIcon,
     PlusIcon,
     VectorSquareIcon,
     WorkflowIcon,
@@ -89,7 +95,8 @@ function useAllWorkspaceWorkflows(workspaceId: number | undefined): WorkflowItem
     }, [workflowDataFingerprint, allProjects]);
 }
 
-type MenuPathType = [] | ['workflows'] | ['files'] | ['dataTables'] | ['knowledgeBases'] | ['workflowExecutions'];
+type MenuPathType =
+    [] | ['workflows'] | ['files'] | ['dataTables'] | ['knowledgeBases'] | ['workflowExecutions'] | ['artifacts'];
 
 const AiHubFilePicker = () => {
     const [open, setOpen] = useState(false);
@@ -102,6 +109,7 @@ const AiHubFilePicker = () => {
     const [knowledgeBasesShowCount, setKnowledgeBasesShowCount] = useState(SECTION_INITIAL_CAP);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
     const environmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+    const currentTaskId = useAiHubTasksStore((state) => state.currentTaskId);
 
     const openFileTab = useAiHubTabsStore((state) => state.openFileTab);
     const openWorkflowTab = useAiHubTabsStore((state) => state.openWorkflowTab);
@@ -136,6 +144,15 @@ const AiHubFilePicker = () => {
         environmentId: environmentId ?? DEVELOPMENT_ENVIRONMENT,
         id: currentWorkspaceId ?? 0,
     });
+
+    // Warm cache hit — the Artifacts card issues this same query under the same key. Non-clickable
+    // artifacts (a WORKFLOW_CREATED with no projectId in metadata, say) have nowhere to route to, so they
+    // are filtered out rather than rendered as dead menu entries.
+    const {data: taskArtifacts} = useAiHubTaskArtifactsQuery(
+        currentTaskId,
+        currentWorkspaceId ?? 0,
+        Boolean(currentWorkspaceId)
+    );
 
     const workflowItems = useAllWorkspaceWorkflows(currentWorkspaceId);
 
@@ -193,6 +210,8 @@ const AiHubFilePicker = () => {
         });
     }, [workflowExecutionsData, lowerSearch]);
 
+    const clickableArtifacts = useMemo(() => (taskArtifacts ?? []).filter(isArtifactClickable), [taskArtifacts]);
+
     const hasResults =
         filteredFiles.length > 0 ||
         filteredDataTables.length > 0 ||
@@ -245,6 +264,11 @@ const AiHubFilePicker = () => {
 
     const handleSelectWorkflowExecution = (id: number, name: string) => {
         openWorkflowExecutionTab(id, name);
+        closeAndReset();
+    };
+
+    const handleSelectArtifact = (artifact: AiHubTaskArtifactI) => {
+        void handleArtifactQuickOpen(artifact);
         closeAndReset();
     };
 
@@ -470,6 +494,14 @@ const AiHubFilePicker = () => {
 
                                     <ChevronRightIcon className="size-3.5 text-muted-foreground" />
                                 </CommandItem>
+
+                                <CommandItem onSelect={() => setMenuPath(['artifacts'])} value="root-artifacts">
+                                    <PackageIcon className="mr-2 size-3.5" />
+
+                                    <span className="flex-1">Artifacts</span>
+
+                                    <ChevronRightIcon className="size-3.5 text-muted-foreground" />
+                                </CommandItem>
                             </CommandGroup>
                         ) : (
                             <>
@@ -680,6 +712,37 @@ const AiHubFilePicker = () => {
                                                 </span>
                                             </CommandItem>
                                         )}
+                                    </CommandGroup>
+                                )}
+
+                                {menuPath[0] === 'artifacts' && (
+                                    <CommandGroup heading="Artifacts">
+                                        {/*
+                                         * cmdk's <CommandEmpty> only renders when the WHOLE Command has zero
+                                         * registered CommandItems, not when this group is empty — the sibling
+                                         * "Back" item (always mounted in every branch view) keeps that count
+                                         * above zero, so <CommandEmpty> would silently render nothing here. A
+                                         * plain element styled like CommandEmpty (`py-6 text-center text-sm`)
+                                         * sidesteps that library limitation.
+                                         */}
+
+                                        {clickableArtifacts.length === 0 && (
+                                            <div className="py-6 text-center text-sm text-muted-foreground">
+                                                No artifacts yet.
+                                            </div>
+                                        )}
+
+                                        {clickableArtifacts.map((artifact) => (
+                                            <CommandItem
+                                                key={`artifact-${artifact.id}`}
+                                                onSelect={() => handleSelectArtifact(artifact)}
+                                                value={`artifact-${artifact.id}-${artifact.artifactName}`}
+                                            >
+                                                {getArtifactIcon(artifact.kind)}
+
+                                                <span className="ml-2 truncate">{artifact.artifactName}</span>
+                                            </CommandItem>
+                                        ))}
                                     </CommandGroup>
                                 )}
                             </>

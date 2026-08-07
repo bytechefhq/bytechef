@@ -5,6 +5,7 @@ import {useAiHubStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubStore';
 import {ThreadPrimitive} from '@assistant-ui/react';
 import {ArrowDownIcon} from 'lucide-react';
 import {FC} from 'react';
+import {twMerge} from 'tailwind-merge';
 
 // Shown while a task switch is fetching that task's history (messages are momentarily empty). The same
 // four-dot pulse as LazyLoadWrapper's suspense fallback and AiHub's deep-link loader, so chunk load →
@@ -83,18 +84,32 @@ const ThreadScrollToBottom: FC = () => (
 );
 
 interface AiHubThreadProps {
+    // Reserves room on the right for the floating artifacts card. The padding sits INSIDE the scroll
+    // viewport rather than on an ancestor, which is what keeps the scrollbar pinned to the pane's edge —
+    // padding an ancestor would narrow the scroller itself and drag the scrollbar inward with it.
+    // AiHubPanel drives this off the same visibility hook the card reads, and applies the matching inset
+    // to the composer so the two keep a shared right edge.
+    contentInsetRight?: boolean;
     // Sample-question chips only make sense for plain copilot tasks — WORKFLOW_CHAT routes to a webhook
     // trigger and PERSONAL_AGENT conversations carry their own purpose, so the panel gates them off there.
     showSuggestions?: boolean;
 }
 
-const AiHubThread: FC<AiHubThreadProps> = ({showSuggestions = true}) => {
+const AiHubThread: FC<AiHubThreadProps> = ({contentInsetRight = false, showSuggestions = true}) => {
     return (
         <ThreadPrimitive.Root
             className="aui-cc-thread-root @container flex h-full flex-col"
             style={{['--thread-max-width' as string]: '44rem'}}
         >
-            <ThreadPrimitive.Viewport className="aui-cc-thread-viewport relative mx-1 flex flex-1 flex-col overflow-x-hidden overflow-y-auto">
+            <ThreadPrimitive.Viewport
+                className={twMerge(
+                    'aui-cc-thread-viewport relative mx-1 flex flex-1 flex-col overflow-x-hidden overflow-y-auto',
+                    // Eased so the transcript slides aside as the card appears rather than jumping the
+                    // instant the first artifact lands mid-turn.
+                    'transition-[padding] duration-200 ease-in-out',
+                    contentInsetRight && 'pr-68'
+                )}
+            >
                 <ThreadPrimitive.If empty>
                     <ThreadEmptyState showSuggestions={showSuggestions} />
                 </ThreadPrimitive.If>

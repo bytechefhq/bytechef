@@ -1,5 +1,7 @@
 import Button from '@/components/Button/Button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import AiHubArtifactsCard from '@/ee/pages/automation/ai-hub/artifacts/AiHubArtifactsCard';
+import useAiHubArtifactsCard from '@/ee/pages/automation/ai-hub/artifacts/useAiHubArtifactsCard';
 import AiHubChatComposer from '@/ee/pages/automation/ai-hub/composer/AiHubChatComposer';
 import AiHubThread from '@/ee/pages/automation/ai-hub/messages/AiHubThread';
 import {useAiHubPersonalAgentQuery} from '@/ee/pages/automation/ai-hub/personal-agents/hooks/useAiHubPersonalAgents';
@@ -16,6 +18,7 @@ import {useAiDefaultModelQuery} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {PanelRightOpenIcon, WrenchIcon} from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
+import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
 const AiHubPanel = () => {
@@ -81,6 +84,10 @@ const AiHubPanel = () => {
 
     const navigate = useNavigate();
 
+    // Same hook the card itself reads, so the column's inset and the card's presence can never disagree.
+    // Both calls resolve against the same two react-query keys, so this one is a cache read.
+    const {visible: artifactsCardVisible} = useAiHubArtifactsCard();
+
     // Note: the "Personal agents" / "Workflow chats" cascades in the model picker are intentionally NOT
     // wired here. Those entries start a NEW conversation, so they only belong on the home composer
     // (AiHubHomePanel) where the user is choosing what to start — inside an existing task the picker is
@@ -88,6 +95,11 @@ const AiHubPanel = () => {
 
     return (
         <div className="relative flex size-full min-h-[50vh] flex-col overflow-x-hidden">
+            {/* Floating artifacts list, absolutely positioned against this relative root. Self-hiding —
+             * see useAiHubArtifactsCard for the conditions under which it renders nothing at all. */}
+
+            <AiHubArtifactsCard />
+
             {/*
              * Panel header: task title on the left, action row (EnvironmentSelect → Ask/Build
              * toggle → clean messages → panel toggle) on the right. The page-level top header was
@@ -184,8 +196,21 @@ const AiHubPanel = () => {
                  * (see aiChatRetryableErrorStore consumers + sonner). Rendering both a banner inside
                  * the thread AND a toast double-notifies the user for the same event. */}
 
+                {/*
+                 * The artifacts card floats over the top-right of this column, so while it is up both the
+                 * transcript and the composer reserve its width (w-64 + right-3 = 268px) instead of letting
+                 * content run underneath it. The two insets are applied separately rather than once on this
+                 * container because the thread's scroll viewport is a descendant: padding the container
+                 * would narrow the scroller and drag the scrollbar away from the pane edge. Both are the
+                 * same value, and both children are `mx-auto` max-width boxes, so they shift by the same
+                 * amount and keep a shared right edge.
+                 */}
+
                 <div className="min-h-0 flex-1">
-                    <AiHubThread showSuggestions={!isWorkflowChat && !isPersonalAgentTask} />
+                    <AiHubThread
+                        contentInsetRight={artifactsCardVisible}
+                        showSuggestions={!isWorkflowChat && !isPersonalAgentTask}
+                    />
                 </div>
 
                 {/*
@@ -198,31 +223,38 @@ const AiHubPanel = () => {
                  * workspace default).
                  */}
 
-                <AiHubChatComposer
-                    modelPicker={
-                        !isWorkflowChat && currentTaskId != null && currentWorkspaceId != null ? (
-                            <ModelPicker
-                                agentDefaultModel={personalAgent?.llmModel ?? null}
-                                agentDefaultProvider={personalAgent?.llmProvider ?? null}
-                                defaultModel={defaultModelData?.aiDefaultModel?.model ?? null}
-                                defaultProvider={defaultModelData?.aiDefaultModel?.provider ?? null}
-                                environment={currentEnvironmentId}
-                                onChange={(provider, model) => {
-                                    writeLastUsedModel(currentWorkspaceId, provider, model);
-                                    setTaskLlmSelection(currentTaskId, provider, model);
-                                }}
-                                selectedModel={
-                                    taskLlmSelection?.model ?? readLastUsedModel(currentWorkspaceId)?.model ?? null
-                                }
-                                selectedProvider={
-                                    taskLlmSelection?.provider ??
-                                    readLastUsedModel(currentWorkspaceId)?.provider ??
-                                    null
-                                }
-                            />
-                        ) : null
-                    }
-                />
+                <div
+                    className={twMerge(
+                        'transition-[padding] duration-200 ease-in-out',
+                        artifactsCardVisible && 'pr-68'
+                    )}
+                >
+                    <AiHubChatComposer
+                        modelPicker={
+                            !isWorkflowChat && currentTaskId != null && currentWorkspaceId != null ? (
+                                <ModelPicker
+                                    agentDefaultModel={personalAgent?.llmModel ?? null}
+                                    agentDefaultProvider={personalAgent?.llmProvider ?? null}
+                                    defaultModel={defaultModelData?.aiDefaultModel?.model ?? null}
+                                    defaultProvider={defaultModelData?.aiDefaultModel?.provider ?? null}
+                                    environment={currentEnvironmentId}
+                                    onChange={(provider, model) => {
+                                        writeLastUsedModel(currentWorkspaceId, provider, model);
+                                        setTaskLlmSelection(currentTaskId, provider, model);
+                                    }}
+                                    selectedModel={
+                                        taskLlmSelection?.model ?? readLastUsedModel(currentWorkspaceId)?.model ?? null
+                                    }
+                                    selectedProvider={
+                                        taskLlmSelection?.provider ??
+                                        readLastUsedModel(currentWorkspaceId)?.provider ??
+                                        null
+                                    }
+                                />
+                            ) : null
+                        }
+                    />
+                </div>
             </div>
         </div>
     );

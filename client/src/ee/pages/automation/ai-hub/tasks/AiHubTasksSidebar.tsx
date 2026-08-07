@@ -19,23 +19,16 @@ import {
     isTaskRunning,
 } from '@/ee/pages/automation/ai-hub/runtime-providers/stores/useAiHubRunStateStore';
 import {aiHubStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubStore';
-import {aiHubTabsStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
 import {useLiveWorkflowLabel} from '@/ee/pages/automation/ai-hub/tasks/hooks/useLiveWorkflowLabel';
 import {useSwitchTask} from '@/ee/pages/automation/ai-hub/tasks/hooks/useSwitchTask';
 import {
-    useAiHubTaskArtifactsQuery,
     useAiHubTasksQuery,
     useDeleteAiHubTaskMutation,
     usePatchAiHubTaskMutation,
 } from '@/ee/pages/automation/ai-hub/tasks/hooks/useTasks';
 import {aiHubTasksStore, useAiHubTasksStore} from '@/ee/pages/automation/ai-hub/tasks/stores/useAiHubTasksStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import {ProjectApi} from '@/shared/middleware/automation/configuration';
-import {
-    useCancelAiHubRunMutation,
-    useCancelWorkflowChatTurnMutation,
-    useDeleteAiHubTaskArtifactMutation,
-} from '@/shared/middleware/graphql';
+import {useCancelAiHubRunMutation, useCancelWorkflowChatTurnMutation} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {
@@ -47,11 +40,7 @@ import {
     ChevronDownIcon,
     ChevronLeftIcon,
     ChevronRightIcon,
-    CodeIcon,
-    DatabaseIcon,
-    FileTextIcon,
     HexagonIcon,
-    ImageIcon,
     LinkIcon,
     Loader2Icon,
     MessageCircleQuestionIcon,
@@ -59,19 +48,16 @@ import {
     MessageSquarePlusIcon,
     MoreVerticalIcon,
     PencilIcon,
-    PlayIcon,
     RotateCcwIcon,
     Trash2Icon,
     WorkflowIcon,
-    WrenchIcon,
-    XIcon,
 } from 'lucide-react';
 import {type MouseEvent, useEffect, useMemo, useRef, useState} from 'react';
 import {Link, useLocation, useNavigate} from 'react-router-dom';
 import {toast} from 'sonner';
 import {twMerge} from 'tailwind-merge';
 
-import {AiHubArtifactKindType, AiHubTaskArtifactI, AiHubTaskI, generateAiHubTaskTitle} from './api/tasks.api';
+import {AiHubTaskI, generateAiHubTaskTitle} from './api/tasks.api';
 
 export const TASKS_PAGE_SIZE = 25;
 
@@ -94,94 +80,6 @@ const TasksSidebarSkeleton = () => (
     </div>
 );
 
-function getArtifactIcon(kind: AiHubArtifactKindType) {
-    if (kind === 'FILE_CREATED' || kind === 'FILE_UPDATED' || kind === 'FILE_REFERENCED') {
-        return <FileTextIcon className="size-3.5 shrink-0 text-muted-foreground" />;
-    }
-
-    if (kind === 'BINARY_FILE_CREATED') {
-        return <ImageIcon className="size-3.5 shrink-0 text-muted-foreground" />;
-    }
-
-    if (kind === 'WORKFLOW_EXECUTION_STARTED') {
-        return <PlayIcon className="size-3.5 shrink-0 text-muted-foreground" />;
-    }
-
-    if (kind === 'WORKFLOW_CREATED' || kind === 'WORKFLOW_UPDATED' || kind === 'WORKFLOW_REFERENCED') {
-        return <WorkflowIcon className="size-3.5 shrink-0 text-muted-foreground" />;
-    }
-
-    if (
-        kind === 'DATA_TABLE_ROW_ADDED' ||
-        kind === 'DATA_TABLE_ROW_UPDATED' ||
-        kind === 'DATA_TABLE_ROW_DELETED' ||
-        kind === 'DATA_TABLE_COLUMN_ADDED' ||
-        kind === 'DATA_TABLE_REFERENCED'
-    ) {
-        return <DatabaseIcon className="size-3.5 shrink-0 text-muted-foreground" />;
-    }
-
-    if (kind === 'KB_DOCUMENT_ADDED' || kind === 'KB_DOCUMENT_DELETED' || kind === 'KB_REFERENCED') {
-        return <BrainIcon className="size-3.5 shrink-0 text-muted-foreground" />;
-    }
-
-    if (kind === 'SKILL_REFERENCED') {
-        return <HexagonIcon className="size-3.5 shrink-0 text-muted-foreground" />;
-    }
-
-    if (kind === 'CUSTOM_COMPONENT_REFERENCED') {
-        return <BlocksIcon className="size-3.5 shrink-0 text-muted-foreground" />;
-    }
-
-    if (kind === 'CODE_WORKFLOW_REFERENCED') {
-        return <CodeIcon className="size-3.5 shrink-0 text-muted-foreground" />;
-    }
-
-    return <WrenchIcon className="size-3.5 shrink-0 text-muted-foreground" />;
-}
-
-function parseMetadataJson(metadataJson: string | null): Record<string, string> {
-    if (!metadataJson) {
-        return {};
-    }
-
-    try {
-        return JSON.parse(metadataJson) as Record<string, string>;
-    } catch (parseError) {
-        // A server-side serialization bug would otherwise make every artifact non-clickable with no diagnostic
-        // trail. Surface a console warning so devtools makes the failure visible; we still fall back to {} to keep
-        // the rest of the sidebar rendering.
-        console.warn('[AiHubTasksSidebar] Failed to parse artifact metadataJson; quick-open will be disabled', {
-            parseError,
-            raw: metadataJson,
-        });
-
-        return {};
-    }
-}
-
-/*
- * Quick-open affordance:
- * - FILE_CREATED / BINARY_FILE_CREATED → opens file tab
- * - WORKFLOW_EXECUTION_STARTED → opens the execution as a right-panel tab
- * - WORKFLOW_CREATED / WORKFLOW_UPDATED → opens workflow tab if metadataJson.projectId is present;
- *   otherwise no quick-open (projectId needed for tab routing)
- * - DATA_TABLE_* → opens data table tab using metadataJson.dataTableId if present;
- *   DATA_TABLE_ROW_* artifactId is a row id which doesn't open cleanly, so we fall back to metadataJson
- * - KB_DOCUMENT_* → opens knowledge-base tab using metadataJson.knowledgeBaseId if present
- * - SKILL_REFERENCED → opens skill tab using artifactId directly (the artifact is the skill itself,
- *   same shape as DATA_TABLE_REFERENCED / KB_REFERENCED)
- * - CUSTOM_COMPONENT_REFERENCED → opens custom-component tab using artifactId directly, same shape as
- *   SKILL_REFERENCED
- * - CODE_WORKFLOW_REFERENCED → artifactId IS the projectId (same shape as CUSTOM_COMPONENT_REFERENCED),
- *   but openCodeWorkflowTab also needs a `language`, which the artifact row doesn't carry (the recorder
- *   only stashes artifactId + name). We fetch the project via ProjectApi().getProject on click and read
- *   its `codeWorkflowLanguage`; if the fetch fails or the project is no longer code-backed, we surface a
- *   toast instead of opening a tab.
- *
- * Limitation: if metadataJson doesn't carry the parent entity id (projectId / dataTableId /
- * knowledgeBaseId), the artifact row is rendered as non-clickable (icon + name + timestamp only).
- */
 /**
  * Cancel a task's in-flight run when it is deleted mid-stream, so the server stops producing events
  * instead of leaving the run in InFlightAiHubRunRegistry until its TTL (where it keeps consuming model
@@ -283,408 +181,29 @@ export function reconcileProbedTaskActivity({
     return decision;
 }
 
-/**
- * CODE_WORKFLOW_REFERENCED's artifact row only carries artifactId (= projectId) + name — the language
- * `openCodeWorkflowTab` needs was never stashed on the artifact (see {@link OpenCodeWorkflowTabToolCallback}
- * on the server, which only records projectId + name). Fetch the project and read its
- * `codeWorkflowLanguage` (added alongside code workflows) rather than inventing a value. A missing
- * language means the project is no longer code-backed (e.g. converted back to a visual workflow) — surface
- * that as a toast instead of opening a tab with a bogus language.
- */
-async function openCodeWorkflowArtifact(artifact: AiHubTaskArtifactI): Promise<void> {
-    try {
-        const project = await new ProjectApi().getProject({id: Number(artifact.artifactId)});
-
-        if (!project.codeWorkflowLanguage) {
-            toast.error(`"${artifact.artifactName}" is no longer a code workflow.`);
-
-            return;
-        }
-
-        aiHubTabsStore
-            .getState()
-            .openCodeWorkflowTab(artifact.artifactId, project.codeWorkflowLanguage, artifact.artifactName);
-    } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-
-        toast.error(`Failed to open "${artifact.artifactName}": ${message}`);
-    }
-}
-
-export async function handleArtifactQuickOpen(artifact: AiHubTaskArtifactI): Promise<void> {
-    const metadata = parseMetadataJson(artifact.metadataJson);
-
-    // FILE_REFERENCED carries the same artifactId shape as FILE_CREATED (asset_file id), so a single
-    // openFileTab call covers both quick-open paths. Same applies to the *_REFERENCED variants below for
-    // workflow / data-table / knowledge-base — they were missing here, so the rows in the sidebar artifact
-    // list looked clickable-shaped (wrench icon, hover) but had no handler firing on click.
-    if (
-        artifact.kind === 'FILE_CREATED' ||
-        artifact.kind === 'FILE_UPDATED' ||
-        artifact.kind === 'BINARY_FILE_CREATED' ||
-        artifact.kind === 'FILE_REFERENCED'
-    ) {
-        aiHubTabsStore.getState().openFileTab(artifact.artifactId, artifact.artifactName);
-
-        return;
-    }
-
-    if (artifact.kind === 'WORKFLOW_EXECUTION_STARTED') {
-        // Opens the execution as a right-panel tab instead of a new browser tab. artifactId is the
-        // workflow execution id; openWorkflowExecutionTab takes a number.
-        aiHubTabsStore.getState().openWorkflowExecutionTab(Number(artifact.artifactId), artifact.artifactName);
-
-        return;
-    }
-
-    if (
-        artifact.kind === 'WORKFLOW_CREATED' ||
-        artifact.kind === 'WORKFLOW_UPDATED' ||
-        artifact.kind === 'WORKFLOW_REFERENCED'
-    ) {
-        const projectId = metadata['projectId'];
-        const projectWorkflowId = Number(metadata['projectWorkflowId'] ?? 0);
-
-        if (projectId) {
-            aiHubTabsStore
-                .getState()
-                .openWorkflowTab(artifact.artifactId, projectId, projectWorkflowId, artifact.artifactName);
-        }
-
-        return;
-    }
-
-    if (
-        artifact.kind === 'DATA_TABLE_ROW_ADDED' ||
-        artifact.kind === 'DATA_TABLE_ROW_UPDATED' ||
-        artifact.kind === 'DATA_TABLE_ROW_DELETED' ||
-        artifact.kind === 'DATA_TABLE_COLUMN_ADDED' ||
-        artifact.kind === 'DATA_TABLE_REFERENCED'
-    ) {
-        // DATA_TABLE_REFERENCED stores the dataTableId directly as artifactId (the artifact is the table
-        // itself). The DATA_TABLE_ROW_* and DATA_TABLE_COLUMN_ADDED variants store a row id / column id as
-        // artifactId and stash the parent dataTableId in metadata — fall back to artifactId for the
-        // referenced case.
-        const dataTableId = metadata['dataTableId'] ?? artifact.artifactId;
-
-        if (dataTableId) {
-            aiHubTabsStore.getState().openDataTableTab(dataTableId, metadata['name'] ?? artifact.artifactName);
-        }
-
-        return;
-    }
-
-    if (
-        artifact.kind === 'KB_DOCUMENT_ADDED' ||
-        artifact.kind === 'KB_DOCUMENT_DELETED' ||
-        artifact.kind === 'KB_REFERENCED'
-    ) {
-        // KB_REFERENCED stores the knowledgeBaseId directly as artifactId. Document-add/delete variants stash
-        // it in metadata — same fallback logic as the data-table case above.
-        const knowledgeBaseId = metadata['knowledgeBaseId'] ?? artifact.artifactId;
-
-        if (knowledgeBaseId) {
-            aiHubTabsStore.getState().openKnowledgeBaseTab(knowledgeBaseId, metadata['name'] ?? artifact.artifactName);
-        }
-
-        return;
-    }
-
-    if (artifact.kind === 'SKILL_REFERENCED') {
-        aiHubTabsStore.getState().openSkillTab(artifact.artifactId, artifact.artifactName);
-
-        return;
-    }
-
-    if (artifact.kind === 'CUSTOM_COMPONENT_REFERENCED') {
-        aiHubTabsStore.getState().openCustomComponentTab(artifact.artifactId, artifact.artifactName);
-
-        return;
-    }
-
-    if (artifact.kind === 'CODE_WORKFLOW_REFERENCED') {
-        await openCodeWorkflowArtifact(artifact);
-
-        return;
-    }
-}
-
-/**
- * Open an artifact that lives under a (possibly non-active) task row in the sidebar.
- *
- * The resource panel ({@link aiHubTabsStore}) is per-task: {@link handleArtifactQuickOpen}'s
- * openFileTab/openWorkflowTab/etc. always append to whichever task is currently mirrored. So clicking a
- * resource nested under a DIFFERENT task than the open conversation would otherwise dump the resource into
- * the active conversation's right panel, leaving the middle (chat) panel out of sync with the resource the
- * user clicked. We switch to the owning task first so the conversation and the resource stay coherent.
- *
- * Ordering matters: {@link useSwitchTask} flips `currentTaskId`, but the tabs store only re-mirrors via an
- * effect in AiHub.tsx that runs on the NEXT render. We mirror it synchronously with
- * {@code setActiveTaskId(task.id)} BEFORE opening so the tab lands on the newly-switched task's set — without
- * it, the open would append to the previous task and the later effect-driven snapshot/restore would wipe it.
- * That explicit call is idempotent with the effect (same id → no-op guard in setActiveTaskId).
- *
- * On switch failure we bail without opening — switchTask already surfaced the error toast, and opening the
- * resource against the still-active (wrong) conversation would compound the confusion.
- */
-export async function openArtifactInTask(
-    artifact: AiHubTaskArtifactI,
-    task: AiHubTaskI,
-    currentTaskId: number | undefined,
-    switchTask: (task: AiHubTaskI) => Promise<boolean>
-): Promise<void> {
-    if (task.id !== currentTaskId) {
-        const switched = await switchTask(task);
-
-        if (!switched) {
-            return;
-        }
-
-        aiHubTabsStore.getState().setActiveTaskId(task.id);
-    }
-
-    await handleArtifactQuickOpen(artifact);
-}
-
-// Reference-kind artifacts are user-attached and removable; agent-driven audit rows
-// (FILE_CREATED, WORKFLOW_EXECUTION_STARTED, MEMORY_*, etc.) are immutable history and must NOT
-// expose a remove affordance — deleting them would corrupt the workspace-wide audit listing.
-function isArtifactRemovable(artifact: AiHubTaskArtifactI): boolean {
-    return (
-        artifact.kind === 'FILE_REFERENCED' ||
-        artifact.kind === 'WORKFLOW_REFERENCED' ||
-        artifact.kind === 'DATA_TABLE_REFERENCED' ||
-        artifact.kind === 'KB_REFERENCED' ||
-        artifact.kind === 'SKILL_REFERENCED' ||
-        artifact.kind === 'CUSTOM_COMPONENT_REFERENCED' ||
-        artifact.kind === 'CODE_WORKFLOW_REFERENCED'
-    );
-}
-
-function isArtifactClickable(artifact: AiHubTaskArtifactI): boolean {
-    if (
-        artifact.kind === 'FILE_CREATED' ||
-        artifact.kind === 'FILE_UPDATED' ||
-        artifact.kind === 'BINARY_FILE_CREATED' ||
-        artifact.kind === 'FILE_REFERENCED'
-    ) {
-        return true;
-    }
-
-    if (artifact.kind === 'WORKFLOW_EXECUTION_STARTED') {
-        return true;
-    }
-
-    const metadata = parseMetadataJson(artifact.metadataJson);
-
-    if (artifact.kind === 'WORKFLOW_CREATED' || artifact.kind === 'WORKFLOW_UPDATED') {
-        return !!metadata['projectId'];
-    }
-
-    if (artifact.kind === 'WORKFLOW_REFERENCED') {
-        // Referenced-workflow rows came from a tab open — they may not have projectId in metadata yet
-        // (the recordReference mutation doesn't currently stash it). Fall back to artifactId being non-empty
-        // so the click attempt at least dispatches; if projectId is truly missing, openWorkflowTab no-ops
-        // without surfacing an error.
-        return !!artifact.artifactId;
-    }
-
-    if (
-        artifact.kind === 'DATA_TABLE_ROW_ADDED' ||
-        artifact.kind === 'DATA_TABLE_ROW_UPDATED' ||
-        artifact.kind === 'DATA_TABLE_ROW_DELETED' ||
-        artifact.kind === 'DATA_TABLE_COLUMN_ADDED'
-    ) {
-        return !!metadata['dataTableId'];
-    }
-
-    if (artifact.kind === 'DATA_TABLE_REFERENCED') {
-        // For referenced tables, artifactId IS the dataTableId — no metadata lookup needed.
-        return !!artifact.artifactId;
-    }
-
-    if (artifact.kind === 'KB_DOCUMENT_ADDED' || artifact.kind === 'KB_DOCUMENT_DELETED') {
-        return !!metadata['knowledgeBaseId'];
-    }
-
-    if (artifact.kind === 'KB_REFERENCED') {
-        // Same logic as DATA_TABLE_REFERENCED — artifactId IS the knowledgeBaseId.
-        return !!artifact.artifactId;
-    }
-
-    if (artifact.kind === 'SKILL_REFERENCED') {
-        // Same logic as DATA_TABLE_REFERENCED / KB_REFERENCED — artifactId IS the skillId.
-        return !!artifact.artifactId;
-    }
-
-    if (artifact.kind === 'CUSTOM_COMPONENT_REFERENCED') {
-        // Same logic as SKILL_REFERENCED — artifactId IS the custom component id.
-        return !!artifact.artifactId;
-    }
-
-    if (artifact.kind === 'CODE_WORKFLOW_REFERENCED') {
-        // Same logic as CUSTOM_COMPONENT_REFERENCED — artifactId IS the projectId. The language fetch
-        // that quick-open needs happens on click (see openCodeWorkflowArtifact), not here.
-        return !!artifact.artifactId;
-    }
-
-    return false;
-}
-
-interface ArtifactRowProps {
-    artifact: AiHubTaskArtifactI;
-    task: AiHubTaskI;
-    workspaceId: number;
-}
-
-const ArtifactRow = ({artifact, task, workspaceId}: ArtifactRowProps) => {
-    const clickable = isArtifactClickable(artifact);
-    const removable = isArtifactRemovable(artifact);
-
-    const queryClient = useQueryClient();
-
-    const currentTaskId = useAiHubTasksStore((state) => state.currentTaskId);
-    const switchTask = useSwitchTask();
-
-    const deleteMutation = useDeleteAiHubTaskArtifactMutation({
-        onError: (error) => {
-            const message = error instanceof Error ? error.message : String(error);
-
-            toast.error(`Failed to remove ${artifact.artifactName}: ${message}`);
-        },
-        // The artifact list query is keyed by ['aiHubTasks', 'artifacts', taskId, workspaceId]
-        // (see AiHubTasksKeys.artifacts) — invalidate by that prefix so the row disappears from the
-        // sidebar without needing the exact key shape react-query built it under. Matching on both
-        // segments avoids needlessly refetching the task list/messages, which share the 'aiHubTasks'
-        // root. Mirrors useRecordReferencedArtifacts' invalidation strategy.
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                predicate: (query) => {
-                    const key = query.queryKey;
-
-                    if (!Array.isArray(key) || key.length < 2) {
-                        return false;
-                    }
-
-                    return key[0] === 'aiHubTasks' && key[1] === 'artifacts';
-                },
-            });
-        },
-    });
-
-    const handleRemove = (event: MouseEvent<HTMLButtonElement>) => {
-        // The remove button sits inside the quick-open button when the row is clickable; stop the click
-        // from bubbling so removing doesn't also trigger the artifact viewer.
-        event.stopPropagation();
-
-        deleteMutation.mutate({
-            input: {
-                artifactId: String(artifact.id),
-                workspaceId: String(workspaceId),
-            },
-        });
-    };
-
-    const content = (
-        <div className="flex min-w-0 flex-1 items-center gap-1.5">
-            {getArtifactIcon(artifact.kind)}
-
-            <span className="min-w-0 flex-1 truncate text-xs text-foreground">{artifact.artifactName}</span>
-
-            {removable && (
-                <button
-                    aria-label={`Remove ${artifact.artifactName}`}
-                    className="shrink-0 rounded p-0.5 text-muted-foreground opacity-0 group-hover:opacity-100 hover:bg-muted hover:text-foreground"
-                    disabled={deleteMutation.isPending}
-                    onClick={handleRemove}
-                    type="button"
-                >
-                    <XIcon className="size-3" />
-                </button>
-            )}
-        </div>
-    );
-
-    if (clickable) {
-        return (
-            <button
-                className="group flex w-full items-center gap-1.5 rounded px-1.5 py-1 text-left hover:bg-accent"
-                onClick={() => void openArtifactInTask(artifact, task, currentTaskId, switchTask)}
-                type="button"
-            >
-                {content}
-            </button>
-        );
-    }
-
-    return <div className="group flex items-center gap-1.5 px-1.5 py-1">{content}</div>;
-};
-
-interface ArtifactListProps {
-    task: AiHubTaskI;
-    workspaceId: number;
-}
-
-const ArtifactList = ({task, workspaceId}: ArtifactListProps) => {
-    const {data: artifacts, isLoading} = useAiHubTaskArtifactsQuery(task.id, workspaceId);
-
-    if (isLoading) {
-        return (
-            <div className="mt-1 ml-4 flex flex-col gap-1 px-1">
-                <Skeleton className="h-5 w-full" />
-
-                <Skeleton className="h-5 w-3/4" />
-            </div>
-        );
-    }
-
-    if (!artifacts || artifacts.length === 0) {
-        return (
-            <div className="mt-1 ml-4 px-1.5 py-1">
-                <span className="text-xs text-muted-foreground">No artifacts yet</span>
-            </div>
-        );
-    }
-
-    return (
-        <div className="mt-1 ml-4 flex flex-col">
-            {artifacts.map((artifact) => (
-                <ArtifactRow artifact={artifact} key={artifact.id} task={task} workspaceId={workspaceId} />
-            ))}
-        </div>
-    );
-};
-
 interface TaskItemProps {
     task: AiHubTaskI;
     isCurrent: boolean;
-    isExpanded: boolean;
     onArchive: () => void;
     onDelete: () => void;
     onRename: () => void;
     onSelect: () => void;
-    onToggleExpand: () => void;
     onUnarchive: () => void;
     workspaceId: number;
 }
 
 const TaskItem = ({
     isCurrent,
-    isExpanded,
     onArchive,
     onDelete,
     onRename,
     onSelect,
-    onToggleExpand,
     onUnarchive,
     task,
     workspaceId,
 }: TaskItemProps) => {
     const queryClient = useQueryClient();
     const isArchived = task.status === 'ARCHIVED';
-    // Workflow-chat tasks route through a webhook, not the LLM agent, so they never produce artifacts.
-    // Hide the whole artifact affordance for them (no expand chevron, no count, no "No artifacts yet").
-    const showArtifacts = task.kind !== 'WORKFLOW_CHAT';
 
     // Subscribe specifically to this task's title-generation failure flag so a retry icon appears
     // on the row when the most recent automatic title-generation attempt failed. Without this, the toast
@@ -702,21 +221,6 @@ const TaskItem = ({
     // updates without re-rendering all the others.
     const activityState = useAiHubTasksStore((state) => state.taskActivity[task.threadId]);
     const [isRetryingTitle, setIsRetryingTitle] = useState(false);
-
-    /*
-     * Artifact count badge: we only know the count once the list has been fetched
-     * (expand-on-demand approach). Before first expand, no badge is shown.
-     * After first expand, the badge reflects the loaded count even when collapsed.
-     * This avoids firing N artifact queries for N sidebar rows on initial load.
-     */
-    const artifactsEnabled = isExpanded && showArtifacts;
-    const {data: artifacts} = useAiHubTaskArtifactsQuery(
-        artifactsEnabled ? task.id : undefined,
-        workspaceId,
-        artifactsEnabled
-    );
-
-    const artifactCount = artifacts?.length ?? 0;
 
     const handleRetryTitleGeneration = async (event: MouseEvent<HTMLButtonElement>) => {
         event.stopPropagation();
@@ -859,12 +363,6 @@ const TaskItem = ({
                         </button>
                     )}
 
-                    {artifactCount > 0 && (
-                        <span className="rounded bg-muted px-1 py-0.5 text-xs font-medium text-muted-foreground">
-                            {artifactCount}
-                        </span>
-                    )}
-
                     {/*
                      * Hover-only action buttons. Switched from `opacity-0 group-hover:opacity-100` to
                      * `hidden group-hover:flex` so the buttons don't reserve layout space when invisible —
@@ -874,24 +372,6 @@ const TaskItem = ({
                      * appear and re-truncate the title (acceptable since the user is mousing over).
                      * `focus-within:flex` keeps keyboard navigation working without a hover.
                      */}
-
-                    {showArtifacts && (
-                        <button
-                            aria-label={isExpanded ? 'Collapse artifacts' : 'Expand artifacts'}
-                            className="hidden rounded p-0.5 group-focus-within:flex group-hover:flex hover:bg-muted focus:flex"
-                            onClick={(event) => {
-                                event.stopPropagation();
-                                onToggleExpand();
-                            }}
-                            type="button"
-                        >
-                            {isExpanded ? (
-                                <ChevronDownIcon className="size-3.5" />
-                            ) : (
-                                <ChevronRightIcon className="size-3.5" />
-                            )}
-                        </button>
-                    )}
 
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -932,8 +412,6 @@ const TaskItem = ({
                     </DropdownMenu>
                 </div>
             </div>
-
-            {isExpanded && showArtifacts && <ArtifactList task={task} workspaceId={workspaceId} />}
         </div>
     );
 };
@@ -948,7 +426,6 @@ interface DeleteDialogStateI {
 }
 
 const AiHubTasksSidebar = () => {
-    const [expandedTaskIds, setExpandedTaskIds] = useState<Set<number>>(new Set());
     const [renameState, setRenameState] = useState<RenameDialogStateI | null>(null);
     const [renameInputValue, setRenameInputValue] = useState('');
     const [deleteDialogState, setDeleteDialogState] = useState<DeleteDialogStateI | null>(null);
@@ -1175,20 +652,6 @@ const AiHubTasksSidebar = () => {
         setDeleteDialogState(null);
     };
 
-    const handleToggleExpand = (taskId: number) => {
-        setExpandedTaskIds((previous) => {
-            const next = new Set(previous);
-
-            if (next.has(taskId)) {
-                next.delete(taskId);
-            } else {
-                next.add(taskId);
-            }
-
-            return next;
-        });
-    };
-
     const isViewingArchived = activeFilter === 'ARCHIVED';
 
     const {pathname} = useLocation();
@@ -1333,7 +796,7 @@ const AiHubTasksSidebar = () => {
              * affordance so the user always has a clear way back.
              *
              * Memories used to live here as a small icon; it's been promoted to a full top-level menu item
-             * above (alongside Personal Agents, Workflow Chats, and Artifact History). One canonical entry point per
+             * above (alongside Personal Agents and Workflow Chats). One canonical entry point per
              * destination keeps the sidebar uncluttered and avoids the "two ways to do the same thing"
              * trap where users wonder whether the small icon and the top-level item differ.
              */}
@@ -1413,13 +876,11 @@ const AiHubTasksSidebar = () => {
                         ) : (
                             <TaskItem
                                 isCurrent={currentTaskId === task.id}
-                                isExpanded={expandedTaskIds.has(task.id)}
                                 key={task.id}
                                 onArchive={() => handleArchive(task)}
                                 onDelete={() => handleDelete(task)}
                                 onRename={() => handleRename(task)}
                                 onSelect={() => handleSelectTask(task)}
-                                onToggleExpand={() => handleToggleExpand(task.id)}
                                 onUnarchive={() => handleUnarchive(task)}
                                 task={task}
                                 workspaceId={currentWorkspaceId}

@@ -15,6 +15,7 @@ vi.mock('@/ee/pages/automation/ai-hub/composer/AiHubChatComposer', () => ({
 }));
 
 vi.mock('@/ee/pages/automation/ai-hub/tasks/hooks/useTasks', () => ({
+    useAiHubTaskArtifactsQuery: () => ({data: []}),
     useAiHubTasksQuery: () => ({data: [], isLoading: false}),
 }));
 
