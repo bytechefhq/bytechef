@@ -11,10 +11,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.mockito.Mockito.mock;
 
-import com.bytechef.ee.ai.hub.task.AiHubTaskService;
-import com.bytechef.ee.platform.ai.tool.usage.ToolUsageRecorder;
+import com.bytechef.platform.ai.tool.BraveWebSearchTools;
 import com.bytechef.platform.ai.tool.FirecrawlTools;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
@@ -35,21 +35,43 @@ class ResearchConfigurationTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    void testResearchChatClientIsBuilt() {
-        ChatModel chatModel = mock(ChatModel.class);
-        FirecrawlTools firecrawlTools = mock(FirecrawlTools.class);
-        Resource promptResource = new ByteArrayResource(
-            "You are a research assistant.".getBytes(StandardCharsets.UTF_8),
-            "test prompt_research.txt");
-
-        ObjectProvider<ToolUsageRecorder> usageRecorderProvider = mock(ObjectProvider.class);
-        ObjectProvider<AiHubTaskService> taskServiceProvider = mock(ObjectProvider.class);
-        JsonMapper jsonMapper = new JsonMapper();
-
+    void testResearchChatClientIsBuiltWithFirecrawlOnly() {
         assertThatNoException().isThrownBy(
             () -> researchConfiguration.researchChatClient(
-                chatModel, firecrawlTools, usageRecorderProvider,
-                taskServiceProvider, jsonMapper, promptResource));
+                mock(ChatModel.class), Optional.of(mock(FirecrawlTools.class)), Optional.empty(),
+                mock(ObjectProvider.class), mock(ObjectProvider.class), new JsonMapper(), promptResource()));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testResearchChatClientIsBuiltWithBraveOnly() {
+        assertThatNoException().isThrownBy(
+            () -> researchConfiguration.researchChatClient(
+                mock(ChatModel.class), Optional.empty(), Optional.of(mock(BraveWebSearchTools.class)),
+                mock(ObjectProvider.class), mock(ObjectProvider.class), new JsonMapper(), promptResource()));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testResearchChatClientIsBuiltWithBothProviders() {
+        assertThatNoException().isThrownBy(
+            () -> researchConfiguration.researchChatClient(
+                mock(ChatModel.class), Optional.of(mock(FirecrawlTools.class)),
+                Optional.of(mock(BraveWebSearchTools.class)), mock(ObjectProvider.class), mock(ObjectProvider.class),
+                new JsonMapper(), promptResource()));
+    }
+
+    private static Resource promptResource() {
+        return new ByteArrayResource(
+            "You are a research assistant.".getBytes(StandardCharsets.UTF_8), "test prompt_research.txt");
+    }
+
+    @Test
+    void testMapMeteredToolName() {
+        assertThat(ResearchConfiguration.mapMeteredToolName("webSearch")).isEqualTo("firecrawl_search");
+        assertThat(ResearchConfiguration.mapMeteredToolName("webpageScrape")).isEqualTo("firecrawl_scrape");
+        assertThat(ResearchConfiguration.mapMeteredToolName("braveWebSearch")).isEqualTo("brave_search");
+        assertThat(ResearchConfiguration.mapMeteredToolName("unknownTool")).isNull();
     }
 
     @Test

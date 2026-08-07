@@ -1,5 +1,8 @@
 bytechef:
   ai:
+    brave:
+      base-url: https://api.search.brave.com/res/v1
+      enabled: false
     copilot:
       enabled: false
     firecrawl:

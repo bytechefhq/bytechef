@@ -24,6 +24,7 @@ import com.bytechef.ee.embedded.ai.tool.IntegrationWorkflowTools;
 import com.bytechef.ee.embedded.ai.tool.ReadIntegrationCodeWorkflowTools;
 import com.bytechef.ee.embedded.ai.tool.ReadIntegrationTools;
 import com.bytechef.ee.embedded.ai.tool.ReadIntegrationWorkflowTools;
+import com.bytechef.platform.ai.tool.BraveWebSearchTools;
 import com.bytechef.platform.ai.tool.ComponentTools;
 import com.bytechef.platform.ai.tool.FirecrawlTools;
 import com.bytechef.platform.ai.tool.TaskTools;
@@ -65,7 +66,7 @@ import org.springframework.core.io.Resource;
  * code-workflow agent class. Tool catalogs mirror the automation Copilot pairs in {@code CopilotConfiguration},
  * re-keyed from project/workspace tools onto the embedded integration tools from {@code embedded-ai-tool}; the shared,
  * platform-generic tools ({@link ComponentTools}, {@link TaskTools}, {@link WorkflowValidatorTools},
- * {@link WorkflowInstructionTools}, {@link FirecrawlTools}) are reused unchanged.
+ * {@link WorkflowInstructionTools}, {@link FirecrawlTools}, {@link BraveWebSearchTools}) are reused unchanged.
  * </p>
  *
  * <p>
@@ -116,7 +117,8 @@ public class EmbeddedCopilotConfiguration {
     WorkflowEditorSpringAIAgent workflowEditorEmbeddedAskSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, ReadIntegrationTools readIntegrationTools,
         ReadIntegrationWorkflowTools readIntegrationWorkflowTools, ComponentTools componentTools, TaskTools taskTools,
-        Optional<FirecrawlTools> firecrawlTools, WorkflowService workflowService,
+        Optional<FirecrawlTools> firecrawlTools, Optional<BraveWebSearchTools> braveWebSearchTools,
+        WorkflowService workflowService,
         WorkflowNodeOutputFacade workflowNodeOutputFacade,
         @Qualifier("questionAnswerAdvisor") Advisor questionAnswerAdvisor, PermissionService permissionService,
         SecurityContextRehydrator securityContextRehydrator,
@@ -128,6 +130,7 @@ public class EmbeddedCopilotConfiguration {
                 workflowInstructionTools));
 
         firecrawlTools.ifPresent(tools::add);
+        braveWebSearchTools.ifPresent(tools::add);
 
         return WorkflowEditorSpringAIAgent.builder()
             .agentId("workflow_editor_embedded_ask")
@@ -231,7 +234,7 @@ public class EmbeddedCopilotConfiguration {
     WorkflowExecutionSpringAIAgent workflowExecutionEmbeddedAskSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, IntegrationWorkflowExecutionTools integrationWorkflowExecutionTools,
         ReadIntegrationWorkflowTools readIntegrationWorkflowTools, ComponentTools componentTools,
-        Optional<FirecrawlTools> firecrawlTools,
+        Optional<FirecrawlTools> firecrawlTools, Optional<BraveWebSearchTools> braveWebSearchTools,
         ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider) throws AGUIException {
 
         List<Object> tools = new ArrayList<>(
@@ -240,6 +243,7 @@ public class EmbeddedCopilotConfiguration {
                 workflowInstructionTools));
 
         firecrawlTools.ifPresent(tools::add);
+        braveWebSearchTools.ifPresent(tools::add);
 
         return WorkflowExecutionSpringAIAgent.builder()
             .agentId("workflow_execution_embedded_ask")

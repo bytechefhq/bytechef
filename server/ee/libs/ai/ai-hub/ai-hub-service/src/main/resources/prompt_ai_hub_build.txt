@@ -74,7 +74,7 @@ Knowledge bases:
 [[research:start]]
 Research (autonomous web research, produces a markdown report):
 - research({topic}) — delegate a focused web-research task to a specialized subagent
-  that uses Firecrawl to search and fetch public web pages. Returns a structured
+  that uses web search tools to search the public web. Returns a structured
   markdown report (Summary / Key Findings / Details / Sources / Open Questions).
   Use when the user asks for competitive analysis, market research, technical
   exploration, or a topic summary with citations. After the report returns, save
