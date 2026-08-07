@@ -28,7 +28,6 @@ import useProperty from '@/pages/platform/workflow-editor/components/properties/
 import isDynamicPropertiesQueryEnabled from '@/pages/platform/workflow-editor/components/properties/isDynamicPropertiesQueryEnabled';
 import getInputHTMLType from '@/pages/platform/workflow-editor/utils/getInputHTMLType';
 import resolveExpressionValue from '@/pages/platform/workflow-editor/utils/resolveExpressionValue';
-import {CLUSTER_ELEMENT_TYPE_TOOLS} from '@/shared/constants';
 import {ERROR_MESSAGES} from '@/shared/errorMessages';
 import {PropertyCopilotMode} from '@/shared/middleware/graphql-types';
 import {
@@ -250,23 +249,21 @@ const Property = ({
                     defaultValue={parameterValue !== undefined ? parameterValue : defaultValue}
                     deletePropertyButton={
                         <>
-                            {workflow.id &&
-                                currentNode?.name &&
-                                currentNode.clusterElementType !== CLUSTER_ELEMENT_TYPE_TOOLS && (
-                                    <PropertyCopilotButton
-                                        anchorRef={propertyCopilotAnchorRef}
-                                        disabled={!!options?.length && !isFormulaMode && !mentionInput}
-                                        dynamic={mentionInput}
-                                        environmentId={currentEnvironmentId}
-                                        getHasValue={getCopilotHasValue}
-                                        mode={isFormulaMode ? PropertyCopilotMode.Formula : PropertyCopilotMode.Text}
-                                        onApply={handleCopilotApply}
-                                        propertyPath={calculatedPath ?? name ?? ''}
-                                        propertyType={type}
-                                        workflowId={workflow.id as string}
-                                        workflowNodeName={currentNode.name}
-                                    />
-                                )}
+                            {workflow.id && currentNode?.name && !currentNode.clusterElementType && (
+                                <PropertyCopilotButton
+                                    anchorRef={propertyCopilotAnchorRef}
+                                    disabled={!!options?.length && !isFormulaMode && !mentionInput}
+                                    dynamic={mentionInput}
+                                    environmentId={currentEnvironmentId}
+                                    getHasValue={getCopilotHasValue}
+                                    mode={isFormulaMode ? PropertyCopilotMode.Formula : PropertyCopilotMode.Text}
+                                    onApply={handleCopilotApply}
+                                    propertyPath={calculatedPath ?? name ?? ''}
+                                    propertyType={type}
+                                    workflowId={workflow.id as string}
+                                    workflowNodeName={currentNode.name}
+                                />
+                            )}
 
                             {deletePropertyButton}
                         </>

@@ -874,3 +874,102 @@ describe('getLayoutElements (dagre) with visual-lane-order graph edges', () => {
         expect(result.edges.some((edge) => edge.type === 'graphTransition')).toBe(false);
     });
 });
+
+describe('getClusterElementsLayoutElements cross-subtree overlap', () => {
+    const canvasWidth = 1200;
+    const childBaseY = 160 + PLACEHOLDER_NODE_HEIGHT + NODE_HEIGHT / 4;
+
+    /**
+     * Two nested cluster roots side by side (a Task Tool and an Approval Gate), each with a child of its own.
+     * The children have different parents, so the per-parent overlap pass never compares them and they used to
+     * render on top of each other.
+     */
+    function buildTwoNestedRootsWithChildren(): Node[] {
+        const nestedRoot = (nodeId: string): Node => ({
+            data: {
+                clusterElementType: 'tools',
+                clusterElementTypeIndex: 0,
+                clusterElementTypesCount: 2,
+                isNestedClusterRoot: true,
+                metadata: {},
+                parentClusterRootElementsTypeCount: 1,
+            },
+            id: nodeId,
+            parentId: 'root',
+            position: {x: 0, y: 0},
+            type: 'workflow',
+        });
+
+        const grandChild = (nodeId: string, parentId: string): Node => ({
+            data: {
+                clusterElementType: 'tools',
+                clusterElementTypeIndex: 0,
+                isNestedClusterRoot: false,
+                metadata: {},
+                parentClusterRootElementsTypeCount: 2,
+            },
+            id: nodeId,
+            parentId,
+            position: {x: 0, y: 0},
+            type: 'workflow',
+        });
+
+        return [
+            {
+                data: {clusterElementTypesCount: 1, clusterElements: {tools: []}},
+                id: 'root',
+                position: {x: 0, y: 0},
+                type: 'clusterRoot',
+            },
+            nestedRoot('taskTool'),
+            nestedRoot('approvalGate'),
+            grandChild('subagent', 'taskTool'),
+            grandChild('gatedTool', 'approvalGate'),
+        ];
+    }
+
+    it('separates children that belong to different nested roots', () => {
+        const result = getClusterElementsLayoutElements({
+            canvasHeight: 800,
+            canvasWidth,
+            edges: [],
+            nodes: buildTwoNestedRootsWithChildren(),
+        });
+
+        const absoluteX = (nodeId: string): number => {
+            let node = result.nodes.find((candidate) => candidate.id === nodeId);
+            let x = 0;
+
+            while (node) {
+                x += node.position.x;
+
+                node = node.parentId ? result.nodes.find((candidate) => candidate.id === node!.parentId) : undefined;
+            }
+
+            return x;
+        };
+
+        const subagentX = absoluteX('subagent');
+        const gatedToolX = absoluteX('gatedTool');
+
+        const leftX = Math.min(subagentX, gatedToolX);
+        const rightX = Math.max(subagentX, gatedToolX);
+
+        expect(rightX - leftX).toBeGreaterThanOrEqual(CLUSTER_ELEMENT_NODE_WIDTH);
+    });
+
+    it('keeps both grandchildren on the same row', () => {
+        const result = getClusterElementsLayoutElements({
+            canvasHeight: 800,
+            canvasWidth,
+            edges: [],
+            nodes: buildTwoNestedRootsWithChildren(),
+        });
+
+        const subagent = result.nodes.find((node) => node.id === 'subagent');
+        const gatedTool = result.nodes.find((node) => node.id === 'gatedTool');
+
+        expect(subagent!.position.y).toBe(childBaseY);
+        expect(gatedTool!.position.y).toBe(childBaseY);
+    });
+});

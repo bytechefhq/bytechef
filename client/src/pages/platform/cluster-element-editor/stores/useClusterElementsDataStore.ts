@@ -29,6 +29,11 @@ interface ClusterElementsDataStoreI {
     nodesLocked: boolean;
     setNodesLocked: (nodesLocked: boolean) => void;
 
+    // Bumped by the Reset layout control. Unlocked canvases skip the automatic layout so hand-placed nodes stay put,
+    // so an explicit reset needs a signal of its own to get through.
+    layoutResetCounter: number;
+    incrementLayoutResetCounter: () => void;
+
     reset: () => void;
 }
 
@@ -80,6 +85,11 @@ const useClusterElementsDataStore = create<ClusterElementsDataStoreI>()(
                 set({nodesLocked});
             },
 
+            layoutResetCounter: 0,
+            incrementLayoutResetCounter: () => {
+                set((state) => ({layoutResetCounter: state.layoutResetCounter + 1}));
+            },
+
             reset: () => {
                 set({
                     canvasZoom: DEFAULT_CLUSTER_ELEMENT_CANVAS_ZOOM,
@@ -87,6 +97,7 @@ const useClusterElementsDataStore = create<ClusterElementsDataStoreI>()(
                     edges: [],
                     isNodeDragging: false,
                     isPositionSaving: false,
+                    layoutResetCounter: 0,
                     nodes: [],
                     nodesLocked: true,
                 });

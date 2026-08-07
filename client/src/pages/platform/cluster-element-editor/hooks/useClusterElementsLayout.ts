@@ -28,6 +28,16 @@ import {getFilteredClusterElementTypes, isPlainObject} from '../utils/clusterEle
 import createClusterElementsEdges from '../utils/createClusterElementsEdges';
 import createClusterElementsNodes from '../utils/createClusterElementsNodes';
 
+const hasNodeSetChanged = (currentNodes: Array<Node>, layoutNodes: Array<Node>) => {
+    if (currentNodes.length !== layoutNodes.length) {
+        return true;
+    }
+
+    const currentNodeIds = new Set(currentNodes.map((node) => node.id));
+
+    return layoutNodes.some((node) => !currentNodeIds.has(node.id));
+};
+
 const useClusterElementsLayout = () => {
     const {
         mainClusterRootComponentDefinition,
@@ -49,10 +59,12 @@ const useClusterElementsLayout = () => {
             workflow: state.workflow,
         }))
     );
-    const {isNodeDragging, isPositionSaving} = useClusterElementsDataStore(
+    const {isNodeDragging, isPositionSaving, layoutResetCounter, nodesLocked} = useClusterElementsDataStore(
         useShallow((state) => ({
             isNodeDragging: state.isNodeDragging,
             isPositionSaving: state.isPositionSaving,
+            layoutResetCounter: state.layoutResetCounter,
+            nodesLocked: state.nodesLocked,
         }))
     );
     const {workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore(
@@ -127,6 +139,7 @@ const useClusterElementsLayout = () => {
 
     const previousCanvasWidthRef = useRef(canvasWidth);
     const cancelAnimationRef = useRef<(() => void) | null>(null);
+    const laidOutLayoutResetCounterRef = useRef(layoutResetCounter);
 
     const workflowDefinitionTasks = useMemo(() => {
         if (!workflow.definition) {
@@ -207,33 +220,29 @@ const useClusterElementsLayout = () => {
         workflow,
     ]);
 
+    // Definitions are collected for EVERY element, not only those already carrying a clusterElements object.
+    // That object is seeded once, when the element is added, so an element added before its component declared
+    // child types would otherwise never be recognised as a nested root. The definition is the source of truth;
+    // the seeded object only records what has been attached so far. Fetches dedupe by component name.
     const getClusterRootQueryParameters = useCallback(
         (elements: ClusterElementsType): Array<{componentName: string; componentVersion: number}> =>
             Object.values(elements).flatMap((value) => {
                 if (Array.isArray(value)) {
-                    return value.flatMap((item: ClusterElementItemType) => {
-                        if (item.clusterElements) {
-                            return [
-                                {
-                                    componentName: item.type.split('/')[0],
-                                    componentVersion: Number(item.type?.split('/')[1]?.replace(/^v/, '')) || 1,
-                                },
-                                ...getClusterRootQueryParameters(item.clusterElements),
-                            ];
-                        }
-
-                        return [];
-                    });
+                    return value.flatMap((item: ClusterElementItemType) => [
+                        {
+                            componentName: item.type.split('/')[0],
+                            componentVersion: Number(item.type?.split('/')[1]?.replace(/^v/, '')) || 1,
+                        },
+                        ...getClusterRootQueryParameters(item.clusterElements ?? {}),
+                    ]);
                 } else if (isPlainObject(value)) {
-                    if (value.clusterElements) {
-                        return [
-                            {
-                                componentName: value.type.split('/')[0],
-                                componentVersion: Number(value.type?.split('/')[1]?.replace(/^v/, '')) || 1,
-                            },
-                            ...getClusterRootQueryParameters(value.clusterElements),
-                        ];
-                    }
+                    return [
+                        {
+                            componentName: value.type.split('/')[0],
+                            componentVersion: Number(value.type?.split('/')[1]?.replace(/^v/, '')) || 1,
+                        },
+                        ...getClusterRootQueryParameters(value.clusterElements ?? {}),
+                    ];
                 }
 
                 return [];
@@ -356,6 +365,29 @@ const useClusterElementsLayout = () => {
         }
 
         const currentNodes = useClusterElementsDataStore.getState().nodes;
+
+        const layoutResetRequested = layoutResetCounter !== laidOutLayoutResetCounterRef.current;
+
+        // Unlocked means the user is arranging nodes by hand, so re-flowing them is unwanted: a drag saves the moved
+        // node's position into the workflow definition, which rebuilds allNodes and would otherwise re-run the layout
+        // and shove every sibling that has no saved position of its own. Keep the positions the user set and take only
+        // the rebuilt data, so label and error changes still reach the canvas. Node additions and removals fall through
+        // to a full layout — a new element has no position of its own and would be stranded at the origin otherwise —
+        // as does an explicit Reset layout, whose whole purpose is to discard the hand-placed positions.
+        if (!nodesLocked && !layoutResetRequested && !hasNodeSetChanged(currentNodes, layoutNodes)) {
+            const layoutNodesById = new Map(layoutNodes.map((node) => [node.id, node]));
+
+            setNodes(
+                currentNodes.map((node) => {
+                    const layoutNode = layoutNodesById.get(node.id);
+
+                    return layoutNode ? {...node, data: layoutNode.data} : node;
+                })
+            );
+
+            return;
+        }
+
         const currentRootNode = currentNodes.find((node) => node.id === rootClusterElementNodeData?.workflowNodeName);
 
         const elements = getClusterElementsLayoutElements({
@@ -366,11 +398,13 @@ const useClusterElementsLayout = () => {
             nodes: layoutNodes,
         });
 
+        laidOutLayoutResetCounterRef.current = layoutResetCounter;
+
         setNodes(elements.nodes);
         setEdges(elements.edges);
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [rootClusterElementNodeData, allNodes]);
+    }, [rootClusterElementNodeData, allNodes, layoutResetCounter]);
 
     // Panel toggle animation: shift nodes horizontally when canvas width changes
     useEffect(() => {
