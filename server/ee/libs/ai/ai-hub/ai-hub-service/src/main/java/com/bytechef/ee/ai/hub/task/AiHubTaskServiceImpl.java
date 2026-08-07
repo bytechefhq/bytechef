@@ -54,8 +54,10 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  * Default implementation of {@link AiHubTaskService}.
  *
  * <p>
- * Message contents are stored and owned by Spring AI's {@code SPRING_AI_CHAT_MEMORY} table. This service reads them via
- * a raw {@link JdbcTemplate} query; it never writes to that table.
+ * Message contents are stored and owned by Spring AI's session store, keyed by {@code AiHubTask.threadId} as the
+ * session id. This service reaches them through {@code AiHubSessionMemory}: reads via {@code SessionService}, and the
+ * few write paths ({@code appendAssistantMessage}, {@code truncateMessagesFrom}, delete cleanup) via
+ * {@code SessionRepository}. The agent's own turns are written by the session memory advisor, not here.
  *
  * @version ee
  *
@@ -260,10 +262,9 @@ public class AiHubTaskServiceImpl implements AiHubTaskService {
         // Always-new semantics (per user request, May 2026): every click on a workflow row in the sidebar
         // starts a fresh task rather than restoring a prior thread. Past tasks remain
         // accessible via the tasks list — they're just not the default landing target. The threadId
-        // is a plain UUID so chat-memory rows are isolated per task, not shared across a
-        // (user, workflow) tuple, and fits the SPRING_AI_CHAT_MEMORY.conversation_id VARCHAR(36) budget.
-        // The kind column on this row is the authoritative discriminator for routing; nothing parses the
-        // threadId.
+        // is a plain UUID so session-store events are isolated per task, not shared across a
+        // (user, workflow) tuple. The kind column on this row is the authoritative discriminator for
+        // routing; nothing parses the threadId.
         LocalDateTime now = LocalDateTime.now(clock);
 
         AiHubTask task = new AiHubTask(userId);

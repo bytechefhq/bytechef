@@ -13,8 +13,9 @@ import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Service that manages AI Hub task metadata and delegates message rehydration to Spring AI's
- * {@code SPRING_AI_CHAT_MEMORY} table.
+ * Service that manages AI Hub task metadata and delegates message rehydration to Spring AI's session store, keyed by
+ * {@code AiHubTask.threadId} as the session id (tables {@code AI_SESSION} / {@code AI_SESSION_EVENT} under the default
+ * jdbc backend; the backend is selected by {@code bytechef.ai.memory.provider}).
  *
  * @version ee
  *
@@ -34,10 +35,9 @@ public interface AiHubTaskService {
      * Creates a fresh workflow-chat task row on every call (always-new semantics, May 2026). Workflow chats are
      * persisted in the same {@code ai_hub_task} table as standard tasks but carry {@code kind = WORKFLOW_CHAT}, the
      * bound {@code workflowExecutionId}, and the parent {@code projectDeploymentId} for sidebar grouping. Each call
-     * inserts a new row with a plain UUID threadId so {@code SPRING_AI_CHAT_MEMORY} rows are isolated per task; past
-     * tasks remain reachable through the tasks list rather than being restored on re-click. The threadId carries no
-     * prefix — Spring AI's bundled {@code SPRING_AI_CHAT_MEMORY.conversation_id} column is VARCHAR(36) (UUID-sized), so
-     * any prefix overflowed it. Routing relies on the {@code kind} column instead.
+     * inserts a new row with a plain UUID threadId so session-store events are isolated per task; past tasks remain
+     * reachable through the tasks list rather than being restored on re-click. The threadId carries no kind prefix —
+     * routing relies on the {@code kind} column instead, which is the authoritative discriminator.
      *
      * <p>
      * The {@code title} is persisted as the new row's display title — the bridge agent doesn't fire the LLM-driven
@@ -61,10 +61,10 @@ public interface AiHubTaskService {
     /**
      * Creates a fresh personal-agent task row on every call (always-new semantics, May 2026). Mirrors
      * {@link #createWorkflowChat} for the agent kind: each call inserts a new row with a plain UUID threadId so
-     * {@code SPRING_AI_CHAT_MEMORY} rows are isolated per task. Past tasks with the same agent remain reachable through
-     * the tasks list rather than being restored on re-click — the partial unique index that previously enforced
-     * one-row-per-agent was dropped in {@code 20260505000001}. See {@link #createWorkflowChat} for why the threadId
-     * carries no kind prefix.
+     * session-store events are isolated per task. Past tasks with the same agent remain reachable through the tasks
+     * list rather than being restored on re-click — the partial unique index that previously enforced one-row-per-agent
+     * was dropped in {@code 20260505000001}. See {@link #createWorkflowChat} for why the threadId carries no kind
+     * prefix.
      *
      * <p>
      * On first creation the {@code title} is persisted as the new row's display title. The LLM's
@@ -91,7 +91,7 @@ public interface AiHubTaskService {
         list(long workspaceId, long userId, int environment, AiHubTaskStatus status);
 
     /**
-     * Loads the message history for a task from Spring AI's {@code SPRING_AI_CHAT_MEMORY} table. Throws
+     * Loads the message history for a task from Spring AI's session store. Throws
      * {@link com.bytechef.ee.ai.hub.exception.ForbiddenException} if the task does not belong to the requester or does
      * not belong to {@code requesterWorkspaceId}, and {@link com.bytechef.ee.ai.hub.exception.NotFoundException} when
      * the task does not exist.
@@ -110,7 +110,7 @@ public interface AiHubTaskService {
         AiHubTaskPatch taskPatch);
 
     /**
-     * Hard-deletes a task, removes its rows from {@code SPRING_AI_CHAT_MEMORY}, and deletes the metadata row. Throws
+     * Hard-deletes a task, removes its events from the session store, and deletes the metadata row. Throws
      * {@link com.bytechef.ee.ai.hub.exception.ForbiddenException} if the task does not belong to the requester or does
      * not belong to {@code requesterWorkspaceId}, and {@link com.bytechef.ee.ai.hub.exception.NotFoundException} when
      * the task does not exist.

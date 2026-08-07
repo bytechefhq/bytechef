@@ -29,8 +29,8 @@ import org.springframework.stereotype.Component;
  * Synthesizes an {@link AgUiParameters} that mirrors what {@code AiHubApiController.chat(...)} builds after the HTTP
  * auth and ownership checks, then delegates to {@link AiHubChatStreamer#runAgent}. The returned
  * {@link org.springframework.web.servlet.mvc.method.annotation.SseEmitter SseEmitter} is discarded — the agent runs to
- * completion and writes its output to {@code SPRING_AI_CHAT_MEMORY} regardless of whether any HTTP client is listening
- * to the stream.
+ * completion and writes its output to the session store regardless of whether any HTTP client is listening to the
+ * stream.
  * </p>
  *
  * <p>
@@ -101,7 +101,7 @@ public class AiHubScheduledChatDispatcher {
         }
 
         // The returned SseEmitter is discarded — no HTTP client is listening on a scheduled run.
-        // The agent runs to completion and writes to SPRING_AI_CHAT_MEMORY regardless.
+        // The agent runs to completion and writes to the session store regardless.
         chatStreamer.runAgent(agent, agUiParameters, threadId);
     }
 

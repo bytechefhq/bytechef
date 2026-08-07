@@ -100,11 +100,11 @@ public class AgUiStreamBridge implements SseStreamBridge {
     /**
      * Accumulates the assistant text emitted across all {@code onEvent(String)} chunks. The streaming path doesn't have
      * a single "final assistant message" the way the sync path does — the assistant reply is the concatenation of every
-     * per-token delta. Capturing it here lets {@link WebhookBridgeAgent} persist the full reply to
-     * {@code SPRING_AI_CHAT_MEMORY} when the run finalizes, so reloading the task later renders the assistant turn the
-     * same way it would for a non-streaming chat. Synchronization is via the {@code completed} AtomicBoolean — chunks
-     * arrive on a single message-broker thread before completion so a plain StringBuilder is safe; a concurrent
-     * appender would force a more elaborate ConcurrentLinkedQueue + drain.
+     * per-token delta. Capturing it here lets {@link WebhookBridgeAgent} persist the full reply to the session store
+     * when the run finalizes, so reloading the task later renders the assistant turn the same way it would for a
+     * non-streaming chat. Synchronization is via the {@code completed} AtomicBoolean — chunks arrive on a single
+     * message-broker thread before completion so a plain StringBuilder is safe; a concurrent appender would force a
+     * more elaborate ConcurrentLinkedQueue + drain.
      */
     private final StringBuilder assistantTextBuilder = new StringBuilder();
 

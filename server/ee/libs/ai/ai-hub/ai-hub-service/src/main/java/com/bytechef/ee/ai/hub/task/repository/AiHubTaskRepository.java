@@ -19,7 +19,7 @@ import org.springframework.data.repository.CrudRepository;
  * workspace-scoped query.
  *
  * <p>
- * Message contents remain in Spring AI's {@code SPRING_AI_CHAT_MEMORY} table and are not managed here.
+ * Message contents remain in Spring AI's session store, keyed by {@code thread_id}, and are not managed here.
  *
  * @version ee
  *

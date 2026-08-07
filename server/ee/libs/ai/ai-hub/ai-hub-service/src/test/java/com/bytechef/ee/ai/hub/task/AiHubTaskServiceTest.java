@@ -385,11 +385,10 @@ class AiHubTaskServiceTest {
         assertThat(result.getProjectDeploymentId()).isEqualTo(99L);
         // Pin the threadId shape (plain UUID) without locking the random value. A regression that returned
         // to deterministic threadIds keyed off (workflow_execution_id, user) would re-introduce the
-        // chat-memory cross-talk the always-new design is meant to eliminate. The 36-char UUID also fits
-        // SPRING_AI_CHAT_MEMORY.conversation_id (VARCHAR(36)); the kind column is the authoritative
-        // discriminator for routing.
+        // session-store cross-talk the always-new design is meant to eliminate. The kind column is the
+        // authoritative discriminator for routing.
         assertThat(result.getThreadId())
-            .as("threadId must be a plain UUID so chat-memory rows fit and are isolated per task")
+            .as("threadId must be a plain UUID so session-store events are isolated per task")
             .matches("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
     }
 
@@ -587,11 +586,10 @@ class AiHubTaskServiceTest {
         assertThat(result.getKind()).isEqualTo(AiHubTaskKind.PERSONAL_AGENT);
         assertThat(result.getTitle()).isEqualTo("Research Assistant");
         assertThat(result.getAiHubPersonalAgentId()).isEqualTo(42L);
-        // Pin the threadId shape (plain UUID) without locking the random value. The 36-char UUID fits
-        // SPRING_AI_CHAT_MEMORY.conversation_id (VARCHAR(36)); the kind column distinguishes personal-agent
-        // rows from workflow-chat rows.
+        // Pin the threadId shape (plain UUID) without locking the random value. The kind column
+        // distinguishes personal-agent rows from workflow-chat rows.
         assertThat(result.getThreadId())
-            .as("threadId must be a plain UUID so chat-memory rows fit and are isolated per task")
+            .as("threadId must be a plain UUID so session-store events are isolated per task")
             .matches("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
         // autoTitled defaults to true on new rows so the LLM-driven generateAiHubTaskTitle loop runs
         // until a title is authoritatively set (LLM regen, or user rename). A regression that flips the

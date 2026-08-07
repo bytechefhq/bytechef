@@ -368,11 +368,21 @@ The `ai_hub_task` table holds three discriminated kinds (`ConversationKind` enum
 
 Always-new conversation semantics: every click on a workflow row or personal-agent row in the sidebar
 starts a fresh conversation rather than restoring a prior thread. Each new row gets its own random
-UUID threadId so `SPRING_AI_CHAT_MEMORY` rows are isolated per conversation, not shared across a
+UUID threadId so session-store events are isolated per conversation, not shared across a
 (user, workflow) or (user, agent) tuple. Past conversations remain reachable through the conversations
 list — they're just no longer the default landing target. There is no partial unique index scoping
 rows per (workspace, user, environment, workflow_execution_id) or (workspace, user, environment,
 ai_hub_personal_agent_id); the `kind` column is the authoritative discriminator.
+
+Message bodies do **not** live in `ai_hub_task` — the row is metadata only (title, preview,
+`message_count`, status, kind, the kind-specific target ids). The transcript lives in Spring AI's
+**session** store, keyed by `ai_hub_task.thread_id` used verbatim as the session id: tables
+`AI_SESSION` / `AI_SESSION_EVENT` under the default jdbc backend, selected by
+`bytechef.ai.memory.provider` (`jdbc` | `redis` | `aws` | `in_memory`). It is NOT
+`SPRING_AI_CHAT_MEMORY` — that table belongs to the AI Agent component's chat-memory cluster
+elements, which the hub does not use. Sessions are all written under the constant session user id
+`"ai-hub"`, so the session store carries no authorization of its own: ownership is enforced on the
+`ai_hub_task` row by `AiHubTaskServiceImpl`, which then reaches the transcript by thread id.
 
 Enum ordinals are pinned by `EnumOrdinalStabilityTest`; append new kinds at the end.
 

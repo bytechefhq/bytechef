@@ -17,8 +17,9 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 /**
- * Persistent metadata record for a AI Hub task. Message contents are stored separately in Spring AI's
- * {@code SPRING_AI_CHAT_MEMORY} table and keyed by {@link #threadId}.
+ * Persistent metadata record for a AI Hub task. Message contents are stored separately in Spring AI's session store
+ * (tables {@code AI_SESSION} / {@code AI_SESSION_EVENT} under the default jdbc backend) and keyed by {@link #threadId},
+ * which is used verbatim as the session id.
  *
  * <p>
  * This is a Spring Data JDBC row-mapper entity. Setters are intentionally permissive — Spring Data JDBC reflects
