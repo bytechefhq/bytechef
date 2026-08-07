@@ -8,6 +8,7 @@ import {describe, expect, it} from 'vitest';
  * 2. Formula mode should NOT activate (typing `=` treated as literal)
  * 3. Data pill suggestion (`$` trigger) should be disabled
  * 4. FromAI toggle button should be hidden
+ * 5. Focusing the input should NOT open the Data Pill Panel
  */
 
 describe('expressionEnabledGate', () => {
@@ -178,6 +179,35 @@ describe('expressionEnabledGate', () => {
 
         it('should show fromAi when expressionEnabled is undefined (legacy)', () => {
             expect(shouldShowFromAi(true, undefined, true)).toBe(true);
+        });
+    });
+
+    describe('data pill panel open gate', () => {
+        /**
+         * Replicates the onFocus handler in PropertyMentionsInput.tsx. A property that takes literals
+         * only has nothing to insert from the panel, so putting the cursor in one must not pop it open.
+         */
+        const shouldOpenDataPillPanel = (
+            workflowNodeDetailsPanelOpen: boolean,
+            expressionEnabled: boolean | undefined
+        ): boolean => {
+            return workflowNodeDetailsPanelOpen && expressionEnabled !== false;
+        };
+
+        it('should open the panel on focus when expressionEnabled is true', () => {
+            expect(shouldOpenDataPillPanel(true, true)).toBe(true);
+        });
+
+        it('should open the panel on focus when expressionEnabled is undefined (legacy)', () => {
+            expect(shouldOpenDataPillPanel(true, undefined)).toBe(true);
+        });
+
+        it('should NOT open the panel on focus when expressionEnabled is false', () => {
+            expect(shouldOpenDataPillPanel(true, false)).toBe(false);
+        });
+
+        it('should NOT open the panel when the node details panel is closed', () => {
+            expect(shouldOpenDataPillPanel(false, true)).toBe(false);
         });
     });
 
