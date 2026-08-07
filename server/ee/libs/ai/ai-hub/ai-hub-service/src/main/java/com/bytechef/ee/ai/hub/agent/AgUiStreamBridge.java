@@ -389,6 +389,12 @@ public class AgUiStreamBridge implements SseStreamBridge {
 
         toolCallStartEvent.setToolCallId(toolCallId);
         toolCallStartEvent.setToolCallName(label);
+        // Required even though @ag-ui/core types it as optional: z.optional(z.string()) accepts an ABSENT key but
+        // rejects an explicit null, and the app ObjectMapper serializes null fields rather than omitting them.
+        // Unset, this ships {"parentMessageId": null} and the browser-side Zod validator tears the whole SSE run
+        // down before a single token renders. Mirrors ToolMapper on the LLM path, which sets it from the same
+        // in-flight message id.
+        toolCallStartEvent.setParentMessageId(messageId);
 
         dispatch(toolCallStartEvent);
 

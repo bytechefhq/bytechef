@@ -356,6 +356,29 @@ class AgUiStreamBridgeTest {
     }
 
     @Test
+    void testTaskStartedToolCallCarriesParentMessageId() {
+        bridge.onEvent(
+            Map.of(
+                "event", "task_started",
+                "payload", Map.of("taskExecutionId", 7L, "name", "slack_1", "type", "slack/v1/sendMessage")));
+
+        ArgumentCaptor<com.agui.core.event.BaseEvent> eventCaptor =
+            ArgumentCaptor.forClass(com.agui.core.event.BaseEvent.class);
+
+        verify(subscriber, times(2)).onEvent(eventCaptor.capture());
+
+        ToolCallStartEvent toolCallStartEvent = (ToolCallStartEvent) eventCaptor.getAllValues()
+            .get(0);
+
+        // parentMessageId must be a non-null string on the wire. @ag-ui/core types it as z.optional(z.string()),
+        // which accepts an ABSENT key but rejects an explicit null — and the app ObjectMapper serializes null
+        // fields rather than omitting them. Leaving it unset therefore ships {"parentMessageId": null}, which
+        // fails the browser-side Zod validator and tears the whole SSE run down before any token renders. The
+        // LLM path never hits this because ToolMapper sets the same field from the in-flight message id.
+        assertThat(toolCallStartEvent.getParentMessageId()).isEqualTo(MESSAGE_ID);
+    }
+
+    @Test
     void testTaskStartedWithoutUsableLabelIsDropped() {
         bridge.onEvent(Map.of("event", "task_started", "payload", Map.of("taskExecutionId", 7L)));
 
