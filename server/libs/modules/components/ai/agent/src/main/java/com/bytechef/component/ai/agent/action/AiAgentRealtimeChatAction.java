@@ -22,7 +22,7 @@ import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.commons.util.JsonUtils;
-import com.bytechef.component.ai.agent.facade.AiAgentToolFacade;
+import com.bytechef.component.ai.llm.facade.AiAgentToolFacade;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ActionDefinition.WebSocketHandler;

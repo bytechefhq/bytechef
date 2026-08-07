@@ -36,12 +36,6 @@ public class ToolConstants {
 
     public static final String APPROVAL_EXPIRES_IN_UNIT_HOURS = "HOURS";
 
-    /**
-     * Boolean parameter on a TOOLS cluster-element entry marking it for the platform-enforced approval gate: every
-     * invocation raises a human-approval request and suspends instead of executing (HITL phase 3).
-     */
-    public static final String REQUIRES_APPROVAL = "requiresApproval";
-
     public static final String TOOL_DESCRIPTION = "toolDescription";
     public static final String TOOL_NAME = "toolName";
 

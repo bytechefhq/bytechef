@@ -34,24 +34,23 @@ import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.ai.agent.action.event.ToolExecutionEvent;
 import com.bytechef.component.ai.agent.action.event.listener.ToolExecutionListener;
-import com.bytechef.component.ai.agent.facade.AiAgentToolFacade;
 import com.bytechef.component.ai.agent.tool.AiAgentConversationCheckpoint;
-import com.bytechef.component.ai.agent.tool.ApprovalGateToolCallback;
 import com.bytechef.component.ai.agent.tool.ConversationResume;
 import com.bytechef.component.ai.agent.tool.ConversationState;
 import com.bytechef.component.ai.agent.tool.SuspendableToolCallingManager;
 import com.bytechef.component.ai.llm.ChatModel.ResponseFormat;
 import com.bytechef.component.ai.llm.advisor.ContextLoggerAdvisor;
 import com.bytechef.component.ai.llm.converter.JsonSchemaStructuredOutputConverter;
+import com.bytechef.component.ai.llm.facade.AiAgentToolFacade;
+import com.bytechef.component.ai.llm.tool.ClusterElementToolCallbacks;
+import com.bytechef.component.ai.llm.tool.DelegatingToolCallback;
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.ai.agent.BaseToolFunction;
-import com.bytechef.component.definition.approval.ApprovalChannelFunction;
 import com.bytechef.platform.ai.constant.AiAgentToolContextKey;
 import com.bytechef.platform.ai.constant.ToolSuspendConstants;
 import com.bytechef.platform.ai.guardrails.AiGuardrailsAdvisorProvider;
-import com.bytechef.platform.ai.tool.constant.ToolConstants;
 import com.bytechef.platform.ai.workspaceprompt.WorkspaceSystemPromptAdvisorProvider;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ActionContextAware;
@@ -59,10 +58,7 @@ import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
 import com.bytechef.platform.component.definition.ai.agent.GuardrailsFunction;
 import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
-import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolCallbackProviderFunction;
-import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolFunction;
 import com.bytechef.platform.component.definition.ai.agent.RagFunction;
-import com.bytechef.platform.component.definition.ai.agent.ToolCallbackProviderFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
@@ -74,7 +70,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -118,7 +113,7 @@ public abstract class AbstractAiAgentChatAction {
     private static final String TOOL_SIMULATION_UNAVAILABLE = "[tool simulation unavailable]";
 
     private final ClusterElementDefinitionService clusterElementDefinitionService;
-    private final AiAgentToolFacade aiAgentToolFacade;
+    private final ClusterElementToolCallbacks clusterElementToolCallbacks;
     private final ToolCallingManager toolCallingManager;
 
     private final @Nullable ObjectProvider<ToolExecutionRecorder> toolExecutionRecorderObjectProvider;
@@ -158,8 +153,9 @@ public abstract class AbstractAiAgentChatAction {
         @Nullable ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider,
         @Nullable ObjectProvider<WorkspaceSystemPromptAdvisorProvider> workspaceSystemPromptAdvisorProviderObjectProvider) {
 
-        this.aiAgentToolFacade = aiAgentToolFacade;
         this.clusterElementDefinitionService = clusterElementDefinitionService;
+        this.clusterElementToolCallbacks =
+            new ClusterElementToolCallbacks(aiAgentToolFacade, clusterElementDefinitionService);
         this.toolCallingManager = toolCallingManager;
         this.toolExecutionRecorderObjectProvider = toolExecutionRecorderObjectProvider;
         this.aiGuardrailsAdvisorProviderObjectProvider = aiGuardrailsAdvisorProviderObjectProvider;
@@ -174,27 +170,6 @@ public abstract class AbstractAiAgentChatAction {
     private @Nullable ToolExecutionRecorder fetchToolExecutionRecorder() {
         return toolExecutionRecorderObjectProvider == null
             ? null : toolExecutionRecorderObjectProvider.getIfAvailable();
-    }
-
-    /**
-     * Resolves the optional per-tool approval expiry from a gated TOOLS entry's parameters ({@code approvalExpiresIn} +
-     * {@code approvalExpiresInUnit}). Returns {@code null} when unset or invalid, which makes the gate fall back to its
-     * 60-day default.
-     */
-    private static @Nullable Duration getApprovalExpiry(Map<String, ?> clusterElementParameters) {
-        Object approvalExpiresIn = clusterElementParameters.get(ToolConstants.APPROVAL_EXPIRES_IN);
-
-        if (!(approvalExpiresIn instanceof Number approvalExpiresInNumber) || approvalExpiresInNumber.longValue() < 1) {
-            return null;
-        }
-
-        Object approvalExpiresInUnit = clusterElementParameters.get(ToolConstants.APPROVAL_EXPIRES_IN_UNIT);
-
-        if (ToolConstants.APPROVAL_EXPIRES_IN_UNIT_HOURS.equals(approvalExpiresInUnit)) {
-            return Duration.ofHours(approvalExpiresInNumber.longValue());
-        }
-
-        return Duration.ofDays(approvalExpiresInNumber.longValue());
     }
 
     protected ChatClient.ChatClientRequestSpec getChatClientRequestSpec(
@@ -305,7 +280,6 @@ public abstract class AbstractAiAgentChatAction {
                 concatToolCallbacks(
                     getToolCallbacks(
                         clusterElementMap.getClusterElements(BaseToolFunction.TOOLS),
-                        clusterElementMap.getClusterElements(ApprovalChannelFunction.APPROVAL_CHANNELS),
                         connectionParameters, context.isEditorEnvironment(), toolExecutionListener, toolSimulations,
                         chatModel, context),
                     chatMemoryResult)
@@ -520,6 +494,9 @@ public abstract class AbstractAiAgentChatAction {
                 return gatedToolName.equals(toolDefinition.name());
             })
             .findFirst()
+            // A gated tool's callback reports its delegate's definition, so the lookup above finds the gate wrapper.
+            // Unwrap it: the human approved this exact invocation, so re-gating would raise a second request.
+            .map(DelegatingToolCallback::unwrap)
             .orElseThrow(() -> new IllegalStateException(
                 "The approved tool '" + gatedToolName + "' is no longer configured on the agent node; the " +
                     "approval cannot be applied."));
@@ -971,51 +948,19 @@ public abstract class AbstractAiAgentChatAction {
         return combinedToolCallbacks;
     }
 
-    /**
-     * Whether a TOOLS entry is the approval tool itself (the suspending {@code approval/requestApproval} cluster
-     * element). Wrapping a suspending tool in the approval gate would deliver a second approval request and set a
-     * suspend whose continueParameters cannot be resumed — a dead run plus a dangling delivered request. An approval
-     * tool is already an approval, so the gate flag is a no-op on it.
-     */
-    private static boolean isSuspendingApprovalTool(ClusterElement clusterElement) {
-        return "approval".equals(clusterElement.getComponentName())
-            && "requestApproval".equals(clusterElement.getClusterElementName());
-    }
-
     private List<ToolCallback> getToolCallbacks(
-        List<ClusterElement> toolClusterElements, List<ClusterElement> approvalChannelClusterElements,
-        Map<String, ComponentConnection> connectionParameters, boolean editorEnvironment,
-        @Nullable ToolExecutionListener toolExecutionListener,
+        List<ClusterElement> toolClusterElements, Map<String, ComponentConnection> connectionParameters,
+        boolean editorEnvironment, @Nullable ToolExecutionListener toolExecutionListener,
         @Nullable Map<String, Map<String, String>> toolSimulations, ChatModel chatModel, ActionContext context) {
 
         List<ToolCallback> toolCallbacks = new ArrayList<>();
 
+        // A TOOLS entry may arrive already wrapped: the approvalGate cluster element returns its children gated.
+        // Simulation and observable wrapping below still run over the flattened list, so a gated callback stays
+        // INSIDE the observable wrapper and the audit listener records the gate outcome like any other tool result.
         for (ClusterElement clusterElement : toolClusterElements) {
-            List<ToolCallback> elementToolCallbacks = buildElementToolCallbacks(
-                clusterElement, connectionParameters, editorEnvironment, context);
-
-            Map<String, ?> clusterElementParameters = clusterElement.getParameters();
-
-            // Platform-enforced per-tool approval gate (HITL phase 3): a TOOLS entry flagged with
-            // requiresApproval: true is wrapped so every invocation raises an approval request and suspends
-            // instead of executing. Applied INSIDE the observable wrapper so the audit listener records the
-            // gate outcome (suspension, later the approved result or denial) like any other tool result.
-            if (Boolean.TRUE.equals(clusterElementParameters.get(ToolConstants.REQUIRES_APPROVAL))
-                && !isSuspendingApprovalTool(clusterElement)) {
-
-                ToolExecutionRecorder toolExecutionRecorder = fetchToolExecutionRecorder();
-
-                Duration approvalExpiry = getApprovalExpiry(clusterElementParameters);
-
-                elementToolCallbacks = elementToolCallbacks.stream()
-                    .map(
-                        toolCallback -> (ToolCallback) new ApprovalGateToolCallback(
-                            toolCallback, approvalChannelClusterElements, connectionParameters,
-                            clusterElementDefinitionService, context, toolExecutionRecorder, approvalExpiry))
-                    .toList();
-            }
-
-            toolCallbacks.addAll(elementToolCallbacks);
+            toolCallbacks.addAll(
+                buildElementToolCallbacks(clusterElement, connectionParameters, editorEnvironment, context));
         }
 
         if (toolSimulations != null && !toolSimulations.isEmpty()) {
@@ -1062,49 +1007,7 @@ public abstract class AbstractAiAgentChatAction {
         ClusterElement clusterElement, Map<String, ComponentConnection> connectionParameters,
         boolean editorEnvironment, ActionContext context) {
 
-        Object clusterElementFunction = clusterElementDefinitionService.getClusterElement(
-            clusterElement.getComponentName(), clusterElement.getComponentVersion(),
-            clusterElement.getClusterElementName());
-
-        if (clusterElementFunction instanceof MultipleConnectionsToolCallbackProviderFunction multipleConnectionsToolCallbackProviderFunction) {
-            try {
-                ToolCallback[] providerCallbacks = multipleConnectionsToolCallbackProviderFunction
-                    .apply(
-                        ParametersFactory.create(clusterElement.getParameters()),
-                        getConnectionParameters(connectionParameters, clusterElement),
-                        ParametersFactory.create(clusterElement.getExtensions()),
-                        connectionParameters, context)
-                    .getToolCallbacks();
-
-                return Arrays.asList(providerCallbacks);
-            } catch (Exception exception) {
-                throw clusterElementInitializationException(clusterElement, "tool callback", exception, context);
-            }
-        } else if (clusterElementFunction instanceof ToolCallbackProviderFunction toolCallbackProviderFunction) {
-            try {
-                ComponentConnection componentConnection = connectionParameters.get(
-                    clusterElement.getWorkflowNodeName());
-
-                ToolCallback[] providerCallbacks = toolCallbackProviderFunction
-                    .apply(
-                        ParametersFactory.create(clusterElement.getParameters()),
-                        ParametersFactory.create(componentConnection), context)
-                    .getToolCallbacks();
-
-                return Arrays.asList(providerCallbacks);
-            } catch (Exception exception) {
-                throw clusterElementInitializationException(clusterElement, "tool callback", exception, context);
-            }
-        } else if (clusterElementFunction instanceof MultipleConnectionsToolFunction) {
-            return List.of(
-                aiAgentToolFacade.getFunctionToolCallback(clusterElement, connectionParameters, editorEnvironment));
-        } else {
-            ComponentConnection componentConnection = connectionParameters.get(
-                clusterElement.getWorkflowNodeName());
-
-            return List.of(
-                aiAgentToolFacade.getFunctionToolCallback(clusterElement, componentConnection, editorEnvironment));
-        }
+        return clusterElementToolCallbacks.build(clusterElement, connectionParameters, editorEnvironment, context);
     }
 
     private List<Message> loadConversationHistory(

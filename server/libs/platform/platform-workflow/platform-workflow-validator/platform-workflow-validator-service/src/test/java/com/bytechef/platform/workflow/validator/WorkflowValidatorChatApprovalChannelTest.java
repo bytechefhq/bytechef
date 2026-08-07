@@ -67,7 +67,7 @@ class WorkflowValidatorChatApprovalChannelTest {
                                 {
                                     "label": "Chat",
                                     "name": "chat_1",
-                                    "type": "approval/v1/chat",
+                                    "type": "chat/v1/chat",
                                     "parameters": {}
                                 }
                             ]
@@ -107,7 +107,7 @@ class WorkflowValidatorChatApprovalChannelTest {
                                 {
                                     "label": "Chat",
                                     "name": "chat_1",
-                                    "type": "approval/v1/chat",
+                                    "type": "chat/v1/chat",
                                     "parameters": {}
                                 },
                                 {
@@ -152,7 +152,7 @@ class WorkflowValidatorChatApprovalChannelTest {
                                 {
                                     "label": "Chat",
                                     "name": "chat_1",
-                                    "type": "approval/v1/chat",
+                                    "type": "chat/v1/chat",
                                     "parameters": {}
                                 }
                             ]
@@ -189,11 +189,21 @@ class WorkflowValidatorChatApprovalChannelTest {
                         "clusterElements": {
                             "tools": [
                                 {
-                                    "label": "Send Message",
-                                    "name": "slack_1",
-                                    "type": "slack/v1/sendMessage",
+                                    "label": "Destructive",
+                                    "name": "approvalGate_1",
+                                    "type": "aiAgentUtils/v1/approvalGate",
                                     "parameters": {
-                                        "requiresApproval": true
+                                        "name": "Destructive"
+                                    },
+                                    "clusterElements": {
+                                        "tools": [
+                                            {
+                                                "label": "Send Message",
+                                                "name": "slack_1",
+                                                "type": "slack/v1/sendMessage",
+                                                "parameters": {}
+                                            }
+                                        ]
                                     }
                                 }
                             ]
@@ -232,11 +242,21 @@ class WorkflowValidatorChatApprovalChannelTest {
                         "clusterElements": {
                             "tools": [
                                 {
-                                    "label": "Send Message",
-                                    "name": "slack_1",
-                                    "type": "slack/v1/sendMessage",
+                                    "label": "Destructive",
+                                    "name": "approvalGate_1",
+                                    "type": "aiAgentUtils/v1/approvalGate",
                                     "parameters": {
-                                        "requiresApproval": true
+                                        "name": "Destructive"
+                                    },
+                                    "clusterElements": {
+                                        "tools": [
+                                            {
+                                                "label": "Send Message",
+                                                "name": "slack_1",
+                                                "type": "slack/v1/sendMessage",
+                                                "parameters": {}
+                                            }
+                                        ]
                                     }
                                 }
                             ]
@@ -310,21 +330,31 @@ class WorkflowValidatorChatApprovalChannelTest {
                         "type": "aiAgent/v1/chat",
                         "parameters": {},
                         "clusterElements": {
-                            "approvalChannels": [
-                                {
-                                    "label": "Slack",
-                                    "name": "slackChannel_1",
-                                    "type": "slack/v1/approvalChannel",
-                                    "parameters": {}
-                                }
-                            ],
                             "tools": [
                                 {
-                                    "label": "Send Message",
-                                    "name": "slack_1",
-                                    "type": "slack/v1/sendMessage",
+                                    "label": "Destructive",
+                                    "name": "approvalGate_1",
+                                    "type": "aiAgentUtils/v1/approvalGate",
                                     "parameters": {
-                                        "requiresApproval": true
+                                        "name": "Destructive"
+                                    },
+                                    "clusterElements": {
+                                        "approvalChannels": [
+                                            {
+                                                "label": "Slack",
+                                                "name": "slackChannel_1",
+                                                "type": "slack/v1/approvalChannel",
+                                                "parameters": {}
+                                            }
+                                        ],
+                                        "tools": [
+                                            {
+                                                "label": "Send Message",
+                                                "name": "slack_1",
+                                                "type": "slack/v1/sendMessage",
+                                                "parameters": {}
+                                            }
+                                        ]
                                     }
                                 }
                             ]

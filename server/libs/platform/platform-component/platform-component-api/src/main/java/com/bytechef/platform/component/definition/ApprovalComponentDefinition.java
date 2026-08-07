@@ -20,14 +20,27 @@ import static com.bytechef.component.definition.approval.ApprovalChannelFunction
 
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
 public interface ApprovalComponentDefinition extends ClusterRootComponentDefinition {
 
+    String REQUEST_APPROVAL = "requestApproval";
+
     @Override
     default List<ClusterElementType> getClusterElementTypes() {
         return List.of(APPROVAL_CHANNELS);
+    }
+
+    /**
+     * Child types are declared per cluster element, not just for the component as a whole: the type list above applies
+     * to the component, so an element left out of this map inherits every type the component declares. Only the tool
+     * that raises a request may carry channels.
+     */
+    @Override
+    default Map<String, List<String>> getClusterElementClusterElementTypes() {
+        return Map.of(REQUEST_APPROVAL, List.of(APPROVAL_CHANNELS.name()));
     }
 }

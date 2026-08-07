@@ -25,8 +25,8 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.ai.agent.facade.AiAgentToolFacade;
 import com.bytechef.component.ai.llm.ChatModel;
+import com.bytechef.component.ai.llm.facade.AiAgentToolFacade;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition.SseEmitterHandler;
 import com.bytechef.component.definition.Parameters;

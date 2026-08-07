@@ -16,11 +16,14 @@
 
 package com.bytechef.component.ai.agent.utils;
 
+import com.bytechef.component.ai.llm.facade.AiAgentToolFacade;
 import com.bytechef.platform.ai.skill.facade.AiSkillFacade;
+import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * @author Ivica Cardic
@@ -31,7 +34,14 @@ public class AiAgentUtilsComponentHandlerTest {
     public void testGetComponentDefinition() {
         JsonFileAssert.assertEquals(
             "definition/ai_agent-utils_v1.json",
-            new AiAgentUtilsComponentHandler(Mockito.mock(AiSkillFacade.class), List.of(), null, null)
-                .getDefinition());
+            new AiAgentUtilsComponentHandler(
+                Mockito.mock(AiAgentToolFacade.class), Mockito.mock(AiSkillFacade.class), List.of(), null, null,
+                toolExecutionRecorderObjectProvider())
+                    .getDefinition());
+    }
+
+    @SuppressWarnings("unchecked")
+    private static ObjectProvider<ToolExecutionRecorder> toolExecutionRecorderObjectProvider() {
+        return Mockito.mock(ObjectProvider.class);
     }
 }

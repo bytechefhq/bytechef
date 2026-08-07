@@ -27,7 +27,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.ai.agent.facade.AiAgentToolFacade;
+import com.bytechef.component.ai.llm.facade.AiAgentToolFacade;
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;

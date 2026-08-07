@@ -30,10 +30,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.ai.agent.facade.AiAgentToolFacade;
+import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsApprovalGate;
 import com.bytechef.component.ai.llm.ChatModel;
+import com.bytechef.component.ai.llm.facade.AiAgentToolFacade;
+import com.bytechef.component.ai.llm.tool.ClusterElementToolCallbacks;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition.SseEmitterHandler;
+import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.platform.ai.constant.AiAgentToolContextKey;
@@ -42,6 +45,7 @@ import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
+import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolCallbackProviderFunction;
 import com.bytechef.platform.component.definition.ai.agent.ToolCallbackProviderFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
@@ -78,12 +82,12 @@ import org.springframework.ai.tool.resolution.DelegatingToolCallbackResolver;
 import reactor.core.publisher.Flux;
 
 /**
- * End-to-end integration test for the platform tool gate ({@code requiresApproval: true}) inside the streaming AI agent
- * suspend/resume flow. Mirrors {@link AiAgentStreamChatActionResumeIntTest}, but with an ordinary EXECUTING tool whose
- * cluster-element entry is flagged for approval: the first model tool call must be intercepted by the gate (tool not
- * executed, approval delivered through the default chat channel, suspend carries the GATED_* continuation keys); an
- * approved resume must execute the tool with the originally captured arguments and patch its real result into the
- * conversation; a rejected resume must patch a denial without ever executing the tool.
+ * End-to-end integration test for the platform tool gate (an {@code approvalGate} cluster element) inside the streaming
+ * AI agent suspend/resume flow. Mirrors {@link AiAgentStreamChatActionResumeIntTest}, but with an ordinary EXECUTING
+ * tool nested beneath a gate: the first model tool call must be intercepted by the gate (tool not executed, approval
+ * delivered through the default chat channel, suspend carries the GATED_* continuation keys); an approved resume must
+ * execute the tool with the originally captured arguments and patch its real result into the conversation; a rejected
+ * resume must patch a denial without ever executing the tool.
  *
  * @author Ivica Cardic
  */
@@ -107,7 +111,7 @@ class AiAgentStreamChatActionResumeGateIntTest {
         assertThat(harness.toolInvocations.get()).isZero();
 
         verify(harness.clusterElementDefinitionService).executeApprovalChannel(
-            eq("approval"), eq(1), eq("chat"), anyMap(), anyString(), isNull(), any());
+            eq("chat"), eq(1), eq("chat"), anyMap(), anyString(), isNull(), any());
 
         Map<String, Object> continueParameters = new HashMap<>(suspend.continueParameters());
 
@@ -334,6 +338,17 @@ class AiAgentStreamChatActionResumeGateIntTest {
             when(service.<ToolCallbackProviderFunction>getClusterElement(
                 eq("testComponent"), eq(1), eq(TOOL_NAME))).thenReturn(toolCallbackProviderFunction);
 
+            // The gate is the real cluster element, not a stub: this test exists to prove the agent action and the
+            // gate still speak the same suspend protocol now that they live in different modules.
+            AiAgentUtilsApprovalGate approvalGate = new AiAgentUtilsApprovalGate(
+                new ClusterElementToolCallbacks(mock(AiAgentToolFacade.class), service), service, null);
+
+            ClusterElementDefinition<MultipleConnectionsToolCallbackProviderFunction> gateDefinition =
+                approvalGate.clusterElementDefinition;
+
+            when(service.<MultipleConnectionsToolCallbackProviderFunction>getClusterElement(
+                eq("aiAgentUtils"), eq(1), eq("approvalGate"))).thenReturn(gateDefinition.getElement());
+
             // The gate's default chat channel delivery goes through the same mocked service; returning null is a
             // successful no-op delivery for the purposes of this test.
             when(service.executeApprovalChannel(
@@ -371,14 +386,22 @@ class AiAgentStreamChatActionResumeGateIntTest {
 
         toolElementMap.put("name", "tool_1");
         toolElementMap.put("type", "testComponent/v1/" + TOOL_NAME);
-        // The load-bearing flag: this is what routes the tool through ApprovalGateToolCallback.
-        toolElementMap.put("parameters", Map.of("requiresApproval", true));
+        toolElementMap.put("parameters", Map.of());
+
+        // The load-bearing structure: nesting the tool beneath an approvalGate is what routes it through
+        // ApprovalGateToolCallback. The gate declares no channels, so delivery falls back to the chat channel.
+        Map<String, Object> gateElementMap = new HashMap<>();
+
+        gateElementMap.put("name", "approvalGate_1");
+        gateElementMap.put("type", "aiAgentUtils/v1/approvalGate");
+        gateElementMap.put("parameters", Map.of("name", "Destructive"));
+        gateElementMap.put("clusterElements", Map.of("tools", List.of(toolElementMap)));
 
         return MockParametersFactory.create(
             Map.of("clusterElements",
                 Map.of(
                     "model", modelElementMap,
-                    "tools", List.of(toolElementMap))));
+                    "tools", List.of(gateElementMap))));
     }
 
     private static Map<String, ComponentConnection> buildConnectionParameters() {
