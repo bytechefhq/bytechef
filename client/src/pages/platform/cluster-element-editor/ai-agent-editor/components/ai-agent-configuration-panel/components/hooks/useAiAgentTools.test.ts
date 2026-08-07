@@ -1,87 +1,101 @@
-import {describe, expect, it} from 'vitest';
+import {renderHook} from '@testing-library/react';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-/**
- * Tests for the tool identifier fallback used by useAiAgentTools.
- *
- * Tool entries can appear in either shape:
- *  - NodeDataType (workflowNodeName) when synced in-memory after a node click.
- *  - ClusterElementItemType (name) when loaded from the workflow definition JSON
- *    or when newly saved via saveClusterElementToWorkflow.
- *
- * If the hook only reads workflowNodeName, a just-added tool ends up with an
- * empty identifier, which later makes the Configure node-details panel blank
- * because its outer gate checks currentNode?.workflowNodeName.
- */
+const {useWorkflowDataStoreMock, useWorkflowEditorStoreMock} = vi.hoisted(() => ({
+    useWorkflowDataStoreMock: vi.fn(),
+    useWorkflowEditorStoreMock: vi.fn(),
+}));
 
-type ToolElementInputType = {
-    name?: string;
-    workflowNodeName?: string;
+vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowDataStore', () => ({
+    default: useWorkflowDataStoreMock,
+}));
+
+vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowEditorStore', () => ({
+    default: useWorkflowEditorStoreMock,
+}));
+
+vi.mock('@/shared/queries/platform/workflowTestConfigurations.queries', () => ({
+    useGetWorkflowTestConfigurationConnectionsQuery: () => ({data: []}),
+}));
+
+vi.mock('@/shared/stores/useEnvironmentStore', () => ({
+    useEnvironmentStore: () => 1,
+}));
+
+import useAiAgentTools from './useAiAgentTools';
+
+const rootClusterElementNodeData = {
+    clusterElements: {
+        tools: [
+            {name: 'grepTool_1', type: 'aiAgentUtils/v1/grepTool'},
+            {
+                clusterElements: {
+                    approvalChannels: [{name: 'slackChannel_1', type: 'slack/v1/approvalChannel'}],
+                    tools: [{name: 'deleteRecord_1', type: 'example/v1/deleteRecord'}],
+                },
+                name: 'approvalGate_1',
+                parameters: {name: 'Destructive'},
+                type: 'aiAgentUtils/v1/approvalGate',
+            },
+        ],
+    },
+    workflowNodeName: 'aiAgent_1',
 };
 
-function deriveToolName(tool: ToolElementInputType): string {
-    return tool.workflowNodeName || tool.name || '';
-}
+describe('useAiAgentTools', () => {
+    beforeEach(() => {
+        useWorkflowEditorStoreMock.mockImplementation((selector: (state: unknown) => unknown) =>
+            selector({rootClusterElementNodeData})
+        );
 
-describe('deriveToolName', () => {
-    it('prefers workflowNodeName when both fields are present', () => {
-        expect(deriveToolName({name: 'workflow_1', workflowNodeName: 'callWorkflow_1'})).toBe('callWorkflow_1');
+        useWorkflowDataStoreMock.mockImplementation((selector: (state: unknown) => unknown) =>
+            selector({componentDefinitions: [], workflow: {id: 'workflow-1'}})
+        );
     });
 
-    it('falls back to name when workflowNodeName is missing (newly added tool)', () => {
-        expect(deriveToolName({name: 'affinity_1'})).toBe('affinity_1');
+    it('keeps an ungated tool out of every group', () => {
+        const {result} = renderHook(() => useAiAgentTools());
+
+        expect(result.current.tools.map((tool) => tool.name)).toEqual(['grepTool_1']);
     });
 
-    it('falls back to name when workflowNodeName is an empty string', () => {
-        expect(deriveToolName({name: 'ahrefs_1', workflowNodeName: ''})).toBe('ahrefs_1');
+    it('groups a gate with its gated tools and channels', () => {
+        const {result} = renderHook(() => useAiAgentTools());
+
+        expect(result.current.toolGroups).toHaveLength(1);
+
+        const [toolGroup] = result.current.toolGroups;
+
+        expect(toolGroup.label).toBe('Destructive');
+        expect(toolGroup.name).toBe('approvalGate_1');
+        expect(toolGroup.tools.map((tool) => tool.name)).toEqual(['deleteRecord_1']);
+        expect(toolGroup.channelLabels).toEqual(['slack']);
     });
 
-    it('returns empty string when neither field is present', () => {
-        expect(deriveToolName({})).toBe('');
-    });
-});
-
-/**
- * Tests for the simple-mode close-on-delete behavior in handleRemoveTool.
- *
- * If the node-details panel is currently showing the tool being removed, the
- * panel must close (and currentNode cleared) before the mutation fires,
- * otherwise it keeps rendering a stale view of a tool that no longer exists.
- */
-
-type ActiveNodeInputType = {
-    activeWorkflowNodeName?: string;
-    toolNameBeingRemoved: string;
-};
-
-function shouldCloseDetailsPanelOnRemove({activeWorkflowNodeName, toolNameBeingRemoved}: ActiveNodeInputType): boolean {
-    return activeWorkflowNodeName === toolNameBeingRemoved;
-}
-
-describe('shouldCloseDetailsPanelOnRemove', () => {
-    it('closes the panel when the removed tool matches the active node', () => {
-        expect(
-            shouldCloseDetailsPanelOnRemove({
-                activeWorkflowNodeName: 'workflow_1',
-                toolNameBeingRemoved: 'workflow_1',
+    it('reports a gate with no channels so the panel can show the chat default', () => {
+        useWorkflowEditorStoreMock.mockImplementation((selector: (state: unknown) => unknown) =>
+            selector({
+                rootClusterElementNodeData: {
+                    clusterElements: {
+                        tools: [
+                            {
+                                clusterElements: {tools: []},
+                                name: 'approvalGate_2',
+                                parameters: {},
+                                type: 'aiAgentUtils/v1/approvalGate',
+                            },
+                        ],
+                    },
+                    workflowNodeName: 'aiAgent_1',
+                },
             })
-        ).toBe(true);
-    });
+        );
 
-    it('leaves the panel open when another tool is being removed', () => {
-        expect(
-            shouldCloseDetailsPanelOnRemove({
-                activeWorkflowNodeName: 'workflow_1',
-                toolNameBeingRemoved: 'affinity_1',
-            })
-        ).toBe(false);
-    });
+        const {result} = renderHook(() => useAiAgentTools());
 
-    it('does not close when no node is currently active', () => {
-        expect(
-            shouldCloseDetailsPanelOnRemove({
-                activeWorkflowNodeName: undefined,
-                toolNameBeingRemoved: 'workflow_1',
-            })
-        ).toBe(false);
+        const [toolGroup] = result.current.toolGroups;
+
+        expect(toolGroup.channelLabels).toEqual([]);
+        expect(toolGroup.label).toBe('approvalGate_2');
     });
 });
