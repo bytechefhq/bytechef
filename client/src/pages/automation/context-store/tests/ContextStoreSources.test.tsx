@@ -75,9 +75,22 @@ vi.mock('@/components/EmptyList', () => ({
 }));
 
 vi.mock('@/components/Button/Button', () => ({
-    default: ({children, onClick}: {children: React.ReactNode; onClick?: () => void}) => (
-        <button data-testid="button" onClick={onClick}>
-            {children}
+    // Mirrors the real Button, which renders `label ?? children` — a mock that only forwarded
+    // `children` made every label-prop button anonymous to role queries. Icon-only buttons carry
+    // no label at all, so `aria-label` has to be forwarded too or they stay anonymous.
+    default: ({
+        'aria-label': ariaLabel,
+        children,
+        label,
+        onClick,
+    }: {
+        'aria-label'?: string;
+        children?: React.ReactNode;
+        label?: string;
+        onClick?: () => void;
+    }) => (
+        <button aria-label={ariaLabel} data-testid="button" onClick={onClick}>
+            {label ?? children}
         </button>
     ),
 }));

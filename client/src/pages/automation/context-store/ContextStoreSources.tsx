@@ -22,7 +22,7 @@ import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {formatDistanceToNow} from 'date-fns';
-import {BoxesIcon} from 'lucide-react';
+import {BoxesIcon, SparklesIcon} from 'lucide-react';
 import {useEffect, useMemo, useState} from 'react';
 import {useParams} from 'react-router-dom';
 
@@ -104,13 +104,17 @@ const ContextStoreSources = () => {
                     centerTitle={true}
                     position="main"
                     right={
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-1">
                             <EnvironmentSelect />
 
                             {copilotEnabled && (
-                                <Button onClick={openCopilot} variant="outline">
-                                    Ask Copilot
-                                </Button>
+                                <Button
+                                    aria-label="Ask Copilot"
+                                    icon={<SparklesIcon />}
+                                    onClick={openCopilot}
+                                    size="icon"
+                                    variant="ghost"
+                                />
                             )}
 
                             {/* Hidden when there are no sources — the "No Sources" empty state already

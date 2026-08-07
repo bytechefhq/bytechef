@@ -1,6 +1,6 @@
 import Button from '@/components/Button/Button';
 import Header from '@/shared/layout/Header';
-import {Trash2} from 'lucide-react';
+import {SparklesIcon, Trash2Icon} from 'lucide-react';
 
 import useDataTableActionsMenu from '../hooks/useDataTableActionsMenu';
 import useDataTableHeader from '../hooks/useDataTableHeader';
@@ -24,17 +24,21 @@ const DataTableHeader = ({onAskCopilot}: DataTableHeaderPropsI) => {
             centerTitle
             position="main"
             right={
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1">
                     {selectedRowsCount > 0 && (
                         <Button onClick={handleOpenDeleteRowsDialog} variant="destructive">
-                            <Trash2 className="size-4" /> Delete ({selectedRowsCount})
+                            <Trash2Icon className="size-4" /> Delete ({selectedRowsCount})
                         </Button>
                     )}
 
                     {onAskCopilot && (
-                        <Button onClick={onAskCopilot} variant="outline">
-                            Ask Copilot
-                        </Button>
+                        <Button
+                            aria-label="Ask Copilot"
+                            icon={<SparklesIcon />}
+                            onClick={onAskCopilot}
+                            size="icon"
+                            variant="ghost"
+                        />
                     )}
 
                     <DataTableActionsMenu

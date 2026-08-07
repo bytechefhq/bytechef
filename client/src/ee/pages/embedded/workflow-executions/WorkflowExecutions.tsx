@@ -443,7 +443,7 @@ export const WorkflowExecutions = () => {
                                     }
                                     onClick={() => refetchWorkflowExecutions()}
                                     size="icon"
-                                    variant="outline"
+                                    variant="ghost"
                                 />
                             </TooltipTrigger>
 

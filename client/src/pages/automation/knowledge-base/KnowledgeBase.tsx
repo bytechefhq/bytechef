@@ -12,6 +12,7 @@ import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useQueryClient} from '@tanstack/react-query';
+import {SparklesIcon} from 'lucide-react';
 import {useEffect} from 'react';
 
 const KnowledgeBase = () => {
@@ -52,9 +53,13 @@ const KnowledgeBase = () => {
                     onBackClick={handleBackClick}
                     right={
                         copilotEnabled && (
-                            <Button onClick={openCopilot} variant="outline">
-                                Ask Copilot
-                            </Button>
+                            <Button
+                                aria-label="Ask Copilot"
+                                icon={<SparklesIcon />}
+                                onClick={openCopilot}
+                                size="icon"
+                                variant="ghost"
+                            />
                         )
                     }
                 />
