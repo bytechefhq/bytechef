@@ -31,7 +31,7 @@ Requires `react` and `react-dom` >= 19.2.3 as peer dependencies.
 ### Local Development Against a Consumer App
 
 The workspace (`sdks/frontend/embedded`) uses a local [Verdaccio](https://verdaccio.org/) registry
-and `npm link` -- there are no `yalc:*` scripts.
+and `npm link`.
 
 #### Option A: npm link (quickest)
 
@@ -64,12 +64,23 @@ concurrently with the `test-apps` Next.js dev server.
 
 #### Suggested workflow steps
 
-1. In the ByteChef `DesktopSidebar` component initialize the dialog with `const {openDialog} = useConnectDialog({options})`
-   a. `options` are described in `UseConnectDialogProps`
+Develop against the embedded sample app in [`../test-apps`](../test-apps) -- a standalone Next.js
+consumer that calls `useConnectDialog` the same way a customer's app would. Do **not** wire the SDK
+into the ByteChef client (`client/`) itself; that is not a consumer of this package.
+
+1. Start the ByteChef server and client, since the sample app opens the connect dialog served by the
+   client (`http://127.0.0.1:5173` -- the sample app's default Base URL).
 2. `cd ~/.../bytechef/sdks/frontend/embedded`
-3. Run `npm run dev`
-4. On change inside the `sdk/index.tsx` the ByteChef dev server needs to be restarted to see the changes
-   a. This is because of Vite's caching
+3. `npm run setup:link` (one time -- builds the library and links it into `test-apps`)
+4. `npm run dev` -- runs the library in watch mode plus the sample app on http://localhost:3000
+5. In the sample app, fill in Key ID / Private Key / External User ID, click **Calculate JWT Token**,
+   pick an integration, then **Connect** to open the dialog.
+6. Edit `library/src/`; Vite rebuilds and Next.js hot reloads the sample app.
+
+The sample app's `useConnectDialog({baseUrl, environment, integrationId, jwtToken})` call in
+`test-apps/app/page.tsx` is the reference usage -- all options are described in
+`UseConnectDialogProps`. See [`../test-apps/README.md`](../test-apps/README.md) for how it generates
+JWTs server-side, and [`../DEVELOPMENT.md`](../DEVELOPMENT.md) for the full development guide.
 
 #### Troubleshooting
 
