@@ -22,8 +22,8 @@ interface AiHubPersonalAgentsListProps {
 
 /**
  * Full-page Personal Agents list, rendered inside the {@code /automation/ai-hub/personal-agents}
- * route via {@link AiHubPersonalAgents}. Visual style matches the Data Tables / Memories list pages — bigger
- * row paddings, semibold title, muted metadata, dropdown menu per row, divide-y separators.
+ * route via {@link AiHubPersonalAgents}. Rows are separated cards — each one carries its own rounded
+ * border with a gap between, matching the Projects list rather than a single divide-y block.
  *
  * <p>Click on a row → idempotent create-or-resolve of a {@code kind = PERSONAL_AGENT} task
  * (server-side find-or-create), then navigate to it. Mirrors the WorkflowChatsList click flow so both
@@ -141,14 +141,14 @@ const AiHubPersonalAgentsList = ({onOpenCreateDialog}: AiHubPersonalAgentsListPr
                     <Button icon={<PlusIcon />} label="Create your first agent" onClick={onOpenCreateDialog} />
                 </div>
             ) : (
-                <div className="w-full divide-y divide-border/50 rounded-md border">
+                <div className="flex w-full flex-col gap-2">
                     {agents.map((agent) => {
                         const displayTitle = agent.title ?? agent.name;
                         const updated = formatRelative(agent.updatedAt);
 
                         return (
                             <div
-                                className="group flex w-full cursor-pointer items-center justify-between gap-4 px-4 hover:bg-muted/40"
+                                className="group flex w-full cursor-pointer items-center justify-between gap-4 rounded border border-border/50 px-4 hover:bg-muted/40"
                                 key={agent.id}
                                 onClick={() => handleSelect(agent)}
                             >
