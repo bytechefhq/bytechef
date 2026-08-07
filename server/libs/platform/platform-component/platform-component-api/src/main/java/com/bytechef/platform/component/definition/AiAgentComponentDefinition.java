@@ -17,7 +17,6 @@
 package com.bytechef.platform.component.definition;
 
 import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
-import static com.bytechef.component.definition.approval.ApprovalChannelFunction.APPROVAL_CHANNELS;
 import static com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction.CHAT_MEMORY;
 import static com.bytechef.platform.component.definition.ai.agent.GuardrailsFunction.GUARDRAILS;
 import static com.bytechef.platform.component.definition.ai.agent.ModelFunction.MODEL;
@@ -38,13 +37,9 @@ import java.util.Map;
  */
 public interface AiAgentComponentDefinition extends ClusterRootComponentDefinition {
 
-    String SMART_WEB_FETCH_TOOL = "smartWebFetchTool";
-
-    String TASK_TOOL = "taskTool";
-
     @Override
     default List<ClusterElementType> getClusterElementTypes() {
-        return List.of(MODEL, CHAT_MEMORY, RAG, GUARDRAILS, TOOLS, APPROVAL_CHANNELS);
+        return List.of(MODEL, CHAT_MEMORY, RAG, GUARDRAILS, TOOLS);
     }
 
     @Override
@@ -55,8 +50,6 @@ public interface AiAgentComponentDefinition extends ClusterRootComponentDefiniti
             JAILBREAK, List.of(MODEL.key()),
             NSFW, List.of(MODEL.key()),
             TOPICAL_ALIGNMENT, List.of(MODEL.key()),
-            CUSTOM, List.of(MODEL.key()),
-            SMART_WEB_FETCH_TOOL, List.of(MODEL.key()),
-            TASK_TOOL, List.of(MODEL.key()));
+            CUSTOM, List.of(MODEL.key()));
     }
 }

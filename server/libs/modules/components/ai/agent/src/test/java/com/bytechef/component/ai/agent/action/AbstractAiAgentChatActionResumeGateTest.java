@@ -74,7 +74,7 @@ class AbstractAiAgentChatActionResumeGateTest {
                     Map.of(
                         "name", "slack_1",
                         "type", "slack/v1/sendMessage",
-                        "parameters", Map.of("requiresApproval", true))))));
+                        "parameters", Map.of())))));
 
     private final AiAgentToolFacade aiAgentToolFacade = mock(AiAgentToolFacade.class);
     private final ClusterElementDefinitionService clusterElementDefinitionService = mock(

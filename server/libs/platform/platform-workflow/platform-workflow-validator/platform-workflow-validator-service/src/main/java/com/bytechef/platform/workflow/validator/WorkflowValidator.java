@@ -699,21 +699,22 @@ public class WorkflowValidator {
 
             List<String> approvalChannelTypes = getApprovalChannelTypes(clusterElementsJsonNode);
 
-            boolean chatOnlyChannels = !approvalChannelTypes.isEmpty() &&
-                approvalChannelTypes.stream()
-                    .allMatch(WorkflowValidator::isChatApprovalChannelType);
-            boolean implicitChatDefault = approvalChannelTypes.isEmpty() &&
-                hasGatedTool(clusterElementsJsonNode);
+            if (!approvalChannelTypes.isEmpty() && isChatOnly(approvalChannelTypes)) {
+                appendChatOnlyWarning("Task '" + getNodeName(taskJsonNode) + "'", false, warnings);
+            }
 
-            if (chatOnlyChannels || implicitChatDefault) {
-                StringUtils.appendWithNewline(
-                    "Task '" + getNodeName(taskJsonNode) + "' delivers approval requests only to the chat channel" +
-                        (implicitChatDefault ? " (the default when no approval channels are configured)" : "") +
-                        ", but the workflow does not start from a chat trigger. Runs started by webhook or " +
-                        "schedule will pause without a live approval card and are only resolvable from the " +
-                        "pending run approvals list or the hosted form. Configure a fallback approval channel " +
-                        "(Slack, email, approval task) or use a chat trigger.",
-                    warnings);
+            for (JsonNode approvalGateJsonNode : getApprovalGates(clusterElementsJsonNode)) {
+                List<String> gateApprovalChannelTypes = getApprovalChannelTypes(
+                    approvalGateJsonNode.get("clusterElements"));
+
+                boolean implicitChatDefault = gateApprovalChannelTypes.isEmpty();
+
+                if (implicitChatDefault || isChatOnly(gateApprovalChannelTypes)) {
+                    appendChatOnlyWarning(
+                        "Approval gate '" + getNodeName(approvalGateJsonNode) + "' in task '" +
+                            getNodeName(taskJsonNode) + "'",
+                        implicitChatDefault, warnings);
+                }
             }
         }
     }
@@ -742,7 +743,54 @@ public class WorkflowValidator {
         return false;
     }
 
-    private static List<String> getApprovalChannelTypes(JsonNode clusterElementsJsonNode) {
+    private static boolean isChatOnly(List<String> approvalChannelTypes) {
+        return approvalChannelTypes.stream()
+            .allMatch(WorkflowValidator::isChatApprovalChannelType);
+    }
+
+    private static void appendChatOnlyWarning(String subject, boolean implicitChatDefault, StringBuilder warnings) {
+        StringUtils.appendWithNewline(
+            subject + " delivers approval requests only to the chat channel" +
+                (implicitChatDefault ? " (the default when no approval channels are configured)" : "") +
+                ", but the workflow does not start from a chat trigger. Runs started by webhook or " +
+                "schedule will pause without a live approval card and are only resolvable from the " +
+                "pending run approvals list or the hosted form. Configure a fallback approval channel " +
+                "(Slack, email, approval task) or use a chat trigger.",
+            warnings);
+    }
+
+    private static List<JsonNode> getApprovalGates(JsonNode clusterElementsJsonNode) {
+        JsonNode toolsJsonNode = clusterElementsJsonNode.get("tools");
+
+        if (toolsJsonNode == null || !toolsJsonNode.isArray()) {
+            return List.of();
+        }
+
+        List<JsonNode> approvalGateJsonNodes = new ArrayList<>();
+
+        for (JsonNode toolJsonNode : toolsJsonNode) {
+            if (!toolJsonNode.isObject() || !toolJsonNode.has("type")) {
+                continue;
+            }
+
+            JsonNode typeJsonNode = toolJsonNode.get("type");
+
+            String[] typeParts = typeJsonNode.asString()
+                .split("/");
+
+            if (typeParts.length == 3 && "approvalGate".equals(typeParts[2])) {
+                approvalGateJsonNodes.add(toolJsonNode);
+            }
+        }
+
+        return approvalGateJsonNodes;
+    }
+
+    private static List<String> getApprovalChannelTypes(@Nullable JsonNode clusterElementsJsonNode) {
+        if (clusterElementsJsonNode == null || !clusterElementsJsonNode.isObject()) {
+            return List.of();
+        }
+
         JsonNode approvalChannelsJsonNode = clusterElementsJsonNode.get("approvalChannels");
 
         if (approvalChannelsJsonNode == null || !approvalChannelsJsonNode.isArray()) {
@@ -765,33 +813,7 @@ public class WorkflowValidator {
     private static boolean isChatApprovalChannelType(String type) {
         String[] typeParts = type.split("/");
 
-        return typeParts.length == 3 && "approval".equals(typeParts[0]) && "chat".equals(typeParts[2]);
-    }
-
-    private static boolean hasGatedTool(JsonNode clusterElementsJsonNode) {
-        JsonNode toolsJsonNode = clusterElementsJsonNode.get("tools");
-
-        if (toolsJsonNode == null || !toolsJsonNode.isArray()) {
-            return false;
-        }
-
-        for (JsonNode toolJsonNode : toolsJsonNode) {
-            if (!toolJsonNode.isObject() || !toolJsonNode.has("parameters")) {
-                continue;
-            }
-
-            JsonNode parametersJsonNode = toolJsonNode.get("parameters");
-
-            if (parametersJsonNode.isObject() && parametersJsonNode.has("requiresApproval")) {
-                JsonNode requiresApprovalJsonNode = parametersJsonNode.get("requiresApproval");
-
-                if (requiresApprovalJsonNode.isBoolean() && requiresApprovalJsonNode.asBoolean()) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
+        return typeParts.length == 3 && "chat".equals(typeParts[0]) && "chat".equals(typeParts[2]);
     }
 
     private static String getNodeName(JsonNode taskJsonNode) {

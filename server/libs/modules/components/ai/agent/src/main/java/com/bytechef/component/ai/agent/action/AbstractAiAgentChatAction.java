@@ -48,6 +48,7 @@ import com.bytechef.component.ai.llm.advisor.TextGenerationFirstAdvisor;
 import com.bytechef.component.ai.llm.converter.JsonSchemaStructuredOutputConverter;
 import com.bytechef.component.ai.llm.facade.AiAgentToolFacade;
 import com.bytechef.component.ai.llm.tool.ClusterElementToolCallbacks;
+import com.bytechef.component.ai.llm.tool.DelegatingToolCallback;
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
@@ -440,13 +441,15 @@ public abstract class AbstractAiAgentChatAction {
         ToolCallback gatedToolCallback = clusterElementMap.getClusterElements(BaseToolFunction.TOOLS)
             .stream()
             .flatMap(
-                clusterElement -> clusterElementToolCallbacks.build(clusterElement, connectionParameters, context).stream())
+                clusterElement -> clusterElementToolCallbacks.build(clusterElement, connectionParameters, context)
+                    .stream())
             .filter(toolCallback -> {
                 ToolDefinition toolDefinition = toolCallback.getToolDefinition();
 
                 return gatedToolName.equals(toolDefinition.name());
             })
             .findFirst()
+            .map(DelegatingToolCallback::unwrap)
             .orElseThrow(() -> new IllegalStateException(
                 "The approved tool '" + gatedToolName + "' is no longer configured on the agent node; the " +
                     "approval cannot be applied."));

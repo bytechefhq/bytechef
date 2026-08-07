@@ -27,8 +27,6 @@ public class ToolConstants {
 
     public static final String APPROVAL_EXPIRES_IN_UNIT_HOURS = "HOURS";
 
-    public static final String REQUIRES_APPROVAL = "requiresApproval";
-
     public static final String TOOL_DESCRIPTION = "toolDescription";
     public static final String TOOL_NAME = "toolName";
 
