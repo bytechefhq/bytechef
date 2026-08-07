@@ -53,7 +53,9 @@ const ThreadEmptyState: FC<ThreadEmptyStateProps> = ({showSuggestions}) => {
 
     return (
         <div className="mx-auto flex w-full max-w-[var(--thread-max-width)] flex-1 flex-col items-center justify-center px-6 py-10 text-center">
-            <p className="text-2xl font-semibold text-foreground">What should we get done?</p>
+            <h1 className="animate-in text-2xl font-semibold text-foreground duration-200 fill-mode-both fade-in slide-in-from-bottom-1">
+                What should we get done?
+            </h1>
 
             <p className="mt-2 text-sm text-muted-foreground">
                 Ask anything, mention files / workflows / data tables, or ask me to build a workflow.

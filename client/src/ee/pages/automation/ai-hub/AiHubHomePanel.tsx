@@ -211,8 +211,6 @@ const AiHubHomePanel = () => {
                             </p>
                         </div>
 
-                        <AiHubSuggestionChips className="mx-auto" />
-
                         <AiHubChatComposer
                             modelPicker={
                                 currentWorkspaceId != null ? (
@@ -242,6 +240,12 @@ const AiHubHomePanel = () => {
                                 ) : null
                             }
                         />
+
+                        {/* Below the composer, matching the Copilot thread: the composer is the primary action and
+                            the chips are a fallback for users who don't know what to ask, so they shouldn't push
+                            the input down the page. */}
+
+                        <AiHubSuggestionChips className="mx-auto" />
                     </div>
                 )}
             </div>

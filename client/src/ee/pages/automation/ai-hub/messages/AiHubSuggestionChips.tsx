@@ -1,3 +1,4 @@
+import {Button} from '@/components/ui/button';
 import {useAui} from '@assistant-ui/react';
 import {FC} from 'react';
 import {twMerge} from 'tailwind-merge';
@@ -7,12 +8,18 @@ import {twMerge} from 'tailwind-merge';
 // research subagent with createAssetFile persistence, typed data-table creation with seed rows,
 // createKnowledgeBase + addKnowledgeBaseDocument, and the personal_agent_manager's schedule tool —
 // so a click always lands on a runnable path rather than a "not supported yet" reply.
+//
+// Each stays at or under ~85 characters so the pill renders on ONE row inside the home panel's max-w-2xl
+// column. That ceiling is measured, not estimated: at text-sm in this column the 85-character
+// knowledge-base line below renders on a single row, while the phrasings that used to run 92-105
+// characters wrapped to a second line and left the stack of chips looking ragged. Keep new entries under
+// it — but do use the room, since the wording is also the prompt the agent receives.
 const SUGGESTED_QUESTIONS: string[] = [
-    'Build a lead enrichment workflow that scores inbound signups and writes the results to a leads data table',
+    'Build a lead enrichment workflow that scores inbound signups into a data table',
     'Research our top 5 competitors and save a battle card for each one',
-    'Create a contacts data table with name, email, and company columns and add three sample rows',
+    'Create a contacts data table with name, email, and company columns and sample rows',
     'Create a knowledge base for our product docs and add a getting-started document to it',
-    "Set up a personal agent that summarizes yesterday's workflow executions every morning at 9:00",
+    "Set up a personal agent that summarizes yesterday's executions every morning",
 ];
 
 interface AiHubSuggestionChipsProps {
@@ -26,21 +33,26 @@ const AiHubSuggestionChips: FC<AiHubSuggestionChipsProps> = ({className}) => {
     const aui = useAui();
 
     return (
-        <div className={twMerge('flex w-full max-w-xl flex-col items-stretch gap-2', className)}>
+        <div className={twMerge('flex w-full flex-wrap items-center justify-center gap-2 px-4', className)}>
             {SUGGESTED_QUESTIONS.map((question) => (
-                <button
-                    className="rounded-lg border border-border bg-background px-3 py-2 text-left text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-                    key={question}
-                    onClick={() =>
-                        aui.thread.append({
-                            content: [{text: question, type: 'text'}],
-                            role: 'user',
-                        })
-                    }
-                    type="button"
-                >
-                    {question}
-                </button>
+                <div className="animate-in duration-200 fill-mode-both fade-in slide-in-from-bottom-2" key={question}>
+                    <Button
+                        // max-w-full + ellipsis rather than wrapping: on a viewport narrower than the copy budget
+                        // above, a chip degrades to a truncated single row (full text still on the title tooltip)
+                        // instead of reflowing to two lines and re-introducing the ragged stack.
+                        className="h-auto max-w-full overflow-hidden rounded-full border border-border/60 px-3.5 py-1.5 text-sm font-normal text-ellipsis whitespace-nowrap text-foreground transition-colors hover:bg-muted"
+                        onClick={() =>
+                            aui.thread.append({
+                                content: [{text: question, type: 'text'}],
+                                role: 'user',
+                            })
+                        }
+                        title={question}
+                        variant="ghost"
+                    >
+                        {question}
+                    </Button>
+                </div>
             ))}
         </div>
     );
