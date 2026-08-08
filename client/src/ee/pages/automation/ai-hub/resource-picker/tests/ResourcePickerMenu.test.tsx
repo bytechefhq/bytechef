@@ -49,6 +49,7 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => {
         useGetAssetFilesQuery: vi.fn(),
         useKnowledgeBasesQuery: vi.fn(),
         useWorkspaceMcpServersQuery: vi.fn(),
+        useWorkspaceProjectWorkflowsQuery: vi.fn(),
     };
 });
 
@@ -70,24 +71,6 @@ vi.mock('@/shared/queries/automation/workflowExecutions.queries', async (importO
     };
 });
 
-vi.mock('@/shared/queries/automation/projects.queries', async (importOriginal) => {
-    const actual = await importOriginal<typeof import('@/shared/queries/automation/projects.queries')>();
-
-    return {
-        ...actual,
-        useGetWorkspaceProjectsQuery: vi.fn(),
-    };
-});
-
-vi.mock('@tanstack/react-query', async (importOriginal) => {
-    const actual = await importOriginal<typeof import('@tanstack/react-query')>();
-
-    return {
-        ...actual,
-        useQueries: vi.fn(),
-    };
-});
-
 // Bypass the 300 ms debounce so search tests don't need fake timers.
 vi.mock('use-debounce', () => ({
     useDebouncedCallback: (fn: (value: string) => void) => fn,
@@ -101,16 +84,13 @@ const {
     useGetAssetFilesQuery,
     useKnowledgeBasesQuery,
     useWorkspaceMcpServersQuery,
+    useWorkspaceProjectWorkflowsQuery,
 } = await import('@/shared/middleware/graphql');
 
 const {useGetApiCollectionsQuery} = await import('@/ee/shared/mutations/automation/apiCollections.queries');
 
 const {useInfiniteWorkspaceProjectWorkflowExecutionsQuery} =
     await import('@/shared/queries/automation/workflowExecutions.queries');
-
-const {useGetWorkspaceProjectsQuery} = await import('@/shared/queries/automation/projects.queries');
-
-const {useQueries} = await import('@tanstack/react-query');
 
 const mockUseAiHubTasksQuery = vi.mocked(useAiHubTasksQuery);
 const mockUseDataTablesQuery = vi.mocked(useDataTablesQuery);
@@ -121,8 +101,7 @@ const mockUseGetApiCollectionsQuery = vi.mocked(useGetApiCollectionsQuery);
 const mockUseInfiniteWorkspaceProjectWorkflowExecutionsQuery = vi.mocked(
     useInfiniteWorkspaceProjectWorkflowExecutionsQuery
 );
-const mockUseGetWorkspaceProjectsQuery = vi.mocked(useGetWorkspaceProjectsQuery);
-const mockUseQueries = vi.mocked(useQueries);
+const mockUseWorkspaceProjectWorkflowsQuery = vi.mocked(useWorkspaceProjectWorkflowsQuery);
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 
@@ -146,8 +125,7 @@ const setupMocks = () => {
     mockUseWorkspaceMcpServersQuery.mockReturnValue(mockQuerySuccess({workspaceMcpServers: []}));
     mockUseGetApiCollectionsQuery.mockReturnValue(mockQuerySuccess([]));
     mockUseAiHubTasksQuery.mockReturnValue(mockQuerySuccess({aiHubTasks: []}));
-    mockUseGetWorkspaceProjectsQuery.mockReturnValue(mockQuerySuccess([]));
-    mockUseQueries.mockReturnValue([]);
+    mockUseWorkspaceProjectWorkflowsQuery.mockReturnValue(mockQuerySuccess({workspaceProjectWorkflows: []}));
 };
 
 const renderMenu = async (extraProps?: Record<string, unknown>) => {
@@ -283,27 +261,42 @@ describe('ResourcePickerMenu', () => {
     });
 
     describe('workflow → project drill-down', () => {
-        // Two projects, each with at least one workflow, to exercise multi-project selection.
-        const PROJECT_ALPHA = {id: 10, name: 'Alpha Project'};
-        const PROJECT_BETA = {id: 20, name: 'Beta Project'};
-
-        // `id` is the workflow's UUID string; `projectWorkflowId` is the numeric join-entity id the
-        // workflow editor actually needs. The two are distinct — exercising that distinction is the point
-        // of these mocks (a regression where projectWorkflowId was derived from Number(id) produced NaN).
-        const WORKFLOW_ALPHA_1 = {id: 'wf-alpha-onboarding', label: 'Alpha Onboarding', projectWorkflowId: 101};
-        const WORKFLOW_BETA_1 = {id: 'wf-beta-checkout', label: 'Beta Checkout', projectWorkflowId: 201};
-        const WORKFLOW_BETA_2 = {id: 'wf-beta-refund', label: 'Beta Refund', projectWorkflowId: 202};
+        // The server returns ONE flat, workspace-wide list; the two-level project → workflow drill-down is regrouped
+        // client-side by `groupWorkflowsByProject`. Two projects, each with at least one workflow, to exercise
+        // multi-project grouping from a single flat response.
+        //
+        // `workflowId` is the workflow's UUID string; `projectWorkflowId` is the join-entity id the workflow editor
+        // actually needs, and it arrives as a GraphQL ID (a string). The two are distinct — exercising that
+        // distinction is the point of these fixtures (a regression where projectWorkflowId was derived from
+        // Number(workflowId) produced NaN).
+        const WORKSPACE_PROJECT_WORKFLOWS = [
+            {
+                projectId: '10',
+                projectName: 'Alpha Project',
+                projectWorkflowId: '101',
+                workflowId: 'wf-alpha-onboarding',
+                workflowLabel: 'Alpha Onboarding',
+            },
+            {
+                projectId: '20',
+                projectName: 'Beta Project',
+                projectWorkflowId: '201',
+                workflowId: 'wf-beta-checkout',
+                workflowLabel: 'Beta Checkout',
+            },
+            {
+                projectId: '20',
+                projectName: 'Beta Project',
+                projectWorkflowId: '202',
+                workflowId: 'wf-beta-refund',
+                workflowLabel: 'Beta Refund',
+            },
+        ];
 
         const setupWorkflowMocks = () => {
-            mockUseGetWorkspaceProjectsQuery.mockReturnValue(
-                mockQuerySuccess([PROJECT_ALPHA, PROJECT_BETA]) as ReturnType<typeof useGetWorkspaceProjectsQuery>
+            mockUseWorkspaceProjectWorkflowsQuery.mockReturnValue(
+                mockQuerySuccess({workspaceProjectWorkflows: WORKSPACE_PROJECT_WORKFLOWS})
             );
-
-            // useQueries returns one result per project in the same order as cappedProjects.
-            mockUseQueries.mockReturnValue([
-                {data: [WORKFLOW_ALPHA_1], status: 'success'},
-                {data: [WORKFLOW_BETA_1, WORKFLOW_BETA_2], status: 'success'},
-            ]);
         };
 
         it('shows the project list after clicking Workflows in the root menu', async () => {

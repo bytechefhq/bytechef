@@ -20,13 +20,7 @@ vi.mock('@/shared/middleware/graphql', () => ({
     useDataTablesQuery: () => ({data: undefined}),
     useGetAssetFilesQuery: () => ({data: undefined}),
     useKnowledgeBasesQuery: () => ({data: undefined}),
-}));
-
-vi.mock('@/shared/queries/automation/projects.queries', () => ({
-    ProjectKeys: {
-        projects: ['projects'],
-    },
-    useGetWorkspaceProjectsQuery: () => ({data: []}),
+    useWorkspaceProjectWorkflowsQuery: () => ({data: undefined}),
 }));
 
 vi.mock('@/shared/queries/automation/workflowExecutions.queries', () => ({

@@ -10,13 +10,14 @@ import {useAiHubTaskArtifactsQuery} from '@/ee/pages/automation/ai-hub/tasks/hoo
 import {useAiHubTasksStore} from '@/ee/pages/automation/ai-hub/tasks/stores/useAiHubTasksStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
-import {Workflow, WorkflowApi} from '@/shared/middleware/automation/configuration';
-import {useDataTablesQuery, useGetAssetFilesQuery, useKnowledgeBasesQuery} from '@/shared/middleware/graphql';
-import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
-import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
+import {
+    useDataTablesQuery,
+    useGetAssetFilesQuery,
+    useKnowledgeBasesQuery,
+    useWorkspaceProjectWorkflowsQuery,
+} from '@/shared/middleware/graphql';
 import {useInfiniteWorkspaceProjectWorkflowExecutionsQuery} from '@/shared/queries/automation/workflowExecutions.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {useQueries} from '@tanstack/react-query';
 import {
     ChevronLeftIcon,
     ChevronRightIcon,
@@ -42,57 +43,39 @@ interface WorkflowItemI {
 const SECTION_INITIAL_CAP = 20;
 const SECTION_EXPAND_INCREMENT = 50;
 
-// Returns workflows enriched with their parent projectId and projectWorkflowId — both are required by
-// `openWorkflowTab` and aren't available on the bare workflow list. The composer doesn't need this metadata
-// (its references are scoped only to the workflow id) so it stays in this picker rather than the composer.
-function useAllWorkspaceWorkflows(workspaceId: number | undefined): WorkflowItemI[] {
-    const {data: projects} = useGetWorkspaceProjectsQuery({id: workspaceId ?? 0}, Boolean(workspaceId));
+/**
+ * Returns workflows enriched with their parent projectId and projectWorkflowId — both are required by
+ * `openWorkflowTab` and aren't available on the bare workflow list. The composer doesn't need this metadata
+ * (its references are scoped only to the workflow id) so it stays in this picker rather than the composer.
+ *
+ * <p>Same single-round-trip query {@code ResourcePickerMenu.useAllWorkspaceWorkflows} uses, gated on the picker being
+ * open. It replaced a per-project request fan-out that saturated the browser's connection pool on large
+ * workspaces.</p>
+ */
+function useAllWorkspaceWorkflows(workspaceId: number | undefined, enabled: boolean): WorkflowItemI[] {
+    const {data} = useWorkspaceProjectWorkflowsQuery(
+        {workspaceId: String(workspaceId ?? '')},
+        {enabled: enabled && workspaceId != null}
+    );
 
-    // All workspace projects (no cap) so workflows from every project are reachable. Project counts are
-    // bounded (tens); each getProjectWorkflows is cheap and react-query-cached.
-    const allProjects = useMemo(() => projects ?? [], [projects]);
-
-    const workflowQueries = useQueries({
-        queries: allProjects.map((project) => ({
-            enabled: Boolean(project.id),
-            queryFn: () => new WorkflowApi().getProjectWorkflows({id: project.id!}),
-            queryKey: ProjectWorkflowKeys.projectWorkflows(project.id!),
-        })),
-    });
-
-    // Same pattern as AiHubComposer.useAllWorkspaceWorkflows: useQueries returns a fresh array
-    // every render, so depend on a stable per-project fingerprint rather than the array itself.
-    const workflowDataList = workflowQueries.map((queryResult) => queryResult.data as Workflow[] | undefined);
-
-    const workflowDataFingerprint = workflowDataList.map((workflows) => (workflows ? workflows.length : -1)).join(',');
+    const workspaceProjectWorkflows = data?.workspaceProjectWorkflows;
 
     return useMemo(() => {
-        const allWorkflows: WorkflowItemI[] = [];
+        if (!workspaceProjectWorkflows) {
+            return [];
+        }
 
-        allProjects.forEach((project, projectIndex) => {
-            const workflows = workflowDataList[projectIndex];
-
-            if (!workflows || project.id == null) {
-                return;
-            }
-
-            for (const workflow of workflows) {
-                allWorkflows.push({
-                    id: String(workflow.id ?? ''),
-                    name: workflow.label ?? workflow.id ?? '',
-                    projectId: String(project.id),
-                    projectName: project.name ?? `Project ${project.id}`,
-                    // `workflow.id` is the workflow's UUID string; the numeric join-entity id the workflow
-                    // editor needs lives on `projectWorkflowId`. Deriving it from Number(id) yields NaN for
-                    // real UUIDs, which renders as "Workflow reference unavailable." in the viewer.
-                    projectWorkflowId: workflow.projectWorkflowId ?? 0,
-                });
-            }
-        });
-
-        return allWorkflows;
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [workflowDataFingerprint, allProjects]);
+        return workspaceProjectWorkflows.map((workspaceProjectWorkflow) => ({
+            id: workspaceProjectWorkflow.workflowId,
+            name: workspaceProjectWorkflow.workflowLabel,
+            projectId: workspaceProjectWorkflow.projectId,
+            projectName: workspaceProjectWorkflow.projectName,
+            // `workflowId` is the workflow's UUID string; the numeric join-entity id the workflow editor needs is
+            // `projectWorkflowId`. Deriving it from Number(workflowId) yields NaN for real UUIDs, which renders as
+            // "Workflow reference unavailable." in the viewer.
+            projectWorkflowId: Number(workspaceProjectWorkflow.projectWorkflowId),
+        }));
+    }, [workspaceProjectWorkflows]);
 }
 
 type MenuPathType =
@@ -154,7 +137,7 @@ const AiHubFilePicker = () => {
         Boolean(currentWorkspaceId)
     );
 
-    const workflowItems = useAllWorkspaceWorkflows(currentWorkspaceId);
+    const workflowItems = useAllWorkspaceWorkflows(currentWorkspaceId, open);
 
     const handleSearchChange = useDebouncedCallback((value: string) => {
         setDebouncedSearch(value);

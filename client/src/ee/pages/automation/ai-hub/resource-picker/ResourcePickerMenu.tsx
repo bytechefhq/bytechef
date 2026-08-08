@@ -4,7 +4,6 @@ import {ReferencedResourceKindType} from '@/ee/pages/automation/ai-hub/composer/
 import {groupWorkflowsByProject} from '@/ee/pages/automation/ai-hub/resource-picker/groupWorkflowsByProject';
 import {useGetApiCollectionsQuery} from '@/ee/shared/mutations/automation/apiCollections.queries';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
-import {Workflow, WorkflowApi} from '@/shared/middleware/automation/configuration';
 import {
     AiHubTaskStatus,
     useAiHubTasksQuery,
@@ -12,11 +11,9 @@ import {
     useGetAssetFilesQuery,
     useKnowledgeBasesQuery,
     useWorkspaceMcpServersQuery,
+    useWorkspaceProjectWorkflowsQuery,
 } from '@/shared/middleware/graphql';
-import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
-import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {useInfiniteWorkspaceProjectWorkflowExecutionsQuery} from '@/shared/queries/automation/workflowExecutions.queries';
-import {useQueries} from '@tanstack/react-query';
 import {
     ChevronLeftIcon,
     ChevronRightIcon,
@@ -82,58 +79,39 @@ interface WorkflowItemI {
 const SECTION_INITIAL_CAP = 20;
 const SECTION_EXPAND_INCREMENT = 50;
 
-function useAllWorkspaceWorkflows(workspaceId: number | undefined): WorkflowItemI[] {
-    const {data: projects} = useGetWorkspaceProjectsQuery({id: workspaceId ?? 0}, Boolean(workspaceId));
+/**
+ * Every latest-version workflow in the workspace, flattened with the project metadata the picker needs to group rows
+ * and open a workflow tab.
+ *
+ * <p>One GraphQL round trip. The previous shape fetched the workspace's projects and then fanned out one
+ * `GET /projects/{id}/workflows` per project; on a workspace with a hundred-plus projects that saturated the browser's
+ * six-connection-per-origin limit for ~12s, stalling unrelated requests — including the lazy-route module fetches for
+ * sibling AI Hub pages — behind it. Gated on `enabled` (the picker being open) so a closed picker costs nothing.</p>
+ */
+function useAllWorkspaceWorkflows(workspaceId: number | undefined, enabled: boolean): WorkflowItemI[] {
+    const {data} = useWorkspaceProjectWorkflowsQuery(
+        {workspaceId: String(workspaceId ?? '')},
+        {enabled: enabled && workspaceId != null}
+    );
 
-    // All workspace projects (no cap) so workflows from every project are reachable. Project counts are
-    // bounded (tens); each getProjectWorkflows is cheap and react-query-cached.
-    const allProjects = useMemo(() => projects ?? [], [projects]);
-
-    const workflowQueries = useQueries({
-        queries: allProjects.map((project) => ({
-            enabled: Boolean(project.id),
-            queryFn: () => new WorkflowApi().getProjectWorkflows({id: project.id!}),
-            queryKey: ProjectWorkflowKeys.projectWorkflows(project.id!),
-        })),
-    });
-
-    // useQueries returns a fresh array reference every render, so depending on it directly defeats useMemo.
-    // Each query's `.data` is stable when the cache hasn't moved, so depend on the data refs indirectly via a stable
-    // fingerprint string. Spreading the array directly into the deps would give useMemo a variable-length deps array
-    // (length grows as projects load), which is undefined behavior in React 19 and hard-errors in dev.
-    const workflowDataList = workflowQueries.map((queryResult) => queryResult.data as Workflow[] | undefined);
-
-    const workflowDataFingerprint = workflowDataList.map((workflows) => (workflows ? workflows.length : -1)).join(',');
+    const workspaceProjectWorkflows = data?.workspaceProjectWorkflows;
 
     return useMemo(() => {
-        const allWorkflows: WorkflowItemI[] = [];
+        if (!workspaceProjectWorkflows) {
+            return [];
+        }
 
-        allProjects.forEach((project, projectIndex) => {
-            const workflows = workflowDataList[projectIndex];
-
-            if (!workflows || project.id == null) {
-                return;
-            }
-
-            for (const workflow of workflows) {
-                allWorkflows.push({
-                    id: String(workflow.id ?? ''),
-                    name: workflow.label ?? workflow.id ?? '',
-                    projectId: String(project.id),
-                    projectName: project.name ?? `Project ${project.id}`,
-                    // `workflow.id` is the workflow's UUID string; the numeric join-entity id the workflow
-                    // editor needs lives on `projectWorkflowId`. Deriving it from Number(id) yields NaN for
-                    // real UUIDs, which renders as "Workflow reference unavailable." in the viewer.
-                    projectWorkflowId: workflow.projectWorkflowId ?? 0,
-                });
-            }
-        });
-
-        return allWorkflows;
-        // workflowDataList is intentionally read inside the memo body but excluded from deps; the fingerprint above
-        // captures the only mutation we care about (per-project data length / presence) with constant-length deps.
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [workflowDataFingerprint, allProjects]);
+        return workspaceProjectWorkflows.map((workspaceProjectWorkflow) => ({
+            id: workspaceProjectWorkflow.workflowId,
+            name: workspaceProjectWorkflow.workflowLabel,
+            projectId: workspaceProjectWorkflow.projectId,
+            projectName: workspaceProjectWorkflow.projectName,
+            // `workflowId` is the workflow's UUID string; the numeric join-entity id the workflow editor needs is
+            // `projectWorkflowId`. Deriving it from Number(workflowId) yields NaN for real UUIDs, which renders as
+            // "Workflow reference unavailable." in the viewer.
+            projectWorkflowId: Number(workspaceProjectWorkflow.projectWorkflowId),
+        }));
+    }, [workspaceProjectWorkflows]);
 }
 
 // The 'workflows' branch uses a two-level drilldown: pick a parent (project), then pick the child
@@ -223,7 +201,7 @@ const ResourcePickerMenu = ({
         {enabled: isPickerActive && workspaceId != null}
     );
 
-    const workflowItems = useAllWorkspaceWorkflows(workspaceId);
+    const workflowItems = useAllWorkspaceWorkflows(workspaceId, isPickerActive);
 
     const handleSearchChange = useDebouncedCallback((value: string) => {
         setDebouncedSearch(value);
