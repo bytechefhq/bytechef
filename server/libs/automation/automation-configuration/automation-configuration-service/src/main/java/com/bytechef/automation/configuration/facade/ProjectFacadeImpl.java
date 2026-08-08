@@ -29,6 +29,7 @@ import com.bytechef.automation.configuration.dto.ProjectTemplateDTO.ComponentDef
 import com.bytechef.automation.configuration.dto.ProjectTemplateDTO.WorkflowInfo;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.dto.SharedProjectDTO;
+import com.bytechef.automation.configuration.dto.WorkspaceProjectWorkflowDTO;
 import com.bytechef.automation.configuration.service.PreBuiltTemplateService;
 import com.bytechef.automation.configuration.service.ProjectCodeWorkflowInfoSupplier;
 import com.bytechef.automation.configuration.service.ProjectCodeWorkflowInfoSupplier.CodeWorkflowInfo;
@@ -59,12 +60,15 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import org.apache.commons.lang3.StringUtils;
@@ -429,6 +433,80 @@ public class ProjectFacadeImpl implements ProjectFacade {
             .map(projectWorkflow -> new ProjectWorkflowDTO(
                 workflowService.getWorkflow(projectWorkflow.getWorkflowId()), projectWorkflow, false))
             .toList();
+    }
+
+    /**
+     * Returns every workspace project's latest-version workflows as one flat, label-only listing.
+     *
+     * <p>
+     * Same set a caller would assemble by invoking {@code ProjectWorkflowFacade.getProjectWorkflows(projectId)} once
+     * per project — latest project version only, sorted by label — but resolved in three batched queries (projects,
+     * their project workflows, the workflows' labels) instead of one round trip per project. Unlike
+     * {@link #getWorkspaceProjectWorkflows(long)}, which returns rows for ALL project versions and parses each workflow
+     * definition, this one is safe to call for a workspace with hundreds of projects.
+     * </p>
+     */
+    @Override
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'WORKFLOW_VIEW')")
+    @Transactional(readOnly = true)
+    public List<WorkspaceProjectWorkflowDTO> getWorkspaceLatestProjectWorkflows(long workspaceId) {
+        List<Project> projects = projectService.getProjects(null, null, false, null, null, workspaceId);
+
+        if (projects.isEmpty()) {
+            return List.of();
+        }
+
+        Map<Long, Project> projectMap = projects.stream()
+            .collect(Collectors.toMap(project -> Objects.requireNonNull(project.getId(), "id"), Function.identity()));
+
+        // One project workflow row exists per (project, version), so the batch load is filtered down to each
+        // project's own last version. Doing the version filter here rather than per project keeps this to a single
+        // repository call regardless of how many projects the workspace has.
+        List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getProjectWorkflows(List.copyOf(
+            projectMap.keySet()))
+            .stream()
+            .filter(projectWorkflow -> {
+                Project project = projectMap.get(projectWorkflow.getProjectId());
+
+                return project != null && project.getLastProjectVersion() == projectWorkflow.getProjectVersion();
+            })
+            .toList();
+
+        if (projectWorkflows.isEmpty()) {
+            return List.of();
+        }
+
+        List<String> workflowIds = projectWorkflows.stream()
+            .map(ProjectWorkflow::getWorkflowId)
+            .distinct()
+            .toList();
+
+        Map<String, Workflow> workflowMap = workflowService.getWorkflows(workflowIds)
+            .stream()
+            .collect(Collectors.toMap(Workflow::getId, Function.identity()));
+
+        List<WorkspaceProjectWorkflowDTO> workspaceProjectWorkflows = new ArrayList<>();
+
+        for (ProjectWorkflow projectWorkflow : projectWorkflows) {
+            Workflow workflow = workflowMap.get(projectWorkflow.getWorkflowId());
+            Project project = projectMap.get(projectWorkflow.getProjectId());
+
+            // A project workflow row whose workflow blob is gone is skipped rather than surfaced as a nameless
+            // entry — the same tolerance the chat-workflow listing applies.
+            if (workflow == null || project == null) {
+                continue;
+            }
+
+            workspaceProjectWorkflows.add(new WorkspaceProjectWorkflowDTO(
+                projectWorkflow.getProjectId(), project.getName(),
+                Objects.requireNonNull(projectWorkflow.getId(), "id"), workflow.getId(), workflow.getLabel()));
+        }
+
+        workspaceProjectWorkflows.sort(
+            Comparator.comparing(WorkspaceProjectWorkflowDTO::projectName, String.CASE_INSENSITIVE_ORDER)
+                .thenComparing(WorkspaceProjectWorkflowDTO::workflowLabel, String.CASE_INSENSITIVE_ORDER));
+
+        return workspaceProjectWorkflows;
     }
 
     @Override

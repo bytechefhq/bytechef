@@ -12,6 +12,7 @@ import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.dto.ProjectTemplateDTO;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.dto.SharedProjectDTO;
+import com.bytechef.automation.configuration.dto.WorkspaceProjectWorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.List;
@@ -91,6 +92,11 @@ public class RemoteProjectFacadeClient implements ProjectFacade {
 
     @Override
     public List<ProjectWorkflowDTO> getWorkspaceProjectWorkflows(long workspaceId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<WorkspaceProjectWorkflowDTO> getWorkspaceLatestProjectWorkflows(long workspaceId) {
         throw new UnsupportedOperationException();
     }
 

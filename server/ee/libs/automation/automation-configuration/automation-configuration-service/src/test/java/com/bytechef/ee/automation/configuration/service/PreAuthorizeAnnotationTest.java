@@ -127,6 +127,8 @@ class PreAuthorizeAnnotationTest {
             clazz, "getWorkspaceProjects", "hasPermission(#workspaceId, 'Workspace', 'WORKFLOW_VIEW')");
         assertMethodPreAuthorizeExists(
             clazz, "getWorkspaceProjectWorkflows", "hasPermission(#workspaceId, 'Workspace', 'WORKFLOW_VIEW')");
+        assertMethodPreAuthorizeExists(
+            clazz, "getWorkspaceLatestProjectWorkflows", "hasPermission(#workspaceId, 'Workspace', 'WORKFLOW_VIEW')");
         // Tenant-wide listing without a workspaceId is admin-only.
         assertAnyMethodHasPreAuthorize(clazz, "getProjects", "isTenantAdmin()");
     }

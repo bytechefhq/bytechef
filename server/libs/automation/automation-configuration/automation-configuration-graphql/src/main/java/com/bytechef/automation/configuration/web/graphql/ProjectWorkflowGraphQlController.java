@@ -23,6 +23,8 @@ import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.SharedWorkflowDTO;
 import com.bytechef.automation.configuration.dto.WorkflowTemplateDTO;
+import com.bytechef.automation.configuration.dto.WorkspaceProjectWorkflowDTO;
+import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.graphql.error.GraphQlBadRequestException;
@@ -53,6 +55,7 @@ public class ProjectWorkflowGraphQlController {
     private static final String ERROR_TRIGGER_COMPONENT_NAME = "workflow";
     private static final String ERROR_TRIGGER_OPERATION_NAME = "newWorkflowError";
 
+    private final ProjectFacade projectFacade;
     private final ProjectWorkflowFacade projectWorkflowFacade;
     private final ProjectWorkflowService projectWorkflowService;
     private final WorkflowFacade workflowFacade;
@@ -60,9 +63,10 @@ public class ProjectWorkflowGraphQlController {
 
     @SuppressFBWarnings("EI")
     public ProjectWorkflowGraphQlController(
-        ProjectWorkflowFacade projectWorkflowFacade, ProjectWorkflowService projectWorkflowService,
-        WorkflowFacade workflowFacade, WorkflowService workflowService) {
+        ProjectFacade projectFacade, ProjectWorkflowFacade projectWorkflowFacade,
+        ProjectWorkflowService projectWorkflowService, WorkflowFacade workflowFacade, WorkflowService workflowService) {
 
+        this.projectFacade = projectFacade;
         this.projectWorkflowFacade = projectWorkflowFacade;
         this.projectWorkflowService = projectWorkflowService;
         this.workflowFacade = workflowFacade;
@@ -149,6 +153,22 @@ public class ProjectWorkflowGraphQlController {
     @QueryMapping(name = "sharedWorkflow")
     public SharedWorkflowDTO sharedWorkflow(@Argument String workflowUuid) {
         return projectWorkflowFacade.getSharedWorkflow(workflowUuid);
+    }
+
+    /**
+     * Flat listing of every latest-version workflow in the workspace, for pickers that let the user reference any
+     * workflow. Replaces the client-side fan-out of one {@code GET /projects/{id}/workflows} per project, which on a
+     * workspace with hundreds of projects saturated the browser's per-origin connection pool and stalled unrelated
+     * requests behind it.
+     *
+     * <p>
+     * Authorization lives on {@code ProjectFacade.getWorkspaceLatestProjectWorkflows} — the per-project REST path this
+     * replaces was guarded per project, so the workspace-level check has to be the facade's, not this controller's.
+     * </p>
+     */
+    @QueryMapping(name = "workspaceProjectWorkflows")
+    public List<WorkspaceProjectWorkflowDTO> workspaceProjectWorkflows(@Argument long workspaceId) {
+        return projectFacade.getWorkspaceLatestProjectWorkflows(workspaceId);
     }
 
     @QueryMapping(name = "workflowTemplate")

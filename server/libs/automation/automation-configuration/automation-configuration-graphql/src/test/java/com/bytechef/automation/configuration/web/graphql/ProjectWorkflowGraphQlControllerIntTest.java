@@ -23,6 +23,8 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.dto.SharedWorkflowDTO;
 import com.bytechef.automation.configuration.dto.WorkflowTemplateDTO;
+import com.bytechef.automation.configuration.dto.WorkspaceProjectWorkflowDTO;
+import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.web.graphql.config.AutomationConfigurationGraphQlConfigurationSharedMocks;
 import com.bytechef.automation.configuration.web.graphql.config.AutomationConfigurationGraphQlTestConfiguration;
@@ -52,6 +54,9 @@ public class ProjectWorkflowGraphQlControllerIntTest {
 
     @Autowired
     private GraphQlTester graphQlTester;
+
+    @Autowired
+    private ProjectFacade projectFacade;
 
     @Autowired
     private ProjectWorkflowFacade projectWorkflowFacade;
@@ -196,5 +201,53 @@ public class ProjectWorkflowGraphQlControllerIntTest {
             .path("workflowTemplate.workflow.label")
             .entity(String.class)
             .isEqualTo("Main");
+    }
+
+    /**
+     * Pins the wire shape the AI Hub pickers depend on. {@code projectId} and {@code projectWorkflowId} are declared
+     * {@code ID!}, so a {@code long} on the DTO reaches the client as a STRING — the client has to coerce
+     * projectWorkflowId back to a number. Getting that wrong is not hypothetical: deriving the numeric id from the
+     * workflow UUID previously produced NaN and rendered "Workflow reference unavailable." in the viewer.
+     */
+    @Test
+    void testWorkspaceProjectWorkflows() {
+        // Given
+        when(projectFacade.getWorkspaceLatestProjectWorkflows(eq(1L)))
+            .thenReturn(
+                List.of(
+                    new WorkspaceProjectWorkflowDTO(10L, "Alpha Project", 101L, "wf-alpha", "Alpha Onboarding")));
+
+        // When & Then
+        this.graphQlTester
+            .document("""
+                query {
+                    workspaceProjectWorkflows(workspaceId: 1) {
+                        projectId
+                        projectName
+                        projectWorkflowId
+                        workflowId
+                        workflowLabel
+                    }
+                }
+                """)
+            .execute()
+            .path("workspaceProjectWorkflows")
+            .entityList(Object.class)
+            .hasSize(1)
+            .path("workspaceProjectWorkflows[0].projectId")
+            .entity(String.class)
+            .isEqualTo("10")
+            .path("workspaceProjectWorkflows[0].projectName")
+            .entity(String.class)
+            .isEqualTo("Alpha Project")
+            .path("workspaceProjectWorkflows[0].projectWorkflowId")
+            .entity(String.class)
+            .isEqualTo("101")
+            .path("workspaceProjectWorkflows[0].workflowId")
+            .entity(String.class)
+            .isEqualTo("wf-alpha")
+            .path("workspaceProjectWorkflows[0].workflowLabel")
+            .entity(String.class)
+            .isEqualTo("Alpha Onboarding");
     }
 }

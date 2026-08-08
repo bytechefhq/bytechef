@@ -34,6 +34,7 @@ import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.dto.ProjectTemplateDTO;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
+import com.bytechef.automation.configuration.dto.WorkspaceProjectWorkflowDTO;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
@@ -640,6 +641,63 @@ public class ProjectFacadeIntTest {
 
         assertThat(allWorkflows.size()).isEqualTo(initialWorkflowsCount);
 
+    }
+
+    @Test
+    public void testGetWorkspaceLatestProjectWorkflowsMatchesPerProjectListing() {
+        Workspace workspace = workspaceRepository.save(new Workspace("test_workspace_latest_project_workflows"));
+
+        List<Long> projectIds = new ArrayList<>();
+
+        for (int i = 0; i < 3; i++) {
+            Project project = new Project();
+
+            project.setName("test_project_" + i);
+            project.setWorkspaceId(workspace.getId());
+
+            project = projectRepository.save(project);
+
+            for (int j = 0; j < 4; j++) {
+                Workflow workflow = new Workflow(
+                    "{\"label\":\"test_workflow_label_" + j + "\",\"tasks\":[]}", Workflow.Format.JSON);
+
+                workflow.setNew(true);
+
+                workflow = workflowRepository.save(workflow);
+
+                projectWorkflowRepository.save(
+                    new ProjectWorkflow(
+                        project.getId(), project.getLastProjectVersion(), workflow.getId(), UUID.randomUUID()));
+            }
+
+            projectIds.add(project.getId());
+        }
+
+        // The workspace-wide listing must return exactly the set a caller would assemble by walking every project one
+        // at a time. That equivalence is the entire justification for clients dropping the per-project fan-out, so it
+        // is pinned here rather than left implicit.
+        List<String> perProjectWorkflowIds = projectIds.stream()
+            .flatMap(projectId -> projectWorkflowFacade.getProjectWorkflows(projectId)
+                .stream()
+                .map(ProjectWorkflowDTO::getId))
+            .sorted()
+            .toList();
+
+        List<WorkspaceProjectWorkflowDTO> workspaceProjectWorkflows =
+            projectFacade.getWorkspaceLatestProjectWorkflows(workspace.getId());
+
+        assertThat(
+            workspaceProjectWorkflows.stream()
+                .map(WorkspaceProjectWorkflowDTO::workflowId)
+                .sorted()
+                .toList()).isEqualTo(perProjectWorkflowIds);
+
+        assertThat(workspaceProjectWorkflows).hasSize(12)
+            .allSatisfy(workspaceProjectWorkflow -> {
+                assertThat(workspaceProjectWorkflow.projectName()).startsWith("test_project_");
+                assertThat(workspaceProjectWorkflow.workflowLabel()).startsWith("test_workflow_label_");
+                assertThat(projectIds).contains(workspaceProjectWorkflow.projectId());
+            });
     }
 
     private void createTestProjectWorkflows(int workspaceCount, int projectCount, int workflowCount) {

@@ -4,6 +4,7 @@ extend type Query {
     projectWorkflow(id: ID!): ProjectWorkflow
     sharedWorkflow(workflowUuid: String!): SharedWorkflow
     workflowTemplate(id: String!, sharedWorkflow: Boolean!): WorkflowTemplate
+    workspaceProjectWorkflows(workspaceId: ID!): [WorkspaceProjectWorkflow!]!
 }
 
 extend type Mutation {
@@ -28,6 +29,19 @@ type ProjectWorkflow {
     version: Int!
     errorProjectWorkflowId: ID
     errorWorkflowDisabled: Boolean!
+}
+
+"""
+A flat, workspace-wide listing entry: one latest-version project workflow reduced to its label and ids.
+Deliberately excludes the workflow definition — this powers pickers that list every workflow in a workspace,
+where returning `ProjectWorkflow.workflow` per row would mean parsing every definition in the workspace.
+"""
+type WorkspaceProjectWorkflow {
+    projectId: ID!
+    projectName: String!
+    projectWorkflowId: ID!
+    workflowId: String!
+    workflowLabel: String!
 }
 
 type SharedWorkflow {
