@@ -16,8 +16,8 @@
 
 package com.bytechef.automation.ai.tool;
 
+import com.bytechef.ai.mcp.server.spi.McpAppResources;
 import com.bytechef.ai.mcp.server.spi.McpAppUiDescriptor;
-import com.bytechef.ai.mcp.server.spi.McpAppViewerResources;
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
 import com.bytechef.automation.ai.tool.datatable.QueryDataTableToolCallback;
 import com.bytechef.automation.assetfile.service.AssetFileFacade;
@@ -79,10 +79,10 @@ public class ViewerToolMcpContributorConfiguration {
                 return Map.of(
                     "getAssetFileContent",
                     new McpAppUiDescriptor(
-                        McpAppViewerResources.FILE_VIEWER_URI, ViewerToolMcpContributorConfiguration::shapeFile),
+                        McpAppResources.FILE_VIEWER_URI, ViewerToolMcpContributorConfiguration::shapeFile),
                     "queryDataTable",
                     new McpAppUiDescriptor(
-                        McpAppViewerResources.DATA_TABLE_VIEWER_URI,
+                        McpAppResources.DATA_TABLE_VIEWER_URI,
                         ViewerToolMcpContributorConfiguration::shapeDataTable));
             }
         };

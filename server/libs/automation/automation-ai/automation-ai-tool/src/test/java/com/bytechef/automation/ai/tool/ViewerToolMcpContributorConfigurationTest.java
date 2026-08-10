@@ -19,8 +19,8 @@ package com.bytechef.automation.ai.tool;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
+import com.bytechef.ai.mcp.server.spi.McpAppResources;
 import com.bytechef.ai.mcp.server.spi.McpAppUiDescriptor;
-import com.bytechef.ai.mcp.server.spi.McpAppViewerResources;
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
 import com.bytechef.automation.assetfile.service.AssetFileFacade;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
@@ -54,9 +54,9 @@ class ViewerToolMcpContributorConfigurationTest {
         Map<String, McpAppUiDescriptor> descriptors = contributor.getMcpAppUiDescriptors();
 
         assertThat(descriptors.get("getAssetFileContent")
-            .resourceUri()).isEqualTo(McpAppViewerResources.FILE_VIEWER_URI);
+            .resourceUri()).isEqualTo(McpAppResources.FILE_VIEWER_URI);
         assertThat(descriptors.get("queryDataTable")
-            .resourceUri()).isEqualTo(McpAppViewerResources.DATA_TABLE_VIEWER_URI);
+            .resourceUri()).isEqualTo(McpAppResources.DATA_TABLE_VIEWER_URI);
     }
 
     @Test

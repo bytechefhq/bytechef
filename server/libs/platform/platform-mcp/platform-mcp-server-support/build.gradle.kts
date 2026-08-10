@@ -1,6 +1,6 @@
 // Bundles the MCP App widgets (mcp-apps/<name>) into this module's resources as mcp-apps/<name>.html (served by
-// McpAppWorkflowEditor / McpAppViewer). Building the widgets requires Node.js, so it is OFF by default to keep the
-// regular Java build Node-free and fast: processResources still picks up a widget's dist/index.html whenever it exists.
+// McpApps). Building the widgets requires Node.js, so it is OFF by default to keep the regular Java build Node-free
+// and fast: processResources still picks up a widget's dist/index.html whenever it exists.
 //
 // Production/release builds must produce those bundles. Do EITHER of:
 //   * `./gradlew :...:platform-mcp-server-support:processResources -PbuildMcpApps` (or set buildMcpApps=true in

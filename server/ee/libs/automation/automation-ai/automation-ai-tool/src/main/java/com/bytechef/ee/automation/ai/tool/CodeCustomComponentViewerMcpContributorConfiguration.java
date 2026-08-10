@@ -7,8 +7,8 @@
 
 package com.bytechef.ee.automation.ai.tool;
 
+import com.bytechef.ai.mcp.server.spi.McpAppResources;
 import com.bytechef.ai.mcp.server.spi.McpAppUiDescriptor;
-import com.bytechef.ai.mcp.server.spi.McpAppViewerResources;
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
 import com.bytechef.automation.configuration.service.ProjectCodeWorkflowInfoSupplier;
 import com.bytechef.ee.automation.configuration.facade.ProjectCodeWorkflowFacade;
@@ -75,11 +75,11 @@ public class CodeCustomComponentViewerMcpContributorConfiguration {
                 return Map.of(
                     "getCodeWorkflowSource",
                     new McpAppUiDescriptor(
-                        McpAppViewerResources.CODE_WORKFLOW_VIEWER_URI,
+                        McpAppResources.CODE_WORKFLOW_VIEWER_URI,
                         CodeCustomComponentViewerMcpContributorConfiguration::shapeCodeWorkflow),
                     "getCustomComponentSource",
                     new McpAppUiDescriptor(
-                        McpAppViewerResources.CUSTOM_COMPONENT_VIEWER_URI,
+                        McpAppResources.CUSTOM_COMPONENT_VIEWER_URI,
                         CodeCustomComponentViewerMcpContributorConfiguration::shapeCustomComponent));
             }
         };

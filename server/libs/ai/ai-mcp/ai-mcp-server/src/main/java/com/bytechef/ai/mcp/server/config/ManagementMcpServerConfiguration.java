@@ -16,8 +16,8 @@
 
 package com.bytechef.ai.mcp.server.config;
 
+import com.bytechef.ai.mcp.server.spi.McpAppResources;
 import com.bytechef.ai.mcp.server.spi.McpAppUiDescriptor;
-import com.bytechef.ai.mcp.server.spi.McpAppViewerResources;
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
 import com.bytechef.automation.ai.tool.ClusterElementTools;
 import com.bytechef.automation.ai.tool.ProjectTools;
@@ -28,8 +28,8 @@ import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.ai.tool.ComponentTools;
 import com.bytechef.platform.ai.tool.TaskDispatcherTools;
 import com.bytechef.platform.ai.tool.TaskTools;
-import com.bytechef.platform.mcp.server.McpAppViewer;
-import com.bytechef.platform.mcp.server.McpAppWorkflowEditor;
+import com.bytechef.platform.mcp.server.McpApps;
+import com.bytechef.platform.mcp.server.McpSseProviderRegistry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.modelcontextprotocol.server.McpAsyncServer;
 import io.modelcontextprotocol.server.McpServer;
@@ -184,19 +184,21 @@ public class ManagementMcpServerConfiguration {
 
     private List<McpServerFeatures.AsyncResourceSpecification> mcpAppResourceSpecifications(String publicUrl) {
         List<McpServerFeatures.AsyncResourceSpecification> resourceSpecifications =
-            new ArrayList<>(McpAppWorkflowEditor.getResourceSpecifications(publicUrl));
+            new ArrayList<>(McpApps.getResourceSpecifications(
+                McpAppResources.WORKFLOW_EDITOR_URI, "ByteChef Workflow Editor",
+                "Read-only workflow canvas rendered while workflows are built via MCP tools", publicUrl));
 
-        resourceSpecifications.addAll(McpAppViewer.getResourceSpecifications(
-            McpAppViewerResources.DATA_TABLE_VIEWER_URI, "ByteChef Data Table Viewer",
+        resourceSpecifications.addAll(McpApps.getResourceSpecifications(
+            McpAppResources.DATA_TABLE_VIEWER_URI, "ByteChef Data Table Viewer",
             "Read-only data table rendered while data tables are queried via MCP tools"));
-        resourceSpecifications.addAll(McpAppViewer.getResourceSpecifications(
-            McpAppViewerResources.CODE_WORKFLOW_VIEWER_URI, "ByteChef Code Workflow Viewer",
+        resourceSpecifications.addAll(McpApps.getResourceSpecifications(
+            McpAppResources.CODE_WORKFLOW_VIEWER_URI, "ByteChef Code Workflow Viewer",
             "Read-only code workflow source rendered while code workflows are read via MCP tools"));
-        resourceSpecifications.addAll(McpAppViewer.getResourceSpecifications(
-            McpAppViewerResources.CUSTOM_COMPONENT_VIEWER_URI, "ByteChef Custom Component Viewer",
+        resourceSpecifications.addAll(McpApps.getResourceSpecifications(
+            McpAppResources.CUSTOM_COMPONENT_VIEWER_URI, "ByteChef Custom Component Viewer",
             "Read-only custom component source rendered while custom components are read via MCP tools"));
-        resourceSpecifications.addAll(McpAppViewer.getResourceSpecifications(
-            McpAppViewerResources.FILE_VIEWER_URI, "ByteChef File Viewer",
+        resourceSpecifications.addAll(McpApps.getResourceSpecifications(
+            McpAppResources.FILE_VIEWER_URI, "ByteChef File Viewer",
             "Read-only file content rendered while asset files are read via MCP tools"));
 
         return resourceSpecifications;
@@ -283,7 +285,7 @@ public class ManagementMcpServerConfiguration {
 
         McpSchema.Tool.Builder toolBuilder = McpSchema.Tool.builder(tool.name(), tool.inputSchema())
             .description(tool.description())
-            .meta(McpAppWorkflowEditor.getToolMeta());
+            .meta(McpApps.getToolMeta(McpAppResources.WORKFLOW_EDITOR_URI));
 
         if (tool.title() != null) {
             toolBuilder.title(tool.title());

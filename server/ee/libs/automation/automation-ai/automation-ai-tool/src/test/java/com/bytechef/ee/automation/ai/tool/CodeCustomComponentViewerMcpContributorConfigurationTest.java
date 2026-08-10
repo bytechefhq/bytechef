@@ -10,8 +10,8 @@ package com.bytechef.ee.automation.ai.tool;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
+import com.bytechef.ai.mcp.server.spi.McpAppResources;
 import com.bytechef.ai.mcp.server.spi.McpAppUiDescriptor;
-import com.bytechef.ai.mcp.server.spi.McpAppViewerResources;
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
 import com.bytechef.automation.configuration.service.ProjectCodeWorkflowInfoSupplier;
 import com.bytechef.ee.automation.configuration.facade.ProjectCodeWorkflowFacade;
@@ -49,9 +49,9 @@ class CodeCustomComponentViewerMcpContributorConfigurationTest {
         Map<String, McpAppUiDescriptor> descriptors = contributor.getMcpAppUiDescriptors();
 
         assertThat(descriptors.get("getCodeWorkflowSource")
-            .resourceUri()).isEqualTo(McpAppViewerResources.CODE_WORKFLOW_VIEWER_URI);
+            .resourceUri()).isEqualTo(McpAppResources.CODE_WORKFLOW_VIEWER_URI);
         assertThat(descriptors.get("getCustomComponentSource")
-            .resourceUri()).isEqualTo(McpAppViewerResources.CUSTOM_COMPONENT_VIEWER_URI);
+            .resourceUri()).isEqualTo(McpAppResources.CUSTOM_COMPONENT_VIEWER_URI);
     }
 
     @Test
