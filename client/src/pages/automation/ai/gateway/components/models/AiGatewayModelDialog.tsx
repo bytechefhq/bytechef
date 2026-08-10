@@ -4,8 +4,8 @@ import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle} from '@/
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {
-    useCreateWorkspaceAiGatewayModelMutation,
-    useUpdateWorkspaceAiGatewayModelMutation,
+    useCreateWorkspaceAiModelMutation,
+    useUpdateWorkspaceAiModelMutation,
     useWorkspaceAiGatewayProvidersQuery,
     useWorkspaceAiGatewayRoutingPoliciesQuery,
 } from '@/shared/middleware/graphql';
@@ -47,17 +47,17 @@ const AiGatewayModelDialog = ({model, onClose, workspaceId}: AiGatewayModelDialo
 
     const isEditMode = !!model;
 
-    const createMutation = useCreateWorkspaceAiGatewayModelMutation({
+    const createMutation = useCreateWorkspaceAiModelMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['workspaceAiGatewayModels']});
+            queryClient.invalidateQueries({queryKey: ['workspaceAiModels']});
 
             onClose();
         },
     });
 
-    const updateMutation = useUpdateWorkspaceAiGatewayModelMutation({
+    const updateMutation = useUpdateWorkspaceAiModelMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['workspaceAiGatewayModels']});
+            queryClient.invalidateQueries({queryKey: ['workspaceAiModels']});
 
             onClose();
         },

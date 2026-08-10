@@ -53,6 +53,17 @@ describe('ModelPicker', () => {
         expect(screen.getByText('Anthropic')).toBeInTheDocument();
     });
 
+    it('shows the raw model id as secondary text under the model label', async () => {
+        render(<ModelPicker environment={1} onChange={vi.fn()} selectedModel={null} selectedProvider={null} />);
+
+        await userEvent.click(screen.getByLabelText('Select LLM provider and model'));
+        await userEvent.click(screen.getByText('Open AI'));
+
+        // The id is what API configurations reference, so a labelled item must keep it visible.
+        expect(screen.getByText('GPT-4o')).toBeInTheDocument();
+        expect(screen.getByText('gpt-4o')).toBeInTheDocument();
+    });
+
     it('shows the configured default model in the trigger when nothing is selected', () => {
         render(
             <ModelPicker

@@ -5,8 +5,8 @@ import {AiGatewayModelType} from '../../../types';
 import AiGatewayModelDialog from '../AiGatewayModelDialog';
 
 vi.mock('@/shared/middleware/graphql', () => ({
-    useCreateWorkspaceAiGatewayModelMutation: vi.fn(),
-    useUpdateWorkspaceAiGatewayModelMutation: vi.fn(),
+    useCreateWorkspaceAiModelMutation: vi.fn(),
+    useUpdateWorkspaceAiModelMutation: vi.fn(),
     useWorkspaceAiGatewayProvidersQuery: () => ({
         data: {
             workspaceAiGatewayProviders: [
@@ -46,11 +46,11 @@ vi.mock('@/shared/middleware/graphql', () => ({
     }),
 }));
 
-const {useCreateWorkspaceAiGatewayModelMutation, useUpdateWorkspaceAiGatewayModelMutation} =
+const {useCreateWorkspaceAiModelMutation, useUpdateWorkspaceAiModelMutation} =
     await import('@/shared/middleware/graphql');
 
-const createModelMutation = stubMutation(vi.mocked(useCreateWorkspaceAiGatewayModelMutation));
-const updateModelMutation = stubMutation(vi.mocked(useUpdateWorkspaceAiGatewayModelMutation));
+const createModelMutation = stubMutation(vi.mocked(useCreateWorkspaceAiModelMutation));
+const updateModelMutation = stubMutation(vi.mocked(useUpdateWorkspaceAiModelMutation));
 
 beforeEach(() => {
     createModelMutation.mutate.mockClear();
@@ -60,6 +60,8 @@ beforeEach(() => {
 const modelWithRoutingPolicy: AiGatewayModelType = {
     alias: null,
     capabilities: null,
+    catalogManaged: true,
+    catalogPinned: false,
     contextWindow: null,
     createdDate: '2026-01-01T00:00:00Z',
     defaultRoutingPolicyId: '1',

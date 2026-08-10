@@ -350,10 +350,17 @@ const ModelPicker = ({
                                         <>
                                             {provider.models.map((model) => (
                                                 <DropdownMenuItem
+                                                    className="flex flex-col items-start gap-0"
                                                     key={model.name}
                                                     onSelect={() => handleSelectModel(provider.key, model.name)}
                                                 >
                                                     <span className="truncate">{model.label || model.name}</span>
+
+                                                    {!!model.label && model.label !== model.name && (
+                                                        <span className="truncate text-xs text-muted-foreground">
+                                                            {model.name}
+                                                        </span>
+                                                    )}
                                                 </DropdownMenuItem>
                                             ))}
 

@@ -1,7 +1,9 @@
-query aiGatewayModels {
-    aiGatewayModels {
+query aiModels {
+    aiModels {
         alias
         capabilities
+        catalogManaged
+        catalogPinned
         contextWindow
         createdDate
         enabled
@@ -15,10 +17,12 @@ query aiGatewayModels {
     }
 }
 
-query aiGatewayModelsByProvider($providerId: ID!) {
-    aiGatewayModelsByProvider(providerId: $providerId) {
+query aiModelsByProvider($providerId: ID!) {
+    aiModelsByProvider(providerId: $providerId) {
         alias
         capabilities
+        catalogManaged
+        catalogPinned
         contextWindow
         createdDate
         enabled
@@ -32,10 +36,12 @@ query aiGatewayModelsByProvider($providerId: ID!) {
     }
 }
 
-mutation createAiGatewayModel($input: CreateAiGatewayModelInput!) {
-    createAiGatewayModel(input: $input) {
+mutation createAiModel($input: CreateAiModelInput!) {
+    createAiModel(input: $input) {
         alias
         capabilities
+        catalogManaged
+        catalogPinned
         contextWindow
         createdDate
         enabled
@@ -49,10 +55,12 @@ mutation createAiGatewayModel($input: CreateAiGatewayModelInput!) {
     }
 }
 
-mutation updateAiGatewayModel($id: ID!, $input: UpdateAiGatewayModelInput!) {
-    updateAiGatewayModel(id: $id, input: $input) {
+mutation updateAiModel($id: ID!, $input: UpdateAiModelInput!) {
+    updateAiModel(id: $id, input: $input) {
         alias
         capabilities
+        catalogManaged
+        catalogPinned
         contextWindow
         createdDate
         enabled
@@ -66,6 +74,25 @@ mutation updateAiGatewayModel($id: ID!, $input: UpdateAiGatewayModelInput!) {
     }
 }
 
-mutation deleteAiGatewayModel($id: ID!) {
-    deleteAiGatewayModel(id: $id)
+mutation deleteAiModel($id: ID!) {
+    deleteAiModel(id: $id)
+}
+
+mutation unpinAiModel($id: ID!) {
+    unpinAiModel(id: $id) {
+        alias
+        capabilities
+        catalogManaged
+        catalogPinned
+        contextWindow
+        createdDate
+        enabled
+        id
+        inputCostPerMTokens
+        lastModifiedDate
+        name
+        outputCostPerMTokens
+        providerId
+        version
+    }
 }

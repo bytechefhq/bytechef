@@ -13,10 +13,10 @@ import {
 } from '@/components/ui/alert-dialog';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {
-    useDeleteWorkspaceAiGatewayModelMutation,
-    useUnpinWorkspaceAiGatewayModelMutation,
-    useWorkspaceAiGatewayModelsQuery,
+    useDeleteWorkspaceAiModelMutation,
+    useUnpinWorkspaceAiModelMutation,
     useWorkspaceAiGatewayProvidersQuery,
+    useWorkspaceAiModelsQuery,
 } from '@/shared/middleware/graphql';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useQueryClient} from '@tanstack/react-query';
@@ -61,7 +61,7 @@ const AiGatewayModels = () => {
     const [unpinningModelId, setUnpinningModelId] = useState<string | undefined>(undefined);
 
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
-    // Model writes (create/update/delete/unpin) require ROLE_ADMIN on WorkspaceAiGatewayModelFacadeImpl, so a
+    // Model writes (create/update/delete/unpin) require ROLE_ADMIN on WorkspaceAiModelFacadeImpl, so a
     // non-admin member would only discover the denial at submit. Gating on `authenticated` as well as the authority
     // avoids a flash-of-privilege during the logout/re-login transition, when `account` can still carry the prior
     // session's authorities before `getAccount()` reconciles.
@@ -71,23 +71,23 @@ const AiGatewayModels = () => {
 
     const queryClient = useQueryClient();
 
-    const {data: modelsData, isLoading: modelsIsLoading} = useWorkspaceAiGatewayModelsQuery({
+    const {data: modelsData, isLoading: modelsIsLoading} = useWorkspaceAiModelsQuery({
         workspaceId: currentWorkspaceId != null ? String(currentWorkspaceId) : '',
     });
     const {data: providersData, isLoading: providersIsLoading} = useWorkspaceAiGatewayProvidersQuery({
         workspaceId: currentWorkspaceId != null ? String(currentWorkspaceId) : '',
     });
 
-    const deleteModelMutation = useDeleteWorkspaceAiGatewayModelMutation({
+    const deleteModelMutation = useDeleteWorkspaceAiModelMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['workspaceAiGatewayModels']});
+            queryClient.invalidateQueries({queryKey: ['workspaceAiModels']});
 
             setDeletingModelId(undefined);
         },
     });
-    const unpinModelMutation = useUnpinWorkspaceAiGatewayModelMutation({
+    const unpinModelMutation = useUnpinWorkspaceAiModelMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['workspaceAiGatewayModels']});
+            queryClient.invalidateQueries({queryKey: ['workspaceAiModels']});
 
             setUnpinningModelId(undefined);
         },
@@ -105,7 +105,7 @@ const AiGatewayModels = () => {
         return providerMap;
     }, [providersData]);
 
-    const models = modelsData?.workspaceAiGatewayModels ?? [];
+    const models = modelsData?.workspaceAiModels ?? [];
 
     const handleConfirmDelete = useCallback(() => {
         if (deletingModelId) {

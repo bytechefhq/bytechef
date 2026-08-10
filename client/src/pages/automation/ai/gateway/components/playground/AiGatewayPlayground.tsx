@@ -8,8 +8,8 @@ import {
     PlaygroundChatCompletionMutation,
     PlaygroundChatRole,
     usePlaygroundChatCompletionMutation,
-    useWorkspaceAiGatewayModelsQuery,
     useWorkspaceAiGatewayProvidersQuery,
+    useWorkspaceAiModelsQuery,
 } from '@/shared/middleware/graphql';
 import {getCookie} from '@/shared/util/cookie-utils';
 import {ColumnsIcon, PlayIcon, TerminalIcon} from 'lucide-react';
@@ -53,7 +53,7 @@ const AiGatewayPlayground = () => {
 
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
-    const {data: modelsData, isLoading: modelsIsLoading} = useWorkspaceAiGatewayModelsQuery(
+    const {data: modelsData, isLoading: modelsIsLoading} = useWorkspaceAiModelsQuery(
         {workspaceId: currentWorkspaceId != null ? String(currentWorkspaceId) : ''},
         {enabled: currentWorkspaceId != null}
     );
@@ -78,7 +78,7 @@ const AiGatewayPlayground = () => {
     });
 
     const enabledModels = useMemo(
-        () => (modelsData?.workspaceAiGatewayModels ?? []).filter((model) => model?.enabled),
+        () => (modelsData?.workspaceAiModels ?? []).filter((model) => model?.enabled),
         [modelsData]
     );
 

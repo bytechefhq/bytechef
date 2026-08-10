@@ -20,17 +20,17 @@ vi.mock('@/shared/middleware/graphql', () => ({
         isPending: false,
         mutate: hoisted.mutate,
     }),
-    useWorkspaceAiGatewayModelsQuery: () => ({
-        data: {
-            // Flat shape, matching the generated WorkspaceAiGatewayModelsQuery type the component reads
-            // (model.name / model.providerId), not a nested model object.
-            workspaceAiGatewayModels: [{enabled: true, id: '1', name: 'gpt-4o', providerId: '20'}],
-        },
-        isLoading: false,
-    }),
     useWorkspaceAiGatewayProvidersQuery: () => ({
         data: {
             workspaceAiGatewayProviders: [{enabled: true, id: '20', name: 'OpenAI'}],
+        },
+        isLoading: false,
+    }),
+    useWorkspaceAiModelsQuery: () => ({
+        data: {
+            // Flat shape, matching the generated WorkspaceAiModelsQuery type the component reads
+            // (model.name / model.providerId), not a nested model object.
+            workspaceAiModels: [{enabled: true, id: '1', name: 'gpt-4o', providerId: '20'}],
         },
         isLoading: false,
     }),

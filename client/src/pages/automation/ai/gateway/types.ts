@@ -17,9 +17,9 @@ import {
     AiPromptQuery,
     AiPromptsQuery,
     PlaygroundChatCompletionMutation,
-    WorkspaceAiGatewayModelsQuery,
     WorkspaceAiGatewayProvidersQuery,
     WorkspaceAiGatewayRoutingPoliciesQuery,
+    WorkspaceAiModelsQuery,
 } from '@/shared/middleware/graphql';
 
 export type AiEvalRuleType = NonNullable<NonNullable<AiEvalRulesQuery['aiEvalRules']>[number]>;
@@ -44,9 +44,7 @@ export type AiObservabilityAlertRuleType = NonNullable<
     NonNullable<AiObservabilityAlertRulesQuery['aiObservabilityAlertRules']>[number]
 >;
 
-export type AiGatewayModelType = NonNullable<
-    NonNullable<WorkspaceAiGatewayModelsQuery['workspaceAiGatewayModels']>[number]
->;
+export type AiGatewayModelType = NonNullable<NonNullable<WorkspaceAiModelsQuery['workspaceAiModels']>[number]>;
 
 export type AiGatewayProjectType = NonNullable<AiGatewayProjectsQuery['aiGatewayProjects'][number]>;
 
