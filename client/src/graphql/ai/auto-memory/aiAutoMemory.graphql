@@ -1,8 +1,21 @@
-query aiAutoMemory($workspaceId: ID!, $id: ID!) {
-    aiAutoMemory(workspaceId: $workspaceId, id: $id) {
+query aiAutoMemory(
+    $workspaceId: ID!
+    $id: ID!
+    $environment: Int!
+    $principalType: AiAutoMemoryPrincipalType
+    $principalId: Long
+) {
+    aiAutoMemory(
+        workspaceId: $workspaceId
+        id: $id
+        environment: $environment
+        principalType: $principalType
+        principalId: $principalId
+    ) {
         id
         workspaceId
-        userId
+        principalType
+        principalId
         name
         title
         description

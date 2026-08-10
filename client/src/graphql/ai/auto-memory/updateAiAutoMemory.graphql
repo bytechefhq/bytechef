@@ -2,7 +2,8 @@ mutation updateAiAutoMemory($input: UpdateAiAutoMemoryInput!) {
     updateAiAutoMemory(input: $input) {
         id
         workspaceId
-        userId
+        principalType
+        principalId
         name
         title
         description
