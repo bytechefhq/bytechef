@@ -1,0 +1,102 @@
+{
+  "acme": {
+    "id": "acme",
+    "name": "Acme",
+    "doc": "https://acme.example/docs",
+    "models": {
+      "acme-large": {
+        "id": "acme-large",
+        "name": "Acme Large",
+        "description": "Flagship",
+        "family": "acme",
+        "attachment": true,
+        "reasoning": true,
+        "tool_call": true,
+        "structured_output": true,
+        "temperature": true,
+        "open_weights": false,
+        "knowledge": "2025-01",
+        "release_date": "2025-06-01",
+        "last_updated": "2025-09-15",
+        "modalities": {
+          "input": [ "text", "image", "hologram" ],
+          "output": [ "text" ]
+        },
+        "limit": {
+          "context": 200000,
+          "output": 64000
+        },
+        "cost": {
+          "input": 3,
+          "output": 15,
+          "cache_read": 0.003625,
+          "tiers": [ {
+            "input": 6,
+            "output": 22.5,
+            "tier": {
+              "type": "context",
+              "size": 200000
+            }
+          } ],
+          "context_over_200k": {
+            "input": 999,
+            "output": 999
+          }
+        }
+      },
+      "acme-free": {
+        "id": "acme-free",
+        "name": "Acme Free",
+        "attachment": false,
+        "reasoning": false,
+        "tool_call": false,
+        "open_weights": true,
+        "modalities": {
+          "input": [ "text" ],
+          "output": [ "text" ]
+        },
+        "limit": {
+          "context": 8192
+        }
+      },
+      "acme-old": {
+        "id": "acme-old",
+        "name": "Acme Old",
+        "status": "deprecated",
+        "attachment": false,
+        "reasoning": false,
+        "tool_call": false,
+        "modalities": {
+          "input": [ "text" ],
+          "output": [ "text" ]
+        },
+        "limit": {
+          "context": 4096
+        },
+        "cost": {
+          "input": 1,
+          "output": 2
+        }
+      },
+      "acme-vision": {
+        "id": "acme-vision",
+        "name": "Acme Vision",
+        "status": "invented-status",
+        "attachment": true,
+        "reasoning": false,
+        "tool_call": false,
+        "modalities": {
+          "input": [ "text" ],
+          "output": [ "image" ]
+        },
+        "limit": {
+          "context": 4096
+        },
+        "cost": {
+          "input": 1,
+          "output": 2
+        }
+      }
+    }
+  }
+}

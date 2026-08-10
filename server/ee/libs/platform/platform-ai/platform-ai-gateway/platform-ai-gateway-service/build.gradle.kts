@@ -30,6 +30,8 @@ dependencies {
     implementation(project(":server:libs:modules:components:ai:llm:nvidia"))
     implementation(project(":server:libs:modules:components:ai:llm:open-ai"))
     implementation(project(":server:libs:modules:components:ai:llm:perplexity"))
+    implementation(project(":server:libs:platform:platform-ai:platform-ai-model-catalog:platform-ai-model-catalog-api"))
+    implementation(project(":server:libs:platform:platform-ai:platform-ai-model-catalog:platform-ai-model-catalog-service"))
     implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
