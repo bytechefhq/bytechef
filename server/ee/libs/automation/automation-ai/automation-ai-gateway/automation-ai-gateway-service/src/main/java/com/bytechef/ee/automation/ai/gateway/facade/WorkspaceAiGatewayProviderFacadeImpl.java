@@ -72,7 +72,7 @@ class WorkspaceAiGatewayProviderFacadeImpl implements WorkspaceAiGatewayProvider
     }
 
     @Override
-    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.USER + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public AiGatewayProvider createWorkspaceProvider(
         String name, AiGatewayProviderType type, String apiKey, String baseUrl, String config, Long workspaceId) {
 
@@ -91,7 +91,7 @@ class WorkspaceAiGatewayProviderFacadeImpl implements WorkspaceAiGatewayProvider
     }
 
     @Override
-    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.USER + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public void deleteWorkspaceProvider(Long workspaceId, Long providerId) {
         verifyWorkspaceOwnership(workspaceId, providerId);
 
@@ -102,13 +102,13 @@ class WorkspaceAiGatewayProviderFacadeImpl implements WorkspaceAiGatewayProvider
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.USER + "\")")
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'AI_GATEWAY_VIEW')")
     public List<AiGatewayProvider> getWorkspaceProviders(Long workspaceId) {
         return workspaceAiGatewayProviderService.getWorkspaceProviders(workspaceId);
     }
 
     @Override
-    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.USER + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public AiGatewayProvider updateWorkspaceProvider(
         Long workspaceId, Long id, String name, String apiKey, String baseUrl, Boolean enabled, String config) {
 
@@ -160,7 +160,7 @@ class WorkspaceAiGatewayProviderFacadeImpl implements WorkspaceAiGatewayProvider
      */
     @Override
     @SuppressFBWarnings("REC_CATCH_EXCEPTION")
-    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.USER + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public ProviderConnectionResult testWorkspaceProviderConnection(Long workspaceId, Long providerId) {
         AiGatewayProvider provider;

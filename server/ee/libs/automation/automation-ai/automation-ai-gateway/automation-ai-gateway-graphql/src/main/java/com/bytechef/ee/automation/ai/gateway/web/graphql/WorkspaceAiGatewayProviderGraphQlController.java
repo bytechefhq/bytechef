@@ -25,8 +25,10 @@ import org.springframework.stereotype.Controller;
  * GraphQL controller for managing workspace AI LLM Gateway provider relationships.
  *
  * <p>
- * Authorization (USER authority) is enforced on {@link WorkspaceAiGatewayProviderFacade}, not here, so the guard
- * applies to every caller of the facade rather than only this GraphQL entry point.
+ * Authorization is enforced on {@link WorkspaceAiGatewayProviderFacade}, not here, so the guards apply to every caller
+ * of the facade rather than only this GraphQL entry point: reads require the caller-bound {@code AI_GATEWAY_VIEW}
+ * workspace permission, writes require the {@code ADMIN} authority, and every write against an existing provider
+ * additionally verifies it belongs to the given workspace.
  *
  * @version ee
  *

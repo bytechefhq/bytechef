@@ -28,7 +28,6 @@ import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
@@ -68,7 +67,18 @@ class AiEvalExecutorAsyncProxyTest {
         }
     }
 
-    @Configuration
+    /**
+     * Deliberately carries no {@code @Configuration}/{@code @TestConfiguration} stereotype. This class lives in
+     * {@code com.bytechef.ee.automation.ai.gateway.evaluation}, a package {@code AiGatewayIntTestConfiguration}
+     * component-scans for its integration suite; a stereotype annotation here would make that scan pick up this class
+     * too and register its mock {@code aiEvalExecutor} bean into every integration test's context. That has not yet
+     * collided with a same-named production bean the way the sibling {@code
+     * AiGatewayModelFacadeAsyncProxyTest.AsyncProxyTestConfiguration} did (see that class's Javadoc for the mechanism
+     * and the {@code BeanDefinitionOverrideException} it caused), but it is the identical latent risk and fixed the
+     * same way. Explicit registration via {@code new AnnotationConfigApplicationContext(
+     * AsyncProxyTestConfiguration.class)} below does not need a stereotype: {@code @Bean} methods on an explicitly
+     * registered class are processed as a "lite" configuration class regardless.
+     */
     @EnableAsync
     static class AsyncProxyTestConfiguration {
 

@@ -134,6 +134,7 @@ class AiEvalRuleFacadeImpl implements AiEvalRuleFacade {
     }
 
     @Override
+    @PreAuthorize("isAuthenticated()")
     public List<EvalTemplate> listTemplates() {
         return EvalTemplateCatalog.templates();
     }

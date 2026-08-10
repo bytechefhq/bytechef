@@ -48,7 +48,7 @@ class WorkspaceAiGatewayRoutingPolicyFacadeImpl implements WorkspaceAiGatewayRou
     }
 
     @Override
-    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.USER + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public AiGatewayRoutingPolicy createWorkspaceRoutingPolicy(
         Long workspaceId, String name, AiGatewayRoutingStrategyType strategy,
         String fallbackModel, String config) {
@@ -66,7 +66,7 @@ class WorkspaceAiGatewayRoutingPolicyFacadeImpl implements WorkspaceAiGatewayRou
     }
 
     @Override
-    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.USER + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public void deleteWorkspaceRoutingPolicy(Long workspaceId, Long routingPolicyId) {
         verifyWorkspaceOwnership(workspaceId, routingPolicyId);
 
@@ -77,13 +77,13 @@ class WorkspaceAiGatewayRoutingPolicyFacadeImpl implements WorkspaceAiGatewayRou
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.USER + "\")")
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'AI_GATEWAY_VIEW')")
     public List<AiGatewayRoutingPolicy> getWorkspaceRoutingPolicies(Long workspaceId) {
         return workspaceAiGatewayRoutingPolicyService.getWorkspaceRoutingPolicies(workspaceId);
     }
 
     @Override
-    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.USER + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public AiGatewayRoutingPolicy updateWorkspaceRoutingPolicy(
         Long workspaceId, Long id, String name, AiGatewayRoutingStrategyType strategy,
         String fallbackModel, String config, Boolean enabled) {

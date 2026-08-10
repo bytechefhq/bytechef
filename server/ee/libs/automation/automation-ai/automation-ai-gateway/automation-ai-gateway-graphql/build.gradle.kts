@@ -17,4 +17,8 @@ dependencies {
     implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-gateway:automation-ai-gateway-service"))
     implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-prompt:platform-ai-prompt-api"))
     implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-api"))
+
+    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-graphql-test")
+    testImplementation(project(":server:libs:test:test-int-support"))
 }
