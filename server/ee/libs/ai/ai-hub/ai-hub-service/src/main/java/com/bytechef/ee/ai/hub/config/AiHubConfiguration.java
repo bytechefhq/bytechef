@@ -13,6 +13,7 @@ import com.bytechef.ai.copilot.tool.AskUserQuestionToolCallback;
 import com.bytechef.ai.copilot.tool.ClusterElementAgentToolCallback;
 import com.bytechef.ai.copilot.tool.CodeEditorAgentToolCallback;
 import com.bytechef.ai.copilot.tool.ConverterAgentToolCallback;
+import com.bytechef.ai.copilot.tool.CopilotAgentType;
 import com.bytechef.ai.copilot.tool.CreateConnectionToolCallback;
 import com.bytechef.ai.copilot.tool.DataTableAgentToolCallback;
 import com.bytechef.ai.copilot.tool.KnowledgeBaseAgentToolCallback;
@@ -33,6 +34,7 @@ import com.bytechef.automation.ai.tool.CreateAssetFileToolCallback;
 import com.bytechef.automation.ai.tool.DeploymentManagerConfiguration;
 import com.bytechef.automation.ai.tool.GetAssetFileContentToolCallback;
 import com.bytechef.automation.ai.tool.ListAssetFilesToolCallback;
+import com.bytechef.automation.ai.tool.ManagerAgentType;
 import com.bytechef.automation.ai.tool.McpManagerConfiguration;
 import com.bytechef.automation.ai.tool.ProjectTools;
 import com.bytechef.automation.ai.tool.ProjectWorkflowTools;
@@ -59,10 +61,16 @@ import com.bytechef.ee.ai.hub.metric.AiHubToolAttachMetrics;
 import com.bytechef.ee.ai.hub.metric.WorkflowChatMetrics;
 import com.bytechef.ee.ai.hub.personalagent.AiHubPersonalAgentService;
 import com.bytechef.ee.ai.hub.progress.ProgressReportingToolCallback;
+import com.bytechef.ee.ai.hub.subagent.SubAgentAdvisorContributor;
+import com.bytechef.ee.ai.hub.subagent.SubAgentAskToolContributor;
+import com.bytechef.ee.ai.hub.subagent.SubAgentSessionMemoryContributor;
+import com.bytechef.ee.ai.hub.subagent.SubagentAskChannelRelay;
+import com.bytechef.ee.ai.hub.subagent.WorkspaceAdvisorContributor;
 import com.bytechef.ee.ai.hub.task.AiHubTask;
 import com.bytechef.ee.ai.hub.task.AiHubTaskArtifactService;
 import com.bytechef.ee.ai.hub.task.AiHubTaskService;
 import com.bytechef.ee.ai.hub.task.AiHubTaskToolFacade;
+import com.bytechef.ee.ai.hub.tool.AiHubAgentType;
 import com.bytechef.ee.ai.hub.tool.AiHubTaskArtifactRecorder;
 import com.bytechef.ee.ai.hub.tool.AttachTaskToolToolCallback;
 import com.bytechef.ee.ai.hub.tool.CreateWorkflowChatToolCallback;
@@ -115,6 +123,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Supplier;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.client.ChatClient;
@@ -259,8 +268,9 @@ public class AiHubConfiguration {
             toolCallbacks.add(
                 new ProgressReportingToolCallback(
                     ResearchConfiguration.createResearchToolCallback(
-                        SubAgentGuardrailedChatClient.wrap(
-                            researchChatClient, aiGuardrails, aiGuardrailMetrics, workspaceSystemPrompts)),
+                        wrapDelegate(
+                            researchChatClient, AiHubAgentType.RESEARCH.key(), aiGuardrails, aiGuardrailMetrics,
+                            workspaceSystemPrompts, aiHubSessionMemory)),
                     "research"));
         }
 
@@ -313,7 +323,8 @@ public class AiHubConfiguration {
             clusterElementAskSubAgentChatClientProvider,
             codeEditorAskSubAgentChatClientProvider, workflowEditorAskSubAgentChatClientProvider, null,
             workflowExecutionAskSubAgentChatClientProvider, customComponentAskSubAgentChatClientProvider,
-            codeWorkflowAskSubAgentChatClientProvider, aiGuardrails, aiGuardrailMetrics, workspaceSystemPrompts);
+            codeWorkflowAskSubAgentChatClientProvider, aiGuardrails, aiGuardrailMetrics, workspaceSystemPrompts,
+            aiHubSessionMemory);
 
         AiHubSpringAIAgent.Builder builder = AiHubSpringAIAgent.builder()
             .agentId(name.toLowerCase())
@@ -455,7 +466,7 @@ public class AiHubConfiguration {
         registerSubAgentToolCallbacks(
             toolCallbacks, researchChatClientProvider, dataAnalystChatClientProvider,
             imageGeneratorChatClientProvider, slideBuilderChatClientProvider, assetFileFacade, aiGuardrails,
-            aiGuardrailMetrics, workspaceSystemPrompts);
+            aiGuardrailMetrics, workspaceSystemPrompts, aiHubSessionMemory);
 
         // Mirrors aiHubAskSpringAIAgent: the research tool is conditionally registered (Firecrawl-gated), so the
         // system prompt's research section must be dropped when it is absent — otherwise the model calls the
@@ -465,7 +476,7 @@ public class AiHubConfiguration {
         registerManagerSubAgentToolCallbacks(
             toolCallbacks, mcpManagerChatClientProvider, personalAgentManagerChatClientProvider,
             deploymentManagerChatClientProvider, apiCollectionManagerChatClientProvider, aiGuardrails,
-            aiGuardrailMetrics, workspaceSystemPrompts);
+            aiGuardrailMetrics, workspaceSystemPrompts, aiHubSessionMemory);
 
         // Consolidated open-tab tool (type-keyed) replaces the seven per-resource variants on the pinned list.
         toolCallbacks.add(new OpenResourceTabToolCallback(aiHubTaskArtifactRecorder));
@@ -496,7 +507,7 @@ public class AiHubConfiguration {
             codeEditorBuildSubAgentChatClientProvider, workflowEditorBuildSubAgentChatClientProvider,
             converterBuildSubAgentChatClientSupplierProvider, workflowExecutionBuildSubAgentChatClientProvider,
             customComponentBuildSubAgentChatClientProvider, codeWorkflowBuildSubAgentChatClientProvider, aiGuardrails,
-            aiGuardrailMetrics, workspaceSystemPrompts);
+            aiGuardrailMetrics, workspaceSystemPrompts, aiHubSessionMemory);
         toolCallbacks.add(new CreateConnectionToolCallback(componentDefinitionService));
         toolCallbacks.add(new SelectConnectionToolCallback(componentDefinitionService));
 
@@ -704,6 +715,71 @@ public class AiHubConfiguration {
     }
 
     /**
+     * The specialists allowed to pose a question to the user. Restricted to the manager specialists: each owns a prompt
+     * that is not shared with a Copilot panel agent, so the tool can be documented where it is registered.
+     *
+     * <p>
+     * The Copilot domain specialists are deliberately absent. Their prompt file is shared by the subagent client and
+     * the panel agent (see the domain copilot slice pattern), and the panel agent has no ask tool registered — so
+     * documenting the tool in that shared prompt would make the panel agent call a tool that does not exist there and
+     * kill the turn with "No ToolCallback found". Wiring them needs a prompt split first, not more wiring.
+     * </p>
+     *
+     * <p>
+     * The generative one-shots (research, data_analyst, image_generator, slide_builder, converter) are absent by intent
+     * rather than by blocker: they are asked to produce something, and a clarifying round trip costs more than it
+     * saves.
+     * </p>
+     */
+    private static final Set<String> ASK_CAPABLE_AGENT_TYPE_KEYS = Set.of(
+        AiHubAgentType.PERSONAL_AGENT_MANAGER.key(), ManagerAgentType.MCP_MANAGER.key(),
+        ManagerAgentType.DEPLOYMENT_MANAGER.key(), ManagerAgentType.API_COLLECTION_MANAGER.key());
+
+    /**
+     * Wraps one delegate's {@code ChatClient} in everything a specialist call needs per request: the calling
+     * workspace's guardrails and system prompt, that specialist's own per-conversation session memory, and — for the
+     * specialists in {@link #ASK_CAPABLE_AGENT_TYPE_KEYS} — the tool that lets it pose a question to the user.
+     *
+     * <p>
+     * Every delegate registration goes through here rather than calling
+     * {@link SubAgentGuardrailedChatClient#wrap(ChatClient, List)} directly, so no site can quietly forget the memory
+     * contributor and leave one specialist amnesiac while the rest remember.
+     * </p>
+     *
+     * <p>
+     * {@code agentTypeKey} MUST be a key registered with {@code AgentTypeRegistry}: it becomes the session-id suffix,
+     * and the purge that runs when an AI Hub task is deleted reconstructs the keys to delete from that registry. A key
+     * that is not registered would produce a session nothing ever deletes.
+     * </p>
+     */
+    private static ChatClient wrapDelegate(
+        ChatClient chatClient, String agentTypeKey, @Nullable AiGuardrails aiGuardrails,
+        @Nullable AiGuardrailMetrics aiGuardrailMetrics, @Nullable WorkspaceSystemPrompts workspaceSystemPrompts,
+        @Nullable AiHubSessionMemory aiHubSessionMemory) {
+
+        List<SubAgentAdvisorContributor> contributors = new ArrayList<>();
+
+        boolean guardrailsPresent = aiGuardrails != null && aiGuardrailMetrics != null;
+
+        if (guardrailsPresent || workspaceSystemPrompts != null) {
+            contributors.add(
+                new WorkspaceAdvisorContributor(
+                    guardrailsPresent ? aiGuardrails : null, guardrailsPresent ? aiGuardrailMetrics : null,
+                    workspaceSystemPrompts));
+        }
+
+        if (aiHubSessionMemory != null) {
+            contributors.add(new SubAgentSessionMemoryContributor(aiHubSessionMemory, agentTypeKey));
+        }
+
+        if (ASK_CAPABLE_AGENT_TYPE_KEYS.contains(agentTypeKey)) {
+            contributors.add(new SubAgentAskToolContributor());
+        }
+
+        return SubAgentGuardrailedChatClient.wrap(chatClient, contributors);
+    }
+
+    /**
      * Registers the optional ChatClient-based sub-agent tool callbacks (research, data analyst, image generator, slide
      * builder) on the supplied tool list. Each is only added when its backing ChatClient bean is present. Extracted to
      * keep the BUILD-agent bean method within Checkstyle's per-method line limit.
@@ -716,13 +792,13 @@ public class AiHubConfiguration {
      * </p>
      *
      * <p>
-     * Each delegate's {@code ChatClient} is wrapped with {@link SubAgentGuardrailedChatClient#wrap} before being handed
-     * to its {@code createXToolCallback} factory, so the delegate's own one-shot LLM call runs under the workspace's
-     * {@code AiGuardrailsAdvisor} and {@code WorkspaceSystemPromptAdvisor} — see that class's javadoc for why this seam
-     * covers every delegate without touching the individual {@code *ToolCallback}/{@code *Configuration} classes.
-     * {@code aiGuardrails}/{@code aiGuardrailMetrics} are {@code null} when the EE guardrails module isn't wired, and
-     * {@code workspaceSystemPrompts} is {@code null} when the EE workspace-prompt module isn't wired, in which case the
-     * corresponding wrapping is a no-op.
+     * Each delegate's {@code ChatClient} is wrapped with {@link #wrapDelegate} before being handed to its
+     * {@code createXToolCallback} factory, so the delegate's own one-shot LLM call runs under the workspace's
+     * {@code AiGuardrailsAdvisor} and {@code WorkspaceSystemPromptAdvisor} and its own session memory — see
+     * {@code SubAgentGuardrailedChatClient}'s javadoc for why this seam covers every delegate without touching the
+     * individual {@code *ToolCallback}/{@code *Configuration} classes. {@code aiGuardrails}/{@code aiGuardrailMetrics}
+     * are {@code null} when the EE guardrails module isn't wired, and {@code workspaceSystemPrompts} is {@code null}
+     * when the EE workspace-prompt module isn't wired, in which case the corresponding wrapping is a no-op.
      * </p>
      */
     private static void registerSubAgentToolCallbacks(
@@ -731,22 +807,24 @@ public class AiHubConfiguration {
         ObjectProvider<ChatClient> imageGeneratorChatClientProvider,
         ObjectProvider<ChatClient> slideBuilderChatClientProvider, AssetFileFacade assetFileFacade,
         @Nullable AiGuardrails aiGuardrails, @Nullable AiGuardrailMetrics aiGuardrailMetrics,
-        @Nullable WorkspaceSystemPrompts workspaceSystemPrompts) {
+        @Nullable WorkspaceSystemPrompts workspaceSystemPrompts, @Nullable AiHubSessionMemory aiHubSessionMemory) {
 
         researchChatClientProvider.ifAvailable(
             researchChatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
                     ResearchConfiguration.createResearchToolCallback(
-                        SubAgentGuardrailedChatClient.wrap(
-                            researchChatClient, aiGuardrails, aiGuardrailMetrics, workspaceSystemPrompts)),
+                        wrapDelegate(
+                            researchChatClient, AiHubAgentType.RESEARCH.key(), aiGuardrails, aiGuardrailMetrics,
+                            workspaceSystemPrompts, aiHubSessionMemory)),
                     "research")));
 
         dataAnalystChatClientProvider.ifAvailable(
             dataAnalystChatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
                     DataAnalystConfiguration.createDataAnalystToolCallback(
-                        SubAgentGuardrailedChatClient.wrap(
-                            dataAnalystChatClient, aiGuardrails, aiGuardrailMetrics, workspaceSystemPrompts),
+                        wrapDelegate(
+                            dataAnalystChatClient, AiHubAgentType.DATA_ANALYST.key(), aiGuardrails,
+                            aiGuardrailMetrics, workspaceSystemPrompts, aiHubSessionMemory),
                         assetFileFacade),
                     "data_analyst")));
 
@@ -754,16 +832,18 @@ public class AiHubConfiguration {
             imageGeneratorChatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
                     ImageGeneratorConfiguration.createImageGeneratorToolCallback(
-                        SubAgentGuardrailedChatClient.wrap(imageGeneratorChatClient, aiGuardrails,
-                            aiGuardrailMetrics, workspaceSystemPrompts)),
+                        wrapDelegate(
+                            imageGeneratorChatClient, AiHubAgentType.IMAGE_GENERATOR.key(), aiGuardrails,
+                            aiGuardrailMetrics, workspaceSystemPrompts, aiHubSessionMemory)),
                     "image_generator")));
 
         slideBuilderChatClientProvider.ifAvailable(
             slideBuilderChatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
                     SlideBuilderConfiguration.createSlideBuilderToolCallback(
-                        SubAgentGuardrailedChatClient.wrap(
-                            slideBuilderChatClient, aiGuardrails, aiGuardrailMetrics, workspaceSystemPrompts)),
+                        wrapDelegate(
+                            slideBuilderChatClient, AiHubAgentType.SLIDE_BUILDER.key(), aiGuardrails,
+                            aiGuardrailMetrics, workspaceSystemPrompts, aiHubSessionMemory)),
                     "slide_builder")));
     }
 
@@ -784,38 +864,47 @@ public class AiHubConfiguration {
         ObjectProvider<ChatClient> personalAgentManagerChatClientProvider,
         ObjectProvider<ChatClient> deploymentManagerChatClientProvider,
         ObjectProvider<ChatClient> apiCollectionManagerChatClientProvider, @Nullable AiGuardrails aiGuardrails,
-        @Nullable AiGuardrailMetrics aiGuardrailMetrics, @Nullable WorkspaceSystemPrompts workspaceSystemPrompts) {
+        @Nullable AiGuardrailMetrics aiGuardrailMetrics, @Nullable WorkspaceSystemPrompts workspaceSystemPrompts,
+        @Nullable AiHubSessionMemory aiHubSessionMemory) {
 
         mcpManagerChatClientProvider.ifAvailable(
             mcpManagerChatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
                     McpManagerConfiguration.createMcpManagerToolCallback(
-                        SubAgentGuardrailedChatClient.wrap(
-                            mcpManagerChatClient, aiGuardrails, aiGuardrailMetrics, workspaceSystemPrompts)),
+                        wrapDelegate(
+                            mcpManagerChatClient, ManagerAgentType.MCP_MANAGER.key(), aiGuardrails,
+                            aiGuardrailMetrics, workspaceSystemPrompts, aiHubSessionMemory),
+                        new SubagentAskChannelRelay()),
                     "mcp_manager")));
 
         personalAgentManagerChatClientProvider.ifAvailable(
             personalAgentManagerChatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
                     PersonalAgentManagerConfiguration.createPersonalAgentManagerToolCallback(
-                        SubAgentGuardrailedChatClient.wrap(personalAgentManagerChatClient, aiGuardrails,
-                            aiGuardrailMetrics, workspaceSystemPrompts)),
+                        wrapDelegate(
+                            personalAgentManagerChatClient, AiHubAgentType.PERSONAL_AGENT_MANAGER.key(),
+                            aiGuardrails, aiGuardrailMetrics, workspaceSystemPrompts, aiHubSessionMemory),
+                        new SubagentAskChannelRelay()),
                     "personal_agent_manager")));
 
         deploymentManagerChatClientProvider.ifAvailable(
             deploymentManagerChatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
                     DeploymentManagerConfiguration.createDeploymentManagerToolCallback(
-                        SubAgentGuardrailedChatClient.wrap(deploymentManagerChatClient, aiGuardrails,
-                            aiGuardrailMetrics, workspaceSystemPrompts)),
+                        wrapDelegate(
+                            deploymentManagerChatClient, ManagerAgentType.DEPLOYMENT_MANAGER.key(), aiGuardrails,
+                            aiGuardrailMetrics, workspaceSystemPrompts, aiHubSessionMemory),
+                        new SubagentAskChannelRelay()),
                     "deployment_manager")));
 
         apiCollectionManagerChatClientProvider.ifAvailable(
             apiCollectionManagerChatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
                     ApiCollectionManagerConfiguration.createApiCollectionManagerToolCallback(
-                        SubAgentGuardrailedChatClient.wrap(apiCollectionManagerChatClient, aiGuardrails,
-                            aiGuardrailMetrics, workspaceSystemPrompts)),
+                        wrapDelegate(
+                            apiCollectionManagerChatClient, ManagerAgentType.API_COLLECTION_MANAGER.key(),
+                            aiGuardrails, aiGuardrailMetrics, workspaceSystemPrompts, aiHubSessionMemory),
+                        new SubagentAskChannelRelay()),
                     "api_collection_manager")));
     }
 
@@ -845,70 +934,82 @@ public class AiHubConfiguration {
         ObjectProvider<ChatClient> workflowExecutionSubAgentChatClientProvider,
         ObjectProvider<ChatClient> customComponentSubAgentChatClientProvider,
         ObjectProvider<ChatClient> codeWorkflowSubAgentChatClientProvider, @Nullable AiGuardrails aiGuardrails,
-        @Nullable AiGuardrailMetrics aiGuardrailMetrics, @Nullable WorkspaceSystemPrompts workspaceSystemPrompts) {
+        @Nullable AiGuardrailMetrics aiGuardrailMetrics, @Nullable WorkspaceSystemPrompts workspaceSystemPrompts,
+        @Nullable AiHubSessionMemory aiHubSessionMemory) {
 
+        // The memory key is CopilotAgentType.SKILLS ("skills"), not this callback's "skills_agent" progress label —
+        // there is no skills_agent agent type, and an unregistered key would leave a session the task-delete purge
+        // could never reconstruct.
         skillsSubAgentChatClientProvider.ifAvailable(
             chatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
                     new SkillsAgentToolCallback(
-                        SubAgentGuardrailedChatClient.wrap(
-                            chatClient, aiGuardrails, aiGuardrailMetrics, workspaceSystemPrompts)),
+                        wrapDelegate(
+                            chatClient, CopilotAgentType.SKILLS.key(), aiGuardrails, aiGuardrailMetrics,
+                            workspaceSystemPrompts, aiHubSessionMemory)),
                     "skills_agent")));
 
         contextStoreSubAgentChatClientProvider.ifAvailable(
             chatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
                     new ContextStoreAgentToolCallback(
-                        SubAgentGuardrailedChatClient.wrap(
-                            chatClient, aiGuardrails, aiGuardrailMetrics, workspaceSystemPrompts)),
+                        wrapDelegate(
+                            chatClient, CopilotAgentType.CONTEXT_STORE_AGENT.key(), aiGuardrails,
+                            aiGuardrailMetrics, workspaceSystemPrompts, aiHubSessionMemory)),
                     "context_store_agent")));
 
         knowledgeBaseSubAgentChatClientProvider.ifAvailable(
             chatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
                     new KnowledgeBaseAgentToolCallback(
-                        SubAgentGuardrailedChatClient.wrap(
-                            chatClient, aiGuardrails, aiGuardrailMetrics, workspaceSystemPrompts)),
+                        wrapDelegate(
+                            chatClient, CopilotAgentType.KNOWLEDGE_BASE_AGENT.key(), aiGuardrails,
+                            aiGuardrailMetrics, workspaceSystemPrompts, aiHubSessionMemory)),
                     "knowledge_base_agent")));
 
         dataTableSubAgentChatClientProvider.ifAvailable(
             chatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
                     new DataTableAgentToolCallback(
-                        SubAgentGuardrailedChatClient.wrap(
-                            chatClient, aiGuardrails, aiGuardrailMetrics, workspaceSystemPrompts)),
+                        wrapDelegate(
+                            chatClient, CopilotAgentType.DATA_TABLE_AGENT.key(), aiGuardrails, aiGuardrailMetrics,
+                            workspaceSystemPrompts, aiHubSessionMemory)),
                     "data_table_agent")));
 
         clusterElementSubAgentChatClientProvider.ifAvailable(
             chatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
                     new ClusterElementAgentToolCallback(
-                        SubAgentGuardrailedChatClient.wrap(
-                            chatClient, aiGuardrails, aiGuardrailMetrics, workspaceSystemPrompts)),
+                        wrapDelegate(
+                            chatClient, CopilotAgentType.CLUSTER_ELEMENT_AGENT.key(), aiGuardrails,
+                            aiGuardrailMetrics, workspaceSystemPrompts, aiHubSessionMemory)),
                     "cluster_element_agent")));
 
         codeEditorSubAgentChatClientProvider.ifAvailable(
             chatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
                     new CodeEditorAgentToolCallback(
-                        SubAgentGuardrailedChatClient.wrap(
-                            chatClient, aiGuardrails, aiGuardrailMetrics, workspaceSystemPrompts)),
+                        wrapDelegate(
+                            chatClient, CopilotAgentType.CODE_EDITOR_AGENT.key(), aiGuardrails, aiGuardrailMetrics,
+                            workspaceSystemPrompts, aiHubSessionMemory)),
                     "code_editor_agent")));
 
         workflowEditorSubAgentChatClientProvider.ifAvailable(
             chatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
                     new WorkflowEditorAgentToolCallback(
-                        SubAgentGuardrailedChatClient.wrap(
-                            chatClient, aiGuardrails, aiGuardrailMetrics, workspaceSystemPrompts)),
+                        wrapDelegate(
+                            chatClient, CopilotAgentType.WORKFLOW_EDITOR_AGENT.key(), aiGuardrails,
+                            aiGuardrailMetrics, workspaceSystemPrompts, aiHubSessionMemory)),
                     "workflow_editor_agent")));
 
         workflowExecutionSubAgentChatClientProvider.ifAvailable(
             chatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
                     new WorkflowExecutionAgentToolCallback(
-                        SubAgentGuardrailedChatClient.wrap(
-                            chatClient, aiGuardrails, aiGuardrailMetrics, workspaceSystemPrompts)),
+                        wrapDelegate(
+                            chatClient, CopilotAgentType.WORKFLOW_EXECUTION_AGENT.key(), aiGuardrails,
+                            aiGuardrailMetrics, workspaceSystemPrompts, aiHubSessionMemory)),
                     "workflow_execution_agent")));
 
         if (converterSubAgentChatClientSupplierProvider != null) {
@@ -916,9 +1017,9 @@ public class AiHubConfiguration {
                 converterChatClientSupplier -> toolCallbacks.add(
                     new ProgressReportingToolCallback(
                         new ConverterAgentToolCallback(
-                            () -> SubAgentGuardrailedChatClient.wrap(
-                                converterChatClientSupplier.get(), aiGuardrails, aiGuardrailMetrics,
-                                workspaceSystemPrompts)),
+                            () -> wrapDelegate(
+                                converterChatClientSupplier.get(), CopilotAgentType.CONVERTER_AGENT.key(),
+                                aiGuardrails, aiGuardrailMetrics, workspaceSystemPrompts, aiHubSessionMemory)),
                         "converter_agent")));
         }
 
@@ -926,16 +1027,18 @@ public class AiHubConfiguration {
             chatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
                     new CustomComponentAgentToolCallback(
-                        SubAgentGuardrailedChatClient.wrap(
-                            chatClient, aiGuardrails, aiGuardrailMetrics, workspaceSystemPrompts)),
+                        wrapDelegate(
+                            chatClient, CopilotAgentType.CUSTOM_COMPONENT_AGENT.key(), aiGuardrails,
+                            aiGuardrailMetrics, workspaceSystemPrompts, aiHubSessionMemory)),
                     "custom_component_agent")));
 
         codeWorkflowSubAgentChatClientProvider.ifAvailable(
             chatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
                     new CodeWorkflowAgentToolCallback(
-                        SubAgentGuardrailedChatClient.wrap(
-                            chatClient, aiGuardrails, aiGuardrailMetrics, workspaceSystemPrompts)),
+                        wrapDelegate(
+                            chatClient, CopilotAgentType.CODE_WORKFLOW_AGENT.key(), aiGuardrails,
+                            aiGuardrailMetrics, workspaceSystemPrompts, aiHubSessionMemory)),
                     "code_workflow_agent")));
     }
 

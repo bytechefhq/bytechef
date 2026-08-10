@@ -7,12 +7,11 @@
 
 package com.bytechef.ee.ai.hub.guardrails;
 
-import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
+import com.bytechef.ee.ai.hub.subagent.SubAgentAdvisorContributor;
+import com.bytechef.ee.ai.hub.subagent.WorkspaceAdvisorContributor;
 import com.bytechef.ee.platform.ai.guardrails.AiGuardrailMetrics;
 import com.bytechef.ee.platform.ai.guardrails.AiGuardrails;
-import com.bytechef.ee.platform.ai.guardrails.advisor.AiGuardrailsAdvisor;
 import com.bytechef.ee.platform.ai.workspaceprompt.WorkspaceSystemPrompts;
-import com.bytechef.ee.platform.ai.workspaceprompt.advisor.WorkspaceSystemPromptAdvisor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.charset.Charset;
 import java.util.HashMap;
@@ -24,7 +23,6 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.ChatClient.ChatClientRequestSpec;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.messages.Message;
-import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.template.TemplateRenderer;
@@ -33,17 +31,22 @@ import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.core.io.Resource;
 
 /**
- * Wraps a subagent delegate's own {@link ChatClient} so its one-shot LLM call runs under the calling workspace's
- * per-request advisors — {@link AiGuardrailsAdvisor} and {@link WorkspaceSystemPromptAdvisor} — closing the coverage
- * gap documented on {@code AiHubSpringAIAgent#resolveChatClient}: previously only the top-level AI Hub agent's own
- * {@link ChatClient} carried these advisors, while every delegate ChatClient (Copilot specialists, the AI-hub-owned
+ * Wraps a subagent delegate's own {@link ChatClient} so its one-shot LLM call runs under the per-request advisors
+ * contributed by a list of {@link SubAgentAdvisorContributor}s — the calling workspace's {@code AiGuardrailsAdvisor}
+ * and {@code WorkspaceSystemPromptAdvisor} (see {@link WorkspaceAdvisorContributor}), plus the specialist's own
+ * per-conversation session memory. This closes the coverage gap documented on
+ * {@code AiHubSpringAIAgent#resolveChatClient}: previously only the top-level AI Hub agent's own {@link ChatClient}
+ * carried these advisors, while every delegate ChatClient (Copilot specialists, the AI-hub-owned
  * research/data_analyst/image_generator/slide_builder subagents, and the
  * mcp_manager/personal_agent_manager/deployment_manager/api_collection_manager specialists) ran completely unguarded
  * and without the workspace's standing instructions.
  *
  * <p>
- * The class keeps its guardrails-era name even though it now also carries the workspace system prompt — renaming would
- * churn all ~18 call sites in {@code AiHubConfiguration} and the git history for no behavior gain.
+ * The class keeps its guardrails-era name even though it now dispatches an arbitrary contributor list — renaming would
+ * churn all 24 call sites in {@code AiHubConfiguration} and the git history for no behavior gain. The contributor seam
+ * exists because this class is overwhelmingly {@link ChatClientRequestSpec} delegation boilerplate: a second decorator
+ * composed alongside it would have to duplicate every one of those methods, and every method added upstream would then
+ * have to be implemented twice.
  * </p>
  *
  * <p>
@@ -55,29 +58,29 @@ import org.springframework.core.io.Resource;
  * the exact same map every hand-rolled delegate callback ( {@code SkillsAgentToolCallback},
  * {@code ManagerSubAgentToolCallback}, {@code ResearchToolCallback}, etc.) already builds from its own
  * {@code ToolContext} parameter and forwards so the specialist's own workspace-scoped tools keep working — see
- * {@link AgentToolInvocationContext#TOOL_CONTEXT_WORKSPACE_ID_KEY}. No changes to any of those delegate classes are
+ * {@code AgentToolInvocationContext#TOOL_CONTEXT_WORKSPACE_ID_KEY}. No changes to any of those delegate classes are
  * required: wrapping happens once, in {@code AiHubConfiguration}, at the single point where each delegate's
  * {@code ChatClient} bean is handed to its {@code ToolCallback} constructor.
  * </p>
  *
  * <p>
- * A missing {@link AiGuardrails} bean (guardrails module absent) skips wrapping entirely via {@link #wrap} — the
- * unchanged, pre-existing behaviour. When present, {@link AiGuardrails#isActive(Long)} is still re-checked on every
- * call (not just once at wrap time) since the resolved workspace id is only known per call; a workspace with every
- * guardrail disabled pays no advisor-construction overhead, mirroring
- * {@code AiHubSpringAIAgent#attachGuardrailsAdvisor}'s own fast path.
+ * An empty contributor list skips wrapping entirely via {@link #wrap} — the unchanged, pre-existing behaviour when the
+ * guardrails module is absent. Each contributor re-evaluates its own preconditions on every call (not just once at wrap
+ * time) since the resolved workspace and conversation ids are only known per call; a workspace with every guardrail
+ * disabled pays no advisor-construction overhead, mirroring {@code AiHubSpringAIAgent#attachGuardrailsAdvisor}'s own
+ * fast path.
  * </p>
  *
  * <p>
  * <b>Null/absent workspace id</b> — when the forwarded {@code ToolContext} carries no resolvable workspace id (never
  * captured, or a delegate that calls {@code .call()}/{@code .stream()} without ever calling {@code .toolContext(...)}
- * first), {@link AiGuardrails#isActive(Long)} and {@link AiGuardrailsAdvisor} are invoked with a {@code null} workspace
+ * first), {@link AiGuardrails#isActive(Long)} and {@code AiGuardrailsAdvisor} are invoked with a {@code null} workspace
  * id — the same tenant-default fallback {@code AiHubSpringAIAgent#attachGuardrailsAdvisor} uses when the verified
  * workspace id is absent from turn state.
  * </p>
  *
  * <p>
- * <b>Block-mode UX inside a subagent</b> — a BLOCK-mode violation makes {@link AiGuardrailsAdvisor#adviseCall} throw
+ * <b>Block-mode UX inside a subagent</b> — a BLOCK-mode violation makes {@code AiGuardrailsAdvisor#adviseCall} throw
  * {@code AiGuardrailViolationException} synchronously out of {@code ChatClientRequestSpec.call()}. Every hand-rolled
  * delegate {@code ToolCallback} already wraps its {@code chatClient.prompt(...).call()} invocation in a
  * {@code catch (RuntimeException exception)} arm that converts the failure into a JSON tool-error string via
@@ -95,24 +98,29 @@ import org.springframework.core.io.Resource;
 public final class SubAgentGuardrailedChatClient implements ChatClient {
 
     private final ChatClient delegate;
-    private final @Nullable AiGuardrails aiGuardrails;
-    private final @Nullable AiGuardrailMetrics aiGuardrailMetrics;
-    private final @Nullable WorkspaceSystemPrompts workspaceSystemPrompts;
+    private final List<SubAgentAdvisorContributor> contributors;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    private SubAgentGuardrailedChatClient(
-        ChatClient delegate, @Nullable AiGuardrails aiGuardrails, @Nullable AiGuardrailMetrics aiGuardrailMetrics,
-        @Nullable WorkspaceSystemPrompts workspaceSystemPrompts) {
-
+    private SubAgentGuardrailedChatClient(ChatClient delegate, List<SubAgentAdvisorContributor> contributors) {
         this.delegate = delegate;
-        this.aiGuardrails = aiGuardrails;
-        this.aiGuardrailMetrics = aiGuardrailMetrics;
-        this.workspaceSystemPrompts = workspaceSystemPrompts;
+        this.contributors = contributors;
     }
 
     /**
-     * Returns {@code chatClient} wrapped so every call it serves runs under the workspace's {@link AiGuardrailsAdvisor}
-     * and {@link WorkspaceSystemPromptAdvisor}, or {@code chatClient} itself unchanged when neither engine is present —
+     * Returns {@code chatClient} wrapped so every call it serves runs under the advisors the given contributors attach,
+     * or {@code chatClient} itself unchanged when there are none to attach.
+     */
+    public static ChatClient wrap(ChatClient chatClient, List<SubAgentAdvisorContributor> contributors) {
+        if (contributors.isEmpty()) {
+            return chatClient;
+        }
+
+        return new SubAgentGuardrailedChatClient(chatClient, List.copyOf(contributors));
+    }
+
+    /**
+     * Returns {@code chatClient} wrapped so every call it serves runs under the workspace's {@code AiGuardrailsAdvisor}
+     * and {@code WorkspaceSystemPromptAdvisor}, or {@code chatClient} itself unchanged when neither engine is present —
      * {@code aiGuardrails} (or its paired {@code aiGuardrailMetrics}) and {@code workspaceSystemPrompts} are both
      * {@code null}, meaning the corresponding EE module isn't on the classpath, or the caller didn't wire one.
      */
@@ -126,9 +134,12 @@ public final class SubAgentGuardrailedChatClient implements ChatClient {
             return chatClient;
         }
 
-        return new SubAgentGuardrailedChatClient(
-            chatClient, guardrailsPresent ? aiGuardrails : null, guardrailsPresent ? aiGuardrailMetrics : null,
-            workspaceSystemPrompts);
+        return wrap(
+            chatClient,
+            List.of(
+                new WorkspaceAdvisorContributor(
+                    guardrailsPresent ? aiGuardrails : null, guardrailsPresent ? aiGuardrailMetrics : null,
+                    workspaceSystemPrompts)));
     }
 
     @Override
@@ -151,20 +162,10 @@ public final class SubAgentGuardrailedChatClient implements ChatClient {
         return delegate.mutate();
     }
 
-    private static @Nullable Long resolveWorkspaceId(@Nullable Map<String, Object> toolContext) {
-        if (toolContext == null || toolContext.isEmpty()) {
-            return null;
-        }
-
-        AgentToolInvocationContext context = AgentToolInvocationContext.fromToolContext(new ToolContext(toolContext));
-
-        return context == null ? null : context.workspaceId();
-    }
-
     /**
      * Delegates every {@link ChatClientRequestSpec} builder call straight through, except {@link #toolContext(Map)} —
-     * captured so the workspace id can be resolved once {@link #call()}/{@link #stream()} attaches the guardrail
-     * advisor — and {@link #call()}/{@link #stream()} themselves, which attach the advisor first.
+     * captured so each contributor can resolve what it needs once {@link #call()}/{@link #stream()} runs them — and
+     * {@link #call()}/{@link #stream()} themselves, which run the contributors first.
      *
      * <p>
      * {@code delegateSpec} is reassigned to each delegate call's own return value rather than discarded in favor of
@@ -332,29 +333,21 @@ public final class SubAgentGuardrailedChatClient implements ChatClient {
 
         @Override
         public CallResponseSpec call() {
-            attachWorkspaceAdvisorsIfActive();
+            attachContributedAdvisors();
 
             return delegateSpec.call();
         }
 
         @Override
         public StreamResponseSpec stream() {
-            attachWorkspaceAdvisorsIfActive();
+            attachContributedAdvisors();
 
             return delegateSpec.stream();
         }
 
-        private void attachWorkspaceAdvisorsIfActive() {
-            Long workspaceId = resolveWorkspaceId(capturedToolContext);
-
-            if (aiGuardrails != null && aiGuardrailMetrics != null && aiGuardrails.isActive(workspaceId)) {
-                delegateSpec = delegateSpec.advisors(
-                    new AiGuardrailsAdvisor(aiGuardrails, workspaceId, aiGuardrailMetrics));
-            }
-
-            if (workspaceSystemPrompts != null && workspaceSystemPrompts.fetchPrompt(workspaceId) != null) {
-                delegateSpec = delegateSpec.advisors(
-                    new WorkspaceSystemPromptAdvisor(workspaceSystemPrompts, workspaceId));
+        private void attachContributedAdvisors() {
+            for (SubAgentAdvisorContributor contributor : contributors) {
+                delegateSpec = contributor.contribute(delegateSpec, capturedToolContext);
             }
         }
     }

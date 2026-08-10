@@ -26,9 +26,11 @@ import com.bytechef.ee.ai.hub.exception.NotFoundException;
 import com.bytechef.ee.ai.hub.personalagent.AiHubPersonalAgentResource;
 import com.bytechef.ee.ai.hub.personalagent.AiHubPersonalAgentResourceKind;
 import com.bytechef.ee.ai.hub.personalagent.AiHubPersonalAgentService;
+import com.bytechef.ee.ai.hub.subagent.SubAgentSessionMemoryContributor;
 import com.bytechef.ee.ai.hub.task.AiHubTaskService.AiHubTaskMessage;
 import com.bytechef.ee.ai.hub.task.AiHubTaskService.AiHubTaskPatch;
 import com.bytechef.ee.ai.hub.task.repository.AiHubTaskRepository;
+import com.bytechef.ee.ai.hub.tool.AiHubAgentType;
 import com.bytechef.ee.ai.hub.toolsearch.ToolSearchCatalogFeeder;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -290,6 +292,47 @@ class AiHubTaskServiceTest {
         taskService.delete(1L, WORKSPACE_ID, USER_ID);
 
         verify(sessionService).delete(THREAD_ID);
+        verify(taskRepository).delete(task);
+    }
+
+    /**
+     * A specialist subagent keeps its own session under {@code <threadId>:<agentType>}; deleting the task must take
+     * those with it rather than leaving one conversation's memory behind for the next one.
+     */
+    @Test
+    void testDeletePurgesSpecialistSessionsAlongsideTheParentSession() {
+        AiHubTask task =
+            buildTask(1L, USER_ID, THREAD_ID, AiHubTaskStatus.ACTIVE);
+
+        when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
+
+        taskService.delete(1L, WORKSPACE_ID, USER_ID);
+
+        verify(sessionService).delete(THREAD_ID);
+        verify(sessionService).delete(
+            SubAgentSessionMemoryContributor.sessionKey(THREAD_ID, AiHubAgentType.PERSONAL_AGENT_MANAGER.key()));
+        verify(sessionService).delete(
+            SubAgentSessionMemoryContributor.sessionKey(THREAD_ID, AiHubAgentType.RESEARCH.key()));
+        verify(taskRepository).delete(task);
+    }
+
+    /**
+     * One failing session delete must not abandon the rest — the purge is best-effort per session, not all-or-nothing.
+     */
+    @Test
+    void testDeleteContinuesPurgingAfterASessionDeleteFails() {
+        AiHubTask task =
+            buildTask(1L, USER_ID, THREAD_ID, AiHubTaskStatus.ACTIVE);
+
+        when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
+
+        doThrow(new IllegalStateException("session store unavailable")).when(sessionService)
+            .delete(THREAD_ID);
+
+        taskService.delete(1L, WORKSPACE_ID, USER_ID);
+
+        verify(sessionService).delete(
+            SubAgentSessionMemoryContributor.sessionKey(THREAD_ID, AiHubAgentType.PERSONAL_AGENT_MANAGER.key()));
         verify(taskRepository).delete(task);
     }
 

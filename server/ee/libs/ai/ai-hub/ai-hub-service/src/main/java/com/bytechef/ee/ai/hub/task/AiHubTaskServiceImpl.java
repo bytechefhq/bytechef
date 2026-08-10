@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.ai.hub.task;
 
+import com.bytechef.ai.agent.tool.AgentTypeRegistry;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.ee.ai.hub.agent.InFlightAiHubRunRegistry;
@@ -19,6 +20,7 @@ import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.ee.ai.hub.personalagent.AiHubPersonalAgentResource;
 import com.bytechef.ee.ai.hub.personalagent.AiHubPersonalAgentService;
 import com.bytechef.ee.ai.hub.personalagent.AiHubPersonalAgentTool;
+import com.bytechef.ee.ai.hub.subagent.SubAgentSessionMemoryContributor;
 import com.bytechef.ee.ai.hub.task.repository.AiHubTaskRepository;
 import com.bytechef.ee.ai.hub.toolsearch.ToolSearchCatalogFeeder;
 import com.bytechef.ee.ai.hub.toolsearch.ToolSearchCatalogFeeder.TaskToolReference;
@@ -975,13 +977,29 @@ public class AiHubTaskServiceImpl implements AiHubTaskService {
             return;
         }
 
+        deleteSession(sessionMemory, threadId);
+
+        // Specialist subagents keep their own per-conversation sessions keyed <threadId>:<agentType>. SessionRepository
+        // has no prefix listing, so the keys are reconstructed from the registry. Registered types include panel agents
+        // that never own a specialist session; deleting a key that was never created is a no-op, and the alternative --
+        // a hand-maintained delegate list -- would rot silently.
+        for (String agentTypeKey : AgentTypeRegistry.keys()) {
+            deleteSession(sessionMemory, SubAgentSessionMemoryContributor.sessionKey(threadId, agentTypeKey));
+        }
+    }
+
+    /**
+     * Each delete is individually guarded so one failure does not abandon the rest — the pre-existing best-effort
+     * contract, applied per session rather than to the whole sweep.
+     */
+    private void deleteSession(AiHubSessionMemory sessionMemory, String sessionId) {
         try {
             sessionMemory.sessionService()
-                .delete(threadId);
+                .delete(sessionId);
         } catch (RuntimeException exception) {
             log.warn(
-                "Failed to delete session messages for threadId {}; leaving orphan messages for background cleanup",
-                threadId, exception);
+                "Failed to delete session messages for sessionId {}; leaving orphan messages for background cleanup",
+                sessionId, exception);
         }
     }
 

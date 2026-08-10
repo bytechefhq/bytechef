@@ -19,6 +19,7 @@ package com.bytechef.ai.agent.tool;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
+import java.util.Set;
 
 /**
  * Central view of every {@link AgentType} contributed by the per-module {@link AgentTypeProvider}s. The providers are
@@ -33,6 +34,15 @@ public final class AgentTypeRegistry {
     private static final Map<String, AgentType> AGENT_TYPES_BY_KEY = load();
 
     private AgentTypeRegistry() {
+    }
+
+    /**
+     * The keys of every registered agent type. Used to construct the deterministic per-specialist session keys that a
+     * task delete must purge; {@code SessionRepository} has no prefix listing, so the keys are constructed rather than
+     * discovered.
+     */
+    public static Set<String> keys() {
+        return Set.copyOf(AGENT_TYPES_BY_KEY.keySet());
     }
 
     public static AgentType fromKey(String key) {
