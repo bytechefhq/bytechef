@@ -89,16 +89,21 @@ public final class RestGitHubProxyClient implements GitHubProxyClient {
             .build(owner, repo);
     }
 
-    private URI buildRawUri(UriBuilder builder, String owner, String repo, String ref, String filePath) {
+    /**
+     * Sends the ref as a query parameter rather than a leading path segment. The proxy otherwise has to guess whether
+     * the first segment of {@code /raw/docs/guide.md} is a ref or a directory, and it resolves that ambiguity in favour
+     * of the ref.
+     */
+    static URI buildRawUri(UriBuilder builder, String owner, String repo, String ref, String filePath) {
+        if (StringUtils.hasText(ref)) {
+            builder.queryParam("ref", ref);
+        }
+
         List<String> segments = new ArrayList<>();
 
         segments.add(owner);
         segments.add(repo);
         segments.add("raw");
-
-        if (StringUtils.hasText(ref)) {
-            segments.add(ref);
-        }
 
         if (filePath != null && !filePath.isEmpty()) {
             for (String part : filePath.split("/")) {
