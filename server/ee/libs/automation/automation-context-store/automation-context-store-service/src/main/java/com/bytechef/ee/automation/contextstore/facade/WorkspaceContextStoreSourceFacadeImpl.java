@@ -227,6 +227,12 @@ public class WorkspaceContextStoreSourceFacadeImpl implements WorkspaceContextSt
 
         projectDeploymentWorkflowService.create(projectDeploymentWorkflow);
 
+        // Creating the row enabled is not enough: only ProjectDeploymentFacade registers the cron trigger with the
+        // scheduler (ProjectDeploymentWorkflowService.create is a plain repository save). Without this the source's
+        // initial sync — fired directly below — would be the only run it ever had. Same reasoning as the toggle path
+        // in toggleProjectDeploymentWorkflow.
+        projectDeploymentFacade.enableProjectDeploymentWorkflow(projectDeploymentId, workflow.getId(), true);
+
         source.setWorkflowId(workflow.getId());
 
         ContextStoreSource updated = contextStoreSourceService.update(source);

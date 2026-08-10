@@ -24,6 +24,7 @@ import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
 import com.bytechef.automation.configuration.domain.SystemProjects;
+import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
@@ -94,6 +95,7 @@ public class WorkspaceKnowledgeBaseSourceFacadeImpl implements WorkspaceKnowledg
     private final ComponentDefinitionService componentDefinitionService;
     private final KnowledgeBaseSourceService knowledgeBaseSourceService;
     private final PrincipalJobFacade principalJobFacade;
+    private final ProjectDeploymentFacade projectDeploymentFacade;
     private final ProjectDeploymentService projectDeploymentService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private final ProjectService projectService;
@@ -105,7 +107,8 @@ public class WorkspaceKnowledgeBaseSourceFacadeImpl implements WorkspaceKnowledg
     @SuppressFBWarnings("EI2")
     public WorkspaceKnowledgeBaseSourceFacadeImpl(
         ComponentDefinitionService componentDefinitionService, KnowledgeBaseSourceService knowledgeBaseSourceService,
-        PrincipalJobFacade principalJobFacade, ProjectDeploymentService projectDeploymentService,
+        PrincipalJobFacade principalJobFacade, ProjectDeploymentFacade projectDeploymentFacade,
+        ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectService projectService,
         ProjectWorkflowService projectWorkflowService,
         TaskExecutor taskExecutor, WorkflowService workflowService,
@@ -114,6 +117,7 @@ public class WorkspaceKnowledgeBaseSourceFacadeImpl implements WorkspaceKnowledg
         this.componentDefinitionService = componentDefinitionService;
         this.knowledgeBaseSourceService = knowledgeBaseSourceService;
         this.principalJobFacade = principalJobFacade;
+        this.projectDeploymentFacade = projectDeploymentFacade;
         this.projectDeploymentService = projectDeploymentService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
         this.projectService = projectService;
@@ -188,6 +192,11 @@ public class WorkspaceKnowledgeBaseSourceFacadeImpl implements WorkspaceKnowledg
         }
 
         projectDeploymentWorkflowService.create(projectDeploymentWorkflow);
+
+        // Creating the row enabled is not enough: only ProjectDeploymentFacade registers the cron trigger with the
+        // scheduler (ProjectDeploymentWorkflowService.create is a plain repository save). Without this the source's
+        // initial sync — fired directly below — would be the only run it ever had.
+        projectDeploymentFacade.enableProjectDeploymentWorkflow(projectDeploymentId, workflow.getId(), true);
 
         source.setWorkflowId(workflow.getId());
 
@@ -443,7 +452,17 @@ public class WorkspaceKnowledgeBaseSourceFacadeImpl implements WorkspaceKnowledg
 
     private long findOrCreateProjectDeployment(long projectId, int projectVersion) {
         return projectDeploymentService.fetchProjectDeployment(projectId, Environment.DEVELOPMENT)
-            .map(ProjectDeployment::getId)
+            .map(projectDeployment -> {
+                // The Knowledge Base deployment is a system-managed singleton that must stay enabled; individual
+                // sources toggle at the ProjectDeploymentWorkflow level. Reconcile a pre-existing deployment that
+                // ended up disabled so the per-workflow trigger-registration guard in ProjectDeploymentFacadeImpl
+                // ("if (projectDeployment.isEnabled())") does not silently swallow the cron trigger.
+                if (!projectDeployment.isEnabled()) {
+                    projectDeploymentService.updateEnabled(projectDeployment.getId(), true);
+                }
+
+                return projectDeployment.getId();
+            })
             .orElseGet(() -> {
                 ProjectDeployment projectDeployment = new ProjectDeployment();
 
@@ -475,10 +494,12 @@ public class WorkspaceKnowledgeBaseSourceFacadeImpl implements WorkspaceKnowledg
             .getLastProjectVersion();
         long projectDeploymentId = findOrCreateProjectDeployment(projectId, projectVersion);
 
-        projectDeploymentWorkflowService.fetchProjectDeploymentWorkflow(projectDeploymentId, workflowId)
-            .ifPresent(
-                projectDeploymentWorkflow -> projectDeploymentWorkflowService.updateEnabled(
-                    projectDeploymentWorkflow.getId(), enabled));
+        // Delegate to ProjectDeploymentFacade (not the raw ProjectDeploymentWorkflowService) so the scheduler cron
+        // trigger is actually registered/unregistered via enableWorkflowTriggers/disableWorkflowTriggers. Flipping
+        // the enabled column alone never arms the schedule, which is why scheduled syncs previously never fired.
+        // findOrCreateProjectDeployment above guarantees the parent deployment is enabled so the facade's
+        // "if (projectDeployment.isEnabled())" trigger-registration guard passes.
+        projectDeploymentFacade.enableProjectDeploymentWorkflow(projectDeploymentId, workflowId, enabled);
     }
 
     /**

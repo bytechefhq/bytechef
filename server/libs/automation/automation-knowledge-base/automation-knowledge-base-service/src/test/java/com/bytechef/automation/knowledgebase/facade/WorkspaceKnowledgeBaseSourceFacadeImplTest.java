@@ -36,6 +36,7 @@ import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
+import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
@@ -95,6 +96,7 @@ class WorkspaceKnowledgeBaseSourceFacadeImplTest {
     private ComponentDefinitionService componentDefinitionService;
     private KnowledgeBaseSourceService knowledgeBaseSourceService;
     private PrincipalJobFacade principalJobFacade;
+    private ProjectDeploymentFacade projectDeploymentFacade;
     private ProjectDeploymentService projectDeploymentService;
     private ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private ProjectService projectService;
@@ -108,6 +110,7 @@ class WorkspaceKnowledgeBaseSourceFacadeImplTest {
         componentDefinitionService = mock(ComponentDefinitionService.class);
         knowledgeBaseSourceService = mock(KnowledgeBaseSourceService.class);
         principalJobFacade = mock(PrincipalJobFacade.class);
+        projectDeploymentFacade = mock(ProjectDeploymentFacade.class);
         projectDeploymentService = mock(ProjectDeploymentService.class);
         projectDeploymentWorkflowService = mock(ProjectDeploymentWorkflowService.class);
         projectService = mock(ProjectService.class);
@@ -116,7 +119,7 @@ class WorkspaceKnowledgeBaseSourceFacadeImplTest {
         workspaceKnowledgeBaseSourceService = mock(WorkspaceKnowledgeBaseSourceService.class);
 
         facade = new WorkspaceKnowledgeBaseSourceFacadeImpl(
-            componentDefinitionService, knowledgeBaseSourceService, principalJobFacade,
+            componentDefinitionService, knowledgeBaseSourceService, principalJobFacade, projectDeploymentFacade,
             projectDeploymentService, projectDeploymentWorkflowService, projectService, projectWorkflowService,
             new SyncTaskExecutor(), workflowService, workspaceKnowledgeBaseSourceService);
 
@@ -217,6 +220,10 @@ class WorkspaceKnowledgeBaseSourceFacadeImplTest {
         // ProjectWorkflow + ProjectDeploymentWorkflow wired.
         verify(projectWorkflowService).addWorkflow(eq(PROJECT_ID), anyInt(), eq(WORKFLOW_ID));
         verify(projectDeploymentWorkflowService).create(any(ProjectDeploymentWorkflow.class));
+
+        // Creating the row enabled does not register the cron trigger — only the facade does. Without this the
+        // initial sync below would be the only run the source ever had.
+        verify(projectDeploymentFacade).enableProjectDeploymentWorkflow(PROJECT_DEPLOYMENT_ID, WORKFLOW_ID, true);
 
         // Initial sync triggered.
         verify(principalJobFacade).createJob(any(JobParametersDTO.class), eq(PROJECT_DEPLOYMENT_ID),
@@ -406,7 +413,9 @@ class WorkspaceKnowledgeBaseSourceFacadeImplTest {
 
         facade.update(WORKSPACE_ID, SOURCE_ID, updateInput);
 
-        verify(projectDeploymentWorkflowService).updateEnabled(PROJECT_DEPLOYMENT_WORKFLOW_ID, false);
+        // Must go through ProjectDeploymentFacade: flipping the enabled column alone never unregisters the
+        // scheduler cron trigger.
+        verify(projectDeploymentFacade).enableProjectDeploymentWorkflow(PROJECT_DEPLOYMENT_ID, WORKFLOW_ID, false);
         assertThat(existingSource.isEnabled()).isFalse();
     }
 
@@ -554,10 +563,64 @@ class WorkspaceKnowledgeBaseSourceFacadeImplTest {
 
         facade.setEnabled(WORKSPACE_ID, SOURCE_ID, false);
 
-        verify(projectDeploymentWorkflowService).updateEnabled(PROJECT_DEPLOYMENT_WORKFLOW_ID, false);
+        // Must go through ProjectDeploymentFacade: flipping the enabled column alone never unregisters the
+        // scheduler cron trigger.
+        verify(projectDeploymentFacade).enableProjectDeploymentWorkflow(PROJECT_DEPLOYMENT_ID, WORKFLOW_ID, false);
         verify(knowledgeBaseSourceService, times(1)).update(any(KnowledgeBaseSource.class));
 
         assertThat(existingSource.isEnabled()).isFalse();
+    }
+
+    @Test
+    void testSetEnabledReconcilesDisabledParentDeployment() {
+        stubSetEnabledCollaborators(false);
+
+        facade.setEnabled(WORKSPACE_ID, SOURCE_ID, true);
+
+        // The system-managed parent deployment must be enabled so the per-workflow trigger-registration guard in
+        // ProjectDeploymentFacadeImpl ("if (projectDeployment.isEnabled())") does not silently swallow the cron.
+        verify(projectDeploymentService).updateEnabled(PROJECT_DEPLOYMENT_ID, true);
+        verify(projectDeploymentFacade).enableProjectDeploymentWorkflow(PROJECT_DEPLOYMENT_ID, WORKFLOW_ID, true);
+    }
+
+    @Test
+    void testSetEnabledLeavesAlreadyEnabledParentDeploymentUntouched() {
+        stubSetEnabledCollaborators(true);
+
+        facade.setEnabled(WORKSPACE_ID, SOURCE_ID, true);
+
+        verify(projectDeploymentService, never()).updateEnabled(anyLong(), anyBoolean());
+        verify(projectDeploymentFacade).enableProjectDeploymentWorkflow(PROJECT_DEPLOYMENT_ID, WORKFLOW_ID, true);
+    }
+
+    /**
+     * Shared setup for the two parent-deployment reconciliation tests: a disabled source whose workflow already exists,
+     * hanging off a parent deployment in the given enabled state.
+     */
+    private void stubSetEnabledCollaborators(boolean parentDeploymentEnabled) {
+        when(workspaceKnowledgeBaseSourceService.fetchWorkspaceIdByKnowledgeBaseSourceId(SOURCE_ID))
+            .thenReturn(Optional.of(WORKSPACE_ID));
+
+        KnowledgeBaseSource existingSource = newSourceWithWorkflow("@hourly");
+
+        existingSource.setEnabled(false);
+
+        when(knowledgeBaseSourceService.get(SOURCE_ID)).thenReturn(existingSource);
+
+        ProjectDeployment existingDeployment = new ProjectDeployment();
+
+        existingDeployment.setId(PROJECT_DEPLOYMENT_ID);
+        existingDeployment.setEnabled(parentDeploymentEnabled);
+
+        when(projectDeploymentService.fetchProjectDeployment(eq(PROJECT_ID), any(Environment.class)))
+            .thenReturn(Optional.of(existingDeployment));
+
+        Project existingProject = new Project();
+
+        existingProject.setId(PROJECT_ID);
+        existingProject.setName("__KNOWLEDGE_BASE__1");
+
+        when(projectService.fetchProject(anyString())).thenReturn(Optional.of(existingProject));
     }
 
     private static CreateKnowledgeBaseSourceInput
