@@ -10,6 +10,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
 
     implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-api"))
+    implementation(project(":server:libs:platform:platform-ai:platform-ai-model-catalog:platform-ai-model-catalog-api"))
     implementation(project(":server:libs:platform:platform-connection:platform-connection-ai-provider"))
 
     testImplementation("org.assertj:assertj-core")

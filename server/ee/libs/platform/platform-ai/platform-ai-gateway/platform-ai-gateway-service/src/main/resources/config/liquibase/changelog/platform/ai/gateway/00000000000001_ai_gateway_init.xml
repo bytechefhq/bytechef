@@ -57,36 +57,6 @@
             </column>
         </createTable>
 
-        <createTable tableName="ai_gateway_model">
-            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="provider_id" type="BIGINT">
-                <constraints nullable="false" foreignKeyName="fk_ai_gateway_model_provider" references="ai_gateway_provider(id)"/>
-            </column>
-            <column name="name" type="VARCHAR(256)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="alias" type="VARCHAR(256)"/>
-            <column name="context_window" type="INT"/>
-            <column name="input_cost_per_m_tokens" type="DECIMAL(10,4)"/>
-            <column name="output_cost_per_m_tokens" type="DECIMAL(10,4)"/>
-            <column name="capabilities" type="VARCHAR(256)"/>
-            <column name="default_routing_policy_id" type="BIGINT"/>
-            <column name="enabled" type="BOOLEAN" defaultValueBoolean="true">
-                <constraints nullable="false"/>
-            </column>
-            <column name="created_date" type="TIMESTAMP">
-                <constraints nullable="false"/>
-            </column>
-            <column name="last_modified_date" type="TIMESTAMP">
-                <constraints nullable="false"/>
-            </column>
-            <column name="version" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-
         <createTable tableName="ai_gateway_budget">
             <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
                 <constraints primaryKey="true" nullable="false"/>
@@ -157,7 +127,7 @@
                 <constraints nullable="false" foreignKeyName="fk_ai_llm_gw_deploy_policy" references="ai_gateway_routing_policy(id)"/>
             </column>
             <column name="model_id" type="BIGINT">
-                <constraints nullable="false" foreignKeyName="fk_ai_llm_gw_deploy_model" references="ai_gateway_model(id)"/>
+                <constraints nullable="false"/>
             </column>
             <column name="weight" type="INT" defaultValueNumeric="1">
                 <constraints nullable="false"/>
@@ -328,5 +298,27 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
+    </changeSet>
+
+    <!--
+        The persisted model catalog moved to platform/ai/model_catalog as ai_model. These constraints belong to the
+        gateway (which knows the catalog; the catalog must not know the gateway): the provider FK onto ai_model and
+        the deployment FK pointing at it. tableExists-guarded because module-scoped test contexts may load this
+        changelog without the catalog's.
+    -->
+    <changeSet id="20260812000001" author="ivicac">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="ai_model"/>
+        </preConditions>
+
+        <addForeignKeyConstraint constraintName="fk_ai_model_provider" baseTableName="ai_model" baseColumnNames="provider_id" referencedTableName="ai_gateway_provider" referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="20260812000002" author="ivicac">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="ai_model"/>
+        </preConditions>
+
+        <addForeignKeyConstraint constraintName="fk_ai_llm_gw_deploy_model" baseTableName="ai_gateway_model_deployment" baseColumnNames="model_id" referencedTableName="ai_model" referencedColumnNames="id"/>
     </changeSet>
 </databaseChangeLog>

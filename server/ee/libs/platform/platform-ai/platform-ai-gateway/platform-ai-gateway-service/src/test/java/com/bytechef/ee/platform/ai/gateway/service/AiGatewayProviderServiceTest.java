@@ -12,12 +12,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayModel;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayProvider;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayProviderType;
 import com.bytechef.ee.platform.ai.gateway.provider.AiGatewayChatModelFactory;
 import com.bytechef.ee.platform.ai.gateway.provider.AiGatewayEmbeddingModelFactory;
 import com.bytechef.ee.platform.ai.gateway.repository.AiGatewayProviderRepository;
+import com.bytechef.ee.platform.ai.model.catalog.domain.AiModel;
+import com.bytechef.ee.platform.ai.model.catalog.service.AiModelService;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Optional;
@@ -44,7 +45,7 @@ class AiGatewayProviderServiceTest {
     private AiGatewayEmbeddingModelFactory aiGatewayEmbeddingModelFactory;
 
     @Mock
-    private AiGatewayModelService aiGatewayModelService;
+    private AiModelService aiModelService;
 
     @Mock
     private AiGatewayProviderRepository aiGatewayProviderRepository;
@@ -54,7 +55,7 @@ class AiGatewayProviderServiceTest {
     @BeforeEach
     void setUp() {
         aiGatewayProviderService = new AiGatewayProviderServiceImpl(
-            aiGatewayChatModelFactory, aiGatewayEmbeddingModelFactory, aiGatewayModelService,
+            aiGatewayChatModelFactory, aiGatewayEmbeddingModelFactory, aiModelService,
             aiGatewayProviderRepository);
     }
 
@@ -69,10 +70,10 @@ class AiGatewayProviderServiceTest {
 
     @Test
     void testDeleteEvictsBothFactoryCachesAndCascadesModelDeletion() {
-        AiGatewayModel firstModel = newModelWithId(1L);
-        AiGatewayModel secondModel = newModelWithId(2L);
+        AiModel firstModel = newModelWithId(1L);
+        AiModel secondModel = newModelWithId(2L);
 
-        when(aiGatewayModelService.getModelsByProviderId(50L)).thenReturn(List.of(firstModel, secondModel));
+        when(aiModelService.getModelsByProviderId(50L)).thenReturn(List.of(firstModel, secondModel));
 
         aiGatewayProviderService.delete(50L);
 
@@ -80,8 +81,8 @@ class AiGatewayProviderServiceTest {
         // encrypted api key stays resident in the chat/embedding caches and is used on subsequent requests.
         verify(aiGatewayChatModelFactory).evict(50L);
         verify(aiGatewayEmbeddingModelFactory).evict(50L);
-        verify(aiGatewayModelService).delete(1L);
-        verify(aiGatewayModelService).delete(2L);
+        verify(aiModelService).delete(1L);
+        verify(aiModelService).delete(2L);
         verify(aiGatewayProviderRepository).deleteById(50L);
     }
 
@@ -116,8 +117,8 @@ class AiGatewayProviderServiceTest {
         return provider;
     }
 
-    private static AiGatewayModel newModelWithId(long id) {
-        AiGatewayModel model = new AiGatewayModel(1L, "gpt-4");
+    private static AiModel newModelWithId(long id) {
+        AiModel model = new AiModel(1L, "gpt-4");
 
         setIdViaReflection(model, id);
 

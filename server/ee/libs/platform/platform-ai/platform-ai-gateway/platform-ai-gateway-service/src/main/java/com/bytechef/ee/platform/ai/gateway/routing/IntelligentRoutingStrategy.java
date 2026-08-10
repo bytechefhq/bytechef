@@ -7,10 +7,10 @@
 
 package com.bytechef.ee.platform.ai.gateway.routing;
 
-import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayModel;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayModelDeployment;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayModelTier;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayRoutingStrategyType;
+import com.bytechef.ee.platform.ai.model.catalog.domain.AiModel;
 import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
@@ -84,7 +84,7 @@ class IntelligentRoutingStrategy implements AiGatewayRoutingStrategy {
     }
 
     private static BigDecimal outputCost(AiGatewayModelDeployment deployment, AiGatewayRoutingContext context) {
-        AiGatewayModel model = context.modelMap()
+        AiModel model = context.modelMap()
             .get(deployment.getModelId());
 
         if (model == null) {

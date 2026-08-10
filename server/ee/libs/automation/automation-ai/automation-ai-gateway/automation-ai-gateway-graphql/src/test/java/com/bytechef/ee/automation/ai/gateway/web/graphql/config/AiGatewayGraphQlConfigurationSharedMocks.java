@@ -7,9 +7,9 @@
 
 package com.bytechef.ee.automation.ai.gateway.web.graphql.config;
 
-import com.bytechef.ee.automation.ai.gateway.facade.AiGatewayModelFacade;
-import com.bytechef.ee.automation.ai.gateway.facade.WorkspaceAiGatewayModelFacade;
-import com.bytechef.ee.platform.ai.gateway.catalog.AiGatewayModelCatalogReconciler;
+import com.bytechef.ee.automation.ai.gateway.facade.AiModelFacade;
+import com.bytechef.ee.automation.ai.gateway.facade.WorkspaceAiModelFacade;
+import com.bytechef.ee.platform.ai.gateway.catalog.AiModelCatalogReconciler;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -27,7 +27,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @MockitoBean(types = {
-    AiGatewayModelCatalogReconciler.class, AiGatewayModelFacade.class, WorkspaceAiGatewayModelFacade.class
+    AiModelCatalogReconciler.class, AiModelFacade.class, WorkspaceAiModelFacade.class
 })
 public @interface AiGatewayGraphQlConfigurationSharedMocks {
 }

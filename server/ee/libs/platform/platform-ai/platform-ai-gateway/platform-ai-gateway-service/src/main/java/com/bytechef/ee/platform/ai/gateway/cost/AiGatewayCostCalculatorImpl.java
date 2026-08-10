@@ -7,7 +7,7 @@
 
 package com.bytechef.ee.platform.ai.gateway.cost;
 
-import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayModel;
+import com.bytechef.ee.platform.ai.model.catalog.domain.AiModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -25,7 +25,7 @@ public class AiGatewayCostCalculatorImpl implements AiGatewayCostCalculator {
     private static final BigDecimal ONE_MILLION = new BigDecimal("1000000");
 
     @Override
-    public BigDecimal calculateCost(AiGatewayModel model, int inputTokens, int outputTokens) {
+    public BigDecimal calculateCost(AiModel model, int inputTokens, int outputTokens) {
         if (model.getInputCostPerMTokens() == null || model.getOutputCostPerMTokens() == null) {
             throw new IllegalStateException(
                 "Model '" + model.getName() + "' (id=" + model.getId() +

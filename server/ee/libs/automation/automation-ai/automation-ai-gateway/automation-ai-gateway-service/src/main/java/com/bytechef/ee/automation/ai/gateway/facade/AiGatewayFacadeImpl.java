@@ -20,7 +20,6 @@ import com.bytechef.ee.automation.ai.prompt.service.WorkspaceAiPromptService;
 import com.bytechef.ee.platform.ai.gateway.cache.AiGatewayResponseCache;
 import com.bytechef.ee.platform.ai.gateway.compression.AiGatewayContextCompressor;
 import com.bytechef.ee.platform.ai.gateway.cost.AiGatewayCostCalculator;
-import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayModel;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayModelDeployment;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayProject;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayProvider;
@@ -44,7 +43,6 @@ import com.bytechef.ee.platform.ai.gateway.routing.AiGatewayRouter;
 import com.bytechef.ee.platform.ai.gateway.routing.AiGatewayRoutingContext;
 import com.bytechef.ee.platform.ai.gateway.routing.PromptComplexityScorer;
 import com.bytechef.ee.platform.ai.gateway.service.AiGatewayModelDeploymentService;
-import com.bytechef.ee.platform.ai.gateway.service.AiGatewayModelService;
 import com.bytechef.ee.platform.ai.gateway.service.AiGatewayProviderService;
 import com.bytechef.ee.platform.ai.gateway.service.AiGatewayRoutingPolicyService;
 import com.bytechef.ee.platform.ai.gateway.util.AiGatewayConstraintMatchers;
@@ -52,6 +50,8 @@ import com.bytechef.ee.platform.ai.guardrails.StreamingResponseRedactor;
 import com.bytechef.ee.platform.ai.llm.usage.AiLlmUsage;
 import com.bytechef.ee.platform.ai.llm.usage.Money;
 import com.bytechef.ee.platform.ai.llm.usage.service.AiLlmUsageService;
+import com.bytechef.ee.platform.ai.model.catalog.domain.AiModel;
+import com.bytechef.ee.platform.ai.model.catalog.service.AiModelService;
 import com.bytechef.ee.platform.ai.observability.domain.AiObservabilitySession;
 import com.bytechef.ee.platform.ai.observability.domain.AiObservabilitySpan;
 import com.bytechef.ee.platform.ai.observability.domain.AiObservabilitySpanStatus;
@@ -168,7 +168,7 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
     private final AiGatewayGuardrails aiGatewayGuardrails;
     private final AiGatewayEmbeddingModelFactory aiGatewayEmbeddingModelFactory;
     private final AiGatewayModelDeploymentService aiGatewayModelDeploymentService;
-    private final AiGatewayModelService aiGatewayModelService;
+    private final AiModelService aiModelService;
     private final WorkspaceAiGatewayProjectService workspaceAiGatewayProjectService;
     private final AiGatewayProviderService aiGatewayProviderService;
     private final AiLlmUsageService aiGatewayRequestLogService;
@@ -205,7 +205,7 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
         AiGatewayGuardrails aiGatewayGuardrails,
         AiGatewayEmbeddingModelFactory aiGatewayEmbeddingModelFactory,
         AiGatewayModelDeploymentService aiGatewayModelDeploymentService,
-        AiGatewayModelService aiGatewayModelService,
+        AiModelService aiModelService,
         WorkspaceAiGatewayProjectService workspaceAiGatewayProjectService,
         AiGatewayProviderService aiGatewayProviderService,
         AiLlmUsageService aiGatewayRequestLogService,
@@ -238,7 +238,7 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
         this.aiGatewayGuardrails = aiGatewayGuardrails;
         this.aiGatewayEmbeddingModelFactory = aiGatewayEmbeddingModelFactory;
         this.aiGatewayModelDeploymentService = aiGatewayModelDeploymentService;
-        this.aiGatewayModelService = aiGatewayModelService;
+        this.aiModelService = aiModelService;
         this.workspaceAiGatewayProjectService = workspaceAiGatewayProjectService;
         this.aiGatewayProviderService = aiGatewayProviderService;
         this.aiGatewayRequestLogService = aiGatewayRequestLogService;
@@ -588,7 +588,7 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
 
                 AiGatewayModelDeployment primaryDeployment = routedDeployments.orderedDeployments()
                     .get(0);
-                AiGatewayModel primaryModel = routedDeployments.modelMap()
+                AiModel primaryModel = routedDeployments.modelMap()
                     .get(primaryDeployment.getModelId());
                 AiGatewayProvider primaryProvider =
                     aiGatewayProviderService.getProvider(primaryModel.getProviderId());
@@ -609,12 +609,12 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
         }
 
         AiGatewayProvider provider = modelResolution.provider();
-        AiGatewayModel model = modelResolution.model();
+        AiModel model = modelResolution.model();
 
         // servedModel/servedProvider default to the routed primary (or the literal model on the non-routing path) and
         // are overwritten by whichever deployment actually streams a token, so the request log records the deployment
         // that served rather than the one first selected.
-        AtomicReference<AiGatewayModel> servedModel = new AtomicReference<>(model);
+        AtomicReference<AiModel> servedModel = new AtomicReference<>(model);
         AtomicReference<AiGatewayProvider> servedProvider = new AtomicReference<>(provider);
 
         AtomicLong streamInputTokens = new AtomicLong(0);
@@ -631,12 +631,12 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
         Flux<ChatResponse> chatResponseFlux;
 
         if (routedDeployments != null) {
-            Map<Long, AiGatewayModel> routedModelMap = routedDeployments.modelMap();
+            Map<Long, AiModel> routedModelMap = routedDeployments.modelMap();
 
             chatResponseFlux = aiGatewayRetryHandler.executeStreamWithRetry(
                 routedDeployments.orderedDeployments(),
                 deployment -> {
-                    AiGatewayModel deploymentModel = routedModelMap.get(deployment.getModelId());
+                    AiModel deploymentModel = routedModelMap.get(deployment.getModelId());
                     AiGatewayProvider deploymentProvider =
                         aiGatewayProviderService.getProvider(deploymentModel.getProviderId());
                     ChatModel deploymentChatModel = aiGatewayChatModelFactory.getChatModel(deploymentProvider);
@@ -775,7 +775,7 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
         reactor.core.publisher.SignalType signalType, AtomicLong streamInputTokens, AtomicLong streamOutputTokens,
         AtomicReference<Throwable> streamError, StringBuilder streamOutputContent,
         AiGatewayChatCompletionRequest effectiveRequest, AiObservabilityTracingHeaders effectiveTracingHeaders,
-        Long workspaceId, AiGatewayModel model, AiGatewayProvider provider, AiGatewayProject project,
+        Long workspaceId, AiModel model, AiGatewayProvider provider, AiGatewayProject project,
         long startTime, @Nullable AtomicLong traceIdHolder) {
 
         int inputTokens = (int) Math.min(streamInputTokens.get(), Integer.MAX_VALUE);
@@ -884,7 +884,7 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
         ModelResolution modelResolution = resolveModel(request.model());
 
         AiGatewayProvider provider = modelResolution.provider();
-        AiGatewayModel model = modelResolution.model();
+        AiModel model = modelResolution.model();
 
         EmbeddingModel embeddingModel = aiGatewayEmbeddingModelFactory.getEmbeddingModel(provider);
 
@@ -1026,7 +1026,7 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
         ModelResolution modelResolution = resolveModel(request.model());
 
         AiGatewayProvider provider = modelResolution.provider();
-        AiGatewayModel model = modelResolution.model();
+        AiModel model = modelResolution.model();
 
         AiGatewayProject project = resolveProject(request.tags());
 
@@ -1121,12 +1121,12 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
                 "No deployments configured for routing policy: " + routingPolicy.getName());
         }
 
-        Map<Long, AiGatewayModel> modelMap = deployments.stream()
+        Map<Long, AiModel> modelMap = deployments.stream()
             .map(AiGatewayModelDeployment::getModelId)
             .distinct()
             .collect(Collectors.toMap(
                 modelId -> modelId,
-                modelId -> aiGatewayModelService.getModel(modelId)));
+                modelId -> aiModelService.getModel(modelId)));
 
         List<AiGatewayModelDeployment> enabledDeployments = deployments.stream()
             .filter(AiGatewayModelDeployment::isEnabled)
@@ -1159,7 +1159,7 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
         try {
             AiGatewayChatCompletionResponse response =
                 aiGatewayRetryHandler.executeWithRetry(orderedDeployments, deployment -> {
-                    AiGatewayModel model = modelMap.get(deployment.getModelId());
+                    AiModel model = modelMap.get(deployment.getModelId());
                     AiGatewayProvider provider = aiGatewayProviderService.getProvider(model.getProviderId());
 
                     ChatModel chatModel = aiGatewayChatModelFactory.getChatModel(provider);
@@ -1393,7 +1393,7 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
      * most-capable tier (score 1.0) rather than failing the request.
      */
     private AiGatewayRoutingContext buildRoutingContext(
-        AiGatewayChatCompletionRequest request, Map<Long, AiGatewayModel> modelMap) {
+        AiGatewayChatCompletionRequest request, Map<Long, AiModel> modelMap) {
 
         Map<String, Double> latencyByModelName = aiGatewayRequestLogService.getAverageLatencyByModel(
             Instant.now()
@@ -1460,10 +1460,10 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
                 "No enabled deployments for routing policy: " + routingPolicy.getName());
         }
 
-        Map<Long, AiGatewayModel> modelMap = enabledDeployments.stream()
+        Map<Long, AiModel> modelMap = enabledDeployments.stream()
             .map(AiGatewayModelDeployment::getModelId)
             .distinct()
-            .collect(Collectors.toMap(modelId -> modelId, aiGatewayModelService::getModel));
+            .collect(Collectors.toMap(modelId -> modelId, aiModelService::getModel));
 
         AiGatewayRoutingContext routingContext = buildRoutingContext(request, modelMap);
 
@@ -1486,7 +1486,7 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
     }
 
     private record RoutedDeployments(
-        List<AiGatewayModelDeployment> orderedDeployments, Map<Long, AiGatewayModel> modelMap) {
+        List<AiGatewayModelDeployment> orderedDeployments, Map<Long, AiModel> modelMap) {
     }
 
     private ModelResolution resolveModel(String modelIdentifier) {
@@ -1511,13 +1511,13 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
             .orElseThrow(() -> new IllegalArgumentException(
                 "No enabled provider found for type: " + providerTypeName));
 
-        AiGatewayModel model = aiGatewayModelService.getModel(provider.getId(), modelName);
+        AiModel model = aiModelService.getModel(provider.getId(), modelName);
 
         return new ModelResolution(provider, model);
     }
 
     private AiGatewayChatCompletionRequest compressMessages(
-        AiGatewayChatCompletionRequest request, AiGatewayModel model,
+        AiGatewayChatCompletionRequest request, AiModel model,
         @Nullable AiGatewayProject project) {
 
         if (!resolveCompressionEnabled(project)) {
@@ -1832,7 +1832,7 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
     }
 
     private AiLlmUsage createSuccessLog(
-        AiGatewayChatCompletionRequest request, AiGatewayModel model, AiGatewayProvider provider,
+        AiGatewayChatCompletionRequest request, AiModel model, AiGatewayProvider provider,
         long startTime, int inputTokens, int outputTokens) {
 
         AiLlmUsage requestLog = new AiLlmUsage(
@@ -1906,7 +1906,7 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
         return errorLog;
     }
 
-    private static BigDecimal calculateFallbackCost(AiGatewayModel model, int inputTokens, int outputTokens) {
+    private static BigDecimal calculateFallbackCost(AiModel model, int inputTokens, int outputTokens) {
         BigDecimal millionTokens = BigDecimal.valueOf(1_000_000);
 
         BigDecimal inputRate = model.getInputCostPerMTokens();
@@ -2092,7 +2092,7 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
         AiObservabilityTracingHeaders tracingHeaders,
         @Nullable Long workspaceId,
         AiGatewayChatCompletionRequest request,
-        AiGatewayModel model,
+        AiModel model,
         AiGatewayProvider provider,
         int inputTokens,
         int outputTokens,
@@ -2593,7 +2593,7 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
         return result.toString();
     }
 
-    private record ModelResolution(AiGatewayProvider provider, AiGatewayModel model) {
+    private record ModelResolution(AiGatewayProvider provider, AiModel model) {
     }
 
     private record ResolvedPrompt(Long promptId, Long promptVersionId, String content) {

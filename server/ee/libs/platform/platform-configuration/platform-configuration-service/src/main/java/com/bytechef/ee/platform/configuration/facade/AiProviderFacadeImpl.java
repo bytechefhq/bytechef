@@ -13,6 +13,8 @@ import com.bytechef.ee.platform.configuration.dto.AiDefaultModelWithApiKeyDTO;
 import com.bytechef.ee.platform.configuration.dto.AiProviderCatalogItemDTO;
 import com.bytechef.ee.platform.configuration.dto.AiProviderDTO;
 import com.bytechef.platform.ai.llm.Provider;
+import com.bytechef.platform.ai.model.catalog.CatalogModel;
+import com.bytechef.platform.ai.model.catalog.ModelCatalog;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
@@ -33,6 +35,7 @@ import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,17 +54,19 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
 
     private final AiProviderConnectionSource aiProviderConnectionSource;
     private final ComponentDefinitionService componentDefinitionService;
+    private final ObjectProvider<ModelCatalog> modelCatalogProvider;
     private final PropertyService propertyService;
     private final ApplicationProperties applicationProperties;
 
     @SuppressFBWarnings("EI")
     public AiProviderFacadeImpl(
         AiProviderConnectionSource aiProviderConnectionSource,
-        ComponentDefinitionService componentDefinitionService, PropertyService propertyService,
-        ApplicationProperties applicationProperties) {
+        ComponentDefinitionService componentDefinitionService, ObjectProvider<ModelCatalog> modelCatalogProvider,
+        PropertyService propertyService, ApplicationProperties applicationProperties) {
 
         this.aiProviderConnectionSource = aiProviderConnectionSource;
         this.componentDefinitionService = componentDefinitionService;
+        this.modelCatalogProvider = modelCatalogProvider;
         this.propertyService = propertyService;
         this.applicationProperties = applicationProperties;
     }
@@ -113,8 +118,9 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
                         ? aiProviderConnectionSource.isEnabled(provider, environment)
                         : ((property != null && property.isEnabled()) || hasConfigApiKey(provider));
 
-                List<AiProviderCatalogItemDTO.Model> models = readChatModels(
-                    resolveFullComponentDefinition(componentDefinition));
+                List<AiProviderCatalogItemDTO.Model> models = labelModels(
+                    modelCatalogProvider.getIfAvailable(), provider,
+                    readChatModels(resolveFullComponentDefinition(componentDefinition)));
 
                 return new AiProviderCatalogItemDTO(
                     provider.getKey(), provider.getLabel(), componentDefinition.getIcon(), enabled,
@@ -354,6 +360,64 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
             .findFirst()
             .map(AiProviderFacadeImpl::extractModelOptions)
             .orElse(List.of());
+    }
+
+    private static List<AiProviderCatalogItemDTO.Model> labelModels(
+        @Nullable ModelCatalog modelCatalog, Provider provider, List<AiProviderCatalogItemDTO.Model> models) {
+
+        String modelsDevProviderId = resolveModelsDevProviderId(provider);
+
+        return models.stream()
+            .map(model -> new AiProviderCatalogItemDTO.Model(
+                model.name(), resolveLabel(modelCatalog, modelsDevProviderId, model)))
+            .toList();
+    }
+
+    /**
+     * The models.dev display name wins when the catalog knows the model; otherwise the component option's own label;
+     * otherwise the model id. Never null or blank — the GraphQL schema declares {@code AiProviderModel.label} non-null,
+     * and an uncataloged model must still render in the picker.
+     */
+    private static String resolveLabel(
+        @Nullable ModelCatalog modelCatalog, @Nullable String modelsDevProviderId,
+        AiProviderCatalogItemDTO.Model model) {
+
+        if (modelCatalog != null && modelsDevProviderId != null) {
+            String displayName = modelCatalog.fetchModel(modelsDevProviderId, model.name())
+                .map(CatalogModel::name)
+                .orElse(null);
+
+            if (displayName != null && !displayName.isBlank()) {
+                return displayName;
+            }
+        }
+
+        String label = model.label();
+
+        return label != null && !label.isBlank() ? label : model.name();
+    }
+
+    /**
+     * Maps ByteChef AI providers onto models.dev provider ids. Exhaustive with no default arm, deliberately — appending
+     * a {@link Provider} value breaks compilation here instead of silently shipping unlabeled models. Null means
+     * models.dev does not catalog the provider (local Ollama; image- or embedding-only providers); labels then fall
+     * back to the option label or the model id.
+     */
+    private static @Nullable String resolveModelsDevProviderId(Provider provider) {
+        return switch (provider) {
+            case ANTHROPIC -> "anthropic";
+            case AZURE_OPEN_AI -> "azure";
+            case DEEPSEEK -> "deepseek";
+            case GROQ -> "groq";
+            case HUGGING_FACE -> null;
+            case MISTRAL -> "mistral";
+            case NVIDIA -> "nvidia";
+            case OLLAMA -> null;
+            case OPEN_AI -> "openai";
+            case PERPLEXITY -> "perplexity";
+            case STABILITY -> null;
+            case VERTEX_GEMINI -> "google-vertex";
+        };
     }
 
     private String resolveDefaultChatModel(Provider provider) {

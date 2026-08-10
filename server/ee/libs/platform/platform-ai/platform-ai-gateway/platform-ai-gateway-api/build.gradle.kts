@@ -5,6 +5,7 @@ dependencies {
     api("org.springframework.data:spring-data-commons")
     api(project(":server:ee:libs:platform:platform-ai:platform-ai-eval:platform-ai-eval-api"))
     api(project(":server:ee:libs:platform:platform-ai:platform-ai-llm-usage:platform-ai-llm-usage-api"))
+    api(project(":server:ee:libs:platform:platform-ai:platform-ai-model-catalog:platform-ai-model-catalog-api"))
     api(project(":server:ee:libs:platform:platform-ai:platform-ai-observability:platform-ai-observability-api"))
 
     implementation("jakarta.validation:jakarta.validation-api")

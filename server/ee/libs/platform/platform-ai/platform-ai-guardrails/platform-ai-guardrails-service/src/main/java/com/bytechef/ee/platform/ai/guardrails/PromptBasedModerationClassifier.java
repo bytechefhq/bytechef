@@ -7,12 +7,12 @@
 
 package com.bytechef.ee.platform.ai.guardrails;
 
-import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayModel;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayProvider;
 import com.bytechef.ee.platform.ai.gateway.guardrail.AiGatewayModerationClassifier;
 import com.bytechef.ee.platform.ai.gateway.provider.AiGatewayChatModelFactory;
-import com.bytechef.ee.platform.ai.gateway.service.AiGatewayModelService;
 import com.bytechef.ee.platform.ai.gateway.service.AiGatewayProviderService;
+import com.bytechef.ee.platform.ai.model.catalog.domain.AiModel;
+import com.bytechef.ee.platform.ai.model.catalog.service.AiModelService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Locale;
@@ -48,18 +48,18 @@ public class PromptBasedModerationClassifier implements AiGatewayModerationClass
     private static final Logger log = LoggerFactory.getLogger(PromptBasedModerationClassifier.class);
 
     private final AiGatewayChatModelFactory aiGatewayChatModelFactory;
-    private final AiGatewayModelService aiGatewayModelService;
+    private final AiModelService aiModelService;
     private final AiGatewayProviderService aiGatewayProviderService;
     private final String moderationModel;
 
     @SuppressFBWarnings("EI")
     public PromptBasedModerationClassifier(
-        AiGatewayChatModelFactory aiGatewayChatModelFactory, AiGatewayModelService aiGatewayModelService,
+        AiGatewayChatModelFactory aiGatewayChatModelFactory, AiModelService aiModelService,
         AiGatewayProviderService aiGatewayProviderService,
         @Value("${bytechef.ai.gateway.guardrails.moderation-model:}") String moderationModel) {
 
         this.aiGatewayChatModelFactory = aiGatewayChatModelFactory;
-        this.aiGatewayModelService = aiGatewayModelService;
+        this.aiModelService = aiModelService;
         this.aiGatewayProviderService = aiGatewayProviderService;
         this.moderationModel = moderationModel;
     }
@@ -71,13 +71,13 @@ public class PromptBasedModerationClassifier implements AiGatewayModerationClass
         }
 
         try {
-            Optional<AiGatewayModel> modelOptional = aiGatewayModelService.findByModelIdentifier(moderationModel);
+            Optional<AiModel> modelOptional = aiModelService.findByModelIdentifier(moderationModel);
 
             if (modelOptional.isEmpty()) {
                 return false;
             }
 
-            AiGatewayModel model = modelOptional.get();
+            AiModel model = modelOptional.get();
 
             AiGatewayProvider provider = aiGatewayProviderService.getProvider(model.getProviderId());
 

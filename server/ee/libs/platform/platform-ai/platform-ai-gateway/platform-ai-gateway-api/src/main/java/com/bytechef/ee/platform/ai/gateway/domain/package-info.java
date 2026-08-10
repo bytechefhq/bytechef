@@ -12,9 +12,10 @@
  * This package contains the persistent entities that back the four feature areas of the platform:
  *
  * <ul>
- * <li><b>Gateway</b> — {@code AiGatewayProvider}, {@code AiGatewayModel}, {@code AiGatewayRoutingPolicy},
- * {@code AiGatewayBudget}, {@code AiGatewayRateLimit}, {@code AiLlmUsage}, and friends. Drives routing, budgets,
- * caching, and rate limiting on the hot request path.
+ * <li><b>Gateway</b> — {@code AiGatewayProvider}, {@code AiGatewayRoutingPolicy}, {@code AiGatewayBudget},
+ * {@code AiGatewayRateLimit}, {@code AiLlmUsage}, and friends. Drives routing, budgets, caching, and rate limiting on
+ * the hot request path. The persisted model catalog ({@code AiModel}) lives in the standalone
+ * {@code platform-ai-model-catalog} module, which the gateway consumes.
  * <li><b>Observability</b> — {@code AiObservabilityTrace}, {@code AiObservabilitySpan}, {@code AiObservabilitySession},
  * {@code AiObservabilityAlertRule}, {@code AiObservabilityAlertEvent}, {@code AiObservabilityExportJob},
  * {@code AiObservabilityWebhookSubscription}. Records and aggregates traffic for the control plane.

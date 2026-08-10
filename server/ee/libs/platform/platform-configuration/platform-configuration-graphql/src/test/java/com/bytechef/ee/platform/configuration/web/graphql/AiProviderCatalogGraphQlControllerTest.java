@@ -32,9 +32,13 @@ class AiProviderCatalogGraphQlControllerTest {
 
     @Test
     void testAiProviderCatalogDelegatesToFacade() {
+        // One model the models.dev catalog labelled, one uncataloged model whose label fell back to the id — the
+        // controller must pass both through untouched.
         AiProviderCatalogItemDTO item = new AiProviderCatalogItemDTO(
             "ai.provider.openAi", "Open AI", "<svg/>", true, false,
-            List.of(new AiProviderCatalogItemDTO.Model("gpt-5", "GPT-5")));
+            List.of(
+                new AiProviderCatalogItemDTO.Model("gpt-5", "GPT-5"),
+                new AiProviderCatalogItemDTO.Model("my-fine-tune", "my-fine-tune")));
 
         when(aiProviderCatalogFacade.getAiProviderCatalog(2)).thenReturn(List.of(item));
 
@@ -45,6 +49,10 @@ class AiProviderCatalogGraphQlControllerTest {
         assertThat(result).singleElement()
             .extracting(AiProviderCatalogItemDTO::key)
             .isEqualTo("ai.provider.openAi");
+        assertThat(result.getFirst()
+            .models())
+                .extracting(AiProviderCatalogItemDTO.Model::label)
+                .containsExactly("GPT-5", "my-fine-tune");
     }
 
     @Test

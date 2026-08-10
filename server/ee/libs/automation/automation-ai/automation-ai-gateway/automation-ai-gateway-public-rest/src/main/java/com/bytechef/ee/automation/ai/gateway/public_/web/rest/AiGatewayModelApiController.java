@@ -9,10 +9,10 @@ package com.bytechef.ee.automation.ai.gateway.public_.web.rest;
 
 import com.bytechef.ee.automation.ai.gateway.public_.web.rest.model.ModelListModel;
 import com.bytechef.ee.automation.ai.gateway.public_.web.rest.model.ModelModel;
-import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayModel;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayProvider;
-import com.bytechef.ee.platform.ai.gateway.service.AiGatewayModelService;
 import com.bytechef.ee.platform.ai.gateway.service.AiGatewayProviderService;
+import com.bytechef.ee.platform.ai.model.catalog.domain.AiModel;
+import com.bytechef.ee.platform.ai.model.catalog.service.AiModelService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -34,20 +34,20 @@ import org.springframework.web.bind.annotation.RestController;
 @SuppressFBWarnings("EI")
 class AiGatewayModelApiController implements ModelApi {
 
-    private final AiGatewayModelService aiGatewayModelService;
+    private final AiModelService aiModelService;
     private final AiGatewayProviderService aiGatewayProviderService;
 
     AiGatewayModelApiController(
-        AiGatewayModelService aiGatewayModelService,
+        AiModelService aiModelService,
         AiGatewayProviderService aiGatewayProviderService) {
 
-        this.aiGatewayModelService = aiGatewayModelService;
+        this.aiModelService = aiModelService;
         this.aiGatewayProviderService = aiGatewayProviderService;
     }
 
     @Override
     public ResponseEntity<ModelListModel> listModels() {
-        List<AiGatewayModel> models = aiGatewayModelService.getEnabledModels();
+        List<AiModel> models = aiModelService.getEnabledModels();
 
         Map<Long, AiGatewayProvider> providerMap = aiGatewayProviderService.getEnabledProviders()
             .stream()
@@ -106,7 +106,7 @@ class AiGatewayModelApiController implements ModelApi {
                 .build();
         }
 
-        AiGatewayModel matchingModel = aiGatewayModelService.getModelsByProviderId(matchingProvider.getId())
+        AiModel matchingModel = aiModelService.getModelsByProviderId(matchingProvider.getId())
             .stream()
             .filter(model -> model.getName()
                 .equals(modelName) && model.isEnabled())

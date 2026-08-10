@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        The persisted AI model catalog, extracted from platform/ai/gateway/00000000000001_ai_gateway_init.xml
+        (where the table was named ai_gateway_model). provider_id references ai_gateway_provider, but the FK
+        constraint is added by the gateway's own changelog — the catalog must not know the gateway exists, while
+        the gateway may know the catalog (see fk_ai_model_provider there).
+    -->
+    <changeSet id="20260812000001" author="ivicac">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="ai_model"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="ai_model">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="provider_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="alias" type="VARCHAR(256)"/>
+            <column name="context_window" type="INT"/>
+            <column name="input_cost_per_m_tokens" type="DECIMAL(10,4)"/>
+            <column name="output_cost_per_m_tokens" type="DECIMAL(10,4)"/>
+            <column name="capabilities" type="VARCHAR(256)"/>
+            <column name="catalog_pinned" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="default_routing_policy_id" type="BIGINT"/>
+            <column name="enabled" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

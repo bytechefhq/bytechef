@@ -10,9 +10,9 @@ package com.bytechef.ee.platform.ai.gateway.routing;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayModel;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayModelDeployment;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayRoutingStrategyType;
+import com.bytechef.ee.platform.ai.model.catalog.domain.AiModel;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
@@ -42,15 +42,15 @@ class AiGatewayRoutingStrategyTest {
         AiGatewayModelDeployment expensiveDeployment = new AiGatewayModelDeployment(1L, 100L);
         AiGatewayModelDeployment cheapDeployment = new AiGatewayModelDeployment(1L, 200L);
 
-        AiGatewayModel expensiveModel = new AiGatewayModel(1L, "gpt-4");
+        AiModel expensiveModel = new AiModel(1L, "gpt-4");
 
         expensiveModel.setInputCostPerMTokens(new BigDecimal("30.00"));
 
-        AiGatewayModel cheapModel = new AiGatewayModel(2L, "gpt-3.5-turbo");
+        AiModel cheapModel = new AiModel(2L, "gpt-3.5-turbo");
 
         cheapModel.setInputCostPerMTokens(new BigDecimal("0.50"));
 
-        Map<Long, AiGatewayModel> modelMap = Map.of(100L, expensiveModel, 200L, cheapModel);
+        Map<Long, AiModel> modelMap = Map.of(100L, expensiveModel, 200L, cheapModel);
 
         AiGatewayRoutingContext context = new AiGatewayRoutingContext(modelMap);
 
@@ -155,15 +155,15 @@ class AiGatewayRoutingStrategyTest {
         AiGatewayModelDeployment cheapDeployment = new AiGatewayModelDeployment(1L, 100L);
         AiGatewayModelDeployment expensiveDeployment = new AiGatewayModelDeployment(1L, 200L);
 
-        AiGatewayModel cheapModel = new AiGatewayModel(1L, "cheap-model");
+        AiModel cheapModel = new AiModel(1L, "cheap-model");
 
         cheapModel.setOutputCostPerMTokens(new BigDecimal("0.50"));
 
-        AiGatewayModel expensiveModel = new AiGatewayModel(2L, "expensive-model");
+        AiModel expensiveModel = new AiModel(2L, "expensive-model");
 
         expensiveModel.setOutputCostPerMTokens(new BigDecimal("30.00"));
 
-        Map<Long, AiGatewayModel> modelMap = Map.of(100L, cheapModel, 200L, expensiveModel);
+        Map<Long, AiModel> modelMap = Map.of(100L, cheapModel, 200L, expensiveModel);
 
         AiGatewayRoutingContext context = new AiGatewayRoutingContext(
             Map.of(), modelMap, 0.2, Map.of(), Map.of());
@@ -182,15 +182,15 @@ class AiGatewayRoutingStrategyTest {
         AiGatewayModelDeployment cheapDeployment = new AiGatewayModelDeployment(1L, 100L);
         AiGatewayModelDeployment expensiveDeployment = new AiGatewayModelDeployment(1L, 200L);
 
-        AiGatewayModel cheapModel = new AiGatewayModel(1L, "cheap-model");
+        AiModel cheapModel = new AiModel(1L, "cheap-model");
 
         cheapModel.setOutputCostPerMTokens(new BigDecimal("0.50"));
 
-        AiGatewayModel expensiveModel = new AiGatewayModel(2L, "expensive-model");
+        AiModel expensiveModel = new AiModel(2L, "expensive-model");
 
         expensiveModel.setOutputCostPerMTokens(new BigDecimal("30.00"));
 
-        Map<Long, AiGatewayModel> modelMap = Map.of(100L, cheapModel, 200L, expensiveModel);
+        Map<Long, AiModel> modelMap = Map.of(100L, cheapModel, 200L, expensiveModel);
 
         AiGatewayRoutingContext context = new AiGatewayRoutingContext(
             Map.of(), modelMap, 0.9, Map.of(), Map.of());
@@ -209,15 +209,15 @@ class AiGatewayRoutingStrategyTest {
         AiGatewayModelDeployment cheapDeployment = new AiGatewayModelDeployment(1L, 100L);
         AiGatewayModelDeployment expensiveDeployment = new AiGatewayModelDeployment(1L, 200L);
 
-        AiGatewayModel cheapModel = new AiGatewayModel(1L, "cheap-model");
+        AiModel cheapModel = new AiModel(1L, "cheap-model");
 
         cheapModel.setOutputCostPerMTokens(new BigDecimal("0.50"));
 
-        AiGatewayModel expensiveModel = new AiGatewayModel(2L, "expensive-model");
+        AiModel expensiveModel = new AiModel(2L, "expensive-model");
 
         expensiveModel.setOutputCostPerMTokens(new BigDecimal("30.00"));
 
-        Map<Long, AiGatewayModel> modelMap = Map.of(100L, cheapModel, 200L, expensiveModel);
+        Map<Long, AiModel> modelMap = Map.of(100L, cheapModel, 200L, expensiveModel);
 
         AiGatewayRoutingContext context = new AiGatewayRoutingContext(
             Map.of(), modelMap, 0.4, Map.of(), Map.of());
@@ -236,15 +236,15 @@ class AiGatewayRoutingStrategyTest {
         AiGatewayModelDeployment cheapDeployment = new AiGatewayModelDeployment(1L, 100L);
         AiGatewayModelDeployment expensiveDeployment = new AiGatewayModelDeployment(1L, 200L);
 
-        AiGatewayModel cheapModel = new AiGatewayModel(1L, "cheap-model");
+        AiModel cheapModel = new AiModel(1L, "cheap-model");
 
         cheapModel.setOutputCostPerMTokens(new BigDecimal("0.50"));
 
-        AiGatewayModel expensiveModel = new AiGatewayModel(2L, "expensive-model");
+        AiModel expensiveModel = new AiModel(2L, "expensive-model");
 
         expensiveModel.setOutputCostPerMTokens(new BigDecimal("30.00"));
 
-        Map<Long, AiGatewayModel> modelMap = Map.of(100L, cheapModel, 200L, expensiveModel);
+        Map<Long, AiModel> modelMap = Map.of(100L, cheapModel, 200L, expensiveModel);
 
         AiGatewayRoutingContext context = new AiGatewayRoutingContext(
             Map.of(), modelMap, 0.6, Map.of(), Map.of());
@@ -263,15 +263,15 @@ class AiGatewayRoutingStrategyTest {
         AiGatewayModelDeployment cheapDeployment = new AiGatewayModelDeployment(1L, 100L);
         AiGatewayModelDeployment expensiveDeployment = new AiGatewayModelDeployment(1L, 200L);
 
-        AiGatewayModel cheapModel = new AiGatewayModel(1L, "cheap-model");
+        AiModel cheapModel = new AiModel(1L, "cheap-model");
 
         cheapModel.setOutputCostPerMTokens(new BigDecimal("0.50"));
 
-        AiGatewayModel expensiveModel = new AiGatewayModel(2L, "expensive-model");
+        AiModel expensiveModel = new AiModel(2L, "expensive-model");
 
         expensiveModel.setOutputCostPerMTokens(new BigDecimal("30.00"));
 
-        Map<Long, AiGatewayModel> modelMap = Map.of(100L, cheapModel, 200L, expensiveModel);
+        Map<Long, AiModel> modelMap = Map.of(100L, cheapModel, 200L, expensiveModel);
 
         AiGatewayRoutingContext context = new AiGatewayRoutingContext(
             Map.of(), modelMap, 0.4, Map.of(), Map.of());
@@ -291,19 +291,19 @@ class AiGatewayRoutingStrategyTest {
         AiGatewayModelDeployment standardDeployment = new AiGatewayModelDeployment(1L, 200L);
         AiGatewayModelDeployment frontierDeployment = new AiGatewayModelDeployment(1L, 300L);
 
-        AiGatewayModel basicModel = new AiGatewayModel(1L, "basic-model");
+        AiModel basicModel = new AiModel(1L, "basic-model");
 
         basicModel.setOutputCostPerMTokens(new BigDecimal("0.05"));
 
-        AiGatewayModel standardModel = new AiGatewayModel(2L, "standard-model");
+        AiModel standardModel = new AiModel(2L, "standard-model");
 
         standardModel.setOutputCostPerMTokens(new BigDecimal("1.75"));
 
-        AiGatewayModel frontierModel = new AiGatewayModel(3L, "frontier-model");
+        AiModel frontierModel = new AiModel(3L, "frontier-model");
 
         frontierModel.setOutputCostPerMTokens(new BigDecimal("6.00"));
 
-        Map<Long, AiGatewayModel> modelMap = Map.of(100L, basicModel, 200L, standardModel, 300L, frontierModel);
+        Map<Long, AiModel> modelMap = Map.of(100L, basicModel, 200L, standardModel, 300L, frontierModel);
 
         AiGatewayRoutingContext context = new AiGatewayRoutingContext(
             Map.of(), modelMap, 0.5, Map.of(), Map.of());
@@ -323,19 +323,19 @@ class AiGatewayRoutingStrategyTest {
         AiGatewayModelDeployment standardDeployment = new AiGatewayModelDeployment(1L, 200L);
         AiGatewayModelDeployment frontierDeployment = new AiGatewayModelDeployment(1L, 300L);
 
-        AiGatewayModel basicModel = new AiGatewayModel(1L, "basic-model");
+        AiModel basicModel = new AiModel(1L, "basic-model");
 
         basicModel.setOutputCostPerMTokens(new BigDecimal("0.05"));
 
-        AiGatewayModel standardModel = new AiGatewayModel(2L, "standard-model");
+        AiModel standardModel = new AiModel(2L, "standard-model");
 
         standardModel.setOutputCostPerMTokens(new BigDecimal("1.75"));
 
-        AiGatewayModel frontierModel = new AiGatewayModel(3L, "frontier-model");
+        AiModel frontierModel = new AiModel(3L, "frontier-model");
 
         frontierModel.setOutputCostPerMTokens(new BigDecimal("6.00"));
 
-        Map<Long, AiGatewayModel> modelMap = Map.of(100L, basicModel, 200L, standardModel, 300L, frontierModel);
+        Map<Long, AiModel> modelMap = Map.of(100L, basicModel, 200L, standardModel, 300L, frontierModel);
 
         AiGatewayRoutingContext context = new AiGatewayRoutingContext(
             Map.of(), modelMap, 0.95, Map.of(), Map.of());
@@ -354,15 +354,15 @@ class AiGatewayRoutingStrategyTest {
         AiGatewayModelDeployment basicDeployment = new AiGatewayModelDeployment(1L, 100L);
         AiGatewayModelDeployment frontierDeployment = new AiGatewayModelDeployment(1L, 300L);
 
-        AiGatewayModel basicModel = new AiGatewayModel(1L, "basic-model");
+        AiModel basicModel = new AiModel(1L, "basic-model");
 
         basicModel.setOutputCostPerMTokens(new BigDecimal("0.05"));
 
-        AiGatewayModel frontierModel = new AiGatewayModel(3L, "frontier-model");
+        AiModel frontierModel = new AiModel(3L, "frontier-model");
 
         frontierModel.setOutputCostPerMTokens(new BigDecimal("6.00"));
 
-        Map<Long, AiGatewayModel> modelMap = Map.of(100L, basicModel, 300L, frontierModel);
+        Map<Long, AiModel> modelMap = Map.of(100L, basicModel, 300L, frontierModel);
 
         AiGatewayRoutingContext context = new AiGatewayRoutingContext(
             Map.of(), modelMap, 1.0, Map.of(), Map.of());
@@ -384,27 +384,27 @@ class AiGatewayRoutingStrategyTest {
         AiGatewayModelDeployment advancedDeployment = new AiGatewayModelDeployment(1L, 400L);
         AiGatewayModelDeployment frontierDeployment = new AiGatewayModelDeployment(1L, 500L);
 
-        AiGatewayModel basicModel = new AiGatewayModel(1L, "basic-model");
+        AiModel basicModel = new AiModel(1L, "basic-model");
 
         basicModel.setOutputCostPerMTokens(new BigDecimal("0.05"));
 
-        AiGatewayModel efficientModel = new AiGatewayModel(2L, "efficient-model");
+        AiModel efficientModel = new AiModel(2L, "efficient-model");
 
         efficientModel.setOutputCostPerMTokens(new BigDecimal("0.50"));
 
-        AiGatewayModel standardModel = new AiGatewayModel(3L, "standard-model");
+        AiModel standardModel = new AiModel(3L, "standard-model");
 
         standardModel.setOutputCostPerMTokens(new BigDecimal("1.75"));
 
-        AiGatewayModel advancedModel = new AiGatewayModel(4L, "advanced-model");
+        AiModel advancedModel = new AiModel(4L, "advanced-model");
 
         advancedModel.setOutputCostPerMTokens(new BigDecimal("3.00"));
 
-        AiGatewayModel frontierModel = new AiGatewayModel(5L, "frontier-model");
+        AiModel frontierModel = new AiModel(5L, "frontier-model");
 
         frontierModel.setOutputCostPerMTokens(new BigDecimal("6.00"));
 
-        Map<Long, AiGatewayModel> modelMap = Map.of(
+        Map<Long, AiModel> modelMap = Map.of(
             100L, basicModel, 200L, efficientModel, 300L, standardModel, 400L, advancedModel, 500L, frontierModel);
 
         List<AiGatewayModelDeployment> deployments = List.of(
@@ -426,7 +426,7 @@ class AiGatewayRoutingStrategyTest {
                 .getModelId());
     }
 
-    private static AiGatewayRoutingContext fiveTierContext(Map<Long, AiGatewayModel> modelMap, double score) {
+    private static AiGatewayRoutingContext fiveTierContext(Map<Long, AiModel> modelMap, double score) {
         return new AiGatewayRoutingContext(Map.of(), modelMap, score, Map.of(), Map.of());
     }
 }

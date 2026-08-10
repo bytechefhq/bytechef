@@ -7,12 +7,12 @@
 
 package com.bytechef.ee.platform.ai.guardrails;
 
-import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayModel;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayProvider;
 import com.bytechef.ee.platform.ai.gateway.guardrail.AiGatewayInjectionClassifier;
 import com.bytechef.ee.platform.ai.gateway.provider.AiGatewayChatModelFactory;
-import com.bytechef.ee.platform.ai.gateway.service.AiGatewayModelService;
 import com.bytechef.ee.platform.ai.gateway.service.AiGatewayProviderService;
+import com.bytechef.ee.platform.ai.model.catalog.domain.AiModel;
+import com.bytechef.ee.platform.ai.model.catalog.service.AiModelService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Locale;
@@ -51,18 +51,18 @@ public class PromptBasedInjectionClassifier implements AiGatewayInjectionClassif
     private static final Logger log = LoggerFactory.getLogger(PromptBasedInjectionClassifier.class);
 
     private final AiGatewayChatModelFactory aiGatewayChatModelFactory;
-    private final AiGatewayModelService aiGatewayModelService;
+    private final AiModelService aiModelService;
     private final AiGatewayProviderService aiGatewayProviderService;
     private final String injectionModel;
 
     @SuppressFBWarnings("EI")
     public PromptBasedInjectionClassifier(
-        AiGatewayChatModelFactory aiGatewayChatModelFactory, AiGatewayModelService aiGatewayModelService,
+        AiGatewayChatModelFactory aiGatewayChatModelFactory, AiModelService aiModelService,
         AiGatewayProviderService aiGatewayProviderService,
         @Value("${bytechef.ai.gateway.guardrails.injection-model:}") String injectionModel) {
 
         this.aiGatewayChatModelFactory = aiGatewayChatModelFactory;
-        this.aiGatewayModelService = aiGatewayModelService;
+        this.aiModelService = aiModelService;
         this.aiGatewayProviderService = aiGatewayProviderService;
         this.injectionModel = injectionModel;
     }
@@ -74,13 +74,13 @@ public class PromptBasedInjectionClassifier implements AiGatewayInjectionClassif
         }
 
         try {
-            Optional<AiGatewayModel> modelOptional = aiGatewayModelService.findByModelIdentifier(injectionModel);
+            Optional<AiModel> modelOptional = aiModelService.findByModelIdentifier(injectionModel);
 
             if (modelOptional.isEmpty()) {
                 return false;
             }
 
-            AiGatewayModel model = modelOptional.get();
+            AiModel model = modelOptional.get();
 
             AiGatewayProvider provider = aiGatewayProviderService.getProvider(model.getProviderId());
 

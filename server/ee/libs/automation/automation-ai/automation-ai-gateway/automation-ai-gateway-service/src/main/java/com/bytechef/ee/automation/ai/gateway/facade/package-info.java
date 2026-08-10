@@ -18,7 +18,7 @@
  * {@code chatCompletion}, {@code chatCompletionStream}, and embedding calls: resolves the routing policy, enforces
  * budgets and rate limits, consults the response cache, dispatches to the upstream provider, and records traces and
  * request logs.
- * <li>{@code WorkspaceAiGatewayProviderFacadeImpl}, {@code WorkspaceAiGatewayModelFacadeImpl},
+ * <li>{@code WorkspaceAiGatewayProviderFacadeImpl}, {@code WorkspaceAiModelFacadeImpl},
  * {@code WorkspaceAiGatewayRoutingPolicyFacadeImpl} — workspace-scoped administration of providers, models, and routing
  * policies used by the configuration UI.
  * </ul>

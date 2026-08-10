@@ -13,11 +13,11 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayModel;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayProvider;
 import com.bytechef.ee.platform.ai.gateway.provider.AiGatewayChatModelFactory;
-import com.bytechef.ee.platform.ai.gateway.service.AiGatewayModelService;
 import com.bytechef.ee.platform.ai.gateway.service.AiGatewayProviderService;
+import com.bytechef.ee.platform.ai.model.catalog.domain.AiModel;
+import com.bytechef.ee.platform.ai.model.catalog.service.AiModelService;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,7 +31,7 @@ import org.springframework.ai.chat.model.ChatModel;
 class PromptBasedModerationClassifierTest {
 
     private final AiGatewayChatModelFactory chatModelFactory = mock(AiGatewayChatModelFactory.class);
-    private final AiGatewayModelService modelService = mock(AiGatewayModelService.class);
+    private final AiModelService modelService = mock(AiModelService.class);
     private final AiGatewayProviderService providerService = mock(AiGatewayProviderService.class);
     private final ChatModel chatModel = mock(ChatModel.class);
 
@@ -40,7 +40,7 @@ class PromptBasedModerationClassifierTest {
 
     @BeforeEach
     void beforeEach() {
-        AiGatewayModel model = mock(AiGatewayModel.class);
+        AiModel model = mock(AiModel.class);
 
         when(model.getProviderId()).thenReturn(5L);
         when(modelService.findByModelIdentifier("moderation-model-1")).thenReturn(Optional.of(model));

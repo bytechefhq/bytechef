@@ -7,8 +7,8 @@
 
 package com.bytechef.ee.platform.ai.gateway.routing;
 
-import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayModel;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayModelDeployment;
+import com.bytechef.ee.platform.ai.model.catalog.domain.AiModel;
 import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
@@ -32,7 +32,7 @@ class CostOptimizedRoutingStrategy implements AiGatewayRoutingStrategy {
 
         return deployments.stream()
             .min(Comparator.comparing(deployment -> {
-                AiGatewayModel model = context.modelMap()
+                AiModel model = context.modelMap()
                     .get(deployment.getModelId());
 
                 if (model == null || model.getInputCostPerMTokens() == null) {

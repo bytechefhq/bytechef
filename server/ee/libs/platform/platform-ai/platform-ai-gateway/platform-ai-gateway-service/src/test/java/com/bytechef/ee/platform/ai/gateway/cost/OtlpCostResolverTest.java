@@ -18,8 +18,8 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayModel;
-import com.bytechef.ee.platform.ai.gateway.service.AiGatewayModelService;
+import com.bytechef.ee.platform.ai.model.catalog.domain.AiModel;
+import com.bytechef.ee.platform.ai.model.catalog.service.AiModelService;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.math.BigDecimal;
@@ -36,9 +36,9 @@ class OtlpCostResolverTest {
 
     @Test
     void testComputesCostFromKnownModel() {
-        AiGatewayModelService modelService = mock(AiGatewayModelService.class);
+        AiModelService modelService = mock(AiModelService.class);
 
-        AiGatewayModel model = mock(AiGatewayModel.class);
+        AiModel model = mock(AiModel.class);
 
         when(model.getInputCostPerMTokens()).thenReturn(new BigDecimal("2.50"));
         when(model.getOutputCostPerMTokens()).thenReturn(new BigDecimal("10.00"));
@@ -54,7 +54,7 @@ class OtlpCostResolverTest {
 
     @Test
     void testReturnsNullWhenModelUnknown() {
-        AiGatewayModelService modelService = mock(AiGatewayModelService.class);
+        AiModelService modelService = mock(AiModelService.class);
 
         when(modelService.findByModelIdentifier("unknown-model"))
             .thenReturn(Optional.empty());
@@ -77,7 +77,7 @@ class OtlpCostResolverTest {
         // Both token attributes absent — legitimate embedding-only / stream-only span. Counter-only signal;
         // any warn-level emission would flood logs for normal traffic.
         SimpleMeterRegistry registry = new SimpleMeterRegistry();
-        OtlpCostResolver resolver = new OtlpCostResolver(mock(AiGatewayModelService.class), staticProvider(registry));
+        OtlpCostResolver resolver = new OtlpCostResolver(mock(AiModelService.class), staticProvider(registry));
 
         assertThat(resolver.computeCost("gpt-4o", null, null)).isNull();
 
@@ -93,7 +93,7 @@ class OtlpCostResolverTest {
         // both cases bucket into MISSING_TOKENS, masking exporter bugs as legitimate embedding-only spans
         // on the dashboard.
         SimpleMeterRegistry registry = new SimpleMeterRegistry();
-        OtlpCostResolver resolver = new OtlpCostResolver(mock(AiGatewayModelService.class), staticProvider(registry));
+        OtlpCostResolver resolver = new OtlpCostResolver(mock(AiModelService.class), staticProvider(registry));
 
         assertThat(resolver.computeCost("gpt-4o", null, 100)).isNull();
         assertThat(resolver.computeCost("gpt-4o", 100, null)).isNull();
@@ -114,7 +114,7 @@ class OtlpCostResolverTest {
         // log so an operator immediately sees what's happening — counters alone require a Grafana dashboard
         // to interpret. A regression dropping the warn would still pass counter assertions in other tests
         // but leave the operational signal hidden.
-        AiGatewayModelService modelService = mock(AiGatewayModelService.class);
+        AiModelService modelService = mock(AiModelService.class);
 
         when(modelService.findByModelIdentifier("rare-unknown-model"))
             .thenReturn(Optional.empty());
@@ -140,7 +140,7 @@ class OtlpCostResolverTest {
         // Provider-rotation onto a not-yet-catalogued model can fire 1k+ spans/min — warn-logging each line
         // would flood structured-log pipelines without adding signal beyond the counter (already wired).
         // Dedup gate must emit at most once per model id per window.
-        AiGatewayModelService modelService = mock(AiGatewayModelService.class);
+        AiModelService modelService = mock(AiModelService.class);
 
         when(modelService.findByModelIdentifier("flooded-model"))
             .thenReturn(Optional.empty());
@@ -193,9 +193,9 @@ class OtlpCostResolverTest {
 
     @Test
     void testReturnsNullWhenModelHasNullRates() {
-        AiGatewayModelService modelService = mock(AiGatewayModelService.class);
+        AiModelService modelService = mock(AiModelService.class);
 
-        AiGatewayModel model = mock(AiGatewayModel.class);
+        AiModel model = mock(AiModel.class);
 
         when(model.getInputCostPerMTokens()).thenReturn(null);
         when(model.getOutputCostPerMTokens()).thenReturn(null);
@@ -220,7 +220,7 @@ class OtlpCostResolverTest {
         // legitimate-looking $0 dashboard reading. A regression returning the same null without the
         // distinct counter tag would silently bypass operator alarms.
         SimpleMeterRegistry registry = new SimpleMeterRegistry();
-        OtlpCostResolver resolver = new OtlpCostResolver(mock(AiGatewayModelService.class), staticProvider(registry));
+        OtlpCostResolver resolver = new OtlpCostResolver(mock(AiModelService.class), staticProvider(registry));
 
         assertThat(resolver.computeCost(null, 100, 100)).isNull();
 
@@ -240,9 +240,9 @@ class OtlpCostResolverTest {
         // Pins the RATES_INVALID reason tag for negative rates. A negative rate is a data-entry typo and must
         // be suppressed from dashboards — but counted with its distinct reason so a Grafana alert can fire
         // before a billing cycle ships under-attributed.
-        AiGatewayModelService modelService = mock(AiGatewayModelService.class);
+        AiModelService modelService = mock(AiModelService.class);
 
-        AiGatewayModel model = mock(AiGatewayModel.class);
+        AiModel model = mock(AiModel.class);
 
         when(model.getInputCostPerMTokens()).thenReturn(new BigDecimal("-1.00"));
         when(model.getOutputCostPerMTokens()).thenReturn(new BigDecimal("10.00"));
@@ -266,9 +266,9 @@ class OtlpCostResolverTest {
         // return BigDecimal.ZERO so dashboards distinguish "$0 free-tier traffic" from "no cost data" (the
         // null-return paths). A regression bucketing zero into RATES_INVALID would hide free-tier workspaces
         // from spend dashboards.
-        AiGatewayModelService modelService = mock(AiGatewayModelService.class);
+        AiModelService modelService = mock(AiModelService.class);
 
-        AiGatewayModel model = mock(AiGatewayModel.class);
+        AiModel model = mock(AiModel.class);
 
         when(model.getInputCostPerMTokens()).thenReturn(BigDecimal.ZERO);
         when(model.getOutputCostPerMTokens()).thenReturn(BigDecimal.ZERO);
@@ -294,9 +294,9 @@ class OtlpCostResolverTest {
         // billed for completions (some embedding+chat hybrids advertise this). The resolver MUST NOT
         // short-circuit on either-zero — only both-zero qualifies for the free-tier fast-path. A regression
         // returning ZERO for any-zero would attribute output cost as $0 and silently understate spend.
-        AiGatewayModelService modelService = mock(AiGatewayModelService.class);
+        AiModelService modelService = mock(AiModelService.class);
 
-        AiGatewayModel model = mock(AiGatewayModel.class);
+        AiModel model = mock(AiModel.class);
 
         when(model.getInputCostPerMTokens()).thenReturn(BigDecimal.ZERO);
         when(model.getOutputCostPerMTokens()).thenReturn(new BigDecimal("0.01"));
@@ -327,7 +327,7 @@ class OtlpCostResolverTest {
         // aggregate. A regression that allowed the multiplication to proceed would let a single rogue exporter
         // effectively zero-out a workspace's billed cost. The TOKENS_INVALID counter MUST fire so a Grafana
         // alert can trigger before a billing cycle ships corrupted.
-        AiGatewayModelService modelService = mock(AiGatewayModelService.class);
+        AiModelService modelService = mock(AiModelService.class);
 
         SimpleMeterRegistry registry = new SimpleMeterRegistry();
         OtlpCostResolver resolver = new OtlpCostResolver(modelService, staticProvider(registry));
@@ -347,7 +347,7 @@ class OtlpCostResolverTest {
 
     @Test
     void testReturnsNullAndCountsTokensInvalidWhenOutputTokensNegative() {
-        AiGatewayModelService modelService = mock(AiGatewayModelService.class);
+        AiModelService modelService = mock(AiModelService.class);
 
         SimpleMeterRegistry registry = new SimpleMeterRegistry();
         OtlpCostResolver resolver = new OtlpCostResolver(modelService, staticProvider(registry));
@@ -364,7 +364,7 @@ class OtlpCostResolverTest {
 
     @Test
     void testReturnsNullAndCountsTokensInvalidWhenBothTokensNegative() {
-        AiGatewayModelService modelService = mock(AiGatewayModelService.class);
+        AiModelService modelService = mock(AiModelService.class);
 
         SimpleMeterRegistry registry = new SimpleMeterRegistry();
         OtlpCostResolver resolver = new OtlpCostResolver(modelService, staticProvider(registry));

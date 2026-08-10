@@ -122,6 +122,52 @@ BEGIN
 END
 \$\$;"
 
+# custom_role.workspace_id never shipped: the per-workspace role tier was removed before release
+# (see docs/superpowers/specs/2026-08-12-custom-roles-tenant-global-collapse-design.md), so the init
+# changelog now creates the table without the column, with a plain unique constraint on name in place
+# of the two partial indexes. Bring a local DB created before that edit forward. Guarded throughout.
+SQL="$SQL
+DO \$\$
+BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.columns
+               WHERE table_name = 'custom_role' AND column_name = 'workspace_id') THEN
+        DROP INDEX IF EXISTS ux_custom_role_global_name;
+        DROP INDEX IF EXISTS ux_custom_role_workspace_name;
+
+        -- Names were unique only within their tier; collapsing the tiers can collide them. Rename the
+        -- newer duplicates deterministically so the plain unique constraint can be added.
+        UPDATE custom_role SET name = name || ' (' || id || ')'
+        WHERE id NOT IN (SELECT MIN(id) FROM custom_role GROUP BY name);
+
+        ALTER TABLE custom_role DROP COLUMN workspace_id;
+    END IF;
+
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'custom_role')
+       AND NOT EXISTS (SELECT 1 FROM information_schema.table_constraints
+                       WHERE table_name = 'custom_role' AND constraint_name = 'uk_custom_role_name') THEN
+        ALTER TABLE custom_role ADD CONSTRAINT uk_custom_role_name UNIQUE (name);
+    END IF;
+END
+\$\$;"
+
+# 2026-08-12 model-catalog extraction: ai_gateway_model was renamed to ai_model in place. The old FK
+# constraints are dropped because the edited changelogs re-add them under new ownership (fk_ai_model_provider
+# from the gateway changelog; fk_ai_llm_gw_deploy_model re-pointed at ai_model) and addForeignKeyConstraint
+# would collide with the renamed table's surviving constraints.
+SQL="$SQL
+DO \$\$
+BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'ai_gateway_model')
+       AND NOT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'ai_model') THEN
+        ALTER TABLE ai_gateway_model RENAME TO ai_model;
+
+        ALTER TABLE ai_model DROP CONSTRAINT IF EXISTS fk_ai_gateway_model_provider;
+
+        ALTER TABLE ai_gateway_model_deployment DROP CONSTRAINT IF EXISTS fk_ai_llm_gw_deploy_model;
+    END IF;
+END
+\$\$;"
+
 # Init changelogs were edited in place, so recorded checksums no longer match. Nulling md5sum
 # makes Liquibase recompute on next run; it does NOT re-run changesets (they stay marked executed).
 SQL="$SQL

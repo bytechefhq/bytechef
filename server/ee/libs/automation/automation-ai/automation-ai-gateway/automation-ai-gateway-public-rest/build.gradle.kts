@@ -77,6 +77,7 @@ dependencies {
     testImplementation(project(":server:ee:libs:platform:platform-ai:platform-ai-gateway:platform-ai-gateway-service"))
     testImplementation(project(":server:ee:libs:platform:platform-ai:platform-ai-gateway-otlp:platform-ai-gateway-otlp-service"))
     testImplementation(project(":server:ee:libs:platform:platform-ai:platform-ai-llm-usage:platform-ai-llm-usage-service"))
+    testImplementation(project(":server:ee:libs:platform:platform-ai:platform-ai-model-catalog:platform-ai-model-catalog-service"))
     testImplementation(project(":server:ee:libs:platform:platform-ai:platform-ai-observability:platform-ai-observability-api"))
     testImplementation(project(":server:ee:libs:platform:platform-ai:platform-ai-observability:platform-ai-observability-service"))
     testImplementation(project(":server:ee:libs:platform:platform-ai:platform-ai-prompt:platform-ai-prompt-service"))

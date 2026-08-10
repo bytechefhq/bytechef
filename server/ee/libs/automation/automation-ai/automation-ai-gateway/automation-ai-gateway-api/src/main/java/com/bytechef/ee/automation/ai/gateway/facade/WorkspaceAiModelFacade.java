@@ -1,0 +1,86 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the ByteChef Enterprise license (the "Enterprise License");
+ * you may not use this file except in compliance with the Enterprise License.
+ */
+
+package com.bytechef.ee.automation.ai.gateway.facade;
+
+import com.bytechef.ee.platform.ai.model.catalog.domain.AiModel;
+import java.util.List;
+
+/**
+ * Defines the interface for managing and retrieving AI LLM Gateway models associated with specific workspaces. Models
+ * are implicitly workspace-scoped through their provider relationship.
+ *
+ * @version ee
+ *
+ * @author Ivica Cardic
+ */
+public interface WorkspaceAiModelFacade {
+
+    /**
+     * Creates a new AI LLM Gateway model and verifies the provider belongs to the specified workspace.
+     *
+     * @param workspaceId            the workspace ID to verify provider ownership
+     * @param providerId             the provider ID for the model
+     * @param name                   the name of the model
+     * @param alias                  the alias for the model
+     * @param contextWindow          the context window size
+     * @param inputCostPerMTokens    the input cost per million tokens
+     * @param outputCostPerMTokens   the output cost per million tokens
+     * @param capabilities           the model capabilities
+     * @param defaultRoutingPolicyId the ID of the default routing policy, or {@code null} to inherit the
+     *                               workspace/system default
+     * @return the created model
+     */
+    AiModel createWorkspaceModel(
+        Long workspaceId, Long providerId, String name, String alias, Integer contextWindow,
+        Double inputCostPerMTokens, Double outputCostPerMTokens, String capabilities, Long defaultRoutingPolicyId);
+
+    /**
+     * Deletes an AI LLM Gateway model after verifying workspace ownership through the provider relationship.
+     *
+     * @param workspaceId the workspace ID to verify ownership
+     * @param modelId     the ID of the model to delete
+     */
+    void deleteWorkspaceModel(Long workspaceId, Long modelId);
+
+    /**
+     * Retrieves all AI LLM Gateway models for providers associated with the specified workspace.
+     *
+     * @param workspaceId the workspace ID
+     * @return a list of models belonging to workspace providers
+     */
+    List<AiModel> getWorkspaceModels(Long workspaceId);
+
+    /**
+     * Clears the catalog-override flag after verifying workspace ownership through the provider relationship, handing
+     * the row back to the reconciler. The next reconcile overwrites its catalog-owned fields.
+     *
+     * @param workspaceId the workspace ID to verify ownership
+     * @param modelId     the ID of the model to unpin
+     * @return the updated model
+     */
+    AiModel unpinWorkspaceModel(Long workspaceId, Long modelId);
+
+    /**
+     * Updates an existing AI LLM Gateway model after verifying workspace ownership through the provider relationship.
+     *
+     * @param workspaceId          the workspace ID to verify ownership
+     * @param modelId              the ID of the model to update
+     * @param name                 the new name
+     * @param alias                the new alias
+     * @param contextWindow        the new context window size
+     * @param inputCostPerMTokens  the new input cost per million tokens
+     * @param outputCostPerMTokens the new output cost per million tokens
+     * @param capabilities         the new capabilities
+     * @param enabled              whether the model is enabled
+     * @return the updated model
+     */
+    AiModel updateWorkspaceModel(
+        Long workspaceId, Long modelId, String name, String alias, Integer contextWindow,
+        Double inputCostPerMTokens, Double outputCostPerMTokens, String capabilities, Boolean enabled,
+        Long defaultRoutingPolicyId);
+}

@@ -7,8 +7,8 @@
 
 package com.bytechef.ee.platform.ai.gateway.cost;
 
-import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayModel;
-import com.bytechef.ee.platform.ai.gateway.service.AiGatewayModelService;
+import com.bytechef.ee.platform.ai.model.catalog.domain.AiModel;
+import com.bytechef.ee.platform.ai.model.catalog.service.AiModelService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.micrometer.core.instrument.Counter;
@@ -92,7 +92,7 @@ public class OtlpCostResolver {
      */
     private static final int MODEL_DEDUP_MAP_SOFT_CAP = 10_000;
 
-    private final AiGatewayModelService aiGatewayModelService;
+    private final AiModelService aiModelService;
     private final MeterRegistry meterRegistry;
 
     // Per-model log-dedup gate: a workspace whose exporter rotates onto a not-yet-catalogued model can fire
@@ -103,9 +103,9 @@ public class OtlpCostResolver {
     private final Map<String, Instant> modelNotRegisteredLastLoggedAt = new ConcurrentHashMap<>();
 
     public OtlpCostResolver(
-        AiGatewayModelService aiGatewayModelService, ObjectProvider<MeterRegistry> meterRegistryProvider) {
+        AiModelService aiModelService, ObjectProvider<MeterRegistry> meterRegistryProvider) {
 
-        this.aiGatewayModelService = aiGatewayModelService;
+        this.aiModelService = aiModelService;
         this.meterRegistry = meterRegistryProvider.getIfAvailable();
     }
 
@@ -190,7 +190,7 @@ public class OtlpCostResolver {
             return null;
         }
 
-        Optional<AiGatewayModel> modelOptional = aiGatewayModelService.findByModelIdentifier(modelIdentifier);
+        Optional<AiModel> modelOptional = aiModelService.findByModelIdentifier(modelIdentifier);
 
         if (modelOptional.isEmpty()) {
             if (shouldLogModelNotRegistered(modelIdentifier)) {
@@ -202,7 +202,7 @@ public class OtlpCostResolver {
             return null;
         }
 
-        AiGatewayModel model = modelOptional.get();
+        AiModel model = modelOptional.get();
 
         BigDecimal inputRate = model.getInputCostPerMTokens();
         BigDecimal outputRate = model.getOutputCostPerMTokens();

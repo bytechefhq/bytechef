@@ -17,6 +17,11 @@ import static org.mockito.Mockito.when;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.platform.configuration.dto.AiProviderCatalogItemDTO;
 import com.bytechef.platform.ai.llm.Provider;
+import com.bytechef.platform.ai.model.catalog.CatalogModel;
+import com.bytechef.platform.ai.model.catalog.Limit;
+import com.bytechef.platform.ai.model.catalog.Modalities;
+import com.bytechef.platform.ai.model.catalog.Modalities.Modality;
+import com.bytechef.platform.ai.model.catalog.ModelCatalog;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.Option;
@@ -26,12 +31,14 @@ import com.bytechef.platform.configuration.domain.Property.Scope;
 import com.bytechef.platform.configuration.service.PropertyService;
 import com.bytechef.platform.connection.aiprovider.AiProviderConnectionSource;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * @version ee
@@ -45,6 +52,9 @@ class AiProviderFacadeCatalogTest {
 
     @Mock
     private ComponentDefinitionService componentDefinitionService;
+
+    @Mock
+    private ObjectProvider<ModelCatalog> modelCatalogProvider;
 
     @Mock
     private PropertyService propertyService;
@@ -65,8 +75,164 @@ class AiProviderFacadeCatalogTest {
         lenient().when(aiProviderConnectionSource.getSupportedProviders())
             .thenReturn(List.of());
 
+        // No models.dev catalog by default — existing tests exercise the option-label path unchanged.
+        lenient().when(modelCatalogProvider.getIfAvailable())
+            .thenReturn(null);
+
         facade = new AiProviderFacadeImpl(
-            aiProviderConnectionSource, componentDefinitionService, propertyService, applicationProperties);
+            aiProviderConnectionSource, componentDefinitionService, modelCatalogProvider, propertyService,
+            applicationProperties);
+    }
+
+    private static CatalogModel catalogModel(String id, String name) {
+        return new CatalogModel(
+            id, name, null, null, false, false, false, false, false, false, null, null, null,
+            CatalogModel.Status.ACTIVE, new Modalities(List.of(Modality.TEXT), List.of(Modality.TEXT)),
+            new Limit(null, null, null), null);
+    }
+
+    @Test
+    void testGetChatProviderCatalogFillsLabelFromModelsDevDisplayName() {
+        Option option = mock(Option.class);
+        when(option.getValue()).thenReturn("claude-sonnet-4-6");
+        when(option.getLabel()).thenReturn("claude-sonnet-4-6");
+
+        StringProperty modelProperty = mock(StringProperty.class);
+        when(modelProperty.getName()).thenReturn("model");
+        when(modelProperty.getOptions()).thenReturn(List.of(option));
+
+        ActionDefinition chatAction = mock(ActionDefinition.class);
+        when(chatAction.getName()).thenReturn("ask");
+        doReturn(List.of(modelProperty)).when(chatAction)
+            .getProperties();
+
+        ComponentDefinition anthropicDefinition = mock(ComponentDefinition.class);
+        when(anthropicDefinition.getName()).thenReturn("anthropic");
+        when(anthropicDefinition.getIcon()).thenReturn("anthropic-icon");
+        when(anthropicDefinition.getVersion()).thenReturn(1);
+        when(anthropicDefinition.getActions()).thenReturn(List.of(chatAction));
+
+        when(componentDefinitionService.getComponentDefinitions()).thenReturn(List.of(anthropicDefinition));
+        when(componentDefinitionService.getComponentDefinition("anthropic", 1)).thenReturn(anthropicDefinition);
+        when(propertyService.getProperties(
+            ArgumentMatchers.anyList(),
+            ArgumentMatchers.eq(Scope.PLATFORM),
+            ArgumentMatchers.isNull(),
+            ArgumentMatchers.eq((long) ENVIRONMENT)))
+                .thenReturn(List.of());
+
+        ModelCatalog modelCatalog = mock(ModelCatalog.class);
+
+        when(modelCatalogProvider.getIfAvailable()).thenReturn(modelCatalog);
+        when(modelCatalog.fetchModel("anthropic", "claude-sonnet-4-6"))
+            .thenReturn(Optional.of(catalogModel("claude-sonnet-4-6", "Claude Sonnet 4.6")));
+
+        List<AiProviderCatalogItemDTO> catalog = facade.getAiChatProviderCatalog(ENVIRONMENT);
+
+        AiProviderCatalogItemDTO anthropic = catalog.stream()
+            .filter(item -> item.key()
+                .equals("ai.provider.anthropic"))
+            .findFirst()
+            .orElseThrow();
+
+        assertThat(anthropic.models()
+            .getFirst()
+            .label()).isEqualTo("Claude Sonnet 4.6");
+        assertThat(anthropic.models()
+            .getFirst()
+            .name()).isEqualTo("claude-sonnet-4-6");
+    }
+
+    @Test
+    void testGetChatProviderCatalogFallsBackToOptionLabelWhenCatalogMisses() {
+        Option option = mock(Option.class);
+        when(option.getValue()).thenReturn("claude-fine-tune");
+        when(option.getLabel()).thenReturn("My Claude Fine-Tune");
+
+        StringProperty modelProperty = mock(StringProperty.class);
+        when(modelProperty.getName()).thenReturn("model");
+        when(modelProperty.getOptions()).thenReturn(List.of(option));
+
+        ActionDefinition chatAction = mock(ActionDefinition.class);
+        when(chatAction.getName()).thenReturn("ask");
+        doReturn(List.of(modelProperty)).when(chatAction)
+            .getProperties();
+
+        ComponentDefinition anthropicDefinition = mock(ComponentDefinition.class);
+        when(anthropicDefinition.getName()).thenReturn("anthropic");
+        when(anthropicDefinition.getIcon()).thenReturn("anthropic-icon");
+        when(anthropicDefinition.getVersion()).thenReturn(1);
+        when(anthropicDefinition.getActions()).thenReturn(List.of(chatAction));
+
+        when(componentDefinitionService.getComponentDefinitions()).thenReturn(List.of(anthropicDefinition));
+        when(componentDefinitionService.getComponentDefinition("anthropic", 1)).thenReturn(anthropicDefinition);
+        when(propertyService.getProperties(
+            ArgumentMatchers.anyList(),
+            ArgumentMatchers.eq(Scope.PLATFORM),
+            ArgumentMatchers.isNull(),
+            ArgumentMatchers.eq((long) ENVIRONMENT)))
+                .thenReturn(List.of());
+
+        ModelCatalog modelCatalog = mock(ModelCatalog.class);
+
+        when(modelCatalogProvider.getIfAvailable()).thenReturn(modelCatalog);
+        when(modelCatalog.fetchModel("anthropic", "claude-fine-tune")).thenReturn(Optional.empty());
+
+        List<AiProviderCatalogItemDTO> catalog = facade.getAiChatProviderCatalog(ENVIRONMENT);
+
+        AiProviderCatalogItemDTO anthropic = catalog.stream()
+            .filter(item -> item.key()
+                .equals("ai.provider.anthropic"))
+            .findFirst()
+            .orElseThrow();
+
+        assertThat(anthropic.models()
+            .getFirst()
+            .label()).isEqualTo("My Claude Fine-Tune");
+    }
+
+    @Test
+    void testGetChatProviderCatalogFallsBackToModelIdWhenNoLabelAnywhere() {
+        Option option = mock(Option.class);
+        when(option.getValue()).thenReturn("claude-fine-tune");
+        when(option.getLabel()).thenReturn(null);
+
+        StringProperty modelProperty = mock(StringProperty.class);
+        when(modelProperty.getName()).thenReturn("model");
+        when(modelProperty.getOptions()).thenReturn(List.of(option));
+
+        ActionDefinition chatAction = mock(ActionDefinition.class);
+        when(chatAction.getName()).thenReturn("ask");
+        doReturn(List.of(modelProperty)).when(chatAction)
+            .getProperties();
+
+        ComponentDefinition anthropicDefinition = mock(ComponentDefinition.class);
+        when(anthropicDefinition.getName()).thenReturn("anthropic");
+        when(anthropicDefinition.getIcon()).thenReturn("anthropic-icon");
+        when(anthropicDefinition.getVersion()).thenReturn(1);
+        when(anthropicDefinition.getActions()).thenReturn(List.of(chatAction));
+
+        when(componentDefinitionService.getComponentDefinitions()).thenReturn(List.of(anthropicDefinition));
+        when(componentDefinitionService.getComponentDefinition("anthropic", 1)).thenReturn(anthropicDefinition);
+        when(propertyService.getProperties(
+            ArgumentMatchers.anyList(),
+            ArgumentMatchers.eq(Scope.PLATFORM),
+            ArgumentMatchers.isNull(),
+            ArgumentMatchers.eq((long) ENVIRONMENT)))
+                .thenReturn(List.of());
+
+        // modelCatalogProvider stays at its default null — no models.dev catalog on the classpath at all.
+        List<AiProviderCatalogItemDTO> catalog = facade.getAiChatProviderCatalog(ENVIRONMENT);
+
+        AiProviderCatalogItemDTO anthropic = catalog.stream()
+            .filter(item -> item.key()
+                .equals("ai.provider.anthropic"))
+            .findFirst()
+            .orElseThrow();
+
+        assertThat(anthropic.models()
+            .getFirst()
+            .label()).isEqualTo("claude-fine-tune");
     }
 
     @Test
@@ -343,7 +509,8 @@ class AiProviderFacadeCatalogTest {
         when(delegatingSource.isEnabled(Provider.OPEN_AI, ENVIRONMENT)).thenReturn(true);
 
         AiProviderFacadeImpl delegatingFacade = new AiProviderFacadeImpl(
-            delegatingSource, componentDefinitionService, propertyService, applicationProperties);
+            delegatingSource, componentDefinitionService, modelCatalogProvider, propertyService,
+            applicationProperties);
 
         ComponentDefinition openAiDefinition = buildEmptyActionComponentDefinition("openAi");
 

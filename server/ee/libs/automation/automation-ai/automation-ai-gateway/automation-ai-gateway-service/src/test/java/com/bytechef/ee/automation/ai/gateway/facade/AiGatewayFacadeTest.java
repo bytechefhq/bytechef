@@ -34,7 +34,6 @@ import com.bytechef.ee.automation.ai.prompt.service.WorkspaceAiPromptService;
 import com.bytechef.ee.platform.ai.gateway.cache.AiGatewayResponseCache;
 import com.bytechef.ee.platform.ai.gateway.compression.AiGatewayContextCompressor;
 import com.bytechef.ee.platform.ai.gateway.cost.AiGatewayCostCalculator;
-import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayModel;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayModelDeployment;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayProvider;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayProviderType;
@@ -56,10 +55,11 @@ import com.bytechef.ee.platform.ai.gateway.routing.AiGatewayRouter;
 import com.bytechef.ee.platform.ai.gateway.routing.AiGatewayRoutingContext;
 import com.bytechef.ee.platform.ai.gateway.routing.PromptComplexityScorer;
 import com.bytechef.ee.platform.ai.gateway.service.AiGatewayModelDeploymentService;
-import com.bytechef.ee.platform.ai.gateway.service.AiGatewayModelService;
 import com.bytechef.ee.platform.ai.gateway.service.AiGatewayProviderService;
 import com.bytechef.ee.platform.ai.gateway.service.AiGatewayRoutingPolicyService;
 import com.bytechef.ee.platform.ai.llm.usage.service.AiLlmUsageService;
+import com.bytechef.ee.platform.ai.model.catalog.domain.AiModel;
+import com.bytechef.ee.platform.ai.model.catalog.service.AiModelService;
 import com.bytechef.ee.platform.ai.observability.domain.AiObservabilitySpan;
 import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityTrace;
 import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityTraceSource;
@@ -133,7 +133,7 @@ class AiGatewayFacadeTest {
     private AiGatewayModelDeploymentService aiGatewayModelDeploymentService;
 
     @Mock
-    private AiGatewayModelService aiGatewayModelService;
+    private AiModelService aiModelService;
 
     @Mock
     private WorkspaceAiGatewayProjectService workspaceAiGatewayProjectService;
@@ -214,7 +214,7 @@ class AiGatewayFacadeTest {
             aiGatewayCostCalculator,
             guardrails,
             aiGatewayEmbeddingModelFactory, aiGatewayModelDeploymentService,
-            aiGatewayModelService, workspaceAiGatewayProjectService, aiGatewayProviderService,
+            aiModelService, workspaceAiGatewayProjectService, aiGatewayProviderService,
             aiGatewayRequestLogService, aiGatewayResponseCache, aiGatewayRetryHandler,
             aiGatewayRouter, aiGatewayRoutingPolicyService, promptComplexityScorer,
             workspaceAiPromptService,
@@ -365,10 +365,10 @@ class AiGatewayFacadeTest {
         when(aiGatewayResponseCache.shouldCache(any())).thenReturn(false);
 
         AiGatewayProvider provider = createProvider();
-        AiGatewayModel model = createModel(provider);
+        AiModel model = createModel(provider);
 
         when(aiGatewayProviderService.getEnabledProviders()).thenReturn(List.of(provider));
-        when(aiGatewayModelService.getModel(provider.getId(), "gpt-4")).thenReturn(model);
+        when(aiModelService.getModel(provider.getId(), "gpt-4")).thenReturn(model);
         when(aiGatewayContextCompressor.compress(any(), any(Integer.class))).thenReturn(request.messages());
 
         ChatModel chatModel = mock(ChatModel.class);
@@ -406,10 +406,10 @@ class AiGatewayFacadeTest {
         when(aiGatewayResponseCache.shouldCache(any())).thenReturn(false);
 
         AiGatewayProvider provider = createProvider();
-        AiGatewayModel model = createModel(provider);
+        AiModel model = createModel(provider);
 
         when(aiGatewayProviderService.getEnabledProviders()).thenReturn(List.of(provider));
-        when(aiGatewayModelService.getModel(provider.getId(), "gpt-4")).thenReturn(model);
+        when(aiModelService.getModel(provider.getId(), "gpt-4")).thenReturn(model);
         when(aiGatewayContextCompressor.compress(any(), any(Integer.class))).thenReturn(request.messages());
 
         ChatModel chatModel = mock(ChatModel.class);
@@ -440,10 +440,10 @@ class AiGatewayFacadeTest {
         when(aiGatewayResponseCache.shouldCache(any())).thenReturn(false);
 
         AiGatewayProvider provider = createProvider();
-        AiGatewayModel model = createModel(provider);
+        AiModel model = createModel(provider);
 
         when(aiGatewayProviderService.getEnabledProviders()).thenReturn(List.of(provider));
-        when(aiGatewayModelService.getModel(provider.getId(), "gpt-4")).thenReturn(model);
+        when(aiModelService.getModel(provider.getId(), "gpt-4")).thenReturn(model);
         when(aiGatewayContextCompressor.compress(any(), any(Integer.class))).thenReturn(request.messages());
 
         ChatModel chatModel = mock(ChatModel.class);
@@ -494,10 +494,10 @@ class AiGatewayFacadeTest {
         when(aiGatewayResponseCache.get("test-cache-key")).thenReturn(null);
 
         AiGatewayProvider provider = createProvider();
-        AiGatewayModel model = createModel(provider);
+        AiModel model = createModel(provider);
 
         when(aiGatewayProviderService.getEnabledProviders()).thenReturn(List.of(provider));
-        when(aiGatewayModelService.getModel(provider.getId(), "gpt-4")).thenReturn(model);
+        when(aiModelService.getModel(provider.getId(), "gpt-4")).thenReturn(model);
         when(aiGatewayContextCompressor.compress(any(), any(Integer.class))).thenReturn(request.messages());
 
         ChatModel chatModel = mock(ChatModel.class);
@@ -526,10 +526,10 @@ class AiGatewayFacadeTest {
         when(aiGatewayResponseCache.shouldCache(any())).thenReturn(false);
 
         AiGatewayProvider provider = createProvider();
-        AiGatewayModel model = createModel(provider);
+        AiModel model = createModel(provider);
 
         when(aiGatewayProviderService.getEnabledProviders()).thenReturn(List.of(provider));
-        when(aiGatewayModelService.getModel(provider.getId(), "gpt-4")).thenReturn(model);
+        when(aiModelService.getModel(provider.getId(), "gpt-4")).thenReturn(model);
         when(aiGatewayContextCompressor.compress(any(), any(Integer.class))).thenReturn(request.messages());
 
         ChatModel chatModel = mock(ChatModel.class);
@@ -562,10 +562,10 @@ class AiGatewayFacadeTest {
         when(aiGatewayResponseCache.shouldCache(any())).thenReturn(false);
 
         AiGatewayProvider provider = createProvider();
-        AiGatewayModel model = createModel(provider);
+        AiModel model = createModel(provider);
 
         when(aiGatewayProviderService.getEnabledProviders()).thenReturn(List.of(provider));
-        when(aiGatewayModelService.getModel(provider.getId(), "gpt-4")).thenReturn(model);
+        when(aiModelService.getModel(provider.getId(), "gpt-4")).thenReturn(model);
         when(aiGatewayContextCompressor.compress(any(), any(Integer.class)))
             .thenReturn(request.messages());
 
@@ -596,10 +596,10 @@ class AiGatewayFacadeTest {
         when(aiGatewayBudgetChecker.checkBudget(1L)).thenReturn(BudgetCheckResult.allowed());
 
         AiGatewayProvider provider = createProvider();
-        AiGatewayModel model = createModel(provider);
+        AiModel model = createModel(provider);
 
         when(aiGatewayProviderService.getEnabledProviders()).thenReturn(List.of(provider));
-        when(aiGatewayModelService.getModel(provider.getId(), "gpt-4")).thenReturn(model);
+        when(aiModelService.getModel(provider.getId(), "gpt-4")).thenReturn(model);
         when(aiGatewayContextCompressor.compress(any(), any(Integer.class))).thenReturn(request.messages());
 
         ChatModel chatModel = mock(ChatModel.class);
@@ -670,14 +670,14 @@ class AiGatewayFacadeTest {
             .thenReturn(routingPolicy);
 
         AiGatewayProvider provider = createProvider();
-        AiGatewayModel model = createModel(provider);
+        AiModel model = createModel(provider);
         AiGatewayModelDeployment deployment = new AiGatewayModelDeployment(10L, 1L);
 
         ReflectionTestUtils.setField(deployment, "id", 100L);
 
         when(aiGatewayModelDeploymentService.getDeploymentsByRoutingPolicyId(10L))
             .thenReturn(List.of(deployment));
-        when(aiGatewayModelService.getModel(1L)).thenReturn(model);
+        when(aiModelService.getModel(1L)).thenReturn(model);
         when(aiGatewayProviderService.getProvider(provider.getId())).thenReturn(provider);
         when(aiGatewayRequestLogService.getAverageLatencyByModel(any(Instant.class)))
             .thenReturn(Map.of());
@@ -720,10 +720,10 @@ class AiGatewayFacadeTest {
         when(aiGatewayBudgetChecker.checkBudget(1L)).thenReturn(BudgetCheckResult.allowed());
 
         AiGatewayProvider provider = createProvider();
-        AiGatewayModel model = createModel(provider);
+        AiModel model = createModel(provider);
 
         when(aiGatewayProviderService.getEnabledProviders()).thenReturn(List.of(provider));
-        when(aiGatewayModelService.getModel(provider.getId(), "gpt-4")).thenReturn(model);
+        when(aiModelService.getModel(provider.getId(), "gpt-4")).thenReturn(model);
 
         EmbeddingModel embeddingModel = mock(EmbeddingModel.class);
 
@@ -766,10 +766,10 @@ class AiGatewayFacadeTest {
         when(aiGatewayBudgetChecker.checkBudget(1L)).thenReturn(BudgetCheckResult.allowed());
 
         AiGatewayProvider provider = createProvider();
-        AiGatewayModel model = createModel(provider);
+        AiModel model = createModel(provider);
 
         when(aiGatewayProviderService.getEnabledProviders()).thenReturn(List.of(provider));
-        when(aiGatewayModelService.getModel(provider.getId(), "gpt-4")).thenReturn(model);
+        when(aiModelService.getModel(provider.getId(), "gpt-4")).thenReturn(model);
 
         EmbeddingModel embeddingModel = mock(EmbeddingModel.class);
 
@@ -803,14 +803,14 @@ class AiGatewayFacadeTest {
             .thenReturn(routingPolicy);
 
         AiGatewayProvider provider = createProvider();
-        AiGatewayModel model = createModel(provider);
+        AiModel model = createModel(provider);
         AiGatewayModelDeployment deployment = new AiGatewayModelDeployment(10L, 1L);
 
         ReflectionTestUtils.setField(deployment, "id", 100L);
 
         when(aiGatewayModelDeploymentService.getDeploymentsByRoutingPolicyId(10L))
             .thenReturn(List.of(deployment));
-        when(aiGatewayModelService.getModel(1L)).thenReturn(model);
+        when(aiModelService.getModel(1L)).thenReturn(model);
         when(aiGatewayProviderService.getProvider(provider.getId())).thenReturn(provider);
         when(aiGatewayRequestLogService.getAverageLatencyByModel(any(Instant.class)))
             .thenReturn(Map.of());
@@ -857,14 +857,14 @@ class AiGatewayFacadeTest {
             .thenReturn(routingPolicy);
 
         AiGatewayProvider provider = createProvider();
-        AiGatewayModel model = createModel(provider);
+        AiModel model = createModel(provider);
         AiGatewayModelDeployment deployment = new AiGatewayModelDeployment(10L, 1L);
 
         ReflectionTestUtils.setField(deployment, "id", 100L);
 
         when(aiGatewayModelDeploymentService.getDeploymentsByRoutingPolicyId(10L))
             .thenReturn(List.of(deployment));
-        when(aiGatewayModelService.getModel(1L)).thenReturn(model);
+        when(aiModelService.getModel(1L)).thenReturn(model);
         when(aiGatewayProviderService.getProvider(provider.getId())).thenReturn(provider);
         when(aiGatewayRequestLogService.getAverageLatencyByModel(any(Instant.class)))
             .thenReturn(Map.of());
@@ -934,10 +934,10 @@ class AiGatewayFacadeTest {
         when(aiGatewayResponseCache.shouldCache(any())).thenReturn(false);
 
         AiGatewayProvider provider = createProvider();
-        AiGatewayModel model = createModel(provider);
+        AiModel model = createModel(provider);
 
         when(aiGatewayProviderService.getEnabledProviders()).thenReturn(List.of(provider));
-        when(aiGatewayModelService.getModel(provider.getId(), "gpt-4")).thenReturn(model);
+        when(aiModelService.getModel(provider.getId(), "gpt-4")).thenReturn(model);
         when(aiGatewayContextCompressor.compress(any(), any(Integer.class))).thenReturn(request.messages());
 
         ChatModel chatModel = mock(ChatModel.class);
@@ -980,10 +980,10 @@ class AiGatewayFacadeTest {
         when(aiGatewayResponseCache.shouldCache(any())).thenReturn(false);
 
         AiGatewayProvider provider = createProvider();
-        AiGatewayModel model = createModel(provider);
+        AiModel model = createModel(provider);
 
         when(aiGatewayProviderService.getEnabledProviders()).thenReturn(List.of(provider));
-        when(aiGatewayModelService.getModel(provider.getId(), "gpt-4")).thenReturn(model);
+        when(aiModelService.getModel(provider.getId(), "gpt-4")).thenReturn(model);
         when(aiGatewayContextCompressor.compress(any(), any(Integer.class))).thenReturn(request.messages());
 
         ChatModel chatModel = mock(ChatModel.class);
@@ -1032,10 +1032,10 @@ class AiGatewayFacadeTest {
         when(aiGatewayResponseCache.shouldCache(any())).thenReturn(false);
 
         AiGatewayProvider provider = createProvider();
-        AiGatewayModel model = createModel(provider);
+        AiModel model = createModel(provider);
 
         when(aiGatewayProviderService.getEnabledProviders()).thenReturn(List.of(provider));
-        when(aiGatewayModelService.getModel(provider.getId(), "gpt-4")).thenReturn(model);
+        when(aiModelService.getModel(provider.getId(), "gpt-4")).thenReturn(model);
         when(aiGatewayContextCompressor.compress(any(), any(Integer.class))).thenReturn(request.messages());
 
         ChatModel chatModel = mock(ChatModel.class);
@@ -1084,10 +1084,10 @@ class AiGatewayFacadeTest {
         when(aiGatewayResponseCache.shouldCache(any())).thenReturn(false);
 
         AiGatewayProvider provider = createProvider();
-        AiGatewayModel model = createModel(provider);
+        AiModel model = createModel(provider);
 
         when(aiGatewayProviderService.getEnabledProviders()).thenReturn(List.of(provider));
-        when(aiGatewayModelService.getModel(provider.getId(), "gpt-4")).thenReturn(model);
+        when(aiModelService.getModel(provider.getId(), "gpt-4")).thenReturn(model);
         when(aiGatewayContextCompressor.compress(any(), any(Integer.class))).thenReturn(request.messages());
 
         ChatModel chatModel = mock(ChatModel.class);
@@ -1192,8 +1192,8 @@ class AiGatewayFacadeTest {
         return provider;
     }
 
-    private AiGatewayModel createModel(AiGatewayProvider provider) {
-        AiGatewayModel model = new AiGatewayModel(provider.getId(), "gpt-4");
+    private AiModel createModel(AiGatewayProvider provider) {
+        AiModel model = new AiModel(provider.getId(), "gpt-4");
 
         model.setContextWindow(128000);
 

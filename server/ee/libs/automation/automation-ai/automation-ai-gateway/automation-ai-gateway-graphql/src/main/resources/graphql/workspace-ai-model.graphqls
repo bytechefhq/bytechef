@@ -1,0 +1,22 @@
+extend type Query {
+    workspaceAiModels(workspaceId: ID!): [AiModel]
+}
+
+extend type Mutation {
+    createWorkspaceAiModel(input: CreateWorkspaceAiModelInput!): AiModel
+    deleteWorkspaceAiModel(workspaceId: ID!, modelId: ID!): Boolean
+    unpinWorkspaceAiModel(workspaceId: ID!, modelId: ID!): AiModel
+    updateWorkspaceAiModel(workspaceId: ID!, id: ID!, input: UpdateAiModelInput!): AiModel
+}
+
+input CreateWorkspaceAiModelInput {
+    alias: String
+    capabilities: String
+    contextWindow: Int
+    defaultRoutingPolicyId: ID
+    inputCostPerMTokens: Float
+    name: String!
+    outputCostPerMTokens: Float
+    providerId: ID!
+    workspaceId: ID!
+}

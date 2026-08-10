@@ -113,6 +113,8 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-notification:platform-notification-remote-rest"))
     implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-rest"))
     implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-service"))
+    implementation(project(":server:libs:platform:platform-ai:platform-ai-model-catalog:platform-ai-model-catalog-api"))
+    implementation(project(":server:libs:platform:platform-ai:platform-ai-model-catalog:platform-ai-model-catalog-service"))
     implementation(project(":server:ee:libs:platform:platform-connection:platform-connection-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-resource-grant:platform-resource-grant-service"))
     implementation(project(":server:ee:libs:platform:platform-user:platform-user-remote-client"))

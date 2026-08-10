@@ -7,7 +7,7 @@
 
 package com.bytechef.ee.platform.ai.gateway.routing;
 
-import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayModel;
+import com.bytechef.ee.platform.ai.model.catalog.domain.AiModel;
 import java.util.Map;
 
 /**
@@ -15,14 +15,14 @@ import java.util.Map;
  */
 public record AiGatewayRoutingContext(
     Map<Long, Double> averageLatencyByModelId,
-    Map<Long, AiGatewayModel> modelMap,
+    Map<Long, AiModel> modelMap,
     double promptComplexityScore,
     Map<Long, String> providerTypeByModelId,
     Map<String, String> tags) {
 
     public AiGatewayRoutingContext(
         Map<Long, Double> averageLatencyByModelId,
-        Map<Long, AiGatewayModel> modelMap,
+        Map<Long, AiModel> modelMap,
         double promptComplexityScore,
         Map<Long, String> providerTypeByModelId,
         Map<String, String> tags) {
@@ -34,12 +34,12 @@ public record AiGatewayRoutingContext(
         this.tags = Map.copyOf(tags);
     }
 
-    public AiGatewayRoutingContext(Map<Long, AiGatewayModel> modelMap) {
+    public AiGatewayRoutingContext(Map<Long, AiModel> modelMap) {
         this(Map.of(), modelMap, 0.5, Map.of(), Map.of());
     }
 
     public AiGatewayRoutingContext(
-        Map<Long, Double> averageLatencyByModelId, Map<Long, AiGatewayModel> modelMap) {
+        Map<Long, Double> averageLatencyByModelId, Map<Long, AiModel> modelMap) {
 
         this(averageLatencyByModelId, modelMap, 0.5, Map.of(), Map.of());
     }

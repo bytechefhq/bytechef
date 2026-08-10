@@ -7,7 +7,7 @@
 
 package com.bytechef.ee.platform.ai.gateway.cost;
 
-import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayModel;
+import com.bytechef.ee.platform.ai.model.catalog.domain.AiModel;
 import java.math.BigDecimal;
 
 /**
@@ -15,5 +15,5 @@ import java.math.BigDecimal;
  */
 public interface AiGatewayCostCalculator {
 
-    BigDecimal calculateCost(AiGatewayModel model, int inputTokens, int outputTokens);
+    BigDecimal calculateCost(AiModel model, int inputTokens, int outputTokens);
 }

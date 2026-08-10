@@ -29,6 +29,7 @@ dependencies {
     implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-gateway:automation-ai-gateway-service"))
     implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-gateway:platform-ai-gateway-service"))
     implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-llm-usage:platform-ai-llm-usage-service"))
+    implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-model-catalog:platform-ai-model-catalog-service"))
     implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-prompt:platform-ai-prompt-service"))
     implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-eval:platform-ai-eval-service"))
     implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-eval:automation-ai-eval-service"))

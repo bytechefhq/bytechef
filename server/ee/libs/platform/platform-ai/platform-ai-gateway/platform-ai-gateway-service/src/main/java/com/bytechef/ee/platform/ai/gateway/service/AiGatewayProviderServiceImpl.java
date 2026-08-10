@@ -7,12 +7,13 @@
 
 package com.bytechef.ee.platform.ai.gateway.service;
 
-import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayModel;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayProvider;
 import com.bytechef.ee.platform.ai.gateway.domain.ApiKey;
 import com.bytechef.ee.platform.ai.gateway.provider.AiGatewayChatModelFactory;
 import com.bytechef.ee.platform.ai.gateway.provider.AiGatewayEmbeddingModelFactory;
 import com.bytechef.ee.platform.ai.gateway.repository.AiGatewayProviderRepository;
+import com.bytechef.ee.platform.ai.model.catalog.domain.AiModel;
+import com.bytechef.ee.platform.ai.model.catalog.service.AiModelService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collection;
@@ -35,18 +36,18 @@ class AiGatewayProviderServiceImpl implements AiGatewayProviderService {
 
     private final AiGatewayChatModelFactory aiGatewayChatModelFactory;
     private final AiGatewayEmbeddingModelFactory aiGatewayEmbeddingModelFactory;
-    private final AiGatewayModelService aiGatewayModelService;
+    private final AiModelService aiModelService;
     private final AiGatewayProviderRepository aiGatewayProviderRepository;
 
     public AiGatewayProviderServiceImpl(
         AiGatewayChatModelFactory aiGatewayChatModelFactory,
         AiGatewayEmbeddingModelFactory aiGatewayEmbeddingModelFactory,
-        AiGatewayModelService aiGatewayModelService,
+        AiModelService aiModelService,
         AiGatewayProviderRepository aiGatewayProviderRepository) {
 
         this.aiGatewayChatModelFactory = aiGatewayChatModelFactory;
         this.aiGatewayEmbeddingModelFactory = aiGatewayEmbeddingModelFactory;
-        this.aiGatewayModelService = aiGatewayModelService;
+        this.aiModelService = aiModelService;
         this.aiGatewayProviderRepository = aiGatewayProviderRepository;
     }
 
@@ -63,10 +64,10 @@ class AiGatewayProviderServiceImpl implements AiGatewayProviderService {
         aiGatewayChatModelFactory.evict(id);
         aiGatewayEmbeddingModelFactory.evict(id);
 
-        List<AiGatewayModel> models = aiGatewayModelService.getModelsByProviderId(id);
+        List<AiModel> models = aiModelService.getModelsByProviderId(id);
 
-        for (AiGatewayModel model : models) {
-            aiGatewayModelService.delete(model.getId());
+        for (AiModel model : models) {
+            aiModelService.delete(model.getId());
         }
 
         aiGatewayProviderRepository.deleteById(id);

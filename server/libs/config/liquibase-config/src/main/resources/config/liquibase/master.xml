@@ -101,11 +101,19 @@
     -->
     <includeAll path="classpath:config/liquibase/changelog/platform/ai/eval/experiment" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />
     <!--
-        platform/ai/gateway holds the ai_gateway_* family (provider, model, budget, routing_policy,
-        model_deployment, spend_summary, project, routing_policy_tag, rate_limit). Extracted from the original
-        monolithic automation/ai_gateway init changeset so the platform tier owns the entity tables. Workspace
-        scoping is a nullable workspace_id column on each entity — there are no workspace_ai_gateway_* relation
-        tables left. Loaded BEFORE automation/ai_gateway/, which still adds gateway-specific FKs onto these tables.
+        platform/ai/model_catalog holds ai_model — the persisted AI model catalog, extracted from
+        platform/ai/gateway (where it was ai_gateway_model). Loaded BEFORE platform/ai/gateway, whose changesets
+        add the provider FK onto ai_model and point ai_gateway_model_deployment.model_id at it.
+    -->
+    <includeAll path="classpath:config/liquibase/changelog/platform/ai/model_catalog" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />
+    <!--
+        platform/ai/gateway holds the ai_gateway_* family (provider, budget, routing_policy, model_deployment,
+        spend_summary, project, routing_policy_tag, rate_limit); ai_model (formerly ai_gateway_model) lives in
+        platform/ai/model_catalog. Extracted from the original monolithic automation/ai_gateway init changeset so
+        the platform tier owns the entity tables. Workspace scoping is a nullable workspace_id column on each
+        entity — there are no workspace_ai_gateway_* relation tables left. Loaded AFTER platform/ai/model_catalog
+        (this file's changesets add FKs onto ai_model) and BEFORE automation/ai_gateway/, which still adds
+        gateway-specific FKs onto these tables.
     -->
     <includeAll path="classpath:config/liquibase/changelog/platform/ai/gateway" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />
     <includeAll path="classpath:config/liquibase/changelog/automation/ai_gateway/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />

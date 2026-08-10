@@ -66,6 +66,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
         "com.bytechef.ee.automation.ai.prompt",
         "com.bytechef.ee.platform.ai.eval",
         "com.bytechef.ee.platform.ai.gateway",
+        "com.bytechef.ee.platform.ai.model.catalog",
         "com.bytechef.ee.platform.ai.llm.usage",
         "com.bytechef.ee.platform.ai.observability",
         "com.bytechef.ee.platform.ai.prompt",

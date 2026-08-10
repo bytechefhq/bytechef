@@ -8,9 +8,9 @@
 package com.bytechef.ee.ai.hub.personalagent;
 
 // Gateway-based validation disabled for now — see the commented block at the bottom of this class.
-// import com.bytechef.ee.automation.ai.gateway.facade.WorkspaceAiGatewayModelFacade;
+// import com.bytechef.ee.automation.ai.gateway.facade.WorkspaceAiModelFacade;
 // import com.bytechef.ee.automation.ai.gateway.service.WorkspaceAiGatewayProviderService;
-// import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayModel;
+// import com.bytechef.ee.platform.ai.model.catalog.domain.AiModel;
 // import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayProvider;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -57,7 +57,7 @@ public class PersonalAgentSaveValidator {
     // ---------------------------------------------------------------------------------------------------------------
     //
     // private final WorkspaceAiGatewayProviderService workspaceAiGatewayProviderService;
-    // private final WorkspaceAiGatewayModelFacade workspaceAiGatewayModelFacade;
+    // private final WorkspaceAiModelFacade workspaceAiModelFacade;
     //
     // AiGatewayProvider provider = resolveProvider(workspaceId, llmProvider);
     //
@@ -69,7 +69,7 @@ public class PersonalAgentSaveValidator {
     //
     // boolean modelFound = false;
     //
-    // for (AiGatewayModel model : workspaceAiGatewayModelFacade.getWorkspaceModels(workspaceId)) {
+    // for (AiModel model : workspaceAiModelFacade.getWorkspaceModels(workspaceId)) {
     // if (model == null || !model.isEnabled()) {
     // continue;
     // }

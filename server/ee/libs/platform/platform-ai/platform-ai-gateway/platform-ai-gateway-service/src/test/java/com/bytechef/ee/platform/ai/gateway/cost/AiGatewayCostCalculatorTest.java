@@ -10,7 +10,7 @@ package com.bytechef.ee.platform.ai.gateway.cost;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayModel;
+import com.bytechef.ee.platform.ai.model.catalog.domain.AiModel;
 import java.math.BigDecimal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,7 +29,7 @@ class AiGatewayCostCalculatorTest {
 
     @Test
     void testCalculateCostWithValidInputAndOutput() {
-        AiGatewayModel model = new AiGatewayModel(1L, "gpt-4");
+        AiModel model = new AiModel(1L, "gpt-4");
 
         model.setInputCostPerMTokens(new BigDecimal("30.00"));
         model.setOutputCostPerMTokens(new BigDecimal("60.00"));
@@ -46,7 +46,7 @@ class AiGatewayCostCalculatorTest {
 
     @Test
     void testCalculateCostZeroTokens() {
-        AiGatewayModel model = new AiGatewayModel(1L, "gpt-4");
+        AiModel model = new AiModel(1L, "gpt-4");
 
         model.setInputCostPerMTokens(new BigDecimal("30.00"));
         model.setOutputCostPerMTokens(new BigDecimal("60.00"));
@@ -58,7 +58,7 @@ class AiGatewayCostCalculatorTest {
 
     @Test
     void testCalculateCostNullInputCostThrows() {
-        AiGatewayModel model = new AiGatewayModel(1L, "gpt-4");
+        AiModel model = new AiModel(1L, "gpt-4");
 
         model.setOutputCostPerMTokens(new BigDecimal("60.00"));
 
@@ -69,7 +69,7 @@ class AiGatewayCostCalculatorTest {
 
     @Test
     void testCalculateCostNullOutputCostThrows() {
-        AiGatewayModel model = new AiGatewayModel(1L, "gpt-4");
+        AiModel model = new AiModel(1L, "gpt-4");
 
         model.setInputCostPerMTokens(new BigDecimal("30.00"));
 

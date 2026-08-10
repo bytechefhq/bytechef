@@ -16,6 +16,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.platform.configuration.dto.AiProviderDTO;
 import com.bytechef.platform.ai.llm.Provider;
+import com.bytechef.platform.ai.model.catalog.ModelCatalog;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Property;
@@ -30,6 +31,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * @version ee
@@ -57,8 +59,15 @@ class AiProviderFacadeProvidersTest {
 
         AiProviderConnectionSource aiProviderConnectionSource = mock(AiProviderConnectionSource.class);
 
+        @SuppressWarnings("unchecked")
+        ObjectProvider<ModelCatalog> modelCatalogProvider = mock(ObjectProvider.class);
+
+        lenient().when(modelCatalogProvider.getIfAvailable())
+            .thenReturn(null);
+
         facade = new AiProviderFacadeImpl(
-            aiProviderConnectionSource, componentDefinitionService, propertyService, applicationProperties);
+            aiProviderConnectionSource, componentDefinitionService, modelCatalogProvider, propertyService,
+            applicationProperties);
     }
 
     @Test
