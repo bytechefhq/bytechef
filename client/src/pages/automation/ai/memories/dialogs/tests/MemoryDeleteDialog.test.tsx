@@ -31,9 +31,10 @@ const makeMemory = (overrides: Partial<AiAutoMemoryI> = {}): AiAutoMemoryI => ({
     id: 1,
     memoryType: 'USER',
     name: 'user_profile',
+    principalId: 42,
+    principalType: 'USER',
     title: 'User profile',
     updatedAt: '2026-04-10T00:00:00Z',
-    userId: 42,
     workspaceId: 1,
     ...overrides,
 });
@@ -67,7 +68,9 @@ beforeEach(() => {
 
 describe('MemoryDeleteDialog', () => {
     it('renders the warning copy with the memory title', () => {
-        wrap(<MemoryDeleteDialog memory={makeMemory()} onClose={vi.fn()} open={true} workspaceId={1} />);
+        wrap(
+            <MemoryDeleteDialog environmentId={0} memory={makeMemory()} onClose={vi.fn()} open={true} workspaceId={1} />
+        );
 
         expect(screen.getByRole('heading', {name: /delete this memory permanently\?/i})).toBeInTheDocument();
         expect(screen.getByText(/"User profile"/)).toBeInTheDocument();
@@ -80,16 +83,54 @@ describe('MemoryDeleteDialog', () => {
 
         mockUseDeleteMutation.mockReturnValue(makeMockMutation({mutateAsync}));
 
-        wrap(<MemoryDeleteDialog memory={makeMemory()} onClose={onClose} open={true} workspaceId={7} />);
+        wrap(
+            <MemoryDeleteDialog environmentId={2} memory={makeMemory()} onClose={onClose} open={true} workspaceId={7} />
+        );
 
         await userEvent.click(screen.getByRole('button', {name: /delete permanently/i}));
 
         await waitFor(() => {
-            expect(mutateAsync).toHaveBeenCalledWith({id: '1', workspaceId: '7'});
+            expect(mutateAsync).toHaveBeenCalledWith({
+                environment: 2,
+                id: '1',
+                principalId: 42,
+                principalType: 'USER',
+                workspaceId: '7',
+            });
         });
 
         expect(toast.success).toHaveBeenCalledWith('Memory "User profile" deleted');
         expect(onClose).toHaveBeenCalled();
+    });
+
+    it('sends the row own principal pair when the memory is deployment-owned', async () => {
+        const mutateAsync = vi.fn().mockResolvedValue(undefined);
+
+        mockUseDeleteMutation.mockReturnValue(makeMockMutation({mutateAsync}));
+
+        wrap(
+            <MemoryDeleteDialog
+                environmentId={2}
+                memory={makeMemory({principalId: 9, principalType: 'PROJECT_DEPLOYMENT'})}
+                onClose={vi.fn()}
+                open={true}
+                workspaceId={7}
+            />
+        );
+
+        await userEvent.click(screen.getByRole('button', {name: /delete permanently/i}));
+
+        await waitFor(() => {
+            // Without the pair the server resolves the CALLER's principal and answers NotFound, so a
+            // deployment-owned delete would fail even for an admin. Both must travel, never one.
+            expect(mutateAsync).toHaveBeenCalledWith({
+                environment: 2,
+                id: '1',
+                principalId: 9,
+                principalType: 'PROJECT_DEPLOYMENT',
+                workspaceId: '7',
+            });
+        });
     });
 
     it('shows an error toast when the delete mutation fails', async () => {
@@ -97,7 +138,9 @@ describe('MemoryDeleteDialog', () => {
 
         mockUseDeleteMutation.mockReturnValue(makeMockMutation({mutateAsync}));
 
-        wrap(<MemoryDeleteDialog memory={makeMemory()} onClose={vi.fn()} open={true} workspaceId={7} />);
+        wrap(
+            <MemoryDeleteDialog environmentId={2} memory={makeMemory()} onClose={vi.fn()} open={true} workspaceId={7} />
+        );
 
         await userEvent.click(screen.getByRole('button', {name: /delete permanently/i}));
 
@@ -109,7 +152,9 @@ describe('MemoryDeleteDialog', () => {
     it('calls onClose when Cancel is clicked', async () => {
         const onClose = vi.fn();
 
-        wrap(<MemoryDeleteDialog memory={makeMemory()} onClose={onClose} open={true} workspaceId={1} />);
+        wrap(
+            <MemoryDeleteDialog environmentId={0} memory={makeMemory()} onClose={onClose} open={true} workspaceId={1} />
+        );
 
         await userEvent.click(screen.getByRole('button', {name: /cancel/i}));
 

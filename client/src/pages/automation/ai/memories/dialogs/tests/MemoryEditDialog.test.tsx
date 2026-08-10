@@ -7,7 +7,10 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {AiAutoMemoryI} from '../../hooks/useAiAutoMemories';
 import MemoryEditDialog from '../MemoryEditDialog';
 
-vi.mock('@/pages/automation/ai/memories/hooks/useAiAutoMemories', () => ({
+// Partial mock: only the mutation hook is stubbed. The memory-type constants are plain data derived from the
+// generated enum and feed the Type select.
+vi.mock('@/pages/automation/ai/memories/hooks/useAiAutoMemories', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/pages/automation/ai/memories/hooks/useAiAutoMemories')>()),
     useUpdateAiAutoMemoryMutation: vi.fn(),
 }));
 
@@ -31,9 +34,10 @@ const makeMemory = (overrides: Partial<AiAutoMemoryI> = {}): AiAutoMemoryI => ({
     id: 1,
     memoryType: 'USER',
     name: 'user_profile',
+    principalId: 42,
+    principalType: 'USER',
     title: 'User profile',
     updatedAt: '2026-04-10T00:00:00Z',
-    userId: 42,
     workspaceId: 1,
     ...overrides,
 });
@@ -67,7 +71,9 @@ beforeEach(() => {
 
 describe('MemoryEditDialog', () => {
     it('pre-fills the form with the current memory values', () => {
-        wrap(<MemoryEditDialog memory={makeMemory()} onClose={vi.fn()} open={true} workspaceId={1} />);
+        wrap(
+            <MemoryEditDialog environmentId={0} memory={makeMemory()} onClose={vi.fn()} open={true} workspaceId={1} />
+        );
 
         expect(screen.getByLabelText('Name')).toHaveValue('user_profile');
         expect(screen.getByLabelText('Name')).toBeDisabled();
@@ -82,7 +88,9 @@ describe('MemoryEditDialog', () => {
 
         mockUseUpdateMutation.mockReturnValue(makeMockMutation({mutateAsync}));
 
-        wrap(<MemoryEditDialog memory={makeMemory()} onClose={onClose} open={true} workspaceId={7} />);
+        wrap(
+            <MemoryEditDialog environmentId={2} memory={makeMemory()} onClose={onClose} open={true} workspaceId={7} />
+        );
 
         const titleInput = screen.getByLabelText('Title');
 
@@ -96,8 +104,11 @@ describe('MemoryEditDialog', () => {
                 input: {
                     content: undefined,
                     description: undefined,
+                    environment: 2,
                     id: '1',
                     memoryType: undefined,
+                    principalId: 42,
+                    principalType: 'USER',
                     title: 'Updated',
                     workspaceId: '7',
                 },
@@ -108,13 +119,45 @@ describe('MemoryEditDialog', () => {
         expect(onClose).toHaveBeenCalled();
     });
 
+    it('sends the row own principal pair when the memory is deployment-owned', async () => {
+        const mutateAsync = vi.fn().mockResolvedValue(makeMemory());
+
+        mockUseUpdateMutation.mockReturnValue(makeMockMutation({mutateAsync}));
+
+        wrap(
+            <MemoryEditDialog
+                environmentId={2}
+                memory={makeMemory({principalId: 9, principalType: 'PROJECT_DEPLOYMENT'})}
+                onClose={vi.fn()}
+                open={true}
+                workspaceId={7}
+            />
+        );
+
+        await userEvent.clear(screen.getByLabelText('Title'));
+        await userEvent.type(screen.getByLabelText('Title'), 'Updated');
+
+        await userEvent.click(screen.getByRole('button', {name: /save/i}));
+
+        await waitFor(() => {
+            const input = mutateAsync.mock.lastCall?.[0].input;
+
+            // Without the pair the server resolves the CALLER's principal and answers NotFound, so a
+            // deployment-owned edit would fail even for an admin. Both must travel, never one.
+            expect(input.principalType).toBe('PROJECT_DEPLOYMENT');
+            expect(input.principalId).toBe(9);
+        });
+    });
+
     it('closes without calling the mutation when nothing changed', async () => {
         const mutateAsync = vi.fn();
         const onClose = vi.fn();
 
         mockUseUpdateMutation.mockReturnValue(makeMockMutation({mutateAsync}));
 
-        wrap(<MemoryEditDialog memory={makeMemory()} onClose={onClose} open={true} workspaceId={7} />);
+        wrap(
+            <MemoryEditDialog environmentId={2} memory={makeMemory()} onClose={onClose} open={true} workspaceId={7} />
+        );
 
         await userEvent.click(screen.getByRole('button', {name: /save/i}));
 
@@ -123,7 +166,9 @@ describe('MemoryEditDialog', () => {
     });
 
     it('disables Save when the title is empty', async () => {
-        wrap(<MemoryEditDialog memory={makeMemory()} onClose={vi.fn()} open={true} workspaceId={1} />);
+        wrap(
+            <MemoryEditDialog environmentId={0} memory={makeMemory()} onClose={vi.fn()} open={true} workspaceId={1} />
+        );
 
         await userEvent.clear(screen.getByLabelText('Title'));
 
@@ -133,7 +178,9 @@ describe('MemoryEditDialog', () => {
     it('calls onClose when Cancel is clicked', async () => {
         const onClose = vi.fn();
 
-        wrap(<MemoryEditDialog memory={makeMemory()} onClose={onClose} open={true} workspaceId={1} />);
+        wrap(
+            <MemoryEditDialog environmentId={0} memory={makeMemory()} onClose={onClose} open={true} workspaceId={1} />
+        );
 
         await userEvent.click(screen.getByRole('button', {name: /cancel/i}));
 

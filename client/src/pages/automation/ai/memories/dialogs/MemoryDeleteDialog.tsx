@@ -7,18 +7,20 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import {AiAutoMemoryPrincipalType} from '@/shared/middleware/graphql';
 import {toast} from 'sonner';
 
 import {AiAutoMemoryI, useDeleteAiAutoMemoryMutation} from '../hooks/useAiAutoMemories';
 
 interface MemoryDeleteDialogProps {
+    environmentId: number;
     memory: AiAutoMemoryI | null;
     onClose: () => void;
     open: boolean;
     workspaceId: number;
 }
 
-const MemoryDeleteDialog = ({memory, onClose, open, workspaceId}: MemoryDeleteDialogProps) => {
+const MemoryDeleteDialog = ({environmentId, memory, onClose, open, workspaceId}: MemoryDeleteDialogProps) => {
     const deleteMemoryMutation = useDeleteAiAutoMemoryMutation();
 
     const handleDelete = async () => {
@@ -27,7 +29,15 @@ const MemoryDeleteDialog = ({memory, onClose, open, workspaceId}: MemoryDeleteDi
         }
 
         try {
-            await deleteMemoryMutation.mutateAsync({id: String(memory.id), workspaceId: String(workspaceId)});
+            await deleteMemoryMutation.mutateAsync({
+                environment: environmentId,
+                id: String(memory.id),
+                // The row's own owner, always as a PAIR — the server rejects one without the other, and omitting
+                // both would resolve to the signed-in user, which is not who owns a deployment-owned memory.
+                principalId: memory.principalId,
+                principalType: memory.principalType as AiAutoMemoryPrincipalType,
+                workspaceId: String(workspaceId),
+            });
 
             toast.success(`Memory "${memory.title}" deleted`);
 

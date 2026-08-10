@@ -2,31 +2,55 @@ import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {Input} from '@/components/ui/input';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
+import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {formatDistanceToNow} from 'date-fns';
-import {BrainIcon, EyeIcon, PencilIcon, SearchIcon, Trash2Icon} from 'lucide-react';
-import {type ReactNode, useMemo, useState} from 'react';
+import {BrainIcon, EllipsisVerticalIcon, EyeIcon, PencilIcon, SearchIcon, Trash2Icon} from 'lucide-react';
+import {useMemo, useState} from 'react';
 
 import MemoryDeleteDialog from './dialogs/MemoryDeleteDialog';
 import MemoryDetailDialog from './dialogs/MemoryDetailDialog';
 import MemoryEditDialog from './dialogs/MemoryEditDialog';
-import {AiAutoMemoryI, AiAutoMemoryTypeType, useAiAutoMemoriesQuery} from './hooks/useAiAutoMemories';
+import {
+    AI_AUTO_MEMORY_TYPES,
+    AI_AUTO_MEMORY_TYPE_META,
+    AiAutoMemoryI,
+    AiAutoMemoryPrincipalI,
+    AiAutoMemoryTypeType,
+    useAiAutoMemoriesQuery,
+    useAiAutoMemoryPrincipalsQuery,
+} from './hooks/useAiAutoMemories';
 
 type FilterValueType = AiAutoMemoryTypeType | 'ALL';
 
+// Nav id for the Owner group's All row. Deliberately not shaped like a principal key, so it can never collide.
+const ALL_OWNERS = 'ALL_OWNERS';
+
+// A principal is identified by the (type, id) PAIR — the same numeric id under a different principal type is a
+// different owner — so the nav item id has to carry both.
+function principalKey(principal: AiAutoMemoryPrincipalI): string {
+    return `${principal.principalType}:${principal.principalId}`;
+}
+
 const FILTER_ITEMS: {label: string; value: FilterValueType}[] = [
     {label: 'All', value: 'ALL'},
-    {label: 'User', value: 'USER'},
-    {label: 'Feedback', value: 'FEEDBACK'},
-    {label: 'Project', value: 'PROJECT'},
-    {label: 'Reference', value: 'REFERENCE'},
+    ...AI_AUTO_MEMORY_TYPES.map((memoryType) => ({
+        label: AI_AUTO_MEMORY_TYPE_META[memoryType].label,
+        value: memoryType,
+    })),
 ];
 
 function formatRelative(value: string): string {
@@ -46,12 +70,13 @@ function formatRelative(value: string): string {
 
 interface MemoriesTableRowPropsI {
     memory: AiAutoMemoryI;
+    mutable: boolean;
     onDelete: (memory: AiAutoMemoryI) => void;
     onEdit: (memory: AiAutoMemoryI) => void;
     onView: (memory: AiAutoMemoryI) => void;
 }
 
-const MemoriesTableRow = ({memory, onDelete, onEdit, onView}: MemoriesTableRowPropsI) => {
+const MemoriesTableRow = ({memory, mutable, onDelete, onEdit, onView}: MemoriesTableRowPropsI) => {
     const relativeTime = useMemo(() => formatRelative(memory.updatedAt), [memory.updatedAt]);
 
     return (
@@ -74,35 +99,45 @@ const MemoriesTableRow = ({memory, onDelete, onEdit, onView}: MemoriesTableRowPr
 
             <td className="px-4 py-2 text-sm text-muted-foreground">{relativeTime}</td>
 
-            <td className="px-4 py-2">
-                <div className="flex items-center gap-1">
-                    <Button
-                        aria-label={`View ${memory.title}`}
-                        icon={<EyeIcon />}
-                        onClick={() => onView(memory)}
-                        size="iconSm"
-                        title="View memory"
-                        variant="ghost"
-                    />
+            <td className="w-px px-4 py-2 text-right">
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild onClick={(event) => event.stopPropagation()}>
+                        <Button
+                            aria-label={`More actions for ${memory.title}`}
+                            icon={<EllipsisVerticalIcon />}
+                            size="icon"
+                            variant="ghost"
+                        />
+                    </DropdownMenuTrigger>
 
-                    <Button
-                        aria-label={`Edit ${memory.title}`}
-                        icon={<PencilIcon />}
-                        onClick={() => onEdit(memory)}
-                        size="iconSm"
-                        title="Edit memory"
-                        variant="ghost"
-                    />
+                    <DropdownMenuContent align="end" className="p-0">
+                        <DropdownMenuItem className="dropdown-menu-item" onClick={() => onView(memory)}>
+                            <EyeIcon /> View
+                        </DropdownMenuItem>
 
-                    <Button
-                        aria-label={`Delete ${memory.title}`}
-                        icon={<Trash2Icon />}
-                        onClick={() => onDelete(memory)}
-                        size="iconSm"
-                        title="Delete memory"
-                        variant="destructiveGhost"
-                    />
-                </div>
+                        {/* Not rendered at all rather than rendered disabled: a memory the caller cannot mutate is
+                            one the server answers with NotFound, so offering the affordance at all would be an item
+                            whose only possible outcome is an error toast. */}
+
+                        {mutable && (
+                            <DropdownMenuItem className="dropdown-menu-item" onClick={() => onEdit(memory)}>
+                                <PencilIcon /> Edit
+                            </DropdownMenuItem>
+                        )}
+
+                        {mutable && <DropdownMenuSeparator className="m-0" />}
+
+                        {mutable && (
+                            <DropdownMenuItem
+                                className="dropdown-menu-item-destructive"
+                                onClick={() => onDelete(memory)}
+                                variant="destructive"
+                            >
+                                <Trash2Icon /> Delete
+                            </DropdownMenuItem>
+                        )}
+                    </DropdownMenuContent>
+                </DropdownMenu>
             </td>
         </tr>
     );
@@ -119,30 +154,41 @@ const MemoriesEmptyState = () => (
     />
 );
 
-interface MemoriesProps {
-    // The left-sidebar nav. The standalone /automation/ai/memories page renders its own sidebar with the
-    // Type filter (matching the other automation pages); the AI Hub > Context > Memories page passes the
-    // AI Hub tasks sidebar so Memories renders inside the AI Hub shell (Context nav visible) — the Type
-    // filter then stays in the header, since the sidebar slot is taken.
-    renderSidebarNav?: () => ReactNode;
-    sidebarTitle?: string;
-}
-
-const Memories = ({renderSidebarNav, sidebarTitle = 'AI'}: MemoriesProps = {}) => {
+const Memories = () => {
     const [activeFilter, setActiveFilter] = useState<FilterValueType>('ALL');
     const [deleteTarget, setDeleteTarget] = useState<AiAutoMemoryI | null>(null);
     const [editTarget, setEditTarget] = useState<AiAutoMemoryI | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
+    const [selectedPrincipalKey, setSelectedPrincipalKey] = useState<string | null>(null);
     const [viewTarget, setViewTarget] = useState<AiAutoMemoryI | null>(null);
 
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+    // The server gates mutating a non-USER-owned memory on the tenant-level ROLE_ADMIN authority (not a workspace
+    // role), so this mirrors exactly that authority. Gated on `authenticated` as well, per the convention in
+    // useHasWorkspaceRole: `account` can still carry a prior session's authorities during a re-login transition.
+    const isAdmin = useAuthenticationStore(
+        (state) => state.authenticated && (state.account?.authorities?.includes('ROLE_ADMIN') ?? false)
+    );
+
+    const {data: principals} = useAiAutoMemoryPrincipalsQuery(currentWorkspaceId, currentEnvironmentId);
 
     const memoryType = activeFilter === 'ALL' ? undefined : activeFilter;
 
     const activeFilterLabel = FILTER_ITEMS.find((item) => item.value === activeFilter)?.label ?? 'All';
 
-    const {data: memories, isLoading} = useAiAutoMemoriesQuery(currentWorkspaceId, currentEnvironmentId, memoryType);
+    // Resolved against the CURRENT owner list rather than trusted from state: switching environment replaces the
+    // owners, and a selection that no longer exists has to fall back to "no principal" (the signed-in user) instead
+    // of filtering by an owner that holds nothing here.
+    const selectedPrincipal = principals?.find((principal) => principalKey(principal) === selectedPrincipalKey);
+
+    const {data: memories, isLoading} = useAiAutoMemoriesQuery(
+        currentWorkspaceId,
+        currentEnvironmentId,
+        memoryType,
+        selectedPrincipal?.principalType,
+        selectedPrincipal?.principalId
+    );
 
     const filteredMemories = useMemo(() => {
         if (!memories) {
@@ -167,10 +213,10 @@ const Memories = ({renderSidebarNav, sidebarTitle = 'AI'}: MemoriesProps = {}) =
 
     return (
         <LayoutContainer
-            // The header surfaces the active filter as the page title (echoes the Type select so the
-            // user can confirm what's being shown), with the type filter, env selector and search input
-            // on the right — matching the AssetFiles toolbar order so the search affordance lives in the
-            // same screen region across automation pages.
+            // The header surfaces the active Type filter as the page title (echoes the sidebar selection so the
+            // user can confirm what's being shown), with the env selector and search input on the right —
+            // matching the AssetFiles toolbar order so the search affordance lives in the same screen region
+            // across automation pages.
             header={
                 <div className="flex w-full items-center gap-2 px-6 py-3">
                     <h1 className="text-base font-semibold">{activeFilterLabel}</h1>
@@ -182,25 +228,6 @@ const Memories = ({renderSidebarNav, sidebarTitle = 'AI'}: MemoriesProps = {}) =
                     )}
 
                     <div className="ml-auto flex items-center gap-2">
-                        {renderSidebarNav && (
-                            <Select
-                                onValueChange={(value) => setActiveFilter(value as FilterValueType)}
-                                value={activeFilter}
-                            >
-                                <SelectTrigger aria-label="Filter by type" className="w-36">
-                                    <SelectValue />
-                                </SelectTrigger>
-
-                                <SelectContent>
-                                    {FILTER_ITEMS.map((item) => (
-                                        <SelectItem key={item.value} value={item.value}>
-                                            {item.label}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        )}
-
                         <EnvironmentSelect />
 
                         <div className="relative w-64">
@@ -217,9 +244,46 @@ const Memories = ({renderSidebarNav, sidebarTitle = 'AI'}: MemoriesProps = {}) =
                 </div>
             }
             leftSidebarBody={
-                renderSidebarNav ? (
-                    renderSidebarNav()
-                ) : (
+                <>
+                    {principals && principals.length > 0 && (
+                        <LeftSidebarNav
+                            body={[
+                                // Sending no principal is the server's All scope: every owner the caller may
+                                // address, which for a non-admin is just their own memories. It leads the group
+                                // because it is the default the page opens on.
+                                <LeftSidebarNavItem
+                                    item={{
+                                        current: !selectedPrincipalKey,
+                                        id: ALL_OWNERS,
+                                        name: 'All',
+                                        onItemClick: () => setSelectedPrincipalKey(null),
+                                    }}
+                                    key={ALL_OWNERS}
+                                />,
+                                ...principals.map((principal) => (
+                                    <LeftSidebarNavItem
+                                        item={{
+                                            current: selectedPrincipalKey === principalKey(principal),
+                                            id: principalKey(principal),
+                                            // The label is resolved server-side ("My memories" for the caller, the
+                                            // deployment's name otherwise) and rendered verbatim — a client-derived
+                                            // label would read "User", which in this sidebar already means a memory
+                                            // CATEGORY.
+                                            name: principal.label,
+                                            onItemClick: (id) => setSelectedPrincipalKey(String(id)),
+                                        }}
+                                        key={principalKey(principal)}
+                                    />
+                                )),
+                            ]}
+                            title="Owner"
+                        />
+                    )}
+
+                    {/* Owner and Type are independent facets, so one item in EACH is legitimately active at once.
+                        Without a divider the two groups read as a single single-select list and the two highlights
+                        look like a bug, so the Type group is ruled off from the Owner group above it. */}
+
                     <LeftSidebarNav
                         body={FILTER_ITEMS.map((item) => (
                             <LeftSidebarNavItem
@@ -232,11 +296,12 @@ const Memories = ({renderSidebarNav, sidebarTitle = 'AI'}: MemoriesProps = {}) =
                                 key={item.value}
                             />
                         ))}
+                        className={principals && principals.length > 0 ? 'mt-2 border-t border-border/50 pt-4' : ''}
                         title="Type"
                     />
-                )
+                </>
             }
-            leftSidebarHeader={<Header position="sidebar" title={renderSidebarNav ? sidebarTitle : 'Memories'} />}
+            leftSidebarHeader={<Header position="sidebar" title="Memories" />}
             leftSidebarOpen
             leftSidebarWidth="64"
         >
@@ -273,7 +338,10 @@ const Memories = ({renderSidebarNav, sidebarTitle = 'AI'}: MemoriesProps = {}) =
                                                 Updated
                                             </th>
 
-                                            <th className="px-4 py-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+                                            {/* w-px collapses the column to its content: the cell holds one icon
+                                                button, so the header text is what would otherwise size it. */}
+
+                                            <th className="w-px px-4 py-2 text-right text-xs font-semibold tracking-wide text-muted-foreground uppercase">
                                                 Actions
                                             </th>
                                         </tr>
@@ -284,6 +352,10 @@ const Memories = ({renderSidebarNav, sidebarTitle = 'AI'}: MemoriesProps = {}) =
                                             <MemoriesTableRow
                                                 key={memory.id}
                                                 memory={memory}
+                                                // A USER-owned row is always the caller's own (the server only ever
+                                                // addresses the caller under USER); anything else is
+                                                // deployment-owned and admin-only to mutate.
+                                                mutable={memory.principalType === 'USER' || isAdmin}
                                                 onDelete={setDeleteTarget}
                                                 onEdit={setEditTarget}
                                                 onView={setViewTarget}
@@ -300,6 +372,7 @@ const Memories = ({renderSidebarNav, sidebarTitle = 'AI'}: MemoriesProps = {}) =
             <MemoryDetailDialog memory={viewTarget} onClose={() => setViewTarget(null)} open={viewTarget !== null} />
 
             <MemoryEditDialog
+                environmentId={currentEnvironmentId}
                 memory={editTarget}
                 onClose={() => setEditTarget(null)}
                 open={editTarget !== null}
@@ -307,6 +380,7 @@ const Memories = ({renderSidebarNav, sidebarTitle = 'AI'}: MemoriesProps = {}) =
             />
 
             <MemoryDeleteDialog
+                environmentId={currentEnvironmentId}
                 memory={deleteTarget}
                 onClose={() => setDeleteTarget(null)}
                 open={deleteTarget !== null}

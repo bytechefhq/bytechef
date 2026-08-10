@@ -11,11 +11,12 @@ import {
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
-import {AiAutoMemoryType} from '@/shared/middleware/graphql';
+import {AiAutoMemoryPrincipalType, AiAutoMemoryType} from '@/shared/middleware/graphql';
 import {useEffect, useState} from 'react';
 import {toast} from 'sonner';
 
 import {
+    AI_AUTO_MEMORY_TYPES,
     AiAutoMemoryI,
     AiAutoMemoryPatchI,
     AiAutoMemoryTypeType,
@@ -23,15 +24,14 @@ import {
 } from '../hooks/useAiAutoMemories';
 
 interface MemoryEditDialogProps {
+    environmentId: number;
     memory: AiAutoMemoryI | null;
     onClose: () => void;
     open: boolean;
     workspaceId: number;
 }
 
-const MEMORY_TYPES: AiAutoMemoryTypeType[] = ['USER', 'FEEDBACK', 'PROJECT', 'REFERENCE'];
-
-const MemoryEditDialog = ({memory, onClose, open, workspaceId}: MemoryEditDialogProps) => {
+const MemoryEditDialog = ({environmentId, memory, onClose, open, workspaceId}: MemoryEditDialogProps) => {
     const [content, setContent] = useState('');
     const [description, setDescription] = useState('');
     const [memoryType, setMemoryType] = useState<AiAutoMemoryTypeType>('USER');
@@ -82,8 +82,13 @@ const MemoryEditDialog = ({memory, onClose, open, workspaceId}: MemoryEditDialog
                 input: {
                     content: patch.content,
                     description: patch.description,
+                    environment: environmentId,
                     id: String(memory.id),
                     memoryType: patch.memoryType as AiAutoMemoryType | undefined,
+                    // The row's own owner, always as a PAIR — the server rejects one without the other, and omitting
+                    // both would resolve to the signed-in user, which is not who owns a deployment-owned memory.
+                    principalId: memory.principalId,
+                    principalType: memory.principalType as AiAutoMemoryPrincipalType,
                     title: patch.title,
                     workspaceId: String(workspaceId),
                 },
@@ -160,7 +165,7 @@ const MemoryEditDialog = ({memory, onClose, open, workspaceId}: MemoryEditDialog
                                 </SelectTrigger>
 
                                 <SelectContent>
-                                    {MEMORY_TYPES.map((type) => (
+                                    {AI_AUTO_MEMORY_TYPES.map((type) => (
                                         <SelectItem key={type} value={type}>
                                             {type}
                                         </SelectItem>

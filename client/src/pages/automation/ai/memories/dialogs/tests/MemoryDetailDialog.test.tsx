@@ -13,9 +13,10 @@ const makeMemory = (overrides: Partial<AiAutoMemoryI> = {}): AiAutoMemoryI => ({
     id: 1,
     memoryType: 'USER',
     name: 'user_profile',
+    principalId: 42,
+    principalType: 'USER',
     title: 'User profile',
     updatedAt: '2026-04-10T12:00:00Z',
-    userId: 42,
     workspaceId: 1,
     ...overrides,
 });

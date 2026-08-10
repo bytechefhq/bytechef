@@ -1,15 +1,19 @@
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import {fireEvent, render, screen} from '@testing-library/react';
+import {render, screen, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {ReactNode} from 'react';
 import {MemoryRouter} from 'react-router-dom';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import Memories from '../Memories';
-import {AiAutoMemoryI} from '../hooks/useAiAutoMemories';
+import {AiAutoMemoryI, AiAutoMemoryPrincipalI} from '../hooks/useAiAutoMemories';
 
-vi.mock('@/pages/automation/ai/memories/hooks/useAiAutoMemories', () => ({
+// Partial mock: the query hooks are stubbed, but the memory-type constants are plain data derived from the
+// generated enum and the component builds its filter list from them at module scope.
+vi.mock('@/pages/automation/ai/memories/hooks/useAiAutoMemories', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/pages/automation/ai/memories/hooks/useAiAutoMemories')>()),
     useAiAutoMemoriesQuery: vi.fn(),
+    useAiAutoMemoryPrincipalsQuery: vi.fn(),
     useDeleteAiAutoMemoryMutation: vi.fn(),
     useUpdateAiAutoMemoryMutation: vi.fn(),
 }));
@@ -26,6 +30,21 @@ vi.mock('@/shared/stores/useEnvironmentStore', () => ({
     ),
 }));
 
+// Mutable so a test can flip the caller to a tenant admin. Hoisted because vi.mock factories run before
+// module-scope consts are initialised.
+const {authenticationState} = vi.hoisted(() => ({
+    authenticationState: {
+        account: undefined as {authorities?: string[]} | undefined,
+        authenticated: false,
+    },
+}));
+
+vi.mock('@/shared/stores/useAuthenticationStore', () => ({
+    useAuthenticationStore: vi.fn((selector: (state: typeof authenticationState) => unknown) =>
+        selector(authenticationState)
+    ),
+}));
+
 vi.mock('sonner', () => ({
     toast: {
         error: vi.fn(),
@@ -33,12 +52,25 @@ vi.mock('sonner', () => ({
     },
 }));
 
-const {useAiAutoMemoriesQuery, useDeleteAiAutoMemoryMutation, useUpdateAiAutoMemoryMutation} =
-    await import('@/pages/automation/ai/memories/hooks/useAiAutoMemories');
+const {
+    useAiAutoMemoriesQuery,
+    useAiAutoMemoryPrincipalsQuery,
+    useDeleteAiAutoMemoryMutation,
+    useUpdateAiAutoMemoryMutation,
+} = await import('@/pages/automation/ai/memories/hooks/useAiAutoMemories');
 
 const mockUseMemoriesQuery = vi.mocked(useAiAutoMemoriesQuery);
+const mockUsePrincipalsQuery = vi.mocked(useAiAutoMemoryPrincipalsQuery);
 const mockUseDeleteMutation = vi.mocked(useDeleteAiAutoMemoryMutation);
 const mockUseUpdateMutation = vi.mocked(useUpdateAiAutoMemoryMutation);
+
+const makePrincipal = (overrides: Partial<AiAutoMemoryPrincipalI> = {}): AiAutoMemoryPrincipalI => ({
+    label: 'My memories',
+    memoryCount: 3,
+    principalId: 42,
+    principalType: 'USER',
+    ...overrides,
+});
 
 const makeMemory = (overrides: Partial<AiAutoMemoryI> = {}): AiAutoMemoryI => ({
     content: 'Default content',
@@ -48,9 +80,10 @@ const makeMemory = (overrides: Partial<AiAutoMemoryI> = {}): AiAutoMemoryI => ({
     id: 1,
     memoryType: 'USER',
     name: 'default_name',
+    principalId: 42,
+    principalType: 'USER',
     title: 'Default title',
     updatedAt: '2026-04-10T00:00:00Z',
-    userId: 42,
     workspaceId: 7,
     ...overrides,
 });
@@ -93,9 +126,19 @@ const wrap = (ui: ReactNode) =>
 
 beforeEach(() => {
     mockUseMemoriesQuery.mockReturnValue(makeQueryResult({data: []}));
+    mockUsePrincipalsQuery.mockReturnValue(makeQueryResult({data: []}));
     mockUseDeleteMutation.mockReturnValue(makeMutation());
     mockUseUpdateMutation.mockReturnValue(makeMutation());
+
+    authenticationState.account = undefined;
+    authenticationState.authenticated = false;
 });
+
+// Row actions live behind a per-row ellipsis dropdown, so a test has to open the row's menu before its items
+// exist in the DOM.
+async function openRowMenu(title: string): Promise<void> {
+    await userEvent.click(screen.getByRole('button', {name: new RegExp(`more actions for ${title}`, 'i')}));
+}
 
 describe('Memories page', () => {
     it('renders the empty-state copy when no memories exist', () => {
@@ -150,7 +193,9 @@ describe('Memories page', () => {
 
         wrap(<Memories />);
 
-        await userEvent.click(screen.getByRole('button', {name: /view alice profile/i}));
+        await openRowMenu('Alice profile');
+
+        await userEvent.click(await screen.findByRole('menuitem', {name: /view/i}));
 
         expect(screen.getByRole('heading', {level: 2, name: /alice profile/i})).toBeInTheDocument();
     });
@@ -162,7 +207,9 @@ describe('Memories page', () => {
 
         wrap(<Memories />);
 
-        await userEvent.click(screen.getByRole('button', {name: /edit alice profile/i}));
+        await openRowMenu('Alice profile');
+
+        await userEvent.click(await screen.findByRole('menuitem', {name: /edit/i}));
 
         expect(screen.getByRole('heading', {name: /edit memory/i})).toBeInTheDocument();
     });
@@ -174,28 +221,237 @@ describe('Memories page', () => {
 
         wrap(<Memories />);
 
-        await userEvent.click(screen.getByRole('button', {name: /delete alice profile/i}));
+        await openRowMenu('Alice profile');
+
+        await userEvent.click(await screen.findByRole('menuitem', {name: /delete/i}));
 
         expect(screen.getByRole('heading', {name: /delete this memory permanently\?/i})).toBeInTheDocument();
     });
 
-    it('invokes the memories query with the selected memoryType filter', async () => {
+    it('does not offer Edit or Delete on a deployment-owned row to a non-admin', async () => {
+        const memories = [
+            makeMemory({id: 1, principalType: 'PROJECT_DEPLOYMENT', title: 'Deployment memory'}),
+            makeMemory({id: 2, principalType: 'USER', title: 'My memory'}),
+        ];
+
+        mockUseMemoriesQuery.mockReturnValue(makeQueryResult({data: memories}));
+
+        wrap(<Memories />);
+
+        await openRowMenu('Deployment memory');
+
+        // The server needs ROLE_ADMIN to mutate a deployment-owned memory and answers NotFound otherwise, so
+        // the affordance must not be offered at all — a live item here can only ever produce an error toast.
+        expect(await screen.findByRole('menuitem', {name: /view/i})).toBeInTheDocument();
+        expect(screen.queryByRole('menuitem', {name: /edit/i})).toBeNull();
+        expect(screen.queryByRole('menuitem', {name: /delete/i})).toBeNull();
+
+        await userEvent.keyboard('{Escape}');
+
+        // The caller's own row keeps both actions.
+        await openRowMenu('My memory');
+
+        expect(await screen.findByRole('menuitem', {name: /edit/i})).toBeInTheDocument();
+        expect(screen.getByRole('menuitem', {name: /delete/i})).toBeInTheDocument();
+    });
+
+    it('offers Edit and Delete on a deployment-owned row to a tenant admin', async () => {
+        authenticationState.account = {authorities: ['ROLE_ADMIN']};
+        authenticationState.authenticated = true;
+
+        mockUseMemoriesQuery.mockReturnValue(
+            makeQueryResult({
+                data: [makeMemory({id: 1, principalType: 'PROJECT_DEPLOYMENT', title: 'Deployment memory'})],
+            })
+        );
+
+        wrap(<Memories />);
+
+        await openRowMenu('Deployment memory');
+
+        expect(await screen.findByRole('menuitem', {name: /edit/i})).toBeInTheDocument();
+        expect(screen.getByRole('menuitem', {name: /delete/i})).toBeInTheDocument();
+    });
+
+    it('does not treat a stale ROLE_ADMIN account as admin while unauthenticated', () => {
+        // Mid re-login `account` can still hold the previous session's authorities; the `authenticated` gate is
+        // what stops a flash of privilege. Same reasoning as useHasWorkspaceRole's tenant-admin short-circuit.
+        authenticationState.account = {authorities: ['ROLE_ADMIN']};
+        authenticationState.authenticated = false;
+
+        mockUseMemoriesQuery.mockReturnValue(
+            makeQueryResult({
+                data: [makeMemory({id: 1, principalType: 'PROJECT_DEPLOYMENT', title: 'Deployment memory'})],
+            })
+        );
+
+        wrap(<Memories />);
+
+        expect(screen.queryByRole('button', {name: /edit deployment memory/i})).toBeNull();
+    });
+
+    it('invokes the memories query with the memoryType picked in the Type sidebar group', async () => {
         mockUseMemoriesQuery.mockReturnValue(makeQueryResult({data: []}));
 
-        // The standalone page filters via its own left sidebar; the header select only renders in the
-        // AI-Hub-embedded variant (sidebar slot taken), so drive that variant here.
-        wrap(<Memories renderSidebarNav={() => <div />} />);
+        wrap(<Memories />);
 
-        // fireEvent instead of userEvent: Radix Select's pointer-capture calls are not
-        // implemented in jsdom (same idiom as SelectFieldRenderer.test.tsx).
-        fireEvent.click(screen.getByRole('combobox', {name: /filter by type/i}));
-
-        fireEvent.click(await screen.findByRole('option', {name: /^feedback$/i}));
+        await userEvent.click(screen.getByRole('link', {name: 'Feedback'}));
 
         const lastCall = mockUseMemoriesQuery.mock.lastCall;
 
         expect(lastCall?.[0]).toBe(7);
         expect(lastCall?.[1]).toBe(0);
         expect(lastCall?.[2]).toBe('FEEDBACK');
+    });
+
+    it('omits the Owner group and both principal arguments while no owner has been picked', () => {
+        mockUsePrincipalsQuery.mockReturnValue(makeQueryResult({data: []}));
+
+        wrap(<Memories />);
+
+        expect(screen.queryByText('Owner')).toBeNull();
+
+        const lastCall = mockUseMemoriesQuery.mock.lastCall;
+
+        // Both undefined is the "signed-in user" contract — the server resolves the caller when neither
+        // principal argument is sent, so an accidental default here would silently change whose memories load.
+        expect(lastCall?.[3]).toBeUndefined();
+        expect(lastCall?.[4]).toBeUndefined();
+    });
+
+    it('renders the server-resolved owner labels verbatim in an Owner group', () => {
+        mockUsePrincipalsQuery.mockReturnValue(
+            makeQueryResult({
+                data: [
+                    makePrincipal({label: 'My memories', principalId: 42, principalType: 'USER'}),
+                    makePrincipal({
+                        label: 'Support triage deployment',
+                        principalId: 9,
+                        principalType: 'PROJECT_DEPLOYMENT',
+                    }),
+                ],
+            })
+        );
+
+        wrap(<Memories />);
+
+        expect(screen.getByText('Owner')).toBeInTheDocument();
+        expect(screen.getByRole('link', {name: 'My memories'})).toBeInTheDocument();
+        expect(screen.getByRole('link', {name: 'Support triage deployment'})).toBeInTheDocument();
+    });
+
+    it('opens on the All owner scope, which sends no principal', () => {
+        mockUsePrincipalsQuery.mockReturnValue(
+            makeQueryResult({
+                data: [
+                    makePrincipal({label: 'My memories', principalId: 42, principalType: 'USER'}),
+                    makePrincipal({
+                        label: 'Support triage deployment',
+                        principalId: 9,
+                        principalType: 'PROJECT_DEPLOYMENT',
+                    }),
+                ],
+            })
+        );
+
+        wrap(<Memories />);
+
+        // Both groups carry an All row, so scope the query to the Owner group — LeftSidebarNav labels it with
+        // its title.
+        const ownerGroup = within(screen.getByLabelText('Owner'));
+
+        // Absent principal arguments are the server's All scope on this query — every owner the caller may
+        // address — so the default view spans owners rather than showing only the caller's own memories.
+        expect(ownerGroup.getByRole('link', {name: 'All'})).toHaveAttribute('aria-current', 'page');
+        expect(ownerGroup.getByRole('link', {name: 'My memories'})).not.toHaveAttribute('aria-current');
+
+        const lastCall = mockUseMemoriesQuery.mock.lastCall;
+
+        expect(lastCall?.[3]).toBeUndefined();
+        expect(lastCall?.[4]).toBeUndefined();
+    });
+
+    it('keeps Owner and Type independent, so one item in each can be active', async () => {
+        mockUsePrincipalsQuery.mockReturnValue(
+            makeQueryResult({
+                data: [makePrincipal({label: 'My memories', principalId: 42, principalType: 'USER'})],
+            })
+        );
+
+        wrap(<Memories />);
+
+        await userEvent.click(screen.getByRole('link', {name: 'My memories'}));
+        await userEvent.click(screen.getByRole('link', {name: 'Feedback'}));
+
+        // Picking a type must not reset the owner scope: they are separate facets, and the query carries both.
+        expect(screen.getByRole('link', {name: 'My memories'})).toHaveAttribute('aria-current', 'page');
+        expect(screen.getByRole('link', {name: 'Feedback'})).toHaveAttribute('aria-current', 'page');
+
+        const lastCall = mockUseMemoriesQuery.mock.lastCall;
+
+        expect(lastCall?.[2]).toBe('FEEDBACK');
+        expect(lastCall?.[3]).toBe('USER');
+        expect(lastCall?.[4]).toBe(42);
+    });
+
+    it('invokes the memories query with the picked owner principal pair', async () => {
+        mockUsePrincipalsQuery.mockReturnValue(
+            makeQueryResult({
+                data: [
+                    makePrincipal({label: 'My memories', principalId: 42, principalType: 'USER'}),
+                    makePrincipal({
+                        label: 'Support triage deployment',
+                        principalId: 9,
+                        principalType: 'PROJECT_DEPLOYMENT',
+                    }),
+                ],
+            })
+        );
+
+        wrap(<Memories />);
+
+        await userEvent.click(screen.getByRole('link', {name: 'Support triage deployment'}));
+
+        const lastCall = mockUseMemoriesQuery.mock.lastCall;
+
+        expect(lastCall?.[3]).toBe('PROJECT_DEPLOYMENT');
+        expect(lastCall?.[4]).toBe(9);
+    });
+
+    it('falls back to the signed-in user when the picked owner is absent from the current environment', async () => {
+        mockUsePrincipalsQuery.mockReturnValue(
+            makeQueryResult({
+                data: [
+                    makePrincipal({
+                        label: 'Support triage deployment',
+                        principalId: 9,
+                        principalType: 'PROJECT_DEPLOYMENT',
+                    }),
+                ],
+            })
+        );
+
+        const {rerender} = wrap(<Memories />);
+
+        await userEvent.click(screen.getByRole('link', {name: 'Support triage deployment'}));
+
+        // Pin the pre-condition, or the assertion below would also hold if the click never registered.
+        expect(mockUseMemoriesQuery.mock.lastCall?.[3]).toBe('PROJECT_DEPLOYMENT');
+
+        // Switching environment replaces the owner list; the previously picked deployment holds nothing here.
+        mockUsePrincipalsQuery.mockReturnValue(makeQueryResult({data: []}));
+
+        rerender(
+            <MemoryRouter>
+                <QueryClientProvider client={new QueryClient({defaultOptions: {queries: {retry: false}}})}>
+                    <Memories />
+                </QueryClientProvider>
+            </MemoryRouter>
+        );
+
+        const lastCall = mockUseMemoriesQuery.mock.lastCall;
+
+        expect(lastCall?.[3]).toBeUndefined();
+        expect(lastCall?.[4]).toBeUndefined();
     });
 });
