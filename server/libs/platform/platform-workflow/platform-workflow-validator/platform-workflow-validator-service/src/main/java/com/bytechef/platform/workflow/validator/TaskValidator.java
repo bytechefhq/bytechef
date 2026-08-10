@@ -40,7 +40,7 @@ import tools.jackson.databind.JsonNode;
 @SuppressFBWarnings("REDOS")
 class TaskValidator {
 
-    private static final Pattern TYPE_PATTERN = Pattern.compile("^[a-zA-Z0-9]+/v[0-9]+(/[a-zA-Z0-9]+)?$");
+    private static final Pattern TYPE_PATTERN = Pattern.compile("^[a-zA-Z0-9-]+/v[0-9]+(/[a-zA-Z0-9]+)?$");
     private static final List<String> VECTOR_STORE_OPTIONAL_CLUSTER_KEYS = List.of(
         "documentReader", "documentTransformer");
 
@@ -583,7 +583,7 @@ class TaskValidator {
 
                 if (!matcher.matches()) {
                     StringUtils.appendWithNewline(
-                        "Field 'type' must match pattern: (alphanumeric)+/v(numeric)+(/(alphanumeric)+)?", errors);
+                        "Field 'type' must match pattern: (alphanumeric|-)+/v(numeric)+(/(alphanumeric)+)?", errors);
                 }
             }
         }
