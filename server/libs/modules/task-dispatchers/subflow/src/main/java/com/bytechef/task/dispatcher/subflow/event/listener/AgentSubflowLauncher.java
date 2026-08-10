@@ -27,6 +27,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.ActionContext.Suspend;
 import com.bytechef.platform.component.constant.MetadataConstants;
+import com.bytechef.platform.workflow.JobInputConstants;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalFactory;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.PendingSubflowRequest;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowRequestConstants;
@@ -88,9 +89,13 @@ public class AgentSubflowLauncher implements ApplicationEventListener {
             return; // an ordinary stop -- nothing to do
         }
 
+        Map<String, Object> subflowInputs = new HashMap<>();
+
+        subflowInputs.put(request.inputsName(), request.inputs());
+        subflowInputs.put(JobInputConstants.TRIGGER_NAME_INPUT, request.inputsName());
+
         JobParametersDTO jobParametersDTO = new JobParametersDTO(
-            request.workflowId(), Map.of(request.inputsName(), request.inputs()),
-            Map.of(SubflowRequestConstants.AGENT_JOB_ID, agentJobId));
+            request.workflowId(), subflowInputs, Map.of(SubflowRequestConstants.AGENT_JOB_ID, agentJobId));
 
         long subflowJobId = childJobPrincipalFactory.createPrincipalLinkedJob(agentJobId, jobParametersDTO);
 

@@ -32,6 +32,7 @@ import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
+import com.bytechef.platform.workflow.JobInputConstants;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.coordinator.trigger.jobparameter.TriggerJobParameterContributor;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
@@ -160,6 +161,24 @@ class TriggerCompletionHandlerTest {
         assertEquals("existingValue", jobParametersDTOs.get(0)
             .getInputs()
             .get("existingKey"));
+    }
+
+    @Test
+    void testHandleNonBatchNonCollectionSeedsReservedTriggerNameInput() {
+        stubCommon();
+        stubName();
+        stubOutput("singleValue");
+        when(triggerExecution.isBatch()).thenReturn(false);
+        stubCreateJob();
+
+        triggerCompletionHandler.handle(triggerExecution);
+
+        List<JobParametersDTO> jobParametersDTOs = captureCreatedJobs(1);
+
+        assertThat(jobParametersDTOs.get(0)
+            .getInputs())
+                .containsEntry(JobInputConstants.TRIGGER_NAME_INPUT, TRIGGER_NAME)
+                .containsKey(TRIGGER_NAME);
     }
 
     @Test

@@ -63,6 +63,7 @@ import com.bytechef.platform.tool.execution.ToolExecutionKind;
 import com.bytechef.platform.tool.execution.ToolExecutionOutcome;
 import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
 import com.bytechef.platform.tool.execution.ToolExecutionSurface;
+import com.bytechef.platform.workflow.JobInputConstants;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
 import com.bytechef.platform.workflow.execution.JobExecutionErrors;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
@@ -460,6 +461,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
             triggerInputs.putAll(inputParameters);
 
             inputs.put(triggerName, triggerInputs);
+            inputs.put(JobInputConstants.TRIGGER_NAME_INPUT, triggerName);
 
             long jobId = principalJobFacade.createJob(
                 new JobParametersDTO(integrationInstanceConfigurationWorkflow.getWorkflowId(), inputs),

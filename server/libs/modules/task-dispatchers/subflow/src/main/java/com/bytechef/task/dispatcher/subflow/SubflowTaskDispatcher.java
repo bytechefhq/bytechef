@@ -32,6 +32,7 @@ import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
+import com.bytechef.platform.workflow.JobInputConstants;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalFactory;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver.Subflow;
@@ -81,9 +82,12 @@ public class SubflowTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
                     workflowUuid, editorEnvironment));
         }
 
-        Map<String, ? extends Map<Object, ?>> inputs = Map.of(
+        Map<String, Object> inputs = new HashMap<>();
+
+        inputs.put(
             subflow.inputsName(),
             MapUtils.getMap(taskExecution.getParameters(), WorkflowConstants.INPUTS, Collections.emptyMap()));
+        inputs.put(JobInputConstants.TRIGGER_NAME_INPUT, subflow.inputsName());
 
         Map<String, Object> childMetadata = new HashMap<>(job.getMetadata());
 

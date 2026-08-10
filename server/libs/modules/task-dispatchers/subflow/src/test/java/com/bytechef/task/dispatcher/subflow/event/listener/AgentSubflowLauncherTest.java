@@ -16,6 +16,7 @@
 
 package com.bytechef.task.dispatcher.subflow.event.listener;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -28,11 +29,13 @@ import static org.mockito.Mockito.when;
 import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.workflow.JobInputConstants;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalFactory;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.PendingSubflowRequest;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowRequestConstants;
@@ -42,6 +45,7 @@ import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -91,8 +95,20 @@ class AgentSubflowLauncherTest {
 
         launcher.onApplicationEvent(new JobStatusApplicationEvent(agentJobId, Job.Status.STOPPED));
 
-        verify(childJobPrincipalFactory).createPrincipalLinkedJob(eq(agentJobId), any());
+        ArgumentCaptor<JobParametersDTO> jobParametersDTOArgumentCaptor =
+            ArgumentCaptor.forClass(JobParametersDTO.class);
+
+        verify(childJobPrincipalFactory).createPrincipalLinkedJob(
+            eq(agentJobId), jobParametersDTOArgumentCaptor.capture());
         verify(jobService).update(agentJob);
+
+        JobParametersDTO jobParametersDTO = jobParametersDTOArgumentCaptor.getValue();
+
+        // The reserved __triggerName key is seeded alongside the inputsName-keyed entry so a sub-agent workflow's
+        // branch dispatcher can route its workflowCall case portably.
+        assertThat(jobParametersDTO.getInputs())
+            .containsEntry(JobInputConstants.TRIGGER_NAME_INPUT, "newWorkflowCall")
+            .containsKey("newWorkflowCall");
     }
 
     @Test

@@ -51,6 +51,7 @@ import com.bytechef.platform.configuration.service.WorkflowTestConfigurationServ
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.job.sync.SseStreamBridge;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
+import com.bytechef.platform.workflow.JobInputConstants;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution.Status;
 import com.bytechef.platform.workflow.execution.dto.JobDTO;
@@ -413,7 +414,23 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
 
                 inputs = MapUtils.concat(
                     (Map<String, Object>) workflowTestConfigurationInputs,
-                    Map.of(workflowTrigger.getName(), sampleOutput));
+                    Map.of(
+                        workflowTrigger.getName(), sampleOutput,
+                        JobInputConstants.TRIGGER_NAME_INPUT, workflowTrigger.getName()));
+            } else {
+                // Caller-supplied inputs (e.g. POST /workflows/{id}/tests) are keyed by the firing
+                // trigger's node name (see WorkflowTestApiController#startWorkflowTest). Match it against
+                // the workflow's triggers so branch_in-style dispatchers keyed on __triggerName still
+                // route correctly; fall back to the first trigger when the supplied inputs don't key by
+                // any trigger name (e.g. a single-trigger workflow tested with raw inputs).
+                String matchedTriggerName = workflowTriggers.stream()
+                    .map(WorkflowTrigger::getName)
+                    .filter(inputs::containsKey)
+                    .findFirst()
+                    .orElse(workflowTrigger.getName());
+
+                inputs = MapUtils.concat(
+                    inputs, Map.of(JobInputConstants.TRIGGER_NAME_INPUT, matchedTriggerName));
             }
         }
 

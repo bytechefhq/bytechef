@@ -28,6 +28,7 @@ import com.bytechef.automation.configuration.domain.ErrorWorkflowDispatch;
 import com.bytechef.exception.RateLimitExceededException;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.coordinator.ErrorWorkflowDispatchCounter;
+import com.bytechef.platform.workflow.JobInputConstants;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -166,8 +167,13 @@ public class ErrorWorkflowJobStatusApplicationEventListener implements Applicati
 
         // Every other trigger dispatch in this codebase (see TriggerCompletionHandler) nests its output under the
         // trigger's node name, and editor data pills are emitted node-name-prefixed accordingly. Passing the payload
-        // as top-level inputs would leave every pill in a handler built in the editor resolving to null.
-        Map<String, Object> inputs = Map.of(dispatch.errorTriggerName(), payload);
+        // as top-level inputs would leave every pill in a handler built in the editor resolving to null. The reserved
+        // __triggerName key is seeded alongside it, same as every other job-creation path that seeds a trigger-named
+        // input (see JobInputConstants), so a handler workflow built from an agent (branch_in keyed on
+        // ${__triggerName}) can route this dispatch too.
+        Map<String, Object> inputs = Map.of(
+            dispatch.errorTriggerName(), payload,
+            JobInputConstants.TRIGGER_NAME_INPUT, dispatch.errorTriggerName());
 
         JobParametersDTO jobParametersDTO = new JobParametersDTO(
             dispatch.handlerWorkflowId(), inputs, Map.of(ERROR_HANDLER_FOR, String.valueOf(jobId)));

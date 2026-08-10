@@ -45,6 +45,7 @@ import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.job.sync.SseStreamBridge;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
+import com.bytechef.platform.workflow.JobInputConstants;
 import com.bytechef.platform.workflow.test.dto.WorkflowTestExecutionDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
@@ -225,7 +226,68 @@ public class TestWorkflowExecutorTest {
         assertThat(inputs).containsKey("myTrigger");
         assertThat(inputs.get("myTrigger")).isInstanceOf(Map.class);
         assertThat(((Map<?, ?>) inputs.get("myTrigger")).get("x")).isEqualTo(1);
+        assertThat(inputs).containsEntry(JobInputConstants.TRIGGER_NAME_INPUT, "myTrigger");
         assertThat(result.triggerExecution()).isNotNull();
+    }
+
+    @Test
+    void executeSyncWithCallerSuppliedInputsSeedsTriggerNameMatchingSuppliedKey() {
+        // Given a workflow with two triggers (e.g. an agent workflow's chat_1 and telegram_1)
+        when(workflowService.getWorkflow(anyString())).thenReturn(workflow);
+
+        WorkflowTrigger chatTrigger = mock(WorkflowTrigger.class);
+        WorkflowTrigger telegramTrigger = mock(WorkflowTrigger.class);
+
+        when(chatTrigger.getName()).thenReturn("chat_1");
+        when(chatTrigger.getType()).thenReturn("compX/v1/start");
+        when(telegramTrigger.getName()).thenReturn("telegram_1");
+        when(workflow.getExtensions(anyString(), any(), anyList()))
+            .thenReturn(List.of(chatTrigger, telegramTrigger));
+
+        WorkflowNodeOutputDTO workflowNodeOutputDTO = new WorkflowNodeOutputDTO(
+            null, null, new OutputResponse(null, Map.of("x", 1), null), null, false, null, "chat_1");
+
+        when(workflowNodeOutputFacade.getWorkflowNodeOutput(WORKFLOW_ID, "chat_1", ENVIRONMENT_ID))
+            .thenReturn(workflowNodeOutputDTO);
+
+        ComponentDefinition component = mock(ComponentDefinition.class);
+
+        when(component.getTitle()).thenReturn("Comp Title");
+        when(component.getIcon()).thenReturn("icon");
+
+        WorkflowNodeType type = WorkflowNodeType.ofType("compX/v1/start");
+
+        when(componentDefinitionService.getComponentDefinition(type.name(), type.version())).thenReturn(component);
+
+        WorkflowTestConfiguration workflowTestConfiguration = new WorkflowTestConfiguration(
+            ENVIRONMENT_ID, Map.of(), WORKFLOW_ID, List.of());
+
+        when(workflowTestConfigurationService.fetchWorkflowTestConfiguration(WORKFLOW_ID, ENVIRONMENT_ID))
+            .thenReturn(Optional.of(workflowTestConfiguration));
+
+        Job job = mock(Job.class);
+
+        when(jobSyncExecutor.startJob(any(JobParametersDTO.class))).thenReturn(1L);
+        when(jobSyncExecutor.awaitJob(anyLong(), any(Boolean.class), any())).thenReturn(job);
+        when(job.getId()).thenReturn(1L);
+
+        // When the caller supplies inputs keyed by the second trigger's node name (as
+        // WorkflowTestApiController#startWorkflowTest does)
+        Map<String, Object> callerInputs = new HashMap<>();
+
+        callerInputs.put("telegram_1", Map.of("text", "hi"));
+
+        testWorkflowExecutor.executeSync(WORKFLOW_ID, callerInputs, ENVIRONMENT_ID);
+
+        // Then __triggerName is seeded with the matching trigger's name, not the first trigger
+        ArgumentCaptor<JobParametersDTO> captor = ArgumentCaptor.forClass(JobParametersDTO.class);
+
+        verify(jobSyncExecutor).startJob(captor.capture());
+
+        JobParametersDTO jobParametersDTO = captor.getValue();
+
+        assertThat(jobParametersDTO.getInputs()).containsEntry(JobInputConstants.TRIGGER_NAME_INPUT, "telegram_1")
+            .containsKey("telegram_1");
     }
 
     @Test

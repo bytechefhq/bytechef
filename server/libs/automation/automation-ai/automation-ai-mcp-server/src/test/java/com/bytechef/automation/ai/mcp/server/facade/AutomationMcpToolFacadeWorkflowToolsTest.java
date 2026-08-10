@@ -29,6 +29,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
@@ -54,6 +55,7 @@ import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpToolService;
 import com.bytechef.platform.plan.provider.PlanLimitsProvider;
 import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
+import com.bytechef.platform.workflow.JobInputConstants;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
@@ -64,6 +66,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.execution.ToolExecutionException;
@@ -215,7 +218,16 @@ class AutomationMcpToolFacadeWorkflowToolsTest {
 
             toolCallback.call("{}");
 
-            verify(principalJobFacade).createJob(any(), anyLong(), any());
+            ArgumentCaptor<JobParametersDTO> jobParametersDTOArgumentCaptor =
+                ArgumentCaptor.forClass(JobParametersDTO.class);
+
+            verify(principalJobFacade).createJob(jobParametersDTOArgumentCaptor.capture(), anyLong(), any());
+
+            JobParametersDTO jobParametersDTO = jobParametersDTOArgumentCaptor.getValue();
+
+            assertThat(jobParametersDTO.getInputs())
+                .containsEntry(JobInputConstants.TRIGGER_NAME_INPUT, "newWorkflowCall_1")
+                .containsKey("newWorkflowCall_1");
         }
     }
 

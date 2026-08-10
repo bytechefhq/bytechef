@@ -17,6 +17,7 @@
 package com.bytechef.platform.webhook.web.websocket;
 
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
+import com.bytechef.platform.workflow.JobInputConstants;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
@@ -74,6 +75,7 @@ public class WorkflowContinuationHelper {
                     workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowUuid()));
 
             inputs.put(workflowExecutionId.getTriggerName(), afterCallData);
+            inputs.put(JobInputConstants.TRIGGER_NAME_INPUT, workflowExecutionId.getTriggerName());
 
             long jobId = TenantContext.callWithTenantId(
                 workflowExecutionId.getTenantId(),

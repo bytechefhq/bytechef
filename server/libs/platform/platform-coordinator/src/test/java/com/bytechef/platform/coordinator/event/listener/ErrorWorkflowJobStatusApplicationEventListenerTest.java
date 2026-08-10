@@ -307,6 +307,13 @@ class ErrorWorkflowJobStatusApplicationEventListenerTest {
         // -- job.setMetadata(Map.of()) above carries no "environment" key, so a regression back to
         // String.valueOf(job.getMetadata("environment")) would show up here as the literal string "null".
         Assertions.assertEquals("STAGING", payload.get("environment"));
+
+        // The reserved __triggerName input must be seeded alongside the trigger-name-keyed payload, same as every
+        // other job-creation path (see JobInputConstants) -- otherwise a handler workflow built from an agent
+        // (branch_in keyed on ${__triggerName}) could never route this dispatch.
+        Assertions.assertEquals(
+            "newWorkflowError_1", jobParametersDTO.getInputs()
+                .get(com.bytechef.platform.workflow.JobInputConstants.TRIGGER_NAME_INPUT));
     }
 
     private ErrorWorkflowJobStatusApplicationEventListener listener() {

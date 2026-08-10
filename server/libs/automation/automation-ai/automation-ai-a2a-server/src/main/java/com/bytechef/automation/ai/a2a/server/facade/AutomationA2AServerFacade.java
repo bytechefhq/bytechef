@@ -44,6 +44,7 @@ import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.plan.provider.PlanLimitsProvider;
+import com.bytechef.platform.workflow.JobInputConstants;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
 import com.bytechef.platform.workflow.execution.JobExecutionErrors;
 import com.bytechef.platform.workflow.execution.JobResumeId;
@@ -167,6 +168,7 @@ public class AutomationA2AServerFacade implements A2AAgentExecutor {
         Map<String, Object> inputs = new java.util.HashMap<>(projectDeploymentWorkflow.getInputs());
 
         inputs.put(exposedWorkflow.triggerName(), Map.of(MESSAGE_INPUT, request.text()));
+        inputs.put(JobInputConstants.TRIGGER_NAME_INPUT, exposedWorkflow.triggerName());
 
         long jobId = principalJobFacade.createJob(
             new JobParametersDTO(projectDeploymentWorkflow.getWorkflowId(), inputs),

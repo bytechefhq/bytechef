@@ -16,6 +16,7 @@
 
 package com.bytechef.task.dispatcher.subflow;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -29,6 +30,7 @@ import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.constant.WorkflowConstants;
+import com.bytechef.platform.workflow.JobInputConstants;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalFactory;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver.Subflow;
@@ -37,6 +39,7 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -88,7 +91,19 @@ class SubflowTaskDispatcherTest {
         subflowTaskDispatcher.dispatch(taskExecution);
 
         verify(subflowResolver).resolveSubflow(WORKFLOW_UUID, WorkflowConstants.NEW_WORKFLOW_CALL, false);
-        verify(childJobPrincipalFactory).createChildJob(anyLong(), any(JobParametersDTO.class));
+
+        ArgumentCaptor<JobParametersDTO> jobParametersDTOArgumentCaptor =
+            ArgumentCaptor.forClass(JobParametersDTO.class);
+
+        verify(childJobPrincipalFactory).createChildJob(anyLong(), jobParametersDTOArgumentCaptor.capture());
+
+        JobParametersDTO jobParametersDTO = jobParametersDTOArgumentCaptor.getValue();
+
+        // The reserved __triggerName key is seeded alongside the inputsName-keyed entry so a sub-agent workflow's
+        // branch dispatcher can route its workflowCall case portably.
+        assertThat(jobParametersDTO.getInputs())
+            .containsEntry(JobInputConstants.TRIGGER_NAME_INPUT, INPUTS_NAME)
+            .containsKey(INPUTS_NAME);
     }
 
     @Test

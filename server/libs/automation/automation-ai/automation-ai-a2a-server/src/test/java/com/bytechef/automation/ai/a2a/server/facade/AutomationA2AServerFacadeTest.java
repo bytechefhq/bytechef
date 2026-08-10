@@ -21,11 +21,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
@@ -43,6 +45,7 @@ import com.bytechef.platform.component.constant.WorkflowConstants;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.plan.provider.PlanLimitsProvider;
+import com.bytechef.platform.workflow.JobInputConstants;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
@@ -51,6 +54,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 import org.springframework.beans.factory.ObjectProvider;
 
@@ -164,6 +168,19 @@ class AutomationA2AServerFacadeTest {
             assertThat(result.inputRequired()).isTrue();
             assertThat(result.jobId()).isEqualTo(100L);
             assertThat(result.text()).contains("Approval required");
+
+            ArgumentCaptor<JobParametersDTO> jobParametersDTOArgumentCaptor =
+                ArgumentCaptor.forClass(JobParametersDTO.class);
+
+            verify(principalJobFacade).createJob(jobParametersDTOArgumentCaptor.capture(), anyLong(), any());
+
+            JobParametersDTO jobParametersDTO = jobParametersDTOArgumentCaptor.getValue();
+
+            // The reserved __triggerName key is seeded alongside the trigger-name-keyed message input so a sub-agent
+            // workflow's branch dispatcher can route its workflowCall case portably.
+            assertThat(jobParametersDTO.getInputs())
+                .containsEntry(JobInputConstants.TRIGGER_NAME_INPUT, "newWorkflowCall_1")
+                .containsKey("newWorkflowCall_1");
         }
     }
 
