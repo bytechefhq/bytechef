@@ -27,6 +27,6 @@ public class AwsSessionChatMemoryComponentHandlerTest {
     @Test
     public void testGetComponentDefinition() {
         JsonFileAssert.assertEquals(
-            "definition/awsSessionChatMemory_v1.json", new AwsSessionChatMemoryComponentHandler().getDefinition());
+            "definition/aws-session-chat-memory_v1.json", new AwsSessionChatMemoryComponentHandler().getDefinition());
     }
 }

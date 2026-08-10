@@ -24,7 +24,7 @@ public class JdbcSessionChatMemoryComponentHandlerTest {
     @Test
     public void testGetComponentDefinition() {
         JsonFileAssert.assertEquals(
-            "definition/jdbcSessionChatMemory_v1.json",
+            "definition/jdbc-session-chat-memory_v1.json",
             new JdbcSessionChatMemoryComponentHandler(null).getDefinition());
     }
 }

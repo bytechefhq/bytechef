@@ -25,7 +25,7 @@ public class BuiltInSessionChatMemoryComponentHandlerTest {
     @Test
     public void testGetComponentDefinition() {
         JsonFileAssert.assertEquals(
-            "definition/builtInSessionChatMemory_v1.json",
+            "definition/built-in-session-chat-memory_v1.json",
             new BuiltInSessionChatMemoryComponentHandler(null, new MockEnvironment()).getDefinition());
     }
 }
