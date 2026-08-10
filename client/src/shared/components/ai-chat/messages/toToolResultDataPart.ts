@@ -172,26 +172,67 @@ export function toToolResultDataPart(toolCallName: string, eventContent: string)
     }
 
     if (toolCallName === 'askUserQuestion') {
-        const parsed = parseJson<AskUserQuestionResultI>(eventContent, 'askUserQuestion result');
+        return toAskUserQuestionDataPart(eventContent, toolCallName);
+    }
 
-        if (!parsed || parsed.kind !== 'ask-user-question' || !Array.isArray(parsed.questions)) {
-            const errorMessage = !parsed
-                ? 'askUserQuestion returned an unparseable payload'
-                : 'askUserQuestion returned a malformed payload (missing kind or questions)';
+    // Payload-kind fallback. A specialist subagent's question reaches the client as the *delegate* tool's result, so
+    // the tool name is `personal_agent_manager` (or any other specialist) and none of the branches above match. Keyed
+    // on the payload's own `kind` so one client change serves every specialist, present and future.
+    //
+    // Scoped to kinds this file already handles: a blanket parse-and-sniff would let an unrelated tool that happens to
+    // emit a `kind` field hijack a renderer.
+    const fallbackKind = readPayloadKind(eventContent);
 
-            return {errorMessage, ok: false, toolName: 'askUserQuestion'};
-        }
-
-        return {
-            data: {
-                awaitingAnswer: parsed.awaitingAnswer,
-                kind: parsed.kind,
-                questions: parsed.questions,
-            },
-            ok: true,
-            type: 'data-ask-user-question',
-        };
+    if (fallbackKind === 'ask-user-question') {
+        return toAskUserQuestionDataPart(eventContent, toolCallName);
     }
 
     return undefined;
+}
+
+function toAskUserQuestionDataPart(eventContent: string, toolName: string): ToolResultDataPartType {
+    const parsed = parseJson<AskUserQuestionResultI>(eventContent, `${toolName} result`);
+
+    if (!parsed || parsed.kind !== 'ask-user-question' || !Array.isArray(parsed.questions)) {
+        const errorMessage = !parsed
+            ? 'askUserQuestion returned an unparseable payload'
+            : 'askUserQuestion returned a malformed payload (missing kind or questions)';
+
+        return {errorMessage, ok: false, toolName};
+    }
+
+    return {
+        data: {
+            awaitingAnswer: parsed.awaitingAnswer,
+            kind: parsed.kind,
+            questions: parsed.questions,
+        },
+        ok: true,
+        type: 'data-ask-user-question',
+    };
+}
+
+/**
+ * Reads a tool result's `kind` without logging. Deliberately not `parseJson`: this runs on *every* unmatched tool
+ * result, and most of those are ordinary prose, so `parseJson`'s warning would fill the console with noise about
+ * payloads that were never meant to be JSON. The cheap `{` guard skips the parse entirely for those.
+ */
+function readPayloadKind(eventContent: string): string | undefined {
+    if (!eventContent.trimStart().startsWith('{')) {
+        return undefined;
+    }
+
+    try {
+        const parsed: unknown = JSON.parse(eventContent);
+
+        if (typeof parsed !== 'object' || parsed === null) {
+            return undefined;
+        }
+
+        const kind = (parsed as {kind?: unknown}).kind;
+
+        return typeof kind === 'string' ? kind : undefined;
+    } catch {
+        return undefined;
+    }
 }

@@ -1,4 +1,4 @@
-import {describe, expect, it} from 'vitest';
+import {describe, expect, it, vi} from 'vitest';
 
 import {toToolResultDataPart} from '../toToolResultDataPart';
 
@@ -211,5 +211,51 @@ describe('toToolResultDataPart', () => {
         expect(
             toToolResultDataPart('openFileTab', JSON.stringify({fileId: '1', name: 'f', opened: true}))
         ).toBeUndefined();
+    });
+});
+
+describe('toToolResultDataPart payload-kind fallback', () => {
+    it('renders an ask-user-question payload returned by a delegate tool', () => {
+        const result = toToolResultDataPart(
+            'personal_agent_manager',
+            JSON.stringify({
+                kind: 'ask-user-question',
+                questions: [
+                    {
+                        header: 'Agent',
+                        multiSelect: false,
+                        options: [{description: 'the support agent', label: 'Support'}],
+                        question: 'Which agent?',
+                    },
+                ],
+            })
+        );
+
+        expect(result).toMatchObject({ok: true, type: 'data-ask-user-question'});
+    });
+
+    it('ignores an unknown kind', () => {
+        const result = toToolResultDataPart('personal_agent_manager', JSON.stringify({kind: 'something-else'}));
+
+        expect(result).toBeUndefined();
+    });
+
+    it('ignores a non-JSON result without throwing', () => {
+        expect(() => toToolResultDataPart('personal_agent_manager', 'Created agent 7.')).not.toThrow();
+        expect(toToolResultDataPart('personal_agent_manager', 'Created agent 7.')).toBeUndefined();
+    });
+
+    it('does not log a warning for an ordinary plain-text tool result', () => {
+        const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+        toToolResultDataPart('personal_agent_manager', 'Created agent 7.');
+
+        expect(warnSpy).not.toHaveBeenCalled();
+
+        warnSpy.mockRestore();
+    });
+
+    it('returns undefined for a tool result that is a JSON array', () => {
+        expect(toToolResultDataPart('personal_agent_manager', '[1,2,3]')).toBeUndefined();
     });
 });
