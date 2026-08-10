@@ -37,6 +37,9 @@ public class WorkflowValidator {
         "caseTrue", "caseFalse", "iteratee", "tasks"
     };
 
+    static final List<String> VALID_INPUT_TYPES = List.of(
+        "boolean", "date", "date_time", "time", "integer", "number", "string");
+
     /**
      * Validates task parameters against a single PropertyInfo task definition.
      *
@@ -107,8 +110,10 @@ public class WorkflowValidator {
                     "Node names must be unique. Duplicate node name: " + duplicateNodeName, errors);
             }
 
+            List<JsonNode> inputJsonNodes = new ArrayList<>();
             List<JsonNode> taskJsonNodes = new ArrayList<>();
 
+            processInputs(taskOutputMap, workflowJsonNode, inputJsonNodes, errors);
             processTriggers(
                 taskDefinitionProvider, taskOutputProvider, taskDefinitionMap, taskOutputMap, warnings,
                 workflowJsonNode, taskJsonNodes);
@@ -116,7 +121,8 @@ public class WorkflowValidator {
                 taskDefinitionProvider, taskOutputProvider, clusterTypesProvider, taskDefinitionMap,
                 taskOutputMap, clusterTypesMap, workflowJsonNode, taskJsonNodes, errors, warnings);
             validateWorkflowTasks(
-                taskJsonNodes, taskDefinitionMap, taskOutputMap, nodeOutputMap, clusterTypesMap, errors, warnings);
+                taskJsonNodes, inputJsonNodes, taskDefinitionMap, taskOutputMap, nodeOutputMap, clusterTypesMap,
+                errors, warnings);
         } catch (Exception e) {
             errors.append("Failed to validate workflow: ");
             errors.append(e.getMessage()
@@ -147,8 +153,19 @@ public class WorkflowValidator {
         Map<String, PropertyInfo> taskOutput, Map<String, PropertyInfo> nodeOutputMap,
         Map<String, List<String>> clusterTypesProviderMap, StringBuilder errors, StringBuilder warnings) {
 
+        validateWorkflowTasks(
+            taskJsonNodes, List.of(), taskDefinitionMap, taskOutput, nodeOutputMap, clusterTypesProviderMap, errors,
+            warnings);
+    }
+
+    private static void validateWorkflowTasks(
+        List<JsonNode> taskJsonNodes, List<JsonNode> inputJsonNodes, Map<String, List<PropertyInfo>> taskDefinitionMap,
+        Map<String, PropertyInfo> taskOutput, Map<String, PropertyInfo> nodeOutputMap,
+        Map<String, List<String>> clusterTypesProviderMap, StringBuilder errors, StringBuilder warnings) {
+
         ValidationContext context = ValidationContext.of(
-            taskJsonNodes, taskDefinitionMap, taskOutput, nodeOutputMap, clusterTypesProviderMap, errors, warnings);
+            taskJsonNodes, inputJsonNodes, taskDefinitionMap, taskOutput, nodeOutputMap, clusterTypesProviderMap,
+            errors, warnings);
 
         TaskValidator.validateAllTasks(context);
     }
@@ -452,6 +469,92 @@ public class WorkflowValidator {
                     taskJsonNode, taskDefinitionMap, taskOutputMap, clusterTypesMap, taskJsonNodes,
                     taskDefinitionProvider, taskOutputProvider, clusterTypesProvider, errors, warnings);
             });
+        }
+    }
+
+    /**
+     * Validates the workflow's top-level inputs and registers them so they can be referenced from tasks via
+     * {@code ${inputName}}. Inputs are optional, unstructured, single-value nodes: unlike tasks and triggers they have
+     * no {@code parameters} and no nested output properties, so their JSON nodes are kept out of {@code taskJsonNodes}
+     * to avoid full task structure validation, and their output is registered directly as a scalar {@link PropertyInfo}
+     * keyed by their {@code name} (each input has its own type, unlike tasks/triggers which share one entry per
+     * component type).
+     */
+    private static void processInputs(
+        Map<String, @Nullable PropertyInfo> taskOutputMap, JsonNode workflowJsonNode, List<JsonNode> inputJsonNodes,
+        StringBuilder errors) {
+
+        JsonNode inputsJsonNode = workflowJsonNode.get("inputs");
+
+        if (inputsJsonNode == null) {
+            return;
+        }
+
+        if (!inputsJsonNode.isArray()) {
+            StringUtils.appendWithNewline("Field 'inputs' must be an array", errors);
+
+            return;
+        }
+
+        for (JsonNode inputJsonNode : inputsJsonNode) {
+            if (!inputJsonNode.isObject()) {
+                StringUtils.appendWithNewline("Input must be an object", errors);
+
+                continue;
+            }
+
+            inputJsonNodes.add(inputJsonNode);
+
+            validateInputFields(inputJsonNode, errors);
+
+            JsonNode typeJsonNode = inputJsonNode.get("type");
+            JsonNode nameJsonNode = inputJsonNode.get("name");
+
+            if (typeJsonNode != null && typeJsonNode.isString() && nameJsonNode != null && nameJsonNode.isString()) {
+                String type = typeJsonNode.asString();
+                String name = nameJsonNode.asString();
+
+                JsonNode requiredJsonNode = inputJsonNode.get("required");
+                boolean required = requiredJsonNode != null && requiredJsonNode.isBoolean() &&
+                    requiredJsonNode.asBoolean();
+
+                taskOutputMap.putIfAbsent(name, new PropertyInfo(name, type.toUpperCase(), null, required, false,
+                    null, null));
+            }
+        }
+    }
+
+    /**
+     * Validates a single input's fields. Names and labels have no format restrictions, they only need to be present
+     * strings; {@code type} must be one of {@link #VALID_INPUT_TYPES}.
+     */
+    private static void validateInputFields(JsonNode inputJsonNode, StringBuilder errors) {
+        String name = "";
+
+        if (inputJsonNode.has("name")) {
+            JsonNode nameJsonNode = inputJsonNode.get("name");
+
+            if (nameJsonNode.isString()) {
+                name = nameJsonNode.asString();
+            }
+        }
+
+        String prefix = name.isEmpty() ? "" : "[" + name + "] ";
+
+        FieldValidator.appendErrorRequiredStringField(inputJsonNode, "name", errors);
+        FieldValidator.appendErrorRequiredStringField(inputJsonNode, "label", errors);
+
+        if (!inputJsonNode.has("type")) {
+            StringUtils.appendWithNewline(prefix + "Missing required field: type", errors);
+        } else {
+            JsonNode typeJsonNode = inputJsonNode.get("type");
+
+            if (!typeJsonNode.isString()) {
+                StringUtils.appendWithNewline(prefix + "Field 'type' must be a string", errors);
+            } else if (!VALID_INPUT_TYPES.contains(typeJsonNode.asString())) {
+                StringUtils.appendWithNewline(
+                    prefix + "Field 'type' must be one of: " + String.join(", ", VALID_INPUT_TYPES), errors);
+            }
         }
     }
 

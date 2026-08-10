@@ -32,6 +32,7 @@ import tools.jackson.databind.JsonNode;
 class ValidationContext {
 
     private final List<JsonNode> taskJsonNodes;
+    private final List<JsonNode> inputJsonNodes;
     private final Map<String, List<PropertyInfo>> taskDefinitionMap;
     private final Map<String, PropertyInfo> taskOutputMap;
     private final Map<String, PropertyInfo> nodeOutputMap;
@@ -43,11 +44,13 @@ class ValidationContext {
     private final Map<String, JsonNode> allTasksMap = new HashMap<>();
 
     private ValidationContext(
-        List<JsonNode> taskJsonNodes, Map<String, List<PropertyInfo>> taskDefinitionMap,
-        Map<String, PropertyInfo> taskOutputMap, Map<String, PropertyInfo> nodeOutputMap,
-        Map<String, List<String>> clusterTypesProviderMap, StringBuilder errors, StringBuilder warnings) {
+        List<JsonNode> taskJsonNodes, List<JsonNode> inputJsonNodes,
+        Map<String, List<PropertyInfo>> taskDefinitionMap, Map<String, PropertyInfo> taskOutputMap,
+        Map<String, PropertyInfo> nodeOutputMap, Map<String, List<String>> clusterTypesProviderMap,
+        StringBuilder errors, StringBuilder warnings) {
 
         this.taskJsonNodes = taskJsonNodes;
+        this.inputJsonNodes = inputJsonNodes;
         this.taskDefinitionMap = taskDefinitionMap;
         this.taskOutputMap = taskOutputMap;
         this.nodeOutputMap = nodeOutputMap;
@@ -71,25 +74,44 @@ class ValidationContext {
         Map<String, PropertyInfo> taskOutputMap, Map<String, PropertyInfo> nodeOutputMap,
         Map<String, List<String>> clusterTypesProviderMap, StringBuilder errors, StringBuilder warnings) {
 
-        return new ValidationContext(taskJsonNodes, taskDefinitionMap, taskOutputMap, nodeOutputMap,
+        return of(
+            taskJsonNodes, List.of(), taskDefinitionMap, taskOutputMap, nodeOutputMap, clusterTypesProviderMap,
+            errors, warnings);
+    }
+
+    public static ValidationContext of(
+        List<JsonNode> taskJsonNodes, List<JsonNode> inputJsonNodes,
+        Map<String, List<PropertyInfo>> taskDefinitionMap, Map<String, PropertyInfo> taskOutputMap,
+        Map<String, PropertyInfo> nodeOutputMap, Map<String, List<String>> clusterTypesProviderMap,
+        StringBuilder errors, StringBuilder warnings) {
+
+        return new ValidationContext(taskJsonNodes, inputJsonNodes, taskDefinitionMap, taskOutputMap, nodeOutputMap,
             clusterTypesProviderMap, errors, warnings);
     }
 
     private void buildTaskMaps() {
+        for (JsonNode inputJsonNode : inputJsonNodes) {
+            addNodeNameAndType(inputJsonNode);
+        }
+
         for (JsonNode taskJsonNode : taskJsonNodes) {
-            if (taskJsonNode.has("name")) {
-                JsonNode nameJsonNode = taskJsonNode.get("name");
+            addNodeNameAndType(taskJsonNode);
+        }
+    }
 
-                String taskName = nameJsonNode.asText();
+    private void addNodeNameAndType(JsonNode nodeJsonNode) {
+        if (nodeJsonNode.has("name")) {
+            JsonNode nameJsonNode = nodeJsonNode.get("name");
 
-                taskNames.add(taskName);
-                allTasksMap.put(taskName, taskJsonNode);
+            String nodeName = nameJsonNode.asText();
 
-                if (taskJsonNode.has("type")) {
-                    JsonNode typeJsonNode = taskJsonNode.get("type");
+            taskNames.add(nodeName);
+            allTasksMap.put(nodeName, nodeJsonNode);
 
-                    taskNameToTypeMap.put(taskName, typeJsonNode.asText());
-                }
+            if (nodeJsonNode.has("type")) {
+                JsonNode typeJsonNode = nodeJsonNode.get("type");
+
+                taskNameToTypeMap.put(nodeName, typeJsonNode.asText());
             }
         }
     }

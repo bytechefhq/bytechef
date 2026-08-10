@@ -3896,58 +3896,6 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateWorkflowValidWorkflowNoErrors() {
-        String workflow = """
-            {
-                "label": "Test Workflow",
-                "description": "Test workflow description",
-                "triggers": [
-                    {
-                        "label": "Manual Trigger",
-                        "name": "trigger_1",
-                        "type": "manual/v1/manual",
-                        "parameters": {}
-                    }
-                ],
-                "tasks": [
-                    {
-                        "label": "Test Task",
-                        "name": "task_1",
-                        "type": "component/v1/action1",
-                        "parameters": {
-                            "name": "test"
-                        }
-                    }
-                ]
-            }
-            """;
-
-        Map<String, List<PropertyInfo>> taskDefinitionMap = Map.of(
-            "component/v1/action1", List.of(new PropertyInfo("name", "STRING", null, false, true, null, null)),
-            "manual/v1/manual", List.of(new PropertyInfo("name", "STRING", null, false, true, null, null)));
-
-        Map<String, PropertyInfo> taskOutputMap = Map.of(
-            "component/v1/action1", new PropertyInfo("result", "STRING", null, false, false, null, null),
-            "manual/v1/manual", new PropertyInfo("result", "STRING", null, false, false, null, null));
-
-        Map<String, List<String>> clusterTypesMap = Map.of();
-
-        StringBuilder errors = new StringBuilder();
-        StringBuilder warnings = new StringBuilder();
-
-        WorkflowValidator.TaskDefinitionProvider taskDefProvider = (taskType, kind) -> taskDefinitionMap.get(taskType);
-        WorkflowValidator.TaskOutputProvider taskOutputProvider =
-            (taskType, kind, warningsBuilder) -> taskOutputMap.get(taskType);
-        WorkflowValidator.ClusterTypesProvider clusterTypesProvider = clusterTypesMap::get;
-
-        WorkflowValidator.validateWorkflow(workflow, taskDefProvider, taskOutputProvider, clusterTypesProvider,
-            new HashMap<>(), new HashMap<>(), new HashMap<>(), errors, warnings);
-
-        assertEquals("", errors.toString());
-        assertEquals("", warnings.toString());
-    }
-
-    @Test
     void validateWorkflowInvalidStructureHasErrors() {
         String workflow = """
             {

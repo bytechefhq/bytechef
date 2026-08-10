@@ -277,7 +277,9 @@ class DataPillValidator {
                     dataPillExpression, fieldPath, currentTaskName, taskOutput, taskNames, taskNameToTypeMap, errors,
                     warnings, context, text, allTasksMap, taskDefinition);
             } else {
-                validateTaskReference(dataPillExpression, taskNames, errors);
+                validateTaskReference(
+                    dataPillExpression, fieldPath, taskOutput, taskNames, taskNameToTypeMap, errors, text,
+                    taskDefinition);
             }
         }
     }
@@ -547,9 +549,57 @@ class DataPillValidator {
         }
     }
 
-    private static void validateTaskReference(String dataPillExpression, List<String> taskNames, StringBuilder errors) {
+    /**
+     * Validates a bare (dot-free) data pill reference. Most bare references name a task/trigger and only need an
+     * existence check, since their output is a structured object rather than a single value. Inputs are the exception:
+     * they carry a single scalar value, so a bare reference to an input is itself a property access and gets checked
+     * against the expected parameter type, the same way a dot-notation property reference would.
+     */
+    private static void validateTaskReference(
+        String dataPillExpression, String fieldPath, Map<String, PropertyInfo> taskOutput, List<String> taskNames,
+        Map<String, String> taskNameToTypeMap, StringBuilder errors, String text, List<PropertyInfo> taskDefinition) {
+
         if (!taskNames.contains(dataPillExpression)) {
             StringUtils.appendWithNewline("Task '" + dataPillExpression + "' doesn't exits.", errors);
+
+            return;
+        }
+
+        String referencedType = taskNameToTypeMap.get(dataPillExpression);
+
+        if (referencedType == null || !WorkflowValidator.VALID_INPUT_TYPES.contains(referencedType)) {
+            return;
+        }
+
+        PropertyInfo outputInfo = taskOutput.get(dataPillExpression);
+
+        if (outputInfo != null) {
+            validateInputTypeCompatibility(dataPillExpression, fieldPath, outputInfo, errors, text, taskDefinition);
+        }
+    }
+
+    /**
+     * Validates the type of a bare input reference against the expected parameter type. Unlike
+     * {@link #validateTypeCompatibility}, the input's own {@link PropertyInfo#type()} is the actual type directly:
+     * inputs have no nested properties to look up, the reference itself resolves to the scalar value.
+     */
+    private static void validateInputTypeCompatibility(
+        String dataPillExpression, String fieldPath, PropertyInfo outputInfo, StringBuilder errors, String text,
+        List<PropertyInfo> taskDefinition) {
+
+        String actualType = outputInfo.type();
+        String expectedType = getExpectedTypeFromDefinition(fieldPath, taskDefinition);
+
+        if (expectedType != null && actualType != null && !isTypeCompatible(expectedType, actualType)) {
+            // Allow any type to be converted to string in interpolation
+            if ("string".equalsIgnoreCase(expectedType) && isStringWithMultipleDataPills(text)) {
+                return;
+            }
+
+            StringUtils.appendWithNewline(
+                "Property '" + dataPillExpression + "' in output of 'inputs' is of type " + actualType.toLowerCase() +
+                    ", not " + expectedType.toLowerCase(),
+                errors);
         }
     }
 
