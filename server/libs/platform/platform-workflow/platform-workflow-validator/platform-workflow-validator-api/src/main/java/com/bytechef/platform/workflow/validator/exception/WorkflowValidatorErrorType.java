@@ -28,6 +28,8 @@ import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
 public class WorkflowValidatorErrorType extends AbstractErrorType {
 
     public static final WorkflowValidatorErrorType DUPLICATE_NODE_NAMES = new WorkflowValidatorErrorType(100);
+    public static final WorkflowValidatorErrorType RESERVED_INPUT_NAME = new WorkflowValidatorErrorType(101);
+    public static final WorkflowValidatorErrorType RESERVED_NODE_NAME = new WorkflowValidatorErrorType(102);
 
     public WorkflowValidatorErrorType(int errorKey) {
         super(WorkflowValidatorFacade.class, errorKey);

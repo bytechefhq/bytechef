@@ -144,6 +144,8 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     @PreAuthorize("hasPermission(#projectId, 'Project', 'WORKFLOW_CREATE')")
     public ProjectWorkflow addWorkflow(long projectId, String definition) {
         workflowValidatorFacade.validateNoDuplicateNodeNames(definition);
+        workflowValidatorFacade.validateNoReservedInputNames(definition);
+        workflowValidatorFacade.validateNoReservedNodeNames(definition);
 
         Project project = projectService.getProject(projectId);
 
@@ -501,6 +503,14 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     @Override
     @PreAuthorize("hasPermission(#workflowId, 'Workflow', 'WORKFLOW_EDIT')")
     public ProjectWorkflowDTO updateWorkflow(String workflowId, String definition, int version) {
+        // These three guards validate the INCOMING definition only, never the definition already stored for
+        // workflowId. So a workflow that was persisted before a guard existed (or otherwise already violates one)
+        // is never locked out of being fixed: a save whose incoming definition resolves the violation passes, and
+        // only a save that still violates a guard is rejected.
+        workflowValidatorFacade.validateNoDuplicateNodeNames(definition);
+        workflowValidatorFacade.validateNoReservedInputNames(definition);
+        workflowValidatorFacade.validateNoReservedNodeNames(definition);
+
         workflowFacade.update(workflowId, definition, version);
 
         for (String cacheName : WorkflowNodeOutputFacade.WORKFLOW_CACHE_NAMES) {
