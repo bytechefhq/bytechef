@@ -18,6 +18,7 @@ package com.bytechef.automation.configuration.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.domain.SystemProjects;
 import com.bytechef.automation.configuration.dto.ProjectTemplateDTO;
 import com.bytechef.automation.configuration.dto.SharedProjectDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
@@ -121,7 +122,10 @@ public class ProjectGraphQlController {
 
     @QueryMapping(name = "projects")
     public List<Project> projects() {
-        return projectService.getProjects();
+        return projectService.getProjects()
+            .stream()
+            .filter(project -> !SystemProjects.isSystemProject(project))
+            .toList();
     }
 
     @QueryMapping(name = "sharedProject")

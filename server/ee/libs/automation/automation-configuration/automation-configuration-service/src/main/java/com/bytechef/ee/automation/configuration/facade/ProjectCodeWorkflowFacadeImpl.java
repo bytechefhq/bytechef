@@ -10,6 +10,7 @@ package com.bytechef.ee.automation.configuration.facade;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
+import com.bytechef.automation.configuration.domain.SystemProjects;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.project.ProjectHandler;
@@ -68,7 +69,7 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
      * uuid carry-forward reads, minting new workflow uuids on the next bridge redeploy and permanently dangling
      * connected-user references.
      */
-    private static final String EMBEDDED_AUTOMATION_MARKER = "__EMBEDDED_AUTOMATION__";
+    private static final String EMBEDDED_AUTOMATION_MARKER = SystemProjects.EMBEDDED_AUTOMATION_NAME_PREFIX;
 
     private final CacheManager cacheManager;
     private final ProjectService projectService;

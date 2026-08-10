@@ -144,7 +144,7 @@ class WorkspaceKnowledgeBaseSourceFacadeImplTest {
         Project createdProject = new Project();
 
         createdProject.setId(PROJECT_ID);
-        createdProject.setName("__knowledge_base_workspace_1");
+        createdProject.setName("__KNOWLEDGE_BASE__1");
         createdProject.setWorkspaceId(WORKSPACE_ID);
 
         when(projectService.create(any(Project.class))).thenReturn(createdProject);
@@ -390,7 +390,7 @@ class WorkspaceKnowledgeBaseSourceFacadeImplTest {
         Project existingProject = new Project();
 
         existingProject.setId(PROJECT_ID);
-        existingProject.setName("__knowledge_base_workspace_1");
+        existingProject.setName("__KNOWLEDGE_BASE__1");
 
         when(projectService.fetchProject(anyString())).thenReturn(Optional.of(existingProject));
 
@@ -434,7 +434,7 @@ class WorkspaceKnowledgeBaseSourceFacadeImplTest {
         Project existingProject = new Project();
 
         existingProject.setId(PROJECT_ID);
-        existingProject.setName("__knowledge_base_workspace_1");
+        existingProject.setName("__KNOWLEDGE_BASE__1");
 
         when(projectService.fetchProject(anyString())).thenReturn(Optional.of(existingProject));
 
@@ -485,7 +485,7 @@ class WorkspaceKnowledgeBaseSourceFacadeImplTest {
         Project existingProject = new Project();
 
         existingProject.setId(PROJECT_ID);
-        existingProject.setName("__knowledge_base_workspace_1");
+        existingProject.setName("__KNOWLEDGE_BASE__1");
 
         when(projectService.fetchProject(anyString())).thenReturn(Optional.of(existingProject));
 
@@ -541,7 +541,7 @@ class WorkspaceKnowledgeBaseSourceFacadeImplTest {
         Project existingProject = new Project();
 
         existingProject.setId(PROJECT_ID);
-        existingProject.setName("__knowledge_base_workspace_1");
+        existingProject.setName("__KNOWLEDGE_BASE__1");
 
         when(projectService.fetchProject(anyString())).thenReturn(Optional.of(existingProject));
 

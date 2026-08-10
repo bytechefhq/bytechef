@@ -19,6 +19,7 @@ package com.bytechef.automation.configuration.web.graphql;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
+import com.bytechef.automation.configuration.domain.SystemProjects;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.commons.util.CollectionUtils;
@@ -30,6 +31,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -114,7 +116,24 @@ public class ProjectDeploymentGraphQlController {
 
         Environment environment = environmentService.getEnvironment(environmentId);
 
-        return projectDeploymentService.getProjectDeployments(false, environment, projectId, tagId, workspaceId);
+        List<ProjectDeployment> projectDeployments = projectDeploymentService.getProjectDeployments(
+            false, environment, projectId, tagId, workspaceId);
+
+        // Deployments of feature-owned system projects are not the user's to see — see SystemProjects.
+        Set<Long> systemProjectIds = projectService
+            .getProjects(
+                projectDeployments.stream()
+                    .map(ProjectDeployment::getProjectId)
+                    .distinct()
+                    .toList())
+            .stream()
+            .filter(SystemProjects::isSystemProject)
+            .map(Project::getId)
+            .collect(Collectors.toSet());
+
+        return projectDeployments.stream()
+            .filter(projectDeployment -> !systemProjectIds.contains(projectDeployment.getProjectId()))
+            .toList();
     }
 
     public record EnvironmentDTO(long id, String name) {

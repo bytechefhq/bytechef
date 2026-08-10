@@ -23,6 +23,7 @@ import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.domain.SharedTemplate;
+import com.bytechef.automation.configuration.domain.SystemProjects;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.dto.ProjectTemplateDTO;
 import com.bytechef.automation.configuration.dto.ProjectTemplateDTO.ComponentDefinitionTuple;
@@ -428,7 +429,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     @Override
     @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'WORKFLOW_VIEW')")
     public List<ProjectWorkflowDTO> getWorkspaceProjectWorkflows(long workspaceId) {
-        return projectWorkflowService.getProjectWorkflows(projectService.getWorkspaceProjectIds(workspaceId))
+        return projectWorkflowService.getProjectWorkflows(getVisibleWorkspaceProjectIds(workspaceId))
             .stream()
             .map(projectWorkflow -> new ProjectWorkflowDTO(
                 workflowService.getWorkflow(projectWorkflow.getWorkflowId()), projectWorkflow, false))
@@ -450,7 +451,10 @@ public class ProjectFacadeImpl implements ProjectFacade {
     @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'WORKFLOW_VIEW')")
     @Transactional(readOnly = true)
     public List<WorkspaceProjectWorkflowDTO> getWorkspaceLatestProjectWorkflows(long workspaceId) {
-        List<Project> projects = projectService.getProjects(null, null, false, null, null, workspaceId);
+        List<Project> projects = projectService.getProjects(null, null, false, null, null, workspaceId)
+            .stream()
+            .filter(project -> !SystemProjects.isSystemProject(project))
+            .toList();
 
         if (projects.isEmpty()) {
             return List.of();
@@ -700,12 +704,29 @@ public class ProjectFacadeImpl implements ProjectFacade {
         return project.getCategoryId() == null ? null : categoryService.getCategory(project.getCategoryId());
     }
 
+    /**
+     * Workspace project ids minus the feature-owned system projects — see {@link SystemProjects}.
+     */
+    private List<Long> getVisibleWorkspaceProjectIds(long workspaceId) {
+        return projectService.getProjects(null, null, null, null, null, workspaceId)
+            .stream()
+            .filter(project -> !SystemProjects.isSystemProject(project))
+            .map(Project::getId)
+            .toList();
+    }
+
     private List<ProjectDTO> getProjects(
         Boolean apiCollections, Long categoryId, Long tagId, Boolean projectDeployments, Status status,
         boolean includeAllFields, Long workspaceId) {
 
-        List<Project> projects = projectService.getProjects(
-            apiCollections, categoryId, projectDeployments, tagId, status, workspaceId);
+        // Feature-owned system projects (Knowledge Base / Context Store sync workflows, embedded catalog projects)
+        // are an implementation detail of those features, not something the user created — keep them out of the
+        // projects listing.
+        List<Project> projects = projectService
+            .getProjects(apiCollections, categoryId, projectDeployments, tagId, status, workspaceId)
+            .stream()
+            .filter(project -> !SystemProjects.isSystemProject(project))
+            .toList();
 
         if (includeAllFields) {
             List<Long> projectIds = projects.stream()

@@ -13,6 +13,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
+import com.bytechef.automation.configuration.domain.SystemProjects;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.security.SkipAutomationAuthorization;
@@ -66,7 +67,7 @@ import tools.jackson.core.type.TypeReference;
 @SkipAutomationAuthorization
 public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowProjectFacade {
 
-    private static final String MARKER = "__EMBEDDED_AUTOMATION__";
+    private static final String MARKER = SystemProjects.EMBEDDED_AUTOMATION_NAME_PREFIX;
 
     private static final String DEFAULT_DEFINITION = """
         {

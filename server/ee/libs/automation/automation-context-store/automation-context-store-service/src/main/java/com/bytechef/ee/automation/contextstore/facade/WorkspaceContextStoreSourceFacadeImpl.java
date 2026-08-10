@@ -14,6 +14,7 @@ import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
+import com.bytechef.automation.configuration.domain.SystemProjects;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
@@ -82,7 +83,7 @@ public class WorkspaceContextStoreSourceFacadeImpl implements WorkspaceContextSt
 
     private static final Logger log = LoggerFactory.getLogger(WorkspaceContextStoreSourceFacadeImpl.class);
 
-    static final String CONTEXT_STORE_PROJECT_NAME_PREFIX = "__CONTEXT_STORE__";
+    static final String CONTEXT_STORE_PROJECT_NAME_PREFIX = SystemProjects.CONTEXT_STORE_NAME_PREFIX;
 
     private final ObjectProvider<ClickHouseTableProvisioner> clickHouseTableProvisionerProvider;
     private final ComponentDefinitionService componentDefinitionService;
@@ -502,7 +503,11 @@ public class WorkspaceContextStoreSourceFacadeImpl implements WorkspaceContextSt
             .orElseGet(() -> {
                 ProjectDeployment projectDeployment = new ProjectDeployment();
 
-                projectDeployment.setName("Context Store deployment");
+                // Named after the system project it deploys, so both rows carry the same marker and a reader of
+                // either table can tell at a glance that neither is user-created. See SystemProjects.
+                Project project = projectService.getProject(projectId);
+
+                projectDeployment.setName(project.getName());
                 projectDeployment.setProjectId(projectId);
                 projectDeployment.setProjectVersion(projectVersion);
                 projectDeployment.setEnvironment(Environment.DEVELOPMENT);

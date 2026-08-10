@@ -27,6 +27,7 @@ import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
+import com.bytechef.automation.configuration.domain.SystemProjects;
 import com.bytechef.automation.configuration.dto.ProjectDeploymentDTO;
 import com.bytechef.automation.configuration.dto.ProjectDeploymentWorkflowDTO;
 import com.bytechef.automation.configuration.exception.ProjectDeploymentErrorType;
@@ -68,6 +69,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -360,8 +363,11 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
         Environment environment = environmentId == null ? null : environmentService.getEnvironment(environmentId);
 
-        List<ProjectDeployment> projectDeployments = projectDeploymentService.getProjectDeployments(
-            false, environment, projectId, tagId, id);
+        // A deployment is only as visible as the project it deploys: the auto-provisioned system projects behind
+        // Knowledge Base / Context Store sync (and the embedded catalog) each own a deployment the user never made
+        // and cannot meaningfully act on. See SystemProjects.
+        List<ProjectDeployment> projectDeployments = filterOutSystemProjectDeployments(
+            projectDeploymentService.getProjectDeployments(false, environment, projectId, tagId, id));
 
         if (includeAllFields) {
             List<ProjectDeploymentWorkflow> projectDeploymentWorkflows = projectDeploymentWorkflowService
@@ -819,6 +825,28 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         return principalJobService.fetchLastJobId(projectDeploymentId, PlatformType.AUTOMATION)
             .map(this::getJobEndDate)
             .orElse(null);
+    }
+
+    /**
+     * Drops the deployments whose project is feature-owned rather than user-created — see {@link SystemProjects}.
+     */
+    private List<ProjectDeployment> filterOutSystemProjectDeployments(List<ProjectDeployment> projectDeployments) {
+        if (projectDeployments.isEmpty()) {
+            return projectDeployments;
+        }
+
+        Set<Long> systemProjectIds = getProjects(projectDeployments).stream()
+            .filter(SystemProjects::isSystemProject)
+            .map(Project::getId)
+            .collect(Collectors.toSet());
+
+        if (systemProjectIds.isEmpty()) {
+            return projectDeployments;
+        }
+
+        return projectDeployments.stream()
+            .filter(projectDeployment -> !systemProjectIds.contains(projectDeployment.getProjectId()))
+            .toList();
     }
 
     private List<Project> getProjects(List<ProjectDeployment> projectDeployments) {

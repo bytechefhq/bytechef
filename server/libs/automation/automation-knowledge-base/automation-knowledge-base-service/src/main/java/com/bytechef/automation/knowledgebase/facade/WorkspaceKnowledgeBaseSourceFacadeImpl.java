@@ -23,6 +23,7 @@ import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
+import com.bytechef.automation.configuration.domain.SystemProjects;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
@@ -69,10 +70,9 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  *
  * <p>
  * Per-workspace projects are auto-provisioned on first use using a fixed name
- * ({@value #KNOWLEDGE_BASE_SOURCE_PROJECT_NAME_PREFIX}{@code <workspaceId>}) and reused by subsequent sources in the
- * same workspace. The same project owns one {@link ProjectDeployment} per environment (DEVELOPMENT for now); each
- * Knowledge Base Source contributes one {@link ProjectDeploymentWorkflow} so its trigger is independently
- * enable-toggleable.
+ * ({@value #KNOWLEDGE_BASE_PROJECT_NAME_PREFIX}{@code <workspaceId>}) and reused by subsequent sources in the same
+ * workspace. The same project owns one {@link ProjectDeployment} per environment (DEVELOPMENT for now); each Knowledge
+ * Base Source contributes one {@link ProjectDeploymentWorkflow} so its trigger is independently enable-toggleable.
  *
  * <p>
  * Mutating methods verify membership through
@@ -89,7 +89,7 @@ public class WorkspaceKnowledgeBaseSourceFacadeImpl implements WorkspaceKnowledg
 
     private static final Logger log = LoggerFactory.getLogger(WorkspaceKnowledgeBaseSourceFacadeImpl.class);
 
-    static final String KNOWLEDGE_BASE_SOURCE_PROJECT_NAME_PREFIX = "__knowledge_base_workspace_";
+    static final String KNOWLEDGE_BASE_PROJECT_NAME_PREFIX = SystemProjects.KNOWLEDGE_BASE_NAME_PREFIX;
 
     private final ComponentDefinitionService componentDefinitionService;
     private final KnowledgeBaseSourceService knowledgeBaseSourceService;
@@ -423,7 +423,7 @@ public class WorkspaceKnowledgeBaseSourceFacadeImpl implements WorkspaceKnowledg
     }
 
     private long findOrCreateKnowledgeBaseSourceProject(Long workspaceId) {
-        String projectName = KNOWLEDGE_BASE_SOURCE_PROJECT_NAME_PREFIX + workspaceId;
+        String projectName = KNOWLEDGE_BASE_PROJECT_NAME_PREFIX + workspaceId;
 
         return projectService.fetchProject(projectName)
             .map(Project::getId)
@@ -447,7 +447,11 @@ public class WorkspaceKnowledgeBaseSourceFacadeImpl implements WorkspaceKnowledg
             .orElseGet(() -> {
                 ProjectDeployment projectDeployment = new ProjectDeployment();
 
-                projectDeployment.setName("Knowledge Base deployment");
+                // Named after the system project it deploys, so both rows carry the same marker and a reader of
+                // either table can tell at a glance that neither is user-created. See SystemProjects.
+                Project project = projectService.getProject(projectId);
+
+                projectDeployment.setName(project.getName());
                 projectDeployment.setProjectId(projectId);
                 projectDeployment.setProjectVersion(projectVersion);
                 projectDeployment.setEnvironment(Environment.DEVELOPMENT);
