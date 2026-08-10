@@ -69,13 +69,21 @@ public class ManagerSubAgentToolCallback implements ToolCallback {
     private final AgentType agentType;
     private final ChatClient chatClient;
     private final String description;
+    private final @Nullable SubAgentAskRelay askRelay;
     private final JsonMapper jsonMapper = new JsonMapper();
 
-    @SuppressFBWarnings("EI_EXPOSE_REP2")
     public ManagerSubAgentToolCallback(AgentType agentType, ChatClient chatClient, String description) {
+        this(agentType, chatClient, description, null);
+    }
+
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
+    public ManagerSubAgentToolCallback(
+        AgentType agentType, ChatClient chatClient, String description, @Nullable SubAgentAskRelay askRelay) {
+
         this.agentType = agentType;
         this.chatClient = chatClient;
         this.description = description;
+        this.askRelay = askRelay;
     }
 
     @Override
@@ -111,11 +119,26 @@ public class ManagerSubAgentToolCallback implements ToolCallback {
             // "Workspace context unavailable".
             Map<String, Object> forwardedContext = toolContext == null ? Map.of() : toolContext.getContext();
 
-            String response = CurrentAgentContext.callWith(agentType, parentAgent,
-                () -> chatClient.prompt(request)
-                    .toolContext(forwardedContext)
-                    .call()
-                    .content());
+            String response;
+
+            if (askRelay == null) {
+                response = invokeSpecialist(request, forwardedContext, parentAgent);
+            } else {
+                SubAgentAskRelay.AskOutcome<String> askOutcome = askRelay.runWithChannel(
+                    () -> invokeSpecialist(request, forwardedContext, parentAgent));
+
+                String pendingQuestion = askOutcome.pendingQuestion();
+
+                // Checked before the null-response guard: a specialist that asked has already produced the thing the
+                // user needs to see, whether or not it also managed a summary. Its summary is discarded here by
+                // design — it is a one-line "I asked the user something", and rendering it beside the question card
+                // would restate the question in prose.
+                if (pendingQuestion != null) {
+                    return pendingQuestion;
+                }
+
+                response = askOutcome.result();
+            }
 
             if (response == null) {
                 log.warn("{} subagent returned null for request='{}'", agentType.key(), request);
@@ -134,6 +157,16 @@ public class ManagerSubAgentToolCallback implements ToolCallback {
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(jsonMapper, ManagerSubAgentToolCallback.class, agentType.key(), exception);
         }
+    }
+
+    private @Nullable String invokeSpecialist(
+        String request, Map<String, Object> forwardedContext, @Nullable AgentType parentAgent) {
+
+        return CurrentAgentContext.callWith(agentType, parentAgent,
+            () -> chatClient.prompt(request)
+                .toolContext(forwardedContext)
+                .call()
+                .content());
     }
 
     public record ManagerSubAgentInput(@Nullable String request) {

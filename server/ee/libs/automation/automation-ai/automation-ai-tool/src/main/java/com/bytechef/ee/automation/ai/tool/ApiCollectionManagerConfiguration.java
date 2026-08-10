@@ -9,10 +9,12 @@ package com.bytechef.ee.automation.ai.tool;
 
 import com.bytechef.automation.ai.tool.ManagerAgentType;
 import com.bytechef.automation.ai.tool.ManagerSubAgentToolCallback;
+import com.bytechef.automation.ai.tool.SubAgentAskRelay;
 import com.bytechef.ee.automation.apiplatform.configuration.facade.ApiCollectionFacade;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.beans.factory.annotation.Value;
@@ -76,8 +78,18 @@ public class ApiCollectionManagerConfiguration {
     public static ManagerSubAgentToolCallback createApiCollectionManagerToolCallback(
         ChatClient apiCollectionManagerChatClient) {
 
+        return createApiCollectionManagerToolCallback(apiCollectionManagerChatClient, null);
+    }
+
+    /**
+     * @param askRelay carries a question the specialist raised back out as this delegate's own tool result;
+     *                 {@code null} keeps the specialist's own summary as the result in every case
+     */
+    public static ManagerSubAgentToolCallback createApiCollectionManagerToolCallback(
+        ChatClient apiCollectionManagerChatClient, @Nullable SubAgentAskRelay askRelay) {
+
         return new ManagerSubAgentToolCallback(
-            ManagerAgentType.API_COLLECTION_MANAGER, apiCollectionManagerChatClient, TOOL_DESCRIPTION);
+            ManagerAgentType.API_COLLECTION_MANAGER, apiCollectionManagerChatClient, TOOL_DESCRIPTION, askRelay);
     }
 
     private String readPrompt(Resource resource) {

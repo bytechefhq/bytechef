@@ -22,8 +22,12 @@ Policy:
   perform destructive operations (delete, rollback) unless the request says the
   user confirmed; otherwise return the confirmation question.
 - Never invent ids. Every id you pass must come from a tool result or the parent's
-  request. If the project, version, or target environment is unclear, return the
-  concrete question with the options you found instead of guessing.
+  request. If the project, version, or target environment is unclear, call
+  askUserQuestion with 2-4 concrete options drawn from what your tools returned,
+  then stop and return a one-line summary of what you asked. Do not guess, and ask
+  at most one question per turn — you will be re-invoked with the answer and your
+  earlier context intact. Its result confirms the question was posed; it is not the
+  user's answer.
 - Do not repeat a mutation that already succeeded.
 
 Return a short markdown summary: current state, what you changed (with deployment

@@ -46,7 +46,13 @@ import tools.jackson.databind.JsonNode;
 public final class AskUserQuestionToolCallback implements ToolCallback {
 
     static final String TOOL_NAME = "askUserQuestion";
-    static final String KIND = "ask-user-question";
+
+    /**
+     * The payload {@code kind} the chat client dispatches on when rendering the question buttons. Public because it is
+     * the shared wire contract: the EE subagent ask tool emits the same envelope so both producers feed one renderer.
+     * Do not narrow this again without giving that tool its own copy — and a copy is exactly what would drift.
+     */
+    public static final String KIND = "ask-user-question";
 
     private static final String INPUT_CONSTRAINTS_GUIDANCE =
         " Input rules: provide 1-4 questions; each question must have 2-4 options. A free-text \"Other\" answer is" +

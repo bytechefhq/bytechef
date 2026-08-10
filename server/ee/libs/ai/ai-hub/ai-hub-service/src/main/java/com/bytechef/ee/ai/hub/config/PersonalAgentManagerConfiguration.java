@@ -8,6 +8,7 @@
 package com.bytechef.ee.ai.hub.config;
 
 import com.bytechef.automation.ai.tool.ManagerSubAgentToolCallback;
+import com.bytechef.automation.ai.tool.SubAgentAskRelay;
 import com.bytechef.ee.ai.hub.personalagent.AiHubPersonalAgentScheduleService;
 import com.bytechef.ee.ai.hub.personalagent.AiHubPersonalAgentService;
 import com.bytechef.ee.ai.hub.task.AiHubTaskService;
@@ -22,6 +23,7 @@ import com.bytechef.ee.ai.hub.tool.UpdateAiHubPersonalAgentToolCallback;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.beans.factory.annotation.Value;
@@ -97,8 +99,20 @@ public class PersonalAgentManagerConfiguration {
     static ManagerSubAgentToolCallback createPersonalAgentManagerToolCallback(
         ChatClient personalAgentManagerChatClient) {
 
+        return createPersonalAgentManagerToolCallback(personalAgentManagerChatClient, null);
+    }
+
+    /**
+     * @param askRelay carries a question the specialist raised back out as this delegate's own tool result;
+     *                 {@code null} keeps the specialist's own summary as the result in every case. The MCP surface
+     *                 passes {@code null} — it registers no ask tool, so binding a channel there would cost a
+     *                 thread-local on every delegation for a question that can never be raised.
+     */
+    static ManagerSubAgentToolCallback createPersonalAgentManagerToolCallback(
+        ChatClient personalAgentManagerChatClient, @Nullable SubAgentAskRelay askRelay) {
+
         return new ManagerSubAgentToolCallback(
-            AiHubAgentType.PERSONAL_AGENT_MANAGER, personalAgentManagerChatClient, TOOL_DESCRIPTION);
+            AiHubAgentType.PERSONAL_AGENT_MANAGER, personalAgentManagerChatClient, TOOL_DESCRIPTION, askRelay);
     }
 
     private String readPrompt(Resource resource) {

@@ -25,6 +25,7 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowSe
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.beans.factory.annotation.Value;
@@ -100,7 +101,18 @@ public class McpManagerConfiguration {
     }
 
     public static ManagerSubAgentToolCallback createMcpManagerToolCallback(ChatClient mcpManagerChatClient) {
-        return new ManagerSubAgentToolCallback(ManagerAgentType.MCP_MANAGER, mcpManagerChatClient, TOOL_DESCRIPTION);
+        return createMcpManagerToolCallback(mcpManagerChatClient, null);
+    }
+
+    /**
+     * @param askRelay carries a question the specialist raised back out as this delegate's own tool result;
+     *                 {@code null} keeps the specialist's own summary as the result in every case
+     */
+    public static ManagerSubAgentToolCallback createMcpManagerToolCallback(
+        ChatClient mcpManagerChatClient, @Nullable SubAgentAskRelay askRelay) {
+
+        return new ManagerSubAgentToolCallback(
+            ManagerAgentType.MCP_MANAGER, mcpManagerChatClient, TOOL_DESCRIPTION, askRelay);
     }
 
     private String readPrompt(Resource resource) {

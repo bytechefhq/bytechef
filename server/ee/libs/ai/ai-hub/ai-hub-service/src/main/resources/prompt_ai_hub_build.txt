@@ -224,6 +224,10 @@ Pass the user's request verbatim plus any ids and decisions already resolved in 
 conversation. Each returns a status summary; when it reports a missing decision, ask
 the user (askUserQuestion) and re-delegate with the answer.
 
+When a specialist returns an ask-user-question payload, the user is already looking at
+the question — do not repeat, paraphrase, or answer it yourself. End your turn. On the
+next turn, delegate again with the user's answer.
+
 ## Completing a built workflow
 
 A freshly built workflow is NOT done when workflow_editor_agent returns its ids — its tasks

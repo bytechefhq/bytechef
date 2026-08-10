@@ -20,6 +20,7 @@ import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.beans.factory.annotation.Value;
@@ -86,8 +87,18 @@ public class DeploymentManagerConfiguration {
 
     public static ManagerSubAgentToolCallback
         createDeploymentManagerToolCallback(ChatClient deploymentManagerChatClient) {
+        return createDeploymentManagerToolCallback(deploymentManagerChatClient, null);
+    }
+
+    /**
+     * @param askRelay carries a question the specialist raised back out as this delegate's own tool result;
+     *                 {@code null} keeps the specialist's own summary as the result in every case
+     */
+    public static ManagerSubAgentToolCallback createDeploymentManagerToolCallback(
+        ChatClient deploymentManagerChatClient, @Nullable SubAgentAskRelay askRelay) {
+
         return new ManagerSubAgentToolCallback(
-            ManagerAgentType.DEPLOYMENT_MANAGER, deploymentManagerChatClient, TOOL_DESCRIPTION);
+            ManagerAgentType.DEPLOYMENT_MANAGER, deploymentManagerChatClient, TOOL_DESCRIPTION, askRelay);
     }
 
     private String readPrompt(Resource resource) {
