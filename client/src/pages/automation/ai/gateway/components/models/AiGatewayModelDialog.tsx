@@ -84,6 +84,7 @@ const AiGatewayModelDialog = ({model, onClose, workspaceId}: AiGatewayModelDialo
                     name,
                     outputCostPerMTokens: outputCostPerMTokens ? parseFloat(outputCostPerMTokens) : undefined,
                 },
+                workspaceId,
             });
         } else {
             createMutation.mutate({

@@ -14,23 +14,60 @@ import {
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {
     useDeleteWorkspaceAiGatewayModelMutation,
+    useUnpinWorkspaceAiGatewayModelMutation,
     useWorkspaceAiGatewayModelsQuery,
     useWorkspaceAiGatewayProvidersQuery,
 } from '@/shared/middleware/graphql';
+import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useQueryClient} from '@tanstack/react-query';
-import {BoxesIcon, PencilIcon, PlusIcon, TrashIcon} from 'lucide-react';
+import {BoxesIcon, PencilIcon, PlusIcon, RotateCcwIcon, TrashIcon} from 'lucide-react';
 import {useCallback, useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 import {AiGatewayModelType} from '../../types';
 import AiGatewayModelDialog from './AiGatewayModelDialog';
 
+/**
+ * Derives the three catalog-relationship states a model row can be in. `catalogPinned` alone only distinguishes two
+ * states; a row can also be unpinned with no matching catalog entry at all (an Azure deployment name, a fine-tune
+ * like `ft:gpt-4o:acme:x`, a model newer than the bundled snapshot) — the reconciler skips those silently, so their
+ * rates are exactly whatever a human typed, and labeling them "Catalog" would misstate who maintains them.
+ */
+const getCatalogBadge = (model: AiGatewayModelType): {className: string; label: string} => {
+    if (model.catalogPinned) {
+        return {
+            className: 'bg-surface-warning-secondary text-content-warning-primary',
+            label: 'Overridden',
+        };
+    }
+
+    if (model.catalogManaged) {
+        return {
+            className: 'bg-surface-success-secondary text-content-success-primary',
+            label: 'Catalog',
+        };
+    }
+
+    return {
+        className: 'bg-surface-neutral-secondary text-content-neutral-primary',
+        label: 'Unmanaged',
+    };
+};
+
 const AiGatewayModels = () => {
     const [deletingModelId, setDeletingModelId] = useState<string | undefined>(undefined);
     const [editingModel, setEditingModel] = useState<AiGatewayModelType | undefined>(undefined);
     const [showDialog, setShowDialog] = useState(false);
+    const [unpinningModelId, setUnpinningModelId] = useState<string | undefined>(undefined);
 
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+    // Model writes (create/update/delete/unpin) require ROLE_ADMIN on WorkspaceAiGatewayModelFacadeImpl, so a
+    // non-admin member would only discover the denial at submit. Gating on `authenticated` as well as the authority
+    // avoids a flash-of-privilege during the logout/re-login transition, when `account` can still carry the prior
+    // session's authorities before `getAccount()` reconciles.
+    const isAdmin = useAuthenticationStore(
+        (state) => state.authenticated && (state.account?.authorities?.includes('ROLE_ADMIN') ?? false)
+    );
 
     const queryClient = useQueryClient();
 
@@ -46,6 +83,13 @@ const AiGatewayModels = () => {
             queryClient.invalidateQueries({queryKey: ['workspaceAiGatewayModels']});
 
             setDeletingModelId(undefined);
+        },
+    });
+    const unpinModelMutation = useUnpinWorkspaceAiGatewayModelMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: ['workspaceAiGatewayModels']});
+
+            setUnpinningModelId(undefined);
         },
     });
 
@@ -72,6 +116,15 @@ const AiGatewayModels = () => {
         }
     }, [currentWorkspaceId, deleteModelMutation, deletingModelId]);
 
+    const handleConfirmUnpin = useCallback(() => {
+        if (unpinningModelId) {
+            unpinModelMutation.mutate({
+                modelId: unpinningModelId,
+                workspaceId: currentWorkspaceId != null ? String(currentWorkspaceId) : '',
+            });
+        }
+    }, [currentWorkspaceId, unpinModelMutation, unpinningModelId]);
+
     const handleEditModel = useCallback((model: AiGatewayModelType) => {
         setEditingModel(model);
         setShowDialog(true);
@@ -90,20 +143,26 @@ const AiGatewayModels = () => {
         <div className="w-full px-2 2xl:mx-auto 2xl:w-4/5">
             {models.length === 0 ? (
                 <EmptyList
-                    button={<Button label="Add Model" onClick={() => setShowDialog(true)} />}
+                    button={isAdmin ? <Button label="Add Model" onClick={() => setShowDialog(true)} /> : undefined}
                     icon={<BoxesIcon className="size-12 text-muted-foreground" />}
-                    message="Register models from your configured providers."
+                    message={
+                        isAdmin
+                            ? 'Register models from your configured providers.'
+                            : 'No models are registered yet. An administrator can add them.'
+                    }
                     title="No Models Registered"
                 />
             ) : (
                 <>
-                    <div className="mb-4 flex items-center justify-end py-4">
-                        <Button
-                            icon={<PlusIcon className="size-4" />}
-                            label="Add Model"
-                            onClick={() => setShowDialog(true)}
-                        />
-                    </div>
+                    {isAdmin && (
+                        <div className="mb-4 flex items-center justify-end py-4">
+                            <Button
+                                icon={<PlusIcon className="size-4" />}
+                                label="Add Model"
+                                onClick={() => setShowDialog(true)}
+                            />
+                        </div>
+                    )}
 
                     <div className="overflow-x-auto">
                         <table className="w-full text-left text-sm">
@@ -123,13 +182,21 @@ const AiGatewayModels = () => {
 
                                     <th className="pb-2 font-medium">Enabled</th>
 
+                                    <th className="pb-2 font-medium">Source</th>
+
                                     <th className="pb-2 font-medium">Actions</th>
                                 </tr>
                             </thead>
 
                             <tbody>
-                                {models.map((model) =>
-                                    model ? (
+                                {models.map((model) => {
+                                    if (!model) {
+                                        return null;
+                                    }
+
+                                    const catalogBadge = getCatalogBadge(model);
+
+                                    return (
                                         <tr className="border-b" key={model.id}>
                                             <td className="py-3 font-medium">{model.name}</td>
 
@@ -171,25 +238,50 @@ const AiGatewayModels = () => {
                                             </td>
 
                                             <td className="py-3">
-                                                <div className="flex gap-2">
-                                                    <button
-                                                        className="text-muted-foreground hover:text-foreground"
-                                                        onClick={() => handleEditModel(model)}
-                                                    >
-                                                        <PencilIcon className="size-4" />
-                                                    </button>
+                                                <span
+                                                    className={twMerge(
+                                                        'rounded-full px-2 py-0.5 text-xs font-medium',
+                                                        catalogBadge.className
+                                                    )}
+                                                >
+                                                    {catalogBadge.label}
+                                                </span>
+                                            </td>
 
-                                                    <button
-                                                        className="text-destructive hover:text-destructive/80"
-                                                        onClick={() => setDeletingModelId(model.id)}
-                                                    >
-                                                        <TrashIcon className="size-4" />
-                                                    </button>
-                                                </div>
+                                            <td className="py-3">
+                                                {isAdmin ? (
+                                                    <div className="flex gap-2">
+                                                        <button
+                                                            className="text-muted-foreground hover:text-foreground"
+                                                            onClick={() => handleEditModel(model)}
+                                                        >
+                                                            <PencilIcon className="size-4" />
+                                                        </button>
+
+                                                        {model.catalogPinned && (
+                                                            <button
+                                                                className="text-muted-foreground hover:text-foreground"
+                                                                onClick={() => setUnpinningModelId(model.id)}
+                                                                title="Reset to catalog"
+                                                            >
+                                                                <RotateCcwIcon className="size-4" />
+                                                            </button>
+                                                        )}
+
+                                                        <button
+                                                            className="text-destructive hover:text-destructive/80"
+                                                            onClick={() => setDeletingModelId(model.id)}
+                                                        >
+                                                            <TrashIcon className="size-4" />
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-muted-foreground">-</span>
+                                                )}
                                             </td>
                                         </tr>
-                                    ) : null
-                                )}
+                                    );
+                                })}
                             </tbody>
                         </table>
                     </div>
@@ -214,6 +306,28 @@ const AiGatewayModels = () => {
                             onClick={handleConfirmDelete}
                         >
                             Delete
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
+            <AlertDialog open={!!unpinningModelId}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Reset this model to catalog pricing?</AlertDialogTitle>
+
+                        <AlertDialogDescription>
+                            This clears your override. On the next catalog reconcile, the context window, cost rates,
+                            and capabilities you set here will be replaced by the catalog's values. This cannot be
+                            undone.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+
+                    <AlertDialogFooter>
+                        <AlertDialogCancel onClick={() => setUnpinningModelId(undefined)}>Cancel</AlertDialogCancel>
+
+                        <AlertDialogAction disabled={unpinModelMutation.isPending} onClick={handleConfirmUnpin}>
+                            Reset to Catalog
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

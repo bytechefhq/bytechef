@@ -1,3 +1,4 @@
+import {AiGatewayProviderType} from '@/shared/middleware/graphql';
 import {fireEvent, render, screen, stubMutation} from '@/shared/util/test-utils';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -36,9 +37,26 @@ beforeEach(() => {
 });
 
 const renderDialog = (onClose = vi.fn()) => {
-    render(<AiGatewayProviderDialog onClose={onClose} workspaceId="1" />);
+    render(<AiGatewayProviderDialog isAdmin onClose={onClose} workspaceId="1" />);
 
     return onClose;
+};
+
+const existingProvider = {
+    baseUrl: '',
+    config: null,
+    createdBy: 'admin',
+    createdDate: '2026-01-01T00:00:00Z',
+    enabled: true,
+    id: '1',
+    lastModifiedBy: 'admin',
+    lastModifiedDate: '2026-01-01T00:00:00Z',
+    name: 'My OpenAI Provider',
+    // The generated enum member, not the bare literal: the dialog's provider prop is typed
+    // AiGatewayProviderType, which a widened string does not satisfy. Resolves to the mocked module's
+    // matching value at run time.
+    type: AiGatewayProviderType.Openai,
+    version: 1,
 };
 
 describe('AiGatewayProviderDialog', () => {
@@ -75,5 +93,19 @@ describe('AiGatewayProviderDialog', () => {
         renderDialog();
 
         expect(screen.getByLabelText('Type')).toHaveAttribute('data-slot', 'select-trigger');
+    });
+
+    it('shows the Test Connection control in edit mode for admins', () => {
+        render(<AiGatewayProviderDialog isAdmin onClose={vi.fn()} provider={existingProvider} workspaceId="1" />);
+
+        expect(screen.getByRole('button', {name: 'Test Connection'})).toBeInTheDocument();
+    });
+
+    it('hides the Test Connection control in edit mode for non-admins', () => {
+        render(
+            <AiGatewayProviderDialog isAdmin={false} onClose={vi.fn()} provider={existingProvider} workspaceId="1" />
+        );
+
+        expect(screen.queryByRole('button', {name: 'Test Connection'})).not.toBeInTheDocument();
     });
 });

@@ -7,6 +7,7 @@ import {
     useDeleteWorkspaceAiGatewayRoutingPolicyMutation,
     useWorkspaceAiGatewayRoutingPoliciesQuery,
 } from '@/shared/middleware/graphql';
+import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {PencilIcon, PlusIcon, RouteIcon, TrashIcon} from 'lucide-react';
 import {useCallback, useState} from 'react';
@@ -21,6 +22,13 @@ const AiGatewayRoutingPolicies = () => {
     const [showDialog, setShowDialog] = useState(false);
 
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+    // Routing policy writes (create/update/delete) require ROLE_ADMIN on
+    // WorkspaceAiGatewayRoutingPolicyFacadeImpl, so a non-admin member would only discover the denial at submit.
+    // Gating on `authenticated` as well as the authority avoids a flash-of-privilege during the logout/re-login
+    // transition, when `account` can still carry the prior session's authorities before `getAccount()` reconciles.
+    const isAdmin = useAuthenticationStore(
+        (state) => state.authenticated && (state.account?.authorities?.includes('ROLE_ADMIN') ?? false)
+    );
 
     const queryClient = useQueryClient();
 
@@ -65,20 +73,26 @@ const AiGatewayRoutingPolicies = () => {
         <div className="w-full px-2 2xl:mx-auto 2xl:w-4/5">
             {policies.length === 0 ? (
                 <EmptyList
-                    button={<Button label="Add Policy" onClick={() => setShowDialog(true)} />}
+                    button={isAdmin ? <Button label="Add Policy" onClick={() => setShowDialog(true)} /> : undefined}
                     icon={<RouteIcon className="size-12 text-muted-foreground" />}
-                    message="Create routing policies to control how requests are distributed across models."
+                    message={
+                        isAdmin
+                            ? 'Create routing policies to control how requests are distributed across models.'
+                            : 'No routing policies are configured yet. An administrator can add them.'
+                    }
                     title="No Routing Policies"
                 />
             ) : (
                 <>
-                    <div className="mb-4 flex items-center justify-end py-4">
-                        <Button
-                            icon={<PlusIcon className="size-4" />}
-                            label="Add Policy"
-                            onClick={() => setShowDialog(true)}
-                        />
-                    </div>
+                    {isAdmin && (
+                        <div className="mb-4 flex items-center justify-end py-4">
+                            <Button
+                                icon={<PlusIcon className="size-4" />}
+                                label="Add Policy"
+                                onClick={() => setShowDialog(true)}
+                            />
+                        </div>
+                    )}
 
                     <div className="overflow-x-auto">
                         <table className="w-full text-left text-sm">
@@ -120,21 +134,25 @@ const AiGatewayRoutingPolicies = () => {
                                             </td>
 
                                             <td className="py-3">
-                                                <div className="flex gap-2">
-                                                    <button
-                                                        className="text-muted-foreground hover:text-foreground"
-                                                        onClick={() => handleEditPolicy(policy)}
-                                                    >
-                                                        <PencilIcon className="size-4" />
-                                                    </button>
+                                                {isAdmin ? (
+                                                    <div className="flex gap-2">
+                                                        <button
+                                                            className="text-muted-foreground hover:text-foreground"
+                                                            onClick={() => handleEditPolicy(policy)}
+                                                        >
+                                                            <PencilIcon className="size-4" />
+                                                        </button>
 
-                                                    <button
-                                                        className="text-destructive hover:text-destructive/80"
-                                                        onClick={() => setDeletingPolicyId(policy.id)}
-                                                    >
-                                                        <TrashIcon className="size-4" />
-                                                    </button>
-                                                </div>
+                                                        <button
+                                                            className="text-destructive hover:text-destructive/80"
+                                                            onClick={() => setDeletingPolicyId(policy.id)}
+                                                        >
+                                                            <TrashIcon className="size-4" />
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-muted-foreground">-</span>
+                                                )}
                                             </td>
                                         </tr>
                                     ) : null

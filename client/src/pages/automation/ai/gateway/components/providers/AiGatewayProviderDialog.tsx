@@ -16,6 +16,7 @@ import {toast} from 'sonner';
 import {AiGatewayProviderType} from '../../types';
 
 interface AiGatewayProviderDialogProps {
+    isAdmin: boolean;
     onClose: () => void;
     provider?: AiGatewayProviderType;
     workspaceId: string;
@@ -32,7 +33,7 @@ const PROVIDER_TYPES: AiGatewayProviderTypeEnum[] = [
     AiGatewayProviderTypeEnum.Openai,
 ];
 
-const AiGatewayProviderDialog = ({onClose, provider, workspaceId}: AiGatewayProviderDialogProps) => {
+const AiGatewayProviderDialog = ({isAdmin, onClose, provider, workspaceId}: AiGatewayProviderDialogProps) => {
     const [apiKey, setApiKey] = useState('');
     const [baseUrl, setBaseUrl] = useState(provider?.baseUrl ?? '');
     const [name, setName] = useState(provider?.name ?? '');
@@ -185,7 +186,7 @@ const AiGatewayProviderDialog = ({onClose, provider, workspaceId}: AiGatewayProv
                 </div>
 
                 <DialogFooter>
-                    {isEditMode && (
+                    {isEditMode && isAdmin && (
                         <Button
                             disabled={testConnectionMutation.isPending}
                             label={testConnectionMutation.isPending ? 'Testing...' : 'Test Connection'}
