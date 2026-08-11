@@ -8,6 +8,8 @@ dependencies {
     implementation("org.springframework.ai:spring-ai-retry")
     implementation("org.springframework.boot:spring-boot-http-client")
     implementation(project(":server:libs:core:commons:commons-util"))
+
+    testImplementation(project(":server:libs:test:test-support"))
 }
 
 subprojects {
