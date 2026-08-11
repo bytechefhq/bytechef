@@ -16,6 +16,8 @@
 
 package com.bytechef.automation.ai.mcp.facade;
 
+import com.bytechef.automation.ai.mcp.audit.McpProjectAuditEvent;
+import com.bytechef.automation.ai.mcp.audit.McpProjectAuditPublisher;
 import com.bytechef.automation.ai.mcp.domain.McpProject;
 import com.bytechef.automation.ai.mcp.domain.McpProjectWorkflow;
 import com.bytechef.automation.ai.mcp.service.McpProjectService;
@@ -44,6 +46,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class McpProjectFacadeImpl implements McpProjectFacade {
 
+    private final McpProjectAuditPublisher mcpProjectAuditPublisher;
     private final McpProjectService mcpProjectService;
     private final McpProjectWorkflowService mcpProjectWorkflowService;
     private final ProjectDeploymentService projectDeploymentService;
@@ -51,10 +54,11 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
 
     @SuppressFBWarnings("EI")
     public McpProjectFacadeImpl(
-        McpProjectService mcpProjectService, McpProjectWorkflowService mcpProjectWorkflowService,
-        ProjectDeploymentService projectDeploymentService,
+        McpProjectAuditPublisher mcpProjectAuditPublisher, McpProjectService mcpProjectService,
+        McpProjectWorkflowService mcpProjectWorkflowService, ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService) {
 
+        this.mcpProjectAuditPublisher = mcpProjectAuditPublisher;
         this.mcpProjectService = mcpProjectService;
         this.mcpProjectWorkflowService = mcpProjectWorkflowService;
         this.projectDeploymentService = projectDeploymentService;
@@ -92,6 +96,12 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
             mcpProjectWorkflowService.create(mcpProject.getId(), projectDeploymentWorkflow.getId());
         }
 
+        Map<String, Object> data = new HashMap<>();
+
+        data.put("projectId", String.valueOf(projectId));
+
+        mcpProjectAuditPublisher.publish(McpProjectAuditEvent.MCP_PROJECT_CREATED, mcpProject.getId(), data);
+
         return mcpProject;
     }
 
@@ -116,6 +126,8 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
         if (projectDeploymentId != null) {
             projectDeploymentService.delete(projectDeploymentId);
         }
+
+        mcpProjectAuditPublisher.publish(McpProjectAuditEvent.MCP_PROJECT_DELETED, mcpProjectId);
     }
 
     @Override

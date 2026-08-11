@@ -20,6 +20,8 @@ import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.ee.automation.apiplatform.configuration.audit.ApiCollectionAuditEvent;
+import com.bytechef.ee.automation.apiplatform.configuration.audit.ApiCollectionAuditPublisher;
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollection;
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollectionEndpoint;
 import com.bytechef.ee.automation.apiplatform.configuration.dto.ApiCollectionDTO;
@@ -69,6 +71,7 @@ import tools.jackson.core.type.TypeReference;
 @Transactional
 public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
 
+    private final ApiCollectionAuditPublisher apiCollectionAuditPublisher;
     private final ApiCollectionService apiCollectionService;
     private final ApiCollectionEndpointService apiCollectionEndpointService;
     private final EnvironmentService environmentService;
@@ -82,12 +85,13 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
 
     @SuppressFBWarnings("EI")
     public ApiCollectionFacadeImpl(
-        ApiCollectionService apiCollectionService, ApiCollectionEndpointService apiCollectionEndpointService,
-        EnvironmentService environmentService, ProjectDeploymentFacade projectDeploymentFacade,
-        ProjectDeploymentService projectDeploymentService,
+        ApiCollectionAuditPublisher apiCollectionAuditPublisher, ApiCollectionService apiCollectionService,
+        ApiCollectionEndpointService apiCollectionEndpointService, EnvironmentService environmentService,
+        ProjectDeploymentFacade projectDeploymentFacade, ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectService projectService,
         ProjectWorkflowService projectWorkflowService, TagService tagService, WorkflowService workflowService) {
 
+        this.apiCollectionAuditPublisher = apiCollectionAuditPublisher;
         this.apiCollectionService = apiCollectionService;
         this.apiCollectionEndpointService = apiCollectionEndpointService;
         this.environmentService = environmentService;
@@ -122,7 +126,17 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
 
         apiCollection.setProjectDeploymentId(projectDeployment.getId());
 
-        return toApiCollectionDTO(apiCollectionService.create(apiCollection));
+        ApiCollection createdApiCollection = apiCollectionService.create(apiCollection);
+
+        Map<String, Object> data = new HashMap<>();
+
+        data.put("name", apiCollectionDTO.name());
+        data.put("projectId", apiCollectionDTO.projectId());
+
+        apiCollectionAuditPublisher.publish(
+            ApiCollectionAuditEvent.API_COLLECTION_CREATED, createdApiCollection.getId(), data);
+
+        return toApiCollectionDTO(createdApiCollection);
     }
 
     @Override
@@ -167,6 +181,8 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
 
         apiCollectionService.delete(id);
         projectDeploymentFacade.deleteProjectDeployment(apiCollection.getProjectDeploymentId());
+
+        apiCollectionAuditPublisher.publish(ApiCollectionAuditEvent.API_COLLECTION_DELETED, id);
     }
 
     @Override

@@ -9,12 +9,16 @@ package com.bytechef.ee.embedded.configuration.service;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.ee.embedded.configuration.audit.IntegrationAuditEvent;
+import com.bytechef.ee.embedded.configuration.audit.IntegrationAuditPublisher;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationVersion;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationVersion.Status;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationRepository;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.lang3.Validate;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -31,9 +35,13 @@ import org.springframework.util.Assert;
 @ConditionalOnEEVersion
 public class IntegrationServiceImpl implements IntegrationService {
 
+    private final IntegrationAuditPublisher integrationAuditPublisher;
     private final IntegrationRepository integrationRepository;
 
-    public IntegrationServiceImpl(IntegrationRepository integrationRepository) {
+    public IntegrationServiceImpl(
+        IntegrationAuditPublisher integrationAuditPublisher, IntegrationRepository integrationRepository) {
+
+        this.integrationAuditPublisher = integrationAuditPublisher;
         this.integrationRepository = integrationRepository;
     }
 
@@ -43,12 +51,29 @@ public class IntegrationServiceImpl implements IntegrationService {
         Assert.isTrue(integration.getId() == null, "'id' must be null");
         Assert.notNull(integration.getComponentName(), "'componentName' must not be null");
 
-        return integrationRepository.save(integration);
+        Integration savedIntegration = integrationRepository.save(integration);
+
+        Map<String, Object> data = new HashMap<>();
+
+        if (savedIntegration.getName() != null) {
+            data.put("name", savedIntegration.getName());
+        }
+
+        if (savedIntegration.getComponentName() != null) {
+            data.put("componentName", savedIntegration.getComponentName());
+        }
+
+        integrationAuditPublisher.publish(
+            IntegrationAuditEvent.INTEGRATION_CREATED, savedIntegration.getId(), data);
+
+        return savedIntegration;
     }
 
     @Override
     public void delete(long id) {
         integrationRepository.deleteById(id);
+
+        integrationAuditPublisher.publish(IntegrationAuditEvent.INTEGRATION_DELETED, id, null);
     }
 
     @Override
@@ -138,6 +163,21 @@ public class IntegrationServiceImpl implements IntegrationService {
         curIntegration.setTagIds(integration.getTagIds());
         curIntegration.setVersion(integration.getVersion());
 
-        return integrationRepository.save(curIntegration);
+        Integration savedIntegration = integrationRepository.save(curIntegration);
+
+        Map<String, Object> data = new HashMap<>();
+
+        if (savedIntegration.getName() != null) {
+            data.put("name", savedIntegration.getName());
+        }
+
+        if (savedIntegration.getComponentName() != null) {
+            data.put("componentName", savedIntegration.getComponentName());
+        }
+
+        integrationAuditPublisher.publish(
+            IntegrationAuditEvent.INTEGRATION_UPDATED, savedIntegration.getId(), data);
+
+        return savedIntegration;
     }
 }

@@ -8,10 +8,13 @@
 package com.bytechef.ee.platform.customcomponent.configuration.service;
 
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.ee.platform.customcomponent.configuration.audit.CustomComponentAuditEvent;
+import com.bytechef.ee.platform.customcomponent.configuration.audit.CustomComponentAuditPublisher;
 import com.bytechef.ee.platform.customcomponent.configuration.domain.CustomComponent;
 import com.bytechef.ee.platform.customcomponent.configuration.repository.CustomComponentRepository;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -28,9 +31,14 @@ import org.springframework.util.Assert;
 @ConditionalOnEEVersion
 public class CustomComponentServiceImpl implements CustomComponentService {
 
+    private final CustomComponentAuditPublisher customComponentAuditPublisher;
     private final CustomComponentRepository customComponentRepository;
 
-    public CustomComponentServiceImpl(CustomComponentRepository customComponentRepository) {
+    public CustomComponentServiceImpl(
+        CustomComponentAuditPublisher customComponentAuditPublisher,
+        CustomComponentRepository customComponentRepository) {
+
+        this.customComponentAuditPublisher = customComponentAuditPublisher;
         this.customComponentRepository = customComponentRepository;
     }
 
@@ -40,12 +48,20 @@ public class CustomComponentServiceImpl implements CustomComponentService {
         Assert.isTrue(customComponent.getId() == null, "'id' must be null");
         Assert.notNull(customComponent.getName(), "'componentName' must not be null");
 
-        return customComponentRepository.save(customComponent);
+        CustomComponent savedCustomComponent = customComponentRepository.save(customComponent);
+
+        customComponentAuditPublisher.publish(
+            CustomComponentAuditEvent.CUSTOM_COMPONENT_CREATED, savedCustomComponent.getId(),
+            Map.of("name", savedCustomComponent.getName()));
+
+        return savedCustomComponent;
     }
 
     @Override
     public void delete(long id) {
         customComponentRepository.deleteById(id);
+
+        customComponentAuditPublisher.publish(CustomComponentAuditEvent.CUSTOM_COMPONENT_DELETED, id, null);
     }
 
     @Override
@@ -55,6 +71,12 @@ public class CustomComponentServiceImpl implements CustomComponentService {
         customComponent.setEnabled(enable);
 
         customComponentRepository.save(customComponent);
+
+        CustomComponentAuditEvent event = enable
+            ? CustomComponentAuditEvent.CUSTOM_COMPONENT_ENABLED
+            : CustomComponentAuditEvent.CUSTOM_COMPONENT_DISABLED;
+
+        customComponentAuditPublisher.publish(event, id, null);
     }
 
     @Override
@@ -85,6 +107,12 @@ public class CustomComponentServiceImpl implements CustomComponentService {
         curCustomComponent.setIcon(customComponent.getIcon());
         curCustomComponent.setTitle(customComponent.getTitle());
 
-        return customComponentRepository.save(curCustomComponent);
+        CustomComponent savedCustomComponent = customComponentRepository.save(curCustomComponent);
+
+        customComponentAuditPublisher.publish(
+            CustomComponentAuditEvent.CUSTOM_COMPONENT_UPDATED, savedCustomComponent.getId(),
+            Map.of("name", savedCustomComponent.getName()));
+
+        return savedCustomComponent;
     }
 }

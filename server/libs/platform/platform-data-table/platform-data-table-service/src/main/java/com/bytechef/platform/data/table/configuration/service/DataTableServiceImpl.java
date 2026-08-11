@@ -17,6 +17,8 @@
 package com.bytechef.platform.data.table.configuration.service;
 
 import com.bytechef.exception.ExecutionException;
+import com.bytechef.platform.data.table.configuration.audit.DataTableAuditEvent;
+import com.bytechef.platform.data.table.configuration.audit.DataTableAuditPublisher;
 import com.bytechef.platform.data.table.configuration.domain.DataTable;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.configuration.exception.DataTableErrorType;
@@ -27,9 +29,9 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -43,11 +45,17 @@ import org.springframework.util.Assert;
 public class DataTableServiceImpl implements DataTableService {
 
     private static final Logger log = LoggerFactory.getLogger(DataTableServiceImpl.class);
+
+    private final DataTableAuditPublisher dataTableAuditPublisher;
     private final DataTableRepository dataTableRepository;
     private final JdbcTemplate jdbcTemplate;
 
     @SuppressFBWarnings("EI")
-    public DataTableServiceImpl(DataTableRepository dataTableRepository, JdbcTemplate jdbcTemplate) {
+    public DataTableServiceImpl(
+        DataTableAuditPublisher dataTableAuditPublisher, DataTableRepository dataTableRepository,
+        JdbcTemplate jdbcTemplate) {
+
+        this.dataTableAuditPublisher = dataTableAuditPublisher;
         this.dataTableRepository = dataTableRepository;
         this.jdbcTemplate = jdbcTemplate;
     }
@@ -72,6 +80,11 @@ public class DataTableServiceImpl implements DataTableService {
             escapeIdentifier(columnSpec.name()) + " " + sqlType(columnSpec.type());
 
         jdbcTemplate.execute(sql);
+
+        long dataTableId = getIdByBaseName(baseName);
+
+        dataTableAuditPublisher.publish(
+            DataTableAuditEvent.DATA_TABLE_COLUMN_ADDED, dataTableId, Map.of("columnName", columnSpec.name()));
     }
 
     @Override
@@ -112,9 +125,12 @@ public class DataTableServiceImpl implements DataTableService {
 
         jdbcTemplate.execute(sql);
 
-        checkRegistry(
+        long dataTableId = checkRegistry(
             baseName,
             new ExecutionException("Unable to find table " + baseName, DataTableErrorType.DATA_TABLE_NOT_CREATED));
+
+        dataTableAuditPublisher.publish(
+            DataTableAuditEvent.DATA_TABLE_CREATED, dataTableId, Map.of("name", baseName));
     }
 
     /**
@@ -137,7 +153,15 @@ public class DataTableServiceImpl implements DataTableService {
         jdbcTemplate.execute(sql);
 
         if (!hasPhysicalTablesForBaseName(baseName)) {
+            Long dataTableId = dataTableRepository.findByName(baseName)
+                .map(DataTable::getId)
+                .orElse(null);
+
             dataTableRepository.deleteByName(baseName);
+
+            if (dataTableId != null) {
+                dataTableAuditPublisher.publish(DataTableAuditEvent.DATA_TABLE_DELETED, dataTableId, Map.of());
+            }
         }
     }
 
@@ -223,7 +247,6 @@ public class DataTableServiceImpl implements DataTableService {
             }
 
             String baseName = tableName.substring(prefix.length());
-
             List<ColumnSpec> columnSpecs = listColumns(tableName)
                 .stream()
                 .filter(columnSpec -> !"id".equalsIgnoreCase(columnSpec.name()))
@@ -233,9 +256,7 @@ public class DataTableServiceImpl implements DataTableService {
                 .orElse(null);
 
             if (dataTable == null) {
-                log.warn(
-                    "Unable to find dataTable {} in environment {}. Skipping watch for database space leaking",
-                    baseName, environmentId);
+                log.warn("Skipping unregistered physical data table '{}' in environment {}", baseName, environmentId);
 
                 continue;
             }
@@ -351,7 +372,7 @@ public class DataTableServiceImpl implements DataTableService {
         return count > 0;
     }
 
-    private void checkRegistry(String baseName, ExecutionException executionException) {
+    private long checkRegistry(String baseName, ExecutionException executionException) {
         Assert.hasText(baseName, "baseName required");
 
         Optional<DataTable> dataTableOptional = dataTableRepository.findByName(baseName);
@@ -359,6 +380,9 @@ public class DataTableServiceImpl implements DataTableService {
         if (dataTableOptional.isEmpty()) {
             throw executionException;
         }
+
+        return dataTableOptional.get()
+            .getId();
     }
 
     private String escapeIdentifier(String identifier) {

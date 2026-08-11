@@ -17,10 +17,14 @@
 package com.bytechef.platform.security.service;
 
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.security.audit.ApiKeyAuditEvent;
+import com.bytechef.platform.security.audit.ApiKeyAuditPublisher;
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.repository.ApiKeyRepository;
 import com.bytechef.tenant.domain.TenantKey;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,9 +37,11 @@ import org.springframework.util.Assert;
 @Transactional
 public class ApiKeyServiceImpl implements ApiKeyService {
 
+    private final ApiKeyAuditPublisher apiKeyAuditPublisher;
     private final ApiKeyRepository apiKeyRepository;
 
-    public ApiKeyServiceImpl(ApiKeyRepository apiKeyRepository) {
+    public ApiKeyServiceImpl(ApiKeyAuditPublisher apiKeyAuditPublisher, ApiKeyRepository apiKeyRepository) {
+        this.apiKeyAuditPublisher = apiKeyAuditPublisher;
         this.apiKeyRepository = apiKeyRepository;
     }
 
@@ -47,12 +53,30 @@ public class ApiKeyServiceImpl implements ApiKeyService {
 
         apiKey.setSecretKey(String.valueOf(TenantKey.of()));
 
-        return apiKeyRepository.save(apiKey);
+        ApiKey savedApiKey = apiKeyRepository.save(apiKey);
+
+        Map<String, Object> data = new HashMap<>();
+
+        if (savedApiKey.getName() != null) {
+            data.put("name", savedApiKey.getName());
+        }
+
+        PlatformType type = savedApiKey.getType();
+
+        if (type != null) {
+            data.put("type", type.name());
+        }
+
+        apiKeyAuditPublisher.publish(ApiKeyAuditEvent.API_KEY_CREATED, savedApiKey.getId(), data);
+
+        return savedApiKey;
     }
 
     @Override
     public void delete(long id) {
         apiKeyRepository.deleteById(id);
+
+        apiKeyAuditPublisher.publish(ApiKeyAuditEvent.API_KEY_DELETED, id);
     }
 
     @Override

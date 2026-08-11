@@ -1,5 +1,7 @@
 dependencies {
     implementation("org.apache.commons:commons-lang3")
+    implementation("org.slf4j:slf4j-api")
+    implementation("org.springframework.boot:spring-boot-actuator")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework:spring-context")
     implementation("org.springframework.ai:spring-ai-autoconfigure-vector-store-pgvector")
@@ -14,6 +16,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-knowledge-base:platform-knowledge-base-file-storage:platform-knowledge-base-file-storage-api"))
     implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:core:tenant:tenant-api"))
+    implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     implementation(project(":server:libs:platform:platform-tag:platform-tag-api"))
 

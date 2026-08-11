@@ -18,7 +18,10 @@ package com.bytechef.automation.knowledgebase.service;
 
 import com.bytechef.automation.knowledgebase.domain.WorkspaceKnowledgeBase;
 import com.bytechef.automation.knowledgebase.repository.WorkspaceKnowledgeBaseRepository;
+import com.bytechef.platform.knowledgebase.audit.KnowledgeBaseAuditEvent;
+import com.bytechef.platform.knowledgebase.audit.KnowledgeBaseAuditPublisher;
 import java.util.List;
+import java.util.Map;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,9 +36,14 @@ import org.springframework.transaction.annotation.Transactional;
 @ConditionalOnProperty(prefix = "bytechef.ai.knowledge-base", name = "enabled", havingValue = "true")
 public class WorkspaceKnowledgeBaseServiceImpl implements WorkspaceKnowledgeBaseService {
 
+    private final KnowledgeBaseAuditPublisher knowledgeBaseAuditPublisher;
     private final WorkspaceKnowledgeBaseRepository workspaceKnowledgeBaseRepository;
 
-    public WorkspaceKnowledgeBaseServiceImpl(WorkspaceKnowledgeBaseRepository workspaceKnowledgeBaseRepository) {
+    public WorkspaceKnowledgeBaseServiceImpl(
+        KnowledgeBaseAuditPublisher knowledgeBaseAuditPublisher,
+        WorkspaceKnowledgeBaseRepository workspaceKnowledgeBaseRepository) {
+
+        this.knowledgeBaseAuditPublisher = knowledgeBaseAuditPublisher;
         this.workspaceKnowledgeBaseRepository = workspaceKnowledgeBaseRepository;
     }
 
@@ -54,6 +62,10 @@ public class WorkspaceKnowledgeBaseServiceImpl implements WorkspaceKnowledgeBase
             WorkspaceKnowledgeBase workspaceKnowledgeBase = new WorkspaceKnowledgeBase(knowledgeBaseId, workspaceId);
 
             workspaceKnowledgeBaseRepository.save(workspaceKnowledgeBase);
+
+            knowledgeBaseAuditPublisher.publish(
+                KnowledgeBaseAuditEvent.KB_ASSIGNED_TO_WORKSPACE, knowledgeBaseId,
+                Map.of("workspaceId", String.valueOf(workspaceId)));
         }
     }
 
@@ -64,6 +76,12 @@ public class WorkspaceKnowledgeBaseServiceImpl implements WorkspaceKnowledgeBase
 
         if (!existingRelationships.isEmpty()) {
             workspaceKnowledgeBaseRepository.deleteAll(existingRelationships);
+
+            for (WorkspaceKnowledgeBase workspaceKnowledgeBase : existingRelationships) {
+                knowledgeBaseAuditPublisher.publish(
+                    KnowledgeBaseAuditEvent.KB_REMOVED_FROM_WORKSPACE, knowledgeBaseId,
+                    Map.of("workspaceId", String.valueOf(workspaceKnowledgeBase.getWorkspaceId())));
+            }
         }
     }
 }

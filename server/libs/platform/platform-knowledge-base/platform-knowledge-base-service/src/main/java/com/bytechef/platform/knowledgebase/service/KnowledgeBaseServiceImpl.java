@@ -16,9 +16,13 @@
 
 package com.bytechef.platform.knowledgebase.service;
 
+import com.bytechef.platform.knowledgebase.audit.KnowledgeBaseAuditEvent;
+import com.bytechef.platform.knowledgebase.audit.KnowledgeBaseAuditPublisher;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.platform.knowledgebase.repository.KnowledgeBaseRepository;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,20 +32,34 @@ import org.springframework.transaction.annotation.Transactional;
 @ConditionalOnProperty(prefix = "bytechef.ai.knowledge-base", name = "enabled", havingValue = "true")
 public class KnowledgeBaseServiceImpl implements KnowledgeBaseService {
 
+    private final KnowledgeBaseAuditPublisher knowledgeBaseAuditPublisher;
     private final KnowledgeBaseRepository knowledgeBaseRepository;
 
-    public KnowledgeBaseServiceImpl(KnowledgeBaseRepository knowledgeBaseRepository) {
+    public KnowledgeBaseServiceImpl(
+        KnowledgeBaseAuditPublisher knowledgeBaseAuditPublisher, KnowledgeBaseRepository knowledgeBaseRepository) {
+
+        this.knowledgeBaseAuditPublisher = knowledgeBaseAuditPublisher;
         this.knowledgeBaseRepository = knowledgeBaseRepository;
     }
 
     @Override
     public KnowledgeBase createKnowledgeBase(KnowledgeBase knowledgeBase) {
-        return knowledgeBaseRepository.save(knowledgeBase);
+        KnowledgeBase savedKnowledgeBase = knowledgeBaseRepository.save(knowledgeBase);
+
+        Map<String, Object> data = new HashMap<>();
+
+        data.put("name", savedKnowledgeBase.getName());
+
+        knowledgeBaseAuditPublisher.publish(KnowledgeBaseAuditEvent.KB_CREATED, savedKnowledgeBase.getId(), data);
+
+        return savedKnowledgeBase;
     }
 
     @Override
     public void deleteKnowledgeBase(Long id) {
         knowledgeBaseRepository.deleteById(id);
+
+        knowledgeBaseAuditPublisher.publish(KnowledgeBaseAuditEvent.KB_DELETED, id);
     }
 
     @Override
@@ -73,6 +91,10 @@ public class KnowledgeBaseServiceImpl implements KnowledgeBaseService {
         existingKnowledgeBase.setMinChunkSizeChars(knowledgeBase.getMinChunkSizeChars());
         existingKnowledgeBase.setOverlap(knowledgeBase.getOverlap());
 
-        return knowledgeBaseRepository.save(existingKnowledgeBase);
+        KnowledgeBase savedKnowledgeBase = knowledgeBaseRepository.save(existingKnowledgeBase);
+
+        knowledgeBaseAuditPublisher.publish(KnowledgeBaseAuditEvent.KB_UPDATED, id);
+
+        return savedKnowledgeBase;
     }
 }

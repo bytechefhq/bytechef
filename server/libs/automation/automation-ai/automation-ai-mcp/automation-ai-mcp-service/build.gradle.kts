@@ -1,5 +1,7 @@
 dependencies {
     implementation("org.apache.commons:commons-lang3")
+    implementation("org.slf4j:slf4j-api")
+    implementation("org.springframework.boot:spring-boot-actuator")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework.data:spring-data-jdbc")
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-api"))

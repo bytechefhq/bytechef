@@ -19,10 +19,12 @@ package com.bytechef.platform.data.table.configuration.service;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.platform.data.table.configuration.audit.DataTableAuditPublisher;
 import com.bytechef.platform.data.table.configuration.repository.DataTableRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,7 +51,8 @@ class DataTableServiceTest {
 
     @BeforeEach
     void setUp() {
-        dataTableService = new DataTableServiceImpl(dataTableRepository, jdbcTemplate);
+        dataTableService = new DataTableServiceImpl(
+            mock(DataTableAuditPublisher.class), dataTableRepository, jdbcTemplate);
     }
 
     @Test

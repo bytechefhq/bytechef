@@ -16,9 +16,13 @@
 
 package com.bytechef.automation.configuration.service;
 
+import com.bytechef.automation.configuration.audit.ProjectWorkflowAuditEvent;
+import com.bytechef.automation.configuration.audit.ProjectWorkflowAuditPublisher;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import org.jspecify.annotations.Nullable;
@@ -34,21 +38,41 @@ import org.springframework.util.Assert;
 @Transactional
 public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
 
+    private final ProjectWorkflowAuditPublisher projectWorkflowAuditPublisher;
     private final ProjectWorkflowRepository projectWorkflowRepository;
 
-    public ProjectWorkflowServiceImpl(ProjectWorkflowRepository projectWorkflowRepository) {
+    public ProjectWorkflowServiceImpl(
+        ProjectWorkflowAuditPublisher projectWorkflowAuditPublisher,
+        ProjectWorkflowRepository projectWorkflowRepository) {
+
+        this.projectWorkflowAuditPublisher = projectWorkflowAuditPublisher;
         this.projectWorkflowRepository = projectWorkflowRepository;
     }
 
     @Override
     @PreAuthorize("hasPermission(#projectId, 'Project', 'WORKFLOW_CREATE')")
     public ProjectWorkflow addWorkflow(long projectId, int projectVersion, String workflowId) {
-        return projectWorkflowRepository.save(new ProjectWorkflow(projectId, projectVersion, workflowId));
+        ProjectWorkflow savedProjectWorkflow = projectWorkflowRepository.save(
+            new ProjectWorkflow(projectId, projectVersion, workflowId));
+
+        Map<String, Object> data = new HashMap<>();
+
+        data.put("projectId", String.valueOf(savedProjectWorkflow.getProjectId()));
+        data.put("workflowId", savedProjectWorkflow.getWorkflowId());
+
+        projectWorkflowAuditPublisher.publish(
+            ProjectWorkflowAuditEvent.WORKFLOW_CREATED, savedProjectWorkflow.getId(), data);
+
+        return savedProjectWorkflow;
     }
 
     @Override
     public void delete(List<Long> ids) {
         projectWorkflowRepository.deleteAllById(ids);
+
+        for (Long id : ids) {
+            projectWorkflowAuditPublisher.publish(ProjectWorkflowAuditEvent.WORKFLOW_DELETED, id);
+        }
     }
 
     @Override
@@ -189,7 +213,19 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
     @PreAuthorize("hasPermission(#projectId, 'Project', 'WORKFLOW_DELETE')")
     public void delete(long projectId, int projectVersion, String workflowId) {
         projectWorkflowRepository.findByProjectIdAndProjectVersionAndWorkflowId(projectId, projectVersion, workflowId)
-            .ifPresent(projectWorkflow -> projectWorkflowRepository.deleteById(projectWorkflow.getId()));
+            .ifPresent(projectWorkflow -> {
+                long projectWorkflowId = projectWorkflow.getId();
+
+                projectWorkflowRepository.deleteById(projectWorkflowId);
+
+                Map<String, Object> data = new HashMap<>();
+
+                data.put("projectId", String.valueOf(projectWorkflow.getProjectId()));
+                data.put("workflowId", projectWorkflow.getWorkflowId());
+
+                projectWorkflowAuditPublisher.publish(
+                    ProjectWorkflowAuditEvent.WORKFLOW_DELETED, projectWorkflowId, data);
+            });
     }
 
     @Override
@@ -219,7 +255,16 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
         curProjectWorkflow.setWorkflowId(projectWorkflow.getWorkflowId());
         curProjectWorkflow.setUuid(projectWorkflow.getUuidAsString());
 
-        return projectWorkflowRepository.save(curProjectWorkflow);
+        ProjectWorkflow savedProjectWorkflow = projectWorkflowRepository.save(curProjectWorkflow);
+
+        Map<String, Object> data = new HashMap<>();
+
+        data.put("workflowId", savedProjectWorkflow.getWorkflowId());
+
+        projectWorkflowAuditPublisher.publish(
+            ProjectWorkflowAuditEvent.WORKFLOW_UPDATED, savedProjectWorkflow.getId(), data);
+
+        return savedProjectWorkflow;
     }
 
     @Override
