@@ -312,6 +312,10 @@ export function useArrayProperty({onDeleteClick, parentArrayItems, path, propert
             Array.isArray(parameterValue)
         ) {
             const parameterArrayItems = parameterValue.map((parameterItem: ArrayPropertyType, index: number) => {
+                if (parameterItem == null) {
+                    return null;
+                }
+
                 const matchingItem = items?.find((item) => item.name === parameterItem.type);
 
                 if (!matchingItem) {
@@ -352,8 +356,13 @@ export function useArrayProperty({onDeleteClick, parentArrayItems, path, propert
                 };
             });
 
-            if (parameterArrayItems?.length) {
-                setArrayItems(parameterArrayItems);
+            const definedParameterArrayItems = parameterArrayItems.filter(
+                (parameterArrayItem): parameterArrayItem is NonNullable<typeof parameterArrayItem> =>
+                    parameterArrayItem != null
+            );
+
+            if (definedParameterArrayItems.length) {
+                setArrayItems(definedParameterArrayItems);
             }
         } else if (items?.length && items[0].type === 'OBJECT' && Array.isArray(parameterValue)) {
             const parameterArrayItems = parameterValue.map((parameterItem: ArrayPropertyType, index: number) => {
