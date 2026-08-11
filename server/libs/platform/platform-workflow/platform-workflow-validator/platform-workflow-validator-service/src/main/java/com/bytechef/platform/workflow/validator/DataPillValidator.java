@@ -65,7 +65,7 @@ class DataPillValidator {
         findDataPillsInNode(
             parametersJsonNode, "", name, context.getTaskOutputs(), context.getTaskNames(),
             context.getTaskNameToTypeMap(), context.getErrors(), context.getWarnings(), taskContext,
-            context.getAllTasksMap(), taskDefinition);
+            context.getAllTasksMap(), taskDefinition, parametersJsonNode);
 
     }
 
@@ -73,7 +73,7 @@ class DataPillValidator {
         JsonNode jsonNode, String currentPath, String currentTaskName, Map<String, PropertyInfo> taskOutput,
         List<String> taskNames, Map<String, String> taskNameToTypeMap, StringBuilder errors,
         StringBuilder warnings, TaskValidationContext context, Map<String, JsonNode> allTasksMap,
-        List<PropertyInfo> taskDefinition) {
+        List<PropertyInfo> taskDefinition, JsonNode rootParametersJsonNode) {
 
         if (jsonNode.isObject()) {
             Set<Map.Entry<String, JsonNode>> fields = jsonNode.properties();
@@ -90,7 +90,7 @@ class DataPillValidator {
 
                 findDataPillsInNode(
                     fieldValue, newPath, currentTaskName, taskOutput, taskNames, taskNameToTypeMap, errors, warnings,
-                    context, allTasksMap, taskDefinition);
+                    context, allTasksMap, taskDefinition, rootParametersJsonNode);
             }
         } else if (jsonNode.isArray()) {
             if (isTaskTypeArray(currentPath, taskDefinition)) {
@@ -104,14 +104,14 @@ class DataPillValidator {
 
                 findDataPillsInNode(
                     jsonNode.get(i), currentPath + "[" + i + "]", currentTaskName, taskOutput, taskNames,
-                    taskNameToTypeMap, errors, warnings, context, allTasksMap, taskDefinition);
+                    taskNameToTypeMap, errors, warnings, context, allTasksMap, taskDefinition, rootParametersJsonNode);
             }
         } else if (jsonNode.isString() && !context.stopProcessing) {
             String textValue = jsonNode.asString();
 
             processDataPillsInText(
                 textValue, currentPath, currentTaskName, taskOutput, taskNames, taskNameToTypeMap, errors, warnings,
-                context, allTasksMap, taskDefinition);
+                context, allTasksMap, taskDefinition, rootParametersJsonNode);
         }
     }
 
@@ -120,7 +120,8 @@ class DataPillValidator {
      */
     @Nullable
     private static String getExpectedTypeFromDefinition(
-        @Nullable String fieldPath, @Nullable List<PropertyInfo> taskDefinition) {
+        @Nullable String fieldPath, @Nullable List<PropertyInfo> taskDefinition,
+        @Nullable JsonNode rootParametersJsonNode) {
 
         if (taskDefinition == null || fieldPath == null || fieldPath.isEmpty()) {
             return null;
@@ -131,14 +132,7 @@ class DataPillValidator {
         List<PropertyInfo> currentProperties = taskDefinition;
 
         for (String part : pathParts) {
-            PropertyInfo foundProperty = null;
-
-            for (PropertyInfo property : currentProperties) {
-                if (part.equals(property.name())) {
-                    foundProperty = property;
-                    break;
-                }
-            }
+            PropertyInfo foundProperty = findActiveProperty(part, currentProperties, rootParametersJsonNode);
 
             if (foundProperty == null) {
                 return null;
@@ -156,6 +150,45 @@ class DataPillValidator {
         }
 
         return null;
+    }
+
+    /**
+     * Finds the property named {@code name} that is actually active given the current parameter values. Task
+     * definitions can declare several properties sharing the same name, each gated by a different displayCondition (a
+     * discriminated union, e.g. var/v1/set's "value" has one entry per "type"); only the one whose condition evaluates
+     * true against the task's root parameters is the real match. A candidate without a displayCondition is kept as a
+     * fallback in case none of the conditional candidates match.
+     */
+    @Nullable
+    private static PropertyInfo findActiveProperty(
+        String name, List<PropertyInfo> properties, @Nullable JsonNode rootParametersJsonNode) {
+
+        PropertyInfo fallback = null;
+
+        for (PropertyInfo property : properties) {
+            if (!name.equals(property.name())) {
+                continue;
+            }
+
+            String displayCondition = property.displayCondition();
+
+            if (displayCondition == null || displayCondition.isEmpty()) {
+                if (fallback == null) {
+                    fallback = property;
+                }
+
+                continue;
+            }
+
+            if (rootParametersJsonNode != null &&
+                DisplayConditionEvaluator.evaluate(displayCondition, rootParametersJsonNode)
+                    .shouldShow()) {
+
+                return property;
+            }
+        }
+
+        return fallback;
     }
 
     private static boolean isLoopTask(String taskName, Map<String, String> taskNameToTypeMap) {
@@ -228,7 +261,8 @@ class DataPillValidator {
     }
 
     /**
-     * Checks if two types are compatible for data pill assignments.
+     * Checks if two types are compatible for data pill assignments. Any type is treated as STRING-compatible since a
+     * reference into a STRING field gets stringified at runtime.
      */
     private static boolean isTypeCompatible(String expectedType, @Nullable String actualType) {
         if (actualType == null) {
@@ -261,7 +295,8 @@ class DataPillValidator {
     private static void processDataPillsInText(
         String text, String fieldPath, String currentTaskName, Map<String, PropertyInfo> taskOutput,
         List<String> taskNames, Map<String, String> taskNameToTypeMap, StringBuilder errors, StringBuilder warnings,
-        TaskValidationContext context, Map<String, JsonNode> allTasksMap, List<PropertyInfo> taskDefinition) {
+        TaskValidationContext context, Map<String, JsonNode> allTasksMap, List<PropertyInfo> taskDefinition,
+        JsonNode rootParametersJsonNode) {
 
         Matcher matcher = DATA_PILL_PATTERN.matcher(text);
 
@@ -275,11 +310,11 @@ class DataPillValidator {
             if (dataPillExpression.contains(".")) {
                 validatePropertyReference(
                     dataPillExpression, fieldPath, currentTaskName, taskOutput, taskNames, taskNameToTypeMap, errors,
-                    warnings, context, text, allTasksMap, taskDefinition);
+                    warnings, context, text, allTasksMap, taskDefinition, rootParametersJsonNode);
             } else {
                 validateTaskReference(
-                    dataPillExpression, fieldPath, taskOutput, taskNames, taskNameToTypeMap, errors, text,
-                    taskDefinition);
+                    dataPillExpression, fieldPath, taskOutput, taskNames, taskNameToTypeMap, errors, taskDefinition,
+                    rootParametersJsonNode);
             }
         }
     }
@@ -458,7 +493,7 @@ class DataPillValidator {
         String dataPillExpression, String fieldPath, String currentTaskName,
         Map<String, PropertyInfo> taskOutputMap, List<String> taskNames, Map<String, String> taskNameToTypeMap,
         StringBuilder errors, StringBuilder warnings, TaskValidationContext context, String text,
-        Map<String, JsonNode> allTasksMap, List<PropertyInfo> taskDefinition) {
+        Map<String, JsonNode> allTasksMap, List<PropertyInfo> taskDefinition, JsonNode rootParametersJsonNode) {
 
         String[] parts = dataPillExpression.split("\\.", 2);
         String referencedTaskName = parts[0];
@@ -490,7 +525,7 @@ class DataPillValidator {
             validatePropertyInOutput(
                 dataPillExpression, referencedTaskType, propertyName, fieldPath, taskOutputMap,
                 context.nodeOutputMap.get(referencedTaskName), errors, warnings, text, referencedTaskName, allTasksMap,
-                taskDefinition);
+                taskDefinition, rootParametersJsonNode);
         }
     }
 
@@ -498,12 +533,12 @@ class DataPillValidator {
         String dataPillExpression, String referencedTaskType, String propertyName, String fieldPath,
         Map<String, PropertyInfo> taskOutput, @Nullable PropertyInfo nodeOutputInfo, StringBuilder errors,
         StringBuilder warnings, String text, String referencedTaskName, Map<String, JsonNode> allTasksMap,
-        List<PropertyInfo> taskDefinition) {
+        List<PropertyInfo> taskDefinition, JsonNode rootParametersJsonNode) {
 
         // Special handling for loop tasks - they auto-generate 'item' output based on the 'items' parameter
         if (referencedTaskType.startsWith("loop/") && propertyName.startsWith("item")) {
             // Get the expected type from task definition if available
-            String expectedType = getExpectedTypeFromDefinition(fieldPath, taskDefinition);
+            String expectedType = getExpectedTypeFromDefinition(fieldPath, taskDefinition, rootParametersJsonNode);
 
             validateLoopItemTypes(
                 dataPillExpression, referencedTaskName, expectedType, allTasksMap, errors, text, taskOutput);
@@ -515,7 +550,7 @@ class DataPillValidator {
             if (PropertyUtils.checkPropertyExists(nodeOutputInfo, propertyName)) {
                 validateTypeCompatibility(
                     dataPillExpression, referencedTaskType, propertyName, fieldPath, nodeOutputInfo, errors, text,
-                    taskDefinition);
+                    taskDefinition, rootParametersJsonNode);
             } else {
                 StringUtils.appendWithNewline(
                     "Property '" + dataPillExpression + "' does not exist in the output of '" + referencedTaskType +
@@ -541,7 +576,7 @@ class DataPillValidator {
 
             validateTypeCompatibility(
                 dataPillExpression, referencedTaskType, propertyName, fieldPath, outputInfo, errors, text,
-                taskDefinition);
+                taskDefinition, rootParametersJsonNode);
         } else {
             StringUtils.appendWithNewline(
                 "Property '" + dataPillExpression + "' might not exist in the output of '" + referencedTaskType + "'",
@@ -557,7 +592,8 @@ class DataPillValidator {
      */
     private static void validateTaskReference(
         String dataPillExpression, String fieldPath, Map<String, PropertyInfo> taskOutput, List<String> taskNames,
-        Map<String, String> taskNameToTypeMap, StringBuilder errors, String text, List<PropertyInfo> taskDefinition) {
+        Map<String, String> taskNameToTypeMap, StringBuilder errors, List<PropertyInfo> taskDefinition,
+        JsonNode rootParametersJsonNode) {
 
         if (!taskNames.contains(dataPillExpression)) {
             StringUtils.appendWithNewline("Task '" + dataPillExpression + "' doesn't exits.", errors);
@@ -574,7 +610,8 @@ class DataPillValidator {
         PropertyInfo outputInfo = taskOutput.get(dataPillExpression);
 
         if (outputInfo != null) {
-            validateInputTypeCompatibility(dataPillExpression, fieldPath, outputInfo, errors, text, taskDefinition);
+            validateInputTypeCompatibility(
+                dataPillExpression, fieldPath, outputInfo, errors, taskDefinition, rootParametersJsonNode);
         }
     }
 
@@ -584,33 +621,33 @@ class DataPillValidator {
      * inputs have no nested properties to look up, the reference itself resolves to the scalar value.
      */
     private static void validateInputTypeCompatibility(
-        String dataPillExpression, String fieldPath, PropertyInfo outputInfo, StringBuilder errors, String text,
-        List<PropertyInfo> taskDefinition) {
+        String dataPillExpression, String fieldPath, PropertyInfo outputInfo, StringBuilder errors,
+        List<PropertyInfo> taskDefinition, JsonNode rootParametersJsonNode) {
 
         String actualType = outputInfo.type();
-        String expectedType = getExpectedTypeFromDefinition(fieldPath, taskDefinition);
+        String expectedType = getExpectedTypeFromDefinition(fieldPath, taskDefinition, rootParametersJsonNode);
 
-        if (expectedType != null && actualType != null && !isTypeCompatible(expectedType, actualType)) {
-            // Allow any type to be converted to string in interpolation
-            if ("string".equalsIgnoreCase(expectedType) && isStringWithMultipleDataPills(text)) {
-                return;
-            }
+        if (expectedType == null || actualType == null) {
+            return;
+        }
 
+        if (!isTypeCompatible(expectedType, actualType)) {
             StringUtils.appendWithNewline(
-                "Property '" + dataPillExpression + "' in output of 'inputs' is of type " + actualType.toLowerCase() +
-                    ", not " + expectedType.toLowerCase(),
+                "Input property '" + dataPillExpression + "' is of type " + actualType.toLowerCase() + ", not "
+                    + expectedType.toLowerCase(),
                 errors);
         }
     }
 
     private static void validateTypeCompatibility(
         String dataPillExpression, String referencedTaskType, String propertyName, String fieldPath,
-        PropertyInfo outputInfo, StringBuilder errors, String text, List<PropertyInfo> taskDefinition) {
+        PropertyInfo outputInfo, StringBuilder errors, String text, List<PropertyInfo> taskDefinition,
+        JsonNode rootParametersJsonNode) {
 
         String actualType = PropertyUtils.getPropertyType(outputInfo, propertyName);
 
         // Get the expected type from task definition if available
-        String expectedType = getExpectedTypeFromDefinition(fieldPath, taskDefinition);
+        String expectedType = getExpectedTypeFromDefinition(fieldPath, taskDefinition, rootParametersJsonNode);
 
         if (expectedType != null && actualType != null &&
             !isTypeCompatible(expectedType, actualType)) {
