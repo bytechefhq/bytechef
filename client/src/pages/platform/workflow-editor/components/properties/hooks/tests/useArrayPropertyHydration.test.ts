@@ -150,6 +150,98 @@ describe('useArrayProperty — hydration from currentNode.parameters', () => {
         expect(result.current.arrayItems).toHaveLength(2);
     });
 
+    it('does not crash when a nested condition array contains a null hole (issue #5402)', async () => {
+        hoisted.storeState.currentNode = {
+            componentName: 'condition',
+            parameters: {
+                conditions: [[{operation: 'CONTAINS', type: 'string', value1: '${var_1}', value2: 'x'}, null]],
+            },
+            workflowNodeName: 'condition_1',
+        };
+
+        const {useArrayProperty} = await import('../useArrayProperty');
+
+        const conditionTypeItems = ['boolean', 'dateTime', 'number', 'string'].map((typeName) => ({
+            name: typeName,
+            properties: [
+                {controlType: 'TEXT', name: 'value1', type: 'STRING'},
+                {controlType: 'SELECT', name: 'operation', type: 'STRING'},
+                {controlType: 'TEXT', name: 'value2', type: 'STRING'},
+            ],
+            type: 'OBJECT',
+        }));
+
+        const {result} = renderHook(() =>
+            useArrayProperty({
+                onDeleteClick: vi.fn(),
+                path: 'conditions[0]',
+                property: {
+                    controlType: 'ARRAY_BUILDER',
+                    items: conditionTypeItems,
+                    name: '0',
+                    type: 'ARRAY',
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                } as any,
+            })
+        );
+
+        await act(async () => {
+            await Promise.resolve();
+        });
+
+        const items = result.current.arrayItems as Array<{name: string}>;
+
+        expect(items).toHaveLength(1);
+        expect(items[0].name).toBe('0');
+    });
+
+    it('keeps original index-based names for items surviving a leading null hole (issue #5402)', async () => {
+        // The surviving item's name must stay aligned with its index in the saved
+        // array, otherwise its parameter path would point at the null slot.
+        hoisted.storeState.currentNode = {
+            componentName: 'condition',
+            parameters: {
+                conditions: [[null, {operation: 'CONTAINS', type: 'string', value1: '${var_1}', value2: 'x'}]],
+            },
+            workflowNodeName: 'condition_1',
+        };
+
+        const {useArrayProperty} = await import('../useArrayProperty');
+
+        const conditionTypeItems = ['boolean', 'dateTime', 'number', 'string'].map((typeName) => ({
+            name: typeName,
+            properties: [
+                {controlType: 'TEXT', name: 'value1', type: 'STRING'},
+                {controlType: 'SELECT', name: 'operation', type: 'STRING'},
+                {controlType: 'TEXT', name: 'value2', type: 'STRING'},
+            ],
+            type: 'OBJECT',
+        }));
+
+        const {result} = renderHook(() =>
+            useArrayProperty({
+                onDeleteClick: vi.fn(),
+                path: 'conditions[0]',
+                property: {
+                    controlType: 'ARRAY_BUILDER',
+                    items: conditionTypeItems,
+                    name: '0',
+                    type: 'ARRAY',
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                } as any,
+            })
+        );
+
+        await act(async () => {
+            await Promise.resolve();
+        });
+
+        const items = result.current.arrayItems as Array<{name: string}>;
+
+        expect(items).toHaveLength(1);
+        expect(items[0].name).toBe('1');
+    });
+
     it('hydrates three STRING items from parameters.value on mount (var component scenario)', async () => {
         // This mirrors the workflow JSON from the bug report:
         //   parameters: {type: 'ARRAY', value: ['www', 'wqewqe', 'rrrr']}
