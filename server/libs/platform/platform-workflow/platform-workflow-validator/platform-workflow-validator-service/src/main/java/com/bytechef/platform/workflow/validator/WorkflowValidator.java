@@ -472,14 +472,6 @@ public class WorkflowValidator {
         }
     }
 
-    /**
-     * Validates the workflow's top-level inputs and registers them so they can be referenced from tasks via
-     * {@code ${inputName}}. Inputs are optional, unstructured, single-value nodes: unlike tasks and triggers they have
-     * no {@code parameters} and no nested output properties, so their JSON nodes are kept out of {@code taskJsonNodes}
-     * to avoid full task structure validation, and their output is registered directly as a scalar {@link PropertyInfo}
-     * keyed by their {@code name} (each input has its own type, unlike tasks/triggers which share one entry per
-     * component type).
-     */
     private static void processInputs(
         Map<String, @Nullable PropertyInfo> taskOutputMap, JsonNode workflowJsonNode, List<JsonNode> inputJsonNodes,
         StringBuilder errors) {
@@ -524,10 +516,6 @@ public class WorkflowValidator {
         }
     }
 
-    /**
-     * Validates a single input's fields. Names and labels have no format restrictions, they only need to be present
-     * strings; {@code type} must be one of {@link #VALID_INPUT_TYPES}.
-     */
     private static void validateInputFields(JsonNode inputJsonNode, StringBuilder errors) {
         String name = "";
 
@@ -584,12 +572,6 @@ public class WorkflowValidator {
         }
     }
 
-    /**
-     * Returns the node names (the trigger plus all tasks, including tasks nested inside condition, loop, branch,
-     * parallel, each, fork-join and on-error dispatchers) that occur more than once in the given workflow JSON. Node
-     * names are global ids of workflow nodes, so a duplicate name produces two nodes with the same id and a broken,
-     * unrenderable graph. A malformed workflow yields an empty list (it is reported by structure validation, not here).
-     */
     public static List<String> getDuplicateNodeNames(String workflow) {
         try {
             return getDuplicateNodeNames(com.bytechef.commons.util.JsonUtils.readTree(workflow));
@@ -600,6 +582,16 @@ public class WorkflowValidator {
 
     static List<String> getDuplicateNodeNames(JsonNode workflowJsonNode) {
         List<String> nodeNames = new ArrayList<>();
+
+        JsonNode inputsJsonNode = workflowJsonNode.get("inputs");
+
+        if (inputsJsonNode != null && inputsJsonNode.isArray()) {
+            for (JsonNode inputJsonNode : inputsJsonNode) {
+                if (inputJsonNode.isObject()) {
+                    collectNodeName(inputJsonNode, nodeNames);
+                }
+            }
+        }
 
         JsonNode triggersJsonNode = workflowJsonNode.get("triggers");
 
