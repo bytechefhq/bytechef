@@ -1,0 +1,3 @@
+query PermissionScopes {
+    permissionScopes
+}

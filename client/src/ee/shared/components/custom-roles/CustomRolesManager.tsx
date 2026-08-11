@@ -1,7 +1,18 @@
 import Button from '@/components/Button/Button';
 import {Input} from '@/components/Input/Input';
 import {Checkbox} from '@/components/ui/checkbox';
+import {
+    Dialog,
+    DialogClose,
+    DialogCloseButton,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
+import Header from '@/shared/layout/Header';
+import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {
     useCreateCustomRoleMutation,
     useCustomRolesQuery,
@@ -9,22 +20,15 @@ import {
     usePermissionScopesQuery,
     useUpdateCustomRoleMutation,
 } from '@/shared/middleware/graphql';
+import {getRoleLabel} from '@/shared/util/role-utils';
 import {useQueryClient} from '@tanstack/react-query';
 import {PencilIcon, Trash2Icon} from 'lucide-react';
 import {useState} from 'react';
 
-interface CustomRolesManagerPropsI {
-    /**
-     * The workspace whose roles are being managed, or `null` for the tenant-global tier. The same value is sent on
-     * every mutation, which is what the server tiers authorization on — so this single prop decides both what the
-     * list contains and what the caller is claiming to be.
-     */
-    workspaceId: string | null;
-}
-
-const CustomRolesManager = ({workspaceId}: CustomRolesManagerPropsI) => {
+const CustomRolesManager = () => {
     const [actionError, setActionError] = useState<string | null>(null);
     const [description, setDescription] = useState('');
+    const [dialogOpen, setDialogOpen] = useState(false);
     const [editingRoleId, setEditingRoleId] = useState<string | null>(null);
     const [name, setName] = useState('');
     const [selectedScopes, setSelectedScopes] = useState<string[]>([]);
@@ -37,8 +41,8 @@ const CustomRolesManager = ({workspaceId}: CustomRolesManagerPropsI) => {
 
     const permissionScopes = permissionScopesData?.permissionScopes ?? [];
 
-    // With a workspace: that workspace's roles plus the tenant-global ones. Without: every role in the tenant.
-    const {data: rolesData} = useCustomRolesQuery({workspaceId});
+    // Every custom role in the tenant — roles are tenant-global and assignable in any workspace.
+    const {data: rolesData} = useCustomRolesQuery({});
 
     const customRoles = rolesData?.customRoles ?? [];
 
@@ -52,6 +56,7 @@ const CustomRolesManager = ({workspaceId}: CustomRolesManagerPropsI) => {
 
     const invalidateCustomRoles = () => {
         resetForm();
+        setDialogOpen(false);
         queryClient.invalidateQueries({queryKey: ['CustomRoles']});
     };
 
@@ -86,11 +91,11 @@ const CustomRolesManager = ({workspaceId}: CustomRolesManagerPropsI) => {
         if (editingRoleId) {
             updateCustomRoleMutation.mutate({
                 id: editingRoleId,
-                input: {description, name, scopes: selectedScopes, workspaceId},
+                input: {description, name, scopes: selectedScopes},
             });
         } else {
             createCustomRoleMutation.mutate({
-                input: {description, name, scopes: selectedScopes, workspaceId},
+                input: {description, name, scopes: selectedScopes},
             });
         }
     };
@@ -101,105 +106,131 @@ const CustomRolesManager = ({workspaceId}: CustomRolesManagerPropsI) => {
         setName(customRole.name);
         setDescription(customRole.description ?? '');
         setSelectedScopes([...customRole.scopes]);
+        setDialogOpen(true);
     };
 
-    /**
-     * A role is editable from the tier that owns it, and only that tier. On a workspace page the global roles are
-     * read-only (they may be in use by every other workspace); on the tenant page the workspace-owned ones are. The
-     * server enforces the same rule, so this only avoids offering a control that would fail.
-     */
-    const isOwnedHere = (roleWorkspaceId: string | null | undefined) => (roleWorkspaceId ?? null) === workspaceId;
+    const handleCreate = () => {
+        resetForm();
+        setDialogOpen(true);
+    };
+
+    // Closing discards whatever was typed. Keeping it would mean the next "Create Role" reopens someone's abandoned
+    // edit, and worse, reopens it still carrying editingRoleId — so Save would overwrite a role they meant to leave.
+    const handleDialogOpenChange = (open: boolean) => {
+        setDialogOpen(open);
+
+        if (!open) {
+            resetForm();
+        }
+    };
 
     return (
-        <div className="w-full space-y-6 p-4">
-            {actionError && (
-                <div className="rounded-md border border-destructive/50 p-3 text-sm text-destructive" role="alert">
-                    {actionError}
-                </div>
-            )}
+        <LayoutContainer
+            header={
+                <Header
+                    centerTitle
+                    description="Roles apply to every workspace in the tenant and can be assigned to any member."
+                    position="main"
+                    right={<Button onClick={handleCreate}>Create Role</Button>}
+                    title="Custom Roles"
+                />
+            }
+            leftSidebarOpen={false}
+        >
+            <div className="w-full space-y-6 p-4">
+                {actionError && (
+                    <div className="rounded-md border border-destructive/50 p-3 text-sm text-destructive" role="alert">
+                        {actionError}
+                    </div>
+                )}
 
-            <fieldset className="space-y-2 border-0 p-0">
-                <legend className="text-sm font-medium">
-                    {editingRoleId ? 'Edit role' : workspaceId ? 'Create a role for this workspace' : 'Create a role'}
-                </legend>
+                <Dialog onOpenChange={handleDialogOpenChange} open={dialogOpen}>
+                    <DialogContent className="max-w-3xl">
+                        <DialogHeader>
+                            <DialogTitle>{editingRoleId ? 'Edit Role' : 'Create Role'}</DialogTitle>
 
-                <p className="text-xs text-muted-foreground">
-                    {workspaceId
-                        ? 'Roles created here belong to this workspace. Roles that apply everywhere are managed in tenant settings.'
-                        : 'Roles created here apply to every workspace in the tenant and can be assigned anywhere.'}
-                </p>
+                            <DialogCloseButton />
+                        </DialogHeader>
 
-                <div className="flex items-center gap-2">
-                    <Input
-                        className="max-w-60"
-                        onChange={(event) => setName(event.target.value)}
-                        placeholder="Role name"
-                        value={name}
-                    />
+                        <div className="space-y-4">
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium">Name</label>
 
-                    <Input
-                        className="max-w-80"
-                        onChange={(event) => setDescription(event.target.value)}
-                        placeholder="Description (optional)"
-                        value={description}
-                    />
+                                <Input
+                                    onChange={(event) => setName(event.target.value)}
+                                    placeholder="Role name"
+                                    value={name}
+                                />
+                            </div>
 
-                    <Button disabled={!name || selectedScopes.length === 0} onClick={handleSubmit}>
-                        {editingRoleId ? 'Save' : 'Create'}
-                    </Button>
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium">Description</label>
 
-                    {editingRoleId && (
-                        <Button onClick={resetForm} variant="outline">
-                            Cancel
-                        </Button>
-                    )}
-                </div>
+                                <Input
+                                    onChange={(event) => setDescription(event.target.value)}
+                                    placeholder="Description (optional)"
+                                    value={description}
+                                />
+                            </div>
 
-                <div className="flex flex-wrap gap-3 pt-2">
-                    {permissionScopes.map((scope) => (
-                        <label className="flex items-center gap-2 text-sm" key={scope}>
-                            <Checkbox
-                                checked={selectedScopes.includes(scope)}
-                                onCheckedChange={() => handleScopeToggle(scope)}
-                            />
+                            <fieldset className="space-y-2 border-0 p-0">
+                                <legend className="text-sm font-medium">Permissions</legend>
 
-                            {scope}
-                        </label>
-                    ))}
-                </div>
-            </fieldset>
+                                <div className="grid max-h-72 grid-cols-2 gap-x-6 gap-y-2 overflow-y-auto pt-1">
+                                    {permissionScopes.map((scope) => (
+                                        <label className="flex items-center gap-2 text-sm" key={scope}>
+                                            <Checkbox
+                                                checked={selectedScopes.includes(scope)}
+                                                onCheckedChange={() => handleScopeToggle(scope)}
+                                            />
 
-            <Table>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead>Name</TableHead>
+                                            {getRoleLabel(scope)}
+                                        </label>
+                                    ))}
+                                </div>
+                            </fieldset>
+                        </div>
 
-                        <TableHead>Scope</TableHead>
+                        <DialogFooter>
+                            <DialogClose asChild>
+                                <Button variant="outline">Cancel</Button>
+                            </DialogClose>
 
-                        <TableHead>Permissions</TableHead>
+                            <Button disabled={!name || selectedScopes.length === 0} onClick={handleSubmit}>
+                                {editingRoleId ? 'Save' : 'Create'}
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
 
-                        <TableHead />
-                    </TableRow>
-                </TableHeader>
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>Name</TableHead>
 
-                <TableBody>
-                    {customRoles.map((customRole) => (
-                        <TableRow key={customRole.id}>
-                            <TableCell>
-                                <div>{customRole.name}</div>
+                            <TableHead>Permissions</TableHead>
 
-                                {customRole.description && (
-                                    <div className="text-xs text-muted-foreground">{customRole.description}</div>
-                                )}
-                            </TableCell>
+                            <TableHead />
+                        </TableRow>
+                    </TableHeader>
 
-                            <TableCell>{customRole.workspaceId ? 'One workspace' : 'All workspaces'}</TableCell>
+                    <TableBody>
+                        {customRoles.map((customRole) => (
+                            <TableRow key={customRole.id}>
+                                <TableCell>
+                                    <div>{customRole.name}</div>
 
-                            <TableCell className="text-xs">{customRole.scopes.join(', ')}</TableCell>
+                                    {customRole.description && (
+                                        <div className="text-xs text-muted-foreground">{customRole.description}</div>
+                                    )}
+                                </TableCell>
 
-                            <TableCell>
-                                {isOwnedHere(customRole.workspaceId) && (
-                                    <div className="flex items-center gap-1">
+                                <TableCell className="text-xs">
+                                    {customRole.scopes.map(getRoleLabel).join(', ')}
+                                </TableCell>
+
+                                <TableCell className="text-right">
+                                    <div className="flex items-center justify-end gap-1">
                                         <Button
                                             icon={<PencilIcon />}
                                             onClick={() => handleEdit(customRole)}
@@ -211,19 +242,18 @@ const CustomRolesManager = ({workspaceId}: CustomRolesManagerPropsI) => {
                                             onClick={() =>
                                                 deleteCustomRoleMutation.mutate({
                                                     id: String(customRole.id),
-                                                    workspaceId,
                                                 })
                                             }
                                             variant="ghost"
                                         />
                                     </div>
-                                )}
-                            </TableCell>
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-        </div>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </div>
+        </LayoutContainer>
     );
 };
 

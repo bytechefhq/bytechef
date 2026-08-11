@@ -133,7 +133,6 @@ const SigningKeys = lazy(() => import('@/ee/pages/settings/embedded/signing-keys
 const AiAgents = lazy(() => import('@/ee/pages/settings/automation/ai/agents/AiAgents'));
 const WorkspaceApiKeys = lazy(() => import('@/ee/pages/settings/automation/workspace-api-keys/WorkspaceApiKeys'));
 const WorkspaceUsers = lazy(() => import('@/ee/pages/settings/automation/users/WorkspaceUsers'));
-const CustomRoles = lazy(() => import('@/ee/pages/settings/automation/custom-roles/CustomRoles'));
 const GlobalCustomRoles = lazy(() => import('@/ee/pages/settings/platform/custom-roles/GlobalCustomRoles'));
 const Workspaces = lazy(() => import('@/ee/pages/settings/automation/workspaces/Workspaces'));
 const OrganizationConnections = lazy(
@@ -218,20 +217,6 @@ const currentWorkspaceSettingsRoutes = {
             path: 'workspace-users',
         },
         {
-            // Same gate as Users, and for the same reason: a workspace admin need not be a tenant admin. The page
-            // checks WORKSPACE_MEMBER_MANAGE for the current workspace.
-            element: (
-                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                    <EEVersion>
-                        <LazyLoadWrapper>
-                            <CustomRoles />
-                        </LazyLoadWrapper>
-                    </EEVersion>
-                </PrivateRoute>
-            ),
-            path: 'custom-roles',
-        },
-        {
             element: (
                 <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
                     <EEVersion>
@@ -291,10 +276,6 @@ const currentWorkspaceSettingsRoutes = {
         {
             href: 'workspace-users',
             title: 'Users',
-        },
-        {
-            href: 'custom-roles',
-            title: 'Custom Roles',
         },
         {
             href: 'git-configuration',
@@ -357,9 +338,6 @@ const platformSettingsRoutes = {
         },
         {
             // Tenant-global roles are assignable in every workspace, so managing them is a tenant-wide act.
-            //
-            // Distinct from the workspace page's 'custom-roles': both route sets are spread into the same children
-            // array under /automation/settings, so a shared path would let the first one shadow the other.
             element: (
                 <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
                     <EEVersion>

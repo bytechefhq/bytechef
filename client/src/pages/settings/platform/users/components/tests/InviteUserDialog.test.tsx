@@ -8,8 +8,9 @@ const hoisted = vi.hoisted(() => {
         handleClose: vi.fn(),
         handleEmailChange: vi.fn(),
         handleInvite: vi.fn(),
-        handleRegeneratePassword: vi.fn(),
         handleRoleChange: vi.fn(),
+        handleWorkspaceRoleChange: vi.fn(),
+        handleWorkspaceToggle: vi.fn(),
         mockUseInviteUserDialog: vi.fn(),
     };
 });
@@ -24,13 +25,19 @@ const defaultMockReturn = {
     handleEmailChange: hoisted.handleEmailChange,
     handleInvite: hoisted.handleInvite,
     handleOpen: vi.fn(),
-    handleRegeneratePassword: hoisted.handleRegeneratePassword,
+    handleOpenChange: vi.fn(),
     handleRoleChange: hoisted.handleRoleChange,
+    handleWorkspaceRoleChange: hoisted.handleWorkspaceRoleChange,
+    handleWorkspaceToggle: hoisted.handleWorkspaceToggle,
     inviteDisabled: false,
     inviteEmail: 'test@example.com',
-    invitePassword: 'GeneratedPass1',
     inviteRole: 'ROLE_ADMIN',
+    inviteWorkspaces: [],
     open: true,
+    workspaces: [
+        {id: '1', name: 'Engineering'},
+        {id: '2', name: 'Marketing'},
+    ],
 };
 
 beforeEach(() => {
@@ -54,14 +61,17 @@ describe('InviteUserDialog', () => {
         expect(screen.getByText('Invite User')).toBeInTheDocument();
     });
 
-    it('should display the dialog description', () => {
+    it('should describe the claim link rather than a password', () => {
         renderInviteUserDialog();
 
-        expect(
-            screen.getByText(
-                'Enter the user email. A strong password is pre-generated according to the security rules. This password will be included in the invitation email.'
-            )
-        ).toBeInTheDocument();
+        expect(screen.getByText(/set their own password/)).toBeInTheDocument();
+    });
+
+    it('should not offer any password field', () => {
+        renderInviteUserDialog();
+
+        expect(screen.queryByText('Password')).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Regenerate'})).not.toBeInTheDocument();
     });
 
     it('should display Email label', () => {
@@ -70,16 +80,26 @@ describe('InviteUserDialog', () => {
         expect(screen.getByText('Email')).toBeInTheDocument();
     });
 
-    it('should display Password label', () => {
-        renderInviteUserDialog();
-
-        expect(screen.getByText('Password')).toBeInTheDocument();
-    });
-
     it('should display Role label', () => {
         renderInviteUserDialog();
 
         expect(screen.getByText('Role')).toBeInTheDocument();
+    });
+
+    it('should list the available workspaces', () => {
+        renderInviteUserDialog();
+
+        expect(screen.getByText('Workspaces')).toBeInTheDocument();
+        expect(screen.getByText('Engineering')).toBeInTheDocument();
+        expect(screen.getByText('Marketing')).toBeInTheDocument();
+    });
+
+    it('should call handleWorkspaceToggle when selecting a workspace', async () => {
+        renderInviteUserDialog();
+
+        await userEvent.click(screen.getAllByRole('checkbox')[0]);
+
+        expect(hoisted.handleWorkspaceToggle).toHaveBeenCalledWith('1');
     });
 
     it('should render Cancel and Invite buttons', () => {
@@ -89,70 +109,41 @@ describe('InviteUserDialog', () => {
         expect(screen.getByRole('button', {name: 'Invite'})).toBeInTheDocument();
     });
 
-    it('should render Regenerate button', () => {
-        renderInviteUserDialog();
-
-        expect(screen.getByRole('button', {name: 'Regenerate'})).toBeInTheDocument();
-    });
-
     it('should call handleInvite when clicking Invite button', async () => {
         renderInviteUserDialog();
 
-        const inviteButton = screen.getByRole('button', {name: 'Invite'});
-        await userEvent.click(inviteButton);
+        await userEvent.click(screen.getByRole('button', {name: 'Invite'}));
 
         expect(hoisted.handleInvite).toHaveBeenCalledTimes(1);
-    });
-
-    it('should call handleRegeneratePassword when clicking Regenerate button', async () => {
-        renderInviteUserDialog();
-
-        const regenerateButton = screen.getByRole('button', {name: 'Regenerate'});
-        await userEvent.click(regenerateButton);
-
-        expect(hoisted.handleRegeneratePassword).toHaveBeenCalledTimes(1);
     });
 
     it('should call handleClose when clicking Cancel button', async () => {
         renderInviteUserDialog();
 
-        const cancelButton = screen.getByRole('button', {name: 'Cancel'});
-        await userEvent.click(cancelButton);
+        await userEvent.click(screen.getByRole('button', {name: 'Cancel'}));
 
-        expect(hoisted.handleClose).toHaveBeenCalled();
-    });
-
-    it('should display password value', () => {
-        renderInviteUserDialog();
-
-        const passwordInput = screen.getByDisplayValue('GeneratedPass1');
-
-        expect(passwordInput).toBeInTheDocument();
+        expect(hoisted.handleClose).toHaveBeenCalledTimes(1);
     });
 
     it('should display current email value in input', () => {
         renderInviteUserDialog();
 
-        const emailInput = screen.getByDisplayValue('test@example.com');
+        expect(screen.getByDisplayValue('test@example.com')).toBeInTheDocument();
+    });
 
-        expect(emailInput).toBeInTheDocument();
+    it('should enable Invite with no workspaces selected', () => {
+        renderInviteUserDialog();
+
+        // An invite carrying no workspaces is valid: it provisions an account belonging to none, which is how a
+        // second tenant admin is created.
+        expect(screen.getByRole('button', {name: 'Invite'})).toBeEnabled();
     });
 });
 
 describe('InviteUserDialog closed state', () => {
     beforeEach(() => {
         hoisted.mockUseInviteUserDialog.mockReturnValue({
-            authorities: ['ROLE_ADMIN', 'ROLE_USER'],
-            handleClose: hoisted.handleClose,
-            handleEmailChange: hoisted.handleEmailChange,
-            handleInvite: hoisted.handleInvite,
-            handleOpen: vi.fn(),
-            handleRegeneratePassword: hoisted.handleRegeneratePassword,
-            handleRoleChange: hoisted.handleRoleChange,
-            inviteDisabled: true,
-            inviteEmail: '',
-            invitePassword: 'GeneratedPass1',
-            inviteRole: null,
+            ...defaultMockReturn,
             open: false,
         });
     });
@@ -167,26 +158,14 @@ describe('InviteUserDialog closed state', () => {
 describe('InviteUserDialog inviteDisabled state', () => {
     beforeEach(() => {
         hoisted.mockUseInviteUserDialog.mockReturnValue({
-            authorities: ['ROLE_ADMIN', 'ROLE_USER'],
-            handleClose: hoisted.handleClose,
-            handleEmailChange: hoisted.handleEmailChange,
-            handleInvite: hoisted.handleInvite,
-            handleOpen: vi.fn(),
-            handleRegeneratePassword: hoisted.handleRegeneratePassword,
-            handleRoleChange: hoisted.handleRoleChange,
+            ...defaultMockReturn,
             inviteDisabled: true,
-            inviteEmail: '',
-            invitePassword: 'GeneratedPass1',
-            inviteRole: 'ROLE_ADMIN',
-            open: true,
         });
     });
 
-    it('should disable Invite button when inviteDisabled is true', () => {
+    it('should disable the Invite button', () => {
         renderInviteUserDialog();
 
-        const inviteButton = screen.getByRole('button', {name: 'Invite'});
-
-        expect(inviteButton).toBeDisabled();
+        expect(screen.getByRole('button', {name: 'Invite'})).toBeDisabled();
     });
 });

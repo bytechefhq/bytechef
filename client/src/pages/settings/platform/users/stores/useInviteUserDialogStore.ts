@@ -1,38 +1,42 @@
-import {generatePassword} from '@/pages/settings/platform/users/util/password-utils';
+import {WorkspaceAssignmentInput} from '@/shared/middleware/graphql';
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
 interface InviteUserDialogStateI {
     inviteEmail: string;
-    invitePassword: string;
     inviteRole: string | null;
+    inviteWorkspaces: WorkspaceAssignmentInput[];
     open: boolean;
-    regeneratePassword: () => void;
+    removeInviteWorkspace: (workspaceId: string) => void;
     reset: () => void;
     setInviteEmail: (email: string) => void;
     setInviteRole: (role: string) => void;
+    setInviteWorkspaceRole: (workspaceId: string, roleName: string) => void;
     setOpen: () => void;
+    toggleInviteWorkspace: (workspaceId: string, roleName: string) => void;
 }
 
 export const useInviteUserDialogStore = create<InviteUserDialogStateI>()(
     devtools(
         (set) => ({
             inviteEmail: '',
-            invitePassword: generatePassword(),
             inviteRole: null,
+            inviteWorkspaces: [],
             open: false,
 
-            regeneratePassword: () => {
-                set(() => ({
-                    invitePassword: generatePassword(),
+            removeInviteWorkspace: (workspaceId: string) => {
+                set((state) => ({
+                    inviteWorkspaces: state.inviteWorkspaces.filter(
+                        (workspace) => workspace.workspaceId !== workspaceId
+                    ),
                 }));
             },
 
             reset: () => {
                 set(() => ({
                     inviteEmail: '',
-                    invitePassword: generatePassword(),
                     inviteRole: null,
+                    inviteWorkspaces: [],
                     open: false,
                 }));
             },
@@ -49,10 +53,30 @@ export const useInviteUserDialogStore = create<InviteUserDialogStateI>()(
                 }));
             },
 
+            setInviteWorkspaceRole: (workspaceId: string, roleName: string) => {
+                set((state) => ({
+                    inviteWorkspaces: state.inviteWorkspaces.map((workspace) =>
+                        workspace.workspaceId === workspaceId ? {...workspace, roleName} : workspace
+                    ),
+                }));
+            },
+
             setOpen: () => {
                 set(() => ({
                     open: true,
                 }));
+            },
+
+            toggleInviteWorkspace: (workspaceId: string, roleName: string) => {
+                set((state) => {
+                    const selected = state.inviteWorkspaces.some((workspace) => workspace.workspaceId === workspaceId);
+
+                    return {
+                        inviteWorkspaces: selected
+                            ? state.inviteWorkspaces.filter((workspace) => workspace.workspaceId !== workspaceId)
+                            : [...state.inviteWorkspaces, {roleName, workspaceId}],
+                    };
+                });
             },
         }),
         {

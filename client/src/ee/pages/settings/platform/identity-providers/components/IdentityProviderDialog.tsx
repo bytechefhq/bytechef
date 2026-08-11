@@ -13,6 +13,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import {Textarea} from '@/components/ui/textarea';
+import {getRoleLabel} from '@/shared/util/role-utils';
 import {DownloadIcon, XIcon} from 'lucide-react';
 import {useMemo} from 'react';
 
@@ -331,9 +332,9 @@ const IdentityProviderDialog = () => {
                                 </SelectTrigger>
 
                                 <SelectContent>
-                                    <SelectItem value="ROLE_USER">ROLE_USER</SelectItem>
+                                    <SelectItem value="ROLE_USER">{getRoleLabel('ROLE_USER')}</SelectItem>
 
-                                    <SelectItem value="ROLE_ADMIN">ROLE_ADMIN</SelectItem>
+                                    <SelectItem value="ROLE_ADMIN">{getRoleLabel('ROLE_ADMIN')}</SelectItem>
                                 </SelectContent>
                             </Select>
                         </fieldset>

@@ -1,0 +1,8 @@
+query CustomRoles($workspaceId: ID) {
+    customRoles(workspaceId: $workspaceId) {
+        id
+        name
+        description
+        scopes
+    }
+}

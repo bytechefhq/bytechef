@@ -1,3 +1,4 @@
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {fireEvent, render, screen} from '@testing-library/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -37,14 +38,14 @@ vi.mock('@tanstack/react-query', () => ({
     useQueryClient: () => ({invalidateQueries: invalidateQueriesMock}),
 }));
 
-vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({
-    useWorkspaceStore: vi.fn(() => 123),
-}));
-
 describe('AiGuardrails', () => {
     beforeEach(() => {
         mutateMock.mockClear();
         invalidateQueriesMock.mockClear();
+
+        // The real store rather than a mocked hook: a mock keeps passing if the state shape changes underneath the
+        // page's selector, which is the regression a page test exists to catch.
+        useWorkspaceStore.setState({currentWorkspaceId: 123});
 
         queryMock.mockReturnValue({
             data: {aiGuardrailsWorkspaceSettings: settings},

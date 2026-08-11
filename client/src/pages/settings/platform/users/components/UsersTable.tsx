@@ -3,6 +3,7 @@ import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/c
 import UsersTableSkeleton from '@/pages/settings/platform/users/components/UsersTableSkeleton';
 import useDeleteUserAlertDialog from '@/pages/settings/platform/users/components/hooks/useDeleteUserAlertDialog';
 import useEditUserDialog from '@/pages/settings/platform/users/components/hooks/useEditUserDialog';
+import {getRoleLabel} from '@/shared/util/role-utils';
 import {EditIcon, Trash2Icon} from 'lucide-react';
 
 import useUsersTable from './hooks/useUsersTable';
@@ -57,7 +58,9 @@ const UsersTable = ({pageNumber}: UsersTableProps) => {
                                     {[user?.firstName, user?.lastName].filter(Boolean).join(' ')}
                                 </TableCell>
 
-                                <TableCell className="whitespace-nowrap">{user?.authorities?.[0] ?? ''}</TableCell>
+                                <TableCell className="whitespace-nowrap">
+                                    {user?.authorities?.[0] ? getRoleLabel(user.authorities[0]) : ''}
+                                </TableCell>
 
                                 <TableCell className="whitespace-nowrap">
                                     {user?.activated ? 'Active' : 'Pending'}

@@ -4,6 +4,8 @@ query WorkspaceUsers($workspaceId: ID!) {
         workspaceId
         userId
         workspaceRole
+        customRoleId
+        inherited
         user {
             email
             firstName
