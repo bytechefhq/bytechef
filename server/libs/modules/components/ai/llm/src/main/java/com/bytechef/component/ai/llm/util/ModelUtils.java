@@ -161,18 +161,40 @@ public class ModelUtils {
             int closeBrace = message.lastIndexOf("}");
 
             if (openBrace >= 0 && closeBrace > openBrace) {
-                String providerMessage = context.json(
-                    json -> json.read(
-                        message.substring(openBrace, closeBrace + 1), "error.message",
-                        new TypeReference<>() {}));
+                String providerMessage = extractProviderErrorMessage(
+                    message.substring(openBrace, closeBrace + 1), context);
 
-                throw new ProviderException(providerMessage);
+                if (providerMessage != null) {
+                    throw new ProviderException(providerMessage);
+                }
             }
 
             throw new ProviderException(message);
         }
 
         return new ChatActionResult(response, guardrailMetadata);
+    }
+
+    private static @Nullable String extractProviderErrorMessage(String errorBody, Context context) {
+        try {
+            Object errorJson = context.json(json -> json.read(errorBody, new TypeReference<>() {}));
+
+            if (errorJson instanceof Map<?, ?> errorMap) {
+                if (errorMap.get("error") instanceof Map<?, ?> nestedErrorMap &&
+                    nestedErrorMap.get("message") instanceof String nestedMessage) {
+
+                    return nestedMessage;
+                }
+
+                if (errorMap.get("message") instanceof String topLevelMessage) {
+                    return topLevelMessage;
+                }
+            }
+
+            return null;
+        } catch (RuntimeException runtimeException) {
+            return null;
+        }
     }
 
     /**
