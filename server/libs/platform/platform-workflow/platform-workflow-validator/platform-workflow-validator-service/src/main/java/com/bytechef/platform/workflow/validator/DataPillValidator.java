@@ -27,9 +27,6 @@ import org.jspecify.annotations.Nullable;
 import tools.jackson.databind.JsonNode;
 
 /**
- * Handles validation of data pill expressions in workflow task parameters. Data pills allow tasks to reference outputs
- * from previous tasks in the workflow.
- *
  * @author Marko Kriskovic
  */
 class DataPillValidator {
@@ -39,10 +36,6 @@ class DataPillValidator {
     private DataPillValidator() {
     }
 
-    /**
-     * Validates data pills in a task's parameters, with access to all tasks for loop type validation, task definition
-     * for type checking, and optional task order validation skipping.
-     */
     public static void validateTaskDataPills(
         JsonNode taskJsonNode, ValidationContext context, List<PropertyInfo> taskDefinition,
         boolean skipTaskOrderValidation) {
@@ -115,9 +108,6 @@ class DataPillValidator {
         }
     }
 
-    /**
-     * Gets the expected type for a field path from the task definition.
-     */
     @Nullable
     private static String getExpectedTypeFromDefinition(
         @Nullable String fieldPath, @Nullable List<PropertyInfo> taskDefinition,
@@ -152,13 +142,6 @@ class DataPillValidator {
         return null;
     }
 
-    /**
-     * Finds the property named {@code name} that is actually active given the current parameter values. Task
-     * definitions can declare several properties sharing the same name, each gated by a different displayCondition (a
-     * discriminated union, e.g. var/v1/set's "value" has one entry per "type"); only the one whose condition evaluates
-     * true against the task's root parameters is the real match. A candidate without a displayCondition is kept as a
-     * fallback in case none of the conditional candidates match.
-     */
     @Nullable
     private static PropertyInfo findActiveProperty(
         String name, List<PropertyInfo> properties, @Nullable JsonNode rootParametersJsonNode) {
@@ -211,9 +194,6 @@ class DataPillValidator {
         return false;
     }
 
-    /**
-     * Checks if the given path corresponds to an array that contains TASK type elements.
-     */
     private static boolean isTaskTypeArray(@Nullable String currentPath, @Nullable List<PropertyInfo> taskDefinition) {
         if (taskDefinition == null || currentPath == null || currentPath.isEmpty()) {
             return false;
@@ -260,10 +240,6 @@ class DataPillValidator {
         return false;
     }
 
-    /**
-     * Checks if two types are compatible for data pill assignments. Any type is treated as STRING-compatible since a
-     * reference into a STRING field gets stringified at runtime.
-     */
     private static boolean isTypeCompatible(String expectedType, @Nullable String actualType) {
         if (actualType == null) {
             return true;
@@ -281,9 +257,6 @@ class DataPillValidator {
         return expectedType.equalsIgnoreCase("string");
     }
 
-    /**
-     * Maps PropertyInfo type strings to standardized lowercase format.
-     */
     private static String mapTypeToString(@Nullable String propertyType) {
         if (propertyType == null) {
             return "unknown";
@@ -584,12 +557,6 @@ class DataPillValidator {
         }
     }
 
-    /**
-     * Validates a bare (dot-free) data pill reference. Most bare references name a task/trigger and only need an
-     * existence check, since their output is a structured object rather than a single value. Inputs are the exception:
-     * they carry a single scalar value, so a bare reference to an input is itself a property access and gets checked
-     * against the expected parameter type, the same way a dot-notation property reference would.
-     */
     private static void validateTaskReference(
         String dataPillExpression, String fieldPath, Map<String, PropertyInfo> taskOutput, List<String> taskNames,
         Map<String, String> taskNameToTypeMap, StringBuilder errors, List<PropertyInfo> taskDefinition,
@@ -615,11 +582,6 @@ class DataPillValidator {
         }
     }
 
-    /**
-     * Validates the type of a bare input reference against the expected parameter type. Unlike
-     * {@link #validateTypeCompatibility}, the input's own {@link PropertyInfo#type()} is the actual type directly:
-     * inputs have no nested properties to look up, the reference itself resolves to the scalar value.
-     */
     private static void validateInputTypeCompatibility(
         String dataPillExpression, String fieldPath, PropertyInfo outputInfo, StringBuilder errors,
         List<PropertyInfo> taskDefinition, JsonNode rootParametersJsonNode) {
