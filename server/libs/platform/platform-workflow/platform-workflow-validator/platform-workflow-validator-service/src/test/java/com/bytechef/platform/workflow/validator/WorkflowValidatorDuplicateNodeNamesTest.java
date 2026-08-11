@@ -128,6 +128,95 @@ class WorkflowValidatorDuplicateNodeNamesTest {
     }
 
     @Test
+    void detectsCollisionBetweenInputAndTaskName() {
+        String workflow = """
+            {
+                "label": "Test Workflow",
+                "description": "Test workflow description",
+                "inputs": [
+                    {"name": "node_1", "label": "Node", "type": "string"}
+                ],
+                "triggers": [
+                    {"label": "Manual Trigger", "name": "trigger_1", "type": "manual/v1/manual", "parameters": {}}
+                ],
+                "tasks": [
+                    {"label": "Task", "name": "node_1", "type": "logger/v1/info", "parameters": {}}
+                ]
+            }
+            """;
+
+        assertEquals("Node names must be unique. Duplicate node name: node_1", validate(workflow));
+    }
+
+    @Test
+    void detectsCollisionBetweenInputAndTriggerName() {
+        String workflow = """
+            {
+                "label": "Test Workflow",
+                "description": "Test workflow description",
+                "inputs": [
+                    {"name": "node_1", "label": "Node", "type": "string"}
+                ],
+                "triggers": [
+                    {"label": "Manual Trigger", "name": "node_1", "type": "manual/v1/manual", "parameters": {}}
+                ],
+                "tasks": []
+            }
+            """;
+
+        assertEquals("Node names must be unique. Duplicate node name: node_1", validate(workflow));
+    }
+
+    @Test
+    void detectsCollisionBetweenInputAndNestedTaskName() {
+        String workflow = """
+            {
+                "label": "Test Workflow",
+                "description": "Test workflow description",
+                "inputs": [
+                    {"name": "email_1", "label": "Email Input", "type": "string"}
+                ],
+                "triggers": [
+                    {"label": "Manual Trigger", "name": "trigger_1", "type": "manual/v1/manual", "parameters": {}}
+                ],
+                "tasks": [
+                    {
+                        "label": "Condition",
+                        "name": "condition_1",
+                        "type": "condition/v1",
+                        "parameters": {
+                            "caseTrue": [],
+                            "caseFalse": [
+                                {"label": "Email", "name": "email_1", "type": "email/v1/send", "parameters": {}}
+                            ]
+                        }
+                    }
+                ]
+            }
+            """;
+
+        assertEquals("Node names must be unique. Duplicate node name: email_1", validate(workflow));
+    }
+
+    @Test
+    void detectsDuplicateNameAmongInputs() {
+        String workflow = """
+            {
+                "label": "Test Workflow",
+                "description": "Test workflow description",
+                "inputs": [
+                    {"name": "input_1", "label": "Input A", "type": "string"},
+                    {"name": "input_1", "label": "Input B", "type": "integer"}
+                ],
+                "triggers": [],
+                "tasks": []
+            }
+            """;
+
+        assertEquals("Node names must be unique. Duplicate node name: input_1", validate(workflow));
+    }
+
+    @Test
     void reportsEachDuplicatedNameOnce() {
         String workflow = """
             {
@@ -168,6 +257,27 @@ class WorkflowValidatorDuplicateNodeNamesTest {
                             ]
                         }
                     }
+                ]
+            }
+            """;
+
+        assertEquals("", validate(workflow));
+    }
+
+    @Test
+    void allowsUniqueInputNameAlongsideTriggerAndTask() {
+        String workflow = """
+            {
+                "label": "Test Workflow",
+                "description": "Test workflow description",
+                "inputs": [
+                    {"name": "input_1", "label": "Input", "type": "string"}
+                ],
+                "triggers": [
+                    {"label": "Manual Trigger", "name": "trigger_1", "type": "manual/v1/manual", "parameters": {}}
+                ],
+                "tasks": [
+                    {"label": "Task", "name": "task_1", "type": "logger/v1/info", "parameters": {}}
                 ]
             }
             """;
