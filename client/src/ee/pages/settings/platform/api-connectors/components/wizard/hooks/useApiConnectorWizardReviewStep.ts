@@ -1,31 +1,40 @@
-import {HttpMethod} from '@/shared/middleware/graphql';
-import {useCallback, useEffect, useMemo, useRef} from 'react';
-import {toast} from 'sonner';
+import {useCallback, useEffect} from 'react';
 import {parse as yamlParse, stringify as yamlStringify} from 'yaml';
 
 import {useApiConnectorWizardStore} from '../../../stores/useApiConnectorWizardStore';
-import {EndpointDefinitionI, WizardModeType} from '../../../types/api-connector-wizard.types';
+import {EndpointDefinitionI} from '../../../types/api-connector-wizard.types';
 import {safeJsonParse} from '../../../utils/json-utils';
+import {buildParameterSchema} from '../../../utils/specification-utils';
 
-interface UseApiConnectorWizardReviewStepProps {
-    mode: WizardModeType;
-}
+/* Operation-level OpenAPI keys the wizard does not model; carried over from the base specification when an endpoint
+ * keeps its path and method, so editing does not silently strip them. */
+const PRESERVED_OPERATION_KEYS = ['callbacks', 'deprecated', 'externalDocs', 'security', 'servers', 'tags'];
 
 interface UseApiConnectorWizardReviewStepI {
     baseUrl: string | undefined;
-    displayEndpoints: EndpointDefinitionI[];
+    endpoints: EndpointDefinitionI[];
     name: string;
     removeEndpoint: (id: string) => void;
     specification: string | undefined;
 }
 
-export default function useApiConnectorWizardReviewStep({
-    mode,
-}: UseApiConnectorWizardReviewStepProps): UseApiConnectorWizardReviewStepI {
-    const {baseUrl, endpoints, name, removeEndpoint, setSpecification, specification} = useApiConnectorWizardStore();
-    const specParseErrorShownRef = useRef(false);
+export default function useApiConnectorWizardReviewStep(): UseApiConnectorWizardReviewStepI {
+    const {baseSpecification, baseUrl, endpoints, name, removeEndpoint, setSpecification, specification} =
+        useApiConnectorWizardStore();
 
     const generateOpenApiSpec = useCallback(() => {
+        let baseSpec: Record<string, unknown> | undefined;
+
+        if (baseSpecification) {
+            try {
+                baseSpec = yamlParse(baseSpecification) as Record<string, unknown>;
+            } catch (error) {
+                console.error('Failed to parse the base specification, regenerating from scratch:', error);
+            }
+        }
+
+        const basePaths = baseSpec?.paths as Record<string, Record<string, unknown>> | undefined;
+
         const paths: Record<string, Record<string, unknown>> = {};
 
         endpoints.forEach((endpoint) => {
@@ -49,13 +58,21 @@ export default function useApiConnectorWizardReviewStep({
             }
 
             if (endpoint.parameters && endpoint.parameters.length > 0) {
-                operation.parameters = endpoint.parameters.map((param) => ({
-                    description: param.description,
-                    in: param.in,
-                    name: param.name,
-                    required: param.required,
-                    schema: {type: param.type},
-                }));
+                operation.parameters = endpoint.parameters.map((param) => {
+                    const parameterObject: Record<string, unknown> = {
+                        description: param.description,
+                        in: param.in,
+                        name: param.name,
+                        required: param.required,
+                        schema: buildParameterSchema(param),
+                    };
+
+                    if (param.example) {
+                        parameterObject.example = param.example;
+                    }
+
+                    return parameterObject;
+                });
             }
 
             if (endpoint.requestBody) {
@@ -99,8 +116,28 @@ export default function useApiConnectorWizardReviewStep({
                 (operation.responses as Record<string, unknown>)[response.statusCode] = responseObj;
             });
 
+            const baseOperation = basePaths?.[endpoint.path]?.[method];
+
+            if (baseOperation && typeof baseOperation === 'object') {
+                Object.entries(baseOperation as Record<string, unknown>).forEach(([key, value]) => {
+                    if (PRESERVED_OPERATION_KEYS.includes(key) || key.startsWith('x-')) {
+                        operation[key] = value;
+                    }
+                });
+            }
+
             paths[endpoint.path][method] = operation;
         });
+
+        // In edit mode the original specification is the base, so top-level sections the wizard does not model
+        // ($ref targets in components, securitySchemes, ...) survive regeneration.
+        if (baseSpec) {
+            return yamlStringify({
+                ...baseSpec,
+                paths,
+                servers: baseUrl ? [{url: baseUrl}] : (baseSpec.servers ?? []),
+            });
+        }
 
         const openApiSpec = {
             info: {
@@ -113,82 +150,19 @@ export default function useApiConnectorWizardReviewStep({
         };
 
         return yamlStringify(openApiSpec);
-    }, [baseUrl, endpoints, name]);
+    }, [baseSpecification, baseUrl, endpoints, name]);
 
     useEffect(() => {
-        if (mode === 'manual') {
-            if (endpoints.length > 0) {
-                const generatedSpec = generateOpenApiSpec();
-
-                setSpecification(generatedSpec);
-            } else {
-                setSpecification(undefined);
-            }
+        if (endpoints.length > 0) {
+            setSpecification(generateOpenApiSpec());
+        } else {
+            setSpecification(undefined);
         }
-    }, [endpoints, generateOpenApiSpec, mode, setSpecification]);
-
-    useEffect(() => {
-        specParseErrorShownRef.current = false;
-    }, [specification]);
-
-    const parseEndpointsFromSpec = useCallback((): EndpointDefinitionI[] => {
-        if (!specification || mode === 'manual') {
-            return endpoints;
-        }
-
-        try {
-            const parsed = yamlParse(specification);
-            const parsedEndpoints: EndpointDefinitionI[] = [];
-
-            if (parsed.paths) {
-                Object.entries(parsed.paths).forEach(([path, methods]) => {
-                    Object.entries(methods as Record<string, Record<string, unknown>>).forEach(
-                        ([method, operation]) => {
-                            const httpMethod = method.toUpperCase() as HttpMethod;
-
-                            if (Object.values(HttpMethod).includes(httpMethod)) {
-                                parsedEndpoints.push({
-                                    description: (operation.description as string) || '',
-                                    httpMethod,
-                                    id: `${path}-${method}`,
-                                    operationId:
-                                        (operation.operationId as string) || `${method}${path.replace(/\//g, '_')}`,
-                                    parameters: [],
-                                    path,
-                                    responses: [],
-                                    summary: (operation.summary as string) || '',
-                                });
-                            }
-                        }
-                    );
-                });
-            }
-
-            return parsedEndpoints;
-        } catch (error) {
-            console.error('Failed to parse API connector specification as YAML:', error);
-
-            if (!specParseErrorShownRef.current) {
-                specParseErrorShownRef.current = true;
-
-                toast.error('Failed to parse specification', {
-                    description:
-                        'The specification could not be parsed. Please check that it is valid YAML/OpenAPI format.',
-                });
-            }
-
-            return [];
-        }
-    }, [endpoints, mode, specification]);
-
-    const displayEndpoints = useMemo(
-        () => (mode === 'manual' ? endpoints : parseEndpointsFromSpec()),
-        [endpoints, mode, parseEndpointsFromSpec]
-    );
+    }, [endpoints, generateOpenApiSpec, setSpecification]);
 
     return {
         baseUrl,
-        displayEndpoints,
+        endpoints,
         name,
         removeEndpoint,
         specification,

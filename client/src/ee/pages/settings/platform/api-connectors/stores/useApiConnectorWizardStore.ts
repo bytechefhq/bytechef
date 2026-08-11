@@ -8,6 +8,7 @@ import {
 } from '../types/api-connector-wizard.types';
 
 const initialState = {
+    baseSpecification: undefined,
     baseUrl: undefined,
     currentStep: 0,
     discoveredEndpoints: [] as DiscoveredEndpointI[],
@@ -70,6 +71,10 @@ export const useApiConnectorWizardStore = create<ApiConnectorWizardStoreType>()(
                 const {discoveredEndpoints} = get();
 
                 set({selectedEndpointIds: discoveredEndpoints.map((endpoint) => endpoint.id)});
+            },
+
+            setBaseSpecification: (specification?: string) => {
+                set({baseSpecification: specification});
             },
 
             setBaseUrl: (url: string) => {

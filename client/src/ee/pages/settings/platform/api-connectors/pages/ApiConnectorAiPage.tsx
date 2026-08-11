@@ -2,6 +2,7 @@ import LoadingIcon from '@/components/LoadingIcon';
 
 import ApiConnectorWizardDocUrlStep from '../components/wizard/ApiConnectorWizardDocUrlStep';
 import ApiConnectorWizardEndpointSelectionStep from '../components/wizard/ApiConnectorWizardEndpointSelectionStep';
+import ApiConnectorWizardEndpointsStep from '../components/wizard/ApiConnectorWizardEndpointsStep';
 import ApiConnectorWizardLayout from '../components/wizard/ApiConnectorWizardLayout';
 import ApiConnectorWizardReviewStep from '../components/wizard/ApiConnectorWizardReviewStep';
 import {WIZARD_STEPS} from '../types/api-connector-wizard.types';
@@ -39,7 +40,9 @@ const ApiConnectorAiPage = () => {
 
             {currentStep === 1 && <ApiConnectorWizardEndpointSelectionStep />}
 
-            {currentStep >= 2 && <ApiConnectorWizardReviewStep mode="ai" />}
+            {currentStep === 2 && <ApiConnectorWizardEndpointsStep />}
+
+            {currentStep >= 3 && <ApiConnectorWizardReviewStep />}
         </ApiConnectorWizardLayout>
     );
 };

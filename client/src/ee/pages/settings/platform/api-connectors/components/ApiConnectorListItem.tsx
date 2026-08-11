@@ -14,6 +14,7 @@ import ApiConnectorEditDialog from '@/ee/pages/settings/platform/api-connectors/
 import ApiConnectorEndpointListItem from '@/ee/pages/settings/platform/api-connectors/components/ApiConnectorEndpointListItem';
 import {ApiConnector} from '@/shared/middleware/graphql';
 import {ChevronDownIcon, EllipsisVerticalIcon} from 'lucide-react';
+import {useNavigate} from 'react-router-dom';
 
 import useApiConnectorListItem from './hooks/useApiConnectorListItem';
 
@@ -31,6 +32,8 @@ const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
         showDeleteDialog,
         showEditDialog,
     } = useApiConnectorListItem({apiConnector});
+
+    const navigate = useNavigate();
 
     return (
         <Collapsible className="mb-2 w-full rounded border border-border/50 px-3 py-4 hover:bg-surface-neutral-primary-hover">
@@ -108,7 +111,15 @@ const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
                         </DropdownMenuTrigger>
 
                         <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => setShowEditDialog(true)}>Edit</DropdownMenuItem>
+                            <DropdownMenuItem
+                                onClick={() =>
+                                    navigate(`/automation/settings/components/api-connectors/${apiConnector.id}/edit`)
+                                }
+                            >
+                                Edit
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem onClick={() => setShowEditDialog(true)}>Edit YAML</DropdownMenuItem>
 
                             <DropdownMenuSeparator />
 

@@ -1,13 +1,23 @@
+import LoadingIcon from '@/components/LoadingIcon';
+
+import ApiConnectorWizardBasicStep from '../components/wizard/ApiConnectorWizardBasicStep';
 import ApiConnectorWizardEndpointsStep from '../components/wizard/ApiConnectorWizardEndpointsStep';
-import ApiConnectorWizardImportStep from '../components/wizard/ApiConnectorWizardImportStep';
 import ApiConnectorWizardLayout from '../components/wizard/ApiConnectorWizardLayout';
 import ApiConnectorWizardReviewStep from '../components/wizard/ApiConnectorWizardReviewStep';
 import {WIZARD_STEPS} from '../types/api-connector-wizard.types';
-import useApiConnectorImportPage from './hooks/useApiConnectorImportPage';
+import useApiConnectorEditPage from './hooks/useApiConnectorEditPage';
 
-const ApiConnectorImportPage = () => {
-    const {canProceed, currentStep, handleCancel, handleNext, handleSave, isPending, previousStep} =
-        useApiConnectorImportPage();
+const ApiConnectorEditPage = () => {
+    const {canProceed, currentStep, handleCancel, handleNext, handleSave, isHydrated, isPending, previousStep} =
+        useApiConnectorEditPage();
+
+    if (!isHydrated) {
+        return (
+            <div className="flex size-full items-center justify-center">
+                <LoadingIcon /> Loading API Connector...
+            </div>
+        );
+    }
 
     return (
         <ApiConnectorWizardLayout
@@ -18,10 +28,10 @@ const ApiConnectorImportPage = () => {
             onNext={handleNext}
             onPrevious={previousStep}
             onSave={handleSave}
-            pageTitle="Import OpenAPI"
-            steps={WIZARD_STEPS.import}
+            pageTitle="Edit API Connector"
+            steps={WIZARD_STEPS.manual}
         >
-            {currentStep === 0 && <ApiConnectorWizardImportStep />}
+            {currentStep === 0 && <ApiConnectorWizardBasicStep />}
 
             {currentStep === 1 && <ApiConnectorWizardEndpointsStep />}
 
@@ -30,4 +40,4 @@ const ApiConnectorImportPage = () => {
     );
 };
 
-export default ApiConnectorImportPage;
+export default ApiConnectorEditPage;

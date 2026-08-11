@@ -14,6 +14,7 @@ import {
     ResponseDefinitionI,
 } from '../../../types/api-connector-wizard.types';
 import {safeJsonParse} from '../../../utils/json-utils';
+import {buildParameterSchema} from '../../../utils/specification-utils';
 
 interface EndpointFormDataI {
     description: string;
@@ -33,6 +34,7 @@ interface UseEndpointFormProps {
 interface UseEndpointFormI {
     control: UseFormReturn<EndpointFormDataI>['control'];
     editorMode: 'form' | 'yaml';
+    form: UseFormReturn<EndpointFormDataI>;
     handleModeChange: (mode: string) => void;
     handleSaveEndpoint: (data: EndpointFormDataI) => void;
     handleSetParameters: (parameters: ParameterDefinitionI[]) => void;
@@ -107,7 +109,7 @@ export default function useEndpointForm({endpoint, onClose, onSave, open}: UseEn
                 in: param.in,
                 name: param.name,
                 required: param.required,
-                schema: {type: param.type},
+                schema: buildParameterSchema(param),
             }));
         }
 
@@ -206,7 +208,9 @@ export default function useEndpointForm({endpoint, onClose, onSave, open}: UseEn
                         ? (rawLocation as ParameterLocationType)
                         : 'query';
 
-                    const rawType = ((param.schema as Record<string, unknown>)?.type as string) || 'string';
+                    const schema = param.schema as Record<string, unknown> | undefined;
+
+                    const rawType = (schema?.type as string) || 'string';
                     const type: ParameterTypeType = validTypes.includes(rawType as ParameterTypeType)
                         ? (rawType as ParameterTypeType)
                         : 'string';
@@ -218,6 +222,7 @@ export default function useEndpointForm({endpoint, onClose, onSave, open}: UseEn
                         in: location,
                         name: (param.name as string) || '',
                         required: !!param.required,
+                        schema: schema && typeof schema === 'object' ? JSON.stringify(schema, null, 2) : undefined,
                         type,
                     };
                 });
@@ -406,6 +411,7 @@ export default function useEndpointForm({endpoint, onClose, onSave, open}: UseEn
     return {
         control,
         editorMode,
+        form,
         handleModeChange,
         handleSaveEndpoint,
         handleSetParameters: setParameters,

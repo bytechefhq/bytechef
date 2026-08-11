@@ -13,6 +13,7 @@ import {parse as yamlParse, stringify as yamlStringify} from 'yaml';
 
 import {useApiConnectorWizardStore} from '../../stores/useApiConnectorWizardStore';
 import {DiscoveredEndpointI} from '../../types/api-connector-wizard.types';
+import {hydrateWizardEndpointsFromSpecification} from '../../utils/specification-utils';
 import {API_CONNECTORS_PATH} from './useImportApiConnector';
 
 // Maximum number of polling attempts before timing out (5 minutes at 1 second intervals)
@@ -34,6 +35,7 @@ const useApiConnectorAiPage = (): UseApiConnectorAiPageI => {
         currentStep,
         discoveredEndpoints,
         documentationUrl,
+        endpoints,
         icon,
         isProcessing,
         jobId,
@@ -44,7 +46,10 @@ const useApiConnectorAiPage = (): UseApiConnectorAiPageI => {
         reset,
         selectAllEndpoints,
         selectedEndpointIds,
+        setBaseSpecification,
+        setBaseUrl,
         setDiscoveredEndpoints,
+        setEndpoints,
         setError,
         setIsProcessing,
         setJobId,
@@ -308,27 +313,39 @@ const useApiConnectorAiPage = (): UseApiConnectorAiPageI => {
                     userPrompt: userPrompt || undefined,
                 },
             });
+        } else if (currentStep === 1) {
+            const filteredSpecification = getSpecificationFilteredBySelectedEndpoints();
+
+            if (!filteredSpecification) {
+                toast.error('Error', {description: 'Failed to filter endpoints. Please try again.'});
+
+                return;
+            }
+
+            const hydrated = hydrateWizardEndpointsFromSpecification(filteredSpecification, {
+                setBaseSpecification,
+                setBaseUrl,
+                setEndpoints,
+            });
+
+            if (!hydrated) {
+                toast.error('Failed to parse specification', {
+                    description: 'The generated specification could not be parsed. Please try again.',
+                });
+
+                return;
+            }
+
+            nextStep();
         } else {
             nextStep();
         }
     };
 
+    // The review step regenerates the specification from the (possibly edited) endpoints on top of the filtered
+    // base specification, so saving needs no filtering of its own anymore.
     const handleSave = () => {
         if (!name || !specification) {
-            return;
-        }
-
-        if (selectedEndpointIds.length === 0) {
-            toast.error('No endpoints selected', {description: 'Please select at least one endpoint before saving.'});
-
-            return;
-        }
-
-        const filteredSpecification = getSpecificationFilteredBySelectedEndpoints();
-
-        if (!filteredSpecification) {
-            toast.error('Error', {description: 'Failed to filter endpoints. Please try again.'});
-
             return;
         }
 
@@ -336,7 +353,7 @@ const useApiConnectorAiPage = (): UseApiConnectorAiPageI => {
             input: {
                 icon: icon || undefined,
                 name,
-                specification: filteredSpecification,
+                specification,
             },
         });
     };
@@ -365,6 +382,10 @@ const useApiConnectorAiPage = (): UseApiConnectorAiPageI => {
 
         if (currentStep === 1) {
             return selectedEndpointIds.length > 0;
+        }
+
+        if (currentStep === 2) {
+            return endpoints.length > 0;
         }
 
         return true;

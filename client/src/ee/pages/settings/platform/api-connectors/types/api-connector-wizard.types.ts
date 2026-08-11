@@ -14,6 +14,7 @@ export interface ApiConnectorWizardActionsI {
     removeEndpoint: (id: string) => void;
     reset: () => void;
     selectAllEndpoints: () => void;
+    setBaseSpecification: (specification?: string) => void;
     setBaseUrl: (url: string) => void;
     setCurrentStep: (step: number) => void;
     setDiscoveredEndpoints: (endpoints: DiscoveredEndpointI[]) => void;
@@ -34,6 +35,8 @@ export interface ApiConnectorWizardActionsI {
 }
 
 export interface ApiConnectorWizardStateI {
+    /** In edit mode, the connector's original specification; regeneration merges paths into it so top-level sections like `components` survive. */
+    baseSpecification?: string;
     baseUrl?: string;
     currentStep: number;
     discoveredEndpoints: DiscoveredEndpointI[];
@@ -70,6 +73,8 @@ export interface ParameterDefinitionI {
     in: ParameterLocationType;
     name: string;
     required: boolean;
+    /** The parameter's original OpenAPI schema as JSON, so format/enum/default survive editing; regeneration uses it verbatim while its type still matches. */
+    schema?: string;
     type: ParameterTypeType;
 }
 
@@ -98,8 +103,8 @@ export interface DiscoveredEndpointI {
 }
 
 export const WIZARD_STEPS: Record<WizardModeType, string[]> = {
-    ai: ['Basic Info', 'Select Endpoints', 'Review'],
-    import: ['Import File', 'Review'],
+    ai: ['Basic Info', 'Select Endpoints', 'Define Endpoints', 'Review'],
+    import: ['Import File', 'Define Endpoints', 'Review'],
     manual: ['Basic Info', 'Define Endpoints', 'Review'],
 };
 
