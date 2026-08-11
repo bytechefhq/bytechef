@@ -20,6 +20,7 @@ import com.bytechef.commons.util.CompressionUtils;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.service.FileStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Set;
 
 /**
  * @author Ivica Cardic
@@ -44,6 +45,16 @@ public class ApiConnectorFileStorageImpl implements ApiConnectorFileStorage {
     @Override
     public void deleteApiConnectorSpecification(FileEntry fileEntry) {
         fileStorageService.deleteFile(API_CONNECTORS_SPECIFICATIONS_DIR, fileEntry);
+    }
+
+    @Override
+    public Set<FileEntry> getApiConnectorDefinitionFileEntries() {
+        return fileStorageService.getFileEntries(API_CONNECTORS_DEFINITIONS_DIR);
+    }
+
+    @Override
+    public Set<FileEntry> getApiConnectorSpecificationFileEntries() {
+        return fileStorageService.getFileEntries(API_CONNECTORS_SPECIFICATIONS_DIR);
     }
 
     @Override

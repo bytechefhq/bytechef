@@ -1,0 +1,99 @@
+- generic [ref=f1e2]:
+  - generic [ref=f1e3]:
+    - generic [ref=f1e6]:
+      - link [ref=f1e8] [cursor=pointer]:
+        - /url: /
+        - img "ByteChef" [ref=f1e10]
+      - navigation "Main navigation" [ref=f1e12]:
+        - list [ref=f1e15]:
+          - listitem [ref=f1e16]:
+            - link "Approval Tasks" [ref=f1e17] [cursor=pointer]:
+              - /url: /automation/approval-tasks
+        - generic [ref=f1e20]:
+          - generic: Build
+          - list [ref=f1e22]:
+            - listitem [ref=f1e23]:
+              - button "Build" [ref=f1e25] [cursor=pointer]
+        - generic [ref=f1e28]:
+          - generic: Deploy
+          - list [ref=f1e30]:
+            - listitem [ref=f1e31]:
+              - button "Deploy" [ref=f1e33] [cursor=pointer]
+        - generic [ref=f1e38]:
+          - generic: Monitor
+          - list [ref=f1e40]:
+            - listitem [ref=f1e41]:
+              - link "Executions" [ref=f1e42] [cursor=pointer]:
+                - /url: /automation/executions
+        - generic [ref=f1e45]:
+          - generic: Data
+          - list [ref=f1e47]:
+            - listitem [ref=f1e48]:
+              - link "Files" [ref=f1e49] [cursor=pointer]:
+                - /url: /automation/asset-files
+        - generic [ref=f1e53]:
+          - generic: AI
+          - list [ref=f1e55]:
+            - listitem [ref=f1e56]:
+              - button "AI" [ref=f1e58] [cursor=pointer]
+      - button "User menu" [ref=f1e63] [cursor=pointer]
+      - button "Toggle Sidebar" [ref=f1e69]
+    - main [ref=f1e70]:
+      - generic [ref=f1e73]:
+        - complementary [ref=f1e74]:
+          - navigation [ref=f1e75]:
+            - generic [ref=f1e76]: Settings
+            - generic [ref=f1e82]:
+              - heading "Current Workspace" [level=3] [ref=f1e83]
+              - heading "AI" [level=3] [ref=f1e84]
+              - link "Hub Connectors" [ref=f1e85] [cursor=pointer]:
+                - /url: /automation/settings/ai-hub/connectors
+              - link "Guardrails" [ref=f1e87] [cursor=pointer]:
+                - /url: /automation/settings/ai/guardrails
+              - link "System Prompt" [ref=f1e89] [cursor=pointer]:
+                - /url: /automation/settings/ai/system-prompt
+              - heading "Organization" [level=3] [ref=f1e91]
+              - link "Workspaces" [ref=f1e92] [cursor=pointer]:
+                - /url: /automation/settings/workspaces
+              - link "Connections" [ref=f1e94] [cursor=pointer]:
+                - /url: /automation/settings/connections
+              - link "AI Providers" [ref=f1e96] [cursor=pointer]:
+                - /url: /automation/settings/ai-providers
+              - link "MCP Server" [ref=f1e98] [cursor=pointer]:
+                - /url: /automation/settings/mcp-server
+              - link "Notifications" [ref=f1e100] [cursor=pointer]:
+                - /url: /automation/settings/notifications
+              - link "Alerts" [ref=f1e102] [cursor=pointer]:
+                - /url: /automation/settings/workflow-alerts
+              - link "License" [ref=f1e104] [cursor=pointer]:
+                - /url: /automation/settings/license
+              - link "Audit Events" [ref=f1e106] [cursor=pointer]:
+                - /url: /automation/settings/audit-events
+              - link "OAuth2 Clients" [ref=f1e108] [cursor=pointer]:
+                - /url: /automation/settings/registered-clients
+        - main [ref=f1e112]:
+          - generic [ref=f1e117]:
+            - generic [ref=f1e118]:
+              - generic [ref=f1e119]:
+                - heading "Create API Connector - Define Endpoints" [level=1] [ref=f1e244]
+                - button "Close" [ref=f1e121] [cursor=pointer]
+              - navigation "Progress" [ref=f1e122]:
+                - list [ref=f1e123]:
+                  - listitem [ref=f1e124]:
+                    - generic [ref=f1e125]: Basic Info
+                  - listitem [ref=f1e126]:
+                    - generic [ref=f1e127]: Define Endpoints
+                  - listitem [ref=f1e128]:
+                    - generic [ref=f1e129]: Review
+            - generic [ref=f1e245]:
+              - generic [ref=f1e246]:
+                - heading "Endpoints" [level=3] [ref=f1e247]
+                - button "Add Endpoint" [ref=f1e248] [cursor=pointer]
+              - generic [ref=f1e249]:
+                - paragraph [ref=f1e250]: No endpoints defined yet.
+                - paragraph [ref=f1e251]: Click "Add Endpoint" to create your first endpoint.
+            - generic [ref=f1e142]:
+              - button "Previous" [ref=f1e252] [cursor=pointer]
+              - button "Next" [disabled]
+    - region "Notifications alt+T"
+  - button "Open Tanstack query devtools" [ref=f1e194] [cursor=pointer]

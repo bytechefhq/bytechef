@@ -1,0 +1,2647 @@
+- generic [ref=e2]:
+  - generic [ref=e130]:
+    - generic [ref=e133]:
+      - link [ref=e135] [cursor=pointer]:
+        - /url: /
+        - img "ByteChef" [ref=e137]
+      - navigation "Main navigation" [ref=e139]:
+        - list [ref=e142]:
+          - listitem [ref=e143]:
+            - link "Approval Tasks" [ref=e144] [cursor=pointer]:
+              - /url: /automation/approval-tasks
+        - generic [ref=e147]:
+          - generic: Build
+          - list [ref=e149]:
+            - listitem [ref=e150]:
+              - button "Build" [ref=e152] [cursor=pointer]
+        - generic [ref=e155]:
+          - generic: Deploy
+          - list [ref=e157]:
+            - listitem [ref=e158]:
+              - button "Deploy" [ref=e160] [cursor=pointer]
+        - generic [ref=e165]:
+          - generic: Monitor
+          - list [ref=e167]:
+            - listitem [ref=e168]:
+              - link "Executions" [ref=e169] [cursor=pointer]:
+                - /url: /automation/executions
+        - generic [ref=e172]:
+          - generic: Data
+          - list [ref=e174]:
+            - listitem [ref=e175]:
+              - link "Files" [ref=e176] [cursor=pointer]:
+                - /url: /automation/asset-files
+        - generic [ref=e180]:
+          - generic: AI
+          - list [ref=e182]:
+            - listitem [ref=e183]:
+              - button "AI" [ref=e185] [cursor=pointer]
+      - button "User menu" [ref=e190] [cursor=pointer]
+      - button "Toggle Sidebar" [ref=e196]
+    - main [ref=e197]:
+      - generic [ref=e200]:
+        - complementary [ref=e201]:
+          - navigation [ref=e202]:
+            - generic [ref=e203]: Projects
+            - generic [ref=e207]:
+              - generic "Categories" [ref=e209]:
+                - heading "Categories" [level=4] [ref=e210]
+                - link "All Categories" [ref=e211] [cursor=pointer]:
+                  - /url: /automation/projects
+                - link "AI" [ref=e213] [cursor=pointer]:
+                  - /url: /automation/projects?categoryId=1053
+                - link "Records" [ref=e215] [cursor=pointer]:
+                  - /url: /automation/projects?categoryId=1056
+                - link "Templates" [ref=e217] [cursor=pointer]:
+                  - /url: /automation/projects?categoryId=1055
+                - link "category3" [ref=e219] [cursor=pointer]:
+                  - /url: /automation/projects?categoryId=1052
+                - link "ddd" [ref=e221] [cursor=pointer]:
+                  - /url: /automation/projects?categoryId=1054
+              - generic "Tags" [ref=e224]:
+                - heading "Tags" [level=4] [ref=e225]
+                - link "ai agent" [ref=e226] [cursor=pointer]:
+                  - /url: /automation/projects?tagId=1072
+                - link "ai universal" [ref=e228] [cursor=pointer]:
+                  - /url: /automation/projects?tagId=1073
+                - link "api" [ref=e230] [cursor=pointer]:
+                  - /url: /automation/projects?tagId=1080
+                - link "bank" [ref=e232] [cursor=pointer]:
+                  - /url: /automation/projects?tagId=1108
+                - link "broker" [ref=e234] [cursor=pointer]:
+                  - /url: /automation/projects?tagId=1104
+                - link "bug" [ref=e236] [cursor=pointer]:
+                  - /url: /automation/projects?tagId=1071
+                - link "car-dealer" [ref=e238] [cursor=pointer]:
+                  - /url: /automation/projects?tagId=1118
+                - link "code" [ref=e240] [cursor=pointer]:
+                  - /url: /automation/projects?tagId=1125
+                - link "condition" [ref=e242] [cursor=pointer]:
+                  - /url: /automation/projects?tagId=1081
+                - link "datastream" [ref=e244] [cursor=pointer]:
+                  - /url: /automation/projects?tagId=1068
+                - link "datatable" [ref=e246] [cursor=pointer]:
+                  - /url: /automation/projects?tagId=1099
+                - link "deployment" [ref=e248] [cursor=pointer]:
+                  - /url: /automation/projects?tagId=1079
+                - link "each" [ref=e250] [cursor=pointer]:
+                  - /url: /automation/projects?tagId=1101
+                - link "expression" [ref=e252] [cursor=pointer]:
+                  - /url: /automation/projects?tagId=1121
+                - link "formtrigger" [ref=e254] [cursor=pointer]:
+                  - /url: /automation/projects?tagId=1102
+                - link "freezing" [ref=e256] [cursor=pointer]:
+                  - /url: /automation/projects?tagId=1120
+                - link "github" [ref=e258] [cursor=pointer]:
+                  - /url: /automation/projects?tagId=1070
+                - link "gmail" [ref=e260] [cursor=pointer]:
+                  - /url: /automation/projects?tagId=1063
+                - link "graph" [ref=e262] [cursor=pointer]:
+                  - /url: /automation/projects?tagId=1127
+                - link "hitl" [ref=e264] [cursor=pointer]:
+                  - /url: /automation/projects?tagId=1116
+                - link "hub" [ref=e266] [cursor=pointer]:
+                  - /url: /automation/projects?tagId=1124
+                - link "komunalac" [ref=e268] [cursor=pointer]:
+                  - /url: /automation/projects?tagId=1103
+                - link "log" [ref=e270] [cursor=pointer]:
+                  - /url: /automation/projects?tagId=1112
+                - link "mailchimp" [ref=e272] [cursor=pointer]:
+                  - /url: /automation/projects?tagId=1065
+                - link "map" [ref=e274] [cursor=pointer]:
+                  - /url: /automation/projects?tagId=1100
+                - link "marko bug" [ref=e276] [cursor=pointer]:
+                  - /url: /automation/projects?tagId=1078
+                - link "mcp" [ref=e278] [cursor=pointer]:
+                  - /url: /automation/projects?tagId=1119
+                - link "moon landing" [ref=e280] [cursor=pointer]:
+                  - /url: /automation/projects?tagId=1107
+                - link "n8n" [ref=e282] [cursor=pointer]:
+                  - /url: /automation/projects?tagId=1123
+                - link "opemipo" [ref=e284] [cursor=pointer]:
+                  - /url: /automation/projects?tagId=1082
+                - link "scheduler" [ref=e286] [cursor=pointer]:
+                  - /url: /automation/projects?tagId=1114
+                - link "script" [ref=e288] [cursor=pointer]:
+                  - /url: /automation/projects?tagId=1069
+                - link "slack" [ref=e290] [cursor=pointer]:
+                  - /url: /automation/projects?tagId=1115
+                - link "spel" [ref=e292] [cursor=pointer]:
+                  - /url: /automation/projects?tagId=1067
+                - link "subflow" [ref=e294] [cursor=pointer]:
+                  - /url: /automation/projects?tagId=1113
+                - link "tag1" [ref=e296] [cursor=pointer]:
+                  - /url: /automation/projects?tagId=1050
+                - link "templates" [ref=e298] [cursor=pointer]:
+                  - /url: /automation/projects?tagId=1111
+                - link "trgovina" [ref=e300] [cursor=pointer]:
+                  - /url: /automation/projects?tagId=1106
+                - link "var" [ref=e302] [cursor=pointer]:
+                  - /url: /automation/projects?tagId=1077
+        - main [ref=e306]:
+          - generic [ref=e308]:
+            - generic [ref=e311]:
+              - text: "Filter by category:"
+              - generic [ref=e312]: All Categories
+            - group [ref=e314]:
+              - button "Create Project" [ref=e315] [cursor=pointer]: New Project
+              - button [ref=e316] [cursor=pointer]
+          - generic [ref=e318]:
+            - generic "0Moon Landing Project_container" [ref=e320] [cursor=pointer]:
+              - generic [ref=e321]:
+                - generic "1081" [ref=e322]:
+                  - link "0Moon Landing Project" [ref=e324]:
+                    - /url: /automation/projects/1081/project-workflows/1833
+                  - generic [ref=e326]:
+                    - button "16 workflows" [ref=e327]
+                    - group "Workflow Creation Actions" [ref=e331]:
+                      - button "Create Workflow" [ref=e332]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e333]
+                    - generic [ref=e335]:
+                      - generic [ref=e336]: "Tags:"
+                      - generic [ref=e337]:
+                        - generic [ref=e338]: moon landing
+                        - button [ref=e339]
+                      - button [ref=e340]
+                - generic [ref=e341]:
+                  - generic [ref=e342]:
+                    - generic [ref=e343]:
+                      - generic [ref=e344]:
+                        - generic [ref=e345]: V17
+                        - generic [ref=e346]: PUBLISHED
+                      - button "Deploy" [ref=e347]
+                    - button "Published at 9/26/2025 9:28:03 AM" [ref=e348]
+                  - button "More Project Actions" [ref=e351]
+            - generic "1Alpha Omega project_container" [ref=e353] [cursor=pointer]:
+              - generic [ref=e354]:
+                - generic "1085" [ref=e355]:
+                  - link "1Alpha Omega project" [ref=e357]:
+                    - /url: /automation/projects/1085/project-workflows/1707
+                  - generic [ref=e359]:
+                    - button "3 workflows" [ref=e360]
+                    - group "Workflow Creation Actions" [ref=e364]:
+                      - button "Create Workflow" [ref=e365]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e366]
+                    - generic [ref=e368]:
+                      - generic [ref=e369]: "Tags:"
+                      - button [ref=e370]
+                - generic [ref=e371]:
+                  - generic [ref=e372]:
+                    - generic [ref=e373]:
+                      - generic [ref=e374]:
+                        - generic [ref=e375]: V9
+                        - generic [ref=e376]: PUBLISHED
+                      - button "Deploy" [ref=e377]
+                    - button "Published at 9/5/2025 3:36:34 PM" [ref=e378]
+                  - button "More Project Actions" [ref=e381]
+            - generic "1Manhatan project_container" [ref=e383] [cursor=pointer]:
+              - generic [ref=e384]:
+                - generic "1172" [ref=e385]:
+                  - link "1Manhatan project" [ref=e387]:
+                    - /url: /automation/projects/1172/project-workflows/1852
+                  - generic [ref=e389]:
+                    - button "3 workflows" [ref=e390]
+                    - group "Workflow Creation Actions" [ref=e394]:
+                      - button "Create Workflow" [ref=e395]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e396]
+                    - generic [ref=e398]:
+                      - generic [ref=e399]: "Tags:"
+                      - button [ref=e400]
+                - generic [ref=e401]:
+                  - generic [ref=e402]:
+                    - generic [ref=e403]:
+                      - generic [ref=e404]:
+                        - generic [ref=e405]: V1
+                        - generic [ref=e406]: PUBLISHED
+                      - button "Deploy" [ref=e407]
+                    - button "Published at 6/2/2026 11:19:11 PM" [ref=e408]
+                  - button "More Project Actions" [ref=e411]
+            - generic "1Trigger Failure Bug_container" [ref=e413] [cursor=pointer]:
+              - generic [ref=e414]:
+                - generic "1135" [ref=e415]:
+                  - link "1Trigger Failure Bug" [ref=e417]:
+                    - /url: /automation/projects/1135/project-workflows/1716
+                  - generic [ref=e419]:
+                    - button "3 workflows" [ref=e420]
+                    - group "Workflow Creation Actions" [ref=e424]:
+                      - button "Create Workflow" [ref=e425]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e426]
+                    - generic [ref=e428]:
+                      - generic [ref=e429]: "Tags:"
+                      - button [ref=e430]
+                - generic [ref=e431]:
+                  - generic [ref=e432]:
+                    - generic [ref=e433]:
+                      - generic [ref=e434]:
+                        - generic [ref=e435]: V1
+                        - generic [ref=e436]: PUBLISHED
+                      - button "Deploy" [ref=e437]
+                    - button "Published at 9/1/2025 11:06:37 AM" [ref=e438]
+                  - button "More Project Actions" [ref=e441]
+            - generic "2code1_container" [ref=e443] [cursor=pointer]:
+              - generic [ref=e444]:
+                - generic "1345" [ref=e445]:
+                  - generic [ref=e446]:
+                    - link [ref=e447]:
+                      - /url: /automation/projects/1345/project-workflows/2994
+                      - button "2code1" [ref=e448]
+                    - generic [ref=e449]: JavaScript
+                  - generic [ref=e451]:
+                    - button "2 workflows" [ref=e452]
+                    - generic [ref=e457]:
+                      - generic [ref=e458]: "Tags:"
+                      - generic [ref=e459]:
+                        - generic [ref=e460]: code
+                        - button [ref=e461]
+                      - button [ref=e462]
+                - generic [ref=e463]:
+                  - generic [ref=e464]:
+                    - generic [ref=e465]:
+                      - generic [ref=e466]:
+                        - generic [ref=e467]: V2
+                        - generic [ref=e468]: PUBLISHED
+                      - button "Deploy" [ref=e469]
+                    - button "Published at 8/6/2026 8:50:24 AM" [ref=e470]
+                  - button "More Project Actions" [ref=e473]
+            - generic "2code2_container" [ref=e475] [cursor=pointer]:
+              - generic [ref=e476]:
+                - generic "1349" [ref=e477]:
+                  - generic [ref=e478]:
+                    - link [ref=e479]:
+                      - /url: /automation/projects/1349/project-workflows/3009
+                      - button "2code2" [ref=e480]
+                    - generic [ref=e481]: JavaScript
+                  - generic [ref=e483]:
+                    - button "1 workflow" [ref=e484]
+                    - generic [ref=e489]:
+                      - generic [ref=e490]: "Tags:"
+                      - button [ref=e491]
+                - generic [ref=e492]:
+                  - generic [ref=e493]:
+                    - generic [ref=e495]:
+                      - generic [ref=e496]: V1
+                      - generic [ref=e497]: DRAFT
+                    - button "Not yet published" [ref=e498]
+                  - button "More Project Actions" [ref=e501]
+            - generic "__context_store_workspace_1049_container" [ref=e503] [cursor=pointer]:
+              - generic [ref=e504]:
+                - generic "1227" [ref=e505]:
+                  - link [ref=e507]:
+                    - /url: /automation/projects/1227/project-workflows/2357
+                    - button "__context_store_workspace_1049" [ref=e508]
+                  - generic [ref=e510]:
+                    - button "4 workflows" [ref=e511]
+                    - group "Workflow Creation Actions" [ref=e515]:
+                      - button "Create Workflow" [ref=e516]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e517]
+                    - generic [ref=e519]:
+                      - generic [ref=e520]: "Tags:"
+                      - button [ref=e521]
+                - generic [ref=e522]:
+                  - generic [ref=e523]:
+                    - generic [ref=e525]:
+                      - generic [ref=e526]: V1
+                      - generic [ref=e527]: DRAFT
+                    - button "Not yet published" [ref=e528]
+                  - button "More Project Actions" [ref=e531]
+            - generic "AI Agent 2_container" [ref=e533] [cursor=pointer]:
+              - generic [ref=e534]:
+                - generic "1212" [ref=e535]:
+                  - link "AI Agent 2" [ref=e537]:
+                    - /url: /automation/projects/1212/project-workflows/2708
+                  - generic [ref=e539]:
+                    - button "8 workflows" [ref=e540]
+                    - group "Workflow Creation Actions" [ref=e544]:
+                      - button "Create Workflow" [ref=e545]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e546]
+                    - generic [ref=e548]:
+                      - generic [ref=e549]: "Tags:"
+                      - generic [ref=e550]:
+                        - generic [ref=e551]: ai agent
+                        - button [ref=e552]
+                      - button [ref=e553]
+                - generic [ref=e554]:
+                  - generic [ref=e555]:
+                    - generic [ref=e556]:
+                      - generic [ref=e557]:
+                        - generic [ref=e558]: V1
+                        - generic [ref=e559]: PUBLISHED
+                      - button "Deploy" [ref=e560]
+                    - button "Published at 1/9/2026 8:25:20 PM" [ref=e561]
+                  - button "More Project Actions" [ref=e564]
+            - generic "AI Table_container" [ref=e566] [cursor=pointer]:
+              - generic [ref=e567]:
+                - generic "1220" [ref=e568]:
+                  - link "AI Table" [ref=e570]:
+                    - /url: /automation/projects/1220/project-workflows/2297
+                  - generic [ref=e572]:
+                    - button "1 workflow" [ref=e573]
+                    - group "Workflow Creation Actions" [ref=e577]:
+                      - button "Create Workflow" [ref=e578]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e579]
+                    - generic [ref=e581]:
+                      - generic [ref=e582]: "Tags:"
+                      - button [ref=e583]
+                - generic [ref=e584]:
+                  - generic [ref=e585]:
+                    - generic [ref=e587]:
+                      - generic [ref=e588]: V1
+                      - generic [ref=e589]: DRAFT
+                    - button "Not yet published" [ref=e590]
+                  - button "More Project Actions" [ref=e593]
+            - generic "AIAgent_container" [ref=e595] [cursor=pointer]:
+              - generic [ref=e596]:
+                - generic "1059" [ref=e597]:
+                  - link "AIAgent" [ref=e599]:
+                    - /url: /automation/projects/1059/project-workflows/2326
+                  - generic [ref=e601]:
+                    - button "18 workflows" [ref=e602]
+                    - group "Workflow Creation Actions" [ref=e606]:
+                      - button "Create Workflow" [ref=e607]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e608]
+                    - generic [ref=e610]:
+                      - generic [ref=e611]: "Tags:"
+                      - generic [ref=e612]:
+                        - generic [ref=e613]: ai agent
+                        - button [ref=e614]
+                      - generic [ref=e615]:
+                        - generic [ref=e616]: gmail
+                        - button [ref=e617]
+                      - button [ref=e618]
+                - generic [ref=e619]:
+                  - generic [ref=e620]:
+                    - generic [ref=e621]:
+                      - generic [ref=e622]:
+                        - generic [ref=e623]: V32
+                        - generic [ref=e624]: PUBLISHED
+                      - button "Deploy" [ref=e625]
+                    - button "Published at 8/7/2026 11:00:45 AM" [ref=e626]
+                  - button "More Project Actions" [ref=e629]
+            - generic "Airtable_container" [ref=e631] [cursor=pointer]:
+              - generic [ref=e632]:
+                - generic "1178" [ref=e633]:
+                  - link "Airtable" [ref=e635]:
+                    - /url: /automation/projects/1178/project-workflows/1897
+                  - generic [ref=e637]:
+                    - button "1 workflow" [ref=e638]
+                    - group "Workflow Creation Actions" [ref=e642]:
+                      - button "Create Workflow" [ref=e643]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e644]
+                    - generic [ref=e646]:
+                      - generic [ref=e647]: "Tags:"
+                      - button [ref=e648]
+                - generic [ref=e649]:
+                  - generic [ref=e650]:
+                    - generic [ref=e652]:
+                      - generic [ref=e653]: V1
+                      - generic [ref=e654]: DRAFT
+                    - button "Not yet published" [ref=e655]
+                  - button "More Project Actions" [ref=e658]
+            - generic "API Connector_container" [ref=e660] [cursor=pointer]:
+              - generic [ref=e661]:
+                - generic "1139" [ref=e662]:
+                  - link "API Connector" [ref=e664]:
+                    - /url: /automation/projects/1139/project-workflows/1727
+                  - generic [ref=e666]:
+                    - button "1 workflow" [ref=e667]
+                    - group "Workflow Creation Actions" [ref=e671]:
+                      - button "Create Workflow" [ref=e672]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e673]
+                    - generic [ref=e675]:
+                      - generic [ref=e676]: "Tags:"
+                      - button [ref=e677]
+                - generic [ref=e678]:
+                  - generic [ref=e679]:
+                    - generic [ref=e681]:
+                      - generic [ref=e682]: V1
+                      - generic [ref=e683]: DRAFT
+                    - button "Not yet published" [ref=e684]
+                  - button "More Project Actions" [ref=e687]
+            - generic "API Platform_container" [ref=e689] [cursor=pointer]:
+              - generic [ref=e690]:
+                - generic "1053" [ref=e691]:
+                  - link "API Platform" [ref=e693]:
+                    - /url: /automation/projects/1053/project-workflows/1054
+                  - generic [ref=e695]:
+                    - button "2 workflows" [ref=e696]
+                    - group "Workflow Creation Actions" [ref=e700]:
+                      - button "Create Workflow" [ref=e701]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e702]
+                    - generic [ref=e704]:
+                      - generic [ref=e705]: "Tags:"
+                      - generic [ref=e706]:
+                        - generic [ref=e707]: api
+                        - button [ref=e708]
+                      - button [ref=e709]
+                - generic [ref=e710]:
+                  - generic [ref=e711]:
+                    - generic [ref=e712]:
+                      - generic [ref=e713]:
+                        - generic [ref=e714]: V15
+                        - generic [ref=e715]: PUBLISHED
+                      - button "Deploy" [ref=e716]
+                    - button "Published at 11/24/2025 11:36:44 AM" [ref=e717]
+                  - button "More Project Actions" [ref=e720]
+            - generic "AWS_container" [ref=e722] [cursor=pointer]:
+              - generic [ref=e723]:
+                - generic "1191" [ref=e724]:
+                  - link "AWS" [ref=e726]:
+                    - /url: /automation/projects/1191/project-workflows/2000
+                  - generic [ref=e728]:
+                    - button "1 workflow" [ref=e729]
+                    - group "Workflow Creation Actions" [ref=e733]:
+                      - button "Create Workflow" [ref=e734]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e735]
+                    - generic [ref=e737]:
+                      - generic [ref=e738]: "Tags:"
+                      - button [ref=e739]
+                - generic [ref=e740]:
+                  - generic [ref=e741]:
+                    - generic [ref=e743]:
+                      - generic [ref=e744]: V1
+                      - generic [ref=e745]: DRAFT
+                    - button "Not yet published" [ref=e746]
+                  - button "More Project Actions" [ref=e749]
+            - generic "Bank_container" [ref=e751] [cursor=pointer]:
+              - generic [ref=e752]:
+                - generic "1185" [ref=e753]:
+                  - link "Bank" [ref=e755]:
+                    - /url: /automation/projects/1185/project-workflows/1952
+                  - generic [ref=e757]:
+                    - button "2 workflows" [ref=e758]
+                    - group "Workflow Creation Actions" [ref=e762]:
+                      - button "Create Workflow" [ref=e763]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e764]
+                    - generic [ref=e766]:
+                      - generic [ref=e767]: "Tags:"
+                      - generic [ref=e768]:
+                        - generic [ref=e769]: bank
+                        - button [ref=e770]
+                      - button [ref=e771]
+                - generic [ref=e772]:
+                  - generic [ref=e773]:
+                    - generic [ref=e775]:
+                      - generic [ref=e776]: V1
+                      - generic [ref=e777]: DRAFT
+                    - button "Not yet published" [ref=e778]
+                  - button "More Project Actions" [ref=e781]
+            - generic "branch_container" [ref=e783] [cursor=pointer]:
+              - generic [ref=e784]:
+                - generic "1070" [ref=e785]:
+                  - link "branch" [ref=e787]:
+                    - /url: /automation/projects/1070/project-workflows/1477
+                  - generic [ref=e789]:
+                    - button "1 workflow" [ref=e790]
+                    - group "Workflow Creation Actions" [ref=e794]:
+                      - button "Create Workflow" [ref=e795]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e796]
+                    - generic [ref=e798]:
+                      - generic [ref=e799]: "Tags:"
+                      - button [ref=e800]
+                - generic [ref=e801]:
+                  - generic [ref=e802]:
+                    - generic [ref=e804]:
+                      - generic [ref=e805]: V1
+                      - generic [ref=e806]: DRAFT
+                    - button "Not yet published" [ref=e807]
+                  - button "More Project Actions" [ref=e810]
+            - generic "Broken Expression_container" [ref=e812] [cursor=pointer]:
+              - generic [ref=e813]:
+                - generic "1336" [ref=e814]:
+                  - link "Broken Expression" [ref=e816]:
+                    - /url: /automation/projects/1336/project-workflows/2963
+                  - generic [ref=e818]:
+                    - button "1 workflow" [ref=e819]
+                    - group "Workflow Creation Actions" [ref=e823]:
+                      - button "Create Workflow" [ref=e824]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e825]
+                    - generic [ref=e827]:
+                      - generic [ref=e828]: "Tags:"
+                      - generic [ref=e829]:
+                        - generic [ref=e830]: expression
+                        - button [ref=e831]
+                      - button [ref=e832]
+                - generic [ref=e833]:
+                  - generic [ref=e834]:
+                    - generic [ref=e836]:
+                      - generic [ref=e837]: V1
+                      - generic [ref=e838]: DRAFT
+                    - button "Not yet published" [ref=e839]
+                  - button "More Project Actions" [ref=e842]
+            - generic "Broker_container" [ref=e844] [cursor=pointer]:
+              - generic [ref=e845]:
+                - generic "1054" [ref=e846]:
+                  - link "Broker" [ref=e848]:
+                    - /url: /automation/projects/1054/project-workflows/1064
+                  - generic [ref=e850]:
+                    - button "9 workflows" [ref=e851]
+                    - group "Workflow Creation Actions" [ref=e855]:
+                      - button "Create Workflow" [ref=e856]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e857]
+                    - generic [ref=e859]:
+                      - generic [ref=e860]: "Tags:"
+                      - generic [ref=e861]:
+                        - generic [ref=e862]: broker
+                        - button [ref=e863]
+                      - button [ref=e864]
+                - generic [ref=e865]:
+                  - generic [ref=e866]:
+                    - generic [ref=e868]:
+                      - generic [ref=e869]: V1
+                      - generic [ref=e870]: DRAFT
+                    - button "Not yet published" [ref=e871]
+                  - button "More Project Actions" [ref=e874]
+            - generic "Car Dealer_container" [ref=e876] [cursor=pointer]:
+              - generic [ref=e877]:
+                - generic "1259" [ref=e878]:
+                  - link "Car Dealer" [ref=e880]:
+                    - /url: /automation/projects/1259/project-workflows/2836
+                  - generic [ref=e882]:
+                    - button "3 workflows" [ref=e883]
+                    - group "Workflow Creation Actions" [ref=e887]:
+                      - button "Create Workflow" [ref=e888]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e889]
+                    - generic [ref=e891]:
+                      - generic [ref=e892]: "Tags:"
+                      - generic [ref=e893]:
+                        - generic [ref=e894]: car-dealer
+                        - button [ref=e895]
+                      - button [ref=e896]
+                - generic [ref=e897]:
+                  - generic [ref=e898]:
+                    - generic [ref=e899]:
+                      - generic [ref=e900]:
+                        - generic [ref=e901]: V8
+                        - generic [ref=e902]: PUBLISHED
+                      - button "Deploy" [ref=e903]
+                    - button "Published at 7/8/2026 9:58:18 AM" [ref=e904]
+                  - button "More Project Actions" [ref=e907]
+            - generic "Client Onboarding Approvals_container" [ref=e909] [cursor=pointer]:
+              - generic [ref=e910]:
+                - generic "1214" [ref=e911]:
+                  - link "Client Onboarding Approvals" [ref=e913]:
+                    - /url: /automation/projects/1214/project-workflows/2229
+                  - generic [ref=e915]:
+                    - button "1 workflow" [ref=e916]
+                    - group "Workflow Creation Actions" [ref=e920]:
+                      - button "Create Workflow" [ref=e921]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e922]
+                    - generic [ref=e924]:
+                      - generic [ref=e925]: "Tags:"
+                      - button [ref=e926]
+                - generic [ref=e927]:
+                  - generic [ref=e928]:
+                    - generic [ref=e930]:
+                      - generic [ref=e931]: V1
+                      - generic [ref=e932]: DRAFT
+                    - button "Not yet published" [ref=e933]
+                  - button "More Project Actions" [ref=e936]
+            - generic "Code Workflow_container" [ref=e938] [cursor=pointer]:
+              - generic [ref=e939]:
+                - generic "1138" [ref=e940]:
+                  - button "Code Workflow" [ref=e942]
+                  - generic [ref=e944]:
+                    - button "0 workflows" [ref=e945]
+                    - group "Workflow Creation Actions" [ref=e949]:
+                      - button "Create Workflow" [ref=e950]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e951]
+                    - generic [ref=e953]:
+                      - generic [ref=e954]: "Tags:"
+                      - button [ref=e955]
+                - generic [ref=e956]:
+                  - generic [ref=e957]:
+                    - generic [ref=e959]:
+                      - generic [ref=e960]: V1
+                      - generic [ref=e961]: DRAFT
+                    - button "Not yet published" [ref=e962]
+                  - button "More Project Actions" [ref=e965]
+            - generic "Condition_container" [ref=e967] [cursor=pointer]:
+              - generic [ref=e968]:
+                - generic "1087" [ref=e969]:
+                  - link "Condition" [ref=e971]:
+                    - /url: /automation/projects/1087/project-workflows/1688
+                  - generic [ref=e973]:
+                    - button "9 workflows" [ref=e974]
+                    - group "Workflow Creation Actions" [ref=e978]:
+                      - button "Create Workflow" [ref=e979]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e980]
+                    - generic [ref=e982]:
+                      - generic [ref=e983]: "Tags:"
+                      - generic [ref=e984]:
+                        - generic [ref=e985]: condition
+                        - button [ref=e986]
+                      - button [ref=e987]
+                - generic [ref=e988]:
+                  - generic [ref=e989]:
+                    - generic [ref=e991]:
+                      - generic [ref=e992]: V1
+                      - generic [ref=e993]: DRAFT
+                    - button "Not yet published" [ref=e994]
+                  - button "More Project Actions" [ref=e997]
+            - generic "Condition OR bug_container" [ref=e999] [cursor=pointer]:
+              - generic [ref=e1000]:
+                - generic "1100" [ref=e1001]:
+                  - link "Condition OR bug" [ref=e1003]:
+                    - /url: /automation/projects/1100/project-workflows/1655
+                  - generic [ref=e1005]:
+                    - button "2 workflows" [ref=e1006]
+                    - group "Workflow Creation Actions" [ref=e1010]:
+                      - button "Create Workflow" [ref=e1011]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e1012]
+                    - generic [ref=e1014]:
+                      - generic [ref=e1015]: "Tags:"
+                      - button [ref=e1016]
+                - generic [ref=e1017]:
+                  - generic [ref=e1018]:
+                    - generic [ref=e1020]:
+                      - generic [ref=e1021]: V1
+                      - generic [ref=e1022]: DRAFT
+                    - button "Not yet published" [ref=e1023]
+                  - button "More Project Actions" [ref=e1026]
+            - generic "Copilot_container" [ref=e1028] [cursor=pointer]:
+              - generic [ref=e1029]:
+                - generic "1095" [ref=e1030]:
+                  - link "Copilot" [ref=e1032]:
+                    - /url: /automation/projects/1095/project-workflows/1616
+                  - generic [ref=e1034]:
+                    - button "2 workflows" [ref=e1035]
+                    - group "Workflow Creation Actions" [ref=e1039]:
+                      - button "Create Workflow" [ref=e1040]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e1041]
+                    - generic [ref=e1043]:
+                      - generic [ref=e1044]: "Tags:"
+                      - button [ref=e1045]
+                - generic [ref=e1046]:
+                  - generic [ref=e1047]:
+                    - generic [ref=e1049]:
+                      - generic [ref=e1050]: V1
+                      - generic [ref=e1051]: DRAFT
+                    - button "Not yet published" [ref=e1052]
+                  - button "More Project Actions" [ref=e1055]
+            - generic "Custom Component_container" [ref=e1057] [cursor=pointer]:
+              - generic [ref=e1058]:
+                - generic "1140" [ref=e1059]:
+                  - link "Custom Component" [ref=e1061]:
+                    - /url: /automation/projects/1140/project-workflows/1728
+                  - generic [ref=e1063]:
+                    - button "1 workflow" [ref=e1064]
+                    - group "Workflow Creation Actions" [ref=e1068]:
+                      - button "Create Workflow" [ref=e1069]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e1070]
+                    - generic [ref=e1072]:
+                      - generic [ref=e1073]: "Tags:"
+                      - button [ref=e1074]
+                - generic [ref=e1075]:
+                  - generic [ref=e1076]:
+                    - generic [ref=e1078]:
+                      - generic [ref=e1079]: V1
+                      - generic [ref=e1080]: DRAFT
+                    - button "Not yet published" [ref=e1081]
+                  - button "More Project Actions" [ref=e1084]
+            - generic "Daily Invoice Capture_container" [ref=e1086] [cursor=pointer]:
+              - generic [ref=e1087]:
+                - generic "1342" [ref=e1088]:
+                  - link [ref=e1090]:
+                    - /url: /automation/projects/1342/project-workflows/2990
+                    - button "Daily Invoice Capture" [ref=e1091]
+                  - generic [ref=e1093]:
+                    - button "1 workflow" [ref=e1094]
+                    - group "Workflow Creation Actions" [ref=e1098]:
+                      - button "Create Workflow" [ref=e1099]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e1100]
+                    - generic [ref=e1102]:
+                      - generic [ref=e1103]: "Tags:"
+                      - button [ref=e1104]
+                - generic [ref=e1105]:
+                  - generic [ref=e1106]:
+                    - generic [ref=e1108]:
+                      - generic [ref=e1109]: V1
+                      - generic [ref=e1110]: DRAFT
+                    - button "Not yet published" [ref=e1111]
+                  - button "More Project Actions" [ref=e1114]
+            - generic "Daily Standup Reminder_container" [ref=e1116] [cursor=pointer]:
+              - generic [ref=e1117]:
+                - generic "1228" [ref=e1118]:
+                  - link [ref=e1120]:
+                    - /url: /automation/projects/1228/project-workflows/2418
+                    - button "Daily Standup Reminder" [ref=e1121]
+                  - generic [ref=e1123]:
+                    - button "1 workflow" [ref=e1124]
+                    - group "Workflow Creation Actions" [ref=e1128]:
+                      - button "Create Workflow" [ref=e1129]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e1130]
+                    - generic [ref=e1132]:
+                      - generic [ref=e1133]: "Tags:"
+                      - button [ref=e1134]
+                - generic [ref=e1135]:
+                  - generic [ref=e1136]:
+                    - generic [ref=e1138]:
+                      - generic [ref=e1139]: V1
+                      - generic [ref=e1140]: DRAFT
+                    - button "Not yet published" [ref=e1141]
+                  - button "More Project Actions" [ref=e1144]
+            - generic "Daily Standup Reminder_container" [ref=e1146] [cursor=pointer]:
+              - generic [ref=e1147]:
+                - generic "1235" [ref=e1148]:
+                  - link [ref=e1150]:
+                    - /url: /automation/projects/1235/project-workflows/2419
+                    - button "Daily Standup Reminder" [ref=e1151]
+                  - generic [ref=e1153]:
+                    - button "1 workflow" [ref=e1154]
+                    - group "Workflow Creation Actions" [ref=e1158]:
+                      - button "Create Workflow" [ref=e1159]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e1160]
+                    - generic [ref=e1162]:
+                      - generic [ref=e1163]: "Tags:"
+                      - button [ref=e1164]
+                - generic [ref=e1165]:
+                  - generic [ref=e1166]:
+                    - generic [ref=e1168]:
+                      - generic [ref=e1169]: V1
+                      - generic [ref=e1170]: DRAFT
+                    - button "Not yet published" [ref=e1171]
+                  - button "More Project Actions" [ref=e1174]
+            - generic "Daily Standup Reminder_container" [ref=e1176] [cursor=pointer]:
+              - generic [ref=e1177]:
+                - generic "1236" [ref=e1178]:
+                  - link [ref=e1180]:
+                    - /url: /automation/projects/1236/project-workflows/2420
+                    - button "Daily Standup Reminder" [ref=e1181]
+                  - generic [ref=e1183]:
+                    - button "1 workflow" [ref=e1184]
+                    - group "Workflow Creation Actions" [ref=e1188]:
+                      - button "Create Workflow" [ref=e1189]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e1190]
+                    - generic [ref=e1192]:
+                      - generic [ref=e1193]: "Tags:"
+                      - button [ref=e1194]
+                - generic [ref=e1195]:
+                  - generic [ref=e1196]:
+                    - generic [ref=e1198]:
+                      - generic [ref=e1199]: V1
+                      - generic [ref=e1200]: DRAFT
+                    - button "Not yet published" [ref=e1201]
+                  - button "More Project Actions" [ref=e1204]
+            - generic "Daily Standup Reminder_container" [ref=e1206] [cursor=pointer]:
+              - generic [ref=e1207]:
+                - generic "1237" [ref=e1208]:
+                  - link [ref=e1210]:
+                    - /url: /automation/projects/1237/project-workflows/2421
+                    - button "Daily Standup Reminder" [ref=e1211]
+                  - generic [ref=e1213]:
+                    - button "1 workflow" [ref=e1214]
+                    - group "Workflow Creation Actions" [ref=e1218]:
+                      - button "Create Workflow" [ref=e1219]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e1220]
+                    - generic [ref=e1222]:
+                      - generic [ref=e1223]: "Tags:"
+                      - button [ref=e1224]
+                - generic [ref=e1225]:
+                  - generic [ref=e1226]:
+                    - generic [ref=e1228]:
+                      - generic [ref=e1229]: V1
+                      - generic [ref=e1230]: DRAFT
+                    - button "Not yet published" [ref=e1231]
+                  - button "More Project Actions" [ref=e1234]
+            - generic "Daily Standup Reminder_container" [ref=e1236] [cursor=pointer]:
+              - generic [ref=e1237]:
+                - generic "1238" [ref=e1238]:
+                  - link [ref=e1240]:
+                    - /url: /automation/projects/1238/project-workflows/2422
+                    - button "Daily Standup Reminder" [ref=e1241]
+                  - generic [ref=e1243]:
+                    - button "1 workflow" [ref=e1244]
+                    - group "Workflow Creation Actions" [ref=e1248]:
+                      - button "Create Workflow" [ref=e1249]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e1250]
+                    - generic [ref=e1252]:
+                      - generic [ref=e1253]: "Tags:"
+                      - button [ref=e1254]
+                - generic [ref=e1255]:
+                  - generic [ref=e1256]:
+                    - generic [ref=e1258]:
+                      - generic [ref=e1259]: V1
+                      - generic [ref=e1260]: DRAFT
+                    - button "Not yet published" [ref=e1261]
+                  - button "More Project Actions" [ref=e1264]
+            - generic "Daily Standup Reminder_container" [ref=e1266] [cursor=pointer]:
+              - generic [ref=e1267]:
+                - generic "1240" [ref=e1268]:
+                  - link [ref=e1270]:
+                    - /url: /automation/projects/1240/project-workflows/2424
+                    - button "Daily Standup Reminder" [ref=e1271]
+                  - generic [ref=e1273]:
+                    - button "1 workflow" [ref=e1274]
+                    - group "Workflow Creation Actions" [ref=e1278]:
+                      - button "Create Workflow" [ref=e1279]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e1280]
+                    - generic [ref=e1282]:
+                      - generic [ref=e1283]: "Tags:"
+                      - button [ref=e1284]
+                - generic [ref=e1285]:
+                  - generic [ref=e1286]:
+                    - generic [ref=e1288]:
+                      - generic [ref=e1289]: V1
+                      - generic [ref=e1290]: DRAFT
+                    - button "Not yet published" [ref=e1291]
+                  - button "More Project Actions" [ref=e1294]
+            - generic "Daily Standup Reminder_container" [ref=e1296] [cursor=pointer]:
+              - generic [ref=e1297]:
+                - generic "1241" [ref=e1298]:
+                  - link [ref=e1300]:
+                    - /url: /automation/projects/1241/project-workflows/2425
+                    - button "Daily Standup Reminder" [ref=e1301]
+                  - generic [ref=e1303]:
+                    - button "1 workflow" [ref=e1304]
+                    - group "Workflow Creation Actions" [ref=e1308]:
+                      - button "Create Workflow" [ref=e1309]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e1310]
+                    - generic [ref=e1312]:
+                      - generic [ref=e1313]: "Tags:"
+                      - button [ref=e1314]
+                - generic [ref=e1315]:
+                  - generic [ref=e1316]:
+                    - generic [ref=e1318]:
+                      - generic [ref=e1319]: V1
+                      - generic [ref=e1320]: DRAFT
+                    - button "Not yet published" [ref=e1321]
+                  - button "More Project Actions" [ref=e1324]
+            - generic "Daily Standup Reminder_container" [ref=e1326] [cursor=pointer]:
+              - generic [ref=e1327]:
+                - generic "1242" [ref=e1328]:
+                  - link [ref=e1330]:
+                    - /url: /automation/projects/1242/project-workflows/2426
+                    - button "Daily Standup Reminder" [ref=e1331]
+                  - generic [ref=e1333]:
+                    - button "1 workflow" [ref=e1334]
+                    - group "Workflow Creation Actions" [ref=e1338]:
+                      - button "Create Workflow" [ref=e1339]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e1340]
+                    - generic [ref=e1342]:
+                      - generic [ref=e1343]: "Tags:"
+                      - button [ref=e1344]
+                - generic [ref=e1345]:
+                  - generic [ref=e1346]:
+                    - generic [ref=e1348]:
+                      - generic [ref=e1349]: V1
+                      - generic [ref=e1350]: DRAFT
+                    - button "Not yet published" [ref=e1351]
+                  - button "More Project Actions" [ref=e1354]
+            - generic "Daily Standup Reminder_container" [ref=e1356] [cursor=pointer]:
+              - generic [ref=e1357]:
+                - generic "1244" [ref=e1358]:
+                  - link [ref=e1360]:
+                    - /url: /automation/projects/1244/project-workflows/2429
+                    - button "Daily Standup Reminder" [ref=e1361]
+                  - generic [ref=e1363]:
+                    - button "1 workflow" [ref=e1364]
+                    - group "Workflow Creation Actions" [ref=e1368]:
+                      - button "Create Workflow" [ref=e1369]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e1370]
+                    - generic [ref=e1372]:
+                      - generic [ref=e1373]: "Tags:"
+                      - button [ref=e1374]
+                - generic [ref=e1375]:
+                  - generic [ref=e1376]:
+                    - generic [ref=e1378]:
+                      - generic [ref=e1379]: V1
+                      - generic [ref=e1380]: DRAFT
+                    - button "Not yet published" [ref=e1381]
+                  - button "More Project Actions" [ref=e1384]
+            - generic "Daily Standup Reminder_container" [ref=e1386] [cursor=pointer]:
+              - generic [ref=e1387]:
+                - generic "1245" [ref=e1388]:
+                  - link [ref=e1390]:
+                    - /url: /automation/projects/1245/project-workflows/2430
+                    - button "Daily Standup Reminder" [ref=e1391]
+                  - generic [ref=e1393]:
+                    - button "1 workflow" [ref=e1394]
+                    - group "Workflow Creation Actions" [ref=e1398]:
+                      - button "Create Workflow" [ref=e1399]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e1400]
+                    - generic [ref=e1402]:
+                      - generic [ref=e1403]: "Tags:"
+                      - button [ref=e1404]
+                - generic [ref=e1405]:
+                  - generic [ref=e1406]:
+                    - generic [ref=e1408]:
+                      - generic [ref=e1409]: V1
+                      - generic [ref=e1410]: DRAFT
+                    - button "Not yet published" [ref=e1411]
+                  - button "More Project Actions" [ref=e1414]
+            - generic "Daily Standup Reminder_container" [ref=e1416] [cursor=pointer]:
+              - generic [ref=e1417]:
+                - generic "1247" [ref=e1418]:
+                  - link [ref=e1420]:
+                    - /url: /automation/projects/1247/project-workflows/2447
+                    - button "Daily Standup Reminder" [ref=e1421]
+                  - generic [ref=e1423]:
+                    - button "1 workflow" [ref=e1424]
+                    - group "Workflow Creation Actions" [ref=e1428]:
+                      - button "Create Workflow" [ref=e1429]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e1430]
+                    - generic [ref=e1432]:
+                      - generic [ref=e1433]: "Tags:"
+                      - button [ref=e1434]
+                - generic [ref=e1435]:
+                  - generic [ref=e1436]:
+                    - generic [ref=e1438]:
+                      - generic [ref=e1439]: V1
+                      - generic [ref=e1440]: DRAFT
+                    - button "Not yet published" [ref=e1441]
+                  - button "More Project Actions" [ref=e1444]
+            - generic "DataPill Panel Bug_container" [ref=e1446] [cursor=pointer]:
+              - generic [ref=e1447]:
+                - generic "1091" [ref=e1448]:
+                  - link "DataPill Panel Bug" [ref=e1450]:
+                    - /url: /automation/projects/1091/project-workflows/1606
+                  - generic [ref=e1452]:
+                    - button "1 workflow" [ref=e1453]
+                    - group "Workflow Creation Actions" [ref=e1457]:
+                      - button "Create Workflow" [ref=e1458]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e1459]
+                    - generic [ref=e1461]:
+                      - generic [ref=e1462]: "Tags:"
+                      - button [ref=e1463]
+                - generic [ref=e1464]:
+                  - generic [ref=e1465]:
+                    - generic [ref=e1467]:
+                      - generic [ref=e1468]: V1
+                      - generic [ref=e1469]: DRAFT
+                    - button "Not yet published" [ref=e1470]
+                  - button "More Project Actions" [ref=e1473]
+            - generic "DataStream_container" [ref=e1475] [cursor=pointer]:
+              - generic [ref=e1476]:
+                - generic "1177" [ref=e1477]:
+                  - link "DataStream" [ref=e1479]:
+                    - /url: /automation/projects/1177/project-workflows/1894
+                  - generic [ref=e1481]:
+                    - button "9 workflows" [ref=e1482]
+                    - group "Workflow Creation Actions" [ref=e1486]:
+                      - button "Create Workflow" [ref=e1487]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e1488]
+                    - generic [ref=e1490]:
+                      - generic [ref=e1491]: "Tags:"
+                      - generic [ref=e1492]:
+                        - generic [ref=e1493]: datastream
+                        - button [ref=e1494]
+                      - button [ref=e1495]
+                - generic [ref=e1496]:
+                  - generic [ref=e1497]:
+                    - generic [ref=e1498]:
+                      - generic [ref=e1499]:
+                        - generic [ref=e1500]: V6
+                        - generic [ref=e1501]: PUBLISHED
+                      - button "Deploy" [ref=e1502]
+                    - button "Published at 2/3/2026 1:03:08 PM" [ref=e1503]
+                  - button "More Project Actions" [ref=e1506]
+            - generic "DataStream2_container" [ref=e1508] [cursor=pointer]:
+              - generic [ref=e1509]:
+                - generic "1216" [ref=e1510]:
+                  - link "DataStream2" [ref=e1512]:
+                    - /url: /automation/projects/1216/project-workflows/2289
+                  - generic [ref=e1514]:
+                    - button "1 workflow" [ref=e1515]
+                    - group "Workflow Creation Actions" [ref=e1519]:
+                      - button "Create Workflow" [ref=e1520]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e1521]
+                    - generic [ref=e1523]:
+                      - generic [ref=e1524]: "Tags:"
+                      - generic [ref=e1525]:
+                        - generic [ref=e1526]: datastream
+                        - button [ref=e1527]
+                      - button [ref=e1528]
+                - generic [ref=e1529]:
+                  - generic [ref=e1530]:
+                    - generic [ref=e1532]:
+                      - generic [ref=e1533]: V1
+                      - generic [ref=e1534]: DRAFT
+                    - button "Not yet published" [ref=e1535]
+                  - button "More Project Actions" [ref=e1538]
+            - generic "DataTable_container" [ref=e1540] [cursor=pointer]:
+              - generic [ref=e1541]:
+                - generic "1193" [ref=e1542]:
+                  - link "DataTable" [ref=e1544]:
+                    - /url: /automation/projects/1193/project-workflows/2007
+                  - generic [ref=e1546]:
+                    - button "9 workflows" [ref=e1547]
+                    - group "Workflow Creation Actions" [ref=e1551]:
+                      - button "Create Workflow" [ref=e1552]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e1553]
+                    - generic [ref=e1555]:
+                      - generic [ref=e1556]: "Tags:"
+                      - generic [ref=e1557]:
+                        - generic [ref=e1558]: datatable
+                        - button [ref=e1559]
+                      - button [ref=e1560]
+                - generic [ref=e1561]:
+                  - generic [ref=e1562]:
+                    - generic [ref=e1563]:
+                      - generic [ref=e1564]:
+                        - generic [ref=e1565]: V3
+                        - generic [ref=e1566]: PUBLISHED
+                      - button "Deploy" [ref=e1567]
+                    - button "Published at 1/19/2026 4:20:22 PM" [ref=e1568]
+                  - button "More Project Actions" [ref=e1571]
+            - generic "Disconnect All bug_container" [ref=e1573] [cursor=pointer]:
+              - generic [ref=e1574]:
+                - generic "1219" [ref=e1575]:
+                  - button "Disconnect All bug" [ref=e1577]
+                  - generic [ref=e1579]:
+                    - button "0 workflows" [ref=e1580]
+                    - group "Workflow Creation Actions" [ref=e1584]:
+                      - button "Create Workflow" [ref=e1585]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e1586]
+                    - generic [ref=e1588]:
+                      - generic [ref=e1589]: "Tags:"
+                      - button [ref=e1590]
+                - generic [ref=e1591]:
+                  - generic [ref=e1592]:
+                    - generic [ref=e1594]:
+                      - generic [ref=e1595]: V1
+                      - generic [ref=e1596]: DRAFT
+                    - button "Not yet published" [ref=e1597]
+                  - button "More Project Actions" [ref=e1600]
+            - generic "display-conditions_container" [ref=e1602] [cursor=pointer]:
+              - generic [ref=e1603]:
+                - generic "1165" [ref=e1604]:
+                  - link "display-conditions" [ref=e1606]:
+                    - /url: /automation/projects/1165/project-workflows/1819
+                  - generic [ref=e1608]:
+                    - button "2 workflows" [ref=e1609]
+                    - group "Workflow Creation Actions" [ref=e1613]:
+                      - button "Create Workflow" [ref=e1614]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e1615]
+                    - generic [ref=e1617]:
+                      - generic [ref=e1618]: "Tags:"
+                      - button [ref=e1619]
+                - generic [ref=e1620]:
+                  - generic [ref=e1621]:
+                    - generic [ref=e1623]:
+                      - generic [ref=e1624]: V1
+                      - generic [ref=e1625]: DRAFT
+                    - button "Not yet published" [ref=e1626]
+                  - button "More Project Actions" [ref=e1629]
+            - generic "DynamicProperties_container" [ref=e1631] [cursor=pointer]:
+              - generic [ref=e1632]:
+                - generic "1222" [ref=e1633]:
+                  - link "DynamicProperties" [ref=e1635]:
+                    - /url: /automation/projects/1222/project-workflows/2332
+                  - generic [ref=e1637]:
+                    - button "1 workflow" [ref=e1638]
+                    - group "Workflow Creation Actions" [ref=e1642]:
+                      - button "Create Workflow" [ref=e1643]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e1644]
+                    - generic [ref=e1646]:
+                      - generic [ref=e1647]: "Tags:"
+                      - button [ref=e1648]
+                - generic [ref=e1649]:
+                  - generic [ref=e1650]:
+                    - generic [ref=e1652]:
+                      - generic [ref=e1653]: V1
+                      - generic [ref=e1654]: DRAFT
+                    - button "Not yet published" [ref=e1655]
+                  - button "More Project Actions" [ref=e1658]
+            - generic "Each_container" [ref=e1660] [cursor=pointer]:
+              - generic [ref=e1661]:
+                - generic "1086" [ref=e1662]:
+                  - link "Each" [ref=e1664]:
+                    - /url: /automation/projects/1086/project-workflows/1565
+                  - generic [ref=e1666]:
+                    - button "2 workflows" [ref=e1667]
+                    - group "Workflow Creation Actions" [ref=e1671]:
+                      - button "Create Workflow" [ref=e1672]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e1673]
+                    - generic [ref=e1675]:
+                      - generic [ref=e1676]: "Tags:"
+                      - generic [ref=e1677]:
+                        - generic [ref=e1678]: each
+                        - button [ref=e1679]
+                      - button [ref=e1680]
+                - generic [ref=e1681]:
+                  - generic [ref=e1682]:
+                    - generic [ref=e1683]:
+                      - generic [ref=e1684]:
+                        - generic [ref=e1685]: V2
+                        - generic [ref=e1686]: PUBLISHED
+                      - button "Deploy" [ref=e1687]
+                    - button "Published at 12/17/2025 10:24:19 PM" [ref=e1688]
+                  - button "More Project Actions" [ref=e1691]
+            - generic "ElevenLabs_container" [ref=e1693] [cursor=pointer]:
+              - generic [ref=e1694]:
+                - generic "1088" [ref=e1695]:
+                  - link "ElevenLabs" [ref=e1697]:
+                    - /url: /automation/projects/1088/project-workflows/1594
+                  - generic [ref=e1699]:
+                    - button "1 workflow" [ref=e1700]
+                    - group "Workflow Creation Actions" [ref=e1704]:
+                      - button "Create Workflow" [ref=e1705]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e1706]
+                    - generic [ref=e1708]:
+                      - generic [ref=e1709]: "Tags:"
+                      - button [ref=e1710]
+                - generic [ref=e1711]:
+                  - generic [ref=e1712]:
+                    - generic [ref=e1714]:
+                      - generic [ref=e1715]: V1
+                      - generic [ref=e1716]: DRAFT
+                    - button "Not yet published" [ref=e1717]
+                  - button "More Project Actions" [ref=e1720]
+            - generic "Environments_container" [ref=e1722] [cursor=pointer]:
+              - generic [ref=e1723]:
+                - generic "1132" [ref=e1724]:
+                  - link "Environments" [ref=e1726]:
+                    - /url: /automation/projects/1132/project-workflows/1691
+                  - generic [ref=e1728]:
+                    - button "1 workflow" [ref=e1729]
+                    - group "Workflow Creation Actions" [ref=e1733]:
+                      - button "Create Workflow" [ref=e1734]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e1735]
+                    - generic [ref=e1737]:
+                      - generic [ref=e1738]: "Tags:"
+                      - button [ref=e1739]
+                - generic [ref=e1740]:
+                  - generic [ref=e1741]:
+                    - generic [ref=e1743]:
+                      - generic [ref=e1744]: V1
+                      - generic [ref=e1745]: DRAFT
+                    - button "Not yet published" [ref=e1746]
+                  - button "More Project Actions" [ref=e1749]
+            - generic "Expense Approval Demo_container" [ref=e1751] [cursor=pointer]:
+              - generic [ref=e1752]:
+                - generic "1334" [ref=e1753]:
+                  - link [ref=e1755]:
+                    - /url: /automation/projects/1334/project-workflows/2959
+                    - button "Expense Approval Demo" [ref=e1756]
+                  - generic [ref=e1758]:
+                    - button "1 workflow" [ref=e1759]
+                    - group "Workflow Creation Actions" [ref=e1763]:
+                      - button "Create Workflow" [ref=e1764]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e1765]
+                    - generic [ref=e1767]:
+                      - generic [ref=e1768]: "Tags:"
+                      - button [ref=e1769]
+                - generic [ref=e1770]:
+                  - generic [ref=e1771]:
+                    - generic [ref=e1773]:
+                      - generic [ref=e1774]: V1
+                      - generic [ref=e1775]: DRAFT
+                    - button "Not yet published" [ref=e1776]
+                  - button "More Project Actions" [ref=e1779]
+            - generic "ForkJoin_container" [ref=e1781] [cursor=pointer]:
+              - generic [ref=e1782]:
+                - generic "1102" [ref=e1783]:
+                  - link "ForkJoin" [ref=e1785]:
+                    - /url: /automation/projects/1102/project-workflows/1670
+                  - generic [ref=e1787]:
+                    - button "2 workflows" [ref=e1788]
+                    - group "Workflow Creation Actions" [ref=e1792]:
+                      - button "Create Workflow" [ref=e1793]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e1794]
+                    - generic [ref=e1796]:
+                      - generic [ref=e1797]: "Tags:"
+                      - button [ref=e1798]
+                - generic [ref=e1799]:
+                  - generic [ref=e1800]:
+                    - generic [ref=e1802]:
+                      - generic [ref=e1803]: V1
+                      - generic [ref=e1804]: DRAFT
+                    - button "Not yet published" [ref=e1805]
+                  - button "More Project Actions" [ref=e1808]
+            - generic "ForkJoin_container" [ref=e1810] [cursor=pointer]:
+              - generic [ref=e1811]:
+                - generic "1224" [ref=e1812]:
+                  - button "ForkJoin" [ref=e1814]
+                  - generic [ref=e1816]:
+                    - button "0 workflows" [ref=e1817]
+                    - group "Workflow Creation Actions" [ref=e1821]:
+                      - button "Create Workflow" [ref=e1822]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e1823]
+                    - generic [ref=e1825]:
+                      - generic [ref=e1826]: "Tags:"
+                      - button [ref=e1827]
+                - generic [ref=e1828]:
+                  - generic [ref=e1829]:
+                    - generic [ref=e1831]:
+                      - generic [ref=e1832]: V1
+                      - generic [ref=e1833]: DRAFT
+                    - button "Not yet published" [ref=e1834]
+                  - button "More Project Actions" [ref=e1837]
+            - generic "FormTrigger_container" [ref=e1839] [cursor=pointer]:
+              - generic [ref=e1840]:
+                - generic "1210" [ref=e1841]:
+                  - link "FormTrigger" [ref=e1843]:
+                    - /url: /automation/projects/1210/project-workflows/2022
+                  - generic [ref=e1845]:
+                    - button "2 workflows" [ref=e1846]
+                    - group "Workflow Creation Actions" [ref=e1850]:
+                      - button "Create Workflow" [ref=e1851]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e1852]
+                    - generic [ref=e1854]:
+                      - generic [ref=e1855]: "Tags:"
+                      - generic [ref=e1856]:
+                        - generic [ref=e1857]: formtrigger
+                        - button [ref=e1858]
+                      - button [ref=e1859]
+                - generic [ref=e1860]:
+                  - generic [ref=e1861]:
+                    - generic [ref=e1862]:
+                      - generic [ref=e1863]:
+                        - generic [ref=e1864]: V6
+                        - generic [ref=e1865]: PUBLISHED
+                      - button "Deploy" [ref=e1866]
+                    - button "Published at 12/27/2025 12:23:25 PM" [ref=e1867]
+                  - button "More Project Actions" [ref=e1870]
+            - generic "Git_container" [ref=e1872] [cursor=pointer]:
+              - generic [ref=e1873]:
+                - generic "1098" [ref=e1874]:
+                  - link "Git" [ref=e1876]:
+                    - /url: /automation/projects/1098/project-workflows/1626
+                  - generic [ref=e1878]:
+                    - button "3 workflows" [ref=e1879]
+                    - group "Workflow Creation Actions" [ref=e1883]:
+                      - button "Create Workflow" [ref=e1884]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e1885]
+                    - generic [ref=e1887]:
+                      - generic [ref=e1888]: "Tags:"
+                      - button [ref=e1889]
+                - generic [ref=e1890]:
+                  - generic [ref=e1891]:
+                    - generic [ref=e1892]:
+                      - generic [ref=e1893]:
+                        - generic [ref=e1894]: V9
+                        - generic [ref=e1895]: PUBLISHED
+                      - button "Deploy" [ref=e1896]
+                    - button "Published at 7/6/2025 9:31:39 AM" [ref=e1897]
+                  - button "More Project Actions" [ref=e1900]
+            - generic "GitHub bug_container" [ref=e1902] [cursor=pointer]:
+              - generic [ref=e1903]:
+                - generic "1092" [ref=e1904]:
+                  - link "GitHub bug" [ref=e1906]:
+                    - /url: /automation/projects/1092/project-workflows/1607
+                  - generic [ref=e1908]:
+                    - button "4 workflows" [ref=e1909]
+                    - group "Workflow Creation Actions" [ref=e1913]:
+                      - button "Create Workflow" [ref=e1914]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e1915]
+                    - generic [ref=e1917]:
+                      - generic [ref=e1918]: "Tags:"
+                      - generic [ref=e1919]:
+                        - generic [ref=e1920]: bug
+                        - button [ref=e1921]
+                      - generic [ref=e1922]:
+                        - generic [ref=e1923]: github
+                        - button [ref=e1924]
+                      - button [ref=e1925]
+                - generic [ref=e1926]:
+                  - generic [ref=e1927]:
+                    - generic [ref=e1928]:
+                      - generic [ref=e1929]:
+                        - generic [ref=e1930]: V1
+                        - generic [ref=e1931]: PUBLISHED
+                      - button "Deploy" [ref=e1932]
+                    - button "Published at 10/9/2025 3:51:05 PM" [ref=e1933]
+                  - button "More Project Actions" [ref=e1936]
+            - generic "GMail_container" [ref=e1938] [cursor=pointer]:
+              - generic [ref=e1939]:
+                - generic "1061" [ref=e1940]:
+                  - link "GMail" [ref=e1942]:
+                    - /url: /automation/projects/1061/project-workflows/1067
+                  - generic [ref=e1944]:
+                    - button "7 workflows" [ref=e1945]
+                    - group "Workflow Creation Actions" [ref=e1949]:
+                      - button "Create Workflow" [ref=e1950]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e1951]
+                    - generic [ref=e1953]:
+                      - generic [ref=e1954]: "Tags:"
+                      - generic [ref=e1955]:
+                        - generic [ref=e1956]: gmail
+                        - button [ref=e1957]
+                      - button [ref=e1958]
+                - generic [ref=e1959]:
+                  - generic [ref=e1960]:
+                    - generic [ref=e1961]:
+                      - generic [ref=e1962]:
+                        - generic [ref=e1963]: V10
+                        - generic [ref=e1964]: PUBLISHED
+                      - button "Deploy" [ref=e1965]
+                    - button "Published at 11/21/2025 3:09:18 PM" [ref=e1966]
+                  - button "More Project Actions" [ref=e1969]
+            - generic "Gmail AI Summarizer to Slack_container" [ref=e1971] [cursor=pointer]:
+              - generic [ref=e1972]:
+                - generic "1257" [ref=e1973]:
+                  - link [ref=e1975]:
+                    - /url: /automation/projects/1257/project-workflows/2780
+                    - button "Gmail AI Summarizer to Slack" [ref=e1976]
+                  - generic [ref=e1978]:
+                    - button "1 workflow" [ref=e1979]
+                    - group "Workflow Creation Actions" [ref=e1983]:
+                      - button "Create Workflow" [ref=e1984]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e1985]
+                    - generic [ref=e1987]:
+                      - generic [ref=e1988]: "Tags:"
+                      - button [ref=e1989]
+                - generic [ref=e1990]:
+                  - generic [ref=e1991]:
+                    - generic [ref=e1993]:
+                      - generic [ref=e1994]: V1
+                      - generic [ref=e1995]: DRAFT
+                    - button "Not yet published" [ref=e1996]
+                  - button "More Project Actions" [ref=e1999]
+            - generic "Gmail AI Summarizer to Slack_container" [ref=e2001] [cursor=pointer]:
+              - generic [ref=e2002]:
+                - generic "1258" [ref=e2003]:
+                  - link [ref=e2005]:
+                    - /url: /automation/projects/1258/project-workflows/2787
+                    - button "Gmail AI Summarizer to Slack" [ref=e2006]
+                  - generic [ref=e2008]:
+                    - button "1 workflow" [ref=e2009]
+                    - group "Workflow Creation Actions" [ref=e2013]:
+                      - button "Create Workflow" [ref=e2014]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e2015]
+                    - generic [ref=e2017]:
+                      - generic [ref=e2018]: "Tags:"
+                      - button [ref=e2019]
+                - generic [ref=e2020]:
+                  - generic [ref=e2021]:
+                    - generic [ref=e2023]:
+                      - generic [ref=e2024]: V1
+                      - generic [ref=e2025]: DRAFT
+                    - button "Not yet published" [ref=e2026]
+                  - button "More Project Actions" [ref=e2029]
+            - generic "Gmail AI Summarizer to Slack_container" [ref=e2031] [cursor=pointer]:
+              - generic [ref=e2032]:
+                - generic "1332" [ref=e2033]:
+                  - link [ref=e2035]:
+                    - /url: /automation/projects/1332/project-workflows/2955
+                    - button "Gmail AI Summarizer to Slack" [ref=e2036]
+                  - generic [ref=e2038]:
+                    - button "2 workflows" [ref=e2039]
+                    - group "Workflow Creation Actions" [ref=e2043]:
+                      - button "Create Workflow" [ref=e2044]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e2045]
+                    - generic [ref=e2047]:
+                      - generic [ref=e2048]: "Tags:"
+                      - button [ref=e2049]
+                - generic [ref=e2050]:
+                  - generic [ref=e2051]:
+                    - generic [ref=e2053]:
+                      - generic [ref=e2054]: V1
+                      - generic [ref=e2055]: DRAFT
+                    - button "Not yet published" [ref=e2056]
+                  - button "More Project Actions" [ref=e2059]
+            - generic "Gmail to Slack_container" [ref=e2061] [cursor=pointer]:
+              - generic [ref=e2062]:
+                - generic "1330" [ref=e2063]:
+                  - link [ref=e2065]:
+                    - /url: /automation/projects/1330/project-workflows/2952
+                    - button "Gmail to Slack" [ref=e2066]
+                  - generic [ref=e2068]:
+                    - button "1 workflow" [ref=e2069]
+                    - group "Workflow Creation Actions" [ref=e2073]:
+                      - button "Create Workflow" [ref=e2074]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e2075]
+                    - generic [ref=e2077]:
+                      - generic [ref=e2078]: "Tags:"
+                      - button [ref=e2079]
+                - generic [ref=e2080]:
+                  - generic [ref=e2081]:
+                    - generic [ref=e2083]:
+                      - generic [ref=e2084]: V1
+                      - generic [ref=e2085]: DRAFT
+                    - button "Not yet published" [ref=e2086]
+                  - button "More Project Actions" [ref=e2089]
+            - generic "Gmail to Slack Email Summarizer_container" [ref=e2091] [cursor=pointer]:
+              - generic [ref=e2092]:
+                - generic "1248" [ref=e2093]:
+                  - link [ref=e2095]:
+                    - /url: /automation/projects/1248/project-workflows/2449
+                    - button "Gmail to Slack Email Summarizer" [ref=e2096]
+                  - generic [ref=e2098]:
+                    - button "1 workflow" [ref=e2099]
+                    - group "Workflow Creation Actions" [ref=e2103]:
+                      - button "Create Workflow" [ref=e2104]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e2105]
+                    - generic [ref=e2107]:
+                      - generic [ref=e2108]: "Tags:"
+                      - button [ref=e2109]
+                - generic [ref=e2110]:
+                  - generic [ref=e2111]:
+                    - generic [ref=e2113]:
+                      - generic [ref=e2114]: V1
+                      - generic [ref=e2115]: DRAFT
+                    - button "Not yet published" [ref=e2116]
+                  - button "More Project Actions" [ref=e2119]
+            - generic "Gmail to Slack Email Summary_container" [ref=e2121] [cursor=pointer]:
+              - generic [ref=e2122]:
+                - generic "1331" [ref=e2123]:
+                  - link [ref=e2125]:
+                    - /url: /automation/projects/1331/project-workflows/2953
+                    - button "Gmail to Slack Email Summary" [ref=e2126]
+                  - generic [ref=e2128]:
+                    - button "1 workflow" [ref=e2129]
+                    - group "Workflow Creation Actions" [ref=e2133]:
+                      - button "Create Workflow" [ref=e2134]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e2135]
+                    - generic [ref=e2137]:
+                      - generic [ref=e2138]: "Tags:"
+                      - button [ref=e2139]
+                - generic [ref=e2140]:
+                  - generic [ref=e2141]:
+                    - generic [ref=e2143]:
+                      - generic [ref=e2144]: V1
+                      - generic [ref=e2145]: DRAFT
+                    - button "Not yet published" [ref=e2146]
+                  - button "More Project Actions" [ref=e2149]
+            - generic "Gmail to Slack Email Summary_container" [ref=e2151] [cursor=pointer]:
+              - generic [ref=e2152]:
+                - generic "1341" [ref=e2153]:
+                  - link [ref=e2155]:
+                    - /url: /automation/projects/1341/project-workflows/2989
+                    - button "Gmail to Slack Email Summary" [ref=e2156]
+                  - generic [ref=e2158]:
+                    - button "1 workflow" [ref=e2159]
+                    - group "Workflow Creation Actions" [ref=e2163]:
+                      - button "Create Workflow" [ref=e2164]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e2165]
+                    - generic [ref=e2167]:
+                      - generic [ref=e2168]: "Tags:"
+                      - button [ref=e2169]
+                - generic [ref=e2170]:
+                  - generic [ref=e2171]:
+                    - generic [ref=e2173]:
+                      - generic [ref=e2174]: V1
+                      - generic [ref=e2175]: DRAFT
+                    - button "Not yet published" [ref=e2176]
+                  - button "More Project Actions" [ref=e2179]
+            - generic "Gmail to Slack Summary_container" [ref=e2181] [cursor=pointer]:
+              - generic [ref=e2182]:
+                - generic "1246" [ref=e2183]:
+                  - link [ref=e2185]:
+                    - /url: /automation/projects/1246/project-workflows/2954
+                    - button "Gmail to Slack Summary" [ref=e2186]
+                  - generic [ref=e2188]:
+                    - button "1 workflow" [ref=e2189]
+                    - group "Workflow Creation Actions" [ref=e2193]:
+                      - button "Create Workflow" [ref=e2194]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e2195]
+                    - generic [ref=e2197]:
+                      - generic [ref=e2198]: "Tags:"
+                      - button [ref=e2199]
+                - generic [ref=e2200]:
+                  - generic [ref=e2201]:
+                    - generic [ref=e2203]:
+                      - generic [ref=e2204]: V1
+                      - generic [ref=e2205]: DRAFT
+                    - button "Not yet published" [ref=e2206]
+                  - button "More Project Actions" [ref=e2209]
+            - generic "Gmail to Slack Summary_container" [ref=e2211] [cursor=pointer]:
+              - generic [ref=e2212]:
+                - generic "1340" [ref=e2213]:
+                  - link [ref=e2215]:
+                    - /url: /automation/projects/1340/project-workflows/2985
+                    - button "Gmail to Slack Summary" [ref=e2216]
+                  - generic [ref=e2218]:
+                    - button "1 workflow" [ref=e2219]
+                    - group "Workflow Creation Actions" [ref=e2223]:
+                      - button "Create Workflow" [ref=e2224]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e2225]
+                    - generic [ref=e2227]:
+                      - generic [ref=e2228]: "Tags:"
+                      - button [ref=e2229]
+                - generic [ref=e2230]:
+                  - generic [ref=e2231]:
+                    - generic [ref=e2233]:
+                      - generic [ref=e2234]: V1
+                      - generic [ref=e2235]: DRAFT
+                    - button "Not yet published" [ref=e2236]
+                  - button "More Project Actions" [ref=e2239]
+            - generic "Google_container" [ref=e2241] [cursor=pointer]:
+              - generic [ref=e2242]:
+                - generic "1187" [ref=e2243]:
+                  - link "Google" [ref=e2245]:
+                    - /url: /automation/projects/1187/project-workflows/2298
+                  - generic [ref=e2247]:
+                    - button "1 workflow" [ref=e2248]
+                    - group "Workflow Creation Actions" [ref=e2252]:
+                      - button "Create Workflow" [ref=e2253]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e2254]
+                    - generic [ref=e2256]:
+                      - generic [ref=e2257]: "Tags:"
+                      - button [ref=e2258]
+                - generic [ref=e2259]:
+                  - generic [ref=e2260]:
+                    - generic [ref=e2262]:
+                      - generic [ref=e2263]: V1
+                      - generic [ref=e2264]: DRAFT
+                    - button "Not yet published" [ref=e2265]
+                  - button "More Project Actions" [ref=e2268]
+            - generic "Graph_container" [ref=e2270] [cursor=pointer]:
+              - generic [ref=e2271]:
+                - generic "1346" [ref=e2272]:
+                  - link "Graph" [ref=e2274]:
+                    - /url: /automation/projects/1346/project-workflows/2996
+                  - generic [ref=e2276]:
+                    - button "1 workflow" [ref=e2277]
+                    - group "Workflow Creation Actions" [ref=e2281]:
+                      - button "Create Workflow" [ref=e2282]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e2283]
+                    - generic [ref=e2285]:
+                      - generic [ref=e2286]: "Tags:"
+                      - generic [ref=e2287]:
+                        - generic [ref=e2288]: graph
+                        - button [ref=e2289]
+                      - button [ref=e2290]
+                - generic [ref=e2291]:
+                  - generic [ref=e2292]:
+                    - generic [ref=e2294]:
+                      - generic [ref=e2295]: V1
+                      - generic [ref=e2296]: DRAFT
+                    - button "Not yet published" [ref=e2297]
+                  - button "More Project Actions" [ref=e2300]
+            - generic "HITL_container" [ref=e2302] [cursor=pointer]:
+              - generic [ref=e2303]:
+                - generic "1099" [ref=e2304]:
+                  - link "HITL" [ref=e2306]:
+                    - /url: /automation/projects/1099/project-workflows/1653
+                  - generic [ref=e2308]:
+                    - button "5 workflows" [ref=e2309]
+                    - group "Workflow Creation Actions" [ref=e2313]:
+                      - button "Create Workflow" [ref=e2314]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e2315]
+                    - generic [ref=e2317]:
+                      - generic [ref=e2318]: "Tags:"
+                      - generic [ref=e2319]:
+                        - generic [ref=e2320]: hitl
+                        - button [ref=e2321]
+                      - button [ref=e2322]
+                - generic [ref=e2323]:
+                  - generic [ref=e2324]:
+                    - generic [ref=e2325]:
+                      - generic [ref=e2326]:
+                        - generic [ref=e2327]: V12
+                        - generic [ref=e2328]: PUBLISHED
+                      - button "Deploy" [ref=e2329]
+                    - button "Published at 6/30/2026 6:00:31 PM" [ref=e2330]
+                  - button "More Project Actions" [ref=e2333]
+            - generic "HOK_container" [ref=e2335] [cursor=pointer]:
+              - generic [ref=e2336]:
+                - generic "1055" [ref=e2337]:
+                  - link "HOK" [ref=e2339]:
+                    - /url: /automation/projects/1055/project-workflows/1060
+                  - generic [ref=e2341]:
+                    - button "2 workflows" [ref=e2342]
+                    - group "Workflow Creation Actions" [ref=e2346]:
+                      - button "Create Workflow" [ref=e2347]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e2348]
+                    - generic [ref=e2350]:
+                      - generic [ref=e2351]: "Tags:"
+                      - button [ref=e2352]
+                - generic [ref=e2353]:
+                  - generic [ref=e2354]:
+                    - generic [ref=e2356]:
+                      - generic [ref=e2357]: V1
+                      - generic [ref=e2358]: DRAFT
+                    - button "Not yet published" [ref=e2359]
+                  - button "More Project Actions" [ref=e2362]
+            - generic "Hub_container" [ref=e2364] [cursor=pointer]:
+              - generic [ref=e2365]:
+                - generic "1339" [ref=e2366]:
+                  - link "Hub" [ref=e2368]:
+                    - /url: /automation/projects/1339/project-workflows/2982
+                  - generic [ref=e2370]:
+                    - button "2 workflows" [ref=e2371]
+                    - group "Workflow Creation Actions" [ref=e2375]:
+                      - button "Create Workflow" [ref=e2376]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e2377]
+                    - generic [ref=e2379]:
+                      - generic [ref=e2380]: "Tags:"
+                      - generic [ref=e2381]:
+                        - generic [ref=e2382]: hub
+                        - button [ref=e2383]
+                      - button [ref=e2384]
+                - generic [ref=e2385]:
+                  - generic [ref=e2386]:
+                    - generic [ref=e2388]:
+                      - generic [ref=e2389]: V1
+                      - generic [ref=e2390]: DRAFT
+                    - button "Not yet published" [ref=e2391]
+                  - button "More Project Actions" [ref=e2394]
+            - generic "Inputs_container" [ref=e2396] [cursor=pointer]:
+              - generic [ref=e2397]:
+                - generic "1179" [ref=e2398]:
+                  - link "Inputs" [ref=e2400]:
+                    - /url: /automation/projects/1179/project-workflows/1932
+                  - generic [ref=e2402]:
+                    - button "3 workflows" [ref=e2403]
+                    - group "Workflow Creation Actions" [ref=e2407]:
+                      - button "Create Workflow" [ref=e2408]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e2409]
+                    - generic [ref=e2411]:
+                      - generic [ref=e2412]: "Tags:"
+                      - button [ref=e2413]
+                - generic [ref=e2414]:
+                  - generic [ref=e2415]:
+                    - generic [ref=e2417]:
+                      - generic [ref=e2418]: V1
+                      - generic [ref=e2419]: DRAFT
+                    - button "Not yet published" [ref=e2420]
+                  - button "More Project Actions" [ref=e2423]
+            - generic "Invalid Workflow_container" [ref=e2425] [cursor=pointer]:
+              - generic [ref=e2426]:
+                - generic "1096" [ref=e2427]:
+                  - link "Invalid Workflow" [ref=e2429]:
+                    - /url: /automation/projects/1096/project-workflows/1617
+                  - generic [ref=e2431]:
+                    - button "1 workflow" [ref=e2432]
+                    - group "Workflow Creation Actions" [ref=e2436]:
+                      - button "Create Workflow" [ref=e2437]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e2438]
+                    - generic [ref=e2440]:
+                      - generic [ref=e2441]: "Tags:"
+                      - button [ref=e2442]
+                - generic [ref=e2443]:
+                  - generic [ref=e2444]:
+                    - generic [ref=e2446]:
+                      - generic [ref=e2447]: V1
+                      - generic [ref=e2448]: DRAFT
+                    - button "Not yet published" [ref=e2449]
+                  - button "More Project Actions" [ref=e2452]
+            - generic "KnowledgeBase agent_container" [ref=e2454] [cursor=pointer]:
+              - generic [ref=e2455]:
+                - generic "1338" [ref=e2456]:
+                  - link "KnowledgeBase agent" [ref=e2458]:
+                    - /url: /automation/projects/1338/project-workflows/2979
+                  - generic [ref=e2460]:
+                    - button "1 workflow" [ref=e2461]
+                    - group "Workflow Creation Actions" [ref=e2465]:
+                      - button "Create Workflow" [ref=e2466]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e2467]
+                    - generic [ref=e2469]:
+                      - generic [ref=e2470]: "Tags:"
+                      - generic [ref=e2471]:
+                        - generic [ref=e2472]: ai agent
+                        - button [ref=e2473]
+                      - button [ref=e2474]
+                - generic [ref=e2475]:
+                  - generic [ref=e2476]:
+                    - generic [ref=e2478]:
+                      - generic [ref=e2479]: V1
+                      - generic [ref=e2480]: DRAFT
+                    - button "Not yet published" [ref=e2481]
+                  - button "More Project Actions" [ref=e2484]
+            - generic "Komunalac_container" [ref=e2486] [cursor=pointer]:
+              - generic [ref=e2487]:
+                - generic "1056" [ref=e2488]:
+                  - link "Komunalac" [ref=e2490]:
+                    - /url: /automation/projects/1056/project-workflows/1596
+                  - generic [ref=e2492]:
+                    - button "5 workflows" [ref=e2493]
+                    - group "Workflow Creation Actions" [ref=e2497]:
+                      - button "Create Workflow" [ref=e2498]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e2499]
+                    - generic [ref=e2501]:
+                      - generic [ref=e2502]: "Tags:"
+                      - generic [ref=e2503]:
+                        - generic [ref=e2504]: komunalac
+                        - button [ref=e2505]
+                      - button [ref=e2506]
+                - generic [ref=e2507]:
+                  - generic [ref=e2508]:
+                    - generic [ref=e2510]:
+                      - generic [ref=e2511]: V1
+                      - generic [ref=e2512]: DRAFT
+                    - button "Not yet published" [ref=e2513]
+                  - button "More Project Actions" [ref=e2516]
+            - generic "Liferay_container" [ref=e2518] [cursor=pointer]:
+              - generic [ref=e2519]:
+                - generic "1136" [ref=e2520]:
+                  - link "Liferay" [ref=e2522]:
+                    - /url: /automation/projects/1136/project-workflows/1726
+                  - generic [ref=e2524]:
+                    - button "1 workflow" [ref=e2525]
+                    - group "Workflow Creation Actions" [ref=e2529]:
+                      - button "Create Workflow" [ref=e2530]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e2531]
+                    - generic [ref=e2533]:
+                      - generic [ref=e2534]: "Tags:"
+                      - button [ref=e2535]
+                - generic [ref=e2536]:
+                  - generic [ref=e2537]:
+                    - generic [ref=e2539]:
+                      - generic [ref=e2540]: V1
+                      - generic [ref=e2541]: DRAFT
+                    - button "Not yet published" [ref=e2542]
+                  - button "More Project Actions" [ref=e2545]
+            - generic "Log debug bug_container" [ref=e2547] [cursor=pointer]:
+              - generic [ref=e2548]:
+                - generic "1234" [ref=e2549]:
+                  - link "Log debug bug" [ref=e2551]:
+                    - /url: /automation/projects/1234/project-workflows/2415
+                  - generic [ref=e2553]:
+                    - button "1 workflow" [ref=e2554]
+                    - group "Workflow Creation Actions" [ref=e2558]:
+                      - button "Create Workflow" [ref=e2559]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e2560]
+                    - generic [ref=e2562]:
+                      - generic [ref=e2563]: "Tags:"
+                      - generic [ref=e2564]:
+                        - generic [ref=e2565]: log
+                        - button [ref=e2566]
+                      - button [ref=e2567]
+                - generic [ref=e2568]:
+                  - generic [ref=e2569]:
+                    - generic [ref=e2570]:
+                      - generic [ref=e2571]:
+                        - generic [ref=e2572]: V2
+                        - generic [ref=e2573]: PUBLISHED
+                      - button "Deploy" [ref=e2574]
+                    - button "Published at 6/5/2026 4:30:23 PM" [ref=e2575]
+                  - button "More Project Actions" [ref=e2578]
+            - generic "Loop_container" [ref=e2580] [cursor=pointer]:
+              - generic [ref=e2581]:
+                - generic "1189" [ref=e2582]:
+                  - link "Loop" [ref=e2584]:
+                    - /url: /automation/projects/1189/project-workflows/1972
+                  - generic [ref=e2586]:
+                    - button "1 workflow" [ref=e2587]
+                    - group "Workflow Creation Actions" [ref=e2591]:
+                      - button "Create Workflow" [ref=e2592]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e2593]
+                    - generic [ref=e2595]:
+                      - generic [ref=e2596]: "Tags:"
+                      - button [ref=e2597]
+                - generic [ref=e2598]:
+                  - generic [ref=e2599]:
+                    - generic [ref=e2601]:
+                      - generic [ref=e2602]: V1
+                      - generic [ref=e2603]: DRAFT
+                    - button "Not yet published" [ref=e2604]
+                  - button "More Project Actions" [ref=e2607]
+            - generic "Mailchimp_container" [ref=e2609] [cursor=pointer]:
+              - generic [ref=e2610]:
+                - generic "1134" [ref=e2611]:
+                  - link "Mailchimp" [ref=e2613]:
+                    - /url: /automation/projects/1134/project-workflows/1693
+                  - generic [ref=e2615]:
+                    - button "1 workflow" [ref=e2616]
+                    - group "Workflow Creation Actions" [ref=e2620]:
+                      - button "Create Workflow" [ref=e2621]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e2622]
+                    - generic [ref=e2624]:
+                      - generic [ref=e2625]: "Tags:"
+                      - generic [ref=e2626]:
+                        - generic [ref=e2627]: mailchimp
+                        - button [ref=e2628]
+                      - button [ref=e2629]
+                - generic [ref=e2630]:
+                  - generic [ref=e2631]:
+                    - generic [ref=e2632]:
+                      - generic [ref=e2633]:
+                        - generic [ref=e2634]: V1
+                        - generic [ref=e2635]: PUBLISHED
+                      - button "Deploy" [ref=e2636]
+                    - button "Published at 8/29/2025 9:29:03 AM" [ref=e2637]
+                  - button "More Project Actions" [ref=e2640]
+            - generic "Map_container" [ref=e2642] [cursor=pointer]:
+              - generic [ref=e2643]:
+                - generic "1103" [ref=e2644]:
+                  - link "Map" [ref=e2646]:
+                    - /url: /automation/projects/1103/project-workflows/1663
+                  - generic [ref=e2648]:
+                    - button "3 workflows" [ref=e2649]
+                    - group "Workflow Creation Actions" [ref=e2653]:
+                      - button "Create Workflow" [ref=e2654]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e2655]
+                    - generic [ref=e2657]:
+                      - generic [ref=e2658]: "Tags:"
+                      - generic [ref=e2659]:
+                        - generic [ref=e2660]: map
+                        - button [ref=e2661]
+                      - button [ref=e2662]
+                - generic [ref=e2663]:
+                  - generic [ref=e2664]:
+                    - generic [ref=e2665]:
+                      - generic [ref=e2666]:
+                        - generic [ref=e2667]: V2
+                        - generic [ref=e2668]: PUBLISHED
+                      - button "Deploy" [ref=e2669]
+                    - button "Published at 12/17/2025 7:47:51 PM" [ref=e2670]
+                  - button "More Project Actions" [ref=e2673]
+            - generic "MCP_container" [ref=e2675] [cursor=pointer]:
+              - generic [ref=e2676]:
+                - generic "1333" [ref=e2677]:
+                  - link "MCP" [ref=e2679]:
+                    - /url: /automation/projects/1333/project-workflows/2957
+                  - generic [ref=e2681]:
+                    - button "1 workflow" [ref=e2682]
+                    - group "Workflow Creation Actions" [ref=e2686]:
+                      - button "Create Workflow" [ref=e2687]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e2688]
+                    - generic [ref=e2690]:
+                      - generic [ref=e2691]: "Tags:"
+                      - generic [ref=e2692]:
+                        - generic [ref=e2693]: mcp
+                        - button [ref=e2694]
+                      - button [ref=e2695]
+                - generic [ref=e2696]:
+                  - generic [ref=e2697]:
+                    - generic [ref=e2698]:
+                      - generic [ref=e2699]:
+                        - generic [ref=e2700]: V1
+                        - generic [ref=e2701]: PUBLISHED
+                      - button "Deploy" [ref=e2702]
+                    - button "Published at 6/27/2026 8:06:18 AM" [ref=e2703]
+                  - button "More Project Actions" [ref=e2706]
+            - generic "Mistral_container" [ref=e2708] [cursor=pointer]:
+              - generic [ref=e2709]:
+                - generic "1225" [ref=e2710]:
+                  - link "Mistral" [ref=e2712]:
+                    - /url: /automation/projects/1225/project-workflows/2355
+                  - generic [ref=e2714]:
+                    - button "1 workflow" [ref=e2715]
+                    - group "Workflow Creation Actions" [ref=e2719]:
+                      - button "Create Workflow" [ref=e2720]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e2721]
+                    - generic [ref=e2723]:
+                      - generic [ref=e2724]: "Tags:"
+                      - button [ref=e2725]
+                - generic [ref=e2726]:
+                  - generic [ref=e2727]:
+                    - generic [ref=e2729]:
+                      - generic [ref=e2730]: V1
+                      - generic [ref=e2731]: DRAFT
+                    - button "Not yet published" [ref=e2732]
+                  - button "More Project Actions" [ref=e2735]
+            - generic "n8n_container" [ref=e2737] [cursor=pointer]:
+              - generic [ref=e2738]:
+                - generic "1337" [ref=e2739]:
+                  - link "n8n" [ref=e2741]:
+                    - /url: /automation/projects/1337/project-workflows/2978
+                  - generic [ref=e2743]:
+                    - button "2 workflows" [ref=e2744]
+                    - group "Workflow Creation Actions" [ref=e2748]:
+                      - button "Create Workflow" [ref=e2749]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e2750]
+                    - generic [ref=e2752]:
+                      - generic [ref=e2753]: "Tags:"
+                      - generic [ref=e2754]:
+                        - generic [ref=e2755]: n8n
+                        - button [ref=e2756]
+                      - button [ref=e2757]
+                - generic [ref=e2758]:
+                  - generic [ref=e2759]:
+                    - generic [ref=e2761]:
+                      - generic [ref=e2762]: V1
+                      - generic [ref=e2763]: DRAFT
+                    - button "Not yet published" [ref=e2764]
+                  - button "More Project Actions" [ref=e2767]
+            - generic "NiftyPM_container" [ref=e2769] [cursor=pointer]:
+              - generic [ref=e2770]:
+                - generic "1089" [ref=e2771]:
+                  - link "NiftyPM" [ref=e2773]:
+                    - /url: /automation/projects/1089/project-workflows/1599
+                  - generic [ref=e2775]:
+                    - button "1 workflow" [ref=e2776]
+                    - group "Workflow Creation Actions" [ref=e2780]:
+                      - button "Create Workflow" [ref=e2781]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e2782]
+                    - generic [ref=e2784]:
+                      - generic [ref=e2785]: "Tags:"
+                      - button [ref=e2786]
+                - generic [ref=e2787]:
+                  - generic [ref=e2788]:
+                    - generic [ref=e2790]:
+                      - generic [ref=e2791]: V1
+                      - generic [ref=e2792]: DRAFT
+                    - button "Not yet published" [ref=e2793]
+                  - button "More Project Actions" [ref=e2796]
+            - generic "ObjectHelper bug_container" [ref=e2798] [cursor=pointer]:
+              - generic [ref=e2799]:
+                - generic "1215" [ref=e2800]:
+                  - link "ObjectHelper bug" [ref=e2802]:
+                    - /url: /automation/projects/1215/project-workflows/2238
+                  - generic [ref=e2804]:
+                    - button "1 workflow" [ref=e2805]
+                    - group "Workflow Creation Actions" [ref=e2809]:
+                      - button "Create Workflow" [ref=e2810]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e2811]
+                    - generic [ref=e2813]:
+                      - generic [ref=e2814]: "Tags:"
+                      - button [ref=e2815]
+                - generic [ref=e2816]:
+                  - generic [ref=e2817]:
+                    - generic [ref=e2819]:
+                      - generic [ref=e2820]: V1
+                      - generic [ref=e2821]: DRAFT
+                    - button "Not yet published" [ref=e2822]
+                  - button "More Project Actions" [ref=e2825]
+            - generic "OneSimpleAPI_container" [ref=e2827] [cursor=pointer]:
+              - generic [ref=e2828]:
+                - generic "1217" [ref=e2829]:
+                  - button "OneSimpleAPI" [ref=e2831]
+                  - generic [ref=e2833]:
+                    - button "0 workflows" [ref=e2834]
+                    - group "Workflow Creation Actions" [ref=e2838]:
+                      - button "Create Workflow" [ref=e2839]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e2840]
+                    - generic [ref=e2842]:
+                      - generic [ref=e2843]: "Tags:"
+                      - button [ref=e2844]
+                - generic [ref=e2845]:
+                  - generic [ref=e2846]:
+                    - generic [ref=e2848]:
+                      - generic [ref=e2849]: V1
+                      - generic [ref=e2850]: DRAFT
+                    - button "Not yet published" [ref=e2851]
+                  - button "More Project Actions" [ref=e2854]
+            - generic "Opemipo_container" [ref=e2856] [cursor=pointer]:
+              - generic [ref=e2857]:
+                - generic "1192" [ref=e2858]:
+                  - link "Opemipo" [ref=e2860]:
+                    - /url: /automation/projects/1192/project-workflows/2006
+                  - generic [ref=e2862]:
+                    - button "1 workflow" [ref=e2863]
+                    - group "Workflow Creation Actions" [ref=e2867]:
+                      - button "Create Workflow" [ref=e2868]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e2869]
+                    - generic [ref=e2871]:
+                      - generic [ref=e2872]: "Tags:"
+                      - generic [ref=e2873]:
+                        - generic [ref=e2874]: opemipo
+                        - button [ref=e2875]
+                      - button [ref=e2876]
+                - generic [ref=e2877]:
+                  - generic [ref=e2878]:
+                    - generic [ref=e2880]:
+                      - generic [ref=e2881]: V1
+                      - generic [ref=e2882]: DRAFT
+                    - button "Not yet published" [ref=e2883]
+                  - button "More Project Actions" [ref=e2886]
+            - generic "OpenAI_container" [ref=e2888] [cursor=pointer]:
+              - generic [ref=e2889]:
+                - generic "1058" [ref=e2890]:
+                  - link "OpenAI" [ref=e2892]:
+                    - /url: /automation/projects/1058/project-workflows/1063
+                  - generic [ref=e2894]:
+                    - button "1 workflow" [ref=e2895]
+                    - group "Workflow Creation Actions" [ref=e2899]:
+                      - button "Create Workflow" [ref=e2900]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e2901]
+                    - generic [ref=e2903]:
+                      - generic [ref=e2904]: "Tags:"
+                      - button [ref=e2905]
+                - generic [ref=e2906]:
+                  - generic [ref=e2907]:
+                    - generic [ref=e2908]:
+                      - generic [ref=e2909]:
+                        - generic [ref=e2910]: V2
+                        - generic [ref=e2911]: PUBLISHED
+                      - button "Deploy" [ref=e2912]
+                    - button "Published at 10/7/2025 12:52:37 PM" [ref=e2913]
+                  - button "More Project Actions" [ref=e2916]
+            - generic "Parallel_container" [ref=e2918] [cursor=pointer]:
+              - generic [ref=e2919]:
+                - generic "1104" [ref=e2920]:
+                  - link "Parallel" [ref=e2922]:
+                    - /url: /automation/projects/1104/project-workflows/1662
+                  - generic [ref=e2924]:
+                    - button "1 workflow" [ref=e2925]
+                    - group "Workflow Creation Actions" [ref=e2929]:
+                      - button "Create Workflow" [ref=e2930]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e2931]
+                    - generic [ref=e2933]:
+                      - generic [ref=e2934]: "Tags:"
+                      - button [ref=e2935]
+                - generic [ref=e2936]:
+                  - generic [ref=e2937]:
+                    - generic [ref=e2939]:
+                      - generic [ref=e2940]: V1
+                      - generic [ref=e2941]: DRAFT
+                    - button "Not yet published" [ref=e2942]
+                  - button "More Project Actions" [ref=e2945]
+            - generic "Prodect Deployment Version Update bug_container" [ref=e2947] [cursor=pointer]:
+              - generic [ref=e2948]:
+                - generic "1190" [ref=e2949]:
+                  - link "Prodect Deployment Version Update bug" [ref=e2951]:
+                    - /url: /automation/projects/1190/project-workflows/1979
+                  - generic [ref=e2953]:
+                    - button "1 workflow" [ref=e2954]
+                    - group "Workflow Creation Actions" [ref=e2958]:
+                      - button "Create Workflow" [ref=e2959]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e2960]
+                    - generic [ref=e2962]:
+                      - generic [ref=e2963]: "Tags:"
+                      - generic [ref=e2964]:
+                        - generic [ref=e2965]: deployment
+                        - button [ref=e2966]
+                      - button [ref=e2967]
+                - generic [ref=e2968]:
+                  - generic [ref=e2969]:
+                    - generic [ref=e2970]:
+                      - generic [ref=e2971]:
+                        - generic [ref=e2972]: V14
+                        - generic [ref=e2973]: PUBLISHED
+                      - button "Deploy" [ref=e2974]
+                    - button "Published at 11/24/2025 7:14:16 AM" [ref=e2975]
+                  - button "More Project Actions" [ref=e2978]
+            - generic "Productboard_container" [ref=e2980] [cursor=pointer]:
+              - generic [ref=e2981]:
+                - generic "1057" [ref=e2982]:
+                  - link "Productboard" [ref=e2984]:
+                    - /url: /automation/projects/1057/project-workflows/1062
+                  - generic [ref=e2986]:
+                    - button "1 workflow" [ref=e2987]
+                    - group "Workflow Creation Actions" [ref=e2991]:
+                      - button "Create Workflow" [ref=e2992]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e2993]
+                    - generic [ref=e2995]:
+                      - generic [ref=e2996]: "Tags:"
+                      - button [ref=e2997]
+                - generic [ref=e2998]:
+                  - generic [ref=e2999]:
+                    - generic [ref=e3001]:
+                      - generic [ref=e3002]: V1
+                      - generic [ref=e3003]: DRAFT
+                    - button "Not yet published" [ref=e3004]
+                  - button "More Project Actions" [ref=e3007]
+            - generic "PTO Elf_container" [ref=e3009] [cursor=pointer]:
+              - generic [ref=e3010]:
+                - generic "1090" [ref=e3011]:
+                  - link "PTO Elf" [ref=e3013]:
+                    - /url: /automation/projects/1090/project-workflows/1600
+                  - generic [ref=e3015]:
+                    - button "1 workflow" [ref=e3016]
+                    - group "Workflow Creation Actions" [ref=e3020]:
+                      - button "Create Workflow" [ref=e3021]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e3022]
+                    - generic [ref=e3024]:
+                      - generic [ref=e3025]: "Tags:"
+                      - button [ref=e3026]
+                - generic [ref=e3027]:
+                  - generic [ref=e3028]:
+                    - generic [ref=e3029]:
+                      - generic [ref=e3030]:
+                        - generic [ref=e3031]: V4
+                        - generic [ref=e3032]: PUBLISHED
+                      - button "Deploy" [ref=e3033]
+                    - button "Published at 6/25/2025 8:43:05 AM" [ref=e3034]
+                  - button "More Project Actions" [ref=e3037]
+            - generic "PV Group Automation_container" [ref=e3039] [cursor=pointer]:
+              - generic [ref=e3040]:
+                - generic "1183" [ref=e3041]:
+                  - link "PV Group Automation" [ref=e3043]:
+                    - /url: /automation/projects/1183/project-workflows/1941
+                  - generic [ref=e3045]:
+                    - button "5 workflows" [ref=e3046]
+                    - group "Workflow Creation Actions" [ref=e3050]:
+                      - button "Create Workflow" [ref=e3051]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e3052]
+                    - generic [ref=e3054]:
+                      - generic [ref=e3055]: "Tags:"
+                      - button [ref=e3056]
+                - generic [ref=e3057]:
+                  - generic [ref=e3058]:
+                    - generic [ref=e3060]:
+                      - generic [ref=e3061]: V1
+                      - generic [ref=e3062]: DRAFT
+                    - button "Not yet published" [ref=e3063]
+                  - button "More Project Actions" [ref=e3066]
+            - generic "Sales Assistant_container" [ref=e3068] [cursor=pointer]:
+              - generic [ref=e3069]:
+                - generic "1226" [ref=e3070]:
+                  - link "Sales Assistant" [ref=e3072]:
+                    - /url: /automation/projects/1226/project-workflows/2356
+                  - generic [ref=e3074]:
+                    - button "1 workflow" [ref=e3075]
+                    - group "Workflow Creation Actions" [ref=e3079]:
+                      - button "Create Workflow" [ref=e3080]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e3081]
+                    - generic [ref=e3083]:
+                      - generic [ref=e3084]: "Tags:"
+                      - generic [ref=e3085]:
+                        - generic [ref=e3086]: ai agent
+                        - button [ref=e3087]
+                      - button [ref=e3088]
+                - generic [ref=e3089]:
+                  - generic [ref=e3090]:
+                    - generic [ref=e3092]:
+                      - generic [ref=e3093]: V1
+                      - generic [ref=e3094]: DRAFT
+                    - button "Not yet published" [ref=e3095]
+                  - button "More Project Actions" [ref=e3098]
+            - generic "Sample Code Project Java_container" [ref=e3100] [cursor=pointer]:
+              - generic [ref=e3101]:
+                - generic "1149" [ref=e3102]:
+                  - generic [ref=e3103]:
+                    - button "Sample Code Project Java" [ref=e3104]
+                    - generic [ref=e3105]: Java
+                  - generic [ref=e3107]:
+                    - button "0 workflows" [ref=e3108]
+                    - generic [ref=e3113]:
+                      - generic [ref=e3114]: "Tags:"
+                      - button [ref=e3115]
+                - generic [ref=e3116]:
+                  - generic [ref=e3117]:
+                    - generic [ref=e3118]:
+                      - generic [ref=e3119]:
+                        - generic [ref=e3120]: V17
+                        - generic [ref=e3121]: PUBLISHED
+                      - button "Deploy" [ref=e3122]
+                    - button "Published at 9/10/2025 9:57:00 AM" [ref=e3123]
+                  - button "More Project Actions" [ref=e3126]
+            - generic "schedule trigger bug_container" [ref=e3128] [cursor=pointer]:
+              - generic [ref=e3129]:
+                - generic "1097" [ref=e3130]:
+                  - link "schedule trigger bug" [ref=e3132]:
+                    - /url: /automation/projects/1097/project-workflows/1618
+                  - generic [ref=e3134]:
+                    - button "1 workflow" [ref=e3135]
+                    - group "Workflow Creation Actions" [ref=e3139]:
+                      - button "Create Workflow" [ref=e3140]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e3141]
+                    - generic [ref=e3143]:
+                      - generic [ref=e3144]: "Tags:"
+                      - button [ref=e3145]
+                - generic [ref=e3146]:
+                  - generic [ref=e3147]:
+                    - generic [ref=e3148]:
+                      - generic [ref=e3149]:
+                        - generic [ref=e3150]: V6
+                        - generic [ref=e3151]: PUBLISHED
+                      - button "Deploy" [ref=e3152]
+                    - button "Published at 7/29/2025 5:53:14 PM" [ref=e3153]
+                  - button "More Project Actions" [ref=e3156]
+            - generic "Scheduler_container" [ref=e3158] [cursor=pointer]:
+              - generic [ref=e3159]:
+                - generic "1071" [ref=e3160]:
+                  - link "Scheduler" [ref=e3162]:
+                    - /url: /automation/projects/1071/project-workflows/1539
+                  - generic [ref=e3164]:
+                    - button "2 workflows" [ref=e3165]
+                    - group "Workflow Creation Actions" [ref=e3169]:
+                      - button "Create Workflow" [ref=e3170]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e3171]
+                    - generic [ref=e3173]:
+                      - generic [ref=e3174]: "Tags:"
+                      - generic [ref=e3175]:
+                        - generic [ref=e3176]: scheduler
+                        - button [ref=e3177]
+                      - button [ref=e3178]
+                - generic [ref=e3179]:
+                  - generic [ref=e3180]:
+                    - generic [ref=e3181]:
+                      - generic [ref=e3182]:
+                        - generic [ref=e3183]: V8
+                        - generic [ref=e3184]: PUBLISHED
+                      - button "Deploy" [ref=e3185]
+                    - button "Published at 6/10/2025 6:02:43 AM" [ref=e3186]
+                  - button "More Project Actions" [ref=e3189]
+            - generic "Script_container" [ref=e3191] [cursor=pointer]:
+              - generic [ref=e3192]:
+                - generic "1173" [ref=e3193]:
+                  - link "Script" [ref=e3195]:
+                    - /url: /automation/projects/1173/project-workflows/1853
+                  - generic [ref=e3197]:
+                    - button "3 workflows" [ref=e3198]
+                    - group "Workflow Creation Actions" [ref=e3202]:
+                      - button "Create Workflow" [ref=e3203]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e3204]
+                    - generic [ref=e3206]:
+                      - generic [ref=e3207]: "Tags:"
+                      - generic [ref=e3208]:
+                        - generic [ref=e3209]: script
+                        - button [ref=e3210]
+                      - button [ref=e3211]
+                - generic [ref=e3212]:
+                  - generic [ref=e3213]:
+                    - generic [ref=e3215]:
+                      - generic [ref=e3216]: V1
+                      - generic [ref=e3217]: DRAFT
+                    - button "Not yet published" [ref=e3218]
+                  - button "More Project Actions" [ref=e3221]
+            - generic "Shopify Bug_container" [ref=e3223] [cursor=pointer]:
+              - generic [ref=e3224]:
+                - generic "1213" [ref=e3225]:
+                  - link "Shopify Bug" [ref=e3227]:
+                    - /url: /automation/projects/1213/project-workflows/2227
+                  - generic [ref=e3229]:
+                    - button "2 workflows" [ref=e3230]
+                    - group "Workflow Creation Actions" [ref=e3234]:
+                      - button "Create Workflow" [ref=e3235]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e3236]
+                    - generic [ref=e3238]:
+                      - generic [ref=e3239]: "Tags:"
+                      - button [ref=e3240]
+                - generic [ref=e3241]:
+                  - generic [ref=e3242]:
+                    - generic [ref=e3244]:
+                      - generic [ref=e3245]: V1
+                      - generic [ref=e3246]: DRAFT
+                    - button "Not yet published" [ref=e3247]
+                  - button "More Project Actions" [ref=e3250]
+            - generic "Slack_container" [ref=e3252] [cursor=pointer]:
+              - generic [ref=e3253]:
+                - generic "1218" [ref=e3254]:
+                  - link "Slack" [ref=e3256]:
+                    - /url: /automation/projects/1218/project-workflows/2710
+                  - generic [ref=e3258]:
+                    - button "3 workflows" [ref=e3259]
+                    - group "Workflow Creation Actions" [ref=e3263]:
+                      - button "Create Workflow" [ref=e3264]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e3265]
+                    - generic [ref=e3267]:
+                      - generic [ref=e3268]: "Tags:"
+                      - generic [ref=e3269]:
+                        - generic [ref=e3270]: slack
+                        - button [ref=e3271]
+                      - button [ref=e3272]
+                - generic [ref=e3273]:
+                  - generic [ref=e3274]:
+                    - generic [ref=e3275]:
+                      - generic [ref=e3276]:
+                        - generic [ref=e3277]: V3
+                        - generic [ref=e3278]: PUBLISHED
+                      - button "Deploy" [ref=e3279]
+                    - button "Published at 6/16/2026 3:41:27 PM" [ref=e3280]
+                  - button "More Project Actions" [ref=e3283]
+            - generic "Slack Reminders_container" [ref=e3285] [cursor=pointer]:
+              - generic [ref=e3286]:
+                - generic "1243" [ref=e3287]:
+                  - link [ref=e3289]:
+                    - /url: /automation/projects/1243/project-workflows/2427
+                    - button "Slack Reminders" [ref=e3290]
+                  - generic [ref=e3292]:
+                    - button "2 workflows" [ref=e3293]
+                    - group "Workflow Creation Actions" [ref=e3297]:
+                      - button "Create Workflow" [ref=e3298]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e3299]
+                    - generic [ref=e3301]:
+                      - generic [ref=e3302]: "Tags:"
+                      - button [ref=e3303]
+                - generic [ref=e3304]:
+                  - generic [ref=e3305]:
+                    - generic [ref=e3307]:
+                      - generic [ref=e3308]: V1
+                      - generic [ref=e3309]: DRAFT
+                    - button "Not yet published" [ref=e3310]
+                  - button "More Project Actions" [ref=e3313]
+            - generic "Slack Scheduled Messages_container" [ref=e3315] [cursor=pointer]:
+              - generic [ref=e3316]:
+                - generic "1239" [ref=e3317]:
+                  - link [ref=e3319]:
+                    - /url: /automation/projects/1239/project-workflows/2423
+                    - button "Slack Scheduled Messages" [ref=e3320]
+                  - generic [ref=e3322]:
+                    - button "1 workflow" [ref=e3323]
+                    - group "Workflow Creation Actions" [ref=e3327]:
+                      - button "Create Workflow" [ref=e3328]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e3329]
+                    - generic [ref=e3331]:
+                      - generic [ref=e3332]: "Tags:"
+                      - button [ref=e3333]
+                - generic [ref=e3334]:
+                  - generic [ref=e3335]:
+                    - generic [ref=e3337]:
+                      - generic [ref=e3338]: V1
+                      - generic [ref=e3339]: DRAFT
+                    - button "Not yet published" [ref=e3340]
+                  - button "More Project Actions" [ref=e3343]
+            - generic "Solo_container" [ref=e3345] [cursor=pointer]:
+              - generic [ref=e3346]:
+                - generic "1093" [ref=e3347]:
+                  - link "Solo" [ref=e3349]:
+                    - /url: /automation/projects/1093/project-workflows/1608
+                  - generic [ref=e3351]:
+                    - button "1 workflow" [ref=e3352]
+                    - group "Workflow Creation Actions" [ref=e3356]:
+                      - button "Create Workflow" [ref=e3357]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e3358]
+                    - generic [ref=e3360]:
+                      - generic [ref=e3361]: "Tags:"
+                      - button [ref=e3362]
+                - generic [ref=e3363]:
+                  - generic [ref=e3364]:
+                    - generic [ref=e3365]:
+                      - generic [ref=e3366]:
+                        - generic [ref=e3367]: V5
+                        - generic [ref=e3368]: PUBLISHED
+                      - button "Deploy" [ref=e3369]
+                    - button "Published at 6/26/2025 5:40:53 PM" [ref=e3370]
+                  - button "More Project Actions" [ref=e3373]
+            - generic "spel_container" [ref=e3375] [cursor=pointer]:
+              - generic [ref=e3376]:
+                - generic "1131" [ref=e3377]:
+                  - link "spel" [ref=e3379]:
+                    - /url: /automation/projects/1131/project-workflows/1690
+                  - generic [ref=e3381]:
+                    - button "2 workflows" [ref=e3382]
+                    - group "Workflow Creation Actions" [ref=e3386]:
+                      - button "Create Workflow" [ref=e3387]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e3388]
+                    - generic [ref=e3390]:
+                      - generic [ref=e3391]: "Tags:"
+                      - generic [ref=e3392]:
+                        - generic [ref=e3393]: spel
+                        - button [ref=e3394]
+                      - button [ref=e3395]
+                - generic [ref=e3396]:
+                  - generic [ref=e3397]:
+                    - generic [ref=e3399]:
+                      - generic [ref=e3400]: V1
+                      - generic [ref=e3401]: DRAFT
+                    - button "Not yet published" [ref=e3402]
+                  - button "More Project Actions" [ref=e3405]
+            - generic "Subflow_container" [ref=e3407] [cursor=pointer]:
+              - generic [ref=e3408]:
+                - generic "1221" [ref=e3409]:
+                  - link "Subflow" [ref=e3411]:
+                    - /url: /automation/projects/1221/project-workflows/2702
+                  - generic [ref=e3413]:
+                    - button "2 workflows" [ref=e3414]
+                    - group "Workflow Creation Actions" [ref=e3418]:
+                      - button "Create Workflow" [ref=e3419]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e3420]
+                    - generic [ref=e3422]:
+                      - generic [ref=e3423]: "Tags:"
+                      - generic [ref=e3424]:
+                        - generic [ref=e3425]: subflow
+                        - button [ref=e3426]
+                      - button [ref=e3427]
+                - generic [ref=e3428]:
+                  - generic [ref=e3429]:
+                    - generic [ref=e3431]:
+                      - generic [ref=e3432]: V1
+                      - generic [ref=e3433]: DRAFT
+                    - button "Not yet published" [ref=e3434]
+                  - button "More Project Actions" [ref=e3437]
+            - generic "Trgovina_container" [ref=e3439] [cursor=pointer]:
+              - generic [ref=e3440]:
+                - generic "1094" [ref=e3441]:
+                  - link "Trgovina" [ref=e3443]:
+                    - /url: /automation/projects/1094/project-workflows/1614
+                  - generic [ref=e3445]:
+                    - button "1 workflow" [ref=e3446]
+                    - group "Workflow Creation Actions" [ref=e3450]:
+                      - button "Create Workflow" [ref=e3451]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e3452]
+                    - generic [ref=e3454]:
+                      - generic [ref=e3455]: "Tags:"
+                      - generic [ref=e3456]:
+                        - generic [ref=e3457]: trgovina
+                        - button [ref=e3458]
+                      - button [ref=e3459]
+                - generic [ref=e3460]:
+                  - generic [ref=e3461]:
+                    - generic [ref=e3462]:
+                      - generic [ref=e3463]:
+                        - generic [ref=e3464]: V1
+                        - generic [ref=e3465]: PUBLISHED
+                      - button "Deploy" [ref=e3466]
+                    - button "Published at 7/2/2025 8:37:20 AM" [ref=e3467]
+                  - button "More Project Actions" [ref=e3470]
+            - generic "Universal AI_container" [ref=e3472] [cursor=pointer]:
+              - generic [ref=e3473]:
+                - generic "1182" [ref=e3474]:
+                  - link "Universal AI" [ref=e3476]:
+                    - /url: /automation/projects/1182/project-workflows/1940
+                  - generic [ref=e3478]:
+                    - button "1 workflow" [ref=e3479]
+                    - group "Workflow Creation Actions" [ref=e3483]:
+                      - button "Create Workflow" [ref=e3484]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e3485]
+                    - generic [ref=e3487]:
+                      - generic [ref=e3488]: "Tags:"
+                      - generic [ref=e3489]:
+                        - generic [ref=e3490]: ai universal
+                        - button [ref=e3491]
+                      - button [ref=e3492]
+                - generic [ref=e3493]:
+                  - generic [ref=e3494]:
+                    - generic [ref=e3496]:
+                      - generic [ref=e3497]: V1
+                      - generic [ref=e3498]: DRAFT
+                    - button "Not yet published" [ref=e3499]
+                  - button "More Project Actions" [ref=e3502]
+            - generic "Upload bug_container" [ref=e3504] [cursor=pointer]:
+              - generic [ref=e3505]:
+                - generic "1174" [ref=e3506]:
+                  - link "Upload bug" [ref=e3508]:
+                    - /url: /automation/projects/1174/project-workflows/1854
+                  - generic [ref=e3510]:
+                    - button "1 workflow" [ref=e3511]
+                    - group "Workflow Creation Actions" [ref=e3515]:
+                      - button "Create Workflow" [ref=e3516]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e3517]
+                    - generic [ref=e3519]:
+                      - generic [ref=e3520]: "Tags:"
+                      - button [ref=e3521]
+                - generic [ref=e3522]:
+                  - generic [ref=e3523]:
+                    - generic [ref=e3525]:
+                      - generic [ref=e3526]: V1
+                      - generic [ref=e3527]: DRAFT
+                    - button "Not yet published" [ref=e3528]
+                  - button "More Project Actions" [ref=e3531]
+            - generic "Var_container" [ref=e3533] [cursor=pointer]:
+              - generic [ref=e3534]:
+                - generic "1186" [ref=e3535]:
+                  - link "Var" [ref=e3537]:
+                    - /url: /automation/projects/1186/project-workflows/1954
+                  - generic [ref=e3539]:
+                    - button "1 workflow" [ref=e3540]
+                    - group "Workflow Creation Actions" [ref=e3544]:
+                      - button "Create Workflow" [ref=e3545]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e3546]
+                    - generic [ref=e3548]:
+                      - generic [ref=e3549]: "Tags:"
+                      - generic [ref=e3550]:
+                        - generic [ref=e3551]: var
+                        - button [ref=e3552]
+                      - button [ref=e3553]
+                - generic [ref=e3554]:
+                  - generic [ref=e3555]:
+                    - generic [ref=e3556]:
+                      - generic [ref=e3557]:
+                        - generic [ref=e3558]: V1
+                        - generic [ref=e3559]: PUBLISHED
+                      - button "Deploy" [ref=e3560]
+                    - button "Published at 1/21/2026 7:47:11 AM" [ref=e3561]
+                  - button "More Project Actions" [ref=e3564]
+            - generic "var bug_container" [ref=e3566] [cursor=pointer]:
+              - generic [ref=e3567]:
+                - generic "1184" [ref=e3568]:
+                  - link "var bug" [ref=e3570]:
+                    - /url: /automation/projects/1184/project-workflows/1949
+                  - generic [ref=e3572]:
+                    - button "2 workflows" [ref=e3573]
+                    - group "Workflow Creation Actions" [ref=e3577]:
+                      - button "Create Workflow" [ref=e3578]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e3579]
+                    - generic [ref=e3581]:
+                      - generic [ref=e3582]: "Tags:"
+                      - generic [ref=e3583]:
+                        - generic [ref=e3584]: var
+                        - button [ref=e3585]
+                      - button [ref=e3586]
+                - generic [ref=e3587]:
+                  - generic [ref=e3588]:
+                    - generic [ref=e3590]:
+                      - generic [ref=e3591]: V1
+                      - generic [ref=e3592]: DRAFT
+                    - button "Not yet published" [ref=e3593]
+                  - button "More Project Actions" [ref=e3596]
+            - generic "Vector Database Load Action bug_container" [ref=e3598] [cursor=pointer]:
+              - generic [ref=e3599]:
+                - generic "1176" [ref=e3600]:
+                  - link "Vector Database Load Action bug" [ref=e3602]:
+                    - /url: /automation/projects/1176/project-workflows/1882
+                  - generic [ref=e3604]:
+                    - button "2 workflows" [ref=e3605]
+                    - group "Workflow Creation Actions" [ref=e3609]:
+                      - button "Create Workflow" [ref=e3610]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e3611]
+                    - generic [ref=e3613]:
+                      - generic [ref=e3614]: "Tags:"
+                      - button [ref=e3615]
+                - generic [ref=e3616]:
+                  - generic [ref=e3617]:
+                    - generic [ref=e3619]:
+                      - generic [ref=e3620]: V1
+                      - generic [ref=e3621]: DRAFT
+                    - button "Not yet published" [ref=e3622]
+                  - button "More Project Actions" [ref=e3625]
+            - generic "VectorStore_container" [ref=e3627] [cursor=pointer]:
+              - generic [ref=e3628]:
+                - generic "1106" [ref=e3629]:
+                  - link "VectorStore" [ref=e3631]:
+                    - /url: /automation/projects/1106/project-workflows/1665
+                  - generic [ref=e3633]:
+                    - button "1 workflow" [ref=e3634]
+                    - group "Workflow Creation Actions" [ref=e3638]:
+                      - button "Create Workflow" [ref=e3639]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e3640]
+                    - generic [ref=e3642]:
+                      - generic [ref=e3643]: "Tags:"
+                      - button [ref=e3644]
+                - generic [ref=e3645]:
+                  - generic [ref=e3646]:
+                    - generic [ref=e3648]:
+                      - generic [ref=e3649]: V1
+                      - generic [ref=e3650]: DRAFT
+                    - button "Not yet published" [ref=e3651]
+                  - button "More Project Actions" [ref=e3654]
+            - generic "Webhook trigger_container" [ref=e3656] [cursor=pointer]:
+              - generic [ref=e3657]:
+                - generic "1181" [ref=e3658]:
+                  - link "Webhook trigger" [ref=e3660]:
+                    - /url: /automation/projects/1181/project-workflows/1935
+                  - generic [ref=e3662]:
+                    - button "2 workflows" [ref=e3663]
+                    - group "Workflow Creation Actions" [ref=e3667]:
+                      - button "Create Workflow" [ref=e3668]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e3669]
+                    - generic [ref=e3671]:
+                      - generic [ref=e3672]: "Tags:"
+                      - button [ref=e3673]
+                - generic [ref=e3674]:
+                  - generic [ref=e3675]:
+                    - generic [ref=e3676]:
+                      - generic [ref=e3677]:
+                        - generic [ref=e3678]: V1
+                        - generic [ref=e3679]: PUBLISHED
+                      - button "Deploy" [ref=e3680]
+                    - button "Published at 11/22/2025 9:33:11 AM" [ref=e3681]
+                  - button "More Project Actions" [ref=e3684]
+            - generic "Workflow Executions bug_container" [ref=e3686] [cursor=pointer]:
+              - generic [ref=e3687]:
+                - generic "1256" [ref=e3688]:
+                  - link "Workflow Executions bug" [ref=e3690]:
+                    - /url: /automation/projects/1256/project-workflows/2703
+                  - generic [ref=e3692]:
+                    - button "1 workflow" [ref=e3693]
+                    - group "Workflow Creation Actions" [ref=e3697]:
+                      - button "Create Workflow" [ref=e3698]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e3699]
+                    - generic [ref=e3701]:
+                      - generic [ref=e3702]: "Tags:"
+                      - button [ref=e3703]
+                - generic [ref=e3704]:
+                  - generic [ref=e3705]:
+                    - generic [ref=e3706]:
+                      - generic [ref=e3707]:
+                        - generic [ref=e3708]: V1
+                        - generic [ref=e3709]: PUBLISHED
+                      - button "Deploy" [ref=e3710]
+                    - button "Published at 6/15/2026 4:04:50 PM" [ref=e3711]
+                  - button "More Project Actions" [ref=e3714]
+            - generic "Workflow freezing bug_container" [ref=e3716] [cursor=pointer]:
+              - generic [ref=e3717]:
+                - generic "1335" [ref=e3718]:
+                  - link "Workflow freezing bug" [ref=e3720]:
+                    - /url: /automation/projects/1335/project-workflows/2960
+                  - generic [ref=e3722]:
+                    - button "2 workflows" [ref=e3723]
+                    - group "Workflow Creation Actions" [ref=e3727]:
+                      - button "Create Workflow" [ref=e3728]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e3729]
+                    - generic [ref=e3731]:
+                      - generic [ref=e3732]: "Tags:"
+                      - generic [ref=e3733]:
+                        - generic [ref=e3734]: freezing
+                        - button [ref=e3735]
+                      - button [ref=e3736]
+                - generic [ref=e3737]:
+                  - generic [ref=e3738]:
+                    - generic [ref=e3740]:
+                      - generic [ref=e3741]: V1
+                      - generic [ref=e3742]: DRAFT
+                    - button "Not yet published" [ref=e3743]
+                  - button "More Project Actions" [ref=e3746]
+            - generic "Workflow Templates_container" [ref=e3748] [cursor=pointer]:
+              - generic [ref=e3749]:
+                - generic "1232" [ref=e3750]:
+                  - button "Workflow Templates" [ref=e3752]
+                  - generic [ref=e3754]:
+                    - button "0 workflows" [ref=e3755]
+                    - group "Workflow Creation Actions" [ref=e3759]:
+                      - button "Create Workflow" [ref=e3760]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e3761]
+                    - generic [ref=e3763]:
+                      - generic [ref=e3764]: "Tags:"
+                      - generic [ref=e3765]:
+                        - generic [ref=e3766]: templates
+                        - button [ref=e3767]
+                      - button [ref=e3768]
+                - generic [ref=e3769]:
+                  - generic [ref=e3770]:
+                    - generic [ref=e3772]:
+                      - generic [ref=e3773]: V1
+                      - generic [ref=e3774]: DRAFT
+                    - button "Not yet published" [ref=e3775]
+                  - button "More Project Actions" [ref=e3778]
+            - generic "Wrong node marked with error_container" [ref=e3780] [cursor=pointer]:
+              - generic [ref=e3781]:
+                - generic "1188" [ref=e3782]:
+                  - link "Wrong node marked with error" [ref=e3784]:
+                    - /url: /automation/projects/1188/project-workflows/1963
+                  - generic [ref=e3786]:
+                    - button "2 workflows" [ref=e3787]
+                    - group "Workflow Creation Actions" [ref=e3791]:
+                      - button "Create Workflow" [ref=e3792]: Workflow
+                      - button "More Workflow Creation Actions" [ref=e3793]
+                    - generic [ref=e3795]:
+                      - generic [ref=e3796]: "Tags:"
+                      - generic [ref=e3797]:
+                        - generic [ref=e3798]: marko bug
+                        - button [ref=e3799]
+                      - button [ref=e3800]
+                - generic [ref=e3801]:
+                  - generic [ref=e3802]:
+                    - generic [ref=e3804]:
+                      - generic [ref=e3805]: V1
+                      - generic [ref=e3806]: DRAFT
+                    - button "Not yet published" [ref=e3807]
+                  - button "More Project Actions" [ref=e3810]
+    - region "Notifications alt+T"
+  - button "Open Tanstack query devtools" [ref=e80] [cursor=pointer]

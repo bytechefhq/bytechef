@@ -9,10 +9,13 @@ package com.bytechef.ee.platform.apiconnector.configuration.service;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.platform.apiconnector.configuration.domain.ApiConnector;
+import com.bytechef.ee.platform.apiconnector.configuration.exception.ApiConnectorErrorType;
 import com.bytechef.ee.platform.apiconnector.configuration.repository.ApiConnectorRepository;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -78,12 +81,25 @@ public class ApiConnectorServiceImpl implements ApiConnectorService {
         Assert.notNull(apiConnector.getName(), "name");
         Assert.notNull(apiConnector.getId(), "id");
 
+        // Names are the lookup key of the runtime component registry, so an update must not steal another row's name;
+        // guarded here so the metadata-only GraphQL path is covered too, not only the facade path.
+        apiConnectorRepository
+            .findByNameAndConnectorVersion(apiConnector.getName(), apiConnector.getConnectorVersion())
+            .filter(existingApiConnector -> !Objects.equals(existingApiConnector.getId(), apiConnector.getId()))
+            .ifPresent(existingApiConnector -> {
+                throw new ConfigurationException(
+                    "An API connector named '%s' already exists".formatted(apiConnector.getName()),
+                    ApiConnectorErrorType.API_CONNECTOR_NAME_ALREADY_EXISTS);
+            });
+
         ApiConnector curApiConnector = getApiConnector(apiConnector.getId());
 
+        curApiConnector.setDefinition(apiConnector.getDefinition());
         curApiConnector.setDescription(apiConnector.getDescription());
-        curApiConnector.setSpecification(apiConnector.getSpecification());
-        curApiConnector.setIcon(curApiConnector.getIcon());
+        curApiConnector.setIcon(apiConnector.getIcon());
         curApiConnector.setName(apiConnector.getName());
+        curApiConnector.setSpecification(apiConnector.getSpecification());
+        curApiConnector.setTitle(apiConnector.getTitle());
 
         return apiConnectorRepository.save(curApiConnector);
     }

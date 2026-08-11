@@ -23,6 +23,12 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+/**
+ * Legacy definition pipeline: runs the CLI's code generator, compiles the generated sources with javac at runtime, and
+ * class-loads the handler to serialize its definition. No production code calls this anymore —
+ * {@link OpenApiComponentDefinitionFactory} builds the definition directly — but it is retained as the golden reference
+ * that {@code OpenApiComponentDefinitionFactoryTest} compares the factory's output against.
+ */
 public class OpenApiGenerator {
 
     private static final String[] LIBS = new String[] {

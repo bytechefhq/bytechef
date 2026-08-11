@@ -18,6 +18,8 @@ import com.bytechef.exception.AbstractErrorType;
 public class ApiConnectorErrorType extends AbstractErrorType {
 
     public static final ApiConnectorErrorType INVALID_API_CONNECTOR_DEFINITION = new ApiConnectorErrorType(100);
+    public static final ApiConnectorErrorType API_CONNECTOR_NAME_ALREADY_EXISTS = new ApiConnectorErrorType(101);
+    public static final ApiConnectorErrorType API_CONNECTOR_VERSION_CONFLICT = new ApiConnectorErrorType(102);
 
     public ApiConnectorErrorType(int errorKey) {
         super(ApiConnector.class, errorKey);

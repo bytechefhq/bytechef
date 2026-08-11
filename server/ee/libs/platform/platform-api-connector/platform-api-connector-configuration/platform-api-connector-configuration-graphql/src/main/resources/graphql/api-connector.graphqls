@@ -1,20 +1,17 @@
 extend type Query {
     apiConnector(id: ID!): ApiConnector
     apiConnectors: [ApiConnector!]!
-    endpointDiscoveryStatus(jobId: String!): EndpointDiscoveryResult
     generationJobStatus(jobId: String!): GenerationJobStatus
 }
 
 extend type Mutation {
-    createApiConnector(input: CreateApiConnectorInput!): ApiConnector!
     deleteApiConnector(id: ID!): Boolean!
+    deleteOrphanedApiConnectorFiles: Int!
     enableApiConnector(id: ID!, enable: Boolean!): Boolean!
     updateApiConnector(id: ID!, input: UpdateApiConnectorInput!): ApiConnector!
     importOpenApiSpecification(input: ImportOpenApiSpecificationInput!): ApiConnector!
     generateSpecification(input: GenerateSpecificationInput!): GenerateSpecificationResponse!
     generateFromDocumentation(input: GenerateFromDocumentationInput!): ApiConnector!
-    startDiscoverEndpoints(input: DiscoverEndpointsInput!): EndpointDiscoveryResult!
-    startGenerateForEndpoints(input: GenerateForEndpointsInput!): GenerationJobStatus!
     startGenerateFromDocumentationPreview(input: GenerateFromDocumentationInput!): GenerationJobStatus!
     cancelGenerationJob(jobId: String!): Boolean!
 }
@@ -54,6 +51,7 @@ type ApiConnectorEndpoint {
 enum HttpMethod {
     DELETE
     GET
+    HEAD
     POST
     PUT
     PATCH
@@ -78,35 +76,14 @@ type GenerateSpecificationResponse {
     specification: String
 }
 
-type DiscoveredEndpoint {
-    id: ID!
-    path: String!
-    method: String!
-    summary: String
-    resource: String
-}
-
-type EndpointDiscoveryResult {
-    jobId: String!
-    status: GenerationJobStatusEnum!
-    endpoints: [DiscoveredEndpoint!]
-    errorMessage: String
-}
-
-input CreateApiConnectorInput {
-    name: String!
-    title: String
-    description: String
-    icon: String
-    connectorVersion: Int!
-}
-
 input UpdateApiConnectorInput {
     name: String
     title: String
     description: String
     icon: String
     connectorVersion: Int
+    specification: String
+    version: Int
 }
 
 input ImportOpenApiSpecificationInput {
@@ -121,24 +98,6 @@ input GenerateFromDocumentationInput {
     icon: String
     userPrompt: String
     maxPages: Int
-}
-
-input DiscoverEndpointsInput {
-    name: String!
-    documentationUrl: String!
-    userPrompt: String
-}
-
-input GenerateForEndpointsInput {
-    name: String!
-    documentationUrl: String!
-    icon: String
-    selectedEndpoints: [SelectedEndpointInput!]!
-}
-
-input SelectedEndpointInput {
-    path: String!
-    method: String!
 }
 
 input GenerateSpecificationInput {

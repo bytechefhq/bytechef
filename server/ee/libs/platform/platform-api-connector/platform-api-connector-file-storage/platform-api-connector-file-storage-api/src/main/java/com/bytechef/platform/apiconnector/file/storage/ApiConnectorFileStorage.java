@@ -17,6 +17,7 @@
 package com.bytechef.platform.apiconnector.file.storage;
 
 import com.bytechef.file.storage.domain.FileEntry;
+import java.util.Set;
 
 /**
  * @author Ivica Cardic
@@ -26,6 +27,10 @@ public interface ApiConnectorFileStorage {
     void deleteApiConnectorDefinition(FileEntry fileEntry);
 
     void deleteApiConnectorSpecification(FileEntry fileEntry);
+
+    Set<FileEntry> getApiConnectorDefinitionFileEntries();
+
+    Set<FileEntry> getApiConnectorSpecificationFileEntries();
 
     String readApiConnectorDefinition(FileEntry fileEntry);
 

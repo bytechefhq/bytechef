@@ -18,9 +18,30 @@ import java.util.List;
  */
 public interface ApiConnectorFacade {
 
-    ApiConnector generateFromDocumentation(String componentName, String documentationUrl);
+    void deleteApiConnector(long id);
+
+    /**
+     * Deletes stored specification/definition blobs that no connector row references (left behind by re-imports that
+     * predate replaced-blob cleanup). Deliberately manual: an import in flight stores its blobs before its row commits,
+     * so an automatic sweep could race it.
+     *
+     * @return the number of orphaned files that were deleted
+     */
+    int deleteOrphanedFiles();
+
+    ApiConnector generateFromDocumentation(String componentName, String documentationUrl, String icon);
+
+    ApiConnectorDTO getApiConnector(long id);
 
     List<ApiConnectorDTO> getApiConnectors();
 
-    ApiConnector importOpenApiSpecification(String componentName, String specification);
+    ApiConnector importOpenApiSpecification(String componentName, String icon, String specification);
+
+    /**
+     * Updates an existing connector by id from a new specification, regenerating its definition. Unlike
+     * {@link #importOpenApiSpecification}, which upserts by name, this is rename-safe: a name change is rejected when
+     * another connector already holds the name. A non-null {@code version} must match the stored row's version,
+     * rejecting concurrent edits.
+     */
+    ApiConnector updateApiConnector(long id, String componentName, String icon, String specification, Integer version);
 }

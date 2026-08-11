@@ -27,7 +27,7 @@ import org.springframework.data.relational.core.mapping.Column;
 public class ApiConnectorEndpoint {
 
     public enum HttpMethod {
-        DELETE, GET, PATCH, POST, PUT
+        DELETE, GET, PATCH, POST, PUT, HEAD
     }
 
     @Column("api_collection_id")

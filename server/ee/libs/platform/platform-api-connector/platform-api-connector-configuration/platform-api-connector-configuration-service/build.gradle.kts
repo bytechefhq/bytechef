@@ -1,4 +1,7 @@
 dependencies {
+    implementation("com.fasterxml.jackson.core:jackson-databind")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     implementation("org.apache.commons:commons-lang3")
     implementation(libs.org.jsoup)
     implementation("org.springframework.ai:spring-ai-client-chat")
@@ -8,7 +11,6 @@ dependencies {
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-tx")
     implementation("org.springframework.security:spring-security-core")
-    implementation(project(":cli:commands:component:init:openapi"))
     implementation(project(":server:libs:config:app-config"))
     implementation(project(":sdks:backend:java:component-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
@@ -21,6 +23,7 @@ dependencies {
     implementation("org.springframework.data:spring-data-jdbc")
 
     testImplementation("org.springframework.data:spring-data-jdbc")
+    testImplementation(project(":cli:commands:component:init:openapi"))
     testImplementation(project(":server:libs:config:liquibase-config"))
     testImplementation(project(":server:libs:test:test-int-support"))
 }
