@@ -20,6 +20,8 @@ import com.bytechef.ee.automation.configuration.audit.WorkspaceUserAuditPublishe
 import com.bytechef.ee.automation.configuration.repository.CustomRoleRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
+import com.bytechef.platform.user.service.UserInvitationService;
+import com.bytechef.platform.user.service.UserService;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
@@ -114,7 +116,7 @@ class RealImplProxyEnforcementIntTest {
 
     @Test
     void testRealCustomRoleServiceImplEnforcesGetCustomRoles() {
-        assertThatThrownBy(() -> customRoleService.getCustomRoles())
+        assertThatThrownBy(() -> customRoleService.getCustomRoles(null))
             .isInstanceOf(AccessDeniedException.class);
     }
 
@@ -163,6 +165,23 @@ class RealImplProxyEnforcementIntTest {
         @Bean
         CustomRoleAuditPublisher customRoleAuditPublisher() {
             return mock(CustomRoleAuditPublisher.class);
+        }
+
+        // The remaining WorkspaceUserServiceImpl collaborators, mocked like the ones above — the proxy fires the
+        // @PreAuthorize check before any of them is touched, so stubs are all these enforcement tests need.
+        @Bean
+        UserInvitationService userInvitationService() {
+            return mock(UserInvitationService.class);
+        }
+
+        @Bean
+        UserService userService() {
+            return mock(UserService.class);
+        }
+
+        @Bean
+        WorkspaceService workspaceService() {
+            return mock(WorkspaceService.class);
         }
     }
 }

@@ -9,6 +9,7 @@ package com.bytechef.ee.platform.user.facade;
 
 import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.User;
+import com.bytechef.platform.user.service.WorkspaceMembershipAssigner.WorkspaceAssignment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;
@@ -33,7 +34,17 @@ public interface UserManagementFacade {
 
     void deleteUser(String login);
 
-    void inviteUser(String email, String password, String role);
+    /**
+     * Provisions a tenant account for {@code email} and mails a claim link on which the recipient sets their own
+     * password. Takes no password: an administrator must not be able to choose, or learn, another person's credential.
+     *
+     * @param email      the invitee's email address
+     * @param role       the tenant authority to grant, e.g. {@code ROLE_USER}
+     * @param workspaces the workspaces to place the invitee in, each with the role to hold there; may be empty, which
+     *                   provisions an account belonging to no workspace — legitimate when creating a second tenant
+     *                   admin
+     */
+    void inviteUser(String email, String role, List<WorkspaceAssignment> workspaces);
 
     Optional<UserWithAuthorities> fetchUser(String login);
 

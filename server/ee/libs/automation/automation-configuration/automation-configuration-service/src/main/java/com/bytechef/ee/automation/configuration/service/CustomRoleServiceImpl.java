@@ -97,24 +97,18 @@ public class CustomRoleServiceImpl implements CustomRoleService {
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("(#workspaceId == null and isTenantAdmin()) or " +
+        "(#workspaceId != null and hasPermission(#workspaceId, 'Workspace', 'WORKSPACE_MEMBER_MANAGE'))")
     @Transactional(readOnly = true)
-    public CustomRole getCustomRole(long roleId) {
-        return OptionalUtils.get(customRoleRepository.findById(roleId));
-    }
-
-    @Override
-    @PreAuthorize("isTenantAdmin()")
-    @Transactional(readOnly = true)
-    public List<CustomRole> getCustomRoles() {
+    public List<CustomRole> getCustomRoles(Long workspaceId) {
+        // The workspaceId is authorization context, not a filter: a workspace member manager reads the list to
+        // populate the assignment picker, a tenant admin reads it to manage roles. Every role is tenant-global.
         return customRoleRepository.findAll();
     }
 
     @Override
     @PreAuthorize("isTenantAdmin()")
-    public CustomRole updateCustomRole(
-        long roleId, String name, String description, Set<String> scopeNames) {
-
+    public CustomRole updateCustomRole(long roleId, String name, String description, Set<String> scopeNames) {
         validateScopeNames(scopeNames);
 
         CustomRole customRole = OptionalUtils.get(customRoleRepository.findById(roleId));
@@ -148,6 +142,15 @@ public class CustomRoleServiceImpl implements CustomRoleService {
         customRoleAuditPublisher.publish(CustomRoleAuditEvent.CUSTOM_ROLE_UPDATED, data);
 
         return saved;
+    }
+
+    @Override
+    @PreAuthorize("isAuthenticated()")
+    @Transactional(readOnly = true)
+    public List<String> getPermissionScopeNames() {
+        // Static metadata, identical for every tenant -- the set of scopes the server was built with, not anyone's
+        // data. Gating it harder than authentication would stop a role editor listing what it may compose from.
+        return List.copyOf(permissionScopeRegistry.getAllScopeNames());
     }
 
     /**

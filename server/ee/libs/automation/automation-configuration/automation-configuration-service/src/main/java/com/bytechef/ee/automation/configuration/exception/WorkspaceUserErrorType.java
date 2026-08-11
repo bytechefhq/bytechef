@@ -23,6 +23,9 @@ public class WorkspaceUserErrorType extends AbstractErrorType {
     public static final WorkspaceUserErrorType NOT_MEMBER = new WorkspaceUserErrorType(101);
     public static final WorkspaceUserErrorType LAST_ADMIN_PROTECTED = new WorkspaceUserErrorType(102);
     public static final WorkspaceUserErrorType SELF_DEMOTION_FORBIDDEN = new WorkspaceUserErrorType(103);
+    public static final WorkspaceUserErrorType INVALID_WORKSPACE_ROLE = new WorkspaceUserErrorType(104);
+    public static final WorkspaceUserErrorType INHERITED_MEMBERSHIP = new WorkspaceUserErrorType(105);
+    public static final WorkspaceUserErrorType CUSTOM_ROLE_NOT_IN_WORKSPACE = new WorkspaceUserErrorType(106);
 
     private WorkspaceUserErrorType(int errorKey) {
         super(WorkspaceUser.class, errorKey);

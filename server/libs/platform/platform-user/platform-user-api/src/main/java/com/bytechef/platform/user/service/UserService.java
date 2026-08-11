@@ -18,6 +18,7 @@ package com.bytechef.platform.user.service;
 
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.dto.AdminUserDTO;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -62,6 +63,11 @@ public interface UserService {
     Page<User> getAllActiveUsers(Pageable pageable);
 
     Page<User> getAllManagedUsers(Pageable pageable);
+
+    /**
+     * Activated users holding the given tenant authority, e.g. {@code ROLE_ADMIN}.
+     */
+    List<User> getUsersByAuthorityName(String authorityName);
 
     User getCurrentUser();
 

@@ -8,8 +8,27 @@ extend type Query {
 }
 
 extend type Mutation {
-    "Add a user to a workspace. Requires ADMIN workspace role."
-    addWorkspaceUser(workspaceId: ID!, userId: ID!, role: WorkspaceRole!): WorkspaceUser!
+    """
+    Add a user to a workspace. Requires ADMIN workspace role. Supply exactly one of `role` or
+    `customRoleId`; a custom role must be tenant-global or owned by this workspace.
+    """
+    addWorkspaceUser(workspaceId: ID!, userId: ID!, role: WorkspaceRole, customRoleId: ID): WorkspaceUser!
+    """
+    Invite someone into a workspace by email, provisioning a tenant account and mailing a claim link
+    when no account exists yet. An address that already has an account is reused, not rejected.
+    Requires the WORKSPACE_MEMBER_MANAGE scope.
+    """
+    inviteWorkspaceUser(
+        workspaceId: ID!
+        email: String!
+        role: WorkspaceRole
+        customRoleId: ID
+    ): WorkspaceUser!
+    """
+    Replace a member's built-in role with a custom one. The role must be tenant-global or owned by
+    this workspace. Requires the WORKSPACE_MEMBER_MANAGE scope.
+    """
+    assignWorkspaceUserCustomRole(workspaceId: ID!, userId: ID!, customRoleId: ID!): WorkspaceUser!
     "Update a workspace user's role. Requires ADMIN workspace role."
     updateWorkspaceUserRole(workspaceId: ID!, userId: ID!, role: WorkspaceRole!): WorkspaceUser!
     "Remove a user from a workspace. Requires ADMIN workspace role."
@@ -17,13 +36,20 @@ extend type Mutation {
 }
 
 type WorkspaceUser {
-    id: ID!
+    "Membership row id, or null for an inherited entry which has no row"
+    id: ID
     workspaceId: ID!
     userId: ID!
     "Built-in workspace role, null if using a custom role"
     workspaceRole: WorkspaceRole
     "Custom role ID (EE only), null if using a built-in role"
     customRoleId: ID
+    """
+    True when the entry is not a stored membership but a tenant admin, who administers every workspace.
+    Such entries are locked: their role cannot be changed and they cannot be removed, because there is
+    no row to change. Revoke tenant admin instead.
+    """
+    inherited: Boolean!
     user: WorkspaceUserInfo
     createdDate: String
 }

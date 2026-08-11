@@ -21,6 +21,7 @@ import com.bytechef.ee.automation.configuration.domain.CustomRole;
 import com.bytechef.ee.automation.configuration.domain.CustomRoleScope;
 import com.bytechef.ee.automation.configuration.repository.CustomRoleRepository;
 import com.bytechef.exception.ConfigurationException;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
@@ -104,6 +105,14 @@ class CustomRoleServiceTest {
     }
 
     @Test
+    void testGetPermissionScopeNamesComesFromTheRegistry() {
+        // The same registry the write path validates against — a client editor built from a different list would
+        // either offer names the server rejects or omit ones a module added later.
+        assertThat(customRoleService.getPermissionScopeNames())
+            .containsExactlyInAnyOrder("WORKFLOW_VIEW", "WORKFLOW_CREATE", "WORKFLOW_EDIT");
+    }
+
+    @Test
     void testUpdateCustomRoleReplacesScopes() {
         CustomRole existingRole = new CustomRole("Old Name", Set.of("WORKFLOW_VIEW"));
 
@@ -112,7 +121,8 @@ class CustomRoleServiceTest {
 
         Set<String> newScopeNames = Set.of("WORKFLOW_VIEW", "WORKFLOW_CREATE", "WORKFLOW_EDIT");
 
-        CustomRole result = customRoleService.updateCustomRole(1L, "New Name", "Updated description", newScopeNames);
+        CustomRole result =
+            customRoleService.updateCustomRole(1L, "New Name", "Updated description", newScopeNames);
 
         assertThat(result.getName()).isEqualTo("New Name");
         assertThat(result.getDescription()).isEqualTo("Updated description");
@@ -148,5 +158,26 @@ class CustomRoleServiceTest {
         customRoleService.updateCustomRole(1L, "New Name", "New description", scopeNames);
 
         verify(permissionService, never()).evictAllWorkspaceScopeCache();
+    }
+
+    @Test
+    void testGetCustomRolesForAWorkspaceReturnsEveryRole() {
+        CustomRole role = new CustomRole("Auditor", Set.of("WORKFLOW_VIEW"));
+
+        when(customRoleRepository.findAll()).thenReturn(List.of(role));
+
+        // The workspaceId is authorization context for the assignment picker, not a filter — every role is
+        // tenant-global and assignable in any workspace.
+        assertThat(customRoleService.getCustomRoles(7L)).containsExactly(role);
+    }
+
+    @Test
+    void testGetCustomRolesWithoutWorkspaceReturnsEveryRole() {
+        when(customRoleRepository.findAll()).thenReturn(List.of());
+
+        customRoleService.getCustomRoles(null);
+
+        // The tenant-wide view is a different authorization tier, guarded by isTenantAdmin() on the method.
+        verify(customRoleRepository).findAll();
     }
 }

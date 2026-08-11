@@ -16,13 +16,21 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.automation.configuration.audit.WorkspaceUserAuditPublisher;
+import com.bytechef.ee.automation.configuration.domain.CustomRole;
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
+import com.bytechef.ee.automation.configuration.repository.CustomRoleRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import com.bytechef.exception.ConfigurationException;
+import com.bytechef.platform.user.domain.User;
+import com.bytechef.platform.user.service.UserInvitationService;
+import com.bytechef.platform.user.service.UserService;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -39,17 +47,26 @@ class WorkspaceUserServiceTest {
     private static final long WORKSPACE_ID = 7L;
     private static final long USER_ID = 42L;
 
+    private CustomRoleRepository customRoleRepository;
     private PermissionService permissionService;
+    private UserInvitationService userInvitationService;
+    private UserService userService;
+    private WorkspaceService workspaceService;
     private WorkspaceUserRepository workspaceUserRepository;
     private WorkspaceUserServiceImpl workspaceUserService;
 
     @BeforeEach
     void setUp() {
+        customRoleRepository = mock(CustomRoleRepository.class);
         permissionService = mock(PermissionService.class);
+        userInvitationService = mock(UserInvitationService.class);
+        userService = mock(UserService.class);
+        workspaceService = mock(WorkspaceService.class);
         workspaceUserRepository = mock(WorkspaceUserRepository.class);
 
         workspaceUserService = new WorkspaceUserServiceImpl(
-            permissionService, mock(WorkspaceUserAuditPublisher.class), workspaceUserRepository);
+            customRoleRepository, permissionService, userInvitationService, userService, workspaceService,
+            mock(WorkspaceUserAuditPublisher.class), workspaceUserRepository);
     }
 
     @Test
@@ -79,6 +96,62 @@ class WorkspaceUserServiceTest {
 
         verify(workspaceUserRepository, never()).save(any(WorkspaceUser.class));
         verify(permissionService, never()).evictWorkspaceScopeCache(USER_ID, WORKSPACE_ID);
+    }
+
+    @Test
+    void testAddWorkspaceUserAcceptsACustomRole() {
+        when(customRoleRepository.findById(900L))
+            .thenReturn(Optional.of(new CustomRole("Deployer", Set.of("WORKFLOW_VIEW"))));
+        when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+            .thenReturn(Optional.empty());
+        when(workspaceUserRepository.save(any(WorkspaceUser.class)))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+
+        WorkspaceUser result = workspaceUserService.addWorkspaceUser(USER_ID, WORKSPACE_ID, null, 900L);
+
+        assertThat(result.getCustomRoleId()).isEqualTo(900L);
+
+        // The XOR invariant holds on creation too, not just on a later conversion.
+        assertThat(result.getWorkspaceRole()).isNull();
+
+        verify(permissionService, times(1)).evictWorkspaceScopeCache(USER_ID, WORKSPACE_ID);
+    }
+
+    @Test
+    void testAddWorkspaceUserRequiresExactlyOneRole() {
+        assertThatThrownBy(() -> workspaceUserService.addWorkspaceUser(USER_ID, WORKSPACE_ID, null, null))
+            .isInstanceOf(ConfigurationException.class)
+            .hasMessageContaining("Exactly one");
+
+        assertThatThrownBy(
+            () -> workspaceUserService.addWorkspaceUser(USER_ID, WORKSPACE_ID, WorkspaceRole.EDITOR, 900L))
+                .isInstanceOf(ConfigurationException.class)
+                .hasMessageContaining("Exactly one");
+
+        // Typed rather than the domain constructor's IllegalArgumentException, which would surface as a 500.
+        verify(workspaceUserRepository, never()).save(any(WorkspaceUser.class));
+    }
+
+    @Test
+    void testInviteWorkspaceUserAcceptsACustomRole() {
+        User invitedUser = createUser(USER_ID);
+
+        when(userService.fetchUserByEmail("newcomer@example.com")).thenReturn(Optional.empty());
+        when(userInvitationService.inviteUser("newcomer@example.com", "ROLE_USER")).thenReturn(invitedUser);
+        when(customRoleRepository.findById(900L))
+            .thenReturn(Optional.of(new CustomRole("Deployer", Set.of("WORKFLOW_VIEW"))));
+        when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID)).thenReturn(Optional.empty());
+        when(workspaceUserRepository.save(any(WorkspaceUser.class)))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+
+        WorkspaceUser result = workspaceUserService.inviteWorkspaceUser(
+            WORKSPACE_ID, "newcomer@example.com", null, 900L);
+
+        assertThat(result.getCustomRoleId()).isEqualTo(900L);
+        assertThat(result.getWorkspaceRole()).isNull();
+
+        // One transaction: the invitee lands on the role that was asked for, not on a built-in fallback.
+        verify(workspaceUserRepository, times(1)).save(any(WorkspaceUser.class));
     }
 
     @Test
@@ -260,5 +333,192 @@ class WorkspaceUserServiceTest {
         assertThat(workspaceUserService.countByCustomRoleId(900L)).isEqualTo(4L);
 
         verify(workspaceUserRepository, times(1)).countByCustomRoleId(900L);
+    }
+
+    @Test
+    void testInviteWorkspaceUserProvisionsAnUnknownEmail() {
+        User invitedUser = createUser(USER_ID);
+
+        when(userService.fetchUserByEmail("newcomer@example.com")).thenReturn(Optional.empty());
+        when(userInvitationService.inviteUser("newcomer@example.com", "ROLE_USER")).thenReturn(invitedUser);
+        when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID)).thenReturn(Optional.empty());
+        when(workspaceUserRepository.save(any(WorkspaceUser.class)))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+
+        WorkspaceUser result = workspaceUserService.inviteWorkspaceUser(
+            WORKSPACE_ID, "newcomer@example.com", WorkspaceRole.EDITOR);
+
+        assertThat(result.getUserId()).isEqualTo(USER_ID);
+        assertThat(result.getWorkspaceRole()).isEqualTo(WorkspaceRole.EDITOR.ordinal());
+
+        // The land-nowhere defect, from the workspace side: an invite that provisioned an account without writing
+        // membership is exactly what this must never do again.
+        verify(workspaceUserRepository, times(1)).save(any(WorkspaceUser.class));
+        verify(permissionService, times(1)).evictWorkspaceScopeCache(USER_ID, WORKSPACE_ID);
+    }
+
+    @Test
+    void testInviteWorkspaceUserReusesAnExistingAccount() {
+        User existingUser = createUser(USER_ID);
+
+        when(userService.fetchUserByEmail("colleague@example.com")).thenReturn(Optional.of(existingUser));
+        when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID)).thenReturn(Optional.empty());
+        when(workspaceUserRepository.save(any(WorkspaceUser.class)))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+        when(workspaceService.getWorkspace(WORKSPACE_ID)).thenReturn(createWorkspace("Engineering"));
+
+        workspaceUserService.inviteWorkspaceUser(WORKSPACE_ID, "colleague@example.com", WorkspaceRole.VIEWER);
+
+        // Reusing rather than rejecting: a workspace admin should not have to know whether a colleague already
+        // signed up, and re-provisioning would consume a second seat for one person.
+        verify(userInvitationService, never()).inviteUser(any(), any());
+        verify(workspaceUserRepository, times(1)).save(any(WorkspaceUser.class));
+    }
+
+    @Test
+    void testInviteWorkspaceUserNotifiesAnExistingAccount() {
+        User existingUser = createUser(USER_ID);
+
+        when(userService.fetchUserByEmail("colleague@example.com")).thenReturn(Optional.of(existingUser));
+        when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID)).thenReturn(Optional.empty());
+        when(workspaceUserRepository.save(any(WorkspaceUser.class)))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+        when(workspaceService.getWorkspace(WORKSPACE_ID)).thenReturn(createWorkspace("Engineering"));
+
+        workspaceUserService.inviteWorkspaceUser(WORKSPACE_ID, "colleague@example.com", WorkspaceRole.VIEWER);
+
+        // Without this the existing account holder is added silently and discovers the workspace by chance. They
+        // must not get the claim link -- they already have a password.
+        verify(userInvitationService).notifyAddedToWorkspace(existingUser, "Engineering");
+    }
+
+    @Test
+    void testInviteWorkspaceUserDoesNotNotifyANewlyProvisionedAccount() {
+        User invitedUser = createUser(USER_ID);
+
+        when(userService.fetchUserByEmail("newcomer@example.com")).thenReturn(Optional.empty());
+        when(userInvitationService.inviteUser("newcomer@example.com", "ROLE_USER")).thenReturn(invitedUser);
+        when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID)).thenReturn(Optional.empty());
+        when(workspaceUserRepository.save(any(WorkspaceUser.class)))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+
+        workspaceUserService.inviteWorkspaceUser(WORKSPACE_ID, "newcomer@example.com", WorkspaceRole.EDITOR);
+
+        // A new account already learned about this through the claim link; a second mail would be noise.
+        verify(userInvitationService, never()).notifyAddedToWorkspace(any(), any());
+    }
+
+    @Test
+    void testInviteWorkspaceUserDoesNotNotifyWhenTheAddFails() {
+        User existingUser = createUser(USER_ID);
+
+        when(userService.fetchUserByEmail("colleague@example.com")).thenReturn(Optional.of(existingUser));
+        when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+            .thenReturn(Optional.of(new WorkspaceUser(USER_ID, WORKSPACE_ID, WorkspaceRole.EDITOR.ordinal())));
+
+        assertThatThrownBy(
+            () -> workspaceUserService.inviteWorkspaceUser(
+                WORKSPACE_ID, "colleague@example.com", WorkspaceRole.VIEWER))
+                    .isInstanceOf(ConfigurationException.class);
+
+        // Announcing access nobody has would be worse than announcing nothing.
+        verify(userInvitationService, never()).notifyAddedToWorkspace(any(), any());
+    }
+
+    @Test
+    void testInviteWorkspaceUserRejectsAnExistingMember() {
+        User existingUser = createUser(USER_ID);
+
+        when(userService.fetchUserByEmail("colleague@example.com")).thenReturn(Optional.of(existingUser));
+        when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+            .thenReturn(Optional.of(new WorkspaceUser(USER_ID, WORKSPACE_ID, WorkspaceRole.EDITOR.ordinal())));
+
+        assertThatThrownBy(
+            () -> workspaceUserService.inviteWorkspaceUser(
+                WORKSPACE_ID, "colleague@example.com", WorkspaceRole.VIEWER))
+                    .isInstanceOf(ConfigurationException.class)
+                    .hasMessageContaining("already a member");
+
+        verify(workspaceUserRepository, never()).save(any(WorkspaceUser.class));
+    }
+
+    private User createUser(long id) {
+        User user = new User();
+
+        user.setId(id);
+
+        return user;
+    }
+
+    @Test
+    void testAssignCustomRoleAcceptsAnExistingRole() {
+        when(customRoleRepository.findById(900L))
+            .thenReturn(Optional.of(new CustomRole("Auditor", Set.of("WORKFLOW_VIEW"))));
+        when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+            .thenReturn(Optional.of(new WorkspaceUser(USER_ID, WORKSPACE_ID, WorkspaceRole.EDITOR.ordinal())));
+        when(workspaceUserRepository.save(any(WorkspaceUser.class)))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+
+        WorkspaceUser result = workspaceUserService.assignCustomRole(USER_ID, WORKSPACE_ID, 900L);
+
+        assertThat(result.getCustomRoleId()).isEqualTo(900L);
+
+        // The XOR invariant: a member holds a built-in role or a custom one, never both.
+        assertThat(result.getWorkspaceRole()).isNull();
+
+        verify(permissionService, times(1)).evictWorkspaceScopeCache(USER_ID, WORKSPACE_ID);
+    }
+
+    @Test
+    void testAssignCustomRoleRejectsAnUnknownRoleId() {
+        // The workspace-boundary check is gone with the per-workspace tier, but a dangling custom_role_id would
+        // fail closed at permission-check time and invisibly lock the member out — writes must still reject it
+        // loudly.
+        when(customRoleRepository.findById(900L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> workspaceUserService.assignCustomRole(USER_ID, WORKSPACE_ID, 900L))
+            .isInstanceOf(ConfigurationException.class)
+            .hasMessageContaining("does not exist");
+
+        verify(workspaceUserRepository, never()).save(any(WorkspaceUser.class));
+    }
+
+    @Test
+    void testAssignCustomRoleRejectsDemotingTheLastAdmin() {
+        when(customRoleRepository.findById(900L))
+            .thenReturn(Optional.of(new CustomRole("Auditor", Set.of("WORKFLOW_VIEW"))));
+        when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+            .thenReturn(Optional.of(new WorkspaceUser(USER_ID, WORKSPACE_ID, WorkspaceRole.ADMIN.ordinal())));
+        when(workspaceUserRepository.countByWorkspaceIdAndWorkspaceRole(WORKSPACE_ID, WorkspaceRole.ADMIN.ordinal()))
+            .thenReturn(1L);
+
+        assertThatThrownBy(() -> workspaceUserService.assignCustomRole(USER_ID, WORKSPACE_ID, 900L))
+            .isInstanceOf(ConfigurationException.class)
+            .hasMessageContaining("last admin");
+
+        // A custom role's scopes are no guarantee it can manage anything, so converting the last admin locks the
+        // workspace out exactly as demoting them to EDITOR would.
+        verify(workspaceUserRepository, never()).save(any(WorkspaceUser.class));
+    }
+
+    @Test
+    void testRemoveWorkspaceUserNamesTenantAdminAccessRatherThanClaimingNonMembership() {
+        when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID)).thenReturn(Optional.empty());
+        when(userService.getUsersByAuthorityName("ROLE_ADMIN")).thenReturn(List.of(createUser(USER_ID)));
+
+        assertThatThrownBy(() -> workspaceUserService.removeWorkspaceUser(USER_ID, WORKSPACE_ID))
+            .isInstanceOf(ConfigurationException.class)
+            .hasMessageContaining("as a tenant admin");
+
+        // "Not a member" describes the row, not the access — misleading for someone who demonstrably administers
+        // the workspace and appears in its members view as an inherited entry.
+    }
+
+    private Workspace createWorkspace(String name) {
+        Workspace workspace = new Workspace();
+
+        workspace.setName(name);
+
+        return workspace;
     }
 }

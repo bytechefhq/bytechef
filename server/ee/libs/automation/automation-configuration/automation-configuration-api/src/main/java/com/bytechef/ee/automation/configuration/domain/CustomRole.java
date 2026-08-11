@@ -73,7 +73,8 @@ public class CustomRole {
     /**
      * Creates a validated custom role. Enforces the invariants that persistence alone cannot: a non-blank name and a
      * non-empty scope set (a role with no scopes grants no permissions, which is almost never what the caller means and
-     * would leave affected users silently locked out).
+     * would leave affected users silently locked out). Every custom role is tenant-global — defined once and assignable
+     * in any workspace.
      */
     public CustomRole(String name, Set<String> scopeNames) {
         Assert.hasText(name, "'name' must not be blank");

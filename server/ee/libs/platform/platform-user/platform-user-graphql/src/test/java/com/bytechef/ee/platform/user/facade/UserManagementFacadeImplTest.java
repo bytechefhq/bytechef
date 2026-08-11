@@ -8,29 +8,36 @@
 package com.bytechef.ee.platform.user.facade;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.platform.mail.MailService;
-import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.exception.EmailAlreadyUsedException;
-import com.bytechef.platform.user.exception.InvalidPasswordException;
 import com.bytechef.platform.user.service.AuthorityService;
+import com.bytechef.platform.user.service.UserInvitationService;
 import com.bytechef.platform.user.service.UserService;
+import com.bytechef.platform.user.service.WorkspaceMembershipAssigner;
+import com.bytechef.platform.user.service.WorkspaceMembershipAssigner.WorkspaceAssignment;
 import com.bytechef.tenant.service.TenantService;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.web.server.ResponseStatusException;
 
 /**
- * Unit test for the {@link UserManagementFacadeImpl} invite orchestration that previously lived in
- * {@code UserGraphQlController}: password validation and email-collision handling run before the user is registered.
+ * Unit test for the {@link UserManagementFacadeImpl} invite orchestration: the email-collision checks it owns, and
+ * workspace assignment through the {@link WorkspaceMembershipAssigner} seam.
+ *
+ * <p>
+ * Provisioning and the claim-link mail moved to {@code UserInvitationService} so both invite surfaces share one
+ * implementation, and are covered by that service's own test. The password-validation tests that used to live here are
+ * gone with the {@code password} argument — an administrator no longer supplies one.
  *
  * @version ee
  *
@@ -38,89 +45,109 @@ import org.mockito.Mockito;
  */
 class UserManagementFacadeImplTest {
 
+    private static final String EMAIL = "newuser@example.com";
+    private static final String ROLE = "ROLE_USER";
+
     private AuthorityService authorityService;
-    private MailService mailService;
     private TenantService tenantService;
+    private UserInvitationService userInvitationService;
     private UserService userService;
+    private WorkspaceMembershipAssigner workspaceMembershipAssigner;
     private UserManagementFacadeImpl userManagementFacade;
 
     @BeforeEach
     void setUp() {
         authorityService = Mockito.mock(AuthorityService.class);
-        mailService = Mockito.mock(MailService.class);
         tenantService = Mockito.mock(TenantService.class);
+        userInvitationService = Mockito.mock(UserInvitationService.class);
         userService = Mockito.mock(UserService.class);
+        workspaceMembershipAssigner = Mockito.mock(WorkspaceMembershipAssigner.class);
 
         userManagementFacade = new UserManagementFacadeImpl(
-            authorityService, mailService, tenantService, userService);
+            authorityService, tenantService, userInvitationService, userService,
+            objectProviderOf(workspaceMembershipAssigner));
     }
 
     @Test
-    void testInviteUserSendsInvitationEmail() {
-        Authority authority = createAuthority("ROLE_USER");
-        User user = createUser("newuser", "newuser@example.com");
+    void testInviteUserDelegatesProvisioning() {
+        givenInvitableUser();
 
-        when(tenantService.isMultiTenantEnabled()).thenReturn(false);
-        when(userService.fetchUserByEmail("newuser@example.com")).thenReturn(Optional.empty());
-        when(userService.registerUser(any(), anyString())).thenReturn(user);
-        when(authorityService.getAuthorities()).thenReturn(List.of(authority));
+        userManagementFacade.inviteUser(EMAIL, ROLE, List.of());
 
-        userManagementFacade.inviteUser("newuser@example.com", "Password123", "ROLE_USER");
-
-        verify(mailService).sendInvitationEmail(any(), anyString());
+        verify(userInvitationService).inviteUser(EMAIL, ROLE);
     }
 
     @Test
-    void testInviteUserWithPasswordTooShortDoesNotRegister() {
-        when(tenantService.isMultiTenantEnabled()).thenReturn(false);
-        when(userService.fetchUserByEmail("test@example.com")).thenReturn(Optional.empty());
+    void testInviteUserAssignsRequestedWorkspaces() {
+        User user = givenInvitableUser();
 
-        assertThatThrownBy(() -> userManagementFacade.inviteUser("test@example.com", "Pass1", "ROLE_USER"))
-            .isInstanceOf(InvalidPasswordException.class);
+        user.setId(11L);
 
-        verify(userService, never()).registerUser(any(), anyString());
+        List<WorkspaceAssignment> assignments = List.of(
+            new WorkspaceAssignment(1L, "EDITOR"), new WorkspaceAssignment(2L, "VIEWER"));
+
+        userManagementFacade.inviteUser(EMAIL, ROLE, assignments);
+
+        verify(workspaceMembershipAssigner).assign(11L, assignments);
+    }
+
+    /**
+     * Pins D2/D7: an invite carrying no workspaces leaves the invitee in none. This is how a second tenant admin is
+     * provisioned, and a later change that "helpfully" auto-joins a default workspace must fail here.
+     */
+    @Test
+    void testInviteUserWithoutWorkspacesAssignsNone() {
+        givenInvitableUser();
+
+        userManagementFacade.inviteUser(EMAIL, ROLE, List.of());
+
+        verifyNoInteractions(workspaceMembershipAssigner);
     }
 
     @Test
-    void testInviteUserWithPasswordMissingUppercaseDoesNotRegister() {
-        when(tenantService.isMultiTenantEnabled()).thenReturn(false);
-        when(userService.fetchUserByEmail("test@example.com")).thenReturn(Optional.empty());
+    void testInviteUserWithWorkspacesRejectedWhenNoAssignerRegistered() {
+        givenInvitableUser();
 
-        assertThatThrownBy(() -> userManagementFacade.inviteUser("test@example.com", "password123", "ROLE_USER"))
-            .isInstanceOf(InvalidPasswordException.class);
+        userManagementFacade = new UserManagementFacadeImpl(
+            authorityService, tenantService, userInvitationService, userService, objectProviderOf(null));
 
-        verify(userService, never()).registerUser(any(), anyString());
+        assertThatThrownBy(
+            () -> userManagementFacade.inviteUser(EMAIL, ROLE, List.of(new WorkspaceAssignment(1L, "EDITOR"))))
+                .isInstanceOf(ResponseStatusException.class)
+                .hasMessageContaining("no workspace support");
     }
 
     @Test
-    void testInviteUserWithPasswordMissingDigitDoesNotRegister() {
-        when(tenantService.isMultiTenantEnabled()).thenReturn(false);
-        when(userService.fetchUserByEmail("test@example.com")).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> userManagementFacade.inviteUser("test@example.com", "PasswordABC", "ROLE_USER"))
-            .isInstanceOf(InvalidPasswordException.class);
-
-        verify(userService, never()).registerUser(any(), anyString());
-    }
-
-    @Test
-    void testInviteUserWithExistingEmailThrows() {
+    void testInviteUserWithExistingEmailNeverProvisions() {
         when(tenantService.isMultiTenantEnabled()).thenReturn(false);
         when(userService.fetchUserByEmail("existing@example.com"))
             .thenReturn(Optional.of(createUser("existing", "existing@example.com")));
 
-        assertThatThrownBy(() -> userManagementFacade.inviteUser("existing@example.com", "Password123", "ROLE_USER"))
+        assertThatThrownBy(() -> userManagementFacade.inviteUser("existing@example.com", ROLE, List.of()))
             .isInstanceOf(EmailAlreadyUsedException.class);
 
-        verify(userService, never()).registerUser(any(), anyString());
+        verify(userInvitationService, never()).inviteUser(anyString(), anyString());
     }
 
-    private Authority createAuthority(String name) {
-        Authority authority = new Authority();
+    @Test
+    void testInviteUserWithEmailUsedInAnotherTenantNeverProvisions() {
+        when(tenantService.isMultiTenantEnabled()).thenReturn(true);
+        when(tenantService.tenantIdsByUserEmailExist(EMAIL)).thenReturn(true);
 
-        authority.setName(name);
+        assertThatThrownBy(() -> userManagementFacade.inviteUser(EMAIL, ROLE, List.of()))
+            .isInstanceOf(EmailAlreadyUsedException.class);
 
-        return authority;
+        verify(userInvitationService, never()).inviteUser(anyString(), anyString());
+    }
+
+    private User givenInvitableUser() {
+        User user = createUser("newuser", EMAIL);
+
+        when(tenantService.isMultiTenantEnabled()).thenReturn(false);
+        when(userService.fetchUserByEmail(EMAIL)).thenReturn(Optional.empty());
+        when(userInvitationService.inviteUser(EMAIL, ROLE)).thenReturn(user);
+
+        return user;
     }
 
     private User createUser(String login, String email) {
@@ -130,5 +157,20 @@ class UserManagementFacadeImplTest {
         user.setEmail(email);
 
         return user;
+    }
+
+    /**
+     * Minimal {@link ObjectProvider} over a single optional bean. Spring's own test doubles pull in a container; only
+     * {@code getIfAvailable} is exercised here.
+     */
+    private static ObjectProvider<WorkspaceMembershipAssigner> objectProviderOf(
+        WorkspaceMembershipAssigner workspaceMembershipAssigner) {
+
+        @SuppressWarnings("unchecked")
+        ObjectProvider<WorkspaceMembershipAssigner> objectProvider = Mockito.mock(ObjectProvider.class);
+
+        when(objectProvider.getIfAvailable()).thenReturn(workspaceMembershipAssigner);
+
+        return objectProvider;
     }
 }

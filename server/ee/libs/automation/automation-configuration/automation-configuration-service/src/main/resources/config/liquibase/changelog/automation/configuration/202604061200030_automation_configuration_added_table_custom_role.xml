@@ -29,10 +29,7 @@
             </column>
         </createTable>
 
-        <addUniqueConstraint
-            tableName="custom_role"
-            columnNames="name"
-            constraintName="uk_custom_role_name"/>
+        <addUniqueConstraint tableName="custom_role" columnNames="name" constraintName="uk_custom_role_name"/>
 
         <createTable tableName="custom_role_scope">
             <column name="custom_role_id" type="BIGINT">

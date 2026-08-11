@@ -42,6 +42,30 @@ class PreAuthorizeAnnotationTest {
         assertPreAuthorize(
             WorkspaceUserService.class.getMethod("getWorkspaceWorkspaceUsers", long.class),
             "hasPermission(#workspaceId, 'Workspace', 'WORKSPACE_VIEW')");
+
+        // The workspace-level invite provisions a tenant account and spends a seat, so its guard is the one most
+        // worth pinning: a scope rather than a role, because a custom role carrying WORKSPACE_MEMBER_MANAGE must
+        // work without a special case, and anything weaker would let a non-manager onboard people.
+        assertPreAuthorize(
+            WorkspaceUserService.class.getMethod(
+                "inviteWorkspaceUser", long.class, String.class,
+                com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole.class),
+            "hasPermission(#workspaceId, 'Workspace', 'WORKSPACE_MEMBER_MANAGE')");
+
+        // The custom-role overloads are a second way into the same writes, so they need the same guard. Declaring
+        // either of the shorter forms as a `default` method delegating here removes its annotation and runs the
+        // delegation against the target rather than the proxy — an unguarded path that reads as harmless tidying.
+        assertPreAuthorize(
+            WorkspaceUserService.class.getMethod(
+                "addWorkspaceUser", long.class, long.class,
+                com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole.class, Long.class),
+            "hasPermission(#workspaceId, 'Workspace', 'WORKSPACE_MEMBER_MANAGE')");
+
+        assertPreAuthorize(
+            WorkspaceUserService.class.getMethod(
+                "inviteWorkspaceUser", long.class, String.class,
+                com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole.class, Long.class),
+            "hasPermission(#workspaceId, 'Workspace', 'WORKSPACE_MEMBER_MANAGE')");
     }
 
     @Test
@@ -163,8 +187,23 @@ class PreAuthorizeAnnotationTest {
     // so their existence is enforced at build time by module wiring rather than at runtime reflection. The
     // delegation contract is exercised end-to-end by PreAuthorizeProxyEnforcementIntTest in this module.
 
+    /**
+     * The scope catalogue is static metadata about what the server was built with — identical for every tenant, and
+     * nobody's data. Gating it harder than authentication would stop a role editor listing what it may compose from.
+     */
     @Test
-    void testCustomRoleServiceIsTenantAdminOnly() throws NoSuchMethodException {
+    void testPermissionScopesRequiresOnlyAuthentication() throws NoSuchMethodException {
+        assertPreAuthorize(
+            CustomRoleService.class.getMethod("getPermissionScopeNames"),
+            "isAuthenticated()");
+    }
+
+    /**
+     * Mutations are tenant-admin-only: a custom role is tenant-global and assignable everywhere, so defining one is a
+     * tenant-wide act. Pinned in full so a workspace-tier branch cannot quietly reappear.
+     */
+    @Test
+    void testCustomRoleMutationsRequireTenantAdmin() throws NoSuchMethodException {
         assertPreAuthorize(
             CustomRoleService.class.getMethod(
                 "createCustomRole", String.class, String.class, java.util.Set.class),
@@ -178,15 +217,19 @@ class PreAuthorizeAnnotationTest {
         assertPreAuthorize(
             CustomRoleService.class.getMethod("deleteCustomRole", long.class),
             "isTenantAdmin()");
+    }
 
-        // Reads are also tenant-admin only — a custom-role row reveals the org's permission strategy.
+    /**
+     * The read is the deliberate remnant of the old two-tier model: it has two audiences — tenant admins managing
+     * roles, and workspace member managers populating the assignment picker. The workspaceId argument is authorization
+     * context only; the body returns every role either way.
+     */
+    @Test
+    void testGetCustomRolesIsTieredForAssignmentReads() throws NoSuchMethodException {
         assertPreAuthorize(
-            CustomRoleService.class.getMethod("getCustomRole", long.class),
-            "isTenantAdmin()");
-
-        assertPreAuthorize(
-            CustomRoleService.class.getMethod("getCustomRoles"),
-            "isTenantAdmin()");
+            CustomRoleService.class.getMethod("getCustomRoles", Long.class),
+            "(#workspaceId == null and isTenantAdmin()) or " +
+                "(#workspaceId != null and hasPermission(#workspaceId, 'Workspace', 'WORKSPACE_MEMBER_MANAGE'))");
     }
 
     private void assertPreAuthorize(Method interfaceMethod, String expectedExpression) {

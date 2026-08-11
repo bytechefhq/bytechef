@@ -53,6 +53,7 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -491,6 +492,12 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public Page<User> getAllManagedUsers(Pageable pageable) {
         return userRepository.findAll(pageable);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<User> getUsersByAuthorityName(String authorityName) {
+        return userRepository.findAllByAuthorityName(authorityName);
     }
 
     @Override

@@ -9,7 +9,6 @@ package com.bytechef.ee.automation.configuration.repository;
 
 import com.bytechef.ee.automation.configuration.domain.CustomRole;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import java.util.Optional;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -21,6 +20,4 @@ import org.springframework.stereotype.Repository;
 @Repository
 @ConditionalOnEEVersion
 public interface CustomRoleRepository extends ListCrudRepository<CustomRole, Long> {
-
-    Optional<CustomRole> findByName(String name);
 }

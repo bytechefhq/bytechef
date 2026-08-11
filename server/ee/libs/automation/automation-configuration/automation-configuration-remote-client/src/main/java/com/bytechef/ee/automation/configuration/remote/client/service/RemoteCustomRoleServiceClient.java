@@ -49,16 +49,15 @@ public class RemoteCustomRoleServiceClient implements CustomRoleService {
     }
 
     @Override
-    public CustomRole getCustomRole(long roleId) {
-        logError("getCustomRole");
+    public List<CustomRole> getCustomRoles(Long workspaceId) {
+        logError("getCustomRoles");
 
-        throw new UnsupportedOperationException(
-            "CustomRoleService.getCustomRole is not available on this app variant");
+        return List.of();
     }
 
     @Override
-    public List<CustomRole> getCustomRoles() {
-        logError("getCustomRoles");
+    public List<String> getPermissionScopeNames() {
+        logError("getPermissionScopeNames");
 
         return List.of();
     }

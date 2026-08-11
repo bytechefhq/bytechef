@@ -1,16 +1,24 @@
 extend type Query {
-    "List all custom roles. Requires tenant admin."
-    customRoles: [CustomRole!]!
-    "Get a custom role by ID. Requires tenant admin."
-    customRole(id: ID!): CustomRole!
+    """
+    List every custom role in the tenant. Roles are tenant-global: defined once, assignable in any
+    workspace. Pass a workspaceId to read as that workspace's member manager (requires the
+    WORKSPACE_MEMBER_MANAGE scope there — the id is authorization context, not a filter), or omit it
+    for the tenant-admin management view.
+    """
+    customRoles(workspaceId: ID): [CustomRole!]!
+    """
+    Every permission scope name the server recognises, for composing a role. Requires authentication:
+    this is static metadata about what the server was built with, identical for every tenant.
+    """
+    permissionScopes: [String!]!
 }
 
 extend type Mutation {
-    "Create a new custom role with the given scopes. Requires tenant admin."
+    "Create a tenant-global custom role, assignable in every workspace. Requires tenant admin."
     createCustomRole(input: CreateCustomRoleInput!): CustomRole!
-    "Update an existing custom role. Requires tenant admin."
+    "Update a custom role. Requires tenant admin."
     updateCustomRole(id: ID!, input: UpdateCustomRoleInput!): CustomRole!
-    "Delete a custom role. Fails if the role is in use by any project member. Requires tenant admin."
+    "Delete a custom role. Fails if it is still assigned to any member. Requires tenant admin."
     deleteCustomRole(id: ID!): Boolean!
 }
 

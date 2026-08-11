@@ -16,6 +16,7 @@
 
 package com.bytechef.ee.platform.user.web.graphql;
 
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
@@ -28,6 +29,7 @@ import com.bytechef.ee.platform.user.web.graphql.config.PlatformUserGraphQlConfi
 import com.bytechef.ee.platform.user.web.graphql.config.PlatformUserGraphQlTestConfiguration;
 import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.User;
+import com.bytechef.platform.user.service.WorkspaceMembershipAssigner.WorkspaceAssignment;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -285,13 +287,13 @@ public class UserGraphQlControllerIntTest {
     void testInviteUser() {
         // Given
         doNothing().when(userManagementFacade)
-            .inviteUser(anyString(), anyString(), anyString());
+            .inviteUser(anyString(), anyString(), anyList());
 
-        // When & Then - password meets requirements: 8+ chars, uppercase, digit
+        // When & Then
         this.graphQlTester
             .document("""
                 mutation {
-                    inviteUser(email: "newuser@example.com", password: "Password123", role: "ROLE_USER")
+                    inviteUser(email: "newuser@example.com", role: "ROLE_USER")
                 }
                 """)
             .execute()
@@ -299,7 +301,38 @@ public class UserGraphQlControllerIntTest {
             .entity(Boolean.class)
             .isEqualTo(true);
 
-        verify(userManagementFacade).inviteUser("newuser@example.com", "Password123", "ROLE_USER");
+        // An omitted workspaces argument reaches the facade as an empty list, not null.
+        verify(userManagementFacade).inviteUser("newuser@example.com", "ROLE_USER", List.of());
+    }
+
+    @Test
+    void testInviteUserWithWorkspaces() {
+        // Given
+        doNothing().when(userManagementFacade)
+            .inviteUser(anyString(), anyString(), anyList());
+
+        // When & Then
+        this.graphQlTester
+            .document("""
+                mutation {
+                    inviteUser(
+                        email: "newuser@example.com"
+                        role: "ROLE_USER"
+                        workspaces: [
+                            {workspaceId: "1", roleName: "EDITOR"}
+                            {workspaceId: "2", roleName: "VIEWER"}
+                        ]
+                    )
+                }
+                """)
+            .execute()
+            .path("inviteUser")
+            .entity(Boolean.class)
+            .isEqualTo(true);
+
+        verify(userManagementFacade).inviteUser(
+            "newuser@example.com", "ROLE_USER",
+            List.of(new WorkspaceAssignment(1L, "EDITOR"), new WorkspaceAssignment(2L, "VIEWER")));
     }
 
     @Test

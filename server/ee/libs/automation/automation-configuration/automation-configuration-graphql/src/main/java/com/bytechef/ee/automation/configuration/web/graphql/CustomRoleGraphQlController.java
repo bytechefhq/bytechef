@@ -20,6 +20,7 @@ import java.util.Set;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -46,13 +47,28 @@ public class CustomRoleGraphQlController {
     }
 
     @QueryMapping
-    public List<CustomRole> customRoles() {
-        return customRoleService.getCustomRoles();
+    public List<CustomRole> customRoles(@Argument Long workspaceId) {
+        return customRoleService.getCustomRoles(workspaceId);
     }
 
+    /**
+     * The scopes a role may be composed from. Served from the same {@code PermissionScopeProvider} registry the write
+     * path validates against, so a client editor cannot offer a name the server would reject, nor omit one a module
+     * added after the client was written.
+     */
     @QueryMapping
-    public CustomRole customRole(@Argument long id) {
-        return customRoleService.getCustomRole(id);
+    public List<String> permissionScopes() {
+        return customRoleService.getPermissionScopeNames();
+    }
+
+    /**
+     * The schema declares {@code scopes: [String!]!}, but property resolution would pick {@code getScopes()}, which
+     * returns the {@code CustomRoleScope} row wrappers Spring Data JDBC needs for the child collection — serialising
+     * them as {@code CustomRoleScope[scope=WORKFLOW_VIEW]}. Map the field explicitly to the unwrapped names.
+     */
+    @SchemaMapping(typeName = "CustomRole", field = "scopes")
+    public Set<String> scopes(CustomRole customRole) {
+        return customRole.getScopeNames();
     }
 
     @MutationMapping

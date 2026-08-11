@@ -17,8 +17,11 @@ import static org.mockito.Mockito.when;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.automation.configuration.audit.WorkspaceUserAuditPublisher;
+import com.bytechef.ee.automation.configuration.repository.CustomRoleRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
+import com.bytechef.platform.user.service.UserInvitationService;
+import com.bytechef.platform.user.service.UserService;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -171,6 +174,28 @@ class PreAuthorizeProxyEnforcementIntTest {
         @Bean
         WorkspaceUserAuditPublisher workspaceUserAuditPublisher() {
             return mock(WorkspaceUserAuditPublisher.class);
+        }
+
+        // The remaining WorkspaceUserServiceImpl collaborators, mocked like the ones above — the proxy fires the
+        // @PreAuthorize check before any of them is touched, so stubs are all these enforcement tests need.
+        @Bean
+        CustomRoleRepository customRoleRepository() {
+            return mock(CustomRoleRepository.class);
+        }
+
+        @Bean
+        UserInvitationService userInvitationService() {
+            return mock(UserInvitationService.class);
+        }
+
+        @Bean
+        UserService userService() {
+            return mock(UserService.class);
+        }
+
+        @Bean
+        WorkspaceService workspaceService() {
+            return mock(WorkspaceService.class);
         }
     }
 
