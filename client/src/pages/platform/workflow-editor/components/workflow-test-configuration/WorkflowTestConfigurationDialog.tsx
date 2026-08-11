@@ -30,6 +30,7 @@ import {
 import {useSaveWorkflowTestConfigurationMutation} from '@/shared/mutations/platform/workflowTestConfigurations.mutations';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {synchronizeGroupedConnections} from '@/shared/util/synchronizeGroupedConnections';
 import * as Portal from '@radix-ui/react-portal';
 import {useQueryClient} from '@tanstack/react-query';
@@ -54,6 +55,7 @@ const WorkflowTestConfigurationDialog = ({
     const [connectionsGrouped, setConnectionsGrouped] = useState(false);
 
     const connectionDialogAllowed = useWorkflowNodeDetailsPanelStore((state) => state.connectionDialogAllowed);
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const {setShowWorkflowCodeEditorSheet, setShowWorkflowInputsSheet} = useWorkflowEditorStore(
         useShallow((state) => ({
@@ -94,6 +96,7 @@ const WorkflowTestConfigurationDialog = ({
         defaultValues: {
             ...workflowTestConfiguration,
             connections: workflowTestConfigurationConnections,
+            environmentId: workflowTestConfiguration?.environmentId ?? currentEnvironmentId,
         },
     });
 
