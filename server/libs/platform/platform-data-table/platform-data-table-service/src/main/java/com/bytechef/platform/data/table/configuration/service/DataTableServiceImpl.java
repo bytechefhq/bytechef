@@ -27,6 +27,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -353,8 +354,9 @@ public class DataTableServiceImpl implements DataTableService {
     private void checkRegistry(String baseName, ExecutionException executionException) {
         Assert.hasText(baseName, "baseName required");
 
-        if (dataTableRepository.findByName(baseName)
-            .isEmpty()) {
+        Optional<DataTable> dataTableOptional = dataTableRepository.findByName(baseName);
+
+        if (dataTableOptional.isEmpty()) {
             throw executionException;
         }
     }
