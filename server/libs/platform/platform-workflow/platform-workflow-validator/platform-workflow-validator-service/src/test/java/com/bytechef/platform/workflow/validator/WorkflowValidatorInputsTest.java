@@ -261,7 +261,7 @@ class WorkflowValidatorInputsTest {
             new HashMap<>(), new HashMap<>(), new HashMap<>(), errors, warnings);
 
         assertEquals(
-            "[task_1] Property 'flag' in output of 'inputs' is of type boolean, not integer", errors.toString());
+            "[task_1] Input property 'flag' is of type boolean, not integer", errors.toString());
         assertEquals("", warnings.toString());
     }
 
@@ -578,5 +578,76 @@ class WorkflowValidatorInputsTest {
         assertEquals("", errors.toString());
         assertEquals(
             "[task_1] Property 'any Name.foo' might not exist in the output of 'string'", warnings.toString());
+    }
+
+    @Test
+    void validateWorkflowInputBareReferenceResolvesDisplayConditionedPropertyNoErrors() {
+        String workflow = """
+            {
+                "label": "error-handler",
+                "description": "",
+                "inputs": [
+                    {
+                        "name": "any Name",
+                        "label": "any Label",
+                        "type": "boolean"
+                    }
+                ],
+                "triggers": [
+                    {
+                        "description": "",
+                        "label": "Manual",
+                        "name": "trigger_1",
+                        "parameters": {},
+                        "type": "manual/v1/manual"
+                    }
+                ],
+                "tasks": [
+                    {
+                        "label": "Var",
+                        "name": "var_1",
+                        "parameters": {
+                            "type": "STRING",
+                            "value": "${any Name}"
+                        },
+                        "type": "var/v1/set"
+                    }
+                ]
+            }
+            """;
+
+        Map<String, List<PropertyInfo>> taskDefinitionMap = Map.of(
+            "manual/v1/manual", List.of(),
+            "var/v1/set", List.of(
+                new PropertyInfo("type", "STRING", null, false, true, null, null),
+                new PropertyInfo("value", "ARRAY", null, true, true, "type == 'ARRAY'", null),
+                new PropertyInfo("value", "BOOLEAN", null, true, true, "type == 'BOOLEAN'", null),
+                new PropertyInfo("value", "DATE", null, true, true, "type == 'DATE'", null),
+                new PropertyInfo("value", "DATE_TIME", null, true, true, "type == 'DATE_TIME'", null),
+                new PropertyInfo("value", "INTEGER", null, true, true, "type == 'INTEGER'", null),
+                new PropertyInfo("value", "NUMBER", null, true, true, "type == 'NUMBER'", null),
+                new PropertyInfo("value", "OBJECT", null, true, true, "type == 'OBJECT'", null),
+                new PropertyInfo("value", "STRING", null, true, true, "type == 'STRING'", null),
+                new PropertyInfo("value", "TIME", null, true, true, "type == 'TIME'", null)));
+
+        Map<String, PropertyInfo> taskOutputMap = Map.of();
+        Map<String, List<String>> clusterTypesMap = Map.of();
+
+        StringBuilder errors = new StringBuilder();
+        StringBuilder warnings = new StringBuilder();
+
+        WorkflowValidator.TaskDefinitionProvider taskDefProvider = (taskType, kind) -> taskDefinitionMap.get(taskType);
+        WorkflowValidator.TaskOutputProvider taskOutputProvider =
+            (taskType, kind, warningsBuilder) -> taskOutputMap.get(taskType);
+        WorkflowValidator.ClusterTypesProvider clusterTypesProvider = clusterTypesMap::get;
+
+        WorkflowValidator.validateWorkflow(workflow, taskDefProvider, taskOutputProvider, clusterTypesProvider,
+            new HashMap<>(), new HashMap<>(), new HashMap<>(), errors, warnings);
+
+        // 'value' is a discriminated union (one PropertyInfo per "type"); the expected type must resolve to the
+        // STRING candidate whose displayCondition matches the task's actual "type": "STRING", not the first "value"
+        // entry in definition order (ARRAY). A boolean input bound into a STRING field is fine - it gets stringified.
+        assertEquals("", errors.toString());
+        assertEquals("", warnings.toString());
     }
 }
