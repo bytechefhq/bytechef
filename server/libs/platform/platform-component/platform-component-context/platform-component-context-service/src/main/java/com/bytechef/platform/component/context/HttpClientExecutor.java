@@ -62,11 +62,13 @@ import java.net.http.HttpResponse;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import javax.net.ssl.SSLContext;
@@ -84,6 +86,11 @@ import tools.jackson.core.type.TypeReference;
  * @author Ivica Cardic
  */
 class HttpClientExecutor {
+
+    private static final String REDACTED_VALUE = "[REDACTED]";
+
+    private static final Set<String> SENSITIVE_HEADER_NAMES = Set.of(
+        "api-key", "authorization", "cookie", "proxy-authorization", "set-cookie", "x-api-key", "x-auth-token");
 
     private final ApplicationContext applicationContext;
     private final TempFileStorage tempFileStorage;
@@ -111,12 +118,34 @@ class HttpClientExecutor {
 
             context.log(log -> log.debug(
                 "uri: {}, requestMethod: {}, headers: {}, queryParameters: {}, responseType: {}",
-                httpRequest.uri(), requestMethod, headers, queryParameters, configuration.getResponseType()));
+                httpRequest.uri(), requestMethod, redactSensitiveHeaders(headers), queryParameters,
+                configuration.getResponseType()));
 
             httpResponse = httpClient.send(httpRequest, createResponseBodyHandler(configuration));
 
             return handleResponse(httpResponse, configuration, context);
         }
+    }
+
+    /**
+     * Returns a copy of {@code headers} with the values of credential-bearing headers (Authorization, Cookie, API-key
+     * variants, ...) replaced by a {@code [REDACTED]} marker, matched case-insensitively. Used for request debug
+     * logging only — log output otherwise leaks live tokens into log files.
+     */
+    static Map<String, List<String>> redactSensitiveHeaders(Map<String, List<String>> headers) {
+        Map<String, List<String>> redactedHeaders = new LinkedHashMap<>();
+
+        for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
+            String headerName = entry.getKey();
+
+            if (headerName != null && SENSITIVE_HEADER_NAMES.contains(headerName.toLowerCase(Locale.ROOT))) {
+                redactedHeaders.put(headerName, List.of(REDACTED_VALUE));
+            } else {
+                redactedHeaders.put(headerName, entry.getValue());
+            }
+        }
+
+        return redactedHeaders;
     }
 
     BodyPublisher createBodyPublisher(@Nullable Body body) {

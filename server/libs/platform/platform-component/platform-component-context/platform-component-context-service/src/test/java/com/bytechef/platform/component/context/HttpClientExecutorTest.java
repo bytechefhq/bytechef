@@ -3836,6 +3836,43 @@ public class HttpClientExecutorTest {
         }
     }
 
+    @Nested
+    @DisplayName("redactSensitiveHeaders()")
+    class RedactSensitiveHeadersTest {
+
+        @Test
+        @DisplayName("Should mask credential-bearing headers case-insensitively and keep other headers")
+        void testMasksCredentialHeadersCaseInsensitively() {
+            Map<String, List<String>> headers = new LinkedHashMap<>();
+
+            headers.put("Authorization", List.of("Bearer secret-token"));
+            headers.put("proxy-authorization", List.of("Basic abc"));
+            headers.put("X-API-KEY", List.of("key123"));
+            headers.put("Cookie", List.of("session=abc"));
+            headers.put("Content-Type", List.of("application/json"));
+
+            Map<String, List<String>> redactedHeaders = HttpClientExecutor.redactSensitiveHeaders(headers);
+
+            assertEquals(List.of("[REDACTED]"), redactedHeaders.get("Authorization"));
+            assertEquals(List.of("[REDACTED]"), redactedHeaders.get("proxy-authorization"));
+            assertEquals(List.of("[REDACTED]"), redactedHeaders.get("X-API-KEY"));
+            assertEquals(List.of("[REDACTED]"), redactedHeaders.get("Cookie"));
+            assertEquals(List.of("application/json"), redactedHeaders.get("Content-Type"));
+        }
+
+        @Test
+        @DisplayName("Should leave the original headers map untouched")
+        void testLeavesOriginalHeadersUntouched() {
+            Map<String, List<String>> headers = new LinkedHashMap<>();
+
+            headers.put("Authorization", List.of("Bearer secret-token"));
+
+            HttpClientExecutor.redactSensitiveHeaders(headers);
+
+            assertEquals(List.of("Bearer secret-token"), headers.get("Authorization"));
+        }
+    }
+
     private static class TestHttpResponse implements HttpResponse<Object> {
 
         private final Object body;
