@@ -49,7 +49,7 @@ const OrganizationConnectionsTable = ({connections, onDeleteClick}: Organization
 
                         <TableCell className="text-right">
                             <Button
-                                icon={<Trash2Icon className="size-4" />}
+                                icon={<Trash2Icon className="size-4 text-destructive" />}
                                 onClick={() => onDeleteClick(connection)}
                                 size="icon"
                                 variant="ghost"
