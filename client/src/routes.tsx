@@ -464,6 +464,18 @@ const platformSettingsRoutes = {
                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                             <EEVersion>
                                 <LazyLoadWrapper>
+                                    <Components tab="component-visibility" />
+                                </LazyLoadWrapper>
+                            </EEVersion>
+                        </PrivateRoute>
+                    ),
+                    path: 'component-visibility',
+                },
+                {
+                    element: (
+                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                            <EEVersion>
+                                <LazyLoadWrapper>
                                     <ApiConnectorManualPage />
                                 </LazyLoadWrapper>
                             </EEVersion>

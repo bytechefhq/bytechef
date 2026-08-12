@@ -9,7 +9,7 @@ import ComponentVisibilityTab from './components/ComponentVisibilityTab';
 const ComponentPoliciesTab = () => {
     return (
         <Tabs className="size-full px-6 pb-4" defaultValue="component-visibility">
-            <TabsList variant="line">
+            <TabsList>
                 <TabsTrigger value="component-visibility">Component Visibility</TabsTrigger>
             </TabsList>
 
