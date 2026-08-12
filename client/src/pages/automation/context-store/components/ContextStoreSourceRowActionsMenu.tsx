@@ -10,10 +10,9 @@ import {
     ContextStoreSource,
     useDeleteContextStoreSourceMutation,
     useRefreshContextStoreSourceMutation,
-    useSetContextStoreSourceEnabledMutation,
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {MoreVerticalIcon, PowerIcon, RefreshCwIcon, TrashIcon} from 'lucide-react';
+import {MoreVerticalIcon, RefreshCwIcon, TrashIcon} from 'lucide-react';
 import {useState} from 'react';
 import {toast} from 'sonner';
 
@@ -47,9 +46,6 @@ const ContextStoreSourceRowActionsMenu = ({isAdmin, source}: ContextStoreSourceR
     const deleteMutation = useDeleteContextStoreSourceMutation({
         onSuccess: invalidateSources,
     });
-    const setEnabledMutation = useSetContextStoreSourceEnabledMutation({
-        onSuccess: invalidateSources,
-    });
 
     if (!isAdmin) {
         return null;
@@ -72,14 +68,6 @@ const ContextStoreSourceRowActionsMenu = ({isAdmin, source}: ContextStoreSourceR
                     <DropdownMenuItem onClick={() => refreshMutation.mutate({id: source.id})}>
                         <RefreshCwIcon className="mr-2 size-4" />
                         Refresh now
-                    </DropdownMenuItem>
-
-                    <DropdownMenuItem
-                        onClick={() => setEnabledMutation.mutate({enabled: !source.enabled, id: source.id})}
-                    >
-                        <PowerIcon className="mr-2 size-4" />
-
-                        {source.enabled ? 'Disable' : 'Enable'}
                     </DropdownMenuItem>
 
                     <DropdownMenuSeparator />

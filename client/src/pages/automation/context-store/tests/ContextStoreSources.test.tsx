@@ -7,6 +7,7 @@ import ContextStoreSources from '../ContextStoreSources';
 const hoisted = vi.hoisted(() => {
     return {
         accountAuthorities: ['ROLE_ADMIN'],
+        mockNavigate: vi.fn(),
         mockRegisterPostTurn: vi.fn(),
         mockSetContext: vi.fn(),
         mockSetCopilotPanelOpen: vi.fn(),
@@ -145,6 +146,7 @@ vi.mock('@/shared/layout/LayoutContainer', () => ({
 }));
 
 vi.mock('react-router-dom', () => ({
+    useNavigate: () => hoisted.mockNavigate,
     useParams: () => ({id: 'store-1'}),
 }));
 

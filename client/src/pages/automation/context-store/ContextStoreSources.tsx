@@ -5,6 +5,7 @@ import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/c
 import AddContextSourceDialog from '@/pages/automation/context-store/components/AddContextSourceDialog';
 import ContextStoreLeftSidebarNav from '@/pages/automation/context-store/components/ContextStoreLeftSidebarNav';
 import ContextStoreSourceDetailDialog from '@/pages/automation/context-store/components/ContextStoreSourceDetailDialog';
+import ContextStoreSourceEnabledToggle from '@/pages/automation/context-store/components/ContextStoreSourceEnabledToggle';
 import ContextStoreSourceRowActionsMenu from '@/pages/automation/context-store/components/ContextStoreSourceRowActionsMenu';
 import useContextStoreSources from '@/pages/automation/context-store/components/hooks/useContextStoreSources';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
@@ -23,8 +24,8 @@ import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {formatDistanceToNow} from 'date-fns';
 import {BoxesIcon, SparklesIcon} from 'lucide-react';
-import {useEffect, useMemo, useState} from 'react';
-import {useParams} from 'react-router-dom';
+import {useEffect, useMemo, useRef, useState} from 'react';
+import {useNavigate, useParams} from 'react-router-dom';
 
 /**
  * Single-store detail page — sources that belong to one Context Store. Mirrors the `KnowledgeBase` detail page: a left
@@ -49,6 +50,13 @@ const ContextStoreSources = () => {
 
     const [selectedSourceId, setSelectedSourceId] = useState<string | null>(null);
 
+    const navigate = useNavigate();
+
+    // The environment this detail page was opened in. A context store belongs to one environment, so switching leaves
+    // this route pointing at a store the new environment does not contain -- the sidebar empties while the page keeps
+    // rendering the old store's sources. Send the reader back to the list rather than showing them that.
+    const openedEnvironmentIdRef = useRef(currentEnvironmentId);
+
     const {error, isLoading, sources} = useContextStoreSources();
 
     const {data: contextStoresData} = useContextStoresQuery({
@@ -72,6 +80,12 @@ const ContextStoreSources = () => {
 
         setCopilotPanelOpen(true);
     };
+
+    useEffect(() => {
+        if (openedEnvironmentIdRef.current !== currentEnvironmentId) {
+            navigate('/automation/context-stores');
+        }
+    }, [currentEnvironmentId, navigate]);
 
     // Refresh this store's sources + the store list after a BUILD-mode copilot turn mutates data (e.g. adding or
     // syncing a source), so the page reflects the change without a manual reload.
@@ -181,7 +195,11 @@ const ContextStoreSources = () => {
                                         </TableCell>
 
                                         <TableCell onClick={(event) => event.stopPropagation()}>
-                                            <ContextStoreSourceRowActionsMenu isAdmin={isAdmin} source={source} />
+                                            <div className="flex items-center justify-end gap-2">
+                                                <ContextStoreSourceEnabledToggle isAdmin={isAdmin} source={source} />
+
+                                                <ContextStoreSourceRowActionsMenu isAdmin={isAdmin} source={source} />
+                                            </div>
                                         </TableCell>
                                     </TableRow>
                                 ))}
