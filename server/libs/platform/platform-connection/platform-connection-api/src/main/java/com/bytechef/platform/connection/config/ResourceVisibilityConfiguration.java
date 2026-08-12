@@ -27,9 +27,10 @@ import org.springframework.context.annotation.Configuration;
  *
  * <p>
  * The registry itself lives in {@code platform-api}, which carries no Spring stereotypes and is not component-scanned,
- * so it needs an explicit {@code @Bean} somewhere that is. This module is that somewhere because it owns the only
- * policy today. When a second resource family gains visibility and can be deployed without connections, move this
- * declaration to a module both depend on rather than adding a second registry.
+ * so it needs an explicit {@code @Bean} somewhere that is. It sits in platform-connection-API rather than -service so
+ * every deployment that consumes the registry gets the bean: configuration-app carries connection facades (via the
+ * remote-client wiring) without {@code platform-connection-service}, and its context failed to boot when this
+ * declaration lived there.
  *
  * @author Ivica Cardic
  */
