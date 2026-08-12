@@ -95,7 +95,17 @@ const RequestBodyEditor = ({onChange, requestBody}: RequestBodyEditorProps) => {
 
             <Dialog onOpenChange={handleDialogOpen} open={isDialogOpen}>
                 <DialogContent className="max-w-lg">
-                    <form className="flex flex-col gap-4" onSubmit={handleSubmit(handleSaveRequestBody)}>
+                    {/* stopPropagation: the dialog DOM is portaled, but React submit events still
+                        bubble through the React tree into the surrounding EndpointForm form */}
+
+                    <form
+                        className="flex flex-col gap-4"
+                        onSubmit={(event) => {
+                            event.stopPropagation();
+
+                            handleSubmit(handleSaveRequestBody)(event);
+                        }}
+                    >
                         <DialogHeader className="flex flex-row items-center justify-between space-y-0">
                             <DialogTitle>{requestBody ? 'Edit' : 'Add'} Request Body</DialogTitle>
 
