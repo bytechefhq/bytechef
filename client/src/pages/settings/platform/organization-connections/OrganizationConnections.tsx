@@ -1,10 +1,12 @@
 import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {ConnectionI} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import OrganizationConnectionDeleteDialog from '@/pages/settings/platform/organization-connections/components/OrganizationConnectionDeleteDialog';
-import OrganizationConnectionDialog from '@/pages/settings/platform/organization-connections/components/OrganizationConnectionDialog';
 import OrganizationConnectionsTable from '@/pages/settings/platform/organization-connections/components/OrganizationConnectionsTable';
 import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
+import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {
@@ -13,7 +15,10 @@ import {
     useDeleteOrganizationConnectionMutation,
     useOrganizationConnectionsQuery,
 } from '@/shared/middleware/graphql';
+import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
+import {ConnectionKeys, useGetConnectionTagsQuery} from '@/shared/queries/automation/connections.queries';
 import {EditionType, useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
+import {UseMutationResult} from '@tanstack/react-query';
 import {Link2Icon, PlusIcon} from 'lucide-react';
 import {useState} from 'react';
 import {Navigate} from 'react-router-dom';
@@ -37,13 +42,45 @@ const OrganizationConnections = () => {
 
     const connections = data?.organizationConnections ?? [];
 
-    const createMutation = useCreateOrganizationConnectionMutation({
-        onSuccess: () => {
-            setIsCreateDialogOpen(false);
+    /**
+     * Adapts the organization create mutation to the shape ConnectionDialog injects. The dialog hands over a flat
+     * connection and expects a numeric id back; createOrganizationConnection takes an input wrapper and returns the id
+     * as a string. Going through the shared dialog is what gets this surface a component picker, the component's real
+     * connection properties, and OAuth2 — none of which the bespoke dialog had.
+     */
+    const useCreateOrganizationConnectionAdapter = (mutationProps: {
+        onError?: (error: Error, variables: ConnectionI) => void;
+        onSuccess?: (result: number, variables: ConnectionI) => void;
+    }) => {
+        const mutation = useCreateOrganizationConnectionMutation({
+            onError: (error: Error, variables) =>
+                mutationProps.onError?.(error, variables.input as unknown as ConnectionI),
+            onSuccess: (result, variables) => {
+                setIsCreateDialogOpen(false);
 
-            refetch();
-        },
-    });
+                refetch();
+
+                mutationProps.onSuccess?.(
+                    Number(result.createOrganizationConnection),
+                    variables.input as unknown as ConnectionI
+                );
+            },
+        });
+
+        return {
+            ...mutation,
+            mutate: (connection: ConnectionI) =>
+                mutation.mutate({
+                    input: {
+                        componentName: connection.componentName ?? '',
+                        connectionVersion: connection.connectionVersion ?? 1,
+                        environmentId: Number(connection.environmentId ?? 0),
+                        name: connection.name ?? '',
+                        parameters: (connection.parameters ?? {}) as Record<string, unknown>,
+                    },
+                }),
+        } as unknown as UseMutationResult<number, Error, ConnectionI, unknown>;
+    };
 
     const deleteMutation = useDeleteOrganizationConnectionMutation({
         onError: () => {
@@ -59,23 +96,14 @@ const OrganizationConnections = () => {
         },
     });
 
-    const handleCreate = (formData: {
-        componentName: string;
-        connectionVersion: number;
-        environmentId: number;
-        name: string;
-        parameters: Record<string, unknown>;
-    }) => {
-        createMutation.mutate({
-            input: {
-                componentName: formData.componentName,
-                connectionVersion: formData.connectionVersion,
-                environmentId: formData.environmentId,
-                name: formData.name,
-                parameters: formData.parameters,
-            },
-        });
-    };
+    const componentDefinitionsQueryResult = useGetComponentDefinitionsQuery({connectionDefinitions: true});
+    const componentDefinitions = componentDefinitionsQueryResult.data;
+
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const workspaceId = currentWorkspaceId ?? 0;
+
+    const connectionTagsQueryResult = useGetConnectionTagsQuery(workspaceId);
 
     const handleDeleteConfirm = (connectionId: string) => {
         deleteMutation.mutate({connectionId});
@@ -135,7 +163,15 @@ const OrganizationConnections = () => {
             </PageLoader>
 
             {isCreateDialogOpen && (
-                <OrganizationConnectionDialog onClose={() => setIsCreateDialogOpen(false)} onSave={handleCreate} />
+                <ConnectionDialog
+                    componentDefinitions={componentDefinitions ?? []}
+                    connectionTagsQueryKey={ConnectionKeys.connectionTags(workspaceId)}
+                    connectionsQueryKey={ConnectionKeys.connections}
+                    onClose={() => setIsCreateDialogOpen(false)}
+                    showOrganizationOption
+                    useCreateConnectionMutation={useCreateOrganizationConnectionAdapter}
+                    useGetConnectionTagsQuery={() => connectionTagsQueryResult}
+                />
             )}
 
             {connectionToDelete && (

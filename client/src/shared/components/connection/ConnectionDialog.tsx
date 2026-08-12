@@ -71,7 +71,7 @@ export interface ConnectionDialogFormProps {
     registeringExisting?: boolean;
     selectedScopes?: {[key: string]: boolean};
     tags: Array<Tag | {label: string; value: string}>;
-    visibility: 'PRIVATE' | 'WORKSPACE';
+    visibility: 'PRIVATE' | 'WORKSPACE' | 'ORGANIZATION';
 }
 
 interface ConnectionDialogProps {
@@ -82,6 +82,12 @@ interface ConnectionDialogProps {
     connectionsQueryKey: QueryKey;
     onClose?: () => void;
     onConnectionCreate?: (connectionId: number) => void;
+    /**
+     * Offers the Organization rung in the visibility picker. Opt-in because ORGANIZATION is not reachable through the
+     * ordinary create path -- setConnectionVisibility rejects it outright -- so only a surface whose create mutation
+     * writes an organization connection may show it.
+     */
+    showOrganizationOption?: boolean;
     triggerNode?: ReactNode;
     useCreateConnectionMutation?: (mutationProps: {
         onSuccess?: (result: number, variables: ConnectionI) => void;
@@ -102,6 +108,7 @@ const ConnectionDialog = ({
     connectionsQueryKey,
     onClose,
     onConnectionCreate,
+    showOrganizationOption,
     triggerNode,
     useCreateConnectionMutation,
     useGetConnectionTagsQuery,
@@ -758,6 +765,7 @@ const ConnectionDialog = ({
                                                                 grantedUserIds={[]}
                                                                 onGrantedUserIdsChange={() => undefined}
                                                                 onVisibilityChange={field.onChange}
+                                                                showOrganizationOption={showOrganizationOption}
                                                                 visibility={field.value}
                                                             />
                                                         </FormControl>
