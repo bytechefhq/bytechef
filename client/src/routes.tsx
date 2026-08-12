@@ -132,6 +132,9 @@ const WorkspaceSystemPrompt = lazy(
     () => import('@/ee/pages/settings/automation/ai/system-prompt/WorkspaceSystemPrompt')
 );
 const WorkspaceApiKeys = lazy(() => import('@/ee/pages/settings/automation/workspace-api-keys/WorkspaceApiKeys'));
+const WorkspaceUsers = lazy(() => import('@/ee/pages/settings/automation/users/WorkspaceUsers'));
+const CustomRoles = lazy(() => import('@/ee/pages/settings/automation/custom-roles/CustomRoles'));
+const GlobalCustomRoles = lazy(() => import('@/ee/pages/settings/platform/custom-roles/GlobalCustomRoles'));
 const Workspaces = lazy(() => import('@/ee/pages/settings/automation/workspaces/Workspaces'));
 const OrganizationConnections = lazy(
     () => import('@/pages/settings/platform/organization-connections/OrganizationConnections')
@@ -196,6 +199,38 @@ const getAccountRoutes = (path: string) => ({
 // Current workspace settings routes
 const currentWorkspaceSettingsRoutes = {
     children: [
+        {
+            // ADMIN *or* USER: a workspace admin need not be a tenant admin, and gating this on ROLE_ADMIN would
+            // reinstate the very problem the page exists to solve. The page itself checks the
+            // WORKSPACE_MEMBER_MANAGE scope for the current workspace.
+            element: (
+                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                    <EEVersion>
+                        <LazyLoadWrapper>
+                            <WorkspaceUsers />
+                        </LazyLoadWrapper>
+                    </EEVersion>
+                </PrivateRoute>
+            ),
+            // Not 'users': the tenant Users page already claims that path, and both route sets are spread into the
+            // same children array under /automation/settings — so sharing it made this page shadow the tenant one,
+            // and the sidebar's `href === 'users'` feature-flag filter hid this one behind a flag meant for that one.
+            path: 'workspace-users',
+        },
+        {
+            // Same gate as Users, and for the same reason: a workspace admin need not be a tenant admin. The page
+            // checks WORKSPACE_MEMBER_MANAGE for the current workspace.
+            element: (
+                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                    <EEVersion>
+                        <LazyLoadWrapper>
+                            <CustomRoles />
+                        </LazyLoadWrapper>
+                    </EEVersion>
+                </PrivateRoute>
+            ),
+            path: 'custom-roles',
+        },
         {
             element: (
                 <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
@@ -262,6 +297,14 @@ const currentWorkspaceSettingsRoutes = {
             title: 'Current Workspace',
         },
         {
+            href: 'workspace-users',
+            title: 'Users',
+        },
+        {
+            href: 'custom-roles',
+            title: 'Custom Roles',
+        },
+        {
             href: 'git-configuration',
             title: 'Git Configuration',
         },
@@ -275,7 +318,7 @@ const currentWorkspaceSettingsRoutes = {
         },
         {
             href: 'ai-hub/connectors',
-            title: 'Hub Connectors',
+            title: 'AI Hub Connectors',
         },
         {
             href: 'ai/guardrails',
@@ -327,6 +370,22 @@ const platformSettingsRoutes = {
                 </PrivateRoute>
             ),
             path: 'users',
+        },
+        {
+            // Tenant-global roles are assignable in every workspace, so managing them is a tenant-wide act.
+            //
+            // Distinct from the workspace page's 'custom-roles': both route sets are spread into the same children
+            // array under /automation/settings, so a shared path would let the first one shadow the other.
+            element: (
+                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                    <EEVersion>
+                        <LazyLoadWrapper>
+                            <GlobalCustomRoles />
+                        </LazyLoadWrapper>
+                    </EEVersion>
+                </PrivateRoute>
+            ),
+            path: 'global-custom-roles',
         },
         {
             element: (
@@ -561,6 +620,10 @@ const platformSettingsRoutes = {
         {
             href: 'users',
             title: 'Users',
+        },
+        {
+            href: 'global-custom-roles',
+            title: 'Custom Roles',
         },
         {
             href: 'connections',

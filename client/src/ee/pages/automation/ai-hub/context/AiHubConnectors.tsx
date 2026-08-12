@@ -345,7 +345,10 @@ const AiHubConnectors = () => {
     const workspaceIdString = String(currentWorkspaceId ?? '');
 
     return (
-        <LayoutContainer header={<Header centerTitle position="main" title="Connectors" />} leftSidebarOpen={false}>
+        <LayoutContainer
+            header={<Header centerTitle position="main" title="AI Hub Connectors" />}
+            leftSidebarOpen={false}
+        >
             <div className="flex w-full flex-1 flex-col gap-10 px-4 py-6 3xl:mx-auto 3xl:w-4/5">
                 {/* Pre-built Connectors */}
 
