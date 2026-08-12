@@ -23,36 +23,543 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.FileEntry;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.ServerSocket;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.sftp.SFTPClient;
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
 import net.schmizz.sshj.xfer.InMemorySourceFile;
+import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPFile;
+import org.apache.commons.net.ftp.FTPReply;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.Timeout;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.testcontainers.containers.Container.ExecResult;
-import org.testcontainers.containers.ContainerLaunchException;
 import org.testcontainers.containers.FixedHostPortGenericContainer;
 import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.wait.strategy.Wait;
 
 /**
- * Integration tests for {@link FtpUploadFileAction} using real FTP and SFTP servers spun up via Testcontainers.
- *
  * @author Igor Beslic
  */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringJUnitConfig(BaseFtpActionIntTest.TestConfig.class)
 public class BaseFtpActionIntTest {
+
+    protected static final List<String> SEEDED_FILE_SUFFIXES = List.of("for-delete", "001", "002", "003", "004", "005");
+    protected static final int SEEDED_FILE_COUNT = SEEDED_FILE_SUFFIXES.size() + 1;
+    protected static final String TEST_CONTENT = "Hello from FTP Integration Test!";
+    protected static final String TEST_FILE_BASE_NAME = "test-document";
+    protected static final String TEST_FILE_BASE_EXTENSION = ".txt";
+
+    protected static final String TEST_FILE_NAME = TEST_FILE_BASE_NAME + TEST_FILE_BASE_EXTENSION;
+
+    protected static final String FTP_REMOTE_PATH = TEST_FILE_NAME;
+    protected static final String SFTP_UPLOAD_DIR = "upload";
+
+    protected static final String SFTP_REMOTE_PATH = "/" + SFTP_UPLOAD_DIR + "/" + TEST_FILE_NAME;
+
+    private static final String FTP_IMAGE =
+        "delfer/alpine-ftp-server@sha256:60bb774d8408d9d4d5c74d05d1c086a34ce192c6c1a142ffac268cac0dbc6fac";
+    private static final String SFTP_IMAGE =
+        "atmoz/sftp@sha256:0960390462a4441dbb63698d7c185b76a41ffcee7b78ff4adf275f3e66f9c475";
+    private static final int FTP_CONTROL_PORT = 21;
+    private static final int SFTP_PORT = 22;
+    private static final int PASSIVE_PORT_COUNT = 10;
+    private static final int PASSIVE_PORT_SEARCH_FIRST = 30100;
+    private static final int PASSIVE_PORT_SEARCH_LAST = 32700;
+    private static final Duration CONTAINER_STARTUP_TIMEOUT = Duration.ofMinutes(3);
+    private static final Duration PROBE_TIMEOUT = Duration.ofSeconds(20);
+    private static final Duration READINESS_TIMEOUT = Duration.ofSeconds(90);
+    private static final Duration READINESS_POLL_INTERVAL = Duration.ofSeconds(1);
+    private static final int PREPARE_MAX_ATTEMPTS = 3;
+    private static final int CONTAINER_LOG_TAIL_LENGTH = 4000;
+
+    static FixedHostPortGenericContainer<?> ftpContainer;
+    static GenericContainer<?> sftpContainer;
+
+    private static int passivePortSearchCursor = PASSIVE_PORT_SEARCH_FIRST;
+    private static volatile boolean sftpSeeded;
+
+    protected String ftpPassword;
+    protected String ftpUsername;
+    protected String ftpHostIp;
+
+    @Value("${bytechef.test.ftp.password:}")
+    private String configuredFtpPassword;
+    @Value("${bytechef.test.ftp.username:}")
+    private String configuredFtpUsername;
+    @Value("${bytechef.test.ftp.host.ip:}")
+    private String configuredFtpHostIp;
+
+    @BeforeAll
+    void resolveConfiguration() {
+        ftpPassword = valueOrDefault(configuredFtpPassword, "T3st@Pass123");
+        ftpUsername = valueOrDefault(configuredFtpUsername, "ftpuser");
+
+        InetAddress loopbackAddress = InetAddress.getLoopbackAddress();
+
+        ftpHostIp = valueOrDefault(configuredFtpHostIp, loopbackAddress.getHostAddress());
+    }
+
+    @BeforeEach
+    @Timeout(value = 5, unit = TimeUnit.MINUTES)
+    void prepareServers() {
+        prepareFtpServer();
+        prepareSftpServer();
+    }
+
+    protected static FileEntry mockFileEntry() throws Exception {
+        FileEntry mockFileEntry = mock(FileEntry.class);
+        when(mockFileEntry.getName()).thenReturn(TEST_FILE_NAME);
+        when(mockFileEntry.getExtension()).thenReturn("txt");
+        when(mockFileEntry.getMimeType()).thenReturn("text/plain");
+
+        return mockFileEntry;
+    }
+
+    protected static ActionContext getMockActionContext(FileEntry mockFileEntry) {
+        ActionContext context = mock(ActionContext.class);
+        Context.File mockContextFile = mock(Context.File.class);
+
+        when(
+            mockContextFile.getInputStream(mockFileEntry)).thenAnswer(
+                invocation -> new ByteArrayInputStream(TEST_CONTENT.getBytes(StandardCharsets.UTF_8)));
+
+        when(
+            context.file(any())).thenAnswer(
+                invocation -> {
+                    Context.ContextFunction<Context.File, FileEntry> fileFunction = invocation.getArgument(0);
+
+                    return fileFunction.apply(mockContextFile);
+                });
+
+        return context;
+    }
+
+    private void prepareFtpServer() {
+        StringBuilder diagnostics = new StringBuilder();
+
+        for (int attempt = 1; attempt <= PREPARE_MAX_ATTEMPTS; attempt++) {
+            try {
+                if (ftpContainer == null || !ftpContainer.isRunning()) {
+                    startFtpContainer();
+                }
+
+                seedFtpFiles();
+
+                return;
+            } catch (Exception exception) {
+                diagnostics.append(System.lineSeparator())
+                    .append("attempt ")
+                    .append(attempt)
+                    .append(": ")
+                    .append(exception);
+
+                discardFtpContainer();
+            }
+        }
+
+        throw new IllegalStateException(
+            "FTP server could not be prepared after " + PREPARE_MAX_ATTEMPTS + " attempts:" + diagnostics);
+    }
+
+    private void prepareSftpServer() {
+        StringBuilder diagnostics = new StringBuilder();
+
+        for (int attempt = 1; attempt <= PREPARE_MAX_ATTEMPTS; attempt++) {
+            try {
+                if (sftpContainer == null || !sftpContainer.isRunning()) {
+                    startSftpContainer();
+                }
+
+                if (!sftpSeeded) {
+                    seedSftpFile();
+
+                    sftpSeeded = true;
+                }
+
+                return;
+            } catch (Exception exception) {
+                diagnostics.append(System.lineSeparator())
+                    .append("attempt ")
+                    .append(attempt)
+                    .append(": ")
+                    .append(exception);
+
+                discardSftpContainer();
+            }
+        }
+
+        throw new IllegalStateException(
+            "SFTP server could not be prepared after " + PREPARE_MAX_ATTEMPTS + " attempts:" + diagnostics);
+    }
+
+    @SuppressWarnings("deprecation")
+    private void startFtpContainer() {
+        int passivePortMin = reservePassivePortRange();
+        int passivePortMax = passivePortMin + PASSIVE_PORT_COUNT - 1;
+
+        FixedHostPortGenericContainer<?> container = new FixedHostPortGenericContainer<>(FTP_IMAGE)
+            .withEnv("USERS", ftpUsername + "|" + ftpPassword)
+            .withCommand(
+                "sh", "-c",
+                "exec vsftpd /etc/vsftpd/vsftpd.conf -obackground=NO -opasv_address=" + ftpHostIp
+                    + " -opasv_min_port=" + passivePortMin + " -opasv_max_port=" + passivePortMax)
+            .withExposedPorts(FTP_CONTROL_PORT)
+            .waitingFor(Wait.forListeningPorts(FTP_CONTROL_PORT))
+            .withStartupTimeout(CONTAINER_STARTUP_TIMEOUT);
+
+        for (int port = passivePortMin; port <= passivePortMax; port++) {
+            container.withFixedExposedPort(port, port);
+        }
+
+        container.start();
+
+        ftpContainer = container;
+
+        awaitFtpReady();
+    }
+
+    private void startSftpContainer() {
+        GenericContainer<?> container = new GenericContainer<>(SFTP_IMAGE)
+            .withCommand(ftpUsername + ":" + ftpPassword + ":::" + SFTP_UPLOAD_DIR)
+            .withExposedPorts(SFTP_PORT)
+            .withStartupTimeout(CONTAINER_STARTUP_TIMEOUT);
+
+        container.start();
+
+        sftpContainer = container;
+        sftpSeeded = false;
+
+        awaitSftpReady();
+    }
+
+    private void discardFtpContainer() {
+        if (ftpContainer != null) {
+            ftpContainer.stop();
+
+            ftpContainer = null;
+        }
+    }
+
+    private void discardSftpContainer() {
+        if (sftpContainer != null) {
+            sftpContainer.stop();
+
+            sftpContainer = null;
+        }
+
+        sftpSeeded = false;
+    }
+
+    private void awaitFtpReady() {
+        long deadline = System.nanoTime() + READINESS_TIMEOUT.toNanos();
+        Exception lastFailure = null;
+
+        while (System.nanoTime() < deadline) {
+            try {
+                listFileNamesViaFtp();
+
+                return;
+            } catch (Exception exception) {
+                lastFailure = exception;
+
+                sleep(READINESS_POLL_INTERVAL);
+            }
+        }
+
+        throw new IllegalStateException(
+            "FTP server did not become ready within " + READINESS_TIMEOUT + describeContainerLogs(ftpContainer),
+            lastFailure);
+    }
+
+    private void awaitSftpReady() {
+        long deadline = System.nanoTime() + READINESS_TIMEOUT.toNanos();
+        Exception lastFailure = null;
+
+        while (System.nanoTime() < deadline) {
+            SSHClient sshClient = null;
+
+            try {
+                sshClient = connectSftp();
+
+                return;
+            } catch (Exception exception) {
+                lastFailure = exception;
+
+                sleep(READINESS_POLL_INTERVAL);
+            } finally {
+                disconnectQuietly(sshClient);
+            }
+        }
+
+        throw new IllegalStateException(
+            "SFTP server did not become ready within " + READINESS_TIMEOUT + describeContainerLogs(sftpContainer),
+            lastFailure);
+    }
+
+    private void seedFtpFiles() throws Exception {
+        String homeDirectory = "/ftp/" + ftpUsername;
+        String testFilePath = homeDirectory + "/" + TEST_FILE_NAME;
+
+        StringBuilder script = new StringBuilder("set -e; rm -rf ")
+            .append(homeDirectory)
+            .append("/*; printf '%s' '")
+            .append(TEST_CONTENT)
+            .append("' > ")
+            .append(testFilePath)
+            .append(';');
+
+        for (String suffix : SEEDED_FILE_SUFFIXES) {
+            script.append(" cp ")
+                .append(testFilePath)
+                .append(' ')
+                .append(homeDirectory)
+                .append('/')
+                .append(TEST_FILE_BASE_NAME)
+                .append('-')
+                .append(suffix)
+                .append(TEST_FILE_BASE_EXTENSION)
+                .append(';');
+        }
+
+        script.append(" chown -R ")
+            .append(ftpUsername)
+            .append(':')
+            .append(ftpUsername)
+            .append(' ')
+            .append(homeDirectory);
+
+        ExecResult result = ftpContainer.execInContainer("sh", "-c", script.toString());
+
+        if (result.getExitCode() != 0) {
+            throw new IllegalStateException(
+                "Failed to seed FTP test files inside container: " + result.getStderr());
+        }
+
+        List<String> fileNames = listFileNamesViaFtp();
+
+        if (fileNames.size() != SEEDED_FILE_COUNT) {
+            throw new IllegalStateException(
+                "Expected " + SEEDED_FILE_COUNT + " seeded FTP files but found " + fileNames);
+        }
+    }
+
+    private void seedSftpFile() throws Exception {
+        SSHClient sshClient = connectSftp();
+
+        try (SFTPClient sftpClient = sshClient.newSFTPClient()) {
+            byte[] contentBytes = TEST_CONTENT.getBytes(StandardCharsets.UTF_8);
+
+            sftpClient.put(new InMemorySourceFile() {
+
+                @Override
+                public String getName() {
+                    return TEST_FILE_NAME;
+                }
+
+                @Override
+                public long getLength() {
+                    return contentBytes.length;
+                }
+
+                @Override
+                public InputStream getInputStream() {
+                    return new ByteArrayInputStream(contentBytes);
+                }
+            }, SFTP_REMOTE_PATH);
+        } finally {
+            disconnectQuietly(sshClient);
+        }
+    }
+
+    private SSHClient connectSftp() throws IOException {
+        SSHClient sshClient = new SSHClient();
+
+        sshClient.addHostKeyVerifier(new PromiscuousVerifier());
+        sshClient.setConnectTimeout((int) PROBE_TIMEOUT.toMillis());
+        sshClient.setTimeout((int) PROBE_TIMEOUT.toMillis());
+
+        try {
+            sshClient.connect(ftpHostIp, sftpContainer.getMappedPort(SFTP_PORT));
+            sshClient.authPassword(ftpUsername, ftpPassword);
+
+            return sshClient;
+        } catch (IOException ioException) {
+            disconnectQuietly(sshClient);
+
+            throw ioException;
+        }
+    }
+
+    private List<String> listFileNamesViaFtp() throws IOException {
+        FTPClient ftpClient = new FTPClient();
+
+        ftpClient.setConnectTimeout((int) PROBE_TIMEOUT.toMillis());
+        ftpClient.setDefaultTimeout((int) PROBE_TIMEOUT.toMillis());
+        ftpClient.setDataTimeout(PROBE_TIMEOUT);
+
+        try {
+            ftpClient.connect(ftpHostIp, ftpContainer.getMappedPort(FTP_CONTROL_PORT));
+
+            if (!FTPReply.isPositiveCompletion(ftpClient.getReplyCode())) {
+                throw new IOException("FTP server refused connection: " + ftpClient.getReplyString());
+            }
+
+            ftpClient.setSoTimeout((int) PROBE_TIMEOUT.toMillis());
+
+            if (!ftpClient.login(ftpUsername, ftpPassword)) {
+                throw new IOException("FTP login failed for user " + ftpUsername + ": " + ftpClient.getReplyString());
+            }
+
+            ftpClient.enterLocalPassiveMode();
+
+            FTPFile[] files = ftpClient.listFiles("");
+
+            if (!FTPReply.isPositiveCompletion(ftpClient.getReplyCode())) {
+                throw new IOException("FTP listing failed: " + ftpClient.getReplyString());
+            }
+
+            return Arrays.stream(files)
+                .map(FTPFile::getName)
+                .filter(name -> !".".equals(name) && !"..".equals(name))
+                .toList();
+        } finally {
+            closeQuietly(ftpClient);
+        }
+    }
+
+    private static synchronized int reservePassivePortRange() {
+        int candidate = passivePortSearchCursor;
+
+        while (candidate + PASSIVE_PORT_COUNT - 1 <= PASSIVE_PORT_SEARCH_LAST) {
+            if (isPortRangeFree(candidate)) {
+                passivePortSearchCursor = candidate + PASSIVE_PORT_COUNT;
+
+                return candidate;
+            }
+
+            candidate += PASSIVE_PORT_COUNT;
+        }
+
+        throw new IllegalStateException(
+            "No free run of " + PASSIVE_PORT_COUNT + " ports between " + passivePortSearchCursor + " and "
+                + PASSIVE_PORT_SEARCH_LAST);
+    }
+
+    @SuppressFBWarnings(
+        value = "UNENCRYPTED_SERVER_SOCKET",
+        justification = "The socket is only bound to probe port availability; nothing is ever served on it")
+    private static boolean isPortRangeFree(int firstPort) {
+        List<ServerSocket> serverSockets = new ArrayList<>();
+
+        try {
+            for (int port = firstPort; port < firstPort + PASSIVE_PORT_COUNT; port++) {
+                ServerSocket serverSocket = new ServerSocket();
+
+                serverSocket.bind(new InetSocketAddress(port));
+
+                serverSockets.add(serverSocket);
+            }
+
+            return true;
+        } catch (IOException ioException) {
+            return false;
+        } finally {
+            for (ServerSocket serverSocket : serverSockets) {
+                closeQuietly(serverSocket);
+            }
+        }
+    }
+
+    private static String describeContainerLogs(GenericContainer<?> container) {
+        if (container == null) {
+            return "; no container to read logs from";
+        }
+
+        try {
+            String logs = container.getLogs();
+
+            if (logs.length() > CONTAINER_LOG_TAIL_LENGTH) {
+                logs = logs.substring(logs.length() - CONTAINER_LOG_TAIL_LENGTH);
+            }
+
+            return "; container logs:" + System.lineSeparator() + logs;
+        } catch (RuntimeException runtimeException) {
+            return "; container logs unavailable: " + runtimeException;
+        }
+    }
+
+    private static String valueOrDefault(String value, String defaultValue) {
+        if (value == null || value.isBlank()) {
+            return defaultValue;
+        }
+
+        return value;
+    }
+
+    private static void sleep(Duration duration) {
+        try {
+            Thread.sleep(duration);
+        } catch (InterruptedException interruptedException) {
+            Thread.currentThread()
+                .interrupt();
+
+            throw new IllegalStateException("Interrupted while waiting for a test container", interruptedException);
+        }
+    }
+
+    @SuppressWarnings("PMD.EmptyCatchBlock")
+    private static void closeQuietly(FTPClient ftpClient) {
+        if (ftpClient.isConnected()) {
+            try {
+                ftpClient.disconnect();
+            } catch (IOException ioException) {
+                // Intentionally ignored - best-effort cleanup of a probe connection
+            }
+        }
+    }
+
+    @SuppressWarnings("PMD.EmptyCatchBlock")
+    private static void closeQuietly(ServerSocket serverSocket) {
+        try {
+            serverSocket.close();
+        } catch (IOException ioException) {
+            // Intentionally ignored - the port probe released what it could
+        }
+    }
+
+    @SuppressWarnings("PMD.EmptyCatchBlock")
+    private static void disconnectQuietly(SSHClient sshClient) {
+        if (sshClient != null && sshClient.isConnected()) {
+            try {
+                sshClient.disconnect();
+            } catch (IOException ioException) {
+                // Intentionally ignored - best-effort cleanup of a probe connection
+            }
+        }
+    }
 
     protected static class TestContextImpl implements ActionContext {
 
@@ -239,244 +746,5 @@ public class BaseFtpActionIntTest {
 
     @Configuration
     static class TestConfig {
-    }
-
-    /**
-     * Shared credentials for both containers. Password must satisfy Alpine Linux's strength requirements used by
-     * {@code delfer/alpine-ftp-server}'s entrypoint.
-     */
-    @Value("${bytechef.test.ftp.password:T3st@Pass123}")
-    protected String ftpPassword;
-    @Value("${bytechef.test.ftp.username:ftpuser}")
-    protected String ftpUsername;
-    @Value("${bytechef.test.ftp.host.ip:127.0.0.1}")
-    protected String ftpHostIp;
-
-    /**
-     * Single passive-mode data port shared by the FTP container and the host. Using a fixed port is required because
-     * the FTP server embeds this port in its PASV response, so the host-side port must match the container port
-     * exactly.
-     */
-    protected static final int PASSIVE_DATA_PORT = 30121;
-    private static final int FTP_CONTAINER_START_MAX_ATTEMPTS = 6;
-    private static final long FTP_CONTAINER_START_RETRY_DELAY_MILLIS = 2000;
-    protected static final String TEST_CONTENT = "Hello from FTP Integration Test!";
-    protected static final String TEST_FILE_BASE_NAME = "test-document";
-    protected static final String TEST_FILE_BASE_EXTENSION = ".txt";
-    protected static final String TEST_FILE_NAME = TEST_FILE_BASE_NAME + TEST_FILE_BASE_EXTENSION;
-    protected static final String FTP_REMOTE_PATH = TEST_FILE_NAME;
-    protected static final String SFTP_UPLOAD_DIR = "upload";
-    protected static final String SFTP_REMOTE_PATH = "/" + SFTP_UPLOAD_DIR + "/" + TEST_FILE_NAME;
-
-    /**
-     * Pure-FTPd container. The {@code ADDRESS} env-var forces the PASV response to advertise {@code 127.0.0.1} so that
-     * the FTP client always connects to the host loopback. The passive port range is collapsed to a single value equal
-     * to {@link #PASSIVE_DATA_PORT} to make the fixed host-port binding deterministic.
-     * <p>
-     * {@link org.testcontainers.containers.FixedHostPortGenericContainer} is used because FTP passive mode requires the
-     * host port and container port to be identical: the server embeds the port number in the PASV response, so the FTP
-     * client connects directly to that port on the host — dynamic port mapping would break this contract.
-     */
-    static FixedHostPortGenericContainer<?> ftpContainer;
-    static GenericContainer<?> sftpContainer;
-
-    @BeforeAll
-    void setUpContainers() throws Exception {
-        startContainersOnce();
-
-        resetFtpFiles();
-
-        uploadTestFileViaFtp();
-        uploadTestFileViaSftp();
-
-        copyTestFileViaFtp("for-delete");
-
-        copyTestFileViaFtp("001");
-        copyTestFileViaFtp("002");
-        copyTestFileViaFtp("003");
-        copyTestFileViaFtp("004");
-        copyTestFileViaFtp("005");
-    }
-
-    private void startContainersOnce() throws InterruptedException {
-        if (ftpContainer == null || !ftpContainer.isRunning()) {
-            if (ftpContainer != null) {
-                ftpContainer.stop();
-            }
-
-            ftpContainer = startFtpContainer();
-        }
-
-        if (sftpContainer == null || !sftpContainer.isRunning()) {
-            if (sftpContainer != null) {
-                sftpContainer.stop();
-            }
-
-            GenericContainer<?> container = new GenericContainer<>("atmoz/sftp:latest")
-                .withCommand(ftpUsername + ":" + ftpPassword + ":::" + SFTP_UPLOAD_DIR)
-                .withExposedPorts(22);
-
-            container.start();
-
-            sftpContainer = container;
-        }
-    }
-
-    @SuppressWarnings("deprecation")
-    private FixedHostPortGenericContainer<?> startFtpContainer() throws InterruptedException {
-        RuntimeException startException = null;
-
-        for (int attempt = 1; attempt <= FTP_CONTAINER_START_MAX_ATTEMPTS; attempt++) {
-            FixedHostPortGenericContainer<?> container =
-                new FixedHostPortGenericContainer<>("delfer/alpine-ftp-server:latest")
-                    .withEnv("USERS", ftpUsername + "|" + ftpPassword)
-                    .withEnv("ADDRESS", ftpHostIp)
-                    .withEnv("MIN_PORT", String.valueOf(PASSIVE_DATA_PORT))
-                    .withEnv("MAX_PORT", String.valueOf(PASSIVE_DATA_PORT))
-                    .withExposedPorts(21)
-                    .withFixedExposedPort(PASSIVE_DATA_PORT, PASSIVE_DATA_PORT);
-
-            try {
-                container.start();
-
-                return container;
-            } catch (RuntimeException exception) {
-                startException = exception;
-
-                container.stop();
-
-                Thread.sleep(FTP_CONTAINER_START_RETRY_DELAY_MILLIS);
-            }
-        }
-
-        throw new IllegalStateException(
-            "FTP container failed to start after " + FTP_CONTAINER_START_MAX_ATTEMPTS + " attempts", startException);
-    }
-
-    protected void resetFtpFiles() throws Exception {
-        var result = executeInFtpContainer("sh", "-c", "rm -rf /ftp/" + ftpUsername + "/*");
-
-        if (result.getExitCode() != 0) {
-            throw new IllegalStateException("Failed to clean FTP test files inside container: " + result.getStderr());
-        }
-    }
-
-    protected static FileEntry mockFileEntry() throws Exception {
-        FileEntry mockFileEntry = mock(FileEntry.class);
-        when(mockFileEntry.getName()).thenReturn(TEST_FILE_NAME);
-        when(mockFileEntry.getExtension()).thenReturn("txt");
-        when(mockFileEntry.getMimeType()).thenReturn("text/plain");
-
-        return mockFileEntry;
-    }
-
-    protected static ActionContext getMockActionContext(FileEntry mockFileEntry) {
-        ActionContext context = mock(ActionContext.class);
-        Context.File mockContextFile = mock(Context.File.class);
-
-        when(
-            mockContextFile.getInputStream(mockFileEntry)).thenAnswer(
-                invocation -> new ByteArrayInputStream(TEST_CONTENT.getBytes(StandardCharsets.UTF_8)));
-
-        when(
-            context.file(any())).thenAnswer(
-                invocation -> {
-                    Context.ContextFunction<Context.File, FileEntry> fileFunction = invocation.getArgument(0);
-
-                    return fileFunction.apply(mockContextFile);
-                });
-
-        return context;
-    }
-
-    /**
-     * Seeds the FTP test file directly inside the container using {@code execInContainer} rather than the FTP protocol.
-     * This sidesteps passive-mode port-mapping complexity (the PASV data port must match host:container exactly) while
-     * still leaving the actual download path.
-     */
-    protected void copyTestFileViaFtp(String newFileSuffix) throws Exception {
-        String filePath = "/ftp/" + ftpUsername + "/" + TEST_FILE_NAME;
-        String copyOfFilePath =
-            "/ftp/" + ftpUsername + "/" + TEST_FILE_BASE_NAME + "-" + newFileSuffix + TEST_FILE_BASE_EXTENSION;
-
-        var result = executeInFtpContainer(
-            "sh", "-c",
-            "cp " + filePath + " " + copyOfFilePath + " && chown " + ftpUsername + ":" + ftpUsername + " "
-                + copyOfFilePath);
-
-        if (result.getExitCode() != 0) {
-            throw new IllegalStateException(
-                "Failed to write FTP test file inside container: " + result.getStderr());
-        }
-    }
-
-    /**
-     * Seeds the FTP test file directly inside the container using {@code execInContainer} rather than the FTP protocol.
-     * This sidesteps passive-mode port-mapping complexity (the PASV data port must match host:container exactly) while
-     * still leaving the actual download path.
-     */
-    protected void uploadTestFileViaFtp() throws Exception {
-        String filePath = "/ftp/" + ftpUsername + "/" + TEST_FILE_NAME;
-
-        var result = executeInFtpContainer(
-            "sh", "-c",
-            "printf '%s' '" + TEST_CONTENT + "' > " + filePath
-                + " && chown " + ftpUsername + ":" + ftpUsername + " " + filePath);
-
-        if (result.getExitCode() != 0) {
-            throw new IllegalStateException(
-                "Failed to write FTP test file inside container: " + result.getStderr());
-        }
-    }
-
-    protected void uploadTestFileViaSftp() throws Exception {
-        SSHClient sshClient = new SSHClient();
-
-        sshClient.addHostKeyVerifier(new PromiscuousVerifier());
-        sshClient.connect(ftpHostIp, sftpContainer.getMappedPort(22));
-        sshClient.authPassword(ftpUsername, ftpPassword);
-
-        try (SFTPClient sftpClient = sshClient.newSFTPClient()) {
-            byte[] contentBytes = TEST_CONTENT.getBytes(StandardCharsets.UTF_8);
-
-            sftpClient.put(new InMemorySourceFile() {
-
-                @Override
-                public String getName() {
-                    return TEST_FILE_NAME;
-                }
-
-                @Override
-                public long getLength() {
-                    return contentBytes.length;
-                }
-
-                @Override
-                public InputStream getInputStream() {
-                    return new ByteArrayInputStream(contentBytes);
-                }
-            }, SFTP_REMOTE_PATH);
-        }
-
-        sshClient.disconnect();
-    }
-
-    private ExecResult executeInFtpContainer(String... command) throws Exception {
-        for (int attempt = 1; attempt <= 2; attempt++) {
-            startContainersOnce();
-
-            try {
-                return ftpContainer.execInContainer(command);
-            } catch (ContainerLaunchException exception) {
-                if (attempt == 2 || ftpContainer == null || ftpContainer.isRunning()) {
-                    throw exception;
-                }
-
-                ftpContainer.stop();
-                ftpContainer = null;
-            }
-        }
-
-        throw new IllegalStateException("Failed to execute command in FTP container after retry");
     }
 }

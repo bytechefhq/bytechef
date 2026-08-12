@@ -40,8 +40,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * Integration tests for {@link FtpListAction} using real FTP and SFTP servers spun up via Testcontainers.
- *
  * @author Igor Beslic
  */
 public class FtpListActionIntTest extends BaseFtpActionIntTest {
@@ -62,7 +60,7 @@ public class FtpListActionIntTest extends BaseFtpActionIntTest {
         List<Map<String, Object>> remoteFileSystemEntryList =
             FtpListAction.perform(inputParameters, connectionParameters, mock(ActionContext.class));
 
-        assertEquals(7, remoteFileSystemEntryList.size());
+        assertEquals(SEEDED_FILE_COUNT, remoteFileSystemEntryList.size());
 
         remoteFileSystemEntryList.forEach(stringObjectMap -> {
             Assertions.assertTrue(stringObjectMap.containsKey(PATH));
@@ -93,7 +91,7 @@ public class FtpListActionIntTest extends BaseFtpActionIntTest {
         List<Map<String, Object>> remoteFileSystemEntryList =
             FtpListAction.perform(inputParameters, connectionParameters, mock(ActionContext.class));
 
-        assertEquals(7, remoteFileSystemEntryList.size());
+        assertEquals(SEEDED_FILE_COUNT, remoteFileSystemEntryList.size());
 
         remoteFileSystemEntryList.forEach(stringObjectMap -> {
             Assertions.assertTrue(stringObjectMap.containsKey(PATH));
@@ -107,5 +105,4 @@ public class FtpListActionIntTest extends BaseFtpActionIntTest {
                 "File name " + fileName + " should contain " + TEST_FILE_BASE_NAME);
         });
     }
-
 }

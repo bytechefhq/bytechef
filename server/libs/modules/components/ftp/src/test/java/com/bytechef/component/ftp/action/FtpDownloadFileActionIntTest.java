@@ -34,20 +34,6 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 /**
- * Integration tests for {@link FtpDownloadFileAction} using real FTP and SFTP servers spun up via Testcontainers.
- *
- * <p>
- * How to extend these tests for new scenarios: <br>
- * 1. Add a new {@code @Test} method. <br>
- * 2. Build {@link Parameters} with {@link MockParametersFactory#create(Map)} using the constants from
- * {@link com.bytechef.component.ftp.constant.FtpConstants}. <br>
- * 4. Call {@link FtpDownloadFileAction#perform} and assert on the captured values. <br>
- * <br>
- * FTP container configuration: change {@link #PASSIVE_DATA_PORT}, {@link #FTP_USERNAME}, or {@link #FTP_PASSWORD} and
- * adjust the environment variables passed to {@code ftpContainer} accordingly. <br>
- * SFTP container configuration: modify the {@code --command} argument of {@code sftpContainer} using the format
- * {@code user:password[:::[dir]]} as documented in the {@code atmoz/sftp} image.
- *
  * @author Igor Beslic
  */
 public class FtpDownloadFileActionIntTest extends BaseFtpActionIntTest {
@@ -88,5 +74,4 @@ public class FtpDownloadFileActionIntTest extends BaseFtpActionIntTest {
         assertEquals(TEST_FILE_NAME, result.getName());
         assertArrayEquals(TEST_CONTENT.getBytes(StandardCharsets.UTF_8), context.getCapturedBytes(result));
     }
-
 }
