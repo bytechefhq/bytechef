@@ -58,6 +58,43 @@ public class FtpDownloadFileActionIntTest extends BaseFtpActionIntTest {
     }
 
     @Test
+    void testDownloadLargeFileViaFtp() throws Exception {
+        Parameters connectionParameters = MockParametersFactory.create(Map.of(
+            HOST, ftpHostIp,
+            PORT, ftpContainer.getMappedPort(21),
+            USERNAME, ftpUsername,
+            PASSWORD, ftpPassword,
+            PASSIVE_MODE, true,
+            SFTP, false));
+        Parameters inputParameters = MockParametersFactory.create(Map.of(PATH, LARGE_TEST_FILE_NAME));
+
+        TestContextImpl context = new TestContextImpl();
+
+        FileEntry result = FtpDownloadFileAction.perform(inputParameters, connectionParameters, context);
+
+        assertEquals(LARGE_TEST_FILE_NAME, result.getName());
+        assertArrayEquals(LARGE_TEST_CONTENT.getBytes(StandardCharsets.UTF_8), context.getCapturedBytes(result));
+    }
+
+    @Test
+    void testDownloadLargeFileViaSftp() throws Exception {
+        Parameters connectionParameters = MockParametersFactory.create(Map.of(
+            HOST, ftpHostIp,
+            PORT, sftpContainer.getMappedPort(22),
+            USERNAME, ftpUsername,
+            PASSWORD, ftpPassword,
+            SFTP, true));
+        Parameters inputParameters = MockParametersFactory.create(Map.of(PATH, LARGE_SFTP_REMOTE_PATH));
+
+        TestContextImpl context = new TestContextImpl();
+
+        FileEntry result = FtpDownloadFileAction.perform(inputParameters, connectionParameters, context);
+
+        assertEquals(LARGE_TEST_FILE_NAME, result.getName());
+        assertArrayEquals(LARGE_TEST_CONTENT.getBytes(StandardCharsets.UTF_8), context.getCapturedBytes(result));
+    }
+
+    @Test
     void testDownloadFileViaSftp() throws Exception {
         Parameters connectionParameters = MockParametersFactory.create(Map.of(
             HOST, ftpHostIp,

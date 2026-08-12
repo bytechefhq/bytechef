@@ -28,7 +28,6 @@ import com.bytechef.component.exception.ProviderException;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.time.Instant;
 import java.util.List;
 import net.schmizz.sshj.SSHClient;
@@ -123,7 +122,7 @@ public interface RemoteFileClient extends Closeable {
 
     void storeFile(String remotePath, InputStream inputStream) throws IOException;
 
-    void retrieveFile(String remotePath, OutputStream outputStream) throws IOException;
+    InputStream retrieveFileStream(String remotePath) throws IOException;
 
     List<RemoteFileInfo> listFiles(String path) throws IOException;
 
