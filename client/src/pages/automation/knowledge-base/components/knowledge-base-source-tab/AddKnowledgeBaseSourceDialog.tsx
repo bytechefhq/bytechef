@@ -1,4 +1,5 @@
 import Button from '@/components/Button/Button';
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
 import {
     Dialog,
     DialogCloseButton,
@@ -23,13 +24,16 @@ import {
     useCreateKnowledgeBaseSourceMutation,
     useDataStreamCompatibleConnectionsQuery,
 } from '@/shared/middleware/graphql';
+import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {useGetClusterElementDefinitionQuery} from '@/shared/queries/platform/clusterElementDefinitions.queries';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {PropertyAllType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
+import {PackageIcon} from 'lucide-react';
 import {ReactNode, useMemo, useState} from 'react';
 import {Control, FieldValues, FormState, useForm} from 'react-hook-form';
+import InlineSVG from 'react-inlinesvg';
 
 interface AddKnowledgeBaseSourceDialogPropsI {
     knowledgeBaseId: string;
@@ -46,6 +50,7 @@ const AddKnowledgeBaseSourceDialog = ({knowledgeBaseId, trigger}: AddKnowledgeBa
     const [open, setOpen] = useState(false);
     const [step, setStep] = useState(0);
     const [name, setName] = useState('');
+    const [selectedComponentName, setSelectedComponentName] = useState<string | null>(null);
     const [selectedConnection, setSelectedConnection] = useState<DataStreamCompatibleConnection | null>(null);
     const [cadence, setCadence] = useState('@daily');
     const [selectedMetadataFields, setSelectedMetadataFields] = useState<string[]>([]);
@@ -136,9 +141,47 @@ const AddKnowledgeBaseSourceDialog = ({knowledgeBaseId, trigger}: AddKnowledgeBa
         [connectionsData?.dataStreamCompatibleConnections]
     );
 
+    // Connection-bounded component catalog, mirroring AddContextSourceDialog: derive the pickable components from the
+    // connections we know about rather than the full definitions list, so a component without a usable connection
+    // cannot be picked. Picking the component first is what makes the following step's property options resolvable --
+    // going straight to a flat connection list left them reporting "No options available".
+    const {data: componentDefinitions} = useGetComponentDefinitionsQuery({actionDefinitions: true}, open);
+
+    const availableComponents = useMemo(() => {
+        const byName = new Map<string, {description?: string; icon?: string; name: string; title?: string}>();
+
+        for (const connection of connections) {
+            if (byName.has(connection.componentName)) {
+                continue;
+            }
+
+            const definition = componentDefinitions?.find((component) => component.name === connection.componentName);
+
+            byName.set(connection.componentName, {
+                description: definition?.description,
+                icon: definition?.icon,
+                name: connection.componentName,
+                title: definition?.title,
+            });
+        }
+
+        return Array.from(byName.values()).sort((firstComponent, secondComponent) =>
+            (firstComponent.title ?? firstComponent.name).localeCompare(secondComponent.title ?? secondComponent.name)
+        );
+    }, [connections, componentDefinitions]);
+
+    const connectionsForSelectedComponent = useMemo(
+        () =>
+            selectedComponentName === null
+                ? []
+                : connections.filter((connection) => connection.componentName === selectedComponentName),
+        [connections, selectedComponentName]
+    );
+
     const resetState = () => {
         setStep(0);
         setName('');
+        setSelectedComponentName(null);
         setSelectedConnection(null);
         setCadence('@daily');
         setSelectedMetadataFields([]);
@@ -247,21 +290,78 @@ const AddKnowledgeBaseSourceDialog = ({knowledgeBaseId, trigger}: AddKnowledgeBa
                                 />
                             </fieldset>
 
-                            <fieldset className="space-y-2 border-0 p-0">
-                                <Label>Pick a Connection</Label>
+                            {selectedComponentName === null ? (
+                                <fieldset className="space-y-2 border-0 p-0">
+                                    <Label>Pick a Component</Label>
 
-                                {connectionsLoading ? (
-                                    <p className="text-sm text-muted-foreground">Loading connections...</p>
-                                ) : connections.length === 0 ? (
-                                    <p className="text-sm text-muted-foreground">
-                                        No data-stream-compatible connections found.
-                                    </p>
-                                ) : (
+                                    {connectionsLoading ? (
+                                        <p className="text-sm text-muted-foreground">Loading components...</p>
+                                    ) : availableComponents.length === 0 ? (
+                                        <p className="text-sm text-muted-foreground">
+                                            No data-stream-compatible connections found in this workspace. Create one on
+                                            the Connections page before adding a source.
+                                        </p>
+                                    ) : (
+                                        <div
+                                            className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3"
+                                            data-testid="kbs-component-grid"
+                                        >
+                                            {availableComponents.map((component) => (
+                                                <Card
+                                                    className="cursor-pointer transition-shadow hover:shadow-md"
+                                                    data-testid={`kbs-component-option-${component.name}`}
+                                                    key={component.name}
+                                                    onClick={() => setSelectedComponentName(component.name)}
+                                                >
+                                                    <CardHeader className="pb-2 text-center">
+                                                        <div className="mx-auto mb-2">
+                                                            {component.icon ? (
+                                                                <InlineSVG className="size-12" src={component.icon} />
+                                                            ) : (
+                                                                <PackageIcon className="size-12 text-content-neutral-tertiary" />
+                                                            )}
+                                                        </div>
+
+                                                        <CardTitle className="text-sm">
+                                                            {component.title || component.name}
+                                                        </CardTitle>
+                                                    </CardHeader>
+
+                                                    {component.description && (
+                                                        <CardContent className="pt-0">
+                                                            <CardDescription className="line-clamp-2 text-center text-xs">
+                                                                {component.description}
+                                                            </CardDescription>
+                                                        </CardContent>
+                                                    )}
+                                                </Card>
+                                            ))}
+                                        </div>
+                                    )}
+                                </fieldset>
+                            ) : (
+                                <fieldset className="space-y-2 border-0 p-0">
+                                    <div className="flex items-center justify-between">
+                                        <Label>Pick a Connection</Label>
+
+                                        <button
+                                            className="text-xs text-muted-foreground hover:text-foreground"
+                                            data-testid="kbs-change-component"
+                                            onClick={() => {
+                                                setSelectedComponentName(null);
+                                                setSelectedConnection(null);
+                                            }}
+                                            type="button"
+                                        >
+                                            Change component
+                                        </button>
+                                    </div>
+
                                     <fieldset
                                         className="max-h-64 space-y-1 overflow-y-auto rounded-md border border-border p-2"
                                         data-testid="kbs-connection-list"
                                     >
-                                        {connections.map((connection) => {
+                                        {connectionsForSelectedComponent.map((connection) => {
                                             const isSelected = selectedConnection?.id === connection.id;
 
                                             return (
@@ -288,8 +388,8 @@ const AddKnowledgeBaseSourceDialog = ({knowledgeBaseId, trigger}: AddKnowledgeBa
                                             );
                                         })}
                                     </fieldset>
-                                )}
-                            </fieldset>
+                                </fieldset>
+                            )}
                         </fieldset>
                     )}
 

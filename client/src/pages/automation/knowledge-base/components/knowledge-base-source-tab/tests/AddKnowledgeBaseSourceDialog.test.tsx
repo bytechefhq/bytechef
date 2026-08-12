@@ -84,6 +84,14 @@ vi.mock('@/shared/queries/platform/componentDefinitions.queries', () => ({
     }),
 }));
 
+// Mocked separately because the automation module re-exports ComponentDefinitionKeys from the platform one, which the
+// mock above does not provide — leaving it unmocked fails at import, not at call.
+vi.mock('@/shared/queries/automation/componentDefinitions.queries', () => ({
+    useGetComponentDefinitionsQuery: () => ({
+        data: [{icon: undefined, name: 'airtable', title: 'Airtable'}],
+    }),
+}));
+
 vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({
     useWorkspaceStore: (selector: (state: {currentWorkspaceId: number}) => unknown) =>
         selector({currentWorkspaceId: hoisted.currentWorkspaceId}),
@@ -151,6 +159,10 @@ const openDialogAndPickConnection = async (user: ReturnType<typeof userEvent.set
     await user.click(screen.getByRole('button', {name: /add source/i}));
 
     await user.type(screen.getByLabelText('Source Name'), 'Acme Source');
+
+    // Component first, then its connections — the same two-stage pick as Add Context Source. Going straight to a flat
+    // connection list is what left step 1's property options unresolvable.
+    await user.click(screen.getByTestId('kbs-component-option-airtable'));
 
     await user.click(screen.getByTestId('kbs-connection-option-42'));
 };
