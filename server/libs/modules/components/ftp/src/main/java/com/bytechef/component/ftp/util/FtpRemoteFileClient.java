@@ -61,10 +61,12 @@ class FtpRemoteFileClient implements RemoteFileClient {
 
             @Override
             public void close() throws IOException {
-                super.close();
-
-                if (!ftpClient.completePendingCommand()) {
-                    throw new ProviderException("Failed to download file: " + ftpClient.getReplyString());
+                try {
+                    super.close();
+                } finally {
+                    if (!ftpClient.completePendingCommand()) {
+                        throw new ProviderException("Failed to download file: " + ftpClient.getReplyString());
+                    }
                 }
             }
         };
