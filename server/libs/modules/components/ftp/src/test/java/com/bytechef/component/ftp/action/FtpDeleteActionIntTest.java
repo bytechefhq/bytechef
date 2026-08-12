@@ -36,8 +36,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * Integration tests for {@link FtpDeleteAction} using real FTP and SFTP servers spun up via Testcontainers.
- *
  * @author Igor Beslic
  */
 public class FtpDeleteActionIntTest extends BaseFtpActionIntTest {
@@ -45,7 +43,7 @@ public class FtpDeleteActionIntTest extends BaseFtpActionIntTest {
     @Test
     void testDelete() throws Exception {
         Parameters connectionParameters = MockParametersFactory.create(Map.of(
-            HOST, ftpContainer.getHost(),
+            HOST, ftpHostIp,
             PORT, ftpContainer.getMappedPort(21),
             USERNAME, ftpUsername,
             PASSWORD, ftpPassword,
@@ -54,7 +52,8 @@ public class FtpDeleteActionIntTest extends BaseFtpActionIntTest {
 
         // list current directory content
         Parameters inputParameters =
-            MockParametersFactory.create(Map.of(PATH, "test-document-for-delete.txt"));
+            MockParametersFactory.create(
+                Map.of(PATH, TEST_FILE_BASE_NAME + "-for-delete" + TEST_FILE_BASE_EXTENSION));
 
         Map<String, Object> remoteFileSystemPerformResult =
             FtpDeleteAction.perform(inputParameters, connectionParameters, mock(ActionContext.class));
@@ -64,5 +63,4 @@ public class FtpDeleteActionIntTest extends BaseFtpActionIntTest {
         Assertions.assertTrue(remoteFileSystemPerformResult.containsKey(DELETED_PATH));
         Assertions.assertTrue((Boolean) remoteFileSystemPerformResult.get(SUCCESS));
     }
-
 }
