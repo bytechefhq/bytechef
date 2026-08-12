@@ -16,18 +16,18 @@
 
 package com.bytechef.component.ftp.util;
 
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.sftp.FileAttributes;
 import net.schmizz.sshj.sftp.FileMode;
+import net.schmizz.sshj.sftp.RemoteFile;
 import net.schmizz.sshj.sftp.RemoteResourceInfo;
 import net.schmizz.sshj.sftp.SFTPClient;
-import net.schmizz.sshj.xfer.InMemoryDestFile;
 import net.schmizz.sshj.xfer.InMemorySourceFile;
 
 /**
@@ -36,6 +36,8 @@ import net.schmizz.sshj.xfer.InMemorySourceFile;
  * @author Ivica Cardic
  */
 class SftpRemoteFileClient implements RemoteFileClient {
+
+    private static final int READ_AHEAD_MAX_UNCONFIRMED_READS = 16;
 
     private final SSHClient sshClient;
     private final SFTPClient sftpClient;
@@ -51,8 +53,28 @@ class SftpRemoteFileClient implements RemoteFileClient {
     }
 
     @Override
-    public void retrieveFile(String remotePath, OutputStream outputStream) throws IOException {
-        sftpClient.get(remotePath, new OutputStreamDestFile(outputStream));
+    public InputStream retrieveFileStream(String remotePath) throws IOException {
+        RemoteFile remoteFile = sftpClient.open(remotePath);
+
+        try {
+            InputStream inputStream = remoteFile.new ReadAheadRemoteFileInputStream(READ_AHEAD_MAX_UNCONFIRMED_READS);
+
+            return new FilterInputStream(inputStream) {
+
+                @Override
+                public void close() throws IOException {
+                    try {
+                        super.close();
+                    } finally {
+                        remoteFile.close();
+                    }
+                }
+            };
+        } catch (RuntimeException runtimeException) {
+            remoteFile.close();
+
+            throw runtimeException;
+        }
     }
 
     @Override
@@ -152,30 +174,6 @@ class SftpRemoteFileClient implements RemoteFileClient {
         @Override
         public InputStream getInputStream() {
             return inputStream;
-        }
-    }
-
-    private static class OutputStreamDestFile extends InMemoryDestFile {
-
-        private final OutputStream outputStream;
-
-        OutputStreamDestFile(OutputStream outputStream) {
-            this.outputStream = outputStream;
-        }
-
-        @Override
-        public OutputStream getOutputStream() {
-            return outputStream;
-        }
-
-        @Override
-        public OutputStream getOutputStream(boolean append) {
-            return outputStream;
-        }
-
-        @Override
-        public long getLength() {
-            return -1;
         }
     }
 }

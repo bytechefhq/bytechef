@@ -29,8 +29,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.component.ftp.util.RemoteFileClient;
 import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
+import java.io.InputStream;
 
 /**
  * @author Ivica Cardic
@@ -57,23 +56,12 @@ public class FtpDownloadFileAction {
 
         String remotePath = inputParameters.getRequiredString(PATH);
 
-        try (RemoteFileClient remoteFileClient = RemoteFileClient.of(connectionParameters)) {
-            PipedInputStream pipedInputStream = new PipedInputStream();
-            PipedOutputStream pipedOutputStream = new PipedOutputStream(pipedInputStream);
+        try (RemoteFileClient remoteFileClient = RemoteFileClient.of(connectionParameters);
+            InputStream inputStream = remoteFileClient.retrieveFileStream(remotePath)) {
 
-            try {
+            String filename = remotePath.substring(remotePath.lastIndexOf('/') + 1);
 
-                String filename = remotePath.substring(remotePath.lastIndexOf('/') + 1);
-
-                remoteFileClient.retrieveFile(remotePath, pipedOutputStream);
-
-                pipedOutputStream.flush();
-                pipedOutputStream.close();
-                return context.file(file -> file.storeContent(filename, pipedInputStream));
-            } finally {
-                pipedInputStream.close();
-                pipedOutputStream.close();
-            }
+            return context.file(file -> file.storeContent(filename, inputStream));
         } catch (IOException ioException) {
             throw new ProviderException("Failed to download file " + remotePath, ioException);
         }

@@ -17,9 +17,9 @@
 package com.bytechef.component.ftp.util;
 
 import com.bytechef.component.exception.ProviderException;
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -50,12 +50,24 @@ class FtpRemoteFileClient implements RemoteFileClient {
     }
 
     @Override
-    public void retrieveFile(String remotePath, OutputStream outputStream) throws IOException {
-        boolean success = ftpClient.retrieveFile(remotePath, outputStream);
+    public InputStream retrieveFileStream(String remotePath) throws IOException {
+        InputStream inputStream = ftpClient.retrieveFileStream(remotePath);
 
-        if (!success) {
+        if (inputStream == null) {
             throw new ProviderException("Failed to download file: " + ftpClient.getReplyString());
         }
+
+        return new FilterInputStream(inputStream) {
+
+            @Override
+            public void close() throws IOException {
+                super.close();
+
+                if (!ftpClient.completePendingCommand()) {
+                    throw new ProviderException("Failed to download file: " + ftpClient.getReplyString());
+                }
+            }
+        };
     }
 
     @Override

@@ -67,7 +67,7 @@ import org.testcontainers.containers.wait.strategy.Wait;
 public class BaseFtpActionIntTest {
 
     protected static final List<String> SEEDED_FILE_SUFFIXES = List.of("for-delete", "001", "002", "003", "004", "005");
-    protected static final int SEEDED_FILE_COUNT = SEEDED_FILE_SUFFIXES.size() + 1;
+    protected static final int SEEDED_FILE_COUNT = SEEDED_FILE_SUFFIXES.size() + 2;
     protected static final String TEST_CONTENT = "Hello from FTP Integration Test!";
     protected static final String TEST_FILE_BASE_NAME = "test-document";
     protected static final String TEST_FILE_BASE_EXTENSION = ".txt";
@@ -78,6 +78,13 @@ public class BaseFtpActionIntTest {
     protected static final String SFTP_UPLOAD_DIR = "upload";
 
     protected static final String SFTP_REMOTE_PATH = "/" + SFTP_UPLOAD_DIR + "/" + TEST_FILE_NAME;
+    protected static final String LARGE_TEST_FILE_NAME = "large-" + TEST_FILE_NAME;
+    protected static final String LARGE_SFTP_REMOTE_PATH = "/" + SFTP_UPLOAD_DIR + "/" + LARGE_TEST_FILE_NAME;
+    protected static final String LARGE_TEST_CONTENT_LINE =
+        "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_";
+    protected static final int LARGE_TEST_CONTENT_LINE_COUNT = 64;
+    protected static final String LARGE_TEST_CONTENT =
+        (LARGE_TEST_CONTENT_LINE + "\n").repeat(LARGE_TEST_CONTENT_LINE_COUNT);
 
     private static final String FTP_IMAGE =
         "delfer/alpine-ftp-server@sha256:60bb774d8408d9d4d5c74d05d1c086a34ce192c6c1a142ffac268cac0dbc6fac";
@@ -194,7 +201,7 @@ public class BaseFtpActionIntTest {
                 }
 
                 if (!sftpSeeded) {
-                    seedSftpFile();
+                    seedSftpFiles();
 
                     sftpSeeded = true;
                 }
@@ -344,6 +351,16 @@ public class BaseFtpActionIntTest {
                 .append(';');
         }
 
+        script.append(" yes '")
+            .append(LARGE_TEST_CONTENT_LINE)
+            .append("' | head -n ")
+            .append(LARGE_TEST_CONTENT_LINE_COUNT)
+            .append(" > ")
+            .append(homeDirectory)
+            .append('/')
+            .append(LARGE_TEST_FILE_NAME)
+            .append(';');
+
         script.append(" chown -R ")
             .append(ftpUsername)
             .append(':')
@@ -366,32 +383,39 @@ public class BaseFtpActionIntTest {
         }
     }
 
-    private void seedSftpFile() throws Exception {
+    private void seedSftpFiles() throws Exception {
         SSHClient sshClient = connectSftp();
 
         try (SFTPClient sftpClient = sshClient.newSFTPClient()) {
-            byte[] contentBytes = TEST_CONTENT.getBytes(StandardCharsets.UTF_8);
-
-            sftpClient.put(new InMemorySourceFile() {
-
-                @Override
-                public String getName() {
-                    return TEST_FILE_NAME;
-                }
-
-                @Override
-                public long getLength() {
-                    return contentBytes.length;
-                }
-
-                @Override
-                public InputStream getInputStream() {
-                    return new ByteArrayInputStream(contentBytes);
-                }
-            }, SFTP_REMOTE_PATH);
+            putSftpFile(sftpClient, SFTP_REMOTE_PATH, TEST_FILE_NAME, TEST_CONTENT);
+            putSftpFile(sftpClient, LARGE_SFTP_REMOTE_PATH, LARGE_TEST_FILE_NAME, LARGE_TEST_CONTENT);
         } finally {
             disconnectQuietly(sshClient);
         }
+    }
+
+    private static void putSftpFile(SFTPClient sftpClient, String remotePath, String fileName, String content)
+        throws IOException {
+
+        byte[] contentBytes = content.getBytes(StandardCharsets.UTF_8);
+
+        sftpClient.put(new InMemorySourceFile() {
+
+            @Override
+            public String getName() {
+                return fileName;
+            }
+
+            @Override
+            public long getLength() {
+                return contentBytes.length;
+            }
+
+            @Override
+            public InputStream getInputStream() {
+                return new ByteArrayInputStream(contentBytes);
+            }
+        }, remotePath);
     }
 
     private SSHClient connectSftp() throws IOException {
