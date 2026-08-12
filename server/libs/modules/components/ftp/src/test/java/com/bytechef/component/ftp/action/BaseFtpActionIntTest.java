@@ -95,11 +95,18 @@ public class BaseFtpActionIntTest {
     private static final int PASSIVE_PORT_COUNT = 10;
     private static final int PASSIVE_PORT_SEARCH_FIRST = 30100;
     private static final int PASSIVE_PORT_SEARCH_LAST = 32700;
-    private static final Duration CONTAINER_STARTUP_TIMEOUT = Duration.ofMinutes(3);
-    private static final Duration PROBE_TIMEOUT = Duration.ofSeconds(20);
-    private static final Duration READINESS_TIMEOUT = Duration.ofSeconds(90);
-    private static final Duration READINESS_POLL_INTERVAL = Duration.ofSeconds(1);
     private static final int PREPARE_MAX_ATTEMPTS = 3;
+    private static final long CONTAINER_STARTUP_TIMEOUT_SECONDS = 180;
+    private static final long READINESS_TIMEOUT_SECONDS = 90;
+    private static final long SEEDING_MARGIN_SECONDS = 60;
+    // Worst case: both servers exhaust every prepare attempt, each bounded by container startup plus readiness polling
+    private static final long PREPARE_TIMEOUT_SECONDS =
+        2 * PREPARE_MAX_ATTEMPTS * (CONTAINER_STARTUP_TIMEOUT_SECONDS + READINESS_TIMEOUT_SECONDS)
+            + SEEDING_MARGIN_SECONDS;
+    private static final Duration CONTAINER_STARTUP_TIMEOUT = Duration.ofSeconds(CONTAINER_STARTUP_TIMEOUT_SECONDS);
+    private static final Duration PROBE_TIMEOUT = Duration.ofSeconds(20);
+    private static final Duration READINESS_TIMEOUT = Duration.ofSeconds(READINESS_TIMEOUT_SECONDS);
+    private static final Duration READINESS_POLL_INTERVAL = Duration.ofSeconds(1);
     private static final int CONTAINER_LOG_TAIL_LENGTH = 4000;
 
     static FixedHostPortGenericContainer<?> ftpContainer;
@@ -130,7 +137,7 @@ public class BaseFtpActionIntTest {
     }
 
     @BeforeEach
-    @Timeout(value = 5, unit = TimeUnit.MINUTES)
+    @Timeout(value = PREPARE_TIMEOUT_SECONDS, unit = TimeUnit.SECONDS)
     void prepareServers() {
         prepareFtpServer();
         prepareSftpServer();
