@@ -1,5 +1,6 @@
 import Button from '@/components/Button/Button';
 import PageLoader from '@/components/PageLoader';
+import KnowledgeBaseDropdownMenu from '@/pages/automation/knowledge-base/components/KnowledgeBaseDropdownMenu';
 import KnowledgeBaseHeader from '@/pages/automation/knowledge-base/components/KnowledgeBaseHeader';
 import KnowledgeBaseInfoCard from '@/pages/automation/knowledge-base/components/KnowledgeBaseInfoCard';
 import KnowledgeBaseLeftSidebarNav from '@/pages/automation/knowledge-base/components/KnowledgeBaseLeftSidebarNav';
@@ -52,15 +53,19 @@ const KnowledgeBase = () => {
                     knowledgeBaseName={knowledgeBase?.name}
                     onBackClick={handleBackClick}
                     right={
-                        copilotEnabled && (
-                            <Button
-                                aria-label="Ask Copilot"
-                                icon={<SparklesIcon />}
-                                onClick={openCopilot}
-                                size="icon"
-                                variant="ghost"
-                            />
-                        )
+                        <div className="flex items-center gap-1">
+                            {copilotEnabled && (
+                                <Button
+                                    aria-label="Ask Copilot"
+                                    icon={<SparklesIcon />}
+                                    onClick={openCopilot}
+                                    size="icon"
+                                    variant="ghost"
+                                />
+                            )}
+
+                            {knowledgeBase && <KnowledgeBaseDropdownMenu knowledgeBase={knowledgeBase} />}
+                        </div>
                     }
                 />
             }
@@ -71,7 +76,7 @@ const KnowledgeBase = () => {
             <PageLoader errors={[error]} loading={isLoading}>
                 {knowledgeBase && (
                     <div className="mx-auto flex h-full w-full max-w-(--breakpoint-lg) flex-col px-4 py-4">
-                        <KnowledgeBaseInfoCard knowledgeBase={knowledgeBase} />
+                        <KnowledgeBaseInfoCard knowledgeBase={knowledgeBase} showDropdownMenu={false} />
 
                         <KnowledgeBaseTabs documents={documents} knowledgeBaseId={knowledgeBaseId} />
                     </div>

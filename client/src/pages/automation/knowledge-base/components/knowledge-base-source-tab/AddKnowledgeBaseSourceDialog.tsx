@@ -14,6 +14,7 @@ import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import CadencePicker from '@/pages/automation/context-store/components/CadencePicker';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {ClusterElementProvider} from '@/pages/platform/workflow-editor/components/properties/ClusterElementContext';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
 import {WorkflowMockProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import TombstoneStrategySelect from '@/shared/components/TombstoneStrategySelect';
@@ -32,7 +33,7 @@ import {PropertyAllType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
 import {PackageIcon} from 'lucide-react';
 import {ReactNode, useMemo, useState} from 'react';
-import {Control, FieldValues, FormState, useForm} from 'react-hook-form';
+import {Control, FieldValues, FormState, useForm, useWatch} from 'react-hook-form';
 import InlineSVG from 'react-inlinesvg';
 
 interface AddKnowledgeBaseSourceDialogPropsI {
@@ -74,6 +75,10 @@ const AddKnowledgeBaseSourceDialog = ({knowledgeBaseId, trigger}: AddKnowledgeBa
     } = useForm<SourceParametersFormI>({
         defaultValues: {sourceParameters: {}},
     });
+
+    // Watched rather than read through getValues: dependent property lookups (tableId depends on baseId) only refresh
+    // when the value they depend on re-renders the context, and getValues is not reactive.
+    const watchedSourceParameters = useWatch({control, name: 'sourceParameters'});
 
     const {data: connectionsData, isLoading: connectionsLoading} = useDataStreamCompatibleConnectionsQuery(
         {
@@ -123,7 +128,7 @@ const AddKnowledgeBaseSourceDialog = ({knowledgeBaseId, trigger}: AddKnowledgeBa
             componentName: selectedConnection?.componentName ?? '',
             componentVersion: selectedConnection?.componentVersion ?? 1,
             connectionId: selectedConnection?.id ?? null,
-            inputParameters: getValues('sourceParameters') as Record<string, unknown>,
+            inputParameters: (watchedSourceParameters ?? {}) as Record<string, unknown>,
         },
         {enabled: !!sourceClusterElementName && !!selectedConnection && step >= 2}
     );
@@ -399,14 +404,30 @@ const AddKnowledgeBaseSourceDialog = ({knowledgeBaseId, trigger}: AddKnowledgeBa
                                 <Label>Source Configuration</Label>
 
                                 <WorkflowMockProvider>
-                                    <Properties
-                                        control={control as unknown as Control<FieldValues>}
-                                        controlPath="sourceParameters"
-                                        customClassName="p-0"
-                                        formState={formState as unknown as FormState<FieldValues>}
-                                        hideFromAi={true}
-                                        properties={sourceProperties}
-                                    />
+                                    {/* Outside the workflow editor there is no currentNode, so ClusterElementContext is
+                                        the only channel carrying the picked connection into the property option
+                                        lookups. Without it every combo box reports "No options available". */}
+
+                                    <ClusterElementProvider
+                                        value={{
+                                            clusterElementName: sourceClusterElementName ?? '',
+                                            componentName: selectedConnection?.componentName ?? '',
+                                            componentVersion: selectedConnection?.componentVersion ?? 1,
+                                            connectionId: selectedConnection?.id
+                                                ? Number(selectedConnection.id)
+                                                : undefined,
+                                            inputParameters: (watchedSourceParameters ?? {}) as Record<string, unknown>,
+                                        }}
+                                    >
+                                        <Properties
+                                            control={control as unknown as Control<FieldValues>}
+                                            controlPath="sourceParameters"
+                                            customClassName="p-0"
+                                            formState={formState as unknown as FormState<FieldValues>}
+                                            hideFromAi={true}
+                                            properties={sourceProperties}
+                                        />
+                                    </ClusterElementProvider>
                                 </WorkflowMockProvider>
                             </fieldset>
                         ) : (

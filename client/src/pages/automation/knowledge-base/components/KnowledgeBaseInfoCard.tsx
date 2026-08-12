@@ -4,9 +4,12 @@ import {DatabaseIcon} from 'lucide-react';
 
 interface KnowledgeBaseInfoCardProps {
     knowledgeBase: KnowledgeBase & {documents: KnowledgeBaseDocument[]};
+    showDropdownMenu?: boolean;
 }
 
-const KnowledgeBaseInfoCard = ({knowledgeBase}: KnowledgeBaseInfoCardProps) => {
+// The full page hosts the actions menu in its header next to the copilot button, so it opts out here. The embeddable
+// variant renders without page chrome, which leaves this card as its only place for edit/delete.
+const KnowledgeBaseInfoCard = ({knowledgeBase, showDropdownMenu = true}: KnowledgeBaseInfoCardProps) => {
     return (
         <div className="mb-4 rounded-lg border border-border/50 bg-surface-neutral-primary p-4">
             <div className="flex items-center justify-between">
@@ -16,7 +19,7 @@ const KnowledgeBaseInfoCard = ({knowledgeBase}: KnowledgeBaseInfoCardProps) => {
                     <h2 className="text-lg font-semibold">{knowledgeBase.name}</h2>
                 </div>
 
-                <KnowledgeBaseDropdownMenu knowledgeBase={knowledgeBase} />
+                {showDropdownMenu && <KnowledgeBaseDropdownMenu knowledgeBase={knowledgeBase} />}
             </div>
 
             {knowledgeBase.description && (

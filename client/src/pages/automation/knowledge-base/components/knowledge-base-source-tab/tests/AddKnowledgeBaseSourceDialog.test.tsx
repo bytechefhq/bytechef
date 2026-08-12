@@ -108,13 +108,31 @@ vi.mock('@/pages/platform/workflow-editor/providers/workflowEditorProvider', () 
     ),
 }));
 
-vi.mock('@/pages/platform/workflow-editor/components/properties/Properties', () => ({
-    default: (props: {properties: Array<{name: string}>; controlPath?: string}) => {
+// The real ClusterElementContext is deliberately left unmocked and read here: it is the only channel through which
+// PropertyComboBox learns the connection id outside the workflow editor, so a missing provider is invisible unless the
+// mocked Properties renderer reports what the context actually carries.
+vi.mock('@/pages/platform/workflow-editor/components/properties/Properties', async () => {
+    const {useClusterElementContext} =
+        await import('@/pages/platform/workflow-editor/components/properties/ClusterElementContext');
+
+    const PropertiesMock = (props: {properties: Array<{name: string}>; controlPath?: string}) => {
         hoisted.propertiesRenderMock(props);
+
+        const clusterElementContext = useClusterElementContext();
 
         return (
             <div data-testid="properties-renderer">
                 <span data-testid="properties-control-path">{props.controlPath}</span>
+
+                <span data-testid="properties-connection-id">{clusterElementContext?.connectionId ?? 'none'}</span>
+
+                <span data-testid="properties-cluster-element-name">
+                    {clusterElementContext?.clusterElementName ?? 'none'}
+                </span>
+
+                <span data-testid="properties-input-parameters">
+                    {JSON.stringify(clusterElementContext?.inputParameters ?? null)}
+                </span>
 
                 {props.properties.map((property) => (
                     <span data-testid={`property-${property.name}`} key={property.name}>
@@ -123,8 +141,10 @@ vi.mock('@/pages/platform/workflow-editor/components/properties/Properties', () 
                 ))}
             </div>
         );
-    },
-}));
+    };
+
+    return {default: PropertiesMock};
+});
 
 vi.mock(import('@tanstack/react-query'), async (importOriginal) => {
     const actual = await importOriginal();
@@ -181,6 +201,21 @@ describe('AddKnowledgeBaseSourceDialog', () => {
         expect(screen.getByTestId('properties-renderer')).toBeInTheDocument();
         expect(screen.getByTestId('property-baseId')).toBeInTheDocument();
         expect(screen.getByTestId('properties-control-path')).toHaveTextContent('sourceParameters');
+    });
+
+    it('supplies the selected connection to the step 1 properties through ClusterElementContext', async () => {
+        const user = userEvent.setup();
+
+        render(<AddKnowledgeBaseSourceDialog knowledgeBaseId="20" />);
+
+        await openDialogAndPickConnection(user);
+
+        await user.click(screen.getByRole('button', {name: /next/i}));
+
+        // Without the context, PropertyComboBox never fires its options query and renders "No options available".
+        expect(screen.getByTestId('properties-connection-id')).toHaveTextContent('42');
+        expect(screen.getByTestId('properties-cluster-element-name')).toHaveTextContent('airtableSource');
+        expect(screen.getByTestId('properties-input-parameters')).toHaveTextContent('{}');
     });
 
     it('shows the empty placeholder on step 1 when the SOURCE has no properties', async () => {

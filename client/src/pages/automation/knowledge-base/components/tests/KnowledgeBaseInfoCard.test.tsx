@@ -79,6 +79,12 @@ describe('KnowledgeBaseInfoCard', () => {
         expect(screen.getByTestId('dropdown-menu-kb-1')).toBeInTheDocument();
     });
 
+    it('hides the dropdown menu when the host renders it elsewhere', () => {
+        render(<KnowledgeBaseInfoCard knowledgeBase={mockKnowledgeBase} showDropdownMenu={false} />);
+
+        expect(screen.queryByTestId('dropdown-menu-kb-1')).not.toBeInTheDocument();
+    });
+
     it('handles empty documents array', () => {
         const kbWithNoDocuments = {...mockKnowledgeBase, documents: []};
 

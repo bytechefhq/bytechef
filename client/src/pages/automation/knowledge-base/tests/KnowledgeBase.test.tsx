@@ -73,8 +73,18 @@ vi.mock('../components/KnowledgeBaseHeader', () => ({
 }));
 
 vi.mock('../components/KnowledgeBaseInfoCard', () => ({
-    default: ({knowledgeBase}: {knowledgeBase: {name: string}}) => (
-        <div data-testid="knowledge-base-info-card">{knowledgeBase.name}</div>
+    default: ({knowledgeBase, showDropdownMenu}: {knowledgeBase: {name: string}; showDropdownMenu?: boolean}) => (
+        <div data-testid="knowledge-base-info-card">
+            {knowledgeBase.name}
+
+            <span data-testid="info-card-show-dropdown-menu">{String(showDropdownMenu)}</span>
+        </div>
+    ),
+}));
+
+vi.mock('../components/KnowledgeBaseDropdownMenu', () => ({
+    default: ({knowledgeBase}: {knowledgeBase: {id: string}}) => (
+        <div data-testid={`knowledge-base-dropdown-menu-${knowledgeBase.id}`}>Dropdown</div>
     ),
 }));
 
@@ -226,6 +236,26 @@ describe('KnowledgeBase', () => {
 
         expect(screen.queryByTestId('knowledge-base-info-card')).not.toBeInTheDocument();
         expect(screen.queryByTestId('knowledge-base-tabs')).not.toBeInTheDocument();
+    });
+
+    it('renders the actions menu in the header rather than the info card', () => {
+        render(<KnowledgeBase />);
+
+        expect(screen.getByTestId('knowledge-base-header')).toContainElement(
+            screen.getByTestId('knowledge-base-dropdown-menu-kb-1')
+        );
+        expect(screen.getByTestId('info-card-show-dropdown-menu')).toHaveTextContent('false');
+    });
+
+    it('does not render the actions menu before the knowledge base loads', () => {
+        hoisted.mockUseKnowledgeBase.mockReturnValue({
+            ...defaultMockReturn,
+            knowledgeBase: undefined,
+        });
+
+        render(<KnowledgeBase />);
+
+        expect(screen.queryByTestId('knowledge-base-dropdown-menu-kb-1')).not.toBeInTheDocument();
     });
 
     it('opens copilot scoped to the current knowledge base', async () => {
