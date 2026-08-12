@@ -127,10 +127,7 @@ const IntegrationInstanceConfigurations = lazy(
 const Integration = lazy(() => import('@/ee/pages/embedded/integration/Integration'));
 const Integrations = lazy(() => import('@/ee/pages/embedded/integrations/Integrations'));
 const SigningKeys = lazy(() => import('@/ee/pages/settings/embedded/signing-keys/SigningKeys'));
-const AiGuardrails = lazy(() => import('@/ee/pages/settings/automation/ai/guardrails/AiGuardrails'));
-const WorkspaceSystemPrompt = lazy(
-    () => import('@/ee/pages/settings/automation/ai/system-prompt/WorkspaceSystemPrompt')
-);
+const AiAgents = lazy(() => import('@/ee/pages/settings/automation/ai/agents/AiAgents'));
 const WorkspaceApiKeys = lazy(() => import('@/ee/pages/settings/automation/workspace-api-keys/WorkspaceApiKeys'));
 const WorkspaceUsers = lazy(() => import('@/ee/pages/settings/automation/users/WorkspaceUsers'));
 const CustomRoles = lazy(() => import('@/ee/pages/settings/automation/custom-roles/CustomRoles'));
@@ -268,28 +265,20 @@ const currentWorkspaceSettingsRoutes = {
             path: 'ai-hub/connectors',
         },
         {
-            element: (
-                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
-                    <EEVersion>
-                        <LazyLoadWrapper>
-                            <AiGuardrails />
-                        </LazyLoadWrapper>
-                    </EEVersion>
-                </PrivateRoute>
-            ),
-            path: 'ai/guardrails',
+            element: <Navigate replace to="/automation/settings/ai/agents/guardrails" />,
+            path: 'ai/agents',
         },
         {
             element: (
                 <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
                     <EEVersion>
                         <LazyLoadWrapper>
-                            <WorkspaceSystemPrompt />
+                            <AiAgents />
                         </LazyLoadWrapper>
                     </EEVersion>
                 </PrivateRoute>
             ),
-            path: 'ai/system-prompt',
+            path: 'ai/agents/:tab',
         },
     ],
     navItems: [
@@ -313,20 +302,12 @@ const currentWorkspaceSettingsRoutes = {
             title: 'API Keys',
         },
         {
-            subgroup: true,
-            title: 'AI',
-        },
-        {
             href: 'ai-hub/connectors',
             title: 'AI Hub Connectors',
         },
         {
-            href: 'ai/guardrails',
-            title: 'Guardrails',
-        },
-        {
-            href: 'ai/system-prompt',
-            title: 'System Prompt',
+            href: 'ai/agents',
+            title: 'AI Agents',
         },
     ],
 };

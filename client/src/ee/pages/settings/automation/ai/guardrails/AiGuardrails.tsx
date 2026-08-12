@@ -5,8 +5,6 @@ import {RadioGroup, RadioGroupItem} from '@/components/ui/radio-group';
 import {Switch} from '@/components/ui/switch';
 import {Textarea} from '@/components/ui/textarea';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import Header from '@/shared/layout/Header';
-import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {
     AiGuardrailsBlockingMode,
     useAiGuardrailsWorkspaceSettingsQuery,
@@ -101,177 +99,168 @@ const AiGuardrails = () => {
     };
 
     return (
-        <LayoutContainer header={<Header centerTitle position="main" title="Guardrails" />} leftSidebarOpen={false}>
-            <PageLoader errors={[error]} loading={isLoading}>
-                <div className="w-full px-4 3xl:mx-auto 3xl:w-4/5">
-                    <div className="space-y-6 py-6">
-                        <p className="text-sm text-muted-foreground">
-                            Workspace-level guardrails apply across every AI surface in this workspace: AI Gateway
-                            requests, canvas AI Agent runs, and AI Hub chat (personal agents and copilot). Project
-                            overlays in AI Gateway settings can add extra protection on top of these, never remove it.
-                        </p>
+        <PageLoader errors={[error]} loading={isLoading}>
+            <div className="w-full px-4 3xl:mx-auto 3xl:w-4/5">
+                <div className="space-y-6 py-6">
+                    <p className="text-sm text-muted-foreground">
+                        Workspace-level guardrails apply across every AI surface in this workspace: AI Gateway requests,
+                        canvas AI Agent runs, and AI Hub chat (personal agents and copilot). Project overlays in AI
+                        Gateway settings can add extra protection on top of these, never remove it.
+                    </p>
 
-                        <fieldset className="space-y-4 border-0 p-0">
-                            <div className="flex items-center justify-between gap-4 rounded-md border p-4">
-                                <div className="flex flex-col gap-1">
-                                    <Label htmlFor="redact-pii">Redact PII</Label>
-
-                                    <p className="text-xs text-muted-foreground">
-                                        Mask emails, phone numbers, SSNs, cards, and IPs in prompts before they leave
-                                        ByteChef; traces store a SHA-256 digest instead of payloads.
-                                    </p>
-                                </div>
-
-                                <Switch
-                                    checked={form.redactPii}
-                                    id="redact-pii"
-                                    onCheckedChange={(checked) => setForm({...form, redactPii: checked})}
-                                />
-                            </div>
-
-                            <div className="flex items-center justify-between gap-4 rounded-md border p-4">
-                                <div className="flex flex-col gap-1">
-                                    <Label htmlFor="redact-secrets">Redact secrets</Label>
-
-                                    <p className="text-xs text-muted-foreground">
-                                        Mask API keys, tokens, JWTs, and private keys in prompts before they leave
-                                        ByteChef.
-                                    </p>
-                                </div>
-
-                                <Switch
-                                    checked={form.redactSecrets}
-                                    id="redact-secrets"
-                                    onCheckedChange={(checked) => setForm({...form, redactSecrets: checked})}
-                                />
-                            </div>
-
-                            <div className="flex items-center justify-between gap-4 rounded-md border p-4">
-                                <div className="flex flex-col gap-1">
-                                    <Label htmlFor="scan-responses">Scan responses</Label>
-
-                                    <p className="text-xs text-muted-foreground">
-                                        Redact PII and secrets from model output before returning it. Non-streaming
-                                        completions only.
-                                    </p>
-                                </div>
-
-                                <Switch
-                                    checked={form.scanResponses}
-                                    id="scan-responses"
-                                    onCheckedChange={(checked) => setForm({...form, scanResponses: checked})}
-                                />
-                            </div>
-
-                            <div className="flex items-center justify-between gap-4 rounded-md border p-4">
-                                <div className="flex flex-col gap-1">
-                                    <Label htmlFor="moderation-enabled">Model-based moderation</Label>
-
-                                    <p className="text-xs text-muted-foreground">
-                                        Reject unsafe prompts across AI Gateway requests, canvas AI Agent runs, and AI
-                                        Hub chat. Requires a moderation model configured via the
-                                        bytechef.ai.gateway.guardrails.moderation-model property.
-                                    </p>
-                                </div>
-
-                                <Switch
-                                    checked={form.moderationEnabled}
-                                    id="moderation-enabled"
-                                    onCheckedChange={(checked) => setForm({...form, moderationEnabled: checked})}
-                                />
-                            </div>
-
-                            <div className="flex items-center justify-between gap-4 rounded-md border p-4">
-                                <div className="flex flex-col gap-1">
-                                    <Label htmlFor="injection-detection-enabled">Prompt-injection detection</Label>
-
-                                    <p className="text-xs text-muted-foreground">
-                                        Reject jailbreak and instruction-override attempts. Requires a configured
-                                        injection model.
-                                    </p>
-                                </div>
-
-                                <Switch
-                                    checked={form.injectionDetectionEnabled}
-                                    id="injection-detection-enabled"
-                                    onCheckedChange={(checked) =>
-                                        setForm({...form, injectionDetectionEnabled: checked})
-                                    }
-                                />
-                            </div>
-
-                            <div className="flex flex-col gap-2 rounded-md border p-4">
-                                <Label htmlFor="blocked-terms">Blocked terms</Label>
+                    <fieldset className="space-y-4 border-0 p-0">
+                        <div className="flex items-center justify-between gap-4 rounded-md border p-4">
+                            <div className="flex flex-col gap-1">
+                                <Label htmlFor="redact-pii">Redact PII</Label>
 
                                 <p className="text-xs text-muted-foreground">
-                                    Comma or newline separated. Requests containing one of these terms are rejected.
+                                    Mask emails, phone numbers, SSNs, cards, and IPs in prompts before they leave
+                                    ByteChef; traces store a SHA-256 digest instead of payloads.
                                 </p>
-
-                                <Textarea
-                                    id="blocked-terms"
-                                    onChange={(event) => setForm({...form, blockedTerms: event.target.value})}
-                                    placeholder="none"
-                                    value={form.blockedTerms}
-                                />
                             </div>
-                        </fieldset>
 
-                        <fieldset className="space-y-3 border-0 p-0">
-                            <legend className="sr-only">Blocking mode</legend>
-
-                            <div className="space-y-3 rounded-md border p-4">
-                                <div>
-                                    <div className="text-sm font-medium">Blocking mode</div>
-
-                                    <p className="text-xs text-muted-foreground">
-                                        Redaction guardrails (redact PII, redact secrets, scan responses) always
-                                        continue -- this setting only governs the blocking guardrails: blocked terms,
-                                        moderation, and prompt-injection detection.
-                                    </p>
-                                </div>
-
-                                <RadioGroup
-                                    className="space-y-2"
-                                    onValueChange={(value) =>
-                                        setForm({...form, blockingMode: value as AiGuardrailsBlockingMode})
-                                    }
-                                    value={form.blockingMode}
-                                >
-                                    <div className="flex items-center gap-2">
-                                        <RadioGroupItem
-                                            id="blocking-mode-block"
-                                            value={AiGuardrailsBlockingMode.Block}
-                                        />
-
-                                        <label htmlFor="blocking-mode-block">Block -- reject the request</label>
-                                    </div>
-
-                                    <div className="flex items-center gap-2">
-                                        <RadioGroupItem
-                                            id="blocking-mode-redact-and-continue"
-                                            value={AiGuardrailsBlockingMode.RedactAndContinue}
-                                        />
-
-                                        <label htmlFor="blocking-mode-redact-and-continue">
-                                            Redact and continue -- strip the offending content and let the request
-                                            proceed
-                                        </label>
-                                    </div>
-                                </RadioGroup>
-                            </div>
-                        </fieldset>
-
-                        <div className="flex justify-end">
-                            <Button
-                                disabled={updateMutation.isPending}
-                                label={updateMutation.isPending ? 'Saving...' : 'Save'}
-                                onClick={handleSave}
+                            <Switch
+                                checked={form.redactPii}
+                                id="redact-pii"
+                                onCheckedChange={(checked) => setForm({...form, redactPii: checked})}
                             />
                         </div>
+
+                        <div className="flex items-center justify-between gap-4 rounded-md border p-4">
+                            <div className="flex flex-col gap-1">
+                                <Label htmlFor="redact-secrets">Redact secrets</Label>
+
+                                <p className="text-xs text-muted-foreground">
+                                    Mask API keys, tokens, JWTs, and private keys in prompts before they leave ByteChef.
+                                </p>
+                            </div>
+
+                            <Switch
+                                checked={form.redactSecrets}
+                                id="redact-secrets"
+                                onCheckedChange={(checked) => setForm({...form, redactSecrets: checked})}
+                            />
+                        </div>
+
+                        <div className="flex items-center justify-between gap-4 rounded-md border p-4">
+                            <div className="flex flex-col gap-1">
+                                <Label htmlFor="scan-responses">Scan responses</Label>
+
+                                <p className="text-xs text-muted-foreground">
+                                    Redact PII and secrets from model output before returning it. Non-streaming
+                                    completions only.
+                                </p>
+                            </div>
+
+                            <Switch
+                                checked={form.scanResponses}
+                                id="scan-responses"
+                                onCheckedChange={(checked) => setForm({...form, scanResponses: checked})}
+                            />
+                        </div>
+
+                        <div className="flex items-center justify-between gap-4 rounded-md border p-4">
+                            <div className="flex flex-col gap-1">
+                                <Label htmlFor="moderation-enabled">Model-based moderation</Label>
+
+                                <p className="text-xs text-muted-foreground">
+                                    Reject unsafe prompts across AI Gateway requests, canvas AI Agent runs, and AI Hub
+                                    chat. Requires a moderation model configured via the
+                                    bytechef.ai.gateway.guardrails.moderation-model property.
+                                </p>
+                            </div>
+
+                            <Switch
+                                checked={form.moderationEnabled}
+                                id="moderation-enabled"
+                                onCheckedChange={(checked) => setForm({...form, moderationEnabled: checked})}
+                            />
+                        </div>
+
+                        <div className="flex items-center justify-between gap-4 rounded-md border p-4">
+                            <div className="flex flex-col gap-1">
+                                <Label htmlFor="injection-detection-enabled">Prompt-injection detection</Label>
+
+                                <p className="text-xs text-muted-foreground">
+                                    Reject jailbreak and instruction-override attempts. Requires a configured injection
+                                    model.
+                                </p>
+                            </div>
+
+                            <Switch
+                                checked={form.injectionDetectionEnabled}
+                                id="injection-detection-enabled"
+                                onCheckedChange={(checked) => setForm({...form, injectionDetectionEnabled: checked})}
+                            />
+                        </div>
+
+                        <div className="flex flex-col gap-2 rounded-md border p-4">
+                            <Label htmlFor="blocked-terms">Blocked terms</Label>
+
+                            <p className="text-xs text-muted-foreground">
+                                Comma or newline separated. Requests containing one of these terms are rejected.
+                            </p>
+
+                            <Textarea
+                                id="blocked-terms"
+                                onChange={(event) => setForm({...form, blockedTerms: event.target.value})}
+                                placeholder="none"
+                                value={form.blockedTerms}
+                            />
+                        </div>
+                    </fieldset>
+
+                    <fieldset className="space-y-3 border-0 p-0">
+                        <legend className="sr-only">Blocking mode</legend>
+
+                        <div className="space-y-3 rounded-md border p-4">
+                            <div>
+                                <div className="text-sm font-medium">Blocking mode</div>
+
+                                <p className="text-xs text-muted-foreground">
+                                    Redaction guardrails (redact PII, redact secrets, scan responses) always continue --
+                                    this setting only governs the blocking guardrails: blocked terms, moderation, and
+                                    prompt-injection detection.
+                                </p>
+                            </div>
+
+                            <RadioGroup
+                                className="space-y-2"
+                                onValueChange={(value) =>
+                                    setForm({...form, blockingMode: value as AiGuardrailsBlockingMode})
+                                }
+                                value={form.blockingMode}
+                            >
+                                <div className="flex items-center gap-2">
+                                    <RadioGroupItem id="blocking-mode-block" value={AiGuardrailsBlockingMode.Block} />
+
+                                    <label htmlFor="blocking-mode-block">Block -- reject the request</label>
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                    <RadioGroupItem
+                                        id="blocking-mode-redact-and-continue"
+                                        value={AiGuardrailsBlockingMode.RedactAndContinue}
+                                    />
+
+                                    <label htmlFor="blocking-mode-redact-and-continue">
+                                        Redact and continue -- strip the offending content and let the request proceed
+                                    </label>
+                                </div>
+                            </RadioGroup>
+                        </div>
+                    </fieldset>
+
+                    <div className="flex justify-end">
+                        <Button
+                            disabled={updateMutation.isPending}
+                            label={updateMutation.isPending ? 'Saving...' : 'Save'}
+                            onClick={handleSave}
+                        />
                     </div>
                 </div>
-            </PageLoader>
-        </LayoutContainer>
+            </div>
+        </PageLoader>
     );
 };
 

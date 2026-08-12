@@ -882,8 +882,11 @@ gateway-only implementation; see "AI Gateway content guardrails" below for the g
   blocking guardrails; redaction guardrails always redact-and-continue). GraphQL:
   `aiGuardrailsWorkspaceSettings(workspaceId)` returns `null` on a missing row (client synthesizes defaults),
   `isAuthenticated()`-gated; `updateAiGuardrailsWorkspaceSettings` is `ROLE_ADMIN`-gated on the controller
-  itself (A2A precedent — no facade layer owns the check here). Settings UI: Workspace Settings → "AI" group
-  → Guardrails page (`/automation/settings/ai/guardrails`, admin + EE gated).
+  itself (A2A precedent — no facade layer owns the check here). Settings UI: Workspace Settings → AI Agents →
+  Guardrails tab (`/automation/settings/ai/agents/guardrails`, admin + EE gated). The former "AI" sidebar group
+  is gone: Guardrails and System Prompt are tabs of one AI Agents page. The earlier `ai/guardrails` and
+  `ai/system-prompt` routes were dropped rather than redirected — neither reached a release tag or `master`, so
+  no bookmark could exist.
 - **Agent surfaces**: `AiGuardrailsAdvisor` (Spring AI `CallAdvisor`/`StreamAdvisor`,
   `platform-ai-guardrails-service`) registers at `HIGHEST_PRECEDENCE`, ahead of per-node canvas guardrail
   cluster elements — the workspace policy is a floor, node elements only add restrictions. The canvas AI
