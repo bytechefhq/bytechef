@@ -1575,12 +1575,24 @@ npm run check
 - Access store imperatively via `store.getState()` for assertions (no hook needed)
 - Export stores (e.g., `export const featureFlagsStore`) to enable direct state manipulation in tests
 - Use `renderHook` from `@testing-library/react` for hooks that wrap stores
-- Flush async store updates with `await act(async () => { await new Promise(r => setTimeout(r, 10)); })`
+- **Never flush async store updates with a fixed sleep** (`await act(async () => { await new Promise(r => setTimeout(r, 10)); })`).
+  A fixed delay races an async chain whose latency is unbounded under parallel vitest workers: it passes in
+  isolation and fails intermittently in full runs, on a different test each time. Wait for the condition instead:
+  `await waitFor(() => { expect(store.getState().someFlag).toBe(expected); }, {interval: 5, timeout: 5000})`.
+  The timeout is a ceiling paid only on genuine failure, not a delay every test waits out.
+- A test that kicks off an async store update **must wait for it to settle before it ends**, even when the
+  assertion only covers intermediate state — otherwise its pending `setTimeout` callbacks fire during a later
+  test and mutate the shared store there (`beforeEach` reset cannot help; the timer outlives the reset).
 
 #### PostHog Mock
 - Global mock in `.vitest/setup.ts` — `onFeatureFlags: vi.fn()`, `isFeatureEnabled: vi.fn().mockReturnValue(false)`
 - `onFeatureFlags` returns `() => void` (unsubscribe); mock overrides must return a function: `return () => {}`
 - `import('posthog-js')` dynamic imports resolve to the same mock; multiple synchronous calls share one Promise
+- `useFeatureFlagsStore` resolves a flag through a four-hop chain: `import('posthog-js')` → promise microtask →
+  `onFeatureFlags` callback → `setTimeout(…, 0)`. Tests must wait on the resulting store state (or on the
+  `onFeatureFlags` subscription), never on elapsed time — see the Zustand note above.
+- Test files are isolated (vitest `forks` pool, `isolate: true`), so `featureFlagsStore` and the PostHog mock
+  **cannot** leak between files; contamination is always within a single file.
 
 ### End-to-End Testing
 - Test complete workflows through the UI

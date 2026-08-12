@@ -1,6 +1,6 @@
 import {applicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {featureFlagsStore, useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
-import {act, renderHook} from '@testing-library/react';
+import {act, renderHook, waitFor} from '@testing-library/react';
 import posthog from 'posthog-js';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -14,8 +14,32 @@ const analyticsDisabled = {
     postHog: {apiKey: undefined, host: undefined},
 };
 
-function flushAsync(): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, 10));
+// The store resolves a flag through a four-hop async chain: dynamic import('posthog-js') ->
+// promise microtask -> onFeatureFlags callback -> setTimeout(..., 0). Its latency is unbounded
+// under parallel vitest workers, so every wait below polls for the condition it actually cares
+// about instead of sleeping for a fixed number of milliseconds. A fixed sleep raced the chain
+// and made this file flaky in full runs while passing in isolation.
+//
+// The chain settles in ~1-2ms when a worker is scheduled, so poll tightly; the timeout is a
+// generous ceiling paid only when a test genuinely fails, not a delay every test waits out.
+const WAIT_OPTIONS = {interval: 5, timeout: 5000};
+
+function waitForFlagValue(featureFlag: string, value: boolean): Promise<void> {
+    return waitFor(() => {
+        expect(featureFlagsStore.getState().featureFlags[featureFlag]).toBe(value);
+    }, WAIT_OPTIONS);
+}
+
+function waitForFlagSettled(featureFlag: string): Promise<void> {
+    return waitFor(() => {
+        expect(featureFlagsStore.getState().loadingFlags[featureFlag]).toBeUndefined();
+    }, WAIT_OPTIONS);
+}
+
+function waitForPostHogSubscription(times: number): Promise<void> {
+    return waitFor(() => {
+        expect(vi.mocked(posthog.onFeatureFlags)).toHaveBeenCalledTimes(times);
+    }, WAIT_OPTIONS);
 }
 
 describe('useFeatureFlagsStore', () => {
@@ -95,12 +119,15 @@ describe('useFeatureFlagsStore', () => {
     });
 
     describe('per-flag loading guard', () => {
-        it('marks flag as loading in the zustand store', () => {
+        it('marks flag as loading in the zustand store', async () => {
             const {result} = renderHook(() => useFeatureFlagsStore());
 
             result.current('ff-300');
 
             expect(featureFlagsStore.getState().loadingFlags['ff-300']).toBe(true);
+
+            // Drain the resolution this test started, so its timers cannot fire during a later test.
+            await waitForFlagSettled('ff-300');
         });
 
         it('prevents duplicate fetches for the same flag', async () => {
@@ -112,14 +139,10 @@ describe('useFeatureFlagsStore', () => {
             result.current('ff-300');
             result.current('ff-300');
 
-            await act(async () => {
-                await flushAsync();
-            });
-
-            expect(vi.mocked(posthog.onFeatureFlags)).toHaveBeenCalledTimes(1);
+            await waitForPostHogSubscription(1);
         });
 
-        it('allows concurrent loading of different flags independently', () => {
+        it('allows concurrent loading of different flags independently', async () => {
             const {result} = renderHook(() => useFeatureFlagsStore());
 
             result.current('ff-300');
@@ -131,6 +154,11 @@ describe('useFeatureFlagsStore', () => {
             expect(loadingFlags['ff-300']).toBe(true);
             expect(loadingFlags['ff-301']).toBe(true);
             expect(loadingFlags['ff-302']).toBe(true);
+
+            // Drain all three resolutions before the test ends.
+            await waitForFlagSettled('ff-300');
+            await waitForFlagSettled('ff-301');
+            await waitForFlagSettled('ff-302');
         });
 
         it('shares loading state across multiple hook instances', async () => {
@@ -142,11 +170,7 @@ describe('useFeatureFlagsStore', () => {
             hookInstance1.current('ff-shared');
             hookInstance2.current('ff-shared');
 
-            await act(async () => {
-                await flushAsync();
-            });
-
-            expect(vi.mocked(posthog.onFeatureFlags)).toHaveBeenCalledTimes(1);
+            await waitForPostHogSubscription(1);
         });
     });
 
@@ -156,11 +180,7 @@ describe('useFeatureFlagsStore', () => {
 
             expect(result.current('ff-400')).toBe(false);
 
-            await act(async () => {
-                await flushAsync();
-            });
-
-            expect(featureFlagsStore.getState().featureFlags['ff-400']).toBe(false);
+            await waitForFlagValue('ff-400', false);
         });
 
         it('clears loading flag after resolving', async () => {
@@ -170,11 +190,7 @@ describe('useFeatureFlagsStore', () => {
 
             expect(featureFlagsStore.getState().loadingFlags['ff-400']).toBe(true);
 
-            await act(async () => {
-                await flushAsync();
-            });
-
-            expect(featureFlagsStore.getState().loadingFlags['ff-400']).toBeUndefined();
+            await waitForFlagSettled('ff-400');
         });
 
         it('does not attempt PostHog import when analytics disabled', async () => {
@@ -182,9 +198,8 @@ describe('useFeatureFlagsStore', () => {
 
             result.current('ff-400');
 
-            await act(async () => {
-                await flushAsync();
-            });
+            // Wait for the resolution to complete, then assert PostHog was never reached.
+            await waitForFlagValue('ff-400', false);
 
             expect(vi.mocked(posthog.onFeatureFlags)).not.toHaveBeenCalled();
         });
@@ -198,12 +213,9 @@ describe('useFeatureFlagsStore', () => {
 
             result.current('ff-400');
 
-            await act(async () => {
-                await flushAsync();
-            });
+            await waitForFlagValue('ff-400', false);
 
             expect(vi.mocked(posthog.onFeatureFlags)).not.toHaveBeenCalled();
-            expect(featureFlagsStore.getState().featureFlags['ff-400']).toBe(false);
         });
 
         it('does not attempt PostHog import when host is missing', async () => {
@@ -215,12 +227,9 @@ describe('useFeatureFlagsStore', () => {
 
             result.current('ff-400');
 
-            await act(async () => {
-                await flushAsync();
-            });
+            await waitForFlagValue('ff-400', false);
 
             expect(vi.mocked(posthog.onFeatureFlags)).not.toHaveBeenCalled();
-            expect(featureFlagsStore.getState().featureFlags['ff-400']).toBe(false);
         });
     });
 
@@ -242,13 +251,10 @@ describe('useFeatureFlagsStore', () => {
 
             result.current('ff-500');
 
-            await act(async () => {
-                await flushAsync();
-            });
+            await waitForFlagValue('ff-500', true);
 
             expect(posthog.onFeatureFlags).toHaveBeenCalled();
             expect(posthog.isFeatureEnabled).toHaveBeenCalledWith('ff-500');
-            expect(featureFlagsStore.getState().featureFlags['ff-500']).toBe(true);
         });
 
         it('sets flag to false when isFeatureEnabled returns false', async () => {
@@ -264,11 +270,7 @@ describe('useFeatureFlagsStore', () => {
 
             result.current('ff-500');
 
-            await act(async () => {
-                await flushAsync();
-            });
-
-            expect(featureFlagsStore.getState().featureFlags['ff-500']).toBe(false);
+            await waitForFlagValue('ff-500', false);
         });
 
         it('clears loading flag after PostHog resolves', async () => {
@@ -282,11 +284,9 @@ describe('useFeatureFlagsStore', () => {
 
             result.current('ff-500');
 
-            await act(async () => {
-                await flushAsync();
-            });
+            expect(featureFlagsStore.getState().loadingFlags['ff-500']).toBe(true);
 
-            expect(featureFlagsStore.getState().loadingFlags['ff-500']).toBeUndefined();
+            await waitForFlagSettled('ff-500');
         });
 
         it('handles deferred onFeatureFlags callback', async () => {
@@ -304,23 +304,23 @@ describe('useFeatureFlagsStore', () => {
 
             result.current('ff-deferred');
 
-            await act(async () => {
-                await flushAsync();
-            });
+            // Wait for the subscription rather than a fixed delay; until the captured callback
+            // fires, the store cannot resolve the flag, so the loading state below is stable.
+            await waitFor(() => {
+                expect(capturedCallback).toBeDefined();
+            }, WAIT_OPTIONS);
 
-            // Flag should still be loading
             expect(featureFlagsStore.getState().loadingFlags['ff-deferred']).toBe(true);
             expect(featureFlagsStore.getState().featureFlags['ff-deferred']).toBeUndefined();
 
             // Now fire the deferred callback
-            capturedCallback!();
-
-            await act(async () => {
-                await flushAsync();
+            act(() => {
+                capturedCallback!();
             });
 
-            expect(featureFlagsStore.getState().featureFlags['ff-deferred']).toBe(true);
-            expect(featureFlagsStore.getState().loadingFlags['ff-deferred']).toBeUndefined();
+            await waitForFlagValue('ff-deferred', true);
+
+            await waitForFlagSettled('ff-deferred');
         });
 
         it('unsubscribes from onFeatureFlags after first invocation to prevent leaks', async () => {
@@ -336,11 +336,9 @@ describe('useFeatureFlagsStore', () => {
 
             result.current('ff-unsub');
 
-            await act(async () => {
-                await flushAsync();
-            });
-
-            expect(unsubscribe).toHaveBeenCalledTimes(1);
+            await waitFor(() => {
+                expect(unsubscribe).toHaveBeenCalledTimes(1);
+            }, WAIT_OPTIONS);
         });
     });
 
@@ -356,11 +354,7 @@ describe('useFeatureFlagsStore', () => {
 
             result.current('ff-600');
 
-            await act(async () => {
-                await flushAsync();
-            });
-
-            expect(featureFlagsStore.getState().featureFlags['ff-600']).toBe(false);
+            await waitForFlagValue('ff-600', false);
         });
 
         it('clears loading flag after PostHog failure', async () => {
@@ -374,11 +368,9 @@ describe('useFeatureFlagsStore', () => {
 
             result.current('ff-600');
 
-            await act(async () => {
-                await flushAsync();
-            });
+            expect(featureFlagsStore.getState().loadingFlags['ff-600']).toBe(true);
 
-            expect(featureFlagsStore.getState().loadingFlags['ff-600']).toBeUndefined();
+            await waitForFlagSettled('ff-600');
         });
     });
 
