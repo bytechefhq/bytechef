@@ -30,4 +30,12 @@ public interface ContextStoreRecordIndexRepository extends ListCrudRepository<Co
     @Modifying
     @Query("DELETE FROM context_store_record_index WHERE record_id = :recordId")
     void deleteAllByRecordId(@Param("recordId") Long recordId);
+
+    @Modifying
+    @Query("""
+        DELETE FROM context_store_record_index
+        WHERE record_id IN (
+            SELECT id FROM context_store_record WHERE source_id = :sourceId AND deleted_at IS NOT NULL)
+        """)
+    int deleteAllForTombstonedRecords(@Param("sourceId") Long sourceId);
 }

@@ -76,10 +76,13 @@ public final class ContextStoreWorkflowGenerator {
     private static final String JOB_PARAMETER_DATASTREAM_MODE = "datastream.mode";
 
     /**
-     * Sentinel cron used for {@code @manual} cadence: minute=0, hour=0, day=31, month=2, weekday=0 — Feb has no day 31,
-     * so the trigger never fires. Manual runs are launched explicitly via {@code refreshNow}.
+     * Sentinel cron used for {@code @manual} cadence: 00:00 on 31 February, a date that does not exist, so the trigger
+     * never fires. Manual runs are launched explicitly via {@code refreshNow}.
+     *
+     * <p>
+     * Quartz six-field form, like every expression here — see {@link #translateCadenceToCron}.
      */
-    private static final String NEVER_FIRES_CRON = "0 0 31 2 0";
+    private static final String NEVER_FIRES_CRON = "0 0 0 31 2 ?";
 
     private static final String METADATA_CONTEXT_STORE_SOURCE_ID = "contextStoreSourceId";
 
@@ -330,14 +333,20 @@ public final class ContextStoreWorkflowGenerator {
         return destination;
     }
 
+    /**
+     * Cadence macros to cron. The scheduler parses these with {@code org.quartz.CronExpression}, which is six-field
+     * (seconds first) and rejects {@code *} in both day-of-month and day-of-week — one of them must be {@code ?}. The
+     * five-field unix forms emitted here previously ({@code @daily} as {@code 0 0 * * *}) failed to parse the moment a
+     * source was enabled. Matches the convention in {@code ScheduleCronNormalizer}.
+     */
     private static String translateCadenceToCron(@Nullable String cadence) {
         if (cadence == null) {
             return NEVER_FIRES_CRON;
         }
 
         return switch (cadence) {
-            case "@hourly" -> "0 * * * *";
-            case "@daily" -> "0 0 * * *";
+            case "@hourly" -> "0 0 * * * ?";
+            case "@daily" -> "0 0 0 * * ?";
             case "@manual" -> NEVER_FIRES_CRON;
             default -> cadence;
         };

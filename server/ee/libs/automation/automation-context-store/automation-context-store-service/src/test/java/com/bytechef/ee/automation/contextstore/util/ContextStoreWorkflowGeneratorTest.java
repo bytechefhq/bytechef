@@ -78,7 +78,7 @@ class ContextStoreWorkflowGeneratorTest {
         @SuppressWarnings("unchecked")
         Map<String, Object> triggerParameters = (Map<String, Object>) trigger.get("parameters");
 
-        assertThat(triggerParameters.get("expression")).isEqualTo("0 * * * *");
+        assertThat(triggerParameters.get("expression")).isEqualTo("0 0 * * * ?");
         assertThat(triggerParameters.get("timezone")).isEqualTo("UTC");
 
         @SuppressWarnings("unchecked")
@@ -158,7 +158,7 @@ class ContextStoreWorkflowGeneratorTest {
             .get("parameters");
 
         // Sentinel cron: Feb 31 — never fires.
-        assertThat(triggerParameters.get("expression")).isEqualTo("0 0 31 2 0");
+        assertThat(triggerParameters.get("expression")).isEqualTo("0 0 0 31 2 ?");
     }
 
     @Test
@@ -187,7 +187,7 @@ class ContextStoreWorkflowGeneratorTest {
         Map<String, Object> triggerParameters = (Map<String, Object>) updatedTriggers.get(0)
             .get("parameters");
 
-        assertThat(triggerParameters.get("expression")).isEqualTo("0 0 * * *");
+        assertThat(triggerParameters.get("expression")).isEqualTo("0 0 0 * * ?");
     }
 
     @Test

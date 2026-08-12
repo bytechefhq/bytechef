@@ -22,4 +22,12 @@ public interface ContextStoreRecordIndexService {
     ContextStoreRecordIndex save(ContextStoreRecordIndex index);
 
     void deleteAllByRecordId(Long recordId);
+
+    /**
+     * Deletes the index rows of every tombstoned ({@code deleted_at IS NOT NULL}) record of the given source. Called by
+     * the sync listener after the FULL_REPLACE tombstone sweep so a deleted upstream record does not leak its sidecar
+     * index rows; running it on every sweep also self-heals rows left behind by earlier runs. Returns the number of
+     * index rows deleted.
+     */
+    int deleteAllForTombstonedRecords(Long sourceId);
 }

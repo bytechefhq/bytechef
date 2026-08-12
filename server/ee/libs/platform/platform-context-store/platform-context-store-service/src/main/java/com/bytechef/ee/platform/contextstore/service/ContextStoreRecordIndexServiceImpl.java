@@ -39,4 +39,9 @@ public class ContextStoreRecordIndexServiceImpl implements ContextStoreRecordInd
     public void deleteAllByRecordId(Long recordId) {
         contextStoreRecordIndexRepository.deleteAllByRecordId(recordId);
     }
+
+    @Override
+    public int deleteAllForTombstonedRecords(Long sourceId) {
+        return contextStoreRecordIndexRepository.deleteAllForTombstonedRecords(sourceId);
+    }
 }
