@@ -28,6 +28,7 @@ export const usePropertyCodeEditorDialogToolbar = ({
         inputParameters,
         saving,
         scriptIsRunning,
+        setConversationToken,
         setCopilotPanelOpen,
         setSaving,
         setScriptIsRunning,
@@ -39,6 +40,7 @@ export const usePropertyCodeEditorDialogToolbar = ({
             inputParameters: state.inputParameters,
             saving: state.saving,
             scriptIsRunning: state.scriptIsRunning,
+            setConversationToken: state.setConversationToken,
             setCopilotPanelOpen: state.setCopilotPanelOpen,
             setSaving: state.setSaving,
             setScriptIsRunning: state.setScriptIsRunning,
@@ -67,7 +69,7 @@ export const usePropertyCodeEditorDialogToolbar = ({
             saveConversationState,
         } = useCopilotStore.getState();
 
-        saveConversationState();
+        setConversationToken(saveConversationState());
         resetMessages();
         generateConversationId();
 
@@ -79,7 +81,7 @@ export const usePropertyCodeEditorDialogToolbar = ({
         });
 
         setCopilotPanelOpen(true);
-    }, [language, setContext, setCopilotPanelOpen]);
+    }, [language, setContext, setConversationToken, setCopilotPanelOpen]);
 
     const handleRunClick = useCallback(() => {
         setScriptIsRunning(true);

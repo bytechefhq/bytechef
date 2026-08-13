@@ -3,7 +3,7 @@ import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {getWorkflowStatusType} from '@/shared/components/workflow-executions/util/workflowExecution-utils';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
-import {useCallback, useMemo, useState} from 'react';
+import {useCallback, useMemo, useRef, useState} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 import useWorkflowExecutionSheetStore from '../../../stores/useWorkflowExecutionSheetStore';
@@ -12,6 +12,8 @@ const POLLING_INTERVAL_MS = 2000;
 
 const useWorkflowExecutionSheet = () => {
     const [copilotPanelOpen, setCopilotPanelOpen] = useState(false);
+
+    const conversationTokenRef = useRef<string | null>(null);
 
     const {setWorkflowExecutionSheetOpen, workflowExecutionId, workflowExecutionSheetOpen} =
         useWorkflowExecutionSheetStore(
@@ -57,7 +59,7 @@ const useWorkflowExecutionSheet = () => {
             saveConversationState,
         } = useCopilotStore.getState();
 
-        saveConversationState();
+        conversationTokenRef.current = saveConversationState();
         resetMessages();
         generateConversationId();
 
@@ -77,14 +79,14 @@ const useWorkflowExecutionSheet = () => {
     }, [currentWorkspaceId, setContext, workflowExecution, workflowExecutionId]);
 
     const handleCopilotClose = useCallback(() => {
-        useCopilotStore.getState().restoreConversationState();
+        useCopilotStore.getState().restoreConversationState(conversationTokenRef.current);
 
         setCopilotPanelOpen(false);
     }, []);
 
     const handleOpenChange = useCallback(() => {
         if (workflowExecutionSheetOpen) {
-            useCopilotStore.getState().restoreConversationState();
+            useCopilotStore.getState().restoreConversationState(conversationTokenRef.current);
             setCopilotPanelOpen(false);
         }
 

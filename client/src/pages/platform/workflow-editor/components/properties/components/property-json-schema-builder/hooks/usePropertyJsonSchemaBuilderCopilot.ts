@@ -34,12 +34,13 @@ export function usePropertyJsonSchemaBuilderCopilot({
     const [copilotPanelOpen, setCopilotPanelOpen] = useState(false);
 
     const pendingSchemaRef = useRef<SchemaRecordType | null>(null);
+    const conversationTokenRef = useRef<string | null>(null);
 
     const handleCopilotOpen = useCallback(() => {
         const {context, generateConversationId, resetMessages, saveConversationState, setContext} =
             useCopilotStore.getState();
 
-        saveConversationState();
+        conversationTokenRef.current = saveConversationState();
         resetMessages();
         generateConversationId();
 
@@ -54,7 +55,7 @@ export function usePropertyJsonSchemaBuilderCopilot({
     }, [propertyPath, title, workflowId, workflowNodeName]);
 
     const handleCopilotClose = useCallback(() => {
-        useCopilotStore.getState().restoreConversationState();
+        useCopilotStore.getState().restoreConversationState(conversationTokenRef.current);
 
         setCopilotPanelOpen(false);
     }, []);

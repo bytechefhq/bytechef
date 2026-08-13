@@ -30,12 +30,13 @@ export function useSampleOutputCopilot({
     const [copilotPanelOpen, setCopilotPanelOpen] = useState(false);
 
     const pendingAppliedRef = useRef<boolean>(false);
+    const conversationTokenRef = useRef<string | null>(null);
 
     const handleCopilotOpen = useCallback(() => {
         const {context, generateConversationId, resetMessages, saveConversationState, setContext} =
             useCopilotStore.getState();
 
-        saveConversationState();
+        conversationTokenRef.current = saveConversationState();
         resetMessages();
         generateConversationId();
 
@@ -50,7 +51,7 @@ export function useSampleOutputCopilot({
     }, [workflowId, workflowNodeName]);
 
     const handleCopilotClose = useCallback(() => {
-        useCopilotStore.getState().restoreConversationState();
+        useCopilotStore.getState().restoreConversationState(conversationTokenRef.current);
 
         setCopilotPanelOpen(false);
     }, []);

@@ -10,6 +10,9 @@ import ContextStoreList from '@/pages/automation/context-store/components/contex
 import useContextStoreSources from '@/pages/automation/context-store/components/hooks/useContextStoreSources';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
+import CopilotButton from '@/shared/components/copilot/CopilotButton';
+import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
+import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
 import {AUTHORITIES} from '@/shared/constants';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -17,8 +20,9 @@ import {useContextStoreTagsQuery, useContextStoresQuery} from '@/shared/middlewa
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
+import {useQueryClient} from '@tanstack/react-query';
 import {LayersIcon} from 'lucide-react';
-import {useMemo} from 'react';
+import {useEffect, useMemo} from 'react';
 import {useSearchParams} from 'react-router-dom';
 
 /**
@@ -40,6 +44,10 @@ const ContextStores = () => {
     const {data: tagsData} = useContextStoreTagsQuery({
         workspaceId: String(currentWorkspaceId),
     });
+
+    const registerPostTurn = useCopilotPostTurnRegistry((state) => state.register);
+
+    const queryClient = useQueryClient();
 
     const isAdmin = account?.authorities?.includes(AUTHORITIES.ADMIN) ?? false;
 
@@ -131,6 +139,16 @@ const ContextStores = () => {
         });
     }, [contextStores, filterData, storeIdToSourceComponentNames]);
 
+    // Refresh the store list and its sources after a BUILD-mode copilot turn creates or updates either, so the page
+    // reflects the change without a manual reload.
+    useEffect(() => {
+        return registerPostTurn(Source.CONTEXT_STORE, () => {
+            queryClient.invalidateQueries({queryKey: ['contextStores']});
+            queryClient.invalidateQueries({queryKey: ['contextStoreSources']});
+            queryClient.invalidateQueries({queryKey: ['contextStoreTags']});
+        });
+    }, [queryClient, registerPostTurn]);
+
     return (
         <LayoutContainer
             header={
@@ -138,14 +156,16 @@ const ContextStores = () => {
                     centerTitle={true}
                     position="main"
                     right={
-                        contextStores.length > 0 ? (
-                            <div className="flex items-center gap-4">
+                        (contextStores.length > 0 || !isLoading) && (
+                            <div className="flex items-center gap-1">
                                 <EnvironmentSelect />
 
-                                {isAdmin && <ContextStoreFormDialog trigger={<Button>New Context Store</Button>} />}
+                                <CopilotButton source={Source.CONTEXT_STORE} />
+
+                                {contextStores.length > 0 && isAdmin && (
+                                    <ContextStoreFormDialog trigger={<Button>New Context Store</Button>} />
+                                )}
                             </div>
-                        ) : (
-                            !isLoading && <EnvironmentSelect />
                         )
                     }
                     title={

@@ -3,6 +3,11 @@ import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
 interface PropertyCodeEditorStateI {
+    // Token minted by the last saveConversationState() call the toolbar's handleCopilotClick made. The
+    // toolbar (which opens Copilot) and this dialog (which restores on close) are sibling hooks with no
+    // shared component instance, so a local ref can't carry the token between them the way it does for the
+    // other local-panel surfaces — this store is the shared place both can reach.
+    conversationToken: string | null;
     copilotPanelOpen: boolean;
     dirty: boolean;
     editorValue: string | undefined;
@@ -15,6 +20,7 @@ interface PropertyCodeEditorStateI {
 
 interface PropertyCodeEditorActionsI {
     reset: () => void;
+    setConversationToken: (token: string | null) => void;
     setCopilotPanelOpen: (open: boolean) => void;
     setDirty: (dirty: boolean) => void;
     setEditorValue: (value: string | undefined) => void;
@@ -28,6 +34,7 @@ interface PropertyCodeEditorActionsI {
 type PropertyCodeEditorStoreType = PropertyCodeEditorActionsI & PropertyCodeEditorStateI;
 
 const initialState: PropertyCodeEditorStateI = {
+    conversationToken: null,
     copilotPanelOpen: false,
     dirty: false,
     editorValue: undefined,
@@ -43,6 +50,7 @@ export const usePropertyCodeEditorDialogStore = create<PropertyCodeEditorStoreTy
         (set) => ({
             ...initialState,
             reset: () => set(initialState),
+            setConversationToken: (token) => set({conversationToken: token}),
             setCopilotPanelOpen: (open) => set({copilotPanelOpen: open}),
             setDirty: (dirty) => set({dirty}),
             setEditorValue: (value) => set({editorValue: value}),

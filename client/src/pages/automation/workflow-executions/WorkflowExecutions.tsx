@@ -9,12 +9,18 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useWorkflowExecutions} from '@/pages/automation/workflow-executions/hooks/useWorkflowExecutions';
 import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import ExecutionsTabs from '@/shared/components/ExecutionsTabs';
+import CopilotButton from '@/shared/components/copilot/CopilotButton';
+import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
+import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
 import Footer from '@/shared/layout/Footer';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {Project} from '@/shared/middleware/automation/configuration';
 import {GetWorkflowExecutionsPageJobStatusEnum} from '@/shared/middleware/automation/workflow/execution';
+import {WorkflowExecutionKeys} from '@/shared/queries/automation/workflowExecutions.queries';
+import {useQueryClient} from '@tanstack/react-query';
 import {ActivityIcon, RefreshCwIcon} from 'lucide-react';
+import {useEffect} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 import WorkflowExecutionsTable from './components/WorkflowExecutionsTable';
@@ -85,6 +91,18 @@ export const WorkflowExecutions = () => {
         workflows,
     } = useWorkflowExecutions();
 
+    const registerPostTurn = useCopilotPostTurnRegistry((state) => state.register);
+
+    const queryClient = useQueryClient();
+
+    // Refresh the executions list after a BUILD-mode copilot turn fixes and re-runs a workflow. The key factory is
+    // imported rather than hardcoded because this list uses a typed key, not a raw string.
+    useEffect(() => {
+        return registerPostTurn(Source.WORKFLOW_EXECUTION, () => {
+            queryClient.invalidateQueries({queryKey: WorkflowExecutionKeys.workflowExecutions});
+        });
+    }, [queryClient, registerPostTurn]);
+
     return (
         <LayoutContainer
             footer={
@@ -128,6 +146,8 @@ export const WorkflowExecutions = () => {
                             </Tooltip>
 
                             <EnvironmentSelect />
+
+                            <CopilotButton source={Source.WORKFLOW_EXECUTION} />
                         </div>
                     }
                     title={<ExecutionsTabs basePath="/automation/executions" />}

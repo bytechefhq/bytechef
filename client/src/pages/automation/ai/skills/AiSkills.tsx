@@ -15,6 +15,7 @@ import AiSkillsTagsNav from '@/pages/automation/ai/skills/components/AiSkillsTag
 import useAiSkillDetailToolbarStore from '@/pages/automation/ai/skills/stores/useAiSkillDetailToolbarStore';
 import {useAiSkillsStore} from '@/pages/automation/ai/skills/stores/useAiSkillsStore';
 import invalidateSkillQueries from '@/pages/automation/ai/skills/utils/invalidateSkillQueries';
+import CopilotButton from '@/shared/components/copilot/CopilotButton';
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
 import useCopilotStateContributorRegistry from '@/shared/components/copilot/stores/useCopilotStateContributorRegistry';
 import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
@@ -68,13 +69,15 @@ const AiSkills = () => {
 
     const ff_4554 = useFeatureFlagsStore()('ff-4554');
 
+    const registerPostTurn = useCopilotPostTurnRegistry((state) => state.register);
+
     const queryClient = useQueryClient();
 
     useEffect(() => {
-        return useCopilotPostTurnRegistry.getState().register(Source.SKILLS, () => {
+        return registerPostTurn(Source.SKILLS, () => {
             invalidateSkillQueries(queryClient);
         });
-    }, [queryClient, skillsView]);
+    }, [queryClient, registerPostTurn]);
 
     useEffect(() => {
         return useCopilotStateContributorRegistry.getState().register(() => {
@@ -103,25 +106,30 @@ const AiSkills = () => {
 
     const headerTitle = route === 'detail' ? (skillsHeaderInfo.title ?? 'Skill') : 'Skills';
 
-    const showToolbar = route === 'list' && skillsView !== 'empty';
+    const showToolbar = route === 'list';
+    const showSearchAndCreate = skillsView !== 'empty';
 
     let toolbarRight: React.ReactNode = undefined;
 
     if (showToolbar) {
         toolbarRight = (
-            <div className="flex items-center gap-2">
-                <div className="relative">
-                    <SearchIcon className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-content-neutral-tertiary" />
+            <div className="flex items-center gap-1">
+                {showSearchAndCreate && (
+                    <div className="relative">
+                        <SearchIcon className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-content-neutral-tertiary" />
 
-                    <Input
-                        className="w-64 pl-9"
-                        onChange={(event) => setSearchQuery(event.target.value)}
-                        placeholder="Search skills..."
-                        value={searchQuery}
-                    />
-                </div>
+                        <Input
+                            className="w-64 pl-9"
+                            onChange={(event) => setSearchQuery(event.target.value)}
+                            placeholder="Search skills..."
+                            value={searchQuery}
+                        />
+                    </div>
+                )}
 
-                <AiSkillsCreateDropdown />
+                <CopilotButton source={Source.SKILLS} />
+
+                {showSearchAndCreate && <AiSkillsCreateDropdown />}
             </div>
         );
     } else if (route === 'detail' && handlers) {

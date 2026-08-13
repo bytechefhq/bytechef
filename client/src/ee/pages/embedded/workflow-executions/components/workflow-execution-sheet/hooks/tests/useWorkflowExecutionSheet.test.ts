@@ -54,7 +54,7 @@ describe('useWorkflowExecutionSheet', () => {
                 source: Source.WORKFLOW_EDITOR,
                 workflowExecutionError: undefined,
             },
-            savedState: null,
+            conversationStack: [],
         });
     });
 

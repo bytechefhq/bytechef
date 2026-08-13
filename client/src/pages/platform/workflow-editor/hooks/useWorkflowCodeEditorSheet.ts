@@ -11,7 +11,7 @@ import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {getTestWorkflowAttachRequest, getTestWorkflowStreamPostRequest} from '@/shared/util/testWorkflow-utils';
-import {Ref, useCallback, useEffect, useState} from 'react';
+import {Ref, useCallback, useEffect, useRef, useState} from 'react';
 import {PanelImperativeHandle, usePanelCallbackRef} from 'react-resizable-panels';
 import {useShallow} from 'zustand/shallow';
 
@@ -80,6 +80,8 @@ const useWorkflowCodeEditorSheet = ({
     const [workflowTestExecution, setWorkflowTestExecution] = useState<WorkflowTestExecution>();
     const [markers, setMarkers] = useState<editor.IMarkerData[]>([]);
 
+    const conversationTokenRef = useRef<string | null>(null);
+
     const hasErrors = markers.some((marker) => marker.severity === MARKER_SEVERITY_ERROR);
 
     const ai = useApplicationInfoStore((state) => state.ai);
@@ -125,7 +127,7 @@ const useWorkflowCodeEditorSheet = ({
             saveConversationState,
         } = useCopilotStore.getState();
 
-        saveConversationState();
+        conversationTokenRef.current = saveConversationState();
         resetMessages();
         generateConversationId();
 
@@ -140,7 +142,7 @@ const useWorkflowCodeEditorSheet = ({
     }, [setContext, workflow.format]);
 
     const handleCopilotClose = useCallback(() => {
-        useCopilotStore.getState().restoreConversationState();
+        useCopilotStore.getState().restoreConversationState(conversationTokenRef.current);
         setCopilotPanelOpen(false);
     }, []);
 
@@ -153,7 +155,7 @@ const useWorkflowCodeEditorSheet = ({
             }
 
             if (!open) {
-                useCopilotStore.getState().restoreConversationState();
+                useCopilotStore.getState().restoreConversationState(conversationTokenRef.current);
                 setCopilotPanelOpen(false);
             }
 
@@ -245,7 +247,7 @@ const useWorkflowCodeEditorSheet = ({
     );
 
     const handleUnsavedChangesAlertDialogClose = useCallback(() => {
-        useCopilotStore.getState().restoreConversationState();
+        useCopilotStore.getState().restoreConversationState(conversationTokenRef.current);
         setCopilotPanelOpen(false);
         setUnsavedChangesAlertDialogOpen(false);
         onSheetOpenClose(false);

@@ -5,9 +5,9 @@ import {twMerge} from 'tailwind-merge';
 
 // Sample questions surfaced on the empty chat states (home panel + empty thread). Each one maps to a
 // capability the BUILD agent actually has today — workflow building with a data-table target, the
-// research subagent with createAssetFile persistence, typed data-table creation with seed rows,
-// createKnowledgeBase + addKnowledgeBaseDocument, and the personal_agent_manager's schedule tool —
-// so a click always lands on a runnable path rather than a "not supported yet" reply.
+// research subagent with persistence delegated to asset_file_agent, typed data-table creation with
+// seed rows, createKnowledgeBase + addKnowledgeBaseDocument, and the personal_agent_manager's
+// schedule tool — so a click always lands on a runnable path rather than a "not supported yet" reply.
 //
 // Each stays at or under ~85 characters so the pill renders on ONE row inside the home panel's max-w-2xl
 // column. That ceiling is measured, not estimated: at text-sm in this column the 85-character

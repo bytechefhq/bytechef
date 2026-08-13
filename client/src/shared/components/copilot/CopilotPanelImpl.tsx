@@ -14,7 +14,7 @@ import {useAiDefaultModelQuery} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {type SuggestionConfig} from '@assistant-ui/react';
 import {BotMessageSquareIcon, BrainCircuitIcon, MessageSquareXIcon, XIcon} from 'lucide-react';
-import {useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
@@ -54,22 +54,26 @@ interface CopilotPanelProps {
     source?: Source;
 }
 
-const CopilotPanelContent = ({className, headerClassName, onClose, source}: Omit<CopilotPanelProps, 'open'>) => {
+export const CopilotPanelContent = ({className, headerClassName, onClose, source}: Omit<CopilotPanelProps, 'open'>) => {
     const {
+        composerPlaceholder,
         context,
         generateConversationId,
         resetMessages,
         selectedLlmModel,
         selectedLlmProvider,
+        setComposerPlaceholder,
         setContext,
         setSelectedLlm,
     } = useCopilotStore(
         useShallow((state) => ({
+            composerPlaceholder: state.composerPlaceholder,
             context: state.context,
             generateConversationId: state.generateConversationId,
             resetMessages: state.resetMessages,
             selectedLlmModel: state.selectedLlmModel,
             selectedLlmProvider: state.selectedLlmProvider,
+            setComposerPlaceholder: state.setComposerPlaceholder,
             setContext: state.setContext,
             setSelectedLlm: state.setSelectedLlm,
         }))
@@ -91,29 +95,81 @@ const CopilotPanelContent = ({className, headerClassName, onClose, source}: Omit
         generateConversationId();
     };
 
-    const handleCloseClick = () => {
-        if (onClose) {
-            onClose();
+    // Shared by the close button and the navigation effect below. Local-panel surfaces pass an onClose and
+    // drive their own open flag, so this only ever applies to the global panel mounted in App.tsx.
+    const closeGlobalPanel = useCallback(() => {
+        const {globalPanelConversationToken, restoreConversationState, setGlobalPanelConversationToken} =
+            useCopilotStore.getState();
+
+        // Only useOpenCopilot.ts pushes for the global panel, and only when the panel was actually closed at
+        // the time — six other call sites (DataTable.tsx, KnowledgeBase.tsx, ContextStoreSources.tsx,
+        // AiSkillDetail.tsx, the EE CustomComponentDetail.tsx, and the workflow-editor toolbar toggle) open
+        // this same panel by setting context and flipping setCopilotPanelOpen directly, without pushing
+        // anything. globalPanelConversationToken is null in exactly that case, so falling through to the
+        // hardcoded reset below (rather than unconditionally restoring whenever the stack happens to be
+        // non-empty) is what stops this close from popping an entry some other surface pushed.
+        //
+        // The token is cleared right after use (both branches) — otherwise it would stay set to this open's
+        // (now popped, or never valid) token forever, since nothing else in production code clears it. A
+        // later close of a direct-open session would then find a stale truthy token, take the restore branch
+        // instead of the fallback, no-op against the (by-then-mismatched) stack top, and skip resetting the
+        // context — leaking this surface's context into whatever opens the global panel next.
+        //
+        // Note the clear only happens here. Three surfaces close the global panel without going through this
+        // function (useProject, AiSkillDetail, the EE useIntegration), but all three are unmount cleanups that
+        // coincide with a pathname change, and the navigation effect below routes that back through here. A
+        // future surface that closes the panel directly WITHOUT navigating would reopen the stale-token window
+        // described above, so it must clear the token itself.
+        if (globalPanelConversationToken) {
+            // Something was open underneath — hand it back rather than discarding it.
+            restoreConversationState(globalPanelConversationToken);
         } else {
             setContext({
                 mode: MODE.ASK,
                 parameters: {},
                 source: Source.WORKFLOW_EDITOR,
             });
-            setCopilotPanelOpen(false);
+            setComposerPlaceholder(undefined);
+        }
+
+        setGlobalPanelConversationToken(null);
+        setCopilotPanelOpen(false);
+    }, [setComposerPlaceholder, setContext, setCopilotPanelOpen]);
+
+    const handleCloseClick = () => {
+        if (onClose) {
+            onClose();
+        } else {
+            closeGlobalPanel();
         }
     };
 
     const previousPathnameRef = useRef(location.pathname);
 
     useEffect(() => {
-        if (previousPathnameRef.current !== location.pathname) {
-            previousPathnameRef.current = location.pathname;
-
-            generateConversationId();
-            resetMessages();
+        if (previousPathnameRef.current === location.pathname) {
+            return;
         }
-    }, [generateConversationId, location.pathname, resetMessages]);
+
+        previousPathnameRef.current = location.pathname;
+
+        generateConversationId();
+        resetMessages();
+
+        /*
+         * Navigating away closes the global panel. Without this it stays open on the new page while
+         * context.source still names the surface the user left — and CopilotRuntimeProvider derives both the
+         * agent id and the /ai/chat/{source} URL from that value, so the first message sent on the new page
+         * would be routed to the previous page's agent carrying the previous page's parameters. Closing
+         * fixes the stale panel and the mis-routing together.
+         *
+         * Local-panel surfaces are left alone: they pass an onClose, own their own open flag, and live inside
+         * dialogs that unmount on navigation anyway.
+         */
+        if (!onClose) {
+            closeGlobalPanel();
+        }
+    }, [closeGlobalPanel, generateConversationId, location.pathname, onClose, resetMessages]);
 
     return (
         <div className={twMerge('relative h-full min-h-[50vh] w-[450px] bg-surface-main', className)}>
@@ -136,7 +192,13 @@ const CopilotPanelContent = ({className, headerClassName, onClose, source}: Omit
                         <TooltipContent>Clean messages</TooltipContent>
                     </Tooltip>
 
-                    <Button icon={<XIcon />} onClick={handleCloseClick} size="icon" variant="ghost" />
+                    <Button
+                        aria-label="Close Copilot panel"
+                        icon={<XIcon />}
+                        onClick={handleCloseClick}
+                        size="icon"
+                        variant="ghost"
+                    />
                 </div>
             </div>
 
@@ -168,6 +230,7 @@ const CopilotPanelContent = ({className, headerClassName, onClose, source}: Omit
                                     />
                                 ) : null
                             }
+                            composerPlaceholder={composerPlaceholder}
                             dataComponents={aiChatDataComponents}
                             leadingComposerActions={
                                 currentWorkspaceId != null ? (

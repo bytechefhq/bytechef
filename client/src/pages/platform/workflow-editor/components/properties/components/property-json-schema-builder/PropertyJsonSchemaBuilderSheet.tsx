@@ -82,12 +82,28 @@ const PropertyJsonSchemaBuilderSheet = ({
         workflowNodeName,
     });
 
+    // The sheet's own close (the outside-click/Escape/close-icon path Radix drives through
+    // onOpenChange) bypasses handleCopilotClose entirely, since that only runs when the Copilot panel
+    // itself closes. Without this, opening Copilot inside the sheet and then closing the sheet directly
+    // pushes a conversation-stack entry that never gets popped. handleCopilotClose is token-guarded, so
+    // calling it here is a no-op on the (common) case where Copilot was never opened.
+    const handleSheetOpenChange = useCallback(
+        (open: boolean) => {
+            if (!open) {
+                handleCopilotClose();
+            }
+
+            onClose?.();
+        },
+        [handleCopilotClose, onClose]
+    );
+
     useEffect(() => {
         setLocalSchema(schema);
     }, [schema]);
 
     return (
-        <Sheet onOpenChange={onClose} open>
+        <Sheet onOpenChange={handleSheetOpenChange} open>
             <VisuallyHidden.Root>
                 <SheetTitle>{title ? `${title} Builder` : 'JSON Schema Builder'}</SheetTitle>
             </VisuallyHidden.Root>

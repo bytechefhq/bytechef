@@ -103,6 +103,12 @@ export type ThreadProps = {
    */
   composerActions?: ReactNode | undefined;
   /**
+   * Placeholder text shown in the empty composer input. Falls back to the
+   * generic "Send a message..." when omitted, so callers that open the panel
+   * for a specific task (e.g. "generate a workflow") can guide the user.
+   */
+  composerPlaceholder?: string | undefined;
+  /**
    * Registry mapping data-part names (e.g. "select-connection") to the
    * component that renders them. When provided, assistant messages render their
    * `data` parts via this registry; when omitted, data parts fall back to the
@@ -150,6 +156,7 @@ const isNewChatView = (s: AssistantState) =>
 export const Thread: FC<ThreadProps> = ({
   components = EMPTY_COMPONENTS,
   composerActions,
+  composerPlaceholder,
   dataComponents,
   leadingComposerActions,
   transparent,
@@ -162,6 +169,7 @@ export const Thread: FC<ThreadProps> = ({
       <ThreadDataComponentsContext.Provider value={dataComponents}>
         <ThreadRoot
           composerActions={composerActions}
+          composerPlaceholder={composerPlaceholder}
           isEmpty={isEmpty}
           leadingComposerActions={leadingComposerActions}
           transparent={transparent}
@@ -174,12 +182,14 @@ export const Thread: FC<ThreadProps> = ({
 
 const ThreadRoot: FC<{
   composerActions?: ReactNode | undefined;
+  composerPlaceholder?: string | undefined;
   isEmpty: boolean;
   leadingComposerActions?: ReactNode | undefined;
   transparent?: boolean | undefined;
   voice?: ThreadVoiceStateI | undefined;
 }> = ({
   composerActions,
+  composerPlaceholder,
   isEmpty,
   leadingComposerActions,
   transparent,
@@ -238,6 +248,7 @@ const ThreadRoot: FC<{
             <ThreadScrollToBottom />
             <Composer
               composerActions={composerActions}
+              composerPlaceholder={composerPlaceholder}
               leadingComposerActions={leadingComposerActions}
               voice={voice}
             />
@@ -314,12 +325,14 @@ const ThreadSuggestionItem: FC = () => {
 
 type ComposerActionProps = {
   composerActions?: ReactNode | undefined;
+  composerPlaceholder?: string | undefined;
   leadingComposerActions?: ReactNode | undefined;
   voice?: ThreadVoiceStateI | undefined;
 };
 
 const Composer: FC<ComposerActionProps> = ({
   composerActions,
+  composerPlaceholder,
   leadingComposerActions,
   voice,
 }) => {
@@ -336,7 +349,7 @@ const Composer: FC<ComposerActionProps> = ({
         >
           <ComposerAttachments />
           <ComposerPrimitive.Input
-            placeholder="Send a message..."
+            placeholder={composerPlaceholder ?? "Send a message..."}
             className="aui-composer-input placeholder:text-muted-foreground/80 max-h-32 min-h-10 w-full resize-none border-0 bg-transparent px-2.5 py-1 text-base shadow-none outline-none focus:border-0 focus:shadow-none focus:ring-0 focus-visible:ring-0"
             rows={1}
             autoFocus

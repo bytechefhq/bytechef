@@ -13,6 +13,7 @@ vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({
 
 vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
     useApplicationInfoStore: () => ({
+        ai: {copilot: {enabled: true}},
         analytics: {enabled: false, postHog: {apiKey: '', host: ''}},
         application: {edition: 'CE'},
         featureFlags: {},
@@ -121,8 +122,13 @@ describe('Projects Import Functionality', () => {
         const createButton = screen.getByRole('button', {name: /create project/i});
         expect(createButton).toBeInTheDocument();
 
+        // Excludes both the "Create Project" button and the header's "Ask Copilot" trigger, which also
+        // renders in the button list once the project list is empty.
         const buttons = screen.getAllByRole('button');
-        const chevronButton = buttons.find((b) => !/create project/i.test(b.textContent || ''))!;
+        const chevronButton = buttons.find(
+            (button) =>
+                !/create project/i.test(button.textContent || '') && button.getAttribute('aria-label') !== 'Ask Copilot'
+        )!;
         await userEvent.click(chevronButton);
 
         await waitFor(() => {
@@ -136,7 +142,7 @@ describe('Projects Import Functionality', () => {
 
         // Open the dropdown using the chevron button
         const buttons = screen.getAllByRole('button');
-        const chevronButton = buttons.find((b) => /chevron-down/i.test(b.innerHTML) || b.querySelector('svg'))!;
+        const chevronButton = buttons.find((button) => /chevron-down/i.test(button.innerHTML))!;
         await userEvent.click(chevronButton);
 
         await waitFor(() => {

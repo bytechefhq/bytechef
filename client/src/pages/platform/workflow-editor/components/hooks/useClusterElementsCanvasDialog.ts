@@ -9,7 +9,7 @@ import {getTask} from '@/pages/platform/workflow-editor/utils/getTask';
 import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
-import {useCallback, useEffect, useMemo} from 'react';
+import {useCallback, useEffect, useMemo, useRef} from 'react';
 
 interface UseClusterElementsCanvasDialogProps {
     onOpenChange: (open: boolean) => void;
@@ -20,6 +20,8 @@ export default function useClusterElementsCanvasDialog({
     onOpenChange,
     workflowReferenceId,
 }: UseClusterElementsCanvasDialogProps) {
+    const conversationTokenRef = useRef<string | null>(null);
+
     const setCopilotPanelOpen = useClusterElementsCanvasDialogStore((state) => state.setCopilotPanelOpen);
     const setShowAiAgentEditor = useClusterElementsCanvasDialogStore((state) => state.setShowAiAgentEditor);
     const setShowDataStreamEditor = useClusterElementsCanvasDialogStore((state) => state.setShowDataStreamEditor);
@@ -166,7 +168,7 @@ export default function useClusterElementsCanvasDialog({
             saveConversationState,
         } = useCopilotStore.getState();
 
-        saveConversationState();
+        conversationTokenRef.current = saveConversationState();
         resetMessages();
         generateConversationId();
 
@@ -181,7 +183,7 @@ export default function useClusterElementsCanvasDialog({
     }, [rootClusterElementNodeData?.name, setCopilotPanelOpen, setContext]);
 
     const handleCopilotClose = useCallback(() => {
-        useCopilotStore.getState().restoreConversationState();
+        useCopilotStore.getState().restoreConversationState(conversationTokenRef.current);
         setCopilotPanelOpen(false);
     }, [setCopilotPanelOpen]);
 
@@ -204,7 +206,7 @@ export default function useClusterElementsCanvasDialog({
             onOpenChange(isOpen);
 
             if (!isOpen) {
-                useCopilotStore.getState().restoreConversationState();
+                useCopilotStore.getState().restoreConversationState(conversationTokenRef.current);
                 useClusterElementsCanvasDialogStore.getState().reset();
                 useClusterElementsDataStore.getState().reset();
                 useTestingModeStore.getState().resetTestingMode();

@@ -6,6 +6,9 @@ import ProjectDeploymentFilterTitle from '@/pages/automation/project-deployments
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
+import CopilotButton from '@/shared/components/copilot/CopilotButton';
+import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
+import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
 import ReadOnlyWorkflowSheet from '@/shared/components/read-only-workflow-editor/ReadOnlyWorkflowSheet';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -13,12 +16,16 @@ import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav
 import {ProjectDeployment} from '@/shared/middleware/automation/configuration';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {useGetProjectDeploymentTagsQuery} from '@/shared/queries/automation/projectDeploymentTags.queries';
-import {useGetWorkspaceProjectDeploymentsQuery} from '@/shared/queries/automation/projectDeployments.queries';
+import {
+    ProjectDeploymentKeys,
+    useGetWorkspaceProjectDeploymentsQuery,
+} from '@/shared/queries/automation/projectDeployments.queries';
 import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
+import {useQueryClient} from '@tanstack/react-query';
 import {Layers3Icon, TagIcon} from 'lucide-react';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 
 import ProjectDeploymentDialog from './components/project-deployment-dialog/ProjectDeploymentDialog';
@@ -122,6 +129,18 @@ const ProjectDeployments = () => {
 
     const {data: taskDispatcherDefinitions} = useGetTaskDispatcherDefinitionsQuery();
 
+    const registerPostTurn = useCopilotPostTurnRegistry((state) => state.register);
+
+    const queryClient = useQueryClient();
+
+    // Refresh the deployment list after a BUILD-mode copilot turn creates or modifies a deployment, so the
+    // page reflects the change without a manual reload.
+    useEffect(() => {
+        return registerPostTurn(Source.PROJECT_DEPLOYMENT, () => {
+            queryClient.invalidateQueries({queryKey: ProjectDeploymentKeys.projectDeployments});
+        });
+    }, [queryClient, registerPostTurn]);
+
     return (
         <LayoutContainer
             header={
@@ -129,25 +148,26 @@ const ProjectDeployments = () => {
                     centerTitle={true}
                     position="main"
                     right={
-                        projectDeployments && projectDeployments.length > 0 ? (
-                            <div className="flex items-center gap-4">
+                        ((projectDeployments && projectDeployments.length > 0) ||
+                            !(projectsIsLoading || projectDeploymentsIsLoading || tagsIsLoading)) && (
+                            <div className="flex items-center gap-1">
                                 <EnvironmentSelect />
 
-                                <ProjectDeploymentDialog
-                                    onSuccess={(deploymentId) => setNewlyCreatedDeploymentId(deploymentId)}
-                                    projectDeployment={
-                                        {
-                                            environmentId: currentEnvironmentId,
-                                        } as ProjectDeployment
-                                    }
-                                    redirectOnSubmit={false}
-                                    triggerNode={<Button label="New Deployment" />}
-                                />
+                                <CopilotButton source={Source.PROJECT_DEPLOYMENT} />
+
+                                {projectDeployments && projectDeployments.length > 0 && (
+                                    <ProjectDeploymentDialog
+                                        onSuccess={(deploymentId) => setNewlyCreatedDeploymentId(deploymentId)}
+                                        projectDeployment={
+                                            {
+                                                environmentId: currentEnvironmentId,
+                                            } as ProjectDeployment
+                                        }
+                                        redirectOnSubmit={false}
+                                        triggerNode={<Button label="New Deployment" />}
+                                    />
+                                )}
                             </div>
-                        ) : (
-                            !(projectsIsLoading || projectDeploymentsIsLoading || tagsIsLoading) && (
-                                <EnvironmentSelect />
-                            )
                         )
                     }
                     title={

@@ -10,11 +10,16 @@ import KnowledgeBaseList from '@/pages/automation/knowledge-bases/components/kno
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import StorageUsageBanner from '@/shared/components/StorageUsageBanner';
+import CopilotButton from '@/shared/components/copilot/CopilotButton';
+import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
+import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useKnowledgeBaseEmbeddingActiveQuery, useKnowledgeBaseStorageUsageQuery} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
+import {useQueryClient} from '@tanstack/react-query';
 import {DatabaseIcon} from 'lucide-react';
+import {useEffect} from 'react';
 
 const KnowledgeBases = () => {
     const currentWorkspaceId = String(useWorkspaceStore((state) => state.currentWorkspaceId));
@@ -34,6 +39,20 @@ const KnowledgeBases = () => {
 
     const storageUsage = storageUsageData?.knowledgeBaseStorageUsage;
 
+    const registerPostTurn = useCopilotPostTurnRegistry((state) => state.register);
+
+    const queryClient = useQueryClient();
+
+    // Refresh the list and the tag sidebar after a BUILD-mode copilot turn creates or retags a knowledge base.
+    useEffect(() => {
+        return registerPostTurn(Source.KNOWLEDGE_BASE, () => {
+            queryClient.invalidateQueries({queryKey: ['knowledgeBases']});
+            queryClient.invalidateQueries({queryKey: ['knowledgeBaseTags']});
+            queryClient.invalidateQueries({queryKey: ['knowledgeBaseTagsByKnowledgeBase']});
+            queryClient.invalidateQueries({queryKey: ['KnowledgeBaseStorageUsage']});
+        });
+    }, [queryClient, registerPostTurn]);
+
     return (
         <LayoutContainer
             header={
@@ -41,17 +60,19 @@ const KnowledgeBases = () => {
                     centerTitle={true}
                     position="main"
                     right={
-                        knowledgeBases.length > 0 ? (
-                            <div className="flex items-center gap-4">
+                        (knowledgeBases.length > 0 || !isLoading) && (
+                            <div className="flex items-center gap-1">
                                 <EnvironmentSelect />
 
-                                <CreateKnowledgeBaseDialog
-                                    trigger={<Button>New Knowledge Base</Button>}
-                                    workspaceId={currentWorkspaceId}
-                                />
+                                <CopilotButton source={Source.KNOWLEDGE_BASE} />
+
+                                {knowledgeBases.length > 0 && (
+                                    <CreateKnowledgeBaseDialog
+                                        trigger={<Button>New Knowledge Base</Button>}
+                                        workspaceId={currentWorkspaceId}
+                                    />
+                                )}
                             </div>
-                        ) : (
-                            !isLoading && <EnvironmentSelect />
                         )
                     }
                     title={

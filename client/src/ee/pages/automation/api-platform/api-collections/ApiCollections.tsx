@@ -5,17 +5,22 @@ import ApiPlatformLeftSidebarNav from '@/ee/pages/automation/api-platform/ApiPla
 import ApiCollectionDialog from '@/ee/pages/automation/api-platform/api-collections/components/ApiCollectionDialog';
 import ApiCollectionsFilterTitle from '@/ee/pages/automation/api-platform/api-collections/components/ApiCollectionsFilterTitle';
 import {useGetApiCollectionTagsQuery} from '@/ee/shared/mutations/automation/apiCollectionTags.queries';
-import {useGetApiCollectionsQuery} from '@/ee/shared/mutations/automation/apiCollections.queries';
+import {ApiCollectionKeys, useGetApiCollectionsQuery} from '@/ee/shared/mutations/automation/apiCollections.queries';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
+import CopilotButton from '@/shared/components/copilot/CopilotButton';
+import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
+import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
 import ReadOnlyWorkflowSheet from '@/shared/components/read-only-workflow-editor/ReadOnlyWorkflowSheet';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
+import {useQueryClient} from '@tanstack/react-query';
 import {Link2Icon} from 'lucide-react';
+import {useEffect} from 'react';
 import {useLocation, useSearchParams} from 'react-router-dom';
 
 import ApiCollectionList from './components/ApiCollectionList';
@@ -70,6 +75,18 @@ const ApiCollections = () => {
 
     const {data: tags, error: tagsError, isLoading: tagsIsLoading} = useGetApiCollectionTagsQuery(currentWorkspaceId!);
 
+    const registerPostTurn = useCopilotPostTurnRegistry((state) => state.register);
+
+    const queryClient = useQueryClient();
+
+    // Refresh the collection list after a BUILD-mode copilot turn creates or modifies an API collection, so the
+    // page reflects the change without a manual reload.
+    useEffect(() => {
+        return registerPostTurn(Source.API_COLLECTION, () => {
+            queryClient.invalidateQueries({queryKey: ApiCollectionKeys.apiCollections});
+        });
+    }, [queryClient, registerPostTurn]);
+
     return (
         <LayoutContainer
             header={
@@ -77,14 +94,17 @@ const ApiCollections = () => {
                     centerTitle={true}
                     position="main"
                     right={
-                        apiCollections && apiCollections.length > 0 ? (
-                            <div className="flex items-center gap-4">
+                        ((apiCollections && apiCollections.length > 0) ||
+                            !(apiCollectionsIsLoading || projectsIsLoading || tagsIsLoading)) && (
+                            <div className="flex items-center gap-1">
                                 <EnvironmentSelect />
 
-                                <ApiCollectionDialog triggerNode={<Button label="New API Collection" />} />
+                                <CopilotButton source={Source.API_COLLECTION} />
+
+                                {apiCollections && apiCollections.length > 0 && (
+                                    <ApiCollectionDialog triggerNode={<Button label="New API Collection" />} />
+                                )}
                             </div>
-                        ) : (
-                            <EnvironmentSelect />
                         )
                     }
                     title={

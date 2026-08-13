@@ -7,6 +7,9 @@ import handleImportProject from '@/pages/automation/project/utils/handleImportPr
 import ProjectsFilterTitle from '@/pages/automation/projects/components/ProjectsFilterTitle';
 import ProjectsLeftSidebarNav from '@/pages/automation/projects/components/ProjectsLeftSidebarNav';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import CopilotButton from '@/shared/components/copilot/CopilotButton';
+import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
+import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
 import {getProjectGitApi} from '@/shared/edition/project-git/projectGitApi';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -14,12 +17,13 @@ import {useImportProjectMutation} from '@/shared/mutations/automation/projects.m
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {useGetProjectCategoriesQuery} from '@/shared/queries/automation/projectCategories.queries';
 import {useGetProjectTagsQuery} from '@/shared/queries/automation/projectTags.queries';
+import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
 import {ProjectKeys, useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {ChevronDownIcon, CodeIcon, FolderIcon, LayoutTemplateIcon, UploadIcon} from 'lucide-react';
-import {useRef, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 import {toast} from 'sonner';
 
@@ -43,6 +47,7 @@ const Projects = () => {
     const navigate = useNavigate();
 
     const queryClient = useQueryClient();
+    const registerPostTurn = useCopilotPostTurnRegistry((state) => state.register);
 
     const importProjectMutation = useImportProjectMutation({
         onSuccess: () => {
@@ -99,58 +104,78 @@ const Projects = () => {
 
     const {data: taskDispatcherDefinitions} = useGetTaskDispatcherDefinitionsQuery();
 
+    // Refresh the project list and the workflows nested under it after a BUILD-mode copilot turn creates or
+    // updates either, so the page reflects the change without a manual reload.
+    useEffect(() => {
+        return registerPostTurn(Source.PROJECT, () => {
+            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
+            queryClient.invalidateQueries({queryKey: ProjectWorkflowKeys.workflows});
+        });
+    }, [queryClient, registerPostTurn]);
+
     return (
         <LayoutContainer
             header={
-                projects &&
-                projects.length > 0 && (
-                    <Header
-                        centerTitle={true}
-                        position="main"
-                        right={
-                            <ButtonGroup>
-                                <ProjectDialog
-                                    onSuccess={(projectId) => projectId && setNewlyCreatedProjectId(projectId)}
-                                    project={undefined}
-                                    triggerNode={
-                                        <Button
-                                            aria-label="Create Project"
-                                            onSelect={(event) => event.preventDefault()}
-                                        >
-                                            New Project
-                                        </Button>
-                                    }
-                                />
+                <Header
+                    centerTitle={true}
+                    position="main"
+                    right={
+                        ((projects && projects.length > 0) || !projectsIsLoading) && (
+                            <div className="flex items-center gap-1">
+                                <CopilotButton source={Source.PROJECT} />
 
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button>
-                                            <ChevronDownIcon />
-                                        </Button>
-                                    </DropdownMenuTrigger>
+                                {projects && projects.length > 0 && (
+                                    <ButtonGroup>
+                                        <ProjectDialog
+                                            onSuccess={(projectId) => projectId && setNewlyCreatedProjectId(projectId)}
+                                            project={undefined}
+                                            triggerNode={
+                                                <Button
+                                                    aria-label="Create Project"
+                                                    onSelect={(event) => event.preventDefault()}
+                                                >
+                                                    New Project
+                                                </Button>
+                                            }
+                                        />
 
-                                    <DropdownMenuContent align="end">
-                                        <DropdownMenuItem onClick={() => navigate(`templates`)}>
-                                            <LayoutTemplateIcon className="mr-2 size-4" />
-                                            From Template
-                                        </DropdownMenuItem>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button>
+                                                    <ChevronDownIcon />
+                                                </Button>
+                                            </DropdownMenuTrigger>
 
-                                        <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
-                                            <UploadIcon className="mr-2 size-4" />
-                                            Import Project
-                                        </DropdownMenuItem>
+                                            <DropdownMenuContent align="end">
+                                                <DropdownMenuItem onClick={() => navigate(`templates`)}>
+                                                    <LayoutTemplateIcon className="mr-2 size-4" />
+                                                    From Template
+                                                </DropdownMenuItem>
 
-                                        <DropdownMenuItem onClick={() => setShowNewCodeWorkflowDialog(true)}>
-                                            <CodeIcon className="mr-2 size-4" />
-                                            New Code Project
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            </ButtonGroup>
-                        }
-                        title={<ProjectsFilterTitle categories={categories} filterData={filterData} tags={tags} />}
-                    />
-                )
+                                                <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
+                                                    <UploadIcon className="mr-2 size-4" />
+                                                    Import Project
+                                                </DropdownMenuItem>
+
+                                                <DropdownMenuItem onClick={() => setShowNewCodeWorkflowDialog(true)}>
+                                                    <CodeIcon className="mr-2 size-4" />
+                                                    New Code Project
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </ButtonGroup>
+                                )}
+                            </div>
+                        )
+                    }
+                    title={
+                        projects && projects.length > 0 ? (
+                            <ProjectsFilterTitle categories={categories} filterData={filterData} tags={tags} />
+                        ) : (
+                            ''
+                        )
+                    }
+                />
             }
             leftSidebarBody={<ProjectsLeftSidebarNav categories={categories} filterData={filterData} tags={tags} />}
             leftSidebarHeader={<Header position="sidebar" title="Projects" />}

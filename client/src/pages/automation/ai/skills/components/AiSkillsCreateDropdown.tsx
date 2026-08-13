@@ -1,8 +1,10 @@
 import Button from '@/components/Button/Button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
-import AiSkillGenerateDialog from '@/pages/automation/ai/skills/components/AiSkillGenerateDialog';
 import AiSkillUploadDialog from '@/pages/automation/ai/skills/components/AiSkillUploadDialog';
 import AiSkillWriteDialog from '@/pages/automation/ai/skills/components/AiSkillWriteDialog';
+import useOpenCopilot from '@/shared/components/copilot/hooks/useOpenCopilot';
+import {MODE, Source} from '@/shared/components/copilot/stores/useCopilotStore';
+import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {ChevronDownIcon, PencilIcon, SparklesIcon, UploadIcon} from 'lucide-react';
 import {ReactNode, useState} from 'react';
@@ -13,13 +15,14 @@ interface AiSkillsCreateDropdownProps {
 }
 
 const AiSkillsCreateDropdown = ({trigger}: AiSkillsCreateDropdownProps = {}) => {
-    const [showGenerateDialog, setShowGenerateDialog] = useState(false);
     const [showUploadDialog, setShowUploadDialog] = useState(false);
     const [showWriteDialog, setShowWriteDialog] = useState(false);
 
     const ff_4554 = useFeatureFlagsStore()('ff-4554');
 
     const navigate = useNavigate();
+    const openCopilot = useOpenCopilot();
+    const copilotEnabled = useApplicationInfoStore((state) => state.ai.copilot.enabled);
 
     const handleCreated = (createdSkillId: string | null) => {
         if (createdSkillId) {
@@ -40,10 +43,17 @@ const AiSkillsCreateDropdown = ({trigger}: AiSkillsCreateDropdownProps = {}) => 
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent align="end" className="w-72">
-                    {ff_4554 && (
+                    {ff_4554 && copilotEnabled && (
                         <DropdownMenuItem
                             className="flex flex-col items-start gap-0.5 p-3"
-                            onClick={() => setShowGenerateDialog(true)}
+                            onClick={() =>
+                                openCopilot({
+                                    composerPlaceholder: 'Summarize my unread Gmail and send me a daily digest.',
+                                    mode: MODE.BUILD,
+                                    parameters: {intent: 'create_skill'},
+                                    source: Source.SKILLS,
+                                })
+                            }
                         >
                             <div className="flex items-center gap-2 font-medium">
                                 <SparklesIcon className="size-4" />
@@ -85,12 +95,6 @@ const AiSkillsCreateDropdown = ({trigger}: AiSkillsCreateDropdownProps = {}) => 
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
-
-            <AiSkillGenerateDialog
-                onCreated={handleCreated}
-                onOpenChange={setShowGenerateDialog}
-                open={showGenerateDialog}
-            />
 
             <AiSkillUploadDialog onCreated={handleCreated} onOpenChange={setShowUploadDialog} open={showUploadDialog} />
 

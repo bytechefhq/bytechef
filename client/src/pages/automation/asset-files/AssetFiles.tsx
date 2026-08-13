@@ -18,6 +18,9 @@ import {useAssetFileUpload} from '@/pages/automation/asset-files/hooks/useAssetF
 import {useAssetFilesStore} from '@/pages/automation/asset-files/stores/useAssetFilesStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
+import CopilotButton from '@/shared/components/copilot/CopilotButton';
+import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
+import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
 import {useOnEnvironmentChange} from '@/shared/hooks/useOnEnvironmentChange';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -51,6 +54,7 @@ const AssetFiles = () => {
     const searchQuery = useAssetFilesStore((state) => state.searchQuery);
     const setSearchQuery = useAssetFilesStore((state) => state.setSearchQuery);
     const setSelectedFileId = useAssetFilesStore((state) => state.setSelectedFileId);
+    const registerPostTurn = useCopilotPostTurnRegistry((state) => state.register);
 
     /*
      * Deep-link: when the route is `/automation/asset-files/:fileId`, pre-select that file so the
@@ -293,8 +297,10 @@ const AssetFiles = () => {
     // its own Upload button, and a Search input over an empty list reads as broken UX. EnvironmentSelect
     // stays visible regardless so the user can still flip envs from an empty workspace.
     const toolbarRight = (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
             <EnvironmentSelect />
+
+            <CopilotButton source={Source.ASSET_FILE} />
 
             {!showCenteredEmpty && (
                 <>
@@ -360,6 +366,30 @@ const AssetFiles = () => {
             />
         </>
     );
+
+    /*
+     * Refresh the file list after a BUILD-mode copilot turn creates, downloads, or edits a file, so the
+     * page reflects it without a manual reload. Prefix-only key: the listing query is keyed by
+     * {environment, mimeTypePrefix, tagIds, workspaceId}, and a copilot turn can change any of those
+     * dimensions, so invalidating the bare prefix is the correct breadth here.
+     *
+     * Also invalidate the detail-sheet queries (GetAssetFile, GetAssetFileTextContent,
+     * GetAssetFileVersions): updateAssetFileContent is a BUILD-mode tool that rewrites a file's content
+     * and appends a version row, and if the detail sheet for that file happens to be open, its three
+     * id-keyed queries would otherwise keep showing stale content and a version list missing the new
+     * entry until the user closes and reopens it. Bare prefix here too, for the same reason as the
+     * listing — the turn can touch a file other than the one currently open, and invalidating an
+     * unmounted detail query costs nothing. Deliberately NOT invalidating GetAssetFileTags: none of the
+     * seven asset-file tools creates, renames, deletes, or reassigns a tag.
+     */
+    useEffect(() => {
+        return registerPostTurn(Source.ASSET_FILE, () => {
+            void queryClient.invalidateQueries({queryKey: ['GetAssetFiles']});
+            void queryClient.invalidateQueries({queryKey: ['GetAssetFile']});
+            void queryClient.invalidateQueries({queryKey: ['GetAssetFileTextContent']});
+            void queryClient.invalidateQueries({queryKey: ['GetAssetFileVersions']});
+        });
+    }, [queryClient, registerPostTurn]);
 
     return (
         <LayoutContainer
