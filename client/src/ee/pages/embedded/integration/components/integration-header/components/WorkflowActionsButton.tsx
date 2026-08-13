@@ -23,7 +23,7 @@ const WorkflowActionsButton = ({
 }: IntegrationHeaderWorkflowActionsButtonProps) => (
     <Tooltip>
         <TooltipTrigger asChild>
-            <div className="mx-2 flex items-center">
+            <div className="flex items-center">
                 {/* A code workflow's Save joins this group, mirroring the workflow JSON editor's save+run pair. */}
 
                 {leadingAction && !workflowIsRunning ? (

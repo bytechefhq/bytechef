@@ -307,7 +307,7 @@ const AutomationWorkflowEditorHeader = ({
                 />
             </div>
 
-            <div className="flex items-center">
+            <div className="flex items-center gap-1">
                 <LoadingIndicator isFetching={isFetching} isOnline={isOnline} />
 
                 <AutomationWorkflowEditorSettingsMenu

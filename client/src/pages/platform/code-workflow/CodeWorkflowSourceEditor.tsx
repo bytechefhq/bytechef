@@ -52,7 +52,7 @@ const CodeWorkflowSourceEditorHeader = ({
         position="main"
         right={
             // pr-12 keeps the buttons clear of the workflow editor's right sidebar, which overlays this row.
-            <div className="flex items-center gap-2 pr-12">
+            <div className="flex items-center gap-1 pr-12">
                 {onTestConfigurationClick && (
                     <Tooltip>
                         <TooltipTrigger asChild>

@@ -104,7 +104,7 @@ const IntegrationHeader = ({
                 )}
             </div>
 
-            <div className="flex items-center">
+            <div className="flex items-center gap-1">
                 {integration?.codeWorkflow && <CodeWorkflowHeaderActions />}
 
                 <LoadingIndicator isFetching={isFetching} isOnline={isOnline} />

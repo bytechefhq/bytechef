@@ -3,6 +3,7 @@ import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import AddContextSourceDialog from '@/pages/automation/context-store/components/AddContextSourceDialog';
+import ContextStoreFormDialog from '@/pages/automation/context-store/components/ContextStoreFormDialog';
 import ContextStoreLeftSidebarNav from '@/pages/automation/context-store/components/ContextStoreLeftSidebarNav';
 import ContextStoreSourceDetailDialog from '@/pages/automation/context-store/components/ContextStoreSourceDetailDialog';
 import ContextStoreSourceEnabledToggle from '@/pages/automation/context-store/components/ContextStoreSourceEnabledToggle';
@@ -23,7 +24,7 @@ import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {formatDistanceToNow} from 'date-fns';
-import {BoxesIcon, SparklesIcon} from 'lucide-react';
+import {BoxesIcon, PlusIcon, SparklesIcon} from 'lucide-react';
 import {useEffect, useMemo, useRef, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 
@@ -146,8 +147,29 @@ const ContextStoreSources = () => {
                     title={storeName}
                 />
             }
-            leftSidebarBody={<ContextStoreLeftSidebarNav />}
-            leftSidebarHeader={<Header position="sidebar" title="Context Store" />}
+            leftSidebarBody={<ContextStoreLeftSidebarNav isAdmin={isAdmin} />}
+            leftSidebarHeader={
+                // The + beside the sidebar title, matching the data tables, knowledge base, skills and agent
+                // detail sidebars — creating one from here needs no trip back to the list.
+                <Header
+                    position="sidebar"
+                    right={
+                        isAdmin ? (
+                            <ContextStoreFormDialog
+                                trigger={
+                                    <Button
+                                        aria-label="New context store"
+                                        icon={<PlusIcon />}
+                                        size="icon"
+                                        variant="ghost"
+                                    />
+                                }
+                            />
+                        ) : undefined
+                    }
+                    title="Context Store"
+                />
+            }
             leftSidebarWidth="64"
         >
             <PageLoader errors={[error]} loading={isLoading}>
@@ -173,7 +195,7 @@ const ContextStoreSources = () => {
                             <TableBody>
                                 {storeSources.map((source) => (
                                     <TableRow
-                                        className="cursor-pointer"
+                                        className="cursor-pointer [&>td]:py-4"
                                         data-testid={`context-store-source-row-${source.id}`}
                                         key={source.id}
                                         onClick={() => setSelectedSourceId(String(source.id))}

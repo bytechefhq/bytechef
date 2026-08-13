@@ -74,7 +74,7 @@ const WorkflowBuilderHeader = ({
                 <Badge label={`V${(workflowVersion ?? 0) + 1} DRAFT`} styleType="outline-outline" weight="semibold" />
             </div>
 
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center gap-1">
                 <LoadingIndicator isFetching={isFetching} isOnline={isOnline} />
 
                 <Button

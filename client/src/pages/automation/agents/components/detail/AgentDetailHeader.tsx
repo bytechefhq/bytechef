@@ -1,0 +1,286 @@
+import Badge from '@/components/Badge/Badge';
+import Button from '@/components/Button/Button';
+import {ButtonGroup} from '@/components/ui/button-group';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import AgentDialog from '@/pages/automation/agents/components/AgentDialog';
+import exportAgent from '@/pages/automation/agents/utils/agentImportExport';
+import invalidateAgentQueries from '@/pages/automation/agents/utils/invalidateAgentQueries';
+import ProjectDeploymentDialog from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialog';
+import ProjectVersionHistorySheet from '@/pages/automation/project/components/ProjectVersionHistorySheet';
+import LeftSidebarButton from '@/pages/automation/project/components/project-header/components/LeftSidebarButton';
+import PublishPopover from '@/pages/automation/project/components/project-header/components/PublishPopover';
+import Header from '@/shared/layout/Header';
+import {ProjectDeployment, ProjectStatus} from '@/shared/middleware/automation/configuration';
+import {
+    useAiAgentVersionsQuery,
+    useDeleteAiAgentMutation,
+    usePublishAiAgentMutation,
+} from '@/shared/middleware/graphql';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
+import {useQueryClient} from '@tanstack/react-query';
+import {
+    DownloadIcon,
+    EllipsisVerticalIcon,
+    HistoryIcon,
+    PencilIcon,
+    PlayIcon,
+    RocketIcon,
+    SparklesIcon,
+    Trash2Icon,
+} from 'lucide-react';
+import {useMemo, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {toast} from 'sonner';
+
+interface AgentDetailHeaderProps {
+    description?: string | null;
+    id: string;
+    lastPublishedVersion: number;
+    onAskCopilot?: () => void;
+    onToggleLeftSidebar: () => void;
+    onToggleTestPanel: () => void;
+    projectId: string;
+    testPanelOpen: boolean;
+    title: string;
+}
+
+const AgentDetailHeader = ({
+    description,
+    id,
+    lastPublishedVersion,
+    onAskCopilot,
+    onToggleLeftSidebar,
+    onToggleTestPanel,
+    projectId,
+    testPanelOpen,
+    title,
+}: AgentDetailHeaderProps) => {
+    const [showDeployDialog, setShowDeployDialog] = useState(false);
+    const [showEditDialog, setShowEditDialog] = useState(false);
+    const [showVersionHistorySheet, setShowVersionHistorySheet] = useState(false);
+
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+
+    const navigate = useNavigate();
+    const queryClient = useQueryClient();
+
+    // Only fetched once the sheet is opened: the history is a rarely-used view, and every publish invalidates it
+    // through invalidateAgentQueries anyway.
+    const {data: agentVersionsData} = useAiAgentVersionsQuery({id}, {enabled: showVersionHistorySheet});
+
+    const publishAgentMutation = usePublishAiAgentMutation({
+        onError: (error) => {
+            toast.error(error instanceof Error ? error.message : 'Failed to publish the agent.');
+        },
+        onSuccess: () => {
+            invalidateAgentQueries(queryClient);
+
+            toast.success('Agent published.');
+        },
+    });
+
+    const deleteAgentMutation = useDeleteAiAgentMutation({
+        onError: (error) => {
+            toast.error(error instanceof Error ? error.message : 'Failed to delete the agent.');
+        },
+        onSuccess: () => {
+            invalidateAgentQueries(queryClient);
+
+            // The page being viewed is gone, so returning to the list is the only sensible destination.
+            navigate('/automation/agents');
+        },
+    });
+
+    // Mirrors the project header's V{n} {STATUS} pill. An agent carries `lastPublishedVersion` plus an
+    // `unpublishedChanges` flag rather than a status column, so the draft version is the next one up —
+    // and a never-published agent is V1 DRAFT, not V0.
+    const isDraft = lastPublishedVersion === 0;
+    const displayVersion = isDraft ? 1 : lastPublishedVersion;
+
+    // Only a published version has a workflow a ProjectDeployment can reference.
+    const deployable = lastPublishedVersion > 0;
+
+    const handlePublishSubmit = ({description, onSuccess}: {description?: string; onSuccess: () => void}) => {
+        publishAgentMutation.mutate({description, id}, {onSuccess});
+    };
+
+    const handleExportClick = async () => {
+        try {
+            await exportAgent(id, title);
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : 'Failed to export the agent.');
+        }
+    };
+
+    // The sheet is the project one: an agent version IS a ProjectVersion of the hidden backing project, so the
+    // GraphQL rows are mapped into that shape rather than the sheet being duplicated for a second date format.
+    const agentVersions = useMemo(
+        () =>
+            (agentVersionsData?.aiAgentVersions ?? []).map((agentVersion) => ({
+                description: agentVersion.description ?? undefined,
+                publishedDate: agentVersion.publishedDate ? new Date(agentVersion.publishedDate) : undefined,
+                status: agentVersion.status === 'PUBLISHED' ? ProjectStatus.Published : ProjectStatus.Draft,
+                version: agentVersion.version,
+            })),
+        [agentVersionsData?.aiAgentVersions]
+    );
+
+    return (
+        <>
+            <Header
+                centerTitle
+                description={description || undefined}
+                position="main"
+                right={
+                    <div className="flex items-center gap-1">
+                        {/* The test panel starts closed and shares the right rail with the copilot, so the
+                            two never compete for it — and opening the copilot no longer has to tear a
+                            mounted panel out from under the layout.
+
+                            The icon avoids two collisions. Not a flask — the simple editor's header uses
+                            FlaskConicalIcon for the evals panel, which is a different thing. And not a bot —
+                            the sidebar and every agent row already use one to mean "an agent", so a bot here
+                            read as another agent rather than as an action. A play icon matches the panel's own
+                            "Test Agent" button. */}
+
+                        {/* A labelled Test button, the same shape the project header's own run control has —
+                            testing an agent is its primary action, not an icon-sized afterthought. */}
+
+                        <Button
+                            aria-label={testPanelOpen ? 'Hide Test Agent panel' : 'Test Agent'}
+                            icon={<PlayIcon />}
+                            label="Test"
+                            onClick={onToggleTestPanel}
+                            variant={testPanelOpen ? 'secondary' : 'default'}
+                        />
+
+                        {/* Publish and Deploy as one segmented group of outline buttons beside the primary Test
+                            button, the same arrangement and hierarchy the project header uses. Publish takes a
+                            description through the project's own popover, which is what fills the version history
+                            the button beside it opens. */}
+
+                        <ButtonGroup>
+                            <PublishPopover
+                                isPending={publishAgentMutation.isPending}
+                                onPublishProjectSubmit={handlePublishSubmit}
+                                title="Publish Agent"
+                                tooltip="Publish the agent"
+                            />
+
+                            <Button
+                                disabled={!deployable}
+                                icon={<RocketIcon />}
+                                label="Deploy"
+                                onClick={() => setShowDeployDialog(true)}
+                                variant="outline"
+                            />
+                        </ButtonGroup>
+
+                        {onAskCopilot && (
+                            <Button
+                                aria-label="Ask Copilot"
+                                icon={<SparklesIcon className="size-4" />}
+                                onClick={onAskCopilot}
+                                size="icon"
+                                variant="ghost"
+                            />
+                        )}
+
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button
+                                    aria-label="Agent menu"
+                                    icon={<EllipsisVerticalIcon />}
+                                    size="icon"
+                                    variant="ghost"
+                                />
+                            </DropdownMenuTrigger>
+
+                            <DropdownMenuContent align="end">
+                                {/* In the menu rather than as a header button of its own, the way the project
+                                    header keeps Project History in its settings menu. */}
+
+                                <DropdownMenuItem onClick={() => setShowVersionHistorySheet(true)}>
+                                    <HistoryIcon /> Agent History
+                                </DropdownMenuItem>
+
+                                <DropdownMenuItem onClick={() => setShowEditDialog(true)}>
+                                    <PencilIcon /> Edit
+                                </DropdownMenuItem>
+
+                                <DropdownMenuItem onClick={handleExportClick}>
+                                    <DownloadIcon /> Export
+                                </DropdownMenuItem>
+
+                                <DropdownMenuSeparator />
+
+                                <DropdownMenuItem
+                                    disabled={deleteAgentMutation.isPending}
+                                    onClick={() => deleteAgentMutation.mutate({id})}
+                                    variant="destructive"
+                                >
+                                    <Trash2Icon /> Delete
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+                }
+                title={
+                    // The sidebar lists every agent, so toggling it is both the way back to the others and
+                    // a way to reclaim the width — the arrow only did the first, and less directly.
+                    <div className="flex items-center space-x-2">
+                        <LeftSidebarButton onLeftSidebarOpenClick={onToggleLeftSidebar} tooltip="See agents" />
+
+                        <span>{title}</span>
+
+                        <Badge
+                            className="flex space-x-1 bg-surface-neutral-primary"
+                            styleType={isDraft ? 'outline-outline' : 'success-outline'}
+                            weight="semibold"
+                        >
+                            <span>V{displayVersion}</span>
+
+                            <span>{isDraft ? 'DRAFT' : 'PUBLISHED'}</span>
+                        </Badge>
+                    </div>
+                }
+            />
+
+            {showDeployDialog && (
+                <ProjectDeploymentDialog
+                    onClose={() => setShowDeployDialog(false)}
+                    projectDeployment={
+                        {
+                            environmentId: currentEnvironmentId,
+                            projectId: +projectId,
+                            projectVersion: lastPublishedVersion,
+                        } as ProjectDeployment
+                    }
+                    redirectOnSubmit={false}
+                />
+            )}
+
+            {/* Controlled: the menu item that opens it unmounts on select, so the dialog cannot hang off a
+                trigger inside the menu. */}
+
+            <AgentDialog agent={{description, id, title}} onOpenChange={setShowEditDialog} open={showEditDialog} />
+
+            {showVersionHistorySheet && (
+                <ProjectVersionHistorySheet
+                    onSheetOpenChange={setShowVersionHistorySheet}
+                    projectVersions={agentVersions}
+                    sheetOpen={showVersionHistorySheet}
+                    title="Agent History"
+                />
+            )}
+        </>
+    );
+};
+
+export default AgentDetailHeader;

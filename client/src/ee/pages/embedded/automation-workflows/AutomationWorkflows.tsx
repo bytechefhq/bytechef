@@ -304,7 +304,7 @@ const AutomationWorkflows = () => {
                         centerTitle={true}
                         position="main"
                         right={
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1">
                                 <Button
                                     aria-label="Deploy Code Workflow"
                                     icon={<UploadIcon />}

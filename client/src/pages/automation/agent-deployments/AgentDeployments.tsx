@@ -1,18 +1,21 @@
 import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import AgentDeploymentListItem from '@/pages/automation/agent-deployments/components/AgentDeploymentListItem';
+import AgentDeploymentsLeftSidebarNav from '@/pages/automation/agent-deployments/components/AgentDeploymentsLeftSidebarNav';
 import useAgentDeployments from '@/pages/automation/agent-deployments/hooks/useAgentDeployments';
+import AgentsFilterTitle from '@/pages/automation/agents/components/AgentsFilterTitle';
 import useAgents from '@/pages/automation/agents/hooks/useAgents';
 import ProjectDeploymentDialog from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialog';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
 import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {ProjectDeployment} from '@/shared/middleware/automation/configuration';
-import {AiAgent} from '@/shared/middleware/graphql';
+import {AiAgent, useAiAgentDeploymentTagsQuery} from '@/shared/middleware/graphql';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
@@ -20,45 +23,13 @@ import {BotMessageSquareIcon, SparklesIcon} from 'lucide-react';
 import {useEffect, useMemo, useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 
-interface NewAgentDeploymentControlProps {
-    onDeployClick: () => void;
-    onSelectedAgentIdChange: (agentId: string) => void;
-    publishedAgents: AiAgent[];
-    selectedAgentId?: string;
-}
-
-const NewAgentDeploymentControl = ({
-    onDeployClick,
-    onSelectedAgentIdChange,
-    publishedAgents,
-    selectedAgentId,
-}: NewAgentDeploymentControlProps) => (
-    <div className="flex items-center gap-2">
-        <Select onValueChange={onSelectedAgentIdChange} value={selectedAgentId}>
-            <SelectTrigger aria-label="Select an agent to deploy" className="w-56">
-                <SelectValue placeholder="Select an agent" />
-            </SelectTrigger>
-
-            <SelectContent>
-                {publishedAgents.map((agent) => (
-                    <SelectItem key={agent.id} value={agent.id}>
-                        {agent.title}
-                    </SelectItem>
-                ))}
-            </SelectContent>
-        </Select>
-
-        <Button disabled={!selectedAgentId} label="New Deployment" onClick={onDeployClick} />
-    </div>
-);
-
 const AgentDeployments = () => {
-    const [selectedAgentId, setSelectedAgentId] = useState<string | undefined>();
     const [showCreateDialog, setShowCreateDialog] = useState(false);
 
     const copilotEnabled = useApplicationInfoStore((state) => state.ai.copilot.enabled);
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const setContext = useCopilotStore((state) => state.setContext);
     const setCopilotPanelOpen = useCopilotPanelStore((state) => state.setCopilotPanelOpen);
@@ -69,6 +40,7 @@ const AgentDeployments = () => {
     const [searchParams] = useSearchParams();
 
     const agentIdFilter = searchParams.get('agentId');
+    const tagIdFilter = searchParams.get('tagId');
 
     const {agentDeployments, agentDeploymentsError, agentDeploymentsIsLoading} = useAgentDeployments();
     const {agents, agentsError, agentsIsLoading} = useAgents();
@@ -80,21 +52,63 @@ const AgentDeployments = () => {
         [agents]
     );
 
-    const filteredDeployments = useMemo(
-        () =>
-            agentIdFilter
-                ? agentDeployments.filter((deployment) => deployment.agentId === agentIdFilter)
-                : agentDeployments,
-        [agentDeployments, agentIdFilter]
+    // A deployment is filtered by its OWN tags. It used to resolve the tag through the owning agent's tags,
+    // which no longer matches what the row shows or what the sidebar lists.
+    const filteredDeployments = useMemo(() => {
+        if (agentIdFilter) {
+            return agentDeployments.filter((deployment) => deployment.agentId === agentIdFilter);
+        }
+
+        if (tagIdFilter) {
+            return agentDeployments.filter((deployment) =>
+                (deployment.tags ?? []).some((tag) => tag?.id === tagIdFilter)
+            );
+        }
+
+        return agentDeployments;
+    }, [agentDeployments, agentIdFilter, tagIdFilter]);
+
+    // Fetched once for the whole list rather than per row, the way ApiCollectionList feeds its own items: each
+    // row filters out what it already carries.
+    const {data: deploymentTagsData} = useAiAgentDeploymentTagsQuery(
+        {workspaceId: String(currentWorkspaceId)},
+        {enabled: currentWorkspaceId != null}
+    );
+
+    const remainingTags = useMemo(
+        () => (deploymentTagsData?.aiAgentDeploymentTags ?? []).map((tag) => ({id: Number(tag.id), name: tag.name})),
+        [deploymentTagsData?.aiAgentDeploymentTags]
     );
 
     const filterAgentTitle = agentIdFilter ? agents.find((agent) => agent.id === agentIdFilter)?.title : undefined;
 
-    const selectedAgent = publishedAgents.find((agent) => agent.id === selectedAgentId);
+    // The sidebar filters deployments by agent OR by tag, exactly as the agents list does, so it reuses that
+    // page's filter title rather than a second component that would drift from it.
+    const filterTagName = tagIdFilter
+        ? agentDeployments.flatMap((deployment) => deployment.tags ?? []).find((tag) => tag?.id === tagIdFilter)?.name
+        : undefined;
+
+    // The dialog picks the agent itself, so the page only needs the deployable set. An agent deployment is
+    // a ProjectDeployment of the agent's hidden backing project, hence projectId + lastPublishedVersion.
+    const agentOptions = useMemo(
+        () =>
+            publishedAgents.map((agent) => ({
+                id: agent.id,
+                lastPublishedVersion: agent.lastPublishedVersion,
+                projectId: agent.projectId,
+                title: agent.title,
+            })),
+        [publishedAgents]
+    );
 
     const handleCreateDialogClose = () => {
         setShowCreateDialog(false);
-        setSelectedAgentId(undefined);
+    };
+
+    // The dialog invalidates the REST projectDeployments keys it owns; this list is the aiAgentDeployments
+    // GraphQL query, which those keys do not reach, so a new deployment would not appear until a reload.
+    const handleCreateDialogSuccess = () => {
+        queryClient.invalidateQueries({queryKey: ['aiAgentDeployments']});
     };
 
     // The agentId filter is the only page state worth carrying: it tells the copilot which agent's
@@ -125,7 +139,9 @@ const AgentDeployments = () => {
                     centerTitle={true}
                     position="main"
                     right={
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1">
+                            <EnvironmentSelect />
+
                             {copilotEnabled && (
                                 <Button
                                     aria-label="Ask Copilot"
@@ -137,23 +153,21 @@ const AgentDeployments = () => {
                             )}
 
                             {filteredDeployments.length > 0 && publishedAgents.length > 0 && (
-                                <NewAgentDeploymentControl
-                                    onDeployClick={() => setShowCreateDialog(true)}
-                                    onSelectedAgentIdChange={setSelectedAgentId}
-                                    publishedAgents={publishedAgents}
-                                    selectedAgentId={selectedAgentId}
-                                />
+                                <Button label="New Deployment" onClick={() => setShowCreateDialog(true)} />
                             )}
                         </div>
                     }
                     title={
-                        filteredDeployments.length > 0
-                            ? filterAgentTitle
-                                ? `Agent Deployments — ${filterAgentTitle}`
-                                : 'Agent Deployments'
-                            : ''
+                        filteredDeployments.length > 0 ? (
+                            <AgentsFilterTitle agentName={filterAgentTitle} tagName={filterTagName} />
+                        ) : (
+                            ''
+                        )
                     }
                 />
+            }
+            leftSidebarBody={
+                <AgentDeploymentsLeftSidebarNav currentAgentId={agentIdFilter} currentTagId={tagIdFilter} />
             }
             leftSidebarHeader={<Header position="sidebar" title="Agent Deployments" />}
             leftSidebarWidth="64"
@@ -163,21 +177,20 @@ const AgentDeployments = () => {
                 loading={agentDeploymentsIsLoading || agentsIsLoading}
             >
                 {filteredDeployments.length > 0 ? (
-                    <div className="w-full px-4 py-4 3xl:mx-auto 3xl:w-4/5">
+                    <div className="w-full px-4 3xl:mx-auto 3xl:w-4/5">
                         {filteredDeployments.map((deployment) => (
-                            <AgentDeploymentListItem deployment={deployment} key={deployment.id} />
+                            <AgentDeploymentListItem
+                                deployment={deployment}
+                                key={deployment.id}
+                                remainingTags={remainingTags}
+                            />
                         ))}
                     </div>
                 ) : (
                     <EmptyList
                         button={
                             publishedAgents.length > 0 ? (
-                                <NewAgentDeploymentControl
-                                    onDeployClick={() => setShowCreateDialog(true)}
-                                    onSelectedAgentIdChange={setSelectedAgentId}
-                                    publishedAgents={publishedAgents}
-                                    selectedAgentId={selectedAgentId}
-                                />
+                                <Button label="New Deployment" onClick={() => setShowCreateDialog(true)} />
                             ) : undefined
                         }
                         icon={<BotMessageSquareIcon className="size-24 text-stroke-neutral-tertiary" />}
@@ -191,16 +204,12 @@ const AgentDeployments = () => {
                 )}
             </PageLoader>
 
-            {showCreateDialog && selectedAgent && (
+            {showCreateDialog && (
                 <ProjectDeploymentDialog
+                    agentOptions={agentOptions}
                     onClose={handleCreateDialogClose}
-                    projectDeployment={
-                        {
-                            environmentId: currentEnvironmentId,
-                            projectId: +selectedAgent.projectId,
-                            projectVersion: selectedAgent.lastPublishedVersion,
-                        } as ProjectDeployment
-                    }
+                    onSuccess={handleCreateDialogSuccess}
+                    projectDeployment={{environmentId: currentEnvironmentId} as ProjectDeployment}
                     redirectOnSubmit={false}
                 />
             )}

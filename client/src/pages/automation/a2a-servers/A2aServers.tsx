@@ -21,7 +21,7 @@ const A2aServers = () => {
                     centerTitle={true}
                     position="main"
                     right={
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-1">
                             <EnvironmentSelect />
 
                             {a2aServers.length > 0 && (

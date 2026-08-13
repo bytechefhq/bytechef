@@ -1,29 +1,22 @@
-import Button from '@/components/Button/Button';
+import LeftSidebarButton from '@/pages/automation/project/components/project-header/components/LeftSidebarButton';
 import Header from '@/shared/layout/Header';
-import {ArrowLeftIcon} from 'lucide-react';
 import {ReactNode} from 'react';
 
 interface KnowledgeBaseHeaderProps {
     knowledgeBaseName: string | undefined;
-    onBackClick: () => void;
+    onToggleLeftSidebar: () => void;
     right?: ReactNode;
 }
 
-const KnowledgeBaseHeader = ({knowledgeBaseName, onBackClick, right}: KnowledgeBaseHeaderProps) => {
+const KnowledgeBaseHeader = ({knowledgeBaseName, onToggleLeftSidebar, right}: KnowledgeBaseHeaderProps) => {
     return (
         <Header
             centerTitle
             position="main"
             right={right}
             title={
-                <div className="flex items-center space-x-2">
-                    <Button
-                        aria-label="Back"
-                        icon={<ArrowLeftIcon className="size-5" />}
-                        onClick={onBackClick}
-                        size="icon"
-                        variant="ghost"
-                    />
+                <div className="flex items-center gap-1">
+                    <LeftSidebarButton onLeftSidebarOpenClick={onToggleLeftSidebar} tooltip="See knowledge bases" />
 
                     <span>{knowledgeBaseName || 'Loading...'}</span>
                 </div>

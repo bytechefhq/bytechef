@@ -20,7 +20,19 @@ const Header = ({
     title,
     titleClassName,
 }: HeaderProps) => (
-    <header className={twMerge('px-4 py-3', centerTitle ? '3xl:mx-auto 3xl:w-4/5' : '3xl:w-4/5', className)}>
+    // The 3xl width cap matches the main content's `3xl:mx-auto 3xl:w-4/5` containers, so it belongs to the
+    // main header only. Inside a fixed-width sidebar it shrinks the header to 80% of the rail and pulls any
+    // right-aligned action away from the edge the search box and rows below still reach.
+    <header
+        className={twMerge(
+            'py-3',
+            // px-3 in a sidebar so the title lines up with the rows beneath it; the main header keeps px-4,
+            // where there is nothing below to align to.
+            position === 'sidebar' ? 'px-3' : 'px-4',
+            position === 'main' && (centerTitle ? '3xl:mx-auto 3xl:w-4/5' : '3xl:w-4/5'),
+            className
+        )}
+    >
         <div className="flex w-full items-center justify-between">
             <div className="flex flex-col">
                 <div

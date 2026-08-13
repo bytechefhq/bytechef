@@ -65,7 +65,7 @@ const CustomComponentDetailHeader = ({
         position="main"
         right={
             showSaveButton && (
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1">
                     <Button disabled={isSaveDisabled} label={isSaving ? 'Saving...' : 'Save'} onClick={onSave} />
 
                     <Button

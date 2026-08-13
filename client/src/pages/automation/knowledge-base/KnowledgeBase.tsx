@@ -6,6 +6,8 @@ import KnowledgeBaseInfoCard from '@/pages/automation/knowledge-base/components/
 import KnowledgeBaseLeftSidebarNav from '@/pages/automation/knowledge-base/components/KnowledgeBaseLeftSidebarNav';
 import KnowledgeBaseTabs from '@/pages/automation/knowledge-base/components/KnowledgeBaseTabs';
 import useKnowledgeBase from '@/pages/automation/knowledge-base/hooks/useKnowledgeBase';
+import CreateKnowledgeBaseDialog from '@/pages/automation/knowledge-bases/components/CreateKnowledgeBaseDialog';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
 import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
@@ -13,13 +15,17 @@ import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useQueryClient} from '@tanstack/react-query';
-import {SparklesIcon} from 'lucide-react';
-import {useEffect} from 'react';
+import {PlusIcon, SparklesIcon} from 'lucide-react';
+import {useEffect, useState} from 'react';
 
 const KnowledgeBase = () => {
-    const {documents, error, handleBackClick, isLoading, knowledgeBase, knowledgeBaseId} = useKnowledgeBase();
+    const [leftSidebarOpen, setLeftSidebarOpen] = useState(true);
+
+    const {documents, error, isLoading, knowledgeBase, knowledgeBaseId} = useKnowledgeBase();
 
     const copilotEnabled = useApplicationInfoStore((state) => state.ai.copilot.enabled);
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+    const workspaceId = currentWorkspaceId == null ? undefined : String(currentWorkspaceId);
 
     const setContext = useCopilotStore((state) => state.setContext);
     const setCopilotPanelOpen = useCopilotPanelStore((state) => state.setCopilotPanelOpen);
@@ -51,7 +57,7 @@ const KnowledgeBase = () => {
             header={
                 <KnowledgeBaseHeader
                     knowledgeBaseName={knowledgeBase?.name}
-                    onBackClick={handleBackClick}
+                    onToggleLeftSidebar={() => setLeftSidebarOpen((open) => !open)}
                     right={
                         <div className="flex items-center gap-1">
                             {copilotEnabled && (
@@ -70,7 +76,30 @@ const KnowledgeBase = () => {
                 />
             }
             leftSidebarBody={<KnowledgeBaseLeftSidebarNav />}
-            leftSidebarHeader={<Header position="sidebar" title="Knowledge Base" />}
+            leftSidebarHeader={
+                // The + beside the sidebar title, matching the data tables, skills and agent detail
+                // sidebars — creating one from here needs no trip back to the list.
+                <Header
+                    position="sidebar"
+                    right={
+                        workspaceId ? (
+                            <CreateKnowledgeBaseDialog
+                                trigger={
+                                    <Button
+                                        aria-label="New knowledge base"
+                                        icon={<PlusIcon />}
+                                        size="icon"
+                                        variant="ghost"
+                                    />
+                                }
+                                workspaceId={workspaceId}
+                            />
+                        ) : undefined
+                    }
+                    title="Knowledge Base"
+                />
+            }
+            leftSidebarOpen={leftSidebarOpen}
             leftSidebarWidth="64"
         >
             <PageLoader errors={[error]} loading={isLoading}>
