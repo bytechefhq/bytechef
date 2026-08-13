@@ -309,7 +309,7 @@ const McpIntegrationInstanceConfigurationWorkflowDialog = ({
                                 name="selectedWorkflowIds"
                                 render={({field}) => (
                                     <FormItem>
-                                        <FormLabel>Select Workflows</FormLabel>
+                                        <FormLabel>Workflows</FormLabel>
 
                                         <div className="space-y-2">
                                             {eligibleWorkflows.map((integrationWorkflow) => (

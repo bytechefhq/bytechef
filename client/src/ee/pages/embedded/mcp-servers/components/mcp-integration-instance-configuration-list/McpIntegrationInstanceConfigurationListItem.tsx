@@ -88,7 +88,10 @@ const McpIntegrationInstanceConfigurationListItem = ({
                     )}
 
                     <Tooltip>
-                        <TooltipTrigger className="flex items-center text-sm text-content-neutral-secondary">
+                        {/* Same fixed width as the component rows so the version badges line up down the whole list --
+                            these project rows sit in the same column but are a different component. */}
+
+                        <TooltipTrigger className="flex w-52 shrink-0 items-center justify-end text-sm text-content-neutral-secondary tabular-nums">
                             {mcpIntegrationInstanceConfiguration.lastModifiedDate ? (
                                 <span className="text-xs">
                                     {`Modified at ${new Date(mcpIntegrationInstanceConfiguration.lastModifiedDate).toLocaleDateString()} ${new Date(mcpIntegrationInstanceConfiguration.lastModifiedDate).toLocaleTimeString()}`}

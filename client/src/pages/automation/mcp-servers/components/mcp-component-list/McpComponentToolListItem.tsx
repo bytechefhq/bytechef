@@ -93,12 +93,12 @@ const McpComponentToolListItem = ({
 
                         <Button
                             aria-label="Delete"
-                            className="rounded p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                            className="rounded p-1"
                             icon={<Trash2Icon className="size-4" />}
                             onClick={() => setShowDeleteDialog(true)}
                             size="iconSm"
                             title="Delete"
-                            variant="ghost"
+                            variant="destructiveGhost"
                         />
                     </div>
                 </div>

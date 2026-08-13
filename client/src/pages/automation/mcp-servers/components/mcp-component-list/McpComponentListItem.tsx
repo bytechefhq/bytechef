@@ -59,8 +59,13 @@ const McpComponentListItem = ({mcpComponent, mcpServer}: {mcpComponent: McpCompo
                     <TooltipContent>Component Version</TooltipContent>
                 </Tooltip>
 
+                {/* Fixed width, right-aligned: the date is the only variable-width element to the right of the
+                    version badge, so without this a single-digit hour ("5:53:18 AM" vs "12:07:49 AM") shifts the
+                    badge of that row out of line with its neighbours. tabular-nums keeps the digits themselves
+                    from wobbling as the clock ticks. */}
+
                 <Tooltip>
-                    <TooltipTrigger className="flex items-center text-xs text-content-neutral-secondary">
+                    <TooltipTrigger className="flex w-52 shrink-0 items-center justify-end text-xs text-content-neutral-secondary tabular-nums">
                         {mcpComponent.lastModifiedDate
                             ? `Modified at ${new Date(mcpComponent.lastModifiedDate).toLocaleDateString()} ${new Date(mcpComponent.lastModifiedDate).toLocaleTimeString()}`
                             : '-'}
