@@ -428,13 +428,13 @@ Tools reach the ai_hub ASK/BUILD agents through three tiers (wired in `AiHubConf
    (`aiHubAskGlobalToolCatalog` / `aiHubBuildGlobalToolCatalog`) feed the pgvector tool-search
    index; tools are callable only after a `searchTool` hit surfaces them. Catalog tools are
    security-context-rehydration-wrapped by `ToolSearchAdvisorConfiguration`, so
-   `@PreAuthorize`-guarded facades work. Demote rarely-used tools here (cloneAssetFile,
-   createWorkflowChat, ASK's listApiCollections) and note them in the prompt as
-   "find with searchTool first".
+   `@PreAuthorize`-guarded facades work. Demote rarely-used tools here (createWorkflowChat,
+   ASK's listApiCollections) and note them in the prompt as "find with searchTool first".
 3. **Specialist subagents** — one-shot ChatClients registered as delegate tools. Two families:
-   Copilot specialists (skills, context_store, knowledge_base, data_table, cluster_element,
-   code_editor, workflow_editor, converter (BUILD-only), workflow_execution, custom_component,
-   code_workflow) via `registerCopilotSubAgentToolCallbacks`, and AI-hub-owned subagents
+   Copilot specialists (skills, context_store, knowledge_base, data_table, asset_file,
+   cluster_element, code_editor, workflow_editor, converter (BUILD-only), workflow_execution,
+   custom_component, code_workflow) via `registerCopilotSubAgentToolCallbacks`, and AI-hub-owned
+   subagents
    (research, data_analyst, image_generator, slide_builder via `registerSubAgentToolCallbacks`;
    mcp_manager, personal_agent_manager, deployment_manager, api_collection_manager via
    `registerManagerSubAgentToolCallbacks` + `ManagerSubAgentToolCallback`). Delegates MUST forward
@@ -570,7 +570,8 @@ slide_builder, managers):
 
 - CE `ai-copilot-service`: `CopilotConfiguration` (copilot-only: workflow_editor, code_editor,
   cluster_element, skills, workflow_execution, converter, json_schema_builder, sample_output),
-  `DataTableAgentConfiguration` (copilot∨hub), `KnowledgeBaseAgentConfiguration` (copilot∨hub ∧
+  `DataTableAgentConfiguration` (copilot∨hub), `AiAgentAgentConfiguration` (copilot∨hub — wraps
+  `AiAgentFacade`, the automation-ai-agent domain), `KnowledgeBaseAgentConfiguration` (copilot∨hub ∧
   `bytechef.ai.knowledge-base.enabled`).
 - EE `automation-ai-copilot`: `AutomationCopilotConfiguration` (copilot∨hub: custom_component +
   code_workflow — panel `*SpringAIAgent`s AND one-shot `*SubAgentChatClient`s in one class),
@@ -709,12 +710,14 @@ Spec: `docs/superpowers/specs/2026-08-05-draft-publish-editors-design.md`.
   semantics, only supplied fields change; authorization via the service's `MCP_EDIT` checks).
 - The `mcp_manager` subagent owns the end-to-end playbook (`prompt_mcp_manager.txt`).
 - The management MCP server folds in `McpServerToolCallbackContributor` beans (SPI in
-  `ai-mcp-server-api`, keeps the CE server free of EE imports). The four manager subagents are
-  contributed there wrapped in `WorkspaceScopedManagerToolCallback`: an optional `workspaceId`
-  input is forwarded into the specialist's ToolContext; a sole workspace auto-selects; multiple
-  return a `workspace_required` error listing candidates. `ProgressReportingToolCallback` is NOT
-  applied on the MCP surface (no AG-UI stream). Spec:
-  `docs/superpowers/specs/2026-07-18-management-mcp-manager-subagents-design.md`.
+  `ai-mcp-server-api`, keeps the CE server free of EE imports). The sixteen sub-agent delegates
+  (the four managers plus the twelve copilot-domain specialists) are contributed there wrapped in
+  `WorkspaceScopedSubAgentToolCallback`: an optional `workspaceId` input is resolved and forwarded
+  into the specialist's ToolContext under both `AutomationToolInvocationContext` and
+  `AgentToolInvocationContext`'s workspace-id keys — the two key families the delegates' inner
+  tools read; a sole workspace auto-selects; multiple return a `workspace_required` error listing
+  candidates. `ProgressReportingToolCallback` is NOT applied on the MCP surface (no AG-UI stream).
+  Spec: `docs/superpowers/specs/2026-07-18-management-mcp-manager-subagents-design.md`.
 
 ### A2A servers (Agent2Agent, automation)
 
@@ -742,6 +745,40 @@ Spec: `docs/superpowers/specs/2026-08-05-draft-publish-editors-design.md`.
   (`sendTaskToRemoteAgent`) is the client counterpart. Spec:
   `docs/superpowers/specs/2026-07-19-expose-ai-agent-a2a-server-design.md`; user docs:
   `docs/content/docs/automation/a2a-servers.mdx`.
+
+### Agents (automation)
+
+A chat-first alternative to hand-built workflows: an `AiAgent` (+ `AiAgentChannel` rows for inbound
+triggers, `AiAgentElement` rows for model/tools/skills/sub-agents/RAG/chat-memory) owns a generated
+workflow definition (`AiAgentWorkflowGenerator`: triggers → `branch_in` keyed on `${__triggerName}` →
+`aiAgent/v1/streamChat` → `branch_out` keyed on `${branch_in.channel}`) living in a hidden
+`__AI_AGENT__<uuid>`-prefixed system project (`SystemProjects`, excluded from ordinary
+project/deployment listings by name prefix). The channel registry
+(`automation-ai-agent-service/.../channel/ChannelDefinitions.java`) is the single place to add a new
+channel. Every save regenerates the draft workflow; publishing is a separate explicit action that
+duplicates each workflow into a new version (never in-place). `__triggerName`
+(`JobInputConstants.TRIGGER_NAME_INPUT`) is a platform-wide reserved job input, and any
+`__`-prefixed input/node name in a hand-authored workflow is rejected by
+`WorkflowValidatorFacade.validateNoReservedInputNames`/`validateNoReservedNodeNames`. Sub-agents
+wire in via `workflow/v1/callAiAgent`; only cycles are hard-blocked, deeper-than-1-level nesting
+is a save-time warning only (`callAiAgent` itself refuses to suspend when already running as a
+subflow). HITL is two INDEPENDENT singleton element rows, both surfaced as Settings-tab switches
+that are off by default because absence of the row IS off: `KIND_APPROVAL_TOOL` emits the platform's
+`approval/v1/requestApproval` LLM-invocable tool directly into the tools array (never inside the
+gate), and `KIND_APPROVAL_GATE` is the agent-level MASTER SWITCH for per-tool gating — with no such
+row `buildToolSequence` emits every tool ungated regardless of its own `requiresApproval` flag, and
+the flags stay on their TOOL rows so switching the gate back on restores the previous gating.
+`AiAgent.settings.builtInTools` (`AiAgentSettings`) turns the generator's `aiAgentUtils` built-ins
+on/off per agent — `askUserQuestion`/`autoMemory`/`skillManagement` default ON, `webSearch`
+(`braveWebSearchTool`) defaults OFF and needs a `webSearchConnectionId` to publish; this replaced the
+old `AUTO_MEMORY` element kind. There is deliberately NO `skills` key: attaching a `SKILL` row is
+itself the opt-in, so `skillsTool` is emitted whenever any exists (and its `parameters.skills` is a
+FLAT array of ids, not `[{skillId}]` objects — both readers call `getList(SKILLS, Long.class)`). Tags
+live in an `ai_agent_tag` join table, the `project_tag` shape. Client pages:
+`src/pages/automation/agents` (list/detail/publish/test chat) and
+`src/pages/automation/agent-deployments` (reuses `ProjectDeploymentDialog`). See
+`docs/agents/agents.md` for the full breakdown and `docs/superpowers/specs/2026-08-10-agents-design.md`
+for the design rationale.
 
 ### Embedded automation code workflow bridge
 
@@ -1619,6 +1656,8 @@ class WorkflowServiceIntTest {
 - Stubs throw `UnsupportedOperationException` — they satisfy Spring DI; actual work is done via REST calls
 - `@ConditionalOnEEVersion` requires `bytechef.edition=ee` in the app's config
 - For lightweight EE apps (e.g., `runtime-job-app`) that can't pull in full remote client modules, use `@TestConfiguration` with mock/stub beans in the integration test
+- `@Bean` declarations consumed across deployments (registries, SPI wiring) must live in the `*-api` module, not `*-service` — distributed EE apps (e.g., `configuration-app`) carry `*-api` + `*-remote-client` WITHOUT `*-service`, so a bean declared there fails their context at boot (bit once with `ResourceVisibilityPolicyRegistry`)
+- Adding a constructor collaborator to a scanned `@Service` impl breaks OTHER modules' hand-assembled `@SpringBootTest(classes=...)` IntTest contexts with missing-bean errors — grep for `*IntTestConfiguration`/`@TestConfiguration` classes that assemble the impl and add mock `@Bean`s there
 
 ### Component Integration Test Configuration
 - Component integration tests use `@ComponentIntTest` → `ComponentTestIntConfiguration` in `platform-component-test-int-support`
