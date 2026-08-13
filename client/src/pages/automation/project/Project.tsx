@@ -8,6 +8,7 @@ import {useRun} from '@/pages/platform/workflow-editor/hooks/useRun';
 import {WorkflowEditorProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import WorkflowTestRunLeaveDialog from '@/shared/components/WorkflowTestRunLeaveDialog';
+import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilotLayoutShifted';
 import {useWorkflowTestRunGuard} from '@/shared/hooks/useWorkflowTestRunGuard';
 import {WebhookTriggerTestApi} from '@/shared/middleware/automation/configuration';
 import {useCreateConnectionMutation} from '@/shared/mutations/automation/connections.mutations';
@@ -49,6 +50,8 @@ const Project = () => {
     } = useProject();
 
     const {runDisabled} = useRun();
+
+    const copilotLayoutShifted = useCopilotLayoutShifted();
 
     return (
         <div className="flex w-full">
@@ -120,9 +123,17 @@ const Project = () => {
                             </WorkflowEditorProvider>
                         </ResizablePanel>
 
-                        <ResizableHandle className="bg-muted" withHandle />
+                        <ResizableHandle className="bg-surface-neutral-secondary" withHandle />
 
-                        <ResizablePanel className="bg-background" defaultSize={0} panelRef={bottomResizablePanelRef}>
+                        <ResizablePanel
+                            className={twMerge(
+                                'bg-surface-main px-3 py-3',
+                                projectLeftSidebarOpen && 'pl-0',
+                                copilotLayoutShifted && 'pr-0'
+                            )}
+                            defaultSize={0}
+                            panelRef={bottomResizablePanelRef}
+                        >
                             {(workflowIsRunning || workflowTestExecution) && (
                                 <WorkflowExecutionsTestOutput
                                     onCloseClick={handleWorkflowExecutionsTestOutputCloseClick}
