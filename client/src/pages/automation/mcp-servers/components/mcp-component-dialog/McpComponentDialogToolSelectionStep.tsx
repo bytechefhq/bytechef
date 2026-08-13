@@ -68,7 +68,7 @@ const McpComponentDialogToolSelectionStep = ({
         <div className="space-y-4 py-4">
             <div className="space-y-2">
                 <Label className="text-sm font-medium" htmlFor="connection-select">
-                    Select Connection
+                    Connection
                 </Label>
 
                 <div className="flex items-center gap-2">
@@ -152,6 +152,9 @@ const McpComponentDialogToolSelectionStep = ({
                 <div className="py-8 text-center text-muted-foreground">No tools available for this component.</div>
             ) : (
                 <>
+                    {/* A section heading, not a form label -- it names the checkbox group rather than one control. */}
+                    <p className="mt-6 text-sm font-medium">Tools</p>
+
                     <div className="flex items-center space-x-3">
                         <Checkbox
                             checked={allToolsSelected}

@@ -1,13 +1,15 @@
 import {Connection} from '@/shared/middleware/automation/configuration';
 import {
     McpComponent,
+    useAuthoritiesQuery,
     useCreateMcpComponentWithToolsMutation,
     useMcpToolsByComponentIdQuery,
     useUpdateMcpComponentWithToolsMutation,
 } from '@/shared/middleware/graphql';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
+import {getRoleLabel} from '@/shared/util/role-utils';
 import {useQueryClient} from '@tanstack/react-query';
-import {useState} from 'react';
+import {useMemo, useState} from 'react';
 
 import {SelectedToolType} from './useMcpComponentDialogToolSelectionStep';
 
@@ -34,7 +36,19 @@ const useMcpComponentDialog = ({mcpComponent, mcpServerId, onOpenChange, open}: 
     const [selectedTools, setSelectedTools] = useState<SelectedToolType[]>([]);
     const [selectedConnection, setSelectedConnection] = useState<Connection | null>(null);
     const [requiredAuthorities, setRequiredAuthorities] = useState<string[]>(mcpComponent?.requiredAuthorities ?? []);
-    const [requiredAuthorityInput, setRequiredAuthorityInput] = useState('');
+
+    // The authority list is the same one the user-management dialogs offer, so an MCP component can only require an
+    // authority that actually exists. The query is ADMIN-only server-side; for a non-admin it simply yields no options
+    // rather than failing the dialog, and any authority already saved on the component stays selected regardless.
+    const {data: authoritiesData, isLoading: authoritiesLoading} = useAuthoritiesQuery({});
+
+    const authorityOptions = useMemo(() => {
+        const authorities = new Set([...(authoritiesData?.authorities ?? []), ...requiredAuthorities]);
+
+        return Array.from(authorities)
+            .map((authority) => ({label: getRoleLabel(authority), value: authority}))
+            .sort((option, otherOption) => option.label.localeCompare(otherOption.label));
+    }, [authoritiesData, requiredAuthorities]);
 
     const {data: existingTools} = useMcpToolsByComponentIdQuery(
         {
@@ -68,21 +82,6 @@ const useMcpComponentDialog = ({mcpComponent, mcpServerId, onOpenChange, open}: 
         setCurrentStep('tools');
     };
 
-    const handleAddRequiredAuthority = () => {
-        const trimmed = requiredAuthorityInput.trim();
-
-        if (trimmed && !requiredAuthorities.includes(trimmed)) {
-            setRequiredAuthorities([...requiredAuthorities, trimmed]);
-            setRequiredAuthorityInput('');
-        }
-    };
-
-    const handleRemoveRequiredAuthority = (requiredAuthority: string) => {
-        setRequiredAuthorities(
-            requiredAuthorities.filter((existingAuthority) => existingAuthority !== requiredAuthority)
-        );
-    };
-
     const handleClose = () => {
         if (onOpenChange) {
             onOpenChange(false);
@@ -99,7 +98,6 @@ const useMcpComponentDialog = ({mcpComponent, mcpServerId, onOpenChange, open}: 
                 : null
         );
         setRequiredAuthorities(mcpComponent?.requiredAuthorities ?? []);
-        setRequiredAuthorityInput('');
 
         if (!mcpComponent) {
             setSelectedTools([]);
@@ -126,7 +124,6 @@ const useMcpComponentDialog = ({mcpComponent, mcpServerId, onOpenChange, open}: 
             setSelectedTools([]);
             setSelectedConnection(null);
             setRequiredAuthorities(mcpComponent?.requiredAuthorities ?? []);
-            setRequiredAuthorityInput('');
         };
 
         if (mcpComponent?.id) {
@@ -202,7 +199,6 @@ const useMcpComponentDialog = ({mcpComponent, mcpServerId, onOpenChange, open}: 
                 : null
         );
         setRequiredAuthorities(mcpComponent?.requiredAuthorities ?? []);
-        setRequiredAuthorityInput('');
 
         if (!mcpComponent) {
             setSelectedTools([]);
@@ -211,21 +207,20 @@ const useMcpComponentDialog = ({mcpComponent, mcpServerId, onOpenChange, open}: 
     };
 
     return {
+        authoritiesLoading,
+        authorityOptions,
         currentStep,
         existingTools,
-        handleAddRequiredAuthority,
         handleBack,
         handleClose,
         handleComponentSelect,
         handleOpenChange,
-        handleRemoveRequiredAuthority,
         handleSave,
         requiredAuthorities,
-        requiredAuthorityInput,
         selectedComponent,
         selectedConnection,
         selectedTools,
-        setRequiredAuthorityInput,
+        setRequiredAuthorities,
         setSelectedConnection,
         setSelectedTools,
     };
