@@ -13,14 +13,23 @@ function renderPanel(taskDispatcherDefinition: Parameters<typeof GraphStatesPane
     );
 }
 
-const {storeState} = vi.hoisted(() => ({
+const {storeState, workflowDataStoreState} = vi.hoisted(() => ({
     storeState: {
         currentNode: undefined as NodeDataType | undefined,
+    },
+    workflowDataStoreState: {
+        workflow: {
+            tasks: undefined as Array<{name: string; parameters?: Record<string, unknown>; type?: string}> | undefined,
+        },
     },
 }));
 
 vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore', () => ({
     default: (selector: (state: typeof storeState) => unknown) => selector(storeState),
+}));
+
+vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowDataStore', () => ({
+    default: (selector: (state: typeof workflowDataStoreState) => unknown) => selector(workflowDataStoreState),
 }));
 
 // Isolate GraphStatesPanel's own list/badge/terminal-text logic from Property's full editor
@@ -102,6 +111,92 @@ describe('GraphStatesPanel', () => {
 
         expect(screen.getByLabelText('node_0 state')).toBeInTheDocument();
         expect(screen.getByLabelText('node_1 state')).toBeInTheDocument();
+    });
+
+    // The panel store holds the node as it was when the panel opened, so a node added or removed on
+    // the canvas afterwards was invisible here until the panel was closed and reopened.
+    it('should list the nodes of the live task, not the panel snapshot', () => {
+        storeState.currentNode = {
+            componentName: 'graph',
+            name: 'graph_1',
+            parameters: {nodes: [{name: 'node_0', tasks: []}]},
+            workflowNodeName: 'graph_1',
+        } as NodeDataType;
+
+        workflowDataStoreState.workflow.tasks = [
+            {
+                name: 'graph_1',
+                parameters: {
+                    nodes: [
+                        {name: 'node_0', tasks: []},
+                        {name: 'node_1', tasks: []},
+                    ],
+                },
+            },
+        ];
+
+        renderPanel(TASK_DISPATCHER_DEFINITION);
+
+        expect(screen.getByLabelText('node_1 state')).toBeInTheDocument();
+
+        workflowDataStoreState.workflow.tasks = undefined;
+    });
+
+    // A graph inside a loop or branch is not a top-level task, so a top-level-only lookup would fall
+    // back to the stale snapshot for exactly those graphs.
+    it('should find a graph nested inside another dispatcher', () => {
+        storeState.currentNode = {
+            componentName: 'graph',
+            name: 'graph_1',
+            parameters: {nodes: [{name: 'node_0', tasks: []}]},
+            workflowNodeName: 'graph_1',
+        } as NodeDataType;
+
+        workflowDataStoreState.workflow.tasks = [
+            {
+                name: 'loop_1',
+                parameters: {
+                    iteratee: [
+                        {
+                            name: 'graph_1',
+                            parameters: {
+                                nodes: [
+                                    {name: 'node_0', tasks: []},
+                                    {name: 'node_9', tasks: []},
+                                ],
+                            },
+                            type: 'graph/v1/graph',
+                        },
+                    ],
+                },
+                type: 'loop/v1/loop',
+            },
+        ];
+
+        renderPanel(TASK_DISPATCHER_DEFINITION);
+
+        expect(screen.getByLabelText('node_9 state')).toBeInTheDocument();
+
+        workflowDataStoreState.workflow.tasks = undefined;
+    });
+
+    // A graph being configured before its first save has no task yet, so the snapshot is still the
+    // only source there.
+    it('should fall back to the panel snapshot when the task has not been saved yet', () => {
+        storeState.currentNode = {
+            componentName: 'graph',
+            name: 'graph_1',
+            parameters: {nodes: [{name: 'node_0', tasks: []}]},
+            workflowNodeName: 'graph_1',
+        } as NodeDataType;
+
+        workflowDataStoreState.workflow.tasks = [];
+
+        renderPanel(TASK_DISPATCHER_DEFINITION);
+
+        expect(screen.getByLabelText('node_0 state')).toBeInTheDocument();
+
+        workflowDataStoreState.workflow.tasks = undefined;
     });
 
     it("should address each node's next editor by its container-parameter path, not a subtask path", () => {

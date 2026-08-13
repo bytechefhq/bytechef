@@ -1,6 +1,8 @@
 import Property from '@/pages/platform/workflow-editor/components/properties/Property';
+import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import extractNextTargets from '@/pages/platform/workflow-editor/utils/extractNextTargets';
+import {flattenDefinitionTasks} from '@/pages/platform/workflow-editor/utils/flattenDefinitionTasks';
 import {TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
 import {GraphNodeType, PropertyAllType} from '@/shared/types';
 import {useMemo} from 'react';
@@ -48,11 +50,24 @@ interface GraphStatesPanelPropsI {
  */
 export default function GraphStatesPanel({taskDispatcherDefinition}: GraphStatesPanelPropsI) {
     const currentNode = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
+    const workflowTasks = useWorkflowDataStore((state) => state.workflow.tasks);
 
-    const graphNodes: Array<GraphNodeType> = useMemo(
-        () => (currentNode?.parameters?.nodes as Array<GraphNodeType> | undefined) ?? [],
-        [currentNode?.parameters?.nodes]
-    );
+    // Read off the LIVE task, not `currentNode.parameters`. The panel store holds the node as it was
+    // when the panel opened, so adding or removing a node on the canvas left this list showing the
+    // graph's membership from before the edit until the panel was closed and reopened. The snapshot
+    // stays the fallback: a node being configured before its first save has no task yet.
+    //
+    // Flattened first — a graph nested inside another dispatcher is not a top-level task, and looking
+    // only there would silently fall back to the stale snapshot for exactly those graphs.
+    const graphNodes: Array<GraphNodeType> = useMemo(() => {
+        const currentTask = flattenDefinitionTasks(workflowTasks ?? []).find(
+            (task) => task.name === currentNode?.workflowNodeName
+        );
+
+        const taskNodes = currentTask?.parameters?.nodes as Array<GraphNodeType> | undefined;
+
+        return taskNodes ?? (currentNode?.parameters?.nodes as Array<GraphNodeType> | undefined) ?? [];
+    }, [currentNode?.parameters?.nodes, currentNode?.workflowNodeName, workflowTasks]);
 
     const declaredNodeNames = useMemo(() => graphNodes.map((graphNode) => graphNode.name), [graphNodes]);
 

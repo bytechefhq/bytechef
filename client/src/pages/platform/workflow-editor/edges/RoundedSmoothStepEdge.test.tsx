@@ -1,3 +1,4 @@
+import {TRIGGER_FAN_IN_BUS_OFFSET} from '@/shared/constants';
 import {render} from '@testing-library/react';
 import {Position, ReactFlowProvider} from '@xyflow/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
@@ -34,6 +35,46 @@ function renderEdgePath(props: Partial<Parameters<typeof RoundedSmoothStepEdge>[
 
     return container.querySelector('path')?.getAttribute('d') ?? '';
 }
+
+describe('RoundedSmoothStepEdge trigger fan-in bus', () => {
+    beforeEach(() => {
+        directionStoreState.layoutDirection = 'TB';
+    });
+
+    // Every trigger in a fan-in row must bend on ONE horizontal line. An outer trigger sits far to
+    // the side, so its Δx beats its Δy even in TB — orientation read off that gave it a vertical
+    // bus, leaving its horizontal leg at the path midpoint instead of on the bus.
+    it('pins both sides of a fan-in row to the same bus line', () => {
+        const busY = 100 + TRIGGER_FAN_IN_BUS_OFFSET;
+
+        // Δx deliberately beats Δy on both, which is the geometry that used to flip the orientation:
+        // a fan-in row is wide and shallow, so its outer triggers always look "horizontal" per-edge.
+        const leftPath = renderEdgePath({data: {triggerFanIn: true}, sourceX: 100, targetX: 400, targetY: 300});
+        const rightPath = renderEdgePath({data: {triggerFanIn: true}, sourceX: 700, targetX: 400, targetY: 300});
+
+        expect(leftPath).toContain(`,${busY}`);
+        expect(rightPath).toContain(`,${busY}`);
+
+        // The midpoint corner the vertical-bus reading produced.
+        expect(leftPath).not.toContain(',200');
+        expect(rightPath).not.toContain(',200');
+    });
+
+    it('pins the bus on the main axis in LR mode', () => {
+        directionStoreState.layoutDirection = 'LR';
+
+        const busX = 300 + TRIGGER_FAN_IN_BUS_OFFSET;
+
+        const outerPath = renderEdgePath({
+            data: {triggerFanIn: true},
+            sourceY: 700,
+            targetX: 900,
+            targetY: 100,
+        });
+
+        expect(outerPath).toContain(`${busX},`);
+    });
+});
 
 describe('RoundedSmoothStepEdge exit jog', () => {
     beforeEach(() => {

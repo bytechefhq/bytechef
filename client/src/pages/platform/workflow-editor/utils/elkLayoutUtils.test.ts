@@ -3721,6 +3721,41 @@ describe('trigger row label separation', () => {
         expect(positionOf(result.nodes, 'task1').y - triggerBottom).toBe(80);
     });
 
+    // Label repacking spaces the row by label width, so a long first label leaves an uneven pitch.
+    // Centering on the MEAN then put the middle trigger beside the target column rather than on it,
+    // and that one edge arrived with a kink while its siblings ran straight into the bus.
+    it('puts the middle trigger of an odd row exactly on the fan-in target', async () => {
+        const nodes: Node[] = [
+            triggerNode('trigger_1', 'Pokreni Svakog Radnog Dana'),
+            triggerNode('trigger_2', 'Go'),
+            triggerNode('trigger_3', 'Run'),
+            taskNode('task1'),
+        ];
+
+        const edges: Edge[] = [edge('trigger_1', 'task1'), edge('trigger_2', 'task1'), edge('trigger_3', 'task1')];
+
+        const result = await getElkLayoutElements({canvasWidth: 1400, direction: 'TB', edges, nodes});
+
+        expect(positionOf(result.nodes, 'trigger_2').x).toBeCloseTo(positionOf(result.nodes, 'task1').x, 5);
+    });
+
+    it('splits an even row around the fan-in target', async () => {
+        const nodes: Node[] = [
+            triggerNode('trigger_1', 'Pokreni Svakog Radnog Dana'),
+            triggerNode('trigger_2', 'Go'),
+            taskNode('task1'),
+        ];
+
+        const edges: Edge[] = [edge('trigger_1', 'task1'), edge('trigger_2', 'task1')];
+
+        const result = await getElkLayoutElements({canvasWidth: 1400, direction: 'TB', edges, nodes});
+
+        const firstX = positionOf(result.nodes, 'trigger_1').x;
+        const secondX = positionOf(result.nodes, 'trigger_2').x;
+
+        expect((firstX + secondX) / 2).toBeCloseTo(positionOf(result.nodes, 'task1').x, 5);
+    });
+
     it('keeps the tight trigger pitch when labels fit', async () => {
         const nodes: Node[] = [triggerNode('trigger_1', 'Run'), triggerNode('trigger_2', 'Go'), taskNode('task1')];
 

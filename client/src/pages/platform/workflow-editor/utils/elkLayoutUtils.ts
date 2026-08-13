@@ -245,7 +245,7 @@ function separateTriggerRow(allNodes: Node[], edges: Edge[], direction: LayoutDi
     }
 
     // Center the row on the fan-in target's axis: the chain below is laid out
-    // around the first task, so aligning the trigger mean with it keeps the
+    // around the first task, so aligning the trigger row with it keeps the
     // fan-in bus symmetric instead of trailing off to one side.
     const triggerIds = new Set(triggerNodes.map((node) => node.id));
     const fanInEdge = edges.find((edge) => triggerIds.has(edge.source) && !triggerIds.has(edge.target));
@@ -257,8 +257,22 @@ function separateTriggerRow(allNodes: Node[], edges: Edge[], direction: LayoutDi
         return;
     }
 
-    const rowMean = triggerNodes.reduce((sum, node) => sum + node.position[rowAxis], 0) / triggerNodes.length;
-    const rowShift = fanInTargetNode.position[rowAxis] - rowMean;
+    // The MEDIAN, not the mean. The label repacking above spaces the row by each trigger's label
+    // width, so the pitch is uneven and the mean drifts off the middle trigger — which then sat
+    // beside the target column and its edge, alone among the row's, arrived with a kink in it.
+    // The median puts an odd row's middle trigger exactly on the target (a straight edge) and
+    // splits an even row's two middle triggers around it. On an evenly spaced row the two agree.
+    const rowPositions = triggerNodes
+        .map((node) => node.position[rowAxis])
+        .sort((positionA, positionB) => positionA - positionB);
+    const middleIndex = Math.floor(rowPositions.length / 2);
+
+    const rowMedian =
+        rowPositions.length % 2 === 1
+            ? rowPositions[middleIndex]!
+            : (rowPositions[middleIndex - 1]! + rowPositions[middleIndex]!) / 2;
+
+    const rowShift = fanInTargetNode.position[rowAxis] - rowMedian;
 
     if (Math.abs(rowShift) >= 1) {
         triggerNodes.forEach((triggerNode) => {
