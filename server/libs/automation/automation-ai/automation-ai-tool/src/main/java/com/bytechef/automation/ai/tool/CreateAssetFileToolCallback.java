@@ -17,6 +17,7 @@
 package com.bytechef.automation.ai.tool;
 
 import com.bytechef.automation.assetfile.domain.AssetFile;
+import com.bytechef.automation.assetfile.exception.AssetFileQuotaExceededException;
 import com.bytechef.automation.assetfile.service.AssetFileFacade;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -188,6 +189,13 @@ public class CreateAssetFileToolCallback implements ToolCallback {
                     created.getSizeBytes()));
         } catch (JacksonException exception) {
             return toolError("Invalid tool input: " + exception.getMessage());
+        } catch (AssetFileQuotaExceededException exception) {
+            // Caught ahead of the generic RuntimeException handler below so the model learns the actual limit
+            // instead of the opaque "createAssetFile failed (AssetFileQuotaExceededException)" the catch-all
+            // would otherwise produce — mirrors CreateAssetFileFromUrlToolCallback's handling.
+            return toolError(
+                "File exceeds the allowed file size limit of " + exception.getLimit()
+                    + " bytes (attempted " + exception.getAttempted() + " bytes)");
         } catch (RuntimeException exception) {
             // Catch-all for transient DB outages, NPEs, downstream 4xx/5xx, and any other RuntimeException that
             // would otherwise abort the entire agent run. Log at WARN with the full stack trace, return a typed

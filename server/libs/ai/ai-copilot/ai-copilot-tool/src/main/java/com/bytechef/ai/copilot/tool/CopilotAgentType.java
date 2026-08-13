@@ -75,7 +75,27 @@ public enum CopilotAgentType implements AgentType {
     DATA_TABLE_ASK("data_table_ask", false),
     DATA_TABLE_BUILD("data_table_build", false),
     DATA_TABLE("data_table", true),
-    DATA_TABLE_AGENT("data_table_agent", false);
+    DATA_TABLE_AGENT("data_table_agent", false),
+    AI_AGENT_ASK("ai_agent_ask", false),
+    AI_AGENT_BUILD("ai_agent_build", false),
+    AI_AGENT("ai_agent", true),
+    AI_AGENT_AGENT("ai_agent_agent", false),
+    PROJECT_ASK("project_ask", false),
+    PROJECT_BUILD("project_build", false),
+    PROJECT("project", true),
+    PROJECT_DEPLOYMENT_ASK("project_deployment_ask", false),
+    PROJECT_DEPLOYMENT_BUILD("project_deployment_build", false),
+    PROJECT_DEPLOYMENT("project_deployment", true),
+    MCP_SERVER_ASK("mcp_server_ask", false),
+    MCP_SERVER_BUILD("mcp_server_build", false),
+    MCP_SERVER("mcp_server", true),
+    ASSET_FILE_ASK("asset_file_ask", false),
+    ASSET_FILE_BUILD("asset_file_build", false),
+    ASSET_FILE("asset_file", true),
+    ASSET_FILE_AGENT("asset_file_agent", false),
+    API_COLLECTION_ASK("api_collection_ask", false),
+    API_COLLECTION_BUILD("api_collection_build", false),
+    API_COLLECTION("api_collection", true);
 
     private final String key;
     private final boolean fallback;

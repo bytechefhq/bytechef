@@ -252,6 +252,21 @@ public class AssetFileFacadeImpl implements AssetFileFacade {
         }
     }
 
+    /**
+     * Returns the configured per-file quota in bytes, or a negative value when no limit is configured.
+     *
+     * <p>
+     * {@code quota} is a {@code @ConfigurationProperties} record bound once at bean creation, so the value returned
+     * here is captured at startup — changing the per-file limit at runtime requires a restart before it takes effect
+     * for callers (such as {@code CreateAssetFileFromUrlToolCallback}) that resolve their download bound from this
+     * method at construction time.
+     * </p>
+     */
+    @Override
+    public long getMaxFileSizeBytes() {
+        return quota.maxFileSizeBytes();
+    }
+
     private void scheduleBlobDeleteAfterCommit(Long id, FileEntry fileEntry) {
         if (!TransactionSynchronizationManager.isSynchronizationActive()) {
             deleteBlobOrEnqueueOrphan(id, fileEntry);

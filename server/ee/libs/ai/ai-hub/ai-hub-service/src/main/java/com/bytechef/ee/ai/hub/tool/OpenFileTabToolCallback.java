@@ -28,8 +28,8 @@ public class OpenFileTabToolCallback implements ToolCallback {
 
     private static final String DESCRIPTION = """
         Open a workspace asset file in the AI Hub resource panel so the user can see it.
-        Call this after creating a file (via createAssetFile) or when referring to an existing
-        file. Use the fileId returned from createAssetFile or listAssetFiles - never invent file
+        Call this after creating a file (via createBinaryAssetFile) or when referring to an
+        existing file. Use the fileId returned from createBinaryAssetFile - never invent file
         IDs.""";
 
     private static final String INPUT_SCHEMA = """

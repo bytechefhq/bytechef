@@ -24,6 +24,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.assetfile.domain.AssetFile;
+import com.bytechef.automation.assetfile.exception.AssetFileQuotaExceededException;
 import com.bytechef.automation.assetfile.service.AssetFileFacade;
 import java.util.Base64;
 import java.util.Map;
@@ -341,6 +342,35 @@ class CreateBinaryAssetFileToolCallbackTest {
             org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(),
             org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(),
             org.mockito.ArgumentMatchers.any());
+    }
+
+    @Test
+    void testCallSurfacesQuotaLimitInsteadOfOpaqueExceptionName() {
+        byte[] data = new byte[] {
+            1, 2, 3, 4
+        };
+        String base64 = Base64.getEncoder()
+            .encodeToString(data);
+
+        when(
+            facade.createBinaryFromAi(
+                org.mockito.ArgumentMatchers.any(), anyInt(),
+                org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(),
+                org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(),
+                org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(),
+                org.mockito.ArgumentMatchers.any()))
+                    .thenThrow(
+                        new AssetFileQuotaExceededException("File size 999 exceeds per-file limit 100", 999, 100));
+
+        String input = "{\"filename\":\"banner.png\",\"mimeType\":\"image/png\",\"base64Content\":\"%s\"}"
+            .formatted(base64);
+
+        String result = callback.call(input, new ToolContext(Map.of(
+            AutomationToolInvocationContext.TOOL_CONTEXT_WORKSPACE_ID_KEY, 5L)));
+
+        assertThat(result).contains("100")
+            .contains("999")
+            .doesNotContain("AssetFileQuotaExceededException");
     }
 
     @Test

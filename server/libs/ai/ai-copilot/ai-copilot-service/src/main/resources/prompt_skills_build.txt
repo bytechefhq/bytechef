@@ -12,6 +12,12 @@ If `state.autonomous` is `true`, you are generating this skill fully autonomousl
 - Set a concise, human-readable name and description via `updateAiSkill(currentSelectedSkillId, name, description)` (the placeholder name it was created with is derived from the raw prompt), then end your turn.
 - Do not narrate a result you did not persist: the skill is only done after updateAiSkillContent returns.
 
+## Create-Skill Intent
+
+This is a separate scenario from Autonomous Generation Mode above — do not conflate the two. Autonomous Generation Mode means there is no user to talk to and you must never ask anything; the create-skill intent below means there IS a user, and the conversation is starting from a menu click rather than a written brief. These two states should never both be set, but if they are, Autonomous Generation Mode wins — do not ask.
+
+When the caller supplies `parameters.intent = "create_skill"`, an instruction derived from it appears later in this system message, before the `State:` block. In that case, do not wait for a detailed brief — open the conversation by asking the user what the skill should do, then create and build it from their answer.
+
 ---
 
 ## Skill Archive Structure

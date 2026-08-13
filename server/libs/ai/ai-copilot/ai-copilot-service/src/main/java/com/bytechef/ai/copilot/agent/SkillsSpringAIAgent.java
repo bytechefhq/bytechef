@@ -71,8 +71,9 @@ public class SkillsSpringAIAgent extends CopilotSpringAIAgent {
         String resolvedMessage = Objects.nonNull(this.systemMessageProvider)
             ? this.systemMessageProvider.apply(this) : this.systemMessage;
 
-        String message = "%s%n%s%n%nState:%n%s%n%nContext:%n%s%n".formatted(
-            resolvedMessage, ADDITIONAL_RULES, state, String.join("\n", contextStrings));
+        String message = "%s%n%s%n%s%n%nState:%n%s%n%nContext:%n%s%n".formatted(
+            resolvedMessage, createIntentMessage(state), ADDITIONAL_RULES, state,
+            String.join("\n", contextStrings));
 
         SystemMessage systemMessage = new SystemMessage();
 
@@ -80,6 +81,32 @@ public class SkillsSpringAIAgent extends CopilotSpringAIAgent {
         systemMessage.setContent(message);
 
         return systemMessage;
+    }
+
+    /**
+     * Turns the caller-supplied {@code parameters} into an explicit instruction. Two callers exist: the AI Skills
+     * listing page and the skill detail view open the panel with no parameters, and the "Create With AI" menu item
+     * opens it with a create-skill intent. Read explicitly rather than relying on the {@code State:} dump appended
+     * below — that dump is a {@code Map.toString()} the model would have to interpret unaided.
+     *
+     * <p>
+     * The header toggle that switches BUILD to ASK preserves {@code parameters}, so the create-skill intent can still
+     * be set when this agent is {@code skills_ask}. The instruction is skipped in ASK mode — "then build it" would
+     * contradict the ASK prompt's read-only rule.
+     */
+    private String createIntentMessage(State state) {
+        if (!(state.get("parameters") instanceof Map<?, ?> parameters)) {
+            return "";
+        }
+
+        StringBuilder message = new StringBuilder();
+
+        if ("create_skill".equals(parameters.get("intent")) && !getAgentId().endsWith("_ask")) {
+            message.append(
+                "The user opened this conversation to create a new skill. Do not wait for a detailed brief — open by asking what the skill should do, then build it.");
+        }
+
+        return message.toString();
     }
 
     public static class Builder extends SpringAIAgent.Builder {

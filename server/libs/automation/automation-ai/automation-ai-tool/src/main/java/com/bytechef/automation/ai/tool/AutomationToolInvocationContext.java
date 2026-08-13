@@ -23,7 +23,7 @@ import org.springframework.ai.chat.model.ToolContext;
 /**
  * CE accessor for the workspace / environment / user / task scope that automation tool callbacks relocated out of
  * ai-hub read from Spring AI's {@link ToolContext}. The literal key strings intentionally match the keys written by the
- * EE {@code AiHubToolInvocationContext} (and by {@link WorkspaceScopedManagerToolCallback} on the management MCP
+ * EE {@code AiHubToolInvocationContext} (and by {@link WorkspaceScopedSubAgentToolCallback} on the management MCP
  * surface), so the AI-Hub / Copilot runtimes need no change to populate them — the same duplicate-key-in-lockstep
  * contract already documented on {@link WorkflowExecutionToolContextKeys}. If the EE key strings ever change, these
  * must change in lockstep.
@@ -40,6 +40,18 @@ public record AutomationToolInvocationContext(
     public static final String TOOL_CONTEXT_LAST_USER_PROMPT_KEY = "bytechef.assetFile.lastUserPrompt";
     public static final String TOOL_CONTEXT_ENVIRONMENT_ID_KEY = "bytechef.assetFile.environmentId";
     public static final String TOOL_CONTEXT_THREAD_ID_KEY = "bytechef.assetFile.threadId";
+
+    /**
+     * CE-visible mirror of {@code com.bytechef.ee.ai.hub.util.Source.FILES.toAgentSourceOrdinal()} — the EE
+     * agent-source enum ordinal persisted into {@code asset_file.generated_by_agent_source} for files created from the
+     * Files surface. Every write path that cannot reference the EE enum directly (the Copilot panel's
+     * {@code ManagerSliceSpringAIAgent} and the management MCP {@code WorkspaceScopedSubAgentToolCallback}) must supply
+     * this literal value under {@link #TOOL_CONTEXT_SOURCE_ORDINAL_KEY} instead. Follows the same
+     * duplicate-value-in-lockstep contract as the key strings above: if EE ever reorders {@code Source}, this must
+     * change to match — though {@code Source}'s own append-only contract already treats reordering as a breaking
+     * change, so in practice this constant only moves if a new CE surface is added ahead of {@code FILES}.
+     */
+    public static final short SOURCE_ORDINAL_FILES = 3;
 
     /**
      * Rehydrates the context from a {@link ToolContext}. Returns {@code null} when the tool context carries none of the

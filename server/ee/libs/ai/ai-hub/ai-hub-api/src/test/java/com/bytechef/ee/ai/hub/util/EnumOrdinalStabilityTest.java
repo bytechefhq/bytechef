@@ -7,6 +7,9 @@
 
 package com.bytechef.ee.ai.hub.util;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.bytechef.automation.ai.tool.AutomationToolInvocationContext;
 import com.bytechef.ee.ai.hub.personalagent.AiHubPersonalAgentResourceKind;
 import com.bytechef.ee.ai.hub.personalagent.ScheduleFrequencyKind;
 import com.bytechef.ee.ai.hub.personalagent.ScheduleLifecycleKind;
@@ -107,6 +110,9 @@ class EnumOrdinalStabilityTest {
         // Edit-in-place of an existing asset file via the updateAssetFileContent tool. Appended at the END per
         // the JDBC enum-storage convention so all earlier ordinals stay pinned.
         expected.put("FILE_UPDATED", 26);
+        // Agent-referenced AI Agent (automation-ai-agent) opened via openResourceTab. Appended at the END per
+        // the JDBC enum-storage convention so all earlier ordinals stay pinned.
+        expected.put("AI_AGENT_REFERENCED", 27);
 
         OrdinalStabilityAssertions.assertOrdinalsMatch(
             AiHubTaskArtifactKind.values(), expected,
@@ -163,6 +169,19 @@ class EnumOrdinalStabilityTest {
         expected.put("AI_HUB", 4);
 
         OrdinalStabilityAssertions.assertOrdinalsMatch(Source.values(), expected, Source.class.getSimpleName());
+    }
+
+    /**
+     * CE cannot reference this EE {@link Source} enum, so {@link AutomationToolInvocationContext#SOURCE_ORDINAL_FILES}
+     * — the literal value every CE write path that cannot see {@code Source} must supply instead — is a hand-copied
+     * mirror of {@code Source.FILES}'s ordinal. Only this EE test module can see both sides, so this is the one place
+     * the mirror is self-checking rather than comment-checked: a future reorder on either side fails this test loudly
+     * instead of silently re-attributing rows.
+     */
+    @Test
+    void testSourceOrdinalFilesMatchesAutomationToolInvocationContextMirror() {
+        assertThat(Source.FILES.toAgentSourceOrdinal())
+            .isEqualTo(AutomationToolInvocationContext.SOURCE_ORDINAL_FILES);
     }
 
     @Test

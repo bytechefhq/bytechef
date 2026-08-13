@@ -58,6 +58,11 @@ public class RemoteAssetFileFacadeClient implements AssetFileFacade {
     }
 
     @Override
+    public long getMaxFileSizeBytes() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public InputStream downloadContent(Long id) {
         throw new UnsupportedOperationException();
     }

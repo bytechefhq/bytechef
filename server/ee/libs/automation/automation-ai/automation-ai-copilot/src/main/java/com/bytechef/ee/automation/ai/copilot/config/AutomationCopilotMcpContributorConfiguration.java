@@ -8,6 +8,8 @@
 package com.bytechef.ee.automation.ai.copilot.config;
 
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
+import com.bytechef.automation.ai.tool.WorkspaceScopedSubAgentToolCallback;
+import com.bytechef.automation.configuration.service.WorkspaceService;
 import com.bytechef.ee.automation.ai.copilot.tool.CodeWorkflowAgentToolCallback;
 import com.bytechef.ee.automation.ai.copilot.tool.ContextStoreAgentToolCallback;
 import com.bytechef.ee.automation.ai.copilot.tool.CustomComponentAgentToolCallback;
@@ -27,7 +29,9 @@ import org.springframework.context.annotation.Configuration;
  * subagents. Each domain exposes its BUILD subagent {@link ChatClient} (defined in
  * {@link AutomationCopilotConfiguration} / {@link ContextStoreAgentConfiguration}), whose tool set includes the
  * read-only tools, so the single delegate tool serves both ask-style and build-style requests. An absent chat client
- * bean (surface toggles off, context-store feature disabled) skips silently.
+ * bean (surface toggles off, context-store feature disabled) skips silently. Each delegate is wrapped in
+ * {@link WorkspaceScopedSubAgentToolCallback} because the management MCP surface has no AI Hub chat state to supply
+ * workspace scope.
  *
  * @version ee
  *
@@ -40,17 +44,24 @@ public class AutomationCopilotMcpContributorConfiguration {
     McpServerToolCallbackContributor automationCopilotAgentToolCallbackContributor(
         @Qualifier("contextStoreBuildSubAgentChatClient") ObjectProvider<ChatClient> contextStoreProvider,
         @Qualifier("customComponentBuildSubAgentChatClient") ObjectProvider<ChatClient> customComponentProvider,
-        @Qualifier("codeWorkflowBuildSubAgentChatClient") ObjectProvider<ChatClient> codeWorkflowProvider) {
+        @Qualifier("codeWorkflowBuildSubAgentChatClient") ObjectProvider<ChatClient> codeWorkflowProvider,
+        WorkspaceService workspaceService) {
 
         return () -> {
             List<ToolCallback> toolCallbacks = new ArrayList<>();
 
             contextStoreProvider.ifAvailable(
-                chatClient -> toolCallbacks.add(new ContextStoreAgentToolCallback(chatClient)));
+                chatClient -> toolCallbacks.add(
+                    new WorkspaceScopedSubAgentToolCallback(
+                        new ContextStoreAgentToolCallback(chatClient), workspaceService)));
             customComponentProvider.ifAvailable(
-                chatClient -> toolCallbacks.add(new CustomComponentAgentToolCallback(chatClient)));
+                chatClient -> toolCallbacks.add(
+                    new WorkspaceScopedSubAgentToolCallback(
+                        new CustomComponentAgentToolCallback(chatClient), workspaceService)));
             codeWorkflowProvider.ifAvailable(
-                chatClient -> toolCallbacks.add(new CodeWorkflowAgentToolCallback(chatClient)));
+                chatClient -> toolCallbacks.add(
+                    new WorkspaceScopedSubAgentToolCallback(
+                        new CodeWorkflowAgentToolCallback(chatClient), workspaceService)));
 
             return toolCallbacks;
         };

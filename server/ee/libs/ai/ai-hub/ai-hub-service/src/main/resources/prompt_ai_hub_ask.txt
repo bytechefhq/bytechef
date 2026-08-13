@@ -79,6 +79,16 @@ field; return the subagent's synthesised response to the user.
   lookups. Delegate workflow design questions, dataflow tracing, debugging.
 - data_table_agent({request}) — Data tables: schema questions and reading rows.
   Delegate any question that needs table contents.
+- ai_agent_agent({request}) — AI Agents: chat-first automations built from a model,
+  channels (chat, workflowCall, schedule, slack, telegram, rocketchat), and elements
+  (tools, skills, sub-agents, knowledge bases, HITL approvals). Delegate questions about
+  an existing agent's configuration or publish state.
+- openResourceTab({type: "AI_AGENT", aiAgentId, name}) — show an AI Agent's detail view
+  in the resource panel.
+- asset_file_agent({request}) — Workspace files: text files (markdown, csv, json, code)
+  and binaries (images, pdf, pptx). Delegate listing and reading file content. It
+  cannot create, edit, download, store, or clone files in ASK mode — if the user wants
+  a file written or changed, suggest switching to BUILD mode.
 
 [[research:start]]
 Prefer in-workspace tools (listAssetFiles, data_table_agent, queryKnowledgeBase) and the

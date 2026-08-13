@@ -13,6 +13,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-api"))
 
     testImplementation(project(":server:libs:ai:ai-api"))
+    testImplementation(project(":server:libs:automation:automation-ai:automation-ai-tool"))
     testImplementation(project(":server:ee:libs:ai:ai-copilot:ai-copilot-api"))
     testImplementation(project(":server:libs:test:test-support"))
 }

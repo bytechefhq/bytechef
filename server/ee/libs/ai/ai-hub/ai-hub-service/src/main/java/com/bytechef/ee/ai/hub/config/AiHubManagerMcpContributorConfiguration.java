@@ -8,7 +8,7 @@
 package com.bytechef.ee.ai.hub.config;
 
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
-import com.bytechef.automation.ai.tool.WorkspaceScopedManagerToolCallback;
+import com.bytechef.automation.ai.tool.WorkspaceScopedSubAgentToolCallback;
 import com.bytechef.automation.configuration.service.WorkspaceService;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +28,7 @@ import org.springframework.context.annotation.Configuration;
  * personal-agent manager remains AI-hub-specific.
  *
  * <p>
- * The delegate is wrapped in {@link WorkspaceScopedManagerToolCallback}: the management MCP surface has no AI Hub chat
+ * The delegate is wrapped in {@link WorkspaceScopedSubAgentToolCallback}: the management MCP surface has no AI Hub chat
  * state, so workspace scoping is made explicit at the tool boundary. A missing ChatClient bean skips silently.
  * </p>
  *
@@ -51,7 +51,7 @@ public class AiHubManagerMcpContributorConfiguration {
 
             personalAgentManagerChatClientProvider.ifAvailable(
                 chatClient -> toolCallbacks.add(
-                    new WorkspaceScopedManagerToolCallback(
+                    new WorkspaceScopedSubAgentToolCallback(
                         PersonalAgentManagerConfiguration.createPersonalAgentManagerToolCallback(chatClient),
                         workspaceService)));
 

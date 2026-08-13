@@ -55,6 +55,15 @@ public interface AssetFileFacade {
 
     void delete(Long id);
 
+    /**
+     * Returns the configured per-file size quota in bytes (the same limit {@code createFromAi} and
+     * {@code createBinaryFromAi} enforce), or a negative value when no per-file limit is configured. Lets a caller that
+     * buffers bytes before calling one of the {@code create*} methods — e.g. a tool that downloads a URL server-side —
+     * bound its own buffer to the effective limit instead of discovering the quota only after fully downloading and
+     * being rejected.
+     */
+    long getMaxFileSizeBytes();
+
     InputStream downloadContent(Long id);
 
     List<AssetFile> findAllByWorkspaceIdAndEnvironment(Long workspaceId, int environment, List<Long> tagIds);

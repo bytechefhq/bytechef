@@ -22,6 +22,7 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
+import com.bytechef.automation.configuration.service.WorkspaceService;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import org.junit.jupiter.api.Test;
@@ -45,18 +46,46 @@ class McpServerToolCallbackContributorConfigurationTest {
         McpServerToolCallbackContributor contributor = configuration.copilotAgentToolCallbackContributor(
             emptyProvider(), present(mock(ChatClient.class)), present(mock(ChatClient.class)),
             present(mock(ChatClient.class)), present(mock(ChatClient.class)), present(mock(ChatClient.class)),
-            present(converterChatClientSupplier), present(mock(ChatClient.class)), present(mock(ChatClient.class)));
+            present(converterChatClientSupplier), present(mock(ChatClient.class)), present(mock(ChatClient.class)),
+            present(mock(ChatClient.class)), present(mock(ChatClient.class)), mock(WorkspaceService.class));
 
-        assertThat(contributor.getToolCallbacks()).hasSize(8);
+        // Asserting names (not just a count) catches a provider wired to the wrong callback type — every
+        // contributed callback is a WorkspaceScopedSubAgentToolCallback, so a mis-wire (e.g. the asset-file
+        // provider passed to DataTableAgentToolCallback) would still pass a bare hasSize check.
+        assertThat(contributor.getToolCallbacks())
+            .extracting(toolCallback -> toolCallback.getToolDefinition()
+                .name())
+            .containsExactlyInAnyOrder(
+                "workflow_editor_agent", "code_editor_agent", "cluster_element_agent", "skills_agent",
+                "workflow_execution_agent", "converter_agent", "knowledge_base_agent", "data_table_agent",
+                "ai_agent_agent", "asset_file_agent");
     }
 
     @Test
     void contributesNothingWhenAllAbsent() {
         McpServerToolCallbackContributor contributor = configuration.copilotAgentToolCallbackContributor(
             emptyProvider(), emptyProvider(), emptyProvider(), emptyProvider(), emptyProvider(), emptyProvider(),
-            emptyProvider(), emptyProvider(), emptyProvider());
+            emptyProvider(), emptyProvider(), emptyProvider(), emptyProvider(), emptyProvider(),
+            mock(WorkspaceService.class));
 
         assertThat(contributor.getToolCallbacks()).isEmpty();
+    }
+
+    @Test
+    void contributedAgentToolsAcceptWorkspaceId() {
+        ChatClient converterChatClient = mock(ChatClient.class);
+
+        Supplier<ChatClient> converterChatClientSupplier = () -> converterChatClient;
+
+        McpServerToolCallbackContributor contributor = configuration.copilotAgentToolCallbackContributor(
+            emptyProvider(), present(mock(ChatClient.class)), present(mock(ChatClient.class)),
+            present(mock(ChatClient.class)), present(mock(ChatClient.class)), present(mock(ChatClient.class)),
+            present(converterChatClientSupplier), present(mock(ChatClient.class)), present(mock(ChatClient.class)),
+            present(mock(ChatClient.class)), present(mock(ChatClient.class)), mock(WorkspaceService.class));
+
+        assertThat(contributor.getToolCallbacks())
+            .allSatisfy(toolCallback -> assertThat(toolCallback.getToolDefinition()
+                .inputSchema()).contains("workspaceId"));
     }
 
     @SuppressWarnings("unchecked")

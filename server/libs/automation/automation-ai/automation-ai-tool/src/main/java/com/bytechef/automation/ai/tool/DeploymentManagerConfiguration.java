@@ -20,9 +20,11 @@ import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.tool.ToolCallback;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -72,16 +74,14 @@ public class DeploymentManagerConfiguration {
 
         String systemPrompt = readPrompt(promptResource);
 
+        DeploymentToolCallbacksFactory deploymentToolCallbacksFactory =
+            new DeploymentToolCallbacksFactory(projectDeploymentFacade);
+
+        List<ToolCallback> toolCallbacks = deploymentToolCallbacksFactory.writeToolCallbacks();
+
         return ChatClient.builder(chatModel)
             .defaultSystem(systemPrompt)
-            .defaultTools(
-                new ListProjectDeploymentsToolCallback(projectDeploymentFacade),
-                new CreateProjectDeploymentToolCallback(projectDeploymentFacade),
-                new UpdateProjectDeploymentToolCallback(projectDeploymentFacade),
-                new DeleteProjectDeploymentToolCallback(projectDeploymentFacade),
-                new RollbackProjectDeploymentToolCallback(projectDeploymentFacade),
-                new ToggleProjectDeploymentToolCallback(projectDeploymentFacade),
-                new PromoteWorkflowToolCallback(projectDeploymentFacade))
+            .defaultToolCallbacks(toolCallbacks)
             .build();
     }
 

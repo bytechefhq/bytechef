@@ -10,6 +10,8 @@ package com.bytechef.ee.embedded.ai.copilot.config;
 import com.bytechef.ai.copilot.tool.CopilotAgentType;
 import com.bytechef.ai.copilot.tool.WorkflowEditorAgentToolCallback;
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
+import com.bytechef.automation.ai.tool.WorkspaceScopedSubAgentToolCallback;
+import com.bytechef.automation.configuration.service.WorkspaceService;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.ai.chat.client.ChatClient;
@@ -31,6 +33,8 @@ import org.springframework.context.annotation.Configuration;
  * and {@link CopilotAgentType#WORKFLOW_EDITOR_EMBEDDED_AGENT}) wrapped around the embedded BUILD subagent
  * {@link ChatClient}. A missing ChatClient bean (feature module absent) skips silently. Like the automation copilot
  * contributor, the AG-UI {@code ProgressReportingToolCallback} wrapper is intentionally NOT applied on this surface.
+ * The delegate is wrapped in {@link WorkspaceScopedSubAgentToolCallback} so the MCP client can supply workspace scope
+ * this surface cannot infer.
  * </p>
  *
  * @version ee
@@ -53,16 +57,19 @@ public class EmbeddedCopilotMcpContributorConfiguration {
     @Bean
     McpServerToolCallbackContributor embeddedWorkflowEditorMcpToolCallbackContributor(
         @Qualifier("workflowEditorEmbeddedBuildSubAgentChatClient") //
-        ObjectProvider<ChatClient> workflowEditorEmbeddedBuildSubAgentChatClientProvider) {
+        ObjectProvider<ChatClient> workflowEditorEmbeddedBuildSubAgentChatClientProvider,
+        WorkspaceService workspaceService) {
 
         return () -> {
             List<ToolCallback> toolCallbacks = new ArrayList<>();
 
             workflowEditorEmbeddedBuildSubAgentChatClientProvider.ifAvailable(
                 chatClient -> toolCallbacks.add(
-                    new WorkflowEditorAgentToolCallback(
-                        chatClient, "workflow_editor_embedded_agent", DESCRIPTION,
-                        CopilotAgentType.WORKFLOW_EDITOR_EMBEDDED_AGENT)));
+                    new WorkspaceScopedSubAgentToolCallback(
+                        new WorkflowEditorAgentToolCallback(
+                            chatClient, "workflow_editor_embedded_agent", DESCRIPTION,
+                            CopilotAgentType.WORKFLOW_EDITOR_EMBEDDED_AGENT),
+                        workspaceService)));
 
             return toolCallbacks;
         };

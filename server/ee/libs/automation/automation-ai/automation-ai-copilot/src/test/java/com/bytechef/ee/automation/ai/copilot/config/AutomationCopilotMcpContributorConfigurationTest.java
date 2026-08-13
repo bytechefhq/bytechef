@@ -13,6 +13,7 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
+import com.bytechef.automation.configuration.service.WorkspaceService;
 import java.util.List;
 import java.util.function.Consumer;
 import org.junit.jupiter.api.Test;
@@ -36,7 +37,7 @@ class AutomationCopilotMcpContributorConfigurationTest {
     @Test
     void testContributesAllAgentsWhenChatClientsPresent() {
         McpServerToolCallbackContributor contributor = configuration.automationCopilotAgentToolCallbackContributor(
-            toPresentProvider(), toPresentProvider(), toPresentProvider());
+            toPresentProvider(), toPresentProvider(), toPresentProvider(), mock(WorkspaceService.class));
 
         List<String> toolNames = contributor.getToolCallbacks()
             .stream()
@@ -50,7 +51,7 @@ class AutomationCopilotMcpContributorConfigurationTest {
     @Test
     void testMissingChatClientsAreSkipped() {
         McpServerToolCallbackContributor contributor = configuration.automationCopilotAgentToolCallbackContributor(
-            toAbsentProvider(), toAbsentProvider(), toAbsentProvider());
+            toAbsentProvider(), toAbsentProvider(), toAbsentProvider(), mock(WorkspaceService.class));
 
         assertThat(contributor.getToolCallbacks()).isEmpty();
     }
@@ -58,7 +59,7 @@ class AutomationCopilotMcpContributorConfigurationTest {
     @Test
     void testPartialAvailabilityContributesOnlyPresentAgents() {
         McpServerToolCallbackContributor contributor = configuration.automationCopilotAgentToolCallbackContributor(
-            toAbsentProvider(), toPresentProvider(), toPresentProvider());
+            toAbsentProvider(), toPresentProvider(), toPresentProvider(), mock(WorkspaceService.class));
 
         List<String> toolNames = contributor.getToolCallbacks()
             .stream()
@@ -67,6 +68,16 @@ class AutomationCopilotMcpContributorConfigurationTest {
             .toList();
 
         assertThat(toolNames).containsExactly("custom_component_agent", "code_workflow_agent");
+    }
+
+    @Test
+    void testContributedAgentToolsAcceptWorkspaceId() {
+        McpServerToolCallbackContributor contributor = configuration.automationCopilotAgentToolCallbackContributor(
+            toPresentProvider(), toPresentProvider(), toPresentProvider(), mock(WorkspaceService.class));
+
+        assertThat(contributor.getToolCallbacks())
+            .allSatisfy(toolCallback -> assertThat(toolCallback.getToolDefinition()
+                .inputSchema()).contains("workspaceId"));
     }
 
     private ObjectProvider<ChatClient> toPresentProvider() {

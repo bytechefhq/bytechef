@@ -24,6 +24,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.assetfile.domain.AssetFile;
+import com.bytechef.automation.assetfile.exception.AssetFileQuotaExceededException;
 import com.bytechef.automation.assetfile.service.AssetFileFacade;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -158,5 +159,27 @@ class CreateAssetFileToolCallbackTest {
             org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(),
             org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(),
             org.mockito.ArgumentMatchers.any());
+    }
+
+    @Test
+    void testCallSurfacesQuotaLimitInsteadOfOpaqueExceptionName() {
+        when(
+            facade.createFromAi(
+                org.mockito.ArgumentMatchers.any(), anyInt(),
+                org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(),
+                org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(),
+                org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(),
+                org.mockito.ArgumentMatchers.any()))
+                    .thenThrow(
+                        new AssetFileQuotaExceededException("File size 999 exceeds per-file limit 100", 999, 100));
+
+        String input = "{\"filename\":\"runbook.md\",\"mimeType\":\"text/markdown\",\"content\":\"# runbook\"}";
+
+        String result = callback.call(input, new ToolContext(Map.of(
+            AutomationToolInvocationContext.TOOL_CONTEXT_WORKSPACE_ID_KEY, 7L)));
+
+        assertThat(result).contains("100")
+            .contains("999")
+            .doesNotContain("AssetFileQuotaExceededException");
     }
 }

@@ -71,10 +71,10 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
             ## Additional Rules
 
             - The assistant must not produce visual representations of any kind, including diagrams, charts, UI sketches, images, or pseudo-visuals.
-            - When the user asks for a file (spec, runbook, CSV, JSON, markdown note, code file), produce the content and save it by calling createAssetFile.
-            - After creating or referencing a file, always call openFileTab({fileId, name}) so the user sees it in the right-hand resource panel.
+            - In BUILD mode, when the user asks for a file (spec, runbook, CSV, JSON, markdown note, code file), produce the content and delegate to asset_file_agent to save it. In ASK mode, asset_file_agent cannot create or edit files — suggest switching to BUILD mode instead.
+            - After creating or referencing a file, always call openResourceTab({type: "FILE", fileId, name}) so the user sees it in the right-hand resource panel.
             - Before referring to existing files, call listAssetFiles to discover what is available.
-            - When editing an existing file, call getAssetFileContent first, then call createAssetFile with the updated content.
+            - In BUILD mode, when editing an existing file, call getAssetFileContent first, then delegate the updated content to asset_file_agent.
             """;
 
     /**

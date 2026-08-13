@@ -28,6 +28,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import org.jspecify.annotations.NonNull;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,6 +36,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 /**
@@ -82,107 +84,19 @@ public class CopilotApiController {
         injectAuthenticatedUserId(stateMap);
         stateMap.put(CopilotConstants.STATE_TENANT_ID, TenantContext.getCurrentTenantId());
 
-        if (agentId.equals("workflow_editor")) {
-            if (Mode.valueOf((String) mode) == Mode.BUILD) {
-                agentId = "workflow_editor_build";
-            } else {
-                agentId = "workflow_editor_ask";
-            }
-        } else if (agentId.equals("workflow_editor_embedded")) {
-            if (Mode.valueOf((String) mode) == Mode.BUILD) {
-                agentId = "workflow_editor_embedded_build";
-            } else {
-                agentId = "workflow_editor_embedded_ask";
-            }
-        } else if (agentId.equals("workflow_execution")) {
-            if (Mode.valueOf((String) mode) == Mode.BUILD) {
-                agentId = "workflow_execution_build";
-            } else {
-                agentId = "workflow_execution_ask";
-            }
-        } else if (agentId.equals("workflow_execution_embedded")) {
-            if (Mode.valueOf((String) mode) == Mode.BUILD) {
-                agentId = "workflow_execution_embedded_build";
-            } else {
-                agentId = "workflow_execution_embedded_ask";
-            }
-        } else if (agentId.equals("code_editor")) {
-            if (Mode.valueOf((String) mode) == Mode.BUILD) {
-                agentId = "code_editor_build";
-            } else {
-                agentId = "code_editor_ask";
-            }
-        } else if (agentId.equals("workflow_code_editor")) {
-            if (Mode.valueOf((String) mode) == Mode.BUILD) {
-                agentId = "workflow_code_editor_build";
-            } else {
-                agentId = "workflow_code_editor_ask";
-            }
-        } else if (agentId.equals("code_workflow")) {
-            if (Mode.valueOf((String) mode) == Mode.BUILD) {
-                agentId = "code_workflow_build";
-            } else {
-                agentId = "code_workflow_ask";
-            }
-        } else if (agentId.equals("code_workflow_embedded")) {
-            if (Mode.valueOf((String) mode) == Mode.BUILD) {
-                agentId = "code_workflow_embedded_build";
-            } else {
-                agentId = "code_workflow_embedded_ask";
-            }
-        } else if (agentId.equals("custom_component")) {
-            if (Mode.valueOf((String) mode) == Mode.BUILD) {
-                agentId = "custom_component_build";
-            } else {
-                agentId = "custom_component_ask";
-            }
-        } else if (agentId.equals("cluster_element")) {
-            if (Mode.valueOf((String) mode) == Mode.BUILD) {
-                agentId = "cluster_element_build";
-            } else {
-                agentId = "cluster_element_ask";
-            }
-        } else if (agentId.equals("converter")) {
+        if (agentId.equals("converter")) {
             agentId = "converter_build";
-        } else if (agentId.equals("skills")) {
-            if (Mode.valueOf((String) mode) == Mode.BUILD) {
-                agentId = "skills_build";
-            } else {
-                agentId = "skills_ask";
-            }
-        } else if (agentId.equals("context_store")) {
-            if (Mode.valueOf((String) mode) == Mode.BUILD) {
-                agentId = "context_store_build";
-            } else {
-                agentId = "context_store_ask";
-            }
-        } else if (agentId.equals("knowledge_base")) {
-            if (Mode.valueOf((String) mode) == Mode.BUILD) {
-                agentId = "knowledge_base_build";
-            } else {
-                agentId = "knowledge_base_ask";
-            }
-        } else if (agentId.equals("data_table")) {
-            if (Mode.valueOf((String) mode) == Mode.BUILD) {
-                agentId = "data_table_build";
-            } else {
-                agentId = "data_table_ask";
-            }
-        } else if (agentId.equals("json_schema_builder")) {
-            if (Mode.valueOf((String) mode) == Mode.BUILD) {
-                agentId = "json_schema_builder_build";
-            } else {
-                agentId = "json_schema_builder_ask";
-            }
-        } else if (agentId.equals("sample_output")) {
-            if (Mode.valueOf((String) mode) == Mode.BUILD) {
-                agentId = "sample_output_build";
-            } else {
-                agentId = "sample_output_ask";
-            }
+        } else {
+            agentId = agentId + "_" + Mode.valueOf((String) mode)
+                .name()
+                .toLowerCase();
         }
 
         LocalAgent localAgent = localAgentMap.get(agentId);
+
+        if (localAgent == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Unknown agentId: " + agentId);
+        }
 
         return this.agUiService.runAgent(localAgent, agUiParameters);
     }

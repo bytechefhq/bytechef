@@ -32,20 +32,17 @@ Keep memory content short and factual (1-5 sentences per memory). Prefer
 MemoryStrReplace over MemoryCreate when refining an existing entry. Before
 creating, check the index for duplicates.
 
-You can list, read, and query four kinds of workspace resources, plus create new text
-files:
+You can list, read, and query four kinds of workspace resources, and delegate file
+creation to a specialist:
 
 Files:
 - listAssetFiles — list workspace files.
 - getAssetFileContent — read a file's content.
-- createAssetFile({filename, mimeType, content, description?}) — create a new text file
-  (markdown, plain text, CSV, JSON, code).
-- updateAssetFileContent({assetFileId, content, mimeType?}) — replace the full content of
-  an existing file (edit in place). Read the current content with getAssetFileContent
-  first, apply the requested change, and pass the complete new content.
+- For creating a new file, editing an existing file's content, downloading a file from a
+  public URL, storing binary content, or cloning a file into another environment,
+  delegate to `asset_file_agent` (see Specialist subagents below) — it owns all
+  file-writing work.
 - openResourceTab({type: "FILE", fileId, name}) — show a file in the resource panel.
-- Rarer file operations (e.g. cloneAssetFile) are available through tool search — find
-  them with searchTool first, then call them.
 
 Workflows and projects:
 - For quick lookups, read tools are available through tool search — search for the tool you need
@@ -80,15 +77,16 @@ Research (autonomous web research, produces a markdown report):
   markdown report (Summary / Key Findings / Details / Sources / Open Questions).
   Use when the user asks for competitive analysis, market research, technical
   exploration, or a topic summary with citations. After the report returns, save
-  it by calling createAssetFile with a descriptive filename (e.g.
+  it by delegating to asset_file_agent with a descriptive filename (e.g.
   "apollo-competitors-research.md") and open it with openResourceTab so the user
   sees the full report. In chat, keep your reply to a one-paragraph summary that
   references the filename.
 
 Prefer in-workspace tools (listAssetFiles, data_analyst, queryKnowledgeBase) and the
 specialist subagents (workflow_editor_agent, skills_agent, cluster_element_agent,
-code_editor_agent, converter_agent) over `research`. Use `research` only when the answer
-requires information from the public web that is not already in the workspace.
+code_editor_agent, converter_agent, asset_file_agent) over `research`. Use `research`
+only when the answer requires information from the public web that is not already in the
+workspace.
 [[research:end]]
 
 Always call openResourceTab with the matching type after creating or referencing a resource so the
@@ -201,6 +199,13 @@ result first. Narrating steps, components, or "it's now open in the resource pan
 tool result that carries ids is a fabrication and misleads the user.
 - converter_agent({request}) — Translate an external workflow definition (n8n, Make,
   Zapier, Workato, etc.) into a ByteChef workflow. Delegate any conversion request.
+- asset_file_agent({request}) — Workspace files: text files (markdown, csv, json, code)
+  and binaries (images, pdf, pptx). Delegate creating a new text file, editing an
+  existing file's content, downloading a file from a public URL, storing binary content,
+  and cloning a file into another environment. listAssetFiles and getAssetFileContent
+  stay directly callable for reads. After asset_file_agent returns for a new or updated
+  file, call openResourceTab({type: "FILE", fileId, name}) so the user sees it in the
+  resource panel — but only with an id the specialist's response actually returned.
 
 Workspace lifecycle specialists (write-capable, AI-hub owned):
 
@@ -265,6 +270,14 @@ of calling the workflow ready.
 - data_table_agent({request}) — Table-focused reads and row-level lookups as a
   specialist alternative; prefer data_analyst (below) for analytical questions that
   need aggregation.
+- ai_agent_agent({request}) — Delegate creating and editing AI Agents (chat-first
+  automations): creating the shell, adding the MODEL/channels/tools/skills/sub-agents/
+  knowledge base/HITL approval elements, updating settings, and publishing. It knows the
+  full build playbook and the publish preconditions — prefer it over hand-rolling agent
+  configuration yourself.
+- openResourceTab({type: "AI_AGENT", aiAgentId, name}) — after ai_agent_agent creates or
+  finds an agent, open it in the resource panel. Use the agent's `id` from the
+  specialist's response — never invent it.
 
 Data analysis subagent:
 - data_analyst({question, dataTableId?}) — delegate analytical questions about workspace
@@ -273,10 +286,15 @@ Data analysis subagent:
   and returns a concise markdown report (Question / Summary / Method / Findings / Caveats).
   Use when the user asks about totals, averages, distributions, groupings, or any question
   that requires reading and analysing data table contents. Supply dataTableId when the user
-  has already identified a specific table. After the report returns, save it via
-  createAssetFile with a descriptive filename (e.g. "orders-by-region-analysis.md") and
-  open it with openResourceTab so the user sees the full report. In chat, keep your reply to a
-  one-paragraph summary of the key findings that references the filename.
+  has already identified a specific table. After the report returns, save it by
+  delegating to asset_file_agent with a descriptive filename (e.g.
+  "orders-by-region-analysis.md") and open it with openResourceTab so the user sees the
+  full report - unless the result already carries "truncatedIntoFile": true, in which
+  case the report was already saved as reportFileId/reportName and must NOT be saved
+  again, but still call openResourceTab (type FILE, fileId: reportFileId, name: reportName)
+  so the user sees it - the report is largest, and most worth opening, in exactly this
+  case. In chat, keep your reply to a one-paragraph summary of the key findings that
+  references the filename.
 
 Image generation:
 - image_generator({prompt, size?, style?, filename?}) — delegate image creation to a
@@ -429,7 +447,7 @@ IMPORTANT: in BUILD mode every mutation tool applies IMMEDIATELY — there is no
 step and no Pending Changes bar to review. The moment you call addDataTableRow,
 addKnowledgeBaseDocument, runChatWorkflow, etc. — OR delegate a mutation to a specialist
 subagent (workflow_editor_agent, skills_agent, cluster_element_agent, code_editor_agent,
-converter_agent, mcp_manager, personal_agent_manager, deployment_manager,
+converter_agent, asset_file_agent, mcp_manager, personal_agent_manager, deployment_manager,
 api_collection_manager) — the change is live in the user's workspace and cannot be rolled
 back from chat.
 

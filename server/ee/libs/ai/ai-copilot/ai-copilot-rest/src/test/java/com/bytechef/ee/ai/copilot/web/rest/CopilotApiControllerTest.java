@@ -28,7 +28,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 /**
@@ -43,8 +45,8 @@ class CopilotApiControllerTest {
     private final ProjectWorkflowService projectWorkflowService = mock(ProjectWorkflowService.class);
 
     private final CopilotApiController controller = new CopilotApiController(
-        agUiService, List.of(), Optional.of(permissionService), Optional.of(projectWorkflowService),
-        Optional.empty());
+        agUiService, List.of(localAgent("converter_build"), localAgent("workflow_editor_ask")),
+        Optional.of(permissionService), Optional.of(projectWorkflowService), Optional.empty());
 
     @Test
     void testChatDeniedWhenUserLacksWorkflowScope() {
@@ -231,6 +233,42 @@ class CopilotApiControllerTest {
         controller.chat("code_workflow_embedded", agUiParameters("BUILD"));
 
         verify(agUiService).runAgent(eq(agent), any());
+    }
+
+    @Test
+    void testChatRoutesProjectToBuildByDefaultRule() {
+        LocalAgent agent = localAgent("project_build");
+        CopilotApiController controller = controllerWith(agent);
+
+        when(agUiService.runAgent(eq(agent), any())).thenReturn(new SseEmitter());
+
+        controller.chat("project", agUiParameters("BUILD"));
+
+        verify(agUiService).runAgent(eq(agent), any());
+    }
+
+    @Test
+    void testChatRoutesConverterToBuildRegardlessOfMode() {
+        LocalAgent agent = localAgent("converter_build");
+        CopilotApiController controller = controllerWith(agent);
+
+        when(agUiService.runAgent(eq(agent), any())).thenReturn(new SseEmitter());
+
+        controller.chat("converter", agUiParameters("ASK"));
+
+        verify(agUiService).runAgent(eq(agent), any());
+    }
+
+    @Test
+    void testChatRejectsUnregisteredAgentWithClientError() {
+        CopilotApiController controllerWithoutAgents = new CopilotApiController(
+            agUiService, List.of(), Optional.empty(), Optional.empty(), Optional.empty());
+
+        assertThatThrownBy(() -> controllerWithoutAgents.chat("workflow_editor", agUiParameters("ASK")))
+            .isInstanceOf(ResponseStatusException.class)
+            .hasFieldOrPropertyWithValue("statusCode", HttpStatus.NOT_FOUND);
+
+        verify(agUiService, never()).runAgent(any(), any());
     }
 
     private AgUiParameters agUiParameters(String mode) {

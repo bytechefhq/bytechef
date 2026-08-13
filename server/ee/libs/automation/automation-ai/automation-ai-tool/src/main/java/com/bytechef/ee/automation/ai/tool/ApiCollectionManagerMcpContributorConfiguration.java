@@ -8,7 +8,7 @@
 package com.bytechef.ee.automation.ai.tool;
 
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
-import com.bytechef.automation.ai.tool.WorkspaceScopedManagerToolCallback;
+import com.bytechef.automation.ai.tool.WorkspaceScopedSubAgentToolCallback;
 import com.bytechef.automation.configuration.service.WorkspaceService;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +26,7 @@ import org.springframework.context.annotation.Configuration;
  * managers (mcp_manager, deployment_manager) are contributed from {@code ManagerMcpContributorConfiguration}.
  *
  * <p>
- * The delegate is wrapped in {@link WorkspaceScopedManagerToolCallback}: the management MCP surface has no AI Hub chat
+ * The delegate is wrapped in {@link WorkspaceScopedSubAgentToolCallback}: the management MCP surface has no AI Hub chat
  * state, so workspace scoping is made explicit at the tool boundary. A missing ChatClient bean skips silently. The
  * {@code bytechef.ai.hub.enabled} gate is retained so the management-MCP exposure is unchanged from when this manager
  * lived in ai-hub-service.
@@ -51,7 +51,7 @@ public class ApiCollectionManagerMcpContributorConfiguration {
 
             apiCollectionManagerChatClientProvider.ifAvailable(
                 chatClient -> toolCallbacks.add(
-                    new WorkspaceScopedManagerToolCallback(
+                    new WorkspaceScopedSubAgentToolCallback(
                         ApiCollectionManagerConfiguration.createApiCollectionManagerToolCallback(chatClient),
                         workspaceService)));
 

@@ -124,7 +124,10 @@ dependencies {
     implementation(project(":spring-ai:spring-ag-ui:integrations:spring-ai"))
     implementation(project(":server:libs:ai:ai-mcp:ai-mcp-server-api"))
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-api"))
+    implementation(project(":server:libs:automation:automation-ai:automation-ai-agent:automation-ai-agent-api"))
+    implementation(project(":server:libs:automation:automation-ai:automation-ai-mcp:automation-ai-mcp-api"))
     implementation(project(":server:libs:automation:automation-ai:automation-ai-tool"))
+    implementation(project(":server:libs:automation:automation-asset-file:automation-asset-file-api"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
     implementation(project(":server:libs:automation:automation-data-table:automation-data-table-api"))
     implementation(project(":server:libs:automation:automation-knowledge-base:automation-knowledge-base-api"))
@@ -139,4 +142,8 @@ dependencies {
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-tool"))
 
     implementation(project(":server:libs:core:tenant:tenant-api"))
+
+    // CopilotAgentType (ai-copilot-tool) implements AgentType, which ai-copilot-tool depends on as
+    // implementation-only; expose it to tests that assert against CopilotAgentType.key().
+    testImplementation(project(":server:libs:ai:ai-api"))
 }
