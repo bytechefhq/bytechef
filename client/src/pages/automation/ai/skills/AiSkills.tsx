@@ -200,10 +200,7 @@ const AiSkills = () => {
 
                         <DropdownMenuSeparator />
 
-                        <DropdownMenuItem
-                            className="text-content-destructive focus:text-content-destructive-primary"
-                            onClick={handlers.onDelete}
-                        >
+                        <DropdownMenuItem onClick={handlers.onDelete} variant="destructive">
                             <Trash2Icon className="mr-2 size-4" /> Delete Skill
                         </DropdownMenuItem>
                     </DropdownMenuContent>

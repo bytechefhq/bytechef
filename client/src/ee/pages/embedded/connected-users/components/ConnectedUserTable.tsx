@@ -143,9 +143,9 @@ const ConnectedUserTable = ({connectedUsers}: ConnectedUserTableProps) => {
                             <DropdownMenuSeparator />
 
                             <DropdownMenuItem
-                                className="text-destructive"
                                 data-action="delete"
                                 data-index={info.row.index.toString()}
+                                variant="destructive"
                             >
                                 Delete
                             </DropdownMenuItem>

@@ -71,7 +71,7 @@ const A2aServerListItem = ({a2aServer}: A2aServerListItemProps) => {
 
                     <DropdownMenuSeparator />
 
-                    <DropdownMenuItem className="text-destructive" onClick={handleDeleteClick}>
+                    <DropdownMenuItem onClick={handleDeleteClick} variant="destructive">
                         Delete
                     </DropdownMenuItem>
                 </DropdownMenuContent>

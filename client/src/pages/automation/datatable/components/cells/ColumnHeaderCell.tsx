@@ -29,10 +29,7 @@ const ColumnHeaderCell = ({columnId, columnName, onDelete, onRename}: ColumnHead
                     <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => onRename(columnId, columnName)}>Rename</DropdownMenuItem>
 
-                        <DropdownMenuItem
-                            className="text-content-destructive focus:text-content-destructive-primary"
-                            onClick={() => onDelete(columnId, columnName)}
-                        >
+                        <DropdownMenuItem onClick={() => onDelete(columnId, columnName)} variant="destructive">
                             Delete
                         </DropdownMenuItem>
                     </DropdownMenuContent>

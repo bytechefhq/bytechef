@@ -61,12 +61,12 @@ const KnowledgeBaseSourceRowActionsMenu = ({isAdmin, source}: KnowledgeBaseSourc
                 <DropdownMenuSeparator />
 
                 <DropdownMenuItem
-                    className="text-content-destructive"
                     onClick={() => {
                         if (window.confirm(`Delete source "${source.name}"? This cannot be undone.`)) {
                             deleteMutation.mutate({id: source.id});
                         }
                     }}
+                    variant="destructive"
                 >
                     <TrashIcon className="mr-2 size-4" />
                     Delete

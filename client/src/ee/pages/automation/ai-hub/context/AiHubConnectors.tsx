@@ -106,7 +106,7 @@ const ConnectorRow = ({connector, onConnect, onRemove, onToggle, onToggleTool, w
                             Edit connection
                         </DropdownMenuItem>
 
-                        <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={onRemove}>
+                        <DropdownMenuItem onClick={onRemove} variant="destructive">
                             <Trash2Icon />
                             Delete
                         </DropdownMenuItem>

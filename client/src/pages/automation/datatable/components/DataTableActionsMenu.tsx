@@ -1,5 +1,11 @@
 import Button from '@/components/Button/Button';
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {Download, MoreVertical, Pencil, Trash2, Upload} from 'lucide-react';
 
 interface DataTableActionsMenuProps {
@@ -38,11 +44,14 @@ const DataTableActionsMenu = ({
                     </DropdownMenuItem>
                 )}
 
+                {tableId && <DropdownMenuSeparator />}
+
+                {/* variant, not a text-* className: DropdownMenuItem colours the icon through
+                    data-[variant=destructive]:*:[svg]:text-destructive, while a colour class on the item leaves
+                    the icon to the [&_svg:not([class*='text-'])]:text-muted-foreground rule and it stays grey. */}
+
                 {tableId && (
-                    <DropdownMenuItem
-                        className="text-content-destructive focus:text-content-destructive-primary"
-                        onClick={onDeleteTable}
-                    >
+                    <DropdownMenuItem onClick={onDeleteTable} variant="destructive">
                         <Trash2 className="mr-2 h-4 w-4" /> Delete Table
                     </DropdownMenuItem>
                 )}

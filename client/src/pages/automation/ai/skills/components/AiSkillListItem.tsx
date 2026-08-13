@@ -95,10 +95,7 @@ const AiSkillListItem = ({deleteSkill, onDownload, onUpdate, skill}: AiSkillList
 
                             <DropdownMenuSeparator />
 
-                            <DropdownMenuItem
-                                className="text-content-destructive"
-                                onClick={() => setShowDeleteDialog(true)}
-                            >
+                            <DropdownMenuItem onClick={() => setShowDeleteDialog(true)} variant="destructive">
                                 <TrashIcon className="mr-2 size-4 text-content-destructive" />
                                 Delete
                             </DropdownMenuItem>

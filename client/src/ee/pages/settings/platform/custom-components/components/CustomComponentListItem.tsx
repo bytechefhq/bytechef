@@ -225,10 +225,7 @@ const CustomComponentListItem = ({customComponent}: CustomComponentItemProps) =>
                             </DropdownMenuTrigger>
 
                             <DropdownMenuContent align="end">
-                                <DropdownMenuItem
-                                    className="text-content-destructive"
-                                    onClick={() => setShowDeleteDialog(true)}
-                                >
+                                <DropdownMenuItem onClick={() => setShowDeleteDialog(true)} variant="destructive">
                                     Delete
                                 </DropdownMenuItem>
                             </DropdownMenuContent>

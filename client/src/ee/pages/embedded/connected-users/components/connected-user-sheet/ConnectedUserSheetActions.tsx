@@ -52,7 +52,7 @@ const ConnectedUserSheetActions = ({connectedUser}: {connectedUser: ConnectedUse
 
                     <DropdownMenuSeparator />
 
-                    <DropdownMenuItem className="text-destructive" onClick={() => setShowDeleteDialog(true)}>
+                    <DropdownMenuItem onClick={() => setShowDeleteDialog(true)} variant="destructive">
                         Delete
                     </DropdownMenuItem>
                 </DropdownMenuContent>

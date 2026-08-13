@@ -210,7 +210,7 @@ const ToolRow = ({
                         </DropdownMenuItem>
                     )}
 
-                    <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={onRemove}>
+                    <DropdownMenuItem onClick={onRemove} variant="destructive">
                         <TrashIcon />
                         Remove
                     </DropdownMenuItem>
@@ -252,7 +252,7 @@ const ResourceRow = ({kind, onRemove, removeDisabled, resourceName}: ResourceRow
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent align="end">
-                    <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={onRemove}>
+                    <DropdownMenuItem onClick={onRemove} variant="destructive">
                         <TrashIcon />
                         Remove
                     </DropdownMenuItem>

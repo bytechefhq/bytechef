@@ -41,9 +41,9 @@ const McpProjectListItemDropdownMenu = ({
                     <DropdownMenuSeparator />
 
                     <DropdownMenuItem
-                        className="text-destructive"
                         disabled={isDeletePending}
                         onClick={() => setShowDeleteDialog(true)}
+                        variant="destructive"
                     >
                         <span className="w-full">Delete</span>
                     </DropdownMenuItem>

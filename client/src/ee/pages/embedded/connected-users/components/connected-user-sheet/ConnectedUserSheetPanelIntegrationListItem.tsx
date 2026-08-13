@@ -185,10 +185,7 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
                             </DropdownMenuTrigger>
 
                             <DropdownMenuContent align="end">
-                                <DropdownMenuItem
-                                    className="text-destructive"
-                                    onClick={() => setShowDeleteDialog(true)}
-                                >
+                                <DropdownMenuItem onClick={() => setShowDeleteDialog(true)} variant="destructive">
                                     Delete
                                 </DropdownMenuItem>
                             </DropdownMenuContent>

@@ -28,7 +28,7 @@ const McpComponentToolDropdownMenu = ({
                         <span className="w-full">Edit</span>
                     </DropdownMenuItem>
 
-                    <DropdownMenuItem className="text-destructive" onClick={() => setShowDeleteDialog(true)}>
+                    <DropdownMenuItem onClick={() => setShowDeleteDialog(true)} variant="destructive">
                         <span className="w-full">Delete</span>
                     </DropdownMenuItem>
                 </DropdownMenuContent>

@@ -211,12 +211,12 @@ const AiHubPersonalAgentsList = ({onOpenCreateDialog}: AiHubPersonalAgentsListPr
                                             </DropdownMenuItem>
 
                                             <DropdownMenuItem
-                                                className="text-destructive focus:text-destructive"
                                                 onClick={(event) => {
                                                     event.stopPropagation();
 
                                                     setAgentToDelete(agent);
                                                 }}
+                                                variant="destructive"
                                             >
                                                 <Trash2Icon className="mr-2 size-4" />
                                                 Delete

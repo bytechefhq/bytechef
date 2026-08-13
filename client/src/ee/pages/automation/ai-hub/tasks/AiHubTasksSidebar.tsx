@@ -404,7 +404,7 @@ const TaskItem = ({
                                 </DropdownMenuItem>
                             )}
 
-                            <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={onDelete}>
+                            <DropdownMenuItem onClick={onDelete} variant="destructive">
                                 <Trash2Icon />
                                 Delete
                             </DropdownMenuItem>
