@@ -8,6 +8,7 @@ import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ToolInvocationsTable from '@/pages/automation/tool-invocations/components/ToolInvocationsTable';
 import {useToolInvocations} from '@/pages/automation/tool-invocations/hooks/useToolInvocations';
+import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import ExecutionsTabs from '@/shared/components/ExecutionsTabs';
 import Footer from '@/shared/layout/Footer';
 import Header from '@/shared/layout/Header';
@@ -86,24 +87,28 @@ export const ToolInvocations = ({basePath = '/automation/executions', mcpServerO
                     className="3xl:w-full"
                     position="main"
                     right={
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    aria-label="Refresh tool invocations"
-                                    disabled={toolInvocationLogsIsFetching}
-                                    icon={
-                                        <RefreshCwIcon
-                                            className={twMerge(toolInvocationLogsIsFetching && 'animate-spin')}
-                                        />
-                                    }
-                                    onClick={() => refetchToolInvocations()}
-                                    size="icon"
-                                    variant="outline"
-                                />
-                            </TooltipTrigger>
+                        <div className="flex items-center gap-1">
+                            <EnvironmentSelect />
 
-                            <TooltipContent>Refresh</TooltipContent>
-                        </Tooltip>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        aria-label="Refresh tool invocations"
+                                        disabled={toolInvocationLogsIsFetching}
+                                        icon={
+                                            <RefreshCwIcon
+                                                className={twMerge(toolInvocationLogsIsFetching && 'animate-spin')}
+                                            />
+                                        }
+                                        onClick={() => refetchToolInvocations()}
+                                        size="icon"
+                                        variant="ghost"
+                                    />
+                                </TooltipTrigger>
+
+                                <TooltipContent>Refresh</TooltipContent>
+                            </Tooltip>
+                        </div>
                     }
                     title={<ExecutionsTabs basePath={basePath} />}
                 />

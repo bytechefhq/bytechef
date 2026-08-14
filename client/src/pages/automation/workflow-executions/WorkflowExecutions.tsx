@@ -126,6 +126,8 @@ export const WorkflowExecutions = () => {
                     position="main"
                     right={
                         <div className="flex items-center gap-1">
+                            <EnvironmentSelect />
+
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Button
@@ -144,8 +146,6 @@ export const WorkflowExecutions = () => {
 
                                 <TooltipContent>Refresh</TooltipContent>
                             </Tooltip>
-
-                            <EnvironmentSelect />
 
                             <CopilotButton source={Source.WORKFLOW_EXECUTION} />
                         </div>
