@@ -78,7 +78,10 @@ const AutomationWorkflowExecutionsTable = ({data}: {data: WorkflowExecution[]}) 
                     {headerGroups.map((headerGroup) => (
                         <TableRow className="border-b-border/50" key={headerGroup.id}>
                             {headerGroup.headers.map((header, index) => (
-                                <TableHead key={`${headerGroup.id}_${header.id}_${index}`}>
+                                <TableHead
+                                    className="text-xs font-semibold tracking-wide text-content-neutral-secondary uppercase"
+                                    key={`${headerGroup.id}_${header.id}_${index}`}
+                                >
                                     {!header.isPlaceholder &&
                                         flexRender(header.column.columnDef.header, header.getContext())}
                                 </TableHead>

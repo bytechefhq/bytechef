@@ -92,7 +92,7 @@ const ExecutionTableHeader = ({className, depth = 0}: {className?: string; depth
             <TableHead className="w-9" />
 
             {columns.map((column) => (
-                <TableHead className="w-4 text-sm font-medium text-inherit" key={column.id}>
+                <TableHead className="w-4 text-xs font-semibold tracking-wide text-inherit uppercase" key={column.id}>
                     {column.header(depth)}
                 </TableHead>
             ))}
