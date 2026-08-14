@@ -110,7 +110,10 @@ const ExecutionTableHeader = ({className, depth = 0}: {className?: string; depth
 
             {columns.map((column) => (
                 <TableHead
-                    className={twMerge('w-4 text-sm font-medium text-inherit', column.headerClassName)}
+                    className={twMerge(
+                        'w-4 text-xs font-semibold tracking-wide text-inherit uppercase',
+                        column.headerClassName
+                    )}
                     key={column.id}
                 >
                     {column.header(depth)}
