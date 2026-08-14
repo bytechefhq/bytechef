@@ -6,7 +6,7 @@ import {twMerge} from 'tailwind-merge';
 // Sample questions surfaced on the empty chat states (home panel + empty thread). Each one maps to a
 // capability the BUILD agent actually has today — workflow building with a data-table target, the
 // research subagent with persistence delegated to asset_file_agent, typed data-table creation with
-// seed rows, createKnowledgeBase + addKnowledgeBaseDocument, and the personal_agent_manager's
+// seed rows, createKnowledgeBase + addKnowledgeBaseDocument, and the task_agent's
 // schedule tool — so a click always lands on a runnable path rather than a "not supported yet" reply.
 //
 // Each stays at or under ~85 characters so the pill renders on ONE row inside the home panel's max-w-2xl
@@ -19,7 +19,7 @@ const SUGGESTED_QUESTIONS: string[] = [
     'Research our top 5 competitors and save a battle card for each one',
     'Create a contacts data table with name, email, and company columns and sample rows',
     'Create a knowledge base for our product docs and add a getting-started document to it',
-    "Set up a personal agent that summarizes yesterday's executions every morning",
+    "Set up a task that summarizes yesterday's executions every morning",
 ];
 
 interface AiHubSuggestionChipsProps {
@@ -28,7 +28,7 @@ interface AiHubSuggestionChipsProps {
 
 // Clickable sample-question chips. Clicking appends the question as a user message on the assistant-ui
 // thread runtime — the same path the composer uses — so AiHubRuntimeProvider.onNew fires, auto-creates
-// the task when needed, and streams the turn. Must render inside AssistantRuntimeProvider.
+// the chat when needed, and streams the turn. Must render inside AssistantRuntimeProvider.
 const AiHubSuggestionChips: FC<AiHubSuggestionChipsProps> = ({className}) => {
     const aui = useAui();
 

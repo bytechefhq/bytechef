@@ -1,3 +1,7 @@
+import {createAiHubChat, generateAiHubChatTitle, patchChat} from '@/ee/pages/automation/ai-hub/chats/api/chats.api';
+import {AiHubChatsKeys} from '@/ee/pages/automation/ai-hub/chats/hooks/useChats';
+import {useTruncateAiHubChatMessagesMutation} from '@/ee/pages/automation/ai-hub/chats/hooks/useTruncateChatMessages';
+import {aiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
 import {aiHubComposerStore} from '@/ee/pages/automation/ai-hub/composer/stores/useAiHubComposerStore';
 import {aiHubProgressStore} from '@/ee/pages/automation/ai-hub/progress/stores/useAiHubProgressStore';
 import {
@@ -6,7 +10,7 @@ import {
 } from '@/ee/pages/automation/ai-hub/runtime-providers/inFlightRunClient';
 import {
     aiHubRunStateStore,
-    isTaskRunning,
+    isChatRunning,
     useAiHubRunStateStore,
 } from '@/ee/pages/automation/ai-hub/runtime-providers/stores/useAiHubRunStateStore';
 import {sanitizeAssistantMessages} from '@/ee/pages/automation/ai-hub/runtime-providers/stripLeakedToolMarkup';
@@ -17,10 +21,6 @@ import {
 } from '@/ee/pages/automation/ai-hub/runtime-providers/workflowStreamHandler';
 import {MODE, useAiHubStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubStore';
 import {aiHubTabsStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
-import {createAiHubTask, generateAiHubTaskTitle, patchTask} from '@/ee/pages/automation/ai-hub/tasks/api/tasks.api';
-import {AiHubTasksKeys} from '@/ee/pages/automation/ai-hub/tasks/hooks/useTasks';
-import {useTruncateAiHubTaskMessagesMutation} from '@/ee/pages/automation/ai-hub/tasks/hooks/useTruncateTaskMessages';
-import {aiHubTasksStore} from '@/ee/pages/automation/ai-hub/tasks/stores/useAiHubTasksStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {ApprovalResolutionContext, ResumeError} from '@/shared/components/ai-chat/approvalResolutionContext';
 import {humanizeAgentErrorMessage} from '@/shared/components/ai-chat/messages/humanizeAgentErrorMessage';
@@ -33,7 +33,7 @@ import {
     useAiChatToolCallStore,
 } from '@/shared/components/ai-chat/stores/useAiChatToolCallStore';
 import {useSSE} from '@/shared/hooks/useSSE';
-import {useAppendAiHubTaskAssistantMessageMutation} from '@/shared/middleware/graphql';
+import {useAppendAiHubChatAssistantMessageMutation} from '@/shared/middleware/graphql';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';
@@ -87,11 +87,13 @@ type OpenCodeWorkflowTabResultType =
 
 type OpenSkillTabResultType = {name: string; opened: true; skillId: string} | {error: string; opened: false};
 
-// openWorkflowChatTab + openAiHubPersonalAgentTab share the same shape — both create-or-restore a Task
-// row server-side and return the threadId/taskId pair the client navigates to. Distinct from the
-// resource-tab tools above because the result drives a task switch, not a resource panel update.
-type OpenTaskTabResultType =
-    {taskId: number; opened: true; threadId: string; title: string | null} | {error: string; opened: false};
+type OpenAiAgentTabResultType = {aiAgentId: string; name: string; opened: true} | {error: string; opened: false};
+
+// openWorkflowChatTab + openAiHubTaskTab share the same shape — both create-or-restore a Chat
+// row server-side and return the threadId/chatId pair the client navigates to. Distinct from the
+// resource-tab tools above because the result drives a chat switch, not a resource panel update.
+type OpenChatTabResultType =
+    {chatId: number; opened: true; threadId: string; title: string | null} | {error: string; opened: false};
 
 interface RunChatWorkflowResultI {
     responseUrl?: string;
@@ -108,6 +110,7 @@ interface ToolCallErrorResultI {
 // discriminator plus the exact legacy field names, so the dispatcher maps it onto the matching legacy branch
 // and reuses the per-type validators and tab-store calls unchanged.
 const OPEN_RESOURCE_TAB_TOOL_NAMES: Record<string, string> = {
+    AI_AGENT: 'openAiAgentTab',
     CODE_WORKFLOW: 'openCodeWorkflowTab',
     CUSTOM_COMPONENT: 'openCustomComponentTab',
     DATA_TABLE: 'openDataTableTab',
@@ -237,23 +240,37 @@ const validateOpenSkillTabResult = (raw: unknown): OpenSkillTabResultType | null
     return {error: typeof record.error === 'string' ? record.error : 'tool reported opened:false', opened: false};
 };
 
-/**
- * Validates the {@code openAiHubPersonalAgentTab} / {@code openWorkflowChatTab} tool result. Both tools share the same
- * shape because both drive a task switch (the server creates-or-restores a Task row and returns the
- * threadId + taskId pair). The runtime provider feeds the parsed result into the command center + tasks
- * stores and navigates to the matching URL — same three-step pattern the sidebar-click handlers use.
- */
-const validateOpenTaskTabResult = (raw: unknown): OpenTaskTabResultType | null => {
+const validateOpenAiAgentTabResult = (raw: unknown): OpenAiAgentTabResultType | null => {
     if (typeof raw !== 'object' || raw === null) {
         return null;
     }
 
     const record = raw as Record<string, unknown>;
 
-    if (record.opened === true && typeof record.threadId === 'string' && typeof record.taskId === 'number') {
+    if (record.opened === true && typeof record.aiAgentId === 'string' && typeof record.name === 'string') {
+        return {aiAgentId: record.aiAgentId, name: record.name, opened: true};
+    }
+
+    return {error: typeof record.error === 'string' ? record.error : 'tool reported opened:false', opened: false};
+};
+
+/**
+ * Validates the {@code openAiHubTaskTab} / {@code openWorkflowChatTab} tool result. Both tools share the same
+ * shape because both drive a chat switch (the server creates-or-restores a Chat row and returns the
+ * threadId + chatId pair). The runtime provider feeds the parsed result into the command center + chats
+ * stores and navigates to the matching URL — same three-step pattern the sidebar-click handlers use.
+ */
+const validateOpenChatTabResult = (raw: unknown): OpenChatTabResultType | null => {
+    if (typeof raw !== 'object' || raw === null) {
+        return null;
+    }
+
+    const record = raw as Record<string, unknown>;
+
+    if (record.opened === true && typeof record.threadId === 'string' && typeof record.chatId === 'number') {
         return {
+            chatId: record.chatId,
             opened: true,
-            taskId: record.taskId,
             threadId: record.threadId,
             title: typeof record.title === 'string' ? record.title : null,
         };
@@ -265,7 +282,7 @@ const validateOpenTaskTabResult = (raw: unknown): OpenTaskTabResultType | null =
 const SUBAGENT_PROGRESS_EVENT_NAME = 'subagent-progress';
 
 /**
- * Custom event name emitted by the server-side {@code AgUiStreamBridge} when a workflow-chat task's underlying
+ * Custom event name emitted by the server-side {@code AgUiStreamBridge} when a workflow chat's underlying
  * webhook trigger pauses with an {@code ask_user_question} signal. The payload carries the question text + options +
  * the workflow's resumeUrl. The client renders the question inline in the assistant's response and (in a follow-up
  * commit) wires the next user input to POST to the resumeUrl instead of starting a fresh workflow run.
@@ -290,12 +307,12 @@ interface BuildSubscriberDepsI {
     appendToLastAssistantMessage: (text: string) => void;
     /** Index of the assistant message that owns tool calls in this turn. Defaults to 0 when not supplied (tests). */
     assistantMessageIndex?: number;
-    /** AG-UI thread/task id this turn belongs to. Stamped on each tool-call entry so the store can
-     * resetForTask without nuking entries that already arrived for the new task. */
-    taskId?: string;
+    /** AG-UI thread/chat id this turn belongs to. Stamped on each tool-call entry so the store can
+     * resetForChat without nuking entries that already arrived for the new chat. */
+    chatId?: string;
     getLastUserMessage: () => string;
     /**
-     * Router navigate function for tool-driven task switches (openAiHubPersonalAgentTab, openWorkflowChatTab).
+     * Router navigate function for tool-driven chat switches (openAiHubTaskTab, openWorkflowChatTab).
      * Optional so tests that don't exercise those tools can omit it; production always supplies it via the
      * provider component, which calls {@code useNavigate()} at render time.
      */
@@ -321,7 +338,7 @@ interface BuildSubscriberDepsI {
          */
         onError?: () => void;
     };
-    /** Optional abort signal for in-flight workflow streams. Aborts when the task changes. */
+    /** Optional abort signal for in-flight workflow streams. Aborts when the chat changes. */
     workflowStreamSignal?: AbortSignal;
     /**
      * Lifecycle hooks for openWorkflowSseStream / fetchWorkflowResponse so the parent provider can keep
@@ -337,25 +354,25 @@ interface BuildSubscriberDepsI {
 
 /**
  * Orchestrates the start of an AI Hub turn so the composer Stop button appears IMMEDIATELY on send, even when the
- * first message has to create a DB task (a round-trip that can take a few seconds). {@code markRunning} runs
- * synchronously BEFORE the awaited {@code createTaskIfNeeded}, so {@code isRunning} flips true at once instead of
+ * first message has to create a DB chat (a round-trip that can take a few seconds). {@code markRunning} runs
+ * synchronously BEFORE the awaited {@code createChatIfNeeded}, so {@code isRunning} flips true at once instead of
  * only after the create resolves (the bug: a multi-second window where the composer showed Send, not Stop).
  * On create failure {@code revertOnFailure} rolls the run-state back and the function returns {@code false} so the
  * caller aborts the turn.
  */
 export async function bootstrapAiHubTurnRunState({
-    createTaskIfNeeded,
+    createChatIfNeeded,
     markRunning,
     revertOnFailure,
 }: {
-    createTaskIfNeeded: () => Promise<void>;
+    createChatIfNeeded: () => Promise<void>;
     markRunning: () => void;
     revertOnFailure: (error: unknown) => void;
 }): Promise<boolean> {
     markRunning();
 
     try {
-        await createTaskIfNeeded();
+        await createChatIfNeeded();
 
         return true;
     } catch (error) {
@@ -373,7 +390,7 @@ export async function bootstrapAiHubTurnRunState({
  * never any value in showing two simultaneous interactive pickers for the exact same property — the user
  * picks once and the agent reads that value — so the caller skips the duplicate append and keeps the single
  * existing picker live. These picker bubbles are client-only (never reconstructed from server history on
- * task switch — see useSwitchTask), so guarding the live append fully suppresses the duplicates.
+ * chat switch — see useSwitchChat), so guarding the live append fully suppresses the duplicates.
  */
 export const hasLivePropertyOptionPicker = (
     messages: ThreadMessageLike[],
@@ -406,11 +423,11 @@ export const buildAiHubSubscriber = ({
     addMessage,
     appendToLastAssistantMessage,
     assistantMessageIndex = 0,
+    chatId: subscriberChatId,
     getLastUserMessage,
     navigate,
     onWorkflowMutated,
     runLifecycle,
-    taskId: subscriberTaskId,
     workflowStreamLifecycle,
     workflowStreamSignal,
 }: BuildSubscriberDepsI): AgentSubscriber => {
@@ -437,15 +454,15 @@ export const buildAiHubSubscriber = ({
 
     return {
         onCustomEvent: ({event}) => {
-            // Drop late progress events from a previous task. findRunningToolCallByName walks every
-            // task's running tools — without this guard a still-running subagent from before a
-            // task switch can land its breadcrumb on an unrelated card with the same subagent name in
-            // the new task. Mirrors the guard on onToolCallStart/End/Result.
-            if (subscriberTaskId != null && useAiHubStore.getState().taskId !== subscriberTaskId) {
+            // Drop late progress events from a previous chat. findRunningToolCallByName walks every
+            // chat's running tools — without this guard a still-running subagent from before a
+            // chat switch can land its breadcrumb on an unrelated card with the same subagent name in
+            // the new chat. Mirrors the guard on onToolCallStart/End/Result.
+            if (subscriberChatId != null && useAiHubStore.getState().chatId !== subscriberChatId) {
                 return;
             }
 
-            // ask-workflow-question — workflow-chat tasks route to the WebhookBridgeAgent server-side, which
+            // ask-workflow-question — workflow chats route to the WebhookBridgeAgent server-side, which
             // emits this event when the underlying webhook trigger pauses with an ask_user_question signal. The
             // event payload carries the question text and a resumeUrl. For v1 we render the formatted question into
             // the assistant message; the resume-flow (next user input POSTs to the resumeUrl instead of starting a
@@ -456,12 +473,12 @@ export const buildAiHubSubscriber = ({
                 if (askEvent && Array.isArray(askEvent.questions)) {
                     appendToLastAssistantMessage(formatAskUserQuestionMessage(askEvent));
 
-                    // Mark this task as paused-waiting-for-answer so the sidebar shows the pause icon
+                    // Mark this chat as paused-waiting-for-answer so the sidebar shows the pause icon
                     // until the user replies. Cleared when the next RUN_STARTED fires (the user's reply triggers
                     // a fresh turn). Resume URL persistence is handled server-side by the WebhookResumeRegistry —
                     // no client-side persistence needed since the bridge picks up the URL on the next turn.
-                    if (subscriberTaskId != null) {
-                        aiHubTasksStore.getState().setActivityState(subscriberTaskId, 'paused');
+                    if (subscriberChatId != null) {
+                        aiHubChatsStore.getState().setActivityState(subscriberChatId, 'paused');
                     }
                 }
 
@@ -470,7 +487,7 @@ export const buildAiHubSubscriber = ({
 
             // approval_request — a workflow run raised an approval through the chat approval channel. Render an
             // interactive approval card as its own assistant message; resolution goes through the card's embedded
-            // ApprovalForm (job-resume endpoint), never through the chat input. Mark the task paused like
+            // ApprovalForm (job-resume endpoint), never through the chat input. Mark the chat paused like
             // ask-workflow-question does — the workflow is suspended until the approval is resolved.
             if (event.name === APPROVAL_REQUEST_EVENT_NAME) {
                 const approvalEvent = event.value as ApprovalRequestEventI | undefined;
@@ -494,8 +511,8 @@ export const buildAiHubSubscriber = ({
                         role: 'assistant',
                     });
 
-                    if (subscriberTaskId != null) {
-                        aiHubTasksStore.getState().setActivityState(subscriberTaskId, 'paused');
+                    if (subscriberChatId != null) {
+                        aiHubChatsStore.getState().setActivityState(subscriberChatId, 'paused');
                     }
                 }
 
@@ -512,11 +529,11 @@ export const buildAiHubSubscriber = ({
                 aiHubProgressStore.getState().setProgress(payload.subagentName, payload.text);
 
                 // Route into the matching subagent tool-call card so it renders as a progress breadcrumb. Pass
-                // subscriberTaskId so a stray event matching by toolName cannot land on a card from a
-                // different task; defense in depth alongside the task-id guard above.
+                // subscriberChatId so a stray event matching by toolName cannot land on a card from a
+                // different chat; defense in depth alongside the chat-id guard above.
                 const matching = aiChatToolCallStore
                     .getState()
-                    .findRunningToolCallByName(payload.subagentName, subscriberTaskId);
+                    .findRunningToolCallByName(payload.subagentName, subscriberChatId);
 
                 if (matching) {
                     aiChatToolCallStore.getState().addProgress(matching.toolCallId, payload.text);
@@ -539,9 +556,9 @@ export const buildAiHubSubscriber = ({
             // was only delivered via the toast rail + retry banner. Routing through addMessage with a
             // data-run-error part keeps any partially-streamed assistant text visible above the error and
             // renders the failure with red styling + an alert icon, distinct from a normal assistant reply.
-            // The drop-late-events guard mirrors the text handler: a stale runAgent from a previous task
-            // must not stamp its error onto the new task's transcript.
-            if (!userAborted && (subscriberTaskId == null || useAiHubStore.getState().taskId === subscriberTaskId)) {
+            // The drop-late-events guard mirrors the text handler: a stale runAgent from a previous chat
+            // must not stamp its error onto the new chat's transcript.
+            if (!userAborted && (subscriberChatId == null || useAiHubStore.getState().chatId === subscriberChatId)) {
                 const rawMessage = typeof event?.message === 'string' ? event.message.trim() : '';
                 const fallback = 'The agent run failed before completing this turn.';
                 const friendly = rawMessage.length > 0 ? humanizeAgentErrorMessage(rawMessage) : fallback;
@@ -564,10 +581,10 @@ export const buildAiHubSubscriber = ({
             runLifecycle?.onError?.();
             runLifecycle?.onSettle();
 
-            terminateOrphanRunningToolCalls(subscriberTaskId, 'aborted');
+            terminateOrphanRunningToolCalls(subscriberChatId, 'aborted');
 
-            if (subscriberTaskId != null) {
-                aiHubTasksStore.getState().clearActivityState(subscriberTaskId);
+            if (subscriberChatId != null) {
+                aiHubChatsStore.getState().clearActivityState(subscriberChatId);
             }
         },
         onRunFinishedEvent: () => {
@@ -577,34 +594,34 @@ export const buildAiHubSubscriber = ({
             // on {@link BuildSubscriberDepsI.runLifecycle} for the failure mode this guards against.
             runLifecycle?.onSettle();
 
-            // Terminate any tool calls still in `running` state for this task. The LLM-side run is
+            // Terminate any tool calls still in `running` state for this chat. The LLM-side run is
             // over (RUN_FINISHED is the last lifecycle event we get), so any entry that didn't receive a
             // ToolCallResultEvent before this point will never get one — the most common cause is a streaming
             // hiccup or a server-side retry where the original toolCallId never produced a result event. Left
             // alone, those entries stay 'running' forever and the projection renders a permanent spinner card
             // alongside the actual completed card. `aborted` (not `error`) since this isn't a true failure;
             // the renderer treats aborted as a neutral state.
-            terminateOrphanRunningToolCalls(subscriberTaskId, 'aborted');
+            terminateOrphanRunningToolCalls(subscriberChatId, 'aborted');
 
-            // Clear the sidebar's running pulse for this task so the row goes back to its idle state.
+            // Clear the sidebar's running pulse for this chat so the row goes back to its idle state.
             // Skip if the bridge emitted ask-workflow-question DURING the turn — onCustomEvent already flipped
             // the activity to 'paused', and we want to preserve that "needs your answer" indicator across the
             // RUN_FINISHED that fires immediately after the question. The store's clearActivityState wipes
             // both states; the order here matters: we check the current value before clearing, so a paused
             // turn keeps its paused state through RUN_FINISHED.
-            if (subscriberTaskId != null) {
-                const currentActivity = aiHubTasksStore.getState().taskActivity[subscriberTaskId];
+            if (subscriberChatId != null) {
+                const currentActivity = aiHubChatsStore.getState().chatActivity[subscriberChatId];
 
                 if (currentActivity !== 'paused') {
-                    aiHubTasksStore.getState().clearActivityState(subscriberTaskId);
+                    aiHubChatsStore.getState().clearActivityState(subscriberChatId);
                 }
             }
         },
         onTextMessageContentEvent: ({event, textMessageBuffer}) => {
-            // Drop late text deltas from a previous task: appendToLastAssistantMessage targets the
-            // CURRENT task's last assistant message, so an in-flight runAgent call from before a
-            // task switch would otherwise overwrite the new task's reply with old text.
-            if (subscriberTaskId != null && useAiHubStore.getState().taskId !== subscriberTaskId) {
+            // Drop late text deltas from a previous chat: appendToLastAssistantMessage targets the
+            // CURRENT chat's last assistant message, so an in-flight runAgent call from before a
+            // chat switch would otherwise overwrite the new chat's reply with old text.
+            if (subscriberChatId != null && useAiHubStore.getState().chatId !== subscriberChatId) {
                 return;
             }
 
@@ -616,17 +633,17 @@ export const buildAiHubSubscriber = ({
             appendToLastAssistantMessage(textMessageBuffer + event.delta);
         },
         onToolCallEndEvent: ({event, toolCallArgs}) => {
-            // Drop late tool-call events from a previous task. Without this guard a stale runAgent run
-            // that lingers after a task switch can mutate the new task's tool-call store entries
+            // Drop late tool-call events from a previous chat. Without this guard a stale runAgent run
+            // that lingers after a chat switch can mutate the new chat's tool-call store entries
             // (or, via onToolCallStartEvent below, recreate them with the OLD assistantMessageIndex stamped in).
-            if (subscriberTaskId != null && useAiHubStore.getState().taskId !== subscriberTaskId) {
+            if (subscriberChatId != null && useAiHubStore.getState().chatId !== subscriberChatId) {
                 return;
             }
 
             aiChatToolCallStore.getState().updateToolCallArgs(event.toolCallId, toolCallArgs ?? {});
         },
         onToolCallResultEvent: ({event}) => {
-            if (subscriberTaskId != null && useAiHubStore.getState().taskId !== subscriberTaskId) {
+            if (subscriberChatId != null && useAiHubStore.getState().chatId !== subscriberChatId) {
                 return;
             }
 
@@ -655,7 +672,7 @@ export const buildAiHubSubscriber = ({
                 return;
             }
 
-            if (toolCallName === 'workflow_editor_agent' || toolCallName === 'converter_agent') {
+            if (toolCallName === 'project_workflow_agent' || toolCallName === 'converter_agent') {
                 onWorkflowMutated?.();
             }
 
@@ -850,12 +867,36 @@ export const buildAiHubSubscriber = ({
                 }
 
                 aiHubTabsStore.getState().openCodeWorkflowTab(parsed.projectId, parsed.language, parsed.name);
-            } else if (toolCallName === 'openAiHubPersonalAgentTab' || toolCallName === 'openWorkflowChatTab') {
-                // LLM-driven task switch. The tool already created/restored the task server-side
-                // (see CreateAiHubPersonalAgentChat / CreateWorkflowChatTask); here we just sync the client
-                // stores and update the URL so the user lands in the new task. Mirrors the three-step
-                // pattern WorkflowChatsList.handleSelect uses for the sidebar-click path so both entry points
-                // produce identical client state.
+            } else if (dispatchToolCallName === 'openAiAgentTab') {
+                const raw = parseJson<unknown>(event.content, 'openAiAgentTab result');
+
+                if (raw === null) {
+                    surfaceTabOpenFailure(dispatchToolCallName, 'unparseable result', event.content);
+
+                    return;
+                }
+
+                const parsed = validateOpenAiAgentTabResult(raw);
+
+                if (parsed === null) {
+                    surfaceTabOpenFailure(dispatchToolCallName, 'unparseable result', event.content);
+
+                    return;
+                }
+
+                if (!parsed.opened) {
+                    surfaceTabOpenFailure(dispatchToolCallName, parsed.error);
+
+                    return;
+                }
+
+                aiHubTabsStore.getState().openAiAgentTab(parsed.aiAgentId, parsed.name);
+            } else if (toolCallName === 'openAiHubTaskTab' || toolCallName === 'openWorkflowChatTab') {
+                // LLM-driven chat switch. The tool already created/restored the chat server-side
+                // (see CreateAiHubTaskChat / CreateWorkflowChatChat); here we just sync the client
+                // stores and update the URL so the user lands in the new chat. Mirrors the three-step
+                // pattern AiHubHomePanel.handleSelectWorkflowChat uses for the picker-click path so both
+                // entry points produce identical client state.
                 const raw = parseJson<unknown>(event.content, `${toolCallName} result`);
 
                 if (raw === null) {
@@ -864,7 +905,7 @@ export const buildAiHubSubscriber = ({
                     return;
                 }
 
-                const parsed = validateOpenTaskTabResult(raw);
+                const parsed = validateOpenChatTabResult(raw);
 
                 if (parsed === null) {
                     surfaceTabOpenFailure(toolCallName, 'unparseable result', event.content);
@@ -879,16 +920,16 @@ export const buildAiHubSubscriber = ({
                 }
 
                 useAiHubStore.setState({
+                    chatId: parsed.threadId,
                     messages: [],
-                    taskId: parsed.threadId,
                 });
 
-                aiHubTasksStore.getState().setCurrentTaskId(parsed.taskId);
+                aiHubChatsStore.getState().setCurrentChatId(parsed.chatId);
 
                 // navigate is optional in the BuildSubscriberDepsI shape so tests that don't exercise this path
                 // don't have to mock it. Production always supplies it via the provider's useNavigate() call.
                 if (navigate) {
-                    navigate(`/automation/ai-hub/tasks/${parsed.taskId}`);
+                    navigate(`/automation/ai-hub/chats/${parsed.chatId}`);
                 }
             } else if (toolCallName === 'runChatWorkflow') {
                 const parsed = parseJson<RunChatWorkflowResultI>(event.content, 'runChatWorkflow result');
@@ -959,7 +1000,7 @@ export const buildAiHubSubscriber = ({
                         const finalResult = finalEntry?.progressiveOutput || '';
 
                         if (info.kind === 'aborted') {
-                            // Caller-side cancel (task switch / panel unmount). Mark the card complete with
+                            // Caller-side cancel (chat switch / panel unmount). Mark the card complete with
                             // whatever output was streamed so it doesn't sit in "running" forever — but skip the
                             // retryable-error banner since this isn't a failure the user should be prompted to retry.
                             aiChatToolCallStore
@@ -1068,11 +1109,11 @@ export const buildAiHubSubscriber = ({
             }
         },
         onToolCallStartEvent: ({event}) => {
-            // Drop late tool-call starts from a previous task. Without this guard, a runaway runAgent
-            // call from before a task switch would create new entries in the toolCalls map stamped with
-            // an assistantMessageIndex captured against the OLD task's message array — projection would
-            // then attach the stale tool-call cards to unrelated assistant messages in the new task.
-            if (subscriberTaskId != null && useAiHubStore.getState().taskId !== subscriberTaskId) {
+            // Drop late tool-call starts from a previous chat. Without this guard, a runaway runAgent
+            // call from before a chat switch would create new entries in the toolCalls map stamped with
+            // an assistantMessageIndex captured against the OLD chat's message array — projection would
+            // then attach the stale tool-call cards to unrelated assistant messages in the new chat.
+            if (subscriberChatId != null && useAiHubStore.getState().chatId !== subscriberChatId) {
                 return;
             }
 
@@ -1080,7 +1121,7 @@ export const buildAiHubSubscriber = ({
 
             aiChatToolCallStore
                 .getState()
-                .startToolCall(event.toolCallId, event.toolCallName, assistantMessageIndex, subscriberTaskId);
+                .startToolCall(event.toolCallId, event.toolCallName, assistantMessageIndex, subscriberChatId);
         },
     };
 };
@@ -1088,7 +1129,7 @@ export const buildAiHubSubscriber = ({
 interface BuildStateToSendArgsI {
     mode: MODE;
     // User-selected LLM picker selection for this conversation. Both must be set OR both null —
-    // half-set is silently dropped (the server's PersonalAgentChatClientResolver would warn-log
+    // half-set is silently dropped (the server's TaskChatClientResolver would warn-log
     // anyway, but omitting client-side keeps the wire format clean).
     userSelectedLlmModel?: string | null;
     userSelectedLlmProvider?: string | null;
@@ -1124,42 +1165,44 @@ const getTabGenericId = (tab: ReturnType<typeof aiHubTabsStore.getState>['openTa
         return tab.customComponentId;
     } else if (tab.kind === 'codeWorkflow') {
         return tab.projectId;
+    } else if (tab.kind === 'aiAgent') {
+        return tab.aiAgentId;
     } else {
         return tab.skillId;
     }
 };
 
 interface PostTurnTelemetryArgsI {
-    taskId: number;
+    chatId: number;
     input: string;
-    invalidateTasks: () => void;
+    invalidateChats: () => void;
     messageCount: number;
     workspaceId: number;
 }
 
 export const runPostTurnTelemetry = ({
+    chatId,
     input,
-    invalidateTasks,
+    invalidateChats,
     messageCount,
-    taskId,
     workspaceId,
 }: PostTurnTelemetryArgsI): void => {
     const lastPreview = input.slice(0, 200);
 
-    patchTask({
+    patchChat({
+        chatId,
         patch: {lastPreview, messageCount},
-        taskId,
         workspaceId,
     }).catch((error) => {
         // Telemetry-only — log loudly with structured context but do not toast on every turn. The user can
-        // still see and use the task; the metadata patch is what keeps the sidebar preview/sort
+        // still see and use the chat; the metadata patch is what keeps the sidebar preview/sort
         // accurate. If this starts failing in production, the console line below is the on-call breadcrumb
         // and the PostHog capture below is the dashboard signal — production users on console-redirected
         // setups (Sentry without console capture configured) only see the latter, so both are required.
         const errorMessage = error instanceof Error ? error.message : String(error);
 
         console.error(
-            `[AiHub] patchTask telemetry failed (workspaceId=${workspaceId}, taskId=${taskId}, messageCount=${messageCount}): ${errorMessage}`,
+            `[AiHub] patchChat telemetry failed (workspaceId=${workspaceId}, chatId=${chatId}, messageCount=${messageCount}): ${errorMessage}`,
             error
         );
 
@@ -1168,10 +1211,10 @@ export const runPostTurnTelemetry = ({
         // is fire-and-forget — a PostHog outage must not amplify a metadata-patch outage.
         import('posthog-js')
             .then((posthogModule) => {
-                posthogModule.default.capture('ai_hub_patch_task_failed', {
+                posthogModule.default.capture('ai_hub_patch_chat_failed', {
+                    chatId,
                     errorMessage,
                     messageCount,
-                    taskId,
                     workspaceId,
                 });
             })
@@ -1186,51 +1229,51 @@ export const runPostTurnTelemetry = ({
     // required THREE exchanges and silently no-op'd if a single turn ever pushed the count past 7
     // (subsequent turns saw `count > 7` and skipped forever, and a transient title-generation failure
     // on the boundary turn could never be retried). Now: any turn that lands on an auto-titled
-    // task re-attempts; the server endpoint short-circuits when {@code auto_titled = false}
+    // chat re-attempts; the server endpoint short-circuits when {@code auto_titled = false}
     // (LLM has already regenerated, or user manually renamed), so the worst case for a locked
-    // task is a cheap server-side read with no LLM call. Workflow chats start at
+    // chat is a cheap server-side read with no LLM call. Workflow chats start at
     // {@code auto_titled = true} despite their initial label-based title — letting the LLM replace
     // "Project A — Reply Bot" with something context-aware after a few turns.
     if (messageCount >= 2) {
-        generateAiHubTaskTitle({taskId, workspaceId})
+        generateAiHubChatTitle({chatId, workspaceId})
             .then(() => {
-                // Clear any prior failure flag for this task so retry buttons disappear after
+                // Clear any prior failure flag for this chat so retry buttons disappear after
                 // a successful regeneration (e.g. after the user manually retries).
-                aiHubTasksStore.getState().clearTitleGenerationFailure(taskId);
+                aiHubChatsStore.getState().clearTitleGenerationFailure(chatId);
 
-                invalidateTasks();
+                invalidateChats();
             })
             .catch((error) => {
-                // Title generation is best-effort; surface to the user so they know why the task is
-                // still labeled "Untitled". Persist the failure in the tasks store so the sidebar
+                // Title generation is best-effort; surface to the user so they know why the chat is
+                // still labeled "Untitled". Persist the failure in the chats store so the sidebar
                 // can render a retry affordance — without this, a user who dismisses the toast loses any
-                // recovery path and the task stays "Untitled" forever.
+                // recovery path and the chat stays "Untitled" forever.
                 const errorMessage = error instanceof Error ? error.message : String(error);
 
-                console.error('Failed to generate task title:', error);
+                console.error('Failed to generate chat title:', error);
 
-                aiHubTasksStore.getState().markTitleGenerationFailed(taskId, errorMessage);
+                aiHubChatsStore.getState().markTitleGenerationFailed(chatId, errorMessage);
 
-                toast.error(`Failed to generate task title: ${errorMessage}`);
+                toast.error(`Failed to generate chat title: ${errorMessage}`);
             });
     }
 };
 
 /**
- * Reads the current task's LLM picker selection from {@link aiHubTasksStore} (if any) and merges it into a
+ * Reads the current chat's LLM picker selection from {@link aiHubChatsStore} (if any) and merges it into a
  * {@link BuildStateToSendArgsI}. Centralized so the two call sites (`agent.setState(...)` in the user-message
  * handler and the retry-resume handler) stay in lockstep — without this, adding a third call site would
  * silently miss the LLM override and the picker selection wouldn't flow through for that turn.
  */
-const withCurrentTaskLlmSelection = (args: BuildStateToSendArgsI): BuildStateToSendArgsI => {
-    const tasksState = aiHubTasksStore.getState();
-    const taskId = tasksState.currentTaskId;
+const withCurrentChatLlmSelection = (args: BuildStateToSendArgsI): BuildStateToSendArgsI => {
+    const chatsState = aiHubChatsStore.getState();
+    const chatId = chatsState.currentChatId;
 
-    if (taskId == null) {
+    if (chatId == null) {
         return args;
     }
 
-    const selection = tasksState.taskLlmSelections[taskId];
+    const selection = chatsState.chatLlmSelections[chatId];
 
     if (selection == null || selection.provider == null || selection.model == null) {
         return args;
@@ -1282,50 +1325,50 @@ export const buildStateToSend = ({
 };
 
 /**
- * Cleanup ritual that runs when the active task changes. Extracted as a standalone function so
+ * Cleanup ritual that runs when the active chat changes. Extracted as a standalone function so
  * the contract is unit-testable without mounting the provider.
  *
  * <p><strong>Important: this DOES NOT abort the in-flight agent stream.</strong> Earlier shapes called
  * {@code controller.abort()} here as a defense-in-depth against late events bleeding into the new
- * task, but the subscriber-level task-id guards in {@link buildAiHubSubscriber}
+ * chat, but the subscriber-level chat-id guards in {@link buildAiHubSubscriber}
  * already prevent that bleed independently — and aborting was killing the agent run server-side. The
- * user-visible regression: sending a message, switching to another task while the response was
+ * user-visible regression: sending a message, switching to another chat while the response was
  * streaming, and returning to the original would show the user message with no assistant reply forever
  * because the run was terminated mid-stream.</p>
  *
  * <p>By leaving the stream alive, the agent continues to run server-side, {@link runPostTurnTelemetry}
- * eventually commits the completed assistant message to the database via {@code patchTask},
- * and when the user returns to the task {@code switchTask} refetches messages and the
+ * eventually commits the completed assistant message to the database via {@code patchChat},
+ * and when the user returns to the chat {@code switchChat} refetches messages and the
  * now-complete message is loaded into the local store. Mid-stream chunks emitted while the user is on
- * a different task are silenced by the task-id guards on the subscriber (intended), so
+ * a different chat are silenced by the chat-id guards on the subscriber (intended), so
  * they never bleed into the wrong UI.</p>
  *
  * <p>Provider unmount (the user navigates away from the AI Hub surface entirely) is handled by
  * a separate effect in {@link AiHubRuntimeProvider} that DOES abort, so we don't leak runs
  * when the consumer disappears.</p>
  *
- * @param previousTaskId the taskId snapshot from the *previous* effect run — used so
- *                               the tool-call store reset targets entries belonging to the task
+ * @param previousChatId the chatId snapshot from the *previous* effect run — used so
+ *                               the tool-call store reset targets entries belonging to the chat
  *                               we are leaving, not whatever the latest closure resolves to.
  */
-export const cleanupForTaskChange = (previousTaskId: string | undefined): void => {
-    // Tool-call cards for the previous task are dropped from local UI state — they're scoped to
-    // the per-task message thread that's about to be replaced by `switchTask`. The
-    // server-side run keeps emitting tool events; the subscriber's task-id guard silences the
+export const cleanupForChatChange = (previousChatId: string | undefined): void => {
+    // Tool-call cards for the previous chat are dropped from local UI state — they're scoped to
+    // the per-chat message thread that's about to be replaced by `switchChat`. The
+    // server-side run keeps emitting tool events; the subscriber's chat-id guard silences the
     // writes that would otherwise hit the now-replaced active store.
-    aiChatToolCallStore.getState().resetForTask(previousTaskId);
+    aiChatToolCallStore.getState().resetForChat(previousChatId);
 };
 
 /**
- * Terminate any tool-call entries still in {@code running} status that belong to {@code taskId}. Called
+ * Terminate any tool-call entries still in {@code running} status that belong to {@code chatId}. Called
  * from {@code onRunFinishedEvent} / {@code onRunErrorEvent} so a tool call that started but never received its
  * matching {@code ToolCallResultEvent} (streaming hiccup, server-side retry that reused the toolName under a
  * different toolCallId, etc.) doesn't stay {@code running} forever — the projection would otherwise render a
  * permanent spinner card alongside the actually-completed card from the second invocation.
  *
- * <p>Scope-by-task matters: a parallel task (e.g., user has two AI Hub tabs open) may
+ * <p>Scope-by-chat matters: a parallel chat (e.g., user has two AI Hub tabs open) may
  * legitimately have running tool calls of its own; calling the store's global {@code failAllRunning} would
- * clobber those. Iterating order here and matching {@code taskId} on each entry keeps the cleanup
+ * clobber those. Iterating order here and matching {@code chatId} on each entry keeps the cleanup
  * surgical.</p>
  *
  * <p>Status {@code aborted} not {@code error}: the absence of a result isn't a real failure — the LLM moved on
@@ -1333,14 +1376,14 @@ export const cleanupForTaskChange = (previousTaskId: string | undefined): void =
  * not getting its result delivered. The renderer treats {@code aborted} as a neutral terminal status.</p>
  */
 export const terminateOrphanRunningToolCalls = (
-    taskId: string | undefined,
+    chatId: string | undefined,
     status: 'aborted' | 'error' = 'aborted'
 ): void => {
-    if (taskId == null) {
+    if (chatId == null) {
         return;
     }
 
-    aiChatToolCallStore.getState().failRunningInTask(taskId, {reason: 'Run finished with no result event'}, status);
+    aiChatToolCallStore.getState().failRunningInChat(chatId, {reason: 'Run finished with no result event'}, status);
 };
 
 /**
@@ -1564,28 +1607,28 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
     const [approvalStreamRequest, setApprovalStreamRequest] = useState<{init?: RequestInit; url: string} | null>(null);
 
     // Approval-continuation accumulation for chat-memory persistence: the resumed run's streamed text and the
-    // owning task id, captured when the resolution starts and flushed when the continuation stream closes.
-    const approvalContinuationTaskIdRef = useRef<number | null>(null);
+    // owning chat id, captured when the resolution starts and flushed when the continuation stream closes.
+    const approvalContinuationChatIdRef = useRef<number | null>(null);
     const approvalContinuationTextRef = useRef('');
 
-    const {addMessage, appendToLastAssistantMessage, editUserMessage, messages, mode, taskId} = useAiHubStore(
+    const {addMessage, appendToLastAssistantMessage, chatId, editUserMessage, messages, mode} = useAiHubStore(
         useShallow((state) => ({
             addMessage: state.addMessage,
             appendToLastAssistantMessage: state.appendToLastAssistantMessage,
+            chatId: state.chatId,
             editUserMessage: state.editUserMessage,
             messages: state.messages,
             mode: state.mode,
-            taskId: state.taskId,
         }))
     );
 
-    // Per-task run state lives in aiHubRunStateStore (keyed by AG-UI thread id). Deriving `isRunning`
-    // for the focused task only — rather than reading a provider-global flag — is what stops a turn
-    // streaming in one task from showing the focused task as "running" after a task switch. The
+    // Per-chat run state lives in aiHubRunStateStore (keyed by AG-UI thread id). Deriving `isRunning`
+    // for the focused chat only — rather than reading a provider-global flag — is what stops a turn
+    // streaming in one chat from showing the focused chat as "running" after a chat switch. The
     // composite covers both the agent run and any fire-and-forget runChatWorkflow sub-streams.
-    const isRunning = useAiHubRunStateStore((state) => isTaskRunning(state, taskId));
+    const isRunning = useAiHubRunStateStore((state) => isChatRunning(state, chatId));
 
-    const truncateTaskMessagesMutation = useTruncateAiHubTaskMessagesMutation();
+    const truncateChatMessagesMutation = useTruncateAiHubChatMessagesMutation();
     const toolCalls = useAiChatToolCallStore((state) => state.toolCalls);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
     const queryClient = useQueryClient();
@@ -1596,9 +1639,9 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
         queryClient.invalidateQueries({queryKey: ProjectWorkflowKeys.workflows});
     }, [queryClient]);
 
-    // Continuation streaming for inline approval cards on workflow-chat tasks: the card resolves through the
+    // Continuation streaming for inline approval cards on workflow chats: the card resolves through the
     // SSE-negotiated resume endpoint (outside the AG-UI turn model), and the resumed run's output is piped into
-    // the conversation here. Client-only — the continuation text is not persisted to the task's chat memory
+    // the conversation here. Client-only — the continuation text is not persisted to the chat's chat memory
     // (WebhookBridgeAgent only persists bridge-run turns), so it does not survive a reload.
     const approvalStreamEventHandlers = useMemo(
         () => ({
@@ -1628,10 +1671,10 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
                         role: 'assistant',
                     });
 
-                    const currentTaskId = useAiHubStore.getState().taskId;
+                    const currentChatId = useAiHubStore.getState().chatId;
 
-                    if (currentTaskId != null) {
-                        aiHubTasksStore.getState().setActivityState(currentTaskId, 'paused');
+                    if (currentChatId != null) {
+                        aiHubChatsStore.getState().setActivityState(currentChatId, 'paused');
                     }
                 }
 
@@ -1683,7 +1726,7 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
         },
     });
 
-    const appendTaskAssistantMessageMutation = useAppendAiHubTaskAssistantMessageMutation();
+    const appendChatAssistantMessageMutation = useAppendAiHubChatAssistantMessageMutation();
 
     // The returned promise settles from the resume request's HTTP outcome so the card only shows success on a 2xx.
     const resolveApproval = useCallback(
@@ -1694,14 +1737,14 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
                 // A fresh assistant bubble so the continuation streams below the card instead of into it.
                 addMessage({content: '', role: 'assistant'});
 
-                const currentTaskId = useAiHubStore.getState().taskId;
+                const currentChatId = useAiHubStore.getState().chatId;
 
-                if (currentTaskId != null) {
-                    aiHubTasksStore.getState().clearActivityState(currentTaskId);
+                if (currentChatId != null) {
+                    aiHubChatsStore.getState().clearActivityState(currentChatId);
                 }
 
                 approvalContinuationTextRef.current = '';
-                approvalContinuationTaskIdRef.current = aiHubTasksStore.getState().currentTaskId ?? null;
+                approvalContinuationChatIdRef.current = aiHubChatsStore.getState().currentChatId ?? null;
 
                 setApprovalStreamRequest({
                     init: {
@@ -1717,7 +1760,7 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
 
     const approvalResolution = useMemo(() => ({resolveApproval}), [resolveApproval]);
 
-    // Flush the continuation into the task's chat memory when the resume stream ends, so the streamed text
+    // Flush the continuation into the chat's chat memory when the resume stream ends, so the streamed text
     // survives a reload — the bridge only persists bridge-run turns, and this stream ran outside it.
     useEffect(() => {
         if (
@@ -1728,17 +1771,17 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
         }
 
         const continuationText = approvalContinuationTextRef.current.trim();
-        const continuationTaskId = approvalContinuationTaskIdRef.current;
+        const continuationChatId = approvalContinuationChatIdRef.current;
 
         approvalContinuationTextRef.current = '';
-        approvalContinuationTaskIdRef.current = null;
+        approvalContinuationChatIdRef.current = null;
 
         setApprovalStreamRequest(null);
 
-        if (continuationText && continuationTaskId != null && currentWorkspaceId != null) {
-            appendTaskAssistantMessageMutation.mutate({
+        if (continuationText && continuationChatId != null && currentWorkspaceId != null) {
+            appendChatAssistantMessageMutation.mutate({
                 content: continuationText,
-                id: String(continuationTaskId),
+                id: String(continuationChatId),
                 workspaceId: String(currentWorkspaceId),
             });
         }
@@ -1752,35 +1795,35 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
 
     const agent = useMemo(
         () =>
-            taskId
+            chatId
                 ? new HttpAgent({
                       agentId: AI_HUB_AGENT_ID,
                       headers: {
                           'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || '',
                       },
-                      threadId: taskId,
+                      threadId: chatId,
                       url: `/api/platform/internal/ai/chat/${AI_HUB_AGENT_ID.toLowerCase()}`,
                   })
                 : null,
-        [taskId]
+        [chatId]
     );
 
-    // Resume an in-flight server-side run for the current task. Fires on mount and whenever taskId changes
+    // Resume an in-flight server-side run for the current chat. Fires on mount and whenever chatId changes
     // (sidebar switch, URL nav, refresh) — if the server says the thread is still streaming, we open an
     // EventSource on the /attach endpoint and feed events through the same subscriber the live POST path
     // uses. Without this effect, a refresh mid-turn would leave the user staring at a partial assistant
     // message that never updates: the server keeps producing tokens but no client is listening for them.
     //
-    // Concurrent streaming across tasks falls out of this: switching to a different task that's also
-    // running just runs the effect again with the new threadId, and the previous task's attach disposes via
-    // the cleanup. The server-side run keeps going regardless — the previous task's sidebar pulse stays
-    // live, driven by the per-task hydrate probe elsewhere.
+    // Concurrent streaming across chats falls out of this: switching to a different chat that's also
+    // running just runs the effect again with the new threadId, and the previous chat's attach disposes via
+    // the cleanup. The server-side run keeps going regardless — the previous chat's sidebar pulse stays
+    // live, driven by the per-chat hydrate probe elsewhere.
     useEffect(() => {
-        if (!taskId) {
+        if (!chatId) {
             return;
         }
 
-        // Reset on every taskId change so a switch into a new thread starts with a fresh "no local turn yet"
+        // Reset on every chatId change so a switch into a new thread starts with a fresh "no local turn yet"
         // assumption. Without this, switching from a thread where the user just hit send into an unrelated
         // thread would still treat its probe response as "user-started", suppressing a legitimate attach.
         localTurnStartedRef.current = false;
@@ -1789,13 +1832,13 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
         let disposeAttach: (() => void) | null = null;
 
         void (async () => {
-            const statusByThreadId = await probeInFlightStatus([taskId]);
+            const statusByThreadId = await probeInFlightStatus([chatId]);
 
             if (attachAbortController.signal.aborted) {
                 return;
             }
 
-            if (!statusByThreadId[taskId]) {
+            if (!statusByThreadId[chatId]) {
                 return;
             }
 
@@ -1810,7 +1853,7 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
 
             // The placeholder assistant message gives onTextMessageContentEvent somewhere to write its
             // accumulated text. ONLY add it if the loaded history doesn't ALREADY end with an assistant
-            // message — when switchTask loaded chat memory rows that include the in-flight turn's partial
+            // message — when switchChat loaded chat memory rows that include the in-flight turn's partial
             // assistant content (Spring AI's chat memory advisor flushes on certain boundaries even
             // mid-turn), the replay would otherwise write into a NEW placeholder and the user would see
             // the same text rendered twice (loaded copy + replay copy). Reusing the trailing assistant
@@ -1819,7 +1862,7 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
             const lastMessage = currentMessages[currentMessages.length - 1];
             // Content-aware: only reuse a trailing assistant that is a plain TEXT message (string content) — that's
             // the in-flight turn's partial reply the replay can cleanly extend. A trailing assistant with ARRAY
-            // content is an artifact-link / tool-call card rebuilt from task artifacts on reload; reusing it (or
+            // content is an artifact-link / tool-call card rebuilt from chat artifacts on reload; reusing it (or
             // letting appendToLastAssistantMessage's scan skip past it onto an earlier turn) would render the resumed
             // reply above the user's message. In that case add a fresh placeholder so the stream anchors at the end.
             const trailingTextAssistantPresent =
@@ -1831,25 +1874,25 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
 
             const assistantMessageIndex = useAiHubStore.getState().messages.length - 1;
 
-            aiHubRunStateStore.getState().setTaskRunning(taskId, true);
-            aiHubTasksStore.getState().clearActivityState(taskId);
-            aiHubTasksStore.getState().setActivityState(taskId, 'running');
+            aiHubRunStateStore.getState().setChatRunning(chatId, true);
+            aiHubChatsStore.getState().clearActivityState(chatId);
+            aiHubChatsStore.getState().setActivityState(chatId, 'running');
 
             const attachSubscriber = buildAiHubSubscriber({
                 addMessage,
                 appendToLastAssistantMessage,
                 assistantMessageIndex,
                 // For attach replays the user message that started the turn was already in chat memory
-                // before the disconnect, so it's loaded via switchTask's getTaskMessages. We surface
+                // before the disconnect, so it's loaded via switchChat's getChatMessages. We surface
                 // "(resumed)" rather than a fabricated string so the retry banner's wording doesn't
                 // mislead — the user can scroll up to see their actual message.
+                chatId,
                 getLastUserMessage: () => '(resumed turn)',
                 navigate,
                 onWorkflowMutated: handleWorkflowMutated,
                 runLifecycle: {
-                    onSettle: () => aiHubRunStateStore.getState().setTaskRunning(taskId, false),
+                    onSettle: () => aiHubRunStateStore.getState().setChatRunning(chatId, false),
                 },
-                taskId,
                 // Workflow-stream lifecycle is a no-op on attach: a resumed runChatWorkflow turn whose
                 // sub-stream was already in flight when the client disconnected cannot be re-attached here
                 // — that's a separate stream the bridge agent owns. The tool-call card will still render
@@ -1868,16 +1911,16 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
 
             disposeAttach = attachToInFlightRun({
                 onClose: () => {
-                    aiHubRunStateStore.getState().setTaskRunning(taskId, false);
+                    aiHubRunStateStore.getState().setChatRunning(chatId, false);
 
                     // Activity state is already cleared by onRunFinishedEvent / onRunErrorEvent inside the
                     // subscriber; this is a defense-in-depth fallback for the case where the EventSource
                     // closes for a non-terminal reason (network blip, server restart). Leaving the pulse
                     // active in that case would look like the run is still going.
-                    aiHubTasksStore.getState().clearActivityState(taskId);
+                    aiHubChatsStore.getState().clearActivityState(chatId);
                 },
                 subscriber: attachSubscriber,
-                threadId: taskId,
+                threadId: chatId,
             });
         })();
 
@@ -1890,9 +1933,9 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
         };
         // addMessage / appendToLastAssistantMessage / navigate are stable from their hooks; omitting them
         // from the dep array is intentional so the effect doesn't tear down + recreate the EventSource on
-        // every render. The effect MUST re-fire when taskId changes — that's the whole point.
+        // every render. The effect MUST re-fire when chatId changes — that's the whole point.
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [taskId]);
+    }, [chatId]);
 
     const onNew = async (message: AppendMessage) => {
         if (message.content[0]?.type !== 'text') {
@@ -1905,7 +1948,7 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
         localTurnStartedRef.current = true;
 
         if (!agent) {
-            const errorMessage = 'AI Hub is not ready: missing task id.';
+            const errorMessage = 'AI Hub is not ready: missing chat id.';
 
             console.error(errorMessage);
             toast.error(errorMessage);
@@ -1924,50 +1967,50 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
 
         // Render the user's message immediately, BEFORE the (possibly slow) auto-create round-trip below.
         // AiHub.tsx flips from the home view to the thread view as soon as messages exist (not only once
-        // the DB task id arrives), so the switch feels instant instead of freezing the home page for the
-        // few seconds createAiHubTask can take. On a create failure the catch below resets the messages,
+        // the DB chat id arrives), so the switch feels instant instead of freezing the home page for the
+        // few seconds createAiHubChat can take. On a create failure the catch below resets the messages,
         // reverting to the home view.
         addMessage({content: input, role: 'user'});
 
         // Generate the runId up front so a Stop click always has one to send, then mark the turn running
         // BEFORE the (possibly multi-second) auto-create round-trip so the composer shows Stop immediately
-        // on send instead of staying on Send until createAiHubTask resolves.
+        // on send instead of staying on Send until createAiHubChat resolves.
         const runId = getRandomId();
 
         const turnStarted = await bootstrapAiHubTurnRunState({
-            createTaskIfNeeded: async () => {
-                if (aiHubTasksStore.getState().currentTaskId != null) {
+            createChatIfNeeded: async () => {
+                if (aiHubChatsStore.getState().currentChatId != null) {
                     return;
                 }
 
                 const currentEnvironmentId = environmentStore.getState().currentEnvironmentId ?? 0;
 
-                const newTask = await createAiHubTask({
+                const newChat = await createAiHubChat({
                     environment: currentEnvironmentId,
-                    threadId: taskId!,
+                    threadId: chatId!,
                     workspaceId: currentWorkspaceId,
                 });
 
-                aiHubTasksStore.getState().setCurrentTaskId(newTask.id);
-                // Promote any home-view picker selection into this freshly-created task's slot so the
-                // override applies to the first turn AND surfaces in the task panel's own picker. No-op
+                aiHubChatsStore.getState().setCurrentChatId(newChat.id);
+                // Promote any home-view picker selection into this freshly-created chat's slot so the
+                // override applies to the first turn AND surfaces in the chat panel's own picker. No-op
                 // when nothing was picked on the home view.
-                aiHubTasksStore.getState().consumeDraftLlmSelection(newTask.id);
+                aiHubChatsStore.getState().consumeDraftLlmSelection(newChat.id);
 
                 queryClient.invalidateQueries({
-                    queryKey: AiHubTasksKeys.list(currentWorkspaceId, currentEnvironmentId, 'ACTIVE'),
+                    queryKey: AiHubChatsKeys.list(currentWorkspaceId, currentEnvironmentId, 'ACTIVE'),
                 });
             },
             markRunning: () => {
-                aiHubRunStateStore.getState().setTaskRunId(taskId, runId);
-                aiHubRunStateStore.getState().setTaskRunning(taskId, true);
+                aiHubRunStateStore.getState().setChatRunId(chatId, runId);
+                aiHubRunStateStore.getState().setChatRunning(chatId, true);
 
-                // Sidebar pulse on the task's row. Activity state is keyed by AG-UI thread id (the per-turn
-                // subscriber's identifier) — see the store doc. Use the taskId from useAiHubStore here since
+                // Sidebar pulse on the chat's row. Activity state is keyed by AG-UI thread id (the per-turn
+                // subscriber's identifier) — see the store doc. Use the chatId from useAiHubStore here since
                 // that's the same thread id the subscriber will see.
-                if (taskId != null) {
-                    aiHubTasksStore.getState().clearActivityState(taskId);
-                    aiHubTasksStore.getState().setActivityState(taskId, 'running');
+                if (chatId != null) {
+                    aiHubChatsStore.getState().clearActivityState(chatId);
+                    aiHubChatsStore.getState().setActivityState(chatId, 'running');
                 }
             },
             revertOnFailure: (error) => {
@@ -1975,16 +2018,16 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
 
                 // Roll back the run-state we optimistically set, and the optimistic user message + view flip,
                 // so the user lands back on the home composer with the Send button.
-                aiHubRunStateStore.getState().setTaskRunning(taskId, false);
+                aiHubRunStateStore.getState().setChatRunning(chatId, false);
 
-                if (taskId != null) {
-                    aiHubTasksStore.getState().clearActivityState(taskId);
+                if (chatId != null) {
+                    aiHubChatsStore.getState().clearActivityState(chatId);
                 }
 
                 useAiHubStore.getState().resetMessages();
 
-                console.error('Failed to auto-create task on first message:', error);
-                toast.error(`Failed to start task: ${errorMessage}`);
+                console.error('Failed to auto-create chat on first message:', error);
+                toast.error(`Failed to start chat: ${errorMessage}`);
                 aiChatRetryableErrorStore.getState().setError({
                     errorMessage,
                     lastUserMessage: input,
@@ -2003,7 +2046,7 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
             role: 'user',
         });
 
-        agent.setState(buildStateToSend(withCurrentTaskLlmSelection({mode, workspaceId: currentWorkspaceId})));
+        agent.setState(buildStateToSend(withCurrentChatLlmSelection({mode, workspaceId: currentWorkspaceId})));
         aiHubComposerStore.getState().clear();
 
         addMessage({content: '', role: 'assistant'});
@@ -2029,6 +2072,7 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
             addMessage,
             appendToLastAssistantMessage,
             assistantMessageIndex,
+            chatId,
             getLastUserMessage,
             navigate,
             onWorkflowMutated: handleWorkflowMutated,
@@ -2038,15 +2082,14 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
                 // agent turn that started a workflow keeps inflightStreamCount > 0 indefinitely and the
                 // composer stays stuck on "running" with no send button.
                 onError: () => turnController.abort(),
-                // Idempotent — the `finally` below also calls setTaskRunning(taskId, false). The subscriber
+                // Idempotent — the `finally` below also calls setChatRunning(chatId, false). The subscriber
                 // hook fires on the server's RUN_FINISHED / RUN_ERROR event; the finally fires when the
                 // SDK's promise resolves. Whichever happens first releases the running flag.
-                onSettle: () => aiHubRunStateStore.getState().setTaskRunning(taskId, false),
+                onSettle: () => aiHubRunStateStore.getState().setChatRunning(chatId, false),
             },
-            taskId,
             workflowStreamLifecycle: {
-                onOpen: () => aiHubRunStateStore.getState().adjustInflightStreamCount(taskId, 1),
-                onSettle: () => aiHubRunStateStore.getState().adjustInflightStreamCount(taskId, -1),
+                onOpen: () => aiHubRunStateStore.getState().adjustInflightStreamCount(chatId, 1),
+                onSettle: () => aiHubRunStateStore.getState().adjustInflightStreamCount(chatId, -1),
             },
             workflowStreamSignal: turnController.signal,
         });
@@ -2075,13 +2118,13 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
             }
 
             // Threads turnController into the AG-UI SDK so its underlying SSE transport closes when we abort
-            // the per-turn controller (task switch / panel unmount). Without this, runAgent's stream
-            // would keep delivering tokens to the now-stale subscriber after a switch — the task-id
+            // the per-turn controller (chat switch / panel unmount). Without this, runAgent's stream
+            // would keep delivering tokens to the now-stale subscriber after a switch — the chat-id
             // guards on the event handlers protect state, but the upstream stream remains open and the
             // server-side context counter keeps incrementing.
             await agent.runAgent({abortController: turnController, forwardedProps, runId}, subscriber);
         } catch (error) {
-            // Skip the toast + retryable banner for caller-initiated aborts (task switch / panel unmount):
+            // Skip the toast + retryable banner for caller-initiated aborts (chat switch / panel unmount):
             // those flows already cancel the per-turn AbortController on purpose, so surfacing them as failures
             // would mis-train the user to think a normal switch broke the agent.
             const isAbort =
@@ -2104,29 +2147,29 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
                 });
             }
         } finally {
-            // Only the agent run flag flips here. The composite `isRunning` stays true while the task's
-            // inflightStreamCount > 0 — the store's isTaskRunning selector covers both.
-            aiHubRunStateStore.getState().setTaskRunning(taskId, false);
+            // Only the agent run flag flips here. The composite `isRunning` stays true while the chat's
+            // inflightStreamCount > 0 — the store's isChatRunning selector covers both.
+            aiHubRunStateStore.getState().setChatRunning(chatId, false);
 
-            const currentTaskId = aiHubTasksStore.getState().currentTaskId;
+            const currentChatId = aiHubChatsStore.getState().currentChatId;
 
-            if (currentTaskId != null) {
+            if (currentChatId != null) {
                 const updatedMessages = useAiHubStore.getState().messages;
 
                 runPostTurnTelemetry({
+                    chatId: currentChatId,
                     input,
-                    invalidateTasks: () => {
+                    invalidateChats: () => {
                         queryClient.invalidateQueries({
-                            queryKey: AiHubTasksKeys.all,
+                            queryKey: AiHubChatsKeys.all,
                         });
                     },
                     messageCount: updatedMessages.length,
-                    taskId: currentTaskId,
                     workspaceId: currentWorkspaceId,
                 });
 
                 queryClient.invalidateQueries({
-                    queryKey: AiHubTasksKeys.artifacts(currentTaskId, currentWorkspaceId),
+                    queryKey: AiHubChatsKeys.artifacts(currentChatId, currentWorkspaceId),
                 });
             }
         }
@@ -2136,7 +2179,7 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
      * Re-runs an agent turn against the *current* contents of `agent.messages`. Callers (onEdit / onReload) are
      * responsible for staging the user message + truncating the local store and the agent transcript before
      * invoking this helper. Mirrors the post-validation portion of {@link onNew} but skips the auto-create-
-     * task branch (an edit/reload only fires against an existing task), the attachment-reading
+     * chat branch (an edit/reload only fires against an existing chat), the attachment-reading
      * path (edits/reloads carry no fresh attachments), and the retryable-error store integration (edits/reloads
      * surface failures via toast so the user can re-try without polluting the retry banner).
      */
@@ -2151,16 +2194,16 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
         // See onNew — publish the runId before the Stop button can appear.
         const runId = getRandomId();
 
-        aiHubRunStateStore.getState().setTaskRunId(taskId, runId);
+        aiHubRunStateStore.getState().setChatRunId(chatId, runId);
 
-        aiHubRunStateStore.getState().setTaskRunning(taskId, true);
+        aiHubRunStateStore.getState().setChatRunning(chatId, true);
 
-        if (taskId != null) {
-            aiHubTasksStore.getState().clearActivityState(taskId);
-            aiHubTasksStore.getState().setActivityState(taskId, 'running');
+        if (chatId != null) {
+            aiHubChatsStore.getState().clearActivityState(chatId);
+            aiHubChatsStore.getState().setActivityState(chatId, 'running');
         }
 
-        agent.setState(buildStateToSend(withCurrentTaskLlmSelection({mode, workspaceId: currentWorkspaceId})));
+        agent.setState(buildStateToSend(withCurrentChatLlmSelection({mode, workspaceId: currentWorkspaceId})));
 
         addMessage({content: '', role: 'assistant'});
 
@@ -2180,18 +2223,18 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
             addMessage,
             appendToLastAssistantMessage,
             assistantMessageIndex,
+            chatId,
             getLastUserMessage: () => lastUserInput,
             navigate,
             onWorkflowMutated: handleWorkflowMutated,
             runLifecycle: {
                 // Mirror onNew — abort the per-turn controller on RUN_ERROR so workflow streams stop.
                 onError: () => turnController.abort(),
-                onSettle: () => aiHubRunStateStore.getState().setTaskRunning(taskId, false),
+                onSettle: () => aiHubRunStateStore.getState().setChatRunning(chatId, false),
             },
-            taskId,
             workflowStreamLifecycle: {
-                onOpen: () => aiHubRunStateStore.getState().adjustInflightStreamCount(taskId, 1),
-                onSettle: () => aiHubRunStateStore.getState().adjustInflightStreamCount(taskId, -1),
+                onOpen: () => aiHubRunStateStore.getState().adjustInflightStreamCount(chatId, 1),
+                onSettle: () => aiHubRunStateStore.getState().adjustInflightStreamCount(chatId, -1),
             },
             workflowStreamSignal: turnController.signal,
         });
@@ -2212,13 +2255,13 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
                 aiChatToolCallStore.getState().failAllRunning({error: errorMessage});
             }
         } finally {
-            aiHubRunStateStore.getState().setTaskRunning(taskId, false);
+            aiHubRunStateStore.getState().setChatRunning(chatId, false);
 
-            const currentTaskId = aiHubTasksStore.getState().currentTaskId;
+            const currentChatId = aiHubChatsStore.getState().currentChatId;
 
-            if (currentTaskId != null) {
+            if (currentChatId != null) {
                 queryClient.invalidateQueries({
-                    queryKey: AiHubTasksKeys.artifacts(currentTaskId, currentWorkspaceId),
+                    queryKey: AiHubChatsKeys.artifacts(currentChatId, currentWorkspaceId),
                 });
             }
         }
@@ -2231,7 +2274,7 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
      *
      * <p>Three-step flow:</p>
      * <ol>
-     *   <li>Server-side: {@code truncateAiHubTaskMessages} purges chat-memory rows from the edit point onward
+     *   <li>Server-side: {@code truncateAiHubChatMessages} purges chat-memory rows from the edit point onward
      *       so the next runAgent sees history-up-to-edit-point only. Without this, the LLM would see the user
      *       "asking twice" — original message + edited message both in history.</li>
      *   <li>Local: rewind the UI store via {@link editUserMessage} (replaces the message at index with the new
@@ -2262,16 +2305,16 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
         }
 
         const input = message.content[0].text;
-        const ccTaskId = aiHubTasksStore.getState().currentTaskId;
+        const ccChatId = aiHubChatsStore.getState().currentChatId;
 
         try {
             // Server-side chat-memory purge runs first so the local rewind below can't get out of sync with
             // the server. If the truncate fails, we surface the error and don't touch the local store —
             // re-trying preserves the user's draft via assistant-ui's editor state.
-            if (ccTaskId != null && currentWorkspaceId != null) {
-                await truncateTaskMessagesMutation.mutateAsync({
+            if (ccChatId != null && currentWorkspaceId != null) {
+                await truncateChatMessagesMutation.mutateAsync({
                     fromMessageIndex: editedIndex,
-                    id: String(ccTaskId),
+                    id: String(ccChatId),
                     workspaceId: String(currentWorkspaceId),
                 });
             }
@@ -2313,7 +2356,7 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
             return;
         }
 
-        const ccTaskId = aiHubTasksStore.getState().currentTaskId;
+        const ccChatId = aiHubChatsStore.getState().currentChatId;
         const currentMessages = useAiHubStore.getState().messages;
         const lastUserContent = currentMessages[parentIndex]?.content;
         const lastUserInput =
@@ -2330,10 +2373,10 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
             // Server-side chat-memory purge: drop the assistant reply (and anything after) but keep the user
             // turn intact. Index = parentIndex + 1 so the user message at parentIndex stays, and the assistant
             // message that came right after gets purged along with any subsequent turns.
-            if (ccTaskId != null && currentWorkspaceId != null) {
-                await truncateTaskMessagesMutation.mutateAsync({
+            if (ccChatId != null && currentWorkspaceId != null) {
+                await truncateChatMessagesMutation.mutateAsync({
                     fromMessageIndex: parentIndex + 1,
-                    id: String(ccTaskId),
+                    id: String(ccChatId),
                     workspaceId: String(currentWorkspaceId),
                 });
             }
@@ -2352,8 +2395,8 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
 
     // The composer's stop button is wired to {@code useExternalStoreRuntime}'s `onCancel` adapter — without this
     // handler, @assistant-ui/react reports `cancel: false` to the composer and clicking the stop button is a
-    // no-op. The cancel sequence aborts the in-flight HttpAgent stream (the same controller the task-
-    // switch ritual uses), clears the task's run flag (setTaskRunning false) so the composer flips back from stop-icon to
+    // no-op. The cancel sequence aborts the in-flight HttpAgent stream (the same controller the chat-
+    // switch ritual uses), clears the chat's run flag (setChatRunning false) so the composer flips back from stop-icon to
     // send-icon immediately, and terminates any still-running tool-call cards as `aborted` so the projection
     // doesn't keep showing forever-spinning cards from the cancelled run.
     const onCancel = async () => {
@@ -2369,9 +2412,9 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
         // a red error indicator that would suggest something failed.
         aiChatToolCallStore.getState().failAllRunning({reason: 'Cancelled by user'}, 'aborted');
 
-        if (taskId) {
-            aiHubRunStateStore.getState().setTaskRunning(taskId, false);
-            aiHubTasksStore.getState().clearActivityState(taskId);
+        if (chatId) {
+            aiHubRunStateStore.getState().setChatRunning(chatId, false);
+            aiHubChatsStore.getState().clearActivityState(chatId);
         }
     };
 
@@ -2393,22 +2436,22 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
     });
 
     useEffect(() => {
-        // Snapshot taskId at effect-run time so cleanup uses the *previous* value (the one this
+        // Snapshot chatId at effect-run time so cleanup uses the *previous* value (the one this
         // effect run was scoped to), not whatever the latest closure resolves to. Without this snapshot a
-        // re-mount race in StrictMode could reset entries that already arrived for the NEW task.
-        const previousTaskId = taskId;
+        // re-mount race in StrictMode could reset entries that already arrived for the NEW chat.
+        const previousChatId = chatId;
 
-        // Task switch → reset local tool-call UI state for the task we're leaving. The
+        // Chat switch → reset local tool-call UI state for the chat we're leaving. The
         // in-flight stream (if any) is INTENTIONALLY left running — see the long Javadoc on
-        // cleanupForTaskChange for why. The unmount-only effect below aborts on actual page exit.
-        return () => cleanupForTaskChange(previousTaskId);
-    }, [taskId]);
+        // cleanupForChatChange for why. The unmount-only effect below aborts on actual page exit.
+        return () => cleanupForChatChange(previousChatId);
+    }, [chatId]);
 
     useEffect(() => {
         // Provider-unmount cleanup: abort any in-flight workflow stream on actual unmount (the user
-        // navigated away from AI Hub entirely, not just to a different task). Empty deps
+        // navigated away from AI Hub entirely, not just to a different chat). Empty deps
         // mean this effect runs once on mount and its cleanup runs once on unmount, so we don't accidentally
-        // abort on task switches the way the taskId-keyed effect would.
+        // abort on chat switches the way the chatId-keyed effect would.
         return () => {
             const controller = workflowStreamControllerRef.current;
 

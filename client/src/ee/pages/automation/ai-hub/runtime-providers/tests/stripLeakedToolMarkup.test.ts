@@ -13,13 +13,13 @@ describe('stripLeakedToolMarkup', () => {
     it('removes a complete function_calls block, keeping surrounding prose', () => {
         const text =
             "I'll build this workflow for you.\n\n" +
-            '<function_calls> <invoke name="workflow_editor_agent"> <parameter name="request">Create a workflow</parameter> </invoke> </function_calls>\n\n' +
+            '<function_calls> <invoke name="project_workflow_agent"> <parameter name="request">Create a workflow</parameter> </invoke> </function_calls>\n\n' +
             'Done!';
 
         const result = stripLeakedToolMarkup(text);
 
         expect(result).not.toContain('function_calls');
-        expect(result).not.toContain('workflow_editor_agent');
+        expect(result).not.toContain('project_workflow_agent');
         expect(result).not.toContain('parameter');
         expect(result).toContain("I'll build this workflow for you.");
         expect(result).toContain('Done!');

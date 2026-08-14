@@ -176,7 +176,7 @@ export function toToolResultDataPart(toolCallName: string, eventContent: string)
     }
 
     // Payload-kind fallback. A specialist subagent's question reaches the client as the *delegate* tool's result, so
-    // the tool name is `personal_agent_manager` (or any other specialist) and none of the branches above match. Keyed
+    // the tool name is `task_agent` (or any other specialist) and none of the branches above match. Keyed
     // on the payload's own `kind` so one client change serves every specialist, present and future.
     //
     // Scoped to kinds this file already handles: a blanket parse-and-sniff would let an unrelated tool that happens to
