@@ -34,7 +34,7 @@ import org.springframework.ai.session.advisor.SessionMemoryAdvisor;
  */
 class SubAgentSessionMemoryContributorTest {
 
-    private static final String PERSONAL_AGENT_MANAGER = "personal_agent_manager";
+    private static final String TASK_AGENT = "task_agent";
 
     private AiHubSessionMemory aiHubSessionMemory;
 
@@ -48,22 +48,22 @@ class SubAgentSessionMemoryContributorTest {
 
     @Test
     void testSessionKeyCombinesThreadIdAndAgentType() {
-        assertThat(SubAgentSessionMemoryContributor.sessionKey("thread-1", PERSONAL_AGENT_MANAGER))
-            .isEqualTo("thread-1:personal_agent_manager");
+        assertThat(SubAgentSessionMemoryContributor.sessionKey("thread-1", TASK_AGENT))
+            .isEqualTo("thread-1:task_agent");
     }
 
     @Test
     void testDifferentAgentTypesOnSameThreadGetDifferentKeys() {
-        String firstKey = SubAgentSessionMemoryContributor.sessionKey("thread-1", PERSONAL_AGENT_MANAGER);
-        String secondKey = SubAgentSessionMemoryContributor.sessionKey("thread-1", "mcp_manager");
+        String firstKey = SubAgentSessionMemoryContributor.sessionKey("thread-1", TASK_AGENT);
+        String secondKey = SubAgentSessionMemoryContributor.sessionKey("thread-1", "mcp_agent");
 
         assertThat(firstKey).isNotEqualTo(secondKey);
     }
 
     @Test
     void testDifferentThreadsForOneAgentTypeGetDifferentKeys() {
-        String firstKey = SubAgentSessionMemoryContributor.sessionKey("thread-1", PERSONAL_AGENT_MANAGER);
-        String secondKey = SubAgentSessionMemoryContributor.sessionKey("thread-2", PERSONAL_AGENT_MANAGER);
+        String firstKey = SubAgentSessionMemoryContributor.sessionKey("thread-1", TASK_AGENT);
+        String secondKey = SubAgentSessionMemoryContributor.sessionKey("thread-2", TASK_AGENT);
 
         assertThat(firstKey).isNotEqualTo(secondKey);
     }
@@ -73,7 +73,7 @@ class SubAgentSessionMemoryContributorTest {
         ChatClientRequestSpec chatClientRequestSpec = mock(ChatClientRequestSpec.class);
 
         SubAgentSessionMemoryContributor contributor = new SubAgentSessionMemoryContributor(
-            aiHubSessionMemory, PERSONAL_AGENT_MANAGER);
+            aiHubSessionMemory, TASK_AGENT);
 
         ChatClientRequestSpec result = contributor.contribute(chatClientRequestSpec, Map.of());
 
@@ -85,7 +85,7 @@ class SubAgentSessionMemoryContributorTest {
         ChatClientRequestSpec chatClientRequestSpec = mock(ChatClientRequestSpec.class);
 
         SubAgentSessionMemoryContributor contributor = new SubAgentSessionMemoryContributor(
-            aiHubSessionMemory, PERSONAL_AGENT_MANAGER);
+            aiHubSessionMemory, TASK_AGENT);
 
         ChatClientRequestSpec result = contributor.contribute(chatClientRequestSpec, null);
 
@@ -97,7 +97,7 @@ class SubAgentSessionMemoryContributorTest {
         ChatClientRequestSpec chatClientRequestSpec = mockFluentRequestSpec();
 
         SubAgentSessionMemoryContributor contributor = new SubAgentSessionMemoryContributor(
-            aiHubSessionMemory, PERSONAL_AGENT_MANAGER);
+            aiHubSessionMemory, TASK_AGENT);
 
         contributor.contribute(
             chatClientRequestSpec,
@@ -120,7 +120,7 @@ class SubAgentSessionMemoryContributorTest {
         ChatClientRequestSpec chatClientRequestSpec = mockFluentRequestSpec();
 
         SubAgentSessionMemoryContributor contributor = new SubAgentSessionMemoryContributor(
-            aiHubSessionMemory, PERSONAL_AGENT_MANAGER);
+            aiHubSessionMemory, TASK_AGENT);
 
         contributor.contribute(
             chatClientRequestSpec,
@@ -137,7 +137,7 @@ class SubAgentSessionMemoryContributorTest {
         advisorSpecConsumer.accept(advisorSpec);
 
         verify(advisorSpec).param(
-            SessionMemoryAdvisor.SESSION_ID_CONTEXT_KEY, "thread-1:" + PERSONAL_AGENT_MANAGER);
+            SessionMemoryAdvisor.SESSION_ID_CONTEXT_KEY, "thread-1:" + TASK_AGENT);
     }
 
     private static ChatClientRequestSpec mockFluentRequestSpec() {

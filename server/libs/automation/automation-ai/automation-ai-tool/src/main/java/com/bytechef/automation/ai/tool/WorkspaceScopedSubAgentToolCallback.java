@@ -59,8 +59,8 @@ import tools.jackson.databind.json.JsonMapper;
  * </p>
  *
  * <p>
- * Applies to both manager delegates ({@link ManagerSubAgentToolCallback}) and the copilot-domain delegates
- * ({@code data_table_agent}, {@code workflow_editor_agent}, …). Delegates must declare an input schema of exactly
+ * Applies to both automation-owned subagent delegates ({@link SubAgentToolCallback}) and the copilot-domain delegates
+ * ({@code data_table_agent}, {@code project_workflow_agent}, …). Delegates must declare an input schema of exactly
  * {@code {"request": string}}: this wrapper re-serializes the delegate input as {@code {"request": ...}} and drops any
  * other field. Every delegate on this surface satisfies that today.
  * </p>

@@ -23,8 +23,8 @@ import com.bytechef.ai.copilot.tool.CodeEditorAgentToolCallback;
 import com.bytechef.ai.copilot.tool.ConverterAgentToolCallback;
 import com.bytechef.ai.copilot.tool.DataTableAgentToolCallback;
 import com.bytechef.ai.copilot.tool.KnowledgeBaseAgentToolCallback;
+import com.bytechef.ai.copilot.tool.ProjectWorkflowAgentToolCallback;
 import com.bytechef.ai.copilot.tool.SkillsAgentToolCallback;
-import com.bytechef.ai.copilot.tool.WorkflowEditorAgentToolCallback;
 import com.bytechef.ai.copilot.tool.WorkflowExecutionAgentToolCallback;
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
 import com.bytechef.automation.ai.tool.SkillsTools;
@@ -72,7 +72,7 @@ class ToolCallbackContributorConfiguration {
             workflowEditorProvider.ifAvailable(
                 chatClient -> toolCallbacks.add(
                     new WorkspaceScopedSubAgentToolCallback(
-                        new WorkflowEditorAgentToolCallback(chatClient), workspaceService)));
+                        new ProjectWorkflowAgentToolCallback(chatClient), workspaceService)));
             codeEditorProvider.ifAvailable(
                 chatClient -> toolCallbacks.add(
                     new WorkspaceScopedSubAgentToolCallback(

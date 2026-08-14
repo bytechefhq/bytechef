@@ -76,7 +76,7 @@ final class ProjectAgentConfigurationTest {
                 securityContextRehydrator, mock(ProjectTools.class), mock(ProjectWorkflowTools.class),
                 present(mock(ChatClient.class)), present(() -> mock(ChatClient.class))));
 
-        assertThat(buildToolNames).contains("createProject", "workflow_editor_agent");
+        assertThat(buildToolNames).contains("createProject", "project_workflow_agent");
     }
 
     /**
@@ -95,7 +95,7 @@ final class ProjectAgentConfigurationTest {
                 emptyProvider(), emptyProvider()));
 
         assertThat(buildToolNames).contains("createProject")
-            .doesNotContain("workflow_editor_agent", "converter_agent");
+            .doesNotContain("project_workflow_agent", "converter_agent");
     }
 
     private static ProjectAgentConfiguration newConfiguration() {

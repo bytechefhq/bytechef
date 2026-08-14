@@ -40,8 +40,8 @@ import org.springframework.ai.tool.ToolCallback;
  * </p>
  *
  * <p>
- * This factory is additive: {@link McpManagerConfiguration}'s existing {@code mcpManagerChatClient} bean keeps
- * constructing its own tool list independently, since it backs the {@code mcp_manager} subagent consumed by AI Hub and
+ * This factory is additive: {@link McpServerSubAgentConfiguration}'s existing {@code mcpAgentChatClient} bean keeps
+ * constructing its own tool list independently, since it backs the {@code mcp_agent} subagent consumed by AI Hub and
  * the management MCP server and must not change behaviour.
  * </p>
  *

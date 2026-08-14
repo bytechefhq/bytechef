@@ -21,9 +21,9 @@ import com.agui.core.state.State;
 import com.bytechef.ai.copilot.agent.OverrideChatClientResolver;
 import com.bytechef.ai.copilot.agent.ProjectSpringAIAgent;
 import com.bytechef.ai.copilot.tool.ConverterAgentToolCallback;
+import com.bytechef.ai.copilot.tool.ProjectWorkflowAgentToolCallback;
 import com.bytechef.ai.copilot.tool.RehydrateContextToolCallback;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
-import com.bytechef.ai.copilot.tool.WorkflowEditorAgentToolCallback;
 import com.bytechef.ai.copilot.util.Mode;
 import com.bytechef.ai.copilot.util.Source;
 import com.bytechef.automation.ai.tool.ProjectTools;
@@ -55,7 +55,7 @@ import org.springframework.core.io.Resource;
  * and {@link ReadProjectWorkflowTools} are CE.
  *
  * <p>
- * The BUILD agent delegates workflow-content work to the {@code workflow_editor_agent} and {@code converter_agent}
+ * The BUILD agent delegates workflow-content work to the {@code project_workflow_agent} and {@code converter_agent}
  * subagents when their {@link ChatClient} beans are present. It does NOT wire a code-workflow delegate:
  * {@code CodeWorkflowAgentToolCallback} lives in the EE module {@code automation-ai-copilot}
  * ({@code server/ee/libs/automation/automation-ai/automation-ai-copilot}), and this module is CE. Wiring it here would
@@ -64,7 +64,7 @@ import org.springframework.core.io.Resource;
  *
  * <p>
  * Gated on {@code bytechef.ai.copilot.enabled} rather than an OR with {@code bytechef.ai.hub.enabled}: the
- * {@code workflow_editor_agent}/{@code converter_agent} delegate beans this configuration depends on are declared in
+ * {@code project_workflow_agent}/{@code converter_agent} delegate beans this configuration depends on are declared in
  * {@code CopilotConfiguration}, which is gated on {@code bytechef.ai.copilot.enabled} alone. An OR-gate here would let
  * this configuration register with {@code hub.enabled=true, copilot.enabled=false}, producing a {@code project_build}
  * agent whose prompt instructs it to delegate workflow-content work to those subagents while both are silently absent.
@@ -154,7 +154,7 @@ public class ProjectAgentConfiguration {
             new ArrayList<>(wrapTools(securityContextRehydrator, List.of(projectTools, projectWorkflowTools)));
 
         workflowEditorProvider.ifAvailable(
-            chatClient -> toolCallbacks.add(new WorkflowEditorAgentToolCallback(chatClient)));
+            chatClient -> toolCallbacks.add(new ProjectWorkflowAgentToolCallback(chatClient)));
         converterSupplierProvider.ifAvailable(
             supplier -> toolCallbacks.add(new ConverterAgentToolCallback(supplier)));
 

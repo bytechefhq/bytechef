@@ -46,7 +46,7 @@ import tools.jackson.databind.json.JsonMapper;
  * @author Ivica Cardic
  */
 @ExtendWith(ObjectMapperSetupExtension.class)
-class WorkflowEditorAgentToolCallbackTest {
+class ProjectWorkflowAgentToolCallbackTest {
 
     private final JsonMapper jsonMapper = new JsonMapper();
 
@@ -63,7 +63,7 @@ class WorkflowEditorAgentToolCallbackTest {
         when(requestSpec.call()).thenReturn(responseSpec);
         when(responseSpec.content()).thenReturn(synthesised);
 
-        WorkflowEditorAgentToolCallback callback = new WorkflowEditorAgentToolCallback(chatClient);
+        ProjectWorkflowAgentToolCallback callback = new ProjectWorkflowAgentToolCallback(chatClient);
 
         String result = callback.call("{\"request\":\"build a daily report workflow\"}");
 
@@ -72,7 +72,7 @@ class WorkflowEditorAgentToolCallbackTest {
 
     @Test
     void testCallReturnsErrorWhenRequestIsBlank() {
-        WorkflowEditorAgentToolCallback callback = new WorkflowEditorAgentToolCallback(mock(ChatClient.class));
+        ProjectWorkflowAgentToolCallback callback = new ProjectWorkflowAgentToolCallback(mock(ChatClient.class));
 
         String result = callback.call("{\"request\":\"   \"}");
 
@@ -82,7 +82,7 @@ class WorkflowEditorAgentToolCallbackTest {
 
     @Test
     void testCallReturnsErrorOnInvalidJson() {
-        WorkflowEditorAgentToolCallback callback = new WorkflowEditorAgentToolCallback(mock(ChatClient.class));
+        ProjectWorkflowAgentToolCallback callback = new ProjectWorkflowAgentToolCallback(mock(ChatClient.class));
 
         String result = callback.call("not-json");
 
@@ -101,7 +101,7 @@ class WorkflowEditorAgentToolCallbackTest {
         when(requestSpec.call()).thenReturn(responseSpec);
         when(responseSpec.content()).thenReturn(null);
 
-        WorkflowEditorAgentToolCallback callback = new WorkflowEditorAgentToolCallback(chatClient);
+        ProjectWorkflowAgentToolCallback callback = new ProjectWorkflowAgentToolCallback(chatClient);
 
         String result = callback.call("{\"request\":\"any\"}");
 
@@ -123,7 +123,7 @@ class WorkflowEditorAgentToolCallbackTest {
         when(requestSpec.call()).thenReturn(responseSpec);
         when(responseSpec.content()).thenThrow(new RuntimeException("project facade unavailable"));
 
-        WorkflowEditorAgentToolCallback callback = new WorkflowEditorAgentToolCallback(chatClient);
+        ProjectWorkflowAgentToolCallback callback = new ProjectWorkflowAgentToolCallback(chatClient);
 
         String result = callback.call("{\"request\":\"any\"}");
 
@@ -132,7 +132,7 @@ class WorkflowEditorAgentToolCallbackTest {
         assertThat(node.get("error")
             .asText())
                 .as("payload must surface tool name")
-                .contains("workflow_editor_agent failed")
+                .contains("project_workflow_agent failed")
                 .as("payload must NOT leak the exception getMessage()")
                 .doesNotContain("project facade unavailable");
     }
@@ -152,7 +152,7 @@ class WorkflowEditorAgentToolCallbackTest {
 
         ToolContext parentToolContext = new ToolContext(parentContextMap);
 
-        WorkflowEditorAgentToolCallback callback = new WorkflowEditorAgentToolCallback(chatClient);
+        ProjectWorkflowAgentToolCallback callback = new ProjectWorkflowAgentToolCallback(chatClient);
 
         callback.call("{\"request\":\"any\"}", parentToolContext);
 
@@ -176,7 +176,7 @@ class WorkflowEditorAgentToolCallbackTest {
         when(requestSpec.call()).thenReturn(responseSpec);
         when(responseSpec.content()).thenReturn("ok");
 
-        WorkflowEditorAgentToolCallback callback = new WorkflowEditorAgentToolCallback(chatClient);
+        ProjectWorkflowAgentToolCallback callback = new ProjectWorkflowAgentToolCallback(chatClient);
 
         callback.call("{\"request\":\"any\"}", null);
 
@@ -189,11 +189,11 @@ class WorkflowEditorAgentToolCallbackTest {
     }
 
     @Test
-    void testToolDefinitionExposesWorkflowEditorAgentNameAndRequestSchema() {
-        WorkflowEditorAgentToolCallback callback = new WorkflowEditorAgentToolCallback(mock(ChatClient.class));
+    void testToolDefinitionExposesProjectWorkflowAgentNameAndRequestSchema() {
+        ProjectWorkflowAgentToolCallback callback = new ProjectWorkflowAgentToolCallback(mock(ChatClient.class));
 
         assertThat(callback.getToolDefinition()
-            .name()).isEqualTo("workflow_editor_agent");
+            .name()).isEqualTo("project_workflow_agent");
         assertThat(callback.getToolDefinition()
             .inputSchema()).contains("\"request\"");
     }
@@ -219,7 +219,7 @@ class WorkflowEditorAgentToolCallbackTest {
         when(requestSpec.call()).thenReturn(responseSpec);
         when(responseSpec.content()).thenThrow(upstreamException);
 
-        WorkflowEditorAgentToolCallback callback = new WorkflowEditorAgentToolCallback(chatClient);
+        ProjectWorkflowAgentToolCallback callback = new ProjectWorkflowAgentToolCallback(chatClient);
 
         String result = callback.call("{\"request\":\"any\"}");
 
@@ -227,7 +227,7 @@ class WorkflowEditorAgentToolCallbackTest {
 
         assertThat(node.has("error")).isTrue();
         assertThat(node.get("error")
-            .asText()).contains("workflow_editor_agent failed");
+            .asText()).contains("project_workflow_agent failed");
     }
 
     private static void stubToolContext(ChatClientRequestSpec requestSpec) {

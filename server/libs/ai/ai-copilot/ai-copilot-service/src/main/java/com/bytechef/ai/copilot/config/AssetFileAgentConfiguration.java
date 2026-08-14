@@ -18,8 +18,8 @@ package com.bytechef.ai.copilot.config;
 
 import com.agui.core.exception.AGUIException;
 import com.agui.core.state.State;
-import com.bytechef.ai.copilot.agent.ManagerSliceSpringAIAgent;
 import com.bytechef.ai.copilot.agent.OverrideChatClientResolver;
+import com.bytechef.ai.copilot.agent.SliceSpringAIAgent;
 import com.bytechef.ai.copilot.tool.RehydrateContextToolCallback;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
 import com.bytechef.ai.copilot.util.Mode;
@@ -73,7 +73,7 @@ public class AssetFileAgentConfiguration {
     }
 
     @Bean
-    ManagerSliceSpringAIAgent assetFileAskSpringAIAgent(
+    SliceSpringAIAgent assetFileAskSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, AssetFileToolCallbacksFactory assetFileToolCallbacksFactory,
         SecurityContextRehydrator securityContextRehydrator,
         ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider)
@@ -81,7 +81,7 @@ public class AssetFileAgentConfiguration {
 
         String name = Source.ASSET_FILE.name() + "_" + Mode.ASK.name();
 
-        return ManagerSliceSpringAIAgent.builder()
+        return SliceSpringAIAgent.builder()
             .agentId(name.toLowerCase())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
@@ -94,7 +94,7 @@ public class AssetFileAgentConfiguration {
     }
 
     @Bean
-    ManagerSliceSpringAIAgent assetFileBuildSpringAIAgent(
+    SliceSpringAIAgent assetFileBuildSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, AssetFileToolCallbacksFactory assetFileToolCallbacksFactory,
         SecurityContextRehydrator securityContextRehydrator,
         ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider)
@@ -102,7 +102,7 @@ public class AssetFileAgentConfiguration {
 
         String name = Source.ASSET_FILE.name() + "_" + Mode.BUILD.name();
 
-        return ManagerSliceSpringAIAgent.builder()
+        return SliceSpringAIAgent.builder()
             .agentId(name.toLowerCase())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
@@ -136,7 +136,7 @@ public class AssetFileAgentConfiguration {
 
     /**
      * Package-private so {@code AssetFileAgentConfigurationTest} can assert on the resolved tool names directly —
-     * {@link ManagerSliceSpringAIAgent} does not expose its wrapped {@link ToolCallback} list.
+     * {@link SliceSpringAIAgent} does not expose its wrapped {@link ToolCallback} list.
      */
     List<ToolCallback> askToolCallbacks(
         SecurityContextRehydrator securityContextRehydrator,
@@ -147,7 +147,7 @@ public class AssetFileAgentConfiguration {
 
     /**
      * Package-private so {@code AssetFileAgentConfigurationTest} can assert on the resolved tool names directly —
-     * {@link ManagerSliceSpringAIAgent} does not expose its wrapped {@link ToolCallback} list.
+     * {@link SliceSpringAIAgent} does not expose its wrapped {@link ToolCallback} list.
      */
     List<ToolCallback> buildToolCallbacks(
         SecurityContextRehydrator securityContextRehydrator,

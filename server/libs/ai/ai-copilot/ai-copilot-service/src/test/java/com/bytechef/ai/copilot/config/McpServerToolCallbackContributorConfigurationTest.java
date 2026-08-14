@@ -56,7 +56,7 @@ class McpServerToolCallbackContributorConfigurationTest {
             .extracting(toolCallback -> toolCallback.getToolDefinition()
                 .name())
             .containsExactlyInAnyOrder(
-                "workflow_editor_agent", "code_editor_agent", "cluster_element_agent", "skills_agent",
+                "project_workflow_agent", "code_editor_agent", "cluster_element_agent", "skills_agent",
                 "workflow_execution_agent", "converter_agent", "knowledge_base_agent", "data_table_agent",
                 "ai_agent_agent", "asset_file_agent");
     }

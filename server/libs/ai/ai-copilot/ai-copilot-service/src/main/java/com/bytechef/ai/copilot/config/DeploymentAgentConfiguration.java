@@ -47,7 +47,7 @@ import org.springframework.core.io.Resource;
  *
  * <p>
  * Deliberately registers NO subagent {@code ChatClient} beans, unlike the other domain slices: the AI Hub already
- * reaches this domain through the {@code deployment_manager} manager subagent, which has no ASK/BUILD split by design.
+ * reaches this domain through the {@code project_deployment_agent} subagent, which has no ASK/BUILD split by design.
  * Adding hub delegates here would give the hub two competing paths to the same deployment tools. Both surfaces share
  * one {@link DeploymentToolCallbacksFactory} so their tool sets cannot drift.
  * </p>

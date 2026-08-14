@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 import com.agui.core.exception.AGUIException;
-import com.bytechef.ai.copilot.agent.ManagerSliceSpringAIAgent;
+import com.bytechef.ai.copilot.agent.SliceSpringAIAgent;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.ai.mcp.facade.McpProjectFacade;
@@ -54,11 +54,11 @@ final class McpServerAgentConfigurationTest {
 
     @Test
     void testAskAgentUsesReadToolsAndBuildAgentUsesWriteTools() throws AGUIException {
-        ManagerSliceSpringAIAgent askAgent = configuration.mcpServerAskSpringAIAgent(
+        SliceSpringAIAgent askAgent = configuration.mcpServerAskSpringAIAgent(
             mock(ChatMemory.class), mock(ChatModel.class), mcpServerToolCallbacksFactory,
             securityContextRehydrator, emptyProvider());
 
-        ManagerSliceSpringAIAgent buildAgent = configuration.mcpServerBuildSpringAIAgent(
+        SliceSpringAIAgent buildAgent = configuration.mcpServerBuildSpringAIAgent(
             mock(ChatMemory.class), mock(ChatModel.class), mcpServerToolCallbacksFactory,
             securityContextRehydrator, emptyProvider());
 

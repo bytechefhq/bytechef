@@ -18,8 +18,8 @@ import org.springframework.ai.tool.ToolCallback;
  * {@code api_collection_build}). Read list feeds ASK; write list feeds BUILD.
  *
  * <p>
- * This factory is additive: {@link ApiCollectionManagerConfiguration}'s existing {@code apiCollectionManagerChatClient}
- * bean keeps constructing its own tool list independently, since it backs the {@code api_collection_manager} subagent
+ * This factory is additive: {@link ApiCollectionSubAgentConfiguration}'s existing {@code apiCollectionAgentChatClient}
+ * bean keeps constructing its own tool list independently, since it backs the {@code api_collection_agent} subagent
  * consumed by AI Hub and the management MCP server and must not change behaviour.
  * </p>
  *

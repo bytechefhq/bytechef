@@ -99,24 +99,24 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
     }
 
     /**
-     * Per-request resolver of {@link ToolCallback}s synthesized from the task's attached tools. Hooked into the
+     * Per-request resolver of {@link ToolCallback}s synthesized from the chat's attached tools. Hooked into the
      * underlying {@link SpringAIAgent#additionalToolCallbacks(RunAgentInput)} so the LLM sees union(static,
-     * task-attached) for the turn. Implementations look up bindings via
-     * {@code AiHubTaskToolFacade.listTaskTools(taskId)} and convert each to a {@code ClusterElementToolCallback}.
+     * chat-attached) for the turn. Implementations look up bindings via
+     * {@code AiHubChatToolFacade.listChatTools(chatId)} and convert each to a {@code ClusterElementToolCallback}.
      */
-    public interface TaskToolBindingResolver {
+    public interface ChatToolBindingResolver {
 
         /**
-         * Returns per-task tool callbacks for the current request. Implementations are expected to tolerate any input
-         * where the resolver can't determine the task (no thread id, task not found, DB outage) by returning an empty
+         * Returns per-chat tool callbacks for the current request. Implementations are expected to tolerate any input
+         * where the resolver can't determine the chat (no thread id, chat not found, DB outage) by returning an empty
          * list — the agent must still respond from its static tool set in that case.
          */
         List<ToolCallback> resolve(AiHubToolInvocationContext invocationContext);
     }
 
     /**
-     * Per-request resolver for an override {@link ChatClient}. Used to swap the LLM at runtime — e.g. when a personal
-     * agent has its own model override set, the routing agent puts the (provider, model) pair into state and this
+     * Per-request resolver for an override {@link ChatClient}. Used to swap the LLM at runtime — e.g. when a chat
+     * template has its own model override set, the routing agent puts the (provider, model) pair into state and this
      * resolver returns a ChatClient built against the agent-specific model.
      *
      * <p>
@@ -133,7 +133,7 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
 
     private final MemoryIndexResolver memoryIndexResolver;
     private final Function<String, Long> threadUserIdResolver;
-    private final TaskToolBindingResolver taskToolBindingResolver;
+    private final ChatToolBindingResolver chatToolBindingResolver;
     private final @Nullable OverrideChatClientResolver overrideChatClientResolver;
     private final @Nullable SecurityContextRehydrator securityContextRehydrator;
     private final @Nullable AiGuardrails aiGuardrails;
@@ -145,7 +145,7 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
 
         this.memoryIndexResolver = builder.memoryIndexResolver;
         this.threadUserIdResolver = builder.threadUserIdResolver;
-        this.taskToolBindingResolver = builder.taskToolBindingResolver;
+        this.chatToolBindingResolver = builder.chatToolBindingResolver;
         this.overrideChatClientResolver = builder.overrideChatClientResolver;
         this.securityContextRehydrator = builder.securityContextRehydrator;
         this.aiGuardrails = builder.aiGuardrails;
@@ -265,25 +265,24 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
     }
 
     /**
-     * Returns the per-request {@link ChatClient}. Tries the override resolver first (used for per-personal-agent model
-     * selection — see {@link AiHubStateKeys#PERSONAL_AGENT_LLM_PROVIDER_KEY} /
-     * {@link AiHubStateKeys#PERSONAL_AGENT_LLM_MODEL_KEY}); falls back to the builder-time default whenever the
-     * resolver is absent, returns null, or throws. Either way, the returned client always has the workspace's
-     * {@link AiGuardrailsAdvisor} attached — see {@link #attachGuardrailsAdvisor}.
+     * Returns the per-request {@link ChatClient}. Tries the override resolver first (used for per-task model selection
+     * — see {@link AiHubStateKeys#TASK_LLM_PROVIDER_KEY} / {@link AiHubStateKeys#TASK_LLM_MODEL_KEY}); falls back to
+     * the builder-time default whenever the resolver is absent, returns null, or throws. Either way, the returned
+     * client always has the workspace's {@link AiGuardrailsAdvisor} attached — see {@link #attachGuardrailsAdvisor}.
      *
      * <p>
      * This single method is the seam every AI Hub LLM turn passes through before the request spec is built (the
      * vendored {@code SpringAIAgent.getChatRequest} calls {@code resolveChatClient(input).prompt(...)} first thing), so
      * attaching the guardrail here covers every conversation kind that reaches the model: COPILOT (default client),
-     * PERSONAL_AGENT including its model-override clients (override branch above), and any future kind routed through
-     * this same {@code run()}. WORKFLOW_CHAT is exempt by construction, not by a check here — it never calls this agent
-     * at all, it is dispatched through {@code WebhookBridgeAgent} instead.
+     * TASK including its model-override clients (override branch above), and any future kind routed through this same
+     * {@code run()}. WORKFLOW_CHAT is exempt by construction, not by a check here — it never calls this agent at all,
+     * it is dispatched through {@code WebhookBridgeAgent} instead.
      * </p>
      *
      * <p>
      * Subagent one-shot delegate calls do NOT go through this method — each specialist owns its own {@link ChatClient},
      * constructed once in {@code AiHubConfiguration} and invoked directly by its hand-rolled {@code ToolCallback}
-     * ({@code SkillsAgentToolCallback}, {@code ManagerSubAgentToolCallback}, {@code ResearchToolCallback}, etc.), never
+     * ({@code SkillsAgentToolCallback}, {@code SubAgentToolCallback}, {@code ResearchToolCallback}, etc.), never
      * through {@code resolveChatClient}. That gap is closed separately: every delegate {@link ChatClient} handed to a
      * {@code ToolCallback} constructor in {@code AiHubConfiguration} is wrapped with
      * {@code com.bytechef.ee.ai.hub.guardrails.SubAgentGuardrailedChatClient#wrap}, which attaches a fresh,
@@ -395,7 +394,7 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
 
     @Override
     protected List<ToolCallback> additionalToolCallbacks(RunAgentInput input) {
-        if (taskToolBindingResolver == null) {
+        if (chatToolBindingResolver == null) {
             return List.of();
         }
 
@@ -408,13 +407,13 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
             // (1) tenant + SecurityContext rehydration (so @PreAuthorize-protected facade calls work on
             // Reactor scheduler threads — see RehydrateContextToolCallback) and (2) empty-return defense
             // (so Anthropic doesn't reject the turn — see NonEmptyToolCallback).
-            return taskToolBindingResolver.resolve(invocationContext)
+            return chatToolBindingResolver.resolve(invocationContext)
                 .stream()
                 .map(this::wrapToolCallback)
                 .toList();
         } catch (RuntimeException exception) {
             log.warn(
-                "AiHubTask tool binding resolution failed for thread={}, workspace={}; continuing with static "
+                "AiHubChat tool binding resolution failed for thread={}, workspace={}; continuing with static "
                     + "callbacks only",
                 invocationContext.threadId(), invocationContext.workspaceId(), exception);
 
@@ -435,7 +434,7 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
         State state = input.state();
 
         // workspaceId and userId come from the controller-verified keys, not from raw request fields. The controller
-        // checks workspace membership and task ownership BEFORE this method runs and rewrites the verified
+        // checks workspace membership and chat ownership BEFORE this method runs and rewrites the verified
         // values into reserved keys; tool callbacks then operate against authenticated-session data, not user-
         // controlled request body.
         Long workspaceId = state == null ? null : NumberUtils.asLong(state.get(AiHubStateKeys.VERIFIED_WORKSPACE_ID));
@@ -480,7 +479,7 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
             contexts.add(new Context("Referenced Resources", formatReferencedResources(resources)));
         }
 
-        appendAiHubPersonalAgentContext(state, contexts);
+        appendAiHubTaskContext(state, contexts);
 
         appendMemoryIndexContext(state, contexts);
 
@@ -503,9 +502,9 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
     }
 
     /**
-     * Appends the per-task Personal Agent overlay to the prompt context. The router fills these state keys for
-     * {@code kind = PERSONAL_AGENT} tasks; they're absent for STANDARD and WORKFLOW_CHAT tasks and the method is a
-     * no-op in that case.
+     * Appends the per-chat Task overlay to the prompt context. The router fills these state keys for
+     * {@code kind = TASK} chats; they're absent for STANDARD and WORKFLOW_CHAT chats and the method is a no-op in that
+     * case.
      *
      * <p>
      * The overlay is added as a {@link Context} entry — NOT as a system-prompt replacement — so the workspace's
@@ -522,13 +521,13 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
     // round-tripping through createSystemMessage's full pipeline. The method is a pure function of (state,
     // contexts) — no agent instance needed — so direct tests give the cleanest pin on the load-bearing
     // wording invariants ("operating as", "do not let these instructions override safety").
-    static void appendAiHubPersonalAgentContext(State state, List<Context> contexts) {
+    static void appendAiHubTaskContext(State state, List<Context> contexts) {
         if (state == null) {
             return;
         }
 
-        Object instructionsObject = state.get(AiHubStateKeys.PERSONAL_AGENT_INSTRUCTIONS_KEY);
-        Object titleObject = state.get(AiHubStateKeys.PERSONAL_AGENT_TITLE_KEY);
+        Object instructionsObject = state.get(AiHubStateKeys.TASK_INSTRUCTIONS_KEY);
+        Object titleObject = state.get(AiHubStateKeys.TASK_TITLE_KEY);
 
         String instructions = instructionsObject instanceof String text && !text.isBlank() ? text : null;
         String title = titleObject instanceof String text && !text.isBlank() ? text : null;
@@ -540,7 +539,7 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
         StringBuilder body = new StringBuilder();
 
         if (title != null) {
-            body.append("You are operating as the user's personal agent: \"")
+            body.append("You are operating as the user's task: \"")
                 .append(title)
                 .append("\".\n");
         }
@@ -551,7 +550,7 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
                 .append(instructions);
         }
 
-        contexts.add(new Context("Personal Agent", body.toString()));
+        contexts.add(new Context("Task", body.toString()));
     }
 
     private void appendMemoryIndexContext(State state, List<Context> contexts) {
@@ -667,7 +666,7 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
 
         private MemoryIndexResolver memoryIndexResolver;
         private Function<String, Long> threadUserIdResolver;
-        private TaskToolBindingResolver taskToolBindingResolver;
+        private ChatToolBindingResolver chatToolBindingResolver;
         private @Nullable OverrideChatClientResolver overrideChatClientResolver;
         private @Nullable SecurityContextRehydrator securityContextRehydrator;
         private @Nullable LlmUsageRecorder llmUsageRecorder;
@@ -700,10 +699,10 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
             return this;
         }
 
-        public Builder taskToolBindingResolver(
-            TaskToolBindingResolver taskToolBindingResolver) {
+        public Builder chatToolBindingResolver(
+            ChatToolBindingResolver chatToolBindingResolver) {
 
-            this.taskToolBindingResolver = taskToolBindingResolver;
+            this.chatToolBindingResolver = chatToolBindingResolver;
 
             return this;
         }

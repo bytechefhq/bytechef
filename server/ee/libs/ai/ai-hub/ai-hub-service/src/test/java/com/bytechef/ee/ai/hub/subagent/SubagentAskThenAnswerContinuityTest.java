@@ -37,7 +37,7 @@ import org.springframework.ai.session.SessionEvent;
  */
 class SubagentAskThenAnswerContinuityTest {
 
-    private static final String PERSONAL_AGENT_MANAGER = "personal_agent_manager";
+    private static final String TASK_AGENT = "task_agent";
     private static final String THREAD_ID = "thread-1";
 
     private AiHubSessionMemory aiHubSessionMemory;
@@ -52,7 +52,7 @@ class SubagentAskThenAnswerContinuityTest {
 
     @Test
     void testTheDelegationAfterAnAnswerStillSeesWhyTheQuestionWasAsked() {
-        String sessionId = SubAgentSessionMemoryContributor.sessionKey(THREAD_ID, PERSONAL_AGENT_MANAGER);
+        String sessionId = SubAgentSessionMemoryContributor.sessionKey(THREAD_ID, TASK_AGENT);
 
         // Turn 1: the specialist drafts, then asks which of two agents the user meant.
         appendExchange(
@@ -79,12 +79,12 @@ class SubagentAskThenAnswerContinuityTest {
     @Test
     void testAnotherSpecialistOnTheSameThreadDoesNotInheritTheAnswer() {
         appendExchange(
-            SubAgentSessionMemoryContributor.sessionKey(THREAD_ID, PERSONAL_AGENT_MANAGER),
+            SubAgentSessionMemoryContributor.sessionKey(THREAD_ID, TASK_AGENT),
             "rename my support agent", "Asked whether you meant Support or Sales.");
 
         List<SessionEvent> otherSpecialistEvents = aiHubSessionMemory.sessionService()
             .getEvents(
-                SubAgentSessionMemoryContributor.sessionKey(THREAD_ID, "mcp_manager"),
+                SubAgentSessionMemoryContributor.sessionKey(THREAD_ID, "mcp_agent"),
                 EventFilter.lastN(SubAgentSessionMemoryContributor.MAX_EVENTS));
 
         assertThat(otherSpecialistEvents).isEmpty();

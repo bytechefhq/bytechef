@@ -18,8 +18,8 @@ package com.bytechef.ai.copilot.config;
 
 import com.agui.core.exception.AGUIException;
 import com.agui.core.state.State;
-import com.bytechef.ai.copilot.agent.ManagerSliceSpringAIAgent;
 import com.bytechef.ai.copilot.agent.OverrideChatClientResolver;
+import com.bytechef.ai.copilot.agent.SliceSpringAIAgent;
 import com.bytechef.ai.copilot.tool.RehydrateContextToolCallback;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
 import com.bytechef.ai.copilot.util.Mode;
@@ -52,15 +52,15 @@ import org.springframework.core.io.Resource;
  * alongside {@code CopilotConfiguration} because {@link McpServerToolCallbacksFactory} is CE.
  *
  * <p>
- * This configuration is purely additive: it does not touch {@code McpManagerConfiguration}'s existing
- * {@code mcpManagerChatClient} bean or {@code createMcpManagerToolCallback} factory methods, which back the
- * {@code mcp_manager} subagent consumed by AI Hub and the management MCP server. Those keep building their own tool
- * list independently of {@link McpServerToolCallbacksFactory}.
+ * This configuration is purely additive: it does not touch {@code McpServerSubAgentConfiguration}'s existing
+ * {@code mcpAgentChatClient} bean or {@code createMcpAgentToolCallback} factory methods, which back the
+ * {@code mcp_agent} subagent consumed by AI Hub and the management MCP server. Those keep building their own tool list
+ * independently of {@link McpServerToolCallbacksFactory}.
  * </p>
  *
  * <p>
  * The MCP facades ({@link McpProjectFacade}, {@link WorkspaceMcpServerFacade}) are optional — mirroring
- * {@code McpManagerConfiguration}'s {@code mcpManagerChatClient} bean, every bean here carries
+ * {@code McpServerSubAgentConfiguration}'s {@code mcpAgentChatClient} bean, every bean here carries
  * {@code @ConditionalOnBean({McpProjectFacade.class, WorkspaceMcpServerFacade.class})} so the whole slice skips
  * silently when the MCP feature module is absent, instead of failing application startup with an unsatisfied
  * dependency. The condition is repeated on the factory bean and both agent beans (rather than only the factory) because
@@ -108,7 +108,7 @@ public class McpServerAgentConfiguration {
     @ConditionalOnBean({
         McpProjectFacade.class, WorkspaceMcpServerFacade.class
     })
-    ManagerSliceSpringAIAgent mcpServerAskSpringAIAgent(
+    SliceSpringAIAgent mcpServerAskSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, McpServerToolCallbacksFactory mcpServerToolCallbacksFactory,
         SecurityContextRehydrator securityContextRehydrator,
         ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider)
@@ -116,7 +116,7 @@ public class McpServerAgentConfiguration {
 
         String name = Source.MCP_SERVER.name() + "_" + Mode.ASK.name();
 
-        return ManagerSliceSpringAIAgent.builder()
+        return SliceSpringAIAgent.builder()
             .agentId(name.toLowerCase())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
@@ -131,7 +131,7 @@ public class McpServerAgentConfiguration {
     @ConditionalOnBean({
         McpProjectFacade.class, WorkspaceMcpServerFacade.class
     })
-    ManagerSliceSpringAIAgent mcpServerBuildSpringAIAgent(
+    SliceSpringAIAgent mcpServerBuildSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, McpServerToolCallbacksFactory mcpServerToolCallbacksFactory,
         SecurityContextRehydrator securityContextRehydrator,
         ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider)
@@ -139,7 +139,7 @@ public class McpServerAgentConfiguration {
 
         String name = Source.MCP_SERVER.name() + "_" + Mode.BUILD.name();
 
-        return ManagerSliceSpringAIAgent.builder()
+        return SliceSpringAIAgent.builder()
             .agentId(name.toLowerCase())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
@@ -152,7 +152,7 @@ public class McpServerAgentConfiguration {
 
     /**
      * Package-private so {@code McpServerAgentConfigurationTest} can assert on the resolved tool names directly —
-     * {@link ManagerSliceSpringAIAgent} does not expose its wrapped {@link ToolCallback} list.
+     * {@link SliceSpringAIAgent} does not expose its wrapped {@link ToolCallback} list.
      */
     List<ToolCallback> askToolCallbacks(
         SecurityContextRehydrator securityContextRehydrator,
@@ -163,7 +163,7 @@ public class McpServerAgentConfiguration {
 
     /**
      * Package-private so {@code McpServerAgentConfigurationTest} can assert on the resolved tool names directly —
-     * {@link ManagerSliceSpringAIAgent} does not expose its wrapped {@link ToolCallback} list.
+     * {@link SliceSpringAIAgent} does not expose its wrapped {@link ToolCallback} list.
      */
     List<ToolCallback> buildToolCallbacks(
         SecurityContextRehydrator securityContextRehydrator,

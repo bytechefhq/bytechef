@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 import com.agui.core.exception.AGUIException;
-import com.bytechef.ai.copilot.agent.ManagerSliceSpringAIAgent;
+import com.bytechef.ai.copilot.agent.SliceSpringAIAgent;
 import com.bytechef.ai.copilot.tool.CopilotAgentType;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
 import com.bytechef.ai.copilot.util.Source;
@@ -59,7 +59,7 @@ final class AssetFileAgentConfigurationTest {
 
     @Test
     void testAskAgentIdAndToolList() throws AGUIException {
-        ManagerSliceSpringAIAgent askAgent = configuration.assetFileAskSpringAIAgent(
+        SliceSpringAIAgent askAgent = configuration.assetFileAskSpringAIAgent(
             mock(ChatMemory.class), mock(ChatModel.class), assetFileToolCallbacksFactory, securityContextRehydrator,
             emptyProvider());
 
@@ -73,7 +73,7 @@ final class AssetFileAgentConfigurationTest {
 
     @Test
     void testBuildAgentIdAndToolList() throws AGUIException {
-        ManagerSliceSpringAIAgent buildAgent = configuration.assetFileBuildSpringAIAgent(
+        SliceSpringAIAgent buildAgent = configuration.assetFileBuildSpringAIAgent(
             mock(ChatMemory.class), mock(ChatModel.class), assetFileToolCallbacksFactory, securityContextRehydrator,
             emptyProvider());
 

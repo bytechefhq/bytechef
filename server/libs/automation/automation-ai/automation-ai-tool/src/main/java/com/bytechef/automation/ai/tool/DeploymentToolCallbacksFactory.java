@@ -24,12 +24,12 @@ import org.springframework.ai.tool.ToolCallback;
 
 /**
  * Builds the project-deployment tool-callback lists shared by the Copilot deployment panel agents and the AI Hub
- * {@code deployment_manager} subagent. Read list feeds ASK; write list feeds BUILD.
+ * {@code project_deployment_agent} subagent. Read list feeds ASK; write list feeds BUILD.
  *
  * <p>
- * The write list is the deployment_manager's tool set verbatim — the manager has no ASK/BUILD split of its own, so it
- * consumes {@link #writeToolCallbacks()} directly. Keeping both surfaces on one factory is what stops a tool added for
- * the hub from silently missing on the panel.
+ * The write list is the project_deployment_agent's tool set verbatim — the subagent has no ASK/BUILD split of its own,
+ * so it consumes {@link #writeToolCallbacks()} directly. Keeping both surfaces on one factory is what stops a tool
+ * added for the hub from silently missing on the panel.
  * </p>
  *
  * @author Ivica Cardic

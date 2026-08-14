@@ -12,8 +12,8 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.automation.ai.tool.ManagerAgentType;
-import com.bytechef.automation.ai.tool.ManagerSubAgentToolCallback;
+import com.bytechef.automation.ai.tool.AutomationSubAgentType;
+import com.bytechef.automation.ai.tool.SubAgentToolCallback;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -23,8 +23,8 @@ import org.springframework.ai.chat.client.ChatClient;
 
 /**
  * Drives a stub specialist that calls the real ask tool, through the real {@link SubagentAskChannelRelay} and
- * {@link ManagerSubAgentToolCallback}, pinning the whole path from "specialist asks" to "delegate's tool result carries
- * the question".
+ * {@link SubAgentToolCallback}, pinning the whole path from "specialist asks" to "delegate's tool result carries the
+ * question".
  *
  * <p>
  * Not a Spring or Testcontainers test — the wiring under test is plain object composition, and a real {@code ChatModel}
@@ -57,7 +57,7 @@ class SubagentAskRelayEndToEndTest {
 
     @Test
     void testDelegateReturnsTheQuestionPayloadWhenTheSpecialistAsks() {
-        ManagerSubAgentToolCallback toolCallback = newToolCallback(true);
+        SubAgentToolCallback toolCallback = newToolCallback(true);
 
         String result = toolCallback.call("{\"request\": \"create an agent\"}");
 
@@ -68,7 +68,7 @@ class SubagentAskRelayEndToEndTest {
 
     @Test
     void testDelegateReturnsTheSummaryWhenTheSpecialistAsksNothing() {
-        ManagerSubAgentToolCallback toolCallback = newToolCallback(false);
+        SubAgentToolCallback toolCallback = newToolCallback(false);
 
         String result = toolCallback.call("{\"request\": \"create an agent\"}");
 
@@ -81,7 +81,7 @@ class SubagentAskRelayEndToEndTest {
      */
     @Test
     void testChannelIsUnboundAfterTheDelegationSoTheNextTurnStartsClean() {
-        ManagerSubAgentToolCallback toolCallback = newToolCallback(true);
+        SubAgentToolCallback toolCallback = newToolCallback(true);
 
         toolCallback.call("{\"request\": \"create an agent\"}");
 
@@ -91,7 +91,7 @@ class SubagentAskRelayEndToEndTest {
     /**
      * @param specialistAsks whether the stub specialist calls the ask tool while the delegation runs
      */
-    private static ManagerSubAgentToolCallback newToolCallback(boolean specialistAsks) {
+    private static SubAgentToolCallback newToolCallback(boolean specialistAsks) {
         ChatClient chatClient = mock(ChatClient.class, Answers.RETURNS_DEEP_STUBS);
 
         when(chatClient.prompt(anyString())
@@ -107,7 +107,7 @@ class SubagentAskRelayEndToEndTest {
                 return SPECIALIST_SUMMARY;
             });
 
-        return new ManagerSubAgentToolCallback(
-            ManagerAgentType.MCP_MANAGER, chatClient, "Manages MCP servers.", new SubagentAskChannelRelay());
+        return new SubAgentToolCallback(
+            AutomationSubAgentType.MCP_AGENT, chatClient, "Manages MCP servers.", new SubagentAskChannelRelay());
     }
 }

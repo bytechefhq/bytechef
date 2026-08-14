@@ -15,8 +15,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
-import com.bytechef.automation.ai.tool.ManagerAgentType;
-import com.bytechef.automation.ai.tool.ManagerSubAgentToolCallback;
+import com.bytechef.automation.ai.tool.AutomationSubAgentType;
+import com.bytechef.automation.ai.tool.SubAgentToolCallback;
 import com.bytechef.ee.platform.ai.guardrails.AiGuardrailMetrics;
 import com.bytechef.ee.platform.ai.guardrails.AiGuardrails;
 import com.bytechef.ee.platform.ai.guardrails.exception.AiGuardrailViolationException;
@@ -268,7 +268,7 @@ class SubAgentGuardrailedChatClientTest {
                 .content();
         } catch (RuntimeException exception) {
             // Mirrors every hand-rolled delegate ToolCallback's own catch (RuntimeException) arm (e.g.
-            // ManagerSubAgentToolCallback.call, SkillsAgentToolCallback.call), which converts any escaping
+            // SubAgentToolCallback.call, SkillsAgentToolCallback.call), which converts any escaping
             // RuntimeException — including AiGuardrailViolationException — into a JSON tool-error string via
             // ToolErrors.runtimeFailure instead of letting it propagate further.
             assertThat(exception).isInstanceOf(AiGuardrailViolationException.class);
@@ -283,27 +283,27 @@ class SubAgentGuardrailedChatClientTest {
 
     /**
      * Same pin as {@link #testBlockedDelegateCallIsCatchableAsToolErrorNotUnhandledCrash}, but exercised through a REAL
-     * delegate class (the manager family's {@link ManagerSubAgentToolCallback}, shared by mcp_manager /
-     * personal_agent_manager / deployment_manager / api_collection_manager) instead of a hand-simulated catch block —
-     * proves the whole seam (wrap the ChatClient in AiHubConfiguration, forward the ToolContext, let the delegate's own
-     * catch (RuntimeException) arm convert the violation) works end to end for one representative family.
+     * delegate class ({@link SubAgentToolCallback}, shared by mcp_agent / task_agent / project_deployment_agent /
+     * api_collection_agent) instead of a hand-simulated catch block — proves the whole seam (wrap the ChatClient in
+     * AiHubConfiguration, forward the ToolContext, let the delegate's own catch (RuntimeException) arm convert the
+     * violation) works end to end for one representative family.
      */
     @Test
-    void testManagerDelegateSurfacesBlockAsToolErrorViaRealCallback() {
+    void testSubAgentDelegateSurfacesBlockAsToolErrorViaRealCallback() {
         when(settingsService.fetchSettings(WORKSPACE_ID)).thenReturn(Optional.empty());
 
         ChatClient inner = ChatClient.builder(unreachableChatModel())
             .build();
         ChatClient guarded = SubAgentGuardrailedChatClient.wrap(inner, blockingGuardrails(), aiGuardrailMetrics, null);
 
-        ManagerSubAgentToolCallback managerToolCallback =
-            new ManagerSubAgentToolCallback(ManagerAgentType.MCP_MANAGER, guarded, "test manager");
+        SubAgentToolCallback subAgentToolCallback =
+            new SubAgentToolCallback(AutomationSubAgentType.MCP_AGENT, guarded, "test subagent");
 
         Map<String, Object> forwardedContext =
             Map.of(AgentToolInvocationContext.TOOL_CONTEXT_WORKSPACE_ID_KEY, WORKSPACE_ID);
         ToolContext toolContext = new ToolContext(forwardedContext);
 
-        String toolResult = managerToolCallback.call(
+        String toolResult = subAgentToolCallback.call(
             "{\"request\":\"Tell me about the " + BLOCKED_TERM + " project\"}", toolContext);
 
         assertThat(toolResult).contains("AiGuardrailViolationException");

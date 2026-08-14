@@ -18,8 +18,8 @@ package com.bytechef.ai.copilot.config;
 
 import com.agui.core.exception.AGUIException;
 import com.agui.core.state.State;
-import com.bytechef.ai.copilot.agent.ManagerSliceSpringAIAgent;
 import com.bytechef.ai.copilot.agent.OverrideChatClientResolver;
+import com.bytechef.ai.copilot.agent.SliceSpringAIAgent;
 import com.bytechef.ai.copilot.tool.RehydrateContextToolCallback;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
 import com.bytechef.ai.copilot.util.Mode;
@@ -47,10 +47,10 @@ import org.springframework.core.io.Resource;
  * {@link ProjectDeploymentToolCallbacksFactory} and the {@link ProjectDeploymentFacade} it wraps are CE.
  *
  * <p>
- * This configuration is purely additive: it does not touch {@code DeploymentManagerConfiguration}'s existing
- * {@code deploymentManagerChatClient} bean or {@code createDeploymentManagerToolCallback} factory methods, which back
- * the {@code deployment_manager} subagent consumed by AI Hub and the management MCP server. Those keep building their
- * own tool list independently of {@link ProjectDeploymentToolCallbacksFactory}.
+ * This configuration is purely additive: it does not touch {@code ProjectDeploymentSubAgentConfiguration}'s existing
+ * {@code projectDeploymentAgentChatClient} bean or {@code createProjectDeploymentAgentToolCallback} factory methods,
+ * which back the {@code project_deployment_agent} subagent consumed by AI Hub and the management MCP server. Those keep
+ * building their own tool list independently of {@link ProjectDeploymentToolCallbacksFactory}.
  * </p>
  *
  * <p>
@@ -81,7 +81,7 @@ public class ProjectDeploymentAgentConfiguration {
     }
 
     @Bean
-    ManagerSliceSpringAIAgent projectDeploymentAskSpringAIAgent(
+    SliceSpringAIAgent projectDeploymentAskSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel,
         ProjectDeploymentToolCallbacksFactory projectDeploymentToolCallbacksFactory,
         SecurityContextRehydrator securityContextRehydrator,
@@ -90,7 +90,7 @@ public class ProjectDeploymentAgentConfiguration {
 
         String name = Source.PROJECT_DEPLOYMENT.name() + "_" + Mode.ASK.name();
 
-        return ManagerSliceSpringAIAgent.builder()
+        return SliceSpringAIAgent.builder()
             .agentId(name.toLowerCase())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
@@ -102,7 +102,7 @@ public class ProjectDeploymentAgentConfiguration {
     }
 
     @Bean
-    ManagerSliceSpringAIAgent projectDeploymentBuildSpringAIAgent(
+    SliceSpringAIAgent projectDeploymentBuildSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel,
         ProjectDeploymentToolCallbacksFactory projectDeploymentToolCallbacksFactory,
         SecurityContextRehydrator securityContextRehydrator,
@@ -111,7 +111,7 @@ public class ProjectDeploymentAgentConfiguration {
 
         String name = Source.PROJECT_DEPLOYMENT.name() + "_" + Mode.BUILD.name();
 
-        return ManagerSliceSpringAIAgent.builder()
+        return SliceSpringAIAgent.builder()
             .agentId(name.toLowerCase())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
@@ -124,7 +124,7 @@ public class ProjectDeploymentAgentConfiguration {
 
     /**
      * Package-private so {@code ProjectDeploymentAgentConfigurationTest} can assert on the resolved tool names directly
-     * — {@link ManagerSliceSpringAIAgent} does not expose its wrapped {@link ToolCallback} list.
+     * — {@link SliceSpringAIAgent} does not expose its wrapped {@link ToolCallback} list.
      */
     List<ToolCallback> askToolCallbacks(
         SecurityContextRehydrator securityContextRehydrator,
@@ -136,7 +136,7 @@ public class ProjectDeploymentAgentConfiguration {
 
     /**
      * Package-private so {@code ProjectDeploymentAgentConfigurationTest} can assert on the resolved tool names directly
-     * — {@link ManagerSliceSpringAIAgent} does not expose its wrapped {@link ToolCallback} list.
+     * — {@link SliceSpringAIAgent} does not expose its wrapped {@link ToolCallback} list.
      */
     List<ToolCallback> buildToolCallbacks(
         SecurityContextRehydrator securityContextRehydrator,

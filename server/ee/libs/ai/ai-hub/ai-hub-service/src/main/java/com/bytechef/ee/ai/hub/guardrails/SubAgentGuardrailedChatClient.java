@@ -38,8 +38,8 @@ import org.springframework.core.io.Resource;
  * {@code AiHubSpringAIAgent#resolveChatClient}: previously only the top-level AI Hub agent's own {@link ChatClient}
  * carried these advisors, while every delegate ChatClient (Copilot specialists, the AI-hub-owned
  * research/data_analyst/image_generator/slide_builder subagents, and the
- * mcp_manager/personal_agent_manager/deployment_manager/api_collection_manager specialists) ran completely unguarded
- * and without the workspace's standing instructions.
+ * mcp_agent/task_agent/project_deployment_agent/api_collection_agent specialists) ran completely unguarded and without
+ * the workspace's standing instructions.
  *
  * <p>
  * The class keeps its guardrails-era name even though it now dispatches an arbitrary contributor list — renaming would
@@ -56,8 +56,8 @@ import org.springframework.core.io.Resource;
  * the turn's {@code RunAgentInput} is available). Instead this wrapper defers resolution to the moment the delegate
  * {@code ToolCallback} forwards the parent's {@code ToolContext} via {@link ChatClientRequestSpec#toolContext(Map)} —
  * the exact same map every hand-rolled delegate callback ( {@code SkillsAgentToolCallback},
- * {@code ManagerSubAgentToolCallback}, {@code ResearchToolCallback}, etc.) already builds from its own
- * {@code ToolContext} parameter and forwards so the specialist's own workspace-scoped tools keep working — see
+ * {@code SubAgentToolCallback}, {@code ResearchToolCallback}, etc.) already builds from its own {@code ToolContext}
+ * parameter and forwards so the specialist's own workspace-scoped tools keep working — see
  * {@code AgentToolInvocationContext#TOOL_CONTEXT_WORKSPACE_ID_KEY}. No changes to any of those delegate classes are
  * required: wrapping happens once, in {@code AiHubConfiguration}, at the single point where each delegate's
  * {@code ChatClient} bean is handed to its {@code ToolCallback} constructor.
@@ -85,7 +85,7 @@ import org.springframework.core.io.Resource;
  * delegate {@code ToolCallback} already wraps its {@code chatClient.prompt(...).call()} invocation in a
  * {@code catch (RuntimeException exception)} arm that converts the failure into a JSON tool-error string via
  * {@code ToolErrors.runtimeFailure(...)} rather than letting it propagate further — so the violation surfaces to the
- * parent LLM as an ordinary tool result (e.g. {@code {"error":"mcp_manager failed (AiGuardrailViolationException)"}})
+ * parent LLM as an ordinary tool result (e.g. {@code {"error":"mcp_agent failed (AiGuardrailViolationException)"}})
  * instead of aborting the whole agent turn. {@code ToolErrors.runtimeFailure} deliberately reports only the exception's
  * simple class name, not {@link Exception#getMessage()} — so even the violation's category never reaches the tool-error
  * payload; this is stricter than the top-level agent's own category-only surfacing, not a regression.

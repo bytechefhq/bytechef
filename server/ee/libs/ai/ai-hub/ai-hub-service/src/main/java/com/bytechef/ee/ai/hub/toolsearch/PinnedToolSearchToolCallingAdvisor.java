@@ -45,7 +45,7 @@ import reactor.core.publisher.Flux;
  * {@code searchTool} call surfaces it. That is correct for the large searchable catalog (1000+ cluster-element / global
  * copilot tools), which is registered with the search-loop's {@code MapToolCallbackResolver} and NOT placed on the
  * agent's options list. It is wrong for the AI Hub's own static tools — the specialist sub-agents
- * ({@code workflow_editor_agent} et al.), core interaction tools ({@code askUserQuestion}, {@code openWorkflowTab}),
+ * ({@code project_workflow_agent} et al.), core interaction tools ({@code askUserQuestion}, {@code openWorkflowTab}),
  * the interactive pickers, the auto-memory tools, and every workspace-resource read/mutation tool
  * ({@code listDataTables}, {@code queryKnowledgeBase}, {@code getAssetFileContent}, deployment / context-store /
  * API-collection tools, …). Those are the tools placed directly on the agent's options list, are resolvable at

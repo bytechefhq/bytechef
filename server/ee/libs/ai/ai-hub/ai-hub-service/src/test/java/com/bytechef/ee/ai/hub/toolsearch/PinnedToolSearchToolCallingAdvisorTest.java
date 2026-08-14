@@ -55,7 +55,7 @@ class PinnedToolSearchToolCallingAdvisorTest {
     void testStaticToolsSurviveSearchNarrowingOnCallPath() {
         when(toolCallingManager.resolveToolDefinitions(any())).thenReturn(List.of());
 
-        ToolCallback specialist = toolCallback("workflow_editor_agent");
+        ToolCallback specialist = toolCallback("project_workflow_agent");
         ToolCallback resourceTool = toolCallback("listDataTables");
 
         PinnedToolSearchToolCallingAdvisor advisor = newAdvisor();
@@ -71,14 +71,14 @@ class PinnedToolSearchToolCallingAdvisorTest {
         // each is resolvable only while on the options list and the prompt calls each directly by name. Pre-fix only a
         // hand-listed subset was re-pinned, so a static tool the prompt named but the subset omitted (e.g.
         // listDataTables) failed with "No ToolCallback found" on the model's direct call.
-        assertThat(toolNames(afterBeforeCall)).contains("workflow_editor_agent", "listDataTables");
+        assertThat(toolNames(afterBeforeCall)).contains("project_workflow_agent", "listDataTables");
     }
 
     @Test
     void testStaticToolsSurviveSearchNarrowingOnStreamPath() {
         when(toolCallingManager.resolveToolDefinitions(any())).thenReturn(List.of());
 
-        ToolCallback specialist = toolCallback("workflow_editor_agent");
+        ToolCallback specialist = toolCallback("project_workflow_agent");
         ToolCallback resourceTool = toolCallback("listDataTables");
 
         PinnedToolSearchToolCallingAdvisor advisor = newAdvisor();
@@ -88,7 +88,7 @@ class PinnedToolSearchToolCallingAdvisorTest {
         ChatClientRequest afterInitialize = advisor.doInitializeLoopStream(request, null);
         ChatClientRequest afterBeforeStream = advisor.doBeforeStream(afterInitialize, null);
 
-        assertThat(toolNames(afterBeforeStream)).contains("workflow_editor_agent", "listDataTables");
+        assertThat(toolNames(afterBeforeStream)).contains("project_workflow_agent", "listDataTables");
     }
 
     @Test

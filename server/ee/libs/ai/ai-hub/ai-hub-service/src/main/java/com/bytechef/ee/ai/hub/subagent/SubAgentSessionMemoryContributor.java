@@ -21,8 +21,8 @@ import org.springframework.ai.session.advisor.SessionMemoryAdvisor;
 
 /**
  * Gives a specialist subagent a durable, per-conversation memory so a multi-turn refinement does not restart from zero
- * on every delegation: without it the specialist never sees its own previous output, and {@code personal_agent_manager}
- * re-drafts an agent's instructions from scratch when the user says "make it shorter".
+ * on every delegation: without it the specialist never sees its own previous output, and {@code task_agent} re-drafts
+ * an agent's instructions from scratch when the user says "make it shorter".
  *
  * <p>
  * The session is keyed {@code <parentThreadId>:<agentTypeKey>} over the same session store the parent AI Hub agent
@@ -76,7 +76,7 @@ public final class SubAgentSessionMemoryContributor implements SubAgentAdvisorCo
     }
 
     /**
-     * The session id a specialist's memory lives under. Public so the purge that runs when an AI Hub task is deleted
+     * The session id a specialist's memory lives under. Public so the purge that runs when an AI Hub chat is deleted
      * constructs exactly the same keys this contributor writes — {@code SessionRepository} has no prefix listing, so
      * the two cannot be allowed to drift apart.
      */

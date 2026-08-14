@@ -38,33 +38,33 @@ import org.springframework.core.io.Resource;
  *
  * @author Ivica Cardic
  */
-class McpManagerConfigurationTest {
+class McpServerSubAgentConfigurationTest {
 
-    private final McpManagerConfiguration mcpManagerConfiguration = new McpManagerConfiguration();
+    private final McpServerSubAgentConfiguration mcpServerSubAgentConfiguration = new McpServerSubAgentConfiguration();
 
     @Test
-    void testMcpManagerChatClientIsBuilt() {
+    void testMcpAgentChatClientIsBuilt() {
         Resource promptResource = new ByteArrayResource(
-            "You are the mcp_manager subagent.".getBytes(StandardCharsets.UTF_8), "test prompt_mcp_manager.txt");
+            "You are the mcp_agent subagent.".getBytes(StandardCharsets.UTF_8), "test prompt_mcp_agent.txt");
 
         assertThatNoException().isThrownBy(
-            () -> mcpManagerConfiguration.mcpManagerChatClient(
+            () -> mcpServerSubAgentConfiguration.mcpAgentChatClient(
                 mock(ChatModel.class), mock(McpProjectFacade.class), mock(McpProjectService.class),
                 mock(McpProjectWorkflowService.class), mock(ProjectDeploymentWorkflowService.class),
                 mock(WorkflowService.class), mock(WorkspaceMcpServerFacade.class), promptResource));
     }
 
     @Test
-    void testMcpManagerToolCallbackIsNamedCorrectly() {
-        ToolCallback toolCallback = McpManagerConfiguration.createMcpManagerToolCallback(mock(ChatClient.class));
+    void testMcpAgentToolCallbackIsNamedCorrectly() {
+        ToolCallback toolCallback = McpServerSubAgentConfiguration.createMcpAgentToolCallback(mock(ChatClient.class));
 
         assertThat(toolCallback.getToolDefinition()
-            .name()).isEqualTo("mcp_manager");
+            .name()).isEqualTo("mcp_agent");
     }
 
     @Test
-    void testMcpManagerToolCallbackDescriptionMentionsFromAi() {
-        ToolCallback toolCallback = McpManagerConfiguration.createMcpManagerToolCallback(mock(ChatClient.class));
+    void testMcpAgentToolCallbackDescriptionMentionsFromAi() {
+        ToolCallback toolCallback = McpServerSubAgentConfiguration.createMcpAgentToolCallback(mock(ChatClient.class));
 
         String description = toolCallback.getToolDefinition()
             .description();

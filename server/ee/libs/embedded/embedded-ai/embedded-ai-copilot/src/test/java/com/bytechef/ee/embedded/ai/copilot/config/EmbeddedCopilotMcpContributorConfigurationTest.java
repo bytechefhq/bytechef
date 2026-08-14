@@ -20,7 +20,7 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.beans.factory.ObjectProvider;
 
 /**
- * Verifies the embedded contributor exposes the workflow_editor_embedded_agent delegate workspace-scoped, and skips an
+ * Verifies the embedded contributor exposes the integration_workflow_agent delegate workspace-scoped, and skips an
  * absent ChatClient bean.
  *
  * @version ee
@@ -41,7 +41,7 @@ class EmbeddedCopilotMcpContributorConfigurationTest {
         assertThat(contributor.getToolCallbacks()).singleElement()
             .satisfies(toolCallback -> {
                 assertThat(toolCallback.getToolDefinition()
-                    .name()).isEqualTo("workflow_editor_embedded_agent");
+                    .name()).isEqualTo("integration_workflow_agent");
                 assertThat(toolCallback.getToolDefinition()
                     .inputSchema()).contains("workspaceId");
             });

@@ -51,7 +51,7 @@ import com.bytechef.ai.copilot.util.Mode;
 import com.bytechef.ai.copilot.util.Source;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.ai.tool.ClusterElementTools;
-import com.bytechef.automation.ai.tool.ProjectTools;
+import com.bytechef.automation.ai.tool.ProjectAuthoringTools;
 import com.bytechef.automation.ai.tool.ProjectWorkflowTools;
 import com.bytechef.automation.ai.tool.ReadProjectTools;
 import com.bytechef.automation.ai.tool.ReadProjectWorkflowTools;
@@ -455,7 +455,7 @@ public class CopilotConfiguration {
 
     @Bean
     WorkflowEditorSpringAIAgent workflowEditorBuildSpringAIAgent(
-        ChatMemory chatMemory, ChatModel chatModel, ProjectTools projectTools,
+        ChatMemory chatMemory, ChatModel chatModel, ProjectAuthoringTools projectAuthoringTools,
         ProjectWorkflowTools projectWorkflowTools, ComponentTools componentTools, TaskTools taskTools,
         ScriptTools scriptTools, WorkflowService workflowService, WorkflowNodeOutputFacade workflowNodeOutputFacade,
         PermissionService permissionService, SecurityContextRehydrator securityContextRehydrator,
@@ -466,8 +466,8 @@ public class CopilotConfiguration {
 
         List<Object> tools = new ArrayList<>(
             List.of(
-                projectTools, projectWorkflowTools, componentTools, taskTools, scriptTools, workflowValidatorTools,
-                workflowInstructionTools));
+                projectAuthoringTools, projectWorkflowTools, componentTools, taskTools, scriptTools,
+                workflowValidatorTools, workflowInstructionTools));
 
         tools.addAll(interactivePickerToolCallbacks());
 
@@ -488,7 +488,7 @@ public class CopilotConfiguration {
 
     @Bean
     ConverterSpringAIAgent converterBuildSpringAIAgent(
-        ChatMemory chatMemory, ChatModel chatModel, ProjectTools projectTools,
+        ChatMemory chatMemory, ChatModel chatModel, ProjectAuthoringTools projectAuthoringTools,
         ProjectWorkflowTools projectWorkflowTools, TaskTools taskTools, ScriptTools scriptTools,
         SecurityContextRehydrator securityContextRehydrator,
         ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider)
@@ -506,7 +506,7 @@ public class CopilotConfiguration {
                 wrapTools(
                     securityContextRehydrator,
                     List.of(
-                        projectTools, projectWorkflowTools, taskTools, scriptTools, workflowValidatorTools,
+                        projectAuthoringTools, projectWorkflowTools, taskTools, scriptTools, workflowValidatorTools,
                         workflowInstructionTools)))
             .overrideChatClientResolver(overrideChatClientResolverProvider.getIfAvailable())
             .build();
@@ -760,14 +760,14 @@ public class CopilotConfiguration {
 
     @Bean
     ChatClient workflowEditorBuildSubAgentChatClient(
-        ChatModel chatModel, ProjectTools projectTools, ProjectWorkflowTools projectWorkflowTools, TaskTools taskTools,
-        ScriptTools scriptTools, SimulationTools simulationTools) {
+        ChatModel chatModel, ProjectAuthoringTools projectAuthoringTools, ProjectWorkflowTools projectWorkflowTools,
+        TaskTools taskTools, ScriptTools scriptTools, SimulationTools simulationTools) {
 
         return ChatClient.builder(chatModel)
             .defaultSystem(getSystemPrompt(promptWorkflowEditorBuildResource))
             .defaultTools(
-                projectTools, projectWorkflowTools, taskTools, scriptTools, simulationTools, workflowValidatorTools,
-                workflowInstructionTools)
+                projectAuthoringTools, projectWorkflowTools, taskTools, scriptTools, simulationTools,
+                workflowValidatorTools, workflowInstructionTools)
             // One-shot subagent (backs the management MCP workflow_editor agent + AI Hub delegation): give it
             // lookupPropertyOptions so it fetches real option values for dynamic-option properties and sets a valid
             // one itself. Not the interactive askUserQuestion/select picker — a one-shot subagent can't ask + resume.
@@ -780,13 +780,13 @@ public class CopilotConfiguration {
 
     @Bean
     ChatClient converterBuildSubAgentChatClient(
-        ChatModel chatModel, ProjectTools projectTools, ProjectWorkflowTools projectWorkflowTools, TaskTools taskTools,
-        ScriptTools scriptTools) {
+        ChatModel chatModel, ProjectAuthoringTools projectAuthoringTools, ProjectWorkflowTools projectWorkflowTools,
+        TaskTools taskTools, ScriptTools scriptTools) {
 
         return ChatClient.builder(chatModel)
             .defaultSystem(getSystemPrompt(promptConverterBuildResource))
             .defaultTools(
-                projectTools, projectWorkflowTools, taskTools, scriptTools, workflowValidatorTools,
+                projectAuthoringTools, projectWorkflowTools, taskTools, scriptTools, workflowValidatorTools,
                 workflowInstructionTools)
             .build();
     }
@@ -799,9 +799,9 @@ public class CopilotConfiguration {
      */
     @Bean
     Supplier<ChatClient> converterBuildSubAgentChatClientSupplier(
-        @Qualifier("converterBuildSubAgentChatClient") ChatClient converterChatClient, ProjectTools projectTools,
-        ProjectWorkflowTools projectWorkflowTools, TaskTools taskTools, ScriptTools scriptTools,
-        ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider) {
+        @Qualifier("converterBuildSubAgentChatClient") ChatClient converterChatClient,
+        ProjectAuthoringTools projectAuthoringTools, ProjectWorkflowTools projectWorkflowTools, TaskTools taskTools,
+        ScriptTools scriptTools, ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider) {
 
         return () -> {
             OverrideChatClientResolver overrideChatClientResolver =
@@ -826,7 +826,7 @@ public class CopilotConfiguration {
             return ChatClient.builder(resolvedChatModel)
                 .defaultSystem(getSystemPrompt(promptConverterBuildResource))
                 .defaultTools(
-                    projectTools, projectWorkflowTools, taskTools, scriptTools, workflowValidatorTools,
+                    projectAuthoringTools, projectWorkflowTools, taskTools, scriptTools, workflowValidatorTools,
                     workflowInstructionTools)
                 .build();
         };

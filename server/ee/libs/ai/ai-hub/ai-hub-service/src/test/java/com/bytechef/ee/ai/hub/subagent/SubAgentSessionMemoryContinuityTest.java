@@ -39,8 +39,8 @@ import org.springframework.ai.session.SessionEvent;
 class SubAgentSessionMemoryContinuityTest {
 
     private static final String THREAD_ID = "thread-1";
-    private static final String PERSONAL_AGENT_MANAGER = "personal_agent_manager";
-    private static final String MCP_MANAGER = "mcp_manager";
+    private static final String TASK_AGENT = "task_agent";
+    private static final String MCP_AGENT = "mcp_agent";
 
     private AiHubSessionMemory aiHubSessionMemory;
 
@@ -54,7 +54,7 @@ class SubAgentSessionMemoryContinuityTest {
 
     @Test
     void testSecondDelegationSeesTheFirstExchange() {
-        String sessionId = SubAgentSessionMemoryContributor.sessionKey(THREAD_ID, PERSONAL_AGENT_MANAGER);
+        String sessionId = SubAgentSessionMemoryContributor.sessionKey(THREAD_ID, TASK_AGENT);
 
         appendExchange(sessionId, "draft instructions for a PR reviewer", "Draft: reviews pull requests.");
 
@@ -71,12 +71,12 @@ class SubAgentSessionMemoryContinuityTest {
     @Test
     void testDifferentSpecialistsOnOneThreadDoNotSeeEachOther() {
         appendExchange(
-            SubAgentSessionMemoryContributor.sessionKey(THREAD_ID, PERSONAL_AGENT_MANAGER), "create an agent",
+            SubAgentSessionMemoryContributor.sessionKey(THREAD_ID, TASK_AGENT), "create an agent",
             "Created agent 7.");
 
         List<SessionEvent> otherSpecialistEvents = aiHubSessionMemory.sessionService()
             .getEvents(
-                SubAgentSessionMemoryContributor.sessionKey(THREAD_ID, MCP_MANAGER),
+                SubAgentSessionMemoryContributor.sessionKey(THREAD_ID, MCP_AGENT),
                 EventFilter.lastN(SubAgentSessionMemoryContributor.MAX_EVENTS));
 
         assertThat(otherSpecialistEvents).isEmpty();
@@ -85,12 +85,12 @@ class SubAgentSessionMemoryContinuityTest {
     @Test
     void testOneSpecialistOnDifferentThreadsDoesNotCrossConversations() {
         appendExchange(
-            SubAgentSessionMemoryContributor.sessionKey(THREAD_ID, PERSONAL_AGENT_MANAGER), "create an agent",
+            SubAgentSessionMemoryContributor.sessionKey(THREAD_ID, TASK_AGENT), "create an agent",
             "Created agent 7.");
 
         List<SessionEvent> otherConversationEvents = aiHubSessionMemory.sessionService()
             .getEvents(
-                SubAgentSessionMemoryContributor.sessionKey("thread-2", PERSONAL_AGENT_MANAGER),
+                SubAgentSessionMemoryContributor.sessionKey("thread-2", TASK_AGENT),
                 EventFilter.lastN(SubAgentSessionMemoryContributor.MAX_EVENTS));
 
         assertThat(otherConversationEvents).isEmpty();
@@ -98,7 +98,7 @@ class SubAgentSessionMemoryContinuityTest {
 
     @Test
     void testReplayIsCappedAtMaxEvents() {
-        String sessionId = SubAgentSessionMemoryContributor.sessionKey(THREAD_ID, PERSONAL_AGENT_MANAGER);
+        String sessionId = SubAgentSessionMemoryContributor.sessionKey(THREAD_ID, TASK_AGENT);
 
         for (int exchangeIndex = 0; exchangeIndex < SubAgentSessionMemoryContributor.MAX_EVENTS; exchangeIndex++) {
             appendExchange(sessionId, "request " + exchangeIndex, "reply " + exchangeIndex);

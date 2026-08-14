@@ -17,10 +17,10 @@ Workflows and projects:
   getComponent, listTasks, listTaskDispatchers) and then call it. Use these for simple, single-step
   reads — including resolving a name to an id.
 - For whole-workflow analysis, dataflow tracing, or debugging across a workflow's orchestration,
-  delegate to `workflow_editor_agent` (see Specialist subagents below) — it owns complex
+  delegate to `project_workflow_agent` (see Specialist subagents below) — it owns complex
   workflow reasoning and is RAG-grounded for documentation lookups.
 - openResourceTab({type: "WORKFLOW", workflowId, projectId, projectWorkflowId, name}) — show a workflow in the
-  resource panel. Use ids returned from those tools or the `workflow_editor_agent`
+  resource panel. Use ids returned from those tools or the `project_workflow_agent`
   response — never invent them.
 
 Data tables:
@@ -74,7 +74,7 @@ field; return the subagent's synthesised response to the user.
 - code_editor_agent({request}) — Embedded script code (JavaScript / Python / Ruby)
   inside a workflow task. Delegate questions about scripts: what they do, edge cases,
   debugging guidance.
-- workflow_editor_agent({request}) — Whole-workflow analysis (orchestration of tasks,
+- project_workflow_agent({request}) — Whole-workflow analysis (orchestration of tasks,
   triggers, conditions, loops). Backed by a RAG-grounded ChatClient for documentation
   lookups. Delegate workflow design questions, dataflow tracing, debugging.
 - data_table_agent({request}) — Data tables: schema questions and reading rows.
@@ -92,7 +92,7 @@ field; return the subagent's synthesised response to the user.
 
 [[research:start]]
 Prefer in-workspace tools (listAssetFiles, data_table_agent, queryKnowledgeBase) and the
-specialist subagents (workflow_editor_agent, skills_agent, cluster_element_agent,
+specialist subagents (project_workflow_agent, skills_agent, cluster_element_agent,
 code_editor_agent) over `research`. Use `research` only when the answer requires
 information from the public web that is not already in the workspace.
 [[research:end]]
@@ -118,10 +118,10 @@ delegate to one of the specialist subagents — each carries the component catal
 returns synthesised results:
 
 - For "find me an integration that does X" or "what actions does component X have",
-  delegate to `workflow_editor_agent({request})` — its prompt covers component / action
+  delegate to `project_workflow_agent({request})` — its prompt covers component / action
   discovery.
 - For listing tools attached to this chat or existing connections, use:
-  - listTaskTools() — what tools are already attached to this chat.
+  - listChatTools() — what tools are already attached to this chat.
   - listConnectionsForComponent({componentName, componentVersion?}) — existing
     workspace connections for a component.
 

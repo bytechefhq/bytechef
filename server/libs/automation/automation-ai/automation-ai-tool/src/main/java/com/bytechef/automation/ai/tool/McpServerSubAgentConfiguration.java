@@ -36,21 +36,20 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 
 /**
- * Registers the {@code mcpManagerChatClient} Spring bean used by the ai_hub BUILD agent.
+ * Registers the {@code mcpAgentChatClient} Spring bean used by the ai_hub BUILD agent.
  *
  * <p>
- * The mcp_manager subagent is a dedicated {@link ChatClient} pre-loaded with the MCP server lifecycle tools
+ * The mcp_agent subagent is a dedicated {@link ChatClient} pre-loaded with the MCP server lifecycle tools
  * ({@code listMcpServers}, {@code createMcpServer}, {@code updateMcpServer}, {@code createMcpProject},
  * {@code cloneMcpProject}) plus the workflow tool-mapping tools ({@code listMcpProjectWorkflows},
- * {@code updateMcpProjectWorkflowParameters}) and the {@code prompt_mcp_manager.txt} system prompt, which carries the
+ * {@code updateMcpProjectWorkflowParameters}) and the {@code prompt_mcp_agent.txt} system prompt, which carries the
  * fromAi authoring playbook. Its isolated context means the parent ai_hub BUILD agent never sees the setup transcript —
  * it only receives the final status summary.
  * </p>
  *
  * <p>
- * The {@link ManagerSubAgentToolCallback} is intentionally <em>not</em> a Spring bean. It is instantiated inline in the
- * ai_hub BUILD agent bean method (via {@link #createMcpManagerToolCallback}) so that it is registered only on that
- * agent.
+ * The {@link SubAgentToolCallback} is intentionally <em>not</em> a Spring bean. It is instantiated inline in the ai_hub
+ * BUILD agent bean method (via {@link #createMcpAgentToolCallback}) so that it is registered only on that agent.
  * </p>
  *
  *
@@ -58,10 +57,10 @@ import org.springframework.core.io.Resource;
  */
 @Configuration
 @ConditionalOnProperty(prefix = "bytechef.ai.hub", name = "enabled", havingValue = "true")
-public class McpManagerConfiguration {
+public class McpServerSubAgentConfiguration {
 
     static final String TOOL_DESCRIPTION = """
-        Delegate MCP server management to a specialised mcp_manager subagent. It creates and configures
+        Delegate MCP server management to a specialised mcp_agent subagent. It creates and configures
         MCP servers that expose selected workflows as MCP tools to external MCP clients (Claude, Cursor,
         etc.): create/enable/disable servers, attach a published project version's workflows, and complete
         each workflow's tool mapping — tool name, tool description, and fromAi(...) parameter expressions
@@ -77,12 +76,12 @@ public class McpManagerConfiguration {
     @ConditionalOnBean({
         McpProjectFacade.class, WorkspaceMcpServerFacade.class
     })
-    ChatClient mcpManagerChatClient(
+    ChatClient mcpAgentChatClient(
         ChatModel chatModel, McpProjectFacade mcpProjectFacade, McpProjectService mcpProjectService,
         McpProjectWorkflowService mcpProjectWorkflowService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
         WorkflowService workflowService, WorkspaceMcpServerFacade workspaceMcpServerFacade,
-        @Value("classpath:prompt_mcp_manager.txt") Resource promptResource) {
+        @Value("classpath:prompt_mcp_agent.txt") Resource promptResource) {
 
         String systemPrompt = readPrompt(promptResource);
 
@@ -100,19 +99,19 @@ public class McpManagerConfiguration {
             .build();
     }
 
-    public static ManagerSubAgentToolCallback createMcpManagerToolCallback(ChatClient mcpManagerChatClient) {
-        return createMcpManagerToolCallback(mcpManagerChatClient, null);
+    public static SubAgentToolCallback createMcpAgentToolCallback(ChatClient mcpAgentChatClient) {
+        return createMcpAgentToolCallback(mcpAgentChatClient, null);
     }
 
     /**
      * @param askRelay carries a question the specialist raised back out as this delegate's own tool result;
      *                 {@code null} keeps the specialist's own summary as the result in every case
      */
-    public static ManagerSubAgentToolCallback createMcpManagerToolCallback(
-        ChatClient mcpManagerChatClient, @Nullable SubAgentAskRelay askRelay) {
+    public static SubAgentToolCallback createMcpAgentToolCallback(
+        ChatClient mcpAgentChatClient, @Nullable SubAgentAskRelay askRelay) {
 
-        return new ManagerSubAgentToolCallback(
-            ManagerAgentType.MCP_MANAGER, mcpManagerChatClient, TOOL_DESCRIPTION, askRelay);
+        return new SubAgentToolCallback(
+            AutomationSubAgentType.MCP_AGENT, mcpAgentChatClient, TOOL_DESCRIPTION, askRelay);
     }
 
     private String readPrompt(Resource resource) {
@@ -122,7 +121,7 @@ public class McpManagerConfiguration {
             return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
         } catch (IOException exception) {
             throw new IllegalStateException(
-                "Failed to read mcp manager prompt resource: " + resource.getDescription(), exception);
+                "Failed to read mcp agent prompt resource: " + resource.getDescription(), exception);
         }
     }
 }

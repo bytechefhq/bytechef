@@ -180,8 +180,8 @@ public class EmbeddedCopilotConfiguration {
      * Stateless embedded workflow-editor BUILD subagent {@link ChatClient} — the embedded mirror of
      * {@code workflowEditorBuildSubAgentChatClient}, bound to the integration + integration-workflow tools and the
      * embedded BUILD prompt. Contributed to the management MCP server (via
-     * {@code ToolCallbackContributorConfiguration}) as the {@code workflow_editor_embedded_agent} tool so MCP clients
-     * can build integration workflows; not wired into the AI-Hub routing agent.
+     * {@code ToolCallbackContributorConfiguration}) as the {@code integration_workflow_agent} tool so MCP clients can
+     * build integration workflows; not wired into the AI-Hub routing agent.
      */
     @Bean
     ChatClient workflowEditorEmbeddedBuildSubAgentChatClient(

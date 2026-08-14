@@ -45,8 +45,8 @@ public record AutomationToolInvocationContext(
      * CE-visible mirror of {@code com.bytechef.ee.ai.hub.util.Source.FILES.toAgentSourceOrdinal()} — the EE
      * agent-source enum ordinal persisted into {@code asset_file.generated_by_agent_source} for files created from the
      * Files surface. Every write path that cannot reference the EE enum directly (the Copilot panel's
-     * {@code ManagerSliceSpringAIAgent} and the management MCP {@code WorkspaceScopedSubAgentToolCallback}) must supply
-     * this literal value under {@link #TOOL_CONTEXT_SOURCE_ORDINAL_KEY} instead. Follows the same
+     * {@code SliceSpringAIAgent} and the management MCP {@code WorkspaceScopedSubAgentToolCallback}) must supply this
+     * literal value under {@link #TOOL_CONTEXT_SOURCE_ORDINAL_KEY} instead. Follows the same
      * duplicate-value-in-lockstep contract as the key strings above: if EE ever reorders {@code Source}, this must
      * change to match — though {@code Source}'s own append-only contract already treats reordering as a breaking
      * change, so in practice this constant only moves if a new CE surface is added ahead of {@code FILES}.

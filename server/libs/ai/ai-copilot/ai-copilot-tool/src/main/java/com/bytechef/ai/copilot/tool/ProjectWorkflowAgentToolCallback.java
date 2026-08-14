@@ -34,14 +34,14 @@ import org.springframework.ai.tool.definition.ToolDefinition;
 import tools.jackson.core.JacksonException;
 
 /**
- * Hand-rolled Spring AI {@link ToolCallback} that exposes the Workflow Editor Copilot subagent to the parent ai_hub
+ * Hand-rolled Spring AI {@link ToolCallback} that exposes the Project Workflow Copilot subagent to the parent ai_hub
  * agent.
  *
  * @author Ivica Cardic
  */
-public class WorkflowEditorAgentToolCallback implements ToolCallback {
+public class ProjectWorkflowAgentToolCallback implements ToolCallback {
 
-    private static final Logger log = LoggerFactory.getLogger(WorkflowEditorAgentToolCallback.class);
+    private static final Logger log = LoggerFactory.getLogger(ProjectWorkflowAgentToolCallback.class);
 
     private static final String DESCRIPTION =
         """
@@ -70,8 +70,8 @@ public class WorkflowEditorAgentToolCallback implements ToolCallback {
     private final CopilotAgentType agentType;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public WorkflowEditorAgentToolCallback(ChatClient workflowEditorChatClient) {
-        this(workflowEditorChatClient, "workflow_editor_agent", DESCRIPTION, CopilotAgentType.WORKFLOW_EDITOR_AGENT);
+    public ProjectWorkflowAgentToolCallback(ChatClient workflowEditorChatClient) {
+        this(workflowEditorChatClient, "project_workflow_agent", DESCRIPTION, CopilotAgentType.PROJECT_WORKFLOW_AGENT);
     }
 
     /**
@@ -79,7 +79,7 @@ public class WorkflowEditorAgentToolCallback implements ToolCallback {
      * the parent agent expose a distinct tool name/description and bind the correct agent type for the subagent call.
      */
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public WorkflowEditorAgentToolCallback(
+    public ProjectWorkflowAgentToolCallback(
         ChatClient workflowEditorChatClient, String toolName, String description, CopilotAgentType agentType) {
 
         this.workflowEditorChatClient = workflowEditorChatClient;
@@ -105,7 +105,7 @@ public class WorkflowEditorAgentToolCallback implements ToolCallback {
     @Override
     public String call(String toolInput, @Nullable ToolContext toolContext) {
         try {
-            WorkflowEditorAgentInput input = JsonUtils.read(toolInput, WorkflowEditorAgentInput.class);
+            ProjectWorkflowAgentInput input = JsonUtils.read(toolInput, ProjectWorkflowAgentInput.class);
 
             String request = input.request();
 
@@ -138,14 +138,14 @@ public class WorkflowEditorAgentToolCallback implements ToolCallback {
             return trailer == null ? result : result + trailer;
         } catch (JacksonException exception) {
             log.warn(
-                "workflow_editor_agent rejected malformed tool input: {} — first 200 chars of input: {}",
+                "project_workflow_agent rejected malformed tool input: {} — first 200 chars of input: {}",
                 exception.getMessage(),
                 toolInput == null ? "<null>" : toolInput.substring(0, Math.min(toolInput.length(), 200)));
 
             return toolError("Invalid tool input: " + exception.getMessage());
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(
-                WorkflowEditorAgentToolCallback.class, "workflow_editor_agent", exception);
+                ProjectWorkflowAgentToolCallback.class, "project_workflow_agent", exception);
         }
     }
 
@@ -153,6 +153,6 @@ public class WorkflowEditorAgentToolCallback implements ToolCallback {
         return ToolErrors.toolError(message);
     }
 
-    public record WorkflowEditorAgentInput(String request) {
+    public record ProjectWorkflowAgentInput(String request) {
     }
 }

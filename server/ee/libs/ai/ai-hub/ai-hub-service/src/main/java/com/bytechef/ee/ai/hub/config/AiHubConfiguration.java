@@ -21,21 +21,21 @@ import com.bytechef.ai.copilot.tool.DataTableAgentToolCallback;
 import com.bytechef.ai.copilot.tool.KnowledgeBaseAgentToolCallback;
 import com.bytechef.ai.copilot.tool.ListConnectionsForComponentToolCallback;
 import com.bytechef.ai.copilot.tool.LookupComponentPropertyOptionsToolCallback;
+import com.bytechef.ai.copilot.tool.ProjectWorkflowAgentToolCallback;
 import com.bytechef.ai.copilot.tool.PropertyOptionsResolver;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
 import com.bytechef.ai.copilot.tool.SelectComponentPropertyOptionToolCallback;
 import com.bytechef.ai.copilot.tool.SelectConnectionToolCallback;
 import com.bytechef.ai.copilot.tool.SkillsAgentToolCallback;
-import com.bytechef.ai.copilot.tool.WorkflowEditorAgentToolCallback;
 import com.bytechef.ai.copilot.tool.WorkflowExecutionAgentToolCallback;
 import com.bytechef.ai.copilot.tool.WorkspaceCopilotConnectionLister;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.automation.ai.tool.AutomationSubAgentType;
 import com.bytechef.automation.ai.tool.ClusterElementTools;
-import com.bytechef.automation.ai.tool.DeploymentManagerConfiguration;
 import com.bytechef.automation.ai.tool.GetAssetFileContentToolCallback;
 import com.bytechef.automation.ai.tool.ListAssetFilesToolCallback;
-import com.bytechef.automation.ai.tool.ManagerAgentType;
-import com.bytechef.automation.ai.tool.McpManagerConfiguration;
+import com.bytechef.automation.ai.tool.McpServerSubAgentConfiguration;
+import com.bytechef.automation.ai.tool.ProjectDeploymentSubAgentConfiguration;
 import com.bytechef.automation.ai.tool.ProjectTools;
 import com.bytechef.automation.ai.tool.ProjectWorkflowTools;
 import com.bytechef.automation.ai.tool.ReadProjectTools;
@@ -54,45 +54,45 @@ import com.bytechef.ee.ai.hub.agent.WebhookBridgeAgent;
 import com.bytechef.ee.ai.hub.agent.WebhookResumeRegistry;
 import com.bytechef.ee.ai.hub.agent.WorkflowChatGuard;
 import com.bytechef.ee.ai.hub.agent.WorkflowChatJobRegistry;
+import com.bytechef.ee.ai.hub.chat.AiHubChat;
+import com.bytechef.ee.ai.hub.chat.AiHubChatArtifactService;
+import com.bytechef.ee.ai.hub.chat.AiHubChatService;
+import com.bytechef.ee.ai.hub.chat.AiHubChatToolFacade;
 import com.bytechef.ee.ai.hub.guardrails.SubAgentGuardrailedChatClient;
 import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.ee.ai.hub.metric.AiHubToolAttachMetrics;
 import com.bytechef.ee.ai.hub.metric.WorkflowChatMetrics;
-import com.bytechef.ee.ai.hub.personalagent.AiHubPersonalAgentService;
 import com.bytechef.ee.ai.hub.progress.ProgressReportingToolCallback;
 import com.bytechef.ee.ai.hub.subagent.SubAgentAdvisorContributor;
 import com.bytechef.ee.ai.hub.subagent.SubAgentAskToolContributor;
 import com.bytechef.ee.ai.hub.subagent.SubAgentSessionMemoryContributor;
 import com.bytechef.ee.ai.hub.subagent.SubagentAskChannelRelay;
 import com.bytechef.ee.ai.hub.subagent.WorkspaceAdvisorContributor;
-import com.bytechef.ee.ai.hub.task.AiHubTask;
-import com.bytechef.ee.ai.hub.task.AiHubTaskArtifactService;
 import com.bytechef.ee.ai.hub.task.AiHubTaskService;
-import com.bytechef.ee.ai.hub.task.AiHubTaskToolFacade;
 import com.bytechef.ee.ai.hub.tool.AiHubAgentType;
-import com.bytechef.ee.ai.hub.tool.AiHubTaskArtifactRecorder;
-import com.bytechef.ee.ai.hub.tool.AttachTaskToolToolCallback;
+import com.bytechef.ee.ai.hub.tool.AiHubChatArtifactRecorder;
+import com.bytechef.ee.ai.hub.tool.AttachChatToolToolCallback;
 import com.bytechef.ee.ai.hub.tool.CreateWorkflowChatToolCallback;
-import com.bytechef.ee.ai.hub.tool.ListAiHubPersonalAgentsToolCallback;
+import com.bytechef.ee.ai.hub.tool.ListAiHubChatsToolCallback;
 import com.bytechef.ee.ai.hub.tool.ListAiHubTasksToolCallback;
+import com.bytechef.ee.ai.hub.tool.ListChatToolsToolCallback;
 import com.bytechef.ee.ai.hub.tool.ListChatWorkflowsToolCallback;
-import com.bytechef.ee.ai.hub.tool.ListTaskToolsToolCallback;
-import com.bytechef.ee.ai.hub.tool.OpenAiHubPersonalAgentTabToolCallback;
+import com.bytechef.ee.ai.hub.tool.OpenAiHubTaskTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenResourceTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenWorkflowChatTabToolCallback;
-import com.bytechef.ee.ai.hub.tool.RemoveTaskToolToolCallback;
+import com.bytechef.ee.ai.hub.tool.RemoveChatToolToolCallback;
 import com.bytechef.ee.ai.hub.tool.RunChatWorkflowToolCallback;
 import com.bytechef.ee.ai.hub.tool.memory.DbAutoMemoryDirectoryOps;
 import com.bytechef.ee.ai.hub.tool.memory.DbMemoryResourceResolver;
+import com.bytechef.ee.ai.hub.toolsearch.AiHubChatBindingToolCallbackResolver;
 import com.bytechef.ee.ai.hub.toolsearch.AiHubGlobalToolCatalog;
-import com.bytechef.ee.ai.hub.toolsearch.AiHubTaskBindingToolCallbackResolver;
 import com.bytechef.ee.ai.hub.toolsearch.ToolSearchCatalogFeeder;
 import com.bytechef.ee.ai.hub.util.Mode;
 import com.bytechef.ee.ai.hub.util.Source;
 import com.bytechef.ee.automation.ai.copilot.tool.CodeWorkflowAgentToolCallback;
 import com.bytechef.ee.automation.ai.copilot.tool.ContextStoreAgentToolCallback;
 import com.bytechef.ee.automation.ai.copilot.tool.CustomComponentAgentToolCallback;
-import com.bytechef.ee.automation.ai.tool.ApiCollectionManagerConfiguration;
+import com.bytechef.ee.automation.ai.tool.ApiCollectionSubAgentConfiguration;
 import com.bytechef.ee.automation.ai.tool.ListApiCollectionsToolCallback;
 import com.bytechef.ee.automation.apiplatform.configuration.facade.ApiCollectionFacade;
 import com.bytechef.ee.platform.ai.guardrails.AiGuardrailMetrics;
@@ -149,9 +149,9 @@ import tools.jackson.databind.json.JsonMapper;
  * {@code kind = STANDARD} turns, and the {@link WebhookBridgeAgent} that handles {@code kind = WORKFLOW_CHAT} turns.
  *
  * <p>
- * The {@code @Bean} methods consume both CC domain types (task / memory / personal-agent services + Command
- * Center–owned tool callbacks) and shared LLM infrastructure (chat memory advisor, tool search advisor, project /
- * data-table / knowledge-base / mcp-project tool callbacks).
+ * The {@code @Bean} methods consume both CC domain types (chat / memory / task services + Command Center–owned tool
+ * callbacks) and shared LLM infrastructure (chat memory advisor, tool search advisor, project / data-table /
+ * knowledge-base / mcp-project tool callbacks).
  * </p>
  *
  * <p>
@@ -218,10 +218,10 @@ public class AiHubConfiguration {
         ObjectProvider<ChatClient> customComponentAskSubAgentChatClientProvider,
         @Qualifier("codeWorkflowAskSubAgentChatClient") //
         ObjectProvider<ChatClient> codeWorkflowAskSubAgentChatClientProvider,
-        AiHubTaskService taskService,
+        AiHubChatService chatService,
         AiAutoMemoryService aiHubMemoryService,
         AssetFileFacade assetFileFacade,
-        AiHubTaskToolFacade taskToolFacade,
+        AiHubChatToolFacade chatToolFacade,
         ComponentDefinitionService componentDefinitionService,
         ConnectionDefinitionService connectionDefinitionService,
         WorkspaceConnectionFacade workspaceConnectionFacade,
@@ -231,10 +231,10 @@ public class AiHubConfiguration {
         TriggerDefinitionFacade triggerDefinitionFacade,
         SecurityContextRehydrator securityContextRehydrator,
         PropertyOptionsResolver propertyOptionsResolver,
-        ObjectProvider<AiHubPersonalAgentService> aiHubPersonalAgentServiceProvider,
+        ObjectProvider<AiHubTaskService> aiHubTaskServiceProvider,
         @Qualifier("aiHubAskToolSearchToolCallAdvisor") //
         ObjectProvider<ToolSearchToolCallingAdvisor> toolSearchToolCallAdvisorProvider,
-        ObjectProvider<AiHubTaskBindingToolCallbackResolver> taskBindingToolCallbackResolverProvider,
+        ObjectProvider<AiHubChatBindingToolCallbackResolver> chatBindingToolCallbackResolverProvider,
         ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider,
         ObjectProvider<LlmUsageRecorder> llmUsageRecorderProvider,
         ObjectProvider<AiGuardrails> aiGuardrailsProvider, ObjectProvider<MeterRegistry> meterRegistryProvider,
@@ -288,15 +288,15 @@ public class AiHubConfiguration {
         // flat queryDataTable — the specialist already owns the read tool set.
         toolCallbacks.add(new GetAssetFileContentToolCallback(assetFileFacade));
         toolCallbacks.add(new ListAssetFilesToolCallback(assetFileFacade));
-        // attachTaskTool/removeTaskTool are deliberately NOT registered here: the ASK prompt declares tool
+        // attachChatTool/removeChatTool are deliberately NOT registered here: the ASK prompt declares tool
         // attachment a BUILD-only mutation ("suggest switching to BUILD mode"), so the registrations were
         // dead weight the prompt forbade the model from using.
         toolCallbacks.add(new AskUserQuestionToolCallback(aiHubToolAttachMetrics));
 
-        // Task / connection state visibility — read-only. Lets the LLM avoid duplicate attaches and pick
+        // Chat / connection state visibility — read-only. Lets the LLM avoid duplicate attaches and pick
         // existing connections before escalating to createConnection.
         registerToolAttachStateVisibilityToolCallbacks(
-            toolCallbacks, taskService, taskToolFacade, componentDefinitionService, connectionDefinitionService,
+            toolCallbacks, chatService, chatToolFacade, componentDefinitionService, connectionDefinitionService,
             workspaceConnectionFacade, actionDefinitionService, actionDefinitionFacade, triggerDefinitionService,
             triggerDefinitionFacade, propertyOptionsResolver, aiHubToolAttachMetrics, jsonMapper);
 
@@ -305,15 +305,15 @@ public class AiHubConfiguration {
         // resolve "the staging customers API" / "my last research thread" to a concrete id without forcing the
         // user to switch into BUILD just to look something up. Workflow-execution lookups are now delegated to
         // the workflow_execution_agent specialist (registered via registerCopilotSubAgentToolCallbacks).
-        toolCallbacks.add(new ListAiHubTasksToolCallback(taskService));
+        toolCallbacks.add(new ListAiHubChatsToolCallback(chatService));
 
         // listApiCollections is demoted to the searchable catalog (aiHubAskGlobalToolCatalog) — rare enough
         // that it should not ride in every model call.
 
-        aiHubPersonalAgentServiceProvider.ifAvailable(aiHubPersonalAgentService -> {
-            toolCallbacks.add(new ListAiHubPersonalAgentsToolCallback(aiHubPersonalAgentService));
-            toolCallbacks.add(new OpenAiHubPersonalAgentTabToolCallback(aiHubPersonalAgentService,
-                taskService));
+        aiHubTaskServiceProvider.ifAvailable(aiHubTaskService -> {
+            toolCallbacks.add(new ListAiHubTasksToolCallback(aiHubTaskService));
+            toolCallbacks.add(new OpenAiHubTaskTabToolCallback(aiHubTaskService,
+                chatService));
         });
 
         // Copilot specialist sub-agent delegation. Each is registered only when its backing ChatClient
@@ -361,9 +361,9 @@ public class AiHubConfiguration {
                 .memorySystemPrompt(promptAiHubAutoMemoryToolsResource)
                 .build());
 
-        taskBindingToolCallbackResolverProvider.ifAvailable(builder::taskToolBindingResolver);
+        chatBindingToolCallbackResolverProvider.ifAvailable(builder::chatToolBindingResolver);
 
-        // Per-personal-agent LLM model override. Bean is only present when AI Gateway is enabled; absent → no
+        // Per-task LLM model override. Bean is only present when AI Gateway is enabled; absent → no
         // override capability, agents fall back to workspace default ChatClient (unchanged behaviour).
         overrideChatClientResolverProvider.ifAvailable(builder::overrideChatClientResolver);
 
@@ -420,9 +420,9 @@ public class AiHubConfiguration {
         ObjectProvider<ChatClient> customComponentBuildSubAgentChatClientProvider,
         @Qualifier("codeWorkflowBuildSubAgentChatClient") //
         ObjectProvider<ChatClient> codeWorkflowBuildSubAgentChatClientProvider,
-        AssetFileFacade assetFileFacade, AiHubTaskArtifactService taskArtifactService,
-        AiHubTaskArtifactRecorder aiHubTaskArtifactRecorder,
-        AiHubTaskService taskService, AiAutoMemoryService aiHubMemoryService,
+        AssetFileFacade assetFileFacade, AiHubChatArtifactService chatArtifactService,
+        AiHubChatArtifactRecorder aiHubChatArtifactRecorder,
+        AiHubChatService chatService, AiAutoMemoryService aiHubMemoryService,
         ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
         ProjectWorkflowService projectWorkflowService,
@@ -437,16 +437,16 @@ public class AiHubConfiguration {
         TriggerDefinitionFacade triggerDefinitionFacade,
         SecurityContextRehydrator securityContextRehydrator,
         PropertyOptionsResolver propertyOptionsResolver,
-        AiHubTaskToolFacade taskToolFacade,
-        @Qualifier("mcpManagerChatClient") ObjectProvider<ChatClient> mcpManagerChatClientProvider,
-        @Qualifier("personalAgentManagerChatClient") //
-        ObjectProvider<ChatClient> personalAgentManagerChatClientProvider,
-        @Qualifier("deploymentManagerChatClient") ObjectProvider<ChatClient> deploymentManagerChatClientProvider,
-        @Qualifier("apiCollectionManagerChatClient") //
-        ObjectProvider<ChatClient> apiCollectionManagerChatClientProvider,
+        AiHubChatToolFacade chatToolFacade,
+        @Qualifier("mcpAgentChatClient") ObjectProvider<ChatClient> mcpAgentChatClientProvider,
+        @Qualifier("taskAgentChatClient") //
+        ObjectProvider<ChatClient> taskAgentChatClientProvider,
+        @Qualifier("projectDeploymentAgentChatClient") ObjectProvider<ChatClient> projectDeploymentAgentChatClientProvider,
+        @Qualifier("apiCollectionAgentChatClient") //
+        ObjectProvider<ChatClient> apiCollectionAgentChatClientProvider,
         @Qualifier("aiHubBuildToolSearchToolCallAdvisor") //
         ObjectProvider<ToolSearchToolCallingAdvisor> toolSearchToolCallAdvisorProvider,
-        ObjectProvider<AiHubTaskBindingToolCallbackResolver> taskBindingToolCallbackResolverProvider,
+        ObjectProvider<AiHubChatBindingToolCallbackResolver> chatBindingToolCallbackResolverProvider,
         ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider,
         ObjectProvider<LlmUsageRecorder> llmUsageRecorderProvider,
         ObjectProvider<AiGuardrails> aiGuardrailsProvider, ObjectProvider<MeterRegistry> meterRegistryProvider,
@@ -481,13 +481,13 @@ public class AiHubConfiguration {
         // documented-but-unregistered tool and the turn dies with "No ToolCallback found".
         boolean researchToolAvailable = researchChatClientProvider.getIfAvailable() != null;
 
-        registerManagerSubAgentToolCallbacks(
-            toolCallbacks, mcpManagerChatClientProvider, personalAgentManagerChatClientProvider,
-            deploymentManagerChatClientProvider, apiCollectionManagerChatClientProvider, aiGuardrails,
+        registerSpecialistSubAgentToolCallbacks(
+            toolCallbacks, mcpAgentChatClientProvider, taskAgentChatClientProvider,
+            projectDeploymentAgentChatClientProvider, apiCollectionAgentChatClientProvider, aiGuardrails,
             aiGuardrailMetrics, workspaceSystemPrompts, aiHubSessionMemory);
 
         // Consolidated open-tab tool (type-keyed) replaces the seven per-resource variants on the pinned list.
-        toolCallbacks.add(new OpenResourceTabToolCallback(aiHubTaskArtifactRecorder));
+        toolCallbacks.add(new OpenResourceTabToolCallback(aiHubChatArtifactRecorder));
         toolCallbacks.add(new OpenWorkflowChatTabToolCallback());
         // Row-level data-table reads are delegated to the data_analyst / data_table_agent specialists instead of
         // a flat queryDataTable — both specialists already own the read tool set.
@@ -498,12 +498,12 @@ public class AiHubConfiguration {
         toolCallbacks.add(
             new RunChatWorkflowToolCallback(
                 projectDeploymentService, projectDeploymentWorkflowService, projectWorkflowService,
-                workflowFacade, workflowService, taskArtifactService));
+                workflowFacade, workflowService, chatArtifactService));
         // createWorkflowChat is demoted to the searchable catalog (aiHubBuildGlobalToolCatalog) — rare enough
         // that it should not ride in every model call.
 
-        // Personal-agent CRUD is delegated to the personal_agent_manager specialist (see
-        // registerManagerSubAgentToolCallbacks); the ASK agent keeps its own read-only flat registrations.
+        // Task CRUD is delegated to the task_agent specialist (see
+        // registerSpecialistSubAgentToolCallbacks); the ASK agent keeps its own read-only flat registrations.
 
         // Copilot specialist sub-agent delegation. Write-capable variants for the BUILD agent, plus
         // the BUILD-only Converter sub-agent. Skips registrations when the corresponding ChatClient
@@ -521,26 +521,26 @@ public class AiHubConfiguration {
         toolCallbacks.add(new SelectConnectionToolCallback(componentDefinitionService));
 
         toolCallbacks.add(
-            new AttachTaskToolToolCallback(taskService, taskToolFacade, connectionService, aiHubToolAttachMetrics));
+            new AttachChatToolToolCallback(chatService, chatToolFacade, connectionService, aiHubToolAttachMetrics));
         toolCallbacks.add(
-            new RemoveTaskToolToolCallback(taskService, taskToolFacade));
+            new RemoveChatToolToolCallback(chatService, chatToolFacade));
         toolCallbacks.add(new AskUserQuestionToolCallback(aiHubToolAttachMetrics));
 
-        // Task / connection state visibility — mirrors the ASK agent. The two callbacks together let the LLM
+        // Chat / connection state visibility — mirrors the ASK agent. The two callbacks together let the LLM
         // resolve "is this already set up?" and "do I have a connection for this?" without escalating to the user.
         registerToolAttachStateVisibilityToolCallbacks(
-            toolCallbacks, taskService, taskToolFacade, componentDefinitionService, connectionDefinitionService,
+            toolCallbacks, chatService, chatToolFacade, componentDefinitionService, connectionDefinitionService,
             workspaceConnectionFacade, actionDefinitionService, actionDefinitionFacade, triggerDefinitionService,
             triggerDefinitionFacade, propertyOptionsResolver, aiHubToolAttachMetrics, jsonMapper);
 
-        // API-collection and MCP-server work is delegated to the api_collection_manager and mcp_manager
-        // specialists (see registerManagerSubAgentToolCallbacks); the ASK agent keeps its read-only
+        // API-collection and MCP-server work is delegated to the api_collection_agent and mcp_agent
+        // specialists (see registerSpecialistSubAgentToolCallbacks); the ASK agent keeps its read-only
         // listApiCollections flat registration.
 
         // Resource discovery — read-only and always-on. Mirrors the same registrations on the ASK agent so
-        // a "list my tasks" turn works identically regardless of which mode is active. Workflow-execution
+        // a "list my chats" turn works identically regardless of which mode is active. Workflow-execution
         // lookups are delegated to the workflow_execution_agent specialist.
-        toolCallbacks.add(new ListAiHubTasksToolCallback(taskService));
+        toolCallbacks.add(new ListAiHubChatsToolCallback(chatService));
 
         // Auto-memory is now exposed via the forked AutoMemoryToolsAdvisor (DB-backed Resource seam),
         // registered as an advisor below rather than as standalone tool callbacks.
@@ -557,8 +557,8 @@ public class AiHubConfiguration {
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(promptAiHubBuildResource, researchToolAvailable))
             .toolCallbacks(toolCallbacks)
-            .threadUserIdResolver(threadId -> taskService.findByThreadId(threadId)
-                .map(AiHubTask::getUserId)
+            .threadUserIdResolver(threadId -> chatService.findByThreadId(threadId)
+                .map(AiHubChat::getUserId)
                 .orElse(null))
             .state(state)
             // Mirrors aiHubAskSpringAIAgent — tenant + SecurityContext rehydration on tool execution so
@@ -579,14 +579,14 @@ public class AiHubConfiguration {
                 .memorySystemPrompt(promptAiHubAutoMemoryToolsResource)
                 .build());
 
-        taskBindingToolCallbackResolverProvider.ifAvailable(buildBuilder::taskToolBindingResolver);
+        chatBindingToolCallbackResolverProvider.ifAvailable(buildBuilder::chatToolBindingResolver);
         overrideChatClientResolverProvider.ifAvailable(buildBuilder::overrideChatClientResolver);
 
         // Per-turn token metering into ai_llm_usage (source = AI_HUB). Absent recorder → advisor logs only.
         llmUsageRecorderProvider.ifAvailable(buildBuilder::llmUsageRecorder);
 
         // Workspace content guardrails on every LLM turn this agent resolves a ChatClient for — mirrors
-        // aiHubAskSpringAIAgent, including personal-agent model-override turns (see
+        // aiHubAskSpringAIAgent, including task model-override turns (see
         // AiHubSpringAIAgent#attachGuardrailsAdvisor). Reuses the same (aiGuardrails, aiGuardrailMetrics) pair the
         // subagent delegate registrations above were wrapped with.
         attachAiGuardrails(buildBuilder, aiGuardrails, aiGuardrailMetrics);
@@ -607,8 +607,8 @@ public class AiHubConfiguration {
      * {@code aiGuardrails} (EE guardrails module not on the classpath) is a no-op — both agents fall back to their
      * pre-existing, unguarded behaviour. Callers resolve the pair once per bean method and pass the SAME instances here
      * and into the subagent registration helpers ({@link #registerCopilotSubAgentToolCallbacks},
-     * {@link #registerSubAgentToolCallbacks}, {@link #registerManagerSubAgentToolCallbacks}) so the top-level agent and
-     * every delegate share one {@code ai_hub}-tagged {@link AiGuardrailMetrics} instance.
+     * {@link #registerSubAgentToolCallbacks}, {@link #registerSpecialistSubAgentToolCallbacks}) so the top-level agent
+     * and every delegate share one {@code ai_hub}-tagged {@link AiGuardrailMetrics} instance.
      */
     private static void attachAiGuardrails(
         AiHubSpringAIAgent.Builder builder, @Nullable AiGuardrails aiGuardrails,
@@ -638,14 +638,14 @@ public class AiHubConfiguration {
     @Bean
     @ConditionalOnBean(WebhookWorkflowExecutor.class)
     WebhookBridgeAgent webhookBridgeAgent(
-        WebhookWorkflowExecutor webhookFacade, AiHubTaskService taskService,
+        WebhookWorkflowExecutor webhookFacade, AiHubChatService chatService,
         WebhookResumeRegistry webhookResumeRegistry, JsonMapper jsonMapper, AssetFileFacade assetFileFacade,
         WorkflowChatMetrics workflowChatMetrics, WorkflowChatJobRegistry workflowChatJobRegistry,
         AiHubSessionMemory aiHubSessionMemory, WorkflowChatGuard workflowChatGuard,
         ObjectProvider<com.bytechef.atlas.execution.facade.JobFacade> jobFacadeProvider) throws AGUIException {
 
         return new WebhookBridgeAgent(
-            webhookFacade, taskService, webhookResumeRegistry, jsonMapper, assetFileFacade,
+            webhookFacade, chatService, webhookResumeRegistry, jsonMapper, assetFileFacade,
             workflowChatMetrics, workflowChatJobRegistry, aiHubSessionMemory, workflowChatGuard,
             jobFacadeProvider.getIfAvailable());
     }
@@ -654,30 +654,30 @@ public class AiHubConfiguration {
     AiHubRoutingAgent aiHubAskRoutingAgent(
         @Qualifier("aiHubAskSpringAIAgent") AiHubSpringAIAgent aiHubAskSpringAIAgent,
         ObjectProvider<WebhookBridgeAgent> webhookBridgeAgentProvider,
-        AiHubTaskService taskService, AssetFileFacade assetFileFacade,
-        ObjectProvider<AiHubPersonalAgentService> aiHubPersonalAgentServiceProvider)
+        AiHubChatService chatService, AssetFileFacade assetFileFacade,
+        ObjectProvider<AiHubTaskService> aiHubTaskServiceProvider)
         throws AGUIException {
 
         return new AiHubRoutingAgent(
             (Source.AI_HUB.name() + "_" + Mode.ASK.name()).toLowerCase(),
             aiHubAskSpringAIAgent,
             webhookBridgeAgentProvider.getIfAvailable(),
-            taskService, assetFileFacade, aiHubPersonalAgentServiceProvider.getIfAvailable());
+            chatService, assetFileFacade, aiHubTaskServiceProvider.getIfAvailable());
     }
 
     @Bean
     AiHubRoutingAgent aiHubBuildRoutingAgent(
         @Qualifier("aiHubBuildSpringAIAgent") AiHubSpringAIAgent aiHubBuildSpringAIAgent,
         ObjectProvider<WebhookBridgeAgent> webhookBridgeAgentProvider,
-        AiHubTaskService taskService, AssetFileFacade assetFileFacade,
-        ObjectProvider<AiHubPersonalAgentService> aiHubPersonalAgentServiceProvider)
+        AiHubChatService chatService, AssetFileFacade assetFileFacade,
+        ObjectProvider<AiHubTaskService> aiHubTaskServiceProvider)
         throws AGUIException {
 
         return new AiHubRoutingAgent(
             (Source.AI_HUB.name() + "_" + Mode.BUILD.name()).toLowerCase(),
             aiHubBuildSpringAIAgent,
             webhookBridgeAgentProvider.getIfAvailable(),
-            taskService, assetFileFacade, aiHubPersonalAgentServiceProvider.getIfAvailable());
+            chatService, assetFileFacade, aiHubTaskServiceProvider.getIfAvailable());
     }
 
     @Bean
@@ -705,7 +705,7 @@ public class AiHubConfiguration {
     AiHubGlobalToolCatalog aiHubBuildGlobalToolCatalog(
         ProjectTools projectTools, ProjectWorkflowTools projectWorkflowTools, ComponentTools componentTools,
         TaskTools taskTools, TaskDispatcherTools taskDispatcherTools, ScriptTools scriptTools,
-        ClusterElementTools clusterElementTools, AiHubTaskService taskService) {
+        ClusterElementTools clusterElementTools, AiHubChatService chatService) {
 
         // cloneAssetFile is reachable through the asset_file_agent delegate (see
         // registerCopilotSubAgentToolCallbacks) rather than the searchable catalog — file-writing work is now
@@ -718,14 +718,15 @@ public class AiHubConfiguration {
                 projectTools, projectWorkflowTools, componentTools, taskTools, taskDispatcherTools, scriptTools,
                 clusterElementTools));
 
-        toolCallbacks.add(new CreateWorkflowChatToolCallback(taskService));
+        toolCallbacks.add(new CreateWorkflowChatToolCallback(chatService));
 
         return new AiHubGlobalToolCatalog(ToolSearchCatalogFeeder.GLOBAL_BUILD_SESSION_ID, toolCallbacks);
     }
 
     /**
-     * The specialists allowed to pose a question to the user. Restricted to the manager specialists: each owns a prompt
-     * that is not shared with a Copilot panel agent, so the tool can be documented where it is registered.
+     * The specialists allowed to pose a question to the user. Restricted to the mcp/task/deployment/api-collection
+     * specialists: each owns a prompt that is not shared with a Copilot panel agent, so the tool can be documented
+     * where it is registered.
      *
      * <p>
      * The Copilot domain specialists are deliberately absent. Their prompt file is shared by the subagent client and
@@ -741,8 +742,8 @@ public class AiHubConfiguration {
      * </p>
      */
     private static final Set<String> ASK_CAPABLE_AGENT_TYPE_KEYS = Set.of(
-        AiHubAgentType.PERSONAL_AGENT_MANAGER.key(), ManagerAgentType.MCP_MANAGER.key(),
-        ManagerAgentType.DEPLOYMENT_MANAGER.key(), ManagerAgentType.API_COLLECTION_MANAGER.key());
+        AiHubAgentType.TASK_AGENT.key(), AutomationSubAgentType.MCP_AGENT.key(),
+        AutomationSubAgentType.PROJECT_DEPLOYMENT_AGENT.key(), AutomationSubAgentType.API_COLLECTION_AGENT.key());
 
     /**
      * Wraps one delegate's {@code ChatClient} in everything a specialist call needs per request: the calling
@@ -757,7 +758,7 @@ public class AiHubConfiguration {
      *
      * <p>
      * {@code agentTypeKey} MUST be a key registered with {@code AgentTypeRegistry}: it becomes the session-id suffix,
-     * and the purge that runs when an AI Hub task is deleted reconstructs the keys to delete from that registry. A key
+     * and the purge that runs when an AI Hub chat is deleted reconstructs the keys to delete from that registry. A key
      * that is not registered would produce a session nothing ever deletes.
      * </p>
      */
@@ -795,7 +796,7 @@ public class AiHubConfiguration {
      *
      * <p>
      * The older {@code workflow_builder} ChatClient sub-agent is intentionally absent — it has been superseded by the
-     * Copilot {@code workflow_editor_agent} specialist registered through
+     * Copilot {@code project_workflow_agent} specialist registered through
      * {@link #registerCopilotSubAgentToolCallbacks}. The Copilot specialist persists workflows internally via
      * {@code ProjectWorkflowTools}, eliminating the JSON round-trip {@code workflow_builder} required.
      * </p>
@@ -857,64 +858,64 @@ public class AiHubConfiguration {
     }
 
     /**
-     * Registers the AI-hub-owned "manager" specialist sub-agent ToolCallbacks (MCP servers, personal agents, project
-     * deployments, API collections) on the supplied tool list. Each is only added when its backing ChatClient bean is
-     * present — a missing facade (feature module not on the classpath) means the specialist's ChatClient bean was not
-     * created and the registration is silently skipped. Mirrors {@link #registerSubAgentToolCallbacks}, including the
+     * Registers the specialist sub-agent ToolCallbacks (MCP servers, tasks, project deployments, API collections) on
+     * the supplied tool list. Each is only added when its backing ChatClient bean is present — a missing facade
+     * (feature module not on the classpath) means the specialist's ChatClient bean was not created and the registration
+     * is silently skipped. Mirrors {@link #registerSubAgentToolCallbacks}, including the
      * {@link SubAgentGuardrailedChatClient#wrap} guardrail/workspace-prompt wrapping. This wiring covers only the AI
-     * Hub chat surface — the separate MCP-surface manager contributions
-     * ({@code AiHubManagerMcpContributorConfiguration}, {@code ManagerMcpContributorConfiguration},
-     * {@code ApiCollectionManagerMcpContributorConfiguration}) construct their own {@code ManagerSubAgentToolCallback}
-     * instances directly from the same underlying {@code ChatClient} beans and are NOT wrapped here — left out of
-     * scope, see the AI Guardrails spec's decisions log.
+     * Hub chat surface — the separate MCP-surface contributions ({@code AiHubSubAgentMcpContributorConfiguration},
+     * {@code SubAgentMcpContributorConfiguration}, {@code ApiCollectionSubAgentMcpContributorConfiguration}) construct
+     * their own {@code SubAgentToolCallback} instances directly from the same underlying {@code ChatClient} beans and
+     * are NOT wrapped here — left out of scope, see the AI Guardrails spec's decisions log.
      */
-    private static void registerManagerSubAgentToolCallbacks(
-        List<ToolCallback> toolCallbacks, ObjectProvider<ChatClient> mcpManagerChatClientProvider,
-        ObjectProvider<ChatClient> personalAgentManagerChatClientProvider,
-        ObjectProvider<ChatClient> deploymentManagerChatClientProvider,
-        ObjectProvider<ChatClient> apiCollectionManagerChatClientProvider, @Nullable AiGuardrails aiGuardrails,
+    private static void registerSpecialistSubAgentToolCallbacks(
+        List<ToolCallback> toolCallbacks, ObjectProvider<ChatClient> mcpAgentChatClientProvider,
+        ObjectProvider<ChatClient> taskAgentChatClientProvider,
+        ObjectProvider<ChatClient> projectDeploymentAgentChatClientProvider,
+        ObjectProvider<ChatClient> apiCollectionAgentChatClientProvider, @Nullable AiGuardrails aiGuardrails,
         @Nullable AiGuardrailMetrics aiGuardrailMetrics, @Nullable WorkspaceSystemPrompts workspaceSystemPrompts,
         @Nullable AiHubSessionMemory aiHubSessionMemory) {
 
-        mcpManagerChatClientProvider.ifAvailable(
-            mcpManagerChatClient -> toolCallbacks.add(
+        mcpAgentChatClientProvider.ifAvailable(
+            mcpAgentChatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
-                    McpManagerConfiguration.createMcpManagerToolCallback(
+                    McpServerSubAgentConfiguration.createMcpAgentToolCallback(
                         wrapDelegate(
-                            mcpManagerChatClient, ManagerAgentType.MCP_MANAGER.key(), aiGuardrails,
+                            mcpAgentChatClient, AutomationSubAgentType.MCP_AGENT.key(), aiGuardrails,
                             aiGuardrailMetrics, workspaceSystemPrompts, aiHubSessionMemory),
                         new SubagentAskChannelRelay()),
-                    "mcp_manager")));
+                    "mcp_agent")));
 
-        personalAgentManagerChatClientProvider.ifAvailable(
-            personalAgentManagerChatClient -> toolCallbacks.add(
+        taskAgentChatClientProvider.ifAvailable(
+            taskAgentChatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
-                    PersonalAgentManagerConfiguration.createPersonalAgentManagerToolCallback(
+                    TaskSubAgentConfiguration.createTaskAgentToolCallback(
                         wrapDelegate(
-                            personalAgentManagerChatClient, AiHubAgentType.PERSONAL_AGENT_MANAGER.key(),
+                            taskAgentChatClient, AiHubAgentType.TASK_AGENT.key(),
                             aiGuardrails, aiGuardrailMetrics, workspaceSystemPrompts, aiHubSessionMemory),
                         new SubagentAskChannelRelay()),
-                    "personal_agent_manager")));
+                    "task_agent")));
 
-        deploymentManagerChatClientProvider.ifAvailable(
-            deploymentManagerChatClient -> toolCallbacks.add(
+        projectDeploymentAgentChatClientProvider.ifAvailable(
+            projectDeploymentAgentChatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
-                    DeploymentManagerConfiguration.createDeploymentManagerToolCallback(
+                    ProjectDeploymentSubAgentConfiguration.createProjectDeploymentAgentToolCallback(
                         wrapDelegate(
-                            deploymentManagerChatClient, ManagerAgentType.DEPLOYMENT_MANAGER.key(), aiGuardrails,
+                            projectDeploymentAgentChatClient, AutomationSubAgentType.PROJECT_DEPLOYMENT_AGENT.key(),
+                            aiGuardrails,
                             aiGuardrailMetrics, workspaceSystemPrompts, aiHubSessionMemory),
                         new SubagentAskChannelRelay()),
-                    "deployment_manager")));
+                    "project_deployment_agent")));
 
-        apiCollectionManagerChatClientProvider.ifAvailable(
-            apiCollectionManagerChatClient -> toolCallbacks.add(
+        apiCollectionAgentChatClientProvider.ifAvailable(
+            apiCollectionAgentChatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
-                    ApiCollectionManagerConfiguration.createApiCollectionManagerToolCallback(
+                    ApiCollectionSubAgentConfiguration.createApiCollectionAgentToolCallback(
                         wrapDelegate(
-                            apiCollectionManagerChatClient, ManagerAgentType.API_COLLECTION_MANAGER.key(),
+                            apiCollectionAgentChatClient, AutomationSubAgentType.API_COLLECTION_AGENT.key(),
                             aiGuardrails, aiGuardrailMetrics, workspaceSystemPrompts, aiHubSessionMemory),
                         new SubagentAskChannelRelay()),
-                    "api_collection_manager")));
+                    "api_collection_agent")));
     }
 
     /**
@@ -949,7 +950,7 @@ public class AiHubConfiguration {
         @Nullable AiHubSessionMemory aiHubSessionMemory) {
 
         // The memory key is CopilotAgentType.SKILLS ("skills"), not this callback's "skills_agent" progress label —
-        // there is no skills_agent agent type, and an unregistered key would leave a session the task-delete purge
+        // there is no skills_agent agent type, and an unregistered key would leave a session the chat-delete purge
         // could never reconstruct.
         skillsSubAgentChatClientProvider.ifAvailable(
             chatClient -> toolCallbacks.add(
@@ -1027,11 +1028,11 @@ public class AiHubConfiguration {
         workflowEditorSubAgentChatClientProvider.ifAvailable(
             chatClient -> toolCallbacks.add(
                 new ProgressReportingToolCallback(
-                    new WorkflowEditorAgentToolCallback(
+                    new ProjectWorkflowAgentToolCallback(
                         wrapDelegate(
-                            chatClient, CopilotAgentType.WORKFLOW_EDITOR_AGENT.key(), aiGuardrails,
+                            chatClient, CopilotAgentType.PROJECT_WORKFLOW_AGENT.key(), aiGuardrails,
                             aiGuardrailMetrics, workspaceSystemPrompts, aiHubSessionMemory)),
-                    "workflow_editor_agent")));
+                    "project_workflow_agent")));
 
         workflowExecutionSubAgentChatClientProvider.ifAvailable(
             chatClient -> toolCallbacks.add(
@@ -1073,12 +1074,12 @@ public class AiHubConfiguration {
     }
 
     /**
-     * Registers state-visibility callbacks for the autonomous tool-attach flow: {@code listTaskTools} and
+     * Registers state-visibility callbacks for the autonomous tool-attach flow: {@code listChatTools} and
      * {@code listConnectionsForComponent}. Read-only on both agents — the LLM uses them to avoid duplicate attaches and
      * to surface an existing connection before falling back to {@code createConnection}.
      */
     private static void registerToolAttachStateVisibilityToolCallbacks(
-        List<ToolCallback> toolCallbacks, AiHubTaskService taskService, AiHubTaskToolFacade taskToolFacade,
+        List<ToolCallback> toolCallbacks, AiHubChatService chatService, AiHubChatToolFacade chatToolFacade,
         ComponentDefinitionService componentDefinitionService,
         ConnectionDefinitionService connectionDefinitionService, WorkspaceConnectionFacade workspaceConnectionFacade,
         ActionDefinitionService actionDefinitionService, ActionDefinitionFacade actionDefinitionFacade,
@@ -1086,7 +1087,7 @@ public class AiHubConfiguration {
         PropertyOptionsResolver propertyOptionsResolver, AiHubToolAttachMetrics aiHubToolAttachMetrics,
         JsonMapper jsonMapper) {
 
-        toolCallbacks.add(new ListTaskToolsToolCallback(taskService, taskToolFacade, aiHubToolAttachMetrics,
+        toolCallbacks.add(new ListChatToolsToolCallback(chatService, chatToolFacade, aiHubToolAttachMetrics,
             jsonMapper));
         toolCallbacks.add(
             new ListConnectionsForComponentToolCallback(

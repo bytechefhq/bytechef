@@ -8,7 +8,7 @@
 package com.bytechef.ee.embedded.ai.copilot.config;
 
 import com.bytechef.ai.copilot.tool.CopilotAgentType;
-import com.bytechef.ai.copilot.tool.WorkflowEditorAgentToolCallback;
+import com.bytechef.ai.copilot.tool.ProjectWorkflowAgentToolCallback;
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
 import com.bytechef.automation.ai.tool.WorkspaceScopedSubAgentToolCallback;
 import com.bytechef.automation.configuration.service.WorkspaceService;
@@ -25,12 +25,12 @@ import org.springframework.context.annotation.Configuration;
  * Contributes the embedded workflow-editor copilot subagent to the management MCP server through the
  * {@link McpServerToolCallbackContributor} SPI — the same extension point the automation copilot specialists use (see
  * {@code ToolCallbackContributorConfiguration}). It exposes the embedded integration-workflow editor as the
- * {@code workflow_editor_embedded_agent} tool so external MCP clients can build and edit integration workflows, the
- * embedded counterpart to the automation {@code workflow_editor_agent}.
+ * {@code integration_workflow_agent} tool so external MCP clients can build and edit integration workflows, the
+ * embedded counterpart to the automation {@code project_workflow_agent}.
  *
  * <p>
- * The delegate reuses {@link WorkflowEditorAgentToolCallback} (parameterized with the embedded tool name, description,
- * and {@link CopilotAgentType#WORKFLOW_EDITOR_EMBEDDED_AGENT}) wrapped around the embedded BUILD subagent
+ * The delegate reuses {@link ProjectWorkflowAgentToolCallback} (parameterized with the embedded tool name, description,
+ * and {@link CopilotAgentType#INTEGRATION_WORKFLOW_AGENT}) wrapped around the embedded BUILD subagent
  * {@link ChatClient}. A missing ChatClient bean (feature module absent) skips silently. Like the automation copilot
  * contributor, the AG-UI {@code ProgressReportingToolCallback} wrapper is intentionally NOT applied on this surface.
  * The delegate is wrapped in {@link WorkspaceScopedSubAgentToolCallback} so the MCP client can supply workspace scope
@@ -51,7 +51,7 @@ public class EmbeddedCopilotMcpContributorConfiguration {
             integration's workflows (orchestration of tasks, triggers, conditions, loops). It also manages
             the integrations themselves (list/create/update/delete/publish). Prefer calling it over
             reasoning about integration-workflow shape directly. Returns the updated workflow JSON plus a
-            change rationale. This is the embedded counterpart of workflow_editor_agent (which targets
+            change rationale. This is the embedded counterpart of project_workflow_agent (which targets
             automation projects).""";
 
     @Bean
@@ -66,9 +66,9 @@ public class EmbeddedCopilotMcpContributorConfiguration {
             workflowEditorEmbeddedBuildSubAgentChatClientProvider.ifAvailable(
                 chatClient -> toolCallbacks.add(
                     new WorkspaceScopedSubAgentToolCallback(
-                        new WorkflowEditorAgentToolCallback(
-                            chatClient, "workflow_editor_embedded_agent", DESCRIPTION,
-                            CopilotAgentType.WORKFLOW_EDITOR_EMBEDDED_AGENT),
+                        new ProjectWorkflowAgentToolCallback(
+                            chatClient, "integration_workflow_agent", DESCRIPTION,
+                            CopilotAgentType.INTEGRATION_WORKFLOW_AGENT),
                         workspaceService)));
 
             return toolCallbacks;

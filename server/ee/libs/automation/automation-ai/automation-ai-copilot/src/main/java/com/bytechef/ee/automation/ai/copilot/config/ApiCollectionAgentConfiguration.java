@@ -9,8 +9,8 @@ package com.bytechef.ee.automation.ai.copilot.config;
 
 import com.agui.core.exception.AGUIException;
 import com.agui.core.state.State;
-import com.bytechef.ai.copilot.agent.ManagerSliceSpringAIAgent;
 import com.bytechef.ai.copilot.agent.OverrideChatClientResolver;
+import com.bytechef.ai.copilot.agent.SliceSpringAIAgent;
 import com.bytechef.ai.copilot.tool.RehydrateContextToolCallback;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
 import com.bytechef.ai.copilot.util.Mode;
@@ -39,15 +39,15 @@ import org.springframework.core.io.Resource;
  * {@link ApiCollectionToolCallbacksFactory} and the {@link ApiCollectionFacade} it wraps are EE.
  *
  * <p>
- * This configuration is purely additive: it does not touch {@code ApiCollectionManagerConfiguration}'s existing
- * {@code apiCollectionManagerChatClient} bean or {@code createApiCollectionManagerToolCallback} factory methods, which
- * back the {@code api_collection_manager} subagent consumed by AI Hub and the management MCP server. Those keep
- * building their own tool list independently of {@link ApiCollectionToolCallbacksFactory}.
+ * This configuration is purely additive: it does not touch {@code ApiCollectionSubAgentConfiguration}'s existing
+ * {@code apiCollectionAgentChatClient} bean or {@code createApiCollectionAgentToolCallback} factory methods, which back
+ * the {@code api_collection_agent} subagent consumed by AI Hub and the management MCP server. Those keep building their
+ * own tool list independently of {@link ApiCollectionToolCallbacksFactory}.
  * </p>
  *
  * <p>
- * {@link ApiCollectionFacade} is optional — mirroring {@code ApiCollectionManagerConfiguration}'s
- * {@code apiCollectionManagerChatClient} bean, every bean here carries
+ * {@link ApiCollectionFacade} is optional — mirroring {@code ApiCollectionSubAgentConfiguration}'s
+ * {@code apiCollectionAgentChatClient} bean, every bean here carries
  * {@code @ConditionalOnBean(ApiCollectionFacade.class)} so the whole slice skips silently when the api-platform feature
  * module is absent, instead of failing application startup with an unsatisfied dependency. The condition is repeated on
  * the factory bean and both agent beans (rather than only the factory) because a Spring {@code @Bean} method with a
@@ -87,7 +87,7 @@ public class ApiCollectionAgentConfiguration {
 
     @Bean
     @ConditionalOnBean(ApiCollectionFacade.class)
-    ManagerSliceSpringAIAgent apiCollectionAskSpringAIAgent(
+    SliceSpringAIAgent apiCollectionAskSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel,
         ApiCollectionToolCallbacksFactory apiCollectionToolCallbacksFactory,
         SecurityContextRehydrator securityContextRehydrator,
@@ -96,7 +96,7 @@ public class ApiCollectionAgentConfiguration {
 
         String name = Source.API_COLLECTION.name() + "_" + Mode.ASK.name();
 
-        return ManagerSliceSpringAIAgent.builder()
+        return SliceSpringAIAgent.builder()
             .agentId(name.toLowerCase())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
@@ -109,7 +109,7 @@ public class ApiCollectionAgentConfiguration {
 
     @Bean
     @ConditionalOnBean(ApiCollectionFacade.class)
-    ManagerSliceSpringAIAgent apiCollectionBuildSpringAIAgent(
+    SliceSpringAIAgent apiCollectionBuildSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel,
         ApiCollectionToolCallbacksFactory apiCollectionToolCallbacksFactory,
         SecurityContextRehydrator securityContextRehydrator,
@@ -118,7 +118,7 @@ public class ApiCollectionAgentConfiguration {
 
         String name = Source.API_COLLECTION.name() + "_" + Mode.BUILD.name();
 
-        return ManagerSliceSpringAIAgent.builder()
+        return SliceSpringAIAgent.builder()
             .agentId(name.toLowerCase())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
@@ -131,7 +131,7 @@ public class ApiCollectionAgentConfiguration {
 
     /**
      * Package-private so {@code ApiCollectionAgentConfigurationTest} can assert on the resolved tool names directly —
-     * {@link ManagerSliceSpringAIAgent} does not expose its wrapped {@link ToolCallback} list.
+     * {@link SliceSpringAIAgent} does not expose its wrapped {@link ToolCallback} list.
      */
     List<ToolCallback> askToolCallbacks(
         SecurityContextRehydrator securityContextRehydrator,
@@ -142,7 +142,7 @@ public class ApiCollectionAgentConfiguration {
 
     /**
      * Package-private so {@code ApiCollectionAgentConfigurationTest} can assert on the resolved tool names directly —
-     * {@link ManagerSliceSpringAIAgent} does not expose its wrapped {@link ToolCallback} list.
+     * {@link SliceSpringAIAgent} does not expose its wrapped {@link ToolCallback} list.
      */
     List<ToolCallback> buildToolCallbacks(
         SecurityContextRehydrator securityContextRehydrator,

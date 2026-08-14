@@ -16,15 +16,15 @@ import org.springframework.ai.chat.client.ChatClient.ChatClientRequestSpec;
  *
  * <p>
  * Attached per request through the contributor seam rather than at {@code ChatClient} construction because most
- * specialist {@code ChatClient} beans are built in CE configurations ({@code McpManagerConfiguration},
- * {@code DeploymentManagerConfiguration}, the Copilot domain configurations) that cannot import this EE tool.
+ * specialist {@code ChatClient} beans are built in CE configurations ({@code McpServerSubAgentConfiguration},
+ * {@code ProjectDeploymentSubAgentConfiguration}, the Copilot domain configurations) that cannot import this EE tool.
  * Request-level tools are <b>added</b> to the builder's {@code defaultTools} rather than replacing them
  * ({@code DefaultChatClient} appends), so a specialist keeps its own tool set and simply gains this one.
  * </p>
  *
  * <p>
  * Only attached for specialists whose prompt documents the tool. A registered-but-undocumented tool is not harmless:
- * tool definitions are self-describing, so a model may call it spuriously and stop mid-task to ask something the user
+ * tool definitions are self-describing, so a model may call it spuriously and stop mid-chat to ask something the user
  * never needed to decide.
  * </p>
  *
