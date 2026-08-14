@@ -353,55 +353,97 @@ public class ExampleComponentHandler implements ComponentHandler {
 - Empty blocks are forbidden — a comment alone doesn't satisfy the `EmptyBlock` rule; add an executable statement
 - `TODO:` comments are forbidden (`TodoComment` rule) — rewrite as plain comments describing intent, or implement the work
 
-### AI Hub Conversations (EE)
+### AI Hub Chats (EE)
 
-#### Conversation kinds and threadId conventions
+The AI Hub's conversation entity is a **chat** (`AiHubChat*`, package `com.bytechef.ee.ai.hub.chat`,
+tables `ai_hub_chat` + `ai_hub_chat_artifact` / `_asset_file` / `_tool` / `_component`, route
+`/automation/ai-hub/chats/:chatId`, sidebar sections "New Chat" and "Chats").
 
-The `ai_hub_task` table holds three discriminated kinds (`ConversationKind` enum, INT ordinal):
+#### Chat kinds and threadId conventions
 
-- `COPILOT` (ordinal 0) — default; runs through the LLM agent. `workflow_execution_id` and
-  `ai_hub_personal_agent_id` are null. ThreadId is a NanoID-style random string from the client.
+The `ai_hub_chat` table holds three discriminated kinds (`AiHubChatKind` enum, INT ordinal):
+
+- `STANDARD` (ordinal 0) — default; runs through the LLM agent. `workflow_execution_id`,
+  `project_deployment_id`, and `ai_hub_task_id` are null. ThreadId is a random string from
+  the client.
 - `WORKFLOW_CHAT` (ordinal 1) — bound to a specific workflow execution; routed through
-  `WebhookBridgeAgent` instead of the LLM. ThreadId is a plain UUID.
-- `PERSONAL_AGENT` (ordinal 2) — runs through the LLM agent with a per-agent instructions overlay.
-  ThreadId is a plain UUID.
+  `WebhookBridgeAgent` instead of the LLM. Carries `workflow_execution_id` +
+  `project_deployment_id`. ThreadId is a plain UUID.
+- `TASK` (ordinal 2) — runs through the LLM agent with a per-task instructions overlay.
+  Carries `ai_hub_task_id`. ThreadId is a plain UUID.
 
-Always-new conversation semantics: every click on a workflow row or personal-agent row in the sidebar
-starts a fresh conversation rather than restoring a prior thread. Each new row gets its own random
-UUID threadId so session-store events are isolated per conversation, not shared across a
-(user, workflow) or (user, agent) tuple. Past conversations remain reachable through the conversations
-list — they're just no longer the default landing target. There is no partial unique index scoping
-rows per (workspace, user, environment, workflow_execution_id) or (workspace, user, environment,
-ai_hub_personal_agent_id); the `kind` column is the authoritative discriminator.
+Always-new chat semantics: every pick of a workflow or a task starts a fresh chat rather
+than restoring a prior thread — including `createWorkflowChatAiHubChat`, which is NOT idempotent
+despite a stale client-side comment claiming otherwise. Each new row gets its own random UUID
+threadId so session-store events are isolated per chat, not shared across a (user, workflow) or
+(user, task) tuple. Past chats remain reachable through the chats list — they're just no longer
+the default landing target. There is no partial unique index scoping rows per
+(workspace, user, environment, workflow_execution_id) or (workspace, user, environment,
+ai_hub_task_id); the `kind` column is the authoritative discriminator.
 
-Message bodies do **not** live in `ai_hub_task` — the row is metadata only (title, preview,
+Message bodies do **not** live in `ai_hub_chat` — the row is metadata only (title, preview,
 `message_count`, status, kind, the kind-specific target ids). The transcript lives in Spring AI's
-**session** store, keyed by `ai_hub_task.thread_id` used verbatim as the session id: tables
+**session** store, keyed by `ai_hub_chat.thread_id` used verbatim as the session id: tables
 `AI_SESSION` / `AI_SESSION_EVENT` under the default jdbc backend, selected by
 `bytechef.ai.memory.provider` (`jdbc` | `redis` | `aws` | `in_memory`). It is NOT
 `SPRING_AI_CHAT_MEMORY` — that table belongs to the AI Agent component's chat-memory cluster
 elements, which the hub does not use. Sessions are all written under the constant session user id
-`"ai-hub"`, so the session store carries no authorization of its own: ownership is enforced on the
-`ai_hub_task` row by `AiHubTaskServiceImpl`, which then reaches the transcript by thread id.
+`"ai-hub"` (`AiHubSessionMemory.SESSION_USER_ID`), so the session store carries no authorization of
+its own: ownership is enforced on the `ai_hub_chat` row by `AiHubChatServiceImpl`, which then reaches
+the transcript by thread id.
 
 Enum ordinals are pinned by `EnumOrdinalStabilityTest`; append new kinds at the end.
 
-#### Personal-agent system-prompt overlay
+#### Tasks ("Scheduled" in the UI)
 
-`AiHubRoutingAgent.applyPersonalAgentOverlay` injects two state keys for `kind = PERSONAL_AGENT`:
+The reusable configuration is a **task**: `AiHubTask*`, package
+`com.bytechef.ee.ai.hub.task`, tables `ai_hub_task` + `_tool` / `_resource` /
+`_schedule`, column `ai_hub_chat.ai_hub_task_id`, routes
+`/automation/ai-hub/tasks{,/new,/:taskId/edit}`, subagent
+`task_agent` (`AiHubAgentType.TASK_AGENT`), tab tool
+`openAiHubTaskTab`, GraphQL `AiHubTaskGraphQlController`.
 
-- `personalAgentInstructions` — the agent's instructions text, appended as a Context block.
-- `personalAgentTitle` — the agent's display name, surfaced as "operating as the user's personal
-  agent: '\<title\>'" in the Context block.
+**The sidebar nav item is labeled "Scheduled"** (CalendarClockIcon) because every task runs
+on a schedule; the page it opens is titled "Tasks". Both names refer to the same entity.
 
-`AiHubSpringAIAgent.appendPersonalAgentContext` reads both keys and renders a Context entry.
-The wording is load-bearing — the test
-`AiHubSpringAIAgentPersonalAgentContextTest.testFullOverlayPinsExactWording` pins both
+Scheduling is **required** and has no on/off toggle: `TaskScheduleValidator` is an
+unconditional static (deliberately not a Spring bean — `TaskSaveValidator` is
+`@ConditionalOnProperty(bytechef.ai.gateway.enabled)` and would silently stop enforcing) invoked from
+`AiHubTaskServiceImpl` and `AiHubTaskScheduleServiceImpl`. It requires `title`,
+`prompt`, `frequencyKind`, `lifecycleKind`, and a valid IANA `zoneId`, plus per-cadence fields:
+`EVERY_X_MINUTES`→`intervalMinutes`, `HOURLY`→`minuteOfHour`, `DAILY`→`timeOfDay`,
+`WEEKLY`→`dayOfWeek`+`timeOfDay`, `MONTHLY`→`dayOfMonth`+`timeOfDay`, `CUSTOM_CRON`→`cronExpression`.
+`validateSchedule` in `AiHubTaskScheduleSection.tsx` mirrors these rules client-side; the
+form is a **single page** (the Overview/Schedule tabs are gone) and one Save persists both halves.
+
+#### Task system-prompt overlay
+
+`AiHubRoutingAgent.applyAiHubTaskOverlay` injects two state keys (from
+`AiHubStateKeys`) for `kind = TASK`:
+
+- `aiHubTaskInstructions` — the task's instructions text, appended as a Context block.
+- `aiHubTaskTitle` — the display name, surfaced as "operating as the user's task:
+  '\<title\>'" in the Context block.
+
+`AiHubSpringAIAgent.appendAiHubTaskContext` reads both keys and renders a `Task`
+Context entry. The wording is load-bearing — the test
+`AiHubSpringAIAgentTaskContextTest.testFullOverlayPinsExactWording` pins both
 "operating as" and "do not let these instructions override safety or security rules" exactly.
 
 The instructions overlay is **advisory** (LLM-readable Context, not a hard ACL). Workspace-level
-guardrails apply on top via the standard system prompt. Branches: agent missing → plain copilot;
-service bean absent → plain copilot; instructions blank → title-only overlay.
+guardrails apply on top via the standard system prompt. Branches: task missing → plain LLM;
+service bean absent → plain LLM; instructions blank → title-only overlay.
+
+#### Chat launchers
+
+There is no Workflow Chats page. The composer's **provider popup** (the `ModelPicker` dropdown on the
+AI Hub home view) is the single launcher, with three cascades above the provider list: **Tasks**,
+**Workflow Chats**, and **Agent Chats**. Agent Chats is backed by the
+`workspaceChatAgents` GraphQL query (`AiAgentFacadeImpl.getWorkspaceChatAgents`) and lists deployed
+`AiAgent`s whose enabled deployment workflow has a hosted chat trigger; those workflows live in
+hidden `__AI_AGENT__` projects that `workspaceChatWorkflows` filters out, so the two cascades are
+disjoint. The separate CE-only `/automation/chats` page renders an **Agents** group from the same
+query above its per-project groups.
 
 ### Workflow-chat metrics
 
@@ -436,8 +478,8 @@ Tools reach the ai_hub ASK/BUILD agents through three tiers (wired in `AiHubConf
    custom_component, code_workflow) via `registerCopilotSubAgentToolCallbacks`, and AI-hub-owned
    subagents
    (research, data_analyst, image_generator, slide_builder via `registerSubAgentToolCallbacks`;
-   mcp_manager, personal_agent_manager, deployment_manager, api_collection_manager via
-   `registerManagerSubAgentToolCallbacks` + `ManagerSubAgentToolCallback`). Delegates MUST forward
+   mcp_agent, task_agent, project_deployment_agent, api_collection_agent via
+   `registerSpecialistSubAgentToolCallbacks` + `SubAgentToolCallback`). Delegates MUST forward
    the parent `ToolContext` into the inner ChatClient (`.toolContext(...)`) or workspace-scoped
    tools fail with "Workspace context unavailable". Wrap delegates in
    `ProgressReportingToolCallback` on the chat surface only (it narrates into the AG-UI stream).
@@ -455,8 +497,8 @@ registration via `ObjectProvider.ifAvailable`, and prompt documentation on the p
 **Consolidated pinned tools** (AI Hub only; per-kind variants remain on the Copilot surface):
 - `openResourceTab({type, name, ...ids})` replaces the seven per-resource open*Tab tools. The
   result echoes `type` plus the legacy field names; `AiHubRuntimeProvider` re-dispatches onto the
-  legacy client branches. `openWorkflowChatTab`/`openAiHubPersonalAgentTab` stay separate — their
-  results drive a task switch, not a resource-panel tab.
+  legacy client branches. `openWorkflowChatTab`/`openAiHubTaskTab` stay separate — their
+  results drive a chat switch, not a resource-panel tab.
 - `lookupPropertyOptions` / `selectPropertyOption` take `kind: ACTION | TRIGGER` +
   `operationName` (classes `LookupComponentPropertyOptionsToolCallback` /
   `SelectComponentPropertyOptionToolCallback`). The `selectPropertyOption` name and its
@@ -513,11 +555,11 @@ conversations race and surface one user's question in another's chat. Read `pend
 `runWithChannel`.
 
 Client: `toToolResultDataPart` dispatches on tool NAME first, then falls back to the payload's `kind`,
-scoped to known kinds — a delegate tool is named `personal_agent_manager`, so no name branch would ever
+scoped to known kinds — a delegate tool is named `task_agent`, so no name branch would ever
 match. The fallback parses silently behind a `{` guard rather than via `parseJson`, which would log a
 warning for every plain-text tool result in the app.
 
-**Wired for asking**: the four manager specialists plus the Copilot domain specialists; generative
+**Wired for asking**: the mcp_agent/task_agent/project_deployment_agent/api_collection_agent specialists plus the Copilot domain specialists; generative
 one-shots (research, data_analyst, image_generator, slide_builder, converter) deliberately are not — see
 the rollout note below. Adding another means three things: register `SubagentAskUserQuestionToolCallback`
 on its `ChatClient`, pass a `SubagentAskChannelRelay` into its delegate callback, and update its prompt.
@@ -565,8 +607,8 @@ providers** — switching does not move existing memories.
 ### Copilot domain agent module map (revised 2026-08-05)
 
 Copilot domain agents live one-config-per-activation-profile, per edition — NOT in ai-hub-service
-(which holds only hub-owned agents: personal_agent_manager, research, data_analyst, image_generator,
-slide_builder, managers):
+(which holds only hub-owned agents: task_agent, research, data_analyst, image_generator,
+slide_builder):
 
 - CE `ai-copilot-service`: `CopilotConfiguration` (copilot-only: workflow_editor, code_editor,
   cluster_element, skills, workflow_execution, converter, json_schema_builder, sample_output),
@@ -586,7 +628,7 @@ contributes context_store/custom_component/code_workflow. A CE class must not ho
 references to EE bean names. Panel agents are dispatched by `CopilotApiController` collecting every
 `LocalAgent` bean by agentId (`<source>_<mode>`); adding a domain needs a controller branch + a client
 `Source` enum entry (lowercase value = URL segment) + an editor trigger + post-turn invalidation via
-`useCopilotPostTurnRegistry`. Manager subagents (api_collection_manager etc.) deliberately have no
+`useCopilotPostTurnRegistry`. Automation-owned subagents (api_collection_agent etc.) deliberately have no
 ask/build split — reads are flat tools on the hub ASK agent.
 
 ### Domain copilot slice pattern (context store / knowledge base / data table)
@@ -708,10 +750,11 @@ Spec: `docs/superpowers/specs/2026-08-05-draft-publish-editors-design.md`.
   workflows with EMPTY parameters, so a setup is not servable until the mapping is completed
   (agent tools: `listMcpProjectWorkflows`, `updateMcpProjectWorkflowParameters` — merge
   semantics, only supplied fields change; authorization via the service's `MCP_EDIT` checks).
-- The `mcp_manager` subagent owns the end-to-end playbook (`prompt_mcp_manager.txt`).
+- The `mcp_agent` subagent owns the end-to-end playbook (`prompt_mcp_agent.txt`).
 - The management MCP server folds in `McpServerToolCallbackContributor` beans (SPI in
   `ai-mcp-server-api`, keeps the CE server free of EE imports). The sixteen sub-agent delegates
-  (the four managers plus the twelve copilot-domain specialists) are contributed there wrapped in
+  (the four mcp_agent/task_agent/project_deployment_agent/api_collection_agent subagents plus the twelve
+  copilot-domain specialists) are contributed there wrapped in
   `WorkspaceScopedSubAgentToolCallback`: an optional `workspaceId` input is resolved and forwarded
   into the specialist's ToolContext under both `AutomationToolInvocationContext` and
   `AgentToolInvocationContext`'s workspace-id keys — the two key families the delegates' inner
@@ -962,7 +1005,7 @@ gateway-only implementation; see "AI Gateway content guardrails" below for the g
   Agent component (CE, `server/libs/modules/components/ai/agent`) reaches it through a CE SPI seam,
   `AiGuardrailsAdvisorProvider` (`platform-ai-api`, same idiom as `ToolExecutionRecorder` — optional bean,
   no-op on CE). AI Hub wires the advisor at the ChatClient-construction seam in `AiHubSpringAIAgent`,
-  covering ASK/BUILD agents and personal-agent override clients.
+  covering ASK/BUILD agents and task override clients.
 - **Subagent delegate LLM calls (F3, ticket 732)**: closed. `SubAgentGuardrailedChatClient`
   (`ee.ai.hub.guardrails`, ai-hub-service) is a hand-written `ChatClient` decorator that wraps a delegate's
   own inner `ChatClient` so its one-shot `.call()`/`.stream()` attaches fresh, per-request advisors before
@@ -972,22 +1015,22 @@ gateway-only implementation; see "AI Gateway content guardrails" below for the g
   (guardrails + workspace system prompt) is one — see "Subagent conversation memory and interactive
   questions" for the seam and the other contributor.
   It resolves the workspace id from the SAME forwarded `ToolContext` map every hand-rolled delegate
-  `ToolCallback` (`SkillsAgentToolCallback`, `ManagerSubAgentToolCallback`, `ResearchToolCallback`, etc.)
+  `ToolCallback` (`SkillsAgentToolCallback`, `SubAgentToolCallback`, `ResearchToolCallback`, etc.)
   already builds and passes to `.toolContext(Map)` — via `AgentToolInvocationContext
   .TOOL_CONTEXT_WORKSPACE_ID_KEY` — so no delegate class needed to change. One seam in
   `AiHubConfiguration` (wrapping the `ChatClient` at the point each is handed to its
   `createXToolCallback`/`new XAgentToolCallback` call) covers all three delegate families: Copilot
   specialists, the AI-hub-owned subagents (research/data_analyst/image_generator/slide_builder), and the
-  manager specialists (mcp_manager/personal_agent_manager/deployment_manager/api_collection_manager). A
+  mcp_agent/task_agent/project_deployment_agent/api_collection_agent specialists. A
   BLOCK-mode violation inside a delegate call throws `AiGuardrailViolationException` synchronously out of
   `.call()`; every delegate's pre-existing `catch (RuntimeException)` arm converts it to a tool-error string
   via `ToolErrors.runtimeFailure(...)` (class-name only, not `getMessage()`) rather than crashing the turn.
   **Still uncovered, inherent to the advisor approach**: a delegate's completion still returns to the
   *parent* as a tool message (skips the parent's own input scan) and streams to the client as tool-result
   events (skips the parent's response scan) — the delegate's OWN advisor now redacts/blocks its own
-  request+response, but the parent agent never re-scans tool outputs. MCP-surface manager subagents
-  (`AiHubManagerMcpContributorConfiguration` et al.) remain a different, out-of-scope surface — they
-  construct their own `ManagerSubAgentToolCallback` from the same `ChatClient` beans on a different `@Bean`
+  request+response, but the parent agent never re-scans tool outputs. MCP-surface subagents
+  (`AiHubSubAgentMcpContributorConfiguration` et al.) remain a different, out-of-scope surface — they
+  construct their own `SubAgentToolCallback` from the same `ChatClient` beans on a different `@Bean`
   method that F3 does not wrap.
 - **Model-based moderation (F2, ticket 732)**: covers every advisor-fronted surface, not just the gateway.
   `AiGuardrails#checkInputs` (the advisor's non-throwing entry point) takes an optional
@@ -1132,7 +1175,7 @@ vi.mock('@/shared/components/copilot/stores/useCopilotStore', () => ({
 }));
 ```
 
-This pattern shows up in `AiHubPersonalAgentsList.test.tsx` and any test that mocks Zustand
+This pattern shows up in `AiHubTasksList.test.tsx` and any test that mocks Zustand
 stores or router hooks via factory-injected mocks.
 
 ### Resource Visibility & Sharing
@@ -1265,6 +1308,7 @@ check. When adding a method, add it to BOTH interfaces, not just the shared one.
 - server-app's `generateComponentIndex` Gradle task writes `META-INF/bytechef/component-index.json` at build time; the components-list view is served from index stubs (zero handlers loaded), single components load on demand via recorded provider class names
 - **When an index is present it is authoritative**: a ServiceLoader component missing from the index is invisible (both in the list and per-name resolution). Apps that assemble their classpath differently (EE apps) must either run the generator or ship without an index — absent/corrupt index falls back transparently to full loading on first registry access
 - The first deep read (`getComponentDefinitions()` consumers, first task execution) still triggers a one-time full load; stubs never reach detail/execution paths
+- **A derived flag is false on a stub unless the index carries its source data.** A plain `ModifiableComponentDefinition` cannot implement a platform interface (it is an SDK class), so `clusterRoot` read false for every component in list views until the index recorded each component's `clusterElementTypes` and `ComponentIndex` started wrapping stubs in `StubClusterRootComponentDefinition`. Any new list-visible flag computed from a capability interface needs the same treatment — check the stub path, not just the loaded one
 
 ### GraphQL Development Workflow
 - Add schema path to `client/codegen.ts` `schema` array
