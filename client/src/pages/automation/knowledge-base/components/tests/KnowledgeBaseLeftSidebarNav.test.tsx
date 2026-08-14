@@ -37,11 +37,13 @@ vi.mock('@/shared/layout/LeftSidebarNav', () => ({
 
 const defaultMockReturn = {
     currentKnowledgeBaseId: 'kb-1',
+    handleSearchChange: vi.fn(),
     isLoading: false,
     knowledgeBases: [
         {id: 'kb-1', name: 'KB 1'},
         {id: 'kb-2', name: 'KB 2'},
     ],
+    search: '',
 };
 
 beforeEach(() => {
@@ -59,12 +61,6 @@ describe('KnowledgeBaseLeftSidebarNav', () => {
         render(<KnowledgeBaseLeftSidebarNav />);
 
         expect(screen.getByTestId('left-sidebar-nav')).toBeInTheDocument();
-    });
-
-    it('renders title', () => {
-        render(<KnowledgeBaseLeftSidebarNav />);
-
-        expect(screen.getByText('Knowledge Bases')).toBeInTheDocument();
     });
 
     it('renders knowledge base items', () => {
@@ -104,6 +100,24 @@ describe('KnowledgeBaseLeftSidebarNav', () => {
         render(<KnowledgeBaseLeftSidebarNav />);
 
         expect(screen.getByText('No knowledge bases.')).toBeInTheDocument();
+    });
+
+    it('renders the search box', () => {
+        render(<KnowledgeBaseLeftSidebarNav />);
+
+        expect(screen.getByPlaceholderText('Search knowledge bases...')).toBeInTheDocument();
+    });
+
+    it('distinguishes a search that matched nothing from an empty workspace', () => {
+        hoisted.mockUseKnowledgeBaseLeftSidebarNav.mockReturnValue({
+            ...defaultMockReturn,
+            knowledgeBases: [],
+            search: 'nope',
+        });
+
+        render(<KnowledgeBaseLeftSidebarNav />);
+
+        expect(screen.getByText('No knowledge bases found.')).toBeInTheDocument();
     });
 
     it('does not render items when loading', () => {

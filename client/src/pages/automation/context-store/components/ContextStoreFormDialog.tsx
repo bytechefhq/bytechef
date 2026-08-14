@@ -31,7 +31,7 @@ type ContextStoreFormDialogPropsType = {
 
 /**
  * Compact create/update dialog for a parent {@link ContextStore}. Reuse for both "New Context Store" buttons and
- * per-row "Rename" actions in the management page.
+ * per-row "Edit" actions in the management page.
  */
 const ContextStoreFormDialog = ({
     contextStore,
@@ -121,7 +121,7 @@ const ContextStoreFormDialog = ({
 
             <DialogContent className="sm:max-w-[480px]">
                 <DialogHeader>
-                    <DialogTitle>{isEdit ? 'Rename Context Store' : 'New Context Store'}</DialogTitle>
+                    <DialogTitle>{isEdit ? 'Edit Context Store' : 'New Context Store'}</DialogTitle>
 
                     <DialogDescription>
                         {isEdit

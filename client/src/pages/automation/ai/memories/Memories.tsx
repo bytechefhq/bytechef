@@ -15,6 +15,7 @@ import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
+import LeftSidebarToggle from '@/shared/layout/LeftSidebarToggle';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {formatDistanceToNow} from 'date-fns';
@@ -219,6 +220,8 @@ const Memories = () => {
             // across automation pages.
             header={
                 <div className="flex w-full items-center gap-2 px-6 py-3">
+                    <LeftSidebarToggle />
+
                     <h1 className="text-base font-semibold">{activeFilterLabel}</h1>
 
                     {totalCount > 0 && (
@@ -302,7 +305,6 @@ const Memories = () => {
                 </>
             }
             leftSidebarHeader={<Header position="sidebar" title="Memories" />}
-            leftSidebarOpen
             leftSidebarWidth="64"
         >
             <PageLoader className="min-h-full" loading={isLoading}>

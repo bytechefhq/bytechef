@@ -1,7 +1,16 @@
+import {TooltipProvider} from '@/components/ui/tooltip';
 import {render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import DataTableHeader from '../DataTableHeader';
+
+// The sidebar toggle in the title renders a Tooltip, which throws outside a provider.
+const renderHeader = () =>
+    render(
+        <TooltipProvider>
+            <DataTableHeader />
+        </TooltipProvider>
+    );
 
 const hoisted = vi.hoisted(() => {
     return {
@@ -89,19 +98,19 @@ afterEach(() => {
 describe('DataTableHeader', () => {
     describe('rendering', () => {
         it('should render the table name', () => {
-            render(<DataTableHeader />);
+            renderHeader();
 
             expect(screen.getByText('TestTable')).toBeInTheDocument();
         });
 
         it('should render the actions menu', () => {
-            render(<DataTableHeader />);
+            renderHeader();
 
             expect(screen.getByTestId('actions-menu')).toBeInTheDocument();
         });
 
         it('should pass correct tableId to actions menu', () => {
-            render(<DataTableHeader />);
+            renderHeader();
 
             expect(screen.getByTestId('table-id')).toHaveTextContent('table-123');
         });
@@ -111,7 +120,7 @@ describe('DataTableHeader', () => {
         it('should not render delete rows button when no rows are selected', () => {
             hoisted.storeState.selectedRowsCount = 0;
 
-            render(<DataTableHeader />);
+            renderHeader();
 
             // The delete rows button should not be present when no rows are selected
             // We check that no button with "Delete (" pattern exists (the rows delete button)
@@ -121,7 +130,7 @@ describe('DataTableHeader', () => {
         it('should render delete rows button when rows are selected', () => {
             hoisted.storeState.selectedRowsCount = 5;
 
-            render(<DataTableHeader />);
+            renderHeader();
 
             expect(screen.getByRole('button', {name: /Delete \(5\)/i})).toBeInTheDocument();
         });
@@ -129,7 +138,7 @@ describe('DataTableHeader', () => {
         it('should show correct count in delete button', () => {
             hoisted.storeState.selectedRowsCount = 10;
 
-            render(<DataTableHeader />);
+            renderHeader();
 
             expect(screen.getByText(/Delete \(10\)/i)).toBeInTheDocument();
         });
@@ -138,7 +147,7 @@ describe('DataTableHeader', () => {
             const user = userEvent.setup();
             hoisted.storeState.selectedRowsCount = 3;
 
-            render(<DataTableHeader />);
+            renderHeader();
 
             const deleteButton = screen.getByRole('button', {name: /Delete \(3\)/i});
 
@@ -152,7 +161,7 @@ describe('DataTableHeader', () => {
         it('should call handleOpenImportCsvDialog when import is clicked', async () => {
             const user = userEvent.setup();
 
-            render(<DataTableHeader />);
+            renderHeader();
 
             const importBtn = screen.getByTestId('import-btn');
 
@@ -164,7 +173,7 @@ describe('DataTableHeader', () => {
         it('should call handleExportCsv when export is clicked', async () => {
             const user = userEvent.setup();
 
-            render(<DataTableHeader />);
+            renderHeader();
 
             const exportBtn = screen.getByTestId('export-btn');
 
@@ -176,7 +185,7 @@ describe('DataTableHeader', () => {
         it('should call handleOpenRenameDialog when rename is clicked', async () => {
             const user = userEvent.setup();
 
-            render(<DataTableHeader />);
+            renderHeader();
 
             const renameBtn = screen.getByTestId('rename-btn');
 
@@ -188,7 +197,7 @@ describe('DataTableHeader', () => {
         it('should call handleOpenDeleteDialog when delete table is clicked', async () => {
             const user = userEvent.setup();
 
-            render(<DataTableHeader />);
+            renderHeader();
 
             const deleteBtn = screen.getByTestId('delete-table-btn');
 

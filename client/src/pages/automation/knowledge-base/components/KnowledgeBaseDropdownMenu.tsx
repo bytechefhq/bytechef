@@ -13,10 +13,12 @@ import {KnowledgeBase} from '@/shared/middleware/graphql';
 import {EditIcon, EllipsisVerticalIcon, Trash2Icon} from 'lucide-react';
 
 interface KnowledgeBaseDropdownMenuProps {
+    /** Extra classes for the trigger. The sidebar passes the hover-reveal the list rows do not want. */
+    className?: string;
     knowledgeBase: KnowledgeBase;
 }
 
-const KnowledgeBaseDropdownMenu = ({knowledgeBase}: KnowledgeBaseDropdownMenuProps) => {
+const KnowledgeBaseDropdownMenu = ({className, knowledgeBase}: KnowledgeBaseDropdownMenuProps) => {
     const {
         handleCloseDeleteDialog,
         handleCloseEditDialog,
@@ -32,6 +34,7 @@ const KnowledgeBaseDropdownMenu = ({knowledgeBase}: KnowledgeBaseDropdownMenuPro
                 <DropdownMenuTrigger asChild>
                     <Button
                         aria-label="More Knowledge Base Actions"
+                        className={className}
                         icon={<EllipsisVerticalIcon />}
                         size="icon"
                         variant="ghost"
@@ -39,17 +42,13 @@ const KnowledgeBaseDropdownMenu = ({knowledgeBase}: KnowledgeBaseDropdownMenuPro
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent align="end" className="p-0">
-                    <DropdownMenuItem className="dropdown-menu-item" onClick={handleShowEditDialog}>
+                    <DropdownMenuItem onClick={handleShowEditDialog}>
                         <EditIcon /> Edit
                     </DropdownMenuItem>
 
-                    <DropdownMenuSeparator className="m-0" />
+                    <DropdownMenuSeparator />
 
-                    <DropdownMenuItem
-                        className="dropdown-menu-item-destructive"
-                        onClick={handleShowDeleteDialog}
-                        variant="destructive"
-                    >
+                    <DropdownMenuItem onClick={handleShowDeleteDialog} variant="destructive">
                         <Trash2Icon /> Delete
                     </DropdownMenuItem>
                 </DropdownMenuContent>

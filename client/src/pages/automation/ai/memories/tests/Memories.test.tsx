@@ -1,3 +1,4 @@
+import {TooltipProvider} from '@/components/ui/tooltip';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {render, screen, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -119,7 +120,9 @@ const wrap = (ui: ReactNode) =>
     render(
         <MemoryRouter>
             <QueryClientProvider client={new QueryClient({defaultOptions: {queries: {retry: false}}})}>
-                {ui}
+                {/* The header's sidebar toggle renders a tooltip, which throws outside a provider. */}
+
+                <TooltipProvider>{ui}</TooltipProvider>
             </QueryClientProvider>
         </MemoryRouter>
     );
@@ -444,7 +447,9 @@ describe('Memories page', () => {
         rerender(
             <MemoryRouter>
                 <QueryClientProvider client={new QueryClient({defaultOptions: {queries: {retry: false}}})}>
-                    <Memories />
+                    <TooltipProvider>
+                        <Memories />
+                    </TooltipProvider>
                 </QueryClientProvider>
             </MemoryRouter>
         );

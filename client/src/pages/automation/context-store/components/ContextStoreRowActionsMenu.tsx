@@ -10,16 +10,19 @@ import {ContextStore, useDeleteContextStoreMutation} from '@/shared/middleware/g
 import {useQueryClient} from '@tanstack/react-query';
 import {MoreVerticalIcon, PencilIcon, TrashIcon} from 'lucide-react';
 import {useState} from 'react';
+import {twMerge} from 'tailwind-merge';
 
 import ContextStoreFormDialog from './ContextStoreFormDialog';
 
 type ContextStoreRowActionsMenuPropsType = {
+    /** Extra classes for the trigger. The sidebar passes the hover-reveal the list rows do not want. */
+    className?: string;
     contextStore: ContextStore;
     isAdmin: boolean;
 };
 
-const ContextStoreRowActionsMenu = ({contextStore, isAdmin}: ContextStoreRowActionsMenuPropsType) => {
-    const [renameOpen, setRenameOpen] = useState(false);
+const ContextStoreRowActionsMenu = ({className, contextStore, isAdmin}: ContextStoreRowActionsMenuPropsType) => {
+    const [editOpen, setEditOpen] = useState(false);
 
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
@@ -43,7 +46,7 @@ const ContextStoreRowActionsMenu = ({contextStore, isAdmin}: ContextStoreRowActi
                 <DropdownMenuTrigger asChild>
                     <button
                         aria-label={`Actions for ${contextStore.name}`}
-                        className="rounded-md p-1 hover:bg-muted"
+                        className={twMerge('rounded-md p-1 hover:bg-muted', className)}
                         data-testid={`context-store-actions-${contextStore.id}`}
                     >
                         <MoreVerticalIcon className="size-4" />
@@ -51,9 +54,9 @@ const ContextStoreRowActionsMenu = ({contextStore, isAdmin}: ContextStoreRowActi
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => setRenameOpen(true)}>
+                    <DropdownMenuItem onClick={() => setEditOpen(true)}>
                         <PencilIcon className="mr-2 size-4" />
-                        Rename
+                        Edit
                     </DropdownMenuItem>
 
                     <DropdownMenuSeparator />
@@ -80,7 +83,7 @@ const ContextStoreRowActionsMenu = ({contextStore, isAdmin}: ContextStoreRowActi
                 </DropdownMenuContent>
             </DropdownMenu>
 
-            <ContextStoreFormDialog contextStore={contextStore} onOpenChange={setRenameOpen} open={renameOpen} />
+            <ContextStoreFormDialog contextStore={contextStore} onOpenChange={setEditOpen} open={editOpen} />
         </>
     );
 };

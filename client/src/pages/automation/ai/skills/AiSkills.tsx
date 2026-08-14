@@ -211,8 +211,9 @@ const AiSkills = () => {
 
     const isDetailView = route === 'detail';
 
-    // The detail view keeps the full skills-list sidebar for switching between skills; the list
-    // view renders a slimmer sidebar carrying just the Tags filter (the data-tables idiom).
+    // The detail view keeps the skills-list sidebar for switching between skills — navigation only,
+    // no Tags: a tag filter there has nothing to filter. The list view renders the Tags filter alone
+    // (the data-tables idiom).
     const showSkillsSidebar = isDetailView;
 
     const leftSidebarBody = showSkillsSidebar ? <AiSkillsLeftSidebar currentId={skillId} /> : <AiSkillsTagsNav />;
@@ -243,7 +244,6 @@ const AiSkills = () => {
             header={<Header centerTitle position="main" right={toolbarRight} title={headerTitle} />}
             leftSidebarBody={leftSidebarBody}
             leftSidebarHeader={leftSidebarHeader}
-            leftSidebarOpen
             leftSidebarWidth="64"
         >
             <div className="flex min-h-0 w-full flex-col px-4 3xl:mx-auto 3xl:w-4/5">

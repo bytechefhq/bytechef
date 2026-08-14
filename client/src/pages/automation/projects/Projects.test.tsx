@@ -122,14 +122,9 @@ describe('Projects Import Functionality', () => {
         const createButton = screen.getByRole('button', {name: /create project/i});
         expect(createButton).toBeInTheDocument();
 
-        // Excludes both the "Create Project" button and the header's "Ask Copilot" trigger, which also
-        // renders in the button list once the project list is empty.
-        const buttons = screen.getAllByRole('button');
-        const chevronButton = buttons.find(
-            (button) =>
-                !/create project/i.test(button.textContent || '') && button.getAttribute('aria-label') !== 'Ask Copilot'
-        )!;
-        await userEvent.click(chevronButton);
+        // Selected by its own label rather than by eliminating the others: the header grew a copilot
+        // trigger and then a sidebar toggle, and each time the "everything else" match picked the wrong one.
+        await userEvent.click(screen.getByRole('button', {name: 'More create options'}));
 
         await waitFor(() => {
             expect(screen.getByText('From Template')).toBeInTheDocument();

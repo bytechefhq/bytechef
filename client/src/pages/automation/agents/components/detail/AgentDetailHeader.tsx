@@ -13,7 +13,6 @@ import exportAgent from '@/pages/automation/agents/utils/agentImportExport';
 import invalidateAgentQueries from '@/pages/automation/agents/utils/invalidateAgentQueries';
 import ProjectDeploymentDialog from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialog';
 import ProjectVersionHistorySheet from '@/pages/automation/project/components/ProjectVersionHistorySheet';
-import LeftSidebarButton from '@/pages/automation/project/components/project-header/components/LeftSidebarButton';
 import PublishPopover from '@/pages/automation/project/components/project-header/components/PublishPopover';
 import Header from '@/shared/layout/Header';
 import {ProjectDeployment, ProjectStatus} from '@/shared/middleware/automation/configuration';
@@ -43,7 +42,6 @@ interface AgentDetailHeaderProps {
     id: string;
     lastPublishedVersion: number;
     onAskCopilot?: () => void;
-    onToggleLeftSidebar: () => void;
     onToggleTestPanel: () => void;
     projectId: string;
     testPanelOpen: boolean;
@@ -55,7 +53,6 @@ const AgentDetailHeader = ({
     id,
     lastPublishedVersion,
     onAskCopilot,
-    onToggleLeftSidebar,
     onToggleTestPanel,
     projectId,
     testPanelOpen,
@@ -232,11 +229,7 @@ const AgentDetailHeader = ({
                     </div>
                 }
                 title={
-                    // The sidebar lists every agent, so toggling it is both the way back to the others and
-                    // a way to reclaim the width — the arrow only did the first, and less directly.
                     <div className="flex items-center space-x-2">
-                        <LeftSidebarButton onLeftSidebarOpenClick={onToggleLeftSidebar} tooltip="See agents" />
-
                         <span>{title}</span>
 
                         <Badge

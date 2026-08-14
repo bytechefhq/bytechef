@@ -1,7 +1,16 @@
-import {render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
+import {TooltipProvider} from '@/components/ui/tooltip';
+import {render, resetAll, screen, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import KnowledgeBaseHeader from '../KnowledgeBaseHeader';
+
+// The sidebar toggle in the title renders a Tooltip, which throws outside a provider.
+const renderHeader = (knowledgeBaseName: string | undefined) =>
+    render(
+        <TooltipProvider>
+            <KnowledgeBaseHeader knowledgeBaseName={knowledgeBaseName} />
+        </TooltipProvider>
+    );
 
 vi.mock('@/shared/layout/Header', () => ({
     default: ({title}: {centerTitle?: boolean; position?: string; title: React.ReactNode}) => (
@@ -27,38 +36,21 @@ afterEach(() => {
 });
 
 describe('KnowledgeBaseHeader', () => {
-    const mockOnBackClick = vi.fn();
-
     it('renders header component', () => {
-        render(<KnowledgeBaseHeader knowledgeBaseName="Test KB" onBackClick={mockOnBackClick} />);
+        renderHeader('Test KB');
 
         expect(screen.getByTestId('header')).toBeInTheDocument();
     });
 
     it('renders knowledge base name', () => {
-        render(<KnowledgeBaseHeader knowledgeBaseName="Test KB" onBackClick={mockOnBackClick} />);
+        renderHeader('Test KB');
 
         expect(screen.getByText('Test KB')).toBeInTheDocument();
     });
 
     it('renders Loading... when name is undefined', () => {
-        render(<KnowledgeBaseHeader knowledgeBaseName={undefined} onBackClick={mockOnBackClick} />);
+        renderHeader(undefined);
 
         expect(screen.getByText('Loading...')).toBeInTheDocument();
-    });
-
-    it('renders back button', () => {
-        render(<KnowledgeBaseHeader knowledgeBaseName="Test KB" onBackClick={mockOnBackClick} />);
-
-        expect(screen.getByTestId('back-button')).toBeInTheDocument();
-    });
-
-    it('calls onBackClick when back button is clicked', async () => {
-        render(<KnowledgeBaseHeader knowledgeBaseName="Test KB" onBackClick={mockOnBackClick} />);
-
-        const backButton = screen.getByTestId('back-button');
-        await userEvent.click(backButton);
-
-        expect(mockOnBackClick).toHaveBeenCalled();
     });
 });

@@ -1,14 +1,12 @@
-import LeftSidebarButton from '@/pages/automation/project/components/project-header/components/LeftSidebarButton';
 import Header from '@/shared/layout/Header';
 import {ReactNode} from 'react';
 
 interface KnowledgeBaseHeaderProps {
     knowledgeBaseName: string | undefined;
-    onToggleLeftSidebar: () => void;
     right?: ReactNode;
 }
 
-const KnowledgeBaseHeader = ({knowledgeBaseName, onToggleLeftSidebar, right}: KnowledgeBaseHeaderProps) => {
+const KnowledgeBaseHeader = ({knowledgeBaseName, right}: KnowledgeBaseHeaderProps) => {
     return (
         <Header
             centerTitle
@@ -16,8 +14,6 @@ const KnowledgeBaseHeader = ({knowledgeBaseName, onToggleLeftSidebar, right}: Kn
             right={right}
             title={
                 <div className="flex items-center gap-1">
-                    <LeftSidebarButton onLeftSidebarOpenClick={onToggleLeftSidebar} tooltip="See knowledge bases" />
-
                     <span>{knowledgeBaseName || 'Loading...'}</span>
                 </div>
             }

@@ -16,11 +16,9 @@ import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {PlusIcon, SparklesIcon} from 'lucide-react';
-import {useEffect, useState} from 'react';
+import {useEffect} from 'react';
 
 const KnowledgeBase = () => {
-    const [leftSidebarOpen, setLeftSidebarOpen] = useState(true);
-
     const {documents, error, isLoading, knowledgeBase, knowledgeBaseId} = useKnowledgeBase();
 
     const copilotEnabled = useApplicationInfoStore((state) => state.ai.copilot.enabled);
@@ -57,7 +55,6 @@ const KnowledgeBase = () => {
             header={
                 <KnowledgeBaseHeader
                     knowledgeBaseName={knowledgeBase?.name}
-                    onToggleLeftSidebar={() => setLeftSidebarOpen((open) => !open)}
                     right={
                         <div className="flex items-center gap-1">
                             {copilotEnabled && (
@@ -99,7 +96,6 @@ const KnowledgeBase = () => {
                     title="Knowledge Base"
                 />
             }
-            leftSidebarOpen={leftSidebarOpen}
             leftSidebarWidth="64"
         >
             <PageLoader errors={[error]} loading={isLoading}>
