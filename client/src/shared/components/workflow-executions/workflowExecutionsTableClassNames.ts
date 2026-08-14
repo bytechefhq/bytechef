@@ -1,7 +1,7 @@
 export const EXECUTIONS_TABLE_HEADER_CLASS_NAME =
     'border border-stroke-neutral-secondary bg-surface-main text-content-neutral-secondary';
 
-export const EXECUTIONS_TABLE_HEAD_CLASS_NAME = 'text-sm font-medium text-inherit';
+export const EXECUTIONS_TABLE_HEAD_CLASS_NAME = 'text-xs font-semibold tracking-wide text-inherit uppercase';
 
 export const EXECUTIONS_TABLE_ROW_CLASS_NAME = 'group cursor-pointer border-0 hover:bg-surface-brand-secondary';
 
