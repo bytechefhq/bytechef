@@ -62,7 +62,7 @@ export default ({mode}) => {
             alias: {
                 '@': path.resolve(import.meta.dirname, './src'),
                 '@bytechef/embedded': path.resolve(import.meta.dirname, '../sdks/frontend/embedded/library/src/main.ts'),
-                '@dagrejs/dagre': path.resolve(import.meta.dirname, 'node_modules/@dagrejs/dagre/dist/dagre.cjs.js'),
+                '@dagrejs/dagre': path.resolve(import.meta.dirname, 'node_modules/@dagrejs/dagre/dist/dagre.cjs'),
             },
         },
         server: {

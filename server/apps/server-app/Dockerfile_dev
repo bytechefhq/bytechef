@@ -1,4 +1,4 @@
-FROM gradle:9.4.0-jdk25-alpine AS build
+FROM gradle:9.7.0-jdk25-alpine AS build
 
 WORKDIR /build
 
@@ -18,7 +18,7 @@ WORKDIR ./
 RUN --mount=type=cache,target=/home/gradle/.gradle/caches \
     gradle bootJar --no-daemon
 
-FROM ghcr.io/graalvm/graalvm-community:25.0.2
+FROM ghcr.io/graalvm/graalvm-community:25.2.4
 
 WORKDIR /opt
 

@@ -5,7 +5,7 @@ bootui = "1.13.1"
 checkstyle = "13.10.0"
 com-google-auto-service = "1.1.1"
 findsecbugs = "1.14.0"
-graalvm = "25.0.3"
+graalvm = "25.2.4"
 grpc = "1.83.1"
 io-modelcontextprotocol-sdk = "2.0.0"
 jackson = "2.19.2"
@@ -69,7 +69,7 @@ org-graalvm-polyglot-js = { module = "org.graalvm.polyglot:js", version.ref = "g
 org-graalvm-polyglot-polyglot = { module = "org.graalvm.polyglot:polyglot", version.ref = "graalvm" }
 org-graalvm-polyglot-python = { module = "org.graalvm.polyglot:python", version.ref = "graalvm" }
 org-graalvm-polyglot-ruby = "org.graalvm.polyglot:ruby:25.0.0"
-org-json = "org.json:json:20260719"
+org-json = "org.json:json:20260814"
 org-jsoup = "org.jsoup:jsoup:1.23.1"
 org-mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "org-mapstruct" }
 org-mapstruct-extensions-spring-mapstruct-spring-annotations = { module = "org.mapstruct.extensions.spring:mapstruct-spring-annotations", version.ref = "org-mapstruct-extensions-spring" }
@@ -99,7 +99,7 @@ gradle-git-properties = "com.gorylenko.gradle-git-properties:4.0.1"
 io-github-ben-manes-versions = "io.github.ben-manes.versions:0.61.0"
 jib = "com.google.cloud.tools.jib:3.5.4"
 nl-littlerobots-version-catalog-update = "nl.littlerobots.version-catalog-update:1.1.1"
-org-graalvm-buildtools-native = "org.graalvm.buildtools.native:1.1.8"
+org-graalvm-buildtools-native = "org.graalvm.buildtools.native:1.1.9"
 org-openapi-generator = "org.openapi.generator:7.24.0"
 org-sonarqube = "org.sonarqube:7.4.0.8496"
 spotbugs = "com.github.spotbugs:6.5.10"
