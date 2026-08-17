@@ -86,16 +86,18 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
 
     private static final Property TOOL_NAME_PROPERTY = Property.toProperty(
         string(ToolConstants.TOOL_NAME)
-            .label("Name")
-            .description("The tool name exposed to the AI model. Defaults to the action name when left blank.")
+            .label("Tool Name")
+            .description("The tool name exposed to the AI model. Defaults to the tool name when left blank.")
+            .placeholder("Defaults to tool name")
             .expressionEnabled(false)
             .required(false));
 
     private static final Property TOOL_DESCRIPTION_PROPERTY = Property.toProperty(
         string(ToolConstants.TOOL_DESCRIPTION)
-            .label("Description")
+            .label("Tool Description")
             .description(
-                "The tool description exposed to the AI model. Defaults to the action description when left blank.")
+                "The tool description exposed to the AI model. Defaults to the tool description when left blank.")
+            .placeholder("Defaults to tool description")
             .controlType(TEXT_AREA)
             .expressionEnabled(false)
             .required(false));

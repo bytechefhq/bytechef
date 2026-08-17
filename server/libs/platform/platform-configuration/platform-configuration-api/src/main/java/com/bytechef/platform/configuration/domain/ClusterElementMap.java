@@ -274,10 +274,28 @@ public class ClusterElementMap extends AbstractMap<String, Object> {
     }
 
     @SuppressWarnings("unchecked")
+    /**
+     * Reads a multiple cluster element type's entries, tolerating BOTH stored shapes.
+     *
+     * <p>
+     * A type's stored value is an array once it declares {@code multipleElements}, but every definition saved before
+     * that flag was flipped holds a bare object — and stored definitions are never migrated. A lone object is therefore
+     * normalised into a single-element list rather than cast, which is what the unchecked cast here used to do: it
+     * succeeded silently and then threw {@code ClassCastException} at the first stream operation.
+     * </p>
+     */
     public List<ClusterElement> getClusterElements(ClusterElementType clusterElementType) {
-        List<ClusterElement> clusterElements = (List<ClusterElement>) super.get(clusterElementType.key());
+        Object value = super.get(clusterElementType.key());
 
-        return clusterElements == null ? List.of() : clusterElements;
+        if (value == null) {
+            return List.of();
+        }
+
+        if (value instanceof ClusterElement clusterElement) {
+            return List.of(clusterElement);
+        }
+
+        return (List<ClusterElement>) value;
     }
 
     private static void add(

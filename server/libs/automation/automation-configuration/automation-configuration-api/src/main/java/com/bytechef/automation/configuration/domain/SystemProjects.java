@@ -25,12 +25,20 @@ import java.util.List;
  * <p>
  * Every system project name is {@code __<DOMAIN>__<discriminator>}: a double-underscore-delimited SCREAMING_SNAKE_CASE
  * domain marker followed by whatever the owning feature scopes by (a workspace id for Knowledge Base and Context Store,
- * the caller-supplied project name for the embedded automation bridge). Keeping one shape across all three lets list
- * surfaces hide them with a single predicate instead of each learning every feature's private naming scheme.
+ * the caller-supplied project name for the embedded automation bridge, an agent id for Agents). Keeping one shape
+ * across all four lets list surfaces hide them with a single predicate instead of each learning every feature's private
+ * naming scheme.
  *
  * <p>
  * The prefix is matched against an explicit {@link #NAME_PREFIXES} allow-list rather than a bare {@code "__"} test, so
  * a user who legitimately names a project {@code __scratch} still sees it in their lists.
+ *
+ * <p>
+ * {@link #projectNameNotLikePredicates(String)} is the single source of truth for excluding system projects from a
+ * hand-built SQL query; repositories should build their {@code project.name} exclusions from it instead of hand-copying
+ * the prefix list. {@link #API_COLLECTION_DEPLOYMENT_NAME_PREFIX} and {@link #MCP_SERVER_DEPLOYMENT_NAME_PREFIX} are a
+ * related but distinct namespace — they mark {@code project_deployment.name}, not {@code project.name} — so they are
+ * excluded from {@link #NAME_PREFIXES} and must be applied with {@link #notLikePredicate(String, String)} individually.
  *
  * @author Ivica Cardic
  */
@@ -52,8 +60,29 @@ public final class SystemProjects {
      */
     public static final String EMBEDDED_AUTOMATION_NAME_PREFIX = "__EMBEDDED_AUTOMATION__";
 
+    /**
+     * Owns the hidden backing project of one Agent.
+     */
+    public static final String AI_AGENT_NAME_PREFIX = "__AI_AGENT__";
+
+    /**
+     * Marks a {@code project_deployment.name}, not a project name — set by the API Platform's ApiCollectionFacadeImpl
+     * when it deploys the hidden project backing an API collection.
+     */
+    public static final String API_COLLECTION_DEPLOYMENT_NAME_PREFIX = "__API_COLLECTION__";
+
+    /**
+     * Marks a {@code project_deployment.name}, not a project name — set by the MCP facade when it deploys the hidden
+     * project backing an MCP server. Mirrors {@code McpServer.MCP_SERVER_NAME_PREFIX} in platform-mcp-api, duplicated
+     * here rather than imported since automation-configuration does not depend on platform-mcp.
+     */
+    public static final String MCP_SERVER_DEPLOYMENT_NAME_PREFIX = "__MCP_SERVER__";
+
+    private static final String LIKE_ESCAPE = "\\";
+
     private static final List<String> NAME_PREFIXES = List.of(
-        KNOWLEDGE_BASE_NAME_PREFIX, CONTEXT_STORE_NAME_PREFIX, EMBEDDED_AUTOMATION_NAME_PREFIX);
+        KNOWLEDGE_BASE_NAME_PREFIX, CONTEXT_STORE_NAME_PREFIX, EMBEDDED_AUTOMATION_NAME_PREFIX,
+        AI_AGENT_NAME_PREFIX);
 
     private SystemProjects() {
     }
@@ -81,5 +110,35 @@ public final class SystemProjects {
         }
 
         return false;
+    }
+
+    /**
+     * One {@code AND columnRef NOT LIKE '...' ESCAPE '\'} SQL fragment per entry in {@link #NAME_PREFIXES}, so a
+     * repository can hide every known system project by name without hand-copying the allow-list. The {@code _}
+     * characters in each prefix are LIKE wildcards, so they are escaped.
+     *
+     * @param columnRef the SQL column reference to filter, e.g. {@code "project.name"}
+     */
+    public static String projectNameNotLikePredicates(String columnRef) {
+        StringBuilder predicates = new StringBuilder();
+
+        for (String namePrefix : NAME_PREFIXES) {
+            predicates.append(notLikePredicate(columnRef, namePrefix));
+        }
+
+        return predicates.toString();
+    }
+
+    /**
+     * A single {@code AND columnRef NOT LIKE '...' ESCAPE '\'} SQL fragment excluding names starting with
+     * {@code prefix}, escaping the {@code _} LIKE wildcard characters the prefix contains.
+     */
+    public static String notLikePredicate(String columnRef, String prefix) {
+        return "AND %s NOT LIKE '%s%%' ESCAPE '%s' ".formatted(columnRef, escapeLikeWildcards(prefix), LIKE_ESCAPE);
+    }
+
+    private static String escapeLikeWildcards(String value) {
+        return value.replace("_", LIKE_ESCAPE + "_")
+            .replace("%", LIKE_ESCAPE + "%");
     }
 }

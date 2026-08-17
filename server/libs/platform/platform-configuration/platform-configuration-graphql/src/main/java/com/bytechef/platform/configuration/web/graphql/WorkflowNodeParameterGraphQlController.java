@@ -19,7 +19,9 @@ package com.bytechef.platform.configuration.web.graphql;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.platform.configuration.facade.WorkflowNodeParameterFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Map;
 import java.util.Set;
+import org.jspecify.annotations.Nullable;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
@@ -36,6 +38,17 @@ public class WorkflowNodeParameterGraphQlController {
     @SuppressFBWarnings("EI")
     public WorkflowNodeParameterGraphQlController(WorkflowNodeParameterFacade workflowNodeParameterFacade) {
         this.workflowNodeParameterFacade = workflowNodeParameterFacade;
+    }
+
+    @QueryMapping
+    public Map<String, Boolean> componentPropertyDisplayConditions(
+        @Argument String componentName, @Argument int componentVersion, @Argument String operationName,
+        @Argument String operationType, @Argument @Nullable Map<String, ?> parameters) {
+
+        return workflowNodeParameterFacade.getDisplayConditions(
+            componentName, componentVersion, operationName,
+            WorkflowNodeParameterFacade.OperationType.valueOf(operationType),
+            parameters == null ? Map.of() : parameters);
     }
 
     @QueryMapping

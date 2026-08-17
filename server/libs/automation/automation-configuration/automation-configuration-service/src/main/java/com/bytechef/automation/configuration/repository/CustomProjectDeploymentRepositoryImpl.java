@@ -17,6 +17,7 @@
 package com.bytechef.automation.configuration.repository;
 
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
+import com.bytechef.automation.configuration.domain.SystemProjects;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.jdbc.core.simple.JdbcClient;
@@ -102,9 +103,14 @@ public class CustomProjectDeploymentRepositoryImpl implements CustomProjectDeplo
             query += "tag_id = ? ";
         }
 
-        query += "AND (project_deployment.name NOT LIKE '__API_COLLECTION__%' AND " +
-            "project_deployment.name NOT LIKE '__MCP_SERVER__%' AND " +
-            "project.name NOT LIKE '__CONTEXT_STORE__%' )";
+        // project_deployment.name markers are a different namespace from project.name markers (see
+        // ApiCollectionFacadeImpl / McpProjectFacadeImpl), so they are excluded individually rather than through
+        // SystemProjects.projectNameNotLikePredicates.
+        query += SystemProjects.notLikePredicate(
+            "project_deployment.name", SystemProjects.API_COLLECTION_DEPLOYMENT_NAME_PREFIX);
+        query += SystemProjects.notLikePredicate(
+            "project_deployment.name", SystemProjects.MCP_SERVER_DEPLOYMENT_NAME_PREFIX);
+        query += SystemProjects.projectNameNotLikePredicates("project.name");
 
         query += "ORDER BY LOWER(project_deployment.name) ASC, project_deployment.project_version ASC, " +
             "project_deployment.environment ASC";

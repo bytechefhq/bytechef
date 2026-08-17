@@ -21,6 +21,7 @@ import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
+import com.bytechef.automation.configuration.domain.SystemProjects;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.service.ProjectService;
@@ -144,7 +145,26 @@ class SubflowDataSourceImpl implements SubflowDataSource {
                 }
 
                 String workflowLabel = workflow.getLabel() == null ? "Unnamed Workflow" : workflow.getLabel();
-                String name = project.getName() + " > " + workflowLabel;
+                String name;
+
+                if (SystemProjects.isSystemProject(project)) {
+                    if (project.getName()
+                        .startsWith(SystemProjects.AI_AGENT_NAME_PREFIX)) {
+
+                        // Published agents are backed by a hidden __AI_AGENT__ project whose generated workflow is
+                        // deliberately callable from this picker — present it as an agent rather than leaking the
+                        // internal project name.
+                        name = "Agent > " + workflowLabel;
+                    } else {
+
+                        // Every other system project's workflows are internal to their owning feature; none happen
+                        // to expose a newWorkflowCall trigger today, but skip them defensively so a future one
+                        // cannot leak into this picker.
+                        continue;
+                    }
+                } else {
+                    name = project.getName() + " > " + workflowLabel;
+                }
 
                 if (lowerCaseSearch == null || lowerCaseSearch.isEmpty() ||
                     name.toLowerCase()

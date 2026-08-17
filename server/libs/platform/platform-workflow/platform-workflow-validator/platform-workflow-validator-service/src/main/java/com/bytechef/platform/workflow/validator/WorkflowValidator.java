@@ -17,6 +17,7 @@
 package com.bytechef.platform.workflow.validator;
 
 import com.bytechef.commons.util.StringUtils;
+import com.bytechef.platform.configuration.domain.HostedChatTriggers;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -643,7 +644,7 @@ public class WorkflowValidator {
 
             String type = typeJsonNode.asString();
 
-            if (type.startsWith("chat/")) {
+            if (HostedChatTriggers.isChatTriggerType(type)) {
                 return true;
             }
         }
@@ -690,7 +691,7 @@ public class WorkflowValidator {
             String[] typeParts = typeJsonNode.asString()
                 .split("/");
 
-            if (typeParts.length == 3 && "approvalGate".equals(typeParts[2])) {
+            if (typeParts.length == 3 && "approvalGateTool".equals(typeParts[2])) {
                 approvalGateJsonNodes.add(toolJsonNode);
             }
         }

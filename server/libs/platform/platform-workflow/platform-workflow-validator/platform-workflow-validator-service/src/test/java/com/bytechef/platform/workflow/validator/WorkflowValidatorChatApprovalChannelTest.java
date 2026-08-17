@@ -190,8 +190,8 @@ class WorkflowValidatorChatApprovalChannelTest {
                             "tools": [
                                 {
                                     "label": "Destructive",
-                                    "name": "approvalGate_1",
-                                    "type": "aiAgentUtils/v1/approvalGate",
+                                    "name": "approvalGateTool_1",
+                                    "type": "aiAgentUtils/v1/approvalGateTool",
                                     "parameters": {
                                         "name": "Destructive"
                                     },
@@ -243,8 +243,8 @@ class WorkflowValidatorChatApprovalChannelTest {
                             "tools": [
                                 {
                                     "label": "Destructive",
-                                    "name": "approvalGate_1",
-                                    "type": "aiAgentUtils/v1/approvalGate",
+                                    "name": "approvalGateTool_1",
+                                    "type": "aiAgentUtils/v1/approvalGateTool",
                                     "parameters": {
                                         "name": "Destructive"
                                     },
@@ -333,8 +333,8 @@ class WorkflowValidatorChatApprovalChannelTest {
                             "tools": [
                                 {
                                     "label": "Destructive",
-                                    "name": "approvalGate_1",
-                                    "type": "aiAgentUtils/v1/approvalGate",
+                                    "name": "approvalGateTool_1",
+                                    "type": "aiAgentUtils/v1/approvalGateTool",
                                     "parameters": {
                                         "name": "Destructive"
                                     },

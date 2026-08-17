@@ -22,6 +22,7 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.component.definition.ComponentCategory;
@@ -32,7 +33,14 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableClusterElementDe
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiablePropertyGroup;
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
+import com.bytechef.component.definition.ConnectionDefinition;
+import com.bytechef.component.definition.Help;
+import com.bytechef.component.definition.PropertyGroup;
+import com.bytechef.component.definition.Resources;
+import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
+import com.bytechef.component.definition.UnifiedApiDefinition;
+import com.bytechef.platform.component.definition.ClusterRootComponentDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,6 +49,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
@@ -198,7 +207,25 @@ public record ComponentIndex(List<Entry> entries) {
                     .toArray(ModifiablePropertyGroup[]::new));
         }
 
-        return componentDefinition;
+        List<ClusterElementTypeSummary> clusterElementTypes = entry.clusterElementTypes();
+
+        if (clusterElementTypes == null || clusterElementTypes.isEmpty()) {
+            return componentDefinition;
+        }
+
+        // ModifiableComponentDefinition is an SDK class and cannot implement the platform-side
+        // ClusterRootComponentDefinition, so a cluster root's stub has to be a delegating wrapper. Without it the
+        // domain wrapper finds no cluster element types and reports clusterRoot = false for every listed component,
+        // since that flag is derived from the types rather than stored.
+        return new StubClusterRootComponentDefinition(
+            componentDefinition,
+            clusterElementTypes
+                .stream()
+                .map(
+                    clusterElementType -> new ClusterElementType(
+                        clusterElementType.name(), clusterElementType.key(), clusterElementType.label(),
+                        clusterElementType.multipleElements(), clusterElementType.required()))
+                .toList());
     }
 
     private static ModifiableActionDefinition toStubActionDefinition(ItemSummary itemSummary) {
@@ -261,7 +288,106 @@ public record ComponentIndex(List<Entry> entries) {
         @Nullable List<CategorySummary> componentCategories, @Nullable List<String> tags,
         @Nullable ConnectionSummary connection, @Nullable List<ItemSummary> actions,
         @Nullable List<TriggerSummary> triggers, @Nullable List<ClusterElementSummary> clusterElements,
-        @Nullable List<String> inputs, String providerClassName, String loaderKind) {
+        @Nullable List<ClusterElementTypeSummary> clusterElementTypes, @Nullable List<String> inputs,
+        String providerClassName, String loaderKind) {
+    }
+
+    /**
+     * Presents a stub component definition as a cluster root, delegating every other call to the stub it wraps.
+     */
+    private record StubClusterRootComponentDefinition(
+        ModifiableComponentDefinition componentDefinition, List<ClusterElementType> clusterElementTypes)
+        implements ClusterRootComponentDefinition {
+
+        @Override
+        public List<ClusterElementType> getClusterElementTypes() {
+            return clusterElementTypes;
+        }
+
+        @Override
+        public List<ActionDefinition> getActions() {
+            return componentDefinition.getActions();
+        }
+
+        @Override
+        public List<ClusterElementDefinition<?>> getClusterElements() {
+            return componentDefinition.getClusterElements();
+        }
+
+        @Override
+        public List<ComponentCategory> getComponentCategories() {
+            return componentDefinition.getComponentCategories();
+        }
+
+        @Override
+        public Optional<ConnectionDefinition> getConnection() {
+            return componentDefinition.getConnection();
+        }
+
+        @Override
+        public boolean getCustomAction() {
+            return componentDefinition.getCustomAction();
+        }
+
+        @Override
+        public Optional<Help> getCustomActionHelp() {
+            return componentDefinition.getCustomActionHelp();
+        }
+
+        @Override
+        public Optional<String> getDescription() {
+            return componentDefinition.getDescription();
+        }
+
+        @Override
+        public Optional<String> getIcon() {
+            return componentDefinition.getIcon();
+        }
+
+        @Override
+        public List<? extends PropertyGroup> getInputs() {
+            return componentDefinition.getInputs();
+        }
+
+        @Override
+        public Map<String, Object> getMetadata() {
+            return componentDefinition.getMetadata();
+        }
+
+        @Override
+        public String getName() {
+            return componentDefinition.getName();
+        }
+
+        @Override
+        public Optional<Resources> getResources() {
+            return componentDefinition.getResources();
+        }
+
+        @Override
+        public List<String> getTags() {
+            return componentDefinition.getTags();
+        }
+
+        @Override
+        public Optional<String> getTitle() {
+            return componentDefinition.getTitle();
+        }
+
+        @Override
+        public List<TriggerDefinition> getTriggers() {
+            return componentDefinition.getTriggers();
+        }
+
+        @Override
+        public Optional<UnifiedApiDefinition> getUnifiedApi() {
+            return componentDefinition.getUnifiedApi();
+        }
+
+        @Override
+        public int getVersion() {
+            return componentDefinition.getVersion();
+        }
     }
 
     public record CategorySummary(String name, @Nullable String label) {
@@ -280,5 +406,15 @@ public record ComponentIndex(List<Entry> entries) {
     public record ClusterElementSummary(
         String name, @Nullable String title, @Nullable String description, String typeName, String typeKey,
         String typeLabel, boolean typeMultipleElements, boolean typeRequired) {
+    }
+
+    /**
+     * The cluster element types a cluster ROOT component declares — what it accepts as children — as opposed to
+     * {@link ClusterElementSummary}, which describes the cluster elements a component contributes to other roots. A
+     * component with a non-empty list here is a cluster root, which is what {@code ComponentDefinition.clusterRoot}
+     * reports.
+     */
+    public record ClusterElementTypeSummary(
+        String name, String key, String label, boolean multipleElements, boolean required) {
     }
 }

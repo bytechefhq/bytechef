@@ -30,7 +30,7 @@ class SystemProjectsTest {
     void testEveryPrefixFollowsTheSharedNameShape() {
         for (String namePrefix : new String[] {
             SystemProjects.KNOWLEDGE_BASE_NAME_PREFIX, SystemProjects.CONTEXT_STORE_NAME_PREFIX,
-            SystemProjects.EMBEDDED_AUTOMATION_NAME_PREFIX
+            SystemProjects.EMBEDDED_AUTOMATION_NAME_PREFIX, SystemProjects.AI_AGENT_NAME_PREFIX
         }) {
             assertTrue(
                 namePrefix.matches("__[A-Z][A-Z_]*[A-Z]__"),
@@ -43,6 +43,7 @@ class SystemProjectsTest {
         assertTrue(SystemProjects.isSystemProjectName(SystemProjects.KNOWLEDGE_BASE_NAME_PREFIX + 1));
         assertTrue(SystemProjects.isSystemProjectName(SystemProjects.CONTEXT_STORE_NAME_PREFIX + 42));
         assertTrue(SystemProjects.isSystemProjectName(SystemProjects.EMBEDDED_AUTOMATION_NAME_PREFIX + "catalog"));
+        assertTrue(SystemProjects.isSystemProjectName(SystemProjects.AI_AGENT_NAME_PREFIX + "x"));
     }
 
     @Test
@@ -68,5 +69,30 @@ class SystemProjectsTest {
 
         assertFalse(SystemProjects.isSystemProject(project));
         assertFalse(SystemProjects.isSystemProject(null));
+    }
+
+    @Test
+    void testProjectNameNotLikePredicatesContainsAnEscapeClausePerPrefix() {
+        String predicates = SystemProjects.projectNameNotLikePredicates("project.name");
+
+        assertTrue(predicates.contains("project.name NOT LIKE '\\_\\_AI\\_AGENT\\_\\_%' ESCAPE '\\'"));
+        assertTrue(predicates.contains("project.name NOT LIKE '\\_\\_KNOWLEDGE\\_BASE\\_\\_%' ESCAPE '\\'"));
+        assertTrue(predicates.contains("project.name NOT LIKE '\\_\\_CONTEXT\\_STORE\\_\\_%' ESCAPE '\\'"));
+        assertTrue(
+            predicates.contains("project.name NOT LIKE '\\_\\_EMBEDDED\\_AUTOMATION\\_\\_%' ESCAPE '\\'"));
+
+        int escapeClauseCount = predicates.split("ESCAPE '\\\\'", -1).length - 1;
+
+        assertTrue(
+            escapeClauseCount == 4,
+            "expected one ESCAPE clause per NAME_PREFIXES entry, got fragments: " + predicates);
+    }
+
+    @Test
+    void testProjectNameNotLikePredicatesUsesTheGivenColumnReference() {
+        String predicates = SystemProjects.projectNameNotLikePredicates("p.name");
+
+        assertTrue(predicates.contains("p.name NOT LIKE"));
+        assertFalse(predicates.contains("project.name NOT LIKE"));
     }
 }

@@ -1,4 +1,17 @@
 extend type Query {
+    """
+    Display conditions for an operation's properties evaluated against a standalone parameter map, for property
+    forms that have no workflow — a tool config dialog, an MCP tool popover, a connection dialog. Returns the
+    conditions that hold; a condition absent from the map is false.
+    """
+    componentPropertyDisplayConditions(
+        componentName: String!
+        componentVersion: Int!
+        operationName: String!
+        operationType: String!
+        parameters: Map
+    ): Map!
+
     clusterElementMissingRequiredProperties(
         workflowId: String!
         workflowNodeName: String!

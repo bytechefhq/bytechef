@@ -17,6 +17,7 @@
 package com.bytechef.automation.configuration.repository;
 
 import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.domain.SystemProjects;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,8 +58,11 @@ public class CustomProjectRepositoryImpl implements CustomProjectRepository {
             query += "JOIN project_tag ON project.id = project_tag.project_id ";
         }
 
+        // __EMBEDDED__ is a distinct, deployment-era marker (see ConnectedUserProjectWorkflowManager in
+        // embedded-configuration-service) — not part of the SystemProjects.NAME_PREFIXES allow-list, kept here
+        // verbatim to preserve existing behavior.
         query += "WHERE project.name NOT LIKE '__EMBEDDED__%' " +
-            "AND project.name NOT LIKE '__CONTEXT_STORE__%' ";
+            SystemProjects.projectNameNotLikePredicates("project.name");
 
         if (apiCollections != null) {
             if (apiCollections) {

@@ -29,6 +29,7 @@ import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
+import com.bytechef.automation.configuration.domain.SystemProjects;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.service.ProjectService;
@@ -484,6 +485,78 @@ class SubflowDataSourceTest {
 
             assertEquals(1, result.size());
             assertNotNull(result.getFirst());
+        }
+    }
+
+    @Test
+    void testGetSubWorkflowsPresentsAgentProjectWorkflowAsAgent() {
+        ProjectWorkflow projectWorkflow = mock(ProjectWorkflow.class);
+
+        when(projectWorkflow.getWorkflowId()).thenReturn(WORKFLOW_ID);
+        when(projectWorkflow.getProjectId()).thenReturn(1L);
+        when(projectWorkflow.getUuidAsString()).thenReturn(WORKFLOW_UUID);
+
+        when(projectWorkflowService.getLatestProjectWorkflows()).thenReturn(List.of(projectWorkflow));
+
+        Workflow workflow = mock(Workflow.class);
+
+        when(workflowService.getWorkflow(WORKFLOW_ID)).thenReturn(workflow);
+        when(workflow.getLabel()).thenReturn("My Agent");
+
+        WorkflowTrigger callableTrigger = mock(WorkflowTrigger.class);
+
+        when(callableTrigger.getType()).thenReturn("workflow/v1/newWorkflowCall");
+
+        Project project = mock(Project.class);
+
+        when(project.getName()).thenReturn(SystemProjects.AI_AGENT_NAME_PREFIX + "abc-123");
+        when(projectService.getProject(1L)).thenReturn(project);
+
+        try (MockedStatic<WorkflowTrigger> mockedWorkflowTrigger = mockStatic(WorkflowTrigger.class)) {
+            mockedWorkflowTrigger.when(() -> WorkflowTrigger.of(workflow))
+                .thenReturn(List.of(callableTrigger));
+
+            List<SubflowEntry> result =
+                subflowDataSource.getSubWorkflows(PlatformType.AUTOMATION, WorkflowConstants.NEW_WORKFLOW_CALL, null);
+
+            assertEquals(1, result.size());
+            assertEquals(WORKFLOW_UUID, result.getFirst()
+                .workflowUuid());
+            assertEquals("Agent > My Agent", result.getFirst()
+                .name());
+        }
+    }
+
+    @Test
+    void testGetSubWorkflowsExcludesOtherSystemProjectWorkflows() {
+        ProjectWorkflow projectWorkflow = mock(ProjectWorkflow.class);
+
+        when(projectWorkflow.getWorkflowId()).thenReturn(WORKFLOW_ID);
+        when(projectWorkflow.getProjectId()).thenReturn(1L);
+
+        when(projectWorkflowService.getLatestProjectWorkflows()).thenReturn(List.of(projectWorkflow));
+
+        Workflow workflow = mock(Workflow.class);
+
+        when(workflowService.getWorkflow(WORKFLOW_ID)).thenReturn(workflow);
+
+        WorkflowTrigger callableTrigger = mock(WorkflowTrigger.class);
+
+        when(callableTrigger.getType()).thenReturn("workflow/v1/newWorkflowCall");
+
+        Project project = mock(Project.class);
+
+        when(project.getName()).thenReturn(SystemProjects.KNOWLEDGE_BASE_NAME_PREFIX + "42");
+        when(projectService.getProject(1L)).thenReturn(project);
+
+        try (MockedStatic<WorkflowTrigger> mockedWorkflowTrigger = mockStatic(WorkflowTrigger.class)) {
+            mockedWorkflowTrigger.when(() -> WorkflowTrigger.of(workflow))
+                .thenReturn(List.of(callableTrigger));
+
+            List<SubflowEntry> result =
+                subflowDataSource.getSubWorkflows(PlatformType.AUTOMATION, WorkflowConstants.NEW_WORKFLOW_CALL, null);
+
+            assertTrue(result.isEmpty());
         }
     }
 

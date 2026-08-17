@@ -58,6 +58,41 @@ class ClusterElementMapTest {
         assertThat(clusterElement.getComponentName()).isEqualTo("hubspot");
     }
 
+    // A type's stored value becomes an array only once it declares multipleElements, and stored definitions are
+    // never migrated — so every definition saved before that flag was flipped still holds a bare object. Both
+    // shapes must resolve, or flipping a type to multiple breaks every agent already using it.
+    @Test
+    void testGetClusterElementsReadsAMultipleTypeStoredAsALoneObject() {
+        Map<String, Object> extensions = Map.of(
+            WorkflowExtConstants.CLUSTER_ELEMENTS,
+            Map.of("tools", Map.of(
+                WorkflowConstants.NAME, "hubspot_1",
+                WorkflowConstants.TYPE, "hubspot/v1/createContact",
+                WorkflowConstants.PARAMETERS, Map.of())));
+
+        ClusterElementMap clusterElementMap = ClusterElementMap.of(extensions);
+
+        assertThat(clusterElementMap.getClusterElements(TOOLS))
+            .extracting(ClusterElement::getWorkflowNodeName)
+            .containsExactly("hubspot_1");
+    }
+
+    @Test
+    void testGetClusterElementResolvesAMultipleTypeStoredAsALoneObject() {
+        Map<String, Object> extensions = Map.of(
+            WorkflowExtConstants.CLUSTER_ELEMENTS,
+            Map.of("tools", Map.of(
+                WorkflowConstants.NAME, "hubspot_1",
+                WorkflowConstants.TYPE, "hubspot/v1/createContact",
+                WorkflowConstants.PARAMETERS, Map.of())));
+
+        ClusterElementMap clusterElementMap = ClusterElementMap.of(extensions);
+
+        ClusterElement clusterElement = clusterElementMap.getClusterElement(TOOLS, "hubspot_1");
+
+        assertThat(clusterElement.getComponentName()).isEqualTo("hubspot");
+    }
+
     @Test
     void testGetClusterElementResolvesNestedChild() {
         Map<String, Object> hubspotTool = Map.of(

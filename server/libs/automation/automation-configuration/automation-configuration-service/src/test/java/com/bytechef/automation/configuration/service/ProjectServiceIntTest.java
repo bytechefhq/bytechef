@@ -159,12 +159,18 @@ public class ProjectServiceIntTest {
                 .workspaceId(workspace.getId())
                 .build());
 
+        projectRepository.save(
+            Project.builder()
+                .name("__AI_AGENT__Agent")
+                .workspaceId(workspace.getId())
+                .build());
+
         List<Project> projects = projectService.getProjects(null, null, null, null, null, workspace.getId());
 
         assertThat(projects)
             .extracting(Project::getName)
             .contains("Regular Project")
-            .doesNotContain("__EMBEDDED_AUTOMATION__Catalog");
+            .doesNotContain("__EMBEDDED_AUTOMATION__Catalog", "__AI_AGENT__Agent");
     }
 
     @Test

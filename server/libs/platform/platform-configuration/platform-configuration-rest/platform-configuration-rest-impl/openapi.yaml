@@ -2096,6 +2096,10 @@ components:
           type: "object"
           additionalProperties:
             type: "integer"
+        clusterRoot:
+          description: "Whether the component declares cluster element types of its own, meaning it is
+            configured through its child cluster elements rather than directly."
+          type: "boolean"
         componentCategories:
           description: "The list of categories the component belongs to."
           type: "array"

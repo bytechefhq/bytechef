@@ -24,11 +24,13 @@ import com.bytechef.component.definition.ConnectionDefinition;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.PropertyGroup;
 import com.bytechef.component.definition.TriggerDefinition;
+import com.bytechef.platform.component.definition.ClusterRootComponentDefinition;
 import com.bytechef.platform.component.handler.loader.ComponentHandlerLoader;
 import com.bytechef.platform.component.handler.loader.ComponentHandlerLoader.ProviderEntry;
 import com.bytechef.platform.component.handler.loader.DefaultComponentHandlerLoader;
 import com.bytechef.platform.component.index.ComponentIndex.CategorySummary;
 import com.bytechef.platform.component.index.ComponentIndex.ClusterElementSummary;
+import com.bytechef.platform.component.index.ComponentIndex.ClusterElementTypeSummary;
 import com.bytechef.platform.component.index.ComponentIndex.ConnectionSummary;
 import com.bytechef.platform.component.index.ComponentIndex.Entry;
 import com.bytechef.platform.component.index.ComponentIndex.ItemSummary;
@@ -128,6 +130,7 @@ public class ComponentIndexGenerator {
                 .stream()
                 .map(ComponentIndexGenerator::toClusterElementSummary)
                 .toList(),
+            toClusterElementTypeSummaries(componentDefinition),
             componentDefinition.getInputs()
                 .stream()
                 .map(PropertyGroup::getName)
@@ -150,6 +153,26 @@ public class ComponentIndexGenerator {
         boolean authorizationRequired = connectionDefinition.getAuthorizationRequired();
 
         return new ConnectionSummary(connectionDefinition.getVersion(), anyPropertyRequired || authorizationRequired);
+    }
+
+    /**
+     * Records the cluster element types a cluster root accepts, which is what the domain wrapper derives its
+     * {@code clusterRoot} flag from. A stub built without them lists the component as an ordinary one.
+     */
+    private static List<ClusterElementTypeSummary> toClusterElementTypeSummaries(
+        ComponentDefinition componentDefinition) {
+
+        if (!(componentDefinition instanceof ClusterRootComponentDefinition clusterRootComponentDefinition)) {
+            return List.of();
+        }
+
+        return clusterRootComponentDefinition.getClusterElementTypes()
+            .stream()
+            .map(
+                clusterElementType -> new ClusterElementTypeSummary(
+                    clusterElementType.name(), clusterElementType.key(), clusterElementType.label(),
+                    clusterElementType.multipleElements(), clusterElementType.required()))
+            .toList();
     }
 
     private static ItemSummary toItemSummary(ActionDefinition actionDefinition) {

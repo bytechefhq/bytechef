@@ -72,6 +72,32 @@ class WorkflowNodeParameterFacadeAuthorizationTest {
         assertExpression("updateWorkflowNodeParameter", "WORKFLOW_EDIT");
     }
 
+    /**
+     * The workflow-free evaluation has no workflowId to scope a permission to, so it carries isAuthenticated() instead.
+     * Pinned because it sits among methods that all guard on a workflow: adding it originally displaced
+     * getClusterElementDisplayConditions' own annotation, silently dropping that method's guard.
+     */
+    @Test
+    void testGetDisplayConditionsRequiresAuthentication() {
+        Method match = null;
+
+        for (Method candidate : WorkflowNodeParameterFacadeImpl.class.getDeclaredMethods()) {
+            if (candidate.getName()
+                .equals("getDisplayConditions") && candidate.isAnnotationPresent(PreAuthorize.class)) {
+
+                match = candidate;
+
+                break;
+            }
+        }
+
+        assertThat(match)
+            .as("@PreAuthorize-annotated method getDisplayConditions")
+            .isNotNull();
+        assertThat(match.getAnnotation(PreAuthorize.class)
+            .value()).isEqualTo("isAuthenticated()");
+    }
+
     private static void assertExpression(String methodName, String scope) {
         Method match = null;
 
