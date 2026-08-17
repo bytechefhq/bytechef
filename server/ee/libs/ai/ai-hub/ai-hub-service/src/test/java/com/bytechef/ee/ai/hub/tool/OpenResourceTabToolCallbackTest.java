@@ -23,12 +23,12 @@ import org.springframework.ai.chat.model.ToolContext;
  */
 class OpenResourceTabToolCallbackTest {
 
-    private AiHubTaskArtifactRecorder artifactRecorder;
+    private AiHubChatArtifactRecorder artifactRecorder;
     private OpenResourceTabToolCallback toolCallback;
 
     @BeforeEach
     void beforeEach() {
-        artifactRecorder = mock(AiHubTaskArtifactRecorder.class);
+        artifactRecorder = mock(AiHubChatArtifactRecorder.class);
         toolCallback = new OpenResourceTabToolCallback(artifactRecorder);
     }
 
@@ -111,5 +111,31 @@ class OpenResourceTabToolCallbackTest {
             "{\"type\": \"KNOWLEDGE_BASE\", \"name\": \"Docs\", \"knowledgeBaseId\": \"kb-1\"}", toolContext);
 
         verify(artifactRecorder).recordReference("thread-1", 9L, "KB_REFERENCED", "kb-1", "Docs");
+    }
+
+    @Test
+    void testAiAgentMissingIdReturnsError() {
+        String result = toolCallback.call("{\"type\": \"AI_AGENT\", \"name\": \"Support Agent\"}");
+
+        assertThat(result).contains("error");
+        assertThat(result).contains("aiAgentId is required");
+    }
+
+    @Test
+    void testAiAgentOutputMatchesShapeAndRecordsReference() {
+        ToolContext toolContext = new ToolContext(
+            Map.of(
+                AiHubToolInvocationContext.TOOL_CONTEXT_THREAD_ID_KEY, "thread-1",
+                AiHubToolInvocationContext.TOOL_CONTEXT_USER_ID_KEY, 9L));
+
+        String result = toolCallback.call(
+            "{\"type\": \"AI_AGENT\", \"name\": \"Support Agent\", \"aiAgentId\": \"agent-1\"}", toolContext);
+
+        assertThat(result).contains("\"opened\":true");
+        assertThat(result).contains("\"type\":\"AI_AGENT\"");
+        assertThat(result).contains("\"aiAgentId\":\"agent-1\"");
+        assertThat(result).contains("\"name\":\"Support Agent\"");
+
+        verify(artifactRecorder).recordReference("thread-1", 9L, "AI_AGENT_REFERENCED", "agent-1", "Support Agent");
     }
 }

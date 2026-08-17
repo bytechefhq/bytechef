@@ -32,6 +32,7 @@
     <includeAll path="classpath:config/liquibase/changelog/platform/component_policy/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />
     <includeAll path="classpath:config/liquibase/changelog/platform/resource_grant/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />
     <includeAll path="classpath:config/liquibase/changelog/automation/configuration/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />
+    <includeAll path="classpath:config/liquibase/changelog/automation/ai_agent/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />
     <includeAll path="classpath:config/liquibase/changelog/automation/mcp/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />
     <includeAll path="classpath:config/liquibase/changelog/automation/a2a/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />
 
@@ -141,7 +142,7 @@
 
     <!--
         automation/aihub is loaded AFTER automation/asset_file: the
-        20260429120001_*_ai_hub_task_asset_file_init.xml changeset has a
+        20260429120001_*_ai_hub_chat_asset_file_init.xml changeset has a
         FK reference to asset_file(id), which is created under the `execution` context.
         Liquibase resolves changesets in master.xml document order regardless of which
         contexts gate them, so any deployment that runs both contexts (mono, multitenant)
@@ -160,10 +161,10 @@
 
     <!--
         automation/aihub_execution holds the v2.2+ per-task tool persistence tables
-        (ai_hub_task_component, ai_hub_task_tool). They live in
+        (ai_hub_chat_component, ai_hub_chat_tool). They live in
         aihub_execution/ rather than aihub/ because their FKs reach into the execution-tier
         connection(id) table — so they must be loaded under the `execution` context, after both
-        automation/aihub/ (FK to ai_hub_task) and platform/execution/ (FK to connection).
+        automation/aihub/ (FK to ai_hub_chat) and platform/execution/ (FK to connection).
     -->
     <includeAll path="classpath:config/liquibase/changelog/automation/aihub_execution" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or execution or multitenant" />
 

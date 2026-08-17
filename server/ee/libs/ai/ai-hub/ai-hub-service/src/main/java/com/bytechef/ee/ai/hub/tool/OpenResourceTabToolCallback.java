@@ -21,17 +21,17 @@ import tools.jackson.core.JacksonException;
 import tools.jackson.databind.json.JsonMapper;
 
 /**
- * Signaling-only Spring AI {@link ToolCallback} that consolidates the seven per-resource open-tab tools
- * ({@code openFileTab}, {@code openWorkflowTab}, {@code openDataTableTab}, {@code openKnowledgeBaseTab},
- * {@code openSkillTab}, {@code openCustomComponentTab}, {@code openCodeWorkflowTab}) into a single {@code type}-keyed
- * tool, trimming the pinned tool list by six entries per agent. The server-side implementation echoes the arguments
- * back as a JSON result carrying the {@code type} discriminator plus the exact legacy field names, so the AI Hub client
- * re-dispatches onto the same per-type validators and tab-store calls the legacy tools used.
+ * Signaling-only Spring AI {@link ToolCallback} that consolidates the per-resource open-tab tools ({@code openFileTab},
+ * {@code openWorkflowTab}, {@code openDataTableTab}, {@code openKnowledgeBaseTab}, {@code openSkillTab},
+ * {@code openCustomComponentTab}, {@code openCodeWorkflowTab}, {@code openAiAgentTab}) into a single {@code type}-keyed
+ * tool, trimming the pinned tool list per agent. The server-side implementation echoes the arguments back as a JSON
+ * result carrying the {@code type} discriminator plus the exact legacy field names, so the AI Hub client re-dispatches
+ * onto the same per-type validators and tab-store calls the legacy tools used.
  *
  * <p>
- * {@code openWorkflowChatTab} / {@code openAiHubPersonalAgentTab} are NOT folded in — their results drive a task switch
- * (thread + navigation), a different contract. The legacy per-type classes also remain for subagent-internal
- * registrations (e.g. the data_analyst specialist's {@code openDataTableTab}).
+ * {@code openWorkflowChatTab} / {@code openAiHubTaskTab} are NOT folded in — their results drive a chat switch (thread
+ * + navigation), a different contract. The legacy per-type classes also remain for subagent-internal registrations
+ * (e.g. the data_analyst specialist's {@code openDataTableTab}).
  * </p>
  *
  * @version ee
@@ -50,7 +50,7 @@ public class OpenResourceTabToolCallback implements ToolCallback {
         and the type's id fields — always ids returned from listing/create tools, never invented:
         FILE: fileId. WORKFLOW: workflowId, projectId, projectWorkflowId (all three, from the build/list
         result). DATA_TABLE: dataTableId. KNOWLEDGE_BASE: knowledgeBaseId. SKILL: skillId.
-        CUSTOM_COMPONENT: customComponentId. CODE_WORKFLOW: projectId, language.""";
+        CUSTOM_COMPONENT: customComponentId. CODE_WORKFLOW: projectId, language. AI_AGENT: aiAgentId.""";
 
     private static final String INPUT_SCHEMA =
         """
@@ -59,7 +59,7 @@ public class OpenResourceTabToolCallback implements ToolCallback {
                 "properties": {
                     "type": {
                         "type": "string",
-                        "enum": ["FILE", "WORKFLOW", "DATA_TABLE", "KNOWLEDGE_BASE", "SKILL", "CUSTOM_COMPONENT", "CODE_WORKFLOW"],
+                        "enum": ["FILE", "WORKFLOW", "DATA_TABLE", "KNOWLEDGE_BASE", "SKILL", "CUSTOM_COMPONENT", "CODE_WORKFLOW", "AI_AGENT"],
                         "description": "The resource kind to open"
                     },
                     "name": {"type": "string", "description": "Display name for the tab"},
@@ -71,16 +71,17 @@ public class OpenResourceTabToolCallback implements ToolCallback {
                     "knowledgeBaseId": {"type": "string", "description": "KNOWLEDGE_BASE: knowledge base id"},
                     "skillId": {"type": "string", "description": "SKILL: skill id"},
                     "customComponentId": {"type": "string", "description": "CUSTOM_COMPONENT: custom component id"},
-                    "language": {"type": "string", "description": "CODE_WORKFLOW: script language"}
+                    "language": {"type": "string", "description": "CODE_WORKFLOW: script language"},
+                    "aiAgentId": {"type": "string", "description": "AI_AGENT: AI Agent id"}
                 },
                 "required": ["type", "name"]
             }""";
 
     private final JsonMapper jsonMapper = new JsonMapper();
-    private final @Nullable AiHubTaskArtifactRecorder artifactRecorder;
+    private final @Nullable AiHubChatArtifactRecorder artifactRecorder;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public OpenResourceTabToolCallback(@Nullable AiHubTaskArtifactRecorder artifactRecorder) {
+    public OpenResourceTabToolCallback(@Nullable AiHubChatArtifactRecorder artifactRecorder) {
         this.artifactRecorder = artifactRecorder;
     }
 
@@ -124,9 +125,11 @@ public class OpenResourceTabToolCallback implements ToolCallback {
                 case "CUSTOM_COMPONENT" -> openSimpleResource(
                     input, "customComponentId", input.customComponentId(), "CUSTOM_COMPONENT_REFERENCED", toolContext);
                 case "CODE_WORKFLOW" -> openCodeWorkflow(input, toolContext);
+                case "AI_AGENT" -> openSimpleResource(
+                    input, "aiAgentId", input.aiAgentId(), "AI_AGENT_REFERENCED", toolContext);
                 default -> toolError(
                     "Unknown type '" + input.type() + "'. Supported: FILE, WORKFLOW, DATA_TABLE, KNOWLEDGE_BASE, " +
-                        "SKILL, CUSTOM_COMPONENT, CODE_WORKFLOW");
+                        "SKILL, CUSTOM_COMPONENT, CODE_WORKFLOW, AI_AGENT");
             };
         } catch (JacksonException exception) {
             return toolError("Invalid tool input: " + exception.getMessage());
@@ -264,7 +267,7 @@ public class OpenResourceTabToolCallback implements ToolCallback {
 
         try {
             // Route through the dedup-aware recorder so a referenced workflow collapses onto an existing
-            // created/updated row for the same (task, workflowId) instead of producing a duplicate sidebar entry.
+            // created/updated row for the same (chat, workflowId) instead of producing a duplicate sidebar entry.
             artifactRecorder.recordWorkflowReference(
                 invocationContext.threadId(), invocationContext.userId(), input.workflowId(), projectId,
                 input.projectWorkflowId(), input.name());
@@ -286,6 +289,7 @@ public class OpenResourceTabToolCallback implements ToolCallback {
     public record OpenResourceTabInput(
         String type, String name, @Nullable String fileId, @Nullable String workflowId, @Nullable String projectId,
         @Nullable Long projectWorkflowId, @Nullable String dataTableId, @Nullable String knowledgeBaseId,
-        @Nullable String skillId, @Nullable String customComponentId, @Nullable String language) {
+        @Nullable String skillId, @Nullable String customComponentId, @Nullable String language,
+        @Nullable String aiAgentId) {
     }
 }

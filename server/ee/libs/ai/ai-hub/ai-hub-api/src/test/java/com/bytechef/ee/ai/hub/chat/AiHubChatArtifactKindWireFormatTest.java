@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.ai.hub.task;
+package com.bytechef.ee.ai.hub.chat;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -15,8 +15,8 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 
 /**
- * Pins the wire-format names of {@link AiHubTaskArtifactKind} against a hard-coded snapshot. The companion TS file at
- * {@code client/src/pages/automation/ai-hub/tasks/api/tasks.api.ts} declares a {@code AiHubArtifactKindType}
+ * Pins the wire-format names of {@link AiHubChatArtifactKind} against a hard-coded snapshot. The companion TS file at
+ * {@code client/src/pages/automation/ai-hub/chats/api/chats.api.ts} declares a {@code AiHubArtifactKindType}
  * string-union literal that mirrors this enum. Drift between the two sides is silent and load-bearing — adding a kind
  * on the server without updating the TS literal causes the UI to dispatch {@code default} on the unrecognized string,
  * which silently disables the artifact's row in the audit and sidebar viewers (the comment at the top of the TS file
@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
  * This test fails on any add, rename, or removal. When you legitimately change the enum, update BOTH this snapshot AND
  * the TS file. Until either an OpenAPI codegen pipeline or a sibling client-side test consuming this list lands, this
  * snapshot is the only mechanical check that the two sides stay synchronized. The complementary
- * {@link com.bytechef.ee.ai.hub.util.EnumOrdinalStabilityTest#testTaskArtifactKindOrdinalsAreStable} catches
+ * {@link com.bytechef.ee.ai.hub.util.EnumOrdinalStabilityTest#testChatArtifactKindOrdinalsAreStable} catches
  * reorderings; this catches name drift.
  * </p>
  *
@@ -34,13 +34,14 @@ import org.junit.jupiter.api.Test;
  *
  * @author Ivica Cardic
  */
-class AiHubTaskArtifactKindWireFormatTest {
+class AiHubChatArtifactKindWireFormatTest {
 
     /**
      * The complete set of wire-format names that the client TS literal MUST also declare. Keep this sorted
      * alphabetically (matches the TS file's union ordering) so a diff highlights additions and removals.
      */
     private static final Set<String> EXPECTED_WIRE_NAMES = new TreeSet<>(Set.of(
+        "AI_AGENT_REFERENCED",
         "API_COLLECTION_REFERENCED",
         "BINARY_FILE_CREATED",
         "CODE_WORKFLOW_REFERENCED",
@@ -62,7 +63,7 @@ class AiHubTaskArtifactKindWireFormatTest {
         "MEMORY_RENAMED",
         "MEMORY_UPDATED",
         "SKILL_REFERENCED",
-        "TASK_REFERENCED",
+        "CHAT_REFERENCED",
         "WORKFLOW_CREATED",
         "WORKFLOW_EXECUTION_REFERENCED",
         "WORKFLOW_EXECUTION_STARTED",
@@ -73,14 +74,14 @@ class AiHubTaskArtifactKindWireFormatTest {
     void testWireFormatNamesMatchClientSnapshot() {
         Set<String> actual = new TreeSet<>();
 
-        Stream.of(AiHubTaskArtifactKind.values())
+        Stream.of(AiHubChatArtifactKind.values())
             .map(Enum::name)
             .forEach(actual::add);
 
         assertThat(actual)
             .as(
-                "AiHubTaskArtifactKind wire-format drift: update both this snapshot AND " +
-                    "client/src/pages/automation/ai-hub/tasks/api/tasks.api.ts " +
+                "AiHubChatArtifactKind wire-format drift: update both this snapshot AND " +
+                    "client/src/pages/automation/ai-hub/chats/api/chats.api.ts " +
                     "(AiHubArtifactKindType) when adding/renaming/removing values")
             .isEqualTo(EXPECTED_WIRE_NAMES);
     }

@@ -21,15 +21,63 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.agui.core.state.State;
 import com.bytechef.ai.copilot.constant.CopilotConstants;
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
+import com.bytechef.automation.ai.tool.AutomationToolInvocationContext;
 import com.bytechef.platform.ai.tool.TaskTools;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 
 class CopilotToolContextUtilsTest {
+
+    /**
+     * Two workspace-id key families reach tools from this one surface: the automation tools (project deployments, asset
+     * files) read {@link AutomationToolInvocationContext}'s keys while the data-table/knowledge-base tools read
+     * {@link AgentToolInvocationContext}'s. Populating only the latter is what made deployment tools opened from a
+     * copilot panel answer "Workspace context unavailable - open this chat from the AI Hub of a workspace".
+     */
+    @Test
+    void testToToolContextPopulatesBothWorkspaceIdKeyFamilies() {
+        Map<String, Object> stateMap = new HashMap<>();
+
+        stateMap.put(CopilotConstants.STATE_WORKSPACE_ID, "7");
+        stateMap.put(CopilotConstants.STATE_ENVIRONMENT_ID, "2");
+        stateMap.put(CopilotConstants.STATE_AUTHENTICATED_USER_ID, "42");
+
+        Map<String, Object> toolContext = CopilotToolContextUtils.toToolContext(new State(stateMap));
+
+        assertThat(toolContext)
+            .containsEntry(AgentToolInvocationContext.TOOL_CONTEXT_WORKSPACE_ID_KEY, 7L)
+            .containsEntry(AutomationToolInvocationContext.TOOL_CONTEXT_WORKSPACE_ID_KEY, 7L)
+            .containsEntry(AutomationToolInvocationContext.TOOL_CONTEXT_USER_ID_KEY, 42L)
+            .containsEntry(AutomationToolInvocationContext.TOOL_CONTEXT_ENVIRONMENT_ID_KEY, 2L);
+
+        assertThat(AutomationToolInvocationContext.fromToolContext(new ToolContext(toolContext)))
+            .isNotNull()
+            .extracting(AutomationToolInvocationContext::workspaceId)
+            .isEqualTo(7L);
+    }
+
+    /**
+     * resolveEnvironmentOrDefault silently buckets a missing environment to DEVELOPMENT, so an absent key reads as a
+     * confidently wrong answer rather than an error — the automation keys must stay absent, not zero, when unset.
+     */
+    @Test
+    void testToToolContextOmitsAutomationKeysThatHaveNoState() {
+        Map<String, Object> stateMap = new HashMap<>();
+
+        stateMap.put(CopilotConstants.STATE_WORKSPACE_ID, "7");
+
+        Map<String, Object> toolContext = CopilotToolContextUtils.toToolContext(new State(stateMap));
+
+        assertThat(toolContext)
+            .containsEntry(AutomationToolInvocationContext.TOOL_CONTEXT_WORKSPACE_ID_KEY, 7L)
+            .doesNotContainKey(AutomationToolInvocationContext.TOOL_CONTEXT_ENVIRONMENT_ID_KEY)
+            .doesNotContainKey(AutomationToolInvocationContext.TOOL_CONTEXT_USER_ID_KEY);
+    }
 
     @Test
     void testToToolContextCopiesAllowedComponentNames() {

@@ -5,22 +5,22 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.ai.hub.task;
+package com.bytechef.ee.ai.hub.chat;
 
 /**
- * Classifies the type of side-effect artifact that was produced during a AI Hub task turn.
+ * Classifies the type of side-effect artifact that was produced during a AI Hub chat turn.
  *
  * <p>
  * <b>Append-only.</b> The values are persisted as INT ordinals via Spring Data JDBC and
  * {@link com.bytechef.ee.ai.hub.util.EnumOrdinals} — reordering or deleting a value would silently re-map every
  * historical row to the wrong kind. New values MUST be appended at the end. The
- * {@code EnumOrdinalStabilityTest#testTaskArtifactKindOrdinals} pinning test enforces this at build time.
+ * {@code EnumOrdinalStabilityTest#testChatArtifactKindOrdinals} pinning test enforces this at build time.
  *
  * @version ee
  *
  * @author Ivica Cardic
  */
-public enum AiHubTaskArtifactKind {
+public enum AiHubChatArtifactKind {
 
     // append-only
     FILE_CREATED,
@@ -48,12 +48,12 @@ public enum AiHubTaskArtifactKind {
     KB_REFERENCED,
 
     // Agent-template referenced resources — the four composer resource kinds (MCP server, API collection,
-    // workflow execution, task) copied onto a spawned task from a personal-agent template. Appended at the
+    // workflow execution, chat) copied onto a spawned chat from a task. Appended at the
     // END per the JDBC enum-storage convention so the ordinals of all earlier values stay pinned.
     MCP_SERVER_REFERENCED,
     API_COLLECTION_REFERENCED,
     WORKFLOW_EXECUTION_REFERENCED,
-    TASK_REFERENCED,
+    CHAT_REFERENCED,
 
     // Agent-opened / composer-referenced skill (SkillsTools archive). Appended at the END per the JDBC
     // enum-storage convention so all earlier ordinals stay pinned.
@@ -69,5 +69,9 @@ public enum AiHubTaskArtifactKind {
 
     // Edit-in-place of an existing asset file via the updateAssetFileContent tool. Appended at the END per the
     // JDBC enum-storage convention so all earlier ordinals stay pinned.
-    FILE_UPDATED
+    FILE_UPDATED,
+
+    // Agent-referenced AI Agent (automation-ai-agent) opened via openResourceTab. Appended at the END per the
+    // JDBC enum-storage convention so all earlier ordinals stay pinned.
+    AI_AGENT_REFERENCED
 }

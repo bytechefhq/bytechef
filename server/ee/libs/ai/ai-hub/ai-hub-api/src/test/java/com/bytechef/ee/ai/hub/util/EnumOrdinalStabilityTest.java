@@ -10,13 +10,13 @@ package com.bytechef.ee.ai.hub.util;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.automation.ai.tool.AutomationToolInvocationContext;
-import com.bytechef.ee.ai.hub.personalagent.AiHubPersonalAgentResourceKind;
-import com.bytechef.ee.ai.hub.personalagent.ScheduleFrequencyKind;
-import com.bytechef.ee.ai.hub.personalagent.ScheduleLifecycleKind;
-import com.bytechef.ee.ai.hub.task.AiHubTaskArtifactKind;
-import com.bytechef.ee.ai.hub.task.AiHubTaskArtifactStatus;
-import com.bytechef.ee.ai.hub.task.AiHubTaskKind;
-import com.bytechef.ee.ai.hub.task.AiHubTaskStatus;
+import com.bytechef.ee.ai.hub.chat.AiHubChatArtifactKind;
+import com.bytechef.ee.ai.hub.chat.AiHubChatArtifactStatus;
+import com.bytechef.ee.ai.hub.chat.AiHubChatKind;
+import com.bytechef.ee.ai.hub.chat.AiHubChatStatus;
+import com.bytechef.ee.ai.hub.task.AiHubTaskResourceKind;
+import com.bytechef.ee.ai.hub.task.ScheduleFrequencyKind;
+import com.bytechef.ee.ai.hub.task.ScheduleLifecycleKind;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryPrincipalType;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryType;
 import com.bytechef.test.assertion.OrdinalStabilityAssertions;
@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Pins the ordinal of every persisted enum value to a fixed integer. The AI Hub entities (
- * {@link com.bytechef.ee.ai.hub.task.AiHubTask}, {@code AiHubTaskArtifact}, {@code AiAutoMemory}, {@code AiHubUsage})
+ * {@link com.bytechef.ee.ai.hub.chat.AiHubChat}, {@code AiHubChatArtifact}, {@code AiAutoMemory}, {@code AiHubUsage})
  * store these enums as {@code int} ordinal columns. A reorder is silent and irreversible — every historical row is
  * re-attributed to whatever value now lives at the old ordinal.
  *
@@ -44,7 +44,7 @@ import org.junit.jupiter.api.Test;
 class EnumOrdinalStabilityTest {
 
     @Test
-    void testTaskStatusOrdinalsAreStable() {
+    void testChatStatusOrdinalsAreStable() {
         Map<String, Integer> expected = new LinkedHashMap<>();
 
         expected.put("ACTIVE", 0);
@@ -52,11 +52,11 @@ class EnumOrdinalStabilityTest {
         expected.put("DELETED", 2);
 
         OrdinalStabilityAssertions.assertOrdinalsMatch(
-            AiHubTaskStatus.values(), expected, AiHubTaskStatus.class.getSimpleName());
+            AiHubChatStatus.values(), expected, AiHubChatStatus.class.getSimpleName());
     }
 
     @Test
-    void testTaskArtifactStatusOrdinalsAreStable() {
+    void testChatArtifactStatusOrdinalsAreStable() {
         Map<String, Integer> expected = new LinkedHashMap<>();
 
         expected.put("APPLIED", 0);
@@ -64,12 +64,12 @@ class EnumOrdinalStabilityTest {
         expected.put("IRREVERSIBLE", 2);
 
         OrdinalStabilityAssertions.assertOrdinalsMatch(
-            AiHubTaskArtifactStatus.values(), expected,
-            AiHubTaskArtifactStatus.class.getSimpleName());
+            AiHubChatArtifactStatus.values(), expected,
+            AiHubChatArtifactStatus.class.getSimpleName());
     }
 
     @Test
-    void testTaskArtifactKindOrdinalsAreStable() {
+    void testChatArtifactKindOrdinalsAreStable() {
         Map<String, Integer> expected = new LinkedHashMap<>();
 
         expected.put("FILE_CREATED", 0);
@@ -97,7 +97,7 @@ class EnumOrdinalStabilityTest {
         expected.put("MCP_SERVER_REFERENCED", 19);
         expected.put("API_COLLECTION_REFERENCED", 20);
         expected.put("WORKFLOW_EXECUTION_REFERENCED", 21);
-        expected.put("TASK_REFERENCED", 22);
+        expected.put("CHAT_REFERENCED", 22);
         // Agent-opened / composer-referenced skill (SkillsTools archive). Appended at the END per the JDBC
         // enum-storage convention so all earlier ordinals stay pinned.
         expected.put("SKILL_REFERENCED", 23);
@@ -115,22 +115,22 @@ class EnumOrdinalStabilityTest {
         expected.put("AI_AGENT_REFERENCED", 27);
 
         OrdinalStabilityAssertions.assertOrdinalsMatch(
-            AiHubTaskArtifactKind.values(), expected,
-            AiHubTaskArtifactKind.class.getSimpleName());
+            AiHubChatArtifactKind.values(), expected,
+            AiHubChatArtifactKind.class.getSimpleName());
     }
 
     @Test
-    void testTaskKindOrdinalsAreStable() {
+    void testChatKindOrdinalsAreStable() {
         Map<String, Integer> expected = new LinkedHashMap<>();
 
         // STANDARD MUST stay at 0 — the column has DEFAULT 0 in Liquibase so every pre-existing row inherits this
-        // value. Reordering would silently re-attribute every task row's kind on the next read.
+        // value. Reordering would silently re-attribute every chat row's kind on the next read.
         expected.put("STANDARD", 0);
         expected.put("WORKFLOW_CHAT", 1);
-        expected.put("PERSONAL_AGENT", 2);
+        expected.put("TASK", 2);
 
         OrdinalStabilityAssertions.assertOrdinalsMatch(
-            AiHubTaskKind.values(), expected, AiHubTaskKind.class.getSimpleName());
+            AiHubChatKind.values(), expected, AiHubChatKind.class.getSimpleName());
     }
 
     @Test
@@ -221,7 +221,7 @@ class EnumOrdinalStabilityTest {
     }
 
     @Test
-    void testPersonalAgentResourceKindOrdinals() {
+    void testTaskResourceKindOrdinals() {
         Map<String, Integer> expected = new LinkedHashMap<>();
 
         expected.put("WORKFLOW", 0);
@@ -231,10 +231,10 @@ class EnumOrdinalStabilityTest {
         expected.put("MCP_SERVER", 4);
         expected.put("API_COLLECTION", 5);
         expected.put("WORKFLOW_EXECUTION", 6);
-        expected.put("TASK", 7);
+        expected.put("CHAT", 7);
 
         OrdinalStabilityAssertions.assertOrdinalsMatch(
-            AiHubPersonalAgentResourceKind.values(), expected,
-            AiHubPersonalAgentResourceKind.class.getSimpleName());
+            AiHubTaskResourceKind.values(), expected,
+            AiHubTaskResourceKind.class.getSimpleName());
     }
 }

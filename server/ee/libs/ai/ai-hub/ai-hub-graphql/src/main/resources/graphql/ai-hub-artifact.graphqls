@@ -1,13 +1,13 @@
 """
-Audit/undo log row for a AI Hub mutation. Mirrors {@link AiHubTaskArtifact}: id is the primary
-key, taskId pins the row to a task, kind/status are ordinal-pinned enums, environmentId is
-denormalised from the parent task at write time so analytics queries do not need a join.
+Audit/undo log row for a AI Hub mutation. Mirrors {@link AiHubChatArtifact}: id is the primary
+key, chatId pins the row to a chat, kind/status are ordinal-pinned enums, environmentId is
+denormalised from the parent chat at write time so analytics queries do not need a join.
 """
-type AiHubTaskArtifact {
+type AiHubChatArtifact {
     id: ID!
-    taskId: ID!
-    kind: AiHubTaskArtifactKind!
-    status: AiHubTaskArtifactStatus!
+    chatId: ID!
+    kind: AiHubChatArtifactKind!
+    status: AiHubChatArtifactStatus!
     artifactId: String!
     artifactName: String!
     metadataJson: String
@@ -16,7 +16,7 @@ type AiHubTaskArtifact {
     statusChangedAt: Long
 }
 
-enum AiHubTaskArtifactKind {
+enum AiHubChatArtifactKind {
     FILE_CREATED
     BINARY_FILE_CREATED
     WORKFLOW_CREATED
@@ -39,14 +39,15 @@ enum AiHubTaskArtifactKind {
     MCP_SERVER_REFERENCED
     API_COLLECTION_REFERENCED
     WORKFLOW_EXECUTION_REFERENCED
-    TASK_REFERENCED
+    CHAT_REFERENCED
     SKILL_REFERENCED
     CUSTOM_COMPONENT_REFERENCED
     CODE_WORKFLOW_REFERENCED
     FILE_UPDATED
+    AI_AGENT_REFERENCED
 }
 
-enum AiHubTaskArtifactStatus {
+enum AiHubChatArtifactStatus {
     APPLIED
     EXPIRED
     IRREVERSIBLE
@@ -57,8 +58,8 @@ Paginated artifact listing. {@code totalCount} is the total across all pages so 
 accurate "showing N of M" hint; {@code hasMore} is a derived convenience for pagination controls so the
 client does not have to compute it from page+size.
 """
-type AiHubTaskArtifactPage {
-    items: [AiHubTaskArtifact!]!
+type AiHubChatArtifactPage {
+    items: [AiHubChatArtifact!]!
     totalCount: Long!
     hasMore: Boolean!
     pageClamped: Boolean!
@@ -67,47 +68,47 @@ type AiHubTaskArtifactPage {
 
 extend type Query {
     """
-    Paginated, filtered audit listing across all aiHubTasks in the workspace. Admin-only — gated by
-    ADMIN authority on AiHubTaskArtifactFacade. {@code page} and {@code size} are silently
+    Paginated, filtered audit listing across all aiHubChats in the workspace. Admin-only — gated by
+    ADMIN authority on AiHubChatArtifactFacade. {@code page} and {@code size} are silently
     clamped to internal bounds (10_000 and 500 respectively); {@code pageClamped}/{@code sizeClamped} on the
     response surface the silent truncation so dashboards/tests can detect a mismatch between requested and
     served values. Negative {@code page} or {@code size < 1} are hard errors — those are malformed, not just
     out-of-range.
     """
-    aiHubTaskArtifacts(
+    aiHubChatArtifacts(
         workspaceId: ID!,
         environment: Int,
         userId: ID,
-        kind: AiHubTaskArtifactKind,
+        kind: AiHubChatArtifactKind,
         from: Long,
         to: Long,
         page: Int,
         size: Int
-    ): AiHubTaskArtifactPage!
+    ): AiHubChatArtifactPage!
 }
 
 extend type Mutation {
     """
-    Records a user-attached reference (file / workflow / data table / knowledge base) as a task
+    Records a user-attached reference (file / workflow / data table / knowledge base) as a chat
     artifact so it appears in the sidebar artifact list. Idempotent — re-attaching the same resource hits
     the existing row instead of creating a duplicate. Used by the composer plus-button menu when the user
-    references an artifact in a task.
+    references an artifact in a chat.
     """
-    recordReferencedAiHubTaskArtifact(input: RecordReferencedAiHubTaskArtifactInput!): AiHubTaskArtifact!
+    recordReferencedAiHubChatArtifact(input: RecordReferencedAiHubChatArtifactInput!): AiHubChatArtifact!
 
     """
     Removes a user-attached reference artifact (FILE_REFERENCED / WORKFLOW_REFERENCED /
-    DATA_TABLE_REFERENCED / KB_REFERENCED) from a task. Returns `true` on success or when the row was
+    DATA_TABLE_REFERENCED / KB_REFERENCED) from a chat. Returns `true` on success or when the row was
     already gone (idempotent). Throws on ownership / workspace mismatch and on any non-reference kind —
     those are agent-driven audit rows that the user cannot delete via this surface.
     """
-    deleteAiHubTaskArtifact(input: DeleteAiHubTaskArtifactInput!): Boolean!
+    deleteAiHubChatArtifact(input: DeleteAiHubChatArtifactInput!): Boolean!
 }
 
-input RecordReferencedAiHubTaskArtifactInput {
+input RecordReferencedAiHubChatArtifactInput {
     workspaceId: ID!
-    taskId: ID!
-    kind: AiHubTaskArtifactKind!
+    chatId: ID!
+    kind: AiHubChatArtifactKind!
     artifactId: String!
     artifactName: String!
     """
@@ -119,7 +120,7 @@ input RecordReferencedAiHubTaskArtifactInput {
     metadataJson: String
 }
 
-input DeleteAiHubTaskArtifactInput {
+input DeleteAiHubChatArtifactInput {
     workspaceId: ID!
     artifactId: ID!
 }
