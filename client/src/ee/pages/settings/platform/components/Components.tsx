@@ -1,6 +1,6 @@
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
-import {Tabs, TabsList, TabsTrigger} from '@/components/ui/tabs';
+import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import ApiConnectorEndpointDetailPanel from '@/ee/pages/settings/platform/api-connectors/components/ApiConnectorEndpointDetailPanel';
 import ApiConnectorList from '@/ee/pages/settings/platform/api-connectors/components/ApiConnectorList';
 import ComponentPoliciesTab from '@/ee/pages/settings/platform/component-policies/ComponentPoliciesTab';
@@ -53,26 +53,28 @@ const Components = ({tab}: ComponentsProps) => {
             header={<Header centerTitle={true} position="main" right={<NewComponentMenu />} title="Components" />}
             leftSidebarOpen={false}
         >
-            <div className="flex size-full flex-col">
+            <Tabs className="size-full" onValueChange={(value) => navigate(`../${value}`)} value={tab}>
                 {showTabs && (
-                    <Tabs className="px-6 pt-2 pb-4" onValueChange={(value) => navigate(`../${value}`)} value={tab}>
-                        <TabsList>
-                            <TabsTrigger value="component-visibility">Component Visibility</TabsTrigger>
+                    <TabsList className="mx-6 mt-2 mb-2">
+                        <TabsTrigger value="component-visibility">Component Visibility</TabsTrigger>
 
-                            <TabsTrigger value="custom">Custom Components</TabsTrigger>
+                        <TabsTrigger value="custom">Custom Components</TabsTrigger>
 
-                            <TabsTrigger value="api-connectors">API Connectors</TabsTrigger>
-                        </TabsList>
-                    </Tabs>
+                        <TabsTrigger value="api-connectors">API Connectors</TabsTrigger>
+                    </TabsList>
                 )}
 
-                {tab === 'policies' ? (
+                <TabsContent value="policies">
                     <ComponentPoliciesTab />
-                ) : tab === 'component-visibility' ? (
+                </TabsContent>
+
+                <TabsContent value="component-visibility">
                     <div className="w-full px-6 3xl:mx-auto 3xl:w-4/5">
                         <ComponentVisibilityTab />
                     </div>
-                ) : tab === 'custom' ? (
+                </TabsContent>
+
+                <TabsContent className="flex flex-col" value="custom">
                     <PageLoader errors={[customComponentsError]} loading={customComponentsLoading}>
                         {customComponents && customComponents.length > 0 ? (
                             <CustomComponentList customComponents={customComponents} />
@@ -87,27 +89,27 @@ const Components = ({tab}: ComponentsProps) => {
                             </div>
                         )}
                     </PageLoader>
-                ) : (
-                    <>
-                        <PageLoader errors={[apiConnectorsError]} loading={apiConnectorsLoading}>
-                            {apiConnectors && apiConnectors.length > 0 ? (
-                                <ApiConnectorList apiConnectors={apiConnectors} />
-                            ) : (
-                                <div className="flex flex-1 items-center justify-center">
-                                    <EmptyList
-                                        button={<NewComponentMenu />}
-                                        icon={<Link2Icon className="size-12 text-content-neutral-tertiary" />}
-                                        message="You do not have any API Connectors created yet."
-                                        title="No API Connectors"
-                                    />
-                                </div>
-                            )}
-                        </PageLoader>
+                </TabsContent>
 
-                        <ApiConnectorEndpointDetailPanel />
-                    </>
-                )}
-            </div>
+                <TabsContent className="flex flex-col" value="api-connectors">
+                    <PageLoader errors={[apiConnectorsError]} loading={apiConnectorsLoading}>
+                        {apiConnectors && apiConnectors.length > 0 ? (
+                            <ApiConnectorList apiConnectors={apiConnectors} />
+                        ) : (
+                            <div className="flex flex-1 items-center justify-center">
+                                <EmptyList
+                                    button={<NewComponentMenu />}
+                                    icon={<Link2Icon className="size-12 text-content-neutral-tertiary" />}
+                                    message="You do not have any API Connectors created yet."
+                                    title="No API Connectors"
+                                />
+                            </div>
+                        )}
+                    </PageLoader>
+
+                    <ApiConnectorEndpointDetailPanel />
+                </TabsContent>
+            </Tabs>
         </LayoutContainer>
     );
 };
