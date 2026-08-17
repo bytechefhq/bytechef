@@ -1,6 +1,7 @@
 import Button from '@/components/Button/Button';
 import {ToggleGroup, ToggleGroupItem} from '@/components/ui/toggle-group';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import AiHubAiAgentViewer from '@/ee/pages/automation/ai-hub/AiHubAiAgentViewer';
 import AiHubDataTableViewer from '@/ee/pages/automation/ai-hub/AiHubDataTableViewer';
 import AiHubFilePicker from '@/ee/pages/automation/ai-hub/AiHubFilePicker';
 import AiHubFileViewer from '@/ee/pages/automation/ai-hub/AiHubFileViewer';
@@ -91,6 +92,10 @@ const renderTabBody = (tab: AiHubTabType) => {
         return <AiHubWorkflowExecutionViewer workflowExecutionId={tab.workflowExecutionId} />;
     }
 
+    if (tab.kind === 'aiAgent') {
+        return <AiHubAiAgentViewer aiAgentId={tab.aiAgentId} name={tab.name} />;
+    }
+
     return null;
 };
 
@@ -118,7 +123,7 @@ const AiHubResourcePanel = () => {
         <div className="size-full bg-surface-main py-2 pr-2">
             <div className="flex size-full flex-col overflow-hidden rounded-xl border bg-surface-neutral-primary shadow-sm">
                 {/* Padding mirrors AiHubPanel header (`px-4 py-3`) so this toolbar lines up vertically
-                 * with the task title + Ask/Build group on the left side when the panel is open. The
+                 * with the chat title + Ask/Build group on the left side when the panel is open. The
                  * old `px-2 py-1` made the right side sit a few pixels higher than the left, with mismatched
                  * horizontal margins, breaking the visual baseline between the two sibling panel headers. */}
 
@@ -231,7 +236,7 @@ const AiHubResourcePanel = () => {
                                 {/* Two file-level affordances next to the view-mode toggle:
                                  *
                                  *   - Open externally → deep-link to the asset-files admin page so the user can
-                                 *     manage tags, rename, see usage, etc., outside of the task context.
+                                 *     manage tags, rename, see usage, etc., outside of the chat context.
                                  *     Routed at `/automation/asset-files/:fileId` (added in routes.tsx); the
                                  *     destination page reads the param and pops the existing detail sheet.
                                  *

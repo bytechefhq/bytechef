@@ -1,0 +1,186 @@
+import {Input} from '@/components/Input/Input';
+import Switch from '@/components/Switch/Switch';
+import {Label} from '@/components/ui/label';
+import invalidateAgentQueries from '@/pages/automation/agents/utils/invalidateAgentQueries';
+import {
+    AiAgentChannel,
+    AiAgentElement,
+    useAddAiAgentElementMutation,
+    useDeleteAiAgentElementMutation,
+    useUpdateAiAgentElementMutation,
+} from '@/shared/middleware/graphql';
+import {useQueryClient} from '@tanstack/react-query';
+import {toast} from 'sonner';
+
+interface AgentApprovalSettingsProps {
+    agentId: string;
+    /** The agent's channels — approvals are delivered over these, so they are named rather than configured. */
+    channels: AiAgentChannel[];
+    elements: AiAgentElement[];
+}
+
+// Which channel types can carry an approval, mirroring ChannelDefinition.approvalDelivery on the server. schedule
+// has nobody to ask and workflowCall's caller is another workflow, so neither appears.
+const APPROVAL_DELIVERY_CHANNEL_LABELS: Record<string, string> = {
+    chat: 'Chat',
+    infobip: 'Infobip (WhatsApp)',
+    rocketchat: 'Rocket.Chat',
+    slack: 'Slack',
+    telegram: 'Telegram',
+    twilio: 'Twilio (WhatsApp)',
+    whatsapp: 'WhatsApp',
+};
+
+/**
+ * The agent's two independent HITL switches, rendered inside the Settings tab's toggle list rather than as a
+ * section of their own.
+ *
+ * <ul>
+ * <li><b>Agent may request approval</b> — the {@code APPROVAL_TOOL} row, an LLM-invocable "ask a human" tool.</li>
+ * <li><b>Tool approval</b> — the {@code APPROVAL_GATE} row, the master switch for the per-tool "Requires
+ * approval" flags set in the Tools section. With it off, {@code AiAgentWorkflowGenerator.buildToolSequence}
+ * emits every tool ungated; the flags stay on their rows, so switching it back on restores the gating.</li>
+ * </ul>
+ *
+ * <p>
+ * Both default OFF, which needs no default to be declared anywhere: absence of the row IS off. Approval
+ * channels are shared by the two mechanisms, so they show whenever either is on.
+ * </p>
+ */
+const AgentApprovalSettings = ({agentId, channels, elements}: AgentApprovalSettingsProps) => {
+    const deliveryChannelLabels = channels
+        .map((channel) => APPROVAL_DELIVERY_CHANNEL_LABELS[channel.channelType])
+        .filter((label): label is string => label != null);
+
+    const gateElement = elements.find((element) => element.kind === 'APPROVAL_GATE');
+    const approvalToolElement = elements.find((element) => element.kind === 'APPROVAL_TOOL');
+
+    const queryClient = useQueryClient();
+
+    const onError = (error: unknown) => toast.error(error instanceof Error ? error.message : 'Failed to save.');
+
+    const addAiAgentElementMutation = useAddAiAgentElementMutation({
+        onError,
+        onSuccess: () => invalidateAgentQueries(queryClient),
+    });
+
+    const updateAiAgentElementMutation = useUpdateAiAgentElementMutation({
+        onError,
+        onSuccess: () => invalidateAgentQueries(queryClient),
+    });
+
+    const deleteAiAgentElementMutation = useDeleteAiAgentElementMutation({
+        onError,
+        onSuccess: () => invalidateAgentQueries(queryClient),
+    });
+
+    const isBusy =
+        addAiAgentElementMutation.isPending ||
+        updateAiAgentElementMutation.isPending ||
+        deleteAiAgentElementMutation.isPending;
+
+    // Only ever updates: the input is unreachable until the gate toggle has created the row.
+    const handleGateExpiryBlur = (value: string) => {
+        if (!gateElement) {
+            return;
+        }
+
+        const trimmed = value.trim();
+
+        if (!trimmed) {
+            return;
+        }
+
+        const days = Number(trimmed);
+
+        if (!Number.isFinite(days) || days <= 0) {
+            return;
+        }
+
+        updateAiAgentElementMutation.mutate({
+            input: {
+                id: gateElement.id,
+                parameters: {approvalExpiresIn: Math.trunc(days), approvalExpiresInUnit: 'DAYS'},
+            },
+        });
+    };
+
+    const handleToolApprovalToggle = (checked: boolean) => {
+        if (checked && !gateElement) {
+            addAiAgentElementMutation.mutate({input: {agentId, kind: 'APPROVAL_GATE'}});
+
+            return;
+        }
+
+        if (!checked && gateElement) {
+            deleteAiAgentElementMutation.mutate({id: gateElement.id});
+        }
+    };
+
+    const handleRequestApprovalToggle = (checked: boolean) => {
+        if (checked && !approvalToolElement) {
+            addAiAgentElementMutation.mutate({input: {agentId, kind: 'APPROVAL_TOOL'}});
+
+            return;
+        }
+
+        if (!checked && approvalToolElement) {
+            deleteAiAgentElementMutation.mutate({id: approvalToolElement.id});
+        }
+    };
+
+    return (
+        <>
+            <Switch
+                checked={!!approvalToolElement}
+                description="Adds a tool the agent's LLM can call mid-turn to ask a human a question."
+                disabled={isBusy}
+                label="Agent may request approval"
+                onCheckedChange={handleRequestApprovalToggle}
+            />
+
+            <Switch
+                checked={!!gateElement}
+                description="Pauses tools marked “Requires approval” until a human approves them."
+                disabled={isBusy}
+                label="Tool approval"
+                onCheckedChange={handleToolApprovalToggle}
+            />
+
+            {gateElement && (
+                <div className="ml-0 space-y-1 sm:ml-8">
+                    <Label htmlFor="agent-approval-gate-expiry">Approval expires after (days)</Label>
+
+                    <Input
+                        className="sm:w-64"
+                        defaultValue={
+                            gateElement.parameters?.approvalExpiresIn != null
+                                ? String(gateElement.parameters.approvalExpiresIn)
+                                : ''
+                        }
+                        disabled={isBusy}
+                        id="agent-approval-gate-expiry"
+                        min={1}
+                        onBlur={(event) => handleGateExpiryBlur(event.target.value)}
+                        placeholder="4"
+                        type="number"
+                    />
+                </div>
+            )}
+
+            {/* Approvals are delivered over the agent's OWN channels — there is nothing to configure here, and
+                nothing that could drift from the channels the agent actually has. Both mechanisms deliver the
+                same way, so this belongs to neither toggle alone. */}
+
+            {(approvalToolElement || gateElement) && (
+                <p className="ml-0 text-sm text-muted-foreground sm:ml-8">
+                    {deliveryChannelLabels.length > 0
+                        ? `Approvals are delivered to the agent's channels: ${deliveryChannelLabels.join(', ')}.`
+                        : 'This agent has no channel that can carry an approval, so approvals fall back to the chat channel — invisible on a webhook or schedule-only agent.'}
+                </p>
+            )}
+        </>
+    );
+};
+
+export default AgentApprovalSettings;

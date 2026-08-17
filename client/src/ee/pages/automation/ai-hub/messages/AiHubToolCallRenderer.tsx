@@ -6,6 +6,7 @@ import {ProjectApi} from '@/shared/middleware/automation/configuration';
 import {
     AlertCircleIcon,
     BlocksIcon,
+    BotIcon,
     CheckCircle2Icon,
     ChevronDownIcon,
     ChevronRightIcon,
@@ -229,12 +230,12 @@ const SubagentBody = ({entry}: SpecialRendererProps) => {
 };
 
 /**
- * Renders the result of an attachTaskTool call as a compact "Attached: <Component> → <Action>" affordance instead of
+ * Renders the result of an attachChatTool call as a compact "Attached: <Component> → <Action>" affordance instead of
  * raw JSON. Falls through to the input-rendered args while the call is still in flight so the user sees what's being
  * attached before the result lands. Re-attach (replacedExistingTool=true on the hardened path) flips the headline to
  * "Reconfigured" so the chat thread doesn't read as if a new tool appeared every time the user adjusts parameters.
  */
-const AttachTaskToolBody = ({entry}: SpecialRendererProps) => {
+const AttachChatToolBody = ({entry}: SpecialRendererProps) => {
     const args = entry.args ?? {};
 
     const componentName = typeof args.componentName === 'string' ? args.componentName : undefined;
@@ -287,10 +288,10 @@ const AttachTaskToolBody = ({entry}: SpecialRendererProps) => {
 };
 
 /**
- * Counterpart to AttachTaskToolBody for removeTaskTool. Surfaces removed={true|false} explicitly so the LLM-emitted
+ * Counterpart to AttachChatToolBody for removeChatTool. Surfaces removed={true|false} explicitly so the LLM-emitted
  * "no matching tool found" path reads cleanly instead of as a generic-success.
  */
-const RemoveTaskToolBody = ({entry}: SpecialRendererProps) => {
+const RemoveChatToolBody = ({entry}: SpecialRendererProps) => {
     const args = entry.args ?? {};
 
     const componentName = typeof args.componentName === 'string' ? args.componentName : undefined;
@@ -381,14 +382,14 @@ const DefaultBody = ({entry}: SpecialRendererProps) => {
 };
 
 const SPECIAL_BODIES: Record<string, ComponentType<SpecialRendererProps>> = {
-    attachTaskTool: AttachTaskToolBody,
+    attachChatTool: AttachChatToolBody,
     createMemory: MemoryBody,
     dataAnalyst: SubagentBody,
     deleteMemory: MemoryBody,
     getMemory: MemoryBody,
     imageGenerator: SubagentBody,
     listMemories: MemoryBody,
-    removeTaskTool: RemoveTaskToolBody,
+    removeChatTool: RemoveChatToolBody,
     research: SubagentBody,
     runChatWorkflow: RunChatWorkflowBody,
     slideBuilder: SubagentBody,
@@ -400,6 +401,7 @@ const SPECIAL_BODIES: Record<string, ComponentType<SpecialRendererProps>> = {
 // as a compact clickable artifact link (name + kind) that re-opens the tab on click — the in-chat equivalent
 // of an artifact row in the left sidebar.
 const ARTIFACT_OPEN_META: Record<string, {icon: ComponentType<{className?: string}>; kind: string}> = {
+    openAiAgentTab: {icon: BotIcon, kind: 'AI Agent'},
     openCodeWorkflowTab: {icon: CodeIcon, kind: 'Code Workflow'},
     openCustomComponentTab: {icon: BlocksIcon, kind: 'Custom Component'},
     openDataTableTab: {icon: DatabaseIcon, kind: 'Data Table'},
@@ -408,15 +410,15 @@ const ARTIFACT_OPEN_META: Record<string, {icon: ComponentType<{className?: strin
     openWorkflowTab: {icon: WorkflowIcon, kind: 'Workflow'},
 };
 
-// Exported so history rehydration (useSwitchTask) can skip these — their link cards are rebuilt from the
-// durable artifact rows instead, which also covers tasks recorded before tool events were persisted.
+// Exported so history rehydration (useSwitchChat) can skip these — their link cards are rebuilt from the
+// durable artifact rows instead, which also covers chats recorded before tool events were persisted.
 export const ARTIFACT_OPEN_TOOL_NAMES: ReadonlySet<string> = new Set(Object.keys(ARTIFACT_OPEN_META));
 
 /**
  * Live openCodeWorkflowTab tool calls carry `language` directly, but REHYDRATED cards (see
- * useSwitchTask's artifactToOpenToolCall) only carry `{name, projectId}` — the artifact row never stashed
+ * useSwitchChat's artifactToOpenToolCall) only carry `{name, projectId}` — the artifact row never stashed
  * the language (the server-side recorder only stores projectId + name). Resolve it the same way the
- * sidebar's quick-open does (AiHubTasksSidebar.openCodeWorkflowArtifact): fetch the project and read its
+ * sidebar's quick-open does (AiHubChatsSidebar.openCodeWorkflowArtifact): fetch the project and read its
  * `codeWorkflowLanguage`. A missing language means the project is no longer code-backed (e.g. converted
  * back to a visual workflow) — surface that as a toast instead of opening a tab with a bogus language.
  */
@@ -463,6 +465,8 @@ const openArtifactTab = (toolName: string, args: Record<string, unknown> | undef
         } else {
             void openCodeWorkflowArtifact(args.projectId, name);
         }
+    } else if (toolName === 'openAiAgentTab' && args?.aiAgentId != null) {
+        tabsStore.openAiAgentTab(String(args.aiAgentId), name);
     }
 };
 

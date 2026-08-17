@@ -65,6 +65,13 @@ const AiHubComposer = () => {
         }
     };
 
+    // AI Agents aren't a `ReferencedResourceKindType` composer reference (see the `onSelectAiAgent` doc on
+    // ResourcePickerMenuPropsI) — @-mentioning one only opens it as a resource-panel tab, it isn't added to
+    // `aiHubComposerStore.referencedResources`.
+    const handleAgentSelect = (agent: {id: string; name: string}) => {
+        aiHubTabsStore.getState().openAiAgentTab(agent.id, agent.name);
+    };
+
     return (
         // Tooltip wraps the menu (not just the button) so the Radix Tooltip.Root is an ancestor of both the
         // TooltipTrigger — which `ResourcePickerMenu` nests inside its PopoverTrigger asChild — and the
@@ -73,6 +80,7 @@ const AiHubComposer = () => {
             <ResourcePickerMenu
                 environmentId={environmentId ?? DEVELOPMENT_ENVIRONMENT}
                 onSelect={handleResourceSelect}
+                onSelectAiAgent={handleAgentSelect}
                 trigger={
                     <TooltipTrigger asChild>
                         <button

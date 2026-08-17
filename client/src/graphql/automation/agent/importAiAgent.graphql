@@ -1,0 +1,6 @@
+mutation importAiAgent($workspaceId: ID!, $json: String!) {
+    importAiAgent(workspaceId: $workspaceId, json: $json) {
+        id
+        title
+    }
+}

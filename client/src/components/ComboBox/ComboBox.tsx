@@ -16,6 +16,9 @@ export type ComboBoxItemType = {
 };
 
 export interface ComboBoxProps {
+    /** Accessible name for the trigger. Its visible content is the selected item (or "Select..."), which says
+     *  nothing about what is being chosen, so a nearby <Label> alone leaves the control unnamed. */
+    ariaLabel?: string;
     disabled?: boolean;
     emptyMessage?: string;
     items: ComboBoxItemType[];
@@ -29,6 +32,7 @@ export interface ComboBoxProps {
 }
 
 const ComboBox: FC<ComboBoxProps> = ({
+    ariaLabel,
     disabled,
     emptyMessage,
     items,
@@ -75,6 +79,7 @@ const ComboBox: FC<ComboBoxProps> = ({
             <PopoverTrigger asChild onBlur={onBlur}>
                 <Button
                     aria-expanded={open}
+                    aria-label={ariaLabel}
                     className="w-full justify-between"
                     disabled={disabled}
                     name={name}

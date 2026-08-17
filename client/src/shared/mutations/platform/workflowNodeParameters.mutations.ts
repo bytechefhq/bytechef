@@ -10,20 +10,51 @@ import {
     ClusterElementDynamicPropertyKeys,
     WorkflowNodeDynamicPropertyKeys,
 } from '@/shared/queries/platform/workflowNodeDynamicProperties.queries';
-import {WorkflowNodeOptionKeys} from '@/shared/queries/platform/workflowNodeOptions.queries';
+import {
+    WorkflowNodeOptionKeys,
+    isDependentOptionsQueryKey,
+} from '@/shared/queries/platform/workflowNodeOptions.queries';
 import {QueryClient, useMutation, useQueryClient} from '@tanstack/react-query';
 
 const clusterElementOptionsQueryKey = ['clusterElementOptions'] as const;
 
+// The key is built inline in PropertyComboBox rather than by a shared builder, so its dependency marker is
+// read here instead of through isDependentOptionsQueryKey.
+function isDependentClusterElementOptionsQueryKey(queryKey: readonly unknown[]): boolean {
+    const [, request] = queryKey;
+
+    if (request && typeof request === 'object') {
+        return !!(request as {lookupDependsOnValues?: unknown[]}).lookupDependsOnValues?.length;
+    }
+
+    return true;
+}
+
 // Dependent queries read their inputs from the persisted workflow on the backend, so any
 // parameter write can shift their results. Invalidate here to force a refetch instead of
 // serving cached (possibly empty) responses keyed by a since-stale dependency snapshot.
+//
+// Options queries are filtered down to the ones that actually declare dependencies. Prefix-matching all of
+// them refetches every option list in the panel on every write — visible as each row of an array property
+// flashing "Refetching…" when a sibling row is added, for options that cannot have changed.
 function invalidateDependentQueries(queryClient: QueryClient) {
     queryClient.invalidateQueries({queryKey: WorkflowNodeDynamicPropertyKeys.workflowNodeDynamicProperties});
     queryClient.invalidateQueries({queryKey: ClusterElementDynamicPropertyKeys.clusterElementDynamicProperties});
-    queryClient.invalidateQueries({queryKey: WorkflowNodeOptionKeys.workflowNodeOptions});
-    queryClient.invalidateQueries({queryKey: WorkflowNodeOptionKeys.clusterElementNodeOptions});
-    queryClient.invalidateQueries({queryKey: clusterElementOptionsQueryKey});
+
+    queryClient.invalidateQueries({
+        predicate: ({queryKey}) => isDependentOptionsQueryKey(queryKey),
+        queryKey: WorkflowNodeOptionKeys.workflowNodeOptions,
+    });
+
+    queryClient.invalidateQueries({
+        predicate: ({queryKey}) => isDependentOptionsQueryKey(queryKey),
+        queryKey: WorkflowNodeOptionKeys.clusterElementNodeOptions,
+    });
+
+    queryClient.invalidateQueries({
+        predicate: ({queryKey}) => isDependentClusterElementOptionsQueryKey(queryKey),
+        queryKey: clusterElementOptionsQueryKey,
+    });
 }
 
 interface DeleteWorkflowNodeParameterProps {

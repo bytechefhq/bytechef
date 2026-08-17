@@ -1,56 +1,57 @@
-import ToolConfigDialog, {
-    ToolConfigDialogTargetI,
-    ToolConfigDialogValuesI,
-} from '@/ee/pages/automation/ai-hub/tools/dialogs/ToolConfigDialog';
-import useTaskToolsCache from '@/ee/pages/automation/ai-hub/tools/hooks/useTaskToolsCache';
-import {AttachAiHubTaskToolInput, useAttachAiHubTaskToolMutation} from '@/shared/middleware/graphql';
+import useChatToolsCache from '@/ee/pages/automation/ai-hub/tools/hooks/useChatToolsCache';
+import ComponentConfigDialog, {
+    ComponentConfigDialogTargetI,
+    ComponentConfigDialogValuesI,
+} from '@/shared/components/component-config/ComponentConfigDialog';
+import {AttachAiHubChatToolInput, useAttachAiHubChatToolMutation} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 
-// Re-export the shared shape under the task-flavoured name so existing consumers
+// Re-export the shared shape under the chat-flavoured name so existing consumers
 // (AiHubComposer) keep their import path while sharing the underlying interface with the
 // generalised dialog. Re-exporting via `export type` rather than a fresh interface because adding new
 // fields here would silently diverge from the generalised dialog's expectations.
-export type {ToolConfigDialogTargetI as TaskToolDialogTargetI};
+export type {ComponentConfigDialogTargetI as ChatToolDialogTargetI};
 
-interface TaskToolDialogProps {
-    taskId: string;
+interface ChatToolDialogProps {
+    chatId: string;
     onClose: () => void;
     open: boolean;
-    target: ToolConfigDialogTargetI | null;
+    target: ComponentConfigDialogTargetI | null;
     workspaceId: number;
 }
 
 /**
- * Thin wrapper around {@link ToolConfigDialog} that wires the attach-task-tool mutation. Mirrors the
- * chat-driven {@code AttachTaskToolToolCallback} affordance — same persistence shape, same idempotency
- * semantics — so the LLM and the user click into the same {@code ai_hub_task_tool} row.
+ * Thin wrapper around {@link ComponentConfigDialog} that wires the attach-chat-tool mutation. Mirrors the
+ * chat-driven {@code AttachChatToolToolCallback} affordance — same persistence shape, same idempotency
+ * semantics — so the LLM and the user click into the same {@code ai_hub_chat_tool} row.
  *
  * <p>
- * Submit fires {@code attachAiHubTaskTool} with the dialog's sanitized values. Success invalidates the
- * task-tools cache so the in-chat resource panel reflects the new attachment without a manual refresh.
+ * Submit fires {@code attachAiHubChatTool} with the dialog's sanitized values. Success invalidates the
+ * chat-tools cache so the in-chat resource panel reflects the new attachment without a manual refresh.
  * The dialog itself owns the connection picker, properties form, sanitization, and create-new-connection
- * affordance — see {@link ToolConfigDialog}.
+ * affordance — see {@link ComponentConfigDialog}.
  * </p>
  */
-const TaskToolDialog = ({onClose, open, target, taskId, workspaceId}: TaskToolDialogProps) => {
+const ChatToolDialog = ({chatId, onClose, open, target, workspaceId}: ChatToolDialogProps) => {
     const environmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
-    const {invalidate} = useTaskToolsCache();
+    const {invalidate} = useChatToolsCache();
 
-    const attachMutation = useAttachAiHubTaskToolMutation({
+    const attachMutation = useAttachAiHubChatToolMutation({
         onSuccess: () => {
-            invalidate(taskId, workspaceId);
+            invalidate(chatId, workspaceId);
 
             onClose();
         },
     });
 
-    const handleSubmit = async (values: ToolConfigDialogValuesI) => {
+    const handleSubmit = async (values: ComponentConfigDialogValuesI) => {
         if (target == null) {
             return;
         }
 
-        const input: AttachAiHubTaskToolInput = {
+        const input: AttachAiHubChatToolInput = {
+            chatId,
             clusterElementName: target.clusterElementName,
             componentName: target.componentName,
             componentVersion: target.componentVersion,
@@ -59,7 +60,6 @@ const TaskToolDialog = ({onClose, open, target, taskId, workspaceId}: TaskToolDi
             // Cast through unknown to satisfy the Any-scalar codegen output. Server treats as Map<String, ?>.
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             parameters: values.parameters as any,
-            taskId,
             workspaceId: String(workspaceId),
         };
 
@@ -67,7 +67,7 @@ const TaskToolDialog = ({onClose, open, target, taskId, workspaceId}: TaskToolDi
     };
 
     return (
-        <ToolConfigDialog
+        <ComponentConfigDialog
             description={
                 target?.description ?? 'Configure a connection and default parameters. The agent can override per call.'
             }
@@ -83,4 +83,4 @@ const TaskToolDialog = ({onClose, open, target, taskId, workspaceId}: TaskToolDi
     );
 };
 
-export default TaskToolDialog;
+export default ChatToolDialog;

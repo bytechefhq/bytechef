@@ -1,0 +1,6 @@
+query aiAgentTags($workspaceId: ID!) {
+    aiAgentTags(workspaceId: $workspaceId) {
+        id
+        name
+    }
+}

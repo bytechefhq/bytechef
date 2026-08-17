@@ -16,6 +16,7 @@ import {
 } from '@/shared/mutations/automation/projectDeployments.mutations';
 import {ProjectDeploymentTagKeys} from '@/shared/queries/automation/projectDeploymentTags.queries';
 import {ProjectDeploymentKeys} from '@/shared/queries/automation/projectDeployments.queries';
+import isInteractiveElementClick from '@/shared/util/interactive-element-utils';
 import {useQueryClient} from '@tanstack/react-query';
 import {ChevronDownIcon} from 'lucide-react';
 import {useCallback, useRef, useState} from 'react';
@@ -83,24 +84,11 @@ const ProjectDeploymentListItem = ({projectDeployment, remainingTags}: ProjectDe
     };
 
     const handleProjectDeploymentListItemClick = useCallback((event: React.MouseEvent) => {
-        const target = event.target as HTMLElement;
-
-        const interactiveSelectors = [
-            '[data-interactive]',
-            '[role="menuitem"]',
-            '.dropdown-menu-item',
-            '[data-radix-dropdown-menu-trigger]',
-            '[data-radix-collapsible-trigger]',
-            'button',
-            'input',
-            'svg',
-        ].join(', ');
-
-        if (target.closest(interactiveSelectors)) {
+        if (isInteractiveElementClick(event.target)) {
             return;
         }
 
-        if (workflowsCollapsibleTriggerRef.current?.contains(target)) {
+        if (workflowsCollapsibleTriggerRef.current?.contains(event.target as Node)) {
             return;
         }
 

@@ -1,6 +1,13 @@
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import exportAgent from '@/pages/automation/agents/utils/agentImportExport';
 import invalidateAgentQueries from '@/pages/automation/agents/utils/invalidateAgentQueries';
 import ProjectDeploymentDialog from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialog';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
@@ -14,8 +21,9 @@ import {
     useUpdateAiAgentTagsMutation,
 } from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
+import isInteractiveElementClick from '@/shared/util/interactive-element-utils';
 import {useQueryClient} from '@tanstack/react-query';
-import {EllipsisVerticalIcon, PencilIcon, RocketIcon, SendIcon, Trash2Icon} from 'lucide-react';
+import {DownloadIcon, EllipsisVerticalIcon, PencilIcon, RocketIcon, SendIcon, Trash2Icon} from 'lucide-react';
 import {useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {toast} from 'sonner';
@@ -81,11 +89,11 @@ const AgentListItem = ({agent}: AgentListItemProps) => {
         },
     });
 
-    // Same derivation as the detail header: an agent has `lastPublishedVersion` plus an `unpublishedChanges`
-    // flag rather than a status column, so the draft is the next version up and a never-published agent
-    // reads V1 DRAFT.
-    const isDraft = agent.unpublishedChanges || agent.lastPublishedVersion === 0;
-    const displayVersion = isDraft ? agent.lastPublishedVersion + 1 : agent.lastPublishedVersion;
+    // The published version wins whenever there is one, even with unpublished edits pending: what the pill
+    // reports is what is deployed and running. Only a never-published agent reads as a draft, and it reads V1
+    // rather than V0 because its draft is the version that publishing would mint.
+    const isDraft = agent.lastPublishedVersion === 0;
+    const displayVersion = isDraft ? 1 : agent.lastPublishedVersion;
 
     const deployable = agent.lastPublishedVersion > 0;
 
@@ -93,10 +101,29 @@ const AgentListItem = ({agent}: AgentListItemProps) => {
         deleteAgentMutation.mutate({id: agent.id});
     };
 
+    const handleExportClick = async () => {
+        try {
+            await exportAgent(agent.id, agent.title);
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : 'Failed to export the agent.');
+        }
+    };
+
+    // The row opens the agent unless the click reached a control that means something else. Guarding the
+    // controls instead — stopPropagation on the column that holds them — also swallowed every click on the
+    // empty space around them, so most of the row's right-hand side did nothing.
+    const handleClick = (event: React.MouseEvent) => {
+        if (isInteractiveElementClick(event.target)) {
+            return;
+        }
+
+        navigate(`/automation/agents/${agent.id}`);
+    };
+
     return (
         <div
-            className="flex cursor-pointer items-center justify-between rounded-md border border-border/50 bg-background p-4"
-            onClick={() => navigate(`/automation/agents/${agent.id}`)}
+            className="flex cursor-pointer items-center justify-between rounded-md border border-border/50 bg-background p-3"
+            onClick={handleClick}
         >
             <div className="flex min-w-0 flex-1 flex-col gap-1">
                 <span className="font-semibold">{agent.title}</span>
@@ -122,8 +149,11 @@ const AgentListItem = ({agent}: AgentListItemProps) => {
                 </div>
             </div>
 
-            <div className="flex shrink-0 items-center gap-4" onClick={(event) => event.stopPropagation()}>
-                <div className="flex flex-col items-end gap-1">
+            <div className="flex shrink-0 items-center gap-4">
+                {/* gap-y-4 matches ProjectListItem's right-hand column, so the published date sits the same
+                    distance below the version badge on both lists. */}
+
+                <div className="flex flex-col items-end gap-y-4">
                     <div className="flex items-center gap-2">
                         <Badge
                             className="flex space-x-1 bg-surface-neutral-primary"
@@ -168,6 +198,12 @@ const AgentListItem = ({agent}: AgentListItemProps) => {
                         <DropdownMenuItem onClick={() => navigate(`/automation/agents/${agent.id}`)}>
                             <PencilIcon /> Edit
                         </DropdownMenuItem>
+
+                        <DropdownMenuItem onClick={handleExportClick}>
+                            <DownloadIcon /> Export
+                        </DropdownMenuItem>
+
+                        <DropdownMenuSeparator />
 
                         <DropdownMenuItem
                             disabled={deleteAgentMutation.isPending}

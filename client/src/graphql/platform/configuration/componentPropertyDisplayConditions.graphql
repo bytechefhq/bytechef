@@ -1,0 +1,15 @@
+query componentPropertyDisplayConditions(
+    $componentName: String!
+    $componentVersion: Int!
+    $operationName: String!
+    $operationType: String!
+    $parameters: Map
+) {
+    componentPropertyDisplayConditions(
+        componentName: $componentName
+        componentVersion: $componentVersion
+        operationName: $operationName
+        operationType: $operationType
+        parameters: $parameters
+    )
+}

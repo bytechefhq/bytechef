@@ -20,50 +20,52 @@ export type AiHubTabType =
     | {id: string; kind: 'knowledgeBase'; knowledgeBaseId: string; name: string}
     | {id: string; kind: 'skill'; name: string; skillId: string}
     | {customComponentId: string; id: string; kind: 'customComponent'; name: string}
-    | {id: string; kind: 'codeWorkflow'; language: string; name: string; projectId: string};
+    | {id: string; kind: 'codeWorkflow'; language: string; name: string; projectId: string}
+    | {aiAgentId: string; id: string; kind: 'aiAgent'; name: string};
 
 /**
- * Per-task snapshot of the tabs view. Keyed by `taskId` in
- * {@link AiHubTabsStateI.snapshotsByTaskId} so that returning to a previous task
+ * Per-chat snapshot of the tabs view. Keyed by `chatId` in
+ * {@link AiHubTabsStateI.snapshotsByChatId} so that returning to a previous chat
  * restores the exact tabs the user had open — AND whether the resource (right) panel was open —
- * instead of inheriting that state from whatever task was most recently active. Persisted via the
- * `persist` middleware below so a page refresh restores the same per-task view.
+ * instead of inheriting that state from whatever chat was most recently active. Persisted via the
+ * `persist` middleware below so a page refresh restores the same per-chat view.
  *
- * The right-panel open/closed state IS snapshotted per task ({@link rightPanelOpen}): switching back
- * to a task restores the panel exactly as the user left it for that task, and a refresh restores it
- * too. (This was previously a single global field forced closed on every switch; it is now per task by
- * design — the user explicitly wants each task to remember its own panel state.)
+ * The right-panel open/closed state IS snapshotted per chat ({@link rightPanelOpen}): switching back
+ * to a chat restores the panel exactly as the user left it for that chat, and a refresh restores it
+ * too. (This was previously a single global field forced closed on every switch; it is now per chat by
+ * design — the user explicitly wants each chat to remember its own panel state.)
  */
-interface TaskTabsSnapshotI {
+interface ChatTabsSnapshotI {
     activeTabId: string | undefined;
     openTabs: AiHubTabType[];
     rightPanelOpen: boolean;
 }
 
 interface AiHubTabsStateI {
-    /** The task whose tabs are currently mirrored to {@link openTabs} / {@link activeTabId}.
-     * `undefined` means home view. Updated via {@link setActiveTaskId}, which is responsible for
-     * snapshotting the previous task's tabs and restoring the new task's tabs. */
-    activeTaskId: number | undefined;
+    /** The chat whose tabs are currently mirrored to {@link openTabs} / {@link activeTabId}.
+     * `undefined` means home view. Updated via {@link setActiveChatId}, which is responsible for
+     * snapshotting the previous chat's tabs and restoring the new chat's tabs. */
+    activeChatId: number | undefined;
     activeTabId: string | undefined;
     openTabs: AiHubTabType[];
-    /** Whether the resource/right panel is shown for the ACTIVE task. Snapshotted per task by
-     * {@link setActiveTaskId} (into {@link snapshotsByTaskId}) and restored on every switch, so each task
+    /** Whether the resource/right panel is shown for the ACTIVE chat. Snapshotted per chat by
+     * {@link setActiveChatId} (into {@link snapshotsByChatId}) and restored on every switch, so each chat
      * remembers its own panel state. Persisted across reloads, so a refresh restores it too. */
     rightPanelOpen: boolean;
-    snapshotsByTaskId: Record<number, TaskTabsSnapshotI>;
-    /** Whether the AI Hub Tasks sidebar is shown as a thin rail (`true`) rather than its full
+    snapshotsByChatId: Record<number, ChatTabsSnapshotI>;
+    /** Whether the AI Hub Chats sidebar is shown as a thin rail (`true`) rather than its full
      * form. Only meaningful while the resource panel is open — that's the only layout state
      * where the sidebar would otherwise be hidden entirely. Transient: never persisted. */
-    tasksSidebarCollapsed: boolean;
-    /** Transient hover-preview ("peek") of the Tasks sidebar while it's collapsed to the rail.
+    chatsSidebarCollapsed: boolean;
+    /** Transient hover-preview ("peek") of the Chats sidebar while it's collapsed to the rail.
      * Set true when the pointer enters the rail and false when it leaves the previewed sidebar, so the
      * full sidebar floats over the content as an overlay (no layout reflow) and collapses back to the
      * rail on mouse-out. Clicking the header's pin control promotes the peek to a pinned-open sidebar
-     * ({@link tasksSidebarCollapsed} = false). Never persisted. */
-    tasksSidebarPeeking: boolean;
+     * ({@link chatsSidebarCollapsed} = false). Never persisted. */
+    chatsSidebarPeeking: boolean;
 
     closeTab: (tabId: string) => void;
+    openAiAgentTab: (aiAgentId: string, name: string) => string;
     openCodeWorkflowTab: (projectId: string, language: string, name: string) => string;
     openCustomComponentTab: (customComponentId: string, name: string) => string;
     openDataTableTab: (dataTableId: string, name: string) => string;
@@ -73,11 +75,11 @@ interface AiHubTabsStateI {
     openWorkflowExecutionTab: (workflowExecutionId: number, name: string) => string;
     openWorkflowTab: (workflowId: string, projectId: string, projectWorkflowId: number, name: string) => string;
     reset: () => void;
-    setActiveTaskId: (taskId: number | undefined) => void;
+    setActiveChatId: (chatId: number | undefined) => void;
     setActiveTab: (tabId: string) => void;
     setRightPanelOpen: (open: boolean) => void;
-    setTasksSidebarCollapsed: (collapsed: boolean) => void;
-    setTasksSidebarPeeking: (peeking: boolean) => void;
+    setChatsSidebarCollapsed: (collapsed: boolean) => void;
+    setChatsSidebarPeeking: (peeking: boolean) => void;
     setViewMode: (tabId: string, mode: AiHubViewModeType) => void;
 }
 
@@ -132,13 +134,13 @@ export const aiHubTabsStore = create<AiHubTabsStateI>()(
     devtools(
         persist(
             (set) => ({
-                activeTaskId: undefined,
+                activeChatId: undefined,
                 activeTabId: undefined,
                 openTabs: [],
                 rightPanelOpen: false,
-                snapshotsByTaskId: {},
-                tasksSidebarCollapsed: true,
-                tasksSidebarPeeking: false,
+                snapshotsByChatId: {},
+                chatsSidebarCollapsed: true,
+                chatsSidebarPeeking: false,
 
                 closeTab: (tabId) =>
                     set((state) => {
@@ -472,105 +474,135 @@ export const aiHubTabsStore = create<AiHubTabsStateI>()(
                     return tabIdToReturn;
                 },
 
+                openAiAgentTab: (aiAgentId, name) => {
+                    let tabIdToReturn = '';
+
+                    set((state) => {
+                        const existing = state.openTabs.find(
+                            (tab): tab is Extract<AiHubTabType, {kind: 'aiAgent'}> =>
+                                tab.kind === 'aiAgent' && tab.aiAgentId === aiAgentId
+                        );
+
+                        if (existing) {
+                            tabIdToReturn = existing.id;
+
+                            return {...state, activeTabId: existing.id, rightPanelOpen: true};
+                        }
+
+                        const newTab: AiHubTabType = {aiAgentId, id: getRandomId(), kind: 'aiAgent', name};
+
+                        tabIdToReturn = newTab.id;
+
+                        return {
+                            ...state,
+                            activeTabId: newTab.id,
+                            openTabs: [...state.openTabs, newTab],
+                            rightPanelOpen: true,
+                        };
+                    });
+
+                    return tabIdToReturn;
+                },
+
                 reset: () =>
                     set({
-                        activeTaskId: undefined,
+                        activeChatId: undefined,
                         activeTabId: undefined,
                         openTabs: [],
                         rightPanelOpen: false,
-                        snapshotsByTaskId: {},
-                        tasksSidebarCollapsed: true,
-                        tasksSidebarPeeking: false,
+                        snapshotsByChatId: {},
+                        chatsSidebarCollapsed: true,
+                        chatsSidebarPeeking: false,
                     }),
 
                 /*
-                 * Snapshot/restore the tabs view as the active task changes.
+                 * Snapshot/restore the tabs view as the active chat changes.
                  *
-                 * When the user switches tasks (sidebar click, deep-link nav, auto-create on first
+                 * When the user switches chats (sidebar click, deep-link nav, auto-create on first
                  * message), this method is the single integration point AiHub.tsx calls. It:
                  *
                  *   1. Captures the current view (`openTabs`, `activeTabId`, `rightPanelOpen`) into
-                 *      `snapshotsByTaskId[previousActiveTaskId]` so the tabs the user had open
-                 *      for that task survive the swap. Skipped when the previous active task is
-                 *      `undefined` (home view) — home doesn't carry per-task tabs.
+                 *      `snapshotsByChatId[previousActiveChatId]` so the tabs the user had open
+                 *      for that chat survive the swap. Skipped when the previous active chat is
+                 *      `undefined` (home view) — home doesn't carry per-chat tabs.
                  *
-                 *   2. Loads the snapshot for the new task if one exists, otherwise resets the active
+                 *   2. Loads the snapshot for the new chat if one exists, otherwise resets the active
                  *      view to empty (no tabs, panel closed). The empty case is the first time the user opens
-                 *      a task in this session — they expect the resource panel to start clean, not to
-                 *      inherit the previous task's tabs.
+                 *      a chat in this session — they expect the resource panel to start clean, not to
+                 *      inherit the previous chat's tabs.
                  *
-                 *   3. Treats no-op transitions (same taskId in and out) as a true no-op so a stray
+                 *   3. Treats no-op transitions (same chatId in and out) as a true no-op so a stray
                  *      effect re-fire doesn't clobber tabs the user just opened.
                  *
                  * Snapshots persist across browser reloads via the {@code persist} middleware below — the
-                 * `snapshotsByTaskId` field is written to `localStorage` (key
+                 * `snapshotsByChatId` field is written to `localStorage` (key
                  * `bytechef.ai-hub.tabs`) on every change and rehydrated on store creation. On cold
-                 * load with a deep-linked `/tasks/:id`, `AiHub.tsx` calls
-                 * `setActiveTaskId(:id)`, which hits the existing snapshot lookup below and restores
-                 * the previously open tabs for that task — including whether the resource panel was open
-                 * (the snapshot now carries {@link TaskTabsSnapshotI.rightPanelOpen}).
+                 * load with a deep-linked `/chats/:id`, `AiHub.tsx` calls
+                 * `setActiveChatId(:id)`, which hits the existing snapshot lookup below and restores
+                 * the previously open tabs for that chat — including whether the resource panel was open
+                 * (the snapshot now carries {@link ChatTabsSnapshotI.rightPanelOpen}).
                  */
-                setActiveTaskId: (taskId) =>
+                setActiveChatId: (chatId) =>
                     set((state) => {
-                        if (state.activeTaskId === taskId) {
+                        if (state.activeChatId === chatId) {
                             return state;
                         }
 
-                        const nextSnapshots = {...state.snapshotsByTaskId};
+                        const nextSnapshots = {...state.snapshotsByChatId};
 
-                        if (state.activeTaskId != null) {
-                            nextSnapshots[state.activeTaskId] = {
+                        if (state.activeChatId != null) {
+                            nextSnapshots[state.activeChatId] = {
                                 activeTabId: state.activeTabId,
                                 openTabs: state.openTabs,
                                 rightPanelOpen: state.rightPanelOpen,
                             };
                         }
 
-                        const restored = taskId != null ? nextSnapshots[taskId] : undefined;
+                        const restored = chatId != null ? nextSnapshots[chatId] : undefined;
 
-                        // Home → task hand-off: when the user is on the home view (no active
-                        // task), they can still open tabs by attaching artifacts in the composer
+                        // Home → chat hand-off: when the user is on the home view (no active
+                        // chat), they can still open tabs by attaching artifacts in the composer
                         // (`@`-mention a file, plus-button menu pick, etc.). Sending a message auto-creates
-                        // a task and triggers this transition. The user's mental model is "the
-                        // artifact I attached is part of the task I just started", so we INHERIT
-                        // the home-view tabs into the new task instead of resetting to empty.
-                        // Subsequent task→task switches still snapshot/restore as normal —
+                        // a chat and triggers this transition. The user's mental model is "the
+                        // artifact I attached is part of the chat I just started", so we INHERIT
+                        // the home-view tabs into the new chat instead of resetting to empty.
+                        // Subsequent chat→chat switches still snapshot/restore as normal —
                         // this carry-over only fires on the special undefined→<convoId> initial transition.
-                        const isHomeToTask = state.activeTaskId == null && taskId != null;
+                        const isHomeToChat = state.activeChatId == null && chatId != null;
 
-                        if (restored == null && isHomeToTask) {
+                        if (restored == null && isHomeToChat) {
                             return {
                                 ...state,
-                                activeTaskId: taskId,
-                                snapshotsByTaskId: nextSnapshots,
+                                activeChatId: chatId,
+                                snapshotsByChatId: nextSnapshots,
                                 // openTabs / activeTabId retained from current state (carry-over of the
                                 // home-view tabs). rightPanelOpen is likewise carried over via `...state`,
-                                // so a panel the user opened on the home view stays open in the new task.
+                                // so a panel the user opened on the home view stays open in the new chat.
                                 // Rail collapsed: see the comment on the default-branch return below.
-                                tasksSidebarCollapsed: true,
-                                tasksSidebarPeeking: false,
+                                chatsSidebarCollapsed: true,
+                                chatsSidebarPeeking: false,
                             };
                         }
 
                         return {
                             ...state,
-                            activeTaskId: taskId,
+                            activeChatId: chatId,
                             activeTabId: restored?.activeTabId,
                             openTabs: restored?.openTabs ?? [],
-                            // Restore the resource panel exactly as the user left it for this task. A task
+                            // Restore the resource panel exactly as the user left it for this chat. A chat
                             // with no snapshot yet (first open this session, or going home) lands closed.
-                            // Per-task by design: switching back to a task brings its panel state with it,
+                            // Per-chat by design: switching back to a chat brings its panel state with it,
                             // and a refresh restores it via the persisted snapshot.
                             rightPanelOpen: restored?.rightPanelOpen ?? false,
-                            snapshotsByTaskId: nextSnapshots,
-                            // Every task switch resets the Tasks sidebar to its collapsed (rail) default.
+                            snapshotsByChatId: nextSnapshots,
+                            // Every chat switch resets the Chats sidebar to its collapsed (rail) default.
                             // The flag is global, but the sidebar is only clickable while VISIBLE — and
                             // with a resource panel open, "visible" means the user expanded it
-                            // (`tasksSidebarCollapsed: false`). Without this reset, switching to another
-                            // task whose snapshot also has the resource panel open would inherit that
-                            // stale `false` and leave the full sidebar covering the new task's panels.
-                            tasksSidebarCollapsed: true,
-                            tasksSidebarPeeking: false,
+                            // (`chatsSidebarCollapsed: false`). Without this reset, switching to another
+                            // chat whose snapshot also has the resource panel open would inherit that
+                            // stale `false` and leave the full sidebar covering the new chat's panels.
+                            chatsSidebarCollapsed: true,
+                            chatsSidebarPeeking: false,
                         };
                     }),
 
@@ -591,18 +623,18 @@ export const aiHubTabsStore = create<AiHubTabsStateI>()(
                         // Reset the rail flag to collapsed so the NEXT resource-panel open starts as a
                         // thin rail again (the minimal, out-of-the-way default) rather than inheriting
                         // a stale expanded state from an earlier session of the panel.
-                        tasksSidebarCollapsed: open ? state.tasksSidebarCollapsed : true,
+                        chatsSidebarCollapsed: open ? state.chatsSidebarCollapsed : true,
                         // A peek only exists while the rail is showing; closing the panel removes the rail,
                         // so clear any in-progress preview.
-                        tasksSidebarPeeking: open ? state.tasksSidebarPeeking : false,
+                        chatsSidebarPeeking: open ? state.chatsSidebarPeeking : false,
                     })),
 
-                setTasksSidebarCollapsed: (collapsed) =>
+                setChatsSidebarCollapsed: (collapsed) =>
                     // Collapsing or pinning the sidebar settles its resting state, so any in-progress hover
                     // preview is no longer meaningful — clear it so a stale peek can't linger on top.
-                    set((state) => ({...state, tasksSidebarCollapsed: collapsed, tasksSidebarPeeking: false})),
+                    set((state) => ({...state, chatsSidebarCollapsed: collapsed, chatsSidebarPeeking: false})),
 
-                setTasksSidebarPeeking: (peeking) => set((state) => ({...state, tasksSidebarPeeking: peeking})),
+                setChatsSidebarPeeking: (peeking) => set((state) => ({...state, chatsSidebarPeeking: peeking})),
 
                 setViewMode: (tabId, mode) =>
                     set((state) => ({
@@ -614,10 +646,10 @@ export const aiHubTabsStore = create<AiHubTabsStateI>()(
             }),
             {
                 /*
-                 * Only `snapshotsByTaskId` is persisted across browser reloads. The active
-                 * mirror fields (`activeTaskId` / `activeTabId` / `openTabs` / `rightPanelOpen`)
-                 * are deliberately re-derived on every mount via the `setActiveTaskId` call in
-                 * AiHub.tsx — driven by the URL's `:taskId` param. Persisting the active
+                 * Only `snapshotsByChatId` is persisted across browser reloads. The active
+                 * mirror fields (`activeChatId` / `activeTabId` / `openTabs` / `rightPanelOpen`)
+                 * are deliberately re-derived on every mount via the `setActiveChatId` call in
+                 * AiHub.tsx — driven by the URL's `:chatId` param. Persisting the active
                  * mirror too would create a brief visual flash on cold-load: the persisted active values
                  * would render before the URL→store sync effect catches up and replaces them with the
                  * URL-derived snapshot.
@@ -630,31 +662,31 @@ export const aiHubTabsStore = create<AiHubTabsStateI>()(
                 name: 'bytechef.ai-hub.tabs',
                 /*
                  * Persist BOTH the active state (`openTabs`, `activeTabId`, `rightPanelOpen`,
-                 * `activeTaskId`) and the per-task snapshots map. Snapshots are only
-                 * written when the user transitions AWAY from a task, so without persisting
-                 * the active state, refreshing the page mid-task drops the right-panel tabs
+                 * `activeChatId`) and the per-chat snapshots map. Snapshots are only
+                 * written when the user transitions AWAY from a chat, so without persisting
+                 * the active state, refreshing the page mid-chat drops the right-panel tabs
                  * the user just opened — they were never snapshotted because they belonged to the
-                 * still-active task.
+                 * still-active chat.
                  *
-                 * On rehydrate, `setActiveTaskId(currentTaskId)` runs from
-                 * AiHub.tsx's effect. If the saved `activeTaskId` matches the URL's
-                 * task id, it's a no-op (state preserved). If they differ (e.g., the user
-                 * deep-linked to a different task), the standard snapshot/restore path runs.
+                 * On rehydrate, `setActiveChatId(currentChatId)` runs from
+                 * AiHub.tsx's effect. If the saved `activeChatId` matches the URL's
+                 * chat id, it's a no-op (state preserved). If they differ (e.g., the user
+                 * deep-linked to a different chat), the standard snapshot/restore path runs.
                  */
                 partialize: (state) => ({
-                    activeTaskId: state.activeTaskId,
+                    activeChatId: state.activeChatId,
                     activeTabId: state.activeTabId,
                     openTabs: state.openTabs,
                     rightPanelOpen: state.rightPanelOpen,
-                    snapshotsByTaskId: state.snapshotsByTaskId,
+                    snapshotsByChatId: state.snapshotsByChatId,
                 }),
-                version: 2,
+                version: 3,
                 migrate: () => ({
-                    activeTaskId: undefined,
+                    activeChatId: undefined,
                     activeTabId: undefined,
                     openTabs: [],
                     rightPanelOpen: false,
-                    snapshotsByTaskId: {},
+                    snapshotsByChatId: {},
                 }),
             }
         )

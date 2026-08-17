@@ -7,9 +7,9 @@ describe('useAiHubTabsStore', () => {
     beforeEach(() => {
         aiHubTabsStore.setState({
             activeTabId: undefined,
+            chatsSidebarCollapsed: true,
             openTabs: [],
             rightPanelOpen: false,
-            tasksSidebarCollapsed: true,
         });
     });
 
@@ -351,6 +351,54 @@ describe('useAiHubTabsStore', () => {
         expect(result.current.activeTabId).toBe(firstTabId);
     });
 
+    // --- AiAgent tab tests ---
+
+    it('opens an aiAgent tab with kind: aiAgent and correct fields', () => {
+        const {result} = renderHook(() => useAiHubTabsStore());
+
+        let tabId = '';
+
+        act(() => {
+            tabId = result.current.openAiAgentTab('agent-1', 'Support Agent');
+        });
+
+        expect(result.current.openTabs).toHaveLength(1);
+
+        const tab = result.current.openTabs[0]!;
+
+        expect(tab.kind).toBe('aiAgent');
+        expect(tab.id).toBe(tabId);
+        expect(tab.name).toBe('Support Agent');
+
+        if (tab.kind === 'aiAgent') {
+            expect(tab.aiAgentId).toBe('agent-1');
+        }
+
+        expect(result.current.activeTabId).toBe(tabId);
+        expect(result.current.rightPanelOpen).toBe(true);
+    });
+
+    it('focuses an existing aiAgent tab when the same aiAgentId is opened again', () => {
+        const {result} = renderHook(() => useAiHubTabsStore());
+
+        let firstTabId = '';
+
+        act(() => {
+            firstTabId = result.current.openAiAgentTab('agent-1', 'Support Agent');
+            result.current.openAiAgentTab('agent-2', 'Sales Agent');
+        });
+
+        expect(result.current.openTabs).toHaveLength(2);
+        expect(result.current.activeTabId).not.toBe(firstTabId);
+
+        act(() => {
+            result.current.openAiAgentTab('agent-1', 'Support Agent');
+        });
+
+        expect(result.current.openTabs).toHaveLength(2);
+        expect(result.current.activeTabId).toBe(firstTabId);
+    });
+
     // --- Mixed-kind tests ---
 
     it('can have all four kinds open simultaneously', () => {
@@ -468,37 +516,37 @@ describe('useAiHubTabsStore', () => {
         }
     });
 
-    describe('setActiveTaskId — home → task hand-off', () => {
-        it('inherits tabs and rightPanelOpen from home view when first task is created', () => {
+    describe('setActiveChatId — home → chat hand-off', () => {
+        it('inherits tabs and rightPanelOpen from home view when first chat is created', () => {
             const {result} = renderHook(() => useAiHubTabsStore());
 
-            // Simulate user attaching a file in the home composer (no active task yet).
+            // Simulate user attaching a file in the home composer (no active chat yet).
             act(() => {
                 result.current.openFileTab('42', 'spec.md');
             });
 
-            expect(result.current.activeTaskId).toBeUndefined();
+            expect(result.current.activeChatId).toBeUndefined();
             expect(result.current.openTabs).toHaveLength(1);
             expect(result.current.rightPanelOpen).toBe(true);
 
-            // User hits Enter — task is auto-created, transition to a real task id.
+            // User hits Enter — chat is auto-created, transition to a real chat id.
             act(() => {
-                result.current.setActiveTaskId(1);
+                result.current.setActiveChatId(1);
             });
 
             // Tabs and right panel state must carry over — without this, the artifact the user attached
-            // on home would be lost when the task panel mounts.
-            expect(result.current.activeTaskId).toBe(1);
+            // on home would be lost when the chat panel mounts.
+            expect(result.current.activeChatId).toBe(1);
             expect(result.current.openTabs).toHaveLength(1);
             expect(result.current.rightPanelOpen).toBe(true);
         });
 
-        it('restores the right panel per task on switch (closed for tasks with no snapshot)', () => {
+        it('restores the right panel per chat on switch (closed for chats with no snapshot)', () => {
             const {result} = renderHook(() => useAiHubTabsStore());
 
             // Land in conv-1 with one tab (opening a tab also opens the right panel).
             act(() => {
-                result.current.setActiveTaskId(1);
+                result.current.setActiveChatId(1);
                 result.current.openFileTab('42', 'a.md');
             });
 
@@ -507,16 +555,16 @@ describe('useAiHubTabsStore', () => {
 
             // Switch to conv-2 — it has no snapshot yet, so it lands with no tabs and the panel closed.
             act(() => {
-                result.current.setActiveTaskId(2);
+                result.current.setActiveChatId(2);
             });
 
             expect(result.current.openTabs).toHaveLength(0);
             expect(result.current.rightPanelOpen).toBe(false);
 
             // Switch back to conv-1 — its snapshot is restored as the user left it: the tab is back AND the
-            // panel reopens, since the resource-panel state is snapshotted per task.
+            // panel reopens, since the resource-panel state is snapshotted per chat.
             act(() => {
-                result.current.setActiveTaskId(1);
+                result.current.setActiveChatId(1);
             });
 
             expect(result.current.openTabs).toHaveLength(1);
@@ -527,15 +575,15 @@ describe('useAiHubTabsStore', () => {
             const {result} = renderHook(() => useAiHubTabsStore());
 
             act(() => {
-                result.current.setActiveTaskId(1);
+                result.current.setActiveChatId(1);
                 result.current.openFileTab('42', 'a.md');
-                result.current.setActiveTaskId(2);
+                result.current.setActiveChatId(2);
             });
 
             // Switching closed the panel...
             expect(result.current.rightPanelOpen).toBe(false);
 
-            // ...and opening a tab in the new task re-opens it.
+            // ...and opening a tab in the new chat re-opens it.
             act(() => {
                 result.current.openFileTab('7', 'b.md');
             });
@@ -544,23 +592,23 @@ describe('useAiHubTabsStore', () => {
         });
     });
 
-    describe('tasksSidebarCollapsed', () => {
-        it('setTasksSidebarCollapsed toggles the rail flag', () => {
+    describe('chatsSidebarCollapsed', () => {
+        it('setChatsSidebarCollapsed toggles the rail flag', () => {
             const {result} = renderHook(() => useAiHubTabsStore());
 
-            expect(result.current.tasksSidebarCollapsed).toBe(true);
+            expect(result.current.chatsSidebarCollapsed).toBe(true);
 
             act(() => {
-                result.current.setTasksSidebarCollapsed(false);
+                result.current.setChatsSidebarCollapsed(false);
             });
 
-            expect(result.current.tasksSidebarCollapsed).toBe(false);
+            expect(result.current.chatsSidebarCollapsed).toBe(false);
 
             act(() => {
-                result.current.setTasksSidebarCollapsed(true);
+                result.current.setChatsSidebarCollapsed(true);
             });
 
-            expect(result.current.tasksSidebarCollapsed).toBe(true);
+            expect(result.current.chatsSidebarCollapsed).toBe(true);
         });
 
         it('closing the resource panel resets the sidebar back to collapsed', () => {
@@ -569,24 +617,24 @@ describe('useAiHubTabsStore', () => {
             // User opened the resource panel, then expanded the sidebar from the rail.
             act(() => {
                 result.current.setRightPanelOpen(true);
-                result.current.setTasksSidebarCollapsed(false);
+                result.current.setChatsSidebarCollapsed(false);
             });
 
-            expect(result.current.tasksSidebarCollapsed).toBe(false);
+            expect(result.current.chatsSidebarCollapsed).toBe(false);
 
             // Closing the panel must return the sidebar to the rail default so the next open starts collapsed.
             act(() => {
                 result.current.setRightPanelOpen(false);
             });
 
-            expect(result.current.tasksSidebarCollapsed).toBe(true);
+            expect(result.current.chatsSidebarCollapsed).toBe(true);
         });
 
         it('opening the resource panel preserves the current rail state', () => {
             const {result} = renderHook(() => useAiHubTabsStore());
 
             act(() => {
-                result.current.setTasksSidebarCollapsed(false);
+                result.current.setChatsSidebarCollapsed(false);
             });
 
             act(() => {
@@ -594,28 +642,28 @@ describe('useAiHubTabsStore', () => {
             });
 
             // setRightPanelOpen(true) must not force the rail state — only closing resets it.
-            expect(result.current.tasksSidebarCollapsed).toBe(false);
+            expect(result.current.chatsSidebarCollapsed).toBe(false);
         });
 
-        it('switching tasks resets the sidebar back to collapsed', () => {
+        it('switching chats resets the sidebar back to collapsed', () => {
             const {result} = renderHook(() => useAiHubTabsStore());
 
-            // On task 1 the user expanded the sidebar over an open resource panel.
+            // On chat 1 the user expanded the sidebar over an open resource panel.
             act(() => {
-                result.current.setActiveTaskId(1);
+                result.current.setActiveChatId(1);
                 result.current.setRightPanelOpen(true);
-                result.current.setTasksSidebarCollapsed(false);
+                result.current.setChatsSidebarCollapsed(false);
             });
 
-            expect(result.current.tasksSidebarCollapsed).toBe(false);
+            expect(result.current.chatsSidebarCollapsed).toBe(false);
 
-            // Clicking another task must collapse the sidebar back to the rail — otherwise the full
-            // sidebar covers the new task's panels until a page refresh.
+            // Clicking another chat must collapse the sidebar back to the rail — otherwise the full
+            // sidebar covers the new chat's panels until a page refresh.
             act(() => {
-                result.current.setActiveTaskId(2);
+                result.current.setActiveChatId(2);
             });
 
-            expect(result.current.tasksSidebarCollapsed).toBe(true);
+            expect(result.current.chatsSidebarCollapsed).toBe(true);
         });
     });
 
@@ -695,12 +743,12 @@ describe('useAiHubTabsStore', () => {
 describe('openWorkflowTab project-scoped dedup', () => {
     beforeEach(() => {
         aiHubTabsStore.setState({
+            activeChatId: undefined,
             activeTabId: undefined,
-            activeTaskId: undefined,
+            chatsSidebarCollapsed: true,
             openTabs: [],
             rightPanelOpen: false,
-            snapshotsByTaskId: {},
-            tasksSidebarCollapsed: true,
+            snapshotsByChatId: {},
         });
     });
 

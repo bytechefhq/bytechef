@@ -58,6 +58,9 @@ const KnowledgeBase = lazy(() => import('@/pages/automation/knowledge-base/Knowl
 const KnowledgeBases = lazy(() => import('@/pages/automation/knowledge-bases/KnowledgeBases'));
 const McpServer = lazy(() => import('@/pages/settings/platform/mcp-server/McpServer'));
 const A2aServers = lazy(() => import('@/pages/automation/a2a-servers/A2aServers'));
+const Agents = lazy(() => import('@/pages/automation/agents/Agents'));
+const AgentDetail = lazy(() => import('@/pages/automation/agents/AgentDetail'));
+const AgentDeployments = lazy(() => import('@/pages/automation/agent-deployments/AgentDeployments'));
 const McpServers = lazy(() => import('@/pages/automation/mcp-servers/McpServers'));
 const Notifications = lazy(() => import('@/pages/settings/platform/notifications/Notifications'));
 const WorkflowAlerts = lazy(() => import('@/pages/settings/platform/workflow-alerts/WorkflowAlerts'));
@@ -77,11 +80,8 @@ const AiHub = lazy(() => import('@/ee/pages/automation/ai-hub/AiHub'));
 const ContextStoreSources = lazy(() => import('@/pages/automation/context-store/ContextStoreSources'));
 const ContextStores = lazy(() => import('@/pages/automation/context-store/ContextStores'));
 const AiAutoMemoriesPage = lazy(() => import('@/pages/automation/ai/memories/Memories'));
-const AiHubPersonalAgentsPage = lazy(() => import('@/ee/pages/automation/ai-hub/personal-agents/AiHubPersonalAgents'));
-const AiHubPersonalAgentFormPage = lazy(
-    () => import('@/ee/pages/automation/ai-hub/personal-agents/AiHubPersonalAgentForm')
-);
-const AiHubWorkflowChatsPage = lazy(() => import('@/ee/pages/automation/ai-hub/tasks/WorkflowChats'));
+const AiHubTasksPage = lazy(() => import('@/ee/pages/automation/ai-hub/tasks/AiHubTasks'));
+const AiHubTaskFormPage = lazy(() => import('@/ee/pages/automation/ai-hub/tasks/AiHubTaskForm'));
 const AiHubConnectorsPage = lazy(() => import('@/ee/pages/automation/ai-hub/context/AiHubConnectors'));
 
 const AiProviders = lazy(() => import('@/ee/pages/settings/platform/ai-providers/AiProviders'));
@@ -901,6 +901,16 @@ export const getRouter = (queryClient: QueryClient) =>
                                     path: 'deployments',
                                 },
                                 {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <LazyLoadWrapper hasLeftSidebar>
+                                                <AgentDeployments />
+                                            </LazyLoadWrapper>
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'agent-deployments',
+                                },
+                                {
                                     children: [
                                         {
                                             index: true,
@@ -954,6 +964,26 @@ export const getRouter = (queryClient: QueryClient) =>
                                         </PrivateRoute>
                                     ),
                                     path: 'a2a-servers',
+                                },
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <LazyLoadWrapper hasLeftSidebar>
+                                                <Agents />
+                                            </LazyLoadWrapper>
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'agents',
+                                },
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <LazyLoadWrapper hasLeftSidebar>
+                                                <AgentDetail />
+                                            </LazyLoadWrapper>
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'agents/:agentId',
                                 },
                                 {
                                     element: (
@@ -1073,7 +1103,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                             </EEVersion>
                                         </PrivateRoute>
                                     ),
-                                    path: 'ai-hub/tasks/:taskId',
+                                    path: 'ai-hub/chats/:chatId',
                                 },
                                 {
                                     element: (
@@ -1092,48 +1122,36 @@ export const getRouter = (queryClient: QueryClient) =>
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                                             <EEVersion>
                                                 <LazyLoadWrapper hasLeftSidebar>
-                                                    <AiHubPersonalAgentsPage />
+                                                    <AiHubTasksPage />
                                                 </LazyLoadWrapper>
                                             </EEVersion>
                                         </PrivateRoute>
                                     ),
-                                    path: 'ai-hub/personal-agents',
+                                    path: 'ai-hub/tasks',
                                 },
                                 {
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                                             <EEVersion>
                                                 <LazyLoadWrapper hasLeftSidebar>
-                                                    <AiHubPersonalAgentFormPage />
+                                                    <AiHubTaskFormPage />
                                                 </LazyLoadWrapper>
                                             </EEVersion>
                                         </PrivateRoute>
                                     ),
-                                    path: 'ai-hub/personal-agents/new',
+                                    path: 'ai-hub/tasks/new',
                                 },
                                 {
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                                             <EEVersion>
                                                 <LazyLoadWrapper hasLeftSidebar>
-                                                    <AiHubPersonalAgentFormPage />
+                                                    <AiHubTaskFormPage />
                                                 </LazyLoadWrapper>
                                             </EEVersion>
                                         </PrivateRoute>
                                     ),
-                                    path: 'ai-hub/personal-agents/:agentId/edit',
-                                },
-                                {
-                                    element: (
-                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <EEVersion>
-                                                <LazyLoadWrapper hasLeftSidebar>
-                                                    <AiHubWorkflowChatsPage />
-                                                </LazyLoadWrapper>
-                                            </EEVersion>
-                                        </PrivateRoute>
-                                    ),
-                                    path: 'ai-hub/workflow-chats',
+                                    path: 'ai-hub/tasks/:taskId/edit',
                                 },
                                 {
                                     children: [

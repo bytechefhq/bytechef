@@ -1,6 +1,6 @@
+import {aiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
 import {ARTIFACT_OPEN_TOOL_NAMES} from '@/ee/pages/automation/ai-hub/messages/AiHubToolCallRenderer';
 import {aiHubStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubStore';
-import {aiHubTasksStore} from '@/ee/pages/automation/ai-hub/tasks/stores/useAiHubTasksStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {toToolResultDataPart} from '@/shared/components/ai-chat/messages/toToolResultDataPart';
 import {reportMutationError} from '@/shared/error/useReportQueryError';
@@ -8,7 +8,7 @@ import {ThreadMessageLike} from '@assistant-ui/react';
 import {useCallback} from 'react';
 import {useNavigate} from 'react-router-dom';
 
-import {AiHubTaskArtifactI, AiHubTaskI, AiHubTaskMessageI, getTaskArtifacts, getTaskMessages} from '../api/tasks.api';
+import {AiHubChatArtifactI, AiHubChatI, AiHubChatMessageI, getChatArtifacts, getChatMessages} from '../api/chats.api';
 
 interface RestoredToolEventI {
     arguments?: string;
@@ -40,7 +40,7 @@ function parseRestoredToolEvents(toolEventsJson: string | null): RestoredToolEve
             ? parsed.filter((event): event is RestoredToolEventI => event != null && typeof event === 'object')
             : [];
     } catch {
-        console.warn('[AiHubTasks] Unparseable toolEventsJson, skipping tool-card restore for this row');
+        console.warn('[AiHubChats] Unparseable toolEventsJson, skipping tool-card restore for this row');
 
         return [];
     }
@@ -135,7 +135,7 @@ function buildRestoredToolParts(
  * next assistant text landed) hoists into a synthetic assistant message right after it, since tool-call parts
  * only render on assistant messages.
  */
-function mapServerMessages(messages: AiHubTaskMessageI[]): ThreadMessageLike[] {
+function mapServerMessages(messages: AiHubChatMessageI[]): ThreadMessageLike[] {
     const lastUserRowIndex = messages.reduce(
         (lastIndex, message, index) => (mapServerRoleToClient(message.role) === 'user' ? index : lastIndex),
         -1
@@ -198,7 +198,7 @@ function mapServerRoleToClient(role: string): 'user' | 'assistant' | 'system' | 
 
     // Server schema drift (a new role shipped without a client update) would otherwise drop the message
     // silently. Warn so it surfaces in the console instead of vanishing into the filter() call.
-    console.warn(`[AiHubTasks] Unknown message role from server: "${role}"`);
+    console.warn(`[AiHubChats] Unknown message role from server: "${role}"`);
 
     return null;
 }
@@ -218,7 +218,7 @@ function parseArtifactMetadata(metadataJson: string | null): Record<string, stri
 }
 
 /**
- * Map a durable {@link AiHubTaskArtifactI} back to the `open*Tab` tool call that originally rendered its
+ * Map a durable {@link AiHubChatArtifactI} back to the `open*Tab` tool call that originally rendered its
  * clickable link card in the transcript. The `*_REFERENCED` kinds correspond to a tab the user opened.
  *
  * Workflows are special: the build/edit flow records a single WORKFLOW_CREATED/WORKFLOW_UPDATED row (server
@@ -230,20 +230,25 @@ function parseArtifactMetadata(metadataJson: string | null): Record<string, stri
  * expects, so the rehydrated card opens the same tab a live click would.
  */
 function artifactToOpenToolCall(
-    artifact: AiHubTaskArtifactI
+    artifact: AiHubChatArtifactI
 ): {args: Record<string, unknown>; toolName: string} | null {
     const metadata = parseArtifactMetadata(artifact.metadataJson);
 
     switch (artifact.kind) {
+        case 'AI_AGENT_REFERENCED':
+            return {
+                args: {aiAgentId: artifact.artifactId, name: artifact.artifactName},
+                toolName: 'openAiAgentTab',
+            };
         case 'CODE_WORKFLOW_REFERENCED':
             // Same shape as CUSTOM_COMPONENT_REFERENCED below — artifactId IS the projectId. The `language`
             // openCodeWorkflowTab needs isn't stashed on the artifact (the recorder only stores projectId +
             // name), so this rehydrated tool-call args blob omits it rather than paying for a project fetch
-            // per artifact on every task switch. Both openCustomComponentTab and openCodeWorkflowTab have
+            // per artifact on every chat switch. Both openCustomComponentTab and openCodeWorkflowTab have
             // ARTIFACT_OPEN_META entries, so the card still renders as a clickable ArtifactLink, not plain
             // JSON — AiHubToolCallRenderer's openArtifactTab resolves the missing language lazily on click,
             // the same project-fetch-then-open flow as the sidebar's live quick-open
-            // (AiHubTasksSidebar.openCodeWorkflowArtifact).
+            // (AiHubChatsSidebar.openCodeWorkflowArtifact).
             return {
                 args: {name: artifact.artifactName, projectId: artifact.artifactId},
                 toolName: 'openCodeWorkflowTab',
@@ -290,11 +295,11 @@ function artifactToOpenToolCall(
 /**
  * Rebuild the artifact link cards that streamed live but were lost on reload. The cards are tool-call UI
  * (fed by an ephemeral store), never persisted in chat memory — but the underlying open is durably recorded
- * as an `ai_hub_task_artifact` row. We synthesise one assistant message whose content is a `tool-call` part
+ * as an `ai_hub_chat_artifact` row. We synthesise one assistant message whose content is a `tool-call` part
  * per openable artifact; MessagePrimitive.Parts renders those via AiHubToolCallFallback -> ArtifactLink, the
  * same path as the live card. Appended after the text transcript (the cards were the last thing shown).
  */
-function buildArtifactLinkMessages(artifacts: AiHubTaskArtifactI[]): ThreadMessageLike[] {
+function buildArtifactLinkMessages(artifacts: AiHubChatArtifactI[]): ThreadMessageLike[] {
     const seen = new Set<string>();
 
     const parts = artifacts
@@ -302,7 +307,7 @@ function buildArtifactLinkMessages(artifacts: AiHubTaskArtifactI[]): ThreadMessa
         .filter(
             (
                 entry
-            ): entry is {artifact: AiHubTaskArtifactI; openCall: {args: Record<string, unknown>; toolName: string}} =>
+            ): entry is {artifact: AiHubChatArtifactI; openCall: {args: Record<string, unknown>; toolName: string}} =>
                 entry.openCall !== null
         )
         .filter(({openCall}) => {
@@ -336,53 +341,53 @@ function buildArtifactLinkMessages(artifacts: AiHubTaskArtifactI[]): ThreadMessa
 
 /**
  * Returns whether the switch succeeded so callers can keep their dialog open on failure instead of closing
- * mid-error. The hook intentionally does NOT mutate command center/task state on failure — a partial overwrite
+ * mid-error. The hook intentionally does NOT mutate command center/chat state on failure — a partial overwrite
  * would leave the user typing into a phantom thread; reportMutationError surfaces the failure as a toast and the
  * caller should show a banner if they want a non-toast indication.
  *
  * Memoised with `useCallback` keyed only on `currentWorkspaceId` so callers (notably the URL <-> store sync
  * effects in AiHub.tsx) can put it in their dependency array without re-running on every render. A
- * fresh closure each render pulled the URL->store effect into a feedback loop that flashed the task
+ * fresh closure each render pulled the URL->store effect into a feedback loop that flashed the chat
  * view on click and then reset back to the home view.
  */
-export function useSwitchTask() {
+export function useSwitchChat() {
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
     const navigate = useNavigate();
 
     return useCallback(
-        async (task: AiHubTaskI): Promise<boolean> => {
-            // Switch the UI to the task IMMEDIATELY — set the thread id + select the task + navigate before
-            // fetching the conversation history. Awaiting getTaskMessages first made the whole click block
+        async (chat: AiHubChatI): Promise<boolean> => {
+            // Switch the UI to the chat IMMEDIATELY — set the thread id + select the chat + navigate before
+            // fetching the conversation history. Awaiting getChatMessages first made the whole click block
             // on a network round-trip (instant when the messages were cached, several seconds on a cold
             // fetch — the intermittent lag the user saw). The thread renders empty for the brief moment
             // until the messages below resolve.
             aiHubStore.setState({
+                chatId: chat.threadId,
                 messages: [],
                 messagesLoading: true,
-                taskId: task.threadId,
             });
 
-            aiHubTasksStore.getState().setCurrentTaskId(task.id);
+            aiHubChatsStore.getState().setCurrentChatId(chat.id);
 
             // Navigate explicitly so the switch works from any CC page (not just /ai-hub
             // itself, which has its own store→URL sync effect). On the canonical /ai-hub
             // route this navigate is idempotent — AiHub.tsx's effect would fire next render
-            // and find URL already matches the store, no-op. From /personal-agents or /workflow-chats
-            // (which have no such effect), this is the only thing that flips the route to the
-            // selected task. Without it, clicking a task row from those pages
-            // updated the stores silently and left the user staring at the unchanged list.
-            navigate(`/automation/ai-hub/tasks/${task.id}`);
+            // and find URL already matches the store, no-op. From /tasks (which has no
+            // such effect), this is the only thing that flips the route to the selected chat.
+            // Without it, clicking a chat row from that page updated the stores silently and left
+            // the user staring at the unchanged list.
+            navigate(`/automation/ai-hub/chats/${chat.id}`);
 
             try {
                 // Fetch history and artifacts together. Artifacts back the link-card reconstruction below;
                 // a failure there must not break the (primary) message load, so it degrades to no cards.
                 const [messages, artifacts] = await Promise.all([
-                    getTaskMessages({
-                        taskId: task.id,
+                    getChatMessages({
+                        chatId: chat.id,
                         workspaceId: currentWorkspaceId,
                     }),
-                    getTaskArtifacts({taskId: task.id, workspaceId: currentWorkspaceId}).catch(
-                        (): AiHubTaskArtifactI[] => []
+                    getChatArtifacts({chatId: chat.id, workspaceId: currentWorkspaceId}).catch(
+                        (): AiHubChatArtifactI[] => []
                     ),
                 ]);
 
@@ -392,9 +397,9 @@ export function useSwitchTask() {
                 // on reload. Rebuild them from the durable artifact rows and append after the transcript.
                 const artifactLinkMessages = buildArtifactLinkMessages(artifacts);
 
-                // Apply only if the user is still on this task — a slower fetch for task A must not clobber
-                // the thread (or clear the loading flag) after the user has already clicked task B.
-                if (aiHubStore.getState().taskId === task.threadId) {
+                // Apply only if the user is still on this chat — a slower fetch for chat A must not clobber
+                // the thread (or clear the loading flag) after the user has already clicked chat B.
+                if (aiHubStore.getState().chatId === chat.threadId) {
                     aiHubStore.setState({
                         messages: [...mappedMessages, ...artifactLinkMessages],
                         messagesLoading: false,
@@ -403,14 +408,14 @@ export function useSwitchTask() {
 
                 return true;
             } catch (error) {
-                if (aiHubStore.getState().taskId === task.threadId) {
+                if (aiHubStore.getState().chatId === chat.threadId) {
                     aiHubStore.setState({messagesLoading: false});
                 }
 
-                // Without surfacing this, the user keeps typing into what they think is the new task
+                // Without surfacing this, the user keeps typing into what they think is the new chat
                 // but is in fact still the previous one. Routing through reportMutationError keeps the toast
-                // wording consistent with the other task mutations in useTasks.
-                reportMutationError('Switch task', error instanceof Error ? error : new Error(String(error)));
+                // wording consistent with the other chat mutations in useChats.
+                reportMutationError('Switch chat', error instanceof Error ? error : new Error(String(error)));
 
                 return false;
             }

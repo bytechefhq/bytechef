@@ -1,18 +1,19 @@
+import {AiHubChatsKeys} from '@/ee/pages/automation/ai-hub/chats/hooks/useChats';
+
 /* eslint-disable sort-keys */
 import {aiHubComposerStore} from '@/ee/pages/automation/ai-hub/composer/stores/useAiHubComposerStore';
 import {aiHubProgressStore} from '@/ee/pages/automation/ai-hub/progress/stores/useAiHubProgressStore';
 import {MODE} from '@/ee/pages/automation/ai-hub/stores/useAiHubStore';
 import {aiHubTabsStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
-import {AiHubTasksKeys} from '@/ee/pages/automation/ai-hub/tasks/hooks/useTasks';
 import {aiChatRetryableErrorStore} from '@/shared/components/ai-chat/stores/useAiChatRetryableErrorStore';
 import {aiChatToolCallStore} from '@/shared/components/ai-chat/stores/useAiChatToolCallStore';
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import {EventType} from '@ag-ui/core';
 import {ThreadMessageLike} from '@assistant-ui/react';
 
-vi.mock('@/ee/pages/automation/ai-hub/tasks/api/tasks.api', () => ({
-    generateAiHubTaskTitle: vi.fn(),
-    patchTask: vi.fn(),
+vi.mock('@/ee/pages/automation/ai-hub/chats/api/chats.api', () => ({
+    generateAiHubChatTitle: vi.fn(),
+    patchChat: vi.fn(),
 }));
 
 vi.mock('../workflowStreamHandler', () => ({
@@ -20,12 +21,12 @@ vi.mock('../workflowStreamHandler', () => ({
     openWorkflowSseStream: vi.fn(),
 }));
 
-const {generateAiHubTaskTitle, patchTask} = await import('@/ee/pages/automation/ai-hub/tasks/api/tasks.api');
+const {generateAiHubChatTitle, patchChat} = await import('@/ee/pages/automation/ai-hub/chats/api/chats.api');
 
 const {fetchWorkflowResponse, openWorkflowSseStream} = await import('../workflowStreamHandler');
 
-const mockPatchTask = vi.mocked(patchTask);
-const mockGenerateTaskTitle = vi.mocked(generateAiHubTaskTitle);
+const mockPatchChat = vi.mocked(patchChat);
+const mockGenerateChatTitle = vi.mocked(generateAiHubChatTitle);
 const mockOpenWorkflowSseStream = vi.mocked(openWorkflowSseStream);
 const mockFetchWorkflowResponse = vi.mocked(fetchWorkflowResponse);
 
@@ -35,7 +36,7 @@ import {
     bootstrapAiHubTurnRunState,
     buildAiHubSubscriber,
     buildStateToSend,
-    cleanupForTaskChange,
+    cleanupForChatChange,
     hasLivePropertyOptionPicker,
     projectMessagesWithToolCalls,
     runPostTurnTelemetry,
@@ -259,6 +260,36 @@ describe('buildAiHubSubscriber', () => {
         }
     });
 
+    it('opens an AI Agent tab when an openResourceTab tool result with type AI_AGENT arrives', () => {
+        const subscriber = buildAiHubSubscriber({
+            addMessage: vi.fn(),
+            appendToLastAssistantMessage: vi.fn(),
+            getLastUserMessage: vi.fn().mockReturnValue(''),
+        });
+
+        subscriber.onToolCallStartEvent!(
+            makeToolCallStartParams({toolCallId: 'call-rt-agent', toolCallName: 'openResourceTab'})
+        );
+
+        subscriber.onToolCallResultEvent!(
+            makeToolCallResultParams({
+                content: JSON.stringify({aiAgentId: 'agent-1', name: 'Support Agent', opened: true, type: 'AI_AGENT'}),
+                toolCallId: 'call-rt-agent',
+            })
+        );
+
+        const state = aiHubTabsStore.getState();
+        const tab = state.openTabs[0]!;
+
+        expect(state.openTabs).toHaveLength(1);
+        expect(tab.name).toBe('Support Agent');
+        expect(tab.kind).toBe('aiAgent');
+
+        if (tab.kind === 'aiAgent') {
+            expect(tab.aiAgentId).toBe('agent-1');
+        }
+    });
+
     it('surfaces a failure when an openResourceTab tool result carries an unknown type', () => {
         const subscriber = buildAiHubSubscriber({
             addMessage: vi.fn(),
@@ -378,6 +409,36 @@ describe('buildAiHubSubscriber', () => {
         }
     });
 
+    it('opens an AI Agent tab when the openAiAgentTab tool result arrives', () => {
+        const subscriber = buildAiHubSubscriber({
+            addMessage: vi.fn(),
+            appendToLastAssistantMessage: vi.fn(),
+            getLastUserMessage: vi.fn().mockReturnValue(''),
+        });
+
+        subscriber.onToolCallStartEvent!(
+            makeToolCallStartParams({toolCallId: 'call-agent', toolCallName: 'openAiAgentTab'})
+        );
+
+        subscriber.onToolCallResultEvent!(
+            makeToolCallResultParams({
+                content: JSON.stringify({aiAgentId: 'agent-1', name: 'Support Agent', opened: true}),
+                toolCallId: 'call-agent',
+            })
+        );
+
+        const state = aiHubTabsStore.getState();
+        const tab = state.openTabs[0]!;
+
+        expect(state.openTabs).toHaveLength(1);
+        expect(tab.name).toBe('Support Agent');
+        expect(tab.kind).toBe('aiAgent');
+
+        if (tab.kind === 'aiAgent') {
+            expect(tab.aiAgentId).toBe('agent-1');
+        }
+    });
+
     it('opens a skill tab when the openSkillTab tool result arrives', () => {
         const subscriber = buildAiHubSubscriber({
             addMessage: vi.fn(),
@@ -474,19 +535,19 @@ describe('buildAiHubSubscriber', () => {
         }
     });
 
-    it('switches task when openAiHubPersonalAgentTab tool result arrives', async () => {
-        // The PA + workflow-chat tab tools share an output shape and a behaviour: the server has already done
-        // create-or-restore on the task, and the client subscriber's job is to (a) sync the command center
-        // store's threadId, (b) sync the tasks store's currentTaskId, and (c) navigate to the
+    it('switches chat when openAiHubTaskTab tool result arrives', async () => {
+        // The task + workflow-chat tab tools share an output shape and a behaviour: the server has already done
+        // create-or-restore on the chat, and the client subscriber's job is to (a) sync the command center
+        // store's threadId, (b) sync the chats store's currentChatId, and (c) navigate to the
         // matching URL. All three steps must fire in order — without (a) the URL→store sync effect would bounce
-        // the user back; without (c) the user would stay on the previous task visually.
+        // the user back; without (c) the user would stay on the previous chat visually.
         const navigate = vi.fn();
 
-        const {aiHubTasksStore} = await import('@/ee/pages/automation/ai-hub/tasks/stores/useAiHubTasksStore');
+        const {aiHubChatsStore} = await import('@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore');
         const {aiHubStore} = await import('@/ee/pages/automation/ai-hub/stores/useAiHubStore');
 
-        aiHubTasksStore.getState().setCurrentTaskId(0);
-        aiHubStore.setState({taskId: 'thread-old', messages: []});
+        aiHubChatsStore.getState().setCurrentChatId(0);
+        aiHubStore.setState({chatId: 'thread-old', messages: []});
 
         const subscriber = buildAiHubSubscriber({
             addMessage: vi.fn(),
@@ -496,13 +557,13 @@ describe('buildAiHubSubscriber', () => {
         });
 
         subscriber.onToolCallStartEvent!(
-            makeToolCallStartParams({toolCallId: 'call-pa', toolCallName: 'openAiHubPersonalAgentTab'})
+            makeToolCallStartParams({toolCallId: 'call-pa', toolCallName: 'openAiHubTaskTab'})
         );
 
         subscriber.onToolCallResultEvent!(
             makeToolCallResultParams({
                 content: JSON.stringify({
-                    taskId: 101,
+                    chatId: 101,
                     opened: true,
                     threadId: '00000000-0000-0000-0000-000000000042',
                     title: 'Research Assistant',
@@ -512,25 +573,25 @@ describe('buildAiHubSubscriber', () => {
         );
 
         // Pin all three side effects. A regression in any one of them would break the create-from-chat flow:
-        // the user would either stay on the old task (URL not updated), see no messages (threadId not
-        // synced), or have a wrong active row in the sidebar (currentTaskId not synced).
-        expect(aiHubStore.getState().taskId).toBe('00000000-0000-0000-0000-000000000042');
-        expect(aiHubTasksStore.getState().currentTaskId).toBe(101);
-        expect(navigate).toHaveBeenCalledWith('/automation/ai-hub/tasks/101');
+        // the user would either stay on the old chat (URL not updated), see no messages (threadId not
+        // synced), or have a wrong active row in the sidebar (currentChatId not synced).
+        expect(aiHubStore.getState().chatId).toBe('00000000-0000-0000-0000-000000000042');
+        expect(aiHubChatsStore.getState().currentChatId).toBe(101);
+        expect(navigate).toHaveBeenCalledWith('/automation/ai-hub/chats/101');
     });
 
-    it('switches task when openWorkflowChatTab tool result arrives', async () => {
-        // Same shape as openAiHubPersonalAgentTab — both tools share the OpenTaskTabResultType validator
+    it('switches chat when openWorkflowChatTab tool result arrives', async () => {
+        // Same shape as openAiHubTaskTab — both tools share the OpenChatTabResultType validator
         // and the same store-sync handler. Pin the workflow-chat sibling separately so a future divergence
         // (e.g. workflow-chat picks up an extra side effect like recording an artifact) doesn't accidentally
-        // regress the PA path.
+        // regress the task path.
         const navigate = vi.fn();
 
-        const {aiHubTasksStore} = await import('@/ee/pages/automation/ai-hub/tasks/stores/useAiHubTasksStore');
+        const {aiHubChatsStore} = await import('@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore');
         const {aiHubStore} = await import('@/ee/pages/automation/ai-hub/stores/useAiHubStore');
 
-        aiHubTasksStore.getState().setCurrentTaskId(0);
-        aiHubStore.setState({taskId: 'thread-old', messages: []});
+        aiHubChatsStore.getState().setCurrentChatId(0);
+        aiHubStore.setState({chatId: 'thread-old', messages: []});
 
         const subscriber = buildAiHubSubscriber({
             addMessage: vi.fn(),
@@ -546,7 +607,7 @@ describe('buildAiHubSubscriber', () => {
         subscriber.onToolCallResultEvent!(
             makeToolCallResultParams({
                 content: JSON.stringify({
-                    taskId: 202,
+                    chatId: 202,
                     opened: true,
                     threadId: '00000000-0000-0000-0000-00000000003e',
                     title: 'Customer Support',
@@ -555,21 +616,21 @@ describe('buildAiHubSubscriber', () => {
             })
         );
 
-        expect(aiHubStore.getState().taskId).toBe('00000000-0000-0000-0000-00000000003e');
-        expect(aiHubTasksStore.getState().currentTaskId).toBe(202);
-        expect(navigate).toHaveBeenCalledWith('/automation/ai-hub/tasks/202');
+        expect(aiHubStore.getState().chatId).toBe('00000000-0000-0000-0000-00000000003e');
+        expect(aiHubChatsStore.getState().currentChatId).toBe(202);
+        expect(navigate).toHaveBeenCalledWith('/automation/ai-hub/chats/202');
     });
 
     it('still syncs stores when navigate dep is undefined', async () => {
         // Tests and headless callers that build the subscriber without a navigate function should still
-        // get the store-sync side effects (command center threadId + taskId currentId). The runtime patch
+        // get the store-sync side effects (command center threadId + chatId currentId). The runtime patch
         // guards the navigate call with `if (navigate)` — without that guard the openX-Tab branch would
         // crash on subscribers built without a router context.
-        const {aiHubTasksStore} = await import('@/ee/pages/automation/ai-hub/tasks/stores/useAiHubTasksStore');
+        const {aiHubChatsStore} = await import('@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore');
         const {aiHubStore} = await import('@/ee/pages/automation/ai-hub/stores/useAiHubStore');
 
-        aiHubTasksStore.getState().setCurrentTaskId(0);
-        aiHubStore.setState({taskId: 'thread-old', messages: []});
+        aiHubChatsStore.getState().setCurrentChatId(0);
+        aiHubStore.setState({chatId: 'thread-old', messages: []});
 
         // No navigate dep supplied — tests that aren't wired through a router shouldn't have to mock one.
         const subscriber = buildAiHubSubscriber({
@@ -579,13 +640,13 @@ describe('buildAiHubSubscriber', () => {
         });
 
         subscriber.onToolCallStartEvent!(
-            makeToolCallStartParams({toolCallId: 'call-no-nav', toolCallName: 'openAiHubPersonalAgentTab'})
+            makeToolCallStartParams({toolCallId: 'call-no-nav', toolCallName: 'openAiHubTaskTab'})
         );
 
         subscriber.onToolCallResultEvent!(
             makeToolCallResultParams({
                 content: JSON.stringify({
-                    taskId: 303,
+                    chatId: 303,
                     opened: true,
                     threadId: '00000000-0000-0000-0000-000000000099',
                     title: 'No Nav Agent',
@@ -594,11 +655,11 @@ describe('buildAiHubSubscriber', () => {
             })
         );
 
-        // Both store-syncs land regardless of navigate. Pin: the user lands on the right task
+        // Both store-syncs land regardless of navigate. Pin: the user lands on the right chat
         // state-wise even when the URL isn't updated (e.g. headless replay scenarios), so the regular
         // URL→store sync effect can pick up the new state on the next render.
-        expect(aiHubStore.getState().taskId).toBe('00000000-0000-0000-0000-000000000099');
-        expect(aiHubTasksStore.getState().currentTaskId).toBe(303);
+        expect(aiHubStore.getState().chatId).toBe('00000000-0000-0000-0000-000000000099');
+        expect(aiHubChatsStore.getState().currentChatId).toBe(303);
     });
 
     it('ignores tool results that are not openFileTab', () => {
@@ -769,15 +830,15 @@ describe('buildAiHubSubscriber', () => {
         expect(currentError!.lastUserMessage).toBe('Run an empty result');
     });
 
-    it('runChatWorkflow streaming threads the per-turn controller signal end-to-end and DOES NOT abort it on task switch', () => {
+    it('runChatWorkflow streaming threads the per-turn controller signal end-to-end and DOES NOT abort it on chat switch', () => {
         // Pins both halves of the contract: (1) the AbortController owned by the provider is the SAME
         // one whose signal the subscriber threads into openWorkflowSseStream — a regression that split
         // the controller across two refs would silently leave streams running on real abort paths; and
-        // (2) `cleanupForTaskChange` does NOT abort that controller. The earlier shape of (2)
-        // killed the agent run mid-stream when the user switched tasks and they could never see
+        // (2) `cleanupForChatChange` does NOT abort that controller. The earlier shape of (2)
+        // killed the agent run mid-stream when the user switched chats and they could never see
         // the assistant reply on return. Now (2) leaves the run alive — the unmount-only effect in the
         // provider handles real teardown — and the user gets the committed message back when
-        // switchTask refetches on return.
+        // switchChat refetches on return.
         const turnController = new AbortController();
 
         const subscriber = buildAiHubSubscriber({
@@ -810,10 +871,10 @@ describe('buildAiHubSubscriber', () => {
         expect(passedSignal).toBe(turnController.signal);
         expect(passedSignal!.aborted).toBe(false);
 
-        cleanupForTaskChange('conv-prev');
+        cleanupForChatChange('conv-prev');
 
         // CRITICAL inversion of the previous assertion: the signal must remain UN-aborted after a
-        // task-switch cleanup. Provider-unmount in production aborts via a separate effect;
+        // chat-switch cleanup. Provider-unmount in production aborts via a separate effect;
         // see AiHubRuntimeProviderCleanup.test.tsx for the contract guards.
         expect(passedSignal!.aborted).toBe(false);
     });
@@ -1478,18 +1539,18 @@ describe('buildStateToSend', () => {
 
 describe('runPostTurnTelemetry', () => {
     beforeEach(() => {
-        mockPatchTask.mockReset();
-        mockGenerateTaskTitle.mockReset();
+        mockPatchChat.mockReset();
+        mockGenerateChatTitle.mockReset();
         // We don't read the response body in any of these tests; satisfy the typed mock with a minimal
-        // object that matches AiHubTaskI's required fields rather than an `as never` cast.
-        const stubTask = {
+        // object that matches AiHubChatI's required fields rather than an `as never` cast.
+        const stubChat = {
             createdAt: '2026-01-01T00:00:00Z',
             autoTitled: true,
             id: 1,
             kind: 'STANDARD' as const,
             lastPreview: null,
             messageCount: 0,
-            aiHubPersonalAgentId: null,
+            aiHubTaskId: null,
             status: 'ACTIVE' as const,
             threadId: 'thread-1',
             title: null,
@@ -1499,11 +1560,11 @@ describe('runPostTurnTelemetry', () => {
             workspaceId: 1,
         };
 
-        mockPatchTask.mockResolvedValue(stubTask);
-        mockGenerateTaskTitle.mockResolvedValue(stubTask);
+        mockPatchChat.mockResolvedValue(stubChat);
+        mockGenerateChatTitle.mockResolvedValue(stubChat);
     });
 
-    it('calls patchTask with lastPreview and messageCount after a turn — no title generation when messageCount < 2', async () => {
+    it('calls patchChat with lastPreview and messageCount after a turn — no title generation when messageCount < 2', async () => {
         const mockInvalidate = vi.fn();
 
         // messageCount=1 represents a partial turn: a user message has been added to the local store
@@ -1511,45 +1572,45 @@ describe('runPostTurnTelemetry', () => {
         // no assistant content to summarise. The patch telemetry still fires so the sidebar's
         // last-preview / sort updates remain accurate during streaming.
         runPostTurnTelemetry({
-            taskId: 42,
+            chatId: 42,
             input: 'Hello world',
-            invalidateTasks: mockInvalidate,
+            invalidateChats: mockInvalidate,
             messageCount: 1,
             workspaceId: 7,
         });
 
         await vi.waitFor(() => {
-            expect(mockPatchTask).toHaveBeenCalledWith({
-                taskId: 42,
+            expect(mockPatchChat).toHaveBeenCalledWith({
+                chatId: 42,
                 patch: {lastPreview: 'Hello world', messageCount: 1},
                 workspaceId: 7,
             });
         });
 
-        expect(mockGenerateTaskTitle).not.toHaveBeenCalled();
+        expect(mockGenerateChatTitle).not.toHaveBeenCalled();
         expect(mockInvalidate).not.toHaveBeenCalled();
     });
 
-    it('fires generateAiHubTaskTitle and invalidates as soon as messageCount reaches 2 (after the first complete exchange)', async () => {
+    it('fires generateAiHubChatTitle and invalidates as soon as messageCount reaches 2 (after the first complete exchange)', async () => {
         // The threshold was lowered from a bounded `>= 6 && <= 7` window (three exchanges) to `>= 2`
         // (one exchange): the bounded window silently no-op'd if a single turn ever pushed the count
-        // past 7, leaving titles stuck at "New Task" forever after a transient failure or a
+        // past 7, leaving titles stuck at "New Chat" forever after a transient failure or a
         // turn that emitted multiple assistant messages. The unbounded `>= 2` re-attempts on every
-        // subsequent turn while the task is untitled; the server endpoint is idempotent
+        // subsequent turn while the chat is untitled; the server endpoint is idempotent
         // (early-return when the row's title is already non-blank) so the retry loop is cheap on the
         // happy path.
         const mockInvalidate = vi.fn();
 
         runPostTurnTelemetry({
-            taskId: 99,
+            chatId: 99,
             input: 'First turn',
-            invalidateTasks: mockInvalidate,
+            invalidateChats: mockInvalidate,
             messageCount: 2,
             workspaceId: 3,
         });
 
         await vi.waitFor(() => {
-            expect(mockGenerateTaskTitle).toHaveBeenCalledWith({taskId: 99, workspaceId: 3});
+            expect(mockGenerateChatTitle).toHaveBeenCalledWith({chatId: 99, workspaceId: 3});
         });
 
         await vi.waitFor(() => {
@@ -1557,7 +1618,7 @@ describe('runPostTurnTelemetry', () => {
         });
     });
 
-    it('continues attempting title generation on every subsequent turn while the task stays untitled', async () => {
+    it('continues attempting title generation on every subsequent turn while the chat stays untitled', async () => {
         // Pinned regression: the previous bounded window (`<= 7`) skipped retries on any turn past 7
         // messages. The new shape fires on every turn with `messageCount >= 2`; the server's
         // idempotency check (returns early when title is already set) keeps the cost negligible if a
@@ -1565,43 +1626,43 @@ describe('runPostTurnTelemetry', () => {
         // "every turn re-attempts". An assertion failure here would mean a regression to a bounded
         // upper limit.
         runPostTurnTelemetry({
-            taskId: 100,
+            chatId: 100,
             input: 'Tenth turn',
-            invalidateTasks: vi.fn(),
+            invalidateChats: vi.fn(),
             messageCount: 20,
             workspaceId: 3,
         });
 
         await vi.waitFor(() => {
-            expect(mockGenerateTaskTitle).toHaveBeenCalledWith({taskId: 100, workspaceId: 3});
+            expect(mockGenerateChatTitle).toHaveBeenCalledWith({chatId: 100, workspaceId: 3});
         });
     });
 });
 
-describe('AiHubTasksKeys.artifacts', () => {
-    it('returns a key that includes the base key, artifacts, taskId, and workspaceId', () => {
-        const key = AiHubTasksKeys.artifacts(42, 7);
+describe('AiHubChatsKeys.artifacts', () => {
+    it('returns a key that includes the base key, artifacts, chatId, and workspaceId', () => {
+        const key = AiHubChatsKeys.artifacts(42, 7);
 
-        expect(key).toEqual(['aiHubTasks', 'artifacts', 42, 7]);
+        expect(key).toEqual(['aiHubChats', 'artifacts', 42, 7]);
     });
 
-    it('returns different keys for different taskId values', () => {
-        const keyA = AiHubTasksKeys.artifacts(1, 1);
-        const keyB = AiHubTasksKeys.artifacts(2, 1);
+    it('returns different keys for different chatId values', () => {
+        const keyA = AiHubChatsKeys.artifacts(1, 1);
+        const keyB = AiHubChatsKeys.artifacts(2, 1);
 
         expect(keyA).not.toEqual(keyB);
     });
 
     it('returns different keys for different workspaceId values', () => {
-        const keyA = AiHubTasksKeys.artifacts(1, 1);
-        const keyB = AiHubTasksKeys.artifacts(1, 2);
+        const keyA = AiHubChatsKeys.artifacts(1, 1);
+        const keyB = AiHubChatsKeys.artifacts(1, 2);
 
         expect(keyA).not.toEqual(keyB);
     });
 
     it('key starts with the base all key so invalidating all also covers artifacts', () => {
-        const allKey = AiHubTasksKeys.all;
-        const artifactsKey = AiHubTasksKeys.artifacts(10, 5);
+        const allKey = AiHubChatsKeys.all;
+        const artifactsKey = AiHubChatsKeys.artifacts(10, 5);
 
         expect(artifactsKey.slice(0, allKey.length)).toEqual([...allKey]);
     });
@@ -1881,7 +1942,7 @@ describe('projectMessagesWithToolCalls', () => {
 });
 
 describe('bootstrapAiHubTurnRunState', () => {
-    it('calls markRunning BEFORE the (slow) task-create resolves', async () => {
+    it('calls markRunning BEFORE the (slow) chat-create resolves', async () => {
         const calls: string[] = [];
         let resolveCreate: () => void = () => {};
 
@@ -1893,7 +1954,7 @@ describe('bootstrapAiHubTurnRunState', () => {
         });
 
         const resultPromise = bootstrapAiHubTurnRunState({
-            createTaskIfNeeded: () => {
+            createChatIfNeeded: () => {
                 calls.push('create-started');
 
                 return createPromise;
@@ -1911,11 +1972,11 @@ describe('bootstrapAiHubTurnRunState', () => {
         expect(calls).toEqual(['mark-running', 'create-started', 'create-resolved']);
     });
 
-    it('reverts and returns false when the task-create fails', async () => {
+    it('reverts and returns false when the chat-create fails', async () => {
         const calls: string[] = [];
 
         const result = await bootstrapAiHubTurnRunState({
-            createTaskIfNeeded: () => {
+            createChatIfNeeded: () => {
                 calls.push('create');
 
                 return Promise.reject(new Error('boom'));

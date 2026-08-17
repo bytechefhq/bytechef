@@ -34,6 +34,12 @@ interface LeftSidebarNavItemProps {
     };
     toLink?: string;
     icon?: ReactNode;
+    /**
+     * Rendered after the label, outside the link — a row menu belongs beside the navigation target, not inside
+     * it, where it would be a button nested in an anchor. The wrapper carries `group`, so a trailing control can
+     * reveal itself on hover the way the data tables sidebar does.
+     */
+    trailing?: ReactNode;
 }
 
 const LeftSidebarNavItem = ({
@@ -41,34 +47,52 @@ const LeftSidebarNavItem = ({
     icon,
     item: {current, id, name, onItemClick},
     toLink = '',
-}: LeftSidebarNavItemProps) => (
-    <Link
-        aria-current={current ? 'page' : undefined}
-        aria-disabled={disabled || undefined}
-        className={cn(
-            buttonVariants({variant: 'ghost'}),
-            current ? 'bg-accent hover:bg-accent' : 'hover:bg-accent',
-            'w-full justify-start px-2 font-normal',
-            disabled && 'pointer-events-none opacity-50'
-        )}
-        onClick={(event) => {
-            if (disabled) {
-                event.preventDefault();
+    trailing,
+}: LeftSidebarNavItemProps) => {
+    const link = (
+        <Link
+            aria-current={current ? 'page' : undefined}
+            aria-disabled={disabled || undefined}
+            className={cn(
+                buttonVariants({variant: 'ghost'}),
+                current ? 'bg-accent hover:bg-accent' : 'hover:bg-accent',
+                'w-full justify-start px-2 font-normal',
+                trailing && 'pr-8',
+                disabled && 'pointer-events-none opacity-50'
+            )}
+            onClick={(event) => {
+                if (disabled) {
+                    event.preventDefault();
 
-                return;
-            }
+                    return;
+                }
 
-            if (onItemClick) {
-                onItemClick(id);
-            }
-        }}
-        tabIndex={disabled ? -1 : undefined}
-        to={toLink}
-    >
-        {icon}
+                if (onItemClick) {
+                    onItemClick(id);
+                }
+            }}
+            tabIndex={disabled ? -1 : undefined}
+            to={toLink}
+        >
+            {icon}
 
-        <span className={cn('truncate', current && 'font-semibold')}>{name}</span>
-    </Link>
-);
+            <span className={cn('truncate', current && 'font-semibold')}>{name}</span>
+        </Link>
+    );
+
+    if (!trailing) {
+        return link;
+    }
+
+    return (
+        // The hover background lives on the wrapper, not the link: with a trailing control the pointer is often
+        // over that control rather than the link, and the row would otherwise show no hover state at all.
+        <div className="group relative flex items-center rounded-md hover:bg-accent">
+            {link}
+
+            <div className="absolute right-1">{trailing}</div>
+        </div>
+    );
+};
 
 export {LeftSidebarNav, LeftSidebarNavItem};

@@ -1,6 +1,7 @@
-import {AiHubArtifactKindType} from '@/ee/pages/automation/ai-hub/tasks/api/tasks.api';
+import {AiHubArtifactKindType} from '@/ee/pages/automation/ai-hub/chats/api/chats.api';
 import {
     BlocksIcon,
+    BotIcon,
     BrainIcon,
     CodeIcon,
     DatabaseIcon,
@@ -53,6 +54,10 @@ export function getArtifactIcon(kind: AiHubArtifactKindType) {
 
     if (kind === 'CODE_WORKFLOW_REFERENCED') {
         return <CodeIcon className="size-3.5 shrink-0 text-muted-foreground" />;
+    }
+
+    if (kind === 'AI_AGENT_REFERENCED') {
+        return <BotIcon className="size-3.5 shrink-0 text-muted-foreground" />;
     }
 
     return <WrenchIcon className="size-3.5 shrink-0 text-muted-foreground" />;

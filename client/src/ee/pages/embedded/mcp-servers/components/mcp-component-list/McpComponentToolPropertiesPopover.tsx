@@ -5,6 +5,7 @@ import useMcpComponentToolPropertiesPopover from '@/ee/pages/embedded/mcp-server
 import {ClusterElementProvider} from '@/pages/platform/workflow-editor/components/properties/ClusterElementContext';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
 import {McpTool} from '@/shared/middleware/graphql';
+import useFormDisplayConditions from '@/shared/queries/platform/useFormDisplayConditions';
 import {XIcon} from 'lucide-react';
 
 interface McpComponentToolPropertiesPopoverProps {
@@ -26,6 +27,17 @@ const McpComponentToolPropertiesPopover = ({
         useMcpComponentToolPropertiesPopover(componentName, componentVersion, mcpTool, onClose);
 
     const formValues = form.watch();
+
+    // A tool's properties are gated on each other (HTTP Client's body properties all hang off bodyContentType),
+    // and this form has no workflow node to read the evaluated conditions off — so they are evaluated against
+    // the form's own values instead.
+    const formDisplayConditions = useFormDisplayConditions({
+        componentName,
+        componentVersion,
+        operationName: mcpTool.name,
+        operationType: 'CLUSTER_ELEMENT',
+        parameters: formValues,
+    });
 
     return (
         <PopoverContent
@@ -69,6 +81,7 @@ const McpComponentToolPropertiesPopover = ({
                                     <Properties
                                         control={control}
                                         controlPath=""
+                                        formDisplayConditions={formDisplayConditions}
                                         formState={formState}
                                         properties={properties}
                                         toolsMode

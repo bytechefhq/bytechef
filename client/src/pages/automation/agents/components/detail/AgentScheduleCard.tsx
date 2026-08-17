@@ -1,0 +1,165 @@
+import Button from '@/components/Button/Button';
+import AgentScheduleDialog, {
+    AgentSchedulePropertiesI,
+} from '@/pages/automation/agents/components/detail/AgentScheduleDialog';
+import AgentSection from '@/pages/automation/agents/components/detail/AgentSection';
+import invalidateAgentQueries from '@/pages/automation/agents/utils/invalidateAgentQueries';
+import {
+    AiAgentChannel,
+    useAddAiAgentChannelMutation,
+    useDeleteAiAgentChannelMutation,
+    useUpdateAiAgentChannelMutation,
+} from '@/shared/middleware/graphql';
+import {useQueryClient} from '@tanstack/react-query';
+import {PlusIcon, SettingsIcon, Trash2Icon} from 'lucide-react';
+import {useState} from 'react';
+import {toast} from 'sonner';
+
+const CHANNEL_TYPE = 'schedule';
+
+interface AgentScheduleCardProps {
+    agentId: string;
+    channels: AiAgentChannel[];
+}
+
+/**
+ * Schedules get their own section rather than a row in Channels: a schedule is not an inbound conversation
+ * the agent replies to, it is a self-started run carrying its own prompt, and its configuration (cron,
+ * timezone, prompt) is larger than any messaging channel's.
+ *
+ * <p>
+ * Underneath it is still an ordinary {@code agent_channel} row of type {@code schedule} — the same registry
+ * entry ({@code ChannelDefinitions.schedule()} → {@code schedule/v1/cron}, backed by
+ * {@code ScheduleComponentHandler}) the generator turns into an additional trigger on the agent's workflow.
+ * Only the presentation is separate.
+ * </p>
+ */
+const AgentScheduleCard = ({agentId, channels}: AgentScheduleCardProps) => {
+    const [showAddDialog, setShowAddDialog] = useState(false);
+    const [editingChannel, setEditingChannel] = useState<AiAgentChannel | null>(null);
+
+    const queryClient = useQueryClient();
+
+    const onError = (error: unknown) => {
+        toast.error(error instanceof Error ? error.message : 'Failed to save the schedule.');
+    };
+
+    const addAgentChannelMutation = useAddAiAgentChannelMutation({
+        onError,
+        onSuccess: () => invalidateAgentQueries(queryClient),
+    });
+
+    const updateAgentChannelMutation = useUpdateAiAgentChannelMutation({
+        onError,
+        onSuccess: () => invalidateAgentQueries(queryClient),
+    });
+
+    const deleteAgentChannelMutation = useDeleteAiAgentChannelMutation({
+        onError,
+        onSuccess: () => invalidateAgentQueries(queryClient),
+    });
+
+    const scheduleChannels = channels.filter((channel) => channel.channelType === CHANNEL_TYPE);
+
+    const closeDialog = () => {
+        setShowAddDialog(false);
+        setEditingChannel(null);
+    };
+
+    const handleSubmit = (values: AgentSchedulePropertiesI) => {
+        if (editingChannel) {
+            updateAgentChannelMutation.mutate({input: {id: editingChannel.id, parameters: values}});
+        } else {
+            addAgentChannelMutation.mutate({
+                input: {agentId, channelType: CHANNEL_TYPE, parameters: values},
+            });
+        }
+
+        closeDialog();
+    };
+
+    const toScheduleProperties = (channel: AiAgentChannel): AgentSchedulePropertiesI => {
+        const parameters = (channel.parameters ?? {}) as Record<string, string>;
+
+        return {
+            expression: parameters.expression ?? '',
+            name: parameters.name ?? '',
+            prompt: parameters.prompt ?? '',
+            timezone: parameters.timezone || 'UTC',
+        };
+    };
+
+    return (
+        <AgentSection
+            action={
+                <Button
+                    icon={<PlusIcon />}
+                    label="Add schedule"
+                    onClick={() => setShowAddDialog(true)}
+                    size="sm"
+                    variant="outline"
+                />
+            }
+            title="Schedules"
+        >
+            {scheduleChannels.length === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                    No schedules yet. A schedule runs the agent on a cron expression with its own prompt.
+                </p>
+            ) : (
+                <ul className="space-y-2">
+                    {scheduleChannels.map((channel) => {
+                        const schedule = toScheduleProperties(channel);
+
+                        return (
+                            <li
+                                aria-label={schedule.name || 'Schedule'}
+                                className="flex items-center justify-between gap-2 rounded-md border border-border/50 px-3 py-2"
+                                key={channel.id}
+                            >
+                                <div className="flex min-w-0 items-baseline gap-2">
+                                    <span className="truncate font-medium">{schedule.name || 'Schedule'}</span>
+
+                                    <span className="truncate text-xs text-muted-foreground">
+                                        {schedule.expression || 'No cron expression'}
+                                    </span>
+                                </div>
+
+                                <div className="flex flex-none items-center gap-2">
+                                    <Button
+                                        aria-label={`Edit ${schedule.name || 'schedule'}`}
+                                        icon={<SettingsIcon />}
+                                        onClick={() => setEditingChannel(channel)}
+                                        size="iconSm"
+                                        variant="ghost"
+                                    />
+
+                                    <Button
+                                        aria-label={`Delete ${schedule.name || 'schedule'}`}
+                                        icon={<Trash2Icon />}
+                                        onClick={() => deleteAgentChannelMutation.mutate({id: channel.id})}
+                                        size="iconSm"
+                                        variant="destructiveGhost"
+                                    />
+                                </div>
+                            </li>
+                        );
+                    })}
+                </ul>
+            )}
+
+            {(showAddDialog || editingChannel) && (
+                <AgentScheduleDialog
+                    key={editingChannel?.id ?? 'add'}
+                    onClose={closeDialog}
+                    onSubmit={handleSubmit}
+                    open
+                    pending={addAgentChannelMutation.isPending || updateAgentChannelMutation.isPending}
+                    schedule={editingChannel ? toScheduleProperties(editingChannel) : null}
+                />
+            )}
+        </AgentSection>
+    );
+};
+
+export default AgentScheduleCard;

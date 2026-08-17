@@ -1,3 +1,4 @@
+import useOpenAgentChat from '@/ee/shared/edition/useOpenAgentChat';
 import {
     usePullProjectFromGitMutation,
     useUpdateProjectGitConfigurationMutation,
@@ -7,6 +8,7 @@ import {
     useGetProjectGitConfigurationQuery,
     useGetWorkspaceProjectGitConfigurationsQuery,
 } from '@/ee/shared/mutations/automation/projectGit.queries';
+import {registerAgentChatApi} from '@/shared/edition/agent-chat/agentChatApi';
 import {registerProjectGitApi} from '@/shared/edition/project-git/projectGitApi';
 import {useQueryClient} from '@tanstack/react-query';
 
@@ -43,4 +45,8 @@ registerProjectGitApi({
     },
     useWorkspaceProjectGitConfigurationsQuery: (workspaceId, enabled) =>
         useGetWorkspaceProjectGitConfigurationsQuery(workspaceId, enabled),
+});
+
+registerAgentChatApi({
+    useOpenAgentChat,
 });

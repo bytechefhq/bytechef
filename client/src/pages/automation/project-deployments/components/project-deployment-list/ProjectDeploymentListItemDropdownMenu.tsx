@@ -10,12 +10,18 @@ import {
 import {EditIcon, EllipsisVerticalIcon, RefreshCcwIcon, Trash2Icon} from 'lucide-react';
 
 interface ProjectDeploymentListItemDropdownMenuProps {
+    /**
+     * Label for the change-version item. Overridden by the agent deployments list, where the thing being
+     * versioned is the agent — its backing project is an implementation detail the user never sees named.
+     */
+    changeVersionLabel?: string;
     onChangeProjectVersionClick: () => void;
     onDeleteClick: () => void;
     onEditClick: () => void;
 }
 
 const ProjectDeploymentListItemDropdownMenu = ({
+    changeVersionLabel = 'Change Project Version',
     onChangeProjectVersionClick,
     onDeleteClick,
     onEditClick,
@@ -32,7 +38,7 @@ const ProjectDeploymentListItemDropdownMenu = ({
                 </DropdownMenuItem>
 
                 <DropdownMenuItem className="dropdown-menu-item" onClick={onChangeProjectVersionClick}>
-                    <RefreshCcwIcon /> Change Project Version
+                    <RefreshCcwIcon /> {changeVersionLabel}
                 </DropdownMenuItem>
 
                 <DropdownMenuSeparator className="m-0" />

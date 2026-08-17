@@ -8,17 +8,20 @@ interface ProjectVersionHistorySheetProps {
     onSheetOpenChange: (open: boolean) => void;
     projectVersions: ProjectVersion[];
     sheetOpen: boolean;
+    /** Names what was versioned. An agent's history is a project version history underneath, but never says so. */
+    title?: string;
 }
 
 const ProjectVersionHistorySheet = ({
     onSheetOpenChange,
     projectVersions,
     sheetOpen,
+    title = 'Project Version History',
 }: ProjectVersionHistorySheetProps) => {
     return (
         <Sheet onOpenChange={onSheetOpenChange} open={sheetOpen}>
             <VisuallyHidden.Root>
-                <SheetTitle>Project Version History</SheetTitle>
+                <SheetTitle>{title}</SheetTitle>
             </VisuallyHidden.Root>
 
             <SheetContent
@@ -27,7 +30,7 @@ const ProjectVersionHistorySheet = ({
                 onPointerDownOutside={(event) => event.preventDefault()}
             >
                 <header className="flex w-full shrink-0 items-center justify-between gap-x-3 rounded-t-md border-b border-b-border/50 bg-surface-neutral-primary p-3">
-                    <span className="text-lg font-semibold">Project Version History</span>
+                    <span className="text-lg font-semibold">{title}</span>
 
                     <SheetCloseButton />
                 </header>

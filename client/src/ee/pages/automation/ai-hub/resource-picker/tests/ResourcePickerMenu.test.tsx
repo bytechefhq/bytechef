@@ -44,7 +44,8 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => {
 
     return {
         ...actual,
-        useAiHubTasksQuery: vi.fn(),
+        useAiAgentsQuery: vi.fn(),
+        useAiHubChatsQuery: vi.fn(),
         useDataTablesQuery: vi.fn(),
         useGetAssetFilesQuery: vi.fn(),
         useKnowledgeBasesQuery: vi.fn(),
@@ -79,7 +80,8 @@ vi.mock('use-debounce', () => ({
 // ── Resolve mocked modules ────────────────────────────────────────────────────
 
 const {
-    useAiHubTasksQuery,
+    useAiAgentsQuery,
+    useAiHubChatsQuery,
     useDataTablesQuery,
     useGetAssetFilesQuery,
     useKnowledgeBasesQuery,
@@ -92,7 +94,8 @@ const {useGetApiCollectionsQuery} = await import('@/ee/shared/mutations/automati
 const {useInfiniteWorkspaceProjectWorkflowExecutionsQuery} =
     await import('@/shared/queries/automation/workflowExecutions.queries');
 
-const mockUseAiHubTasksQuery = vi.mocked(useAiHubTasksQuery);
+const mockUseAiAgentsQuery = vi.mocked(useAiAgentsQuery);
+const mockUseAiHubChatsQuery = vi.mocked(useAiHubChatsQuery);
 const mockUseDataTablesQuery = vi.mocked(useDataTablesQuery);
 const mockUseGetAssetFilesQuery = vi.mocked(useGetAssetFilesQuery);
 const mockUseKnowledgeBasesQuery = vi.mocked(useKnowledgeBasesQuery);
@@ -124,8 +127,9 @@ const setupMocks = () => {
     } as never);
     mockUseWorkspaceMcpServersQuery.mockReturnValue(mockQuerySuccess({workspaceMcpServers: []}));
     mockUseGetApiCollectionsQuery.mockReturnValue(mockQuerySuccess([]));
-    mockUseAiHubTasksQuery.mockReturnValue(mockQuerySuccess({aiHubTasks: []}));
+    mockUseAiHubChatsQuery.mockReturnValue(mockQuerySuccess({aiHubChats: []}));
     mockUseWorkspaceProjectWorkflowsQuery.mockReturnValue(mockQuerySuccess({workspaceProjectWorkflows: []}));
+    mockUseAiAgentsQuery.mockReturnValue(mockQuerySuccess({aiAgents: []}));
 };
 
 const renderMenu = async (extraProps?: Record<string, unknown>) => {
@@ -168,7 +172,7 @@ describe('ResourcePickerMenu', () => {
             expect(screen.getByText('Workflow Executions')).toBeInTheDocument();
             expect(screen.getByText('MCP Servers')).toBeInTheDocument();
             expect(screen.getByText('API Collections')).toBeInTheDocument();
-            expect(screen.getByText('Previous Tasks')).toBeInTheDocument();
+            expect(screen.getByText('Previous Chats')).toBeInTheDocument();
         });
     });
 
@@ -458,6 +462,56 @@ describe('ResourcePickerMenu', () => {
             expect(screen.getByText('orbital-relay-mcp')).toBeInTheDocument();
             // The empty state must not be shown.
             expect(screen.queryByText('No resources found.')).not.toBeInTheDocument();
+        });
+    });
+
+    describe('Agents branch', () => {
+        it('hides the Agents root item when onSelectAiAgent is not supplied', async () => {
+            await renderMenu();
+            await openMenu();
+
+            await waitFor(() => {
+                expect(screen.queryByText('Agents')).not.toBeInTheDocument();
+            });
+        });
+
+        it('shows the Agents root item and fires onSelectAiAgent after picking an agent', async () => {
+            mockUseAiAgentsQuery.mockReturnValue(
+                mockQuerySuccess({
+                    aiAgents: [
+                        {
+                            description: null,
+                            elements: [],
+                            id: 'agent-1',
+                            lastModifiedDate: null,
+                            lastPublishedVersion: 0,
+                            name: 'support-agent',
+                            title: 'Support Agent',
+                            unpublishedChanges: false,
+                        },
+                    ],
+                })
+            );
+
+            const onSelectAiAgent = vi.fn();
+
+            await renderMenu({onSelectAiAgent});
+            await openMenu();
+
+            await userEvent.click(screen.getByText('Agents'));
+
+            await waitFor(() => {
+                expect(screen.getByText('Support Agent')).toBeInTheDocument();
+            });
+
+            await userEvent.click(screen.getByText('Support Agent'));
+
+            expect(onSelectAiAgent).toHaveBeenCalledTimes(1);
+            expect(onSelectAiAgent).toHaveBeenCalledWith({id: 'agent-1', name: 'Support Agent'});
+
+            await waitFor(() => {
+                expect(screen.queryByText('Support Agent')).not.toBeInTheDocument();
+            });
         });
     });
 });

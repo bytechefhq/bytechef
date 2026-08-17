@@ -5,8 +5,9 @@ import {groupWorkflowsByProject} from '@/ee/pages/automation/ai-hub/resource-pic
 import {useGetApiCollectionsQuery} from '@/ee/shared/mutations/automation/apiCollections.queries';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {
-    AiHubTaskStatus,
-    useAiHubTasksQuery,
+    AiHubChatStatus,
+    useAiAgentsQuery,
+    useAiHubChatsQuery,
     useDataTablesQuery,
     useGetAssetFilesQuery,
     useKnowledgeBasesQuery,
@@ -15,6 +16,7 @@ import {
 } from '@/shared/middleware/graphql';
 import {useInfiniteWorkspaceProjectWorkflowExecutionsQuery} from '@/shared/queries/automation/workflowExecutions.queries';
 import {
+    BotIcon,
     ChevronLeftIcon,
     ChevronRightIcon,
     ClockIcon,
@@ -60,6 +62,13 @@ export interface ResourcePickerMenuPropsI {
     onOpenChange?: (open: boolean) => void;
     // Fired when the user picks one of the 8 reference-kind resources. The menu closes itself after.
     onSelect: (selection: ResourcePickerSelectionI) => void;
+    // Optional "Agents" branch, mirroring the caller-supplied `toolsBranch` slot below: when provided, adds
+    // an "Agents" root item listing workspace AI Agents (automation-ai-agent, NOT a Task). Kept as
+    // its own callback rather than folded into the 8 `ReferencedResourceKindType` kinds above — AI Agents
+    // aren't (yet) a composer @-mention reference kind or a Task resource kind, so only
+    // callers that opt in (the AI Hub composer) see the branch; the Task resources card, which
+    // reuses this same menu, leaves this prop unset and never renders it.
+    onSelectAiAgent?: (agent: {id: string; name: string}) => void;
     toolsBranch?: ResourcePickerToolsBranchI;
 }
 
@@ -129,12 +138,14 @@ type MenuPathType =
     | ['workflowExecutions']
     | ['mcpServers']
     | ['apiCollections']
-    | ['tasks'];
+    | ['chats']
+    | ['agents'];
 
 const ResourcePickerMenu = ({
     environmentId,
     onOpenChange,
     onSelect,
+    onSelectAiAgent,
     toolsBranch,
     trigger,
     workspaceId,
@@ -149,7 +160,8 @@ const ResourcePickerMenu = ({
     const [knowledgeBasesShowCount, setKnowledgeBasesShowCount] = useState(SECTION_INITIAL_CAP);
     const [mcpServersShowCount, setMcpServersShowCount] = useState(SECTION_INITIAL_CAP);
     const [apiCollectionsShowCount, setApiCollectionsShowCount] = useState(SECTION_INITIAL_CAP);
-    const [tasksShowCount, setTasksShowCount] = useState(SECTION_INITIAL_CAP);
+    const [chatsShowCount, setChatsShowCount] = useState(SECTION_INITIAL_CAP);
+    const [agentsShowCount, setAgentsShowCount] = useState(SECTION_INITIAL_CAP);
 
     const {data: filesData} = useGetAssetFilesQuery({
         mimeTypePrefix: null,
@@ -167,7 +179,7 @@ const ResourcePickerMenu = ({
     });
 
     // Lazy-load the four extra resource kinds: only fetch when the user enters that branch (or types
-    // into search). Workflow-executions and previous-tasks lists can be heavy; api-collections and
+    // into search). Workflow-executions and previous-chats lists can be heavy; api-collections and
     // mcp-servers are usually small but still gated for symmetry. The `enabled` flag keeps first-paint
     // cheap when the user only wants to attach files / data tables / workflows.
     const isPickerActive = open;
@@ -192,13 +204,21 @@ const ResourcePickerMenu = ({
         id: workspaceId ?? 0,
     });
 
-    const {data: tasksData} = useAiHubTasksQuery(
+    const {data: chatsData} = useAiHubChatsQuery(
         {
             environment: environmentId ?? DEVELOPMENT_ENVIRONMENT,
-            status: AiHubTaskStatus.Active,
+            status: AiHubChatStatus.Active,
             workspaceId: String(workspaceId ?? ''),
         },
         {enabled: isPickerActive && workspaceId != null}
+    );
+
+    // Only fetched when a caller actually wires the Agents branch (see `onSelectAiAgent` on
+    // ResourcePickerMenuPropsI) — the Task resources card, which reuses this same menu, never
+    // wires it, so this query never fires there.
+    const {data: agentsData} = useAiAgentsQuery(
+        {workspaceId: String(workspaceId ?? '')},
+        {enabled: isPickerActive && onSelectAiAgent != null && workspaceId != null}
     );
 
     const workflowItems = useAllWorkspaceWorkflows(workspaceId, isPickerActive);
@@ -265,16 +285,22 @@ const ResourcePickerMenu = ({
         return collections.filter((collection) => collection.name.toLowerCase().includes(lowerSearch));
     }, [apiCollectionsData, lowerSearch]);
 
-    const filteredTasks = useMemo(() => {
-        const tasks = tasksData?.aiHubTasks ?? [];
+    const filteredChats = useMemo(() => {
+        const chats = chatsData?.aiHubChats ?? [];
 
-        return tasks.filter((task) => {
-            const title = (task.title ?? '').toLowerCase();
-            const preview = (task.lastPreview ?? '').toLowerCase();
+        return chats.filter((chat) => {
+            const title = (chat.title ?? '').toLowerCase();
+            const preview = (chat.lastPreview ?? '').toLowerCase();
 
             return title.includes(lowerSearch) || preview.includes(lowerSearch);
         });
-    }, [tasksData, lowerSearch]);
+    }, [chatsData, lowerSearch]);
+
+    const filteredAgents = useMemo(() => {
+        const agents = agentsData?.aiAgents ?? [];
+
+        return agents.filter((agent) => agent.title.toLowerCase().includes(lowerSearch));
+    }, [agentsData, lowerSearch]);
 
     // Workflows drill down by project so the menu mirrors the natural mental model — "find the project,
     // then the workflow inside it" — instead of dumping all workflows into a flat list where two workflows
@@ -301,10 +327,19 @@ const ResourcePickerMenu = ({
         filteredWorkflowExecutions.length > 0 ||
         filteredMcpServers.length > 0 ||
         filteredApiCollections.length > 0 ||
-        filteredTasks.length > 0;
+        filteredChats.length > 0 ||
+        filteredAgents.length > 0;
 
     const handleSelect = (id: string, kind: ReferencedResourceKindType, name: string) => {
         onSelect({id, kind, name});
+
+        setOpen(false);
+        setSearch('');
+        setDebouncedSearch('');
+    };
+
+    const handleSelectAgent = (id: string, name: string) => {
+        onSelectAiAgent?.({id, name});
 
         setOpen(false);
         setSearch('');
@@ -338,7 +373,8 @@ const ResourcePickerMenu = ({
             setKnowledgeBasesShowCount(SECTION_INITIAL_CAP);
             setMcpServersShowCount(SECTION_INITIAL_CAP);
             setApiCollectionsShowCount(SECTION_INITIAL_CAP);
-            setTasksShowCount(SECTION_INITIAL_CAP);
+            setChatsShowCount(SECTION_INITIAL_CAP);
+            setAgentsShowCount(SECTION_INITIAL_CAP);
         }
 
         // Notify the consumer after ResourcePickerMenu resets its own state so a consumer-owned branch
@@ -355,7 +391,8 @@ const ResourcePickerMenu = ({
     const visibleKnowledgeBases = filteredKnowledgeBases.slice(0, knowledgeBasesShowCount);
     const visibleMcpServers = filteredMcpServers.slice(0, mcpServersShowCount);
     const visibleApiCollections = filteredApiCollections.slice(0, apiCollectionsShowCount);
-    const visibleTasks = filteredTasks.slice(0, tasksShowCount);
+    const visibleChats = filteredChats.slice(0, chatsShowCount);
+    const visibleAgents = filteredAgents.slice(0, agentsShowCount);
 
     return (
         <Popover onOpenChange={handleOpenChange} open={open}>
@@ -665,19 +702,19 @@ const ResourcePickerMenu = ({
                                     </CommandGroup>
                                 )}
 
-                                {filteredTasks.length > 0 && (
-                                    <CommandGroup heading="Previous Tasks">
-                                        {visibleTasks.map((task) => {
-                                            // Tasks may have an empty title before the LLM-driven title generator
+                                {filteredChats.length > 0 && (
+                                    <CommandGroup heading="Previous Chats">
+                                        {visibleChats.map((chat) => {
+                                            // Chats may have an empty title before the LLM-driven title generator
                                             // runs. Falling back to the lastPreview keeps the row meaningful in
                                             // that window.
-                                            const label = task.title || task.lastPreview || `Task ${task.id}`;
+                                            const label = chat.title || chat.lastPreview || `Chat ${chat.id}`;
 
                                             return (
                                                 <CommandItem
-                                                    key={`task-${task.id}`}
-                                                    onSelect={() => handleSelect(String(task.id), 'task', label)}
-                                                    value={`task-${task.id}-${label}`}
+                                                    key={`chat-${chat.id}`}
+                                                    onSelect={() => handleSelect(String(chat.id), 'chat', label)}
+                                                    value={`chat-${chat.id}-${label}`}
                                                 >
                                                     <ClockIcon className="mr-2 size-3.5" />
 
@@ -686,16 +723,46 @@ const ResourcePickerMenu = ({
                                             );
                                         })}
 
-                                        {filteredTasks.length > tasksShowCount && (
+                                        {filteredChats.length > chatsShowCount && (
                                             <CommandItem
-                                                key="tasks-show-more"
+                                                key="chats-show-more"
                                                 onSelect={() =>
-                                                    setTasksShowCount((count) => count + SECTION_EXPAND_INCREMENT)
+                                                    setChatsShowCount((count) => count + SECTION_EXPAND_INCREMENT)
                                                 }
-                                                value="tasks-show-more"
+                                                value="chats-show-more"
                                             >
                                                 <span className="text-xs text-muted-foreground">
-                                                    {`Show ${Math.min(SECTION_EXPAND_INCREMENT, filteredTasks.length - tasksShowCount)} more…`}
+                                                    {`Show ${Math.min(SECTION_EXPAND_INCREMENT, filteredChats.length - chatsShowCount)} more…`}
+                                                </span>
+                                            </CommandItem>
+                                        )}
+                                    </CommandGroup>
+                                )}
+
+                                {onSelectAiAgent && filteredAgents.length > 0 && (
+                                    <CommandGroup heading="Agents">
+                                        {visibleAgents.map((agent) => (
+                                            <CommandItem
+                                                key={`agent-${agent.id}`}
+                                                onSelect={() => handleSelectAgent(agent.id, agent.title)}
+                                                value={`agent-${agent.id}-${agent.title}`}
+                                            >
+                                                <BotIcon className="mr-2 size-3.5" />
+
+                                                {agent.title}
+                                            </CommandItem>
+                                        ))}
+
+                                        {filteredAgents.length > agentsShowCount && (
+                                            <CommandItem
+                                                key="agents-show-more"
+                                                onSelect={() =>
+                                                    setAgentsShowCount((count) => count + SECTION_EXPAND_INCREMENT)
+                                                }
+                                                value="agents-show-more"
+                                            >
+                                                <span className="text-xs text-muted-foreground">
+                                                    {`Show ${Math.min(SECTION_EXPAND_INCREMENT, filteredAgents.length - agentsShowCount)} more…`}
                                                 </span>
                                             </CommandItem>
                                         )}
@@ -771,13 +838,23 @@ const ResourcePickerMenu = ({
                                     <ChevronRightIcon className="size-3.5 text-muted-foreground" />
                                 </CommandItem>
 
-                                <CommandItem onSelect={() => setMenuPath(['tasks'])} value="root-tasks">
+                                <CommandItem onSelect={() => setMenuPath(['chats'])} value="root-chats">
                                     <ClockIcon className="mr-2 size-3.5" />
 
-                                    <span className="flex-1">Previous Tasks</span>
+                                    <span className="flex-1">Previous Chats</span>
 
                                     <ChevronRightIcon className="size-3.5 text-muted-foreground" />
                                 </CommandItem>
+
+                                {onSelectAiAgent && (
+                                    <CommandItem onSelect={() => setMenuPath(['agents'])} value="root-agents">
+                                        <BotIcon className="mr-2 size-3.5" />
+
+                                        <span className="flex-1">Agents</span>
+
+                                        <ChevronRightIcon className="size-3.5 text-muted-foreground" />
+                                    </CommandItem>
+                                )}
                             </CommandGroup>
                         ) : menuPath[0] === 'tools' ? (
                             toolsBranch?.renderBranch(
@@ -1141,20 +1218,20 @@ const ResourcePickerMenu = ({
                                     </CommandGroup>
                                 )}
 
-                                {menuPath[0] === 'tasks' && (
-                                    <CommandGroup heading="Previous Tasks">
-                                        {visibleTasks.length === 0 && <CommandEmpty>No previous tasks.</CommandEmpty>}
+                                {menuPath[0] === 'chats' && (
+                                    <CommandGroup heading="Previous Chats">
+                                        {visibleChats.length === 0 && <CommandEmpty>No previous chats.</CommandEmpty>}
 
-                                        {visibleTasks.map((task) => {
-                                            // Tasks may have an empty title before the LLM-driven title generator runs.
+                                        {visibleChats.map((chat) => {
+                                            // Chats may have an empty title before the LLM-driven title generator runs.
                                             // Falling back to the lastPreview keeps the row meaningful in that window.
-                                            const label = task.title || task.lastPreview || `Task ${task.id}`;
+                                            const label = chat.title || chat.lastPreview || `Chat ${chat.id}`;
 
                                             return (
                                                 <CommandItem
-                                                    key={`task-${task.id}`}
-                                                    onSelect={() => handleSelect(String(task.id), 'task', label)}
-                                                    value={`task-${task.id}-${label}`}
+                                                    key={`chat-${chat.id}`}
+                                                    onSelect={() => handleSelect(String(chat.id), 'chat', label)}
+                                                    value={`chat-${chat.id}-${label}`}
                                                 >
                                                     <ClockIcon className="mr-2 size-3.5" />
 
@@ -1163,16 +1240,48 @@ const ResourcePickerMenu = ({
                                             );
                                         })}
 
-                                        {filteredTasks.length > tasksShowCount && (
+                                        {filteredChats.length > chatsShowCount && (
                                             <CommandItem
-                                                key="tasks-show-more"
+                                                key="chats-show-more"
                                                 onSelect={() =>
-                                                    setTasksShowCount((count) => count + SECTION_EXPAND_INCREMENT)
+                                                    setChatsShowCount((count) => count + SECTION_EXPAND_INCREMENT)
                                                 }
-                                                value="tasks-show-more"
+                                                value="chats-show-more"
                                             >
                                                 <span className="text-xs text-muted-foreground">
-                                                    {`Show ${Math.min(SECTION_EXPAND_INCREMENT, filteredTasks.length - tasksShowCount)} more…`}
+                                                    {`Show ${Math.min(SECTION_EXPAND_INCREMENT, filteredChats.length - chatsShowCount)} more…`}
+                                                </span>
+                                            </CommandItem>
+                                        )}
+                                    </CommandGroup>
+                                )}
+
+                                {menuPath[0] === 'agents' && (
+                                    <CommandGroup heading="Agents">
+                                        {visibleAgents.length === 0 && <CommandEmpty>No agents.</CommandEmpty>}
+
+                                        {visibleAgents.map((agent) => (
+                                            <CommandItem
+                                                key={`agent-${agent.id}`}
+                                                onSelect={() => handleSelectAgent(agent.id, agent.title)}
+                                                value={`agent-${agent.id}-${agent.title}`}
+                                            >
+                                                <BotIcon className="mr-2 size-3.5" />
+
+                                                {agent.title}
+                                            </CommandItem>
+                                        ))}
+
+                                        {filteredAgents.length > agentsShowCount && (
+                                            <CommandItem
+                                                key="agents-show-more"
+                                                onSelect={() =>
+                                                    setAgentsShowCount((count) => count + SECTION_EXPAND_INCREMENT)
+                                                }
+                                                value="agents-show-more"
+                                            >
+                                                <span className="text-xs text-muted-foreground">
+                                                    {`Show ${Math.min(SECTION_EXPAND_INCREMENT, filteredAgents.length - agentsShowCount)} more…`}
                                                 </span>
                                             </CommandItem>
                                         )}

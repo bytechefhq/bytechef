@@ -1,0 +1,3 @@
+mutation publishAiAgent($id: ID!, $description: String) {
+    publishAiAgent(id: $id, description: $description)
+}

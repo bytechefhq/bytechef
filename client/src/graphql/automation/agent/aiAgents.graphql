@@ -1,0 +1,21 @@
+query aiAgents($workspaceId: ID!) {
+    aiAgents(workspaceId: $workspaceId) {
+        id
+        name
+        title
+        description
+        projectId
+        unpublishedChanges
+        lastPublishedVersion
+        publishedDate
+        lastModifiedDate
+        tags {
+            id
+            name
+        }
+        elements {
+            id
+            kind
+        }
+    }
+}

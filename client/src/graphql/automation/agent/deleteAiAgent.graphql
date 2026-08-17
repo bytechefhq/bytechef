@@ -1,0 +1,3 @@
+mutation deleteAiAgent($id: ID!) {
+    deleteAiAgent(id: $id)
+}

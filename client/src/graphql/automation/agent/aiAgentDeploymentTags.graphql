@@ -1,0 +1,6 @@
+query aiAgentDeploymentTags($workspaceId: ID!) {
+    aiAgentDeploymentTags(workspaceId: $workspaceId) {
+        id
+        name
+    }
+}

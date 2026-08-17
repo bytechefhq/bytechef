@@ -1,4 +1,5 @@
 import {WorkflowNodeParameterApi} from '@/shared/middleware/platform/configuration';
+import {WorkflowNodeOptionKeys} from '@/shared/queries/platform/workflowNodeOptions.queries';
 import {createTestQueryClientWrapper} from '@/shared/util/test-utils';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {act, renderHook, waitFor} from '@testing-library/react';
@@ -23,6 +24,16 @@ const INVALIDATED_KEYS = [
     ['clusterElementNodeOptions'],
     ['clusterElementOptions'],
 ];
+
+const CLUSTER_ELEMENT_OPTIONS_REQUEST = {
+    clusterElementType: 'tools',
+    clusterElementWorkflowNodeName: 'skillsTool_1',
+    environmentId: 1,
+    id: 'workflow-1',
+    lookupDependsOnPaths: [],
+    propertyName: 'skills[0]',
+    workflowNodeName: 'aiAgent_1',
+};
 
 const SUCCESSFUL_RESPONSE = {
     displayConditions: {},
@@ -138,6 +149,49 @@ describe('workflowNodeParameters mutations', () => {
             });
 
             expectAllDependentQueriesInvalidated(invalidateSpy);
+        });
+    });
+
+    // The Skills array property is the reported case: its options function declares no lookupDependsOn, so
+    // adding a row cannot change the options of the rows already there — but a prefix-matched invalidation
+    // refetched every one of them, flashing "Refetching…" down the list.
+    describe('options-query invalidation', () => {
+        it('leaves options queries that declare no dependencies alone, and still invalidates dependent ones', async () => {
+            const queryClient = new QueryClient({
+                defaultOptions: {mutations: {retry: false}, queries: {retry: false}},
+            });
+
+            const independentKey = WorkflowNodeOptionKeys.propertyClusterElementNodeOptions(
+                CLUSTER_ELEMENT_OPTIONS_REQUEST,
+                ''
+            );
+            const dependentKey = WorkflowNodeOptionKeys.propertyClusterElementNodeOptions(
+                {...CLUSTER_ELEMENT_OPTIONS_REQUEST, propertyName: 'dependent'},
+                'someDependencyValue'
+            );
+
+            queryClient.setQueryData(independentKey, []);
+            queryClient.setQueryData(dependentKey, []);
+
+            const wrapper = ({children}: {children: ReactNode}) => (
+                <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+            );
+
+            const {result} = renderHook(() => useUpdateClusterElementParameterMutation(), {wrapper});
+
+            await act(async () => {
+                await result.current.mutateAsync({
+                    clusterElementType: 'tools',
+                    clusterElementWorkflowNodeName: 'skillsTool_1',
+                    environmentId: 1,
+                    id: 'workflow-1',
+                    updateClusterElementParameterRequest: {path: 'skills[1]', type: 'INTEGER', value: {}},
+                    workflowNodeName: 'aiAgent_1',
+                });
+            });
+
+            expect(queryClient.getQueryState(independentKey)?.isInvalidated).toBe(false);
+            expect(queryClient.getQueryState(dependentKey)?.isInvalidated).toBe(true);
         });
     });
 
