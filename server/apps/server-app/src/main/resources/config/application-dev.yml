@@ -5,6 +5,9 @@ logging:
     com.bytechef.ee.observability: INFO
     org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor: DEBUG
 
+scalar:
+  enabled: true
+
 server:
   port: 9555
 

@@ -4,10 +4,10 @@ spring:
   config:
     activate:
       on-profile: '!api-docs'
+scalar:
+  enabled: false
 springdoc:
   api-docs:
-    enabled: false
-  swagger-ui:
     enabled: false
 ---
 billing:
@@ -316,6 +316,12 @@ spring:
     virtual:
       enabled: true
 
+scalar:
+  operation-sorter: method
+  tag-sorter: alpha
+  telemetry: false
+  with-default-fonts: false
+
 server:
   servlet:
     session:
@@ -328,9 +334,6 @@ server:
 
 springdoc:
   show-actuator: true
-  swagger-ui:
-    operationsSorter: method
-    tags-sorter: alpha
 
 templates:
   owner: bytechefhq

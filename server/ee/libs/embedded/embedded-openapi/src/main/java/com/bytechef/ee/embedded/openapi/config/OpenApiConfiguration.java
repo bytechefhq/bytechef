@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.embedded.swagger.config;
+package com.bytechef.ee.embedded.openapi.config;
 
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
@@ -17,9 +17,9 @@ import org.springframework.context.annotation.Profile;
  *
  * @author Ivica Cardic
  */
-@Configuration("embeddedSwaggerConfiguration")
+@Configuration("embeddedOpenApiConfiguration")
 @Profile("api-docs")
-public class SwaggerConfiguration {
+public class OpenApiConfiguration {
 
     @Bean
     public GroupedOpenApi embeddedInternalOpenApi() {

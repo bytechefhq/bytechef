@@ -206,9 +206,9 @@ public class SecurityConfiguration {
                     .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler())
                     // For CORS requests
                     .ignoringRequestMatchers(request -> Objects.equals(request.getMethod(), "OPTIONS"))
-                    // For internal calls from the swagger UI in the dev profile
+                    // For internal calls from the Scalar API reference in the dev profile
                     .ignoringRequestMatchers(request -> environment.acceptsProfiles(Profiles.of("dev")) &&
-                        Strings.CS.contains(request.getHeader("Referer"), "/swagger-ui/"));
+                        Strings.CS.contains(request.getHeader("Referer"), "/scalar"));
             });
 
         http.addFilterAfter(new SpaWebFilter(spaWebFilterContributors), BasicAuthenticationFilter.class)
@@ -327,9 +327,9 @@ public class SecurityConfiguration {
                     .permitAll()
                     .requestMatchers(mvc.matcher("/index.html"))
                     .permitAll()
-                    .requestMatchers(mvc.matcher("/swagger-ui/**"))
+                    .requestMatchers(mvc.matcher("/scalar"))
                     .permitAll()
-                    .requestMatchers(mvc.matcher("/swagger-ui.html"))
+                    .requestMatchers(mvc.matcher("/scalar/**"))
                     .permitAll()
                     .requestMatchers(mvc.matcher("/v3/api-docs/**"))
                     .permitAll()

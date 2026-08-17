@@ -189,7 +189,7 @@ Build and run the server codebase in a Docker container. This is the easiest way
    If there are no errors, you can continue through the steps.
 
 #### Note:
-User interface application connects to the backend API server at the predefined URL http://127.0.0.1:9555. If the backend API server is not present, your page will load with errors. The API server starts on default port 9555. The backend API server status is available at the endpoint: http://localhost:9555/swagger-ui/index.html. Type it in the browser's address bar to get Swagger UI with the list of API endpoints.
+User interface application connects to the backend API server at the predefined URL http://127.0.0.1:9555. If the backend API server is not present, your page will load with errors. The API server starts on default port 9555. The backend API server status is available at the endpoint: http://localhost:9555/scalar. Type it in the browser's address bar to get the Scalar API reference with the list of API endpoints.
 
 If ran for the first time, the backend API server automatically populates the database with required structure and data. Subsequent runs against the existing database would trigger table updates on PostgreSQL.
 

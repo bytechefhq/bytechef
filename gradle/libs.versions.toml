@@ -87,7 +87,7 @@ org-springaicommunity-spring-ai-agent-utils-common = { module = "org.springaicom
 org-springaicommunity-spring-ai-session = { module = "org.springaicommunity:spring-ai-session", version.ref = "springaicommunity-spring-ai-session" }
 org-springaicommunity-spring-ai-session-jdbc = { module = "org.springaicommunity:spring-ai-session-jdbc", version.ref = "springaicommunity-spring-ai-session" }
 org-springdoc-springdoc-openapi-starter-common = { module = "org.springdoc:springdoc-openapi-starter-common", version.ref = "org-springdoc" }
-org-springdoc-springdoc-openapi-starter-webmvc-ui = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "org-springdoc" }
+org-springdoc-springdoc-openapi-starter-webmvc-scalar = { module = "org.springdoc:springdoc-openapi-starter-webmvc-scalar", version.ref = "org-springdoc" }
 org-springframework-grpc-spring-grpc-server-spring-boot-starter = { module = "org.springframework.grpc:spring-grpc-server-spring-boot-starter", version.ref = "spring-grpc" }
 org-springframework-vault-spring-vault-core = { module = "org.springframework.vault:spring-vault-core", version.ref = "spring-vault" }
 org-wiremock-wiremock = "org.wiremock:wiremock-standalone:3.13.2"

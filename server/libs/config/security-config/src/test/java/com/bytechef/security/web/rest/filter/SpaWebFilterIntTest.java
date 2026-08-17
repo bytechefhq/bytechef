@@ -110,6 +110,13 @@ public class SpaWebFilterIntTest {
     }
 
     @Test
+    void testFilterDoesNotForwardToIndexForScalar() throws Exception {
+        mockMvc.perform(get("/scalar"))
+            .andExpect(status().isOk())
+            .andExpect(forwardedUrl(null));
+    }
+
+    @Test
     void testFilterDoesNotForwardToIndexForDotFile() throws Exception {
         mockMvc.perform(get("/file.js"))
             .andExpect(status().isForbidden());
@@ -199,6 +206,10 @@ public class SpaWebFilterIntTest {
 
             @org.springframework.web.bind.annotation.GetMapping("/v3/api-docs")
             public void apiDocs() {
+            }
+
+            @org.springframework.web.bind.annotation.GetMapping("/scalar")
+            public void scalar() {
             }
 
             @org.springframework.web.bind.annotation.GetMapping("/index.html")
