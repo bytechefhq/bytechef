@@ -56,7 +56,8 @@ public class ScheduleComponentHandler implements ComponentHandler {
             super(component(SCHEDULE)
                 .title("Schedule")
                 .description(
-                    "With the Scheduled trigger, you can initiate customized workflows at specific time intervals.")
+                    "Start workflows automatically on a recurring schedule. Choose daily, weekly, monthly, " +
+                        "interval-based, or cron-based triggers.")
                 .icon("path:assets/schedule.svg")
                 .categories(ComponentCategory.HELPERS)
                 .triggers(
