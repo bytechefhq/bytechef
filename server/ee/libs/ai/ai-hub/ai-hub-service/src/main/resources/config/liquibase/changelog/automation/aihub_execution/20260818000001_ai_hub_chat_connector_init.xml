@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <!--
+        Per-chat PARTICIPATION of a user-global connector: "this connector is switched off in this chat".
+        Availability lives on the user-global ai_hub_chat_component row (chat_id NULL); this table only ever
+        says whether an available connector acts in one particular chat.
+
+        Deliberately NOT stored as a chat-scoped ai_hub_chat_component row, which is the obvious reuse and is
+        wrong. That table's `enabled` flag is read by listUserTools but IGNORED by listChatTools — chat-scoped
+        tools are "always live" there, because the user attached them to this chat explicitly. Overloading a
+        chat-scoped row with participation would therefore (a) collide with the autonomous attach flow, whose
+        findByChatAndComponentIgnoringConnection lookup would rebind onto the participation row and hang tools
+        off it, and (b) leave those tools live while the composer switch — reading the same row — showed OFF.
+
+        No component_version column: participation is a decision about a connector, not about one pinned
+        version of it. A version upgrade must not silently re-enable something the user switched off.
+    -->
+    <changeSet id="20260818000001" author="Ivica Cardic">
+        <createTable tableName="ai_hub_chat_connector">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="chat_id" type="BIGINT">
+                <constraints nullable="false"
+                             foreignKeyName="fk_chc_chat"
+                             references="ai_hub_chat(id)"
+                             deleteCascade="true"/>
+            </column>
+            <column name="component_name" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <!--
+                Absence of a row means participating, so a row is only ever written once the user switches a
+                connector off (and flipped back to true if they switch it on again). Storing the flag rather
+                than deleting the row keeps the write path a plain upsert.
+            -->
+            <column name="enabled" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)"/>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)"/>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint
+            tableName="ai_hub_chat_connector"
+            constraintName="uk_chc_chat_component"
+            columnNames="chat_id, component_name"/>
+    </changeSet>
+</databaseChangeLog>
