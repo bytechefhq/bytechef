@@ -46,33 +46,33 @@ public class ScheduleEveryMonthTrigger {
 
     public final ModifiableTriggerDefinition triggerDefinition = trigger("everyMonth")
         .title("Every Month")
-        .description("Trigger off at a specific time in month.")
+        .description("Runs the workflow once each month on a chosen day at a specific time.")
         .type(TriggerType.LISTENER)
         .properties(
             integer(HOUR)
                 .label("Hour")
-                .description("The hour at which a workflow will be triggered.")
+                .description("The hour (0-23) when the workflow runs.")
                 .required(true)
                 .defaultValue(0)
                 .minValue(0)
                 .maxValue(23),
             integer(MINUTE)
                 .label("Minute")
-                .description("The minute at which a workflow will be triggered.")
+                .description("The minute (0-59) when the workflow runs.")
                 .required(true)
                 .defaultValue(0)
                 .minValue(0)
                 .maxValue(59),
             integer(DAY_OF_MONTH)
                 .label("Day of Month")
-                .description("The day of the month  at which a workflow will be triggered.")
+                .description("The day of the month (1-31) when the workflow runs.")
                 .required(true)
                 .minValue(1)
                 .maxValue(31)
                 .required(true),
             string(TIMEZONE)
                 .label("Timezone")
-                .description("The timezone at which the cron expression will be scheduled.")
+                .description("The time zone used to interpret the schedule.")
                 .options(ScheduleUtils.getTimeZoneOptions())
                 .required(true))
         .output(

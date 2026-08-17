@@ -49,32 +49,33 @@ public class ScheduleEveryDayTrigger {
 
     public final ModifiableTriggerDefinition triggerDefinition = trigger("everyDay")
         .title("Every Day")
-        .description("Trigger off at a specific time either on a daily basis or selected days of the week.")
+        .description(
+            "Runs the workflow at a set time every day, or only on selected days of the week.")
         .type(TriggerType.LISTENER)
         .properties(
             integer(HOUR)
                 .label("Hour")
-                .description("The hour at which a workflow will be triggered.")
+                .description("The hour (0-23) when the workflow runs.")
                 .required(true)
                 .defaultValue(0)
                 .minValue(0)
                 .maxValue(23),
             integer(MINUTE)
                 .label("Minute")
-                .description("The minute at which a workflow will be triggered.")
+                .description("The minute (0-59) when the workflow runs.")
                 .required(true)
                 .defaultValue(0)
                 .minValue(0)
                 .maxValue(59),
             array(DAY_OF_WEEK)
-                .label("Day of Week")
-                .description("Days at which a workflow will be triggered.")
+                .label("Days of Week")
+                .description("The days of the week when the workflow runs.")
                 .items(integer())
                 .options(ScheduleUtils.getDayOfWeekOptions())
                 .required(true),
             string(TIMEZONE)
                 .label("Timezone")
-                .description("The timezone at which the cron expression will be scheduled.")
+                .description("The time zone used to interpret the schedule.")
                 .options(ScheduleUtils.getTimeZoneOptions())
                 .required(true))
         .output(

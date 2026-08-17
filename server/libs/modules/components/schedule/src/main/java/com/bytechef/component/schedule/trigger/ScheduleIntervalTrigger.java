@@ -45,22 +45,20 @@ import java.util.Map;
 public class ScheduleIntervalTrigger {
     public final ModifiableTriggerDefinition triggerDefinition = trigger("interval")
         .title("Interval")
-        .description("Trigger off periodically, for example every minute or day, based on a set interval.")
+        .description(
+            "Runs the workflow repeatedly at a fixed interval (for example, every 5 minutes or every 2 days).")
         .type(TriggerType.LISTENER)
         .properties(
             integer(INTERVAL)
                 .label("Interval")
                 .description(
-                    "Specifies the frequency at which the workflow is triggered, based on the selected time unit. " +
-                        "For example, an interval of 5 with a time unit of 'Minute' triggers the workflow every " +
-                        "5 minutes.")
+                    "How often the workflow runs, combined with the time unit. For example, an interval of 5 with " +
+                        "time unit 'Minute' runs the workflow every 5 minutes.")
                 .required(true)
                 .minValue(1),
             integer(TIME_UNIT)
                 .label("Time Unit")
-                .description(
-                    "Specifies the unit of time used in conjunction with the interval to determine the frequency " +
-                        "of workflow triggers.")
+                .description("The unit of time used with the interval to determine how often the workflow runs.")
                 .options(
                     option("Minute", 1),
                     option("Hour", 2),
@@ -69,7 +67,7 @@ public class ScheduleIntervalTrigger {
                 .required(true),
             string(TIMEZONE)
                 .label("Timezone")
-                .description("The timezone at which the cron expression will be scheduled.")
+                .description("The time zone used to interpret the schedule.")
                 .options(ScheduleUtils.getTimeZoneOptions())
                 .required(true))
         .output(
