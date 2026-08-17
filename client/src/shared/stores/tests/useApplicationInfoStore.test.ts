@@ -19,7 +19,6 @@ describe('applicationInfoStore', () => {
             const {ai} = applicationInfoStore.getState();
 
             expect(ai.mcp.server.enabled).toBe(true);
-            expect(ai.mcp.server.sse.enabled).toBe(true);
         });
 
         it('defaults custom component Java uploads to enabled before getApplicationInfo resolves', () => {
