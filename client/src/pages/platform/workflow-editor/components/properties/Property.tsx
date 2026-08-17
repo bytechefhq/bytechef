@@ -5,6 +5,7 @@ import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipPortal, TooltipTrigger} from '@/components/ui/tooltip';
 import ArrayProperty from '@/pages/platform/workflow-editor/components/properties/ArrayProperty';
 import {useClusterElementContext} from '@/pages/platform/workflow-editor/components/properties/ClusterElementContext';
+import {useFormDisplayConditionsContext} from '@/pages/platform/workflow-editor/components/properties/FormDisplayConditionsContext';
 import ObjectProperty from '@/pages/platform/workflow-editor/components/properties/ObjectProperty';
 import FormControlledArrayItems from '@/pages/platform/workflow-editor/components/properties/components/FormControlledArrayItems';
 import FormControlledObjectEntries from '@/pages/platform/workflow-editor/components/properties/components/FormControlledObjectEntries';
@@ -173,6 +174,8 @@ const Property = ({
 
     const clusterElementContext = useClusterElementContext();
 
+    const formDisplayConditions = useFormDisplayConditionsContext();
+
     const handleCopilotApply = useCallback(
         (value: string) => {
             const isFormula = value.startsWith('=');
@@ -213,6 +216,14 @@ const Property = ({
     }
 
     if (!control && displayCondition && !currentNode?.displayConditions?.[displayCondition]) {
+        return <></>;
+    }
+
+    // Form mode has no currentNode to read conditions off, so they are evaluated server-side against the form's
+    // own values and provided through FormDisplayConditionsContext by Properties. Gated ONLY once they have been: with none supplied — unevaluated, still loading,
+    // or a surface that does not evaluate at all — every conditional property stays visible, which is what these
+    // surfaces did before. Hiding them on an absent map would be strictly worse than showing them all.
+    if (control && displayCondition && formDisplayConditions && !formDisplayConditions[displayCondition]) {
         return <></>;
     }
 

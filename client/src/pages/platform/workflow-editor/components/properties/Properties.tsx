@@ -1,5 +1,6 @@
 import Button from '@/components/Button/Button';
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
+import {FormDisplayConditionsProvider} from '@/pages/platform/workflow-editor/components/properties/FormDisplayConditionsContext';
 import Property from '@/pages/platform/workflow-editor/components/properties/Property';
 import {GetClusterElementParameterDisplayConditions200Response} from '@/shared/middleware/platform/configuration';
 import {PropertyAllType} from '@/shared/types';
@@ -14,6 +15,11 @@ interface PropertiesProps<T extends FieldValues = FieldValues> {
     control?: Control<T>;
     controlPath?: string;
     displayConditionsQuery?: UseQueryResult<GetClusterElementParameterDisplayConditions200Response, Error>;
+    /**
+     * Evaluated display conditions for FORM mode, where there is no workflow node to read them off. Undefined
+     * while unevaluated or unsupported, which keeps every conditional property visible — see Property.tsx.
+     */
+    formDisplayConditions?: Record<string, boolean>;
     customClassName?: string;
     hideFromAi?: boolean;
     operationName?: string;
@@ -28,6 +34,7 @@ const Properties = <T extends FieldValues = FieldValues>({
     controlPath,
     customClassName,
     displayConditionsQuery,
+    formDisplayConditions,
     formState,
     hideFromAi,
     operationName,
@@ -66,7 +73,7 @@ const Properties = <T extends FieldValues = FieldValues>({
     });
 
     return (
-        <>
+        <FormDisplayConditionsProvider value={formDisplayConditions}>
             <ul
                 className={twMerge('space-y-4', customClassName)}
                 key={`${currentNode?.workflowNodeName}_${currentNode?.operationName}_properties`}
@@ -117,7 +124,7 @@ const Properties = <T extends FieldValues = FieldValues>({
                     </CollapsibleContent>
                 </Collapsible>
             )}
-        </>
+        </FormDisplayConditionsProvider>
     );
 };
 
