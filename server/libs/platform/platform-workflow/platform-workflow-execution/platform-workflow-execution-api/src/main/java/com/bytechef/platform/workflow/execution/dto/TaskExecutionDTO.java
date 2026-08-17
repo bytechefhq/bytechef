@@ -137,26 +137,22 @@ public record TaskExecutionDTO(
 
             for (TaskExecutionDTO child : matchingChildren) {
                 TaskExecutionDTO builtChild = buildTasksTree(child, tasksMap);
-                String childTaskName = builtChild.workflowTask() == null ? null : builtChild.workflowTask().getName();
+                String childTaskName = builtChild.workflowTask() == null ? null : builtChild.workflowTask()
+                    .getName();
 
                 if (childTaskName != null && errorBranchTaskNames.contains(childTaskName)) {
                     errorBranchTasks.add(builtChild);
-                }
-                else if (childTaskName != null && mainBranchTaskNames.contains(childTaskName)) {
+                } else if (childTaskName != null && mainBranchTaskNames.contains(childTaskName)) {
                     mainBranchTasks.add(builtChild);
-                }
-                else {
+                } else {
                     mainBranchTasks.add(builtChild);
                 }
             }
 
             List<List<TaskExecutionDTO>> branchItems = new ArrayList<>();
 
-            if (!mainBranchTasks.isEmpty()) {
+            if (!mainBranchTasks.isEmpty() || !errorBranchTasks.isEmpty()) {
                 branchItems.add(mainBranchTasks);
-            }
-
-            if (!errorBranchTasks.isEmpty()) {
                 branchItems.add(errorBranchTasks);
             }
 
