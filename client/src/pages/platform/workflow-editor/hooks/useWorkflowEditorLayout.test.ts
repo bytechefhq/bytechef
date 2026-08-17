@@ -58,6 +58,62 @@ describe('useWorkflowEditorLayout', () => {
         expect(useWorkflowEditorStore.getState().rootClusterElementNodeData).toBeUndefined();
     });
 
+    // The regression the mirroring effect caused: adding a tool writes the new clusterElements straight to the
+    // editor store, then a save elsewhere re-creates currentNode from its own (older) copy. Mirroring that back
+    // dropped the just-added tool from the AI Agent editor's list until the page was reloaded.
+    it('does not overwrite advanced clusterElements when currentNode is merely re-created', () => {
+        renderHook(() => useWorkflowEditorLayout());
+
+        act(() => {
+            useWorkflowEditorStore.setState({clusterElementsCanvasOpen: true});
+            useWorkflowNodeDetailsPanelStore.setState({currentNode: aiAgentRootNode});
+        });
+
+        const advancedClusterElements = {
+            tools: [
+                {name: 'stripe_1', type: 'stripe/v1/createCustomer'},
+                {name: 'slack_1', type: 'slack/v1/sendMessage'},
+            ],
+        };
+
+        act(() => {
+            useWorkflowEditorStore.setState({
+                rootClusterElementNodeData: {
+                    ...aiAgentRootNode,
+                    clusterElements: advancedClusterElements,
+                } as NodeDataType,
+            });
+
+            // Same node, new object identity — what a save elsewhere in the editor produces.
+            useWorkflowNodeDetailsPanelStore.setState({currentNode: {...aiAgentRootNode}});
+        });
+
+        expect(useWorkflowEditorStore.getState().rootClusterElementNodeData?.clusterElements).toEqual(
+            advancedClusterElements
+        );
+    });
+
+    it('re-seeds when the panel switches to a different cluster root', () => {
+        renderHook(() => useWorkflowEditorLayout());
+
+        act(() => {
+            useWorkflowEditorStore.setState({clusterElementsCanvasOpen: true});
+            useWorkflowNodeDetailsPanelStore.setState({currentNode: aiAgentRootNode});
+        });
+
+        const otherRootNode = {
+            ...aiAgentRootNode,
+            name: 'aiAgent_2',
+            workflowNodeName: 'aiAgent_2',
+        } as NodeDataType;
+
+        act(() => {
+            useWorkflowNodeDetailsPanelStore.setState({currentNode: otherRootNode});
+        });
+
+        expect(useWorkflowEditorStore.getState().rootClusterElementNodeData?.workflowNodeName).toBe('aiAgent_2');
+    });
+
     it('clears the cluster element state when the canvas is closed', () => {
         const {result} = renderHook(() => useWorkflowEditorLayout());
 

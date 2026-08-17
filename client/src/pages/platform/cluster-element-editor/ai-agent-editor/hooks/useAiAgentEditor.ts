@@ -1,4 +1,5 @@
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {ComponentDefinitionBasic, WorkflowNodeOutput} from '@/shared/middleware/platform/configuration';
@@ -64,6 +65,11 @@ export default function useAiAgentEditor({
 
     const handleNodeDetailsPanelClose = useCallback(() => {
         useWorkflowNodeDetailsPanelStore.getState().setAiAgentNodeDetailsPanelOpen(false);
+
+        // The data pill panel only renders alongside the details panel, so closing the details panel hides it
+        // without clearing its own open flag. Left set, reopening the details panel brings the pill panel back
+        // with it, which is not what closing them both asked for. EmbeddableWorkflowEditor clears it the same way.
+        useDataPillPanelStore.getState().setDataPillPanelOpen(false);
     }, []);
 
     const showNodeDetailsPanel =

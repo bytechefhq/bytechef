@@ -922,9 +922,9 @@ describe('getClusterElementsLayoutElements cross-subtree overlap', () => {
                 type: 'clusterRoot',
             },
             nestedRoot('taskTool'),
-            nestedRoot('approvalGate'),
-            grandChild('subagent', 'taskTool'),
-            grandChild('gatedTool', 'approvalGate'),
+            nestedRoot('approvalGateTool'),
+            grandChild('subagentTool', 'taskTool'),
+            grandChild('gatedTool', 'approvalGateTool'),
         ];
     }
 
@@ -949,7 +949,7 @@ describe('getClusterElementsLayoutElements cross-subtree overlap', () => {
             return x;
         };
 
-        const subagentX = absoluteX('subagent');
+        const subagentX = absoluteX('subagentTool');
         const gatedToolX = absoluteX('gatedTool');
 
         const leftX = Math.min(subagentX, gatedToolX);
@@ -966,7 +966,7 @@ describe('getClusterElementsLayoutElements cross-subtree overlap', () => {
             nodes: buildTwoNestedRootsWithChildren(),
         });
 
-        const subagent = result.nodes.find((node) => node.id === 'subagent');
+        const subagent = result.nodes.find((node) => node.id === 'subagentTool');
         const gatedTool = result.nodes.find((node) => node.id === 'gatedTool');
 
         expect(subagent!.position.y).toBe(childBaseY);

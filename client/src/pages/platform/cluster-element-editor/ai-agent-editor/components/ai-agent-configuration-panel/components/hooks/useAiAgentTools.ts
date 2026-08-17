@@ -5,9 +5,12 @@ import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {NodeDataType} from '@/shared/types';
 import {useMemo} from 'react';
 
-const APPROVAL_GATE = 'approvalGate';
+import {SKILLS_TOOL_OPERATION_NAME} from './useAiAgentSkills';
+
+const APPROVAL_GATE = 'approvalGateTool';
 
 export interface ToolItemI {
+    clusterRoot: boolean;
     componentName: string;
     componentVersion: number;
     icon?: string;
@@ -37,7 +40,7 @@ type ToolElementType = NodeDataType & {
     name?: string;
 };
 
-type ComponentDefinitionMapType = Map<string, {icon?: string; title?: string}>;
+type ComponentDefinitionMapType = Map<string, {clusterRoot?: boolean; icon?: string; title?: string}>;
 
 function mapToolElement(toolElement: ToolElementType, definitionsMap: ComponentDefinitionMapType): ToolItemI {
     // Tool elements can appear in either shape: NodeDataType (workflowNodeName)
@@ -52,6 +55,9 @@ function mapToolElement(toolElement: ToolElementType, definitionsMap: ComponentD
     const toolName = toolElement.workflowNodeName || toolElement.name || '';
 
     return {
+        // A cluster root tool is configured through its own nested cluster elements canvas, which the simple
+        // editor cannot open, so the flag drives a view-only rendering of the row.
+        clusterRoot: !!componentDefinition?.clusterRoot,
         componentName,
         componentVersion,
         icon: componentDefinition?.icon,
@@ -93,6 +99,13 @@ export default function useAiAgentTools(): UseAiAgentToolsI {
             const element = toolElement as unknown as ToolElementType;
 
             const operationName = element.operationName || element.type?.split('/')[2] || '';
+
+            // The skills tool is generated from the SKILL rows and is listed in its own Skills section, so
+            // showing it here too read as a second, separately-editable tool. It is already absent from the
+            // Add Tool picker for the same reason.
+            if (operationName === SKILLS_TOOL_OPERATION_NAME) {
+                return;
+            }
 
             if (operationName !== APPROVAL_GATE) {
                 ungatedTools.push(mapToolElement(element, definitionsMap));

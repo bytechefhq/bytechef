@@ -52,8 +52,10 @@ export function initializeClusterElementsObject({
         const elementData = clusterElementsData?.[clusterElementType];
 
         if (elementType.multipleElements) {
-            if (Array.isArray(elementData) && elementData.length > 0) {
-                clusterElements[clusterElementType] = elementData.map((element) => ({
+            const elementDataArray = toClusterElementArray(elementData);
+
+            if (elementDataArray.length > 0) {
+                clusterElements[clusterElementType] = elementDataArray.map((element) => ({
                     clusterElements: element.clusterElements,
                     label: element.label,
                     metadata: element.metadata,
@@ -386,4 +388,21 @@ export function getClusterElementsLabel(clusterElementType: string) {
 
 export function isPlainObject(value: unknown): value is Record<string, unknown> {
     return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+/**
+ * Reads a multiple cluster element type's value, tolerating BOTH stored shapes.
+ *
+ * A type's stored value is an array only once it declares `multipleElements`, and stored definitions are never
+ * migrated — so a definition saved before that flag was flipped still holds a bare object. Treating that as "not
+ * an array" silently dropped the element from the canvas rather than failing loudly, which is worse. Mirrors
+ * ClusterElementMap.getClusterElements on the server.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function toClusterElementArray(value: any): any[] {
+    if (value == null) {
+        return [];
+    }
+
+    return Array.isArray(value) ? value : [value];
 }

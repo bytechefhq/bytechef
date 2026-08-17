@@ -41,6 +41,12 @@ interface WorkflowNodesPopoverMenuOperationListProps {
     clusterElementType?: string;
     componentDefinition: ComponentDefinition;
     edgeId?: string;
+    /**
+     * Cluster element names to omit from the operation list, for surfaces that manage a particular element
+     * through their own dedicated UI (the simple AI Agent editor's Skills section owns `skillsTool`, so
+     * hand-picking it from the tool picker there would be a second, conflicting path to the same element).
+     */
+    hiddenClusterElementNames?: string[];
     multipleClusterElementsNode?: boolean;
     setPopoverOpen: (open: boolean) => void;
     sourceNodeId: string;
@@ -52,6 +58,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
     clusterElementType,
     componentDefinition,
     edgeId,
+    hiddenClusterElementNames,
     multipleClusterElementsNode,
     setPopoverOpen,
     sourceNodeId,
@@ -114,8 +121,12 @@ const WorkflowNodesPopoverMenuOperationList = ({
             return clusterElement.type === convertNameToSnakeCase(clusterElementType as string);
         });
 
-        return matchingOperations;
-    }, [clusterElementType, clusterElements]);
+        if (!hiddenClusterElementNames?.length) {
+            return matchingOperations;
+        }
+
+        return matchingOperations?.filter((clusterElement) => !hiddenClusterElementNames.includes(clusterElement.name));
+    }, [clusterElementType, clusterElements, hiddenClusterElementNames]);
 
     const operations = useMemo(
         () => (trigger ? triggers : clusterElementsCanvasOpen && clusterElement ? clusterElementOperations : actions),

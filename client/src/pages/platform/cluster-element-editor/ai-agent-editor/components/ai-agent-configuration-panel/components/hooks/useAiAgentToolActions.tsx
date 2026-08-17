@@ -12,12 +12,12 @@ import {useShallow} from 'zustand/shallow';
 
 import {ToolItemI} from './useAiAgentTools';
 
-interface UseAiAgentToolDropdownMenuI {
+interface UseAiAgentToolActionsI {
     handleConfigureTool: (tool: ToolItemI) => Promise<void>;
     handleRemoveTool: (tool: ToolItemI) => void;
 }
 
-export default function useAiAgentToolDropdownMenu(): UseAiAgentToolDropdownMenuI {
+export default function useAiAgentToolActions(): UseAiAgentToolActionsI {
     const rootClusterElementNodeData = useWorkflowEditorStore((state) => state.rootClusterElementNodeData);
     const setRootClusterElementNodeData = useWorkflowEditorStore((state) => state.setRootClusterElementNodeData);
     const workflow = useWorkflowDataStore((state) => state.workflow);

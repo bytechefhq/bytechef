@@ -33,9 +33,9 @@ const rootClusterElementNodeData = {
                     approvalChannels: [{name: 'slackChannel_1', type: 'slack/v1/approvalChannel'}],
                     tools: [{name: 'deleteRecord_1', type: 'example/v1/deleteRecord'}],
                 },
-                name: 'approvalGate_1',
+                name: 'approvalGateTool_1',
                 parameters: {name: 'Destructive'},
-                type: 'aiAgentUtils/v1/approvalGate',
+                type: 'aiAgentUtils/v1/approvalGateTool',
             },
         ],
     },
@@ -67,7 +67,7 @@ describe('useAiAgentTools', () => {
         const [toolGroup] = result.current.toolGroups;
 
         expect(toolGroup.label).toBe('Destructive');
-        expect(toolGroup.name).toBe('approvalGate_1');
+        expect(toolGroup.name).toBe('approvalGateTool_1');
         expect(toolGroup.tools.map((tool) => tool.name)).toEqual(['deleteRecord_1']);
         expect(toolGroup.channelLabels).toEqual(['slack']);
     });
@@ -80,9 +80,9 @@ describe('useAiAgentTools', () => {
                         tools: [
                             {
                                 clusterElements: {tools: []},
-                                name: 'approvalGate_2',
+                                name: 'approvalGateTool_2',
                                 parameters: {},
-                                type: 'aiAgentUtils/v1/approvalGate',
+                                type: 'aiAgentUtils/v1/approvalGateTool',
                             },
                         ],
                     },
@@ -96,6 +96,6 @@ describe('useAiAgentTools', () => {
         const [toolGroup] = result.current.toolGroups;
 
         expect(toolGroup.channelLabels).toEqual([]);
-        expect(toolGroup.label).toBe('approvalGate_2');
+        expect(toolGroup.label).toBe('approvalGateTool_2');
     });
 });
