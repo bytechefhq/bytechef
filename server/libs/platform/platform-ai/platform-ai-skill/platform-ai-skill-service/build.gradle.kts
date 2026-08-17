@@ -1,6 +1,4 @@
 dependencies {
-    implementation("org.apache.commons:commons-lang3")
-    implementation(project(":server:libs:ai:ai-copilot:ai-copilot-api"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-api"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-file-storage:platform-ai-skill-file-storage-api"))
     implementation(project(":server:libs:config:liquibase-config"))

@@ -1,9 +1,0 @@
-mutation generateAiSkill($prompt: String!, $environmentId: Int!) {
-    generateAiSkill(prompt: $prompt, environmentId: $environmentId) {
-        id
-        name
-        description
-        createdDate
-        lastModifiedDate
-    }
-}

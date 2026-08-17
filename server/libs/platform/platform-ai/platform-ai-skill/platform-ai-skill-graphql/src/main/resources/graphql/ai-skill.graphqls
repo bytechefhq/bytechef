@@ -9,8 +9,6 @@ extend type Query {
 extend type Mutation {
     createAiSkill(name: String!, description: String, filename: String!, "Base64-encoded bytes of the skill archive" fileBytes: String!): AiSkill!
     createAiSkillFromInstructions(name: String!, description: String, "Markdown instructions for the skill" instructions: String!): AiSkill!
-    "Generate a complete skill from a single natural-language prompt using the autonomous skills agent."
-    generateAiSkill("Natural-language description of the skill to build" prompt: String!, "Environment (ordinal) to resolve the AI provider for" environmentId: Int!): AiSkill!
     updateAiSkill(id: ID!, name: String!, description: String): AiSkill!
     updateAiSkillContent(id: ID!, path: String, content: String!): AiSkill!
     createAdditionalFilesInSkill(id: ID!, additionalFiles: Map!): AiSkill!

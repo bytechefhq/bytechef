@@ -90,11 +90,6 @@ class AiSkillGraphQlController {
     }
 
     @MutationMapping
-    AiSkill generateAiSkill(@Argument String prompt, @Argument int environmentId) {
-        return aiSkillApiFacade.generateAiSkill(prompt, environmentId);
-    }
-
-    @MutationMapping
     AiSkill updateAiSkill(
         @Argument long id, @Argument String name, @Argument @Nullable String description) {
 
