@@ -1,0 +1,97 @@
+extend type Query {
+    aiAgent(id: ID!): AiAgent
+    aiAgents(workspaceId: ID!): [AiAgent!]!
+    aiAgentDeployments(workspaceId: ID!): [AiAgentDeployment!]!
+    aiAgentDeploymentTags(workspaceId: ID!): [Tag!]!
+    aiAgentTags(workspaceId: ID!): [Tag!]!
+    aiAgentVersions(id: ID!): [AiAgentVersion!]!
+    exportAiAgent(id: ID!): String!
+    workspaceChatAgents(workspaceId: ID!, environmentId: ID!): [ChatAgent!]!
+}
+
+extend type Mutation {
+    createAiAgent(input: CreateAiAgentInput!): AiAgent!
+    updateAiAgent(input: UpdateAiAgentInput!): AiAgent!
+    updateAiAgentSettings(id: ID!, settings: Map!): Boolean!
+    deleteAiAgent(id: ID!): Boolean!
+    addAiAgentChannel(input: AddAiAgentChannelInput!): AiAgentChannel!
+    updateAiAgentChannel(input: UpdateAiAgentChannelInput!): Boolean!
+    deleteAiAgentChannel(id: ID!): Boolean!
+    addAiAgentElement(input: AddAiAgentElementInput!): AiAgentElement!
+    updateAiAgentElement(input: UpdateAiAgentElementInput!): Boolean!
+    deleteAiAgentElement(id: ID!): Boolean!
+    updateAiAgentDeploymentTags(input: UpdateAiAgentDeploymentTagsInput!): Boolean!
+    updateAiAgentTags(input: UpdateAiAgentTagsInput!): Boolean!
+    publishAiAgent(id: ID!, description: String): Int!
+    importAiAgent(workspaceId: ID!, json: String!): AiAgent!
+}
+
+type AiAgent {
+    id: ID!
+    name: String!
+    title: String!
+    description: String
+    instructions: String
+    workspaceId: ID
+    projectId: ID!
+    uuid: String!
+    unpublishedChanges: Boolean!
+    lastPublishedVersion: Int!
+    publishedDate: String
+    channels: [AiAgentChannel!]!
+    elements: [AiAgentElement!]!
+    settings: Map
+    tags: [Tag!]!
+    lastModifiedDate: String
+    draftWorkflowId: String!
+}
+
+type AiAgentVersion {
+    version: Int!
+    description: String
+    publishedDate: String
+    status: String!
+}
+
+type AiAgentChannel { id: ID!, channelType: String!, position: Int!, parameters: Map, connectionId: ID }
+type AiAgentElement { id: ID!, kind: String!, referenceId: ID, position: Int!, parameters: Map, connectionId: ID }
+
+type AiAgentDeployment {
+    id: ID!
+    name: String!
+    agentId: ID!
+    agentTitle: String!
+    projectId: ID!
+    environmentId: Int!
+    enabled: Boolean!
+    projectVersion: Int!
+    workflows: [AiAgentDeploymentWorkflow!]!
+    tags: [Tag!]
+    lastExecutionDate: String
+}
+
+type AiAgentDeploymentWorkflow {
+    workflowId: String!
+    enabled: Boolean!
+    triggers: [AiAgentDeploymentTrigger!]!
+}
+
+type AiAgentDeploymentTrigger { name: String!, type: String!, parameters: Map, staticWebhookUrl: String }
+
+type ChatAgent {
+    aiAgentId: ID!
+    agentName: String!
+    agentTitle: String!
+    projectDeploymentId: ID!
+    workflowExecutionId: String!
+    workflowLabel: String!
+}
+
+input CreateAiAgentInput { title: String!, description: String, workspaceId: ID! }
+input UpdateAiAgentInput { id: ID!, title: String, description: String, instructions: String }
+input AddAiAgentChannelInput { agentId: ID!, channelType: String!, parameters: Map, connectionId: ID }
+input UpdateAiAgentChannelInput { id: ID!, parameters: Map, connectionId: ID }
+input AddAiAgentElementInput { agentId: ID!, kind: String!, referenceId: ID, parameters: Map, connectionId: ID }
+input UpdateAiAgentElementInput { id: ID!, parameters: Map, connectionId: ID }
+input UpdateAiAgentDeploymentTagsInput { id: ID!, tags: [TagInput!] }
+input UpdateAiAgentTagsInput { id: ID!, tags: [TagInput!] }

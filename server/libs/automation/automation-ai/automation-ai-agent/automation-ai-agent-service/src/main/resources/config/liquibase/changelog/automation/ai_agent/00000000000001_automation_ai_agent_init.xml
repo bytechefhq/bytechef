@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="00000000000001" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="ai_agent"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="ai_agent">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="title" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(1024)"/>
+            <column name="instructions" type="TEXT"/>
+            <column name="workspace_id" type="BIGINT"/>
+            <column name="project_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_ai_agent_project" references="project(id)"/>
+            </column>
+            <column name="uuid" type="${uuid_type}">
+                <constraints nullable="false"/>
+            </column>
+            <!-- Per-agent settings JSON (currently just builtInTools on/off + webSearchConnectionId — see
+                 com.bytechef.automation.ai.agent.util.AiAgentSettings). Nullable: absent key/column both mean
+                 "every built-in's documented default applies". Schema is branch-only/unreleased, so this column is
+                 added to the init changelog in place rather than as a new changeset — same convention this
+                 changelog already follows. -->
+            <column name="settings" type="TEXT"/>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!--
+            Defense in depth: AiAgent.NAME_PATTERN enforces the slug regex in setName(...) but Spring Data JDBC
+            reflection bypasses the setter on hydration. Mirrors the equivalent ck_ai_auto_memory_name_slug
+            constraint on ai_auto_memory.name (platform-ai-auto-memory-repository-jdbc). Pattern matches
+            AiAgent.NAME_PATTERN exactly: ^[a-z0-9_-]{1,64}$.
+        -->
+        <sql>
+            ALTER TABLE ai_agent
+            ADD CONSTRAINT ck_ai_agent_name_slug
+            CHECK (name ~ '^[a-z0-9_-]{1,64}$')
+        </sql>
+
+        <createTable tableName="ai_agent_channel">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="agent_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_ai_agent_channel_agent" references="ai_agent(id)" deleteCascade="true"/>
+            </column>
+            <column name="channel_type" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="position" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parameters" type="TEXT"/>
+            <column name="connection_id" type="BIGINT"/>
+        </createTable>
+
+        <createTable tableName="ai_agent_element">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="agent_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_ai_agent_element_agent" references="ai_agent(id)" deleteCascade="true"/>
+            </column>
+            <column name="kind" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="reference_id" type="BIGINT"/>
+            <column name="parameters" type="TEXT"/>
+            <column name="connection_id" type="BIGINT"/>
+            <column name="position" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Many-to-many agent ↔ tag join, same shape as project_tag/data_table_tag: a tag labels many agents and
+             an agent carries many tags, so this is the sanctioned relation-table case rather than a column. -->
+        <createTable tableName="ai_agent_tag">
+            <column name="ai_agent_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="tag_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey tableName="ai_agent_tag" columnNames="ai_agent_id,tag_id"/>
+
+        <addForeignKeyConstraint
+            baseTableName="ai_agent_tag"
+            baseColumnNames="ai_agent_id"
+            constraintName="fk_ai_agent_tag_ai_agent"
+            referencedTableName="ai_agent"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint
+            baseTableName="ai_agent_tag"
+            baseColumnNames="tag_id"
+            constraintName="fk_ai_agent_tag_tag"
+            referencedTableName="tag"
+            referencedColumnNames="id"/>
+
+        <rollback>
+            <sql>ALTER TABLE ai_agent DROP CONSTRAINT IF EXISTS ck_ai_agent_name_slug;</sql>
+            <dropTable tableName="ai_agent_tag"/>
+            <dropTable tableName="ai_agent_element"/>
+            <dropTable tableName="ai_agent_channel"/>
+            <dropTable tableName="ai_agent"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

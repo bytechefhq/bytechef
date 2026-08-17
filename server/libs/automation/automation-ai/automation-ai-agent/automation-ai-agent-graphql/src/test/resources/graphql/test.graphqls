@@ -1,0 +1,26 @@
+# Test-only GraphQL base operations and minimal type stubs for GraphQL slice tests in this module.
+
+# Base operation types so that 'extend type Query/Mutation' from main resources can merge.
+type Query {
+    _placeholder: Boolean
+}
+
+type Mutation {
+    _placeholder: Boolean
+}
+
+# Declared platform-wide by platform-configuration-graphql's map.graphqls; not on this module's classpath in a slice
+# test, so it is stubbed here (see AiAgentGraphQlTestConfiguration for the matching Coercing registration).
+scalar Map
+
+# Declared platform-wide by platform-configuration-graphql's tag.graphqls / tag-input.graphqls; stubbed here for the
+# same reason as Map above.
+type Tag {
+    id: ID!
+    name: String!
+}
+
+input TagInput {
+    id: ID
+    name: String!
+}

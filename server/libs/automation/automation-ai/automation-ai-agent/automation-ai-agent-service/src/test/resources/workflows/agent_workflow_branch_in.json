@@ -1,0 +1,46 @@
+{
+  "label": "Agent workflow branch_in execution test",
+  "description": "branch_in-only slice of a generated agent workflow (chat + telegram channels), used by AgentWorkflowExecutionIntTest to execute the real branch_in dispatcher through a JobSyncExecutor-based harness. The branch_in task below is byte-for-byte what AgentWorkflowGenerator.generate(...) emits as tasks[0] for the two-channel (chat, telegram) fixture agent that AgentWorkflowExecutionIntTest builds -- pinned by testGeneratedBranchInMatchesExecutionFixture so this file can never silently drift from the generator. aiAgent_1 and branch_out are intentionally omitted: this test only exercises branch_in's inbound envelope mapping, not the LLM call or the outbound reply.",
+  "outputs": [ {
+    "name": "result",
+    "value": "${branch_in}"
+  } ],
+  "tasks": [ {
+    "name": "branch_in",
+    "type": "branch/v1",
+    "parameters": {
+      "expression": "${__triggerName}",
+      "cases": [ {
+        "key": "chat_1",
+        "tasks": [ {
+          "name": "envelope_chat_1",
+          "type": "var/v1/set",
+          "parameters": {
+            "value": {
+              "text": "${chat_1.message}",
+              "conversationId": "${chat_1.conversationId}",
+              "attachments": "${chat_1.attachments}",
+              "replyTo": null,
+              "channel": "chat"
+            }
+          }
+        } ]
+      }, {
+        "key": "telegram_1",
+        "tasks": [ {
+          "name": "envelope_telegram_1",
+          "type": "var/v1/set",
+          "parameters": {
+            "value": {
+              "text": "${telegram_1.message.text}",
+              "conversationId": "${telegram_1.message.chat.id}",
+              "attachments": [ ],
+              "replyTo": "${telegram_1.message.chat.id}",
+              "channel": "telegram"
+            }
+          }
+        } ]
+      } ]
+    }
+  } ]
+}
