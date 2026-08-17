@@ -1,9 +1,11 @@
+import Button from '@/components/Button/Button';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
-import {ComponentIcon} from 'lucide-react';
+import {ComponentIcon, SettingsIcon, TrashIcon, WorkflowIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
 
-import AiAgentToolDropdownMenu from './AiAgentToolDropdownMenu';
+import useAiAgentToolActions from './hooks/useAiAgentToolActions';
 import {ToolItemI} from './hooks/useAiAgentTools';
 
 interface AiAgentToolPropsI {
@@ -12,6 +14,8 @@ interface AiAgentToolPropsI {
 }
 
 export default function AiAgentTool({configuredConnectionKeys, tool}: AiAgentToolPropsI) {
+    const {handleConfigureTool, handleRemoveTool} = useAiAgentToolActions();
+
     const {data: toolComponentDefinition} = useGetComponentDefinitionQuery(
         {componentName: tool.componentName, componentVersion: tool.componentVersion},
         !!tool.componentName
@@ -45,7 +49,38 @@ export default function AiAgentTool({configuredConnectionKeys, tool}: AiAgentToo
                 <span className="flex-1 text-xs font-medium">{tool.operationName}</span>
             </div>
 
-            <AiAgentToolDropdownMenu tool={tool} />
+            {tool.clusterRoot ? (
+                <Tooltip>
+                    <TooltipTrigger
+                        aria-label="Configure on the advanced canvas"
+                        className="flex size-6 items-center justify-center text-muted-foreground"
+                    >
+                        <WorkflowIcon className="size-4" />
+                    </TooltipTrigger>
+
+                    <TooltipContent className="max-w-xs">
+                        This tool has its own cluster elements. Switch to the advanced canvas to configure it.
+                    </TooltipContent>
+                </Tooltip>
+            ) : (
+                <Button
+                    aria-label="Configure tool"
+                    className="size-6"
+                    icon={<SettingsIcon />}
+                    onClick={() => handleConfigureTool(tool)}
+                    size="iconSm"
+                    variant="ghost"
+                />
+            )}
+
+            <Button
+                aria-label="Remove tool"
+                className="size-6"
+                icon={<TrashIcon />}
+                onClick={() => handleRemoveTool(tool)}
+                size="iconSm"
+                variant="destructiveGhost"
+            />
         </div>
     );
 }

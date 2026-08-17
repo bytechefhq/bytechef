@@ -1,7 +1,7 @@
 import {act, renderHook} from '@testing-library/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-import useAiAgentToolDropdownMenu from './useAiAgentToolDropdownMenu';
+import useAiAgentToolActions from './useAiAgentToolActions';
 import {ToolItemI} from './useAiAgentTools';
 
 const hoisted = vi.hoisted(() => ({
@@ -46,6 +46,7 @@ vi.mock('@tanstack/react-query', () => ({useQueryClient: () => ({})}));
 
 const channel: ToolItemI = {
     clusterElementType: 'approvalChannels',
+    clusterRoot: false,
     componentName: 'slack',
     componentVersion: 1,
     label: 'slack_1',
@@ -55,13 +56,13 @@ const channel: ToolItemI = {
     type: 'slack/v1/approvalChannel',
 };
 
-describe('useAiAgentToolDropdownMenu', () => {
+describe('useAiAgentToolActions', () => {
     beforeEach(() => {
         vi.clearAllMocks();
     });
 
     it('removes an approval channel as an approval channel cluster element', () => {
-        const {result} = renderHook(() => useAiAgentToolDropdownMenu());
+        const {result} = renderHook(() => useAiAgentToolActions());
 
         act(() => result.current.handleRemoveTool(channel));
 
@@ -73,7 +74,7 @@ describe('useAiAgentToolDropdownMenu', () => {
     });
 
     it('opens an approval channel as an approval channel cluster element', async () => {
-        const {result} = renderHook(() => useAiAgentToolDropdownMenu());
+        const {result} = renderHook(() => useAiAgentToolActions());
 
         await act(async () => {
             await result.current.handleConfigureTool(channel);

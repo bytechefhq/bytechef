@@ -1,4 +1,5 @@
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {ComponentDefinitionBasic, WorkflowNodeOutput} from '@/shared/middleware/platform/configuration';
@@ -62,6 +63,8 @@ export default function useAiAgentEditor({
 
     const handleNodeDetailsPanelClose = useCallback(() => {
         useWorkflowNodeDetailsPanelStore.getState().setAiAgentNodeDetailsPanelOpen(false);
+
+        useDataPillPanelStore.getState().setDataPillPanelOpen(false);
     }, []);
 
     const showNodeDetailsPanel =

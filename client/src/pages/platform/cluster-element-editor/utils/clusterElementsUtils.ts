@@ -57,8 +57,10 @@ export function initializeClusterElementsObject({
         const elementData = clusterElementsData?.[clusterElementType];
 
         if (elementType.multipleElements) {
-            if (Array.isArray(elementData) && elementData.length > 0) {
-                clusterElements[clusterElementType] = elementData.map((element) => ({
+            const elementDataArray = toClusterElementArray(elementData);
+
+            if (elementDataArray.length > 0) {
+                clusterElements[clusterElementType] = elementDataArray.map((element) => ({
                     clusterElements: element.clusterElements,
                     label: element.label,
                     metadata: element.metadata,
@@ -411,4 +413,13 @@ export function getClusterElementsLabel(clusterElementType: string) {
 
 export function isPlainObject(value: unknown): value is Record<string, unknown> {
     return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function toClusterElementArray(value: any): any[] {
+    if (value == null) {
+        return [];
+    }
+
+    return Array.isArray(value) ? value : [value];
 }

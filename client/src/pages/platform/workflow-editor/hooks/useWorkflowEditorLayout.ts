@@ -1,10 +1,12 @@
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
-import {useCallback, useEffect, useMemo} from 'react';
+import {useCallback, useEffect, useMemo, useRef} from 'react';
 import {useShallow} from 'zustand/shallow';
 
 const useWorkflowEditorLayout = () => {
+    const seededRootNodeNameRef = useRef<string | undefined>(undefined);
+
     const workflowId = useWorkflowDataStore((state) => state.workflow.id);
     const currentNode = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
     const clusterElementsCanvasOpen = useWorkflowEditorStore((state) => state.clusterElementsCanvasOpen);
@@ -27,6 +29,8 @@ const useWorkflowEditorLayout = () => {
             setClusterElementsCanvasOpen(open);
 
             if (!open) {
+                seededRootNodeNameRef.current = undefined;
+
                 setRootClusterElementNodeData(undefined);
                 setNestedClusterRootsComponentDefinitions({});
             }
@@ -35,10 +39,18 @@ const useWorkflowEditorLayout = () => {
     );
 
     useEffect(() => {
-        if (clusterElementsCanvasOpen && isMainRootClusterElement) {
-            setRootClusterElementNodeData(currentNode);
+        if (!clusterElementsCanvasOpen || !isMainRootClusterElement) {
+            return;
         }
-    }, [clusterElementsCanvasOpen, isMainRootClusterElement, setRootClusterElementNodeData, currentNode]);
+
+        if (seededRootNodeNameRef.current === currentNode?.workflowNodeName) {
+            return;
+        }
+
+        seededRootNodeNameRef.current = currentNode?.workflowNodeName;
+
+        setRootClusterElementNodeData(currentNode);
+    }, [clusterElementsCanvasOpen, currentNode, isMainRootClusterElement, setRootClusterElementNodeData]);
 
     useEffect(() => {
         handleClusterElementsCanvasOpenChange(false);

@@ -1,20 +1,24 @@
 import Button from '@/components/Button/Button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import WorkflowNodesPopoverMenu from '@/pages/platform/workflow-editor/components/WorkflowNodesPopoverMenu';
-import {InfoIcon, PlusIcon, ShieldCheckIcon} from 'lucide-react';
+import {InfoIcon, PlusIcon, SettingsIcon, ShieldCheckIcon, TrashIcon} from 'lucide-react';
 
 import AiAgentTool from './AiAgentTool';
-import AiAgentToolDropdownMenu from './AiAgentToolDropdownMenu';
+import {SKILLS_TOOL_OPERATION_NAME} from './hooks/useAiAgentSkills';
+import useAiAgentToolActions from './hooks/useAiAgentToolActions';
 import useAiAgentTools from './hooks/useAiAgentTools';
+
+const HIDDEN_TOOL_NAMES = [SKILLS_TOOL_OPERATION_NAME];
 
 export default function AiAgentTools() {
     const {configuredConnectionKeys, rootWorkflowNodeName, toolGroups, tools} = useAiAgentTools();
+    const {handleConfigureTool, handleRemoveTool} = useAiAgentToolActions();
 
     return (
         <div className="space-y-2">
             <div className="mb-3 flex items-center justify-between">
                 <div className="flex items-center gap-1">
-                    <h2 className="flex-1">Tools this agent can use:</h2>
+                    <h2 className="flex-1">Tools</h2>
 
                     <Tooltip>
                         <TooltipTrigger>
@@ -31,7 +35,9 @@ export default function AiAgentTools() {
                 {rootWorkflowNodeName && (
                     <WorkflowNodesPopoverMenu
                         clusterElementType="tools"
+                        hiddenClusterElementNames={HIDDEN_TOOL_NAMES}
                         hideActionComponents
+                        hideClusterRootComponents
                         hideTaskDispatchers
                         hideTriggerComponents
                         multipleClusterElementsNode
@@ -75,6 +81,7 @@ export default function AiAgentTools() {
                             <WorkflowNodesPopoverMenu
                                 clusterElementType="tools"
                                 hideActionComponents
+                                hideClusterRootComponents
                                 hideTaskDispatchers
                                 hideTriggerComponents
                                 multipleClusterElementsNode
@@ -83,7 +90,23 @@ export default function AiAgentTools() {
                                 <Button icon={<PlusIcon />} label="Add Tool" size="sm" variant="ghost" />
                             </WorkflowNodesPopoverMenu>
 
-                            <AiAgentToolDropdownMenu tool={toolGroup.tool} />
+                            <Button
+                                aria-label="Configure approval gate"
+                                className="size-6"
+                                icon={<SettingsIcon />}
+                                onClick={() => handleConfigureTool(toolGroup.tool)}
+                                size="iconSm"
+                                variant="ghost"
+                            />
+
+                            <Button
+                                aria-label="Remove approval gate"
+                                className="size-6"
+                                icon={<TrashIcon />}
+                                onClick={() => handleRemoveTool(toolGroup.tool)}
+                                size="iconSm"
+                                variant="destructiveGhost"
+                            />
                         </div>
                     </div>
 

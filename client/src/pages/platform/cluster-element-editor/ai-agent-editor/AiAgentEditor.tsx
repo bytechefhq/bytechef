@@ -82,7 +82,7 @@ export default function AiAgentEditor({
                     <AiAgentConfigurationPanel />
                 </div>
 
-                <div className="relative mb-4 min-h-0">
+                <div className="relative min-h-0">
                     <div className="size-full overflow-hidden">
                         <Suspense fallback={null}>
                             <AiAgentTestingPanel />

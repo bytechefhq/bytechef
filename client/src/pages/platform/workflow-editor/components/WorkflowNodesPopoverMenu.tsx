@@ -20,8 +20,10 @@ interface WorkflowNodesPopoverMenuProps extends PropsWithChildren {
     edgeId?: string;
     hideActionComponents?: boolean;
     hideClusterElementComponents?: boolean;
+    hideClusterRootComponents?: boolean;
     hideTriggerComponents?: boolean;
     hideTaskDispatchers?: boolean;
+    hiddenClusterElementNames?: string[];
     initialComponentDefinition?: ComponentDefinition;
     multipleClusterElementsNode?: boolean;
     nodeIndex?: number;
@@ -36,8 +38,10 @@ const WorkflowNodesPopoverMenu = ({
     children,
     clusterElementType,
     edgeId,
+    hiddenClusterElementNames,
     hideActionComponents = false,
     hideClusterElementComponents = false,
+    hideClusterRootComponents = false,
     hideTaskDispatchers = false,
     hideTriggerComponents = false,
     initialComponentDefinition,
@@ -228,6 +232,7 @@ const WorkflowNodesPopoverMenu = ({
                         handleComponentClick={handleComponentClick}
                         hideActionComponents={hideActionComponents}
                         hideClusterElementComponents={hideClusterElementComponents}
+                        hideClusterRootComponents={hideClusterRootComponents}
                         hideTaskDispatchers={hideTaskDispatchers}
                         hideTriggerComponents={hideTriggerComponents}
                         onPasteClose={handlePasteClose}
@@ -242,6 +247,7 @@ const WorkflowNodesPopoverMenu = ({
                             clusterElementType={clusterElementType}
                             componentDefinition={componentDefinitionToBeAdded}
                             edgeId={edgeId}
+                            hiddenClusterElementNames={hiddenClusterElementNames}
                             multipleClusterElementsNode={multipleClusterElementsNode}
                             setPopoverOpen={setPopoverOpen}
                             sourceNodeId={sourceNodeId}

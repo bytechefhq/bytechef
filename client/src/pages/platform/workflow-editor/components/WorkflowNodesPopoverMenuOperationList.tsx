@@ -38,6 +38,7 @@ interface WorkflowNodesPopoverMenuOperationListProps {
     clusterElementType?: string;
     componentDefinition: ComponentDefinition;
     edgeId?: string;
+    hiddenClusterElementNames?: string[];
     multipleClusterElementsNode?: boolean;
     setPopoverOpen: (open: boolean) => void;
     sourceNodeId: string;
@@ -49,6 +50,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
     clusterElementType,
     componentDefinition,
     edgeId,
+    hiddenClusterElementNames,
     multipleClusterElementsNode,
     setPopoverOpen,
     sourceNodeId,
@@ -137,8 +139,12 @@ const WorkflowNodesPopoverMenuOperationList = ({
             return clusterElement.type === convertNameToSnakeCase(clusterElementType as string);
         });
 
-        return matchingOperations;
-    }, [clusterElementType, clusterElements]);
+        if (!hiddenClusterElementNames?.length) {
+            return matchingOperations;
+        }
+
+        return matchingOperations?.filter((clusterElement) => !hiddenClusterElementNames.includes(clusterElement.name));
+    }, [clusterElementType, clusterElements, hiddenClusterElementNames]);
 
     const operations = useMemo(() => {
         if (trigger) {

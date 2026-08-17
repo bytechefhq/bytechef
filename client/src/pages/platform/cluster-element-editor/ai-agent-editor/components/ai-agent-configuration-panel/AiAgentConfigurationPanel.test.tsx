@@ -20,6 +20,11 @@ vi.mock(
 );
 
 vi.mock(
+    '@/pages/platform/cluster-element-editor/ai-agent-editor/components/ai-agent-configuration-panel/components/AiAgentSkills',
+    () => ({default: () => null})
+);
+
+vi.mock(
     '@/pages/platform/cluster-element-editor/ai-agent-editor/components/ai-agent-configuration-panel/components/AiAgentStreamResponseField',
     () => ({default: () => null})
 );

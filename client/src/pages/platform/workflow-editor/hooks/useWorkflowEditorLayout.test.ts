@@ -65,6 +65,58 @@ describe('useWorkflowEditorLayout', () => {
         expect(useWorkflowEditorStore.getState().rootClusterElementNodeData).toBeUndefined();
     });
 
+    it('does not overwrite advanced clusterElements when currentNode is merely re-created', () => {
+        renderHook(() => useWorkflowEditorLayout());
+
+        act(() => {
+            useWorkflowEditorStore.setState({clusterElementsCanvasOpen: true});
+            useWorkflowNodeDetailsPanelStore.setState({currentNode: aiAgentRootNode});
+        });
+
+        const advancedClusterElements = {
+            tools: [
+                {name: 'stripe_1', type: 'stripe/v1/createCustomer'},
+                {name: 'slack_1', type: 'slack/v1/sendMessage'},
+            ],
+        };
+
+        act(() => {
+            useWorkflowEditorStore.setState({
+                rootClusterElementNodeData: {
+                    ...aiAgentRootNode,
+                    clusterElements: advancedClusterElements,
+                } as NodeDataType,
+            });
+
+            useWorkflowNodeDetailsPanelStore.setState({currentNode: {...aiAgentRootNode}});
+        });
+
+        expect(useWorkflowEditorStore.getState().rootClusterElementNodeData?.clusterElements).toEqual(
+            advancedClusterElements
+        );
+    });
+
+    it('re-seeds when the panel switches to a different cluster root', () => {
+        renderHook(() => useWorkflowEditorLayout());
+
+        act(() => {
+            useWorkflowEditorStore.setState({clusterElementsCanvasOpen: true});
+            useWorkflowNodeDetailsPanelStore.setState({currentNode: aiAgentRootNode});
+        });
+
+        const otherRootNode = {
+            ...aiAgentRootNode,
+            name: 'aiAgent_2',
+            workflowNodeName: 'aiAgent_2',
+        } as NodeDataType;
+
+        act(() => {
+            useWorkflowNodeDetailsPanelStore.setState({currentNode: otherRootNode});
+        });
+
+        expect(useWorkflowEditorStore.getState().rootClusterElementNodeData?.workflowNodeName).toBe('aiAgent_2');
+    });
+
     it('clears the cluster element state when the canvas is closed', () => {
         const {result} = renderHook(() => useWorkflowEditorLayout());
 

@@ -6,10 +6,13 @@ import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {NodeDataType} from '@/shared/types';
 import {useMemo} from 'react';
 
+import {SKILLS_TOOL_OPERATION_NAME} from './useAiAgentSkills';
+
 const APPROVAL_GATE = 'approvalGate';
 
 export interface ToolItemI {
     clusterElementType: string;
+    clusterRoot: boolean;
     componentName: string;
     componentVersion: number;
     icon?: string;
@@ -40,7 +43,7 @@ type ToolElementType = NodeDataType & {
     name?: string;
 };
 
-type ComponentDefinitionMapType = Map<string, {icon?: string; title?: string}>;
+type ComponentDefinitionMapType = Map<string, {clusterRoot?: boolean; icon?: string; title?: string}>;
 
 function mapToolElement(
     toolElement: ToolElementType,
@@ -56,6 +59,7 @@ function mapToolElement(
 
     return {
         clusterElementType,
+        clusterRoot: !!componentDefinition?.clusterRoot,
         componentName,
         componentVersion,
         icon: componentDefinition?.icon,
@@ -97,6 +101,10 @@ export default function useAiAgentTools(): UseAiAgentToolsI {
             const element = toolElement as unknown as ToolElementType;
 
             const operationName = element.operationName || element.type?.split('/')[2] || '';
+
+            if (operationName === SKILLS_TOOL_OPERATION_NAME) {
+                return;
+            }
 
             if (operationName !== APPROVAL_GATE) {
                 ungatedTools.push(mapToolElement(element, definitionsMap));

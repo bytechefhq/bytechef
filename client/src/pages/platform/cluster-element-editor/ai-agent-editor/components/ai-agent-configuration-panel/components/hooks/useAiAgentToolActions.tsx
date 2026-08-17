@@ -12,12 +12,12 @@ import {useShallow} from 'zustand/shallow';
 
 import {ToolItemI} from './useAiAgentTools';
 
-interface UseAiAgentToolDropdownMenuI {
+interface UseAiAgentToolActionsI {
     handleConfigureTool: (tool: ToolItemI) => Promise<void>;
     handleRemoveTool: (tool: ToolItemI) => void;
 }
 
-export default function useAiAgentToolDropdownMenu(): UseAiAgentToolDropdownMenuI {
+export default function useAiAgentToolActions(): UseAiAgentToolActionsI {
     const rootClusterElementNodeData = useWorkflowEditorStore((state) => state.rootClusterElementNodeData);
     const setRootClusterElementNodeData = useWorkflowEditorStore((state) => state.setRootClusterElementNodeData);
     const workflow = useWorkflowDataStore((state) => state.workflow);
@@ -103,9 +103,6 @@ export default function useAiAgentToolDropdownMenu(): UseAiAgentToolDropdownMenu
                 workflowNodeName: tool.name,
             };
 
-            // Close the simple-mode node details panel if it is currently showing
-            // the tool being removed — otherwise it keeps rendering stale data
-            // for a tool that no longer exists.
             const {currentNode: activeNode} = useWorkflowNodeDetailsPanelStore.getState();
 
             if (activeNode?.workflowNodeName === tool.name) {

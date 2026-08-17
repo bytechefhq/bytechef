@@ -21,6 +21,7 @@ interface WorkflowNodesListProps {
     edgeId?: string;
     handleComponentClick?: (clickedItem: ClickedDefinitionType) => void;
     hideActionComponents?: boolean;
+    hideClusterRootComponents?: boolean;
     hideClusterElementComponents?: boolean;
     hideTriggerComponents?: boolean;
     hideTaskDispatchers?: boolean;
@@ -51,6 +52,7 @@ const WorkflowNodesPopoverMenuComponentList = memo(
         handleComponentClick,
         hideActionComponents = false,
         hideClusterElementComponents = false,
+        hideClusterRootComponents = false,
         hideTaskDispatchers = false,
         hideTriggerComponents = false,
         onPasteClose,
@@ -129,8 +131,10 @@ const WorkflowNodesPopoverMenuComponentList = memo(
                 return [];
             }
 
-            return componentsWithActions.filter((component) => hasClusterElementType(component, clusterElementType));
-        }, [componentsWithActions, clusterElementType]);
+            return componentsWithActions
+                .filter((component) => hasClusterElementType(component, clusterElementType))
+                .filter((component) => !hideClusterRootComponents || !component.clusterRoot);
+        }, [componentsWithActions, clusterElementType, hideClusterRootComponents]);
 
         return (
             <div className={twMerge('rounded-lg', actionPanelOpen ? 'w-node-popover-width' : 'w-full')}>

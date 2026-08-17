@@ -1,3 +1,4 @@
+import {toClusterElementArray} from '@/pages/platform/cluster-element-editor/utils/clusterElementsUtils';
 import {ComponentDefinition} from '@/shared/middleware/platform/configuration';
 import {ClusterElementsType, NestedClusterRootComponentDefinitionType} from '@/shared/types';
 import {Node} from '@xyflow/react';
@@ -51,8 +52,10 @@ export default function createClusterElementNodes({
         const clusterElementValue = clusterElements[clusterElementTypeName];
 
         if (isMultipleClusterElementsNode) {
-            if (Array.isArray(clusterElementValue) && clusterElementValue.length) {
-                clusterElementValue.forEach((element) => {
+            const clusterElementValues = toClusterElementArray(clusterElementValue);
+
+            if (clusterElementValues.length) {
+                clusterElementValues.forEach((element) => {
                     const filteredClusterElementTypes = getFilteredClusterElementTypes({
                         clusterRootComponentDefinition: nestedClusterRootsDefinitions[element.type?.split('/')[0]],
                         currentClusterElementsType: element.type?.split('/')[2] || '',

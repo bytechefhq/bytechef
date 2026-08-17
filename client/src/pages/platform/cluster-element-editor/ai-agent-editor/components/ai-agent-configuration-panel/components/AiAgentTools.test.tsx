@@ -1,9 +1,14 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
-import {render, screen, within} from '@testing-library/react';
+import {fireEvent, render, screen, within} from '@testing-library/react';
 import {ReactNode} from 'react';
 import {describe, expect, it, vi} from 'vitest';
 
 import AiAgentTools from './AiAgentTools';
+
+const hoisted = vi.hoisted(() => ({
+    handleConfigureTool: vi.fn(),
+    handleRemoveTool: vi.fn(),
+}));
 
 vi.mock('@/pages/platform/workflow-editor/components/WorkflowNodesPopoverMenu', () => ({
     default: ({children}: {children: ReactNode}) => <>{children}</>,
@@ -13,8 +18,8 @@ vi.mock('./AiAgentTool', () => ({
     default: ({tool}: {tool: {name: string}}) => <span>{`Tool ${tool.name}`}</span>,
 }));
 
-vi.mock('./AiAgentToolDropdownMenu', () => ({
-    default: ({tool}: {tool: {name: string}}) => <button type="button">{`Tool menu of ${tool.name}`}</button>,
+vi.mock('./hooks/useAiAgentToolActions', () => ({
+    default: () => hoisted,
 }));
 
 vi.mock('./hooks/useAiAgentTools', () => ({
@@ -65,7 +70,7 @@ describe('AiAgentTools', () => {
         expect(screen.getByRole('group', {name: 'Approval Gate requires approval'})).toBeInTheDocument();
     });
 
-    it("offers the gate's configure and remove menu in its group heading", () => {
+    it('configures and removes the gate from its group heading', () => {
         render(
             <TooltipProvider>
                 <AiAgentTools />
@@ -74,7 +79,11 @@ describe('AiAgentTools', () => {
 
         const toolGroup = screen.getByRole('group', {name: 'Approval Gate requires approval'});
 
-        expect(within(toolGroup).getByRole('button', {name: 'Tool menu of approvalGate_1'})).toBeInTheDocument();
+        fireEvent.click(within(toolGroup).getByRole('button', {name: 'Configure approval gate'}));
+        fireEvent.click(within(toolGroup).getByRole('button', {name: 'Remove approval gate'}));
+
+        expect(hoisted.handleConfigureTool).toHaveBeenCalledWith(expect.objectContaining({name: 'approvalGate_1'}));
+        expect(hoisted.handleRemoveTool).toHaveBeenCalledWith(expect.objectContaining({name: 'approvalGate_1'}));
     });
 
     it('lists each approval channel as an item with its configure and remove menu', () => {

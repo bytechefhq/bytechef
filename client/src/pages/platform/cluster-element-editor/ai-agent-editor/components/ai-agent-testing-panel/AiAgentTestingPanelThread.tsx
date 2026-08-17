@@ -78,7 +78,11 @@ export const Thread: FC = () => {
                 >
                     <ThreadPrimitive.Viewport className="aui-thread-viewport relative flex min-h-0 flex-1 flex-col overflow-x-auto overflow-y-scroll px-4">
                         <ThreadPrimitive.If empty>
-                            <ThreadWelcome />
+                            <div className="flex grow flex-col justify-center gap-4">
+                                <ThreadWelcome />
+
+                                <Composer />
+                            </div>
                         </ThreadPrimitive.If>
 
                         <ThreadPrimitive.Messages
@@ -91,9 +95,9 @@ export const Thread: FC = () => {
 
                         <ThreadPrimitive.If empty={false}>
                             <div className="aui-thread-viewport-spacer min-h-8 grow" />
-                        </ThreadPrimitive.If>
 
-                        <Composer />
+                            <Composer />
+                        </ThreadPrimitive.If>
                     </ThreadPrimitive.Viewport>
                 </ThreadPrimitive.Root>
             </MotionConfig>
@@ -117,9 +121,9 @@ const ThreadScrollToBottom: FC = () => {
 
 const ThreadWelcome: FC = () => {
     return (
-        <div className="aui-thread-welcome-root mx-auto my-auto flex w-full max-w-(--thread-max-width) grow flex-col">
-            <div className="aui-thread-welcome-center flex w-full grow flex-col items-center justify-center">
-                <div className="aui-thread-welcome-message flex size-full flex-col justify-center px-8">
+        <div className="aui-thread-welcome-root mx-auto flex w-full max-w-(--thread-max-width) flex-col">
+            <div className="aui-thread-welcome-center flex w-full flex-col">
+                <div className="aui-thread-welcome-message flex w-full flex-col px-8">
                     <m.div
                         animate={{opacity: 1, y: 0}}
                         className="aui-thread-welcome-message-motion-1 text-2xl font-semibold"

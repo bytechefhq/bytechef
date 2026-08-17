@@ -16,7 +16,7 @@ export default function AiAgentModelSelectField() {
     return (
         <div>
             <h2 className="mb-2 flex items-center font-normal">
-                Model:
+                Model
                 <RequiredMark />
             </h2>
 
