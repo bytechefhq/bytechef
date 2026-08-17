@@ -1,15 +1,18 @@
 import Button from '@/components/Button/Button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import AiHubChatsSidebarToggle from '@/ee/pages/automation/ai-hub/AiHubChatsSidebarToggle';
 import AiHubArtifactsCard from '@/ee/pages/automation/ai-hub/artifacts/AiHubArtifactsCard';
 import useAiHubArtifactsCard from '@/ee/pages/automation/ai-hub/artifacts/useAiHubArtifactsCard';
+import {isWebhookBridgedChat} from '@/ee/pages/automation/ai-hub/chats/api/chats.api';
+import {useAiHubChatsQuery} from '@/ee/pages/automation/ai-hub/chats/hooks/useChats';
+import {aiHubChatsStore, useAiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
 import AiHubChatComposer from '@/ee/pages/automation/ai-hub/composer/AiHubChatComposer';
+import useAiHubChatLaunchers from '@/ee/pages/automation/ai-hub/hooks/useAiHubChatLaunchers';
 import AiHubThread from '@/ee/pages/automation/ai-hub/messages/AiHubThread';
-import {useAiHubPersonalAgentQuery} from '@/ee/pages/automation/ai-hub/personal-agents/hooks/useAiHubPersonalAgents';
 import useAiHubSettingsStore from '@/ee/pages/automation/ai-hub/stores/useAiHubSettingsStore';
 import {useAiHubStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubStore';
 import {useAiHubTabsStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
-import {useAiHubTasksQuery} from '@/ee/pages/automation/ai-hub/tasks/hooks/useTasks';
-import {aiHubTasksStore, useAiHubTasksStore} from '@/ee/pages/automation/ai-hub/tasks/stores/useAiHubTasksStore';
+import {useAiHubTaskQuery} from '@/ee/pages/automation/ai-hub/tasks/hooks/useAiHubTasks';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import ModelPicker from '@/shared/components/ai/model-picker/ModelPicker';
@@ -22,25 +25,29 @@ import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
 const AiHubPanel = () => {
-    const {generateTaskId, resetMessages} = useAiHubStore(
+    const {generateChatId, resetMessages} = useAiHubStore(
         useShallow((state) => ({
-            generateTaskId: state.generateTaskId,
+            generateChatId: state.generateChatId,
             resetMessages: state.resetMessages,
         }))
     );
 
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
-    const currentTaskId = useAiHubTasksStore((state) => state.currentTaskId);
+    const currentChatId = useAiHubChatsStore((state) => state.currentChatId);
 
     const {data: defaultModelData} = useAiDefaultModelQuery({environment: String(currentEnvironmentId)});
-    // Per-task LLM picker selection. Reads/writes the per-task map in the tasks store; both null = no
-    // override (server uses workspace default; personal-agent tasks still get their per-agent override
+    // The picker's Agents / Workflows cascades. Picking one leaves this chat and lands on a freshly created
+    // one, so the launchers belong here just as much as on the home composer — a user already in a
+    // conversation shouldn't have to navigate home to start a different kind of chat.
+    const {agentChats, onSelectAgentChat, onSelectWorkflowChat, workflowChats} = useAiHubChatLaunchers();
+    // Per-chat LLM picker selection. Reads/writes the per-chat map in the chats store; both null = no
+    // override (server uses workspace default; task chats still get their per-task override
     // applied server-side ahead of the workspace default).
-    const taskLlmSelection = useAiHubTasksStore((state) =>
-        currentTaskId != null ? state.taskLlmSelections[currentTaskId] : undefined
+    const chatLlmSelection = useAiHubChatsStore((state) =>
+        currentChatId != null ? state.chatLlmSelections[currentChatId] : undefined
     );
-    const setTaskLlmSelection = useAiHubTasksStore((state) => state.setTaskLlmSelection);
+    const setChatLlmSelection = useAiHubChatsStore((state) => state.setChatLlmSelection);
 
     const {rightPanelOpen, setRightPanelOpen} = useAiHubTabsStore(
         useShallow((state) => ({
@@ -56,30 +63,32 @@ const AiHubPanel = () => {
         }))
     );
 
-    // The task list query is already loaded by the sidebar; reading from the same query key here
-    // is essentially a cache lookup. We don't fetch a single task by id because we need to react
+    // The chat list query is already loaded by the sidebar; reading from the same query key here
+    // is essentially a cache lookup. We don't fetch a single chat by id because we need to react
     // to title-generation updates that the list query already invalidates.
-    const {data: tasks} = useAiHubTasksQuery(currentWorkspaceId, currentEnvironmentId, 'ACTIVE');
+    const {data: chats} = useAiHubChatsQuery(currentWorkspaceId, currentEnvironmentId, 'ACTIVE');
 
-    const currentTask = tasks?.find((task) => task.id === currentTaskId);
-    // "New Task" placeholder until the auto-title generator (kicked off by runPostTurnTelemetry
+    const currentChat = chats?.find((chat) => chat.id === currentChatId);
+    // "New Chat" placeholder until the auto-title generator (kicked off by runPostTurnTelemetry
     // around message-count >= 6) writes a real title back. Using this label everywhere the title falls
     // back lets the user see "this is a fresh chat" instead of the more terminal-sounding "Untitled".
-    const taskTitle = currentTask?.title || 'New Task';
-    // Workflow-chat tasks get a small badge under the title. The badge anchors the routing
-    // distinction visibly when the panel header is the only place the task identity surfaces.
-    const isWorkflowChat = currentTask?.kind === 'WORKFLOW_CHAT';
-    const isPersonalAgentTask = currentTask?.kind === 'PERSONAL_AGENT';
+    const chatTitle = currentChat?.title || 'New Chat';
+    // Webhook-bridged chats get a small badge under the title. The badge anchors the routing distinction
+    // visibly when the panel header is the only place the chat identity surfaces, and names what the user
+    // picked: an agent chat says "agent", never the workflow behind it.
+    const isWorkflowChat = isWebhookBridgedChat(currentChat?.kind);
+    const isAgentChat = currentChat?.kind === 'AGENT_CHAT';
+    const isTaskChat = currentChat?.kind === 'TASK';
 
-    // For PERSONAL_AGENT-kind tasks, fetch the bound agent so the ModelPicker can surface "Use agent
-    // default" as the revert label (instead of "Use workspace default") and preselect the agent's
+    // For TASK-kind chats, fetch the bound task so the ModelPicker can surface "Use task
+    // default" as the revert label (instead of "Use workspace default") and preselect the task's
     // pinned (llmProvider, llmModel) in the trigger when the user hasn't overridden per-conversation.
-    // The query is gated on the kind + agent id presence so it's a true no-op for STANDARD / WORKFLOW_CHAT
-    // tasks (TanStack Query short-circuits at the enabled=false fence).
-    const {data: personalAgent} = useAiHubPersonalAgentQuery(
-        currentTask?.aiHubPersonalAgentId ?? undefined,
+    // The query is gated on the kind + task id presence so it's a true no-op for STANDARD / WORKFLOW_CHAT
+    // chats (TanStack Query short-circuits at the enabled=false fence).
+    const {data: task} = useAiHubTaskQuery(
+        currentChat?.aiHubTaskId ?? undefined,
         currentWorkspaceId ?? 0,
-        isPersonalAgentTask && currentTask?.aiHubPersonalAgentId != null && currentWorkspaceId != null
+        isTaskChat && currentChat?.aiHubTaskId != null && currentWorkspaceId != null
     );
 
     const navigate = useNavigate();
@@ -88,9 +97,9 @@ const AiHubPanel = () => {
     // Both calls resolve against the same two react-query keys, so this one is a cache read.
     const {visible: artifactsCardVisible} = useAiHubArtifactsCard();
 
-    // Note: the "Personal agents" / "Workflow chats" cascades in the model picker are intentionally NOT
+    // Note: the "Tasks" / "Workflow chats" cascades in the model picker are intentionally NOT
     // wired here. Those entries start a NEW conversation, so they only belong on the home composer
-    // (AiHubHomePanel) where the user is choosing what to start — inside an existing task the picker is
+    // (AiHubHomePanel) where the user is choosing what to start — inside an existing chat the picker is
     // strictly for switching the model. See AiHubHomePanel for that wiring.
 
     return (
@@ -101,24 +110,33 @@ const AiHubPanel = () => {
             <AiHubArtifactsCard />
 
             {/*
-             * Panel header: task title on the left, action row (EnvironmentSelect → Ask/Build
-             * toggle → clean messages → panel toggle) on the right. The page-level top header was
-             * removed in favor of sidebars stretching top-to-bottom, so the task title and the
+             * Panel header: sidebar toggle + chat title on the left, action row (EnvironmentSelect →
+             * tool-call toggle → resource panel toggle) on the right. The page-level top header was
+             * removed in favor of sidebars stretching top-to-bottom, so the chat title and the
              * EnvironmentSelect both live here next to the per-thread action affordances.
              */}
 
             <div className="flex items-center justify-between gap-4 px-3 py-3">
-                <div className="flex min-w-0 flex-1 items-baseline gap-2">
-                    <h2 className="min-w-0 truncate text-base font-medium" title={taskTitle}>
-                        {taskTitle}
+                <div className="flex min-w-0 flex-1 items-center gap-2">
+                    {/* Same place the shared Header puts the sidebar toggle on other pages: first in the
+                     * title row. See AiHubChatsSidebarToggle for why the AI Hub renders its own. */}
+
+                    <AiHubChatsSidebarToggle />
+
+                    <h2 className="min-w-0 truncate text-base font-medium" title={chatTitle}>
+                        {chatTitle}
                     </h2>
 
                     {isWorkflowChat && (
                         <span
                             className="shrink-0 rounded-full bg-surface-brand-secondary px-2 py-1 text-xs leading-none font-medium text-content-brand-primary"
-                            title="This task is bound to a workflow execution. Messages are forwarded to the workflow's webhook trigger instead of an LLM."
+                            title={
+                                isAgentChat
+                                    ? "This chat is bound to an AI Agent. Messages are forwarded to the agent's workflow instead of the AI Hub's own LLM."
+                                    : "This chat is bound to a workflow execution. Messages are forwarded to the workflow's webhook trigger instead of an LLM."
+                            }
                         >
-                            Workflow chat
+                            {isAgentChat ? 'Agent chat' : 'Workflow chat'}
                         </span>
                     )}
                 </div>
@@ -126,17 +144,17 @@ const AiHubPanel = () => {
                 <div className="flex items-center gap-1">
                     {/*
                      * EnvironmentSelect first so it reads as "set scope, then act on scope". Switching
-                     * environments invalidates the active task (it's scoped to one env's tables),
-                     * so the onChange resets task state + routes home rather than leaving the
+                     * environments invalidates the active chat (it's scoped to one env's tables),
+                     * so the onChange resets chat state + routes home rather than leaving the
                      * user staring at a stale 404 panel.
                      */}
 
                     <EnvironmentSelect
                         onChange={() => {
-                            aiHubTasksStore.getState().setCurrentTaskId(undefined);
+                            aiHubChatsStore.getState().setCurrentChatId(undefined);
 
                             resetMessages();
-                            generateTaskId();
+                            generateChatId();
 
                             navigate('/automation/ai-hub');
                         }}
@@ -209,17 +227,17 @@ const AiHubPanel = () => {
                 <div className="min-h-0 flex-1">
                     <AiHubThread
                         contentInsetRight={artifactsCardVisible}
-                        showSuggestions={!isWorkflowChat && !isPersonalAgentTask}
+                        showSuggestions={!isWorkflowChat && !isTaskChat}
                     />
                 </div>
 
                 {/*
-                 * Per-task LLM picker, rendered as the leading control in the composer footer (replacing
-                 * the previous header placement). Hidden for WORKFLOW_CHAT tasks — those route through
+                 * Per-chat LLM picker, rendered as the leading control in the composer footer (replacing
+                 * the previous header placement). Hidden for WORKFLOW_CHAT chats — those route through
                  * the workflow's webhook trigger, not the LLM, so a model override would be a no-op.
-                 * For PERSONAL_AGENT tasks, the agent's pinned (llmProvider, llmModel) is passed as
-                 * agentDefault* so the picker shows the agent's model in the trigger and "Use agent
-                 * default" clears the user override (precedence: user-selected > personal-agent >
+                 * For TASK chats, the task's pinned (llmProvider, llmModel) is passed as
+                 * taskDefault* so the picker shows the task's model in the trigger and "Use task
+                 * default" clears the user override (precedence: user-selected > task >
                  * workspace default).
                  */}
 
@@ -231,25 +249,29 @@ const AiHubPanel = () => {
                 >
                     <AiHubChatComposer
                         modelPicker={
-                            !isWorkflowChat && currentTaskId != null && currentWorkspaceId != null ? (
+                            !isWorkflowChat && currentChatId != null && currentWorkspaceId != null ? (
                                 <ModelPicker
-                                    agentDefaultModel={personalAgent?.llmModel ?? null}
-                                    agentDefaultProvider={personalAgent?.llmProvider ?? null}
+                                    agentChats={agentChats}
                                     defaultModel={defaultModelData?.aiDefaultModel?.model ?? null}
                                     defaultProvider={defaultModelData?.aiDefaultModel?.provider ?? null}
                                     environment={currentEnvironmentId}
                                     onChange={(provider, model) => {
                                         writeLastUsedModel(currentWorkspaceId, provider, model);
-                                        setTaskLlmSelection(currentTaskId, provider, model);
+                                        setChatLlmSelection(currentChatId, provider, model);
                                     }}
+                                    onSelectAgentChat={onSelectAgentChat}
+                                    onSelectWorkflowChat={onSelectWorkflowChat}
                                     selectedModel={
-                                        taskLlmSelection?.model ?? readLastUsedModel(currentWorkspaceId)?.model ?? null
+                                        chatLlmSelection?.model ?? readLastUsedModel(currentWorkspaceId)?.model ?? null
                                     }
                                     selectedProvider={
-                                        taskLlmSelection?.provider ??
+                                        chatLlmSelection?.provider ??
                                         readLastUsedModel(currentWorkspaceId)?.provider ??
                                         null
                                     }
+                                    taskDefaultModel={task?.llmModel ?? null}
+                                    taskDefaultProvider={task?.llmProvider ?? null}
+                                    workflowChats={workflowChats}
                                 />
                             ) : null
                         }

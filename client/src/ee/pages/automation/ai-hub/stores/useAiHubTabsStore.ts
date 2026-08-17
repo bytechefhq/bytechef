@@ -53,14 +53,15 @@ interface AiHubTabsStateI {
      * remembers its own panel state. Persisted across reloads, so a refresh restores it too. */
     rightPanelOpen: boolean;
     snapshotsByChatId: Record<number, ChatTabsSnapshotI>;
-    /** Whether the AI Hub Chats sidebar is shown as a thin rail (`true`) rather than its full
-     * form. Only meaningful while the resource panel is open — that's the only layout state
-     * where the sidebar would otherwise be hidden entirely. Transient: never persisted. */
+    /** Whether the AI Hub Chats sidebar is hidden (`true`) or docked open (`false`). Driven only by the
+     * user's toggle in the panel header (AiHubChatsSidebarToggle) — like the sidebar toggle on every
+     * other page — and independent of the resource (right) panel and of chat switches. Transient: never
+     * persisted, so a reload starts with the sidebar open, same as other pages. */
     chatsSidebarCollapsed: boolean;
-    /** Transient hover-preview ("peek") of the Chats sidebar while it's collapsed to the rail.
-     * Set true when the pointer enters the rail and false when it leaves the previewed sidebar, so the
-     * full sidebar floats over the content as an overlay (no layout reflow) and collapses back to the
-     * rail on mouse-out. Clicking the header's pin control promotes the peek to a pinned-open sidebar
+    /** Transient hover-preview ("peek") of the Chats sidebar while it's hidden. Set true when the pointer
+     * rests on the header toggle and false when it leaves the previewed sidebar, so the full sidebar
+     * floats over the content as an overlay (no layout reflow) and slides back out on mouse-out. Clicking
+     * the sidebar header's pin control promotes the peek to a docked-open sidebar
      * ({@link chatsSidebarCollapsed} = false). Never persisted. */
     chatsSidebarPeeking: boolean;
 
@@ -139,7 +140,7 @@ export const aiHubTabsStore = create<AiHubTabsStateI>()(
                 openTabs: [],
                 rightPanelOpen: false,
                 snapshotsByChatId: {},
-                chatsSidebarCollapsed: true,
+                chatsSidebarCollapsed: false,
                 chatsSidebarPeeking: false,
 
                 closeTab: (tabId) =>
@@ -511,7 +512,7 @@ export const aiHubTabsStore = create<AiHubTabsStateI>()(
                         openTabs: [],
                         rightPanelOpen: false,
                         snapshotsByChatId: {},
-                        chatsSidebarCollapsed: true,
+                        chatsSidebarCollapsed: false,
                         chatsSidebarPeeking: false,
                     }),
 
@@ -578,9 +579,6 @@ export const aiHubTabsStore = create<AiHubTabsStateI>()(
                                 // openTabs / activeTabId retained from current state (carry-over of the
                                 // home-view tabs). rightPanelOpen is likewise carried over via `...state`,
                                 // so a panel the user opened on the home view stays open in the new chat.
-                                // Rail collapsed: see the comment on the default-branch return below.
-                                chatsSidebarCollapsed: true,
-                                chatsSidebarPeeking: false,
                             };
                         }
 
@@ -595,14 +593,9 @@ export const aiHubTabsStore = create<AiHubTabsStateI>()(
                             // and a refresh restores it via the persisted snapshot.
                             rightPanelOpen: restored?.rightPanelOpen ?? false,
                             snapshotsByChatId: nextSnapshots,
-                            // Every chat switch resets the Chats sidebar to its collapsed (rail) default.
-                            // The flag is global, but the sidebar is only clickable while VISIBLE — and
-                            // with a resource panel open, "visible" means the user expanded it
-                            // (`chatsSidebarCollapsed: false`). Without this reset, switching to another
-                            // chat whose snapshot also has the resource panel open would inherit that
-                            // stale `false` and leave the full sidebar covering the new chat's panels.
-                            chatsSidebarCollapsed: true,
-                            chatsSidebarPeeking: false,
+                            // `chatsSidebarCollapsed` / `chatsSidebarPeeking` are deliberately left alone:
+                            // the sidebar is a page-level control (open/closed by the header toggle), not
+                            // per-chat state, so switching chats must not snap it open or shut.
                         };
                     }),
 
@@ -615,22 +608,13 @@ export const aiHubTabsStore = create<AiHubTabsStateI>()(
                         return {...state, activeTabId: tabId};
                     }),
 
-                setRightPanelOpen: (open) =>
-                    set((state) => ({
-                        ...state,
-                        rightPanelOpen: open,
-                        // Closing the resource panel returns the layout to the full-width sidebar.
-                        // Reset the rail flag to collapsed so the NEXT resource-panel open starts as a
-                        // thin rail again (the minimal, out-of-the-way default) rather than inheriting
-                        // a stale expanded state from an earlier session of the panel.
-                        chatsSidebarCollapsed: open ? state.chatsSidebarCollapsed : true,
-                        // A peek only exists while the rail is showing; closing the panel removes the rail,
-                        // so clear any in-progress preview.
-                        chatsSidebarPeeking: open ? state.chatsSidebarPeeking : false,
-                    })),
+                // Independent of the Chats sidebar: opening the resource panel no longer collapses the
+                // sidebar (the header toggle is always available to close it by hand), and closing it
+                // no longer resets the sidebar.
+                setRightPanelOpen: (open) => set((state) => ({...state, rightPanelOpen: open})),
 
                 setChatsSidebarCollapsed: (collapsed) =>
-                    // Collapsing or pinning the sidebar settles its resting state, so any in-progress hover
+                    // Hiding or pinning the sidebar settles its resting state, so any in-progress hover
                     // preview is no longer meaningful — clear it so a stale peek can't linger on top.
                     set((state) => ({...state, chatsSidebarCollapsed: collapsed, chatsSidebarPeeking: false})),
 

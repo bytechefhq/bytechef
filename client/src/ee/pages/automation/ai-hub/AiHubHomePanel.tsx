@@ -1,32 +1,25 @@
 import Button from '@/components/Button/Button';
+import AiHubChatsSidebarToggle from '@/ee/pages/automation/ai-hub/AiHubChatsSidebarToggle';
+import {aiHubChatsStore, useAiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
 import AiHubChatComposer from '@/ee/pages/automation/ai-hub/composer/AiHubChatComposer';
+import useAiHubChatLaunchers from '@/ee/pages/automation/ai-hub/hooks/useAiHubChatLaunchers';
 import AiHubSuggestionChips from '@/ee/pages/automation/ai-hub/messages/AiHubSuggestionChips';
-import {useAiHubPersonalAgentsQuery} from '@/ee/pages/automation/ai-hub/personal-agents/hooks/useAiHubPersonalAgents';
 import {aiHubStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubStore';
-import {AiHubTasksKeys} from '@/ee/pages/automation/ai-hub/tasks/hooks/useTasks';
-import {aiHubTasksStore, useAiHubTasksStore} from '@/ee/pages/automation/ai-hub/tasks/stores/useAiHubTasksStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import ModelPicker from '@/shared/components/ai/model-picker/ModelPicker';
 import {readLastUsedModel, writeLastUsedModel} from '@/shared/components/ai/model-picker/lastUsedModel';
-import {
-    useAiDefaultModelQuery,
-    useCreateAiHubPersonalAgentTaskMutation,
-    useCreateWorkflowChatAiHubTaskMutation,
-    useWorkspaceChatWorkflowsQuery,
-} from '@/shared/middleware/graphql';
+import {useAiDefaultModelQuery} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {useQueryClient} from '@tanstack/react-query';
 import {BrainCircuitIcon} from 'lucide-react';
-import {useCallback, useMemo} from 'react';
 import {useNavigate} from 'react-router-dom';
 
 const AI_PROVIDERS_SETTINGS_PATH = '/automation/settings/ai-providers';
 
 // Note: this view stays mounted inside the same `AiHubRuntimeProvider` (hoisted to
-// AiHubContent), so the runtime instance survives the home -> task transition. Without that
-// hoist the auto-create-task flow would unmount the provider mid-`onNew`, abort the AG-UI agent run,
-// and the user would land on the task page with their message but no streaming reply.
+// AiHubContent), so the runtime instance survives the home -> chat transition. Without that
+// hoist the auto-create-chat flow would unmount the provider mid-`onNew`, abort the AG-UI agent run,
+// and the user would land on the chat page with their message but no streaming reply.
 //
 // No retry banner here on purpose: agent / tool failures surface via the global toast layer (sonner).
 // Rendering both a banner here and a toast would double-notify the user for the same event.
@@ -35,12 +28,12 @@ const AiHubHomePanel = () => {
 
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
-    // Draft slot: the home composer has no task to scope a selection to until the user sends a
-    // message (AiHubRuntimeProvider.onNew auto-creates the task on first send). The draft is migrated
-    // into taskLlmSelections[newTaskId] inside onNew via consumeDraftLlmSelection so the override
-    // applies to the first turn AND shows up in the task panel's own ModelPicker after the transition.
-    const draftLlmSelection = useAiHubTasksStore((state) => state.draftLlmSelection);
-    const setDraftLlmSelection = useAiHubTasksStore((state) => state.setDraftLlmSelection);
+    // Draft slot: the home composer has no chat to scope a selection to until the user sends a
+    // message (AiHubRuntimeProvider.onNew auto-creates the chat on first send). The draft is migrated
+    // into chatLlmSelections[newChatId] inside onNew via consumeDraftLlmSelection so the override
+    // applies to the first turn AND shows up in the chat panel's own ModelPicker after the transition.
+    const draftLlmSelection = useAiHubChatsStore((state) => state.draftLlmSelection);
+    const setDraftLlmSelection = useAiHubChatsStore((state) => state.setDraftLlmSelection);
 
     const {data: defaultModelData, isPending: isDefaultModelPending} = useAiDefaultModelQuery({
         environment: String(currentEnvironmentId),
@@ -48,138 +41,34 @@ const AiHubHomePanel = () => {
 
     const hasEnabledProvider = defaultModelData?.aiDefaultModel != null;
 
-    // Personal agents + workflow chats feed the model picker's two top cascades. They live on the HOME
-    // composer only: picking one starts a NEW conversation (a fresh PERSONAL_AGENT / WORKFLOW_CHAT task)
-    // and navigates to it. Inside an existing task the picker is just for switching the model, so these
-    // are not wired there (see AiHubPanel).
-    const {data: agents} = useAiHubPersonalAgentsQuery(currentWorkspaceId ?? 0, currentEnvironmentId);
-    const {data: chatWorkflowsData} = useWorkspaceChatWorkflowsQuery(
-        {environmentId: String(currentEnvironmentId), workspaceId: String(currentWorkspaceId ?? 0)},
-        {enabled: currentWorkspaceId != null}
-    );
-
-    const createPersonalAgentTaskMutation = useCreateAiHubPersonalAgentTaskMutation();
-    const createWorkflowChatMutation = useCreateWorkflowChatAiHubTaskMutation();
-    const queryClient = useQueryClient();
-
-    // Pre-shape into the picker's minimal interface so the picker stays decoupled from the codegen types.
-    const pickerAgents = useMemo(
-        () =>
-            (agents ?? []).map((agent) => ({
-                id: agent.id,
-                name: agent.name,
-                title: agent.title ?? null,
-            })),
-        [agents]
-    );
-
-    const pickerWorkflowChats = useMemo(
-        () =>
-            (chatWorkflowsData?.workspaceChatWorkflows ?? []).map((chat) => ({
-                label: `${chat.projectName} — ${chat.workflowLabel}`,
-                projectDeploymentId: chat.projectDeploymentId,
-                workflowExecutionId: chat.workflowExecutionId,
-            })),
-        [chatWorkflowsData]
-    );
-
-    const handleSelectPersonalAgent = useCallback(
-        async (agentId: number) => {
-            if (currentWorkspaceId == null) {
-                return;
-            }
-
-            const agent = agents?.find((candidate) => candidate.id === agentId);
-
-            if (agent == null) {
-                return;
-            }
-
-            // Always-new on the server: each pick produces a fresh task row with a fresh threadId. The task
-            // comes back with kind=PERSONAL_AGENT so the routing agent applies the agent's instructions
-            // overlay (and the per-agent LLM override, if set) on every turn.
-            const result = await createPersonalAgentTaskMutation.mutateAsync({
-                input: {
-                    aiHubPersonalAgentId: String(agent.id),
-                    environment: currentEnvironmentId,
-                    title: agent.title ?? agent.name,
-                    workspaceId: String(currentWorkspaceId),
-                },
-            });
-
-            const task = result.createAiHubPersonalAgentTask;
-
-            aiHubStore.setState({
-                messages: [],
-                taskId: task.threadId,
-            });
-
-            aiHubTasksStore.getState().setCurrentTaskId(Number(task.id));
-
-            // Invalidate every (env, status) bucket of the tasks list query so the new PERSONAL_AGENT row
-            // appears in the sidebar without a manual refresh.
-            queryClient.invalidateQueries({
-                queryKey: [...AiHubTasksKeys.all, 'list', currentWorkspaceId],
-            });
-
-            navigate(`/automation/ai-hub/tasks/${task.id}`);
-        },
-        [agents, createPersonalAgentTaskMutation, currentEnvironmentId, currentWorkspaceId, navigate, queryClient]
-    );
-
-    const handleSelectWorkflowChat = useCallback(
-        async (workflowExecutionId: string, projectDeploymentId: string, label: string) => {
-            if (currentWorkspaceId == null) {
-                return;
-            }
-
-            // Server is idempotent on (workspaceId, workflowExecutionId): re-picking the same workflow
-            // returns the existing kind=WORKFLOW_CHAT task instead of duplicating. The `title` argument is
-            // only persisted on FIRST creation; on a re-pick the existing title is preserved (the bridge
-            // bypasses the LLM-driven title generator so workflow-chat titles stay manual).
-            const result = await createWorkflowChatMutation.mutateAsync({
-                environment: currentEnvironmentId,
-                projectDeploymentId,
-                title: label,
-                workflowExecutionId,
-                workspaceId: String(currentWorkspaceId),
-            });
-
-            const task = result.createWorkflowChatAiHubTask;
-
-            aiHubStore.setState({
-                messages: [],
-                taskId: task.threadId,
-            });
-
-            aiHubTasksStore.getState().setCurrentTaskId(Number(task.id));
-
-            queryClient.invalidateQueries({
-                queryKey: [...AiHubTasksKeys.all, 'list', currentWorkspaceId],
-            });
-
-            navigate(`/automation/ai-hub/tasks/${task.id}`);
-        },
-        [createWorkflowChatMutation, currentEnvironmentId, currentWorkspaceId, navigate, queryClient]
-    );
+    // The model picker's Agents / Workflows cascades: picking one starts a NEW WORKFLOW_CHAT chat and
+    // navigates to it. The same hook is wired into the in-chat picker (AiHubPanel) so a launcher is always
+    // one click away.
+    const {agentChats, onSelectAgentChat, onSelectWorkflowChat, workflowChats} = useAiHubChatLaunchers();
 
     return (
         <div className="relative flex size-full flex-col bg-background">
             {/*
-             * Header strip with EnvironmentSelect tucked to the right edge — same position the selector
-             * occupies on the task panel header (AiHubPanel). Without this, navigating
-             * from a task back to the home view loses the env selector entirely (it lived in the
+             * Header strip: sidebar toggle at the left edge, EnvironmentSelect tucked to the right edge —
+             * the same positions they occupy on the chat panel header (AiHubPanel). Without this, navigating
+             * from a chat back to the home view loses the env selector entirely (it lived in the
              * page-level top header before that header was removed). Putting it here keeps env switching
-             * one click away regardless of whether the user has an active task.
+             * one click away regardless of whether the user has an active chat.
              */}
 
-            <div className="flex items-center justify-end px-4 py-3">
+            <div className="flex items-center justify-between px-3 py-3">
+                {/* Sidebar toggle first in the row, where the chat panel header (and every other page's
+                 * header) puts it — otherwise a user who hid the sidebar and came home would have no way
+                 * to bring it back from here. */}
+
+                <AiHubChatsSidebarToggle />
+
                 <EnvironmentSelect
                     onChange={() => {
-                        aiHubTasksStore.getState().setCurrentTaskId(undefined);
+                        aiHubChatsStore.getState().setCurrentChatId(undefined);
 
                         aiHubStore.getState().resetMessages();
-                        aiHubStore.getState().generateTaskId();
+                        aiHubStore.getState().generateChatId();
 
                         navigate('/automation/ai-hub');
                     }}
@@ -215,6 +104,7 @@ const AiHubHomePanel = () => {
                             modelPicker={
                                 currentWorkspaceId != null ? (
                                     <ModelPicker
+                                        agentChats={agentChats}
                                         defaultModel={defaultModelData?.aiDefaultModel?.model ?? null}
                                         defaultProvider={defaultModelData?.aiDefaultModel?.provider ?? null}
                                         environment={currentEnvironmentId}
@@ -222,9 +112,8 @@ const AiHubHomePanel = () => {
                                             writeLastUsedModel(currentWorkspaceId, provider, model);
                                             setDraftLlmSelection(provider, model);
                                         }}
-                                        onSelectPersonalAgent={handleSelectPersonalAgent}
-                                        onSelectWorkflowChat={handleSelectWorkflowChat}
-                                        personalAgents={pickerAgents}
+                                        onSelectAgentChat={onSelectAgentChat}
+                                        onSelectWorkflowChat={onSelectWorkflowChat}
                                         selectedModel={
                                             draftLlmSelection?.model ??
                                             readLastUsedModel(currentWorkspaceId)?.model ??
@@ -235,7 +124,7 @@ const AiHubHomePanel = () => {
                                             readLastUsedModel(currentWorkspaceId)?.provider ??
                                             null
                                         }
-                                        workflowChats={pickerWorkflowChats}
+                                        workflowChats={workflowChats}
                                     />
                                 ) : null
                             }

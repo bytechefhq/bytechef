@@ -1,0 +1,8 @@
+mutation setAiHubChatConnectorEnabled($workspaceId: ID!, $chatId: ID!, $connectorId: ID!, $enabled: Boolean!) {
+    setAiHubChatConnectorEnabled(
+        workspaceId: $workspaceId
+        chatId: $chatId
+        connectorId: $connectorId
+        enabled: $enabled
+    )
+}

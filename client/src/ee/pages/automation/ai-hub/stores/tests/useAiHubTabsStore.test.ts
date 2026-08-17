@@ -593,16 +593,22 @@ describe('useAiHubTabsStore', () => {
     });
 
     describe('chatsSidebarCollapsed', () => {
-        it('setChatsSidebarCollapsed toggles the rail flag', () => {
+        it('starts open (not collapsed), like the sidebar on every other page', () => {
+            aiHubTabsStore.getState().reset();
+
+            expect(aiHubTabsStore.getState().chatsSidebarCollapsed).toBe(false);
+        });
+
+        it('setChatsSidebarCollapsed toggles the hidden flag and clears any peek', () => {
             const {result} = renderHook(() => useAiHubTabsStore());
 
-            expect(result.current.chatsSidebarCollapsed).toBe(true);
-
             act(() => {
+                result.current.setChatsSidebarPeeking(true);
                 result.current.setChatsSidebarCollapsed(false);
             });
 
             expect(result.current.chatsSidebarCollapsed).toBe(false);
+            expect(result.current.chatsSidebarPeeking).toBe(false);
 
             act(() => {
                 result.current.setChatsSidebarCollapsed(true);
@@ -611,59 +617,50 @@ describe('useAiHubTabsStore', () => {
             expect(result.current.chatsSidebarCollapsed).toBe(true);
         });
 
-        it('closing the resource panel resets the sidebar back to collapsed', () => {
+        it('opening or closing the resource panel leaves the sidebar state alone', () => {
             const {result} = renderHook(() => useAiHubTabsStore());
 
-            // User opened the resource panel, then expanded the sidebar from the rail.
+            // Sidebar open, resource panel opens: the sidebar must NOT collapse (the header toggle is
+            // always there to close it by hand).
             act(() => {
-                result.current.setRightPanelOpen(true);
                 result.current.setChatsSidebarCollapsed(false);
+                result.current.setRightPanelOpen(true);
             });
 
             expect(result.current.chatsSidebarCollapsed).toBe(false);
 
-            // Closing the panel must return the sidebar to the rail default so the next open starts collapsed.
+            // Sidebar hidden, resource panel closes: the sidebar must stay hidden.
             act(() => {
+                result.current.setChatsSidebarCollapsed(true);
+                result.current.setChatsSidebarPeeking(true);
                 result.current.setRightPanelOpen(false);
             });
 
             expect(result.current.chatsSidebarCollapsed).toBe(true);
+            expect(result.current.chatsSidebarPeeking).toBe(true);
         });
 
-        it('opening the resource panel preserves the current rail state', () => {
+        it('switching chats leaves the sidebar state alone', () => {
             const {result} = renderHook(() => useAiHubTabsStore());
 
-            act(() => {
-                result.current.setChatsSidebarCollapsed(false);
-            });
-
-            act(() => {
-                result.current.setRightPanelOpen(true);
-            });
-
-            // setRightPanelOpen(true) must not force the rail state — only closing resets it.
-            expect(result.current.chatsSidebarCollapsed).toBe(false);
-        });
-
-        it('switching chats resets the sidebar back to collapsed', () => {
-            const {result} = renderHook(() => useAiHubTabsStore());
-
-            // On chat 1 the user expanded the sidebar over an open resource panel.
             act(() => {
                 result.current.setActiveChatId(1);
-                result.current.setRightPanelOpen(true);
-                result.current.setChatsSidebarCollapsed(false);
+                result.current.setChatsSidebarCollapsed(true);
             });
 
-            expect(result.current.chatsSidebarCollapsed).toBe(false);
-
-            // Clicking another chat must collapse the sidebar back to the rail — otherwise the full
-            // sidebar covers the new chat's panels until a page refresh.
             act(() => {
                 result.current.setActiveChatId(2);
             });
 
             expect(result.current.chatsSidebarCollapsed).toBe(true);
+
+            act(() => {
+                result.current.setChatsSidebarCollapsed(false);
+                result.current.setActiveChatId(undefined);
+                result.current.setActiveChatId(3);
+            });
+
+            expect(result.current.chatsSidebarCollapsed).toBe(false);
         });
     });
 

@@ -1,62 +1,74 @@
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
+import AiHubChatsSidebarPinButton from '@/ee/pages/automation/ai-hub/AiHubChatsSidebarPinButton';
 import AiHubErrorBoundary from '@/ee/pages/automation/ai-hub/AiHubErrorBoundary';
 import AiHubHomePanel from '@/ee/pages/automation/ai-hub/AiHubHomePanel';
 import AiHubPanel from '@/ee/pages/automation/ai-hub/AiHubPanel';
 import AiHubResourcePanel from '@/ee/pages/automation/ai-hub/AiHubResourcePanel';
-import AiHubTasksSidebarCollapseButton from '@/ee/pages/automation/ai-hub/AiHubTasksSidebarCollapseButton';
-import AiHubTasksSidebarRail from '@/ee/pages/automation/ai-hub/AiHubTasksSidebarRail';
+import AiHubChatsSidebar from '@/ee/pages/automation/ai-hub/chats/AiHubChatsSidebar';
+import {isWebhookBridgedChat} from '@/ee/pages/automation/ai-hub/chats/api/chats.api';
+import {useAiHubChatsQuery} from '@/ee/pages/automation/ai-hub/chats/hooks/useChats';
+import useRecordReferencedArtifacts from '@/ee/pages/automation/ai-hub/chats/hooks/useRecordReferencedArtifacts';
+import {useSwitchChat} from '@/ee/pages/automation/ai-hub/chats/hooks/useSwitchChat';
+import {aiHubChatsStore, useAiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
 import {useResetAiHubStoresOnWorkspaceChange} from '@/ee/pages/automation/ai-hub/hooks/useResetAiHubStoresOnWorkspaceChange';
 import {AiHubRuntimeProvider} from '@/ee/pages/automation/ai-hub/runtime-providers/AiHubRuntimeProvider';
 import {MODE, useAiHubStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubStore';
 import {useAiHubTabsStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
-import AiHubTasksSidebar from '@/ee/pages/automation/ai-hub/tasks/AiHubTasksSidebar';
-import useRecordReferencedArtifacts from '@/ee/pages/automation/ai-hub/tasks/hooks/useRecordReferencedArtifacts';
-import {useSwitchTask} from '@/ee/pages/automation/ai-hub/tasks/hooks/useSwitchTask';
-import {useAiHubTasksQuery} from '@/ee/pages/automation/ai-hub/tasks/hooks/useTasks';
-import {aiHubTasksStore, useAiHubTasksStore} from '@/ee/pages/automation/ai-hub/tasks/stores/useAiHubTasksStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {aiChatAskedQuestionsStore} from '@/shared/components/ai-chat/stores/useAiChatAskedQuestionsStore';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {useEffect, useRef} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {type PanelImperativeHandle} from 'react-resizable-panels';
 import {useNavigate, useParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 
 const AiHubContent = () => {
     const setMode = useAiHubStore((state) => state.setMode);
-    const generateTaskId = useAiHubStore((state) => state.generateTaskId);
+    const generateChatId = useAiHubStore((state) => state.generateChatId);
     const resetMessages = useAiHubStore((state) => state.resetMessages);
 
     const rightPanelOpen = useAiHubTabsStore((state) => state.rightPanelOpen);
-    const tasksSidebarCollapsed = useAiHubTabsStore((state) => state.tasksSidebarCollapsed);
-    const tasksSidebarPeeking = useAiHubTabsStore((state) => state.tasksSidebarPeeking);
-    const setActiveTabsTaskId = useAiHubTabsStore((state) => state.setActiveTaskId);
-    const setTasksSidebarPeeking = useAiHubTabsStore((state) => state.setTasksSidebarPeeking);
+    const chatsSidebarCollapsed = useAiHubTabsStore((state) => state.chatsSidebarCollapsed);
+    const chatsSidebarPeeking = useAiHubTabsStore((state) => state.chatsSidebarPeeking);
+    const setActiveTabsChatId = useAiHubTabsStore((state) => state.setActiveChatId);
+    const setChatsSidebarPeeking = useAiHubTabsStore((state) => state.setChatsSidebarPeeking);
 
-    const currentTaskId = useAiHubTasksStore((state) => state.currentTaskId);
-    // Flip to the thread view as soon as there are messages, not only once the DB task id arrives. On the
-    // home→task transition, AiHubRuntimeProvider.onNew adds the user message before awaiting the (possibly
-    // slow) task creation — gating on messages here makes that switch feel instant instead of leaving the
+    // The Chats sidebar is a page-level control, toggled by the PanelLeftIcon button that sits before the
+    // title in the panel header (AiHubChatsSidebarToggle) — same as the sidebar toggle on every other
+    // page. It's independent of the resource (right) panel: opening the resource panel no longer
+    // collapses the sidebar, because the toggle is always there to close it by hand.
+    const showChatsSidebar = !chatsSidebarCollapsed;
+
+    // While hidden, resting the pointer on the toggle "peeks" the sidebar: it floats in OVER the content
+    // as an overlay (no reflow) and slides back out when the pointer leaves it. The peek pops in
+    // instantly (`leftSidebarAnimate` off) so it lands under the resting pointer, whereas docking /
+    // hiding it and the peek's slide-out are animated like any other page's sidebar.
+    const peekChatsSidebar = chatsSidebarCollapsed && chatsSidebarPeeking;
+
+    const currentChatId = useAiHubChatsStore((state) => state.currentChatId);
+    // Flip to the thread view as soon as there are messages, not only once the DB chat id arrives. On the
+    // home→chat transition, AiHubRuntimeProvider.onNew adds the user message before awaiting the (possibly
+    // slow) chat creation — gating on messages here makes that switch feel instant instead of leaving the
     // user on a frozen home page. The selector returns a boolean so it only re-renders on the 0↔non-empty
     // edge, not on every streamed chunk.
     const hasMessages = useAiHubStore((state) => state.messages.length > 0);
-    const hasActiveTask = currentTaskId != null || hasMessages;
+    const hasActiveChat = currentChatId != null || hasMessages;
 
-    // The resource (right) panel only shows in the split view — an active task plus an open right panel.
-    const showResourcePanel = hasActiveTask && rightPanelOpen;
+    const hasOpenTabs = useAiHubTabsStore((state) => state.openTabs.length > 0);
 
-    // Opening the resource panel collapses the left Tasks sidebar to a thin rail (`tasksSidebarCollapsed`)
-    // so the chat + resource panels reclaim the width. No delay on either edge: the rail/sidebar swap
-    // tracks `showResourcePanel` directly so the sidebar's padding ease runs on the SAME 300ms clock as
-    // the chat's slide — otherwise the panel header (pinned to the sidebar-affected left edge) and the
-    // centered body move on different clocks and look out of sync. Open stays instant via
-    // `leftSidebarAnimate={!showSidebarRail}` (false while the rail shows); close animates the reappear.
-    const showSidebarRail = showResourcePanel && tasksSidebarCollapsed;
+    // Named so the two places that need it (the visibility gate below and the delayed-unmount effect
+    // further down) can't drift apart.
+    const hasResourceContent = hasActiveChat || hasOpenTabs;
 
-    // Coordinated open/close for the RIGHT resource panel (the left sidebar / rail behavior is untouched).
-    // The resource pane is a COLLAPSIBLE panel that's always mounted (when a task is active) so its width
+    // The resource (right) panel shows for an active chat AND on the home view the moment a composer
+    // pick opens a tab — "if I add a resource, I should see it immediately", before the first message
+    // creates the chat. The home→chat snapshot carry-over in setActiveChatId keeps those tabs.
+    const showResourcePanel = rightPanelOpen && hasResourceContent;
+
+    // Coordinated open/close for the RIGHT resource panel (the left sidebar behavior is untouched).
+    // The resource pane is a COLLAPSIBLE panel that's always mounted (when a chat is active) so its width
     // can animate from 0 — rather than the chat snapping to 35% the instant a pre-sized split mounts.
     //
     // `react-resizable-panels` v4 applies `className` to a nested div, not the flex item, so a CSS
@@ -115,29 +127,50 @@ const AiHubContent = () => {
         return () => clearTimeout(timerId);
     }, [showResourcePanel]);
 
+    // Mirrors `hasResourceContent`, but on the falling edge (last tab closed / chat cleared) it lags
+    // behind by the same 320ms as the collapse animation above instead of flipping synchronously. Without
+    // this lag, `AiHubResourcePanel` would unmount in the SAME commit that `hasResourceContent` goes
+    // false — before the width-collapse effect (keyed on `showResourcePanel`, which reads this same
+    // predicate) has even had a chance to run — leaving a frame where the pane is still ~62% wide but
+    // visually empty, then narrows to 0. Rising edge (content appearing) stays synchronous: the pane
+    // should show its content immediately, same as it always expanded immediately.
+    const [resourcePanelMounted, setResourcePanelMounted] = useState(hasResourceContent);
+
+    useEffect(() => {
+        if (hasResourceContent) {
+            setResourcePanelMounted(true);
+
+            return;
+        }
+
+        const timerId = setTimeout(() => setResourcePanelMounted(false), 320);
+
+        return () => clearTimeout(timerId);
+    }, [hasResourceContent]);
+
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
-    const {data: tasks, isLoading: tasksLoading} = useAiHubTasksQuery(
+    const {data: chats, isLoading: chatsLoading} = useAiHubChatsQuery(
         currentWorkspaceId,
         currentEnvironmentId,
         'ACTIVE'
     );
 
     const navigate = useNavigate();
-    const {taskId: urlTaskIdParam} = useParams<{taskId?: string}>();
-    const switchTask = useSwitchTask();
+    const {chatId: urlChatIdParam} = useParams<{chatId?: string}>();
+    const switchChat = useSwitchChat();
 
-    // Deep link to /tasks/:id lands here with an empty store: the URL→store sync effect below can only
-    // switch to the task once the (async) tasks query resolves. Without this flag the home panel would
+    // Deep link to /chats/:id lands here with an empty store: the URL→store sync effect below can only
+    // switch to the chat once the (async) chats query resolves. Without this flag the home panel would
     // flash in that gap — hold the loader instead, but only while the id can still resolve (query in
-    // flight, or the task exists in the resolved list). An unknown/foreign id falls back to the home
-    // view, matching the sync effect's silent no-op for missing tasks.
-    const pendingUrlTask =
-        !hasActiveTask &&
-        !!urlTaskIdParam &&
-        (tasksLoading || (tasks?.some((task) => String(task.id) === urlTaskIdParam) ?? false));
+    // flight, or the chat exists in the resolved list). An unknown/foreign id falls back to the home
+    // view, matching the sync effect's silent no-op for missing chats.
+    const pendingUrlChat =
+        !hasActiveChat &&
+        !!urlChatIdParam &&
+        (chatsLoading || (chats?.some((chat) => String(chat.id) === urlChatIdParam) ?? false));
 
-    // Active task lookup happens inside AiHubPanel now — title + workflow-chat badge
+    // Active chat lookup happens inside AiHubPanel now — title + workflow-chat badge
     // both live there alongside the Ask/Build toggle. The CC root no longer needs the title because the
     // top header strip is gone.
 
@@ -146,48 +179,48 @@ const AiHubContent = () => {
     // the reset multiple times on workspace change.
     useResetAiHubStoresOnWorkspaceChange();
 
-    // Records each open right-panel tab as a `ai_hub_task_artifact` so it shows up in the sidebar
+    // Records each open right-panel tab as a `ai_hub_chat_artifact` so it shows up in the sidebar
     // artifact list. Bridges the gap between the UI-only tab state and the persistent artifact log —
     // covers BOTH user-driven attachment (composer plus-button → opens tab) and agent-driven attachment
     // (chat tool calls that open files/workflows). The hook is a no-op when there's no active
-    // task (home view); it resumes recording once a task is created.
+    // chat (home view); it resumes recording once a chat is created.
     //
-    // Disabled for WORKFLOW_CHAT tasks: they auto-open their bound workflow in the right panel, but a
+    // Disabled for WORKFLOW_CHAT chats: they auto-open their bound workflow in the right panel, but a
     // workflow chat routes through a webhook (not the LLM) and must not accrue artifacts — otherwise that
     // auto-opened workflow would be recorded as a (spurious) artifact of the chat.
-    const currentTaskIsWorkflowChat = tasks?.find((task) => task.id === currentTaskId)?.kind === 'WORKFLOW_CHAT';
+    const currentChatIsWorkflowChat = isWebhookBridgedChat(chats?.find((chat) => chat.id === currentChatId)?.kind);
 
-    useRecordReferencedArtifacts(currentTaskId, currentWorkspaceId ?? 0, !currentTaskIsWorkflowChat);
+    useRecordReferencedArtifacts(currentChatId, currentWorkspaceId ?? 0, !currentChatIsWorkflowChat);
 
     useEffect(() => {
         setMode(MODE.BUILD);
     }, [setMode]);
 
     /*
-     * Mirror the active task into the tabs store so per-task tab snapshots can be
+     * Mirror the active chat into the tabs store so per-chat tab snapshots can be
      * saved/restored across switches. Without this wiring the resource-panel tabs would persist
-     * VISUALLY across task changes (the store is global) but they wouldn't be associated with
-     * any task — switching from /tasks/A back to /tasks/B would still show
-     * task A's tabs because the store doesn't know which task it's mirroring.
+     * VISUALLY across chat changes (the store is global) but they wouldn't be associated with
+     * any chat — switching from /chats/A back to /chats/B would still show
+     * chat A's tabs because the store doesn't know which chat it's mirroring.
      */
     useEffect(() => {
-        setActiveTabsTaskId(currentTaskId);
-    }, [currentTaskId, setActiveTabsTaskId]);
+        setActiveTabsChatId(currentChatId);
+    }, [currentChatId, setActiveTabsChatId]);
 
     /*
-     * Reset the askUserQuestion answered-state store on task switch. The store is keyed by question
+     * Reset the askUserQuestion answered-state store on chat switch. The store is keyed by question
      * content fingerprint (question text + option labels), which is content-stable per question instance
-     * but NOT scoped to a task. Two different tasks producing the same question shape (e.g. "Which Slack
-     * channel?" with the same channel list) would otherwise share the answered state — task B would see
-     * task A's answer as already-submitted, hide the buttons, and confuse the user. The workspace-change
+     * but NOT scoped to a chat. Two different chats producing the same question shape (e.g. "Which Slack
+     * channel?" with the same channel list) would otherwise share the answered state — chat B would see
+     * chat A's answer as already-submitted, hide the buttons, and confuse the user. The workspace-change
      * reset hook already calls reset() for cross-workspace switches; this effect covers in-workspace
-     * task switches.
+     * chat switches.
      */
     useEffect(() => {
         aiChatAskedQuestionsStore.getState().reset();
-    }, [currentTaskId]);
+    }, [currentChatId]);
 
-    // Note: workflow-chat tasks intentionally do NOT auto-open their bound workflow in the right resource
+    // Note: workflow chats intentionally do NOT auto-open their bound workflow in the right resource
     // panel. A workflow chat is a chat — popping the full workflow editor (Publish/Deploy, editable nodes)
     // on every open was heavy and surprising. The workflow can still be opened manually via the right
     // panel's resource picker if the user wants to inspect it.
@@ -197,55 +230,55 @@ const AiHubContent = () => {
      *
      * Three flow shapes need to coexist without cross-firing:
      *
-     *   (a) STORE-DRIVEN — `storeChanged` is true. Caused by a sidebar task row click
-     *       (`switchTask` writes the store), the auto-create path inside `onNew`
-     *       (`createAiHubTask` then `setCurrentTaskId`), or an explicit reset (delete /
-     *       archive of the active task). The URL must catch up. ALWAYS HANDLED FIRST so the
+     *   (a) STORE-DRIVEN — `storeChanged` is true. Caused by a sidebar chat row click
+     *       (`switchChat` writes the store), the auto-create path inside `onNew`
+     *       (`createAiHubChat` then `setCurrentChatId`), or an explicit reset (delete /
+     *       archive of the active chat). The URL must catch up. ALWAYS HANDLED FIRST so the
      *       URL→store invariant below cannot revert the store back to whatever the URL still says.
      *
-     *   (b) URL-DRIVEN STANDING — URL has a task id and the store doesn't yet match. Triggered
-     *       on cold-mount deep links and on every render until the tasks query resolves. This
-     *       has to be a STANDING condition (not gated on cross-render diff) because the tasks
+     *   (b) URL-DRIVEN STANDING — URL has a chat id and the store doesn't yet match. Triggered
+     *       on cold-mount deep links and on every render until the chats query resolves. This
+     *       has to be a STANDING condition (not gated on cross-render diff) because the chats
      *       list is async and may arrive after the first render — gating on `urlChanged` made the
      *       deep-link case silently no-op whenever the data landed on render 2+.
      *
-     *   (c) URL → home — URL has no task id but the store still does. Reset the store.
+     *   (c) URL → home — URL has no chat id but the store still does. Reset the store.
      *       Fires under TWO conditions:
      *         1. URL just transitioned to home (`urlChanged`) — sidebar AI Hub icon click.
      *         2. Initial effect run on mount (`isFirstEffectRef`) — catches the remount case where
-     *            the user clicks a task, navigates to another page, then returns to
-     *            /ai-hub with `urlTaskIdParam = undefined` and a stale
-     *            `currentTaskId` left in the global store from before navigation.
+     *            the user clicks a chat, navigates to another page, then returns to
+     *            /ai-hub with `urlChatIdParam = undefined` and a stale
+     *            `currentChatId` left in the global store from before navigation.
      *       NOT a fully-standing condition: between branch (a) calling `navigate()` and React Router's
      *       URL context catching up, there's a render where store has the new id but `useParams`
      *       still returns `undefined`. A standing branch (c) would erroneously reset the store there,
-     *       triggering an A → C → A bounce loop (URL flips home → task → home → task
+     *       triggering an A → C → A bounce loop (URL flips home → chat → home → chat
      *       on every send-from-home flow).
      *
-     * The previous shape ran (b) before (a). When the user clicked a sibling task row from
-     * /tasks/17 to /tasks/18, the store changed to 18 but the URL was still "17"; (b)
-     * saw the mismatch, found task 17 in the list, and called `switchTask(17)`,
-     * which clobbered the user's intent. Symptom: clicking a different task appeared to do
+     * The previous shape ran (b) before (a). When the user clicked a sibling chat row from
+     * /chats/17 to /chats/18, the store changed to 18 but the URL was still "17"; (b)
+     * saw the mismatch, found chat 17 in the list, and called `switchChat(17)`,
+     * which clobbered the user's intent. Symptom: clicking a different chat appeared to do
      * nothing (the panel stayed on 17). The order swap below fixes that without breaking deep links.
      */
-    const previousUrlParamRef = useRef(urlTaskIdParam);
-    const previousStoreIdRef = useRef(currentTaskId);
+    const previousUrlParamRef = useRef(urlChatIdParam);
+    const previousStoreIdRef = useRef(currentChatId);
     const isFirstEffectRef = useRef(true);
 
     useEffect(() => {
-        const urlChanged = urlTaskIdParam !== previousUrlParamRef.current;
-        const storeChanged = currentTaskId !== previousStoreIdRef.current;
+        const urlChanged = urlChatIdParam !== previousUrlParamRef.current;
+        const storeChanged = currentChatId !== previousStoreIdRef.current;
         const isFirstEffect = isFirstEffectRef.current;
 
-        previousUrlParamRef.current = urlTaskIdParam;
-        previousStoreIdRef.current = currentTaskId;
+        previousUrlParamRef.current = urlChatIdParam;
+        previousStoreIdRef.current = currentChatId;
         isFirstEffectRef.current = false;
 
         // (a) STORE-DRIVEN: highest priority. Push URL to match the store.
         if (storeChanged) {
-            if (currentTaskId != null && String(currentTaskId) !== urlTaskIdParam) {
-                navigate(`/automation/ai-hub/tasks/${currentTaskId}`);
-            } else if (currentTaskId == null && urlTaskIdParam) {
+            if (currentChatId != null && String(currentChatId) !== urlChatIdParam) {
+                navigate(`/automation/ai-hub/chats/${currentChatId}`);
+            } else if (currentChatId == null && urlChatIdParam) {
                 navigate('/automation/ai-hub');
             }
 
@@ -253,16 +286,16 @@ const AiHubContent = () => {
         }
 
         // (b) URL-DRIVEN STANDING: URL has an id, keep store aligned. Self-heals across renders.
-        if (urlTaskIdParam) {
-            const idNum = Number(urlTaskIdParam);
+        if (urlChatIdParam) {
+            const idNum = Number(urlChatIdParam);
 
-            if (!Number.isNaN(idNum) && idNum !== currentTaskId) {
-                const task = tasks?.find((candidate) => candidate.id === idNum);
+            if (!Number.isNaN(idNum) && idNum !== currentChatId) {
+                const chat = chats?.find((candidate) => candidate.id === idNum);
 
-                if (task) {
-                    void switchTask(task);
+                if (chat) {
+                    void switchChat(chat);
                 }
-                // No task found: fall through silently. Next tasks refetch retries.
+                // No chat found: fall through silently. Next chats refetch retries.
             }
 
             return;
@@ -270,21 +303,21 @@ const AiHubContent = () => {
 
         // (c) URL → home. Reset store on (1) URL transition to home or (2) first effect run after mount
         // with a stale store value. NOT on intermediate renders during branch (a)'s navigate() flush.
-        if ((urlChanged || isFirstEffect) && currentTaskId != null) {
-            aiHubTasksStore.getState().setCurrentTaskId(undefined);
+        if ((urlChanged || isFirstEffect) && currentChatId != null) {
+            aiHubChatsStore.getState().setCurrentChatId(undefined);
             resetMessages();
-            generateTaskId();
+            generateChatId();
         }
-    }, [tasks, currentTaskId, generateTaskId, navigate, resetMessages, switchTask, urlTaskIdParam]);
+    }, [chats, currentChatId, generateChatId, navigate, resetMessages, switchChat, urlChatIdParam]);
 
-    // Home view: no active task yet — show only the centered composer. The first message sent here
-    // auto-creates a task (see AiHubRuntimeProvider.onNew), which flips this branch to the
-    // panel view containing the thread. Personal Agents and Workflow Chats are full-page routes — they live
-    // outside this component (see /automation/ai-hub/personal-agents and /workflow-chats).
-    // While a deep-linked task is still resolving, render the same four-dot pulse as
-    // LazyLoadWrapper's suspense fallback so the route-chunk load and the task resolution read as one
-    // continuous loading state instead of loader → home flash → task.
-    const mainBody = pendingUrlTask ? (
+    // Home view: no active chat yet — show only the centered composer. The first message sent here
+    // auto-creates a chat (see AiHubRuntimeProvider.onNew), which flips this branch to the
+    // panel view containing the thread. Tasks is a full-page route — it lives
+    // outside this component (see /automation/ai-hub/tasks).
+    // While a deep-linked chat is still resolving, render the same four-dot pulse as
+    // LazyLoadWrapper's suspense fallback so the route-chunk load and the chat resolution read as one
+    // continuous loading state instead of loader → home flash → chat.
+    const mainBody = pendingUrlChat ? (
         <div className="flex size-full items-center justify-center p-8">
             <div className="flex animate-pulse space-x-2">
                 <div className="size-4 rounded-full bg-content-neutral-tertiary"></div>
@@ -296,24 +329,11 @@ const AiHubContent = () => {
                 <div className="size-4 rounded-full bg-content-neutral-tertiary"></div>
             </div>
         </div>
-    ) : !hasActiveTask ? (
-        <AiHubHomePanel />
     ) : (
         <div className="flex size-full">
-            {/* Collapsed Tasks sidebar (rail), shown while the resource panel is open and the sidebar is
-             * collapsed. It appears/disappears instantly — the sidebar is intentionally not animated; only
-             * the chat/resource split animates. Expanding it (its "show tasks" button) flips
-             * `tasksSidebarCollapsed`, which brings the full LayoutContainer sidebar back. */}
-
-            {/* Hovering the rail "peeks" the full Tasks sidebar: it floats in as an overlay (see
-             * `leftSidebarOverlay` below) without reflowing the chat, and collapses back when the pointer
-             * leaves it. The pointer-leave that closes the peek is on the overlay aside itself. */}
-
-            {showSidebarRail && <AiHubTasksSidebarRail onMouseEnter={() => setTasksSidebarPeeking(true)} />}
-
             <ResizablePanelGroup className="min-w-0 flex-1" orientation="horizontal">
                 <ResizablePanel elementRef={chatPaneElementRef} minSize="25%">
-                    <AiHubPanel />
+                    {hasActiveChat ? <AiHubPanel /> : <AiHubHomePanel />}
                 </ResizablePanel>
 
                 {/* Invisible draggable gap (no grip line) so the resource panel reads as a floating
@@ -341,7 +361,10 @@ const AiHubContent = () => {
                     panelRef={resourcePanelHandleRef}
                 >
                     <div className="size-full overflow-hidden">
-                        <AiHubResourcePanel />
+                        {/* `resourcePanelMounted` (not `hasResourceContent` directly) — see the effect
+                         * above for why the unmount lags the content going away by 320ms. */}
+
+                        {resourcePanelMounted && <AiHubResourcePanel />}
                     </div>
                 </ResizablePanel>
             </ResizablePanelGroup>
@@ -351,44 +374,43 @@ const AiHubContent = () => {
     return (
         <LayoutContainer
             className="bg-surface-main"
-            // No top `header` slot any more — both the task title (which lived on the left of the
+            // No top `header` slot any more — both the chat title (which lived on the left of the
             // header) and the EnvironmentSelect (which lived on the right) have moved into their natural
             // homes: the title sits inside AiHubPanel's own header alongside the Ask/Build toggle,
-            // and EnvironmentSelect lives in AiHubTasksSidebar's Tasks row. This
+            // and EnvironmentSelect lives in AiHubChatsSidebar's Chats row. This
             // lets both sidebars stretch top-to-bottom without a strip across the top of the layout.
-            // Animate the sidebar only when the FULL sidebar is the one being shown (i.e. on the close /
-            // rail→sidebar transition). That eases the content padding from the rail's 48px back to the
-            // sidebar's 256px, so the chat slides to its final width instead of bumping 208px in one frame.
-            // On open (sidebar→rail) animation stays off, so the collapse is instant and doesn't flash.
-            leftSidebarAnimate={!showSidebarRail}
-            leftSidebarBody={<AiHubTasksSidebar />}
-            // The collapse-to-rail control lives in the header's `right` slot so it sits in line with the
-            // "AI Hub" title. Shown only while the resource panel is open — the only state where collapsing
-            // to the rail is meaningful.
+            // Animation is off only while a peek is up: the preview must pop in instantly under the resting
+            // pointer (an animated slide-in would leave a window where the pointer never "entered" the
+            // aside, so its mouse-leave — which ends the peek — could never fire). Every other transition
+            // (dock open, hide, and the peek's own slide-out) animates like any other page's sidebar.
+            leftSidebarAnimate={!peekChatsSidebar}
+            leftSidebarBody={<AiHubChatsSidebar />}
+            // While peeking, the sidebar header carries a PIN control (in line with the "AI Hub" title) —
+            // the peek overlay floats over the panel-header toggle that opened it, so that toggle can't be
+            // clicked to dock the preview open. When docked open there is nothing here: the header toggle
+            // is the close control, as on every other page.
             leftSidebarHeader={
                 <Header
                     position="sidebar"
-                    right={showResourcePanel ? <AiHubTasksSidebarCollapseButton /> : undefined}
+                    right={peekChatsSidebar ? <AiHubChatsSidebarPinButton /> : undefined}
                     title="AI Hub"
                 />
             }
-            // End the hover "peek" when the pointer leaves the floating sidebar — collapses it back to the
-            // rail. Pinning (the header control) clears the peek separately via the store.
-            leftSidebarOnMouseLeave={() => setTasksSidebarPeeking(false)}
-            // Hide the LayoutContainer left sidebar while the collapsed rail stands in for it (resource
-            // panel open + collapsed). Otherwise the full sidebar renders here as usual.
-            leftSidebarOpen={!showSidebarRail}
-            // While collapsed to the rail, a hover floats the full sidebar OVER the content (no reflow) as
-            // a preview. `leftSidebarOpen` stays false so the docked sidebar reserves no space.
-            leftSidebarOverlay={showSidebarRail && tasksSidebarPeeking}
+            // End the hover "peek" when the pointer leaves the floating sidebar — slides it back out.
+            // Pinning (the header control) clears the peek separately via the store.
+            leftSidebarOnMouseLeave={() => setChatsSidebarPeeking(false)}
+            leftSidebarOpen={showChatsSidebar}
+            // While hidden, a hover on the toggle floats the full sidebar OVER the content (no reflow) as a
+            // preview. `leftSidebarOpen` stays false so the docked sidebar reserves no space.
+            leftSidebarOverlay={peekChatsSidebar}
             leftSidebarWidth="64"
         >
             {/*
              * Runtime provider is hoisted up here (was previously instantiated inside HomePanel and Panel).
-             * The home -> task transition flips `mainBody` from `AiHubHomePanel` to the
+             * The home -> chat transition flips `mainBody` from `AiHubHomePanel` to the
              * `AiHubPanel` view; if each side owned its own provider, that flip would unmount the
              * provider mid-`onNew`, fire its cleanup useEffect, and abort the AG-UI agent run via
-             * `cleanupForTaskChange` — the user would land on the task page with their
+             * `cleanupForChatChange` — the user would land on the chat page with their
              * message but no streaming reply. Mounting the provider once at this level keeps the runtime
              * (and its turn AbortController) alive across the view swap.
              *

@@ -18,30 +18,36 @@ import {twMerge} from 'tailwind-merge';
 
 const AI_PROVIDERS_SETTINGS_PATH = '/automation/settings/ai-providers';
 
-export interface ModelPickerPersonalAgentI {
-    id: number;
-    name: string;
-    title: string | null;
-}
-
 export interface ModelPickerWorkflowChatI {
     label: string;
     projectDeploymentId: string;
     workflowExecutionId: string;
 }
 
+/**
+ * An agent's chat-reachable workflow. Structurally identical to {@link ModelPickerWorkflowChatI} because
+ * both cascades open the same kind of chat through the same idempotent create call — only the source of
+ * the row differs (a user's deployed workflow vs. an agent's hidden backing workflow), and with it the
+ * `label`, which is the agent's title rather than "project — workflow".
+ */
+export interface ModelPickerAgentChatI {
+    label: string;
+    projectDeploymentId: string;
+    workflowExecutionId: string;
+}
+
 export interface ModelPickerPropsI {
-    agentDefaultModel?: string | null;
-    agentDefaultProvider?: string | null;
+    agentChats?: ModelPickerAgentChatI[];
+    taskDefaultModel?: string | null;
+    taskDefaultProvider?: string | null;
     defaultModel?: string | null;
     defaultProvider?: string | null;
     environment: number;
     iconOnly?: boolean;
     layout?: 'compact' | 'full';
     onChange: (provider: string | null, model: string | null) => void;
-    onSelectPersonalAgent?: (agentId: number) => void;
+    onSelectAgentChat?: (workflowExecutionId: string, projectDeploymentId: string, label: string) => void;
     onSelectWorkflowChat?: (workflowExecutionId: string, projectDeploymentId: string, label: string) => void;
-    personalAgents?: ModelPickerPersonalAgentI[];
     workflowChats?: ModelPickerWorkflowChatI[];
     selectedModel: string | null;
     selectedProvider: string | null;
@@ -51,19 +57,19 @@ export interface ModelPickerPropsI {
 const isPresent = <T,>(value: T | null): value is T => value != null;
 
 const ModelPicker = ({
-    agentDefaultModel,
-    agentDefaultProvider,
+    agentChats,
     defaultModel,
     defaultProvider,
     environment,
     iconOnly = false,
     layout = 'compact',
     onChange,
-    onSelectPersonalAgent,
+    onSelectAgentChat,
     onSelectWorkflowChat,
-    personalAgents,
     selectedModel,
     selectedProvider,
+    taskDefaultModel,
+    taskDefaultProvider,
     workflowChats,
     workspaceDefaultLabel,
 }: ModelPickerPropsI) => {
@@ -92,27 +98,14 @@ const ModelPicker = ({
         return [...filtered].sort((first, second) => first.name.localeCompare(second.name));
     }, [providers, searchQuery]);
 
-    const showPersonalAgentsSection = onSelectPersonalAgent != null && (personalAgents?.length ?? 0) > 0;
-
-    const sortedPersonalAgents = useMemo(() => {
-        if (!showPersonalAgentsSection || personalAgents == null) {
-            return [];
-        }
-
-        const query = searchQuery.trim().toLowerCase();
-        const filtered = query
-            ? personalAgents.filter(
-                  (agent) =>
-                      (agent.title ?? '').toLowerCase().includes(query) || agent.name.toLowerCase().includes(query)
-              )
-            : personalAgents;
-
-        return [...filtered].sort((first, second) =>
-            (first.title ?? first.name).localeCompare(second.title ?? second.name)
-        );
-    }, [personalAgents, searchQuery, showPersonalAgentsSection]);
-
-    const showWorkflowChatsSection = onSelectWorkflowChat != null && (workflowChats?.length ?? 0) > 0;
+    /*
+     * Both chat-launcher cascades render whenever the caller wires their handler — including when the list
+     * behind one is empty, in which case the sub-menu explains why. Hiding an empty cascade outright (the
+     * earlier behaviour) made a launcher look unimplemented rather than unpopulated: an agent whose project
+     * deployment is disabled drops out of `workspaceChatAgents`, and with the whole "Agents" row gone there
+     * was nothing to tell the user that deploying it is what brings the entry back.
+     */
+    const showWorkflowChatsSection = onSelectWorkflowChat != null;
 
     const sortedWorkflowChats = useMemo(() => {
         if (!showWorkflowChatsSection || workflowChats == null) {
@@ -127,6 +120,19 @@ const ModelPicker = ({
         return [...filtered].sort((first, second) => first.label.localeCompare(second.label));
     }, [searchQuery, showWorkflowChatsSection, workflowChats]);
 
+    const showAgentChatsSection = onSelectAgentChat != null;
+
+    const sortedAgentChats = useMemo(() => {
+        if (!showAgentChatsSection || agentChats == null) {
+            return [];
+        }
+
+        const query = searchQuery.trim().toLowerCase();
+        const filtered = query ? agentChats.filter((chat) => chat.label.toLowerCase().includes(query)) : agentChats;
+
+        return [...filtered].sort((first, second) => first.label.localeCompare(second.label));
+    }, [agentChats, searchQuery, showAgentChatsSection]);
+
     const triggerContent = useMemo(() => {
         if (selectedProvider && selectedModel) {
             const provider = providers.find((candidate) => candidate.key === selectedProvider);
@@ -135,11 +141,11 @@ const ModelPicker = ({
             return {icon: provider?.icon ?? null, label: model?.label || selectedModel};
         }
 
-        if (agentDefaultProvider && agentDefaultModel) {
-            const provider = providers.find((candidate) => candidate.key === agentDefaultProvider);
-            const model = provider?.models.find((candidate) => candidate.name === agentDefaultModel);
+        if (taskDefaultProvider && taskDefaultModel) {
+            const provider = providers.find((candidate) => candidate.key === taskDefaultProvider);
+            const model = provider?.models.find((candidate) => candidate.name === taskDefaultModel);
 
-            return {icon: provider?.icon ?? null, label: model?.label || agentDefaultModel};
+            return {icon: provider?.icon ?? null, label: model?.label || taskDefaultModel};
         }
 
         if (defaultProvider && defaultModel) {
@@ -151,13 +157,13 @@ const ModelPicker = ({
 
         return {icon: null, label: workspaceDefaultLabel ?? 'Select model'};
     }, [
-        agentDefaultModel,
-        agentDefaultProvider,
         defaultModel,
         defaultProvider,
         providers,
         selectedModel,
         selectedProvider,
+        taskDefaultModel,
+        taskDefaultProvider,
         workspaceDefaultLabel,
     ]);
 
@@ -183,13 +189,13 @@ const ModelPicker = ({
         closeMenu();
     };
 
-    const handleSelectPersonalAgent = (agentId: number) => {
-        onSelectPersonalAgent?.(agentId);
+    const handleSelectWorkflowChat = (chat: ModelPickerWorkflowChatI) => {
+        onSelectWorkflowChat?.(chat.workflowExecutionId, chat.projectDeploymentId, chat.label);
         closeMenu();
     };
 
-    const handleSelectWorkflowChat = (chat: ModelPickerWorkflowChatI) => {
-        onSelectWorkflowChat?.(chat.workflowExecutionId, chat.projectDeploymentId, chat.label);
+    const handleSelectAgentChat = (chat: ModelPickerAgentChatI) => {
+        onSelectAgentChat?.(chat.workflowExecutionId, chat.projectDeploymentId, chat.label);
         closeMenu();
     };
 
@@ -253,8 +259,8 @@ const ModelPicker = ({
                             <BrainCircuitIcon className="text-muted-foreground" />
 
                             <span>
-                                {agentDefaultProvider && agentDefaultModel
-                                    ? 'Use agent default'
+                                {taskDefaultProvider && taskDefaultModel
+                                    ? 'Use task default'
                                     : `Use ${workspaceDefaultLabel.toLowerCase()}`}
                             </span>
                         </DropdownMenuItem>
@@ -263,25 +269,37 @@ const ModelPicker = ({
                     </>
                 )}
 
-                {showPersonalAgentsSection && (
+                {/*
+                 * Agents sits directly above Workflows, in the same group above the provider separator: both
+                 * open a kind=WORKFLOW_CHAT chat bound to a deployed workflow's webhook, the only difference
+                 * being that an agent's workflow lives in its hidden backing project. Agents leads because it
+                 * is the one users reach for by name; keeping the two adjacent (rather than splitting agents
+                 * into their own page) is what makes this popup the single launcher for every kind of chat.
+                 */}
+
+                {showAgentChatsSection && (
                     <DropdownMenuSub>
                         <DropdownMenuSubTrigger>
                             <BotIcon className="text-muted-foreground" />
 
-                            <span>Personal agents</span>
+                            <span>Agents</span>
                         </DropdownMenuSubTrigger>
 
                         <DropdownMenuPortal>
                             <DropdownMenuSubContent className="max-h-80 overflow-y-auto">
-                                {sortedPersonalAgents.length === 0 ? (
-                                    <div className="px-2 py-1.5 text-sm text-muted-foreground">No matching agents.</div>
+                                {sortedAgentChats.length === 0 ? (
+                                    <div className="px-2 py-1.5 text-sm text-muted-foreground">
+                                        {searchQuery.trim()
+                                            ? 'No matching agents.'
+                                            : 'No agent with an enabled deployment.'}
+                                    </div>
                                 ) : (
-                                    sortedPersonalAgents.map((agent) => (
+                                    sortedAgentChats.map((chat) => (
                                         <DropdownMenuItem
-                                            key={agent.id}
-                                            onSelect={() => handleSelectPersonalAgent(agent.id)}
+                                            key={chat.workflowExecutionId}
+                                            onSelect={() => handleSelectAgentChat(chat)}
                                         >
-                                            <span className="truncate">{agent.title || agent.name}</span>
+                                            <span className="truncate">{chat.label}</span>
                                         </DropdownMenuItem>
                                     ))
                                 )}
@@ -295,14 +313,16 @@ const ModelPicker = ({
                         <DropdownMenuSubTrigger>
                             <WorkflowIcon className="text-muted-foreground" />
 
-                            <span>Workflow chats</span>
+                            <span>Workflows</span>
                         </DropdownMenuSubTrigger>
 
                         <DropdownMenuPortal>
                             <DropdownMenuSubContent className="max-h-80 overflow-y-auto">
                                 {sortedWorkflowChats.length === 0 ? (
                                     <div className="px-2 py-1.5 text-sm text-muted-foreground">
-                                        No matching workflows.
+                                        {searchQuery.trim()
+                                            ? 'No matching workflows.'
+                                            : 'No deployed workflow with a chat trigger.'}
                                     </div>
                                 ) : (
                                     sortedWorkflowChats.map((chat) => (
@@ -319,7 +339,7 @@ const ModelPicker = ({
                     </DropdownMenuSub>
                 )}
 
-                {(showPersonalAgentsSection || showWorkflowChatsSection) && <DropdownMenuSeparator />}
+                {(showAgentChatsSection || showWorkflowChatsSection) && <DropdownMenuSeparator />}
 
                 {sortedProviders.length === 0 ? (
                     <div className="px-2 py-1.5 text-sm text-muted-foreground">

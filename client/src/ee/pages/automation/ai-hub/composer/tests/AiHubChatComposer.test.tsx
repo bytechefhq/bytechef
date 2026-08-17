@@ -38,18 +38,14 @@ vi.mock('@/ee/pages/automation/ai-hub/composer/AiHubComposerDropZone', () => ({
     default: ({children}: {children: ReactNode}) => <div data-testid="drop-zone">{children}</div>,
 }));
 
-// AiHubComposer (the ResourcePickerMenu trigger) and TaskToolChips are sibling subtrees, not under
+// AiHubComposer (the ResourcePickerMenu trigger) and ChatToolChips are sibling subtrees, not under
 // test here — stub them to keep the render lightweight.
 vi.mock('@/ee/pages/automation/ai-hub/composer/AiHubComposer', () => ({
     default: () => <div data-testid="ai-hub-composer" />,
 }));
 
-vi.mock('@/ee/pages/automation/ai-hub/composer/AiHubConnectorsMenu', () => ({
-    default: () => <div data-testid="ai-hub-connectors-menu" />,
-}));
-
-vi.mock('@/ee/pages/automation/ai-hub/tools/TaskToolChips', () => ({
-    default: () => <div data-testid="task-tool-chips" />,
+vi.mock('@/ee/pages/automation/ai-hub/tools/ChatToolChips', () => ({
+    default: () => <div data-testid="chat-tool-chips" />,
 }));
 
 // The assistant-ui runtime primitives require an AssistantRuntimeProvider context. Stub the pieces the
@@ -86,21 +82,21 @@ vi.mock('@/shared/middleware/graphql', () => ({
     useCancelWorkflowChatTurnMutation: () => ({mutate: vi.fn()}),
 }));
 
-// The active-task lookup (currentTaskId from the tasks store ∩ the tasks query) drives `isWorkflowChat`,
-// which gates the resource-attachment controls. Hoisted mutable refs let each test set the active task's
-// kind; both default to "no active task" so existing chip tests see a standard (non-workflow) composer.
-const {currentTaskIdRef, tasksQueryRef} = vi.hoisted(() => ({
-    currentTaskIdRef: {current: undefined as number | undefined},
-    tasksQueryRef: {current: undefined as Array<{id: number; kind: string}> | undefined},
+// The active-chat lookup (currentChatId from the chats store ∩ the chats query) drives `isWorkflowChat`,
+// which gates the resource-attachment controls. Hoisted mutable refs let each test set the active chat's
+// kind; both default to "no active chat" so existing chip tests see a standard (non-workflow) composer.
+const {chatsQueryRef, currentChatIdRef} = vi.hoisted(() => ({
+    chatsQueryRef: {current: undefined as Array<{id: number; kind: string}> | undefined},
+    currentChatIdRef: {current: undefined as number | undefined},
 }));
 
-vi.mock('@/ee/pages/automation/ai-hub/tasks/hooks/useTasks', () => ({
-    useAiHubTasksQuery: () => ({data: tasksQueryRef.current}),
+vi.mock('@/ee/pages/automation/ai-hub/chats/hooks/useChats', () => ({
+    useAiHubChatsQuery: () => ({data: chatsQueryRef.current}),
 }));
 
-vi.mock('@/ee/pages/automation/ai-hub/tasks/stores/useAiHubTasksStore', () => ({
-    useAiHubTasksStore: (selector: (state: {currentTaskId: number | undefined}) => unknown) =>
-        selector({currentTaskId: currentTaskIdRef.current}),
+vi.mock('@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore', () => ({
+    useAiHubChatsStore: (selector: (state: {currentChatId: number | undefined}) => unknown) =>
+        selector({currentChatId: currentChatIdRef.current}),
 }));
 
 // Workspace / environment stores are read via selectors; constant returns are enough here.
@@ -126,10 +122,26 @@ const renderComposer = async () => {
 };
 
 beforeEach(() => {
-    aiHubComposerStore.setState({referencedResources: []});
+    aiHubComposerStore.setState({referencedResources: [], selectedSkills: []});
 
-    currentTaskIdRef.current = undefined;
-    tasksQueryRef.current = undefined;
+    currentChatIdRef.current = undefined;
+    chatsQueryRef.current = undefined;
+});
+
+describe('AiHubChatComposer skill chips', () => {
+    it('renders a chip for each skill armed through the / menu and removes it on X', async () => {
+        aiHubComposerStore.setState({selectedSkills: [{id: 'skill-1', name: 'email-digest'}]});
+
+        await renderComposer();
+
+        expect(screen.getByTestId('skill-chip')).toBeInTheDocument();
+        expect(screen.getByText('email-digest')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByLabelText('Remove email-digest'));
+
+        expect(aiHubComposerStore.getState().selectedSkills).toEqual([]);
+        expect(screen.queryByText('email-digest')).not.toBeInTheDocument();
+    });
 });
 
 describe('AiHubChatComposer referenced-resource chips', () => {
@@ -166,9 +178,9 @@ describe('AiHubChatComposer referenced-resource chips', () => {
 });
 
 describe('AiHubChatComposer workflow-chat attachment gating', () => {
-    it('renders the resource picker and attach-file button for a standard task', async () => {
-        currentTaskIdRef.current = 7;
-        tasksQueryRef.current = [{id: 7, kind: 'STANDARD'}];
+    it('renders the resource picker and attach-file button for a standard chat', async () => {
+        currentChatIdRef.current = 7;
+        chatsQueryRef.current = [{id: 7, kind: 'STANDARD'}];
 
         await renderComposer();
 
@@ -176,9 +188,9 @@ describe('AiHubChatComposer workflow-chat attachment gating', () => {
         expect(screen.getByLabelText('Attach file')).toBeInTheDocument();
     });
 
-    it('hides the resource picker and attach-file button for a workflow-chat task', async () => {
-        currentTaskIdRef.current = 7;
-        tasksQueryRef.current = [{id: 7, kind: 'WORKFLOW_CHAT'}];
+    it('hides the resource picker and attach-file button for a workflow chat', async () => {
+        currentChatIdRef.current = 7;
+        chatsQueryRef.current = [{id: 7, kind: 'WORKFLOW_CHAT'}];
 
         await renderComposer();
 

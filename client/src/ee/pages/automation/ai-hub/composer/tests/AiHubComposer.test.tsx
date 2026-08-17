@@ -16,7 +16,7 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
  * The behaviours that moved out are covered by their new homes and are intentionally NOT re-tested here:
  *   - resource-picker drill-down, search, "Show more" pagination, workflow aggregation, the 8 root
  *     entries → ResourcePickerMenu.test.tsx
- *   - onSelect → store / tab routing and the toolsBranch wiring → AiHubComposerResourcePicker.test.tsx
+ *   - onSelect → store / tab routing and the customBranches wiring → AiHubComposerResourcePicker.test.tsx
  *   - file upload / retry / dismiss / error handling → useAiHubAttachmentUpload.test.ts
  *   - drag-and-drop file handling → AiHubComposerDropZone.test.tsx
  */
@@ -27,19 +27,19 @@ vi.mock('@/ee/pages/automation/ai-hub/resource-picker/ResourcePickerMenu', () =>
     default: ({trigger}: {trigger: ReactNode}) => <div data-testid="resource-picker-menu">{trigger}</div>,
 }));
 
-// TaskToolDialog is a sibling heavy modal, not under test here — stub it out.
-vi.mock('@/ee/pages/automation/ai-hub/tools/dialogs/TaskToolDialog', () => ({
+// ChatToolDialog is a sibling heavy modal, not under test here — stub it out.
+vi.mock('@/ee/pages/automation/ai-hub/tools/dialogs/ChatToolDialog', () => ({
     default: () => null,
 }));
 
-// The composer issues useAiHubTaskToolableComponentsQuery for the Tools branch catalog walk. Stub it so the
+// The composer issues useAiHubChatToolableComponentsQuery for the Tools branch catalog walk. Stub it so the
 // component mounts without a live GraphQL fetch.
 vi.mock('@/shared/middleware/graphql', async (importOriginal) => {
     const actual = await importOriginal<typeof import('@/shared/middleware/graphql')>();
 
     return {
         ...actual,
-        useAiHubTaskToolableComponentsQuery: vi.fn().mockReturnValue({data: undefined, isLoading: false}),
+        useAiHubChatToolableComponentsQuery: vi.fn().mockReturnValue({data: undefined, isLoading: false}),
     };
 });
 

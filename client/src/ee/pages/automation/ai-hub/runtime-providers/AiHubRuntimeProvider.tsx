@@ -1961,7 +1961,15 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
             return;
         }
 
-        const input = message.content[0].text;
+        // Skills armed through the composer's '/' menu ride along as `/<name>` prefixes rather than as agent
+        // state: the '/<name>' form is what the ai_hub prompts already teach the agent to recognise, and
+        // keeping it in the message text means the user sees in the transcript exactly which skills the turn
+        // was sent with. The composer store is cleared below, so the arming is per-message.
+        const selectedSkills = aiHubComposerStore.getState().selectedSkills;
+        const input =
+            selectedSkills.length > 0
+                ? `${selectedSkills.map((skill) => `/${skill.name}`).join(' ')} ${message.content[0].text}`
+                : message.content[0].text;
 
         aiChatRetryableErrorStore.getState().clearError();
 

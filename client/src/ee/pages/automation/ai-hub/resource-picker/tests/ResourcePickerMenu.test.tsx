@@ -44,7 +44,6 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => {
 
     return {
         ...actual,
-        useAiAgentsQuery: vi.fn(),
         useAiHubChatsQuery: vi.fn(),
         useDataTablesQuery: vi.fn(),
         useGetAssetFilesQuery: vi.fn(),
@@ -80,7 +79,6 @@ vi.mock('use-debounce', () => ({
 // ── Resolve mocked modules ────────────────────────────────────────────────────
 
 const {
-    useAiAgentsQuery,
     useAiHubChatsQuery,
     useDataTablesQuery,
     useGetAssetFilesQuery,
@@ -94,7 +92,6 @@ const {useGetApiCollectionsQuery} = await import('@/ee/shared/mutations/automati
 const {useInfiniteWorkspaceProjectWorkflowExecutionsQuery} =
     await import('@/shared/queries/automation/workflowExecutions.queries');
 
-const mockUseAiAgentsQuery = vi.mocked(useAiAgentsQuery);
 const mockUseAiHubChatsQuery = vi.mocked(useAiHubChatsQuery);
 const mockUseDataTablesQuery = vi.mocked(useDataTablesQuery);
 const mockUseGetAssetFilesQuery = vi.mocked(useGetAssetFilesQuery);
@@ -129,7 +126,6 @@ const setupMocks = () => {
     mockUseGetApiCollectionsQuery.mockReturnValue(mockQuerySuccess([]));
     mockUseAiHubChatsQuery.mockReturnValue(mockQuerySuccess({aiHubChats: []}));
     mockUseWorkspaceProjectWorkflowsQuery.mockReturnValue(mockQuerySuccess({workspaceProjectWorkflows: []}));
-    mockUseAiAgentsQuery.mockReturnValue(mockQuerySuccess({aiAgents: []}));
 };
 
 const renderMenu = async (extraProps?: Record<string, unknown>) => {
@@ -176,44 +172,72 @@ describe('ResourcePickerMenu', () => {
         });
     });
 
-    it('hides the Tools root item when toolsBranch is not supplied', async () => {
+    it('shows no custom branch root items when customBranches is not supplied', async () => {
         await renderMenu();
         await openMenu();
 
         await waitFor(() => {
-            expect(screen.queryByText('Tools')).not.toBeInTheDocument();
+            expect(screen.queryByText('Connectors')).not.toBeInTheDocument();
+            expect(screen.queryByText('Skills')).not.toBeInTheDocument();
         });
     });
 
-    it('shows the Tools root item when toolsBranch is supplied', async () => {
-        const {default: ResourcePickerMenu} = await import('../ResourcePickerMenu');
-        const onSelect = vi.fn();
+    // Each branch must reach ITS OWN body: the menu stores the branch key in the path and looks it up, so a
+    // lookup that ignored the key (or a single shared slot) would silently render the first branch for both.
+    it('renders every custom branch root item and drills into the matching branch body', async () => {
+        const customBranches = [
+            {
+                key: 'connectors',
+                renderBranch: (onBack: () => void) => (
+                    <div>
+                        <button onClick={onBack}>Back</button>
 
-        const toolsBranch = {
-            renderBranch: (onBack: () => void) => (
-                <div>
-                    <button onClick={onBack}>Back</button>
+                        <span>Connectors branch content</span>
+                    </div>
+                ),
+                renderRootItem: (onEnter: () => void) => <button onClick={onEnter}>Connectors</button>,
+            },
+            {
+                key: 'skills',
+                renderBranch: () => <span>Skills branch content</span>,
+                renderRootItem: (onEnter: () => void) => <button onClick={onEnter}>Skills</button>,
+            },
+        ];
 
-                    <span>Tools branch content</span>
-                </div>
-            ),
-            renderRootItem: (onEnter: () => void) => <button onClick={onEnter}>Tools</button>,
-        };
-
-        render(
-            <ResourcePickerMenu
-                environmentId={0}
-                onSelect={onSelect}
-                toolsBranch={toolsBranch}
-                trigger={<button>Open picker</button>}
-                workspaceId={1}
-            />
-        );
-
+        await renderMenu({customBranches});
         await openMenu();
 
         await waitFor(() => {
-            expect(screen.getByText('Tools')).toBeInTheDocument();
+            expect(screen.getByText('Connectors')).toBeInTheDocument();
+            expect(screen.getByText('Skills')).toBeInTheDocument();
+        });
+
+        await userEvent.click(screen.getByRole('button', {name: 'Skills'}));
+
+        await waitFor(() => {
+            expect(screen.getByText('Skills branch content')).toBeInTheDocument();
+        });
+
+        expect(screen.queryByText('Connectors branch content')).not.toBeInTheDocument();
+    });
+
+    it('returns to the root menu from a custom branch via onBack', async () => {
+        const customBranches = [
+            {
+                key: 'connectors',
+                renderBranch: (onBack: () => void) => <button onClick={onBack}>Back</button>,
+                renderRootItem: (onEnter: () => void) => <button onClick={onEnter}>Connectors</button>,
+            },
+        ];
+
+        await renderMenu({customBranches});
+        await openMenu();
+
+        await userEvent.click(await screen.findByRole('button', {name: 'Connectors'}));
+        await userEvent.click(await screen.findByRole('button', {name: 'Back'}));
+
+        await waitFor(() => {
+            expect(screen.getByText('Files')).toBeInTheDocument();
         });
     });
 
@@ -462,56 +486,6 @@ describe('ResourcePickerMenu', () => {
             expect(screen.getByText('orbital-relay-mcp')).toBeInTheDocument();
             // The empty state must not be shown.
             expect(screen.queryByText('No resources found.')).not.toBeInTheDocument();
-        });
-    });
-
-    describe('Agents branch', () => {
-        it('hides the Agents root item when onSelectAiAgent is not supplied', async () => {
-            await renderMenu();
-            await openMenu();
-
-            await waitFor(() => {
-                expect(screen.queryByText('Agents')).not.toBeInTheDocument();
-            });
-        });
-
-        it('shows the Agents root item and fires onSelectAiAgent after picking an agent', async () => {
-            mockUseAiAgentsQuery.mockReturnValue(
-                mockQuerySuccess({
-                    aiAgents: [
-                        {
-                            description: null,
-                            elements: [],
-                            id: 'agent-1',
-                            lastModifiedDate: null,
-                            lastPublishedVersion: 0,
-                            name: 'support-agent',
-                            title: 'Support Agent',
-                            unpublishedChanges: false,
-                        },
-                    ],
-                })
-            );
-
-            const onSelectAiAgent = vi.fn();
-
-            await renderMenu({onSelectAiAgent});
-            await openMenu();
-
-            await userEvent.click(screen.getByText('Agents'));
-
-            await waitFor(() => {
-                expect(screen.getByText('Support Agent')).toBeInTheDocument();
-            });
-
-            await userEvent.click(screen.getByText('Support Agent'));
-
-            expect(onSelectAiAgent).toHaveBeenCalledTimes(1);
-            expect(onSelectAiAgent).toHaveBeenCalledWith({id: 'agent-1', name: 'Support Agent'});
-
-            await waitFor(() => {
-                expect(screen.queryByText('Support Agent')).not.toBeInTheDocument();
-            });
         });
     });
 });

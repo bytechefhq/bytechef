@@ -6,7 +6,6 @@ import {useGetApiCollectionsQuery} from '@/ee/shared/mutations/automation/apiCol
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {
     AiHubChatStatus,
-    useAiAgentsQuery,
     useAiHubChatsQuery,
     useDataTablesQuery,
     useGetAssetFilesQuery,
@@ -16,7 +15,6 @@ import {
 } from '@/shared/middleware/graphql';
 import {useInfiniteWorkspaceProjectWorkflowExecutionsQuery} from '@/shared/queries/automation/workflowExecutions.queries';
 import {
-    BotIcon,
     ChevronLeftIcon,
     ChevronRightIcon,
     ClockIcon,
@@ -28,7 +26,7 @@ import {
     VectorSquareIcon,
     WorkflowIcon,
 } from 'lucide-react';
-import {ReactNode, useMemo, useState} from 'react';
+import {Fragment, ReactNode, useMemo, useState} from 'react';
 import {useDebouncedCallback} from 'use-debounce';
 
 export interface ResourcePickerSelectionI {
@@ -40,19 +38,26 @@ export interface ResourcePickerSelectionI {
     projectWorkflowId?: number;
 }
 
-// A caller-supplied Tools branch. ResourcePickerMenu covers only the 8 reference kinds; Tools differs per
-// context, so each caller plugs its own. When omitted, the menu shows only 8 kinds.
-export interface ResourcePickerToolsBranchI {
-    // Rendered as the "Tools" CommandItem in the root menu. `onEnter` drills the menu into the tools branch.
+// A caller-supplied branch. ResourcePickerMenu covers only the 8 reference kinds; anything else (Connectors,
+// Skills, a context-specific Tools list) differs per caller, so each caller plugs its own. When omitted, the
+// menu shows only the 8 kinds.
+//
+// A list rather than one named slot: the menu wires each branch into three places (root item, path match,
+// branch body), so a second bespoke prop would triple those call sites again.
+export interface ResourcePickerCustomBranchI {
+    // Menu-path segment identifying this branch — e.g. 'connectors'. Must be unique within one caller's list.
+    key: string;
+    // Rendered as the branch's CommandItem in the root menu. `onEnter` drills the menu into the branch.
     renderRootItem: (onEnter: () => void) => ReactNode;
-    // Rendered as the full menu body when the tools branch is active. `onBack` returns to the root menu;
-    // `onClose` closes the whole picker popover (used when a tool pick opens a dialog that must not sit
+    // Rendered as the full menu body when this branch is active. `onBack` returns to the root menu;
+    // `onClose` closes the whole picker popover (used when a pick opens a dialog that must not sit
     // behind an open popover).
     renderBranch: (onBack: () => void, onClose: () => void) => ReactNode;
 }
 
 export interface ResourcePickerMenuPropsI {
     workspaceId: number;
+    customBranches?: ResourcePickerCustomBranchI[];
     environmentId: number;
     // The Popover trigger (the composer's "+" button, the agent form's "Add" button).
     trigger: ReactNode;
@@ -62,14 +67,6 @@ export interface ResourcePickerMenuPropsI {
     onOpenChange?: (open: boolean) => void;
     // Fired when the user picks one of the 8 reference-kind resources. The menu closes itself after.
     onSelect: (selection: ResourcePickerSelectionI) => void;
-    // Optional "Agents" branch, mirroring the caller-supplied `toolsBranch` slot below: when provided, adds
-    // an "Agents" root item listing workspace AI Agents (automation-ai-agent, NOT a Task). Kept as
-    // its own callback rather than folded into the 8 `ReferencedResourceKindType` kinds above — AI Agents
-    // aren't (yet) a composer @-mention reference kind or a Task resource kind, so only
-    // callers that opt in (the AI Hub composer) see the branch; the Task resources card, which
-    // reuses this same menu, leaves this prop unset and never renders it.
-    onSelectAiAgent?: (agent: {id: string; name: string}) => void;
-    toolsBranch?: ResourcePickerToolsBranchI;
 }
 
 interface WorkflowItemI {
@@ -125,8 +122,9 @@ function useAllWorkspaceWorkflows(workspaceId: number | undefined, enabled: bool
 
 // The 'workflows' branch uses a two-level drilldown: pick a parent (project), then pick the child
 // (workflow). Keeps each visible list short — a workspace can have hundreds of workflows across projects —
-// and it matches the user's mental model ("find the project, then the workflow inside it"). The 'tools'
-// branch is caller-owned: ResourcePickerMenu only tracks the ['tools'] path and delegates rendering.
+// and it matches the user's mental model ("find the project, then the workflow inside it"). Caller-supplied
+// branches are owned by the caller: ResourcePickerMenu only tracks the ['custom', key] path and delegates
+// rendering.
 type MenuPathType =
     | []
     | ['workflows']
@@ -134,19 +132,17 @@ type MenuPathType =
     | ['files']
     | ['dataTables']
     | ['knowledgeBases']
-    | ['tools']
+    | ['custom', string]
     | ['workflowExecutions']
     | ['mcpServers']
     | ['apiCollections']
-    | ['chats']
-    | ['agents'];
+    | ['chats'];
 
 const ResourcePickerMenu = ({
+    customBranches,
     environmentId,
     onOpenChange,
     onSelect,
-    onSelectAiAgent,
-    toolsBranch,
     trigger,
     workspaceId,
 }: ResourcePickerMenuPropsI) => {
@@ -161,7 +157,6 @@ const ResourcePickerMenu = ({
     const [mcpServersShowCount, setMcpServersShowCount] = useState(SECTION_INITIAL_CAP);
     const [apiCollectionsShowCount, setApiCollectionsShowCount] = useState(SECTION_INITIAL_CAP);
     const [chatsShowCount, setChatsShowCount] = useState(SECTION_INITIAL_CAP);
-    const [agentsShowCount, setAgentsShowCount] = useState(SECTION_INITIAL_CAP);
 
     const {data: filesData} = useGetAssetFilesQuery({
         mimeTypePrefix: null,
@@ -211,14 +206,6 @@ const ResourcePickerMenu = ({
             workspaceId: String(workspaceId ?? ''),
         },
         {enabled: isPickerActive && workspaceId != null}
-    );
-
-    // Only fetched when a caller actually wires the Agents branch (see `onSelectAiAgent` on
-    // ResourcePickerMenuPropsI) — the Task resources card, which reuses this same menu, never
-    // wires it, so this query never fires there.
-    const {data: agentsData} = useAiAgentsQuery(
-        {workspaceId: String(workspaceId ?? '')},
-        {enabled: isPickerActive && onSelectAiAgent != null && workspaceId != null}
     );
 
     const workflowItems = useAllWorkspaceWorkflows(workspaceId, isPickerActive);
@@ -296,12 +283,6 @@ const ResourcePickerMenu = ({
         });
     }, [chatsData, lowerSearch]);
 
-    const filteredAgents = useMemo(() => {
-        const agents = agentsData?.aiAgents ?? [];
-
-        return agents.filter((agent) => agent.title.toLowerCase().includes(lowerSearch));
-    }, [agentsData, lowerSearch]);
-
     // Workflows drill down by project so the menu mirrors the natural mental model — "find the project,
     // then the workflow inside it" — instead of dumping all workflows into a flat list where two workflows
     // with similar names from different projects look indistinguishable. Preserves source-order of
@@ -319,6 +300,17 @@ const ResourcePickerMenu = ({
         return filteredWorkflowProjects.find((project) => project.projectId === menuPath[1]) ?? null;
     }, [menuPath, filteredWorkflowProjects]);
 
+    // The active caller-supplied branch, matched by the key stored in the menu path. Null for an unknown key
+    // — the path can only be set from a branch that existed when the row was clicked, but a caller whose
+    // branch list changes while the menu is open must get an empty body rather than a crash.
+    const activeCustomBranch = useMemo(() => {
+        if (menuPath.length !== 2 || menuPath[0] !== 'custom') {
+            return null;
+        }
+
+        return customBranches?.find((branch) => branch.key === menuPath[1]) ?? null;
+    }, [menuPath, customBranches]);
+
     const hasResults =
         filteredFiles.length > 0 ||
         filteredDataTables.length > 0 ||
@@ -327,19 +319,10 @@ const ResourcePickerMenu = ({
         filteredWorkflowExecutions.length > 0 ||
         filteredMcpServers.length > 0 ||
         filteredApiCollections.length > 0 ||
-        filteredChats.length > 0 ||
-        filteredAgents.length > 0;
+        filteredChats.length > 0;
 
     const handleSelect = (id: string, kind: ReferencedResourceKindType, name: string) => {
         onSelect({id, kind, name});
-
-        setOpen(false);
-        setSearch('');
-        setDebouncedSearch('');
-    };
-
-    const handleSelectAgent = (id: string, name: string) => {
-        onSelectAiAgent?.({id, name});
 
         setOpen(false);
         setSearch('');
@@ -374,7 +357,6 @@ const ResourcePickerMenu = ({
             setMcpServersShowCount(SECTION_INITIAL_CAP);
             setApiCollectionsShowCount(SECTION_INITIAL_CAP);
             setChatsShowCount(SECTION_INITIAL_CAP);
-            setAgentsShowCount(SECTION_INITIAL_CAP);
         }
 
         // Notify the consumer after ResourcePickerMenu resets its own state so a consumer-owned branch
@@ -392,7 +374,6 @@ const ResourcePickerMenu = ({
     const visibleMcpServers = filteredMcpServers.slice(0, mcpServersShowCount);
     const visibleApiCollections = filteredApiCollections.slice(0, apiCollectionsShowCount);
     const visibleChats = filteredChats.slice(0, chatsShowCount);
-    const visibleAgents = filteredAgents.slice(0, agentsShowCount);
 
     return (
         <Popover onOpenChange={handleOpenChange} open={open}>
@@ -738,36 +719,6 @@ const ResourcePickerMenu = ({
                                         )}
                                     </CommandGroup>
                                 )}
-
-                                {onSelectAiAgent && filteredAgents.length > 0 && (
-                                    <CommandGroup heading="Agents">
-                                        {visibleAgents.map((agent) => (
-                                            <CommandItem
-                                                key={`agent-${agent.id}`}
-                                                onSelect={() => handleSelectAgent(agent.id, agent.title)}
-                                                value={`agent-${agent.id}-${agent.title}`}
-                                            >
-                                                <BotIcon className="mr-2 size-3.5" />
-
-                                                {agent.title}
-                                            </CommandItem>
-                                        ))}
-
-                                        {filteredAgents.length > agentsShowCount && (
-                                            <CommandItem
-                                                key="agents-show-more"
-                                                onSelect={() =>
-                                                    setAgentsShowCount((count) => count + SECTION_EXPAND_INCREMENT)
-                                                }
-                                                value="agents-show-more"
-                                            >
-                                                <span className="text-xs text-muted-foreground">
-                                                    {`Show ${Math.min(SECTION_EXPAND_INCREMENT, filteredAgents.length - agentsShowCount)} more…`}
-                                                </span>
-                                            </CommandItem>
-                                        )}
-                                    </CommandGroup>
-                                )}
                             </>
                         ) : menuPath.length === 0 ? (
                             <CommandGroup>
@@ -806,7 +757,11 @@ const ResourcePickerMenu = ({
                                     <ChevronRightIcon className="size-3.5 text-muted-foreground" />
                                 </CommandItem>
 
-                                {toolsBranch?.renderRootItem(() => setMenuPath(['tools']))}
+                                {customBranches?.map((branch) => (
+                                    <Fragment key={`custom-branch-${branch.key}`}>
+                                        {branch.renderRootItem(() => setMenuPath(['custom', branch.key]))}
+                                    </Fragment>
+                                ))}
 
                                 <CommandItem
                                     onSelect={() => setMenuPath(['workflowExecutions'])}
@@ -845,19 +800,9 @@ const ResourcePickerMenu = ({
 
                                     <ChevronRightIcon className="size-3.5 text-muted-foreground" />
                                 </CommandItem>
-
-                                {onSelectAiAgent && (
-                                    <CommandItem onSelect={() => setMenuPath(['agents'])} value="root-agents">
-                                        <BotIcon className="mr-2 size-3.5" />
-
-                                        <span className="flex-1">Agents</span>
-
-                                        <ChevronRightIcon className="size-3.5 text-muted-foreground" />
-                                    </CommandItem>
-                                )}
                             </CommandGroup>
-                        ) : menuPath[0] === 'tools' ? (
-                            toolsBranch?.renderBranch(
+                        ) : menuPath[0] === 'custom' ? (
+                            activeCustomBranch?.renderBranch(
                                 () => setMenuPath([]),
                                 () => handleOpenChange(false)
                             )
@@ -1250,38 +1195,6 @@ const ResourcePickerMenu = ({
                                             >
                                                 <span className="text-xs text-muted-foreground">
                                                     {`Show ${Math.min(SECTION_EXPAND_INCREMENT, filteredChats.length - chatsShowCount)} more…`}
-                                                </span>
-                                            </CommandItem>
-                                        )}
-                                    </CommandGroup>
-                                )}
-
-                                {menuPath[0] === 'agents' && (
-                                    <CommandGroup heading="Agents">
-                                        {visibleAgents.length === 0 && <CommandEmpty>No agents.</CommandEmpty>}
-
-                                        {visibleAgents.map((agent) => (
-                                            <CommandItem
-                                                key={`agent-${agent.id}`}
-                                                onSelect={() => handleSelectAgent(agent.id, agent.title)}
-                                                value={`agent-${agent.id}-${agent.title}`}
-                                            >
-                                                <BotIcon className="mr-2 size-3.5" />
-
-                                                {agent.title}
-                                            </CommandItem>
-                                        ))}
-
-                                        {filteredAgents.length > agentsShowCount && (
-                                            <CommandItem
-                                                key="agents-show-more"
-                                                onSelect={() =>
-                                                    setAgentsShowCount((count) => count + SECTION_EXPAND_INCREMENT)
-                                                }
-                                                value="agents-show-more"
-                                            >
-                                                <span className="text-xs text-muted-foreground">
-                                                    {`Show ${Math.min(SECTION_EXPAND_INCREMENT, filteredAgents.length - agentsShowCount)} more…`}
                                                 </span>
                                             </CommandItem>
                                         )}

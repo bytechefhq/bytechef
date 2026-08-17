@@ -1,9 +1,11 @@
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {isWebhookBridgedChat} from '@/ee/pages/automation/ai-hub/chats/api/chats.api';
+import {useAiHubChatsQuery} from '@/ee/pages/automation/ai-hub/chats/hooks/useChats';
+import {useAiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
 import AiHubComposer from '@/ee/pages/automation/ai-hub/composer/AiHubComposer';
 import AiHubComposerDropZone from '@/ee/pages/automation/ai-hub/composer/AiHubComposerDropZone';
-import AiHubConnectorsMenu from '@/ee/pages/automation/ai-hub/composer/AiHubConnectorsMenu';
 import AiHubSkillsMenu from '@/ee/pages/automation/ai-hub/composer/AiHubSkillsMenu';
 import {
     ALLOWED_MIME_TYPES,
@@ -16,37 +18,44 @@ import {
 } from '@/ee/pages/automation/ai-hub/composer/stores/useAiHubComposerStore';
 import {aiHubRunStateStore} from '@/ee/pages/automation/ai-hub/runtime-providers/stores/useAiHubRunStateStore';
 import {MODE, useAiHubStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubStore';
-import {useAiHubTasksQuery} from '@/ee/pages/automation/ai-hub/tasks/hooks/useTasks';
-import {useAiHubTasksStore} from '@/ee/pages/automation/ai-hub/tasks/stores/useAiHubTasksStore';
-import TaskToolChips from '@/ee/pages/automation/ai-hub/tools/TaskToolChips';
+import ChatToolChips from '@/ee/pages/automation/ai-hub/tools/ChatToolChips';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import ModeSwitch from '@/shared/components/ModeSwitch/ModeSwitch';
 import {usePushToTalk} from '@/shared/hooks/usePushToTalk';
 import {useCancelAiHubRunMutation, useCancelWorkflowChatTurnMutation} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {ComposerPrimitive, ThreadPrimitive, useAui} from '@assistant-ui/react';
-import {ArrowUpIcon, Loader2Icon, MicIcon, PaperclipIcon, RotateCcwIcon, SquareIcon, XIcon} from 'lucide-react';
+import {
+    ArrowUpIcon,
+    HexagonIcon,
+    Loader2Icon,
+    MicIcon,
+    PaperclipIcon,
+    RotateCcwIcon,
+    SquareIcon,
+    XIcon,
+} from 'lucide-react';
 import {KeyboardEvent, ReactNode, useCallback, useEffect, useRef} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 const KIND_LABELS: Record<ReferencedResourceKindType, string> = {
     apiCollection: 'API Collection',
+    chat: 'Previous Chat',
     dataTable: 'Data Table',
     file: 'File',
     knowledgeBase: 'Knowledge Base',
     mcpServer: 'MCP Server',
-    task: 'Previous Task',
     workflow: 'Workflow',
     workflowExecution: 'Workflow Execution',
 };
 
 const KIND_BADGE_CLASSES: Record<ReferencedResourceKindType, string> = {
     apiCollection: 'bg-pink-100 text-pink-700 dark:bg-pink-950 dark:text-pink-300',
+    chat: 'bg-slate-100 text-slate-700 dark:bg-slate-950 dark:text-slate-300',
     dataTable: 'bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300',
     file: 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300',
     knowledgeBase: 'bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300',
     mcpServer: 'bg-cyan-100 text-cyan-700 dark:bg-cyan-950 dark:text-cyan-300',
-    task: 'bg-slate-100 text-slate-700 dark:bg-slate-950 dark:text-slate-300',
     workflow: 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300',
     workflowExecution: 'bg-orange-100 text-orange-700 dark:bg-orange-950 dark:text-orange-300',
 };
@@ -55,38 +64,39 @@ interface AiHubChatComposerPropsI {
     /**
      * Optional pre-built LLM provider/model picker rendered as the first control in the composer's
      * left footer group (before the resource picker / paperclip). The parent passes the picker as a
-     * node so it can wire the per-task selection state (taskLlmSelections), workflow-chat / personal-
+     * node so it can wire the per-chat selection state (chatLlmSelections), workflow-chat / personal-
      * agent overrides, and workspace-scoped GraphQL queries without duplicating those hooks here.
-     * When undefined, no picker is rendered (workflow-chat tasks pass nothing).
+     * When undefined, no picker is rendered (workflow chats pass nothing).
      */
     modelPicker?: ReactNode;
 }
 
 const AiHubChatComposer = ({modelPicker}: AiHubChatComposerPropsI) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const previousTaskIdRef = useRef<string | undefined>(undefined);
+    const previousChatIdRef = useRef<string | undefined>(undefined);
 
     const referencedResources = useAiHubComposerStore((state) => state.referencedResources);
+    const selectedSkills = useAiHubComposerStore((state) => state.selectedSkills);
     const mode = useAiHubStore((state) => state.mode);
     const setMode = useAiHubStore((state) => state.setMode);
-    const taskId = useAiHubStore((state) => state.taskId);
+    const chatId = useAiHubStore((state) => state.chatId);
 
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const {dismiss, retry, upload, uploads} = useAiHubAttachmentUpload(currentWorkspaceId);
 
-    // Look up the active task's kind so we route to the right server-side cancel mutation:
+    // Look up the active chat's kind so we route to the right server-side cancel mutation:
     // - WORKFLOW_CHAT → cancelWorkflowChatTurn (stops the workflow execution via JobFacade)
-    // - STANDARD / PERSONAL_AGENT → cancelAiHubRun (marks the InFlightAiHubRunRegistry entry
-    //   terminated so a re-mount probe sees the task as not in flight and stops showing the
+    // - STANDARD → cancelAiHubRun (marks the InFlightAiHubRunRegistry entry
+    //   terminated so a re-mount probe sees the chat as not in flight and stops showing the
     //   streaming UI)
     // Without the second mutation, a Stop click only closed the client-side SSE; the agent kept
-    // streaming server-side and a return-to-task re-attached to it, re-showing the Stop button.
-    const currentTaskId = useAiHubTasksStore((state) => state.currentTaskId);
-    const {data: tasks} = useAiHubTasksQuery(currentWorkspaceId, currentEnvironmentId, 'ACTIVE');
-    const activeTask = tasks?.find((task) => task.id === currentTaskId);
-    const isWorkflowChat = activeTask?.kind === 'WORKFLOW_CHAT';
+    // streaming server-side and a return-to-chat re-attached to it, re-showing the Stop button.
+    const currentChatId = useAiHubChatsStore((state) => state.currentChatId);
+    const {data: chats} = useAiHubChatsQuery(currentWorkspaceId, currentEnvironmentId, 'ACTIVE');
+    const activeChat = chats?.find((chat) => chat.id === currentChatId);
+    const isWorkflowChat = isWebhookBridgedChat(activeChat?.kind);
 
     const cancelWorkflowChatTurnMutation = useCancelWorkflowChatTurnMutation();
     const cancelAiHubRunMutation = useCancelAiHubRunMutation();
@@ -117,7 +127,7 @@ const AiHubChatComposer = ({modelPicker}: AiHubChatComposerPropsI) => {
     const handleCancelTurn = useCallback(() => {
         // Always close the AG-UI stream first via the runtime — this fires the AbortController which
         // cleans up the client-side SSE subscriber and flips isAgentRunning false. Then issue the
-        // server-side cancel mutation matching the task's kind, so the agent / workflow actually
+        // server-side cancel mutation matching the chat's kind, so the agent / workflow actually
         // stops producing events on the server too. Without the server-side cancel, the run stays
         // in the InFlightAiHubRunRegistry and a re-mount probe re-attaches to it, re-showing the
         // Stop button.
@@ -126,23 +136,23 @@ const AiHubChatComposer = ({modelPicker}: AiHubChatComposerPropsI) => {
         // user-facing, just a stopJob() / registry.cancel() side effect.
         aui.thread.cancelRun();
 
-        if (currentTaskId == null || currentWorkspaceId == null) {
+        if (currentChatId == null || currentWorkspaceId == null) {
             return;
         }
 
         if (isWorkflowChat) {
             cancelWorkflowChatTurnMutation.mutate({
-                id: String(currentTaskId),
+                id: String(currentChatId),
                 workspaceId: String(currentWorkspaceId),
             });
         } else {
             // runId lets the server tombstone the exact run if this Stop reaches it before the agent
             // POST registers the run. undefined when no turn runId is known — server falls back to
             // threadId-only cancel.
-            const runId = taskId != null ? aiHubRunStateStore.getState().runIdByTask[taskId] : undefined;
+            const runId = chatId != null ? aiHubRunStateStore.getState().runIdByChat[chatId] : undefined;
 
             cancelAiHubRunMutation.mutate({
-                id: String(currentTaskId),
+                id: String(currentChatId),
                 runId,
                 workspaceId: String(currentWorkspaceId),
             });
@@ -150,10 +160,10 @@ const AiHubChatComposer = ({modelPicker}: AiHubChatComposerPropsI) => {
     }, [
         cancelAiHubRunMutation,
         cancelWorkflowChatTurnMutation,
-        currentTaskId,
+        currentChatId,
         currentWorkspaceId,
         isWorkflowChat,
-        taskId,
+        chatId,
         aui,
     ]);
 
@@ -182,9 +192,13 @@ const AiHubChatComposer = ({modelPicker}: AiHubChatComposerPropsI) => {
         aiHubComposerStore.getState().removeReference(id, kind);
     };
 
+    const handleRemoveSkill = (id: string) => {
+        aiHubComposerStore.getState().removeSkill(id);
+    };
+
     // Paste handler — moved here from AiHubComposer (which no longer owns the upload hook). Document-level
     // listener so any paste with files while this composer is mounted triggers an upload. Skipped for
-    // workflow-chat tasks, which cannot have any resource attached (messages forward to a webhook, not an
+    // workflow chats, which cannot have any resource attached (messages forward to a webhook, not an
     // LLM agent that consumes attached context).
     useEffect(() => {
         if (isWorkflowChat) {
@@ -210,23 +224,23 @@ const AiHubChatComposer = ({modelPicker}: AiHubChatComposerPropsI) => {
         };
     }, [isWorkflowChat, upload]);
 
-    // Clear the composer draft when switching tasks. The composer runtime is hoisted once for the whole
-    // AI Hub surface (see AiHubRuntimeProvider in AiHub.tsx), so an unsent draft typed under task A would
-    // otherwise carry over into task B. The first render (previousTaskIdRef = undefined) doesn't clear, so
-    // a draft typed on the home view survives the home→task auto-create transition. Only call setText when
+    // Clear the composer draft when switching chats. The composer runtime is hoisted once for the whole
+    // AI Hub surface (see AiHubRuntimeProvider in AiHub.tsx), so an unsent draft typed under chat A would
+    // otherwise carry over into chat B. The first render (previousChatIdRef = undefined) doesn't clear, so
+    // a draft typed on the home view survives the home→chat auto-create transition. Only call setText when
     // there's actually a draft — calling setText('') on an already-empty composer suppresses the native
     // textarea placeholder ("Send a message...").
     useEffect(() => {
         if (
-            previousTaskIdRef.current !== undefined &&
-            previousTaskIdRef.current !== taskId &&
+            previousChatIdRef.current !== undefined &&
+            previousChatIdRef.current !== chatId &&
             aui.composer.getState().text
         ) {
             aui.composer.setText('');
         }
 
-        previousTaskIdRef.current = taskId;
-    }, [aui, taskId]);
+        previousChatIdRef.current = chatId;
+    }, [aui, chatId]);
 
     const handleKeyDown = useCallback((event: KeyboardEvent<HTMLTextAreaElement>) => {
         if (event.key === 'Enter' && event.altKey && !event.shiftKey) {
@@ -254,7 +268,7 @@ const AiHubChatComposer = ({modelPicker}: AiHubChatComposerPropsI) => {
         }
     }, []);
 
-    const hasChips = referencedResources.length > 0 || uploads.length > 0;
+    const hasChips = referencedResources.length > 0 || selectedSkills.length > 0 || uploads.length > 0;
 
     return (
         // Previously had `sticky bottom-0` which caused a layout-shift on the home page: the home panel
@@ -274,19 +288,46 @@ const AiHubChatComposer = ({modelPicker}: AiHubChatComposerPropsI) => {
             <AiHubComposerDropZone disabled={isWorkflowChat} onFilesDropped={handleFilesDropped}>
                 <ComposerPrimitive.Root className="flex w-full flex-col rounded-2xl border border-border bg-muted/40 shadow-sm focus-within:border-foreground/20">
                     {/*
-                     * Task-attached tools (persisted across turns) get their own chip row above
+                     * Chat-attached tools (persisted across turns) get their own chip row above
                      * the in-flight referenced-resources row. Sibling layout keeps the two distinct mental
                      * models — "tools the agent can use" vs. "context I'm @-mentioning right now" —
                      * visually separate. The component renders nothing when no tools are attached, so
                      * mounting it unconditionally is cheap.
                      */}
 
-                    {taskId && currentWorkspaceId != null && (
-                        <TaskToolChips taskId={taskId} workspaceId={currentWorkspaceId} />
+                    {chatId && currentWorkspaceId != null && (
+                        <ChatToolChips chatId={chatId} workspaceId={currentWorkspaceId} />
                     )}
 
                     {hasChips && (
                         <div className="flex flex-wrap gap-1.5 px-3 pt-2" data-testid="reference-chips">
+                            {/*
+                             * Skills first in the row: they change how the agent behaves for this message,
+                             * whereas the chips after them only add context to it.
+                             */}
+
+                            {selectedSkills.map((skill) => (
+                                <Badge
+                                    className="flex items-center gap-1 bg-lime-100 px-2 py-0.5 text-xs font-normal text-lime-700 dark:bg-lime-950 dark:text-lime-300"
+                                    data-testid="skill-chip"
+                                    key={`skill-${skill.id}`}
+                                    styleType="outline-outline"
+                                >
+                                    <HexagonIcon className="size-3" />
+
+                                    <span>{skill.name}</span>
+
+                                    <button
+                                        aria-label={`Remove ${skill.name}`}
+                                        className="ml-0.5 rounded hover:opacity-75"
+                                        onClick={() => handleRemoveSkill(skill.id)}
+                                        type="button"
+                                    >
+                                        <XIcon className="size-3" />
+                                    </button>
+                                </Badge>
+                            ))}
+
                             {referencedResources.map((resource) => (
                                 <Badge
                                     className={`flex items-center gap-1 px-2 py-0.5 text-xs font-normal ${KIND_BADGE_CLASSES[resource.kind]}`}
@@ -374,7 +415,7 @@ const AiHubChatComposer = ({modelPicker}: AiHubChatComposerPropsI) => {
                             {modelPicker}
 
                             {/*
-                             * Resource attachment is hidden for workflow-chat tasks: the resource picker
+                             * Resource attachment is hidden for workflow chats: the resource picker
                              * (+), the paperclip file button, and the hidden file input. A workflow chat
                              * forwards messages to a webhook trigger rather than an LLM agent, so attached
                              * files/resources have nowhere to flow. Drag-drop and paste are gated separately
@@ -384,8 +425,6 @@ const AiHubChatComposer = ({modelPicker}: AiHubChatComposerPropsI) => {
                             {!isWorkflowChat && (
                                 <>
                                     <AiHubComposer />
-
-                                    <AiHubConnectorsMenu />
 
                                     <Tooltip>
                                         <TooltipTrigger asChild>
@@ -402,6 +441,8 @@ const AiHubChatComposer = ({modelPicker}: AiHubChatComposerPropsI) => {
                                         <TooltipContent>Attach file</TooltipContent>
                                     </Tooltip>
 
+                                    {/* Renders nothing until the user types '/' — the skills pointer path is
+                                     * a branch of the "+" menu, this is the keyboard path's popover. */}
                                     <AiHubSkillsMenu />
 
                                     <input
@@ -465,7 +506,7 @@ const AiHubChatComposer = ({modelPicker}: AiHubChatComposerPropsI) => {
                                 {/*
                                  * Custom Stop button (replaces ComposerPrimitive.Cancel) so we can fire the
                                  * server-side cancelWorkflowChatTurn mutation alongside the client-side
-                                 * stream cancel for workflow-chat tasks. ComposerPrimitive.Cancel
+                                 * stream cancel for workflow chats. ComposerPrimitive.Cancel
                                  * only closes the SSE stream — without the server-side stopJob call, the
                                  * workflow keeps running on the server while the UI thinks it stopped.
                                  */}
