@@ -57,10 +57,15 @@ import org.springframework.ai.tool.ToolCallbackProvider;
  *
  * @author Ivica Cardic
  */
-public class AiAgentUtilsApprovalGate {
+public class AiAgentUtilsApprovalGateTool {
 
     private static final String APPROVAL = "approval";
-    private static final String APPROVAL_GATE = "approvalGate";
+    /**
+     * The gate's cluster element name. Public because {@code AiAgentUtilsComponentHandler} (which registers its allowed
+     * child types) and {@code AiAgentUtilsTaskTool} (which refuses to run a gate inside a subagent) both match on it —
+     * three private copies of one string is how the rename to {@code *Tool} nearly went half-done.
+     */
+    public static final String APPROVAL_GATE = "approvalGateTool";
     private static final String DAYS = "DAYS";
     private static final String NAME = "name";
     private static final String REQUEST_APPROVAL = "requestApproval";
@@ -74,7 +79,7 @@ public class AiAgentUtilsApprovalGate {
     public final ClusterElementDefinition<MultipleConnectionsToolCallbackProviderFunction> clusterElementDefinition;
 
     @SuppressFBWarnings("EI")
-    public AiAgentUtilsApprovalGate(
+    public AiAgentUtilsApprovalGateTool(
         ClusterElementToolCallbacks clusterElementToolCallbacks,
         ClusterElementDefinitionService clusterElementDefinitionService,
         @Nullable ToolExecutionRecorder toolExecutionRecorder) {

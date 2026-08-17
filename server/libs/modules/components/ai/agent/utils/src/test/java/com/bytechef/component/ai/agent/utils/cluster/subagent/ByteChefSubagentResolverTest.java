@@ -76,7 +76,7 @@ class ByteChefSubagentResolverTest {
 
     private static ClusterElement clusterElement(String workflowNodeName, String name, String description) {
         return new ClusterElement(
-            null, null, Map.of(), null, "aiAgentUtils/v1/subagent",
+            null, null, Map.of(), null, "aiAgentUtils/v1/subagentTool",
             Map.of("subagentName", name, "description", description, "instructions", "Do the thing."),
             workflowNodeName);
     }

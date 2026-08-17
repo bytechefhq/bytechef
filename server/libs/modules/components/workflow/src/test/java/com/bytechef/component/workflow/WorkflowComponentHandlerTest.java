@@ -17,11 +17,14 @@
 package com.bytechef.component.workflow;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import com.bytechef.platform.workflow.task.dispatcher.subflow.CallableAiAgentDataSource;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowDataSource;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * @author Ivica Cardic
@@ -30,9 +33,15 @@ public class WorkflowComponentHandlerTest {
 
     @Test
     void testGetComponentDefinition() {
+        @SuppressWarnings("unchecked")
+        ObjectProvider<CallableAiAgentDataSource> callableAgentDataSourceProvider = mock(ObjectProvider.class);
+
+        when(callableAgentDataSourceProvider.getIfAvailable()).thenReturn(mock(CallableAiAgentDataSource.class));
+
         JsonFileAssert.assertEquals(
             "definition/workflow_v1.json",
-            new WorkflowComponentHandler(mock(SubflowDataSource.class), mock(SubflowResolver.class))
-                .getDefinition());
+            new WorkflowComponentHandler(
+                mock(SubflowDataSource.class), mock(SubflowResolver.class), callableAgentDataSourceProvider)
+                    .getDefinition());
     }
 }

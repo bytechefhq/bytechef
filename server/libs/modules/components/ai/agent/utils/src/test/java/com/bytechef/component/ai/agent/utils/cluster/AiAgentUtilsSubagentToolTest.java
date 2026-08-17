@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-class AiAgentUtilsSubagentTest {
+class AiAgentUtilsSubagentToolTest {
 
     @Test
     void testSubagentTypeAllowsMultipleOptionalElements() {
@@ -35,7 +35,7 @@ class AiAgentUtilsSubagentTest {
 
     @Test
     void testClusterElementDefinitionDeclaresBuilderAuthoredPersona() {
-        assertThat(AiAgentUtilsSubagent.CLUSTER_ELEMENT_DEFINITION.getName()).isEqualTo("subagent");
-        assertThat(AiAgentUtilsSubagent.CLUSTER_ELEMENT_DEFINITION.getProperties()).isNotEmpty();
+        assertThat(AiAgentUtilsSubagentTool.CLUSTER_ELEMENT_DEFINITION.getName()).isEqualTo("subagentTool");
+        assertThat(AiAgentUtilsSubagentTool.CLUSTER_ELEMENT_DEFINITION.getProperties()).isNotEmpty();
     }
 }

@@ -63,8 +63,6 @@ import org.springframework.ai.tool.ToolCallbackProvider;
  */
 public class AiAgentUtilsTaskTool {
 
-    private static final String APPROVAL_GATE = "approvalGate";
-
     /**
      * Shared across runs because a repository is built per invocation while the executor must outlive any one of them.
      * Virtual threads keep an idle pool free, and the component handler is a singleton, so this lives for the
@@ -154,7 +152,7 @@ public class AiAgentUtilsTaskTool {
             // A gate here would suspend on the AGENT's context and return the sentinel into the subagent's own
             // ChatClient, which treats it as an ordinary result and continues; the parent then cannot find the
             // sentinel among its own tool responses and the suspend is orphaned.
-            if (APPROVAL_GATE.equals(toolClusterElement.getClusterElementName())) {
+            if (AiAgentUtilsApprovalGateTool.APPROVAL_GATE.equals(toolClusterElement.getClusterElementName())) {
                 throw new IllegalStateException(
                     "Approval gates cannot be attached to a subagent — a suspended subagent run cannot be resumed. " +
                         "Attach the gate to the agent instead.");

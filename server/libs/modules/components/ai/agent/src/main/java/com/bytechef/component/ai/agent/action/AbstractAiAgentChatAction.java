@@ -829,9 +829,11 @@ public abstract class AbstractAiAgentChatAction {
 
         advisors.add(toolCallingAdvisor);
 
-        clusterElementMap.fetchClusterElement(RAG)
-            .map(clusterElement -> getRagAdvisor(connectionParameters, clusterElement, context))
-            .ifPresent(advisors::add);
+        // One advisor per knowledge base: RAG is a multiple cluster element, and fetchClusterElement would return
+        // only the first, silently retrieving from one knowledge base while the agent is configured with several.
+        for (ClusterElement ragClusterElement : clusterElementMap.getClusterElements(RAG)) {
+            advisors.add(getRagAdvisor(connectionParameters, ragClusterElement, context));
+        }
 
         advisors.add(new ContextLoggerAdvisor(context));
 
@@ -955,7 +957,7 @@ public abstract class AbstractAiAgentChatAction {
 
         List<ToolCallback> toolCallbacks = new ArrayList<>();
 
-        // A TOOLS entry may arrive already wrapped: the approvalGate cluster element returns its children gated.
+        // A TOOLS entry may arrive already wrapped: the approvalGateTool cluster element returns its children gated.
         // Simulation and observable wrapping below still run over the flattened list, so a gated callback stays
         // INSIDE the observable wrapper and the audit listener records the gate outcome like any other tool result.
         for (ClusterElement clusterElement : toolClusterElements) {

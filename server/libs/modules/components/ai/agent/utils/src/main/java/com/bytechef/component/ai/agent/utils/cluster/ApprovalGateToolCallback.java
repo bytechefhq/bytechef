@@ -51,12 +51,12 @@ import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 
 /**
- * Platform-enforced approval gate. Wraps a tool callback attached beneath an {@link AiAgentUtilsApprovalGate}: instead
- * of executing, the first call delivers a standard approval request (tool name + the AI-chosen arguments) through that
- * gate's APPROVAL_CHANNELS cluster elements — defaulting to the chat channel when none are configured — and suspends
- * the workflow. On resume, approval executes the tool with the original arguments and rejection feeds a denial back
- * into the agent loop (see {@code AbstractAiAgentChatAction.buildPatchedRequestSpec}). Enforcement lives here, in the
- * platform — the LLM cannot invoke a flagged tool un-gated.
+ * Platform-enforced approval gate. Wraps a tool callback attached beneath an {@link AiAgentUtilsApprovalGateTool}:
+ * instead of executing, the first call delivers a standard approval request (tool name + the AI-chosen arguments)
+ * through that gate's APPROVAL_CHANNELS cluster elements — defaulting to the chat channel when none are configured —
+ * and suspends the workflow. On resume, approval executes the tool with the original arguments and rejection feeds a
+ * denial back into the agent loop (see {@code AbstractAiAgentChatAction.buildPatchedRequestSpec}). Enforcement lives
+ * here, in the platform — the LLM cannot invoke a flagged tool un-gated.
  *
  * @author Ivica Cardic
  */

@@ -30,7 +30,7 @@ import com.bytechef.component.ai.agent.utils.action.AiAgentUtilsDeleteAiSkillAct
 import com.bytechef.component.ai.agent.utils.action.AiAgentUtilsRemoveFileFromAiSkillAction;
 import com.bytechef.component.ai.agent.utils.action.AiAgentUtilsUpdateAiSkillAction;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsAgentClientTool;
-import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsApprovalGate;
+import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsApprovalGateTool;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsAskUserQuestionTool;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsAutoMemoryTool;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsBraveWebSearchTool;
@@ -40,7 +40,7 @@ import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsGrepTool;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsListDirectoryTool;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsShellTools;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsSmartWebFetchTool;
-import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsSubagent;
+import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsSubagentTool;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsTaskTool;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsTodoWriteTool;
 import com.bytechef.component.ai.llm.facade.AiAgentToolFacade;
@@ -68,9 +68,8 @@ import org.springframework.stereotype.Component;
 @Component("aiAgentUtils_v1_ComponentHandler")
 public class AiAgentUtilsComponentHandler implements ComponentHandler {
 
-    private static final String APPROVAL_GATE = "approvalGate";
     private static final String SMART_WEB_FETCH_TOOL = "smartWebFetchTool";
-    private static final String SUBAGENT_ELEMENT = "subagent";
+    private static final String SUBAGENT_ELEMENT = "subagentTool";
     private static final String TASK_TOOL = "taskTool";
 
     private final ComponentDefinition componentDefinition;
@@ -89,7 +88,7 @@ public class AiAgentUtilsComponentHandler implements ComponentHandler {
 
         AiAgentUtilsAutoMemoryTool agentUtilsAutoMemoryTool = new AiAgentUtilsAutoMemoryTool(aiAutoMemoryService);
 
-        AiAgentUtilsApprovalGate agentUtilsApprovalGate = new AiAgentUtilsApprovalGate(
+        AiAgentUtilsApprovalGateTool agentUtilsApprovalGate = new AiAgentUtilsApprovalGateTool(
             new ClusterElementToolCallbacks(aiAgentToolFacade, clusterElementDefinitionService),
             clusterElementDefinitionService, toolExecutionRecorderObjectProvider.getIfAvailable());
 
@@ -109,7 +108,7 @@ public class AiAgentUtilsComponentHandler implements ComponentHandler {
             agentUtilsAutoMemoryTool.clusterElementDefinition,
             AiAgentUtilsTodoWriteTool.CLUSTER_ELEMENT_DEFINITION,
             agentUtilsTaskTool.clusterElementDefinition,
-            AiAgentUtilsSubagent.CLUSTER_ELEMENT_DEFINITION,
+            AiAgentUtilsSubagentTool.CLUSTER_ELEMENT_DEFINITION,
             tool(AiAgentUtilsAppendFilesToAiSkillAction.of(aiSkillFacade)),
             tool(AiAgentUtilsCreateAiSkillAction.of(aiSkillFacade)),
             tool(AiAgentUtilsDeleteAiSkillAction.of(aiSkillFacade)),
@@ -162,7 +161,8 @@ public class AiAgentUtilsComponentHandler implements ComponentHandler {
         clusterElementClusterElementTypes.put(TASK_TOOL, List.of(MODEL.name(), SUBAGENT.name()));
         clusterElementClusterElementTypes.put(SUBAGENT_ELEMENT, List.of(MODEL.name(), TOOLS.name()));
         clusterElementClusterElementTypes.put(SMART_WEB_FETCH_TOOL, List.of(MODEL.name()));
-        clusterElementClusterElementTypes.put(APPROVAL_GATE, List.of(TOOLS.name(), APPROVAL_CHANNELS.name()));
+        clusterElementClusterElementTypes.put(
+            AiAgentUtilsApprovalGateTool.APPROVAL_GATE, List.of(TOOLS.name(), APPROVAL_CHANNELS.name()));
 
         return clusterElementClusterElementTypes;
     }

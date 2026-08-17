@@ -26,8 +26,6 @@ import static com.bytechef.platform.ai.tool.constant.ToolConstants.TOOL_DESCRIPT
 import static com.bytechef.platform.ai.tool.constant.ToolConstants.TOOL_NAME;
 import static com.bytechef.platform.component.constant.WorkflowConstants.NEW_WORKFLOW_CALL;
 
-import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ClusterElementDefinition.OutputFunction;
 import com.bytechef.component.definition.ClusterElementDefinition.PropertiesFunction;
@@ -37,18 +35,13 @@ import com.bytechef.component.definition.ai.agent.ToolFunction;
 import com.bytechef.definition.BaseOutputDefinition;
 import com.bytechef.definition.BaseProperty;
 import com.bytechef.definition.BaseProperty.BaseValueProperty;
-import com.bytechef.platform.ai.constant.ToolSuspendConstants;
 import com.bytechef.platform.component.definition.ActionContextAware;
-import com.bytechef.platform.component.definition.ClusterElementContextAware;
 import com.bytechef.platform.constant.PlatformType;
-import com.bytechef.platform.workflow.task.dispatcher.subflow.PendingSubflowRequest;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowDataSource;
-import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowRequestConstants;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver.Subflow;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -63,21 +56,20 @@ public class WorkflowCallWorkflowTool {
 
     private static final String WORKFLOW_UUID = "workflowUuid";
 
+    private static final String TOOL_LABEL = "Call Workflow";
+
     // Error tokens returned to the LLM. Extracted as constants so tests can assert by equality (not substring),
-    // and so callers downstream can branch on them without parsing free-form text.
+    // and so callers downstream can branch on them without parsing free-form text. Text/logic shared with
+    // WorkflowCallAgentTool lives in SubflowToolSupport — these are kept as same-valued fields on this class so the
+    // existing tests referencing WorkflowCallWorkflowTool.ERROR_* by name keep compiling and passing unchanged.
 
-    static final String ERROR_NOT_AGENT_CONTEXT =
-        "Error: the Call Workflow tool can only be used by an AI agent.";
+    static final String ERROR_NOT_AGENT_CONTEXT = SubflowToolSupport.notAgentContextError(TOOL_LABEL);
 
-    static final String ERROR_ALREADY_SUSPENDED =
-        "Error: another tool already suspended the agent in this turn; only one suspending tool call " +
-            "(including Call Workflow) is supported per turn.";
+    static final String ERROR_ALREADY_SUSPENDED = SubflowToolSupport.alreadySuspendedError(TOOL_LABEL);
 
-    static final String ERROR_AGENT_IS_SUBFLOW =
-        "Error: calling a sub-workflow as a tool is not supported when the agent itself runs as a sub-workflow.";
+    static final String ERROR_AGENT_IS_SUBFLOW = SubflowToolSupport.ERROR_AGENT_IS_SUBFLOW;
 
-    static final String ERROR_RESOLVE_FAILED_PREFIX =
-        "Error: could not resolve the requested sub-workflow: ";
+    static final String ERROR_RESOLVE_FAILED_PREFIX = SubflowToolSupport.ERROR_RESOLVE_FAILED_PREFIX;
 
     private WorkflowCallWorkflowTool() {
     }
@@ -116,34 +108,12 @@ public class WorkflowCallWorkflowTool {
 
     private static ToolFunction getToolFunction(SubflowResolver subflowResolver) {
         return (inputParameters, connectionParameters, context) -> {
-            ActionContext agentActionContext = resolveAgentActionContext(context);
+            ActionContextAware actionContextAware;
 
-            if (!(agentActionContext instanceof ActionContextAware actionContextAware)) {
-                log.warn("Call Workflow tool invoked outside an AI agent context (contract violation)");
-
-                return ERROR_NOT_AGENT_CONTEXT;
-            }
-
-            if (actionContextAware.getSuspend() != null) {
-                log.warn(
-                    "Call Workflow tool invoked after another tool already suspended the agent (jobId={})",
-                    actionContextAware.getJobId());
-
-                return ERROR_ALREADY_SUSPENDED;
-            }
-
-            // The agent is itself a sub-workflow (parentTaskExecutionId != null). JobServiceImpl.resumeToStatusStarted
-            // asserts parentTaskExecutionId == null, so a later resumeJob on the agent would throw and the agent
-            // would be parked forever -- exactly the silent-park failure mode #5055 was filed against. Fail fast
-            // with an LLM-readable error instead of suspending into an irrecoverable state.
-
-            if (actionContextAware.getParentTaskExecutionId() != null) {
-                log.warn(
-                    "Call Workflow tool invoked from an agent that itself runs as a sub-workflow "
-                        + "(jobId={}, parentTaskExecutionId={}); refusing to suspend",
-                    actionContextAware.getJobId(), actionContextAware.getParentTaskExecutionId());
-
-                return ERROR_AGENT_IS_SUBFLOW;
+            try {
+                actionContextAware = SubflowToolSupport.requireGuardsPassed(context, TOOL_LABEL);
+            } catch (SubflowToolSupport.GuardFailure guardFailure) {
+                return guardFailure.getMessage();
             }
 
             String workflowUuid = inputParameters.getRequiredString(WORKFLOW_UUID);
@@ -166,25 +136,8 @@ public class WorkflowCallWorkflowTool {
                 return ERROR_RESOLVE_FAILED_PREFIX + exception.getMessage();
             }
 
-            PendingSubflowRequest request = new PendingSubflowRequest(
-                subflow.workflowId(), subflow.inputsName(), inputs, editorEnvironment, PlatformType.AUTOMATION);
-
-            Map<String, Object> continueParameters = new HashMap<>();
-
-            continueParameters.put(SubflowRequestConstants.PENDING_SUBFLOW, request);
-
-            agentActionContext.suspend(new ActionContext.Suspend(continueParameters, null));
-
-            return ToolSuspendConstants.SUSPENDED_SENTINEL;
+            return SubflowToolSupport.suspendForSubflow(actionContextAware, subflow, inputs, editorEnvironment);
         };
-    }
-
-    private static ActionContext resolveAgentActionContext(ClusterElementContext context) {
-        if (context instanceof ClusterElementContextAware clusterElementContextAware) {
-            return clusterElementContextAware.getAgentActionContext();
-        }
-
-        return null;
     }
 
     private static ClusterElementDefinition.OptionsFunction<String> getWorkflowOptionsFunction(
