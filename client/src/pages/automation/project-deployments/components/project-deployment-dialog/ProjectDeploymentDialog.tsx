@@ -2,6 +2,7 @@ import Button from '@/components/Button/Button';
 import LoadingDots from '@/components/LoadingDots';
 import LoadingIcon from '@/components/LoadingIcon';
 import Switch from '@/components/Switch/Switch';
+import TooltipTriggerIcon from '@/components/TooltipTriggerIcon/TooltipTriggerIcon';
 import {
     Dialog,
     DialogClose,
@@ -597,9 +598,9 @@ const ProjectDeploymentDialog = ({
                                     />
 
                                     <Tooltip>
-                                        <TooltipTrigger asChild>
+                                        <TooltipTriggerIcon label="Connection grouping">
                                             <InfoIcon className="size-4 cursor-default text-content-onsurface-secondary" />
-                                        </TooltipTrigger>
+                                        </TooltipTriggerIcon>
 
                                         <TooltipContent>Connections grouped by their app.</TooltipContent>
                                     </Tooltip>

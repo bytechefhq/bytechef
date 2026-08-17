@@ -1,5 +1,6 @@
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
+import TooltipTriggerIcon from '@/components/TooltipTriggerIcon/TooltipTriggerIcon';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -7,8 +8,10 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {Tooltip, TooltipContent} from '@/components/ui/tooltip';
 import exportAgent from '@/pages/automation/agents/utils/agentImportExport';
 import invalidateAgentQueries from '@/pages/automation/agents/utils/invalidateAgentQueries';
+import isScheduledAgent from '@/pages/automation/agents/utils/isScheduledAgent';
 import ProjectDeploymentDialog from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialog';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import TagList from '@/shared/components/TagList';
@@ -23,7 +26,15 @@ import {
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import isInteractiveElementClick from '@/shared/util/interactive-element-utils';
 import {useQueryClient} from '@tanstack/react-query';
-import {DownloadIcon, EllipsisVerticalIcon, PencilIcon, RocketIcon, SendIcon, Trash2Icon} from 'lucide-react';
+import {
+    CalendarClockIcon,
+    DownloadIcon,
+    EllipsisVerticalIcon,
+    PencilIcon,
+    RocketIcon,
+    SendIcon,
+    Trash2Icon,
+} from 'lucide-react';
 import {useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {toast} from 'sonner';
@@ -60,6 +71,23 @@ const AgentListItem = ({agent}: AgentListItemProps) => {
             .map((tag) => ({id: Number(tag.id), name: tag.name}))
             .filter((tag) => !attachedTagIds.has(tag.id));
     }, [agentTagsData?.aiAgentTags, agentTags]);
+
+    // The row shows only THAT the agent is scheduled; the cadence rides in the marker's tooltip. An agent may
+    // own several schedules, and each one reads as a cron string, so putting them on the title line would push
+    // the title around by whatever the agent happens to be scheduled for.
+    const scheduleSummary = useMemo(
+        () =>
+            (agent.channels ?? [])
+                .filter((channel) => channel?.channelType === 'schedule')
+                .map((channel) => {
+                    const parameters = (channel?.parameters ?? {}) as Record<string, unknown>;
+
+                    return [parameters.name, parameters.expression].filter(Boolean).join(' — ');
+                })
+                .filter(Boolean)
+                .join(', '),
+        [agent.channels]
+    );
 
     const deleteAgentMutation = useDeleteAiAgentMutation({
         onError: (error) => {
@@ -126,7 +154,19 @@ const AgentListItem = ({agent}: AgentListItemProps) => {
             onClick={handleClick}
         >
             <div className="flex min-w-0 flex-1 flex-col gap-1">
-                <span className="font-semibold">{agent.title}</span>
+                <span className="flex items-center gap-1.5 font-semibold">
+                    {agent.title}
+
+                    {isScheduledAgent(agent) && (
+                        <Tooltip>
+                            <TooltipTriggerIcon label="Scheduled">
+                                <CalendarClockIcon className="size-4 shrink-0 text-muted-foreground" />
+                            </TooltipTriggerIcon>
+
+                            <TooltipContent>{scheduleSummary || 'Scheduled'}</TooltipContent>
+                        </Tooltip>
+                    )}
+                </span>
 
                 {agent.description && <span className="text-sm text-muted-foreground">{agent.description}</span>}
 

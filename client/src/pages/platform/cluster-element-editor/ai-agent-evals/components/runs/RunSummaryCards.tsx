@@ -1,4 +1,5 @@
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import TooltipTriggerIcon from '@/components/TooltipTriggerIcon/TooltipTriggerIcon';
+import {Tooltip, TooltipContent} from '@/components/ui/tooltip';
 import {InfoIcon} from 'lucide-react';
 
 export interface RunSummaryI {
@@ -55,9 +56,9 @@ const RunSummaryCards = ({summary}: RunSummaryCardsProps) => {
                 <div className="flex items-center gap-1 text-xs text-content-neutral-secondary">
                     Tokens
                     <Tooltip>
-                        <TooltipTrigger asChild>
+                        <TooltipTriggerIcon label="Tokens">
                             <InfoIcon className="size-3 text-muted-foreground" />
-                        </TooltipTrigger>
+                        </TooltipTriggerIcon>
 
                         <TooltipContent className="max-w-64" side="right">
                             Total tokens consumed by this evaluation run across all scenarios.
@@ -74,9 +75,9 @@ const RunSummaryCards = ({summary}: RunSummaryCardsProps) => {
                 <div className="flex items-center gap-1 text-xs text-content-neutral-secondary">
                     Agent Version
                     <Tooltip>
-                        <TooltipTrigger asChild>
+                        <TooltipTriggerIcon label="Agent Version">
                             <InfoIcon className="size-3 text-muted-foreground" />
-                        </TooltipTrigger>
+                        </TooltipTriggerIcon>
 
                         <TooltipContent className="max-w-64" side="right">
                             The version of the Agent that was tested in this evaluation run.

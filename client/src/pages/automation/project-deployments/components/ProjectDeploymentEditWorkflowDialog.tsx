@@ -1,5 +1,6 @@
 import Button from '@/components/Button/Button';
 import Switch from '@/components/Switch/Switch';
+import TooltipTriggerIcon from '@/components/TooltipTriggerIcon/TooltipTriggerIcon';
 import {
     Dialog,
     DialogClose,
@@ -11,7 +12,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import {Form} from '@/components/ui/form';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {Tooltip, TooltipContent} from '@/components/ui/tooltip';
 import ProjectDeploymentDialogWorkflowsStepItem from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogWorkflowsStepItem';
 import getWorkflowComponentConnections from '@/pages/automation/project-deployments/components/project-deployment-dialog/projectDeploymentDialog-utils';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
@@ -186,9 +187,9 @@ const ProjectDeploymentEditWorkflowDialog = ({
                                 />
 
                                 <Tooltip>
-                                    <TooltipTrigger asChild>
+                                    <TooltipTriggerIcon label="Connection grouping">
                                         <InfoIcon className="size-4 cursor-default text-content-neutral-tertiary" />
-                                    </TooltipTrigger>
+                                    </TooltipTriggerIcon>
 
                                     <TooltipContent>Connections grouped by their app.</TooltipContent>
                                 </Tooltip>

@@ -1,6 +1,7 @@
 import {Input} from '@/components/Input/Input';
+import TooltipTriggerIcon from '@/components/TooltipTriggerIcon/TooltipTriggerIcon';
 import {Skeleton} from '@/components/ui/skeleton';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {Tooltip, TooltipContent} from '@/components/ui/tooltip';
 import DataPillPanelBody, {
     OperationType,
 } from '@/pages/platform/workflow-editor/components/datapills/DataPillPanelBody';
@@ -102,9 +103,9 @@ const DataPillPanel = ({className, loading, previousComponentDefinitions, workfl
                     <span>Data Pill Panel</span>
 
                     <Tooltip>
-                        <TooltipTrigger asChild>
+                        <TooltipTriggerIcon label="Data Pill Panel">
                             <InfoIcon className="ml-1 size-4" />
-                        </TooltipTrigger>
+                        </TooltipTriggerIcon>
 
                         <TooltipContent>
                             To use data from the previous step drag its data pill into a field, or click on the data

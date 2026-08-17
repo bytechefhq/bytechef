@@ -1,5 +1,6 @@
 import Button from '@/components/Button/Button';
 import Switch from '@/components/Switch/Switch';
+import TooltipTriggerIcon from '@/components/TooltipTriggerIcon/TooltipTriggerIcon';
 import {
     Dialog,
     DialogClose,
@@ -265,9 +266,9 @@ const WorkflowTestConfigurationDialog = ({
                             />
 
                             <Tooltip>
-                                <TooltipTrigger asChild>
+                                <TooltipTriggerIcon label="Connection grouping">
                                     <InfoIcon className="size-4 cursor-default text-content-onsurface-secondary" />
-                                </TooltipTrigger>
+                                </TooltipTriggerIcon>
 
                                 <TooltipContent>Connections grouped by their component.</TooltipContent>
                             </Tooltip>
