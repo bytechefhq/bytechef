@@ -557,6 +557,24 @@ registration via `ObjectProvider.ifAvailable`, and prompt documentation on the p
   `SelectComponentPropertyOptionToolCallback`). The `selectPropertyOption` name and its
   `select-property-option` marker payload are client-load-bearing — do not rename.
 
+**Subagent delegate model propagation (ticket 732).** The nine catalog-backed intelligent delegates
+(`buildWorkflow`, `importWorkflow`, `configureClusterElement`, `writeScript`,
+`authorSkill`, `debugWorkflowExecution`, `buildCustomComponent`, `buildCodeWorkflow`,
+`buildIntegrationWorkflow`) follow the `ChatModel` the caller picked in the AI Hub composer or a
+Copilot panel toolbar; the management MCP surface does not, structurally —
+`WorkspaceScopedSubAgentToolCallback` never writes `AgentToolInvocationContext
+.TOOL_CONTEXT_LLM_PROVIDER_KEY`/`TOOL_CONTEXT_LLM_MODEL_KEY` into the context it forwards, so those
+delegates always run on the default. Resolution flows tool-context keys (populated by
+`AiHubSpringAIAgent#toolContext` / `CopilotToolContextUtils#toToolContext`) →
+`SubAgentChatModelResolver` (EE `CatalogSubAgentChatModelResolver`) →
+`IntelligentToolChatClientFactory#get(ChatModel)`, which rebuilds the delegate's `ChatClient` over the
+picked model with the same prompt and tools it would otherwise use. The hub's precedence —
+user-selected beats task override, in `AiHubChatClientResolver` — must stay in step with what those
+keys carry, or a delegate runs on a different model than the one its caller turn resolved to; and
+resolution is fail-open everywhere (`SubAgentChatModelResolution`): a missing resolver, a missing
+pick, or a resolver that throws all fall back to the delegate's default client, so a model preference
+never fails a turn.
+
 ### Subagent conversation memory and interactive questions (EE, ticket 732)
 
 Two features sharing the `com.bytechef.ee.ai.hub.subagent` package. Specs:
@@ -586,7 +604,7 @@ absent when the `ToolContext` carries no conversation id (the MCP manager surfac
 `agentTypeKey` MUST be a key registered with `AgentTypeRegistry` (which gained `keys()` for this): task
 delete reconstructs the per-specialist keys from that registry to purge them, since `SessionRepository` has
 no prefix listing. Note the skills specialist keys on `CopilotAgentType.SKILLS` (`"skills"`), NOT its
-`"skills_agent"` progress label — there is no `skills_agent` agent type, and an unregistered key would
+`"authorSkill"` tool name — there is no `authorSkill` agent type, and an unregistered key would
 leave a session nothing ever deletes. All 20 delegate sites go through `AiHubConfiguration.wrapDelegate`
 so none can forget the memory contributor.
 
