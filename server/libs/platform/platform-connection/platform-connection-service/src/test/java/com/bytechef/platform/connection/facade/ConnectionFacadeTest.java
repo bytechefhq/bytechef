@@ -18,9 +18,13 @@ package com.bytechef.platform.connection.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.Authorization;
+import com.bytechef.component.definition.Authorization.AuthorizationCallbackResponse;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.domain.Connection;
@@ -32,6 +36,7 @@ import com.bytechef.platform.security.domain.ResourceVisibility;
 import com.bytechef.platform.tag.service.TagService;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import io.micrometer.core.instrument.MeterRegistry;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -170,6 +175,78 @@ class ConnectionFacadeTest {
 
         assertThat(captor.getValue()
             .getVisibility()).isEqualTo(ResourceVisibility.WORKSPACE);
+    }
+
+    @Test
+    void testUpdateAuthorizationNonOAuthUpdatesParametersDirectly() {
+        ConnectionFacadeImpl facade = newFacade("EE");
+
+        Connection connection = new Connection();
+
+        connection.setId(5L);
+        connection.setComponentName("dummy");
+
+        when(connectionService.getConnection(5L)).thenReturn(connection);
+
+        facade.updateAuthorization(5L, Map.of("apiKey", "new"));
+
+        verify(connectionService).updateConnectionParameters(5L, Map.of("apiKey", "new"));
+    }
+
+    @Test
+    void testUpdateAuthorizationOAuth2AuthorizationCodeMergesCallbackResult() {
+        ConnectionFacadeImpl facade = newFacade("EE");
+
+        Connection connection = new Connection();
+
+        connection.setId(5L);
+        connection.setComponentName("slack");
+        connection.setConnectionVersion(1);
+        connection.setAuthorizationType(AuthorizationType.OAUTH2_AUTHORIZATION_CODE);
+        connection.setParameters(Map.of(Authorization.CLIENT_ID, "id", Authorization.CLIENT_SECRET, "secret"));
+
+        when(connectionService.getConnection(5L)).thenReturn(connection);
+        when(connectionDefinitionService.getAuthorizationType("slack", 1, AuthorizationType.OAUTH2_AUTHORIZATION_CODE))
+            .thenReturn(AuthorizationType.OAUTH2_AUTHORIZATION_CODE);
+        when(oAuth2Service.checkPredefinedParameters(eq("slack"), any())).thenReturn(Map.of());
+        when(oAuth2Service.getRedirectUri()).thenReturn("http://localhost/callback");
+        when(connectionDefinitionService.executeAuthorizationCallback(
+            eq("slack"), eq(1), eq(AuthorizationType.OAUTH2_AUTHORIZATION_CODE), any(),
+            eq("http://localhost/callback")))
+                .thenReturn(new AuthorizationCallbackResponse(Map.of(Authorization.ACCESS_TOKEN, "tok123")));
+
+        facade.updateAuthorization(5L, Map.of(Authorization.CODE, "auth-code"));
+
+        ArgumentCaptor<Map<String, Object>> captor = ArgumentCaptor.captor();
+
+        verify(connectionDefinitionService).executeAuthorizationCallback(
+            eq("slack"), eq(1), eq(AuthorizationType.OAUTH2_AUTHORIZATION_CODE), any(),
+            eq("http://localhost/callback"));
+        verify(connectionService).updateConnectionParameters(eq(5L), captor.capture());
+
+        assertThat(captor.getValue()).containsEntry(Authorization.ACCESS_TOKEN, "tok123");
+    }
+
+    @Test
+    void testUpdateAuthorizationStripsStateParameter() {
+        ConnectionFacadeImpl facade = newFacade("EE");
+
+        Connection connection = new Connection();
+
+        connection.setId(5L);
+        connection.setComponentName("dummy");
+
+        when(connectionService.getConnection(5L)).thenReturn(connection);
+
+        facade.updateAuthorization(5L, Map.of("apiKey", "new", "state", "csrf-token"));
+
+        ArgumentCaptor<Map<String, Object>> captor = ArgumentCaptor.captor();
+
+        verify(connectionService).updateConnectionParameters(eq(5L), captor.capture());
+
+        assertThat(captor.getValue())
+            .containsEntry("apiKey", "new")
+            .doesNotContainKey("state");
     }
 
     private ConnectionFacadeImpl newFacade(String edition) {

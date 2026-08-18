@@ -32,8 +32,8 @@ public final class ConnectedUserConstants {
      * Literal first path segments of every "Frontend" (no-{@code {externalUserId}}) route mounted under
      * {@code /api/embedded/v<n>/}, traceable to their {@code openapi.yaml}:
      * <ul>
-     * <li>{@code automation}, {@code me}, {@code components}, {@code integration-instances}, {@code integrations} --
-     * embedded-configuration-public-rest</li>
+     * <li>{@code automation}, {@code me}, {@code components}, {@code connections}, {@code integration-instances},
+     * {@code integrations} -- embedded-configuration-public-rest</li>
      * <li>{@code app-events}, {@code workflows} -- embedded-webhook-public-rest</li>
      * <li>{@code unified} -- embedded-unified-rest ({@code /v1/unified/accounting/**}, {@code /v1/unified/crm/**})</li>
      * </ul>
@@ -47,8 +47,8 @@ public final class ConnectedUserConstants {
      * the segment stays reserved so a stale caller of the old URL is rejected at authentication instead of minting.
      */
     public static final Set<String> FRONTEND_RESERVED_PATH_SEGMENTS = Set.of(
-        "app-events", "automation", "components", "external", "integration-instances", "integrations", "me",
-        "unified", "workflows");
+        "app-events", "automation", "components", "connections", "external", "integration-instances", "integrations",
+        "me", "unified", "workflows");
 
     private ConnectedUserConstants() {
     }

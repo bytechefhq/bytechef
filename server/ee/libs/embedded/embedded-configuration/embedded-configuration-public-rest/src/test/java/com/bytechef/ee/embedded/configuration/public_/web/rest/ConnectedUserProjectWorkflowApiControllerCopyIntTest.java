@@ -42,6 +42,8 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 @EmbeddedConfigurationPublicRestSharedMocks
 public class ConnectedUserProjectWorkflowApiControllerCopyIntTest {
 
+    private static final String HIDDEN_WORKFLOW_UUID = "hidden-workflow-uuid";
+    private static final String UNKNOWN_WORKFLOW_UUID = "unknown-id";
     private static final String WORKFLOW_UUID = "workflow-uuid-001";
 
     @Autowired
@@ -96,13 +98,13 @@ public class ConnectedUserProjectWorkflowApiControllerCopyIntTest {
     @WithMockUser(username = "user@example.com")
     public void testCopyFrontendWorkflowTemplateUnknownIdReturns404() {
         when(connectedUserProjectFacade.copyWorkflowTemplate(
-            eq("user@example.com"), eq("unknown-id"), any(Environment.class)))
-                .thenThrow(new IllegalArgumentException("Workflow template not found: unknown-id"));
+            eq("user@example.com"), eq(UNKNOWN_WORKFLOW_UUID), any(Environment.class)))
+                .thenThrow(new IllegalArgumentException("Workflow template not found: " + UNKNOWN_WORKFLOW_UUID));
 
         try {
             webTestClient
                 .post()
-                .uri("/v1/automation/workflow-templates/{workflowUuid}/copy", "unknown-id")
+                .uri("/v1/automation/workflow-templates/{workflowUuid}/copy", UNKNOWN_WORKFLOW_UUID)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus()
@@ -110,5 +112,44 @@ public class ConnectedUserProjectWorkflowApiControllerCopyIntTest {
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
+    }
+
+    /**
+     * A template the connected user's permission expression hides reaches the controller as the same
+     * {@link IllegalArgumentException} an unknown uuid does, and must leave the HTTP layer as the same bodyless 404 --
+     * otherwise the response itself would tell the caller which templates exist.
+     */
+    @Test
+    @WithMockUser(username = "user@example.com")
+    public void testCopyFrontendWorkflowTemplateHiddenTemplateIsIndistinguishableFromUnknownUuid() {
+        when(connectedUserProjectFacade.copyWorkflowTemplate(
+            eq("user@example.com"), eq(HIDDEN_WORKFLOW_UUID), any(Environment.class)))
+                .thenThrow(
+                    new IllegalArgumentException(
+                        "Not a published catalog workflow template: " + HIDDEN_WORKFLOW_UUID));
+        when(connectedUserProjectFacade.copyWorkflowTemplate(
+            eq("user@example.com"), eq(UNKNOWN_WORKFLOW_UUID), any(Environment.class)))
+                .thenThrow(
+                    new IllegalArgumentException(
+                        "Not a published catalog workflow template: " + UNKNOWN_WORKFLOW_UUID));
+
+        try {
+            expectCopyNotFoundWithoutBody(HIDDEN_WORKFLOW_UUID);
+            expectCopyNotFoundWithoutBody(UNKNOWN_WORKFLOW_UUID);
+        } catch (Exception exception) {
+            Assertions.fail(exception);
+        }
+    }
+
+    private void expectCopyNotFoundWithoutBody(String workflowUuid) {
+        webTestClient
+            .post()
+            .uri("/v1/automation/workflow-templates/{workflowUuid}/copy", workflowUuid)
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isNotFound()
+            .expectBody()
+            .isEmpty();
     }
 }

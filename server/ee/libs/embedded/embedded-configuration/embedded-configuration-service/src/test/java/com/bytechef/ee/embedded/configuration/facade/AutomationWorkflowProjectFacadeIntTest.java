@@ -135,6 +135,9 @@ public class AutomationWorkflowProjectFacadeIntTest {
     private ConnectedUserService connectedUserService;
 
     @Autowired
+    private EmbeddedPermissionEvaluator embeddedPermissionEvaluator;
+
+    @Autowired
     private AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
 
     @Autowired
@@ -159,6 +162,11 @@ public class AutomationWorkflowProjectFacadeIntTest {
 
         when(connectedUserService.getConnectedUser(TEST_EXTERNAL_USER_ID, Environment.PRODUCTION))
             .thenReturn(connectedUser);
+
+        // copyWorkflowTemplate validates against the permission-FILTERED catalog, which consults this (mocked)
+        // evaluator; the default mock answer of false would hide every template from every user.
+        when(embeddedPermissionEvaluator.evaluate(any(), any()))
+            .thenReturn(true);
     }
 
     @Test

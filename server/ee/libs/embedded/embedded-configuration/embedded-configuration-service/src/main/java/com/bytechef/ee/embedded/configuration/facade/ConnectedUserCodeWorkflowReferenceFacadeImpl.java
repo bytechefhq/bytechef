@@ -19,6 +19,7 @@ import com.bytechef.automation.configuration.security.SkipAutomationAuthorizatio
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProject;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflowConnection;
@@ -31,6 +32,7 @@ import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import org.springframework.stereotype.Service;
@@ -49,6 +51,7 @@ public class ConnectedUserCodeWorkflowReferenceFacadeImpl implements ConnectedUs
 
     private static final String MARKER = "__EMBEDDED__";
 
+    private final AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
     private final ConnectedUserProjectWorkflowConnectionRepository connectedUserProjectWorkflowConnectionRepository;
     private final ConnectedUserProjectWorkflowRepository connectedUserProjectWorkflowRepository;
     private final ConnectedUserProjectWorkflowManager connectedUserProjectWorkflowManager;
@@ -61,6 +64,7 @@ public class ConnectedUserCodeWorkflowReferenceFacadeImpl implements ConnectedUs
 
     @SuppressFBWarnings("EI")
     public ConnectedUserCodeWorkflowReferenceFacadeImpl(
+        AutomationWorkflowProjectFacade automationWorkflowProjectFacade,
         ConnectedUserProjectWorkflowConnectionRepository connectedUserProjectWorkflowConnectionRepository,
         ConnectedUserProjectWorkflowRepository connectedUserProjectWorkflowRepository,
         ConnectedUserProjectWorkflowManager connectedUserProjectWorkflowManager,
@@ -69,6 +73,7 @@ public class ConnectedUserCodeWorkflowReferenceFacadeImpl implements ConnectedUs
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
         ProjectWorkflowService projectWorkflowService, WorkflowService workflowService) {
 
+        this.automationWorkflowProjectFacade = automationWorkflowProjectFacade;
         this.connectedUserProjectWorkflowConnectionRepository = connectedUserProjectWorkflowConnectionRepository;
         this.connectedUserProjectWorkflowRepository = connectedUserProjectWorkflowRepository;
         this.connectedUserProjectWorkflowManager = connectedUserProjectWorkflowManager;
@@ -113,6 +118,8 @@ public class ConnectedUserCodeWorkflowReferenceFacadeImpl implements ConnectedUs
         if (existing.isPresent()) {
             return existing.get();
         }
+
+        validateCatalogWorkflowTemplateVisible(externalUserId, catalogWorkflowUuid, environment);
 
         String catalogWorkflowId = projectWorkflowService.getLastPublishedWorkflowId(catalogWorkflowUuid);
         ProjectWorkflow catalogProjectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(
@@ -160,6 +167,33 @@ public class ConnectedUserCodeWorkflowReferenceFacadeImpl implements ConnectedUs
         }
 
         return saved;
+    }
+
+    /**
+     * Provisioning-time authorization, mirroring {@link ConnectedUserProjectFacadeImpl#copyWorkflowTemplate}: the
+     * caller-supplied {@code catalogWorkflowUuid} must belong to a template the PERMISSION-FILTERED catalog would show
+     * this connected user, so a template the catalog listing hides can never be provisioned by uuid. An unknown uuid
+     * and a uuid the user may not see both miss this same membership test and fail identically, so nothing here reveals
+     * whether the template exists.
+     *
+     * <p>
+     * Deliberately called AFTER the existing-reference early return in {@link #getOrCreateReference}: this gates
+     * PROVISIONING only. A reference already provisioned keeps running even if the vendor later narrows the permission
+     * expression -- revoking access to already running automations is a separate product decision.
+     */
+    private void validateCatalogWorkflowTemplateVisible(
+        String externalUserId, String catalogWorkflowUuid, Environment environment) {
+
+        boolean visibleCatalogWorkflowTemplate = automationWorkflowProjectFacade
+            .getPublishedProjects(externalUserId, environment)
+            .stream()
+            .flatMap(project -> CollectionUtils.stream(project.workflowTemplates()))
+            .anyMatch(workflowTemplate -> Objects.equals(workflowTemplate.workflowUuid(), catalogWorkflowUuid));
+
+        if (!visibleCatalogWorkflowTemplate) {
+            throw new IllegalArgumentException(
+                "Not a published catalog workflow template: " + catalogWorkflowUuid);
+        }
     }
 
     private long getOrCreateProjectDeployment(

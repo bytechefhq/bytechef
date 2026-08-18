@@ -46,7 +46,7 @@ public class SpaWebFilter extends OncePerRequestFilter {
 
     /**
      * Forwards any HTTP request with an unmapped path (i.e., not handled by other controllers or static resources),
-     * except those containing a period (indicating a file extension), to the client {@code index.html}.
+     * except those containing a period (indicating a file extension), to the appropriate client SPA entry point.
      *
      * <p>
      * This is commonly used in Single Page Application (SPA) setups where client-side routing handles navigation. If
@@ -56,8 +56,13 @@ public class SpaWebFilter extends OncePerRequestFilter {
      * <li>Does NOT contain a period (to exclude direct file requests, such as images or scripts)</li>
      * <li>Matches the pattern {@code /(.*)} (i.e., is a valid root-relative path)</li>
      * </ul>
-     * then the method forwards the request internally to {@code /index.html}. This allows the front-end application to
-     * handle the routing on the client side.
+     * then the method forwards the request internally to the appropriate SPA entry point:
+     * <ul>
+     * <li>Paths starting with {@code /embedded/builder/} are forwarded to {@code /workflow-builder.html}</li>
+     * <li>Paths starting with {@code /embedded/hub} are forwarded to {@code /automation-hub.html}</li>
+     * <li>All other routes are forwarded to {@code /index.html}</li>
+     * </ul>
+     * This allows the front-end application to handle the routing on the client side.
      * <p>
      * All other requests, including paths with file extensions (e.g., {@code index.html}, {@code app.js}), are
      * processed normally.
@@ -79,6 +84,14 @@ public class SpaWebFilter extends OncePerRequestFilter {
 
         if (path.startsWith("/embedded/builder/") && !path.contains(".")) {
             RequestDispatcher requestDispatcher = request.getRequestDispatcher("/workflow-builder.html");
+
+            requestDispatcher.forward(request, response);
+
+            return;
+        }
+
+        if (path.startsWith("/embedded/hub") && !path.contains(".")) {
+            RequestDispatcher requestDispatcher = request.getRequestDispatcher("/automation-hub.html");
 
             requestDispatcher.forward(request, response);
 

@@ -30,5 +30,10 @@ public interface ConnectUserProjectWorkflowMapper
     @Mapping(target = "description", source = "workflow.description")
     @Mapping(target = "label", source = "workflow.label")
     @Mapping(target = "lastModifiedDate", source = "workflow.lastModifiedDate")
+    @Mapping(target = "kind", source = "kind")
+    @Mapping(target = "catalogWorkflowUuid", source = "catalogWorkflowUuid")
+    @Mapping(target = "copiedFromWorkflowUuid", source = "copiedFromWorkflowUuid")
+    @Mapping(target = "dangling", source = "dangling")
+    @Mapping(target = "components", source = "components")
     ConnectedUserProjectWorkflowModel convert(ConnectedUserProjectWorkflowDTO connectedUserProjectWorkflowDTO);
 }

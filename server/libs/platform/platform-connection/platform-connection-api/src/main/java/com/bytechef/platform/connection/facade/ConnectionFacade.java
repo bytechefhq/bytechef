@@ -21,6 +21,7 @@ import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
+import java.util.Map;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -64,5 +65,15 @@ public interface ConnectionFacade {
     void update(long id, List<Tag> tags);
 
     void update(long id, String name, List<Tag> tags, int version);
+
+    /**
+     * Replaces a connection's credentials in place, keeping its id (and therefore every wiring that already references
+     * it) unchanged. When the merged parameters contain an OAuth2 authorization {@code code}, the authorization-code
+     * exchange is re-run exactly as it is during {@link #create(ConnectionDTO, PlatformType)} and its result is merged
+     * into the parameters before they are persisted. Ownership of {@code id} is enforced by
+     * {@link com.bytechef.platform.connection.service.ConnectionService#updateConnectionParameters(long, Map)}, not by
+     * this method.
+     */
+    void updateAuthorization(long id, Map<String, ?> parameters);
 
 }

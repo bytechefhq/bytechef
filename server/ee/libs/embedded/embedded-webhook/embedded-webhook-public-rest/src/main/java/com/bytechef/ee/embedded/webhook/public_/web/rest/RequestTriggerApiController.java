@@ -182,6 +182,16 @@ public class RequestTriggerApiController extends AbstractWebhookTriggerControlle
      * No published catalog workflow with this uuid, and no enabled reference/copy to it, all resolve to the SAME 404 an
      * unknown workflowUuid always returned -- an existence leak would tell a caller something about the catalog they
      * otherwise couldn't see.
+     *
+     * <p>
+     * The catalog lookup below deliberately uses the UNFILTERED {@code getPublishedProjects()}, never the
+     * permission-filtered overload. It runs BEFORE the already-provisioned short-circuits of shapes 2 and 3 (shape 2's
+     * lives inside {@code getOrCreateReference}, shape 3's is {@link #findExistingCopyOfTemplate}), so filtering it
+     * here would 404 an automation that was provisioned while its template was permitted and whose template a vendor
+     * has since hidden. Provisioning is gated instead, inside the two facades, behind those short-circuits -- and the
+     * rejection they raise is mapped by {@link #notFoundForRejectedProvisioning} onto the very same bodyless 404 this
+     * method returns for an unknown uuid, so gating provisioning costs no existence leak. Only shape 1 short-circuits
+     * before this lookup.
      */
     private ResponseEntity<Object> executeAutomationBridgeWorkflow(
         ConnectedUser connectedUser, String workflowUuid, Environment environment) {
@@ -224,6 +234,8 @@ public class RequestTriggerApiController extends AbstractWebhookTriggerControlle
         } catch (MissingConnectionException missingConnectionException) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(Map.of("missingConnectionComponentName", missingConnectionException.getComponentName()));
+        } catch (IllegalArgumentException illegalArgumentException) {
+            return notFoundForRejectedProvisioning(workflowUuid, illegalArgumentException);
         }
 
         if (!reference.isEnabled() || reference.isDangling()) {
@@ -257,10 +269,43 @@ public class RequestTriggerApiController extends AbstractWebhookTriggerControlle
     private ResponseEntity<Object> executeVisualTemplateWorkflow(
         ConnectedUser connectedUser, String catalogWorkflowUuid, Environment environment) {
 
-        ConnectedUserProjectWorkflow copy = findExistingCopyOfTemplate(connectedUser.getId(), catalogWorkflowUuid)
-            .orElseGet(() -> provisionVisualTemplateCopy(connectedUser, catalogWorkflowUuid, environment));
+        Optional<ConnectedUserProjectWorkflow> existingCopy = findExistingCopyOfTemplate(
+            connectedUser.getId(), catalogWorkflowUuid);
+
+        if (existingCopy.isPresent()) {
+            return dispatchCopyModeWorkflow(existingCopy.get(), environment);
+        }
+
+        ConnectedUserProjectWorkflow copy;
+
+        // Scoped to the provisioning call alone -- deliberately not wrapped around the existing-copy branch above, so
+        // an automation already provisioned from this template can never be rejected by it.
+        try {
+            copy = provisionVisualTemplateCopy(connectedUser, catalogWorkflowUuid, environment);
+        } catch (IllegalArgumentException illegalArgumentException) {
+            return notFoundForRejectedProvisioning(catalogWorkflowUuid, illegalArgumentException);
+        }
 
         return dispatchCopyModeWorkflow(copy, environment);
+    }
+
+    /**
+     * Maps a provisioning rejection -- the connected user is not permitted to see this catalog template -- onto the
+     * bodyless 404 {@link #executeAutomationBridgeWorkflow} returns for a uuid that does not exist at all, so the two
+     * are indistinguishable. Left to propagate it would surface as a 400 carrying the message, which would confirm the
+     * template exists. Logged at debug because the response deliberately says nothing.
+     */
+    private ResponseEntity<Object> notFoundForRejectedProvisioning(
+        String workflowUuid, IllegalArgumentException illegalArgumentException) {
+
+        if (log.isDebugEnabled()) {
+            log.debug(
+                "Provisioning of catalog workflow {} was rejected for the connected user; returning 404: {}",
+                workflowUuid, illegalArgumentException.getMessage());
+        }
+
+        return ResponseEntity.notFound()
+            .build();
     }
 
     private ConnectedUserProjectWorkflow provisionVisualTemplateCopy(

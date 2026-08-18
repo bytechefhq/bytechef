@@ -558,6 +558,211 @@ class RequestTriggerApiControllerAutomationBridgeTest {
             .isWorkflowDisabled(Mockito.any());
     }
 
+    /**
+     * HARD REQUIREMENT. The unfiltered pre-check in {@code executeAutomationBridgeWorkflow} runs BEFORE the
+     * already-provisioned short-circuit for this shape (the early return lives inside {@code getOrCreateReference}), so
+     * filtering that pre-check would 404 a reference that was provisioned while it was permitted and whose template a
+     * vendor has since hidden. This pins that such an automation keeps running: the controller applies no filter of its
+     * own, and the facade's early return hands back the existing reference without consulting the catalog (pinned on
+     * the facade side by {@code ConnectedUserCodeWorkflowReferenceFacadeAuthorizationTest}).
+     */
+    @Test
+    void testAlreadyProvisionedReferenceStillDispatchesAfterItsTemplateBecomesHidden() {
+        RequestTriggerApiController controller = controller();
+
+        Mockito.when(integrationWorkflowService.fetchLastWorkflowId(Mockito.eq("hidden-uuid-1"), Mockito.any()))
+            .thenReturn(Optional.empty());
+        Mockito.when(automationWorkflowProjectFacade.getPublishedProjects())
+            .thenReturn(publishedProjectsFor(true, "hidden-uuid-1"));
+
+        ConnectedUser connectedUser = new ConnectedUser(Map.of(), "user-1@example.com", true, "ext-1", 1L, "User 1", 0);
+
+        Mockito.when(connectedUserService.getConnectedUser(Mockito.anyString(), Mockito.any()))
+            .thenReturn(connectedUser);
+
+        // What the real facade does for an already-provisioned reference: return it from the early return, without
+        // ever evaluating the permission expression.
+        Mockito.when(
+            connectedUserCodeWorkflowReferenceFacade.getOrCreateReference(
+                Mockito.eq("ext-1"), Mockito.eq("hidden-uuid-1"), Mockito.any()))
+            .thenReturn(referenceFor(42L, true, false));
+        Mockito.when(projectWorkflowService.getLastPublishedWorkflowId("hidden-uuid-1"))
+            .thenReturn("catalog-wf-hidden");
+        Mockito.when(workflowService.getWorkflow("catalog-wf-hidden"))
+            .thenReturn(requestTriggerWorkflow("trigger_hidden"));
+
+        try (MockedStatic<SecurityUtils> securityUtils = Mockito.mockStatic(SecurityUtils.class)) {
+            securityUtils.when(SecurityUtils::fetchCurrentUserLogin)
+                .thenReturn(Optional.of("user-1"));
+
+            controller.executeWorkflow("hidden-uuid-1", null);
+        }
+
+        ArgumentCaptor<WorkflowExecutionId> workflowExecutionIdCaptor =
+            ArgumentCaptor.forClass(WorkflowExecutionId.class);
+
+        Mockito.verify(webhookWorkflowExecutor)
+            .isWorkflowDisabled(workflowExecutionIdCaptor.capture());
+
+        WorkflowExecutionId workflowExecutionId = workflowExecutionIdCaptor.getValue();
+
+        Assertions.assertEquals(42L, workflowExecutionId.getJobPrincipalId());
+        Assertions.assertEquals("trigger_hidden", workflowExecutionId.getTriggerName());
+
+        // The controller must never apply the permission filter itself: doing so would kill this running automation.
+        Mockito.verify(automationWorkflowProjectFacade, Mockito.never())
+            .getPublishedProjects(Mockito.anyString(), Mockito.any());
+    }
+
+    /**
+     * HARD REQUIREMENT, the visual-template twin of the test above: {@code findExistingCopyOfTemplate} also runs AFTER
+     * the unfiltered pre-check, so an existing copy provisioned while its template was permitted must still dispatch
+     * once the template is hidden. {@code copyWorkflowTemplate} -- the only place the rejection can originate for this
+     * shape -- is never reached.
+     */
+    @Test
+    void testAlreadyProvisionedCopyStillDispatchesAfterItsTemplateBecomesHidden() {
+        RequestTriggerApiController controller = controller();
+
+        Mockito.when(integrationWorkflowService.fetchLastWorkflowId(Mockito.eq("hidden-uuid-2"), Mockito.any()))
+            .thenReturn(Optional.empty());
+        Mockito.when(automationWorkflowProjectFacade.getPublishedProjects())
+            .thenReturn(publishedProjectsFor(false, "hidden-uuid-2"));
+
+        ConnectedUser connectedUser = new ConnectedUser(Map.of(), "user-1@example.com", true, "ext-1", 1L, "User 1", 0);
+
+        Mockito.when(connectedUserService.getConnectedUser(Mockito.anyString(), Mockito.any()))
+            .thenReturn(connectedUser);
+
+        ConnectedUserProjectWorkflow existingCopy = copyModeFor(302L, true, false);
+
+        existingCopy.setCopiedFromWorkflowUuid("hidden-uuid-2");
+
+        Mockito.when(connectedUserCodeWorkflowReferenceFacade.getConnectedUserWorkflows(1L))
+            .thenReturn(List.of(existingCopy));
+
+        ProjectWorkflow projectWorkflow = new ProjectWorkflow(9L, 2, "copy-wf-hidden", UUID.fromString(
+            "00000000-0000-0000-0000-000000000303"));
+
+        Mockito.when(projectWorkflowService.getProjectWorkflow(302L))
+            .thenReturn(projectWorkflow);
+        Mockito.when(projectDeploymentService.getProjectDeploymentId(9L, Environment.PRODUCTION))
+            .thenReturn(602L);
+        Mockito.when(
+            projectWorkflowService.fetchProjectWorkflowWorkflowId(602L, projectWorkflow.getUuidAsString()))
+            .thenReturn(Optional.of("copy-wf-hidden"));
+        Mockito.when(workflowService.getWorkflow("copy-wf-hidden"))
+            .thenReturn(requestTriggerWorkflow("trigger_hidden_copy"));
+
+        try (MockedStatic<SecurityUtils> securityUtils = Mockito.mockStatic(SecurityUtils.class)) {
+            securityUtils.when(SecurityUtils::fetchCurrentUserLogin)
+                .thenReturn(Optional.of("user-1"));
+
+            controller.executeWorkflow("hidden-uuid-2", null);
+        }
+
+        ArgumentCaptor<WorkflowExecutionId> workflowExecutionIdCaptor =
+            ArgumentCaptor.forClass(WorkflowExecutionId.class);
+
+        Mockito.verify(webhookWorkflowExecutor)
+            .isWorkflowDisabled(workflowExecutionIdCaptor.capture());
+
+        Assertions.assertEquals(
+            "trigger_hidden_copy",
+            workflowExecutionIdCaptor.getValue()
+                .getTriggerName());
+
+        // Provisioning is never attempted for an existing copy, so its rejection cannot fire here.
+        Mockito.verifyNoInteractions(connectedUserProjectFacade);
+        Mockito.verify(automationWorkflowProjectFacade, Mockito.never())
+            .getPublishedProjects(Mockito.anyString(), Mockito.any());
+    }
+
+    /**
+     * Closes the existence oracle for the reference shape: a caller with no provisioned row asking for a template the
+     * permission-filtered catalog hides must get exactly what an unknown uuid gets. The rejection originates in
+     * {@code getOrCreateReference}; without a mapping it escapes as a 400 carrying a ProblemDetail, which the bodyless
+     * 404 of an unknown uuid would be trivially distinguishable from.
+     */
+    @Test
+    void testHiddenTemplateAndUnknownUuidReturnByteIdenticalNotFoundForTheReferenceShape() {
+        RequestTriggerApiController controller = controller();
+
+        Mockito.when(integrationWorkflowService.fetchLastWorkflowId(Mockito.eq("hidden-uuid-3"), Mockito.any()))
+            .thenReturn(Optional.empty());
+        Mockito.when(integrationWorkflowService.fetchLastWorkflowId(Mockito.eq("unknown-uuid-3"), Mockito.any()))
+            .thenReturn(Optional.empty());
+
+        // The tenant-wide catalog carries the hidden template but not the unknown uuid -- the asymmetry the oracle
+        // was built on.
+        Mockito.when(automationWorkflowProjectFacade.getPublishedProjects())
+            .thenReturn(publishedProjectsFor(true, "hidden-uuid-3"));
+
+        ConnectedUser connectedUser = new ConnectedUser(Map.of(), "user-1@example.com", true, "ext-1", 1L, "User 1", 0);
+
+        Mockito.when(connectedUserService.getConnectedUser(Mockito.anyString(), Mockito.any()))
+            .thenReturn(connectedUser);
+        Mockito.when(
+            connectedUserCodeWorkflowReferenceFacade.getOrCreateReference(
+                Mockito.eq("ext-1"), Mockito.eq("hidden-uuid-3"), Mockito.any()))
+            .thenThrow(new IllegalArgumentException("Not a published catalog workflow template: hidden-uuid-3"));
+
+        ResponseEntity<Object> hiddenResponseEntity;
+        ResponseEntity<Object> unknownResponseEntity;
+
+        try (MockedStatic<SecurityUtils> securityUtils = Mockito.mockStatic(SecurityUtils.class)) {
+            securityUtils.when(SecurityUtils::fetchCurrentUserLogin)
+                .thenReturn(Optional.of("user-1"));
+
+            hiddenResponseEntity = controller.executeWorkflow("hidden-uuid-3", null);
+            unknownResponseEntity = controller.executeWorkflow("unknown-uuid-3", null);
+        }
+
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, hiddenResponseEntity.getStatusCode());
+        Assertions.assertNull(hiddenResponseEntity.getBody());
+        Assertions.assertEquals(hiddenResponseEntity, unknownResponseEntity);
+    }
+
+    /**
+     * The visual-template twin: here the rejection originates in {@code copyWorkflowTemplate}, and must converge on the
+     * same bodyless 404.
+     */
+    @Test
+    void testHiddenTemplateAndUnknownUuidReturnByteIdenticalNotFoundForTheCopyShape() {
+        RequestTriggerApiController controller = controller();
+
+        Mockito.when(integrationWorkflowService.fetchLastWorkflowId(Mockito.eq("hidden-uuid-4"), Mockito.any()))
+            .thenReturn(Optional.empty());
+        Mockito.when(integrationWorkflowService.fetchLastWorkflowId(Mockito.eq("unknown-uuid-4"), Mockito.any()))
+            .thenReturn(Optional.empty());
+        Mockito.when(automationWorkflowProjectFacade.getPublishedProjects())
+            .thenReturn(publishedProjectsFor(false, "hidden-uuid-4"));
+
+        ConnectedUser connectedUser = new ConnectedUser(Map.of(), "user-1@example.com", true, "ext-1", 1L, "User 1", 0);
+
+        Mockito.when(connectedUserService.getConnectedUser(Mockito.anyString(), Mockito.any()))
+            .thenReturn(connectedUser);
+        Mockito.when(
+            connectedUserProjectFacade.copyWorkflowTemplate(
+                Mockito.eq("ext-1"), Mockito.eq("hidden-uuid-4"), Mockito.any()))
+            .thenThrow(new IllegalArgumentException("Not a published catalog workflow template: hidden-uuid-4"));
+
+        ResponseEntity<Object> hiddenResponseEntity;
+        ResponseEntity<Object> unknownResponseEntity;
+
+        try (MockedStatic<SecurityUtils> securityUtils = Mockito.mockStatic(SecurityUtils.class)) {
+            securityUtils.when(SecurityUtils::fetchCurrentUserLogin)
+                .thenReturn(Optional.of("user-1"));
+
+            hiddenResponseEntity = controller.executeWorkflow("hidden-uuid-4", null);
+            unknownResponseEntity = controller.executeWorkflow("unknown-uuid-4", null);
+        }
+
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, hiddenResponseEntity.getStatusCode());
+        Assertions.assertNull(hiddenResponseEntity.getBody());
+        Assertions.assertEquals(hiddenResponseEntity, unknownResponseEntity);
+    }
+
     private static Workflow requestTriggerWorkflow(String triggerName) {
         return new Workflow(
             "{\"label\":\"Catalog Workflow\",\"triggers\":[{\"name\":\"" + triggerName + "\",\"type\":\"request/v1\"}],"

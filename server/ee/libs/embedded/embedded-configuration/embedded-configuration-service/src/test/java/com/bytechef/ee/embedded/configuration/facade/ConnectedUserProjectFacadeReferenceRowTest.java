@@ -59,7 +59,7 @@ class ConnectedUserProjectFacadeReferenceRowTest {
         facade = new ConnectedUserProjectFacadeImpl(
             null, null, connectUserProjectService, connectedUserCodeWorkflowReferenceFacade, null, null,
             connectedUserProjectWorkflowService, connectedUserService, null, null, null, null, null, null, null, null,
-            null, null, null, null, null, projectWorkflowService, null, null, null, null);
+            null, null, null, null, null, projectWorkflowService, null, null, null, null, null);
     }
 
     @Test

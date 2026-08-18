@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.configuration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -171,6 +172,9 @@ class AutomationCodeWorkflowBridgeIntTest {
     private ConnectionService connectionService;
 
     @Autowired
+    private EmbeddedPermissionEvaluator embeddedPermissionEvaluator;
+
+    @Autowired
     private ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
 
     @Autowired
@@ -193,6 +197,11 @@ class AutomationCodeWorkflowBridgeIntTest {
             .thenReturn(new ComponentDefinition(CODE_WORKFLOW_COMPONENT_NAME));
         when(connectionService.getConnections(PlatformType.EMBEDDED))
             .thenReturn(List.of());
+
+        // getOrCreateReference validates the catalog uuid against the permission-FILTERED catalog, which consults this
+        // (mocked) evaluator; the default mock answer of false would hide every template from every connected user.
+        when(embeddedPermissionEvaluator.evaluate(any(), any()))
+            .thenReturn(true);
     }
 
     /**

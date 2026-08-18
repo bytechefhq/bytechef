@@ -52,7 +52,7 @@ class ConnectedUserProjectFacadeCopilotChatTest {
 
         ConnectedUserProjectFacadeImpl impl = new ConnectedUserProjectFacadeImpl(
             null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
-            null, null, null, projectWorkflowService, null, null, null, null);
+            null, null, null, projectWorkflowService, null, null, null, null, null);
 
         ConnectedUserProjectFacadeImpl facadeSpy = spy(impl);
 

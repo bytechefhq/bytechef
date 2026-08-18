@@ -146,6 +146,6 @@ class ConnectedUserProjectFacadeEnableByUuidTest {
             null, null, null, connectedUserCodeWorkflowReferenceFacade, connectedUserProjectWorkflowManager,
             connectedUserProjectWorkflowRepository, null, null, null, null, null, null, null, null, null,
             projectDeploymentFacade, projectDeploymentService, null, null, null, null, projectWorkflowService, null,
-            null, null, null);
+            null, null, null, null);
     }
 }

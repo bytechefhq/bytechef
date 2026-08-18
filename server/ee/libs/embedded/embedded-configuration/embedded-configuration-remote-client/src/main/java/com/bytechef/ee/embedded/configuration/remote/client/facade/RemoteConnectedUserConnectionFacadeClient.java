@@ -11,6 +11,8 @@ import com.bytechef.ee.embedded.configuration.facade.ConnectedUserConnectionFaca
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import java.util.List;
+import java.util.Map;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 /**
@@ -28,7 +30,19 @@ public class RemoteConnectedUserConnectionFacadeClient implements ConnectedUserC
     }
 
     @Override
-    public List<ConnectionDTO> getConnections(Long connectedUserId, String componentName, List<Long> connectionIds) {
+    public void deleteConnectedUserConnection(long connectedUserId, long connectionId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<ConnectionDTO> getConnections(
+        Long connectedUserId, @Nullable String componentName, List<Long> connectionIds) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void reauthorizeConnectedUserConnection(long connectedUserId, long connectionId, Map<String, ?> parameters) {
         throw new UnsupportedOperationException();
     }
 }

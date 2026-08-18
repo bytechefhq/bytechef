@@ -20,7 +20,11 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Set;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,17 +64,28 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
     }
 
     @Override
+    public void deleteConnectedUserConnection(long connectedUserId, long connectionId) {
+        requireOwned(connectedUserId, connectionId);
+
+        connectionFacade.delete(connectionId);
+    }
+
+    @Override
     public List<ConnectionDTO> getConnections(
-        Long connectedUserId, String componentName, List<Long> connectionIds) {
+        Long connectedUserId, @Nullable String componentName, List<Long> connectionIds) {
 
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(connectedUserId);
 
         Set<Long> allConnectionIds = new LinkedHashSet<>();
 
+        List<IntegrationInstance> integrationInstances = componentName == null
+            ? integrationInstanceService.getConnectedUserIntegrationInstances(
+                connectedUser.getId(), connectedUser.getEnvironment())
+            : integrationInstanceService.getIntegrationInstances(
+                connectedUser.getId(), componentName, connectedUser.getEnvironment());
+
         allConnectionIds.addAll(
-            integrationInstanceService
-                .getIntegrationInstances(connectedUser.getId(), componentName, connectedUser.getEnvironment())
-                .stream()
+            integrationInstances.stream()
                 .map(IntegrationInstance::getConnectionId)
                 .toList());
 
@@ -79,7 +94,31 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
 
         return connectionFacade.getConnections(new ArrayList<>(allConnectionIds), PlatformType.EMBEDDED)
             .stream()
-            .filter(connectionDTO -> componentName.equals(connectionDTO.componentName()))
+            .filter(connectionDTO -> componentName == null || componentName.equals(connectionDTO.componentName()))
             .toList();
+    }
+
+    @Override
+    public void reauthorizeConnectedUserConnection(long connectedUserId, long connectionId, Map<String, ?> parameters) {
+        requireOwned(connectedUserId, connectionId);
+
+        connectionFacade.updateAuthorization(connectionId, parameters);
+    }
+
+    /**
+     * A vendor-shared connection is never owned via this path: it never appears in
+     * {@code connectedUserConnectionService.getConnectionIds} or the caller's integration instances, and this check
+     * deliberately passes an empty {@code connectionIds} list rather than any shared-connection id set, so a shared
+     * connection can never satisfy ownership here and is therefore never deletable or reauthorizable by an end user.
+     */
+    private void requireOwned(long connectedUserId, long connectionId) {
+        List<ConnectionDTO> ownedConnectionDTOs = getConnections(connectedUserId, null, List.of());
+
+        boolean owned = ownedConnectionDTOs.stream()
+            .anyMatch(connectionDTO -> Objects.equals(connectionDTO.id(), connectionId));
+
+        if (!owned) {
+            throw new NoSuchElementException("Connection id=%s not found".formatted(connectionId));
+        }
     }
 }

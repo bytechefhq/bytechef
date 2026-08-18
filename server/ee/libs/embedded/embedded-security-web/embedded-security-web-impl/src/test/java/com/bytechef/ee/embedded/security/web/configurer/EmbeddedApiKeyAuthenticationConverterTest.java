@@ -242,8 +242,8 @@ class EmbeddedApiKeyAuthenticationConverterTest {
      */
     @ParameterizedTest
     @ValueSource(strings = {
-        "app-events", "automation", "components", "external", "integration-instances", "integrations", "me",
-        "unified", "workflows"
+        "app-events", "automation", "components", "connections", "external", "integration-instances", "integrations",
+        "me", "unified", "workflows"
     })
     void testConvertWithNonJwtTokenAndReservedSegmentThrowsBadCredentialsException(String reservedSegment) {
         String tenantKey = EncodingUtils.base64EncodeToString("test-tenant" + ":randomData");

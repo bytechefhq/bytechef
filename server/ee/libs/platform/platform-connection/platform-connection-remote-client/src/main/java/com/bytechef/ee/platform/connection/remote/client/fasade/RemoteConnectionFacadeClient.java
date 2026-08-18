@@ -13,6 +13,7 @@ import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
+import java.util.Map;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
@@ -82,6 +83,11 @@ public class RemoteConnectionFacadeClient implements ConnectionFacade {
 
     @Override
     public void update(long id, String name, List<Tag> tags, int version) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void updateAuthorization(long id, Map<String, ?> parameters) {
         throw new UnsupportedOperationException();
     }
 }

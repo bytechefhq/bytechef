@@ -9,6 +9,9 @@ package com.bytechef.ee.embedded.configuration.facade;
 
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @version ee
@@ -19,5 +22,22 @@ public interface ConnectedUserConnectionFacade {
 
     long createConnectedUserConnection(long connectedUserId, ConnectionDTO connectionDTO);
 
-    List<ConnectionDTO> getConnections(Long connectedUserId, String componentName, List<Long> connectionIds);
+    /**
+     * Deletes a connection owned by the connected user. Throws {@link NoSuchElementException} when {@code connectionId}
+     * is not owned by {@code connectedUserId} (never surfaces as a permission error, so a connection id cannot be
+     * enumerated by a connected user probing ids that belong to someone else).
+     */
+    void deleteConnectedUserConnection(long connectedUserId, long connectionId);
+
+    /**
+     * @param componentName the component to filter by, or {@code null} to return connections across every component
+     */
+    List<ConnectionDTO> getConnections(
+        Long connectedUserId, @Nullable String componentName, List<Long> connectionIds);
+
+    /**
+     * Replaces the credentials of a connection owned by the connected user, keeping its id. Throws
+     * {@link NoSuchElementException} when {@code connectionId} is not owned by {@code connectedUserId}.
+     */
+    void reauthorizeConnectedUserConnection(long connectedUserId, long connectionId, Map<String, ?> parameters);
 }

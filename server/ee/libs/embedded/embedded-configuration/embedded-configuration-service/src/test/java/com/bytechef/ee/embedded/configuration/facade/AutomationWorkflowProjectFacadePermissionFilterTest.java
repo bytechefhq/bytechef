@@ -26,7 +26,6 @@ import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.platform.category.service.CategoryService;
-import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
@@ -50,7 +49,6 @@ class AutomationWorkflowProjectFacadePermissionFilterTest {
     private static final String MARKER = "__EMBEDDED_AUTOMATION__";
 
     private final CategoryService categoryService = mock(CategoryService.class);
-    private final ComponentDefinitionService componentDefinitionService = mock(ComponentDefinitionService.class);
     private final ConnectedUserService connectedUserService = mock(ConnectedUserService.class);
     private final EmbeddedPermissionEvaluator embeddedPermissionEvaluator =
         new EmbeddedPermissionEvaluator(SpelEvaluator.create());
@@ -59,6 +57,7 @@ class AutomationWorkflowProjectFacadePermissionFilterTest {
     private final ProjectWorkflowFacade projectWorkflowFacade = mock(ProjectWorkflowFacade.class);
     private final ProjectWorkflowService projectWorkflowService = mock(ProjectWorkflowService.class);
     private final TagService tagService = mock(TagService.class);
+    private final WorkflowComponentResolver workflowComponentResolver = mock(WorkflowComponentResolver.class);
     private final WorkflowNodeTestOutputService workflowNodeTestOutputService =
         mock(WorkflowNodeTestOutputService.class);
     private final WorkflowService workflowService = mock(WorkflowService.class);
@@ -66,8 +65,8 @@ class AutomationWorkflowProjectFacadePermissionFilterTest {
         mock(WorkflowTestConfigurationService.class);
 
     private final AutomationWorkflowProjectFacadeImpl facade = new AutomationWorkflowProjectFacadeImpl(
-        categoryService, componentDefinitionService, connectedUserService, embeddedPermissionEvaluator,
-        projectCodeWorkflowService, projectService, projectWorkflowFacade, projectWorkflowService, tagService,
+        categoryService, connectedUserService, embeddedPermissionEvaluator, projectCodeWorkflowService,
+        projectService, projectWorkflowFacade, projectWorkflowService, tagService, workflowComponentResolver,
         workflowNodeTestOutputService, workflowService, workflowTestConfigurationService);
 
     @Test

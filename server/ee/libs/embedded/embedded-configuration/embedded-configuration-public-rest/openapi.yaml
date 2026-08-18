@@ -251,6 +251,154 @@ paths:
                 type: "string"
       security:
         - jwtBearerAuth: [ ]
+  /automation/workflow-templates/{workflowUuid}/provision:
+    post:
+      description: "Provision a reference to a catalog code workflow for the authenticated connected user."
+      summary: "Provision a workflow reference"
+      tags:
+        - "connected-user-project-workflow"
+      operationId: "provisionFrontendWorkflowReference"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+        - name: "workflowUuid"
+          description: "The workflow template uuid."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "204":
+          description: "Successful operation."
+        "409":
+          description: "A required connection could not be auto-wired."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MissingConnectionError"
+      security:
+        - jwtBearerAuth: [ ]
+    delete:
+      description: "De-provision a reference to a catalog code workflow for the authenticated connected user."
+      summary: "De-provision a workflow reference"
+      tags:
+        - "connected-user-project-workflow"
+      operationId: "deprovisionFrontendWorkflowReference"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+        - name: "workflowUuid"
+          description: "The workflow template uuid."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "204":
+          description: "Successful operation."
+      security:
+        - jwtBearerAuth: [ ]
+  /connections:
+    get:
+      description: "Get every connection owned by the authenticated connected user."
+      summary: "Get all connected user's connections"
+      tags:
+        - "connection"
+      operationId: "getAllFrontendConnections"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+      responses:
+        "200":
+          description: "The list of connections."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Connection"
+      security:
+        - jwtBearerAuth: [ ]
+  /connections/{id}:
+    delete:
+      description: "Delete a connection owned by the authenticated connected user."
+      summary: "Delete a connection"
+      tags:
+        - "connection"
+      operationId: "deleteFrontendConnection"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+        - name: "id"
+          description: "The id of a connection."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "204":
+          description: "Successful operation."
+        "404":
+          description: "The connection does not exist or is not owned by the caller."
+        "409":
+          description: "The connection is still used by an automation."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConnectionInUseError"
+      security:
+        - jwtBearerAuth: [ ]
+  /connections/{id}/reauthorize:
+    post:
+      description: "Replace the credentials of a connection owned by the authenticated connected user, keeping its id."
+      summary: "Reauthorize a connection"
+      tags:
+        - "connection"
+      operationId: "reauthorizeFrontendConnection"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+        - name: "id"
+          description: "The id of a connection."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReauthorizeConnectionRequest"
+      responses:
+        "204":
+          description: "Successful operation."
+        "404":
+          description: "The connection does not exist or is not owned by the caller."
+      security:
+        - jwtBearerAuth: [ ]
   /automation/workflows:
     get:
       description: "Get automation workflows for particular external user."
@@ -609,6 +757,41 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/Connection"
+      security:
+        - jwtBearerAuth: [ ]
+    post:
+      description: "Create a connection for the authenticated connected user."
+      summary: "Create a connected user connection"
+      tags:
+        - "connection"
+      operationId: "createFrontendConnection"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+        - name: "componentName"
+          description: "The component name."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateConnectionRequest"
+      responses:
+        "200":
+          description: "The id of the created connection."
+          content:
+            application/json:
+              schema:
+                type: "integer"
+                format: "int64"
       security:
         - jwtBearerAuth: [ ]
   /integration-instances/{id}:
@@ -1769,6 +1952,26 @@ components:
         workflowVersion:
           type: "integer"
           description: "The workflow version, if null a workflow is not yet published"
+        kind:
+          description: "COPY when the workflow is the user's own editable copy; REFERENCE when it points at a shared catalog workflow."
+          type: "string"
+          enum:
+            - "COPY"
+            - "REFERENCE"
+        catalogWorkflowUuid:
+          description: "For REFERENCE rows, the uuid of the catalog workflow being referenced."
+          type: "string"
+        copiedFromWorkflowUuid:
+          description: "For COPY rows, the uuid of the catalog template the copy was created from. Null otherwise."
+          type: "string"
+        dangling:
+          description: "True when a REFERENCE points at a catalog workflow that is no longer served."
+          type: "boolean"
+        components:
+          description: "The components used by the workflow."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/AutomationWorkflowProjectComponent"
     Connection:
       description: "Contains all required information to open a connection to a service defined by componentName parameter"
       type: "object"
@@ -1785,6 +1988,52 @@ components:
           type: "string"
         environment:
           $ref: '#/components/schemas/Environment'
+        componentName:
+          description: "The component name."
+          type: "string"
+        connectionVersion:
+          description: "The connection version."
+          type: "integer"
+        authorizationType:
+          description: "The authorization type name."
+          type: "string"
+        createdDate:
+          description: "The created date."
+          type: "string"
+          format: "date-time"
+    CreateConnectionRequest:
+      type: "object"
+      required:
+        - "name"
+        - "connectionVersion"
+        - "parameters"
+      properties:
+        name:
+          type: "string"
+        authorizationType:
+          description: "The authorization type name; null for connections without authorization."
+          type: "string"
+        connectionVersion:
+          type: "integer"
+        parameters:
+          type: "object"
+          additionalProperties: true
+    ReauthorizeConnectionRequest:
+      type: "object"
+      required:
+        - "parameters"
+      properties:
+        parameters:
+          type: "object"
+          additionalProperties: true
+    ConnectionInUseError:
+      type: "object"
+      description: "Returned when a connection cannot be deleted because it is still used by an automation."
+      properties:
+        reason:
+          type: "string"
+          enum:
+            - "CONNECTION_IS_USED"
     ConnectionConfig:
       description: "The connection configuration"
       type: "object"

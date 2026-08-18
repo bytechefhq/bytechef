@@ -88,6 +88,25 @@ public class SpaWebFilterIntTest {
     }
 
     @Test
+    void testFilterForwardsEmbeddedHubRootToAutomationHubHtml() throws Exception {
+        mockMvc.perform(get("/embedded/hub"))
+            .andExpect(status().isOk())
+            .andExpect(forwardedUrl("/automation-hub.html"));
+    }
+
+    @Test
+    void testFilterForwardsEmbeddedHubDeepLinkToAutomationHubHtml() throws Exception {
+        mockMvc.perform(get("/embedded/hub/builder/0199f000-aaaa-bbbb-cccc-000000000001"))
+            .andExpect(forwardedUrl("/automation-hub.html"));
+    }
+
+    @Test
+    void testFilterDoesNotForwardEmbeddedHubAssets() throws Exception {
+        mockMvc.perform(get("/embedded/hub/assets/app.js"))
+            .andExpect(forwardedUrl(null));
+    }
+
+    @Test
     void testFilterStillForwardsLegacyWorkflowBuilderToIndex() throws Exception {
         mockMvc.perform(get("/embedded/workflow-builder/0199f000-aaaa-bbbb-cccc-000000000001"))
             .andExpect(status().isOk())

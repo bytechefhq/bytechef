@@ -53,6 +53,8 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 public class ConnectedUserProjectWorkflowApiControllerReferenceIntTest {
 
     private static final String EXTERNAL_USER_ID = "ext-user-1";
+    private static final String HIDDEN_WORKFLOW_UUID = "hidden-catalog-uuid";
+    private static final String UNKNOWN_WORKFLOW_UUID = "no-such-uuid";
     private static final String WORKFLOW_UUID = "catalog-uuid-1";
 
     @Autowired
@@ -128,6 +130,45 @@ public class ConnectedUserProjectWorkflowApiControllerReferenceIntTest {
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
+    }
+
+    /**
+     * The {@code {externalUserId}} admin-facing route reaches the same facade, so it must reject the same way: a
+     * template hidden by the connected user's permission expression and a uuid that does not exist both leave the HTTP
+     * layer as the same bodyless 404.
+     */
+    @Test
+    @WithMockUser(username = EXTERNAL_USER_ID)
+    public void testExplicitProvisionHiddenTemplateIsIndistinguishableFromUnknownUuid() {
+        when(connectedUserCodeWorkflowReferenceFacade.getOrCreateReference(
+            eq(EXTERNAL_USER_ID), eq(HIDDEN_WORKFLOW_UUID), any(Environment.class)))
+                .thenThrow(
+                    new IllegalArgumentException(
+                        "Not a published catalog workflow template: " + HIDDEN_WORKFLOW_UUID));
+        when(connectedUserCodeWorkflowReferenceFacade.getOrCreateReference(
+            eq(EXTERNAL_USER_ID), eq(UNKNOWN_WORKFLOW_UUID), any(Environment.class)))
+                .thenThrow(
+                    new IllegalArgumentException(
+                        "Not a published catalog workflow template: " + UNKNOWN_WORKFLOW_UUID));
+
+        try {
+            expectProvisionNotFoundWithoutBody(HIDDEN_WORKFLOW_UUID);
+            expectProvisionNotFoundWithoutBody(UNKNOWN_WORKFLOW_UUID);
+        } catch (Exception exception) {
+            Assertions.fail(exception);
+        }
+    }
+
+    private void expectProvisionNotFoundWithoutBody(String workflowUuid) {
+        webTestClient
+            .post()
+            .uri("/v1/{externalUserId}/automation/workflow-templates/{workflowUuid}/provision", EXTERNAL_USER_ID,
+                workflowUuid)
+            .exchange()
+            .expectStatus()
+            .isNotFound()
+            .expectBody()
+            .isEmpty();
     }
 
     /**

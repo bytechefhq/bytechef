@@ -20,6 +20,8 @@ import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProject;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflowConnection;
+import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
+import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateDTO;
 import com.bytechef.ee.embedded.configuration.exception.MissingConnectionException;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowConnectionRepository;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
@@ -50,6 +52,9 @@ import org.mockito.stubbing.Answer;
     MockitoExtension.class, ObjectMapperSetupExtension.class
 })
 class ConnectedUserCodeWorkflowReferenceFacadeTest {
+
+    @Mock
+    private AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
 
     @Mock
     private ConnectedUserProjectWorkflowConnectionRepository connectedUserProjectWorkflowConnectionRepository;
@@ -83,9 +88,17 @@ class ConnectedUserCodeWorkflowReferenceFacadeTest {
     @BeforeEach
     void setUp() {
         facade = new ConnectedUserCodeWorkflowReferenceFacadeImpl(
-            connectedUserProjectWorkflowConnectionRepository, connectedUserProjectWorkflowRepository,
-            connectedUserProjectWorkflowManager, connectedUserWorkflowConnectionResolver, projectDeploymentFacade,
-            projectDeploymentService, projectDeploymentWorkflowService, projectWorkflowService, workflowService);
+            automationWorkflowProjectFacade, connectedUserProjectWorkflowConnectionRepository,
+            connectedUserProjectWorkflowRepository, connectedUserProjectWorkflowManager,
+            connectedUserWorkflowConnectionResolver, projectDeploymentFacade, projectDeploymentService,
+            projectDeploymentWorkflowService, projectWorkflowService, workflowService);
+
+        // Every case in this class provisions a template the connected user IS permitted to see; the rejections are
+        // covered by ConnectedUserCodeWorkflowReferenceFacadeAuthorizationTest. Lenient because the cases that do not
+        // provision (existing reference, enable/disable, dangling) never reach the catalog lookup.
+        Mockito.lenient()
+            .when(automationWorkflowProjectFacade.getPublishedProjects(Mockito.anyString(), Mockito.any()))
+            .thenReturn(List.of(publishedCatalogProject("catalog-uuid")));
     }
 
     /**
@@ -250,9 +263,12 @@ class ConnectedUserCodeWorkflowReferenceFacadeTest {
             "userA", "catalog-uuid", Environment.PRODUCTION);
 
         Assertions.assertSame(existingReference, result);
+
+        // automationWorkflowProjectFacade included deliberately: the provisioning-time permission check must not run
+        // for an already-provisioned reference, so a narrowed permission expression cannot break a running automation.
         Mockito.verifyNoInteractions(
-            projectWorkflowService, workflowService, connectedUserWorkflowConnectionResolver, projectDeploymentFacade,
-            projectDeploymentService);
+            automationWorkflowProjectFacade, projectWorkflowService, workflowService,
+            connectedUserWorkflowConnectionResolver, projectDeploymentFacade, projectDeploymentService);
     }
 
     /**
@@ -625,6 +641,15 @@ class ConnectedUserCodeWorkflowReferenceFacadeTest {
         Assertions.assertFalse(crmReference.isDangling());
         Mockito.verify(connectedUserProjectWorkflowRepository, Mockito.never())
             .save(crmReference);
+    }
+
+    private static AutomationWorkflowProjectDTO publishedCatalogProject(String workflowUuid) {
+        return new AutomationWorkflowProjectDTO(
+            500L, "Catalog", "", null, List.of(), true, 1, 1,
+            List.of(
+                new ConnectedUserWorkflowTemplateDTO(
+                    workflowUuid, "Label", "Description", null, List.of(), List.of(), null)),
+            null, true);
     }
 
     /**
