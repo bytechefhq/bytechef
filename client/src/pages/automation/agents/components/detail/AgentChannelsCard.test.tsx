@@ -1,3 +1,7 @@
+import {
+    AI_AGENT_CHANNEL_DEFINITIONS,
+    aiAgentChannelDefinitionsQueryResult,
+} from '@/pages/automation/agents/hooks/aiAgentChannelDefinitions.fixture';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {render, screen, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -13,13 +17,19 @@ beforeAll(() => {
     Element.prototype.releasePointerCapture = vi.fn();
 });
 
-const {addAgentChannelMutate, deleteAgentChannelMutate, getWorkspaceConnectionsQuery, updateAgentChannelMutate} =
-    vi.hoisted(() => ({
-        addAgentChannelMutate: vi.fn(),
-        deleteAgentChannelMutate: vi.fn(),
-        getWorkspaceConnectionsQuery: vi.fn().mockReturnValue({data: []}),
-        updateAgentChannelMutate: vi.fn(),
-    }));
+const {
+    addAgentChannelMutate,
+    channelDefinitionsQuery,
+    deleteAgentChannelMutate,
+    getWorkspaceConnectionsQuery,
+    updateAgentChannelMutate,
+} = vi.hoisted(() => ({
+    addAgentChannelMutate: vi.fn(),
+    channelDefinitionsQuery: vi.fn(),
+    deleteAgentChannelMutate: vi.fn(),
+    getWorkspaceConnectionsQuery: vi.fn().mockReturnValue({data: []}),
+    updateAgentChannelMutate: vi.fn(),
+}));
 
 // Editing a channel opens the shared component config dialog, which reaches ConnectionDialog and its graphql
 // exports — unloadable here, since this file mocks the graphql module wholesale. The stub keeps the one thing
@@ -28,12 +38,23 @@ vi.mock('@/shared/components/component-config/ComponentConfigDialog', () => ({
     default: ({
         onSubmit,
         picker,
+        target,
     }: {
         onSubmit: (values: {connectionId: null; parameters: object}) => void;
         picker?: ReactNode;
+        target?: {clusterElementName: string; componentName: string; componentVersion: number} | null;
     }) => (
         <div>
             {picker}
+
+            {/* The tuple the dialog looks a definition up by. Rendered so a test can pin it: a wrong trigger
+                name yields an EMPTY Properties tab in the real dialog rather than an error. */}
+
+            {target && (
+                <span data-testid="component-config-target">
+                    {`${target.componentName}/v${target.componentVersion}/${target.clusterElementName}`}
+                </span>
+            )}
 
             <button onClick={() => onSubmit({connectionId: null, parameters: {}})} type="button">
                 Save
@@ -54,8 +75,11 @@ vi.mock('@/shared/queries/automation/connections.queries', () => ({
     useGetWorkspaceConnectionsQuery: getWorkspaceConnectionsQuery,
 }));
 
+// The GENERATED QUERY is mocked, not useAiAgentChannelDefinitions -- so the real hook, including the one
+// client-side exclusion it applies to the add menu, runs in these tests.
 vi.mock('@/shared/middleware/graphql', () => ({
     useAddAiAgentChannelMutation: () => ({isPending: false, mutate: addAgentChannelMutate}),
+    useAiAgentChannelDefinitionsQuery: () => channelDefinitionsQuery(),
     useDeleteAiAgentChannelMutation: () => ({isPending: false, mutate: deleteAgentChannelMutate}),
     useUpdateAiAgentChannelMutation: () => ({isPending: false, mutate: updateAgentChannelMutate}),
 }));
@@ -81,12 +105,15 @@ const telegramChannel = {
     parameters: {},
     position: 2,
 };
+const slackChannel = {channelType: 'slack', connectionId: 'conn-1', id: 'slack-1', parameters: {}, position: 3};
+const whatsappChannel = {channelType: 'whatsapp', connectionId: null, id: 'whatsapp-1', parameters: {}, position: 4};
 
 beforeEach(() => {
     addAgentChannelMutate.mockReset();
     deleteAgentChannelMutate.mockReset();
     updateAgentChannelMutate.mockReset();
     getWorkspaceConnectionsQuery.mockReset().mockReturnValue({data: []});
+    channelDefinitionsQuery.mockReset().mockReturnValue(aiAgentChannelDefinitionsQueryResult());
 });
 
 describe('AgentChannelsCard', () => {
@@ -120,10 +147,69 @@ describe('AgentChannelsCard', () => {
         // Schedules section (AgentScheduleCard) instead of as a messaging channel.
         expect(screen.queryByRole('option', {name: 'Schedule'})).not.toBeInTheDocument();
 
-        // whatsapp is de-scoped from v1: the component's declared trigger output schema doesn't match the real
-        // Cloud API webhook shape (arrays vs single objects) — see AgentChannelsCard.tsx's ADDABLE_CHANNEL_TYPES
-        // comment and docs/agents/agents.md.
+        // Titles come from each channel's own declaration now, which is why these two read as WhatsApp channels
+        // rather than as bare component names -- twilio and infobip each also expose SMS and inbound-call
+        // operations, so "Twilio" alone would not say which one this is.
+        expect(screen.getByRole('option', {name: 'Twilio (WhatsApp)'})).toBeInTheDocument();
+        expect(screen.getByRole('option', {name: 'Infobip (WhatsApp)'})).toBeInTheDocument();
+
+        // whatsapp is de-scoped: its declared trigger output schema does not match the real Cloud API webhook
+        // payload, so the exclusion lives in useAiAgentChannelDefinitions rather than in this card. Only the add
+        // affordance is hidden -- the row test below pins that an existing channel is untouched.
         expect(screen.queryByRole('option', {name: 'WhatsApp'})).not.toBeInTheDocument();
+    });
+
+    // The exclusion above hides the "add a new one" affordance and nothing else: an agent that already has a
+    // whatsapp channel must keep seeing it and keep being able to configure it.
+    it('renders an existing whatsapp channel and leaves it configurable', () => {
+        wrap(<AgentChannelsCard agentId="agent-1" channels={[chatChannel, whatsappChannel]} />);
+
+        const whatsappRow = screen.getByRole('listitem', {name: 'WhatsApp'});
+
+        expect(within(whatsappRow).getByRole('button', {name: 'Edit WhatsApp channel'})).toBeInTheDocument();
+        expect(within(whatsappRow).getByRole('button', {name: 'Delete WhatsApp trigger'})).toBeInTheDocument();
+    });
+
+    // A channel is edited through its trigger's own property tree, and a wrong trigger name renders an empty
+    // Properties tab rather than an error. Slack's channel pairs newMessage; the client used to name anyEvent.
+    it("opens a channel's own trigger, as the registry pairs it", async () => {
+        const user = userEvent.setup({pointerEventsCheck: 0});
+
+        wrap(<AgentChannelsCard agentId="agent-1" channels={[chatChannel, slackChannel]} />);
+
+        await user.click(screen.getByRole('button', {name: 'Edit Slack channel'}));
+
+        expect(await screen.findByTestId('component-config-target')).toHaveTextContent('slack/v1/newMessage');
+    });
+
+    // The Configure affordance follows what there is to configure, which is a connection OR the trigger's own
+    // unpinned properties -- not the connection alone. chat is the case that distinguishes the two: it takes no
+    // connection, and its trigger's only property (mode) is pinned to hosted by the channel itself, so there is
+    // nothing left to set and the row carries no button.
+    it('offers no configure affordance on a channel with neither a connection nor unpinned properties', () => {
+        wrap(<AgentChannelsCard agentId="agent-1" channels={[chatChannel, workflowCallChannel]} />);
+
+        const chatRow = screen.getByRole('listitem', {name: 'Chat'});
+
+        expect(within(chatRow).queryByRole('button', {name: /edit/i})).not.toBeInTheDocument();
+    });
+
+    // ...and the predicate is genuinely reading propertiesConfigurable rather than standing in for
+    // connectionRequired: a channel with properties and no connection does get the button.
+    it('offers the configure affordance on a channel that has properties but no connection', () => {
+        channelDefinitionsQuery.mockReturnValue(
+            aiAgentChannelDefinitionsQueryResult(
+                AI_AGENT_CHANNEL_DEFINITIONS.map((definition) =>
+                    definition.channelType === 'chat' ? {...definition, propertiesConfigurable: true} : definition
+                )
+            )
+        );
+
+        wrap(<AgentChannelsCard agentId="agent-1" channels={[chatChannel, workflowCallChannel]} />);
+
+        const chatRow = screen.getByRole('listitem', {name: 'Chat'});
+
+        expect(within(chatRow).getByRole('button', {name: 'Edit Chat channel'})).toBeInTheDocument();
     });
 
     it('fires the delete mutation for a telegram row', async () => {

@@ -2,6 +2,10 @@ import Button from '@/components/Button/Button';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {Label} from '@/components/ui/label';
 import AgentSection from '@/pages/automation/agents/components/detail/AgentSection';
+import {
+    type AiAgentChannelDefinitionType,
+    useAiAgentChannelDefinitions,
+} from '@/pages/automation/agents/hooks/useAiAgentChannelDefinitions';
 import invalidateAgentQueries from '@/pages/automation/agents/utils/invalidateAgentQueries';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import ComponentConfigDialog from '@/shared/components/component-config/ComponentConfigDialog';
@@ -11,77 +15,16 @@ import {
     useDeleteAiAgentChannelMutation,
     useUpdateAiAgentChannelMutation,
 } from '@/shared/middleware/graphql';
-import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {ComponentIcon, LockIcon, PlusIcon, SettingsIcon, Trash2Icon} from 'lucide-react';
 import {useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {toast} from 'sonner';
 
-// The registry mirrors ChannelDefinitions on the server (automation-ai-agent-service): chat/workflowCall are
-// created automatically for every agent and can never be removed, the rest are opt-in triggers.
-const PINNED_CHANNEL_TYPES = ['chat', 'workflowCall'];
-// 'whatsapp' is intentionally excluded from the add-trigger menu: the whatsapp component's declared trigger
-// output shape (ChannelDefinitions.whatsapp()'s source comment) nests entry/changes/value/messages as single
-// objects, but WhatsApp's real Cloud API webhook sends those as arrays — the generated envelope mapping would
-// read the wrong path against a real payload. The channel type stays registered server-side (and this card
-// still renders an existing whatsapp channel row if one is already configured) so nothing breaks for an agent
-// that already has one; only the "add a new whatsapp trigger" affordance is hidden until the component's
-// output schema is fixed. See docs/agents/agents.md's "known-disabled channel" note.
-// 'schedule' is deliberately absent too: it is still an agent_channel row of type 'schedule', but it is
-// presented in its own Schedules section (AgentScheduleCard) rather than as a messaging channel.
-// infobip's trigger declares a REQUIRED `number` property (the number to monitor), which the add dialog does
-// not collect -- it only picks a type and a connection. The channel is added first and configured after, through
-// the row's own Configure dialog, the same two-step a tool row uses; until that number is set the channel will
-// fail to register its webhook.
-const ADDABLE_CHANNEL_TYPES = ['slack', 'telegram', 'rocketchat', 'twilio', 'infobip'];
-
-const CHANNEL_TYPE_LABELS: Record<string, string> = {
-    chat: 'Chat',
-    // Both are WhatsApp channels — twilio/v1/newWhatsappMessage and infobip/v1/newWhatsappMessage. Each
-    // component also exposes SMS and inbound-call triggers, so a bare "Twilio" would not say which one this is.
-    infobip: 'Infobip (WhatsApp)',
-    rocketchat: 'Rocket.Chat',
-    schedule: 'Schedule',
-    slack: 'Slack',
-    telegram: 'Telegram',
-    twilio: 'Twilio (WhatsApp)',
-    whatsapp: 'WhatsApp',
-    workflowCall: 'Workflow Call',
-};
-
-// Connection component names, as registered via ComponentDsl.component(...). Most match the channel type
-// literally; WhatsApp is the one exception (the component name capitalizes the "A").
-const MESSAGING_CHANNEL_COMPONENT_NAMES: Record<string, string> = {
-    infobip: 'infobip',
-    rocketchat: 'rocketchat',
-    slack: 'slack',
-    telegram: 'telegram',
-    twilio: 'twilio',
-    whatsapp: 'whatsApp',
-};
-
-// The trigger each channel type installs, matching ChannelDefinitions' triggerType on the server (the segment
-// after /v1/). Editing a channel opens that trigger's own property tree, so a wrong name here yields an empty
-// Properties tab rather than an error — keep it in step with the server registry.
-const CHANNEL_TRIGGER_NAMES: Record<string, string> = {
-    infobip: 'newWhatsappMessage',
-    rocketchat: 'newMessage',
-    slack: 'anyEvent',
-    telegram: 'newMessage',
-    twilio: 'newWhatsappMessage',
-    whatsapp: 'messageReceived',
-};
-
-// Deliberately separate from the map above, which also drives the per-row connections query and the
-// connection control it gates. chat and workflow ARE real components (ChatComponentHandler /
-// WorkflowComponentHandler, each shipping an icon asset), so their rows should carry a logo -- but neither
-// takes a connection, and listing them above would give the pinned rows a connection picker they cannot use.
-const CHANNEL_ICON_COMPONENT_NAMES: Record<string, string> = {
-    ...MESSAGING_CHANNEL_COMPONENT_NAMES,
-    chat: 'chat',
-    workflowCall: 'workflow',
-};
+// The one reserved channel key this card names. Its row is hidden rather than removed: the generator always
+// emits a workflowCall channel and it is how a workflow invokes the agent, but it carries no configuration --
+// its input schema is fixed -- so a permanently inert row was only taking up space.
+const WORKFLOW_CALL_CHANNEL_TYPE = 'workflowCall';
 
 interface AgentChannelsCardProps {
     agentId: string;
@@ -90,26 +33,30 @@ interface AgentChannelsCardProps {
 
 interface AgentChannelRowProps {
     channel: AiAgentChannel;
+    /** The channel's registry entry, or undefined for a stored channel type no deployed component declares. */
+    definition?: AiAgentChannelDefinitionType;
     onDelete?: (id: string) => void;
     onEdit?: (channel: AiAgentChannel) => void;
     pinned: boolean;
 }
 
-const AgentChannelRow = ({channel, onDelete, onEdit, pinned}: AgentChannelRowProps) => {
-    const componentName = MESSAGING_CHANNEL_COMPONENT_NAMES[channel.channelType];
-    const iconComponentName = CHANNEL_ICON_COMPONENT_NAMES[channel.channelType];
+const AgentChannelRow = ({channel, definition, onDelete, onEdit, pinned}: AgentChannelRowProps) => {
+    const label = definition?.title || channel.channelType;
 
-    const {data: componentDefinition} = useGetComponentDefinitionQuery(
-        {componentName: iconComponentName, componentVersion: 1},
-        !!iconComponentName
-    );
+    // Configuring a channel opens its trigger's Connection + Properties pair, so the affordance is offered where
+    // there is either half to fill in. This used to read connectionRequired alone, which was a proxy for the
+    // wrong thing: it happens to match every channel that needs a connection, and silently hides the button on a
+    // channel configured purely through its trigger's properties -- which chat, with its mode property and no
+    // connection, already was. workflowCall stays buttonless on the honest predicate too: no connection, and its
+    // one property is the inputSchema its own channel declaration pins.
+    const configurable = (definition?.connectionRequired ?? false) || (definition?.propertiesConfigurable ?? false);
 
     return (
         // One line, label left / controls right — the same shape ApprovalChannelRow uses. The two channel
         // lists sit on the same page, so a stacked "Connection" fieldset here read as a different kind of
         // row rather than the same row with different content.
         <li
-            aria-label={CHANNEL_TYPE_LABELS[channel.channelType] || channel.channelType}
+            aria-label={label}
             className="flex items-center justify-between gap-2 rounded-md border border-border/50 p-3"
         >
             <div className="flex min-w-0 items-center gap-2 font-medium">
@@ -117,20 +64,20 @@ const AgentChannelRow = ({channel, onDelete, onEdit, pinned}: AgentChannelRowPro
                     platform channel (lock), a messaging channel (component logo) or neither. */}
 
                 <span className="flex size-5 flex-none items-center justify-center">
-                    {componentDefinition?.icon ? (
+                    {definition?.icon ? (
                         <InlineSVG
                             className="size-5"
                             loader={<ComponentIcon className="size-5 text-gray-700" />}
-                            src={componentDefinition.icon}
+                            src={definition.icon}
                         />
                     ) : (
                         pinned && <LockIcon aria-hidden className="size-3.5 text-content-neutral-tertiary" />
                     )}
                 </span>
 
-                <span className="truncate">{CHANNEL_TYPE_LABELS[channel.channelType] || channel.channelType}</span>
+                <span className="truncate">{label}</span>
 
-                {channel.channelType === 'workflowCall' && (
+                {channel.channelType === WORKFLOW_CALL_CHANNEL_TYPE && (
                     <span className="truncate text-xs font-normal text-muted-foreground">
                         Predefined input schema: {'{message, conversationId?, attachments?}'}
                     </span>
@@ -138,9 +85,9 @@ const AgentChannelRow = ({channel, onDelete, onEdit, pinned}: AgentChannelRowPro
             </div>
 
             <div className="flex flex-none items-center gap-2">
-                {componentName && onEdit && (
+                {configurable && onEdit && (
                     <Button
-                        aria-label={`Edit ${CHANNEL_TYPE_LABELS[channel.channelType] || channel.channelType} channel`}
+                        aria-label={`Edit ${label} channel`}
                         icon={<SettingsIcon />}
                         onClick={() => onEdit(channel)}
                         size="iconSm"
@@ -150,7 +97,7 @@ const AgentChannelRow = ({channel, onDelete, onEdit, pinned}: AgentChannelRowPro
 
                 {!pinned && onDelete && (
                     <Button
-                        aria-label={`Delete ${CHANNEL_TYPE_LABELS[channel.channelType] || channel.channelType} trigger`}
+                        aria-label={`Delete ${label} trigger`}
                         icon={<Trash2Icon />}
                         onClick={() => onDelete(channel.id)}
                         size="iconSm"
@@ -168,6 +115,8 @@ const AgentChannelsCard = ({agentId, channels}: AgentChannelsCardProps) => {
     const [editingChannel, setEditingChannel] = useState<AiAgentChannel | null>(null);
 
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const {addableDefinitions, definitionsByType, isLoading} = useAiAgentChannelDefinitions();
 
     const queryClient = useQueryClient();
 
@@ -190,14 +139,23 @@ const AgentChannelsCard = ({agentId, channels}: AgentChannelsCardProps) => {
         onSuccess: () => invalidateAgentQueries(queryClient),
     });
 
-    // workflowCall is hidden rather than removed: the generator always emits it and it is how a workflow
-    // invokes the agent, but it carries no configuration -- its input schema is fixed -- so a permanently
-    // inert row was only taking up space. It is still a real channel on the agent; only the row is gone.
-    const pinnedChannels = channels.filter(
-        (channel) => PINNED_CHANNEL_TYPES.includes(channel.channelType) && channel.channelType !== 'workflowCall'
+    // No channel can be classified until the registry answers, and guessing is worse than waiting: an
+    // unclassified chat row would fall through to the list below and offer the Delete button a pinned channel
+    // must never have. One frame of an empty list beats one frame of a destructive affordance.
+    const classifiableChannels = isLoading ? [] : channels;
+
+    // pinned marks the two channels every agent gets by construction and can never remove. workflowCall is one
+    // of them but its row stays hidden, for the reason WORKFLOW_CALL_CHANNEL_TYPE records.
+    const pinnedChannels = classifiableChannels.filter(
+        (channel) =>
+            definitionsByType[channel.channelType]?.pinned && channel.channelType !== WORKFLOW_CALL_CHANNEL_TYPE
     );
-    const otherChannels = channels.filter(
-        (channel) => !PINNED_CHANNEL_TYPES.includes(channel.channelType) && channel.channelType !== 'schedule'
+
+    // A schedule row is a real agent_channel row, but it belongs to the Schedules section (AgentScheduleCard)
+    // rather than to a list of channels — it is the one entry the registry marks as not a channel at all.
+    const otherChannels = classifiableChannels.filter(
+        (channel) =>
+            !definitionsByType[channel.channelType]?.pinned && !definitionsByType[channel.channelType]?.schedule
     );
 
     const closeAddDialog = () => {
@@ -283,12 +241,19 @@ const AgentChannelsCard = ({agentId, channels}: AgentChannelsCardProps) => {
         >
             <ul className="space-y-2">
                 {pinnedChannels.map((channel) => (
-                    <AgentChannelRow channel={channel} key={channel.id} onEdit={setEditingChannel} pinned />
+                    <AgentChannelRow
+                        channel={channel}
+                        definition={definitionsByType[channel.channelType]}
+                        key={channel.id}
+                        onEdit={setEditingChannel}
+                        pinned
+                    />
                 ))}
 
                 {otherChannels.map((channel) => (
                     <AgentChannelRow
                         channel={channel}
+                        definition={definitionsByType[channel.channelType]}
                         key={channel.id}
                         onDelete={handleDeleteChannel}
                         onEdit={setEditingChannel}
@@ -319,9 +284,9 @@ const AgentChannelsCard = ({agentId, channels}: AgentChannelsCardProps) => {
                                 </SelectTrigger>
 
                                 <SelectContent>
-                                    {ADDABLE_CHANNEL_TYPES.map((type) => (
-                                        <SelectItem key={type} value={type}>
-                                            {CHANNEL_TYPE_LABELS[type] ?? type}
+                                    {addableDefinitions.map((definition) => (
+                                        <SelectItem key={definition.channelType} value={definition.channelType}>
+                                            {definition.title}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
@@ -332,11 +297,11 @@ const AgentChannelsCard = ({agentId, channels}: AgentChannelsCardProps) => {
                     target={
                         addChannelType
                             ? {
-                                  clusterElementName: CHANNEL_TRIGGER_NAMES[addChannelType] ?? '',
-                                  componentName: MESSAGING_CHANNEL_COMPONENT_NAMES[addChannelType] ?? '',
-                                  componentVersion: 1,
+                                  clusterElementName: definitionsByType[addChannelType]?.triggerName ?? '',
+                                  componentName: definitionsByType[addChannelType]?.componentName ?? '',
+                                  componentVersion: definitionsByType[addChannelType]?.componentVersion ?? 1,
                                   kind: 'TRIGGER',
-                                  title: CHANNEL_TYPE_LABELS[addChannelType] || addChannelType,
+                                  title: definitionsByType[addChannelType]?.title || addChannelType,
                               }
                             : null
                     }
@@ -361,14 +326,14 @@ const AgentChannelsCard = ({agentId, channels}: AgentChannelsCardProps) => {
                     open
                     pending={updateAgentChannelMutation.isPending}
                     target={{
-                        clusterElementName: CHANNEL_TRIGGER_NAMES[editingChannel.channelType] ?? '',
-                        componentName: MESSAGING_CHANNEL_COMPONENT_NAMES[editingChannel.channelType] ?? '',
-                        componentVersion: 1,
+                        clusterElementName: definitionsByType[editingChannel.channelType]?.triggerName ?? '',
+                        componentName: definitionsByType[editingChannel.channelType]?.componentName ?? '',
+                        componentVersion: definitionsByType[editingChannel.channelType]?.componentVersion ?? 1,
                         kind: 'TRIGGER',
-                        title: CHANNEL_TYPE_LABELS[editingChannel.channelType] || editingChannel.channelType,
+                        title: definitionsByType[editingChannel.channelType]?.title || editingChannel.channelType,
                     }}
                     title={`Configure ${
-                        CHANNEL_TYPE_LABELS[editingChannel.channelType] || editingChannel.channelType
+                        definitionsByType[editingChannel.channelType]?.title || editingChannel.channelType
                     } channel`}
                     workspaceId={Number(currentWorkspaceId)}
                 />

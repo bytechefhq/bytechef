@@ -1,36 +1,43 @@
 import Button from '@/components/Button/Button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {
+    type AiAgentChannelDefinitionType,
+    useAiAgentChannelDefinitions,
+} from '@/pages/automation/agents/hooks/useAiAgentChannelDefinitions';
 import {getPageUrl} from '@/pages/automation/project-deployments/components/project-deployment-workflow-list/util/pageUrl-utils';
 import {getAgentChatApi} from '@/shared/edition/agent-chat/agentChatApi';
 import {AiAgentDeploymentTrigger, AiAgentDeploymentWorkflow} from '@/shared/middleware/graphql';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
 import {ClipboardIcon, MessageCircleIcon} from 'lucide-react';
+import {useMemo} from 'react';
 import {Link} from 'react-router-dom';
 
-// Mirrors ChannelDefinitions on the server (automation-ai-agent-service): the trigger `type` string's first path
-// segment identifies the channel. Messaging channels all expose a STATIC_WEBHOOK trigger, so they get a copy-url
-// affordance instead of an in-app link/caption.
-const CHANNEL_LABELS: Record<string, string> = {
-    chat: 'Chat',
-    rocketchat: 'Rocket.Chat',
-    schedule: 'Schedule',
-    slack: 'Slack',
-    telegram: 'Telegram',
-    whatsApp: 'WhatsApp',
-    workflow: 'Workflow Call',
-};
-
-const MESSAGING_CHANNEL_PREFIXES = ['slack/', 'telegram/', 'whatsApp/', 'rocketchat/'];
+// The one reserved channel key this list names, matching AiAgentChannelType.CHAT server-side.
+const CHAT_CHANNEL_TYPE = 'chat';
 
 export const WORKFLOW_CALL_TRIGGER_TYPE = 'workflow/v1/newWorkflowCall';
 
-const getChannelLabel = (triggerType: string) => {
-    const prefix = triggerType.split('/')[0];
+/**
+ * A deployment carries a trigger TYPE (`<component>/v<version>/<trigger>`) where the registry is keyed by channel
+ * type, so the channel is recovered from the two the definition also carries.
+ *
+ * The fallback to the component alone is what keeps an already-published deployment readable: its trigger type is
+ * frozen at publish time, so a workflow published before Slack's channel moved from `anyEvent` to `newMessage`
+ * still has to name its channel rather than print a bare lowercase component name.
+ */
+const findChannelDefinition = (definitions: AiAgentChannelDefinitionType[], triggerType: string) => {
+    const [componentName, , triggerName] = triggerType.split('/');
 
-    return CHANNEL_LABELS[prefix] ?? prefix;
+    return (
+        definitions.find(
+            (definition) => definition.componentName === componentName && definition.triggerName === triggerName
+        ) ?? definitions.find((definition) => definition.componentName === componentName)
+    );
 };
 
 interface AgentDeploymentChannelListItemProps {
+    /** The channel this trigger belongs to, or undefined when no deployed component declares it. */
+    definition?: AiAgentChannelDefinitionType;
     /** The ProjectDeployment id and agent title, needed to open the chat as a conversation on EE. */
     projectDeploymentId: string;
     title: string;
@@ -41,15 +48,24 @@ interface AgentDeploymentChannelListItemProps {
 // and a telegram channel must never show one channel's URL under the other's row. Telegram is DYNAMIC_WEBHOOK (it
 // registers its webhook with the provider itself), so its staticWebhookUrl is always null and it correctly gets no
 // copy button below, same as schedule/workflowCall.
-const AgentDeploymentChannelListItem = ({projectDeploymentId, title, trigger}: AgentDeploymentChannelListItemProps) => {
+const AgentDeploymentChannelListItem = ({
+    definition,
+    projectDeploymentId,
+    title,
+    trigger,
+}: AgentDeploymentChannelListItemProps) => {
     /* eslint-disable @typescript-eslint/no-unused-vars */
     const [_, copyToClipboard] = useCopyToClipboard();
 
-    const label = getChannelLabel(trigger.type);
+    const label = definition?.title || trigger.type.split('/')[0];
 
-    const isChatTrigger = trigger.type.startsWith('chat/');
-    const isScheduleTrigger = trigger.type.startsWith('schedule/');
-    const isMessagingTrigger = MESSAGING_CHANNEL_PREFIXES.some((prefix) => trigger.type.startsWith(prefix));
+    const isChatTrigger = definition?.channelType === CHAT_CHANNEL_TYPE;
+    const isScheduleTrigger = definition?.schedule ?? false;
+
+    // Every channel that is neither pinned nor the schedule is a messaging channel reached over a STATIC_WEBHOOK,
+    // so it gets the copy-url affordance -- derived rather than listed, which is what brings twilio and infobip in
+    // (a hand-written prefix list had simply never been extended to them).
+    const isMessagingTrigger = definition != null && !definition.pinned && !definition.schedule;
 
     const expression = (trigger.parameters as {expression?: string} | undefined)?.expression;
     const staticWebhookUrl = trigger.staticWebhookUrl;
@@ -140,15 +156,22 @@ interface AgentDeploymentChannelListProps {
 }
 
 const AgentDeploymentChannelList = ({projectDeploymentId, title, workflows}: AgentDeploymentChannelListProps) => {
+    const {definitions} = useAiAgentChannelDefinitions();
+
     // workflowCall is hidden for the same reason it is hidden on the agent detail page: the generator always
     // emits it, it carries no configuration and nothing here can act on it, so the row was permanently inert.
-    const rows = workflows.flatMap((workflow) =>
-        workflow.triggers
-            .filter((trigger) => trigger.type !== WORKFLOW_CALL_TRIGGER_TYPE)
-            .map((trigger) => ({
-                key: `${workflow.workflowId}-${trigger.name}`,
-                trigger,
-            }))
+    const rows = useMemo(
+        () =>
+            workflows.flatMap((workflow) =>
+                workflow.triggers
+                    .filter((trigger) => trigger.type !== WORKFLOW_CALL_TRIGGER_TYPE)
+                    .map((trigger) => ({
+                        definition: findChannelDefinition(definitions, trigger.type),
+                        key: `${workflow.workflowId}-${trigger.name}`,
+                        trigger,
+                    }))
+            ),
+        [definitions, workflows]
     );
 
     if (!rows.length) {
@@ -157,8 +180,9 @@ const AgentDeploymentChannelList = ({projectDeploymentId, title, workflows}: Age
 
     return (
         <ul className="divide-y divide-stroke-neutral-primary">
-            {rows.map(({key, trigger}) => (
+            {rows.map(({definition, key, trigger}) => (
                 <AgentDeploymentChannelListItem
+                    definition={definition}
                     key={key}
                     projectDeploymentId={projectDeploymentId}
                     title={title}

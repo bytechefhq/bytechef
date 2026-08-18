@@ -3,6 +3,7 @@ import AgentScheduleDialog, {
     AgentSchedulePropertiesI,
 } from '@/pages/automation/agents/components/detail/AgentScheduleDialog';
 import AgentSection from '@/pages/automation/agents/components/detail/AgentSection';
+import {CADENCE_PARAMETER_KEYS} from '@/pages/automation/agents/utils/agentScheduleCron';
 import invalidateAgentQueries from '@/pages/automation/agents/utils/invalidateAgentQueries';
 import {
     AiAgentChannel,
@@ -28,10 +29,10 @@ interface AgentScheduleCardProps {
  * timezone, prompt) is larger than any messaging channel's.
  *
  * <p>
- * Underneath it is still an ordinary {@code agent_channel} row of type {@code schedule} — the same registry
- * entry ({@code ChannelDefinitions.schedule()} → {@code schedule/v1/cron}, backed by
- * {@code ScheduleComponentHandler}) the generator turns into an additional trigger on the agent's workflow.
- * Only the presentation is separate.
+ * Underneath it is still an ordinary {@code agent_channel} row of type {@code schedule}, which the generator
+ * turns into an additional {@code schedule/v1/cron} trigger on the agent's workflow. No component declares
+ * that entry — a schedule is the one thing in the list that is not a channel, so {@code AgentChannelResolver}
+ * synthesizes it from the {@code schedule} component's own trigger. Only the presentation is separate.
  * </p>
  */
 const AgentScheduleCard = ({agentId, channels}: AgentScheduleCardProps) => {
@@ -79,14 +80,24 @@ const AgentScheduleCard = ({agentId, channels}: AgentScheduleCardProps) => {
     };
 
     const toScheduleProperties = (channel: AiAgentChannel): AgentSchedulePropertiesI => {
-        const parameters = (channel.parameters ?? {}) as Record<string, string>;
+        const parameters = (channel.parameters ?? {}) as Record<string, unknown>;
 
-        return {
-            expression: parameters.expression ?? '',
-            name: parameters.name ?? '',
-            prompt: parameters.prompt ?? '',
-            timezone: parameters.timezone || 'UTC',
+        const properties: AgentSchedulePropertiesI = {
+            expression: String(parameters.expression ?? ''),
+            name: String(parameters.name ?? ''),
+            prompt: String(parameters.prompt ?? ''),
+            timezone: String(parameters.timezone || 'UTC'),
         };
+
+        // The cadence keys are carried through verbatim so the dialog can restore the picker; the dialog,
+        // not this card, is what interprets them.
+        for (const key of CADENCE_PARAMETER_KEYS) {
+            if (parameters[key] != null) {
+                properties[key] = String(parameters[key]);
+            }
+        }
+
+        return properties;
     };
 
     return (

@@ -1,6 +1,7 @@
 import {Input} from '@/components/Input/Input';
 import Switch from '@/components/Switch/Switch';
 import {Label} from '@/components/ui/label';
+import {useAiAgentChannelDefinitions} from '@/pages/automation/agents/hooks/useAiAgentChannelDefinitions';
 import invalidateAgentQueries from '@/pages/automation/agents/utils/invalidateAgentQueries';
 import {
     AiAgentChannel,
@@ -19,18 +20,6 @@ interface AgentApprovalSettingsProps {
     elements: AiAgentElement[];
 }
 
-// Which channel types can carry an approval, mirroring ChannelDefinition.approvalDelivery on the server. schedule
-// has nobody to ask and workflowCall's caller is another workflow, so neither appears.
-const APPROVAL_DELIVERY_CHANNEL_LABELS: Record<string, string> = {
-    chat: 'Chat',
-    infobip: 'Infobip (WhatsApp)',
-    rocketchat: 'Rocket.Chat',
-    slack: 'Slack',
-    telegram: 'Telegram',
-    twilio: 'Twilio (WhatsApp)',
-    whatsapp: 'WhatsApp',
-};
-
 /**
  * The agent's two independent HITL switches, rendered inside the Settings tab's toggle list rather than as a
  * section of their own.
@@ -48,9 +37,15 @@ const APPROVAL_DELIVERY_CHANNEL_LABELS: Record<string, string> = {
  * </p>
  */
 const AgentApprovalSettings = ({agentId, channels, elements}: AgentApprovalSettingsProps) => {
+    const {definitionsByType} = useAiAgentChannelDefinitions();
+
+    // A channel can carry an approval when its own declaration names an approval-delivery element, which is what
+    // approvalCapable reports. schedule has nobody to ask and workflowCall's caller is another workflow, so
+    // neither declares one -- and neither is named here, without this component having to know that.
     const deliveryChannelLabels = channels
-        .map((channel) => APPROVAL_DELIVERY_CHANNEL_LABELS[channel.channelType])
-        .filter((label): label is string => label != null);
+        .map((channel) => definitionsByType[channel.channelType])
+        .filter((definition) => definition?.approvalCapable)
+        .map((definition) => definition.title);
 
     const gateElement = elements.find((element) => element.kind === 'APPROVAL_GATE');
     const approvalToolElement = elements.find((element) => element.kind === 'APPROVAL_TOOL');

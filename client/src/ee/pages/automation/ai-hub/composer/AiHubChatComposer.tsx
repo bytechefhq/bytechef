@@ -1,7 +1,7 @@
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {isWebhookBridgedChat} from '@/ee/pages/automation/ai-hub/chats/api/chats.api';
+import {isChannelAgentChat, isWebhookBridgedChat} from '@/ee/pages/automation/ai-hub/chats/api/chats.api';
 import {useAiHubChatsQuery} from '@/ee/pages/automation/ai-hub/chats/hooks/useChats';
 import {useAiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
 import AiHubComposer from '@/ee/pages/automation/ai-hub/composer/AiHubComposer';
@@ -31,6 +31,7 @@ import {
     Loader2Icon,
     MicIcon,
     PaperclipIcon,
+    RadioTowerIcon,
     RotateCcwIcon,
     SquareIcon,
     XIcon,
@@ -97,6 +98,13 @@ const AiHubChatComposer = ({modelPicker}: AiHubChatComposerPropsI) => {
     const {data: chats} = useAiHubChatsQuery(currentWorkspaceId, currentEnvironmentId, 'ACTIVE');
     const activeChat = chats?.find((chat) => chat.id === currentChatId);
     const isWorkflowChat = isWebhookBridgedChat(activeChat?.kind);
+    // Channel-born agent chats (Slack, a schedule, …) are read-only: the conversation is driven by its
+    // channel, not by AI Hub, so a typed message here has nowhere real to go — the server's
+    // WebhookBridgeAgent rejects the null workflowExecutionId with an error rather than misrouting into
+    // the actual Slack channel, but that's a server-side safety net, not a substitute for the client not
+    // offering the affordance at all. isWorkflowChat alone is NOT this gate: typing is the entire point of
+    // a WORKFLOW_CHAT (and a composer-created AGENT_CHAT), so gating on it would break those.
+    const isChannelBornChat = activeChat != null && isChannelAgentChat(activeChat);
 
     const cancelWorkflowChatTurnMutation = useCancelWorkflowChatTurnMutation();
     const cancelAiHubRunMutation = useCancelAiHubRunMutation();
@@ -401,128 +409,149 @@ const AiHubChatComposer = ({modelPicker}: AiHubChatComposerPropsI) => {
                         </div>
                     )}
 
-                    <ComposerPrimitive.Input
-                        aria-label="Message input"
-                        autoFocus
-                        className="max-h-32 min-h-12 w-full resize-none border-0 bg-transparent px-4 pt-2 pb-1 text-sm ring-0 outline-none placeholder:text-muted-foreground"
-                        onKeyDown={handleKeyDown}
-                        placeholder="Send a message..."
-                        rows={1}
-                    />
+                    {isChannelBornChat ? (
+                        // Read-only affordance replacing the input entirely, rather than a disabled
+                        // ComposerPrimitive.Input: a channel-born row's conversation is driven by its
+                        // channel, not by AI Hub, so there is nothing for a typed message here to do — the
+                        // server-side WebhookBridgeAgent rejects it as an error rather than delivering it,
+                        // since the row has no workflowExecutionId to bridge into. Replacing the whole
+                        // control (rather than disabling it) makes that unambiguous without depending on
+                        // how the primitive's own disabled state renders.
+                        <div
+                            className="flex items-center gap-2 px-4 py-3 text-sm text-muted-foreground"
+                            data-testid="channel-born-readonly-notice"
+                        >
+                            <RadioTowerIcon aria-hidden className="size-4 shrink-0" />
 
-                    <div className="flex items-center justify-between gap-1 px-2 pb-2">
-                        <div className="flex min-w-0 items-center gap-1">
-                            {modelPicker}
-
-                            {/*
-                             * Resource attachment is hidden for workflow chats: the resource picker
-                             * (+), the paperclip file button, and the hidden file input. A workflow chat
-                             * forwards messages to a webhook trigger rather than an LLM agent, so attached
-                             * files/resources have nowhere to flow. Drag-drop and paste are gated separately
-                             * (the drop zone's `disabled` prop and the paste effect's early return).
-                             */}
-
-                            {!isWorkflowChat && (
-                                <>
-                                    <AiHubComposer />
-
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <button
-                                                aria-label="Attach file"
-                                                className="flex size-7 items-center justify-center rounded-full text-muted-foreground hover:bg-accent hover:text-foreground"
-                                                onClick={handleAttachClick}
-                                                type="button"
-                                            >
-                                                <PaperclipIcon className="size-4" />
-                                            </button>
-                                        </TooltipTrigger>
-
-                                        <TooltipContent>Attach file</TooltipContent>
-                                    </Tooltip>
-
-                                    {/* Renders nothing until the user types '/' — the skills pointer path is
-                                     * a branch of the "+" menu, this is the keyboard path's popover. */}
-                                    <AiHubSkillsMenu />
-
-                                    <input
-                                        accept={ALLOWED_MIME_TYPES.join(',')}
-                                        aria-label="File upload input"
-                                        className="hidden"
-                                        multiple
-                                        onChange={handleFileInputChange}
-                                        ref={fileInputRef}
-                                        type="file"
-                                    />
-                                </>
-                            )}
+                            <span>
+                                This conversation happens on its channel (Slack, a schedule, …) — you can read it here,
+                                but you can&apos;t reply from AI Hub.
+                            </span>
                         </div>
-
-                        <div className="flex shrink-0 items-center gap-2">
-                            <ModeSwitch
-                                build={mode === MODE.BUILD}
-                                onBuildChange={(build) => setMode(build ? MODE.BUILD : MODE.ASK)}
+                    ) : (
+                        <>
+                            <ComposerPrimitive.Input
+                                aria-label="Message input"
+                                autoFocus
+                                className="max-h-32 min-h-12 w-full resize-none border-0 bg-transparent px-4 pt-2 pb-1 text-sm ring-0 outline-none placeholder:text-muted-foreground"
+                                onKeyDown={handleKeyDown}
+                                placeholder="Send a message..."
+                                rows={1}
                             />
 
-                            {/*
-                             * Push-to-talk dictation: records a clip and transcribes it server-side via the configured
-                             * STT provider (POST /api/platform/internal/ai/transcribe), then appends the text to the
-                             * composer draft. See usePushToTalk.
-                             */}
+                            <div className="flex items-center justify-between gap-1 px-2 pb-2">
+                                <div className="flex min-w-0 items-center gap-1">
+                                    {modelPicker}
 
-                            <Button
-                                aria-label={isVoiceRecording ? 'Stop voice input' : 'Start voice input'}
-                                className="size-8 rounded-full"
-                                disabled={isVoiceTranscribing}
-                                icon={
-                                    isVoiceTranscribing ? (
-                                        <Loader2Icon className="size-4 animate-spin" />
-                                    ) : isVoiceRecording ? (
-                                        <SquareIcon className="size-3.5 animate-pulse fill-current text-content-destructive" />
-                                    ) : (
-                                        <MicIcon className="size-4" />
-                                    )
-                                }
-                                onClick={handleMicClick}
-                                size="icon"
-                                type="button"
-                                variant="ghost"
-                            />
+                                    {/*
+                                     * Resource attachment is hidden for workflow chats: the resource picker
+                                     * (+), the paperclip file button, and the hidden file input. A workflow chat
+                                     * forwards messages to a webhook trigger rather than an LLM agent, so attached
+                                     * files/resources have nowhere to flow. Drag-drop and paste are gated separately
+                                     * (the drop zone's `disabled` prop and the paste effect's early return).
+                                     */}
 
-                            <ThreadPrimitive.If running={false}>
-                                <ComposerPrimitive.Send asChild>
+                                    {!isWorkflowChat && (
+                                        <>
+                                            <AiHubComposer />
+
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <button
+                                                        aria-label="Attach file"
+                                                        className="flex size-7 items-center justify-center rounded-full text-muted-foreground hover:bg-accent hover:text-foreground"
+                                                        onClick={handleAttachClick}
+                                                        type="button"
+                                                    >
+                                                        <PaperclipIcon className="size-4" />
+                                                    </button>
+                                                </TooltipTrigger>
+
+                                                <TooltipContent>Attach file</TooltipContent>
+                                            </Tooltip>
+
+                                            <AiHubSkillsMenu />
+
+                                            <input
+                                                accept={ALLOWED_MIME_TYPES.join(',')}
+                                                aria-label="File upload input"
+                                                className="hidden"
+                                                multiple
+                                                onChange={handleFileInputChange}
+                                                ref={fileInputRef}
+                                                type="file"
+                                            />
+                                        </>
+                                    )}
+                                </div>
+
+                                <div className="flex shrink-0 items-center gap-2">
+                                    <ModeSwitch
+                                        build={mode === MODE.BUILD}
+                                        onBuildChange={(build) => setMode(build ? MODE.BUILD : MODE.ASK)}
+                                    />
+
+                                    {/*
+                                     * Push-to-talk dictation: records a clip and transcribes it server-side via the configured
+                                     * STT provider (POST /api/platform/internal/ai/transcribe), then appends the text to the
+                                     * composer draft. See usePushToTalk.
+                                     */}
+
                                     <Button
-                                        aria-label="Send message"
+                                        aria-label={isVoiceRecording ? 'Stop voice input' : 'Start voice input'}
                                         className="size-8 rounded-full"
-                                        icon={<ArrowUpIcon className="size-4" />}
+                                        disabled={isVoiceTranscribing}
+                                        icon={
+                                            isVoiceTranscribing ? (
+                                                <Loader2Icon className="size-4 animate-spin" />
+                                            ) : isVoiceRecording ? (
+                                                <SquareIcon className="size-3.5 animate-pulse fill-current text-content-destructive" />
+                                            ) : (
+                                                <MicIcon className="size-4" />
+                                            )
+                                        }
+                                        onClick={handleMicClick}
                                         size="icon"
-                                        type="submit"
-                                        variant="default"
+                                        type="button"
+                                        variant="ghost"
                                     />
-                                </ComposerPrimitive.Send>
-                            </ThreadPrimitive.If>
 
-                            <ThreadPrimitive.If running>
-                                {/*
-                                 * Custom Stop button (replaces ComposerPrimitive.Cancel) so we can fire the
-                                 * server-side cancelWorkflowChatTurn mutation alongside the client-side
-                                 * stream cancel for workflow chats. ComposerPrimitive.Cancel
-                                 * only closes the SSE stream — without the server-side stopJob call, the
-                                 * workflow keeps running on the server while the UI thinks it stopped.
-                                 */}
+                                    <ThreadPrimitive.If running={false}>
+                                        <ComposerPrimitive.Send asChild>
+                                            <Button
+                                                aria-label="Send message"
+                                                className="size-8 rounded-full"
+                                                icon={<ArrowUpIcon className="size-4" />}
+                                                size="icon"
+                                                type="submit"
+                                                variant="default"
+                                            />
+                                        </ComposerPrimitive.Send>
+                                    </ThreadPrimitive.If>
 
-                                <Button
-                                    aria-label={isWorkflowChat ? 'Stop running workflow' : 'Stop generating'}
-                                    className="size-8 rounded-full"
-                                    icon={<SquareIcon className="size-3.5 fill-current" />}
-                                    onClick={handleCancelTurn}
-                                    size="icon"
-                                    type="button"
-                                    variant="default"
-                                />
-                            </ThreadPrimitive.If>
-                        </div>
-                    </div>
+                                    <ThreadPrimitive.If running>
+                                        {/*
+                                         * Custom Stop button (replaces ComposerPrimitive.Cancel) so we can fire the
+                                         * server-side cancelWorkflowChatTurn mutation alongside the client-side
+                                         * stream cancel for workflow chats. ComposerPrimitive.Cancel
+                                         * only closes the SSE stream — without the server-side stopJob call, the
+                                         * workflow keeps running on the server while the UI thinks it stopped.
+                                         */}
+
+                                        <Button
+                                            aria-label={isWorkflowChat ? 'Stop running workflow' : 'Stop generating'}
+                                            className="size-8 rounded-full"
+                                            icon={<SquareIcon className="size-3.5 fill-current" />}
+                                            onClick={handleCancelTurn}
+                                            size="icon"
+                                            type="button"
+                                            variant="default"
+                                        />
+                                    </ThreadPrimitive.If>
+                                </div>
+                            </div>
+                        </>
+                    )}
                 </ComposerPrimitive.Root>
             </AiHubComposerDropZone>
         </div>

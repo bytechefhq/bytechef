@@ -1,3 +1,4 @@
+import {aiAgentChannelDefinitionsQueryResult} from '@/pages/automation/agents/hooks/aiAgentChannelDefinitions.fixture';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -51,8 +52,10 @@ vi.mock('@/shared/queries/automation/componentDefinitions.queries', () => ({
     useGetComponentDefinitionsQuery: getComponentDefinitionsQuery,
 }));
 
+// The generated query is mocked, so the real useAiAgentChannelDefinitions runs on top of it.
 vi.mock('@/shared/middleware/graphql', () => ({
     useAddAiAgentElementMutation: () => ({isPending: mutationPendingState.isAddPending, mutate: addAgentElementMutate}),
+    useAiAgentChannelDefinitionsQuery: () => aiAgentChannelDefinitionsQueryResult(),
     useDeleteAiAgentElementMutation: () => ({isPending: false, mutate: deleteAgentElementMutate}),
     useUpdateAiAgentElementMutation: () => ({isPending: false, mutate: updateAgentElementMutate}),
 }));
@@ -118,6 +121,27 @@ describe('AgentApprovalSettings', () => {
 
         expect(screen.getByText(/delivered to the agent's channels: Chat, Slack/)).toBeInTheDocument();
         expect(screen.queryByRole('button', {name: 'Add channel'})).not.toBeInTheDocument();
+    });
+
+    // Whether a channel can carry an approval is the channel's own declaration, not a list kept here: twilio
+    // declares a WhatsApp approval element and is named with the title that declaration carries, while
+    // workflowCall declares none and is silently skipped.
+    it('names an approval-capable channel by its declared title and skips one that declares none', () => {
+        wrap(
+            <AgentApprovalSettings
+                agentId="agent-1"
+                channels={
+                    [
+                        {channelType: 'twilio', connectionId: 'conn-2', id: 'twilio-1', parameters: {}, position: 0},
+                        {channelType: 'workflowCall', connectionId: null, id: 'wc-1', parameters: {}, position: 1},
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    ] as any
+                }
+                elements={[approvalToolElement]}
+            />
+        );
+
+        expect(screen.getByText(/delivered to the agent's channels: Twilio \(WhatsApp\)\./)).toBeInTheDocument();
     });
 
     // schedule and workflowCall cannot carry an approval — one has nobody to ask, the other's caller is another
