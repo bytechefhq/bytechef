@@ -55,7 +55,8 @@ class CustomComponentAgentToolCallbackTest {
         when(requestSpec.call()).thenReturn(responseSpec);
         when(responseSpec.content()).thenReturn(synthesised);
 
-        CustomComponentAgentToolCallback callback = new CustomComponentAgentToolCallback(customComponentChatClient);
+        CustomComponentAgentToolCallback callback =
+            new CustomComponentAgentToolCallback(chatModel -> customComponentChatClient, null);
 
         String result = callback.call("{\"request\":\"list my custom components\"}");
 
@@ -66,7 +67,8 @@ class CustomComponentAgentToolCallbackTest {
     void testCallReturnsErrorWhenRequestIsBlank() {
         ChatClient customComponentChatClient = mock(ChatClient.class);
 
-        CustomComponentAgentToolCallback callback = new CustomComponentAgentToolCallback(customComponentChatClient);
+        CustomComponentAgentToolCallback callback =
+            new CustomComponentAgentToolCallback(chatModel -> customComponentChatClient, null);
 
         String result = callback.call("{\"request\":\"   \"}");
 
@@ -78,7 +80,8 @@ class CustomComponentAgentToolCallbackTest {
     void testCallReturnsErrorOnInvalidJson() {
         ChatClient customComponentChatClient = mock(ChatClient.class);
 
-        CustomComponentAgentToolCallback callback = new CustomComponentAgentToolCallback(customComponentChatClient);
+        CustomComponentAgentToolCallback callback =
+            new CustomComponentAgentToolCallback(chatModel -> customComponentChatClient, null);
 
         String result = callback.call("not-json");
 
@@ -97,7 +100,8 @@ class CustomComponentAgentToolCallbackTest {
         when(requestSpec.call()).thenReturn(responseSpec);
         when(responseSpec.content()).thenReturn(null);
 
-        CustomComponentAgentToolCallback callback = new CustomComponentAgentToolCallback(customComponentChatClient);
+        CustomComponentAgentToolCallback callback =
+            new CustomComponentAgentToolCallback(chatModel -> customComponentChatClient, null);
 
         String result = callback.call("{\"request\":\"any request\"}");
 
@@ -121,7 +125,8 @@ class CustomComponentAgentToolCallbackTest {
         when(requestSpec.call()).thenReturn(responseSpec);
         when(responseSpec.content()).thenThrow(new RuntimeException("component repository unavailable"));
 
-        CustomComponentAgentToolCallback callback = new CustomComponentAgentToolCallback(customComponentChatClient);
+        CustomComponentAgentToolCallback callback =
+            new CustomComponentAgentToolCallback(chatModel -> customComponentChatClient, null);
 
         String result = callback.call("{\"request\":\"any\"}");
 
@@ -130,7 +135,7 @@ class CustomComponentAgentToolCallbackTest {
         assertThat(node.get("error")
             .asText())
                 .as("payload must surface tool name for the LLM to recover")
-                .contains("custom_component_agent failed")
+                .contains("buildCustomComponent failed")
                 .as("payload must NOT leak the exception's getMessage() text — see ToolErrors.runtimeFailure")
                 .doesNotContain("component repository unavailable");
     }
@@ -150,7 +155,8 @@ class CustomComponentAgentToolCallbackTest {
 
         ToolContext parentToolContext = new ToolContext(parentContextMap);
 
-        CustomComponentAgentToolCallback callback = new CustomComponentAgentToolCallback(customComponentChatClient);
+        CustomComponentAgentToolCallback callback =
+            new CustomComponentAgentToolCallback(chatModel -> customComponentChatClient, null);
 
         callback.call("{\"request\":\"any\"}", parentToolContext);
 
@@ -168,7 +174,8 @@ class CustomComponentAgentToolCallbackTest {
         when(requestSpec.call()).thenReturn(responseSpec);
         when(responseSpec.content()).thenReturn("ok");
 
-        CustomComponentAgentToolCallback callback = new CustomComponentAgentToolCallback(customComponentChatClient);
+        CustomComponentAgentToolCallback callback =
+            new CustomComponentAgentToolCallback(chatModel -> customComponentChatClient, null);
 
         callback.call("{\"request\":\"any\"}", null);
 
@@ -177,10 +184,11 @@ class CustomComponentAgentToolCallbackTest {
 
     @Test
     void testToolDefinitionExposesCustomComponentAgentNameAndRequestSchema() {
-        CustomComponentAgentToolCallback callback = new CustomComponentAgentToolCallback(mock(ChatClient.class));
+        CustomComponentAgentToolCallback callback =
+            new CustomComponentAgentToolCallback(chatModel -> mock(ChatClient.class), null);
 
         assertThat(callback.getToolDefinition()
-            .name()).isEqualTo("custom_component_agent");
+            .name()).isEqualTo("buildCustomComponent");
         assertThat(callback.getToolDefinition()
             .inputSchema()).contains("\"request\"");
     }
@@ -206,7 +214,8 @@ class CustomComponentAgentToolCallbackTest {
         when(requestSpec.call()).thenReturn(responseSpec);
         when(responseSpec.content()).thenThrow(upstreamException);
 
-        CustomComponentAgentToolCallback callback = new CustomComponentAgentToolCallback(customComponentChatClient);
+        CustomComponentAgentToolCallback callback =
+            new CustomComponentAgentToolCallback(chatModel -> customComponentChatClient, null);
 
         String result = callback.call("{\"request\":\"any\"}");
 
@@ -216,7 +225,7 @@ class CustomComponentAgentToolCallbackTest {
             .as("every upstream RuntimeException must produce a typed tool-error payload, not propagate")
             .isTrue();
         assertThat(node.get("error")
-            .asText()).contains("custom_component_agent failed");
+            .asText()).contains("buildCustomComponent failed");
     }
 
     private static void stubToolContext(ChatClientRequestSpec requestSpec) {

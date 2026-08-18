@@ -20,6 +20,9 @@ import com.bytechef.ai.agent.tool.AgentType;
 import com.bytechef.ai.agent.tool.CurrentAgentContext;
 import com.bytechef.ai.agent.tool.CurrentAgentContext.AgentBinding;
 import com.bytechef.ai.agent.tool.ToolErrors;
+import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
+import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolution;
+import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
 import com.bytechef.commons.util.JsonUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
@@ -54,7 +57,8 @@ public class WorkflowExecutionAgentToolCallback implements ToolCallback {
             subagent. Use this to inspect or diagnose a run — why it failed, which task errored, what a task's
             input/output was — and, in BUILD mode, to fix the underlying workflow. Pass the user request verbatim;
             the subagent resolves the execution and does its own analysis. Returns the synthesised analysis (ASK) or
-            the applied fix plus rationale (BUILD).""";
+            the applied fix plus rationale (BUILD). Include the workflow execution ID if known; otherwise describe
+            the run and the subagent resolves it by listing recent executions.""";
 
     private static final String INPUT_SCHEMA =
         """
@@ -69,17 +73,21 @@ public class WorkflowExecutionAgentToolCallback implements ToolCallback {
                 "required": ["request"]
             }""";
 
-    private final ChatClient workflowExecutionChatClient;
+    private final IntelligentToolChatClientFactory chatClientFactory;
+    private final @Nullable SubAgentChatModelResolver chatModelResolver;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public WorkflowExecutionAgentToolCallback(ChatClient workflowExecutionChatClient) {
-        this.workflowExecutionChatClient = workflowExecutionChatClient;
+    public WorkflowExecutionAgentToolCallback(
+        IntelligentToolChatClientFactory chatClientFactory, @Nullable SubAgentChatModelResolver chatModelResolver) {
+
+        this.chatClientFactory = chatClientFactory;
+        this.chatModelResolver = chatModelResolver;
     }
 
     @Override
     public ToolDefinition getToolDefinition() {
         return ToolDefinition.builder()
-            .name("workflow_execution_agent")
+            .name("debugWorkflowExecution")
             .description(DESCRIPTION)
             .inputSchema(INPUT_SCHEMA)
             .build();
@@ -103,11 +111,14 @@ public class WorkflowExecutionAgentToolCallback implements ToolCallback {
             AgentBinding parent = CurrentAgentContext.current();
             AgentType parentAgent = parent != null ? parent.agentName() : null;
 
-            Map<String, Object> forwardedContext = toolContext == null ? Map.of() : toolContext.getContext();
+            Map<String, Object> parentContext = toolContext == null ? Map.of() : toolContext.getContext();
 
-            String result = CurrentAgentContext.callWith(CopilotAgentType.WORKFLOW_EXECUTION_AGENT, parentAgent,
+            ChatClient workflowExecutionChatClient =
+                chatClientFactory.get(SubAgentChatModelResolution.resolve(chatModelResolver, parentContext));
+
+            String result = CurrentAgentContext.callWith(CopilotAgentType.DEBUG_WORKFLOW_EXECUTION, parentAgent,
                 () -> workflowExecutionChatClient.prompt(input.request())
-                    .toolContext(forwardedContext)
+                    .toolContext(parentContext)
                     .call()
                     .content());
 
@@ -122,14 +133,14 @@ public class WorkflowExecutionAgentToolCallback implements ToolCallback {
             return result;
         } catch (JacksonException exception) {
             log.warn(
-                "workflow_execution_agent rejected malformed tool input: {} — first 200 chars of input: {}",
+                "debugWorkflowExecution rejected malformed tool input: {} — first 200 chars of input: {}",
                 exception.getMessage(),
                 toolInput == null ? "<null>" : toolInput.substring(0, Math.min(toolInput.length(), 200)));
 
             return toolError("Invalid tool input: " + exception.getMessage());
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(
-                WorkflowExecutionAgentToolCallback.class, "workflow_execution_agent", exception);
+                WorkflowExecutionAgentToolCallback.class, "debugWorkflowExecution", exception);
         }
     }
 

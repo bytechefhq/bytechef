@@ -20,10 +20,11 @@ import com.agui.core.exception.AGUIException;
 import com.agui.core.state.State;
 import com.bytechef.ai.copilot.agent.OverrideChatClientResolver;
 import com.bytechef.ai.copilot.agent.ProjectSpringAIAgent;
-import com.bytechef.ai.copilot.tool.ConverterAgentToolCallback;
-import com.bytechef.ai.copilot.tool.ProjectWorkflowAgentToolCallback;
 import com.bytechef.ai.copilot.tool.RehydrateContextToolCallback;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
+import com.bytechef.ai.copilot.tool.catalog.IntelligentToolCatalog;
+import com.bytechef.ai.copilot.tool.catalog.IntelligentToolScope;
+import com.bytechef.ai.copilot.tool.catalog.IntelligentToolVariant;
 import com.bytechef.ai.copilot.util.Mode;
 import com.bytechef.ai.copilot.util.Source;
 import com.bytechef.automation.ai.tool.ProjectTools;
@@ -35,14 +36,11 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
-import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -55,8 +53,11 @@ import org.springframework.core.io.Resource;
  * and {@link ReadProjectWorkflowTools} are CE.
  *
  * <p>
- * The BUILD agent delegates workflow-content work to the {@code project_workflow_agent} and {@code converter_agent}
- * subagents when their {@link ChatClient} beans are present. It does NOT wire a code-workflow delegate:
+ * The BUILD agent delegates workflow-content work to the {@code buildWorkflow} and {@code importWorkflow} subagents,
+ * fetched from the {@link com.bytechef.ai.copilot.tool.catalog.IntelligentToolCatalog} via
+ * {@link com.bytechef.ai.copilot.tool.catalog.IntelligentToolCatalog#getForPanel} scoped to
+ * {@link com.bytechef.ai.copilot.tool.catalog.IntelligentToolScope#PROJECT}; the catalog silently omits either
+ * definition whose underlying {@code ChatClient} bean is absent. It does NOT wire a code-workflow delegate:
  * {@code CodeWorkflowAgentToolCallback} lives in the EE module {@code automation-ai-copilot}
  * ({@code server/ee/libs/automation/automation-ai/automation-ai-copilot}), and this module is CE. Wiring it here would
  * invert the CE/EE dependency direction. The EE module should contribute that delegate itself (e.g. by decorating or
@@ -64,7 +65,8 @@ import org.springframework.core.io.Resource;
  *
  * <p>
  * Gated on {@code bytechef.ai.copilot.enabled} rather than an OR with {@code bytechef.ai.hub.enabled}: the
- * {@code project_workflow_agent}/{@code converter_agent} delegate beans this configuration depends on are declared in
+ * {@code buildWorkflow}/{@code importWorkflow} delegate {@code ChatClient} beans that
+ * {@link com.bytechef.ai.copilot.config.CopilotIntelligentToolContributor} resolves are declared in
  * {@code CopilotConfiguration}, which is gated on {@code bytechef.ai.copilot.enabled} alone. An OR-gate here would let
  * this configuration register with {@code hub.enabled=true, copilot.enabled=false}, producing a {@code project_build}
  * agent whose prompt instructs it to delegate workflow-content work to those subagents while both are silently absent.
@@ -108,9 +110,7 @@ public class ProjectAgentConfiguration {
     ProjectSpringAIAgent projectBuildSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, ProjectTools projectTools,
         ProjectWorkflowTools projectWorkflowTools, SecurityContextRehydrator securityContextRehydrator,
-        @Qualifier("workflowEditorBuildSubAgentChatClient") ObjectProvider<ChatClient> workflowEditorProvider,
-        @Qualifier("converterBuildSubAgentChatClientSupplier") //
-        ObjectProvider<Supplier<ChatClient>> converterSupplierProvider,
+        IntelligentToolCatalog intelligentToolCatalog,
         ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider)
         throws AGUIException {
 
@@ -124,8 +124,7 @@ public class ProjectAgentConfiguration {
             .state(state)
             .toolCallbacks(
                 buildToolCallbacks(
-                    securityContextRehydrator, projectTools, projectWorkflowTools, workflowEditorProvider,
-                    converterSupplierProvider))
+                    securityContextRehydrator, projectTools, projectWorkflowTools, intelligentToolCatalog))
             .overrideChatClientResolver(overrideChatClientResolverProvider.getIfAvailable())
             .build();
     }
@@ -147,16 +146,18 @@ public class ProjectAgentConfiguration {
      */
     List<ToolCallback> buildToolCallbacks(
         SecurityContextRehydrator securityContextRehydrator, ProjectTools projectTools,
-        ProjectWorkflowTools projectWorkflowTools, ObjectProvider<ChatClient> workflowEditorProvider,
-        ObjectProvider<Supplier<ChatClient>> converterSupplierProvider) {
+        ProjectWorkflowTools projectWorkflowTools, IntelligentToolCatalog intelligentToolCatalog) {
 
         List<ToolCallback> toolCallbacks =
             new ArrayList<>(wrapTools(securityContextRehydrator, List.of(projectTools, projectWorkflowTools)));
 
-        workflowEditorProvider.ifAvailable(
-            chatClient -> toolCallbacks.add(new ProjectWorkflowAgentToolCallback(chatClient)));
-        converterSupplierProvider.ifAvailable(
-            supplier -> toolCallbacks.add(new ConverterAgentToolCallback(supplier)));
+        // Both delegates are registered bare here, matching their pre-catalog registration: the panel's flat CRUD
+        // tools (projectTools/projectWorkflowTools above) get RehydrateContextToolCallback via wrapTools, but these
+        // two intelligent delegates never did and still don't.
+        toolCallbacks.addAll(
+            intelligentToolCatalog.getForPanel(
+                IntelligentToolScope.PROJECT, IntelligentToolVariant.BUILD, (chatClient, definition) -> chatClient,
+                (toolCallback, definition) -> toolCallback));
 
         return toolCallbacks;
     }

@@ -17,6 +17,11 @@ dependencies {
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     implementation(project(":server:ee:libs:embedded:embedded-ai:embedded-ai-tool"))
 
+    // CopilotAgentType (ai-copilot-tool) implements AgentType, which ai-copilot-tool depends on as
+    // implementation-only; expose it here for EmbeddedIntelligentToolContributor's CopilotAgentType.key() calls
+    // and for tests that assert against them.
+    implementation(project(":server:libs:ai:ai-api"))
+
     testImplementation("org.assertj:assertj-core")
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.mockito:mockito-core")

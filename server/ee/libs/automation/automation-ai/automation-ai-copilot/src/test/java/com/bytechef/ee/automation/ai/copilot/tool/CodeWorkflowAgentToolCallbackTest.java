@@ -55,7 +55,8 @@ class CodeWorkflowAgentToolCallbackTest {
         when(requestSpec.call()).thenReturn(responseSpec);
         when(responseSpec.content()).thenReturn(synthesised);
 
-        CodeWorkflowAgentToolCallback callback = new CodeWorkflowAgentToolCallback(codeWorkflowChatClient);
+        CodeWorkflowAgentToolCallback callback =
+            new CodeWorkflowAgentToolCallback(chatModel -> codeWorkflowChatClient, null);
 
         String result = callback.call("{\"request\":\"list my code workflows\"}");
 
@@ -66,7 +67,8 @@ class CodeWorkflowAgentToolCallbackTest {
     void testCallReturnsErrorWhenRequestIsBlank() {
         ChatClient codeWorkflowChatClient = mock(ChatClient.class);
 
-        CodeWorkflowAgentToolCallback callback = new CodeWorkflowAgentToolCallback(codeWorkflowChatClient);
+        CodeWorkflowAgentToolCallback callback =
+            new CodeWorkflowAgentToolCallback(chatModel -> codeWorkflowChatClient, null);
 
         String result = callback.call("{\"request\":\"   \"}");
 
@@ -78,7 +80,8 @@ class CodeWorkflowAgentToolCallbackTest {
     void testCallReturnsErrorOnInvalidJson() {
         ChatClient codeWorkflowChatClient = mock(ChatClient.class);
 
-        CodeWorkflowAgentToolCallback callback = new CodeWorkflowAgentToolCallback(codeWorkflowChatClient);
+        CodeWorkflowAgentToolCallback callback =
+            new CodeWorkflowAgentToolCallback(chatModel -> codeWorkflowChatClient, null);
 
         String result = callback.call("not-json");
 
@@ -97,7 +100,8 @@ class CodeWorkflowAgentToolCallbackTest {
         when(requestSpec.call()).thenReturn(responseSpec);
         when(responseSpec.content()).thenReturn(null);
 
-        CodeWorkflowAgentToolCallback callback = new CodeWorkflowAgentToolCallback(codeWorkflowChatClient);
+        CodeWorkflowAgentToolCallback callback =
+            new CodeWorkflowAgentToolCallback(chatModel -> codeWorkflowChatClient, null);
 
         String result = callback.call("{\"request\":\"any request\"}");
 
@@ -121,7 +125,8 @@ class CodeWorkflowAgentToolCallbackTest {
         when(requestSpec.call()).thenReturn(responseSpec);
         when(responseSpec.content()).thenThrow(new RuntimeException("project repository unavailable"));
 
-        CodeWorkflowAgentToolCallback callback = new CodeWorkflowAgentToolCallback(codeWorkflowChatClient);
+        CodeWorkflowAgentToolCallback callback =
+            new CodeWorkflowAgentToolCallback(chatModel -> codeWorkflowChatClient, null);
 
         String result = callback.call("{\"request\":\"any\"}");
 
@@ -130,7 +135,7 @@ class CodeWorkflowAgentToolCallbackTest {
         assertThat(node.get("error")
             .asText())
                 .as("payload must surface tool name for the LLM to recover")
-                .contains("code_workflow_agent failed")
+                .contains("buildCodeWorkflow failed")
                 .as("payload must NOT leak the exception's getMessage() text — see ToolErrors.runtimeFailure")
                 .doesNotContain("project repository unavailable");
     }
@@ -150,7 +155,8 @@ class CodeWorkflowAgentToolCallbackTest {
 
         ToolContext parentToolContext = new ToolContext(parentContextMap);
 
-        CodeWorkflowAgentToolCallback callback = new CodeWorkflowAgentToolCallback(codeWorkflowChatClient);
+        CodeWorkflowAgentToolCallback callback =
+            new CodeWorkflowAgentToolCallback(chatModel -> codeWorkflowChatClient, null);
 
         callback.call("{\"request\":\"any\"}", parentToolContext);
 
@@ -168,7 +174,8 @@ class CodeWorkflowAgentToolCallbackTest {
         when(requestSpec.call()).thenReturn(responseSpec);
         when(responseSpec.content()).thenReturn("ok");
 
-        CodeWorkflowAgentToolCallback callback = new CodeWorkflowAgentToolCallback(codeWorkflowChatClient);
+        CodeWorkflowAgentToolCallback callback =
+            new CodeWorkflowAgentToolCallback(chatModel -> codeWorkflowChatClient, null);
 
         callback.call("{\"request\":\"any\"}", null);
 
@@ -177,10 +184,11 @@ class CodeWorkflowAgentToolCallbackTest {
 
     @Test
     void testToolDefinitionExposesCodeWorkflowAgentNameAndRequestSchema() {
-        CodeWorkflowAgentToolCallback callback = new CodeWorkflowAgentToolCallback(mock(ChatClient.class));
+        CodeWorkflowAgentToolCallback callback =
+            new CodeWorkflowAgentToolCallback(chatModel -> mock(ChatClient.class), null);
 
         assertThat(callback.getToolDefinition()
-            .name()).isEqualTo("code_workflow_agent");
+            .name()).isEqualTo("buildCodeWorkflow");
         assertThat(callback.getToolDefinition()
             .inputSchema()).contains("\"request\"");
     }
@@ -206,7 +214,8 @@ class CodeWorkflowAgentToolCallbackTest {
         when(requestSpec.call()).thenReturn(responseSpec);
         when(responseSpec.content()).thenThrow(upstreamException);
 
-        CodeWorkflowAgentToolCallback callback = new CodeWorkflowAgentToolCallback(codeWorkflowChatClient);
+        CodeWorkflowAgentToolCallback callback =
+            new CodeWorkflowAgentToolCallback(chatModel -> codeWorkflowChatClient, null);
 
         String result = callback.call("{\"request\":\"any\"}");
 
@@ -216,7 +225,7 @@ class CodeWorkflowAgentToolCallbackTest {
             .as("every upstream RuntimeException must produce a typed tool-error payload, not propagate")
             .isTrue();
         assertThat(node.get("error")
-            .asText()).contains("code_workflow_agent failed");
+            .asText()).contains("buildCodeWorkflow failed");
     }
 
     private static void stubToolContext(ChatClientRequestSpec requestSpec) {

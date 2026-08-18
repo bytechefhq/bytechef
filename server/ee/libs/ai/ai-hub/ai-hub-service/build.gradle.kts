@@ -121,4 +121,9 @@ dependencies {
     testImplementation(project(":server:libs:platform:platform-user:platform-user-service"))
     testImplementation(project(":server:libs:test:test-int-support"))
     testImplementation(project(":server:libs:test:test-support"))
+    // IntelligentToolSurfaceParityTest assembles the IntelligentToolCatalog over all three intelligent-tool
+    // contributors — CE ai-copilot-service and EE automation-ai-copilot are already implementation deps above;
+    // embedded-ai-copilot (EmbeddedIntelligentToolContributor / EmbeddedCopilotMcpContributorConfiguration) is
+    // needed only for that test.
+    testImplementation(project(":server:ee:libs:embedded:embedded-ai:embedded-ai-copilot"))
 }

@@ -79,7 +79,8 @@ public class CatalogChatClientResolverImpl implements CatalogChatClientResolver 
         return resolveChatModel(defaultModel.provider(), defaultModel.model(), environment);
     }
 
-    private @Nullable ChatModel resolveChatModel(String providerKey, String model, int environment) {
+    @Override
+    public @Nullable ChatModel resolveChatModel(String providerKey, String model, int environment) {
         Provider provider = Arrays.stream(Provider.values())
             .filter(curProvider -> Objects.equals(curProvider.getKey(), providerKey))
             .findFirst()

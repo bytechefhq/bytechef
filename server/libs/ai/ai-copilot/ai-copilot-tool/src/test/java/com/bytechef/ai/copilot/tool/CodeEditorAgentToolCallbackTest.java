@@ -62,7 +62,7 @@ class CodeEditorAgentToolCallbackTest {
         when(requestSpec.call()).thenReturn(responseSpec);
         when(responseSpec.content()).thenReturn(synthesised);
 
-        CodeEditorAgentToolCallback callback = new CodeEditorAgentToolCallback(chatClient);
+        CodeEditorAgentToolCallback callback = new CodeEditorAgentToolCallback(chatModel -> chatClient, null);
 
         String result = callback.call("{\"request\":\"uppercase the input\"}");
 
@@ -71,7 +71,8 @@ class CodeEditorAgentToolCallbackTest {
 
     @Test
     void testCallReturnsErrorWhenRequestIsBlank() {
-        CodeEditorAgentToolCallback callback = new CodeEditorAgentToolCallback(mock(ChatClient.class));
+        CodeEditorAgentToolCallback callback =
+            new CodeEditorAgentToolCallback(chatModel -> mock(ChatClient.class), null);
 
         String result = callback.call("{\"request\":\"   \"}");
 
@@ -81,7 +82,8 @@ class CodeEditorAgentToolCallbackTest {
 
     @Test
     void testCallReturnsErrorOnInvalidJson() {
-        CodeEditorAgentToolCallback callback = new CodeEditorAgentToolCallback(mock(ChatClient.class));
+        CodeEditorAgentToolCallback callback =
+            new CodeEditorAgentToolCallback(chatModel -> mock(ChatClient.class), null);
 
         String result = callback.call("not-json");
 
@@ -100,7 +102,7 @@ class CodeEditorAgentToolCallbackTest {
         when(requestSpec.call()).thenReturn(responseSpec);
         when(responseSpec.content()).thenReturn(null);
 
-        CodeEditorAgentToolCallback callback = new CodeEditorAgentToolCallback(chatClient);
+        CodeEditorAgentToolCallback callback = new CodeEditorAgentToolCallback(chatModel -> chatClient, null);
 
         String result = callback.call("{\"request\":\"any\"}");
 
@@ -122,7 +124,7 @@ class CodeEditorAgentToolCallbackTest {
         when(requestSpec.call()).thenReturn(responseSpec);
         when(responseSpec.content()).thenThrow(new RuntimeException("script engine failure"));
 
-        CodeEditorAgentToolCallback callback = new CodeEditorAgentToolCallback(chatClient);
+        CodeEditorAgentToolCallback callback = new CodeEditorAgentToolCallback(chatModel -> chatClient, null);
 
         String result = callback.call("{\"request\":\"any\"}");
 
@@ -131,7 +133,7 @@ class CodeEditorAgentToolCallbackTest {
         assertThat(node.get("error")
             .asText())
                 .as("payload must surface tool name")
-                .contains("code_editor_agent failed")
+                .contains("writeScript failed")
                 .as("payload must NOT leak the exception getMessage()")
                 .doesNotContain("script engine failure");
     }
@@ -151,7 +153,7 @@ class CodeEditorAgentToolCallbackTest {
 
         ToolContext parentToolContext = new ToolContext(parentContextMap);
 
-        CodeEditorAgentToolCallback callback = new CodeEditorAgentToolCallback(chatClient);
+        CodeEditorAgentToolCallback callback = new CodeEditorAgentToolCallback(chatModel -> chatClient, null);
 
         callback.call("{\"request\":\"any\"}", parentToolContext);
 
@@ -169,7 +171,7 @@ class CodeEditorAgentToolCallbackTest {
         when(requestSpec.call()).thenReturn(responseSpec);
         when(responseSpec.content()).thenReturn("ok");
 
-        CodeEditorAgentToolCallback callback = new CodeEditorAgentToolCallback(chatClient);
+        CodeEditorAgentToolCallback callback = new CodeEditorAgentToolCallback(chatModel -> chatClient, null);
 
         callback.call("{\"request\":\"any\"}", null);
 
@@ -178,10 +180,11 @@ class CodeEditorAgentToolCallbackTest {
 
     @Test
     void testToolDefinitionExposesCodeEditorAgentNameAndRequestSchema() {
-        CodeEditorAgentToolCallback callback = new CodeEditorAgentToolCallback(mock(ChatClient.class));
+        CodeEditorAgentToolCallback callback =
+            new CodeEditorAgentToolCallback(chatModel -> mock(ChatClient.class), null);
 
         assertThat(callback.getToolDefinition()
-            .name()).isEqualTo("code_editor_agent");
+            .name()).isEqualTo("writeScript");
         assertThat(callback.getToolDefinition()
             .inputSchema()).contains("\"request\"");
     }
@@ -207,7 +210,7 @@ class CodeEditorAgentToolCallbackTest {
         when(requestSpec.call()).thenReturn(responseSpec);
         when(responseSpec.content()).thenThrow(upstreamException);
 
-        CodeEditorAgentToolCallback callback = new CodeEditorAgentToolCallback(chatClient);
+        CodeEditorAgentToolCallback callback = new CodeEditorAgentToolCallback(chatModel -> chatClient, null);
 
         String result = callback.call("{\"request\":\"any\"}");
 
@@ -215,7 +218,7 @@ class CodeEditorAgentToolCallbackTest {
 
         assertThat(node.has("error")).isTrue();
         assertThat(node.get("error")
-            .asText()).contains("code_editor_agent failed");
+            .asText()).contains("writeScript failed");
     }
 
     private static void stubToolContext(ChatClientRequestSpec requestSpec) {

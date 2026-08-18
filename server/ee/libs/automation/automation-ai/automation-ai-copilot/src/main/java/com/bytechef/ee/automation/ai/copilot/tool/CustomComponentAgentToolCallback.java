@@ -12,6 +12,9 @@ import com.bytechef.ai.agent.tool.CurrentAgentContext;
 import com.bytechef.ai.agent.tool.CurrentAgentContext.AgentBinding;
 import com.bytechef.ai.agent.tool.ToolErrors;
 import com.bytechef.ai.copilot.tool.CopilotAgentType;
+import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
+import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolution;
+import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
 import com.bytechef.commons.util.JsonUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
@@ -44,7 +47,9 @@ public class CustomComponentAgentToolCallback implements ToolCallback {
             creating, updating, and deleting custom components, including authoring and iterating the source
             until it compiles. Prefer calling it over reasoning about custom components directly. The result
             is a synthesised markdown report or, in build mode, a summary of the mutations performed including
-            the affected custom component id and name.""";
+            the affected custom component id and name. Creates a new custom component when the request
+            describes one that doesn't exist, or updates/deletes an existing one named or identified by id in
+            the request.""";
 
     private static final String INPUT_SCHEMA =
         """
@@ -59,17 +64,21 @@ public class CustomComponentAgentToolCallback implements ToolCallback {
                 "required": ["request"]
             }""";
 
-    private final ChatClient customComponentChatClient;
+    private final IntelligentToolChatClientFactory chatClientFactory;
+    private final @Nullable SubAgentChatModelResolver chatModelResolver;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public CustomComponentAgentToolCallback(ChatClient customComponentChatClient) {
-        this.customComponentChatClient = customComponentChatClient;
+    public CustomComponentAgentToolCallback(
+        IntelligentToolChatClientFactory chatClientFactory, @Nullable SubAgentChatModelResolver chatModelResolver) {
+
+        this.chatClientFactory = chatClientFactory;
+        this.chatModelResolver = chatModelResolver;
     }
 
     @Override
     public ToolDefinition getToolDefinition() {
         return ToolDefinition.builder()
-            .name("custom_component_agent")
+            .name("buildCustomComponent")
             .description(DESCRIPTION)
             .inputSchema(INPUT_SCHEMA)
             .build();
@@ -94,12 +103,15 @@ public class CustomComponentAgentToolCallback implements ToolCallback {
             AgentBinding parent = CurrentAgentContext.current();
             AgentType parentAgent = parent != null ? parent.agentName() : null;
 
-            Map<String, Object> forwardedContext = toolContext == null ? Map.of() : toolContext.getContext();
+            Map<String, Object> parentContext = toolContext == null ? Map.of() : toolContext.getContext();
+
+            ChatClient customComponentChatClient =
+                chatClientFactory.get(SubAgentChatModelResolution.resolve(chatModelResolver, parentContext));
 
             String result = CurrentAgentContext.callWith(
-                CopilotAgentType.CUSTOM_COMPONENT_AGENT, parentAgent,
+                CopilotAgentType.BUILD_CUSTOM_COMPONENT, parentAgent,
                 () -> customComponentChatClient.prompt(request)
-                    .toolContext(forwardedContext)
+                    .toolContext(parentContext)
                     .call()
                     .content());
 
@@ -112,14 +124,14 @@ public class CustomComponentAgentToolCallback implements ToolCallback {
             return result;
         } catch (JacksonException exception) {
             log.warn(
-                "custom_component_agent rejected malformed tool input: {} — first 200 chars of input: {}",
+                "buildCustomComponent rejected malformed tool input: {} — first 200 chars of input: {}",
                 exception.getMessage(),
                 toolInput == null ? "<null>" : toolInput.substring(0, Math.min(toolInput.length(), 200)));
 
             return toolError("Invalid tool input: " + exception.getMessage());
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(
-                CustomComponentAgentToolCallback.class, "custom_component_agent", exception);
+                CustomComponentAgentToolCallback.class, "buildCustomComponent", exception);
         }
     }
 

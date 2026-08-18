@@ -12,23 +12,19 @@ import com.agui.core.state.State;
 import com.bytechef.ai.copilot.tool.AiAgentAgentToolCallback;
 import com.bytechef.ai.copilot.tool.AskUserQuestionToolCallback;
 import com.bytechef.ai.copilot.tool.AssetFileAgentToolCallback;
-import com.bytechef.ai.copilot.tool.ClusterElementAgentToolCallback;
-import com.bytechef.ai.copilot.tool.CodeEditorAgentToolCallback;
-import com.bytechef.ai.copilot.tool.ConverterAgentToolCallback;
 import com.bytechef.ai.copilot.tool.CopilotAgentType;
 import com.bytechef.ai.copilot.tool.CreateConnectionToolCallback;
 import com.bytechef.ai.copilot.tool.DataTableAgentToolCallback;
 import com.bytechef.ai.copilot.tool.KnowledgeBaseAgentToolCallback;
 import com.bytechef.ai.copilot.tool.ListConnectionsForComponentToolCallback;
 import com.bytechef.ai.copilot.tool.LookupComponentPropertyOptionsToolCallback;
-import com.bytechef.ai.copilot.tool.ProjectWorkflowAgentToolCallback;
 import com.bytechef.ai.copilot.tool.PropertyOptionsResolver;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
 import com.bytechef.ai.copilot.tool.SelectComponentPropertyOptionToolCallback;
 import com.bytechef.ai.copilot.tool.SelectConnectionToolCallback;
-import com.bytechef.ai.copilot.tool.SkillsAgentToolCallback;
-import com.bytechef.ai.copilot.tool.WorkflowExecutionAgentToolCallback;
 import com.bytechef.ai.copilot.tool.WorkspaceCopilotConnectionLister;
+import com.bytechef.ai.copilot.tool.catalog.IntelligentToolCatalog;
+import com.bytechef.ai.copilot.tool.catalog.IntelligentToolVariant;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.ai.tool.AutomationSubAgentType;
 import com.bytechef.automation.ai.tool.ClusterElementTools;
@@ -86,9 +82,7 @@ import com.bytechef.ee.ai.hub.toolsearch.AiHubGlobalToolCatalog;
 import com.bytechef.ee.ai.hub.toolsearch.ToolSearchCatalogFeeder;
 import com.bytechef.ee.ai.hub.util.Mode;
 import com.bytechef.ee.ai.hub.util.Source;
-import com.bytechef.ee.automation.ai.copilot.tool.CodeWorkflowAgentToolCallback;
 import com.bytechef.ee.automation.ai.copilot.tool.ContextStoreAgentToolCallback;
-import com.bytechef.ee.automation.ai.copilot.tool.CustomComponentAgentToolCallback;
 import com.bytechef.ee.automation.ai.tool.ApiCollectionSubAgentConfiguration;
 import com.bytechef.ee.automation.ai.tool.ListApiCollectionsToolCallback;
 import com.bytechef.ee.automation.apiplatform.configuration.facade.ApiCollectionFacade;
@@ -120,7 +114,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Supplier;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.toolsearch.ToolSearchToolCallingAdvisor;
@@ -167,6 +160,21 @@ public class AiHubConfiguration {
     static final String RESEARCH_SECTION_START_MARKER = "[[research:start]]";
     static final String RESEARCH_SECTION_END_MARKER = "[[research:end]]";
 
+    /**
+     * Names of the {@code com.bytechef.ai.copilot.tool.catalog.IntelligentToolDefinition}s the AI Hub registers on both
+     * its ASK and BUILD agents, filtered with {@link IntelligentToolCatalog#getByNames} over its own name partition.
+     *
+     * <p>
+     * This is deliberately EIGHT of the catalog's nine names, not all nine: {@code buildIntegrationWorkflow} is an
+     * embedded-product delegate (the embedded counterpart of {@code buildWorkflow}) that reaches only the embedded
+     * management-MCP surface — the AI Hub has never registered it and its prompts do not mention it. This is the one
+     * deliberate hub/MCP parity gap; {@code IntelligentToolSurfaceParityTest} asserts it explicitly.
+     * </p>
+     */
+    static final Set<String> INTELLIGENT_TOOL_NAMES = Set.of(
+        "authorSkill", "configureClusterElement", "writeScript", "buildWorkflow",
+        "debugWorkflowExecution", "importWorkflow", "buildCustomComponent", "buildCodeWorkflow");
+
     private final Resource promptAiHubAskResource;
     private final Resource promptAiHubAutoMemoryToolsResource;
     private final Resource promptAiHubBuildResource;
@@ -192,7 +200,6 @@ public class AiHubConfiguration {
     AiHubSpringAIAgent aiHubAskSpringAIAgent(
         AiHubSessionMemory aiHubSessionMemory, ChatModel chatModel, ObjectProvider<ToolCallback> toolCallbackProvider,
         @Qualifier("researchChatClient") ObjectProvider<ChatClient> researchChatClientProvider,
-        @Qualifier("skillsAskSubAgentChatClient") ObjectProvider<ChatClient> skillsAskSubAgentChatClientProvider,
         @Qualifier("contextStoreAskSubAgentChatClient") //
         ObjectProvider<ChatClient> contextStoreAskSubAgentChatClientProvider,
         @Qualifier("knowledgeBaseAskSubAgentChatClient") //
@@ -203,18 +210,6 @@ public class AiHubConfiguration {
         ObjectProvider<ChatClient> aiAgentAskSubAgentChatClientProvider,
         @Qualifier("assetFileAskSubAgentChatClient") //
         ObjectProvider<ChatClient> assetFileAskSubAgentChatClientProvider,
-        @Qualifier("clusterElementAskSubAgentChatClient") //
-        ObjectProvider<ChatClient> clusterElementAskSubAgentChatClientProvider,
-        @Qualifier("codeEditorAskSubAgentChatClient") //
-        ObjectProvider<ChatClient> codeEditorAskSubAgentChatClientProvider,
-        @Qualifier("workflowEditorAskSubAgentChatClient") //
-        ObjectProvider<ChatClient> workflowEditorAskSubAgentChatClientProvider,
-        @Qualifier("workflowExecutionAskSubAgentChatClient") //
-        ObjectProvider<ChatClient> workflowExecutionAskSubAgentChatClientProvider,
-        @Qualifier("customComponentAskSubAgentChatClient") //
-        ObjectProvider<ChatClient> customComponentAskSubAgentChatClientProvider,
-        @Qualifier("codeWorkflowAskSubAgentChatClient") //
-        ObjectProvider<ChatClient> codeWorkflowAskSubAgentChatClientProvider,
         AiHubChatService chatService,
         AiAutoMemoryService aiHubMemoryService,
         AssetFileFacade assetFileFacade,
@@ -235,7 +230,8 @@ public class AiHubConfiguration {
         ObjectProvider<LlmUsageRecorder> llmUsageRecorderProvider,
         ObjectProvider<AiGuardrails> aiGuardrailsProvider, ObjectProvider<MeterRegistry> meterRegistryProvider,
         ObjectProvider<WorkspaceSystemPrompts> workspaceSystemPromptsProvider,
-        AiHubToolAttachMetrics aiHubToolAttachMetrics, JsonMapper jsonMapper)
+        AiHubToolAttachMetrics aiHubToolAttachMetrics, JsonMapper jsonMapper,
+        IntelligentToolCatalog intelligentToolCatalog)
         throws AGUIException {
 
         String name = Source.AI_HUB.name() + "_" + Mode.ASK.name();
@@ -300,25 +296,29 @@ public class AiHubConfiguration {
         // way to enumerate. Read-only — both the ASK and BUILD agents register them so a casual ASK turn can
         // resolve "the staging customers API" / "my last research thread" to a concrete id without forcing the
         // user to switch into BUILD just to look something up. Workflow-execution lookups are now delegated to
-        // the workflow_execution_agent specialist (registered via registerCopilotSubAgentToolCallbacks).
+        // the debugWorkflowExecution specialist (registered via registerCopilotSubAgentToolCallbacks).
         toolCallbacks.add(new ListAiHubChatsToolCallback(chatService));
 
         // listApiCollections is demoted to the searchable catalog (aiHubAskGlobalToolCatalog) — rare enough
         // that it should not ride in every model call.
 
-        // Copilot specialist sub-agent delegation. Each is registered only when its backing ChatClient
+        // Copilot CRUD specialist sub-agent delegation. Each is registered only when its backing ChatClient
         // bean is present (the Copilot gate bytechef.ai.copilot.enabled is independent of AI Hub's
         // gate — if Copilot is disabled the beans are absent and the registrations are silently
-        // skipped). Converter is BUILD-only and passed as null here.
+        // skipped).
         registerCopilotSubAgentToolCallbacks(
-            toolCallbacks, skillsAskSubAgentChatClientProvider, contextStoreAskSubAgentChatClientProvider,
-            knowledgeBaseAskSubAgentChatClientProvider, dataTableAskSubAgentChatClientProvider,
-            aiAgentAskSubAgentChatClientProvider, assetFileAskSubAgentChatClientProvider, false,
-            clusterElementAskSubAgentChatClientProvider,
-            codeEditorAskSubAgentChatClientProvider, workflowEditorAskSubAgentChatClientProvider, null,
-            workflowExecutionAskSubAgentChatClientProvider, customComponentAskSubAgentChatClientProvider,
-            codeWorkflowAskSubAgentChatClientProvider, aiGuardrails, aiGuardrailMetrics, workspaceSystemPrompts,
+            toolCallbacks, contextStoreAskSubAgentChatClientProvider, knowledgeBaseAskSubAgentChatClientProvider,
+            dataTableAskSubAgentChatClientProvider, aiAgentAskSubAgentChatClientProvider,
+            assetFileAskSubAgentChatClientProvider, false, aiGuardrails, aiGuardrailMetrics, workspaceSystemPrompts,
             aiHubSessionMemory);
+
+        // Intelligent delegate tools (skills, cluster element, code editor, project workflow, workflow
+        // execution, converter, custom component, code workflow) come from the shared catalog. Converter has
+        // no ASK subagent ChatClient (Copilot ships only a BUILD-mode Converter agent), so the catalog skips
+        // it for this variant — matching the pre-catalog behaviour of passing null for the converter here.
+        registerIntelligentToolCallbacks(
+            toolCallbacks, intelligentToolCatalog, IntelligentToolVariant.ASK, aiGuardrails, aiGuardrailMetrics,
+            workspaceSystemPrompts, aiHubSessionMemory);
 
         AiHubSpringAIAgent.Builder builder = AiHubSpringAIAgent.builder()
             .agentId(name.toLowerCase())
@@ -385,7 +385,6 @@ public class AiHubConfiguration {
         @Qualifier("dataAnalystChatClient") ObjectProvider<ChatClient> dataAnalystChatClientProvider,
         @Qualifier("imageGeneratorChatClient") ObjectProvider<ChatClient> imageGeneratorChatClientProvider,
         @Qualifier("slideBuilderChatClient") ObjectProvider<ChatClient> slideBuilderChatClientProvider,
-        @Qualifier("skillsBuildSubAgentChatClient") ObjectProvider<ChatClient> skillsBuildSubAgentChatClientProvider,
         @Qualifier("contextStoreBuildSubAgentChatClient") //
         ObjectProvider<ChatClient> contextStoreBuildSubAgentChatClientProvider,
         @Qualifier("knowledgeBaseBuildSubAgentChatClient") //
@@ -396,20 +395,6 @@ public class AiHubConfiguration {
         ObjectProvider<ChatClient> aiAgentBuildSubAgentChatClientProvider,
         @Qualifier("assetFileBuildSubAgentChatClient") //
         ObjectProvider<ChatClient> assetFileBuildSubAgentChatClientProvider,
-        @Qualifier("clusterElementBuildSubAgentChatClient") //
-        ObjectProvider<ChatClient> clusterElementBuildSubAgentChatClientProvider,
-        @Qualifier("codeEditorBuildSubAgentChatClient") //
-        ObjectProvider<ChatClient> codeEditorBuildSubAgentChatClientProvider,
-        @Qualifier("workflowEditorBuildSubAgentChatClient") //
-        ObjectProvider<ChatClient> workflowEditorBuildSubAgentChatClientProvider,
-        @Qualifier("workflowExecutionBuildSubAgentChatClient") //
-        ObjectProvider<ChatClient> workflowExecutionBuildSubAgentChatClientProvider,
-        @Qualifier("converterBuildSubAgentChatClientSupplier") //
-        ObjectProvider<Supplier<ChatClient>> converterBuildSubAgentChatClientSupplierProvider,
-        @Qualifier("customComponentBuildSubAgentChatClient") //
-        ObjectProvider<ChatClient> customComponentBuildSubAgentChatClientProvider,
-        @Qualifier("codeWorkflowBuildSubAgentChatClient") //
-        ObjectProvider<ChatClient> codeWorkflowBuildSubAgentChatClientProvider,
         AssetFileFacade assetFileFacade, AiHubChatArtifactService chatArtifactService,
         AiHubChatArtifactRecorder aiHubChatArtifactRecorder,
         AiHubChatService chatService, AiAutoMemoryService aiHubMemoryService,
@@ -439,7 +424,8 @@ public class AiHubConfiguration {
         ObjectProvider<LlmUsageRecorder> llmUsageRecorderProvider,
         ObjectProvider<AiGuardrails> aiGuardrailsProvider, ObjectProvider<MeterRegistry> meterRegistryProvider,
         ObjectProvider<WorkspaceSystemPrompts> workspaceSystemPromptsProvider,
-        AiHubToolAttachMetrics aiHubToolAttachMetrics, JsonMapper jsonMapper)
+        AiHubToolAttachMetrics aiHubToolAttachMetrics, JsonMapper jsonMapper,
+        IntelligentToolCatalog intelligentToolCatalog)
         throws AGUIException {
 
         String name = Source.AI_HUB.name() + "_" + Mode.BUILD.name();
@@ -490,18 +476,21 @@ public class AiHubConfiguration {
         // createWorkflowChat is demoted to the searchable catalog (aiHubBuildGlobalToolCatalog) — rare enough
         // that it should not ride in every model call.
 
-        // Copilot specialist sub-agent delegation. Write-capable variants for the BUILD agent, plus
-        // the BUILD-only Converter sub-agent. Skips registrations when the corresponding ChatClient
-        // bean is absent (Copilot disabled).
+        // Copilot CRUD specialist sub-agent delegation. Write-capable variants for the BUILD agent. Skips
+        // registrations when the corresponding ChatClient bean is absent (Copilot disabled).
         registerCopilotSubAgentToolCallbacks(
-            toolCallbacks, skillsBuildSubAgentChatClientProvider, contextStoreBuildSubAgentChatClientProvider,
-            knowledgeBaseBuildSubAgentChatClientProvider, dataTableBuildSubAgentChatClientProvider,
-            aiAgentBuildSubAgentChatClientProvider, assetFileBuildSubAgentChatClientProvider, true,
-            clusterElementBuildSubAgentChatClientProvider,
-            codeEditorBuildSubAgentChatClientProvider, workflowEditorBuildSubAgentChatClientProvider,
-            converterBuildSubAgentChatClientSupplierProvider, workflowExecutionBuildSubAgentChatClientProvider,
-            customComponentBuildSubAgentChatClientProvider, codeWorkflowBuildSubAgentChatClientProvider, aiGuardrails,
-            aiGuardrailMetrics, workspaceSystemPrompts, aiHubSessionMemory);
+            toolCallbacks, contextStoreBuildSubAgentChatClientProvider, knowledgeBaseBuildSubAgentChatClientProvider,
+            dataTableBuildSubAgentChatClientProvider, aiAgentBuildSubAgentChatClientProvider,
+            assetFileBuildSubAgentChatClientProvider, true, aiGuardrails, aiGuardrailMetrics, workspaceSystemPrompts,
+            aiHubSessionMemory);
+
+        // Intelligent delegate tools (skills, cluster element, code editor, project workflow, workflow
+        // execution, converter, custom component, code workflow) come from the shared catalog, including the
+        // BUILD-only Converter sub-agent.
+        registerIntelligentToolCallbacks(
+            toolCallbacks, intelligentToolCatalog, IntelligentToolVariant.BUILD, aiGuardrails, aiGuardrailMetrics,
+            workspaceSystemPrompts, aiHubSessionMemory);
+
         toolCallbacks.add(new CreateConnectionToolCallback(componentDefinitionService));
         toolCallbacks.add(new SelectConnectionToolCallback(componentDefinitionService));
 
@@ -524,7 +513,7 @@ public class AiHubConfiguration {
 
         // Resource discovery — read-only and always-on. Mirrors the same registrations on the ASK agent so
         // a "list my chats" turn works identically regardless of which mode is active. Workflow-execution
-        // lookups are delegated to the workflow_execution_agent specialist.
+        // lookups are delegated to the debugWorkflowExecution specialist.
         toolCallbacks.add(new ListAiHubChatsToolCallback(chatService));
 
         // Auto-memory is now exposed via the forked AutoMemoryToolsAdvisor (DB-backed Resource seam),
@@ -773,15 +762,37 @@ public class AiHubConfiguration {
     }
 
     /**
+     * Registers the {@link #INTELLIGENT_TOOL_NAMES} delegates from the shared {@link IntelligentToolCatalog} for the
+     * given {@code variant}, decorated exactly like the pre-catalog registrations: each delegate's {@code ChatClient}
+     * is wrapped with {@link #wrapDelegate} and each resulting {@link ToolCallback} is wrapped in a
+     * {@link ProgressReportingToolCallback} labelled with the definition's own name. Extracted to keep both agent bean
+     * methods within Checkstyle's per-method line limit.
+     */
+    private static void registerIntelligentToolCallbacks(
+        List<ToolCallback> toolCallbacks, IntelligentToolCatalog intelligentToolCatalog,
+        IntelligentToolVariant variant, @Nullable AiGuardrails aiGuardrails,
+        @Nullable AiGuardrailMetrics aiGuardrailMetrics, @Nullable WorkspaceSystemPrompts workspaceSystemPrompts,
+        @Nullable AiHubSessionMemory aiHubSessionMemory) {
+
+        toolCallbacks.addAll(
+            intelligentToolCatalog.getByNames(
+                INTELLIGENT_TOOL_NAMES, variant,
+                (chatClient, definition) -> wrapDelegate(
+                    chatClient, definition.agentTypeKey(), aiGuardrails, aiGuardrailMetrics, workspaceSystemPrompts,
+                    aiHubSessionMemory),
+                (toolCallback, definition) -> new ProgressReportingToolCallback(toolCallback, definition.name())));
+    }
+
+    /**
      * Registers the optional ChatClient-based sub-agent tool callbacks (research, data analyst, image generator, slide
      * builder) on the supplied tool list. Each is only added when its backing ChatClient bean is present. Extracted to
      * keep the BUILD-agent bean method within Checkstyle's per-method line limit.
      *
      * <p>
      * The older {@code workflow_builder} ChatClient sub-agent is intentionally absent — it has been superseded by the
-     * Copilot {@code project_workflow_agent} specialist registered through
-     * {@link #registerCopilotSubAgentToolCallbacks}. The Copilot specialist persists workflows internally via
-     * {@code ProjectWorkflowTools}, eliminating the JSON round-trip {@code workflow_builder} required.
+     * Copilot {@code buildWorkflow} specialist registered through {@link #registerCopilotSubAgentToolCallbacks}. The
+     * Copilot specialist persists workflows internally via {@code ProjectWorkflowTools}, eliminating the JSON
+     * round-trip {@code workflow_builder} required.
      * </p>
      *
      * <p>
@@ -891,47 +902,28 @@ public class AiHubConfiguration {
     }
 
     /**
-     * Registers the Copilot specialist sub-agent ToolCallbacks (skills, context store, knowledge base, data table, ai
-     * agent builder, asset file, cluster element, code editor, workflow editor, converter) on the supplied tool list.
-     * Each is only added when its backing ChatClient bean is present — Copilot disabled or a particular specialist
-     * missing skips silently. Mirrors {@link #registerSubAgentToolCallbacks} for the older ChatClient sub-agents
-     * (research / data_analyst / image_generator / slide_builder).
+     * Registers the Copilot CRUD specialist sub-agent ToolCallbacks (context store, knowledge base, data table, ai
+     * agent builder, asset file) on the supplied tool list. Each is only added when its backing ChatClient bean is
+     * present — Copilot disabled or a particular specialist missing skips silently. Mirrors
+     * {@link #registerSubAgentToolCallbacks} for the older ChatClient sub-agents (research / data_analyst /
+     * image_generator / slide_builder).
      *
      * <p>
-     * The {@code converterProvider} is nullable because the ASK agent has no Converter specialist (Copilot only ships a
-     * BUILD-mode Converter agent); callers from the ASK bean pass {@code null} and the converter registration is
-     * skipped.
+     * The intelligent delegates that used to live here (skills, cluster element, code editor, project workflow,
+     * workflow execution, converter, custom component, code workflow) are now registered from the shared
+     * {@link IntelligentToolCatalog} at the call sites instead — see {@link #INTELLIGENT_TOOL_NAMES}.
      * </p>
      */
     private static void registerCopilotSubAgentToolCallbacks(
         List<ToolCallback> toolCallbacks,
-        ObjectProvider<ChatClient> skillsSubAgentChatClientProvider,
         ObjectProvider<ChatClient> contextStoreSubAgentChatClientProvider,
         ObjectProvider<ChatClient> knowledgeBaseSubAgentChatClientProvider,
         ObjectProvider<ChatClient> dataTableSubAgentChatClientProvider,
         ObjectProvider<ChatClient> aiAgentSubAgentChatClientProvider,
         ObjectProvider<ChatClient> assetFileSubAgentChatClientProvider, boolean assetFileWriteCapable,
-        ObjectProvider<ChatClient> clusterElementSubAgentChatClientProvider,
-        ObjectProvider<ChatClient> codeEditorSubAgentChatClientProvider,
-        ObjectProvider<ChatClient> workflowEditorSubAgentChatClientProvider,
-        @Nullable ObjectProvider<Supplier<ChatClient>> converterSubAgentChatClientSupplierProvider,
-        ObjectProvider<ChatClient> workflowExecutionSubAgentChatClientProvider,
-        ObjectProvider<ChatClient> customComponentSubAgentChatClientProvider,
-        ObjectProvider<ChatClient> codeWorkflowSubAgentChatClientProvider, @Nullable AiGuardrails aiGuardrails,
+        @Nullable AiGuardrails aiGuardrails,
         @Nullable AiGuardrailMetrics aiGuardrailMetrics, @Nullable WorkspaceSystemPrompts workspaceSystemPrompts,
         @Nullable AiHubSessionMemory aiHubSessionMemory) {
-
-        // The memory key is CopilotAgentType.SKILLS ("skills"), not this callback's "skills_agent" progress label —
-        // there is no skills_agent agent type, and an unregistered key would leave a session the chat-delete purge
-        // could never reconstruct.
-        skillsSubAgentChatClientProvider.ifAvailable(
-            chatClient -> toolCallbacks.add(
-                new ProgressReportingToolCallback(
-                    new SkillsAgentToolCallback(
-                        wrapDelegate(
-                            chatClient, CopilotAgentType.SKILLS.key(), aiGuardrails, aiGuardrailMetrics,
-                            workspaceSystemPrompts, aiHubSessionMemory)),
-                    "skills_agent")));
 
         contextStoreSubAgentChatClientProvider.ifAvailable(
             chatClient -> toolCallbacks.add(
@@ -978,71 +970,6 @@ public class AiHubConfiguration {
                             workspaceSystemPrompts, aiHubSessionMemory),
                         assetFileWriteCapable),
                     "asset_file_agent")));
-
-        clusterElementSubAgentChatClientProvider.ifAvailable(
-            chatClient -> toolCallbacks.add(
-                new ProgressReportingToolCallback(
-                    new ClusterElementAgentToolCallback(
-                        wrapDelegate(
-                            chatClient, CopilotAgentType.CLUSTER_ELEMENT_AGENT.key(), aiGuardrails,
-                            aiGuardrailMetrics, workspaceSystemPrompts, aiHubSessionMemory)),
-                    "cluster_element_agent")));
-
-        codeEditorSubAgentChatClientProvider.ifAvailable(
-            chatClient -> toolCallbacks.add(
-                new ProgressReportingToolCallback(
-                    new CodeEditorAgentToolCallback(
-                        wrapDelegate(
-                            chatClient, CopilotAgentType.CODE_EDITOR_AGENT.key(), aiGuardrails, aiGuardrailMetrics,
-                            workspaceSystemPrompts, aiHubSessionMemory)),
-                    "code_editor_agent")));
-
-        workflowEditorSubAgentChatClientProvider.ifAvailable(
-            chatClient -> toolCallbacks.add(
-                new ProgressReportingToolCallback(
-                    new ProjectWorkflowAgentToolCallback(
-                        wrapDelegate(
-                            chatClient, CopilotAgentType.PROJECT_WORKFLOW_AGENT.key(), aiGuardrails,
-                            aiGuardrailMetrics, workspaceSystemPrompts, aiHubSessionMemory)),
-                    "project_workflow_agent")));
-
-        workflowExecutionSubAgentChatClientProvider.ifAvailable(
-            chatClient -> toolCallbacks.add(
-                new ProgressReportingToolCallback(
-                    new WorkflowExecutionAgentToolCallback(
-                        wrapDelegate(
-                            chatClient, CopilotAgentType.WORKFLOW_EXECUTION_AGENT.key(), aiGuardrails,
-                            aiGuardrailMetrics, workspaceSystemPrompts, aiHubSessionMemory)),
-                    "workflow_execution_agent")));
-
-        if (converterSubAgentChatClientSupplierProvider != null) {
-            converterSubAgentChatClientSupplierProvider.ifAvailable(
-                converterChatClientSupplier -> toolCallbacks.add(
-                    new ProgressReportingToolCallback(
-                        new ConverterAgentToolCallback(
-                            () -> wrapDelegate(
-                                converterChatClientSupplier.get(), CopilotAgentType.CONVERTER_AGENT.key(),
-                                aiGuardrails, aiGuardrailMetrics, workspaceSystemPrompts, aiHubSessionMemory)),
-                        "converter_agent")));
-        }
-
-        customComponentSubAgentChatClientProvider.ifAvailable(
-            chatClient -> toolCallbacks.add(
-                new ProgressReportingToolCallback(
-                    new CustomComponentAgentToolCallback(
-                        wrapDelegate(
-                            chatClient, CopilotAgentType.CUSTOM_COMPONENT_AGENT.key(), aiGuardrails,
-                            aiGuardrailMetrics, workspaceSystemPrompts, aiHubSessionMemory)),
-                    "custom_component_agent")));
-
-        codeWorkflowSubAgentChatClientProvider.ifAvailable(
-            chatClient -> toolCallbacks.add(
-                new ProgressReportingToolCallback(
-                    new CodeWorkflowAgentToolCallback(
-                        wrapDelegate(
-                            chatClient, CopilotAgentType.CODE_WORKFLOW_AGENT.key(), aiGuardrails,
-                            aiGuardrailMetrics, workspaceSystemPrompts, aiHubSessionMemory)),
-                    "code_workflow_agent")));
     }
 
     /**

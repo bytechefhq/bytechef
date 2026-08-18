@@ -69,4 +69,18 @@ public interface CatalogChatClientResolver {
      */
     @Nullable
     ChatModel resolveDefaultChatModel(@Nullable String preferredProviderKey, int environment);
+
+    /**
+     * Resolves a {@link ChatModel} for the given environment ordinal, catalog provider key and model name. Mirrors
+     * {@link #resolve(String, String, int)} but returns the model unwrapped so callers can attach their own system
+     * prompt and tools.
+     *
+     * @param providerKey the catalog provider key (e.g. {@code "ai.provider.openAi"})
+     * @param model       the model name
+     * @param environment the environment ordinal (must be within the {@code Environment} enum range; out-of-range
+     *                    values fail closed and return {@code null})
+     * @return the resolved {@link ChatModel}, or {@code null} when the selection can't be resolved
+     */
+    @Nullable
+    ChatModel resolveChatModel(String providerKey, String model, int environment);
 }

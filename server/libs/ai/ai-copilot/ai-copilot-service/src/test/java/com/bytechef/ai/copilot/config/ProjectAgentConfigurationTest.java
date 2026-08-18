@@ -17,20 +17,33 @@
 package com.bytechef.ai.copilot.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.agui.core.exception.AGUIException;
 import com.bytechef.ai.copilot.agent.ProjectSpringAIAgent;
+import com.bytechef.ai.copilot.tool.ClusterElementAgentToolCallback;
+import com.bytechef.ai.copilot.tool.ConverterAgentToolCallback;
+import com.bytechef.ai.copilot.tool.ProjectWorkflowAgentToolCallback;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
+import com.bytechef.ai.copilot.tool.catalog.IntelligentToolCatalog;
+import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
+import com.bytechef.ai.copilot.tool.catalog.IntelligentToolContributor;
+import com.bytechef.ai.copilot.tool.catalog.IntelligentToolDefinition;
+import com.bytechef.ai.copilot.tool.catalog.IntelligentToolScope;
+import com.bytechef.ai.copilot.tool.catalog.IntelligentToolVariant;
 import com.bytechef.automation.ai.tool.ProjectTools;
 import com.bytechef.automation.ai.tool.ProjectWorkflowTools;
 import com.bytechef.automation.ai.tool.ReadProjectTools;
 import com.bytechef.automation.ai.tool.ReadProjectWorkflowTools;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.reflect.Field;
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Stream;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.memory.ChatMemory;
@@ -50,6 +63,8 @@ final class ProjectAgentConfigurationTest {
 
     @Test
     void testAskAgentUsesReadToolsAndBuildAgentUsesWriteTools() throws AGUIException {
+        IntelligentToolCatalog catalog = catalogOf(projectWorkflowDefinition(), converterDefinition());
+
         ProjectSpringAIAgent askAgent = configuration.projectAskSpringAIAgent(
             mock(ChatMemory.class), mock(ChatModel.class), new ReadProjectTools(mock(ProjectTools.class)),
             new ReadProjectWorkflowTools(mock(ProjectWorkflowTools.class)), securityContextRehydrator,
@@ -57,8 +72,7 @@ final class ProjectAgentConfigurationTest {
 
         ProjectSpringAIAgent buildAgent = configuration.projectBuildSpringAIAgent(
             mock(ChatMemory.class), mock(ChatModel.class), mock(ProjectTools.class), mock(ProjectWorkflowTools.class),
-            securityContextRehydrator, present(mock(ChatClient.class)), present(() -> mock(ChatClient.class)),
-            emptyProvider());
+            securityContextRehydrator, catalog, emptyProvider());
 
         assertThat(askAgent.getAgentId()).isEqualTo("project_ask");
         assertThat(buildAgent.getAgentId()).isEqualTo("project_build");
@@ -69,33 +83,30 @@ final class ProjectAgentConfigurationTest {
                 new ReadProjectWorkflowTools(mock(ProjectWorkflowTools.class))));
 
         assertThat(askToolNames).contains("listProjects")
-            .doesNotContain("createProject");
+            .doesNotContain("createProject", "buildWorkflow", "importWorkflow");
 
         List<String> buildToolNames = toolNames(
             configuration.buildToolCallbacks(
-                securityContextRehydrator, mock(ProjectTools.class), mock(ProjectWorkflowTools.class),
-                present(mock(ChatClient.class)), present(() -> mock(ChatClient.class))));
+                securityContextRehydrator, mock(ProjectTools.class), mock(ProjectWorkflowTools.class), catalog));
 
-        assertThat(buildToolNames).contains("createProject", "project_workflow_agent");
+        assertThat(buildToolNames).contains("createProject", "buildWorkflow", "importWorkflow");
     }
 
     /**
-     * {@code buildToolCallbacks} is exercised directly with empty {@link ObjectProvider}s here purely to verify the
-     * defensive {@code ifAvailable} skip mechanics. This is NOT a supported runtime configuration: since
-     * {@code ProjectAgentConfiguration} is now gated on {@code bytechef.ai.copilot.enabled} alone (matching
-     * {@code CopilotConfiguration}, which declares the {@code workflowEditorBuildSubAgentChatClient} and
-     * {@code converterBuildSubAgentChatClientSupplier} beans), the delegates are always present whenever this
-     * configuration's beans are registered.
+     * {@code buildWorkflow} and {@code importWorkflow} are the only two definitions
+     * {@code CopilotIntelligentToolContributor} scopes to {@link IntelligentToolScope#PROJECT} — every other
+     * intelligent delegate (e.g. {@code configureClusterElement}, which ships with an empty {@code panelScopes()}) must
+     * not reach this panel's build tool list.
      */
     @Test
-    void testBuildToolCallbacksSkipsDelegatesWhenProvidersEmpty() {
+    void testBuildToolCallbacksOmitsDefinitionsNotScopedToProjectPanel() {
         List<String> buildToolNames = toolNames(
             configuration.buildToolCallbacks(
                 securityContextRehydrator, mock(ProjectTools.class), mock(ProjectWorkflowTools.class),
-                emptyProvider(), emptyProvider()));
+                catalogOf(clusterElementDefinition())));
 
         assertThat(buildToolNames).contains("createProject")
-            .doesNotContain("project_workflow_agent", "converter_agent");
+            .doesNotContain("configureClusterElement");
     }
 
     private static ProjectAgentConfiguration newConfiguration() {
@@ -128,23 +139,97 @@ final class ProjectAgentConfigurationTest {
     }
 
     @SuppressWarnings("unchecked")
-    private static <T> ObjectProvider<T> present(T value) {
-        ObjectProvider<T> provider = mock(ObjectProvider.class);
+    private static <T> ObjectProvider<T> emptyProvider() {
+        return mock(ObjectProvider.class);
+    }
 
-        doAnswer(invocation -> {
-            Consumer<T> consumer = invocation.getArgument(0);
+    private static IntelligentToolDefinition projectWorkflowDefinition() {
+        ChatClient chatClient = mock(ChatClient.class);
 
-            consumer.accept(value);
+        return new FakeIntelligentToolDefinition(
+            "buildWorkflow", Set.of(IntelligentToolScope.PROJECT),
+            Map.of(IntelligentToolVariant.BUILD, (IntelligentToolChatClientFactory) chatModel -> chatClient),
+            chatClientFactory -> new ProjectWorkflowAgentToolCallback(chatClientFactory, null));
+    }
 
-            return null;
-        }).when(provider)
-            .ifAvailable(any());
+    private static IntelligentToolDefinition converterDefinition() {
+        ChatClient chatClient = mock(ChatClient.class);
 
-        return provider;
+        return new FakeIntelligentToolDefinition(
+            "importWorkflow", Set.of(IntelligentToolScope.PROJECT),
+            Map.of(IntelligentToolVariant.BUILD, (IntelligentToolChatClientFactory) chatModel -> chatClient),
+            chatClientFactory -> new ConverterAgentToolCallback(chatClientFactory, null));
+    }
+
+    private static IntelligentToolDefinition clusterElementDefinition() {
+        ChatClient chatClient = mock(ChatClient.class);
+
+        return new FakeIntelligentToolDefinition(
+            "configureClusterElement", Set.of(),
+            Map.of(IntelligentToolVariant.BUILD, (IntelligentToolChatClientFactory) chatModel -> chatClient),
+            chatClientFactory -> new ClusterElementAgentToolCallback(chatClientFactory, null));
+    }
+
+    private static IntelligentToolCatalog catalogOf(IntelligentToolDefinition... definitions) {
+        IntelligentToolContributor contributor = () -> List.of(definitions);
+
+        return new IntelligentToolCatalog(fixedObjectProvider(contributor));
     }
 
     @SuppressWarnings("unchecked")
-    private static <T> ObjectProvider<T> emptyProvider() {
-        return mock(ObjectProvider.class);
+    private static ObjectProvider<IntelligentToolContributor> fixedObjectProvider(
+        IntelligentToolContributor contributor) {
+
+        ObjectProvider<IntelligentToolContributor> objectProvider = mock(ObjectProvider.class);
+
+        when(objectProvider.orderedStream()).thenReturn(Stream.of(contributor));
+
+        return objectProvider;
+    }
+
+    private static final class FakeIntelligentToolDefinition implements IntelligentToolDefinition {
+
+        private final String name;
+        private final Set<IntelligentToolScope> panelScopes;
+        private final Map<IntelligentToolVariant, IntelligentToolChatClientFactory> chatClientFactoriesByVariant;
+        private final Function<IntelligentToolChatClientFactory, ToolCallback> toolCallbackFactory;
+
+        private FakeIntelligentToolDefinition(
+            String name, Set<IntelligentToolScope> panelScopes,
+            Map<IntelligentToolVariant, IntelligentToolChatClientFactory> chatClientFactoriesByVariant,
+            Function<IntelligentToolChatClientFactory, ToolCallback> toolCallbackFactory) {
+
+            this.name = name;
+            this.panelScopes = panelScopes;
+            this.chatClientFactoriesByVariant = chatClientFactoriesByVariant;
+            this.toolCallbackFactory = toolCallbackFactory;
+        }
+
+        @Override
+        public String name() {
+            return name;
+        }
+
+        @Override
+        public String agentTypeKey() {
+            return name;
+        }
+
+        @Override
+        @SuppressFBWarnings("EI_EXPOSE_REP")
+        public Set<IntelligentToolScope> panelScopes() {
+            return panelScopes;
+        }
+
+        @Override
+        @Nullable
+        public IntelligentToolChatClientFactory chatClientFactory(IntelligentToolVariant variant) {
+            return chatClientFactoriesByVariant.get(variant);
+        }
+
+        @Override
+        public ToolCallback create(IntelligentToolChatClientFactory chatClientFactory) {
+            return toolCallbackFactory.apply(chatClientFactory);
+        }
     }
 }

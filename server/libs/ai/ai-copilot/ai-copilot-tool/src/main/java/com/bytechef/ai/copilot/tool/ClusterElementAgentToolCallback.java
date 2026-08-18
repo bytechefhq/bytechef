@@ -20,6 +20,9 @@ import com.bytechef.ai.agent.tool.AgentType;
 import com.bytechef.ai.agent.tool.CurrentAgentContext;
 import com.bytechef.ai.agent.tool.CurrentAgentContext.AgentBinding;
 import com.bytechef.ai.agent.tool.ToolErrors;
+import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
+import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolution;
+import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
 import com.bytechef.commons.util.JsonUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
@@ -48,7 +51,9 @@ public class ClusterElementAgentToolCallback implements ToolCallback {
             Cluster elements are the slotted child operations inside cluster-root components (AI Agent,
             Knowledge Base, etc.) — model, chat memory, RAG source, guardrails, tools. The subagent owns
             the canonical behaviour for designing, editing, and explaining cluster element configuration;
-            prefer calling it over reasoning about cluster element shape directly.""";
+            prefer calling it over reasoning about cluster element shape directly. Include the workflow's
+            ID and the target task's name in the request — the subagent needs both to locate the cluster
+            element inside the workflow.""";
 
     private static final String INPUT_SCHEMA =
         """
@@ -63,17 +68,21 @@ public class ClusterElementAgentToolCallback implements ToolCallback {
                 "required": ["request"]
             }""";
 
-    private final ChatClient clusterElementChatClient;
+    private final IntelligentToolChatClientFactory chatClientFactory;
+    private final @Nullable SubAgentChatModelResolver chatModelResolver;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public ClusterElementAgentToolCallback(ChatClient clusterElementChatClient) {
-        this.clusterElementChatClient = clusterElementChatClient;
+    public ClusterElementAgentToolCallback(
+        IntelligentToolChatClientFactory chatClientFactory, @Nullable SubAgentChatModelResolver chatModelResolver) {
+
+        this.chatClientFactory = chatClientFactory;
+        this.chatModelResolver = chatModelResolver;
     }
 
     @Override
     public ToolDefinition getToolDefinition() {
         return ToolDefinition.builder()
-            .name("cluster_element_agent")
+            .name("configureClusterElement")
             .description(DESCRIPTION)
             .inputSchema(INPUT_SCHEMA)
             .build();
@@ -98,12 +107,15 @@ public class ClusterElementAgentToolCallback implements ToolCallback {
             AgentBinding parent = CurrentAgentContext.current();
             AgentType parentAgent = parent != null ? parent.agentName() : null;
 
-            Map<String, Object> forwardedContext = toolContext == null ? Map.of() : toolContext.getContext();
+            Map<String, Object> parentContext = toolContext == null ? Map.of() : toolContext.getContext();
+
+            ChatClient clusterElementChatClient =
+                chatClientFactory.get(SubAgentChatModelResolution.resolve(chatModelResolver, parentContext));
 
             String result = CurrentAgentContext.callWith(
-                CopilotAgentType.CLUSTER_ELEMENT_AGENT, parentAgent,
+                CopilotAgentType.CONFIGURE_CLUSTER_ELEMENT, parentAgent,
                 () -> clusterElementChatClient.prompt(request)
-                    .toolContext(forwardedContext)
+                    .toolContext(parentContext)
                     .call()
                     .content());
 
@@ -116,14 +128,14 @@ public class ClusterElementAgentToolCallback implements ToolCallback {
             return result;
         } catch (JacksonException exception) {
             log.warn(
-                "cluster_element_agent rejected malformed tool input: {} — first 200 chars of input: {}",
+                "configureClusterElement rejected malformed tool input: {} — first 200 chars of input: {}",
                 exception.getMessage(),
                 toolInput == null ? "<null>" : toolInput.substring(0, Math.min(toolInput.length(), 200)));
 
             return toolError("Invalid tool input: " + exception.getMessage());
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(
-                ClusterElementAgentToolCallback.class, "cluster_element_agent", exception);
+                ClusterElementAgentToolCallback.class, "configureClusterElement", exception);
         }
     }
 

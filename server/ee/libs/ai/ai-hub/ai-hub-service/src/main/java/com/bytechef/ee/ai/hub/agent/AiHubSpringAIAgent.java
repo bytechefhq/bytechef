@@ -240,6 +240,11 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
         return advisorParams;
     }
 
+    /**
+     * The {@code llmProvider}/{@code llmModel} keys populated here MUST stay consistent with
+     * {@link AiHubChatClientResolver}, this surface's {@code OverrideChatClientResolver} — a mismatch would run a
+     * delegate subagent on a different model than the one its caller resolved for this turn.
+     */
     @Override
     protected Map<String, Object> toolContext(RunAgentInput input) {
         AiHubToolInvocationContext aiHubContext = buildInvocationContext(input);
@@ -251,6 +256,8 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
             : asString(input.state()
                 .get(AiHubStateKeys.VERIFIED_TENANT_ID));
 
+        SelectedLlm selectedLlm = resolveSelectedLlm(input.state());
+
         toolContext.putAll(
             AgentToolInvocationContext.builder()
                 .workspaceId(aiHubContext.workspaceId())
@@ -258,10 +265,49 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
                 .environmentId(aiHubContext.environmentId())
                 .conversationId(aiHubContext.threadId())
                 .tenantId(tenantId)
+                .llmProvider(selectedLlm == null ? null : selectedLlm.provider())
+                .llmModel(selectedLlm == null ? null : selectedLlm.model())
                 .build()
                 .toToolContext());
 
         return toolContext;
+    }
+
+    /**
+    /**
+     * The (provider, model) pair a subagent delegate should be handed. Precedence mirrors
+     * {@link AiHubChatClientResolver#resolve(State)} exactly: the user's per-conversation selection
+     * ({@link AiHubStateKeys#USER_SELECTED_LLM_PROVIDER_KEY} / {@link AiHubStateKeys#USER_SELECTED_LLM_MODEL_KEY}).
+     * A half-set pair (only one of provider/model present) is a transient client artifact, not malicious input, so it
+     * yields null after a single warning log rather than failing the turn — the delegate then inherits the workspace
+     * default, exactly as the resolver's own fallback does.
+     */
+    static @Nullable SelectedLlm resolveSelectedLlm(@Nullable State state) {
+        if (state == null) {
+            return null;
+        }
+
+        String llmProvider = asString(state.get(AiHubStateKeys.USER_SELECTED_LLM_PROVIDER_KEY));
+        String llmModel = asString(state.get(AiHubStateKeys.USER_SELECTED_LLM_MODEL_KEY));
+
+        if ((llmProvider == null) != (llmModel == null)) {
+            log.warn(
+                "User-selected LLM half-set (provider={}, model={}); falling back to the workspace default",
+                llmProvider, llmModel);
+        }
+
+        if (llmProvider == null || llmModel == null) {
+            return null;
+        }
+
+        return new SelectedLlm(llmProvider, llmModel);
+    }
+
+    /**
+     * The (provider, model) pair resolved by {@link #resolveSelectedLlm(State)}, carried into the tool context for
+     * subagent delegates.
+     */
+    record SelectedLlm(String provider, String model) {
     }
 
     /**

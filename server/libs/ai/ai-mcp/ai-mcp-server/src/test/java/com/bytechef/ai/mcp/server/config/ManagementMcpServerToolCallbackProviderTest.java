@@ -49,7 +49,7 @@ class ManagementMcpServerToolCallbackProviderTest {
 
         when(contributed.getToolDefinition()).thenReturn(
             ToolDefinition.builder()
-                .name("project_workflow_agent")
+                .name("buildWorkflow")
                 .description("d")
                 .inputSchema("{\"type\":\"object\"}")
                 .build());
@@ -68,7 +68,7 @@ class ManagementMcpServerToolCallbackProviderTest {
                 .name())
             .toList();
 
-        assertThat(names).contains("project_workflow_agent");
+        assertThat(names).contains("buildWorkflow");
     }
 
     @Test

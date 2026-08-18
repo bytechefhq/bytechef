@@ -14,6 +14,7 @@ import com.bytechef.ai.copilot.agent.WorkflowEditorSpringAIAgent;
 import com.bytechef.ai.copilot.agent.WorkflowExecutionSpringAIAgent;
 import com.bytechef.ai.copilot.tool.RehydrateContextToolCallback;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
+import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.embedded.ai.copilot.agent.EmbeddedCodeWorkflowSpringAIAgent;
@@ -93,7 +94,18 @@ public class EmbeddedCopilotConfiguration {
     private final WorkflowInstructionTools workflowInstructionTools;
     private final State state = new State();
 
-    @SuppressFBWarnings("EI")
+    // Read once at configuration init rather than per delegation: workflowEditorEmbeddedBuildSubAgentChatClientFactory
+    // rebuilds its ChatClient on every delegation (to honour a caller-picked ChatModel), and getSystemPrompt(Resource)
+    // performs I/O.
+    private final String workflowEditorEmbeddedBuildSystemPrompt;
+
+    // CT_CONSTRUCTOR_THROW: the constructor reads and validates the workflow-editor-embedded-build prompt resource up
+    // front (see workflowEditorEmbeddedBuildSystemPrompt above) so getSystemPrompt's IllegalStateException surfaces at
+    // startup, not on the first delegation; Spring never subclasses this @Configuration in a way that could observe
+    // partially-initialized state.
+    @SuppressFBWarnings({
+        "EI", "CT_CONSTRUCTOR_THROW"
+    })
     public EmbeddedCopilotConfiguration(
         @Value("classpath:prompt_workflow_editor_embedded_ask.txt") Resource promptWorkflowEditorEmbeddedAskResource,
         @Value("classpath:prompt_workflow_editor_embedded_build.txt") Resource promptWorkflowEditorEmbeddedBuildResource,
@@ -111,6 +123,8 @@ public class EmbeddedCopilotConfiguration {
         this.promptWorkflowExecutionEmbeddedBuildResource = promptWorkflowExecutionEmbeddedBuildResource;
         this.workflowValidatorTools = workflowValidatorTools;
         this.workflowInstructionTools = workflowInstructionTools;
+
+        this.workflowEditorEmbeddedBuildSystemPrompt = getSystemPrompt(promptWorkflowEditorEmbeddedBuildResource);
     }
 
     @Bean
@@ -165,7 +179,7 @@ public class EmbeddedCopilotConfiguration {
             .agentId("workflow_editor_embedded_build")
             .chatMemory(chatMemory)
             .chatModel(chatModel)
-            .systemMessage(getSystemPrompt(promptWorkflowEditorEmbeddedBuildResource))
+            .systemMessage(workflowEditorEmbeddedBuildSystemPrompt)
             .state(state)
             .toolCallbacks(wrapTools(securityContextRehydrator, tools))
             .workflowService(workflowService)
@@ -180,7 +194,7 @@ public class EmbeddedCopilotConfiguration {
      * Stateless embedded workflow-editor BUILD subagent {@link ChatClient} — the embedded mirror of
      * {@code workflowEditorBuildSubAgentChatClient}, bound to the integration + integration-workflow tools and the
      * embedded BUILD prompt. Contributed to the management MCP server (via
-     * {@code ToolCallbackContributorConfiguration}) as the {@code integration_workflow_agent} tool so MCP clients can
+     * {@code ToolCallbackContributorConfiguration}) as the {@code buildIntegrationWorkflow} tool so MCP clients can
      * build integration workflows; not wired into the AI-Hub routing agent.
      */
     @Bean
@@ -188,8 +202,29 @@ public class EmbeddedCopilotConfiguration {
         ChatModel chatModel, IntegrationTools integrationTools, IntegrationWorkflowTools integrationWorkflowTools,
         ComponentTools componentTools, TaskTools taskTools) {
 
+        return buildWorkflowEditorEmbeddedBuildSubAgentChatClient(
+            chatModel, integrationTools, integrationWorkflowTools, componentTools, taskTools);
+    }
+
+    @Bean
+    IntelligentToolChatClientFactory workflowEditorEmbeddedBuildSubAgentChatClientFactory(
+        @Qualifier("workflowEditorEmbeddedBuildSubAgentChatClient") //
+        ChatClient workflowEditorEmbeddedBuildSubAgentChatClient,
+        IntegrationTools integrationTools, IntegrationWorkflowTools integrationWorkflowTools,
+        ComponentTools componentTools, TaskTools taskTools) {
+
+        return candidateChatModel -> candidateChatModel == null
+            ? workflowEditorEmbeddedBuildSubAgentChatClient
+            : buildWorkflowEditorEmbeddedBuildSubAgentChatClient(
+                candidateChatModel, integrationTools, integrationWorkflowTools, componentTools, taskTools);
+    }
+
+    private ChatClient buildWorkflowEditorEmbeddedBuildSubAgentChatClient(
+        ChatModel chatModel, IntegrationTools integrationTools, IntegrationWorkflowTools integrationWorkflowTools,
+        ComponentTools componentTools, TaskTools taskTools) {
+
         return ChatClient.builder(chatModel)
-            .defaultSystem(getSystemPrompt(promptWorkflowEditorEmbeddedBuildResource))
+            .defaultSystem(workflowEditorEmbeddedBuildSystemPrompt)
             .defaultTools(
                 integrationTools, integrationWorkflowTools, componentTools, taskTools, workflowValidatorTools,
                 workflowInstructionTools)

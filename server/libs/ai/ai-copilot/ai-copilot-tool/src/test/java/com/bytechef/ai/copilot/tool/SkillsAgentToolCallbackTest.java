@@ -62,7 +62,7 @@ class SkillsAgentToolCallbackTest {
         when(requestSpec.call()).thenReturn(responseSpec);
         when(responseSpec.content()).thenReturn(synthesised);
 
-        SkillsAgentToolCallback callback = new SkillsAgentToolCallback(skillsChatClient);
+        SkillsAgentToolCallback callback = new SkillsAgentToolCallback(chatModel -> skillsChatClient, null);
 
         String result = callback.call("{\"request\":\"list my skills\"}");
 
@@ -73,7 +73,7 @@ class SkillsAgentToolCallbackTest {
     void testCallReturnsErrorWhenRequestIsBlank() {
         ChatClient skillsChatClient = mock(ChatClient.class);
 
-        SkillsAgentToolCallback callback = new SkillsAgentToolCallback(skillsChatClient);
+        SkillsAgentToolCallback callback = new SkillsAgentToolCallback(chatModel -> skillsChatClient, null);
 
         String result = callback.call("{\"request\":\"   \"}");
 
@@ -85,7 +85,7 @@ class SkillsAgentToolCallbackTest {
     void testCallReturnsErrorOnInvalidJson() {
         ChatClient skillsChatClient = mock(ChatClient.class);
 
-        SkillsAgentToolCallback callback = new SkillsAgentToolCallback(skillsChatClient);
+        SkillsAgentToolCallback callback = new SkillsAgentToolCallback(chatModel -> skillsChatClient, null);
 
         String result = callback.call("not-json");
 
@@ -104,7 +104,7 @@ class SkillsAgentToolCallbackTest {
         when(requestSpec.call()).thenReturn(responseSpec);
         when(responseSpec.content()).thenReturn(null);
 
-        SkillsAgentToolCallback callback = new SkillsAgentToolCallback(skillsChatClient);
+        SkillsAgentToolCallback callback = new SkillsAgentToolCallback(chatModel -> skillsChatClient, null);
 
         String result = callback.call("{\"request\":\"any request\"}");
 
@@ -130,7 +130,7 @@ class SkillsAgentToolCallbackTest {
         when(requestSpec.call()).thenReturn(responseSpec);
         when(responseSpec.content()).thenThrow(new RuntimeException("skill repository unavailable"));
 
-        SkillsAgentToolCallback callback = new SkillsAgentToolCallback(skillsChatClient);
+        SkillsAgentToolCallback callback = new SkillsAgentToolCallback(chatModel -> skillsChatClient, null);
 
         String result = callback.call("{\"request\":\"any\"}");
 
@@ -139,7 +139,7 @@ class SkillsAgentToolCallbackTest {
         assertThat(node.get("error")
             .asText())
                 .as("payload must surface tool name for the LLM to recover")
-                .contains("skills_agent failed")
+                .contains("authorSkill failed")
                 .as("payload must NOT leak the exception's getMessage() text — see ToolErrors.runtimeFailure")
                 .doesNotContain("skill repository unavailable");
     }
@@ -159,7 +159,7 @@ class SkillsAgentToolCallbackTest {
 
         ToolContext parentToolContext = new ToolContext(parentContextMap);
 
-        SkillsAgentToolCallback callback = new SkillsAgentToolCallback(skillsChatClient);
+        SkillsAgentToolCallback callback = new SkillsAgentToolCallback(chatModel -> skillsChatClient, null);
 
         callback.call("{\"request\":\"any\"}", parentToolContext);
 
@@ -179,7 +179,7 @@ class SkillsAgentToolCallbackTest {
         when(requestSpec.call()).thenReturn(responseSpec);
         when(responseSpec.content()).thenReturn("ok");
 
-        SkillsAgentToolCallback callback = new SkillsAgentToolCallback(skillsChatClient);
+        SkillsAgentToolCallback callback = new SkillsAgentToolCallback(chatModel -> skillsChatClient, null);
 
         callback.call("{\"request\":\"any\"}", null);
 
@@ -188,10 +188,10 @@ class SkillsAgentToolCallbackTest {
 
     @Test
     void testToolDefinitionExposesSkillsAgentNameAndRequestSchema() {
-        SkillsAgentToolCallback callback = new SkillsAgentToolCallback(mock(ChatClient.class));
+        SkillsAgentToolCallback callback = new SkillsAgentToolCallback(chatModel -> mock(ChatClient.class), null);
 
         assertThat(callback.getToolDefinition()
-            .name()).isEqualTo("skills_agent");
+            .name()).isEqualTo("authorSkill");
         assertThat(callback.getToolDefinition()
             .inputSchema()).contains("\"request\"");
     }
@@ -221,7 +221,7 @@ class SkillsAgentToolCallbackTest {
         when(requestSpec.call()).thenReturn(responseSpec);
         when(responseSpec.content()).thenThrow(upstreamException);
 
-        SkillsAgentToolCallback callback = new SkillsAgentToolCallback(skillsChatClient);
+        SkillsAgentToolCallback callback = new SkillsAgentToolCallback(chatModel -> skillsChatClient, null);
 
         String result = callback.call("{\"request\":\"any\"}");
 
@@ -231,7 +231,7 @@ class SkillsAgentToolCallbackTest {
             .as("every upstream RuntimeException must produce a typed tool-error payload, not propagate")
             .isTrue();
         assertThat(node.get("error")
-            .asText()).contains("skills_agent failed");
+            .asText()).contains("authorSkill failed");
     }
 
     private static void stubToolContext(ChatClientRequestSpec requestSpec) {

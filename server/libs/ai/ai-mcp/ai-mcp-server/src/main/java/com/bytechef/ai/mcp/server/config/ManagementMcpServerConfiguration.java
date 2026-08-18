@@ -29,7 +29,6 @@ import com.bytechef.platform.ai.tool.ComponentTools;
 import com.bytechef.platform.ai.tool.TaskDispatcherTools;
 import com.bytechef.platform.ai.tool.TaskTools;
 import com.bytechef.platform.mcp.server.McpApps;
-import com.bytechef.platform.mcp.server.McpSseProviderRegistry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.modelcontextprotocol.server.McpAsyncServer;
 import io.modelcontextprotocol.server.McpServer;
@@ -75,6 +74,24 @@ public class ManagementMcpServerConfiguration {
 
     private static final String DEFINITION = "definition";
 
+    // Surfaced verbatim as the initialize result's `instructions` field (MCP SDK 2.0's
+    // McpServer.AsyncSpecification#instructions) — the only sequencing guidance external MCP clients (Claude
+    // Desktop, Cursor) get, since they never see the Copilot/AI Hub system prompt. Keep tool names in sync with
+    // the live capability names; a stale name here points a client at nothing.
+    private static final String INSTRUCTIONS =
+        """
+            ByteChef management server. Two kinds of tools: ordinary tools are deterministic CRUD — call them \
+            directly; intelligent tools (buildWorkflow, buildIntegrationWorkflow, importWorkflow, \
+            configureClusterElement, writeScript, buildCodeWorkflow, buildCustomComponent, authorSkill, \
+            debugWorkflowExecution) run an inner AI agent and may take minutes — call them for judgment work, \
+            not for CRUD.
+            To build a workflow: createProject (if needed) → createProjectWorkflow → buildWorkflow with \
+            the workflowId and a plain-language instruction. Each intelligent-tool call is independent and \
+            re-reads current state (e.g. the workflow) rather than remembering earlier calls, so iterate by \
+            calling the tool again with the next instruction and restate any context it still needs.
+            Most tools require workspace context: if a tool returns a workspace_required error, retry with one \
+            of the workspaceId values listed in its 'workspaces' field.""";
+
     private static final Logger log = LoggerFactory.getLogger(ManagementMcpServerConfiguration.class);
 
     private final ComponentTools componentTools;
@@ -119,6 +136,7 @@ public class ManagementMcpServerConfiguration {
     McpAsyncServer mcpAsyncServer(ApplicationProperties applicationProperties) {
         return McpServer.async(webMvcStreamableHttpServerTransportProvider())
             .serverInfo("mcp-server", "1.0.0")
+            .instructions(INSTRUCTIONS)
             .capabilities(
                 McpSchema.ServerCapabilities.builder()
                     .resources(false, true)

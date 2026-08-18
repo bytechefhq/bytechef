@@ -23,8 +23,8 @@ import org.springframework.context.annotation.Configuration;
  * {@code publishCustomComponent}, {@code deleteCustomComponent}) as first-class management MCP tools — the write
  * counterpart of {@link CodeCustomComponentViewerMcpContributorConfiguration}'s read-only viewer tools. This lets an
  * MCP client author code directly with a read → edit → update loop instead of delegating to the one-shot
- * {@code custom_component_agent}/{@code code_workflow_agent} subagents. All writes are draft-safe: editor-path saves
- * create or update drafts and can never modify a published version; publishing is a separate explicit tool call
+ * {@code buildCustomComponent}/{@code buildCodeWorkflow} subagents. All writes are draft-safe: editor-path saves create
+ * or update drafts and can never modify a published version; publishing is a separate explicit tool call
  * ({@code publishCustomComponent} here, {@code publishProject} from the core management tool set for code workflows).
  * Each backing tools bean is optional (via {@link ObjectProvider}) so a deployment lacking it exposes nothing.
  *

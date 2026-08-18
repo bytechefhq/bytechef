@@ -20,6 +20,9 @@ import com.bytechef.ai.agent.tool.AgentType;
 import com.bytechef.ai.agent.tool.CurrentAgentContext;
 import com.bytechef.ai.agent.tool.CurrentAgentContext.AgentBinding;
 import com.bytechef.ai.agent.tool.ToolErrors;
+import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
+import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolution;
+import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
 import com.bytechef.ai.copilot.tool.util.WorkflowPersistCaptureUtils;
 import com.bytechef.commons.util.JsonUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -49,7 +52,9 @@ public class ProjectWorkflowAgentToolCallback implements ToolCallback {
             this for requests that design, edit, debug, or explain a workflow (orchestration of tasks,
             triggers, conditions, loops). The subagent owns the canonical behaviour for this domain;
             prefer calling it over reasoning about workflow shape directly. ASK mode returns analysis;
-            BUILD mode returns the updated workflow JSON plus a change rationale.""";
+            BUILD mode returns the updated workflow JSON plus a change rationale. The workflow must
+            already exist — create it with createProjectWorkflow first, then include its workflowId in
+            the request.""";
 
     private static final String INPUT_SCHEMA =
         """
@@ -64,14 +69,19 @@ public class ProjectWorkflowAgentToolCallback implements ToolCallback {
                 "required": ["request"]
             }""";
 
-    private final ChatClient workflowEditorChatClient;
+    private final IntelligentToolChatClientFactory chatClientFactory;
+    private final @Nullable SubAgentChatModelResolver chatModelResolver;
     private final String toolName;
     private final String description;
     private final CopilotAgentType agentType;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public ProjectWorkflowAgentToolCallback(ChatClient workflowEditorChatClient) {
-        this(workflowEditorChatClient, "project_workflow_agent", DESCRIPTION, CopilotAgentType.PROJECT_WORKFLOW_AGENT);
+    public ProjectWorkflowAgentToolCallback(
+        IntelligentToolChatClientFactory chatClientFactory, @Nullable SubAgentChatModelResolver chatModelResolver) {
+
+        this(
+            chatClientFactory, chatModelResolver, "buildWorkflow", DESCRIPTION,
+            CopilotAgentType.BUILD_WORKFLOW);
     }
 
     /**
@@ -80,9 +90,11 @@ public class ProjectWorkflowAgentToolCallback implements ToolCallback {
      */
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public ProjectWorkflowAgentToolCallback(
-        ChatClient workflowEditorChatClient, String toolName, String description, CopilotAgentType agentType) {
+        IntelligentToolChatClientFactory chatClientFactory, @Nullable SubAgentChatModelResolver chatModelResolver,
+        String toolName, String description, CopilotAgentType agentType) {
 
-        this.workflowEditorChatClient = workflowEditorChatClient;
+        this.chatClientFactory = chatClientFactory;
+        this.chatModelResolver = chatModelResolver;
         this.toolName = toolName;
         this.description = description;
         this.agentType = agentType;
@@ -120,6 +132,9 @@ public class ProjectWorkflowAgentToolCallback implements ToolCallback {
 
             Map<String, Object> forwardedContext = WorkflowPersistCaptureUtils.withCaptureHolder(parentContext);
 
+            ChatClient workflowEditorChatClient =
+                chatClientFactory.get(SubAgentChatModelResolution.resolve(chatModelResolver, parentContext));
+
             String result = CurrentAgentContext.callWith(
                 agentType, parentAgent,
                 () -> workflowEditorChatClient.prompt(request)
@@ -138,14 +153,14 @@ public class ProjectWorkflowAgentToolCallback implements ToolCallback {
             return trailer == null ? result : result + trailer;
         } catch (JacksonException exception) {
             log.warn(
-                "project_workflow_agent rejected malformed tool input: {} — first 200 chars of input: {}",
+                "buildWorkflow rejected malformed tool input: {} — first 200 chars of input: {}",
                 exception.getMessage(),
                 toolInput == null ? "<null>" : toolInput.substring(0, Math.min(toolInput.length(), 200)));
 
             return toolError("Invalid tool input: " + exception.getMessage());
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(
-                ProjectWorkflowAgentToolCallback.class, "project_workflow_agent", exception);
+                ProjectWorkflowAgentToolCallback.class, "buildWorkflow", exception);
         }
     }
 

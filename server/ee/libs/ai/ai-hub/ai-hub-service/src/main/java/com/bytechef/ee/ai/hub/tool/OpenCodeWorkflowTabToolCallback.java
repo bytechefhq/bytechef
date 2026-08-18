@@ -33,9 +33,9 @@ public class OpenCodeWorkflowTabToolCallback implements ToolCallback {
 
     private static final String DESCRIPTION = """
         Open a code workflow in the AI Hub resource panel so the user can see it.
-        Call this after the code_workflow_agent reports a built or changed code workflow, or when referring to
+        Call this after the buildCodeWorkflow reports a built or changed code workflow, or when referring to
         an existing code workflow.
-        Use the projectId, language, and name reported by code_workflow_agent - never invent code workflow
+        Use the projectId, language, and name reported by buildCodeWorkflow - never invent code workflow
         project IDs.""";
 
     private static final String INPUT_SCHEMA = """

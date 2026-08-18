@@ -52,7 +52,7 @@ import org.springframework.security.core.Authentication;
 public record AgentToolInvocationContext(
     @Nullable Long workspaceId, @Nullable Long userId, @Nullable Long environmentId,
     @Nullable String conversationId, @Nullable String tenantId, @Nullable Authentication authentication,
-    boolean skipAutomationAuthorization) {
+    boolean skipAutomationAuthorization, @Nullable String llmProvider, @Nullable String llmModel) {
 
     public static final String TOOL_CONTEXT_WORKSPACE_ID_KEY = "bytechef.agentTool.workspaceId";
     public static final String TOOL_CONTEXT_USER_ID_KEY = "bytechef.agentTool.userId";
@@ -61,6 +61,22 @@ public record AgentToolInvocationContext(
     public static final String TOOL_CONTEXT_TENANT_ID_KEY = "bytechef.agentTool.tenantId";
     public static final String TOOL_CONTEXT_AUTHENTICATION_KEY = "bytechef.agentTool.authentication";
     public static final String TOOL_CONTEXT_SKIP_AUTHORIZATION_KEY = "bytechef.agentTool.skipAutomationAuthorization";
+    public static final String TOOL_CONTEXT_LLM_PROVIDER_KEY = "bytechef.agentTool.llmProvider";
+    public static final String TOOL_CONTEXT_LLM_MODEL_KEY = "bytechef.agentTool.llmModel";
+
+    /**
+     * Convenience constructor for callers that need explicit control over the embedded automation-authorization bypass
+     * but carry no LLM provider/model override.
+     */
+    public AgentToolInvocationContext(
+        @Nullable Long workspaceId, @Nullable Long userId, @Nullable Long environmentId,
+        @Nullable String conversationId, @Nullable String tenantId, @Nullable Authentication authentication,
+        boolean skipAutomationAuthorization) {
+
+        this(
+            workspaceId, userId, environmentId, conversationId, tenantId, authentication, skipAutomationAuthorization,
+            null, null);
+    }
 
     /**
      * Convenience constructor for callers that carry a captured authentication but do not request the embedded
@@ -70,7 +86,7 @@ public record AgentToolInvocationContext(
         @Nullable Long workspaceId, @Nullable Long userId, @Nullable Long environmentId,
         @Nullable String conversationId, @Nullable String tenantId, @Nullable Authentication authentication) {
 
-        this(workspaceId, userId, environmentId, conversationId, tenantId, authentication, false);
+        this(workspaceId, userId, environmentId, conversationId, tenantId, authentication, false, null, null);
     }
 
     /**
@@ -81,7 +97,7 @@ public record AgentToolInvocationContext(
         @Nullable Long workspaceId, @Nullable Long userId, @Nullable Long environmentId,
         @Nullable String conversationId, @Nullable String tenantId) {
 
-        this(workspaceId, userId, environmentId, conversationId, tenantId, null, false);
+        this(workspaceId, userId, environmentId, conversationId, tenantId, null, false, null, null);
     }
 
     public static Builder builder() {
@@ -107,14 +123,18 @@ public record AgentToolInvocationContext(
         Authentication authentication = map.get(TOOL_CONTEXT_AUTHENTICATION_KEY) instanceof Authentication value
             ? value : null;
         boolean skipAutomationAuthorization = asBoolean(map.get(TOOL_CONTEXT_SKIP_AUTHORIZATION_KEY));
+        String llmProvider = asString(map.get(TOOL_CONTEXT_LLM_PROVIDER_KEY));
+        String llmModel = asString(map.get(TOOL_CONTEXT_LLM_MODEL_KEY));
 
         if (workspaceId == null && userId == null && environmentId == null && conversationId == null
-            && tenantId == null && authentication == null && !skipAutomationAuthorization) {
+            && tenantId == null && authentication == null && !skipAutomationAuthorization && llmProvider == null
+            && llmModel == null) {
             return null;
         }
 
         return new AgentToolInvocationContext(
-            workspaceId, userId, environmentId, conversationId, tenantId, authentication, skipAutomationAuthorization);
+            workspaceId, userId, environmentId, conversationId, tenantId, authentication, skipAutomationAuthorization,
+            llmProvider, llmModel);
     }
 
     public int resolveEnvironmentOrDefault() {
@@ -150,6 +170,14 @@ public record AgentToolInvocationContext(
 
         if (skipAutomationAuthorization) {
             map.put(TOOL_CONTEXT_SKIP_AUTHORIZATION_KEY, Boolean.TRUE);
+        }
+
+        if (llmProvider != null) {
+            map.put(TOOL_CONTEXT_LLM_PROVIDER_KEY, llmProvider);
+        }
+
+        if (llmModel != null) {
+            map.put(TOOL_CONTEXT_LLM_MODEL_KEY, llmModel);
         }
 
         return map;
@@ -197,6 +225,8 @@ public record AgentToolInvocationContext(
         private @Nullable String tenantId;
         private @Nullable Authentication authentication;
         private boolean skipAutomationAuthorization;
+        private @Nullable String llmProvider;
+        private @Nullable String llmModel;
 
         private Builder() {
         }
@@ -243,10 +273,22 @@ public record AgentToolInvocationContext(
             return this;
         }
 
+        public Builder llmProvider(@Nullable String llmProvider) {
+            this.llmProvider = llmProvider;
+
+            return this;
+        }
+
+        public Builder llmModel(@Nullable String llmModel) {
+            this.llmModel = llmModel;
+
+            return this;
+        }
+
         public AgentToolInvocationContext build() {
             return new AgentToolInvocationContext(
                 workspaceId, userId, environmentId, conversationId, tenantId, authentication,
-                skipAutomationAuthorization);
+                skipAutomationAuthorization, llmProvider, llmModel);
         }
     }
 }

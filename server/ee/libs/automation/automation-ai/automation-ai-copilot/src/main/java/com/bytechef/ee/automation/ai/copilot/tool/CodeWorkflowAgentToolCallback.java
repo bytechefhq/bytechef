@@ -12,6 +12,9 @@ import com.bytechef.ai.agent.tool.CurrentAgentContext;
 import com.bytechef.ai.agent.tool.CurrentAgentContext.AgentBinding;
 import com.bytechef.ai.agent.tool.ToolErrors;
 import com.bytechef.ai.copilot.tool.CopilotAgentType;
+import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
+import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolution;
+import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
 import com.bytechef.commons.util.JsonUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
@@ -43,7 +46,9 @@ public class CodeWorkflowAgentToolCallback implements ToolCallback {
             The subagent owns the canonical behaviour for listing, explaining, creating, and updating code
             workflows, including authoring and iterating the source until it compiles. Prefer calling it over
             reasoning about code workflows directly. The result is a synthesised markdown report or, in build
-            mode, a summary of the mutations performed including the affected project id, name, and language.""";
+            mode, a summary of the mutations performed including the affected project id, name, and language.
+            Creates a new code workflow project when the request describes one that doesn't exist, or updates
+            an existing one named or identified by id in the request.""";
 
     private static final String INPUT_SCHEMA =
         """
@@ -58,17 +63,21 @@ public class CodeWorkflowAgentToolCallback implements ToolCallback {
                 "required": ["request"]
             }""";
 
-    private final ChatClient codeWorkflowChatClient;
+    private final IntelligentToolChatClientFactory chatClientFactory;
+    private final @Nullable SubAgentChatModelResolver chatModelResolver;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public CodeWorkflowAgentToolCallback(ChatClient codeWorkflowChatClient) {
-        this.codeWorkflowChatClient = codeWorkflowChatClient;
+    public CodeWorkflowAgentToolCallback(
+        IntelligentToolChatClientFactory chatClientFactory, @Nullable SubAgentChatModelResolver chatModelResolver) {
+
+        this.chatClientFactory = chatClientFactory;
+        this.chatModelResolver = chatModelResolver;
     }
 
     @Override
     public ToolDefinition getToolDefinition() {
         return ToolDefinition.builder()
-            .name("code_workflow_agent")
+            .name("buildCodeWorkflow")
             .description(DESCRIPTION)
             .inputSchema(INPUT_SCHEMA)
             .build();
@@ -93,12 +102,15 @@ public class CodeWorkflowAgentToolCallback implements ToolCallback {
             AgentBinding parent = CurrentAgentContext.current();
             AgentType parentAgent = parent != null ? parent.agentName() : null;
 
-            Map<String, Object> forwardedContext = toolContext == null ? Map.of() : toolContext.getContext();
+            Map<String, Object> parentContext = toolContext == null ? Map.of() : toolContext.getContext();
+
+            ChatClient codeWorkflowChatClient =
+                chatClientFactory.get(SubAgentChatModelResolution.resolve(chatModelResolver, parentContext));
 
             String result = CurrentAgentContext.callWith(
-                CopilotAgentType.CODE_WORKFLOW_AGENT, parentAgent,
+                CopilotAgentType.BUILD_CODE_WORKFLOW, parentAgent,
                 () -> codeWorkflowChatClient.prompt(request)
-                    .toolContext(forwardedContext)
+                    .toolContext(parentContext)
                     .call()
                     .content());
 
@@ -111,14 +123,14 @@ public class CodeWorkflowAgentToolCallback implements ToolCallback {
             return result;
         } catch (JacksonException exception) {
             log.warn(
-                "code_workflow_agent rejected malformed tool input: {} — first 200 chars of input: {}",
+                "buildCodeWorkflow rejected malformed tool input: {} — first 200 chars of input: {}",
                 exception.getMessage(),
                 toolInput == null ? "<null>" : toolInput.substring(0, Math.min(toolInput.length(), 200)));
 
             return toolError("Invalid tool input: " + exception.getMessage());
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(
-                CodeWorkflowAgentToolCallback.class, "code_workflow_agent", exception);
+                CodeWorkflowAgentToolCallback.class, "buildCodeWorkflow", exception);
         }
     }
 

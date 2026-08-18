@@ -26,6 +26,8 @@ import com.bytechef.platform.ai.tool.TaskTools;
 import java.util.HashMap;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 
 /**
@@ -35,9 +37,16 @@ import org.springframework.security.core.Authentication;
  */
 public final class CopilotToolContextUtils {
 
+    private static final Logger log = LoggerFactory.getLogger(CopilotToolContextUtils.class);
+
     private CopilotToolContextUtils() {
     }
 
+    /**
+     * The {@code llmProvider}/{@code llmModel} keys populated here MUST stay consistent with
+     * {@code CopilotChatClientResolver}, this surface's {@code OverrideChatClientResolver} — a mismatch would run a
+     * delegate subagent on a different model than the one its caller resolved for this turn.
+     */
     public static Map<String, Object> toToolContext(@Nullable State state) {
         if (state == null) {
             return Map.of();
@@ -65,6 +74,21 @@ public final class CopilotToolContextUtils {
         // so the flag is carried through the tool context and re-armed by RehydrateContextToolCallback.
         boolean skipAutomationAuthorization = authentication != null;
 
+        String llmProvider = StringUtils.asString(state.get(CopilotConstants.STATE_USER_SELECTED_LLM_PROVIDER));
+        String llmModel = StringUtils.asString(state.get(CopilotConstants.STATE_USER_SELECTED_LLM_MODEL));
+
+        if (llmProvider == null || llmModel == null) {
+            if ((llmProvider == null) != (llmModel == null)) {
+                log.warn(
+                    "Copilot user-selected LLM half-set (provider={}, model={}); not propagating a model override "
+                        + "into the tool context",
+                    llmProvider, llmModel);
+            }
+
+            llmProvider = null;
+            llmModel = null;
+        }
+
         toolContext.putAll(
             AgentToolInvocationContext.builder()
                 .workspaceId(workspaceId)
@@ -73,6 +97,8 @@ public final class CopilotToolContextUtils {
                 .tenantId(tenantId)
                 .authentication(authentication)
                 .skipAutomationAuthorization(skipAutomationAuthorization)
+                .llmProvider(llmProvider)
+                .llmModel(llmModel)
                 .build()
                 .toToolContext());
 

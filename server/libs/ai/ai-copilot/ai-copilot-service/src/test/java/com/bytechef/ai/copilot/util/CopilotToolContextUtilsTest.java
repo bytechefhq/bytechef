@@ -170,4 +170,33 @@ class CopilotToolContextUtilsTest {
             .containsEntry(TaskTools.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY, Set.of("slack"))
             .containsEntry(AgentToolInvocationContext.TOOL_CONTEXT_WORKSPACE_ID_KEY, 7L);
     }
+
+    @Test
+    void testPropagatesTheUserSelectedModel() {
+        State state = new State();
+
+        state.set(CopilotConstants.STATE_ENVIRONMENT_ID, 1L);
+        state.set(CopilotConstants.STATE_USER_SELECTED_LLM_PROVIDER, "anthropic");
+        state.set(CopilotConstants.STATE_USER_SELECTED_LLM_MODEL, "claude-opus-4");
+
+        Map<String, Object> toolContext = CopilotToolContextUtils.toToolContext(state);
+
+        assertThat(toolContext)
+            .containsEntry(AgentToolInvocationContext.TOOL_CONTEXT_LLM_PROVIDER_KEY, "anthropic")
+            .containsEntry(AgentToolInvocationContext.TOOL_CONTEXT_LLM_MODEL_KEY, "claude-opus-4");
+    }
+
+    @Test
+    void testOmitsTheModelKeysWhenHalfSet() {
+        State state = new State();
+
+        state.set(CopilotConstants.STATE_ENVIRONMENT_ID, 1L);
+        state.set(CopilotConstants.STATE_USER_SELECTED_LLM_PROVIDER, "anthropic");
+
+        Map<String, Object> toolContext = CopilotToolContextUtils.toToolContext(state);
+
+        assertThat(toolContext)
+            .doesNotContainKey(AgentToolInvocationContext.TOOL_CONTEXT_LLM_PROVIDER_KEY)
+            .doesNotContainKey(AgentToolInvocationContext.TOOL_CONTEXT_LLM_MODEL_KEY);
+    }
 }

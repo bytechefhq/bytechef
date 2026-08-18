@@ -20,11 +20,13 @@ import com.bytechef.ai.agent.tool.AgentType;
 import com.bytechef.ai.agent.tool.CurrentAgentContext;
 import com.bytechef.ai.agent.tool.CurrentAgentContext.AgentBinding;
 import com.bytechef.ai.agent.tool.ToolErrors;
+import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
+import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolution;
+import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
 import com.bytechef.ai.copilot.tool.util.WorkflowPersistCaptureUtils;
 import com.bytechef.commons.util.JsonUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
-import java.util.function.Supplier;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +51,9 @@ public class ConverterAgentToolCallback implements ToolCallback {
             Delegate a request to convert an external workflow definition (n8n, Make, Zapier, Workato,
             etc.) into a ByteChef workflow. The Converter subagent owns the canonical behaviour for this
             domain — translating constructs, mapping integrations, and producing valid ByteChef workflow
-            JSON plus a rationale.""";
+            JSON plus a rationale. Include the source workflow definition to convert in the request; if
+            no existing project or workflowId is named, the subagent creates new ones to hold the
+            result.""";
 
     private static final String INPUT_SCHEMA =
         """
@@ -64,22 +68,21 @@ public class ConverterAgentToolCallback implements ToolCallback {
                 "required": ["request"]
             }""";
 
-    private final Supplier<ChatClient> converterChatClientSupplier;
+    private final IntelligentToolChatClientFactory chatClientFactory;
+    private final @Nullable SubAgentChatModelResolver chatModelResolver;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public ConverterAgentToolCallback(ChatClient converterChatClient) {
-        this(() -> converterChatClient);
-    }
+    public ConverterAgentToolCallback(
+        IntelligentToolChatClientFactory chatClientFactory, @Nullable SubAgentChatModelResolver chatModelResolver) {
 
-    @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public ConverterAgentToolCallback(Supplier<ChatClient> converterChatClientSupplier) {
-        this.converterChatClientSupplier = converterChatClientSupplier;
+        this.chatClientFactory = chatClientFactory;
+        this.chatModelResolver = chatModelResolver;
     }
 
     @Override
     public ToolDefinition getToolDefinition() {
         return ToolDefinition.builder()
-            .name("converter_agent")
+            .name("importWorkflow")
             .description(DESCRIPTION)
             .inputSchema(INPUT_SCHEMA)
             .build();
@@ -108,10 +111,11 @@ public class ConverterAgentToolCallback implements ToolCallback {
 
             Map<String, Object> forwardedContext = WorkflowPersistCaptureUtils.withCaptureHolder(parentContext);
 
-            ChatClient converterChatClient = converterChatClientSupplier.get();
+            ChatClient converterChatClient =
+                chatClientFactory.get(SubAgentChatModelResolution.resolve(chatModelResolver, parentContext));
 
             String result = CurrentAgentContext.callWith(
-                CopilotAgentType.CONVERTER_AGENT, parentAgent,
+                CopilotAgentType.IMPORT_WORKFLOW, parentAgent,
                 () -> converterChatClient.prompt(request)
                     .toolContext(forwardedContext)
                     .call()
@@ -128,14 +132,14 @@ public class ConverterAgentToolCallback implements ToolCallback {
             return trailer == null ? result : result + trailer;
         } catch (JacksonException exception) {
             log.warn(
-                "converter_agent rejected malformed tool input: {} — first 200 chars of input: {}",
+                "importWorkflow rejected malformed tool input: {} — first 200 chars of input: {}",
                 exception.getMessage(),
                 toolInput == null ? "<null>" : toolInput.substring(0, Math.min(toolInput.length(), 200)));
 
             return toolError("Invalid tool input: " + exception.getMessage());
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(
-                ConverterAgentToolCallback.class, "converter_agent", exception);
+                ConverterAgentToolCallback.class, "importWorkflow", exception);
         }
     }
 

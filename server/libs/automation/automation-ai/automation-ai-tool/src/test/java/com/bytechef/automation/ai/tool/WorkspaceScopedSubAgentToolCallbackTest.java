@@ -156,6 +156,21 @@ class WorkspaceScopedSubAgentToolCallbackTest {
             .containsEntry(AgentToolInvocationContext.TOOL_CONTEXT_WORKSPACE_ID_KEY, 42L);
     }
 
+    /**
+     * The management MCP surface must keep running every delegate on its default {@code ChatModel}: it never carries an
+     * AI Hub composer or Copilot panel model pick, so this wrapper must not fabricate one. This is what makes "MCP
+     * keeps the default model" hold structurally rather than merely by omission — a future change that starts writing
+     * these keys here would silently make {@code SubAgentChatModelResolver} start re-targeting MCP delegate calls too.
+     */
+    @Test
+    void testDoesNotForwardLlmProviderOrModelKeys() {
+        toolCallback.call("{\"request\": \"list servers\", \"workspaceId\": 42}");
+
+        assertThat(delegate.capturedContext)
+            .doesNotContainKey(AgentToolInvocationContext.TOOL_CONTEXT_LLM_PROVIDER_KEY)
+            .doesNotContainKey(AgentToolInvocationContext.TOOL_CONTEXT_LLM_MODEL_KEY);
+    }
+
     @Test
     void testSingleWorkspaceIsAutoSelected() {
         Workspace workspace = new Workspace();

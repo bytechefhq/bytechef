@@ -45,15 +45,14 @@ import reactor.core.publisher.Flux;
  * {@code searchTool} call surfaces it. That is correct for the large searchable catalog (1000+ cluster-element / global
  * copilot tools), which is registered with the search-loop's {@code MapToolCallbackResolver} and NOT placed on the
  * agent's options list. It is wrong for the AI Hub's own static tools — the specialist sub-agents
- * ({@code project_workflow_agent} et al.), core interaction tools ({@code askUserQuestion}, {@code openWorkflowTab}),
- * the interactive pickers, the auto-memory tools, and every workspace-resource read/mutation tool
- * ({@code listDataTables}, {@code queryKnowledgeBase}, {@code getAssetFileContent}, deployment / context-store /
- * API-collection tools, …). Those are the tools placed directly on the agent's options list, are resolvable at
- * execution time ONLY while on that list, and the system prompt instructs the model to call each of them directly by
- * name. On a follow-up turn the model does so — it "knows" the name from the prompt and prior conversation — but the
- * prior {@code searchTool} response that once surfaced it is no longer in the window (chat memory does not persist the
- * intermediate search exchange), so the underlying tool-calling manager throws
- * {@code No ToolCallback found for tool name: ...}.
+ * ({@code buildWorkflow} et al.), core interaction tools ({@code askUserQuestion}, {@code openWorkflowTab}), the
+ * interactive pickers, the auto-memory tools, and every workspace-resource read/mutation tool ({@code listDataTables},
+ * {@code queryKnowledgeBase}, {@code getAssetFileContent}, deployment / context-store / API-collection tools, …). Those
+ * are the tools placed directly on the agent's options list, are resolvable at execution time ONLY while on that list,
+ * and the system prompt instructs the model to call each of them directly by name. On a follow-up turn the model does
+ * so — it "knows" the name from the prompt and prior conversation — but the prior {@code searchTool} response that once
+ * surfaced it is no longer in the window (chat memory does not persist the intermediate search exchange), so the
+ * underlying tool-calling manager throws {@code No ToolCallback found for tool name: ...}.
  * </p>
  *
  * <p>

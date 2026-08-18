@@ -76,7 +76,7 @@ public final class ComponentSlugUtils {
             .toList();
 
         if (candidates.isEmpty()) {
-            message.append(" Use the project_workflow_agent to look up the correct component slug, then retry.");
+            message.append(" Use the buildWorkflow to look up the correct component slug, then retry.");
         } else {
             message.append(" Did you mean: ")
                 .append(String.join(", ", candidates))

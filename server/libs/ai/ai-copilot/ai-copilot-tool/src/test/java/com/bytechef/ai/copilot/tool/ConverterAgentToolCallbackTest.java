@@ -64,7 +64,7 @@ class ConverterAgentToolCallbackTest {
         when(requestSpec.call()).thenReturn(responseSpec);
         when(responseSpec.content()).thenReturn(synthesised);
 
-        ConverterAgentToolCallback callback = new ConverterAgentToolCallback(chatClient);
+        ConverterAgentToolCallback callback = new ConverterAgentToolCallback(chatModel -> chatClient, null);
 
         String result = callback.call("{\"request\":\"convert this n8n workflow\"}");
 
@@ -73,7 +73,7 @@ class ConverterAgentToolCallbackTest {
 
     @Test
     void testCallReturnsErrorWhenRequestIsBlank() {
-        ConverterAgentToolCallback callback = new ConverterAgentToolCallback(mock(ChatClient.class));
+        ConverterAgentToolCallback callback = new ConverterAgentToolCallback(chatModel -> mock(ChatClient.class), null);
 
         String result = callback.call("{\"request\":\"   \"}");
 
@@ -83,7 +83,7 @@ class ConverterAgentToolCallbackTest {
 
     @Test
     void testCallReturnsErrorOnInvalidJson() {
-        ConverterAgentToolCallback callback = new ConverterAgentToolCallback(mock(ChatClient.class));
+        ConverterAgentToolCallback callback = new ConverterAgentToolCallback(chatModel -> mock(ChatClient.class), null);
 
         String result = callback.call("not-json");
 
@@ -102,7 +102,7 @@ class ConverterAgentToolCallbackTest {
         when(requestSpec.call()).thenReturn(responseSpec);
         when(responseSpec.content()).thenReturn(null);
 
-        ConverterAgentToolCallback callback = new ConverterAgentToolCallback(chatClient);
+        ConverterAgentToolCallback callback = new ConverterAgentToolCallback(chatModel -> chatClient, null);
 
         String result = callback.call("{\"request\":\"any\"}");
 
@@ -124,7 +124,7 @@ class ConverterAgentToolCallbackTest {
         when(requestSpec.call()).thenReturn(responseSpec);
         when(responseSpec.content()).thenThrow(new RuntimeException("conversion engine failure"));
 
-        ConverterAgentToolCallback callback = new ConverterAgentToolCallback(chatClient);
+        ConverterAgentToolCallback callback = new ConverterAgentToolCallback(chatModel -> chatClient, null);
 
         String result = callback.call("{\"request\":\"any\"}");
 
@@ -133,7 +133,7 @@ class ConverterAgentToolCallbackTest {
         assertThat(node.get("error")
             .asText())
                 .as("payload must surface tool name")
-                .contains("converter_agent failed")
+                .contains("importWorkflow failed")
                 .as("payload must NOT leak the exception getMessage()")
                 .doesNotContain("conversion engine failure");
     }
@@ -153,7 +153,7 @@ class ConverterAgentToolCallbackTest {
 
         ToolContext parentToolContext = new ToolContext(parentContextMap);
 
-        ConverterAgentToolCallback callback = new ConverterAgentToolCallback(chatClient);
+        ConverterAgentToolCallback callback = new ConverterAgentToolCallback(chatModel -> chatClient, null);
 
         callback.call("{\"request\":\"any\"}", parentToolContext);
 
@@ -177,7 +177,7 @@ class ConverterAgentToolCallbackTest {
         when(requestSpec.call()).thenReturn(responseSpec);
         when(responseSpec.content()).thenReturn("ok");
 
-        ConverterAgentToolCallback callback = new ConverterAgentToolCallback(chatClient);
+        ConverterAgentToolCallback callback = new ConverterAgentToolCallback(chatModel -> chatClient, null);
 
         callback.call("{\"request\":\"any\"}", null);
 
@@ -190,7 +190,7 @@ class ConverterAgentToolCallbackTest {
     }
 
     @Test
-    void testCallResolvesChatClientFromSupplierPerCall() {
+    void testCallResolvesChatClientFromFactoryPerCall() {
         ChatClient chatClient = mock(ChatClient.class);
         ChatClientRequestSpec requestSpec = mock(ChatClientRequestSpec.class);
         CallResponseSpec responseSpec = mock(CallResponseSpec.class);
@@ -200,28 +200,28 @@ class ConverterAgentToolCallbackTest {
         when(requestSpec.call()).thenReturn(responseSpec);
         when(responseSpec.content()).thenReturn("converted");
 
-        AtomicInteger supplierCalls = new AtomicInteger();
+        AtomicInteger factoryCalls = new AtomicInteger();
 
-        ConverterAgentToolCallback callback = new ConverterAgentToolCallback(() -> {
-            supplierCalls.incrementAndGet();
+        ConverterAgentToolCallback callback = new ConverterAgentToolCallback(chatModel -> {
+            factoryCalls.incrementAndGet();
 
             return chatClient;
-        });
+        }, null);
 
         String firstResult = callback.call("{\"request\":\"convert this n8n workflow\"}");
         String secondResult = callback.call("{\"request\":\"convert that make workflow\"}");
 
         assertThat(firstResult).isEqualTo("converted");
         assertThat(secondResult).isEqualTo("converted");
-        assertThat(supplierCalls.get()).isEqualTo(2);
+        assertThat(factoryCalls.get()).isEqualTo(2);
     }
 
     @Test
     void testToolDefinitionExposesConverterAgentNameAndRequestSchema() {
-        ConverterAgentToolCallback callback = new ConverterAgentToolCallback(mock(ChatClient.class));
+        ConverterAgentToolCallback callback = new ConverterAgentToolCallback(chatModel -> mock(ChatClient.class), null);
 
         assertThat(callback.getToolDefinition()
-            .name()).isEqualTo("converter_agent");
+            .name()).isEqualTo("importWorkflow");
         assertThat(callback.getToolDefinition()
             .inputSchema()).contains("\"request\"");
     }
@@ -247,7 +247,7 @@ class ConverterAgentToolCallbackTest {
         when(requestSpec.call()).thenReturn(responseSpec);
         when(responseSpec.content()).thenThrow(upstreamException);
 
-        ConverterAgentToolCallback callback = new ConverterAgentToolCallback(chatClient);
+        ConverterAgentToolCallback callback = new ConverterAgentToolCallback(chatModel -> chatClient, null);
 
         String result = callback.call("{\"request\":\"any\"}");
 
@@ -255,7 +255,7 @@ class ConverterAgentToolCallbackTest {
 
         assertThat(node.has("error")).isTrue();
         assertThat(node.get("error")
-            .asText()).contains("converter_agent failed");
+            .asText()).contains("importWorkflow failed");
     }
 
     private static void stubToolContext(ChatClientRequestSpec requestSpec) {
