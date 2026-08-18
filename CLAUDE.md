@@ -527,7 +527,9 @@ Tools reach the ai_hub ASK/BUILD agents through three tiers (wired in `AiHubConf
    ASK's listApiCollections) and note them in the prompt as "find with searchTool first".
 3. **Specialist subagents** — one-shot ChatClients registered as delegate tools. Two families, and
    this is now the COMPLETE list (ticket 732, CRUD-delegate unwind, complete): the
-   nine catalog-backed intelligent delegates shared with the Copilot panels and the management MCP
+   nine catalog-backed intelligent delegates the hub surfaces — the catalog itself holds TEN; the hub
+   omits the embedded-only `buildIntegrationWorkflow`, so "nine" and "all ten" below both hold and
+   are counting different sets — shared with the Copilot panels and the management MCP
    surface (`authorSkill`, `configureClusterElement`, `writeScript`, `buildWorkflow`,
    `debugWorkflowExecution`, `importWorkflow` (BUILD-only), `buildCustomComponent`,
    `buildCodeWorkflow`, `configureMcpServer` (BUILD-only) — see `INTELLIGENT_TOOL_NAMES` and
@@ -570,7 +572,8 @@ registration via `ObjectProvider.ifAvailable`, and prompt documentation on the p
   `select-property-option` marker payload are client-load-bearing — do not rename.
 
 **Subagent delegate model propagation (ticket 732).** Every catalog-backed intelligent delegate — all
-ten, each constructed with a `SubAgentChatModelResolver` by its `IntelligentToolContributor` — follows
+ten in the catalog, i.e. the hub's nine plus the embedded-only `buildIntegrationWorkflow`, each
+constructed with a `SubAgentChatModelResolver` by its `IntelligentToolContributor` — follows
 the `ChatModel` the caller picked in the AI Hub composer or a Copilot panel toolbar; the management
 MCP surface does not, structurally —
 `WorkspaceScopedSubAgentToolCallback` never writes `AgentToolInvocationContext
@@ -657,6 +660,18 @@ tool is attached to the delegate's own `ChatClient` innermost, before the per-su
 `chatClientDecorator`, via `mutate().defaultTools(...)`, so a surface that wraps the client still
 delegates to one carrying it. `SubAgentAskRelay` is an optional bean: absent it (a deployment without
 the EE module) nothing is attached and nothing is wrapped, which is exactly the pre-ask behaviour.
+
+**The one opt-out, and why it is a flag and not a set.** `IntelligentToolDefinition#askCapable()`
+defaults to `true`; the converter delegate (`importWorkflow`) returns `false`, and the seam skips both
+the tool attachment and the wrapper for it. That is not an oversight in the seam — it is the one
+delegate for which "no allowlist" is wrong: `prompt_converter_build.txt` line 4 tells it to NEVER ask
+and to answer with valid JSON and no explanations, so an attached tool inviting it to ask contradicts
+its own prompt, and a question envelope returned where the caller expects a workflow definition is a
+silent contract break. It lives on the definition rather than as a name-keyed `Set` in a configuration
+class deliberately: that was the old `ASK_CAPABLE_AGENT_TYPE_KEYS` shape, whose failure mode was that
+the gate sat far from what it gated and could silently empty. `IntelligentToolSurfaceParityTest`
+pins both the flag and its premise (the prompt still carrying the never-ask directive), and asserts
+every other definition is ask-capable.
 
 **The renderer is per-surface.** `getByNames`/`getForPanel`'s four-argument forms default to
 `SubAgentQuestionRenderer.JSON` — the AI Hub and both Copilot panels keep it, because their client
@@ -747,7 +762,10 @@ slide_builder):
   `bytechef.ai.knowledge-base.enabled`).
 - EE `automation-ai-copilot`: `AutomationCopilotConfiguration` (copilot∨hub: custom_component +
   code_workflow — panel `*SpringAIAgent`s AND one-shot `*SubAgentChatClient`s in one class),
-  `ContextStoreAgentConfiguration` (copilot∨hub ∧ `bytechef.context-store.enabled`).
+  `ContextStoreAgentConfiguration` (copilot∨hub ∧ `bytechef.context-store.enabled` ∧ `@ConditionalOnEEVersion`
+  — the authorization-enforcing `ContextStoreSourceFacade` its tool factory needs is itself EE-gated. Consequence:
+  on `edition != ee` with the context store enabled, the Copilot context-store panel agents are simply absent, and
+  both surfaces tolerate that via `ObjectProvider`/`List` injection).
 
 Per domain and mode there is ONE prompt file shared by the panel agent and the subagent client (no
 `_copilot_` prompt twins). `*AskSubAgentChatClient` beans feed only the hub ASK agent;
