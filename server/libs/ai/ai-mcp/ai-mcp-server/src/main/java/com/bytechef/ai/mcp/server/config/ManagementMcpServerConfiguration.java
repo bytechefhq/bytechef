@@ -106,6 +106,10 @@ public class ManagementMcpServerConfiguration {
             listMcpProjectWorkflows(mcpServerId) shows each attached workflow's current mapping state. \
             configureMcpServer never creates the server, attaches workflows to it, or enables it — those are \
             the flat tools above.
+            An intelligent tool may come back with a question and numbered options instead of a result: \
+            present the options to the user, then call the SAME intelligent tool again, restating the \
+            original request together with the chosen answer — that call is independent like every other, \
+            so the answer on its own is not enough for it to act on. Ordinary CRUD tools never do this.
             listMcpServers and createMcpServer additionally accept an optional workspaceId (and \
             environment) since MCP servers are workspace-scoped: omit it when the account has exactly one \
             workspace, otherwise retry with an explicit workspaceId from the workspace_required error's \

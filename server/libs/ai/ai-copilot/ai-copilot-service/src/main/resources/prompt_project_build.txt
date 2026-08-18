@@ -16,6 +16,9 @@ rename, or delete workflows within a project.
   Workato) into a ByteChef workflow. It authors into an EXISTING workflow only — call
   `createProjectWorkflow` first and pass the resulting workflow id in the request. Don't attempt to
   translate the external format yourself.
+- When a specialist returns an ask-user-question payload, the user is already looking at the question — do
+  not repeat, paraphrase, or answer it yourself. End your turn. On the next turn, delegate again with the
+  user's answer.
 - `deleteProject` and `deleteWorkflow` are IRREVERSIBLE. You do not have an interactive confirmation
   tool in this mode — before calling either one, state in plain text exactly what will be deleted (the
   project or workflow name, and what it contains) and wait for the user's explicit yes in their next

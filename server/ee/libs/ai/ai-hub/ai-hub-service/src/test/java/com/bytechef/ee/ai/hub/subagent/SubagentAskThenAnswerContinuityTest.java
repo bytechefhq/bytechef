@@ -28,7 +28,9 @@ import org.springframework.ai.session.SessionEvent;
  * <p>
  * Without memory this feature is worse than nothing — a specialist that asks a good question and is re-delegated with
  * total amnesia has to re-derive everything, and the user, having answered a specific question, watches it start over.
- * Buttons make that failure faster to reach, not less painful. This test is what keeps the two wired together.
+ * Buttons make that failure faster to reach, not less painful. This test is what keeps the two wired together —
+ * {@link AiHubSessionMemory} plus {@link SubAgentSessionMemoryContributor} on one side, {@link SubagentAskChannelRelay}
+ * and the CE {@code SubAgentAskRelayToolCallback} on the other.
  * </p>
  *
  * @version ee
@@ -37,7 +39,7 @@ import org.springframework.ai.session.SessionEvent;
  */
 class SubagentAskThenAnswerContinuityTest {
 
-    private static final String PROJECT_DEPLOYMENT_AGENT = "project_deployment_agent";
+    private static final String BUILD_WORKFLOW_AGENT = "buildWorkflow";
     private static final String THREAD_ID = "thread-1";
 
     private AiHubSessionMemory aiHubSessionMemory;
@@ -52,7 +54,7 @@ class SubagentAskThenAnswerContinuityTest {
 
     @Test
     void testTheDelegationAfterAnAnswerStillSeesWhyTheQuestionWasAsked() {
-        String sessionId = SubAgentSessionMemoryContributor.sessionKey(THREAD_ID, PROJECT_DEPLOYMENT_AGENT);
+        String sessionId = SubAgentSessionMemoryContributor.sessionKey(THREAD_ID, BUILD_WORKFLOW_AGENT);
 
         // Turn 1: the specialist drafts, then asks which of two environments the user meant.
         appendExchange(
@@ -79,7 +81,7 @@ class SubagentAskThenAnswerContinuityTest {
     @Test
     void testAnotherSpecialistOnTheSameThreadDoesNotInheritTheAnswer() {
         appendExchange(
-            SubAgentSessionMemoryContributor.sessionKey(THREAD_ID, PROJECT_DEPLOYMENT_AGENT),
+            SubAgentSessionMemoryContributor.sessionKey(THREAD_ID, BUILD_WORKFLOW_AGENT),
             "promote the support agent to production", "Asked whether you meant staging or production.");
 
         List<SessionEvent> otherSpecialistEvents = aiHubSessionMemory.sessionService()

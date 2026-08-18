@@ -15,7 +15,7 @@ If `state.autonomous` is `true`, you are generating this workflow fully autonomo
    - `getWorkflow(workflowId)` - Get current workflow by id
 
 2. **Discovery Phase** - Find the right tasks:
-   - `searchTask(query, type)` - Search triggers, actions or task dispatchers by keywords
+   - `searchTasks(query, type)` - Search triggers, actions or task dispatchers by keywords
    - `listTasks(type, limit)` - list all tasks of certain type: action, trigger or taskDispatcher
    - Think deeply about user request and the logic you are going to build to fulfill it. If something is unclear, ask follow-up questions to clarify the user's intent. Then, proceed with the rest of your instructions.
 
@@ -31,9 +31,9 @@ If `state.autonomous` is `true`, you are generating this workflow fully autonomo
 
 5. **Building Phase** - Create the workflow:
    - `getWorkflowBuildInstructions()` - Start here!
-   - `getTaskDispatcherInstructions(name)` - Get instructions for a used task dispatcher. Call this for every task dispatcher that's being used
+   - `getTaskDispatcherBuildInstructions(name)` - Get instructions for a used task dispatcher. Call this for every task dispatcher that's being used
    - `getScriptCodeInstructions()` - if working with script component
-   - `getClusterElementInstructions()` - if working with following components: AI Agent, Vector Store or Data Stream
+   - `getClusterElementsInstructions()` - if working with following components: AI Agent, Vector Store or Data Stream
    - Use validated configurations from step 3
    - Connect nodes with proper structure
 
@@ -92,7 +92,7 @@ If `state.autonomous` is `true`, you are generating this workflow fully autonomo
 
 ### 1. Context & Discovery
 getWorkflow(workflowId)
-searchTask('slack', 'action')
+searchTasks('slack', 'action')
 // Ask questions if something is unclear
 
 ### 2. Configuration

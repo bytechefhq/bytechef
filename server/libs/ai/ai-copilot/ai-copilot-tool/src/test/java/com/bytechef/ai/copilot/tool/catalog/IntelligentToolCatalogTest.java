@@ -17,9 +17,13 @@
 package com.bytechef.ai.copilot.tool.catalog;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.ai.copilot.tool.ask.SubAgentAskRelay;
+import com.bytechef.ai.copilot.tool.ask.SubAgentQuestionRenderer;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,18 +32,26 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
+import org.mockito.Answers;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * @author Ivica Cardic
  */
 class IntelligentToolCatalogTest {
+
+    private static final String QUESTION_ENVELOPE =
+        """
+            {"kind":"ask-user-question","awaitingAnswer":true,"questions":[{"question":"Which project?",\
+            "options":[{"label":"Alpha","description":"the first"},{"label":"Beta","description":"the second"}]}]}""";
 
     @Test
     void testGetByNamesSkipsDefinitionWithNoSupplierForAskVariant() {
@@ -234,6 +246,136 @@ class IntelligentToolCatalogTest {
         return new LazyIntelligentToolDefinition("test_tool", chatClientFactory, mock(ToolCallback.class));
     }
 
+    @Test
+    void testAskRelayIsNotAppliedWhenNoRelayBeanIsPresent() {
+        FakeIntelligentToolDefinition projectWorkflowAgent = projectScopedDefinition();
+
+        IntelligentToolCatalog catalog = catalogOf(projectWorkflowAgent);
+
+        List<ToolCallback> toolCallbacks = catalog.getForPanel(
+            IntelligentToolScope.PROJECT, IntelligentToolVariant.BUILD, identityChatClientDecorator(),
+            identityToolCallbackDecorator());
+
+        assertThat(toolCallbacks)
+            .as("with no SubAgentAskRelay bean the catalog must hand back the definition's own callback untouched")
+            .containsExactly(projectWorkflowAgent.toolCallback);
+    }
+
+    @Test
+    void testAskCapableCallbackStillAdvertisesTheDefinitionName() {
+        ToolCallback delegateToolCallback = mock(ToolCallback.class);
+
+        when(delegateToolCallback.getToolDefinition()).thenReturn(
+            ToolDefinition.builder()
+                .name("buildWorkflow")
+                .description("delegate description")
+                .inputSchema("{\"type\":\"object\"}")
+                .build());
+
+        LazyIntelligentToolDefinition projectWorkflowAgent = new LazyIntelligentToolDefinition(
+            "buildWorkflow", chatModel -> deepStubChatClient(), delegateToolCallback);
+
+        IntelligentToolCatalog catalog = catalogOf(new FakeAskRelay(null), projectWorkflowAgent);
+
+        List<ToolCallback> toolCallbacks = catalog.getByNames(
+            Set.of("buildWorkflow"), IntelligentToolVariant.BUILD, identityChatClientDecorator(),
+            identityToolCallbackDecorator());
+
+        assertThat(toolCallbacks).hasSize(1);
+
+        ToolCallback askCapableToolCallback = toolCallbacks.getFirst();
+        ToolDefinition toolDefinition = askCapableToolCallback.getToolDefinition();
+
+        assertThat(toolDefinition.name())
+            .as("the ask-relay wrapper must advertise the delegate's own name — anything else and the model calls a"
+                + " tool that never resolves")
+            .isEqualTo("buildWorkflow");
+        assertThat(toolDefinition.description()).isEqualTo("delegate description");
+    }
+
+    @Test
+    void testAskToolIsAttachedToTheDelegatesOwnChatClient() {
+        ChatClient rawChatClient = deepStubChatClient();
+        FakeIntelligentToolDefinition projectWorkflowAgent = projectScopedDefinition(rawChatClient);
+
+        FakeAskRelay askRelay = new FakeAskRelay(null);
+
+        IntelligentToolCatalog catalog = catalogOf(askRelay, projectWorkflowAgent);
+
+        catalog.getForPanel(
+            IntelligentToolScope.PROJECT, IntelligentToolVariant.BUILD, identityChatClientDecorator(),
+            identityToolCallbackDecorator());
+
+        assertThat(askRelay.askToolCallbackRequestCount)
+            .as("the catalog must attach the relay's askUserQuestion tool to every delegate's own ChatClient")
+            .isEqualTo(1);
+    }
+
+    @Test
+    void testPlainTextRendererReachesTheWrapperForTheManagementMcpSurface() {
+        ToolCallback delegateToolCallback = mock(ToolCallback.class);
+
+        when(delegateToolCallback.getToolDefinition()).thenReturn(
+            ToolDefinition.builder()
+                .name("configureMcpServer")
+                .description("delegate description")
+                .inputSchema("{\"type\":\"object\"}")
+                .build());
+        when(delegateToolCallback.call(anyString(), any())).thenReturn("the specialist summary");
+
+        LazyIntelligentToolDefinition mcpAgent = new LazyIntelligentToolDefinition(
+            "configureMcpServer", chatModel -> deepStubChatClient(), delegateToolCallback);
+
+        IntelligentToolCatalog catalog = catalogOf(new FakeAskRelay(QUESTION_ENVELOPE), mcpAgent);
+
+        List<ToolCallback> toolCallbacks = catalog.getByNames(
+            Set.of("configureMcpServer"), IntelligentToolVariant.BUILD, identityChatClientDecorator(),
+            identityToolCallbackDecorator(), SubAgentQuestionRenderer.PLAIN_TEXT);
+
+        String result = toolCallbacks.getFirst()
+            .call("{\"request\":\"go\"}");
+
+        assertThat(result)
+            .contains("1. Alpha")
+            .doesNotContain("\"kind\":\"ask-user-question\"");
+    }
+
+    @Test
+    void testDefaultRendererKeepsTheJsonEnvelopeForPanelsAndTheHub() {
+        ToolCallback delegateToolCallback = mock(ToolCallback.class);
+
+        when(delegateToolCallback.getToolDefinition()).thenReturn(
+            ToolDefinition.builder()
+                .name("buildWorkflow")
+                .description("delegate description")
+                .inputSchema("{\"type\":\"object\"}")
+                .build());
+        when(delegateToolCallback.call(anyString(), any())).thenReturn("the specialist summary");
+
+        LazyIntelligentToolDefinition projectWorkflowAgent = new LazyIntelligentToolDefinition(
+            "buildWorkflow", chatModel -> deepStubChatClient(), delegateToolCallback);
+
+        IntelligentToolCatalog catalog = catalogOf(new FakeAskRelay(QUESTION_ENVELOPE), projectWorkflowAgent);
+
+        List<ToolCallback> toolCallbacks = catalog.getByNames(
+            Set.of("buildWorkflow"), IntelligentToolVariant.BUILD, identityChatClientDecorator(),
+            identityToolCallbackDecorator());
+
+        assertThat(toolCallbacks.getFirst()
+            .call("{\"request\":\"go\"}"))
+                .isEqualTo(QUESTION_ENVELOPE);
+    }
+
+    private static ChatClient deepStubChatClient() {
+        ChatClient chatClient = mock(ChatClient.class, Answers.RETURNS_DEEP_STUBS);
+
+        when(chatClient.mutate()
+            .defaultTools(any(Object[].class))
+            .build()).thenReturn(chatClient);
+
+        return chatClient;
+    }
+
     private static BiFunction<ChatClient, IntelligentToolDefinition, ChatClient> identityChatClientDecorator() {
         return (chatClient, definition) -> chatClient;
     }
@@ -243,9 +385,26 @@ class IntelligentToolCatalogTest {
     }
 
     private static IntelligentToolCatalog catalogOf(IntelligentToolDefinition... definitions) {
+        return catalogOf(null, definitions);
+    }
+
+    private static IntelligentToolCatalog catalogOf(
+        @Nullable SubAgentAskRelay askRelay, IntelligentToolDefinition... definitions) {
+
         IntelligentToolContributor contributor = () -> List.of(definitions);
 
-        return new IntelligentToolCatalog(fixedObjectProvider(contributor));
+        return askRelay == null
+            ? new IntelligentToolCatalog(fixedObjectProvider(contributor))
+            : new IntelligentToolCatalog(fixedObjectProvider(contributor), fixedAskRelayProvider(askRelay));
+    }
+
+    @SuppressWarnings("unchecked")
+    private static ObjectProvider<SubAgentAskRelay> fixedAskRelayProvider(@Nullable SubAgentAskRelay askRelay) {
+        ObjectProvider<SubAgentAskRelay> objectProvider = mock(ObjectProvider.class);
+
+        when(objectProvider.getIfAvailable()).thenReturn(askRelay);
+
+        return objectProvider;
     }
 
     @SuppressWarnings("unchecked")
@@ -351,6 +510,29 @@ class IntelligentToolCatalogTest {
         @Override
         public ToolCallback create(IntelligentToolChatClientFactory chatClientFactory) {
             return toolCallback;
+        }
+    }
+
+    private static final class FakeAskRelay implements SubAgentAskRelay {
+
+        private final @Nullable String pendingQuestion;
+
+        private int askToolCallbackRequestCount;
+
+        private FakeAskRelay(@Nullable String pendingQuestion) {
+            this.pendingQuestion = pendingQuestion;
+        }
+
+        @Override
+        public ToolCallback askUserQuestionToolCallback() {
+            askToolCallbackRequestCount++;
+
+            return mock(ToolCallback.class);
+        }
+
+        @Override
+        public <T> AskOutcome<T> runWithChannel(Supplier<T> supplier) {
+            return new AskOutcome<>(supplier.get(), pendingQuestion);
         }
     }
 }

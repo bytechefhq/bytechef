@@ -32,6 +32,27 @@ import tools.jackson.databind.JsonNode;
  * </p>
  *
  * <p>
+ * Neither {@link #SPECIALIST_CONTRACT_GUIDANCE} nor {@link #STOP_INSTRUCTION} promises the specialist that its context
+ * survives to the follow-up call, because on two of the three surfaces it does not: per-conversation specialist memory
+ * is attached only by {@code AiHubConfiguration#wrapDelegate}, while both Copilot panel configurations and all three
+ * management-MCP contributors pass an identity {@code chatClientDecorator} — and the MCP surface carries no
+ * conversation id to key a session on in the first place. The same tool instance is attached on every surface, so its
+ * text has to be true on the weakest one. What both texts do instead is tell the specialist to put what matters into
+ * the summary, which travels on every surface.
+ * </p>
+ *
+ * <p>
+ * The tool <b>name</b> and <b>input schema</b> are the delegate's verbatim; only the description differs, gaining
+ * {@link #SPECIALIST_CONTRACT_GUIDANCE}. That guidance lives here rather than in the specialist's system prompt on
+ * purpose. Every specialist prompt file is shared with a Copilot panel agent (see the domain copilot slice pattern),
+ * and the panel agent's {@code askUserQuestion} — where it has one at all — follows the OPPOSITE contract: it
+ * <i>returns</i> the envelope and keeps going. A shared prompt therefore cannot state this contract truthfully for both
+ * readers, and stating it for a panel agent that has no such tool at all would name a tool the agent does not have and
+ * kill the turn with "No ToolCallback found". A tool description is read only by the agents actually holding the tool,
+ * which is exactly the audience this instruction has.
+ * </p>
+ *
+ * <p>
  * The one behavioural difference is what goes back to the LLM. The main agent <i>returns</i> the envelope, because the
  * client renders the main agent's tool result directly. A specialist's tool result is never rendered — it is consumed
  * by the specialist's own LLM — so this one writes the envelope to {@link SubagentAskChannel} (whence the delegate
@@ -47,9 +68,23 @@ import tools.jackson.databind.JsonNode;
  */
 public final class SubagentAskUserQuestionToolCallback implements ToolCallback {
 
+    /**
+     * Appended to the delegate's own description. Names the two things a specialist must know that the main agent's
+     * reader must not be told: that the question reaches the user through the delegating agent's stream rather than
+     * this tool's return value, and that the correct move after asking is to stop.
+     */
+    private static final String SPECIALIST_CONTRACT_GUIDANCE =
+        " You are running as a delegated specialist: this tool poses the question to the user through the agent that" +
+            " delegated to you, and returns only an acknowledgement — never the user's answer. Ask at most ONE" +
+            " question per delegation, then STOP. Do not guess an answer, and do not keep working past the question." +
+            " Return a one-line summary naming what you asked and what you had already established, since the" +
+            " delegating agent works from that summary and a later call may reach you with none of this turn's" +
+            " reasoning still in hand.";
+
     private static final String STOP_INSTRUCTION =
-        "Question posed to the user. Stop now and return a one-line summary of what you asked. " +
-            "You will be re-invoked with the user's answer and your prior context intact.";
+        "Question posed to the user. Stop now and return a one-line summary of what you asked and what you had " +
+            "already established. A later call will bring the user's answer, but may not bring this turn's " +
+            "reasoning with it, so put anything the follow-up needs into that summary.";
 
     private static final Logger log = LoggerFactory.getLogger(SubagentAskUserQuestionToolCallback.class);
 
@@ -61,7 +96,13 @@ public final class SubagentAskUserQuestionToolCallback implements ToolCallback {
 
     @Override
     public ToolDefinition getToolDefinition() {
-        return delegate.getToolDefinition();
+        ToolDefinition toolDefinition = delegate.getToolDefinition();
+
+        return ToolDefinition.builder()
+            .name(toolDefinition.name())
+            .description(toolDefinition.description() + SPECIALIST_CONTRACT_GUIDANCE)
+            .inputSchema(toolDefinition.inputSchema())
+            .build();
     }
 
     @Override

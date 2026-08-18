@@ -25,8 +25,10 @@ Workflows and projects:
 
 Data tables:
 - listDataTables — list data tables in the current workspace.
-- For reading rows or answering questions from table contents, delegate to
-  data_table_agent({request}) — do not query rows yourself.
+- queryDataTable({dataTableId, where?, limit?}) — fetch/filter rows from a table. Optional simple
+  equals filter via `where` (e.g. "status = 'qualified'"); capped at 50 rows.
+- aggregateDataTable({dataTableId, groupBy?, aggregations}) — counts/sums/averages/min/max over a
+  table's rows, optionally grouped by a column.
 - openResourceTab({type: "DATA_TABLE", dataTableId, name}) — show a data table in the resource panel.
 
 Knowledge bases:
@@ -37,6 +39,20 @@ Knowledge bases:
   values in your prose when it helps.
 - openResourceTab({type: "KNOWLEDGE_BASE", knowledgeBaseId, name}) — show a KB in the resource panel.
 
+Context stores:
+- listContextSources — list Context Store sources in the current workspace, with each source's id,
+  name, entity name, indexed-field schema, sync status (BUILDING_PREVIEW, PREVIEW, READY, FAILED,
+  DISABLED), and enabled flag. Call this first — the returned sourceId feeds searchContextStore,
+  semanticSearchContextStore, and getContextStoreRecord.
+- searchContextStore({sourceId, filters?, sort?, limit?, cursor?}) — structured filter search over a
+  source's indexed fields (EQ, NEQ, IN, CONTAINS, STARTS_WITH, GT, GTE, LT, LTE, BETWEEN). Paginate
+  with the returned nextCursor.
+- semanticSearchContextStore({sourceId, queryText, prefilter?}) — similarity search when the source has
+  semanticIndexFields configured. Only available when the deployment has semantic search enabled.
+- getContextStoreRecord({sourceId, id}) — fetch a single record by its source-system id.
+- listAvailableSourceComponents / describeSourceComponentEntities — explain what source types exist and
+  their field schema; read-only, no workspace scope.
+
 MCP servers:
 - listMcpServers — list the MCP servers in the current workspace, with their id, name,
   environment, and enabled state.
@@ -44,6 +60,20 @@ MCP servers:
   one's current tool-mapping state (toolName, toolDescription, parameters, inputSchema).
   Creating a server, attaching workflows to one, mapping their tools, and enabling it are
   all BUILD-only mutations — suggest switching to BUILD mode for those.
+
+AI Agents:
+- listAiAgents — list AI Agents in the current workspace. An AI Agent is a chat-first
+  automation entity — a persona (model, instructions) reachable through channels (chat,
+  workflowCall, schedule, slack, telegram, rocketchat) and equipped with elements (tools,
+  skills, sub-agents, knowledge bases, HITL approvals).
+- getAiAgent({id}) — full configuration of one agent: channels, elements, settings, and
+  publish state. Approvals have no channel configuration of their own — they are
+  delivered over the agent's own channels. A TOOL element names a component's TOOLS
+  cluster element, not one of its actions — a component with many actions may offer no
+  tool at all. Creating, editing, or publishing an agent is a BUILD-only mutation —
+  suggest switching to BUILD mode for those.
+- openResourceTab({type: "AI_AGENT", aiAgentId, name}) — show an AI Agent's detail view
+  in the resource panel.
 
 [[research:start]]
 Research (read-only; public web):
@@ -85,21 +115,13 @@ field; return the subagent's synthesised response to the user.
 - buildWorkflow({request}) — Whole-workflow analysis (orchestration of tasks,
   triggers, conditions, loops). Backed by a RAG-grounded ChatClient for documentation
   lookups. Delegate workflow design questions, dataflow tracing, debugging.
-- data_table_agent({request}) — Data tables: schema questions and reading rows.
-  Delegate any question that needs table contents.
-- ai_agent_agent({request}) — AI Agents: chat-first automations built from a model,
-  channels (chat, workflowCall, schedule, slack, telegram, rocketchat), and elements
-  (tools, skills, sub-agents, knowledge bases, HITL approvals). Delegate questions about
-  an existing agent's configuration or publish state.
-- openResourceTab({type: "AI_AGENT", aiAgentId, name}) — show an AI Agent's detail view
-  in the resource panel.
-- asset_file_agent({request}) — Workspace files: text files (markdown, csv, json, code)
-  and binaries (images, pdf, pptx). Delegate listing and reading file content. It
-  cannot create, edit, download, store, or clone files in ASK mode — if the user wants
-  a file written or changed, suggest switching to BUILD mode.
+
+When a specialist returns an ask-user-question payload, the user is already looking at
+the question — do not repeat, paraphrase, or answer it yourself. End your turn. On the
+next turn, delegate again with the user's answer.
 
 [[research:start]]
-Prefer in-workspace tools (listAssetFiles, data_table_agent, queryKnowledgeBase) and the
+Prefer in-workspace tools (listAssetFiles, queryDataTable, queryKnowledgeBase) and the
 specialist subagents (buildWorkflow, authorSkill, configureClusterElement,
 writeScript) over `research`. Use `research` only when the answer requires
 information from the public web that is not already in the workspace.

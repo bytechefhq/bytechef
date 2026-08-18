@@ -574,7 +574,7 @@ public class CopilotConfiguration {
     SkillsSpringAIAgent skillsBuildSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, ReadProjectTools readProjectTools,
         ReadProjectWorkflowTools readProjectWorkflowTools, SkillsTools skillsTools,
-        SecurityContextRehydrator securityContextRehydrator,
+        ComponentTools componentTools, SecurityContextRehydrator securityContextRehydrator,
         ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider)
         throws AGUIException {
 
@@ -590,8 +590,8 @@ public class CopilotConfiguration {
                 wrapTools(
                     securityContextRehydrator,
                     List.of(
-                        skillsTools, readProjectTools, readProjectWorkflowTools, workflowValidatorTools,
-                        workflowInstructionTools)))
+                        skillsTools, readProjectTools, readProjectWorkflowTools, componentTools,
+                        workflowValidatorTools, workflowInstructionTools)))
             .overrideChatClientResolver(overrideChatClientResolverProvider.getIfAvailable())
             .build();
     }
@@ -882,7 +882,10 @@ public class CopilotConfiguration {
                 workflowInstructionTools)
             // One-shot subagent (backs the management MCP workflow_editor agent + AI Hub delegation): give it
             // lookupPropertyOptions so it fetches real option values for dynamic-option properties and sets a valid
-            // one itself. Not the interactive askUserQuestion/select picker — a one-shot subagent can't ask + resume.
+            // one itself. Deliberately not the interactive select picker, whose result the client must render and
+            // resolve in place. askUserQuestion is not registered here either, but for the opposite reason: the
+            // specialist-flavoured one is attached to every intelligent delegate by IntelligentToolCatalog, which
+            // owns that wiring so no delegate configuration has to remember it.
             .defaultToolCallbacks(
                 new LookupComponentPropertyOptionsToolCallback(
                     actionDefinitionService, actionDefinitionFacade, triggerDefinitionService, triggerDefinitionFacade,
@@ -1045,31 +1048,34 @@ public class CopilotConfiguration {
     @Bean
     ChatClient skillsBuildSubAgentChatClient(
         ChatModel chatModel, ReadProjectTools readProjectTools,
-        ReadProjectWorkflowTools readProjectWorkflowTools, SkillsTools skillsTools) {
+        ReadProjectWorkflowTools readProjectWorkflowTools, SkillsTools skillsTools,
+        ComponentTools componentTools) {
 
-        return buildSkillsBuildSubAgentChatClient(chatModel, readProjectTools, readProjectWorkflowTools, skillsTools);
+        return buildSkillsBuildSubAgentChatClient(
+            chatModel, readProjectTools, readProjectWorkflowTools, skillsTools, componentTools);
     }
 
     @Bean
     IntelligentToolChatClientFactory skillsBuildSubAgentChatClientFactory(
         @Qualifier("skillsBuildSubAgentChatClient") ChatClient skillsBuildSubAgentChatClient,
         ReadProjectTools readProjectTools, ReadProjectWorkflowTools readProjectWorkflowTools,
-        SkillsTools skillsTools) {
+        SkillsTools skillsTools, ComponentTools componentTools) {
 
         return candidateChatModel -> candidateChatModel == null
             ? skillsBuildSubAgentChatClient
             : buildSkillsBuildSubAgentChatClient(
-                candidateChatModel, readProjectTools, readProjectWorkflowTools, skillsTools);
+                candidateChatModel, readProjectTools, readProjectWorkflowTools, skillsTools, componentTools);
     }
 
     private ChatClient buildSkillsBuildSubAgentChatClient(
         ChatModel chatModel, ReadProjectTools readProjectTools,
-        ReadProjectWorkflowTools readProjectWorkflowTools, SkillsTools skillsTools) {
+        ReadProjectWorkflowTools readProjectWorkflowTools, SkillsTools skillsTools,
+        ComponentTools componentTools) {
 
         return ChatClient.builder(chatModel)
             .defaultSystem(skillsBuildSystemPrompt)
             .defaultTools(
-                skillsTools, readProjectTools, readProjectWorkflowTools, workflowValidatorTools,
+                skillsTools, readProjectTools, readProjectWorkflowTools, componentTools, workflowValidatorTools,
                 workflowInstructionTools)
             .build();
     }

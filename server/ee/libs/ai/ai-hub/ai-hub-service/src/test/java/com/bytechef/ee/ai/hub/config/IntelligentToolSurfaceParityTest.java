@@ -21,18 +21,24 @@ import com.bytechef.ai.copilot.tool.catalog.IntelligentToolVariant;
 import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
 import com.bytechef.ee.automation.ai.copilot.config.AutomationCopilotMcpContributorConfiguration;
 import com.bytechef.ee.embedded.ai.copilot.config.EmbeddedCopilotMcpContributorConfiguration;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -300,6 +306,124 @@ class IntelligentToolSurfaceParityTest {
                     + " IntelligentToolChatClientFactory @Qualifier across all four contributors (11 copilot + 4"
                     + " automation + 1 embedded + 1 automation-tool)")
             .isEqualTo(17);
+    }
+
+    @Test
+    void testEveryDefinitionNameMatchesTheNameItsOwnCallbackAdvertises() throws ReflectiveOperationException {
+        // Every intelligent tool's name is written down twice: once as the definition's name() (the catalog's
+        // registration key) and once as a hardcoded default baked into the callback's short constructor (e.g.
+        // ProjectWorkflowAgentToolCallback delegates to this(..., "buildWorkflow", ...)). Nothing else asserts the
+        // two agree — if they ever diverge, the catalog advertises one name while the callback answers to another,
+        // and the model calls a tool that never resolves (a runtime "No ToolCallback found", invisible at compile
+        // time). This walks the catalog data-driven, over whatever contributedDefinitions() returns, rather than a
+        // hardcoded list of names, so a tool added later is covered automatically.
+        List<IntelligentToolDefinition> definitions = contributedDefinitions();
+
+        assertThat(definitions).isNotEmpty();
+
+        for (IntelligentToolDefinition definition : definitions) {
+            IntelligentToolChatClientFactory chatClientFactory = firstNonNullChatClientFactory(definition);
+
+            assertThat(chatClientFactory)
+                .as(
+                    "%s#chatClientFactory(variant) returned null for every IntelligentToolVariant — cannot build its"
+                        + " ToolCallback to check the name",
+                    definition.name())
+                .isNotNull();
+
+            ToolCallback toolCallback = definition.create(chatClientFactory);
+            ToolDefinition callbackToolDefinition = toolCallback.getToolDefinition();
+
+            assertThat(callbackToolDefinition.name())
+                .as(
+                    "intelligent tool '%s': the catalog definition's name() must equal the name its own ToolCallback"
+                        + " advertises via ToolDefinition#name() — catalog says '%s', callback says '%s'; a mismatch"
+                        + " means the model would call a tool name that never resolves to this callback",
+                    definition.name(), definition.name(), callbackToolDefinition.name())
+                .isEqualTo(definition.name());
+        }
+    }
+
+    /**
+     * The invariant behind {@link IntelligentToolDefinition#askCapable()}: a delegate whose own system prompt forbids
+     * asking must not be handed the specialist {@code askUserQuestion} tool, because
+     * {@code IntelligentToolCatalog#buildToolCallback} otherwise attaches it to every delegate it builds.
+     *
+     * <p>
+     * The general form — "for every definition, read the prompt behind it and assert the two agree" — is NOT checkable
+     * here, and deliberately so: a definition exposes its {@code chatClientFactory}, never the prompt resource that
+     * factory closed over, so there is no mapping from a definition name to a {@code prompt_*.txt} to read. Rather than
+     * hardcode that mapping (which would itself be a claim that could drift), this asserts the one concrete case plus
+     * its premise — that {@code prompt_converter_build.txt} still carries the never-ask directive — so relaxing the
+     * prompt and flipping the flag both fail here.
+     * </p>
+     */
+    @Test
+    void testConverterDelegateIsNotAskCapableWhileItsPromptForbidsAsking() throws ReflectiveOperationException {
+        String converterPrompt = readClasspathResource("prompt_converter_build.txt");
+
+        assertThat(converterPrompt)
+            .as(
+                "premise of this test: prompt_converter_build.txt forbids asking. If this directive was deliberately"
+                    + " removed, revisit importWorkflow's askCapable() opt-out rather than only this assertion")
+            .contains("You must NEVER ask the user any questions");
+
+        List<IntelligentToolDefinition> definitions = contributedDefinitions();
+
+        IntelligentToolDefinition converterDefinition = definitions.stream()
+            .filter(definition -> "importWorkflow".equals(definition.name()))
+            .findFirst()
+            .orElseThrow(() -> new AssertionError("no 'importWorkflow' definition was contributed to the catalog"));
+
+        assertThat(converterDefinition.askCapable())
+            .as(
+                "importWorkflow is backed by prompt_converter_build.txt, which forbids asking and requires a bare-JSON"
+                    + " answer; an attached askUserQuestion tool would contradict its prompt and could return a"
+                    + " question envelope where the caller's contract expects a workflow definition")
+            .isFalse();
+
+        for (IntelligentToolDefinition definition : definitions) {
+            if (definition == converterDefinition) {
+                continue;
+            }
+
+            assertThat(definition.askCapable())
+                .as(
+                    "intelligent tool '%s': ask-capability is the default and the converter is the only opt-out today."
+                        + " If another delegate's prompt started forbidding asking, add it above rather than relaxing"
+                        + " this assertion",
+                    definition.name())
+                .isTrue();
+        }
+    }
+
+    private static String readClasspathResource(String name) {
+        ClassLoader classLoader = IntelligentToolSurfaceParityTest.class.getClassLoader();
+
+        try (InputStream inputStream = classLoader.getResourceAsStream(name)) {
+            if (inputStream == null) {
+                throw new AssertionError("classpath resource not found: " + name);
+            }
+
+            return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+        } catch (IOException exception) {
+            throw new AssertionError("failed to read classpath resource: " + name, exception);
+        }
+    }
+
+    @Nullable
+    private static IntelligentToolChatClientFactory firstNonNullChatClientFactory(
+        IntelligentToolDefinition definition) {
+
+        for (IntelligentToolVariant variant : IntelligentToolVariant.values()) {
+            IntelligentToolChatClientFactory chatClientFactory = definition.chatClientFactory(variant);
+
+            if (chatClientFactory != null) {
+                return chatClientFactory;
+            }
+        }
+
+        return null;
     }
 
     private static void assertFactoryMethodIsASpringBeanMethod(String className, String methodName)

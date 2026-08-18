@@ -70,6 +70,28 @@ public interface IntelligentToolDefinition {
     IntelligentToolChatClientFactory chatClientFactory(IntelligentToolVariant variant);
 
     /**
+     * Whether this delegate may be handed the specialist-facing {@code askUserQuestion} tool — {@code true} for every
+     * delegate that does not say otherwise, so a delegate added later is ask-capable without having to remember.
+     *
+     * <p>
+     * Return {@code false} only when the delegate's own system prompt forbids asking, or when its caller's contract
+     * cannot accept a question envelope where it expects a result. The converter delegate ({@code importWorkflow}) is
+     * the one such case today: {@code prompt_converter_build.txt} tells it never to ask and to answer with valid JSON
+     * and nothing else, so attaching a tool whose description invites it to ask would contradict its prompt and, if it
+     * ever asked, hand the caller a question where a workflow definition was expected.
+     * </p>
+     *
+     * <p>
+     * This is a flag on the definition rather than a name-keyed allowlist in a configuration class on purpose: the
+     * earlier {@code ASK_CAPABLE_AGENT_TYPE_KEYS} shape put the gate far from the thing it gated and could silently
+     * empty. A flag travels with the definition it describes.
+     * </p>
+     */
+    default boolean askCapable() {
+        return true;
+    }
+
+    /**
      * Builds the {@link ToolCallback} over the given (already surface-decorated)
      * {@link IntelligentToolChatClientFactory}.
      */

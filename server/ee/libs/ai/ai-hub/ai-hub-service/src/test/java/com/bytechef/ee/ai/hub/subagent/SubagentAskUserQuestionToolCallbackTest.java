@@ -9,9 +9,12 @@ package com.bytechef.ee.ai.hub.subagent;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.bytechef.ai.copilot.tool.AskUserQuestionToolCallback;
+import com.bytechef.ai.copilot.tool.ToolStateVisibilityMetrics;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.ai.tool.definition.ToolDefinition;
 
 /**
  * @version ee
@@ -111,5 +114,66 @@ class SubagentAskUserQuestionToolCallbackTest {
         assertThat(
             toolCallback.getToolDefinition()
                 .name()).isEqualTo("askUserQuestion");
+    }
+
+    @Test
+    void testInputSchemaIsTheMainAgentToolsVerbatimSoTheEnvelopeCannotDrift() {
+        SubagentAskUserQuestionToolCallback toolCallback = new SubagentAskUserQuestionToolCallback();
+        AskUserQuestionToolCallback mainAgentToolCallback =
+            new AskUserQuestionToolCallback(ToolStateVisibilityMetrics.NOOP);
+
+        ToolDefinition toolDefinition = toolCallback.getToolDefinition();
+        ToolDefinition mainAgentToolDefinition = mainAgentToolCallback.getToolDefinition();
+
+        assertThat(toolDefinition.inputSchema()).isEqualTo(mainAgentToolDefinition.inputSchema());
+    }
+
+    /**
+     * The specialist contract cannot live in the specialist's system prompt: that file is shared with a Copilot panel
+     * agent whose own {@code askUserQuestion} follows the opposite contract, or which has no such tool at all. The
+     * description is read only by agents actually holding the tool.
+     */
+    @Test
+    void testDescriptionTellsTheSpecialistToStopAfterAsking() {
+        SubagentAskUserQuestionToolCallback toolCallback = new SubagentAskUserQuestionToolCallback();
+        AskUserQuestionToolCallback mainAgentToolCallback =
+            new AskUserQuestionToolCallback(ToolStateVisibilityMetrics.NOOP);
+
+        ToolDefinition toolDefinition = toolCallback.getToolDefinition();
+        ToolDefinition mainAgentToolDefinition = mainAgentToolCallback.getToolDefinition();
+
+        assertThat(toolDefinition.description())
+            .startsWith(mainAgentToolDefinition.description())
+            .contains("Ask at most ONE question per delegation, then STOP")
+            .contains("Return a one-line summary naming what you asked and what you had already established")
+            .contains("never the user's answer");
+    }
+
+    /**
+     * Per-conversation specialist memory is attached only by {@code AiHubConfiguration#wrapDelegate}. Both Copilot
+     * panel configurations and all three management-MCP contributors pass an identity {@code chatClientDecorator}, and
+     * the MCP surface carries no conversation id to key a session on at all — so a specialist there genuinely starts
+     * from nothing on the follow-up call. One tool instance is attached on every surface, so neither of its two texts
+     * may promise a retention only one surface provides.
+     */
+    @Test
+    void testNeitherTextPromisesThatTheSpecialistsContextSurvivesTheFollowUpCall() {
+        SubagentAskUserQuestionToolCallback toolCallback = new SubagentAskUserQuestionToolCallback();
+
+        ToolDefinition toolDefinition = toolCallback.getToolDefinition();
+
+        String stopInstruction = SubagentAskChannel.runWithChannel(
+            () -> toolCallback.call(VALID_TOOL_INPUT, null));
+
+        assertThat(toolDefinition.description())
+            .doesNotContain("context intact")
+            .doesNotContain("prior context");
+        assertThat(stopInstruction)
+            .doesNotContain("context intact")
+            .doesNotContain("prior context");
+        assertThat(stopInstruction)
+            .as("the summary is the only thing that reaches the follow-up call on every surface, so the specialist"
+                + " must be told to put what matters into it")
+            .contains("put anything the follow-up needs into that summary");
     }
 }
