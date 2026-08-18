@@ -11,8 +11,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
 import com.bytechef.ee.automation.ai.tool.contextstore.ContextStoreToolCallbacksFactory;
-import com.bytechef.ee.automation.contextstore.facade.WorkspaceContextStoreFacade;
-import com.bytechef.ee.automation.contextstore.facade.WorkspaceContextStoreSourceFacade;
+import com.bytechef.ee.automation.contextstore.facade.ContextStoreFacade;
+import com.bytechef.ee.automation.contextstore.facade.ContextStoreSourceFacade;
 import com.bytechef.ee.automation.contextstore.service.WorkspaceContextStoreSourceService;
 import com.bytechef.ee.platform.contextstore.service.ContextStoreQueryService;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -44,7 +44,11 @@ class ContextStoreAgentConfigurationConditionTest {
     @Test
     void testBacksOffWhenContextStoreIsDisabled() {
         try (AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext()) {
-            addProperties(context, Map.of("bytechef.ai.copilot.enabled", "true", "bytechef.ai.hub.enabled", "true"));
+            addProperties(
+                context,
+                Map.of(
+                    "bytechef.ai.copilot.enabled", "true", "bytechef.ai.hub.enabled", "true", "bytechef.edition",
+                    "ee"));
 
             // Only the beans that exist when the context-store feature is off are registered here, mirroring a real
             // server context; refresh() fails with an unsatisfied dependency if the configuration activates anyway.
@@ -58,7 +62,11 @@ class ContextStoreAgentConfigurationConditionTest {
     @Test
     void testActivatesWhenContextStoreAndAnAgentSurfaceAreEnabled() {
         try (AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext()) {
-            addProperties(context, Map.of("bytechef.ai.hub.enabled", "true", "bytechef.context-store.enabled", "true"));
+            addProperties(
+                context,
+                Map.of(
+                    "bytechef.ai.hub.enabled", "true", "bytechef.context-store.enabled", "true", "bytechef.edition",
+                    "ee"));
 
             context.register(
                 UngatedDependenciesConfiguration.class, ContextStoreDependenciesConfiguration.class,
@@ -66,8 +74,8 @@ class ContextStoreAgentConfigurationConditionTest {
             context.refresh();
 
             assertThat(context.getBeanNamesForType(ContextStoreToolCallbacksFactory.class)).hasSize(1);
-            assertThat(context.containsBean("contextStoreAskSubAgentChatClient")).isTrue();
-            assertThat(context.containsBean("contextStoreBuildSubAgentChatClient")).isTrue();
+            assertThat(context.containsBean("contextStoreAskSpringAIAgent")).isTrue();
+            assertThat(context.containsBean("contextStoreBuildSpringAIAgent")).isTrue();
         }
     }
 
@@ -112,13 +120,13 @@ class ContextStoreAgentConfigurationConditionTest {
         }
 
         @Bean
-        WorkspaceContextStoreFacade workspaceContextStoreFacade() {
-            return Mockito.mock(WorkspaceContextStoreFacade.class);
+        ContextStoreFacade contextStoreFacade() {
+            return Mockito.mock(ContextStoreFacade.class);
         }
 
         @Bean
-        WorkspaceContextStoreSourceFacade workspaceContextStoreSourceFacade() {
-            return Mockito.mock(WorkspaceContextStoreSourceFacade.class);
+        ContextStoreSourceFacade contextStoreSourceFacade() {
+            return Mockito.mock(ContextStoreSourceFacade.class);
         }
 
         @Bean

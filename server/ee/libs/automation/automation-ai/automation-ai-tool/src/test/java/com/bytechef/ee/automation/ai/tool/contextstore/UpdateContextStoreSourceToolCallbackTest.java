@@ -15,11 +15,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.automation.contextstore.dto.UpdateContextStoreSourceInput;
-import com.bytechef.ee.automation.contextstore.facade.WorkspaceContextStoreSourceFacade;
-import com.bytechef.ee.automation.contextstore.service.WorkspaceContextStoreSourceService;
+import com.bytechef.ee.automation.contextstore.facade.ContextStoreSourceFacade;
 import com.bytechef.ee.platform.contextstore.domain.ContextStoreSource;
 import com.bytechef.ee.platform.contextstore.domain.ContextStoreSourceStatus;
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.ai.tool.definition.ToolDefinition;
@@ -37,8 +35,8 @@ class UpdateContextStoreSourceToolCallbackTest {
 
     @Test
     void testToolDefinitionExposesName() {
-        UpdateContextStoreSourceToolCallback callback = new UpdateContextStoreSourceToolCallback(
-            mock(WorkspaceContextStoreSourceFacade.class), mock(WorkspaceContextStoreSourceService.class));
+        UpdateContextStoreSourceToolCallback callback =
+            new UpdateContextStoreSourceToolCallback(mock(ContextStoreSourceFacade.class));
 
         ToolDefinition definition = callback.getToolDefinition();
 
@@ -56,13 +54,11 @@ class UpdateContextStoreSourceToolCallbackTest {
         updated.setEnabled(true);
         updated.setStatus(ContextStoreSourceStatus.READY);
 
-        WorkspaceContextStoreSourceFacade facade = mock(WorkspaceContextStoreSourceFacade.class);
-        WorkspaceContextStoreSourceService service = mock(WorkspaceContextStoreSourceService.class);
+        ContextStoreSourceFacade facade = mock(ContextStoreSourceFacade.class);
 
-        when(service.fetchWorkspaceIdByContextStoreSourceId(42L)).thenReturn(Optional.of(7L));
-        when(facade.update(eq(7L), eq(42L), any(UpdateContextStoreSourceInput.class))).thenReturn(updated);
+        when(facade.updateContextStoreSource(eq(42L), any(UpdateContextStoreSourceInput.class))).thenReturn(updated);
 
-        UpdateContextStoreSourceToolCallback callback = new UpdateContextStoreSourceToolCallback(facade, service);
+        UpdateContextStoreSourceToolCallback callback = new UpdateContextStoreSourceToolCallback(facade);
 
         String result = callback.call("{\"id\":42,\"name\":\"renamed\",\"cadence\":\"@daily\"}");
 
@@ -76,7 +72,7 @@ class UpdateContextStoreSourceToolCallbackTest {
         ArgumentCaptor<UpdateContextStoreSourceInput> captor =
             ArgumentCaptor.forClass(UpdateContextStoreSourceInput.class);
 
-        verify(facade).update(eq(7L), eq(42L), captor.capture());
+        verify(facade).updateContextStoreSource(eq(42L), captor.capture());
 
         UpdateContextStoreSourceInput captured = captor.getValue();
 
@@ -86,9 +82,27 @@ class UpdateContextStoreSourceToolCallbackTest {
     }
 
     @Test
+    void testCallSurfacesIllegalStateAsToolError() throws Exception {
+        ContextStoreSourceFacade facade = mock(ContextStoreSourceFacade.class);
+
+        when(facade.updateContextStoreSource(eq(42L), any(UpdateContextStoreSourceInput.class)))
+            .thenThrow(new IllegalStateException("ContextStoreSource 42 has no owning workspace"));
+
+        UpdateContextStoreSourceToolCallback callback = new UpdateContextStoreSourceToolCallback(facade);
+
+        String result = callback.call("{\"id\":42,\"name\":\"renamed\"}");
+
+        JsonNode node = jsonMapper.readTree(result);
+
+        assertThat(node.has("error")).isTrue();
+        assertThat(node.get("error")
+            .asText()).contains("has no owning workspace");
+    }
+
+    @Test
     void testCallRequiresId() throws Exception {
-        UpdateContextStoreSourceToolCallback callback = new UpdateContextStoreSourceToolCallback(
-            mock(WorkspaceContextStoreSourceFacade.class), mock(WorkspaceContextStoreSourceService.class));
+        UpdateContextStoreSourceToolCallback callback =
+            new UpdateContextStoreSourceToolCallback(mock(ContextStoreSourceFacade.class));
 
         String result = callback.call("{\"name\":\"x\"}");
 

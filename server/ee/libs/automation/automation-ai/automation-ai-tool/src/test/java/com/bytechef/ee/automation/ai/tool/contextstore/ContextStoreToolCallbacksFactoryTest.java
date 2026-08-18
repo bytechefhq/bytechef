@@ -9,8 +9,8 @@ package com.bytechef.ee.automation.ai.tool.contextstore;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.bytechef.ee.automation.contextstore.facade.WorkspaceContextStoreFacade;
-import com.bytechef.ee.automation.contextstore.facade.WorkspaceContextStoreSourceFacade;
+import com.bytechef.ee.automation.contextstore.facade.ContextStoreFacade;
+import com.bytechef.ee.automation.contextstore.facade.ContextStoreSourceFacade;
 import com.bytechef.ee.automation.contextstore.service.WorkspaceContextStoreSourceService;
 import com.bytechef.ee.platform.contextstore.service.ContextStoreQueryService;
 import com.bytechef.ee.platform.contextstore.service.ContextStoreSemanticSearchService;
@@ -31,8 +31,8 @@ class ContextStoreToolCallbacksFactoryTest {
     private final ContextStoreToolCallbacksFactory factory = new ContextStoreToolCallbacksFactory(
         Mockito.mock(WorkspaceContextStoreSourceService.class),
         Mockito.mock(ContextStoreQueryService.class),
-        Mockito.mock(WorkspaceContextStoreSourceFacade.class),
-        Mockito.mock(WorkspaceContextStoreFacade.class),
+        Mockito.mock(ContextStoreSourceFacade.class),
+        Mockito.mock(ContextStoreFacade.class),
         Mockito.mock(ContextStoreSemanticSearchService.class),
         Mockito.mock(ClusterElementDefinitionService.class));
 

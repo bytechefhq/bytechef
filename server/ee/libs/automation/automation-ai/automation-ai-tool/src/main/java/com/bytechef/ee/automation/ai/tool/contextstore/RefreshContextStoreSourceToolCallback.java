@@ -8,8 +8,7 @@
 package com.bytechef.ee.automation.ai.tool.contextstore;
 
 import com.bytechef.ai.agent.tool.ToolErrors;
-import com.bytechef.ee.automation.contextstore.facade.WorkspaceContextStoreSourceFacade;
-import com.bytechef.ee.automation.contextstore.service.WorkspaceContextStoreSourceService;
+import com.bytechef.ee.automation.contextstore.facade.ContextStoreSourceFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
@@ -24,6 +23,10 @@ import tools.jackson.databind.json.JsonMapper;
  * Atlas job id (not a Spring Batch execution id) so the agent can report back the in-flight sync. Honors the source's
  * existing cadence and workflow definition — does not mutate either.
  *
+ * <p>
+ * Calls the authorization-enforcing {@link ContextStoreSourceFacade}, which requires the admin role and resolves the
+ * source's owning workspace itself — the tool needs no workspace context of its own.
+ *
  * @author Ivica Cardic
  * @version ee
  */
@@ -34,7 +37,7 @@ public class RefreshContextStoreSourceToolCallback implements ToolCallback {
     private static final String DESCRIPTION = """
         Trigger an immediate sync run on a Context Store source. Honors the source's existing workflow definition;
         does not mutate cadence or any other field. Returns the created job id so the user can be told a sync is
-        in-flight.""";
+        in-flight. Requires the admin role - a non-admin caller is rejected.""";
 
     private static final String INPUT_SCHEMA =
         """
@@ -46,17 +49,12 @@ public class RefreshContextStoreSourceToolCallback implements ToolCallback {
                 "required": ["id"]
             }""";
 
-    private final WorkspaceContextStoreSourceFacade workspaceContextStoreSourceFacade;
-    private final WorkspaceContextStoreSourceService workspaceContextStoreSourceService;
+    private final ContextStoreSourceFacade contextStoreSourceFacade;
     private final JsonMapper jsonMapper = new JsonMapper();
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public RefreshContextStoreSourceToolCallback(
-        WorkspaceContextStoreSourceFacade workspaceContextStoreSourceFacade,
-        WorkspaceContextStoreSourceService workspaceContextStoreSourceService) {
-
-        this.workspaceContextStoreSourceFacade = workspaceContextStoreSourceFacade;
-        this.workspaceContextStoreSourceService = workspaceContextStoreSourceService;
+    public RefreshContextStoreSourceToolCallback(ContextStoreSourceFacade contextStoreSourceFacade) {
+        this.contextStoreSourceFacade = contextStoreSourceFacade;
     }
 
     @Override
@@ -83,15 +81,7 @@ public class RefreshContextStoreSourceToolCallback implements ToolCallback {
                 return toolError("id is required");
             }
 
-            Long workspaceId =
-                workspaceContextStoreSourceService.fetchWorkspaceIdByContextStoreSourceId(input.id())
-                    .orElse(null);
-
-            if (workspaceId == null) {
-                return toolError("ContextStoreSource " + input.id() + " has no owning workspace");
-            }
-
-            long jobId = workspaceContextStoreSourceFacade.refreshNow(workspaceId, input.id());
+            Long jobId = contextStoreSourceFacade.refreshContextStoreSource(input.id());
 
             return jsonMapper.writeValueAsString(Map.of("id", input.id(), "jobId", jobId));
         } catch (JacksonException exception) {

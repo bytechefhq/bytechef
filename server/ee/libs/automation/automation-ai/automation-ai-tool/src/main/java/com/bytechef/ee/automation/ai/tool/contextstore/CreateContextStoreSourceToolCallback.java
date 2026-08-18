@@ -10,7 +10,7 @@ package com.bytechef.ee.automation.ai.tool.contextstore;
 import com.bytechef.ai.agent.tool.ToolErrors;
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.ee.automation.contextstore.dto.CreateContextStoreSourceInput;
-import com.bytechef.ee.automation.contextstore.facade.WorkspaceContextStoreSourceFacade;
+import com.bytechef.ee.automation.contextstore.facade.ContextStoreSourceFacade;
 import com.bytechef.ee.platform.contextstore.domain.ContextStoreSource;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.LinkedHashMap;
@@ -26,8 +26,9 @@ import tools.jackson.databind.json.JsonMapper;
  * Spring AI {@link ToolCallback} that provisions a new Context Store source. Creates the source row (which now carries
  * the record-shape fields directly — Phase 2 collapsed the Entity layer), an auto-generated sync workflow
  * ({@code [schedule.cron] -> [data-stream.stream(SOURCE=..., DESTINATION=contextStore.writeToReplica)]}), and triggers
- * the initial sync run. Workspace admin role required at the facade level; chat-level user confirmation expected before
- * execution per CC mutation-callback precedent.
+ * the initial sync run. Calls the authorization-enforcing {@link ContextStoreSourceFacade}, so the admin role is
+ * genuinely required of the invoking principal; chat-level user confirmation is expected before execution per CC
+ * mutation-callback precedent.
  *
  * <p>
  * The tool resolves {@code workspaceId} from the {@link AgentToolInvocationContext} on the chat's {@link ToolContext}.
@@ -42,7 +43,7 @@ public class CreateContextStoreSourceToolCallback implements ToolCallback {
 
     private static final String DESCRIPTION = """
         Provision a new Context Store source. Creates the source row, an auto-generated sync workflow, and triggers
-        the initial sync run. Workspace admin role required.
+        the initial sync run. Requires the admin role - a non-admin caller is rejected.
 
         Always confirm with the user before calling — this creates persistent infrastructure and starts a sync job.
 
@@ -81,12 +82,12 @@ public class CreateContextStoreSourceToolCallback implements ToolCallback {
                     "sourceComponentName", "sourceComponentVersion", "cadence"]
             }""";
 
-    private final WorkspaceContextStoreSourceFacade workspaceContextStoreSourceFacade;
+    private final ContextStoreSourceFacade contextStoreSourceFacade;
     private final JsonMapper jsonMapper = new JsonMapper();
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public CreateContextStoreSourceToolCallback(WorkspaceContextStoreSourceFacade workspaceContextStoreSourceFacade) {
-        this.workspaceContextStoreSourceFacade = workspaceContextStoreSourceFacade;
+    public CreateContextStoreSourceToolCallback(ContextStoreSourceFacade contextStoreSourceFacade) {
+        this.contextStoreSourceFacade = contextStoreSourceFacade;
     }
 
     @Override
@@ -173,7 +174,7 @@ public class CreateContextStoreSourceToolCallback implements ToolCallback {
                 null,
                 input.parameters());
 
-            ContextStoreSource created = workspaceContextStoreSourceFacade.create(workspaceId, facadeInput);
+            ContextStoreSource created = contextStoreSourceFacade.createContextStoreSource(workspaceId, facadeInput);
 
             Map<String, Object> response = new LinkedHashMap<>();
 

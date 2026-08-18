@@ -16,13 +16,16 @@
 
 package com.bytechef.ai.mcp.server.security.web.config;
 
+import com.bytechef.ai.mcp.server.security.web.authentication.ManagementMcpAuthenticationRequiredResolver;
 import com.bytechef.ai.mcp.server.security.web.configurer.ManagementMcpServerSecurityConfigurer;
 import com.bytechef.platform.configuration.service.PropertyService;
 import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.security.web.config.SecurityConfigurerContributor;
+import com.bytechef.platform.security.web.mcp.McpAuthenticationRequiredResolver;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -54,5 +57,14 @@ public class ManagementMcpServerApiKeySecurityConfigurerContributor implements S
     public <T extends AbstractHttpConfigurer<T, B>, B extends HttpSecurityBuilder<B>> T getSecurityConfigurerAdapter() {
         return (T) new ManagementMcpServerSecurityConfigurer(
             apiKeyService, authorityService, propertyService, userService);
+    }
+
+    /**
+     * Lets the OAuth2 discovery challenge skip a management server that does not require authentication, so the
+     * per-tenant toggle keeps working once a trusted issuer is configured.
+     */
+    @Bean
+    McpAuthenticationRequiredResolver managementMcpAuthenticationRequiredResolver() {
+        return new ManagementMcpAuthenticationRequiredResolver(propertyService);
     }
 }

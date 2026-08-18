@@ -77,7 +77,7 @@ public class ManagementMcpServerServiceImpl implements ManagementMcpServerServic
             MCP_SERVER_PROPERTY_KEY, Property.Scope.PLATFORM, null);
 
         boolean authenticationRequired = propertyOptional
-            .map(property -> Boolean.TRUE.equals(property.get("authenticationRequired")))
+            .map(property -> !Boolean.FALSE.equals(property.get("authenticationRequired")))
             .orElse(true);
 
         String secretKey = String.valueOf(TenantKey.of());
@@ -89,11 +89,18 @@ public class ManagementMcpServerServiceImpl implements ManagementMcpServerServic
         return toManagementMcpServerUrl(secretKey);
     }
 
+    /**
+     * Reports the tenant's setting for the admin UI, expressing the same rule the two request-path readers
+     * ({@code ManagementMcpAuthenticationRequiredResolver} and {@code ManagementMcpServerApiKeyAuthenticationProvider})
+     * apply: authentication is required unless the {@code authenticationRequired} entry is explicitly {@code false}. A
+     * property missing the entry - or missing altogether - therefore reads as {@code true}, so the toggle cannot show
+     * "off" for a surface that challenges.
+     */
     @Override
     public boolean isAuthenticationRequired() {
         return propertyService.fetchProperty(MCP_SERVER_PROPERTY_KEY, Property.Scope.PLATFORM, null)
-            .map(property -> Boolean.TRUE.equals(property.get("authenticationRequired")))
-            .orElse(false);
+            .map(property -> !Boolean.FALSE.equals(property.get("authenticationRequired")))
+            .orElse(true);
     }
 
     @Override

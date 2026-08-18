@@ -8,8 +8,7 @@
 package com.bytechef.ee.automation.ai.tool.contextstore;
 
 import com.bytechef.ai.agent.tool.ToolErrors;
-import com.bytechef.ee.automation.contextstore.facade.WorkspaceContextStoreSourceFacade;
-import com.bytechef.ee.automation.contextstore.service.WorkspaceContextStoreSourceService;
+import com.bytechef.ee.automation.contextstore.facade.ContextStoreSourceFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
@@ -24,6 +23,10 @@ import tools.jackson.databind.json.JsonMapper;
  * rows, the auto-generated workflow, and the corresponding {@code ProjectDeploymentWorkflow}. Irreversible — confirm
  * with the user before calling.
  *
+ * <p>
+ * Calls the authorization-enforcing {@link ContextStoreSourceFacade}, which requires the admin role and resolves the
+ * source's owning workspace itself — the tool needs no workspace context of its own.
+ *
  * @author Ivica Cardic
  * @version ee
  */
@@ -33,7 +36,8 @@ public class DeleteContextStoreSourceToolCallback implements ToolCallback {
 
     private static final String DESCRIPTION = """
         Delete a Context Store source. Cascade deletes its entities, records, index rows, the auto-generated sync
-        workflow, and its ProjectDeploymentWorkflow. Irreversible. Always confirm with the user before calling.""";
+        workflow, and its ProjectDeploymentWorkflow. Irreversible. Requires the admin role - a non-admin caller is
+        rejected. Always confirm with the user before calling.""";
 
     private static final String INPUT_SCHEMA =
         """
@@ -45,17 +49,12 @@ public class DeleteContextStoreSourceToolCallback implements ToolCallback {
                 "required": ["id"]
             }""";
 
-    private final WorkspaceContextStoreSourceFacade workspaceContextStoreSourceFacade;
-    private final WorkspaceContextStoreSourceService workspaceContextStoreSourceService;
+    private final ContextStoreSourceFacade contextStoreSourceFacade;
     private final JsonMapper jsonMapper = new JsonMapper();
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public DeleteContextStoreSourceToolCallback(
-        WorkspaceContextStoreSourceFacade workspaceContextStoreSourceFacade,
-        WorkspaceContextStoreSourceService workspaceContextStoreSourceService) {
-
-        this.workspaceContextStoreSourceFacade = workspaceContextStoreSourceFacade;
-        this.workspaceContextStoreSourceService = workspaceContextStoreSourceService;
+    public DeleteContextStoreSourceToolCallback(ContextStoreSourceFacade contextStoreSourceFacade) {
+        this.contextStoreSourceFacade = contextStoreSourceFacade;
     }
 
     @Override
@@ -82,20 +81,12 @@ public class DeleteContextStoreSourceToolCallback implements ToolCallback {
                 return toolError("id is required");
             }
 
-            Long workspaceId =
-                workspaceContextStoreSourceService.fetchWorkspaceIdByContextStoreSourceId(input.id())
-                    .orElse(null);
-
-            if (workspaceId == null) {
-                return toolError("ContextStoreSource " + input.id() + " has no owning workspace");
-            }
-
-            workspaceContextStoreSourceFacade.delete(workspaceId, input.id());
+            contextStoreSourceFacade.deleteContextStoreSource(input.id());
 
             return jsonMapper.writeValueAsString(Map.of("deleted", true, "id", input.id()));
         } catch (JacksonException exception) {
             return toolError("Invalid tool input: " + exception.getMessage());
-        } catch (IllegalArgumentException exception) {
+        } catch (IllegalArgumentException | IllegalStateException exception) {
             return toolError(exception.getMessage());
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(

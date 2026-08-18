@@ -8,13 +8,11 @@
 package com.bytechef.ee.automation.ai.tool.contextstore;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
-import com.bytechef.ee.automation.contextstore.facade.WorkspaceContextStoreSourceFacade;
-import com.bytechef.ee.automation.contextstore.service.WorkspaceContextStoreSourceService;
-import java.util.Optional;
+import com.bytechef.ee.automation.contextstore.facade.ContextStoreSourceFacade;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import tools.jackson.databind.JsonNode;
@@ -31,8 +29,8 @@ class DeleteContextStoreSourceToolCallbackTest {
 
     @Test
     void testToolDefinitionExposesName() {
-        DeleteContextStoreSourceToolCallback callback = new DeleteContextStoreSourceToolCallback(
-            mock(WorkspaceContextStoreSourceFacade.class), mock(WorkspaceContextStoreSourceService.class));
+        DeleteContextStoreSourceToolCallback callback =
+            new DeleteContextStoreSourceToolCallback(mock(ContextStoreSourceFacade.class));
 
         ToolDefinition definition = callback.getToolDefinition();
 
@@ -42,12 +40,9 @@ class DeleteContextStoreSourceToolCallbackTest {
 
     @Test
     void testCallDelegatesToFacade() throws Exception {
-        WorkspaceContextStoreSourceFacade facade = mock(WorkspaceContextStoreSourceFacade.class);
-        WorkspaceContextStoreSourceService service = mock(WorkspaceContextStoreSourceService.class);
+        ContextStoreSourceFacade facade = mock(ContextStoreSourceFacade.class);
 
-        when(service.fetchWorkspaceIdByContextStoreSourceId(42L)).thenReturn(Optional.of(7L));
-
-        DeleteContextStoreSourceToolCallback callback = new DeleteContextStoreSourceToolCallback(facade, service);
+        DeleteContextStoreSourceToolCallback callback = new DeleteContextStoreSourceToolCallback(facade);
 
         String result = callback.call("{\"id\":42}");
 
@@ -58,13 +53,31 @@ class DeleteContextStoreSourceToolCallbackTest {
         assertThat(node.get("id")
             .asLong()).isEqualTo(42L);
 
-        verify(facade).delete(7L, 42L);
+        verify(facade).deleteContextStoreSource(42L);
+    }
+
+    @Test
+    void testCallSurfacesIllegalStateAsToolError() throws Exception {
+        ContextStoreSourceFacade facade = mock(ContextStoreSourceFacade.class);
+
+        doThrow(new IllegalStateException("ContextStoreSource 42 has no owning workspace")).when(facade)
+            .deleteContextStoreSource(42L);
+
+        DeleteContextStoreSourceToolCallback callback = new DeleteContextStoreSourceToolCallback(facade);
+
+        String result = callback.call("{\"id\":42}");
+
+        JsonNode node = jsonMapper.readTree(result);
+
+        assertThat(node.has("error")).isTrue();
+        assertThat(node.get("error")
+            .asText()).contains("has no owning workspace");
     }
 
     @Test
     void testCallRequiresId() throws Exception {
-        DeleteContextStoreSourceToolCallback callback = new DeleteContextStoreSourceToolCallback(
-            mock(WorkspaceContextStoreSourceFacade.class), mock(WorkspaceContextStoreSourceService.class));
+        DeleteContextStoreSourceToolCallback callback =
+            new DeleteContextStoreSourceToolCallback(mock(ContextStoreSourceFacade.class));
 
         String result = callback.call("{}");
 

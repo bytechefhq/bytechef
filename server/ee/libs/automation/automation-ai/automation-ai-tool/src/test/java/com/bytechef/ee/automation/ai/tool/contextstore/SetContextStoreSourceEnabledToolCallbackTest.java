@@ -12,9 +12,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.ee.automation.contextstore.facade.WorkspaceContextStoreSourceFacade;
-import com.bytechef.ee.automation.contextstore.service.WorkspaceContextStoreSourceService;
-import java.util.Optional;
+import com.bytechef.ee.automation.contextstore.facade.ContextStoreSourceFacade;
+import com.bytechef.ee.platform.contextstore.domain.ContextStoreSource;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import tools.jackson.databind.JsonNode;
@@ -31,8 +30,8 @@ class SetContextStoreSourceEnabledToolCallbackTest {
 
     @Test
     void testToolDefinitionExposesName() {
-        SetContextStoreSourceEnabledToolCallback callback = new SetContextStoreSourceEnabledToolCallback(
-            mock(WorkspaceContextStoreSourceFacade.class), mock(WorkspaceContextStoreSourceService.class));
+        SetContextStoreSourceEnabledToolCallback callback =
+            new SetContextStoreSourceEnabledToolCallback(mock(ContextStoreSourceFacade.class));
 
         ToolDefinition definition = callback.getToolDefinition();
 
@@ -42,13 +41,11 @@ class SetContextStoreSourceEnabledToolCallbackTest {
 
     @Test
     void testCallEnablesSource() throws Exception {
-        WorkspaceContextStoreSourceFacade facade = mock(WorkspaceContextStoreSourceFacade.class);
-        WorkspaceContextStoreSourceService service = mock(WorkspaceContextStoreSourceService.class);
+        ContextStoreSourceFacade facade = mock(ContextStoreSourceFacade.class);
 
-        when(service.fetchWorkspaceIdByContextStoreSourceId(42L)).thenReturn(Optional.of(7L));
+        when(facade.setContextStoreSourceEnabled(42L, true)).thenReturn(contextStoreSource(true));
 
-        SetContextStoreSourceEnabledToolCallback callback =
-            new SetContextStoreSourceEnabledToolCallback(facade, service);
+        SetContextStoreSourceEnabledToolCallback callback = new SetContextStoreSourceEnabledToolCallback(facade);
 
         String result = callback.call("{\"id\":42,\"enabled\":true}");
 
@@ -59,18 +56,16 @@ class SetContextStoreSourceEnabledToolCallbackTest {
         assertThat(node.get("enabled")
             .asBoolean()).isTrue();
 
-        verify(facade).setEnabled(7L, 42L, true);
+        verify(facade).setContextStoreSourceEnabled(42L, true);
     }
 
     @Test
     void testCallDisablesSource() throws Exception {
-        WorkspaceContextStoreSourceFacade facade = mock(WorkspaceContextStoreSourceFacade.class);
-        WorkspaceContextStoreSourceService service = mock(WorkspaceContextStoreSourceService.class);
+        ContextStoreSourceFacade facade = mock(ContextStoreSourceFacade.class);
 
-        when(service.fetchWorkspaceIdByContextStoreSourceId(42L)).thenReturn(Optional.of(7L));
+        when(facade.setContextStoreSourceEnabled(42L, false)).thenReturn(contextStoreSource(false));
 
-        SetContextStoreSourceEnabledToolCallback callback =
-            new SetContextStoreSourceEnabledToolCallback(facade, service);
+        SetContextStoreSourceEnabledToolCallback callback = new SetContextStoreSourceEnabledToolCallback(facade);
 
         String result = callback.call("{\"id\":42,\"enabled\":false}");
 
@@ -79,18 +74,45 @@ class SetContextStoreSourceEnabledToolCallbackTest {
         assertThat(node.get("enabled")
             .asBoolean()).isFalse();
 
-        verify(facade).setEnabled(7L, 42L, false);
+        verify(facade).setContextStoreSourceEnabled(42L, false);
+    }
+
+    @Test
+    void testCallSurfacesIllegalStateAsToolError() throws Exception {
+        ContextStoreSourceFacade facade = mock(ContextStoreSourceFacade.class);
+
+        when(facade.setContextStoreSourceEnabled(42L, true))
+            .thenThrow(new IllegalStateException("ContextStoreSource 42 has no owning workspace"));
+
+        SetContextStoreSourceEnabledToolCallback callback = new SetContextStoreSourceEnabledToolCallback(facade);
+
+        String result = callback.call("{\"id\":42,\"enabled\":true}");
+
+        JsonNode node = jsonMapper.readTree(result);
+
+        assertThat(node.has("error")).isTrue();
+        assertThat(node.get("error")
+            .asText()).contains("has no owning workspace");
     }
 
     @Test
     void testCallRequiresEnabled() throws Exception {
-        SetContextStoreSourceEnabledToolCallback callback = new SetContextStoreSourceEnabledToolCallback(
-            mock(WorkspaceContextStoreSourceFacade.class), mock(WorkspaceContextStoreSourceService.class));
+        SetContextStoreSourceEnabledToolCallback callback =
+            new SetContextStoreSourceEnabledToolCallback(mock(ContextStoreSourceFacade.class));
 
         String result = callback.call("{\"id\":42}");
 
         JsonNode node = jsonMapper.readTree(result);
 
         assertThat(node.has("error")).isTrue();
+    }
+
+    private static ContextStoreSource contextStoreSource(boolean enabled) {
+        ContextStoreSource contextStoreSource = new ContextStoreSource();
+
+        contextStoreSource.setId(42L);
+        contextStoreSource.setEnabled(enabled);
+
+        return contextStoreSource;
     }
 }

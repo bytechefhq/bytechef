@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
-import com.bytechef.ee.automation.contextstore.facade.WorkspaceContextStoreFacade;
+import com.bytechef.ee.automation.contextstore.facade.ContextStoreFacade;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -24,7 +24,7 @@ import org.springframework.ai.chat.model.ToolContext;
  */
 class DeleteContextStoreToolCallbackTest {
 
-    private final WorkspaceContextStoreFacade facade = Mockito.mock(WorkspaceContextStoreFacade.class);
+    private final ContextStoreFacade facade = Mockito.mock(ContextStoreFacade.class);
     private final DeleteContextStoreToolCallback toolCallback = new DeleteContextStoreToolCallback(facade);
 
     @Test
@@ -37,7 +37,7 @@ class DeleteContextStoreToolCallbackTest {
 
         String result = toolCallback.call("{\"id\": 42}", toolContext);
 
-        verify(facade).deleteWorkspaceContextStore(7L, 42L);
+        verify(facade).deleteContextStore(7L, 42L);
         assertThat(result).contains("\"deleted\":true");
     }
 

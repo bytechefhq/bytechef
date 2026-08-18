@@ -228,6 +228,8 @@ class McpOAuth2ResourceServerSecurityIntTest {
 
     @Test
     void testUnauthenticatedRequestReturnsDiscoveryChallenge() throws Exception {
+        mockManagementMcpServerProperty(true);
+
         HttpResponse<String> httpResponse = postInitialize(MCP_SERVER_SECRET_KEY, null);
 
         assertThat(httpResponse.statusCode()).isEqualTo(401);
@@ -238,6 +240,23 @@ class McpOAuth2ResourceServerSecurityIntTest {
 
         assertThat(wwwAuthenticate).contains("Bearer");
         assertThat(wwwAuthenticate).contains("resource_metadata");
+    }
+
+    @Test
+    void testUnauthenticatedRequestIsNotChallengedWhenAuthenticationNotRequired() throws Exception {
+        mockManagementMcpServerProperty(false);
+
+        HttpResponse<String> httpResponse = postInitialize(MCP_SERVER_SECRET_KEY, null);
+
+        assertThat(httpResponse.statusCode()).isEqualTo(200);
+    }
+
+    private void mockManagementMcpServerProperty(boolean authenticationRequired) {
+        Property property = mock(Property.class);
+
+        when(property.get("secretKey")).thenReturn(MCP_SERVER_SECRET_KEY);
+        when(property.get("authenticationRequired")).thenReturn(authenticationRequired);
+        when(propertyService.getProperty("mcp.server", Property.Scope.PLATFORM, null)).thenReturn(property);
     }
 
     @Test

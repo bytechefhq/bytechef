@@ -16,7 +16,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.ee.automation.contextstore.dto.CreateContextStoreSourceInput;
-import com.bytechef.ee.automation.contextstore.facade.WorkspaceContextStoreSourceFacade;
+import com.bytechef.ee.automation.contextstore.facade.ContextStoreSourceFacade;
 import com.bytechef.ee.platform.contextstore.domain.ContextStoreSource;
 import com.bytechef.ee.platform.contextstore.domain.ContextStoreSourceStatus;
 import org.junit.jupiter.api.Test;
@@ -47,7 +47,7 @@ class CreateContextStoreSourceToolCallbackTest {
     @Test
     void testToolDefinitionExposesName() {
         CreateContextStoreSourceToolCallback callback = new CreateContextStoreSourceToolCallback(
-            mock(WorkspaceContextStoreSourceFacade.class));
+            mock(ContextStoreSourceFacade.class));
 
         ToolDefinition definition = callback.getToolDefinition();
 
@@ -69,9 +69,10 @@ class CreateContextStoreSourceToolCallbackTest {
         created.setEnabled(true);
         created.setWorkflowId("wf-123");
 
-        WorkspaceContextStoreSourceFacade facade = mock(WorkspaceContextStoreSourceFacade.class);
+        ContextStoreSourceFacade facade = mock(ContextStoreSourceFacade.class);
 
-        when(facade.create(eq(workspaceId), any(CreateContextStoreSourceInput.class))).thenReturn(created);
+        when(facade.createContextStoreSource(eq(workspaceId), any(CreateContextStoreSourceInput.class)))
+            .thenReturn(created);
 
         CreateContextStoreSourceToolCallback callback = new CreateContextStoreSourceToolCallback(facade);
 
@@ -103,7 +104,7 @@ class CreateContextStoreSourceToolCallbackTest {
         ArgumentCaptor<CreateContextStoreSourceInput> captor =
             ArgumentCaptor.forClass(CreateContextStoreSourceInput.class);
 
-        verify(facade).create(eq(workspaceId), captor.capture());
+        verify(facade).createContextStoreSource(eq(workspaceId), captor.capture());
 
         CreateContextStoreSourceInput captured = captor.getValue();
 
@@ -126,9 +127,10 @@ class CreateContextStoreSourceToolCallbackTest {
         created.setEnabled(true);
         created.setWorkflowId("wf-124");
 
-        WorkspaceContextStoreSourceFacade facade = mock(WorkspaceContextStoreSourceFacade.class);
+        ContextStoreSourceFacade facade = mock(ContextStoreSourceFacade.class);
 
-        when(facade.create(eq(workspaceId), any(CreateContextStoreSourceInput.class))).thenReturn(created);
+        when(facade.createContextStoreSource(eq(workspaceId), any(CreateContextStoreSourceInput.class)))
+            .thenReturn(created);
 
         CreateContextStoreSourceToolCallback callback = new CreateContextStoreSourceToolCallback(facade);
 
@@ -150,7 +152,7 @@ class CreateContextStoreSourceToolCallbackTest {
         ArgumentCaptor<CreateContextStoreSourceInput> captor =
             ArgumentCaptor.forClass(CreateContextStoreSourceInput.class);
 
-        verify(facade).create(eq(workspaceId), captor.capture());
+        verify(facade).createContextStoreSource(eq(workspaceId), captor.capture());
 
         CreateContextStoreSourceInput captured = captor.getValue();
 
@@ -160,7 +162,7 @@ class CreateContextStoreSourceToolCallbackTest {
     @Test
     void testCallReturnsErrorOnMissingFields() throws Exception {
         CreateContextStoreSourceToolCallback callback = new CreateContextStoreSourceToolCallback(
-            mock(WorkspaceContextStoreSourceFacade.class));
+            mock(ContextStoreSourceFacade.class));
 
         String result = callback.call("{\"name\":\"x\"}", toolContext(1L));
 
@@ -172,7 +174,7 @@ class CreateContextStoreSourceToolCallbackTest {
     @Test
     void testCallReturnsErrorWhenWorkspaceContextMissing() throws Exception {
         CreateContextStoreSourceToolCallback callback = new CreateContextStoreSourceToolCallback(
-            mock(WorkspaceContextStoreSourceFacade.class));
+            mock(ContextStoreSourceFacade.class));
 
         String input =
             """

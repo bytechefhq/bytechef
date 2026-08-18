@@ -28,6 +28,7 @@ import com.bytechef.platform.security.web.config.McpJwtSecurityConfigurerContrib
 import com.bytechef.platform.security.web.config.McpOAuth2ResourceServerSecurityConfigurerContributor;
 import com.bytechef.platform.security.web.config.McpResourceServerProperties;
 import com.bytechef.platform.security.web.config.McpResourceServerProperties.Issuer;
+import com.bytechef.platform.security.web.mcp.McpAuthenticationRequiredResolver;
 import com.bytechef.platform.security.web.mcp.oauth2.McpFederatedIssuerAuthenticator;
 import com.bytechef.platform.security.web.mcp.oauth2.McpJwtDecoderFactory;
 import com.bytechef.platform.user.service.AuthorityService;
@@ -153,9 +154,11 @@ public class McpOAuth2ResourceServerCeOnlyIntTestConfiguration {
 
     @Bean
     McpDiscoverySecurityConfigurerContributor mcpDiscoverySecurityConfigurerContributor(
-        McpResourceServerProperties mcpResourceServerProperties) {
+        McpResourceServerProperties mcpResourceServerProperties,
+        ObjectProvider<McpAuthenticationRequiredResolver> mcpAuthenticationRequiredResolverProvider) {
 
-        return new McpDiscoverySecurityConfigurerContributor(mcpResourceServerProperties);
+        return new McpDiscoverySecurityConfigurerContributor(
+            mcpResourceServerProperties, mcpAuthenticationRequiredResolverProvider);
     }
 
     @Bean

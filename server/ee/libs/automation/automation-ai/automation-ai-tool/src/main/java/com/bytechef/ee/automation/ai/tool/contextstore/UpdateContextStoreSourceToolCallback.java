@@ -9,8 +9,7 @@ package com.bytechef.ee.automation.ai.tool.contextstore;
 
 import com.bytechef.ai.agent.tool.ToolErrors;
 import com.bytechef.ee.automation.contextstore.dto.UpdateContextStoreSourceInput;
-import com.bytechef.ee.automation.contextstore.facade.WorkspaceContextStoreSourceFacade;
-import com.bytechef.ee.automation.contextstore.service.WorkspaceContextStoreSourceService;
+import com.bytechef.ee.automation.contextstore.facade.ContextStoreSourceFacade;
 import com.bytechef.ee.platform.contextstore.domain.ContextStoreSource;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.LinkedHashMap;
@@ -27,6 +26,10 @@ import tools.jackson.databind.json.JsonMapper;
  * rewrites the auto-generated workflow's cron-trigger parameter only; an enabled change toggles the underlying
  * {@code ProjectDeploymentWorkflow}. All fields are optional — {@code null} means "leave unchanged".
  *
+ * <p>
+ * Calls the authorization-enforcing {@link ContextStoreSourceFacade}, which requires the admin role and resolves the
+ * source's owning workspace itself — the tool needs no workspace context of its own.
+ *
  * @author Ivica Cardic
  * @version ee
  */
@@ -37,7 +40,8 @@ public class UpdateContextStoreSourceToolCallback implements ToolCallback {
     private static final String DESCRIPTION = """
         Update a Context Store source's name, cadence, or enabled flag. Pass only the fields to change; null/missing
         fields are left untouched. A cadence change targets the workflow's cron-trigger parameter only; the rest of
-        the workflow definition is preserved. Confirm with the user before calling.""";
+        the workflow definition is preserved. Requires the admin role - a non-admin caller is rejected. Confirm with
+        the user before calling.""";
 
     private static final String INPUT_SCHEMA =
         """
@@ -52,17 +56,12 @@ public class UpdateContextStoreSourceToolCallback implements ToolCallback {
                 "required": ["id"]
             }""";
 
-    private final WorkspaceContextStoreSourceFacade workspaceContextStoreSourceFacade;
-    private final WorkspaceContextStoreSourceService workspaceContextStoreSourceService;
+    private final ContextStoreSourceFacade contextStoreSourceFacade;
     private final JsonMapper jsonMapper = new JsonMapper();
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public UpdateContextStoreSourceToolCallback(
-        WorkspaceContextStoreSourceFacade workspaceContextStoreSourceFacade,
-        WorkspaceContextStoreSourceService workspaceContextStoreSourceService) {
-
-        this.workspaceContextStoreSourceFacade = workspaceContextStoreSourceFacade;
-        this.workspaceContextStoreSourceService = workspaceContextStoreSourceService;
+    public UpdateContextStoreSourceToolCallback(ContextStoreSourceFacade contextStoreSourceFacade) {
+        this.contextStoreSourceFacade = contextStoreSourceFacade;
     }
 
     @Override
@@ -89,19 +88,10 @@ public class UpdateContextStoreSourceToolCallback implements ToolCallback {
                 return toolError("id is required");
             }
 
-            Long workspaceId =
-                workspaceContextStoreSourceService.fetchWorkspaceIdByContextStoreSourceId(input.id())
-                    .orElse(null);
-
-            if (workspaceId == null) {
-                return toolError("ContextStoreSource " + input.id() + " has no owning workspace");
-            }
-
             UpdateContextStoreSourceInput facadeInput = new UpdateContextStoreSourceInput(
                 input.name(), input.cadence(), input.enabled(), null, null);
 
-            ContextStoreSource updated =
-                workspaceContextStoreSourceFacade.update(workspaceId, input.id(), facadeInput);
+            ContextStoreSource updated = contextStoreSourceFacade.updateContextStoreSource(input.id(), facadeInput);
 
             Map<String, Object> response = new LinkedHashMap<>();
 
@@ -115,7 +105,7 @@ public class UpdateContextStoreSourceToolCallback implements ToolCallback {
             return jsonMapper.writeValueAsString(response);
         } catch (JacksonException exception) {
             return toolError("Invalid tool input: " + exception.getMessage());
-        } catch (IllegalArgumentException exception) {
+        } catch (IllegalArgumentException | IllegalStateException exception) {
             return toolError(exception.getMessage());
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(

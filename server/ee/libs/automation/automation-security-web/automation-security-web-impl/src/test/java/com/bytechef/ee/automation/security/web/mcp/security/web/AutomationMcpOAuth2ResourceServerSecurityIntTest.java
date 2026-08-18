@@ -35,6 +35,7 @@ import io.modelcontextprotocol.client.transport.HttpClientStreamableHttpTranspor
 import io.modelcontextprotocol.spec.McpSchema;
 import java.net.URI;
 import java.net.http.HttpClient;
+import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.security.KeyPair;
@@ -164,10 +165,38 @@ class AutomationMcpOAuth2ResourceServerSecurityIntTest {
         assertThat(httpResponse.statusCode()).isEqualTo(401);
     }
 
+    @Test
+    void testInitializeWithoutTokenWhenAuthenticationRequiredReturnsDiscoveryChallenge() throws Exception {
+        mockMcpServer(true);
+
+        HttpResponse<String> httpResponse = postInitialize(MCP_SERVER_SECRET_KEY, null);
+
+        HttpHeaders httpHeaders = httpResponse.headers();
+
+        assertThat(httpResponse.statusCode()).isEqualTo(401);
+        assertThat(httpHeaders.firstValue("WWW-Authenticate")).hasValue(
+            "Bearer resource_metadata=\"http://localhost:" + port
+                + "/.well-known/oauth-protected-resource/api/automation/" + MCP_SERVER_SECRET_KEY + "/mcp\"");
+    }
+
+    @Test
+    void testInitializeWithoutTokenWhenAuthenticationNotRequiredIsNotChallenged() throws Exception {
+        mockMcpServer(false);
+
+        HttpResponse<String> httpResponse = postInitialize(MCP_SERVER_SECRET_KEY, null);
+
+        assertThat(httpResponse.statusCode()).isEqualTo(200);
+    }
+
     private void mockMcpServer() {
+        mockMcpServer(false);
+    }
+
+    private void mockMcpServer(boolean authenticationRequired) {
         McpServer mcpServer = mock(McpServer.class);
 
         when(mcpServer.getEnvironment()).thenReturn(ENVIRONMENT);
+        when(mcpServer.isAuthenticationRequired()).thenReturn(authenticationRequired);
         when(mcpServerService.getMcpServer(MCP_SERVER_SECRET_KEY)).thenReturn(mcpServer);
     }
 

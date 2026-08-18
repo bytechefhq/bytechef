@@ -8,8 +8,6 @@
 package com.bytechef.ee.automation.ai.copilot.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -21,10 +19,16 @@ import com.bytechef.ai.copilot.tool.catalog.IntelligentToolScope;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolVariant;
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
 import com.bytechef.automation.configuration.service.WorkspaceService;
+import com.bytechef.ee.automation.ai.tool.contextstore.ContextStoreToolCallbacksFactory;
+import com.bytechef.ee.automation.contextstore.facade.ContextStoreFacade;
+import com.bytechef.ee.automation.contextstore.facade.ContextStoreSourceFacade;
+import com.bytechef.ee.automation.contextstore.service.WorkspaceContextStoreSourceService;
+import com.bytechef.ee.platform.contextstore.service.ContextStoreQueryService;
+import com.bytechef.ee.platform.contextstore.service.ContextStoreSemanticSearchService;
+import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
@@ -34,9 +38,9 @@ import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.beans.factory.ObjectProvider;
 
 /**
- * Pins the management MCP exposure of the EE Copilot domain subagents: each present BUILD subagent chat client
- * contributes its delegate tool, and a missing bean (surface toggles off, context-store feature disabled) skips
- * silently instead of failing the contributor.
+ * Pins the management MCP exposure of this contributor's two surfaces: the catalog-backed intelligent-tool delegates
+ * ({@code buildCustomComponent}/{@code buildCodeWorkflow}), and the flat context-store CRUD tool set (ticket 732,
+ * CRUD-delegate-unwind Task 7, replacing the dissolved {@code context_store_agent} delegate).
  *
  * @version ee
  *
@@ -44,41 +48,22 @@ import org.springframework.beans.factory.ObjectProvider;
  */
 class AutomationCopilotMcpContributorConfigurationTest {
 
+    private static final Set<String> EXPECTED_CONTEXT_STORE_TOOL_NAMES = Set.of(
+        "listContextSources", "searchContextStore", "getContextStoreRecord", "listAvailableSourceComponents",
+        "describeSourceComponentEntities", "semanticSearchContextStore", "createContextStoreSource",
+        "updateContextStoreSource", "deleteContextStoreSource", "refreshContextStoreSource",
+        "setContextStoreSourceEnabled", "deleteContextStore");
+
     private final AutomationCopilotMcpContributorConfiguration configuration =
         new AutomationCopilotMcpContributorConfiguration();
 
     @Test
-    void testContributesAllAgentsWhenChatClientsPresent() {
+    void testContributesAllIntelligentToolsWhenChatClientsPresent() {
         IntelligentToolCatalog intelligentToolCatalog = catalogOf(
             intelligentDefinition("buildCustomComponent"), intelligentDefinition("buildCodeWorkflow"));
 
         McpServerToolCallbackContributor contributor = configuration.automationCopilotAgentToolCallbackContributor(
-            toPresentProvider(), intelligentToolCatalog, mock(WorkspaceService.class));
-
-        List<String> toolNames = contributor.getToolCallbacks()
-            .stream()
-            .map(toolCallback -> toolCallback.getToolDefinition()
-                .name())
-            .toList();
-
-        assertThat(toolNames).containsExactly("context_store_agent", "buildCustomComponent", "buildCodeWorkflow");
-    }
-
-    @Test
-    void testMissingChatClientsAreSkipped() {
-        McpServerToolCallbackContributor contributor = configuration.automationCopilotAgentToolCallbackContributor(
-            toAbsentProvider(), catalogOf(), mock(WorkspaceService.class));
-
-        assertThat(contributor.getToolCallbacks()).isEmpty();
-    }
-
-    @Test
-    void testPartialAvailabilityContributesOnlyPresentAgents() {
-        IntelligentToolCatalog intelligentToolCatalog = catalogOf(
-            intelligentDefinition("buildCustomComponent"), intelligentDefinition("buildCodeWorkflow"));
-
-        McpServerToolCallbackContributor contributor = configuration.automationCopilotAgentToolCallbackContributor(
-            toAbsentProvider(), intelligentToolCatalog, mock(WorkspaceService.class));
+            intelligentToolCatalog, mock(WorkspaceService.class));
 
         List<String> toolNames = contributor.getToolCallbacks()
             .stream()
@@ -90,12 +75,39 @@ class AutomationCopilotMcpContributorConfigurationTest {
     }
 
     @Test
-    void testContributedAgentToolsAcceptWorkspaceId() {
-        IntelligentToolCatalog intelligentToolCatalog = catalogOf(
-            intelligentDefinition("buildCustomComponent"), intelligentDefinition("buildCodeWorkflow"));
-
+    void testNoIntelligentToolsWhenCatalogEmpty() {
         McpServerToolCallbackContributor contributor = configuration.automationCopilotAgentToolCallbackContributor(
-            toPresentProvider(), intelligentToolCatalog, mock(WorkspaceService.class));
+            catalogOf(), mock(WorkspaceService.class));
+
+        assertThat(contributor.getToolCallbacks()).isEmpty();
+    }
+
+    @Test
+    void testContextStoreFlatCrudContributesExactlyTheTwelveToolNames() {
+        McpServerToolCallbackContributor contributor = configuration.contextStoreFlatCrudMcpContributor(
+            presentContextStoreFactory(), mock(WorkspaceService.class));
+
+        List<String> toolNames = contributor.getToolCallbacks()
+            .stream()
+            .map(toolCallback -> toolCallback.getToolDefinition()
+                .name())
+            .toList();
+
+        assertThat(toolNames).containsExactlyInAnyOrderElementsOf(EXPECTED_CONTEXT_STORE_TOOL_NAMES);
+    }
+
+    @Test
+    void testContextStoreFlatCrudReturnsEmptyListWhenFactoryAbsent() {
+        McpServerToolCallbackContributor contributor = configuration.contextStoreFlatCrudMcpContributor(
+            absentContextStoreFactory(), mock(WorkspaceService.class));
+
+        assertThat(contributor.getToolCallbacks()).isEmpty();
+    }
+
+    @Test
+    void testContextStoreFlatCrudToolsAcceptWorkspaceId() {
+        McpServerToolCallbackContributor contributor = configuration.contextStoreFlatCrudMcpContributor(
+            presentContextStoreFactory(), mock(WorkspaceService.class));
 
         assertThat(contributor.getToolCallbacks())
             .allSatisfy(toolCallback -> assertThat(toolCallback.getToolDefinition()
@@ -135,30 +147,23 @@ class AutomationCopilotMcpContributorConfigurationTest {
         return objectProvider;
     }
 
-    private ObjectProvider<ChatClient> toPresentProvider() {
-        ChatClient chatClient = mock(ChatClient.class);
+    @SuppressWarnings("unchecked")
+    private static ObjectProvider<ContextStoreToolCallbacksFactory> presentContextStoreFactory() {
+        ContextStoreToolCallbacksFactory factory = new ContextStoreToolCallbacksFactory(
+            mock(WorkspaceContextStoreSourceService.class), mock(ContextStoreQueryService.class),
+            mock(ContextStoreSourceFacade.class), mock(ContextStoreFacade.class),
+            mock(ContextStoreSemanticSearchService.class), mock(ClusterElementDefinitionService.class));
 
-        @SuppressWarnings("unchecked")
-        ObjectProvider<ChatClient> chatClientProvider = mock(ObjectProvider.class);
+        ObjectProvider<ContextStoreToolCallbacksFactory> provider = mock(ObjectProvider.class);
 
-        doAnswer(invocation -> {
-            Consumer<ChatClient> dependencyConsumer = invocation.getArgument(0);
+        when(provider.getIfAvailable()).thenReturn(factory);
 
-            dependencyConsumer.accept(chatClient);
-
-            return null;
-        }).when(chatClientProvider)
-            .ifAvailable(any());
-
-        return chatClientProvider;
+        return provider;
     }
 
-    private ObjectProvider<ChatClient> toAbsentProvider() {
-        // A plain mock's ifAvailable is a no-op, mirroring Spring's behaviour for an absent bean.
-        @SuppressWarnings("unchecked")
-        ObjectProvider<ChatClient> chatClientProvider = mock(ObjectProvider.class);
-
-        return chatClientProvider;
+    @SuppressWarnings("unchecked")
+    private static ObjectProvider<ContextStoreToolCallbacksFactory> absentContextStoreFactory() {
+        return mock(ObjectProvider.class);
     }
 
     private static final class FakeIntelligentToolDefinition implements IntelligentToolDefinition {

@@ -16,18 +16,18 @@ import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
 import com.bytechef.ai.copilot.util.Mode;
 import com.bytechef.ai.copilot.util.Source;
 import com.bytechef.ee.automation.ai.tool.contextstore.ContextStoreToolCallbacksFactory;
-import com.bytechef.ee.automation.contextstore.facade.WorkspaceContextStoreFacade;
-import com.bytechef.ee.automation.contextstore.facade.WorkspaceContextStoreSourceFacade;
+import com.bytechef.ee.automation.contextstore.facade.ContextStoreFacade;
+import com.bytechef.ee.automation.contextstore.facade.ContextStoreSourceFacade;
 import com.bytechef.ee.automation.contextstore.service.WorkspaceContextStoreSourceService;
 import com.bytechef.ee.platform.contextstore.service.ContextStoreQueryService;
 import com.bytechef.ee.platform.contextstore.service.ContextStoreSemanticSearchService;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.tool.ToolCallback;
@@ -40,21 +40,36 @@ import org.springframework.core.io.Resource;
 
 /**
  * Registers the Context Store Copilot panel source agents ({@code context_store_ask}/{@code context_store_build}) and
- * the AI Hub Context Store subagent {@link ChatClient} beans. These beans live in EE (not the CE
- * {@code CopilotConfiguration}, where the other Copilot panel source agents live) because
- * {@link ContextStoreToolCallbacksFactory} and the context-store services/facades it wraps are EE.
+ * the {@link ContextStoreToolCallbacksFactory} bean they (and the AI Hub's flat context-store registrations, see
+ * {@code AiHubConfiguration#contextStoreFlatCrudToolCallbacks}/{@code #contextStoreCatalogToolCallbacks}) consume.
+ * These beans live in EE (not the CE {@code CopilotConfiguration}, where the other Copilot panel source agents live)
+ * because {@link ContextStoreToolCallbacksFactory} and the context-store services/facades it wraps are EE.
+ *
+ * <p>
+ * The two subagent {@code ChatClient} beans that used to live here ({@code contextStoreAskSubAgentChatClient} /
+ * {@code contextStoreBuildSubAgentChatClient}) are gone (ticket 732, CRUD-delegate-unwind Task 7) — they backed only
+ * the now-dissolved {@code context_store_agent} delegate (both the AI Hub chat surface's registration and the
+ * management MCP surface's), which is replaced by flat/catalog tool-callback registrations straight off
+ * {@link ContextStoreToolCallbacksFactory}. The panel agents below never consumed those beans — they already call the
+ * factory's {@code readToolCallbacks()}/{@code writeToolCallbacks()} directly — so they are unaffected.
+ * </p>
  *
  * <p>
  * Gated so the beans exist when either the Copilot panel or the AI Hub surface is enabled, since both consume these
  * agents — but only while the context-store feature itself is on: every context-store service and facade injected here
  * is registered only when {@code bytechef.context-store.enabled=true}, so activating without it fails server startup.
- * Both surfaces tolerate the absence of these beans ({@code ObjectProvider}/{@code List} injection).
+ * {@code @ConditionalOnEEVersion} is part of that same gate: the authorization-enforcing
+ * {@link ContextStoreSourceFacade} the tool factory now needs is itself EE-version-gated (as is
+ * {@code ContextStoreSourceGraphQlController}, the other consumer), so activating on a non-{@code ee} edition would
+ * fail startup on an unsatisfied dependency. Both surfaces tolerate the absence of these beans
+ * ({@code ObjectProvider}/{@code List} injection).
  *
  * @version ee
  *
  * @author Ivica Cardic
  */
 @Configuration
+@ConditionalOnEEVersion
 @ConditionalOnExpression("(${bytechef.ai.copilot.enabled:false} or ${bytechef.ai.hub.enabled:false})"
     + " and ${bytechef.context-store.enabled:false}")
 public class ContextStoreAgentConfiguration {
@@ -71,14 +86,14 @@ public class ContextStoreAgentConfiguration {
     ContextStoreToolCallbacksFactory contextStoreToolCallbacksFactory(
         WorkspaceContextStoreSourceService workspaceContextStoreSourceService,
         ContextStoreQueryService contextStoreQueryService,
-        WorkspaceContextStoreSourceFacade workspaceContextStoreSourceFacade,
-        WorkspaceContextStoreFacade workspaceContextStoreFacade,
+        ContextStoreSourceFacade contextStoreSourceFacade,
+        ContextStoreFacade contextStoreFacade,
         ObjectProvider<ContextStoreSemanticSearchService> contextStoreSemanticSearchServiceProvider,
         ClusterElementDefinitionService clusterElementDefinitionService) {
 
         return new ContextStoreToolCallbacksFactory(
-            workspaceContextStoreSourceService, contextStoreQueryService, workspaceContextStoreSourceFacade,
-            workspaceContextStoreFacade, contextStoreSemanticSearchServiceProvider.getIfAvailable(),
+            workspaceContextStoreSourceService, contextStoreQueryService, contextStoreSourceFacade,
+            contextStoreFacade, contextStoreSemanticSearchServiceProvider.getIfAvailable(),
             clusterElementDefinitionService);
     }
 
@@ -123,26 +138,6 @@ public class ContextStoreAgentConfiguration {
             .toolCallbacks(
                 wrapToolCallbacks(securityContextRehydrator, contextStoreToolCallbacksFactory.writeToolCallbacks()))
             .overrideChatClientResolver(overrideChatClientResolverProvider.getIfAvailable())
-            .build();
-    }
-
-    @Bean
-    ChatClient contextStoreAskSubAgentChatClient(
-        ChatModel chatModel, ContextStoreToolCallbacksFactory contextStoreToolCallbacksFactory) {
-
-        return ChatClient.builder(chatModel)
-            .defaultSystem(readPrompt(promptContextStoreAskResource))
-            .defaultToolCallbacks(contextStoreToolCallbacksFactory.readToolCallbacks())
-            .build();
-    }
-
-    @Bean
-    ChatClient contextStoreBuildSubAgentChatClient(
-        ChatModel chatModel, ContextStoreToolCallbacksFactory contextStoreToolCallbacksFactory) {
-
-        return ChatClient.builder(chatModel)
-            .defaultSystem(readPrompt(promptContextStoreBuildResource))
-            .defaultToolCallbacks(contextStoreToolCallbacksFactory.writeToolCallbacks())
             .build();
     }
 

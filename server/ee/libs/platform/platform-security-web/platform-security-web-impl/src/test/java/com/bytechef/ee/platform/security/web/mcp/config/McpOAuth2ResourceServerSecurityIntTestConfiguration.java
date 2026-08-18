@@ -10,6 +10,7 @@ package com.bytechef.ee.platform.security.web.mcp.config;
 import static org.mockito.Mockito.mock;
 import static org.springframework.security.config.Customizer.withDefaults;
 
+import com.bytechef.ai.mcp.server.security.web.authentication.ManagementMcpAuthenticationRequiredResolver;
 import com.bytechef.ai.mcp.server.security.web.configurer.ManagementMcpServerSecurityConfigurer;
 import com.bytechef.ee.platform.security.web.config.McpTenantTrustResolutionConfigurerContributor;
 import com.bytechef.ee.platform.security.web.mcp.oauth2.McpTenantIssuerResolver;
@@ -24,6 +25,7 @@ import com.bytechef.platform.security.web.config.McpJwtSecurityConfigurerContrib
 import com.bytechef.platform.security.web.config.McpOAuth2ResourceServerSecurityConfigurerContributor;
 import com.bytechef.platform.security.web.config.McpResourceServerProperties;
 import com.bytechef.platform.security.web.config.McpResourceServerProperties.Issuer;
+import com.bytechef.platform.security.web.mcp.McpAuthenticationRequiredResolver;
 import com.bytechef.platform.security.web.mcp.oauth2.McpAudienceValidator;
 import com.bytechef.platform.security.web.mcp.oauth2.McpFederatedIssuerAuthenticator;
 import com.bytechef.platform.security.web.mcp.oauth2.McpJwtDecoderFactory;
@@ -220,10 +222,17 @@ public class McpOAuth2ResourceServerSecurityIntTestConfiguration {
     }
 
     @Bean
-    McpDiscoverySecurityConfigurerContributor mcpDiscoverySecurityConfigurerContributor(
-        McpResourceServerProperties mcpResourceServerProperties) {
+    McpAuthenticationRequiredResolver managementMcpAuthenticationRequiredResolver(PropertyService propertyService) {
+        return new ManagementMcpAuthenticationRequiredResolver(propertyService);
+    }
 
-        return new McpDiscoverySecurityConfigurerContributor(mcpResourceServerProperties);
+    @Bean
+    McpDiscoverySecurityConfigurerContributor mcpDiscoverySecurityConfigurerContributor(
+        McpResourceServerProperties mcpResourceServerProperties,
+        ObjectProvider<McpAuthenticationRequiredResolver> mcpAuthenticationRequiredResolverProvider) {
+
+        return new McpDiscoverySecurityConfigurerContributor(
+            mcpResourceServerProperties, mcpAuthenticationRequiredResolverProvider);
     }
 
     @Bean

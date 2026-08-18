@@ -51,11 +51,23 @@ class ManagementMcpServerServiceTest {
     }
 
     @Test
-    void testIsAuthenticationRequiredReturnsFalseWhenKeyMissing() {
+    void testIsAuthenticationRequiredReturnsTrueWhenKeyMissing() {
         Property property = mock(Property.class);
 
         when(property.get("secretKey")).thenReturn("abc");
         when(property.get("authenticationRequired")).thenReturn(null);
+        when(propertyService.fetchProperty(MCP_SERVER_PROPERTY_KEY, Property.Scope.PLATFORM, null))
+            .thenReturn(Optional.of(property));
+
+        assertThat(managementMcpServerService.isAuthenticationRequired()).isTrue();
+    }
+
+    @Test
+    void testIsAuthenticationRequiredReturnsFalseWhenKeyExplicitlyFalse() {
+        Property property = mock(Property.class);
+
+        when(property.get("secretKey")).thenReturn("abc");
+        when(property.get("authenticationRequired")).thenReturn(false);
         when(propertyService.fetchProperty(MCP_SERVER_PROPERTY_KEY, Property.Scope.PLATFORM, null))
             .thenReturn(Optional.of(property));
 
@@ -75,11 +87,11 @@ class ManagementMcpServerServiceTest {
     }
 
     @Test
-    void testIsAuthenticationRequiredReturnsFalseWhenPropertyAbsent() {
+    void testIsAuthenticationRequiredReturnsTrueWhenPropertyAbsent() {
         when(propertyService.fetchProperty(MCP_SERVER_PROPERTY_KEY, Property.Scope.PLATFORM, null))
             .thenReturn(Optional.empty());
 
-        assertThat(managementMcpServerService.isAuthenticationRequired()).isFalse();
+        assertThat(managementMcpServerService.isAuthenticationRequired()).isTrue();
     }
 
     @Test

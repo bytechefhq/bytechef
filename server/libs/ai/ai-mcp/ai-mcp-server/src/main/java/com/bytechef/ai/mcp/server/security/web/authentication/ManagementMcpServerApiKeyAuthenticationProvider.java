@@ -39,6 +39,12 @@ import org.springframework.security.core.AuthenticationException;
  * is an admin key (no platform type), that the URL path secret matches the configured MCP server secret, and that the
  * key's environment matches the requested environment.
  *
+ * <p>
+ * An API key is required unless the tenant's {@code mcp.server} property carries an explicit
+ * {@code authenticationRequired = false}; a property missing the entry requires one, so a legacy row written before the
+ * entry existed no longer yields an authority-less {@code McpAnonymousAuthenticationToken}. The same rule is expressed
+ * by {@code ManagementMcpAuthenticationRequiredResolver}, and the two must stay in agreement.
+ *
  * @author Ivica Cardic
  */
 public class ManagementMcpServerApiKeyAuthenticationProvider implements AuthenticationProvider {
@@ -74,7 +80,7 @@ public class ManagementMcpServerApiKeyAuthenticationProvider implements Authenti
             throw new BadCredentialsException("Invalid MCP server secret key");
         }
 
-        if (!Boolean.TRUE.equals(property.get("authenticationRequired"))) {
+        if (Boolean.FALSE.equals(property.get("authenticationRequired"))) {
             return new McpAnonymousAuthenticationToken(mcpApiKeyCredentials.getMcpServerSecretKey());
         }
 

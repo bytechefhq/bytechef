@@ -16,9 +16,12 @@
 
 package com.bytechef.platform.security.web.config;
 
+import com.bytechef.platform.security.web.mcp.McpAuthenticationRequiredResolver;
+import com.bytechef.platform.security.web.mcp.oauth2.McpAuthenticationRequiredPredicate;
 import com.bytechef.platform.security.web.mcp.oauth2.McpDiscoveryAuthenticationFilter;
 import com.bytechef.platform.security.web.mcp.oauth2.McpTenantProtectedResourceMetadataAuthenticationEntryPoint;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -31,6 +34,14 @@ import org.springframework.security.web.util.matcher.RegexRequestMatcher;
  * {@code WWW-Authenticate} header). When active, an unauthenticated MCP request receives {@code 401} with a
  * {@code WWW-Authenticate: Bearer} header carrying the RFC 9728 protected-resource-metadata pointer.
  *
+ * <p>
+ * A server whose {@code authenticationRequired} is off is exempt from the challenge and falls through to the credential
+ * filters, which serve it anonymously - otherwise configuring an issuer would silently override that per-server toggle
+ * across every MCP server on the deployment. Because the toggle is stored per surface (a {@code mcp_server} row for
+ * automation, the {@code mcp.server} platform property for management), each surface contributes its own
+ * {@link McpAuthenticationRequiredResolver}; with none contributed - a CE build, or a surface that never registered one
+ * - every token-less request is challenged, which is the pre-SPI behavior.
+ *
  * @author Ivica Cardic
  */
 @Configuration
@@ -38,10 +49,15 @@ public class McpDiscoverySecurityConfigurerContributor implements SecurityConfig
 
     private static final String MCP_PATH_REGEX = "^/api/(automation|management)/.+/mcp";
 
+    private final ObjectProvider<McpAuthenticationRequiredResolver> mcpAuthenticationRequiredResolverProvider;
     private final McpResourceServerProperties mcpResourceServerProperties;
 
     @SuppressFBWarnings("EI2")
-    public McpDiscoverySecurityConfigurerContributor(McpResourceServerProperties mcpResourceServerProperties) {
+    public McpDiscoverySecurityConfigurerContributor(
+        McpResourceServerProperties mcpResourceServerProperties,
+        ObjectProvider<McpAuthenticationRequiredResolver> mcpAuthenticationRequiredResolverProvider) {
+
+        this.mcpAuthenticationRequiredResolverProvider = mcpAuthenticationRequiredResolverProvider;
         this.mcpResourceServerProperties = mcpResourceServerProperties;
     }
 
@@ -61,8 +77,16 @@ public class McpDiscoverySecurityConfigurerContributor implements SecurityConfig
         AuthenticationEntryPoint authenticationEntryPoint =
             new McpTenantProtectedResourceMetadataAuthenticationEntryPoint();
 
+        // A server that opted out of authentication must not be challenged - it is served anonymously by the
+        // credential filters downstream. Each surface contributes its own resolver because the flag lives in a
+        // different place per surface; with none contributed the predicate requires authentication.
+        McpAuthenticationRequiredPredicate mcpAuthenticationRequiredPredicate = new McpAuthenticationRequiredPredicate(
+            mcpAuthenticationRequiredResolverProvider.orderedStream()
+                .toList());
+
         McpDiscoveryAuthenticationFilter mcpDiscoveryAuthenticationFilter = new McpDiscoveryAuthenticationFilter(
-            RegexRequestMatcher.regexMatcher(MCP_PATH_REGEX), authenticationEntryPoint);
+            RegexRequestMatcher.regexMatcher(MCP_PATH_REGEX), authenticationEntryPoint,
+            mcpAuthenticationRequiredPredicate);
 
         return (T) new McpDiscoverySecurityConfigurer(mcpDiscoveryAuthenticationFilter);
     }

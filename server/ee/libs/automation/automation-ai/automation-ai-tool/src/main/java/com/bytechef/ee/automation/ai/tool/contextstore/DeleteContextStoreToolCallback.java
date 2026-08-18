@@ -9,7 +9,7 @@ package com.bytechef.ee.automation.ai.tool.contextstore;
 
 import com.bytechef.ai.agent.tool.ToolErrors;
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
-import com.bytechef.ee.automation.contextstore.facade.WorkspaceContextStoreFacade;
+import com.bytechef.ee.automation.contextstore.facade.ContextStoreFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
@@ -23,6 +23,11 @@ import tools.jackson.databind.json.JsonMapper;
  * Deletes an entire Context Store (and, by FK cascade, all its sources, entities, and records) scoped to the
  * invocation's workspace. Irreversible — the caller must confirm with the user first.
  *
+ * <p>
+ * Calls the authorization-enforcing {@link ContextStoreFacade}, which requires the admin role, rather than the
+ * deliberately unguarded {@code WorkspaceContextStoreFacade} the data plane uses — this operation cascades to every
+ * source, entity, and record under the store, so it must not be reachable by a non-admin caller.
+ *
  * @author Ivica Cardic
  * @version ee
  */
@@ -32,7 +37,7 @@ public class DeleteContextStoreToolCallback implements ToolCallback {
 
     private static final String DESCRIPTION = """
         Delete an entire Context Store. Cascade deletes every source, entity, and record it contains. Irreversible.
-        Always confirm with the user before calling.""";
+        Requires the admin role - a non-admin caller is rejected. Always confirm with the user before calling.""";
 
     private static final String INPUT_SCHEMA = """
         {
@@ -43,12 +48,12 @@ public class DeleteContextStoreToolCallback implements ToolCallback {
             "required": ["id"]
         }""";
 
-    private final WorkspaceContextStoreFacade workspaceContextStoreFacade;
+    private final ContextStoreFacade contextStoreFacade;
     private final JsonMapper jsonMapper = new JsonMapper();
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public DeleteContextStoreToolCallback(WorkspaceContextStoreFacade workspaceContextStoreFacade) {
-        this.workspaceContextStoreFacade = workspaceContextStoreFacade;
+    public DeleteContextStoreToolCallback(ContextStoreFacade contextStoreFacade) {
+        this.contextStoreFacade = contextStoreFacade;
     }
 
     @Override
@@ -81,7 +86,7 @@ public class DeleteContextStoreToolCallback implements ToolCallback {
                 return toolError("Workspace context unavailable - open this chat from a workspace.");
             }
 
-            workspaceContextStoreFacade.deleteWorkspaceContextStore(workspaceId, input.id());
+            contextStoreFacade.deleteContextStore(workspaceId, input.id());
 
             return jsonMapper.writeValueAsString(Map.of("deleted", true, "id", input.id()));
         } catch (JacksonException exception) {

@@ -11,9 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.ee.automation.contextstore.facade.WorkspaceContextStoreSourceFacade;
-import com.bytechef.ee.automation.contextstore.service.WorkspaceContextStoreSourceService;
-import java.util.Optional;
+import com.bytechef.ee.automation.contextstore.facade.ContextStoreSourceFacade;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import tools.jackson.databind.JsonNode;
@@ -30,8 +28,8 @@ class RefreshContextStoreSourceToolCallbackTest {
 
     @Test
     void testToolDefinitionExposesName() {
-        RefreshContextStoreSourceToolCallback callback = new RefreshContextStoreSourceToolCallback(
-            mock(WorkspaceContextStoreSourceFacade.class), mock(WorkspaceContextStoreSourceService.class));
+        RefreshContextStoreSourceToolCallback callback =
+            new RefreshContextStoreSourceToolCallback(mock(ContextStoreSourceFacade.class));
 
         ToolDefinition definition = callback.getToolDefinition();
 
@@ -40,13 +38,11 @@ class RefreshContextStoreSourceToolCallbackTest {
 
     @Test
     void testCallReturnsJobId() throws Exception {
-        WorkspaceContextStoreSourceFacade facade = mock(WorkspaceContextStoreSourceFacade.class);
-        WorkspaceContextStoreSourceService service = mock(WorkspaceContextStoreSourceService.class);
+        ContextStoreSourceFacade facade = mock(ContextStoreSourceFacade.class);
 
-        when(service.fetchWorkspaceIdByContextStoreSourceId(42L)).thenReturn(Optional.of(7L));
-        when(facade.refreshNow(7L, 42L)).thenReturn(12345L);
+        when(facade.refreshContextStoreSource(42L)).thenReturn(12345L);
 
-        RefreshContextStoreSourceToolCallback callback = new RefreshContextStoreSourceToolCallback(facade, service);
+        RefreshContextStoreSourceToolCallback callback = new RefreshContextStoreSourceToolCallback(facade);
 
         String result = callback.call("{\"id\":42}");
 
@@ -60,8 +56,8 @@ class RefreshContextStoreSourceToolCallbackTest {
 
     @Test
     void testCallRequiresId() throws Exception {
-        RefreshContextStoreSourceToolCallback callback = new RefreshContextStoreSourceToolCallback(
-            mock(WorkspaceContextStoreSourceFacade.class), mock(WorkspaceContextStoreSourceService.class));
+        RefreshContextStoreSourceToolCallback callback =
+            new RefreshContextStoreSourceToolCallback(mock(ContextStoreSourceFacade.class));
 
         String result = callback.call("{}");
 
@@ -72,13 +68,11 @@ class RefreshContextStoreSourceToolCallbackTest {
 
     @Test
     void testCallSurfacesIllegalStateAsToolError() throws Exception {
-        WorkspaceContextStoreSourceFacade facade = mock(WorkspaceContextStoreSourceFacade.class);
-        WorkspaceContextStoreSourceService service = mock(WorkspaceContextStoreSourceService.class);
+        ContextStoreSourceFacade facade = mock(ContextStoreSourceFacade.class);
 
-        when(service.fetchWorkspaceIdByContextStoreSourceId(42L)).thenReturn(Optional.of(7L));
-        when(facade.refreshNow(7L, 42L)).thenThrow(new IllegalStateException("source has no workflow"));
+        when(facade.refreshContextStoreSource(42L)).thenThrow(new IllegalStateException("source has no workflow"));
 
-        RefreshContextStoreSourceToolCallback callback = new RefreshContextStoreSourceToolCallback(facade, service);
+        RefreshContextStoreSourceToolCallback callback = new RefreshContextStoreSourceToolCallback(facade);
 
         String result = callback.call("{\"id\":42}");
 

@@ -11,6 +11,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.config.Customizer.withDefaults;
 
+import com.bytechef.automation.ai.mcp.server.security.web.authentication.AutomationMcpAuthenticationRequiredResolver;
 import com.bytechef.automation.ai.mcp.server.security.web.configurer.AutomationMcpServerSecurityConfigurer;
 import com.bytechef.ee.platform.security.web.config.McpTenantTrustResolutionConfigurerContributor;
 import com.bytechef.ee.platform.security.web.mcp.oauth2.McpTenantIssuerResolver;
@@ -20,10 +21,12 @@ import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.mcp.server.FilterableMcpServerBuilder;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.security.service.ApiKeyService;
+import com.bytechef.platform.security.web.config.McpDiscoverySecurityConfigurerContributor;
 import com.bytechef.platform.security.web.config.McpJwtSecurityConfigurerContributor;
 import com.bytechef.platform.security.web.config.McpOAuth2ResourceServerSecurityConfigurerContributor;
 import com.bytechef.platform.security.web.config.McpResourceServerProperties;
 import com.bytechef.platform.security.web.config.McpResourceServerProperties.Issuer;
+import com.bytechef.platform.security.web.mcp.McpAuthenticationRequiredResolver;
 import com.bytechef.platform.security.web.mcp.oauth2.McpAudienceValidator;
 import com.bytechef.platform.security.web.mcp.oauth2.McpFederatedIssuerAuthenticator;
 import com.bytechef.platform.security.web.mcp.oauth2.McpJwtDecoderFactory;
@@ -170,6 +173,20 @@ public class AutomationMcpOAuth2ResourceServerSecurityIntTestConfiguration {
     }
 
     @Bean
+    McpAuthenticationRequiredResolver automationMcpAuthenticationRequiredResolver(McpServerService mcpServerService) {
+        return new AutomationMcpAuthenticationRequiredResolver(mcpServerService);
+    }
+
+    @Bean
+    McpDiscoverySecurityConfigurerContributor mcpDiscoverySecurityConfigurerContributor(
+        McpResourceServerProperties mcpResourceServerProperties,
+        ObjectProvider<McpAuthenticationRequiredResolver> mcpAuthenticationRequiredResolverProvider) {
+
+        return new McpDiscoverySecurityConfigurerContributor(
+            mcpResourceServerProperties, mcpAuthenticationRequiredResolverProvider);
+    }
+
+    @Bean
     McpTenantTrustResolutionConfigurerContributor mcpTenantTrustResolutionConfigurerContributor(
         McpResourceServerProperties mcpResourceServerProperties, IdentityProviderService identityProviderService) {
 
@@ -214,7 +231,8 @@ public class AutomationMcpOAuth2ResourceServerSecurityIntTestConfiguration {
         McpServerService mcpServerService, UserService userService,
         McpOAuth2ResourceServerSecurityConfigurerContributor resourceServerContributor,
         McpTenantTrustResolutionConfigurerContributor tenantTrustContributor,
-        McpJwtSecurityConfigurerContributor jwtContributor) throws Exception {
+        McpJwtSecurityConfigurerContributor jwtContributor,
+        McpDiscoverySecurityConfigurerContributor discoveryContributor) throws Exception {
 
         return http
             .authorizeHttpRequests(authorize -> authorize.anyRequest()
@@ -226,6 +244,7 @@ public class AutomationMcpOAuth2ResourceServerSecurityIntTestConfiguration {
             .with(resourceServerContributor.getSecurityConfigurerAdapter(), withDefaults())
             .with(tenantTrustContributor.getSecurityConfigurerAdapter(), withDefaults())
             .with(jwtContributor.getSecurityConfigurerAdapter(), withDefaults())
+            .with(discoveryContributor.getSecurityConfigurerAdapter(), withDefaults())
             .build();
     }
 

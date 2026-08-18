@@ -8,8 +8,8 @@
 package com.bytechef.ee.automation.ai.tool.contextstore;
 
 import com.bytechef.ai.agent.tool.ToolErrors;
-import com.bytechef.ee.automation.contextstore.facade.WorkspaceContextStoreSourceFacade;
-import com.bytechef.ee.automation.contextstore.service.WorkspaceContextStoreSourceService;
+import com.bytechef.ee.automation.contextstore.facade.ContextStoreSourceFacade;
+import com.bytechef.ee.platform.contextstore.domain.ContextStoreSource;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
@@ -24,6 +24,10 @@ import tools.jackson.databind.json.JsonMapper;
  * underlying {@code ProjectDeploymentWorkflow}, which in turn enables/disables the cron trigger in the scheduler. A
  * disabled source's records remain queryable; only the periodic sync is paused.
  *
+ * <p>
+ * Calls the authorization-enforcing {@link ContextStoreSourceFacade}, which requires the admin role and resolves the
+ * source's owning workspace itself — the tool needs no workspace context of its own.
+ *
  * @author Ivica Cardic
  * @version ee
  */
@@ -34,7 +38,7 @@ public class SetContextStoreSourceEnabledToolCallback implements ToolCallback {
     private static final String DESCRIPTION = """
         Enable or disable periodic sync for a Context Store source. Disabling pauses the cron trigger in the
         scheduler — already-synced records remain queryable. Enabling resumes the schedule on the source's existing
-        cadence.""";
+        cadence. Requires the admin role - a non-admin caller is rejected.""";
 
     private static final String INPUT_SCHEMA =
         """
@@ -47,17 +51,12 @@ public class SetContextStoreSourceEnabledToolCallback implements ToolCallback {
                 "required": ["id", "enabled"]
             }""";
 
-    private final WorkspaceContextStoreSourceFacade workspaceContextStoreSourceFacade;
-    private final WorkspaceContextStoreSourceService workspaceContextStoreSourceService;
+    private final ContextStoreSourceFacade contextStoreSourceFacade;
     private final JsonMapper jsonMapper = new JsonMapper();
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public SetContextStoreSourceEnabledToolCallback(
-        WorkspaceContextStoreSourceFacade workspaceContextStoreSourceFacade,
-        WorkspaceContextStoreSourceService workspaceContextStoreSourceService) {
-
-        this.workspaceContextStoreSourceFacade = workspaceContextStoreSourceFacade;
-        this.workspaceContextStoreSourceService = workspaceContextStoreSourceService;
+    public SetContextStoreSourceEnabledToolCallback(ContextStoreSourceFacade contextStoreSourceFacade) {
+        this.contextStoreSourceFacade = contextStoreSourceFacade;
     }
 
     @Override
@@ -88,20 +87,13 @@ public class SetContextStoreSourceEnabledToolCallback implements ToolCallback {
                 return toolError("enabled is required");
             }
 
-            Long workspaceId =
-                workspaceContextStoreSourceService.fetchWorkspaceIdByContextStoreSourceId(input.id())
-                    .orElse(null);
+            ContextStoreSource updated =
+                contextStoreSourceFacade.setContextStoreSourceEnabled(input.id(), input.enabled());
 
-            if (workspaceId == null) {
-                return toolError("ContextStoreSource " + input.id() + " has no owning workspace");
-            }
-
-            workspaceContextStoreSourceFacade.setEnabled(workspaceId, input.id(), input.enabled());
-
-            return jsonMapper.writeValueAsString(Map.of("id", input.id(), "enabled", input.enabled()));
+            return jsonMapper.writeValueAsString(Map.of("id", updated.getId(), "enabled", updated.isEnabled()));
         } catch (JacksonException exception) {
             return toolError("Invalid tool input: " + exception.getMessage());
-        } catch (IllegalArgumentException exception) {
+        } catch (IllegalArgumentException | IllegalStateException exception) {
             return toolError(exception.getMessage());
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(
