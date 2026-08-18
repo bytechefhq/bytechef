@@ -525,24 +525,36 @@ Tools reach the ai_hub ASK/BUILD agents through three tiers (wired in `AiHubConf
    security-context-rehydration-wrapped by `ToolSearchAdvisorConfiguration`, so
    `@PreAuthorize`-guarded facades work. Demote rarely-used tools here (createWorkflowChat,
    ASK's listApiCollections) and note them in the prompt as "find with searchTool first".
-3. **Specialist subagents** — one-shot ChatClients registered as delegate tools. Two families:
-   Copilot specialists (skills, context_store, knowledge_base, data_table, asset_file,
-   cluster_element, code_editor, workflow_editor, converter (BUILD-only), workflow_execution,
-   custom_component, code_workflow) via `registerCopilotSubAgentToolCallbacks`, and AI-hub-owned
-   subagents
-   (research, data_analyst, image_generator, slide_builder via `registerSubAgentToolCallbacks`;
-   mcp_agent, project_deployment_agent, api_collection_agent via
-   `registerSpecialistSubAgentToolCallbacks` + `SubAgentToolCallback`). Delegates MUST forward
-   the parent `ToolContext` into the inner ChatClient (`.toolContext(...)`) or workspace-scoped
-   tools fail with "Workspace context unavailable". Wrap delegates in
-   `ProgressReportingToolCallback` on the chat surface only (it narrates into the AG-UI stream).
+3. **Specialist subagents** — one-shot ChatClients registered as delegate tools. Two families, and
+   this is now the COMPLETE list (ticket 732, CRUD-delegate unwind, complete): the
+   nine catalog-backed intelligent delegates shared with the Copilot panels and the management MCP
+   surface (`authorSkill`, `configureClusterElement`, `writeScript`, `buildWorkflow`,
+   `debugWorkflowExecution`, `importWorkflow` (BUILD-only), `buildCustomComponent`,
+   `buildCodeWorkflow`, `configureMcpServer` (BUILD-only) — see `INTELLIGENT_TOOL_NAMES` and
+   `registerIntelligentToolCallbacks`), and the four AI-hub-owned generative one-shots (`research`,
+   `data_analyst`, `image_generator`, `slide_builder` via `registerSubAgentToolCallbacks`) that were
+   deliberately never migrated into the catalog. Every other specialist that used to exist here —
+   the Copilot CRUD specialists (context_store, knowledge_base, data_table, asset_file, ai_agent —
+   `skills` was never one of these; `authorSkill` has always been catalog-backed) and the
+   automation-owned CRUD specialists (mcp_agent, project_deployment_agent, api_collection_agent) —
+   was dissolved; their tools are registered flat (or catalog-demoted for
+   mutations) on whichever surface used to delegate to them, and
+   `registerCopilotSubAgentToolCallbacks`/`registerSpecialistSubAgentToolCallbacks`/
+   `SubAgentToolCallback` no longer exist. Delegates MUST forward the parent `ToolContext` into the
+   inner ChatClient (`.toolContext(...)`) or workspace-scoped tools fail with "Workspace context
+   unavailable". Wrap delegates in `ProgressReportingToolCallback` on the chat surface only (it
+   narrates into the AG-UI stream).
 
 Rules of thumb: streaming and suspend/resume contracts must stay pinned on the main agent —
 `runChatWorkflow`'s SSE/awaitingInput contract is client-coupled to the MAIN agent's tool-call
-event, and a subagent cannot pause mid-run and resume where it left off. It CAN, however, ask the
-user a rendered multiple-choice question: it asks, stops, and is re-delegated with the answer and
-its own memory intact (see "Subagent conversation memory and interactive questions"). Self-contained
-CRUD domains go behind a specialist; rare one-shot tools go to the catalog. Adding a subagent means:
+event, and a subagent cannot pause mid-run and resume where it left off. It CAN, however, put a
+rendered multiple-choice question to the user mid-delegation: it asks, stops, and the parent
+re-delegates with the answer — see "Subagent conversation memory and interactive questions" for the
+seam and for what does NOT survive that round trip. Per that plan's own conclusion, do NOT create a
+specialist just to hide the number of CRUD tools in a domain — self-contained CRUD domains go flat
+(pinned or catalog-demoted per the schema-pressure guidance above) on whichever surface needs them.
+Reserve a specialist for genuine multi-step reasoning over a domain (workflow editing, code
+generation, research) that a flat tool list cannot express. Adding a subagent means:
 enum entry in `AiHubAgentType` (auto-registered via `AiHubAgentTypeProvider`), a
 `*Configuration` with a ChatClient bean + prompt resource + static `create*ToolCallback` factory,
 registration via `ObjectProvider.ifAvailable`, and prompt documentation on the parent agent.
@@ -557,11 +569,10 @@ registration via `ObjectProvider.ifAvailable`, and prompt documentation on the p
   `SelectComponentPropertyOptionToolCallback`). The `selectPropertyOption` name and its
   `select-property-option` marker payload are client-load-bearing — do not rename.
 
-**Subagent delegate model propagation (ticket 732).** The nine catalog-backed intelligent delegates
-(`buildWorkflow`, `importWorkflow`, `configureClusterElement`, `writeScript`,
-`authorSkill`, `debugWorkflowExecution`, `buildCustomComponent`, `buildCodeWorkflow`,
-`buildIntegrationWorkflow`) follow the `ChatModel` the caller picked in the AI Hub composer or a
-Copilot panel toolbar; the management MCP surface does not, structurally —
+**Subagent delegate model propagation (ticket 732).** Every catalog-backed intelligent delegate — all
+ten, each constructed with a `SubAgentChatModelResolver` by its `IntelligentToolContributor` — follows
+the `ChatModel` the caller picked in the AI Hub composer or a Copilot panel toolbar; the management
+MCP surface does not, structurally —
 `WorkspaceScopedSubAgentToolCallback` never writes `AgentToolInvocationContext
 .TOOL_CONTEXT_LLM_PROVIDER_KEY`/`TOOL_CONTEXT_LLM_MODEL_KEY` into the context it forwards, so those
 delegates always run on the default. Resolution flows tool-context keys (populated by
@@ -577,17 +588,23 @@ never fails a turn.
 
 ### Subagent conversation memory and interactive questions (EE, ticket 732)
 
-Two features sharing the `com.bytechef.ee.ai.hub.subagent` package. Specs:
-`docs/superpowers/specs/2026-08-07-subagent-conversation-memory-design.md` and
-`…-subagent-interactive-questions-design.md`.
+Two features, and they no longer share a package. Memory is EE, in
+`com.bytechef.ee.ai.hub.subagent`. The ask capability straddles editions: the seam, the decorator and
+the renderer are CE in `com.bytechef.ai.copilot.tool.ask` (they have to be — the catalog that wires
+them is CE), the channel, tool and relay implementation are EE in that same `…hub.subagent` package.
+Specs: `docs/superpowers/specs/2026-08-07-subagent-conversation-memory-design.md` and
+`docs/superpowers/specs/2026-08-07-subagent-interactive-questions-design.md` — read the second for
+rationale, not wiring: it still describes the deleted `SubAgentToolCallback`/allowlist shape rather
+than the catalog seam below.
 
-**The contributor seam.** `SubAgentGuardrailedChatClient` no longer hardcodes advisors — it dispatches a
+**The contributor seam.** `SubAgentGuardrailedChatClient` does not hardcode advisors — it dispatches a
 `List<SubAgentAdvisorContributor>`, each of which takes the forwarded `ToolContext` and returns the request
 spec (a spec, not a `List<Advisor>`, because a contributor may need to set advisor *params*). The class is
 ~250 lines of `ChatClientRequestSpec` delegation boilerplate, which is exactly why a second decorator was
 rejected: every method added upstream would have to be implemented twice. Its guardrails-era name is kept
-deliberately. Two contributors ship: `WorkspaceAdvisorContributor` (guardrails + workspace system prompt)
-and `SubAgentSessionMemoryContributor`.
+deliberately. Two contributors ship today: `WorkspaceAdvisorContributor` (guardrails + workspace system
+prompt) and `SubAgentSessionMemoryContributor` (this section) — both wired from
+`AiHubConfiguration#wrapDelegate` and ONLY from there — which is what makes memory hub-only (below).
 
 **Memory.** Each specialist gets a durable per-conversation session keyed
 `<parentThreadId>:<agentTypeKey>` (`SubAgentSessionMemoryContributor.sessionKey`, public and unit-tested —
@@ -601,41 +618,83 @@ parent, which uses `TOOL_MESSAGE_PERSISTENCE_ADVISOR_ORDER` to capture its full 
 specialist's tool traffic is mostly listing calls it re-runs anyway. Fail-open on session-store errors, and
 absent when the `ToolContext` carries no conversation id (the MCP manager surface, which stays stateless).
 
+**Memory is hub-only, and that asymmetry is load-bearing.** `SubAgentSessionMemoryContributor` is
+attached in `AiHubConfiguration#wrapDelegate` and nowhere else. Every other surface that builds the
+same delegates passes an identity `chatClientDecorator` — both Copilot panel configurations
+(`ProjectAgentConfiguration`, `McpServerAgentConfiguration`, via `IntelligentToolCatalog#getForPanel`)
+and all three management-MCP contributors (via `#getByNames`) — and the MCP surface carries no
+conversation id to key a session on in the first place. **A specialist on a panel or over MCP has NO
+memory across delegations**: the call that brings a user's answer back starts from nothing. Nothing
+user-facing may say otherwise. A shipped text once told MCP clients a specialist resumes "with its
+context intact"; it was false, and the ask tool's description, its stop instruction,
+`SubAgentQuestionFormatter`'s re-invocation sentence and `ManagementMcpServerConfiguration`'s
+`instructions` were each corrected to tell the caller to restate what the specialist needs.
+
 `agentTypeKey` MUST be a key registered with `AgentTypeRegistry` (which gained `keys()` for this): task
 delete reconstructs the per-specialist keys from that registry to purge them, since `SessionRepository` has
 no prefix listing. Note the skills specialist keys on `CopilotAgentType.SKILLS` (`"skills"`), NOT its
 `"authorSkill"` tool name — there is no `authorSkill` agent type, and an unregistered key would
-leave a session nothing ever deletes. All 20 delegate sites go through `AiHubConfiguration.wrapDelegate`
-so none can forget the memory contributor.
+leave a session nothing ever deletes. Every AI Hub delegate site goes through
+`AiHubConfiguration#wrapDelegate`, so no hub delegate can forget the memory contributor — but that
+method is the hub's alone, not a shared path (see above).
 
-**Interactive questions.** A specialist calls `askUserQuestion`
-(`SubagentAskUserQuestionToolCallback`, which DECORATES the CE `AskUserQuestionToolCallback` so the
-payload is byte-identical to the main agent's and inherits its strict input validation). The tool writes
-the envelope into `SubagentAskChannel` — thread-bound, LIFO-safe, holding at most ONE question per
-delegation — and returns a stop instruction, NOT the payload: returning the payload would make the
-specialist read its own question back as the answer and invent the user's decision. The delegate
-`ToolCallback` runs the delegation through the CE `SubAgentAskRelay` seam (EE impl
-`SubagentAskChannelRelay`) and, if a question was raised, returns the payload as **its own** tool result —
-which is what puts it on the parent's stream, since a delegate tool result IS a main-agent tool result. The
-specialist's text summary is discarded in that branch by design.
+**Interactive questions.** A delegated specialist can put a real multiple-choice question to the
+user. It calls `askUserQuestion` (`SubagentAskUserQuestionToolCallback`, EE, which DECORATES the CE
+`AskUserQuestionToolCallback` so the payload is byte-identical to the main agent's and inherits its
+strict input validation); that writes the envelope into `SubagentAskChannel` — thread-bound,
+`ThreadLocal` restored rather than cleared so nesting is LIFO-safe, holding at most ONE question per
+delegation — and returns a stop instruction. `SubAgentAskRelayToolCallback` (CE) wraps the delegate,
+runs the delegation through the `SubAgentAskRelay` seam (CE interface, EE impl
+`SubagentAskChannelRelay`) and, when a question was raised, returns the payload as **its own** tool
+result — which is what puts it on the parent's stream, since a delegate tool result IS a main-agent
+tool result. The specialist's text summary is discarded in that branch by design.
 
-`SubAgentAskRelay.runWithChannel` returns `AskOutcome(result, pendingQuestion)` rather than exposing a
-separate post-call `pending()` read. That is load-bearing, not style: a delegate `ToolCallback` is a
-singleton serving every concurrent delegation, so any stash outliving the binding would let two
-conversations race and surface one user's question in another's chat. Read `pending()` only from inside
-`runWithChannel`.
+**One seam, not per delegate.** Both the tool attachment and the wrapper are applied in
+`IntelligentToolCatalog#buildToolCallback` — the private per-definition method that is the sole build
+path behind BOTH `getByNames` and `getForPanel`. Every intelligent delegate is therefore ask-capable
+from one edit and a delegate added later inherits it; there is no allowlist left to decay. The ask
+tool is attached to the delegate's own `ChatClient` innermost, before the per-surface
+`chatClientDecorator`, via `mutate().defaultTools(...)`, so a surface that wraps the client still
+delegates to one carrying it. `SubAgentAskRelay` is an optional bean: absent it (a deployment without
+the EE module) nothing is attached and nothing is wrapped, which is exactly the pre-ask behaviour.
 
-Client: `toToolResultDataPart` dispatches on tool NAME first, then falls back to the payload's `kind`,
-scoped to known kinds — a delegate tool is named e.g. `mcp_agent`, so no name branch would ever
-match. The fallback parses silently behind a `{` guard rather than via `parseJson`, which would log a
-warning for every plain-text tool result in the app.
+**The renderer is per-surface.** `getByNames`/`getForPanel`'s four-argument forms default to
+`SubAgentQuestionRenderer.JSON` — the AI Hub and both Copilot panels keep it, because their client
+renders the `ask-user-question` envelope as a choice card. The three management-MCP contributors (CE
+`ToolCallbackContributorConfiguration`, EE `AutomationCopilotMcpContributorConfiguration`, EE
+`EmbeddedCopilotMcpContributorConfiguration`) pass `PLAIN_TEXT`, which `SubAgentQuestionFormatter`
+renders as numbered human-readable text: there is no AG-UI stream and no envelope renderer there.
 
-**Wired for asking**: the mcp_agent/project_deployment_agent/api_collection_agent specialists plus the Copilot domain specialists; generative
-one-shots (research, data_analyst, image_generator, slide_builder, converter) deliberately are not — see
-the rollout note below. Adding another means three things: register `SubagentAskUserQuestionToolCallback`
-on its `ChatClient`, pass a `SubagentAskChannelRelay` into its delegate callback, and update its prompt.
-Known gaps, all deliberate: one question per delegation; nothing enforces that the specialist stops after
-asking (prompt guidance only); `truncateMessagesFrom` does not rewind specialist memory.
+**Two invariants, and why.** The ask tool returns a **stop instruction, never the payload** —
+returning the payload would make the specialist read its own question back as the answer and
+fabricate the user's decision, a failure that is invisible because the run completes normally with a
+plausible answer. And `SubAgentAskRelay#runWithChannel` returns `AskOutcome(result, pendingQuestion)`
+rather than exposing a post-call `pending()` read: a delegate `ToolCallback` is a singleton serving
+every concurrent delegation, so any stash outliving the binding would let two conversations race and
+surface one user's question in another's chat. Read `pending()` only from inside `runWithChannel`.
+
+**Two classes from the old stack did NOT come back and must not be described as existing**:
+`SubAgentToolCallback` (the relay logic used to live inside it; today's delegates are per-domain
+callback classes rather than one shared class, which is why that logic had to become a wrapper
+applied once at the catalog) and `SubAgentAskToolContributor` (the
+`ASK_CAPABLE_AGENT_TYPE_KEYS` gate, which the catalog seam replaced outright). Surviving javadoc
+mentions of either are historical.
+
+The contract reaches the specialist through the **tool's description**
+(`SPECIALIST_CONTRACT_GUIDANCE`), not its prompt: every specialist prompt file is shared with a
+Copilot panel agent, only `WORKFLOW_EDITOR_ASK`/`BUILD` have an `askUserQuestion` at all, and the
+panel tool's contract is the opposite (it returns the envelope and keeps going) — one shared file
+cannot state both truthfully, and naming a tool an agent lacks kills the turn.
+
+Client: `toToolResultDataPart` dispatches on tool NAME first, then falls back to the payload's
+`kind`, scoped to known kinds — a delegate tool is named e.g. `buildWorkflow`, so no name branch
+would ever match. The fallback parses silently behind a `{` guard rather than via `parseJson`, which
+would log a warning for every plain-text tool result in the app.
+
+Known gaps, all deliberate: one question per delegation (`SubagentAskChannel.offer` returns `false`
+on a second, and the tool turns that into a tool error); nothing enforces that the specialist stops
+after asking (tool description and stop instruction only); `truncateMessagesFrom` does not rewind
+specialist memory.
 
 ### Agent HITL approvals (chat cards + tool gate)
 
@@ -699,18 +758,22 @@ contributes context_store/custom_component/code_workflow. A CE class must not ho
 references to EE bean names. Panel agents are dispatched by `CopilotApiController` collecting every
 `LocalAgent` bean by agentId (`<source>_<mode>`); adding a domain needs a controller branch + a client
 `Source` enum entry (lowercase value = URL segment) + an editor trigger + post-turn invalidation via
-`useCopilotPostTurnRegistry`. Automation-owned subagents (api_collection_agent etc.) deliberately have no
-ask/build split — reads are flat tools on the hub ASK agent.
+`useCopilotPostTurnRegistry`. The automation-owned CRUD domains (API collections, project deployments,
+MCP servers) have no subagent at all any more: their reads are flat tools on the hub ASK agent and
+their writes flat on BUILD, so there is no ask/build ChatClient pair to split.
 
 ### Domain copilot slice pattern (context store / knowledge base / data table)
 
 Each domain slice follows the same shape (see `docs/superpowers/plans/` for the slice plans):
 shared tool callbacks + a `*ToolCallbacksFactory` (read list feeds ASK, write list feeds BUILD)
 in `automation-ai-tool`; a `<Domain>AgentConfiguration` (module per the map above) defining the
-source-panel agents and the ask/build subagent ChatClients; a `<domain>_agent` delegate callback
-in `ai-copilot-tool`; a source enum entry on both surfaces; AI Hub delegates the domain to the
-specialist instead of registering flat mutation tools; the client detail page gets a copilot
-trigger + post-turn query invalidation.
+source-panel agent; a source enum entry on both surfaces; the client detail page gets a copilot
+trigger + post-turn query invalidation. The delegate half of this shape is GONE — there is no
+`<domain>_agent` callback in `ai-copilot-tool` for any of these three (the six `*AgentToolCallback`
+classes left in that package all back catalog-registered intelligent tools), and the AI Hub registers
+each domain's tools directly: the read leg pinned on BOTH agents, the mutation leg catalog-demoted on
+BUILD. Do not add a delegate for a new CRUD domain (see the AI Hub agent tool architecture rules of
+thumb).
 
 ### Editor draft/publish (custom components & code workflows, 2026-08-05)
 
@@ -821,11 +884,20 @@ Spec: `docs/superpowers/specs/2026-08-05-draft-publish-editors-design.md`.
   workflows with EMPTY parameters, so a setup is not servable until the mapping is completed
   (agent tools: `listMcpProjectWorkflows`, `updateMcpProjectWorkflowParameters` — merge
   semantics, only supplied fields change; authorization via the service's `MCP_EDIT` checks).
-- The `mcp_agent` subagent owns the end-to-end playbook (`prompt_mcp_agent.txt`).
+- There is no `mcp_agent` subagent. `prompt_mcp_agent.txt` survives under its old name as the system
+  prompt of the `configureMcpServer` intelligent tool (`McpServerSubAgentConfiguration`), narrowed to
+  tool-mapping synthesis over exactly two tools (`listMcpProjectWorkflows`,
+  `updateMcpProjectWorkflowParameters`). Creating, attaching and enabling servers are flat CRUD tools
+  on whichever surface calls it.
 - The management MCP server folds in `McpServerToolCallbackContributor` beans (SPI in
-  `ai-mcp-server-api`, keeps the CE server free of EE imports). The sixteen sub-agent delegates
-  (the three mcp_agent/project_deployment_agent/api_collection_agent subagents plus the twelve
-  copilot-domain specialists) are contributed there wrapped in
+  `ai-mcp-server-api`, keeps the CE server free of EE imports). The intelligent delegates reach it
+  through `IntelligentToolCatalog#getByNames`, each contributor over its OWN name partition rather
+  than the whole catalog — CE `ToolCallbackContributorConfiguration` (seven: `buildWorkflow`,
+  `importWorkflow`, `configureClusterElement`, `writeScript`, `authorSkill`,
+  `debugWorkflowExecution`, `configureMcpServer`), EE `AutomationCopilotMcpContributorConfiguration`
+  (`buildCustomComponent`, `buildCodeWorkflow`) and EE `EmbeddedCopilotMcpContributorConfiguration`
+  (`buildIntegrationWorkflow`) — so the count is a property of those three sets, not a fixed number,
+  and a definition whose `ChatClient` bean is absent is silently skipped. Each is wrapped in
   `WorkspaceScopedSubAgentToolCallback`: an optional `workspaceId` input is resolved and forwarded
   into the specialist's ToolContext under both `AutomationToolInvocationContext` and
   `AgentToolInvocationContext`'s workspace-id keys — the two key families the delegates' inner
@@ -1095,23 +1167,27 @@ gateway-only implementation; see "AI Gateway content guardrails" below for the g
   (guardrails + workspace system prompt) is one — see "Subagent conversation memory and interactive
   questions" for the seam and the other contributor.
   It resolves the workspace id from the SAME forwarded `ToolContext` map every hand-rolled delegate
-  `ToolCallback` (`SkillsAgentToolCallback`, `SubAgentToolCallback`, `ResearchToolCallback`, etc.)
+  `ToolCallback` (`SkillsAgentToolCallback`, `ResearchToolCallback`, etc.)
   already builds and passes to `.toolContext(Map)` — via `AgentToolInvocationContext
   .TOOL_CONTEXT_WORKSPACE_ID_KEY` — so no delegate class needed to change. One seam in
-  `AiHubConfiguration` (wrapping the `ChatClient` at the point each is handed to its
-  `createXToolCallback`/`new XAgentToolCallback` call) covers all three delegate families: Copilot
-  specialists, the AI-hub-owned subagents (research/data_analyst/image_generator/slide_builder), and the
-  mcp_agent/project_deployment_agent/api_collection_agent specialists. A
+  `AiHubConfiguration` (`#wrapDelegate`) covers both delegate families the hub has: the
+  catalog-backed intelligent delegates (via `registerIntelligentToolCallbacks`) and the AI-hub-owned
+  generative one-shots research/data_analyst/image_generator/slide_builder (via
+  `registerSubAgentToolCallbacks`). It does NOT reach the Copilot panels or the management MCP
+  surface, which build the same delegates with an identity `chatClientDecorator`. A
   BLOCK-mode violation inside a delegate call throws `AiGuardrailViolationException` synchronously out of
   `.call()`; every delegate's pre-existing `catch (RuntimeException)` arm converts it to a tool-error string
   via `ToolErrors.runtimeFailure(...)` (class-name only, not `getMessage()`) rather than crashing the turn.
   **Still uncovered, inherent to the advisor approach**: a delegate's completion still returns to the
   *parent* as a tool message (skips the parent's own input scan) and streams to the client as tool-result
   events (skips the parent's response scan) — the delegate's OWN advisor now redacts/blocks its own
-  request+response, but the parent agent never re-scans tool outputs. MCP-surface subagents
-  (the per-domain MCP contributor configurations) remain a different, out-of-scope surface — they
-  construct their own `SubAgentToolCallback` from the same `ChatClient` beans on a different `@Bean`
-  method that F3 does not wrap.
+  request+response, but the parent agent never re-scans tool outputs. **Also still uncovered: the
+  Copilot panels and the management MCP surface.** They build the same intelligent delegates from the
+  shared `IntelligentToolCatalog` with an identity `chatClientDecorator`, so no
+  `SubAgentGuardrailedChatClient` is applied and those delegate calls run without the workspace's
+  guardrails or system prompt — the same seam asymmetry that leaves them without session memory. (The
+  older `SubAgentToolCallback` construction path this bullet used to flag is gone, but the surfaces it
+  named still are not covered.)
 - **Model-based moderation (F2, ticket 732)**: covers every advisor-fronted surface, not just the gateway.
   `AiGuardrails#checkInputs` (the advisor's non-throwing entry point) takes an optional
   `AiGatewayModerationClassifier` (same SPI the gateway adapter's own classifier already implements — no
