@@ -29,8 +29,11 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.ai.tool.ToolCallback;
 
 /**
- * Builds the Knowledge Base tool-callback lists shared by the Copilot agents and the AI Hub
- * {@code knowledge_base_agent} subagent. Read list feeds ASK; write list feeds BUILD.
+ * Builds the Knowledge Base tool-callback lists shared by the Copilot panel agents, the AI Hub ASK/BUILD agents (which
+ * register the two reads flat and the five mutations via the searchable tool catalog rather than through a delegate —
+ * the former {@code knowledge_base_agent} subagent was dissolved, ticket 732, CRUD-delegate-unwind Task 6), and the
+ * management MCP server (which registers all seven flat — no schema-count pressure there). Read list feeds ASK; write
+ * list feeds BUILD.
  *
  * @author Ivica Cardic
  */

@@ -15,8 +15,16 @@ import java.util.List;
 /**
  * Authorization-enforcing facade for the Context Store source surface. Hosts the {@code ADMIN} guard so it applies to
  * every caller rather than only the GraphQL entry point, and keeps it off the shared
- * {@code WorkspaceContextStoreSourceFacade} which the AI Hub chat-define tools and data plane rely on. Delegates to the
- * existing shared collaborators.
+ * {@code WorkspaceContextStoreSourceFacade}, which stays deliberately unguarded for the reads and the data plane.
+ * Delegates to those existing shared collaborators.
+ *
+ * <p>
+ * Every source <em>mutation</em> now goes through here, agent tools included: the five source-mutation tool callbacks
+ * ({@code Create}/{@code Update}/{@code Delete}/{@code Refresh}/{@code SetContextStoreSourceEnabled}) that
+ * {@code ContextStoreToolCallbacksFactory} builds are constructed over this facade, and their LLM-visible descriptions
+ * state the admin requirement — so it has to hold on every surface they reach, not only the GraphQL one. Only the reads
+ * ({@code listContextSources}, the search tools) still go straight to the unguarded workspace facade/service.
+ * </p>
  *
  * @version ee
  *

@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.ai.agent.tool.CoreAgentType;
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.service.WorkspaceService;
@@ -27,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
@@ -52,7 +52,7 @@ class WorkspaceScopedSubAgentToolCallbackTest {
     @Test
     void testToolDefinitionKeepsDelegateNameAndExtendsSchema() {
         assertThat(toolCallback.getToolDefinition()
-            .name()).isEqualTo("project_deployment_agent");
+            .name()).isEqualTo("unknown");
         assertThat(toolCallback.getToolDefinition()
             .inputSchema()).contains("workspaceId")
                 .contains("environment");
@@ -79,18 +79,17 @@ class WorkspaceScopedSubAgentToolCallbackTest {
     }
 
     /**
-     * Every delegate wrapped by this class gets the FILES source ordinal written unconditionally — the key is a no-op
-     * for delegates that never create asset files, but the {@code asset_file_agent} delegate cannot get the correct
-     * attribution any other way on this surface (see {@link WorkspaceScopedSubAgentToolCallback} class Javadoc).
+     * No delegate wrapped by this class reads {@code sourceOrdinal} anymore — the one that did,
+     * {@code asset_file_agent}, was dissolved (ticket 732, CRUD-delegate-unwind Task 4) in favour of flat asset-file
+     * tools wrapped by {@link WorkspaceScopedFlatToolCallback} instead, which now owns that write (see this class's
+     * Javadoc).
      */
     @Test
-    void testForwardsSourceOrdinalUnconditionally() {
+    void testDoesNotForwardSourceOrdinal() {
         toolCallback.call("{\"request\": \"list servers\", \"workspaceId\": 42}");
 
         assertThat(delegate.capturedContext)
-            .containsEntry(
-                AutomationToolInvocationContext.TOOL_CONTEXT_SOURCE_ORDINAL_KEY,
-                AutomationToolInvocationContext.SOURCE_ORDINAL_FILES);
+            .doesNotContainKey(AutomationToolInvocationContext.TOOL_CONTEXT_SOURCE_ORDINAL_KEY);
     }
 
     /**
@@ -231,16 +230,29 @@ class WorkspaceScopedSubAgentToolCallbackTest {
 
     /**
      * Fake delegate that records the forwarded input and ToolContext and answers directly, so the wrapper's behaviour
-     * is observable without stubbing the specialist's ChatClient chain.
+     * is observable without stubbing a real specialist's ChatClient chain. Implements {@link ToolCallback} directly
+     * rather than extending a real delegate class — the automation-owned {@code SubAgentToolCallback} this used to
+     * extend was removed (ticket 732, CRUD-delegate unwind Task 9b) once its last consumer,
+     * {@code project_deployment_agent}, was dissolved.
      */
-    private static final class ContextCapturingDelegate extends SubAgentToolCallback {
+    private static final class ContextCapturingDelegate implements ToolCallback {
 
         private Map<String, Object> capturedContext;
         private String capturedInput;
 
-        ContextCapturingDelegate() {
-            super(AutomationSubAgentType.PROJECT_DEPLOYMENT_AGENT, mock(ChatClient.class),
-                "Manages project deployments.");
+        @Override
+        public ToolDefinition getToolDefinition() {
+            return ToolDefinition.builder()
+                .name(CoreAgentType.UNKNOWN.key())
+                .description("Manages project deployments.")
+                .inputSchema(
+                    "{\"type\": \"object\", \"properties\": {\"request\": {\"type\": \"string\"}}, \"required\": [\"request\"]}")
+                .build();
+        }
+
+        @Override
+        public String call(String toolInput) {
+            return call(toolInput, null);
         }
 
         @Override
@@ -254,7 +266,7 @@ class WorkspaceScopedSubAgentToolCallbackTest {
 
     /**
      * Fake copilot-domain delegate: a plain {@link ToolCallback} with the same {@code {request}} input schema the real
-     * delegates declare, proving the wrapper no longer requires a {@link SubAgentToolCallback}.
+     * delegates declare.
      */
     private static final class PlainCopilotDelegate implements ToolCallback {
 

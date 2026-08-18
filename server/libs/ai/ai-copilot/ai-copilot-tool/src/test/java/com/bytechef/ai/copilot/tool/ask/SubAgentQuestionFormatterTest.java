@@ -46,14 +46,14 @@ class SubAgentQuestionFormatterTest {
                     "awaitingAnswer": true
                 }""";
 
-        String formatted = SubAgentQuestionFormatter.format("mcp_agent", envelope);
+        String formatted = SubAgentQuestionFormatter.format("configureMcpServer", envelope);
 
-        assertThat(formatted).contains("mcp_agent agent needs a decision before continuing");
+        assertThat(formatted).contains("configureMcpServer agent needs a decision before continuing");
         assertThat(formatted).contains("Which project should the workflow live in?");
         assertThat(formatted).contains("1. CRM Project — The primary CRM automation project");
         assertThat(formatted).contains("2. Marketing Project — Campaign automation workflows");
         assertThat(formatted).contains(
-            "Present these options to the user. Then call mcp_agent again, restating the original request "
+            "Present these options to the user. Then call configureMcpServer again, restating the original request "
                 + "together with the chosen answer — this agent does not carry anything over from the call that "
                 + "asked, so an answer on its own is not enough to act on.");
     }
@@ -85,7 +85,7 @@ class SubAgentQuestionFormatterTest {
                     "awaitingAnswer": true
                 }""";
 
-        String formatted = SubAgentQuestionFormatter.format("mcp_agent", envelope);
+        String formatted = SubAgentQuestionFormatter.format("configureMcpServer", envelope);
 
         assertThat(formatted).contains("Which project?");
         assertThat(formatted).contains("Which environment?");
@@ -112,7 +112,7 @@ class SubAgentQuestionFormatterTest {
                     ]
                 }""";
 
-        String formatted = SubAgentQuestionFormatter.format("task_agent", envelope);
+        String formatted = SubAgentQuestionFormatter.format("buildWorkflow", envelope);
 
         assertThat(formatted).contains("1. Option A\n");
         assertThat(formatted).contains("2. Option B\n");
@@ -133,7 +133,7 @@ class SubAgentQuestionFormatterTest {
                     ]
                 }""";
 
-        String formatted = SubAgentQuestionFormatter.format("task_agent", envelope);
+        String formatted = SubAgentQuestionFormatter.format("buildWorkflow", envelope);
 
         assertThat(formatted).contains("Pick one");
         assertThat(formatted).contains("(no options provided)");
@@ -143,7 +143,7 @@ class SubAgentQuestionFormatterTest {
     void testEmptyQuestionsArrayFallsBackToRawEnvelope() {
         String envelope = "{\"kind\":\"ask-user-question\",\"questions\":[]}";
 
-        String formatted = SubAgentQuestionFormatter.format("task_agent", envelope);
+        String formatted = SubAgentQuestionFormatter.format("buildWorkflow", envelope);
 
         assertThat(formatted).isEqualTo(envelope);
     }
@@ -152,7 +152,7 @@ class SubAgentQuestionFormatterTest {
     void testMissingQuestionsFieldFallsBackToRawEnvelope() {
         String envelope = "{\"kind\":\"ask-user-question\"}";
 
-        String formatted = SubAgentQuestionFormatter.format("task_agent", envelope);
+        String formatted = SubAgentQuestionFormatter.format("buildWorkflow", envelope);
 
         assertThat(formatted).isEqualTo(envelope);
     }
@@ -161,7 +161,7 @@ class SubAgentQuestionFormatterTest {
     void testUnparseableEnvelopeFallsBackToRawInput() {
         String notJson = "this is not json";
 
-        String formatted = SubAgentQuestionFormatter.format("task_agent", notJson);
+        String formatted = SubAgentQuestionFormatter.format("buildWorkflow", notJson);
 
         assertThat(formatted).isEqualTo(notJson);
     }

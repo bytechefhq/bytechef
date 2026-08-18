@@ -56,7 +56,9 @@ public class UpdateAssetFileContentToolCallback implements ToolCallback {
         Replace the full content of an existing text file in the user's workspace. Use this when the
         user asks you to edit, revise, or rewrite a file that already exists (get the id from
         listAssetFiles and the current content from getAssetFileContent first). Supply the complete
-        new content — this overwrites the file. For a brand-new file use createAssetFile instead.""";
+        new content — this overwrites the file. For a brand-new file use createAssetFile instead.
+        Before calling this, state which file you are about to overwrite and wait for the user to
+        confirm in their next message, unless they already explicitly asked for this exact edit.""";
 
     private static final String INPUT_SCHEMA =
         """

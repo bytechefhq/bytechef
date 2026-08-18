@@ -19,8 +19,10 @@ import org.springframework.stereotype.Component;
  *
  * <p>
  * Registered as a plain {@link Component} rather than a bean of {@code AiHubConfiguration}: the capability belongs to
- * every surface the catalog serves — the Copilot panels and the management MCP server as much as the AI Hub — and
- * gating it on {@code bytechef.ai.hub.enabled} would silently switch it off for the other two.
+ * every surface the catalog serves — the Copilot panels and the management MCP server as much as the AI Hub — wherever
+ * this module is on the classpath, and gating it on {@code bytechef.ai.hub.enabled} would silently switch it off for
+ * the other two. A deployment that does not carry ai-hub-service has no {@code SubAgentAskRelay} bean at all, and the
+ * catalog then attaches nothing — the pre-ask behaviour.
  * </p>
  *
  * <p>

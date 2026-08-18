@@ -36,7 +36,6 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.tool.ToolCallback;
@@ -49,10 +48,18 @@ import org.springframework.core.io.Resource;
 
 /**
  * Registers the Knowledge Base Copilot panel source agents ({@code knowledge_base_ask}/{@code knowledge_base_build})
- * and the Knowledge Base subagent {@link ChatClient} beans consumed by the ai_hub agents and the management MCP server.
- * Lives in CE alongside {@code CopilotConfiguration} because {@link KnowledgeBaseToolCallbacksFactory} and the
- * knowledge-base services/facades it wraps are CE; the optional {@code ToolArtifactRecorder} hook is a CE SPI that the
- * EE AI Hub recorder plugs into when present.
+ * and the {@link KnowledgeBaseToolCallbacksFactory} bean consumed by the panel agents, the ai_hub agents (flat/catalog
+ * — ticket 732, CRUD-delegate-unwind Task 6), and the management MCP server (flat). Lives in CE alongside
+ * {@code CopilotConfiguration} because {@link KnowledgeBaseToolCallbacksFactory} and the knowledge-base
+ * services/facades it wraps are CE; the optional {@code ToolArtifactRecorder} hook is a CE SPI that the EE AI Hub
+ * recorder plugs into when present.
+ *
+ * <p>
+ * The {@code knowledgeBaseAskSubAgentChatClient}/{@code knowledgeBaseBuildSubAgentChatClient} beans that used to live
+ * here fed only the now-dissolved {@code knowledge_base_agent} delegate wrapper — the panel agent beans below have
+ * always called {@link KnowledgeBaseToolCallbacksFactory}'s read/write lists directly, so removing the two subagent
+ * beans leaves the panel untouched.
+ * </p>
  *
  * <p>
  * Gated so the beans exist when either the Copilot panel or the AI Hub surface is enabled, since both consume these
@@ -129,26 +136,6 @@ public class KnowledgeBaseAgentConfiguration {
             .toolCallbacks(
                 wrapToolCallbacks(securityContextRehydrator, knowledgeBaseToolCallbacksFactory.writeToolCallbacks()))
             .overrideChatClientResolver(overrideChatClientResolverProvider.getIfAvailable())
-            .build();
-    }
-
-    @Bean
-    ChatClient knowledgeBaseAskSubAgentChatClient(
-        ChatModel chatModel, KnowledgeBaseToolCallbacksFactory knowledgeBaseToolCallbacksFactory) {
-
-        return ChatClient.builder(chatModel)
-            .defaultSystem(readPrompt(promptKnowledgeBaseAskResource))
-            .defaultToolCallbacks(knowledgeBaseToolCallbacksFactory.readToolCallbacks())
-            .build();
-    }
-
-    @Bean
-    ChatClient knowledgeBaseBuildSubAgentChatClient(
-        ChatModel chatModel, KnowledgeBaseToolCallbacksFactory knowledgeBaseToolCallbacksFactory) {
-
-        return ChatClient.builder(chatModel)
-            .defaultSystem(readPrompt(promptKnowledgeBaseBuildResource))
-            .defaultToolCallbacks(knowledgeBaseToolCallbacksFactory.writeToolCallbacks())
             .build();
     }
 

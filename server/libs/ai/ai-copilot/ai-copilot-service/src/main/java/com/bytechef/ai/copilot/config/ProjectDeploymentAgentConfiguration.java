@@ -24,8 +24,7 @@ import com.bytechef.ai.copilot.tool.RehydrateContextToolCallback;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
 import com.bytechef.ai.copilot.util.Mode;
 import com.bytechef.ai.copilot.util.Source;
-import com.bytechef.automation.ai.tool.ProjectDeploymentToolCallbacksFactory;
-import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
+import com.bytechef.automation.ai.tool.DeploymentToolCallbacksFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -44,13 +43,18 @@ import org.springframework.core.io.Resource;
 /**
  * Registers the Project Deployment Copilot panel source agents ({@code project_deployment_ask}/
  * {@code project_deployment_build}). Lives in CE alongside {@code CopilotConfiguration} because
- * {@link ProjectDeploymentToolCallbacksFactory} and the {@link ProjectDeploymentFacade} it wraps are CE.
+ * {@link DeploymentToolCallbacksFactory} and the {@code ProjectDeploymentFacade} it wraps are CE.
  *
  * <p>
- * This configuration is purely additive: it does not touch {@code ProjectDeploymentSubAgentConfiguration}'s existing
- * {@code projectDeploymentAgentChatClient} bean or {@code createProjectDeploymentAgentToolCallback} factory methods,
- * which back the {@code project_deployment_agent} subagent consumed by AI Hub and the management MCP server. Those keep
- * building their own tool list independently of {@link ProjectDeploymentToolCallbacksFactory}.
+ * This configuration used to be purely additive to a separate {@code ProjectDeploymentSubAgentConfiguration}, which
+ * backed the {@code project_deployment_agent} subagent consumed by AI Hub and the management MCP server from an
+ * independently-constructed tool list. That delegate is gone (ticket 732, CRUD-delegate-unwind plan, Task 3) — AI Hub
+ * and the management MCP server now consume {@link DeploymentToolCallbacksFactory} directly instead. This configuration
+ * used to build its own byte-identical {@code ProjectDeploymentToolCallbacksFactory} bean for its panel pair alone (a
+ * pre-existing phase-3 duplication); that factory is gone too (ticket 732, CRUD-delegate-unwind plan, Task 9), folded
+ * into {@link DeploymentToolCallbacksFactory} — the bean {@code DeploymentAgentConfiguration} already registers — since
+ * {@code bytechef.ai.copilot.enabled=true} always also satisfies that configuration's copilot-or-hub condition, so the
+ * bean is guaranteed present whenever this configuration is active.
  * </p>
  *
  * <p>
@@ -74,16 +78,8 @@ public class ProjectDeploymentAgentConfiguration {
     private final State state = new State();
 
     @Bean
-    ProjectDeploymentToolCallbacksFactory projectDeploymentToolCallbacksFactory(
-        ProjectDeploymentFacade projectDeploymentFacade) {
-
-        return new ProjectDeploymentToolCallbacksFactory(projectDeploymentFacade);
-    }
-
-    @Bean
     SliceSpringAIAgent projectDeploymentAskSpringAIAgent(
-        ChatMemory chatMemory, ChatModel chatModel,
-        ProjectDeploymentToolCallbacksFactory projectDeploymentToolCallbacksFactory,
+        ChatMemory chatMemory, ChatModel chatModel, DeploymentToolCallbacksFactory deploymentToolCallbacksFactory,
         SecurityContextRehydrator securityContextRehydrator,
         ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider)
         throws AGUIException {
@@ -96,15 +92,14 @@ public class ProjectDeploymentAgentConfiguration {
             .chatModel(chatModel)
             .systemMessage(readPrompt(promptProjectDeploymentAskResource))
             .state(state)
-            .toolCallbacks(askToolCallbacks(securityContextRehydrator, projectDeploymentToolCallbacksFactory))
+            .toolCallbacks(askToolCallbacks(securityContextRehydrator, deploymentToolCallbacksFactory))
             .overrideChatClientResolver(overrideChatClientResolverProvider.getIfAvailable())
             .build();
     }
 
     @Bean
     SliceSpringAIAgent projectDeploymentBuildSpringAIAgent(
-        ChatMemory chatMemory, ChatModel chatModel,
-        ProjectDeploymentToolCallbacksFactory projectDeploymentToolCallbacksFactory,
+        ChatMemory chatMemory, ChatModel chatModel, DeploymentToolCallbacksFactory deploymentToolCallbacksFactory,
         SecurityContextRehydrator securityContextRehydrator,
         ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider)
         throws AGUIException {
@@ -117,7 +112,7 @@ public class ProjectDeploymentAgentConfiguration {
             .chatModel(chatModel)
             .systemMessage(readPrompt(promptProjectDeploymentBuildResource))
             .state(state)
-            .toolCallbacks(buildToolCallbacks(securityContextRehydrator, projectDeploymentToolCallbacksFactory))
+            .toolCallbacks(buildToolCallbacks(securityContextRehydrator, deploymentToolCallbacksFactory))
             .overrideChatClientResolver(overrideChatClientResolverProvider.getIfAvailable())
             .build();
     }
@@ -128,10 +123,9 @@ public class ProjectDeploymentAgentConfiguration {
      */
     List<ToolCallback> askToolCallbacks(
         SecurityContextRehydrator securityContextRehydrator,
-        ProjectDeploymentToolCallbacksFactory projectDeploymentToolCallbacksFactory) {
+        DeploymentToolCallbacksFactory deploymentToolCallbacksFactory) {
 
-        return wrapToolCallbacks(
-            securityContextRehydrator, projectDeploymentToolCallbacksFactory.readToolCallbacks());
+        return wrapToolCallbacks(securityContextRehydrator, deploymentToolCallbacksFactory.readToolCallbacks());
     }
 
     /**
@@ -140,10 +134,9 @@ public class ProjectDeploymentAgentConfiguration {
      */
     List<ToolCallback> buildToolCallbacks(
         SecurityContextRehydrator securityContextRehydrator,
-        ProjectDeploymentToolCallbacksFactory projectDeploymentToolCallbacksFactory) {
+        DeploymentToolCallbacksFactory deploymentToolCallbacksFactory) {
 
-        return wrapToolCallbacks(
-            securityContextRehydrator, projectDeploymentToolCallbacksFactory.writeToolCallbacks());
+        return wrapToolCallbacks(securityContextRehydrator, deploymentToolCallbacksFactory.writeToolCallbacks());
     }
 
     private List<ToolCallback> wrapToolCallbacks(

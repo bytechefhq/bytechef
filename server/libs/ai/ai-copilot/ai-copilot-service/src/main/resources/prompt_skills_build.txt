@@ -147,7 +147,7 @@ Ask what the script should do *if not already clear*. Identify inputs, outputs, 
 #### 3. Discovery - when the script needs to call ByteChef component actions
 - `searchActions(query)` - search actions by keywords
 - `getProperties(componentName, actionName, version)` - get detailed descriptions of an action's properties
-- `getActionDefinition(componentName, actionName, version)` - optional; basic structure of the action
+- `getAction(componentName, actionName, version)` - optional; basic structure of the action
 
 ### 4. Write / Edit Script
 Apply GraalVM Runtime Constraints above and any additional rules from `getScriptCodeInstructions()`. Use `context.component` for HTTP, logging, and other operations.

@@ -9,13 +9,8 @@ package com.bytechef.ee.ai.hub.config;
 
 import com.agui.core.exception.AGUIException;
 import com.agui.core.state.State;
-import com.bytechef.ai.copilot.tool.AiAgentAgentToolCallback;
 import com.bytechef.ai.copilot.tool.AskUserQuestionToolCallback;
-import com.bytechef.ai.copilot.tool.AssetFileAgentToolCallback;
-import com.bytechef.ai.copilot.tool.CopilotAgentType;
 import com.bytechef.ai.copilot.tool.CreateConnectionToolCallback;
-import com.bytechef.ai.copilot.tool.DataTableAgentToolCallback;
-import com.bytechef.ai.copilot.tool.KnowledgeBaseAgentToolCallback;
 import com.bytechef.ai.copilot.tool.ListConnectionsForComponentToolCallback;
 import com.bytechef.ai.copilot.tool.LookupComponentPropertyOptionsToolCallback;
 import com.bytechef.ai.copilot.tool.PropertyOptionsResolver;
@@ -26,17 +21,19 @@ import com.bytechef.ai.copilot.tool.WorkspaceCopilotConnectionLister;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolCatalog;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolVariant;
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.automation.ai.tool.AutomationSubAgentType;
+import com.bytechef.automation.ai.tool.AssetFileToolCallbacksFactory;
 import com.bytechef.automation.ai.tool.ClusterElementTools;
-import com.bytechef.automation.ai.tool.GetAssetFileContentToolCallback;
-import com.bytechef.automation.ai.tool.ListAssetFilesToolCallback;
+import com.bytechef.automation.ai.tool.DeploymentToolCallbacksFactory;
 import com.bytechef.automation.ai.tool.McpServerToolCallbacksFactory;
-import com.bytechef.automation.ai.tool.ProjectDeploymentSubAgentConfiguration;
 import com.bytechef.automation.ai.tool.ProjectTools;
 import com.bytechef.automation.ai.tool.ProjectWorkflowTools;
 import com.bytechef.automation.ai.tool.ReadProjectTools;
 import com.bytechef.automation.ai.tool.ReadProjectWorkflowTools;
 import com.bytechef.automation.ai.tool.ScriptTools;
+import com.bytechef.automation.ai.tool.WorkflowExecutionTools;
+import com.bytechef.automation.ai.tool.aiagent.AiAgentToolCallbacksFactory;
+import com.bytechef.automation.ai.tool.datatable.DataTableToolCallbacksFactory;
+import com.bytechef.automation.ai.tool.knowledgebase.KnowledgeBaseToolCallbacksFactory;
 import com.bytechef.automation.assetfile.service.AssetFileFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
@@ -60,9 +57,7 @@ import com.bytechef.ee.ai.hub.metric.AiHubToolAttachMetrics;
 import com.bytechef.ee.ai.hub.metric.WorkflowChatMetrics;
 import com.bytechef.ee.ai.hub.progress.ProgressReportingToolCallback;
 import com.bytechef.ee.ai.hub.subagent.SubAgentAdvisorContributor;
-import com.bytechef.ee.ai.hub.subagent.SubAgentAskToolContributor;
 import com.bytechef.ee.ai.hub.subagent.SubAgentSessionMemoryContributor;
-import com.bytechef.ee.ai.hub.subagent.SubagentAskChannelRelay;
 import com.bytechef.ee.ai.hub.subagent.WorkspaceAdvisorContributor;
 import com.bytechef.ee.ai.hub.tool.AiHubAgentType;
 import com.bytechef.ee.ai.hub.tool.AiHubChatArtifactRecorder;
@@ -82,10 +77,8 @@ import com.bytechef.ee.ai.hub.toolsearch.AiHubGlobalToolCatalog;
 import com.bytechef.ee.ai.hub.toolsearch.ToolSearchCatalogFeeder;
 import com.bytechef.ee.ai.hub.util.Mode;
 import com.bytechef.ee.ai.hub.util.Source;
-import com.bytechef.ee.automation.ai.copilot.tool.ContextStoreAgentToolCallback;
-import com.bytechef.ee.automation.ai.tool.ApiCollectionSubAgentConfiguration;
-import com.bytechef.ee.automation.ai.tool.ListApiCollectionsToolCallback;
-import com.bytechef.ee.automation.apiplatform.configuration.facade.ApiCollectionFacade;
+import com.bytechef.ee.automation.ai.tool.ApiCollectionToolCallbacksFactory;
+import com.bytechef.ee.automation.ai.tool.contextstore.ContextStoreToolCallbacksFactory;
 import com.bytechef.ee.platform.ai.guardrails.AiGuardrailMetrics;
 import com.bytechef.ee.platform.ai.guardrails.AiGuardrails;
 import com.bytechef.ee.platform.ai.llm.usage.LlmUsageRecorder;
@@ -114,6 +107,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.toolsearch.ToolSearchToolCallingAdvisor;
@@ -213,20 +207,16 @@ public class AiHubConfiguration {
     AiHubSpringAIAgent aiHubAskSpringAIAgent(
         AiHubSessionMemory aiHubSessionMemory, ChatModel chatModel, ObjectProvider<ToolCallback> toolCallbackProvider,
         @Qualifier("researchChatClient") ObjectProvider<ChatClient> researchChatClientProvider,
-        @Qualifier("contextStoreAskSubAgentChatClient") //
-        ObjectProvider<ChatClient> contextStoreAskSubAgentChatClientProvider,
-        @Qualifier("knowledgeBaseAskSubAgentChatClient") //
-        ObjectProvider<ChatClient> knowledgeBaseAskSubAgentChatClientProvider,
-        @Qualifier("dataTableAskSubAgentChatClient") //
-        ObjectProvider<ChatClient> dataTableAskSubAgentChatClientProvider,
-        @Qualifier("aiAgentAskSubAgentChatClient") //
-        ObjectProvider<ChatClient> aiAgentAskSubAgentChatClientProvider,
-        @Qualifier("assetFileAskSubAgentChatClient") //
-        ObjectProvider<ChatClient> assetFileAskSubAgentChatClientProvider,
         ObjectProvider<McpServerToolCallbacksFactory> mcpServerToolCallbacksFactoryProvider,
+        ObjectProvider<ApiCollectionToolCallbacksFactory> apiCollectionToolCallbacksFactoryProvider,
+        ObjectProvider<DeploymentToolCallbacksFactory> deploymentToolCallbacksFactoryProvider,
+        ObjectProvider<AssetFileToolCallbacksFactory> assetFileToolCallbacksFactoryProvider,
+        ObjectProvider<DataTableToolCallbacksFactory> dataTableToolCallbacksFactoryProvider,
+        ObjectProvider<KnowledgeBaseToolCallbacksFactory> knowledgeBaseToolCallbacksFactoryProvider,
+        ObjectProvider<ContextStoreToolCallbacksFactory> contextStoreToolCallbacksFactoryProvider,
+        ObjectProvider<AiAgentToolCallbacksFactory> aiAgentToolCallbacksFactoryProvider,
         AiHubChatService chatService,
         AiAutoMemoryService aiHubMemoryService,
-        AssetFileFacade assetFileFacade,
         AiHubChatToolFacade chatToolFacade,
         ComponentDefinitionService componentDefinitionService,
         ConnectionDefinitionService connectionDefinitionService,
@@ -288,12 +278,16 @@ public class AiHubConfiguration {
         // wired — the client still records the reference when the tab opens.
         toolCallbacks.add(new OpenResourceTabToolCallback(null));
         toolCallbacks.add(new OpenWorkflowChatTabToolCallback());
-        // Read-only asset-file access. The ASK prompt documents listAssetFiles/getAssetFileContent, and without
-        // these registrations the model's direct calls fail with "No ToolCallback found". Creation stays
-        // BUILD-only. Row-level data-table reads are delegated to the data_table_agent specialist instead of a
-        // flat queryDataTable — the specialist already owns the read tool set.
-        toolCallbacks.add(new GetAssetFileContentToolCallback(assetFileFacade));
-        toolCallbacks.add(new ListAssetFilesToolCallback(assetFileFacade));
+        // Read-only asset-file access (ticket 732, Task 4) — see assetFileFlatCrudToolCallbacks' javadoc. The
+        // ASK prompt documents listAssetFiles/getAssetFileContent, and without these registrations the model's
+        // direct calls fail with "No ToolCallback found". Creation stays BUILD-only.
+        toolCallbacks.addAll(assetFileFlatCrudToolCallbacks(assetFileToolCallbacksFactoryProvider, false));
+        // Data-table, knowledge-base, context-store, and AI-Agent-builder reads are flat (Tasks 5-8); mutations
+        // are catalog-demoted.
+        toolCallbacks.addAll(dataTableFlatCrudToolCallbacks(dataTableToolCallbacksFactoryProvider));
+        toolCallbacks.addAll(knowledgeBaseFlatCrudToolCallbacks(knowledgeBaseToolCallbacksFactoryProvider));
+        toolCallbacks.addAll(contextStoreFlatCrudToolCallbacks(contextStoreToolCallbacksFactoryProvider));
+        toolCallbacks.addAll(aiAgentFlatCrudToolCallbacks(aiAgentToolCallbacksFactoryProvider));
         // attachChatTool/removeChatTool are deliberately NOT registered here: the ASK prompt declares tool
         // attachment a BUILD-only mutation ("suggest switching to BUILD mode"), so the registrations were
         // dead weight the prompt forbade the model from using.
@@ -310,23 +304,13 @@ public class AiHubConfiguration {
         // way to enumerate. Read-only — both the ASK and BUILD agents register them so a casual ASK turn can
         // resolve "the staging customers API" / "my last research thread" to a concrete id without forcing the
         // user to switch into BUILD just to look something up. Workflow-execution lookups are now delegated to
-        // the debugWorkflowExecution specialist (registered via registerCopilotSubAgentToolCallbacks).
+        // the debugWorkflowExecution specialist (registered via registerIntelligentToolCallbacks).
         toolCallbacks.add(new ListAiHubChatsToolCallback(chatService));
-        // MCP server read leg (ticket 732, Task 3); see mcpServerFlatCrudToolCallbacks' javadoc.
+        // MCP server / API-collection / project-deployment read legs (ticket 732, Tasks 2-3) — see each
+        // *FlatCrudToolCallbacks helper's own javadoc.
         toolCallbacks.addAll(mcpServerFlatCrudToolCallbacks(mcpServerToolCallbacksFactoryProvider, false));
-
-        // listApiCollections is demoted to the searchable catalog (aiHubAskGlobalToolCatalog) — rare enough
-        // that it should not ride in every model call.
-
-        // Copilot CRUD specialist sub-agent delegation. Each is registered only when its backing ChatClient
-        // bean is present (the Copilot gate bytechef.ai.copilot.enabled is independent of AI Hub's
-        // gate — if Copilot is disabled the beans are absent and the registrations are silently
-        // skipped).
-        registerCopilotSubAgentToolCallbacks(
-            toolCallbacks, contextStoreAskSubAgentChatClientProvider, knowledgeBaseAskSubAgentChatClientProvider,
-            dataTableAskSubAgentChatClientProvider, aiAgentAskSubAgentChatClientProvider,
-            assetFileAskSubAgentChatClientProvider, false, aiGuardrails, aiGuardrailMetrics, workspaceSystemPrompts,
-            aiHubSessionMemory);
+        toolCallbacks.addAll(apiCollectionFlatCrudToolCallbacks(apiCollectionToolCallbacksFactoryProvider, false));
+        toolCallbacks.addAll(deploymentFlatCrudToolCallbacks(deploymentToolCallbacksFactoryProvider, false));
 
         // Intelligent delegate tools (skills, cluster element, code editor, project workflow, workflow
         // execution, converter, custom component, code workflow) come from the shared catalog. Converter has
@@ -401,17 +385,12 @@ public class AiHubConfiguration {
         @Qualifier("dataAnalystChatClient") ObjectProvider<ChatClient> dataAnalystChatClientProvider,
         @Qualifier("imageGeneratorChatClient") ObjectProvider<ChatClient> imageGeneratorChatClientProvider,
         @Qualifier("slideBuilderChatClient") ObjectProvider<ChatClient> slideBuilderChatClientProvider,
-        @Qualifier("contextStoreBuildSubAgentChatClient") //
-        ObjectProvider<ChatClient> contextStoreBuildSubAgentChatClientProvider,
-        @Qualifier("knowledgeBaseBuildSubAgentChatClient") //
-        ObjectProvider<ChatClient> knowledgeBaseBuildSubAgentChatClientProvider,
-        @Qualifier("dataTableBuildSubAgentChatClient") //
-        ObjectProvider<ChatClient> dataTableBuildSubAgentChatClientProvider,
-        @Qualifier("aiAgentBuildSubAgentChatClient") //
-        ObjectProvider<ChatClient> aiAgentBuildSubAgentChatClientProvider,
-        @Qualifier("assetFileBuildSubAgentChatClient") //
-        ObjectProvider<ChatClient> assetFileBuildSubAgentChatClientProvider,
         ObjectProvider<McpServerToolCallbacksFactory> mcpServerToolCallbacksFactoryProvider,
+        ObjectProvider<AssetFileToolCallbacksFactory> assetFileToolCallbacksFactoryProvider,
+        ObjectProvider<DataTableToolCallbacksFactory> dataTableToolCallbacksFactoryProvider,
+        ObjectProvider<KnowledgeBaseToolCallbacksFactory> knowledgeBaseToolCallbacksFactoryProvider,
+        ObjectProvider<ContextStoreToolCallbacksFactory> contextStoreToolCallbacksFactoryProvider,
+        ObjectProvider<AiAgentToolCallbacksFactory> aiAgentToolCallbacksFactoryProvider,
         AssetFileFacade assetFileFacade, AiHubChatArtifactService chatArtifactService,
         AiHubChatArtifactRecorder aiHubChatArtifactRecorder,
         AiHubChatService chatService, AiAutoMemoryService aiHubMemoryService,
@@ -430,9 +409,8 @@ public class AiHubConfiguration {
         SecurityContextRehydrator securityContextRehydrator,
         PropertyOptionsResolver propertyOptionsResolver,
         AiHubChatToolFacade chatToolFacade,
-        @Qualifier("projectDeploymentAgentChatClient") ObjectProvider<ChatClient> projectDeploymentAgentChatClientProvider,
-        @Qualifier("apiCollectionAgentChatClient") //
-        ObjectProvider<ChatClient> apiCollectionAgentChatClientProvider,
+        ObjectProvider<ApiCollectionToolCallbacksFactory> apiCollectionToolCallbacksFactoryProvider,
+        ObjectProvider<DeploymentToolCallbacksFactory> deploymentToolCallbacksFactoryProvider,
         @Qualifier("aiHubBuildToolSearchToolCallAdvisor") //
         ObjectProvider<ToolSearchToolCallingAdvisor> toolSearchToolCallAdvisorProvider,
         ObjectProvider<AiHubChatBindingToolCallbackResolver> chatBindingToolCallbackResolverProvider,
@@ -471,16 +449,9 @@ public class AiHubConfiguration {
         // documented-but-unregistered tool and the turn dies with "No ToolCallback found".
         boolean researchToolAvailable = researchChatClientProvider.getIfAvailable() != null;
 
-        registerSpecialistSubAgentToolCallbacks(
-            toolCallbacks, projectDeploymentAgentChatClientProvider,
-            apiCollectionAgentChatClientProvider, aiGuardrails, aiGuardrailMetrics, workspaceSystemPrompts,
-            aiHubSessionMemory);
-
         // Consolidated open-tab tool (type-keyed) replaces the seven per-resource variants on the pinned list.
         toolCallbacks.add(new OpenResourceTabToolCallback(aiHubChatArtifactRecorder));
         toolCallbacks.add(new OpenWorkflowChatTabToolCallback());
-        // Row-level data-table reads are delegated to the data_analyst / data_table_agent specialists instead of
-        // a flat queryDataTable — both specialists already own the read tool set.
         toolCallbacks.add(
             new ListChatWorkflowsToolCallback(
                 projectDeploymentService, projectDeploymentWorkflowService, projectWorkflowService,
@@ -492,13 +463,23 @@ public class AiHubConfiguration {
         // createWorkflowChat is demoted to the searchable catalog (aiHubBuildGlobalToolCatalog) — rare enough
         // that it should not ride in every model call.
 
-        // Copilot CRUD specialist sub-agent delegation. Write-capable variants for the BUILD agent. Skips
-        // registrations when the corresponding ChatClient bean is absent (Copilot disabled).
-        registerCopilotSubAgentToolCallbacks(
-            toolCallbacks, contextStoreBuildSubAgentChatClientProvider, knowledgeBaseBuildSubAgentChatClientProvider,
-            dataTableBuildSubAgentChatClientProvider, aiAgentBuildSubAgentChatClientProvider,
-            assetFileBuildSubAgentChatClientProvider, true, aiGuardrails, aiGuardrailMetrics, workspaceSystemPrompts,
-            aiHubSessionMemory);
+        // API-collection CRUD is flat (ticket 732, Task 2); see apiCollectionFlatCrudToolCallbacks' javadoc.
+        toolCallbacks.addAll(apiCollectionFlatCrudToolCallbacks(apiCollectionToolCallbacksFactoryProvider, true));
+        // Project-deployment CRUD is flat (ticket 732, Task 3); see deploymentFlatCrudToolCallbacks' javadoc.
+        toolCallbacks.addAll(deploymentFlatCrudToolCallbacks(deploymentToolCallbacksFactoryProvider, true));
+        // Data-table reads are flat (ticket 732, Task 5); see dataTableFlatCrudToolCallbacks' javadoc. The eight
+        // mutations are catalog-demoted instead of pinned here — see aiHubBuildGlobalToolCatalog's javadoc.
+        toolCallbacks.addAll(dataTableFlatCrudToolCallbacks(dataTableToolCallbacksFactoryProvider));
+        // Knowledge-base reads are flat (ticket 732, Task 6); see knowledgeBaseFlatCrudToolCallbacks' javadoc.
+        // The five mutations are catalog-demoted instead of pinned here — see aiHubBuildGlobalToolCatalog's javadoc.
+        toolCallbacks.addAll(knowledgeBaseFlatCrudToolCallbacks(knowledgeBaseToolCallbacksFactoryProvider));
+        // Context-store reads are flat (ticket 732, Task 7); see contextStoreFlatCrudToolCallbacks' javadoc. The
+        // six mutations are catalog-demoted instead of pinned here — see aiHubBuildGlobalToolCatalog's javadoc.
+        toolCallbacks.addAll(contextStoreFlatCrudToolCallbacks(contextStoreToolCallbacksFactoryProvider));
+        // AI-Agent-builder reads are flat (ticket 732, Task 8 — the LAST CRUD-delegate-unwind task); see
+        // aiAgentFlatCrudToolCallbacks' javadoc. The nine mutations are catalog-demoted instead of pinned here —
+        // see aiHubBuildGlobalToolCatalog's javadoc.
+        toolCallbacks.addAll(aiAgentFlatCrudToolCallbacks(aiAgentToolCallbacksFactoryProvider));
 
         // Intelligent delegate tools (skills, cluster element, code editor, project workflow, workflow
         // execution, converter, custom component, code workflow) come from the shared catalog, including the
@@ -523,8 +504,7 @@ public class AiHubConfiguration {
             workspaceConnectionFacade, actionDefinitionService, actionDefinitionFacade, triggerDefinitionService,
             triggerDefinitionFacade, propertyOptionsResolver, aiHubToolAttachMetrics, jsonMapper);
 
-        // API-collection work is delegated to api_collection_agent; ASK keeps read-only listApiCollections.
-        // MCP-server flat CRUD (Task 3) below — see mcpServerFlatCrudToolCallbacks' javadoc.
+        // MCP-server flat CRUD (Task 3) — see mcpServerFlatCrudToolCallbacks' javadoc.
         toolCallbacks.addAll(mcpServerFlatCrudToolCallbacks(mcpServerToolCallbacksFactoryProvider, true));
 
         // Resource discovery — read-only and always-on. Mirrors the same registrations on the ASK agent so
@@ -535,12 +515,9 @@ public class AiHubConfiguration {
         // Auto-memory is now exposed via the forked AutoMemoryToolsAdvisor (DB-backed Resource seam),
         // registered as an advisor below rather than as standalone tool callbacks.
 
-        // createAssetFile, updateAssetFileContent, and cloneAssetFile are delegated to the asset_file_agent
-        // specialist (see registerCopilotSubAgentToolCallbacks) instead of flat registrations here — the
-        // specialist now owns file-writing end-to-end. The two reads stay pinned: the BUILD prompt documents
-        // them directly, and demoting them would break those turns.
-        toolCallbacks.add(new GetAssetFileContentToolCallback(assetFileFacade));
-        toolCallbacks.add(new ListAssetFilesToolCallback(assetFileFacade));
+        // Asset-file CRUD is flat (ticket 732, Task 4 of the CRUD-delegate unwind); see
+        // assetFileFlatCrudToolCallbacks' javadoc.
+        toolCallbacks.addAll(assetFileFlatCrudToolCallbacks(assetFileToolCallbacksFactoryProvider, true));
 
         AiHubSpringAIAgent.Builder buildBuilder = AiHubSpringAIAgent.builder()
             .agentId(name.toLowerCase())
@@ -596,9 +573,8 @@ public class AiHubConfiguration {
      * deployment-wide surface property, see {@link AiGuardrailMetrics}'s own javadoc) to {@code builder}. Absent
      * {@code aiGuardrails} (EE guardrails module not on the classpath) is a no-op — both agents fall back to their
      * pre-existing, unguarded behaviour. Callers resolve the pair once per bean method and pass the SAME instances here
-     * and into the subagent registration helpers ({@link #registerCopilotSubAgentToolCallbacks},
-     * {@link #registerSubAgentToolCallbacks}, {@link #registerSpecialistSubAgentToolCallbacks}) so the top-level agent
-     * and every delegate share one {@code ai_hub}-tagged {@link AiGuardrailMetrics} instance.
+     * and into the subagent registration helper ({@link #registerSubAgentToolCallbacks}) so the top-level agent and
+     * every delegate share one {@code ai_hub}-tagged {@link AiGuardrailMetrics} instance.
      */
     private static void attachAiGuardrails(
         AiHubSpringAIAgent.Builder builder, @Nullable AiGuardrails aiGuardrails,
@@ -672,19 +648,19 @@ public class AiHubConfiguration {
     AiHubGlobalToolCatalog aiHubAskGlobalToolCatalog(
         ReadProjectTools readProjectTools, ReadProjectWorkflowTools readProjectWorkflowTools,
         ComponentTools componentTools, TaskTools taskTools, TaskDispatcherTools taskDispatcherTools,
-        ObjectProvider<ApiCollectionFacade> apiCollectionFacadeProvider) {
+        WorkflowExecutionTools workflowExecutionTools) {
 
         List<ToolCallback> toolCallbacks = new ArrayList<>();
 
         Collections.addAll(
             toolCallbacks,
             ToolCallbacks.from(
-                readProjectTools, readProjectWorkflowTools, componentTools, taskTools, taskDispatcherTools));
+                readProjectTools, readProjectWorkflowTools, componentTools, taskTools, taskDispatcherTools,
+                workflowExecutionTools));
 
-        // Demoted from the pinned list: rarely-used reads stay reachable through searchTool without paying
-        // per-turn schema cost on every model call.
-        apiCollectionFacadeProvider.ifAvailable(
-            apiCollectionFacade -> toolCallbacks.add(new ListApiCollectionsToolCallback(apiCollectionFacade)));
+        // listApiCollections used to be demoted here (rarely-used read, kept out of the pinned list). Ticket 732,
+        // Task 2 of the CRUD-delegate unwind pins it instead alongside its two write siblings — see
+        // apiCollectionFlatCrudToolCallbacks' javadoc.
 
         return new AiHubGlobalToolCatalog(ToolSearchCatalogFeeder.GLOBAL_ASK_SESSION_ID, toolCallbacks);
     }
@@ -693,64 +669,88 @@ public class AiHubConfiguration {
     AiHubGlobalToolCatalog aiHubBuildGlobalToolCatalog(
         ProjectTools projectTools, ProjectWorkflowTools projectWorkflowTools, ComponentTools componentTools,
         TaskTools taskTools, TaskDispatcherTools taskDispatcherTools, ScriptTools scriptTools,
-        ClusterElementTools clusterElementTools, AiHubChatService chatService) {
+        ClusterElementTools clusterElementTools, WorkflowExecutionTools workflowExecutionTools,
+        AiHubChatService chatService,
+        ObjectProvider<DataTableToolCallbacksFactory> dataTableToolCallbacksFactoryProvider,
+        ObjectProvider<KnowledgeBaseToolCallbacksFactory> knowledgeBaseToolCallbacksFactoryProvider,
+        ObjectProvider<ContextStoreToolCallbacksFactory> contextStoreToolCallbacksFactoryProvider,
+        ObjectProvider<AiAgentToolCallbacksFactory> aiAgentToolCallbacksFactoryProvider) {
 
-        // cloneAssetFile is reachable through the asset_file_agent delegate (see
-        // registerCopilotSubAgentToolCallbacks) rather than the searchable catalog — file-writing work is now
-        // owned end-to-end by the specialist subagent.
+        // cloneAssetFile is pinned flat on the BUILD agent (see assetFileFlatCrudToolCallbacks), not catalog-
+        // demoted — it rides with the other six asset-file tools as one coherent CRUD surface.
         List<ToolCallback> toolCallbacks = new ArrayList<>();
 
         Collections.addAll(
             toolCallbacks,
             ToolCallbacks.from(
                 projectTools, projectWorkflowTools, componentTools, taskTools, taskDispatcherTools, scriptTools,
-                clusterElementTools));
+                clusterElementTools, workflowExecutionTools));
 
         toolCallbacks.add(new CreateWorkflowChatToolCallback(chatService));
+
+        // Data-table mutations are catalog-demoted rather than pinned (ticket 732, Task 5 of the CRUD-delegate
+        // unwind) — see dataTableCatalogToolCallbacks' javadoc for why this domain departs from the smaller
+        // domains' precedent of pinning everything.
+        toolCallbacks.addAll(dataTableCatalogToolCallbacks(dataTableToolCallbacksFactoryProvider));
+
+        // Knowledge-base mutations are catalog-demoted rather than pinned (ticket 732, Task 6 of the CRUD-delegate
+        // unwind) — see knowledgeBaseCatalogToolCallbacks' javadoc.
+        toolCallbacks.addAll(knowledgeBaseCatalogToolCallbacks(knowledgeBaseToolCallbacksFactoryProvider));
+
+        // Context-store mutations are catalog-demoted rather than pinned (ticket 732, Task 7 of the CRUD-delegate
+        // unwind) — see contextStoreCatalogToolCallbacks' javadoc.
+        toolCallbacks.addAll(contextStoreCatalogToolCallbacks(contextStoreToolCallbacksFactoryProvider));
+
+        // AI-Agent-builder mutations are catalog-demoted rather than pinned (ticket 732, Task 8 of the
+        // CRUD-delegate unwind, the LAST delegate) — see aiAgentCatalogToolCallbacks' javadoc.
+        toolCallbacks.addAll(aiAgentCatalogToolCallbacks(aiAgentToolCallbacksFactoryProvider));
 
         return new AiHubGlobalToolCatalog(ToolSearchCatalogFeeder.GLOBAL_BUILD_SESSION_ID, toolCallbacks);
     }
 
     /**
-     * The specialists allowed to pose a question to the user. Restricted to the deployment/api-collection
-     * specialists: each owns a prompt that is not shared with a Copilot panel agent, so the tool can be documented
-     * where it is registered.
-     *
-     * <p>
-     * The Copilot domain specialists are deliberately absent. Their prompt file is shared by the subagent client and
-     * the panel agent (see the domain copilot slice pattern), and the panel agent has no ask tool registered — so
-     * documenting the tool in that shared prompt would make the panel agent call a tool that does not exist there and
-     * kill the turn with "No ToolCallback found". Wiring them needs a prompt split first, not more wiring.
-     * </p>
-     *
-     * <p>
-     * The generative one-shots (research, data_analyst, image_generator, slide_builder, converter) are absent by intent
-     * rather than by blocker: they are asked to produce something, and a clarifying round trip costs more than it
-     * saves. {@code configureMcpServer} (formerly the mcp/task/deployment/api-collection specialist mcp_agent, now a
-     * catalog-backed intelligent tool routed through {@link #registerIntelligentToolCallbacks} instead of this
-     * specialist registration) is absent for the same reason as the other catalog-backed intelligent tools — none of
-     * them are in this set today.
-     * </p>
-     */
-    private static final Set<String> ASK_CAPABLE_AGENT_TYPE_KEYS = Set.of(
-        AutomationSubAgentType.PROJECT_DEPLOYMENT_AGENT.key(),
-        AutomationSubAgentType.API_COLLECTION_AGENT.key());
-
-    /**
      * Wraps one delegate's {@code ChatClient} in everything a specialist call needs per request: the calling
-     * workspace's guardrails and system prompt, that specialist's own per-conversation session memory, and — for the
-     * specialists in {@link #ASK_CAPABLE_AGENT_TYPE_KEYS} — the tool that lets it pose a question to the user.
+     * workspace's guardrails and system prompt, and that specialist's own per-conversation session memory.
      *
      * <p>
-     * Every delegate registration goes through here rather than calling
-     * {@link SubAgentGuardrailedChatClient#wrap(ChatClient, List)} directly, so no site can quietly forget the memory
-     * contributor and leave one specialist amnesiac while the rest remember.
+     * Every AI Hub delegate registration goes through here rather than calling
+     * {@link SubAgentGuardrailedChatClient#wrap(ChatClient, List)} directly, so no hub site can quietly forget the
+     * memory contributor and leave one specialist amnesiac while the rest remember.
      * </p>
      *
      * <p>
      * {@code agentTypeKey} MUST be a key registered with {@code AgentTypeRegistry}: it becomes the session-id suffix,
      * and the purge that runs when an AI Hub chat is deleted reconstructs the keys to delete from that registry. A key
      * that is not registered would produce a session nothing ever deletes.
+     * </p>
+     *
+     * <p>
+     * <b>The ask capability is deliberately NOT attached here.</b> A third contributor used to be —
+     * {@code SubAgentAskToolContributor}, which let an allow-listed specialist pose a question to the user, gated on an
+     * {@code ASK_CAPABLE_AGENT_TYPE_KEYS} set. That set decayed to an empty compile-time {@code Set.of()} once its last
+     * member was dissolved, and the whole interactive-question stack was removed as unreachable. It is back (ticket
+     * 732), rebuilt one layer out: {@code IntelligentToolCatalog#buildToolCallback} attaches the specialist-facing
+     * {@code askUserQuestion} tool to every intelligent delegate's own {@code ChatClient} and wraps the delegate in
+     * {@code SubAgentAskRelayToolCallback}, which carries a raised question out as the delegate's own tool result. One
+     * seam serves the AI Hub, the Copilot panels and the management MCP server alike, a delegate added later inherits
+     * the capability instead of having to remember, and there is no allowlist left to decay. Exactly two classes from
+     * the old stack did not come back and have no replacement: {@code SubAgentToolCallback} (the delegate callback the
+     * relay was built INTO — today's intelligent delegates are their own classes) and
+     * {@code SubAgentAskToolContributor} (this method's gate). Surviving javadoc mentions of either are historical.
+     * </p>
+     *
+     * <p>
+     * <b>Session memory reaches a specialist ONLY through this method, and that asymmetry is load-bearing.</b>
+     * {@link SubAgentSessionMemoryContributor} is attached here and nowhere else. Every other surface that builds the
+     * same delegates — {@code ProjectAgentConfiguration} and {@code McpServerAgentConfiguration} through
+     * {@code IntelligentToolCatalog#getForPanel}, and the three management-MCP contributors through {@code #getByNames}
+     * — passes an identity {@code chatClientDecorator}; the MCP surface additionally carries no conversation id for
+     * {@link SubAgentSessionMemoryContributor} to key a session on, so memory could not be attached there even if a
+     * decorator wanted to. A specialist that asks a question on a panel or over MCP therefore starts from nothing on
+     * the call that brings the answer back. Nothing user-facing may say otherwise: the ask tool's description, its stop
+     * instruction, {@code SubAgentQuestionFormatter}'s re-invocation sentence and the management MCP server's
+     * {@code instructions} each claimed a surviving context at some point and were each corrected to tell the caller to
+     * restate what the specialist needs.
      * </p>
      */
     private static ChatClient wrapDelegate(
@@ -771,10 +771,6 @@ public class AiHubConfiguration {
 
         if (aiHubSessionMemory != null) {
             contributors.add(new SubAgentSessionMemoryContributor(aiHubSessionMemory, agentTypeKey));
-        }
-
-        if (ASK_CAPABLE_AGENT_TYPE_KEYS.contains(agentTypeKey)) {
-            contributors.add(new SubAgentAskToolContributor());
         }
 
         return SubAgentGuardrailedChatClient.wrap(chatClient, contributors);
@@ -809,7 +805,7 @@ public class AiHubConfiguration {
      *
      * <p>
      * The older {@code workflow_builder} ChatClient sub-agent is intentionally absent — it has been superseded by the
-     * Copilot {@code buildWorkflow} specialist registered through {@link #registerCopilotSubAgentToolCallbacks}. The
+     * Copilot {@code buildWorkflow} specialist registered through {@link #registerIntelligentToolCallbacks}. The
      * Copilot specialist persists workflows internally via {@code ProjectWorkflowTools}, eliminating the JSON
      * round-trip {@code workflow_builder} required.
      * </p>
@@ -870,122 +866,17 @@ public class AiHubConfiguration {
                     "slide_builder")));
     }
 
-    /**
-     * Registers the specialist sub-agent ToolCallbacks (project deployments, API collections) on the supplied tool
-     * list. Each is only added when its backing ChatClient bean is present — a missing facade (feature module not on
-     * the classpath) means the specialist's ChatClient bean was not created and the registration is silently skipped.
-     * Mirrors {@link #registerSubAgentToolCallbacks}, including the {@link SubAgentGuardrailedChatClient#wrap}
-     * guardrail/workspace-prompt wrapping. This wiring covers only the AI Hub chat surface — the separate MCP-surface
-     * contributions ({@code SubAgentMcpContributorConfiguration},
-     * {@code ApiCollectionSubAgentMcpContributorConfiguration}) construct their own {@code SubAgentToolCallback}
-     * instances directly from the same underlying {@code ChatClient} beans and are NOT wrapped here — left out of
-     * scope, see the AI Guardrails spec's decisions log.
-     *
-     * <p>
-     * MCP servers no longer register here: the {@code mcp_agent} specialist was promoted into the catalog-backed
-     * {@code configureMcpServer} intelligent tool, registered instead through {@link #registerIntelligentToolCallbacks}
-     * / {@link #INTELLIGENT_TOOL_NAMES}.
-     * </p>
-     */
-    private static void registerSpecialistSubAgentToolCallbacks(
-        List<ToolCallback> toolCallbacks,
-        ObjectProvider<ChatClient> projectDeploymentAgentChatClientProvider,
-        ObjectProvider<ChatClient> apiCollectionAgentChatClientProvider, @Nullable AiGuardrails aiGuardrails,
-        @Nullable AiGuardrailMetrics aiGuardrailMetrics, @Nullable WorkspaceSystemPrompts workspaceSystemPrompts,
-        @Nullable AiHubSessionMemory aiHubSessionMemory) {
-
-        projectDeploymentAgentChatClientProvider.ifAvailable(
-            projectDeploymentAgentChatClient -> toolCallbacks.add(
-                new ProgressReportingToolCallback(
-                    ProjectDeploymentSubAgentConfiguration.createProjectDeploymentAgentToolCallback(
-                        wrapDelegate(
-                            projectDeploymentAgentChatClient, AutomationSubAgentType.PROJECT_DEPLOYMENT_AGENT.key(),
-                            aiGuardrails,
-                            aiGuardrailMetrics, workspaceSystemPrompts, aiHubSessionMemory),
-                        new SubagentAskChannelRelay()),
-                    "project_deployment_agent")));
-
-        apiCollectionAgentChatClientProvider.ifAvailable(
-            apiCollectionAgentChatClient -> toolCallbacks.add(
-                new ProgressReportingToolCallback(
-                    ApiCollectionSubAgentConfiguration.createApiCollectionAgentToolCallback(
-                        wrapDelegate(
-                            apiCollectionAgentChatClient, AutomationSubAgentType.API_COLLECTION_AGENT.key(),
-                            aiGuardrails, aiGuardrailMetrics, workspaceSystemPrompts, aiHubSessionMemory),
-                        new SubagentAskChannelRelay()),
-                    "api_collection_agent")));
-    }
-
-    /**
-     * Registers the Copilot CRUD specialist sub-agent ToolCallbacks (context store, knowledge base, data table, ai
-     * agent builder, asset file) on the supplied tool list. Each is only added when its backing ChatClient bean is
-     * present — Copilot disabled or a particular specialist missing skips silently. Mirrors
-     * {@link #registerSubAgentToolCallbacks} for the older ChatClient sub-agents (research / data_analyst /
-     * image_generator / slide_builder).
-     *
-     * <p>
-     * The intelligent delegates that used to live here (skills, cluster element, code editor, project workflow,
-     * workflow execution, converter, custom component, code workflow) are now registered from the shared
-     * {@link IntelligentToolCatalog} at the call sites instead — see {@link #INTELLIGENT_TOOL_NAMES}.
-     * </p>
-     */
-    private static void registerCopilotSubAgentToolCallbacks(
-        List<ToolCallback> toolCallbacks,
-        ObjectProvider<ChatClient> contextStoreSubAgentChatClientProvider,
-        ObjectProvider<ChatClient> knowledgeBaseSubAgentChatClientProvider,
-        ObjectProvider<ChatClient> dataTableSubAgentChatClientProvider,
-        ObjectProvider<ChatClient> aiAgentSubAgentChatClientProvider,
-        ObjectProvider<ChatClient> assetFileSubAgentChatClientProvider, boolean assetFileWriteCapable,
-        @Nullable AiGuardrails aiGuardrails,
-        @Nullable AiGuardrailMetrics aiGuardrailMetrics, @Nullable WorkspaceSystemPrompts workspaceSystemPrompts,
-        @Nullable AiHubSessionMemory aiHubSessionMemory) {
-
-        contextStoreSubAgentChatClientProvider.ifAvailable(
-            chatClient -> toolCallbacks.add(
-                new ProgressReportingToolCallback(
-                    new ContextStoreAgentToolCallback(
-                        wrapDelegate(
-                            chatClient, CopilotAgentType.CONTEXT_STORE_AGENT.key(), aiGuardrails,
-                            aiGuardrailMetrics, workspaceSystemPrompts, aiHubSessionMemory)),
-                    "context_store_agent")));
-
-        knowledgeBaseSubAgentChatClientProvider.ifAvailable(
-            chatClient -> toolCallbacks.add(
-                new ProgressReportingToolCallback(
-                    new KnowledgeBaseAgentToolCallback(
-                        wrapDelegate(
-                            chatClient, CopilotAgentType.KNOWLEDGE_BASE_AGENT.key(), aiGuardrails,
-                            aiGuardrailMetrics, workspaceSystemPrompts, aiHubSessionMemory)),
-                    "knowledge_base_agent")));
-
-        dataTableSubAgentChatClientProvider.ifAvailable(
-            chatClient -> toolCallbacks.add(
-                new ProgressReportingToolCallback(
-                    new DataTableAgentToolCallback(
-                        wrapDelegate(
-                            chatClient, CopilotAgentType.DATA_TABLE_AGENT.key(), aiGuardrails, aiGuardrailMetrics,
-                            workspaceSystemPrompts, aiHubSessionMemory)),
-                    "data_table_agent")));
-
-        aiAgentSubAgentChatClientProvider.ifAvailable(
-            chatClient -> toolCallbacks.add(
-                new ProgressReportingToolCallback(
-                    new AiAgentAgentToolCallback(
-                        wrapDelegate(
-                            chatClient, CopilotAgentType.AI_AGENT_AGENT.key(), aiGuardrails, aiGuardrailMetrics,
-                            workspaceSystemPrompts, aiHubSessionMemory)),
-                    "ai_agent_agent")));
-
-        assetFileSubAgentChatClientProvider.ifAvailable(
-            chatClient -> toolCallbacks.add(
-                new ProgressReportingToolCallback(
-                    new AssetFileAgentToolCallback(
-                        wrapDelegate(
-                            chatClient, CopilotAgentType.ASSET_FILE_AGENT.key(), aiGuardrails, aiGuardrailMetrics,
-                            workspaceSystemPrompts, aiHubSessionMemory),
-                        assetFileWriteCapable),
-                    "asset_file_agent")));
-    }
+    // There is no longer a registerCopilotSubAgentToolCallbacks method: it used to register the Copilot CRUD
+    // specialist sub-agent ToolCallbacks (asset_file_agent, data_table_agent, knowledge_base_agent,
+    // context_store_agent, ai_agent_agent) on the supplied tool list, one ChatClient-backed delegate at a time. All
+    // five are gone now (ticket 732, CRUD-delegate-unwind Tasks 4-8 — ai_agent_agent was the LAST one, Task 8): their
+    // reads are registered flat instead (see assetFileFlatCrudToolCallbacks, dataTableFlatCrudToolCallbacks,
+    // knowledgeBaseFlatCrudToolCallbacks, contextStoreFlatCrudToolCallbacks, aiAgentFlatCrudToolCallbacks below) and
+    // every mutation set except asset-file's is catalog-demoted (see dataTableCatalogToolCallbacks,
+    // knowledgeBaseCatalogToolCallbacks, contextStoreCatalogToolCallbacks, aiAgentCatalogToolCallbacks below). The
+    // intelligent delegates that used to live in the deleted method too (skills, cluster element, code editor,
+    // project workflow, workflow execution, converter, custom component, code workflow) are registered from the
+    // shared IntelligentToolCatalog at the call sites instead — see INTELLIGENT_TOOL_NAMES.
 
     /**
      * Registers state-visibility callbacks for the autonomous tool-attach flow: {@code listChatTools} and
@@ -1057,6 +948,518 @@ public class AiHubConfiguration {
         return mcpServerToolCallbacksFactory.writeToolCallbacks()
             .stream()
             .filter(toolCallback -> !MCP_PROJECT_WORKFLOW_PARAMETERS_TOOL_NAME.equals(
+                toolCallback.getToolDefinition()
+                    .name()))
+            .toList();
+    }
+
+    /**
+     * The three API-collection CRUD tools flattened onto this surface (ticket 732, Task 2 of the CRUD-delegate unwind),
+     * replacing the dissolved {@code api_collection_agent} delegate: {@code listApiCollections} on both agents, plus
+     * (write-only) {@code createApiCollection}, {@code cloneApiCollection} on BUILD — mirroring how every other flat
+     * domain in this class splits its read/write leg between ASK and BUILD. An absent factory bean (Copilot disabled,
+     * or the api-platform facade not on the classpath) resolves to an empty list — the same silent-skip degrade every
+     * other Copilot-domain registration in this class already follows.
+     *
+     * <p>
+     * All three are pinned rather than catalog-demoted — a departure from {@code listApiCollections}'s PRE-dissolution
+     * placement, which lived in {@code aiHubAskGlobalToolCatalog} as a rarely-used read. Matching the
+     * {@code task_agent} (Task 1) and MCP-server-CRUD (Task 3) precedents: the domain is tiny (three tools total, the
+     * smallest of the eight delegates this plan dissolves), so splitting the one read tool into the catalog while its
+     * two write siblings stay pinned on BUILD would fragment one coherent CRUD surface across two lookup mechanisms for
+     * a marginal schema saving, and would force a {@code searchTool} round trip into a request the ASK agent should be
+     * able to answer immediately ("what API collections do I have").
+     * </p>
+     *
+     * <p>
+     * No context wrapping is needed here (unlike the management MCP surface's {@code WorkspaceScopedFlatToolCallback}):
+     * every tool call routed through {@link AiHubSpringAIAgent#toolContext} already carries
+     * {@link com.bytechef.automation.ai.tool.AutomationToolInvocationContext}-compatible keys — the exact family
+     * {@code listApiCollections} reads — for every registered pinned tool, not just API-collection ones.
+     * {@code createApiCollection}/{@code cloneApiCollection} never read that context at all (they resolve everything
+     * from an id already in their own input), a pre-existing property of these tool classes unaffected by dissolving
+     * the delegate that used to wrap them.
+     * </p>
+     *
+     * <p>
+     * Package-private for {@code AiHubConfigurationApiCollectionFlatCrudToolCallbacksTest}.
+     * </p>
+     */
+    static List<ToolCallback> apiCollectionFlatCrudToolCallbacks(
+        ObjectProvider<ApiCollectionToolCallbacksFactory> apiCollectionToolCallbacksFactoryProvider,
+        boolean writable) {
+
+        ApiCollectionToolCallbacksFactory apiCollectionToolCallbacksFactory = apiCollectionToolCallbacksFactoryProvider
+            .getIfAvailable();
+
+        if (apiCollectionToolCallbacksFactory == null) {
+            return List.of();
+        }
+
+        return writable
+            ? apiCollectionToolCallbacksFactory.writeToolCallbacks()
+            : apiCollectionToolCallbacksFactory.readToolCallbacks();
+    }
+
+    /**
+     * The seven project-deployment CRUD tools flattened onto this surface (ticket 732, Task 3 of the CRUD-delegate
+     * unwind), replacing the dissolved {@code project_deployment_agent} delegate: {@code listProjectDeployments} on
+     * both agents, plus (write-only) {@code createProjectDeployment}, {@code updateProjectDeployment},
+     * {@code deleteProjectDeployment}, {@code rollbackProjectDeployment}, {@code toggleProjectDeployment},
+     * {@code promoteWorkflow} on BUILD — mirroring how every other flat domain in this class splits its read/write leg
+     * between ASK and BUILD. An absent factory bean resolves to an empty list — the same silent-skip degrade every
+     * other Copilot-domain registration in this class already follows; unlike
+     * {@link #apiCollectionFlatCrudToolCallbacks}, {@link DeploymentToolCallbacksFactory} is registered whenever EITHER
+     * {@code bytechef.ai.copilot.enabled} OR {@code bytechef.ai.hub.enabled} is true (see
+     * {@code DeploymentAgentConfiguration}), so this domain does not carry that trade-off.
+     *
+     * <p>
+     * All seven are pinned rather than catalog-demoted — the same departure from the plan's general "mutations go to
+     * the searchable catalog" guidance that {@code task_agent} (Task 1) and MCP-server-CRUD (Task 3's earlier,
+     * differently-scoped sibling plan) took: the domain is comparable in size to the seven-tool task precedent, ASK
+     * gains its one read tool for the first time here (the dissolved delegate was BUILD-only, so there is no
+     * pre-existing catalog placement to preserve either way), and splitting the six mutations into the catalog while
+     * {@code listProjectDeployments} stays pinned would fragment one coherent CRUD surface across two lookup mechanisms
+     * for a marginal schema saving — plus force a {@code searchTool} round trip into a request ASK should answer
+     * immediately ("what deployments do I have").
+     * </p>
+     *
+     * <p>
+     * No context wrapping is needed here (unlike the management MCP surface's {@code WorkspaceScopedFlatToolCallback}):
+     * every tool call routed through {@link AiHubSpringAIAgent#toolContext} already carries
+     * {@link com.bytechef.automation.ai.tool.AutomationToolInvocationContext}-compatible keys — the exact family
+     * {@code listProjectDeployments} reads — for every registered pinned tool, not just deployment ones. The six
+     * mutations never read that context at all (they resolve everything from an id already in their own input), a
+     * pre-existing property of these tool classes unaffected by dissolving the delegate that used to wrap them —
+     * including a pre-existing lack of any workspace-ownership check at the tool or facade level, carried forward
+     * unchanged rather than introduced by this flattening.
+     * </p>
+     *
+     * <p>
+     * Package-private for {@code AiHubConfigurationDeploymentFlatCrudToolCallbacksTest}.
+     * </p>
+     */
+    static List<ToolCallback> deploymentFlatCrudToolCallbacks(
+        ObjectProvider<DeploymentToolCallbacksFactory> deploymentToolCallbacksFactoryProvider, boolean writable) {
+
+        DeploymentToolCallbacksFactory deploymentToolCallbacksFactory = deploymentToolCallbacksFactoryProvider
+            .getIfAvailable();
+
+        if (deploymentToolCallbacksFactory == null) {
+            return List.of();
+        }
+
+        return writable
+            ? deploymentToolCallbacksFactory.writeToolCallbacks()
+            : deploymentToolCallbacksFactory.readToolCallbacks();
+    }
+
+    /**
+     * The seven asset-file CRUD tools flattened onto this surface (ticket 732, Task 4 of the CRUD-delegate unwind),
+     * replacing the dissolved {@code asset_file_agent} delegate: {@code listAssetFiles} + {@code getAssetFileContent}
+     * on both agents, plus (write-only) {@code createAssetFile}, {@code createBinaryAssetFile},
+     * {@code updateAssetFileContent}, {@code cloneAssetFile}, {@code createAssetFileFromUrl} on BUILD — mirroring how
+     * every other flat domain in this class splits its read/write leg between ASK and BUILD. An absent factory bean
+     * (both Copilot AND AI Hub disabled — {@link AssetFileToolCallbacksFactory} is registered whenever either is, see
+     * {@code AssetFileAgentConfiguration}) resolves to an empty list — the same silent-skip degrade every other
+     * Copilot-domain registration in this class already follows.
+     *
+     * <p>
+     * All seven are pinned rather than catalog-demoted — the same departure from the plan's general "mutations go to
+     * the searchable catalog" guidance that {@code task_agent} (Task 1), {@code api_collection_agent} (Task 2), and
+     * {@code project_deployment_agent} (Task 3) took: the domain is comparable in size to those precedents, the two
+     * reads were ALREADY pinned before this task (the dissolved delegate only ever owned the five writes), and
+     * splitting the five mutations into the catalog while the two reads stay pinned would fragment one coherent CRUD
+     * surface across two lookup mechanisms for a marginal schema saving.
+     * </p>
+     *
+     * <p>
+     * No context wrapping is needed here (unlike the management MCP surface's {@code WorkspaceScopedFlatToolCallback}):
+     * every tool call routed through {@link AiHubSpringAIAgent#toolContext} already carries
+     * {@link com.bytechef.automation.ai.tool.AutomationToolInvocationContext}-compatible keys — the exact family every
+     * one of these seven tools reads, including {@code sourceOrdinal} for the three create tools — for every registered
+     * pinned tool, not just asset-file ones.
+     * </p>
+     *
+     * <p>
+     * Package-private for {@code AiHubConfigurationAssetFileFlatCrudToolCallbacksTest}.
+     * </p>
+     */
+    static List<ToolCallback> assetFileFlatCrudToolCallbacks(
+        ObjectProvider<AssetFileToolCallbacksFactory> assetFileToolCallbacksFactoryProvider, boolean writable) {
+
+        AssetFileToolCallbacksFactory assetFileToolCallbacksFactory = assetFileToolCallbacksFactoryProvider
+            .getIfAvailable();
+
+        if (assetFileToolCallbacksFactory == null) {
+            return List.of();
+        }
+
+        return writable
+            ? assetFileToolCallbacksFactory.writeToolCallbacks()
+            : assetFileToolCallbacksFactory.readToolCallbacks();
+    }
+
+    /**
+     * The three read-only data-table tools ({@code listDataTables}, {@code queryDataTable}, {@code aggregateDataTable})
+     * flattened onto BOTH ai_hub agents (ticket 732, Task 5 of the CRUD-delegate unwind), replacing the read leg of the
+     * dissolved {@code data_table_agent} delegate. Unlike every sibling {@code *FlatCrudToolCallbacks} helper in this
+     * class, there is no {@code writable} parameter — ASK and BUILD pin the exact same three reads; the eight mutations
+     * are catalog-demoted instead of joining BUILD's pinned list (see {@link #dataTableCatalogToolCallbacks}), so there
+     * is no larger "write" set to return here. An absent factory bean (both Copilot AND AI Hub disabled —
+     * {@link DataTableToolCallbacksFactory} is registered whenever either is, see {@code DataTableAgentConfiguration})
+     * resolves to an empty list.
+     *
+     * <p>
+     * No context wrapping is needed here (unlike the management MCP surface's
+     * {@code com.bytechef.automation.ai.tool.WorkspaceScopedFlatToolCallback}): every tool call routed through
+     * {@link AiHubSpringAIAgent#toolContext} already carries {@code AgentToolInvocationContext}-compatible keys — the
+     * exact family every one of these three tools reads, which is the OTHER family from every domain flattened onto
+     * this class before this task (all of which read {@code AutomationToolInvocationContext}'s).
+     * </p>
+     *
+     * <p>
+     * Package-private for {@code AiHubConfigurationDataTableFlatCrudToolCallbacksTest}.
+     * </p>
+     */
+    static List<ToolCallback> dataTableFlatCrudToolCallbacks(
+        ObjectProvider<DataTableToolCallbacksFactory> dataTableToolCallbacksFactoryProvider) {
+
+        DataTableToolCallbacksFactory dataTableToolCallbacksFactory = dataTableToolCallbacksFactoryProvider
+            .getIfAvailable();
+
+        if (dataTableToolCallbacksFactory == null) {
+            return List.of();
+        }
+
+        return dataTableToolCallbacksFactory.readToolCallbacks();
+    }
+
+    /**
+     * The eight mutation data-table tools ({@code addDataTableRow}, {@code updateDataTableRow},
+     * {@code deleteDataTableRow}, {@code addDataTableColumn}, {@code createDataTable}, {@code createDataTableFromCsv},
+     * {@code cloneDataTable}, {@code dropDataTable}) registered on the BUILD agent's searchable tool catalog rather
+     * than pinned (ticket 732, Task 5 of the CRUD-delegate unwind) — a departure from how the SMALLER flattened domains
+     * in this class (task_agent's 7, api_collection_agent's 3, project_deployment_agent's 7, asset_file_agent's 7) were
+     * all pinned in full. Data-table is the first of the larger domains (eleven tools total) and the plan's general
+     * "reads pinned, mutations to the searchable catalog" guidance — the same treatment {@code createWorkflowChat}
+     * already gets — applies here rather than being departed from: pinning all eleven would add real schema-token
+     * weight to EVERY BUILD-mode model call for a domain most turns never touch. The three reads still pin (see
+     * {@link #dataTableFlatCrudToolCallbacks}) since grounding queries ("what tables do I have", "what's in this
+     * table") are far higher frequency than any single mutation. The prompt documents "find with searchTool first" for
+     * each demoted name — see {@code prompt_ai_hub_build.txt}'s Data-table mutations section.
+     *
+     * <p>
+     * Derives the mutation set as {@code writeToolCallbacks() minus readToolCallbacks()} by name rather than hand-
+     * listing eight classes, so this list can never silently drift out of step with the factory's own read/write split.
+     * </p>
+     *
+     * <p>
+     * Catalog tools are security-context-rehydration-wrapped by {@code ToolSearchAdvisorConfiguration} and receive the
+     * same {@link AiHubSpringAIAgent#toolContext} as every pinned tool once a {@code searchTool} hit surfaces them —
+     * catalog membership does not change which context family a tool reads, so no extra wrapping is needed here either.
+     * </p>
+     *
+     * <p>
+     * Package-private for {@code AiHubConfigurationDataTableFlatCrudToolCallbacksTest}.
+     * </p>
+     */
+    static List<ToolCallback> dataTableCatalogToolCallbacks(
+        ObjectProvider<DataTableToolCallbacksFactory> dataTableToolCallbacksFactoryProvider) {
+
+        DataTableToolCallbacksFactory dataTableToolCallbacksFactory = dataTableToolCallbacksFactoryProvider
+            .getIfAvailable();
+
+        if (dataTableToolCallbacksFactory == null) {
+            return List.of();
+        }
+
+        Set<String> readNames = dataTableToolCallbacksFactory.readToolCallbacks()
+            .stream()
+            .map(toolCallback -> toolCallback.getToolDefinition()
+                .name())
+            .collect(Collectors.toSet());
+
+        return dataTableToolCallbacksFactory.writeToolCallbacks()
+            .stream()
+            .filter(toolCallback -> !readNames.contains(
+                toolCallback.getToolDefinition()
+                    .name()))
+            .toList();
+    }
+
+    /**
+     * The two read-only knowledge-base tools ({@code listKnowledgeBases}, {@code queryKnowledgeBase}) flattened onto
+     * BOTH ai_hub agents (ticket 732, Task 6 of the CRUD-delegate unwind), replacing the read leg of the dissolved
+     * {@code knowledge_base_agent} delegate. Like {@link #dataTableFlatCrudToolCallbacks} there is no {@code writable}
+     * parameter — ASK and BUILD pin the exact same two reads; the five mutations are catalog-demoted instead of joining
+     * BUILD's pinned list (see {@link #knowledgeBaseCatalogToolCallbacks}). An absent factory bean (both Copilot AND AI
+     * Hub disabled, or the knowledge-base feature itself off — {@link KnowledgeBaseToolCallbacksFactory} is registered
+     * only when {@code bytechef.ai.knowledge-base.enabled=true} AND either surface is on, see
+     * {@code KnowledgeBaseAgentConfiguration}) resolves to an empty list.
+     *
+     * <p>
+     * No context wrapping is needed here (unlike the management MCP surface's
+     * {@code com.bytechef.automation.ai.tool.WorkspaceScopedFlatToolCallback}): every tool call routed through
+     * {@link AiHubSpringAIAgent#toolContext} already carries {@code AgentToolInvocationContext}-compatible keys — the
+     * same family the flat data-table tools read (see {@link #dataTableFlatCrudToolCallbacks}'s javadoc), and the
+     * family every one of these two knowledge-base tools reads too.
+     * </p>
+     *
+     * <p>
+     * Package-private for {@code AiHubConfigurationKnowledgeBaseFlatCrudToolCallbacksTest}.
+     * </p>
+     */
+    static List<ToolCallback> knowledgeBaseFlatCrudToolCallbacks(
+        ObjectProvider<KnowledgeBaseToolCallbacksFactory> knowledgeBaseToolCallbacksFactoryProvider) {
+
+        KnowledgeBaseToolCallbacksFactory knowledgeBaseToolCallbacksFactory = knowledgeBaseToolCallbacksFactoryProvider
+            .getIfAvailable();
+
+        if (knowledgeBaseToolCallbacksFactory == null) {
+            return List.of();
+        }
+
+        return knowledgeBaseToolCallbacksFactory.readToolCallbacks();
+    }
+
+    /**
+     * The five mutation knowledge-base tools ({@code createKnowledgeBase}, {@code addKnowledgeBaseDocument},
+     * {@code deleteKnowledgeBaseDocument}, {@code cloneKnowledgeBase}, {@code deleteKnowledgeBase}) registered on the
+     * BUILD agent's searchable tool catalog rather than pinned (ticket 732, Task 6 of the CRUD-delegate unwind),
+     * matching {@link #dataTableCatalogToolCallbacks}'s split rather than the smaller domains' precedent of pinning
+     * everything — the task brief calls for the same reads-pinned/mutations-catalog treatment here. The two reads still
+     * pin (see {@link #knowledgeBaseFlatCrudToolCallbacks}) since grounding queries ("what knowledge bases do I have",
+     * "what does this KB contain") are far higher frequency than any single mutation. The prompt documents "find with
+     * searchTool first" for each demoted name — see {@code prompt_ai_hub_build.txt}'s Knowledge-base mutations section.
+     *
+     * <p>
+     * Derives the mutation set as {@code writeToolCallbacks() minus readToolCallbacks()} by name rather than hand-
+     * listing five classes, so this list can never silently drift out of step with the factory's own read/write split —
+     * mirrors {@link #dataTableCatalogToolCallbacks}.
+     * </p>
+     *
+     * <p>
+     * Catalog tools are security-context-rehydration-wrapped by {@code ToolSearchAdvisorConfiguration} and receive the
+     * same {@link AiHubSpringAIAgent#toolContext} as every pinned tool once a {@code searchTool} hit surfaces them —
+     * catalog membership does not change which context family a tool reads, so no extra wrapping is needed here either.
+     * </p>
+     *
+     * <p>
+     * Package-private for {@code AiHubConfigurationKnowledgeBaseFlatCrudToolCallbacksTest}.
+     * </p>
+     */
+    static List<ToolCallback> knowledgeBaseCatalogToolCallbacks(
+        ObjectProvider<KnowledgeBaseToolCallbacksFactory> knowledgeBaseToolCallbacksFactoryProvider) {
+
+        KnowledgeBaseToolCallbacksFactory knowledgeBaseToolCallbacksFactory = knowledgeBaseToolCallbacksFactoryProvider
+            .getIfAvailable();
+
+        if (knowledgeBaseToolCallbacksFactory == null) {
+            return List.of();
+        }
+
+        Set<String> readNames = knowledgeBaseToolCallbacksFactory.readToolCallbacks()
+            .stream()
+            .map(toolCallback -> toolCallback.getToolDefinition()
+                .name())
+            .collect(Collectors.toSet());
+
+        return knowledgeBaseToolCallbacksFactory.writeToolCallbacks()
+            .stream()
+            .filter(toolCallback -> !readNames.contains(
+                toolCallback.getToolDefinition()
+                    .name()))
+            .toList();
+    }
+
+    /**
+     * The six read-only context-store tools ({@code listContextSources}, {@code searchContextStore},
+     * {@code getContextStoreRecord}, {@code listAvailableSourceComponents}, {@code describeSourceComponentEntities},
+     * {@code semanticSearchContextStore} — the last one only when the semantic-search service is on the classpath)
+     * flattened onto BOTH ai_hub agents (ticket 732, Task 7 of the CRUD-delegate unwind), replacing the read leg of the
+     * dissolved {@code context_store_agent} delegate. Like {@link #dataTableFlatCrudToolCallbacks} and
+     * {@link #knowledgeBaseFlatCrudToolCallbacks} there is no {@code writable} parameter — ASK and BUILD pin the exact
+     * same reads; the six mutations are catalog-demoted instead of joining BUILD's pinned list (see
+     * {@link #contextStoreCatalogToolCallbacks}). An absent factory bean (both Copilot AND AI Hub disabled, or the
+     * context-store feature itself off — {@link ContextStoreToolCallbacksFactory} is registered only when
+     * {@code bytechef.context-store.enabled=true} AND either surface is on, see {@code ContextStoreAgentConfiguration})
+     * resolves to an empty list.
+     *
+     * <p>
+     * No context wrapping is needed here (unlike the management MCP surface's
+     * {@code com.bytechef.automation.ai.tool.WorkspaceScopedFlatToolCallback}): every tool call routed through
+     * {@link AiHubSpringAIAgent#toolContext} already carries {@code AgentToolInvocationContext}-compatible keys — the
+     * same family the flat data-table and knowledge-base tools read (see {@link #dataTableFlatCrudToolCallbacks}'s
+     * javadoc), and the family every one of these context-store reads that looks at workspace scope reads too. Four of
+     * the six write-side siblings (see {@link #contextStoreCatalogToolCallbacks}) instead resolve their owning
+     * workspace by looking up the entity id in their own input, reading no tool-context family at all — a pre-existing
+     * property of those tool classes unaffected by dissolving the delegate that used to wrap them.
+     * </p>
+     *
+     * <p>
+     * Package-private for {@code AiHubConfigurationContextStoreFlatCrudToolCallbacksTest}.
+     * </p>
+     */
+    static List<ToolCallback> contextStoreFlatCrudToolCallbacks(
+        ObjectProvider<ContextStoreToolCallbacksFactory> contextStoreToolCallbacksFactoryProvider) {
+
+        ContextStoreToolCallbacksFactory contextStoreToolCallbacksFactory = contextStoreToolCallbacksFactoryProvider
+            .getIfAvailable();
+
+        if (contextStoreToolCallbacksFactory == null) {
+            return List.of();
+        }
+
+        return contextStoreToolCallbacksFactory.readToolCallbacks();
+    }
+
+    /**
+     * The six mutation context-store tools ({@code createContextStoreSource}, {@code updateContextStoreSource},
+     * {@code deleteContextStoreSource}, {@code refreshContextStoreSource}, {@code setContextStoreSourceEnabled},
+     * {@code deleteContextStore}) registered on the BUILD agent's searchable tool catalog rather than pinned (ticket
+     * 732, Task 7 of the CRUD-delegate unwind) — the largest tool count of any delegate this plan dissolves (twelve
+     * total), so it gets the same reads-pinned/mutations-catalog treatment {@link #dataTableCatalogToolCallbacks} and
+     * {@link #knowledgeBaseCatalogToolCallbacks} already established for the other large domains, rather than the
+     * smaller domains' precedent of pinning everything. The six reads still pin (see
+     * {@link #contextStoreFlatCrudToolCallbacks}) since grounding queries ("what context stores/sources do I have",
+     * "what's in this source") are far higher frequency than any single mutation. The prompt documents "find with
+     * searchTool first" for each demoted name — see {@code prompt_ai_hub_build.txt}'s Context-store mutations section.
+     *
+     * <p>
+     * Derives the mutation set as {@code writeToolCallbacks() minus readToolCallbacks()} by name rather than hand-
+     * listing six classes, so this list can never silently drift out of step with the factory's own read/write split —
+     * mirrors {@link #dataTableCatalogToolCallbacks} and {@link #knowledgeBaseCatalogToolCallbacks}.
+     * </p>
+     *
+     * <p>
+     * Catalog tools are security-context-rehydration-wrapped by {@code ToolSearchAdvisorConfiguration} and receive the
+     * same {@link AiHubSpringAIAgent#toolContext} as every pinned tool once a {@code searchTool} hit surfaces them —
+     * catalog membership does not change which context family a tool reads, so no extra wrapping is needed here either.
+     * </p>
+     *
+     * <p>
+     * Package-private for {@code AiHubConfigurationContextStoreFlatCrudToolCallbacksTest}.
+     * </p>
+     */
+    static List<ToolCallback> contextStoreCatalogToolCallbacks(
+        ObjectProvider<ContextStoreToolCallbacksFactory> contextStoreToolCallbacksFactoryProvider) {
+
+        ContextStoreToolCallbacksFactory contextStoreToolCallbacksFactory = contextStoreToolCallbacksFactoryProvider
+            .getIfAvailable();
+
+        if (contextStoreToolCallbacksFactory == null) {
+            return List.of();
+        }
+
+        Set<String> readNames = contextStoreToolCallbacksFactory.readToolCallbacks()
+            .stream()
+            .map(toolCallback -> toolCallback.getToolDefinition()
+                .name())
+            .collect(Collectors.toSet());
+
+        return contextStoreToolCallbacksFactory.writeToolCallbacks()
+            .stream()
+            .filter(toolCallback -> !readNames.contains(
+                toolCallback.getToolDefinition()
+                    .name()))
+            .toList();
+    }
+
+    /**
+     * The two read-only AI-Agent-builder tools ({@code listAiAgents}, {@code getAiAgent}) flattened onto BOTH ai_hub
+     * agents (ticket 732, Task 8 of the CRUD-delegate unwind — the LAST delegate in the plan), replacing the read leg
+     * of the dissolved {@code ai_agent_agent} delegate. Like {@link #dataTableFlatCrudToolCallbacks},
+     * {@link #knowledgeBaseFlatCrudToolCallbacks}, and {@link #contextStoreFlatCrudToolCallbacks} there is no
+     * {@code writable} parameter — ASK and BUILD pin the exact same two reads; the nine mutations are catalog-demoted
+     * instead of joining BUILD's pinned list (see {@link #aiAgentCatalogToolCallbacks}). An absent factory bean (both
+     * Copilot AND AI Hub disabled — {@link AiAgentToolCallbacksFactory} is registered whenever either is, see
+     * {@code AiAgentAgentConfiguration}) resolves to an empty list.
+     *
+     * <p>
+     * No context wrapping is needed here (unlike the management MCP surface's
+     * {@code com.bytechef.automation.ai.tool.WorkspaceScopedFlatToolCallback}): every tool call routed through
+     * {@link AiHubSpringAIAgent#toolContext} already carries {@code AgentToolInvocationContext}-compatible keys — the
+     * same family every AI-Agent-builder tool reads (an {@code AiAgent} is an automation entity managed through the CE
+     * {@code AiAgentFacade}, not an AI-hub-owned one, so this mirrors data-table/knowledge-base/context-store rather
+     * than the {@code AutomationToolInvocationContext} family the earlier, smaller delegates in this plan read). Of
+     * these two reads, only {@code listAiAgents} actually looks at workspace scope; {@code getAiAgent} resolves
+     * everything from the {@code id} already in its own input.
+     * </p>
+     *
+     * <p>
+     * Package-private for {@code AiHubConfigurationAiAgentFlatCrudToolCallbacksTest}.
+     * </p>
+     */
+    static List<ToolCallback> aiAgentFlatCrudToolCallbacks(
+        ObjectProvider<AiAgentToolCallbacksFactory> aiAgentToolCallbacksFactoryProvider) {
+
+        AiAgentToolCallbacksFactory aiAgentToolCallbacksFactory = aiAgentToolCallbacksFactoryProvider
+            .getIfAvailable();
+
+        if (aiAgentToolCallbacksFactory == null) {
+            return List.of();
+        }
+
+        return aiAgentToolCallbacksFactory.readToolCallbacks();
+    }
+
+    /**
+     * The nine mutation AI-Agent-builder tools ({@code createAiAgent}, {@code updateAiAgent},
+     * {@code addAiAgentChannel}, {@code deleteAiAgentChannel}, {@code addAiAgentElement}, {@code updateAiAgentElement},
+     * {@code deleteAiAgentElement}, {@code updateAiAgentSettings}, {@code publishAiAgent}) registered on the BUILD
+     * agent's searchable tool catalog rather than pinned (ticket 732, Task 8 of the CRUD-delegate unwind — the LAST
+     * delegate) — the second-largest mutation set of any domain this plan dissolves (nine, versus context-store's six
+     * and data-table's eight), so it gets the same reads-pinned/mutations-catalog treatment
+     * {@link #dataTableCatalogToolCallbacks}, {@link #knowledgeBaseCatalogToolCallbacks}, and
+     * {@link #contextStoreCatalogToolCallbacks} already established for the other large domains, rather than the
+     * smaller domains' precedent of pinning everything. The two reads still pin (see
+     * {@link #aiAgentFlatCrudToolCallbacks}) since grounding queries ("what agents do I have", "what does this agent
+     * look like") are far higher frequency than any single mutation. The prompt documents "find with searchTool first"
+     * for each demoted name — see {@code prompt_ai_hub_build.txt}'s AI-Agent-builder mutations section.
+     *
+     * <p>
+     * Derives the mutation set as {@code writeToolCallbacks() minus readToolCallbacks()} by name rather than hand-
+     * listing nine classes, so this list can never silently drift out of step with the factory's own read/write split —
+     * mirrors {@link #dataTableCatalogToolCallbacks}, {@link #knowledgeBaseCatalogToolCallbacks}, and
+     * {@link #contextStoreCatalogToolCallbacks}.
+     * </p>
+     *
+     * <p>
+     * Of the nine, only {@code createAiAgent} reads workspace scope from the tool context; the other eight resolve
+     * their owning workspace by looking up the entity id already in their own input, reading no tool-context family at
+     * all — a pre-existing property of those tool classes unaffected by dissolving the delegate that used to wrap them.
+     * </p>
+     *
+     * <p>
+     * Catalog tools are security-context-rehydration-wrapped by {@code ToolSearchAdvisorConfiguration} and receive the
+     * same {@link AiHubSpringAIAgent#toolContext} as every pinned tool once a {@code searchTool} hit surfaces them —
+     * catalog membership does not change which context family a tool reads, so no extra wrapping is needed here either.
+     * </p>
+     *
+     * <p>
+     * Package-private for {@code AiHubConfigurationAiAgentFlatCrudToolCallbacksTest}.
+     * </p>
+     */
+    static List<ToolCallback> aiAgentCatalogToolCallbacks(
+        ObjectProvider<AiAgentToolCallbacksFactory> aiAgentToolCallbacksFactoryProvider) {
+
+        AiAgentToolCallbacksFactory aiAgentToolCallbacksFactory = aiAgentToolCallbacksFactoryProvider
+            .getIfAvailable();
+
+        if (aiAgentToolCallbacksFactory == null) {
+            return List.of();
+        }
+
+        Set<String> readNames = aiAgentToolCallbacksFactory.readToolCallbacks()
+            .stream()
+            .map(toolCallback -> toolCallback.getToolDefinition()
+                .name())
+            .collect(Collectors.toSet());
+
+        return aiAgentToolCallbacksFactory.writeToolCallbacks()
+            .stream()
+            .filter(toolCallback -> !readNames.contains(
                 toolCallback.getToolDefinition()
                     .name()))
             .toList();

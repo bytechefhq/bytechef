@@ -17,39 +17,35 @@
 package com.bytechef.automation.ai.tool;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 
 import com.bytechef.ai.mcp.server.spi.McpAppResources;
 import com.bytechef.ai.mcp.server.spi.McpAppUiDescriptor;
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
-import com.bytechef.automation.assetfile.service.AssetFileFacade;
-import com.bytechef.platform.data.table.configuration.service.DataTableService;
-import com.bytechef.platform.data.table.execution.service.DataTableRowService;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.ObjectProvider;
 
 @ExtendWith(ObjectMapperSetupExtension.class)
 class ViewerToolMcpContributorConfigurationTest {
 
     private final ViewerToolMcpContributorConfiguration configuration = new ViewerToolMcpContributorConfiguration();
 
+    /**
+     * Neither {@code getAssetFileContent} (ticket 732, CRUD-delegate-unwind Task 4) nor {@code queryDataTable} (Task 5)
+     * is one of this contributor's own tool callbacks anymore — both callable tools now come from
+     * {@code ToolCallbackContributorConfiguration}'s flat-CRUD MCP contributors, correctly workspace-scoped;
+     * registering either a second time here (unwrapped, and therefore broken on this ToolContext-less surface) would
+     * both duplicate the tool name and resurrect the pre-existing "Workspace context unavailable" bug the flat
+     * registrations fixed. {@code ManagementMcpServerConfiguration} matches descriptors to tools by name across every
+     * contributor, so both descriptors still apply to tools supplied elsewhere.
+     */
     @Test
-    void testContributesFileAndDataTableToolsWithDescriptors() {
-        McpServerToolCallbackContributor contributor = configuration.viewerToolMcpContributor(
-            present(mock(AssetFileFacade.class)), present(mock(DataTableRowService.class)),
-            present(mock(DataTableService.class)));
+    void testContributesNoToolsButBothDescriptors() {
+        McpServerToolCallbackContributor contributor = configuration.viewerToolMcpContributor();
 
-        List<String> toolNames = contributor.getToolCallbacks()
-            .stream()
-            .map(toolCallback -> toolCallback.getToolDefinition()
-                .name())
-            .toList();
-
-        assertThat(toolNames).containsExactlyInAnyOrder("getAssetFileContent", "queryDataTable");
+        assertThat(contributor.getToolCallbacks()).isEmpty();
 
         Map<String, McpAppUiDescriptor> descriptors = contributor.getMcpAppUiDescriptors();
 
@@ -60,17 +56,8 @@ class ViewerToolMcpContributorConfigurationTest {
     }
 
     @Test
-    void testSkipsToolsWhenFacadesAbsent() {
-        McpServerToolCallbackContributor contributor = configuration.viewerToolMcpContributor(
-            absent(), absent(), absent());
-
-        assertThat(contributor.getToolCallbacks()).isEmpty();
-    }
-
-    @Test
     void testFileShaperExtractsViewerFields() {
-        McpServerToolCallbackContributor contributor = configuration.viewerToolMcpContributor(
-            present(mock(AssetFileFacade.class)), absent(), absent());
+        McpServerToolCallbackContributor contributor = configuration.viewerToolMcpContributor();
 
         Map<String, Object> structuredContent = contributor.getMcpAppUiDescriptors()
             .get("getAssetFileContent")
@@ -85,8 +72,7 @@ class ViewerToolMcpContributorConfigurationTest {
 
     @Test
     void testDataTableShaperWrapsRows() {
-        McpServerToolCallbackContributor contributor = configuration.viewerToolMcpContributor(
-            absent(), present(mock(DataTableRowService.class)), present(mock(DataTableService.class)));
+        McpServerToolCallbackContributor contributor = configuration.viewerToolMcpContributor();
 
         Map<String, Object> structuredContent = contributor.getMcpAppUiDescriptors()
             .get("queryDataTable")
@@ -95,22 +81,5 @@ class ViewerToolMcpContributorConfigurationTest {
 
         assertThat(structuredContent).containsKey("rows");
         assertThat((List<?>) structuredContent.get("rows")).hasSize(2);
-    }
-
-    private static <T> ObjectProvider<T> present(T value) {
-        @SuppressWarnings("unchecked")
-        ObjectProvider<T> provider = mock(ObjectProvider.class);
-
-        org.mockito.Mockito.when(provider.getIfAvailable())
-            .thenReturn(value);
-
-        return provider;
-    }
-
-    private static <T> ObjectProvider<T> absent() {
-        @SuppressWarnings("unchecked")
-        ObjectProvider<T> provider = mock(ObjectProvider.class);
-
-        return provider;
     }
 }

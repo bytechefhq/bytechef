@@ -38,8 +38,12 @@ import org.springframework.core.io.Resource;
  * {@code AiHubSpringAIAgent#resolveChatClient}: previously only the top-level AI Hub agent's own {@link ChatClient}
  * carried these advisors, while every delegate ChatClient (Copilot specialists, the AI-hub-owned
  * research/data_analyst/image_generator/slide_builder subagents, and the
- * mcp_agent/project_deployment_agent/api_collection_agent specialists) ran completely unguarded and without the
- * workspace's standing instructions.
+ * mcp_agent/project_deployment_agent/api_collection_agent specialists of the time) ran completely unguarded and without
+ * the workspace's standing instructions. NONE of that last group remain a delegate today — {@code mcp_agent} was
+ * promoted into the catalog-backed {@code configureMcpServer} intelligent tool, and {@code api_collection_agent} and
+ * {@code project_deployment_agent} were dissolved with their tools registered flat (ticket 732, CRUD-delegate unwind
+ * Tasks 2 and 3) — but this class still wraps every remaining and future delegate (the Copilot specialists, the
+ * generative one-shots) uniformly through the contributor seam below.
  *
  * <p>
  * The class keeps its guardrails-era name even though it now dispatches an arbitrary contributor list — renaming would
@@ -56,8 +60,8 @@ import org.springframework.core.io.Resource;
  * the turn's {@code RunAgentInput} is available). Instead this wrapper defers resolution to the moment the delegate
  * {@code ToolCallback} forwards the parent's {@code ToolContext} via {@link ChatClientRequestSpec#toolContext(Map)} —
  * the exact same map every hand-rolled delegate callback ( {@code SkillsAgentToolCallback},
- * {@code SubAgentToolCallback}, {@code ResearchToolCallback}, etc.) already builds from its own {@code ToolContext}
- * parameter and forwards so the specialist's own workspace-scoped tools keep working — see
+ * {@code ProjectWorkflowAgentToolCallback}, {@code ResearchToolCallback}, etc.) already builds from its own
+ * {@code ToolContext} parameter and forwards so the specialist's own workspace-scoped tools keep working — see
  * {@code AgentToolInvocationContext#TOOL_CONTEXT_WORKSPACE_ID_KEY}. No changes to any of those delegate classes are
  * required: wrapping happens once, in {@code AiHubConfiguration}, at the single point where each delegate's
  * {@code ChatClient} bean is handed to its {@code ToolCallback} constructor.

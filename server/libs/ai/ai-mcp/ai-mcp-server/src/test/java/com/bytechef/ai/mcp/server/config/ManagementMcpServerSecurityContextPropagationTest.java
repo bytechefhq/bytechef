@@ -167,7 +167,12 @@ class ManagementMcpServerSecurityContextPropagationTest {
             McpToolUtils.toAsyncToolSpecification(probe);
 
         asyncToolSpecification.callHandler()
-            .apply(mock(McpAsyncServerExchange.class), new McpSchema.CallToolRequest("probe", Map.of()))
+            .apply(
+                mock(McpAsyncServerExchange.class),
+                McpSchema.CallToolRequest.builder()
+                    .name("probe")
+                    .arguments(Map.of())
+                    .build())
             .block();
 
         return capturedResult.get();

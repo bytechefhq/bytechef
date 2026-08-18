@@ -17,6 +17,7 @@
 package com.bytechef.automation.ai.tool;
 
 import com.bytechef.ai.agent.tool.ToolErrors;
+import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.service.WorkspaceService;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -51,11 +52,23 @@ import tools.jackson.databind.node.ObjectNode;
  * </p>
  *
  * <p>
- * Only writes {@link AutomationToolInvocationContext}'s key family. Both delegates this wrapper is built for
- * ({@code listMcpServers}, {@code createMcpServer}) read exclusively that family, never
- * {@code com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext}'s — unlike the subagent delegates
- * {@link WorkspaceScopedSubAgentToolCallback} wraps, which read either family depending on which specialist. A future
- * delegate wrapped here that also reads the other family would need this class extended the same way.
+ * Writes BOTH workspace-id/environment-id key families unconditionally: {@link AutomationToolInvocationContext}'s (read
+ * by the MCP-server CRUD pair, the project-deployment CRUD set, and the flat asset-file tools) and
+ * {@link AgentToolInvocationContext}'s (read by the flat data-table tools, ticket 732, CRUD-delegate-unwind Task 5 —
+ * the first flat domain flattened here that reads the OTHER family — and the flat knowledge-base tools, Task 6). This
+ * mirrors the dual-write {@link WorkspaceScopedSubAgentToolCallback} already does for the subagent delegates it wraps,
+ * which read either family depending on which specialist. Writing both unconditionally is harmless for tools that only
+ * read one family — exactly the same trade-off {@link WorkspaceScopedSubAgentToolCallback} already makes.
+ * </p>
+ *
+ * <p>
+ * Also writes {@link AutomationToolInvocationContext#TOOL_CONTEXT_SOURCE_ORDINAL_KEY} unconditionally, set to
+ * {@link AutomationToolInvocationContext#SOURCE_ORDINAL_FILES} — the same unconditional-write choice
+ * {@link WorkspaceScopedSubAgentToolCallback} makes for the same key. Only the asset-file create tools
+ * ({@code createAssetFile}, {@code createBinaryAssetFile}, {@code createAssetFileFromUrl}) read it; every other tool
+ * wrapped here ignores it, so writing it unconditionally is harmless and keeps this wrapper tool-agnostic. Without
+ * this, a file created through the management MCP server would carry a {@code null}
+ * {@code asset_file.generated_by_agent_source} instead of being attributed to the Files surface.
  * </p>
  *
  * @author Ivica Cardic
@@ -143,6 +156,23 @@ public class WorkspaceScopedFlatToolCallback implements ToolCallback {
 
             forwardedContext.put(AutomationToolInvocationContext.TOOL_CONTEXT_WORKSPACE_ID_KEY, workspaceId);
             forwardedContext.put(AutomationToolInvocationContext.TOOL_CONTEXT_ENVIRONMENT_ID_KEY, environmentOrdinal);
+
+            // See class Javadoc: a missing sourceOrdinal only matters to the asset-file create tools; every other
+            // tool wrapped by this class ignores the key, so writing it unconditionally is harmless.
+            forwardedContext.put(
+                AutomationToolInvocationContext.TOOL_CONTEXT_SOURCE_ORDINAL_KEY,
+                AutomationToolInvocationContext.SOURCE_ORDINAL_FILES);
+
+            // Two workspace-id key families exist (see class Javadoc): tools carried over from the delegate-unwind
+            // family before Task 5 read AutomationToolInvocationContext's key, while the flat data-table tools read
+            // AgentToolInvocationContext's. Writing both unconditionally, like WorkspaceScopedSubAgentToolCallback
+            // already does for the subagent delegates it wraps, keeps this wrapper tool-agnostic.
+            forwardedContext.putAll(
+                AgentToolInvocationContext.builder()
+                    .workspaceId(workspaceId)
+                    .environmentId(environmentOrdinal)
+                    .build()
+                    .toToolContext());
 
             return delegate.call(jsonMapper.writeValueAsString(inputNode), new ToolContext(forwardedContext));
         } catch (JacksonException exception) {

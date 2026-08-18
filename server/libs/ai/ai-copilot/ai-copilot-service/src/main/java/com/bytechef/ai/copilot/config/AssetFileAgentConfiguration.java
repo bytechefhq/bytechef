@@ -33,7 +33,6 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.tool.ToolCallback;
@@ -45,10 +44,19 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 
 /**
- * Registers the asset-file Copilot panel source agents ({@code asset_file_ask}/{@code asset_file_build}) and the
- * asset-file subagent {@link ChatClient} beans consumed by the AI Hub root agents and the management MCP server. Lives
- * in CE because {@link AssetFileToolCallbacksFactory} and {@link AssetFileFacade} are CE; the optional
- * {@link ToolArtifactRecorder} hook is a CE SPI that the EE AI Hub recorder plugs into when present.
+ * Registers the {@link AssetFileToolCallbacksFactory} bean and the asset-file Copilot panel source agents
+ * ({@code asset_file_ask}/{@code asset_file_build}, triggered from the workspace Files page). Lives in CE because
+ * {@link AssetFileToolCallbacksFactory} and {@link AssetFileFacade} are CE; the optional {@link ToolArtifactRecorder}
+ * hook is a CE SPI that the EE AI Hub recorder plugs into when present.
+ *
+ * <p>
+ * There is no {@code asset_file_agent} subagent {@code ChatClient} bean here (ticket 732, CRUD-delegate-unwind Task 4
+ * dissolved it): the AI Hub root agents and the management MCP server now call {@link AssetFileToolCallbacksFactory}'s
+ * read/write tool lists flat instead of delegating through a specialist — see
+ * {@code AiHubConfiguration#assetFileFlatCrudToolCallbacks} and
+ * {@code ToolCallbackContributorConfiguration#assetFileFlatCrudMcpContributor}. The panel agents below are unaffected:
+ * they always called the factory's tool lists directly and never went through the delegate.
+ * </p>
  *
  * @author Ivica Cardic
  */
@@ -111,26 +119,6 @@ public class AssetFileAgentConfiguration {
             .toolCallbacks(buildToolCallbacks(securityContextRehydrator, assetFileToolCallbacksFactory))
             .overrideChatClientResolver(overrideChatClientResolverProvider.getIfAvailable())
             .sourceOrdinal(AutomationToolInvocationContext.SOURCE_ORDINAL_FILES)
-            .build();
-    }
-
-    @Bean
-    ChatClient assetFileAskSubAgentChatClient(
-        ChatModel chatModel, AssetFileToolCallbacksFactory assetFileToolCallbacksFactory) {
-
-        return ChatClient.builder(chatModel)
-            .defaultSystem(readPrompt(promptAssetFileAskResource))
-            .defaultToolCallbacks(assetFileToolCallbacksFactory.readToolCallbacks())
-            .build();
-    }
-
-    @Bean
-    ChatClient assetFileBuildSubAgentChatClient(
-        ChatModel chatModel, AssetFileToolCallbacksFactory assetFileToolCallbacksFactory) {
-
-        return ChatClient.builder(chatModel)
-            .defaultSystem(readPrompt(promptAssetFileBuildResource))
-            .defaultToolCallbacks(assetFileToolCallbacksFactory.writeToolCallbacks())
             .build();
     }
 

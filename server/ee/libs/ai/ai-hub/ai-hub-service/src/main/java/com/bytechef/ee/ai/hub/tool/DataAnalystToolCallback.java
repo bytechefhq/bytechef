@@ -73,7 +73,7 @@ public class DataAnalystToolCallback implements ToolCallback {
             user's question verbatim as the 'question' field. Optionally supply 'dataTableId'
             when the user has already identified a specific table.
 
-            After the report returns, save it by delegating to asset_file_agent and open it
+            After the report returns, save it by calling createAssetFile and open it
             with openResourceTab (type FILE); summarise findings in one paragraph in chat -
             unless the result already carries "truncatedIntoFile": true, in which case the
             report was already saved as reportFileId/reportName and must NOT be saved again,

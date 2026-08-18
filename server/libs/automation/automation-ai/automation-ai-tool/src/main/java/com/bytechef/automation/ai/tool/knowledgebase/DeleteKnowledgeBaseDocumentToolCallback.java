@@ -59,7 +59,9 @@ public class DeleteKnowledgeBaseDocumentToolCallback implements ToolCallback {
     private static final String DESCRIPTION = """
         Delete a document from a knowledge base by its id. Supply the knowledgeBaseId (from
         listKnowledgeBases) and the documentId to delete. The document is deleted immediately.
-        The knowledgeBaseId must belong to the current workspace.""";
+        The knowledgeBaseId must belong to the current workspace. Irreversible — state exactly
+        which document you are about to remove and get the user's explicit confirmation before
+        calling.""";
 
     private static final String INPUT_SCHEMA =
         """

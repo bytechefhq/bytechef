@@ -74,8 +74,8 @@ class KnowledgeBaseAgentConfigurationConditionTest {
             context.refresh();
 
             assertThat(context.getBeanNamesForType(KnowledgeBaseToolCallbacksFactory.class)).hasSize(1);
-            assertThat(context.containsBean("knowledgeBaseAskSubAgentChatClient")).isTrue();
-            assertThat(context.containsBean("knowledgeBaseBuildSubAgentChatClient")).isTrue();
+            assertThat(context.containsBean("knowledgeBaseAskSpringAIAgent")).isTrue();
+            assertThat(context.containsBean("knowledgeBaseBuildSpringAIAgent")).isTrue();
         }
     }
 

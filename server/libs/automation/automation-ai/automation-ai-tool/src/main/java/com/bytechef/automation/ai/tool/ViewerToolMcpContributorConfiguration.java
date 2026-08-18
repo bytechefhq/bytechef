@@ -19,26 +19,38 @@ package com.bytechef.automation.ai.tool;
 import com.bytechef.ai.mcp.server.spi.McpAppResources;
 import com.bytechef.ai.mcp.server.spi.McpAppUiDescriptor;
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
-import com.bytechef.automation.ai.tool.datatable.QueryDataTableToolCallback;
-import com.bytechef.automation.assetfile.service.AssetFileFacade;
 import com.bytechef.commons.util.JsonUtils;
-import com.bytechef.platform.data.table.configuration.service.DataTableService;
-import com.bytechef.platform.data.table.execution.service.DataTableRowService;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.tool.ToolCallback;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Surfaces the CE read-only viewer-backing tools ({@code getAssetFileContent} → file viewer, {@code queryDataTable} →
- * data-table viewer) as first-class management MCP tools and declares their MCP App UI descriptors. Each backing facade
- * is optional (via {@link ObjectProvider}) so lightweight deployments that lack it simply do not expose that tool.
+ * Declares the MCP App UI descriptors for {@code getAssetFileContent} (file viewer) and {@code queryDataTable}
+ * (data-table viewer). Contributes NO {@link ToolCallback}s of its own — both tools used to be registered here
+ * directly, unwrapped, and therefore ALWAYS failed with "Workspace context unavailable" on this surface: the management
+ * MCP server carries no {@code ToolContext} of its own, and only
+ * {@link WorkspaceScopedFlatToolCallback}/{@link WorkspaceScopedSubAgentToolCallback} inject one.
+ *
+ * <p>
+ * {@code getAssetFileContent}'s callable tool moved to {@code ToolCallbackContributorConfiguration
+ * #assetFileFlatCrudMcpContributor} (ticket 732, CRUD-delegate-unwind Task 4), correctly wrapped alongside its six
+ * asset-file siblings. {@code queryDataTable}'s callable tool moved to {@code ToolCallbackContributorConfiguration
+ * #dataTableFlatCrudMcpContributor} (ticket 732, CRUD-delegate-unwind Task 5) the same way, alongside its ten
+ * data-table siblings — registering it a second time here (unwrapped) would both duplicate the tool name on
+ * {@code tools/list} and resurrect the same bug the asset-file fix already closed.
+ * </p>
+ *
+ * <p>
+ * {@link #getMcpAppUiDescriptors()} still declares both bindings here regardless —
+ * {@code ManagementMcpServerConfiguration} matches descriptors to tools by NAME across every contributor's combined map
+ * ({@code collectMcpAppUiDescriptors}), so a descriptor does not need to originate from the same contributor as the
+ * callable tool.
+ * </p>
  *
  * @author Ivica Cardic
  */
@@ -47,31 +59,12 @@ import org.springframework.context.annotation.Configuration;
 public class ViewerToolMcpContributorConfiguration {
 
     @Bean
-    McpServerToolCallbackContributor viewerToolMcpContributor(
-        ObjectProvider<AssetFileFacade> assetFileFacadeProvider,
-        ObjectProvider<DataTableRowService> dataTableRowServiceProvider,
-        ObjectProvider<DataTableService> dataTableServiceProvider) {
-
+    McpServerToolCallbackContributor viewerToolMcpContributor() {
         return new McpServerToolCallbackContributor() {
 
             @Override
             public List<ToolCallback> getToolCallbacks() {
-                List<ToolCallback> toolCallbacks = new ArrayList<>();
-
-                AssetFileFacade assetFileFacade = assetFileFacadeProvider.getIfAvailable();
-
-                if (assetFileFacade != null) {
-                    toolCallbacks.add(new GetAssetFileContentToolCallback(assetFileFacade));
-                }
-
-                DataTableRowService dataTableRowService = dataTableRowServiceProvider.getIfAvailable();
-                DataTableService dataTableService = dataTableServiceProvider.getIfAvailable();
-
-                if (dataTableRowService != null && dataTableService != null) {
-                    toolCallbacks.add(new QueryDataTableToolCallback(dataTableRowService, dataTableService));
-                }
-
-                return toolCallbacks;
+                return List.of();
             }
 
             @Override

@@ -46,10 +46,14 @@ import org.springframework.core.io.Resource;
  * copilot trigger on the project-deployments and agent-deployments pages.
  *
  * <p>
- * Deliberately registers NO subagent {@code ChatClient} beans, unlike the other domain slices: the AI Hub already
- * reaches this domain through the {@code project_deployment_agent} subagent, which has no ASK/BUILD split by design.
- * Adding hub delegates here would give the hub two competing paths to the same deployment tools. Both surfaces share
- * one {@link DeploymentToolCallbacksFactory} so their tool sets cannot drift.
+ * Deliberately registers NO subagent {@code ChatClient} beans, unlike the other domain slices: the AI Hub used to reach
+ * this domain through a {@code project_deployment_agent} subagent (no ASK/BUILD split of its own) built from this same
+ * {@link DeploymentToolCallbacksFactory} bean. That delegate is gone (ticket 732, CRUD-delegate-unwind plan, Task 3) —
+ * the AI Hub ASK/BUILD agents and the management MCP server (see {@code ToolCallbackContributorConfiguration
+ * #deploymentFlatCrudMcpContributor}) now resolve {@link DeploymentToolCallbacksFactory} directly via
+ * {@code ObjectProvider}, the same pattern {@code McpServerToolCallbacksFactory} already uses for the (separate,
+ * earlier) MCP-server-CRUD flattening. All four surfaces — this panel pair, AI Hub ASK/BUILD, and the management MCP
+ * server — share one {@link DeploymentToolCallbacksFactory} bean so their tool sets cannot drift.
  * </p>
  *
  * <p>

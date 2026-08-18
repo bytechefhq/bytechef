@@ -52,17 +52,20 @@ import tools.jackson.databind.json.JsonMapper;
  * </p>
  *
  * <p>
- * Every delegate wrapped here also gets {@link AutomationToolInvocationContext#TOOL_CONTEXT_SOURCE_ORDINAL_KEY} set to
- * {@link AutomationToolInvocationContext#SOURCE_ORDINAL_FILES}. Only the {@code asset_file_agent} delegate reads it —
- * every other delegate ignores the key, so writing it unconditionally here is harmless and keeps this wrapper from
- * needing to know which specific delegate it is adapting.
+ * Does NOT write {@link AutomationToolInvocationContext#TOOL_CONTEXT_SOURCE_ORDINAL_KEY}. It used to, unconditionally,
+ * for every delegate wrapped here — but the only delegate that ever read it, {@code asset_file_agent}, was dissolved
+ * (ticket 732, CRUD-delegate-unwind Task 4) in favour of flat asset-file tools registered through
+ * {@link WorkspaceScopedFlatToolCallback}, which now owns that write. No delegate left on this surface reads the key,
+ * so writing it here would be dead weight.
  * </p>
  *
  * <p>
- * Applies to both automation-owned subagent delegates ({@link SubAgentToolCallback}) and the copilot-domain delegates
- * ({@code data_table_agent}, {@code buildWorkflow}, …). Delegates must declare an input schema of exactly
- * {@code {"request": string}}: this wrapper re-serializes the delegate input as {@code {"request": ...}} and drops any
- * other field. Every delegate on this surface satisfies that today.
+ * Applies to the copilot-domain delegates ({@code ai_agent_agent}, {@code buildWorkflow}, …). It used to also wrap
+ * automation-owned delegates built on {@code SubAgentToolCallback} (mcp_agent, task_agent, project_deployment_agent,
+ * api_collection_agent), but all four were dissolved (ticket 732, CRUD-delegate unwind) and
+ * {@code SubAgentToolCallback} was removed as unreachable along with them (Task 9b). Delegates must declare an input
+ * schema of exactly {@code {"request": string}}: this wrapper re-serializes the delegate input as
+ * {@code {"request": ...}} and drops any other field. Every delegate on this surface satisfies that today.
  * </p>
  *
  * <p>
@@ -181,13 +184,6 @@ public class WorkspaceScopedSubAgentToolCallback implements ToolCallback {
 
             forwardedContext.put(AutomationToolInvocationContext.TOOL_CONTEXT_WORKSPACE_ID_KEY, workspaceId);
             forwardedContext.put(AutomationToolInvocationContext.TOOL_CONTEXT_ENVIRONMENT_ID_KEY, environmentOrdinal);
-
-            // A missing sourceOrdinal only matters to the asset-file create tools (createAssetFile,
-            // createBinaryAssetFile, createAssetFileFromUrl); every other delegate on this surface ignores the
-            // key, so writing it unconditionally is harmless and keeps this wrapper delegate-agnostic.
-            forwardedContext.put(
-                AutomationToolInvocationContext.TOOL_CONTEXT_SOURCE_ORDINAL_KEY,
-                AutomationToolInvocationContext.SOURCE_ORDINAL_FILES);
 
             // Two workspace-id key families exist: automation/asset-file tools read
             // AutomationToolInvocationContext's key, while the data-table, knowledge-base and

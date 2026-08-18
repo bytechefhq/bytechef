@@ -22,7 +22,7 @@ import static org.mockito.Mockito.mock;
 import com.agui.core.exception.AGUIException;
 import com.bytechef.ai.copilot.agent.SliceSpringAIAgent;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
-import com.bytechef.automation.ai.tool.ProjectDeploymentToolCallbacksFactory;
+import com.bytechef.automation.ai.tool.DeploymentToolCallbacksFactory;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import java.lang.reflect.Field;
 import java.util.List;
@@ -42,24 +42,24 @@ final class ProjectDeploymentAgentConfigurationTest {
 
     private final SecurityContextRehydrator securityContextRehydrator = mock(SecurityContextRehydrator.class);
 
-    private final ProjectDeploymentToolCallbacksFactory projectDeploymentToolCallbacksFactory =
-        new ProjectDeploymentToolCallbacksFactory(mock(ProjectDeploymentFacade.class));
+    private final DeploymentToolCallbacksFactory deploymentToolCallbacksFactory =
+        new DeploymentToolCallbacksFactory(mock(ProjectDeploymentFacade.class));
 
     @Test
     void testAskAgentUsesReadToolsAndBuildAgentUsesWriteTools() throws AGUIException {
         SliceSpringAIAgent askAgent = configuration.projectDeploymentAskSpringAIAgent(
-            mock(ChatMemory.class), mock(ChatModel.class), projectDeploymentToolCallbacksFactory,
+            mock(ChatMemory.class), mock(ChatModel.class), deploymentToolCallbacksFactory,
             securityContextRehydrator, emptyProvider());
 
         SliceSpringAIAgent buildAgent = configuration.projectDeploymentBuildSpringAIAgent(
-            mock(ChatMemory.class), mock(ChatModel.class), projectDeploymentToolCallbacksFactory,
+            mock(ChatMemory.class), mock(ChatModel.class), deploymentToolCallbacksFactory,
             securityContextRehydrator, emptyProvider());
 
         assertThat(askAgent.getAgentId()).isEqualTo("project_deployment_ask");
         assertThat(buildAgent.getAgentId()).isEqualTo("project_deployment_build");
 
         List<String> buildToolNames = toolNames(
-            configuration.buildToolCallbacks(securityContextRehydrator, projectDeploymentToolCallbacksFactory));
+            configuration.buildToolCallbacks(securityContextRehydrator, deploymentToolCallbacksFactory));
 
         assertThat(buildToolNames).contains(
             "listProjectDeployments", "createProjectDeployment", "updateProjectDeployment",
@@ -69,7 +69,7 @@ final class ProjectDeploymentAgentConfigurationTest {
     @Test
     void testAskAgentToolsAreReadOnly() {
         List<String> askToolNames = toolNames(
-            configuration.askToolCallbacks(securityContextRehydrator, projectDeploymentToolCallbacksFactory));
+            configuration.askToolCallbacks(securityContextRehydrator, deploymentToolCallbacksFactory));
 
         assertThat(askToolNames).containsExactly("listProjectDeployments");
         assertThat(askToolNames).doesNotContain(

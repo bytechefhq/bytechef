@@ -13,10 +13,14 @@ import static org.mockito.Mockito.mock;
 import com.agui.core.exception.AGUIException;
 import com.bytechef.ai.copilot.agent.SliceSpringAIAgent;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
+import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
+import com.bytechef.automation.configuration.service.WorkspaceService;
 import com.bytechef.ee.automation.ai.tool.ApiCollectionToolCallbacksFactory;
 import com.bytechef.ee.automation.apiplatform.configuration.facade.ApiCollectionFacade;
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
@@ -64,6 +68,44 @@ final class ApiCollectionAgentConfigurationTest {
             configuration.askToolCallbacks(securityContextRehydrator, apiCollectionToolCallbacksFactory));
 
         assertThat(askToolNames).containsExactly("listApiCollections");
+    }
+
+    @Test
+    void testMcpContributorRegistersAllThreeToolsFlat() {
+        McpServerToolCallbackContributor contributor = configuration.apiCollectionFlatCrudMcpContributor(
+            apiCollectionToolCallbacksFactory, mock(WorkspaceService.class));
+
+        List<String> toolNames = toolNames(contributor.getToolCallbacks());
+
+        assertThat(toolNames).containsExactlyInAnyOrder(
+            "listApiCollections", "createApiCollection", "cloneApiCollection");
+    }
+
+    @Test
+    void testMcpContributorOnlyWrapsTheWorkspaceScopedListTool() {
+        McpServerToolCallbackContributor contributor = configuration.apiCollectionFlatCrudMcpContributor(
+            apiCollectionToolCallbacksFactory, mock(WorkspaceService.class));
+
+        Map<String, ToolCallback> toolCallbacksByName = contributor.getToolCallbacks()
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    toolCallback -> toolCallback.getToolDefinition()
+                        .name(),
+                    toolCallback -> toolCallback));
+
+        assertThat(
+            toolCallbacksByName.get("listApiCollections")
+                .getToolDefinition()
+                .inputSchema()).contains("workspaceId");
+        assertThat(
+            toolCallbacksByName.get("createApiCollection")
+                .getToolDefinition()
+                .inputSchema()).doesNotContain("workspaceId");
+        assertThat(
+            toolCallbacksByName.get("cloneApiCollection")
+                .getToolDefinition()
+                .inputSchema()).doesNotContain("workspaceId");
     }
 
     private static ApiCollectionAgentConfiguration newConfiguration() {

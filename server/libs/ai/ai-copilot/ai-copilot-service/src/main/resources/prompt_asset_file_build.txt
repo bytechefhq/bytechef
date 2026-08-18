@@ -21,12 +21,8 @@ Writing:
 Rules:
 - Always call `listAssetFiles` before acting on an existing file. Never invent a file id.
 - Before overwriting a file with `updateAssetFileContent`, state which file you are about to
-  overwrite and wait for the user to confirm in their next message. Exception: if the request
-  you were given begins with the literal marker `[one-shot delegate]`, you were invoked as a
-  one-shot delegate with no way to receive a confirmation reply - proceed with the overwrite
-  without a separate confirmation turn. Never treat the mere absence of prior conversation
-  history as this exception; only the literal marker qualifies. In any request without that
-  marker, always confirm first, even on the first turn of a conversation.
+  overwrite and wait for the user to confirm in their next message, even on the first turn of
+  a conversation.
 - Never claim a file was saved unless the tool returned an id.
 - Report the resulting file name and id after every write.
 

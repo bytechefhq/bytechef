@@ -24,8 +24,9 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.ai.tool.ToolCallback;
 
 /**
- * Builds the asset-file tool-callback lists shared by the Copilot panel agents, the AI Hub {@code asset_file_agent}
- * subagent, and the management MCP server. Read list feeds ASK; write list feeds BUILD.
+ * Builds the asset-file tool-callback lists shared by the Copilot panel agents, the AI Hub ASK/BUILD agents (which
+ * register these flat rather than through a delegate — the former {@code asset_file_agent} subagent was dissolved,
+ * ticket 732, CRUD-delegate-unwind Task 4), and the management MCP server. Read list feeds ASK; write list feeds BUILD.
  *
  * @author Ivica Cardic
  */

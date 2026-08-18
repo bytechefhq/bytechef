@@ -31,7 +31,6 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.tool.ToolCallback;
@@ -43,13 +42,23 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 
 /**
- * Registers the AI Agent builder Copilot panel source agents ({@code ai_agent_ask}/{@code ai_agent_build}) and the AI
- * Agent subagent {@link ChatClient} beans consumed by the ai_hub agents. Lives in CE alongside
- * {@code CopilotConfiguration} because {@link AiAgentToolCallbacksFactory} wraps the CE {@link AiAgentFacade}.
+ * Registers the AI Agent builder Copilot panel source agents ({@code ai_agent_ask}/{@code ai_agent_build}) and the
+ * {@link AiAgentToolCallbacksFactory} bean the AI Hub ASK/BUILD agents and the management MCP surface flatten the AI
+ * Agent (agent-builder) CRUD tool set from. Lives in CE alongside {@code CopilotConfiguration} because
+ * {@link AiAgentToolCallbacksFactory} wraps the CE {@link AiAgentFacade}.
  *
  * <p>
- * Gated so the beans exist when either the Copilot panel or the AI Hub surface is enabled, since both consume these
- * agents.
+ * There is no longer an {@code ai_agent_agent} subagent {@code ChatClient} pair here (ticket 732, CRUD-delegate-unwind
+ * Task 8 — the LAST delegate in the plan): the {@code aiAgentAskSubAgentChatClient}/
+ * {@code aiAgentBuildSubAgentChatClient} beans that used to back the dissolved delegate are gone along with it — see
+ * {@code AiHubConfiguration#aiAgentFlatCrudToolCallbacks}/{@code #aiAgentCatalogToolCallbacks} and
+ * {@code ToolCallbackContributorConfiguration#aiAgentFlatCrudMcpContributor}.
+ * </p>
+ *
+ * <p>
+ * Gated so the factory bean exists when either the Copilot panel or the AI Hub surface is enabled, since both consume
+ * it (the panel agents below always need it; AI Hub/MCP need it only when the corresponding flattening runs).
+ * </p>
  *
  * @author Ivica Cardic
  */
@@ -109,26 +118,6 @@ public class AiAgentAgentConfiguration {
             .toolCallbacks(
                 wrapToolCallbacks(securityContextRehydrator, aiAgentToolCallbacksFactory.writeToolCallbacks()))
             .overrideChatClientResolver(overrideChatClientResolverProvider.getIfAvailable())
-            .build();
-    }
-
-    @Bean
-    ChatClient aiAgentAskSubAgentChatClient(
-        ChatModel chatModel, AiAgentToolCallbacksFactory aiAgentToolCallbacksFactory) {
-
-        return ChatClient.builder(chatModel)
-            .defaultSystem(readPrompt(promptAiAgentAskResource))
-            .defaultToolCallbacks(aiAgentToolCallbacksFactory.readToolCallbacks())
-            .build();
-    }
-
-    @Bean
-    ChatClient aiAgentBuildSubAgentChatClient(
-        ChatModel chatModel, AiAgentToolCallbacksFactory aiAgentToolCallbacksFactory) {
-
-        return ChatClient.builder(chatModel)
-            .defaultSystem(readPrompt(promptAiAgentBuildResource))
-            .defaultToolCallbacks(aiAgentToolCallbacksFactory.writeToolCallbacks())
             .build();
     }
 

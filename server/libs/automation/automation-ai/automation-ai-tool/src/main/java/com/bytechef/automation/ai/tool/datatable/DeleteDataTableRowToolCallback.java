@@ -59,7 +59,9 @@ public class DeleteDataTableRowToolCallback implements ToolCallback {
 
     private static final String DESCRIPTION = """
         Delete a row from a data table by its id. Supply the dataTableId (from listDataTables) and
-        the rowId to delete. The row is deleted immediately. The dataTableId must belong to the
+        the rowId to delete. The row is deleted immediately and irreversibly — state exactly which
+        row you are about to remove and get the user's explicit confirmation before calling this
+        tool, unless they already confirmed this exact deletion. The dataTableId must belong to the
         current workspace.""";
 
     private static final String INPUT_SCHEMA =

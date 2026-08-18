@@ -23,13 +23,27 @@ import java.util.List;
 import org.springframework.ai.tool.ToolCallback;
 
 /**
- * Builds the project-deployment tool-callback lists shared by the Copilot deployment panel agents and the AI Hub
- * {@code project_deployment_agent} subagent. Read list feeds ASK; write list feeds BUILD.
+ * Builds the project-deployment tool-callback lists shared by the Copilot deployment panel agents
+ * ({@code deployment_ask}/{@code deployment_build} in {@code DeploymentAgentConfiguration},
+ * {@code project_deployment_ask}/{@code project_deployment_build} in {@code ProjectDeploymentAgentConfiguration}), the
+ * AI Hub ASK/BUILD agents, and the management MCP server. Read list feeds ASK; write list feeds BUILD (and the MCP
+ * surface, which has no ASK/BUILD split of its own).
  *
  * <p>
- * The write list is the project_deployment_agent's tool set verbatim — the subagent has no ASK/BUILD split of its own,
- * so it consumes {@link #writeToolCallbacks()} directly. Keeping both surfaces on one factory is what stops a tool
- * added for the hub from silently missing on the panel.
+ * Formerly also backed the {@code project_deployment_agent} delegate ({@code ProjectDeploymentSubAgentConfiguration},
+ * which built its own tool list from this same factory) — dissolved ticket 732, CRUD-delegate unwind Task 3, with its
+ * seven tools registered flat directly from {@link #readToolCallbacks()}/{@link #writeToolCallbacks()} on
+ * {@code AiHubConfiguration} and a new MCP contributor in {@code ToolCallbackContributorConfiguration}
+ * (ai-copilot-service). Keeping every surface on one factory is what stops a tool added for one from silently missing
+ * on another.
+ * </p>
+ *
+ * <p>
+ * A sibling factory, {@code ProjectDeploymentToolCallbacksFactory}, used to build the SAME seven tools independently
+ * for the {@code project_deployment_ask}/{@code project_deployment_build} Copilot panel agents alone — a pre-existing
+ * phase-3 duplication. Folded into this factory (ticket 732, CRUD-delegate-unwind plan, Task 9): the twin is deleted
+ * and {@code ProjectDeploymentAgentConfiguration} now consumes this bean directly, so every surface (both panel pairs,
+ * AI Hub, and the management MCP server) shares one factory.
  * </p>
  *
  * @author Ivica Cardic

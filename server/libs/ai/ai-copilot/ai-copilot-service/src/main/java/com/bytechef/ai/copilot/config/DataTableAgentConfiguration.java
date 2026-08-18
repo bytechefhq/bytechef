@@ -34,7 +34,6 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.tool.ToolCallback;
@@ -46,15 +45,16 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 
 /**
- * Registers the Data Table Copilot panel source agents ({@code data_table_ask}/{@code data_table_build}) and the Data
- * Table subagent {@link ChatClient} beans consumed by the ai_hub agents and the management MCP server. Lives in CE
- * alongside {@code CopilotConfiguration} because {@link DataTableToolCallbacksFactory} and the data-table
- * services/facades it wraps are CE; the optional {@code ToolArtifactRecorder} hook is a CE SPI that the EE AI Hub
- * recorder plugs into when present.
+ * Registers the Data Table Copilot panel source agents ({@code data_table_ask}/{@code data_table_build}) and the shared
+ * {@link DataTableToolCallbacksFactory} bean the ai_hub agents and the management MCP server register flat (ticket 732,
+ * CRUD-delegate-unwind Task 5 — the former {@code data_table_agent} subagent, and the two {@code ChatClient} beans that
+ * used to back it, were dissolved). Lives in CE alongside {@code CopilotConfiguration} because
+ * {@link DataTableToolCallbacksFactory} and the data-table services/facades it wraps are CE; the optional
+ * {@code ToolArtifactRecorder} hook is a CE SPI that the EE AI Hub recorder plugs into when present.
  *
  * <p>
- * Gated so the beans exist when either the Copilot panel or the AI Hub surface is enabled, since both consume these
- * agents.
+ * Gated so the beans exist when either the Copilot panel or the AI Hub surface is enabled, since both consume the panel
+ * agents and/or the factory.
  *
  * @author Ivica Cardic
  */
@@ -120,26 +120,6 @@ public class DataTableAgentConfiguration {
             .toolCallbacks(
                 wrapToolCallbacks(securityContextRehydrator, dataTableToolCallbacksFactory.writeToolCallbacks()))
             .overrideChatClientResolver(overrideChatClientResolverProvider.getIfAvailable())
-            .build();
-    }
-
-    @Bean
-    ChatClient dataTableAskSubAgentChatClient(
-        ChatModel chatModel, DataTableToolCallbacksFactory dataTableToolCallbacksFactory) {
-
-        return ChatClient.builder(chatModel)
-            .defaultSystem(readPrompt(promptDataTableAskResource))
-            .defaultToolCallbacks(dataTableToolCallbacksFactory.readToolCallbacks())
-            .build();
-    }
-
-    @Bean
-    ChatClient dataTableBuildSubAgentChatClient(
-        ChatModel chatModel, DataTableToolCallbacksFactory dataTableToolCallbacksFactory) {
-
-        return ChatClient.builder(chatModel)
-            .defaultSystem(readPrompt(promptDataTableBuildResource))
-            .defaultToolCallbacks(dataTableToolCallbacksFactory.writeToolCallbacks())
             .build();
     }
 

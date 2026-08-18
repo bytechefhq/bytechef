@@ -13,6 +13,15 @@ import com.bytechef.ai.agent.tool.AgentType;
  * The AI-hub-owned agent types: the ai_hub chat flow (with its ASK/BUILD variants and a coarse fallback) and the AI-hub
  * subagents invoked as tools.
  *
+ * <p>
+ * The automation-owned counterpart of this enum, {@code AutomationSubAgentType} — which held {@code mcp_agent}, then
+ * {@code api_collection_agent}, then {@code project_deployment_agent} as they were each dissolved in turn — was deleted
+ * outright once {@code project_deployment_agent} (its last value, ticket 732, Task 3) was dissolved too. Its removal
+ * means {@code AgentTypeRegistry.keys()} no longer reconstructs those specialists' session keys, so any rows created
+ * under the old keys before this change are orphaned rather than migrated (bounded-replay caches, not user data); see
+ * {@code AiHubConfiguration#wrapDelegate}'s javadoc for that family's full history.
+ * </p>
+ *
  * @version ee
  *
  * @author Ivica Cardic

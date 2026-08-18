@@ -18,9 +18,11 @@ import org.springframework.ai.tool.ToolCallback;
  * {@code api_collection_build}). Read list feeds ASK; write list feeds BUILD.
  *
  * <p>
- * This factory is additive: {@link ApiCollectionSubAgentConfiguration}'s existing {@code apiCollectionAgentChatClient}
- * bean keeps constructing its own tool list independently, since it backs the {@code api_collection_agent} subagent
- * consumed by AI Hub and the management MCP server and must not change behaviour.
+ * This factory is now also the sole source for the AI Hub ASK/BUILD agents (via
+ * {@code AiHubConfiguration#apiCollectionFlatCrudToolCallbacks}) and the management MCP server (via
+ * {@code ApiCollectionAgentConfiguration#apiCollectionFlatCrudMcpContributor}). The former {@code api_collection_agent}
+ * delegate (dissolved ticket 732, Task 2 of the CRUD-delegate unwind), which used to construct its own independent tool
+ * list wrapping the same three {@link ToolCallback} classes, is gone — this factory is no longer merely additive to it.
  * </p>
  *
  * @version ee

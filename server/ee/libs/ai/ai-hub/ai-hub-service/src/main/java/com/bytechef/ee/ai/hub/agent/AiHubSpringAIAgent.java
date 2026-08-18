@@ -71,10 +71,10 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
             ## Additional Rules
 
             - The assistant must not produce visual representations of any kind, including diagrams, charts, UI sketches, images, or pseudo-visuals.
-            - In BUILD mode, when the user asks for a file (spec, runbook, CSV, JSON, markdown note, code file), produce the content and delegate to asset_file_agent to save it. In ASK mode, asset_file_agent cannot create or edit files — suggest switching to BUILD mode instead.
+            - In BUILD mode, when the user asks for a file (spec, runbook, CSV, JSON, markdown note, code file), produce the content and call createAssetFile to save it. In ASK mode, file creation is unavailable — suggest switching to BUILD mode instead.
             - After creating or referencing a file, always call openResourceTab({type: "FILE", fileId, name}) so the user sees it in the right-hand resource panel.
             - Before referring to existing files, call listAssetFiles to discover what is available.
-            - In BUILD mode, when editing an existing file, call getAssetFileContent first, then delegate the updated content to asset_file_agent.
+            - In BUILD mode, when editing an existing file, call getAssetFileContent first, then call updateAssetFileContent with the new content.
             """;
 
     /**
@@ -274,11 +274,10 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
     }
 
     /**
-    /**
      * The (provider, model) pair a subagent delegate should be handed. Precedence mirrors
      * {@link AiHubChatClientResolver#resolve(State)} exactly: the user's per-conversation selection
-     * ({@link AiHubStateKeys#USER_SELECTED_LLM_PROVIDER_KEY} / {@link AiHubStateKeys#USER_SELECTED_LLM_MODEL_KEY}).
-     * A half-set pair (only one of provider/model present) is a transient client artifact, not malicious input, so it
+     * ({@link AiHubStateKeys#USER_SELECTED_LLM_PROVIDER_KEY} / {@link AiHubStateKeys#USER_SELECTED_LLM_MODEL_KEY}). A
+     * half-set pair (only one of provider/model present) is a transient client artifact, not malicious input, so it
      * yields null after a single warning log rather than failing the turn — the delegate then inherits the workspace
      * default, exactly as the resolver's own fallback does.
      */
@@ -328,9 +327,9 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
      * <p>
      * Subagent one-shot delegate calls do NOT go through this method — each specialist owns its own {@link ChatClient},
      * constructed once in {@code AiHubConfiguration} and invoked directly by its hand-rolled {@code ToolCallback}
-     * ({@code SkillsAgentToolCallback}, {@code SubAgentToolCallback}, {@code ResearchToolCallback}, etc.), never
-     * through {@code resolveChatClient}. That gap is closed separately: every delegate {@link ChatClient} handed to a
-     * {@code ToolCallback} constructor in {@code AiHubConfiguration} is wrapped with
+     * ({@code SkillsAgentToolCallback}, {@code ProjectWorkflowAgentToolCallback}, {@code ResearchToolCallback}, etc.),
+     * never through {@code resolveChatClient}. That gap is closed separately: every delegate {@link ChatClient} handed
+     * to a {@code ToolCallback} constructor in {@code AiHubConfiguration} is wrapped with
      * {@code com.bytechef.ee.ai.hub.guardrails.SubAgentGuardrailedChatClient#wrap}, which attaches a fresh,
      * workspace-scoped {@link AiGuardrailsAdvisor} to the delegate's own {@code .call()}/{@code .stream()} — the
      * workspace id is resolved per call from the {@code ToolContext} the delegate forwards via
