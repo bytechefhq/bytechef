@@ -404,17 +404,59 @@ Message bodies do **not** live in `ai_hub_chat` — the row is metadata only (ti
 **session** store, keyed by `ai_hub_chat.thread_id` used verbatim as the session id: tables
 `AI_SESSION` / `AI_SESSION_EVENT` under the default jdbc backend, selected by
 `bytechef.ai.memory.provider` (`jdbc` | `redis` | `aws` | `in_memory`). It is NOT
-`SPRING_AI_CHAT_MEMORY` — that table belongs to the AI Agent component's chat-memory cluster
-elements, which the hub does not use. Sessions are all written under the constant session user id
-`"ai-hub"` (`AiHubSessionMemory.SESSION_USER_ID`), so the session store carries no authorization of
-its own: ownership is enforced on the `ai_hub_chat` row by `AiHubChatServiceImpl`, which then reaches
-the transcript by thread id.
+`SPRING_AI_CHAT_MEMORY`. **Correction (ticket 732, prior drafts of this doc got this backwards):** the
+AI Agent component's *builtin* chat-memory element (`chat-memory-builtin`'s `ChatMemory.java`) is
+built on the SAME session primitives as the hub — `SessionRepository` + `DefaultSessionService` +
+`SessionMemoryAdvisor` — not on `SPRING_AI_CHAT_MEMORY`; that table belongs only to whichever
+*non-builtin* chat-memory cluster element a workflow author picks instead. Because the builtin element
+writes to the session store under session id = the node's `conversationId`, an AI Agent using it
+already has its transcript sitting exactly where the hub reads — see "Channel-born agent
+conversations" below. Sessions are all written under the constant session user id `"ai-hub"`
+(`AiHubSessionMemory.SESSION_USER_ID`), so the session store carries no authorization of its own:
+ownership is enforced on the `ai_hub_chat` row by `AiHubChatServiceImpl`, which then reaches the
+transcript by thread id.
 
 Enum ordinals are pinned by `EnumOrdinalStabilityTest`; append new kinds at the end. The removed
 `TASK` kind held ordinal 2 and `AGENT_CHAT` took its place — legal only because the AI Hub has never
 shipped in a release tag, so no customer row carries either value. A dev database written before that
 change must be reset, not migrated: an old `AGENT_CHAT` row (3) is now out of range and throws, and an
 old `TASK` row (2) silently reads as `AGENT_CHAT` and routes to the webhook bridge.
+
+#### Channel-born agent conversations (ticket 732)
+
+When an AI Agent is reached through a channel (Slack, WhatsApp, a schedule, …) instead of the composer,
+`AiHubAgentConversationRecorder` (EE `ai-hub-service`) find-or-creates the `AGENT_CHAT` row at turn
+completion, through the CE SPI `com.bytechef.platform.ai.conversation.AgentConversationRecorder`
+(`platform-ai-api`) that the AI Agent component calls. It writes **no transcript** — the builtin
+chat-memory element already wrote both sides of the turn into the session store under
+session id = `conversationId` (see the correction above); the recorder only points a metadata row at
+that thread and refreshes `message_count`/preview through the hub's own read/patch paths.
+
+- **`workflow_execution_id` null invariant.** Channel-born `AGENT_CHAT` rows always have a null
+  `workflow_execution_id`; composer-created ones (`createAgentChatAiHubChat`) always carry one. Both
+  the recorder's `adoptChat` hijack guard and the client's `isChannelAgentChat` discriminator
+  (`chats.api.ts`) depend on this holding, combined with `aiAgentId != null` — changing either
+  production path is a two-sided change.
+- **Chat memory off ⇒ no chat, by design.** The agent's Settings card "Chat memory" toggle deletes the
+  `CHAT_MEMORY` element when switched off (`AgentSettingsCard.tsx`); with no element there is no
+  `conversationId`, no session, and the recorder is a silent no-op — not an error path.
+- **Monolith only.** The recorder verifies the claimed workspace by resolving `workflowId` through
+  `ProjectService#fetchWorkflowProject`. `RemoteProjectServiceClient.fetchWorkflowProject` is an
+  `UnsupportedOperationException` stub like its siblings (see "EE Microservice Remote Client
+  Pattern"), so on a distributed EE deployment verification throws, the recorder's fail-open path
+  swallows it, and no row is ever created for a channel-born run — fail-closed and safe, but silent,
+  the same shape as orphaned-job recovery and the error-workflow handler being monolith-only.
+- **Attribution is only partly verified.** `workspaceId`/`aiAgentId`/`creatorUserId` are read off the
+  workflow node's extension map by a component with no principal, under globally allowlisted reserved
+  keys a hand-authored definition could set to anything. `workflowId` comes from the platform's own
+  execution context instead, so the recorder resolves it back to the workflow's real project and
+  rejects a `workspaceId` mismatch — cross-workspace forgery is closed. Still open: `creatorUserId` is
+  unverified, so within one workspace a definition author can attribute a row to a colleague;
+  `aiAgentId` is unverifiable by construction, since checking it would pull in the
+  `automation-ai-agent` dependency this SPI is designed to avoid.
+- **Privacy, decided deliberately.** A channel-born chat is readable by the agent's **creator** only
+  (phase 1) — including previews of what external Slack/WhatsApp senders wrote. The external sender
+  has no ByteChef account and no consent surface of their own.
 
 #### Scheduling an agent
 
@@ -805,11 +847,20 @@ Spec: `docs/superpowers/specs/2026-08-05-draft-publish-editors-design.md`.
 A chat-first alternative to hand-built workflows: an `AiAgent` (+ `AiAgentChannel` rows for inbound
 triggers, `AiAgentElement` rows for model/tools/skills/sub-agents/RAG/chat-memory) owns a generated
 workflow definition (`AiAgentWorkflowGenerator`: triggers → `branch_in` keyed on `${__triggerName}` →
-`aiAgent/v1/streamChat` → `branch_out` keyed on `${branch_in.channel}`) living in a hidden
+`aiAgent/v1/streamChat` → `branch_out` also keyed on `${__triggerName}`, one case per channel ROW so
+two rows of one type can reply with their own row-configured values) living in a hidden
 `__AI_AGENT__<uuid>`-prefixed system project (`SystemProjects`, excluded from ordinary
-project/deployment listings by name prefix). The channel registry
-(`automation-ai-agent-service/.../channel/ChannelDefinitions.java`) is the single place to add a new
-channel. Every save regenerates the draft workflow; publishing is a separate explicit action that
+project/deployment listings by name prefix). **Channels are declared by components**: a trigger
+carries `.agentRequest(...)` and an action `.agentReply(...)` stating where the contract fields
+(`conversationId`, `message`, `attachments`) live on each end, and
+`ComponentDsl.agentChannel(name, trigger[, replyAction])` pairs them (spec
+`2026-08-17-sdk-agent-channels-design.md`). Existing operations are reused — only `slack/newMessage`
+was added, because declining an event means returning an empty collection. The generator reads the
+descriptors through `ComponentDefinitionService.getAgentChannelDefinitions()` and names no component.
+`AiAgentChannelType` keeps only `chat`/`workflowCall`/`schedule`: the first two because the facade
+pins them (auto-created, undeletable), `schedule` because it is **not a channel** — it has no reply
+and no conversation partner, stays on `schedule/v1/cron`, and is the generator's one deliberate
+branch. Every save regenerates the draft workflow; publishing is a separate explicit action that
 duplicates each workflow into a new version (never in-place). `__triggerName`
 (`JobInputConstants.TRIGGER_NAME_INPUT`) is a platform-wide reserved job input, and any
 `__`-prefixed input/node name in a hand-authored workflow is rejected by
@@ -1406,6 +1457,13 @@ Regenerate the CLI's OpenAPI clients with each project's **`generateClient`** ta
 default `openApiGenerate`, which is unconfigured and fails with "generator name must be specified".
 Generated Java sources are committed and deliberately not wired to `compileJava`; regenerate manually
 when an `openapi.yaml` changes. The surrounding `docs/`, `gradlew`, `pom.xml` scaffolding is gitignored.
+
+**Upgrading openapi-generator is a two-file change.** `platform-configuration-rest-impl` vendors one
+template, `openapi-templates/pojo.mustache`, to keep 7.24.0's unconditional `@JsonInclude(NON_NULL)`
+off the REST models (there is no generator flag for it). The copy is pinned to 7.24.0's shape, so a
+bump must re-diff it against the new generator's own `JavaSpring/pojo.mustache` and re-apply the two
+deletions. The `verifyOpenApiPojoTemplate` task in that module fails the build on a stale copy and
+prints the procedure; see `openapi-templates/README.md`.
 
 ### Resolving PR Review Comments
 - Use `gh api graphql` with `resolveReviewThread` mutation to close threads programmatically
