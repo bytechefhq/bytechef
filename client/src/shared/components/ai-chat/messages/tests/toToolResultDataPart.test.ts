@@ -214,10 +214,13 @@ describe('toToolResultDataPart', () => {
     });
 });
 
+// A specialist subagent's question arrives as the *delegate* tool's result, so the tool name is a live intelligent
+// delegate (buildWorkflow, configureMcpServer, ...) and no name branch above matches. These pin the payload-kind
+// fallback that renders it.
 describe('toToolResultDataPart payload-kind fallback', () => {
     it('renders an ask-user-question payload returned by a delegate tool', () => {
         const result = toToolResultDataPart(
-            'mcp_agent',
+            'configureMcpServer',
             JSON.stringify({
                 kind: 'ask-user-question',
                 questions: [
@@ -235,20 +238,20 @@ describe('toToolResultDataPart payload-kind fallback', () => {
     });
 
     it('ignores an unknown kind', () => {
-        const result = toToolResultDataPart('mcp_agent', JSON.stringify({kind: 'something-else'}));
+        const result = toToolResultDataPart('configureMcpServer', JSON.stringify({kind: 'something-else'}));
 
         expect(result).toBeUndefined();
     });
 
     it('ignores a non-JSON result without throwing', () => {
-        expect(() => toToolResultDataPart('mcp_agent', 'Created MCP server 7.')).not.toThrow();
-        expect(toToolResultDataPart('mcp_agent', 'Created MCP server 7.')).toBeUndefined();
+        expect(() => toToolResultDataPart('configureMcpServer', 'Created MCP server 7.')).not.toThrow();
+        expect(toToolResultDataPart('configureMcpServer', 'Created MCP server 7.')).toBeUndefined();
     });
 
     it('does not log a warning for an ordinary plain-text tool result', () => {
         const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-        toToolResultDataPart('mcp_agent', 'Created MCP server 7.');
+        toToolResultDataPart('configureMcpServer', 'Created MCP server 7.');
 
         expect(warnSpy).not.toHaveBeenCalled();
 
@@ -256,6 +259,6 @@ describe('toToolResultDataPart payload-kind fallback', () => {
     });
 
     it('returns undefined for a tool result that is a JSON array', () => {
-        expect(toToolResultDataPart('mcp_agent', '[1,2,3]')).toBeUndefined();
+        expect(toToolResultDataPart('configureMcpServer', '[1,2,3]')).toBeUndefined();
     });
 });
