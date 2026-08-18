@@ -5,7 +5,7 @@ import {twMerge} from 'tailwind-merge';
 
 // Sample questions surfaced on the empty chat states (home panel + empty thread). Each one maps to a
 // capability the BUILD agent actually has today — workflow building with a data-table target, the
-// research subagent with persistence delegated to asset_file_agent, typed data-table creation with
+// research subagent with persistence via the flat createAssetFile tool, typed data-table creation with
 // seed rows, createKnowledgeBase + addKnowledgeBaseDocument, and createAiAgent + addAiAgentChannel with
 // channelType "schedule" (which needs no connection) — so a click always lands on a runnable path
 // rather than a "not supported yet" reply.
