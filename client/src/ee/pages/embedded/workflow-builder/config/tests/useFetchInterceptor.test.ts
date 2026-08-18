@@ -115,6 +115,25 @@ describe('useFetchInterceptor (embedded)', () => {
             sessionStorage.removeItem('environment');
         });
 
+        it('adds Authorization and X-ENVIRONMENT headers for embedded public API URLs', () => {
+            sessionStorage.setItem('jwtToken', 'test-jwt');
+            sessionStorage.setItem('environment', 'production');
+
+            renderHook(() => useFetchInterceptor());
+
+            const result = hoisted.registeredHandlers!.request('/api/embedded/v1/connections', {headers: {}});
+
+            expect((result as [string, Record<string, unknown>])[1].headers).toEqual(
+                expect.objectContaining({
+                    Authorization: 'Bearer test-jwt',
+                    'X-ENVIRONMENT': 'PRODUCTION',
+                })
+            );
+
+            sessionStorage.removeItem('jwtToken');
+            sessionStorage.removeItem('environment');
+        });
+
         it('does not add auth headers for non-internal URLs', () => {
             renderHook(() => useFetchInterceptor());
 
@@ -168,6 +187,49 @@ describe('useFetchInterceptor (embedded)', () => {
             expect(hoisted.toastError).toHaveBeenCalledWith('Error', {
                 description: 'Something went wrong',
                 id: 'fetch-error-500',
+                onAutoClose: expect.any(Function),
+                onDismiss: expect.any(Function),
+            });
+        });
+
+        it('suppresses the toast for a designed 409 on the embedded public API', async () => {
+            renderHook(() => useFetchInterceptor());
+
+            // Provisioning answers a missing connection with a 409 and the wizard renders it
+            // inline; a generic red toast on top of that contradicts the step-level treatment.
+            const response = createMockResponse({
+                jsonData: {missingConnectionComponentName: 'slack'},
+                status: 409,
+                url: 'http://localhost/api/embedded/v1/automation/workflow-templates/wf-1/provision',
+            });
+
+            hoisted.registeredHandlers!.response(response);
+
+            await act(async () => {
+                await new Promise((resolve) => setTimeout(resolve, 0));
+            });
+
+            expect(hoisted.toastError).not.toHaveBeenCalled();
+        });
+
+        it('still toasts a 409 outside the embedded public API', async () => {
+            renderHook(() => useFetchInterceptor());
+
+            const response = createMockResponse({
+                jsonData: {detail: 'Conflict', title: 'Error'},
+                status: 409,
+                url: 'http://localhost/internal/api/test',
+            });
+
+            hoisted.registeredHandlers!.response(response);
+
+            await act(async () => {
+                await new Promise((resolve) => setTimeout(resolve, 0));
+            });
+
+            expect(hoisted.toastError).toHaveBeenCalledWith('Error', {
+                description: 'Conflict',
+                id: 'fetch-error-409',
                 onAutoClose: expect.any(Function),
                 onDismiss: expect.any(Function),
             });

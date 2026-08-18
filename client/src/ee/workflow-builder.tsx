@@ -1,6 +1,6 @@
 import {createRoot} from 'react-dom/client';
 
-import './styles/index.css';
+import '../styles/index.css';
 
 import {TooltipProvider} from '@/components/ui/tooltip';
 import EmbeddedWorkflowBuilderApp from '@/ee/EmbeddedWorkflowBuilderApp';

@@ -1,3 +1,5 @@
+import {HubBuilderContext} from '@/ee/pages/embedded/automation-hub/hubBuilderContext';
+import {useEmbedHandshake} from '@/ee/pages/embedded/shared/useEmbedHandshake';
 import {
     ConnectedUserProjectWorkflowKeys,
     useGetConnectedUserProjectWorkflowQuery,
@@ -21,7 +23,7 @@ import {WorkflowNodeDescriptionKeys} from '@/shared/queries/platform/workflowNod
 import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {WorkflowNodeParameterKeys} from '@/shared/queries/platform/workflowNodeParameters.queries';
 import {useQueryClient} from '@tanstack/react-query';
-import {useEffect, useRef, useState} from 'react';
+import {useContext, useEffect, useRef, useState} from 'react';
 import {PanelImperativeHandle} from 'react-resizable-panels';
 import {useParams} from 'react-router-dom';
 
@@ -29,6 +31,8 @@ export const useWorkflowBuilder = () => {
     const [initialized, setInitialized] = useState(false);
     const [includeComponents, setIncludeComponents] = useState<string[] | undefined>(undefined);
     const [sharedConnectionIds, setSharedConnectionIds] = useState<number[] | undefined>(undefined);
+
+    const hubContext = useContext(HubBuilderContext);
 
     const {setWorkflow, workflow} = useWorkflowDataStore();
     const {setShowConnectionNote} = useConnectionNoteStore();
@@ -128,6 +132,28 @@ export const useWorkflowBuilder = () => {
         }
     };
 
+    useEmbedHandshake((params) => {
+        setConnectionDialogAllowed(params.connectionDialogAllowed ?? false);
+        setIncludeComponents(params.includeComponents);
+        setSharedConnectionIds(params.sharedConnectionIds);
+        setInitialized(true);
+    }, !hubContext);
+
+    // Rendering inside the Automation Hub (`HubBuilderView`): the hub already ran the
+    // EMBED_READY/EMBED_INIT handshake, so its three settings are taken from `HubBuilderContext`
+    // instead of running a second handshake (disabled above via the `!hubContext` `enabled` flag).
+    useEffect(() => {
+        if (!hubContext) {
+            return;
+        }
+
+        setConnectionDialogAllowed(hubContext.connectionDialogAllowed);
+        setIncludeComponents(hubContext.includeComponents);
+        setSharedConnectionIds(hubContext.sharedConnectionIds);
+        setInitialized(true);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [hubContext]);
+
     useEffect(() => {
         setShowBottomPanelOpen(false);
 
@@ -135,60 +161,8 @@ export const useWorkflowBuilder = () => {
             bottomResizablePanelRef.current.resize(0);
         }
 
-        const parentOriginsRaw = (import.meta.env.VITE_EMBEDDED_PARENT_ORIGINS as string | undefined) ?? '';
-        const allowedParentOrigins = parentOriginsRaw
-            .split(',')
-            .map((origin) => origin.trim())
-            .filter(Boolean);
-
-        const isAllowedOrigin = (origin: string) =>
-            allowedParentOrigins.length === 0 || allowedParentOrigins.includes(origin);
-
-        const listener = (event: MessageEvent) => {
-            if (event.source !== window.parent || event.source === window) {
-                return;
-            }
-
-            if (!isAllowedOrigin(event.origin)) {
-                return;
-            }
-
-            if (event.data.type === 'EMBED_INIT') {
-                const sharedConnectionIds = event.data.params.sharedConnectionIds;
-                const connectionDialogAllowed = event.data.params.connectionDialogAllowed ?? false;
-                const environment = event.data.params.environment || 'PRODUCTION';
-                const includeComponents = event.data.params.includeComponents;
-                const jwtToken = event.data.params.jwtToken;
-
-                setConnectionDialogAllowed(connectionDialogAllowed);
-                setIncludeComponents(includeComponents);
-                setSharedConnectionIds(sharedConnectionIds);
-
-                if (jwtToken) {
-                    sessionStorage.setItem('jwtToken', jwtToken);
-                    sessionStorage.setItem('environment', environment);
-                }
-
-                setInitialized(true);
-            }
-        };
-
-        window.addEventListener('message', listener);
-
-        if (window.parent !== window) {
-            if (allowedParentOrigins.length === 0) {
-                window.parent.postMessage({type: 'EMBED_READY'}, '*');
-            } else {
-                for (const origin of allowedParentOrigins) {
-                    window.parent.postMessage({type: 'EMBED_READY'}, origin);
-                }
-            }
-        }
-
         return () => {
             setRightSidebarOpen(false);
-
-            window.removeEventListener('message', listener);
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);

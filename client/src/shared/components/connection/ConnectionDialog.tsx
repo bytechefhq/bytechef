@@ -80,6 +80,12 @@ interface ConnectionDialogProps {
     connection?: ConnectionI | undefined;
     connectionTagsQueryKey: QueryKey;
     connectionsQueryKey: QueryKey;
+    /**
+     * Overrides the dialog's default description ("Create your connection to connect to the chosen
+     * service"). Optional and additive -- every existing caller keeps today's description unchanged.
+     * Only rendered in the same place the default description is: while `connection?.id` is falsy.
+     */
+    description?: string;
     onClose?: () => void;
     onConnectionCreate?: (connectionId: number) => void;
     /**
@@ -88,6 +94,14 @@ interface ConnectionDialogProps {
      * writes an organization connection may show it.
      */
     showOrganizationOption?: boolean;
+    /**
+     * Overrides the dialog's default title (`Create Connection` / `Edit Connection`, derived from
+     * `connection?.id`). Optional and additive -- every existing caller keeps today's title
+     * unchanged. Exists for callers like the hub's reconnect flow, whose `connection` is deliberately
+     * `id`-less (see `HubConnectionDialog`) so the create/edit branching itself must stay untouched,
+     * yet the dialog still needs to read as something other than "Create Connection".
+     */
+    title?: string;
     triggerNode?: ReactNode;
     useCreateConnectionMutation?: (mutationProps: {
         onSuccess?: (result: number, variables: ConnectionI) => void;
@@ -106,9 +120,11 @@ const ConnectionDialog = ({
     connection,
     connectionTagsQueryKey,
     connectionsQueryKey,
+    description,
     onClose,
     onConnectionCreate,
     showOrganizationOption,
+    title,
     triggerNode,
     useCreateConnectionMutation,
     useGetConnectionTagsQuery,
@@ -494,11 +510,11 @@ const ConnectionDialog = ({
                 <Form {...form}>
                     <DialogHeader className="flex flex-row items-center justify-between space-y-0 px-6 pt-6 pb-4">
                         <div className="flex flex-col space-y-1">
-                            <DialogTitle>{`${connection?.id ? 'Edit' : 'Create'} Connection`}</DialogTitle>
+                            <DialogTitle>{title || `${connection?.id ? 'Edit' : 'Create'} Connection`}</DialogTitle>
 
                             {!connection?.id && (
                                 <DialogDescription>
-                                    Create your connection to connect to the chosen service
+                                    {description || 'Create your connection to connect to the chosen service'}
                                 </DialogDescription>
                             )}
                         </div>

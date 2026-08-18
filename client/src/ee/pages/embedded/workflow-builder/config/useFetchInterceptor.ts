@@ -57,7 +57,7 @@ export default function useFetchInterceptor() {
                     url = apiBasePath + url;
                 }
 
-                if (url.includes('/internal/') || url.includes('/graphql')) {
+                if (url.includes('/internal/') || url.includes('/graphql') || url.includes('/api/embedded/v1/')) {
                     return [
                         url,
                         {
@@ -83,6 +83,14 @@ export default function useFetchInterceptor() {
                     clearCurrentEnvironmentId();
                     clearCurrentWorkspaceId();
 
+                    return response;
+                }
+
+                // The hub's public API answers two DESIGNED 409s — a missing connection while
+                // provisioning, and a connection still in use on delete — and the view that made
+                // the call renders each one inline. That inline treatment is the contract, so a
+                // generic red toast on top of it is noise; every other status still toasts.
+                if (response.status === 409 && response.url.includes('/api/embedded/v1/')) {
                     return response;
                 }
 

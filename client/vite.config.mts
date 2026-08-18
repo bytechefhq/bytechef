@@ -21,6 +21,7 @@ export default ({mode}) => {
             manifest: true,
             rollupOptions: {
                 input: {
+                    automationHub: resolve(import.meta.dirname, 'automation-hub.html'),
                     connect: resolve(import.meta.dirname, 'connect.html'),
                     main: resolve(import.meta.dirname, 'index.html'),
                     workflowBuilder: resolve(import.meta.dirname, 'workflow-builder.html'),
@@ -63,6 +64,12 @@ export default ({mode}) => {
                 '@': path.resolve(import.meta.dirname, './src'),
                 '@bytechef/embedded': path.resolve(import.meta.dirname, '../sdks/frontend/embedded/library/src/main.ts'),
                 '@dagrejs/dagre': path.resolve(import.meta.dirname, 'node_modules/@dagrejs/dagre/dist/dagre.cjs'),
+                // monaco-editor 0.56's exports map rewrites "./*" to "./esm/vs/*", so the legacy deep specifier
+                // monaco-worker-manager uses resolves to esm/vs/esm/vs/... . Alias it to the real file.
+                'monaco-editor/esm/vs/editor/editor.worker.js': path.resolve(
+                    import.meta.dirname,
+                    'node_modules/monaco-editor/esm/vs/editor/editor.worker.js'
+                ),
             },
         },
         server: {

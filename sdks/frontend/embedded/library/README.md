@@ -26,6 +26,25 @@ Requires `react` and `react-dom` >= 19.2.3 as peer dependencies.
 
 - ✅ Code quality tools with **ESLint**, **Prettier** and **Stylelint**.
 
+## Components
+
+### AutomationHub
+
+Embeds the end-user Automation Hub in an iframe: an Automations tab (the published template catalog plus the user's own automations) and a Connections tab, with the workflow builder as an internal route reached from the Automations tab.
+
+```tsx
+<AutomationHub
+    baseUrl="https://app.bytechef.io"
+    className="h-[800px] w-full"
+    environment="PRODUCTION"
+    jwtToken={jwtToken}
+    tabs={{connections: true, newWorkflow: false}}
+    theme={{mode: 'light', primaryColor: '#2563eb', borderRadius: '0.5rem'}}
+/>
+```
+
+`theme.fontFamily` must be a font the iframe can load (system/web-safe); host-page `@font-face` does not cross the iframe boundary.
+
 ## Development
 
 ### Local Development Against a Consumer App
@@ -103,20 +122,20 @@ npm install
 
 ## 🤖 Scripts
 
-|      Script       | Function                                                                                                                               |
-| :---------------: | -------------------------------------------------------------------------------------------------------------------------------------- |
-|      `build`      | Build the `dist`, with types declarations, after checking types with TypeScript.                                                       |
-|      `lint`       | Lint the project with **Eslint**.                                                                                                      |
-|    `lint:fix`     | Lint and fix the project with **Eslint**.                                                                                              |
-|     `format`      | Check the project format with **Prettier**.                                                                                            |
-|   `format:fix`    | Format the project code with **Prettier**.                                                                                             |
-|    `stylelint`    | Lint the styles code with **Stylelint**.                                                                                               |
-|  `stylelint:fix`  | Lint and fix the styles code with **Stylelint**.                                                                                       |
-|    `storybook`    | Start a Storybook development server.                                                                                                  |
-| `build-storybook` | Build the Storybook `dist`.                                                                                                            |
-|      `test`       | Run the tests with **Vitest** using `jsdom` and starts a **Vitest UI** dev server.                                                     |
-|    `coverage`     | Generate a coverage report, with **v8**.                                                                                               |
-|      `watch`      | Rebuilds the project and watches for file changes to trigger automatic rebuilds.                                                       |
-| `publish:local`   | Publish the built package to the local Verdaccio registry (`npm run registry:start` at the workspace root).                            |
-|   `link:local`    | `npm link` the library for consumption via `npm link @bytechef/embedded`.                                                              |
-| `unlink:local`    | Remove the global `npm link` registration.                                                                                             |
+|      Script       | Function                                                                                                    |
+| :---------------: | ----------------------------------------------------------------------------------------------------------- |
+|      `build`      | Build the `dist`, with types declarations, after checking types with TypeScript.                            |
+|      `lint`       | Lint the project with **Eslint**.                                                                           |
+|    `lint:fix`     | Lint and fix the project with **Eslint**.                                                                   |
+|     `format`      | Check the project format with **Prettier**.                                                                 |
+|   `format:fix`    | Format the project code with **Prettier**.                                                                  |
+|    `stylelint`    | Lint the styles code with **Stylelint**.                                                                    |
+|  `stylelint:fix`  | Lint and fix the styles code with **Stylelint**.                                                            |
+|    `storybook`    | Start a Storybook development server.                                                                       |
+| `build-storybook` | Build the Storybook `dist`.                                                                                 |
+|      `test`       | Run the tests with **Vitest** using `jsdom` and starts a **Vitest UI** dev server.                          |
+|    `coverage`     | Generate a coverage report, with **v8**.                                                                    |
+|      `watch`      | Rebuilds the project and watches for file changes to trigger automatic rebuilds.                            |
+|  `publish:local`  | Publish the built package to the local Verdaccio registry (`npm run registry:start` at the workspace root). |
+|   `link:local`    | `npm link` the library for consumption via `npm link @bytechef/embedded`.                                   |
+|  `unlink:local`   | Remove the global `npm link` registration.                                                                  |
