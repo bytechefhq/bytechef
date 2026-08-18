@@ -672,7 +672,7 @@ export const buildAiHubSubscriber = ({
                 return;
             }
 
-            if (toolCallName === 'project_workflow_agent' || toolCallName === 'converter_agent') {
+            if (toolCallName === 'buildWorkflow' || toolCallName === 'importWorkflow') {
                 onWorkflowMutated?.();
             }
 
