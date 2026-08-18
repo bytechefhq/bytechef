@@ -108,6 +108,7 @@ class SubagentAskRelayEndToEndTest {
             });
 
         return new SubAgentToolCallback(
-            AutomationSubAgentType.MCP_AGENT, chatClient, "Manages MCP servers.", new SubagentAskChannelRelay());
+            AutomationSubAgentType.PROJECT_DEPLOYMENT_AGENT, chatClient, "Manages project deployments.",
+            new SubagentAskChannelRelay());
     }
 }

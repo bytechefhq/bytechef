@@ -22,6 +22,9 @@ import com.bytechef.ai.copilot.agent.OverrideChatClientResolver;
 import com.bytechef.ai.copilot.agent.SliceSpringAIAgent;
 import com.bytechef.ai.copilot.tool.RehydrateContextToolCallback;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
+import com.bytechef.ai.copilot.tool.catalog.IntelligentToolCatalog;
+import com.bytechef.ai.copilot.tool.catalog.IntelligentToolScope;
+import com.bytechef.ai.copilot.tool.catalog.IntelligentToolVariant;
 import com.bytechef.ai.copilot.util.Mode;
 import com.bytechef.ai.copilot.util.Source;
 import com.bytechef.atlas.configuration.service.WorkflowService;
@@ -52,15 +55,17 @@ import org.springframework.core.io.Resource;
  * alongside {@code CopilotConfiguration} because {@link McpServerToolCallbacksFactory} is CE.
  *
  * <p>
- * This configuration is purely additive: it does not touch {@code McpServerSubAgentConfiguration}'s existing
- * {@code mcpAgentChatClient} bean or {@code createMcpAgentToolCallback} factory methods, which back the
- * {@code mcp_agent} subagent consumed by AI Hub and the management MCP server. Those keep building their own tool list
+ * This configuration is purely additive: it does not touch {@code McpServerSubAgentConfiguration}'s
+ * {@code mcpServerBuildSubAgentChatClient} / {@code mcpServerBuildSubAgentChatClientFactory} beans, which back the
+ * {@code configureMcpServer} intelligent tool (the promoted {@code mcp_agent} delegate) consumed by AI Hub, the
+ * management MCP server, and — via {@link com.bytechef.ai.copilot.tool.catalog.IntelligentToolCatalog#getForPanel} —
+ * this module's own {@code mcp_server_build} agent below. Those beans build their own, narrower two-tool ChatClient
  * independently of {@link McpServerToolCallbacksFactory}.
  * </p>
  *
  * <p>
  * The MCP facades ({@link McpProjectFacade}, {@link WorkspaceMcpServerFacade}) are optional — mirroring
- * {@code McpServerSubAgentConfiguration}'s {@code mcpAgentChatClient} bean, every bean here carries
+ * {@code McpServerSubAgentConfiguration}'s own {@code @ConditionalOnBean} gate, every bean here carries
  * {@code @ConditionalOnBean({McpProjectFacade.class, WorkspaceMcpServerFacade.class})} so the whole slice skips
  * silently when the MCP feature module is absent, instead of failing application startup with an unsatisfied
  * dependency. The condition is repeated on the factory bean and both agent beans (rather than only the factory) because
@@ -133,7 +138,7 @@ public class McpServerAgentConfiguration {
     })
     SliceSpringAIAgent mcpServerBuildSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, McpServerToolCallbacksFactory mcpServerToolCallbacksFactory,
-        SecurityContextRehydrator securityContextRehydrator,
+        SecurityContextRehydrator securityContextRehydrator, IntelligentToolCatalog intelligentToolCatalog,
         ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider)
         throws AGUIException {
 
@@ -145,7 +150,8 @@ public class McpServerAgentConfiguration {
             .chatModel(chatModel)
             .systemMessage(readPrompt(promptMcpServerBuildResource))
             .state(state)
-            .toolCallbacks(buildToolCallbacks(securityContextRehydrator, mcpServerToolCallbacksFactory))
+            .toolCallbacks(
+                buildToolCallbacks(securityContextRehydrator, mcpServerToolCallbacksFactory, intelligentToolCatalog))
             .overrideChatClientResolver(overrideChatClientResolverProvider.getIfAvailable())
             .build();
     }
@@ -164,12 +170,28 @@ public class McpServerAgentConfiguration {
     /**
      * Package-private so {@code McpServerAgentConfigurationTest} can assert on the resolved tool names directly —
      * {@link SliceSpringAIAgent} does not expose its wrapped {@link ToolCallback} list.
+     *
+     * <p>
+     * Also fetches {@code configureMcpServer} from the shared {@link IntelligentToolCatalog}, scoped to
+     * {@link IntelligentToolScope#MCP_SERVER} — the panel can delegate synthesizing a server's tool mapping to that
+     * specialist instead of doing it inline with the flat CRUD tools above. Registered bare (no
+     * {@link RehydrateContextToolCallback} wrapping), matching how {@code ProjectAgentConfiguration} registers its own
+     * panel-scoped intelligent delegates.
+     * </p>
      */
     List<ToolCallback> buildToolCallbacks(
         SecurityContextRehydrator securityContextRehydrator,
-        McpServerToolCallbacksFactory mcpServerToolCallbacksFactory) {
+        McpServerToolCallbacksFactory mcpServerToolCallbacksFactory, IntelligentToolCatalog intelligentToolCatalog) {
 
-        return wrapToolCallbacks(securityContextRehydrator, mcpServerToolCallbacksFactory.writeToolCallbacks());
+        List<ToolCallback> toolCallbacks = new ArrayList<>(
+            wrapToolCallbacks(securityContextRehydrator, mcpServerToolCallbacksFactory.writeToolCallbacks()));
+
+        toolCallbacks.addAll(
+            intelligentToolCatalog.getForPanel(
+                IntelligentToolScope.MCP_SERVER, IntelligentToolVariant.BUILD, (chatClient, definition) -> chatClient,
+                (toolCallback, definition) -> toolCallback));
+
+        return toolCallbacks;
     }
 
     private List<ToolCallback> wrapToolCallbacks(

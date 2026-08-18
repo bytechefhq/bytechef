@@ -18,10 +18,18 @@ package com.bytechef.ai.copilot.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.agui.core.exception.AGUIException;
 import com.bytechef.ai.copilot.agent.SliceSpringAIAgent;
+import com.bytechef.ai.copilot.tool.ConfigureMcpServerToolCallback;
+import com.bytechef.ai.copilot.tool.CopilotAgentType;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
+import com.bytechef.ai.copilot.tool.catalog.IntelligentToolCatalog;
+import com.bytechef.ai.copilot.tool.catalog.IntelligentToolContributor;
+import com.bytechef.ai.copilot.tool.catalog.IntelligentToolDefinition;
+import com.bytechef.ai.copilot.tool.catalog.IntelligentToolScope;
+import com.bytechef.ai.copilot.tool.catalog.SimpleIntelligentToolDefinition;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.ai.mcp.facade.McpProjectFacade;
 import com.bytechef.automation.ai.mcp.facade.WorkspaceMcpServerFacade;
@@ -31,7 +39,10 @@ import com.bytechef.automation.ai.tool.McpServerToolCallbacksFactory;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.tool.ToolCallback;
@@ -60,17 +71,27 @@ final class McpServerAgentConfigurationTest {
 
         SliceSpringAIAgent buildAgent = configuration.mcpServerBuildSpringAIAgent(
             mock(ChatMemory.class), mock(ChatModel.class), mcpServerToolCallbacksFactory,
-            securityContextRehydrator, emptyProvider());
+            securityContextRehydrator, emptyCatalog(), emptyProvider());
 
         assertThat(askAgent.getAgentId()).isEqualTo("mcp_server_ask");
         assertThat(buildAgent.getAgentId()).isEqualTo("mcp_server_build");
 
         List<String> buildToolNames = toolNames(
-            configuration.buildToolCallbacks(securityContextRehydrator, mcpServerToolCallbacksFactory));
+            configuration.buildToolCallbacks(
+                securityContextRehydrator, mcpServerToolCallbacksFactory, emptyCatalog()));
 
         assertThat(buildToolNames).containsExactlyInAnyOrder(
             "listMcpServers", "listMcpProjectWorkflows", "createMcpServer", "updateMcpServer", "createMcpProject",
             "cloneMcpProject", "updateMcpProjectWorkflowParameters");
+    }
+
+    @Test
+    void testBuildToolCallbacksIncludesConfigureMcpServerFromTheCatalog() {
+        List<String> buildToolNames = toolNames(
+            configuration.buildToolCallbacks(
+                securityContextRehydrator, mcpServerToolCallbacksFactory, catalogWithConfigureMcpServer()));
+
+        assertThat(buildToolNames).contains("configureMcpServer");
     }
 
     @Test
@@ -113,5 +134,35 @@ final class McpServerAgentConfigurationTest {
     @SuppressWarnings("unchecked")
     private static <T> ObjectProvider<T> emptyProvider() {
         return mock(ObjectProvider.class);
+    }
+
+    private static IntelligentToolCatalog emptyCatalog() {
+        return catalogOf();
+    }
+
+    private static IntelligentToolCatalog catalogWithConfigureMcpServer() {
+        return catalogOf(
+            new SimpleIntelligentToolDefinition(
+                "configureMcpServer", CopilotAgentType.CONFIGURE_MCP_SERVER.key(),
+                Set.of(IntelligentToolScope.MCP_SERVER),
+                variant -> chatModel -> mock(ChatClient.class),
+                chatClientFactory -> new ConfigureMcpServerToolCallback(chatClientFactory, null)));
+    }
+
+    private static IntelligentToolCatalog catalogOf(IntelligentToolDefinition... definitions) {
+        IntelligentToolContributor contributor = () -> List.of(definitions);
+
+        return new IntelligentToolCatalog(fixedContributorProvider(contributor));
+    }
+
+    @SuppressWarnings("unchecked")
+    private static ObjectProvider<IntelligentToolContributor> fixedContributorProvider(
+        IntelligentToolContributor contributor) {
+
+        ObjectProvider<IntelligentToolContributor> objectProvider = mock(ObjectProvider.class);
+
+        when(objectProvider.orderedStream()).thenReturn(Stream.of(contributor));
+
+        return objectProvider;
     }
 }

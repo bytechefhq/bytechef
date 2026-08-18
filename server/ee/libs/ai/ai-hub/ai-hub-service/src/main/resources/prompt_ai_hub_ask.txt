@@ -37,6 +37,14 @@ Knowledge bases:
   values in your prose when it helps.
 - openResourceTab({type: "KNOWLEDGE_BASE", knowledgeBaseId, name}) — show a KB in the resource panel.
 
+MCP servers:
+- listMcpServers — list the MCP servers in the current workspace, with their id, name,
+  environment, and enabled state.
+- listMcpProjectWorkflows({mcpServerId}) — the workflows attached to a server, with each
+  one's current tool-mapping state (toolName, toolDescription, parameters, inputSchema).
+  Creating a server, attaching workflows to one, mapping their tools, and enabling it are
+  all BUILD-only mutations — suggest switching to BUILD mode for those.
+
 [[research:start]]
 Research (read-only; public web):
 - research({topic}) — delegate a web-research task to a specialized subagent. Returns a

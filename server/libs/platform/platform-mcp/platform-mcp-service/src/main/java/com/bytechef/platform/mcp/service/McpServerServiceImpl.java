@@ -22,6 +22,7 @@ import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.repository.McpServerRepository;
 import java.util.Comparator;
 import java.util.List;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,9 +36,15 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class McpServerServiceImpl implements McpServerService {
 
+    private final List<McpServerEnablementValidator> mcpServerEnablementValidators;
     private final McpServerRepository mcpServerRepository;
 
-    public McpServerServiceImpl(McpServerRepository mcpServerRepository) {
+    public McpServerServiceImpl(
+        ObjectProvider<McpServerEnablementValidator> mcpServerEnablementValidatorProvider,
+        McpServerRepository mcpServerRepository) {
+
+        this.mcpServerEnablementValidators = mcpServerEnablementValidatorProvider.orderedStream()
+            .toList();
         this.mcpServerRepository = mcpServerRepository;
     }
 
@@ -152,6 +159,12 @@ public class McpServerServiceImpl implements McpServerService {
 
         if (name != null) {
             existingMcpServer.setName(name);
+        }
+
+        if (Boolean.TRUE.equals(enabled)) {
+            for (McpServerEnablementValidator mcpServerEnablementValidator : mcpServerEnablementValidators) {
+                mcpServerEnablementValidator.validateEnablement(id);
+            }
         }
 
         if (enabled != null) {

@@ -13,7 +13,9 @@ rename, or delete workflows within a project.
   project/workflow lifecycle (create the container, name it, wire it to the right project, publish it,
   delete it), not the orchestration inside it.
 - Use the `importWorkflow` tool to import an external automation definition (n8n, Make, Zapier,
-  Workato) into a ByteChef workflow. Don't attempt to translate the external format yourself.
+  Workato) into a ByteChef workflow. It authors into an EXISTING workflow only — call
+  `createProjectWorkflow` first and pass the resulting workflow id in the request. Don't attempt to
+  translate the external format yourself.
 - `deleteProject` and `deleteWorkflow` are IRREVERSIBLE. You do not have an interactive confirmation
   tool in this mode — before calling either one, state in plain text exactly what will be deleted (the
   project or workflow name, and what it contains) and wait for the user's explicit yes in their next
@@ -56,7 +58,7 @@ Delegate tools:
 | Tool | Purpose |
 |---|---|
 | `buildWorkflow` | Delegate anything about workflow *content* — tasks, triggers, conditions, loops. |
-| `importWorkflow` | Import an n8n/Make/Zapier/Workato definition as a ByteChef workflow. |
+| `importWorkflow` | Import an n8n/Make/Zapier/Workato definition into an existing ByteChef workflow (create it with `createProjectWorkflow` first). |
 
 ## Typical Flow: "Create a workflow that does X"
 

@@ -119,6 +119,12 @@ public interface McpServerService {
     /**
      * Updates an existing MCP server with the provided input parameters.
      *
+     * <p>
+     * When {@code enabled} is {@code true}, every registered {@link McpServerEnablementValidator} is asked to validate
+     * the server first; a validator that throws prevents the server from being enabled. Disabling a server (or leaving
+     * {@code enabled} unset) never invokes the validators — taking a broken server offline must always succeed.
+     * </p>
+     *
      * @param id      the ID of the MCP server to update
      * @param name    the name of the server (can be null if not updating)
      * @param enabled whether the server is enabled (can be null if not updating)

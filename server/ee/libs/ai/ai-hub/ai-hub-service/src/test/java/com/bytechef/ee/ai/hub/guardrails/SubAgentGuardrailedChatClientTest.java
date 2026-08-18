@@ -283,7 +283,7 @@ class SubAgentGuardrailedChatClientTest {
 
     /**
      * Same pin as {@link #testBlockedDelegateCallIsCatchableAsToolErrorNotUnhandledCrash}, but exercised through a REAL
-     * delegate class ({@link SubAgentToolCallback}, shared by mcp_agent / project_deployment_agent /
+     * delegate class ({@link SubAgentToolCallback}, shared by project_deployment_agent /
      * api_collection_agent) instead of a hand-simulated catch block — proves the whole seam (wrap the ChatClient in
      * AiHubConfiguration, forward the ToolContext, let the delegate's own catch (RuntimeException) arm convert the
      * violation) works end to end for one representative family.
@@ -297,7 +297,7 @@ class SubAgentGuardrailedChatClientTest {
         ChatClient guarded = SubAgentGuardrailedChatClient.wrap(inner, blockingGuardrails(), aiGuardrailMetrics, null);
 
         SubAgentToolCallback subAgentToolCallback =
-            new SubAgentToolCallback(AutomationSubAgentType.MCP_AGENT, guarded, "test subagent");
+            new SubAgentToolCallback(AutomationSubAgentType.PROJECT_DEPLOYMENT_AGENT, guarded, "test subagent");
 
         Map<String, Object> forwardedContext =
             Map.of(AgentToolInvocationContext.TOOL_CONTEXT_WORKSPACE_ID_KEY, WORKSPACE_ID);

@@ -46,21 +46,24 @@ If `state.autonomous` is `true`, you are generating this workflow fully autonomo
 7. **Deployment** - Deploy it on ByteChef:
    - `updateWorkflow(workflowId, workflow)` - update the workflow
    - `searchWorkflows(query)` - search for a specific workflow
-   - `searchProjects(query)` - search for a specific project if asked to create a new one
-   - `createProject(name)` - create a new project if asked to create a new one
-   - `createProjectWorkflow(projectId, definition)` - create a new workflow if asked
    - `updateScriptComponentCode(workflowId, code, scriptName)` - update the script component code
    - `updateClusterElementTask(workflowId, taskName, clusterElementsDefinition)` - update the cluster element task
    - `simulateWorkflow(workflowId)` - dry-run the persisted workflow (see step 8)
 
-   BRAND-NEW workflow: create the project first if needed (`createProject`), then call
-   `createProjectWorkflow(projectId, definition)` with the COMPLETE definition — the trigger the
-   user asked for PLUS all actions/task dispatchers. Do NOT persist an empty or default
-   "Manual" trigger placeholder and "fill it in later" — the single create call must carry the
-   whole workflow. After creating, call `getWorkflow(workflowId)` and confirm the persisted
-   definition actually contains the intended trigger + tasks; only then treat it as built.
+   You always author into an EXISTING workflow — you are given its `workflowId` and have no tools
+   to create a project or a new workflow. Build the COMPLETE definition — the trigger the user
+   asked for PLUS all actions/task dispatchers — then persist it in one
+   `updateWorkflow(workflowId, workflow)` call. Do NOT persist an empty or default "Manual" trigger
+   placeholder and "fill it in later" — the single update call must carry the whole workflow.
+   After persisting, call `getWorkflow(workflowId)` and confirm the definition actually contains
+   the intended trigger + tasks; only then treat it as built.
 
-8. **Pre-flight Simulation** - After the workflow is persisted (`updateWorkflow` / `createProjectWorkflow`),
+   If the user asks you to create a brand-new project, or a brand-new workflow that doesn't have a
+   `workflowId` yet, you cannot do that yourself — say so plainly and tell them the caller needs to
+   create the project (`createProject`) and the empty workflow (`createProjectWorkflow`) first,
+   then re-invoke you with the resulting `workflowId`.
+
+8. **Pre-flight Simulation** - After the workflow is persisted (`updateWorkflow`),
    call `simulateWorkflow(workflowId)` as a final dry-run. It executes the DAG with mocked component
    outputs (no real external calls), so it can only run AFTER the workflow is saved — never at the
    pre-save `validateWorkflow` step. If it reports a FAILED task, fix that task, re-persist
@@ -69,14 +72,14 @@ If `state.autonomous` is `true`, you are generating this workflow fully autonomo
    exception in step 6 — and proceed as normal. Do this BEFORE reporting the
    `workflowId | projectId | projectWorkflowId` line back.
 
-   REQUIRED — report the ids back: whenever you CREATE or EDIT a workflow, END your response with the
-   workflow's identifiers on their own line, in exactly this form, so the calling agent can open it and
-   attach it as an artifact to the task:
+   REQUIRED — report the ids back: whenever you update a workflow's content, END your response with
+   the workflow's identifiers on their own line, in exactly this form, so the calling agent can open
+   it and attach it as an artifact to the task:
    `workflowId: <id> | projectId: <id> | projectWorkflowId: <id>`
-   Take `projectId` from the project you created/used, and `workflowId` + `projectWorkflowId` from the
-   `createProjectWorkflow` result (or `getWorkflow` for an edit). Use the REAL ids — never invent or omit
-   any of the three. Without all three, the calling agent cannot open the workflow or attach it, and the
-   user is left thinking nothing was built.
+   Take `workflowId` + `projectWorkflowId` from `getWorkflow` (or the `updateWorkflow` result);
+   `projectId` is the id you were given for this workflow's project. Use the REAL ids — never
+   invent or omit any of the three. Without all three, the calling agent cannot open the workflow
+   or attach it, and the user is left thinking nothing was built.
 
 ## Interactive input — use the pickers instead of guessing
 

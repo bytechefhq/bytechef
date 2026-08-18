@@ -20,56 +20,88 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.mockito.Mockito.mock;
 
+import com.bytechef.ai.copilot.tool.ConfigureMcpServerToolCallback;
+import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.automation.ai.mcp.facade.McpProjectFacade;
-import com.bytechef.automation.ai.mcp.facade.WorkspaceMcpServerFacade;
 import com.bytechef.automation.ai.mcp.service.McpProjectService;
 import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
-import java.nio.charset.StandardCharsets;
+import java.lang.reflect.Field;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.tool.ToolCallback;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
+import org.springframework.core.io.ClassPathResource;
 
 /**
- *
  * @author Ivica Cardic
  */
-class McpServerSubAgentConfigurationTest {
+final class McpServerSubAgentConfigurationTest {
 
-    private final McpServerSubAgentConfiguration mcpServerSubAgentConfiguration = new McpServerSubAgentConfiguration();
+    private final McpServerSubAgentConfiguration configuration = newConfiguration();
 
     @Test
-    void testMcpAgentChatClientIsBuilt() {
-        Resource promptResource = new ByteArrayResource(
-            "You are the mcp_agent subagent.".getBytes(StandardCharsets.UTF_8), "test prompt_mcp_agent.txt");
-
+    void testMcpServerBuildSubAgentChatClientIsBuilt() {
         assertThatNoException().isThrownBy(
-            () -> mcpServerSubAgentConfiguration.mcpAgentChatClient(
-                mock(ChatModel.class), mock(McpProjectFacade.class), mock(McpProjectService.class),
-                mock(McpProjectWorkflowService.class), mock(ProjectDeploymentWorkflowService.class),
-                mock(WorkflowService.class), mock(WorkspaceMcpServerFacade.class), promptResource));
+            () -> configuration.mcpServerBuildSubAgentChatClient(
+                mock(ChatModel.class), mock(McpProjectService.class), mock(McpProjectWorkflowService.class),
+                mock(ProjectDeploymentWorkflowService.class), mock(WorkflowService.class)));
     }
 
     @Test
-    void testMcpAgentToolCallbackIsNamedCorrectly() {
-        ToolCallback toolCallback = McpServerSubAgentConfiguration.createMcpAgentToolCallback(mock(ChatClient.class));
+    void testFactoryReturnsFixedClientWhenNoChatModelSupplied() {
+        ChatClient fixedChatClient = mock(ChatClient.class);
 
-        assertThat(toolCallback.getToolDefinition()
-            .name()).isEqualTo("mcp_agent");
+        IntelligentToolChatClientFactory factory = configuration.mcpServerBuildSubAgentChatClientFactory(
+            fixedChatClient, mock(McpProjectService.class), mock(McpProjectWorkflowService.class),
+            mock(ProjectDeploymentWorkflowService.class), mock(WorkflowService.class));
+
+        assertThat(factory.get(null)).isSameAs(fixedChatClient);
     }
 
     @Test
-    void testMcpAgentToolCallbackDescriptionMentionsFromAi() {
-        ToolCallback toolCallback = McpServerSubAgentConfiguration.createMcpAgentToolCallback(mock(ChatClient.class));
+    void testFactoryRebuildsClientWhenChatModelSupplied() {
+        ChatClient fixedChatClient = mock(ChatClient.class);
+
+        IntelligentToolChatClientFactory factory = configuration.mcpServerBuildSubAgentChatClientFactory(
+            fixedChatClient, mock(McpProjectService.class), mock(McpProjectWorkflowService.class),
+            mock(ProjectDeploymentWorkflowService.class), mock(WorkflowService.class));
+
+        ChatClient rebuilt = factory.get(mock(ChatModel.class));
+
+        assertThat(rebuilt).isNotNull()
+            .isNotSameAs(fixedChatClient);
+    }
+
+    @Test
+    void testConfigureMcpServerToolCallbackDescriptionMentionsFromAi() {
+        ToolCallback toolCallback = new ConfigureMcpServerToolCallback(chatModel -> mock(ChatClient.class), null);
 
         String description = toolCallback.getToolDefinition()
             .description();
 
         assertThat(description).contains("fromAi");
         assertThat(description.toLowerCase()).contains("mcp server");
+    }
+
+    private static McpServerSubAgentConfiguration newConfiguration() {
+        McpServerSubAgentConfiguration configuration = new McpServerSubAgentConfiguration();
+
+        setResourceField(configuration, "promptResource", "prompt_mcp_agent.txt");
+
+        return configuration;
+    }
+
+    private static void setResourceField(
+        McpServerSubAgentConfiguration configuration, String fieldName, String classpathResource) {
+
+        try {
+            Field field = McpServerSubAgentConfiguration.class.getDeclaredField(fieldName);
+
+            field.setAccessible(true);
+            field.set(configuration, new ClassPathResource(classpathResource));
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException(exception);
+        }
     }
 }

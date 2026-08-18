@@ -93,7 +93,8 @@ public enum CopilotAgentType implements AgentType {
     ASSET_FILE_AGENT("asset_file_agent", false),
     API_COLLECTION_ASK("api_collection_ask", false),
     API_COLLECTION_BUILD("api_collection_build", false),
-    API_COLLECTION("api_collection", true);
+    API_COLLECTION("api_collection", true),
+    CONFIGURE_MCP_SERVER("configureMcpServer", false);
 
     private final String key;
     private final boolean fallback;

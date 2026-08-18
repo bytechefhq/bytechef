@@ -16,102 +16,94 @@
 
 package com.bytechef.automation.ai.tool;
 
+import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.automation.ai.mcp.facade.McpProjectFacade;
-import com.bytechef.automation.ai.mcp.facade.WorkspaceMcpServerFacade;
 import com.bytechef.automation.ai.mcp.service.McpProjectService;
 import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 
 /**
- * Registers the {@code mcpAgentChatClient} Spring bean used by the ai_hub BUILD agent.
+ * Registers the {@code mcpServerBuildSubAgentChatClient} / {@code mcpServerBuildSubAgentChatClientFactory} Spring beans
+ * that back the {@code configureMcpServer} intelligent tool — the MCP-server tool-mapping subagent consumed by the
+ * ai_hub BUILD agent, the management MCP server, and the MCP Servers Copilot panel (see
+ * {@link McpServerIntelligentToolContributor}, which registers the {@code configureMcpServer}
+ * {@code IntelligentToolDefinition} against this factory).
  *
  * <p>
- * The mcp_agent subagent is a dedicated {@link ChatClient} pre-loaded with the MCP server lifecycle tools
- * ({@code listMcpServers}, {@code createMcpServer}, {@code updateMcpServer}, {@code createMcpProject},
- * {@code cloneMcpProject}) plus the workflow tool-mapping tools ({@code listMcpProjectWorkflows},
- * {@code updateMcpProjectWorkflowParameters}) and the {@code prompt_mcp_agent.txt} system prompt, which carries the
- * fromAi authoring playbook. Its isolated context means the parent ai_hub BUILD agent never sees the setup transcript —
- * it only receives the final status summary.
+ * The subagent carries exactly two CRUD tools — {@link ListMcpProjectWorkflowsToolCallback} and
+ * {@link UpdateMcpProjectWorkflowParametersToolCallback} — plus the {@code prompt_mcp_agent.txt} system prompt, which
+ * carries the fromAi authoring playbook narrowed to tool-mapping synthesis. It does not create, attach to, or enable
+ * servers; those remain flat CRUD tools on whichever surface calls this subagent.
  * </p>
  *
  * <p>
- * The {@link SubAgentToolCallback} is intentionally <em>not</em> a Spring bean. It is instantiated inline in the ai_hub
- * BUILD agent bean method (via {@link #createMcpAgentToolCallback}) so that it is registered only on that agent.
+ * Gated so the beans exist when either the Copilot panel or the AI Hub surface is enabled, since both consume this
+ * subagent — mirrors {@code DataTableAgentConfiguration}.
  * </p>
- *
  *
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnProperty(prefix = "bytechef.ai.hub", name = "enabled", havingValue = "true")
+@ConditionalOnExpression("${bytechef.ai.copilot.enabled:false} or ${bytechef.ai.hub.enabled:false}")
 public class McpServerSubAgentConfiguration {
 
-    static final String TOOL_DESCRIPTION = """
-        Delegate MCP server management to a specialised mcp_agent subagent. It creates and configures
-        MCP servers that expose selected workflows as MCP tools to external MCP clients (Claude, Cursor,
-        etc.): create/enable/disable servers, attach a published project version's workflows, and complete
-        each workflow's tool mapping — tool name, tool description, and fromAi(...) parameter expressions
-        that define which inputs the calling agent supplies. Use for any request like "expose this
-        workflow over MCP", "set up an MCP server", "make these workflows available to Claude", or "fix
-        the tool schema of my MCP workflow". Pass the user's request verbatim in 'request', plus any ids
-        (project, workflow, server) and decisions already resolved in this conversation. The subagent
-        returns a status summary including the server URL-relevant ids; if it reports missing decisions
-        (which project, which workflows, naming), relay them to the user with askUserQuestion and
-        re-delegate with the answers.""";
+    @Value("classpath:prompt_mcp_agent.txt")
+    private Resource promptResource;
 
     @Bean
     @ConditionalOnBean({
-        McpProjectFacade.class, WorkspaceMcpServerFacade.class
+        McpProjectService.class, McpProjectWorkflowService.class
     })
-    ChatClient mcpAgentChatClient(
-        ChatModel chatModel, McpProjectFacade mcpProjectFacade, McpProjectService mcpProjectService,
+    ChatClient mcpServerBuildSubAgentChatClient(
+        ChatModel chatModel, McpProjectService mcpProjectService,
         McpProjectWorkflowService mcpProjectWorkflowService,
-        ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
-        WorkflowService workflowService, WorkspaceMcpServerFacade workspaceMcpServerFacade,
-        @Value("classpath:prompt_mcp_agent.txt") Resource promptResource) {
+        ProjectDeploymentWorkflowService projectDeploymentWorkflowService, WorkflowService workflowService) {
 
-        String systemPrompt = readPrompt(promptResource);
+        return buildMcpServerBuildSubAgentChatClient(
+            chatModel, mcpProjectService, mcpProjectWorkflowService, projectDeploymentWorkflowService,
+            workflowService);
+    }
+
+    @Bean
+    @ConditionalOnBean({
+        McpProjectService.class, McpProjectWorkflowService.class
+    })
+    IntelligentToolChatClientFactory mcpServerBuildSubAgentChatClientFactory(
+        @Qualifier("mcpServerBuildSubAgentChatClient") ChatClient mcpServerBuildSubAgentChatClient,
+        McpProjectService mcpProjectService, McpProjectWorkflowService mcpProjectWorkflowService,
+        ProjectDeploymentWorkflowService projectDeploymentWorkflowService, WorkflowService workflowService) {
+
+        return candidateChatModel -> candidateChatModel == null
+            ? mcpServerBuildSubAgentChatClient
+            : buildMcpServerBuildSubAgentChatClient(
+                candidateChatModel, mcpProjectService, mcpProjectWorkflowService, projectDeploymentWorkflowService,
+                workflowService);
+    }
+
+    private ChatClient buildMcpServerBuildSubAgentChatClient(
+        ChatModel chatModel, McpProjectService mcpProjectService,
+        McpProjectWorkflowService mcpProjectWorkflowService,
+        ProjectDeploymentWorkflowService projectDeploymentWorkflowService, WorkflowService workflowService) {
 
         return ChatClient.builder(chatModel)
-            .defaultSystem(systemPrompt)
+            .defaultSystem(readPrompt(promptResource))
             .defaultTools(
-                new ListMcpServersToolCallback(workspaceMcpServerFacade),
-                new CreateMcpServerToolCallback(workspaceMcpServerFacade),
-                new UpdateMcpServerToolCallback(workspaceMcpServerFacade),
-                new CreateMcpProjectToolCallback(mcpProjectFacade),
-                new CloneMcpProjectToolCallback(mcpProjectFacade),
                 new ListMcpProjectWorkflowsToolCallback(
                     mcpProjectService, mcpProjectWorkflowService, projectDeploymentWorkflowService, workflowService),
                 new UpdateMcpProjectWorkflowParametersToolCallback(mcpProjectWorkflowService))
             .build();
-    }
-
-    public static SubAgentToolCallback createMcpAgentToolCallback(ChatClient mcpAgentChatClient) {
-        return createMcpAgentToolCallback(mcpAgentChatClient, null);
-    }
-
-    /**
-     * @param askRelay carries a question the specialist raised back out as this delegate's own tool result;
-     *                 {@code null} keeps the specialist's own summary as the result in every case
-     */
-    public static SubAgentToolCallback createMcpAgentToolCallback(
-        ChatClient mcpAgentChatClient, @Nullable SubAgentAskRelay askRelay) {
-
-        return new SubAgentToolCallback(
-            AutomationSubAgentType.MCP_AGENT, mcpAgentChatClient, TOOL_DESCRIPTION, askRelay);
     }
 
     private String readPrompt(Resource resource) {
@@ -121,7 +113,7 @@ public class McpServerSubAgentConfiguration {
             return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
         } catch (IOException exception) {
             throw new IllegalStateException(
-                "Failed to read mcp agent prompt resource: " + resource.getDescription(), exception);
+                "Failed to read mcp server prompt resource: " + resource.getDescription(), exception);
         }
     }
 }

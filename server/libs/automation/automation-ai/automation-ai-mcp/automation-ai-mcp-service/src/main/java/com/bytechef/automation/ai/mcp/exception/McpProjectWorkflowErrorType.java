@@ -14,16 +14,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.ai.copilot.tool.catalog;
+package com.bytechef.automation.ai.mcp.exception;
+
+import com.bytechef.automation.ai.mcp.domain.McpProjectWorkflow;
+import com.bytechef.exception.AbstractErrorType;
 
 /**
- * The Copilot panels an intelligent delegate tool may be surfaced on. The AI Hub and the management MCP surface always
- * get every definition regardless of this scope — it only governs which per-panel Copilot surfaces receive a given
- * delegate.
- *
  * @author Ivica Cardic
  */
-public enum IntelligentToolScope {
+public class McpProjectWorkflowErrorType extends AbstractErrorType {
 
-    PROJECT, MCP_SERVER
+    public static final McpProjectWorkflowErrorType INCOMPLETE_TOOL_MAPPING = new McpProjectWorkflowErrorType(100);
+
+    private McpProjectWorkflowErrorType(int errorKey) {
+        super(McpProjectWorkflow.class, errorKey);
+    }
 }

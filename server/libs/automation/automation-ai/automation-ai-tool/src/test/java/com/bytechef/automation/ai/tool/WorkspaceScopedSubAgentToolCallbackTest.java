@@ -52,7 +52,7 @@ class WorkspaceScopedSubAgentToolCallbackTest {
     @Test
     void testToolDefinitionKeepsDelegateNameAndExtendsSchema() {
         assertThat(toolCallback.getToolDefinition()
-            .name()).isEqualTo("mcp_agent");
+            .name()).isEqualTo("project_deployment_agent");
         assertThat(toolCallback.getToolDefinition()
             .inputSchema()).contains("workspaceId")
                 .contains("environment");
@@ -239,7 +239,8 @@ class WorkspaceScopedSubAgentToolCallbackTest {
         private String capturedInput;
 
         ContextCapturingDelegate() {
-            super(AutomationSubAgentType.MCP_AGENT, mock(ChatClient.class), "Manages MCP servers.");
+            super(AutomationSubAgentType.PROJECT_DEPLOYMENT_AGENT, mock(ChatClient.class),
+                "Manages project deployments.");
         }
 
         @Override

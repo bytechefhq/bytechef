@@ -83,12 +83,33 @@ public class ManagementMcpServerConfiguration {
             ByteChef management server. Two kinds of tools: ordinary tools are deterministic CRUD — call them \
             directly; intelligent tools (buildWorkflow, buildIntegrationWorkflow, importWorkflow, \
             configureClusterElement, writeScript, buildCodeWorkflow, buildCustomComponent, authorSkill, \
-            debugWorkflowExecution) run an inner AI agent and may take minutes — call them for judgment work, \
-            not for CRUD.
+            debugWorkflowExecution, configureMcpServer) run an inner AI agent and may take minutes — call them \
+            for judgment work, not for CRUD.
             To build a workflow: createProject (if needed) → createProjectWorkflow → buildWorkflow with \
-            the workflowId and a plain-language instruction. Each intelligent-tool call is independent and \
-            re-reads current state (e.g. the workflow) rather than remembering earlier calls, so iterate by \
+            the workflowId and a plain-language instruction. To import an external workflow (n8n, Make, \
+            Zapier, Workato): createProject (if needed) → createProjectWorkflow → importWorkflow with the \
+            workflowId and the source definition — it has no project/workflow-creation tools of its own. \
+            Each intelligent-tool call is independent and re-reads current state (e.g. the workflow) rather \
+            than remembering earlier calls, so iterate by \
             calling the tool again with the next instruction and restate any context it still needs.
+            To expose workflows over MCP: createMcpServer(name, environment, enabled?) — leave enabled unset \
+            or false, since a server with any unmapped attached workflow cannot be enabled — then \
+            createMcpProject(mcpServerId, projectId, projectVersion, workflowIds) to attach a published \
+            project version's workflows (the server must already exist; this tool does not create one), then \
+            configureMcpServer(mcpServerId) to synthesize each attached workflow's tool mapping (tool name, \
+            tool description, fromAi(...) input expressions), then updateMcpServer(mcpServerId, enabled=true) \
+            to bring it online. That last call FAILS with a typed error naming the still-unmapped workflows \
+            if any attached workflow lacks a toolName or a required fromAi mapping — that is the enable-guard \
+            working as intended, not a bug; complete the mapping and retry. listMcpServers resolves a \
+            user-named server to its numeric id, cloneMcpProject(mcpProjectId, targetMcpServerId) duplicates \
+            an existing MCP project's exposed workflows onto another server, and \
+            listMcpProjectWorkflows(mcpServerId) shows each attached workflow's current mapping state. \
+            configureMcpServer never creates the server, attaches workflows to it, or enables it — those are \
+            the flat tools above.
+            listMcpServers and createMcpServer additionally accept an optional workspaceId (and \
+            environment) since MCP servers are workspace-scoped: omit it when the account has exactly one \
+            workspace, otherwise retry with an explicit workspaceId from the workspace_required error's \
+            'workspaces' field.
             Most tools require workspace context: if a tool returns a workspace_required error, retry with one \
             of the workspaceId values listed in its 'workspaces' field.""";
 

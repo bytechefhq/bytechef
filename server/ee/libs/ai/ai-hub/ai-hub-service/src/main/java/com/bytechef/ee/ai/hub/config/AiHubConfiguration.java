@@ -30,7 +30,7 @@ import com.bytechef.automation.ai.tool.AutomationSubAgentType;
 import com.bytechef.automation.ai.tool.ClusterElementTools;
 import com.bytechef.automation.ai.tool.GetAssetFileContentToolCallback;
 import com.bytechef.automation.ai.tool.ListAssetFilesToolCallback;
-import com.bytechef.automation.ai.tool.McpServerSubAgentConfiguration;
+import com.bytechef.automation.ai.tool.McpServerToolCallbacksFactory;
 import com.bytechef.automation.ai.tool.ProjectDeploymentSubAgentConfiguration;
 import com.bytechef.automation.ai.tool.ProjectTools;
 import com.bytechef.automation.ai.tool.ProjectWorkflowTools;
@@ -165,15 +165,28 @@ public class AiHubConfiguration {
      * its ASK and BUILD agents, filtered with {@link IntelligentToolCatalog#getByNames} over its own name partition.
      *
      * <p>
-     * This is deliberately EIGHT of the catalog's nine names, not all nine: {@code buildIntegrationWorkflow} is an
+     * This is deliberately NINE of the catalog's ten names, not all ten: {@code buildIntegrationWorkflow} is an
      * embedded-product delegate (the embedded counterpart of {@code buildWorkflow}) that reaches only the embedded
      * management-MCP surface — the AI Hub has never registered it and its prompts do not mention it. This is the one
-     * deliberate hub/MCP parity gap; {@code IntelligentToolSurfaceParityTest} asserts it explicitly.
+     * deliberate hub/MCP parity gap; {@code IntelligentToolSurfaceParityTest} asserts it explicitly. Every name here
+     * has a {@code null} ASK {@code chatClientFactory} except the eight pre-existing ones — {@code configureMcpServer}
+     * (the promoted {@code mcp_agent} delegate) is BUILD-only, matching {@code importWorkflow}'s shape, so the catalog
+     * silently skips it on the ASK agent's own {@link #registerIntelligentToolCallbacks} call.
      * </p>
      */
     static final Set<String> INTELLIGENT_TOOL_NAMES = Set.of(
         "authorSkill", "configureClusterElement", "writeScript", "buildWorkflow",
-        "debugWorkflowExecution", "importWorkflow", "buildCustomComponent", "buildCodeWorkflow");
+        "debugWorkflowExecution", "importWorkflow", "buildCustomComponent", "buildCodeWorkflow",
+        "configureMcpServer");
+
+    /**
+     * The one tool in {@link McpServerToolCallbacksFactory#writeToolCallbacks()}'s seven-tool write leg that stays OFF
+     * both flat surfaces (ticket 732, Task 3): the tool-mapping mutation lives exclusively inside the
+     * {@code configureMcpServer} intelligent tool's inner two-tool ChatClient (see
+     * {@code McpServerSubAgentConfiguration}), so flattening it here too would duplicate the mapping capability on two
+     * paths with different judgment behind them.
+     */
+    private static final String MCP_PROJECT_WORKFLOW_PARAMETERS_TOOL_NAME = "updateMcpProjectWorkflowParameters";
 
     private final Resource promptAiHubAskResource;
     private final Resource promptAiHubAutoMemoryToolsResource;
@@ -210,6 +223,7 @@ public class AiHubConfiguration {
         ObjectProvider<ChatClient> aiAgentAskSubAgentChatClientProvider,
         @Qualifier("assetFileAskSubAgentChatClient") //
         ObjectProvider<ChatClient> assetFileAskSubAgentChatClientProvider,
+        ObjectProvider<McpServerToolCallbacksFactory> mcpServerToolCallbacksFactoryProvider,
         AiHubChatService chatService,
         AiAutoMemoryService aiHubMemoryService,
         AssetFileFacade assetFileFacade,
@@ -298,6 +312,8 @@ public class AiHubConfiguration {
         // user to switch into BUILD just to look something up. Workflow-execution lookups are now delegated to
         // the debugWorkflowExecution specialist (registered via registerCopilotSubAgentToolCallbacks).
         toolCallbacks.add(new ListAiHubChatsToolCallback(chatService));
+        // MCP server read leg (ticket 732, Task 3); see mcpServerFlatCrudToolCallbacks' javadoc.
+        toolCallbacks.addAll(mcpServerFlatCrudToolCallbacks(mcpServerToolCallbacksFactoryProvider, false));
 
         // listApiCollections is demoted to the searchable catalog (aiHubAskGlobalToolCatalog) — rare enough
         // that it should not ride in every model call.
@@ -395,6 +411,7 @@ public class AiHubConfiguration {
         ObjectProvider<ChatClient> aiAgentBuildSubAgentChatClientProvider,
         @Qualifier("assetFileBuildSubAgentChatClient") //
         ObjectProvider<ChatClient> assetFileBuildSubAgentChatClientProvider,
+        ObjectProvider<McpServerToolCallbacksFactory> mcpServerToolCallbacksFactoryProvider,
         AssetFileFacade assetFileFacade, AiHubChatArtifactService chatArtifactService,
         AiHubChatArtifactRecorder aiHubChatArtifactRecorder,
         AiHubChatService chatService, AiAutoMemoryService aiHubMemoryService,
@@ -413,7 +430,6 @@ public class AiHubConfiguration {
         SecurityContextRehydrator securityContextRehydrator,
         PropertyOptionsResolver propertyOptionsResolver,
         AiHubChatToolFacade chatToolFacade,
-        @Qualifier("mcpAgentChatClient") ObjectProvider<ChatClient> mcpAgentChatClientProvider,
         @Qualifier("projectDeploymentAgentChatClient") ObjectProvider<ChatClient> projectDeploymentAgentChatClientProvider,
         @Qualifier("apiCollectionAgentChatClient") //
         ObjectProvider<ChatClient> apiCollectionAgentChatClientProvider,
@@ -456,7 +472,7 @@ public class AiHubConfiguration {
         boolean researchToolAvailable = researchChatClientProvider.getIfAvailable() != null;
 
         registerSpecialistSubAgentToolCallbacks(
-            toolCallbacks, mcpAgentChatClientProvider, projectDeploymentAgentChatClientProvider,
+            toolCallbacks, projectDeploymentAgentChatClientProvider,
             apiCollectionAgentChatClientProvider, aiGuardrails, aiGuardrailMetrics, workspaceSystemPrompts,
             aiHubSessionMemory);
 
@@ -507,9 +523,9 @@ public class AiHubConfiguration {
             workspaceConnectionFacade, actionDefinitionService, actionDefinitionFacade, triggerDefinitionService,
             triggerDefinitionFacade, propertyOptionsResolver, aiHubToolAttachMetrics, jsonMapper);
 
-        // API-collection and MCP-server work is delegated to the api_collection_agent and mcp_agent
-        // specialists (see registerSpecialistSubAgentToolCallbacks); the ASK agent keeps its read-only
-        // listApiCollections flat registration.
+        // API-collection work is delegated to api_collection_agent; ASK keeps read-only listApiCollections.
+        // MCP-server flat CRUD (Task 3) below — see mcpServerFlatCrudToolCallbacks' javadoc.
+        toolCallbacks.addAll(mcpServerFlatCrudToolCallbacks(mcpServerToolCallbacksFactoryProvider, true));
 
         // Resource discovery — read-only and always-on. Mirrors the same registrations on the ASK agent so
         // a "list my chats" turn works identically regardless of which mode is active. Workflow-execution
@@ -696,7 +712,7 @@ public class AiHubConfiguration {
     }
 
     /**
-     * The specialists allowed to pose a question to the user. Restricted to the mcp/deployment/api-collection
+     * The specialists allowed to pose a question to the user. Restricted to the deployment/api-collection
      * specialists: each owns a prompt that is not shared with a Copilot panel agent, so the tool can be documented
      * where it is registered.
      *
@@ -710,11 +726,14 @@ public class AiHubConfiguration {
      * <p>
      * The generative one-shots (research, data_analyst, image_generator, slide_builder, converter) are absent by intent
      * rather than by blocker: they are asked to produce something, and a clarifying round trip costs more than it
-     * saves.
+     * saves. {@code configureMcpServer} (formerly the mcp/task/deployment/api-collection specialist mcp_agent, now a
+     * catalog-backed intelligent tool routed through {@link #registerIntelligentToolCallbacks} instead of this
+     * specialist registration) is absent for the same reason as the other catalog-backed intelligent tools — none of
+     * them are in this set today.
      * </p>
      */
     private static final Set<String> ASK_CAPABLE_AGENT_TYPE_KEYS = Set.of(
-        AutomationSubAgentType.MCP_AGENT.key(), AutomationSubAgentType.PROJECT_DEPLOYMENT_AGENT.key(),
+        AutomationSubAgentType.PROJECT_DEPLOYMENT_AGENT.key(),
         AutomationSubAgentType.API_COLLECTION_AGENT.key());
 
     /**
@@ -852,32 +871,28 @@ public class AiHubConfiguration {
     }
 
     /**
-     * Registers the specialist sub-agent ToolCallbacks (MCP servers, project deployments, API collections) on the
-     * supplied tool list. Each is only added when its backing ChatClient bean is present — a missing facade (feature
-     * module not on the classpath) means the specialist's ChatClient bean was not created and the registration is
-     * silently skipped. Mirrors {@link #registerSubAgentToolCallbacks}, including the
-     * {@link SubAgentGuardrailedChatClient#wrap} guardrail/workspace-prompt wrapping. This wiring covers only the AI
-     * Hub chat surface — the separate MCP-surface contributions ({@code SubAgentMcpContributorConfiguration},
+     * Registers the specialist sub-agent ToolCallbacks (project deployments, API collections) on the supplied tool
+     * list. Each is only added when its backing ChatClient bean is present — a missing facade (feature module not on
+     * the classpath) means the specialist's ChatClient bean was not created and the registration is silently skipped.
+     * Mirrors {@link #registerSubAgentToolCallbacks}, including the {@link SubAgentGuardrailedChatClient#wrap}
+     * guardrail/workspace-prompt wrapping. This wiring covers only the AI Hub chat surface — the separate MCP-surface
+     * contributions ({@code SubAgentMcpContributorConfiguration},
      * {@code ApiCollectionSubAgentMcpContributorConfiguration}) construct their own {@code SubAgentToolCallback}
      * instances directly from the same underlying {@code ChatClient} beans and are NOT wrapped here — left out of
      * scope, see the AI Guardrails spec's decisions log.
+     *
+     * <p>
+     * MCP servers no longer register here: the {@code mcp_agent} specialist was promoted into the catalog-backed
+     * {@code configureMcpServer} intelligent tool, registered instead through {@link #registerIntelligentToolCallbacks}
+     * / {@link #INTELLIGENT_TOOL_NAMES}.
+     * </p>
      */
     private static void registerSpecialistSubAgentToolCallbacks(
-        List<ToolCallback> toolCallbacks, ObjectProvider<ChatClient> mcpAgentChatClientProvider,
+        List<ToolCallback> toolCallbacks,
         ObjectProvider<ChatClient> projectDeploymentAgentChatClientProvider,
         ObjectProvider<ChatClient> apiCollectionAgentChatClientProvider, @Nullable AiGuardrails aiGuardrails,
         @Nullable AiGuardrailMetrics aiGuardrailMetrics, @Nullable WorkspaceSystemPrompts workspaceSystemPrompts,
         @Nullable AiHubSessionMemory aiHubSessionMemory) {
-
-        mcpAgentChatClientProvider.ifAvailable(
-            mcpAgentChatClient -> toolCallbacks.add(
-                new ProgressReportingToolCallback(
-                    McpServerSubAgentConfiguration.createMcpAgentToolCallback(
-                        wrapDelegate(
-                            mcpAgentChatClient, AutomationSubAgentType.MCP_AGENT.key(), aiGuardrails,
-                            aiGuardrailMetrics, workspaceSystemPrompts, aiHubSessionMemory),
-                        new SubagentAskChannelRelay()),
-                    "mcp_agent")));
 
         projectDeploymentAgentChatClientProvider.ifAvailable(
             projectDeploymentAgentChatClient -> toolCallbacks.add(
@@ -1002,6 +1017,49 @@ public class AiHubConfiguration {
             new SelectComponentPropertyOptionToolCallback(
                 actionDefinitionService, actionDefinitionFacade, triggerDefinitionService, triggerDefinitionFacade,
                 propertyOptionsResolver, aiHubToolAttachMetrics));
+    }
+
+    /**
+     * The MCP server CRUD tools flattened onto this surface (ticket 732, Task 3): {@code listMcpServers} +
+     * {@code listMcpProjectWorkflows} on both agents, plus (write-only) {@code createMcpServer},
+     * {@code updateMcpServer}, {@code createMcpProject}, {@code cloneMcpProject} on BUILD — mirroring how every other
+     * flat domain in this class splits its read/write leg between ASK and BUILD. Filters
+     * {@link McpServerToolCallbacksFactory#writeToolCallbacks()} down to exclude
+     * {@value #MCP_PROJECT_WORKFLOW_PARAMETERS_TOOL_NAME}, see that constant's javadoc. An absent factory bean (Copilot
+     * disabled, or the MCP facades not on the classpath) resolves to an empty list — the same silent-skip degrade every
+     * other Copilot-domain registration in this class already follows.
+     *
+     * <p>
+     * No context wrapping is needed here (unlike the management MCP surface's {@code WorkspaceScopedFlatToolCallback}):
+     * every tool call routed through {@link AiHubSpringAIAgent#toolContext} already carries
+     * {@link com.bytechef.automation.ai.tool.AutomationToolInvocationContext}-compatible keys — the exact family
+     * {@code listMcpServers}/{@code createMcpServer} read — for every registered pinned tool, not just MCP ones.
+     * </p>
+     *
+     * <p>
+     * Package-private for {@code AiHubConfigurationMcpServerFlatCrudToolCallbacksTest}.
+     * </p>
+     */
+    static List<ToolCallback> mcpServerFlatCrudToolCallbacks(
+        ObjectProvider<McpServerToolCallbacksFactory> mcpServerToolCallbacksFactoryProvider, boolean writable) {
+
+        McpServerToolCallbacksFactory mcpServerToolCallbacksFactory = mcpServerToolCallbacksFactoryProvider
+            .getIfAvailable();
+
+        if (mcpServerToolCallbacksFactory == null) {
+            return List.of();
+        }
+
+        if (!writable) {
+            return mcpServerToolCallbacksFactory.readToolCallbacks();
+        }
+
+        return mcpServerToolCallbacksFactory.writeToolCallbacks()
+            .stream()
+            .filter(toolCallback -> !MCP_PROJECT_WORKFLOW_PARAMETERS_TOOL_NAME.equals(
+                toolCallback.getToolDefinition()
+                    .name()))
+            .toList();
     }
 
     private String getSystemPrompt(Resource systemPromptResource, boolean researchToolAvailable) {

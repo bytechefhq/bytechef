@@ -39,17 +39,27 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Surface-parity guard for the intelligent tool catalog (ticket 732). The catalog is fed by three
- * {@link IntelligentToolContributor} beans — CE {@code CopilotIntelligentToolContributor}, EE automation
- * {@code AutomationIntelligentToolContributor}, and EE embedded {@code EmbeddedIntelligentToolContributor} — each
- * package-private in its own module, reached here by reflection so the test can assemble the real production
- * definitions without those modules exposing their configuration classes.
+ * Surface-parity guard for the intelligent tool catalog (ticket 732). The catalog is fed by four
+ * {@link IntelligentToolContributor} beans — CE {@code CopilotIntelligentToolContributor}, CE automation
+ * {@code McpServerIntelligentToolContributor}, EE automation {@code AutomationIntelligentToolContributor}, and EE
+ * embedded {@code EmbeddedIntelligentToolContributor} — each package-private in its own module, reached here by
+ * reflection so the test can assemble the real production definitions without those modules exposing their
+ * configuration classes.
+ *
+ * <p>
+ * {@code McpServerIntelligentToolContributor} lives in CE {@code automation-ai-tool} rather than the EE
+ * {@code AutomationIntelligentToolContributor} (automation-ai-copilot) despite both being "automation-owned":
+ * {@code configureMcpServer}'s {@code ChatClient} closes over CE-only MCP services, and MCP servers are a CE capability
+ * available whenever either the Copilot panel or the AI Hub surface is enabled — unlike
+ * {@code buildCustomComponent}/{@code buildCodeWorkflow}, which are genuinely EE-gated.
+ * </p>
  *
  * <p>
  * Every surface that narrows the catalog with {@link IntelligentToolCatalog#getByNames} declares its owned name set as
  * a {@code public static final Set<String>} constant: the three management-MCP contributor configs
- * ({@link ToolCallbackContributorConfiguration#INTELLIGENT_TOOL_NAMES},
- * {@link AutomationCopilotMcpContributorConfiguration#INTELLIGENT_TOOL_NAMES},
+ * ({@link ToolCallbackContributorConfiguration#INTELLIGENT_TOOL_NAMES} — which also claims {@code configureMcpServer}
+ * even though that definition is contributed from a different module, since {@code getByNames} filters the whole
+ * catalog by name regardless of origin — {@link AutomationCopilotMcpContributorConfiguration#INTELLIGENT_TOOL_NAMES},
  * {@link EmbeddedCopilotMcpContributorConfiguration#INTELLIGENT_TOOL_NAMES}) and the AI Hub
  * ({@link AiHubConfiguration#INTELLIGENT_TOOL_NAMES}). This test is what makes the partition assertable rather than
  * merely narrated in Javadoc.
@@ -63,7 +73,8 @@ class IntelligentToolSurfaceParityTest {
 
     private static final Set<String> EXPECTED_CATALOG_NAMES = Set.of(
         "buildWorkflow", "importWorkflow", "configureClusterElement", "writeScript", "authorSkill",
-        "debugWorkflowExecution", "buildCustomComponent", "buildCodeWorkflow", "buildIntegrationWorkflow");
+        "debugWorkflowExecution", "buildCustomComponent", "buildCodeWorkflow", "buildIntegrationWorkflow",
+        "configureMcpServer");
 
     private static final String COPILOT_CONTRIBUTOR_CLASS_NAME =
         "com.bytechef.ai.copilot.config.CopilotIntelligentToolContributor";
@@ -99,14 +110,22 @@ class IntelligentToolSurfaceParityTest {
     private static final Set<String> EMBEDDED_CONTRIBUTOR_EXPECTED_QUALIFIERS =
         Set.of("workflowEditorEmbeddedBuildSubAgentChatClientFactory");
 
+    private static final String AUTOMATION_TOOL_CONTRIBUTOR_CLASS_NAME =
+        "com.bytechef.automation.ai.tool.McpServerIntelligentToolContributor";
+    private static final String AUTOMATION_TOOL_CONTRIBUTOR_METHOD_NAME = "mcpServerIntelligentToolContributor";
+
+    // Verified against the @Bean methods in McpServerSubAgentConfiguration (automation-ai-tool).
+    private static final Set<String> AUTOMATION_TOOL_CONTRIBUTOR_EXPECTED_QUALIFIERS =
+        Set.of("mcpServerBuildSubAgentChatClientFactory");
+
     @Test
-    void testCatalogContributesExactlyTheNineExpectedNames() throws ReflectiveOperationException {
+    void testCatalogContributesExactlyTheTenExpectedNames() throws ReflectiveOperationException {
         IntelligentToolCatalog catalog = buildCatalog();
 
         List<String> catalogNames = catalog.getNames();
 
         assertThat(new HashSet<>(catalogNames))
-            .as("catalog.getNames() vs the nine expected intelligent tool names")
+            .as("catalog.getNames() vs the ten expected intelligent tool names")
             .isEqualTo(EXPECTED_CATALOG_NAMES);
         assertThat(catalogNames)
             .as("catalog.getNames() must not contain a duplicate registration")
@@ -162,7 +181,7 @@ class IntelligentToolSurfaceParityTest {
         // surface today. The AI Hub has never registered it and its prompts do not mention it. Later narrowing
         // work closes this gap; until then this assertion pins it as intentional rather than an oversight.
         assertThat(AiHubConfiguration.INTELLIGENT_TOOL_NAMES)
-            .as("AiHubConfiguration.INTELLIGENT_TOOL_NAMES vs (the nine catalog names - buildIntegrationWorkflow)")
+            .as("AiHubConfiguration.INTELLIGENT_TOOL_NAMES vs (the ten catalog names - buildIntegrationWorkflow)")
             .isEqualTo(expectedHubNames);
     }
 
@@ -191,6 +210,8 @@ class IntelligentToolSurfaceParityTest {
         assertFactoryMethodIsASpringBeanMethod(COPILOT_CONTRIBUTOR_CLASS_NAME, COPILOT_CONTRIBUTOR_METHOD_NAME);
         assertFactoryMethodIsASpringBeanMethod(AUTOMATION_CONTRIBUTOR_CLASS_NAME, AUTOMATION_CONTRIBUTOR_METHOD_NAME);
         assertFactoryMethodIsASpringBeanMethod(EMBEDDED_CONTRIBUTOR_CLASS_NAME, EMBEDDED_CONTRIBUTOR_METHOD_NAME);
+        assertFactoryMethodIsASpringBeanMethod(
+            AUTOMATION_TOOL_CONTRIBUTOR_CLASS_NAME, AUTOMATION_TOOL_CONTRIBUTOR_METHOD_NAME);
     }
 
     @Test
@@ -211,6 +232,9 @@ class IntelligentToolSurfaceParityTest {
         assertFactoryMethodQualifiers(
             EMBEDDED_CONTRIBUTOR_CLASS_NAME, EMBEDDED_CONTRIBUTOR_METHOD_NAME,
             EMBEDDED_CONTRIBUTOR_EXPECTED_QUALIFIERS);
+        assertFactoryMethodQualifiers(
+            AUTOMATION_TOOL_CONTRIBUTOR_CLASS_NAME, AUTOMATION_TOOL_CONTRIBUTOR_METHOD_NAME,
+            AUTOMATION_TOOL_CONTRIBUTOR_EXPECTED_QUALIFIERS);
     }
 
     @Test
@@ -238,11 +262,11 @@ class IntelligentToolSurfaceParityTest {
     void testEveryContributedDefinitionChatClientFactoryHonoursTheCallerPickedChatModel()
         throws ReflectiveOperationException {
 
-        // Ticket 732: nine intelligent delegates now resolve a per-invocation ChatModel (the one the caller picked in
+        // Ticket 732: ten intelligent delegates now resolve a per-invocation ChatModel (the one the caller picked in
         // the AI Hub composer or a Copilot panel toolbar) instead of always using the contributor's default client.
         // Task 5's own test only proved this for the six CE Copilot definitions; this is the one place that sees all
-        // nine tools across all three contributors (CE Copilot, EE automation, EE embedded), so it is the only test
-        // that can catch a definition wired to ignore the override.
+        // ten tools across all four contributors (CE Copilot, EE automation, EE embedded, CE automation-tool), so it
+        // is the only test that can catch a definition wired to ignore the override.
         List<IntelligentToolDefinition> definitions = contributedDefinitions();
         ChatModel chatModel = mock(ChatModel.class);
         int testedVariantCount = 0;
@@ -273,9 +297,9 @@ class IntelligentToolSurfaceParityTest {
         assertThat(testedVariantCount)
             .as(
                 "total (definition, variant) pairs with a non-null chatClientFactory — one per"
-                    + " IntelligentToolChatClientFactory @Qualifier across all three contributors (11 copilot + 4"
-                    + " automation + 1 embedded)")
-            .isEqualTo(16);
+                    + " IntelligentToolChatClientFactory @Qualifier across all four contributors (11 copilot + 4"
+                    + " automation + 1 embedded + 1 automation-tool)")
+            .isEqualTo(17);
     }
 
     private static void assertFactoryMethodIsASpringBeanMethod(String className, String methodName)
@@ -359,10 +383,10 @@ class IntelligentToolSurfaceParityTest {
     }
 
     /**
-     * Assembles the catalog over the three real production {@link IntelligentToolContributor} beans, each reached by
+     * Assembles the catalog over the four real production {@link IntelligentToolContributor} beans, each reached by
      * reflection because its declaring {@code @Configuration} class is package-private in a module this test does not
      * otherwise depend on by source. Every {@code IntelligentToolChatClientFactory} constructor argument is mocked
-     * present so every one of the nine definitions is actually contributed.
+     * present so every one of the ten definitions is actually contributed.
      */
     private static IntelligentToolCatalog buildCatalog() throws ReflectiveOperationException {
         List<IntelligentToolDefinition> definitions = contributedDefinitions();
@@ -372,7 +396,7 @@ class IntelligentToolSurfaceParityTest {
     }
 
     /**
-     * The definitions returned by the three real production {@link IntelligentToolContributor} beans, in contribution
+     * The definitions returned by the four real production {@link IntelligentToolContributor} beans, in contribution
      * order — the shared basis for {@link #buildCatalog()} and the per-definition {@code agentTypeKey()} assertion.
      */
     private static List<IntelligentToolDefinition> contributedDefinitions() throws ReflectiveOperationException {
@@ -395,11 +419,16 @@ class IntelligentToolSurfaceParityTest {
             EMBEDDED_CONTRIBUTOR_CLASS_NAME, EMBEDDED_CONTRIBUTOR_METHOD_NAME, chatClientFactoryProvider(),
             chatModelResolverProvider());
 
+        IntelligentToolContributor automationToolContributor = invokeContributorFactory(
+            AUTOMATION_TOOL_CONTRIBUTOR_CLASS_NAME, AUTOMATION_TOOL_CONTRIBUTOR_METHOD_NAME,
+            chatClientFactoryProvider(), chatModelResolverProvider());
+
         List<IntelligentToolDefinition> definitions = new ArrayList<>();
 
         definitions.addAll(copilotContributor.getIntelligentToolDefinitions());
         definitions.addAll(automationContributor.getIntelligentToolDefinitions());
         definitions.addAll(embeddedContributor.getIntelligentToolDefinitions());
+        definitions.addAll(automationToolContributor.getIntelligentToolDefinitions());
 
         return definitions;
     }
@@ -450,7 +479,7 @@ class IntelligentToolSurfaceParityTest {
      * A fake {@link IntelligentToolChatClientFactory} — rather than a plain Mockito mock, whose unstubbed
      * {@code get(ChatModel)} would return {@code null} for every argument — that answers a distinct {@link ChatClient}
      * for {@code get(null)} versus {@code get(chatModel)}. Every call captures its own pair of clients, so each of the
-     * sixteen provider instances built across the three contributors is independently distinguishable, which is what
+     * seventeen provider instances built across the four contributors is independently distinguishable, which is what
      * lets {@code testEveryContributedDefinitionChatClientFactoryHonoursTheCallerPickedChatModel} detect a definition
      * that discards the caller-picked {@link ChatModel} instead of rebuilding its client over it.
      */
