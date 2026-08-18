@@ -25,5 +25,18 @@ public class ChatConstants {
     public static final String CHAT = "chat";
     public static final String CONVERSATION_ID = "conversationId";
     public static final String MESSAGE = "message";
+    public static final String MODE = "mode";
+
+    /**
+     * ByteChef hosts the chat interface. Pinned by the {@code chat} agent channel: an agent reached through the Chat
+     * channel is reached through the hosted interface by definition, so the choice is the workflow author's to make on
+     * a hand-built chat workflow, not the agent's.
+     */
+    public static final int MODE_HOSTED_CHAT = 1;
+
+    /**
+     * The caller supplies its own chat interface.
+     */
+    public static final int MODE_EMBEDDED_CHAT = 2;
     public static final String STREAM = "stream";
 }

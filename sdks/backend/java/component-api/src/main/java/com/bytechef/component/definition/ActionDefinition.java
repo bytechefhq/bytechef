@@ -24,6 +24,7 @@ import static com.bytechef.component.definition.ActionDefinition.WebhookResponse
 
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.HashMap;
@@ -42,6 +43,21 @@ import java.util.function.Consumer;
  * @author Ivica Cardic
  */
 public interface ActionDefinition {
+
+    /**
+     * Returns the descriptor marking this action as the reply half of an agent channel, stating which of its properties
+     * receive the agent channel contract fields.
+     * <p>
+     * Absent from the serialized definition when no descriptor is declared, so that an action which opted into nothing
+     * keeps the definition it had before agent channels existed.
+     *
+     * @return an {@code Optional} containing the agent reply descriptor if defined, or an empty {@code Optional}
+     *         otherwise
+     */
+    @JsonInclude(JsonInclude.Include.NON_ABSENT)
+    default Optional<AgentReplyDefinition> getAgentReplyDefinition() {
+        return Optional.empty();
+    }
 
     /**
      * TODO

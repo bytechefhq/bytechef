@@ -29,6 +29,7 @@ import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.automation.ai.agent.channel.AiAgentChannelType;
 import com.bytechef.automation.ai.agent.domain.AiAgent;
 import com.bytechef.automation.ai.agent.domain.AiAgentChannel;
+import com.bytechef.automation.ai.agent.test.TestAgentChannels;
 import com.bytechef.automation.ai.agent.util.AiAgentWorkflowGenerator;
 import com.bytechef.automation.ai.agent.util.AiAgentWorkflowGenerator.SubAgentRef;
 import com.bytechef.commons.util.EncodingUtils;
@@ -42,9 +43,6 @@ import com.bytechef.platform.workflow.task.dispatcher.test.workflow.TaskDispatch
 import com.bytechef.platform.workflow.task.dispatcher.test.workflow.TaskDispatcherJobTestExecutor.TaskDispatcherJobExecution;
 import com.bytechef.task.dispatcher.branch.BranchTaskDispatcher;
 import com.bytechef.task.dispatcher.branch.completion.BranchTaskCompletionHandler;
-import com.bytechef.task.dispatcher.condition.ConditionTaskDispatcher;
-import com.bytechef.task.dispatcher.condition.completion.ConditionTaskCompletionHandler;
-import com.bytechef.task.dispatcher.terminate.TerminateTaskDispatcher;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
@@ -95,9 +93,6 @@ class AiAgentWorkflowExecutionIntTest {
     private static final String WORKFLOW_ID =
         EncodingUtils.base64EncodeToString("agent_workflow_branch_in".getBytes(StandardCharsets.UTF_8));
 
-    private static final String WORKFLOW_ID_SLACK_BOT_GUARD =
-        EncodingUtils.base64EncodeToString("agent_workflow_slack_bot_guard".getBytes(StandardCharsets.UTF_8));
-
     private static final Function<Long, SubAgentRef> NO_SUB_AGENTS = referenceId -> {
         throw new AssertionError("The chat+telegram fixture carries no SUB_AGENT elements");
     };
@@ -110,9 +105,9 @@ class AiAgentWorkflowExecutionIntTest {
 
     /**
      * Drift guard for {@code workflows/agent_workflow_branch_in.yaml}: the fixture's {@code branch_in} task must stay
-     * byte-identical to what {@link AiAgentWorkflowGenerator#generate(AiAgent, List, List, Function)} emits for the
-     * same two-channel (chat, telegram) agent — otherwise this test's "real" branch_in would silently diverge from the
-     * generator it is supposed to be exercising.
+     * byte-identical to what {@link AiAgentWorkflowGenerator#generate} emits for the same two-channel (chat, telegram)
+     * agent — otherwise this test's "real" branch_in would silently diverge from the generator it is supposed to be
+     * exercising.
      */
     @Test
     void testGeneratedBranchInMatchesExecutionFixture() {
@@ -146,8 +141,7 @@ class AiAgentWorkflowExecutionIntTest {
         assertThat(envelope).containsEntry("channel", "chat")
             .containsEntry("text", "hi")
             .containsEntry("conversationId", "c1")
-            .containsEntry("attachments", List.of())
-            .containsEntry("replyTo", null);
+            .containsEntry("attachments", List.of());
     }
 
     @Test
@@ -163,97 +157,7 @@ class AiAgentWorkflowExecutionIntTest {
         assertThat(envelope).containsEntry("channel", "telegram")
             .containsEntry("text", "hello bot")
             .containsEntry("conversationId", 555)
-            .containsEntry("replyTo", 555)
             .containsEntry("attachments", List.of());
-    }
-
-    /**
-     * Drift guard for {@code workflows/agent_workflow_slack_bot_guard.json}: the fixture's {@code branch_in} task —
-     * including the nested Slack echo-loop guard ({@code condition/v1} keyed on bot-message detection, wrapping the
-     * ordinary envelope task) — must stay byte-identical to what
-     * {@link AiAgentWorkflowGenerator#generate(AiAgent, List, List, Function)} emits for the same single-slack-channel
-     * agent, so this test's "real" branch_in can never silently diverge from the generator it exercises. See
-     * {@code AiAgentWorkflowGenerator.buildSlackBotEchoGuard}'s javadoc for why {@code terminate/v1} (not a silent
-     * {@code branch_out} case) is the guard mechanism.
-     */
-    @Test
-    void testGeneratedSlackBranchInMatchesExecutionFixture() {
-        Map<String, Object> generated = generateSlackChannelDefinition();
-
-        @SuppressWarnings("unchecked")
-        List<Map<String, Object>> tasks = (List<Map<String, Object>>) generated.get("tasks");
-
-        Map<String, Object> generatedBranchIn = tasks.get(0);
-
-        assertThat(generatedBranchIn.get("name")).isEqualTo("branch_in");
-
-        Map<String, Object> fixture = readFixtureWorkflow("/workflows/agent_workflow_slack_bot_guard.json");
-
-        @SuppressWarnings("unchecked")
-        List<Map<String, Object>> fixtureTasks = (List<Map<String, Object>>) fixture.get("tasks");
-
-        assertThat(fixtureTasks.get(0)).isEqualTo(generatedBranchIn);
-    }
-
-    @Test
-    void testSlackHumanMessageEnvelopeIsRoutedAndEvaluated() {
-        Map<String, Object> envelope = executeBranchIn(
-            WORKFLOW_ID_SLACK_BOT_GUARD,
-            Map.of(
-                JobInputConstants.TRIGGER_NAME_INPUT, "slack_1",
-                "slack_1", Map.of(
-                    "text", "hello there",
-                    "channel", "C123")));
-
-        assertThat(envelope).containsEntry("channel", "slack")
-            .containsEntry("text", "hello there")
-            .containsEntry("conversationId", "C123")
-            .containsEntry("replyTo", "C123")
-            .containsEntry("attachments", List.of());
-    }
-
-    /**
-     * A message carrying {@code bot_id} (the shape Slack's Events API gives a {@code chat.postMessage}-posted message —
-     * exactly what the agent's own {@code reply_slack} task posts) must be terminated by the guard before the envelope
-     * task ever runs: the job ends {@code STOPPED} with no {@code result} output, not COMPLETED with a slack envelope.
-     * Without this guard, the agent's own reply would loop back in as a new inbound turn.
-     */
-    @Test
-    void testSlackBotIdMessageIsTerminatedBeforeEnvelopeRuns() {
-        assertBotEventIsTerminated(
-            Map.of(
-                "text", "I'm the agent's own reply",
-                "channel", "C123",
-                "bot_id", "B0123456"));
-    }
-
-    /**
-     * Same guard, the OTHER Slack bot signal: a legacy bot integration's message carries
-     * {@code subtype == "bot_message"} instead of (or alongside) {@code bot_id}.
-     */
-    @Test
-    void testSlackBotMessageSubtypeIsTerminatedBeforeEnvelopeRuns() {
-        assertBotEventIsTerminated(
-            Map.of(
-                "text", "I'm the agent's own reply",
-                "channel", "C123",
-                "subtype", "bot_message"));
-    }
-
-    private void assertBotEventIsTerminated(Map<String, Object> slackEventPayload) {
-        TaskDispatcherJobExecution jobExecution = taskDispatcherJobTestExecutor.execute(
-            WORKFLOW_ID_SLACK_BOT_GUARD,
-            Map.of(
-                JobInputConstants.TRIGGER_NAME_INPUT, "slack_1",
-                "slack_1", slackEventPayload),
-            this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories,
-            this::getTaskHandlerMap);
-
-        Job job = jobExecution.job();
-
-        assertThat(jobExecution.getExecutionErrors()).isEmpty();
-        assertThat(job.getStatus()).isEqualTo(Job.Status.STOPPED);
-        assertThat(job.getOutputs()).isNull();
     }
 
     private Map<String, Object> executeBranchIn(Map<String, Object> inputs) {
@@ -279,14 +183,7 @@ class AiAgentWorkflowExecutionIntTest {
 
     private static Map<String, Object> generateTwoChannelDefinition() {
         String definition = AiAgentWorkflowGenerator.generate(
-            newAgent(), twoChannelFixtureChannels(), List.of(), NO_SUB_AGENTS);
-
-        return JsonUtils.read(definition, new TypeReference<>() {});
-    }
-
-    private static Map<String, Object> generateSlackChannelDefinition() {
-        String definition = AiAgentWorkflowGenerator.generate(
-            newAgent(), slackFixtureChannels(), List.of(), NO_SUB_AGENTS);
+            newAgent(), twoChannelFixtureChannels(), List.of(), NO_SUB_AGENTS, null, TestAgentChannels.resolver());
 
         return JsonUtils.read(definition, new TypeReference<>() {});
     }
@@ -326,7 +223,7 @@ class AiAgentWorkflowExecutionIntTest {
         chatChannel.setId(1L);
         chatChannel.setPosition(0);
 
-        AiAgentChannel telegramChannel = new AiAgentChannel(1L, AiAgentChannelType.TELEGRAM);
+        AiAgentChannel telegramChannel = new AiAgentChannel(1L, TestAgentChannels.TELEGRAM);
 
         telegramChannel.setId(2L);
         telegramChannel.setPosition(1);
@@ -335,29 +232,12 @@ class AiAgentWorkflowExecutionIntTest {
         return List.of(chatChannel, telegramChannel);
     }
 
-    private static List<AiAgentChannel> slackFixtureChannels() {
-        AiAgentChannel slackChannel = new AiAgentChannel(1L, AiAgentChannelType.SLACK);
-
-        slackChannel.setId(1L);
-        slackChannel.setPosition(0);
-        slackChannel.setConnectionId(100L);
-
-        return List.of(slackChannel);
-    }
-
     @SuppressWarnings("PMD")
     private List<TaskCompletionHandlerFactory> getTaskCompletionHandlerFactories(
         ContextService contextService, CounterService counterService, TaskExecutionService taskExecutionService) {
 
         return List.of(
             (taskCompletionHandler, taskDispatcher) -> new BranchTaskCompletionHandler(
-                contextService, EVALUATOR, taskCompletionHandler, taskDispatcher, taskExecutionService,
-                taskFileStorage),
-            // The slack case's nested condition/v1 (see AiAgentWorkflowGenerator.buildSlackBotEchoGuard) needs its
-            // own completion handler to bubble a completed caseFalse (non-bot) sub-task back up through the
-            // condition to branch_in -- terminate/v1 (the caseTrue arm) deliberately has no completion handler; it
-            // stops the job directly instead of completing normally (see TerminateTaskDispatcher).
-            (taskCompletionHandler, taskDispatcher) -> new ConditionTaskCompletionHandler(
                 contextService, EVALUATOR, taskCompletionHandler, taskDispatcher, taskExecutionService,
                 taskFileStorage));
     }
@@ -370,10 +250,7 @@ class AiAgentWorkflowExecutionIntTest {
         return List.of(
             (taskDispatcher) -> new BranchTaskDispatcher(
                 contextService, EVALUATOR, eventPublisher, taskDispatcher, taskExecutionService,
-                taskFileStorage),
-            (taskDispatcher) -> new ConditionTaskDispatcher(
-                contextService, EVALUATOR, eventPublisher, taskDispatcher, taskExecutionService, taskFileStorage),
-            (taskDispatcher) -> new TerminateTaskDispatcher(eventPublisher, taskExecutionService));
+                taskFileStorage));
     }
 
     private Map<String, TaskHandler<?>> getTaskHandlerMap() {

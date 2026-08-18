@@ -35,6 +35,7 @@ import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
+import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.configuration.service.EnvironmentServiceImpl;
@@ -117,6 +118,17 @@ public class AutomationAiAgentIntTestConfiguration {
     @Bean
     TriggerDefinitionService triggerDefinitionService() {
         return Mockito.mock(TriggerDefinitionService.class);
+    }
+
+    /**
+     * {@code AgentChannelResolver} (component-scanned with the rest of this module) resolves every stored channel key
+     * against the component registry. This slice deliberately does not pull that registry in, so the service is stubbed
+     * with the handful of components these tests reach — see {@link TestComponentDefinitions}, which builds real SDK
+     * definitions rather than mocking the DTOs, so the flattening the resolver depends on is genuinely exercised.
+     */
+    @Bean
+    ComponentDefinitionService componentDefinitionService() {
+        return TestComponentDefinitions.componentDefinitionService();
     }
 
     // getAgentDeployments reads a deployment's last execution through these, exactly as ProjectDeploymentFacadeImpl

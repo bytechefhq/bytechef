@@ -29,9 +29,6 @@ import org.springframework.ai.chat.client.advisor.api.Advisor;
 public interface RagFunction {
 
     /**
-     *
-     */
-    /**
      * Multiple: an agent can carry several knowledge bases, each with its own retrieval parameters. Stored definitions
      * are NOT migrated, so a definition saved while this was single still holds a bare object —
      * ClusterElementMap.getClusterElements normalises that on read.

@@ -16,7 +16,10 @@
 
 package com.bytechef.component.infobip;
 
+import static com.bytechef.component.definition.ComponentDsl.agentChannel;
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.infobip.constant.InfobipConstants.INFOBIP;
+import static com.bytechef.component.infobip.constant.InfobipConstants.WHATS_APP;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -39,7 +42,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class InfobipComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component("infobip")
+    private static final ComponentDefinition COMPONENT_DEFINITION = component(INFOBIP)
         .title("Infobip")
         .description(
             "Infobip is a global communications platform that provide cloud-based messaging and omnichannel " +
@@ -61,7 +64,13 @@ public class InfobipComponentHandler implements ComponentHandler {
         .triggers(
             InfobipInboundCallTrigger.TRIGGER_DEFINITION,
             InfobipNewSMSTrigger.TRIGGER_DEFINITION,
-            InfobipNewWhatsAppMessageTrigger.TRIGGER_DEFINITION);
+            InfobipNewWhatsAppMessageTrigger.TRIGGER_DEFINITION)
+        .agentChannels(
+            agentChannel(
+                INFOBIP, InfobipNewWhatsAppMessageTrigger.TRIGGER_DEFINITION,
+                InfobipSendWhatsappTextMessageAction.ACTION_DEFINITION)
+                    .title("Infobip (WhatsApp)")
+                    .approvalChannel(WHATS_APP));
 
     @Override
     public ComponentDefinition getDefinition() {

@@ -41,6 +41,7 @@ public class InfobipConstants {
     public static final String GROUP_ID = "groupId";
     public static final String GROUP_NAME = "groupName";
     public static final String ID = "id";
+    public static final String INFOBIP = "infobip";
     public static final String KEYWORD = "keyword";
     public static final String LANGUAGE = "language";
     public static final String MESSAGES = "messages";
@@ -54,6 +55,7 @@ public class InfobipConstants {
     public static final String TEMPLATE_NAME = "templateName";
     public static final String TEXT = "text";
     public static final String TO = "to";
+    public static final String WHATS_APP = "whatsApp";
 
     public static final ModifiableStringProperty KEYWORD_PROPERTY = string(KEYWORD)
         .label("Keyword")

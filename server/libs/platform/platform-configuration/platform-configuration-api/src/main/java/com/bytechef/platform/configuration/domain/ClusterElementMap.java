@@ -273,7 +273,6 @@ public class ClusterElementMap extends AbstractMap<String, Object> {
         return clusterElementMap.findNestedClusterElement(clusterElementType, clusterElementWorkflowNodeName);
     }
 
-    @SuppressWarnings("unchecked")
     /**
      * Reads a multiple cluster element type's entries, tolerating BOTH stored shapes.
      *
@@ -284,6 +283,7 @@ public class ClusterElementMap extends AbstractMap<String, Object> {
      * succeeded silently and then threw {@code ClassCastException} at the first stream operation.
      * </p>
      */
+    @SuppressWarnings("unchecked")
     public List<ClusterElement> getClusterElements(ClusterElementType clusterElementType) {
         Object value = super.get(clusterElementType.key());
 

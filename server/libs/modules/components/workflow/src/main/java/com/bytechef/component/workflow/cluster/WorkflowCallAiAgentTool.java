@@ -43,11 +43,11 @@ import org.slf4j.LoggerFactory;
  * {@link SubflowToolSupport}). Unlike {@code callWorkflow} — which exposes an arbitrary sub-workflow's own
  * {@code workflowCall} input schema as the LLM's tool arguments — this tool targets a fixed {@code {message}} contract:
  * every AiAgent-generated workflow's {@code workflowCall} channel always declares exactly
- * {@code {message, conversationId}} (see {@code AiAgentWorkflowGenerator.WORKFLOW_CALL_INPUT_SCHEMA}), so a single
- * static {@code message} property serves both the canvas builder mapping and (once wired to a {@code fromAi(...)}
- * expression, either by a human via the "let AI decide" toggle or by {@code AiAgentWorkflowGenerator} for a generated
- * {@code SUB_AGENT} row) the LLM function-calling schema — see this class's {@code message} property javadoc for how
- * that schema is actually derived.
+ * {@code {message, conversationId}} (see {@code WorkflowConstants.AI_AGENT_CALL_INPUT_SCHEMA}, which the component pins
+ * on that channel's own {@code triggerParameters}), so a single static {@code message} property serves both the canvas
+ * builder mapping and (once wired to a {@code fromAi(...)} expression, either by a human via the "let AI decide" toggle
+ * or by {@code AiAgentWorkflowGenerator} for a generated {@code SUB_AGENT} row) the LLM function-calling schema — see
+ * this class's {@code message} property javadoc for how that schema is actually derived.
  *
  * @author Ivica Cardic
  */

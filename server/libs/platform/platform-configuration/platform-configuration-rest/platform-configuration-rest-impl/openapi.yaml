@@ -1804,6 +1804,72 @@ components:
         title:
           description: "The title"
           type: "string"
+    AgentChannelDefinition:
+      description: "A trigger/reply-action pair through which an AI Agent can be reached."
+      type: "object"
+      required:
+      - "componentName"
+      - "componentVersion"
+      - "conversationIdPath"
+      - "messagePath"
+      - "name"
+      - "triggerName"
+      properties:
+        approvalChannelName:
+          description: "The name of the approval cluster element used to gate replies on this channel."
+          type: "string"
+        attachmentsPath:
+          description: "The path, within the trigger's payload, to the incoming message's attachments."
+          type: "string"
+        componentName:
+          description: "The name of the component that declares this channel."
+          type: "string"
+        componentVersion:
+          description: "The version of the component that declares this channel."
+          type: "integer"
+        conversationIdPath:
+          description: "The path, within the trigger's payload, to the conversation id."
+          type: "string"
+        description:
+          description: "The description."
+          type: "string"
+        messagePath:
+          description: "The path, within the trigger's payload, to the incoming message text."
+          type: "string"
+        name:
+          description: "The channel's stored key (matches `ai_agent_channel.channel_type`)."
+          type: "string"
+        replyActionName:
+          description: "The name of the reply action, if this channel supports replying."
+          type: "string"
+        replyAttachmentsProperty:
+          description: "The reply action property that carries outgoing attachments."
+          type: "string"
+        replyChannelParameters:
+          description: "Reply action parameters mapped from trigger property row keys."
+          type: "object"
+          additionalProperties:
+            type: "string"
+        replyConversationIdProperty:
+          description: "The reply action property that carries the conversation id."
+          type: "string"
+        replyFixedParameters:
+          description: "Reply action parameters fixed to constant values."
+          type: "object"
+          additionalProperties: true
+        replyMessageProperty:
+          description: "The reply action property that carries the outgoing message text."
+          type: "string"
+        title:
+          description: "The title"
+          type: "string"
+        triggerName:
+          description: "The name of the trigger through which incoming messages arrive."
+          type: "string"
+        triggerParameters:
+          description: "Fixed parameters applied to the trigger when it is used as an agent channel."
+          type: "object"
+          additionalProperties: true
     AnyValue:
       description: "Can be anything: string, number, array, object, etc. (except `null`)"
     ArrayProperty:
@@ -1996,6 +2062,11 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/ActionDefinitionBasic"
+        agentChannels:
+          description: "The AI Agent channels this component declares."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/AgentChannelDefinition"
         clusterElement:
           description: "Is the component cluster element."
           type: "boolean"

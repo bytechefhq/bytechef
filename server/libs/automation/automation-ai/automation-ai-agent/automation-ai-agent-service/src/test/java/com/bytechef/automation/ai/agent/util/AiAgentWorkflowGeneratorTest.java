@@ -17,11 +17,14 @@
 package com.bytechef.automation.ai.agent.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 
 import com.bytechef.automation.ai.agent.channel.AiAgentChannelType;
+import com.bytechef.automation.ai.agent.channel.ResolvedAgentChannel;
 import com.bytechef.automation.ai.agent.domain.AiAgent;
 import com.bytechef.automation.ai.agent.domain.AiAgentChannel;
 import com.bytechef.automation.ai.agent.domain.AiAgentElement;
+import com.bytechef.automation.ai.agent.test.TestAgentChannels;
 import com.bytechef.automation.ai.agent.util.AiAgentWorkflowGenerator.SubAgentRef;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.jackson.config.JacksonConfiguration;
@@ -49,6 +52,12 @@ import tools.jackson.core.type.TypeReference;
 @ContextConfiguration(classes = JacksonConfiguration.class)
 @ExtendWith(ObjectMapperSetupExtension.class)
 class AiAgentWorkflowGeneratorTest {
+
+    /**
+     * The channels this generator is rendered against — see {@link TestAgentChannels}. Every per-channel value the
+     * generator emits arrives through here, which is the point: no component is named in production code any more.
+     */
+    private static final Function<String, ResolvedAgentChannel> CHANNEL_RESOLVER = TestAgentChannels.resolver();
 
     private static final UUID AGENT_UUID = UUID.fromString("11111111-1111-1111-1111-111111111111");
     private static final String STORED_SCHEDULE_PROMPT = "Summarize today's news";
@@ -91,7 +100,8 @@ class AiAgentWorkflowGeneratorTest {
         AiAgent agent = newAgent();
         List<AiAgentChannel> channels = twoChannelFixtureChannels();
 
-        String definition = AiAgentWorkflowGenerator.generate(agent, channels, List.of(), NO_SUB_AGENTS);
+        String definition =
+            AiAgentWorkflowGenerator.generate(agent, channels, List.of(), NO_SUB_AGENTS, null, CHANNEL_RESOLVER);
 
         Map<String, Object> parsed = JsonUtils.read(definition, new TypeReference<>() {});
 
@@ -103,10 +113,60 @@ class AiAgentWorkflowGeneratorTest {
         AiAgent agent = newAgent();
         List<AiAgentChannel> channels = twoChannelFixtureChannels();
 
-        String first = AiAgentWorkflowGenerator.generate(agent, channels, List.of(), NO_SUB_AGENTS);
-        String second = AiAgentWorkflowGenerator.generate(agent, channels, List.of(), NO_SUB_AGENTS);
+        String first =
+            AiAgentWorkflowGenerator.generate(agent, channels, List.of(), NO_SUB_AGENTS, null, CHANNEL_RESOLVER);
+        String second =
+            AiAgentWorkflowGenerator.generate(agent, channels, List.of(), NO_SUB_AGENTS, null, CHANNEL_RESOLVER);
 
         assertThat(second).isEqualTo(first);
+    }
+
+    /**
+     * Pins the AI Hub visibility identity stamp (ticket 732, {@code 2026-08-17-agent-run-hub-visibility}):
+     * {@code aiAgent_1} carries {@code aiHubWorkspaceId} / {@code aiHubAgentId} / {@code aiHubCreatorUserId} as sibling
+     * keys next to {@code clusterElements}, resolved from {@link AiAgent#getWorkspaceId()}, {@link AiAgent#getId()},
+     * and the caller-supplied {@code creatorUserId} argument respectively — {@code AbstractAiAgentChatAction} reads
+     * these back as opaque values to report a completed turn.
+     */
+    @Test
+    void testAiAgentNodeCarriesAiHubIdentityStamp() {
+        AiAgent agent = newAgent();
+
+        agent.setWorkspaceId(55L);
+
+        List<AiAgentChannel> channels = twoChannelFixtureChannels();
+
+        String definition =
+            AiAgentWorkflowGenerator.generate(agent, channels, List.of(), NO_SUB_AGENTS, 77L, CHANNEL_RESOLVER);
+
+        Map<String, Object> parsed = JsonUtils.read(definition, new TypeReference<>() {});
+        Map<String, Object> aiAgentNode = tasks(parsed).get(1);
+
+        assertThat(aiAgentNode.get("aiHubWorkspaceId")).isEqualTo(55);
+        assertThat(aiAgentNode.get("aiHubAgentId")).isEqualTo(1);
+        assertThat(aiAgentNode.get("aiHubCreatorUserId")).isEqualTo(77);
+    }
+
+    /**
+     * The counterpart to {@link #testAiAgentNodeCarriesAiHubIdentityStamp}: an agent with no workspace (the embedded
+     * platform type has no workspace concept) and no resolvable creator carries a partial stamp — {@code aiHubAgentId}
+     * only, since {@link AiAgent#getId()} is always known by generation time — rather than a stamp with null-valued
+     * keys.
+     */
+    @Test
+    void testAiAgentNodeOmitsUnresolvableIdentityStampFields() {
+        AiAgent agent = newAgent();
+        List<AiAgentChannel> channels = twoChannelFixtureChannels();
+
+        String definition =
+            AiAgentWorkflowGenerator.generate(agent, channels, List.of(), NO_SUB_AGENTS, null, CHANNEL_RESOLVER);
+
+        Map<String, Object> parsed = JsonUtils.read(definition, new TypeReference<>() {});
+        Map<String, Object> aiAgentNode = tasks(parsed).get(1);
+
+        assertThat(aiAgentNode).containsKey("aiHubAgentId")
+            .doesNotContainKey("aiHubWorkspaceId")
+            .doesNotContainKey("aiHubCreatorUserId");
     }
 
     @Test
@@ -212,8 +272,14 @@ class AiAgentWorkflowGeneratorTest {
         assertThat(parameters(aiAgentNode)).doesNotContainKey("systemPrompt");
     }
 
+    /**
+     * {@code branch_out} keys on the trigger's node name, one case per channel ROW — not one per channel TYPE, which is
+     * what it emitted before this generator became registry-driven. A reply action may take a value configured on the
+     * row (twilio's number, see {@link #testReplyTaskWiresRowParameterProperty}), and two rows of one type sharing a
+     * single case could only carry one of the two values.
+     */
     @Test
-    void testBranchOutCaseKeysAreChannelTypes() {
+    void testBranchOutCaseKeysAreTriggerNodeNames() {
         AiAgent agent = newAgent();
         List<AiAgentChannel> channels = twoChannelFixtureChannels();
 
@@ -225,14 +291,59 @@ class AiAgentWorkflowGeneratorTest {
 
         Map<String, Object> branchOutParameters = parameters(branchOut);
 
-        assertThat(branchOutParameters.get("expression")).isEqualTo("${branch_in.channel}");
+        assertThat(branchOutParameters.get("expression")).isEqualTo("${__triggerName}");
 
         List<Map<String, Object>> cases = cases(branchOutParameters);
 
         assertThat(cases).extracting(oneCase -> oneCase.get("key"))
-            .containsExactly(
-                AiAgentChannelType.CHAT, AiAgentChannelType.WORKFLOW_CALL, AiAgentChannelType.TELEGRAM,
-                AiAgentChannelType.SCHEDULE);
+            .containsExactly("chat_1", "workflowCall_1", "telegram_1", "schedule_1");
+    }
+
+    @Test
+    void testBranchOutGivesEachRowOfOneChannelTypeItsOwnCase() {
+        AiAgent agent = newAgent();
+
+        AiAgentChannel firstTwilioChannel = newChannel(TestAgentChannels.TWILIO, 10L, 0, Map.of("number", "+15550001"));
+        AiAgentChannel secondTwilioChannel =
+            newChannel(TestAgentChannels.TWILIO, 11L, 1, Map.of("number", "+15550002"));
+
+        Map<String, Object> parsed = generateAndParse(agent, List.of(firstTwilioChannel, secondTwilioChannel));
+
+        assertThat(cases(parameters(tasks(parsed).get(2)))).extracting(oneCase -> oneCase.get("key"))
+            .containsExactly("twilio_1", "twilio_2");
+
+        assertThat(parameters(replyTasks(caseByKey(parsed, "twilio_1")).get(0)).get("From")).isEqualTo("+15550001");
+        assertThat(parameters(replyTasks(caseByKey(parsed, "twilio_2")).get(0)).get("From")).isEqualTo("+15550002");
+    }
+
+    /**
+     * The end-to-end shape a Slack channel produces, pinned here rather than left to a manual smoke run: adding one
+     * Slack channel to an agent must yield a {@code slack_1} trigger node, a {@code branch_out} case keyed on that node
+     * name, and a {@code reply_slack_1} task on the component's own reply action addressed to the conversation the
+     * request arrived on. Every part of that comes from the component's declared descriptor now, so a component that
+     * stops declaring one would break this rather than silently generating an agent that never answers.
+     */
+    @Test
+    void testSlackChannelGeneratesItsTriggerNodeBranchOutCaseAndReplyTask() {
+        AiAgent agent = newAgent();
+
+        AiAgentChannel slackChannel = newChannel(TestAgentChannels.SLACK, 20L, 0, Map.of());
+
+        Map<String, Object> parsed = generateAndParse(agent, List.of(slackChannel));
+
+        Map<String, Object> triggerNode = triggers(parsed).get(0);
+
+        assertThat(triggerNode.get("name")).isEqualTo("slack_1");
+        assertThat(triggerNode.get("type")).isEqualTo("slack/v1/newMessage");
+
+        assertThat(cases(parameters(tasks(parsed).get(2)))).extracting(oneCase -> oneCase.get("key"))
+            .containsExactly("slack_1");
+
+        Map<String, Object> replyTask = replyTasks(caseByKey(parsed, "slack_1")).get(0);
+
+        assertThat(replyTask.get("name")).isEqualTo("reply_slack_1");
+        assertThat(replyTask.get("type")).isEqualTo("slack/v1/sendChannelMessage");
+        assertThat(parameters(replyTask)).containsEntry("channel", "${branch_in.conversationId}");
     }
 
     @Test
@@ -242,10 +353,10 @@ class AiAgentWorkflowGeneratorTest {
 
         Map<String, Object> parsed = generateAndParse(agent, channels);
 
-        Map<String, Object> chatCase = caseByKey(parsed, AiAgentChannelType.CHAT);
+        Map<String, Object> chatCase = caseByKey(parsed, "chat_1");
         Map<String, Object> replyTask = replyTasks(chatCase).get(0);
 
-        assertThat(replyTask.get("name")).isEqualTo("reply_chat");
+        assertThat(replyTask.get("name")).isEqualTo("reply_chat_1");
         assertThat(replyTask.get("type")).isEqualTo("chat/v1/responseToRequest");
         // aiAgent_1's output is an unnamed string (streamChat has no "response" property), so the reply
         // references the bare node, not a ".text" field path.
@@ -264,12 +375,10 @@ class AiAgentWorkflowGeneratorTest {
 
         assertThat(workflowCallTrigger.get("name")).isEqualTo("workflowCall_1");
 
-        Object inputSchema = parameters(workflowCallTrigger).get("inputSchema");
-
-        assertThat(inputSchema).isInstanceOf(String.class)
-            .asString()
-            .contains("\"message\"")
-            .contains("\"conversationId\"");
+        // The schema is not the generator's to know: it arrives verbatim from the channel's declared
+        // triggerParameters, which is why the fixture supplies it and this asserts equality rather than substrings.
+        assertThat(parameters(workflowCallTrigger).get("inputSchema"))
+            .isEqualTo(TestAgentChannels.WORKFLOW_CALL_INPUT_SCHEMA);
     }
 
     @Test
@@ -279,18 +388,34 @@ class AiAgentWorkflowGeneratorTest {
 
         Map<String, Object> parsed = generateAndParse(agent, channels);
 
-        Map<String, Object> workflowCallCase = caseByKey(parsed, AiAgentChannelType.WORKFLOW_CALL);
+        Map<String, Object> workflowCallCase = caseByKey(parsed, "workflowCall_1");
         Map<String, Object> replyTask = replyTasks(workflowCallCase).get(0);
 
         Map<String, Object> replyParameters = parameters(replyTask);
 
-        assertThat(replyParameters.get("outputSchema")).asInstanceOf(InstanceOfAssertFactories.STRING)
-            .contains("\"message\"");
+        assertThat(replyParameters.get("outputSchema")).isEqualTo(TestAgentChannels.WORKFLOW_CALL_OUTPUT_SCHEMA);
+    }
+
+    /**
+     * A reply descriptor may target a nested parameter: {@code workflow}'s reply receives the agent's text at
+     * {@code response.message}, where {@code response} is a {@code dynamicProperties} map. The generator must build a
+     * nested map, not a key that literally contains a dot.
+     */
+    @Test
+    void testReplyTaskWritesNestedParameterForDottedProperty() {
+        AiAgent agent = newAgent();
+        List<AiAgentChannel> channels = twoChannelFixtureChannels();
+
+        Map<String, Object> parsed = generateAndParse(agent, channels);
+
+        Map<String, Object> replyParameters = parameters(replyTasks(caseByKey(parsed, "workflowCall_1")).get(0));
+
+        assertThat(replyParameters).doesNotContainKey("response.message");
 
         @SuppressWarnings("unchecked")
         Map<String, Object> response = (Map<String, Object>) replyParameters.get("response");
 
-        assertThat(response.get("message")).isEqualTo("${aiAgent_1}");
+        assertThat(response).containsExactly(entry("message", "${aiAgent_1}"));
     }
 
     @Test
@@ -304,14 +429,162 @@ class AiAgentWorkflowGeneratorTest {
 
         assertConnectionsBlock(telegramTrigger, "telegram");
 
-        Map<String, Object> telegramCase = caseByKey(parsed, AiAgentChannelType.TELEGRAM);
+        Map<String, Object> telegramCase = caseByKey(parsed, "telegram_1");
         Map<String, Object> replyTask = replyTasks(telegramCase).get(0);
 
         assertThat(replyTask.get("type")).isEqualTo("telegram/v1/sendMessage");
-        assertThat(parameters(replyTask).get("chat_id")).isEqualTo("${branch_in.replyTo}");
+        assertThat(parameters(replyTask).get("chat_id")).isEqualTo("${branch_in.conversationId}");
         assertThat(parameters(replyTask).get("text")).isEqualTo("${aiAgent_1}");
 
         assertConnectionsBlock(replyTask, "telegram");
+    }
+
+    /**
+     * The envelope reads the trigger node through the channel's own request binding, so a legacy nested payload
+     * (telegram's {@code message.chat.id}) and a conforming flat one (chat's {@code conversationId}) take the same code
+     * path — nothing here knows either component.
+     */
+    @Test
+    void testEnvelopeUsesRequestBindingPaths() {
+        AiAgent agent = newAgent();
+        List<AiAgentChannel> channels = twoChannelFixtureChannels();
+
+        Map<String, Object> parsed = generateAndParse(agent, channels);
+
+        assertThat(envelopeOf(parsed, "telegram_1"))
+            .containsEntry("text", "${telegram_1.message.text}")
+            .containsEntry("conversationId", "${telegram_1.message.chat.id}")
+            .containsEntry("channel", TestAgentChannels.TELEGRAM);
+
+        assertThat(envelopeOf(parsed, "chat_1"))
+            .containsEntry("text", "${chat_1.message}")
+            .containsEntry("conversationId", "${chat_1.conversationId}")
+            .containsEntry("channel", AiAgentChannelType.CHAT);
+    }
+
+    /**
+     * Both arms of the attachments binding: a channel whose request descriptor binds a path reads it off the trigger
+     * node, and one that binds none (its trigger carries no files) gets a real empty array rather than an expression
+     * resolving to nothing.
+     */
+    @Test
+    void testEnvelopeAttachmentsFollowTheBoundPathOrEmptyArray() {
+        AiAgent agent = newAgent();
+        List<AiAgentChannel> channels = twoChannelFixtureChannels();
+
+        Map<String, Object> parsed = generateAndParse(agent, channels);
+
+        assertThat(envelopeOf(parsed, "chat_1")).containsEntry("attachments", "${chat_1.attachments}");
+        assertThat(envelopeOf(parsed, "workflowCall_1"))
+            .containsEntry("attachments", "${workflowCall_1.attachments}");
+        assertThat(envelopeOf(parsed, "telegram_1")).containsEntry("attachments", List.of());
+    }
+
+    /**
+     * The envelope carries exactly the four fields the contract defines. {@code replyTo}/{@code replyFrom} are gone:
+     * {@code conversationId} doubles as the reply address, and a reply sender that varies per row now comes from the
+     * row (see {@link #testReplyTaskWiresRowParameterProperty}) rather than from the inbound payload.
+     */
+    @Test
+    void testEnvelopeCarriesOnlyContractFields() {
+        AiAgent agent = newAgent();
+        List<AiAgentChannel> channels = twoChannelFixtureChannels();
+
+        Map<String, Object> parsed = generateAndParse(agent, channels);
+
+        for (String nodeName : List.of("chat_1", "workflowCall_1", "telegram_1", "schedule_1")) {
+            assertThat(envelopeOf(parsed, nodeName)).containsOnlyKeys(
+                "text", "conversationId", "attachments", "channel");
+        }
+    }
+
+    /**
+     * twilio's reply is sent AS the WhatsApp number configured on the channel row — the descriptor maps the row's
+     * {@code number} parameter onto the action's {@code From} property — and pins {@code useTemplate} false, without
+     * which a free-text agent reply is not expressible at all.
+     */
+    @Test
+    void testReplyTaskWiresRowParameterProperty() {
+        AiAgent agent = newAgent();
+        AiAgentChannel twilioChannel = newChannel(
+            TestAgentChannels.TWILIO, 9L, 0, Map.of("number", "+15550001111"));
+
+        Map<String, Object> parsed = generateAndParse(agent, List.of(twilioChannel));
+
+        Map<String, Object> replyParameters = parameters(replyTasks(caseByKey(parsed, "twilio_1")).get(0));
+
+        assertThat(replyParameters).containsEntry("From", "+15550001111")
+            .containsEntry("To", "${branch_in.conversationId}")
+            .containsEntry("Body", "${aiAgent_1}");
+    }
+
+    @Test
+    void testReplyTaskWiresPinnedParameters() {
+        AiAgent agent = newAgent();
+        AiAgentChannel twilioChannel = newChannel(
+            TestAgentChannels.TWILIO, 9L, 0, Map.of("number", "+15550001111"));
+
+        Map<String, Object> parsed = generateAndParse(agent, List.of(twilioChannel));
+
+        assertThat(parameters(replyTasks(caseByKey(parsed, "twilio_1")).get(0))).containsEntry("useTemplate", false);
+    }
+
+    /**
+     * A row parameter the reply descriptor maps but the row never set contributes nothing, rather than a null-valued
+     * parameter the action would then have to defend against.
+     */
+    @Test
+    void testReplyTaskOmitsRowParameterPropertyWhenTheRowDoesNotCarryIt() {
+        AiAgent agent = newAgent();
+        AiAgentChannel twilioChannel = newChannel(TestAgentChannels.TWILIO, 9L, 0, Map.of());
+
+        Map<String, Object> parsed = generateAndParse(agent, List.of(twilioChannel));
+
+        assertThat(parameters(replyTasks(caseByKey(parsed, "twilio_1")).get(0))).doesNotContainKey("From");
+    }
+
+    /**
+     * A channel declaration's {@code triggerParameters} are pinned — the SDK calls them "trigger parameters that are
+     * always emitted for this channel" — so a row parameter of the same name must not displace one. {@code inputSchema}
+     * is a declared property of {@code workflow/v1/newWorkflowCall}, so it passes the row-parameter allow-list; a row
+     * carrying it would otherwise replace the contract schema {@code ${workflowCall_1.message}} is derived from.
+     * {@code workflowCall} rows are not reachable through the UI, but {@code updateAgentChannel} writes row parameters
+     * verbatim.
+     */
+    @Test
+    void testPinnedTriggerParametersWinOverRowParameters() {
+        AiAgent agent = newAgent();
+        AiAgentChannel workflowCallChannel = newChannel(
+            AiAgentChannelType.WORKFLOW_CALL, 9L, 0, Map.of("inputSchema", "{\"type\":\"string\"}"));
+
+        Map<String, Object> parsed = generateAndParse(agent, List.of(workflowCallChannel));
+
+        Map<String, Object> workflowCallTrigger = triggers(parsed).get(0);
+
+        assertThat(parameters(workflowCallTrigger).get("inputSchema"))
+            .isEqualTo(TestAgentChannels.WORKFLOW_CALL_INPUT_SCHEMA);
+    }
+
+    /**
+     * Row parameters reach the trigger node only when the resolved trigger declares a property of that name, which is
+     * what lets the schedule row's UI-only keys be excluded generically instead of by a hardcoded list.
+     */
+    @Test
+    void testTriggerParametersExcludeUiOnlyRowKeys() {
+        AiAgent agent = newAgent();
+        AiAgentChannel scheduleChannel = newChannel(
+            AiAgentChannelType.SCHEDULE, 9L, 0,
+            Map.of(
+                "prompt", STORED_SCHEDULE_PROMPT, "name", "Daily digest", "expression", "0 9 * * *", "timezone",
+                "UTC"));
+
+        Map<String, Object> parsed = generateAndParse(agent, List.of(scheduleChannel));
+
+        Map<String, Object> scheduleTrigger = triggers(parsed).get(0);
+
+        assertThat(scheduleTrigger.get("type")).isEqualTo("schedule/v1/cron");
+        assertThat(parameters(scheduleTrigger)).containsOnly(
+            entry("expression", "0 9 * * *"), entry("timezone", "UTC"));
     }
 
     @Test
@@ -334,105 +607,17 @@ class AiAgentWorkflowGeneratorTest {
 
         assertThat(envelope.get("text")).isEqualTo(STORED_SCHEDULE_PROMPT);
         assertThat(envelope.get("channel")).isEqualTo(AiAgentChannelType.SCHEDULE);
-        assertThat(envelope.get("replyTo")).isNull();
         assertThat(envelope.get("conversationId")).isNotNull()
             .isNotEqualTo("=uuid()");
 
-        Map<String, Object> scheduleOutCase = caseByKey(parsed, AiAgentChannelType.SCHEDULE);
+        // A schedule receives nothing, so nothing in its envelope may read its own trigger node — the resolver's
+        // synthesized binding carries no paths at all, and this is what proves the generator never consults them.
+        assertThat(envelope.values()).noneSatisfy(
+            value -> assertThat(String.valueOf(value)).contains("${schedule_1."));
+
+        Map<String, Object> scheduleOutCase = caseByKey(parsed, "schedule_1");
 
         assertThat(replyTasks(scheduleOutCase)).isEmpty();
-    }
-
-    /**
-     * Pins the Slack echo-loop guard's exact generated shape (see
-     * {@code AiAgentWorkflowGenerator.buildSlackBotEchoGuard} javadoc): the slack case's single task is a nested
-     * {@code condition/v1} — not the plain {@code envelope_slack_1} {@code var/v1/set} task every other channel gets
-     * directly — whose TRUE arm (bot-originated event) is a {@code terminate/v1} task and whose FALSE arm is the
-     * ordinary envelope task, unchanged.
-     */
-    @Test
-    void testSlackCaseGuardsAgainstBotOriginatedEchoWithTerminate() {
-        AiAgent agent = newAgent();
-        List<AiAgentChannel> channels = List.of(slackFixtureChannel());
-
-        Map<String, Object> parsed = generateAndParse(agent, channels);
-
-        Map<String, Object> branchInParameters = parameters(tasks(parsed).get(0));
-        Map<String, Object> slackCase = caseInCasesByKey(branchInParameters, "slack_1");
-
-        List<Map<String, Object>> slackCaseTasks = replyTasks(slackCase);
-
-        assertThat(slackCaseTasks).hasSize(1);
-
-        Map<String, Object> guard = slackCaseTasks.get(0);
-
-        assertThat(guard.get("name")).isEqualTo("botGuard_slack_1");
-        assertThat(guard.get("type")).isEqualTo("condition/v1");
-
-        Map<String, Object> guardParameters = parameters(guard);
-
-        assertThat(guardParameters.get("rawExpression")).isEqualTo(true);
-        assertThat(guardParameters.get("expression"))
-            .isEqualTo("=slack_1['bot_id'] != null or slack_1['subtype'] == 'bot_message'");
-
-        @SuppressWarnings("unchecked")
-        List<Map<String, Object>> caseTrue = (List<Map<String, Object>>) guardParameters.get("caseTrue");
-
-        assertThat(caseTrue).hasSize(1);
-
-        Map<String, Object> terminateTask = caseTrue.get(0);
-
-        assertThat(terminateTask.get("name")).isEqualTo("terminateBotEvent_slack_1");
-        assertThat(terminateTask.get("type")).isEqualTo("terminate/v1");
-        assertThat(parameters(terminateTask)).containsKey("message");
-
-        @SuppressWarnings("unchecked")
-        List<Map<String, Object>> caseFalse = (List<Map<String, Object>>) guardParameters.get("caseFalse");
-
-        assertThat(caseFalse).hasSize(1);
-
-        Map<String, Object> envelopeTask = caseFalse.get(0);
-
-        assertThat(envelopeTask.get("name")).isEqualTo("envelope_slack_1");
-        assertThat(envelopeTask.get("type")).isEqualTo("var/v1/set");
-
-        @SuppressWarnings("unchecked")
-        Map<String, Object> envelope = (Map<String, Object>) parameters(envelopeTask).get("value");
-
-        assertThat(envelope.get("channel")).isEqualTo(AiAgentChannelType.SLACK);
-    }
-
-    /**
-     * Every other channel's case is untouched by the slack-only guard: still exactly one task, the plain envelope
-     * {@code var/v1/set}, with no nested {@code condition/v1}.
-     */
-    @Test
-    void testNonSlackCasesAreNotWrappedByBotEchoGuard() {
-        AiAgent agent = newAgent();
-        List<AiAgentChannel> channels = twoChannelFixtureChannels();
-
-        Map<String, Object> parsed = generateAndParse(agent, channels);
-
-        Map<String, Object> branchInParameters = parameters(tasks(parsed).get(0));
-        Map<String, Object> chatCase = caseInCasesByKey(branchInParameters, "chat_1");
-
-        List<Map<String, Object>> chatCaseTasks = replyTasks(chatCase);
-
-        assertThat(chatCaseTasks).hasSize(1);
-        assertThat(chatCaseTasks.get(0)
-            .get("name")).isEqualTo("envelope_chat_1");
-        assertThat(chatCaseTasks.get(0)
-            .get("type")).isEqualTo("var/v1/set");
-    }
-
-    private static AiAgentChannel slackFixtureChannel() {
-        AiAgentChannel slackChannel = new AiAgentChannel(1L, AiAgentChannelType.SLACK);
-
-        slackChannel.setId(5L);
-        slackChannel.setPosition(0);
-        slackChannel.setConnectionId(200L);
-
-        return slackChannel;
     }
 
     @Test
@@ -456,7 +641,8 @@ class AiAgentWorkflowGeneratorTest {
         List<AiAgentElement> elements = fullElementsFixtureElements();
 
         String definition =
-            AiAgentWorkflowGenerator.generate(agent, channels, elements, FULL_ELEMENTS_SUB_AGENT_RESOLVER);
+            AiAgentWorkflowGenerator.generate(agent, channels, elements, FULL_ELEMENTS_SUB_AGENT_RESOLVER, null,
+                CHANNEL_RESOLVER);
 
         Map<String, Object> parsed = JsonUtils.read(definition, new TypeReference<>() {});
 
@@ -469,8 +655,12 @@ class AiAgentWorkflowGeneratorTest {
         List<AiAgentChannel> channels = twoChannelFixtureChannels();
         List<AiAgentElement> elements = fullElementsFixtureElements();
 
-        String first = AiAgentWorkflowGenerator.generate(agent, channels, elements, FULL_ELEMENTS_SUB_AGENT_RESOLVER);
-        String second = AiAgentWorkflowGenerator.generate(agent, channels, elements, FULL_ELEMENTS_SUB_AGENT_RESOLVER);
+        String first =
+            AiAgentWorkflowGenerator.generate(agent, channels, elements, FULL_ELEMENTS_SUB_AGENT_RESOLVER, null,
+                CHANNEL_RESOLVER);
+        String second =
+            AiAgentWorkflowGenerator.generate(agent, channels, elements, FULL_ELEMENTS_SUB_AGENT_RESOLVER, null,
+                CHANNEL_RESOLVER);
 
         assertThat(second).isEqualTo(first);
     }
@@ -699,8 +889,10 @@ class AiAgentWorkflowGeneratorTest {
         List<AiAgentChannel> channels = twoChannelFixtureChannels();
         List<AiAgentElement> elements = chatMemoryCollisionFixtureElements();
 
-        String first = AiAgentWorkflowGenerator.generate(agent, channels, elements, NO_SUB_AGENTS);
-        String second = AiAgentWorkflowGenerator.generate(agent, channels, elements, NO_SUB_AGENTS);
+        String first =
+            AiAgentWorkflowGenerator.generate(agent, channels, elements, NO_SUB_AGENTS, null, CHANNEL_RESOLVER);
+        String second =
+            AiAgentWorkflowGenerator.generate(agent, channels, elements, NO_SUB_AGENTS, null, CHANNEL_RESOLVER);
 
         assertThat(second).isEqualTo(first);
     }
@@ -731,7 +923,8 @@ class AiAgentWorkflowGeneratorTest {
         List<AiAgentChannel> channels = twoChannelFixtureChannels();
         List<AiAgentElement> elements = hitlFixtureElements();
 
-        String definition = AiAgentWorkflowGenerator.generate(agent, channels, elements, NO_SUB_AGENTS);
+        String definition =
+            AiAgentWorkflowGenerator.generate(agent, channels, elements, NO_SUB_AGENTS, null, CHANNEL_RESOLVER);
 
         Map<String, Object> parsed = JsonUtils.read(definition, new TypeReference<>() {});
 
@@ -744,8 +937,10 @@ class AiAgentWorkflowGeneratorTest {
         List<AiAgentChannel> channels = twoChannelFixtureChannels();
         List<AiAgentElement> elements = hitlFixtureElements();
 
-        String first = AiAgentWorkflowGenerator.generate(agent, channels, elements, NO_SUB_AGENTS);
-        String second = AiAgentWorkflowGenerator.generate(agent, channels, elements, NO_SUB_AGENTS);
+        String first =
+            AiAgentWorkflowGenerator.generate(agent, channels, elements, NO_SUB_AGENTS, null, CHANNEL_RESOLVER);
+        String second =
+            AiAgentWorkflowGenerator.generate(agent, channels, elements, NO_SUB_AGENTS, null, CHANNEL_RESOLVER);
 
         assertThat(second).isEqualTo(first);
     }
@@ -816,7 +1011,7 @@ class AiAgentWorkflowGeneratorTest {
         List<AiAgentElement> elements = hitlFixtureElements();
 
         List<AiAgentWorkflowGenerator.ConnectionRef> connectionRefs =
-            AiAgentWorkflowGenerator.buildConnectionRefs(agent, channels, elements);
+            AiAgentWorkflowGenerator.buildConnectionRefs(agent, channels, elements, CHANNEL_RESOLVER);
 
         // The telegram CHANNEL is a trigger, so it is keyed (its own node name, its component name). Every element
         // is a cluster element hanging off aiAgent_1, so each is keyed (the cluster root, the element's node name).
@@ -837,7 +1032,8 @@ class AiAgentWorkflowGeneratorTest {
         List<AiAgentChannel> channels = twoChannelFixtureChannels();
         List<AiAgentElement> elements = approvalToolFixtureElements();
 
-        String definition = AiAgentWorkflowGenerator.generate(agent, channels, elements, NO_SUB_AGENTS);
+        String definition =
+            AiAgentWorkflowGenerator.generate(agent, channels, elements, NO_SUB_AGENTS, null, CHANNEL_RESOLVER);
 
         Map<String, Object> parsed = JsonUtils.read(definition, new TypeReference<>() {});
 
@@ -850,8 +1046,10 @@ class AiAgentWorkflowGeneratorTest {
         List<AiAgentChannel> channels = twoChannelFixtureChannels();
         List<AiAgentElement> elements = approvalToolFixtureElements();
 
-        String first = AiAgentWorkflowGenerator.generate(agent, channels, elements, NO_SUB_AGENTS);
-        String second = AiAgentWorkflowGenerator.generate(agent, channels, elements, NO_SUB_AGENTS);
+        String first =
+            AiAgentWorkflowGenerator.generate(agent, channels, elements, NO_SUB_AGENTS, null, CHANNEL_RESOLVER);
+        String second =
+            AiAgentWorkflowGenerator.generate(agent, channels, elements, NO_SUB_AGENTS, null, CHANNEL_RESOLVER);
 
         assertThat(second).isEqualTo(first);
     }
@@ -887,7 +1085,7 @@ class AiAgentWorkflowGeneratorTest {
         List<AiAgentElement> elements = approvalToolFixtureElements();
 
         List<AiAgentWorkflowGenerator.ConnectionRef> connectionRefs =
-            AiAgentWorkflowGenerator.buildConnectionRefs(agent, channels, elements);
+            AiAgentWorkflowGenerator.buildConnectionRefs(agent, channels, elements, CHANNEL_RESOLVER);
 
         // telegram trigger, then the approval tool's own slack channel (chat needs no connection). No gate exists in
         // this fixture, so nothing else contributes a ref.
@@ -964,8 +1162,10 @@ class AiAgentWorkflowGeneratorTest {
         List<AiAgentChannel> channels = twoChannelFixtureChannels();
         List<AiAgentElement> elements = gateAndApprovalToolFixtureElements();
 
-        String first = AiAgentWorkflowGenerator.generate(agent, channels, elements, NO_SUB_AGENTS);
-        String second = AiAgentWorkflowGenerator.generate(agent, channels, elements, NO_SUB_AGENTS);
+        String first =
+            AiAgentWorkflowGenerator.generate(agent, channels, elements, NO_SUB_AGENTS, null, CHANNEL_RESOLVER);
+        String second =
+            AiAgentWorkflowGenerator.generate(agent, channels, elements, NO_SUB_AGENTS, null, CHANNEL_RESOLVER);
 
         assertThat(second).isEqualTo(first);
     }
@@ -1031,8 +1231,12 @@ class AiAgentWorkflowGeneratorTest {
         List<AiAgentChannel> channels = twoChannelFixtureChannels();
         List<AiAgentElement> elements = maximalFixtureElements();
 
-        String first = AiAgentWorkflowGenerator.generate(agent, channels, elements, FULL_ELEMENTS_SUB_AGENT_RESOLVER);
-        String second = AiAgentWorkflowGenerator.generate(agent, channels, elements, FULL_ELEMENTS_SUB_AGENT_RESOLVER);
+        String first =
+            AiAgentWorkflowGenerator.generate(agent, channels, elements, FULL_ELEMENTS_SUB_AGENT_RESOLVER, null,
+                CHANNEL_RESOLVER);
+        String second =
+            AiAgentWorkflowGenerator.generate(agent, channels, elements, FULL_ELEMENTS_SUB_AGENT_RESOLVER, null,
+                CHANNEL_RESOLVER);
 
         assertThat(second).isEqualTo(first);
     }
@@ -1044,7 +1248,8 @@ class AiAgentWorkflowGeneratorTest {
         List<AiAgentElement> elements = maximalFixtureElements();
 
         String definition =
-            AiAgentWorkflowGenerator.generate(agent, channels, elements, FULL_ELEMENTS_SUB_AGENT_RESOLVER);
+            AiAgentWorkflowGenerator.generate(agent, channels, elements, FULL_ELEMENTS_SUB_AGENT_RESOLVER, null,
+                CHANNEL_RESOLVER);
 
         Map<String, Object> parsed = JsonUtils.read(definition, new TypeReference<>() {});
 
@@ -1223,7 +1428,7 @@ class AiAgentWorkflowGeneratorTest {
         agent.setSettings(Map.of("builtInTools", Map.of("webSearch", true, "webSearchConnectionId", 55)));
 
         List<AiAgentWorkflowGenerator.ConnectionRef> connectionRefs =
-            AiAgentWorkflowGenerator.buildConnectionRefs(agent, List.of(), List.of());
+            AiAgentWorkflowGenerator.buildConnectionRefs(agent, List.of(), List.of(), CHANNEL_RESOLVER);
 
         // askUserQuestion(aiAgentUtils_1)/autoMemory(aiAgentUtils_2)/skillManagement(aiAgentUtils_3..7) reserve node
         // names but add no ref (see buildConnectionRefs' javadoc). webSearch draws from the brave counter rather
@@ -1280,7 +1485,8 @@ class AiAgentWorkflowGeneratorTest {
                     "askUserQuestion", false, "autoMemory", false, "skillManagement", false, "webSearch", false)));
 
         String definition =
-            AiAgentWorkflowGenerator.generate(agent, twoChannelFixtureChannels(), List.of(), NO_SUB_AGENTS);
+            AiAgentWorkflowGenerator.generate(agent, twoChannelFixtureChannels(), List.of(), NO_SUB_AGENTS, null,
+                CHANNEL_RESOLVER);
         Map<String, Object> parsed = JsonUtils.read(definition, new TypeReference<>() {});
 
         Map<String, Object> aiAgentNode = tasks(parsed).get(1);
@@ -1297,8 +1503,10 @@ class AiAgentWorkflowGeneratorTest {
 
         List<AiAgentChannel> channels = twoChannelFixtureChannels();
 
-        String first = AiAgentWorkflowGenerator.generate(agent, channels, List.of(), NO_SUB_AGENTS);
-        String second = AiAgentWorkflowGenerator.generate(agent, channels, List.of(), NO_SUB_AGENTS);
+        String first =
+            AiAgentWorkflowGenerator.generate(agent, channels, List.of(), NO_SUB_AGENTS, null, CHANNEL_RESOLVER);
+        String second =
+            AiAgentWorkflowGenerator.generate(agent, channels, List.of(), NO_SUB_AGENTS, null, CHANNEL_RESOLVER);
 
         assertThat(second).isEqualTo(first);
     }
@@ -1353,7 +1561,8 @@ class AiAgentWorkflowGeneratorTest {
         List<AiAgentChannel> channels = twoChannelFixtureChannels();
         List<AiAgentElement> elements = hitlFixtureElements();
 
-        String definition = AiAgentWorkflowGenerator.generate(agent, channels, elements, NO_SUB_AGENTS);
+        String definition =
+            AiAgentWorkflowGenerator.generate(agent, channels, elements, NO_SUB_AGENTS, null, CHANNEL_RESOLVER);
         Map<String, Object> parsed = JsonUtils.read(definition, new TypeReference<>() {});
 
         Map<String, Object> aiAgentNode = tasks(parsed).get(1);
@@ -1377,7 +1586,8 @@ class AiAgentWorkflowGeneratorTest {
 
         List<AiAgentChannel> channels = twoChannelFixtureChannels();
 
-        String definition = AiAgentWorkflowGenerator.generate(agent, channels, elements, subAgentResolver);
+        String definition =
+            AiAgentWorkflowGenerator.generate(agent, channels, elements, subAgentResolver, null, CHANNEL_RESOLVER);
         Map<String, Object> parsed = JsonUtils.read(definition, new TypeReference<>() {});
 
         Map<String, Object> aiAgentNode = tasks(parsed).get(1);
@@ -1394,7 +1604,8 @@ class AiAgentWorkflowGeneratorTest {
         List<AiAgentElement> elements = fullElementsFixtureElements();
 
         String definition =
-            AiAgentWorkflowGenerator.generate(agent, channels, elements, FULL_ELEMENTS_SUB_AGENT_RESOLVER);
+            AiAgentWorkflowGenerator.generate(agent, channels, elements, FULL_ELEMENTS_SUB_AGENT_RESOLVER, null,
+                CHANNEL_RESOLVER);
         Map<String, Object> parsed = JsonUtils.read(definition, new TypeReference<>() {});
 
         Map<String, Object> aiAgentNode = tasks(parsed).get(1);
@@ -1520,7 +1731,8 @@ class AiAgentWorkflowGeneratorTest {
     }
 
     private static Map<String, Object> generateAndParse(AiAgent agent, List<AiAgentChannel> channels) {
-        String definition = AiAgentWorkflowGenerator.generate(agent, channels, List.of(), NO_SUB_AGENTS);
+        String definition =
+            AiAgentWorkflowGenerator.generate(agent, channels, List.of(), NO_SUB_AGENTS, null, CHANNEL_RESOLVER);
 
         return JsonUtils.read(definition, new TypeReference<>() {});
     }
@@ -1550,8 +1762,29 @@ class AiAgentWorkflowGeneratorTest {
         return (List<Map<String, Object>>) oneCase.get("tasks");
     }
 
-    private static Map<String, Object> caseByKey(Map<String, Object> parsed, String channelType) {
-        return caseInCasesByKey(parameters(tasks(parsed).get(2)), channelType);
+    private static Map<String, Object> caseByKey(Map<String, Object> parsed, String triggerNodeName) {
+        return caseInCasesByKey(parameters(tasks(parsed).get(2)), triggerNodeName);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Map<String, Object> envelopeOf(Map<String, Object> parsed, String triggerNodeName) {
+        Map<String, Object> branchInCase = caseInCasesByKey(parameters(tasks(parsed).get(0)), triggerNodeName);
+        Map<String, Object> envelopeSetTask = replyTasks(branchInCase).get(0);
+
+        return (Map<String, Object>) parameters(envelopeSetTask).get("value");
+    }
+
+    private static AiAgentChannel newChannel(
+        String channelType, long id, int position, Map<String, Object> parameters) {
+
+        AiAgentChannel channel = new AiAgentChannel(1L, channelType);
+
+        channel.setId(id);
+        channel.setPosition(position);
+        channel.setConnectionId(200L);
+        channel.setParameters(parameters);
+
+        return channel;
     }
 
     private static Map<String, Object> caseInCasesByKey(Map<String, Object> dispatcherParameters, String key) {
@@ -1583,7 +1816,7 @@ class AiAgentWorkflowGeneratorTest {
         workflowCallChannel.setId(2L);
         workflowCallChannel.setPosition(1);
 
-        AiAgentChannel telegramChannel = new AiAgentChannel(1L, AiAgentChannelType.TELEGRAM);
+        AiAgentChannel telegramChannel = new AiAgentChannel(1L, TestAgentChannels.TELEGRAM);
 
         telegramChannel.setId(3L);
         telegramChannel.setPosition(2);

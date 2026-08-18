@@ -27,11 +27,12 @@ import java.util.Set;
  * destination whether it needs a {@code connections} block when nesting it under an
  * {@code aiAgentUtils/v1/approvalGateTool} (or an {@code approval/v1/requestApproval}) cluster element.
  * <p>
- * An agent reaches only the subset of these components that {@code ChannelDefinitions.approvalDelivery} maps its own
- * channel types onto — approval destinations are derived from the agent's channels rather than configured, so the
- * remaining entries below are unreachable from an agent today. They are kept because the registry is a catalogue of
- * what each component actually exposes: {@code defaultElementName}/{@code elementNames} record that, and a channel type
- * mapped onto one of them later needs no new research.
+ * An agent reaches only the subset of these components that its own channels name through
+ * {@code AgentChannelDefinition.getApprovalChannelName()}, reached here as
+ * {@link ResolvedAgentChannel#approvalDelivery()} — approval destinations are derived from the agent's channels rather
+ * than configured, so the remaining entries below are unreachable from an agent today. They are kept because the
+ * registry is a catalogue of what each component actually exposes: {@code defaultElementName}/{@code elementNames}
+ * record that, and a channel type mapped onto one of them later needs no new research.
  * <p>
  * Every entry below was read from the corresponding component's cluster-element source rather than guessed — kept in
  * sync against a {@code find server -iname "*ApprovalChannel*.java"} sweep (13 components, 15 elements: every component

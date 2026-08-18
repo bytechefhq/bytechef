@@ -23,6 +23,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.automation.ai.agent.channel.ResolvedAgentChannel;
 import com.bytechef.automation.ai.agent.domain.AiAgent;
 import com.bytechef.automation.ai.agent.domain.AiAgentChannel;
 import com.bytechef.automation.ai.agent.domain.AiAgentElement;
@@ -38,6 +39,7 @@ import com.bytechef.automation.ai.agent.web.graphql.config.AiAgentGraphQlTestCon
 import com.bytechef.exception.ConfigurationException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -133,6 +135,175 @@ class AiAgentGraphQlControllerTest {
             .path("aiAgents[0].elements[0].kind")
             .entity(String.class)
             .isEqualTo(AiAgentElement.KIND_MODEL);
+    }
+
+    /**
+     * Pins the projection {@code AiAgentChannelDefinitionPayload} performs on a {@link ResolvedAgentChannel}: the node
+     * types split into component/version/operation, and the three flags derived from the reserved channel keys. The
+     * schedule row is asserted alongside a messaging one because it is the entry the resolver synthesizes — it is the
+     * only source of the client's schedule-card metadata, and it must come back {@code schedule = true},
+     * {@code pinned = false} and with no reply action.
+     */
+    @Test
+    void testAiAgentChannelDefinitionsReturnsMappedRowsFromFacade() {
+        ResolvedAgentChannel slackChannel = new ResolvedAgentChannel(
+            "slack", "Slack", "Reach the agent from a Slack channel", "path:assets/slack.svg", "slack/v1/newMessage",
+            "slack/v1/sendChannelMessage", true, Map.of(), Map.of(), Set.of(), Set.of(),
+            new ResolvedAgentChannel.Binding(
+                "conversationId", "message", null, "text", "channel", null, Map.of(), Map.of()),
+            new ResolvedAgentChannel.ApprovalDelivery("slack", "slack"));
+        ResolvedAgentChannel scheduleChannel = new ResolvedAgentChannel(
+            "schedule", "Schedule", null, "path:assets/schedule.svg", "schedule/v1/cron", null, false, Map.of(),
+            Map.of(), Set.of("expression", "timezone"), Set.of(),
+            new ResolvedAgentChannel.Binding(null, null, null, null, null, null, Map.of(), Map.of()), null);
+
+        when(agentFacade.getAgentChannelDefinitions()).thenReturn(List.of(slackChannel, scheduleChannel));
+
+        this.graphQlTester
+            .document("""
+                query {
+                    aiAgentChannelDefinitions {
+                        channelType
+                        componentName
+                        componentVersion
+                        triggerName
+                        replyActionName
+                        title
+                        description
+                        icon
+                        connectionRequired
+                        propertiesConfigurable
+                        approvalCapable
+                        pinned
+                        schedule
+                    }
+                }
+                """)
+            .execute()
+            .errors()
+            .verify()
+            .path("aiAgentChannelDefinitions[0].channelType")
+            .entity(String.class)
+            .isEqualTo("slack")
+            .path("aiAgentChannelDefinitions[0].componentName")
+            .entity(String.class)
+            .isEqualTo("slack")
+            .path("aiAgentChannelDefinitions[0].componentVersion")
+            .entity(Integer.class)
+            .isEqualTo(1)
+            .path("aiAgentChannelDefinitions[0].triggerName")
+            .entity(String.class)
+            .isEqualTo("newMessage")
+            .path("aiAgentChannelDefinitions[0].replyActionName")
+            .entity(String.class)
+            .isEqualTo("sendChannelMessage")
+            .path("aiAgentChannelDefinitions[0].title")
+            .entity(String.class)
+            .isEqualTo("Slack")
+            .path("aiAgentChannelDefinitions[0].description")
+            .entity(String.class)
+            .isEqualTo("Reach the agent from a Slack channel")
+            .path("aiAgentChannelDefinitions[0].icon")
+            .entity(String.class)
+            .isEqualTo("path:assets/slack.svg")
+            .path("aiAgentChannelDefinitions[0].connectionRequired")
+            .entity(Boolean.class)
+            .isEqualTo(true)
+            .path("aiAgentChannelDefinitions[0].approvalCapable")
+            .entity(Boolean.class)
+            .isEqualTo(true)
+            .path("aiAgentChannelDefinitions[0].pinned")
+            .entity(Boolean.class)
+            .isEqualTo(false)
+            .path("aiAgentChannelDefinitions[0].schedule")
+            .entity(Boolean.class)
+            .isEqualTo(false)
+            // Slack's channel trigger declares no properties, so its Configure affordance rests on the connection
+            // alone -- the flag is deliberately independent of connectionRequired, which is true just above.
+            .path("aiAgentChannelDefinitions[0].propertiesConfigurable")
+            .entity(Boolean.class)
+            .isEqualTo(false)
+            .path("aiAgentChannelDefinitions[1].channelType")
+            .entity(String.class)
+            .isEqualTo("schedule")
+            .path("aiAgentChannelDefinitions[1].componentName")
+            .entity(String.class)
+            .isEqualTo("schedule")
+            .path("aiAgentChannelDefinitions[1].triggerName")
+            .entity(String.class)
+            .isEqualTo("cron")
+            .path("aiAgentChannelDefinitions[1].replyActionName")
+            .valueIsNull()
+            .path("aiAgentChannelDefinitions[1].title")
+            .entity(String.class)
+            .isEqualTo("Schedule")
+            .path("aiAgentChannelDefinitions[1].connectionRequired")
+            .entity(Boolean.class)
+            .isEqualTo(false)
+            .path("aiAgentChannelDefinitions[1].approvalCapable")
+            .entity(Boolean.class)
+            .isEqualTo(false)
+            .path("aiAgentChannelDefinitions[1].pinned")
+            .entity(Boolean.class)
+            .isEqualTo(false)
+            .path("aiAgentChannelDefinitions[1].schedule")
+            .entity(Boolean.class)
+            .isEqualTo(true)
+            // The converse pair: no connection, but two settable properties.
+            .path("aiAgentChannelDefinitions[1].propertiesConfigurable")
+            .entity(Boolean.class)
+            .isEqualTo(true);
+
+        verify(agentFacade).getAgentChannelDefinitions();
+    }
+
+    /**
+     * The two platform channels every agent carries by construction come back {@code pinned}, which is what makes the
+     * client render them as auto-created and undeletable — the flag replacing its own {@code PINNED_CHANNEL_TYPES}
+     * literal.
+     */
+    @Test
+    void testAiAgentChannelDefinitionsMarksChatAndWorkflowCallPinned() {
+        ResolvedAgentChannel chatChannel = new ResolvedAgentChannel(
+            "chat", "Chat", null, "path:assets/chat.svg", "chat/v1/newChatRequest", "chat/v1/responseToRequest", false,
+            Map.of(), Map.of(), Set.of(), Set.of(),
+            new ResolvedAgentChannel.Binding(
+                "conversationId", "message", null, "message", null, null, Map.of(), Map.of()),
+            null);
+        ResolvedAgentChannel workflowCallChannel = new ResolvedAgentChannel(
+            "workflowCall", "Workflow Call", null, "path:assets/workflow.svg", "workflow/v1/newWorkflowCall",
+            "workflow/v1/responseToWorkflowCall", false, Map.of(), Map.of(), Set.of(), Set.of(),
+            new ResolvedAgentChannel.Binding(
+                "conversationId", "message", null, "response.message", null, null, Map.of(), Map.of()),
+            null);
+
+        when(agentFacade.getAgentChannelDefinitions()).thenReturn(List.of(chatChannel, workflowCallChannel));
+
+        this.graphQlTester
+            .document("""
+                query {
+                    aiAgentChannelDefinitions {
+                        channelType
+                        pinned
+                        schedule
+                    }
+                }
+                """)
+            .execute()
+            .errors()
+            .verify()
+            .path("aiAgentChannelDefinitions[0].pinned")
+            .entity(Boolean.class)
+            .isEqualTo(true)
+            .path("aiAgentChannelDefinitions[0].schedule")
+            .entity(Boolean.class)
+            .isEqualTo(false)
+            .path("aiAgentChannelDefinitions[1].pinned")
+            .entity(Boolean.class)
+            .isEqualTo(true)
+            .path("aiAgentChannelDefinitions[1].schedule")
+            .entity(Boolean.class)
+            .isEqualTo(false);
     }
 
     @Test

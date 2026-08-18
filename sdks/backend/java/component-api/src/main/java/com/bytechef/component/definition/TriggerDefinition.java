@@ -19,6 +19,7 @@ package com.bytechef.component.definition;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import com.bytechef.definition.BaseOutputFunction;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.List;
@@ -59,6 +60,20 @@ public interface TriggerDefinition {
         PATCH,
         POST,
         PUT,
+    }
+
+    /**
+     * Returns the descriptor marking this trigger as an agent request, stating where the agent channel contract fields
+     * live within this trigger's output.
+     * <p>
+     * Absent from the serialized definition when no descriptor is declared, so that a trigger which opted into nothing
+     * keeps the definition it had before agent channels existed.
+     *
+     * @return an {@link Optional} containing the agent request descriptor, or an empty {@link Optional} if none is set
+     */
+    @JsonInclude(JsonInclude.Include.NON_ABSENT)
+    default Optional<AgentRequestDefinition> getAgentRequestDefinition() {
+        return Optional.empty();
     }
 
     /**

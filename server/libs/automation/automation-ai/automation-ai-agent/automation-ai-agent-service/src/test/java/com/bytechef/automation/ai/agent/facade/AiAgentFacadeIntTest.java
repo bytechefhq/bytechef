@@ -24,6 +24,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.ai.agent.channel.AiAgentChannelType;
+import com.bytechef.automation.ai.agent.channel.ResolvedAgentChannel;
 import com.bytechef.automation.ai.agent.config.AutomationAiAgentIntTestConfiguration;
 import com.bytechef.automation.ai.agent.domain.AiAgent;
 import com.bytechef.automation.ai.agent.domain.AiAgentChannel;
@@ -88,6 +89,13 @@ class AiAgentFacadeIntTest {
      * {@code <channelType>_<nth occurrence>}, and the chat channel is always emitted first.
      */
     private static final String CHAT_TRIGGER_NAME = "chat_1";
+
+    /**
+     * A discovered channel key: only chat/workflowCall/schedule have an {@link AiAgentChannelType} constant, every
+     * other channel is whatever a component declares. See {@code TestComponentDefinitions} for the stubbed slack
+     * component this slice resolves it against.
+     */
+    private static final String SLACK_CHANNEL_TYPE = "slack";
 
     @Autowired
     private AiAgentFacade agentFacade;
@@ -234,7 +242,7 @@ class AiAgentFacadeIntTest {
         AiAgentDTO agentDTO = agentFacade.createAgent("Support Bot", null, workspaceId);
         AiAgent agent = agentDTO.agent();
 
-        agentFacade.addAgentChannel(agent.getId(), AiAgentChannelType.SLACK, Map.of(), 77L);
+        agentFacade.addAgentChannel(agent.getId(), SLACK_CHANNEL_TYPE, Map.of(), 77L);
 
         agentFacade.addAgentElement(
             agent.getId(), AiAgentElement.KIND_TOOL, null,
@@ -431,7 +439,7 @@ class AiAgentFacadeIntTest {
         AiAgent agent = agentDTO.agent();
 
         agentFacade.updateAgent(agent.getId(), "Support Bot", "Answers questions", "Be concise.");
-        agentFacade.addAgentChannel(agent.getId(), AiAgentChannelType.SLACK, Map.of(), 77L);
+        agentFacade.addAgentChannel(agent.getId(), SLACK_CHANNEL_TYPE, Map.of(), 77L);
         agentFacade.addAgentElement(
             agent.getId(), AiAgentElement.KIND_MODEL, null, Map.of("provider", "openai", "model", "gpt-4"), 42L);
 
@@ -439,7 +447,7 @@ class AiAgentFacadeIntTest {
 
         assertThat(exported).contains("Support Bot")
             .contains("Be concise.")
-            .contains(AiAgentChannelType.SLACK)
+            .contains(SLACK_CHANNEL_TYPE)
             .contains("gpt-4")
             // Connection ids belong to a workspace and an environment; carrying one across would dangle or point
             // at someone else's credential.
@@ -453,7 +461,7 @@ class AiAgentFacadeIntTest {
         AiAgent source = sourceDTO.agent();
 
         agentFacade.updateAgent(source.getId(), "Support Bot", "Answers questions", "Be concise.");
-        agentFacade.addAgentChannel(source.getId(), AiAgentChannelType.SLACK, Map.of(), 77L);
+        agentFacade.addAgentChannel(source.getId(), SLACK_CHANNEL_TYPE, Map.of(), 77L);
         agentFacade.addAgentElement(
             source.getId(), AiAgentElement.KIND_MODEL, null, Map.of("provider", "openai", "model", "gpt-4"), 42L);
 
@@ -466,7 +474,7 @@ class AiAgentFacadeIntTest {
 
         assertThat(importedDTO.channels()).extracting(AiAgentChannel::getChannelType)
             .containsExactlyInAnyOrder(
-                AiAgentChannelType.CHAT, AiAgentChannelType.WORKFLOW_CALL, AiAgentChannelType.SLACK);
+                AiAgentChannelType.CHAT, AiAgentChannelType.WORKFLOW_CALL, SLACK_CHANNEL_TYPE);
 
         // Exactly one chat memory: createAgent adds it, and the imported one must not add a second.
         assertThat(importedDTO.elements()).extracting(AiAgentElement::getKind)
@@ -874,6 +882,39 @@ class AiAgentFacadeIntTest {
                 .isEqualTo(AiAgentErrorType.CHANNEL_CONNECTION_MISSING.getErrorKey()));
     }
 
+    /**
+     * The test twilio channel maps its row's {@code number} onto the reply action's REQUIRED {@code From} property, so
+     * a row that does not carry {@code number} generates a reply task with no sender. Publish must refuse it rather
+     * than let the agent fail on its first answer — the generator omits an unset mapped parameter by design, and
+     * nothing downstream notices.
+     */
+    @Test
+    void testPublishAgentWithMissingRequiredChannelParameterThrowsChannelParameterMissing() {
+        AiAgentDTO agentDTO = agentFacade.createAgent("Support Bot", null, workspaceId);
+        AiAgent agent = agentDTO.agent();
+
+        agentFacade.addAgentElement(
+            agent.getId(), AiAgentElement.KIND_MODEL, null, Map.of("provider", "openai", "model", "gpt-4"), null);
+        agentFacade.addAgentChannel(agent.getId(), "twilio", null, null);
+
+        assertThatThrownBy(() -> agentFacade.publishAgent(agent.getId(), "First release"))
+            .isInstanceOf(ConfigurationException.class)
+            .satisfies(exception -> assertThat(((ConfigurationException) exception).getErrorKey())
+                .isEqualTo(AiAgentErrorType.CHANNEL_PARAMETER_MISSING.getErrorKey()));
+    }
+
+    @Test
+    void testPublishAgentWithSuppliedRequiredChannelParameterPublishes() {
+        AiAgentDTO agentDTO = agentFacade.createAgent("Support Bot", null, workspaceId);
+        AiAgent agent = agentDTO.agent();
+
+        agentFacade.addAgentElement(
+            agent.getId(), AiAgentElement.KIND_MODEL, null, Map.of("provider", "openai", "model", "gpt-4"), null);
+        agentFacade.addAgentChannel(agent.getId(), "twilio", Map.of("number", "+15550000000"), null);
+
+        assertThat(agentFacade.publishAgent(agent.getId(), "First release")).isPositive();
+    }
+
     @Test
     void testPublishAgentWithUnpublishedSubAgentThrowsSubAgentNotPublished() {
         AiAgentDTO parentAgentDTO = agentFacade.createAgent("Parent Bot", null, workspaceId);
@@ -973,6 +1014,37 @@ class AiAgentFacadeIntTest {
         for (String workflowId : allWorkflowIds) {
             assertThat(workflowCrudRepository.findById(workflowId)).isEmpty();
         }
+    }
+
+    /**
+     * The channel definitions the client's cards, add menu and approval picker are built from. Asserts the two things
+     * no compiler can: that the synthesized {@code schedule} entry — which no component declares, so the registry
+     * cannot supply it — survives all the way to the facade, and that every entry carries a non-blank title, since the
+     * client renders that string directly and a missing declaration would surface a raw lowercase component name.
+     */
+    @Test
+    void testGetAgentChannelDefinitionsIncludesSynthesizedScheduleEntry() {
+        List<ResolvedAgentChannel> channelDefinitions = agentFacade.getAgentChannelDefinitions();
+
+        assertThat(channelDefinitions)
+            .extracting(ResolvedAgentChannel::name)
+            .contains(
+                AiAgentChannelType.CHAT, AiAgentChannelType.WORKFLOW_CALL, AiAgentChannelType.SCHEDULE, "slack",
+                "telegram", "twilio");
+
+        assertThat(channelDefinitions)
+            .allSatisfy(channelDefinition -> assertThat(channelDefinition.title()).isNotBlank());
+
+        ResolvedAgentChannel scheduleChannelDefinition = channelDefinitions.stream()
+            .filter(channelDefinition -> AiAgentChannelType.SCHEDULE.equals(channelDefinition.name()))
+            .findFirst()
+            .orElseThrow();
+
+        assertThat(scheduleChannelDefinition.title()).isEqualTo("Schedule");
+        assertThat(scheduleChannelDefinition.triggerType()).isEqualTo("schedule/v1/cron");
+        assertThat(scheduleChannelDefinition.replyActionType()).isNull();
+        assertThat(scheduleChannelDefinition.connectionRequired()).isFalse();
+        assertThat(scheduleChannelDefinition.approvalDelivery()).isNull();
     }
 
     /**

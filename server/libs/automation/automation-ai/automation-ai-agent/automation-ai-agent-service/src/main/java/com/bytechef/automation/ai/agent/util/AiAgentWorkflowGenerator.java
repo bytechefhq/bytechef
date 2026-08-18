@@ -19,11 +19,9 @@ package com.bytechef.automation.ai.agent.util;
 import com.bytechef.automation.ai.agent.channel.AiAgentChannelType;
 import com.bytechef.automation.ai.agent.channel.ApprovalChannelDefinitions;
 import com.bytechef.automation.ai.agent.channel.ApprovalChannelDefinitions.ApprovalChannelDefinition;
-import com.bytechef.automation.ai.agent.channel.ChannelDefinition;
-import com.bytechef.automation.ai.agent.channel.ChannelDefinition.ApprovalDelivery;
-import com.bytechef.automation.ai.agent.channel.ChannelDefinition.EnvelopeMapping;
-import com.bytechef.automation.ai.agent.channel.ChannelDefinition.ReplyTask;
-import com.bytechef.automation.ai.agent.channel.ChannelDefinitions;
+import com.bytechef.automation.ai.agent.channel.ResolvedAgentChannel;
+import com.bytechef.automation.ai.agent.channel.ResolvedAgentChannel.ApprovalDelivery;
+import com.bytechef.automation.ai.agent.channel.ResolvedAgentChannel.Binding;
 import com.bytechef.automation.ai.agent.domain.AiAgent;
 import com.bytechef.automation.ai.agent.domain.AiAgentChannel;
 import com.bytechef.automation.ai.agent.domain.AiAgentElement;
@@ -38,6 +36,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import org.jspecify.annotations.Nullable;
@@ -125,39 +124,22 @@ public final class AiAgentWorkflowGenerator {
 
     private static final String BRANCH_TYPE = "branch/v1";
     private static final String VAR_SET_TYPE = "var/v1/set";
-    private static final String CONDITION_TYPE = "condition/v1";
-    private static final String TERMINATE_TYPE = "terminate/v1";
-
-    /** Slack Events API bot-message signals — see {@link #buildSlackBotEchoGuard}. */
-    private static final String SLACK_BOT_ID_FIELD = "bot_id";
-    private static final String SLACK_SUBTYPE_FIELD = "subtype";
-    private static final String SLACK_BOT_MESSAGE_SUBTYPE = "bot_message";
     private static final String AI_AGENT_NODE_NAME = "aiAgent_1";
     private static final String AI_AGENT_TYPE = "aiAgent/v1/streamChat";
 
     private static final String BRANCH_IN_NAME = "branch_in";
     private static final String BRANCH_OUT_NAME = "branch_out";
 
-    private static final String AGENT_OUTPUT_TOKEN = "__AGENT_OUTPUT__";
-    private static final String ENVELOPE_TOKEN_PREFIX = "__ENVELOPE__";
-    private static final String NODE_TOKEN = "__NODE__";
-    private static final String EMPTY_ARRAY_LITERAL = "[]";
-
     private static final String AGENT_OUTPUT_EXPRESSION = "${" + AI_AGENT_NODE_NAME + "}";
 
-    /** Envelope field keys — see {@link EnvelopeMapping} and the design doc's generated-shape table. */
+    /** Envelope field keys — see the design doc's generated-shape table. */
     private static final String FIELD_TEXT = "text";
     private static final String FIELD_CONVERSATION_ID = "conversationId";
     private static final String FIELD_ATTACHMENTS = "attachments";
-    private static final String FIELD_REPLY_TO = "replyTo";
-    private static final String FIELD_REPLY_FROM = "replyFrom";
     private static final String FIELD_CHANNEL = "channel";
 
     /** Stored per-schedule prompt: {@code AiAgentChannel.parameters["prompt"]}, per the interface note. */
     private static final String SCHEDULE_PROMPT_PARAMETER = "prompt";
-
-    /** A schedule's display name, stored on the agent_channel row purely so the UI can label the row. */
-    private static final String SCHEDULE_NAME_PARAMETER = "name";
 
     /**
      * {@code aiAgent_1}'s system-prompt parameter key — {@code LLMConstants.SYSTEM_PROMPT_PROPERTY = string(
@@ -166,46 +148,28 @@ public final class AiAgentWorkflowGenerator {
      */
     private static final String SYSTEM_PROMPT_PARAMETER = "systemPrompt";
 
-    /**
-     * Predefined {@code inputSchema} for the {@code workflowCall} trigger, per the interface note and
-     * {@code WorkflowNewWorkflowCallTrigger} / {@code WorkflowResponseUtils#triggerOutput} (the trigger's output is
-     * whatever this schema describes).
-     */
-    private static final String WORKFLOW_CALL_INPUT_SCHEMA =
-        "{\"type\":\"object\",\"properties\":{\"message\":{\"type\":\"string\"},"
-            + "\"conversationId\":{\"type\":\"string\"},"
-            + "\"attachments\":{\"type\":\"array\",\"items\":{\"type\":\"object\"}}},"
-            + "\"required\":[\"message\"]}";
-
-    /**
-     * Predefined {@code outputSchema} for {@code workflow/v1/responseToWorkflowCall}'s {@code response} dynamic
-     * properties, mirroring {@link #WORKFLOW_CALL_INPUT_SCHEMA}'s {@code message} field name (see
-     * {@code ChannelDefinitions.workflowCall()}'s source comment: "building that JSON-schema string is the generator's
-     * job").
-     */
-    private static final String WORKFLOW_CALL_OUTPUT_SCHEMA =
-        "{\"type\":\"object\",\"properties\":{\"message\":{\"type\":\"string\"}},\"required\":[\"message\"]}";
-
-    private static final String INPUT_SCHEMA_PARAMETER = "inputSchema";
-    private static final String OUTPUT_SCHEMA_PARAMETER = "outputSchema";
-
     private AiAgentWorkflowGenerator() {
     }
 
     /**
      * Builds the complete workflow-definition JSON for {@code agent}. {@code elements} and {@code subAgentResolver}
-     * feed {@code aiAgent_1}'s {@code clusterElements} — see this class's javadoc.
+     * feed {@code aiAgent_1}'s {@code clusterElements} — see this class's javadoc. {@code creatorUserId} is the
+     * caller's already-resolved mapping of {@link AiAgent#getCreatedBy()} (an auditing username string) to a platform
+     * user id — see {@code WorkflowExtConstants.AI_HUB_CREATOR_USER_ID}; {@code null} when the creator's username could
+     * not be resolved (e.g. the user was since deleted), in which case that field of the stamp is simply omitted.
      */
     public static String generate(
         AiAgent agent, List<AiAgentChannel> channels, List<AiAgentElement> elements,
-        Function<Long, SubAgentRef> subAgentResolver) {
+        Function<Long, SubAgentRef> subAgentResolver, @Nullable Long creatorUserId,
+        Function<String, ResolvedAgentChannel> channelResolver) {
 
         Objects.requireNonNull(agent, "agent");
         Objects.requireNonNull(channels, "channels");
         Objects.requireNonNull(elements, "elements");
         Objects.requireNonNull(subAgentResolver, "subAgentResolver");
+        Objects.requireNonNull(channelResolver, "channelResolver");
 
-        List<ChannelNode> channelNodes = buildChannelNodes(channels);
+        List<ChannelNode> channelNodes = buildChannelNodes(channels, channelResolver);
 
         Map<String, Object> definition = new LinkedHashMap<>();
 
@@ -216,7 +180,8 @@ public final class AiAgentWorkflowGenerator {
         definition.put(
             "tasks",
             List.of(
-                buildBranchIn(agent, channelNodes), buildAiAgentNode(agent, channels, elements, subAgentResolver),
+                buildBranchIn(agent, channelNodes),
+                buildAiAgentNode(agent, channels, elements, subAgentResolver, creatorUserId, channelResolver),
                 buildBranchOut(channelNodes)));
 
         return JsonUtils.write(definition);
@@ -272,7 +237,7 @@ public final class AiAgentWorkflowGenerator {
      * connections from there, not from {@code AiAgentChannel}/{@code AiAgentElement}/{@code AiAgent.settings}
      * directly). Mirrors {@link #buildTools}'/{@link #buildClusterElements}'s own node-naming/counter logic exactly,
      * rather than sharing code with them, so the mapping can never silently drift from {@link #generate}'s actual
-     * output — see the "Known follow-ups" note on this invariant in {@code docs/agents/agents.md}.
+     * output — see the "Known follow-ups" note on this invariant in {@code .agents/agents.md}.
      *
      * <p>
      * Unlike the pre-built-ins version of this method, EVERY group {@link #buildTools} may emit — including groups that
@@ -287,24 +252,25 @@ public final class AiAgentWorkflowGenerator {
      * wrong node name for those refs.
      */
     public static List<ConnectionRef> buildConnectionRefs(
-        AiAgent agent, List<AiAgentChannel> channels, List<AiAgentElement> elements) {
+        AiAgent agent, List<AiAgentChannel> channels, List<AiAgentElement> elements,
+        Function<String, ResolvedAgentChannel> channelResolver) {
 
         Objects.requireNonNull(agent, "agent");
         Objects.requireNonNull(channels, "channels");
         Objects.requireNonNull(elements, "elements");
+        Objects.requireNonNull(channelResolver, "channelResolver");
 
         List<ConnectionRef> connectionRefs = new ArrayList<>();
 
-        for (ChannelNode channelNode : buildChannelNodes(channels)) {
-            ChannelDefinition definition = channelNode.definition();
+        for (ChannelNode channelNode : buildChannelNodes(channels, channelResolver)) {
+            ResolvedAgentChannel definition = channelNode.definition();
 
             if (definition.connectionRequired()) {
                 connectionRefs.add(
                     new ConnectionRef(
                         channelNode.channel()
                             .getId(),
-                        ConnectionRefOwnerKind.CHANNEL, channelNode.nodeName(),
-                        componentNameOf(definition.triggerType())));
+                        ConnectionRefOwnerKind.CHANNEL, channelNode.nodeName(), definition.componentName()));
             }
         }
 
@@ -322,7 +288,8 @@ public final class AiAgentWorkflowGenerator {
                     nextNodeName(nodeCounters, provider)));
         }
 
-        List<ApprovalDeliveryChannel> approvalDeliveryChannels = buildApprovalDeliveryChannels(channels);
+        List<ApprovalDeliveryChannel> approvalDeliveryChannels = buildApprovalDeliveryChannels(
+            channels, channelResolver);
 
         boolean approvalGateEnabled = singleElementOfKind(elements, KIND_APPROVAL_GATE) != null;
 
@@ -437,13 +404,15 @@ public final class AiAgentWorkflowGenerator {
      * {@code workflowCall}'s caller is another workflow — and an agent left with none falls back to the chat channel at
      * run time, which is the pre-existing behaviour for an empty list.
      */
-    private static List<ApprovalDeliveryChannel> buildApprovalDeliveryChannels(List<AiAgentChannel> channels) {
+    private static List<ApprovalDeliveryChannel> buildApprovalDeliveryChannels(
+        List<AiAgentChannel> channels, Function<String, ResolvedAgentChannel> channelResolver) {
+
         List<ApprovalDeliveryChannel> deliveryChannels = new ArrayList<>();
 
         for (AiAgentChannel channel : channels) {
-            ChannelDefinition channelDefinition = ChannelDefinitions.getChannelDefinition(channel.getChannelType());
+            ResolvedAgentChannel resolvedAgentChannel = resolveChannel(channelResolver, channel.getChannelType());
 
-            ApprovalDelivery approvalDelivery = channelDefinition.approvalDelivery();
+            ApprovalDelivery approvalDelivery = resolvedAgentChannel.approvalDelivery();
 
             if (approvalDelivery == null) {
                 continue;
@@ -475,7 +444,9 @@ public final class AiAgentWorkflowGenerator {
      * {@code position} — then assigns each a {@code <channelType>_<n>} node name, {@code n} counting per channelType in
      * that order.
      */
-    private static List<ChannelNode> buildChannelNodes(List<AiAgentChannel> channels) {
+    private static List<ChannelNode> buildChannelNodes(
+        List<AiAgentChannel> channels, Function<String, ResolvedAgentChannel> channelResolver) {
+
         List<AiAgentChannel> chatChannels = channelsOfType(channels, AiAgentChannelType.CHAT);
         List<AiAgentChannel> workflowCallChannels = channelsOfType(channels, AiAgentChannelType.WORKFLOW_CALL);
         List<AiAgentChannel> remainingChannels = channels.stream()
@@ -498,10 +469,28 @@ public final class AiAgentWorkflowGenerator {
             int n = countByChannelType.merge(channelType, 1, Integer::sum);
             String nodeName = channelType + "_" + n;
 
-            channelNodes.add(new ChannelNode(channel, nodeName, ChannelDefinitions.getChannelDefinition(channelType)));
+            channelNodes.add(new ChannelNode(channel, nodeName, resolveChannel(channelResolver, channelType)));
         }
 
         return channelNodes;
+    }
+
+    /**
+     * @throws IllegalArgumentException if no component declares {@code channelType} and it is not the synthesized
+     *                                  {@code schedule} entry — a stored row naming a channel the registry cannot serve
+     *                                  (an uninstalled component, a renamed channel) must fail loudly rather than
+     *                                  generate a workflow silently missing that trigger
+     */
+    private static ResolvedAgentChannel resolveChannel(
+        Function<String, ResolvedAgentChannel> channelResolver, String channelType) {
+
+        ResolvedAgentChannel resolvedAgentChannel = channelResolver.apply(channelType);
+
+        if (resolvedAgentChannel == null) {
+            throw new IllegalArgumentException("Unknown agent channel type: " + channelType);
+        }
+
+        return resolvedAgentChannel;
     }
 
     private static List<AiAgentChannel> channelsOfType(List<AiAgentChannel> channels, String channelType) {
@@ -525,7 +514,7 @@ public final class AiAgentWorkflowGenerator {
 
     private static Map<String, Object> buildTrigger(ChannelNode channelNode) {
         AiAgentChannel channel = channelNode.channel();
-        ChannelDefinition definition = channelNode.definition();
+        ResolvedAgentChannel definition = channelNode.definition();
 
         Map<String, Object> trigger = new LinkedHashMap<>();
 
@@ -540,25 +529,38 @@ public final class AiAgentWorkflowGenerator {
         return trigger;
     }
 
-    private static Map<String, Object> buildTriggerParameters(AiAgentChannel channel, ChannelDefinition definition) {
-        Map<String, Object> parameters = new LinkedHashMap<>(definition.defaultTriggerParameters());
+    /**
+     * The trigger node's parameters: the trigger's own declared defaults, then the owning {@code agent_channel} row's
+     * per-instance config, and finally whatever the channel declaration pins ({@code workflowCall}'s
+     * {@code inputSchema}).
+     * <p>
+     * Row parameters are restricted to properties the resolved trigger actually declares, so a row key that exists only
+     * for the UI stays on the row — a schedule row's {@code prompt} (which feeds branch_in's envelope text) and
+     * {@code name} (which only labels the row) are excluded generically by {@code cron} declaring neither, rather than
+     * by a bespoke exclusion list this generator would have to keep in sync.
+     * <p>
+     * The declaration's parameters go on LAST because pinned means pinned — the SDK calls them "trigger parameters that
+     * are always emitted for this channel". They name declared trigger properties, so they would otherwise pass the
+     * row-parameter allow-list and be replaceable through {@code updateAgentChannel}: a {@code workflowCall} row
+     * carrying {@code inputSchema} would silently swap out the contract schema {@code ${workflowCall_1.message}} is
+     * derived from.
+     */
+    private static Map<String, Object> buildTriggerParameters(
+        AiAgentChannel channel, ResolvedAgentChannel definition) {
 
-        // Per-instance config (schedule's cron/timezone, messaging filters) layered on top from the owning
-        // agent_channel row. SCHEDULE_PROMPT_PARAMETER is excluded — it feeds branch_in's envelope text, not a
-        // property any trigger declares — and so is SCHEDULE_NAME_PARAMETER, which exists only to label the row
-        // in the UI and would otherwise be emitted as an unknown trigger property.
+        Map<String, Object> parameters = new LinkedHashMap<>(definition.triggerPropertyDefaults());
+
+        Set<String> triggerPropertyNames = definition.triggerPropertyNames();
+
         for (Map.Entry<String, ?> entry : channel.getParameters()
             .entrySet()) {
 
-            if (!SCHEDULE_PROMPT_PARAMETER.equals(entry.getKey())
-                && !SCHEDULE_NAME_PARAMETER.equals(entry.getKey())) {
+            if (triggerPropertyNames.contains(entry.getKey())) {
                 parameters.put(entry.getKey(), entry.getValue());
             }
         }
 
-        if (AiAgentChannelType.WORKFLOW_CALL.equals(channel.getChannelType())) {
-            parameters.put(INPUT_SCHEMA_PARAMETER, WORKFLOW_CALL_INPUT_SCHEMA);
-        }
+        parameters.putAll(definition.triggerParameters());
 
         return parameters;
     }
@@ -578,12 +580,7 @@ public final class AiAgentWorkflowGenerator {
             Map<String, Object> oneCase = new LinkedHashMap<>();
 
             oneCase.put("key", channelNode.nodeName());
-            oneCase.put(
-                "tasks",
-                AiAgentChannelType.SLACK.equals(channelNode.channel()
-                    .getChannelType())
-                        ? List.of(buildSlackBotEchoGuard(channelNode, envelopeSetTask))
-                        : List.of(envelopeSetTask));
+            oneCase.put("tasks", List.of(envelopeSetTask));
 
             cases.add(oneCase);
         }
@@ -610,107 +607,46 @@ public final class AiAgentWorkflowGenerator {
     }
 
     /**
-     * Guards the slack case against Slack's own webhook redelivering the bot's OWN reply as a new inbound event:
-     * {@code slack/v1/sendChannelMessage} posts as the configured bot, and {@code slack/v1/anyEvent} has no built-in
-     * filter to exclude a bot's own messages from the events it delivers, so without this guard every agent reply would
-     * loop back in as a new inbound turn, get answered again, get redelivered again — an unbounded
-     * agent-replies-to-itself loop (and, since each iteration is a real LLM call, an unbounded cost loop too).
-     *
+     * The {@code branch_in} case's envelope: the contract's three fields read off the trigger node through the
+     * channel's own request binding, plus the channel key. A channel that carries no attachments (its descriptor binds
+     * no path) gets a real empty array rather than an expression reading nothing.
      * <p>
-     * <b>Detection.</b> {@code SlackAnyEventTrigger} declares no output schema — {@code webhookRequest} returns Slack's
-     * raw Events API {@code event} object verbatim — so the trigger node's own output carries whatever fields that
-     * event has. Per the Slack Events API, a message posted by a bot (including via {@code chat.postMessage}, what the
-     * reply task uses) carries a {@code bot_id} field; a message from a "legacy" bot integration instead carries
-     * {@code subtype == "bot_message"}. Checking both covers either shape.
-     *
-     * <p>
-     * <b>Guard mechanism: {@code terminate/v1}, not a silent {@code branch_out} case.</b> A nested {@code condition/v1}
-     * wraps the channel's normal envelope task: the FALSE arm (not a bot event) is the ordinary
-     * {@code envelope_slack_<n>} {@code var/v1/set} task; the TRUE arm (a bot event) is a {@code terminate/v1} task,
-     * which stops the whole job cleanly before {@code aiAgent_1} ever runs (see {@code TerminateTaskDispatcher}: it
-     * marks every ancestor task execution — the condition, and {@code branch_in} itself — {@code CANCELLED} and
-     * publishes a job-stop event). This was chosen over the cheaper-looking alternative of letting the envelope task
-     * run as normal but making {@code branch_out}'s {@code channel} field a SpEL conditional that emits an unmatched
-     * sentinel (e.g. {@code "slackSilent"}) for a bot event, so {@code branch_out} falls through its default (no case,
-     * no reply): that alternative is strictly worse because {@code aiAgent_1} — a real, billed LLM call — would still
-     * run on every bot-echoed event, merely suppressing the reply rather than avoiding the cost. {@code terminate/v1}
-     * avoids the LLM call entirely, so it is the primary approach; the {@code branch_out}-sentinel shape is documented
-     * here only as the fallback if {@code terminate/v1} were ever found unsuitable inside a nested {@code branch_in}
-     * case (it has not been).
+     * <b>Schedule is the one exception</b>, and the only place this generator knows a channel key: a schedule receives
+     * nothing, so its text is the row's stored prompt and its conversation id is a content-derived UUID (a fresh random
+     * one would break byte-identical regeneration). Both are written before either binding path would be consulted —
+     * which is why the synthesized schedule binding may carry nulls.
      */
-    private static Map<String, Object> buildSlackBotEchoGuard(ChannelNode channelNode, Map<String, Object> normalTask) {
-        String nodeName = channelNode.nodeName();
-
-        Map<String, Object> terminateTask = new LinkedHashMap<>();
-
-        terminateTask.put("name", "terminateBotEvent_" + nodeName);
-        terminateTask.put("type", TERMINATE_TYPE);
-        terminateTask.put(
-            "parameters",
-            Map.of(
-                "message",
-                "Ignored a Slack event that originated from this agent's own bot reply (echo-loop guard)."));
-
-        Map<String, Object> conditionParameters = new LinkedHashMap<>();
-
-        // NOT a ${...} template: SpelEvaluator's TEXT-accessor grammar (used everywhere else in this generator,
-        // e.g. envelope fields) only allows a single bare property path inside ${...} (see
-        // SpelEvaluator.INVALID_ACCESSOR_PATTERN — no operators, comparisons, or literals). A boolean SpEL formula
-        // needs the OTHER supported form instead: a leading "=" with no ${}/{} wrapper at all (SpelEvaluator's
-        // FORMULA_EXPRESSION_PATTERN), the same convention condition/v1's own "Raw Expression" UI mode uses.
-        //
-        // Bracket ['key'] indexing, not dot property access: SlackAnyEventTrigger declares no output schema, so
-        // bot_id is very often simply ABSENT from the map (present only on a bot-posted event). ByteChef's custom
-        // SpEL MapPropertyAccessor (which is what makes dot-notation like "slack_1.text" work elsewhere in this
-        // generator) does not resolve an absent key to null the way plain Map#get does; SpEL's built-in bracket
-        // indexer does, so this is the only form that is safe against a missing bot_id/subtype key.
-        conditionParameters.put("rawExpression", true);
-        conditionParameters.put(
-            "expression",
-            "=" + nodeName + "['" + SLACK_BOT_ID_FIELD + "'] != null or " + nodeName + "['" + SLACK_SUBTYPE_FIELD
-                + "'] == '" + SLACK_BOT_MESSAGE_SUBTYPE + "'");
-        conditionParameters.put("caseTrue", List.of(terminateTask));
-        conditionParameters.put("caseFalse", List.of(normalTask));
-
-        Map<String, Object> conditionTask = new LinkedHashMap<>();
-
-        conditionTask.put("name", "botGuard_" + nodeName);
-        conditionTask.put("type", CONDITION_TYPE);
-        conditionTask.put("parameters", conditionParameters);
-
-        return conditionTask;
-    }
-
     private static Map<String, Object> buildEnvelope(AiAgent agent, ChannelNode channelNode) {
         AiAgentChannel channel = channelNode.channel();
-        EnvelopeMapping mapping = channelNode.definition()
-            .envelopeMapping();
+        String nodeName = channelNode.nodeName();
+
+        Binding binding = channelNode.definition()
+            .binding();
 
         Map<String, Object> envelope = new LinkedHashMap<>();
 
         if (AiAgentChannelType.SCHEDULE.equals(channel.getChannelType())) {
-            // Overrides EnvelopeMapping.text() (null in the registry — no incoming message to derive it from) and
-            // EnvelopeMapping.conversationId() ("=uuid()", a fresh non-deterministic id each run — incompatible with
-            // the byte-identical-output requirement). Per the interface note: text is the channel's stored prompt,
-            // conversationId is a content-derived UUID so regenerating the same agent yields the same value.
             envelope.put(FIELD_TEXT, MapUtils.getRequiredString(channel.getParameters(), SCHEDULE_PROMPT_PARAMETER));
             envelope.put(FIELD_CONVERSATION_ID, scheduleConversationId(agent, channel));
         } else {
-            envelope.put(FIELD_TEXT, substitute(mapping.text(), channelNode.nodeName()));
-            envelope.put(FIELD_CONVERSATION_ID, substitute(mapping.conversationId(), channelNode.nodeName()));
+            String messagePath = Objects.requireNonNull(binding.messagePath(), "messagePath");
+            String conversationIdPath = Objects.requireNonNull(binding.conversationIdPath(), "conversationIdPath");
+
+            envelope.put(FIELD_TEXT, nodeExpression(nodeName, messagePath));
+            envelope.put(FIELD_CONVERSATION_ID, nodeExpression(nodeName, conversationIdPath));
         }
 
-        envelope.put(FIELD_ATTACHMENTS, substituteAttachments(mapping.attachments(), channelNode.nodeName()));
-        envelope.put(FIELD_REPLY_TO, substitute(mapping.replyTo(), channelNode.nodeName()));
+        String attachmentsPath = binding.attachmentsPath();
 
-        // Only channels whose reply action takes a sender address carry this; omitting it otherwise keeps every
-        // pre-existing channel's generated envelope byte-identical.
-        if (mapping.replyFrom() != null) {
-            envelope.put(FIELD_REPLY_FROM, substitute(mapping.replyFrom(), channelNode.nodeName()));
-        }
+        envelope.put(
+            FIELD_ATTACHMENTS, attachmentsPath == null ? List.of() : nodeExpression(nodeName, attachmentsPath));
         envelope.put(FIELD_CHANNEL, channel.getChannelType());
 
         return envelope;
+    }
+
+    private static String nodeExpression(String nodeName, String path) {
+        return "${" + nodeName + "." + path + "}";
     }
 
     /**
@@ -725,32 +661,12 @@ public final class AiAgentWorkflowGenerator {
             .toString();
     }
 
-    private static Object substitute(String expression, String nodeName) {
-        if (expression == null) {
-            return null;
-        }
-
-        return expression.replace(NODE_TOKEN, nodeName);
-    }
-
-    /**
-     * {@code EnvelopeMapping.attachments()} is either a real expression (chat) or the literal
-     * {@value #EMPTY_ARRAY_LITERAL} (every other channel — see {@link EnvelopeMapping#attachments()}'s doc). The
-     * literal means an actual empty array, not the two-character string, so it is emitted as {@link List#of()}.
-     */
-    private static Object substituteAttachments(String expression, String nodeName) {
-        if (EMPTY_ARRAY_LITERAL.equals(expression)) {
-            return List.of();
-        }
-
-        return substitute(expression, nodeName);
-    }
-
     // --- aiAgent_1 -----------------------------------------------------------------------------------------------
 
     private static Map<String, Object> buildAiAgentNode(
         AiAgent agent, List<AiAgentChannel> channels, List<AiAgentElement> elements,
-        Function<Long, SubAgentRef> subAgentResolver) {
+        Function<Long, SubAgentRef> subAgentResolver, @Nullable Long creatorUserId,
+        Function<String, ResolvedAgentChannel> channelResolver) {
 
         Map<String, Object> parameters = new LinkedHashMap<>();
 
@@ -770,7 +686,28 @@ public final class AiAgentWorkflowGenerator {
         aiAgentNode.put("name", AI_AGENT_NODE_NAME);
         aiAgentNode.put("type", AI_AGENT_TYPE);
         aiAgentNode.put("parameters", parameters);
-        aiAgentNode.put("clusterElements", buildClusterElements(agent, channels, elements, subAgentResolver));
+        aiAgentNode.put(
+            "clusterElements", buildClusterElements(agent, channels, elements, subAgentResolver, channelResolver));
+
+        // AI Hub visibility identity stamp — see WorkflowExtConstants.AI_HUB_*_ID's javadoc. Every field is emitted
+        // only when resolvable, so an agent with no workspace (embedded has no workspace concept) or whose creator
+        // could not be resolved to a user id simply carries a partial (or absent) stamp, and
+        // AbstractAiAgentChatAction treats that the same as "nothing to report".
+        Long workspaceId = agent.getWorkspaceId();
+
+        if (workspaceId != null) {
+            aiAgentNode.put(WorkflowExtConstants.AI_HUB_WORKSPACE_ID, workspaceId);
+        }
+
+        Long aiAgentId = agent.getId();
+
+        if (aiAgentId != null) {
+            aiAgentNode.put(WorkflowExtConstants.AI_HUB_AGENT_ID, aiAgentId);
+        }
+
+        if (creatorUserId != null) {
+            aiAgentNode.put(WorkflowExtConstants.AI_HUB_CREATOR_USER_ID, creatorUserId);
+        }
 
         return aiAgentNode;
     }
@@ -913,9 +850,10 @@ public final class AiAgentWorkflowGenerator {
      * {@code "conversationId"}) and {@code WorkflowComponentHandler}'s {@code component(WorkflowConstants.WORKFLOW)}
      * where {@code WORKFLOW = "workflow"}. Unlike the generic {@code callWorkflow} element (arbitrary sub-workflow,
      * dynamic input schema), {@code callAiAgent} targets the fixed {@code {message, conversationId}} contract every
-     * AiAgent-generated workflow's {@code workflowCall} channel declares (see {@link #WORKFLOW_CALL_INPUT_SCHEMA}), so
-     * this generator emits {@code agentUuid} directly instead of resolving a workflow uuid itself —
-     * {@code CallableAiAgentDataSource#resolveAgent} does that mapping at dispatch time.
+     * AiAgent-generated workflow's {@code workflowCall} channel declares (the {@code workflow} component pins that
+     * schema on the channel's own {@code triggerParameters}), so this generator emits {@code agentUuid} directly
+     * instead of resolving a workflow uuid itself — {@code CallableAiAgentDataSource#resolveAgent} does that mapping at
+     * dispatch time.
      */
     private static final String WORKFLOW_COMPONENT = "workflow";
     private static final String CALL_AI_AGENT_ELEMENT_NAME = "callAiAgent";
@@ -993,7 +931,7 @@ public final class AiAgentWorkflowGenerator {
      */
     private static Map<String, Object> buildClusterElements(
         AiAgent agent, List<AiAgentChannel> channels, List<AiAgentElement> elements,
-        Function<Long, SubAgentRef> subAgentResolver) {
+        Function<Long, SubAgentRef> subAgentResolver, Function<String, ResolvedAgentChannel> channelResolver) {
 
         Map<String, Integer> nodeCounters = new LinkedHashMap<>();
         Map<String, Object> clusterElements = new LinkedHashMap<>();
@@ -1007,7 +945,7 @@ public final class AiAgentWorkflowGenerator {
         }
 
         List<Map<String, Object>> tools = buildTools(
-            agent.getSettings(), channels, elements, subAgentResolver, nodeCounters);
+            agent.getSettings(), channels, elements, subAgentResolver, nodeCounters, channelResolver);
 
         if (!tools.isEmpty()) {
             clusterElements.put(CLUSTER_KEY_TOOLS, tools);
@@ -1091,11 +1029,13 @@ public final class AiAgentWorkflowGenerator {
      */
     private static List<Map<String, Object>> buildTools(
         Map<String, ?> settings, List<AiAgentChannel> channels, List<AiAgentElement> elements,
-        Function<Long, SubAgentRef> subAgentResolver, Map<String, Integer> nodeCounters) {
+        Function<Long, SubAgentRef> subAgentResolver, Map<String, Integer> nodeCounters,
+        Function<String, ResolvedAgentChannel> channelResolver) {
 
         List<Map<String, Object>> tools = new ArrayList<>();
 
-        List<ApprovalDeliveryChannel> approvalDeliveryChannels = buildApprovalDeliveryChannels(channels);
+        List<ApprovalDeliveryChannel> approvalDeliveryChannels = buildApprovalDeliveryChannels(
+            channels, channelResolver);
         AiAgentElement approvalGateElement = singleElementOfKind(elements, KIND_APPROVAL_GATE);
 
         for (ToolSequenceEntry entry : buildToolSequence(
@@ -1545,7 +1485,7 @@ public final class AiAgentWorkflowGenerator {
     private static Map<String, Object> buildBranchOut(List<ChannelNode> channelNodes) {
         Map<String, Object> parameters = new LinkedHashMap<>();
 
-        parameters.put("expression", "${" + BRANCH_IN_NAME + "." + FIELD_CHANNEL + "}");
+        parameters.put("expression", "${" + JobInputConstants.TRIGGER_NAME_INPUT + "}");
         parameters.put("cases", buildBranchOutCases(channelNodes));
 
         Map<String, Object> branchOut = new LinkedHashMap<>();
@@ -1558,109 +1498,117 @@ public final class AiAgentWorkflowGenerator {
     }
 
     /**
-     * One case per distinct channelType (channels sharing a type — e.g. two telegram channels — share one reply case:
-     * reply routing only needs the channel kind + {@code replyTo}, both already in the envelope).
+     * One case per channel ROW, keyed by the trigger's node name — not one per channel TYPE, which is what this used to
+     * emit. A reply action may take values configured on the row (twilio's WhatsApp number, which the reply is sent
+     * AS), and two rows of one type would then have to share a single case carrying one of the two numbers.
      */
     private static List<Map<String, Object>> buildBranchOutCases(List<ChannelNode> channelNodes) {
-        Map<String, ChannelDefinition> definitionByChannelType = new LinkedHashMap<>();
-
-        for (ChannelNode channelNode : channelNodes) {
-            definitionByChannelType.putIfAbsent(
-                channelNode.channel()
-                    .getChannelType(),
-                channelNode.definition());
-        }
-
         List<Map<String, Object>> cases = new ArrayList<>();
 
-        for (Map.Entry<String, ChannelDefinition> entry : definitionByChannelType.entrySet()) {
-            cases.add(buildBranchOutCase(entry.getKey(), entry.getValue()));
+        for (ChannelNode channelNode : channelNodes) {
+            cases.add(buildBranchOutCase(channelNode));
         }
 
         return cases;
     }
 
-    private static Map<String, Object> buildBranchOutCase(String channelType, ChannelDefinition definition) {
+    private static Map<String, Object> buildBranchOutCase(ChannelNode channelNode) {
+        ResolvedAgentChannel definition = channelNode.definition();
+
         Map<String, Object> oneCase = new LinkedHashMap<>();
 
-        oneCase.put("key", channelType);
+        oneCase.put("key", channelNode.nodeName());
 
-        ReplyTask replyTask = definition.replyTask();
-
-        // schedule has no ReplyTask (design doc: "empty case — no reply; the run's value is tool side effects").
+        // A schedule has no reply action (design doc: "empty case -- no reply; the run's value is tool side effects").
         oneCase.put(
-            "tasks", replyTask == null ? List.of() : List.of(buildReplyTask(channelType, definition, replyTask)));
+            "tasks", definition.replyActionType() == null ? List.of() : List.of(buildReplyTask(channelNode)));
 
         return oneCase;
     }
 
-    private static Map<String, Object> buildReplyTask(
-        String channelType, ChannelDefinition definition,
-        ReplyTask replyTask) {
+    /**
+     * The reply task, built entirely from the reply action's own descriptor — every property name below comes from the
+     * component's declaration, so no component is named here.
+     */
+    private static Map<String, Object> buildReplyTask(ChannelNode channelNode) {
+        ResolvedAgentChannel definition = channelNode.definition();
+
+        Binding binding = definition.binding();
 
         Map<String, Object> parameters = new LinkedHashMap<>();
 
-        if (AiAgentChannelType.WORKFLOW_CALL.equals(channelType)) {
-            parameters.put(OUTPUT_SCHEMA_PARAMETER, WORKFLOW_CALL_OUTPUT_SCHEMA);
+        putReplyParameter(
+            parameters, Objects.requireNonNull(binding.replyMessageProperty(), "replyMessageProperty"),
+            AGENT_OUTPUT_EXPRESSION);
+
+        String replyConversationIdProperty = binding.replyConversationIdProperty();
+
+        if (replyConversationIdProperty != null) {
+            putReplyParameter(
+                parameters, replyConversationIdProperty,
+                "${" + BRANCH_IN_NAME + "." + FIELD_CONVERSATION_ID + "}");
         }
 
-        @SuppressWarnings("unchecked")
-        Map<String, Object> substitutedParameters = (Map<String, Object>) substituteReplyValue(
-            replyTask.parameters());
+        // binding.replyAttachmentsProperty() is deliberately left unwired: aiAgent_1's output is a bare string today,
+        // so there is nothing to send back.
 
-        parameters.putAll(substitutedParameters);
+        AiAgentChannel channel = channelNode.channel();
 
-        Map<String, Object> replyTaskMap = new LinkedHashMap<>();
+        for (Map.Entry<String, String> entry : binding.replyChannelParameters()
+            .entrySet()) {
 
-        replyTaskMap.put("name", "reply_" + channelType);
-        replyTaskMap.put("type", replyTask.type());
-        replyTaskMap.put("parameters", parameters);
+            Object value = channel.getParameters()
+                .get(entry.getKey());
+
+            if (value != null) {
+                putReplyParameter(parameters, entry.getValue(), value);
+            }
+        }
+
+        for (Map.Entry<String, Object> entry : binding.replyFixedParameters()
+            .entrySet()) {
+
+            putReplyParameter(parameters, entry.getKey(), entry.getValue());
+        }
+
+        String replyActionType = Objects.requireNonNull(definition.replyActionType(), "replyActionType");
+
+        Map<String, Object> replyTask = new LinkedHashMap<>();
+
+        replyTask.put("name", "reply_" + channelNode.nodeName());
+        replyTask.put("type", replyActionType);
+        replyTask.put("parameters", parameters);
 
         if (definition.connectionRequired()) {
-            replyTaskMap.put(WorkflowExtConstants.CONNECTIONS, buildConnections(replyTask.type()));
+            replyTask.put(WorkflowExtConstants.CONNECTIONS, buildConnections(replyActionType));
         }
 
-        return replyTaskMap;
+        return replyTask;
     }
 
     /**
-     * Recursively substitutes {@code __AGENT_OUTPUT__} and {@code __ENVELOPE__<field>} tokens (see
-     * {@link ChannelDefinition}'s class doc) in a {@link ReplyTask#parameters()} tree.
+     * A descriptor may target a nested parameter — {@code workflow}'s reply receives the agent's text at
+     * {@code "response.message"}, where {@code response} is a {@code dynamicProperties} map. A dotted name therefore
+     * becomes a nested map rather than a key that literally contains a dot.
      */
-    private static Object substituteReplyValue(Object value) {
-        if (value instanceof Map<?, ?> map) {
-            Map<String, Object> substituted = new LinkedHashMap<>();
+    @SuppressWarnings("unchecked")
+    private static void putReplyParameter(Map<String, Object> parameters, String propertyName, Object value) {
+        int index = propertyName.indexOf('.');
 
-            for (Map.Entry<?, ?> entry : map.entrySet()) {
-                substituted.put((String) entry.getKey(), substituteReplyValue(entry.getValue()));
-            }
+        if (index < 0) {
+            parameters.put(propertyName, value);
 
-            return substituted;
+            return;
         }
 
-        if (value instanceof String stringValue) {
-            if (AGENT_OUTPUT_TOKEN.equals(stringValue)) {
-                return AGENT_OUTPUT_EXPRESSION;
-            }
+        Map<String, Object> nestedParameters = (Map<String, Object>) parameters.computeIfAbsent(
+            propertyName.substring(0, index), key -> new LinkedHashMap<String, Object>());
 
-            if (stringValue.startsWith(ENVELOPE_TOKEN_PREFIX)) {
-                String field = stringValue.substring(ENVELOPE_TOKEN_PREFIX.length());
-
-                return "${" + BRANCH_IN_NAME + "." + field + "}";
-            }
-
-            return stringValue;
-        }
-
-        return value;
+        putReplyParameter(nestedParameters, propertyName.substring(index + 1), value);
     }
 
     // --- connections ---------------------------------------------------------------------------------------------
 
-    /**
-     * {@code nodeType} is {@code <componentName>/v<version>/<operation>} (every {@code ChannelDefinition} trigger and
-     * reply type follows this convention — see {@code ChannelDefinitions}' source citations).
-     */
     /**
      * A {@code connections} block for a TASK or TRIGGER node, keyed by component name — the platform's convention for a
      * node that is a workflow node in its own right. Cluster elements use
@@ -1703,6 +1651,6 @@ public final class AiAgentWorkflowGenerator {
         return Map.of(connectionKey, connection);
     }
 
-    private record ChannelNode(AiAgentChannel channel, String nodeName, ChannelDefinition definition) {
+    private record ChannelNode(AiAgentChannel channel, String nodeName, ResolvedAgentChannel definition) {
     }
 }

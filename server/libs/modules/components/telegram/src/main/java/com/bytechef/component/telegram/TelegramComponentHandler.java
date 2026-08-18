@@ -16,8 +16,10 @@
 
 package com.bytechef.component.telegram;
 
+import static com.bytechef.component.definition.ComponentDsl.agentChannel;
 import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.definition.ComponentDsl.tool;
+import static com.bytechef.component.telegram.constant.TelegramConstants.TELEGRAM;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -35,7 +37,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class TelegramComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component("telegram")
+    private static final ComponentDefinition COMPONENT_DEFINITION = component(TELEGRAM)
         .title("Telegram")
         .description(
             "Telegram is a cloud-based messaging platform that enables users to send messages, media, and files, and " +
@@ -53,6 +55,12 @@ public class TelegramComponentHandler implements ComponentHandler {
             tool(TelegramSendMediaAction.ACTION_DEFINITION),
             tool(TelegramSendMessageAction.ACTION_DEFINITION))
         .triggers(TelegramNewMessageTrigger.TRIGGER_DEFINITION)
+        .agentChannels(
+            agentChannel(
+                TELEGRAM, TelegramNewMessageTrigger.TRIGGER_DEFINITION,
+                TelegramSendMessageAction.ACTION_DEFINITION)
+                    .title("Telegram")
+                    .approvalChannel(TELEGRAM))
         .version(1);
 
     @Override

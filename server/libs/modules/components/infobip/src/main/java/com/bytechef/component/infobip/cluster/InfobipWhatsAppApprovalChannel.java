@@ -27,6 +27,7 @@ import static com.bytechef.component.infobip.constant.InfobipConstants.CONTENT;
 import static com.bytechef.component.infobip.constant.InfobipConstants.FROM;
 import static com.bytechef.component.infobip.constant.InfobipConstants.TEXT;
 import static com.bytechef.component.infobip.constant.InfobipConstants.TO;
+import static com.bytechef.component.infobip.constant.InfobipConstants.WHATS_APP;
 
 import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ClusterElementDefinition;
@@ -50,7 +51,7 @@ import java.util.Map;
 public class InfobipWhatsAppApprovalChannel {
 
     public static final ClusterElementDefinition<ApprovalChannelFunction> CLUSTER_ELEMENT_DEFINITION =
-        ComponentDsl.<ApprovalChannelFunction>clusterElement("whatsApp")
+        ComponentDsl.<ApprovalChannelFunction>clusterElement(WHATS_APP)
             .title("WhatsApp")
             .description("Sends an approval request WhatsApp text message via Infobip.")
             .type(APPROVAL_CHANNELS)

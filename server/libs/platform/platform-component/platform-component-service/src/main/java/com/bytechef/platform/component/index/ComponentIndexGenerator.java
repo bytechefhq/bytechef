@@ -17,6 +17,9 @@
 package com.bytechef.platform.component.index;
 
 import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.AgentChannelDefinition;
+import com.bytechef.component.definition.AgentReplyDefinition;
+import com.bytechef.component.definition.AgentRequestDefinition;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -28,6 +31,7 @@ import com.bytechef.platform.component.definition.ClusterRootComponentDefinition
 import com.bytechef.platform.component.handler.loader.ComponentHandlerLoader;
 import com.bytechef.platform.component.handler.loader.ComponentHandlerLoader.ProviderEntry;
 import com.bytechef.platform.component.handler.loader.DefaultComponentHandlerLoader;
+import com.bytechef.platform.component.index.ComponentIndex.AgentChannelSummary;
 import com.bytechef.platform.component.index.ComponentIndex.CategorySummary;
 import com.bytechef.platform.component.index.ComponentIndex.ClusterElementSummary;
 import com.bytechef.platform.component.index.ComponentIndex.ClusterElementTypeSummary;
@@ -42,6 +46,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import tools.jackson.databind.SerializationFeature;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -98,7 +104,7 @@ public class ComponentIndexGenerator {
         Files.writeString(outputPath, jsonMapper.writeValueAsString(new ComponentIndex(entries)));
     }
 
-    private static Entry toEntry(
+    static Entry toEntry(
         ComponentDefinition componentDefinition, String providerClassName, String loaderKind) {
 
         return new Entry(
@@ -131,6 +137,10 @@ public class ComponentIndexGenerator {
                 .map(ComponentIndexGenerator::toClusterElementSummary)
                 .toList(),
             toClusterElementTypeSummaries(componentDefinition),
+            componentDefinition.getAgentChannels()
+                .stream()
+                .map(ComponentIndexGenerator::toAgentChannelSummary)
+                .toList(),
             componentDefinition.getInputs()
                 .stream()
                 .map(PropertyGroup::getName)
@@ -173,6 +183,44 @@ public class ComponentIndexGenerator {
                     clusterElementType.name(), clusterElementType.key(), clusterElementType.label(),
                     clusterElementType.multipleElements(), clusterElementType.required()))
             .toList();
+    }
+
+    /**
+     * Records the full request/reply binding of an agent channel - not just its name - so the stub the index serves can
+     * rebuild a channel whose paths and mapped properties match the real component exactly.
+     */
+    private static AgentChannelSummary toAgentChannelSummary(AgentChannelDefinition agentChannelDefinition) {
+        AgentRequestDefinition agentRequestDefinition = agentChannelDefinition.getTrigger()
+            .getAgentRequestDefinition()
+            .orElseThrow();
+
+        Optional<AgentReplyDefinition> agentReplyDefinition = agentChannelDefinition.getReplyAction()
+            .flatMap(ActionDefinition::getAgentReplyDefinition);
+
+        return new AgentChannelSummary(
+            agentChannelDefinition.getName(),
+            agentChannelDefinition.getTitle()
+                .orElse(null),
+            agentChannelDefinition.getDescription()
+                .orElse(null),
+            agentChannelDefinition.getTriggerName(),
+            agentChannelDefinition.getReplyActionName(),
+            agentChannelDefinition.getApprovalChannelName()
+                .orElse(null),
+            agentRequestDefinition.getConversationIdPath(),
+            agentRequestDefinition.getMessagePath(),
+            agentRequestDefinition.getAttachmentsPath()
+                .orElse(null),
+            agentReplyDefinition.map(AgentReplyDefinition::getMessageProperty)
+                .orElse(null),
+            agentReplyDefinition.flatMap(AgentReplyDefinition::getConversationIdProperty)
+                .orElse(null),
+            agentReplyDefinition.flatMap(AgentReplyDefinition::getAttachmentsProperty)
+                .orElse(null),
+            agentReplyDefinition.map(AgentReplyDefinition::getChannelParameters)
+                .orElseGet(Map::of),
+            agentReplyDefinition.map(AgentReplyDefinition::getFixedParameters)
+                .orElseGet(Map::of));
     }
 
     private static ItemSummary toItemSummary(ActionDefinition actionDefinition) {

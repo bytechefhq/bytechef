@@ -22,6 +22,7 @@ import static com.bytechef.component.definition.approval.ApprovalChannelFunction
 import static com.bytechef.component.definition.approval.ApprovalChannelFunction.FORM_DESCRIPTION;
 import static com.bytechef.component.definition.approval.ApprovalChannelFunction.FORM_TITLE;
 import static com.bytechef.component.definition.approval.ApprovalChannelFunction.INPUTS;
+import static com.bytechef.component.rocketchat.constant.RocketchatConstants.ROCKETCHAT;
 import static com.bytechef.component.rocketchat.constant.RocketchatConstants.ROOM_ID;
 
 import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
@@ -45,7 +46,7 @@ import java.util.Map;
 public class RocketchatApprovalChannel {
 
     public static final ModifiableClusterElementDefinition<ApprovalChannelFunction> CLUSTER_ELEMENT_DEFINITION =
-        ComponentDsl.<ApprovalChannelFunction>clusterElement("rocketchat")
+        ComponentDsl.<ApprovalChannelFunction>clusterElement(ROCKETCHAT)
             .title("Rocket.Chat")
             .description("Sends an approval request message to a Rocket.Chat channel.")
             .type(APPROVAL_CHANNELS)

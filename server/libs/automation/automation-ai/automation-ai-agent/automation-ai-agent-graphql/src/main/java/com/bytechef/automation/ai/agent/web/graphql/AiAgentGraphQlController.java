@@ -16,6 +16,8 @@
 
 package com.bytechef.automation.ai.agent.web.graphql;
 
+import com.bytechef.automation.ai.agent.channel.AiAgentChannelType;
+import com.bytechef.automation.ai.agent.channel.ResolvedAgentChannel;
 import com.bytechef.automation.ai.agent.domain.AiAgentChannel;
 import com.bytechef.automation.ai.agent.domain.AiAgentElement;
 import com.bytechef.automation.ai.agent.dto.AiAgentDTO;
@@ -23,11 +25,13 @@ import com.bytechef.automation.ai.agent.dto.AiAgentDeploymentDTO;
 import com.bytechef.automation.ai.agent.dto.AiAgentVersionDTO;
 import com.bytechef.automation.ai.agent.dto.ChatAgentDTO;
 import com.bytechef.automation.ai.agent.facade.AiAgentFacade;
+import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import org.jspecify.annotations.Nullable;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -60,6 +64,21 @@ public class AiAgentGraphQlController {
     @PreAuthorize("isAuthenticated()")
     public AiAgentPayload aiAgent(@Argument long id) {
         return new AiAgentPayload(agentFacade.getAgent(id));
+    }
+
+    /**
+     * Backs every channel-aware surface of the agent client — the channel cards, their add menu, the approval-delivery
+     * picker and the deployment channel list — which mirrored the component registry in five hand-maintained maps
+     * before this query existed. Unscoped: a channel definition is a property of the deployed components, not of a
+     * workspace.
+     */
+    @QueryMapping
+    @PreAuthorize("isAuthenticated()")
+    public List<AiAgentChannelDefinitionPayload> aiAgentChannelDefinitions() {
+        return agentFacade.getAgentChannelDefinitions()
+            .stream()
+            .map(AiAgentChannelDefinitionPayload::new)
+            .toList();
     }
 
     @QueryMapping
@@ -340,6 +359,96 @@ public class AiAgentGraphQlController {
         }
     }
 
+    /**
+     * Flattens a {@link ResolvedAgentChannel} into the {@code AiAgentChannelDefinition} GraphQL type: the component
+     * coordinates the client needs to open a channel's property tree ({@code componentName}/{@code componentVersion}/
+     * {@code triggerName}, split out of the resolved node types), its display metadata, and the three client-facing
+     * flags derived from the reserved channel keys — {@code pinned} (auto-created, undeletable), {@code schedule} (not
+     * a channel at all) and {@code approvalCapable}.
+     */
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
+    public record AiAgentChannelDefinitionPayload(ResolvedAgentChannel resolvedAgentChannel) {
+
+        public String channelType() {
+            return resolvedAgentChannel.name();
+        }
+
+        public String componentName() {
+            return resolvedAgentChannel.componentName();
+        }
+
+        public int componentVersion() {
+            WorkflowNodeType triggerNodeType = WorkflowNodeType.ofType(resolvedAgentChannel.triggerType());
+
+            return triggerNodeType.version();
+        }
+
+        public String triggerName() {
+            WorkflowNodeType triggerNodeType = WorkflowNodeType.ofType(resolvedAgentChannel.triggerType());
+
+            return Objects.requireNonNull(triggerNodeType.operation());
+        }
+
+        /**
+         * The reply action's bare name, or {@code null} for a channel that answers nobody — a schedule.
+         */
+        public @Nullable String replyActionName() {
+            String replyActionType = resolvedAgentChannel.replyActionType();
+
+            if (replyActionType == null) {
+                return null;
+            }
+
+            WorkflowNodeType replyActionNodeType = WorkflowNodeType.ofType(replyActionType);
+
+            return replyActionNodeType.operation();
+        }
+
+        public String title() {
+            return resolvedAgentChannel.title();
+        }
+
+        public @Nullable String description() {
+            return resolvedAgentChannel.description();
+        }
+
+        public @Nullable String icon() {
+            return resolvedAgentChannel.icon();
+        }
+
+        public boolean connectionRequired() {
+            return resolvedAgentChannel.connectionRequired();
+        }
+
+        /**
+         * Whether the channel's row has properties to set, independent of whether it needs a connection. The client
+         * offers its Configure affordance on either, having previously used {@code connectionRequired} alone as a
+         * stand-in for both — see {@link ResolvedAgentChannel#propertiesConfigurable()}.
+         */
+        public boolean propertiesConfigurable() {
+            return resolvedAgentChannel.propertiesConfigurable();
+        }
+
+        public boolean approvalCapable() {
+            return resolvedAgentChannel.approvalDelivery() != null;
+        }
+
+        /**
+         * Whether the client renders this channel as auto-created and undeletable. The two platform channels every
+         * agent has by construction, replacing the client's own {@code PINNED_CHANNEL_TYPES} literal.
+         */
+        public boolean pinned() {
+            String channelType = channelType();
+
+            return AiAgentChannelType.CHAT.equals(channelType)
+                || AiAgentChannelType.WORKFLOW_CALL.equals(channelType);
+        }
+
+        public boolean schedule() {
+            return AiAgentChannelType.SCHEDULE.equals(channelType());
+        }
+    }
+
     public record CreateAiAgentInput(String title, @Nullable String description, long workspaceId) {
     }
 
@@ -368,13 +477,14 @@ public class AiAgentGraphQlController {
         long id, @Nullable Map<String, Object> parameters, @Nullable Long connectionId) {
     }
 
-    @SuppressFBWarnings("EI_EXPOSE_REP")
     /**
      * @param id the {@code ProjectDeployment} id — an agent deployment IS one
      */
+    @SuppressFBWarnings("EI_EXPOSE_REP")
     public record UpdateAiAgentDeploymentTagsInput(long id, @Nullable List<TagInput> tags) {
     }
 
+    @SuppressFBWarnings("EI_EXPOSE_REP")
     public record UpdateAiAgentTagsInput(long id, @Nullable List<TagInput> tags) {
     }
 

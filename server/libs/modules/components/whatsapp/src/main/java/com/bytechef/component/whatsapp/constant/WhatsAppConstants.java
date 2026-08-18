@@ -21,6 +21,12 @@ package com.bytechef.component.whatsapp.constant;
  */
 public class WhatsAppConstants {
 
+    /**
+     * The agent channel key, stored verbatim as the channel type of an agent's channel row. Lowercase, unlike
+     * {@link #WHATS_APP}, because that is the key the existing rows already carry; the two must not be conflated.
+     */
+    public static final String AGENT_CHANNEL_NAME = "whatsapp";
+
     public static final String APP_SECRET = "appSecret";
     public static final String BODY = "body";
     public static final String CONTACTS = "contacts";
@@ -36,6 +42,12 @@ public class WhatsAppConstants {
     public static final String SYSTEM_USER_ACCESS_TOKEN = "systemUserAccessToken";
     public static final String TEXT = "text";
     public static final String TYPE = "type";
+
+    /**
+     * The component's own name, which is also the name of its approval-channel cluster element. Note the capital A —
+     * the agent channel is keyed by the lowercase {@link #AGENT_CHANNEL_NAME} instead.
+     */
+    public static final String WHATS_APP = "whatsApp";
 
     private WhatsAppConstants() {
     }

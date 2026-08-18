@@ -10,6 +10,7 @@ dependencies {
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
     implementation(project(":server:libs:automation:automation-ai:automation-ai-agent:automation-ai-agent-api"))
     implementation(project(":server:libs:platform:platform-api"))
+    implementation(project(":server:libs:platform:platform-component:platform-component-api"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     implementation(project(":server:libs:platform:platform-tag:platform-tag-api"))
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
@@ -31,10 +32,6 @@ dependencies {
     testImplementation(project(":server:libs:atlas:atlas-worker:atlas-worker-api"))
     testImplementation(project(":server:libs:core:evaluator:evaluator-impl"))
     testImplementation(project(":server:libs:modules:task-dispatchers:branch"))
-    // AiAgentWorkflowExecutionIntTest's Slack echo-loop guard tests: the generated slack case nests a condition/v1
-    // (bot-message detection) whose TRUE arm is a terminate/v1 task.
-    testImplementation(project(":server:libs:modules:task-dispatchers:condition"))
-    testImplementation(project(":server:libs:modules:task-dispatchers:terminate"))
     testImplementation(project(":server:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-test-int-support"))
     testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-service"))
     testImplementation(project(":server:libs:config:jackson-config"))

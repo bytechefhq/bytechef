@@ -19,6 +19,7 @@ package com.bytechef.component.chat.action;
 import static com.bytechef.component.chat.constant.ChatConstants.ATTACHMENTS;
 import static com.bytechef.component.chat.constant.ChatConstants.MESSAGE;
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.agentReply;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.fileEntry;
 import static com.bytechef.component.definition.ComponentDsl.string;
@@ -49,6 +50,7 @@ public class ChatResponseToRequestAction {
                 .placeholder("Add attachment")
                 .items(fileEntry()))
         .output(ChatResponseToRequestAction::output)
+        .agentReply(agentReply().attachments(ATTACHMENTS))
         .perform(ChatResponseToRequestAction::perform);
 
     protected static OutputResponse output(

@@ -28,12 +28,18 @@ import static com.bytechef.component.definition.ComponentDsl.string;
  */
 public class RocketchatConstants {
 
+    /**
+     * The room a message arrived in, as named by Rocket.Chat's outgoing-webhook payload. The {@code newMessage} trigger
+     * declares no output schema, so this is the only place the field name is written down.
+     */
+    public static final String CHANNEL_ID = "channel_id";
     public static final String DOMAIN = "domain";
     public static final String EXCLUDE_SELF = "excludeSelf";
     public static final String ID = "id";
     public static final String MEMBERS = "members";
     public static final String NAME = "name";
     public static final String READ_ONLY = "readOnly";
+    public static final String ROCKETCHAT = "rocketchat";
     public static final String ROOM_ID = "roomId";
     public static final String TEXT = "text";
     public static final String USERNAME = "username";

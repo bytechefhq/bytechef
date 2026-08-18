@@ -17,9 +17,19 @@
 package com.bytechef.automation.ai.agent.channel;
 
 /**
- * The set of channel types an {@code AiAgent} can be reached through. Values are stored verbatim (STRING, not ordinal)
- * in {@code agent_channel.channel_type} and matched against the channel registry (see {@code ChannelDefinitions} in
- * {@code automation-ai-agent-service}).
+ * The three channel keys this module gives product semantics to. Every OTHER channel an {@code AiAgent} can be reached
+ * through is discovered from the component registry (see {@code AgentChannelResolver} in
+ * {@code automation-ai-agent-service}) and has no constant here — a Slack or Telegram channel is nothing but a row
+ * whose {@code ai_agent_channel.channel_type} matches a component's own {@code agentChannel(...)} declaration.
+ * <p>
+ * The three below survive because code branches on them:
+ * <ul>
+ * <li>{@code CHAT} and {@code WORKFLOW_CALL} are ordinary discovered channels, but the facade auto-creates them with
+ * every agent and refuses to delete them.</li>
+ * <li>{@code SCHEDULE} is not a channel at all — it has nobody on the other end — and is the workflow generator's one
+ * non-channel branch (see {@code AgentChannelResolver}'s javadoc).</li>
+ * </ul>
+ * Values are stored verbatim (STRING, not ordinal) in {@code ai_agent_channel.channel_type}.
  *
  * @author Ivica Cardic
  */
@@ -28,12 +38,6 @@ public final class AiAgentChannelType {
     public static final String CHAT = "chat";
     public static final String WORKFLOW_CALL = "workflowCall";
     public static final String SCHEDULE = "schedule";
-    public static final String SLACK = "slack";
-    public static final String TELEGRAM = "telegram";
-    public static final String WHATSAPP = "whatsapp";
-    public static final String ROCKETCHAT = "rocketchat";
-    public static final String TWILIO = "twilio";
-    public static final String INFOBIP = "infobip";
 
     private AiAgentChannelType() {
     }

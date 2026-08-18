@@ -20,9 +20,9 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.automation.ai.agent.channel.AgentChannelResolver;
 import com.bytechef.automation.ai.agent.channel.AiAgentChannelType;
-import com.bytechef.automation.ai.agent.channel.ChannelDefinition;
-import com.bytechef.automation.ai.agent.channel.ChannelDefinitions;
+import com.bytechef.automation.ai.agent.channel.ResolvedAgentChannel;
 import com.bytechef.automation.ai.agent.domain.AiAgent;
 import com.bytechef.automation.ai.agent.domain.AiAgentChannel;
 import com.bytechef.automation.ai.agent.domain.AiAgentElement;
@@ -66,6 +66,8 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
+import com.bytechef.platform.user.domain.User;
+import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -78,8 +80,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
@@ -143,6 +147,7 @@ public class AiAgentFacadeImpl implements AiAgentFacade {
         AiAgentElement.KIND_CHAT_MEMORY);
 
     private final AiAgentService agentService;
+    private final AgentChannelResolver agentChannelResolver;
     private final AiAgentChannelService agentChannelService;
     private final AiAgentElementService agentElementService;
     private final EnvironmentService environmentService;
@@ -157,11 +162,13 @@ public class AiAgentFacadeImpl implements AiAgentFacade {
     private final TagService tagService;
     private final PrincipalJobService principalJobService;
     private final JobService jobService;
+    private final UserService userService;
     private final String webhookUrl;
 
     @SuppressFBWarnings("EI2")
     public AiAgentFacadeImpl(
-        AiAgentService agentService, AiAgentChannelService agentChannelService,
+        AiAgentService agentService, AgentChannelResolver agentChannelResolver,
+        AiAgentChannelService agentChannelService,
         AiAgentElementService agentElementService, EnvironmentService environmentService,
         ProjectService projectService, ProjectWorkflowService projectWorkflowService,
         ProjectDeploymentService projectDeploymentService,
@@ -169,10 +176,11 @@ public class AiAgentFacadeImpl implements AiAgentFacade {
         TriggerDefinitionService triggerDefinitionService, WorkflowService workflowService,
         WorkflowTestConfigurationService workflowTestConfigurationService,
         WorkflowNodeTestOutputService workflowNodeTestOutputService, TagService tagService,
-        PrincipalJobService principalJobService, JobService jobService,
+        PrincipalJobService principalJobService, JobService jobService, UserService userService,
         @Value("${bytechef.webhook-url}") String webhookUrl) {
 
         this.agentService = agentService;
+        this.agentChannelResolver = agentChannelResolver;
         this.agentChannelService = agentChannelService;
         this.agentElementService = agentElementService;
         this.environmentService = environmentService;
@@ -187,6 +195,7 @@ public class AiAgentFacadeImpl implements AiAgentFacade {
         this.tagService = tagService;
         this.principalJobService = principalJobService;
         this.jobService = jobService;
+        this.userService = userService;
         this.webhookUrl = webhookUrl;
     }
 
@@ -514,14 +523,10 @@ public class AiAgentFacadeImpl implements AiAgentFacade {
         return value instanceof String string ? string : null;
     }
 
-    private static boolean isKnownChannelType(String channelType) {
-        try {
-            ChannelDefinitions.getChannelDefinition(channelType);
+    private boolean isKnownChannelType(String channelType) {
+        Optional<ResolvedAgentChannel> resolvedAgentChannel = agentChannelResolver.resolve(channelType);
 
-            return true;
-        } catch (IllegalArgumentException illegalArgumentException) {
-            return false;
-        }
+        return resolvedAgentChannel.isPresent();
     }
 
     @Override
@@ -546,6 +551,12 @@ public class AiAgentFacadeImpl implements AiAgentFacade {
         agentService.update(id, savedTags.stream()
             .map(Tag::getId)
             .toList());
+    }
+
+    @Override
+    @PreAuthorize("isAuthenticated()")
+    public List<ResolvedAgentChannel> getAgentChannelDefinitions() {
+        return agentChannelResolver.resolveAll();
     }
 
     @Override
@@ -904,14 +915,16 @@ public class AiAgentFacadeImpl implements AiAgentFacade {
         }
 
         for (AiAgentChannel channel : agentChannelService.getByAgentId(agent.getId())) {
-            ChannelDefinition channelDefinition = ChannelDefinitions.getChannelDefinition(channel.getChannelType());
+            ResolvedAgentChannel resolvedAgentChannel = resolveChannelType(channel.getChannelType());
 
-            if (channelDefinition.connectionRequired() && channel.getConnectionId() == null) {
+            if (resolvedAgentChannel.connectionRequired() && channel.getConnectionId() == null) {
                 throw new ConfigurationException(
                     "Channel " + channel.getId() + " of type '" + channel.getChannelType()
                         + "' requires a connection to publish",
                     AiAgentErrorType.CHANNEL_CONNECTION_MISSING);
             }
+
+            validateRequiredChannelParameters(channel, resolvedAgentChannel);
         }
 
         for (AiAgentElement element : elements) {
@@ -950,6 +963,48 @@ public class AiAgentFacadeImpl implements AiAgentFacade {
                 "Agent " + agent.getId()
                     + " has settings.builtInTools.webSearch enabled but no webSearchConnectionId to publish",
                 AiAgentErrorType.BUILT_IN_TOOL_CONNECTION_MISSING);
+        }
+    }
+
+    /**
+     * A channel declaration may feed a reply action property from the channel row
+     * ({@code AgentReplyDefinition.channelParameter(rowKey, property)}), and {@code AiAgentWorkflowGenerator} simply
+     * omits a mapping whose row parameter is unset. That is right for an optional property and wrong for a required
+     * one: the generated reply task would be missing a value the action cannot run without, and the agent would fail on
+     * its first answer with nothing having complained at publish time.
+     * <p>
+     * This is deliberately generic rather than a per-component check — twilio's required {@code From} fed by an
+     * optional trigger property {@code number} is the case that exists today, but any future channel using
+     * {@code channelParameter} inherits the guard. A dotted target is skipped: it descends into a
+     * {@code dynamicProperties} map whose members carry no statically known requiredness (see
+     * {@code AgentChannelResolver.requiredPropertyNames}).
+     */
+    private static void validateRequiredChannelParameters(
+        AiAgentChannel channel, ResolvedAgentChannel resolvedAgentChannel) {
+
+        Set<String> requiredReplyPropertyNames = resolvedAgentChannel.requiredReplyPropertyNames();
+
+        if (requiredReplyPropertyNames.isEmpty()) {
+            return;
+        }
+
+        Map<String, ?> parameters = channel.getParameters();
+        ResolvedAgentChannel.Binding binding = resolvedAgentChannel.binding();
+
+        for (Map.Entry<String, String> entry : binding.replyChannelParameters()
+            .entrySet()) {
+
+            if (!requiredReplyPropertyNames.contains(entry.getValue())) {
+                continue;
+            }
+
+            if (parameters.get(entry.getKey()) == null) {
+                throw new ConfigurationException(
+                    "Channel " + channel.getId() + " of type '" + channel.getChannelType() + "' must have parameter '"
+                        + entry.getKey() + "' set, since it supplies the reply action's required property '"
+                        + entry.getValue() + "'",
+                    AiAgentErrorType.CHANNEL_PARAMETER_MISSING);
+            }
         }
     }
 
@@ -1002,7 +1057,9 @@ public class AiAgentFacadeImpl implements AiAgentFacade {
         List<AiAgentChannel> channels = agentChannelService.getByAgentId(agent.getId());
         List<AiAgentElement> elements = agentElementService.getByAgentId(agent.getId());
 
-        String definition = AiAgentWorkflowGenerator.generate(agent, channels, elements, this::resolveSubAgentRef);
+        String definition = AiAgentWorkflowGenerator.generate(
+            agent, channels, elements, this::resolveSubAgentRef, resolveCreatorUserId(agent),
+            resolveChannels(channels));
 
         workflowService.update(workflowId, definition, workflow.getVersion());
 
@@ -1036,7 +1093,7 @@ public class AiAgentFacadeImpl implements AiAgentFacade {
         }
 
         for (AiAgentWorkflowGenerator.ConnectionRef connectionRef : AiAgentWorkflowGenerator.buildConnectionRefs(
-            agent, channels, elements)) {
+            agent, channels, elements, resolveChannels(channels))) {
 
             // An approval delivery node is owned by the agent_channel row it was derived from, so it resolves
             // through the CHANNEL branch and reuses that channel's own connection — no element-side fallback.
@@ -1064,13 +1121,54 @@ public class AiAgentFacadeImpl implements AiAgentFacade {
         List<AiAgentChannel> channels = agentChannelService.getByAgentId(agent.getId());
         List<AiAgentElement> elements = agentElementService.getByAgentId(agent.getId());
 
-        return AiAgentWorkflowGenerator.generate(agent, channels, elements, this::resolveSubAgentRef);
+        return AiAgentWorkflowGenerator.generate(
+            agent, channels, elements, this::resolveSubAgentRef, resolveCreatorUserId(agent),
+            resolveChannels(channels));
+    }
+
+    /**
+     * Resolves each of the agent's channel types ONCE per generation and hands the generator a lookup over that map, so
+     * a channel used by two rows is resolved once and the generator stays a pure function of what it is given.
+     */
+    private Function<String, ResolvedAgentChannel> resolveChannels(List<AiAgentChannel> channels) {
+        Map<String, ResolvedAgentChannel> resolvedChannels = new LinkedHashMap<>();
+
+        for (AiAgentChannel channel : channels) {
+            String channelType = channel.getChannelType();
+
+            if (!resolvedChannels.containsKey(channelType)) {
+                agentChannelResolver.resolve(channelType)
+                    .ifPresent(resolvedAgentChannel -> resolvedChannels.put(channelType, resolvedAgentChannel));
+            }
+        }
+
+        return resolvedChannels::get;
     }
 
     private SubAgentRef resolveSubAgentRef(Long targetAgentId) {
         AiAgent targetAgent = agentService.getAgent(targetAgentId);
 
         return new SubAgentRef(targetAgent.getName(), targetAgent.getDescription(), targetAgent.getUuid());
+    }
+
+    /**
+     * Resolves the agent's {@code createdBy} auditing username to a platform user id for the AI Hub visibility identity
+     * stamp (see {@code WorkflowExtConstants.AI_HUB_CREATOR_USER_ID}) — this facade is the only place that has both
+     * {@link AiAgent#getCreatedBy()} and {@link UserService}, so the resolution happens here rather than in
+     * {@link AiAgentWorkflowGenerator} itself. Returns {@code null} (never throws) when {@code createdBy} is absent or
+     * does not resolve to a known user (e.g. the creator was since deleted); the generator then omits that field of the
+     * stamp.
+     */
+    private @Nullable Long resolveCreatorUserId(AiAgent agent) {
+        String createdBy = agent.getCreatedBy();
+
+        if (createdBy == null) {
+            return null;
+        }
+
+        return userService.fetchUserByLogin(createdBy)
+            .map(User::getId)
+            .orElse(null);
     }
 
     /**
@@ -1256,13 +1354,20 @@ public class AiAgentFacadeImpl implements AiAgentFacade {
         return AiAgentChannelType.CHAT.equals(channelType) || AiAgentChannelType.WORKFLOW_CALL.equals(channelType);
     }
 
-    private static void validateChannelType(String channelType) {
-        try {
-            ChannelDefinitions.getChannelDefinition(channelType);
-        } catch (IllegalArgumentException illegalArgumentException) {
-            throw new ConfigurationException(
-                illegalArgumentException.getMessage(), AiAgentErrorType.UNKNOWN_CHANNEL_TYPE);
-        }
+    private void validateChannelType(String channelType) {
+        resolveChannelType(channelType);
+    }
+
+    /**
+     * @throws ConfigurationException if no component declares {@code channelType} — an uninstalled component or a
+     *                                renamed channel must be rejected at the API boundary rather than surface later as
+     *                                a workflow missing its trigger
+     */
+    private ResolvedAgentChannel resolveChannelType(String channelType) {
+        return agentChannelResolver.resolve(channelType)
+            .orElseThrow(
+                () -> new ConfigurationException(
+                    "Unknown agent channel type: " + channelType, AiAgentErrorType.UNKNOWN_CHANNEL_TYPE));
     }
 
     /**

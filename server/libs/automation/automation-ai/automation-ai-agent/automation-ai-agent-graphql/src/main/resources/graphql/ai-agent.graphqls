@@ -1,5 +1,6 @@
 extend type Query {
     aiAgent(id: ID!): AiAgent
+    aiAgentChannelDefinitions: [AiAgentChannelDefinition!]!
     aiAgents(workspaceId: ID!): [AiAgent!]!
     aiAgentDeployments(workspaceId: ID!): [AiAgentDeployment!]!
     aiAgentDeploymentTags(workspaceId: ID!): [Tag!]!
@@ -55,6 +56,22 @@ type AiAgentVersion {
 
 type AiAgentChannel { id: ID!, channelType: String!, position: Int!, parameters: Map, connectionId: ID }
 type AiAgentElement { id: ID!, kind: String!, referenceId: ID, position: Int!, parameters: Map, connectionId: ID }
+
+type AiAgentChannelDefinition {
+    channelType: String!
+    componentName: String!
+    componentVersion: Int!
+    triggerName: String!
+    replyActionName: String
+    title: String!
+    description: String
+    icon: String
+    connectionRequired: Boolean!
+    propertiesConfigurable: Boolean!
+    approvalCapable: Boolean!
+    pinned: Boolean!
+    schedule: Boolean!
+}
 
 type AiAgentDeployment {
     id: ID!

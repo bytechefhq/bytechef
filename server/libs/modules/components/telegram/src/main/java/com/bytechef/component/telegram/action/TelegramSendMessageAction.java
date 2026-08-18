@@ -17,6 +17,7 @@
 package com.bytechef.component.telegram.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.agentReply;
 import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
@@ -66,6 +67,10 @@ public class TelegramSendMessageAction {
                         bool("ok"),
                         object("result")
                             .properties(MESSAGE_OUTPUT_PROPERTIES))))
+        .agentReply(
+            agentReply()
+                .conversationId(CHAT_ID)
+                .message(TEXT))
         .perform(TelegramSendMessageAction::perform)
         .help("", "https://docs.bytechef.io/reference/components/telegram_v1#send-message");
 

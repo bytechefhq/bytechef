@@ -94,7 +94,7 @@ public class ComponentDefinitionRegistryIndexTest {
                     "slack", version, "Slack",
                     "Slack is a messaging platform for teams to communicate and collaborate.",
                     "path:assets/slack.svg", null, null,
-                    new ComponentIndex.ConnectionSummary(1, true), actionSummaries, null, null, null,
+                    new ComponentIndex.ConnectionSummary(1, true), actionSummaries, null, null, null, null,
                     List.of("channel"), SlackComponentHandler.class.getName(), "default")));
     }
 
@@ -210,7 +210,7 @@ public class ComponentDefinitionRegistryIndexTest {
         ComponentIndex componentIndex = new ComponentIndex(
             List.of(
                 new ComponentIndex.Entry(
-                    "ghost", 1, "Ghost", null, null, null, null, null, null, null, null, null, null,
+                    "ghost", 1, "Ghost", null, null, null, null, null, null, null, null, null, null, null,
                     "com.bytechef.component.ghost.DoesNotExistComponentHandler", "default")));
 
         ComponentDefinitionRegistry componentDefinitionRegistry = createRegistry(componentIndex);
@@ -275,7 +275,7 @@ public class ComponentDefinitionRegistryIndexTest {
                     List.of(
                         new ComponentIndex.ClusterElementSummary(
                             "myTool", "My Tool", null, "TOOLS", "tools", "Tools", true, false)),
-                    null, List.of("channel"), "does.not.Matter", "default")));
+                    null, null, List.of("channel"), "does.not.Matter", "default")));
 
         ComponentDefinitionRegistry componentDefinitionRegistry = createRegistry(componentIndex);
 
@@ -317,7 +317,7 @@ public class ComponentDefinitionRegistryIndexTest {
                 new ComponentIndex.Entry(
                     "fakeRoot", 1, "Fake Root", null, null, null, null, null, null, null, null,
                     List.of(new ComponentIndex.ClusterElementTypeSummary("TOOLS", "tools", "Tools", true, false)),
-                    null, "does.not.Matter", "default")));
+                    null, null, "does.not.Matter", "default")));
 
         ComponentDefinitionRegistry componentDefinitionRegistry = createRegistry(componentIndex);
 
@@ -347,7 +347,7 @@ public class ComponentDefinitionRegistryIndexTest {
                 new ComponentIndex.Entry(
                     "slack", 1, "Slack", null, null, null, null, null, null,
                     List.of(new ComponentIndex.TriggerSummary("newMessage", null, null, "NOT_A_REAL_TRIGGER_TYPE")),
-                    null, null, null, SlackComponentHandler.class.getName(), "default")));
+                    null, null, null, null, SlackComponentHandler.class.getName(), "default")));
 
         ComponentDefinitionRegistry componentDefinitionRegistry = createRegistry(brokenComponentIndex);
 

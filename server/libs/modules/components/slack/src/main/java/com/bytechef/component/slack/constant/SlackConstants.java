@@ -31,14 +31,18 @@ import com.bytechef.component.definition.Property.ControlType;
  */
 public class SlackConstants {
 
+    public static final String BOT_ID = "bot_id";
+    public static final String BOT_MESSAGE = "bot_message";
     public static final String CHANNEL = "channel";
     public static final String CHALLENGE = "challenge";
     public static final String SIGNING_SECRET = "signingSecret";
     public static final String ERROR = "error";
+    public static final String EVENT = "event";
     public static final String ID = "id";
     public static final String NAME = "name";
     public static final String OK = "ok";
     public static final String POST_AT = "post_at";
+    public static final String SUBTYPE = "subtype";
     public static final String TEXT = "text";
     public static final String TIMESTAMP = "timestamp";
     public static final String TYPE = "type";

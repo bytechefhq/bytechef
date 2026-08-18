@@ -17,6 +17,7 @@
 package com.bytechef.component.whatsapp.trigger;
 
 import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
+import static com.bytechef.component.definition.ComponentDsl.agentRequest;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
@@ -41,6 +42,32 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * The request half of the {@code whatsapp} agent channel. Its descriptor reproduces, unchanged, the expression paths
+ * the channel has always read.
+ * <p>
+ * Two known limitations ride along with those paths, both inherited rather than introduced here, and both pinned by
+ * {@code WhatsAppNewIncomingMessageTriggerAgentChannelTest}:
+ * <ol>
+ * <li>The paths descend through {@code value}, matching Meta's documented payload, while the output schema declared
+ * below places {@code messages} as a SIBLING of {@code value} under {@code changes}. One of the two is wrong and this
+ * repository holds no fixture that says which.</li>
+ * <li>Meta documents {@code entry}, {@code changes} and {@code messages} as arrays; the schema below declares each a
+ * single object, and the paths address them as such. The evaluator is SpEL, which indexes explicitly but does not
+ * auto-flatten a list, so if the payload really is an array these paths resolve to nothing.</li>
+ * </ol>
+ * The path segments are therefore spelled as literals rather than assembled from the constants the schema uses: sharing
+ * constants would assert a correspondence between path and schema that does not currently hold.
+ * <p>
+ * The first limitation is also why this is the one channel declaring {@code agentRequest().unverifiedPaths(...)}. Every
+ * other trigger with a declared output schema has each segment of each path checked against it; here that check would
+ * have to be satisfied by editing one of the two disagreeing halves, and neither may be edited until a live webhook
+ * says which is right. Opting out states that in the declaration rather than silently weakening the rule for everyone,
+ * and it still leaves each path's first segment checked.
+ * <p>
+ * No {@code attachments} path is bound. The trigger's message output declares no attachments field, today's envelope
+ * maps the literal {@code []}, and an absent path is how a channel states that it carries none — leaving the generator
+ * to wire that same {@code []}.
+ *
  * @author Luka Ljubić
  */
 public class WhatsAppNewIncomingMessageTrigger {
@@ -85,6 +112,15 @@ public class WhatsAppNewIncomingMessageTrigger {
                                                 object("text")
                                                     .properties(
                                                         string("body"))))))))
+        .agentRequest(
+            agentRequest()
+                .conversationId("entry.changes.value.messages.from")
+                .message("entry.changes.value.messages.text.body")
+                .unverifiedPaths(
+                    "the declared output schema places 'messages' as a sibling of 'value' under 'changes', while "
+                        + "these paths descend through 'value' as Meta's documented payload does; one of the two is "
+                        + "wrong and this repository holds no fixture that says which, so neither may be changed to "
+                        + "make the other validate"))
         .webhookDisable(WhatsAppNewIncomingMessageTrigger::webhookDisable)
         .webhookEnable(WhatsAppNewIncomingMessageTrigger::webhookEnable)
         .webhookRequest(WhatsAppNewIncomingMessageTrigger::webhookRequest);

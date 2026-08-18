@@ -20,7 +20,6 @@
               "text": "${chat_1.message}",
               "conversationId": "${chat_1.conversationId}",
               "attachments": "${chat_1.attachments}",
-              "replyTo": null,
               "channel": "chat"
             }
           }
@@ -35,7 +34,6 @@
               "text": "${telegram_1.message.text}",
               "conversationId": "${telegram_1.message.chat.id}",
               "attachments": [ ],
-              "replyTo": "${telegram_1.message.chat.id}",
               "channel": "telegram"
             }
           }

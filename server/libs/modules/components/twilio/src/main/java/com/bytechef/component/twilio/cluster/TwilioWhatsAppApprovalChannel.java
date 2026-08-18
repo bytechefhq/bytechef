@@ -28,6 +28,7 @@ import static com.bytechef.component.definition.approval.ApprovalChannelFunction
 import static com.bytechef.component.twilio.constant.TwilioConstants.BODY;
 import static com.bytechef.component.twilio.constant.TwilioConstants.FROM;
 import static com.bytechef.component.twilio.constant.TwilioConstants.TO;
+import static com.bytechef.component.twilio.constant.TwilioConstants.WHATS_APP;
 
 import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ClusterElementDefinition;
@@ -52,7 +53,7 @@ import java.util.Map;
 public class TwilioWhatsAppApprovalChannel {
 
     public static final ClusterElementDefinition<ApprovalChannelFunction> CLUSTER_ELEMENT_DEFINITION =
-        ComponentDsl.<ApprovalChannelFunction>clusterElement("whatsApp")
+        ComponentDsl.<ApprovalChannelFunction>clusterElement(WHATS_APP)
             .title("WhatsApp")
             .description("Sends an approval request WhatsApp message via Twilio.")
             .type(APPROVAL_CHANNELS)

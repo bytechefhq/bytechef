@@ -31,6 +31,7 @@ import com.bytechef.platform.component.ComponentDefinitionRegistry;
 import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.domain.ActionDefinition;
+import com.bytechef.platform.component.domain.AgentChannelDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.TriggerDefinition;
@@ -79,6 +80,12 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
     }
 
     @Override
+    public Optional<AgentChannelDefinition> fetchAgentChannelDefinition(String name) {
+        return componentDefinitionRegistry.fetchAgentChannelDefinition(name)
+            .filter(agentChannelDefinition -> isComponentVisible(agentChannelDefinition.getComponentName()));
+    }
+
+    @Override
     public Optional<ComponentDefinition> fetchComponentDefinition(String name, @Nullable Integer version) {
         return componentDefinitionRegistry.fetchComponentDefinition(name, version)
             .map(ComponentDefinition::new);
@@ -123,6 +130,14 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
 
             throw new ConfigurationException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_OPTIONS);
         }
+    }
+
+    @Override
+    public List<AgentChannelDefinition> getAgentChannelDefinitions() {
+        return componentDefinitionRegistry.getAgentChannelDefinitions()
+            .stream()
+            .filter(agentChannelDefinition -> isComponentVisible(agentChannelDefinition.getComponentName()))
+            .toList();
     }
 
     @Override

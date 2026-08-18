@@ -34,4 +34,7 @@
 
     <!-- Central @ConfigurationProperties aggregator; its deliberate per-provider structure exceeds FileLength. -->
     <suppress files="ApplicationProperties\.java" checks="FileLength"/>
+
+    <!-- Central component DSL aggregator; one Modifiable* class per definition type exceeds FileLength. -->
+    <suppress files="ComponentDsl\.java" checks="FileLength"/>
 </suppressions>

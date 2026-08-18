@@ -16,7 +16,11 @@
 
 package com.bytechef.component.workflow;
 
+import static com.bytechef.component.definition.ComponentDsl.agentChannel;
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.workflow.constant.WorkflowConstants.AI_AGENT_CALL_INPUT_SCHEMA;
+import static com.bytechef.component.workflow.constant.WorkflowConstants.WORKFLOW_CALL;
+import static com.bytechef.platform.component.constant.WorkflowConstants.INPUT_SCHEMA;
 import static com.bytechef.platform.component.constant.WorkflowConstants.WORKFLOW;
 
 import com.bytechef.component.ComponentHandler;
@@ -33,6 +37,7 @@ import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowDataSource;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 
@@ -76,7 +81,13 @@ public final class WorkflowComponentHandler implements ComponentHandler {
                 WorkflowNewWorkflowCallTrigger.TRIGGER_DEFINITION,
                 WorkflowNewWorkflowErrorTrigger.TRIGGER_DEFINITION)
             .actions(WorkflowResponseToWorkflowCallAction.ACTION_DEFINITION)
-            .clusterElements(clusterElementDefinitions.toArray(new ClusterElementDefinition<?>[0]));
+            .clusterElements(clusterElementDefinitions.toArray(new ClusterElementDefinition<?>[0]))
+            .agentChannels(
+                agentChannel(
+                    WORKFLOW_CALL, WorkflowNewWorkflowCallTrigger.TRIGGER_DEFINITION,
+                    WorkflowResponseToWorkflowCallAction.ACTION_DEFINITION)
+                        .title("Workflow Call")
+                        .triggerParameters(Map.of(INPUT_SCHEMA, AI_AGENT_CALL_INPUT_SCHEMA)));
     }
 
     @Override

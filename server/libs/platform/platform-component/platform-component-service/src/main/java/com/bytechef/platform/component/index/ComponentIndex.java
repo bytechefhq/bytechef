@@ -17,24 +17,32 @@
 package com.bytechef.platform.component.index;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.agentChannel;
+import static com.bytechef.component.definition.ComponentDsl.agentReply;
+import static com.bytechef.component.definition.ComponentDsl.agentRequest;
 import static com.bytechef.component.definition.ComponentDsl.clusterElement;
 import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.definition.ComponentDsl.connection;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 
 import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.AgentChannelDefinition;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableAgentChannelDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableAgentReplyDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiablePropertyGroup;
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.ConnectionDefinition;
 import com.bytechef.component.definition.Help;
+import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.PropertyGroup;
 import com.bytechef.component.definition.Resources;
 import com.bytechef.component.definition.TriggerDefinition;
@@ -50,8 +58,11 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -207,6 +218,19 @@ public record ComponentIndex(List<Entry> entries) {
                     .toArray(ModifiablePropertyGroup[]::new));
         }
 
+        // Triggers and actions must already be attached above: agent-channel rebuilding pairs a channel against
+        // them by name, and (for reply mappings) declares stub properties on them before pairing, since Task 1's
+        // agentChannel(...) validates the pair eagerly at construction time.
+        List<AgentChannelSummary> agentChannels = entry.agentChannels();
+
+        if (agentChannels != null && !agentChannels.isEmpty()) {
+            componentDefinition.agentChannels(
+                agentChannels
+                    .stream()
+                    .map(agentChannelSummary -> toStubAgentChannelDefinition(componentDefinition, agentChannelSummary))
+                    .toList());
+        }
+
         List<ClusterElementTypeSummary> clusterElementTypes = entry.clusterElementTypes();
 
         if (clusterElementTypes == null || clusterElementTypes.isEmpty()) {
@@ -282,14 +306,127 @@ public record ComponentIndex(List<Entry> entries) {
         return clusterElementDefinition;
     }
 
+    /**
+     * Rebuilds an {@link AgentChannelDefinition} from its {@link AgentChannelSummary}. The summary carries the full
+     * request/reply binding (paths and mapped property names), not just the channel's name, because a stub missing the
+     * binding would let the workflow generator wire the wrong expressions — worse than the channel simply not appearing
+     * on the stub.
+     */
+    private static AgentChannelDefinition toStubAgentChannelDefinition(
+        ModifiableComponentDefinition componentDefinition, AgentChannelSummary agentChannelSummary) {
+
+        TriggerDefinition triggerDefinition = componentDefinition.getTriggers()
+            .stream()
+            .filter(candidate -> Objects.equals(candidate.getName(), agentChannelSummary.triggerName()))
+            .findFirst()
+            .orElseThrow(() -> new IllegalStateException(
+                "Index entry '%s' agent channel '%s' references unknown trigger '%s'".formatted(
+                    componentDefinition.getName(), agentChannelSummary.name(), agentChannelSummary.triggerName())));
+
+        // Rebuild the request descriptor from the summary. Stub triggers carry no output schema, so the path check
+        // against the output is skipped for them anyway - the descriptor is what must survive, since the generator
+        // reads its paths and a stub missing them would wire the workflow to the wrong expressions. For the same
+        // reason the index records no unverifiedPaths reason: it exists only to relax that skipped check, so a stub
+        // that dropped it validates identically.
+        if (triggerDefinition instanceof ModifiableTriggerDefinition modifiableTrigger) {
+            modifiableTrigger.agentRequest(
+                agentRequest()
+                    .conversationId(agentChannelSummary.conversationIdPath())
+                    .message(agentChannelSummary.messagePath())
+                    .attachments(agentChannelSummary.attachmentsPath()));
+
+            // Stub triggers carry no properties either, and Task 1's channel-parameter check matches trigger
+            // property names EXACTLY (never by dot-segment) - any row key a reply mapping references must be
+            // declared here before pairing, the same reason stub action properties are declared below.
+            Map<String, String> replyChannelParameters = agentChannelSummary.replyChannelParameters();
+
+            if (modifiableTrigger.getProperties()
+                .isEmpty() && !replyChannelParameters.isEmpty()) {
+
+                modifiableTrigger.properties(
+                    replyChannelParameters.keySet()
+                        .stream()
+                        .map(ComponentDsl::string)
+                        .toArray(Property[]::new));
+            }
+        }
+
+        ModifiableAgentChannelDefinition agentChannelDefinition;
+
+        if (agentChannelSummary.replyActionName() == null) {
+            agentChannelDefinition = agentChannel(agentChannelSummary.name(), triggerDefinition);
+        } else {
+            ActionDefinition actionDefinition = componentDefinition.getActions()
+                .stream()
+                .filter(candidate -> Objects.equals(candidate.getName(), agentChannelSummary.replyActionName()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException(
+                    "Index entry '%s' agent channel '%s' references unknown action '%s'".formatted(
+                        componentDefinition.getName(), agentChannelSummary.name(),
+                        agentChannelSummary.replyActionName())));
+
+            // Rebuild the reply descriptor from the summary unconditionally, mirroring the trigger side above:
+            // attaching it must not depend on whether the property-declaration guard below ran, or a stub action
+            // that already carried properties would never get a reply descriptor at all and later fail pairing
+            // with a confusing "no reply descriptor" error instead of a properties-validation one.
+            if (actionDefinition instanceof ModifiableActionDefinition modifiableAction) {
+                // Stub actions carry no properties, so declare the mapped ones before attaching the reply
+                // descriptor - Task 1 validates every mapped name against the action's properties, and a stub
+                // with none would fail that check. Stubs never reach detail/execution paths (see the class
+                // Javadoc).
+                if (modifiableAction.getProperties()
+                    .isEmpty()) {
+
+                    modifiableAction.properties(
+                        Stream.of(
+                            Stream.of(
+                                agentChannelSummary.replyMessageProperty(),
+                                agentChannelSummary.replyConversationIdProperty(),
+                                agentChannelSummary.replyAttachmentsProperty()),
+                            agentChannelSummary.replyChannelParameters()
+                                .values()
+                                .stream(),
+                            agentChannelSummary.replyFixedParameters()
+                                .keySet()
+                                .stream())
+                            .flatMap(Function.identity())
+                            .filter(Objects::nonNull)
+                            .map(propertyName -> string(propertyName.split("\\.")[0]))
+                            .distinct()
+                            .toList());
+                }
+
+                ModifiableAgentReplyDefinition agentReplyDefinition = agentReply()
+                    .conversationId(agentChannelSummary.replyConversationIdProperty())
+                    .message(agentChannelSummary.replyMessageProperty())
+                    .attachments(agentChannelSummary.replyAttachmentsProperty());
+
+                agentChannelSummary.replyChannelParameters()
+                    .forEach(agentReplyDefinition::channelParameter);
+                agentChannelSummary.replyFixedParameters()
+                    .forEach(agentReplyDefinition::fixedParameter);
+
+                modifiableAction.agentReply(agentReplyDefinition);
+            }
+
+            agentChannelDefinition = agentChannel(agentChannelSummary.name(), triggerDefinition, actionDefinition);
+        }
+
+        return agentChannelDefinition
+            .title(agentChannelSummary.title())
+            .description(agentChannelSummary.description())
+            .approvalChannel(agentChannelSummary.approvalChannelName());
+    }
+
     @SuppressFBWarnings("EI")
     public record Entry(
         String name, int version, @Nullable String title, @Nullable String description, @Nullable String icon,
         @Nullable List<CategorySummary> componentCategories, @Nullable List<String> tags,
         @Nullable ConnectionSummary connection, @Nullable List<ItemSummary> actions,
         @Nullable List<TriggerSummary> triggers, @Nullable List<ClusterElementSummary> clusterElements,
-        @Nullable List<ClusterElementTypeSummary> clusterElementTypes, @Nullable List<String> inputs,
-        String providerClassName, String loaderKind) {
+        @Nullable List<ClusterElementTypeSummary> clusterElementTypes,
+        @Nullable List<AgentChannelSummary> agentChannels, @Nullable List<String> inputs, String providerClassName,
+        String loaderKind) {
     }
 
     /**
@@ -307,6 +444,11 @@ public record ComponentIndex(List<Entry> entries) {
         @Override
         public List<ActionDefinition> getActions() {
             return componentDefinition.getActions();
+        }
+
+        @Override
+        public List<AgentChannelDefinition> getAgentChannels() {
+            return componentDefinition.getAgentChannels();
         }
 
         @Override
@@ -416,5 +558,20 @@ public record ComponentIndex(List<Entry> entries) {
      */
     public record ClusterElementTypeSummary(
         String name, String key, String label, boolean multipleElements, boolean required) {
+    }
+
+    /**
+     * Carries the full request/reply binding for an agent channel, not just its identity, because the index serves the
+     * components-list stub without loading the real component. A stub whose channel carried only a name would let the
+     * AI Agent workflow generator wire the channel's expressions wrong — worse than the channel not appearing on the
+     * stub at all.
+     */
+    @SuppressFBWarnings("EI")
+    public record AgentChannelSummary(
+        String name, @Nullable String title, @Nullable String description, String triggerName,
+        @Nullable String replyActionName, @Nullable String approvalChannelName, String conversationIdPath,
+        String messagePath, @Nullable String attachmentsPath, @Nullable String replyMessageProperty,
+        @Nullable String replyConversationIdProperty, @Nullable String replyAttachmentsProperty,
+        Map<String, String> replyChannelParameters, Map<String, Object> replyFixedParameters) {
     }
 }

@@ -362,6 +362,10 @@ public class TriggerExecution implements Cloneable, Errorable, Prioritizable, Re
         return workflowExecutionId;
     }
 
+    // A WorkflowTrigger is parsed once from the workflow definition and then read as a value; nothing in the
+    // execution path writes back through it. Copying it out would mean a toMap()/re-parse round trip on every read,
+    // which is why this follows getWorkflowExecutionId() above and suppresses instead.
+    @SuppressFBWarnings("EI")
     public WorkflowTrigger getWorkflowTrigger() {
         return workflowTrigger;
     }
@@ -464,6 +468,7 @@ public class TriggerExecution implements Cloneable, Errorable, Prioritizable, Re
         this.workflowExecutionId = workflowExecutionId;
     }
 
+    @SuppressFBWarnings("EI2")
     public void setWorkflowTrigger(WorkflowTrigger workflowTrigger) {
         this.workflowTrigger = workflowTrigger;
     }

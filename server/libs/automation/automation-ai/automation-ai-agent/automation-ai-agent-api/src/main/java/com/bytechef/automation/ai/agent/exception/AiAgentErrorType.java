@@ -81,6 +81,15 @@ public class AiAgentErrorType extends AbstractErrorType {
     /** Importing an agent from a document that is not valid JSON, or that carries no title. */
     public static final AiAgentErrorType INVALID_AGENT_IMPORT = new AiAgentErrorType(113);
 
+    /**
+     * Publishing an agent that has a channel whose row does not carry a parameter its reply action declares REQUIRED.
+     * The channel declaration maps row parameters onto reply properties
+     * ({@code AgentReplyDefinition.channelParameter(...)}), and the generator simply omits a mapped parameter the row
+     * does not carry — so without this the reply task would be generated missing a required value and fail on the
+     * agent's first answer instead of at publish time.
+     */
+    public static final AiAgentErrorType CHANNEL_PARAMETER_MISSING = new AiAgentErrorType(114);
+
     public AiAgentErrorType(int errorKey) {
         super(AiAgentFacade.class, errorKey);
     }

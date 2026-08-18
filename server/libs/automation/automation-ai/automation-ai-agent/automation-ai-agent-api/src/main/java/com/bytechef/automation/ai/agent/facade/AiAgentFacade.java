@@ -16,6 +16,7 @@
 
 package com.bytechef.automation.ai.agent.facade;
 
+import com.bytechef.automation.ai.agent.channel.ResolvedAgentChannel;
 import com.bytechef.automation.ai.agent.domain.AiAgentChannel;
 import com.bytechef.automation.ai.agent.domain.AiAgentElement;
 import com.bytechef.automation.ai.agent.dto.AiAgentDTO;
@@ -54,6 +55,14 @@ public interface AiAgentFacade {
      * {@code AiAgentFacadeImpl.hasAnyDeployment} already relies on.
      */
     List<AiAgentDeploymentDTO> getAgentDeployments(Long workspaceId);
+
+    /**
+     * Every channel an agent can be reached through, resolved from the component registry — one entry per component-
+     * declared {@code agentChannel(...)}, plus the synthesized {@code schedule} entry the registry cannot supply (a
+     * schedule is not a channel; see {@code docs/superpowers/specs/2026-08-17-sdk-agent-channels-design.md}). Backs the
+     * client's channel cards, which would otherwise have to mirror the registry by hand.
+     */
+    List<ResolvedAgentChannel> getAgentChannelDefinitions();
 
     /**
      * Read-model for the client's "Agent Chats" picker: every enabled, chat-reachable workflow of every agent in
@@ -121,10 +130,6 @@ public interface AiAgentFacade {
     int publishAgent(long id, String description);
 
     /**
-     * Every tag attached to any agent in {@code workspaceId} — the option set the agents list's tag filter and the
-     * per-row tag editor draw from.
-     */
-    /**
      * Every tag attached to an agent deployment in the workspace. Distinct from {@link #getAgentTags(Long)}: an agent
      * deployment is a {@code ProjectDeployment} and carries ordinary project-deployment tags, which are a different set
      * from the owning agent's own.
@@ -156,7 +161,16 @@ public interface AiAgentFacade {
      */
     AiAgentDTO importAgent(long workspaceId, String json);
 
+    /**
+     * Every tag attached to any agent in {@code workspaceId} — the option set the agents list's tag filter and the
+     * per-row tag editor draw from.
+     */
     List<Tag> getAgentTags(Long workspaceId);
+
+    /**
+     * @param id the {@code ProjectDeployment} id — an agent deployment IS one, so its tags are project-deployment tags
+     */
+    void updateAgentDeploymentTags(long id, List<Tag> tags);
 
     /**
      * Replaces the agent's ENTIRE tag set (not an add/remove delta) — tags not present in {@code tags} are detached.
@@ -164,11 +178,6 @@ public interface AiAgentFacade {
      * mutation here this does NOT regenerate the draft workflow: tags are list-page metadata and the generator never
      * reads them.
      */
-    /**
-     * @param id the {@code ProjectDeployment} id — an agent deployment IS one, so its tags are project-deployment tags
-     */
-    void updateAgentDeploymentTags(long id, List<Tag> tags);
-
     void updateAgentTags(long id, List<Tag> tags);
 
     /**

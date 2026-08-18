@@ -17,6 +17,7 @@
 package com.bytechef.component.whatsapp.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.agentReply;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
@@ -42,6 +43,10 @@ import com.bytechef.component.definition.TypeReference;
 import java.util.Map;
 
 /**
+ * The reply half of the {@code whatsapp} agent channel. The constant that names the addressee property is called
+ * {@code RECEIVE_USER}, but its value is {@code "to"} — that is the property name the descriptor binds and the one the
+ * generated reply task fills.
+ *
  * @author Luka Ljubić
  */
 public class WhatsAppSendMessageAction {
@@ -71,6 +76,10 @@ public class WhatsAppSendMessageAction {
                         object(MESSAGES)
                             .properties(
                                 string(ID)))))
+        .agentReply(
+            agentReply()
+                .conversationId(RECEIVE_USER)
+                .message(BODY))
         .perform(WhatsAppSendMessageAction::perform);
 
     private WhatsAppSendMessageAction() {

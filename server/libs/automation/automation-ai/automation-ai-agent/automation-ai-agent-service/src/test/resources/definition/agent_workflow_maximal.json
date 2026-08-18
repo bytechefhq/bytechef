@@ -12,7 +12,7 @@
     "name": "workflowCall_1",
     "type": "workflow/v1/newWorkflowCall",
     "parameters": {
-      "inputSchema": "{\"type\":\"object\",\"properties\":{\"message\":{\"type\":\"string\"},\"conversationId\":{\"type\":\"string\"},\"attachments\":{\"type\":\"array\",\"items\":{\"type\":\"object\"}}},\"required\":[\"message\"]}"
+      "inputSchema": "{\"type\":\"object\",\"properties\":{\"conversationId\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"},\"attachments\":{\"type\":\"array\",\"items\":{\"type\":\"object\"}}},\"required\":[\"conversationId\",\"message\"]}"
     }
   }, {
     "name": "telegram_1",
@@ -47,7 +47,6 @@
               "text": "${chat_1.message}",
               "conversationId": "${chat_1.conversationId}",
               "attachments": "${chat_1.attachments}",
-              "replyTo": null,
               "channel": "chat"
             }
           }
@@ -62,7 +61,6 @@
               "text": "${workflowCall_1.message}",
               "conversationId": "${workflowCall_1.conversationId}",
               "attachments": "${workflowCall_1.attachments}",
-              "replyTo": null,
               "channel": "workflowCall"
             }
           }
@@ -77,7 +75,6 @@
               "text": "${telegram_1.message.text}",
               "conversationId": "${telegram_1.message.chat.id}",
               "attachments": [ ],
-              "replyTo": "${telegram_1.message.chat.id}",
               "channel": "telegram"
             }
           }
@@ -92,7 +89,6 @@
               "text": "Summarize today's news",
               "conversationId": "90dcefad-c7a5-3c43-ba3d-6a0e4f28f386",
               "attachments": [ ],
-              "replyTo": null,
               "channel": "schedule"
             }
           }
@@ -271,41 +267,42 @@
           "conversationId": "${branch_in.conversationId}"
         }
       }
-    }
+    },
+    "aiHubAgentId": 1
   }, {
     "name": "branch_out",
     "type": "branch/v1",
     "parameters": {
-      "expression": "${branch_in.channel}",
+      "expression": "${__triggerName}",
       "cases": [ {
-        "key": "chat",
+        "key": "chat_1",
         "tasks": [ {
-          "name": "reply_chat",
+          "name": "reply_chat_1",
           "type": "chat/v1/responseToRequest",
           "parameters": {
             "message": "${aiAgent_1}"
           }
         } ]
       }, {
-        "key": "workflowCall",
+        "key": "workflowCall_1",
         "tasks": [ {
-          "name": "reply_workflowCall",
+          "name": "reply_workflowCall_1",
           "type": "workflow/v1/responseToWorkflowCall",
           "parameters": {
-            "outputSchema": "{\"type\":\"object\",\"properties\":{\"message\":{\"type\":\"string\"}},\"required\":[\"message\"]}",
             "response": {
               "message": "${aiAgent_1}"
-            }
+            },
+            "outputSchema": "{\"type\":\"object\",\"properties\":{\"message\":{\"type\":\"string\"}},\"required\":[\"message\"]}"
           }
         } ]
       }, {
-        "key": "telegram",
+        "key": "telegram_1",
         "tasks": [ {
-          "name": "reply_telegram",
+          "name": "reply_telegram_1",
           "type": "telegram/v1/sendMessage",
           "parameters": {
-            "chat_id": "${branch_in.replyTo}",
-            "text": "${aiAgent_1}"
+            "text": "${aiAgent_1}",
+            "chat_id": "${branch_in.conversationId}"
           },
           "connections": {
             "telegram": {
@@ -315,7 +312,7 @@
           }
         } ]
       }, {
-        "key": "schedule",
+        "key": "schedule_1",
         "tasks": [ ]
       } ]
     }
