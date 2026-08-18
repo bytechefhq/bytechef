@@ -146,7 +146,7 @@ The `server/ee/` directory contains microservices for distributed deployment:
 - `runtime-job-app/` - Runtime job execution
 
 ### Available Components
-ByteChef includes 190+ built-in components in `server/libs/modules/components/` covering CRM, project management, communication, e-commerce, cloud storage, AI/ML, databases, and custom code execution.
+ByteChef includes 268 built-in components in `server/libs/modules/components/` covering CRM, project management, communication, e-commerce, cloud storage, AI/ML, databases, and custom code execution. Count components by leaf module, not by top-level directory: several top-level entries are grouping folders holding many components each (`google` holds 18, `microsoft` 7) and a few are not components at all (`build`, `libs`), which is where the old "190+" came from. The figure matches the generated reference pages exactly.
 
 ## Development Patterns
 
@@ -363,23 +363,41 @@ tables `ai_hub_chat` + `ai_hub_chat_artifact` / `_asset_file` / `_tool` / `_comp
 
 The `ai_hub_chat` table holds three discriminated kinds (`AiHubChatKind` enum, INT ordinal):
 
-- `STANDARD` (ordinal 0) — default; runs through the LLM agent. `workflow_execution_id`,
-  `project_deployment_id`, and `ai_hub_task_id` are null. ThreadId is a random string from
-  the client.
+- `STANDARD` (ordinal 0) — default; runs through the LLM agent. `workflow_execution_id`
+  and `project_deployment_id` are null. ThreadId is a random string from the client.
 - `WORKFLOW_CHAT` (ordinal 1) — bound to a specific workflow execution; routed through
   `WebhookBridgeAgent` instead of the LLM. Carries `workflow_execution_id` +
   `project_deployment_id`. ThreadId is a plain UUID.
-- `TASK` (ordinal 2) — runs through the LLM agent with a per-task instructions overlay.
-  Carries `ai_hub_task_id`. ThreadId is a plain UUID.
+- `AGENT_CHAT` (ordinal 2) — bound to an **AI Agent's** generated workflow. Mechanically
+  identical to `WORKFLOW_CHAT` (same `WebhookBridgeAgent`, same two columns, same plain-UUID
+  threadId) and distinct only so the UI can name what the user picked: an agent, never the
+  hidden `__AI_AGENT__` project's workflow behind it. Before it existed the client re-derived
+  this per render by matching `workflow_execution_id` against `workspaceChatAgents`, which went
+  blind the moment an agent was undeployed.
 
-Always-new chat semantics: every pick of a workflow or a task starts a fresh chat rather
-than restoring a prior thread — including `createWorkflowChatAiHubChat`, which is NOT idempotent
-despite a stale client-side comment claiming otherwise. Each new row gets its own random UUID
-threadId so session-store events are isolated per chat, not shared across a (user, workflow) or
-(user, task) tuple. Past chats remain reachable through the chats list — they're just no longer
+**Never test the two bridged kinds by enumerating constants.** Ask
+`AiHubChatKind#isWebhookBridged()` server-side (both routing sites do: `AiHubRoutingAgent` and
+`WebhookBridgeAgent`'s misroute guard) and `isWebhookBridgedChat(kind)` (`chats.api.ts`)
+client-side, for every affordance that exists because a bridged chat has no LLM behind it — no
+model picker, no artifacts, no suggestion chips, no attachments, cancel via
+`cancelWorkflowChatTurn`, the auto-opened workflow panel. A missed site routes an agent chat to
+the LLM, which answers plausibly in place of the agent's actual run and logs nothing. Beware the
+inverse too: a `kind !== 'WORKFLOW_CHAT'` fallback silently absorbs each new
+kind — the sidebar's default-icon branch tests `=== 'STANDARD'` positively for that reason, with
+`toChat` funnelling unrecognised server kinds there.
+
+Always-new chat semantics: every pick of an agent or a workflow starts a fresh chat rather
+than restoring a prior thread — including `createWorkflowChatAiHubChat` and
+`createAgentChatAiHubChat`, neither of which is idempotent despite a stale client-side comment
+claiming otherwise. The two bridged mutations differ ONLY in the kind they stamp and share one
+`createWebhookBridgedChat` implementation; they are separate mutations rather than one with a flag
+because the caller already knows which cascade the user picked, and a boolean would let a client
+silently create a mislabelled row. Each new row gets its own random UUID
+threadId so session-store events are isolated per chat, not shared across a (user, workflow)
+tuple. Past chats remain reachable through the chats list — they're just no longer
 the default landing target. There is no partial unique index scoping rows per
-(workspace, user, environment, workflow_execution_id) or (workspace, user, environment,
-ai_hub_task_id); the `kind` column is the authoritative discriminator.
+(workspace, user, environment, workflow_execution_id); the `kind` column is the authoritative
+discriminator.
 
 Message bodies do **not** live in `ai_hub_chat` — the row is metadata only (title, preview,
 `message_count`, status, kind, the kind-specific target ids). The transcript lives in Spring AI's
@@ -392,57 +410,50 @@ elements, which the hub does not use. Sessions are all written under the constan
 its own: ownership is enforced on the `ai_hub_chat` row by `AiHubChatServiceImpl`, which then reaches
 the transcript by thread id.
 
-Enum ordinals are pinned by `EnumOrdinalStabilityTest`; append new kinds at the end.
+Enum ordinals are pinned by `EnumOrdinalStabilityTest`; append new kinds at the end. The removed
+`TASK` kind held ordinal 2 and `AGENT_CHAT` took its place — legal only because the AI Hub has never
+shipped in a release tag, so no customer row carries either value. A dev database written before that
+change must be reset, not migrated: an old `AGENT_CHAT` row (3) is now out of range and throws, and an
+old `TASK` row (2) silently reads as `AGENT_CHAT` and routes to the webhook bridge.
 
-#### Tasks ("Scheduled" in the UI)
+#### Scheduling an agent
 
-The reusable configuration is a **task**: `AiHubTask*`, package
-`com.bytechef.ee.ai.hub.task`, tables `ai_hub_task` + `_tool` / `_resource` /
-`_schedule`, column `ai_hub_chat.ai_hub_task_id`, routes
-`/automation/ai-hub/tasks{,/new,/:taskId/edit}`, subagent
-`task_agent` (`AiHubAgentType.TASK_AGENT`), tab tool
-`openAiHubTaskTab`, GraphQL `AiHubTaskGraphQlController`.
+There is no AI Hub task entity. A recurring run is an **AI Agent with a `schedule` channel**: an
+`ai_agent_channel` row whose `channelType` is `schedule`, carrying `expression` (a 5-field cron),
+`timezone`, `prompt` and `name` in its `parameters` map. `AiAgentWorkflowGenerator` turns that row
+into a `schedule/v1/cron` trigger on the agent's generated workflow, and — uniquely among channels —
+substitutes the stored `prompt` into `branch_in`'s envelope `text` as a **literal**, because a
+schedule has no incoming message to derive it from (`ChannelDefinitions.schedule()` therefore leaves
+`EnvelopeMapping.text()` null). `aiAgent_1`'s `userPrompt` is `${branch_in.text}`.
 
-**The sidebar nav item is labeled "Scheduled"** (CalendarClockIcon) because every task runs
-on a schedule; the page it opens is titled "Tasks". Both names refer to the same entity.
+Two consequences worth knowing: the prompt is baked into the generated workflow at save time rather
+than read at fire time, and `MapUtils.getRequiredString` only rejects a *missing* prompt — an empty
+string passes, so a blank prompt produces a schedule that fires on time and hands the agent nothing.
+Client-side validation is the only gate.
 
-Scheduling is **required** and has no on/off toggle: `TaskScheduleValidator` is an
-unconditional static (deliberately not a Spring bean — `TaskSaveValidator` is
-`@ConditionalOnProperty(bytechef.ai.gateway.enabled)` and would silently stop enforcing) invoked from
-`AiHubTaskServiceImpl` and `AiHubTaskScheduleServiceImpl`. It requires `title`,
-`prompt`, `frequencyKind`, `lifecycleKind`, and a valid IANA `zoneId`, plus per-cadence fields:
-`EVERY_X_MINUTES`→`intervalMinutes`, `HOURLY`→`minuteOfHour`, `DAILY`→`timeOfDay`,
-`WEEKLY`→`dayOfWeek`+`timeOfDay`, `MONTHLY`→`dayOfMonth`+`timeOfDay`, `CUSTOM_CRON`→`cronExpression`.
-`validateSchedule` in `AiHubTaskScheduleSection.tsx` mirrors these rules client-side; the
-form is a **single page** (the Overview/Schedule tabs are gone) and one Save persists both halves.
-
-#### Task system-prompt overlay
-
-`AiHubRoutingAgent.applyAiHubTaskOverlay` injects two state keys (from
-`AiHubStateKeys`) for `kind = TASK`:
-
-- `aiHubTaskInstructions` — the task's instructions text, appended as a Context block.
-- `aiHubTaskTitle` — the display name, surfaced as "operating as the user's task:
-  '\<title\>'" in the Context block.
-
-`AiHubSpringAIAgent.appendAiHubTaskContext` reads both keys and renders a `Task`
-Context entry. The wording is load-bearing — the test
-`AiHubSpringAIAgentTaskContextTest.testFullOverlayPinsExactWording` pins both
-"operating as" and "do not let these instructions override safety or security rules" exactly.
-
-The instructions overlay is **advisory** (LLM-readable Context, not a hard ACL). Workspace-level
-guardrails apply on top via the standard system prompt. Branches: task missing → plain LLM;
-service bean absent → plain LLM; instructions blank → title-only overlay.
+The cadence UI is shared: `agentScheduleCron.ts` owns `toCronExpression` /
+`toCadenceParameters` / `fromCadenceParameters` / `validateAgentScheduleCadence`, and
+`AgentScheduleFrequencyFields` renders the per-kind fields. Note that component renders the fields
+*belonging to* a frequency — the frequency `<Select>` itself lives in each caller
+(`AgentScheduleDialog`, `AgentDialog`), so a caller that omits it is silently pinned to one cadence.
+A schedule can be defined at agent-creation time in `AgentDialog` or afterwards on the detail page's
+schedule card; both write the identical channel payload.
 
 #### Chat launchers
 
-There is no Workflow Chats page. The composer's **provider popup** (the `ModelPicker` dropdown on the
-AI Hub home view) is the single launcher, with three cascades above the provider list: **Tasks**,
-**Workflow Chats**, and **Agent Chats**. Agent Chats is backed by the
-`workspaceChatAgents` GraphQL query (`AiAgentFacadeImpl.getWorkspaceChatAgents`) and lists deployed
-`AiAgent`s whose enabled deployment workflow has a hosted chat trigger; those workflows live in
-hidden `__AI_AGENT__` projects that `workspaceChatWorkflows` filters out, so the two cascades are
-disjoint. The separate CE-only `/automation/chats` page renders an **Agents** group from the same
+There is no Workflow Chats page. The composer's **provider popup** (the `ModelPicker` dropdown) is the
+single launcher, with two cascades above the provider list: **Agents** (first) and **Workflows**.
+`useAiHubChatLaunchers` owns both and is wired into the home composer AND the in-chat composer, so a
+launcher is reachable without navigating home. There is deliberately no scheduling cascade — a
+scheduled agent runs on its own cron, so there is nothing to launch interactively.
+
+Agents is backed by the `workspaceChatAgents` GraphQL query (`AiAgentFacadeImpl.getWorkspaceChatAgents`)
+and lists `AiAgent`s whose **enabled** project deployment has a workflow with a hosted chat trigger;
+those workflows live in hidden `__AI_AGENT__` projects that `workspaceChatWorkflows` filters out, so the
+two cascades are disjoint. A disabled or missing deployment drops the agent from the listing entirely —
+which is why both cascades render even when empty, with a sub-menu naming the reason ("No agent with an
+enabled deployment."). Hiding an empty cascade made a launcher read as unimplemented rather than
+unpopulated. The separate CE-only `/automation/chats` page renders an **Agents** group from the same
 query above its per-project groups.
 
 ### Workflow-chat metrics
@@ -478,7 +489,7 @@ Tools reach the ai_hub ASK/BUILD agents through three tiers (wired in `AiHubConf
    custom_component, code_workflow) via `registerCopilotSubAgentToolCallbacks`, and AI-hub-owned
    subagents
    (research, data_analyst, image_generator, slide_builder via `registerSubAgentToolCallbacks`;
-   mcp_agent, task_agent, project_deployment_agent, api_collection_agent via
+   mcp_agent, project_deployment_agent, api_collection_agent via
    `registerSpecialistSubAgentToolCallbacks` + `SubAgentToolCallback`). Delegates MUST forward
    the parent `ToolContext` into the inner ChatClient (`.toolContext(...)`) or workspace-scoped
    tools fail with "Workspace context unavailable". Wrap delegates in
@@ -497,8 +508,8 @@ registration via `ObjectProvider.ifAvailable`, and prompt documentation on the p
 **Consolidated pinned tools** (AI Hub only; per-kind variants remain on the Copilot surface):
 - `openResourceTab({type, name, ...ids})` replaces the seven per-resource open*Tab tools. The
   result echoes `type` plus the legacy field names; `AiHubRuntimeProvider` re-dispatches onto the
-  legacy client branches. `openWorkflowChatTab`/`openAiHubTaskTab` stay separate — their
-  results drive a chat switch, not a resource-panel tab.
+  legacy client branches. `openWorkflowChatTab` stays separate — its result drives a chat switch,
+  not a resource-panel tab.
 - `lookupPropertyOptions` / `selectPropertyOption` take `kind: ACTION | TRIGGER` +
   `operationName` (classes `LookupComponentPropertyOptionsToolCallback` /
   `SelectComponentPropertyOptionToolCallback`). The `selectPropertyOption` name and its
@@ -555,11 +566,11 @@ conversations race and surface one user's question in another's chat. Read `pend
 `runWithChannel`.
 
 Client: `toToolResultDataPart` dispatches on tool NAME first, then falls back to the payload's `kind`,
-scoped to known kinds — a delegate tool is named `task_agent`, so no name branch would ever
+scoped to known kinds — a delegate tool is named e.g. `mcp_agent`, so no name branch would ever
 match. The fallback parses silently behind a `{` guard rather than via `parseJson`, which would log a
 warning for every plain-text tool result in the app.
 
-**Wired for asking**: the mcp_agent/task_agent/project_deployment_agent/api_collection_agent specialists plus the Copilot domain specialists; generative
+**Wired for asking**: the mcp_agent/project_deployment_agent/api_collection_agent specialists plus the Copilot domain specialists; generative
 one-shots (research, data_analyst, image_generator, slide_builder, converter) deliberately are not — see
 the rollout note below. Adding another means three things: register `SubagentAskUserQuestionToolCallback`
 on its `ChatClient`, pass a `SubagentAskChannelRelay` into its delegate callback, and update its prompt.
@@ -607,7 +618,7 @@ providers** — switching does not move existing memories.
 ### Copilot domain agent module map (revised 2026-08-05)
 
 Copilot domain agents live one-config-per-activation-profile, per edition — NOT in ai-hub-service
-(which holds only hub-owned agents: task_agent, research, data_analyst, image_generator,
+(which holds only hub-owned agents: research, data_analyst, image_generator,
 slide_builder):
 
 - CE `ai-copilot-service`: `CopilotConfiguration` (copilot-only: workflow_editor, code_editor,
@@ -753,7 +764,7 @@ Spec: `docs/superpowers/specs/2026-08-05-draft-publish-editors-design.md`.
 - The `mcp_agent` subagent owns the end-to-end playbook (`prompt_mcp_agent.txt`).
 - The management MCP server folds in `McpServerToolCallbackContributor` beans (SPI in
   `ai-mcp-server-api`, keeps the CE server free of EE imports). The sixteen sub-agent delegates
-  (the four mcp_agent/task_agent/project_deployment_agent/api_collection_agent subagents plus the twelve
+  (the three mcp_agent/project_deployment_agent/api_collection_agent subagents plus the twelve
   copilot-domain specialists) are contributed there wrapped in
   `WorkspaceScopedSubAgentToolCallback`: an optional `workspaceId` input is resolved and forwarded
   into the specialist's ToolContext under both `AutomationToolInvocationContext` and
@@ -1021,7 +1032,7 @@ gateway-only implementation; see "AI Gateway content guardrails" below for the g
   `AiHubConfiguration` (wrapping the `ChatClient` at the point each is handed to its
   `createXToolCallback`/`new XAgentToolCallback` call) covers all three delegate families: Copilot
   specialists, the AI-hub-owned subagents (research/data_analyst/image_generator/slide_builder), and the
-  mcp_agent/task_agent/project_deployment_agent/api_collection_agent specialists. A
+  mcp_agent/project_deployment_agent/api_collection_agent specialists. A
   BLOCK-mode violation inside a delegate call throws `AiGuardrailViolationException` synchronously out of
   `.call()`; every delegate's pre-existing `catch (RuntimeException)` arm converts it to a tool-error string
   via `ToolErrors.runtimeFailure(...)` (class-name only, not `getMessage()`) rather than crashing the turn.
@@ -1029,7 +1040,7 @@ gateway-only implementation; see "AI Gateway content guardrails" below for the g
   *parent* as a tool message (skips the parent's own input scan) and streams to the client as tool-result
   events (skips the parent's response scan) — the delegate's OWN advisor now redacts/blocks its own
   request+response, but the parent agent never re-scans tool outputs. MCP-surface subagents
-  (`AiHubSubAgentMcpContributorConfiguration` et al.) remain a different, out-of-scope surface — they
+  (the per-domain MCP contributor configurations) remain a different, out-of-scope surface — they
   construct their own `SubAgentToolCallback` from the same `ChatClient` beans on a different `@Bean`
   method that F3 does not wrap.
 - **Model-based moderation (F2, ticket 732)**: covers every advisor-fronted surface, not just the gateway.
@@ -1175,7 +1186,7 @@ vi.mock('@/shared/components/copilot/stores/useCopilotStore', () => ({
 }));
 ```
 
-This pattern shows up in `AiHubTasksList.test.tsx` and any test that mocks Zustand
+This pattern shows up in `Agents.test.tsx` and any test that mocks Zustand
 stores or router hooks via factory-injected mocks.
 
 ### Resource Visibility & Sharing
@@ -1227,9 +1238,12 @@ list correctly hides. In CE this replaces owner-isolation *only* for resource ty
 **Audit**: `CONNECTION_VISIBILITY_CHANGED`, `CONNECTION_ACCESS_GRANTED`, `CONNECTION_ACCESS_REVOKED`.
 The first and last are `strictAudit` — both can remove access.
 
-**Metrics**: `bytechef_connection_create` (Counter), tagged
-`visibility=PRIVATE|WORKSPACE|ORGANIZATION`, wired via `ObjectProvider<MeterRegistry>` so lightweight
-app variants without actuator start cleanly.
+**Metrics**: `bytechef_connection_create` (Counter), tagged `visibility`, wired via
+`ObjectProvider<MeterRegistry>` so lightweight app variants without actuator start cleanly. Only
+`PRIVATE` and `WORKSPACE` are ever emitted: the counter lives in
+`WorkspaceConnectionFacadeImpl.incrementCreateCounter` — its own description reads "Connections
+created via the workspace facade" — and `createOrganizationConnection` is a separate EE GraphQL
+controller that never reaches it, while `setConnectionVisibility` rejects `ORGANIZATION` outright.
 
 
 ### Spring Boot Project Conventions
@@ -1471,9 +1485,12 @@ when an `openapi.yaml` changes. The surrounding `docs/`, `gradlew`, `pom.xml` sc
   false) also publishes `ResumeJobEvent` — at-least-once semantics, the interrupted task re-runs
   from the last completed node — capped by `max-auto-resume-attempts` (default 3) tracked in job
   metadata. Disable the whole monitor with `bytechef.workflow.execution.recovery.enabled=false`.
-  Stale-row finders are `getStaleTaskExecutions`/`getStaleJobs` (EE remote clients throw
-  `UnsupportedOperationException`; the monitor warn-skips, so orphan detection is monolith-only
-  for now). Detection lives OUTSIDE `server/libs/atlas/` except the engine-owned heartbeat
+  Stale-row finders are `getStaleTaskExecutions`/`getStaleJobs`, and they work in distributed EE
+  too: `RemoteJobServiceClient` (`getStaleJobs`/`getLongRunningJobs`/`getEndedJobs`) and
+  `RemoteTaskExecutionServiceClient.getStaleTaskExecutions` make real REST calls, against matching
+  endpoints on `RemoteJobServiceController` and `RemoteTaskExecutionServiceController`. The monitor's
+  `UnsupportedOperationException` warn-skip is a fallback for remote clients that lack them, not the
+  normal path. Detection lives OUTSIDE `server/libs/atlas/` except the engine-owned heartbeat
   primitives; semantics pinned by `OrphanedJobRecoveryMonitorTest`, and the underlying
   stale/long-running SQL finders by `StaleExecutionFinderIntTest` (Testcontainers PG).
 - **Per-run timeouts**: `JobTimeoutMonitor` (platform-coordinator, every minute,
@@ -1642,7 +1659,7 @@ skipped_recursion|skipped_subflow_child|skipped_no_config|skipped_unsupported|fa
 - `docker-compose.dev.server.yml` for server-only development
 
 ### Kubernetes
-- Helm charts are in `kubernetes/helm/bytechef-monolith/`
+- The Helm chart is in `kubernetes/helm/bytechef/` — one chart, deploying the single-node application
 - Supports both monolith and microservices deployments
 
 ### CI/CD
