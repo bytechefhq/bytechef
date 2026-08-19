@@ -1409,6 +1409,64 @@ created via the workspace facade" — and `createOrganizationConnection` is a se
 controller that never reaches it, while `setConnectionVisibility` rejects `ORGANIZATION` outright.
 
 
+### Per-environment workspace roles (EE)
+
+A workspace member holds either **one implicit role** (a `workspace_user` row with
+`environment IS NULL`, applying everywhere — what every pre-existing member has) or **one row per
+environment**, where an absent row is a denial. Never both: `setEnvironmentRole` deletes the implicit
+row in the same transaction, and two partial unique indexes (`uk_workspace_user_implicit`,
+`uk_workspace_user_explicit`) enforce it — the older `uk_workspace_user_workspace_user` constraint was
+dropped because it forbade the shape outright. Removing a member's last environment row removes them
+from the workspace; it does NOT restore an implicit row, which would turn "revoke their last
+environment" into "grant them every environment".
+
+**The environment is always an explicit argument, never read from `EnvironmentContext`.** That
+thread-local holds the *source* environment during a promotion and is lost on worker threads and in
+agent tool calls, so an implicit read fails open in exactly the case the feature exists for.
+
+**Three checks, and the safety of the first depends on the other two.** Breaking any one silently
+re-opens an escalation:
+
+1. `hasWorkspaceScope(workspaceId, scope)` — environment-unaware — returns the implicit row's scopes,
+   or for an explicit-mode member the **union** across the environments they can reach. Most guarded
+   operations name no environment, so without the union an explicit-mode member holds nothing anywhere.
+2. Operations taking effect in **every** environment at once use
+   `hasWorkspaceScopeInEveryEnvironment` (`addWorkspaceUser`, `inviteWorkspaceUser`,
+   `updateWorkspaceUserRole`, `assignCustomRole`, `removeWorkspaceUser`). Without this, (1) lets a
+   member who administers only Development grant themselves Production.
+3. Operations acting **in one** environment check that environment:
+   `hasWorkspaceScopeInEnvironment(..., #environment)` for the per-environment writes, the
+   `ResourceEnvironmentResolver` SPI for by-id guards, and `ProjectDeploymentDTO`'s own environment
+   for promotion.
+
+Both new expressions are SpEL functions on `AutomationMethodSecurityExpressionRoot`, not
+`hasPermission` overloads — Spring fixes `hasPermission`'s two shapes and neither carries an
+environment. Promotion's guard is `hasPermission(#projectDeploymentDTO, 'WORKFLOW_EDIT')`, the
+**two**-argument form: the three-argument form casts its first argument to `Serializable`, which that
+record is not, and routes to a method that never reaches the promotion branch.
+`PromotionGuardExpressionRoutingTest` pins the whole path by evaluating the real annotation.
+
+**`ResourceEnvironmentResolver`** (`automation-configuration-api`) is opt-in per resource type;
+`ProjectDeployment`, `Connection`, `McpServer` and `ApiKey` contribute one. A type with no resolver
+keeps the environment-unaware check, which is correct — a project, a workflow definition or a data
+table does not live in an environment. A resolver returning empty falls back rather than denying.
+
+**The scope cache key includes the environment.** Without it the first environment checked warms the
+entry and every later one is served those scopes — silent privilege escalation that any
+single-environment test passes. Eviction loops all three enum values and builds keys through
+`TenantCacheKeyUtils.getKey`, never `SimpleKey`, or it no-ops against the tenant-prefixed read key.
+
+**Admin protection is per environment.** `validateNotLastAdmin` counts workspace-wide and cannot see
+the new failure: the sole admin moves themselves to Development-only and the other environments are
+stranded while the count still reads one. The per-environment writes refuse to strand an environment,
+counting a null-environment row as administering every one. Tenant admins bypass, as they do
+workspace-wide.
+
+CE is unaffected — every new overload returns `isAuthenticated()`, since CE has no authorization
+boundary between workspace members. Spec:
+`docs/superpowers/specs/2026-08-19-per-environment-workspace-roles-design.md` (see its As built
+section).
+
 ### Spring Boot Project Conventions
 
 - **Integration Test Naming**: All integration test classes must end with "IntTest" suffix (e.g., `WorkflowFacadeIntTest.java`)
