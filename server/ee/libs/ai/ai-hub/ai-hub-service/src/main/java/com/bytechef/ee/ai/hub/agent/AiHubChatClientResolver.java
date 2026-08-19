@@ -24,16 +24,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 /**
- * Resolves a per-request override {@link ChatClient} for AI Hub conversations that carry a model override. Honors two
- * precedence layers, in order:
- *
- * <ol>
- * <li><b>User-selected, per conversation</b> — {@link AiHubStateKeys#USER_SELECTED_LLM_PROVIDER_KEY} +
- * {@link AiHubStateKeys#USER_SELECTED_LLM_MODEL_KEY}, set by the client (chat-toolbar picker).</li>
- * <li><b>Personal-agent override, per agent</b> — {@link AiHubStateKeys#PERSONAL_AGENT_LLM_PROVIDER_KEY} +
- * {@link AiHubStateKeys#PERSONAL_AGENT_LLM_MODEL_KEY}, injected by {@code AiHubRoutingAgent} when the active personal
- * agent has the override columns populated.</li>
- * </ol>
+ * Resolves a per-request override {@link ChatClient} for AI Hub conversations that carry a model override. The one
+ * override layer is the user's per-conversation selection — {@link AiHubStateKeys#USER_SELECTED_LLM_PROVIDER_KEY} +
+ * {@link AiHubStateKeys#USER_SELECTED_LLM_MODEL_KEY}, set by the client (chat-toolbar picker).
  *
  * <p>
  * The resolved (provider, model) pair is looked up against the platform AI provider catalog via
@@ -43,18 +36,15 @@ import org.springframework.stereotype.Component;
  * <p>
  * Returns {@code null} (fall back to default — caller uses the workspace {@code @Primary ChatModel}) on any of:
  * <ul>
- * <li>Neither layer fully set (no override requested — common case).</li>
+ * <li>The override is not fully set (no override requested — common case).</li>
  * <li>{@link AiHubStateKeys#VERIFIED_WORKSPACE_ID} absent (defensive).</li>
  * <li>The catalog can't resolve the requested (provider, model) pair.</li>
  * </ul>
  *
  * <p>
- * Half-set states (only one of provider/model present) at the user-selected layer fall through to the personal-agent
- * layer with a single warning log — half-set is treated as a transient client artifact (e.g. user mid-picking), not
- * malicious input, so we don't 400 the turn.
- *
- * <p>
- * Save-time validation for personal-agent override pairs lives in {@link PersonalAgentSaveValidator}, NOT here.
+ * Half-set states (only one of provider/model present) fall back to the workspace default with a single warning log —
+ * half-set is treated as a transient client artifact (e.g. user mid-picking), not malicious input, so we don't 400 the
+ * turn.
  *
  * <p>
  * Gated by {@code bytechef.ai.gateway.enabled=true} — the override resolver is absent in CE and lightweight EE
@@ -91,24 +81,16 @@ public class AiHubChatClientResolver implements AiHubSpringAIAgent.OverrideChatC
             return null;
         }
 
-        // Precedence: user-selected (chat-toolbar picker) wins over personal-agent (configured at agent save).
         String llmProvider = asString(state.get(AiHubStateKeys.USER_SELECTED_LLM_PROVIDER_KEY));
         String llmModel = asString(state.get(AiHubStateKeys.USER_SELECTED_LLM_MODEL_KEY));
 
-        boolean userSelected = llmProvider != null && llmModel != null;
-
-        if (!userSelected) {
-            if ((llmProvider == null) != (llmModel == null)) {
-                // Transient client artifact (e.g. user mid-picking): one half arrived, the other didn't. Don't 400
-                // the turn — fall through to the next precedence layer so the conversation continues, and log once
-                // so the asymmetry is visible if it persists across turns.
-                log.warn(
-                    "User-selected LLM half-set (provider={}, model={}); falling through to personal-agent override",
-                    llmProvider, llmModel);
-            }
-
-            llmProvider = asString(state.get(AiHubStateKeys.PERSONAL_AGENT_LLM_PROVIDER_KEY));
-            llmModel = asString(state.get(AiHubStateKeys.PERSONAL_AGENT_LLM_MODEL_KEY));
+        if ((llmProvider == null) != (llmModel == null)) {
+            // Transient client artifact (e.g. user mid-picking): one half arrived, the other didn't. Don't 400 the
+            // turn — returning null lets the caller fall back to the workspace default so the conversation
+            // continues, and log once so the asymmetry is visible if it persists across turns.
+            log.warn(
+                "User-selected LLM half-set (provider={}, model={}); falling back to the workspace default",
+                llmProvider, llmModel);
         }
 
         if (llmProvider == null || llmModel == null) {
@@ -172,7 +154,7 @@ public class AiHubChatClientResolver implements AiHubSpringAIAgent.OverrideChatC
     // workspaceId, llmProvider);
     // } else {
     // log.warn(
-    // "Personal-agent LLM override skipped: workspace {} has no enabled provider matching '{}'. " +
+    // "Task LLM override skipped: workspace {} has no enabled provider matching '{}'. " +
     // "Falling back to workspace default. Re-save the agent with a different provider to fix.",
     // workspaceId, llmProvider);
     // }

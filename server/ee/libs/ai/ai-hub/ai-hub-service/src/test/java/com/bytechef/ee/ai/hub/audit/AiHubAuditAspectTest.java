@@ -54,7 +54,7 @@ class AiHubAuditAspectTest {
         AiHubAuditAspect aspect = newAspect();
 
         AuditAiHub annotation = annotation(
-            AiHubAuditEvent.AI_HUB_PERSONAL_AGENT_CREATED, false,
+            AiHubAuditEvent.AI_HUB_CHAT_CREATED, false,
             entry("workspaceId", "#workspaceId"),
             entry("agentName", "#result.toString()"));
 
@@ -70,7 +70,7 @@ class AiHubAuditAspectTest {
 
         ArgumentCaptor<Map<String, Object>> dataCaptor = ArgumentCaptor.forClass(Map.class);
 
-        verify(publisher).publish(eq(AiHubAuditEvent.AI_HUB_PERSONAL_AGENT_CREATED), dataCaptor.capture());
+        verify(publisher).publish(eq(AiHubAuditEvent.AI_HUB_CHAT_CREATED), dataCaptor.capture());
 
         assertThat(dataCaptor.getValue())
             .containsEntry("workspaceId", "42")
@@ -82,7 +82,7 @@ class AiHubAuditAspectTest {
         AiHubAuditAspect aspect = newAspect();
 
         AuditAiHub annotation = annotation(
-            AiHubAuditEvent.AI_HUB_PERSONAL_AGENT_DELETED, false,
+            AiHubAuditEvent.AI_HUB_CHAT_DELETED, false,
             entry("workspaceId", "#nonexistent.boom()"));
 
         JoinPoint joinPoint = joinPointFor(
@@ -108,7 +108,7 @@ class AiHubAuditAspectTest {
         AiHubAuditAspect aspect = newAspect();
 
         AuditAiHub annotation = annotation(
-            AiHubAuditEvent.AI_HUB_PERSONAL_AGENT_UPDATED, false,
+            AiHubAuditEvent.AI_HUB_WORKSPACE_SETTINGS_UPDATED, false,
             entry("workspaceId", "#nonexistent.boom()"));
 
         JoinPoint joinPoint = joinPointFor(

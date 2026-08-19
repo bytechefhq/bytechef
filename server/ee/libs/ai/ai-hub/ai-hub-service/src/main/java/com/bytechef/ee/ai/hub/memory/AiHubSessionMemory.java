@@ -41,7 +41,7 @@ import org.springframework.ai.session.advisor.SessionMemoryAdvisor;
 public class AiHubSessionMemory implements AutoCloseable {
 
     /**
-     * User id assigned to sessions the AI Hub creates. Conversation enumeration goes through {@code ai_hub_task} rows
+     * User id assigned to sessions the AI Hub creates. Conversation enumeration goes through {@code ai_hub_chat} rows
      * (threadIds), not session listing, so the value only needs to be stable.
      */
     public static final String SESSION_USER_ID = "ai-hub";

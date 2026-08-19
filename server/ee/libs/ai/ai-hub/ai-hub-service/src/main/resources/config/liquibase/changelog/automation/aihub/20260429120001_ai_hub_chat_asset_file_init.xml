@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20260429120001" author="Ivica Cardic">
+        <createTable tableName="ai_hub_chat_asset_file">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="chat_id" type="BIGINT">
+                <constraints nullable="false"
+                             foreignKeyName="fk_cc_chat_asset_file_chat"
+                             references="ai_hub_chat(id)"
+                             deleteCascade="true"/>
+            </column>
+            <column name="asset_file_id" type="BIGINT">
+                <constraints nullable="false"
+                             foreignKeyName="fk_cc_conv_asset_file_asset_file"
+                             references="asset_file(id)"
+                             deleteCascade="true"/>
+            </column>
+            <!--
+                relationship is persisted as an INT ordinal of AiHubChatAssetFileRelationship
+                (AUTHORED=0, ATTACHED=1, MENTIONED=2, READ_BY_TOOL=3). Append-only contract enforced by
+                AiHubChatAssetFileRelationshipOrdinalStabilityTest — never reorder, rename, or remove.
+            -->
+            <column name="relationship" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!--
+            One row per (chat, file, relationship) tuple. Enforces idempotency: re-attaching the
+            same file in the same chat does not produce duplicate join rows.
+        -->
+        <addUniqueConstraint tableName="ai_hub_chat_asset_file"
+                             columnNames="chat_id, asset_file_id, relationship"
+                             constraintName="uk_cc_conv_asset_file_triple"/>
+
+        <createIndex tableName="ai_hub_chat_asset_file"
+                     indexName="idx_cc_chat_asset_file_chat">
+            <column name="chat_id"/>
+            <column name="created_at" descending="true"/>
+        </createIndex>
+
+        <createIndex tableName="ai_hub_chat_asset_file"
+                     indexName="idx_cc_conv_asset_file_asset_file">
+            <column name="asset_file_id"/>
+        </createIndex>
+
+        <!--
+            Partial unique index: an asset_file may have at most one AUTHORED row across all chats.
+            Encodes the "one author chat per file" invariant at the database level so a future
+            raw-SQL writer or a service path that forgets the check cannot create two authors for one file.
+            relationship=0 is the AUTHORED ordinal — pinned by the stability test, append-only enum.
+        -->
+        <sql>
+            CREATE UNIQUE INDEX uk_asset_file_authored_once
+            ON ai_hub_chat_asset_file (asset_file_id)
+            WHERE relationship = 0
+        </sql>
+    </changeSet>
+</databaseChangeLog>

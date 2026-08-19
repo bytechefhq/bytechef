@@ -38,8 +38,8 @@ import org.springframework.core.io.Resource;
  * {@code AiHubSpringAIAgent#resolveChatClient}: previously only the top-level AI Hub agent's own {@link ChatClient}
  * carried these advisors, while every delegate ChatClient (Copilot specialists, the AI-hub-owned
  * research/data_analyst/image_generator/slide_builder subagents, and the
- * mcp_agent/task_agent/project_deployment_agent/api_collection_agent specialists) ran completely unguarded and without
- * the workspace's standing instructions.
+ * mcp_agent/project_deployment_agent/api_collection_agent specialists) ran completely unguarded and without the
+ * workspace's standing instructions.
  *
  * <p>
  * The class keeps its guardrails-era name even though it now dispatches an arbitrary contributor list — renaming would

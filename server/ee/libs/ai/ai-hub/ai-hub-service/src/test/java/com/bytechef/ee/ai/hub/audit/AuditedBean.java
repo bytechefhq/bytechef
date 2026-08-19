@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 public class AuditedBean {
 
     @AuditAiHub(
-        event = AiHubAuditEvent.AI_HUB_PERSONAL_AGENT_UPDATED,
+        event = AiHubAuditEvent.AI_HUB_WORKSPACE_SETTINGS_UPDATED,
         data = {
             @AuditAiHub.AuditData(key = "workspaceId", value = "#workspaceId"),
             @AuditAiHub.AuditData(key = "agentId", value = "#agentId")

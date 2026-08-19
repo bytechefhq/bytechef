@@ -214,10 +214,10 @@ class ClusterElementToolCallbackTest {
 
     @Test
     void testPinnedConnectionShortCircuitsWorkspaceLookup() throws Exception {
-        // v2 task-attached tools pin the connection at attach time. The callback must use
+        // v2 chat-attached tools pin the connection at attach time. The callback must use
         // getConnection(pinnedId) directly and skip the workspace-scoped lookup-and-disambiguate path
         // entirely — otherwise a workspace that grew a second connection of the same component after
-        // attach would suddenly trigger the "ambiguous" envelope mid-task.
+        // attach would suddenly trigger the "ambiguous" envelope mid-chat.
         ClusterElementDefinitionService clusterElementDefinitionService = mock(ClusterElementDefinitionService.class);
         ConnectionService connectionService = mock(ConnectionService.class);
 

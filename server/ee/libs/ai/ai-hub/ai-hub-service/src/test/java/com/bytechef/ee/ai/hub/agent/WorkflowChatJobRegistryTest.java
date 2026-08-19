@@ -13,10 +13,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 
 /**
- * Unit tests for {@link WorkflowChatJobRegistry}. The registry is the taskId → jobId mapping the cancel-turn mutation
+ * Unit tests for {@link WorkflowChatJobRegistry}. The registry is the chatId → jobId mapping the cancel-turn mutation
  * reads to resolve which workflow execution to stop. Mirrors {@code WebhookResumeRegistry} for shape and is tested for
  * the same reasons: small contract surface, but a regression here breaks cancel silently — a user clicking Stop on a
- * workflow chat would see the button do nothing because the registry couldn't resolve the task back to its job.
+ * workflow chat would see the button do nothing because the registry couldn't resolve the chat back to its job.
  *
  * @version ee
  *
@@ -29,7 +29,7 @@ class WorkflowChatJobRegistryTest {
         WorkflowChatJobRegistry registry = newRegistry();
 
         // No entry — the cancel-turn mutation interprets null as "no job to cancel" and surfaces a clean
-        // false to the client. Without this null return, a freshly-loaded task would surface a
+        // false to the client. Without this null return, a freshly-loaded chat would surface a
         // confusing NullPointerException on the first cancel attempt.
         assertThat(registry.get(42L)).isNull();
     }
@@ -63,7 +63,7 @@ class WorkflowChatJobRegistryTest {
         registry.register(42L, 7777L);
         registry.register(42L, 8888L);
 
-        // The bridge contract is "the latest jobId wins" — a task whose previous turn finished but
+        // The bridge contract is "the latest jobId wins" — a chat whose previous turn finished but
         // whose cache entry hasn't yet been evicted gets its slot replaced when the next turn's start
         // event fires. Pin: register-then-register-then-get returns the second value.
         assertThat(registry.get(42L)).isEqualTo(8888L);
@@ -96,20 +96,20 @@ class WorkflowChatJobRegistryTest {
     }
 
     @Test
-    void testRegistryIsKeyedByTaskId() {
+    void testRegistryIsKeyedByChatId() {
         WorkflowChatJobRegistry registry = newRegistry();
 
         registry.register(1L, 100L);
         registry.register(2L, 200L);
 
-        // Independent tasks don't pollute each other's slots — concurrent workflow chats can each
-        // have their own pending jobId, and cancelling task 1 doesn't touch task 2.
+        // Independent chats don't pollute each other's slots — concurrent workflow chats can each
+        // have their own pending jobId, and cancelling chat 1 doesn't touch chat 2.
         assertThat(registry.get(1L)).isEqualTo(100L);
         assertThat(registry.get(2L)).isEqualTo(200L);
 
         registry.clear(1L);
 
-        // Pin the cross-key isolation: clearing task 1 leaves task 2's entry intact.
+        // Pin the cross-key isolation: clearing chat 1 leaves chat 2's entry intact.
         assertThat(registry.get(1L)).isNull();
         assertThat(registry.get(2L)).isEqualTo(200L);
     }

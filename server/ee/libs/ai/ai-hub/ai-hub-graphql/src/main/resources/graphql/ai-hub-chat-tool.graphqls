@@ -1,0 +1,162 @@
+# Per-chat tool persistence (v2.2 + v2.4 client UI).
+#
+# Two read shapes:
+#   - aiHubChatTools(...) returns the tools currently attached to a chat, joined with their
+#     parent component-binding context — this is what the chat chip list renders.
+#   - aiHubChatToolableComponents(...) returns the catalog of components that have at least one
+#     tool-typed cluster element, so the plus-button menu can show a hierarchical list.
+#
+# Three write shapes mirror the chat affordances (AttachChatTool / RemoveChatTool /
+# updateToolParameters) so the UI and the LLM share one mutation surface.
+
+type AiHubChatToolBinding {
+    chatToolId: ID!
+    chatComponentId: ID!
+    chatId: ID!
+    componentName: String!
+    componentVersion: Int!
+    clusterElementName: String!
+    connectionId: ID
+    environment: Int!
+    parameters: Any!
+}
+
+type ToolableComponent {
+    componentName: String!
+    componentVersion: Int!
+    title: String
+    description: String
+    icon: String
+    tools: [ToolableClusterElement!]!
+    "Whether this component requires a connection to be used (drives the composer's Connect vs toggle affordance)."
+    connectionRequired: Boolean!
+}
+
+type ToolableClusterElement {
+    name: String!
+    title: String
+    description: String
+}
+
+extend type Query {
+    """
+    Lists every tool attached to the supplied chat, joined with its parent component-binding
+    context. Used by the chat attached-tools chip list in the composer.
+    """
+    aiHubChatTools(workspaceId: ID!, chatId: ID!): [AiHubChatToolBinding!]!
+
+    """
+    Lists components that publish at least one tool-typed cluster element, with each component's tool
+    catalog. Powers the composer plus-button menu's Tools section so users can browse the catalog
+    without going through chat.
+    """
+    aiHubChatToolableComponents(workspaceId: ID!): [ToolableComponent!]!
+
+    """
+    The current user's globally-added connectors (the Connectors page Pre-built list). Each carries the
+    component metadata, its connection, the component-level enabled flag, and its tools with per-tool
+    enabled flags.
+
+    Pass `chatId` to also resolve `enabledInChat` against that chat; without it every connector reports
+    `enabledInChat: true`, since participating is the default.
+    """
+    aiHubUserConnectors(workspaceId: ID!, chatId: ID): [AiHubUserConnector!]!
+}
+
+extend type Mutation {
+    """
+    Attach a tool to a chat. Idempotent — re-attaching the same (component, action, connection)
+    upserts the tool's parameters in place. Returns the persisted ids so the client can immediately
+    address the row in subsequent updates / removes.
+    """
+    attachAiHubChatTool(input: AttachAiHubChatToolInput!): AiHubChatToolBinding!
+
+    """
+    Update only the parameters of a previously attached tool (e.g. user adjusts the default channel
+    after attach). Other fields on the binding (component, action, connection) are immutable post-attach;
+    if the user wants to switch connection they should detach + reattach instead.
+    """
+    updateAiHubChatToolParameters(workspaceId: ID!, chatToolId: ID!, parameters: Any!): AiHubChatToolBinding!
+
+    """
+    Detach a single tool. Returns true on success; false when the id was not found (idempotent).
+    """
+    removeAiHubChatTool(workspaceId: ID!, chatToolId: ID!): Boolean!
+
+    """
+    Detach a whole component binding (cascades to all its tools via the FK). Use when the user wants to
+    remove all of e.g. Slack's tools at once instead of one at a time.
+    """
+    detachAiHubChatComponent(workspaceId: ID!, chatComponentId: ID!): Boolean!
+
+    """
+    Add a pre-built connector to the current user's AI Hub (a user-global "added connector"). Idempotent —
+    re-adding refreshes the connection in place. Returns the connector id.
+    """
+    addAiHubUserConnector(
+        workspaceId: ID!, componentName: String!, componentVersion: Int!, connectionId: ID, environment: Int!
+    ): ID!
+
+    """Remove a user connector (cascades its tool config). Idempotent — returns false when not found/owned."""
+    removeAiHubUserConnector(workspaceId: ID!, connectorId: ID!): Boolean!
+
+    """
+    Toggle a user connector on/off (the component-level enabled flag). This is AVAILABILITY — off means the
+    connector is unusable everywhere, and it stops appearing in the composer's Connectors branch at all.
+    """
+    setAiHubUserConnectorEnabled(workspaceId: ID!, connectorId: ID!, enabled: Boolean!): Boolean!
+
+    """
+    Toggle a user connector on/off WITHIN ONE CHAT, leaving its user-global availability untouched. This is
+    PARTICIPATION — the composer's per-connector switch. Absence of a chat-scoped record means participating,
+    so existing chats are unaffected until the user flips one.
+    """
+    setAiHubChatConnectorEnabled(
+        workspaceId: ID!, chatId: ID!, connectorId: ID!, enabled: Boolean!
+    ): Boolean!
+
+    """Toggle a single tool within a user connector on/off."""
+    setAiHubUserConnectorToolEnabled(
+        workspaceId: ID!, connectorId: ID!, toolName: String!, enabled: Boolean!
+    ): Boolean!
+
+    """Set the pre-configured parameter values for a single tool within a user connector."""
+    setAiHubUserConnectorToolParameters(
+        workspaceId: ID!, connectorId: ID!, toolName: String!, parameters: Any!
+    ): Boolean!
+}
+
+type AiHubUserConnector {
+    id: ID!
+    componentName: String!
+    componentVersion: Int!
+    title: String
+    description: String
+    icon: String
+    connectionId: ID
+    connectionRequired: Boolean!
+    """Availability — set on the Connectors page; off means unusable in every chat."""
+    enabled: Boolean!
+    """Participation in the chat named by the query's `chatId`; true when no chatId was supplied."""
+    enabledInChat: Boolean!
+    tools: [AiHubUserConnectorTool!]!
+}
+
+type AiHubUserConnectorTool {
+    name: String!
+    title: String
+    description: String
+    enabled: Boolean!
+    parameters: Any
+}
+
+input AttachAiHubChatToolInput {
+    workspaceId: ID!
+    chatId: ID!
+    componentName: String!
+    componentVersion: Int
+    clusterElementName: String!
+    connectionId: ID
+    environment: Int!
+    parameters: Any
+}

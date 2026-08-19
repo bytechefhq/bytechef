@@ -97,7 +97,7 @@ class ArtifactGeneratorRegistryTest {
         public GenerationResult generate(GenerationRequest request) {
             invocations++;
 
-            return new GenerationResult(assetFileId, request.filename(), format, request.taskId() != null);
+            return new GenerationResult(assetFileId, request.filename(), format, request.chatId() != null);
         }
     }
 }

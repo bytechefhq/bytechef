@@ -27,8 +27,8 @@ import reactor.core.publisher.Flux;
 /**
  * Spring AI {@link CallAdvisor}/{@link StreamAdvisor} appending the workspace administrator's standing instructions to
  * the request's system message, under {@link #WORKSPACE_INSTRUCTIONS_HEADER}. The base agent prompt always comes first
- * and the section wording states it cannot override safety/security rules — the same advisory posture as the
- * personal-agent overlay.
+ * and the section wording states it cannot override safety/security rules — the same advisory posture as the task
+ * overlay.
  *
  * <p>
  * Runs at {@code HIGHEST_PRECEDENCE + 100} — AFTER {@code AiGuardrailsAdvisor}'s input scan, so an admin's own

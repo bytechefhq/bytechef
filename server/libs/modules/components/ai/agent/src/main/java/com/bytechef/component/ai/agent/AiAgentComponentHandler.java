@@ -28,6 +28,7 @@ import com.bytechef.component.ai.llm.facade.AiAgentToolFacade;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.platform.ai.conversation.AgentConversationRecorder;
 import com.bytechef.platform.ai.guardrails.AiGuardrailsAdvisorProvider;
 import com.bytechef.platform.ai.workspaceprompt.WorkspaceSystemPromptAdvisorProvider;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
@@ -51,13 +52,14 @@ public class AiAgentComponentHandler implements ComponentHandler {
         ToolCallingManager toolCallingManager,
         ObjectProvider<ToolExecutionRecorder> toolExecutionRecorderObjectProvider,
         ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider,
-        ObjectProvider<WorkspaceSystemPromptAdvisorProvider> workspaceSystemPromptAdvisorProviderObjectProvider) {
+        ObjectProvider<WorkspaceSystemPromptAdvisorProvider> workspaceSystemPromptAdvisorProviderObjectProvider,
+        ObjectProvider<AgentConversationRecorder> agentConversationRecorderObjectProvider) {
 
         final ActionDefinition aiAgentChatActionDefinition =
             AiAgentChatAction.of(
                 aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager,
                 toolExecutionRecorderObjectProvider, aiGuardrailsAdvisorProviderObjectProvider,
-                workspaceSystemPromptAdvisorProviderObjectProvider);
+                workspaceSystemPromptAdvisorProviderObjectProvider, agentConversationRecorderObjectProvider);
 
         this.componentDefinition = new AiAgentComponentDefinitionImpl(
             component(AI_AGENT)
@@ -70,7 +72,7 @@ public class AiAgentComponentHandler implements ComponentHandler {
                     AiAgentStreamChatAction.of(
                         aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager,
                         toolExecutionRecorderObjectProvider, aiGuardrailsAdvisorProviderObjectProvider,
-                        workspaceSystemPromptAdvisorProviderObjectProvider),
+                        workspaceSystemPromptAdvisorProviderObjectProvider, agentConversationRecorderObjectProvider),
                     AiAgentRealtimeChatAction.of(
                         aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager,
                         toolExecutionRecorderObjectProvider, aiGuardrailsAdvisorProviderObjectProvider,

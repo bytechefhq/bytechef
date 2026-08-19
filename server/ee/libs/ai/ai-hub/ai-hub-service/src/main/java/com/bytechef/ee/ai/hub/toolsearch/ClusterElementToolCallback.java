@@ -77,14 +77,14 @@ public class ClusterElementToolCallback implements ToolCallback {
     private final ClusterElementDefinitionService clusterElementDefinitionService;
     private final ConnectionService connectionService;
     /**
-     * Pre-bound connection id (v2 per-task tools). When set, the callback uses {@code connectionService
+     * Pre-bound connection id (v2 per-chat tools). When set, the callback uses {@code connectionService
      * .getConnection(pinnedConnectionId)} directly and skips the workspace-scoped lookup-and-disambiguate path. When
      * null (v1 catalog discovery path), the workspace-scoped lookup runs and returns the standard zero/one/many
      * envelopes documented in the class javadoc.
      */
     private final @Nullable Long pinnedConnectionId;
     /**
-     * Pre-set parameter defaults from a per-task tool binding. Merged INTO the LLM-supplied JSON args (LLM args take
+     * Pre-set parameter defaults from a per-chat tool binding. Merged INTO the LLM-supplied JSON args (LLM args take
      * precedence on conflict), so the chat agent can override per-call without losing the user's persisted defaults.
      */
     private final Map<String, ?> pinnedParameters;
@@ -186,7 +186,7 @@ public class ClusterElementToolCallback implements ToolCallback {
         try {
             Map<String, Object> llmParameters = parseInput(toolInput);
 
-            // Pinned defaults from a v2 task binding go in FIRST so LLM-supplied keys overwrite them
+            // Pinned defaults from a v2 chat binding go in FIRST so LLM-supplied keys overwrite them
             // on conflict — chat-driven per-call override of a persisted default is the natural mental model
             // for users who say "this time send to #urgent instead of #engineering".
             Map<String, Object> mergedParameters = new HashMap<>(pinnedParameters);
@@ -236,9 +236,9 @@ public class ClusterElementToolCallback implements ToolCallback {
      * the rationale.
      */
     private ConnectionResolution resolveConnection(long environmentId) throws JacksonException {
-        // v2 path: per-task binding pinned a specific connection at attach time. Use it directly so
+        // v2 path: per-chat binding pinned a specific connection at attach time. Use it directly so
         // a workspace that subsequently grew a second connection of the same component doesn't trigger the
-        // "ambiguous" envelope mid-task. The user already disambiguated when they attached.
+        // "ambiguous" envelope mid-chat. The user already disambiguated when they attached.
         if (pinnedConnectionId != null) {
             Connection pinned = connectionService.getConnection(pinnedConnectionId);
 

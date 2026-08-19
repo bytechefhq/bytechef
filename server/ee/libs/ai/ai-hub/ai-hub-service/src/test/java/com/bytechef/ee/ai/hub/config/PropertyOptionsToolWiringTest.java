@@ -13,9 +13,9 @@ import static org.mockito.Mockito.mock;
 import com.bytechef.ai.copilot.tool.PropertyOptionsResolver;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
+import com.bytechef.ee.ai.hub.chat.AiHubChatService;
+import com.bytechef.ee.ai.hub.chat.AiHubChatToolFacade;
 import com.bytechef.ee.ai.hub.metric.AiHubToolAttachMetrics;
-import com.bytechef.ee.ai.hub.task.AiHubTaskService;
-import com.bytechef.ee.ai.hub.task.AiHubTaskToolFacade;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ActionDefinitionService;
@@ -49,8 +49,8 @@ class PropertyOptionsToolWiringTest {
             new SecurityContextRehydrator(mock(UserService.class), mock(AuthorityService.class)));
 
         Method method = AiHubConfiguration.class.getDeclaredMethod(
-            "registerToolAttachStateVisibilityToolCallbacks", List.class, AiHubTaskService.class,
-            AiHubTaskToolFacade.class, ComponentDefinitionService.class, ConnectionDefinitionService.class,
+            "registerToolAttachStateVisibilityToolCallbacks", List.class, AiHubChatService.class,
+            AiHubChatToolFacade.class, ComponentDefinitionService.class, ConnectionDefinitionService.class,
             WorkspaceConnectionFacade.class, ActionDefinitionService.class, ActionDefinitionFacade.class,
             TriggerDefinitionService.class, TriggerDefinitionFacade.class, PropertyOptionsResolver.class,
             AiHubToolAttachMetrics.class, JsonMapper.class);
@@ -58,7 +58,7 @@ class PropertyOptionsToolWiringTest {
         method.setAccessible(true);
 
         method.invoke(
-            null, toolCallbacks, mock(AiHubTaskService.class), mock(AiHubTaskToolFacade.class),
+            null, toolCallbacks, mock(AiHubChatService.class), mock(AiHubChatToolFacade.class),
             mock(ComponentDefinitionService.class), mock(ConnectionDefinitionService.class),
             mock(WorkspaceConnectionFacade.class), mock(ActionDefinitionService.class),
             mock(ActionDefinitionFacade.class), mock(TriggerDefinitionService.class),

@@ -37,7 +37,7 @@ import org.springframework.ai.session.SessionEvent;
  */
 class SubagentAskThenAnswerContinuityTest {
 
-    private static final String TASK_AGENT = "task_agent";
+    private static final String PROJECT_DEPLOYMENT_AGENT = "project_deployment_agent";
     private static final String THREAD_ID = "thread-1";
 
     private AiHubSessionMemory aiHubSessionMemory;
@@ -52,12 +52,12 @@ class SubagentAskThenAnswerContinuityTest {
 
     @Test
     void testTheDelegationAfterAnAnswerStillSeesWhyTheQuestionWasAsked() {
-        String sessionId = SubAgentSessionMemoryContributor.sessionKey(THREAD_ID, TASK_AGENT);
+        String sessionId = SubAgentSessionMemoryContributor.sessionKey(THREAD_ID, PROJECT_DEPLOYMENT_AGENT);
 
-        // Turn 1: the specialist drafts, then asks which of two agents the user meant.
+        // Turn 1: the specialist drafts, then asks which of two environments the user meant.
         appendExchange(
-            sessionId, "rename my support agent",
-            "Draft: 'Support Triage'. Asked whether you meant Support or Sales.");
+            sessionId, "promote the support agent to production",
+            "Draft: promote to production. Asked whether you meant staging or production.");
 
         // Turn 2: the parent re-delegates with the user's answer. What the specialist loads is turn 1.
         List<SessionEvent> replayed = aiHubSessionMemory.sessionService()
@@ -68,8 +68,8 @@ class SubagentAskThenAnswerContinuityTest {
             replayed.get(1)
                 .getMessage()
                 .getText())
-                    .contains("Support Triage")
-                    .contains("Support or Sales");
+                    .contains("promote to production")
+                    .contains("staging or production");
     }
 
     /**
@@ -79,8 +79,8 @@ class SubagentAskThenAnswerContinuityTest {
     @Test
     void testAnotherSpecialistOnTheSameThreadDoesNotInheritTheAnswer() {
         appendExchange(
-            SubAgentSessionMemoryContributor.sessionKey(THREAD_ID, TASK_AGENT),
-            "rename my support agent", "Asked whether you meant Support or Sales.");
+            SubAgentSessionMemoryContributor.sessionKey(THREAD_ID, PROJECT_DEPLOYMENT_AGENT),
+            "promote the support agent to production", "Asked whether you meant staging or production.");
 
         List<SessionEvent> otherSpecialistEvents = aiHubSessionMemory.sessionService()
             .getEvents(

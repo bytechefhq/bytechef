@@ -30,6 +30,7 @@ import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ActionDefinition.ResumePerformFunction.ResumeResponse;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.ai.constant.AiAgentToolContextKey;
+import com.bytechef.platform.ai.conversation.AgentConversationRecorder;
 import com.bytechef.platform.ai.guardrails.AiGuardrailsAdvisorProvider;
 import com.bytechef.platform.ai.workspaceprompt.WorkspaceSystemPromptAdvisorProvider;
 import com.bytechef.platform.component.ComponentConnection;
@@ -64,12 +65,13 @@ public class AiAgentChatAction extends AbstractAiAgentChatAction {
         ToolCallingManager toolCallingManager,
         @Nullable ObjectProvider<ToolExecutionRecorder> toolExecutionRecorderObjectProvider,
         @Nullable ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider,
-        @Nullable ObjectProvider<WorkspaceSystemPromptAdvisorProvider> workspaceSystemPromptAdvisorProviderObjectProvider) {
+        @Nullable ObjectProvider<WorkspaceSystemPromptAdvisorProvider> workspaceSystemPromptAdvisorProviderObjectProvider,
+        @Nullable ObjectProvider<AgentConversationRecorder> agentConversationRecorderObjectProvider) {
 
         return new AiAgentChatAction(
             aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager,
             toolExecutionRecorderObjectProvider, aiGuardrailsAdvisorProviderObjectProvider,
-            workspaceSystemPromptAdvisorProviderObjectProvider).build();
+            workspaceSystemPromptAdvisorProviderObjectProvider, agentConversationRecorderObjectProvider).build();
     }
 
     private AiAgentChatAction(
@@ -77,12 +79,13 @@ public class AiAgentChatAction extends AbstractAiAgentChatAction {
         ToolCallingManager toolCallingManager,
         @Nullable ObjectProvider<ToolExecutionRecorder> toolExecutionRecorderObjectProvider,
         @Nullable ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider,
-        @Nullable ObjectProvider<WorkspaceSystemPromptAdvisorProvider> workspaceSystemPromptAdvisorProviderObjectProvider) {
+        @Nullable ObjectProvider<WorkspaceSystemPromptAdvisorProvider> workspaceSystemPromptAdvisorProviderObjectProvider,
+        @Nullable ObjectProvider<AgentConversationRecorder> agentConversationRecorderObjectProvider) {
 
         super(
             aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager,
             toolExecutionRecorderObjectProvider, aiGuardrailsAdvisorProviderObjectProvider,
-            workspaceSystemPromptAdvisorProviderObjectProvider);
+            workspaceSystemPromptAdvisorProviderObjectProvider, agentConversationRecorderObjectProvider);
     }
 
     private ChatActionDefinitionWrapper build() {
@@ -124,6 +127,8 @@ public class AiAgentChatAction extends AbstractAiAgentChatAction {
         // buildPatchedRequestSpec). Clear it on success — mirroring perform — so the stale pre-approval conversation
         // does not linger in data storage or get restored if this agent node runs again in the same job.
         clearConversationCheckpoint(context);
+
+        recordAgentConversationTurn(extensions, context);
 
         return ResumeResponse.of(new HashMap<>(Map.of("response", response)));
     }
@@ -172,6 +177,8 @@ public class AiAgentChatAction extends AbstractAiAgentChatAction {
             call, inputParameters, context);
 
         clearConversationCheckpoint(context);
+
+        recordAgentConversationTurn(extensions, context);
 
         Object chatResponse = chatActionResult.response();
 

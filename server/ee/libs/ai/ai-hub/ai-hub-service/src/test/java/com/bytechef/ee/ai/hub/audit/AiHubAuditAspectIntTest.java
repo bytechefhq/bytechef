@@ -68,7 +68,7 @@ public class AiHubAuditAspectIntTest {
 
                 PersistentAuditEvent event = events.get(0);
 
-                assertThat(event.getEventType()).isEqualTo("AI_HUB_PERSONAL_AGENT_UPDATED");
+                assertThat(event.getEventType()).isEqualTo("AI_HUB_WORKSPACE_SETTINGS_UPDATED");
                 assertThat(event.getData())
                     .containsEntry("workspaceId", "7")
                     .containsEntry("agentId", "99");

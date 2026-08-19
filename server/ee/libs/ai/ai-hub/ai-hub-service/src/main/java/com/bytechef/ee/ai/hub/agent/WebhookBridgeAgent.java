@@ -22,11 +22,10 @@ import com.bytechef.automation.assetfile.domain.AssetFile;
 import com.bytechef.automation.assetfile.service.AssetFileFacade;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody.ContentType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
+import com.bytechef.ee.ai.hub.chat.AiHubChat;
+import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.ee.ai.hub.metric.WorkflowChatMetrics;
-import com.bytechef.ee.ai.hub.task.AiHubTask;
-import com.bytechef.ee.ai.hub.task.AiHubTaskKind;
-import com.bytechef.ee.ai.hub.task.AiHubTaskService;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.domain.WebhookTriggerFlags;
@@ -58,7 +57,7 @@ import org.springframework.ai.session.SessionRepository;
 import tools.jackson.databind.json.JsonMapper;
 
 /**
- * AG-UI {@link LocalAgent} that routes per-turn invocations of {@code kind = WORKFLOW_CHAT} tasks through the webhook
+ * AG-UI {@link LocalAgent} that routes per-turn invocations of {@code kind = WORKFLOW_CHAT} chats through the webhook
  * executor instead of the LLM. Built on top of {@link WebhookWorkflowExecutor} so the existing HTTP/SSE controller and
  * this bridge share the same orchestration logic.
  *
@@ -66,8 +65,8 @@ import tools.jackson.databind.json.JsonMapper;
  * Per-turn flow:
  * </p>
  * <ol>
- * <li>Look up the {@link AiHubTask} for {@code input.threadId()}. Verify it's a {@code kind = WORKFLOW_CHAT} row; any
- * non-workflow-chat task reaching this agent is a routing bug — surface as a RUN_ERROR rather than silently delegating,
+ * <li>Look up the {@link AiHubChat} for {@code input.threadId()}. Verify it's a {@code kind = WORKFLOW_CHAT} row; any
+ * non-workflow-chat row reaching this agent is a routing bug — surface as a RUN_ERROR rather than silently delegating,
  * since the user would otherwise see no visible failure.</li>
  * <li>Extract the user's last message from {@code input.messages()} and build a {@link WebhookRequest} with it. The
  * webhook trigger reads the {@code message} parameter to drive the workflow's first step.</li>
@@ -75,7 +74,7 @@ import tools.jackson.databind.json.JsonMapper;
  * {@link WebhookWorkflowExecutor#executeSync}; streaming triggers through
  * {@link WebhookWorkflowExecutor#executeStreaming} with an {@link AgUiStreamBridge}.</li>
  * <li>Either path culminates in a {@code RUN_FINISHED} or {@code RUN_ERROR} event on the AG-UI subscriber, mirroring
- * what the LLM agent path emits — so the client's runtime provider treats both flavours of tasks identically.</li>
+ * what the LLM agent path emits — so the client's runtime provider treats both flavours of chats identically.</li>
  * </ol>
  *
  * <p>
@@ -85,8 +84,8 @@ import tools.jackson.databind.json.JsonMapper;
  * wrapped in {@link BridgedFileEntry} (which implements the SDK {@link com.bytechef.component.definition.FileEntry}
  * interface) so {@code ChatNewRequestTrigger} sees real file entries — its {@code list.getFirst() instanceof FileEntry}
  * discriminator picks the file-list branch the same way as the legacy multipart upload path. Promoting through
- * {@link AssetFileFacade} (rather than a transient temp scope) means a file dropped in either flavour of task becomes
- * browsable in the Files panel and survives across the task lifecycle, matching how the rest of the CC surface treats
+ * {@link AssetFileFacade} (rather than a transient temp scope) means a file dropped in either flavour of chat becomes
+ * browsable in the Files panel and survives across the chat lifecycle, matching how the rest of the CC surface treats
  * user-supplied content.
  * </p>
  *
@@ -115,8 +114,8 @@ public class WebhookBridgeAgent extends LocalAgent {
     private static final int MAX_ATTACHMENT_BYTES = 25 * 1024 * 1024;
 
     /**
-     * The bridge body shape ({@code body.content = {message, taskId, attachments}}) is calibrated for the canonical
-     * chat trigger ({@code newChatRequest}). Other webhook triggers wired to a workflow-chat task will see this shape
+     * The bridge body shape ({@code body.content = {message, chatId, attachments}}) is calibrated for the canonical
+     * chat trigger ({@code newChatRequest}). Other webhook triggers wired to a workflow chat will see this shape
      * regardless — generic triggers reading from {@code parameters} still work since the same data lands there too, but
      * a trigger expecting a different body shape needs adapter logic that doesn't exist yet. We tag every turn with the
      * trigger name so ops can spot non-chat triggers being used.
@@ -124,7 +123,7 @@ public class WebhookBridgeAgent extends LocalAgent {
     private static final String CHAT_TRIGGER_NAME = "newChatRequest";
 
     private final WebhookWorkflowExecutor webhookWorkflowExecutor;
-    private final AiHubTaskService taskService;
+    private final AiHubChatService chatService;
     private final WebhookResumeRegistry resumeRegistry;
     private final HttpClient resumeHttpClient;
     private final JsonMapper jsonMapper;
@@ -138,7 +137,7 @@ public class WebhookBridgeAgent extends LocalAgent {
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public WebhookBridgeAgent(
-        WebhookWorkflowExecutor webhookWorkflowExecutor, AiHubTaskService taskService,
+        WebhookWorkflowExecutor webhookWorkflowExecutor, AiHubChatService chatService,
         WebhookResumeRegistry resumeRegistry, JsonMapper jsonMapper, AssetFileFacade assetFileFacade,
         WorkflowChatMetrics metrics, WorkflowChatJobRegistry jobRegistry, AiHubSessionMemory sessionMemory,
         WorkflowChatGuard guard, @Nullable JobFacade jobFacade) throws AGUIException {
@@ -150,7 +149,7 @@ public class WebhookBridgeAgent extends LocalAgent {
             "webhook-bridge-agent", null, null, "(unused — webhook bridge bypasses LLM)", List.of());
 
         this.webhookWorkflowExecutor = webhookWorkflowExecutor;
-        this.taskService = taskService;
+        this.chatService = chatService;
         this.resumeRegistry = resumeRegistry;
         this.jsonMapper = jsonMapper;
         this.assetFileFacade = assetFileFacade;
@@ -174,37 +173,38 @@ public class WebhookBridgeAgent extends LocalAgent {
         // produce a valid event sequence: RUN_STARTED, then RUN_ERROR, then RUN_FINALIZED.
         emitRunStarted(input, subscriber);
 
-        Optional<AiHubTask> taskOptional = taskService.findByThreadId(input.threadId());
+        Optional<AiHubChat> chatOptional = chatService.findByThreadId(input.threadId());
 
-        if (taskOptional.isEmpty()) {
-            emitError(input, subscriber, "AiHubTask not found for thread " + input.threadId());
+        if (chatOptional.isEmpty()) {
+            emitError(input, subscriber, "AiHubChat not found for thread " + input.threadId());
 
             return;
         }
 
-        AiHubTask task = taskOptional.get();
+        AiHubChat chat = chatOptional.get();
 
-        if (task.getKind() != AiHubTaskKind.WORKFLOW_CHAT) {
+        if (!chat.getKind()
+            .isWebhookBridged()) {
             // The router upstream should have dispatched this to the LLM agent — landing here means a routing
             // bug. Surface as RUN_ERROR so the client doesn't sit waiting for events that never arrive. The log line
             // is the breadcrumb for ops to track down the misroute.
             log.warn(
-                "WebhookBridgeAgent invoked for non-WORKFLOW_CHAT task {} (kind={}). Misroute.",
-                task.getId(), task.getKind());
+                "WebhookBridgeAgent invoked for a chat that is not webhook-bridged: {} (kind={}). Misroute.",
+                chat.getId(), chat.getKind());
 
             emitError(input, subscriber,
-                "AiHubTask kind mismatch: bridge agent invoked for non-workflow-chat task");
+                "AiHubChat kind mismatch: bridge agent invoked for a non-workflow chat");
 
             return;
         }
 
-        String workflowExecutionIdStr = task.getWorkflowExecutionId();
+        String workflowExecutionIdStr = chat.getWorkflowExecutionId();
 
         if (workflowExecutionIdStr == null || workflowExecutionIdStr.isBlank()) {
             // Defensive: WORKFLOW_CHAT rows MUST have workflowExecutionId — the create path always stamps it. A
             // null/blank value indicates a kind/payload mismatch (e.g. a row mis-tagged as WORKFLOW_CHAT). Treat
             // as a recoverable error rather than NPE.
-            emitError(input, subscriber, "Workflow chat task is missing workflowExecutionId");
+            emitError(input, subscriber, "Workflow chat is missing workflowExecutionId");
 
             return;
         }
@@ -229,7 +229,7 @@ public class WebhookBridgeAgent extends LocalAgent {
             return;
         }
 
-        if (!tryAdmitOrEmitError(input, task, subscriber)) {
+        if (!tryAdmitOrEmitError(input, chat, subscriber)) {
             return;
         }
 
@@ -239,33 +239,33 @@ public class WebhookBridgeAgent extends LocalAgent {
         // Resume short-circuit: a previous turn paused the workflow at `ask_user_question` and AgUiStreamBridge
         // captured the resume URL into the registry. The atomic `consume()` removes-and-returns so the next-next
         // turn (if any) starts a fresh execution rather than re-resuming with a stale URL.
-        String pendingResumeUrl = resumeRegistry.consume(task.getId());
+        String pendingResumeUrl = resumeRegistry.consume(chat.getId());
 
         if (pendingResumeUrl != null) {
-            recordTurn("resume", task);
+            recordTurn("resume", chat);
 
             handleResume(
-                input, pendingResumeUrl, userMessage, task, subscriber, messageId, input.threadId(),
+                input, pendingResumeUrl, userMessage, chat, subscriber, messageId, input.threadId(),
                 input.runId(), input.forwardedProps());
 
             return;
         }
 
         WebhookTriggerFlags flags = lookupTriggerFlagsOrEmitError(
-            input, workflowExecutionId, workflowExecutionIdStr, task, subscriber);
+            input, workflowExecutionId, workflowExecutionIdStr, chat, subscriber);
 
         if (flags == null) {
             return;
         }
 
-        WebhookRequest webhookRequest = buildWebhookRequest(userMessage, task, input.forwardedProps());
+        WebhookRequest webhookRequest = buildWebhookRequest(userMessage, chat, input.forwardedProps());
 
         // Capture into final references so the lambda can read them — needed because the bridge's onFinalize
         // runs asynchronously after the streaming run completes. The streamingPathRef flag is set by the routing
         // decision below; the closure reads it to know whether to persist chat-memory itself (streaming path: yes)
         // or skip because handleSyncOutputs already did (sync path: no).
         String capturedUserMessage = userMessage;
-        String capturedThreadId = task.getThreadId();
+        String capturedThreadId = chat.getThreadId();
         AgUiStreamBridge[] bridgeRef = new AgUiStreamBridge[1];
         boolean[] streamingPathRef = new boolean[1];
 
@@ -289,10 +289,10 @@ public class WebhookBridgeAgent extends LocalAgent {
                 AgUiStreamBridge currentBridge = bridgeRef[0];
 
                 // Streaming/resume paths: handleSyncOutputs never ran, so chat-memory hasn't been written. Persist
-                // the user turn regardless of whether the assistant produced text — the task history needs
+                // the user turn regardless of whether the assistant produced text — the chat history needs
                 // the user's message even when the workflow errors before producing output. If chunks were
                 // streamed, fold the accumulated assistant text into the same persist call so reloading the
-                // task renders the assistant turn the same way it would for a sync chat reply.
+                // chat renders the assistant turn the same way it would for a sync chat reply.
                 //
                 // Skip when handleSyncOutputs already persisted (sync path with extractable message): that path
                 // calls persistTurnToChatMemory itself and we don't want a duplicate user turn. The signal is
@@ -316,7 +316,7 @@ public class WebhookBridgeAgent extends LocalAgent {
         };
 
         AgUiStreamBridge bridge = new AgUiStreamBridge(
-            subscriber, messageId, input.threadId(), input.runId(), task.getId(), resumeRegistry,
+            subscriber, messageId, input.threadId(), input.runId(), chat.getId(), resumeRegistry,
             jobRegistry, guard, jobFacade, onFinalize);
 
         bridgeRef[0] = bridge;
@@ -329,17 +329,17 @@ public class WebhookBridgeAgent extends LocalAgent {
 
         if (log.isDebugEnabled() && !CHAT_TRIGGER_NAME.equals(triggerName)) {
             log.debug(
-                "Workflow-chat task {} runs against non-chat trigger '{}'; body shape may not match.",
-                task.getId(), triggerName);
+                "Workflow chat {} runs against non-chat trigger '{}'; body shape may not match.",
+                chat.getId(), triggerName);
         }
 
-        // Note: we do NOT record a WORKFLOW_EXECUTION_STARTED artifact here. The task IS the workflow
+        // Note: we do NOT record a WORKFLOW_EXECUTION_STARTED artifact here. The chat IS the workflow
         // execution for workflow-chat — every turn would otherwise produce one of these rows under its own
-        // task, which is circular ("here's a sidebar link to the execution that produced this very
+        // chat, which is circular ("here's a sidebar link to the execution that produced this very
         // sidebar entry"). The execution is still reachable from the dedicated /automation/executions page
         // for ops/debugging. The companion path — RunChatWorkflowToolCallback — keeps the artifact because
-        // there the task is a standard task that *invoked* a workflow as a tool, so the
-        // artifact links to a separate execution that's not implicit in the task thread.
+        // there the chat is a standard chat that *invoked* a workflow as a tool, so the
+        // artifact links to a separate execution that's not implicit in the chat thread.
 
         // Routing decision: workflow-content awareness wins over the trigger flag for chat workflows.
         //
@@ -379,8 +379,8 @@ public class WebhookBridgeAgent extends LocalAgent {
             // text living under `outputs.__webhookResponse.body.message` (see extractMessage's unwrap path).
             // streamingPathRef stays false — handleSyncOutputs persists chat-memory itself, so the onFinalize
             // closure must skip persistence to avoid duplicating the user turn.
-            recordTurn("sync", task);
-            executeSync(workflowExecutionId, webhookRequest, bridge, subscriber, messageId, task, userMessage);
+            recordTurn("sync", chat);
+            executeSync(workflowExecutionId, webhookRequest, bridge, subscriber, messageId, chat, userMessage);
         } else {
             // Streaming path: events arrive on the bridge as the workflow runs, via SseStreamBridgeRegistry which
             // works across coordinator/worker process boundaries. AI agent token deltas reach the AG-UI client as
@@ -390,7 +390,7 @@ public class WebhookBridgeAgent extends LocalAgent {
             // the user turn for streaming runs and would render as empty (no assistant message) on reload.
             streamingPathRef[0] = true;
 
-            recordTurn("streaming", task);
+            recordTurn("streaming", chat);
             webhookWorkflowExecutor.stream(workflowExecutionId, webhookRequest, bridge);
         }
     }
@@ -401,14 +401,14 @@ public class WebhookBridgeAgent extends LocalAgent {
      * dual-record approach lets ops choose whether to slice by workspace or aggregate globally without paying the
      * cardinality cost on every counter.
      */
-    private void recordTurn(String outcome, AiHubTask task) {
+    private void recordTurn(String outcome, AiHubChat chat) {
         metrics.recordTurn(outcome);
-        metrics.recordTurnByWorkspace(outcome, taskService.getWorkspaceId(task.getId()));
+        metrics.recordTurnByWorkspace(outcome, chatService.getWorkspaceId(chat.getId()));
     }
 
     private void executeSync(
         WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest, AgUiStreamBridge bridge,
-        AgentSubscriber subscriber, String messageId, AiHubTask task, String userMessageText) {
+        AgentSubscriber subscriber, String messageId, AiHubChat chat, String userMessageText) {
 
         try {
             // Belt-and-suspenders: the upfront isWorkflowDisabled check in run() (via lookupTriggerFlagsOrEmitError)
@@ -418,10 +418,10 @@ public class WebhookBridgeAgent extends LocalAgent {
             // (a silent no-op here would leave the client UI hung waiting for events that never arrive).
             if (webhookWorkflowExecutor.isWorkflowDisabled(workflowExecutionId)) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Workflow chat disabled mid-turn for task {}", task.getId());
+                    log.debug("Workflow chat disabled mid-turn for chat {}", chat.getId());
                 }
 
-                bridge.onError(new IllegalStateException(disabledChatErrorMessage(task)));
+                bridge.onError(new IllegalStateException(disabledChatErrorMessage(chat)));
 
                 return;
             }
@@ -439,45 +439,45 @@ public class WebhookBridgeAgent extends LocalAgent {
                     : new IllegalStateException(cause);
             }
 
-            handleSyncOutputs(outputs, bridge, subscriber, messageId, task, userMessageText);
+            handleSyncOutputs(outputs, bridge, subscriber, messageId, chat, userMessageText);
         } catch (RuntimeException exception) {
             bridge.onError(exception);
         }
     }
 
     /**
-     * Renders a user-facing error message for the disabled-workflow case. Keeps the task title in the message so a user
+     * Renders a user-facing error message for the disabled-workflow case. Keeps the chat title in the message so a user
      * with multiple workflow chats open knows which one is broken — "This chat is disabled" is ambiguous when several
      * chats sit in the same sidebar.
      */
-    private static String disabledChatErrorMessage(AiHubTask task) {
-        String title = task.getTitle();
+    private static String disabledChatErrorMessage(AiHubChat chat) {
+        String title = chat.getTitle();
 
         if (title != null && !title.isBlank()) {
             return "This workflow chat (\"" + title + "\") is currently disabled. Re-enable the workflow's "
-                + "deployment to resume the task.";
+                + "deployment to resume the chat.";
         }
 
         return "This workflow chat is currently disabled. Re-enable the workflow's deployment to resume the "
-            + "task.";
+            + "chat.";
     }
 
     /**
      * Renders a user-facing error message for the workflow-deleted case. Distinguishes from the disabled message
      * because the recovery action is different: disabled chats can be re-enabled in place; deleted-workflow chats need
-     * the user to either restore the workflow or archive the task.
+     * the user to either restore the workflow or archive the chat.
      */
-    private static String deletedWorkflowErrorMessage(AiHubTask task) {
-        String title = task.getTitle();
+    private static String deletedWorkflowErrorMessage(AiHubChat chat) {
+        String title = chat.getTitle();
 
         if (title != null && !title.isBlank()) {
             return "This workflow chat (\"" + title + "\") can no longer be reached — the underlying workflow "
-                + "has been deleted or its deployment removed. Archive this task, or restore the "
+                + "has been deleted or its deployment removed. Archive this chat, or restore the "
                 + "workflow to resume.";
         }
 
         return "This workflow chat can no longer be reached — the underlying workflow has been deleted or its "
-            + "deployment removed. Archive this task, or restore the workflow to resume.";
+            + "deployment removed. Archive this chat, or restore the workflow to resume.";
     }
 
     /**
@@ -505,19 +505,19 @@ public class WebhookBridgeAgent extends LocalAgent {
      * </p>
      */
     private void handleResume(
-        RunAgentInput input, String resumeUrl, String userMessage, AiHubTask task,
+        RunAgentInput input, String resumeUrl, String userMessage, AiHubChat chat,
         AgentSubscriber subscriber, String messageId, String threadId, String runId,
         @Nullable Object forwardedProps) {
 
         AgUiStreamBridge bridge = new AgUiStreamBridge(
-            subscriber, messageId, threadId, runId, task.getId(), resumeRegistry, jobRegistry, guard,
+            subscriber, messageId, threadId, runId, chat.getId(), resumeRegistry, jobRegistry, guard,
             jobFacade, () -> finalizeRun(input, subscriber));
 
         try {
             String requestBody = jsonMapper.writeValueAsString(
                 Map.of(
                     "message", userMessage,
-                    "taskId", task.getThreadId(),
+                    "chatId", chat.getThreadId(),
                     "attachments", extractAttachments(forwardedProps)));
 
             HttpRequest httpRequest = HttpRequest.newBuilder()
@@ -561,7 +561,7 @@ public class WebhookBridgeAgent extends LocalAgent {
                 metrics.recordResume("success");
 
                 streamResumeBody(response.body(), bridge);
-                handleResumeStreamComplete(bridge, task, userMessage);
+                handleResumeStreamComplete(bridge, chat, userMessage);
 
                 return;
             }
@@ -574,7 +574,7 @@ public class WebhookBridgeAgent extends LocalAgent {
             String body = collectBodyLines(response.body());
             Object outputs = parseResponseBody(body);
 
-            handleSyncOutputs(outputs, bridge, subscriber, messageId, task, userMessage);
+            handleSyncOutputs(outputs, bridge, subscriber, messageId, chat, userMessage);
         } catch (InterruptedException interruptedException) {
             Thread.currentThread()
                 .interrupt();
@@ -583,7 +583,7 @@ public class WebhookBridgeAgent extends LocalAgent {
 
             bridge.onError(interruptedException);
         } catch (RuntimeException | java.io.IOException exception) {
-            log.warn("Workflow resume to {} failed for task {}", resumeUrl, task.getId(), exception);
+            log.warn("Workflow resume to {} failed for chat {}", resumeUrl, chat.getId(), exception);
 
             metrics.recordResume("transport_error");
 
@@ -651,17 +651,17 @@ public class WebhookBridgeAgent extends LocalAgent {
     /**
      * Completes a streaming resume turn. Mirrors the ask-user-question/no-text branches of {@link #handleSyncOutputs}
      * for chat-memory persistence — the user's edited message and any final assistant text need to land in chat-memory
-     * so the task survives a reload, regardless of which transport carried the response.
+     * so the chat survives a reload, regardless of which transport carried the response.
      */
     private void handleResumeStreamComplete(
-        AgUiStreamBridge bridge, AiHubTask task, String userMessage) {
+        AgUiStreamBridge bridge, AiHubChat chat, String userMessage) {
         // Streaming resume currently doesn't surface a single "final message" the way the sync handler does —
         // the bridge has been emitting text deltas as they arrive, so the assistant's reply is already
         // visible. Persist the user message to chat-memory; the assistant text is captured separately by
         // ChatMemory's advisor when the agent path runs (which it doesn't for the bridge), so for parity with
         // the streaming path we accept that streaming-resume-only assistant text won't survive a reload until
         // the broader chat-memory persistence work that's tracked separately.
-        persistTurnToChatMemory(task.getThreadId(), userMessage, null);
+        persistTurnToChatMemory(chat.getThreadId(), userMessage, null);
 
         bridge.onComplete();
     }
@@ -686,7 +686,7 @@ public class WebhookBridgeAgent extends LocalAgent {
 
     private void handleSyncOutputs(
         @Nullable Object outputs, AgUiStreamBridge bridge, AgentSubscriber subscriber, String messageId,
-        AiHubTask task, String userMessageText) {
+        AiHubChat chat, String userMessageText) {
 
         // Detect ask_user_question / questions in the sync result so the bridge translates to a custom event
         // before completing. Mirrors the streaming path's onEvent handling.
@@ -696,8 +696,8 @@ public class WebhookBridgeAgent extends LocalAgent {
             bridge.onEvent(outputMap);
 
             // Persist the user input even on the ask-user-question path — the workflow paused waiting for an
-            // answer, but the user's previous message is still part of the task history.
-            persistTurnToChatMemory(task.getThreadId(), userMessageText, null);
+            // answer, but the user's previous message is still part of the chat history.
+            persistTurnToChatMemory(chat.getThreadId(), userMessageText, null);
 
             bridge.onComplete();
 
@@ -721,7 +721,7 @@ public class WebhookBridgeAgent extends LocalAgent {
             // sequence and skip the synthetic onNewMessage emit. Persist the streamed assistant text to
             // chat-memory if extractMessage found one (covers stream + chat/responseToRequest hybrid workflows
             // where both produce content); otherwise persist just the user turn.
-            persistTurnToChatMemory(task.getThreadId(), userMessageText, message);
+            persistTurnToChatMemory(chat.getThreadId(), userMessageText, message);
 
             bridge.onComplete();
 
@@ -765,11 +765,11 @@ public class WebhookBridgeAgent extends LocalAgent {
                 }
 
                 log.warn(
-                    "Workflow chat task {} produced no extractable chat reply and no streamed text. " +
+                    "Workflow chat {} produced no extractable chat reply and no streamed text. " +
                         "outputsType={} topLevelKeys={} envelopeType={} envelopePreview={}. If the workflow " +
                         "uses chat/responseToRequest with `message: ${{<aiTask>}}`, change it to " +
                         "`${{<aiTask>.text}}` or the matching scalar field on the AI task's output schema.",
-                    task.getId(),
+                    chat.getId(),
                     outputs.getClass()
                         .getSimpleName(),
                     outputs instanceof Map<?, ?> outputMap ? outputMap.keySet() : "(not a Map)",
@@ -779,9 +779,9 @@ public class WebhookBridgeAgent extends LocalAgent {
                     envelopePreview);
             } else {
                 log.warn(
-                    "Workflow chat task {} produced null outputs and no streamed text. Workflow likely " +
+                    "Workflow chat {} produced null outputs and no streamed text. Workflow likely " +
                         "has no terminal task; add a streaming AI agent task or a `chat/responseToRequest` step.",
-                    task.getId());
+                    chat.getId());
             }
 
             message = "This workflow finished but produced no chat reply. If you wired "
@@ -791,7 +791,7 @@ public class WebhookBridgeAgent extends LocalAgent {
         }
 
         // Case 2 (and the case 3 fallback): emit a single text event + AssistantMessage so the AG-UI client
-        // renders the assistant reply. ChatMemory persistence keeps the task history reachable after a
+        // renders the assistant reply. ChatMemory persistence keeps the chat history reachable after a
         // page reload — see the persistTurnToChatMemory javadoc for why this is explicit on the bridge path.
         bridge.onEvent(message);
 
@@ -802,21 +802,21 @@ public class WebhookBridgeAgent extends LocalAgent {
 
         subscriber.onNewMessage(assistantMessage);
 
-        persistTurnToChatMemory(task.getThreadId(), userMessageText, message);
+        persistTurnToChatMemory(chat.getThreadId(), userMessageText, message);
 
         bridge.onComplete();
     }
 
     /**
-     * Persists a user/assistant exchange to the AI Hub session store so the task thread survives a page reload. The
-     * bridge bypasses the LLM agent's memory advisor pipeline, so without this call workflow-chat tasks would have no
+     * Persists a user/assistant exchange to the AI Hub session store so the chat thread survives a page reload. The
+     * bridge bypasses the LLM agent's memory advisor pipeline, so without this call workflow chats would have no
      * persisted history — clicking back into a workflow chat after navigating away would render an empty thread even
-     * though the task row exists.
+     * though the chat row exists.
      *
      * <p>
      * Best-effort: a session-store write failure logs at WARN and the user-visible turn continues. The
      * {@link AiHubSessionMemory} bean is workspace-shared (one bean for the whole app); sessions are keyed by
-     * {@code threadId}, which uniquely identifies a task across the workspace+user partition, and owned by the AI Hub's
+     * {@code threadId}, which uniquely identifies a chat across the workspace+user partition, and owned by the AI Hub's
      * shared session user id.
      * </p>
      *
@@ -886,7 +886,7 @@ public class WebhookBridgeAgent extends LocalAgent {
             // observed shapes get the same handling here:
             //
             // - Direct String: some serialization paths collapse the envelope to just the response string
-            // (rare, but seen in the wild on tasks created against older code).
+            // (rare, but seen in the wild on chats created against older code).
             // - Nested with no `body` field: some serializers strip null fields, leaving a Map with only
             // headers/statusCode/type. We probe the envelope itself for message-like keys as a last
             // resort so the user's reply still surfaces.
@@ -1011,7 +1011,7 @@ public class WebhookBridgeAgent extends LocalAgent {
      * <li><b>String</b> — return verbatim. The canonical case where {@code chat/responseToRequest} was wired with a
      * plain text expression (e.g. {@code ${openAi_1.text}}).</li>
      * <li><b>Map with text-shaped fields</b> — common when the user wires {@code message: ${openAi_1}} and the AI
-     * task's output is an object like {@code {content: "...", role: "assistant"}}. Probes a small set of likely keys
+     * chat's output is an object like {@code {content: "...", role: "assistant"}}. Probes a small set of likely keys
      * ({@code content}, {@code text}, {@code message}, {@code response}, {@code answer}) so the chat renders the actual
      * reply rather than a stringified JSON dump. Skips numeric / structural fields that aren't intended as user-facing
      * text.</li>
@@ -1050,7 +1050,7 @@ public class WebhookBridgeAgent extends LocalAgent {
     /**
      * Builds the {@link WebhookRequest} the bridge hands to the workflow executor. The shape mirrors what the legacy
      * {@code Chats.tsx} multipart-form-data POST produced after server-side parsing:
-     * {@code body.content = Map<message, taskId, attachments>} with {@code contentType = JSON}. The downstream chat
+     * {@code body.content = Map<message, chatId, attachments>} with {@code contentType = JSON}. The downstream chat
      * trigger ({@code ChatNewRequestTrigger}) reads from {@code body.content} — leaving the body empty (the v1 shape)
      * made the trigger throw {@code IllegalArgumentException("Invalid webhook request.")} for every workflow chat using
      * {@code newChatRequest}, so this fix is also required for text-only chats.
@@ -1063,20 +1063,20 @@ public class WebhookBridgeAgent extends LocalAgent {
      * Files panel, queryable by other tools, retained per workspace quota), and the resulting {@code FileEntry} is
      * wrapped in {@link BridgedFileEntry} for the trigger's {@code instanceof FileEntry} discriminator. Same storage
      * shape the legacy multipart upload path produced — using AssetFileFacade rather than the older temp file scope
-     * means a file dropped in either flavour of task (workflow-chat or standard) becomes a first-class workspace
+     * means a file dropped in either flavour of chat (workflow-chat or standard) becomes a first-class workspace
      * artifact instead of vanishing after the turn.
      * </p>
      */
     private WebhookRequest buildWebhookRequest(
-        String userMessage, AiHubTask task, @Nullable Object forwardedProps) {
+        String userMessage, AiHubChat chat, @Nullable Object forwardedProps) {
 
-        String threadId = task.getThreadId();
+        String threadId = chat.getThreadId();
 
         Map<String, Object> bodyContent = new HashMap<>();
 
         bodyContent.put("message", userMessage);
-        bodyContent.put("taskId", threadId);
-        bodyContent.put("attachments", promoteAttachments(extractAttachments(forwardedProps), task));
+        bodyContent.put("chatId", threadId);
+        bodyContent.put("attachments", promoteAttachments(extractAttachments(forwardedProps), chat));
 
         // Parameters stays populated for triggers that read from there (e.g. plain "incoming webhook" patterns).
         // The new chat trigger reads exclusively from body.content, but other webhook triggers a workflow chat
@@ -1084,7 +1084,7 @@ public class WebhookBridgeAgent extends LocalAgent {
         Map<String, List<String>> parameters = new HashMap<>();
 
         parameters.put("message", List.of(userMessage));
-        parameters.put("taskId", List.of(threadId));
+        parameters.put("chatId", List.of(threadId));
 
         return new WebhookRequest(
             Map.of(),
@@ -1107,13 +1107,13 @@ public class WebhookBridgeAgent extends LocalAgent {
      * </p>
      *
      * <p>
-     * Asset files inherit the task's workspace + environment so they sit alongside whatever LLM- or workflow-emitted
+     * Asset files inherit the chat's workspace + environment so they sit alongside whatever LLM- or workflow-emitted
      * artifacts the user already has in the Files panel. The {@code AssetFileSource} defaults to the upload variant
      * (set by {@code AssetFileFacade.createFromUpload}) — distinct from the AI-generated source — so listings can
      * filter on origin if needed.
      * </p>
      */
-    private List<Object> promoteAttachments(List<?> rawAttachments, AiHubTask task) {
+    private List<Object> promoteAttachments(List<?> rawAttachments, AiHubChat chat) {
         List<Object> result = new ArrayList<>(rawAttachments.size());
 
         for (Object raw : rawAttachments) {
@@ -1132,7 +1132,7 @@ public class WebhookBridgeAgent extends LocalAgent {
             }
 
             try {
-                BridgedFileEntry bridged = promoteAttachment(attachmentMap, task);
+                BridgedFileEntry bridged = promoteAttachment(attachmentMap, chat);
 
                 if (bridged != null) {
                     result.add(bridged);
@@ -1156,7 +1156,7 @@ public class WebhookBridgeAgent extends LocalAgent {
     }
 
     private @Nullable BridgedFileEntry
-        promoteAttachment(Map<?, ?> attachmentMap, AiHubTask task) {
+        promoteAttachment(Map<?, ?> attachmentMap, AiHubChat chat) {
         Object base64Object = attachmentMap.get("base64");
 
         if (!(base64Object instanceof String base64String) || base64String.isBlank()) {
@@ -1200,10 +1200,10 @@ public class WebhookBridgeAgent extends LocalAgent {
         byte[] bytes = Base64.getDecoder()
             .decode(base64String);
 
-        // createFromUpload runs workspace quota + size-limit checks. The task's environment ordinal is used
+        // createFromUpload runs workspace quota + size-limit checks. The chat's environment ordinal is used
         // so dev-uploaded attachments don't leak into prod's Files panel listings (env is part of every list query).
         AssetFile assetFile = assetFileFacade.createFromUpload(
-            taskService.getWorkspaceId(task.getId()), task.getEnvironment()
+            chatService.getWorkspaceId(chat.getId()), chat.getEnvironment()
                 .ordinal(),
             filename, contentType, new ByteArrayInputStream(bytes));
 
@@ -1280,7 +1280,7 @@ public class WebhookBridgeAgent extends LocalAgent {
      * <p>
      * Two failure modes share this helper because both happen in the same lookup path: the workflow is enabled but
      * disabled mid-turn ({@code isWorkflowDisabled} returns true), or the underlying workflow / project deployment /
-     * trigger has been deleted out from under the task (any RuntimeException from the lookup chain). Catching any
+     * trigger has been deleted out from under the chat (any RuntimeException from the lookup chain). Catching any
      * RuntimeException is broader than strict {@code NotFoundException}-only handling, but the facade composes calls
      * across several services and narrowing to one exception type misses real cases (project deployment deleted while
      * the workflow row remains).
@@ -1288,21 +1288,21 @@ public class WebhookBridgeAgent extends LocalAgent {
      *
      * <p>
      * Both rejection paths release the admission lock explicitly because the bridge — which would normally release on
-     * its own terminal events — never gets constructed in this branch. Without the explicit release the task would stay
+     * its own terminal events — never gets constructed in this branch. Without the explicit release the chat would stay
      * locked until cache TTL expired, blocking the user from retrying after they re-enable the deployment.
      * </p>
      */
     private @Nullable WebhookTriggerFlags lookupTriggerFlagsOrEmitError(
         RunAgentInput input, WorkflowExecutionId workflowExecutionId, String workflowExecutionIdStr,
-        AiHubTask task, AgentSubscriber subscriber) {
+        AiHubChat chat, AgentSubscriber subscriber) {
 
         try {
             if (webhookWorkflowExecutor.isWorkflowDisabled(workflowExecutionId)) {
                 metrics.recordUnreachable("disabled");
 
-                guard.release(task.getId());
+                guard.release(chat.getId());
 
-                emitError(input, subscriber, disabledChatErrorMessage(task));
+                emitError(input, subscriber, disabledChatErrorMessage(chat));
 
                 return null;
             }
@@ -1310,21 +1310,21 @@ public class WebhookBridgeAgent extends LocalAgent {
             return webhookWorkflowExecutor.getWebhookTriggerFlags(workflowExecutionId);
         } catch (RuntimeException exception) {
             log.warn(
-                "Workflow chat trigger lookup failed for task {} (workflowExecutionId={})",
-                task.getId(), workflowExecutionIdStr, exception);
+                "Workflow chat trigger lookup failed for chat {} (workflowExecutionId={})",
+                chat.getId(), workflowExecutionIdStr, exception);
 
             metrics.recordUnreachable("deleted");
 
-            guard.release(task.getId());
+            guard.release(chat.getId());
 
-            emitError(input, subscriber, deletedWorkflowErrorMessage(task));
+            emitError(input, subscriber, deletedWorkflowErrorMessage(chat));
 
             return null;
         }
     }
 
     /**
-     * Per-task admission gate: enforces a 2-second cooldown between turns (rate limit) and refuses a new turn while a
+     * Per-chat admission gate: enforces a 2-second cooldown between turns (rate limit) and refuses a new turn while a
      * previous one is still in flight (concurrency). Returns {@code true} if the turn is admitted; on rejection emits a
      * RUN_ERROR with the guard's user-facing message and returns {@code false} so the caller can short-circuit the rest
      * of run().
@@ -1337,8 +1337,8 @@ public class WebhookBridgeAgent extends LocalAgent {
      * </p>
      */
     private boolean
-        tryAdmitOrEmitError(RunAgentInput input, AiHubTask task, AgentSubscriber subscriber) {
-        WorkflowChatGuard.AdmissionResult admission = guard.tryAdmit(task.getId());
+        tryAdmitOrEmitError(RunAgentInput input, AiHubChat chat, AgentSubscriber subscriber) {
+        WorkflowChatGuard.AdmissionResult admission = guard.tryAdmit(chat.getId());
 
         if (admission instanceof WorkflowChatGuard.AdmissionResult.Admit) {
             return true;
@@ -1352,7 +1352,7 @@ public class WebhookBridgeAgent extends LocalAgent {
         // hammering the gate (typical sign of a buggy embedded client) versus a global spike (likely a deploy
         // affecting all clients).
         metrics.recordTurn(outcome);
-        metrics.recordTurnByWorkspace(outcome, taskService.getWorkspaceId(task.getId()));
+        metrics.recordTurnByWorkspace(outcome, chatService.getWorkspaceId(chat.getId()));
 
         String message = admission.userFacingMessage();
 

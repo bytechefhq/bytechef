@@ -61,8 +61,8 @@ import reactor.core.publisher.Flux;
  * <p>
  * Registered for every AI Hub agent (ASK + BUILD) in {@link AiHubSpringAIAgent.Builder#build()}. Because the base
  * {@code SpringAIAgent} attaches advisors to the per-request spec rather than baking them into a single ChatClient,
- * this advisor also observes turns served by a per-request override ChatClient (user-selected or personal-agent model),
- * not only the workspace-default client.
+ * this advisor also observes turns served by a per-request override ChatClient (user-selected or task model), not only
+ * the workspace-default client.
  * </p>
  *
  * @version ee

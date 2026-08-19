@@ -133,7 +133,7 @@ public class MultiSessionToolIndex implements ToolIndex {
         List<Document> documents = vectorStore.similaritySearch(searchRequest);
 
         // De-duplicate by tool name, keeping the highest-scoring reference when the same tool surfaces in more than one
-        // session (e.g. a task subset that overlaps the workspace catalog).
+        // session (e.g. a chat subset that overlaps the workspace catalog).
         Map<String, ToolReference> bestByToolName = new LinkedHashMap<>();
 
         if (documents != null) {

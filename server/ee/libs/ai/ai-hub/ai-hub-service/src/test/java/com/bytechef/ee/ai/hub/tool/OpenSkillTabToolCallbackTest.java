@@ -34,7 +34,7 @@ class OpenSkillTabToolCallbackTest {
 
     @Test
     void testCallRecordsSkillReferenceWhenRecorderPresent() {
-        AiHubTaskArtifactRecorder artifactRecorder = mock(AiHubTaskArtifactRecorder.class);
+        AiHubChatArtifactRecorder artifactRecorder = mock(AiHubChatArtifactRecorder.class);
 
         OpenSkillTabToolCallback callback = new OpenSkillTabToolCallback(artifactRecorder);
 

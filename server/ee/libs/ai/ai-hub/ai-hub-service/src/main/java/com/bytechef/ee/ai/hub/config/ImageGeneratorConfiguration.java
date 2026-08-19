@@ -10,8 +10,8 @@ package com.bytechef.ee.ai.hub.config;
 import com.bytechef.automation.ai.tool.CreateBinaryAssetFileToolCallback;
 import com.bytechef.automation.assetfile.service.AssetFileFacade;
 import com.bytechef.config.ApplicationProperties;
-import com.bytechef.ee.ai.hub.task.AiHubTaskService;
-import com.bytechef.ee.ai.hub.tool.AiHubTaskArtifactRecorder;
+import com.bytechef.ee.ai.hub.chat.AiHubChatService;
+import com.bytechef.ee.ai.hub.tool.AiHubChatArtifactRecorder;
 import com.bytechef.ee.ai.hub.tool.GenerateImageToolCallback;
 import com.bytechef.ee.ai.hub.tool.ImageGeneratorToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenFileTabToolCallback;
@@ -60,9 +60,9 @@ public class ImageGeneratorConfiguration {
         ChatModel chatModel,
         ApplicationProperties applicationProperties,
         AssetFileFacade assetFileFacade,
-        AiHubTaskArtifactRecorder taskArtifactRecorder,
+        AiHubChatArtifactRecorder chatArtifactRecorder,
         ObjectProvider<ToolUsageRecorder> toolUsageRecorderProvider,
-        ObjectProvider<AiHubTaskService> taskServiceProvider,
+        ObjectProvider<AiHubChatService> chatServiceProvider,
         JsonMapper jsonMapper,
         @Value("classpath:prompt_image_generator.txt") Resource promptResource) {
 
@@ -70,16 +70,16 @@ public class ImageGeneratorConfiguration {
 
         GenerateImageToolCallback generateImage = new GenerateImageToolCallback(applicationProperties);
         CreateBinaryAssetFileToolCallback createBinaryAssetFile =
-            new CreateBinaryAssetFileToolCallback(assetFileFacade, taskArtifactRecorder, jsonMapper);
+            new CreateBinaryAssetFileToolCallback(assetFileFacade, chatArtifactRecorder, jsonMapper);
         OpenFileTabToolCallback openFileTab = new OpenFileTabToolCallback();
 
         ToolUsageRecorder usageRecorder = toolUsageRecorderProvider.getIfAvailable();
-        AiHubTaskService taskService = taskServiceProvider.getIfAvailable();
+        AiHubChatService chatService = chatServiceProvider.getIfAvailable();
 
-        ToolCallback meteredGenerateImage = (usageRecorder != null && taskService != null)
+        ToolCallback meteredGenerateImage = (usageRecorder != null && chatService != null)
             ? new MeteredToolCallback(
                 generateImage, "openai_image", 1, usageRecorder,
-                AiHubToolUsageContextResolver.create(taskService, "openai_image"),
+                AiHubToolUsageContextResolver.create(chatService, "openai_image"),
                 MeteredToolCallback.singleStringField("size"), jsonMapper)
             : generateImage;
 

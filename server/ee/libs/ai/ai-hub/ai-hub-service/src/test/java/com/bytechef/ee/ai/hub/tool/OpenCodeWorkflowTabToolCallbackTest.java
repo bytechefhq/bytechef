@@ -36,7 +36,7 @@ class OpenCodeWorkflowTabToolCallbackTest {
 
     @Test
     void testCallRecordsCodeWorkflowReferenceWhenRecorderPresent() {
-        AiHubTaskArtifactRecorder artifactRecorder = mock(AiHubTaskArtifactRecorder.class);
+        AiHubChatArtifactRecorder artifactRecorder = mock(AiHubChatArtifactRecorder.class);
 
         OpenCodeWorkflowTabToolCallback callback = new OpenCodeWorkflowTabToolCallback(artifactRecorder);
 

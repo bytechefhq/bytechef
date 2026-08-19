@@ -15,7 +15,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Component;
 
 /**
- * Per-task resume URL registry. Workflow chats that emit {@code ask_user_question} pause execution and hand the client
+ * Per-chat resume URL registry. Workflow chats that emit {@code ask_user_question} pause execution and hand the client
  * a {@code resumeUrl} to POST the user's answer to. {@link AgUiStreamBridge} captures the URL on the way through;
  * {@link WebhookBridgeAgent} consults this registry on the next user turn to decide whether to start a fresh workflow
  * run (the default) or resume the paused one.
@@ -38,9 +38,9 @@ import org.springframework.stereotype.Component;
  * <p>
  * <b>consume() is not strictly atomic across instances.</b> Spring Cache exposes {@link Cache#get} and
  * {@link Cache#evictIfPresent} as separate operations; with Redis there's a single network round-trip between them. The
- * worst-case race is a duplicate resume POST when two near-simultaneous turns from the same task hit two different
+ * worst-case race is a duplicate resume POST when two near-simultaneous turns from the same chat hit two different
  * instances and both observe the entry before either evicts. That requires (a) a buggy or retrying client AND (b)
- * cross-instance dispatch on the same taskId in the same millisecond — narrow enough that we accept it. If production
+ * cross-instance dispatch on the same chatId in the same millisecond — narrow enough that we accept it. If production
  * traces show this happening, swap in {@code RedisTemplate.opsForValue().getAndDelete} for true atomicity at the cost
  * of a Redis-specific dependency.
  * </p>
@@ -69,16 +69,16 @@ public class WebhookResumeRegistry {
     }
 
     /**
-     * Records a pending resume URL for the given task. Called by {@link AgUiStreamBridge} when the underlying workflow
+     * Records a pending resume URL for the given chat. Called by {@link AgUiStreamBridge} when the underlying workflow
      * emits an {@code ask_user_question} event with a resume URL. Overwrites any prior entry — the workflow can issue a
-     * new question on the same task and the latest URL wins.
+     * new question on the same chat and the latest URL wins.
      */
-    public void register(long taskId, String resumeUrl) {
-        getCache().put(taskId, resumeUrl);
+    public void register(long chatId, String resumeUrl) {
+        getCache().put(chatId, resumeUrl);
     }
 
     /**
-     * Removes and returns any pending resume URL for the given task. Called by {@link WebhookBridgeAgent} at the top of
+     * Removes and returns any pending resume URL for the given chat. Called by {@link WebhookBridgeAgent} at the top of
      * {@code run()}: a non-null return means "this is a resume turn, POST the user's input to the URL"; a null return
      * means "regular new-execution turn."
      *
@@ -87,13 +87,13 @@ public class WebhookResumeRegistry {
      * see the class javadoc's "consume() is not strictly atomic" note for the acceptance rationale.
      * </p>
      */
-    public @Nullable String consume(long taskId) {
+    public @Nullable String consume(long chatId) {
         Cache cache = getCache();
 
-        String resumeUrl = cache.get(taskId, String.class);
+        String resumeUrl = cache.get(chatId, String.class);
 
         if (resumeUrl != null) {
-            cache.evictIfPresent(taskId);
+            cache.evictIfPresent(chatId);
         }
 
         return resumeUrl;

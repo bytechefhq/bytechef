@@ -9,7 +9,7 @@ package com.bytechef.ee.ai.hub.artifact;
 
 import com.bytechef.automation.assetfile.domain.AssetFileFormat;
 import com.bytechef.automation.assetfile.service.AssetFileFacade;
-import com.bytechef.ee.ai.hub.task.AiHubTaskAssetFileService;
+import com.bytechef.ee.ai.hub.chat.AiHubChatAssetFileService;
 import java.nio.charset.StandardCharsets;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -62,9 +62,9 @@ public class HtmlArtifactGenerator extends AbstractTextArtifactGenerator {
     private static final int MAX_CONTENT_BYTES = 1_000_000;
 
     public HtmlArtifactGenerator(
-        AssetFileFacade assetFileFacade, AiHubTaskAssetFileService taskAssetFileService) {
+        AssetFileFacade assetFileFacade, AiHubChatAssetFileService chatAssetFileService) {
 
-        super(assetFileFacade, taskAssetFileService);
+        super(assetFileFacade, chatAssetFileService);
     }
 
     @Override
@@ -118,7 +118,7 @@ public class HtmlArtifactGenerator extends AbstractTextArtifactGenerator {
 
     private static Document parseStrict(String html) {
         // Empty baseUri because the artifact must be self-contained — relative URLs resolved against a base
-        // would defeat the no-external-refs rule introduced in Task 4.
+        // would defeat the no-external-refs rule introduced in Chat 4.
         return Jsoup.parse(html, "", Parser.htmlParser());
     }
 

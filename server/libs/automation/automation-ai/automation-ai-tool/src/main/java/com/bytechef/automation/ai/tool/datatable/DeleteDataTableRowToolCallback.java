@@ -49,7 +49,7 @@ import tools.jackson.databind.json.JsonMapper;
 public class DeleteDataTableRowToolCallback implements ToolCallback {
 
     /**
-     * Name of the artifact kind recorded on success, matching the {@code AiHubTaskArtifactKind.DATA_TABLE_ROW_DELETED}
+     * Name of the artifact kind recorded on success, matching the {@code AiHubChatArtifactKind.DATA_TABLE_ROW_DELETED}
      * enum constant on the AI Hub side. Carried as a plain string so this shared lib does not depend on ai-hub.
      */
     static final String ARTIFACT_KIND_DATA_TABLE_ROW_DELETED = "DATA_TABLE_ROW_DELETED";

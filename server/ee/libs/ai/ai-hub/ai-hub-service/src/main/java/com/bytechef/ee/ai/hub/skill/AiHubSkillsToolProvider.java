@@ -35,7 +35,7 @@ import org.springframework.stereotype.Component;
  * Loads the current user's AI skills (the same set shown on the AI &gt; Skills page) into a single Spring AI Community
  * {@link SkillsTool} {@link ToolCallback} that the AI Hub agent can invoke — so a skill the user picks via the composer
  * slash-menu (e.g. {@code /research ...}) actually steers the run. The
- * {@link com.bytechef.ee.ai.hub.toolsearch.AiHubTaskBindingToolCallbackResolver} unions this with the task tools, user
+ * {@link com.bytechef.ee.ai.hub.toolsearch.AiHubChatBindingToolCallbackResolver} unions this with the chat tools, user
  * connectors, and MCP server tools.
  *
  * <p>

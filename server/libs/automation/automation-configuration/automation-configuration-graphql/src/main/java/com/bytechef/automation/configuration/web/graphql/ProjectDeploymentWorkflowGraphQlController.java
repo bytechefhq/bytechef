@@ -33,6 +33,7 @@ import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.domain.HostedChatTriggers;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.constant.PlatformType;
@@ -60,7 +61,6 @@ import org.springframework.stereotype.Controller;
 @ConditionalOnCoordinator
 public class ProjectDeploymentWorkflowGraphQlController {
 
-    private static final String CHAT_TRIGGER_TYPE_PREFIX = "chat/";
     private static final String MANUAL_TRIGGER_NAME = "manual";
 
     private final EnvironmentService environmentService;
@@ -241,7 +241,7 @@ public class ProjectDeploymentWorkflowGraphQlController {
 
             List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
 
-            if (workflowTriggers.isEmpty() || !hasHostedChatTrigger(workflowTriggers)) {
+            if (!HostedChatTriggers.hasHostedChatTrigger(workflowTriggers)) {
                 continue;
             }
 
@@ -277,32 +277,6 @@ public class ProjectDeploymentWorkflowGraphQlController {
         }
 
         return chatWorkflows;
-    }
-
-    /**
-     * Matches the client's legacy filter: at least one trigger type starts with {@code chat/}, and the first trigger's
-     * {@code parameters.mode} is absent or equal to {@code 1}.
-     */
-    private static boolean hasHostedChatTrigger(List<WorkflowTrigger> workflowTriggers) {
-        boolean hasChatTrigger = workflowTriggers.stream()
-            .map(WorkflowTrigger::getType)
-            .anyMatch(type -> type != null && type.startsWith(CHAT_TRIGGER_TYPE_PREFIX));
-
-        if (!hasChatTrigger) {
-            return false;
-        }
-
-        WorkflowTrigger workflowTrigger = workflowTriggers.getFirst();
-
-        Map<String, ?> parameters = workflowTrigger.getParameters();
-
-        Object mode = parameters.get("mode");
-
-        if (mode == null) {
-            return true;
-        }
-
-        return mode instanceof Number number && number.intValue() == 1;
     }
 
     private String resolveStaticWebhookExecutionId(

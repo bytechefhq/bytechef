@@ -39,7 +39,7 @@ import tools.jackson.databind.json.JsonMapper;
  * <p>
  * The inline query/filter logic is shared with the AI-Hub superset variant via {@link DataTableQuerySupport}. This
  * class has no CSV-export capability at all (unlike its ai-hub sibling, which exports via an
- * {@code ArtifactGeneratorRegistry} + {@code AiHubTaskService} the shared lib cannot depend on), so a request with
+ * {@code ArtifactGeneratorRegistry} + {@code AiHubChatService} the shared lib cannot depend on), so a request with
  * {@code exportToCsv=true} is always rejected at the tool boundary with a structured error pointing the LLM at the
  * inline path.
  * </p>

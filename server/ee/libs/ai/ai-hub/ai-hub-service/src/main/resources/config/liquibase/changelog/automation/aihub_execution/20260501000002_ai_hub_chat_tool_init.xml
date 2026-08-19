@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <!--
+        Per-chat tool instance (v2.2). Mirrors mcp_tool but bound to a
+        ai_hub_chat_component (instead of mcp_component). Each row carries pre-configured
+        parameters that get merged into LLM-supplied invocation args at dispatch time.
+
+        Parameters use the same MapWrapper-converted JSONB approach as mcp_tool.parameters — Spring Data
+        JDBC's converter chain handles serialization. JSONB chosen over TEXT so the storage layer can
+        eventually support indexed lookup on parameter keys (not exercised in v1 but free with this typing).
+    -->
+    <changeSet id="20260501000002" author="Ivica Cardic">
+        <createTable tableName="ai_hub_chat_tool">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="chat_component_id" type="BIGINT">
+                <constraints nullable="false"
+                             foreignKeyName="fk_cct_component"
+                             references="ai_hub_chat_component(id)"
+                             deleteCascade="true"/>
+            </column>
+            <!--
+                cluster element name (action key); rendered to the LLM as
+                <componentName>_<clusterElementName> via ToolNameNormalizer.
+            -->
+            <column name="name" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parameters" type="JSONB">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)"/>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)"/>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!--
+            One configured tool per (binding, action). Re-adding the same action to the same component
+            binding updates the existing parameter row instead of creating a duplicate; chat affordance
+            "add the sendMessage tool with channel #engineering" is therefore replay-safe.
+        -->
+        <addUniqueConstraint
+            tableName="ai_hub_chat_tool"
+            constraintName="uk_cct_component_name"
+            columnNames="chat_component_id, name"/>
+
+        <createIndex tableName="ai_hub_chat_tool"
+                     indexName="idx_cct_component">
+            <column name="chat_component_id"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

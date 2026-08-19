@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <!--
+        Adapt the per-CHAT tool tables to also support PER-USER (global) tool configuration. A row with
+        chat_id NULL and (user_id, workspace_id) set is a user-global "added connector" the user manages on the
+        Connectors page; it applies to every chat that user starts, unioned with chat-scoped rows at dispatch.
+
+        - chat_id becomes nullable (NULL => user-global row).
+        - user_id / workspace_id added (set on user-global rows; NULL on chat-scoped rows).
+        - enabled added to both tables for the component-level and per-tool toggles on the Connectors page.
+
+        The existing uk_ccc_chat_comp_conn_env still enforces uniqueness for chat-scoped rows (chat_id NOT
+        NULL). A partial unique index enforces one user-global row per (user, workspace, component, version).
+    -->
+    <changeSet id="20260701000001-1" author="Ivica Cardic">
+        <dropNotNullConstraint tableName="ai_hub_chat_component" columnName="chat_id" columnDataType="BIGINT"/>
+
+        <addColumn tableName="ai_hub_chat_component">
+            <column name="user_id" type="BIGINT"/>
+
+            <column name="workspace_id" type="BIGINT"/>
+
+            <column name="enabled" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <addColumn tableName="ai_hub_chat_tool">
+            <column name="enabled" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <!--
+            One user-global "added connector" per (user, workspace, component, version). Partial index
+            (chat_id IS NULL) so it only constrains user-global rows and leaves chat-scoped rows to the
+            existing uk_ccc_chat_comp_conn_env. liquibase's createIndex can't express a WHERE clause in
+            dbchangelog-4.20, so this is raw SQL (Postgres partial unique index).
+        -->
+        <sql>
+            CREATE UNIQUE INDEX uk_ahtc_user_comp ON ai_hub_chat_component
+                (user_id, workspace_id, component_name, component_version) WHERE chat_id IS NULL
+        </sql>
+
+        <createIndex tableName="ai_hub_chat_component" indexName="idx_ahtc_user_workspace">
+            <column name="user_id"/>
+
+            <column name="workspace_id"/>
+        </createIndex>
+
+        <rollback>
+            <dropIndex tableName="ai_hub_chat_component" indexName="idx_ahtc_user_workspace"/>
+
+            <sql>DROP INDEX IF EXISTS uk_ahtc_user_comp</sql>
+
+            <dropColumn tableName="ai_hub_chat_tool" columnName="enabled"/>
+
+            <dropColumn tableName="ai_hub_chat_component" columnName="enabled"/>
+
+            <dropColumn tableName="ai_hub_chat_component" columnName="workspace_id"/>
+
+            <dropColumn tableName="ai_hub_chat_component" columnName="user_id"/>
+
+            <addNotNullConstraint tableName="ai_hub_chat_component" columnName="chat_id" columnDataType="BIGINT"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

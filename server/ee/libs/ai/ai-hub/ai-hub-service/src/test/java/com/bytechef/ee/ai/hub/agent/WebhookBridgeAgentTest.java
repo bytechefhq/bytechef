@@ -28,10 +28,10 @@ import com.agui.core.message.UserMessage;
 import com.agui.core.state.State;
 import com.bytechef.automation.assetfile.domain.AssetFile;
 import com.bytechef.automation.assetfile.service.AssetFileFacade;
-import com.bytechef.ee.ai.hub.task.AiHubTask;
-import com.bytechef.ee.ai.hub.task.AiHubTaskKind;
-import com.bytechef.ee.ai.hub.task.AiHubTaskService;
-import com.bytechef.ee.ai.hub.task.AiHubTaskStatus;
+import com.bytechef.ee.ai.hub.chat.AiHubChat;
+import com.bytechef.ee.ai.hub.chat.AiHubChatKind;
+import com.bytechef.ee.ai.hub.chat.AiHubChatService;
+import com.bytechef.ee.ai.hub.chat.AiHubChatStatus;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.domain.WebhookTriggerFlags;
@@ -62,11 +62,11 @@ class WebhookBridgeAgentTest {
 
     private static final String THREAD_ID = "00000000-0000-0000-0000-00000000004e";
     private static final String RUN_ID = "run-1";
-    private static final long TASK_ID = 11L;
+    private static final long CHAT_ID = 11L;
     private static final long PROJECT_DEPLOYMENT_ID = 99L;
 
     private WebhookWorkflowExecutor webhookFacade;
-    private AiHubTaskService taskService;
+    private AiHubChatService chatService;
     private WebhookResumeRegistry resumeRegistry;
     private JsonMapper jsonMapper;
     private AgentSubscriber subscriber;
@@ -75,7 +75,7 @@ class WebhookBridgeAgentTest {
     @BeforeEach
     void setUp() {
         webhookFacade = mock(WebhookWorkflowExecutor.class);
-        taskService = mock(AiHubTaskService.class);
+        chatService = mock(AiHubChatService.class);
         resumeRegistry = new WebhookResumeRegistry(
             new ConcurrentMapCacheManager(WebhookResumeRegistry.CACHE_NAME));
         jsonMapper = JsonMapper.builder()
@@ -103,8 +103,8 @@ class WebhookBridgeAgentTest {
     }
 
     @Test
-    void testEmitsErrorWhenTaskNotFound() throws AGUIException {
-        when(taskService.findByThreadId(THREAD_ID))
+    void testEmitsErrorWhenChatNotFound() throws AGUIException {
+        when(chatService.findByThreadId(THREAD_ID))
             .thenReturn(Optional.empty());
 
         WebhookBridgeAgent agent = newAgent();
@@ -116,16 +116,16 @@ class WebhookBridgeAgentTest {
         verify(subscriber, timeout(2000)).onRunErrorEvent(errorCaptor.capture());
 
         assertThat(errorCaptor.getValue()
-            .getError()).contains("AiHubTask not found");
+            .getError()).contains("AiHubChat not found");
     }
 
     @Test
-    void testEmitsRoutingMisrouteErrorForStandardTask() throws AGUIException {
-        AiHubTask task =
-            newTask(AiHubTaskKind.STANDARD, AiHubTaskStatus.ACTIVE, "title");
+    void testEmitsRoutingMisrouteErrorForStandardChat() throws AGUIException {
+        AiHubChat chat =
+            newChat(AiHubChatKind.STANDARD, AiHubChatStatus.ACTIVE, "title");
 
-        when(taskService.findByThreadId(THREAD_ID))
-            .thenReturn(Optional.of(task));
+        when(chatService.findByThreadId(THREAD_ID))
+            .thenReturn(Optional.of(chat));
 
         WebhookBridgeAgent agent = newAgent();
 
@@ -141,13 +141,13 @@ class WebhookBridgeAgentTest {
     }
 
     @Test
-    void testEmitsFriendlyDisabledMessageWithTaskTitle() throws AGUIException {
-        AiHubTask task =
-            newTask(AiHubTaskKind.WORKFLOW_CHAT, AiHubTaskStatus.ACTIVE,
+    void testEmitsFriendlyDisabledMessageWithChatTitle() throws AGUIException {
+        AiHubChat chat =
+            newChat(AiHubChatKind.WORKFLOW_CHAT, AiHubChatStatus.ACTIVE,
                 "My Helpful Bot");
 
-        when(taskService.findByThreadId(THREAD_ID))
-            .thenReturn(Optional.of(task));
+        when(chatService.findByThreadId(THREAD_ID))
+            .thenReturn(Optional.of(chat));
         when(webhookFacade.isWorkflowDisabled(any(WorkflowExecutionId.class)))
             .thenReturn(true);
 
@@ -171,12 +171,12 @@ class WebhookBridgeAgentTest {
 
     @Test
     void testEmitsFriendlyDeletedWorkflowMessageWhenLookupThrows() throws AGUIException {
-        AiHubTask task =
-            newTask(AiHubTaskKind.WORKFLOW_CHAT, AiHubTaskStatus.ACTIVE,
+        AiHubChat chat =
+            newChat(AiHubChatKind.WORKFLOW_CHAT, AiHubChatStatus.ACTIVE,
                 "Stale Chat");
 
-        when(taskService.findByThreadId(THREAD_ID))
-            .thenReturn(Optional.of(task));
+        when(chatService.findByThreadId(THREAD_ID))
+            .thenReturn(Optional.of(chat));
         when(webhookFacade.isWorkflowDisabled(any(WorkflowExecutionId.class)))
             .thenThrow(new RuntimeException("workflow not found"));
 
@@ -195,18 +195,18 @@ class WebhookBridgeAgentTest {
         assertThat(errorMessage)
             .contains("can no longer be reached")
             .contains("Stale Chat")
-            .contains("Archive this task");
+            .contains("Archive this chat");
     }
 
     @Test
     @SuppressWarnings("unchecked")
     void testWebhookRequestBodyIncludesMessageAndAttachments() throws AGUIException {
-        AiHubTask task =
-            newTask(AiHubTaskKind.WORKFLOW_CHAT, AiHubTaskStatus.ACTIVE,
+        AiHubChat chat =
+            newChat(AiHubChatKind.WORKFLOW_CHAT, AiHubChatStatus.ACTIVE,
                 "Chat");
 
-        when(taskService.findByThreadId(THREAD_ID))
-            .thenReturn(Optional.of(task));
+        when(chatService.findByThreadId(THREAD_ID))
+            .thenReturn(Optional.of(chat));
         when(webhookFacade.isWorkflowDisabled(any(WorkflowExecutionId.class)))
             .thenReturn(false);
         when(webhookFacade.getWebhookTriggerFlags(any(WorkflowExecutionId.class)))
@@ -234,7 +234,7 @@ class WebhookBridgeAgentTest {
 
         assertThat(bodyContent)
             .containsEntry("message", "Hello")
-            .containsEntry("taskId", THREAD_ID);
+            .containsEntry("chatId", THREAD_ID);
 
         List<?> attachments = (List<?>) bodyContent.get("attachments");
 
@@ -256,12 +256,12 @@ class WebhookBridgeAgentTest {
     @Test
     @SuppressWarnings("unchecked")
     void testAttachmentsWithoutBase64AreDropped() throws AGUIException {
-        AiHubTask task =
-            newTask(AiHubTaskKind.WORKFLOW_CHAT, AiHubTaskStatus.ACTIVE,
+        AiHubChat chat =
+            newChat(AiHubChatKind.WORKFLOW_CHAT, AiHubChatStatus.ACTIVE,
                 "Chat");
 
-        when(taskService.findByThreadId(THREAD_ID))
-            .thenReturn(Optional.of(task));
+        when(chatService.findByThreadId(THREAD_ID))
+            .thenReturn(Optional.of(chat));
         when(webhookFacade.isWorkflowDisabled(any(WorkflowExecutionId.class)))
             .thenReturn(false);
         when(webhookFacade.getWebhookTriggerFlags(any(WorkflowExecutionId.class)))
@@ -306,12 +306,12 @@ class WebhookBridgeAgentTest {
      */
     @Test
     void testWebhookResponseEnvelopeUnwrapsBodyMessage() throws AGUIException {
-        AiHubTask task =
-            newTask(AiHubTaskKind.WORKFLOW_CHAT, AiHubTaskStatus.ACTIVE,
+        AiHubChat chat =
+            newChat(AiHubChatKind.WORKFLOW_CHAT, AiHubChatStatus.ACTIVE,
                 "Chat");
 
-        when(taskService.findByThreadId(THREAD_ID))
-            .thenReturn(Optional.of(task));
+        when(chatService.findByThreadId(THREAD_ID))
+            .thenReturn(Optional.of(chat));
         when(webhookFacade.isWorkflowDisabled(any(WorkflowExecutionId.class)))
             .thenReturn(false);
         when(webhookFacade.getWebhookTriggerFlags(any(WorkflowExecutionId.class)))
@@ -348,12 +348,12 @@ class WebhookBridgeAgentTest {
      */
     @Test
     void testWebhookResponseEnvelopeWithStringBody() throws AGUIException {
-        AiHubTask task =
-            newTask(AiHubTaskKind.WORKFLOW_CHAT, AiHubTaskStatus.ACTIVE,
+        AiHubChat chat =
+            newChat(AiHubChatKind.WORKFLOW_CHAT, AiHubChatStatus.ACTIVE,
                 "Chat");
 
-        when(taskService.findByThreadId(THREAD_ID))
-            .thenReturn(Optional.of(task));
+        when(chatService.findByThreadId(THREAD_ID))
+            .thenReturn(Optional.of(chat));
         when(webhookFacade.isWorkflowDisabled(any(WorkflowExecutionId.class)))
             .thenReturn(false);
         when(webhookFacade.getWebhookTriggerFlags(any(WorkflowExecutionId.class)))
@@ -388,12 +388,12 @@ class WebhookBridgeAgentTest {
      */
     @Test
     void testTopLevelMessageMapStillEmitsAssistantText() throws AGUIException {
-        AiHubTask task =
-            newTask(AiHubTaskKind.WORKFLOW_CHAT, AiHubTaskStatus.ACTIVE,
+        AiHubChat chat =
+            newChat(AiHubChatKind.WORKFLOW_CHAT, AiHubChatStatus.ACTIVE,
                 "Chat");
 
-        when(taskService.findByThreadId(THREAD_ID))
-            .thenReturn(Optional.of(task));
+        when(chatService.findByThreadId(THREAD_ID))
+            .thenReturn(Optional.of(chat));
         when(webhookFacade.isWorkflowDisabled(any(WorkflowExecutionId.class)))
             .thenReturn(false);
         when(webhookFacade.getWebhookTriggerFlags(any(WorkflowExecutionId.class)))
@@ -421,12 +421,12 @@ class WebhookBridgeAgentTest {
      */
     @Test
     void testEmptyOutputsEmitsActionableFallbackMessage() throws AGUIException {
-        AiHubTask task =
-            newTask(AiHubTaskKind.WORKFLOW_CHAT, AiHubTaskStatus.ACTIVE,
+        AiHubChat chat =
+            newChat(AiHubChatKind.WORKFLOW_CHAT, AiHubChatStatus.ACTIVE,
                 "Chat");
 
-        when(taskService.findByThreadId(THREAD_ID))
-            .thenReturn(Optional.of(task));
+        when(chatService.findByThreadId(THREAD_ID))
+            .thenReturn(Optional.of(chat));
         when(webhookFacade.isWorkflowDisabled(any(WorkflowExecutionId.class)))
             .thenReturn(false);
         when(webhookFacade.getWebhookTriggerFlags(any(WorkflowExecutionId.class)))
@@ -458,7 +458,7 @@ class WebhookBridgeAgentTest {
         // WorkflowChatMetrics records counters via Micrometer when a MeterRegistry is on the classpath. Tests
         // don't need a real registry — a mock satisfies the dependency and Mockito stubs every method to a
         // no-op, which is exactly the "no actuator on this app variant" production fallback the metrics class
-        // is designed for. AiHubTaskArtifactService and WorkflowChatJobRegistry likewise — the bridge
+        // is designed for. AiHubChatArtifactService and WorkflowChatJobRegistry likewise — the bridge
         // calls
         // them best-effort and tests don't assert on either. WorkflowChatGuard is stubbed to admit every turn so
         // the existing dispatch / sync / streaming assertions don't trip on the rate-limit + concurrency gate;
@@ -468,7 +468,7 @@ class WebhookBridgeAgentTest {
         when(guard.tryAdmit(anyLong())).thenReturn(WorkflowChatGuard.AdmissionResult.admit());
 
         return new WebhookBridgeAgent(
-            webhookFacade, taskService, resumeRegistry, jsonMapper, assetFileFacade,
+            webhookFacade, chatService, resumeRegistry, jsonMapper, assetFileFacade,
             mock(com.bytechef.ee.ai.hub.metric.WorkflowChatMetrics.class),
             mock(WorkflowChatJobRegistry.class),
             new com.bytechef.ee.ai.hub.memory.AiHubSessionMemory(
@@ -478,26 +478,26 @@ class WebhookBridgeAgentTest {
             guard, null);
     }
 
-    private static AiHubTask
-        newTask(AiHubTaskKind kind, AiHubTaskStatus status, String title) {
-        AiHubTask task = new AiHubTask(3L);
+    private static AiHubChat
+        newChat(AiHubChatKind kind, AiHubChatStatus status, String title) {
+        AiHubChat chat = new AiHubChat(3L);
 
-        task.setId(TASK_ID);
-        task.setThreadId(THREAD_ID);
-        task.setKind(kind);
-        task.setStatus(status);
-        task.setTitle(title);
-        task.setProjectDeploymentId(PROJECT_DEPLOYMENT_ID);
+        chat.setId(CHAT_ID);
+        chat.setThreadId(THREAD_ID);
+        chat.setKind(kind);
+        chat.setStatus(status);
+        chat.setTitle(title);
+        chat.setProjectDeploymentId(PROJECT_DEPLOYMENT_ID);
 
-        if (kind == AiHubTaskKind.WORKFLOW_CHAT) {
+        if (kind == AiHubChatKind.WORKFLOW_CHAT) {
             // Build a real WorkflowExecutionId so parse() succeeds in the bridge — using a hand-rolled string
             // would force us to recreate the encoding logic inline and silently rot when the format changes.
-            task.setWorkflowExecutionId(
+            chat.setWorkflowExecutionId(
                 WorkflowExecutionId.of(PlatformType.AUTOMATION, 1L, "uuid-123", "newChatRequest")
                     .toString());
         }
 
-        return task;
+        return chat;
     }
 
     private static RunAgentInput buildInput(String userMessageText) {

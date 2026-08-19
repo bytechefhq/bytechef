@@ -48,7 +48,7 @@ import tools.jackson.databind.json.JsonMapper;
 public class DeleteKnowledgeBaseDocumentToolCallback implements ToolCallback {
 
     /**
-     * Name of the artifact kind recorded on success, matching the {@code AiHubTaskArtifactKind.KB_DOCUMENT_DELETED}
+     * Name of the artifact kind recorded on success, matching the {@code AiHubChatArtifactKind.KB_DOCUMENT_DELETED}
      * enum constant on the AI Hub side. Carried as a plain string so this shared lib does not depend on ai-hub.
      */
     static final String ARTIFACT_KIND_KB_DOCUMENT_DELETED = "KB_DOCUMENT_DELETED";

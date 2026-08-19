@@ -5,7 +5,7 @@
                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
     <!--
         User-registered external MCP (Model Context Protocol) servers. Scoped per (user, workspace,
-        environment) like the user-global "added connectors" in ai_hub_task_component. The AI Hub agent
+        environment) like the user-global "added connectors" in ai_hub_chat_component. The AI Hub agent
         connects OUT to `url` as an MCP client; `auth_token` holds an optional bearer token encrypted at
         rest (never returned to the client). Tool discovery + agent bridging land in a follow-up increment.
     -->

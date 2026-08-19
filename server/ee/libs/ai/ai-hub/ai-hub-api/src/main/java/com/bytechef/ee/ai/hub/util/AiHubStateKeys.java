@@ -15,7 +15,7 @@ package com.bytechef.ee.ai.hub.util;
  * <p>
  * Why a dedicated namespace: the agent's {@code buildInvocationContext} originally read {@code workspaceId} and
  * {@code userId} directly from the request-supplied state. That made the SSE chat path the one place in the system
- * where workspace membership and task ownership were not gated server-side — any authenticated user could submit
+ * where workspace membership and chat ownership were not gated server-side — any authenticated user could submit
  * {@code state.workspaceId=&lt;victim_ws&gt;} and have the LLM tools operate against that workspace. The controller now
  * verifies these values and rewrites them into the server-controlled keys defined here. Anything else the client sent
  * under the same names is irrelevant — the agent reads only these keys.
@@ -40,8 +40,8 @@ public final class AiHubStateKeys {
     public static final String VERIFIED_WORKSPACE_ID = "__verifiedWorkspaceId";
 
     /**
-     * The verified thread id placed by the controller after the task-ownership check passes. Optional — only present
-     * when the client sent a {@code threadId} that resolves to a task owned by the authenticated user.
+     * The verified thread id placed by the controller after the chat-ownership check passes. Optional — only present
+     * when the client sent a {@code threadId} that resolves to a chat owned by the authenticated user.
      */
     public static final String VERIFIED_THREAD_ID = "__verifiedThreadId";
 
@@ -64,38 +64,11 @@ public final class AiHubStateKeys {
     public static final String VERIFIED_TENANT_ID = "bytechef.aiHub.verifiedTenantId";
 
     /**
-     * Personal-agent instructions string, set by the routing agent for {@code kind = PERSONAL_AGENT} tasks. Read by
-     * {@code AiHubSpringAIAgent.appendPersonalAgentContext} to inject the agent's instructions as a Context block in
-     * the system prompt.
-     */
-    public static final String PERSONAL_AGENT_INSTRUCTIONS_KEY = "aiHubPersonalAgentInstructions";
-
-    /**
-     * Personal-agent display title, set by the routing agent alongside {@link #PERSONAL_AGENT_INSTRUCTIONS_KEY}.
-     * Surfaced as "operating as the user's personal agent: '\<title\>'" in the Context block.
-     */
-    public static final String PERSONAL_AGENT_TITLE_KEY = "aiHubPersonalAgentTitle";
-
-    /**
-     * Optional per-agent LLM provider override, set by the routing agent when the personal agent has a non-null
-     * {@code llmProvider} field. Consumed by {@code AiHubSpringAIAgent.resolveChatClient} to swap the ChatModel for the
-     * duration of this run. Always paired with {@link #PERSONAL_AGENT_LLM_MODEL_KEY}; the routing agent injects both or
-     * neither.
-     */
-    public static final String PERSONAL_AGENT_LLM_PROVIDER_KEY = "aiHubPersonalAgentLlmProvider";
-
-    /**
-     * Optional per-agent LLM model override. See {@link #PERSONAL_AGENT_LLM_PROVIDER_KEY} for usage.
-     */
-    public static final String PERSONAL_AGENT_LLM_MODEL_KEY = "aiHubPersonalAgentLlmModel";
-
-    /**
      * User-selected LLM provider for the current conversation, supplied by the client via the AG-UI request
-     * {@code state.userSelectedLlmProvider}. Takes precedence over the per-agent override (which itself takes
-     * precedence over the workspace default) when honored by {@code AiHubChatClientResolver}. Always paired with
-     * {@link #USER_SELECTED_LLM_MODEL_KEY}: half-set states (only provider or only model present) fall through to the
-     * next precedence layer with a warning log rather than 400-ing the request, since a half-set state is a transient
-     * client artifact rather than malicious input.
+     * {@code state.userSelectedLlmProvider}. Takes precedence over the workspace default when honored by
+     * {@code AiHubChatClientResolver}. Always paired with {@link #USER_SELECTED_LLM_MODEL_KEY}: half-set states (only
+     * provider or only model present) fall back to the workspace default with a warning log rather than 400-ing the
+     * request, since a half-set state is a transient client artifact rather than malicious input.
      *
      * <p>
      * Unlike {@link #VERIFIED_WORKSPACE_ID} and friends, this key is <em>not</em> rewritten by the controller — the

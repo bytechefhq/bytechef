@@ -9,7 +9,7 @@ package com.bytechef.ee.ai.hub.artifact;
 
 import com.bytechef.automation.assetfile.domain.AssetFileFormat;
 import com.bytechef.automation.assetfile.service.AssetFileFacade;
-import com.bytechef.ee.ai.hub.task.AiHubTaskAssetFileService;
+import com.bytechef.ee.ai.hub.chat.AiHubChatAssetFileService;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -58,9 +58,9 @@ public class ChartArtifactGenerator extends AbstractTextArtifactGenerator {
     private static final TypeReference<Map<String, Object>> CHART_SPEC_TYPE = new TypeReference<>() {};
 
     public ChartArtifactGenerator(
-        AssetFileFacade assetFileFacade, AiHubTaskAssetFileService taskAssetFileService) {
+        AssetFileFacade assetFileFacade, AiHubChatAssetFileService chatAssetFileService) {
 
-        super(assetFileFacade, taskAssetFileService);
+        super(assetFileFacade, chatAssetFileService);
     }
 
     @Override

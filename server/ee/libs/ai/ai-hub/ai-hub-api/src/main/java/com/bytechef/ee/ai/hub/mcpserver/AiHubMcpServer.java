@@ -20,7 +20,7 @@ import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * A user-registered external MCP (Model Context Protocol) server. Scoped per (user, workspace, environment) like the
- * user-global "added connectors" — every task the user starts can use its tools (bridging into the agent is a follow-up
+ * user-global "added connectors" — every chat the user starts can use its tools (bridging into the agent is a follow-up
  * increment). The agent connects OUT to {@link #url} as an MCP client.
  *
  * <p>

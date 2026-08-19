@@ -15,8 +15,8 @@ import com.bytechef.automation.assetfile.domain.AssetFileFormat;
 import com.bytechef.ee.ai.hub.artifact.ArtifactGeneratorRegistry;
 import com.bytechef.ee.ai.hub.artifact.GenerationRequest;
 import com.bytechef.ee.ai.hub.artifact.GenerationResult;
-import com.bytechef.ee.ai.hub.task.AiHubTask;
-import com.bytechef.ee.ai.hub.task.AiHubTaskService;
+import com.bytechef.ee.ai.hub.chat.AiHubChat;
+import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -40,7 +40,7 @@ import tools.jackson.databind.json.JsonMapper;
  * <p>
  * This is the AI-Hub <em>superset</em> variant: on top of the inline-query behaviour it adds an {@code exportToCsv}
  * branch that materialises the rowset as a CSV {@code asset_file} through the EE AI-Hub artifact pipeline
- * ({@code ArtifactGeneratorRegistry} / {@code CsvArtifactGenerator} / {@code AiHubTaskService}). That branch is
+ * ({@code ArtifactGeneratorRegistry} / {@code CsvArtifactGenerator} / {@code AiHubChatService}). That branch is
  * genuinely AI-Hub-coupled, so it cannot live in the shared lib. The inline query/filter semantics are shared with the
  * canonical inline-only version {@link com.bytechef.automation.ai.tool.datatable.QueryDataTableToolCallback} through
  * {@link DataTableQuerySupport}; this class is retained only for the {@code data_analyst} subagent, which has the
@@ -61,7 +61,7 @@ public class QueryDataTableToolCallback implements ToolCallback {
         object with column names as keys. Obtain the dataTableId from listDataTables first.
 
         When `exportToCsv` is true, the result rows are written as a CSV asset_file (format=CSV,
-        source=AI_GENERATED) registered with the task, and the response carries
+        source=AI_GENERATED) registered with the chat, and the response carries
         {exported, assetFileId, filename, rowCount} instead of the inline rows. Use this when
         the user asks "give me a CSV of...", "export... to file", or when the result set is
         large enough that an inline JSON array would clutter chat. The csv export bypasses the
@@ -75,7 +75,7 @@ public class QueryDataTableToolCallback implements ToolCallback {
                     "dataTableId": {"type": "string", "description": "Data table id obtained from listDataTables"},
                     "where": {"type": "string", "description": "Optional simple equals filter, e.g. \\"status = 'qualified'\\""},
                     "limit": {"type": "integer", "description": "Maximum number of rows to return (capped at 50 for inline; ignored when exportToCsv=true)"},
-                    "exportToCsv": {"type": "boolean", "description": "When true, write the result rows as a CSV asset_file registered with the task rather than returning them inline"}
+                    "exportToCsv": {"type": "boolean", "description": "When true, write the result rows as a CSV asset_file registered with the chat rather than returning them inline"}
                 },
                 "required": ["dataTableId"]
             }""";
@@ -85,7 +85,7 @@ public class QueryDataTableToolCallback implements ToolCallback {
     @Nullable
     private final ArtifactGeneratorRegistry artifactGeneratorRegistry;
     @Nullable
-    private final AiHubTaskService taskService;
+    private final AiHubChatService chatService;
     private final DataTableRowService dataTableRowService;
     private final DataTableService dataTableService;
     private final JsonMapper jsonMapper = new JsonMapper();
@@ -93,12 +93,12 @@ public class QueryDataTableToolCallback implements ToolCallback {
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public QueryDataTableToolCallback(
         ArtifactGeneratorRegistry artifactGeneratorRegistry,
-        AiHubTaskService taskService,
+        AiHubChatService chatService,
         DataTableRowService dataTableRowService,
         DataTableService dataTableService) {
 
         this.artifactGeneratorRegistry = artifactGeneratorRegistry;
-        this.taskService = taskService;
+        this.chatService = chatService;
         this.dataTableRowService = dataTableRowService;
         this.dataTableService = dataTableService;
     }
@@ -166,7 +166,7 @@ public class QueryDataTableToolCallback implements ToolCallback {
 
             boolean exportToCsv = Boolean.TRUE.equals(input.exportToCsv());
 
-            if (exportToCsv && (artifactGeneratorRegistry == null || taskService == null)) {
+            if (exportToCsv && (artifactGeneratorRegistry == null || chatService == null)) {
                 return toolError(
                     "exportToCsv is not available in this tool context — request the inline rows instead.");
             }
@@ -205,7 +205,7 @@ public class QueryDataTableToolCallback implements ToolCallback {
     /**
      * Materialises the rowset as a CSV {@code asset_file} via the existing CHART/JSON/MARKDOWN generator pipeline.
      * Reuses {@link com.bytechef.ee.ai.hub.artifact.CsvArtifactGenerator} so the generated file: (a) is registered to
-     * the task via the {@code AUTHORED} join, (b) appears in the Generated tab on the Files page, and (c) inherits the
+     * the chat via the {@code AUTHORED} join, (b) appears in the Generated tab on the Files page, and (c) inherits the
      * same workspace/env scoping as user-uploaded files. Returns a tool result envelope keyed by {@code exported:true}
      * so the LLM dispatches differently than the inline-JSON path.
      */
@@ -219,13 +219,13 @@ public class QueryDataTableToolCallback implements ToolCallback {
                 .format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"))
             + ".csv";
 
-        Long taskId = resolveTaskId(invocationContext.threadId());
+        Long chatId = resolveChatId(invocationContext.threadId());
 
         GenerationRequest request = new GenerationRequest(
             invocationContext.workspaceId(),
             invocationContext.userId() == null ? 0L : invocationContext.userId(),
             (int) resolveEnvironmentId(invocationContext),
-            taskId,
+            chatId,
             invocationContext.sourceOrdinal() == null ? (short) 0 : invocationContext.sourceOrdinal(),
             invocationContext.lastUserPrompt(),
             filename,
@@ -239,21 +239,21 @@ public class QueryDataTableToolCallback implements ToolCallback {
             "assetFileId", result.assetFileId(),
             "filename", result.filename(),
             "rowCount", rowMaps.size(),
-            "taskLinked", result.taskLinked()));
+            "chatLinked", result.chatLinked()));
     }
 
     /**
-     * Resolves the task row for the bound thread so the CSV export can be linked. {@code null} on first-turn races or
+     * Resolves the chat row for the bound thread so the CSV export can be linked. {@code null} on first-turn races or
      * when the tool is invoked outside a chat (rare for this tool); the artifact still persists, just without the
      * AUTHORED join.
      */
-    private @Nullable Long resolveTaskId(@Nullable String threadId) {
+    private @Nullable Long resolveChatId(@Nullable String threadId) {
         if (threadId == null || threadId.isBlank()) {
             return null;
         }
 
-        return taskService.findByThreadId(threadId)
-            .map(AiHubTask::getId)
+        return chatService.findByThreadId(threadId)
+            .map(AiHubChat::getId)
             .orElse(null);
     }
 

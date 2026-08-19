@@ -30,6 +30,7 @@ import com.bytechef.component.definition.ActionDefinition.SseEmitterHandler;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.ai.constant.AiAgentSseEventType;
 import com.bytechef.platform.ai.constant.AiAgentToolContextKey;
+import com.bytechef.platform.ai.conversation.AgentConversationRecorder;
 import com.bytechef.platform.ai.guardrails.AiGuardrailsAdvisorProvider;
 import com.bytechef.platform.ai.workspaceprompt.WorkspaceSystemPromptAdvisorProvider;
 import com.bytechef.platform.component.ComponentConnection;
@@ -79,12 +80,13 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
         ToolCallingManager toolCallingManager,
         @Nullable ObjectProvider<ToolExecutionRecorder> toolExecutionRecorderObjectProvider,
         @Nullable ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider,
-        @Nullable ObjectProvider<WorkspaceSystemPromptAdvisorProvider> workspaceSystemPromptAdvisorProviderObjectProvider) {
+        @Nullable ObjectProvider<WorkspaceSystemPromptAdvisorProvider> workspaceSystemPromptAdvisorProviderObjectProvider,
+        @Nullable ObjectProvider<AgentConversationRecorder> agentConversationRecorderObjectProvider) {
 
         return new AiAgentStreamChatAction(
             aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager,
             toolExecutionRecorderObjectProvider, aiGuardrailsAdvisorProviderObjectProvider,
-            workspaceSystemPromptAdvisorProviderObjectProvider).build();
+            workspaceSystemPromptAdvisorProviderObjectProvider, agentConversationRecorderObjectProvider).build();
     }
 
     private AiAgentStreamChatAction(
@@ -92,12 +94,13 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
         ToolCallingManager toolCallingManager,
         @Nullable ObjectProvider<ToolExecutionRecorder> toolExecutionRecorderObjectProvider,
         @Nullable ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider,
-        @Nullable ObjectProvider<WorkspaceSystemPromptAdvisorProvider> workspaceSystemPromptAdvisorProviderObjectProvider) {
+        @Nullable ObjectProvider<WorkspaceSystemPromptAdvisorProvider> workspaceSystemPromptAdvisorProviderObjectProvider,
+        @Nullable ObjectProvider<AgentConversationRecorder> agentConversationRecorderObjectProvider) {
 
         super(
             aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager,
             toolExecutionRecorderObjectProvider, aiGuardrailsAdvisorProviderObjectProvider,
-            workspaceSystemPromptAdvisorProviderObjectProvider);
+            workspaceSystemPromptAdvisorProviderObjectProvider, agentConversationRecorderObjectProvider);
     }
 
     /**
@@ -159,7 +162,8 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
         Flux<Object> contentFlux = withEnvironmentContext(
             chatClientRequestSpec.stream()
                 .chatResponse()
-                .concatMap(chatResponse -> Flux.fromIterable(toSseEvents(chatResponse, context))));
+                .concatMap(chatResponse -> Flux.fromIterable(toSseEvents(chatResponse, context)))
+                .doOnComplete(createAgentConversationTurnRecorder(extensions, context)));
 
         return createSseHandler(contentFlux, emitterReference, bufferedEvents, context);
     }
@@ -216,7 +220,8 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
         Flux<Object> contentFlux = withEnvironmentContext(
             chatClientRequestSpec.stream()
                 .chatResponse()
-                .concatMap(chatResponse -> Flux.fromIterable(toSseEvents(chatResponse, context))));
+                .concatMap(chatResponse -> Flux.fromIterable(toSseEvents(chatResponse, context)))
+                .doOnComplete(createAgentConversationTurnRecorder(extensions, context)));
 
         return createSseHandler(contentFlux, emitterReference, bufferedEvents, context);
     }

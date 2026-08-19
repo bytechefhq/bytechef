@@ -7,7 +7,7 @@
 
 package com.bytechef.ee.ai.hub.config;
 
-import com.bytechef.ee.ai.hub.task.AiHubTaskService;
+import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import com.bytechef.ee.ai.hub.tool.ResearchToolCallback;
 import com.bytechef.ee.ai.hub.usage.AiHubToolUsageContextResolver;
 import com.bytechef.ee.platform.ai.tool.usage.MeteredToolCallback;
@@ -70,7 +70,7 @@ public class ResearchConfiguration {
         Optional<FirecrawlTools> firecrawlTools,
         Optional<BraveWebSearchTools> braveWebSearchTools,
         ObjectProvider<ToolUsageRecorder> toolUsageRecorderProvider,
-        ObjectProvider<AiHubTaskService> taskServiceProvider,
+        ObjectProvider<AiHubChatService> chatServiceProvider,
         JsonMapper jsonMapper,
         @Value("classpath:prompt_research.txt") Resource promptResource) {
 
@@ -82,7 +82,7 @@ public class ResearchConfiguration {
         braveWebSearchTools.ifPresent(tools -> toolCallbacks.addAll(List.of(ToolCallbacks.from(tools))));
 
         ToolUsageRecorder usageRecorder = toolUsageRecorderProvider.getIfAvailable();
-        AiHubTaskService taskService = taskServiceProvider.getIfAvailable();
+        AiHubChatService chatService = chatServiceProvider.getIfAvailable();
 
         List<ToolCallback> wrapped = new ArrayList<>(toolCallbacks.size());
 
@@ -92,10 +92,10 @@ public class ResearchConfiguration {
 
             String meteredToolName = mapMeteredToolName(name);
 
-            if (meteredToolName != null && usageRecorder != null && taskService != null) {
+            if (meteredToolName != null && usageRecorder != null && chatService != null) {
                 wrapped.add(new MeteredToolCallback(
                     callback, meteredToolName, 1, usageRecorder,
-                    AiHubToolUsageContextResolver.create(taskService, meteredToolName),
+                    AiHubToolUsageContextResolver.create(chatService, meteredToolName),
                     MeteredToolCallback.singleStringField("websiteMap".equals(name) ? "url"
                         : "webpageScrape".equals(name) ? "url" : "query"),
                     jsonMapper));

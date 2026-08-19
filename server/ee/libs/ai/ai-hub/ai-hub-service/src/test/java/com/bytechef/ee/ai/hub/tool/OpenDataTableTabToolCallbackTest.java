@@ -56,7 +56,7 @@ class OpenDataTableTabToolCallbackTest {
 
     @Test
     void testCallRecordsDataTableReferenceWhenRecorderPresent() {
-        AiHubTaskArtifactRecorder artifactRecorder = mock(AiHubTaskArtifactRecorder.class);
+        AiHubChatArtifactRecorder artifactRecorder = mock(AiHubChatArtifactRecorder.class);
 
         OpenDataTableTabToolCallback callback = new OpenDataTableTabToolCallback(artifactRecorder);
 

@@ -15,8 +15,8 @@ import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
-import com.bytechef.ee.ai.hub.task.AiHubTaskArtifactKind;
-import com.bytechef.ee.ai.hub.task.AiHubTaskArtifactService;
+import com.bytechef.ee.ai.hub.chat.AiHubChatArtifactKind;
+import com.bytechef.ee.ai.hub.chat.AiHubChatArtifactService;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -89,7 +89,7 @@ public class RunChatWorkflowToolCallback implements ToolCallback {
     private final ProjectWorkflowService projectWorkflowService;
     private final WorkflowFacade workflowFacade;
     private final WorkflowService workflowService;
-    private final AiHubTaskArtifactService taskArtifactService;
+    private final AiHubChatArtifactService chatArtifactService;
     private final JsonMapper jsonMapper;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
@@ -109,10 +109,10 @@ public class RunChatWorkflowToolCallback implements ToolCallback {
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
         ProjectWorkflowService projectWorkflowService,
         WorkflowFacade workflowFacade, WorkflowService workflowService,
-        AiHubTaskArtifactService taskArtifactService) {
+        AiHubChatArtifactService chatArtifactService) {
 
         this(projectDeploymentService, projectDeploymentWorkflowService, projectWorkflowService, workflowFacade,
-            workflowService, taskArtifactService, new JsonMapper());
+            workflowService, chatArtifactService, new JsonMapper());
     }
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
@@ -121,14 +121,14 @@ public class RunChatWorkflowToolCallback implements ToolCallback {
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
         ProjectWorkflowService projectWorkflowService,
         WorkflowFacade workflowFacade, WorkflowService workflowService,
-        AiHubTaskArtifactService taskArtifactService, JsonMapper jsonMapper) {
+        AiHubChatArtifactService chatArtifactService, JsonMapper jsonMapper) {
 
         this.projectDeploymentService = projectDeploymentService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
         this.projectWorkflowService = projectWorkflowService;
         this.workflowFacade = workflowFacade;
         this.workflowService = workflowService;
-        this.taskArtifactService = taskArtifactService;
+        this.chatArtifactService = chatArtifactService;
         this.jsonMapper = jsonMapper;
     }
 
@@ -245,7 +245,7 @@ public class RunChatWorkflowToolCallback implements ToolCallback {
     private void recordWorkflowExecutionStarted(
         AiHubToolInvocationContext invocationContext, Workflow workflow, String triggerId) {
 
-        if (taskArtifactService == null || invocationContext.threadId() == null) {
+        if (chatArtifactService == null || invocationContext.threadId() == null) {
             return;
         }
 
@@ -260,9 +260,9 @@ public class RunChatWorkflowToolCallback implements ToolCallback {
 
         String workflowLabel = workflow.getLabel() != null ? workflow.getLabel() : workflow.getId();
 
-        taskArtifactService.record(
+        chatArtifactService.record(
             invocationContext.threadId(), invocationContext.userId(),
-            AiHubTaskArtifactKind.WORKFLOW_EXECUTION_STARTED, triggerId, workflowLabel, null);
+            AiHubChatArtifactKind.WORKFLOW_EXECUTION_STARTED, triggerId, workflowLabel, null);
     }
 
     private String toolError(String message) {

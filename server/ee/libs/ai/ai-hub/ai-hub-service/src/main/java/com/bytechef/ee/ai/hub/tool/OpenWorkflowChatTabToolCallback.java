@@ -16,9 +16,9 @@ import tools.jackson.core.JacksonException;
 import tools.jackson.databind.json.JsonMapper;
 
 /**
- * Signaling-only Spring AI {@link ToolCallback} that lets the AI Hub agent navigate the user to a workflow-chat task.
+ * Signaling-only Spring AI {@link ToolCallback} that lets the AI Hub agent navigate the user to a workflow chat.
  * Server-side this is a no-op that echoes the {@code threadId} back as the result; the client subscriber intercepts the
- * tool-call event and switches the active task to the matching workflow-chat row in the sidebar.
+ * tool-call event and switches the active chat to the matching workflow-chat row in the sidebar.
  *
  * <p>
  * Pairs with {@link CreateWorkflowChatToolCallback}: the LLM creates a workflow chat (or finds an existing one), then
@@ -33,7 +33,7 @@ import tools.jackson.databind.json.JsonMapper;
 public class OpenWorkflowChatTabToolCallback implements ToolCallback {
 
     private static final String DESCRIPTION = """
-        Navigate the user to a workflow-chat task. Call this AFTER createWorkflowChat to surface
+        Navigate the user to a workflow chat. Call this AFTER createWorkflowChat to surface
         the new chat in the AI Hub sidebar — pass the threadId returned from createWorkflowChat.
         Never invent a threadId.""";
 

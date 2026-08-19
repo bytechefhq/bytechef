@@ -19,6 +19,7 @@ import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
+import com.bytechef.platform.configuration.domain.HostedChatTriggers;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.constant.PlatformType;
@@ -44,9 +45,10 @@ import tools.jackson.core.JacksonException;
 import tools.jackson.databind.json.JsonMapper;
 
 /**
- * Spring AI {@link ToolCallback} that lists all chat-eligible workflows in the current workspace. A workflow is
- * chat-eligible if its trigger type starts with {@code chat/} and the trigger's {@code mode} parameter is absent or
- * equal to 1 (hosted-chat mode). Returns a compact JSON array suitable for the AI Hub BUILD agent.
+ * Spring AI {@link ToolCallback} that lists all chat-eligible workflows in the current workspace. Chat-eligibility is
+ * {@link HostedChatTriggers#hasHostedChatTrigger(java.util.List)} — the same predicate the sibling GraphQL chat
+ * listings use, so this tool never offers the agent a workflow those surfaces would hide. Returns a compact JSON array
+ * suitable for the AI Hub BUILD agent.
  *
  * @version ee
  *
@@ -55,8 +57,6 @@ import tools.jackson.databind.json.JsonMapper;
 public class ListChatWorkflowsToolCallback implements ToolCallback {
 
     private static final Logger log = LoggerFactory.getLogger(ListChatWorkflowsToolCallback.class);
-
-    private static final String CHAT_TRIGGER_TYPE_PREFIX = "chat/";
 
     private static final String DESCRIPTION = """
         List all workflows in the workspace that can be run as a chat — i.e. those
@@ -204,7 +204,7 @@ public class ListChatWorkflowsToolCallback implements ToolCallback {
 
                 List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
 
-                if (workflowTriggers.isEmpty() || !hasHostedChatTrigger(workflowTriggers)) {
+                if (!HostedChatTriggers.hasHostedChatTrigger(workflowTriggers)) {
                     continue;
                 }
 
@@ -254,26 +254,6 @@ public class ListChatWorkflowsToolCallback implements ToolCallback {
             return ToolErrors.runtimeFailure(
                 jsonMapper, ListChatWorkflowsToolCallback.class, "listChatWorkflows", exception);
         }
-    }
-
-    private static boolean hasHostedChatTrigger(List<WorkflowTrigger> workflowTriggers) {
-        boolean hasChatTrigger = workflowTriggers.stream()
-            .map(WorkflowTrigger::getType)
-            .anyMatch(type -> type != null && type.startsWith(CHAT_TRIGGER_TYPE_PREFIX));
-
-        if (!hasChatTrigger) {
-            return false;
-        }
-
-        WorkflowTrigger firstTrigger = workflowTriggers.getFirst();
-        Map<String, ?> parameters = firstTrigger.getParameters();
-        Object mode = parameters.get("mode");
-
-        if (mode == null) {
-            return true;
-        }
-
-        return mode instanceof Number number && number.intValue() == 1;
     }
 
     private @Nullable String resolveStaticWebhookExecutionId(

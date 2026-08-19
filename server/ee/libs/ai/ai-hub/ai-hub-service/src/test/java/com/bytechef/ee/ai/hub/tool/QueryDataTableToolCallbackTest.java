@@ -22,8 +22,8 @@ import com.bytechef.automation.assetfile.domain.AssetFileFormat;
 import com.bytechef.ee.ai.hub.artifact.ArtifactGeneratorRegistry;
 import com.bytechef.ee.ai.hub.artifact.GenerationRequest;
 import com.bytechef.ee.ai.hub.artifact.GenerationResult;
-import com.bytechef.ee.ai.hub.task.AiHubTask;
-import com.bytechef.ee.ai.hub.task.AiHubTaskService;
+import com.bytechef.ee.ai.hub.chat.AiHubChat;
+import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
@@ -167,11 +167,11 @@ class QueryDataTableToolCallbackTest {
     void testExportToCsvWritesAssetFileAndReturnsEnvelope() throws Exception {
         // Pin the export-CSV branch end-to-end: rows go to the CSV generator, the result envelope keys on
         // exported=true so the LLM dispatches differently from the inline path, the asset_file id surfaces back
-        // for the chip, and taskLinked propagates so the LLM can mention the file in chat.
+        // for the chip, and chatLinked propagates so the LLM can mention the file in chat.
         DataTableRowService dataTableRowService = mock(DataTableRowService.class);
         DataTableService dataTableService = mock(DataTableService.class);
         ArtifactGeneratorRegistry registry = mock(ArtifactGeneratorRegistry.class);
-        AiHubTaskService taskService = mock(AiHubTaskService.class);
+        AiHubChatService chatService = mock(AiHubChatService.class);
 
         when(dataTableService.getBaseNameById(42L)).thenReturn("contacts");
         when(dataTableRowService.listRows(eq("contacts"), anyInt(), eq(0), anyLong()))
@@ -179,16 +179,16 @@ class QueryDataTableToolCallbackTest {
                 new DataTableRow(1L, Map.of("name", "Alice", "city", "NA")),
                 new DataTableRow(2L, Map.of("name", "Bob", "city", "EU"))));
 
-        AiHubTask task = mock(AiHubTask.class);
+        AiHubChat chat = mock(AiHubChat.class);
 
-        when(task.getId()).thenReturn(7L);
-        when(taskService.findByThreadId("thread-1")).thenReturn(Optional.of(task));
+        when(chat.getId()).thenReturn(7L);
+        when(chatService.findByThreadId("thread-1")).thenReturn(Optional.of(chat));
 
         when(registry.generate(eq(AssetFileFormat.CSV), any(GenerationRequest.class)))
             .thenReturn(new GenerationResult(101L, "contacts-export.csv", AssetFileFormat.CSV, true));
 
         QueryDataTableToolCallback callback = new QueryDataTableToolCallback(
-            registry, taskService, dataTableRowService, dataTableService);
+            registry, chatService, dataTableRowService, dataTableService);
 
         ToolContext toolContext = new ToolContext(
             new AiHubToolInvocationContext(1L, 10L, (short) 0, "give me a csv", 0L, "thread-1")
@@ -205,7 +205,7 @@ class QueryDataTableToolCallbackTest {
             .asLong()).isEqualTo(101L);
         assertThat(node.get("rowCount")
             .asInt()).isEqualTo(2);
-        assertThat(node.get("taskLinked")
+        assertThat(node.get("chatLinked")
             .asBoolean()).isTrue();
 
         ArgumentCaptor<GenerationRequest> requestCaptor = ArgumentCaptor.forClass(GenerationRequest.class);
@@ -216,7 +216,7 @@ class QueryDataTableToolCallbackTest {
 
         assertThat(captured.workspaceId()).isEqualTo(1L);
         assertThat(captured.userId()).isEqualTo(10L);
-        assertThat(captured.taskId()).isEqualTo(7L);
+        assertThat(captured.chatId()).isEqualTo(7L);
         // Header row + two data rows; quoted-comma escaping happens via escapeCsvField — the cell values here are
         // simple so the rendered CSV is naive comma-joined; the test pins the row count rather than the exact
         // string to avoid coupling to header iteration order (LinkedHashSet is insertion-ordered, but per-row

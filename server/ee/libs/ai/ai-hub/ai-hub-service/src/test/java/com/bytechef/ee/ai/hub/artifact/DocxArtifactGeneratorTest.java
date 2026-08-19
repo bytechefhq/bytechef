@@ -18,7 +18,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.automation.assetfile.domain.AssetFile;
 import com.bytechef.automation.assetfile.domain.AssetFileFormat;
 import com.bytechef.automation.assetfile.service.AssetFileFacade;
-import com.bytechef.ee.ai.hub.task.AiHubTaskAssetFileService;
+import com.bytechef.ee.ai.hub.chat.AiHubChatAssetFileService;
 import java.io.ByteArrayInputStream;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
@@ -39,7 +39,7 @@ class DocxArtifactGeneratorTest {
         // valid-looking but empty XWPF (e.g. forgot to call addRun) would still pass a "facade was called" check
         // — checking the actual rendered text is what catches that class of bug.
         AssetFileFacade facade = mock(AssetFileFacade.class);
-        AiHubTaskAssetFileService linkService = mock(AiHubTaskAssetFileService.class);
+        AiHubChatAssetFileService linkService = mock(AiHubChatAssetFileService.class);
 
         AssetFile saved = mock(AssetFile.class);
 
@@ -93,7 +93,7 @@ class DocxArtifactGeneratorTest {
     @Test
     void testGenerateAppendsDocxExtension() {
         AssetFileFacade facade = mock(AssetFileFacade.class);
-        AiHubTaskAssetFileService linkService = mock(AiHubTaskAssetFileService.class);
+        AiHubChatAssetFileService linkService = mock(AiHubChatAssetFileService.class);
 
         AssetFile saved = mock(AssetFile.class);
 
@@ -115,7 +115,7 @@ class DocxArtifactGeneratorTest {
     @Test
     void testGenerateRejectsMalformedSpec() {
         AssetFileFacade facade = mock(AssetFileFacade.class);
-        AiHubTaskAssetFileService linkService = mock(AiHubTaskAssetFileService.class);
+        AiHubChatAssetFileService linkService = mock(AiHubChatAssetFileService.class);
 
         DocxArtifactGenerator generator = new DocxArtifactGenerator(facade, linkService);
 
@@ -131,7 +131,7 @@ class DocxArtifactGeneratorTest {
         // for cover pages and one-line memos. Pin so a regression that requires sections=[] doesn't reject this
         // valid use case.
         AssetFileFacade facade = mock(AssetFileFacade.class);
-        AiHubTaskAssetFileService linkService = mock(AiHubTaskAssetFileService.class);
+        AiHubChatAssetFileService linkService = mock(AiHubChatAssetFileService.class);
 
         AssetFile saved = mock(AssetFile.class);
 

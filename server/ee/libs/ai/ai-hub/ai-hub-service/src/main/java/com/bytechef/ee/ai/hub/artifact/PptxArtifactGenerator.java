@@ -10,8 +10,8 @@ package com.bytechef.ee.ai.hub.artifact;
 import com.bytechef.automation.assetfile.domain.AssetFile;
 import com.bytechef.automation.assetfile.domain.AssetFileFormat;
 import com.bytechef.automation.assetfile.service.AssetFileFacade;
-import com.bytechef.ee.ai.hub.task.AiHubTaskAssetFileService;
-import com.bytechef.ee.ai.hub.task.AuthorshipAlreadyAssignedException;
+import com.bytechef.ee.ai.hub.chat.AiHubChatAssetFileService;
+import com.bytechef.ee.ai.hub.chat.AuthorshipAlreadyAssignedException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.awt.Rectangle;
 import java.io.ByteArrayOutputStream;
@@ -75,13 +75,13 @@ public class PptxArtifactGenerator implements ArtifactGenerator {
     private static final int SIDE_PADDING = 36;
 
     private final AssetFileFacade assetFileFacade;
-    private final AiHubTaskAssetFileService taskAssetFileService;
+    private final AiHubChatAssetFileService chatAssetFileService;
 
     public PptxArtifactGenerator(
-        AssetFileFacade assetFileFacade, AiHubTaskAssetFileService taskAssetFileService) {
+        AssetFileFacade assetFileFacade, AiHubChatAssetFileService chatAssetFileService) {
 
         this.assetFileFacade = assetFileFacade;
-        this.taskAssetFileService = taskAssetFileService;
+        this.chatAssetFileService = chatAssetFileService;
     }
 
     @Override
@@ -108,17 +108,17 @@ public class PptxArtifactGenerator implements ArtifactGenerator {
             request.generatedFromPrompt());
 
         boolean linked = false;
-        Long taskId = request.taskId();
+        Long chatId = request.chatId();
 
-        if (taskId != null) {
+        if (chatId != null) {
             try {
-                taskAssetFileService.recordAuthorship(taskId, saved.getId());
+                chatAssetFileService.recordAuthorship(chatId, saved.getId());
                 linked = true;
             } catch (AuthorshipAlreadyAssignedException exception) {
                 log.warn(
-                    "Generated PPTX asset_file {} already authored by another task; skipping AUTHORED join "
-                        + "for task {}",
-                    saved.getId(), taskId, exception);
+                    "Generated PPTX asset_file {} already authored by another chat; skipping AUTHORED join "
+                        + "for chat {}",
+                    saved.getId(), chatId, exception);
             }
         }
 

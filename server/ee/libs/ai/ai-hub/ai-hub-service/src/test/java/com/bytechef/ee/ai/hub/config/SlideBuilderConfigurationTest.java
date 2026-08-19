@@ -12,8 +12,8 @@ import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.mockito.Mockito.mock;
 
 import com.bytechef.automation.assetfile.service.AssetFileFacade;
-import com.bytechef.ee.ai.hub.task.AiHubTaskService;
-import com.bytechef.ee.ai.hub.tool.AiHubTaskArtifactRecorder;
+import com.bytechef.ee.ai.hub.chat.AiHubChatService;
+import com.bytechef.ee.ai.hub.tool.AiHubChatArtifactRecorder;
 import com.bytechef.ee.platform.ai.tool.usage.ToolUsageRecorder;
 import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.Test;
@@ -39,20 +39,20 @@ class SlideBuilderConfigurationTest {
     void testSlideBuilderChatClientIsBuilt() {
         ChatModel chatModel = mock(ChatModel.class);
         AssetFileFacade assetFileFacade = mock(AssetFileFacade.class);
-        AiHubTaskArtifactRecorder artifactRecorder =
-            mock(AiHubTaskArtifactRecorder.class);
+        AiHubChatArtifactRecorder artifactRecorder =
+            mock(AiHubChatArtifactRecorder.class);
         Resource promptResource = new ByteArrayResource(
             "You are a slide-deck-construction subagent.".getBytes(StandardCharsets.UTF_8),
             "test prompt_slide_builder.txt");
 
         ObjectProvider<ToolUsageRecorder> usageRecorderProvider = mock(ObjectProvider.class);
-        ObjectProvider<AiHubTaskService> taskServiceProvider = mock(ObjectProvider.class);
+        ObjectProvider<AiHubChatService> chatServiceProvider = mock(ObjectProvider.class);
         JsonMapper jsonMapper = new JsonMapper();
 
         assertThatNoException().isThrownBy(
             () -> slideBuilderConfiguration.slideBuilderChatClient(
                 chatModel, assetFileFacade, artifactRecorder,
-                usageRecorderProvider, taskServiceProvider, jsonMapper, promptResource));
+                usageRecorderProvider, chatServiceProvider, jsonMapper, promptResource));
     }
 
     @Test

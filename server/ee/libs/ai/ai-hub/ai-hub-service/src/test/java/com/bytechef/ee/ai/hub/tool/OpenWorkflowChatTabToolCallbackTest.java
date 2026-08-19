@@ -16,7 +16,7 @@ import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Unit tests for {@link OpenWorkflowChatTabToolCallback}. The tool is signaling-only — its server-side behaviour is to
- * echo the {@code threadId} back so the client subscriber can switch the active task. Tests pin the echo contract and
+ * echo the {@code threadId} back so the client subscriber can switch the active chat. Tests pin the echo contract and
  * the input validation, both of which the client subscriber depends on.
  *
  * @version ee
@@ -54,7 +54,7 @@ class OpenWorkflowChatTabToolCallbackTest {
 
         JsonNode node = jsonMapper.readTree(callback.call("{\"threadId\":\"   \"}"));
 
-        // Blank threadId would route the client to no task at all — fail closed rather than silently
+        // Blank threadId would route the client to no chat at all — fail closed rather than silently
         // open the empty AI Hub root.
         assertThat(node.has("error")).isTrue();
     }

@@ -19,8 +19,8 @@ import com.bytechef.automation.assetfile.domain.AssetFileFormat;
 import com.bytechef.ee.ai.hub.artifact.ArtifactGeneratorRegistry;
 import com.bytechef.ee.ai.hub.artifact.GenerationRequest;
 import com.bytechef.ee.ai.hub.artifact.GenerationResult;
-import com.bytechef.ee.ai.hub.task.AiHubTask;
-import com.bytechef.ee.ai.hub.task.AiHubTaskService;
+import com.bytechef.ee.ai.hub.chat.AiHubChat;
+import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -47,9 +47,9 @@ class GenerateArtifactToolCallbackTest {
         // Probe-oracle defense: a tool input with no bound workspace must NOT default-author into workspace 0
         // — the chat surface is the only authoritative source of workspace identity. Pin the error path.
         ArtifactGeneratorRegistry registry = mock(ArtifactGeneratorRegistry.class);
-        AiHubTaskService taskService = mock(AiHubTaskService.class);
+        AiHubChatService chatService = mock(AiHubChatService.class);
 
-        GenerateArtifactToolCallback callback = new GenerateArtifactToolCallback(registry, taskService);
+        GenerateArtifactToolCallback callback = new GenerateArtifactToolCallback(registry, chatService);
 
         String result = callback.call(
             "{\"format\":\"MARKDOWN\",\"filename\":\"r.md\",\"content\":\"# x\"}");
@@ -61,17 +61,17 @@ class GenerateArtifactToolCallbackTest {
     @Test
     void testCallDispatchesToRegistryWithBundledRequest() throws Exception {
         ArtifactGeneratorRegistry registry = mock(ArtifactGeneratorRegistry.class);
-        AiHubTaskService taskService = mock(AiHubTaskService.class);
+        AiHubChatService chatService = mock(AiHubChatService.class);
 
-        AiHubTask task = mock(AiHubTask.class);
+        AiHubChat chat = mock(AiHubChat.class);
 
-        when(task.getId()).thenReturn(7L);
-        when(taskService.findByThreadId("thread-1")).thenReturn(Optional.of(task));
+        when(chat.getId()).thenReturn(7L);
+        when(chatService.findByThreadId("thread-1")).thenReturn(Optional.of(chat));
 
         when(registry.generate(eq(AssetFileFormat.MARKDOWN), any(GenerationRequest.class)))
             .thenReturn(new GenerationResult(42L, "report.md", AssetFileFormat.MARKDOWN, true));
 
-        GenerateArtifactToolCallback callback = new GenerateArtifactToolCallback(registry, taskService);
+        GenerateArtifactToolCallback callback = new GenerateArtifactToolCallback(registry, chatService);
 
         String result = callback.call(
             "{\"format\":\"MARKDOWN\",\"filename\":\"report.md\",\"content\":\"# hello\"}",
@@ -85,7 +85,7 @@ class GenerateArtifactToolCallbackTest {
             .asText()).isEqualTo("report.md");
         assertThat(node.get("format")
             .asText()).isEqualTo("MARKDOWN");
-        assertThat(node.get("taskLinked")
+        assertThat(node.get("chatLinked")
             .asBoolean()).isTrue();
 
         ArgumentCaptor<GenerationRequest> requestCaptor = ArgumentCaptor.forClass(GenerationRequest.class);
@@ -97,24 +97,24 @@ class GenerateArtifactToolCallbackTest {
         assertThat(captured.workspaceId()).isEqualTo(1L);
         assertThat(captured.userId()).isEqualTo(10L);
         assertThat(captured.environmentId()).isEqualTo(0);
-        assertThat(captured.taskId()).isEqualTo(7L);
+        assertThat(captured.chatId()).isEqualTo(7L);
         assertThat(captured.generatedFromPrompt()).isEqualTo("summarise");
     }
 
     @Test
-    void testCallTreatsMissingTaskAsFirstTurn() {
-        // First-turn race: the tool fires before the chat endpoint has created the task row. The generator
-        // must persist the file with taskId=null rather than failing — pin the request.taskId=null
-        // path so a regression that throws on missing task surfaces here.
+    void testCallTreatsMissingChatAsFirstTurn() {
+        // First-turn race: the tool fires before the chat endpoint has created the chat row. The generator
+        // must persist the file with chatId=null rather than failing — pin the request.chatId=null
+        // path so a regression that throws on missing chat surfaces here.
         ArtifactGeneratorRegistry registry = mock(ArtifactGeneratorRegistry.class);
-        AiHubTaskService taskService = mock(AiHubTaskService.class);
+        AiHubChatService chatService = mock(AiHubChatService.class);
 
-        when(taskService.findByThreadId("thread-1")).thenReturn(Optional.empty());
+        when(chatService.findByThreadId("thread-1")).thenReturn(Optional.empty());
 
         when(registry.generate(eq(AssetFileFormat.MARKDOWN), any(GenerationRequest.class)))
             .thenReturn(new GenerationResult(42L, "first.md", AssetFileFormat.MARKDOWN, false));
 
-        GenerateArtifactToolCallback callback = new GenerateArtifactToolCallback(registry, taskService);
+        GenerateArtifactToolCallback callback = new GenerateArtifactToolCallback(registry, chatService);
 
         callback.call(
             "{\"format\":\"MARKDOWN\",\"filename\":\"first.md\",\"content\":\"# x\"}",
@@ -125,15 +125,15 @@ class GenerateArtifactToolCallbackTest {
         verify(registry).generate(eq(AssetFileFormat.MARKDOWN), requestCaptor.capture());
 
         assertThat(requestCaptor.getValue()
-            .taskId()).isNull();
+            .chatId()).isNull();
     }
 
     @Test
     void testCallReturnsErrorOnUnknownFormat() {
         ArtifactGeneratorRegistry registry = mock(ArtifactGeneratorRegistry.class);
-        AiHubTaskService taskService = mock(AiHubTaskService.class);
+        AiHubChatService chatService = mock(AiHubChatService.class);
 
-        GenerateArtifactToolCallback callback = new GenerateArtifactToolCallback(registry, taskService);
+        GenerateArtifactToolCallback callback = new GenerateArtifactToolCallback(registry, chatService);
 
         String result = callback.call(
             "{\"format\":\"BOGUS\",\"filename\":\"x\",\"content\":\"x\"}", toolContext());
@@ -145,9 +145,9 @@ class GenerateArtifactToolCallbackTest {
     @Test
     void testCallReturnsErrorOnMissingFilename() {
         ArtifactGeneratorRegistry registry = mock(ArtifactGeneratorRegistry.class);
-        AiHubTaskService taskService = mock(AiHubTaskService.class);
+        AiHubChatService chatService = mock(AiHubChatService.class);
 
-        GenerateArtifactToolCallback callback = new GenerateArtifactToolCallback(registry, taskService);
+        GenerateArtifactToolCallback callback = new GenerateArtifactToolCallback(registry, chatService);
 
         String result = callback.call(
             "{\"format\":\"MARKDOWN\",\"filename\":\"\",\"content\":\"# x\"}", toolContext());
@@ -161,12 +161,12 @@ class GenerateArtifactToolCallbackTest {
         // CE without the EE-only POI generators). Pin: the registry's IllegalArgumentException surfaces as a
         // structured tool error rather than bubbling up as a runtime failure.
         ArtifactGeneratorRegistry registry = mock(ArtifactGeneratorRegistry.class);
-        AiHubTaskService taskService = mock(AiHubTaskService.class);
+        AiHubChatService chatService = mock(AiHubChatService.class);
 
         when(registry.generate(eq(AssetFileFormat.PPTX), any(GenerationRequest.class)))
             .thenThrow(new IllegalArgumentException("No ArtifactGenerator registered for format 'PPTX'"));
 
-        GenerateArtifactToolCallback callback = new GenerateArtifactToolCallback(registry, taskService);
+        GenerateArtifactToolCallback callback = new GenerateArtifactToolCallback(registry, chatService);
 
         String result = callback.call(
             "{\"format\":\"PPTX\",\"filename\":\"deck.pptx\",\"content\":\"{}\"}", toolContext());
@@ -177,12 +177,12 @@ class GenerateArtifactToolCallbackTest {
     @Test
     void testCallDispatchesHtmlFormatToRegistry() throws Exception {
         ArtifactGeneratorRegistry registry = mock(ArtifactGeneratorRegistry.class);
-        AiHubTaskService taskService = mock(AiHubTaskService.class);
+        AiHubChatService chatService = mock(AiHubChatService.class);
 
         when(registry.generate(eq(AssetFileFormat.HTML), any(GenerationRequest.class)))
             .thenReturn(new GenerationResult(99L, "widget.html", AssetFileFormat.HTML, false));
 
-        GenerateArtifactToolCallback callback = new GenerateArtifactToolCallback(registry, taskService);
+        GenerateArtifactToolCallback callback = new GenerateArtifactToolCallback(registry, chatService);
 
         String html = "<!doctype html><html><head></head><body><h1>x</h1></body></html>";
 
@@ -201,9 +201,9 @@ class GenerateArtifactToolCallbackTest {
     @Test
     void testToolDescriptionAdvertisesHtmlInSchemaEnum() {
         ArtifactGeneratorRegistry registry = mock(ArtifactGeneratorRegistry.class);
-        AiHubTaskService taskService = mock(AiHubTaskService.class);
+        AiHubChatService chatService = mock(AiHubChatService.class);
 
-        GenerateArtifactToolCallback callback = new GenerateArtifactToolCallback(registry, taskService);
+        GenerateArtifactToolCallback callback = new GenerateArtifactToolCallback(registry, chatService);
 
         String schema = callback.getToolDefinition()
             .inputSchema();
@@ -216,9 +216,9 @@ class GenerateArtifactToolCallbackTest {
         // The steering line is the only nudge keeping the LLM from reaching for HTML when CHART/MARKDOWN
         // would do. Pin it so a refactor of the description doesn't silently drop the guidance.
         ArtifactGeneratorRegistry registry = mock(ArtifactGeneratorRegistry.class);
-        AiHubTaskService taskService = mock(AiHubTaskService.class);
+        AiHubChatService chatService = mock(AiHubChatService.class);
 
-        GenerateArtifactToolCallback callback = new GenerateArtifactToolCallback(registry, taskService);
+        GenerateArtifactToolCallback callback = new GenerateArtifactToolCallback(registry, chatService);
 
         String description = callback.getToolDefinition()
             .description();

@@ -67,7 +67,7 @@ public class AiHubToolAttachMetrics implements ToolStateVisibilityMetrics {
     }
 
     /**
-     * Records a state-visibility callback invocation ({@code listTaskTools}, {@code listConnectionsForComponent},
+     * Records a state-visibility callback invocation ({@code listChatTools}, {@code listConnectionsForComponent},
      * {@code lookupActionPropertyOptions}, {@code lookupTriggerPropertyOptions}). Tag {@code tool} discriminates; tag
      * {@code outcome} is one of {@code success}, {@code empty}, {@code error}, plus the lookup-specific outcomes
      * {@code connection_required}, {@code dependency_missing}, {@code no_options_for_property}. {@code empty} on
@@ -91,14 +91,14 @@ public class AiHubToolAttachMetrics implements ToolStateVisibilityMetrics {
     }
 
     /**
-     * Records an {@code attachTaskTool} invocation. Tag {@code outcome}:
+     * Records an {@code attachChatTool} invocation. Tag {@code outcome}:
      * <ul>
-     * <li>{@code new_component} — fresh attach, no prior binding for this (task, component, version, env) tuple.</li>
+     * <li>{@code new_component} — fresh attach, no prior binding for this (chat, component, version, env) tuple.</li>
      * <li>{@code rebound_connection} — hardened-attach rebind path: existing binding found, connection updated in
      * place. A spike here means the autonomous flow is doing what it's designed to (null-then-real) — useful signal
      * that the rebind is being exercised vs. dead code.</li>
      * <li>{@code connection_environment_mismatch} — defensive guard fired: the LLM-supplied {@code connectionId}
-     * resolved to a connection in a different environment than the chat's task. Should be near-zero in production
+     * resolved to a connection in a different environment than the chat's chat. Should be near-zero in production
      * (listConnectionsForComponent filters by env); a spike points to LLM hallucinating connection ids from prior
      * cross-env chat memory.</li>
      * <li>{@code error} — facade or context failure.</li>

@@ -56,7 +56,7 @@ class OpenKnowledgeBaseTabToolCallbackTest {
 
     @Test
     void testCallRecordsKnowledgeBaseReferenceWhenRecorderPresent() {
-        AiHubTaskArtifactRecorder artifactRecorder = mock(AiHubTaskArtifactRecorder.class);
+        AiHubChatArtifactRecorder artifactRecorder = mock(AiHubChatArtifactRecorder.class);
 
         OpenKnowledgeBaseTabToolCallback callback = new OpenKnowledgeBaseTabToolCallback(artifactRecorder);
 

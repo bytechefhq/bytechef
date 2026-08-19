@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <!--
+        Per-chat component binding (v2.2). Mirrors mcp_component (platform-mcp) but scoped to a
+        ai_hub_chat instead of an mcp_server. Each row pins a (component_name, version,
+        environment, optional connection) tuple to a chat; rows in ai_hub_chat_tool
+        then attach configured cluster-element invocations to the binding.
+
+        Loaded under automation/aihub_execution/ (not automation/aihub/) because the FK to
+        connection(id) requires the execution-tier `connection` table to exist. master.xml orders
+        automation/aihub_execution AFTER automation/asset_file specifically for this dependency layering.
+    -->
+    <changeSet id="20260501000001" author="Ivica Cardic">
+        <createTable tableName="ai_hub_chat_component">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="chat_id" type="BIGINT">
+                <constraints nullable="false"
+                             foreignKeyName="fk_ccc_chat"
+                             references="ai_hub_chat(id)"
+                             deleteCascade="true"/>
+            </column>
+            <column name="component_name" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="component_version" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <!--
+                Nullable: a deleted connection cascades to NULL here so the binding row stays attached to the
+                chat but becomes unusable until reconnected (surfaced in chat as a "Reconnect" chip).
+                Tools that don't need a connection (logic, math) hold a permanently-null connection_id.
+            -->
+            <column name="connection_id" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="environment" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)"/>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)"/>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!--
+            connection_id FK uses ON DELETE SET NULL so a deleted connection cascades to NULL on the binding
+            row (the binding stays attached to the chat but becomes unusable until reconnected,
+            surfaced in chat as a "Reconnect" chip). Tools that don't need a connection (logic, math) hold a
+            permanently-null connection_id. Liquibase's inline `<constraints>` element doesn't support
+            `deleteSetNull` in dbchangelog-4.20 (only `deleteCascade` is inline-supported), so the FK is
+            declared as a separate <addForeignKeyConstraint> — same pattern as ai_hub_usage's
+            chat_id FK.
+        -->
+        <addForeignKeyConstraint
+            baseTableName="ai_hub_chat_component"
+            baseColumnNames="connection_id"
+            constraintName="fk_ccc_connection"
+            referencedTableName="connection"
+            referencedColumnNames="id"
+            onDelete="SET NULL"/>
+
+        <!--
+            Idempotent attach: re-attaching the same (component, version, connection, environment) to a
+            chat should hit the existing row, not create a duplicate. The chat-driven flow uses this
+            to make "add slack tools to this chat" safe to call repeatedly without proliferating rows.
+        -->
+        <addUniqueConstraint
+            tableName="ai_hub_chat_component"
+            constraintName="uk_ccc_chat_comp_conn_env"
+            columnNames="chat_id, component_name, component_version, connection_id, environment"/>
+
+        <createIndex tableName="ai_hub_chat_component"
+                     indexName="idx_ccc_chat">
+            <column name="chat_id"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

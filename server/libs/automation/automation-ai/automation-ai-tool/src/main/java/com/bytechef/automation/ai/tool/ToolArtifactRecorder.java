@@ -35,7 +35,7 @@ public interface ToolArtifactRecorder {
      *
      * @param threadId     the AG-UI thread id that identifies the active task
      * @param userId       the id of the user who owns the task (may be {@code null} — will be treated as 0)
-     * @param artifactKind the kind string (matches {@code AiHubTaskArtifactKind.name()})
+     * @param artifactKind the kind string (matches {@code AiHubChatArtifactKind.name()})
      * @param artifactId   string representation of the created entity id
      * @param artifactName display name snapshot at creation time
      */

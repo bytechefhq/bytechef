@@ -9,7 +9,7 @@ package com.bytechef.ee.ai.hub.artifact;
 
 import com.bytechef.automation.assetfile.domain.AssetFileFormat;
 import com.bytechef.automation.assetfile.service.AssetFileFacade;
-import com.bytechef.ee.ai.hub.task.AiHubTaskAssetFileService;
+import com.bytechef.ee.ai.hub.chat.AiHubChatAssetFileService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import tools.jackson.core.JacksonException;
@@ -42,9 +42,9 @@ public class JsonArtifactGenerator extends AbstractTextArtifactGenerator {
     private static final JsonMapper JSON_MAPPER = new JsonMapper();
 
     public JsonArtifactGenerator(
-        AssetFileFacade assetFileFacade, AiHubTaskAssetFileService taskAssetFileService) {
+        AssetFileFacade assetFileFacade, AiHubChatAssetFileService chatAssetFileService) {
 
-        super(assetFileFacade, taskAssetFileService);
+        super(assetFileFacade, chatAssetFileService);
     }
 
     @Override

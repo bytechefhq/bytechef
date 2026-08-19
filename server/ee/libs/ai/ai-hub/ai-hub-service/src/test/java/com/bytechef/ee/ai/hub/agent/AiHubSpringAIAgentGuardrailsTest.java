@@ -40,8 +40,7 @@ import reactor.test.StepVerifier;
 /**
  * Pins {@link AiHubSpringAIAgent#resolveChatClient} as the single seam that attaches the workspace's
  * {@code AiGuardrailsAdvisor} to every AI Hub LLM turn: the default (builder-time) {@link ChatClient} AND a per-request
- * override client (the personal-agent model-override path), both a BLOCK-mode violation and a REDACT_AND_CONTINUE
- * downgrade.
+ * override client (the task model-override path), both a BLOCK-mode violation and a REDACT_AND_CONTINUE downgrade.
  *
  * @version ee
  *
@@ -81,7 +80,7 @@ class AiHubSpringAIAgentGuardrailsTest {
     }
 
     /**
-     * Coverage rationale pin: a personal agent's model-override ChatClient is resolved by
+     * Coverage rationale pin: a model-override ChatClient is resolved by
      * {@link AiHubSpringAIAgent.OverrideChatClientResolver}, but it still flows through
      * {@link AiHubSpringAIAgent#resolveChatClient} before the request spec is built, so the guardrail must be attached
      * there too — not only on the builder-time default client.
@@ -105,7 +104,6 @@ class AiHubSpringAIAgentGuardrailsTest {
         State state = new State();
 
         state.set(AiHubStateKeys.VERIFIED_WORKSPACE_ID, WORKSPACE_ID);
-        state.set(AiHubStateKeys.PERSONAL_AGENT_TITLE_KEY, "My Agent");
 
         ChatClient chatClient = agent.resolveChatClient(runInput(state));
 

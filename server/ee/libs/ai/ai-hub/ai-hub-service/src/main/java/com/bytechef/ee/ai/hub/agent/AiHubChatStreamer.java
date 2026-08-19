@@ -38,7 +38,7 @@ import tools.jackson.databind.ObjectMapper;
  * registered in-flight run and returns an emitter attached to its sink — the original run keeps streaming, the second
  * caller just gets the same events.</li>
  * <li>A separate {@link #attachToRun} call exposes the same sink under a different HTTP verb so the client's mount-time
- * probe can latch onto a streaming task without re-submitting the user's message.</li>
+ * probe can latch onto a streaming chat without re-submitting the user's message.</li>
  * </ul>
  *
  * <p>
@@ -78,7 +78,7 @@ public class AiHubChatStreamer {
      * is NOT re-invoked. Useful when assistant-ui's runtime retriggers POST on mount (rare, but happens with some
      * adapter shapes).</li>
      * <li>{@code threadId} is null → fall back to legacy single-shot behaviour (no registry, no attach support). This
-     * is the very-first-turn path before a task row exists; subsequent turns always carry the thread id.</li>
+     * is the very-first-turn path before a chat row exists; subsequent turns always carry the thread id.</li>
      * </ul>
      */
     public SseEmitter runAgent(LocalAgent agent, AgUiParameters agUiParameters, String threadId) {
@@ -127,7 +127,7 @@ public class AiHubChatStreamer {
 
     /**
      * Single-shot fall-through used when the controller couldn't resolve a verified thread id (e.g. very first turn,
-     * before the task row exists). Mirrors the original {@code AgUiService.runAgent} behaviour: emitter is the sole
+     * before the chat row exists). Mirrors the original {@code AgUiService.runAgent} behaviour: emitter is the sole
      * subscriber; a disconnect kills the agent's emission target but the run itself keeps going as a side-effect leak.
      * Acceptable because every subsequent turn carries the thread id and goes through the registered path.
      */

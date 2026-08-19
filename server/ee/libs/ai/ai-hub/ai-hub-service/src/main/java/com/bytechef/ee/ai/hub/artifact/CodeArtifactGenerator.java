@@ -9,7 +9,7 @@ package com.bytechef.ee.ai.hub.artifact;
 
 import com.bytechef.automation.assetfile.domain.AssetFileFormat;
 import com.bytechef.automation.assetfile.service.AssetFileFacade;
-import com.bytechef.ee.ai.hub.task.AiHubTaskAssetFileService;
+import com.bytechef.ee.ai.hub.chat.AiHubChatAssetFileService;
 import java.util.Map;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
@@ -64,9 +64,9 @@ public class CodeArtifactGenerator extends AbstractTextArtifactGenerator {
         Map.entry("xml", "application/xml"));
 
     public CodeArtifactGenerator(
-        AssetFileFacade assetFileFacade, AiHubTaskAssetFileService taskAssetFileService) {
+        AssetFileFacade assetFileFacade, AiHubChatAssetFileService chatAssetFileService) {
 
-        super(assetFileFacade, taskAssetFileService);
+        super(assetFileFacade, chatAssetFileService);
     }
 
     @Override

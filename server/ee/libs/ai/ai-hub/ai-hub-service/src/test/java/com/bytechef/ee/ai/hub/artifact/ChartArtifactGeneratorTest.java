@@ -19,7 +19,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.automation.assetfile.domain.AssetFile;
 import com.bytechef.automation.assetfile.domain.AssetFileFormat;
 import com.bytechef.automation.assetfile.service.AssetFileFacade;
-import com.bytechef.ee.ai.hub.task.AiHubTaskAssetFileService;
+import com.bytechef.ee.ai.hub.chat.AiHubChatAssetFileService;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,7 +32,7 @@ class ChartArtifactGeneratorTest {
     @Test
     void testGenerateAcceptsValidBarChart() {
         AssetFileFacade facade = mock(AssetFileFacade.class);
-        AiHubTaskAssetFileService linkService = mock(AiHubTaskAssetFileService.class);
+        AiHubChatAssetFileService linkService = mock(AiHubChatAssetFileService.class);
 
         AssetFile saved = mock(AssetFile.class);
 
@@ -71,7 +71,7 @@ class ChartArtifactGeneratorTest {
         // separate download request just to read the spec — and the metadata_json column would be perpetually null
         // for chart rows, which the audit page would surface as a "missing metadata" warning.
         AssetFileFacade facade = mock(AssetFileFacade.class);
-        AiHubTaskAssetFileService linkService = mock(AiHubTaskAssetFileService.class);
+        AiHubChatAssetFileService linkService = mock(AiHubChatAssetFileService.class);
 
         AssetFile saved = mock(AssetFile.class);
 
@@ -97,7 +97,7 @@ class ChartArtifactGeneratorTest {
     @Test
     void testGenerateAcceptsValidPieChart() {
         AssetFileFacade facade = mock(AssetFileFacade.class);
-        AiHubTaskAssetFileService linkService = mock(AiHubTaskAssetFileService.class);
+        AiHubChatAssetFileService linkService = mock(AiHubChatAssetFileService.class);
 
         AssetFile saved = mock(AssetFile.class);
 
@@ -127,7 +127,7 @@ class ChartArtifactGeneratorTest {
     @Test
     void testValidationRejectsUnknownChartType() {
         AssetFileFacade facade = mock(AssetFileFacade.class);
-        AiHubTaskAssetFileService linkService = mock(AiHubTaskAssetFileService.class);
+        AiHubChatAssetFileService linkService = mock(AiHubChatAssetFileService.class);
 
         ChartArtifactGenerator generator = new ChartArtifactGenerator(facade, linkService);
 
@@ -144,7 +144,7 @@ class ChartArtifactGeneratorTest {
         // as "where did my data point go?" — pinning the rejection at the generator turns that into an LLM-
         // recoverable error rather than silent visual data loss.
         AssetFileFacade facade = mock(AssetFileFacade.class);
-        AiHubTaskAssetFileService linkService = mock(AiHubTaskAssetFileService.class);
+        AiHubChatAssetFileService linkService = mock(AiHubChatAssetFileService.class);
 
         ChartArtifactGenerator generator = new ChartArtifactGenerator(facade, linkService);
 
@@ -160,7 +160,7 @@ class ChartArtifactGeneratorTest {
     @Test
     void testValidationRejectsRowMissingYKey() {
         AssetFileFacade facade = mock(AssetFileFacade.class);
-        AiHubTaskAssetFileService linkService = mock(AiHubTaskAssetFileService.class);
+        AiHubChatAssetFileService linkService = mock(AiHubChatAssetFileService.class);
 
         ChartArtifactGenerator generator = new ChartArtifactGenerator(facade, linkService);
 
@@ -177,7 +177,7 @@ class ChartArtifactGeneratorTest {
     @Test
     void testValidationRejectsEmptyData() {
         AssetFileFacade facade = mock(AssetFileFacade.class);
-        AiHubTaskAssetFileService linkService = mock(AiHubTaskAssetFileService.class);
+        AiHubChatAssetFileService linkService = mock(AiHubChatAssetFileService.class);
 
         ChartArtifactGenerator generator = new ChartArtifactGenerator(facade, linkService);
 
@@ -191,7 +191,7 @@ class ChartArtifactGeneratorTest {
     @Test
     void testValidationRejectsPieRowMissingValueKey() {
         AssetFileFacade facade = mock(AssetFileFacade.class);
-        AiHubTaskAssetFileService linkService = mock(AiHubTaskAssetFileService.class);
+        AiHubChatAssetFileService linkService = mock(AiHubChatAssetFileService.class);
 
         ChartArtifactGenerator generator = new ChartArtifactGenerator(facade, linkService);
 

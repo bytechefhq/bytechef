@@ -10,8 +10,8 @@ package com.bytechef.ee.ai.hub.config;
 import com.bytechef.automation.ai.tool.CreateBinaryAssetFileToolCallback;
 import com.bytechef.automation.ai.tool.GetAssetFileContentToolCallback;
 import com.bytechef.automation.assetfile.service.AssetFileFacade;
-import com.bytechef.ee.ai.hub.task.AiHubTaskService;
-import com.bytechef.ee.ai.hub.tool.AiHubTaskArtifactRecorder;
+import com.bytechef.ee.ai.hub.chat.AiHubChatService;
+import com.bytechef.ee.ai.hub.tool.AiHubChatArtifactRecorder;
 import com.bytechef.ee.ai.hub.tool.CreateSlideDeckToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenFileTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.SlideBuilderToolCallback;
@@ -59,9 +59,9 @@ public class SlideBuilderConfiguration {
     ChatClient slideBuilderChatClient(
         ChatModel chatModel,
         AssetFileFacade assetFileFacade,
-        AiHubTaskArtifactRecorder taskArtifactRecorder,
+        AiHubChatArtifactRecorder chatArtifactRecorder,
         ObjectProvider<ToolUsageRecorder> toolUsageRecorderProvider,
-        ObjectProvider<AiHubTaskService> taskServiceProvider,
+        ObjectProvider<AiHubChatService> chatServiceProvider,
         JsonMapper jsonMapper,
         @Value("classpath:prompt_slide_builder.txt") Resource promptResource) {
 
@@ -69,17 +69,17 @@ public class SlideBuilderConfiguration {
 
         CreateSlideDeckToolCallback createSlideDeck = new CreateSlideDeckToolCallback();
         CreateBinaryAssetFileToolCallback createBinaryAssetFile =
-            new CreateBinaryAssetFileToolCallback(assetFileFacade, taskArtifactRecorder, jsonMapper);
+            new CreateBinaryAssetFileToolCallback(assetFileFacade, chatArtifactRecorder, jsonMapper);
         GetAssetFileContentToolCallback getAssetFileContent = new GetAssetFileContentToolCallback(assetFileFacade);
         OpenFileTabToolCallback openFileTab = new OpenFileTabToolCallback();
 
         ToolUsageRecorder usageRecorder = toolUsageRecorderProvider.getIfAvailable();
-        AiHubTaskService taskService = taskServiceProvider.getIfAvailable();
+        AiHubChatService chatService = chatServiceProvider.getIfAvailable();
 
-        ToolCallback meteredCreateSlideDeck = (usageRecorder != null && taskService != null)
+        ToolCallback meteredCreateSlideDeck = (usageRecorder != null && chatService != null)
             ? new MeteredToolCallback(
                 createSlideDeck, "pptx_generate", 1, usageRecorder,
-                AiHubToolUsageContextResolver.create(taskService, "pptx_generate"),
+                AiHubToolUsageContextResolver.create(chatService, "pptx_generate"),
                 MeteredToolCallback.singleStringField("title"), jsonMapper)
             : createSlideDeck;
 

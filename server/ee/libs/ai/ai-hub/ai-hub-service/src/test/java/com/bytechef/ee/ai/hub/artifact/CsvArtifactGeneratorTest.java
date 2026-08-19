@@ -19,7 +19,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.automation.assetfile.domain.AssetFile;
 import com.bytechef.automation.assetfile.domain.AssetFileFormat;
 import com.bytechef.automation.assetfile.service.AssetFileFacade;
-import com.bytechef.ee.ai.hub.task.AiHubTaskAssetFileService;
+import com.bytechef.ee.ai.hub.chat.AiHubChatAssetFileService;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,7 +32,7 @@ class CsvArtifactGeneratorTest {
     @Test
     void testGenerateAcceptsConsistentRows() {
         AssetFileFacade facade = mock(AssetFileFacade.class);
-        AiHubTaskAssetFileService linkService = mock(AiHubTaskAssetFileService.class);
+        AiHubChatAssetFileService linkService = mock(AiHubChatAssetFileService.class);
 
         AssetFile saved = mock(AssetFile.class);
 
@@ -58,7 +58,7 @@ class CsvArtifactGeneratorTest {
         // the user's workspace and surface as an import error days later. Pin the row-count check so a regression
         // that loosens it surfaces here.
         AssetFileFacade facade = mock(AssetFileFacade.class);
-        AiHubTaskAssetFileService linkService = mock(AiHubTaskAssetFileService.class);
+        AiHubChatAssetFileService linkService = mock(AiHubChatAssetFileService.class);
 
         CsvArtifactGenerator generator = new CsvArtifactGenerator(facade, linkService);
 
@@ -75,7 +75,7 @@ class CsvArtifactGeneratorTest {
         // legitimate "Doe, John" cell would be miscounted as two columns and falsely rejected. This test pins that
         // the validator does not regress to a naive split.
         AssetFileFacade facade = mock(AssetFileFacade.class);
-        AiHubTaskAssetFileService linkService = mock(AiHubTaskAssetFileService.class);
+        AiHubChatAssetFileService linkService = mock(AiHubChatAssetFileService.class);
 
         AssetFile saved = mock(AssetFile.class);
 
@@ -99,7 +99,7 @@ class CsvArtifactGeneratorTest {
     @Test
     void testValidationAllowsEmbeddedNewlinesInQuotedField() {
         AssetFileFacade facade = mock(AssetFileFacade.class);
-        AiHubTaskAssetFileService linkService = mock(AiHubTaskAssetFileService.class);
+        AiHubChatAssetFileService linkService = mock(AiHubChatAssetFileService.class);
 
         AssetFile saved = mock(AssetFile.class);
 
@@ -128,7 +128,7 @@ class CsvArtifactGeneratorTest {
     @Test
     void testValidationRejectsEmptyContent() {
         AssetFileFacade facade = mock(AssetFileFacade.class);
-        AiHubTaskAssetFileService linkService = mock(AiHubTaskAssetFileService.class);
+        AiHubChatAssetFileService linkService = mock(AiHubChatAssetFileService.class);
 
         CsvArtifactGenerator generator = new CsvArtifactGenerator(facade, linkService);
 

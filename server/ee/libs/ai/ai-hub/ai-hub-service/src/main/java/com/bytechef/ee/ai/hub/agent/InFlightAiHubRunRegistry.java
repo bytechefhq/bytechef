@@ -30,8 +30,8 @@ import reactor.core.publisher.Sinks;
  * <ol>
  * <li>A client refresh mid-stream doesn't kill the agent — the original emitter dies, the run keeps publishing into its
  * {@link Sinks.Many replay sink}, and a later attach call sees both the buffered history and the live tail.</li>
- * <li>Multiple AI Hub tasks can stream concurrently — each registered with its own {@code threadId} sink. Switching
- * tasks in the sidebar reattaches to whichever sink is currently in flight (or to none, if the run completed since the
+ * <li>Multiple AI Hub chats can stream concurrently — each registered with its own {@code threadId} sink. Switching
+ * chats in the sidebar reattaches to whichever sink is currently in flight (or to none, if the run completed since the
  * last visit).</li>
  * </ol>
  *
@@ -257,7 +257,7 @@ public class InFlightAiHubRunRegistry {
     /**
      * Returns {@code true} if a non-terminated run exists for {@code threadId}. Used by the client's mount-time probe
      * to decide between "attach to existing stream" vs "start a fresh turn." A terminated-but-still-cached entry
-     * reports {@code false} so the sidebar's hydrate probe doesn't paint a stuck pulse on a task that already settled.
+     * reports {@code false} so the sidebar's hydrate probe doesn't paint a stuck pulse on a chat that already settled.
      */
     public boolean isInFlight(String threadId) {
         InFlightRun run = runs.getIfPresent(threadId);
@@ -267,7 +267,7 @@ public class InFlightAiHubRunRegistry {
 
     /**
      * Returns the thread ids that currently have non-terminated runs. Used by the sidebar's hydrate-on-mount probe to
-     * paint a "running" pulse on every task the user has actively streaming, not just the focused one.
+     * paint a "running" pulse on every chat the user has actively streaming, not just the focused one.
      */
     public Collection<String> getInFlightThreadIds() {
         List<String> result = new ArrayList<>();

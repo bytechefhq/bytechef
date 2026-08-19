@@ -39,6 +39,21 @@ public interface ProjectService {
 
     Optional<Project> fetchProject(String name, long workspaceId);
 
+    /**
+     * Non-throwing counterpart of {@link #getWorkflowProject(String)}, for callers to which "this workflow belongs to
+     * no project" is an ordinary answer rather than an error.
+     *
+     * <p>
+     * Prefer this over catching {@code getWorkflowProject}'s exception. That method is {@code @Transactional}, so the
+     * instant its proxy sees the throw, Spring's default {@code globalRollbackOnParticipationFailure} marks the
+     * CALLER's participating transaction rollback-only — the caller's catch block then runs, but its transaction is
+     * already doomed and fails at commit with {@code UnexpectedRollbackException}. Mocked unit tests never exercise
+     * that proxy chain and so never reveal it. Compare {@code ProjectCodeWorkflowServiceImpl#getProjectCodeWorkflow},
+     * which had to be annotated {@code noRollbackFor} for exactly this reason.
+     * </p>
+     */
+    Optional<Project> fetchWorkflowProject(String workflowId);
+
     Project getProjectDeploymentProject(long projectDeploymentId);
 
     Project getProject(long id);

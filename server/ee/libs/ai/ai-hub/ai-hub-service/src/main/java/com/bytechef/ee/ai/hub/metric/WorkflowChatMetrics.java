@@ -121,8 +121,8 @@ public class WorkflowChatMetrics {
     /**
      * Records a turn where the workflow could not be reached. Tag {@code reason} is one of {@code disabled} (the
      * upfront isWorkflowDisabled returned true) or {@code deleted} (the trigger lookup threw, indicating the workflow /
-     * project deployment / trigger was deleted out from under the task). Useful for spotting workspaces with stale
-     * workflow chats so the task can be archived or the workflow restored.
+     * project deployment / trigger was deleted out from under the chat). Useful for spotting workspaces with stale
+     * workflow chats so the chat can be archived or the workflow restored.
      */
     public void recordUnreachable(String reason) {
         MeterRegistry meterRegistry = meterRegistryProvider.getIfAvailable();

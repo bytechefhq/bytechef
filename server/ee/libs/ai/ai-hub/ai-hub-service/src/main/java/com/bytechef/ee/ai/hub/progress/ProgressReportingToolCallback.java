@@ -19,7 +19,7 @@ import org.springframework.ai.tool.definition.ToolDefinition;
  *
  * <p>
  * The progress text is: {@code "<subagentName>: <first 80 chars of input>"}. This gives the user a real-time signal
- * that the parent agent has delegated work to a named subagent and shows the first few characters of the task it was
+ * that the parent agent has delegated work to a named subagent and shows the first few characters of the chat it was
  * given.
  * </p>
  *

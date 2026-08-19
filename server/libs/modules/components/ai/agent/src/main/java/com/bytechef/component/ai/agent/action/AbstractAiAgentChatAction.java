@@ -50,6 +50,8 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.ai.agent.BaseToolFunction;
 import com.bytechef.platform.ai.constant.AiAgentToolContextKey;
 import com.bytechef.platform.ai.constant.ToolSuspendConstants;
+import com.bytechef.platform.ai.conversation.AgentConversationRecorder;
+import com.bytechef.platform.ai.conversation.AgentConversationRecorder.AgentConversation;
 import com.bytechef.platform.ai.guardrails.AiGuardrailsAdvisorProvider;
 import com.bytechef.platform.ai.workspaceprompt.WorkspaceSystemPromptAdvisorProvider;
 import com.bytechef.platform.component.ComponentConnection;
@@ -60,12 +62,14 @@ import com.bytechef.platform.component.definition.ai.agent.GuardrailsFunction;
 import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
 import com.bytechef.platform.component.definition.ai.agent.RagFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
+import com.bytechef.platform.configuration.constant.WorkflowExtConstants;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
 import com.bytechef.platform.tool.execution.ToolExecutionKind;
 import com.bytechef.platform.tool.execution.ToolExecutionOutcome;
 import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
 import com.bytechef.platform.tool.execution.ToolExecutionSurface;
+import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -79,6 +83,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -99,6 +105,8 @@ import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.augment.AugmentedToolCallbackProvider;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.beans.factory.ObjectProvider;
+import reactor.core.scheduler.Scheduler;
+import reactor.core.scheduler.Schedulers;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -119,6 +127,20 @@ public abstract class AbstractAiAgentChatAction {
     private final @Nullable ObjectProvider<ToolExecutionRecorder> toolExecutionRecorderObjectProvider;
     private final @Nullable ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider;
     private final @Nullable ObjectProvider<WorkspaceSystemPromptAdvisorProvider> workspaceSystemPromptAdvisorProviderObjectProvider;
+    private final @Nullable ObjectProvider<AgentConversationRecorder> agentConversationRecorderObjectProvider;
+
+    /**
+     * Bounds the partial-identity-stamp warning to one line per action instance — see
+     * {@link #recordAgentConversationTurn}. An action is a long-lived singleton, so this trades "every misconfigured
+     * agent is named" for "a misconfigured agent cannot flood the log on every turn"; the first one named is enough to
+     * start diagnosing.
+     */
+    private final AtomicBoolean partialIdentityStampWarned = new AtomicBoolean();
+
+    /**
+     * Bounds the recorder-failure warning to one line per action instance — see {@link #warnAboutRecordingFailure}.
+     */
+    private final AtomicBoolean recordingFailureWarned = new AtomicBoolean();
 
     protected AbstractAiAgentChatAction(
         AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
@@ -153,6 +175,19 @@ public abstract class AbstractAiAgentChatAction {
         @Nullable ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider,
         @Nullable ObjectProvider<WorkspaceSystemPromptAdvisorProvider> workspaceSystemPromptAdvisorProviderObjectProvider) {
 
+        this(aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager,
+            toolExecutionRecorderObjectProvider, aiGuardrailsAdvisorProviderObjectProvider,
+            workspaceSystemPromptAdvisorProviderObjectProvider, null);
+    }
+
+    protected AbstractAiAgentChatAction(
+        AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
+        ToolCallingManager toolCallingManager,
+        @Nullable ObjectProvider<ToolExecutionRecorder> toolExecutionRecorderObjectProvider,
+        @Nullable ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider,
+        @Nullable ObjectProvider<WorkspaceSystemPromptAdvisorProvider> workspaceSystemPromptAdvisorProviderObjectProvider,
+        @Nullable ObjectProvider<AgentConversationRecorder> agentConversationRecorderObjectProvider) {
+
         this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.clusterElementToolCallbacks =
             new ClusterElementToolCallbacks(aiAgentToolFacade, clusterElementDefinitionService);
@@ -160,6 +195,7 @@ public abstract class AbstractAiAgentChatAction {
         this.toolExecutionRecorderObjectProvider = toolExecutionRecorderObjectProvider;
         this.aiGuardrailsAdvisorProviderObjectProvider = aiGuardrailsAdvisorProviderObjectProvider;
         this.workspaceSystemPromptAdvisorProviderObjectProvider = workspaceSystemPromptAdvisorProviderObjectProvider;
+        this.agentConversationRecorderObjectProvider = agentConversationRecorderObjectProvider;
     }
 
     /**
@@ -210,21 +246,7 @@ public abstract class AbstractAiAgentChatAction {
 
         ChatModel chatModel = resolveChatModel(inputParameters, connectionParameters, clusterElementMap);
 
-        String conversationId = clusterElementMap.fetchClusterElement(CHAT_MEMORY)
-            .map(clusterElement -> {
-                Parameters chatMemoryParameters = ParametersFactory.create(clusterElement.getParameters());
-
-                String id = chatMemoryParameters.getString("conversationId");
-
-                if (id != null) {
-                    return id;
-                }
-
-                UUID uuid = UUID.randomUUID();
-
-                return uuid.toString();
-            })
-            .orElse(null);
+        String conversationId = resolveConversationId(clusterElementMap);
 
         // Build the chat-memory Result once here and share it with getAdvisors so the stateful SessionService backing
         // the memory implementation is not constructed twice (the Result carries the advisor AND the recall tool
@@ -846,6 +868,216 @@ public abstract class AbstractAiAgentChatAction {
         ComponentConnection componentConnection = componentConnections.get(clusterElement.getWorkflowNodeName());
 
         return ParametersFactory.create(componentConnection);
+    }
+
+    /**
+     * Resolves the conversation id off the node's (possibly absent) {@code CHAT_MEMORY} cluster element — extracted so
+     * both {@link #getChatClientRequestSpec} and the turn recorder resolve it the same way. When the element is
+     * configured with no explicit {@code conversationId} parameter, a fresh random one is returned on every call; that
+     * fallback is unreachable for an AI-Agent-generated workflow (its generator always pins an explicit
+     * {@code conversationId} expression), so calling this a second time after the turn completes cannot observe a
+     * different value there — see {@link #recordAgentConversationTurn}.
+     */
+    private static @Nullable String resolveConversationId(ClusterElementMap clusterElementMap) {
+        return clusterElementMap.fetchClusterElement(CHAT_MEMORY)
+            .map(clusterElement -> {
+                Parameters chatMemoryParameters = ParametersFactory.create(clusterElement.getParameters());
+
+                String id = chatMemoryParameters.getString("conversationId");
+
+                if (id != null) {
+                    return id;
+                }
+
+                UUID uuid = UUID.randomUUID();
+
+                return uuid.toString();
+            })
+            .orElse(null);
+    }
+
+    /**
+     * Captures the tenant bound to the <b>calling</b> thread and returns a runnable that re-binds it before reporting
+     * the turn, for actions that only know the turn is complete on some other thread — the streaming action reports
+     * from {@code Flux#doOnComplete}, which runs on a reactor thread.
+     *
+     * <p>
+     * {@link com.bytechef.tenant.TenantContext} is a bare {@link ThreadLocal} defaulting to {@code "public"}, so a
+     * reactor thread would otherwise route the Hub write into the wrong tenant's schema — and
+     * {@link #recordAgentConversationTurn}'s fail-open catch would swallow the evidence. The environment gets the same
+     * treatment one level up, through {@code AiAgentStreamChatAction#withEnvironmentContext} and
+     * {@code EnvironmentContextThreadLocalAccessor}; a {@code TenantContextThreadLocalAccessor} exists too, but both
+     * ride on {@code Hooks.enableAutomaticContextPropagation()}, which is installed by a
+     * {@code platform-configuration-service} bean that need not be on the classpath wherever this component runs.
+     * Capturing explicitly here holds regardless.
+     * </p>
+     *
+     * <p>
+     * The returned runnable does not do the work itself: it hands it to {@link Schedulers#boundedElastic()}. Reporting
+     * a turn opens a JDBC transaction and walks the conversation's whole session transcript to refresh the Hub row's
+     * preview and message count, which is an O(number of turns) <b>blocking</b> read — and the completion callback of a
+     * streaming LLM response runs on a shared <b>non-blocking</b> reactor thread ({@code reactor-http-nio-*}). Left
+     * inline, one long-lived channel conversation would stall that event loop for every unrelated request it also
+     * serves. The tenant is captured explicitly (below), so the extra hop costs nothing in fidelity.
+     * </p>
+     *
+     * <p>
+     * Must be called on the perform thread (i.e. while assembling the flux), not from inside the callback.
+     * </p>
+     */
+    protected Runnable createAgentConversationTurnRecorder(Parameters extensions, ActionContext context) {
+        String tenantId = TenantContext.getCurrentTenantId();
+
+        return () -> {
+            Scheduler scheduler = Schedulers.boundedElastic();
+
+            try {
+                scheduler.schedule(() -> recordAgentConversationTurn(tenantId, extensions, context));
+            } catch (RejectedExecutionException exception) {
+                // Only reachable once the scheduler is shutting down. Dropping the turn keeps the "never block the
+                // completion thread" invariant absolute; recording is best-effort by contract anyway.
+                context.log(
+                    log -> log.warn(
+                        "Failed to schedule the agent conversation turn recorder for the AI Hub", exception));
+            }
+        };
+    }
+
+    /**
+     * Reports a completed agent-chat turn to the optional, EE-only {@link AgentConversationRecorder} port so it can be
+     * surfaced in the AI Hub (ticket 732, {@code 2026-08-17-agent-run-hub-visibility}). Called once per completed turn
+     * by each concrete action, at the point where it considers the turn done — never from a job-status listener, which
+     * would have to recover the turn text from node output and would double-report for subflow children. Use
+     * {@link #createAgentConversationTurnRecorder} instead when the completion point is on another thread.
+     *
+     * <p>
+     * Skips entirely (no recorder interaction) when any of the following holds, all treated as "nothing to report"
+     * rather than an error:
+     * <ul>
+     * <li>no {@code AgentConversationRecorder} bean is registered (CE, or the recorder-less constructor);</li>
+     * <li>the run is an editor-environment test run — an Agent Studio test chat is not a conversation to archive;</li>
+     * <li>{@code conversationId} cannot be resolved — chat memory is off for this agent, so there is no session and
+     * therefore no Hub chat to attribute the turn to;</li>
+     * <li>the {@link WorkflowExtConstants#AI_HUB_WORKSPACE_ID}/{@link WorkflowExtConstants#AI_HUB_AGENT_ID}/
+     * {@link WorkflowExtConstants#AI_HUB_CREATOR_USER_ID} identity stamp {@code AiAgentWorkflowGenerator} writes onto
+     * the node is wholly absent — a hand-built canvas {@code aiAgent} node (out of scope for this feature; see the
+     * design spec's Scope section) never carries it.</li>
+     * </ul>
+     *
+     * <p>
+     * A <b>partial</b> stamp is a different state and is not silent: it means the generator ran but could not resolve
+     * one of the three fields (an agent with no workspace, or a creator that no longer maps to a user), so Hub
+     * visibility is dark for a reason ops needs to see. It is warned about once per action instance — enough to
+     * diagnose, bounded so a misconfigured agent cannot flood the log on every turn.
+     * </p>
+     *
+     * <p>
+     * Fail-open: any exception raised while resolving the stamp or calling the recorder is logged and swallowed — this
+     * method must never fail the agent's turn.
+     * </p>
+     */
+    protected void recordAgentConversationTurn(Parameters extensions, ActionContext context) {
+        recordAgentConversationTurn(TenantContext.getCurrentTenantId(), extensions, context);
+    }
+
+    private void recordAgentConversationTurn(String tenantId, Parameters extensions, ActionContext context) {
+        if (agentConversationRecorderObjectProvider == null) {
+            return;
+        }
+
+        try {
+            TenantContext.runWithTenantId(tenantId, () -> doRecordAgentConversationTurn(extensions, context));
+        } catch (Exception exception) {
+            warnAboutRecordingFailure(exception, context);
+        }
+    }
+
+    /**
+     * Warns once per action instance about a recorder failure, then drops to debug.
+     *
+     * <p>
+     * A failure here is usually permanent rather than transient: on a distributed EE deployment the recorder's
+     * workspace-verification lookup ({@code RemoteProjectServiceClient#fetchWorkflowProject}) is an unimplemented stub
+     * that throws {@code UnsupportedOperationException}, so an unbounded warn would repeat on <b>every</b> turn of
+     * every agent, forever. Same bounding as {@link #warnAboutPartialIdentityStamp}: the first line is enough to
+     * diagnose, and the rest stay available at debug.
+     * </p>
+     */
+    private void warnAboutRecordingFailure(Exception exception, ActionContext context) {
+        if (recordingFailureWarned.compareAndSet(false, true)) {
+            context.log(
+                log -> log.warn("Failed to record agent conversation turn for the AI Hub", exception));
+        } else {
+            context.log(
+                log -> log.debug("Failed to record agent conversation turn for the AI Hub", exception));
+        }
+    }
+
+    private void doRecordAgentConversationTurn(Parameters extensions, ActionContext context) {
+        AgentConversationRecorder agentConversationRecorder = Objects
+            .requireNonNull(agentConversationRecorderObjectProvider)
+            .getIfAvailable();
+
+        if (agentConversationRecorder == null) {
+            return;
+        }
+
+        if (context.isEditorEnvironment()) {
+            return;
+        }
+
+        ClusterElementMap clusterElementMap = ClusterElementMap.of(extensions);
+
+        String conversationId = resolveConversationId(clusterElementMap);
+
+        if (conversationId == null) {
+            return;
+        }
+
+        Long workspaceId = extensions.getLong(WorkflowExtConstants.AI_HUB_WORKSPACE_ID);
+        Long aiAgentId = extensions.getLong(WorkflowExtConstants.AI_HUB_AGENT_ID);
+        Long creatorUserId = extensions.getLong(WorkflowExtConstants.AI_HUB_CREATOR_USER_ID);
+
+        if (workspaceId == null && aiAgentId == null && creatorUserId == null) {
+            return;
+        }
+
+        if (workspaceId == null || aiAgentId == null || creatorUserId == null) {
+            warnAboutPartialIdentityStamp(workspaceId, aiAgentId, creatorUserId, context);
+
+            return;
+        }
+
+        // The workflow id and environment come from the platform's execution context, NOT from the node definition,
+        // so a hand-authored definition cannot forge them. The recorder needs the workflow id to verify the
+        // (forgeable) workspace stamp above against the workflow's real owning workspace — see AgentConversation.
+        String workflowId = null;
+        Long environmentId = null;
+
+        if (context instanceof ActionContextAware actionContextAware) {
+            workflowId = actionContextAware.getWorkflowId();
+            environmentId = actionContextAware.getEnvironmentId();
+        }
+
+        agentConversationRecorder.recordTurn(
+            new AgentConversation(
+                workspaceId, aiAgentId, creatorUserId, conversationId, null, null, workflowId, environmentId));
+    }
+
+    private void warnAboutPartialIdentityStamp(
+        @Nullable Long workspaceId, @Nullable Long aiAgentId, @Nullable Long creatorUserId, ActionContext context) {
+
+        if (!partialIdentityStampWarned.compareAndSet(false, true)) {
+            return;
+        }
+
+        context.log(
+            log -> log.warn(
+                "AI Hub visibility is off for this agent: the identity stamp on the aiAgent node is partial, so no " +
+                    "conversation turn can be reported. {}={}, {}={}, {}={} (a null field means the generator could " +
+                    "not resolve it — an agent with no workspace, or a creator that no longer maps to a user).",
+                WorkflowExtConstants.AI_HUB_WORKSPACE_ID, workspaceId, WorkflowExtConstants.AI_HUB_AGENT_ID, aiAgentId,
+                WorkflowExtConstants.AI_HUB_CREATOR_USER_ID, creatorUserId));
     }
 
     private static Consumer<ChatClient.AdvisorSpec> getConversationAdvisor(@Nullable String conversationId) {

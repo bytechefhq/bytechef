@@ -1,0 +1,216 @@
+"""
+AI Hub chat metadata. {@code threadId} is client-generated and keys Spring AI's chat-memory
+table; the (workspace, user, environment, threadId) tuple uniquely identifies the chat thread.
+"""
+type AiHubChat {
+    id: ID!
+    workspaceId: Long!
+    userId: Long!
+    threadId: String!
+    title: String
+    lastPreview: String
+    messageCount: Int!
+    status: AiHubChatStatus!
+    environmentId: Long!
+    createdAt: Long
+    updatedAt: Long
+    """
+    Discriminator for the chat flavour. STANDARD (default) talks to the LLM agent; WORKFLOW_CHAT
+    binds the chat to a specific workflow execution and the client picks ChatRuntimeProvider
+    instead of AiHubRuntimeProvider for those rows.
+    """
+    kind: AiHubChatKind!
+    """
+    Composite WorkflowExecutionId string the chat is bound to. Non-null when {@code kind = WORKFLOW_CHAT}.
+    """
+    workflowExecutionId: String
+    """
+    Parent project-deployment id for the workflow execution. Used by the sidebar to group workflow chats by project.
+    Non-null when {@code kind = WORKFLOW_CHAT}.
+    """
+    projectDeploymentId: Long
+    """
+    Whether the title was set automatically (creation-time auto-label or LLM regeneration) and remains eligible
+    for further LLM regeneration. Flips to false when the LLM regenerates a title or the user renames the
+    chat, so the regen loop fires once and then stops. The client uses this flag to decide whether to
+    invoke generateAiHubChatTitle on each turn.
+    """
+    autoTitled: Boolean!
+    """
+    Owning AiAgent id for a chat that originated from an agent's channel run (Slack, a schedule, ...).
+    Null for composer-created chats of every kind, including composer-created AGENT_CHAT rows. The client
+    treats a non-null aiAgentId together with a null workflowExecutionId as the signal that an AGENT_CHAT
+    row is channel-born rather than started from the composer's Agents cascade — the same two-signal check
+    AiHubAgentConversationRecorder#adoptChat uses server-side to decide whether an existing row may be
+    adopted by a new turn.
+    """
+    aiAgentId: Long
+}
+
+enum AiHubChatKind {
+    STANDARD
+    WORKFLOW_CHAT
+    AGENT_CHAT
+}
+
+enum AiHubChatStatus {
+    ACTIVE
+    ARCHIVED
+    DELETED
+}
+
+"""
+Single chat message in a chat. {@code role} is one of {@code user}/{@code assistant}/{@code system};
+{@code timestamp} is the message's epoch-milli arrival time.
+"""
+type AiHubChatMessage {
+    role: String!
+    content: String!
+    timestamp: Long!
+    """
+    Nullable JSON array of the tool activity that followed this row before the next visible row — entries are
+    {kind: "call", id, name, arguments} and {kind: "result", id, name, response}. The client rebuilds tool-call
+    cards and interactive tool-result cards (askUserQuestion, etc.) from it on reload.
+    """
+    toolEventsJson: String
+}
+
+input AiHubChatPatchInput {
+    id: ID!
+    workspaceId: ID!
+    title: String
+    lastPreview: String
+    messageCount: Int
+    status: AiHubChatStatus
+}
+
+extend type Query {
+    """
+    Lists aiHubChats for the current user in the given workspace, scoped to the supplied environment so
+    DEVELOPMENT chat history does not bleed into a PRODUCTION session view. Filtered by lifecycle status
+    (default {@code ACTIVE}).
+    """
+    aiHubChats(workspaceId: ID!, environment: Int!, status: AiHubChatStatus): [AiHubChat!]!
+
+    """
+    Returns the message history for a chat. Ownership is verified at the service layer — a caller who
+    is not the chat's owner gets a 403-equivalent error.
+    """
+    aiHubChatMessages(workspaceId: ID!, id: ID!): [AiHubChatMessage!]!
+
+    """
+    Returns the artifact log for a chat, ordered newest-first. Ownership is verified by the service
+    layer. Distinct from the workspace-wide {@code aiHubChatArtifacts} admin query — this is the
+    per-chat read used by the sidebar.
+    """
+    aiHubChatArtifactsByAiHubChat(workspaceId: ID!, id: ID!): [AiHubChatArtifact!]!
+}
+
+extend type Mutation {
+    """
+    Creates a new chat, or returns the existing one if the same {@code threadId} is reused. Idempotent
+    on (workspace, user, environment, threadId).
+    """
+    createAiHubChat(workspaceId: ID!, environment: Int!, threadId: String!): AiHubChat!
+
+    """
+    Creates (or returns the existing) workflow chat bound to the given workflow execution. Idempotent
+    on (workspace, user, environment, workflowExecutionId): re-clicking the same workflow-chat sidebar row restores
+    the existing thread instead of creating a duplicate. Returns a row with {@code kind = WORKFLOW_CHAT}.
+    For an AI Agent's workflow use {@code createAgentChatAiHubChat} instead, which stamps {@code AGENT_CHAT}.
+
+    Optional {@code title} is persisted on first creation (when the row doesn't yet exist) so workflow-chat
+    aiHubChats get a meaningful sidebar label without waiting for the LLM-driven title generation that the
+    bridge bypasses. Pass e.g. "{projectName} — {workflowLabel}" from the client. The title is NOT overwritten on
+    the idempotency path — once a row has been named, that name sticks.
+    """
+    createWorkflowChatAiHubChat(
+        workspaceId: ID!, environment: Int!, workflowExecutionId: String!, projectDeploymentId: ID!,
+        title: String): AiHubChat!
+
+    """
+    Creates an agent chat bound to the given AI Agent workflow's execution. Mechanically identical to
+    {@code createWorkflowChatAiHubChat} — always-new, same webhook bridge serves the turns — but the returned row
+    carries {@code kind = AGENT_CHAT} so the UI can present it as the agent the user picked rather than as the
+    hidden {@code __AI_AGENT__} project's workflow behind it.
+
+    Pass the agent's title as {@code title}; it becomes the new row's sidebar label, since the bridge bypasses the
+    LLM-driven title generation.
+    """
+    createAgentChatAiHubChat(
+        workspaceId: ID!, environment: Int!, workflowExecutionId: String!, projectDeploymentId: ID!,
+        title: String): AiHubChat!
+
+    """
+    Partial update of a chat by primary key. At least one of {@code title}, {@code lastPreview},
+    {@code messageCount}, {@code status} must be non-null — an all-null patch is rejected with an error.
+    """
+    updateAiHubChat(input: AiHubChatPatchInput!): AiHubChat!
+
+    """
+    Generates a title for a chat using the AI title-generation service, then saves it. Idempotent —
+    if the chat already has a non-blank title, returns the current state without calling the LLM.
+    Throws when the upstream model is unavailable so the client can surface a retryable error.
+    """
+    generateAiHubChatTitle(workspaceId: ID!, id: ID!): AiHubChat!
+
+    """
+    Hard-deletes a chat and removes its messages from the chat-memory table. Associated artifacts
+    cascade via the database FK. Returns true on success; throws Forbidden when the caller is not the
+    chat's owner.
+    """
+    deleteAiHubChat(workspaceId: ID!, id: ID!): Boolean!
+
+    """
+    Bulk-archives workflow-chat aiHubChats for the given workspace. Returns the number of rows that flipped
+    to ARCHIVED. Chats already ARCHIVED are skipped (idempotent); aiHubChats the caller doesn't own
+    are silently filtered (the service-layer ownership check rejects them per row, but we don't surface
+    individual failures — the caller asked to archive everything, partial successes are acceptable).
+
+    Designed for the "I have 30 workflow chats clogging my sidebar" cleanup case. The caller passes the kind
+    discriminator so this can later be extended to bulk-archive standard aiHubChats too without overloading
+    the same mutation; for now only WORKFLOW_CHAT is supported.
+    """
+    bulkArchiveWorkflowChatAiHubChats(workspaceId: ID!, environment: Int!): Int!
+
+    """
+    Cancels the in-flight workflow-chat turn for the given chat. Returns {@code true} if a job was
+    cancelled, {@code false} when the chat has no running turn (idempotent — the user may click stop
+    after the workflow already completed, and we want the client to be able to disambiguate that from a
+    successful cancel without complex error handling).
+
+    Resolves through the per-chat jobId registry that AgUiStreamBridge populates from the executor's
+    start event. Throws Forbidden when the caller doesn't own the chat.
+    """
+    cancelWorkflowChatTurn(workspaceId: ID!, id: ID!): Boolean!
+
+    """
+    Truncates the chat-memory history for a chat, deleting the message at {@code fromMessageIndex} and
+    every message after it. Used by the edit-and-resend UX: the user clicks edit on a previous user message,
+    the client truncates here, and the next runAgent call re-runs from the edited message.
+
+    Returns the number of messages deleted. Idempotent — calling with an index past the end deletes zero.
+    Throws Forbidden when the caller does not own the chat.
+    """
+    truncateAiHubChatMessages(workspaceId: ID!, id: ID!, fromMessageIndex: Int!): Int!
+
+    "Appends an assistant message to the chat's chat memory — persists an approval-resolution continuation streamed outside the bridge turn model."
+    appendAiHubChatAssistantMessage(workspaceId: ID!, id: ID!, content: String!): Boolean!
+
+    """
+    Cancels an in-flight LLM agent run for a STANDARD chat. Companion to
+    {@code cancelWorkflowChatTurn}, which targets workflow chats bound to a workflow execution.
+    The server marks the run terminated in the in-flight registry and emits a complete signal to any
+    SSE subscribers; a subsequent mount-time probe sees the chat as not-in-flight so the client stops
+    showing the streaming UI.
+
+    Returns {@code true} when a non-terminated run was cancelled, {@code false} when none was in flight
+    (idempotent — the user may click stop after the run finished, and we want the client to disambiguate
+    that from a successful cancel without complex error handling). Throws Forbidden when the caller does
+    not own the chat.
+
+    The optional runId is the AG-UI runId of the turn being stopped; when supplied the server
+    tombstones it so a Stop that reaches the server before the agent run registers still sticks.
+    """
+    cancelAiHubRun(workspaceId: ID!, id: ID!, runId: String): Boolean!
+}

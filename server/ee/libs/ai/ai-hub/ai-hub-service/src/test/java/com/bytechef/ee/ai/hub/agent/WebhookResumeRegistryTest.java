@@ -15,7 +15,7 @@ import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 /**
  * Unit tests for {@link WebhookResumeRegistry}. The registry's correctness lives almost entirely in the contract around
  * {@link WebhookResumeRegistry#consume(long)} — it must atomically remove-and-return so a duplicate delivery of the
- * same task turn doesn't fire the resume POST twice.
+ * same chat turn doesn't fire the resume POST twice.
  *
  * @version ee
  *
@@ -46,7 +46,7 @@ class WebhookResumeRegistryTest {
         registry.register(42L, "https://example.com/resume/abc");
 
         // First consume returns the URL; second consume sees an empty slot. This is the contract that
-        // prevents duplicate-resume-POST when a task receives two near-simultaneous turns.
+        // prevents duplicate-resume-POST when a chat receives two near-simultaneous turns.
         assertThat(registry.consume(42L)).isEqualTo("https://example.com/resume/abc");
         assertThat(registry.consume(42L)).isNull();
     }
@@ -59,18 +59,18 @@ class WebhookResumeRegistryTest {
         registry.register(42L, "https://example.com/resume/new");
 
         // The bridge contract is "the latest URL wins" — a workflow that emits a second
-        // ask_user_question on the same task should resume against the latest URL.
+        // ask_user_question on the same chat should resume against the latest URL.
         assertThat(registry.consume(42L)).isEqualTo("https://example.com/resume/new");
     }
 
     @Test
-    void testRegistryIsKeyedByTaskId() {
+    void testRegistryIsKeyedByChatId() {
         WebhookResumeRegistry registry = newRegistry();
 
         registry.register(1L, "https://example.com/resume/one");
         registry.register(2L, "https://example.com/resume/two");
 
-        // Independent tasks don't pollute each other's slots — concurrent workflow chats
+        // Independent chats don't pollute each other's slots — concurrent workflow chats
         // can each have their own pending resume URL.
         assertThat(registry.consume(1L)).isEqualTo("https://example.com/resume/one");
         assertThat(registry.consume(2L)).isEqualTo("https://example.com/resume/two");

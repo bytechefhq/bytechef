@@ -37,22 +37,22 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * <ul>
  * <li><b>Workspace catalog (v1).</b> {@link #populate()} re-indexes every tool-typed cluster element under the single
  * {@link #CATALOG_SESSION_ID} session. Used as the default search corpus when a chat turn isn't bound to a
- * task-specific tool subset (e.g. brand-new task that hasn't attached anything yet).</li>
- * <li><b>Per-task subset (v2).</b> {@link #populateForTask(long, Collection)} re-indexes the supplied tool list under a
- * task-scoped session id ({@link #taskSessionId(long)}). Used when a task has been seeded from a personal-agent
- * template or has had tools attached/detached, so search queries on that task only return its in-scope tools instead of
- * the workspace-wide catalog. Pairs with {@link #clearTaskSession(long)} on task deletion to keep the vector store from
- * accumulating orphaned per-task rows.</li>
+ * chat-specific tool subset (e.g. brand-new chat that hasn't attached anything yet).</li>
+ * <li><b>Per-chat subset (v2).</b> {@link #populateForChat(long, Collection)} re-indexes the supplied tool list under a
+ * chat-scoped session id ({@link #chatSessionId(long)}). Used when a chat has been seeded from a task's tool template
+ * or has had tools attached/detached, so search queries on that chat only return its in-scope tools instead of the
+ * workspace-wide catalog. Pairs with {@link #clearChatSession(long)} on chat deletion to keep the vector store from
+ * accumulating orphaned per-chat rows.</li>
  * </ul>
  *
  * <p>
- * <b>Why per-task sessions matter:</b> the workspace-wide catalog can grow into the thousands of tool entries once a
+ * <b>Why per-chat sessions matter:</b> the workspace-wide catalog can grow into the thousands of tool entries once a
  * workspace connects 50+ components. Even with top-K=5 search, the LLM's tool picks become noisier — Slack's
- * sendMessage and a custom Webhook's POST both surface for "send a message". A personal agent that pre-attaches the
- * three tools the agent's purpose actually needs (e.g. "summarize PRs": GitHub list-prs, GitHub get-pr-diff, Linear
- * create-issue) gives the LLM exactly those three to choose from, eliminating the noise. The session-id partition is
- * how we tell the {@link VectorToolIndex} "search this subset, not the workspace catalog" without re-architecting the
- * underlying pgvector store.
+ * sendMessage and a custom Webhook's POST both surface for "send a message". A task that pre-attaches the three tools
+ * the task's purpose actually needs (e.g. "summarize PRs": GitHub list-prs, GitHub get-pr-diff, Linear create-issue)
+ * gives the LLM exactly those three to choose from, eliminating the noise. The session-id partition is how we tell the
+ * {@link VectorToolIndex} "search this subset, not the workspace catalog" without re-architecting the underlying
+ * pgvector store.
  * </p>
  *
  * <p>
@@ -70,7 +70,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * {@link #populate()} path short-circuits when the current catalog's content hash matches the hash stored in
  * {@link #META_TABLE_NAME} from the previous successful populate — so cold-start cost drops to one tiny SQL query when
  * the catalog hasn't changed, and the 90-second embedding spin only happens on first boot or after a component
- * description / tool list actually changes. Per-task subset re-indexes ({@link #populateForTask}) skip the hash check
+ * description / tool list actually changes. Per-chat subset re-indexes ({@link #populateForChat}) skip the hash check
  * because those are 5–20 entries, on-demand, and the savings vs the bookkeeping aren't worth it.</li>
  * </ul>
  *
@@ -78,7 +78,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * Tool name shape exposed to the LLM: <code>componentName_clusterElementName</code>. This is the lookup key the advisor
  * uses to dispatch when the LLM picks a discovered tool by name; it MUST match the {@code toolName} on the registered
  * {@link ClusterElementToolCallback} (see {@link ToolSearchAdvisorConfiguration}). The same normalization applies
- * whether the entry is indexed under the workspace catalog or a task subset.
+ * whether the entry is indexed under the workspace catalog or a chat subset.
  * </p>
  *
  * @version ee
@@ -88,14 +88,14 @@ import org.springframework.jdbc.core.JdbcTemplate;
 public class ToolSearchCatalogFeeder {
 
     /**
-     * Session id for the workspace-wide tool catalog — the default search corpus used for tasks that don't have an
+     * Session id for the workspace-wide tool catalog — the default search corpus used for chats that don't have an
      * explicit tool subset attached. v1 used this as the only session id; v2 keeps it as the fallback while adding
-     * per-task sessions on top.
+     * per-chat sessions on top.
      */
     public static final String CATALOG_SESSION_ID = "ai_hub_tool_catalog";
 
     /**
-     * Per-mode persistent sessions for the AI Hub global static tool beans (project/workflow/component/task/...).
+     * Per-mode persistent sessions for the AI Hub global static tool beans (project/workflow/component/chat/...).
      * Embedded once at startup via {@link #populateGlobalTools(String, List)} and unioned into the per-mode searcher so
      * they are discoverable without being re-embedded on every user turn. Split per mode because the ASK read-only
      * variants and the BUILD full set share tool names (e.g. {@code listProjects}) and would collide in one session.
@@ -105,11 +105,11 @@ public class ToolSearchCatalogFeeder {
     public static final String GLOBAL_BUILD_SESSION_ID = CATALOG_SESSION_ID + ":global:build";
 
     /**
-     * Prefix for per-task session ids, joined with the task primary key via {@code :}. Keeping the prefix distinct from
+     * Prefix for per-chat session ids, joined with the chat primary key via {@code :}. Keeping the prefix distinct from
      * the workspace catalog id prevents collisions and makes the partition obvious in pgvector traces — a search trace
-     * showing {@code session_id = ai_hub_tool_catalog:task:42} immediately pinpoints which task drove the corpus.
+     * showing {@code session_id = ai_hub_tool_catalog:chat:42} immediately pinpoints which chat drove the corpus.
      */
-    private static final String TASK_SESSION_PREFIX = CATALOG_SESSION_ID + ":task:";
+    private static final String CHAT_SESSION_PREFIX = CATALOG_SESSION_ID + ":chat:";
 
     /**
      * Per-session bookkeeping for the catalog-hash skip. Explicitly schema-qualified to the same fixed schema the
@@ -148,12 +148,12 @@ public class ToolSearchCatalogFeeder {
     }
 
     /**
-     * Returns the session id used to index the given task's tool subset. Stable across calls so
-     * {@link #populateForTask(long, Collection)} and {@link #clearTaskSession(long)} agree on which pgvector partition
+     * Returns the session id used to index the given chat's tool subset. Stable across calls so
+     * {@link #populateForChat(long, Collection)} and {@link #clearChatSession(long)} agree on which pgvector partition
      * to write/clear.
      */
-    public static String taskSessionId(long taskId) {
-        return TASK_SESSION_PREFIX + taskId;
+    public static String chatSessionId(long chatId) {
+        return CHAT_SESSION_PREFIX + chatId;
     }
 
     /**
@@ -214,8 +214,8 @@ public class ToolSearchCatalogFeeder {
     }
 
     /**
-     * Re-populates a task-scoped tool subset. The supplied {@code taskTools} list is expected to be the tools currently
-     * bound to the task (typically pulled from {@code AiHubTaskToolFacade.listTaskTools(taskId)} mapped to the
+     * Re-populates a chat-scoped tool subset. The supplied {@code chatTools} list is expected to be the tools currently
+     * bound to the chat (typically pulled from {@code AiHubChatToolFacade.listChatTools(chatId)} mapped to the
      * component-typed cluster-element triple). Resolution from binding to cluster-element definition happens here so
      * the caller doesn't need a {@code ClusterElementDefinitionService} reference.
      *
@@ -223,11 +223,10 @@ public class ToolSearchCatalogFeeder {
      * <b>Safe to re-call:</b> the index is cleared and re-built on every invocation. Call sites:
      * </p>
      * <ul>
-     * <li>AiHubTask creation (after personal-agent template tools have been copied) — populates the initial
-     * subset.</li>
-     * <li>Tool attached/detached on the task — refreshes the subset so the next search sees the change before the next
+     * <li>AiHubChat creation (after the task's template tools have been copied) — populates the initial subset.</li>
+     * <li>Tool attached/detached on the chat — refreshes the subset so the next search sees the change before the next
      * chat turn.</li>
-     * <li>AiHubTask delete — pair with {@link #clearTaskSession(long)} to release the entries.</li>
+     * <li>AiHubChat delete — pair with {@link #clearChatSession(long)} to release the entries.</li>
      * </ul>
      *
      * <p>
@@ -236,31 +235,31 @@ public class ToolSearchCatalogFeeder {
      * subset.
      * </p>
      *
-     * @param taskId    the task primary key
-     * @param taskTools the task's currently bound tools as (componentName, componentVersion, clusterElementName)
+     * @param chatId    the chat primary key
+     * @param chatTools the chat's currently bound tools as (componentName, componentVersion, clusterElementName)
      *                  triples; an empty collection clears the session
      */
-    public void populateForTask(long taskId, Collection<TaskToolReference> taskTools) {
-        String sessionId = taskSessionId(taskId);
+    public void populateForChat(long chatId, Collection<ChatToolReference> chatTools) {
+        String sessionId = chatSessionId(chatId);
 
-        if (taskTools == null || taskTools.isEmpty()) {
+        if (chatTools == null || chatTools.isEmpty()) {
             // No subset to index — clear so a previously-populated session doesn't leak into search results after
-            // the user has detached every tool. Equivalent to calling clearTaskSession explicitly; provided
+            // the user has detached every tool. Equivalent to calling clearChatSession explicitly; provided
             // here so call sites don't have to special-case the empty-collection branch.
             vectorToolIndex.clearIndex(sessionId);
 
             if (log.isDebugEnabled()) {
                 log.debug(
-                    "AiHubTask {} has no attached tools; cleared session {} (search will fall back to catalog)",
-                    taskId, sessionId);
+                    "AiHubChat {} has no attached tools; cleared session {} (search will fall back to catalog)",
+                    chatId, sessionId);
             }
 
             return;
         }
 
-        List<ClusterElementDefinition> resolvedDefinitions = new ArrayList<>(taskTools.size());
+        List<ClusterElementDefinition> resolvedDefinitions = new ArrayList<>(chatTools.size());
 
-        for (TaskToolReference reference : taskTools) {
+        for (ChatToolReference reference : chatTools) {
             try {
                 ClusterElementDefinition definition = clusterElementDefinitionService.getClusterElementDefinition(
                     reference.componentName(), reference.componentVersion(), reference.clusterElementName());
@@ -269,19 +268,19 @@ public class ToolSearchCatalogFeeder {
             } catch (RuntimeException exception) {
                 // Component upgrade dropped the action, OR the binding was attached against a component version
                 // that no longer ships. Log + skip rather than fail the populate — the user's other bound tools
-                // still get indexed and the task remains usable.
+                // still get indexed and the chat remains usable.
                 log.warn(
-                    "Skipping task tool {}/{} v{} for task {} — cluster element no longer in catalog",
+                    "Skipping chat tool {}/{} v{} for chat {} — cluster element no longer in catalog",
                     reference.componentName(), reference.clusterElementName(), reference.componentVersion(),
-                    taskId, exception);
+                    chatId, exception);
             }
         }
 
         int indexed = indexCatalog(sessionId, resolvedDefinitions);
 
         log.info(
-            "Tool search subset populated for task {}: indexed {} of {} attached tools under session {}",
-            taskId, indexed, taskTools.size(), sessionId);
+            "Tool search subset populated for chat {}: indexed {} of {} attached tools under session {}",
+            chatId, indexed, chatTools.size(), sessionId);
     }
 
     /**
@@ -335,22 +334,22 @@ public class ToolSearchCatalogFeeder {
     }
 
     /**
-     * Removes every entry from the given task's session. Used on task deletion to keep the vector store from
-     * accumulating orphaned per-task rows. Idempotent — calling with an unknown task id is a benign no-op (no-op clear
+     * Removes every entry from the given chat's session. Used on chat deletion to keep the vector store from
+     * accumulating orphaned per-chat rows. Idempotent — calling with an unknown chat id is a benign no-op (no-op clear
      * in the underlying searcher).
      */
-    public void clearTaskSession(long taskId) {
-        String sessionId = taskSessionId(taskId);
+    public void clearChatSession(long chatId) {
+        String sessionId = chatSessionId(chatId);
 
         vectorToolIndex.clearIndex(sessionId);
 
         if (log.isDebugEnabled()) {
-            log.debug("Cleared tool search session {} for task {}", sessionId, taskId);
+            log.debug("Cleared tool search session {} for chat {}", sessionId, chatId);
         }
     }
 
     /**
-     * Shared indexing routine used by both the workspace-catalog and per-task paths. Builds the filtered
+     * Shared indexing routine used by both the workspace-catalog and per-chat paths. Builds the filtered
      * {@link CatalogEntry} list (skipping cluster elements with a blank summary) then delegates to
      * {@link #indexEntries(String, List)} for the clear-then-index work. Returns the number of entries actually
      * indexed.
@@ -384,7 +383,7 @@ public class ToolSearchCatalogFeeder {
      * underlying {@code VectorStore.add} runs its {@code BatchingStrategy} over the full document list and embeds each
      * batch in one request, so a several-hundred-entry catalog collapses from one embedding HTTP round-trip per tool to
      * a handful — cutting first-boot latency and embedding-endpoint request-rate pressure. Used by the workspace
-     * catalog, per-task subset, and global tool paths.
+     * catalog, per-chat subset, and global tool paths.
      */
     private int indexEntries(String sessionId, List<CatalogEntry> entries) {
         vectorToolIndex.clearIndex(sessionId);
@@ -422,13 +421,13 @@ public class ToolSearchCatalogFeeder {
     }
 
     /**
-     * Lightweight DTO for {@link #populateForTask(long, Collection)} input. Decouples the feeder from the task-tool
-     * persistence shape — callers can adapt {@code AiHubTaskToolBinding} (full join including connection/parameters)
+     * Lightweight DTO for {@link #populateForChat(long, Collection)} input. Decouples the feeder from the chat-tool
+     * persistence shape — callers can adapt {@code AiHubChatToolBinding} (full join including connection/parameters)
      * into this triple without dragging the binding's connection-typed dependencies into the feeder's API surface.
      */
-    public record TaskToolReference(String componentName, int componentVersion, String clusterElementName) {
+    public record ChatToolReference(String componentName, int componentVersion, String clusterElementName) {
 
-        public TaskToolReference {
+        public ChatToolReference {
             Objects.requireNonNull(componentName, "componentName");
             Objects.requireNonNull(clusterElementName, "clusterElementName");
         }

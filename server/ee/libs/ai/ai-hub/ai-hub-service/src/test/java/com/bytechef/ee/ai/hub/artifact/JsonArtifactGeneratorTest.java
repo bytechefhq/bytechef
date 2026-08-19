@@ -18,7 +18,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.automation.assetfile.domain.AssetFile;
 import com.bytechef.automation.assetfile.domain.AssetFileFormat;
 import com.bytechef.automation.assetfile.service.AssetFileFacade;
-import com.bytechef.ee.ai.hub.task.AiHubTaskAssetFileService;
+import com.bytechef.ee.ai.hub.chat.AiHubChatAssetFileService;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,7 +31,7 @@ class JsonArtifactGeneratorTest {
     @Test
     void testGenerateAcceptsValidJsonObject() {
         AssetFileFacade facade = mock(AssetFileFacade.class);
-        AiHubTaskAssetFileService linkService = mock(AiHubTaskAssetFileService.class);
+        AiHubChatAssetFileService linkService = mock(AiHubChatAssetFileService.class);
 
         AssetFile saved = mock(AssetFile.class);
 
@@ -57,7 +57,7 @@ class JsonArtifactGeneratorTest {
         // always an object — pin the array path so a regression that narrowed validation to objects only would fail
         // here.
         AssetFileFacade facade = mock(AssetFileFacade.class);
-        AiHubTaskAssetFileService linkService = mock(AiHubTaskAssetFileService.class);
+        AiHubChatAssetFileService linkService = mock(AiHubChatAssetFileService.class);
 
         AssetFile saved = mock(AssetFile.class);
 
@@ -79,7 +79,7 @@ class JsonArtifactGeneratorTest {
     @Test
     void testValidationRejectsMalformedJson() {
         AssetFileFacade facade = mock(AssetFileFacade.class);
-        AiHubTaskAssetFileService linkService = mock(AiHubTaskAssetFileService.class);
+        AiHubChatAssetFileService linkService = mock(AiHubChatAssetFileService.class);
 
         JsonArtifactGenerator generator = new JsonArtifactGenerator(facade, linkService);
 
@@ -94,7 +94,7 @@ class JsonArtifactGeneratorTest {
         // The Jackson default parser does NOT accept JSON5 trailing commas; if the LLM emits "[1,2,]" we want to
         // reject so the model self-corrects, rather than sneaking through and failing at the consumer's parser.
         AssetFileFacade facade = mock(AssetFileFacade.class);
-        AiHubTaskAssetFileService linkService = mock(AiHubTaskAssetFileService.class);
+        AiHubChatAssetFileService linkService = mock(AiHubChatAssetFileService.class);
 
         JsonArtifactGenerator generator = new JsonArtifactGenerator(facade, linkService);
 
@@ -106,7 +106,7 @@ class JsonArtifactGeneratorTest {
     @Test
     void testValidationRejectsEmptyContent() {
         AssetFileFacade facade = mock(AssetFileFacade.class);
-        AiHubTaskAssetFileService linkService = mock(AiHubTaskAssetFileService.class);
+        AiHubChatAssetFileService linkService = mock(AiHubChatAssetFileService.class);
 
         JsonArtifactGenerator generator = new JsonArtifactGenerator(facade, linkService);
 

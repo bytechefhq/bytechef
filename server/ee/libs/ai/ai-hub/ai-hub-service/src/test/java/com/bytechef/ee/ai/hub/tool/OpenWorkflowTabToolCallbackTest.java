@@ -63,7 +63,7 @@ class OpenWorkflowTabToolCallbackTest {
 
     @Test
     void testCallRecordsWorkflowReferenceViaDedupPath() {
-        AiHubTaskArtifactRecorder artifactRecorder = mock(AiHubTaskArtifactRecorder.class);
+        AiHubChatArtifactRecorder artifactRecorder = mock(AiHubChatArtifactRecorder.class);
 
         OpenWorkflowTabToolCallback callback = new OpenWorkflowTabToolCallback(artifactRecorder);
 

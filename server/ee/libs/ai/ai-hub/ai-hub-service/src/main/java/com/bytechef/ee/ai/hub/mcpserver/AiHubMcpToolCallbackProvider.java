@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
 /**
  * Resolves the {@link ToolCallback}s for a user's ENABLED external MCP servers at agent-turn time: for each server it
  * gets a cached client, lists its tools, and bridges them via Spring AI's {@link SyncMcpToolCallbackProvider}. The
- * {@link com.bytechef.ee.ai.hub.toolsearch.AiHubTaskBindingToolCallbackResolver} unions these with the task's own tools
+ * {@link com.bytechef.ee.ai.hub.toolsearch.AiHubChatBindingToolCallbackResolver} unions these with the chat's own tools
  * and the user's added connectors.
  *
  * <p>

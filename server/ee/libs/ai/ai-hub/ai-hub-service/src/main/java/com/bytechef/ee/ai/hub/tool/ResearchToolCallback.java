@@ -33,8 +33,8 @@ import tools.jackson.databind.json.JsonMapper;
  * the synthesised markdown report returned by {@code call()}.
  *
  * <p>
- * <b>Why hand-rolled instead of {@code TaskTool.builder()}?</b> The
- * {@code org.springaicommunity.agent.tools.task.TaskTool} library's {@code ClaudeSubagentExecutor} injects a shared set
+ * <b>Why hand-rolled instead of {@code ChatTool.builder()}?</b> The
+ * {@code org.springaicommunity.agent.tools.chat.ChatTool} library's {@code ClaudeSubagentExecutor} injects a shared set
  * of Claude Code SDK tools (Grep, Glob, Shell, FileSystem, SmartWebFetch) that are incompatible with ByteChef's
  * Spring-managed {@link com.bytechef.platform.ai.tool.FirecrawlTools} bean. There is no API to register a named
  * subagent backed by an externally-constructed {@link ChatClient}; the builder only accepts {@link ChatClient.Builder}

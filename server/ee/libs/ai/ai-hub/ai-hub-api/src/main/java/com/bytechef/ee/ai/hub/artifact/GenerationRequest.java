@@ -35,14 +35,14 @@ import org.jspecify.annotations.Nullable;
  *                               appear on the {@code asset_file} row directly (workspace ownership is the access key).
  * @param environmentId          the environment ordinal the resulting row is partitioned to. Inherited from the chat
  *                               surface — the environment selector at the top of AI Hub decides this.
- * @param taskId                 the task id to link the file to via {@code (taskId, fileId,
- *                                AUTHORED)}. {@code null} on first-turn races where the task row does not yet exist;
+ * @param chatId                 the chat id to link the file to via {@code (chatId, fileId,
+ *                                AUTHORED)}. {@code null} on first-turn races where the chat row does not yet exist;
  *                               the file still persists in that case but with no join.
  * @param generatedByAgentSource the AG-UI agent source ordinal that produced this artifact (e.g. AI Hub). Persisted on
  *                               the {@code asset_file} row for cross-agent provenance reporting.
  * @param generatedFromPrompt    the user's last prompt text. Persisted on the {@code asset_file} row so the audit view
  *                               can surface "what did the user ask that produced this file?" without joining back to
- *                               the task message log.
+ *                               the chat message log.
  * @param filename               the desired file name. Generators may extend it with a format-specific extension if the
  *                               caller didn't include one (e.g. {@code "report"} → {@code "report.md"}).
  * @param payload                the generator-specific payload. For text generators this is the literal content; for
@@ -56,7 +56,7 @@ public record GenerationRequest(
     long workspaceId,
     long userId,
     int environmentId,
-    @Nullable Long taskId,
+    @Nullable Long chatId,
     short generatedByAgentSource,
     @Nullable String generatedFromPrompt,
     String filename,

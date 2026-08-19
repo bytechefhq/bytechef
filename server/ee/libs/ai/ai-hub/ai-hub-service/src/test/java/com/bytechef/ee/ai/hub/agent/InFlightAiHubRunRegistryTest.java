@@ -132,9 +132,9 @@ class InFlightAiHubRunRegistryTest {
 
     @Test
     void testGetInFlightThreadIdsReturnsOnlyActiveRuns() {
-        // Scenario: the sidebar wants to paint a pulse on each task currently streaming. A finished thread
+        // Scenario: the sidebar wants to paint a pulse on each chat currently streaming. A finished thread
         // that's still in the retention window must NOT appear — otherwise the user sees a stuck running
-        // pulse on a task that already settled.
+        // pulse on a chat that already settled.
         InFlightAiHubRunRegistry registry = newRegistry();
 
         registry.startRun("thread-1", "run-1");

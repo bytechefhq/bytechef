@@ -27,8 +27,7 @@ public enum AiHubAgentType implements AgentType {
     DATA_ANALYST("data_analyst", false),
     IMAGE_GENERATOR("image_generator", false),
     SLIDE_BUILDER("slide_builder", false),
-    WORKFLOW_BUILDER("workflow_builder", false),
-    TASK_AGENT("task_agent", false);
+    WORKFLOW_BUILDER("workflow_builder", false);
 
     private final String key;
     private final boolean fallback;

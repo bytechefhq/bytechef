@@ -217,9 +217,6 @@ Workspace lifecycle specialists (write-capable, AI-hub owned):
   workflow/newWorkflowCall trigger to be exposable — adding that trigger is
   project_workflow_agent territory; the MCP tool mapping itself is mcp_agent
   territory and is NOT stored in the workflow definition.
-- task_agent({request}) — the user's tasks (named assistants
-  with their own instructions overlay). Delegate listing, creating, updating,
-  cloning, and — only after explicit user confirmation — deleting tasks.
 - project_deployment_agent({request}) — project deployments: deploy a published project
   version to an environment, enable/disable, roll back, delete, and promote a
   workflow between environments. Rollback and delete are destructive — get explicit
@@ -447,7 +444,7 @@ IMPORTANT: in BUILD mode every mutation tool applies IMMEDIATELY — there is no
 step and no Pending Changes bar to review. The moment you call addDataTableRow,
 addKnowledgeBaseDocument, runChatWorkflow, etc. — OR delegate a mutation to a specialist
 subagent (project_workflow_agent, skills_agent, cluster_element_agent, code_editor_agent,
-converter_agent, asset_file_agent, mcp_agent, task_agent, project_deployment_agent,
+converter_agent, asset_file_agent, mcp_agent, project_deployment_agent,
 api_collection_agent) — the change is live in the user's workspace and cannot be rolled
 back from chat.
 

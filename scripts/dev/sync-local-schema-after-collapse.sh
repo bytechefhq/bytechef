@@ -18,13 +18,22 @@ DATABASE="${2:-bytechef}"
 
 # Relation tables the collapse removes, paired with the entity that gains workspace_id.
 # Add a line per table as each one is collapsed.
+# NOTE: this list is parsed line by line - no comments or blank-ish lines inside PAIRS.
+#
+# AI Hub deliberately has NO entry. Its two tables were renamed in place in Aug 2026
+# (ai_hub_personal_agent -> ai_hub_task, and the old conversation table ai_hub_task -> ai_hub_chat),
+# so the relation tables this script would drop are named after the PRE-rename entities
+# (workspace_ai_hub_personal_agent, workspace_ai_hub_task). A local DB old enough to still carry
+# those is also old enough to predate the rename, which this script cannot perform - such a DB must
+# be recreated, not patched. Post-rename DBs have no workspace_ai_hub_* tables at all. Worse, a pair
+# keyed on the shipped names would be actively wrong: in a legacy DB `workspace_ai_hub_task` holds
+# CONVERSATION membership, which must never be backfilled onto today's `ai_hub_task` (a task
+# definition).
 PAIRS="
 workspace_ai_auto_memory:ai_auto_memory
 workspace_context_store:context_store
 workspace_context_store_source:context_store_source
 workspace_knowledge_base_source:knowledge_base_source
-workspace_ai_hub_personal_agent:ai_hub_personal_agent
-workspace_ai_hub_task:ai_hub_task
 workspace_ai_gateway_budget:ai_gateway_budget
 workspace_ai_gateway_project:ai_gateway_project
 workspace_ai_gateway_provider:ai_gateway_provider

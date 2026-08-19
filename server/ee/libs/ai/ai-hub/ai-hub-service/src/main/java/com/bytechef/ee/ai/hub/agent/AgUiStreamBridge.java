@@ -86,7 +86,7 @@ public class AgUiStreamBridge implements SseStreamBridge {
     private final String messageId;
     private final String threadId;
     private final String runId;
-    private final long taskId;
+    private final long chatId;
     private final WebhookResumeRegistry resumeRegistry;
     private final WorkflowChatJobRegistry jobRegistry;
     private final WorkflowChatGuard guard;
@@ -101,7 +101,7 @@ public class AgUiStreamBridge implements SseStreamBridge {
      * Accumulates the assistant text emitted across all {@code onEvent(String)} chunks. The streaming path doesn't have
      * a single "final assistant message" the way the sync path does — the assistant reply is the concatenation of every
      * per-token delta. Capturing it here lets {@link WebhookBridgeAgent} persist the full reply to the session store
-     * when the run finalizes, so reloading the task later renders the assistant turn the same way it would for a
+     * when the run finalizes, so reloading the chat later renders the assistant turn the same way it would for a
      * non-streaming chat. Synchronization is via the {@code completed} AtomicBoolean — chunks arrive on a single
      * message-broker thread before completion so a plain StringBuilder is safe; a concurrent appender would force a
      * more elaborate ConcurrentLinkedQueue + drain.
@@ -137,12 +137,12 @@ public class AgUiStreamBridge implements SseStreamBridge {
     }
 
     /**
-     * @param taskId         the persistent {@code ai_hub_task.id} for the workflow chat — used as the key when
+     * @param chatId         the persistent {@code ai_hub_chat.id} for the workflow chat — used as the key when
      *                       registering a pending resume URL on {@code ask_user_question} events.
      *                       {@link WebhookBridgeAgent} reads this same key on the next turn to decide whether to start
      *                       a fresh workflow run or POST to the registered resume URL.
      * @param resumeRegistry the application-scoped registry where ask-user-question resume URLs land.
-     * @param guard          the per-task rate-limit + concurrency gate. Released on terminal events so the next turn
+     * @param guard          the per-chat rate-limit + concurrency gate. Released on terminal events so the next turn
      *                       can be admitted; same idempotent {@code completed} flag covers double-release under racing
      *                       onComplete/onError paths.
      * @param jobFacade      optional job-cancel hook fired from {@link #onError} so a workflow that errors out (or
@@ -158,7 +158,7 @@ public class AgUiStreamBridge implements SseStreamBridge {
      */
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public AgUiStreamBridge(
-        AgentSubscriber subscriber, String messageId, String threadId, String runId, long taskId,
+        AgentSubscriber subscriber, String messageId, String threadId, String runId, long chatId,
         WebhookResumeRegistry resumeRegistry, WorkflowChatJobRegistry jobRegistry, WorkflowChatGuard guard,
         @Nullable JobFacade jobFacade, Runnable onFinalize) {
 
@@ -166,7 +166,7 @@ public class AgUiStreamBridge implements SseStreamBridge {
         this.messageId = messageId;
         this.threadId = threadId;
         this.runId = runId;
-        this.taskId = taskId;
+        this.chatId = chatId;
         this.resumeRegistry = resumeRegistry;
         this.jobRegistry = jobRegistry;
         this.guard = guard;
@@ -178,7 +178,7 @@ public class AgUiStreamBridge implements SseStreamBridge {
     public void onEvent(Object payload) {
         if (completed.get()) {
             // Stream-after-complete is benign but worth logging at DEBUG so a flood of late events surfaces
-            // when investigating a stuck task.
+            // when investigating a stuck chat.
             if (log.isDebugEnabled()) {
                 log.debug("AgUiStreamBridge dropping post-complete event: {}", payload);
             }
@@ -236,14 +236,14 @@ public class AgUiStreamBridge implements SseStreamBridge {
                 Object rawResumeUrl = map.get("resumeUrl");
 
                 if (rawResumeUrl instanceof String resumeUrl && !resumeUrl.isBlank()) {
-                    resumeRegistry.register(taskId, resumeUrl);
+                    resumeRegistry.register(chatId, resumeUrl);
                 } else if (log.isDebugEnabled()) {
                     // Workflows that emit ask_user_question without a resumeUrl can't be resumed via this bridge —
                     // the question still renders client-side, but the user's answer will start a fresh execution
                     // rather than resuming. Log at DEBUG so it's discoverable when investigating.
                     log.debug(
-                        "ask_user_question event without a resumeUrl for task {}; resume not possible",
-                        taskId);
+                        "ask_user_question event without a resumeUrl for chat {}; resume not possible",
+                        chatId);
                 }
 
                 emitCustomEvent(ASK_WORKFLOW_QUESTION_EVENT_NAME, map);
@@ -265,7 +265,7 @@ public class AgUiStreamBridge implements SseStreamBridge {
 
         // Anything non-String non-Map is dropped with a DEBUG log rather than rendered. The coordinator normally
         // emits task_started as an enriched map (handled above), but falls back to a bare Long taskExecutionId
-        // when the task row can't be loaded; without this guard those Longs would land in the chat as raw numbers
+        // when the chat row can't be loaded; without this guard those Longs would land in the chat as raw numbers
         // via Objects.toString.
         if (!(payload instanceof String stringPayload)) {
             if (log.isDebugEnabled()) {
@@ -313,10 +313,10 @@ public class AgUiStreamBridge implements SseStreamBridge {
                     ? jobIdNumber.longValue()
                     : Long.parseLong(jobIdObject.toString());
 
-                jobRegistry.register(taskId, jobId);
+                jobRegistry.register(chatId, jobId);
             } catch (NumberFormatException exception) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Could not parse jobId from start event for task {}: {}", taskId, jobIdObject);
+                    log.debug("Could not parse jobId from start event for chat {}: {}", chatId, jobIdObject);
                 }
             }
         }
@@ -411,15 +411,15 @@ public class AgUiStreamBridge implements SseStreamBridge {
             return;
         }
 
-        // Clear any in-flight jobId for this task — the workflow run is done so a cancel attempt now
+        // Clear any in-flight jobId for this chat — the workflow run is done so a cancel attempt now
         // would fail (or worse, cancel the next turn's job if one races into the same slot before the cache
         // entry naturally expires). Idempotent so onComplete-after-onError or duplicate completion are safe.
-        jobRegistry.clear(taskId);
+        jobRegistry.clear(chatId);
 
-        // Release the per-task concurrency lock so the next turn can be admitted. Sequence matters:
+        // Release the per-chat concurrency lock so the next turn can be admitted. Sequence matters:
         // job registry cleared first (so any racing cancel attempt sees no work to cancel), THEN the lock is
         // freed (so a follow-up turn can land).
-        guard.release(taskId);
+        guard.release(chatId);
 
         if (started.get()) {
             TextMessageEndEvent end = new TextMessageEndEvent();
@@ -452,14 +452,14 @@ public class AgUiStreamBridge implements SseStreamBridge {
         // happens BEFORE the stopJob call so a racing turn that lands between them sees an empty slot rather
         // than the stale entry we're about to invalidate. stopJob itself is idempotent, so the rare race
         // where the cancel mutation fires concurrently is benign.
-        Long inFlightJobId = jobRegistry.get(taskId);
+        Long inFlightJobId = jobRegistry.get(chatId);
 
-        jobRegistry.clear(taskId);
+        jobRegistry.clear(chatId);
 
         // Same release-after-clear ordering as onComplete — without this a workflow that crashes mid-run would
-        // leave the task locked until the cache TTL expires (30 minutes), giving the user a confusing
+        // leave the chat locked until the cache TTL expires (30 minutes), giving the user a confusing
         // "previous turn still running" error long after the actual previous turn died.
-        guard.release(taskId);
+        guard.release(chatId);
 
         // WC #5b auto-cancel-on-disconnect: when the client drops mid-stream the bridge sees an emit failure
         // that surfaces here. Without an explicit stopJob the workflow keeps running and burns worker capacity
@@ -474,8 +474,8 @@ public class AgUiStreamBridge implements SseStreamBridge {
                 // shouldn't propagate further — the user's RUN_ERROR event still fires below regardless.
                 if (log.isDebugEnabled()) {
                     log.debug(
-                        "stopJob for jobId {} (task {}) failed during onError handling",
-                        inFlightJobId, taskId, exception);
+                        "stopJob for jobId {} (chat {}) failed during onError handling",
+                        inFlightJobId, chatId, exception);
                 }
             }
         }
@@ -494,7 +494,7 @@ public class AgUiStreamBridge implements SseStreamBridge {
 
     /**
      * Best-effort invocation of the finalize closure supplied by {@link WebhookBridgeAgent}. Swallows any throwable —
-     * the bridge has already emitted its terminal lifecycle event and released the task guard at this point, so a
+     * the bridge has already emitted its terminal lifecycle event and released the chat guard at this point, so a
      * thrown finalizer must not prevent that work from being seen as committed.
      */
     private void runFinalize() {
@@ -502,9 +502,9 @@ public class AgUiStreamBridge implements SseStreamBridge {
             onFinalize.run();
         } catch (RuntimeException exception) {
             log.warn(
-                "AgUiStreamBridge.onFinalize callback threw for task {}; SSE may stay open until client "
+                "AgUiStreamBridge.onFinalize callback threw for chat {}; SSE may stay open until client "
                     + "disconnects or the emitter times out",
-                taskId, exception);
+                chatId, exception);
         }
     }
 

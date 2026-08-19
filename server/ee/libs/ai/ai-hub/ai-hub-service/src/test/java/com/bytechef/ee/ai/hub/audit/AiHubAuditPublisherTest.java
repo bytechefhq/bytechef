@@ -48,7 +48,7 @@ class AiHubAuditPublisherTest {
     void testPublishesAuditApplicationEventWithSystemPrincipalWhenUnauthenticated() {
         AiHubAuditPublisher publisher = newPublisher();
 
-        publisher.publish(AiHubAuditEvent.AI_HUB_PERSONAL_AGENT_SCHEDULE_FIRED, Map.of("scheduleId", "42"));
+        publisher.publish(AiHubAuditEvent.AI_HUB_CHAT_CREATED, Map.of("chatId", "42"));
 
         ArgumentCaptor<AuditApplicationEvent> captor = ArgumentCaptor.forClass(AuditApplicationEvent.class);
 
@@ -58,8 +58,8 @@ class AiHubAuditPublisherTest {
             .getAuditEvent();
 
         assertThat(auditEvent.getPrincipal()).isEqualTo("SYSTEM");
-        assertThat(auditEvent.getType()).isEqualTo("AI_HUB_PERSONAL_AGENT_SCHEDULE_FIRED");
-        assertThat(auditEvent.getData()).containsEntry("scheduleId", "42");
+        assertThat(auditEvent.getType()).isEqualTo("AI_HUB_CHAT_CREATED");
+        assertThat(auditEvent.getData()).containsEntry("chatId", "42");
     }
 
     @Test
@@ -84,7 +84,7 @@ class AiHubAuditPublisherTest {
         doThrow(new RuntimeException("downstream blew up")).when(applicationEventPublisher)
             .publishEvent(any(AuditApplicationEvent.class));
 
-        publisher.publish(AiHubAuditEvent.AI_HUB_PERSONAL_AGENT_CREATED, Map.of("workspaceId", "1"));
+        publisher.publish(AiHubAuditEvent.AI_HUB_WORKSPACE_SETTINGS_UPDATED, Map.of("workspaceId", "1"));
 
         Counter counter = meterRegistry.find("bytechef_ai_hub_audit_failed")
             .counter();

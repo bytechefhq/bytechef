@@ -17,7 +17,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.automation.assetfile.domain.AssetFile;
 import com.bytechef.automation.assetfile.domain.AssetFileFormat;
 import com.bytechef.automation.assetfile.service.AssetFileFacade;
-import com.bytechef.ee.ai.hub.task.AiHubTaskAssetFileService;
+import com.bytechef.ee.ai.hub.chat.AiHubChatAssetFileService;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -30,7 +30,7 @@ class CodeArtifactGeneratorTest {
     @Test
     void testGenerateMapsPyExtensionToPythonMimeType() {
         AssetFileFacade facade = mock(AssetFileFacade.class);
-        AiHubTaskAssetFileService linkService = mock(AiHubTaskAssetFileService.class);
+        AiHubChatAssetFileService linkService = mock(AiHubChatAssetFileService.class);
 
         AssetFile saved = mock(AssetFile.class);
 
@@ -55,7 +55,7 @@ class CodeArtifactGeneratorTest {
         // so an unknown extension is at most a wrong content-type on download. Pin the fallback so a future widening
         // of the table doesn't accidentally change the fallback shape (e.g. throwing instead of returning text/plain).
         AssetFileFacade facade = mock(AssetFileFacade.class);
-        AiHubTaskAssetFileService linkService = mock(AiHubTaskAssetFileService.class);
+        AiHubChatAssetFileService linkService = mock(AiHubChatAssetFileService.class);
 
         AssetFile saved = mock(AssetFile.class);
 
@@ -77,7 +77,7 @@ class CodeArtifactGeneratorTest {
         // Code intentionally has no default extension — adding one would force a guess about which language the LLM
         // meant. The file persists with text/plain mime; Monaco then handles language detection on the client side.
         AssetFileFacade facade = mock(AssetFileFacade.class);
-        AiHubTaskAssetFileService linkService = mock(AiHubTaskAssetFileService.class);
+        AiHubChatAssetFileService linkService = mock(AiHubChatAssetFileService.class);
 
         AssetFile saved = mock(AssetFile.class);
 
@@ -99,7 +99,7 @@ class CodeArtifactGeneratorTest {
     @Test
     void testFormatIsCode() {
         CodeArtifactGenerator generator = new CodeArtifactGenerator(
-            mock(AssetFileFacade.class), mock(AiHubTaskAssetFileService.class));
+            mock(AssetFileFacade.class), mock(AiHubChatAssetFileService.class));
 
         assertThat(generator.format()).isEqualTo(AssetFileFormat.CODE);
     }

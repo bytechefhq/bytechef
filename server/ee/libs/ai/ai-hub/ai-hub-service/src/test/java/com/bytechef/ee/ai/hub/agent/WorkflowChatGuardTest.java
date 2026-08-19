@@ -21,7 +21,7 @@ import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
  * <ul>
  * <li>Falsely admitting back-to-back turns burns paid-LLM API quota and races two workflow runs whose outputs land in
  * the chat in non-deterministic order.</li>
- * <li>Falsely rejecting a legitimate retry locks the user out of their own task until the cache TTL expires.</li>
+ * <li>Falsely rejecting a legitimate retry locks the user out of their own chat until the cache TTL expires.</li>
  * </ul>
  *
  * <p>
@@ -70,7 +70,7 @@ class WorkflowChatGuardTest {
 
         AdmissionResult result = guard.tryAdmit(1L);
 
-        // Same task, immediate second call: rate-limit fires because the previous turn started < 2s ago.
+        // Same chat, immediate second call: rate-limit fires because the previous turn started < 2s ago.
         // Concurrency would NOT fire because release() cleared the in-flight slot.
         assertThat(result).isInstanceOf(AdmissionResult.RateLimited.class);
 
@@ -109,11 +109,11 @@ class WorkflowChatGuardTest {
     }
 
     @Test
-    void testIndependentTasksDoNotInterfere() {
+    void testIndependentChatsDoNotInterfere() {
         WorkflowChatGuard guard = newGuard();
 
         guard.tryAdmit(1L);
-        // AiHubTask 2 has no in-flight turn and no rate-limit history — both gates pass.
+        // AiHubChat 2 has no in-flight turn and no rate-limit history — both gates pass.
         AdmissionResult result = guard.tryAdmit(2L);
 
         assertThat(result).isInstanceOf(AdmissionResult.Admit.class);
@@ -123,7 +123,7 @@ class WorkflowChatGuardTest {
     void testReleaseIsIdempotent() {
         WorkflowChatGuard guard = newGuard();
 
-        // Releasing a never-admitted task is a no-op rather than a throw — the bridge calls
+        // Releasing a never-admitted chat is a no-op rather than a throw — the bridge calls
         // release() unconditionally on terminal events, even paths that never admitted (early-error
         // branches that took a guard.release() short-circuit).
         guard.release(1L);

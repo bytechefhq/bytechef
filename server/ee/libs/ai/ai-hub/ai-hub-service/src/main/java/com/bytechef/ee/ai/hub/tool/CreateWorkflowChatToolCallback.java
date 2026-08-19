@@ -8,8 +8,8 @@
 package com.bytechef.ee.ai.hub.tool;
 
 import com.bytechef.ai.agent.tool.ToolErrors;
-import com.bytechef.ee.ai.hub.task.AiHubTask;
-import com.bytechef.ee.ai.hub.task.AiHubTaskService;
+import com.bytechef.ee.ai.hub.chat.AiHubChat;
+import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.model.ToolContext;
@@ -19,12 +19,12 @@ import tools.jackson.core.JacksonException;
 import tools.jackson.databind.json.JsonMapper;
 
 /**
- * Spring AI {@link ToolCallback} that creates a workflow-chat task for a given workflow execution. Pairs with
+ * Spring AI {@link ToolCallback} that creates a workflow chat for a given workflow execution. Pairs with
  * {@link ListChatWorkflowsToolCallback} (which surfaces the {@code workflowExecutionTriggerId} the LLM passes here) and
- * with the bridge agent that executes turns once the task exists.
+ * with the bridge agent that executes turns once the chat exists.
  *
  * <p>
- * <b>Why this tool exists:</b> the workflow-chats sidebar lazily creates the task row on the first user click — users
+ * <b>Why this tool exists:</b> the workflow-chats sidebar lazily creates the chat row on the first user click — users
  * who can describe what they want ("set up a chat with my support workflow") otherwise have to remember which workflow
  * corresponds to that intent and click through. This tool lets the agent do the lookup-and-create with one
  * natural-language turn, returning the {@code threadId} the client navigates to via
@@ -32,8 +32,8 @@ import tools.jackson.databind.json.JsonMapper;
  * </p>
  *
  * <p>
- * Each invocation creates a new task row through {@link AiHubTaskService#createWorkflowChat} (always-new semantics, May
- * 2026); past tasks bound to the same workflow remain reachable through the tasks list rather than being restored on
+ * Each invocation creates a new chat row through {@link AiHubChatService#createWorkflowChat} (always-new semantics, May
+ * 2026); past chats bound to the same workflow remain reachable through the chats list rather than being restored on
  * re-invocation.
  * </p>
  *
@@ -44,11 +44,11 @@ import tools.jackson.databind.json.JsonMapper;
 public class CreateWorkflowChatToolCallback implements ToolCallback {
 
     private static final String DESCRIPTION = """
-        Create a workflow-chat task for a workflow returned by listChatWorkflows. Use this when the
+        Create a workflow chat for a workflow returned by listChatWorkflows. Use this when the
         user asks to start chatting with a workflow by name (e.g. "open a chat with my customer support
-        workflow"). Each call creates a fresh task; past tasks with the same workflow remain
-        in the tasks list. Returns {threadId, taskId, title} so you can pass threadId to
-        openWorkflowChatTab to surface the new task in the AI Hub. Always call
+        workflow"). Each call creates a fresh chat; past chats with the same workflow remain
+        in the chats list. Returns {threadId, chatId, title} so you can pass threadId to
+        openWorkflowChatTab to surface the new chat in the AI Hub. Always call
         listChatWorkflows first to obtain a real workflowExecutionTriggerId — never invent one.""";
 
     private static final String INPUT_SCHEMA =
@@ -66,18 +66,18 @@ public class CreateWorkflowChatToolCallback implements ToolCallback {
                     },
                     "title": {
                         "type": "string",
-                        "description": "Optional initial title for the task row in the sidebar. Use a short human-readable label like the workflow name."
+                        "description": "Optional initial title for the chat row in the sidebar. Use a short human-readable label like the workflow name."
                     }
                 },
                 "required": ["workflowExecutionTriggerId", "projectDeploymentId"]
             }""";
 
-    private final AiHubTaskService taskService;
+    private final AiHubChatService chatService;
     private final JsonMapper jsonMapper = new JsonMapper();
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public CreateWorkflowChatToolCallback(AiHubTaskService taskService) {
-        this.taskService = taskService;
+    public CreateWorkflowChatToolCallback(AiHubChatService chatService) {
+        this.chatService = chatService;
     }
 
     @Override
@@ -136,17 +136,17 @@ public class CreateWorkflowChatToolCallback implements ToolCallback {
             }
 
             // Resolve the environment ordinal via the shared helper so this tool stays consistent with how the rest
-            // of the asset-file / task tooling defaults to DEVELOPMENT (ordinal 0) when the toolContext
+            // of the asset-file / chat tooling defaults to DEVELOPMENT (ordinal 0) when the toolContext
             // hasn't been threaded through.
             int environment = AiHubToolInvocationContext.resolveEnvironmentOrDefault(context);
 
-            AiHubTask task = taskService.createWorkflowChat(
+            AiHubChat chat = chatService.createWorkflowChat(
                 workspaceId, userId, environment, input.workflowExecutionTriggerId(), projectDeploymentId,
                 input.title());
 
             return jsonMapper.writeValueAsString(
                 new CreateWorkflowChatOutput(
-                    task.getThreadId(), task.getId(), task.getTitle()));
+                    chat.getThreadId(), chat.getId(), chat.getTitle()));
         } catch (JacksonException exception) {
             return toolError("Invalid tool input: " + exception.getMessage());
         } catch (RuntimeException exception) {
@@ -163,6 +163,6 @@ public class CreateWorkflowChatToolCallback implements ToolCallback {
         String workflowExecutionTriggerId, String projectDeploymentId, @Nullable String title) {
     }
 
-    public record CreateWorkflowChatOutput(String threadId, long taskId, @Nullable String title) {
+    public record CreateWorkflowChatOutput(String threadId, long chatId, @Nullable String title) {
     }
 }

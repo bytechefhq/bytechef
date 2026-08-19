@@ -43,7 +43,7 @@ import tools.jackson.databind.json.JsonMapper;
  * payload is returned to the parent instead, keeping the parent's context lean.
  *
  * <p>
- * <b>Why hand-rolled instead of {@code TaskTool.builder()}?</b> The same reason as
+ * <b>Why hand-rolled instead of {@code ChatTool.builder()}?</b> The same reason as
  * {@link com.bytechef.ee.ai.hub.tool.ResearchToolCallback} — no API exists to register a named subagent backed by an
  * externally-constructed {@link ChatClient}. The hand-rolled approach achieves the same architecture without
  * incompatible tooling.

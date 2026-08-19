@@ -50,10 +50,10 @@ public class OpenWorkflowTabToolCallback implements ToolCallback {
         }""";
 
     private final JsonMapper jsonMapper = new JsonMapper();
-    private final @Nullable AiHubTaskArtifactRecorder artifactRecorder;
+    private final @Nullable AiHubChatArtifactRecorder artifactRecorder;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public OpenWorkflowTabToolCallback(@Nullable AiHubTaskArtifactRecorder artifactRecorder) {
+    public OpenWorkflowTabToolCallback(@Nullable AiHubChatArtifactRecorder artifactRecorder) {
         this.artifactRecorder = artifactRecorder;
     }
 
@@ -95,8 +95,8 @@ public class OpenWorkflowTabToolCallback implements ToolCallback {
                 return toolError("name is required");
             }
 
-            // Record the workflow as a task artifact server-side. The client also records it when the tab
-            // opens (idempotent on (taskId, kind, workflowId)), so this is a robustness layer that no longer
+            // Record the workflow as a chat artifact server-side. The client also records it when the tab
+            // opens (idempotent on (chatId, kind, workflowId)), so this is a robustness layer that no longer
             // depends on the client tab-watching hook firing. Metadata carries the routing ids the sidebar
             // quick-open needs.
             recordArtifact(toolContext, input);
@@ -137,7 +137,7 @@ public class OpenWorkflowTabToolCallback implements ToolCallback {
 
         try {
             // Route through the dedup-aware recorder so a referenced workflow collapses onto an existing
-            // created/updated row for the same (task, workflowId) instead of producing a duplicate sidebar entry.
+            // created/updated row for the same (chat, workflowId) instead of producing a duplicate sidebar entry.
             artifactRecorder.recordWorkflowReference(
                 invocationContext.threadId(), invocationContext.userId(), input.workflowId(), projectId,
                 input.projectWorkflowId(), input.name());

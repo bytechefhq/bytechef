@@ -14,9 +14,6 @@ import com.bytechef.ee.ai.hub.chat.AiHubChatArtifactKind;
 import com.bytechef.ee.ai.hub.chat.AiHubChatArtifactStatus;
 import com.bytechef.ee.ai.hub.chat.AiHubChatKind;
 import com.bytechef.ee.ai.hub.chat.AiHubChatStatus;
-import com.bytechef.ee.ai.hub.task.AiHubTaskResourceKind;
-import com.bytechef.ee.ai.hub.task.ScheduleFrequencyKind;
-import com.bytechef.ee.ai.hub.task.ScheduleLifecycleKind;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryPrincipalType;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryType;
 import com.bytechef.test.assertion.OrdinalStabilityAssertions;
@@ -127,7 +124,10 @@ class EnumOrdinalStabilityTest {
         // value. Reordering would silently re-attribute every chat row's kind on the next read.
         expected.put("STANDARD", 0);
         expected.put("WORKFLOW_CHAT", 1);
-        expected.put("TASK", 2);
+        // AGENT_CHAT moved 3 → 2 when the TASK kind was removed. Legal only because the AI Hub is unreleased (no
+        // customer database holds an ai_hub_chat row); a local developer database written before the removal can
+        // still hold kind=2 (TASK) or kind=3 (AGENT_CHAT) rows and must be reset rather than debugged.
+        expected.put("AGENT_CHAT", 2);
 
         OrdinalStabilityAssertions.assertOrdinalsMatch(
             AiHubChatKind.values(), expected, AiHubChatKind.class.getSimpleName());
@@ -192,49 +192,5 @@ class EnumOrdinalStabilityTest {
         expected.put("BUILD", 1);
 
         OrdinalStabilityAssertions.assertOrdinalsMatch(Mode.values(), expected, Mode.class.getSimpleName());
-    }
-
-    @Test
-    void testScheduleFrequencyKindOrdinals() {
-        Map<String, Integer> expected = new LinkedHashMap<>();
-
-        expected.put("EVERY_X_MINUTES", 0);
-        expected.put("HOURLY", 1);
-        expected.put("DAILY", 2);
-        expected.put("WEEKLY", 3);
-        expected.put("MONTHLY", 4);
-        expected.put("CUSTOM_CRON", 5);
-
-        OrdinalStabilityAssertions.assertOrdinalsMatch(
-            ScheduleFrequencyKind.values(), expected, ScheduleFrequencyKind.class.getSimpleName());
-    }
-
-    @Test
-    void testScheduleLifecycleKindOrdinals() {
-        Map<String, Integer> expected = new LinkedHashMap<>();
-
-        expected.put("RECURRING", 0);
-        expected.put("NUMBER_OF_RUNS", 1);
-
-        OrdinalStabilityAssertions.assertOrdinalsMatch(
-            ScheduleLifecycleKind.values(), expected, ScheduleLifecycleKind.class.getSimpleName());
-    }
-
-    @Test
-    void testTaskResourceKindOrdinals() {
-        Map<String, Integer> expected = new LinkedHashMap<>();
-
-        expected.put("WORKFLOW", 0);
-        expected.put("FILE", 1);
-        expected.put("DATA_TABLE", 2);
-        expected.put("KNOWLEDGE_BASE", 3);
-        expected.put("MCP_SERVER", 4);
-        expected.put("API_COLLECTION", 5);
-        expected.put("WORKFLOW_EXECUTION", 6);
-        expected.put("CHAT", 7);
-
-        OrdinalStabilityAssertions.assertOrdinalsMatch(
-            AiHubTaskResourceKind.values(), expected,
-            AiHubTaskResourceKind.class.getSimpleName());
     }
 }

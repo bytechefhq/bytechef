@@ -29,9 +29,9 @@ import tools.jackson.databind.json.JsonMapper;
  * onto the same per-type validators and tab-store calls the legacy tools used.
  *
  * <p>
- * {@code openWorkflowChatTab} / {@code openAiHubTaskTab} are NOT folded in — their results drive a chat switch (thread
- * + navigation), a different contract. The legacy per-type classes also remain for subagent-internal registrations
- * (e.g. the data_analyst specialist's {@code openDataTableTab}).
+ * {@code openWorkflowChatTab} is NOT folded in — its result drives a chat switch (thread + navigation), a different
+ * contract. The legacy per-type classes also remain for subagent-internal registrations (e.g. the data_analyst
+ * specialist's {@code openDataTableTab}).
  * </p>
  *
  * @version ee

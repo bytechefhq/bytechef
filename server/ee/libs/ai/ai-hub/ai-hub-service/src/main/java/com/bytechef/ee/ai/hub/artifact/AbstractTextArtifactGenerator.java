@@ -10,8 +10,8 @@ package com.bytechef.ee.ai.hub.artifact;
 import com.bytechef.automation.assetfile.domain.AssetFile;
 import com.bytechef.automation.assetfile.domain.AssetFileFormat;
 import com.bytechef.automation.assetfile.service.AssetFileFacade;
-import com.bytechef.ee.ai.hub.task.AiHubTaskAssetFileService;
-import com.bytechef.ee.ai.hub.task.AuthorshipAlreadyAssignedException;
+import com.bytechef.ee.ai.hub.chat.AiHubChatAssetFileService;
+import com.bytechef.ee.ai.hub.chat.AuthorshipAlreadyAssignedException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Shared base for the text passthrough generators (markdown, code, csv, json). The LLM has already produced the final
  * content as part of its tool-call argument; the generator's only job is to persist it as an {@code asset_file} row,
- * link the row to the task via the {@code AUTHORED} join, and report back.
+ * link the row to the chat via the {@code AUTHORED} join, and report back.
  *
  * <p>
  * The DOCX/PPTX/CHART generators do not extend this class — they have nontrivial materialisation steps (POI document
@@ -38,13 +38,13 @@ public abstract class AbstractTextArtifactGenerator implements ArtifactGenerator
     private static final Logger log = LoggerFactory.getLogger(AbstractTextArtifactGenerator.class);
 
     private final AssetFileFacade assetFileFacade;
-    private final AiHubTaskAssetFileService taskAssetFileService;
+    private final AiHubChatAssetFileService chatAssetFileService;
 
     protected AbstractTextArtifactGenerator(
-        AssetFileFacade assetFileFacade, AiHubTaskAssetFileService taskAssetFileService) {
+        AssetFileFacade assetFileFacade, AiHubChatAssetFileService chatAssetFileService) {
 
         this.assetFileFacade = assetFileFacade;
-        this.taskAssetFileService = taskAssetFileService;
+        this.chatAssetFileService = chatAssetFileService;
     }
 
     @Override
@@ -67,21 +67,21 @@ public abstract class AbstractTextArtifactGenerator implements ArtifactGenerator
             request.generatedFromPrompt());
 
         boolean linked = false;
-        Long taskId = request.taskId();
+        Long chatId = request.chatId();
 
-        if (taskId != null) {
+        if (chatId != null) {
             try {
-                taskAssetFileService.recordAuthorship(taskId, saved.getId());
+                chatAssetFileService.recordAuthorship(chatId, saved.getId());
                 linked = true;
             } catch (AuthorshipAlreadyAssignedException exception) {
-                // The asset_file is already authored by a *different* task. The generator-supplied filename
+                // The asset_file is already authored by a *different* chat. The generator-supplied filename
                 // resolution should have prevented collisions (resolveUniqueName is workspace-scoped) so this branch
                 // really only fires on a TOCTOU race or a bug. Logging at WARN keeps the audit trail; the file was
-                // persisted and is reachable by id, just not joined to *this* task.
+                // persisted and is reachable by id, just not joined to *this* chat.
                 log.warn(
-                    "Generated asset_file {} already has a different authoring task; skipping AUTHORED join "
-                        + "for task {}",
-                    saved.getId(), taskId, exception);
+                    "Generated asset_file {} already has a different authoring chat; skipping AUTHORED join "
+                        + "for chat {}",
+                    saved.getId(), chatId, exception);
             }
         }
 

@@ -24,10 +24,10 @@ import com.agui.core.message.BaseMessage;
 import com.agui.core.message.UserMessage;
 import com.agui.core.state.State;
 import com.bytechef.automation.assetfile.service.AssetFileFacade;
-import com.bytechef.ee.ai.hub.task.AiHubTask;
-import com.bytechef.ee.ai.hub.task.AiHubTaskKind;
-import com.bytechef.ee.ai.hub.task.AiHubTaskService;
-import com.bytechef.ee.ai.hub.task.AiHubTaskStatus;
+import com.bytechef.ee.ai.hub.chat.AiHubChat;
+import com.bytechef.ee.ai.hub.chat.AiHubChatKind;
+import com.bytechef.ee.ai.hub.chat.AiHubChatService;
+import com.bytechef.ee.ai.hub.chat.AiHubChatStatus;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
@@ -73,10 +73,10 @@ import tools.jackson.databind.json.JsonMapper;
 class WebhookBridgeAgentResumeTest {
 
     private static final String THREAD_ID = "00000000-0000-0000-0000-00000000004e";
-    private static final long TASK_ID = 11L;
+    private static final long CHAT_ID = 11L;
 
     private WebhookWorkflowExecutor webhookFacade;
-    private AiHubTaskService taskService;
+    private AiHubChatService chatService;
     private WebhookResumeRegistry resumeRegistry;
     private JsonMapper jsonMapper;
     private AgentSubscriber subscriber;
@@ -88,7 +88,7 @@ class WebhookBridgeAgentResumeTest {
     @BeforeEach
     void setUp() throws IOException {
         webhookFacade = mock(WebhookWorkflowExecutor.class);
-        taskService = mock(AiHubTaskService.class);
+        chatService = mock(AiHubChatService.class);
         resumeRegistry = new WebhookResumeRegistry(
             new ConcurrentMapCacheManager(WebhookResumeRegistry.CACHE_NAME));
         jsonMapper = JsonMapper.builder()
@@ -134,12 +134,12 @@ class WebhookBridgeAgentResumeTest {
             exchange.close();
         });
 
-        AiHubTask task = newWorkflowChatTask();
+        AiHubChat chat = newWorkflowChat();
 
-        when(taskService.findByThreadId(THREAD_ID)).thenReturn(Optional.of(task));
+        when(chatService.findByThreadId(THREAD_ID)).thenReturn(Optional.of(chat));
 
         // Pre-register the resume URL so the bridge picks the resume path on this turn.
-        resumeRegistry.register(TASK_ID, baseUrl + "/resume");
+        resumeRegistry.register(CHAT_ID, baseUrl + "/resume");
 
         WebhookBridgeAgent agent = newAgent();
 
@@ -152,7 +152,7 @@ class WebhookBridgeAgentResumeTest {
         assertThat(contentCaptor.getValue()
             .getDelta()).isEqualTo("Got your answer.");
         assertThat(capturedRequestBody.get())
-            .as("Resume body must include the user's message and the task's threadId")
+            .as("Resume body must include the user's message and the chat's threadId")
             .contains("My answer is 42")
             .contains(THREAD_ID);
     }
@@ -168,11 +168,11 @@ class WebhookBridgeAgentResumeTest {
             exchange.close();
         });
 
-        AiHubTask task = newWorkflowChatTask();
+        AiHubChat chat = newWorkflowChat();
 
-        when(taskService.findByThreadId(THREAD_ID)).thenReturn(Optional.of(task));
+        when(chatService.findByThreadId(THREAD_ID)).thenReturn(Optional.of(chat));
 
-        resumeRegistry.register(TASK_ID, baseUrl + "/resume");
+        resumeRegistry.register(CHAT_ID, baseUrl + "/resume");
 
         WebhookBridgeAgent agent = newAgent();
 
@@ -207,11 +207,11 @@ class WebhookBridgeAgentResumeTest {
             exchange.close();
         });
 
-        AiHubTask task = newWorkflowChatTask();
+        AiHubChat chat = newWorkflowChat();
 
-        when(taskService.findByThreadId(THREAD_ID)).thenReturn(Optional.of(task));
+        when(chatService.findByThreadId(THREAD_ID)).thenReturn(Optional.of(chat));
 
-        resumeRegistry.register(TASK_ID, baseUrl + "/resume");
+        resumeRegistry.register(CHAT_ID, baseUrl + "/resume");
 
         WebhookBridgeAgent agent = newAgent();
 
@@ -244,11 +244,11 @@ class WebhookBridgeAgentResumeTest {
             exchange.close();
         });
 
-        AiHubTask task = newWorkflowChatTask();
+        AiHubChat chat = newWorkflowChat();
 
-        when(taskService.findByThreadId(THREAD_ID)).thenReturn(Optional.of(task));
+        when(chatService.findByThreadId(THREAD_ID)).thenReturn(Optional.of(chat));
 
-        resumeRegistry.register(TASK_ID, baseUrl + "/resume");
+        resumeRegistry.register(CHAT_ID, baseUrl + "/resume");
 
         WebhookBridgeAgent agent = newAgent();
 
@@ -285,11 +285,11 @@ class WebhookBridgeAgentResumeTest {
             exchange.close();
         });
 
-        AiHubTask task = newWorkflowChatTask();
+        AiHubChat chat = newWorkflowChat();
 
-        when(taskService.findByThreadId(THREAD_ID)).thenReturn(Optional.of(task));
+        when(chatService.findByThreadId(THREAD_ID)).thenReturn(Optional.of(chat));
 
-        resumeRegistry.register(TASK_ID, baseUrl + "/resume");
+        resumeRegistry.register(CHAT_ID, baseUrl + "/resume");
 
         WebhookBridgeAgent agent = newAgent();
 
@@ -313,11 +313,11 @@ class WebhookBridgeAgentResumeTest {
             exchange.close();
         });
 
-        AiHubTask task = newWorkflowChatTask();
+        AiHubChat chat = newWorkflowChat();
 
-        when(taskService.findByThreadId(THREAD_ID)).thenReturn(Optional.of(task));
+        when(chatService.findByThreadId(THREAD_ID)).thenReturn(Optional.of(chat));
 
-        resumeRegistry.register(TASK_ID, baseUrl + "/resume");
+        resumeRegistry.register(CHAT_ID, baseUrl + "/resume");
 
         WebhookBridgeAgent agent = newAgent();
 
@@ -329,7 +329,7 @@ class WebhookBridgeAgentResumeTest {
         // The atomic consume contract: a duplicate-delivered turn cannot fire the resume POST twice. After the
         // first turn fires the registry slot is empty, so a re-register would have to happen for resume to
         // trigger again.
-        assertThat(resumeRegistry.consume(TASK_ID))
+        assertThat(resumeRegistry.consume(CHAT_ID))
             .as("Resume URL must be consumed before the HTTP call so duplicates start fresh executions")
             .isNull();
     }
@@ -348,7 +348,7 @@ class WebhookBridgeAgentResumeTest {
         when(guard.tryAdmit(anyLong())).thenReturn(WorkflowChatGuard.AdmissionResult.admit());
 
         return new WebhookBridgeAgent(
-            webhookFacade, taskService, resumeRegistry, jsonMapper, assetFileFacade,
+            webhookFacade, chatService, resumeRegistry, jsonMapper, assetFileFacade,
             mock(com.bytechef.ee.ai.hub.metric.WorkflowChatMetrics.class),
             mock(WorkflowChatJobRegistry.class),
             new com.bytechef.ee.ai.hub.memory.AiHubSessionMemory(
@@ -358,20 +358,20 @@ class WebhookBridgeAgentResumeTest {
             guard, null);
     }
 
-    private static AiHubTask newWorkflowChatTask() {
-        AiHubTask task = new AiHubTask(3L);
+    private static AiHubChat newWorkflowChat() {
+        AiHubChat chat = new AiHubChat(3L);
 
-        task.setId(TASK_ID);
-        task.setThreadId(THREAD_ID);
-        task.setKind(AiHubTaskKind.WORKFLOW_CHAT);
-        task.setStatus(AiHubTaskStatus.ACTIVE);
-        task.setTitle("Resume Test");
-        task.setProjectDeploymentId(99L);
-        task.setWorkflowExecutionId(
+        chat.setId(CHAT_ID);
+        chat.setThreadId(THREAD_ID);
+        chat.setKind(AiHubChatKind.WORKFLOW_CHAT);
+        chat.setStatus(AiHubChatStatus.ACTIVE);
+        chat.setTitle("Resume Test");
+        chat.setProjectDeploymentId(99L);
+        chat.setWorkflowExecutionId(
             WorkflowExecutionId.of(PlatformType.AUTOMATION, 1L, "uuid-123", "newChatRequest")
                 .toString());
 
-        return task;
+        return chat;
     }
 
     private static com.agui.core.agent.RunAgentInput buildInput(String userMessageText) {

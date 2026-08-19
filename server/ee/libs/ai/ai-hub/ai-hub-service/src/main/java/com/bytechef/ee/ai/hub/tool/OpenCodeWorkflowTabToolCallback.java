@@ -50,10 +50,10 @@ public class OpenCodeWorkflowTabToolCallback implements ToolCallback {
         }""";
 
     private final JsonMapper jsonMapper = new JsonMapper();
-    private final @Nullable AiHubTaskArtifactRecorder artifactRecorder;
+    private final @Nullable AiHubChatArtifactRecorder artifactRecorder;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public OpenCodeWorkflowTabToolCallback(@Nullable AiHubTaskArtifactRecorder artifactRecorder) {
+    public OpenCodeWorkflowTabToolCallback(@Nullable AiHubChatArtifactRecorder artifactRecorder) {
         this.artifactRecorder = artifactRecorder;
     }
 

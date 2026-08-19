@@ -20,18 +20,13 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.ee.ai.hub.audit.AiHubAuditPublisher;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService.AiHubChatMessage;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService.AiHubChatPatch;
 import com.bytechef.ee.ai.hub.chat.repository.AiHubChatRepository;
 import com.bytechef.ee.ai.hub.exception.ConflictException;
 import com.bytechef.ee.ai.hub.exception.NotFoundException;
 import com.bytechef.ee.ai.hub.subagent.SubAgentSessionMemoryContributor;
-import com.bytechef.ee.ai.hub.task.AiHubTaskResource;
-import com.bytechef.ee.ai.hub.task.AiHubTaskResourceKind;
-import com.bytechef.ee.ai.hub.task.AiHubTaskService;
 import com.bytechef.ee.ai.hub.tool.AiHubAgentType;
-import com.bytechef.ee.ai.hub.toolsearch.ToolSearchCatalogFeeder;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -94,11 +89,10 @@ class AiHubChatServiceTest {
         lenient().when(aiHubSessionMemory.sessionRepository())
             .thenReturn(sessionRepository);
 
-        // The optional ObjectProvider dependencies are left null (copyTaskToolTemplate and the tool-search /
-        // artifact paths guard on null) — the same shape the previous @InjectMocks wiring produced.
+        // The optional tool-search ObjectProvider is left null (the delete path's index clear guards on null) —
+        // the same shape the previous @InjectMocks wiring produced.
         chatService = new AiHubChatServiceImpl(
-            chatRepository, jobFacade, jobRegistry, inFlightRunRegistry, null, null, null, null,
-            aiHubSessionMemoryProvider, null);
+            chatRepository, jobFacade, jobRegistry, inFlightRunRegistry, null, aiHubSessionMemoryProvider, null);
     }
 
     private static org.springframework.ai.session.SessionEvent sessionEvent(
@@ -310,7 +304,7 @@ class AiHubChatServiceTest {
 
         verify(sessionService).delete(THREAD_ID);
         verify(sessionService).delete(
-            SubAgentSessionMemoryContributor.sessionKey(THREAD_ID, AiHubAgentType.TASK_AGENT.key()));
+            SubAgentSessionMemoryContributor.sessionKey(THREAD_ID, AiHubAgentType.DATA_ANALYST.key()));
         verify(sessionService).delete(
             SubAgentSessionMemoryContributor.sessionKey(THREAD_ID, AiHubAgentType.RESEARCH.key()));
         verify(chatRepository).delete(chat);
@@ -332,7 +326,7 @@ class AiHubChatServiceTest {
         chatService.delete(1L, WORKSPACE_ID, USER_ID);
 
         verify(sessionService).delete(
-            SubAgentSessionMemoryContributor.sessionKey(THREAD_ID, AiHubAgentType.TASK_AGENT.key()));
+            SubAgentSessionMemoryContributor.sessionKey(THREAD_ID, AiHubAgentType.DATA_ANALYST.key()));
         verify(chatRepository).delete(chat);
     }
 
@@ -452,6 +446,25 @@ class AiHubChatServiceTest {
         assertThat(first.getThreadId())
             .as("two clicks on the same workflow row must produce distinct threadIds")
             .isNotEqualTo(second.getThreadId());
+    }
+
+    @Test
+    void testCreateAgentChatStampsAgentChatKind() {
+        // Only the kind separates an agent chat from a workflow chat; everything else — the always-new UUID threadId,
+        // the bound execution, the deployment, the initial title — is the shared bridged-chat shape. The kind is what
+        // survives an agent being undeployed, which is the whole reason it is persisted rather than re-derived.
+        when(chatRepository.save(any(AiHubChat.class)))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+
+        AiHubChat result = chatService.createAgentChat(WORKSPACE_ID, USER_ID, 0, "wf-exec-id", 99L, "Agent1");
+
+        assertThat(result.getKind()).isEqualTo(AiHubChatKind.AGENT_CHAT);
+        assertThat(result.getTitle()).isEqualTo("Agent1");
+        assertThat(result.getWorkflowExecutionId()).isEqualTo("wf-exec-id");
+        assertThat(result.getProjectDeploymentId()).isEqualTo(99L);
+        assertThat(result.getThreadId())
+            .as("threadId must be a plain UUID so session-store events are isolated per chat")
+            .matches("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
     }
 
     private static AiHubChat buildChat(
@@ -606,175 +619,5 @@ class AiHubChatServiceTest {
 
         assertThatThrownBy(() -> chatService.truncateMessagesFrom(1L, WORKSPACE_ID, OTHER_USER_ID, 0))
             .isInstanceOf(NotFoundException.class);
-    }
-
-    @Test
-    void testCreateAiHubTaskChatPersistsNewRowWithUuidThreadId() {
-        // Always-new semantics: service inserts a fresh chat on every call with kind=TASK, the
-        // supplied title, and a UUID-prefixed threadId so chat-memory rows are isolated per chat. The
-        // partial unique index that previously enforced one-row-per-(workspace, user, environment, agent) was
-        // dropped in 20260505000001; this method no longer reads from the repository before saving.
-        when(chatRepository.save(any(AiHubChat.class))).thenAnswer(invocation -> {
-            AiHubChat captured = invocation.getArgument(0);
-
-            captured.setId(123L);
-
-            return captured;
-        });
-
-        AiHubChat result = chatService.createAiHubTaskChat(
-            WORKSPACE_ID, USER_ID, 0, 42L, "Research Assistant");
-
-        assertThat(result.getId()).isEqualTo(123L);
-        assertThat(result.getKind()).isEqualTo(AiHubChatKind.TASK);
-        assertThat(result.getTitle()).isEqualTo("Research Assistant");
-        assertThat(result.getAiHubTaskId()).isEqualTo(42L);
-        // Pin the threadId shape (plain UUID) without locking the random value. The kind column
-        // distinguishes task rows from workflow-chat rows.
-        assertThat(result.getThreadId())
-            .as("threadId must be a plain UUID so session-store events are isolated per chat")
-            .matches("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
-        // autoTitled defaults to true on new rows so the LLM-driven generateAiHubChatTitle loop runs
-        // until a title is authoritatively set (LLM regen, or user rename). A regression that flips the
-        // default to false would silently disable title regeneration for every new task chat,
-        // leaving them stuck at the initial creation-time placeholder forever.
-        assertThat(result.isAutoTitled())
-            .as("new task chats must be eligible for LLM title regeneration")
-            .isTrue();
-    }
-
-    @Test
-    void testCreateAiHubTaskChatProducesDistinctRowsOnEveryCall() {
-        // Always-new invariant: two consecutive calls with the same (workspace, user, environment, agent)
-        // tuple must produce two distinct chat rows with two distinct threadIds. Mirrors the
-        // workflow-chat invariant and pins the always-new design against a regression that re-introduces
-        // find-or-create.
-        when(chatRepository.save(any(AiHubChat.class)))
-            .thenAnswer(invocation -> invocation.getArgument(0));
-
-        AiHubChat first = chatService.createAiHubTaskChat(
-            WORKSPACE_ID, USER_ID, 0, 42L, "Research Assistant");
-        AiHubChat second = chatService.createAiHubTaskChat(
-            WORKSPACE_ID, USER_ID, 0, 42L, "Research Assistant");
-
-        assertThat(first.getThreadId())
-            .as("two clicks on the same task row must produce distinct threadIds")
-            .isNotEqualTo(second.getThreadId());
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    void testCreateAiHubTaskChatCopiesTaskResourcesAsArtifacts() {
-        // Verifies that copyTaskResourceTemplate calls AiHubChatArtifactService.recordReference once per
-        // resource and maps the kind correctly: WORKFLOW → WORKFLOW_REFERENCED, FILE → FILE_REFERENCED.
-        AiHubTaskService taskService = mock(AiHubTaskService.class);
-        AiHubChatArtifactService artifactService = mock(AiHubChatArtifactService.class);
-
-        AiHubChatServiceImpl service = newServiceWithProviders(taskService, artifactService);
-
-        stubSaveReturnsId(55L);
-
-        AiHubTaskResource workflowResource =
-            new AiHubTaskResource(42L, AiHubTaskResourceKind.WORKFLOW, "wf-1", "Daily standup");
-        AiHubTaskResource fileResource =
-            new AiHubTaskResource(42L, AiHubTaskResourceKind.FILE, "file-9", "notes.md");
-
-        when(taskService.listResources(42L)).thenReturn(List.of(workflowResource, fileResource));
-
-        AiHubChat result = service.createAiHubTaskChat(WORKSPACE_ID, USER_ID, 0, 42L, "Research Assistant");
-
-        assertThat(result.getId()).isEqualTo(55L);
-
-        verify(artifactService).recordReference(
-            55L, WORKSPACE_ID, USER_ID, AiHubChatArtifactKind.WORKFLOW_REFERENCED, "wf-1", "Daily standup", null);
-        verify(artifactService).recordReference(
-            55L, WORKSPACE_ID, USER_ID, AiHubChatArtifactKind.FILE_REFERENCED, "file-9", "notes.md", null);
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    void testCreateAiHubTaskChatSkipsFailingResourceWithoutAbortingChatCreation() {
-        // Per-resource failure must be swallowed (loop continues) and must NOT abort chat creation.
-        // Verify: chat still returned non-null AND second resource still recorded despite first throwing.
-        AiHubTaskService taskService = mock(AiHubTaskService.class);
-        AiHubChatArtifactService artifactService = mock(AiHubChatArtifactService.class);
-
-        AiHubChatServiceImpl service = newServiceWithProviders(taskService, artifactService);
-
-        stubSaveReturnsId(66L);
-
-        AiHubTaskResource firstResource =
-            new AiHubTaskResource(42L, AiHubTaskResourceKind.WORKFLOW, "wf-1", "Daily standup");
-        AiHubTaskResource secondResource =
-            new AiHubTaskResource(42L, AiHubTaskResourceKind.FILE, "file-9", "notes.md");
-
-        when(taskService.listResources(42L)).thenReturn(List.of(firstResource, secondResource));
-
-        doThrow(new RuntimeException("simulated failure"))
-            .when(artifactService)
-            .recordReference(
-                eq(66L), eq(WORKSPACE_ID), eq(USER_ID), eq(AiHubChatArtifactKind.WORKFLOW_REFERENCED),
-                eq("wf-1"), eq("Daily standup"), eq(null));
-
-        AiHubChat result = service.createAiHubTaskChat(WORKSPACE_ID, USER_ID, 0, 42L, "Research Assistant");
-
-        assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(66L);
-
-        // Second resource must still be recorded despite the first failing.
-        verify(artifactService).recordReference(
-            66L, WORKSPACE_ID, USER_ID, AiHubChatArtifactKind.FILE_REFERENCED, "file-9", "notes.md", null);
-    }
-
-    /**
-     * Constructs an {@link AiHubChatServiceImpl} manually with the shared {@code @Mock} infrastructure fields plus
-     * explicit {@link ObjectProvider} mocks for {@link AiHubTaskService} and {@link AiHubChatArtifactService}. The
-     * tool-related providers return {@code null} from {@code getIfAvailable()} so {@code copyTaskToolTemplate} stays a
-     * no-op and the tests isolate the resource copy path. Mirrors {@code AiHubTaskServiceTest#newService()}.
-     */
-    @SuppressWarnings("unchecked")
-    private AiHubChatServiceImpl newServiceWithProviders(
-        AiHubTaskService taskService,
-        AiHubChatArtifactService artifactService) {
-
-        ObjectProvider<AiHubTaskService> taskServiceProvider =
-            mock(ObjectProvider.class);
-
-        lenient().when(taskServiceProvider.getIfAvailable())
-            .thenReturn(taskService);
-
-        ObjectProvider<AiHubChatToolFacade> chatToolFacadeProvider = mock(ObjectProvider.class);
-
-        lenient().when(chatToolFacadeProvider.getIfAvailable())
-            .thenReturn(null);
-
-        ObjectProvider<ToolSearchCatalogFeeder> toolSearchCatalogFeederProvider = mock(ObjectProvider.class);
-
-        lenient().when(toolSearchCatalogFeederProvider.getIfAvailable())
-            .thenReturn(null);
-
-        ObjectProvider<AiHubChatArtifactService> chatArtifactServiceProvider = mock(ObjectProvider.class);
-
-        lenient().when(chatArtifactServiceProvider.getIfAvailable())
-            .thenReturn(artifactService);
-
-        return new AiHubChatServiceImpl(
-            chatRepository, jobFacade, jobRegistry, inFlightRunRegistry,
-            taskServiceProvider, chatToolFacadeProvider, toolSearchCatalogFeederProvider,
-            chatArtifactServiceProvider, aiHubSessionMemoryProvider, mock(AiHubAuditPublisher.class));
-    }
-
-    /**
-     * Stubs {@code chatRepository.save} so the returned chat has a non-null {@code id}. Required for the copy-path
-     * tests because {@code copyTaskResourceTemplate} guards on {@code saved.getId() != null}.
-     */
-    private void stubSaveReturnsId(long chatId) {
-        when(chatRepository.save(any(AiHubChat.class))).thenAnswer(invocation -> {
-            AiHubChat captured = invocation.getArgument(0);
-
-            captured.setId(chatId);
-
-            return captured;
-        });
     }
 }

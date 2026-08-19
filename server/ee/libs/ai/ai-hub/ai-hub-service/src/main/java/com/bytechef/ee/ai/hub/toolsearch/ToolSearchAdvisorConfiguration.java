@@ -148,20 +148,20 @@ public class ToolSearchAdvisorConfiguration {
     }
 
     /**
-     * v2 dynamic per-task tool callback resolver. Injected into the agent so each chat turn synthesizes the task's
+     * v2 dynamic per-chat tool callback resolver. Injected into the agent so each chat turn synthesizes the chat's
      * attached tools as Spring AI {@link ToolCallback}s on top of the static set.
      */
     @Bean
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    AiHubTaskBindingToolCallbackResolver taskBindingToolCallbackResolver(
-        com.bytechef.ee.ai.hub.task.AiHubTaskService taskService,
-        com.bytechef.ee.ai.hub.task.AiHubTaskToolFacade taskToolFacade,
+    AiHubChatBindingToolCallbackResolver chatBindingToolCallbackResolver(
+        com.bytechef.ee.ai.hub.chat.AiHubChatService chatService,
+        com.bytechef.ee.ai.hub.chat.AiHubChatToolFacade chatToolFacade,
         ClusterElementDefinitionService clusterElementDefinitionService, ConnectionService connectionService,
         com.bytechef.ee.ai.hub.mcpserver.AiHubMcpToolCallbackProvider mcpToolCallbackProvider,
         com.bytechef.ee.ai.hub.skill.AiHubSkillsToolProvider skillsToolCallbackProvider) {
 
-        return new AiHubTaskBindingToolCallbackResolver(
-            taskService, taskToolFacade, clusterElementDefinitionService, connectionService, mcpToolCallbackProvider,
+        return new AiHubChatBindingToolCallbackResolver(
+            chatService, chatToolFacade, clusterElementDefinitionService, connectionService, mcpToolCallbackProvider,
             skillsToolCallbackProvider);
     }
 

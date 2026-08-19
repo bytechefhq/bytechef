@@ -15,8 +15,8 @@ import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
 /**
- * Single AI Hub auto-configuration: enables Spring Data JDBC repositories for every CC-owned sub-domain (task,
- * personal-agent) and binds {@code bytechef.ai-hub.cost-estimation.*} configuration properties.
+ * Single AI Hub auto-configuration: enables Spring Data JDBC repositories for every CC-owned sub-domain (chat, task)
+ * and binds {@code bytechef.ai-hub.cost-estimation.*} configuration properties.
  *
  * <p>
  * Cross-module repositories are NOT scanned here — they're owned by their own module's auto-configuration:
@@ -30,7 +30,7 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
  * </ul>
  *
  * <p>
- * Service-layer beans ({@code AiHubTaskServiceImpl}, {@code DefaultCostEstimator}, etc.) are picked up by Spring's
+ * Service-layer beans ({@code AiHubChatServiceImpl}, {@code DefaultCostEstimator}, etc.) are picked up by Spring's
  * component scan via {@code @Component} / {@code @Service} annotations and are not declared here.
  * </p>
  *
@@ -44,8 +44,8 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 @EnableJdbcRepositories(
     basePackages = {
         "com.bytechef.ee.ai.hub.mcpserver.repository",
-        "com.bytechef.ee.ai.hub.personalagent.repository",
         "com.bytechef.ee.ai.hub.task.repository",
+        "com.bytechef.ee.ai.hub.chat.repository",
         "com.bytechef.ee.ai.hub.workspacesettings.repository"
     })
 public class AiHubJdbcRepositoryConfiguration {

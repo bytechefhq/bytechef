@@ -17,15 +17,15 @@ import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Component;
 
 /**
- * Per-task guard for workflow-chat turns. Enforces two production-safety invariants:
+ * Per-chat guard for workflow-chat turns. Enforces two production-safety invariants:
  *
  * <ul>
  * <li><b>Rate limit:</b> at most {@value #RATE_LIMIT_MIN_INTERVAL_MS} milliseconds between turns. A user who spams
  * Enter or a buggy client that retries on every keystroke can't fire 100 workflow executions per second — workflows
  * that hit paid APIs (LLM, OpenAI, external services) would otherwise be a denial-of-wallet vector. The cooldown is
- * per-task rather than per-user so multiple parallel workflow chats stay independently usable.</li>
+ * per-chat rather than per-user so multiple parallel workflow chats stay independently usable.</li>
  *
- * <li><b>Concurrency:</b> at most one in-flight turn per task. Two near-simultaneous user messages (mis-click on the
+ * <li><b>Concurrency:</b> at most one in-flight turn per chat. Two near-simultaneous user messages (mis-click on the
  * send button, network retry) would otherwise race two workflow executions whose outputs land in the chat in
  * non-deterministic order. The lock is acquired on turn start and released on turn complete; a request that finds a
  * held lock surfaces a "previous turn still running" error to the user.</li>
@@ -54,21 +54,21 @@ import org.springframework.stereotype.Component;
 public class WorkflowChatGuard {
 
     /**
-     * Cooldown between successive turns on the same task. 2 seconds is comfortable for a normal user (faster than
+     * Cooldown between successive turns on the same chat. 2 seconds is comfortable for a normal user (faster than
      * typing-then-clicking-send takes anyway) but high enough to bound a runaway client to ~30 turns/min instead of
      * unbounded.
      */
     public static final long RATE_LIMIT_MIN_INTERVAL_MS = 2_000L;
 
     /**
-     * Cache name for last-turn timestamps (rate limit). Key: task id. Value: epoch millis of the last turn that
+     * Cache name for last-turn timestamps (rate limit). Key: chat id. Value: epoch millis of the last turn that
      * started.
      */
     public static final String LAST_TURN_CACHE_NAME =
         "com.bytechef.ee.ai.hub.agent.WorkflowChatGuard.lastTurn";
 
     /**
-     * Cache name for in-flight task locks (concurrency). Key: task id. Value: epoch millis of when the lock was
+     * Cache name for in-flight chat locks (concurrency). Key: chat id. Value: epoch millis of when the lock was
      * acquired (used for diagnostics — never read for correctness).
      */
     public static final String IN_FLIGHT_CACHE_NAME =
@@ -82,7 +82,7 @@ public class WorkflowChatGuard {
     }
 
     /**
-     * Attempts to acquire the per-task turn slot. Returns {@link AdmissionResult#admit()} on success (the bridge
+     * Attempts to acquire the per-chat turn slot. Returns {@link AdmissionResult#admit()} on success (the bridge
      * proceeds with the turn and must call {@link #release(long)} on completion);
      * {@link AdmissionResult#rateLimited(Duration)} or {@link AdmissionResult#concurrencyBlocked()} on rejection (the
      * bridge surfaces a RUN_ERROR with the result's message).
@@ -93,12 +93,12 @@ public class WorkflowChatGuard {
      * back-to-back attempts where the previous turn completed quickly.
      * </p>
      */
-    public AdmissionResult tryAdmit(long taskId) {
+    public AdmissionResult tryAdmit(long chatId) {
         Cache inFlight = getCache(IN_FLIGHT_CACHE_NAME);
 
-        // Concurrency check: refuse if a turn is already in flight for this task. The cache entry
+        // Concurrency check: refuse if a turn is already in flight for this chat. The cache entry
         // is set by acquire() below (this method) and cleared by release() at turn end.
-        if (inFlight.get(taskId) != null) {
+        if (inFlight.get(chatId) != null) {
             return AdmissionResult.concurrencyBlocked();
         }
 
@@ -106,7 +106,7 @@ public class WorkflowChatGuard {
         // window suggest a runaway client. Read the last-turn timestamp; if within RATE_LIMIT_MIN_INTERVAL_MS,
         // refuse with the time remaining so the client can show a "wait X seconds" message.
         Cache lastTurn = getCache(LAST_TURN_CACHE_NAME);
-        Long lastTurnMillis = lastTurn.get(taskId, Long.class);
+        Long lastTurnMillis = lastTurn.get(chatId, Long.class);
         long now = Instant.now()
             .toEpochMilli();
 
@@ -122,18 +122,18 @@ public class WorkflowChatGuard {
         // rate limit on the next attempt). The in-flight marker stays until release() fires; the last-turn
         // timestamp is set BEFORE the workflow runs so even a turn that takes 30 seconds enforces the
         // cooldown against the start time, not the end time.
-        inFlight.put(taskId, now);
-        lastTurn.put(taskId, now);
+        inFlight.put(chatId, now);
+        lastTurn.put(chatId, now);
 
         return AdmissionResult.admit();
     }
 
     /**
-     * Releases the per-task turn slot. Idempotent — calling release() on a task with no held lock is a no-op. The
+     * Releases the per-chat turn slot. Idempotent — calling release() on a chat with no held lock is a no-op. The
      * bridge calls this in onComplete / onError paths so a finished turn frees the slot for the next message.
      */
-    public void release(long taskId) {
-        getCache(IN_FLIGHT_CACHE_NAME).evictIfPresent(taskId);
+    public void release(long chatId) {
+        getCache(IN_FLIGHT_CACHE_NAME).evictIfPresent(chatId);
     }
 
     private Cache getCache(String name) {

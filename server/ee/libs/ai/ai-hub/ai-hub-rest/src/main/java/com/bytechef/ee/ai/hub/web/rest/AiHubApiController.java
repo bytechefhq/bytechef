@@ -14,9 +14,9 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.ee.ai.hub.agent.AiHubChatStreamer;
 import com.bytechef.ee.ai.hub.agent.InFlightAiHubRunRegistry;
+import com.bytechef.ee.ai.hub.chat.AiHubChat;
+import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import com.bytechef.ee.ai.hub.security.WorkspaceAccessGuard;
-import com.bytechef.ee.ai.hub.task.AiHubTask;
-import com.bytechef.ee.ai.hub.task.AiHubTaskService;
 import com.bytechef.ee.ai.hub.util.AiHubStateKeys;
 import com.bytechef.ee.ai.hub.util.Mode;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -57,10 +57,10 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
  * variant based on {@link Mode}) and runs it through the AG-UI service.
  *
  * <p>
- * The {@code ai_hub} agent is the only AG-UI-dispatched agent that is bound to a {@link AiHubTask} — its
- * {@code threadId} keys a row in {@code ai_hub_task} and every tool callback invoked from the agent records its work
+ * The {@code ai_hub} agent is the only AG-UI-dispatched agent that is bound to a {@link AiHubChat} — its
+ * {@code threadId} keys a row in {@code ai_hub_chat} and every tool callback invoked from the agent records its work
  * against that row's {@code id}. Keeping the dispatcher in the {@code automation-ai-hub-rest} module means CC owns
- * end-to-end the path that creates, mutates, and reads its own task surface.
+ * end-to-end the path that creates, mutates, and reads its own chat surface.
  * </p>
  *
  * <p>
@@ -85,21 +85,21 @@ public class AiHubApiController {
     private final Map<String, LocalAgent> localAgentMap;
     private final AiHubChatStreamer chatStreamer;
     private final InFlightAiHubRunRegistry inFlightRunRegistry;
-    private final AiHubTaskService taskService;
+    private final AiHubChatService chatService;
     private final UserService userService;
     private final WorkspaceFacade workspaceFacade;
 
     @SuppressFBWarnings("EI")
     public AiHubApiController(
         AiHubChatStreamer chatStreamer, InFlightAiHubRunRegistry inFlightRunRegistry,
-        List<LocalAgent> localAgents, AiHubTaskService taskService,
+        List<LocalAgent> localAgents, AiHubChatService chatService,
         UserService userService, WorkspaceFacade workspaceFacade) {
 
         this.chatStreamer = chatStreamer;
         this.inFlightRunRegistry = inFlightRunRegistry;
         this.localAgentMap = localAgents.stream()
             .collect(Collectors.toMap(LocalAgent::getAgentId, localAgent -> localAgent));
-        this.taskService = taskService;
+        this.chatService = chatService;
         this.userService = userService;
         this.workspaceFacade = workspaceFacade;
     }
@@ -139,7 +139,7 @@ public class AiHubApiController {
      * invocation), it opens an EventSource here and gets the buffered prefix + live tail.
      *
      * <p>
-     * Auth gate matches the POST path: the resolved {@link AiHubTask} must belong to the authenticated user. 404 is
+     * Auth gate matches the POST path: the resolved {@link AiHubChat} must belong to the authenticated user. 404 is
      * returned when no run is registered for the thread — the client treats that as "fell off the bus" and renders
      * history-only without a running pulse.
      * </p>
@@ -149,7 +149,7 @@ public class AiHubApiController {
         long userId = userService.getCurrentUser()
             .getId();
 
-        AiHubTask task = enforceThreadOwnershipForAttach(threadId, userId);
+        AiHubChat chat = enforceThreadOwnershipForAttach(threadId, userId);
 
         Optional<SseEmitter> emitterOptional = chatStreamer.attachToRun(threadId);
 
@@ -158,7 +158,7 @@ public class AiHubApiController {
             // no run to attach to is best surfaced as 404 so the client can fall back to history-only rendering.
             Metrics.counter(
                 "bytechef.ai_hub.chat.attach_miss_total",
-                "taskId", String.valueOf(task.getId()))
+                "chatId", String.valueOf(chat.getId()))
                 .increment();
 
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No in-flight run for thread");
@@ -172,7 +172,7 @@ public class AiHubApiController {
 
     /**
      * Reports which of the supplied {@code threadIds} currently have in-flight runs. Used by the sidebar on mount /
-     * environment switch to paint a "running" pulse on each task that's actively streaming, not just the focused one.
+     * environment switch to paint a "running" pulse on each chat that's actively streaming, not just the focused one.
      * Filtering against a caller-supplied id set scopes the answer to threads the user actually owns — without it, an
      * enumeration of every in-flight thread would leak cross-workspace state.
      */
@@ -197,28 +197,28 @@ public class AiHubApiController {
             return false;
         }
 
-        Optional<AiHubTask> task = taskService.findByThreadId(threadId);
+        Optional<AiHubChat> chat = chatService.findByThreadId(threadId);
 
-        return task.isPresent() && task.get()
+        return chat.isPresent() && chat.get()
             .getUserId() == userId;
     }
 
-    private AiHubTask enforceThreadOwnershipForAttach(String threadId, long userId) {
+    private AiHubChat enforceThreadOwnershipForAttach(String threadId, long userId) {
         if (threadId == null || threadId.isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Missing threadId");
         }
 
-        Optional<AiHubTask> task = taskService.findByThreadId(threadId);
+        Optional<AiHubChat> chat = chatService.findByThreadId(threadId);
 
-        if (task.isEmpty()) {
+        if (chat.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Unknown thread");
         }
 
-        AiHubTask row = task.get();
+        AiHubChat row = chat.get();
 
         if (row.getUserId() != userId) {
             throw new ResponseStatusException(
-                HttpStatus.FORBIDDEN, "AiHubTask is not accessible to the current user");
+                HttpStatus.FORBIDDEN, "AiHubChat is not accessible to the current user");
         }
 
         return row;
@@ -246,8 +246,8 @@ public class AiHubApiController {
     }
 
     /**
-     * Verifies that the resolved {@link AiHubTask} belongs to the authenticated user AND lives in the requested
-     * workspace. Returns the verified thread id, or {@code null} when none was supplied or no task exists yet (first
+     * Verifies that the resolved {@link AiHubChat} belongs to the authenticated user AND lives in the requested
+     * workspace. Returns the verified thread id, or {@code null} when none was supplied or no chat exists yet (first
      * turn).
      */
     private String enforceThreadOwnership(AgUiParameters agUiParameters, long userId, long workspaceId) {
@@ -261,20 +261,20 @@ public class AiHubApiController {
             return null;
         }
 
-        Optional<AiHubTask> task = taskService.findByThreadId(threadId);
+        Optional<AiHubChat> chat = chatService.findByThreadId(threadId);
 
-        if (task.isEmpty()) {
+        if (chat.isEmpty()) {
             Metrics.counter("bytechef.ai_hub.chat.threadid_unknown_total")
                 .increment();
 
             return null;
         }
 
-        AiHubTask row = task.get();
+        AiHubChat row = chat.get();
 
-        if (row.getUserId() != userId || taskService.getWorkspaceId(row.getId()) != workspaceId) {
+        if (row.getUserId() != userId || chatService.getWorkspaceId(row.getId()) != workspaceId) {
             throw new ResponseStatusException(
-                HttpStatus.FORBIDDEN, "AiHubTask is not accessible to the current user");
+                HttpStatus.FORBIDDEN, "AiHubChat is not accessible to the current user");
         }
 
         return threadId;

@@ -16,7 +16,7 @@ import com.bytechef.automation.assetfile.domain.AssetFileFormat;
  *
  * <p>
  * Generators are <strong>synchronous</strong>. They run inside the agent's tool-call dispatch, persist the
- * {@code asset_file} row, link it to the task via the {@code AUTHORED} join, and return the row id in
+ * {@code asset_file} row, link it to the chat via the {@code AUTHORED} join, and return the row id in
  * {@link GenerationResult}. The chat surface renders the resulting tool result as a clickable file chip via the
  * existing tool-call channel — there is intentionally no separate streaming protocol for generated artifacts (text
  * formats already stream through the chat token stream; binary formats are unrenderable until complete).
@@ -48,10 +48,10 @@ public interface ArtifactGenerator {
      * the structured prompt).</li>
      * <li>Inserting an {@code asset_file} row via the platform facade with {@code source=AI_GENERATED}, the supplied
      * {@code generatedByAgentSource} ordinal, and {@code generatedFromPrompt} set to the user's last prompt.</li>
-     * <li>Recording the {@code (taskId, assetFileId, AUTHORED)} join via
-     * {@code AiHubTaskAssetFileService.recordAuthorship} when {@code taskId} is non-null. When the request carries no
-     * task context (rare — first-turn race before the chat endpoint creates the row), the file still persists but is
-     * not joined; the caller surfaces this back as {@code taskLinked=false}.</li>
+     * <li>Recording the {@code (chatId, assetFileId, AUTHORED)} join via
+     * {@code AiHubChatAssetFileService.recordAuthorship} when {@code chatId} is non-null. When the request carries no
+     * chat context (rare — first-turn race before the chat endpoint creates the row), the file still persists but is
+     * not joined; the caller surfaces this back as {@code chatLinked=false}.</li>
      * </ol>
      */
     GenerationResult generate(GenerationRequest request);

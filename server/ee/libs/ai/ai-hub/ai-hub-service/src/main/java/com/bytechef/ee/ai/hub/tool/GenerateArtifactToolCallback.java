@@ -12,8 +12,8 @@ import com.bytechef.automation.assetfile.domain.AssetFileFormat;
 import com.bytechef.ee.ai.hub.artifact.ArtifactGeneratorRegistry;
 import com.bytechef.ee.ai.hub.artifact.GenerationRequest;
 import com.bytechef.ee.ai.hub.artifact.GenerationResult;
-import com.bytechef.ee.ai.hub.task.AiHubTask;
-import com.bytechef.ee.ai.hub.task.AiHubTaskService;
+import com.bytechef.ee.ai.hub.chat.AiHubChat;
+import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Optional;
@@ -88,15 +88,15 @@ public class GenerateArtifactToolCallback implements ToolCallback {
             }""";
 
     private final ArtifactGeneratorRegistry artifactGeneratorRegistry;
-    private final AiHubTaskService taskService;
+    private final AiHubChatService chatService;
     private final JsonMapper jsonMapper = new JsonMapper();
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public GenerateArtifactToolCallback(
-        ArtifactGeneratorRegistry artifactGeneratorRegistry, AiHubTaskService taskService) {
+        ArtifactGeneratorRegistry artifactGeneratorRegistry, AiHubChatService chatService) {
 
         this.artifactGeneratorRegistry = artifactGeneratorRegistry;
-        this.taskService = taskService;
+        this.chatService = chatService;
     }
 
     @Override
@@ -146,13 +146,13 @@ public class GenerateArtifactToolCallback implements ToolCallback {
                     "Workspace context unavailable - open this chat from the AI Hub of a workspace.");
             }
 
-            Long taskId = resolveTaskId(invocationContext.threadId());
+            Long chatId = resolveChatId(invocationContext.threadId());
 
             GenerationRequest request = new GenerationRequest(
                 invocationContext.workspaceId(),
                 invocationContext.userId(),
                 AiHubToolInvocationContext.resolveEnvironmentOrDefault(invocationContext),
-                taskId,
+                chatId,
                 invocationContext.sourceOrdinal() == null ? (short) 0 : invocationContext.sourceOrdinal(),
                 invocationContext.lastUserPrompt(),
                 input.filename(),
@@ -177,7 +177,7 @@ public class GenerateArtifactToolCallback implements ToolCallback {
                 result.filename(),
                 result.format()
                     .name(),
-                result.taskLinked()));
+                result.chatLinked()));
         } catch (JacksonException exception) {
             return ToolErrors.toolError(jsonMapper, "Invalid tool input: " + exception.getMessage());
         } catch (RuntimeException exception) {
@@ -186,19 +186,19 @@ public class GenerateArtifactToolCallback implements ToolCallback {
     }
 
     /**
-     * Resolves the task row id for the bound thread. {@code null} is a tolerated state — first-turn races where the
-     * apply tool fires before the chat endpoint has created the matching task. The generator still persists the file
-     * but skips the AUTHORED join; the caller surfaces this back as {@code taskLinked=false} so the LLM can prompt the
+     * Resolves the chat row id for the bound thread. {@code null} is a tolerated state — first-turn races where the
+     * apply tool fires before the chat endpoint has created the matching chat. The generator still persists the file
+     * but skips the AUTHORED join; the caller surfaces this back as {@code chatLinked=false} so the LLM can prompt the
      * user to attach manually if desired.
      */
-    private Long resolveTaskId(@Nullable String threadId) {
+    private Long resolveChatId(@Nullable String threadId) {
         if (threadId == null || threadId.isBlank()) {
             return null;
         }
 
-        Optional<AiHubTask> task = taskService.findByThreadId(threadId);
+        Optional<AiHubChat> chat = chatService.findByThreadId(threadId);
 
-        return task.map(AiHubTask::getId)
+        return chat.map(AiHubChat::getId)
             .orElse(null);
     }
 
@@ -228,6 +228,6 @@ public class GenerateArtifactToolCallback implements ToolCallback {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public record GenerateArtifactOutput(
-        long assetFileId, String filename, String format, boolean taskLinked) {
+        long assetFileId, String filename, String format, boolean chatLinked) {
     }
 }

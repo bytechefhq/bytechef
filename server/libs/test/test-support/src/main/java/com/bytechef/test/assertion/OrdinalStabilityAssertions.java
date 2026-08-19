@@ -26,7 +26,7 @@ import java.util.Map;
  *
  * <p>
  * Many ByteChef tables persist enum columns as {@code int} ordinals (see {@code automation-asset-file},
- * {@code ai-copilot}'s {@code AiHubTask}/{@code AiHubTaskArtifact}/{@code AiAutoMemory}/ {@code AiHubUsage} entities).
+ * {@code ai-copilot}'s {@code AiHubChat}/{@code AiHubChatArtifact}/{@code AiAutoMemory}/ {@code AiHubUsage} entities).
  * A reorder, rename, or removal of an enum constant silently re-attributes every historical row to a different value at
  * the same ordinal — there is no DB-side guard. The only protection is a unit test that pins the ordinal of every value
  * and fails on any change.

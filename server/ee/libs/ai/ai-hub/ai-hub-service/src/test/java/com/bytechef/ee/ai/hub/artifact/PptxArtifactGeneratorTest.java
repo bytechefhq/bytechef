@@ -18,7 +18,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.automation.assetfile.domain.AssetFile;
 import com.bytechef.automation.assetfile.domain.AssetFileFormat;
 import com.bytechef.automation.assetfile.service.AssetFileFacade;
-import com.bytechef.ee.ai.hub.task.AiHubTaskAssetFileService;
+import com.bytechef.ee.ai.hub.chat.AiHubChatAssetFileService;
 import java.io.ByteArrayInputStream;
 import java.util.List;
 import org.apache.poi.xslf.usermodel.XMLSlideShow;
@@ -38,7 +38,7 @@ class PptxArtifactGeneratorTest {
     @Test
     void testGenerateRendersSlidesWithTitleAndBullets() throws Exception {
         AssetFileFacade facade = mock(AssetFileFacade.class);
-        AiHubTaskAssetFileService linkService = mock(AiHubTaskAssetFileService.class);
+        AiHubChatAssetFileService linkService = mock(AiHubChatAssetFileService.class);
 
         AssetFile saved = mock(AssetFile.class);
 
@@ -90,7 +90,7 @@ class PptxArtifactGeneratorTest {
         // A zero-slide PPTX is technically valid OOXML but Keynote treats it as corrupt. Pin: an empty slides list
         // produces a single blank slide rather than a zero-slide deck.
         AssetFileFacade facade = mock(AssetFileFacade.class);
-        AiHubTaskAssetFileService linkService = mock(AiHubTaskAssetFileService.class);
+        AiHubChatAssetFileService linkService = mock(AiHubChatAssetFileService.class);
 
         AssetFile saved = mock(AssetFile.class);
 
@@ -120,7 +120,7 @@ class PptxArtifactGeneratorTest {
     @Test
     void testGenerateAppendsPptxExtension() {
         AssetFileFacade facade = mock(AssetFileFacade.class);
-        AiHubTaskAssetFileService linkService = mock(AiHubTaskAssetFileService.class);
+        AiHubChatAssetFileService linkService = mock(AiHubChatAssetFileService.class);
 
         AssetFile saved = mock(AssetFile.class);
 
@@ -141,7 +141,7 @@ class PptxArtifactGeneratorTest {
     @Test
     void testGenerateRejectsMalformedSpec() {
         AssetFileFacade facade = mock(AssetFileFacade.class);
-        AiHubTaskAssetFileService linkService = mock(AiHubTaskAssetFileService.class);
+        AiHubChatAssetFileService linkService = mock(AiHubChatAssetFileService.class);
 
         PptxArtifactGenerator generator = new PptxArtifactGenerator(facade, linkService);
 

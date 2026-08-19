@@ -17,9 +17,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.ee.ai.hub.task.AiHubTask;
-import com.bytechef.ee.ai.hub.task.AiHubTaskKind;
-import com.bytechef.ee.ai.hub.task.AiHubTaskService;
+import com.bytechef.ee.ai.hub.chat.AiHubChat;
+import com.bytechef.ee.ai.hub.chat.AiHubChatKind;
+import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.model.ToolContext;
@@ -28,16 +28,15 @@ import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 
 /**
- * Unit tests for {@link CreateWorkflowChatToolCallback}. The tool is the LLM's create-or-restore handle on
- * workflow-chat tasks — the tests pin the contract callers (the LLM, the AI Hub sidebar that re-uses the threadId)
- * depend on:
+ * Unit tests for {@link CreateWorkflowChatToolCallback}. The tool is the LLM's create-or-restore handle on workflow
+ * chats — the tests pin the contract callers (the LLM, the AI Hub sidebar that re-uses the threadId) depend on:
  *
  * <ul>
  * <li>The tool surfaces validation errors as a JSON {@code error} field rather than throwing — the LLM agent expects
  * tool results to always be JSON.</li>
  * <li>The tool resolves workspace + user from the {@link ToolContext} (not from the input arguments) so an LLM cannot
  * fabricate a workspace id and create chats elsewhere.</li>
- * <li>The output shape is {@code {threadId, taskId, title}} — pinned because {@link OpenWorkflowChatTabToolCallback}
+ * <li>The output shape is {@code {threadId, chatId, title}} — pinned because {@link OpenWorkflowChatTabToolCallback}
  * reads {@code threadId} verbatim and a rename here would silently break the navigation tool.</li>
  * </ul>
  *
@@ -52,7 +51,7 @@ class CreateWorkflowChatToolCallbackTest {
     @Test
     void testToolDefinitionExposesNameAndSchema() {
         CreateWorkflowChatToolCallback callback =
-            new CreateWorkflowChatToolCallback(mock(AiHubTaskService.class));
+            new CreateWorkflowChatToolCallback(mock(AiHubChatService.class));
 
         ToolDefinition definition = callback.getToolDefinition();
 
@@ -67,7 +66,7 @@ class CreateWorkflowChatToolCallbackTest {
     @Test
     void testRejectsMissingWorkflowExecutionTriggerId() throws Exception {
         CreateWorkflowChatToolCallback callback =
-            new CreateWorkflowChatToolCallback(mock(AiHubTaskService.class));
+            new CreateWorkflowChatToolCallback(mock(AiHubChatService.class));
 
         String result = callback.call("{\"projectDeploymentId\":\"1\"}", contextFor(7L, 3L));
 
@@ -81,7 +80,7 @@ class CreateWorkflowChatToolCallbackTest {
     @Test
     void testRejectsMissingProjectDeploymentId() throws Exception {
         CreateWorkflowChatToolCallback callback =
-            new CreateWorkflowChatToolCallback(mock(AiHubTaskService.class));
+            new CreateWorkflowChatToolCallback(mock(AiHubChatService.class));
 
         String result = callback.call("{\"workflowExecutionTriggerId\":\"abc\"}", contextFor(7L, 3L));
 
@@ -95,7 +94,7 @@ class CreateWorkflowChatToolCallbackTest {
     @Test
     void testRejectsNonNumericProjectDeploymentId() throws Exception {
         CreateWorkflowChatToolCallback callback =
-            new CreateWorkflowChatToolCallback(mock(AiHubTaskService.class));
+            new CreateWorkflowChatToolCallback(mock(AiHubChatService.class));
 
         String result = callback.call(
             "{\"workflowExecutionTriggerId\":\"abc\",\"projectDeploymentId\":\"not-a-number\"}", contextFor(7L, 3L));
@@ -113,7 +112,7 @@ class CreateWorkflowChatToolCallbackTest {
     @Test
     void testRejectsMissingWorkspaceContext() throws Exception {
         CreateWorkflowChatToolCallback callback =
-            new CreateWorkflowChatToolCallback(mock(AiHubTaskService.class));
+            new CreateWorkflowChatToolCallback(mock(AiHubChatService.class));
 
         // No tool context — the LLM must NOT be able to forge workspaceId via input arguments. The tool refuses
         // to act when the workspace cannot be resolved from the trusted ToolContext channel.
@@ -128,17 +127,17 @@ class CreateWorkflowChatToolCallbackTest {
     }
 
     @Test
-    void testCreatesTaskAndReturnsThreadId() throws Exception {
-        AiHubTaskService taskService = mock(AiHubTaskService.class);
+    void testCreatesChatAndReturnsThreadId() throws Exception {
+        AiHubChatService chatService = mock(AiHubChatService.class);
 
-        AiHubTask persisted =
-            newTask(101L, "00000000-0000-0000-0000-00000000abc3", "Support bot");
+        AiHubChat persisted =
+            newChat(101L, "00000000-0000-0000-0000-00000000abc3", "Support bot");
 
         when(
-            taskService.createWorkflowChat(
+            chatService.createWorkflowChat(
                 anyLong(), anyLong(), anyInt(), anyString(), anyLong(), isNull())).thenReturn(persisted);
 
-        CreateWorkflowChatToolCallback callback = new CreateWorkflowChatToolCallback(taskService);
+        CreateWorkflowChatToolCallback callback = new CreateWorkflowChatToolCallback(chatService);
 
         String result = callback.call(
             "{\"workflowExecutionTriggerId\":\"abc\",\"projectDeploymentId\":\"1\"}", contextFor(7L, 3L));
@@ -150,45 +149,45 @@ class CreateWorkflowChatToolCallbackTest {
         // navigation flow in the product.
         assertThat(node.get("threadId")
             .asText()).isEqualTo("00000000-0000-0000-0000-00000000abc3");
-        assertThat(node.get("taskId")
+        assertThat(node.get("chatId")
             .asLong()).isEqualTo(101L);
         assertThat(node.get("title")
             .asText()).isEqualTo("Support bot");
 
-        verify(taskService).createWorkflowChat(
+        verify(chatService).createWorkflowChat(
             eq(7L), eq(3L), anyInt(), eq("abc"), eq(1L), isNull());
     }
 
     @Test
     void testPropagatesTitleArgument() throws Exception {
-        AiHubTaskService taskService = mock(AiHubTaskService.class);
+        AiHubChatService chatService = mock(AiHubChatService.class);
 
         when(
-            taskService.createWorkflowChat(
+            chatService.createWorkflowChat(
                 anyLong(), anyLong(), anyInt(), anyString(), anyLong(), eq("My Title")))
-                    .thenReturn(newTask(1L, "thread", "My Title"));
+                    .thenReturn(newChat(1L, "thread", "My Title"));
 
-        CreateWorkflowChatToolCallback callback = new CreateWorkflowChatToolCallback(taskService);
+        CreateWorkflowChatToolCallback callback = new CreateWorkflowChatToolCallback(chatService);
 
         callback.call(
             "{\"workflowExecutionTriggerId\":\"abc\",\"projectDeploymentId\":\"1\",\"title\":\"My Title\"}",
             contextFor(7L, 3L));
 
-        // Title goes through verbatim — the task service is responsible for null/blank handling, so we
+        // Title goes through verbatim — the chat service is responsible for null/blank handling, so we
         // just verify the tool doesn't strip or transform the value.
-        verify(taskService).createWorkflowChat(
+        verify(chatService).createWorkflowChat(
             eq(7L), eq(3L), anyInt(), eq("abc"), eq(1L), eq("My Title"));
     }
 
-    private static AiHubTask newTask(long id, String threadId, String title) {
-        AiHubTask task = new AiHubTask(3L);
+    private static AiHubChat newChat(long id, String threadId, String title) {
+        AiHubChat chat = new AiHubChat(3L);
 
-        task.setId(id);
-        task.setThreadId(threadId);
-        task.setKind(AiHubTaskKind.WORKFLOW_CHAT);
-        task.setTitle(title);
+        chat.setId(id);
+        chat.setThreadId(threadId);
+        chat.setKind(AiHubChatKind.WORKFLOW_CHAT);
+        chat.setTitle(title);
 
-        return task;
+        return chat;
     }
 
     private static ToolContext contextFor(long workspaceId, long userId) {

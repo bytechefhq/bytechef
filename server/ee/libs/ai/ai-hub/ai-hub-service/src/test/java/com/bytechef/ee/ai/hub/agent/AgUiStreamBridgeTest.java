@@ -43,7 +43,7 @@ class AgUiStreamBridgeTest {
     private static final String MESSAGE_ID = "msg-1";
     private static final String THREAD_ID = "thread-1";
     private static final String RUN_ID = "run-1";
-    private static final long TASK_ID = 42L;
+    private static final long CHAT_ID = 42L;
 
     private AgentSubscriber subscriber;
     private WebhookResumeRegistry registry;
@@ -64,7 +64,7 @@ class AgUiStreamBridgeTest {
                 WorkflowChatGuard.LAST_TURN_CACHE_NAME, WorkflowChatGuard.IN_FLIGHT_CACHE_NAME));
 
         bridge = new AgUiStreamBridge(
-            subscriber, MESSAGE_ID, THREAD_ID, RUN_ID, TASK_ID, registry, jobRegistry, guard, null,
+            subscriber, MESSAGE_ID, THREAD_ID, RUN_ID, CHAT_ID, registry, jobRegistry, guard, null,
             () -> {});
     }
 
@@ -103,7 +103,7 @@ class AgUiStreamBridgeTest {
         bridge.onEvent(payload);
 
         // Resume URL must land in the registry so the next user turn can POST to it.
-        assertThat(registry.consume(TASK_ID)).isEqualTo("https://example.com/resume/abc");
+        assertThat(registry.consume(CHAT_ID)).isEqualTo("https://example.com/resume/abc");
 
         ArgumentCaptor<CustomEvent> eventCaptor = ArgumentCaptor.forClass(CustomEvent.class);
 
@@ -124,7 +124,7 @@ class AgUiStreamBridgeTest {
 
         // Without a resumeUrl the question still needs to render client-side — the user's answer just
         // starts a fresh execution rather than resuming. Don't drop the event silently.
-        assertThat(registry.consume(TASK_ID)).isNull();
+        assertThat(registry.consume(CHAT_ID)).isNull();
 
         verify(subscriber).onCustomEvent(any());
     }
@@ -255,7 +255,7 @@ class AgUiStreamBridgeTest {
                 WorkflowChatGuard.LAST_TURN_CACHE_NAME, WorkflowChatGuard.IN_FLIGHT_CACHE_NAME));
 
         AgUiStreamBridge bridgeWithJobFacade = new AgUiStreamBridge(
-            localSubscriber, MESSAGE_ID, THREAD_ID, RUN_ID, TASK_ID, localRegistry, localJobRegistry,
+            localSubscriber, MESSAGE_ID, THREAD_ID, RUN_ID, CHAT_ID, localRegistry, localJobRegistry,
             localGuard, jobFacade, () -> {});
 
         // Simulate the executor's start event so the bridge populates the job registry.
@@ -289,7 +289,7 @@ class AgUiStreamBridgeTest {
                 WorkflowChatGuard.LAST_TURN_CACHE_NAME, WorkflowChatGuard.IN_FLIGHT_CACHE_NAME));
 
         AgUiStreamBridge bridgeWithFlakyJobFacade = new AgUiStreamBridge(
-            localSubscriber, MESSAGE_ID, THREAD_ID, RUN_ID, TASK_ID, localRegistry, localJobRegistry,
+            localSubscriber, MESSAGE_ID, THREAD_ID, RUN_ID, CHAT_ID, localRegistry, localJobRegistry,
             localGuard, jobFacade, () -> {});
 
         bridgeWithFlakyJobFacade.onEvent(Map.of("event", "start", "payload", Map.of("jobId", 8888L)));
@@ -318,7 +318,7 @@ class AgUiStreamBridgeTest {
                 WorkflowChatGuard.LAST_TURN_CACHE_NAME, WorkflowChatGuard.IN_FLIGHT_CACHE_NAME));
 
         AgUiStreamBridge bridgeWithJobFacade = new AgUiStreamBridge(
-            localSubscriber, MESSAGE_ID, THREAD_ID, RUN_ID, TASK_ID, localRegistry, localJobRegistry,
+            localSubscriber, MESSAGE_ID, THREAD_ID, RUN_ID, CHAT_ID, localRegistry, localJobRegistry,
             localGuard, jobFacade, () -> {});
 
         // No prior start event — registry is empty.

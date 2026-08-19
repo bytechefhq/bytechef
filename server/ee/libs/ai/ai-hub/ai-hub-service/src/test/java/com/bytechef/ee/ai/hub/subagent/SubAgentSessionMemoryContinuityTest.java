@@ -39,7 +39,7 @@ import org.springframework.ai.session.SessionEvent;
 class SubAgentSessionMemoryContinuityTest {
 
     private static final String THREAD_ID = "thread-1";
-    private static final String TASK_AGENT = "task_agent";
+    private static final String PROJECT_DEPLOYMENT_AGENT = "project_deployment_agent";
     private static final String MCP_AGENT = "mcp_agent";
 
     private AiHubSessionMemory aiHubSessionMemory;
@@ -54,9 +54,9 @@ class SubAgentSessionMemoryContinuityTest {
 
     @Test
     void testSecondDelegationSeesTheFirstExchange() {
-        String sessionId = SubAgentSessionMemoryContributor.sessionKey(THREAD_ID, TASK_AGENT);
+        String sessionId = SubAgentSessionMemoryContributor.sessionKey(THREAD_ID, PROJECT_DEPLOYMENT_AGENT);
 
-        appendExchange(sessionId, "draft instructions for a PR reviewer", "Draft: reviews pull requests.");
+        appendExchange(sessionId, "deploy version 3 to staging", "Deployed version 3 to staging.");
 
         List<SessionEvent> events = aiHubSessionMemory.sessionService()
             .getEvents(sessionId, EventFilter.lastN(SubAgentSessionMemoryContributor.MAX_EVENTS));
@@ -65,14 +65,14 @@ class SubAgentSessionMemoryContinuityTest {
         assertThat(
             events.get(1)
                 .getMessage()
-                .getText()).contains("reviews pull requests");
+                .getText()).contains("Deployed version 3");
     }
 
     @Test
     void testDifferentSpecialistsOnOneThreadDoNotSeeEachOther() {
         appendExchange(
-            SubAgentSessionMemoryContributor.sessionKey(THREAD_ID, TASK_AGENT), "create an agent",
-            "Created agent 7.");
+            SubAgentSessionMemoryContributor.sessionKey(THREAD_ID, PROJECT_DEPLOYMENT_AGENT),
+            "roll back the staging deployment", "Rolled back to version 2.");
 
         List<SessionEvent> otherSpecialistEvents = aiHubSessionMemory.sessionService()
             .getEvents(
@@ -85,12 +85,12 @@ class SubAgentSessionMemoryContinuityTest {
     @Test
     void testOneSpecialistOnDifferentThreadsDoesNotCrossConversations() {
         appendExchange(
-            SubAgentSessionMemoryContributor.sessionKey(THREAD_ID, TASK_AGENT), "create an agent",
-            "Created agent 7.");
+            SubAgentSessionMemoryContributor.sessionKey(THREAD_ID, PROJECT_DEPLOYMENT_AGENT),
+            "roll back the staging deployment", "Rolled back to version 2.");
 
         List<SessionEvent> otherConversationEvents = aiHubSessionMemory.sessionService()
             .getEvents(
-                SubAgentSessionMemoryContributor.sessionKey("thread-2", TASK_AGENT),
+                SubAgentSessionMemoryContributor.sessionKey("thread-2", PROJECT_DEPLOYMENT_AGENT),
                 EventFilter.lastN(SubAgentSessionMemoryContributor.MAX_EVENTS));
 
         assertThat(otherConversationEvents).isEmpty();
@@ -98,7 +98,7 @@ class SubAgentSessionMemoryContinuityTest {
 
     @Test
     void testReplayIsCappedAtMaxEvents() {
-        String sessionId = SubAgentSessionMemoryContributor.sessionKey(THREAD_ID, TASK_AGENT);
+        String sessionId = SubAgentSessionMemoryContributor.sessionKey(THREAD_ID, PROJECT_DEPLOYMENT_AGENT);
 
         for (int exchangeIndex = 0; exchangeIndex < SubAgentSessionMemoryContributor.MAX_EVENTS; exchangeIndex++) {
             appendExchange(sessionId, "request " + exchangeIndex, "reply " + exchangeIndex);

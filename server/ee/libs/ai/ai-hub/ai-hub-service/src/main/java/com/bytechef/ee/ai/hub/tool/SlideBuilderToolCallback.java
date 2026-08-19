@@ -35,7 +35,7 @@ import tools.jackson.databind.json.JsonMapper;
  * construction transcript; it only receives the one-paragraph summary returned by {@code call()}.
  *
  * <p>
- * <b>Why hand-rolled instead of {@code TaskTool.builder()}?</b> The same reason as {@link ResearchToolCallback} — no
+ * <b>Why hand-rolled instead of {@code ChatTool.builder()}?</b> The same reason as {@link ResearchToolCallback} — no
  * API exists to register a named subagent backed by an externally-constructed {@link ChatClient}. The hand-rolled
  * approach achieves the same architecture without incompatible tooling.
  *

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="20260429140000-1" author="Ivica Cardic">
+        <addColumn tableName="ai_hub_chat">
+            <column name="environment" type="INT"/>
+        </addColumn>
+
+        <!-- Backfill existing chats to DEVELOPMENT (ordinal 0). The Environment enum is append-only; -->
+        <!-- DEVELOPMENT must remain at ordinal 0 for this default to stay correct. -->
+        <update tableName="ai_hub_chat">
+            <column name="environment" valueNumeric="0"/>
+        </update>
+
+        <addNotNullConstraint
+            tableName="ai_hub_chat" columnName="environment" columnDataType="INT"/>
+
+        <createIndex tableName="ai_hub_chat" indexName="idx_cc_chat_environment">
+            <column name="environment"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

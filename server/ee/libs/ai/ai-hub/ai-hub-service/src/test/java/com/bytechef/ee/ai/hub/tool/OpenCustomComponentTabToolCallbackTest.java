@@ -34,7 +34,7 @@ class OpenCustomComponentTabToolCallbackTest {
 
     @Test
     void testCallRecordsCustomComponentReferenceWhenRecorderPresent() {
-        AiHubTaskArtifactRecorder artifactRecorder = mock(AiHubTaskArtifactRecorder.class);
+        AiHubChatArtifactRecorder artifactRecorder = mock(AiHubChatArtifactRecorder.class);
 
         OpenCustomComponentTabToolCallback callback = new OpenCustomComponentTabToolCallback(artifactRecorder);
 

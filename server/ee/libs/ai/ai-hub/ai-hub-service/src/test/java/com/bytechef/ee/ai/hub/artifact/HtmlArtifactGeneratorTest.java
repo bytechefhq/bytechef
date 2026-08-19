@@ -18,7 +18,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.automation.assetfile.domain.AssetFile;
 import com.bytechef.automation.assetfile.domain.AssetFileFormat;
 import com.bytechef.automation.assetfile.service.AssetFileFacade;
-import com.bytechef.ee.ai.hub.task.AiHubTaskAssetFileService;
+import com.bytechef.ee.ai.hub.chat.AiHubChatAssetFileService;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -40,7 +40,7 @@ class HtmlArtifactGeneratorTest {
     @Test
     void testFormatIsHtml() {
         HtmlArtifactGenerator generator = new HtmlArtifactGenerator(
-            mock(AssetFileFacade.class), mock(AiHubTaskAssetFileService.class));
+            mock(AssetFileFacade.class), mock(AiHubChatAssetFileService.class));
 
         assertThat(generator.format()).isEqualTo(AssetFileFormat.HTML);
     }
@@ -48,7 +48,7 @@ class HtmlArtifactGeneratorTest {
     @Test
     void testGenerateHappyPathPersistsAsTextHtmlWithCspInjected() {
         AssetFileFacade facade = mock(AssetFileFacade.class);
-        AiHubTaskAssetFileService linkService = mock(AiHubTaskAssetFileService.class);
+        AiHubChatAssetFileService linkService = mock(AiHubChatAssetFileService.class);
 
         AssetFile saved = mock(AssetFile.class);
 
@@ -81,7 +81,7 @@ class HtmlArtifactGeneratorTest {
     @Test
     void testGenerateAppendsHtmlExtensionWhenMissing() {
         AssetFileFacade facade = mock(AssetFileFacade.class);
-        AiHubTaskAssetFileService linkService = mock(AiHubTaskAssetFileService.class);
+        AiHubChatAssetFileService linkService = mock(AiHubChatAssetFileService.class);
 
         AssetFile saved = mock(AssetFile.class);
 
@@ -105,9 +105,9 @@ class HtmlArtifactGeneratorTest {
     void testGenerateRejectsNonHtmlContent() {
         // Sanity guard: a request whose content isn't recognisable HTML must surface a validation error
         // rather than landing as a malformed asset_file row. Detailed structural rules are pinned in
-        // Task 4's tests.
+        // Chat 4's tests.
         HtmlArtifactGenerator generator = new HtmlArtifactGenerator(
-            mock(AssetFileFacade.class), mock(AiHubTaskAssetFileService.class));
+            mock(AssetFileFacade.class), mock(AiHubChatAssetFileService.class));
 
         assertThatThrownBy(() -> generator.generate(
             new GenerationRequest(1L, 10L, 0, null, (short) 0, "x", "x.html", "not html", null)))
@@ -119,7 +119,7 @@ class HtmlArtifactGeneratorTest {
         // Pin the actionable error message — the LLM can choose between trimming an inlined data URI
         // and reauthoring the artifact only when it knows the actual byte count vs. the 1 MB cap.
         HtmlArtifactGenerator generator = new HtmlArtifactGenerator(
-            mock(AssetFileFacade.class), mock(AiHubTaskAssetFileService.class));
+            mock(AssetFileFacade.class), mock(AiHubChatAssetFileService.class));
 
         StringBuilder big = new StringBuilder("<!doctype html><html><head></head><body>");
 
@@ -167,7 +167,7 @@ class HtmlArtifactGeneratorTest {
     @Test
     void testGenerateAllowsDataUriScriptSrc() {
         AssetFileFacade facade = mock(AssetFileFacade.class);
-        AiHubTaskAssetFileService linkService = mock(AiHubTaskAssetFileService.class);
+        AiHubChatAssetFileService linkService = mock(AiHubChatAssetFileService.class);
 
         AssetFile saved = mock(AssetFile.class);
 
@@ -345,7 +345,7 @@ class HtmlArtifactGeneratorTest {
         // Sanity guard: a fully-data-URI multi-entry srcset must pass. Otherwise the new per-candidate
         // validator could become overzealous.
         AssetFileFacade facade = mock(AssetFileFacade.class);
-        AiHubTaskAssetFileService linkService = mock(AiHubTaskAssetFileService.class);
+        AiHubChatAssetFileService linkService = mock(AiHubChatAssetFileService.class);
 
         AssetFile saved = mock(AssetFile.class);
 
@@ -379,7 +379,7 @@ class HtmlArtifactGeneratorTest {
         // switching to append (which would let the LLM-authored CSP win on permissive directives) fails
         // the build instead of silently inverting the security boundary.
         AssetFileFacade facade = mock(AssetFileFacade.class);
-        AiHubTaskAssetFileService linkService = mock(AiHubTaskAssetFileService.class);
+        AiHubChatAssetFileService linkService = mock(AiHubChatAssetFileService.class);
 
         AssetFile saved = mock(AssetFile.class);
 
@@ -420,6 +420,6 @@ class HtmlArtifactGeneratorTest {
     }
 
     private HtmlArtifactGenerator newGenerator() {
-        return new HtmlArtifactGenerator(mock(AssetFileFacade.class), mock(AiHubTaskAssetFileService.class));
+        return new HtmlArtifactGenerator(mock(AssetFileFacade.class), mock(AiHubChatAssetFileService.class));
     }
 }
