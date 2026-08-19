@@ -125,7 +125,18 @@ const WorkspaceUsersDialog = ({onClose, open, workspaceId}: WorkspaceUsersDialog
                                 </TableCell>
 
                                 <TableCell>
-                                    {canManageMembers ? (
+                                    {/*
+                                      A row scoped to one environment is shown read-only here. The controls in this
+                                      dialog act on the member's workspace-wide row, which an explicit-mode member
+                                      does not have -- the role select would resolve an arbitrary environment's row
+                                      and edit that one silently. Per-environment roles are managed on the Users page.
+                                    */}
+
+                                    {workspaceUser.environment ? (
+                                        <span className="text-sm text-muted-foreground">
+                                            {workspaceUser.workspaceRole} in {workspaceUser.environment}
+                                        </span>
+                                    ) : canManageMembers ? (
                                         <Select
                                             onValueChange={(role) =>
                                                 updateRoleMutation.mutate({
@@ -161,18 +172,20 @@ const WorkspaceUsersDialog = ({onClose, open, workspaceId}: WorkspaceUsersDialog
 
                                 {canManageMembers && (
                                     <TableCell>
-                                        <button
-                                            aria-label="Remove user from workspace"
-                                            className="text-destructive hover:text-destructive/80"
-                                            onClick={() =>
-                                                removeUserMutation.mutate({
-                                                    userId: workspaceUser.userId,
-                                                    workspaceId: String(workspaceId),
-                                                })
-                                            }
-                                        >
-                                            <Trash2Icon className="size-4" />
-                                        </button>
+                                        {!workspaceUser.environment && (
+                                            <button
+                                                aria-label="Remove user from workspace"
+                                                className="text-destructive hover:text-destructive/80"
+                                                onClick={() =>
+                                                    removeUserMutation.mutate({
+                                                        userId: workspaceUser.userId,
+                                                        workspaceId: String(workspaceId),
+                                                    })
+                                                }
+                                            >
+                                                <Trash2Icon className="size-4" />
+                                            </button>
+                                        )}
                                     </TableCell>
                                 )}
                             </TableRow>

@@ -11,8 +11,10 @@ const hoisted = vi.hoisted(() => ({
     captureUpdateOnError: vi.fn(),
     customRoles: [{id: '900', name: 'Deployer', scopes: ['WORKFLOW_VIEW']}] as unknown[],
     inviteWorkspaceUserMutate: vi.fn(),
+    removeEnvironmentRoleMutate: vi.fn(),
     removeWorkspaceUserMutate: vi.fn(),
     scopes: ['WORKSPACE_MEMBER_MANAGE'] as string[],
+    setEnvironmentRoleMutate: vi.fn(),
     updateWorkspaceUserRoleMutate: vi.fn(),
     workspaceUsers: [] as unknown[],
 }));
@@ -26,13 +28,16 @@ vi.mock('zustand/react/shallow', () => ({
 }));
 
 vi.mock('@/shared/middleware/graphql', () => ({
+    EnvironmentEnum: {Development: 'DEVELOPMENT', Production: 'PRODUCTION', Staging: 'STAGING'},
     WorkspaceRole: {Admin: 'ADMIN', Editor: 'EDITOR', Viewer: 'VIEWER'},
     useAddWorkspaceUserMutation: vi.fn(() => ({mutate: hoisted.addWorkspaceUserMutate})),
     useAssignWorkspaceUserCustomRoleMutation: vi.fn(() => ({mutate: hoisted.assignCustomRoleMutate})),
     useCustomRolesQuery: vi.fn(() => ({data: {customRoles: hoisted.customRoles}})),
     useInviteWorkspaceUserMutation: vi.fn(() => ({mutate: hoisted.inviteWorkspaceUserMutate})),
     useMyWorkspaceScopesQuery: vi.fn(() => ({data: {myWorkspaceScopes: hoisted.scopes}, isLoading: false})),
+    useRemoveWorkspaceUserEnvironmentRoleMutation: vi.fn(() => ({mutate: hoisted.removeEnvironmentRoleMutate})),
     useRemoveWorkspaceUserMutation: vi.fn(() => ({mutate: hoisted.removeWorkspaceUserMutate})),
+    useSetWorkspaceUserEnvironmentRoleMutation: vi.fn(() => ({mutate: hoisted.setEnvironmentRoleMutate})),
     useUpdateWorkspaceUserRoleMutation: vi.fn((options: {onError: (error: Error) => void}) => {
         hoisted.captureUpdateOnError(options.onError);
 
@@ -49,6 +54,7 @@ vi.mock(import('@tanstack/react-query'), async (importOriginal) => ({
 }));
 
 const member = {
+    environment: null,
     id: '1',
     inherited: false,
     user: {email: 'member@example.com', firstName: 'Mem', lastName: 'Ber'},
@@ -58,12 +64,33 @@ const member = {
 };
 
 const inheritedAdmin = {
+    environment: null,
     id: null,
     inherited: true,
     user: {email: 'owner@example.com', firstName: 'Ten', lastName: 'Ant'},
     userId: '99',
     workspaceId: '7',
     workspaceRole: 'ADMIN',
+};
+
+const developmentRole = {
+    environment: 'DEVELOPMENT',
+    id: '2',
+    inherited: false,
+    user: {email: 'member@example.com', firstName: 'Mem', lastName: 'Ber'},
+    userId: '10',
+    workspaceId: '7',
+    workspaceRole: 'EDITOR',
+};
+
+const productionRole = {
+    environment: 'PRODUCTION',
+    id: '3',
+    inherited: false,
+    user: {email: 'member@example.com', firstName: 'Mem', lastName: 'Ber'},
+    userId: '10',
+    workspaceId: '7',
+    workspaceRole: 'VIEWER',
 };
 
 describe('WorkspaceUsers', () => {
@@ -171,6 +198,79 @@ describe('WorkspaceUsers', () => {
 
         expect(screen.getByRole('option', {name: 'Deployer'})).toBeInTheDocument();
         expect(screen.getByRole('option', {name: 'Editor'})).toBeInTheDocument();
+    });
+
+    it('shows one role row per environment once a member has environment roles', async () => {
+        hoisted.workspaceUsers = [developmentRole, productionRole];
+
+        render(<WorkspaceUsers />);
+
+        expect(await screen.findByText('Development')).toBeInTheDocument();
+        expect(screen.getByText('Production')).toBeInTheDocument();
+
+        // One member, listed once, not once per row.
+        expect(screen.getAllByText('member@example.com')).toHaveLength(1);
+    });
+
+    it('warns that removing the last environment role removes the member', async () => {
+        hoisted.workspaceUsers = [developmentRole];
+
+        render(<WorkspaceUsers />);
+
+        await userEvent.click(await screen.findByRole('button', {name: /remove development role/i}));
+
+        // A per-row delete reads like a demotion but is a revoke, so the dialog must say what it actually does.
+        expect(screen.getByText(/removes them from the workspace/i)).toBeInTheDocument();
+    });
+
+    it('warns only about that environment when the member holds others', async () => {
+        hoisted.workspaceUsers = [developmentRole, productionRole];
+
+        render(<WorkspaceUsers />);
+
+        await userEvent.click(await screen.findByRole('button', {name: /remove development role/i}));
+
+        expect(screen.queryByText(/removes them from the workspace/i)).not.toBeInTheDocument();
+        expect(screen.getByText(/lose access to Development/i)).toBeInTheDocument();
+    });
+
+    it('removes an environment role once confirmed', async () => {
+        hoisted.workspaceUsers = [developmentRole, productionRole];
+
+        render(<WorkspaceUsers />);
+
+        await userEvent.click(await screen.findByRole('button', {name: /remove development role/i}));
+        await userEvent.click(screen.getByRole('button', {name: 'Remove'}));
+
+        expect(hoisted.removeEnvironmentRoleMutate).toHaveBeenCalledWith({
+            environment: 'DEVELOPMENT',
+            userId: '10',
+            workspaceId: '7',
+        });
+    });
+
+    it('sends a custom role for one environment as customRoleId, not as a built-in role', async () => {
+        hoisted.workspaceUsers = [developmentRole];
+
+        render(<WorkspaceUsers />);
+
+        await userEvent.click(await screen.findByRole('combobox', {name: /development role/i}));
+        await userEvent.click(screen.getByRole('option', {name: 'Deployer'}));
+
+        // The value carries a prefix rather than a role name; sending it as `role` would put a bogus enum on the wire.
+        expect(hoisted.setEnvironmentRoleMutate).toHaveBeenCalledWith({
+            customRoleId: '900',
+            environment: 'DEVELOPMENT',
+            userId: '10',
+            workspaceId: '7',
+        });
+    });
+
+    it('renders a workspace-wide role for a member with no environment rows', () => {
+        render(<WorkspaceUsers />);
+
+        expect(screen.queryByText('Development')).not.toBeInTheDocument();
+        expect(screen.getByRole('button', {name: /per-environment roles/i})).toBeInTheDocument();
     });
 
     it('renders a membership error inline rather than only as a toast', async () => {

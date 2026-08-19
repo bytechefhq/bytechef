@@ -12,5 +12,6 @@ query WorkspaceUsers($workspaceId: ID!) {
             lastName
         }
         createdDate
+        environment
     }
 }
