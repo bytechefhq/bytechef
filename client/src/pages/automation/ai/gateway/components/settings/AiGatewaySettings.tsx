@@ -109,7 +109,7 @@ const AiGatewaySettings = () => {
                 <div className="mt-1 flex flex-wrap items-center gap-1 text-sm text-muted-foreground">
                     <span>Workspace-level guardrails moved to</span>
 
-                    <Link className="underline" to="/automation/settings/ai/guardrails">
+                    <Link className="underline" to="/automation/settings/ai/agents/guardrails">
                         Settings &rarr; AI &rarr; Guardrails
                     </Link>
 
