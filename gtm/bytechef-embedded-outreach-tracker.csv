@@ -73,3 +73,54 @@ Documenso,documenso.com,Germany/USA,Dev tools,E-signature (OSS),6,3,Ivica,The n8
 Pylon,usepylon.com,USA,Dev tools,B2B support,6,3,Ivica,Every deal hinges on another Slack-Teams-Salesforce-Jira permutation - before the post-Series-B hiring wave goes to connector maintenance.,No direct pain artifact found - verify first,,,,,,,,,,
 Zenskar,zenskar.com,USA,HR/fin-ops,Billing / rev-rec,6,3,Ivica,Promising 200+ two-way integrations on a Series A team is a permanent maintenance tax - worth comparing notes on running that catalog embedded.,Weakest evidence in segment,,,,,,,,,,
 SPRY,sprypt.com,USA,US vertical,Outpatient rehab EMR,6,3,Co-founder,Enterprise rehab deals bring EHR and clearinghouse integration asks - say yes without pulling engineers off the core EMR.,Weakest evidence in segment; 236 employees,,,,,,,,,,
+
+
+Followed from 15
+
+| Company | Contact | Role | Profile | Note draft |
+|---|---|---|---|---|
+| Plancraft | Julian Wiedenhaus | CEO & Co-founder | https://www.linkedin.com/in/julianwiedenhaus/ | Hi Julian — noticed Plancraft's DATEV workflow still leans on CSV export/import while you scale across 11 countries. We help construction-tech platforms ship real two-way accounting & supplier APIs fast. Worth a quick chat? |
+| Atlar | Johannes Elgh | CTO & Co-founder | https://www.linkedin.com/in/jelgh/ | Hi Johannes — saw Atlar is staffing a 9-engineer Connectivity team for bank/ERP integrations. Worth comparing notes on what an embedded open-source integration layer could take off that roadmap? |
+| Hyperline | Clément Garbay | Co-founder & CTO | https://www.linkedin.com/in/clementgarbay/ | Hi Clément — your changelog shows accounting connectors shipping one at a time (Zoho Books, then NetSuite/Rillet). We help teams like Hyperline ship ten a quarter without burning core eng. Open to a quick chat? |
+| Payslip | Fidelma McGuirk | Founder & CEO | https://www.linkedin.com/in/fidelmamcguirk/ | Hi Fidelma — noticed Payslip's team hand-builds every HCM-to-payroll connector (Workday PECI, SuccessFactors). We turn that workload into configuration on an embedded platform. Worth a quick chat? |
+| Sequence | Riya Grover | Co-founder & CEO | https://www.linkedin.com/in/riya-grover-a22a4822/ | Hi Riya — Sequence's docs route NetSuite customers to CSV exports and "talk to our team." We help billing platforms make NetSuite (and the next ten ERPs) native. Worth a quick chat? |
+| Zelt | Chris Priebe | Co-founder & CEO | https://www.linkedin.com/in/chrisagain/ | Hi Chris — reviews of Zelt flag the missing integration ecosystem and public API. An embedded iPaaS gives you both, plus fixes for things like the Nest pension sync. Worth a quick chat? |
+| Coperniq | Abdullah Al-Zandani | CEO | https://www.linkedin.com/in/azandani/ | Hi Abdullah — Coperniq's support docs list ~8 native integrations, with the rest routed through Zapier. We help teams ship that long tail natively and white-labeled. Worth a quick chat? |
+| Latchel | Ethan Lieber | CEO & Co-founder | https://www.linkedin.com/in/ethanlieber/ | Hi Ethan — congrats on the Series A. Saw the funds are earmarked to deepen third-party property management integrations — we help compress that roadmap from quarters to weeks. Worth a quick chat? |
+| Lawmatics | Matt Spiegel | Founder & CEO | https://www.linkedin.com/in/mattspiegelesq/ | Hi Matt — G2 reviewers praise Lawmatics' automation but repeatedly flag integrations as a weak spot. We help close that gap without staffing a connector team. Worth a quick chat? |
+| Checkly | Hannes Lenke | CEO | https://www.linkedin.com/in/hanneslenke/ | Hi Hannes — Checkly's alert-channel list is a fraction of Datadog's, and the community has filed integration requests for years. We help you match that catalog breadth at startup cost. Worth a quick chat? |
+| Infisical | Maidul Islam | Co-founder | https://www.linkedin.com/in/maidul98/ | Hi Maidul — secret-sync bugs like the GitLab masked-sync failure have sat open since 2024 across Infisical's hand-built connectors. We maintain 190+ so yours don't rot. Worth a quick chat? |
+| Plane | Vamsi Kurama | CEO & Co-founder | https://www.linkedin.com/in/vamsi-kurama/ | Hi Vamsi — Plane's Gitea-sync issue has 94 upvotes since 2023, with GitLab parity and Mattermost queued behind it. We can power those syncs so your engineers stay on core PM. Worth a chat? |
+| Secoda | Etai Mizrahi | CEO | https://www.linkedin.com/in/etai-mizrahi-07656aa1/ | Hi Etai — Secoda's docs promise Airflow, S3 and great_expectations connectors "on the roadmap" and ask users to email requests. We can help clear that whole queue. Worth a quick chat? |
+| SigNoz | Pranay Prateek | Co-founder | https://www.linkedin.com/in/pranay01/ | Hi Pranay — the Discord alert-channel request your own team filed from a paying-user thread has been open since Jan 2023. We help observability platforms close gaps like this fast. Worth a chat? |
+| Awell | Thomas Vande Casteele | Co-founder & CEO | https://www.linkedin.com/in/thomasvdc/ | Hi Thomas — noticed each EHR integration at Awell is hand-built extension by extension. We offer a self-serve connector catalog so your team stays focused on care flows. Worth a quick chat? |
+| Chainels | Erwin Buckers | CEO | Founder & CEO | https://www.linkedin.com/in/erwin-buckers-35699028/ | High |
+| Chainels | Christiaan Titos Bolivar | CTO (closest equiv.) | Lead Developer — no formal CTO title exists | https://www.linkedin.com/in/christiaan-titos-bolivar-b17550ba/ | Medium |
+| Dockflow | Pauline Van Ostaeyen | CEO (closest equiv.) | Co-Founder — commercial/leadership focus, no one holds literal "CEO" title | https://be.linkedin.com/in/paulinevanostaeyen | Low |
+| Dockflow | Michiel Valee | CTO (closest equiv.) | Co-Founder / Tech Lead | https://be.linkedin.com/in/michielvalee | Medium |
+| EverReal | Nessim Djerboua | CEO | CEO & Founder | https://www.linkedin.com/in/nessimdjerboua/ | High |
+| EverReal | Liviu Ignat | CTO | CTO & Co-Founder | https://www.linkedin.com/in/liviu-ignat-76835b21/ | High |
+| FreightSuite | Samuel Moore | CEO | Co-Founder (CEO per third-party org chart) | https://www.linkedin.com/in/samuel-moore-370767206/ | Medium |
+| FreightSuite | — not confirmed — | CTO | William Jacobs is technical co-founder but no source confirms a CTO-equivalent title | https://uk.linkedin.com/in/william-jacobs-4233665b | Low |
+| Harbor Lab | Antonis Malaxianakis | CEO | Founder & CEO | https://gr.linkedin.com/in/antonis-malaxianakis-7b656b6b | High |
+| Harbor Lab | Spyros Lamprinidis | CTO | Chief Technology Officer | https://www.linkedin.com/in/spyroslambrinidis/ | Medium |
+| HERO Software | Michael Kessler | CEO | Founder & CEO (Geschäftsführer) | https://de.linkedin.com/in/michael-kessler-6201b7a0 | High |
+| HERO Software | Constantin Schomburg | CTO | Chief Technology Officer | https://www.linkedin.com/in/cschomburg/ | High |
+| Legl | Julia Salasky | CEO | CEO | https://uk.linkedin.com/in/juliasalasky | High |
+| Legl | Matt Jared | CTO | CTO | https://uk.linkedin.com/in/matt-jared-42013a128 | Medium |
+| Rentio | Stijn Roels | CEO | CEO (LinkedIn shows "Co-Founder") | https://be.linkedin.com/in/stijn-roels | High |
+| Rentio | — not confirmed — | CTO | No source titles anyone CTO; Dries Van Schevensteen is Lead Engineer/Developer | https://www.linkedin.com/in/dries-van-schevensteen-7244259b/ | Low |
+| Carv | Barend Raaff | CEO (closest equiv.) | Co-Founder — no one holds explicit "CEO" title; prior CEO experience at Harver | https://www.linkedin.com/in/barend-raaff-602979/ | Low |
+| Carv | Steven Kroon | CTO | Chief Technology Officer | https://www.linkedin.com/in/stevenkroon/ | Medium |
+| Circula | Nikolai Skatchkov | CEO | CEO & Co-Founder | https://de.linkedin.com/in/skatchkov | High |
+| Circula | Roman Leicht | CTO | CTO & Co-Founder | https://de.linkedin.com/in/romanleicht | High |
+| Embat | Antonio Berga | CEO | Co-CEO & Founder (Carlos Serrano García-Lisón is the other Co-CEO, no LinkedIn found) | https://es.linkedin.com/in/antonio-berga | High |
+| Embat | Tomás Gil | CTO | CTO | https://es.linkedin.com/in/tomasgiletreros | High |
+| Kolleno | Dimitri Raziev | CEO | CEO & Co-Founder | https://www.linkedin.com/in/dimitri-raziev-7312845/ | High |
+| Kolleno | Ron Danenberg | CTO | CTO & Founder | https://www.linkedin.com/in/rondanenberg/ | Medium |
+| Omnea | Ben Freeman | CEO | Co-Founder & CEO | https://www.linkedin.com/in/ben-freeman-a8542166/ | High |
+| Omnea | Ben Allen | CTO | Co-Founder & CTO | https://uk.linkedin.com/in/benjaminjallen | High |
+| Quandri | Jackson Fregeau | CEO | Co-Founder & CEO | https://ca.linkedin.com/in/jacksonfregeau | High |
+| Quandri | Heather Natour | CTO (closest equiv.) | VP of Engineering — no one holds CTO title | https://www.linkedin.com/in/heather-natour/ | Medium |
+| Solvimon | Kim Verkooij | CEO | Co-Founder & CEO | https://nl.linkedin.com/in/kimverkooij | High |
+| Solvimon | Etienne Gerts | CTO | Co-Founder & CTO | https://www.linkedin.com/in/etienne-gerts-91636b4/ | High |
