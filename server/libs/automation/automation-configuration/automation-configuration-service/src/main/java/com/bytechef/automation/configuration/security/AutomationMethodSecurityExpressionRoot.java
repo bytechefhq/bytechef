@@ -17,6 +17,7 @@
 package com.bytechef.automation.configuration.security;
 
 import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.platform.configuration.domain.Environment;
 import java.util.function.Supplier;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.security.access.expression.SecurityExpressionRoot;
@@ -89,6 +90,32 @@ public final class AutomationMethodSecurityExpressionRoot
         }
 
         return permissionService.isResourceOwner(resourceType, id);
+    }
+
+    /**
+     * Requires {@code scope} in every environment of the workspace. Use it on an operation whose effect is not confined
+     * to one environment — a workspace-wide role grant takes effect everywhere at once, so authorising it from a role
+     * held in a single environment would be an escalation.
+     */
+    public boolean hasWorkspaceScopeInEveryEnvironment(long workspaceId, String scope) {
+        if (AutomationAuthorizationContext.isSkipChecks()) {
+            return true;
+        }
+
+        return permissionService.hasWorkspaceScopeInEveryEnvironment(workspaceId, scope);
+    }
+
+    /**
+     * Requires {@code scope} in the environment the operation acts on. The environment is taken from the guarded
+     * method's own arguments, never from {@code EnvironmentContext}, which holds the source environment during a
+     * promotion and is lost on worker threads.
+     */
+    public boolean hasWorkspaceScopeInEnvironment(long workspaceId, String scope, Environment environment) {
+        if (AutomationAuthorizationContext.isSkipChecks()) {
+            return true;
+        }
+
+        return permissionService.hasWorkspaceScope(workspaceId, scope, environment);
     }
 
     @Override

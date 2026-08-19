@@ -43,7 +43,7 @@ class PermissionServiceResourceTest {
     private PermissionServiceImpl service(ResourceOwnershipResolver... resolvers) {
         return new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
-            workspaceUserRepository, List.of(resolvers), List.of(), permissiveResolver());
+            workspaceUserRepository, List.of(resolvers), List.of(), permissiveResolver(), List.of());
     }
 
     private static ResourceOwnershipResolver resolver(String type, ResourceOwner owner) {

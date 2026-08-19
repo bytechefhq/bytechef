@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <!--
+      Give workspace_user an environment dimension. A NULL environment means "every environment" and is what every
+      existing row has, so there is no data migration and no behaviour change on upgrade.
+
+      Per (workspace_id, user_id) the membership is either implicit (a single NULL row) or explicit (one row per
+      environment, an absent row meaning denial). That one-mode-at-a-time rule is a service-layer invariant; the
+      schema below enforces only the weaker part of it, because a partial index cannot express "not both modes".
+
+      Every changeset is precondition-guarded so that a database which already carries the change - a developer
+      database patched by hand, or one where the superseded constraint was never created because
+      202604061200060 hit its own MARK_RAN precondition - converges instead of failing at startup.
+    -->
+
+    <changeSet id="20260819120000" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="workspace_user" columnName="environment"/>
+            </not>
+        </preConditions>
+
+        <comment>Add the nullable environment ordinal to workspace_user. NULL means every environment.</comment>
+
+        <addColumn tableName="workspace_user">
+            <column name="environment" type="INT"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20260819120001" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <indexExists tableName="workspace_user" indexName="uk_workspace_user_workspace_user"/>
+        </preConditions>
+
+        <comment>
+            Drop the (workspace_id, user_id) unique constraint added by 202604061200060. It forbids the several rows
+            per member that explicit mode requires. This is not a weakening: uk_workspace_user_implicit below
+            re-imposes exactly the same rule over the NULL rows, which is every row that exists today.
+        </comment>
+
+        <dropUniqueConstraint tableName="workspace_user" constraintName="uk_workspace_user_workspace_user"/>
+    </changeSet>
+
+    <changeSet id="20260819120002" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="workspace_user" indexName="uk_workspace_user_implicit"/>
+            </not>
+        </preConditions>
+
+        <comment>
+            At most one implicit row per member. Written as raw SQL because Liquibase's createIndex has no WHERE
+            clause, and a plain three-column unique constraint would not do: PostgreSQL treats NULLs as distinct and
+            would admit unlimited NULL rows for one member.
+        </comment>
+
+        <sql>
+            CREATE UNIQUE INDEX uk_workspace_user_implicit
+                ON workspace_user (workspace_id, user_id) WHERE environment IS NULL;
+        </sql>
+
+        <rollback>
+            <sql>DROP INDEX IF EXISTS uk_workspace_user_implicit;</sql>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260819120003" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="workspace_user" indexName="uk_workspace_user_explicit"/>
+            </not>
+        </preConditions>
+
+        <comment>At most one explicit row per member per environment.</comment>
+
+        <sql>
+            CREATE UNIQUE INDEX uk_workspace_user_explicit
+                ON workspace_user (workspace_id, user_id, environment) WHERE environment IS NOT NULL;
+        </sql>
+
+        <rollback>
+            <sql>DROP INDEX IF EXISTS uk_workspace_user_explicit;</sql>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

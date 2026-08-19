@@ -10,6 +10,7 @@ package com.bytechef.ee.automation.configuration.service;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
+import com.bytechef.automation.configuration.security.ResourceEnvironmentResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceVisibilityProvider;
 import com.bytechef.automation.configuration.service.PermissionService;
@@ -17,6 +18,7 @@ import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -25,6 +27,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.Set;
 import java.util.function.Function;
@@ -52,6 +55,7 @@ public class PermissionServiceImpl implements PermissionService {
     private final ProjectRepository projectRepository;
     private final WorkspaceScopeCacheService workspaceScopeCacheService;
     private final WorkspaceUserRepository workspaceUserRepository;
+    private final Map<String, ResourceEnvironmentResolver> resourceEnvironmentResolvers;
     private final Map<String, ResourceOwnershipResolver> resourceOwnershipResolvers;
     private final Map<String, ResourceVisibilityProvider> resourceVisibilityProviders;
     private final ResourceVisibilityResolver resourceVisibilityResolver;
@@ -65,7 +69,8 @@ public class PermissionServiceImpl implements PermissionService {
         WorkspaceUserRepository workspaceUserRepository,
         List<ResourceOwnershipResolver> resourceOwnershipResolvers,
         List<ResourceVisibilityProvider> resourceVisibilityProviders,
-        ResourceVisibilityResolver resourceVisibilityResolver) {
+        ResourceVisibilityResolver resourceVisibilityResolver,
+        List<ResourceEnvironmentResolver> resourceEnvironmentResolvers) {
 
         this.currentUserResolver = currentUserResolver;
         this.permissionScopeRegistry = permissionScopeRegistry;
@@ -77,6 +82,9 @@ public class PermissionServiceImpl implements PermissionService {
         this.resourceVisibilityProviders = resourceVisibilityProviders.stream()
             .collect(Collectors.toMap(ResourceVisibilityProvider::resourceType, Function.identity()));
         this.resourceVisibilityResolver = resourceVisibilityResolver;
+
+        this.resourceEnvironmentResolvers = resourceEnvironmentResolvers.stream()
+            .collect(Collectors.toMap(ResourceEnvironmentResolver::resourceType, Function.identity()));
     }
 
     @Override
@@ -144,6 +152,56 @@ public class PermissionServiceImpl implements PermissionService {
         return scopeNames.contains(scope);
     }
 
+    /**
+     * Mirrors the environment-unaware overload, including the skip-checks and tenant-admin short circuits, and differs
+     * only in resolving the member's role for {@code environment}. A tenant admin is deliberately not subject to
+     * per-environment roles.
+     */
+    @Override
+    public boolean hasWorkspaceScope(long workspaceId, String scope, Environment environment) {
+        if (isAutomationAuthorizationSkipped()) {
+            return true;
+        }
+
+        if (isTenantAdmin()) {
+            return true;
+        }
+
+        OptionalLong userId = currentUserResolver.fetchCurrentUserId();
+
+        if (userId.isEmpty()) {
+            return false;
+        }
+
+        Set<String> scopeNames =
+            workspaceScopeCacheService.getWorkspaceScopes(userId.getAsLong(), workspaceId, environment);
+
+        return scopeNames.contains(scope);
+    }
+
+    /**
+     * Requires the scope in every environment, so that an operation whose effect is not confined to one environment
+     * cannot be authorised by a role held in only one of them.
+     */
+    @Override
+    public boolean hasWorkspaceScopeInEveryEnvironment(long workspaceId, String scope) {
+        if (isAutomationAuthorizationSkipped()) {
+            return true;
+        }
+
+        if (isTenantAdmin()) {
+            return true;
+        }
+
+        for (Environment environment : Environment.values()) {
+            if (!hasWorkspaceScope(workspaceId, scope, environment)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     @Override
     public boolean hasWorkspaceScopeForProject(long projectId, String scope) {
         if (isAutomationAuthorizationSkipped()) {
@@ -163,6 +221,27 @@ public class PermissionServiceImpl implements PermissionService {
         }
 
         return hasWorkspaceScope(workspaceId, scope);
+    }
+
+    @Override
+    public boolean hasWorkspaceScopeForProject(long projectId, String scope, Environment environment) {
+        if (isAutomationAuthorizationSkipped()) {
+            return true;
+        }
+
+        if (isTenantAdmin()) {
+            return true;
+        }
+
+        Long workspaceId = projectRepository.findById(projectId)
+            .map(Project::getWorkspaceId)
+            .orElse(null);
+
+        if (workspaceId == null) {
+            return false;
+        }
+
+        return hasWorkspaceScope(workspaceId, scope, environment);
     }
 
     @Override
@@ -193,6 +272,20 @@ public class PermissionServiceImpl implements PermissionService {
 
         if (workspaceId.isEmpty()) {
             return false;
+        }
+
+        // A resource that lives in an environment is checked against the role the caller holds THERE. Without this,
+        // a member who is viewer in Production would still pass a by-id check on a Production deployment, because the
+        // environment-unaware check unions the environments they can reach. A type with no resolver, or a resolver
+        // that cannot answer, keeps the environment-unaware check it had before.
+        ResourceEnvironmentResolver resourceEnvironmentResolver = resourceEnvironmentResolvers.get(resourceType);
+
+        if (resourceEnvironmentResolver != null) {
+            Optional<Environment> environment = resourceEnvironmentResolver.fetchEnvironment(id);
+
+            if (environment.isPresent()) {
+                return hasWorkspaceScope(workspaceId.getAsLong(), scope, environment.get());
+            }
         }
 
         return hasWorkspaceScope(workspaceId.getAsLong(), scope);

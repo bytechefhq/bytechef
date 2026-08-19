@@ -8,6 +8,7 @@
 package com.bytechef.ee.automation.configuration.domain;
 
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
+import com.bytechef.platform.configuration.domain.Environment;
 import java.time.Instant;
 import java.util.Objects;
 import org.springframework.data.annotation.CreatedBy;
@@ -35,6 +36,14 @@ public class WorkspaceUser {
     @Column("created_date")
     @CreatedDate
     private Instant createdDate;
+
+    /**
+     * The {@link Environment} ordinal this membership applies to, or {@code null} for a row that applies to every
+     * environment. Stored as the ordinal rather than the name, matching {@code workspaceRole} and the repo-wide
+     * convention; {@code Environment}'s values are pinned, so reading one back by index is safe.
+     */
+    @Column("environment")
+    private Integer environment;
 
     @Id
     private Long id;
@@ -121,6 +130,20 @@ public class WorkspaceUser {
     }
 
     /**
+     * Constructs a {@code WorkspaceUser} with a typed built-in role scoped to a single environment. A {@code null}
+     * environment produces an implicit row, identical to {@link #forRole(Long, Long, WorkspaceRole)}.
+     */
+    public static WorkspaceUser forRole(
+        Long userId, Long workspaceId, WorkspaceRole workspaceRole, Environment environment) {
+
+        WorkspaceUser workspaceUser = forRole(userId, workspaceId, workspaceRole);
+
+        workspaceUser.environment = environment == null ? null : environment.ordinal();
+
+        return workspaceUser;
+    }
+
+    /**
      * Creates a workspace membership backed by a custom role (no built-in {@code workspaceRole}).
      */
     public static WorkspaceUser forCustomRole(Long userId, Long workspaceId, long customRoleId) {
@@ -129,12 +152,35 @@ public class WorkspaceUser {
         return new WorkspaceUser(userId, workspaceId, null, customRoleId);
     }
 
+    /**
+     * Constructs a {@code WorkspaceUser} with a custom role scoped to a single environment. A {@code null} environment
+     * produces an implicit row, identical to {@link #forCustomRole(Long, Long, long)}.
+     */
+    public static WorkspaceUser forCustomRole(
+        Long userId, Long workspaceId, long customRoleId, Environment environment) {
+
+        WorkspaceUser workspaceUser = forCustomRole(userId, workspaceId, customRoleId);
+
+        workspaceUser.environment = environment == null ? null : environment.ordinal();
+
+        return workspaceUser;
+    }
+
     public String getCreatedBy() {
         return createdBy;
     }
 
     public Instant getCreatedDate() {
         return createdDate;
+    }
+
+    /**
+     * Returns the environment this membership applies to, or {@code null} when it applies to every environment (an
+     * implicit row). A member is either implicit — one {@code null} row — or explicit — one row per environment, where
+     * an absent row denies that environment.
+     */
+    public Environment getEnvironment() {
+        return environment == null ? null : Environment.values()[environment];
     }
 
     public Long getId() {
@@ -237,6 +283,7 @@ public class WorkspaceUser {
             ", workspaceId=" + workspaceId +
             ", workspaceRole=" + workspaceRole +
             ", customRoleId=" + customRoleId +
+            ", environment=" + environment +
             ", createdBy='" + createdBy + '\'' +
             ", createdDate=" + createdDate +
             ", lastModifiedBy='" + lastModifiedBy + '\'' +

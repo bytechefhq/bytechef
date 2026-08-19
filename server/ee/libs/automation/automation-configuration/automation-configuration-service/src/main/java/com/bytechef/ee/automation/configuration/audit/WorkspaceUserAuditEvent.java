@@ -31,5 +31,17 @@ public enum WorkspaceUserAuditEvent {
     /**
      * An existing member's workspace role was updated. Payload: {@code workspaceId}, {@code userId}, {@code role}.
      */
-    WORKSPACE_USER_ROLE_UPDATED
+    WORKSPACE_USER_ROLE_UPDATED,
+
+    /**
+     * A member was granted, or had updated, a role scoped to a single environment. Appended at the end so existing
+     * ordinals are untouched.
+     */
+    WORKSPACE_USER_ENVIRONMENT_ROLE_UPDATED,
+
+    /**
+     * A member's role in a single environment was revoked. When it was their last environment row this also ended their
+     * membership, since a member in explicit mode is reachable only where they hold a row.
+     */
+    WORKSPACE_USER_ENVIRONMENT_ROLE_REMOVED
 }

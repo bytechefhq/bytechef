@@ -48,6 +48,7 @@ class RbacMigrationsIntTest {
         // retyped the column fails loudly here.
         assertColumnExists(jdbc, "workspace_user", "workspace_role");
         assertColumnExists(jdbc, "workspace_user", "custom_role_id");
+        assertColumnExists(jdbc, "workspace_user", "environment");
         assertTableExists(jdbc, "custom_role");
         assertTableExists(jdbc, "custom_role_scope");
 
@@ -82,20 +83,34 @@ class RbacMigrationsIntTest {
     }
 
     @Test
-    void testWorkspaceUserUniqueConstraintIsRegistered() {
-        // The (workspace_id, user_id) unique constraint added by 202604061200060 must exist after migration. We
-        // assert via the PostgreSQL information_schema rather than attempting a duplicate insert (which would
-        // require the full FK chain). If the constraint name or columns drift, this fails fast.
+    void testWorkspaceUserUniquenessIsEnforcedByThePartialIndexes() {
+        // The (workspace_id, user_id) unique constraint added by 202604061200060 was dropped by 20260819120000,
+        // which needed several rows per member to carry per-environment roles. Uniqueness did not go away, it split
+        // in two: one implicit row per member, and one explicit row per member per environment. We assert via the
+        // PostgreSQL catalog rather than attempting a duplicate insert (which would require the full FK chain).
         JdbcTemplate jdbc = new JdbcTemplate(dataSource);
 
-        Long constraintCount = jdbc.queryForObject(
+        assertIndexExists(jdbc, "uk_workspace_user_implicit");
+        assertIndexExists(jdbc, "uk_workspace_user_explicit");
+
+        Long supersededConstraintCount = jdbc.queryForObject(
             "SELECT COUNT(*) FROM information_schema.table_constraints "
                 + "WHERE table_name = 'workspace_user' AND constraint_type = 'UNIQUE' "
                 + "AND constraint_name = 'uk_workspace_user_workspace_user'",
             Long.class);
 
-        assertThat(constraintCount)
-            .as("uk_workspace_user_workspace_user unique constraint must be registered after migrations")
+        assertThat(supersededConstraintCount)
+            .as("uk_workspace_user_workspace_user forbids per-environment rows and must be dropped")
+            .isEqualTo(0L);
+    }
+
+    private static void assertIndexExists(JdbcTemplate jdbc, String indexName) {
+        Long indexCount = jdbc.queryForObject(
+            "SELECT COUNT(*) FROM pg_indexes WHERE tablename = 'workspace_user' AND indexname = ?",
+            Long.class, indexName);
+
+        assertThat(indexCount)
+            .as("index %s must be registered after migrations", indexName)
             .isEqualTo(1L);
     }
 }

@@ -9,6 +9,7 @@ package com.bytechef.ee.automation.configuration.remote.client.service;
 
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.configuration.domain.Environment;
 import java.io.Serializable;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
@@ -70,7 +71,28 @@ public class RemotePermissionServiceClient implements PermissionService {
     }
 
     @Override
+    public boolean hasWorkspaceScope(long workspaceId, String scope, Environment environment) {
+        logError("hasWorkspaceScope");
+
+        return false;
+    }
+
+    @Override
+    public boolean hasWorkspaceScopeInEveryEnvironment(long workspaceId, String scope) {
+        logError("hasWorkspaceScopeInEveryEnvironment");
+
+        return false;
+    }
+
+    @Override
     public boolean hasWorkspaceScopeForProject(long projectId, String scope) {
+        logError("hasWorkspaceScopeForProject");
+
+        return false;
+    }
+
+    @Override
+    public boolean hasWorkspaceScopeForProject(long projectId, String scope, Environment environment) {
         logError("hasWorkspaceScopeForProject");
 
         return false;

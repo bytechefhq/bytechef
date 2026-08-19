@@ -81,7 +81,7 @@ class PermissionServiceTest {
 
         permissionService = new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
-            workspaceUserRepository, List.of(), List.of(), permissiveResolver());
+            workspaceUserRepository, List.of(), List.of(), permissiveResolver(), List.of());
 
         securityUtilsMock = mockStatic(SecurityUtils.class);
 
@@ -473,7 +473,7 @@ class PermissionServiceTest {
     private PermissionServiceImpl createService(ResourceOwnershipResolver... resolvers) {
         return new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
-            workspaceUserRepository, List.of(resolvers), List.of(), permissiveResolver());
+            workspaceUserRepository, List.of(resolvers), List.of(), permissiveResolver(), List.of());
     }
 
     private static ResourceOwnershipResolver resolver(String type, ResourceOwner owner) {

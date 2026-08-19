@@ -82,7 +82,7 @@ class WorkspaceScopeCacheServiceTest {
     void testGetWorkspaceScopesResolvesBuiltInRole() {
         WorkspaceUser workspaceUser = WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.EDITOR);
 
-        when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+        when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(USER_ID, WORKSPACE_ID))
             .thenReturn(Optional.of(workspaceUser));
         when(permissionScopeRegistry.getScopeNames(WorkspaceRole.EDITOR))
             .thenReturn(Set.of("WORKFLOW_VIEW", "WORKFLOW_EDIT"));
@@ -96,7 +96,7 @@ class WorkspaceScopeCacheServiceTest {
     void testGetWorkspaceScopesResolvesCustomRole() {
         WorkspaceUser workspaceUser = WorkspaceUser.forCustomRole(USER_ID, WORKSPACE_ID, 900L);
 
-        when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+        when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(USER_ID, WORKSPACE_ID))
             .thenReturn(Optional.of(workspaceUser));
         when(customRoleScopeResolver.resolveScopes(900L))
             .thenReturn(Optional.of(Set.of("PROJECT_SETTINGS")));
@@ -108,7 +108,7 @@ class WorkspaceScopeCacheServiceTest {
 
     @Test
     void testGetWorkspaceScopesReturnsEmptyForUnknownMembership() {
-        when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+        when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(USER_ID, WORKSPACE_ID))
             .thenReturn(Optional.empty());
 
         assertThat(service.getWorkspaceScopes(USER_ID, WORKSPACE_ID)).isEmpty();
@@ -122,7 +122,7 @@ class WorkspaceScopeCacheServiceTest {
         WorkspaceUser corrupted = mock(WorkspaceUser.class);
 
         when(corrupted.getWorkspaceRole()).thenReturn(999);
-        when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+        when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(USER_ID, WORKSPACE_ID))
             .thenReturn(Optional.of(corrupted));
 
         assertThat(service.getWorkspaceScopes(USER_ID, WORKSPACE_ID)).isEmpty();
@@ -139,7 +139,7 @@ class WorkspaceScopeCacheServiceTest {
 
         when(corrupted.getWorkspaceRole()).thenReturn(null);
         when(corrupted.getCustomRoleId()).thenReturn(null);
-        when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+        when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(USER_ID, WORKSPACE_ID))
             .thenReturn(Optional.of(corrupted));
 
         assertThatThrownBy(() -> service.getWorkspaceScopes(USER_ID, WORKSPACE_ID))

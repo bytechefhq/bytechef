@@ -41,9 +41,14 @@ import org.springframework.security.access.prepost.PreAuthorize;
 class ProjectDeploymentFacadeAuthorizationTest {
 
     @Test
-    void testCreateProjectDeploymentRequiresWorkflowEdit() {
+    void testCreateProjectDeploymentRequiresWorkflowEditInTheTargetEnvironment() {
+        // The whole DTO rather than its projectId, and the two-argument hasPermission form rather than the
+        // three-argument one: creating a deployment is a promotion, so AutomationPermissionEvaluator reads the target
+        // environment off the object and checks the role held THERE. The two-argument form is what lets the object
+        // through as itself -- the three-argument form casts its first argument to Serializable, which this record is
+        // not. Changing either half silently reverts the check to the source environment.
         assertExpression(
-            "hasPermission(#projectDeploymentDTO.projectId, 'Project', 'WORKFLOW_EDIT')",
+            "hasPermission(#projectDeploymentDTO, 'WORKFLOW_EDIT')",
             "createProjectDeployment", ProjectDeploymentDTO.class);
     }
 

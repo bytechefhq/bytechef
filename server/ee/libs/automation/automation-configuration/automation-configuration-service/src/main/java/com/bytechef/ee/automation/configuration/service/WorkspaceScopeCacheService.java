@@ -11,11 +11,14 @@ import com.bytechef.automation.configuration.service.PermissionService.UserWorks
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -119,11 +122,65 @@ public class WorkspaceScopeCacheService {
         }
     }
 
+    /**
+     * Returns the scopes the member holds without reference to any environment: their implicit row's scopes, or — for a
+     * member in explicit mode, who has no implicit row — the union across the environments they can reach.
+     * <p>
+     * The union is what makes explicit mode usable at all: most guarded operations name no environment, and a member
+     * holding only per-environment rows would otherwise hold nothing anywhere. It is safe only because every operation
+     * whose effect lands in a particular environment is separately checked against that environment — a deployment
+     * against the one it targets, a per-environment role grant against the one it names — and because an operation
+     * taking effect across all environments at once uses {@code hasWorkspaceScopeInEveryEnvironment} instead. Weakening
+     * any of those turns this union into an escalation path.
+     */
     @Cacheable(value = WORKSPACE_SCOPES_CACHE)
     public Set<String> getWorkspaceScopes(long userId, long workspaceId) {
-        return workspaceUserRepository.findByUserIdAndWorkspaceId(userId, workspaceId)
+        Optional<WorkspaceUser> implicitWorkspaceUser = workspaceUserRepository
+            .findByUserIdAndWorkspaceIdAndEnvironmentIsNull(userId, workspaceId);
+
+        if (implicitWorkspaceUser.isPresent()) {
+            return dispatchScopes(implicitWorkspaceUser.get(), userId, workspaceId);
+        }
+
+        Set<String> unionScopes = new HashSet<>();
+
+        for (WorkspaceUser workspaceUser : workspaceUserRepository.findAllByUserIdAndWorkspaceId(userId, workspaceId)) {
+            unionScopes.addAll(dispatchScopes(workspaceUser, userId, workspaceId));
+        }
+
+        return unionScopes;
+    }
+
+    /**
+     * Returns the scopes the member holds in one environment.
+     * <p>
+     * The environment is part of the cache key because Spring's key generator includes every argument. Were it absent,
+     * the first environment checked would warm the entry and every later check on another environment would be served
+     * that same scope set — a member who is viewer in Production answered with their Development scopes, for as long as
+     * the entry lives.
+     */
+    @Cacheable(value = WORKSPACE_SCOPES_CACHE)
+    public Set<String> getWorkspaceScopes(long userId, long workspaceId, Environment environment) {
+        return fetchWorkspaceUser(userId, workspaceId, environment)
             .map(workspaceUser -> dispatchScopes(workspaceUser, userId, workspaceId))
             .orElse(Collections.emptySet());
+    }
+
+    /**
+     * Mirrors {@code WorkspaceUserService.fetchRole}'s precedence — an environment row wins, otherwise the implicit
+     * row, otherwise nothing. It resolves through the repository rather than that service because
+     * {@code WorkspaceUserServiceImpl} already depends on {@code PermissionService}, which depends on this class:
+     * injecting the service here would close a cycle.
+     */
+    private Optional<WorkspaceUser> fetchWorkspaceUser(long userId, long workspaceId, Environment environment) {
+        Optional<WorkspaceUser> environmentWorkspaceUser = workspaceUserRepository
+            .findByUserIdAndWorkspaceIdAndEnvironment(userId, workspaceId, environment.ordinal());
+
+        if (environmentWorkspaceUser.isPresent()) {
+            return environmentWorkspaceUser;
+        }
+
+        return workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(userId, workspaceId);
     }
 
     private void evictSingleEntry(long userId, long workspaceId) {
@@ -135,6 +192,12 @@ public class WorkspaceScopeCacheService {
             // "<tenantId>_<userId>_<workspaceId>". A bare SimpleKey(userId, workspaceId) would never match it, so the
             // eviction would silently no-op and stale scopes would be served until the TTL expires.
             cache.evict(TenantCacheKeyUtils.getKey(userId, workspaceId));
+
+            // Both method arities are cached, so both key shapes must be evicted. The cache holds up to one entry per
+            // environment for this member and the enum is closed, so the loop is bounded and needs no prefix scan.
+            for (Environment environment : Environment.values()) {
+                cache.evict(TenantCacheKeyUtils.getKey(userId, workspaceId, environment));
+            }
         }
     }
 

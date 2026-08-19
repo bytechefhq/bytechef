@@ -145,7 +145,9 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#projectDeploymentDTO.projectId, 'Project', 'WORKFLOW_EDIT')")
+    // The whole DTO, not its projectId: the evaluator reads the target environment off it so that the role
+    // checked is the one held in the environment being deployed into.
+    @PreAuthorize("hasPermission(#projectDeploymentDTO, 'WORKFLOW_EDIT')")
     public long createProjectDeployment(ProjectDeploymentDTO projectDeploymentDTO) {
         return createProjectDeployment(
             projectDeploymentDTO.toProjectDeployment(), CollectionUtils.map(

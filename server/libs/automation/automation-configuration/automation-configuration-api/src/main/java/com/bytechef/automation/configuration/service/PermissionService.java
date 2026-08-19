@@ -16,6 +16,7 @@
 
 package com.bytechef.automation.configuration.service;
 
+import com.bytechef.platform.configuration.domain.Environment;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Set;
@@ -75,6 +76,37 @@ public interface PermissionService {
     boolean hasWorkspaceScope(long workspaceId, String scope);
 
     /**
+     * Returns whether the current user has been granted {@code scope} in the workspace, <em>in the environment being
+     * acted on</em>.
+     *
+     * <p>
+     * The environment is always passed explicitly and is never read from {@code EnvironmentContext}. That thread-local
+     * holds the <em>source</em> environment during a promotion, and is already known to be lost on worker threads and
+     * in agent tool calls, so an implicit read would fail open in precisely the case this overload exists for.
+     *
+     * @param workspaceId the workspace whose scope grants are inspected
+     * @param scope       the scope name the user must hold
+     * @param environment the environment the caller intends to act on
+     * @return {@code true} if the current user holds {@code scope} in the workspace for that environment
+     */
+    boolean hasWorkspaceScope(long workspaceId, String scope, Environment environment);
+
+    /**
+     * Returns whether the current user has been granted {@code scope} in <em>every</em> environment of the workspace.
+     *
+     * <p>
+     * This is the check for an operation whose effect is not confined to one environment — granting a workspace-wide
+     * role, for instance, takes effect everywhere at once. The environment-unaware
+     * {@link #hasWorkspaceScope(long, String)} is a union across the environments a member can reach, so using it here
+     * would let a member who administers only Development grant themselves Production.
+     *
+     * @param workspaceId the workspace whose scope grants are inspected
+     * @param scope       the scope name the user must hold in every environment
+     * @return {@code true} if the current user holds {@code scope} in every environment
+     */
+    boolean hasWorkspaceScopeInEveryEnvironment(long workspaceId, String scope);
+
+    /**
      * Returns whether the current user has {@code scope} in the workspace that owns the project.
      *
      * @param projectId the project whose owning workspace is checked
@@ -82,6 +114,17 @@ public interface PermissionService {
      * @return {@code true} if the current user holds {@code scope} in the project's workspace
      */
     boolean hasWorkspaceScopeForProject(long projectId, String scope);
+
+    /**
+     * Returns whether the current user has {@code scope} in the workspace that owns the project, in the environment
+     * being acted on. See {@link #hasWorkspaceScope(long, String, Environment)} for why the environment is a parameter.
+     *
+     * @param projectId   the project whose owning workspace is checked
+     * @param scope       the scope name the user must hold in that workspace
+     * @param environment the environment the caller intends to act on
+     * @return {@code true} if the current user holds {@code scope} in the project's workspace for that environment
+     */
+    boolean hasWorkspaceScopeForProject(long projectId, String scope, Environment environment);
 
     /**
      * Returns whether the current user has {@code scope} for the resource, resolved to its owning workspace via the

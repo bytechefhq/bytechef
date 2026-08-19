@@ -20,6 +20,7 @@ import com.bytechef.ee.automation.configuration.audit.WorkspaceUserAuditPublishe
 import com.bytechef.ee.automation.configuration.repository.CustomRoleRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.user.service.UserInvitationService;
 import com.bytechef.platform.user.service.UserService;
 import java.util.List;
@@ -138,6 +139,21 @@ class PreAuthorizeProxyEnforcementIntTest {
     void testRealWorkspaceUserServiceImplEnforcesUpdateWorkspaceUserRole() {
         assertThatThrownBy(
             () -> workspaceUserService.updateWorkspaceUserRole(2L, 1L, WorkspaceRole.VIEWER))
+                .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    void testRealWorkspaceUserServiceImplEnforcesSetEnvironmentRole() {
+        assertThatThrownBy(
+            () -> workspaceUserService.setEnvironmentRole(
+                2L, 1L, Environment.PRODUCTION, WorkspaceRole.VIEWER, null))
+                    .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    void testRealWorkspaceUserServiceImplEnforcesRemoveEnvironmentRole() {
+        assertThatThrownBy(
+            () -> workspaceUserService.removeEnvironmentRole(2L, 1L, Environment.PRODUCTION))
                 .isInstanceOf(AccessDeniedException.class);
     }
 

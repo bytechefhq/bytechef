@@ -7,8 +7,10 @@
 
 package com.bytechef.ee.automation.configuration.service;
 
+import com.bytechef.ee.automation.configuration.domain.ResolvedRole;
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
+import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
 import java.util.Optional;
 
@@ -87,6 +89,54 @@ public interface WorkspaceUserService {
      * {@code CustomRoleService} to refuse deletion of a custom role that is still in use.
      */
     long countByCustomRoleId(long customRoleId);
+
+    /**
+     * Resolves the role a member holds in one environment.
+     *
+     * <p>
+     * A row naming the environment wins outright; otherwise the member's implicit row — the one that applies everywhere
+     * — is used. Empty means denied. There is deliberately no third fallback: a member in explicit mode has no implicit
+     * row, so an environment they were not granted resolves to nothing, which is how "no access to Production" is
+     * expressed.
+     *
+     * <p>
+     * The environment is a parameter and is never read from {@code EnvironmentContext}. That thread-local holds the
+     * <em>source</em> environment during a promotion and is lost on worker threads, so an implicit read would fail open
+     * in exactly the case this exists for.
+     */
+    Optional<ResolvedRole> fetchRole(long userId, long workspaceId, Environment environment);
+
+    /**
+     * Grants a member a built-in role in one environment, switching them into explicit mode.
+     *
+     * <p>
+     * Their implicit row, if any, is deleted in the same transaction — the two modes never coexist, so no reader can
+     * find two rows disagreeing about one environment and no evaluator needs a precedence rule. An existing row for
+     * that environment is updated in place.
+     *
+     * <p>
+     * Exactly one of {@code workspaceRole} and {@code customRoleId} must be supplied, mirroring the XOR invariant
+     * {@link WorkspaceUser} enforces on its own columns. A custom role is already per-environment at the model level,
+     * because {@code custom_role_id} rides in the same row as the environment.
+     *
+     * @throws com.bytechef.exception.ConfigurationException if neither or both role arguments are supplied, if the
+     *                                                       custom role is unknown, if the write would leave an
+     *                                                       environment without an admin, or if it would withdraw the
+     *                                                       caller's own ADMIN role from an environment
+     */
+    WorkspaceUser setEnvironmentRole(
+        long userId, long workspaceId, Environment environment, WorkspaceRole workspaceRole, Long customRoleId);
+
+    /**
+     * Revokes a member's role in one environment.
+     *
+     * <p>
+     * When it was their last environment row they are left with no rows at all, which is the same state as not being a
+     * member. No implicit row is written to replace it: that would turn "revoke their last environment" into "grant
+     * them every environment". Returning someone to implicit mode is {@code addWorkspaceUser}, an explicit call that
+     * names the role to restore.
+     */
+    void removeEnvironmentRole(long userId, long workspaceId, Environment environment);
 
     Optional<WorkspaceUser> fetchWorkspaceUser(long userId, long workspaceId);
 

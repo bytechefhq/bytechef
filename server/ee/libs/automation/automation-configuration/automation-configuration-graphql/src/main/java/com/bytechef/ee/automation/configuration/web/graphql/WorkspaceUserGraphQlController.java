@@ -13,6 +13,7 @@ import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import com.bytechef.ee.automation.configuration.service.WorkspaceUserService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
@@ -151,6 +152,24 @@ public class WorkspaceUserGraphQlController {
         return workspaceUserService.removeWorkspaceUser(userId, workspaceId);
     }
 
+    @MutationMapping
+    public WorkspaceUserView setWorkspaceUserEnvironmentRole(
+        @Argument long workspaceId, @Argument long userId, @Argument Environment environment,
+        @Argument WorkspaceRole role, @Argument Long customRoleId) {
+
+        return WorkspaceUserView.stored(
+            workspaceUserService.setEnvironmentRole(userId, workspaceId, environment, role, customRoleId));
+    }
+
+    @MutationMapping
+    public boolean removeWorkspaceUserEnvironmentRole(
+        @Argument long workspaceId, @Argument long userId, @Argument Environment environment) {
+
+        workspaceUserService.removeEnvironmentRole(userId, workspaceId, environment);
+
+        return true;
+    }
+
     @SchemaMapping(typeName = "WorkspaceUser", field = "user")
     public WorkspaceUserInfo user(WorkspaceUserView workspaceUserView) {
         User user = userService.getUser(workspaceUserView.userId());
@@ -167,21 +186,28 @@ public class WorkspaceUserGraphQlController {
      */
     public record WorkspaceUserView(
         Long id, long workspaceId, long userId, String workspaceRole, Long customRoleId, boolean inherited,
-        String createdDate) {
+        String createdDate, String environment) {
 
         static WorkspaceUserView stored(WorkspaceUser workspaceUser) {
             Integer roleOrdinal = workspaceUser.getWorkspaceRole();
+            Environment environment = workspaceUser.getEnvironment();
 
             return new WorkspaceUserView(
                 workspaceUser.getId(), workspaceUser.getWorkspaceId(), workspaceUser.getUserId(),
                 roleOrdinal == null ? null : WorkspaceRole.values()[roleOrdinal].name(),
                 workspaceUser.getCustomRoleId(), false,
-                workspaceUser.getCreatedDate() == null ? null : String.valueOf(workspaceUser.getCreatedDate()));
+                workspaceUser.getCreatedDate() == null ? null : String.valueOf(workspaceUser.getCreatedDate()),
+                environment == null ? null : environment.name());
         }
 
+        /**
+         * Synthesizes an entry for a tenant admin, who administers every workspace and has no row. Their environment is
+         * always null: a tenant admin is not subject to per-environment roles at all, because every scope check
+         * short-circuits on isTenantAdmin() before any row is read.
+         */
         static WorkspaceUserView inherited(long workspaceId, long userId) {
             return new WorkspaceUserView(
-                null, workspaceId, userId, WorkspaceRole.ADMIN.name(), null, true, null);
+                null, workspaceId, userId, WorkspaceRole.ADMIN.name(), null, true, null, null);
         }
     }
 }

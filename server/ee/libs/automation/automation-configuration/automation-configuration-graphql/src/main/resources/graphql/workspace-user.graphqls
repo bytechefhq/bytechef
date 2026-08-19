@@ -33,6 +33,25 @@ extend type Mutation {
     updateWorkspaceUserRole(workspaceId: ID!, userId: ID!, role: WorkspaceRole!): WorkspaceUser!
     "Remove a user from a workspace. Requires ADMIN workspace role."
     removeWorkspaceUser(workspaceId: ID!, userId: ID!): Boolean!
+    """
+    Give a member a role in one environment. The first such call switches the member from a
+    single workspace-wide role to per-environment roles, deleting their workspace-wide row.
+    Environments the member has no row for are then denied. Supply exactly one of `role` or
+    `customRoleId`. Requires the WORKSPACE_MEMBER_MANAGE scope.
+    """
+    setWorkspaceUserEnvironmentRole(
+        workspaceId: ID!
+        userId: ID!
+        environment: EnvironmentEnum!
+        role: WorkspaceRole
+        customRoleId: ID
+    ): WorkspaceUser!
+    """
+    Remove a member's role in one environment, denying them there. Removing their last
+    environment role removes them from the workspace entirely - it does not restore a
+    workspace-wide role. Requires the WORKSPACE_MEMBER_MANAGE scope.
+    """
+    removeWorkspaceUserEnvironmentRole(workspaceId: ID!, userId: ID!, environment: EnvironmentEnum!): Boolean!
 }
 
 type WorkspaceUser {
@@ -52,6 +71,8 @@ type WorkspaceUser {
     inherited: Boolean!
     user: WorkspaceUserInfo
     createdDate: String
+    "The environment this role applies to, or null when it applies to every environment"
+    environment: EnvironmentEnum
 }
 
 type WorkspaceUserInfo {

@@ -20,6 +20,7 @@ import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
 import com.bytechef.automation.configuration.security.ResourceVisibilityProvider;
 import com.bytechef.platform.annotation.ConditionalOnCEVersion;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.user.service.UserService;
@@ -91,8 +92,33 @@ public class PermissionServiceImpl implements PermissionService {
         return SecurityUtils.isAuthenticated();
     }
 
+    /**
+     * Community Edition has no authorization boundary between workspace members, so per-environment roles do not exist
+     * here and this matches the environment-unaware overload exactly.
+     */
+    @Override
+    public boolean hasWorkspaceScope(long workspaceId, String scope, Environment environment) {
+        return SecurityUtils.isAuthenticated();
+    }
+
+    /**
+     * See {@link #hasWorkspaceScope(long, String, Environment)} — per-environment roles are an Enterprise feature.
+     */
+    @Override
+    public boolean hasWorkspaceScopeInEveryEnvironment(long workspaceId, String scope) {
+        return SecurityUtils.isAuthenticated();
+    }
+
     @Override
     public boolean hasWorkspaceScopeForProject(long projectId, String scope) {
+        return SecurityUtils.isAuthenticated();
+    }
+
+    /**
+     * See {@link #hasWorkspaceScope(long, String, Environment)} — per-environment roles are an Enterprise feature.
+     */
+    @Override
+    public boolean hasWorkspaceScopeForProject(long projectId, String scope, Environment environment) {
         return SecurityUtils.isAuthenticated();
     }
 

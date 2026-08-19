@@ -149,7 +149,7 @@ class PermissionServiceVisibilityTest {
             currentUserResolver, mock(PermissionScopeRegistry.class), mock(ProjectRepository.class),
             workspaceScopeCacheService, mock(WorkspaceUserRepository.class),
             List.of(connectionOwnershipResolver(), apiKeyOwnershipResolver()),
-            List.of(connectionVisibilityProvider()), visibilityResolver(grantedConnectionIds));
+            List.of(connectionVisibilityProvider()), visibilityResolver(grantedConnectionIds), List.of());
     }
 
     private static ResourceOwnershipResolver connectionOwnershipResolver() {
