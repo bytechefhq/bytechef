@@ -80,8 +80,6 @@ const AiHub = lazy(() => import('@/ee/pages/automation/ai-hub/AiHub'));
 const ContextStoreSources = lazy(() => import('@/pages/automation/context-store/ContextStoreSources'));
 const ContextStores = lazy(() => import('@/pages/automation/context-store/ContextStores'));
 const AiAutoMemoriesPage = lazy(() => import('@/pages/automation/ai/memories/Memories'));
-const AiHubTasksPage = lazy(() => import('@/ee/pages/automation/ai-hub/tasks/AiHubTasks'));
-const AiHubTaskFormPage = lazy(() => import('@/ee/pages/automation/ai-hub/tasks/AiHubTaskForm'));
 const AiHubConnectorsPage = lazy(() => import('@/ee/pages/automation/ai-hub/context/AiHubConnectors'));
 
 const AiProviders = lazy(() => import('@/ee/pages/settings/platform/ai-providers/AiProviders'));
@@ -1116,42 +1114,6 @@ export const getRouter = (queryClient: QueryClient) =>
                                         </PrivateRoute>
                                     ),
                                     path: 'ai/memories',
-                                },
-                                {
-                                    element: (
-                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <EEVersion>
-                                                <LazyLoadWrapper hasLeftSidebar>
-                                                    <AiHubTasksPage />
-                                                </LazyLoadWrapper>
-                                            </EEVersion>
-                                        </PrivateRoute>
-                                    ),
-                                    path: 'ai-hub/tasks',
-                                },
-                                {
-                                    element: (
-                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <EEVersion>
-                                                <LazyLoadWrapper hasLeftSidebar>
-                                                    <AiHubTaskFormPage />
-                                                </LazyLoadWrapper>
-                                            </EEVersion>
-                                        </PrivateRoute>
-                                    ),
-                                    path: 'ai-hub/tasks/new',
-                                },
-                                {
-                                    element: (
-                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <EEVersion>
-                                                <LazyLoadWrapper hasLeftSidebar>
-                                                    <AiHubTaskFormPage />
-                                                </LazyLoadWrapper>
-                                            </EEVersion>
-                                        </PrivateRoute>
-                                    ),
-                                    path: 'ai-hub/tasks/:taskId/edit',
                                 },
                                 {
                                     children: [

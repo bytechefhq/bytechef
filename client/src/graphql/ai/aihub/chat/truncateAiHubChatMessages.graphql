@@ -1,0 +1,3 @@
+mutation truncateAiHubChatMessages($workspaceId: ID!, $id: ID!, $fromMessageIndex: Int!) {
+    truncateAiHubChatMessages(workspaceId: $workspaceId, id: $id, fromMessageIndex: $fromMessageIndex)
+}

@@ -6,7 +6,7 @@ import {twMerge} from 'tailwind-merge';
 interface AiHubComposerDropZonePropsI {
     children: ReactNode;
     className?: string;
-    // Drag-drop uploads are suppressed when true (e.g. workflow-chat tasks, which forward messages to a
+    // Drag-drop uploads are suppressed when true (e.g. workflow chats, which forward messages to a
     // webhook and cannot consume attached resources). The wrapper div is still rendered so the surrounding
     // composer layout is unchanged — only the drag handlers and the "Drop files to attach" overlay are off.
     disabled?: boolean;

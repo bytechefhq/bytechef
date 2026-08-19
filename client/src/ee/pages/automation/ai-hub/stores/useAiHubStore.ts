@@ -10,8 +10,8 @@ export enum MODE {
 }
 
 interface AiHubStateI {
-    taskId: string | undefined;
-    generateTaskId: () => void;
+    chatId: string | undefined;
+    generateChatId: () => void;
 
     mode: MODE;
     setMode: (mode: MODE) => void;
@@ -22,8 +22,8 @@ interface AiHubStateI {
     editUserMessage: (index: number, content: string) => void;
     resetMessages: () => void;
 
-    // True while a task switch is fetching that task's history. The thread shows a loading placeholder
-    // (not the "What should we get done?" empty state) so switching tasks reads as load→content instead of
+    // True while a chat switch is fetching that chat's history. The thread shows a loading placeholder
+    // (not the "What should we get done?" empty state) so switching chats reads as load→content instead of
     // flashing the welcome/empty thread before the messages arrive.
     messagesLoading: boolean;
     setMessagesLoading: (loading: boolean) => void;
@@ -37,9 +37,9 @@ interface AiHubStateI {
 
 export const aiHubStore = create<AiHubStateI>()(
     devtools((set) => ({
-        taskId: generateRandomId(),
-        generateTaskId: () => {
-            set({taskId: generateRandomId()});
+        chatId: generateRandomId(),
+        generateChatId: () => {
+            set({chatId: generateRandomId()});
         },
 
         mode: MODE.BUILD,
@@ -61,7 +61,7 @@ export const aiHubStore = create<AiHubStateI>()(
                     // Stop at the most recent user message. The streaming reply belongs to the current turn, which
                     // begins after that message, so a fresh assistant is pushed at the end rather than reusing one
                     // found before it. Without this boundary a resumed stream — when the trailing message is an
-                    // artifact-link card (array content) or the user's message itself after a task-switch reload —
+                    // artifact-link card (array content) or the user's message itself after a chat-switch reload —
                     // would walk past both and overwrite a PRIOR turn's assistant, rendering the reply above the
                     // user's message.
                     if (message.role === 'user') {

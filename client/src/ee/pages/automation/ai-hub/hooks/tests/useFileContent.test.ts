@@ -133,7 +133,7 @@ describe('useFileContent', () => {
                 status: 200,
                 text: () => Promise.resolve('late'),
             } as Response);
-            // Flush microtasks so the .then chain runs.
+            // Flush microchats so the .then chain runs.
             await Promise.resolve();
         });
 

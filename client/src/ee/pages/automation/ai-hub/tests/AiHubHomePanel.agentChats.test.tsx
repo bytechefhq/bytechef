@@ -39,10 +39,6 @@ vi.mock('@/shared/middleware/graphql', () => ({
     useWorkspaceChatWorkflowsQuery: () => ({data: {workspaceChatWorkflows: []}}),
 }));
 
-vi.mock('@/ee/pages/automation/ai-hub/tasks/hooks/useAiHubTasks', () => ({
-    useAiHubTasksQuery: () => ({data: []}),
-}));
-
 // The composer is a heavy assistant-ui surface; only its `modelPicker` slot matters here, so render
 // that slot alone and keep the test focused on the picker -> create-chat wiring.
 vi.mock('@/ee/pages/automation/ai-hub/composer/AiHubChatComposer', () => ({

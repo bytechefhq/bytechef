@@ -1,6 +1,7 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import {aiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
 import {aiHubRunStateStore} from '@/ee/pages/automation/ai-hub/runtime-providers/stores/useAiHubRunStateStore';
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {MemoryRouter} from 'react-router-dom';
@@ -14,8 +15,15 @@ import AiHubChatsSidebar, {
 } from '../AiHubChatsSidebar';
 import {AiHubChatI} from '../api/chats.api';
 
+// vi.mock factories hoist above module-scope consts, so the mutable chats list the individual chat-row
+// tests below need to configure per-test has to be declared via vi.hoisted rather than a plain outer
+// `let` — referencing a plain outer binding here throws "Cannot access X before initialization".
+const {mockChatsDataRef} = vi.hoisted(() => ({
+    mockChatsDataRef: {current: [] as AiHubChatI[]},
+}));
+
 vi.mock('@/ee/pages/automation/ai-hub/chats/hooks/useChats', () => ({
-    useAiHubChatsQuery: () => ({data: [], isLoading: false}),
+    useAiHubChatsQuery: () => ({data: mockChatsDataRef.current, isLoading: false}),
     useDeleteAiHubChatMutation: () => ({mutate: vi.fn()}),
     usePatchAiHubChatMutation: () => ({mutate: vi.fn()}),
 }));
@@ -36,21 +44,33 @@ vi.mock('@/shared/stores/useEnvironmentStore', () => ({
 vi.mock('@/shared/middleware/graphql', () => ({
     useCancelAiHubRunMutation: () => ({mutate: vi.fn()}),
     useCancelWorkflowChatTurnMutation: () => ({mutate: vi.fn()}),
+    useWorkspaceChatWorkflowsQuery: () => ({data: undefined}),
 }));
 
+// Reset unconditionally after every test in this file, not just the ones that set it — a leftover chats
+// list would otherwise leak into the top-menu / "More"-menu describe blocks below, which render the
+// sidebar assuming an empty list.
+afterEach(() => {
+    mockChatsDataRef.current = [];
+});
+
 function renderSidebar() {
+    const queryClient = new QueryClient({defaultOptions: {queries: {retry: false}}});
+
     return render(
-        <MemoryRouter initialEntries={['/automation/ai-hub']}>
-            <TooltipProvider>
-                <AiHubChatsSidebar />
-            </TooltipProvider>
-        </MemoryRouter>
+        <QueryClientProvider client={queryClient}>
+            <MemoryRouter initialEntries={['/automation/ai-hub']}>
+                <TooltipProvider>
+                    <AiHubChatsSidebar />
+                </TooltipProvider>
+            </MemoryRouter>
+        </QueryClientProvider>
     );
 }
 
 function buildChat(overrides: Partial<AiHubChatI> = {}): AiHubChatI {
     return {
-        aiHubTaskId: null,
+        aiAgentId: null,
         autoTitled: true,
         createdAt: new Date().toISOString(),
         id: 1,
@@ -248,12 +268,17 @@ describe('AiHubChatsSidebar top menu', () => {
         expect(screen.queryByText('Workflow Chats')).not.toBeInTheDocument();
     });
 
-    it('still renders New Chat, Scheduled, and More', () => {
+    it('still renders New Chat and More', () => {
         renderSidebar();
 
         expect(screen.getByText('New Chat')).toBeInTheDocument();
-        expect(screen.getByText('Scheduled')).toBeInTheDocument();
         expect(screen.getByText('More')).toBeInTheDocument();
+    });
+
+    it('does not render a "Scheduled" nav item — scheduling lives on the AI Agent, not the hub', () => {
+        renderSidebar();
+
+        expect(screen.queryByText('Scheduled')).not.toBeInTheDocument();
     });
 });
 
@@ -317,5 +342,82 @@ describe('AiHubChatsSidebar "More" menu', () => {
         await user.click(screen.getByText('More'));
 
         await waitFor(() => expect(screen.queryByRole('menuitem', {name: /memories/i})).not.toBeInTheDocument());
+    });
+});
+
+describe('AiHubChatsSidebar channel-born agent chat rows', () => {
+    beforeEach(() => {
+        aiHubChatsStore.getState().reset();
+    });
+
+    // Channel-born rows (recorded by AiHubAgentConversationRecorder from a Slack/schedule run) share
+    // kind=AGENT_CHAT with composer-created rows. Telling them apart needs BOTH signals — a non-null
+    // aiAgentId (only the recorder stamps it) AND a null workflowExecutionId (only the recorder leaves it
+    // null; createAgentChatAiHubChat requires it) — mirroring the server's own
+    // AiHubAgentConversationRecorder#adoptChat guard, which also refuses to trust either alone. These
+    // tests pin the visible consequences (icon + fallback title) across the discriminator's corners, not
+    // just the two "normal" cases, so a regression there shows up as a broken render.
+    it('shows the channel icon and the "Agent Conversation" fallback title for an untitled channel-born row', () => {
+        mockChatsDataRef.current = [
+            buildChat({aiAgentId: 9, id: 21, kind: 'AGENT_CHAT', title: null, workflowExecutionId: null}),
+        ];
+
+        renderSidebar();
+
+        expect(screen.getByLabelText('Agent channel conversation')).toBeInTheDocument();
+        expect(screen.queryByLabelText('Agent chat')).not.toBeInTheDocument();
+        expect(screen.getByText('Agent Conversation')).toBeInTheDocument();
+    });
+
+    it('shows the plain agent icon and the "New Chat" fallback title for an untitled composer-created row', () => {
+        mockChatsDataRef.current = [
+            buildChat({aiAgentId: null, id: 22, kind: 'AGENT_CHAT', title: null, workflowExecutionId: 'exec-1'}),
+        ];
+
+        renderSidebar();
+
+        expect(screen.getByLabelText('Agent chat')).toBeInTheDocument();
+        expect(screen.queryByLabelText('Agent channel conversation')).not.toBeInTheDocument();
+        expect(screen.queryByText('Agent Conversation')).not.toBeInTheDocument();
+
+        // "New Chat" also labels the top nav's create-chat link, so this row falling back to the same
+        // placeholder shows up as a SECOND match rather than a unique one.
+        expect(screen.getAllByText('New Chat')).toHaveLength(2);
+    });
+
+    it("does NOT treat a null-aiAgentId, null-workflowExecutionId row as channel-born (today's actual composer-created shape)", () => {
+        // A single-signal ("workflowExecutionId == null") discriminator would misclassify this row as
+        // channel-born. Both signals are required, matching the server's guard — this is the case that
+        // regresses first if either signal is dropped from the client check.
+        mockChatsDataRef.current = [
+            buildChat({aiAgentId: null, id: 24, kind: 'AGENT_CHAT', title: null, workflowExecutionId: null}),
+        ];
+
+        renderSidebar();
+
+        expect(screen.getByLabelText('Agent chat')).toBeInTheDocument();
+        expect(screen.queryByLabelText('Agent channel conversation')).not.toBeInTheDocument();
+        expect(screen.getAllByText('New Chat')).toHaveLength(2);
+    });
+
+    it('prefers a stored title over the channel-born fallback, while still showing the channel icon', () => {
+        mockChatsDataRef.current = [
+            buildChat({
+                aiAgentId: 9,
+                id: 23,
+                kind: 'AGENT_CHAT',
+                title: 'Support escalation',
+                workflowExecutionId: null,
+            }),
+        ];
+
+        renderSidebar();
+
+        expect(screen.getByText('Support escalation')).toBeInTheDocument();
+        expect(screen.queryByText('Agent Conversation')).not.toBeInTheDocument();
+        // The icon is driven by isChannelAgentChat independently of the title fallback — a titled
+        // channel-born row must still read as channel-born, not silently revert to the plain agent icon
+        // just because it has a name.
+        expect(screen.getByLabelText('Agent channel conversation')).toBeInTheDocument();
     });
 });

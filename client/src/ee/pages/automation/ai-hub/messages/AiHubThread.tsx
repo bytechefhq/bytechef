@@ -7,9 +7,9 @@ import {ArrowDownIcon} from 'lucide-react';
 import {FC} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-// Shown while a task switch is fetching that task's history (messages are momentarily empty). The same
+// Shown while a chat switch is fetching that chat's history (messages are momentarily empty). The same
 // four-dot pulse as LazyLoadWrapper's suspense fallback and AiHub's deep-link loader, so chunk load →
-// task resolution → history fetch read as ONE continuous loading state — message-shaped skeletons here
+// chat resolution → history fetch read as ONE continuous loading state — message-shaped skeletons here
 // used to register as two floating gray boxes because the small user-bubble bars are barely visible.
 const ThreadLoadingState: FC = () => (
     <div className="flex flex-1 items-center justify-center p-8">
@@ -28,7 +28,7 @@ const ThreadLoadingState: FC = () => (
 // Decide what an empty thread shows. `ThreadPrimitive.If empty` gates this on the assistant-ui runtime's
 // projected message list, which lags `aiHubStore.messages` by one commit: `useExternalStoreRuntime` ingests
 // new messages via `runtime.setAdapter(store)` inside a `useEffect`, so the runtime still reports "empty" for
-// one frame after the store has already been populated. At the tail of a task switch that leaves a window
+// one frame after the store has already been populated. At the tail of a chat switch that leaves a window
 // where `messagesLoading` has flipped false but the runtime hasn't caught up — which would flash the welcome
 // copy (identical to the home page). Treating "the store already has messages" as still-loading keeps the
 // skeleton on screen for that frame instead. `messagesLoading` alone covers the front of the switch (store
@@ -43,7 +43,7 @@ interface ThreadEmptyStateProps {
 
 // Empty thread: a loading placeholder while history is being fetched (or landing), otherwise the welcome
 // prompt. Both only render when the runtime has zero messages; see shouldShowThreadLoadingState for how the
-// "fetching" vs "new task" disambiguation is made without flashing the welcome mid-switch.
+// "fetching" vs "new chat" disambiguation is made without flashing the welcome mid-switch.
 const ThreadEmptyState: FC<ThreadEmptyStateProps> = ({showSuggestions}) => {
     const messagesLoading = useAiHubStore((state) => state.messagesLoading);
     const hasStoreMessages = useAiHubStore((state) => state.messages.length > 0);
@@ -90,8 +90,8 @@ interface AiHubThreadProps {
     // AiHubPanel drives this off the same visibility hook the card reads, and applies the matching inset
     // to the composer so the two keep a shared right edge.
     contentInsetRight?: boolean;
-    // Sample-question chips only make sense for plain copilot tasks — WORKFLOW_CHAT routes to a webhook
-    // trigger and PERSONAL_AGENT conversations carry their own purpose, so the panel gates them off there.
+    // Sample-question chips only make sense for plain copilot chats — WORKFLOW_CHAT routes to a webhook
+    // trigger rather than the LLM, so the panel gates them off there.
     showSuggestions?: boolean;
 }
 

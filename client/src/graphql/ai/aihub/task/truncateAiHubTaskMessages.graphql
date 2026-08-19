@@ -1,3 +1,0 @@
-mutation truncateAiHubTaskMessages($workspaceId: ID!, $id: ID!, $fromMessageIndex: Int!) {
-    truncateAiHubTaskMessages(workspaceId: $workspaceId, id: $id, fromMessageIndex: $fromMessageIndex)
-}

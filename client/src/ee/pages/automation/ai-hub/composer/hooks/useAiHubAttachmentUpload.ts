@@ -215,9 +215,9 @@ export const useAiHubAttachmentUpload = (workspaceId: number | undefined) => {
                 // 1) UX: the user just uploaded a file — they expect to see it. Without this, the upload
                 //    appears to succeed silently and the file is invisible until they manually open it.
                 // 2) Artifact recording: useRecordReferencedArtifacts watches `openTabs` and writes a
-                //    ai_hub_task_artifact row only for tabs in that array. The composer store's reference
+                //    ai_hub_chat_artifact row only for tabs in that array. The composer store's reference
                 //    list is invisible to that hook. Without opening a tab, uploaded files never appear in
-                //    the task's "Artifacts" sidebar list, even though the file is in workspace
+                //    the chat's "Artifacts" sidebar list, even though the file is in workspace
                 //    storage and the LLM can see it via list/get tools.
                 aiHubTabsStore.getState().openFileTab(String(response.id), response.name);
 

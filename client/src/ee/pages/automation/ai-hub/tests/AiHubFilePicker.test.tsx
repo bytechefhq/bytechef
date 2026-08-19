@@ -1,17 +1,17 @@
 import AiHubFilePicker from '@/ee/pages/automation/ai-hub/AiHubFilePicker';
+import {aiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
 import {aiHubTabsStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
-import {aiHubTasksStore} from '@/ee/pages/automation/ai-hub/tasks/stores/useAiHubTasksStore';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {fireEvent, render, screen} from '@testing-library/react';
 import {ReactNode} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-const {mockUseAiHubTaskArtifactsQuery} = vi.hoisted(() => ({
-    mockUseAiHubTaskArtifactsQuery: vi.fn(),
+const {mockUseAiHubChatArtifactsQuery} = vi.hoisted(() => ({
+    mockUseAiHubChatArtifactsQuery: vi.fn(),
 }));
 
-vi.mock('@/ee/pages/automation/ai-hub/tasks/hooks/useTasks', () => ({
-    useAiHubTaskArtifactsQuery: (...args: unknown[]) => mockUseAiHubTaskArtifactsQuery(...args),
+vi.mock('@/ee/pages/automation/ai-hub/chats/hooks/useChats', () => ({
+    useAiHubChatArtifactsQuery: (...args: unknown[]) => mockUseAiHubChatArtifactsQuery(...args),
 }));
 
 // The picker's other branches fan out into project/workflow/file/data-table/knowledge-base queries that
@@ -50,28 +50,28 @@ const wrap = (ui: ReactNode) => {
 
 describe('AiHubFilePicker artifacts branch', () => {
     beforeEach(() => {
-        aiHubTasksStore.setState({currentTaskId: 7});
+        aiHubChatsStore.setState({currentChatId: 7});
 
         aiHubTabsStore.setState({
+            activeChatId: undefined,
             activeTabId: undefined,
-            activeTaskId: undefined,
+            chatsSidebarCollapsed: true,
             openTabs: [],
             rightPanelOpen: false,
-            snapshotsByTaskId: {},
-            tasksSidebarCollapsed: true,
+            snapshotsByChatId: {},
         });
 
-        mockUseAiHubTaskArtifactsQuery.mockReturnValue({
+        mockUseAiHubChatArtifactsQuery.mockReturnValue({
             data: [
                 {
                     artifactId: 'file-1',
                     artifactName: 'report.csv',
+                    chatId: 7,
                     createdAt: new Date().toISOString(),
                     id: 1,
                     kind: 'FILE_CREATED',
                     metadataJson: null,
                     status: 'APPLIED',
-                    taskId: 7,
                 },
             ],
         });
@@ -90,8 +90,8 @@ describe('AiHubFilePicker artifacts branch', () => {
         expect(state.openTabs[0]!.kind).toBe('file');
     });
 
-    it('shows an empty state when the task has no artifacts', () => {
-        mockUseAiHubTaskArtifactsQuery.mockReturnValue({data: []});
+    it('shows an empty state when the chat has no artifacts', () => {
+        mockUseAiHubChatArtifactsQuery.mockReturnValue({data: []});
 
         wrap(<AiHubFilePicker />);
 

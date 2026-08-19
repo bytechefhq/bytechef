@@ -312,8 +312,7 @@ const AiHubContent = () => {
 
     // Home view: no active chat yet — show only the centered composer. The first message sent here
     // auto-creates a chat (see AiHubRuntimeProvider.onNew), which flips this branch to the
-    // panel view containing the thread. Tasks is a full-page route — it lives
-    // outside this component (see /automation/ai-hub/tasks).
+    // panel view containing the thread.
     // While a deep-linked chat is still resolving, render the same four-dot pulse as
     // LazyLoadWrapper's suspense fallback so the route-chunk load and the chat resolution read as one
     // continuous loading state instead of loader → home flash → chat.

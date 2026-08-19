@@ -4,11 +4,11 @@ import {aiChatRetryableErrorStore} from '@/shared/components/ai-chat/stores/useA
 import {aiChatToolCallStore} from '@/shared/components/ai-chat/stores/useAiChatToolCallStore';
 import {useEffect, useRef} from 'react';
 
+import {aiHubChatsStore} from '../chats/stores/useAiHubChatsStore';
 import {aiHubComposerStore} from '../composer/stores/useAiHubComposerStore';
 import {aiHubProgressStore} from '../progress/stores/useAiHubProgressStore';
 import {aiHubStore} from '../stores/useAiHubStore';
 import {aiHubTabsStore} from '../stores/useAiHubTabsStore';
-import {aiHubTasksStore} from '../tasks/stores/useAiHubTasksStore';
 
 /**
  * Resets every AI Hub Zustand store when the active workspace changes. The stores are module-scoped
@@ -43,13 +43,13 @@ export function useResetAiHubStoresOnWorkspaceChange(): void {
         }
 
         aiHubComposerStore.getState().clear();
-        aiHubTasksStore.getState().reset();
+        aiHubChatsStore.getState().reset();
         aiHubProgressStore.getState().clearProgress();
         aiChatRetryableErrorStore.getState().clearError();
         aiHubTabsStore.getState().reset();
         aiChatToolCallStore.getState().reset();
         aiChatAskedQuestionsStore.getState().reset();
         aiHubStore.getState().resetMessages();
-        aiHubStore.getState().generateTaskId();
+        aiHubStore.getState().generateChatId();
     }, [currentWorkspaceId]);
 }

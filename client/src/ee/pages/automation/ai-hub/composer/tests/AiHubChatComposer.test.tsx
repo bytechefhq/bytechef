@@ -82,11 +82,19 @@ vi.mock('@/shared/middleware/graphql', () => ({
     useCancelWorkflowChatTurnMutation: () => ({mutate: vi.fn()}),
 }));
 
-// The active-chat lookup (currentChatId from the chats store ∩ the chats query) drives `isWorkflowChat`,
-// which gates the resource-attachment controls. Hoisted mutable refs let each test set the active chat's
-// kind; both default to "no active chat" so existing chip tests see a standard (non-workflow) composer.
+// The active-chat lookup (currentChatId from the chats store ∩ the chats query) drives `isWorkflowChat`
+// (gates the resource-attachment controls) and `isChannelBornChat` (gates the message input itself).
+// Hoisted mutable refs let each test set the active chat's kind/aiAgentId/workflowExecutionId; all default
+// to "no active chat" so existing chip tests see a standard (non-workflow) composer.
+interface MockChatI {
+    aiAgentId?: number | null;
+    id: number;
+    kind: string;
+    workflowExecutionId?: string | null;
+}
+
 const {chatsQueryRef, currentChatIdRef} = vi.hoisted(() => ({
-    chatsQueryRef: {current: undefined as Array<{id: number; kind: string}> | undefined},
+    chatsQueryRef: {current: undefined as MockChatI[] | undefined},
     currentChatIdRef: {current: undefined as number | undefined},
 }));
 
@@ -196,5 +204,54 @@ describe('AiHubChatComposer workflow-chat attachment gating', () => {
 
         expect(screen.queryByTestId('ai-hub-composer')).not.toBeInTheDocument();
         expect(screen.queryByLabelText('Attach file')).not.toBeInTheDocument();
+    });
+});
+
+describe('AiHubChatComposer channel-born agent chat input gating', () => {
+    // Channel-born AGENT_CHAT rows (aiAgentId stamped, workflowExecutionId null — see isChannelAgentChat)
+    // must not offer a typeable input at all: the conversation is driven by its channel (Slack, a
+    // schedule, …), not by AI Hub, so a message typed here has nowhere real to go. This is the fix for
+    // the gap where isWorkflowChat alone hid only the attachment controls above, leaving the message
+    // input itself enabled — this test fails if that gate is ever removed or narrowed back to
+    // isWorkflowChat.
+    it('replaces the message input with a read-only notice for a channel-born agent chat', async () => {
+        currentChatIdRef.current = 7;
+        chatsQueryRef.current = [{aiAgentId: 9, id: 7, kind: 'AGENT_CHAT', workflowExecutionId: null}];
+
+        await renderComposer();
+
+        expect(screen.queryByLabelText('Message input')).not.toBeInTheDocument();
+        expect(screen.getByTestId('channel-born-readonly-notice')).toBeInTheDocument();
+        expect(screen.getByText(/happens on its channel/)).toBeInTheDocument();
+    });
+
+    it('still renders a typeable message input for a composer-created agent chat (aiAgentId null)', async () => {
+        currentChatIdRef.current = 7;
+        chatsQueryRef.current = [{aiAgentId: null, id: 7, kind: 'AGENT_CHAT', workflowExecutionId: 'exec-1'}];
+
+        await renderComposer();
+
+        expect(screen.getByLabelText('Message input')).toBeInTheDocument();
+        expect(screen.queryByTestId('channel-born-readonly-notice')).not.toBeInTheDocument();
+    });
+
+    it('still renders a typeable message input for a WORKFLOW_CHAT — typing is the entire point of it', async () => {
+        currentChatIdRef.current = 7;
+        chatsQueryRef.current = [{aiAgentId: null, id: 7, kind: 'WORKFLOW_CHAT', workflowExecutionId: 'exec-1'}];
+
+        await renderComposer();
+
+        expect(screen.getByLabelText('Message input')).toBeInTheDocument();
+        expect(screen.queryByTestId('channel-born-readonly-notice')).not.toBeInTheDocument();
+    });
+
+    it('still renders a typeable message input for a STANDARD chat', async () => {
+        currentChatIdRef.current = 7;
+        chatsQueryRef.current = [{id: 7, kind: 'STANDARD'}];
+
+        await renderComposer();
+
+        expect(screen.getByLabelText('Message input')).toBeInTheDocument();
+        expect(screen.queryByTestId('channel-born-readonly-notice')).not.toBeInTheDocument();
     });
 });

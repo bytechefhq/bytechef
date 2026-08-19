@@ -3,11 +3,11 @@ import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandL
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {getArtifactIcon} from '@/ee/pages/automation/ai-hub/artifacts/artifactIcons';
 import {handleArtifactQuickOpen, isArtifactClickable} from '@/ee/pages/automation/ai-hub/artifacts/artifactOpen';
+import {AiHubChatArtifactI} from '@/ee/pages/automation/ai-hub/chats/api/chats.api';
+import {useAiHubChatArtifactsQuery} from '@/ee/pages/automation/ai-hub/chats/hooks/useChats';
+import {useAiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
 import {groupWorkflowsByProject} from '@/ee/pages/automation/ai-hub/resource-picker/groupWorkflowsByProject';
 import {useAiHubTabsStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
-import {AiHubTaskArtifactI} from '@/ee/pages/automation/ai-hub/tasks/api/tasks.api';
-import {useAiHubTaskArtifactsQuery} from '@/ee/pages/automation/ai-hub/tasks/hooks/useTasks';
-import {useAiHubTasksStore} from '@/ee/pages/automation/ai-hub/tasks/stores/useAiHubTasksStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {
@@ -92,7 +92,7 @@ const AiHubFilePicker = () => {
     const [knowledgeBasesShowCount, setKnowledgeBasesShowCount] = useState(SECTION_INITIAL_CAP);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
     const environmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
-    const currentTaskId = useAiHubTasksStore((state) => state.currentTaskId);
+    const currentChatId = useAiHubChatsStore((state) => state.currentChatId);
 
     const openFileTab = useAiHubTabsStore((state) => state.openFileTab);
     const openWorkflowTab = useAiHubTabsStore((state) => state.openWorkflowTab);
@@ -131,8 +131,8 @@ const AiHubFilePicker = () => {
     // Warm cache hit — the Artifacts card issues this same query under the same key. Non-clickable
     // artifacts (a WORKFLOW_CREATED with no projectId in metadata, say) have nowhere to route to, so they
     // are filtered out rather than rendered as dead menu entries.
-    const {data: taskArtifacts} = useAiHubTaskArtifactsQuery(
-        currentTaskId,
+    const {data: chatArtifacts} = useAiHubChatArtifactsQuery(
+        currentChatId,
         currentWorkspaceId ?? 0,
         Boolean(currentWorkspaceId)
     );
@@ -193,7 +193,7 @@ const AiHubFilePicker = () => {
         });
     }, [workflowExecutionsData, lowerSearch]);
 
-    const clickableArtifacts = useMemo(() => (taskArtifacts ?? []).filter(isArtifactClickable), [taskArtifacts]);
+    const clickableArtifacts = useMemo(() => (chatArtifacts ?? []).filter(isArtifactClickable), [chatArtifacts]);
 
     const hasResults =
         filteredFiles.length > 0 ||
@@ -250,7 +250,7 @@ const AiHubFilePicker = () => {
         closeAndReset();
     };
 
-    const handleSelectArtifact = (artifact: AiHubTaskArtifactI) => {
+    const handleSelectArtifact = (artifact: AiHubChatArtifactI) => {
         void handleArtifactQuickOpen(artifact);
         closeAndReset();
     };

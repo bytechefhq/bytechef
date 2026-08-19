@@ -6,7 +6,7 @@ interface AiHubWorkflowExecutionViewerProps {
 
 /**
  * Body of a `workflowExecution` resource tab. Renders the shared {@link WorkflowExecutionDetail}
- * (job / trigger / task accordion + read-only canvas) — the same content as the standalone
+ * (job / trigger / chat accordion + read-only canvas) — the same content as the standalone
  * workflow-execution slide-over sheet, minus the Sheet chrome.
  *
  * <p>No internal title bar — the tab strip in {@link AiHubResourcePanel} already shows the

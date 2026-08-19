@@ -18,6 +18,7 @@ const {
     mockSetContext,
     mockSetCopilotPanelOpen,
     navigateMock,
+    searchParams,
 } = vi.hoisted(() => ({
     copilotEnabled: {value: true},
     mockInvalidateAgentQueries: vi.fn(),
@@ -25,11 +26,12 @@ const {
     mockSetContext: vi.fn(),
     mockSetCopilotPanelOpen: vi.fn(),
     navigateMock: vi.fn(),
+    searchParams: {value: new URLSearchParams()},
 }));
 
 vi.mock('react-router-dom', () => ({
     useNavigate: () => navigateMock,
-    useSearchParams: () => [new URLSearchParams(), vi.fn()],
+    useSearchParams: () => [searchParams.value, vi.fn()],
 }));
 
 vi.mock('@/pages/automation/agents/utils/invalidateAgentQueries', () => ({
@@ -81,6 +83,7 @@ vi.mock('@/pages/automation/project-deployments/components/project-deployment-di
 }));
 
 vi.mock('@/shared/middleware/graphql', () => ({
+    useAddAiAgentChannelMutation: vi.fn().mockReturnValue({isPending: false, mutate: vi.fn()}),
     useAiAgentTagsQuery: vi.fn().mockReturnValue({data: {aiAgentTags: []}}),
     useAiAgentsQuery: vi.fn(),
     useCreateAiAgentMutation: vi.fn(),
@@ -124,6 +127,7 @@ const wrap = (ui: ReactNode) => {
 
 beforeEach(() => {
     copilotEnabled.value = true;
+    searchParams.value = new URLSearchParams();
 
     navigateMock.mockReset();
     mockInvalidateAgentQueries.mockReset();
@@ -236,6 +240,38 @@ describe('Agents', () => {
         wrap(<Agents />);
 
         expect(screen.queryByRole('button', {name: 'Ask Copilot'})).not.toBeInTheDocument();
+    });
+
+    it('narrows the list to scheduled agents when the scheduled filter is active', () => {
+        searchParams.value = new URLSearchParams('filter=scheduled');
+
+        mockUseAiAgentsQuery.mockReturnValue(
+            queryResult({
+                aiAgents: [
+                    {
+                        channels: [{channelType: 'schedule', id: '10', parameters: {expression: '30 9 * * ?'}}],
+                        elements: [],
+                        id: '1',
+                        tags: [],
+                        title: 'Agent1',
+                    },
+                    {
+                        channels: [{channelType: 'chat', id: '11', parameters: {}}],
+                        elements: [],
+                        id: '2',
+                        tags: [],
+                        title: 'Agent2',
+                    },
+                ],
+            })
+        );
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        mockUseCreateAiAgentMutation.mockReturnValue({isPending: false, mutate: vi.fn()} as any);
+
+        wrap(<Agents />);
+
+        expect(screen.getByText('Agent1')).toBeInTheDocument();
+        expect(screen.queryByText('Agent2')).not.toBeInTheDocument();
     });
 
     it('registers agent query invalidation for post-turn copilot refreshes', () => {

@@ -1,0 +1,13 @@
+query aiHubChatTools($workspaceId: ID!, $chatId: ID!) {
+    aiHubChatTools(workspaceId: $workspaceId, chatId: $chatId) {
+        clusterElementName
+        componentName
+        componentVersion
+        connectionId
+        chatComponentId
+        chatId
+        chatToolId
+        environment
+        parameters
+    }
+}

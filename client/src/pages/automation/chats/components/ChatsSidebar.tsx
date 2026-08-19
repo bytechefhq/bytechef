@@ -2,7 +2,7 @@ import {Skeleton} from '@/components/ui/skeleton';
 import {useChatsStore} from '@/pages/automation/chats/stores/useChatsStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
-import {useWorkspaceChatWorkflowsQuery} from '@/shared/middleware/graphql';
+import {useWorkspaceChatAgentsQuery, useWorkspaceChatWorkflowsQuery} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useMemo} from 'react';
 import {useParams} from 'react-router-dom';
@@ -44,6 +44,13 @@ const ChatsSidebar = () => {
         workspaceId: String(currentWorkspaceId),
     });
 
+    const {data: chatAgentsData, isLoading: isChatAgentsLoading} = useWorkspaceChatAgentsQuery({
+        environmentId: String(currentEnvironmentId),
+        workspaceId: String(currentWorkspaceId),
+    });
+
+    const chatAgents = chatAgentsData?.workspaceChatAgents ?? [];
+
     const workflowsByProject: Map<string, ProjectChatGroupI> = useMemo(() => {
         const result = new Map<string, ProjectChatGroupI>();
 
@@ -69,17 +76,37 @@ const ChatsSidebar = () => {
         return result;
     }, [isLoading, data]);
 
-    if (isLoading) {
+    if (isLoading || isChatAgentsLoading) {
         return <ChatsSidebarSkeleton />;
     }
 
-    if (!data?.workspaceChatWorkflows) {
-        return null;
-    }
+    const hasNoChats = workflowsByProject.size === 0 && chatAgents.length === 0;
 
     return (
         <>
-            {workflowsByProject.size === 0 ? (
+            {chatAgents.length > 0 && (
+                <LeftSidebarNav
+                    body={
+                        <>
+                            {chatAgents.map((chatAgent) => (
+                                <LeftSidebarNavItem
+                                    disabled={isRunning && workflowExecutionId !== chatAgent.workflowExecutionId}
+                                    item={{
+                                        current: workflowExecutionId === chatAgent.workflowExecutionId,
+                                        id: chatAgent.workflowExecutionId,
+                                        name: chatAgent.agentTitle,
+                                    }}
+                                    key={chatAgent.workflowExecutionId}
+                                    toLink={`/automation/chats/${chatAgent.workflowExecutionId}`}
+                                />
+                            ))}
+                        </>
+                    }
+                    title="Agents"
+                />
+            )}
+
+            {hasNoChats ? (
                 <div className="mb-4 px-2">
                     <span className="px-3 text-xs">No chats found</span>
                 </div>

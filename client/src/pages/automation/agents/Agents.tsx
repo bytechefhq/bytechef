@@ -5,6 +5,7 @@ import {ButtonGroup} from '@/components/ui/button-group';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import AgentsFilterTitle from '@/pages/automation/agents/components/AgentsFilterTitle';
 import invalidateAgentQueries from '@/pages/automation/agents/utils/invalidateAgentQueries';
+import isScheduledAgent from '@/pages/automation/agents/utils/isScheduledAgent';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
@@ -69,15 +70,22 @@ const Agents = () => {
     };
 
     const agentIdFilter = searchParams.get('agentId');
+    const filter = searchParams.get('filter');
     const tagIdFilter = searchParams.get('tagId');
 
     const {agents, agentsError, agentsIsLoading} = useAgents();
 
-    // A tag selects a SET of agents; an explicit agent selection is narrower and wins outright rather than
-    // intersecting, so picking one clears the other.
+    // A tag or the scheduled filter selects a SET of agents; an explicit agent selection is narrower and wins
+    // outright rather than intersecting, so picking one clears the other. Each sidebar item links to a single
+    // search param, so only a hand-written URL can set two at once — and then the first branch that matches
+    // wins rather than the filters combining.
     const filteredAgents = useMemo(() => {
         if (agentIdFilter) {
             return agents.filter((agent) => agent.id === agentIdFilter);
+        }
+
+        if (filter === 'scheduled') {
+            return agents.filter((agent) => isScheduledAgent(agent));
         }
 
         if (tagIdFilter) {
@@ -85,7 +93,7 @@ const Agents = () => {
         }
 
         return agents;
-    }, [agents, agentIdFilter, tagIdFilter]);
+    }, [agents, agentIdFilter, filter, tagIdFilter]);
 
     const filterAgentName = agentIdFilter ? agents.find((agent) => agent.id === agentIdFilter)?.title : undefined;
 
@@ -161,7 +169,11 @@ const Agents = () => {
                     }
                     title={
                         agents.length > 0 ? (
-                            <AgentsFilterTitle agentName={filterAgentName} tagName={filterTagName} />
+                            <AgentsFilterTitle
+                                agentName={filterAgentName}
+                                scheduled={filter === 'scheduled'}
+                                tagName={filterTagName}
+                            />
                         ) : (
                             ''
                         )
@@ -171,6 +183,7 @@ const Agents = () => {
             leftSidebarBody={
                 <AgentsLeftSidebarNav
                     currentAgentId={agentIdFilter ?? undefined}
+                    currentFilter={filter}
                     currentTagId={tagIdFilter}
                     filterMode
                 />

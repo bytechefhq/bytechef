@@ -1,0 +1,17 @@
+mutation updateAiHubChatToolParameters($workspaceId: ID!, $chatToolId: ID!, $parameters: Any!) {
+    updateAiHubChatToolParameters(
+        workspaceId: $workspaceId
+        chatToolId: $chatToolId
+        parameters: $parameters
+    ) {
+        clusterElementName
+        componentName
+        componentVersion
+        connectionId
+        chatComponentId
+        chatId
+        chatToolId
+        environment
+        parameters
+    }
+}

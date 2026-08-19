@@ -4,7 +4,7 @@ import useAiHubSettingsStore from '@/ee/pages/automation/ai-hub/stores/useAiHubS
 import {ChevronDownIcon, ChevronUpIcon} from 'lucide-react';
 
 /**
- * Floating list of the ACTIVE task's artifacts, pinned to the top-right of the chat pane. See
+ * Floating list of the ACTIVE chat's artifacts, pinned to the top-right of the chat pane. See
  * {@link useAiHubArtifactsCard} for the conditions under which it renders nothing at all.
  *
  * <p>Clicking a row opens the artifact as a tab — and every {@code aiHubTabsStore.open*Tab} setter also

@@ -2,7 +2,7 @@ import Button from '@/components/Button/Button';
 import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from '@/components/ui/dialog';
 import {Input} from '@/components/ui/input';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import {useAddAiHubUserConnectorMutation, useAiHubTaskToolableComponentsQuery} from '@/shared/middleware/graphql';
+import {useAddAiHubUserConnectorMutation, useAiHubChatToolableComponentsQuery} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {Loader2Icon, PlugIcon, SearchIcon} from 'lucide-react';
@@ -27,7 +27,7 @@ const AiHubAddConnectorDialog = ({addedComponentNames, onClose}: AiHubAddConnect
 
     const queryClient = useQueryClient();
 
-    const {data, isLoading} = useAiHubTaskToolableComponentsQuery(
+    const {data, isLoading} = useAiHubChatToolableComponentsQuery(
         {workspaceId: String(currentWorkspaceId ?? '')},
         {enabled: currentWorkspaceId != null}
     );
@@ -39,7 +39,7 @@ const AiHubAddConnectorDialog = ({addedComponentNames, onClose}: AiHubAddConnect
     const components = useMemo(() => {
         const normalizedSearch = searchTerm.trim().toLowerCase();
 
-        return [...(data?.aiHubTaskToolableComponents ?? [])]
+        return [...(data?.aiHubChatToolableComponents ?? [])]
             .filter((component) => !addedComponentNames.has(component.componentName))
             .filter((component) => {
                 if (!normalizedSearch) {

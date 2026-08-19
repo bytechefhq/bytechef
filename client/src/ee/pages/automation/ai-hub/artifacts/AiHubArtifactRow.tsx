@@ -4,15 +4,15 @@ import {
     isArtifactClickable,
     isArtifactRemovable,
 } from '@/ee/pages/automation/ai-hub/artifacts/artifactOpen';
-import {AiHubTaskArtifactI} from '@/ee/pages/automation/ai-hub/tasks/api/tasks.api';
-import {useDeleteAiHubTaskArtifactMutation} from '@/shared/middleware/graphql';
+import {AiHubChatArtifactI} from '@/ee/pages/automation/ai-hub/chats/api/chats.api';
+import {useDeleteAiHubChatArtifactMutation} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {XIcon} from 'lucide-react';
 import {type MouseEvent} from 'react';
 import {toast} from 'sonner';
 
 interface AiHubArtifactRowPropsI {
-    artifact: AiHubTaskArtifactI;
+    artifact: AiHubChatArtifactI;
     workspaceId: number;
 }
 
@@ -22,16 +22,16 @@ const AiHubArtifactRow = ({artifact, workspaceId}: AiHubArtifactRowPropsI) => {
     const clickable = isArtifactClickable(artifact);
     const removable = isArtifactRemovable(artifact);
 
-    const deleteMutation = useDeleteAiHubTaskArtifactMutation({
+    const deleteMutation = useDeleteAiHubChatArtifactMutation({
         onError: (error) => {
             const message = error instanceof Error ? error.message : String(error);
 
             toast.error(`Failed to remove ${artifact.artifactName}: ${message}`);
         },
-        // The artifact list query is keyed by ['aiHubTasks', 'artifacts', taskId, workspaceId] (see
-        // AiHubTasksKeys.artifacts) — invalidate by that prefix so the row disappears without needing the
+        // The artifact list query is keyed by ['aiHubChats', 'artifacts', chatId, workspaceId] (see
+        // AiHubChatsKeys.artifacts) — invalidate by that prefix so the row disappears without needing the
         // exact key shape react-query built it under. Matching on both segments avoids needlessly
-        // refetching the task list/messages, which share the 'aiHubTasks' root. Mirrors
+        // refetching the chat list/messages, which share the 'aiHubChats' root. Mirrors
         // useRecordReferencedArtifacts' invalidation strategy.
         onSuccess: () => {
             queryClient.invalidateQueries({
@@ -42,7 +42,7 @@ const AiHubArtifactRow = ({artifact, workspaceId}: AiHubArtifactRowPropsI) => {
                         return false;
                     }
 
-                    return key[0] === 'aiHubTasks' && key[1] === 'artifacts';
+                    return key[0] === 'aiHubChats' && key[1] === 'artifacts';
                 },
             });
         },

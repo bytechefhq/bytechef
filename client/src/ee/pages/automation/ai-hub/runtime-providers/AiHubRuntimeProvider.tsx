@@ -89,9 +89,9 @@ type OpenSkillTabResultType = {name: string; opened: true; skillId: string} | {e
 
 type OpenAiAgentTabResultType = {aiAgentId: string; name: string; opened: true} | {error: string; opened: false};
 
-// openWorkflowChatTab + openAiHubTaskTab share the same shape — both create-or-restore a Chat
-// row server-side and return the threadId/chatId pair the client navigates to. Distinct from the
-// resource-tab tools above because the result drives a chat switch, not a resource panel update.
+// openWorkflowChatTab creates-or-restores a Chat row server-side and returns the threadId/chatId pair the
+// client navigates to. Distinct from the resource-tab tools above because the result drives a chat switch,
+// not a resource panel update.
 type OpenChatTabResultType =
     {chatId: number; opened: true; threadId: string; title: string | null} | {error: string; opened: false};
 
@@ -255,10 +255,10 @@ const validateOpenAiAgentTabResult = (raw: unknown): OpenAiAgentTabResultType | 
 };
 
 /**
- * Validates the {@code openAiHubTaskTab} / {@code openWorkflowChatTab} tool result. Both tools share the same
- * shape because both drive a chat switch (the server creates-or-restores a Chat row and returns the
- * threadId + chatId pair). The runtime provider feeds the parsed result into the command center + chats
- * stores and navigates to the matching URL — same three-step pattern the sidebar-click handlers use.
+ * Validates the {@code openWorkflowChatTab} tool result. The tool drives a chat switch (the server
+ * creates-or-restores a Chat row and returns the threadId + chatId pair). The runtime provider feeds the
+ * parsed result into the command center + chats stores and navigates to the matching URL — same three-step
+ * pattern the sidebar-click handlers use.
  */
 const validateOpenChatTabResult = (raw: unknown): OpenChatTabResultType | null => {
     if (typeof raw !== 'object' || raw === null) {
@@ -312,8 +312,8 @@ interface BuildSubscriberDepsI {
     chatId?: string;
     getLastUserMessage: () => string;
     /**
-     * Router navigate function for tool-driven chat switches (openAiHubTaskTab, openWorkflowChatTab).
-     * Optional so tests that don't exercise those tools can omit it; production always supplies it via the
+     * Router navigate function for tool-driven chat switches (openWorkflowChatTab).
+     * Optional so tests that don't exercise that tool can omit it; production always supplies it via the
      * provider component, which calls {@code useNavigate()} at render time.
      */
     navigate?: (path: string) => void;
@@ -891,9 +891,9 @@ export const buildAiHubSubscriber = ({
                 }
 
                 aiHubTabsStore.getState().openAiAgentTab(parsed.aiAgentId, parsed.name);
-            } else if (toolCallName === 'openAiHubTaskTab' || toolCallName === 'openWorkflowChatTab') {
+            } else if (toolCallName === 'openWorkflowChatTab') {
                 // LLM-driven chat switch. The tool already created/restored the chat server-side
-                // (see CreateAiHubTaskChat / CreateWorkflowChatChat); here we just sync the client
+                // (see CreateWorkflowChatChat); here we just sync the client
                 // stores and update the URL so the user lands in the new chat. Mirrors the three-step
                 // pattern AiHubHomePanel.handleSelectWorkflowChat uses for the picker-click path so both
                 // entry points produce identical client state.

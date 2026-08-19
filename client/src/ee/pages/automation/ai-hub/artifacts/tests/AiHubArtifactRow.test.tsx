@@ -4,29 +4,29 @@ import {fireEvent, render, screen} from '@testing-library/react';
 import {ReactElement} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {AiHubTaskArtifactI} from '../../tasks/api/tasks.api';
+import {AiHubChatArtifactI} from '../../chats/api/chats.api';
 import AiHubArtifactRow from '../AiHubArtifactRow';
 
 vi.mock('@/shared/middleware/graphql', () => ({
-    useDeleteAiHubTaskArtifactMutation: () => ({isPending: false, mutate: vi.fn()}),
+    useDeleteAiHubChatArtifactMutation: () => ({isPending: false, mutate: vi.fn()}),
 }));
 
-function buildArtifact(overrides: Partial<AiHubTaskArtifactI> = {}): AiHubTaskArtifactI {
+function buildArtifact(overrides: Partial<AiHubChatArtifactI> = {}): AiHubChatArtifactI {
     return {
         artifactId: 'file-1',
         artifactName: 'report.csv',
+        chatId: 1,
         createdAt: new Date().toISOString(),
         id: 1,
         kind: 'FILE_CREATED',
         metadataJson: null,
         status: 'APPLIED',
-        taskId: 1,
         ...overrides,
     };
 }
 
 // AiHubArtifactRow calls useQueryClient() directly (for the delete mutation's onSuccess invalidation),
-// so it needs a real QueryClientProvider ancestor even though useDeleteAiHubTaskArtifactMutation itself
+// so it needs a real QueryClientProvider ancestor even though useDeleteAiHubChatArtifactMutation itself
 // is mocked above.
 function renderRow(ui: ReactElement) {
     return render(<QueryClientProvider client={new QueryClient()}>{ui}</QueryClientProvider>);
@@ -35,12 +35,12 @@ function renderRow(ui: ReactElement) {
 describe('AiHubArtifactRow', () => {
     beforeEach(() => {
         aiHubTabsStore.setState({
+            activeChatId: undefined,
             activeTabId: undefined,
-            activeTaskId: undefined,
+            chatsSidebarCollapsed: true,
             openTabs: [],
             rightPanelOpen: false,
-            snapshotsByTaskId: {},
-            tasksSidebarCollapsed: true,
+            snapshotsByChatId: {},
         });
     });
 

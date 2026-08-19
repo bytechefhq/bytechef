@@ -17,5 +17,10 @@ query aiAgents($workspaceId: ID!) {
             id
             kind
         }
+        channels {
+            id
+            channelType
+            parameters
+        }
     }
 }

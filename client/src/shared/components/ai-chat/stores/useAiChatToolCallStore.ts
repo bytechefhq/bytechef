@@ -7,7 +7,7 @@ import {devtools} from 'zustand/middleware';
  * - `running` — request in flight
  * - `success` — completed normally
  * - `error` — completed with a real failure (server error, network failure, parse error)
- * - `aborted` — cleanup ritual on task switch terminated the call; NOT a real error. Renderers should show
+ * - `aborted` — cleanup ritual on chat switch terminated the call; NOT a real error. Renderers should show
  *   a neutral "Switched away" affordance, not an error indicator. Distinguishing this from `error` prevents the
  *   flapping bug where `failAllRunning` would set `error` and a late SSE `onComplete({kind:'aborted'})` callback
  *   would then flip back to `success` — leaving a misleading or oscillating UI.
@@ -33,8 +33,8 @@ export interface SubagentProgressEntryI {
  */
 export interface ToolCallEntryI {
     args?: Record<string, unknown>;
-    /** AG-UI thread/task id this entry belongs to. Used to scope reset on task switch. */
-    taskId?: string;
+    /** AG-UI thread/chat id this entry belongs to. Used to scope reset on chat switch. */
+    chatId?: string;
     /** Index into the messages array of the assistant message that owns this tool call. */
     messageIndex: number;
     progress: SubagentProgressEntryI[];
@@ -70,33 +70,33 @@ interface ToolCallStateI {
     completeToolCall: (toolCallId: string, result: unknown, isError: boolean) => void;
     /**
      * Force any tool calls still in `running` state to a terminal status. The default `aborted` is correct for the
-     * task-switch cleanup ritual — it prevents the flapping race where `error` would be later overwritten by
+     * chat-switch cleanup ritual — it prevents the flapping race where `error` would be later overwritten by
      * a successful `completeToolCall` from a late SSE callback. Pass `error` for genuine failures (e.g. agent throw).
      */
     failAllRunning: (errorResult: unknown, status?: 'aborted' | 'error') => void;
     /**
-     * Task-scoped sibling of {@link failAllRunning}: terminates only entries whose {@code taskId}
+     * Chat-scoped sibling of {@link failAllRunning}: terminates only entries whose {@code chatId}
      * matches. Used by {@code onRunFinishedEvent} / {@code onRunErrorEvent} in the runtime provider so a tool call
      * that started but never received its matching {@code ToolCallResultEvent} stops spinning at end-of-run, without
-     * clobbering parallel tasks' legitimate in-flight cards.
+     * clobbering parallel chats' legitimate in-flight cards.
      */
-    failRunningInTask: (taskId: string, errorResult: unknown, status?: 'aborted' | 'error') => void;
+    failRunningInChat: (chatId: string, errorResult: unknown, status?: 'aborted' | 'error') => void;
     /**
-     * Returns the most-recently-started running tool call matching {@code toolName}. Pass {@code taskId} so a
-     * late breadcrumb arriving for a switched-away task cannot land on the wrong card. The cleanup ritual
-     * already flips entries from prior tasks to 'error' on switch — this filter is defense in depth against
-     * any race window where two tasks briefly share a running call with the same toolName.
+     * Returns the most-recently-started running tool call matching {@code toolName}. Pass {@code chatId} so a
+     * late breadcrumb arriving for a switched-away chat cannot land on the wrong card. The cleanup ritual
+     * already flips entries from prior chats to 'error' on switch — this filter is defense in depth against
+     * any race window where two chats briefly share a running call with the same toolName.
      */
-    findRunningToolCallByName: (toolName: string, taskId?: string) => RunningToolCallEntryType | undefined;
+    findRunningToolCallByName: (toolName: string, chatId?: string) => RunningToolCallEntryType | undefined;
     /** Insertion order of tool-call ids — used to project them into the assistant message in arrival order. */
     order: string[];
     reset: () => void;
     /**
-     * Drop only the entries belonging to {@code taskId}. Used by the runtime provider on task
-     * switch so we don't nuke entries that already arrived for the NEW task in a re-mount race.
+     * Drop only the entries belonging to {@code chatId}. Used by the runtime provider on chat
+     * switch so we don't nuke entries that already arrived for the NEW chat in a re-mount race.
      */
-    resetForTask: (taskId: string | undefined) => void;
-    startToolCall: (toolCallId: string, toolName: string, messageIndex: number, taskId?: string) => void;
+    resetForChat: (chatId: string | undefined) => void;
+    startToolCall: (toolCallId: string, toolName: string, messageIndex: number, chatId?: string) => void;
     toolCalls: Record<string, ToolCallEntryI>;
     updateToolCallArgs: (toolCallId: string, args: Record<string, unknown>) => void;
 }
@@ -106,14 +106,14 @@ export const aiChatToolCallStore = create<ToolCallStateI>()(
         order: [] as string[],
         toolCalls: {} as Record<string, ToolCallEntryI>,
 
-        startToolCall: (toolCallId, toolName, messageIndex, taskId) =>
+        startToolCall: (toolCallId, toolName, messageIndex, chatId) =>
             set((state) => {
                 if (state.toolCalls[toolCallId]) {
                     return state;
                 }
 
                 const newEntry: RunningToolCallEntryType = {
-                    taskId,
+                    chatId,
                     messageIndex,
                     progress: [],
                     progressiveOutput: '',
@@ -169,7 +169,7 @@ export const aiChatToolCallStore = create<ToolCallStateI>()(
                 // explicit shape lock confirms exactly which fields land on the terminal entry.
                 const completed: TerminalToolCallEntryType = {
                     args: existing.args,
-                    taskId: existing.taskId,
+                    chatId: existing.chatId,
                     messageIndex: existing.messageIndex,
                     progress: existing.progress,
                     progressiveOutput: existing.progressiveOutput,
@@ -241,7 +241,7 @@ export const aiChatToolCallStore = create<ToolCallStateI>()(
                     if (entry && entry.status === 'running') {
                         const terminated: TerminalToolCallEntryType = {
                             args: entry.args,
-                            taskId: entry.taskId,
+                            chatId: entry.chatId,
                             messageIndex: entry.messageIndex,
                             progress: entry.progress,
                             progressiveOutput: entry.progressiveOutput,
@@ -263,7 +263,7 @@ export const aiChatToolCallStore = create<ToolCallStateI>()(
                 return {...state, toolCalls: updated};
             }),
 
-        failRunningInTask: (taskId, errorResult, status = 'aborted') =>
+        failRunningInChat: (chatId, errorResult, status = 'aborted') =>
             set((state) => {
                 const updated: Record<string, ToolCallEntryI> = {...state.toolCalls};
                 let mutated = false;
@@ -271,10 +271,10 @@ export const aiChatToolCallStore = create<ToolCallStateI>()(
                 for (const id of state.order) {
                     const entry = updated[id];
 
-                    if (entry && entry.status === 'running' && entry.taskId === taskId) {
+                    if (entry && entry.status === 'running' && entry.chatId === chatId) {
                         const terminated: TerminalToolCallEntryType = {
                             args: entry.args,
-                            taskId: entry.taskId,
+                            chatId: entry.chatId,
                             messageIndex: entry.messageIndex,
                             progress: entry.progress,
                             progressiveOutput: entry.progressiveOutput,
@@ -296,12 +296,12 @@ export const aiChatToolCallStore = create<ToolCallStateI>()(
                 return {...state, toolCalls: updated};
             }),
 
-        findRunningToolCallByName: (toolName, taskId) => {
+        findRunningToolCallByName: (toolName, chatId) => {
             const {order, toolCalls} = get();
 
-            // Walk in reverse insertion order so the most recently started call wins. When taskId is
-            // supplied, skip entries belonging to other tasks so a late event after a task switch
-            // does not land on a card from the previous task.
+            // Walk in reverse insertion order so the most recently started call wins. When chatId is
+            // supplied, skip entries belonging to other chats so a late event after a chat switch
+            // does not land on a card from the previous chat.
             for (let i = order.length - 1; i >= 0; i--) {
                 const entry = toolCalls[order[i]];
 
@@ -309,7 +309,7 @@ export const aiChatToolCallStore = create<ToolCallStateI>()(
                     continue;
                 }
 
-                if (taskId !== undefined && entry.taskId !== taskId) {
+                if (chatId !== undefined && entry.chatId !== chatId) {
                     continue;
                 }
 
@@ -321,10 +321,10 @@ export const aiChatToolCallStore = create<ToolCallStateI>()(
 
         reset: () => set({order: [], toolCalls: {}}),
 
-        resetForTask: (taskId) =>
+        resetForChat: (chatId) =>
             set((state) => {
-                if (!taskId) {
-                    // Untracked entries (callers without a taskId) — fall through to a hard reset so we
+                if (!chatId) {
+                    // Untracked entries (callers without a chatId) — fall through to a hard reset so we
                     // don't leave them lingering forever.
                     return {order: [], toolCalls: {}};
                 }
@@ -335,7 +335,7 @@ export const aiChatToolCallStore = create<ToolCallStateI>()(
                 for (const id of state.order) {
                     const entry = state.toolCalls[id];
 
-                    if (entry && entry.taskId !== taskId) {
+                    if (entry && entry.chatId !== chatId) {
                         survivingOrder.push(id);
                         survivingToolCalls[id] = entry;
                     }

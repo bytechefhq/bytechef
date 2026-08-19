@@ -217,7 +217,7 @@ describe('toToolResultDataPart', () => {
 describe('toToolResultDataPart payload-kind fallback', () => {
     it('renders an ask-user-question payload returned by a delegate tool', () => {
         const result = toToolResultDataPart(
-            'task_agent',
+            'mcp_agent',
             JSON.stringify({
                 kind: 'ask-user-question',
                 questions: [
@@ -235,20 +235,20 @@ describe('toToolResultDataPart payload-kind fallback', () => {
     });
 
     it('ignores an unknown kind', () => {
-        const result = toToolResultDataPart('task_agent', JSON.stringify({kind: 'something-else'}));
+        const result = toToolResultDataPart('mcp_agent', JSON.stringify({kind: 'something-else'}));
 
         expect(result).toBeUndefined();
     });
 
     it('ignores a non-JSON result without throwing', () => {
-        expect(() => toToolResultDataPart('task_agent', 'Created agent 7.')).not.toThrow();
-        expect(toToolResultDataPart('task_agent', 'Created agent 7.')).toBeUndefined();
+        expect(() => toToolResultDataPart('mcp_agent', 'Created MCP server 7.')).not.toThrow();
+        expect(toToolResultDataPart('mcp_agent', 'Created MCP server 7.')).toBeUndefined();
     });
 
     it('does not log a warning for an ordinary plain-text tool result', () => {
         const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-        toToolResultDataPart('task_agent', 'Created agent 7.');
+        toToolResultDataPart('mcp_agent', 'Created MCP server 7.');
 
         expect(warnSpy).not.toHaveBeenCalled();
 
@@ -256,6 +256,6 @@ describe('toToolResultDataPart payload-kind fallback', () => {
     });
 
     it('returns undefined for a tool result that is a JSON array', () => {
-        expect(toToolResultDataPart('task_agent', '[1,2,3]')).toBeUndefined();
+        expect(toToolResultDataPart('mcp_agent', '[1,2,3]')).toBeUndefined();
     });
 });

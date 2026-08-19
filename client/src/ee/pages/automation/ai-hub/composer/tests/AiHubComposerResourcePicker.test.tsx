@@ -33,19 +33,19 @@ vi.mock('@/ee/pages/automation/ai-hub/resource-picker/ResourcePickerMenu', () =>
     },
 }));
 
-// TaskToolDialog renders a heavy modal tree and is a sibling, not under test here — stub it out.
-vi.mock('@/ee/pages/automation/ai-hub/tools/dialogs/TaskToolDialog', () => ({
+// ChatToolDialog renders a heavy modal tree and is a sibling, not under test here — stub it out.
+vi.mock('@/ee/pages/automation/ai-hub/tools/dialogs/ChatToolDialog', () => ({
     default: () => null,
 }));
 
-// The composer issues useAiHubTaskToolableComponentsQuery for the Tools branch catalog walk. Stub it so the
+// The composer issues useAiHubChatToolableComponentsQuery for the Tools branch catalog walk. Stub it so the
 // component mounts without a live GraphQL fetch; the Tools catalog content itself is not under test here.
 vi.mock('@/shared/middleware/graphql', async (importOriginal) => {
     const actual = await importOriginal<typeof import('@/shared/middleware/graphql')>();
 
     return {
         ...actual,
-        useAiHubTaskToolableComponentsQuery: vi.fn().mockReturnValue({data: undefined, isLoading: false}),
+        useAiHubChatToolableComponentsQuery: vi.fn().mockReturnValue({data: undefined, isLoading: false}),
     };
 });
 
@@ -74,11 +74,11 @@ beforeEach(() => {
     aiHubComposerStore.setState({referencedResources: []});
 
     aiHubTabsStore.setState({
+        activeChatId: undefined,
         activeTabId: undefined,
-        activeTaskId: undefined,
         openTabs: [],
         rightPanelOpen: false,
-        snapshotsByTaskId: {},
+        snapshotsByChatId: {},
     });
 
     resourcePickerOnSelectRef.current = null;

@@ -12,9 +12,27 @@ import {
 } from '@/components/ui/dialog';
 import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
+import AgentScheduleFrequencyFields from '@/pages/automation/agents/components/detail/AgentScheduleFrequencyFields';
+import {
+    AgentScheduleCadenceErrorsI,
+    AgentScheduleCadenceI,
+    SCHEDULE_FREQUENCY_KINDS,
+    SCHEDULE_FREQUENCY_LABELS,
+    ScheduleFrequencyKindType,
+    fromCadenceParameters,
+    toCadenceParameters,
+    toCronExpression,
+    validateAgentScheduleCadence,
+} from '@/pages/automation/agents/utils/agentScheduleCron';
 import {useMemo, useState} from 'react';
 
+/**
+ * What one schedule stores on its channel row. The four named keys are always present; the cadence keys
+ * (frequencyKind, timeOfDay, dayOfWeek, …) ride in the same map as strings, written by toCadenceParameters
+ * and read back by fromCadenceParameters.
+ */
 export interface AgentSchedulePropertiesI {
+    [key: string]: string | undefined;
     expression: string;
     name: string;
     prompt: string;
@@ -33,14 +51,23 @@ interface AgentScheduleDialogPropsI {
 /**
  * Add/edit form for one schedule.
  *
- * A dialog rather than the inline fields this replaced: a schedule carries four values, and rendering all of
- * them per row made a list of schedules unreadable — the row now shows only what identifies it, its name and
- * cron expression.
+ * A dialog rather than inline fields: a schedule carries a name, a prompt, a timezone and a cadence, and
+ * rendering all of them per row made a list of schedules unreadable — the row shows only what identifies it.
+ *
+ * The cadence is picked (daily, weekly, …) rather than typed as a cron string, and the generated expression
+ * is what `schedule/v1/cron` actually reads. The picker's own fields are stored beside it so reopening the
+ * dialog restores the choice instead of parsing a cron string back into one.
  */
 const AgentScheduleDialog = ({onClose, onSubmit, open, pending, schedule}: AgentScheduleDialogPropsI) => {
-    const [expression, setExpression] = useState(schedule?.expression ?? '');
+    // A new schedule opens on DAILY rather than CUSTOM_CRON: the picker exists so the common cadences need
+    // no cron knowledge, and fromCadenceParameters({}) would land on the one kind that does.
+    const [cadence, setCadence] = useState<AgentScheduleCadenceI>(() =>
+        schedule ? fromCadenceParameters(schedule) : {frequencyKind: 'DAILY', timeOfDay: null}
+    );
+    const [errors, setErrors] = useState<AgentScheduleCadenceErrorsI>({});
     const [name, setName] = useState(schedule?.name ?? '');
     const [prompt, setPrompt] = useState(schedule?.prompt ?? '');
+    const [promptError, setPromptError] = useState<string | undefined>(undefined);
     const [timezone, setTimezone] = useState(schedule?.timezone || 'UTC');
 
     // Intl.supportedValuesOf is the browser's own tz database, so the list cannot drift from what the runtime
@@ -55,6 +82,30 @@ const AgentScheduleDialog = ({onClose, onSubmit, open, pending, schedule}: Agent
         return zones.includes('UTC') ? zones : ['UTC', ...zones];
     }, []);
 
+    const handleSubmit = () => {
+        const cadenceErrors = validateAgentScheduleCadence(cadence);
+        // A blank prompt is the one invalid schedule the server accepts: AiAgentWorkflowGenerator bakes the
+        // prompt into branch_in's envelope as a literal, and MapUtils.getRequiredString rejects only a MISSING
+        // key — "" passes. The schedule then fires on time and hands the agent nothing, which reads as the cron
+        // being broken. This check is the only gate.
+        const promptMissing = prompt.trim() === '';
+
+        setErrors(cadenceErrors);
+        setPromptError(promptMissing ? 'Prompt is required' : undefined);
+
+        if (promptMissing || Object.keys(cadenceErrors).length > 0) {
+            return;
+        }
+
+        onSubmit({
+            ...toCadenceParameters(cadence),
+            expression: toCronExpression(cadence),
+            name,
+            prompt,
+            timezone,
+        });
+    };
+
     return (
         <Dialog onOpenChange={(nextOpen) => !nextOpen && onClose()} open={open}>
             <DialogContent>
@@ -62,7 +113,7 @@ const AgentScheduleDialog = ({onClose, onSubmit, open, pending, schedule}: Agent
                     <div className="flex flex-col space-y-1">
                         <DialogTitle>{schedule ? 'Edit Schedule' : 'Add Schedule'}</DialogTitle>
 
-                        <DialogDescription>Run the agent on a cron expression with its own prompt.</DialogDescription>
+                        <DialogDescription>Run the agent on a schedule with its own prompt.</DialogDescription>
                     </div>
 
                     <DialogCloseButton />
@@ -82,14 +133,26 @@ const AgentScheduleDialog = ({onClose, onSubmit, open, pending, schedule}: Agent
 
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div className="space-y-1">
-                            <Label htmlFor="agent-schedule-expression">Cron expression</Label>
+                            <Label htmlFor="agent-schedule-frequency-kind">Frequency</Label>
 
-                            <Input
-                                id="agent-schedule-expression"
-                                onChange={(event) => setExpression(event.target.value)}
-                                placeholder="0 9 * * *"
-                                value={expression}
-                            />
+                            <Select
+                                onValueChange={(selected) =>
+                                    setCadence({...cadence, frequencyKind: selected as ScheduleFrequencyKindType})
+                                }
+                                value={cadence.frequencyKind}
+                            >
+                                <SelectTrigger id="agent-schedule-frequency-kind">
+                                    <SelectValue />
+                                </SelectTrigger>
+
+                                <SelectContent>
+                                    {SCHEDULE_FREQUENCY_KINDS.map((kind) => (
+                                        <SelectItem key={kind} value={kind}>
+                                            {SCHEDULE_FREQUENCY_LABELS[kind]}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         </div>
 
                         <div className="space-y-1">
@@ -111,6 +174,8 @@ const AgentScheduleDialog = ({onClose, onSubmit, open, pending, schedule}: Agent
                         </div>
                     </div>
 
+                    <AgentScheduleFrequencyFields cadence={cadence} errors={errors} onChange={setCadence} />
+
                     <div className="space-y-1">
                         <Label htmlFor="agent-schedule-prompt">Prompt</Label>
 
@@ -121,17 +186,15 @@ const AgentScheduleDialog = ({onClose, onSubmit, open, pending, schedule}: Agent
                             rows={3}
                             value={prompt}
                         />
+
+                        {promptError && <p className="text-xs text-destructive">{promptError}</p>}
                     </div>
                 </fieldset>
 
                 <DialogFooter>
                     <Button label="Cancel" onClick={onClose} variant="outline" />
 
-                    <Button
-                        disabled={!expression.trim() || pending}
-                        label={schedule ? 'Save' : 'Add'}
-                        onClick={() => onSubmit({expression, name, prompt, timezone})}
-                    />
+                    <Button disabled={pending} label={schedule ? 'Save' : 'Add'} onClick={handleSubmit} />
                 </DialogFooter>
             </DialogContent>
         </Dialog>

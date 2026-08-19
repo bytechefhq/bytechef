@@ -1,7 +1,7 @@
 import {aiHubTabsStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {AiHubTaskArtifactI} from '../../tasks/api/tasks.api';
+import {AiHubChatArtifactI} from '../../chats/api/chats.api';
 import {handleArtifactQuickOpen} from '../artifactOpen';
 
 const {mockGetProject, mockToastError} = vi.hoisted(() => ({
@@ -31,12 +31,12 @@ vi.mock('sonner', () => ({
 describe('handleArtifactQuickOpen', () => {
     beforeEach(() => {
         aiHubTabsStore.setState({
+            activeChatId: undefined,
             activeTabId: undefined,
-            activeTaskId: undefined,
+            chatsSidebarCollapsed: true,
             openTabs: [],
             rightPanelOpen: false,
-            snapshotsByTaskId: {},
-            tasksSidebarCollapsed: true,
+            snapshotsByChatId: {},
         });
     });
 
@@ -47,15 +47,15 @@ describe('handleArtifactQuickOpen', () => {
     it('opens a workflowExecution tab for a WORKFLOW_EXECUTION_STARTED artifact and does not call window.open', () => {
         const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
 
-        const workflowExecutionArtifact: AiHubTaskArtifactI = {
+        const workflowExecutionArtifact: AiHubChatArtifactI = {
             artifactId: '777',
             artifactName: 'Run #777',
+            chatId: 42,
             createdAt: new Date().toISOString(),
             id: 1,
             kind: 'WORKFLOW_EXECUTION_STARTED',
             metadataJson: null,
             status: 'APPLIED',
-            taskId: 42,
         };
 
         handleArtifactQuickOpen(workflowExecutionArtifact);
@@ -79,15 +79,15 @@ describe('handleArtifactQuickOpen', () => {
     });
 
     it('opens a skill tab for a SKILL_REFERENCED artifact using artifactId as the skillId', () => {
-        const skillArtifact: AiHubTaskArtifactI = {
+        const skillArtifact: AiHubChatArtifactI = {
             artifactId: '7',
             artifactName: 'Triage',
+            chatId: 42,
             createdAt: new Date().toISOString(),
             id: 1,
             kind: 'SKILL_REFERENCED',
             metadataJson: null,
             status: 'APPLIED',
-            taskId: 42,
         };
 
         handleArtifactQuickOpen(skillArtifact);
@@ -107,15 +107,15 @@ describe('handleArtifactQuickOpen', () => {
     });
 
     it('opens a custom component tab for a CUSTOM_COMPONENT_REFERENCED artifact using artifactId as the customComponentId', () => {
-        const customComponentArtifact: AiHubTaskArtifactI = {
+        const customComponentArtifact: AiHubChatArtifactI = {
             artifactId: '9',
             artifactName: 'My Component',
+            chatId: 42,
             createdAt: new Date().toISOString(),
             id: 1,
             kind: 'CUSTOM_COMPONENT_REFERENCED',
             metadataJson: null,
             status: 'APPLIED',
-            taskId: 42,
         };
 
         handleArtifactQuickOpen(customComponentArtifact);
@@ -135,16 +135,16 @@ describe('handleArtifactQuickOpen', () => {
     });
 
     describe('CODE_WORKFLOW_REFERENCED', () => {
-        function buildCodeWorkflowArtifact(overrides: Partial<AiHubTaskArtifactI> = {}): AiHubTaskArtifactI {
+        function buildCodeWorkflowArtifact(overrides: Partial<AiHubChatArtifactI> = {}): AiHubChatArtifactI {
             return {
                 artifactId: '11',
                 artifactName: 'My Code Workflow',
+                chatId: 42,
                 createdAt: new Date().toISOString(),
                 id: 1,
                 kind: 'CODE_WORKFLOW_REFERENCED',
                 metadataJson: null,
                 status: 'APPLIED',
-                taskId: 42,
                 ...overrides,
             };
         }

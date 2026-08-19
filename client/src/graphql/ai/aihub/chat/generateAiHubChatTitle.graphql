@@ -1,0 +1,20 @@
+mutation generateAiHubChatTitle($workspaceId: ID!, $id: ID!) {
+    generateAiHubChatTitle(workspaceId: $workspaceId, id: $id) {
+        id
+        workspaceId
+        userId
+        threadId
+        title
+        lastPreview
+        messageCount
+        status
+        environmentId
+        createdAt
+        updatedAt
+        kind
+        workflowExecutionId
+        projectDeploymentId
+        autoTitled
+        aiAgentId
+    }
+}

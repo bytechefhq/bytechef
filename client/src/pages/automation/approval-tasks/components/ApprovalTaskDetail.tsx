@@ -42,9 +42,8 @@ export default function ApprovalTaskDetail() {
 
     return (
         <div className="h-full overflow-y-auto p-6">
-            <div className="mb-6">
-                <h1 className="text-xl font-semibold text-foreground">{approvalTask.title}</h1>
-            </div>
+            {/* The title lives in the page header (see ApprovalTasks), so the body starts at its first field
+                rather than repeating the name a second time below an empty header bar. */}
 
             <div className="flex gap-6">
                 <div className="max-w-lg min-w-0 flex-1">

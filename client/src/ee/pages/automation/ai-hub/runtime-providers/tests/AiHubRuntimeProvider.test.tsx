@@ -535,56 +535,12 @@ describe('buildAiHubSubscriber', () => {
         }
     });
 
-    it('switches chat when openAiHubTaskTab tool result arrives', async () => {
-        // The task + workflow-chat tab tools share an output shape and a behaviour: the server has already done
-        // create-or-restore on the chat, and the client subscriber's job is to (a) sync the command center
-        // store's threadId, (b) sync the chats store's currentChatId, and (c) navigate to the
-        // matching URL. All three steps must fire in order — without (a) the URL→store sync effect would bounce
-        // the user back; without (c) the user would stay on the previous chat visually.
-        const navigate = vi.fn();
-
-        const {aiHubChatsStore} = await import('@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore');
-        const {aiHubStore} = await import('@/ee/pages/automation/ai-hub/stores/useAiHubStore');
-
-        aiHubChatsStore.getState().setCurrentChatId(0);
-        aiHubStore.setState({chatId: 'thread-old', messages: []});
-
-        const subscriber = buildAiHubSubscriber({
-            addMessage: vi.fn(),
-            appendToLastAssistantMessage: vi.fn(),
-            getLastUserMessage: vi.fn().mockReturnValue(''),
-            navigate,
-        });
-
-        subscriber.onToolCallStartEvent!(
-            makeToolCallStartParams({toolCallId: 'call-pa', toolCallName: 'openAiHubTaskTab'})
-        );
-
-        subscriber.onToolCallResultEvent!(
-            makeToolCallResultParams({
-                content: JSON.stringify({
-                    chatId: 101,
-                    opened: true,
-                    threadId: '00000000-0000-0000-0000-000000000042',
-                    title: 'Research Assistant',
-                }),
-                toolCallId: 'call-pa',
-            })
-        );
-
-        // Pin all three side effects. A regression in any one of them would break the create-from-chat flow:
-        // the user would either stay on the old chat (URL not updated), see no messages (threadId not
-        // synced), or have a wrong active row in the sidebar (currentChatId not synced).
-        expect(aiHubStore.getState().chatId).toBe('00000000-0000-0000-0000-000000000042');
-        expect(aiHubChatsStore.getState().currentChatId).toBe(101);
-        expect(navigate).toHaveBeenCalledWith('/automation/ai-hub/chats/101');
-    });
-
     it('switches chat when openWorkflowChatTab tool result arrives', async () => {
-        // Same shape as openAiHubTaskTab — both tools share the OpenChatTabResultType validator
-        // and the same store-sync handler. Pin the workflow-chat sibling separately so a future divergence
-        // (e.g. workflow-chat picks up an extra side effect like recording an artifact) doesn't accidentally
-        // regress the task path.
+        // The server has already done create-or-restore on the chat, and the client subscriber's job is to
+        // (a) sync the command center store's threadId, (b) sync the chats store's currentChatId, and
+        // (c) navigate to the matching URL. All three steps must fire in order — without (a) the URL→store
+        // sync effect would bounce the user back; without (c) the user would stay on the previous chat
+        // visually.
         const navigate = vi.fn();
 
         const {aiHubChatsStore} = await import('@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore');
@@ -640,7 +596,7 @@ describe('buildAiHubSubscriber', () => {
         });
 
         subscriber.onToolCallStartEvent!(
-            makeToolCallStartParams({toolCallId: 'call-no-nav', toolCallName: 'openAiHubTaskTab'})
+            makeToolCallStartParams({toolCallId: 'call-no-nav', toolCallName: 'openWorkflowChatTab'})
         );
 
         subscriber.onToolCallResultEvent!(
@@ -1544,13 +1500,13 @@ describe('runPostTurnTelemetry', () => {
         // We don't read the response body in any of these tests; satisfy the typed mock with a minimal
         // object that matches AiHubChatI's required fields rather than an `as never` cast.
         const stubChat = {
+            aiAgentId: null,
             createdAt: '2026-01-01T00:00:00Z',
             autoTitled: true,
             id: 1,
             kind: 'STANDARD' as const,
             lastPreview: null,
             messageCount: 0,
-            aiHubTaskId: null,
             status: 'ACTIVE' as const,
             threadId: 'thread-1',
             title: null,

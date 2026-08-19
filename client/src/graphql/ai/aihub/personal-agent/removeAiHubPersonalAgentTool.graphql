@@ -1,3 +1,0 @@
-mutation removeAiHubPersonalAgentTool($workspaceId: ID!, $toolId: ID!) {
-    removeAiHubPersonalAgentTool(workspaceId: $workspaceId, toolId: $toolId)
-}

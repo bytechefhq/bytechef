@@ -38,8 +38,6 @@ export interface ModelPickerAgentChatI {
 
 export interface ModelPickerPropsI {
     agentChats?: ModelPickerAgentChatI[];
-    taskDefaultModel?: string | null;
-    taskDefaultProvider?: string | null;
     defaultModel?: string | null;
     defaultProvider?: string | null;
     environment: number;
@@ -68,8 +66,6 @@ const ModelPicker = ({
     onSelectWorkflowChat,
     selectedModel,
     selectedProvider,
-    taskDefaultModel,
-    taskDefaultProvider,
     workflowChats,
     workspaceDefaultLabel,
 }: ModelPickerPropsI) => {
@@ -141,13 +137,6 @@ const ModelPicker = ({
             return {icon: provider?.icon ?? null, label: model?.label || selectedModel};
         }
 
-        if (taskDefaultProvider && taskDefaultModel) {
-            const provider = providers.find((candidate) => candidate.key === taskDefaultProvider);
-            const model = provider?.models.find((candidate) => candidate.name === taskDefaultModel);
-
-            return {icon: provider?.icon ?? null, label: model?.label || taskDefaultModel};
-        }
-
         if (defaultProvider && defaultModel) {
             const provider = providers.find((candidate) => candidate.key === defaultProvider);
             const model = provider?.models.find((candidate) => candidate.name === defaultModel);
@@ -156,16 +145,7 @@ const ModelPicker = ({
         }
 
         return {icon: null, label: workspaceDefaultLabel ?? 'Select model'};
-    }, [
-        defaultModel,
-        defaultProvider,
-        providers,
-        selectedModel,
-        selectedProvider,
-        taskDefaultModel,
-        taskDefaultProvider,
-        workspaceDefaultLabel,
-    ]);
+    }, [defaultModel, defaultProvider, providers, selectedModel, selectedProvider, workspaceDefaultLabel]);
 
     const closeMenu = () => {
         setOpen(false);
@@ -258,11 +238,7 @@ const ModelPicker = ({
                         <DropdownMenuItem onSelect={() => handleSelectDefault()}>
                             <BrainCircuitIcon className="text-muted-foreground" />
 
-                            <span>
-                                {taskDefaultProvider && taskDefaultModel
-                                    ? 'Use task default'
-                                    : `Use ${workspaceDefaultLabel.toLowerCase()}`}
-                            </span>
+                            <span>{`Use ${workspaceDefaultLabel.toLowerCase()}`}</span>
                         </DropdownMenuItem>
 
                         <DropdownMenuSeparator />

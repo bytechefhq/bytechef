@@ -1,0 +1,20 @@
+query aiHubChats($workspaceId: ID!, $environment: Int!, $status: AiHubChatStatus) {
+    aiHubChats(workspaceId: $workspaceId, environment: $environment, status: $status) {
+        id
+        workspaceId
+        userId
+        threadId
+        title
+        lastPreview
+        messageCount
+        status
+        environmentId
+        createdAt
+        updatedAt
+        kind
+        workflowExecutionId
+        projectDeploymentId
+        autoTitled
+        aiAgentId
+    }
+}

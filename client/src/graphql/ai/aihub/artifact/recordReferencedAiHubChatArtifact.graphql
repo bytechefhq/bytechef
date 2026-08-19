@@ -1,0 +1,12 @@
+mutation recordReferencedAiHubChatArtifact($input: RecordReferencedAiHubChatArtifactInput!) {
+    recordReferencedAiHubChatArtifact(input: $input) {
+        id
+        chatId
+        kind
+        status
+        artifactId
+        artifactName
+        environmentId
+        createdAt
+    }
+}

@@ -55,9 +55,8 @@ const WorkspaceSystemPrompt = () => {
                 <div className="space-y-6 py-6">
                     <p className="text-sm text-muted-foreground">
                         Standing instructions appended to every AI agent operating in this workspace: AI Hub chat
-                        (copilot and personal agents), its specialist subagents, and canvas AI Agent runs. Each
-                        agent&apos;s own prompt and safety rules always come first — these instructions cannot override
-                        them.
+                        (copilot and tasks), its specialist subagents, and canvas AI Agent runs. Each agent&apos;s own
+                        prompt and safety rules always come first — these instructions cannot override them.
                     </p>
 
                     <fieldset className="space-y-2 border-0 p-0">

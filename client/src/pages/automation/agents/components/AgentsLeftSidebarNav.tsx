@@ -9,6 +9,8 @@ import {useMemo, useState} from 'react';
 
 interface AgentsLeftSidebarNavProps {
     currentAgentId?: string;
+    /** The `filter` search param — `scheduled` is the only value the list page understands today. */
+    currentFilter?: string | null;
     currentTagId?: string | null;
     /**
      * List-page mode. The agents become tag-style filters rather than links to each detail page, and a Tags
@@ -22,7 +24,12 @@ interface AgentsLeftSidebarNavProps {
  * The workspace's agents, as the Agents pages' left sidebar — the same shape the Data Tables detail page
  * uses, so switching between agents never needs a trip back to the list.
  */
-const AgentsLeftSidebarNav = ({currentAgentId, currentTagId, filterMode = false}: AgentsLeftSidebarNavProps) => {
+const AgentsLeftSidebarNav = ({
+    currentAgentId,
+    currentFilter,
+    currentTagId,
+    filterMode = false,
+}: AgentsLeftSidebarNavProps) => {
     const [search, setSearch] = useState('');
 
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
@@ -69,8 +76,28 @@ const AgentsLeftSidebarNav = ({currentAgentId, currentTagId, filterMode = false}
                     <>
                         {filterMode && (
                             <LeftSidebarNavItem
-                                item={{current: !currentAgentId && !currentTagId, id: 'all-agents', name: 'All Agents'}}
+                                item={{
+                                    // Tests the one filter value this nav actually offers, not truthiness: an
+                                    // unrecognised ?filter= falls through to the unfiltered list, and All
+                                    // Agents should stay current rather than leaving no item selected.
+                                    current: !currentAgentId && currentFilter !== 'scheduled' && !currentTagId,
+                                    id: 'all-agents',
+                                    name: 'All Agents',
+                                }}
                                 toLink=""
+                            />
+                        )}
+
+                        {/* Scheduled sits beside All Agents rather than in the Tags group: it is a property of
+                            the agent (it owns a schedule channel), not something anyone tagged it with. */}
+                        {filterMode && (
+                            <LeftSidebarNavItem
+                                item={{
+                                    current: currentFilter === 'scheduled',
+                                    id: 'scheduled-agents',
+                                    name: 'Scheduled',
+                                }}
+                                toLink="?filter=scheduled"
                             />
                         )}
 

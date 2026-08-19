@@ -1,3 +1,0 @@
-mutation removeAiHubTaskTool($workspaceId: ID!, $taskToolId: ID!) {
-    removeAiHubTaskTool(workspaceId: $workspaceId, taskToolId: $taskToolId)
-}

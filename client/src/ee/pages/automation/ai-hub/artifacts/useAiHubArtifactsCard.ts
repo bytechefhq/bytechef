@@ -1,12 +1,12 @@
+import {AiHubChatArtifactI, isWebhookBridgedChat} from '@/ee/pages/automation/ai-hub/chats/api/chats.api';
+import {useAiHubChatArtifactsQuery, useAiHubChatsQuery} from '@/ee/pages/automation/ai-hub/chats/hooks/useChats';
+import {useAiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
 import {useAiHubTabsStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
-import {AiHubTaskArtifactI} from '@/ee/pages/automation/ai-hub/tasks/api/tasks.api';
-import {useAiHubTaskArtifactsQuery, useAiHubTasksQuery} from '@/ee/pages/automation/ai-hub/tasks/hooks/useTasks';
-import {useAiHubTasksStore} from '@/ee/pages/automation/ai-hub/tasks/stores/useAiHubTasksStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 
 export interface AiHubArtifactsCardStateI {
-    artifacts: AiHubTaskArtifactI[];
+    artifacts: AiHubChatArtifactI[];
     visible: boolean;
     workspaceId: number;
 }
@@ -20,27 +20,27 @@ export interface AiHubArtifactsCardStateI {
  *
  * <p>The card is hidden whenever the resource panel is open — the panel's tab strip already lists what has
  * been opened, and the chat pane narrows to ~38% in that layout, leaving no room for a 256px overlay — for
- * WORKFLOW_CHAT tasks (webhook-routed, so they never accrue artifacts), on the home view, and when the
- * task has no artifacts at all. A floating "No artifacts yet" card would be pure noise over the
+ * WORKFLOW_CHAT chats (webhook-routed, so they never accrue artifacts), on the home view, and when the
+ * chat has no artifacts at all. A floating "No artifacts yet" card would be pure noise over the
  * transcript; that message lives in the resource panel's + menu instead, which the user opens
  * deliberately.</p>
  */
 export default function useAiHubArtifactsCard(): AiHubArtifactsCardStateI {
     const rightPanelOpen = useAiHubTabsStore((state) => state.rightPanelOpen);
-    const currentTaskId = useAiHubTasksStore((state) => state.currentTaskId);
+    const currentChatId = useAiHubChatsStore((state) => state.currentChatId);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     // Cache lookup, not a fetch — the sidebar already loaded this list under the same query key.
-    const {data: tasks} = useAiHubTasksQuery(currentWorkspaceId, currentEnvironmentId, 'ACTIVE');
+    const {data: chats} = useAiHubChatsQuery(currentWorkspaceId, currentEnvironmentId, 'ACTIVE');
 
-    const currentTask = tasks?.find((task) => task.id === currentTaskId);
+    const currentChat = chats?.find((chat) => chat.id === currentChatId);
     // Workflow chats route through a webhook rather than the LLM agent, so they never accrue artifacts.
-    const isWorkflowChat = currentTask?.kind === 'WORKFLOW_CHAT';
+    const isWorkflowChat = isWebhookBridgedChat(currentChat?.kind);
 
-    const enabled = currentTaskId != null && currentWorkspaceId != null && !rightPanelOpen && !isWorkflowChat;
+    const enabled = currentChatId != null && currentWorkspaceId != null && !rightPanelOpen && !isWorkflowChat;
 
-    const {data: artifacts} = useAiHubTaskArtifactsQuery(currentTaskId, currentWorkspaceId ?? 0, enabled);
+    const {data: artifacts} = useAiHubChatArtifactsQuery(currentChatId, currentWorkspaceId ?? 0, enabled);
 
     return {
         artifacts: artifacts ?? [],

@@ -14,7 +14,7 @@ interface AiHubSettingsStateI {
  * thread header toggle flips them on for debugging/inspection. Persisted so the choice survives reloads.
  *
  * The Artifacts card overlays the transcript, so its collapsed state is persisted globally rather than per
- * task — a user who finds it intrusive collapses it once.
+ * chat — a user who finds it intrusive collapses it once.
  */
 const useAiHubSettingsStore = create<AiHubSettingsStateI>()(
     devtools(

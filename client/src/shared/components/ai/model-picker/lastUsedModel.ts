@@ -1,6 +1,6 @@
 /**
  * Per-workspace persistence of the user's last-used (provider, model) selection so a fresh conversation
- * or task seeds the picker with what they last ran, instead of the workspace default. Keyed by workspace;
+ * or chat seeds the picker with what they last ran, instead of the workspace default. Keyed by workspace;
  * the value is a stable provider key (e.g. "ai.provider.openAi") + model name.
  */
 interface LastUsedModelI {

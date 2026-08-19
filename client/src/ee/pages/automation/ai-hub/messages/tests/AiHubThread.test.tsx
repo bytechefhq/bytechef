@@ -3,7 +3,7 @@ import {describe, expect, it} from 'vitest';
 
 describe('shouldShowThreadLoadingState', () => {
     it('shows the loading skeleton while history is being fetched (front of a switch)', () => {
-        // switchTask clears the store to [] and flips messagesLoading true before the fetch resolves.
+        // switchChat clears the store to [] and flips messagesLoading true before the fetch resolves.
         expect(shouldShowThreadLoadingState(true, false)).toBe(true);
     });
 
@@ -14,8 +14,8 @@ describe('shouldShowThreadLoadingState', () => {
         expect(shouldShowThreadLoadingState(false, true)).toBe(true);
     });
 
-    it('shows the welcome prompt for a genuinely empty new task (no history, nothing loading)', () => {
-        // A freshly created personal-agent / workflow-chat task: messages=[], messagesLoading=false. This is
+    it('shows the welcome prompt for a genuinely empty new chat (no history, nothing loading)', () => {
+        // A freshly created workflow chat: messages=[], messagesLoading=false. This is
         // the one legitimate welcome case and must not be masked by the skeleton.
         expect(shouldShowThreadLoadingState(false, false)).toBe(false);
     });

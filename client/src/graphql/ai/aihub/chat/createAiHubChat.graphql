@@ -1,0 +1,20 @@
+mutation createAiHubChat($workspaceId: ID!, $environment: Int!, $threadId: String!) {
+    createAiHubChat(workspaceId: $workspaceId, environment: $environment, threadId: $threadId) {
+        id
+        workspaceId
+        userId
+        threadId
+        title
+        lastPreview
+        messageCount
+        status
+        environmentId
+        createdAt
+        updatedAt
+        kind
+        workflowExecutionId
+        projectDeploymentId
+        autoTitled
+        aiAgentId
+    }
+}

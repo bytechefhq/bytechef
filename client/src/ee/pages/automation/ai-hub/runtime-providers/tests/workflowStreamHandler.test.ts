@@ -290,7 +290,7 @@ describe('openWorkflowSseStream', () => {
         // handler MUST call onComplete with `aborted: true` (so consumers can mark tool-call cards complete),
         // MUST NOT call onError (an abort is not a failure), and MUST stop reading from the stream so
         // subsequent chunks are not delivered. Without the `aborted: true` signal, tool-call cards remain
-        // stuck in the "running" state forever once the task switches away.
+        // stuck in the "running" state forever once the chat switches away.
         const onComplete = vi.fn();
         const onError = vi.fn();
         const appendToLastAssistantMessage = vi.fn();

@@ -77,8 +77,8 @@ interface ComponentConfigDialogPropsI {
     /** Called when the dialog should close (cancel button, escape, outside click, post-submit success). */
     onClose: () => void;
     /**
-     * Caller-specific submit. Wired to whichever mutation the caller owns — attachAiHubTaskTool when a
-     * tool is first attached, updateAiHubTaskToolConfig when an attached tool is reconfigured. The dialog
+     * Caller-specific submit. Wired to whichever mutation the caller owns — an attach mutation when a
+     * tool is first attached, an update mutation when an attached tool is reconfigured. The dialog
      * awaits this promise before closing so the caller can short-circuit on validation failure.
      */
     onSubmit: (values: ComponentConfigDialogValuesI) => Promise<void> | void;
@@ -86,7 +86,7 @@ interface ComponentConfigDialogPropsI {
     /** Whether the underlying mutation is in flight — disables the submit button + swaps the label. */
     pending?: boolean;
     /**
-     * Override for the dialog header. Defaults to "Configure {target.title}" — task attach overrides
+     * Override for the dialog header. Defaults to "Configure {target.title}" — attach flows override
      * to "Attach {target.title} tool" so the verb matches the action being taken. Same for the submit button
      * label; the description override covers contexts where the default action-spec text doesn't fit.
      */
@@ -111,8 +111,8 @@ interface ComponentConfigDialogPropsI {
  * <ul>
  *   <li><b>Chat attach</b> — picks a connection and pre-set parameters when the user attaches a tool
  *     to the active chat. Submit fires the {@code attachAiHubChatTool} mutation.</li>
- *   <li><b>Task tool configure</b> — edits the per-tool config that gets carried into every
- *     chat spawned from the task. Submit fires the {@code updateAiHubTaskToolConfig} mutation.</li>
+ *   <li><b>Agent element configure</b> — edits the per-element config carried by an AI Agent's tool,
+ *     model, and channel cards. Submit fires that card's own element mutation.</li>
  * </ul>
  *
  * <p>

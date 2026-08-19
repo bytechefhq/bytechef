@@ -1,0 +1,3 @@
+mutation detachAiHubChatComponent($workspaceId: ID!, $chatComponentId: ID!) {
+    detachAiHubChatComponent(workspaceId: $workspaceId, chatComponentId: $chatComponentId)
+}

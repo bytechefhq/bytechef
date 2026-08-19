@@ -104,8 +104,8 @@ const AiGuardrails = () => {
                 <div className="space-y-6 py-6">
                     <p className="text-sm text-muted-foreground">
                         Workspace-level guardrails apply across every AI surface in this workspace: AI Gateway requests,
-                        canvas AI Agent runs, and AI Hub chat (personal agents and copilot). Project overlays in AI
-                        Gateway settings can add extra protection on top of these, never remove it.
+                        canvas AI Agent runs, and AI Hub chat (tasks and copilot). Project overlays in AI Gateway
+                        settings can add extra protection on top of these, never remove it.
                     </p>
 
                     <fieldset className="space-y-4 border-0 p-0">

@@ -1,18 +1,18 @@
+import {aiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
 import {aiHubTabsStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
-import {aiHubTasksStore} from '@/ee/pages/automation/ai-hub/tasks/stores/useAiHubTasksStore';
 import {render, screen} from '@testing-library/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import AiHubArtifactsCard from '../AiHubArtifactsCard';
 
-const {mockTaskKind, mockUseAiHubTaskArtifactsQuery} = vi.hoisted(() => ({
-    mockTaskKind: {current: 'STANDARD'},
-    mockUseAiHubTaskArtifactsQuery: vi.fn(),
+const {mockChatKind, mockUseAiHubChatArtifactsQuery} = vi.hoisted(() => ({
+    mockChatKind: {current: 'STANDARD'},
+    mockUseAiHubChatArtifactsQuery: vi.fn(),
 }));
 
-vi.mock('@/ee/pages/automation/ai-hub/tasks/hooks/useTasks', () => ({
-    useAiHubTaskArtifactsQuery: (...args: unknown[]) => mockUseAiHubTaskArtifactsQuery(...args),
-    useAiHubTasksQuery: () => ({data: [{id: 7, kind: mockTaskKind.current}]}),
+vi.mock('@/ee/pages/automation/ai-hub/chats/hooks/useChats', () => ({
+    useAiHubChatArtifactsQuery: (...args: unknown[]) => mockUseAiHubChatArtifactsQuery(...args),
+    useAiHubChatsQuery: () => ({data: [{id: 7, kind: mockChatKind.current}]}),
 }));
 
 vi.mock('@/ee/pages/automation/ai-hub/artifacts/AiHubArtifactRow', () => ({
@@ -31,17 +31,17 @@ vi.mock('@/shared/stores/useEnvironmentStore', () => ({
 
 describe('AiHubArtifactsCard', () => {
     beforeEach(() => {
-        mockTaskKind.current = 'STANDARD';
+        mockChatKind.current = 'STANDARD';
 
-        mockUseAiHubTaskArtifactsQuery.mockReturnValue({
+        mockUseAiHubChatArtifactsQuery.mockReturnValue({
             data: [{artifactName: 'report.csv', id: 1}],
         });
 
-        aiHubTasksStore.setState({currentTaskId: 7});
+        aiHubChatsStore.setState({currentChatId: 7});
         aiHubTabsStore.setState({rightPanelOpen: false});
     });
 
-    it('renders the artifacts of the active task', () => {
+    it('renders the artifacts of the active chat', () => {
         render(<AiHubArtifactsCard />);
 
         expect(screen.getByText('Artifacts')).toBeInTheDocument();
@@ -56,8 +56,8 @@ describe('AiHubArtifactsCard', () => {
         expect(container).toBeEmptyDOMElement();
     });
 
-    it('renders nothing when the task has no artifacts', () => {
-        mockUseAiHubTaskArtifactsQuery.mockReturnValue({data: []});
+    it('renders nothing when the chat has no artifacts', () => {
+        mockUseAiHubChatArtifactsQuery.mockReturnValue({data: []});
 
         const {container} = render(<AiHubArtifactsCard />);
 
@@ -65,15 +65,15 @@ describe('AiHubArtifactsCard', () => {
     });
 
     it('renders nothing for a workflow chat, which never produces artifacts', () => {
-        mockTaskKind.current = 'WORKFLOW_CHAT';
+        mockChatKind.current = 'WORKFLOW_CHAT';
 
         const {container} = render(<AiHubArtifactsCard />);
 
         expect(container).toBeEmptyDOMElement();
     });
 
-    it('renders nothing on the home view, where no task is active', () => {
-        aiHubTasksStore.setState({currentTaskId: undefined});
+    it('renders nothing on the home view, where no chat is active', () => {
+        aiHubChatsStore.setState({currentChatId: undefined});
 
         const {container} = render(<AiHubArtifactsCard />);
 

@@ -128,7 +128,7 @@ describe('AiHubComposerDropZone', () => {
         expect(mockToast.error).toHaveBeenCalledWith(expect.stringContaining('bad.zip'));
     });
 
-    test('disabled zone does not show the drag overlay (workflow-chat tasks)', () => {
+    test('disabled zone does not show the drag overlay (workflow chats)', () => {
         render(
             <AiHubComposerDropZone disabled onFilesDropped={vi.fn()}>
                 <div>composer</div>

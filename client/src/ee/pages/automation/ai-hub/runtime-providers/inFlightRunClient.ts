@@ -1,6 +1,6 @@
 /**
  * Client-side adapter for the AI Hub's `/attach` and `/in-flight` endpoints. Lets the runtime provider
- * resume streaming after a page refresh and hydrate sidebar pulses for tasks the user has running in other
+ * resume streaming after a page refresh and hydrate sidebar pulses for chats the user has running in other
  * threads.
  *
  * <p>
@@ -13,8 +13,8 @@ import {type AgentSubscriber, EventType} from '@ag-ui/client';
 
 const IN_FLIGHT_ENDPOINT = '/api/platform/internal/ai/chat/ai_hub/in-flight';
 
-// The probe passes every visible task's threadId as a repeated `threadIds` query param. Sent as one
-// request, a large task list overflows the servlet container's max request-line length and Tomcat
+// The probe passes every visible chat's threadId as a repeated `threadIds` query param. Sent as one
+// request, a large chat list overflows the servlet container's max request-line length and Tomcat
 // rejects it with an HTML 400 *before* the controller runs. Chunking keeps each URL comfortably under
 // common limits: at ~47 chars per id (`&threadIds=<uuid>`), 40 ids ≈ 1.9 KB of query string.
 const IN_FLIGHT_BATCH_SIZE = 40;
@@ -39,7 +39,7 @@ export interface AttachOptionsI {
 
 /**
  * Opens an EventSource on the AI Hub attach endpoint and forwards each event into the supplied AG-UI
- * subscriber. Returns a disposer the caller invokes on task switch / unmount.
+ * subscriber. Returns a disposer the caller invokes on chat switch / unmount.
  *
  * <p>
  * The AG-UI SDK's HttpAgent maintains a {@code textMessageBuffer} and a per-tool-call argument buffer that
@@ -267,7 +267,7 @@ export function attachToInFlightRun({onClose, subscriber, threadId}: AttachOptio
  * {@code false}. Network errors degrade silently to "no streams" — better to render a static history than
  * to surface a transient probe failure as a permanent block.
  *
- * <p>Thread ids are probed in batches (see {@link IN_FLIGHT_BATCH_SIZE}) so a large task list doesn't
+ * <p>Thread ids are probed in batches (see {@link IN_FLIGHT_BATCH_SIZE}) so a large chat list doesn't
  * overflow the request-line length limit. Batches run concurrently and each degrades independently: a
  * single failed batch contributes no entries rather than failing the whole probe.</p>
  */

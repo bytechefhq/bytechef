@@ -10,7 +10,7 @@ export interface WorkflowStreamErrorI {
  * - `empty`: server closed cleanly without delivering any chunks. Promoted to a distinct kind so the type system
  *   forces every consumer to handle the no-output case explicitly — a `kind === 'completed'` check then cannot
  *   accidentally treat a no-output close as success.
- * - `aborted`: caller aborted via AbortController (task switch, panel unmount). Do NOT surface as failure.
+ * - `aborted`: caller aborted via AbortController (chat switch, panel unmount). Do NOT surface as failure.
  */
 export type WorkflowStreamCompleteType =
     {chunkCount: number; kind: 'completed'} | {kind: 'empty'} | {chunkCount: number; kind: 'aborted'};
@@ -20,7 +20,7 @@ interface WorkflowStreamHandlerDepsI {
     onChunk: (chunk: string) => void;
     onComplete: (info: WorkflowStreamCompleteType) => void;
     onError?: (error: WorkflowStreamErrorI) => void;
-    /** Optional signal so the caller can cancel mid-stream (e.g. on task switch or panel unmount). */
+    /** Optional signal so the caller can cancel mid-stream (e.g. on chat switch or panel unmount). */
     signal?: AbortSignal;
 }
 
@@ -72,7 +72,7 @@ function reportUnexpectedReaderCancelRejection(cancelError: unknown): void {
  *     onComplete is NOT called.
  *   - Stream-level fetch/read exception (excluding AbortError): onError is invoked, onComplete is NOT called.
  *   - Caller-side abort (AbortError): onComplete is called with `{kind: 'aborted', chunkCount}` so consumers
- *     can clean up tool-call cards. Without this, an in-flight stream cancelled on task switch would
+ *     can clean up tool-call cards. Without this, an in-flight stream cancelled on chat switch would
  *     leave its tool-call card stuck in the "running" state forever.
  *   - Normal close with at least one chunk: onComplete is called with `{chunkCount, kind: 'completed'}`.
  *   - Normal close with no chunks: onComplete is called with `{kind: 'empty'}`.
@@ -286,7 +286,7 @@ export async function openWorkflowSseStream({
     }
 
     if (aborted) {
-        // Abort is part of the normal lifecycle (task switch / panel unmount). Tell consumers so they
+        // Abort is part of the normal lifecycle (chat switch / panel unmount). Tell consumers so they
         // can mark tool-call cards complete instead of leaving them spinning forever.
         onComplete({chunkCount, kind: 'aborted'});
 
@@ -369,7 +369,7 @@ export async function fetchWorkflowResponse({
         }
     } catch (error) {
         if ((error as Error)?.name === 'AbortError') {
-            // Abort is part of the normal lifecycle (task switch / panel unmount). Tell consumers so
+            // Abort is part of the normal lifecycle (chat switch / panel unmount). Tell consumers so
             // they can mark tool-call cards complete instead of leaving them spinning forever.
             onComplete({chunkCount: 0, kind: 'aborted'});
 
