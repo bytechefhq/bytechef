@@ -21,6 +21,7 @@ import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -82,6 +83,12 @@ public class AiHubAgentConversationRecorder implements AgentConversationRecorder
     private final Clock clock;
     private final ProjectService projectService;
 
+    /**
+     * Marked {@code @Autowired} because this class has two constructors: Spring auto-selects a constructor only when
+     * there is exactly one candidate, and would otherwise fall back to a no-arg constructor that does not exist,
+     * failing context startup.
+     */
+    @Autowired
     public AiHubAgentConversationRecorder(
         AiHubChatRepository chatRepository, AiHubChatService chatService, ProjectService projectService) {
 
