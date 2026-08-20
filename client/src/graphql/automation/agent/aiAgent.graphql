@@ -32,5 +32,6 @@ query aiAgent($id: ID!) {
         }
         lastModifiedDate
         draftWorkflowId
+        visibility
     }
 }

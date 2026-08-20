@@ -1,0 +1,3 @@
+mutation SetAiAgentVisibility($agentId: ID!, $visibility: ResourceVisibility!) {
+    setAiAgentVisibility(agentId: $agentId, visibility: $visibility)
+}

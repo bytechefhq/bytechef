@@ -9,11 +9,14 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import AgentDialog from '@/pages/automation/agents/components/AgentDialog';
+import AgentVisibilityDialog from '@/pages/automation/agents/components/detail/AgentVisibilityDialog';
 import exportAgent from '@/pages/automation/agents/utils/agentImportExport';
 import invalidateAgentQueries from '@/pages/automation/agents/utils/invalidateAgentQueries';
 import ProjectDeploymentDialog from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialog';
 import ProjectVersionHistorySheet from '@/pages/automation/project/components/ProjectVersionHistorySheet';
 import PublishPopover from '@/pages/automation/project/components/project-header/components/PublishPopover';
+import {ResourceVisibilityValueType} from '@/shared/components/visibility/ResourceVisibilityPicker';
+import {useIsVisibilityEditionEnabled} from '@/shared/hooks/useVisibilityFeatureEnabled';
 import Header from '@/shared/layout/Header';
 import {ProjectDeployment, ProjectStatus} from '@/shared/middleware/automation/configuration';
 import {
@@ -26,6 +29,7 @@ import {useQueryClient} from '@tanstack/react-query';
 import {
     DownloadIcon,
     EllipsisVerticalIcon,
+    EyeIcon,
     HistoryIcon,
     PencilIcon,
     PlayIcon,
@@ -46,6 +50,7 @@ interface AgentDetailHeaderProps {
     projectId: string;
     testPanelOpen: boolean;
     title: string;
+    visibility?: ResourceVisibilityValueType;
 }
 
 const AgentDetailHeader = ({
@@ -57,10 +62,16 @@ const AgentDetailHeader = ({
     projectId,
     testPanelOpen,
     title,
+    visibility,
 }: AgentDetailHeaderProps) => {
     const [showDeployDialog, setShowDeployDialog] = useState(false);
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showVersionHistorySheet, setShowVersionHistorySheet] = useState(false);
+    const [showVisibilityDialog, setShowVisibilityDialog] = useState(false);
+
+    // The edition primitive rather than useVisibilityFeatureEnabled: the menu item only needs to know the
+    // feature exists, and the dialog behind it does its own workspace-context check.
+    const visibilityEnabled = useIsVisibilityEditionEnabled();
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
@@ -211,6 +222,15 @@ const AgentDetailHeader = ({
                                     <PencilIcon /> Edit
                                 </DropdownMenuItem>
 
+                                {/* "Who can see this" rather than "Visibility": on an agent the short word reads
+                                    as "who may talk to it", which this control does not change. */}
+
+                                {visibilityEnabled && (
+                                    <DropdownMenuItem onClick={() => setShowVisibilityDialog(true)}>
+                                        <EyeIcon /> Who Can See This
+                                    </DropdownMenuItem>
+                                )}
+
                                 <DropdownMenuItem onClick={handleExportClick}>
                                     <DownloadIcon /> Export
                                 </DropdownMenuItem>
@@ -263,6 +283,14 @@ const AgentDetailHeader = ({
                 trigger inside the menu. */}
 
             <AgentDialog agent={{description, id, title}} onOpenChange={setShowEditDialog} open={showEditDialog} />
+
+            {showVisibilityDialog && (
+                <AgentVisibilityDialog
+                    agentId={id}
+                    onClose={() => setShowVisibilityDialog(false)}
+                    visibility={visibility}
+                />
+            )}
 
             {showVersionHistorySheet && (
                 <ProjectVersionHistorySheet

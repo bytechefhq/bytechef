@@ -1,0 +1,3 @@
+query AiAgentGrants($agentId: ID!) {
+    aiAgentGrants(agentId: $agentId)
+}

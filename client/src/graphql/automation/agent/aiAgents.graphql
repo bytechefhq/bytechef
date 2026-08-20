@@ -9,6 +9,7 @@ query aiAgents($workspaceId: ID!) {
         lastPublishedVersion
         publishedDate
         lastModifiedDate
+        visibility
         tags {
             id
             name

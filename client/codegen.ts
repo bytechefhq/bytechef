@@ -111,6 +111,7 @@ const config: CodegenConfig = {
         '../server/ee/libs/automation/automation-workflow-alert/automation-workflow-alert-graphql/src/main/resources/graphql/*.graphqls',
         '../server/ee/libs/platform/platform-notification/platform-notification-workspace/src/main/resources/graphql/*.graphqls',
         '../server/libs/automation/automation-ai/automation-ai-agent/automation-ai-agent-graphql/src/main/resources/graphql/*.graphqls',
+        '../server/ee/libs/automation/automation-ai/automation-ai-agent/automation-ai-agent-graphql/src/main/resources/graphql/*.graphqls',
     ],
 };
 

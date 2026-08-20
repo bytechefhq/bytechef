@@ -33,6 +33,18 @@ vi.mock('@/shared/middleware/graphql', () => ({
     useUpdateAiAgentTagsMutation: vi.fn().mockReturnValue({isPending: false, mutate: vi.fn()}),
 }));
 
+// The row's visibility badge. Disabled here so this file keeps testing what it is named for; the badge itself
+// is covered by AgentListItem.visibility.test.tsx, which mocks the hook's own dependencies instead of the hook.
+vi.mock('@/shared/hooks/useAiAgentVisibility', () => ({
+    useAiAgentVisibility: () => ({
+        enabled: false,
+        grantedUserIds: [],
+        onGrantedUserIdsChange: vi.fn(),
+        onVisibilityChange: vi.fn(),
+        workspaceMembers: [],
+    }),
+}));
+
 const renderItem = (agent: Partial<AiAgent>) => {
     const queryClient = new QueryClient({defaultOptions: {mutations: {retry: false}, queries: {retry: false}}});
 

@@ -70,6 +70,7 @@ const AgentDetail = () => {
                         projectId={agent.projectId}
                         testPanelOpen={testPanelOpen}
                         title={agent.title}
+                        visibility={agent.visibility}
                     />
                 )
             }

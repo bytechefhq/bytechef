@@ -1,0 +1,3 @@
+mutation GrantAiAgentAccess($agentId: ID!, $userId: ID!) {
+    grantAiAgentAccess(agentId: $agentId, userId: $userId)
+}

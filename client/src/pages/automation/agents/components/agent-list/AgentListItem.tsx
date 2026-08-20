@@ -9,12 +9,18 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent} from '@/components/ui/tooltip';
+import AgentVisibilityCaveat from '@/pages/automation/agents/components/AgentVisibilityCaveat';
 import exportAgent from '@/pages/automation/agents/utils/agentImportExport';
 import invalidateAgentQueries from '@/pages/automation/agents/utils/invalidateAgentQueries';
 import isScheduledAgent from '@/pages/automation/agents/utils/isScheduledAgent';
 import ProjectDeploymentDialog from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialog';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import TagList from '@/shared/components/TagList';
+import ResourceVisibilityBadge from '@/shared/components/visibility/ResourceVisibilityBadge';
+import ResourceVisibilityPicker, {
+    ResourceVisibilityValueType,
+} from '@/shared/components/visibility/ResourceVisibilityPicker';
+import {useAiAgentVisibility} from '@/shared/hooks/useAiAgentVisibility';
 import {ProjectDeployment} from '@/shared/middleware/automation/configuration';
 import {
     AiAgent,
@@ -51,6 +57,11 @@ const AgentListItem = ({agent}: AgentListItemProps) => {
 
     const navigate = useNavigate();
     const queryClient = useQueryClient();
+
+    // The same hook the detail page's dialog uses, so the badge dropdown and the dialog cannot drift on the
+    // grant diff or on which caches they invalidate — the project list item and project header share
+    // useProjectVisibility for exactly this reason.
+    const agentVisibility = useAiAgentVisibility({agentId: agent.id, visibility: agent.visibility});
 
     const {data: agentTagsData} = useAiAgentTagsQuery(
         {workspaceId: String(currentWorkspaceId)},
@@ -125,6 +136,10 @@ const AgentListItem = ({agent}: AgentListItemProps) => {
 
     const deployable = agent.lastPublishedVersion > 0;
 
+    // The generated enum's values ARE these strings, so this is a representation cast rather than a claim about
+    // the value. WORKSPACE is the column default and what a CE server always reports.
+    const visibility = (agent.visibility ?? 'WORKSPACE') as ResourceVisibilityValueType;
+
     const handleDeleteClick = () => {
         deleteAgentMutation.mutate({id: agent.id});
     };
@@ -156,6 +171,43 @@ const AgentListItem = ({agent}: AgentListItemProps) => {
             <div className="flex min-w-0 flex-1 flex-col gap-1">
                 <span className="flex items-center gap-1.5 font-semibold">
                     {agent.title}
+
+                    {agentVisibility.enabled && (
+                        <span onClick={(event) => event.stopPropagation()}>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <button
+                                        aria-label="Change visibility"
+                                        className="cursor-pointer rounded-sm hover:bg-surface-neutral-primary-hover"
+                                        type="button"
+                                    >
+                                        <ResourceVisibilityBadge
+                                            grantedUserCount={agentVisibility.grantedUserIds.length}
+                                            visibility={visibility}
+                                        />
+                                    </button>
+                                </DropdownMenuTrigger>
+
+                                <DropdownMenuContent align="start" className="p-0">
+                                    {/* The caveat rides along with the picker here as well as in the detail
+                                        dialog: this dropdown can set an agent PRIVATE, so it has to say what
+                                        that does and does not do. */}
+
+                                    <div className="flex max-w-80 min-w-64 flex-col gap-3 p-3">
+                                        <ResourceVisibilityPicker
+                                            grantedUserIds={agentVisibility.grantedUserIds}
+                                            onGrantedUserIdsChange={agentVisibility.onGrantedUserIdsChange}
+                                            onVisibilityChange={agentVisibility.onVisibilityChange}
+                                            visibility={visibility}
+                                            workspaceMembers={agentVisibility.workspaceMembers}
+                                        />
+
+                                        <AgentVisibilityCaveat />
+                                    </div>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </span>
+                    )}
 
                     {isScheduledAgent(agent) && (
                         <Tooltip>

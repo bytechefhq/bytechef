@@ -75,6 +75,19 @@ vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({
     useWorkspaceStore: vi.fn((selector) => selector({currentWorkspaceId: 7})),
 }));
 
+// Each row's visibility badge, disabled: it reaches useApplicationInfoStore.EditionType and five graphql
+// mutation hooks, none of which this file's wholesale mocks declare, and none of which these tests are about.
+// The badge is covered by AgentListItem.visibility.test.tsx.
+vi.mock('@/shared/hooks/useAiAgentVisibility', () => ({
+    useAiAgentVisibility: () => ({
+        enabled: false,
+        grantedUserIds: [],
+        onGrantedUserIdsChange: vi.fn(),
+        onVisibilityChange: vi.fn(),
+        workspaceMembers: [],
+    }),
+}));
+
 // The row's Deploy button imports ProjectDeploymentDialog, which transitively reaches ConnectionDialog and
 // a chain of module-scope enum reads off the graphql module this file mocks wholesale. These tests are
 // about the agent list, not the deploy flow, so the dialog is stubbed rather than each enum re-declared.

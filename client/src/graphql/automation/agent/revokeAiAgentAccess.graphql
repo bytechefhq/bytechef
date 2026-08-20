@@ -1,0 +1,3 @@
+mutation RevokeAiAgentAccess($agentId: ID!, $userId: ID!) {
+    revokeAiAgentAccess(agentId: $agentId, userId: $userId)
+}
