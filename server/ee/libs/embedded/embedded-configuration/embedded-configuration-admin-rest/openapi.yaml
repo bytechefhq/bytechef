@@ -4,7 +4,7 @@ info:
   title: "The Embedded Configuration Admin API"
   version: "1"
 servers:
-  - url: "/api/platform/v1"
+  - url: "/api/embedded/v1"
 tags:
   - name: "automation-project-code-workflow-admin"
     description: "The Embedded Automation Project Code Workflow Admin API"

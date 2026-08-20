@@ -34,7 +34,8 @@ public class EmbeddedApiKeySecurityConfigurer extends AbstractApiKeyHttpConfigur
         SigningKeyService signingKeyService) {
 
         super(
-            request -> regexMatcher("^/api/embedded/v[0-9]+/.+").matches(request) ||
+            request -> (regexMatcher("^/api/embedded/v[0-9]+/.+").matches(request) &&
+                !regexMatcher(EmbeddedAdminApiKeySecurityConfigurer.PATH_PATTERN).matches(request)) ||
                 ((regexMatcher("^/api/(?:automation|embedded|platform)/internal/.+").matches(request) ||
                     regexMatcher("^/graphql$").matches(request)) &&
                     request.getHeader("Authorization") != null),

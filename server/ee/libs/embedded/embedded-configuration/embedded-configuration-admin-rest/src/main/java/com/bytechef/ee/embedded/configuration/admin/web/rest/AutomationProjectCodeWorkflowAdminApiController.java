@@ -28,13 +28,17 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
- * Platform admin-API counterpart of {@code AutomationProjectCodeWorkflowApiController} (embedded internal). That
- * internal endpoint is reachable only through {@code EmbeddedApiKeySecurityConfigurer}'s connected-user auth, which
- * requires a {@code /v<n>/{externalUserId}/} path segment and grants zero authorities -- a plain platform API-key
- * bearer token can never satisfy the facade's {@code ROLE_ADMIN} guard through it. This controller is mounted on the
- * {@code /api/platform/v1/**} surface instead, exactly mirroring {@code CustomComponentApiController}: it is matched by
- * {@code PlatformApiKeySecurityConfigurer} (path pattern {@code ^/api/platform/v[0-9]+/.+}), which authenticates the
- * bearer token via {@code ApiKeyService} and grants the underlying user's real Spring authorities.
+ * Admin-API counterpart of {@code AutomationProjectCodeWorkflowApiController} (embedded internal). That internal
+ * endpoint is reachable only through {@code EmbeddedApiKeySecurityConfigurer}'s connected-user auth, which requires a
+ * {@code /v<n>/{externalUserId}/} path segment and grants zero authorities -- a plain API-key bearer token can never
+ * satisfy the facade's {@code ROLE_ADMIN} guard through it.
+ *
+ * <p>
+ * This controller is mounted on {@code /api/embedded/v1/**} alongside the rest of the embedded API, and carved out of
+ * that connected-user configurer by {@code EmbeddedAdminApiKeySecurityConfigurer}, whose {@code PATH_PATTERN} the two
+ * share. That configurer authenticates the bearer token as the key's own ByteChef user with their real Spring
+ * authorities, and accepts admin API keys only -- these operations act on the whole tenant rather than on one workspace
+ * or environment.
  *
  * <p>
  * Deploying through here creates the same embedded relation as the internal endpoint: the resulting catalog
@@ -65,7 +69,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @author Ivica Cardic
  */
 @RestController("com.bytechef.ee.embedded.configuration.admin.web.rest.AutomationProjectCodeWorkflowAdminApiController")
-@RequestMapping("${openapi.openAPIDefinition.base-path.platform:}/v1")
+@RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}/v1")
 @ConditionalOnCoordinator
 @ConditionalOnEEVersion
 public class AutomationProjectCodeWorkflowAdminApiController implements AutomationProjectCodeWorkflowAdminApi {
