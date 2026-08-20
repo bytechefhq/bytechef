@@ -132,7 +132,12 @@ const NewIntegrationCodeWorkflowDialog = ({onClose}: NewIntegrationCodeWorkflowD
 
                                             <SelectItem value={CodeWorkflowLanguage.Python}>Python</SelectItem>
 
-                                            <SelectItem value={CodeWorkflowLanguage.Ruby}>Ruby</SelectItem>
+                                            {/* RUBY-DISABLED: org.graalvm.polyglot:ruby is published only up to
+                                            25.0.0 and crashes on the Truffle 25.2.4 the server pins, so Ruby cannot
+                                            be offered. Re-enable once a polyglot ruby jar built on Truffle 25.2+
+                                            ships (or GraalVM is downgraded). Grep RUBY-DISABLED.
+
+                                            <SelectItem value={CodeWorkflowLanguage.Ruby}>Ruby</SelectItem> */}
                                         </SelectContent>
                                     </Select>
 

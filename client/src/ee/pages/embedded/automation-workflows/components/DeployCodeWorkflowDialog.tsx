@@ -16,6 +16,12 @@ interface DeployCodeWorkflowDialogProps {
     onDeployed?: () => void;
 }
 
+// RUBY-DISABLED: '.rb' dropped from the file input's accept list below — org.graalvm.polyglot:ruby is published only
+// up to 25.0.0 and crashes on the Truffle 25.2.4 the server pins, so a deployed Ruby code workflow could not be
+// loaded. Restore '.rb' once a polyglot ruby jar built on Truffle 25.2+ ships (or GraalVM is downgraded). Grep
+// RUBY-DISABLED.
+const ACCEPTED_FILE_EXTENSIONS = '.jar,.js,.py';
+
 const DeployCodeWorkflowDialog = ({onClose, onDeployed}: DeployCodeWorkflowDialogProps) => {
     const [file, setFile] = useState<File | null>(null);
     const [deploying, setDeploying] = useState(false);
@@ -78,7 +84,7 @@ const DeployCodeWorkflowDialog = ({onClose, onDeployed}: DeployCodeWorkflowDialo
                 <label className="flex flex-col gap-1 text-sm" htmlFor="deploy-code-workflow-file">
                     Project file
                     <input
-                        accept=".jar,.js,.py,.rb"
+                        accept={ACCEPTED_FILE_EXTENSIONS}
                         id="deploy-code-workflow-file"
                         onChange={(event) => setFile(event.target.files?.[0] || null)}
                         type="file"

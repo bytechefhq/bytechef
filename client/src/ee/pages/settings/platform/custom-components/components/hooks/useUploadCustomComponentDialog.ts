@@ -18,7 +18,11 @@ export default function useUploadCustomComponentDialog() {
 
     const queryClient = useQueryClient();
 
-    const acceptedExtensions = javaEnabled ? '.jar,.js,.py,.rb' : '.js,.py,.rb';
+    // RUBY-DISABLED: '.rb' dropped from the accepted extensions — org.graalvm.polyglot:ruby is published only
+    // up to 25.0.0 and crashes on the Truffle 25.2.4 the server pins, so an uploaded Ruby custom component
+    // could not be loaded. Restore '.rb' once a polyglot ruby jar built on Truffle 25.2+ ships (or GraalVM is
+    // downgraded). Grep RUBY-DISABLED.
+    const acceptedExtensions = javaEnabled ? '.jar,.js,.py' : '.js,.py';
 
     const resetForm = useCallback(() => {
         setSelectedFiles([]);
