@@ -56,7 +56,12 @@ public final class PolyglotSandbox {
             .allowHostClassLoading(false)
             .allowHostClassLookup(className -> false)
             .allowNativeAccess(false)
-            .allowCreateThread(isRubyPermitted(permittedLanguages))
+            // RUBY-DISABLED: while Ruby is disabled no permitted language needs the fiber carve-out, so
+            // thread creation stays off unconditionally. Restore
+            // .allowCreateThread(isRubyPermitted(permittedLanguages)) together with the commented-out
+            // helper below once a polyglot ruby jar built on Truffle 25.2+ is published (or GraalVM is
+            // downgraded). Grep RUBY-DISABLED.
+            .allowCreateThread(false)
             .allowCreateProcess(false)
             .allowIO(IOAccess.NONE)
             .allowEnvironmentAccess(EnvironmentAccess.NONE)
@@ -64,13 +69,14 @@ public final class PolyglotSandbox {
             .build();
     }
 
-    private static boolean isRubyPermitted(String... permittedLanguages) {
-        for (String permittedLanguage : permittedLanguages) {
-            if ("ruby".equals(permittedLanguage)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
+    // RUBY-DISABLED: unused while Ruby is disabled; see the allowCreateThread call above.
+//    private static boolean isRubyPermitted(String... permittedLanguages) {
+//        for (String permittedLanguage : permittedLanguages) {
+//            if ("ruby".equals(permittedLanguage)) {
+//                return true;
+//            }
+//        }
+//
+//        return false;
+//    }
 }

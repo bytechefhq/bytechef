@@ -82,6 +82,43 @@ class ProjectCodeWorkflowFacadeUploadDisabledTest {
             .isNotInstanceOf(ConfigurationException.class);
     }
 
+    /**
+     * {@code javaEnabled} is deliberately TRUE here. With it false, a rejection would be explained equally well by the
+     * Java guard above, and this test would pass whether or not the Ruby guard exists. Enabling Java removes that
+     * alternative, so the only thing that can reject a Ruby upload is the guard under test.
+     *
+     * <p>
+     * RUBY-DISABLED: delete this test when Ruby is restored. Until then it closes the last hole in the disable —
+     * create-empty refused Ruby and the client dropped {@code .rb} from its accept lists, but a direct API caller could
+     * still deploy a Ruby workflow the polyglot loader cannot run.
+     */
+    @Test
+    void testSaveRejectsRubyUploadEvenWhenJavaIsEnabled() {
+        ProjectService projectService = mock(ProjectService.class);
+        ProjectWorkflowService projectWorkflowService = mock(ProjectWorkflowService.class);
+        CodeWorkflowContainerFacade codeWorkflowContainerFacade = mock(CodeWorkflowContainerFacade.class);
+        ProjectCodeWorkflowService projectCodeWorkflowService = mock(ProjectCodeWorkflowService.class);
+
+        ProjectCodeWorkflowFacadeImpl projectCodeWorkflowFacade = new ProjectCodeWorkflowFacadeImpl(
+            applicationProperties(true), mock(CacheManager.class), projectService, projectWorkflowService,
+            codeWorkflowContainerFacade, projectCodeWorkflowService, mock(CodeWorkflowContainerService.class),
+            mock(CodeWorkflowFileStorage.class), mock(TagService.class), mock(WorkflowService.class));
+
+        assertThatThrownBy(() -> projectCodeWorkflowFacade.save(1L, new byte[0], Language.RUBY))
+            .isInstanceOf(ConfigurationException.class)
+            .satisfies(thrown -> {
+                ConfigurationException configurationException = (ConfigurationException) thrown;
+
+                // 101 is LANGUAGE_NOT_SUPPORTED, not the 100 the Java guard raises -- asserting the key is what
+                // distinguishes the two rejections.
+                assertThat(configurationException.getErrorKey()).isEqualTo(101);
+                assertThat(configurationException.getEntityClass()).isEqualTo(CodeWorkflowContainer.class);
+            });
+
+        verifyNoInteractions(
+            projectService, projectWorkflowService, codeWorkflowContainerFacade, projectCodeWorkflowService);
+    }
+
     private static ApplicationProperties applicationProperties(boolean javaEnabled) {
         ApplicationProperties.Workflow workflow = new ApplicationProperties.Workflow();
 

@@ -39,10 +39,14 @@ public class CustomComponentAgentToolCallback implements ToolCallback {
 
     private static final Logger log = LoggerFactory.getLogger(CustomComponentAgentToolCallback.class);
 
+    // RUBY-DISABLED: "Ruby" removed from the subagent description below — org.graalvm.polyglot:ruby is published
+    // only up to 25.0.0 and crashes on the Truffle 25.2.4 this repo pins, so a Ruby custom component cannot be loaded
+    // (the custom-component registry now skips it). Restore it once a polyglot ruby jar built on Truffle 25.2+ is
+    // published (or GraalVM is downgraded). Grep RUBY-DISABLED.
     private static final String DESCRIPTION =
         """
             Delegate a user request about custom components to a specialised Custom Component subagent.
-            Custom components are single-file, user-authored components (JavaScript, Python, Ruby) that add
+            Custom components are single-file, user-authored components (JavaScript, Python) that add
             new actions to the platform. The subagent owns the canonical behaviour for listing, explaining,
             creating, updating, and deleting custom components, including authoring and iterating the source
             until it compiles. Prefer calling it over reasoning about custom components directly. The result

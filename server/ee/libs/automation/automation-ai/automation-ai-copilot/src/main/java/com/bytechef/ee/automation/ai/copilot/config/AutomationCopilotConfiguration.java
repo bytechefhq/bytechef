@@ -80,6 +80,17 @@ public class AutomationCopilotConfiguration {
 
     private final State state = new State();
 
+    // RUBY-DISABLED: the prompt resources loaded below had every Ruby reference DELETED, not commented out.
+    // readPrompt() below is a verbatim readAllBytes with no comment stripping, so the whole file becomes the
+    // system message — a commented-out Ruby section would still be read by the model as content and it would
+    // keep offering a language that org.graalvm.polyglot:ruby (stuck at 25.0.0, crashes on the pinned Truffle
+    // 25.2.4) can no longer run. The marker therefore lives here, in code the model never sees.
+    // Affected: prompt_code_workflow_build.txt (supported-language line, the whole '### Ruby' contract section,
+    // and the createCodeWorkflow language list), prompt_code_workflow_ask.txt and prompt_custom_component_ask.txt
+    // (supported-language lines). Once a polyglot ruby jar built on Truffle 25.2+ is published (or GraalVM is
+    // downgraded), restore in each file: the supported-language sentence, the language enumeration in the tool
+    // description, and the '### Ruby' contract section (mirror the '### Python' section; the removed text is in
+    // git history at this commit). Grep RUBY-DISABLED.
     // CT_CONSTRUCTOR_THROW: the constructor reads and validates the prompt resources up front (see the hoisted
     // *SystemPrompt fields above) so readPrompt's IllegalStateException surfaces at startup, not on the first
     // delegation; Spring never subclasses this @Configuration in a way that could observe partially-initialized state.

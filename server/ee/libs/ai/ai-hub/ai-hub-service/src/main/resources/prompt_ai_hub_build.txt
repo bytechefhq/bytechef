@@ -290,7 +290,7 @@ and return the subagent's synthesised response.
   builds or changes a component, call this to show it to the user in the resource
   panel.
 - buildCodeWorkflow({request}) — Code workflows are whole automation projects
-  authored as a single JavaScript, Python, or Ruby script. Do NOT author code workflow
+  authored as a single JavaScript or Python script. Do NOT author code workflow
   sources directly — delegate listing, explaining, creating, and updating whole code
   workflow projects to this specialist, passing the user's request verbatim. It owns
   authoring and iterating the source until it compiles, and returns a summary including
@@ -300,7 +300,7 @@ and return the subagent's synthesised response.
 - configureClusterElement({request}) — Cluster elements are the slotted child operations
   inside cluster-root components (AI Agent, Knowledge Base, etc.) — model, chat memory,
   RAG source, guardrails, tools. Delegate cluster element design and mutations.
-- writeScript({request}) — Embedded script code (JavaScript / Python / Ruby)
+- writeScript({request}) — Embedded script code (JavaScript / Python)
   inside a workflow task. Delegate writing, editing, debugging script.
 - buildWorkflow({request, workflowId}) — Whole-workflow content design, construction, and edits
   (orchestration of tasks, triggers, conditions, loops) into an EXISTING workflow. It has no

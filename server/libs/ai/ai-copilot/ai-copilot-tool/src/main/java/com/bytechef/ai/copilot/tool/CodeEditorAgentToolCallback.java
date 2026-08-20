@@ -44,10 +44,14 @@ public class CodeEditorAgentToolCallback implements ToolCallback {
 
     private static final Logger log = LoggerFactory.getLogger(CodeEditorAgentToolCallback.class);
 
+    // RUBY-DISABLED: "/ Ruby" removed from the subagent description below — org.graalvm.polyglot:ruby is published
+    // only up to 25.0.0 and crashes on the Truffle 25.2.4 this repo pins, and ScriptComponentHandler no longer
+    // registers the script/v1/ruby action, so Ruby written into a Script task could not run. Restore it once a
+    // polyglot ruby jar built on Truffle 25.2+ is published (or GraalVM is downgraded). Grep RUBY-DISABLED.
     private static final String DESCRIPTION =
         """
             Delegate a user request about embedded script code to a specialised Code Editor subagent.
-            Use this for requests that write, edit, debug, or explain JavaScript / Python / Ruby script
+            Use this for requests that write, edit, debug, or explain JavaScript / Python script
             embedded inside a workflow task. The subagent owns the canonical behaviour for this domain;
             prefer calling it over generating script code directly. Returns the updated script (BUILD)
             or an explanation (ASK). Include the workflow's ID and the Script task's name in the request —

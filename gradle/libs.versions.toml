@@ -68,7 +68,11 @@ org-graalvm-polyglot-java = { module = "org.graalvm.polyglot:java", version.ref 
 org-graalvm-polyglot-js = { module = "org.graalvm.polyglot:js", version.ref = "graalvm" }
 org-graalvm-polyglot-polyglot = { module = "org.graalvm.polyglot:polyglot", version.ref = "graalvm" }
 org-graalvm-polyglot-python = { module = "org.graalvm.polyglot:python", version.ref = "graalvm" }
-org-graalvm-polyglot-ruby = "org.graalvm.polyglot:ruby:25.0.0"
+# RUBY-DISABLED: org.graalvm.polyglot:ruby is published only up to 25.0.0, which crashes on the Truffle
+# 25.2.4 pinned above ("Invalid inline context node ... TryNodeGen expected but is RescueClassesNode").
+# Re-enable when a polyglot ruby jar built on Truffle 25.2+ is published, or if graalvm is downgraded.
+# Every disabled site is greppable as RUBY-DISABLED.
+#org-graalvm-polyglot-ruby = "org.graalvm.polyglot:ruby:25.0.0"
 org-json = "org.json:json:20260814"
 org-jsoup = "org.jsoup:jsoup:1.23.1"
 org-mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "org-mapstruct" }

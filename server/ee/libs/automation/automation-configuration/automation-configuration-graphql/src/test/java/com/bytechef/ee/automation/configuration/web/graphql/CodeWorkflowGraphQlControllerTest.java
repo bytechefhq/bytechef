@@ -78,12 +78,17 @@ class CodeWorkflowGraphQlControllerTest {
         when(projectCodeWorkflowFacade.createEmptyCodeWorkflow(anyLong(), anyString(), eq(Language.PYTHON), isNull(),
             isNull(), isNull()))
                 .thenReturn(project);
-        when(projectCodeWorkflowFacade.createEmptyCodeWorkflow(anyLong(), anyString(), eq(Language.RUBY), isNull(),
-            isNull(), isNull()))
-                .thenReturn(project);
+        // RUBY-DISABLED: the facade now rejects RUBY with LANGUAGE_NOT_SUPPORTED — org.graalvm.polyglot:ruby is
+        // published only up to 25.0.0 and crashes on the Truffle 25.2.4 this repo pins. The RUBY member of the
+        // GraphQL Language enum is kept (existing Ruby containers must still be readable), but this controller test
+        // no longer claims a Ruby create succeeds. Restore the two commented blocks once a polyglot ruby jar built on
+        // Truffle 25.2+ is published (or GraalVM is downgraded). Grep RUBY-DISABLED.
+//        when(projectCodeWorkflowFacade.createEmptyCodeWorkflow(anyLong(), anyString(), eq(Language.RUBY), isNull(),
+//            isNull(), isNull()))
+//                .thenReturn(project);
 
         assertThat(controller.createCodeWorkflow(1L, "python-project", Language.PYTHON, null, null, null))
             .isEqualTo("1");
-        assertThat(controller.createCodeWorkflow(1L, "ruby-project", Language.RUBY, null, null, null)).isEqualTo("1");
+//        assertThat(controller.createCodeWorkflow(1L, "ruby-project", Language.RUBY, null, null, null)).isEqualTo("1");
     }
 }

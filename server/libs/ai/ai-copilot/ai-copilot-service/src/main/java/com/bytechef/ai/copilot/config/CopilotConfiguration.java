@@ -156,6 +156,15 @@ public class CopilotConfiguration {
     // CT_CONSTRUCTOR_THROW: the constructor reads and validates the prompt resources up front (see the hoisted
     // *SystemPrompt fields above) so getSystemPrompt's IllegalStateException surfaces at startup, not on the first
     // delegation; Spring never subclasses this @Configuration in a way that could observe partially-initialized state.
+    // RUBY-DISABLED: the prompt resources loaded below had every Ruby reference DELETED, not commented out.
+    // readPrompt() below is a verbatim readAllBytes with no comment stripping, so the whole file becomes the
+    // system message — a commented-out Ruby section would still be read by the model as content and it would
+    // keep offering a language that org.graalvm.polyglot:ruby (stuck at 25.0.0, crashes on the pinned Truffle
+    // 25.2.4) can no longer run. The marker therefore lives here, in code the model never sees.
+    // Affected: prompt_code_editor_build.txt — the '- Ruby: `def perform(input, context) ... end`' perform-signature
+    // bullet. ScriptComponentHandler no longer registers the script/v1/ruby action either, so Ruby written into a
+    // Script task could not run. Once a polyglot ruby jar built on Truffle 25.2+ is published (or GraalVM is
+    // downgraded), restore that bullet alongside the Script component's Ruby action. Grep RUBY-DISABLED.
     @SuppressFBWarnings({
         "EI", "CT_CONSTRUCTOR_THROW"
     })

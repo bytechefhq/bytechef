@@ -42,12 +42,12 @@ public class IntegrationCodeWorkflowTools {
     }
 
     @Tool(
-        description = "Create a new empty code workflow integration. Supported languages are JAVASCRIPT, PYTHON and " +
-            "RUBY (JAVA is not supported). Returns a confirmation message with the created integration's ID and component name.")
+        description = "Create a new empty code workflow integration. Supported languages are JAVASCRIPT and " +
+            "PYTHON (JAVA is not supported). Returns a confirmation message with the created integration's ID and component name.")
     public String createIntegrationCodeWorkflow(
         @ToolParam(description = "The component name of the code workflow integration") String componentName,
         @ToolParam(
-            description = "Language of the code workflow: JAVASCRIPT, PYTHON, or RUBY") String language) {
+            description = "Language of the code workflow: JAVASCRIPT or PYTHON") String language) {
 
         Language resolvedLanguage = resolveLanguage(language);
 
@@ -98,14 +98,14 @@ public class IntegrationCodeWorkflowTools {
     }
 
     /**
-     * Maps the incoming language name to {@link Language}, rejecting anything other than JAVASCRIPT, PYTHON, and RUBY.
-     * JAVA is a valid {@link Language} member but code workflows created through this tool are always
-     * polyglot-script-backed, so it is rejected here even though the facade would also reject it.
+     * Maps the incoming language name to {@link Language}, rejecting anything other than JAVASCRIPT and PYTHON. JAVA is
+     * a valid {@link Language} member but code workflows created through this tool are always polyglot-script-backed,
+     * so it is rejected here even though the facade would also reject it.
      */
     private static Language resolveLanguage(String language) {
         if (language == null || language.isBlank()) {
             throw new ExecutionException(
-                "Language must not be blank. Supported languages: JAVASCRIPT, PYTHON, RUBY.",
+                "Language must not be blank. Supported languages: JAVASCRIPT, PYTHON.",
                 IntegrationCodeWorkflowToolErrorType.UNSUPPORTED_LANGUAGE);
         }
 
@@ -117,15 +117,22 @@ public class IntegrationCodeWorkflowTools {
                     .toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException e) {
             throw new ExecutionException(
-                "Unsupported language '" + language + "'. Supported languages: JAVASCRIPT, PYTHON, RUBY.",
+                "Unsupported language '" + language + "'. Supported languages: JAVASCRIPT, PYTHON.",
                 IntegrationCodeWorkflowToolErrorType.UNSUPPORTED_LANGUAGE);
         }
 
-        if (resolvedLanguage != Language.JAVASCRIPT && resolvedLanguage != Language.PYTHON
-            && resolvedLanguage != Language.RUBY) {
+        // RUBY-DISABLED: RUBY is dropped from the accepted set (and from the tool/param descriptions above) because
+        // org.graalvm.polyglot:ruby is published only up to 25.0.0 and crashes on the Truffle 25.2.4 this repo pins,
+        // so a copilot-generated Ruby code workflow could never be loaded or run. A RUBY request is now rejected with
+        // UNSUPPORTED_LANGUAGE — the same contract JAVA already gets — rather than silently substituted. The
+        // Language.RUBY constant itself is untouched; ordinals are persisted as INTs. Restore the commented
+        // condition, and RUBY in the descriptions, once a polyglot ruby jar built on Truffle 25.2+ is published (or
+        // GraalVM is downgraded). Grep RUBY-DISABLED.
+        if (resolvedLanguage != Language.JAVASCRIPT && resolvedLanguage != Language.PYTHON) {
+//            && resolvedLanguage != Language.RUBY) {
 
             throw new ExecutionException(
-                "Unsupported language '" + language + "'. Supported languages: JAVASCRIPT, PYTHON, RUBY.",
+                "Unsupported language '" + language + "'. Supported languages: JAVASCRIPT, PYTHON.",
                 IntegrationCodeWorkflowToolErrorType.UNSUPPORTED_LANGUAGE);
         }
 

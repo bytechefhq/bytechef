@@ -23,7 +23,6 @@ import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.component.script.task.handler.ScriptJavaScriptTaskHandler;
 import com.bytechef.component.script.task.handler.ScriptPythonTaskHandler;
-import com.bytechef.component.script.task.handler.ScriptRubyTaskHandler;
 import com.bytechef.platform.component.test.ComponentJobTestExecutor;
 import com.bytechef.platform.component.test.config.ComponentTestIntConfiguration;
 import java.nio.charset.StandardCharsets;
@@ -62,8 +61,11 @@ public class ScriptComponentHandlerIntTest {
     @Autowired
     private ScriptPythonTaskHandler scriptPythonTaskHandler;
 
-    @Autowired
-    private ScriptRubyTaskHandler scriptRubyTaskHandler;
+    // RUBY-DISABLED: ScriptRubyTaskHandler is no longer a @Component, so this injection point would fail
+    // context startup. Re-enable with the rest of the Ruby surface once a polyglot ruby jar built on Truffle
+    // 25.2+ is published (or GraalVM is downgraded). Grep RUBY-DISABLED.
+//    @Autowired
+//    private ScriptRubyTaskHandler scriptRubyTaskHandler;
 
     @Autowired
     private ScriptJavaScriptTaskHandler scriptJavaScriptTaskHandler;
@@ -119,19 +121,20 @@ public class ScriptComponentHandlerIntTest {
         Assertions.assertEquals(6000, outputs.get("result"));
     }
 
-    @Test
-    public void testPerformRuby() {
-        Job job = componentJobTestExecutor.execute(
-            ENCODER.encodeToString("script_v1_ruby".getBytes(StandardCharsets.UTF_8)),
-            Map.of("factor", 3),
-            Map.of("var/v1/set", taskHandler, "script/v1/ruby", scriptRubyTaskHandler));
-
-        assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
-
-        Map<String, ?> outputs = taskFileStorage.readJobOutputs(job.getOutputs());
-
-        Assertions.assertEquals(6000, outputs.get("result"));
-    }
+    // RUBY-DISABLED: grep RUBY-DISABLED; re-enable with the rest of the Ruby surface.
+//    @Test
+//    public void testPerformRuby() {
+//        Job job = componentJobTestExecutor.execute(
+//            ENCODER.encodeToString("script_v1_ruby".getBytes(StandardCharsets.UTF_8)),
+//            Map.of("factor", 3),
+//            Map.of("var/v1/set", taskHandler, "script/v1/ruby", scriptRubyTaskHandler));
+//
+//        assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
+//
+//        Map<String, ?> outputs = taskFileStorage.readJobOutputs(job.getOutputs());
+//
+//        Assertions.assertEquals(6000, outputs.get("result"));
+//    }
 
     @ComponentScan(basePackages = "com.bytechef.component.script")
     @TestConfiguration

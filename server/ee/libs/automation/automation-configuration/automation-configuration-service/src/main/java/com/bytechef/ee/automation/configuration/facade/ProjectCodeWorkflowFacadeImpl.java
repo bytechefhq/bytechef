@@ -139,9 +139,17 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
         @Nullable List<String> tags) {
         validateName(name);
 
-        if (language != Language.JAVASCRIPT && language != Language.PYTHON && language != Language.RUBY) {
+        // RUBY-DISABLED: RUBY is dropped from the create-empty allowlist because org.graalvm.polyglot:ruby is
+        // published only up to 25.0.0 and crashes on the Truffle 25.2.4 this repo pins, so the rendered Ruby starter
+        // template could not be loaded by the polyglot loader below. A RUBY request is rejected with
+        // LANGUAGE_NOT_SUPPORTED — the same contract JAVA already gets — rather than silently downgraded to another
+        // language. The Language.RUBY constant and the Ruby starter template are untouched (ordinals are persisted as
+        // INTs). Restore RUBY here, and in the message, once a polyglot ruby jar built on Truffle 25.2+ is published
+        // (or GraalVM is downgraded). Grep RUBY-DISABLED.
+        if (language != Language.JAVASCRIPT && language != Language.PYTHON) {
+//        if (language != Language.JAVASCRIPT && language != Language.PYTHON && language != Language.RUBY) {
             throw new ConfigurationException(
-                "Create-empty supports JavaScript, Python and Ruby only",
+                "Create-empty supports JavaScript and Python only",
                 CodeWorkflowErrorType.LANGUAGE_NOT_SUPPORTED);
         }
 
@@ -218,6 +226,18 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
     @Override
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public void save(long workspaceId, byte[] bytes, Language language) {
+        // RUBY-DISABLED: a Ruby upload is rejected here as well as at create-empty, because deploying one would
+        // store a workflow the polyglot loader cannot run — org.graalvm.polyglot:ruby is published only up to 25.0.0,
+        // which crashes on the Truffle 25.2.4 this repo pins. Without this the REST/API caller kept a path the client
+        // no longer offers: the accept lists dropped .rb, but nothing server-side refused it. Restore by deleting this
+        // block once a polyglot ruby jar built on Truffle 25.2+ is published (or GraalVM is downgraded). Grep
+        // RUBY-DISABLED.
+        if (language == Language.RUBY) {
+            throw new ConfigurationException(
+                "Uploading of Ruby code workflows is temporarily disabled",
+                CodeWorkflowErrorType.LANGUAGE_NOT_SUPPORTED);
+        }
+
         if (!javaEnabled && language == Language.JAVA) {
             throw new ConfigurationException(
                 "Uploading of Java code workflows is disabled",

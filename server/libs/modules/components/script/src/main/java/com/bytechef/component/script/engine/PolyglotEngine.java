@@ -63,7 +63,10 @@ public class PolyglotEngine {
                 case "js" -> "function perform(input, context) {\n\treturn null;\n}";
                 case "python" -> "def perform(input, context):\n\treturn null";
                 case "R" -> "perform <- function(input, context) {\n\treturn null\n}";
-                case "ruby" -> "def perform(input, context)\n\treturn null;\nend";
+                // RUBY-DISABLED: org.graalvm.polyglot:ruby is stuck at 25.0.0 and crashes on the pinned
+                // Truffle 25.2.4; re-enable when a ruby jar built on Truffle 25.2+ ships (or GraalVM is
+                // downgraded). Grep RUBY-DISABLED.
+//              case "ruby" -> "def perform(input, context)\n\treturn null;\nend";
                 default -> throw new IllegalArgumentException("languageId: %s does not exist".formatted(languageId));
             }));
 

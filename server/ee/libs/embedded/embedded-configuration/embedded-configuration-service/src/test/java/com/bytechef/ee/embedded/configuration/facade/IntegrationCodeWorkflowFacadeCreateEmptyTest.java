@@ -141,8 +141,14 @@ class IntegrationCodeWorkflowFacadeCreateEmptyTest {
         verify(integrationService, never()).publishIntegration(anyLong(), any());
     }
 
+    // RUBY-DISABLED: RUBY joins JAVA in the rejected set — org.graalvm.polyglot:ruby is published only up to 25.0.0
+    // and crashes on the Truffle 25.2.4 this repo pins, so create-empty rejects it with LANGUAGE_NOT_SUPPORTED rather
+    // than rendering a starter it cannot load. Drop RUBY from names below once a polyglot ruby jar built on Truffle
+    // 25.2+ is published (or GraalVM is downgraded). Grep RUBY-DISABLED.
     @ParameterizedTest
-    @EnumSource(value = Language.class, names = "JAVA")
+    @EnumSource(value = Language.class, names = {
+        "JAVA", "RUBY"
+    })
     void testCreateEmptyCodeWorkflowRejectsUnsupportedLanguage(Language language) {
         CodeWorkflowContainerFacade codeWorkflowContainerFacade = mock(CodeWorkflowContainerFacade.class);
         IntegrationCodeWorkflowService integrationCodeWorkflowService = mock(IntegrationCodeWorkflowService.class);

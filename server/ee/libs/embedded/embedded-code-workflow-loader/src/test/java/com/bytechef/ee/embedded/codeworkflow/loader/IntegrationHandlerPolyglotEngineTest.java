@@ -20,6 +20,7 @@ import com.bytechef.workflow.definition.WorkflowTaskDefinition;
 import java.util.List;
 import java.util.Map;
 import java.util.OptionalInt;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -216,6 +217,11 @@ class IntegrationHandlerPolyglotEngineTest {
         assertEquals("python result", result);
     }
 
+    // RUBY-DISABLED: org.graalvm.polyglot:ruby is published only up to 25.0.0 and crashes on the pinned
+    // Truffle 25.2.4; the ruby dependency is commented out so the language is not even installed. Remove
+    // this @Disabled once a polyglot ruby jar built on Truffle 25.2+ is published (or GraalVM is
+    // downgraded). Grep RUBY-DISABLED.
+    @Disabled("RUBY-DISABLED")
     @Test
     void testPerformReceivesComponentCapableContextForRuby() throws Exception {
         TaskDefinition taskDefinition = loadSingleTask("ruby", CONTEXT_RUBY_SOURCE);

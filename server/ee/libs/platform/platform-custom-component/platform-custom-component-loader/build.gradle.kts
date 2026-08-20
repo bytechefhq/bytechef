@@ -10,7 +10,10 @@ dependencies {
     implementation(rootProject.libs.org.graalvm.polyglot.java)
     implementation(rootProject.libs.org.graalvm.polyglot.js)
     implementation(rootProject.libs.org.graalvm.polyglot.python)
-    implementation(rootProject.libs.org.graalvm.polyglot.ruby)
+    // RUBY-DISABLED: polyglot ruby is stuck at 25.0.0 and crashes on the pinned Truffle 25.2.4. Re-enable
+    // together with the org-graalvm-polyglot-ruby entry in gradle/libs.versions.toml once a ruby jar built on
+    // Truffle 25.2+ is published (or GraalVM is downgraded). Grep RUBY-DISABLED for every site.
+//    implementation(rootProject.libs.org.graalvm.polyglot.ruby)
     implementation(project(":server:libs:core:class-loader:class-loader-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))

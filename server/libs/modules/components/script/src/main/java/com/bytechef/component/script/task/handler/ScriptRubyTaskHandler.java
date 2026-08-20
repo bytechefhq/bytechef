@@ -16,17 +16,21 @@
 
 package com.bytechef.component.script.task.handler;
 
-import static com.bytechef.platform.component.definition.ScriptComponentDefinition.SCRIPT;
+//import static com.bytechef.platform.component.definition.ScriptComponentDefinition.SCRIPT;
 
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.workflow.worker.task.handler.AbstractTaskHandler;
-import org.springframework.stereotype.Component;
+//import org.springframework.stereotype.Component;
 
 /**
  * @author Matija Petanjek
  * @author Ivica Cardic
  */
-@Component(SCRIPT + "/v1/ruby")
+// RUBY-DISABLED: the @Component registration is commented out because org.graalvm.polyglot:ruby is published
+// only up to 25.0.0 and crashes on the pinned Truffle 25.2.4; the "script/v1/ruby" action it handles is no
+// longer registered by ScriptComponentHandler. Re-enable together with those registrations once a polyglot
+// ruby jar built on Truffle 25.2+ is published (or GraalVM is downgraded). Grep RUBY-DISABLED.
+//@Component(SCRIPT + "/v1/ruby")
 public class ScriptRubyTaskHandler extends AbstractTaskHandler {
 
     public ScriptRubyTaskHandler(ActionDefinitionFacade actionDefinitionFacade) {

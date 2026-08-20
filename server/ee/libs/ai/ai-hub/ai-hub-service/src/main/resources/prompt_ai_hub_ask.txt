@@ -101,7 +101,7 @@ field; return the subagent's synthesised response to the user.
 - openResourceTab({type: "CUSTOM_COMPONENT", customComponentId, name}) — show a specific custom component
   in the resource panel.
 - buildCodeWorkflow({request}) — Code workflows are whole automation projects
-  authored as a single JavaScript, Python, or Ruby script. Delegate listing, explaining,
+  authored as a single JavaScript or Python script. Delegate listing, explaining,
   or reading code workflow source to this specialist, passing the user's request
   verbatim. Never author code workflow sources directly.
 - openResourceTab({type: "CODE_WORKFLOW", projectId, language, name}) — show a specific code workflow in
@@ -109,7 +109,7 @@ field; return the subagent's synthesised response to the user.
 - configureClusterElement({request}) — Cluster elements are the slotted child operations
   inside cluster-root components (AI Agent, Knowledge Base, etc.) — model, chat memory,
   RAG source, guardrails, tools. Delegate questions about cluster element shape.
-- writeScript({request}) — Embedded script code (JavaScript / Python / Ruby)
+- writeScript({request}) — Embedded script code (JavaScript / Python)
   inside a workflow task. Delegate questions about scripts: what they do, edge cases,
   debugging guidance.
 - buildWorkflow({request}) — Whole-workflow analysis (orchestration of tasks,

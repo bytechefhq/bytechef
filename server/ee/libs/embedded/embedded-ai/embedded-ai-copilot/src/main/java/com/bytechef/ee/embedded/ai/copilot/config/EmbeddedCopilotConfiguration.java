@@ -103,6 +103,17 @@ public class EmbeddedCopilotConfiguration {
     // front (see workflowEditorEmbeddedBuildSystemPrompt above) so getSystemPrompt's IllegalStateException surfaces at
     // startup, not on the first delegation; Spring never subclasses this @Configuration in a way that could observe
     // partially-initialized state.
+    // RUBY-DISABLED: the prompt resources loaded below had every Ruby reference DELETED, not commented out.
+    // readPrompt() below is a verbatim readAllBytes with no comment stripping, so the whole file becomes the
+    // system message — a commented-out Ruby section would still be read by the model as content and it would
+    // keep offering a language that org.graalvm.polyglot:ruby (stuck at 25.0.0, crashes on the pinned Truffle
+    // 25.2.4) can no longer run. The marker therefore lives here, in code the model never sees.
+    // Affected: prompt_code_workflow_embedded_build.txt (supported-language line, the whole '### Ruby' contract
+    // section, and the createIntegrationCodeWorkflow language list) and prompt_code_workflow_embedded_ask.txt
+    // (supported-language line) — the embedded twins of the automation prompts, which drift if only one side is
+    // changed. Once a polyglot ruby jar built on Truffle 25.2+ is published (or GraalVM is downgraded), restore
+    // both files together with their automation counterparts; the removed text is in git history at this commit.
+    // Grep RUBY-DISABLED.
     @SuppressFBWarnings({
         "EI", "CT_CONSTRUCTOR_THROW"
     })

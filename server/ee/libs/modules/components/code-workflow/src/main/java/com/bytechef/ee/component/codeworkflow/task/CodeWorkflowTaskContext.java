@@ -53,7 +53,12 @@ import org.jspecify.annotations.Nullable;
  * <p>
  * Also implements {@link ComponentActionInvoker} so the same resolution/dispatch logic can back a polyglot
  * {@code context.component} proxy chain once the loader engines learn to hand this context to guest (JavaScript,
- * Python, Ruby) code workflow tasks.
+ * Python) code workflow tasks.
+ *
+ * <p>
+ * RUBY-DISABLED: Ruby is temporarily off — org.graalvm.polyglot:ruby is published only up to 25.0.0 and crashes on the
+ * pinned Truffle 25.2.4. Add it back to the guest language list above once a ruby jar built on Truffle 25.2+ ships (or
+ * GraalVM is downgraded). Grep RUBY-DISABLED.
  *
  * @version ee
  *

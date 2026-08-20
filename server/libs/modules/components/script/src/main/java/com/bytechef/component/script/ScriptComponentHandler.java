@@ -24,13 +24,10 @@ import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.script.action.ScriptJavaScriptAction;
 import com.bytechef.component.script.action.ScriptPythonAction;
-import com.bytechef.component.script.action.ScriptRubyAction;
 import com.bytechef.component.script.cluster.datastream.ScriptJavaScriptItemProcessor;
 import com.bytechef.component.script.cluster.datastream.ScriptPythonItemProcessor;
-import com.bytechef.component.script.cluster.datastream.ScriptRubyItemProcessor;
 import com.bytechef.component.script.cluster.tool.ScriptJavaScriptTool;
 import com.bytechef.component.script.cluster.tool.ScriptPythonTool;
-import com.bytechef.component.script.cluster.tool.ScriptRubyTool;
 import com.bytechef.component.script.engine.PolyglotEngine;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.ScriptComponentDefinition;
@@ -40,6 +37,11 @@ import org.springframework.stereotype.Component;
  * @author Matija Petanjek
  * @author Ivica Cardic
  */
+// RUBY-DISABLED: the Ruby action, tool and item processor registrations below are commented out because
+// org.graalvm.polyglot:ruby is published only up to 25.0.0 and crashes on the Truffle 25.2.4 this repo pins
+// ("Invalid inline context node ... TryNodeGen expected but is RescueClassesNode"). Re-enable them, their
+// imports, ScriptRubyTaskHandler, the gradle dependency and the Ruby entries in the script_v1.json test
+// snapshot once a polyglot ruby jar built on Truffle 25.2+ is published (or GraalVM is downgraded).
 @Component(SCRIPT + "_v1_ComponentHandler")
 public class ScriptComponentHandler implements ComponentHandler {
 
@@ -62,24 +64,24 @@ public class ScriptComponentHandler implements ComponentHandler {
                 component(SCRIPT)
                     .title("Script")
                     .description(
-                        "Executes user-defined code. User can write custom workflow logic in Java, JavaScript, Python, R or Ruby programming languages.")
+                        "Executes user-defined code. User can write custom workflow logic in Java, JavaScript, Python or R programming languages.")
                     .icon("path:assets/script.svg")
                     .categories(ComponentCategory.HELPERS, ComponentCategory.DEVELOPER_TOOLS)
                     .actions(
                         ScriptJavaScriptAction.of(polyglotEngine),
-                        ScriptPythonAction.of(polyglotEngine),
+                        ScriptPythonAction.of(polyglotEngine))
 //                        ScriptRAction.of(polyglotEngine),
 //                        ScriptJavaAction.of(polyglotEngine),
-                        ScriptRubyAction.of(polyglotEngine))
+//                        ScriptRubyAction.of(polyglotEngine))
                     .clusterElements(
                         ScriptJavaScriptTool.of(polyglotEngine),
                         ScriptPythonTool.of(polyglotEngine),
-                        ScriptRubyTool.of(polyglotEngine),
+//                        ScriptRubyTool.of(polyglotEngine),
 //                        ScriptJavaItemProcessor.of(polyglotEngine),
 //                        ScriptRAction.of(polyglotEngine),
                         ScriptJavaScriptItemProcessor.of(polyglotEngine),
-                        ScriptPythonItemProcessor.of(polyglotEngine),
-                        ScriptRubyItemProcessor.of(polyglotEngine)));
+                        ScriptPythonItemProcessor.of(polyglotEngine)));
+//                        ScriptRubyItemProcessor.of(polyglotEngine)));
         }
     }
 }

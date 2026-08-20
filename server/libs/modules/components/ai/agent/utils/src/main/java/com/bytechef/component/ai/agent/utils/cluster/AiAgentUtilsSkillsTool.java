@@ -74,7 +74,12 @@ public class AiAgentUtilsSkillsTool implements AiAgentUtilsClusterElementContrib
     private static final Map<String, String> EXTENSION_TO_LANGUAGE_ID = Map.of(
         "js", "js",
         "py", "python",
-        "rb", "ruby",
+        // RUBY-DISABLED: a skill archive's .rb script would be registered as a tool and then fail at
+        // execution — org.graalvm.polyglot:ruby is stuck at 25.0.0 and crashes on the pinned Truffle 25.2.4,
+        // and the dependency is commented out, so the "ruby" language is not installed. With the mapping gone
+        // the script is skipped with an "Unsupported script extension" warning instead. Re-enable once a
+        // polyglot ruby jar built on Truffle 25.2+ ships (or GraalVM is downgraded). Grep RUBY-DISABLED.
+//        "rb", "ruby",
         "r", "R",
         "java", "java");
     private static final Pattern FRONTMATTER_NAME_PATTERN = Pattern.compile(

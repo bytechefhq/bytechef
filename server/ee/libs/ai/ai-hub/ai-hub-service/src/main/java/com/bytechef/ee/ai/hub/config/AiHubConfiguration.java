@@ -187,6 +187,16 @@ public class AiHubConfiguration {
     private final Resource promptAiHubBuildResource;
     private final State state = new State();
 
+    // RUBY-DISABLED: the prompt resources loaded below had every Ruby reference DELETED, not commented out.
+    // getSystemPrompt() reads them with a verbatim readAllBytes and filters nothing but the RESEARCH_SECTION
+    // markers, so the rest of the file becomes the system message as-is — a commented-out Ruby line would still
+    // be read by the model as content and it would keep offering a language that org.graalvm.polyglot:ruby
+    // (stuck at 25.0.0, crashes on the pinned Truffle 25.2.4) can no longer run. The marker therefore lives
+    // here, in code the model never sees.
+    // Affected: prompt_ai_hub_build.txt and prompt_ai_hub_ask.txt — the buildCodeWorkflow and writeScript router
+    // entries, which named Ruby as an authoring language. These mirror the subagent DESCRIPTION constants in
+    // CodeWorkflowAgentToolCallback and CodeEditorAgentToolCallback; restore both together once a polyglot ruby jar
+    // built on Truffle 25.2+ is published (or GraalVM is downgraded). Grep RUBY-DISABLED.
     @SuppressFBWarnings("EI")
     public AiHubConfiguration(
         @Value("classpath:prompt_ai_hub_ask.txt") Resource promptAiHubAskResource,
