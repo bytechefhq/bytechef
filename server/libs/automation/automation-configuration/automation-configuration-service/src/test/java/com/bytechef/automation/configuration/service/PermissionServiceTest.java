@@ -19,6 +19,7 @@ package com.bytechef.automation.configuration.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
+import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.service.ResourceVisibilityResolver.VisibilityRecord;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.user.service.UserService;
@@ -37,8 +38,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
  */
 class PermissionServiceTest {
 
-    private final PermissionService permissionService =
-        new PermissionServiceImpl(mock(UserService.class), List.of(), List.of(), permissiveResolver());
+    // The 'Project' ownership resolver is registered here, as production does, because the project-keyed checks route
+    // through hasResourceScope. Without it every such check would fail closed on the missing resolver, which would
+    // make the deny-unauthenticated assertions below pass for a reason that has nothing to do with authentication.
+    private final PermissionService permissionService = new PermissionServiceImpl(
+        mock(UserService.class), List.of(projectOwnershipResolver()), List.of(), permissiveResolver());
 
     @BeforeEach
     void setUp() {
@@ -77,6 +81,16 @@ class PermissionServiceTest {
         assertThat(permissionService.hasWorkspaceScopeForProject(1L, "WORKFLOW_VIEW")).isTrue();
         assertThat(permissionService.hasWorkspaceScopeForProject(1L, "PROJECT_DELETE")).isTrue();
         assertThat(permissionService.hasWorkspaceScopeForProject(1L, "ANY_UNRECOGNIZED_SCOPE")).isTrue();
+    }
+
+    @Test
+    void testHasWorkspaceScopeForProjectFailsClosedForUnresolvableProject() {
+        // A project that resolves to nothing — modelled here by registering no 'Project' resolver at all. Routing the
+        // project-keyed check through hasResourceScope tightened this case from permissive to denied.
+        PermissionService resolverLessPermissionService =
+            new PermissionServiceImpl(mock(UserService.class), List.of(), List.of(), permissiveResolver());
+
+        assertThat(resolverLessPermissionService.hasWorkspaceScopeForProject(1L, "WORKFLOW_VIEW")).isFalse();
     }
 
     @Test
@@ -129,6 +143,24 @@ class PermissionServiceTest {
     @Test
     void testEvictAllWorkspaceScopeCacheIsNoOp() {
         permissionService.evictAllWorkspaceScopeCache();
+    }
+
+    /**
+     * Mirrors production's {@code ProjectOwnershipResolver}: a project is owned by a workspace and carries no owner
+     * user, which is what makes CE permissive for it.
+     */
+    private static ResourceOwnershipResolver projectOwnershipResolver() {
+        return new ResourceOwnershipResolver() {
+            @Override
+            public String resourceType() {
+                return "Project";
+            }
+
+            @Override
+            public ResourceOwner resolveOwner(long id) {
+                return ResourceOwner.ofWorkspace(42L);
+            }
+        };
     }
 
     /**

@@ -52,10 +52,17 @@ public class CustomProjectDeploymentRepositoryImpl implements CustomProjectDeplo
         if (embedded != null) {
             query += "WHERE ";
 
+            // Escaped via SystemProjects rather than spliced literally: the marker's own underscores are LIKE
+            // single-character wildcards, so the unescaped '__EMBEDDED__%' this used to emit also matched any name
+            // of the form <2 chars>EMBEDDED<2 chars>... -- '__EMBEDDED_AUTOMATION__x' and an ordinary user project
+            // called 'MyEMBEDDEDxyz' alike. The former merely double-covered a row SystemProjects already hides;
+            // the latter silently vanished from every non-embedded deployment listing.
             if (embedded) {
-                query += "project.name LIKE '__EMBEDDED__%' ";
+                query += SystemProjects.likeCondition(
+                    "project.name", SystemProjects.EMBEDDED_DEPLOYMENT_NAME_PREFIX);
             } else {
-                query += "project.name NOT LIKE '__EMBEDDED__%' ";
+                query += SystemProjects.notLikeCondition(
+                    "project.name", SystemProjects.EMBEDDED_DEPLOYMENT_NAME_PREFIX);
             }
         }
 

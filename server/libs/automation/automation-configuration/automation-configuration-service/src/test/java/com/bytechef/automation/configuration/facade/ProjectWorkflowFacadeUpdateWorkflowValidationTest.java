@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
+import com.bytechef.automation.configuration.security.ProjectVisibilityFilter;
 import com.bytechef.automation.configuration.service.PreBuiltTemplateService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
@@ -91,6 +92,9 @@ class ProjectWorkflowFacadeUpdateWorkflowValidationTest {
     private ProjectService projectService;
 
     @Mock
+    private ProjectVisibilityFilter projectVisibilityFilter;
+
+    @Mock
     private ProjectWorkflowService projectWorkflowService;
 
     @Mock
@@ -121,7 +125,8 @@ class ProjectWorkflowFacadeUpdateWorkflowValidationTest {
         projectWorkflowFacade = new ProjectWorkflowFacadeImpl(
             componentDefinitionHelper, preBuiltTemplateService, applicationProperties, environmentService,
             errorWorkflowConfigurationValidator, projectDeploymentService, projectDeploymentWorkflowService,
-            projectService, projectWorkflowService, sharedTemplateFileStorage, sharedTemplateService,
+            projectService, projectVisibilityFilter, projectWorkflowService, sharedTemplateFileStorage,
+            sharedTemplateService,
             workflowCacheManager, workflowFacade, List.of(), workflowService, workflowTestConfigurationService,
             flatDuplicateNameAwareFacade());
     }

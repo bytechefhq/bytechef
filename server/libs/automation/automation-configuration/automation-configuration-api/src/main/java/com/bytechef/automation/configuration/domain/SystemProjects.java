@@ -66,6 +66,14 @@ public final class SystemProjects {
     public static final String AI_AGENT_NAME_PREFIX = "__AI_AGENT__";
 
     /**
+     * The deployment-era marker the embedded bridge writes into {@code project.name}. Distinct from
+     * {@link #EMBEDDED_AUTOMATION_NAME_PREFIX} and deliberately NOT part of {@link #NAME_PREFIXES} — list surfaces
+     * include or exclude it explicitly via the {@code embedded} flag rather than hiding it unconditionally. Mirrors the
+     * {@code MARKER} constant in embedded-configuration-service's connected-user facades.
+     */
+    public static final String EMBEDDED_DEPLOYMENT_NAME_PREFIX = "__EMBEDDED__";
+
+    /**
      * Marks a {@code project_deployment.name}, not a project name — set by the API Platform's ApiCollectionFacadeImpl
      * when it deploys the hidden project backing an API collection.
      */
@@ -134,7 +142,23 @@ public final class SystemProjects {
      * {@code prefix}, escaping the {@code _} LIKE wildcard characters the prefix contains.
      */
     public static String notLikePredicate(String columnRef, String prefix) {
-        return "AND %s NOT LIKE '%s%%' ESCAPE '%s' ".formatted(columnRef, escapeLikeWildcards(prefix), LIKE_ESCAPE);
+        return "AND " + notLikeCondition(columnRef, prefix);
+    }
+
+    /**
+     * The bare {@code columnRef NOT LIKE '...' ESCAPE '\'} condition, without a leading {@code AND}, for callers
+     * splicing it straight after a {@code WHERE}.
+     */
+    public static String notLikeCondition(String columnRef, String prefix) {
+        return "%s NOT LIKE '%s%%' ESCAPE '%s' ".formatted(columnRef, escapeLikeWildcards(prefix), LIKE_ESCAPE);
+    }
+
+    /**
+     * Positive twin of {@link #notLikeCondition}: {@code columnRef LIKE '...' ESCAPE '\'}, for a caller selecting
+     * <em>only</em> the marked rows.
+     */
+    public static String likeCondition(String columnRef, String prefix) {
+        return "%s LIKE '%s%%' ESCAPE '%s' ".formatted(columnRef, escapeLikeWildcards(prefix), LIKE_ESCAPE);
     }
 
     private static String escapeLikeWildcards(String value) {

@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,14 +60,27 @@ public class AutomationSearchFacadeImpl implements AutomationSearchFacade {
 
         String currentTenantId = TenantContext.getCurrentTenantId();
 
-        // Resolve the caller's accessible workspaces in this (authenticated) thread; the provider fan-out runs on a
-        // pool that does not carry the SecurityContext.
+        // Captured here and re-established inside every pooled task, exactly like the tenant id above: the fan-out
+        // runs on the common ForkJoinPool, which inherits neither. A provider that resolves resource visibility
+        // reads the current principal, and SecurityUtils.getCurrentUserLogin() throws when there is none — so
+        // without this the whole search fails rather than degrading.
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        // Resolved once here rather than per provider — the answer is the same for every one of them.
         Set<Long> accessibleWorkspaceIds = getAccessibleWorkspaceIds();
 
         for (SearchAssetProvider provider : providers) {
-            CompletableFuture<List<SearchResult<?>>> future = CompletableFuture.supplyAsync(
-                () -> (List<SearchResult<?>>) TenantContext.callWithTenantId(currentTenantId,
-                    () -> provider.search(query, limit)));
+            CompletableFuture<List<SearchResult<?>>> future = CompletableFuture.supplyAsync(() -> {
+                SecurityContextHolder.setContext(securityContext);
+
+                try {
+                    return (List<SearchResult<?>>) TenantContext.callWithTenantId(
+                        currentTenantId, () -> provider.search(query, limit));
+                } finally {
+                    // Pooled threads outlive the request, so the principal must not be left behind on one.
+                    SecurityContextHolder.clearContext();
+                }
+            });
 
             futures.add(future);
         }

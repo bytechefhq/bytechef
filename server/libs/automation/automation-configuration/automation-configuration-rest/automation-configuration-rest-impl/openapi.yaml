@@ -1250,9 +1250,9 @@ components:
               type: integer
               format: int64
             visibility:
-              description: "The visibility scope of the connection. Accepted on create:\
-                \ PRIVATE (default) or WORKSPACE — setting WORKSPACE requires ROLE_ADMIN.\
-                \ ORGANIZATION is not user-settable."
+              description: "The visibility scope of the connection. Accepted on create;\
+                \ defaults to WORKSPACE (shared with the workspace). PRIVATE withholds\
+                \ it; ORGANIZATION is not user-settable here."
               type: "string"
               enum:
                 - "PRIVATE"
@@ -1342,6 +1342,15 @@ components:
         uuid:
           description: "The uuid of a project."
           type: "string"
+        visibility:
+          description: "The visibility scope of the project: WORKSPACE (default, shared\
+            \ with every member of the owning workspace) or PRIVATE (owner plus named\
+            \ grantees, EE). Accepted on create; changed afterwards via the setProjectVisibility\
+            \ GraphQL mutation. CE always persists WORKSPACE."
+          type: "string"
+          enum:
+            - "PRIVATE"
+            - "WORKSPACE"
     ProjectDeployment:
       description: "Contains configurations and connections required for the execution\
         \ of project workflows."

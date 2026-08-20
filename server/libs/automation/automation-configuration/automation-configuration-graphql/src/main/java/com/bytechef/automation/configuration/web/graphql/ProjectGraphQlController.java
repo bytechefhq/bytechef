@@ -18,11 +18,9 @@ package com.bytechef.automation.configuration.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.configuration.domain.Project;
-import com.bytechef.automation.configuration.domain.SystemProjects;
 import com.bytechef.automation.configuration.dto.ProjectTemplateDTO;
 import com.bytechef.automation.configuration.dto.SharedProjectDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
-import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.graphql.error.GraphQlBadRequestException;
 import com.bytechef.platform.category.domain.Category;
@@ -50,17 +48,14 @@ public class ProjectGraphQlController {
 
     private final CategoryService categoryService;
     private final ProjectFacade projectFacade;
-    private final ProjectService projectService;
     private final TagService tagService;
 
     @SuppressFBWarnings("EI")
     public ProjectGraphQlController(
-        CategoryService categoryService, ProjectFacade projectFacade, ProjectService projectService,
-        TagService tagService) {
+        CategoryService categoryService, ProjectFacade projectFacade, TagService tagService) {
 
         this.categoryService = categoryService;
         this.projectFacade = projectFacade;
-        this.projectService = projectService;
         this.tagService = tagService;
     }
 
@@ -115,17 +110,38 @@ public class ProjectGraphQlController {
         return true;
     }
 
+    /**
+     * The project behind the {@code project} query.
+     *
+     * <p>
+     * Authorization lives on {@link ProjectFacade#getProjectRow(long)}, which carries
+     * {@code hasPermission(#id, 'Project', 'WORKFLOW_VIEW')} — the same visibility-preconditioned scope check this
+     * method used to run in its own body, for want of a facade method returning the entity the {@code Project} field
+     * resolvers need.
+     */
     @QueryMapping(name = "project")
     public Project project(@Argument long id) {
-        return projectService.getProject(id);
+        return projectFacade.getProjectRow(id);
     }
 
+    /**
+     * Every project the caller may open, and no more.
+     *
+     * <p>
+     * Narrowing lives on {@link ProjectFacade#getProjectRows()}, which keeps the caller to the workspaces they hold
+     * {@code WORKFLOW_VIEW} in and then filters through {@code ProjectVisibilityFilter} in one batched call — the two
+     * halves {@code hasResourceScope(id, 'Project', scope)} composes for a project. Until that seam existed this method
+     * assembled the listing itself out of {@code ProjectService} and {@code PermissionService}, past the facade layer
+     * that owns authorization.
+     *
+     * <p>
+     * There is no {@code @PreAuthorize} on that facade method to inherit, and there should not be — a tenant-wide
+     * listing has no id to gate on, so it is filtered rather than guarded. The surface audit exempts both ends saying
+     * exactly that, rather than pointing at an annotation that would overstate what it does.
+     */
     @QueryMapping(name = "projects")
     public List<Project> projects() {
-        return projectService.getProjects()
-            .stream()
-            .filter(project -> !SystemProjects.isSystemProject(project))
-            .toList();
+        return projectFacade.getProjectRows();
     }
 
     @QueryMapping(name = "sharedProject")

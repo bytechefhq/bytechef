@@ -30,7 +30,7 @@ import org.jspecify.annotations.Nullable;
  * <p>
  * {@code ProjectDeploymentService.getProjectDeployments(long)} (and every other projectId-scoped listing path) filters
  * out {@code __AI_AGENT__} projects (see {@code SystemProjects}), so this DTO is assembled by
- * {@code AiAgentFacade#getAgentDeployments(Long)} from the unfiltered {@code fetchProjectDeployment(projectId,
+ * {@code AiAgentFacade#getAgentDeployments(long)} from the unfiltered {@code fetchProjectDeployment(projectId,
  * Environment)} lookup instead — the same mechanism {@code AiAgentFacadeImpl.hasAnyDeployment} already relies on.
  * </p>
  *

@@ -46,6 +46,7 @@ import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.repository.CategoryRepository;
 import com.bytechef.platform.file.storage.SharedTemplateFileStorage;
 import com.bytechef.platform.githubproxy.client.model.FileItem;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -70,6 +71,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
@@ -83,6 +85,10 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     })
 @Import(PostgreSQLContainerConfiguration.class)
 @ProjectIntTestConfigurationSharedMocks
+// The project list surfaces resolve visibility against the current principal, so they need one — the same treatment
+// WorkspaceConnectionFacadeIntTest already gets. In production every one of them is @PreAuthorize-gated, and those
+// gates deny an unauthenticated caller long before the resolver is reached.
+@WithMockUser(username = "admin@localhost.com", authorities = AuthorityConstants.ADMIN)
 public class ProjectFacadeIntTest {
 
     @Autowired

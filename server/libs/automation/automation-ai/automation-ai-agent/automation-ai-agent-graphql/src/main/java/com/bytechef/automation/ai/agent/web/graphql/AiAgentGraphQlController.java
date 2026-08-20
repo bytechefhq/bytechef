@@ -93,7 +93,7 @@ public class AiAgentGraphQlController {
     /**
      * Backs the AiAgent Deployments page. Every projectId-scoped {@code ProjectDeploymentService} listing path
      * (including {@code getProjectDeployments(long)}) excludes {@code __AI_AGENT__} projects, so this query does not
-     * reuse {@code workspaceProjectDeployments} — it delegates to {@link AiAgentFacade#getAgentDeployments(Long)},
+     * reuse {@code workspaceProjectDeployments} — it delegates to {@link AiAgentFacade#getAgentDeployments(long)},
      * which assembles the list from the unfiltered per-environment lookup instead. See that method's javadoc.
      */
     @QueryMapping
@@ -108,9 +108,15 @@ public class AiAgentGraphQlController {
      * hidden {@code __AI_AGENT__} projects that every projectId-scoped {@code ProjectDeploymentService} listing path
      * filters out. Rows carry a {@code workflowExecutionId} built exactly the way that query builds it, so the client
      * opens both kinds of chat through one code path.
+     *
+     * <p>
+     * Authorization lives on {@link AiAgentFacade#getWorkspaceChatAgents(long, long)}, which carries
+     * {@code hasPermission(#workspaceId, 'Workspace', 'WORKFLOW_VIEW')} &mdash; the same gate its sibling carries, on
+     * the facade rather than here, because the API facade is this codebase's authorization layer. The
+     * {@code isAuthenticated()} this method used to carry is subsumed by it: {@code hasPermission} fails closed for an
+     * anonymous caller.
      */
     @QueryMapping
-    @PreAuthorize("isAuthenticated()")
     public List<ChatAgentDTO> workspaceChatAgents(@Argument long workspaceId, @Argument long environmentId) {
         return agentFacade.getWorkspaceChatAgents(workspaceId, environmentId);
     }

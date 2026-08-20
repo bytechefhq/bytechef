@@ -58,6 +58,18 @@ class ProjectWorkflowFacadeAuthorizationTest {
             String.class);
     }
 
+    /**
+     * The editor's primary read path. {@code 'ProjectWorkflow'} rather than {@code 'Workflow'} because the argument is
+     * the project-workflow row id, not the workflow uuid; the behavioural half — that the denial comes from the owning
+     * project's reach — is in {@code ProjectWorkflowFacadeVisibilityTest}.
+     */
+    @Test
+    void testGetProjectWorkflowByProjectWorkflowIdRequiresWorkflowView() {
+        assertExpression(
+            "getProjectWorkflow", "hasPermission(#projectWorkflowId, 'ProjectWorkflow', 'WORKFLOW_VIEW')",
+            long.class);
+    }
+
     @Test
     void testGetProjectWorkflowsByProjectIdRequiresWorkflowView() {
         assertExpression("getProjectWorkflows", "hasPermission(#projectId, 'Project', 'WORKFLOW_VIEW')",

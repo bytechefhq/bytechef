@@ -19,8 +19,7 @@ package com.bytechef.automation.configuration.web.graphql;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
-import com.bytechef.automation.configuration.domain.SystemProjects;
-import com.bytechef.automation.configuration.service.ProjectDeploymentService;
+import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -31,7 +30,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -47,17 +45,17 @@ import org.springframework.stereotype.Controller;
 public class ProjectDeploymentGraphQlController {
 
     private final EnvironmentService environmentService;
-    private final ProjectDeploymentService projectDeploymentService;
+    private final ProjectDeploymentFacade projectDeploymentFacade;
     private final ProjectService projectService;
     private final TagService tagService;
 
     @SuppressFBWarnings("EI")
     public ProjectDeploymentGraphQlController(
-        EnvironmentService environmentService, ProjectDeploymentService projectDeploymentService,
+        EnvironmentService environmentService, ProjectDeploymentFacade projectDeploymentFacade,
         ProjectService projectService, TagService tagService) {
 
         this.environmentService = environmentService;
-        this.projectDeploymentService = projectDeploymentService;
+        this.projectDeploymentFacade = projectDeploymentFacade;
         this.projectService = projectService;
         this.tagService = tagService;
     }
@@ -110,30 +108,30 @@ public class ProjectDeploymentGraphQlController {
                         .toList()));
     }
 
+    /**
+     * Every deployment in the workspace the caller may see.
+     *
+     * <p>
+     * Authorization lives on {@link ProjectDeploymentFacade#getWorkspaceProjectDeployments(long, long, Long, Long)},
+     * which carries {@code hasPermission(#workspaceId, 'Workspace', 'DEPLOYMENT_VIEW')} and drops both the
+     * feature-owned system projects and the projects the caller cannot see — the same gate and the same two filters the
+     * REST twin has always applied to the identical set. Until that seam existed this method read the rows off
+     * {@code ProjectDeploymentService} directly, past the facade, which is how it came to have neither.
+     *
+     * <p>
+     * {@code workspaceId} and {@code environmentId} are primitive and {@code projectId} and {@code tagId} are not,
+     * matching the schema exactly: the first two are {@code ID!} and the last two are nullable filters. The distinction
+     * is load-bearing for {@code workspaceId} in the sense {@code AiAgentFacadeAuthorizationTest} spells out —
+     * {@code #workspaceId} is only a usable gate key while it cannot be null, since a boxed null would reach
+     * {@code AutomationPermissionEvaluator} as a null target id. Declaring it primitive is what makes a later
+     * relaxation of the schema fail here, at binding, instead of downstream as an unboxing NPE with the gate already
+     * behind it.
+     */
     @QueryMapping(name = "workspaceProjectDeployments")
     public List<ProjectDeployment> workspaceProjectDeployments(
-        @Argument Long workspaceId, @Argument Long environmentId, @Argument Long projectId, @Argument Long tagId) {
+        @Argument long workspaceId, @Argument long environmentId, @Argument Long projectId, @Argument Long tagId) {
 
-        Environment environment = environmentService.getEnvironment(environmentId);
-
-        List<ProjectDeployment> projectDeployments = projectDeploymentService.getProjectDeployments(
-            false, environment, projectId, tagId, workspaceId);
-
-        // Deployments of feature-owned system projects are not the user's to see — see SystemProjects.
-        Set<Long> systemProjectIds = projectService
-            .getProjects(
-                projectDeployments.stream()
-                    .map(ProjectDeployment::getProjectId)
-                    .distinct()
-                    .toList())
-            .stream()
-            .filter(SystemProjects::isSystemProject)
-            .map(Project::getId)
-            .collect(Collectors.toSet());
-
-        return projectDeployments.stream()
-            .filter(projectDeployment -> !systemProjectIds.contains(projectDeployment.getProjectId()))
-            .toList();
+        return projectDeploymentFacade.getWorkspaceProjectDeployments(workspaceId, environmentId, projectId, tagId);
     }
 
     public record EnvironmentDTO(long id, String name) {

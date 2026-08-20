@@ -103,7 +103,7 @@ public class ProjectApiController implements ProjectApi {
     @Override
     public ResponseEntity<List<ProjectVersionModel>> getProjectVersions(Long id) {
         return ResponseEntity.ok(
-            projectService.getProjectVersions(id)
+            projectFacade.getProjectVersions(id)
                 .stream()
                 .map(projectVersion -> conversionService.convert(projectVersion, ProjectVersionModel.class))
                 .toList());

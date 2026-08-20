@@ -20,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 
 import com.bytechef.automation.configuration.facade.ProjectFacade;
-import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.graphql.error.GraphQlBadRequestException;
 import com.bytechef.platform.category.service.CategoryService;
 import com.bytechef.platform.tag.service.TagService;
@@ -46,9 +45,6 @@ class ProjectGraphQlControllerErrorWorkflowTest {
 
     @Mock
     private ProjectFacade projectFacade;
-
-    @Mock
-    private ProjectService projectService;
 
     @Mock
     private TagService tagService;

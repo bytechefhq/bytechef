@@ -36,5 +36,22 @@ public enum ProjectAuditEvent {
     /**
      * A project was deleted. Payload: {@code projectId} identifies the now-removed row.
      */
-    PROJECT_DELETED
+    PROJECT_DELETED,
+
+    /**
+     * The project's reach changed. Payload: {@code projectId}, {@code toVisibility} (the new {@code ResourceVisibility}
+     * name).
+     */
+    PROJECT_VISIBILITY_CHANGED,
+
+    /**
+     * A named workspace member was granted access to a withheld project. Payload: {@code projectId},
+     * {@code targetUserId}.
+     */
+    PROJECT_ACCESS_GRANTED,
+
+    /**
+     * A grant was revoked. Payload: {@code projectId}, {@code targetUserId}.
+     */
+    PROJECT_ACCESS_REVOKED
 }

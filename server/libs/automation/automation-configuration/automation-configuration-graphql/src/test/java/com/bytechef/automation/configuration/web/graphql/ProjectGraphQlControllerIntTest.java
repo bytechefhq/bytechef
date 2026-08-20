@@ -27,7 +27,6 @@ import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.dto.ProjectTemplateDTO;
 import com.bytechef.automation.configuration.dto.SharedProjectDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
-import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.web.graphql.config.AutomationConfigurationGraphQlConfigurationSharedMocks;
 import com.bytechef.automation.configuration.web.graphql.config.AutomationConfigurationGraphQlTestConfiguration;
 import com.bytechef.platform.category.domain.Category;
@@ -68,9 +67,6 @@ public class ProjectGraphQlControllerIntTest {
     private ProjectFacade projectFacade;
 
     @Autowired
-    private ProjectService projectService;
-
-    @Autowired
     private TagService tagService;
 
     @Test
@@ -80,7 +76,7 @@ public class ProjectGraphQlControllerIntTest {
         mockProject.setCategoryId(10L);
         Category mockCategory = createMockCategory(10L, "Test Category");
 
-        when(projectService.getProject(1L)).thenReturn(mockProject);
+        when(projectFacade.getProjectRow(1L)).thenReturn(mockProject);
         when(categoryService.getCategory(10L)).thenReturn(mockCategory);
 
         // When & Then
@@ -143,7 +139,7 @@ public class ProjectGraphQlControllerIntTest {
     void testGetProjectById() {
         // Given
         Project mockProject = createMockProject(1051L, "Effective Java");
-        when(projectService.getProject(1051L)).thenReturn(mockProject);
+        when(projectFacade.getProjectRow(1051L)).thenReturn(mockProject);
 
         // When & Then
         this.graphQlTester
@@ -165,7 +161,7 @@ public class ProjectGraphQlControllerIntTest {
         List<Project> mockProjects = List.of(
             createMockProject(1L, "Project 1"),
             createMockProject(2L, "Project 2"));
-        when(projectService.getProjects()).thenReturn(mockProjects);
+        when(projectFacade.getProjectRows()).thenReturn(mockProjects);
 
         // When & Then
         this.graphQlTester
@@ -319,7 +315,7 @@ public class ProjectGraphQlControllerIntTest {
             createMockTag(2L, "Tag 2"),
             createMockTag(3L, "Tag 3"));
 
-        when(projectService.getProjects()).thenReturn(mockProjects);
+        when(projectFacade.getProjectRows()).thenReturn(mockProjects);
         when(tagService.getTags(any())).thenReturn(mockTags);
 
         // When & Then

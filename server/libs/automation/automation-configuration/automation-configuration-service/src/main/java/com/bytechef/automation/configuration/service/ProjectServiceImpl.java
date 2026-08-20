@@ -21,10 +21,15 @@ import com.bytechef.automation.configuration.audit.ProjectAuditPublisher;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
+import com.bytechef.automation.configuration.exception.ProjectErrorType;
 import com.bytechef.automation.configuration.listener.ProjectGitSyncEventListener;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
+import com.bytechef.automation.configuration.security.ProjectVisibilityFilter;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.exception.ConfigurationException;
+import com.bytechef.platform.security.domain.ResourceVisibility;
+import com.bytechef.platform.security.domain.ResourceVisibilityPolicyRegistry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -48,15 +53,17 @@ public class ProjectServiceImpl implements ProjectService {
     private final ApplicationContext applicationContext;
     private final ProjectAuditPublisher projectAuditPublisher;
     private final ProjectRepository projectRepository;
+    private final ResourceVisibilityPolicyRegistry resourceVisibilityPolicyRegistry;
 
     @SuppressFBWarnings("EI")
     public ProjectServiceImpl(
         ApplicationContext applicationContext, ProjectAuditPublisher projectAuditPublisher,
-        ProjectRepository projectRepository) {
+        ProjectRepository projectRepository, ResourceVisibilityPolicyRegistry resourceVisibilityPolicyRegistry) {
 
         this.applicationContext = applicationContext;
         this.projectAuditPublisher = projectAuditPublisher;
         this.projectRepository = projectRepository;
+        this.resourceVisibilityPolicyRegistry = resourceVisibilityPolicyRegistry;
     }
 
     @Override
@@ -83,6 +90,12 @@ public class ProjectServiceImpl implements ProjectService {
         projectRepository.deleteById(id);
 
         projectAuditPublisher.publish(ProjectAuditEvent.PROJECT_DELETED, id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Project> fetchProject(long id) {
+        return projectRepository.findById(id);
     }
 
     @Override
@@ -246,6 +259,32 @@ public class ProjectServiceImpl implements ProjectService {
 
         project.setPermissionExpression(permissionExpression);
 
+        return projectRepository.save(project);
+    }
+
+    /**
+     * Rejects a rung the project model does not support, so the guarantee does not rest on caller discipline. The
+     * sharing facade checks the same thing first and keeps owning the error a caller sees — this is the backstop for a
+     * second caller that forgets to, and it throws the identical typed error so the two are indistinguishable to a
+     * client. An unsupported rung persisted here would be loud in the worst way: {@code ProjectMapper} and the EE
+     * {@code ApiCollectionMapper} map {@code ORGANIZATION} to {@code THROW_EXCEPTION}, so a bad row makes every
+     * subsequent READ of the project throw.
+     */
+    @Override
+    public Project updateVisibility(long id, ResourceVisibility visibility) {
+        if (!resourceVisibilityPolicyRegistry.supports(ProjectVisibilityFilter.PROJECT, visibility)) {
+            throw new ConfigurationException(
+                "Project does not support %s visibility".formatted(visibility),
+                ProjectErrorType.UNSUPPORTED_VISIBILITY);
+        }
+
+        Project project = getProject(id);
+
+        project.setVisibility(visibility);
+
+        // Deliberately no audit here: the sharing facade emits PROJECT_VISIBILITY_CHANGED for this write. Emitting a
+        // generic PROJECT_UPDATED as well would log one change twice under two event types, and a reader could not
+        // tell that from two changes.
         return projectRepository.save(project);
     }
 }

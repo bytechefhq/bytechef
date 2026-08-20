@@ -16,15 +16,21 @@
 
 package com.bytechef.automation.configuration.security;
 
-import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
+import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.OptionalLong;
 import org.springframework.stereotype.Component;
 
 /**
- * Maps a project id to its owning workspace ({@code project.workspace_id}) for the {@code 'Project'} token. Reads the
- * repository directly (not the {@code @PreAuthorize}-guarded facade) to avoid recursion. Returns no {@code ownerUserId}
- * so CE treats projects as shared (permissive). Fails closed when the project cannot be resolved.
+ * Maps a project id to its owning workspace ({@code project.workspace_id}) and, via {@code created_by}, its owner user
+ * id (needed by {@code isResourceOwner('Project', …)} on the sharing facade). Reads the repository directly (not the
+ * {@code @PreAuthorize}-guarded facade) to avoid recursion. Fails closed when the project cannot be resolved.
+ *
+ * <p>
+ * CE {@code hasResourceScope} does not owner-isolate projects because {@link ProjectVisibilityProvider} is registered —
+ * visibility decides instead; the two must be registered together. Returning an owner here without that provider would
+ * hide every project from everyone but its creator.
  *
  * @author Ivica Cardic
  */
@@ -32,10 +38,12 @@ import org.springframework.stereotype.Component;
 public class ProjectOwnershipResolver implements ResourceOwnershipResolver {
 
     private final ProjectRepository projectRepository;
+    private final UserService userService;
 
     @SuppressFBWarnings("EI")
-    public ProjectOwnershipResolver(ProjectRepository projectRepository) {
+    public ProjectOwnershipResolver(ProjectRepository projectRepository, UserService userService) {
         this.projectRepository = projectRepository;
+        this.userService = userService;
     }
 
     @Override
@@ -46,8 +54,29 @@ public class ProjectOwnershipResolver implements ResourceOwnershipResolver {
     @Override
     public ResourceOwner resolveOwner(long id) {
         return projectRepository.findById(id)
-            .map(Project::getWorkspaceId)
-            .map(ResourceOwner::ofWorkspace)
+            .map(project -> ResourceOwner.of(
+                toOptionalLong(project.getWorkspaceId()), resolveOwnerUserId(project.getCreatedBy())))
             .orElseGet(ResourceOwner::unknown);
+    }
+
+    /**
+     * Resolved on every call, not only for a project the caller cannot already see: an owner must be able to change the
+     * visibility of a project that is currently WORKSPACE-visible, so {@code isResourceOwner('Project', …)} needs this
+     * regardless of reach. The lookup is a third query on the authorization path, but a cached one —
+     * {@code UserRepository.findByLogin} is {@code @Cacheable(USERS_BY_LOGIN_CACHE)} and tenant-keyed, evicted by
+     * {@code UserServiceImpl} on every user mutation.
+     */
+    private OptionalLong resolveOwnerUserId(String createdBy) {
+        if (createdBy == null) {
+            return OptionalLong.empty();
+        }
+
+        return userService.fetchUserByLogin(createdBy)
+            .map(user -> toOptionalLong(user.getId()))
+            .orElseGet(OptionalLong::empty);
+    }
+
+    private static OptionalLong toOptionalLong(Long value) {
+        return value == null ? OptionalLong.empty() : OptionalLong.of(value);
     }
 }

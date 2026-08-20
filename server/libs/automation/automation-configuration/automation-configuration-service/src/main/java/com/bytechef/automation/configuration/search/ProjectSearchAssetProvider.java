@@ -16,7 +16,9 @@
 
 package com.bytechef.automation.configuration.search;
 
+import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.SystemProjects;
+import com.bytechef.automation.configuration.security.ProjectVisibilityFilter;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.search.SearchAssetProvider;
 import com.bytechef.automation.search.SearchAssetType;
@@ -31,18 +33,24 @@ import org.springframework.stereotype.Component;
 class ProjectSearchAssetProvider implements SearchAssetProvider {
 
     private final ProjectService projectService;
+    private final ProjectVisibilityFilter projectVisibilityFilter;
 
-    ProjectSearchAssetProvider(ProjectService projectService) {
+    ProjectSearchAssetProvider(ProjectService projectService, ProjectVisibilityFilter projectVisibilityFilter) {
         this.projectService = projectService;
+        this.projectVisibilityFilter = projectVisibilityFilter;
     }
 
     @Override
     public List<ProjectSearchResult> search(String query, int limit) {
         String queryLower = query.toLowerCase(Locale.ROOT);
 
-        return projectService.getProjects(false, null, null, null, null, null)
-            .stream()
-            .filter(project -> !SystemProjects.isSystemProject(project))
+        List<Project> projects = projectVisibilityFilter.filterVisible(
+            projectService.getProjects(false, null, null, null, null, null)
+                .stream()
+                .filter(project -> !SystemProjects.isSystemProject(project))
+                .toList());
+
+        return projects.stream()
             .filter(
                 project -> containsIgnoreCase(project.getName(), queryLower) ||
                     containsIgnoreCase(project.getDescription(), queryLower))

@@ -19,6 +19,7 @@ type Project {
     category: Category
     tags: [Tag]
     errorProjectWorkflowId: ID
+    visibility: ResourceVisibility!
 }
 
 type ProjectTemplate {

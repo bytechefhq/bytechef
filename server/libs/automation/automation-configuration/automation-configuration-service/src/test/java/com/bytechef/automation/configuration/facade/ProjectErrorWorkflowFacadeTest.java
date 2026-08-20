@@ -16,16 +16,36 @@
 
 package com.bytechef.automation.configuration.facade;
 
+import static org.mockito.Mockito.mock;
+
+import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.automation.configuration.security.ProjectVisibilityFilter;
+import com.bytechef.automation.configuration.security.ProjectVisibilityPolicy;
+import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.automation.configuration.service.PreBuiltTemplateService;
+import com.bytechef.automation.configuration.service.ProjectCodeWorkflowInfoSupplier;
+import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.automation.configuration.service.SharedTemplateService;
+import com.bytechef.automation.configuration.util.ComponentDefinitionHelper;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.platform.category.service.CategoryService;
+import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
+import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.file.storage.SharedTemplateFileStorage;
+import com.bytechef.platform.security.domain.ResourceVisibilityPolicyRegistry;
+import com.bytechef.platform.tag.service.TagService;
+import java.util.List;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * @author Ivica Cardic
@@ -42,8 +62,31 @@ class ProjectErrorWorkflowFacadeTest {
     @Mock
     private ProjectService projectService;
 
-    @InjectMocks
     private ProjectFacadeImpl projectFacade;
+
+    /**
+     * Constructed explicitly rather than through {@code @InjectMocks}: the facade's first constructor parameter is the
+     * {@code bytechef.edition} string, which Mockito would supply as {@code null} and the constructor rightly rejects.
+     */
+    @BeforeEach
+    void setUp() {
+        @SuppressWarnings("unchecked")
+        ObjectProvider<ProjectCodeWorkflowInfoSupplier> projectCodeWorkflowInfoSupplierProvider =
+            mock(ObjectProvider.class);
+
+        projectFacade = new ProjectFacadeImpl(
+            "CE", applicationProperties, mock(CategoryService.class), mock(ComponentDefinitionHelper.class),
+            errorWorkflowConfigurationValidator, mock(PermissionService.class),
+            mock(PreBuiltTemplateService.class),
+            projectCodeWorkflowInfoSupplierProvider, mock(ProjectWorkflowService.class),
+            mock(ProjectDeploymentService.class),
+            projectService, mock(ProjectVisibilityFilter.class),
+            new ResourceVisibilityPolicyRegistry(List.of(new ProjectVisibilityPolicy())),
+            mock(ProjectDeploymentFacade.class), mock(ProjectWorkflowFacade.class),
+            mock(SharedTemplateFileStorage.class), mock(SharedTemplateService.class), mock(TagService.class),
+            mock(WorkflowService.class), mock(WorkflowTestConfigurationService.class),
+            mock(WorkflowNodeTestOutputService.class));
+    }
 
     @Test
     void testValidatesBeforeSaving() {

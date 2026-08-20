@@ -20,6 +20,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
+import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.domain.SharedTemplate;
@@ -31,6 +32,9 @@ import com.bytechef.automation.configuration.dto.ProjectTemplateDTO.WorkflowInfo
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.dto.SharedProjectDTO;
 import com.bytechef.automation.configuration.dto.WorkspaceProjectWorkflowDTO;
+import com.bytechef.automation.configuration.exception.ProjectErrorType;
+import com.bytechef.automation.configuration.security.ProjectVisibilityFilter;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.PreBuiltTemplateService;
 import com.bytechef.automation.configuration.service.ProjectCodeWorkflowInfoSupplier;
 import com.bytechef.automation.configuration.service.ProjectCodeWorkflowInfoSupplier.CodeWorkflowInfo;
@@ -44,12 +48,15 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.service.CategoryService;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.file.storage.SharedTemplateFileStorage;
+import com.bytechef.platform.security.domain.ResourceVisibility;
+import com.bytechef.platform.security.domain.ResourceVisibilityPolicyRegistry;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -77,6 +84,7 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -98,11 +106,15 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     private final CategoryService categoryService;
     private final ComponentDefinitionHelper componentDefinitionHelper;
+    private final boolean eeEdition;
     private final ErrorWorkflowConfigurationValidator errorWorkflowConfigurationValidator;
+    private final PermissionService permissionService;
     private final PreBuiltTemplateService preBuiltTemplateService;
     private final ObjectProvider<ProjectCodeWorkflowInfoSupplier> projectCodeWorkflowInfoSupplierProvider;
     private final ProjectService projectService;
+    private final ProjectVisibilityFilter projectVisibilityFilter;
     private final ProjectWorkflowService projectWorkflowService;
+    private final ResourceVisibilityPolicyRegistry resourceVisibilityPolicyRegistry;
     private final ProjectDeploymentFacade projectDeploymentFacade;
     private final ProjectDeploymentService projectDeploymentService;
     private final ProjectWorkflowFacade projectWorkflowFacade;
@@ -114,29 +126,40 @@ public class ProjectFacadeImpl implements ProjectFacade {
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
     private final WorkflowNodeTestOutputService workflowNodeTestOutputService;
 
-    @SuppressFBWarnings("EI2")
+    @SuppressFBWarnings({
+        "CT_CONSTRUCTOR_THROW", "EI2"
+    })
     public ProjectFacadeImpl(
+        @Value("${bytechef.edition:CE}") String edition,
         ApplicationProperties applicationProperties, CategoryService categoryService,
         ComponentDefinitionHelper componentDefinitionHelper,
         ErrorWorkflowConfigurationValidator errorWorkflowConfigurationValidator,
-        PreBuiltTemplateService preBuiltTemplateService,
+        PermissionService permissionService, PreBuiltTemplateService preBuiltTemplateService,
         ObjectProvider<ProjectCodeWorkflowInfoSupplier> projectCodeWorkflowInfoSupplierProvider,
         ProjectWorkflowService projectWorkflowService,
         ProjectDeploymentService projectDeploymentService, ProjectService projectService,
+        ProjectVisibilityFilter projectVisibilityFilter,
+        ResourceVisibilityPolicyRegistry resourceVisibilityPolicyRegistry,
         ProjectDeploymentFacade projectDeploymentFacade, ProjectWorkflowFacade projectWorkflowFacade,
         SharedTemplateFileStorage sharedTemplateFileStorage, SharedTemplateService sharedTemplateService,
         TagService tagService, WorkflowService workflowService,
         WorkflowTestConfigurationService workflowTestConfigurationService,
         WorkflowNodeTestOutputService workflowNodeTestOutputService) {
 
+        validateEdition(edition);
+
         this.categoryService = categoryService;
         this.componentDefinitionHelper = componentDefinitionHelper;
+        this.eeEdition = "EE".equalsIgnoreCase(edition);
         this.errorWorkflowConfigurationValidator = errorWorkflowConfigurationValidator;
+        this.permissionService = permissionService;
         this.preBuiltTemplateService = preBuiltTemplateService;
         this.projectCodeWorkflowInfoSupplierProvider = projectCodeWorkflowInfoSupplierProvider;
         this.projectWorkflowService = projectWorkflowService;
         this.projectDeploymentService = projectDeploymentService;
         this.projectService = projectService;
+        this.projectVisibilityFilter = projectVisibilityFilter;
+        this.resourceVisibilityPolicyRegistry = resourceVisibilityPolicyRegistry;
         this.projectDeploymentFacade = projectDeploymentFacade;
         this.projectWorkflowFacade = projectWorkflowFacade;
         this.publicUrl = applicationProperties.getPublicUrl();
@@ -152,6 +175,9 @@ public class ProjectFacadeImpl implements ProjectFacade {
     @PreAuthorize("hasPermission(#projectDTO.workspaceId, 'Workspace', 'PROJECT_CREATE')")
     public long createProject(ProjectDTO projectDTO) {
         Project project = projectDTO.toProject();
+
+        applyCreateVisibility(project, projectDTO.visibility());
+
         Category category = projectDTO.category();
 
         if (category != null) {
@@ -289,6 +315,27 @@ public class ProjectFacadeImpl implements ProjectFacade {
         return toProjectDTO(project);
     }
 
+    /**
+     * The domain-object read behind the GraphQL {@code project} query.
+     *
+     * <p>
+     * Carries the same gate as {@link #getProject(long)} above, because it discloses the same project: the visibility
+     * precondition plus the workspace scope, composed by {@code hasPermission(#id, 'Project', ...)}, so a
+     * {@code PRIVATE} project withheld from the caller answers the same way here as it does through the DTO read.
+     *
+     * <p>
+     * This method exists because {@code ProjectGraphQlController} used to run that check itself — a
+     * {@code PermissionService.hasResourceScope} call in the method body and a hand-thrown
+     * {@code AccessDeniedException} — for want of a facade method returning the entity its field resolvers need. An
+     * in-body check is a check nothing audits and nothing inherits; this codebase keeps authorization on the facade.
+     */
+    @Override
+    @PreAuthorize("hasPermission(#id, 'Project', 'WORKFLOW_VIEW')")
+    @Transactional(readOnly = true)
+    public Project getProjectRow(long id) {
+        return projectService.getProject(id);
+    }
+
     @Override
     @Transactional(readOnly = true)
     public ProjectTemplateDTO getProjectTemplate(String id, boolean sharedProject) {
@@ -386,6 +433,99 @@ public class ProjectFacadeImpl implements ProjectFacade {
         return getProjects(null, categoryId, tagId, projectDeployments, status, true, null);
     }
 
+    /**
+     * The listing behind the GraphQL {@code projects} query — every project the caller may open, and no more.
+     *
+     * <p>
+     * The two halves below are the two halves {@code hasResourceScope(id, 'Project', scope)} composes for a project:
+     * the workspace scope held in the project's OWN workspace, and the visibility precondition. Filtering on reach
+     * alone left this listing tenant-wide — an EE member of one workspace could enumerate every WORKSPACE-visible
+     * project in the tenant and then be denied opening any of them, which is the list-looser-than-by-id shape the
+     * visibility model exists to close. There is no per-project environment resolver, so those two halves are the whole
+     * of the by-id answer; {@code ProjectFacadeRowVisibilityTest} pins the agreement with {@link #getProjectRow(long)}.
+     *
+     * <p>
+     * A project with no workspace cannot be scope-checked and is therefore not listed, rather than being listed
+     * unchecked.
+     *
+     * <p>
+     * The system-project filter is the one thing here with no counterpart on the by-id read, so it is the one place the
+     * two answer differently — see {@link ProjectFacade#getProjectRow(long)} for what that discloses and why it is left
+     * standing. The agreement test skips those ids for that reason.
+     *
+     * <p>
+     * There is deliberately no {@code @PreAuthorize} here, and its absence is the honest description of this method: a
+     * tenant-wide listing has no id to gate on, so the only expression an annotation could carry is
+     * {@code isAuthenticated()} — and that is already the floor the body enforces. CE's
+     * {@code PermissionService.hasWorkspaceScope} is literally {@code SecurityUtils.isAuthenticated()}, and EE's
+     * returns false when there is no current user, so an unauthenticated caller is narrowed to nothing by the scope
+     * check below rather than let through it. An annotation would add no protection and would change the answer from an
+     * empty list to a denial; the surface audit records this method as filtered rather than guarded, which is what it
+     * is.
+     *
+     * <p>
+     * <strong>Cost, and why the two halves are batched differently.</strong> This reads every project row in the tenant
+     * with no predicate, then makes one {@code hasWorkspaceScope} call per DISTINCT workspace, then one batched
+     * visibility call. Only the last of those was made a single call, and {@code ProjectFacadeRowVisibilityTest} pins
+     * it at {@code times(1)}. The scope half was deliberately left per-workspace. A
+     * {@code hasWorkspaceScopes(Collection<Long>, scope)} on {@code PermissionService} was considered and not written:
+     * CE's implementation is {@code isAuthenticated()}, so it has nothing to batch, and EE's would still resolve one
+     * cached {@code WorkspaceScopeCacheService} entry per workspace and one {@code CustomRoleScopeResolver} lookup per
+     * custom role behind it. The batch method would move the loop inside {@code PermissionService} rather than remove
+     * it — and a {@code times(1)} test over it would then pin an API shape while asserting nothing about the work done,
+     * which is the failure mode this whole body of tests exists to avoid. Adding it would also mean changing a
+     * security-critical interface in CE and EE together for no measured gain.
+     *
+     * <p>
+     * The loop is over distinct workspaces, which a tenant has few of, and each call is cache-served after the first;
+     * the unbounded term here is the whole-tenant scan above it, which a scope batch would not touch. Not a regression
+     * either way — {@code ProjectGraphQlController} did exactly this before the listing moved here. If this ever needs
+     * fixing, the scan is the thing to fix: a repository predicate that returns only the rows of the workspaces the
+     * caller is a member of.
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<Project> getProjectRows() {
+        List<Project> projects = projectService.getProjects()
+            .stream()
+            .filter(project -> !SystemProjects.isSystemProject(project))
+            .filter(project -> project.getWorkspaceId() != null)
+            .toList();
+
+        Set<Long> scopedWorkspaceIds = projects.stream()
+            .map(Project::getWorkspaceId)
+            .distinct()
+            .filter(workspaceId -> permissionService.hasWorkspaceScope(workspaceId, "WORKFLOW_VIEW"))
+            .collect(Collectors.toSet());
+
+        return projectVisibilityFilter.filterVisible(
+            projects.stream()
+                .filter(project -> scopedWorkspaceIds.contains(project.getWorkspaceId()))
+                .toList());
+    }
+
+    /**
+     * The project's publication history.
+     *
+     * <p>
+     * Carries the same gate as {@link #getProject(long)} beside it, because it discloses the same project: the version
+     * list names each publication's description and date, so a caller who may not open the project may not read its
+     * history either. The gate is the visibility precondition plus the workspace scope, composed by
+     * {@code hasPermission(#id, 'Project', ...)}, so a {@code PRIVATE} project withheld from the caller answers the
+     * same way here as it does through {@code getProject}.
+     *
+     * <p>
+     * This method exists because {@code ProjectApiController} used to serve {@code GET
+     * /internal/projects/{id}/versions} straight off {@code ProjectService}, reaching past the facade layer that owns
+     * authorization — an open by-id read of any project's history, in any workspace, at any reach.
+     */
+    @Override
+    @PreAuthorize("hasPermission(#id, 'Project', 'WORKFLOW_VIEW')")
+    @Transactional(readOnly = true)
+    public List<ProjectVersion> getProjectVersions(long id) {
+        return projectService.getProjectVersions(id);
+    }
+
     @Override
     @Transactional(readOnly = true)
     public SharedProjectDTO getSharedProject(String projectUuid) {
@@ -451,10 +591,11 @@ public class ProjectFacadeImpl implements ProjectFacade {
     @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'WORKFLOW_VIEW')")
     @Transactional(readOnly = true)
     public List<WorkspaceProjectWorkflowDTO> getWorkspaceLatestProjectWorkflows(long workspaceId) {
-        List<Project> projects = projectService.getProjects(null, null, false, null, null, workspaceId)
-            .stream()
-            .filter(project -> !SystemProjects.isSystemProject(project))
-            .toList();
+        List<Project> projects = projectVisibilityFilter.filterVisible(
+            projectService.getProjects(null, null, false, null, null, workspaceId)
+                .stream()
+                .filter(project -> !SystemProjects.isSystemProject(project))
+                .toList());
 
         if (projects.isEmpty()) {
             return List.of();
@@ -599,6 +740,55 @@ public class ProjectFacadeImpl implements ProjectFacade {
         projectService.updateErrorWorkflow(projectId, errorProjectWorkflowId);
     }
 
+    /**
+     * CE force-writes WORKSPACE (there is no authorization boundary between members to withhold from); EE takes the
+     * request, defaulting to the policy default and rejecting rungs the project type does not support.
+     *
+     * <p>
+     * {@code defaultVisibility} throws for an unregistered resource type, which cannot happen here:
+     * {@link com.bytechef.automation.configuration.security.ProjectVisibilityPolicy} is a {@code @Component} in this
+     * very module, so every application carrying this facade also contributes the {@code "Project"} policy. No fallback
+     * is written for that state on purpose — one would hide a genuine misconfiguration.
+     */
+    private void applyCreateVisibility(Project project, @Nullable ResourceVisibility requestedVisibility) {
+        if (!eeEdition) {
+            if (requestedVisibility != null && requestedVisibility != ResourceVisibility.WORKSPACE
+                && log.isInfoEnabled()) {
+
+                log.info(
+                    "Forcing WORKSPACE visibility for project (requested={}, eeEdition=false)", requestedVisibility);
+            }
+
+            project.setVisibility(ResourceVisibility.WORKSPACE);
+
+            return;
+        }
+
+        ResourceVisibility visibility = requestedVisibility == null
+            ? resourceVisibilityPolicyRegistry.defaultVisibility(ProjectVisibilityFilter.PROJECT)
+            : requestedVisibility;
+
+        if (!resourceVisibilityPolicyRegistry.supports(ProjectVisibilityFilter.PROJECT, visibility)) {
+            throw new ConfigurationException(
+                "Project does not support %s visibility".formatted(visibility),
+                ProjectErrorType.UNSUPPORTED_VISIBILITY);
+        }
+
+        project.setVisibility(visibility);
+    }
+
+    /**
+     * Fail loud at startup when {@code bytechef.edition} is set to an unknown value so an accidental misconfiguration
+     * (e.g. {@code Enterprise}, {@code ee }, a typo) does not silently disable EE features by falling through the
+     * {@code "EE".equalsIgnoreCase(edition)} check.
+     */
+    private static void validateEdition(String edition) {
+        if (edition == null || !("CE".equalsIgnoreCase(edition) || "EE".equalsIgnoreCase(edition))) {
+            throw new IllegalStateException(
+                "bytechef.edition must be CE or EE (case-insensitive); got '" + edition + "'");
+        }
+    }
+
     private List<Tag> checkTags(List<Tag> tags) {
         return CollectionUtils.isEmpty(tags) ? Collections.emptyList() : tagService.save(tags);
     }
@@ -705,12 +895,17 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     /**
-     * Workspace project ids minus the feature-owned system projects — see {@link SystemProjects}.
+     * Workspace project ids minus the feature-owned system projects (see {@link SystemProjects}) and minus the projects
+     * the current principal may not see.
      */
     private List<Long> getVisibleWorkspaceProjectIds(long workspaceId) {
-        return projectService.getProjects(null, null, null, null, null, workspaceId)
+        List<Project> projects = projectService.getProjects(null, null, null, null, null, workspaceId)
             .stream()
             .filter(project -> !SystemProjects.isSystemProject(project))
+            .toList();
+
+        return projectVisibilityFilter.filterVisible(projects)
+            .stream()
             .map(Project::getId)
             .toList();
     }
@@ -721,12 +916,13 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
         // Feature-owned system projects (Knowledge Base / Context Store sync workflows, embedded catalog projects)
         // are an implementation detail of those features, not something the user created — keep them out of the
-        // projects listing.
-        List<Project> projects = projectService
-            .getProjects(apiCollections, categoryId, projectDeployments, tagId, status, workspaceId)
-            .stream()
-            .filter(project -> !SystemProjects.isSystemProject(project))
-            .toList();
+        // projects listing. The visibility filter then drops the projects the current principal may not see, so this
+        // listing agrees with the by-id gates rather than advertising rows they would refuse to open.
+        List<Project> projects = projectVisibilityFilter.filterVisible(
+            projectService.getProjects(apiCollections, categoryId, projectDeployments, tagId, status, workspaceId)
+                .stream()
+                .filter(project -> !SystemProjects.isSystemProject(project))
+                .toList());
 
         if (includeAllFields) {
             List<Long> projectIds = projects.stream()

@@ -59,9 +59,11 @@ public class CustomProjectRepositoryImpl implements CustomProjectRepository {
         }
 
         // __EMBEDDED__ is a distinct, deployment-era marker (see ConnectedUserProjectWorkflowManager in
-        // embedded-configuration-service) — not part of the SystemProjects.NAME_PREFIXES allow-list, kept here
-        // verbatim to preserve existing behavior.
-        query += "WHERE project.name NOT LIKE '__EMBEDDED__%' " +
+        // embedded-configuration-service) — not part of the SystemProjects.NAME_PREFIXES allow-list, so it is
+        // excluded on its own. Escaped: the marker's underscores are LIKE wildcards, and the unescaped form this
+        // used to emit also hid any name shaped <2 chars>EMBEDDED<2 chars>..., an ordinary 'MyEMBEDDEDxyz' included.
+        query += "WHERE " +
+            SystemProjects.notLikeCondition("project.name", SystemProjects.EMBEDDED_DEPLOYMENT_NAME_PREFIX) +
             SystemProjects.projectNameNotLikePredicates("project.name");
 
         if (apiCollections != null) {

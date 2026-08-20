@@ -31,6 +31,7 @@ import com.bytechef.automation.configuration.domain.SystemProjects;
 import com.bytechef.automation.configuration.dto.ProjectDeploymentDTO;
 import com.bytechef.automation.configuration.dto.ProjectDeploymentWorkflowDTO;
 import com.bytechef.automation.configuration.exception.ProjectDeploymentErrorType;
+import com.bytechef.automation.configuration.security.ProjectVisibilityFilter;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
@@ -44,6 +45,7 @@ import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.domain.HostedChatTriggers;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.service.EnvironmentService;
@@ -62,14 +64,17 @@ import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -89,6 +94,8 @@ import org.springframework.util.Assert;
 @Transactional
 public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
+    private static final String MANUAL_TRIGGER_NAME = "manual";
+
     private static final Logger log = LoggerFactory.getLogger(ProjectDeploymentFacadeImpl.class);
 
     private final ApplicationEventPublisher applicationEventPublisher;
@@ -102,6 +109,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     private final ProjectDeploymentService projectDeploymentService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private final ProjectService projectService;
+    private final ProjectVisibilityFilter projectVisibilityFilter;
     private final ProjectWorkflowService projectWorkflowService;
     private final TagService tagService;
     private final TriggerDefinitionService triggerDefinitionService;
@@ -118,8 +126,9 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         PrincipalJobService principalJobService, JobFacade jobFacade, JobService jobService,
         ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectService projectService,
-        ProjectWorkflowService projectWorkflowService, TagService tagService,
-        TriggerDefinitionService triggerDefinitionService, TriggerExecutionService triggerExecutionService,
+        ProjectVisibilityFilter projectVisibilityFilter, ProjectWorkflowService projectWorkflowService,
+        TagService tagService, TriggerDefinitionService triggerDefinitionService,
+        TriggerExecutionService triggerExecutionService,
         TriggerLifecycleFacade triggerLifecycleFacade, ApplicationProperties applicationProperties,
         ComponentConnectionFacade componentConnectionFacade, WorkflowService workflowService) {
 
@@ -134,6 +143,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         this.projectDeploymentService = projectDeploymentService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
         this.projectService = projectService;
+        this.projectVisibilityFilter = projectVisibilityFilter;
         this.projectWorkflowService = projectWorkflowService;
         this.tagService = tagService;
         this.triggerDefinitionService = triggerDefinitionService;
@@ -311,6 +321,30 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         projectDeploymentWorkflowService.updateEnabled(projectDeploymentWorkflow.getId(), enable);
     }
 
+    /**
+     * The embedded overload: resolves the deployment from a project id plus an environment, then does what the
+     * three-argument one does.
+     *
+     * <p>
+     * Ungated on purpose, and pinned that way by
+     * {@code ProjectDeploymentFacadeAuthorizationTest.testEmbeddedEnableWorkflowOverloadIsNotGated}. Its only
+     * production caller is the EE embedded {@code ConnectedUserProjectFacade}; embedded authorizes by api key and
+     * connected user at its own REST boundary, not by workspace RBAC, and there is no platform workspace behind an
+     * embedded caller for a {@code hasPermission} to resolve against. Gating it would fail closed for every embedded
+     * deployment.
+     *
+     * <p>
+     * The call below is an in-bean self-invocation, so it does not cross the security proxy and the
+     * {@code hasPermission(#projectDeploymentId, 'ProjectDeployment', 'DEPLOYMENT_EDIT')} on the three-argument
+     * overload does not fire. That is the behaviour this method wants, but it is worth saying that it holds by accident
+     * of how Spring AOP works rather than by anything stated: were this ever changed to go through the proxy —
+     * self-injection, {@code AopContext.currentProxy()}, or splitting the two overloads onto separate beans — the
+     * embedded path would start being denied, and the test above is what would catch it. The audit in
+     * {@code VisibilityBearingSurfaceAuditTest} cannot record this alongside the class's other ungated
+     * internal-composition overloads: its {@code EXEMPTIONS} map is keyed by signatures the audit's own scan produces,
+     * and this signature names no visibility-bearing type, so an entry for it would fail
+     * {@code testEveryExemptionStillMatchesASurface}.
+     */
     @Override
     public void enableProjectDeploymentWorkflow(
         long projectId, String workflowId, boolean enable, Environment environment) {
@@ -344,6 +378,45 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
             tagService.getTags(projectDeployment.getTagIds()));
     }
 
+    /**
+     * The by-id read behind the {@code projectDeploymentWorkflow} GraphQL query, which until this gate was added was a
+     * root query anyone authenticated in the tenant could call. What it hands back is not a row's metadata: the
+     * {@code ProjectDeploymentWorkflow} GraphQL type exposes the deployment's {@code inputs} and {@code connections}
+     * and resolves {@code projectWorkflow.workflow} into the whole workflow definition. The id it is keyed by is the
+     * same string that forms the path segment of the workflow's static webhook URL, which is handed to third parties by
+     * design &mdash; so an ungated read here turned "holds a webhook URL" into "reads a PRIVATE project's workflow".
+     *
+     * <p>
+     * Two scopes rather than one, because two different things leak and they are separately grantable. A custom role
+     * carries an arbitrary set of scope names, so {@code DEPLOYMENT_VIEW} without {@code WORKFLOW_VIEW} — and the
+     * reverse — are both constructible: the first would read the workflow definition, the second the deployment's
+     * inputs and connection bindings. The sibling by-id reads ask for exactly one each,
+     * {@code hasPermission(#id, 'ProjectDeployment', 'DEPLOYMENT_VIEW')} on {@link #getProjectDeployment(long)} and
+     * {@code hasPermission(#projectWorkflowId, 'ProjectWorkflow', 'WORKFLOW_VIEW')} on
+     * {@code ProjectWorkflowFacadeImpl.getProjectWorkflow(long)}; this surface returns the union of what those two
+     * return, so it asks for the union of what they ask for.
+     *
+     * <p>
+     * Both are checked against {@code 'ProjectDeployment'} rather than one against {@code 'ProjectWorkflow'}, and that
+     * is the stronger of the two spellings rather than a convenience: a deployment has a
+     * {@code ResourceEnvironmentResolver} and a project workflow does not, so a deployment-keyed check is answered by
+     * the role the caller holds in THAT environment instead of the union over the environments they can reach. The
+     * visibility precondition is identical either way — both providers redirect to the owning project, and a
+     * deployment's workflows belong to the project it deploys.
+     */
+    @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#workflowExecutionId.jobPrincipalId, 'ProjectDeployment', 'DEPLOYMENT_VIEW') and " +
+        "hasPermission(#workflowExecutionId.jobPrincipalId, 'ProjectDeployment', 'WORKFLOW_VIEW')")
+    public ProjectDeploymentWorkflow getProjectDeploymentWorkflow(WorkflowExecutionId workflowExecutionId) {
+        long projectDeploymentId = workflowExecutionId.getJobPrincipalId();
+
+        String workflowId = projectWorkflowService.getProjectWorkflowWorkflowId(
+            projectDeploymentId, workflowExecutionId.getWorkflowUuid());
+
+        return projectDeploymentWorkflowService.getProjectDeploymentWorkflow(projectDeploymentId, workflowId);
+    }
+
     @Override
     @Transactional(readOnly = true)
     @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'DEPLOYMENT_VIEW')")
@@ -356,6 +429,163 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                 .map(ProjectDeployment::getTagIds)
                 .flatMap(Collection::stream)
                 .toList());
+    }
+
+    /**
+     * The gate and the filter below are the two halves the by-id reads this listing leads to already compose. Until
+     * they were added the query had neither: it named the project and labelled the workflow of every hosted-chat
+     * deployment in ANY workspace, {@code PRIVATE} projects included &mdash; a listing looser than the
+     * {@code hasPermission(#projectWorkflowId, 'ProjectWorkflow', 'WORKFLOW_VIEW')} that guards opening one of those
+     * rows in the right panel. {@code WORKFLOW_VIEW} rather than the {@code DEPLOYMENT_VIEW} its neighbour
+     * {@link #getWorkspaceProjectDeployments} uses, because what leaks is project names and workflow labels, and
+     * because it is the scope the by-id read this row leads to asks for; both are VIEWER-rank, so no workspace member
+     * loses a row they had.
+     *
+     * <p>
+     * The visibility half is one batched {@link ProjectVisibilityFilter#visibleProjectIds(Collection)} call over the
+     * projects already loaded for the listing, not a per-row check &mdash; a per-element check inside the loop below
+     * would be an N+1 authorization storm on a surface built expressly to avoid one.
+     *
+     * <p>
+     * Every consumer tolerates a shorter list: the launcher's Workflows cascade still renders, with its own reason ("No
+     * deployed workflow with a chat trigger."), the {@code /automation/chats} sidebar falls back to its empty state,
+     * and {@code useLiveWorkflowLabel} returns null, which suppresses one tooltip line.
+     */
+    @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'WORKFLOW_VIEW')")
+    public List<ChatWorkflow> getWorkspaceChatWorkflows(long workspaceId, long environmentId) {
+        Environment environment = environmentService.getEnvironment(environmentId);
+
+        List<ProjectDeployment> projectDeployments = projectDeploymentService.getProjectDeployments(
+            false, environment, null, null, workspaceId);
+
+        if (projectDeployments.isEmpty()) {
+            return List.of();
+        }
+
+        List<ProjectDeployment> enabledProjectDeployments = projectDeployments.stream()
+            .filter(ProjectDeployment::isEnabled)
+            .toList();
+
+        if (enabledProjectDeployments.isEmpty()) {
+            return List.of();
+        }
+
+        List<Long> projectDeploymentIds = enabledProjectDeployments.stream()
+            .map(ProjectDeployment::getId)
+            .toList();
+
+        List<ProjectDeploymentWorkflow> enabledProjectDeploymentWorkflows = projectDeploymentWorkflowService
+            .getProjectDeploymentWorkflows(projectDeploymentIds)
+            .stream()
+            .filter(ProjectDeploymentWorkflow::isEnabled)
+            .toList();
+
+        if (enabledProjectDeploymentWorkflows.isEmpty()) {
+            return List.of();
+        }
+
+        List<String> workflowIds = enabledProjectDeploymentWorkflows.stream()
+            .map(ProjectDeploymentWorkflow::getWorkflowId)
+            .distinct()
+            .toList();
+
+        Map<String, Workflow> workflowMap = workflowService.getWorkflows(workflowIds)
+            .stream()
+            .collect(Collectors.toMap(Workflow::getId, Function.identity()));
+
+        Map<String, ProjectWorkflow> projectWorkflowMap = projectWorkflowService
+            .getWorkflowProjectWorkflows(workflowIds)
+            .stream()
+            .collect(Collectors.toMap(ProjectWorkflow::getWorkflowId, Function.identity()));
+
+        List<Project> projects = projectService.getProjects(
+            enabledProjectDeployments.stream()
+                .map(ProjectDeployment::getProjectId)
+                .distinct()
+                .toList());
+
+        Map<Long, Project> projectMap = projects.stream()
+            .collect(Collectors.toMap(project -> Objects.requireNonNull(project.getId(), "id"), Function.identity()));
+
+        Set<Long> visibleProjectIds = projectVisibilityFilter.visibleProjectIds(projects);
+
+        Map<Long, ProjectDeployment> projectDeploymentMap = enabledProjectDeployments.stream()
+            .collect(Collectors.toMap(ProjectDeployment::getId, Function.identity()));
+
+        Map<TriggerDefinitionKey, TriggerDefinition> triggerDefinitionMap = new HashMap<>();
+
+        List<ChatWorkflow> chatWorkflows = new ArrayList<>();
+
+        for (ProjectDeploymentWorkflow projectDeploymentWorkflow : enabledProjectDeploymentWorkflows) {
+            Workflow workflow = workflowMap.get(projectDeploymentWorkflow.getWorkflowId());
+
+            if (workflow == null) {
+                continue;
+            }
+
+            List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
+
+            if (!HostedChatTriggers.hasHostedChatTrigger(workflowTriggers)) {
+                continue;
+            }
+
+            String webhookExecutionId = resolveStaticWebhookExecutionId(
+                workflow, workflowTriggers, projectDeploymentWorkflow, projectWorkflowMap, triggerDefinitionMap);
+
+            if (webhookExecutionId == null) {
+                continue;
+            }
+
+            ProjectDeployment projectDeployment =
+                projectDeploymentMap.get(projectDeploymentWorkflow.getProjectDeploymentId());
+
+            if (projectDeployment == null) {
+                continue;
+            }
+
+            Project project = projectMap.get(projectDeployment.getProjectId());
+
+            // A workflow is only as visible as the project that owns it. A project row that is gone cannot be
+            // checked at all, so it is skipped rather than listed under a placeholder name as it used to be —
+            // an unnameable project is not one to advertise.
+            if (project == null || !visibleProjectIds.contains(project.getId())) {
+                continue;
+            }
+
+            // projectWorkflowMap is keyed on workflow.id (see workflowIds loader above) and is the same
+            // lookup resolveStaticWebhookExecutionId already did successfully — otherwise we would have
+            // continued past that step. Reusing it here gives the client the (projectId, projectWorkflowId)
+            // pair it needs to open the workflow's definition tab in the AI Hub right panel without an
+            // extra round-trip.
+            ProjectWorkflow projectWorkflow = projectWorkflowMap.get(workflow.getId());
+
+            chatWorkflows.add(
+                new ChatWorkflow(
+                    projectDeploymentWorkflow.getProjectDeploymentId(), projectDeployment.getProjectId(),
+                    project.getName(), projectWorkflow.getId(), webhookExecutionId, workflow.getId(),
+                    workflow.getLabel() == null ? "Untitled Workflow" : workflow.getLabel()));
+        }
+
+        return chatWorkflows;
+    }
+
+    /**
+     * Serves the GraphQL {@code workspaceProjectDeployments} listing. Its gate and its filtering used to live in
+     * {@code ProjectDeploymentGraphQlController}, which read the rows straight off {@code ProjectDeploymentService} —
+     * past this facade, and so past the gate and the filters its REST twin below had all along.
+     */
+    @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'DEPLOYMENT_VIEW')")
+    public List<ProjectDeployment> getWorkspaceProjectDeployments(
+        long workspaceId, long environmentId, Long projectId, Long tagId) {
+
+        Environment environment = environmentService.getEnvironment(environmentId);
+
+        return filterOutSystemProjectDeployments(
+            projectDeploymentService.getProjectDeployments(false, environment, projectId, tagId, workspaceId));
     }
 
     @Override
@@ -830,33 +1060,43 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     }
 
     /**
-     * Drops the deployments whose project is feature-owned rather than user-created — see {@link SystemProjects}.
+     * Drops the deployments whose project is feature-owned rather than user-created (see {@link SystemProjects}) or
+     * hidden from the current principal — a deployment is only as visible as the project it deploys.
      */
     private List<ProjectDeployment> filterOutSystemProjectDeployments(List<ProjectDeployment> projectDeployments) {
         if (projectDeployments.isEmpty()) {
             return projectDeployments;
         }
 
-        Set<Long> systemProjectIds = getProjects(projectDeployments).stream()
+        List<Project> projects = getProjects(projectDeployments);
+
+        Set<Long> systemProjectIds = projects.stream()
             .filter(SystemProjects::isSystemProject)
             .map(Project::getId)
             .collect(Collectors.toSet());
 
-        if (systemProjectIds.isEmpty()) {
-            return projectDeployments;
-        }
+        Set<Long> visibleProjectIds = projectVisibilityFilter.visibleProjectIds(projects);
 
         return projectDeployments.stream()
             .filter(projectDeployment -> !systemProjectIds.contains(projectDeployment.getProjectId()))
+            .filter(projectDeployment -> visibleProjectIds.contains(projectDeployment.getProjectId()))
             .toList();
     }
 
+    /**
+     * The distinct projects the given deployments belong to. Several deployments of one project — one per environment —
+     * are the norm, so the ids are deduplicated before the lookup: undeduplicated, the IN list of the lookup query
+     * grows with the number of environments each project is deployed to rather than with the number of projects being
+     * loaded. Matches how {@code getWorkspaceProjectDeployments} already derives its project ids for the workflow
+     * lookup.
+     */
     private List<Project> getProjects(List<ProjectDeployment> projectDeployments) {
         return projectService.getProjects(
             projectDeployments
                 .stream()
                 .map(ProjectDeployment::getProjectId)
                 .filter(Objects::nonNull)
+                .distinct()
                 .toList());
     }
 
@@ -884,7 +1124,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
             }
 
             if (triggerDefinition.getType() == TriggerType.STATIC_WEBHOOK &&
-                !Objects.equals(triggerDefinition.getName(), "manual")) {
+                !Objects.equals(triggerDefinition.getName(), MANUAL_TRIGGER_NAME)) {
 
                 ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflow.getId());
 
@@ -931,6 +1171,43 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
             .findFirst()
             .map(ProjectWorkflow::getUuidAsString)
             .orElseThrow();
+    }
+
+    private String resolveStaticWebhookExecutionId(
+        Workflow workflow, List<WorkflowTrigger> workflowTriggers, ProjectDeploymentWorkflow deploymentWorkflow,
+        Map<String, ProjectWorkflow> projectWorkflowsByWorkflowId,
+        Map<TriggerDefinitionKey, TriggerDefinition> triggerDefinitionCache) {
+
+        for (WorkflowTrigger workflowTrigger : workflowTriggers) {
+            WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
+
+            TriggerDefinitionKey triggerDefinitionKey = new TriggerDefinitionKey(
+                workflowNodeType.name(), workflowNodeType.version(),
+                Objects.requireNonNull(workflowNodeType.operation()));
+
+            TriggerDefinition triggerDefinition = triggerDefinitionCache.computeIfAbsent(
+                triggerDefinitionKey,
+                lookupKey -> triggerDefinitionService.getTriggerDefinition(
+                    lookupKey.name(), lookupKey.version(), lookupKey.operation()));
+
+            if (triggerDefinition.getType() == TriggerType.STATIC_WEBHOOK &&
+                !Objects.equals(triggerDefinition.getName(), MANUAL_TRIGGER_NAME)) {
+
+                ProjectWorkflow projectWorkflow = projectWorkflowsByWorkflowId.get(workflow.getId());
+
+                if (projectWorkflow == null) {
+                    return null;
+                }
+
+                WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
+                    PlatformType.AUTOMATION, deploymentWorkflow.getProjectDeploymentId(),
+                    projectWorkflow.getUuidAsString(), workflowTrigger.getName());
+
+                return workflowExecutionId.toString();
+            }
+        }
+
+        return null;
     }
 
     private ProjectDeploymentWorkflowDTO toProjectDeploymentWorkflowDTO(
@@ -1018,5 +1295,12 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                 }
             }
         }
+    }
+
+    /**
+     * Memoization key for the trigger-definition lookups {@link #getWorkspaceChatWorkflows} would otherwise repeat once
+     * per workflow in the listing.
+     */
+    private record TriggerDefinitionKey(String name, int version, String operation) {
     }
 }

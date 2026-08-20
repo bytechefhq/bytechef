@@ -23,12 +23,15 @@ import static org.mockito.Mockito.when;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
+import com.bytechef.platform.user.service.UserService;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 /**
  * Pins the identity/locator resolvers that route the {@code 'Workspace'}/{@code 'Project'}/{@code 'Workflow'} tokens
- * through {@code hasResourceScope}. None populate {@code ownerUserId}, so CE treats them as shared (permissive).
+ * through {@code hasResourceScope}. Only the project resolver populates {@code ownerUserId} (from {@code created_by},
+ * covered by {@code ProjectOwnershipResolverTest}); the others leave it empty, so CE treats them as shared
+ * (permissive).
  *
  * @author Ivica Cardic
  */
@@ -51,7 +54,7 @@ class WorkspaceProjectWorkflowOwnershipResolverTest {
 
         when(projectRepository.findById(3L)).thenReturn(Optional.of(project));
 
-        assertThat(new ProjectOwnershipResolver(projectRepository).resolveOwner(3L)
+        assertThat(new ProjectOwnershipResolver(projectRepository, mock(UserService.class)).resolveOwner(3L)
             .workspaceId()).hasValue(7L);
     }
 
@@ -61,7 +64,7 @@ class WorkspaceProjectWorkflowOwnershipResolverTest {
 
         when(projectRepository.findById(3L)).thenReturn(Optional.empty());
 
-        assertThat(new ProjectOwnershipResolver(projectRepository).resolveOwner(3L)
+        assertThat(new ProjectOwnershipResolver(projectRepository, mock(UserService.class)).resolveOwner(3L)
             .workspaceId()).isEmpty();
     }
 

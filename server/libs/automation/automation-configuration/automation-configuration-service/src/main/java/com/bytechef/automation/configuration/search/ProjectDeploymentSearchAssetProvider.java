@@ -19,6 +19,7 @@ package com.bytechef.automation.configuration.search;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.SystemProjects;
+import com.bytechef.automation.configuration.security.ProjectVisibilityFilter;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.search.SearchAssetProvider;
@@ -38,11 +39,15 @@ class ProjectDeploymentSearchAssetProvider implements SearchAssetProvider {
 
     private final ProjectDeploymentService projectDeploymentService;
     private final ProjectService projectService;
+    private final ProjectVisibilityFilter projectVisibilityFilter;
 
-    ProjectDeploymentSearchAssetProvider(ProjectDeploymentService projectDeploymentService,
-        ProjectService projectService) {
+    ProjectDeploymentSearchAssetProvider(
+        ProjectDeploymentService projectDeploymentService, ProjectService projectService,
+        ProjectVisibilityFilter projectVisibilityFilter) {
+
         this.projectDeploymentService = projectDeploymentService;
         this.projectService = projectService;
+        this.projectVisibilityFilter = projectVisibilityFilter;
     }
 
     @Override
@@ -60,7 +65,9 @@ class ProjectDeploymentSearchAssetProvider implements SearchAssetProvider {
             .distinct()
             .toList();
 
-        Map<Long, Project> projectMap = projectService.getProjects(projectIds)
+        // Built from the visible projects only, so the `project != null` guard below drops a deployment whose project
+        // is hidden as well as one whose project is gone — a deployment is only as visible as the project it deploys.
+        Map<Long, Project> projectMap = projectVisibilityFilter.filterVisible(projectService.getProjects(projectIds))
             .stream()
             .collect(Collectors.toMap(Project::getId, Function.identity()));
 

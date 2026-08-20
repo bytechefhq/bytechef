@@ -33,17 +33,25 @@ import java.util.Map;
  * rules (deployed or sub-agent-referenced agents cannot be deleted; the permanent {@code chat}/{@code workflowCall}
  * channels cannot be removed).
  *
+ * <p>
+ * Every {@code workspaceId} parameter here is primitive {@code long} and must stay that way: the implementation gates
+ * each of these methods on {@code hasPermission(#workspaceId, 'Workspace', ...)}, and a boxed {@code null} would reach
+ * {@code AutomationPermissionEvaluator} as a null target id. That currently fails closed in both editions, but only
+ * incidentally — the resolver cannot map {@code null} to an owner — so the parameter type, not the evaluator, is what
+ * this relies on.
+ * </p>
+ *
  * @author Ivica Cardic
  */
 public interface AiAgentFacade {
 
-    AiAgentDTO createAgent(String title, String description, Long workspaceId);
+    AiAgentDTO createAgent(String title, String description, long workspaceId);
 
     void deleteAgent(long id);
 
     AiAgentDTO getAgent(long id);
 
-    List<AiAgentDTO> getAgents(Long workspaceId);
+    List<AiAgentDTO> getAgents(long workspaceId);
 
     /**
      * Read-model for the AiAgent Deployments page: every {@code ProjectDeployment} of every agent in
@@ -54,7 +62,7 @@ public interface AiAgentFacade {
      * {@code fetchProjectDeployment(projectId, Environment)} lookup instead, the same mechanism
      * {@code AiAgentFacadeImpl.hasAnyDeployment} already relies on.
      */
-    List<AiAgentDeploymentDTO> getAgentDeployments(Long workspaceId);
+    List<AiAgentDeploymentDTO> getAgentDeployments(long workspaceId);
 
     /**
      * Every channel an agent can be reached through, resolved from the component registry — one entry per component-
@@ -74,8 +82,15 @@ public interface AiAgentFacade {
      * {@code ProjectDeploymentService} listing path filters out. Rows carry a {@code workflowExecutionId} built exactly
      * the way that query builds it, so both feed the same client chat surface.
      * </p>
+     *
+     * <p>
+     * Gated on workspace membership by the implementation, with the same scope the sibling uses. The two cascades sit
+     * side by side in one launcher popup and disclose the same class of data — an entity name plus a workflow label —
+     * so a caller who cannot see one has no business seeing the other. {@code workspaceId} is primitive precisely
+     * because the gate keys on it: a {@code null} would reach the evaluator as a null target id.
+     * </p>
      */
-    List<ChatAgentDTO> getWorkspaceChatAgents(Long workspaceId, long environmentId);
+    List<ChatAgentDTO> getWorkspaceChatAgents(long workspaceId, long environmentId);
 
     /**
      * Partial update: a {@code null} {@code title}/{@code description}/{@code instructions} leaves that field's
@@ -130,11 +145,11 @@ public interface AiAgentFacade {
     int publishAgent(long id, String description);
 
     /**
-     * Every tag attached to an agent deployment in the workspace. Distinct from {@link #getAgentTags(Long)}: an agent
+     * Every tag attached to an agent deployment in the workspace. Distinct from {@link #getAgentTags(long)}: an agent
      * deployment is a {@code ProjectDeployment} and carries ordinary project-deployment tags, which are a different set
      * from the owning agent's own.
      */
-    List<Tag> getAgentDeploymentTags(Long workspaceId);
+    List<Tag> getAgentDeploymentTags(long workspaceId);
 
     /**
      * The agent's version history, newest first — every {@code ProjectVersion} of its backing project, draft included.
@@ -165,7 +180,7 @@ public interface AiAgentFacade {
      * Every tag attached to any agent in {@code workspaceId} — the option set the agents list's tag filter and the
      * per-row tag editor draw from.
      */
-    List<Tag> getAgentTags(Long workspaceId);
+    List<Tag> getAgentTags(long workspaceId);
 
     /**
      * @param id the {@code ProjectDeployment} id — an agent deployment IS one, so its tags are project-deployment tags

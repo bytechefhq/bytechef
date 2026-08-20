@@ -27,6 +27,7 @@ import com.bytechef.automation.configuration.audit.ProjectWorkflowAuditPublisher
 import com.bytechef.automation.configuration.callback.ProjectCallback;
 import com.bytechef.automation.configuration.callback.ProjectWorkflowCallback;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
+import com.bytechef.automation.configuration.security.ProjectVisibilityPolicy;
 import com.bytechef.automation.configuration.service.ProjectDeploymentServiceImpl;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowServiceImpl;
 import com.bytechef.automation.configuration.service.ProjectServiceImpl;
@@ -41,6 +42,7 @@ import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.configuration.service.EnvironmentServiceImpl;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputServiceImpl;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationServiceImpl;
+import com.bytechef.platform.security.domain.ResourceVisibilityPolicyRegistry;
 import com.bytechef.platform.tag.service.TagService;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
@@ -113,6 +115,17 @@ public class AutomationAiAgentIntTestConfiguration {
     @Bean
     ProjectCallback projectCallback() {
         return new ProjectCallback();
+    }
+
+    /**
+     * {@code ProjectServiceImpl.updateVisibility} validates the requested rung against this registry. The production
+     * bean is assembled in platform-connection-api's {@code ResourceVisibilityConfiguration}, which this slice does not
+     * scan, so it is declared here over the real {@link ProjectVisibilityPolicy} rather than mocked — a mock would let
+     * an unsupported rung through and make the slice disagree with production.
+     */
+    @Bean
+    ResourceVisibilityPolicyRegistry resourceVisibilityPolicyRegistry() {
+        return new ResourceVisibilityPolicyRegistry(List.of(new ProjectVisibilityPolicy()));
     }
 
     @Bean

@@ -17,15 +17,19 @@
 package com.bytechef.automation.configuration.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.automation.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfigurationSharedMocks;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.Workspace;
+import com.bytechef.automation.configuration.exception.ProjectErrorType;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.repository.CategoryRepository;
+import com.bytechef.platform.security.domain.ResourceVisibility;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -237,6 +241,76 @@ public class ProjectServiceIntTest {
             .hasFieldOrPropertyWithValue("description", "description2")
             .hasFieldOrPropertyWithValue("name", "name2")
             .hasFieldOrPropertyWithValue("tagIds", List.of(tag.getId()));
+    }
+
+    /**
+     * The Critical invariant of the project-visibility feature: visibility changes ONLY through the dedicated sharing
+     * mutation, never as a side effect of editing a project. {@code ProjectModel} now carries {@code visibility}, so a
+     * REST update body can hold one and it reaches {@link ProjectService#update} on the incoming object — the only
+     * thing that discards it is this method's field-by-field copy list. Adding
+     * {@code curProject.setVisibility(project.getVisibility())} there would silently widen every PRIVATE project a
+     * client round-trips, so that copy list is pinned here rather than by a comment.
+     */
+    @Test
+    public void testUpdateCannotChangeVisibility() {
+        Project project = getProject();
+
+        project.setVisibility(ResourceVisibility.PRIVATE);
+
+        project = projectRepository.save(project);
+
+        long projectId = Validate.notNull(project.getId(), "id");
+
+        // A REST update body carrying a widened visibility alongside an ordinary rename.
+        project.setName("name2");
+        project.setVisibility(ResourceVisibility.WORKSPACE);
+
+        projectService.update(project);
+
+        Project updatedProject = projectRepository.findById(projectId)
+            .orElseThrow();
+
+        // The rename landed, so the update really ran — and the visibility did not come with it.
+        assertThat(updatedProject.getName()).isEqualTo("name2");
+        assertThat(updatedProject.getVisibility()).isEqualTo(ResourceVisibility.PRIVATE);
+    }
+
+    /**
+     * {@link ProjectService#updateVisibility} used to write whatever it was handed, resting on its single caller — the
+     * EE sharing facade — to validate the rung first. A second caller forgetting to would persist a rung
+     * {@code ProjectMapper} maps to {@code THROW_EXCEPTION}, after which every subsequent READ of the project throws.
+     * The registry check therefore lives in the service too. This runs against the REAL
+     * {@code ResourceVisibilityPolicyRegistry} assembled from {@code ProjectVisibilityPolicy}, not a stub, so it fails
+     * if the policy ever starts advertising ORGANIZATION without the mappers being taught it.
+     */
+    @Test
+    public void testUpdateVisibilityRejectsUnsupportedRung() {
+        Project project = projectRepository.save(getProject());
+
+        long projectId = Validate.notNull(project.getId(), "id");
+
+        assertThatThrownBy(() -> projectService.updateVisibility(projectId, ResourceVisibility.ORGANIZATION))
+            .isInstanceOf(ConfigurationException.class)
+            .satisfies(
+                exception -> assertThat(((ConfigurationException) exception).getErrorKey())
+                    .isEqualTo(ProjectErrorType.UNSUPPORTED_VISIBILITY.getErrorKey()));
+
+        assertThat(projectRepository.findById(projectId)
+            .orElseThrow()
+            .getVisibility()).isEqualTo(ResourceVisibility.WORKSPACE);
+    }
+
+    @Test
+    public void testUpdateVisibilityWritesSupportedRung() {
+        Project project = projectRepository.save(getProject());
+
+        long projectId = Validate.notNull(project.getId(), "id");
+
+        projectService.updateVisibility(projectId, ResourceVisibility.PRIVATE);
+
+        assertThat(projectRepository.findById(projectId)
+            .orElseThrow()
+            .getVisibility()).isEqualTo(ResourceVisibility.PRIVATE);
     }
 
     private Project getProject() {

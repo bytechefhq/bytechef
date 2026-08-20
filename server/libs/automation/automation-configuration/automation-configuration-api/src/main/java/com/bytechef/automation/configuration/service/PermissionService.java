@@ -109,6 +109,11 @@ public interface PermissionService {
     /**
      * Returns whether the current user has {@code scope} in the workspace that owns the project.
      *
+     * <p>
+     * Holding the scope is necessary but not sufficient: the project must also be visible to the caller and resolve to
+     * an owning workspace, so this denies where a bare workspace-scope lookup would have allowed — a project the caller
+     * cannot see, and one that cannot be resolved at all.
+     *
      * @param projectId the project whose owning workspace is checked
      * @param scope     the scope name the user must hold in that workspace
      * @return {@code true} if the current user holds {@code scope} in the project's workspace
@@ -118,6 +123,10 @@ public interface PermissionService {
     /**
      * Returns whether the current user has {@code scope} in the workspace that owns the project, in the environment
      * being acted on. See {@link #hasWorkspaceScope(long, String, Environment)} for why the environment is a parameter.
+     *
+     * <p>
+     * Carries the same visibility and resolvability preconditions as
+     * {@link #hasWorkspaceScopeForProject(long, String)}.
      *
      * @param projectId   the project whose owning workspace is checked
      * @param scope       the scope name the user must hold in that workspace
@@ -140,6 +149,12 @@ public interface PermissionService {
     /**
      * Returns whether the current user holds at least {@code minimumRole} in the workspace that owns the resource.
      *
+     * <p>
+     * Deliberately carries NO visibility precondition, unlike every other by-id check here: this is the owner-or-admin
+     * sharing-management posture, so an admin can repair the sharing of a resource they cannot themselves see. See
+     * {@code docs/superpowers/specs/2026-08-17-project-visibility-design.md} §17 for the full entry-point audit —
+     * extend that table when adding a method to this interface.
+     *
      * @param id           the resource identifier
      * @param resourceType the resource type key used to select the ownership resolver
      * @param minimumRole  the minimum {@link WorkspaceRoleType} name required
@@ -148,7 +163,11 @@ public interface PermissionService {
     boolean hasResourceRole(long id, String resourceType, String minimumRole);
 
     /**
-     * Returns whether the current user has {@code scope} in the workspace that owns the workflow.
+     * Returns whether the current user has {@code scope} in the workspace that owns the workflow, and may see the
+     * project the workflow belongs to. Both editions route this through
+     * {@link #hasResourceScope(Serializable, String, String)} so a workflow-keyed check carries the same visibility
+     * precondition as every other by-id check; a workflow inside a project the caller cannot see is denied even when
+     * the caller holds the scope in that workspace.
      *
      * @param workflowId the workflow whose owning workspace is checked
      * @param scope      the scope name the user must hold in that workspace

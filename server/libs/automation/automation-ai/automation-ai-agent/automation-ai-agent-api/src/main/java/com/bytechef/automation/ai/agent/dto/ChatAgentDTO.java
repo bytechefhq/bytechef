@@ -18,7 +18,7 @@ package com.bytechef.automation.ai.agent.dto;
 
 /**
  * Read-model for one deployed, chat-reachable agent workflow — the "Agent Chats" counterpart of
- * {@code ProjectDeploymentWorkflowGraphQlController.ChatWorkflow}.
+ * {@code ProjectDeploymentFacade.ChatWorkflow}.
  *
  * <p>
  * A separate row type (and a separate query) rather than more {@code ChatWorkflow} rows because agents live in hidden

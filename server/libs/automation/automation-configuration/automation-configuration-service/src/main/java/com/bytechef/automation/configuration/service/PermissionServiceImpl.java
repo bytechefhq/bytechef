@@ -38,7 +38,10 @@ import org.springframework.stereotype.Service;
 /**
  * Community Edition implementation of {@link PermissionService}. Fine-grained RBAC (workspace roles, project scopes,
  * custom roles) is an Enterprise Edition feature, so in CE the workspace/role/scope checks grant access to any
- * authenticated (non-anonymous) caller and deny unauthenticated ones. Resource-level access
+ * authenticated (non-anonymous) caller and deny unauthenticated ones. The two
+ * {@link #hasWorkspaceScopeForProject(long, String)} overloads and {@link #hasWorkflowScope(String, String)} are the
+ * exception: they are keyed on a project or on a workflow that belongs to one, so they run the same resource-level
+ * check as everything else rather than answering on authentication alone. Resource-level access
  * ({@link #hasResourceScope(Serializable, String, String)}) still fails closed: it denies unauthenticated callers and
  * unknown resource types, and enforces owner isolation for user-owned resources. Coarse-grained access control is
  * otherwise enforced by Spring Security's {@code ROLE_USER}/{@code ROLE_ADMIN} authorities plus the client-side UI
@@ -111,15 +114,22 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public boolean hasWorkspaceScopeForProject(long projectId, String scope) {
-        return SecurityUtils.isAuthenticated();
+        // A project-keyed check is a resource-scope check on the project: routing through hasResourceScope gives it
+        // the same visibility precondition every hasPermission(#id, 'Project', ...) gate has.
+        return hasResourceScope(projectId, "Project", scope);
     }
 
     /**
-     * See {@link #hasWorkspaceScope(long, String, Environment)} — per-environment roles are an Enterprise feature.
+     * Drops the {@link Environment} and runs exactly what the environment-unaware overload runs, rather than adding the
+     * visibility precondition inline as EE does. CE has no per-environment roles —
+     * {@link #hasWorkspaceScope(long, String, Environment)} is itself environment-blind — so nothing is lost, and
+     * routing both project-keyed overloads through the same {@code hasResourceScope} call is what keeps them from
+     * disagreeing about the same project: an inline precondition would leave this one permitting a project the
+     * two-argument sibling denies.
      */
     @Override
     public boolean hasWorkspaceScopeForProject(long projectId, String scope, Environment environment) {
-        return SecurityUtils.isAuthenticated();
+        return hasResourceScope(projectId, "Project", scope);
     }
 
     @Override
@@ -182,17 +192,14 @@ public class PermissionServiceImpl implements PermissionService {
             return true;
         }
 
-        if (!(id instanceof Number number)) {
-            return false;
-        }
-
-        return resourceVisibilityProvider.fetchVisibility(number.longValue())
+        return resourceVisibilityProvider.fetchVisibility(id)
             .map(visibilityRecord -> {
                 // workspaceId is unused by both resolver implementations — they resolve against the current
                 // principal, not the argument — so 0 is safe. The parameter exists for a future SQL-predicate
-                // implementation.
+                // implementation. The resource type handed to the resolver is the one the record and its grants
+                // are stored under, which for an inheriting resource is its parent's.
                 Set<Long> visibleIds = resourceVisibilityResolver.filterVisibleIds(
-                    resourceType, 0L, List.of(visibilityRecord));
+                    resourceVisibilityProvider.visibilityResourceType(), 0L, List.of(visibilityRecord));
 
                 return !visibleIds.isEmpty();
             })
@@ -211,7 +218,9 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public boolean hasWorkflowScope(String workflowId, String scope) {
-        return SecurityUtils.isAuthenticated();
+        // A workflow-keyed check is a resource-scope check on the workflow: routing through hasResourceScope gives it
+        // the visibility precondition, and WorkflowVisibilityProvider redirects the lookup to the owning project.
+        return hasResourceScope(workflowId, "Workflow", scope);
     }
 
     @Override

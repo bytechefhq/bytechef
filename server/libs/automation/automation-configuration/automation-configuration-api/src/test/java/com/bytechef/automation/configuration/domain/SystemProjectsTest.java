@@ -16,6 +16,7 @@
 
 package com.bytechef.automation.configuration.domain;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -94,5 +95,31 @@ class SystemProjectsTest {
 
         assertTrue(predicates.contains("p.name NOT LIKE"));
         assertFalse(predicates.contains("project.name NOT LIKE"));
+    }
+
+    /**
+     * The escaping is the point of these helpers, not a detail of them. A prefix spliced in raw reads as a LIKE pattern
+     * whose {@code _} characters are single-character wildcards, so {@code '__EMBEDDED__%'} matches
+     * {@code 'MyEMBEDDEDxyz'} — which is how an ordinary project once disappeared from every non-embedded listing.
+     */
+    @Test
+    void testConditionsEscapeTheUnderscoreWildcards() {
+        assertEquals(
+            "project.name NOT LIKE '\\_\\_EMBEDDED\\_\\_%' ESCAPE '\\' ",
+            SystemProjects.notLikeCondition("project.name", SystemProjects.EMBEDDED_DEPLOYMENT_NAME_PREFIX));
+        assertEquals(
+            "project.name LIKE '\\_\\_EMBEDDED\\_\\_%' ESCAPE '\\' ",
+            SystemProjects.likeCondition("project.name", SystemProjects.EMBEDDED_DEPLOYMENT_NAME_PREFIX));
+    }
+
+    /**
+     * {@code notLikePredicate} is now {@code "AND " + notLikeCondition}; pinning that keeps the two from drifting into
+     * two separately-maintained format strings.
+     */
+    @Test
+    void testNotLikePredicateIsTheConditionWithAnAnd() {
+        assertEquals(
+            "AND " + SystemProjects.notLikeCondition("project.name", SystemProjects.AI_AGENT_NAME_PREFIX),
+            SystemProjects.notLikePredicate("project.name", SystemProjects.AI_AGENT_NAME_PREFIX));
     }
 }

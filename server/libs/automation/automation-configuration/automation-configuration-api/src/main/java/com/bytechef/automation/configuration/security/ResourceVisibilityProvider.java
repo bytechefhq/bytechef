@@ -17,6 +17,7 @@
 package com.bytechef.automation.configuration.security;
 
 import com.bytechef.automation.configuration.service.ResourceVisibilityResolver.VisibilityRecord;
+import java.io.Serializable;
 import java.util.Optional;
 
 /**
@@ -38,7 +39,8 @@ public interface ResourceVisibilityProvider {
 
     /**
      * Discriminator matching {@code ResourceOwnershipResolver.resourceType()} and
-     * {@code ResourceVisibilityPolicy.resourceType()} — e.g. {@code "Connection"}. Must be unique across providers.
+     * {@code ResourceVisibilityPolicy.resourceType()} — e.g. {@code "Connection"}, {@code "Project"},
+     * {@code "Workflow"}. Must be unique across providers.
      */
     String resourceType();
 
@@ -46,4 +48,25 @@ public interface ResourceVisibilityProvider {
      * The resource's visibility and creator, or empty when it does not exist.
      */
     Optional<VisibilityRecord> fetchVisibility(long id);
+
+    /**
+     * Id-shape-agnostic entry point used by {@code PermissionService}. The default handles numeric ids; providers for
+     * string-keyed resources (workflows) override it. A non-numeric id on the default fails closed.
+     */
+    default Optional<VisibilityRecord> fetchVisibility(Serializable id) {
+        if (id instanceof Number number) {
+            return fetchVisibility(number.longValue());
+        }
+
+        return Optional.empty();
+    }
+
+    /**
+     * The resource type under which the returned record's visibility and grants are stored. A resource that inherits
+     * its reach returns its parent's type ({@code "Project"}) and its record's id is the parent's id, so grant lookups
+     * resolve against the parent. Defaults to {@link #resourceType()}.
+     */
+    default String visibilityResourceType() {
+        return resourceType();
+    }
 }

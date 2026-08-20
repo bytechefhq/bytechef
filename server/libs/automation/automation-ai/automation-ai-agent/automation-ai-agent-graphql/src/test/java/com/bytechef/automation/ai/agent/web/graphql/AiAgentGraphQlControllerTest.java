@@ -386,7 +386,7 @@ class AiAgentGraphQlControllerTest {
 
     /**
      * Pins the "Agent Chats" read model at the GraphQL boundary: both string IDs reach
-     * {@link AiAgentFacade#getWorkspaceChatAgents(Long, long)} as numbers, and every {@code ChatAgentDTO} component is
+     * {@link AiAgentFacade#getWorkspaceChatAgents(long, long)} as numbers, and every {@code ChatAgentDTO} component is
      * exposed under the exact {@code ChatAgent} field name the client queries — in particular
      * {@code workflowExecutionId}, which the client feeds back verbatim as the chat webhook's path segment, so a
      * renamed or reshaped field here would leave the client with rows it cannot open.

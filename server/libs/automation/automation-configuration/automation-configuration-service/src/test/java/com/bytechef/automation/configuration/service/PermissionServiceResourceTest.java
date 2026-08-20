@@ -23,12 +23,15 @@ import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
 import com.bytechef.automation.configuration.security.ResourceVisibilityProvider;
 import com.bytechef.automation.configuration.service.ResourceVisibilityResolver.VisibilityRecord;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.domain.ResourceVisibility;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -128,6 +131,100 @@ class PermissionServiceResourceTest {
         assertThat(service.hasResourceScope(1L, "Connection", "CONNECTION_DELETE")).isTrue();
     }
 
+    @Test
+    void testStringIdOnNumericProviderFailsClosedInCe() {
+        // The ownership resolver answers for a String id too, so the owner branch would return true on its own.
+        // That leaves the visibility precondition as the only thing that can produce false: if the default
+        // fetchVisibility(Serializable) stopped failing closed on a non-numeric id, this test would go green.
+        PermissionService service = new PermissionServiceImpl(
+            userService, List.of(anyIdResolver("Connection", ResourceOwner.ofUser(7L))),
+            List.of(visibilityProvider("Connection")), permissiveResolver());
+
+        assertThat(service.hasResourceScope("abc", "Connection", "CONNECTION_DELETE")).isFalse();
+    }
+
+    @Test
+    void testHasWorkspaceScopeForProjectHonoursVisibilityInCe() {
+        // The project resolves to a workspace, so the has-a-provider branch of hasResourceScope would return true on
+        // its own — as the pre-change body (isAuthenticated()) also did. The visibility precondition is therefore the
+        // only thing that can produce false here.
+        User user = new User();
+
+        user.setId(99L);
+
+        when(userService.fetchCurrentUser()).thenReturn(Optional.of(user));
+
+        ResourceVisibilityResolver denyAll = (resourceType, workspaceId, candidates) -> Set.of();
+
+        PermissionService service = new PermissionServiceImpl(
+            userService, List.of(resolver("Project", ResourceOwner.ofWorkspace(1L))),
+            List.of(privateProjectVisibilityProvider()), denyAll);
+
+        assertThat(service.hasWorkspaceScopeForProject(1L, "WORKFLOW_VIEW")).isFalse();
+    }
+
+    @Test
+    void testHasWorkspaceScopeForProjectWithEnvironmentHonoursVisibilityInCe() {
+        // Same wiring as the environment-unaware test above, and for the same reason: everything except visibility
+        // permits. CE's environment-aware overload delegates to the same chokepoint, so the two cannot disagree
+        // about one project.
+        User user = new User();
+
+        user.setId(99L);
+
+        when(userService.fetchCurrentUser()).thenReturn(Optional.of(user));
+
+        ResourceVisibilityResolver denyAll = (resourceType, workspaceId, candidates) -> Set.of();
+
+        PermissionService service = new PermissionServiceImpl(
+            userService, List.of(resolver("Project", ResourceOwner.ofWorkspace(1L))),
+            List.of(privateProjectVisibilityProvider()), denyAll);
+
+        assertThat(service.hasWorkspaceScopeForProject(1L, "WORKFLOW_VIEW", Environment.PRODUCTION)).isFalse();
+    }
+
+    /**
+     * Unlike {@link #resolver(String, ResourceOwner)}, this one answers for a non-numeric id as well, instead of
+     * inheriting the SPI default that fails closed for it.
+     */
+    private static ResourceOwnershipResolver anyIdResolver(String type, ResourceOwner owner) {
+        return new ResourceOwnershipResolver() {
+            @Override
+            public String resourceType() {
+                return type;
+            }
+
+            @Override
+            public ResourceOwner resolveOwner(long id) {
+                return owner;
+            }
+
+            @Override
+            public ResourceOwner resolveOwner(Serializable id) {
+                return owner;
+            }
+        };
+    }
+
+    /**
+     * A project nobody but its creator can see, shared by both project-keyed tests so the two overloads are pinned
+     * against identical wiring.
+     */
+    private static ResourceVisibilityProvider privateProjectVisibilityProvider() {
+        return new ResourceVisibilityProvider() {
+
+            @Override
+            public String resourceType() {
+                return "Project";
+            }
+
+            @Override
+            public Optional<VisibilityRecord> fetchVisibility(long id) {
+                return Optional.of(new VisibilityRecord(id, ResourceVisibility.PRIVATE, "someone-else"));
+            }
+        };
+    }
+
     private static ResourceVisibilityProvider visibilityProvider(String resourceType) {
         return new ResourceVisibilityProvider() {
 
@@ -182,10 +279,74 @@ class PermissionServiceResourceTest {
     }
 
     @Test
-    void testHasWorkflowScopePermissiveInCe() {
-        PermissionService service = permissionService();
+    void testHasWorkflowScopeWorkspaceMappedIsPermissiveInCe() {
+        // CE is permissive for a workflow that RESOLVES — one whose ownership resolver answers, mapping it to a
+        // workspace and no owner user. It is not permissive unconditionally: hasWorkflowScope routes through
+        // hasResourceScope, so an unregistered or non-answering resolver fails closed, which is why the Workflow
+        // ownership resolver has to be registered for this to pass.
+        PermissionService service = new PermissionServiceImpl(
+            userService, List.of(anyIdResolver("Workflow", ResourceOwner.ofWorkspace(1L))), List.of(),
+            permissiveResolver());
 
         assertThat(service.hasWorkflowScope("wf-uuid", "WORKFLOW_EDIT")).isTrue();
+    }
+
+    @Test
+    void testHasWorkflowScopeHonoursTheProjectsVisibilityInCe() {
+        // Both halves register the same ownership resolver, which answers for a String id and resolves to a
+        // workspace — so the ownership branch permits in both, and the resolver's verdict on the owning project is
+        // the only difference between them. Remove the precondition from hasWorkflowScope and the first assertion
+        // goes green for the wrong reason.
+        ResourceVisibilityResolver denyAll = (resourceType, workspaceId, candidates) -> Set.of();
+
+        PermissionService hidden = new PermissionServiceImpl(
+            userService, List.of(anyIdResolver("Workflow", ResourceOwner.ofWorkspace(1L))),
+            List.of(workflowVisibilityProvider()), denyAll);
+
+        assertThat(hidden.hasWorkflowScope("wf-uuid", "WORKFLOW_VIEW"))
+            .as("a workflow inside a project the caller cannot see must be denied")
+            .isFalse();
+
+        PermissionService visible = new PermissionServiceImpl(
+            userService, List.of(anyIdResolver("Workflow", ResourceOwner.ofWorkspace(1L))),
+            List.of(workflowVisibilityProvider()), permissiveResolver());
+
+        assertThat(visible.hasWorkflowScope("wf-uuid", "WORKFLOW_VIEW"))
+            .as("the same workflow is permitted once its project is visible")
+            .isTrue();
+    }
+
+    /**
+     * Mirrors the production {@code WorkflowVisibilityProvider}: a workflow is keyed by a String and inherits the
+     * record of the project that owns it, so grants resolve under {@code "Project"}.
+     */
+    private static ResourceVisibilityProvider workflowVisibilityProvider() {
+        return new ResourceVisibilityProvider() {
+
+            @Override
+            public String resourceType() {
+                return "Workflow";
+            }
+
+            @Override
+            public String visibilityResourceType() {
+                return "Project";
+            }
+
+            @Override
+            public Optional<VisibilityRecord> fetchVisibility(long id) {
+                return Optional.empty();
+            }
+
+            @Override
+            public Optional<VisibilityRecord> fetchVisibility(Serializable id) {
+                if (!(id instanceof String)) {
+                    return Optional.empty();
+                }
+
+                return Optional.of(new VisibilityRecord(20L, ResourceVisibility.PRIVATE, "someone-else"));
+            }
+        };
     }
 
     @Test
