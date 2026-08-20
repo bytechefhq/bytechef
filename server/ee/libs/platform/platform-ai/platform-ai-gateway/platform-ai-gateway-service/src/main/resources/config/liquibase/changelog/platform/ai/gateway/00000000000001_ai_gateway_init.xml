@@ -5,6 +5,16 @@
                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
     <!--
+        The empty <rollback/> blocks in this file are deliberate, not omissions.
+
+        A changeset guarded by a MARK_RAN precondition can be recorded as ran without having applied its change, so
+        its inverse must never run. With no rollback declared Liquibase auto-generates that inverse (dropColumn,
+        dropTable, and so on) and a rollback would then destroy an object this changeset never created. An empty
+        rollback leaves the object in place instead: inert, and re-applying the changeset is a no-op through the same
+        precondition.
+    -->
+
+    <!--
         Workspace-agnostic ai_gateway tables. Extracted from automation/ai_gateway/00000000000001_ai_gateway_init.xml
         so the platform tier owns the entity tables it uses; the workspace_ai_gateway_* membership tables stay in
         automation/ai_gateway/. Loaded BEFORE automation/ai_gateway/ in master.xml so the workspace_*-tables' FKs
@@ -179,6 +189,7 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
+        <rollback/>
     </changeSet>
 
     <changeSet id="20260507000002" author="ivicac">
@@ -219,6 +230,7 @@
         </createTable>
 
         <addForeignKeyConstraint constraintName="fk_ai_gateway_project_routing_policy" baseTableName="ai_gateway_project" baseColumnNames="routing_policy_id" referencedTableName="ai_gateway_routing_policy" referencedColumnNames="id"/>
+        <rollback/>
     </changeSet>
 
     <!--
@@ -254,6 +266,7 @@
                                  baseColumnNames="tag_id"
                                  referencedTableName="tag" referencedColumnNames="id"
                                  constraintName="fk_ai_gateway_routing_policy_tag_tag"/>
+        <rollback/>
     </changeSet>
 
     <changeSet id="20260507000004" author="ivicac">
@@ -298,6 +311,7 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
+        <rollback/>
     </changeSet>
 
     <!--
@@ -312,6 +326,7 @@
         </preConditions>
 
         <addForeignKeyConstraint constraintName="fk_ai_model_provider" baseTableName="ai_model" baseColumnNames="provider_id" referencedTableName="ai_gateway_provider" referencedColumnNames="id"/>
+        <rollback/>
     </changeSet>
 
     <changeSet id="20260812000002" author="ivicac">
@@ -320,5 +335,6 @@
         </preConditions>
 
         <addForeignKeyConstraint constraintName="fk_ai_llm_gw_deploy_model" baseTableName="ai_gateway_model_deployment" baseColumnNames="model_id" referencedTableName="ai_model" referencedColumnNames="id"/>
+        <rollback/>
     </changeSet>
 </databaseChangeLog>

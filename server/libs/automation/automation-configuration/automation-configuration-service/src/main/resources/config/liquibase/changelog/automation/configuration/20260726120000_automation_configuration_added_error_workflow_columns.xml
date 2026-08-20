@@ -4,6 +4,16 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
+    <!--
+        The empty <rollback/> blocks in this file are deliberate, not omissions.
+
+        A changeset guarded by a MARK_RAN precondition can be recorded as ran without having applied its change, so
+        its inverse must never run. With no rollback declared Liquibase auto-generates that inverse (dropColumn,
+        dropTable, and so on) and a rollback would then destroy an object this changeset never created. An empty
+        rollback leaves the object in place instead: inert, and re-applying the changeset is a no-op through the same
+        precondition.
+    -->
+
     <!-- Error-workflow handler reference. Nullable on both tables: null on project means no project-wide
          handler, null on project_workflow means inherit the project's. The separate disabled flag exists
          because null already means inherit, so it cannot also mean "opt out". -->
@@ -17,6 +27,7 @@
         <addColumn tableName="project">
             <column name="error_project_workflow_id" type="BIGINT"/>
         </addColumn>
+        <rollback/>
     </changeSet>
 
     <changeSet id="20260726120000-2" author="Ivica Cardic">
@@ -32,5 +43,6 @@
                 <constraints nullable="false"/>
             </column>
         </addColumn>
+        <rollback/>
     </changeSet>
 </databaseChangeLog>

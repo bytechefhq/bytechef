@@ -3,6 +3,16 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <!--
+        The empty <rollback/> blocks in this file are deliberate, not omissions.
+
+        A changeset guarded by a MARK_RAN precondition can be recorded as ran without having applied its change, so
+        its inverse must never run. With no rollback declared Liquibase auto-generates that inverse (dropColumn,
+        dropTable, and so on) and a rollback would then destroy an object this changeset never created. An empty
+        rollback leaves the object in place instead: inert, and re-applying the changeset is a no-op through the same
+        precondition.
+    -->
+
     <changeSet id="00000000000002" author="Ivica Cardic">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -221,6 +231,7 @@
         <createIndex tableName="ai_observability_span" indexName="idx_ai_obs_span_created">
             <column name="created_date"/>
         </createIndex>
+        <rollback/>
     </changeSet>
 
     <changeSet id="00000000000002-10" author="Ivica Cardic">
@@ -277,6 +288,7 @@
         <createIndex tableName="ai_observability_alert_rule" indexName="idx_ai_obs_alert_rule_workspace">
             <column name="workspace_id"/>
         </createIndex>
+        <rollback/>
     </changeSet>
 
     <changeSet id="00000000000002-12" author="Ivica Cardic">
@@ -298,6 +310,7 @@
         <addForeignKeyConstraint constraintName="fk_ai_obs_arc_alert_rule"
                                  baseTableName="ai_observability_alert_rule_channel" baseColumnNames="ai_observability_alert_rule"
                                  referencedTableName="ai_observability_alert_rule" referencedColumnNames="id"/>
+        <rollback/>
     </changeSet>
 
     <!-- The foreign key targets the notification table, owned by the platform/notification changelog, which
@@ -317,6 +330,7 @@
         <addForeignKeyConstraint constraintName="fk_ai_obs_arc_notification"
                                  baseTableName="ai_observability_alert_rule_channel" baseColumnNames="notification_id"
                                  referencedTableName="notification" referencedColumnNames="id" onDelete="CASCADE"/>
+        <rollback/>
     </changeSet>
 
     <changeSet id="00000000000002-13" author="Ivica Cardic">
@@ -355,6 +369,7 @@
         <createIndex tableName="ai_observability_alert_event" indexName="idx_ai_obs_alert_event_created">
             <column name="created_date"/>
         </createIndex>
+        <rollback/>
     </changeSet>
 
     <changeSet id="00000000000002-6" author="Ivica Cardic">
@@ -453,6 +468,7 @@
             <column name="workspace_id"/>
             <column name="enabled"/>
         </createIndex>
+        <rollback/>
     </changeSet>
 
     <changeSet id="00000000000002-15" author="Ivica Cardic">
@@ -496,5 +512,6 @@
         <createIndex tableName="ai_observability_webhook_delivery" indexName="idx_ai_obs_webhook_delivery_created">
             <column name="created_date"/>
         </createIndex>
+        <rollback/>
     </changeSet>
 </databaseChangeLog>

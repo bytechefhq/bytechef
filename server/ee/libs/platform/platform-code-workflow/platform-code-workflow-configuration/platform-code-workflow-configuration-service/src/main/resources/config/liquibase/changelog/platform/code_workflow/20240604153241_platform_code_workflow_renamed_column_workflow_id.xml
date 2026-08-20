@@ -3,6 +3,16 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <!--
+        The empty <rollback/> blocks in this file are deliberate, not omissions.
+
+        A changeset guarded by a MARK_RAN precondition can be recorded as ran without having applied its change, so
+        its inverse must never run. With no rollback declared Liquibase auto-generates that inverse (dropColumn,
+        dropTable, and so on) and a rollback would then destroy an object this changeset never created. An empty
+        rollback leaves the object in place instead: inert, and re-applying the changeset is a no-op through the same
+        precondition.
+    -->
+
     <changeSet id="20240604153241" author="Ivica Cardic">
         <preConditions onFail="MARK_RAN">
             <columnExists tableName="code_workflow" columnName="workflow_id"/>
@@ -11,5 +21,6 @@
         <renameColumn tableName="code_workflow" oldColumnName="workflow_id" newColumnName="id"/>
 
         <modifyDataType tableName="code_workflow" columnName="id" newDataType="${uuid_type}"/>
+        <rollback/>
     </changeSet>
 </databaseChangeLog>

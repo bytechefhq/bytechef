@@ -4,6 +4,16 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
     <!--
+        The empty <rollback/> blocks in this file are deliberate, not omissions.
+
+        A changeset guarded by a MARK_RAN precondition can be recorded as ran without having applied its change, so
+        its inverse must never run. With no rollback declared Liquibase auto-generates that inverse (dropColumn,
+        dropTable, and so on) and a rollback would then destroy an object this changeset never created. An empty
+        rollback leaves the object in place instead: inert, and re-applying the changeset is a no-op through the same
+        precondition.
+    -->
+
+    <!--
         Author note: ai_prompt + ai_prompt_version were extracted from
         automation/ai_gateway/00000000000003_ai_prompt_init.xml so non-gateway agent surfaces (e.g. command center)
         can reuse the same prompt store. A prompt belongs to at most one workspace, carried by the nullable
@@ -100,5 +110,6 @@
         <createIndex tableName="ai_prompt_version" indexName="idx_ai_obs_prompt_version_active">
             <column name="active"/>
         </createIndex>
+        <rollback/>
     </changeSet>
 </databaseChangeLog>
