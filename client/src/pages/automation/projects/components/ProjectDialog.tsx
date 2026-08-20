@@ -15,7 +15,9 @@ import {
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Textarea} from '@/components/ui/textarea';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import ResourceVisibilityPicker from '@/shared/components/visibility/ResourceVisibilityPicker';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
+import {useIsVisibilityEditionEnabled} from '@/shared/hooks/useVisibilityFeatureEnabled';
 import {Category, Project, Tag} from '@/shared/middleware/automation/configuration';
 import {useCreateProjectMutation, useUpdateProjectMutation} from '@/shared/mutations/automation/projects.mutations';
 import {ProjectCategoryKeys, useGetProjectCategoriesQuery} from '@/shared/queries/automation/projectCategories.queries';
@@ -39,6 +41,8 @@ const ProjectDialog = ({onClose, onSuccess, project, triggerNode}: ProjectDialog
 
     const {captureProjectCreated} = useAnalytics();
 
+    const visibilityFeatureEnabled = useIsVisibilityEditionEnabled();
+
     const form = useForm<Project>({
         defaultValues: {
             category: project?.category
@@ -54,6 +58,7 @@ const ProjectDialog = ({onClose, onSuccess, project, triggerNode}: ProjectDialog
                     ...tag,
                     label: tag.name,
                 })) || [],
+            visibility: project?.visibility || 'WORKSPACE',
             workspaceId: project?.workspaceId,
         } as Project,
     });
@@ -272,6 +277,33 @@ const ProjectDialog = ({onClose, onSuccess, project, triggerNode}: ProjectDialog
                                                         ...tag,
                                                     };
                                                 })}
+                                            />
+                                        </FormControl>
+
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        )}
+
+                        {!project?.id && visibilityFeatureEnabled && (
+                            <FormField
+                                control={control}
+                                name="visibility"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Visibility</FormLabel>
+
+                                        <FormControl>
+                                            {/* Grants need a project id, so creation offers reach only; the list
+                                                item's picker adds people afterwards. */}
+
+                                            <ResourceVisibilityPicker
+                                                grantedUserIds={[]}
+                                                onGrantedUserIdsChange={() => undefined}
+                                                onVisibilityChange={field.onChange}
+                                                showSpecificPeopleOption={false}
+                                                visibility={field.value || 'WORKSPACE'}
                                             />
                                         </FormControl>
 

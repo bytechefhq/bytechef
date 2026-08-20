@@ -1,3 +1,4 @@
+import {TooltipProvider} from '@/components/ui/tooltip';
 import {fireEvent, render, screen, waitFor} from '@/shared/util/test-utils';
 import userEvent from '@testing-library/user-event';
 import {ComponentProps} from 'react';
@@ -17,6 +18,12 @@ const hoisted = vi.hoisted(() => ({
         data: {connectionCredentialStores: [{readOnly: false, type: 'DATABASE'}]},
         isLoading: false,
     } as Record<string, unknown>,
+    useIsVisibilityEditionEnabled: vi.fn(() => false),
+}));
+
+// Edition gate for the visibility picker — off by default so the credential-store tests below are unaffected
+vi.mock('@/shared/hooks/useVisibilityFeatureEnabled', () => ({
+    useIsVisibilityEditionEnabled: hoisted.useIsVisibilityEditionEnabled,
 }));
 
 // GraphQL: credential stores query
@@ -132,16 +139,19 @@ function makeCreateMutationStub() {
 
 /** Render the dialog in create mode (no connection, no triggerNode → opens immediately). */
 function renderDialog(overrides: Partial<ComponentProps<typeof ConnectionDialog>> = {}) {
+    // TooltipProvider: the edit-path ResourceVisibilityBadge renders a Radix Tooltip, which throws without one.
     return render(
-        <ConnectionDialog
-            componentDefinition={MOCK_COMPONENT_DEFINITION as never}
-            componentDefinitions={MOCK_COMPONENT_DEFINITIONS as never}
-            connectionTagsQueryKey={['connectionTags']}
-            connectionsQueryKey={['connections']}
-            useCreateConnectionMutation={() => makeCreateMutationStub() as never}
-            useGetConnectionTagsQuery={stubGetConnectionTagsQuery as never}
-            {...overrides}
-        />
+        <TooltipProvider>
+            <ConnectionDialog
+                componentDefinition={MOCK_COMPONENT_DEFINITION as never}
+                componentDefinitions={MOCK_COMPONENT_DEFINITIONS as never}
+                connectionTagsQueryKey={['connectionTags']}
+                connectionsQueryKey={['connections']}
+                useCreateConnectionMutation={() => makeCreateMutationStub() as never}
+                useGetConnectionTagsQuery={stubGetConnectionTagsQuery as never}
+                {...overrides}
+            />
+        </TooltipProvider>
     );
 }
 
@@ -152,6 +162,9 @@ function renderDialog(overrides: Partial<ComponentProps<typeof ConnectionDialog>
 describe('ConnectionDialog credential store integration', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+
+        hoisted.useIsVisibilityEditionEnabled.mockReturnValue(false);
+
         Element.prototype.scrollIntoView = vi.fn();
     });
 
@@ -333,5 +346,69 @@ describe('ConnectionDialog credential store integration', () => {
 
         // Without store data, stores defaults to [] → picker hidden
         expect(screen.queryByText(/credential storage/i)).not.toBeInTheDocument();
+    });
+});
+
+describe('ConnectionDialog visibility', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+
+        hoisted.useIsVisibilityEditionEnabled.mockReturnValue(true);
+
+        hoisted.storesQueryResult = {
+            data: {connectionCredentialStores: [{readOnly: false, type: 'DATABASE'}]},
+            isLoading: false,
+        };
+
+        Element.prototype.scrollIntoView = vi.fn();
+    });
+
+    it('offers the visibility picker when creating a connection in EE', () => {
+        renderDialog();
+
+        expect(screen.getByText('Visibility')).toBeInTheDocument();
+        expect(screen.getByLabelText('Shared with workspace')).toBeInTheDocument();
+        expect(screen.getByLabelText('Private')).toBeInTheDocument();
+    });
+
+    it('does not offer "Specific people" when creating, because there is no connection id to grant against', () => {
+        renderDialog();
+
+        // Anchor: the picker itself rendered, so the absence below is showSpecificPeopleOption={false} and not
+        // a missing picker.
+        expect(screen.getByLabelText('Shared with workspace')).toBeInTheDocument();
+        expect(screen.queryByLabelText('Specific people')).not.toBeInTheDocument();
+    });
+
+    it('shows a read-only badge instead of the picker when editing an existing connection', () => {
+        renderDialog({
+            connection: {
+                componentName: 'acme',
+                connectionVersion: 1,
+                environmentId: 0,
+                id: 42,
+                name: 'Existing Acme Connection',
+                parameters: {},
+                version: 1,
+                visibility: 'WORKSPACE',
+            } as never,
+        });
+
+        // Anchor: proves the edit-path visibility block rendered, so the absence below is the create/edit gate
+        // and not a failed render.
+        expect(screen.getByText(/change visibility and sharing from the connection list/i)).toBeInTheDocument();
+        expect(screen.queryByLabelText('Shared with workspace')).not.toBeInTheDocument();
+        expect(screen.queryByLabelText('Specific people')).not.toBeInTheDocument();
+    });
+
+    it('does not offer the picker in CE', () => {
+        hoisted.useIsVisibilityEditionEnabled.mockReturnValue(false);
+
+        renderDialog();
+
+        // Anchor: proves the dialog itself rendered, so the absence below is the edition gate and not a failed
+        // render.
+        expect(screen.getByText('Create Connection')).toBeInTheDocument();
+        expect(screen.queryByText('Visibility')).not.toBeInTheDocument();
     });
 });

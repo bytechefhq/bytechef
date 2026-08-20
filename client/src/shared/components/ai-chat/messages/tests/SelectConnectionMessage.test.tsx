@@ -42,7 +42,7 @@ vi.mock('@/shared/queries/automation/connections.queries', () => ({
     }),
 }));
 
-vi.mock('@/pages/automation/connections/components/ConnectionScopeBadge', () => ({
+vi.mock('@/shared/components/visibility/ResourceVisibilityBadge', () => ({
     default: () => null,
 }));
 

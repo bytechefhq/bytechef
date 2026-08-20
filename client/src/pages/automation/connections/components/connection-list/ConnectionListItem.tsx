@@ -20,10 +20,11 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {useVisibilityFeatureEnabled} from '@/pages/automation/connections/hooks/useVisibilityFeatureEnabled';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
-import ConnectionVisibilityPicker from '@/shared/components/connection/ConnectionVisibilityPicker';
 import {connectionCredentialStoreLabels} from '@/shared/components/connection/connectionCredentialStoreLabels';
+import ResourceVisibilityBadge from '@/shared/components/visibility/ResourceVisibilityBadge';
+import ResourceVisibilityPicker from '@/shared/components/visibility/ResourceVisibilityPicker';
+import {useVisibilityFeatureEnabled} from '@/shared/hooks/useVisibilityFeatureEnabled';
 import {Connection, Tag} from '@/shared/middleware/automation/configuration';
 import {
     ConnectionCredentialStoreType,
@@ -49,7 +50,6 @@ import {memo, useMemo, useState} from 'react';
 import {toast} from 'sonner';
 
 import TagList from '../../../../../shared/components/TagList';
-import ConnectionScopeBadge from '../ConnectionScopeBadge';
 
 interface ConnectionListItemProps {
     componentDefinitions: ComponentDefinitionBasic[];
@@ -194,7 +194,7 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
 
         return (
             <div className="min-w-64 p-3">
-                <ConnectionVisibilityPicker
+                <ResourceVisibilityPicker
                     grantedUserIds={grantedUserIds}
                     onGrantedUserIdsChange={(nextUserIds) => {
                         // Diff rather than replace: the server has no set-grants operation, and expressing it as
@@ -264,7 +264,7 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
                                                     className="cursor-pointer rounded-sm hover:bg-surface-neutral-primary-hover"
                                                     type="button"
                                                 >
-                                                    <ConnectionScopeBadge
+                                                    <ResourceVisibilityBadge
                                                         grantedUserCount={grantedUserIds.length}
                                                         visibility={connection.visibility || 'WORKSPACE'}
                                                     />
@@ -277,7 +277,9 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
                                         </DropdownMenu>
                                     ) : (
                                         visibilityFeatureEnabled && (
-                                            <ConnectionScopeBadge visibility={connection.visibility || 'WORKSPACE'} />
+                                            <ResourceVisibilityBadge
+                                                visibility={connection.visibility || 'WORKSPACE'}
+                                            />
                                         )
                                     )}
                                 </div>

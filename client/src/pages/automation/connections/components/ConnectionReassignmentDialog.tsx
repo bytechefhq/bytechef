@@ -11,6 +11,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
+import ResourceVisibilityBadge from '@/shared/components/visibility/ResourceVisibilityBadge';
 import {
     useAffectedWorkflowsQuery,
     useReassignAllConnectionsMutation,
@@ -20,8 +21,6 @@ import {
 import {AlertTriangleIcon} from 'lucide-react';
 import {useEffect, useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
-
-import ConnectionScopeBadge from './ConnectionScopeBadge';
 
 interface ConnectionReassignmentDialogProps {
     onClose: () => void;
@@ -175,7 +174,7 @@ const ConnectionReassignmentDialog = ({onClose, open, userLogin, workspaceId}: C
                                             </TableCell>
 
                                             <TableCell className="px-3 py-2">
-                                                <ConnectionScopeBadge visibility={connection.visibility} />
+                                                <ResourceVisibilityBadge visibility={connection.visibility} />
                                             </TableCell>
 
                                             <TableCell className="px-3 py-2 text-sm text-muted-foreground">

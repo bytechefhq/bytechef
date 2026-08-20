@@ -3,19 +3,19 @@ import userEvent from '@testing-library/user-event';
 import {useState} from 'react';
 import {describe, expect, it, vi} from 'vitest';
 
-import ConnectionVisibilityPicker, {deriveVisibilityState} from './ConnectionVisibilityPicker';
+import ResourceVisibilityPicker, {deriveVisibilityState} from './ResourceVisibilityPicker';
 
 const MEMBERS = [
     {label: 'ana@example.com', userId: 8},
     {label: 'marko@example.com', userId: 9},
 ];
 
-const renderPicker = (props: Partial<Parameters<typeof ConnectionVisibilityPicker>[0]> = {}) => {
+const renderPicker = (props: Partial<Parameters<typeof ResourceVisibilityPicker>[0]> = {}) => {
     const onGrantedUserIdsChange = vi.fn();
     const onVisibilityChange = vi.fn();
 
     render(
-        <ConnectionVisibilityPicker
+        <ResourceVisibilityPicker
             grantedUserIds={[]}
             onGrantedUserIdsChange={onGrantedUserIdsChange}
             onVisibilityChange={onVisibilityChange}
@@ -44,7 +44,7 @@ describe('deriveVisibilityState', () => {
     });
 });
 
-describe('ConnectionVisibilityPicker', () => {
+describe('ResourceVisibilityPicker', () => {
     it('preselects Shared with workspace for a new connection', () => {
         renderPicker();
 
@@ -107,7 +107,7 @@ describe('ConnectionVisibilityPicker', () => {
             const [grantedUserIds, setGrantedUserIds] = useState<number[]>([]);
 
             return (
-                <ConnectionVisibilityPicker
+                <ResourceVisibilityPicker
                     grantedUserIds={grantedUserIds}
                     onGrantedUserIdsChange={setGrantedUserIds}
                     onVisibilityChange={setVisibility}

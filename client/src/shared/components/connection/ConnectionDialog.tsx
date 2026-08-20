@@ -17,15 +17,15 @@ import {
 } from '@/components/ui/dialog';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Label} from '@/components/ui/label';
-import ConnectionScopeBadge from '@/pages/automation/connections/components/ConnectionScopeBadge';
-import {useIsVisibilityEditionEnabled} from '@/pages/automation/connections/hooks/useVisibilityFeatureEnabled';
 import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
 import {ConnectionI, WorkflowMockProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import ConnectionParameters from '@/shared/components/connection/ConnectionParameters';
-import ConnectionVisibilityPicker from '@/shared/components/connection/ConnectionVisibilityPicker';
 import {CodePayloadI, TokenPayloadI} from '@/shared/components/connection/oauth2/useOAuth2';
+import ResourceVisibilityBadge from '@/shared/components/visibility/ResourceVisibilityBadge';
+import ResourceVisibilityPicker from '@/shared/components/visibility/ResourceVisibilityPicker';
+import {useIsVisibilityEditionEnabled} from '@/shared/hooks/useVisibilityFeatureEnabled';
 import {ConnectionCredentialStoreType, useConnectionCredentialStoresQuery} from '@/shared/middleware/graphql';
 import {
     Authorization,
@@ -777,11 +777,12 @@ const ConnectionDialog = ({
                                                                 an id, so creation offers reach only; the list-page
                                                                 picker adds people afterwards. */}
 
-                                                            <ConnectionVisibilityPicker
+                                                            <ResourceVisibilityPicker
                                                                 grantedUserIds={[]}
                                                                 onGrantedUserIdsChange={() => undefined}
                                                                 onVisibilityChange={field.onChange}
                                                                 showOrganizationOption={showOrganizationOption}
+                                                                showSpecificPeopleOption={false}
                                                                 visibility={field.value}
                                                             />
                                                         </FormControl>
@@ -797,7 +798,7 @@ const ConnectionDialog = ({
                                                 <FormLabel>Visibility</FormLabel>
 
                                                 <FormControl>
-                                                    <ConnectionScopeBadge visibility={connection.visibility} />
+                                                    <ResourceVisibilityBadge visibility={connection.visibility} />
                                                 </FormControl>
 
                                                 <p className="text-xs text-muted-foreground">

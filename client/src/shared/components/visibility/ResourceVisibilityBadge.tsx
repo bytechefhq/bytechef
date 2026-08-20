@@ -1,18 +1,19 @@
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {ConnectionVisibilityEnum} from '@/shared/middleware/automation/configuration';
+import {ResourceVisibilityValueType} from '@/shared/components/visibility/ResourceVisibilityPicker';
 import {BuildingIcon, GlobeIcon, LockIcon, UsersIcon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';
 
-interface ConnectionScopeBadgePropsI {
+interface ResourceVisibilityBadgePropsI {
     grantedUserCount?: number;
-    visibility: ConnectionVisibilityEnum;
+    visibility: ResourceVisibilityValueType;
 }
 
-// Keyed on the generated enum so a server-side enum extension fails the type check at codegen time
-// instead of silently falling back to the runtime default. VISIBILITY_CONFIG as a fully-satisfied
-// Record<ConnectionVisibilityEnum, …> forces the developer to add UI config for any new visibility.
+// ResourceVisibilityValueType mirrors the GraphQL ResourceVisibility enum. VISIBILITY_CONFIG as a
+// fully-satisfied Record<ResourceVisibilityValueType, …> forces the developer to add UI config for
+// any new visibility value the type gains. A value the server adds ahead of a client deploy is not
+// representable in the type, so it is handled defensively below by falling back to PRIVATE.
 const VISIBILITY_CONFIG: Record<
-    ConnectionVisibilityEnum,
+    ResourceVisibilityValueType,
     {className: string; icon: typeof LockIcon; label: string; tooltip: string}
 > = {
     ORGANIZATION: {
@@ -42,7 +43,7 @@ const SPECIFIC_PEOPLE_CONFIG = {
     tooltip: 'Withheld from the workspace and shared with named colleagues.',
 };
 
-const ConnectionScopeBadge = ({grantedUserCount = 0, visibility}: ConnectionScopeBadgePropsI) => {
+const ResourceVisibilityBadge = ({grantedUserCount = 0, visibility}: ResourceVisibilityBadgePropsI) => {
     // "Specific people" is not a stored value — it is PRIVATE with grants — so it is resolved here rather than
     // living in VISIBILITY_CONFIG, which stays a total mapping of the server enum.
     const isSpecificPeople = visibility === 'PRIVATE' && grantedUserCount > 0;
@@ -76,4 +77,4 @@ const ConnectionScopeBadge = ({grantedUserCount = 0, visibility}: ConnectionScop
     );
 };
 
-export default ConnectionScopeBadge;
+export default ResourceVisibilityBadge;

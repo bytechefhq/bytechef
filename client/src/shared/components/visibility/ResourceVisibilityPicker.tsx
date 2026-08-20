@@ -6,20 +6,23 @@ import {RadioGroup, RadioGroupItem} from '@/components/ui/radio-group';
 import {XIcon} from 'lucide-react';
 import {useState} from 'react';
 
-export type ConnectionVisibilityStateType = 'ORGANIZATION' | 'PRIVATE' | 'SPECIFIC_PEOPLE' | 'WORKSPACE';
+export type ResourceVisibilityValueType = 'ORGANIZATION' | 'PRIVATE' | 'WORKSPACE';
+
+export type ResourceVisibilityStateType = ResourceVisibilityValueType | 'SPECIFIC_PEOPLE';
 
 export interface WorkspaceMemberI {
     label: string;
     userId: number;
 }
 
-interface ConnectionVisibilityPickerPropsI {
+interface ResourceVisibilityPickerPropsI {
     grantedUserIds: number[];
     isAdmin?: boolean;
     onGrantedUserIdsChange: (userIds: number[]) => void;
-    onVisibilityChange: (visibility: 'ORGANIZATION' | 'PRIVATE' | 'WORKSPACE') => void;
+    onVisibilityChange: (visibility: ResourceVisibilityValueType) => void;
     showOrganizationOption?: boolean;
-    visibility: 'ORGANIZATION' | 'PRIVATE' | 'WORKSPACE';
+    showSpecificPeopleOption?: boolean;
+    visibility: ResourceVisibilityValueType;
     workspaceMembers?: WorkspaceMemberI[];
 }
 
@@ -29,9 +32,9 @@ interface ConnectionVisibilityPickerPropsI {
  * enum value that would be indistinguishable from PRIVATE the moment its last grant was revoked.
  */
 export const deriveVisibilityState = (
-    visibility: 'ORGANIZATION' | 'PRIVATE' | 'WORKSPACE',
+    visibility: ResourceVisibilityValueType,
     grantedUserIds: number[]
-): ConnectionVisibilityStateType => {
+): ResourceVisibilityStateType => {
     if (visibility === 'PRIVATE' && grantedUserIds.length > 0) {
         return 'SPECIFIC_PEOPLE';
     }
@@ -39,15 +42,16 @@ export const deriveVisibilityState = (
     return visibility;
 };
 
-const ConnectionVisibilityPicker = ({
+const ResourceVisibilityPicker = ({
     grantedUserIds,
     isAdmin = false,
     onGrantedUserIdsChange,
     onVisibilityChange,
     showOrganizationOption = false,
+    showSpecificPeopleOption = true,
     visibility,
     workspaceMembers = [],
-}: ConnectionVisibilityPickerPropsI) => {
+}: ResourceVisibilityPickerPropsI) => {
     // "Specific people" cannot be derived from props alone. It stores as PRIVATE, so a user who selects it before
     // naming anyone would see the radio snap straight back to Private with no way to reach the people picker. This
     // holds the intent until the first grant exists, after which the derived state carries it.
@@ -73,7 +77,7 @@ const ConnectionVisibilityPicker = ({
 
         // Leaving PRIVATE makes any grants inert rather than deleting them, so demoting again restores the same
         // audience. The server keeps the rows for the same reason.
-        onVisibilityChange(nextState as 'ORGANIZATION' | 'PRIVATE' | 'WORKSPACE');
+        onVisibilityChange(nextState as ResourceVisibilityValueType);
     };
 
     const ungrantedMembers = workspaceMembers.filter((member) => !grantedUserIds.includes(member.userId));
@@ -100,13 +104,20 @@ const ConnectionVisibilityPicker = ({
                     </Label>
                 </div>
 
-                <div className="flex items-center space-x-2">
-                    <RadioGroupItem id="visibility-specific-people" value="SPECIFIC_PEOPLE" />
+                {/* Naming people requires grant rows, which require the resource to exist. A create dialog has no
+                    id to grant against, so it must not OFFER the state - selecting it there would silently reduce
+                    the user's stated intent to Private and reveal an empty people picker. Defaults to shown, so
+                    every already-shipped caller keeps its four states. */}
 
-                    <Label className="font-normal" htmlFor="visibility-specific-people">
-                        Specific people
-                    </Label>
-                </div>
+                {showSpecificPeopleOption && (
+                    <div className="flex items-center space-x-2">
+                        <RadioGroupItem id="visibility-specific-people" value="SPECIFIC_PEOPLE" />
+
+                        <Label className="font-normal" htmlFor="visibility-specific-people">
+                            Specific people
+                        </Label>
+                    </div>
+                )}
 
                 {showOrganizationOption && isAdmin && (
                     <div className="flex items-center space-x-2">
@@ -119,7 +130,7 @@ const ConnectionVisibilityPicker = ({
                 )}
             </RadioGroup>
 
-            {state === 'SPECIFIC_PEOPLE' && (
+            {showSpecificPeopleOption && state === 'SPECIFIC_PEOPLE' && (
                 <div className="space-y-2 pl-6">
                     <div className="flex flex-wrap gap-1">
                         {grantedUserIds.map((userId) => (
@@ -161,4 +172,4 @@ const ConnectionVisibilityPicker = ({
     );
 };
 
-export default ConnectionVisibilityPicker;
+export default ResourceVisibilityPicker;

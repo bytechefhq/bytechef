@@ -12,24 +12,26 @@ export type VisibilityFeatureType =
     | {enabled: false; isAdmin: boolean; workspaceId: number | undefined};
 
 /**
- * Primitive EE-edition gate for the connection-visibility feature. Use this as the edition check
- * primitive — higher-level gates (workspace-scoped, platform-type-scoped) compose this with their
- * own context. Keeping the edition check in one place means a future switch from
- * {@link EditionType.EE} to a feature-flag or other mechanism updates every call site at once.
+ * Primitive EE-edition gate for the resource-visibility feature, whatever the resource — connections and
+ * projects today. Use this as the edition check primitive — higher-level gates (workspace-scoped,
+ * platform-type-scoped) compose this with their own context. Keeping the edition check in one place means a
+ * future switch from {@link EditionType.EE} to a feature-flag or other mechanism updates every call site at once.
  */
 export const useIsVisibilityEditionEnabled = (): boolean =>
     useApplicationInfoStore((state) => state.application?.edition === EditionType.EE);
 
 /**
- * Gate for the connection-visibility UI on workspace-scoped pages (connection list, list-item
- * menus, scope badges). Returns:
+ * Gate for the resource-visibility UI on workspace-scoped pages (the connection and project lists, their
+ * list-item menus and visibility badges). Returns:
  * - enabled: the visibility UI should render (EE edition + a concrete workspace context)
  * - isAdmin: current user has ROLE_ADMIN (controls promote/demote/share menu items)
  * - workspaceId: the workspace mutations should be scoped to
  *
- * Shared dialogs that render in both Automation and Embedded platforms (e.g.
- * {@code ConnectionDialog}) cannot use this hook because embedded has no workspaceId; they should
- * compose {@link useIsVisibilityEditionEnabled} with their own platform-type check.
+ * Two kinds of surface should compose {@link useIsVisibilityEditionEnabled} with their own check instead:
+ * - those with no workspace in context — dialogs rendering in both Automation and Embedded (e.g.
+ *   {@code ConnectionDialog}), since embedded has no workspaceId to narrow on;
+ * - create dialogs (e.g. {@code ProjectDialog}), which DO have a workspace but need only the edition half:
+ *   a resource that does not exist yet has no id to grant against, so they offer reach and nothing more.
  */
 export const useVisibilityFeatureEnabled = (): VisibilityFeatureType => {
     const workspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
