@@ -8,8 +8,7 @@
 package com.bytechef.ee.automation.ai.gateway.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.automation.configuration.service.PermissionService;
-import com.bytechef.ee.automation.ai.gateway.facade.AiGatewayFacade;
+import com.bytechef.ee.automation.ai.gateway.facade.AiGatewayPlaygroundFacade;
 import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayChatCompletionRequest;
 import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayChatCompletionResponse;
 import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayChatMessage;
@@ -22,12 +21,9 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerSentEvent;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -39,8 +35,9 @@ import reactor.core.publisher.Flux;
  * REST controller exposing a Server-Sent Events endpoint for the AI Gateway Playground.
  *
  * <p>
- * Wraps {@link AiGatewayFacade#chatCompletionStream} with session-based authentication so playground streaming requests
- * go through the full gateway pipeline (routing, cost tracking, tracing with {@code source = PLAYGROUND}).
+ * Wraps {@link AiGatewayPlaygroundFacade#playgroundChatCompletionStream} with session-based authentication so
+ * playground streaming requests go through the full gateway pipeline (routing, cost tracking, tracing with
+ * {@code source = PLAYGROUND}).
  *
  * @version ee
  *
@@ -54,36 +51,26 @@ import reactor.core.publisher.Flux;
 @PreAuthorize("isAuthenticated()")
 class AiGatewayPlaygroundRestController {
 
-    private static final Logger log = LoggerFactory.getLogger(AiGatewayPlaygroundRestController.class);
-
-    private final AiGatewayFacade aiGatewayFacade;
-    private final PermissionService permissionService;
+    private final AiGatewayPlaygroundFacade aiGatewayPlaygroundFacade;
 
     @SuppressFBWarnings("EI")
-    AiGatewayPlaygroundRestController(AiGatewayFacade aiGatewayFacade, PermissionService permissionService) {
-        this.aiGatewayFacade = aiGatewayFacade;
-        this.permissionService = permissionService;
+    AiGatewayPlaygroundRestController(AiGatewayPlaygroundFacade aiGatewayPlaygroundFacade) {
+        this.aiGatewayPlaygroundFacade = aiGatewayPlaygroundFacade;
     }
 
+    /**
+     * Authorization lives on
+     * {@link AiGatewayPlaygroundFacade#playgroundChatCompletionStream(long, java.util.function.Supplier, AtomicLong)},
+     * which requires at least the EDITOR role in the workspace the run is billed and traced against &mdash; the API
+     * facade is this codebase's authorization layer, and this controller carries no gate of its own. That check used to
+     * live in this method's body, where it was invisible to any audit scanning for {@code @PreAuthorize}.
+     */
     @PostMapping(value = "/chat/completions/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     Flux<ServerSentEvent<Object>> chatCompletionsStream(
         @RequestBody PlaygroundChatCompletionStreamInput input) {
 
         if (input.workspaceId() == null) {
             throw new IllegalArgumentException("workspaceId is required for playground streaming");
-        }
-
-        // Tenant guard: ROLE_ADMIN alone is not enough — a tenant admin who is not a member of the target
-        // workspace could otherwise bill that workspace's budget / pollute its traces by stamping its id here.
-        // Uniform message ("Not authorized for the requested workspace") so cross-tenant probers cannot enumerate
-        // workspace ids by reading the error body — diagnostic context is logged server-side at the throw site
-        // instead.
-        if (!permissionService.hasWorkspaceRole(input.workspaceId(), "EDITOR")) {
-            log.warn(
-                "Playground stream authorization rejected: workspaceId={} requiredRole=EDITOR",
-                input.workspaceId());
-
-            throw new AccessDeniedException("Not authorized for the requested workspace");
         }
 
         long startTime = System.currentTimeMillis();
@@ -93,65 +80,54 @@ class AiGatewayPlaygroundRestController {
         AtomicReference<String> finishReason = new AtomicReference<>();
         AtomicLong traceId = new AtomicLong(0);
 
-        // Defer request construction and facade invocation inside the reactive pipeline so any synchronous throw
-        // (invalid role, budget/rate-limit rejection, etc.) surfaces to onErrorResume as a framed `event: error`
-        // SSE frame instead of an abruptly-closed stream.
-        Flux<ServerSentEvent<Object>> chunks = Flux.defer(() -> {
-            List<AiGatewayChatMessage> messages = input.messages()
-                .stream()
-                .map(message -> new AiGatewayChatMessage(
-                    AiGatewayChatRole.valueOf(message.role()), message.content(), null, null, null))
-                .toList();
+        // The facade defers request construction and the gateway invocation inside the reactive pipeline so any
+        // synchronous throw (invalid role, budget/rate-limit rejection, etc.) surfaces to onErrorResume as a framed
+        // `event: error` SSE frame instead of an abruptly-closed stream. The workspace guard it carries deliberately
+        // runs outside that deferral, so a denial is a 403 on the request rather than a frame on an accepted stream.
+        Flux<ServerSentEvent<Object>> chunks = aiGatewayPlaygroundFacade
+            .playgroundChatCompletionStream(input.workspaceId(), () -> buildRequest(input), traceId)
+            .map(response -> {
+                String content = null;
 
-            AiGatewayChatCompletionRequest request = new AiGatewayChatCompletionRequest(
-                input.model(), messages, input.temperature(), input.maxTokens(), input.topP(),
-                true, null, null, null, null, Map.of("workspace_id", input.workspaceId()
-                    .toString()));
+                if (response.choices() != null && !response.choices()
+                    .isEmpty()) {
 
-            return aiGatewayFacade.chatCompletionStream(request, null, null, traceId)
-                .map(response -> {
-                    String content = null;
+                    AiGatewayChatCompletionResponse.Choice choice = response.choices()
+                        .getFirst();
 
-                    if (response.choices() != null && !response.choices()
-                        .isEmpty()) {
-
-                        AiGatewayChatCompletionResponse.Choice choice = response.choices()
-                            .getFirst();
-
-                        if (choice.message() != null) {
-                            content = choice.message()
-                                .content();
-                        }
-
-                        if (choice.finishReason() != null) {
-                            finishReason.set(choice.finishReason());
-                        }
+                    if (choice.message() != null) {
+                        content = choice.message()
+                            .content();
                     }
 
-                    if (response.usage() != null) {
-                        if (response.usage()
-                            .promptTokens() > 0) {
+                    if (choice.finishReason() != null) {
+                        finishReason.set(choice.finishReason());
+                    }
+                }
 
-                            inputTokens.set(response.usage()
-                                .promptTokens());
-                        }
+                if (response.usage() != null) {
+                    if (response.usage()
+                        .promptTokens() > 0) {
 
-                        if (response.usage()
-                            .completionTokens() > 0) {
-
-                            outputTokens.set(response.usage()
-                                .completionTokens());
-                        }
+                        inputTokens.set(response.usage()
+                            .promptTokens());
                     }
 
-                    PlaygroundStreamChunkDto chunk = new PlaygroundStreamChunkDto(
-                        content, false, null, null, null, null, null);
+                    if (response.usage()
+                        .completionTokens() > 0) {
 
-                    return ServerSentEvent.<Object>builder()
-                        .data(chunk)
-                        .build();
-                });
-        });
+                        outputTokens.set(response.usage()
+                            .completionTokens());
+                    }
+                }
+
+                PlaygroundStreamChunkDto chunk = new PlaygroundStreamChunkDto(
+                    content, false, null, null, null, null, null);
+
+                return ServerSentEvent.<Object>builder()
+                    .data(chunk)
+                    .build();
+            });
 
         return chunks.concatWith(Flux.defer(() -> {
             int latencyMs = (int) (System.currentTimeMillis() - startTime);
@@ -174,6 +150,19 @@ class AiGatewayPlaygroundRestController {
                         .getSimpleName(),
                     exception.getMessage() != null ? exception.getMessage() : "Streaming failed"))
                 .build()));
+    }
+
+    private static AiGatewayChatCompletionRequest buildRequest(PlaygroundChatCompletionStreamInput input) {
+        List<AiGatewayChatMessage> messages = input.messages()
+            .stream()
+            .map(message -> new AiGatewayChatMessage(
+                AiGatewayChatRole.valueOf(message.role()), message.content(), null, null, null))
+            .toList();
+
+        return new AiGatewayChatCompletionRequest(
+            input.model(), messages, input.temperature(), input.maxTokens(), input.topP(),
+            true, null, null, null, null, Map.of("workspace_id", input.workspaceId()
+                .toString()));
     }
 
     @SuppressFBWarnings("EI")

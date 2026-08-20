@@ -8,17 +8,13 @@
 package com.bytechef.ee.ai.copilot.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.automation.configuration.service.PermissionService;
-import com.bytechef.automation.configuration.service.ProjectWorkflowService;
-import com.bytechef.ee.ai.copilot.workflow.WorkflowDescriptionCopilotGenerator;
+import com.bytechef.ee.ai.copilot.web.graphql.facade.WorkflowDescriptionCopilotFacade;
 import com.bytechef.ee.ai.copilot.workflow.WorkflowDescriptionCopilotRequest;
 import com.bytechef.ee.ai.copilot.workflow.WorkflowDescriptionCopilotResult;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.Optional;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -34,39 +30,27 @@ import org.springframework.stereotype.Controller;
 @SuppressFBWarnings("EI")
 public class WorkflowDescriptionCopilotGraphQlController {
 
-    private static final String WORKFLOW_VIEW_SCOPE = "WORKFLOW_VIEW";
-
-    private final PermissionService permissionService;
-    private final ProjectWorkflowService projectWorkflowService;
-    private final WorkflowDescriptionCopilotGenerator workflowDescriptionCopilotGenerator;
+    private final WorkflowDescriptionCopilotFacade workflowDescriptionCopilotFacade;
 
     public WorkflowDescriptionCopilotGraphQlController(
-        PermissionService permissionService, ProjectWorkflowService projectWorkflowService,
-        Optional<WorkflowDescriptionCopilotGenerator> workflowDescriptionCopilotGenerator) {
+        WorkflowDescriptionCopilotFacade workflowDescriptionCopilotFacade) {
 
-        this.permissionService = permissionService;
-        this.projectWorkflowService = projectWorkflowService;
-        this.workflowDescriptionCopilotGenerator = workflowDescriptionCopilotGenerator.orElse(null);
+        this.workflowDescriptionCopilotFacade = workflowDescriptionCopilotFacade;
     }
 
+    /**
+     * Authorization lives on
+     * {@link WorkflowDescriptionCopilotFacade#generateWorkflowDescription(WorkflowDescriptionCopilotRequest)}, which
+     * resolves the owning project from the client-supplied {@code workflowId} and requires {@code WORKFLOW_VIEW} on its
+     * workspace &mdash; the API facade is this codebase's authorization layer, and this controller carries no gate of
+     * its own. That check used to live in this method's body, where it was invisible to any audit scanning for
+     * {@code @PreAuthorize}.
+     */
     @MutationMapping
     public GenerateWorkflowDescriptionPayload generateWorkflowDescription(
         @Argument GenerateWorkflowDescriptionInput input) {
 
-        if (workflowDescriptionCopilotGenerator == null) {
-            throw new IllegalStateException("Workflow Description Copilot is not enabled");
-        }
-
-        // Authorize: the workflowId is client-supplied, so verify the current user may view the owning
-        // project before reading its definition (IDOR / cross-tenant guard).
-        long projectId = projectWorkflowService.getWorkflowProjectWorkflow(input.workflowId())
-            .getProjectId();
-
-        if (!permissionService.hasWorkspaceScopeForProject(projectId, WORKFLOW_VIEW_SCOPE)) {
-            throw new AccessDeniedException("Access denied to workflow " + input.workflowId());
-        }
-
-        WorkflowDescriptionCopilotResult result = workflowDescriptionCopilotGenerator.generate(
+        WorkflowDescriptionCopilotResult result = workflowDescriptionCopilotFacade.generateWorkflowDescription(
             new WorkflowDescriptionCopilotRequest(
                 input.workflowId(), input.workflowNodeName(), input.environmentId()));
 

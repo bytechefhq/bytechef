@@ -8,71 +8,69 @@
 package com.bytechef.ee.ai.copilot.web.graphql;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.ee.ai.copilot.web.graphql.WorkflowDescriptionCopilotGraphQlController.GenerateWorkflowDescriptionInput;
 import com.bytechef.ee.ai.copilot.web.graphql.WorkflowDescriptionCopilotGraphQlController.GenerateWorkflowDescriptionPayload;
-import com.bytechef.ee.ai.copilot.workflow.WorkflowDescriptionCopilotGenerator;
+import com.bytechef.ee.ai.copilot.web.graphql.facade.WorkflowDescriptionCopilotFacade;
+import com.bytechef.ee.ai.copilot.workflow.WorkflowDescriptionCopilotRequest;
 import com.bytechef.ee.ai.copilot.workflow.WorkflowDescriptionCopilotResult;
-import java.util.Optional;
+import java.lang.reflect.Field;
+import java.util.Arrays;
 import org.junit.jupiter.api.Test;
-import org.springframework.security.access.AccessDeniedException;
 
 /**
+ * Pins that the mutation reaches the generator through the facade layer, which is where this codebase puts
+ * authorization. The {@code WORKFLOW_VIEW} guard itself is pinned by
+ * {@code WorkflowDescriptionCopilotFacadeImplTest#testGenerateDeniedWhenUserLacksWorkflowViewScope}.
+ *
+ * <p>
+ * The controller carries no gate of its own and is not meant to. Asserting the delegation is not enough on its own:
+ * {@code testControllerHoldsNoAuthorizationCollaborators} is what makes a revert to a locally written
+ * {@code permissionService} check fail here rather than pass, since such a check has to reintroduce one of those
+ * collaborators as a field.
+ *
  * @version ee
  *
  * @author Ivica Cardic
  */
 class WorkflowDescriptionCopilotGraphQlControllerTest {
 
-    private final PermissionService permissionService = mock(PermissionService.class);
-    private final ProjectWorkflowService projectWorkflowService = mock(ProjectWorkflowService.class);
-    private final WorkflowDescriptionCopilotGenerator generator = mock(WorkflowDescriptionCopilotGenerator.class);
+    private final WorkflowDescriptionCopilotFacade workflowDescriptionCopilotFacade =
+        mock(WorkflowDescriptionCopilotFacade.class);
 
     private final WorkflowDescriptionCopilotGraphQlController controller =
-        new WorkflowDescriptionCopilotGraphQlController(
-            permissionService, projectWorkflowService, Optional.of(generator));
+        new WorkflowDescriptionCopilotGraphQlController(workflowDescriptionCopilotFacade);
 
     @Test
-    void testGenerateDeniedWhenUserLacksWorkflowViewScope() {
-        givenWorkflowProject(42L);
-
-        when(permissionService.hasWorkspaceScopeForProject(42L, "WORKFLOW_VIEW")).thenReturn(false);
-
-        assertThatThrownBy(() -> controller.generateWorkflowDescription(input()))
-            .isInstanceOf(AccessDeniedException.class);
-
-        verify(generator, never()).generate(any());
-    }
-
-    @Test
-    void testGenerateAllowedWhenUserHasWorkflowViewScope() {
-        givenWorkflowProject(42L);
-
-        when(permissionService.hasWorkspaceScopeForProject(42L, "WORKFLOW_VIEW")).thenReturn(true);
-        when(generator.generate(any())).thenReturn(new WorkflowDescriptionCopilotResult("Syncs records."));
+    void testGenerateWorkflowDescriptionDelegatesToTheGuardedFacade() {
+        when(workflowDescriptionCopilotFacade.generateWorkflowDescription(request()))
+            .thenReturn(new WorkflowDescriptionCopilotResult("Syncs records."));
 
         GenerateWorkflowDescriptionPayload payload = controller.generateWorkflowDescription(input());
 
         assertThat(payload.value()).isEqualTo("Syncs records.");
+
+        verify(workflowDescriptionCopilotFacade).generateWorkflowDescription(request());
     }
 
-    private void givenWorkflowProject(long projectId) {
-        ProjectWorkflow projectWorkflow = mock(ProjectWorkflow.class);
-
-        when(projectWorkflow.getProjectId()).thenReturn(projectId);
-        when(projectWorkflowService.getWorkflowProjectWorkflow("wf1")).thenReturn(projectWorkflow);
+    @Test
+    void testControllerHoldsNoAuthorizationCollaborators() {
+        assertThat(Arrays.stream(WorkflowDescriptionCopilotGraphQlController.class.getDeclaredFields())
+            .map(Field::getType))
+                .as("authorization belongs on the facade; the controller must not hold the services a gate needs")
+                .doesNotContain(PermissionService.class, ProjectWorkflowService.class);
     }
 
     private static GenerateWorkflowDescriptionInput input() {
         return new GenerateWorkflowDescriptionInput("wf1", null, 0);
+    }
+
+    private static WorkflowDescriptionCopilotRequest request() {
+        return new WorkflowDescriptionCopilotRequest("wf1", null, 0);
     }
 }
