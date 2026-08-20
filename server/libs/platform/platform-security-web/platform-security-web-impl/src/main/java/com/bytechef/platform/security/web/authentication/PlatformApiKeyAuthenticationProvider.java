@@ -65,6 +65,16 @@ public class PlatformApiKeyAuthenticationProvider implements AuthenticationProvi
             throw new BadCredentialsException("Unknown API secret key", e);
         }
 
+        // Only admin API keys reach /api/platform/v1. An admin key is the one with no PlatformType:
+        // getAdminApiKeys(environmentId) is getApiKeys(environmentId, null), so a non-null type means
+        // the caller presented an automation or embedded key. Every operation behind this path is
+        // ROLE_ADMIN-guarded at its facade and tenant-wide in effect -- custom components carry no
+        // environment column at all -- so accepting an environment-scoped key here promised a
+        // containment the endpoint does not provide.
+        if (apiKey.getType() != null) {
+            throw new BadCredentialsException("Admin API key required");
+        }
+
         org.springframework.security.core.userdetails.User user = userService.fetchUser(apiKey.getUserId())
             .map(curUser -> createSpringSecurityUser(platformApiKeyAuthenticationToken.getSecretKey(), curUser))
             .orElseThrow(() -> new UsernameNotFoundException(
