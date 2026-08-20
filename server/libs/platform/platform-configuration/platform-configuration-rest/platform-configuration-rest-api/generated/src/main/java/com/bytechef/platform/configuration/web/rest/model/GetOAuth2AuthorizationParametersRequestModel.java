@@ -3,6 +3,7 @@ package com.bytechef.platform.configuration.web.rest.model;
 import java.net.URI;
 import java.util.Objects;
 import com.bytechef.platform.configuration.web.rest.model.AuthorizationTypeModel;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -26,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "getOAuth2AuthorizationParameters_request", description = "Contains all required information to open a connection to a service defined by componentName parameter.")
 @JsonTypeName("getOAuth2AuthorizationParameters_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-01T09:51:24.669688+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-08-18T08:42:35.953453+02:00[Europe/Zagreb]", comments = "Generator version: 7.24.0")
 public class GetOAuth2AuthorizationParametersRequestModel {
 
   private AuthorizationTypeModel authorizationType;
@@ -35,7 +36,6 @@ public class GetOAuth2AuthorizationParametersRequestModel {
 
   private @Nullable Integer connectionVersion;
 
-  @Valid
   private Map<String, Object> parameters = new HashMap<>();
 
   public GetOAuth2AuthorizationParametersRequestModel() {

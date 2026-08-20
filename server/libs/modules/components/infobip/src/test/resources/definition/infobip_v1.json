@@ -1777,6 +1777,15 @@
     "title": "Send Whatsapp Template Message",
     "workflowNodeDescription": null
   }, {
+    "agentReplyDefinition": {
+      "attachmentsProperty": null,
+      "channelParameters": {
+        "number": "from"
+      },
+      "conversationIdProperty": "to",
+      "fixedParameters": { },
+      "messageProperty": "text"
+    },
     "batch": false,
     "beforeResume": null,
     "beforeSuspend": null,
@@ -2329,6 +2338,15 @@
     "resumePerform": null,
     "title": "Send WhatsApp Text Message",
     "workflowNodeDescription": null
+  } ],
+  "agentChannels": [ {
+    "approvalChannelName": "whatsApp",
+    "description": null,
+    "name": "infobip",
+    "replyActionName": "sendWhatsappTextMessage",
+    "title": "Infobip (WhatsApp)",
+    "triggerName": "newWhatsappMessage",
+    "triggerParameters": { }
   } ],
   "clusterElements": [ {
     "name": "sms",
@@ -2962,6 +2980,11 @@
     "workflowNodeDescription": null,
     "workflowSyncExecution": false
   }, {
+    "agentRequestDefinition": {
+      "attachmentsPath": null,
+      "conversationIdPath": "results.from",
+      "messagePath": "results.message.text"
+    },
     "batch": false,
     "deduplicate": null,
     "deprecated": false,

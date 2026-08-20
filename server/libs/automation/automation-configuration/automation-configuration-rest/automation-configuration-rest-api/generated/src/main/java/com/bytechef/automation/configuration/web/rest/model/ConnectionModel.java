@@ -157,7 +157,7 @@ public class ConnectionModel {
   private @Nullable StatusEnum status;
 
   /**
-   * The visibility scope of the connection. Accepted on create: PRIVATE (default) or WORKSPACE — setting WORKSPACE requires ROLE_ADMIN. ORGANIZATION is not user-settable.
+   * The visibility scope of the connection. Accepted on create; defaults to WORKSPACE (shared with the workspace). PRIVATE withholds it; ORGANIZATION is not user-settable here.
    */
   public enum VisibilityEnum {
     PRIVATE("PRIVATE"),
@@ -671,11 +671,11 @@ public class ConnectionModel {
   }
 
   /**
-   * The visibility scope of the connection. Accepted on create: PRIVATE (default) or WORKSPACE — setting WORKSPACE requires ROLE_ADMIN. ORGANIZATION is not user-settable.
+   * The visibility scope of the connection. Accepted on create; defaults to WORKSPACE (shared with the workspace). PRIVATE withholds it; ORGANIZATION is not user-settable here.
    * @return visibility
    */
   
-  @Schema(name = "visibility", description = "The visibility scope of the connection. Accepted on create: PRIVATE (default) or WORKSPACE — setting WORKSPACE requires ROLE_ADMIN. ORGANIZATION is not user-settable.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "visibility", description = "The visibility scope of the connection. Accepted on create; defaults to WORKSPACE (shared with the workspace). PRIVATE withholds it; ORGANIZATION is not user-settable here.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("visibility")
   public @Nullable VisibilityEnum getVisibility() {
     return visibility;

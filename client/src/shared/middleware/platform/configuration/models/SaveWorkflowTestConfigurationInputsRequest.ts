@@ -51,7 +51,7 @@ export function SaveWorkflowTestConfigurationInputsRequestFromJSONTyped(json: an
     return {
         
         'key': json['key'] == null ? undefined : json['key'],
-        'value': json['value'] == null ? undefined : json['value'],
+        'value': json['value'] === undefined ? undefined : json['value'] === null ? null : json['value'],
     };
 }
 

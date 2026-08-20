@@ -5,6 +5,7 @@ import java.util.Objects;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AuthorizationTypeModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.InputModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.OAuth2Model;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -29,14 +30,16 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ConnectionConfig", description = "The connection configuration")
 @JsonTypeName("ConnectionConfig")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-27T21:42:20.429973+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-08-18T00:19:21.376010+02:00[Europe/Zagreb]", comments = "Generator version: 7.24.0")
 public class ConnectionConfigModel {
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private @Nullable AuthorizationTypeModel authorizationType;
 
-  @Valid
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private List<@Valid InputModel> inputs = new ArrayList<>();
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private @Nullable OAuth2Model oauth2;
 
   public ConnectionConfigModel authorizationType(@Nullable AuthorizationTypeModel authorizationType) {

@@ -18,6 +18,7 @@ src/main/java/com/bytechef/platform/configuration/web/rest/WorkflowNodeTestOutpu
 src/main/java/com/bytechef/platform/configuration/web/rest/WorkflowTestConfigurationApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ActionDefinitionBasicModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ActionDefinitionModel.java
+src/main/java/com/bytechef/platform/configuration/web/rest/model/AgentChannelDefinitionModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ArrayPropertyModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/AuthorizationModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/AuthorizationTypeModel.java

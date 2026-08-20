@@ -36,6 +36,8 @@ public class ComponentDefinitionBasicModel {
   @Valid
   private Map<String, Integer> clusterElementsCount = new HashMap<>();
 
+  private @Nullable Boolean clusterRoot;
+
   @Valid
   private List<@Valid ComponentCategoryModel> componentCategories = new ArrayList<>();
 
@@ -113,6 +115,27 @@ public class ComponentDefinitionBasicModel {
   @JsonProperty("clusterElementsCount")
   public void setClusterElementsCount(Map<String, Integer> clusterElementsCount) {
     this.clusterElementsCount = clusterElementsCount;
+  }
+
+  public ComponentDefinitionBasicModel clusterRoot(@Nullable Boolean clusterRoot) {
+    this.clusterRoot = clusterRoot;
+    return this;
+  }
+
+  /**
+   * Whether the component declares cluster element types of its own, meaning it is configured through its child cluster elements rather than directly.
+   * @return clusterRoot
+   */
+
+  @Schema(name = "clusterRoot", description = "Whether the component declares cluster element types of its own, meaning it is configured through its child cluster elements rather than directly.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("clusterRoot")
+  public @Nullable Boolean getClusterRoot() {
+    return clusterRoot;
+  }
+
+  @JsonProperty("clusterRoot")
+  public void setClusterRoot(@Nullable Boolean clusterRoot) {
+    this.clusterRoot = clusterRoot;
   }
 
   public ComponentDefinitionBasicModel componentCategories(List<@Valid ComponentCategoryModel> componentCategories) {
@@ -302,6 +325,7 @@ public class ComponentDefinitionBasicModel {
     ComponentDefinitionBasicModel componentDefinitionBasic = (ComponentDefinitionBasicModel) o;
     return Objects.equals(this.actionsCount, componentDefinitionBasic.actionsCount) &&
         Objects.equals(this.clusterElementsCount, componentDefinitionBasic.clusterElementsCount) &&
+        Objects.equals(this.clusterRoot, componentDefinitionBasic.clusterRoot) &&
         Objects.equals(this.componentCategories, componentDefinitionBasic.componentCategories) &&
         Objects.equals(this.description, componentDefinitionBasic.description) &&
         Objects.equals(this.icon, componentDefinitionBasic.icon) &&
@@ -314,7 +338,7 @@ public class ComponentDefinitionBasicModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(actionsCount, clusterElementsCount, componentCategories, description, icon, inputsCount, name, title, triggersCount, version);
+    return Objects.hash(actionsCount, clusterElementsCount, clusterRoot, componentCategories, description, icon, inputsCount, name, title, triggersCount, version);
   }
 
   @Override
@@ -323,6 +347,7 @@ public class ComponentDefinitionBasicModel {
     sb.append("class ComponentDefinitionBasicModel {\n");
     sb.append("    actionsCount: ").append(toIndentedString(actionsCount)).append("\n");
     sb.append("    clusterElementsCount: ").append(toIndentedString(clusterElementsCount)).append("\n");
+    sb.append("    clusterRoot: ").append(toIndentedString(clusterRoot)).append("\n");
     sb.append("    componentCategories: ").append(toIndentedString(componentCategories)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    icon: ").append(toIndentedString(icon)).append("\n");

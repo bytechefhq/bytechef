@@ -3,6 +3,7 @@ package com.bytechef.ee.embedded.configuration.public_.web.rest.model;
 import java.net.URI;
 import java.util.Objects;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.IntegrationInstanceModel;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -26,24 +27,28 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationBasic", description = "A group of workflows that make one logical integration for a particular service represented by component.")
 @JsonTypeName("IntegrationBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-27T21:42:20.429973+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-08-18T00:19:21.376010+02:00[Europe/Zagreb]", comments = "Generator version: 7.24.0")
 public class IntegrationBasicModel {
 
   private String componentName;
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private @Nullable String description;
 
   private String icon;
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private @Nullable Long id;
 
-  @Valid
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private List<@Valid IntegrationInstanceModel> integrationInstances = new ArrayList<>();
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private @Nullable Integer integrationVersion;
 
   private Boolean multipleInstances = false;
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private @Nullable String name;
 
   public IntegrationBasicModel() {

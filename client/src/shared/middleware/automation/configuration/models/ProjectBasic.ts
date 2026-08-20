@@ -93,8 +93,23 @@ export interface ProjectBasic {
      * @memberof ProjectBasic
      */
     uuid?: string;
+    /**
+     * The visibility scope of the project: WORKSPACE (default, shared with every member of the owning workspace) or PRIVATE (owner plus named grantees, EE). Accepted on create; changed afterwards via the setProjectVisibility GraphQL mutation. CE always persists WORKSPACE.
+     * @type {ProjectBasicVisibilityEnum}
+     * @memberof ProjectBasic
+     */
+    visibility?: ProjectBasicVisibilityEnum;
 }
 
+
+/**
+ * @export
+ */
+export const ProjectBasicVisibilityEnum = {
+    Private: 'PRIVATE',
+    Workspace: 'WORKSPACE'
+} as const;
+export type ProjectBasicVisibilityEnum = typeof ProjectBasicVisibilityEnum[keyof typeof ProjectBasicVisibilityEnum];
 
 
 /**
@@ -126,6 +141,7 @@ export function ProjectBasicFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'lastStatus': json['lastStatus'] == null ? undefined : ProjectStatusFromJSON(json['lastStatus']),
         'lastProjectVersion': json['lastProjectVersion'] == null ? undefined : json['lastProjectVersion'],
         'uuid': json['uuid'] == null ? undefined : json['uuid'],
+        'visibility': json['visibility'] == null ? undefined : json['visibility'],
     };
 }
 
@@ -144,6 +160,7 @@ export function ProjectBasicToJSONTyped(value?: Omit<ProjectBasic, 'createdBy'|'
         'name': value['name'],
         'lastStatus': ProjectStatusToJSON(value['lastStatus']),
         'uuid': value['uuid'],
+        'visibility': value['visibility'],
     };
 }
 

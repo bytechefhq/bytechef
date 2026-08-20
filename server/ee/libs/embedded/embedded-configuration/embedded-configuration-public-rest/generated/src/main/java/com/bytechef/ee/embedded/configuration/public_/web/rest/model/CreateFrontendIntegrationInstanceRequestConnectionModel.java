@@ -2,6 +2,7 @@ package com.bytechef.ee.embedded.configuration.public_.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -23,10 +24,10 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("createFrontendIntegrationInstance_request_connection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-27T21:42:20.429973+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-08-18T00:19:21.376010+02:00[Europe/Zagreb]", comments = "Generator version: 7.24.0")
 public class CreateFrontendIntegrationInstanceRequestConnectionModel {
 
-  @Valid
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private Map<String, Object> parameters = new HashMap<>();
 
   public CreateFrontendIntegrationInstanceRequestConnectionModel parameters(Map<String, Object> parameters) {

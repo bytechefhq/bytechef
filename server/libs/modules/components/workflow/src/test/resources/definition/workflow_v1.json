@@ -1,5 +1,14 @@
 {
   "actions": [ {
+    "agentReplyDefinition": {
+      "attachmentsProperty": null,
+      "channelParameters": { },
+      "conversationIdProperty": null,
+      "fixedParameters": {
+        "outputSchema": "{\"type\":\"object\",\"properties\":{\"message\":{\"type\":\"string\"}},\"required\":[\"message\"]}"
+      },
+      "messageProperty": "response.message"
+    },
     "batch": false,
     "beforeResume": null,
     "beforeSuspend": null,
@@ -58,6 +67,17 @@
     "resumePerform": null,
     "title": "Response to Workflow Call",
     "workflowNodeDescription": null
+  } ],
+  "agentChannels": [ {
+    "approvalChannelName": null,
+    "description": null,
+    "name": "workflowCall",
+    "replyActionName": "responseToWorkflowCall",
+    "title": "Workflow Call",
+    "triggerName": "newWorkflowCall",
+    "triggerParameters": {
+      "inputSchema": "{\"type\":\"object\",\"properties\":{\"conversationId\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"},\"attachments\":{\"type\":\"array\",\"items\":{\"type\":\"object\"}}},\"required\":[\"conversationId\",\"message\"]}"
+    }
   } ],
   "clusterElements": [ {
     "name": "callWorkflow",
@@ -165,6 +185,136 @@
       "required": false
     },
     "workflowNodeDescription": null
+  }, {
+    "name": "callAiAgent",
+    "description": "Calls another (published) agent as an AI agent tool.",
+    "element": { },
+    "help": null,
+    "outputDefinition": null,
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": false,
+      "controlType": "TEXT",
+      "defaultValue": null,
+      "description": "The tool name exposed to the AI model.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": false,
+      "hidden": false,
+      "label": "Name",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "toolName",
+      "options": [ ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": false,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": false,
+      "controlType": "TEXT_AREA",
+      "defaultValue": null,
+      "description": "The tool description exposed to the AI model.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": false,
+      "hidden": false,
+      "label": "Description",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "toolDescription",
+      "options": [ ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": false,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": false,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "The published agent to call when this tool is invoked.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Agent",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "agentUuid",
+      "options": [ ],
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": [ ]
+      },
+      "optionsLoadedDynamically": false,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": false,
+      "controlType": "TEXT_AREA",
+      "defaultValue": null,
+      "description": "The message sent to the agent.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Message",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "message",
+      "options": [ ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": false,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": false,
+      "controlType": "TEXT",
+      "defaultValue": null,
+      "description": "Optional memory-thread key passed to the called agent. Left blank, the sub-agent starts (or continues) whatever thread its own conversationId input resolves to.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Conversation ID",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "conversationId",
+      "options": [ ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": false,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    } ],
+    "title": "Call AI Agent",
+    "type": {
+      "name": "TOOLS",
+      "key": "tools",
+      "label": "Tools",
+      "multipleElements": true,
+      "required": false
+    },
+    "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
     "name": "helpers",
@@ -182,6 +332,11 @@
   "tags": [ ],
   "title": "Workflow",
   "triggers": [ {
+    "agentRequestDefinition": {
+      "attachmentsPath": "attachments",
+      "conversationIdPath": "conversationId",
+      "messagePath": "message"
+    },
     "batch": false,
     "deduplicate": null,
     "deprecated": false,

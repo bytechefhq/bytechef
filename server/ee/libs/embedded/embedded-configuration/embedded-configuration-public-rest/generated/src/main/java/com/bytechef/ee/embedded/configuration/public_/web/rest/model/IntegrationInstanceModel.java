@@ -5,6 +5,7 @@ import java.util.Objects;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.CredentialStatusModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.IntegrationInstanceWorkflowModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.McpIntegrationInstanceToolModel;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -29,22 +30,24 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstance", description = "The integration instance represents a configured integration for a specific user, containing connection and status information")
 @JsonTypeName("IntegrationInstance")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-27T21:42:20.429973+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-08-18T00:19:21.376010+02:00[Europe/Zagreb]", comments = "Generator version: 7.24.0")
 public class IntegrationInstanceModel {
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private @Nullable Long id;
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private @Nullable CredentialStatusModel credentialStatus;
 
   private Boolean enabled;
 
-  @Valid
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private List<@Valid McpIntegrationInstanceToolModel> mcpTools = new ArrayList<>();
 
-  @Valid
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private List<@Valid IntegrationInstanceWorkflowModel> mcpWorkflows = new ArrayList<>();
 
-  @Valid
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private List<@Valid IntegrationInstanceWorkflowModel> workflows = new ArrayList<>();
 
   public IntegrationInstanceModel() {

@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.Objects;
 import com.bytechef.platform.configuration.web.rest.model.PropertyTypeModel;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
@@ -50,7 +51,7 @@ import jakarta.annotation.Generated;
   @JsonSubTypes.Type(value = ValuePropertyModel.class, name = "ValueProperty")
 })
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-01T09:51:24.669688+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-08-18T08:42:35.953453+02:00[Europe/Zagreb]", comments = "Generator version: 7.24.0")
 public class PropertyModel {
 
   private Boolean advancedOption = false;
@@ -63,7 +64,6 @@ public class PropertyModel {
 
   private Boolean hidden = false;
 
-  @Valid
   private Map<String, Object> metadata = new HashMap<>();
 
   private @Nullable String name;

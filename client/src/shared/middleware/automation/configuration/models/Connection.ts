@@ -162,7 +162,7 @@ export interface Connection {
      */
     readonly status?: ConnectionStatusEnum;
     /**
-     * The visibility scope of the connection. Accepted on create: PRIVATE (default) or WORKSPACE — setting WORKSPACE requires ROLE_ADMIN. ORGANIZATION is not user-settable.
+     * The visibility scope of the connection. Accepted on create; defaults to WORKSPACE (shared with the workspace). PRIVATE withholds it; ORGANIZATION is not user-settable here.
      * @type {ConnectionVisibilityEnum}
      * @memberof Connection
      */

@@ -1,5 +1,12 @@
 {
   "actions": [ {
+    "agentReplyDefinition": {
+      "attachmentsProperty": null,
+      "channelParameters": { },
+      "conversationIdProperty": "to",
+      "fixedParameters": { },
+      "messageProperty": "body"
+    },
     "batch": false,
     "beforeResume": null,
     "beforeSuspend": null,
@@ -366,6 +373,15 @@
     "title": "Send Message",
     "workflowNodeDescription": null
   } ],
+  "agentChannels": [ {
+    "approvalChannelName": "whatsApp",
+    "description": null,
+    "name": "whatsapp",
+    "replyActionName": "sendMessage",
+    "title": "WhatsApp",
+    "triggerName": "messageReceived",
+    "triggerParameters": { }
+  } ],
   "clusterElements": [ {
     "name": "whatsApp",
     "description": "Sends an approval request message via WhatsApp.",
@@ -518,6 +534,12 @@
   "tags": [ ],
   "title": "WhatsApp",
   "triggers": [ {
+    "agentRequestDefinition": {
+      "attachmentsPath": null,
+      "conversationIdPath": "entry.changes.value.messages.from",
+      "messagePath": "entry.changes.value.messages.text.body",
+      "unverifiedPathsReason": "the declared output schema places 'messages' as a sibling of 'value' under 'changes', while these paths descend through 'value' as Meta's documented payload does; one of the two is wrong and this repository holds no fixture that says which, so neither may be changed to make the other validate"
+    },
     "batch": false,
     "deduplicate": null,
     "deprecated": false,

@@ -59,6 +59,43 @@ public class ProjectModel {
 
   private @Nullable String uuid;
 
+  /**
+   * The visibility scope of the project: WORKSPACE (default, shared with every member of the owning workspace) or PRIVATE (owner plus named grantees, EE). Accepted on create; changed afterwards via the setProjectVisibility GraphQL mutation. CE always persists WORKSPACE.
+   */
+  public enum VisibilityEnum {
+    PRIVATE("PRIVATE"),
+    
+    WORKSPACE("WORKSPACE");
+
+    private final String value;
+
+    VisibilityEnum(String value) {
+      this.value = value;
+    }
+
+    @JsonValue
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    @JsonCreator
+    public static VisibilityEnum fromValue(String value) {
+      for (VisibilityEnum b : VisibilityEnum.values()) {
+        if (b.value.equals(value)) {
+          return b;
+        }
+      }
+      throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+  }
+
+  private @Nullable VisibilityEnum visibility;
+
   private @Nullable CategoryModel category;
 
   private @Nullable Boolean codeWorkflow;
@@ -318,6 +355,27 @@ public class ProjectModel {
     this.uuid = uuid;
   }
 
+  public ProjectModel visibility(@Nullable VisibilityEnum visibility) {
+    this.visibility = visibility;
+    return this;
+  }
+
+  /**
+   * The visibility scope of the project: WORKSPACE (default, shared with every member of the owning workspace) or PRIVATE (owner plus named grantees, EE). Accepted on create; changed afterwards via the setProjectVisibility GraphQL mutation. CE always persists WORKSPACE.
+   * @return visibility
+   */
+  
+  @Schema(name = "visibility", description = "The visibility scope of the project: WORKSPACE (default, shared with every member of the owning workspace) or PRIVATE (owner plus named grantees, EE). Accepted on create; changed afterwards via the setProjectVisibility GraphQL mutation. CE always persists WORKSPACE.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("visibility")
+  public @Nullable VisibilityEnum getVisibility() {
+    return visibility;
+  }
+
+  @JsonProperty("visibility")
+  public void setVisibility(@Nullable VisibilityEnum visibility) {
+    this.visibility = visibility;
+  }
+
   public ProjectModel category(@Nullable CategoryModel category) {
     this.category = category;
     return this;
@@ -501,6 +559,7 @@ public class ProjectModel {
         Objects.equals(this.lastStatus, project.lastStatus) &&
         Objects.equals(this.lastProjectVersion, project.lastProjectVersion) &&
         Objects.equals(this.uuid, project.uuid) &&
+        Objects.equals(this.visibility, project.visibility) &&
         Objects.equals(this.category, project.category) &&
         Objects.equals(this.codeWorkflow, project.codeWorkflow) &&
         Objects.equals(this.codeWorkflowLanguage, project.codeWorkflowLanguage) &&
@@ -512,7 +571,7 @@ public class ProjectModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, description, id, lastModifiedBy, lastModifiedDate, name, lastPublishedDate, lastStatus, lastProjectVersion, uuid, category, codeWorkflow, codeWorkflowLanguage, projectWorkflowIds, tags, workspaceId, version);
+    return Objects.hash(createdBy, createdDate, description, id, lastModifiedBy, lastModifiedDate, name, lastPublishedDate, lastStatus, lastProjectVersion, uuid, visibility, category, codeWorkflow, codeWorkflowLanguage, projectWorkflowIds, tags, workspaceId, version);
   }
 
   @Override
@@ -530,6 +589,7 @@ public class ProjectModel {
     sb.append("    lastStatus: ").append(toIndentedString(lastStatus)).append("\n");
     sb.append("    lastProjectVersion: ").append(toIndentedString(lastProjectVersion)).append("\n");
     sb.append("    uuid: ").append(toIndentedString(uuid)).append("\n");
+    sb.append("    visibility: ").append(toIndentedString(visibility)).append("\n");
     sb.append("    category: ").append(toIndentedString(category)).append("\n");
     sb.append("    codeWorkflow: ").append(toIndentedString(codeWorkflow)).append("\n");
     sb.append("    codeWorkflowLanguage: ").append(toIndentedString(codeWorkflowLanguage)).append("\n");

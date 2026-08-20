@@ -3,6 +3,7 @@ package com.bytechef.platform.configuration.web.rest.model;
 import java.net.URI;
 import java.util.Objects;
 import com.bytechef.platform.configuration.web.rest.model.ComponentConnectionModel;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -28,25 +29,21 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowTrigger", description = "Represents a definition of a workflow trigger.")
 @JsonTypeName("WorkflowTrigger")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-01T09:51:24.669688+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-08-18T08:42:35.953453+02:00[Europe/Zagreb]", comments = "Generator version: 7.24.0")
 public class WorkflowTriggerModel {
 
-  @Valid
   private List<@Valid ComponentConnectionModel> connections = new ArrayList<>();
 
   private @Nullable String description;
 
-  @Valid
   private Map<String, Object> extensions = new HashMap<>();
 
   private @Nullable String label;
 
-  @Valid
   private Map<String, Object> metadata = new HashMap<>();
 
   private String name;
 
-  @Valid
   private Map<String, Object> parameters = new HashMap<>();
 
   private @Nullable String timeout;

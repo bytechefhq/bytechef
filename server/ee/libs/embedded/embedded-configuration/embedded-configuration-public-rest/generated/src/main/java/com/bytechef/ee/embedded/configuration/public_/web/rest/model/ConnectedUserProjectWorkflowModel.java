@@ -2,10 +2,16 @@ package com.bytechef.ee.embedded.configuration.public_.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationWorkflowProjectComponentModel;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.annotation.JsonValue;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
@@ -24,26 +30,84 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ConnectedUserProjectWorkflow", description = "A group of tasks that make one logical workflow.")
 @JsonTypeName("ConnectedUserProjectWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-27T21:42:20.429973+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-08-18T00:19:21.376010+02:00[Europe/Zagreb]", comments = "Generator version: 7.24.0")
 public class ConnectedUserProjectWorkflowModel {
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private @Nullable OffsetDateTime createdDate;
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private @Nullable String description;
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private @Nullable String definition;
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private @Nullable OffsetDateTime lastModifiedDate;
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private @Nullable Boolean enabled;
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private @Nullable String label;
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private @Nullable String workflowUuid;
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private @Nullable Integer workflowVersion;
+
+  /**
+   * COPY when the workflow is the user's own editable copy; REFERENCE when it points at a shared catalog workflow.
+   */
+  public enum KindEnum {
+    COPY("COPY"),
+    
+    REFERENCE("REFERENCE");
+
+    private final String value;
+
+    KindEnum(String value) {
+      this.value = value;
+    }
+
+    @JsonValue
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    @JsonCreator
+    public static KindEnum fromValue(String value) {
+      for (KindEnum b : KindEnum.values()) {
+        if (b.value.equalsIgnoreCase(value)) {
+          return b;
+        }
+      }
+      throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+  }
+
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private @Nullable KindEnum kind;
+
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private @Nullable String catalogWorkflowUuid;
+
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private @Nullable String copiedFromWorkflowUuid;
+
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private @Nullable Boolean dangling;
+
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private List<@Valid AutomationWorkflowProjectComponentModel> components = new ArrayList<>();
 
   public ConnectedUserProjectWorkflowModel createdDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
@@ -213,6 +277,119 @@ public class ConnectedUserProjectWorkflowModel {
     this.workflowVersion = workflowVersion;
   }
 
+  public ConnectedUserProjectWorkflowModel kind(@Nullable KindEnum kind) {
+    this.kind = kind;
+    return this;
+  }
+
+  /**
+   * COPY when the workflow is the user's own editable copy; REFERENCE when it points at a shared catalog workflow.
+   * @return kind
+   */
+  
+  @Schema(name = "kind", description = "COPY when the workflow is the user's own editable copy; REFERENCE when it points at a shared catalog workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("kind")
+  public @Nullable KindEnum getKind() {
+    return kind;
+  }
+
+  @JsonProperty("kind")
+  public void setKind(@Nullable KindEnum kind) {
+    this.kind = kind;
+  }
+
+  public ConnectedUserProjectWorkflowModel catalogWorkflowUuid(@Nullable String catalogWorkflowUuid) {
+    this.catalogWorkflowUuid = catalogWorkflowUuid;
+    return this;
+  }
+
+  /**
+   * For REFERENCE rows, the uuid of the catalog workflow being referenced.
+   * @return catalogWorkflowUuid
+   */
+  
+  @Schema(name = "catalogWorkflowUuid", description = "For REFERENCE rows, the uuid of the catalog workflow being referenced.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("catalogWorkflowUuid")
+  public @Nullable String getCatalogWorkflowUuid() {
+    return catalogWorkflowUuid;
+  }
+
+  @JsonProperty("catalogWorkflowUuid")
+  public void setCatalogWorkflowUuid(@Nullable String catalogWorkflowUuid) {
+    this.catalogWorkflowUuid = catalogWorkflowUuid;
+  }
+
+  public ConnectedUserProjectWorkflowModel copiedFromWorkflowUuid(@Nullable String copiedFromWorkflowUuid) {
+    this.copiedFromWorkflowUuid = copiedFromWorkflowUuid;
+    return this;
+  }
+
+  /**
+   * For COPY rows, the uuid of the catalog template the copy was created from. Null otherwise.
+   * @return copiedFromWorkflowUuid
+   */
+  
+  @Schema(name = "copiedFromWorkflowUuid", description = "For COPY rows, the uuid of the catalog template the copy was created from. Null otherwise.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("copiedFromWorkflowUuid")
+  public @Nullable String getCopiedFromWorkflowUuid() {
+    return copiedFromWorkflowUuid;
+  }
+
+  @JsonProperty("copiedFromWorkflowUuid")
+  public void setCopiedFromWorkflowUuid(@Nullable String copiedFromWorkflowUuid) {
+    this.copiedFromWorkflowUuid = copiedFromWorkflowUuid;
+  }
+
+  public ConnectedUserProjectWorkflowModel dangling(@Nullable Boolean dangling) {
+    this.dangling = dangling;
+    return this;
+  }
+
+  /**
+   * True when a REFERENCE points at a catalog workflow that is no longer served.
+   * @return dangling
+   */
+  
+  @Schema(name = "dangling", description = "True when a REFERENCE points at a catalog workflow that is no longer served.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("dangling")
+  public @Nullable Boolean getDangling() {
+    return dangling;
+  }
+
+  @JsonProperty("dangling")
+  public void setDangling(@Nullable Boolean dangling) {
+    this.dangling = dangling;
+  }
+
+  public ConnectedUserProjectWorkflowModel components(List<@Valid AutomationWorkflowProjectComponentModel> components) {
+    this.components = components;
+    return this;
+  }
+
+  public ConnectedUserProjectWorkflowModel addComponentsItem(AutomationWorkflowProjectComponentModel componentsItem) {
+    if (this.components == null) {
+      this.components = new ArrayList<>();
+    }
+    this.components.add(componentsItem);
+    return this;
+  }
+
+  /**
+   * The components used by the workflow.
+   * @return components
+   */
+  @Valid 
+  @Schema(name = "components", description = "The components used by the workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("components")
+  public List<@Valid AutomationWorkflowProjectComponentModel> getComponents() {
+    return components;
+  }
+
+  @JsonProperty("components")
+  public void setComponents(List<@Valid AutomationWorkflowProjectComponentModel> components) {
+    this.components = components;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -229,12 +406,17 @@ public class ConnectedUserProjectWorkflowModel {
         Objects.equals(this.enabled, connectedUserProjectWorkflow.enabled) &&
         Objects.equals(this.label, connectedUserProjectWorkflow.label) &&
         Objects.equals(this.workflowUuid, connectedUserProjectWorkflow.workflowUuid) &&
-        Objects.equals(this.workflowVersion, connectedUserProjectWorkflow.workflowVersion);
+        Objects.equals(this.workflowVersion, connectedUserProjectWorkflow.workflowVersion) &&
+        Objects.equals(this.kind, connectedUserProjectWorkflow.kind) &&
+        Objects.equals(this.catalogWorkflowUuid, connectedUserProjectWorkflow.catalogWorkflowUuid) &&
+        Objects.equals(this.copiedFromWorkflowUuid, connectedUserProjectWorkflow.copiedFromWorkflowUuid) &&
+        Objects.equals(this.dangling, connectedUserProjectWorkflow.dangling) &&
+        Objects.equals(this.components, connectedUserProjectWorkflow.components);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdDate, description, definition, lastModifiedDate, enabled, label, workflowUuid, workflowVersion);
+    return Objects.hash(createdDate, description, definition, lastModifiedDate, enabled, label, workflowUuid, workflowVersion, kind, catalogWorkflowUuid, copiedFromWorkflowUuid, dangling, components);
   }
 
   @Override
@@ -249,6 +431,11 @@ public class ConnectedUserProjectWorkflowModel {
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    workflowUuid: ").append(toIndentedString(workflowUuid)).append("\n");
     sb.append("    workflowVersion: ").append(toIndentedString(workflowVersion)).append("\n");
+    sb.append("    kind: ").append(toIndentedString(kind)).append("\n");
+    sb.append("    catalogWorkflowUuid: ").append(toIndentedString(catalogWorkflowUuid)).append("\n");
+    sb.append("    copiedFromWorkflowUuid: ").append(toIndentedString(copiedFromWorkflowUuid)).append("\n");
+    sb.append("    dangling: ").append(toIndentedString(dangling)).append("\n");
+    sb.append("    components: ").append(toIndentedString(components)).append("\n");
     sb.append("}");
     return sb.toString();
   }

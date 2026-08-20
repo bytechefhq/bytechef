@@ -3,6 +3,7 @@ package com.bytechef.ee.embedded.configuration.public_.web.rest.model;
 import java.net.URI;
 import java.util.Objects;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ComponentPropertyModel;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -26,14 +27,15 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ComponentPropertyGroup", description = "A resolved component property group rendered as one compound input.")
 @JsonTypeName("ComponentPropertyGroup")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-27T21:42:20.429973+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-08-18T00:19:21.376010+02:00[Europe/Zagreb]", comments = "Generator version: 7.24.0")
 public class ComponentPropertyGroupModel {
 
   private String name;
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private @Nullable String label;
 
-  @Valid
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private List<@Valid ComponentPropertyModel> properties = new ArrayList<>();
 
   public ComponentPropertyGroupModel() {

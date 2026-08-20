@@ -31,7 +31,7 @@ export interface CheckWorkflowNodeTestOutputExists200Response {
  * Check if a given object implements the CheckWorkflowNodeTestOutputExists200Response interface.
  */
 export function instanceOfCheckWorkflowNodeTestOutputExists200Response(value: object): value is CheckWorkflowNodeTestOutputExists200Response {
-    if (!('_exists' in value) || value['_exists'] === undefined) return false;
+    if ((!('_exists' in (value as Record<string, any>)) && !('exists' in (value as Record<string, any>))) || ((value as Record<string, any>)['_exists'] === undefined && (value as Record<string, any>)['exists'] === undefined)) return false;
     return true;
 }
 

@@ -1110,7 +1110,7 @@
   "icon": "path:assets/redis.svg",
   "inputs": [ ],
   "metadata": { },
-  "name": "redis",
+  "name": "redisVectorStore",
   "resources": null,
   "tags": [ ],
   "title": "Redis",

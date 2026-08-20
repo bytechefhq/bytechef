@@ -1085,11 +1085,11 @@
   } ],
   "clusterElementClusterElementTypes": {
     "checkForViolations": [ "checkForViolations" ],
-    "custom": [ "model" ],
-    "jailbreak": [ "model" ],
     "sanitizeText": [ "sanitizeText" ],
+    "jailbreak": [ "model" ],
     "nsfw": [ "model" ],
-    "topicalAlignment": [ "model" ]
+    "topicalAlignment": [ "model" ],
+    "custom": [ "model" ]
   },
   "clusterElementTypes": [ {
     "name": "MODEL",
@@ -1107,7 +1107,7 @@
     "name": "RAG",
     "key": "rag",
     "label": "RAG",
-    "multipleElements": false,
+    "multipleElements": true,
     "required": false
   }, {
     "name": "GUARDRAILS",

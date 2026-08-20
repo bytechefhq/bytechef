@@ -2,6 +2,7 @@
 /* eslint-disable */
 export * from './ActionDefinition';
 export * from './ActionDefinitionBasic';
+export * from './AgentChannelDefinition';
 export * from './ArrayProperty';
 export * from './Authorization';
 export * from './AuthorizationType';

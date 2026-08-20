@@ -1265,25 +1265,25 @@
     "workflowNodeDescription": null
   } ],
   "clusterElementClusterElementTypes": {
-    "braveWebSearchTool": [ ],
+    "approvalGateTool": [ "TOOLS", "APPROVAL_CHANNELS" ],
     "appendFilesToAiSkill": [ ],
-    "askUserQuestionTool": [ ],
-    "todoWriteTool": [ ],
-    "deleteAiSkill": [ ],
-    "subagent": [ "MODEL", "TOOLS" ],
-    "approvalGate": [ "TOOLS", "APPROVAL_CHANNELS" ],
-    "taskTool": [ "MODEL", "SUBAGENT" ],
-    "globTool": [ ],
-    "agentClientTool": [ ],
-    "removeFileFromAiSkill": [ ],
-    "listDirectoryTool": [ ],
-    "shellTools": [ ],
-    "autoMemoryTool": [ ],
-    "createAiSkill": [ ],
-    "smartWebFetchTool": [ "MODEL" ],
-    "grepTool": [ ],
+    "braveWebSearchTool": [ ],
+    "fileSystemTools": [ ],
     "updateAiSkill": [ ],
-    "fileSystemTools": [ ]
+    "grepTool": [ ],
+    "smartWebFetchTool": [ "MODEL" ],
+    "createAiSkill": [ ],
+    "autoMemoryTool": [ ],
+    "shellTools": [ ],
+    "listDirectoryTool": [ ],
+    "removeFileFromAiSkill": [ ],
+    "agentClientTool": [ ],
+    "globTool": [ ],
+    "taskTool": [ "MODEL", "SUBAGENT" ],
+    "deleteAiSkill": [ ],
+    "todoWriteTool": [ ],
+    "askUserQuestionTool": [ ],
+    "subagentTool": [ "MODEL", "TOOLS" ]
   },
   "clusterElementTypes": [ {
     "name": "MODEL",
@@ -1350,7 +1350,7 @@
     },
     "workflowNodeDescription": null
   }, {
-    "name": "approvalGate",
+    "name": "approvalGateTool",
     "description": "Require human approval before the agent may call any tool attached to this gate.",
     "element": { },
     "help": null,
@@ -1625,7 +1625,7 @@
     },
     "workflowNodeDescription": null
   }, {
-    "name": "subagent",
+    "name": "subagentTool",
     "description": "A specialized agent the Task Tool can delegate to.",
     "element": null,
     "help": null,

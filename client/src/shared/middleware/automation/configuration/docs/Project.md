@@ -18,6 +18,7 @@ Name | Type
 `lastStatus` | [ProjectStatus](ProjectStatus.md)
 `lastProjectVersion` | number
 `uuid` | string
+`visibility` | string
 `category` | [Category](Category.md)
 `codeWorkflow` | boolean
 `codeWorkflowLanguage` | string
@@ -44,6 +45,7 @@ const example = {
   "lastStatus": null,
   "lastProjectVersion": null,
   "uuid": null,
+  "visibility": null,
   "category": null,
   "codeWorkflow": null,
   "codeWorkflowLanguage": null,

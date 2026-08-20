@@ -40,6 +40,12 @@ export interface ComponentDefinitionBasic {
      */
     clusterElementsCount?: { [key: string]: number; };
     /**
+     * Whether the component declares cluster element types of its own, meaning it is configured through its child cluster elements rather than directly.
+     * @type {boolean}
+     * @memberof ComponentDefinitionBasic
+     */
+    clusterRoot?: boolean;
+    /**
      * The list of categories the component belongs to.
      * @type {Array<ComponentCategory>}
      * @memberof ComponentDefinitionBasic
@@ -110,6 +116,7 @@ export function ComponentDefinitionBasicFromJSONTyped(json: any, ignoreDiscrimin
         
         'actionsCount': json['actionsCount'] == null ? undefined : json['actionsCount'],
         'clusterElementsCount': json['clusterElementsCount'] == null ? undefined : json['clusterElementsCount'],
+        'clusterRoot': json['clusterRoot'] == null ? undefined : json['clusterRoot'],
         'componentCategories': json['componentCategories'] == null ? undefined : ((json['componentCategories'] as Array<any>).map(ComponentCategoryFromJSON)),
         'description': json['description'] == null ? undefined : json['description'],
         'icon': json['icon'] == null ? undefined : json['icon'],
@@ -134,6 +141,7 @@ export function ComponentDefinitionBasicToJSONTyped(value?: ComponentDefinitionB
         
         'actionsCount': value['actionsCount'],
         'clusterElementsCount': value['clusterElementsCount'],
+        'clusterRoot': value['clusterRoot'],
         'componentCategories': value['componentCategories'] == null ? undefined : ((value['componentCategories'] as Array<any>).map(ComponentCategoryToJSON)),
         'description': value['description'],
         'icon': value['icon'],

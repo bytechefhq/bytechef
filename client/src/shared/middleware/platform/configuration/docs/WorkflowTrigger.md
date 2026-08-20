@@ -9,6 +9,7 @@ Name | Type
 ------------ | -------------
 `connections` | [Array&lt;ComponentConnection&gt;](ComponentConnection.md)
 `description` | string
+`extensions` | { [key: string]: any; }
 `label` | string
 `metadata` | { [key: string]: any; }
 `name` | string
@@ -25,6 +26,7 @@ import type { WorkflowTrigger } from ''
 const example = {
   "connections": null,
   "description": null,
+  "extensions": null,
   "label": null,
   "metadata": null,
   "name": null,

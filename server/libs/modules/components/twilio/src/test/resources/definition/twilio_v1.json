@@ -1764,6 +1764,17 @@
     "title": "Send SMS",
     "workflowNodeDescription": null
   }, {
+    "agentReplyDefinition": {
+      "attachmentsProperty": null,
+      "channelParameters": {
+        "number": "From"
+      },
+      "conversationIdProperty": "To",
+      "fixedParameters": {
+        "useTemplate": false
+      },
+      "messageProperty": "Body"
+    },
     "batch": false,
     "beforeResume": null,
     "beforeSuspend": null,
@@ -3278,6 +3289,15 @@
     "resumePerform": null,
     "title": "Send WhatsApp Message",
     "workflowNodeDescription": null
+  } ],
+  "agentChannels": [ {
+    "approvalChannelName": "whatsApp",
+    "description": null,
+    "name": "twilio",
+    "replyActionName": "sendWhatsAppMessage",
+    "title": "Twilio (WhatsApp)",
+    "triggerName": "newWhatsappMessage",
+    "triggerParameters": { }
   } ],
   "clusterElements": [ {
     "name": "sms",
@@ -7174,6 +7194,11 @@
     "workflowNodeDescription": null,
     "workflowSyncExecution": false
   }, {
+    "agentRequestDefinition": {
+      "attachmentsPath": null,
+      "conversationIdPath": "From",
+      "messagePath": "Body"
+    },
     "batch": false,
     "deduplicate": null,
     "deprecated": false,
@@ -7191,7 +7216,29 @@
     },
     "poll": null,
     "processErrorResponse": null,
-    "properties": [ ],
+    "properties": [ {
+      "advancedOption": false,
+      "controlType": "TEXT",
+      "defaultValue": null,
+      "description": "The WhatsApp-enabled Twilio number this channel listens on.",
+      "displayCondition": null,
+      "exampleValue": "whatsapp:+15554449999",
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Number",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "number",
+      "options": [ ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": false,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    } ],
     "title": "New WhatsApp Message",
     "type": "STATIC_WEBHOOK",
     "webhookDisable": null,

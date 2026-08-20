@@ -3,10 +3,13 @@ package com.bytechef.ee.embedded.configuration.public_.web.rest.model;
 import java.net.URI;
 import java.util.Objects;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnvironmentModel;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
+import java.time.OffsetDateTime;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
@@ -24,14 +27,28 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Connection", description = "Contains all required information to open a connection to a service defined by componentName parameter")
 @JsonTypeName("Connection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-27T21:42:20.429973+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-08-18T00:19:21.376010+02:00[Europe/Zagreb]", comments = "Generator version: 7.24.0")
 public class ConnectionModel {
 
   private Long id;
 
   private String name;
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private @Nullable EnvironmentModel environment;
+
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private @Nullable String componentName;
+
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private @Nullable Integer connectionVersion;
+
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private @Nullable String authorizationType;
+
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+  private @Nullable OffsetDateTime createdDate;
 
   public ConnectionModel() {
     super();
@@ -108,6 +125,90 @@ public class ConnectionModel {
     this.environment = environment;
   }
 
+  public ConnectionModel componentName(@Nullable String componentName) {
+    this.componentName = componentName;
+    return this;
+  }
+
+  /**
+   * The component name.
+   * @return componentName
+   */
+  
+  @Schema(name = "componentName", description = "The component name.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("componentName")
+  public @Nullable String getComponentName() {
+    return componentName;
+  }
+
+  @JsonProperty("componentName")
+  public void setComponentName(@Nullable String componentName) {
+    this.componentName = componentName;
+  }
+
+  public ConnectionModel connectionVersion(@Nullable Integer connectionVersion) {
+    this.connectionVersion = connectionVersion;
+    return this;
+  }
+
+  /**
+   * The connection version.
+   * @return connectionVersion
+   */
+  
+  @Schema(name = "connectionVersion", description = "The connection version.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("connectionVersion")
+  public @Nullable Integer getConnectionVersion() {
+    return connectionVersion;
+  }
+
+  @JsonProperty("connectionVersion")
+  public void setConnectionVersion(@Nullable Integer connectionVersion) {
+    this.connectionVersion = connectionVersion;
+  }
+
+  public ConnectionModel authorizationType(@Nullable String authorizationType) {
+    this.authorizationType = authorizationType;
+    return this;
+  }
+
+  /**
+   * The authorization type name.
+   * @return authorizationType
+   */
+  
+  @Schema(name = "authorizationType", description = "The authorization type name.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("authorizationType")
+  public @Nullable String getAuthorizationType() {
+    return authorizationType;
+  }
+
+  @JsonProperty("authorizationType")
+  public void setAuthorizationType(@Nullable String authorizationType) {
+    this.authorizationType = authorizationType;
+  }
+
+  public ConnectionModel createdDate(@Nullable OffsetDateTime createdDate) {
+    this.createdDate = createdDate;
+    return this;
+  }
+
+  /**
+   * The created date.
+   * @return createdDate
+   */
+  @Valid 
+  @Schema(name = "createdDate", description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("createdDate")
+  public @Nullable OffsetDateTime getCreatedDate() {
+    return createdDate;
+  }
+
+  @JsonProperty("createdDate")
+  public void setCreatedDate(@Nullable OffsetDateTime createdDate) {
+    this.createdDate = createdDate;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -119,12 +220,16 @@ public class ConnectionModel {
     ConnectionModel connection = (ConnectionModel) o;
     return Objects.equals(this.id, connection.id) &&
         Objects.equals(this.name, connection.name) &&
-        Objects.equals(this.environment, connection.environment);
+        Objects.equals(this.environment, connection.environment) &&
+        Objects.equals(this.componentName, connection.componentName) &&
+        Objects.equals(this.connectionVersion, connection.connectionVersion) &&
+        Objects.equals(this.authorizationType, connection.authorizationType) &&
+        Objects.equals(this.createdDate, connection.createdDate);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, environment);
+    return Objects.hash(id, name, environment, componentName, connectionVersion, authorizationType, createdDate);
   }
 
   @Override
@@ -134,6 +239,10 @@ public class ConnectionModel {
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    environment: ").append(toIndentedString(environment)).append("\n");
+    sb.append("    componentName: ").append(toIndentedString(componentName)).append("\n");
+    sb.append("    connectionVersion: ").append(toIndentedString(connectionVersion)).append("\n");
+    sb.append("    authorizationType: ").append(toIndentedString(authorizationType)).append("\n");
+    sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("}");
     return sb.toString();
   }

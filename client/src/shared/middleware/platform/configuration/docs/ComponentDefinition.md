@@ -9,6 +9,7 @@ Name | Type
 ------------ | -------------
 `actionClusterElementTypes` | { [key: string]: Array&lt;string&gt;; }
 `actions` | [Array&lt;ActionDefinitionBasic&gt;](ActionDefinitionBasic.md)
+`agentChannels` | [Array&lt;AgentChannelDefinition&gt;](AgentChannelDefinition.md)
 `clusterElement` | boolean
 `clusterElementClusterElementTypes` | { [key: string]: Array&lt;string&gt;; }
 `clusterElements` | [Array&lt;ClusterElementDefinitionBasic&gt;](ClusterElementDefinitionBasic.md)
@@ -37,6 +38,7 @@ import type { ComponentDefinition } from ''
 const example = {
   "actionClusterElementTypes": null,
   "actions": null,
+  "agentChannels": null,
   "clusterElement": null,
   "clusterElementClusterElementTypes": null,
   "clusterElements": null,

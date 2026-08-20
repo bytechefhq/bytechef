@@ -5,6 +5,7 @@ import java.util.Objects;
 import com.bytechef.platform.configuration.web.rest.model.AuthorizationModel;
 import com.bytechef.platform.configuration.web.rest.model.ConnectionDefinitionHelpModel;
 import com.bytechef.platform.configuration.web.rest.model.PropertyModel;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -28,12 +29,11 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ConnectionDefinition", description = "Definition of a connection to an outside service.")
 @JsonTypeName("ConnectionDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-01T09:51:24.669688+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-08-18T08:42:35.953453+02:00[Europe/Zagreb]", comments = "Generator version: 7.24.0")
 public class ConnectionDefinitionModel {
 
   private Boolean authorizationRequired = true;
 
-  @Valid
   private List<@Valid AuthorizationModel> authorizations = new ArrayList<>();
 
   private @Nullable String baseUri;
@@ -44,7 +44,6 @@ public class ConnectionDefinitionModel {
 
   private @Nullable ConnectionDefinitionHelpModel help;
 
-  @Valid
   private List<@Valid PropertyModel> properties = new ArrayList<>();
 
   private @Nullable String componentTitle;
