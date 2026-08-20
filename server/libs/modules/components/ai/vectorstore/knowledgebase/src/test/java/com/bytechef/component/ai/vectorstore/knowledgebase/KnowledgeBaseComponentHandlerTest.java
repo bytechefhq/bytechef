@@ -16,6 +16,9 @@
 
 package com.bytechef.component.ai.vectorstore.knowledgebase;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.bytechef.platform.component.definition.ClusterRootComponentDefinition;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
 
@@ -29,5 +32,30 @@ class KnowledgeBaseComponentHandlerTest {
         JsonFileAssert.assertEquals(
             "definition/knowledgeBase_v1.json",
             new KnowledgeBaseComponentHandler(null, null, null, null, null, null, null, null, null).getDefinition());
+    }
+
+    /**
+     * Pins the ITERATION ORDER of the two cluster-element-type maps, not just their contents. They are serialised
+     * verbatim into {@code knowledgeBase_v1.json} above and used to be built with {@code Map.of}, whose iteration order
+     * the JVM randomises per run, so every regeneration reshuffled these keys. {@code JsonFileAssert} compares JSON
+     * objects order-insensitively, which is exactly why {@code testGetDefinition} cannot catch this and these
+     * assertions have to exist separately.
+     *
+     * <p>
+     * Reached through {@code getDefinition()} because the definition class is a private inner class — which is also the
+     * honest route: it is the object the snapshot is generated from.
+     */
+    @Test
+    void testClusterElementTypeMapIterationOrderIsDeterministic() {
+        ClusterRootComponentDefinition clusterRootComponentDefinition =
+            (ClusterRootComponentDefinition) new KnowledgeBaseComponentHandler(
+                null, null, null, null, null, null, null, null, null).getDefinition();
+
+        assertThat(clusterRootComponentDefinition.getActionClusterElementTypes()
+            .keySet())
+                .containsExactly("delete", "load", "search", "update");
+        assertThat(clusterRootComponentDefinition.getClusterElementClusterElementTypes()
+            .keySet())
+                .containsExactly("vectorStore", "search");
     }
 }

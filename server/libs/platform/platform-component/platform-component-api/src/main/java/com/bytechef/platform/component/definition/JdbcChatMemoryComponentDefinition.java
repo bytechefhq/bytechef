@@ -19,6 +19,8 @@ package com.bytechef.platform.component.definition;
 import static com.bytechef.platform.component.definition.ai.agent.DataSourceFunction.DATA_SOURCE;
 
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,10 +36,16 @@ public interface JdbcChatMemoryComponentDefinition extends ClusterRootComponentD
 
     @Override
     default Map<String, List<String>> getActionClusterElementTypes() {
-        return Map.of(
-            "addMessages", List.of(DATA_SOURCE.name()),
-            "getMessages", List.of(DATA_SOURCE.name()),
-            "deleteConversation", List.of(DATA_SOURCE.name()),
-            "listConversations", List.of(DATA_SOURCE.name()));
+        // LinkedHashMap rather than Map.of: Map.of randomises its iteration order per JVM run, so these four keys
+        // shuffle in the generated definition snapshot every time anyone regenerates it. Purely cosmetic --
+        // JsonFileAssert compares JSON objects order-insensitively -- but it makes each regeneration a spurious diff.
+        Map<String, List<String>> actionClusterElementTypes = new LinkedHashMap<>();
+
+        actionClusterElementTypes.put("addMessages", List.of(DATA_SOURCE.name()));
+        actionClusterElementTypes.put("getMessages", List.of(DATA_SOURCE.name()));
+        actionClusterElementTypes.put("deleteConversation", List.of(DATA_SOURCE.name()));
+        actionClusterElementTypes.put("listConversations", List.of(DATA_SOURCE.name()));
+
+        return Collections.unmodifiableMap(actionClusterElementTypes);
     }
 }

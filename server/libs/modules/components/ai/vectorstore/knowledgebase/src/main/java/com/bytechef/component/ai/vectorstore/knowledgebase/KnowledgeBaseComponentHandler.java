@@ -53,6 +53,8 @@ import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentTagService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseSourceService;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.ai.vectorstore.VectorStore;
@@ -174,18 +176,30 @@ public class KnowledgeBaseComponentHandler implements ComponentHandler {
 
         @Override
         public Map<String, List<String>> getActionClusterElementTypes() {
-            return Map.of(
-                DELETE, List.of(),
-                LOAD, List.of(DOCUMENT_READER.name(), DOCUMENT_TRANSFORMER.name()),
-                SEARCH, List.of(),
-                UPDATE, List.of(DOCUMENT_READER.name(), DOCUMENT_TRANSFORMER.name()));
+            // LinkedHashMap rather than Map.of: Map.of randomises its iteration order per JVM run, so these keys
+            // shuffle in the generated knowledgeBase_v1.json snapshot every time anyone regenerates it. Purely
+            // cosmetic -- JsonFileAssert compares JSON objects order-insensitively -- but it makes each regeneration
+            // produce a spurious diff. These override the VectorStoreComponentDefinition defaults, which are pinned
+            // the same way for the same reason.
+            Map<String, List<String>> actionClusterElementTypes = new LinkedHashMap<>();
+
+            actionClusterElementTypes.put(DELETE, List.of());
+            actionClusterElementTypes.put(LOAD, List.of(DOCUMENT_READER.name(), DOCUMENT_TRANSFORMER.name()));
+            actionClusterElementTypes.put(SEARCH, List.of());
+            actionClusterElementTypes.put(UPDATE, List.of(DOCUMENT_READER.name(), DOCUMENT_TRANSFORMER.name()));
+
+            return Collections.unmodifiableMap(actionClusterElementTypes);
         }
 
         @Override
         public Map<String, List<String>> getClusterElementClusterElementTypes() {
-            return Map.of(
-                VECTOR_STORE, List.of(),
-                SEARCH, List.of());
+            // See getActionClusterElementTypes above -- same reason.
+            Map<String, List<String>> clusterElementClusterElementTypes = new LinkedHashMap<>();
+
+            clusterElementClusterElementTypes.put(VECTOR_STORE, List.of());
+            clusterElementClusterElementTypes.put(SEARCH, List.of());
+
+            return Collections.unmodifiableMap(clusterElementClusterElementTypes);
         }
     }
 }

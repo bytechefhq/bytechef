@@ -21,6 +21,8 @@ import static com.bytechef.platform.component.definition.ai.vectorstore.Document
 import static com.bytechef.platform.component.definition.ai.vectorstore.EmbeddingFunction.EMBEDDING;
 
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -74,11 +76,20 @@ public interface VectorStoreComponentDefinition extends ClusterRootComponentDefi
      */
     @Override
     default Map<String, List<String>> getActionClusterElementTypes() {
-        return Map.of(
-            DELETE, List.of(EMBEDDING.name()),
-            LOAD, List.of(DOCUMENT_READER.name(), DOCUMENT_TRANSFORMER.name(), EMBEDDING.name()),
-            SEARCH, List.of(EMBEDDING.name()),
+        // LinkedHashMap rather than Map.of: Map.of randomises its iteration order per JVM run, so these keys shuffle
+        // in the generated definition snapshot of every vector-store component every time anyone regenerates them.
+        // Purely cosmetic -- JsonFileAssert compares JSON objects order-insensitively -- but it turns each
+        // regeneration into a spurious multi-file diff.
+        Map<String, List<String>> actionClusterElementTypes = new LinkedHashMap<>();
+
+        actionClusterElementTypes.put(DELETE, List.of(EMBEDDING.name()));
+        actionClusterElementTypes.put(
+            LOAD, List.of(DOCUMENT_READER.name(), DOCUMENT_TRANSFORMER.name(), EMBEDDING.name()));
+        actionClusterElementTypes.put(SEARCH, List.of(EMBEDDING.name()));
+        actionClusterElementTypes.put(
             UPDATE, List.of(DOCUMENT_READER.name(), DOCUMENT_TRANSFORMER.name(), EMBEDDING.name()));
+
+        return Collections.unmodifiableMap(actionClusterElementTypes);
     }
 
     /**
@@ -89,8 +100,12 @@ public interface VectorStoreComponentDefinition extends ClusterRootComponentDefi
      */
     @Override
     default Map<String, List<String>> getClusterElementClusterElementTypes() {
-        return Map.of(
-            VECTOR_STORE, List.of(EMBEDDING.name()),
-            SEARCH, List.of(EMBEDDING.name()));
+        // See getActionClusterElementTypes above -- same reason.
+        Map<String, List<String>> clusterElementClusterElementTypes = new LinkedHashMap<>();
+
+        clusterElementClusterElementTypes.put(VECTOR_STORE, List.of(EMBEDDING.name()));
+        clusterElementClusterElementTypes.put(SEARCH, List.of(EMBEDDING.name()));
+
+        return Collections.unmodifiableMap(clusterElementClusterElementTypes);
     }
 }

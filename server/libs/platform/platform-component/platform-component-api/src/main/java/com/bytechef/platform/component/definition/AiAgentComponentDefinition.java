@@ -29,6 +29,8 @@ import static com.bytechef.platform.component.definition.ai.agent.guardrails.Gua
 import static com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailSanitizerFunction.SANITIZE_TEXT;
 
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -49,12 +51,19 @@ public interface AiAgentComponentDefinition extends ClusterRootComponentDefiniti
      */
     @Override
     default Map<String, List<String>> getClusterElementClusterElementTypes() {
-        return Map.of(
-            CHECK_FOR_VIOLATIONS.key(), List.of(CHECK_FOR_VIOLATIONS.key()),
-            SANITIZE_TEXT.key(), List.of(SANITIZE_TEXT.key()),
-            JAILBREAK, List.of(MODEL.key()),
-            NSFW, List.of(MODEL.key()),
-            TOPICAL_ALIGNMENT, List.of(MODEL.key()),
-            CUSTOM, List.of(MODEL.key()));
+        // LinkedHashMap rather than Map.of: Map.of randomises its iteration order per JVM run, so these six keys
+        // shuffle in the generated ai-agent_v1.json definition snapshot every time anyone regenerates it. Purely
+        // cosmetic -- JSONAssert compares objects order-insensitively -- but it makes every regeneration produce a
+        // spurious diff.
+        Map<String, List<String>> clusterElementClusterElementTypes = new LinkedHashMap<>();
+
+        clusterElementClusterElementTypes.put(CHECK_FOR_VIOLATIONS.key(), List.of(CHECK_FOR_VIOLATIONS.key()));
+        clusterElementClusterElementTypes.put(SANITIZE_TEXT.key(), List.of(SANITIZE_TEXT.key()));
+        clusterElementClusterElementTypes.put(JAILBREAK, List.of(MODEL.key()));
+        clusterElementClusterElementTypes.put(NSFW, List.of(MODEL.key()));
+        clusterElementClusterElementTypes.put(TOPICAL_ALIGNMENT, List.of(MODEL.key()));
+        clusterElementClusterElementTypes.put(CUSTOM, List.of(MODEL.key()));
+
+        return Collections.unmodifiableMap(clusterElementClusterElementTypes);
     }
 }
