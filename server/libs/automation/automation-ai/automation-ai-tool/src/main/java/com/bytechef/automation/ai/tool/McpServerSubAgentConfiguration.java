@@ -38,7 +38,7 @@ import org.springframework.core.io.Resource;
  * Registers the {@code mcpServerBuildSubAgentChatClient} / {@code mcpServerBuildSubAgentChatClientFactory} Spring beans
  * that back the {@code configureMcpServer} intelligent tool — the MCP-server tool-mapping subagent consumed by the
  * ai_hub BUILD agent, the management MCP server, and the MCP Servers Copilot panel (see
- * {@link McpServerIntelligentToolContributor}, which registers the {@code configureMcpServer}
+ * {@link McpServerIntelligentToolContributorConfiguration}, which registers the {@code configureMcpServer}
  * {@code IntelligentToolDefinition} against this factory).
  *
  * <p>

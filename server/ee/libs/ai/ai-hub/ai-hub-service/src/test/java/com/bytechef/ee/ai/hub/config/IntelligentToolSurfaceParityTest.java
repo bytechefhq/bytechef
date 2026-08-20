@@ -46,17 +46,18 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * Surface-parity guard for the intelligent tool catalog (ticket 732). The catalog is fed by four
- * {@link IntelligentToolContributor} beans — CE {@code CopilotIntelligentToolContributor}, CE automation
- * {@code McpServerIntelligentToolContributor}, EE automation {@code AutomationIntelligentToolContributor}, and EE
- * embedded {@code EmbeddedIntelligentToolContributor} — each package-private in its own module, reached here by
+ * {@link IntelligentToolContributor} beans — CE {@code CopilotIntelligentToolContributorConfiguration}, CE automation
+ * {@code McpServerIntelligentToolContributorConfiguration}, EE automation
+ * {@code AutomationIntelligentToolContributorConfiguration}, and EE embedded
+ * {@code EmbeddedIntelligentToolContributorConfiguration} — each package-private in its own module, reached here by
  * reflection so the test can assemble the real production definitions without those modules exposing their
  * configuration classes.
  *
  * <p>
- * {@code McpServerIntelligentToolContributor} lives in CE {@code automation-ai-tool} rather than the EE
- * {@code AutomationIntelligentToolContributor} (automation-ai-copilot) despite both being "automation-owned":
- * {@code configureMcpServer}'s {@code ChatClient} closes over CE-only MCP services, and MCP servers are a CE capability
- * available whenever either the Copilot panel or the AI Hub surface is enabled — unlike
+ * {@code McpServerIntelligentToolContributorConfiguration} lives in CE {@code automation-ai-tool} rather than the EE
+ * {@code AutomationIntelligentToolContributorConfiguration} (automation-ai-copilot) despite both being
+ * "automation-owned": {@code configureMcpServer}'s {@code ChatClient} closes over CE-only MCP services, and MCP servers
+ * are a CE capability available whenever either the Copilot panel or the AI Hub surface is enabled — unlike
  * {@code buildCustomComponent}/{@code buildCodeWorkflow}, which are genuinely EE-gated.
  * </p>
  *
@@ -83,7 +84,7 @@ class IntelligentToolSurfaceParityTest {
         "configureMcpServer");
 
     private static final String COPILOT_CONTRIBUTOR_CLASS_NAME =
-        "com.bytechef.ai.copilot.config.CopilotIntelligentToolContributor";
+        "com.bytechef.ai.copilot.config.CopilotIntelligentToolContributorConfiguration";
     private static final String COPILOT_CONTRIBUTOR_METHOD_NAME = "copilotIntelligentToolContributor";
 
     // The @Qualifier bean names copilotIntelligentToolContributor resolves, in declaration order — each one is the
@@ -100,7 +101,7 @@ class IntelligentToolSurfaceParityTest {
         "workflowExecutionBuildSubAgentChatClientFactory");
 
     private static final String AUTOMATION_CONTRIBUTOR_CLASS_NAME =
-        "com.bytechef.ee.automation.ai.copilot.config.AutomationIntelligentToolContributor";
+        "com.bytechef.ee.automation.ai.copilot.config.AutomationIntelligentToolContributorConfiguration";
     private static final String AUTOMATION_CONTRIBUTOR_METHOD_NAME = "automationIntelligentToolContributor";
 
     // Verified against the @Bean methods in AutomationCopilotConfiguration.
@@ -109,7 +110,7 @@ class IntelligentToolSurfaceParityTest {
         "codeWorkflowAskSubAgentChatClientFactory", "codeWorkflowBuildSubAgentChatClientFactory");
 
     private static final String EMBEDDED_CONTRIBUTOR_CLASS_NAME =
-        "com.bytechef.ee.embedded.ai.copilot.config.EmbeddedIntelligentToolContributor";
+        "com.bytechef.ee.embedded.ai.copilot.config.EmbeddedIntelligentToolContributorConfiguration";
     private static final String EMBEDDED_CONTRIBUTOR_METHOD_NAME = "embeddedIntelligentToolContributor";
 
     // Verified against the @Bean method in EmbeddedCopilotConfiguration.
@@ -117,7 +118,7 @@ class IntelligentToolSurfaceParityTest {
         Set.of("workflowEditorEmbeddedBuildSubAgentChatClientFactory");
 
     private static final String AUTOMATION_TOOL_CONTRIBUTOR_CLASS_NAME =
-        "com.bytechef.automation.ai.tool.McpServerIntelligentToolContributor";
+        "com.bytechef.automation.ai.tool.McpServerIntelligentToolContributorConfiguration";
     private static final String AUTOMATION_TOOL_CONTRIBUTOR_METHOD_NAME = "mcpServerIntelligentToolContributor";
 
     // Verified against the @Bean methods in McpServerSubAgentConfiguration (automation-ai-tool).

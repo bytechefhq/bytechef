@@ -33,7 +33,7 @@ import org.springframework.beans.factory.ObjectProvider;
 /**
  * Verifies the embedded contributor exposes the buildIntegrationWorkflow delegate workspace-scoped. Whether the
  * definition is contributed at all — i.e. whether its ChatClient bean is present — is
- * {@code EmbeddedIntelligentToolContributorTest}'s concern, not this class's: this contributor is a pure
+ * {@code EmbeddedIntelligentToolContributorConfigurationTest}'s concern, not this class's: this contributor is a pure
  * {@link IntelligentToolCatalog#getByNames} filter over whatever the catalog already contains.
  *
  * @version ee

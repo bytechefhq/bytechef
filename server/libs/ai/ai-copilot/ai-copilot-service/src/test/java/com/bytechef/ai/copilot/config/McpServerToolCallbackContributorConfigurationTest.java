@@ -75,7 +75,8 @@ class McpServerToolCallbackContributorConfigurationTest {
 
         // Pins that copilotAgentToolCallbackContributor's getByNames call correctly passes the fed-in fake
         // definitions through to its output; the real ChatClient-to-callback wiring for those six is
-        // CopilotIntelligentToolContributorTest's concern, since the fakes here return a canned ToolCallback
+        // CopilotIntelligentToolContributorConfigurationTest's concern, since the fakes here return a canned
+        // ToolCallback
         // regardless of how it was built. asset_file_agent (ticket 732, Task 4), data_table_agent (Task 5),
         // knowledge_base_agent (Task 6), context_store_agent (Task 7), and ai_agent_agent (Task 8 — the LAST
         // CRUD-delegate-unwind task) are all gone from this list — their tools are flattened onto

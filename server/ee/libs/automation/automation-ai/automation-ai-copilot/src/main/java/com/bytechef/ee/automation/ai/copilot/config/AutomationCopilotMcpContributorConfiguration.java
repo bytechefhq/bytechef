@@ -29,7 +29,7 @@ import org.springframework.context.annotation.Configuration;
  * the EE counterpart of the CE {@code ToolCallbackContributorConfiguration}, which contributes only CE-domain
  * subagents/flat tool sets. {@code buildCustomComponent} and {@code buildCodeWorkflow} are contributed via
  * {@link IntelligentToolCatalog#getByNames}, over the definitions registered by
- * {@link AutomationIntelligentToolContributor}. Each intelligent-tool domain exposes its BUILD subagent
+ * {@link AutomationIntelligentToolContributorConfiguration}. Each intelligent-tool domain exposes its BUILD subagent
  * {@code ChatClient} (defined in {@link AutomationCopilotConfiguration}), whose tool set includes the read-only tools,
  * so the single delegate tool serves both ask-style and build-style requests. An absent chat client bean (surface
  * toggles off) skips silently. Each delegate is wrapped in {@link WorkspaceScopedSubAgentToolCallback} because the
@@ -52,7 +52,7 @@ public class AutomationCopilotMcpContributorConfiguration {
 
     /**
      * Names of the {@link com.bytechef.ai.copilot.tool.catalog.IntelligentToolDefinition}s this contributor owns on the
-     * management MCP surface, contributed by {@link AutomationIntelligentToolContributor}. Filtered with
+     * management MCP surface, contributed by {@link AutomationIntelligentToolContributorConfiguration}. Filtered with
      * {@link IntelligentToolCatalog#getByNames} over its own name partition, never the whole catalog, because the CE
      * {@code ToolCallbackContributorConfiguration} and the embedded {@code EmbeddedCopilotMcpContributorConfiguration}
      * register their own management-MCP contributor configs against the same catalog — {@code getAll} here would

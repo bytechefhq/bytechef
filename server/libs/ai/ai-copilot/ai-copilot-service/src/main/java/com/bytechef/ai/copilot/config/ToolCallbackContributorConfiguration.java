@@ -47,7 +47,7 @@ public class ToolCallbackContributorConfiguration {
 
     /**
      * Names of the {@link com.bytechef.ai.copilot.tool.catalog.IntelligentToolDefinition}s this contributor owns on the
-     * management MCP surface, contributed by {@link CopilotIntelligentToolContributor}. Filtered with
+     * management MCP surface, contributed by {@link CopilotIntelligentToolContributorConfiguration}. Filtered with
      * {@link IntelligentToolCatalog#getByNames} over its own name partition, never the whole catalog, because later EE
      * intelligent-tool contributors (custom_component, code_workflow, integration_workflow) register their own
      * management-MCP contributor configs against the same catalog — {@code getAll} here would double-register their
@@ -59,11 +59,11 @@ public class ToolCallbackContributorConfiguration {
      * </p>
      *
      * <p>
-     * {@code configureMcpServer} is contributed by the automation-owned {@code McpServerIntelligentToolContributor}
-     * (automation-ai-tool), not by this module's own {@code CopilotIntelligentToolContributor} —
-     * {@link IntelligentToolCatalog#getByNames} filters the whole catalog by name regardless of which contributor
-     * supplied a given definition, so it still belongs in this CE surface's owned partition alongside the six
-     * CE-contributed names.
+     * {@code configureMcpServer} is contributed by the automation-owned
+     * {@code McpServerIntelligentToolContributorConfiguration} (automation-ai-tool), not by this module's own
+     * {@code CopilotIntelligentToolContributorConfiguration} — {@link IntelligentToolCatalog#getByNames} filters the
+     * whole catalog by name regardless of which contributor supplied a given definition, so it still belongs in this CE
+     * surface's owned partition alongside the six CE-contributed names.
      * </p>
      */
     public static final Set<String> INTELLIGENT_TOOL_NAMES = Set.of(
@@ -120,7 +120,7 @@ public class ToolCallbackContributorConfiguration {
     /**
      * Flattens the MCP server CRUD tool set (ticket 732, Task 3) onto the management MCP surface — the
      * create/attach/enable capability the {@code mcp_agent} -> {@code configureMcpServer} promotion removed from this
-     * surface (see {@code McpServerIntelligentToolContributor}'s javadoc for that history).
+     * surface (see {@code McpServerIntelligentToolContributorConfiguration}'s javadoc for that history).
      * {@link McpServerToolCallbacksFactory#writeToolCallbacks()} supplies all six by construction
      * ({@code listMcpServers}, {@code listMcpProjectWorkflows}, {@code createMcpServer}, {@code updateMcpServer},
      * {@code createMcpProject}, {@code cloneMcpProject}) plus a seventh,

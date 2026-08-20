@@ -66,7 +66,7 @@ import org.springframework.core.io.Resource;
  * <p>
  * Gated on {@code bytechef.ai.copilot.enabled} rather than an OR with {@code bytechef.ai.hub.enabled}: the
  * {@code buildWorkflow}/{@code importWorkflow} delegate {@code ChatClient} beans that
- * {@link com.bytechef.ai.copilot.config.CopilotIntelligentToolContributor} resolves are declared in
+ * {@link com.bytechef.ai.copilot.config.CopilotIntelligentToolContributorConfiguration} resolves are declared in
  * {@code CopilotConfiguration}, which is gated on {@code bytechef.ai.copilot.enabled} alone. An OR-gate here would let
  * this configuration register with {@code hub.enabled=true, copilot.enabled=false}, producing a {@code project_build}
  * agent whose prompt instructs it to delegate workflow-content work to those subagents while both are silently absent.

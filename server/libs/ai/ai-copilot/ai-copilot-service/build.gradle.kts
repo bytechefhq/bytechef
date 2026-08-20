@@ -144,7 +144,7 @@ dependencies {
     implementation(project(":server:libs:core:tenant:tenant-api"))
 
     // CopilotAgentType (ai-copilot-tool) implements AgentType, which ai-copilot-tool depends on as
-    // implementation-only; expose it here for CopilotIntelligentToolContributor's CopilotAgentType.key() calls
+    // implementation-only; expose it here for CopilotIntelligentToolContributorConfiguration's CopilotAgentType.key() calls
     // and for tests that assert against them.
     implementation(project(":server:libs:ai:ai-api"))
 }

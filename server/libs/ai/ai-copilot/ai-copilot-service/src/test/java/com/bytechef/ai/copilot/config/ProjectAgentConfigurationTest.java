@@ -94,9 +94,9 @@ final class ProjectAgentConfigurationTest {
 
     /**
      * {@code buildWorkflow} and {@code importWorkflow} are the only two definitions
-     * {@code CopilotIntelligentToolContributor} scopes to {@link IntelligentToolScope#PROJECT} — every other
-     * intelligent delegate (e.g. {@code configureClusterElement}, which ships with an empty {@code panelScopes()}) must
-     * not reach this panel's build tool list.
+     * {@code CopilotIntelligentToolContributorConfiguration} scopes to {@link IntelligentToolScope#PROJECT} — every
+     * other intelligent delegate (e.g. {@code configureClusterElement}, which ships with an empty
+     * {@code panelScopes()}) must not reach this panel's build tool list.
      */
     @Test
     void testBuildToolCallbacksOmitsDefinitionsNotScopedToProjectPanel() {

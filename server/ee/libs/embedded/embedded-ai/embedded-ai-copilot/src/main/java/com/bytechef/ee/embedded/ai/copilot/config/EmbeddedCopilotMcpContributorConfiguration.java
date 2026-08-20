@@ -26,9 +26,9 @@ import org.springframework.context.annotation.Configuration;
  *
  * <p>
  * The delegate is contributed via {@link IntelligentToolCatalog#getByNames}, over the single definition registered by
- * {@link EmbeddedIntelligentToolContributor} — which builds the delegate around the embedded BUILD subagent
- * {@code ChatClient} reusing the shared {@code ProjectWorkflowAgentToolCallback}. A missing ChatClient bean (feature
- * module absent) skips silently. Like the automation copilot contributor, the AG-UI
+ * {@link EmbeddedIntelligentToolContributorConfiguration} — which builds the delegate around the embedded BUILD
+ * subagent {@code ChatClient} reusing the shared {@code ProjectWorkflowAgentToolCallback}. A missing ChatClient bean
+ * (feature module absent) skips silently. Like the automation copilot contributor, the AG-UI
  * {@code ProgressReportingToolCallback} wrapper is intentionally NOT applied on this surface. The delegate is wrapped
  * in {@link WorkspaceScopedSubAgentToolCallback} so the MCP client can supply workspace scope this surface cannot
  * infer.
@@ -43,7 +43,7 @@ public class EmbeddedCopilotMcpContributorConfiguration {
 
     /**
      * Name of the {@link com.bytechef.ai.copilot.tool.catalog.IntelligentToolDefinition} this contributor owns on the
-     * management MCP surface, contributed by {@link EmbeddedIntelligentToolContributor}. Filtered with
+     * management MCP surface, contributed by {@link EmbeddedIntelligentToolContributorConfiguration}. Filtered with
      * {@link IntelligentToolCatalog#getByNames} over its own name partition, never the whole catalog, because the CE
      * {@code ToolCallbackContributorConfiguration} and the EE automation
      * {@code AutomationCopilotMcpContributorConfiguration} register their own management-MCP contributor configs
