@@ -33,6 +33,7 @@ import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.exception.UserNotFoundException;
 import com.bytechef.platform.user.service.UserService;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -79,9 +80,14 @@ class PermissionServiceTest {
         // than isolating either side.
         currentUserResolver = new CurrentUserResolver(userService);
 
+        // hasWorkspaceScopeForProject and hasWorkflowScope route through hasResourceScope, so the 'Project' and
+        // 'Workflow' ownership resolvers production registers have to be present here too. They read the same mocked
+        // repository the old inline lookups did, so the per-test findById/findByWorkflowId stubs keep driving these
+        // tests unchanged.
         permissionService = new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
-            workspaceUserRepository, List.of(), List.of(), permissiveResolver(), List.of());
+            workspaceUserRepository, List.of(projectOwnershipResolver(), workflowOwnershipResolver()), List.of(),
+            permissiveResolver(), List.of());
 
         securityUtilsMock = mockStatic(SecurityUtils.class);
 
@@ -474,6 +480,57 @@ class PermissionServiceTest {
         return new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
             workspaceUserRepository, List.of(resolvers), List.of(), permissiveResolver(), List.of());
+    }
+
+    /**
+     * Mirrors production's {@code ProjectOwnershipResolver}: reads {@code project.workspace_id} straight off the
+     * repository and fails closed when the project does not exist.
+     */
+    private ResourceOwnershipResolver projectOwnershipResolver() {
+        return new ResourceOwnershipResolver() {
+            @Override
+            public String resourceType() {
+                return "Project";
+            }
+
+            @Override
+            public ResourceOwner resolveOwner(long id) {
+                return projectRepository.findById(id)
+                    .map(Project::getWorkspaceId)
+                    .map(ResourceOwner::ofWorkspace)
+                    .orElseGet(ResourceOwner::unknown);
+            }
+        };
+    }
+
+    /**
+     * Mirrors production's {@code WorkflowOwnershipResolver}: a String-keyed workflow resolves to its project's
+     * workspace off the same mocked repository, and anything else fails closed.
+     */
+    private ResourceOwnershipResolver workflowOwnershipResolver() {
+        return new ResourceOwnershipResolver() {
+            @Override
+            public String resourceType() {
+                return "Workflow";
+            }
+
+            @Override
+            public ResourceOwner resolveOwner(long id) {
+                return ResourceOwner.unknown();
+            }
+
+            @Override
+            public ResourceOwner resolveOwner(Serializable id) {
+                if (!(id instanceof String workflowId)) {
+                    return ResourceOwner.unknown();
+                }
+
+                return projectRepository.findByWorkflowId(workflowId)
+                    .map(Project::getWorkspaceId)
+                    .map(ResourceOwner::ofWorkspace)
+                    .orElseGet(ResourceOwner::unknown);
+            }
+        };
     }
 
     private static ResourceOwnershipResolver resolver(String type, ResourceOwner owner) {

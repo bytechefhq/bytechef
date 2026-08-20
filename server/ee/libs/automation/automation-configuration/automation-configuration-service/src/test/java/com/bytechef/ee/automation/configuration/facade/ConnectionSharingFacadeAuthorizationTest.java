@@ -34,8 +34,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
  * to keep open — an admin always satisfies the second disjunct.
  *
  * <p>
- * Runtime enforcement of these expressions by Spring Security is proven generically by
- * {@code PreAuthorizeProxyEnforcementIntTest}.
+ * Runtime enforcement of the {@code @permissionService.<method>} bean-reference form is proven by
+ * {@code PreAuthorizeProxyEnforcementIntTest}, which calls this very facade through its security proxy for both
+ * disjuncts.
  *
  * @version ee
  *

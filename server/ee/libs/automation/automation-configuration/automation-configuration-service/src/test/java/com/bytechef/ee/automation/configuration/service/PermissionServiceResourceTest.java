@@ -141,7 +141,7 @@ class PermissionServiceResourceTest {
         when(workspaceScopeCacheService.getWorkspaceScopes(7L, 42L))
             .thenReturn(Set.of("WORKFLOW_EDIT"));
 
-        PermissionServiceImpl service = service();
+        PermissionServiceImpl service = service(workflowOwnershipResolver());
 
         assertThat(service.hasWorkflowScope("wf-uuid", "WORKFLOW_EDIT")).isTrue();
     }
@@ -150,9 +150,40 @@ class PermissionServiceResourceTest {
     void testHasWorkflowScopeUnknownWorkflowFailsClosedInEe() {
         when(projectRepository.findByWorkflowId("nope")).thenReturn(java.util.Optional.empty());
 
-        PermissionServiceImpl service = service();
+        PermissionServiceImpl service = service(workflowOwnershipResolver());
 
         assertThat(service.hasWorkflowScope("nope", "WORKFLOW_EDIT")).isFalse();
+    }
+
+    /**
+     * Mirrors the production {@code WorkflowOwnershipResolver}, which {@code hasWorkflowScope} now goes through: a
+     * String-keyed workflow resolves to its project's workspace, and an unresolvable one fails closed.
+     */
+    private ResourceOwnershipResolver workflowOwnershipResolver() {
+        return new ResourceOwnershipResolver() {
+
+            @Override
+            public String resourceType() {
+                return "Workflow";
+            }
+
+            @Override
+            public ResourceOwner resolveOwner(long id) {
+                return ResourceOwner.unknown();
+            }
+
+            @Override
+            public ResourceOwner resolveOwner(java.io.Serializable id) {
+                if (!(id instanceof String workflowId)) {
+                    return ResourceOwner.unknown();
+                }
+
+                return projectRepository.findByWorkflowId(workflowId)
+                    .map(com.bytechef.automation.configuration.domain.Project::getWorkspaceId)
+                    .map(ResourceOwner::ofWorkspace)
+                    .orElseGet(ResourceOwner::unknown);
+            }
+        };
     }
 
     /**

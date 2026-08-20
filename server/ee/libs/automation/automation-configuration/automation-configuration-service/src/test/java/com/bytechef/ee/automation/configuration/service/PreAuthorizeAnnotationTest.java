@@ -162,6 +162,10 @@ class PreAuthorizeAnnotationTest {
         // the service eventually filters.
         assertMethodPreAuthorizeExists(
             clazz, "getProject", "hasPermission(#id, 'Project', 'WORKFLOW_VIEW')");
+        // Same scope as getProject: the version history discloses the same project, and ProjectApiController used to
+        // serve it straight off ProjectService, past the facade layer that owns authorization.
+        assertMethodPreAuthorizeExists(
+            clazz, "getProjectVersions", "hasPermission(#id, 'Project', 'WORKFLOW_VIEW')");
         assertAnyMethodHasPreAuthorize(
             clazz, "getWorkspaceProjects", "hasPermission(#workspaceId, 'Workspace', 'WORKFLOW_VIEW')");
         assertMethodPreAuthorizeExists(

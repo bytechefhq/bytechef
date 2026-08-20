@@ -8,8 +8,10 @@
 package com.bytechef.ee.automation.configuration.event;
 
 import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.security.ProjectVisibilityFilter;
 import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowService;
 import com.bytechef.ee.automation.configuration.service.ProjectGitConfigurationService;
+import com.bytechef.ee.platform.resource.grant.service.ResourceGrantService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.data.relational.core.mapping.event.AbstractRelationalEventListener;
@@ -28,14 +30,17 @@ public class ProjectBeforeDeleteEventListener extends AbstractRelationalEventLis
 
     private final ProjectCodeWorkflowService projectCodeWorkflowService;
     private final ProjectGitConfigurationService projectGitConfigurationService;
+    private final ResourceGrantService resourceGrantService;
 
     @SuppressFBWarnings("EI")
     public ProjectBeforeDeleteEventListener(
         ProjectCodeWorkflowService projectCodeWorkflowService,
-        ProjectGitConfigurationService projectGitConfigurationService) {
+        ProjectGitConfigurationService projectGitConfigurationService,
+        ResourceGrantService resourceGrantService) {
 
         this.projectCodeWorkflowService = projectCodeWorkflowService;
         this.projectGitConfigurationService = projectGitConfigurationService;
+        this.resourceGrantService = resourceGrantService;
     }
 
     @Override
@@ -43,6 +48,10 @@ public class ProjectBeforeDeleteEventListener extends AbstractRelationalEventLis
         Identifier identifier = event.getId();
 
         long projectId = (Long) identifier.getValue();
+
+        // Grants first: resource_grant.resource_id is polymorphic and carries no foreign key, so a grant left behind
+        // would attach to whatever later recycles this id.
+        resourceGrantService.deleteGrants(ProjectVisibilityFilter.PROJECT, projectId);
 
         projectCodeWorkflowService.deleteProjectCodeWorkflows(projectId);
         projectGitConfigurationService.delete(projectId);

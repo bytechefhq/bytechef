@@ -22,6 +22,7 @@ import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.ai.conversation.AgentConversationRecorder.AgentConversation;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.security.domain.ResourceVisibility;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
@@ -202,6 +203,11 @@ class AiHubAgentConversationRecorderChatMemoryOffIntTest {
         }
 
         @Override
+        public Optional<Project> fetchProject(long id) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
         public Optional<Project> fetchProject(String name) {
             throw new UnsupportedOperationException();
         }
@@ -276,6 +282,11 @@ class AiHubAgentConversationRecorderChatMemoryOffIntTest {
 
         @Override
         public Project updatePermissionExpression(long id, String permissionExpression) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Project updateVisibility(long id, ResourceVisibility visibility) {
             throw new UnsupportedOperationException();
         }
     }

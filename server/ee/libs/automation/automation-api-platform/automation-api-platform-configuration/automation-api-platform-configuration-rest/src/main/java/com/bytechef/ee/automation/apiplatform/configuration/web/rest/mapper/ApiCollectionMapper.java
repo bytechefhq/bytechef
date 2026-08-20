@@ -14,9 +14,12 @@ import com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentBas
 import com.bytechef.ee.automation.apiplatform.configuration.dto.ApiCollectionDTO;
 import com.bytechef.ee.automation.apiplatform.configuration.web.rest.mapper.config.ApiPlatformConfigurationMapperSpringConfig;
 import com.bytechef.ee.automation.apiplatform.configuration.web.rest.model.ApiCollectionModel;
+import com.bytechef.platform.security.domain.ResourceVisibility;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingConstants;
+import org.mapstruct.ValueMapping;
 import org.mapstruct.extensions.spring.DelegatingConverter;
 import org.springframework.core.convert.converter.Converter;
 
@@ -53,4 +56,12 @@ public interface ApiCollectionMapper extends Converter<ApiCollectionDTO, ApiColl
     @Mapping(target = "tagIds", ignore = true)
     @Mapping(target = "categoryId", ignore = true)
     Project mapToProject(ProjectBasicModel projectBasicModel);
+
+    /**
+     * A project can never be ORGANIZATION — {@code ProjectVisibilityPolicy} does not support the rung and the create
+     * path rejects it — so a row holding it means the write path failed. Throw rather than folding it to WORKSPACE,
+     * which would turn a corrupt row into a plausible-looking one. Do not "fix" this into a silent mapping.
+     */
+    @ValueMapping(source = "ORGANIZATION", target = MappingConstants.THROW_EXCEPTION)
+    ProjectBasicModel.VisibilityEnum map(ResourceVisibility resourceVisibility);
 }

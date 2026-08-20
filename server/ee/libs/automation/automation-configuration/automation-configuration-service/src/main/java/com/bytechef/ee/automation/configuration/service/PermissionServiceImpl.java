@@ -204,25 +204,17 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public boolean hasWorkspaceScopeForProject(long projectId, String scope) {
-        if (isAutomationAuthorizationSkipped()) {
-            return true;
-        }
-
-        if (isTenantAdmin()) {
-            return true;
-        }
-
-        Long workspaceId = projectRepository.findById(projectId)
-            .map(Project::getWorkspaceId)
-            .orElse(null);
-
-        if (workspaceId == null) {
-            return false;
-        }
-
-        return hasWorkspaceScope(workspaceId, scope);
+        // A project-keyed check is a resource-scope check on the project: routing through hasResourceScope gives it
+        // the same visibility precondition every hasPermission(#id, 'Project', ...) gate has.
+        return hasResourceScope(projectId, "Project", scope);
     }
 
+    /**
+     * Carries the same visibility precondition as the environment-unaware overload, but inline rather than by
+     * delegating to {@link #hasResourceScope(Serializable, String, String)} — that path would discard the explicit
+     * {@code environment}, which is the whole reason this overload exists (the promotion caller passes the environment
+     * being deployed INTO, not the one it is acting from).
+     */
     @Override
     public boolean hasWorkspaceScopeForProject(long projectId, String scope, Environment environment) {
         if (isAutomationAuthorizationSkipped()) {
@@ -231,6 +223,10 @@ public class PermissionServiceImpl implements PermissionService {
 
         if (isTenantAdmin()) {
             return true;
+        }
+
+        if (!isResourceVisible(projectId, "Project")) {
+            return false;
         }
 
         Long workspaceId = projectRepository.findById(projectId)
@@ -303,17 +299,14 @@ public class PermissionServiceImpl implements PermissionService {
             return true;
         }
 
-        if (!(id instanceof Number number)) {
-            return false;
-        }
-
-        return resourceVisibilityProvider.fetchVisibility(number.longValue())
+        return resourceVisibilityProvider.fetchVisibility(id)
             .map(visibilityRecord -> {
                 // workspaceId is unused by both resolver implementations — they resolve against the current
                 // principal, not the argument — so 0 is safe. The parameter exists for a future SQL-predicate
-                // implementation.
+                // implementation. The resource type handed to the resolver is the one the record and its grants
+                // are stored under, which for an inheriting resource is its parent's.
                 Set<Long> visibleIds = resourceVisibilityResolver.filterVisibleIds(
-                    resourceType, 0L, List.of(visibilityRecord));
+                    resourceVisibilityProvider.visibilityResourceType(), 0L, List.of(visibilityRecord));
 
                 return !visibleIds.isEmpty();
             })
@@ -370,23 +363,9 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public boolean hasWorkflowScope(String workflowId, String scope) {
-        if (isAutomationAuthorizationSkipped()) {
-            return true;
-        }
-
-        if (isTenantAdmin()) {
-            return true;
-        }
-
-        Long workspaceId = projectRepository.findByWorkflowId(workflowId)
-            .map(Project::getWorkspaceId)
-            .orElse(null);
-
-        if (workspaceId == null) {
-            return false;
-        }
-
-        return hasWorkspaceScope(workspaceId, scope);
+        // A workflow-keyed check is a resource-scope check on the workflow: routing through hasResourceScope gives it
+        // the visibility precondition, and WorkflowVisibilityProvider redirects the lookup to the owning project.
+        return hasResourceScope(workflowId, "Workflow", scope);
     }
 
     @Override

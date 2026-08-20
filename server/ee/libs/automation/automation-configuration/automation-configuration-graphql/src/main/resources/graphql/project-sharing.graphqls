@@ -1,0 +1,13 @@
+extend type Query {
+    """The users a private project has been granted to. Owner or admin only — an ordinary viewer of a shared project must not learn who else it was handed to. (EE only)"""
+    projectGrants(workspaceId: ID!, projectId: ID!): [Long!]!
+}
+
+extend type Mutation {
+    """Set a project's reach. PRIVATE withholds it (and its workflows, deployments and executions) from the workspace; WORKSPACE shares it. ORGANIZATION is not supported for projects. (owner or admin, EE only)"""
+    setProjectVisibility(workspaceId: ID!, projectId: ID!, visibility: ResourceVisibility!): Boolean!
+    """Grant a named workspace member access to a project its owner has withheld. Idempotent. (owner or admin, EE only)"""
+    grantProjectAccess(workspaceId: ID!, projectId: ID!, userId: ID!): Boolean!
+    """Revoke a grant. Silent when no grant exists. (owner or admin, EE only)"""
+    revokeProjectAccess(workspaceId: ID!, projectId: ID!, userId: ID!): Boolean!
+}

@@ -7,6 +7,8 @@
 
 package com.bytechef.ee.automation.configuration.remote.client.facade;
 
+import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.dto.ProjectTemplateDTO;
@@ -68,12 +70,27 @@ public class RemoteProjectFacadeClient implements ProjectFacade {
     }
 
     @Override
+    public Project getProjectRow(long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<ProjectTemplateDTO> getPreBuiltProjectTemplates(String query, String category) {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public List<ProjectDTO> getProjects(Long categoryId, Boolean projectDeployments, Long tagId, Status status) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<Project> getProjectRows() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<ProjectVersion> getProjectVersions(long id) {
         throw new UnsupportedOperationException();
     }
 
