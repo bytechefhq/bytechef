@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Control fixture for LiquibaseMarkRanRollbackIntTest. This is the shape the repository's changelogs used to have:
+    a MARK_RAN precondition and NO rollback block, so Liquibase supplies the inverse itself. The test applies it and
+    rolls it back to observe the generated dropColumn destroying a column the changeset never created.
+
+    It deliberately lives outside config/liquibase/ so neither the application's includeAll ever loads it nor
+    LiquibaseMarkRanRollbackTest, which scans config/liquibase/**, ever reports it as a violation.
+-->
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="exposed-add-column" author="ByteChef">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="project" columnName="visibility"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="project">
+            <column name="visibility" type="INT" defaultValueNumeric="1">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>
