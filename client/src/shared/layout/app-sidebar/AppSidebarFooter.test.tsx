@@ -93,6 +93,9 @@ describe('AppSidebarFooter', () => {
         expect(screen.getAllByText('user@localhost.com').length).toBeGreaterThanOrEqual(2);
     });
 
+    // Resetting the cache refetches every active query, and those refetches race the log out
+    // request — whichever land after the session is gone come back unauthenticated and surface as
+    // an error toast on the login page.
     it('drops the query cache on log out without refetching anything', async () => {
         const user = userEvent.setup();
         const queryClient = new QueryClient();

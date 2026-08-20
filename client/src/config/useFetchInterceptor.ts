@@ -37,6 +37,11 @@ function handlesErrorInline(url: string): boolean {
     return url.includes('/approval-form/');
 }
 
+/*
+ * A GraphQL response reports an expired or ended session inside a 2xx body, so the status-based
+ * branch never sees it. The server marks this failure with a machine-readable code in the error
+ * extensions — match on that rather than on the human-readable message, which is free to change.
+ */
 const AUTHENTICATION_REQUIRED_ERROR_CODE = 'AUTHENTICATION_REQUIRED';
 
 interface GraphQlErrorI {
@@ -184,6 +189,10 @@ export default function useFetchInterceptor() {
                         .then((data: {errors?: Array<GraphQlErrorI>}) => {
                             const errors = data.errors ?? [];
 
+                            // Treat an unauthenticated GraphQL error the way an unauthenticated REST
+                            // response is treated: drop the session and let the route guard send the
+                            // user to the login page. Toasting it instead reports the end of a
+                            // session as a failure — which is what a normal log out looks like.
                             if (errors.some(isAuthenticationError)) {
                                 clearAuthentication();
                                 clearCurrentWorkspaceId();

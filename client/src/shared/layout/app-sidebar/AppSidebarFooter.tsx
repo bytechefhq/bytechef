@@ -80,6 +80,9 @@ export function AppSidebarFooter() {
     const handleLogOutClick = async () => {
         analytics.reset();
 
+        // Cancel rather than reset: resetting refetches every active query, and those refetches race
+        // the log out request, so whichever ones land after the session is gone come back
+        // unauthenticated. Nothing is worth re-reading on the way out — drop the cache instead.
         await queryClient.cancelQueries();
 
         await logout();
