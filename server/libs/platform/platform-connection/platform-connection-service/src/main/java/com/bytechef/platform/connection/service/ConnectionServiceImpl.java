@@ -462,6 +462,26 @@ public class ConnectionServiceImpl implements ConnectionService {
     }
 
     @Override
+    public Connection replaceConnectionParameters(long connectionId, Map<String, ?> parameters) {
+        rejectIfAiProviderConnection(connectionId);
+
+        Assert.notNull(parameters, "'parameters' must not be null");
+
+        Connection connection = getConnection(connectionId);
+        CredentialStore store = getStore(connection.getCredentialStoreType());
+
+        if (store.isReadOnly()) {
+            throw new ReadOnlyCredentialStoreException(store.getType());
+        }
+
+        validateOwnerOrAdmin(connection);
+
+        store.storeSecret(connection, new HashMap<>(parameters));
+
+        return populateParameters(connectionRepository.save(connection));
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public List<Connection> getInactiveConnections(List<Long> connectionIds) {
         if (connectionIds == null || connectionIds.isEmpty()) {

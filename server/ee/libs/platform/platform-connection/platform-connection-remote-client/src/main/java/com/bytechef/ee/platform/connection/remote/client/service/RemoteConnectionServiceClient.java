@@ -152,6 +152,11 @@ public class RemoteConnectionServiceClient implements ConnectionService {
     }
 
     @Override
+    public Connection replaceConnectionParameters(long connectionId, Map<String, ?> parameters) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Connection updateVisibility(long id, ResourceVisibility visibility) {
         throw new UnsupportedOperationException();
     }

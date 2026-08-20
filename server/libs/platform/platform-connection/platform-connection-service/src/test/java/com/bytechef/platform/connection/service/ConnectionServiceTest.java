@@ -19,6 +19,7 @@ package com.bytechef.platform.connection.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
@@ -279,5 +280,39 @@ class ConnectionServiceTest {
         // The inline parameters column must be empty for an external-store row.
         assertThat(parametersAtSaveTime.get()).isEmpty();
         assertThat(connection.getCredentialStoreType()).isEqualTo(CredentialStoreType.AWS_SECRETS_MANAGER);
+    }
+
+    @Test
+    void testReplaceConnectionParametersDoesNotMergeStoredValues() {
+        CredentialStore credentialStore = Mockito.mock(CredentialStore.class);
+
+        lenient().when(credentialStore.getType())
+            .thenReturn(CredentialStoreType.DATABASE);
+        lenient().when(credentialStore.isReadOnly())
+            .thenReturn(false);
+
+        Connection connection = new Connection();
+
+        connection.setId(CONNECTION_ID);
+        connection.setComponentName("mailchimp");
+        connection.setCredentialStoreType(CredentialStoreType.DATABASE);
+        connection.setCreatedBy(ADMIN_USER);
+
+        doReturn(Map.of("apiKey", "old", "region", "us1")).when(credentialStore)
+            .getSecret(connection);
+
+        ConnectionServiceImpl serviceWithStores = new ConnectionServiceImpl(
+            List.of(credentialStore), connectionRepository, aiProviderConnectionRepositoryProvider);
+
+        when(connectionRepository.findById(CONNECTION_ID)).thenReturn(Optional.of(connection));
+        when(connectionRepository.save(any(Connection.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        serviceWithStores.replaceConnectionParameters(CONNECTION_ID, Map.of("apiKey", "new"));
+
+        ArgumentCaptor<Map<String, ?>> captor = ArgumentCaptor.captor();
+
+        verify(credentialStore).storeSecret(eq(connection), captor.capture());
+
+        assertThat(captor.getValue()).isEqualTo(Map.of("apiKey", "new"));
     }
 }

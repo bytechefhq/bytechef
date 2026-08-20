@@ -93,6 +93,18 @@ public interface ConnectionService {
 
     Connection updateConnectionParameters(long connectionId, Map<String, ?> parameters);
 
+    /**
+     * Writes {@code parameters} to the connection's credential store <strong>wholesale</strong>, discarding whatever
+     * was stored before. This is the deliberate counterpart to {@link #updateConnectionParameters}, which merges: a
+     * caller that has already computed the connection's complete final parameter map must not have the previous map
+     * merged back underneath it, or a cleared value would silently survive.
+     *
+     * <p>
+     * Every other guard is identical to {@link #updateConnectionParameters} — AI provider connections are rejected, a
+     * read-only credential store throws, and only the connection's creator or an admin may call it.
+     */
+    Connection replaceConnectionParameters(long connectionId, Map<String, ?> parameters);
+
     Connection updateVisibility(long id, ResourceVisibility visibility);
 
     /**
