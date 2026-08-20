@@ -71,7 +71,11 @@ import reactor.core.publisher.Hooks;
  */
 class ManagementMcpServerSecurityContextPropagationTest {
 
-    private boolean automaticContextPropagationEnabledBeforeTest;
+    // Written in @BeforeEach and read back in @AfterEach. JUnit does not promise those two callbacks run on the
+    // same thread, and this test deliberately exercises reactor's boundedElastic pool, so the read needs the
+    // happens-before a volatile write gives it - otherwise the restore below can act on a stale value and leave
+    // the process-global Hooks state flipped for every later test in the JVM.
+    private volatile boolean automaticContextPropagationEnabledBeforeTest;
 
     @BeforeEach
     void captureAutomaticContextPropagationState() {

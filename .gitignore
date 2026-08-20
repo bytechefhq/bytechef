@@ -91,6 +91,9 @@ dataSources
 # `git add` skipped it with nothing but a hint.
 !docs/content/docs/**/build/
 **/generated/generated
+# -XX:+HeapDumpOnOutOfMemoryError (see org.gradle.jvmargs in gradle.properties) drops the dump in the
+# working directory, which for the Gradle daemon is the repo root. These are multi-gigabyte files.
+*.hprof
 
 ######################
 # Package Files
