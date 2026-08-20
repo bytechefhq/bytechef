@@ -1354,10 +1354,42 @@ stores or router hooks via factory-injected mocks.
 
 ### Resource Visibility & Sharing
 
-Connections carry a `visibility` column typed `ResourceVisibility` (`PRIVATE < WORKSPACE <
-ORGANIZATION`, in `platform-api`). Every resource is created **WORKSPACE-visible** — shared with its
-workspace unless its owner withholds it. The model is resource-agnostic; connections are the only
-resource wired to it so far.
+A resource wired to this model carries a `visibility` column typed `ResourceVisibility` (`PRIVATE <
+WORKSPACE < ORGANIZATION`, in `platform-api`, ordinals pinned by `ResourceVisibilityTest`). Every
+resource is created **WORKSPACE-visible** — shared with its workspace unless its owner withholds it.
+The model is resource-agnostic. Wired so far: **connections** (`PRIVATE`/`WORKSPACE`/`ORGANIZATION`)
+and **projects** (`PRIVATE`/`WORKSPACE`; `ProjectVisibilityPolicy`, column `project.visibility`).
+Workflows, project workflows, project deployments and jobs have **no column** — they inherit the
+project's reach at check time via `ResourceVisibilityProvider`s whose `visibilityResourceType()`
+returns `"Project"` and whose record id is the project id, so grants resolve against
+`("Project", projectId)`.
+
+**"Specific people"** is not a fourth stored value — it is `PRIVATE` plus rows in `resource_grant`
+(EE, `platform-resource-grant`). A grant conveys visibility only; what the recipient may then do is
+decided by the usual `PermissionScope`/`WorkspaceRole` machinery. Grants survive promotion so demoting
+restores the previous audience, and are deleted with the resource because `resource_id` is
+polymorphic and has no foreign key (connections in `WorkspaceConnectionFacadeImpl.delete`, projects in
+EE `ProjectBeforeDeleteEventListener`).
+
+**Visibility is a precondition of `hasResourceScope`**, in both editions — not a filter running beside
+it. Without that, a member holding `CONNECTION_EDIT` would pass the by-id check for a connection the
+list correctly hides. In CE this replaces owner-isolation *only* for resource types that registered a
+`ResourceVisibilityProvider`; API keys and other user-owned resources keep it.
+EE is pinned by `PermissionServiceVisibilityTest` (an EE-only class) and CE by the CE
+`PermissionServiceResourceTest`; both are the regression guard, one per edition. Four entry points carry
+the precondition: `hasResourceScope`, both `hasWorkspaceScopeForProject` overloads and
+`hasWorkflowScope`. The whole `PermissionService` surface is enumerated and classified in
+`docs/superpowers/specs/2026-08-17-project-visibility-design.md` §17 — extend that table when adding a
+method rather than reasoning about it case by case; three of the four were closed by the project-
+visibility plan (`hasResourceScope` came from phase 1) and two of those three were found after the
+design rather than by it. The one deliberate omission is `hasResourceRole`, which is the owner-or-admin
+sharing-management posture (an admin must be able to repair the sharing of a resource they cannot
+themselves see). **That table covers the SPI, not the facades that reach it** — a facade method with no
+annotation at all cannot appear in a table of what annotations route to, which is how
+`ProjectWorkflowFacadeImpl`'s `getProjectWorkflow(long)` and no-argument `getProjectWorkflows()` stayed
+unguarded until the whole-branch review.
+
+#### Connections
 
 - **CE**: `ConnectionFacadeImpl.create()` force-writes `WORKSPACE`. No picker, no grants — CE has no
   authorization boundary between workspace members, so everything is workspace-public.
@@ -1373,18 +1405,6 @@ resource wired to it so far.
 controllers obfuscate `authorizationParameters` and null `parameters`, and no `ConnectionFacade` method
 mutates authorization parameters after creation. A member can run a workflow against a colleague's
 account; they cannot extract or repoint the credential.
-
-**"Specific people"** is not a fourth stored value — it is `PRIVATE` plus rows in `resource_grant`
-(EE, `platform-resource-grant`). A grant conveys visibility only; what the recipient may then do is
-decided by the usual `PermissionScope`/`WorkspaceRole` machinery. Grants survive promotion so demoting
-restores the previous audience, and are deleted with the connection because `resource_id` is
-polymorphic and has no foreign key.
-
-**Visibility is a precondition of `hasResourceScope`**, in both editions — not a filter running beside
-it. Without that, a member holding `CONNECTION_EDIT` would pass the by-id check for a connection the
-list correctly hides. In CE this replaces owner-isolation *only* for resource types that registered a
-`ResourceVisibilityProvider`; API keys and other user-owned resources keep it.
-`PermissionServiceVisibilityTest` is the regression guard.
 
 **GraphQL mutations** (owner-or-admin, annotated on the facade so they protect every caller):
 - `setConnectionVisibility(workspaceId, connectionId, visibility)` — rejects `ORGANIZATION` (set
@@ -1407,6 +1427,68 @@ The first and last are `strictAudit` — both can remove access.
 `WorkspaceConnectionFacadeImpl.incrementCreateCounter` — its own description reads "Connections
 created via the workspace facade" — and `createOrganizationConnection` is a separate EE GraphQL
 controller that never reaches it, while `setConnectionVisibility` rejects `ORGANIZATION` outright.
+
+#### Projects (resource visibility phase 2)
+
+- **CE**: `ProjectFacadeImpl.applyCreateVisibility` force-writes `WORKSPACE` and logs a requested
+  `PRIVATE` rather than honouring it. **EE**: takes the request, defaulting to the policy default and
+  rejecting an unsupported rung against `ProjectVisibilityPolicy.supportedVisibilities()`, which omits
+  `ORGANIZATION` because a project belongs to exactly one workspace and the model has no way to express
+  one that reaches outside it. `ORGANIZATION` is therefore never persisted in either edition, but by
+  different means — EE consults the policy, CE never reaches it (the force-write returns first), and the
+  REST enum cannot express the request in the first place. Only two paths write the column — create, and
+  EE's `setProjectVisibility`; `updateProject` deliberately cannot change it.
+- **Inheritance is a management-surface control only.** A `PRIVATE` project's deployments, webhooks,
+  triggers and schedules keep serving traffic exactly as before. Making a project private hides it,
+  its workflows, its deployments and its executions from the workspace's *lists and by-id reads* — it is
+  not a way to undeploy or pause anything.
+- **`ProjectVisibilityFilter` (`automation-configuration-api`) is the single `Project → VisibilityRecord`
+  mapping** every list surface uses (projects, workflows, deployments, executions, search, GraphQL). It
+  sits in `-api`, not `-service`, because `automation-configuration-graphql` depends only on `-api`; it
+  resolves its `ResourceVisibilityResolver` through an `ObjectProvider` and fails closed, since six
+  distributed EE apps carry `-api` without `-service` (ai-copilot, connection, coordinator, execution,
+  webhook, worker — configuration-app is the one that carries both).
+- **`hasWorkspaceScopeForProject` delegates to `hasResourceScope(projectId, "Project", scope)`** in both
+  editions (the 3-arg EE overload inlines the same precondition so it can keep the explicit
+  `Environment`). `hasWorkflowScope` routes through `hasResourceScope(workflowId, "Workflow", …)`, where
+  `WorkflowVisibilityProvider` redirects the lookup to the owning project.
+- **`ProjectOwnershipResolver` returns `ownerUserId` (from `created_by`) ONLY because
+  `ProjectVisibilityProvider` is registered** — CE `hasResourceScope` then takes the visibility branch
+  instead of owner-isolating. The two must never be split across commits: a resolver with an owner but
+  no provider hides every project from everyone but its creator in CE.
+- **"Hiding a project hides its EXECUTIONS" is monolith-only — the rest of the family is not.** Four of
+  the five providers (`ProjectVisibilityProvider`, `ProjectWorkflowVisibilityProvider`,
+  `ProjectDeploymentVisibilityProvider`, `WorkflowVisibilityProvider`) are unconditional `@Component`s in
+  CE `automation-configuration-service`, which `configuration-app` **does** carry — so in distributed EE
+  the project, project-workflow, deployment and workflow types are enforced there exactly as in the
+  monolith. Only `JobVisibilityProvider` is missing: it ships in `automation-workflow-execution-service`,
+  which `configuration-app` does not carry, so `"Job"` has no registered provider in that app and is
+  unrestricted by visibility there. This is narrower than an earlier draft of this bullet (and of the
+  design spec's §15.1) claimed — do not restate it as "configuration-app carries no providers".
+  `execution-app`, which serves the automation executions REST surface, does not leak in compensation:
+  it carries `automation-configuration-remote-client` rather than `-service`, so the unfiltered
+  executions list throws (`RemoteProjectFacadeClient.getWorkspaceProjectWorkflows` is an
+  `UnsupportedOperationException` stub) and every explicit project/workflow/deployment filter is denied
+  (`RemotePermissionServiceClient` returns `false` for every check).
+- **No "not while deployed" rule** when narrowing a project to `PRIVATE` (connections have one) —
+  deployments inherit, so narrowing takes them along and nothing dangles.
+- **Duplicating or importing a project produces a `WORKSPACE` copy carrying NO grants** — a copy is a new
+  resource by a new actor, so it starts with standard permissions rather than the source's audience.
+- **EE sharing** lives on the separate `ProjectSharingFacade` (owner-or-admin, annotated on the impl),
+  GraphQL `project-sharing.graphqls`: `setProjectVisibility` / `grantProjectAccess` /
+  `revokeProjectAccess` / `projectGrants`. The three enumeration-relevant failures — unknown project,
+  project not in the named workspace, grantee not a member of it — all collapse to the same
+  `ProjectErrorType.INVALID_PROJECT` so user ids and project ids cannot be probed. An unsupported rung is
+  a different, non-enumerating failure and keeps its own `UNSUPPORTED_VISIBILITY`.
+- **Audit**: `PROJECT_VISIBILITY_CHANGED`, `PROJECT_ACCESS_GRANTED`, `PROJECT_ACCESS_REVOKED` (via
+  `ProjectAuditPublisher`). No create metric — spec decision ⚑9.
+- **Client**: three surfaces, all EE-gated through `useVisibilityFeatureEnabled` /
+  `useIsVisibilityEditionEnabled` — the create dialog's picker (reach only; a project that does not exist
+  yet has no id to grant against), the project list item's visibility badge dropdown, and the project
+  header settings menu's **`Visibility`** item. That menu item is labelled Visibility, not "Share": it
+  already hosts two outward-publishing "Share" items (Share project, Share with Community) that mean
+  something else entirely. `ResourceVisibilityPicker`/`ResourceVisibilityBadge` live in
+  `client/src/shared/components/visibility/` and are shared with connections.
 
 
 ### Per-environment workspace roles (EE)
