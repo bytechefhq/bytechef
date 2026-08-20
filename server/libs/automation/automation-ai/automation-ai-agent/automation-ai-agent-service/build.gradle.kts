@@ -18,6 +18,10 @@ dependencies {
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-api"))
 
     testImplementation("org.junit.jupiter:junit-jupiter")
+    // AiAgentProjectAuditSubjectIntTest asserts on the AuditApplicationEvent ProjectAuditPublisher emits.
+    // automation-configuration-service declares spring-boot-actuator as `implementation`, so the event types are
+    // not on this module's compile classpath transitively.
+    testImplementation("org.springframework.boot:spring-boot-actuator")
     testImplementation("org.mockito:mockito-core")
     testImplementation("org.mockito:mockito-junit-jupiter")
     testImplementation("org.springframework.boot:spring-boot-starter-cache-test")

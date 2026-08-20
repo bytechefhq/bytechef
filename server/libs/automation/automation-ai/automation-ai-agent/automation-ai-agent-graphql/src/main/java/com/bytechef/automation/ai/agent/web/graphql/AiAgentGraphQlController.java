@@ -26,6 +26,7 @@ import com.bytechef.automation.ai.agent.dto.AiAgentVersionDTO;
 import com.bytechef.automation.ai.agent.dto.ChatAgentDTO;
 import com.bytechef.automation.ai.agent.facade.AiAgentFacade;
 import com.bytechef.platform.definition.WorkflowNodeType;
+import com.bytechef.platform.security.domain.ResourceVisibility;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
@@ -357,6 +358,15 @@ public class AiAgentGraphQlController {
 
         public List<Tag> tags() {
             return agentDTO.tags();
+        }
+
+        /**
+         * The agent's reach, which is its hidden backing project's — see {@code AiAgentVisibilityProvider}. Exposed so
+         * the detail page's visibility picker can render the value it is about to change; the mutations that change it
+         * are the EE {@code AiAgentSharingGraphQlController}'s.
+         */
+        public ResourceVisibility visibility() {
+            return agentDTO.visibility();
         }
 
         public @Nullable Instant lastModifiedDate() {

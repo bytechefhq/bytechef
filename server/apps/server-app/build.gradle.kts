@@ -327,6 +327,8 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-gateway-otlp:platform-ai-gateway-otlp-api"))
     implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-gateway-otlp:platform-ai-gateway-otlp-service"))
     implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-prompt:platform-ai-prompt-service"))
+    implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-agent:automation-ai-agent-graphql"))
+    implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-agent:automation-ai-agent-service"))
     implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-prompt:automation-ai-prompt-graphql"))
     implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-prompt:automation-ai-prompt-service"))
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-graphql"))

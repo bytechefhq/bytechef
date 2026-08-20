@@ -19,6 +19,7 @@ package com.bytechef.automation.ai.agent.dto;
 import com.bytechef.automation.ai.agent.domain.AiAgent;
 import com.bytechef.automation.ai.agent.domain.AiAgentChannel;
 import com.bytechef.automation.ai.agent.domain.AiAgentElement;
+import com.bytechef.platform.security.domain.ResourceVisibility;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
@@ -41,6 +42,10 @@ import org.jspecify.annotations.Nullable;
  * @param publishedDate        when the backing project's most recently published version was published, or {@code null}
  *                             if it has never been published
  * @param tags                 the agent's tags, resolved from its {@code ai_agent_tag} rows
+ * @param visibility           who may see the agent, read from the backing project rather than stored on
+ *                             {@code ai_agent}: an agent's generated workflow is not reachable as a capability separate
+ *                             from the agent, so the two reaches can never need to diverge and a second column could
+ *                             only drift from this one. See {@code AiAgentVisibilityProvider}.
  *
  * @author Ivica Cardic
  */
@@ -49,7 +54,7 @@ import org.jspecify.annotations.Nullable;
 })
 public record AiAgentDTO(
     AiAgent agent, List<AiAgentChannel> channels, List<AiAgentElement> elements, boolean unpublishedChanges,
-    int lastPublishedVersion, @Nullable Instant publishedDate, List<Tag> tags) {
+    int lastPublishedVersion, @Nullable Instant publishedDate, List<Tag> tags, ResourceVisibility visibility) {
 
     /**
      * Convenience accessor for {@link AiAgent#getSettings()} — not a separate stored field, just a flatter read path

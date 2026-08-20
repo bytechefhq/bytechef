@@ -37,6 +37,7 @@ import com.bytechef.automation.ai.agent.facade.AiAgentFacade;
 import com.bytechef.automation.ai.agent.web.graphql.config.AiAgentGraphQlConfigurationSharedMocks;
 import com.bytechef.automation.ai.agent.web.graphql.config.AiAgentGraphQlTestConfiguration;
 import com.bytechef.exception.ConfigurationException;
+import com.bytechef.platform.security.domain.ResourceVisibility;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -77,7 +78,8 @@ class AiAgentGraphQlControllerTest {
         AiAgent agent = createMockAgent(1L, "agent-one", "Agent One", "desc", 10L, 100L);
         AiAgentChannel channel = createMockChannel(5L, "chat", 0);
         AiAgentElement element = createMockElement(7L, AiAgentElement.KIND_MODEL, 0);
-        AiAgentDTO agentDTO = new AiAgentDTO(agent, List.of(channel), List.of(element), true, 0, null, List.of());
+        AiAgentDTO agentDTO = new AiAgentDTO(
+            agent, List.of(channel), List.of(element), true, 0, null, List.of(), ResourceVisibility.WORKSPACE);
 
         when(agentFacade.getAgents(10L)).thenReturn(List.of(agentDTO));
 
@@ -439,7 +441,8 @@ class AiAgentGraphQlControllerTest {
     @Test
     void testCreateAgentMapsInputToFacadeCall() {
         AiAgent createdAgent = createMockAgent(2L, "new-agent", "New Agent", "d", 10L, 100L);
-        AiAgentDTO agentDTO = new AiAgentDTO(createdAgent, List.of(), List.of(), true, 0, null, List.of());
+        AiAgentDTO agentDTO = new AiAgentDTO(
+            createdAgent, List.of(), List.of(), true, 0, null, List.of(), ResourceVisibility.WORKSPACE);
 
         when(agentFacade.createAgent("New Agent", "d", 10L)).thenReturn(agentDTO);
 
@@ -583,7 +586,8 @@ class AiAgentGraphQlControllerTest {
 
         agent.setSettings(Map.of("builtInTools", Map.of("webSearch", true)));
 
-        AiAgentDTO agentDTO = new AiAgentDTO(agent, List.of(), List.of(), true, 0, null, List.of());
+        AiAgentDTO agentDTO = new AiAgentDTO(
+            agent, List.of(), List.of(), true, 0, null, List.of(), ResourceVisibility.WORKSPACE);
 
         when(agentFacade.getAgent(1L)).thenReturn(agentDTO);
 

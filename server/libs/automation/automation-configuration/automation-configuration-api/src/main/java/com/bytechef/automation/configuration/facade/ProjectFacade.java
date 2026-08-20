@@ -59,16 +59,17 @@ public interface ProjectFacade {
      * separate name rather than an overload: the two differ only in return type, which Java cannot overload on.
      *
      * <p>
-     * One exception to "the same question", and the only one: this answers for a feature-owned system project
-     * ({@code SystemProjects}) where {@link #getProjectRows()} does not list it. The listing hides the auto-provisioned
-     * {@code __AI_AGENT__} / {@code __KNOWLEDGE_BASE__} / {@code __CONTEXT_STORE__} / {@code __EMBEDDED_*} projects
-     * because they are a feature's bookkeeping rather than something a user made; this read has no such filter, so a
-     * caller who already holds one of those ids gets its row. The GraphQL {@code
-     * Project} type it feeds exposes name, category, tags, {@code errorProjectWorkflowId} and visibility — no workflow
-     * content — and the gate is unchanged, so a caller with no {@code WORKFLOW_VIEW} in the owning workspace is refused
-     * either way. Recorded rather than closed: it is an asymmetry between a listing and a by-id read, which is the
-     * shape this whole model exists to name out loud. {@code ProjectFacadeRowVisibilityTest} skips system projects in
-     * its agreement loop for exactly this reason.
+     * Feature-owned system projects ({@code SystemProjects}) answer as though they do not exist, matching
+     * {@link #getProjectRows()}, which never lists them. The auto-provisioned {@code __AI_AGENT__} /
+     * {@code __KNOWLEDGE_BASE__} / {@code __CONTEXT_STORE__} / {@code __EMBEDDED_*} projects are a feature's
+     * bookkeeping rather than something a user made, so holding one of their ids buys nothing here.
+     *
+     * <p>
+     * This used to be the one exception to "the same question": the listing dropped them and this read answered for
+     * them. Nothing secret leaked — the name is {@code __AI_AGENT__<uuid>}, the description empty, and the gate refused
+     * a caller without {@code WORKFLOW_VIEW} either way — but the two halves of a pair documented as answering alike
+     * did not, so the asymmetry was closed rather than left recorded. {@code ProjectFacadeRowVisibilityTest}'s
+     * agreement loop now covers system projects instead of skipping them.
      */
     Project getProjectRow(long id);
 
@@ -87,10 +88,9 @@ public interface ProjectFacade {
      * {@link #getProjectRow(long)} answers one id at a time.
      *
      * <p>
-     * Two things drop out here that the by-id read still answers for, so the agreement is exact only outside them.
-     * Projects with no owning workspace cannot be scope-checked and are therefore not listed rather than listed
-     * unchecked. Feature-owned system projects are not listed either — see {@link #getProjectRow(long)} for why that
-     * one is an asymmetry rather than a gate, and why it is left standing.
+     * One thing drops out here that the by-id read still answers for: projects with no owning workspace cannot be
+     * scope-checked and are therefore not listed rather than listed unchecked. Feature-owned system projects drop out
+     * of both sides — see {@link #getProjectRow(long)}.
      *
      * <p>
      * Unlike {@link #getProjectRow(long)} this carries no {@code @PreAuthorize}: there is no id to gate on, and the

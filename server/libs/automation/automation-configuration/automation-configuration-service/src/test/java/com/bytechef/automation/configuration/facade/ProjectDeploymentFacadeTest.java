@@ -166,10 +166,6 @@ class ProjectDeploymentFacadeTest {
      */
     @Test
     void testWorkspaceProjectDeploymentRowsHideSystemProjectsAndHiddenProjects() {
-        Project systemProject = project(SYSTEM_PROJECT_ID);
-
-        systemProject.setName(SystemProjects.AI_AGENT_NAME_PREFIX + "agent");
-
         when(environmentService.getEnvironment(0L)).thenReturn(Environment.DEVELOPMENT);
         when(
             projectDeploymentService.getProjectDeployments(
@@ -180,7 +176,7 @@ class ProjectDeploymentFacadeTest {
                             projectDeployment(11L, HIDDEN_PROJECT_ID, Environment.DEVELOPMENT),
                             projectDeployment(12L, SYSTEM_PROJECT_ID, Environment.DEVELOPMENT)));
         when(projectService.getProjects(anyList()))
-            .thenReturn(List.of(project(VISIBLE_PROJECT_ID), project(HIDDEN_PROJECT_ID), systemProject));
+            .thenReturn(List.of(project(VISIBLE_PROJECT_ID), project(HIDDEN_PROJECT_ID), systemProject()));
 
         assertThat(projectDeploymentFacade.getWorkspaceProjectDeployments(WORKSPACE_ID, 0L, null, null))
             .extracting(ProjectDeployment::getId)
@@ -189,17 +185,55 @@ class ProjectDeploymentFacadeTest {
 
     @Test
     void testGetProjectDeploymentTags() {
-        ProjectDeployment projectDeployment = new ProjectDeployment();
+        stubOneTaggedDeploymentPerProject();
 
-        projectDeployment.setTagIds(List.of(20L, 21L));
-
-        when(projectDeploymentService.getProjectDeployments(null, null, null, null, 1L))
-            .thenReturn(List.of(projectDeployment));
         when(tagService.getTags(List.of(20L, 21L))).thenReturn(List.of(new Tag("x"), new Tag("y")));
 
-        List<Tag> tags = projectDeploymentFacade.getProjectDeploymentTags(1L);
+        List<Tag> tags = projectDeploymentFacade.getProjectDeploymentTags(WORKSPACE_ID);
 
         assertThat(tags).hasSize(2);
+    }
+
+    /**
+     * This listing feeds the tag dropdown over {@link ProjectDeploymentFacadeImpl#getWorkspaceProjectDeployments}, and
+     * until it shared that method's {@code filterOutSystemProjectDeployments} the two disagreed: the dropdown offered
+     * names aggregated off withheld and system projects, each of them selecting nothing in the list beside it.
+     *
+     * <p>
+     * The three deployments carry DIFFERENT tag ids and the assertion is on the ids handed to {@code TagService}, so a
+     * facade that stopped filtering asks for the other two and fails here — where asserting the returned tags would
+     * only pin what the stub was told to return.
+     */
+    @Test
+    void testProjectDeploymentTagsDropTheTagsOfHiddenAndSystemProjects() {
+        stubOneTaggedDeploymentPerProject();
+
+        projectDeploymentFacade.getProjectDeploymentTags(WORKSPACE_ID);
+
+        verify(tagService).getTags(List.of(20L, 21L));
+    }
+
+    /**
+     * One tagged deployment per project — visible, hidden, system — differing only in which project owns them and which
+     * tag ids they carry, so each exclusion above is attributable to exactly one filter.
+     */
+    private void stubOneTaggedDeploymentPerProject() {
+        when(projectDeploymentService.getProjectDeployments(null, null, null, null, WORKSPACE_ID))
+            .thenReturn(
+                List.of(
+                    taggedProjectDeployment(10L, VISIBLE_PROJECT_ID, List.of(20L, 21L)),
+                    taggedProjectDeployment(11L, HIDDEN_PROJECT_ID, List.of(22L)),
+                    taggedProjectDeployment(12L, SYSTEM_PROJECT_ID, List.of(23L))));
+        when(projectService.getProjects(anyList()))
+            .thenReturn(List.of(project(VISIBLE_PROJECT_ID), project(HIDDEN_PROJECT_ID), systemProject()));
+    }
+
+    private static ProjectDeployment taggedProjectDeployment(long id, long projectId, List<Long> tagIds) {
+        ProjectDeployment projectDeployment = projectDeployment(id, projectId, Environment.DEVELOPMENT);
+
+        projectDeployment.setTagIds(tagIds);
+
+        return projectDeployment;
     }
 
     @Test
@@ -262,6 +296,14 @@ class ProjectDeploymentFacadeTest {
         when(objectProvider.getIfAvailable()).thenReturn(resourceVisibilityResolver);
 
         return objectProvider;
+    }
+
+    private static Project systemProject() {
+        Project systemProject = project(SYSTEM_PROJECT_ID);
+
+        systemProject.setName(SystemProjects.AI_AGENT_NAME_PREFIX + "agent");
+
+        return systemProject;
     }
 
     private static Project project(long id) {

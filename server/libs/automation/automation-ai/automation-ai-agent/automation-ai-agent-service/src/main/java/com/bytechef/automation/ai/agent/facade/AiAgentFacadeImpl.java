@@ -47,6 +47,7 @@ import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.domain.SystemProjects;
+import com.bytechef.automation.configuration.security.ProjectVisibilityFilter;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
@@ -109,24 +110,48 @@ import org.springframework.transaction.annotation.Transactional;
  * <b>Authorization.</b> The methods keyed on a {@code workspaceId} — {@link #createAgent}, {@link #importAgent},
  * {@link #getAgents}, {@link #getAgentTags}, {@link #getAgentDeploymentTags}, {@link #getAgentDeployments} and
  * {@link #getWorkspaceChatAgents} — carry a workspace-keyed gate: the two writes require
- * {@code hasPermission(#workspaceId, 'Workspace', 'WORKFLOW_CREATE')}, the five reads the {@code 'WORKFLOW_VIEW'}
- * equivalent. Nothing there is invented: {@code 'Workspace'} resolves through {@code WorkspaceOwnershipResolver} and
- * both scopes are {@code WorkflowPermissionScope} constants registered by {@code WorkflowPermissionScopeProvider}
- * (VIEWER-rank for {@code WORKFLOW_VIEW}, EDITOR-rank for {@code WORKFLOW_CREATE}), so no workspace member loses access
- * it had by role. {@code WORKFLOW_*} rather than {@code PROJECT_*} because an agent is a workflow generator: it owns a
- * generated workflow in a hidden {@code __AI_AGENT__} project, and the hidden project is an implementation detail of
- * that workflow rather than a project the user manages. Until these gates were added, any authenticated user in the
- * tenant could name every agent of every workspace — and create one in a workspace they do not belong to — by passing
- * its id.
+ * {@code hasPermission(#workspaceId, 'Workspace', 'AGENT_CREATE')}, the five reads the {@code 'AGENT_VIEW'} equivalent.
+ * {@code 'Workspace'} resolves through {@code WorkspaceOwnershipResolver} and both scopes are
+ * {@code AgentPermissionScope} constants registered by {@code AgentPermissionScopeProvider} (VIEWER-rank for
+ * {@code AGENT_VIEW}, EDITOR-rank for {@code AGENT_CREATE}), so no member holding a built-in role loses access it had.
+ * These seven were first gated with the {@code WORKFLOW_*} equivalents as an acknowledged stopgap, before an
+ * {@code AGENT_*} family existed; they were re-tokenised once it did, so that the whole agent surface answers to one
+ * vocabulary and a custom role can grant agent access without granting workflow access.
  * </p>
  *
  * <p>
- * Every remaining method is keyed on an {@code AiAgent} (or a child row) and still carries only
- * {@code @PreAuthorize("isAuthenticated()")}. That is deliberate and unchanged: an entity-keyed check would need an
- * {@code AGENT_*} permission name and a resolver registered for the {@code AiAgent} entity, neither of which exists,
- * and a half-wired name nothing recognizes would be worse than an honest {@code isAuthenticated()}. A future task
- * should introduce real {@code AGENT_*} permissions end-to-end (service + evaluator + UI). The workspace-keyed gates
- * above do not depend on that work and do not pre-empt it — re-tokenising seven annotations is mechanical.
+ * Every remaining method is keyed on an entity id and gated on the scope its operation deserves. The twelve keyed on an
+ * agent id take {@code hasPermission(#id, 'AiAgent', …)} — {@code AGENT_VIEW} for the reads ({@link #getAgent},
+ * {@link #getAgentVersions}, {@link #exportAgent}, {@link #getDraftWorkflowId}), {@code AGENT_EDIT} for the
+ * draft-affecting writes ({@link #updateAgent}, {@link #updateAgentSettings}, {@link #updateAgentTags},
+ * {@link #updateAgentDeploymentTags}, {@link #addAgentChannel}, {@link #addAgentElement}, {@link #publishAgent}) and
+ * {@code AGENT_DELETE} for {@link #deleteAgent}. The four keyed on a child row — {@link #updateAgentChannel},
+ * {@link #deleteAgentChannel}, {@link #updateAgentElement}, {@link #deleteAgentElement} — take {@code AGENT_EDIT} on
+ * their own resource token, {@code 'AiAgentChannel'} / {@code 'AiAgentElement'}, because nothing in their argument
+ * lists names the agent: their resolvers walk child &rarr; agent &rarr; workspace so a child id belonging to another
+ * workspace's agent is denied. Deleting a channel or an element is {@code AGENT_EDIT} rather than {@code AGENT_DELETE}
+ * — it edits the agent's draft rather than removing the agent. {@link #getAgentChannelDefinitions} keeps
+ * {@code isAuthenticated()}; see its own javadoc.
+ * </p>
+ *
+ * <p>
+ * <b>Visibility.</b> Every one of those by-id gates now carries a visibility precondition as well as a scope check:
+ * {@code AiAgentVisibilityProvider} (and its two child providers) register {@code 'AiAgent'}, {@code 'AiAgentChannel'}
+ * and {@code 'AiAgentElement'} with {@code PermissionServiceImpl.isResourceVisible}, so holding {@code AGENT_VIEW} in a
+ * workspace no longer entitles a member to an agent a colleague has withheld. An agent's reach is its hidden
+ * {@code __AI_AGENT__} project's, not a second column of its own. The two workspace-keyed listings that name agents —
+ * {@link #getAgents} and {@link #getAgentDeployments} — filter per row through {@link #visibleAgents} so they agree
+ * with the by-id reads, and so does {@link #getWorkspaceChatAgents}, whose sibling cascade in
+ * {@code ProjectDeploymentFacadeImpl} already did. It is EE that resolves grants, but the precondition itself is in
+ * both editions.
+ * </p>
+ *
+ * <p>
+ * All four scopes are {@code AgentPermissionScope} constants registered by {@code AgentPermissionScopeProvider}
+ * (VIEWER-rank for {@code AGENT_VIEW}, EDITOR-rank for the other three), and all three resource tokens resolve through
+ * an {@code AiAgent*OwnershipResolver} in this module. {@code ai_agent.workspace_id} is nullable, so those resolvers
+ * fail closed on a workspace-less agent rather than substituting a default — an agent nobody's workspace owns is
+ * reachable by nobody but a tenant admin.
  * </p>
  *
  * <p>
@@ -175,6 +200,7 @@ public class AiAgentFacadeImpl implements AiAgentFacade {
     private final AiAgentElementService agentElementService;
     private final EnvironmentService environmentService;
     private final ProjectService projectService;
+    private final ProjectVisibilityFilter projectVisibilityFilter;
     private final ProjectWorkflowService projectWorkflowService;
     private final ProjectDeploymentService projectDeploymentService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
@@ -193,7 +219,8 @@ public class AiAgentFacadeImpl implements AiAgentFacade {
         AiAgentService agentService, AgentChannelResolver agentChannelResolver,
         AiAgentChannelService agentChannelService,
         AiAgentElementService agentElementService, EnvironmentService environmentService,
-        ProjectService projectService, ProjectWorkflowService projectWorkflowService,
+        ProjectService projectService, ProjectVisibilityFilter projectVisibilityFilter,
+        ProjectWorkflowService projectWorkflowService,
         ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
         TriggerDefinitionService triggerDefinitionService, WorkflowService workflowService,
@@ -208,6 +235,7 @@ public class AiAgentFacadeImpl implements AiAgentFacade {
         this.agentElementService = agentElementService;
         this.environmentService = environmentService;
         this.projectService = projectService;
+        this.projectVisibilityFilter = projectVisibilityFilter;
         this.projectWorkflowService = projectWorkflowService;
         this.projectDeploymentService = projectDeploymentService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
@@ -223,7 +251,7 @@ public class AiAgentFacadeImpl implements AiAgentFacade {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'WORKFLOW_CREATE')")
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'AGENT_CREATE')")
     public AiAgentDTO createAgent(String title, String description, long workspaceId) {
         Objects.requireNonNull(title, "title");
 
@@ -275,7 +303,7 @@ public class AiAgentFacadeImpl implements AiAgentFacade {
     }
 
     @Override
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(#id, 'AiAgent', 'AGENT_DELETE')")
     public void deleteAgent(long id) {
         AiAgent agent = agentService.getAgent(id);
 
@@ -341,27 +369,40 @@ public class AiAgentFacadeImpl implements AiAgentFacade {
     }
 
     @Override
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(#id, 'AiAgent', 'AGENT_VIEW')")
     @Transactional(readOnly = true)
     public AiAgentDTO getAgent(long id) {
         return toAgentDTO(agentService.getAgent(id));
     }
 
+    /**
+     * The workspace-keyed gate answers "may this member list agents at all"; it cannot answer "which of them" — that is
+     * per row, and it is what {@link #visibleAgents} adds. Without the filter a withheld agent would still be named
+     * here while every by-id read of it was denied, which is exactly the list/by-id disagreement
+     * {@code PermissionServiceVisibilityTest} exists to prevent for connections.
+     */
     @Override
-    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'WORKFLOW_VIEW')")
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'AGENT_VIEW')")
     @Transactional(readOnly = true)
     public List<AiAgentDTO> getAgents(long workspaceId) {
-        return agentService.getAgents(workspaceId)
+        return visibleAgents(workspaceId)
             .stream()
             .map(this::toAgentDTO)
             .toList();
     }
 
+    /**
+     * Filtered through {@link #visibleAgents} like every other listing here. A tag name is weak information, but this
+     * listing exists to describe the agents the caller can see — it feeds the filter dropdown over {@link #getAgents} —
+     * so a name that appears in it and on no listed agent is both a leak and a dead filter option.
+     * {@link #getAgentDeploymentTags} needs no filter of its own: it aggregates over {@link #getAgentDeployments},
+     * which is already filtered.
+     */
     @Override
-    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'WORKFLOW_VIEW')")
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'AGENT_VIEW')")
     @Transactional(readOnly = true)
     public List<Tag> getAgentTags(long workspaceId) {
-        List<AiAgent> agents = agentService.getAgents(workspaceId);
+        List<AiAgent> agents = visibleAgents(workspaceId);
 
         List<Long> tagIds = agents.stream()
             .map(AiAgent::getTagIds)
@@ -373,7 +414,7 @@ public class AiAgentFacadeImpl implements AiAgentFacade {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'WORKFLOW_VIEW')")
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'AGENT_VIEW')")
     @Transactional(readOnly = true)
     public List<Tag> getAgentDeploymentTags(long workspaceId) {
         List<Long> tagIds = getAgentDeployments(workspaceId)
@@ -388,7 +429,7 @@ public class AiAgentFacadeImpl implements AiAgentFacade {
     }
 
     @Override
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(#id, 'AiAgent', 'AGENT_VIEW')")
     @Transactional(readOnly = true)
     public List<AiAgentVersionDTO> getAgentVersions(long id) {
         AiAgent agent = agentService.getAgent(id);
@@ -408,7 +449,7 @@ public class AiAgentFacadeImpl implements AiAgentFacade {
     }
 
     @Override
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(#id, 'AiAgent', 'AGENT_VIEW')")
     @Transactional(readOnly = true)
     public String exportAgent(long id) {
         AiAgent agent = agentService.getAgent(id);
@@ -437,7 +478,7 @@ public class AiAgentFacadeImpl implements AiAgentFacade {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'WORKFLOW_CREATE')")
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'AGENT_CREATE')")
     public AiAgentDTO importAgent(long workspaceId, String json) {
         Map<String, ?> exportedAgent;
 
@@ -553,7 +594,7 @@ public class AiAgentFacadeImpl implements AiAgentFacade {
     }
 
     @Override
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(#id, 'AiAgent', 'AGENT_EDIT')")
     public void updateAgentDeploymentTags(long id, List<Tag> tags) {
         // Same shape as updateAgentTags: persist any tag the client typed but never saved, so every id below is a
         // real row before a project_deployment_tag FK references it.
@@ -565,7 +606,7 @@ public class AiAgentFacadeImpl implements AiAgentFacade {
     }
 
     @Override
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(#id, 'AiAgent', 'AGENT_EDIT')")
     public void updateAgentTags(long id, List<Tag> tags) {
         // Persist any tag the client typed but never saved, so every id below is a real row before it is referenced
         // by an ai_agent_tag FK.
@@ -576,6 +617,12 @@ public class AiAgentFacadeImpl implements AiAgentFacade {
             .toList());
     }
 
+    /**
+     * The only method on this facade that keeps {@code isAuthenticated()}, and it is not an oversight: it reads the
+     * component registry and touches no entity, so it takes no id to key a check on and discloses nothing
+     * workspace-specific — the same channel catalog for every caller in the tenant. An {@code AGENT_VIEW} gate here
+     * would need a workspace argument invented for the sole purpose of being checked.
+     */
     @Override
     @PreAuthorize("isAuthenticated()")
     public List<ResolvedAgentChannel> getAgentChannelDefinitions() {
@@ -583,10 +630,14 @@ public class AiAgentFacadeImpl implements AiAgentFacade {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'WORKFLOW_VIEW')")
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'AGENT_VIEW')")
     @Transactional(readOnly = true)
     public List<AiAgentDeploymentDTO> getAgentDeployments(long workspaceId) {
-        List<AiAgent> agents = agentService.getAgents(workspaceId);
+        // Filtered for the same reason the agent list is: a deployment row carries its agent's title, so listing the
+        // deployments of a withheld agent would disclose the thing withholding it was meant to withhold. It also keeps
+        // this page agreeing with the project deployments page, whose rows already inherit their project's reach
+        // through ProjectDeploymentVisibilityProvider.
+        List<AiAgent> agents = visibleAgents(workspaceId);
 
         List<AiAgentDeploymentDTO> agentDeployments = new ArrayList<>();
 
@@ -611,24 +662,36 @@ public class AiAgentFacadeImpl implements AiAgentFacade {
      * reason: the two listings are the two cascades of one launcher popup, and both disclose an entity name and a
      * workflow label for every hosted-chat deployment in the workspace. Until it was added this method took nothing but
      * {@code isAuthenticated()}, so any authenticated user in the tenant could name every agent of every workspace by
-     * passing its id — a listing looser than the by-id reads each of its rows leads to. {@code WORKFLOW_VIEW} rather
-     * than a deployment scope because a workflow label is what leaks; it is VIEWER-rank, so no workspace member loses a
-     * row they had.
+     * passing its id — a listing looser than the by-id reads each of its rows leads to. {@code AGENT_VIEW} rather than
+     * a deployment scope because what leaks is an agent and its workflow label, not a deployment; it is VIEWER-rank, so
+     * no workspace member loses a row they had. The sibling stays on {@code WORKFLOW_VIEW} because it is listing
+     * workflows, not agents — the two gates are now deliberately different tokens over the same popup, which is the
+     * point of having an agent vocabulary at all.
      *
      * <p>
-     * No visibility filter, unlike the sibling: agents live in hidden {@code __AI_AGENT__} projects that no list
-     * surface shows and no picker can target, so their visibility is never anything but the value auto-provisioning
-     * left. Filtering on it would hide agents on the strength of a field the user cannot see or set.
+     * Filtered through {@link #visibleAgents}, like {@link #getAgents} and {@link #getAgentDeployments}, and for the
+     * reason the gate above is shared: this listing and {@code ProjectDeploymentFacadeImpl.getWorkspaceChatWorkflows}
+     * are the two cascades of one AI Hub launcher popup, the sibling already filters through
+     * {@code ProjectVisibilityFilter}, and two halves of one popup disagreeing about who may be named in it is not a
+     * defensible answer. What the popup does is name agents by title so a colleague can pick one — a management
+     * surface, whatever it launches.
+     *
+     * <p>
+     * It is not a claim that withholding an agent stops it answering, and nothing here makes it one: the argument that
+     * a channel is reached from outside holds for Slack, WhatsApp and the webhooks, none of which consults visibility
+     * and none of which is listed here. A member who is not meant to find the agent simply does not find it in
+     * ByteChef's own launcher. The visibility picker on the agent detail page says exactly that, and still warns that
+     * the agent keeps replying on every channel it is deployed with.
      */
     @Override
-    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'WORKFLOW_VIEW')")
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'AGENT_VIEW')")
     @Transactional(readOnly = true)
     public List<ChatAgentDTO> getWorkspaceChatAgents(long workspaceId, long environmentId) {
         Environment environment = environmentService.getEnvironment(environmentId);
 
         List<ChatAgentDTO> chatAgents = new ArrayList<>();
 
-        for (AiAgent agent : agentService.getAgents(workspaceId)) {
+        for (AiAgent agent : visibleAgents(workspaceId)) {
             ProjectDeployment projectDeployment = projectDeploymentService
                 .fetchProjectDeployment(agent.getProjectId(), environment)
                 .orElse(null);
@@ -714,7 +777,7 @@ public class AiAgentFacadeImpl implements AiAgentFacade {
     }
 
     @Override
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(#id, 'AiAgent', 'AGENT_EDIT')")
     public AiAgentDTO updateAgent(long id, String title, String description, String instructions) {
         AiAgent agent = agentService.getAgent(id);
 
@@ -745,7 +808,7 @@ public class AiAgentFacadeImpl implements AiAgentFacade {
     }
 
     @Override
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(#id, 'AiAgent', 'AGENT_EDIT')")
     public void updateAgentSettings(long id, Map<String, Object> settings) {
         AiAgent agent = agentService.getAgent(id);
 
@@ -758,7 +821,7 @@ public class AiAgentFacadeImpl implements AiAgentFacade {
     }
 
     @Override
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(#agentId, 'AiAgent', 'AGENT_EDIT')")
     public AiAgentChannel addAgentChannel(
         long agentId, String channelType, @Nullable Map<String, Object> parameters, @Nullable Long connectionId) {
 
@@ -797,7 +860,7 @@ public class AiAgentFacadeImpl implements AiAgentFacade {
     }
 
     @Override
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(#channelId, 'AiAgentChannel', 'AGENT_EDIT')")
     public void updateAgentChannel(
         long channelId, @Nullable Map<String, Object> parameters, @Nullable Long connectionId) {
         AiAgentChannel channel = agentChannelService.getAgentChannel(channelId);
@@ -820,7 +883,7 @@ public class AiAgentFacadeImpl implements AiAgentFacade {
     }
 
     @Override
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(#channelId, 'AiAgentChannel', 'AGENT_EDIT')")
     public void deleteAgentChannel(long channelId) {
         AiAgentChannel channel = agentChannelService.getAgentChannel(channelId);
 
@@ -838,7 +901,7 @@ public class AiAgentFacadeImpl implements AiAgentFacade {
     }
 
     @Override
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(#agentId, 'AiAgent', 'AGENT_EDIT')")
     public AiAgentElement addAgentElement(
         long agentId, String kind, @Nullable Long referenceId, @Nullable Map<String, Object> parameters,
         @Nullable Long connectionId) {
@@ -881,7 +944,7 @@ public class AiAgentFacadeImpl implements AiAgentFacade {
     }
 
     @Override
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(#elementId, 'AiAgentElement', 'AGENT_EDIT')")
     public void updateAgentElement(
         long elementId, @Nullable Map<String, Object> parameters, @Nullable Long connectionId) {
         AiAgentElement element = agentElementService.getAgentElement(elementId);
@@ -902,7 +965,7 @@ public class AiAgentFacadeImpl implements AiAgentFacade {
     }
 
     @Override
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(#elementId, 'AiAgentElement', 'AGENT_EDIT')")
     public void deleteAgentElement(long elementId) {
         AiAgentElement element = agentElementService.getAgentElement(elementId);
         AiAgent agent = agentService.getAgent(element.getAgentId());
@@ -913,7 +976,7 @@ public class AiAgentFacadeImpl implements AiAgentFacade {
     }
 
     @Override
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(#id, 'AiAgent', 'AGENT_EDIT')")
     public int publishAgent(long id, String description) {
         AiAgent agent = agentService.getAgent(id);
 
@@ -927,7 +990,7 @@ public class AiAgentFacadeImpl implements AiAgentFacade {
     }
 
     @Override
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(#agentId, 'AiAgent', 'AGENT_VIEW')")
     @Transactional(readOnly = true)
     public String getDraftWorkflowId(long agentId) {
         AiAgent agent = agentService.getAgent(agentId);
@@ -1269,7 +1332,44 @@ public class AiAgentFacadeImpl implements AiAgentFacade {
         // list path — and agent counts per workspace are small.
         List<Tag> tags = tagService.getTags(agent.getTagIds());
 
-        return new AiAgentDTO(agent, channels, elements, unpublishedChanges, lastPublishedVersion, publishedDate, tags);
+        // The agent's reach IS the backing project's, read here rather than stored a second time on ai_agent: see
+        // AiAgentVisibilityProvider for why one question is kept to one record. The project is already loaded above,
+        // so exposing it costs nothing.
+        return new AiAgentDTO(
+            agent, channels, elements, unpublishedChanges, lastPublishedVersion, publishedDate, tags,
+            project.getVisibility());
+    }
+
+    /**
+     * The agents of a workspace the current principal may see, in the order {@code AiAgentService} returned them.
+     *
+     * <p>
+     * An agent inherits the reach of its hidden {@code __AI_AGENT__} project, so the filter runs over those projects
+     * and keeps the agents whose project survived — the same record {@code AiAgentVisibilityProvider} hands the by-id
+     * gates, through the same {@code ProjectVisibilityFilter} every project list surface uses, so a list and a by-id
+     * read of the same agent cannot disagree.
+     *
+     * <p>
+     * One project read per agent, which {@code toAgentDTO} then repeats for the survivors. Deliberate: that method
+     * already issues a project read plus two workflow reads and a tag read per agent, so threading the loaded project
+     * through would not change the shape of this path, and agent counts per workspace are small.
+     */
+    private List<AiAgent> visibleAgents(long workspaceId) {
+        List<AiAgent> agents = agentService.getAgents(workspaceId);
+
+        if (agents.isEmpty()) {
+            return agents;
+        }
+
+        Set<Long> visibleProjectIds = projectVisibilityFilter.visibleProjectIds(
+            agents.stream()
+                .map(AiAgent::getProjectId)
+                .map(projectService::getProject)
+                .toList());
+
+        return agents.stream()
+            .filter(agent -> visibleProjectIds.contains(agent.getProjectId()))
+            .toList();
     }
 
     /**

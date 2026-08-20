@@ -24,3 +24,11 @@ input TagInput {
     id: ID
     name: String!
 }
+
+# Declared platform-wide by automation-configuration-graphql's connection.graphqls; not on this module's classpath in
+# a slice test, so it is stubbed here for the same reason as Map and Tag above. AiAgent.visibility is typed on it.
+enum ResourceVisibility {
+    PRIVATE
+    WORKSPACE
+    ORGANIZATION
+}

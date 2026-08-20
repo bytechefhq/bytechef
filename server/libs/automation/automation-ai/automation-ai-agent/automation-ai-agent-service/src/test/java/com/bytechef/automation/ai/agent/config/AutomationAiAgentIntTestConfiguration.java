@@ -27,11 +27,14 @@ import com.bytechef.automation.configuration.audit.ProjectWorkflowAuditPublisher
 import com.bytechef.automation.configuration.callback.ProjectCallback;
 import com.bytechef.automation.configuration.callback.ProjectWorkflowCallback;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
+import com.bytechef.automation.configuration.security.ProjectVisibilityFilter;
 import com.bytechef.automation.configuration.security.ProjectVisibilityPolicy;
 import com.bytechef.automation.configuration.service.ProjectDeploymentServiceImpl;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowServiceImpl;
 import com.bytechef.automation.configuration.service.ProjectServiceImpl;
 import com.bytechef.automation.configuration.service.ProjectWorkflowServiceImpl;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver.VisibilityRecord;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.jackson.config.JacksonConfiguration;
@@ -49,8 +52,11 @@ import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
@@ -126,6 +132,52 @@ public class AutomationAiAgentIntTestConfiguration {
     @Bean
     ResourceVisibilityPolicyRegistry resourceVisibilityPolicyRegistry() {
         return new ResourceVisibilityPolicyRegistry(List.of(new ProjectVisibilityPolicy()));
+    }
+
+    /**
+     * {@code AiAgentFacadeImpl}'s agent and agent-deployment listings filter through this. Declared here over the real
+     * {@link ProjectVisibilityFilter} rather than mocked, for the same reason as the registry above, and with no
+     * resolver behind it: this slice carries neither edition's {@code ResourceVisibilityResolver}, and the filter's own
+     * no-resolver branch hides every project. An empty {@code ObjectProvider} would therefore empty both listings and
+     * make every test of them fail for a reason that has nothing to do with what it asserts, so the resolver supplied
+     * here admits everything — visibility itself is covered by {@code AiAgentFacadeVisibilityFilterTest} and
+     * {@code PermissionServiceAgentVisibilityTest}, which stub the resolver per case.
+     */
+    @Bean
+    ProjectVisibilityFilter projectVisibilityFilter() {
+        ResourceVisibilityResolver resourceVisibilityResolver =
+            (resourceType, workspaceId, candidates) -> candidates.stream()
+                .map(VisibilityRecord::id)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+
+        return new ProjectVisibilityFilter(new SingletonObjectProvider<>(resourceVisibilityResolver));
+    }
+
+    /**
+     * The narrowest possible {@link ObjectProvider}: {@link ProjectVisibilityFilter} calls nothing on it but
+     * {@code getIfAvailable}, and Spring offers no ready-made single-value implementation outside a bean factory.
+     */
+    private record SingletonObjectProvider<T>(T instance) implements ObjectProvider<T> {
+
+        @Override
+        public T getObject() {
+            return instance;
+        }
+
+        @Override
+        public T getObject(Object... args) {
+            return instance;
+        }
+
+        @Override
+        public T getIfAvailable() {
+            return instance;
+        }
+
+        @Override
+        public T getIfUnique() {
+            return instance;
+        }
     }
 
     @Bean

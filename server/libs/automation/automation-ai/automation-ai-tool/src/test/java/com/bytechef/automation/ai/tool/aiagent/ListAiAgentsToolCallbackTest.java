@@ -24,6 +24,7 @@ import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.automation.ai.agent.domain.AiAgent;
 import com.bytechef.automation.ai.agent.dto.AiAgentDTO;
 import com.bytechef.automation.ai.agent.facade.AiAgentFacade;
+import com.bytechef.platform.security.domain.ResourceVisibility;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.model.ToolContext;
@@ -60,7 +61,8 @@ class ListAiAgentsToolCallbackTest {
         agent.setTitle("Support Bot");
         agent.setDescription("Handles support tickets");
 
-        AiAgentDTO agentDTO = new AiAgentDTO(agent, List.of(), List.of(), false, 2, null, List.of());
+        AiAgentDTO agentDTO = new AiAgentDTO(
+            agent, List.of(), List.of(), false, 2, null, List.of(), ResourceVisibility.WORKSPACE);
 
         when(aiAgentFacade.getAgents(workspaceId)).thenReturn(List.of(agentDTO));
 

@@ -643,6 +643,9 @@ include("server:ee:libs:ai:ai-copilot:ai-copilot-rest")
 include("server:ee:libs:ai:ai-copilot:ai-copilot-service")
 
 
+include("server:ee:libs:automation:automation-ai:automation-ai-agent:automation-ai-agent-api")
+include("server:ee:libs:automation:automation-ai:automation-ai-agent:automation-ai-agent-graphql")
+include("server:ee:libs:automation:automation-ai:automation-ai-agent:automation-ai-agent-service")
 include("server:ee:libs:automation:automation-ai:automation-ai-eval:automation-ai-eval-dataset:automation-ai-eval-dataset-api")
 include("server:ee:libs:automation:automation-ai:automation-ai-eval:automation-ai-eval-dataset:automation-ai-eval-dataset-public-rest")
 include("server:ee:libs:automation:automation-ai:automation-ai-eval:automation-ai-eval-dataset:automation-ai-eval-dataset-service")

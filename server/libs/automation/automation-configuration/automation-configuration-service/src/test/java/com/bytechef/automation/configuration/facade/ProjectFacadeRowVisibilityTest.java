@@ -53,6 +53,7 @@ import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -144,6 +145,14 @@ class ProjectFacadeRowVisibilityTest {
     void testProjectRowsAgreeWithTheByIdGate() {
         when(projectService.getProjects()).thenReturn(allProjects);
 
+        // Every fixture project has to be reachable by id, not just the listing. isByIdReadAnswered runs the real
+        // getProjectRow body, and an unstubbed mock returns null -- which SystemProjects.isSystemProject reads as
+        // "not a system project", so the system-project filter would never fire and this loop would pass while
+        // proving nothing about it.
+        for (Project project : allProjects) {
+            when(projectService.getProject(Objects.requireNonNull(project.getId(), "id"))).thenReturn(project);
+        }
+
         assertByIdGateIsTheProjectViewScope();
 
         Set<Long> listedProjectIds = createProjectFacade().getProjectRows()
@@ -154,15 +163,11 @@ class ProjectFacadeRowVisibilityTest {
         for (Project project : allProjects) {
             long projectId = Objects.requireNonNull(project.getId(), "id");
 
-            // The documented exception to the agreement: the listing drops feature-owned system projects, the by-id
-            // read answers for them. Skipped rather than asserted either way -- asserting agreement would be false,
-            // and asserting the disagreement here would freeze it into the contract this loop exists to state.
-            if (SystemProjects.isSystemProject(project)) {
-                continue;
-            }
-
-            assertThat(isByIdReadPermitted(projectId))
-                .describedAs("project id=%s: the listing and the by-id gate must answer alike", projectId)
+            // No exception any more: system projects used to be skipped here, because the listing dropped them and
+            // the by-id read answered for them. getProjectRow now filters them too, so every project in the fixture
+            // -- system projects included -- must answer alike on both sides.
+            assertThat(isByIdReadAnswered(projectId))
+                .describedAs("project id=%s: the listing and the by-id read must answer alike", projectId)
                 .isEqualTo(listedProjectIds.contains(projectId));
         }
 
@@ -211,6 +216,30 @@ class ProjectFacadeRowVisibilityTest {
 
         return automationPermissionEvaluator.hasPermission(
             null, projectId, PROJECT_RESOURCE_TYPE, WORKFLOW_VIEW_SCOPE);
+    }
+
+    /**
+     * Whether a by-id read actually yields the project — the gate permitting it AND the method body not filtering it
+     * away.
+     *
+     * <p>
+     * The gate alone is not the contract. {@code getProjectRow} also drops feature-owned system projects in its body,
+     * and a unit test calling the facade directly crosses no security proxy, so the two halves have to be composed by
+     * hand: evaluating only the gate would report a system project as readable and put the disagreement this loop
+     * exists to rule out back where it was.
+     */
+    private boolean isByIdReadAnswered(long projectId) {
+        if (!isByIdReadPermitted(projectId)) {
+            return false;
+        }
+
+        try {
+            createProjectFacade().getProjectRow(projectId);
+
+            return true;
+        } catch (NoSuchElementException noSuchElementException) {
+            return false;
+        }
     }
 
     /**

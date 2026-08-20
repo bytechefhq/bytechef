@@ -90,6 +90,14 @@ public class AiAgentErrorType extends AbstractErrorType {
      */
     public static final AiAgentErrorType CHANNEL_PARAMETER_MISSING = new AiAgentErrorType(114);
 
+    /**
+     * A sharing operation named an agent that does not exist, or one whose {@code workspace_id} is null. Deliberately
+     * one code for both: telling them apart would let a caller probe agent ids. Raised by
+     * {@code AiAgentSharingFacadeImpl}, the EE agent-keyed face of {@code ProjectSharingFacade}, which collapses its
+     * own two cases the same way.
+     */
+    public static final AiAgentErrorType INVALID_AGENT = new AiAgentErrorType(115);
+
     public AiAgentErrorType(int errorKey) {
         super(AiAgentFacade.class, errorKey);
     }

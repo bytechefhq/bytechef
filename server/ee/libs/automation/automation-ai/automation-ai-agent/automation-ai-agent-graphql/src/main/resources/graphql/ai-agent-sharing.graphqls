@@ -1,0 +1,13 @@
+extend type Query {
+    """The users a withheld agent has been granted to. Requires AGENT_EDIT on the agent and, through the project facade this delegates to, ownership of it or workspace admin — the audience of a withheld agent is not part of seeing it. (EE only)"""
+    aiAgentGrants(agentId: ID!): [Long!]!
+}
+
+extend type Mutation {
+    """Set who may SEE an agent. PRIVATE withholds it from the workspace's agent and deployment lists and from every by-id read; WORKSPACE shares it. It does not change who can USE the agent: a withheld agent's Slack, WhatsApp, webhook and hosted-chat channels keep answering everyone exactly as before. Stored on the agent's hidden backing project, which is the one record either question has. ORGANIZATION is not supported. (AGENT_EDIT plus owner-or-admin, EE only)"""
+    setAiAgentVisibility(agentId: ID!, visibility: ResourceVisibility!): Boolean!
+    """Grant a named workspace member sight of an agent its owner has withheld. Idempotent. (AGENT_EDIT plus owner-or-admin, EE only)"""
+    grantAiAgentAccess(agentId: ID!, userId: ID!): Boolean!
+    """Revoke a grant. Silent when no grant exists. (AGENT_EDIT plus owner-or-admin, EE only)"""
+    revokeAiAgentAccess(agentId: ID!, userId: ID!): Boolean!
+}

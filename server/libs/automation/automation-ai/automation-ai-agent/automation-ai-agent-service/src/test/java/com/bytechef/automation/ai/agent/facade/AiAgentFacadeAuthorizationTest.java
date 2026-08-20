@@ -22,11 +22,15 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 /**
- * Pins the workspace-membership gate on every {@code workspaceId}-keyed method of {@link AiAgentFacadeImpl}.
+ * Pins the {@code @PreAuthorize} expression on every method of {@link AiAgentFacadeImpl} — the seven keyed on a
+ * {@code workspaceId}, the twelve keyed on an agent id, the four keyed on a channel or element id, and the one that is
+ * deliberately left at {@code isAuthenticated()}.
  *
  * <p>
  * The expression is compared as a string rather than exercised through a live evaluator on purpose. What went wrong
@@ -41,75 +45,103 @@ import org.springframework.security.access.prepost.PreAuthorize;
  * at the method lookup, before the expression is even read.
  *
  * <p>
- * {@link #testEveryWorkspaceKeyedMethodIsGated()} is the backstop: the per-method pins above it only catch a gate that
- * is <em>changed</em>, never a seventh {@code workspaceId} method added later with {@code isAuthenticated()} and no
- * test of its own.
+ * {@link #testEveryWorkspaceKeyedMethodIsGated()} and {@link #testEveryFacadeMethodIsGated()} are the backstops: the
+ * per-method pins above them only catch a gate that is <em>changed</em>, never a method added later with
+ * {@code isAuthenticated()} and no test of its own. The second is the broader of the two — it holds every method of the
+ * {@code AiAgentFacade} interface to a {@code hasPermission} expression against a single named exemption, so a new
+ * ungated method has to be argued for in this file before it compiles green.
  *
  * @author Ivica Cardic
  */
 class AiAgentFacadeAuthorizationTest {
 
-    private static final String WORKFLOW_CREATE =
-        "hasPermission(#workspaceId, 'Workspace', 'WORKFLOW_CREATE')";
+    private static final String AGENT_CREATE_BY_WORKSPACE_ID =
+        "hasPermission(#workspaceId, 'Workspace', 'AGENT_CREATE')";
 
-    private static final String WORKFLOW_VIEW =
-        "hasPermission(#workspaceId, 'Workspace', 'WORKFLOW_VIEW')";
+    private static final String AGENT_VIEW_BY_WORKSPACE_ID =
+        "hasPermission(#workspaceId, 'Workspace', 'AGENT_VIEW')";
+
+    private static final String AGENT_DELETE_BY_ID = "hasPermission(#id, 'AiAgent', 'AGENT_DELETE')";
+
+    private static final String AGENT_EDIT_BY_AGENT_ID = "hasPermission(#agentId, 'AiAgent', 'AGENT_EDIT')";
+
+    private static final String AGENT_EDIT_BY_ID = "hasPermission(#id, 'AiAgent', 'AGENT_EDIT')";
+
+    private static final String AGENT_VIEW_BY_AGENT_ID = "hasPermission(#agentId, 'AiAgent', 'AGENT_VIEW')";
+
+    private static final String AGENT_VIEW_BY_ID = "hasPermission(#id, 'AiAgent', 'AGENT_VIEW')";
+
+    private static final String CHANNEL_AGENT_EDIT =
+        "hasPermission(#channelId, 'AiAgentChannel', 'AGENT_EDIT')";
+
+    private static final String ELEMENT_AGENT_EDIT =
+        "hasPermission(#elementId, 'AiAgentElement', 'AGENT_EDIT')";
 
     /**
-     * {@code WORKFLOW_CREATE} rather than the {@code WORKFLOW_VIEW} the reads take, because provisioning an agent
-     * writes: it mints a hidden {@code __AI_AGENT__} project and its generated draft workflow in the target workspace.
-     * {@code WORKFLOW_CREATE} is EDITOR-rank in {@code WorkflowPermissionScopeProvider}, so a workspace VIEWER can list
+     * The one method that carries no resource gate. Named here rather than skipped silently so
+     * {@link #testEveryFacadeMethodIsGated()} reads as an exemption with a reason attached rather than a hole.
+     * {@code getAgentChannelDefinitions} reads the component registry, takes no id, and returns the same catalog for
+     * every caller in the tenant.
+     */
+    private static final Set<String> UNGATED_METHOD_NAMES = Set.of("getAgentChannelDefinitions");
+
+    /**
+     * {@code AGENT_CREATE} rather than the {@code AGENT_VIEW} the reads take, because provisioning an agent writes: it
+     * mints a hidden {@code __AI_AGENT__} project and its generated draft workflow in the target workspace.
+     * {@code AGENT_CREATE} is EDITOR-rank in {@code AgentPermissionScopeProvider}, so a workspace VIEWER can list
      * agents and cannot create one — which is the distinction the single {@code isAuthenticated()} this replaced could
      * not express.
      */
     @Test
-    void testCreateAgentRequiresWorkspaceWorkflowCreator() {
-        assertExpression(WORKFLOW_CREATE, "createAgent", String.class, String.class, long.class);
+    void testCreateAgentRequiresWorkspaceAgentCreator() {
+        assertExpression(AGENT_CREATE_BY_WORKSPACE_ID, "createAgent", String.class, String.class, long.class);
     }
 
     /**
-     * Same scope as {@link #testCreateAgentRequiresWorkspaceWorkflowCreator()} because it is the same operation with a
+     * Same scope as {@link #testCreateAgentRequiresWorkspaceAgentCreator()} because it is the same operation with a
      * different source of the field values: import provisions a fresh agent, project and draft workflow in
      * {@code workspaceId}. If the two ever disagree, one route into the workspace is cheaper than the other.
      */
     @Test
-    void testImportAgentRequiresWorkspaceWorkflowCreator() {
-        assertExpression(WORKFLOW_CREATE, "importAgent", long.class, String.class);
+    void testImportAgentRequiresWorkspaceAgentCreator() {
+        assertExpression(AGENT_CREATE_BY_WORKSPACE_ID, "importAgent", long.class, String.class);
     }
 
     /**
      * The listing that matters most: it discloses the same agent names and titles
-     * {@link #testGetWorkspaceChatAgentsRequiresWorkspaceWorkflowViewer()} covers, so gating only the chat picker would
+     * {@link #testGetWorkspaceChatAgentsRequiresWorkspaceAgentViewer()} covers, so gating only the chat picker would
      * have closed one of two doors into the same room.
      */
     @Test
-    void testGetAgentsRequiresWorkspaceWorkflowViewer() {
-        assertExpression(WORKFLOW_VIEW, "getAgents", long.class);
+    void testGetAgentsRequiresWorkspaceAgentViewer() {
+        assertExpression(AGENT_VIEW_BY_WORKSPACE_ID, "getAgents", long.class);
     }
 
     @Test
-    void testGetAgentTagsRequiresWorkspaceWorkflowViewer() {
-        assertExpression(WORKFLOW_VIEW, "getAgentTags", long.class);
+    void testGetAgentTagsRequiresWorkspaceAgentViewer() {
+        assertExpression(AGENT_VIEW_BY_WORKSPACE_ID, "getAgentTags", long.class);
     }
 
     @Test
-    void testGetAgentDeploymentTagsRequiresWorkspaceWorkflowViewer() {
-        assertExpression(WORKFLOW_VIEW, "getAgentDeploymentTags", long.class);
+    void testGetAgentDeploymentTagsRequiresWorkspaceAgentViewer() {
+        assertExpression(AGENT_VIEW_BY_WORKSPACE_ID, "getAgentDeploymentTags", long.class);
     }
 
     @Test
-    void testGetAgentDeploymentsRequiresWorkspaceWorkflowViewer() {
-        assertExpression(WORKFLOW_VIEW, "getAgentDeployments", long.class);
+    void testGetAgentDeploymentsRequiresWorkspaceAgentViewer() {
+        assertExpression(AGENT_VIEW_BY_WORKSPACE_ID, "getAgentDeployments", long.class);
     }
 
     /**
-     * The scope and target are copied from {@code ProjectDeploymentFacadeImpl.getWorkspaceChatWorkflows}, the other
-     * cascade of the same launcher popup. If the two ever disagree, one of the two halves of one picker is enforcing
-     * something the other is not.
+     * The target is the one {@code ProjectDeploymentFacadeImpl.getWorkspaceChatWorkflows} carries — the other cascade
+     * of the same launcher popup — but the scope is deliberately no longer identical to it. That sibling lists
+     * workflows and keeps {@code WORKFLOW_VIEW}; this one lists agents and takes {@code AGENT_VIEW}. Both are
+     * VIEWER-rank, so the two halves of the popup still agree for every built-in role; they part company only in a
+     * custom role that grants one vocabulary and not the other, which is exactly what an agent scope family is for.
      */
     @Test
-    void testGetWorkspaceChatAgentsRequiresWorkspaceWorkflowViewer() {
-        assertExpression(WORKFLOW_VIEW, "getWorkspaceChatAgents", long.class, long.class);
+    void testGetWorkspaceChatAgentsRequiresWorkspaceAgentViewer() {
+        assertExpression(AGENT_VIEW_BY_WORKSPACE_ID, "getWorkspaceChatAgents", long.class, long.class);
     }
 
     /**
@@ -157,6 +189,169 @@ class AiAgentFacadeAuthorizationTest {
                 .sorted()
                 .toList())
                     .as("workspaceId-keyed methods without a workspace-keyed hasPermission gate")
+                    .isEmpty();
+    }
+
+    /**
+     * {@code AGENT_DELETE} rather than the {@code AGENT_EDIT} the draft mutators take: this is the one operation on
+     * this facade that removes the agent, its hidden {@code __AI_AGENT__} project and every published version with it.
+     * The scope is EDITOR-rank like the rest of the family, so this is a naming distinction rather than a privilege one
+     * today — but the two are separable in a custom role, and a role built to let someone tune agents without being
+     * able to destroy them is exactly the distinction {@code isAuthenticated()} could not express.
+     */
+    @Test
+    void testDeleteAgentRequiresAgentDelete() {
+        assertExpression(AGENT_DELETE_BY_ID, "deleteAgent", long.class);
+    }
+
+    /**
+     * The by-id read that {@link #testGetAgentsRequiresWorkspaceAgentViewer()} does not cover: the listing was gated
+     * this morning, but until now any authenticated user in the tenant could fetch any single agent — title,
+     * description, instructions, channel and element configuration — by passing its id past the workspace filter the
+     * listing applies.
+     */
+    @Test
+    void testGetAgentRequiresAgentView() {
+        assertExpression(AGENT_VIEW_BY_ID, "getAgent", long.class);
+    }
+
+    @Test
+    void testGetAgentVersionsRequiresAgentView() {
+        assertExpression(AGENT_VIEW_BY_ID, "getAgentVersions", long.class);
+    }
+
+    /**
+     * {@code AGENT_VIEW} and not something stronger, but it is the read with the widest blast radius: the export
+     * document carries the agent's instructions, settings, channels and elements in full. If any read on this facade is
+     * ever relaxed, this is the one that must not be.
+     */
+    @Test
+    void testExportAgentRequiresAgentView() {
+        assertExpression(AGENT_VIEW_BY_ID, "exportAgent", long.class);
+    }
+
+    @Test
+    void testGetDraftWorkflowIdRequiresAgentView() {
+        assertExpression(AGENT_VIEW_BY_AGENT_ID, "getDraftWorkflowId", long.class);
+    }
+
+    @Test
+    void testUpdateAgentRequiresAgentEdit() {
+        assertExpression(AGENT_EDIT_BY_ID, "updateAgent", long.class, String.class, String.class, String.class);
+    }
+
+    @Test
+    void testUpdateAgentSettingsRequiresAgentEdit() {
+        assertExpression(AGENT_EDIT_BY_ID, "updateAgentSettings", long.class, Map.class);
+    }
+
+    @Test
+    void testUpdateAgentTagsRequiresAgentEdit() {
+        assertExpression(AGENT_EDIT_BY_ID, "updateAgentTags", long.class, List.class);
+    }
+
+    @Test
+    void testUpdateAgentDeploymentTagsRequiresAgentEdit() {
+        assertExpression(AGENT_EDIT_BY_ID, "updateAgentDeploymentTags", long.class, List.class);
+    }
+
+    /**
+     * Publishing cuts a new version of the agent's generated workflow and is therefore a write on the agent, not a
+     * separate act of deployment — {@code AGENT_EDIT}, the same scope as editing the draft it publishes.
+     */
+    @Test
+    void testPublishAgentRequiresAgentEdit() {
+        assertExpression(AGENT_EDIT_BY_ID, "publishAgent", long.class, String.class);
+    }
+
+    @Test
+    void testAddAgentChannelRequiresAgentEdit() {
+        assertExpression(AGENT_EDIT_BY_AGENT_ID, "addAgentChannel", long.class, String.class, Map.class, Long.class);
+    }
+
+    @Test
+    void testAddAgentElementRequiresAgentEdit() {
+        assertExpression(
+            AGENT_EDIT_BY_AGENT_ID, "addAgentElement", long.class, String.class, Long.class, Map.class, Long.class);
+    }
+
+    /**
+     * The channel and element mutators are the four methods that could not be gated on an agent id at all: they are
+     * keyed on the child row's own id and nothing in the argument list names the agent or the workspace. Hence the
+     * dedicated {@code 'AiAgentChannel'} / {@code 'AiAgentElement'} resource tokens, whose resolvers walk child &rarr;
+     * agent &rarr; workspace so a channel id belonging to another workspace's agent resolves to <em>that</em> workspace
+     * and is denied.
+     *
+     * <p>
+     * The token half of the expression is as load-bearing as the scope half here, which is why it is pinned character
+     * for character: spelling this {@code hasPermission(#channelId, 'AiAgent', …)} would hand the channel id to the
+     * agent resolver, which would read it as an agent id — resolving some unrelated agent that happens to share the
+     * number, or nothing at all. Silently checking the wrong row is worse than not checking.
+     */
+    @Test
+    void testUpdateAgentChannelRequiresAgentEditOnTheChannelsOwnWorkspace() {
+        assertExpression(CHANNEL_AGENT_EDIT, "updateAgentChannel", long.class, Map.class, Long.class);
+    }
+
+    @Test
+    void testDeleteAgentChannelRequiresAgentEditOnTheChannelsOwnWorkspace() {
+        assertExpression(CHANNEL_AGENT_EDIT, "deleteAgentChannel", long.class);
+    }
+
+    @Test
+    void testUpdateAgentElementRequiresAgentEditOnTheElementsOwnWorkspace() {
+        assertExpression(ELEMENT_AGENT_EDIT, "updateAgentElement", long.class, Map.class, Long.class);
+    }
+
+    @Test
+    void testDeleteAgentElementRequiresAgentEditOnTheElementsOwnWorkspace() {
+        assertExpression(ELEMENT_AGENT_EDIT, "deleteAgentElement", long.class);
+    }
+
+    /**
+     * The registry read that legitimately keeps {@code isAuthenticated()}. Pinned positively rather than left out, so
+     * that a later change tightening or loosening it has to come through this test — and so the exemption in
+     * {@link #UNGATED_METHOD_NAMES} cannot quietly grow to cover a method that does touch an entity.
+     */
+    @Test
+    void testGetAgentChannelDefinitionsStaysAuthenticatedOnly() {
+        assertExpression("isAuthenticated()", "getAgentChannelDefinitions");
+    }
+
+    /**
+     * The broad backstop. Every method of the {@code AiAgentFacade} interface must carry a {@code hasPermission}
+     * expression, with {@link #UNGATED_METHOD_NAMES} the single named exemption.
+     *
+     * <p>
+     * Discovery runs over the interface rather than over {@code AiAgentFacadeImpl.class.getDeclaredMethods()} so that
+     * private helpers and bridge methods cannot dilute it, and the discovered count is asserted first: a filter that
+     * silently matched nothing would make the "all gated" assertion below pass while checking nothing, which is the
+     * exact failure mode this file exists to prevent.
+     */
+    @Test
+    void testEveryFacadeMethodIsGated() {
+        List<Method> facadeMethods = Arrays.stream(AiAgentFacade.class.getDeclaredMethods())
+            .filter(method -> !method.isSynthetic())
+            .map(method -> findMethod(method.getName(), method.getParameterTypes()))
+            .toList();
+
+        assertThat(facadeMethods)
+            .as("methods of AiAgentFacade (empty here means the discovery filter is broken, not that all is well)")
+            .hasSize(24);
+
+        assertThat(
+            facadeMethods.stream()
+                .filter(method -> !UNGATED_METHOD_NAMES.contains(method.getName()))
+                .filter(method -> {
+                    PreAuthorize preAuthorize = method.getAnnotation(PreAuthorize.class);
+
+                    return preAuthorize == null || !preAuthorize.value()
+                        .startsWith("hasPermission(");
+                })
+                .map(Method::getName)
+                .sorted()
+                .toList())
+                    .as("AiAgentFacade methods without a hasPermission gate")
                     .isEmpty();
     }
 

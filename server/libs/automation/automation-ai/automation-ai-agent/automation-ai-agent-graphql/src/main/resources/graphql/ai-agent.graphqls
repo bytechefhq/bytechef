@@ -45,6 +45,8 @@ type AiAgent {
     tags: [Tag!]!
     lastModifiedDate: String
     draftWorkflowId: String!
+    """Who may see this agent, inherited from its hidden backing project. Governs management surfaces only — a PRIVATE agent keeps serving every one of its channels."""
+    visibility: ResourceVisibility!
 }
 
 type AiAgentVersion {

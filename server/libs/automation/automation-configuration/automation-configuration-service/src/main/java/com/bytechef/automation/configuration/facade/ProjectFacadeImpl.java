@@ -71,6 +71,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -333,7 +334,23 @@ public class ProjectFacadeImpl implements ProjectFacade {
     @PreAuthorize("hasPermission(#id, 'Project', 'WORKFLOW_VIEW')")
     @Transactional(readOnly = true)
     public Project getProjectRow(long id) {
-        return projectService.getProject(id);
+        Project project = projectService.getProject(id);
+
+        // A feature-owned system project answers as though it does not exist, which is what the listing already
+        // implies by never showing one. Until this filter existed the pair disagreed: getProjectRows() dropped system
+        // projects and this method returned them, so anyone holding the id of an agent's hidden __AI_AGENT__ project
+        // could read it by id. Nothing secret leaked -- the name is __AI_AGENT__<uuid> and the description is empty --
+        // but the javadoc pair claimed the two answered the same question, and they did not.
+        //
+        // NoSuchElementException rather than a denial, and thrown with no message, because it is exactly what
+        // ProjectService.getProject raises for an absent id (OptionalUtils.get -> Optional.orElseThrow). A distinct
+        // exception would let a caller tell "this id is a system project" from "this id is nothing", which is the
+        // distinction being removed.
+        if (SystemProjects.isSystemProject(project)) {
+            throw new NoSuchElementException();
+        }
+
+        return project;
     }
 
     @Override

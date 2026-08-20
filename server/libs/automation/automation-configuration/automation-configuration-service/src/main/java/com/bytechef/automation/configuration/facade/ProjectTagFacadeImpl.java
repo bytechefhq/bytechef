@@ -17,6 +17,7 @@
 package com.bytechef.automation.configuration.facade;
 
 import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.security.ProjectVisibilityFilter;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.tag.domain.Tag;
@@ -36,21 +37,31 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProjectTagFacadeImpl implements ProjectTagFacade {
 
     private final ProjectService projectService;
+    private final ProjectVisibilityFilter projectVisibilityFilter;
     private final TagService tagService;
 
     @SuppressFBWarnings("EI")
-    public ProjectTagFacadeImpl(ProjectService projectService, TagService tagService) {
+    public ProjectTagFacadeImpl(
+        ProjectService projectService, ProjectVisibilityFilter projectVisibilityFilter, TagService tagService) {
+
         this.projectService = projectService;
+        this.projectVisibilityFilter = projectVisibilityFilter;
         this.tagService = tagService;
     }
 
+    /**
+     * Filtered through {@link ProjectVisibilityFilter} for the same reason every project listing is: this feeds the tag
+     * dropdown over the project list, so a tag aggregated off a project the caller cannot see is both a name disclosed
+     * from a withheld project and a filter option that selects nothing. One batched call over the projects already
+     * loaded, not a per-row check.
+     */
     @Override
     @Transactional(readOnly = true)
     @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'WORKFLOW_VIEW')")
     public List<Tag> getProjectTags(long workspaceId) {
         List<Long> projectIds = projectService.getWorkspaceProjectIds(workspaceId);
 
-        List<Project> projects = projectService.getProjects(projectIds);
+        List<Project> projects = projectVisibilityFilter.filterVisible(projectService.getProjects(projectIds));
 
         return tagService.getTags(CollectionUtils.flatMap(projects, Project::getTagIds));
     }

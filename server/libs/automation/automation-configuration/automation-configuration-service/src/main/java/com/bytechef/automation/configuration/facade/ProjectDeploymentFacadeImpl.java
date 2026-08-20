@@ -417,12 +417,18 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         return projectDeploymentWorkflowService.getProjectDeploymentWorkflow(projectDeploymentId, workflowId);
     }
 
+    /**
+     * Narrowed by {@link #filterOutSystemProjectDeployments}, the same helper
+     * {@link #getWorkspaceProjectDeployments(long, long, Long, Long)} uses. This listing feeds the filter dropdown over
+     * that one, so a tag it offers that matches no listed deployment is both a name disclosed from a project the caller
+     * cannot see and a filter option that selects nothing.
+     */
     @Override
     @Transactional(readOnly = true)
     @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'DEPLOYMENT_VIEW')")
     public List<Tag> getProjectDeploymentTags(long workspaceId) {
-        List<ProjectDeployment> projectDeployments =
-            projectDeploymentService.getProjectDeployments(null, null, null, null, workspaceId);
+        List<ProjectDeployment> projectDeployments = filterOutSystemProjectDeployments(
+            projectDeploymentService.getProjectDeployments(null, null, null, null, workspaceId));
 
         return tagService.getTags(
             projectDeployments.stream()
