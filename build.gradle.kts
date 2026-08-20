@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.io.github.ben.manes.versions)
     id("com.bytechef.java-common-conventions")
+    id("com.bytechef.openapi-generator-conventions")
     id("jacoco-report-aggregation")
     id("jvm-test-suite")
     alias(libs.plugins.nl.littlerobots.version.catalog.update)
@@ -27,6 +28,7 @@ versionCatalogUpdate {
 
 subprojects {
     apply(plugin = "com.bytechef.java-common-conventions")
+    apply(plugin = "com.bytechef.openapi-generator-conventions")
     apply(plugin = "io.spring.dependency-management")
 
     configurations.all {
@@ -78,3 +80,4 @@ reporting {
 tasks.matching { it.name.startsWith("spotless") }.configureEach {
     enabled = false
 }
+
