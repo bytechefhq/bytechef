@@ -1,4 +1,8 @@
 ---
+# NOTE: any route defined below with NO {externalUserId} path parameter (e.g. /app-events,
+# /workflows/{workflowUuid}) is JWT-only by design -- add its literal first path segment to
+# ConnectedUserConstants.FRONTEND_RESERVED_PATH_SEGMENTS (embedded-connected-user-api) so
+# EmbeddedApiKeyAuthenticationConverter rejects non-JWT tokens on it instead of minting a phantom ConnectedUser.
 openapi: "3.0.1"
 info:
   title: "The Embedded Public V1 API"
@@ -13,8 +17,10 @@ tags:
 paths:
   /app-events:
     post:
-      description: "Execute workflows."
-      summary: "Execute workflows"
+      description: "Fires an App Event for the connected user, starting every one of their enabled\
+        \ workflows that has an App Event trigger. Returns no body; inspect the runs through the\
+        \ workflow executions endpoints."
+      summary: "Trigger all subscribed workflows"
       tags:
         - "app-event-trigger"
       operationId: "executeWorkflows"
@@ -48,8 +54,9 @@ paths:
           $ref: "#/components/responses/notImplemented"
   /workflows/{workflowUuid}:
     post:
-      description: "Execute workflows."
-      summary: "Execute workflows"
+      description: "Executes a single workflow through its Request trigger and returns the result\
+        \ the workflow produces."
+      summary: "Execute a workflow"
       tags:
         - "request-trigger"
       operationId: "executeWorkflow"

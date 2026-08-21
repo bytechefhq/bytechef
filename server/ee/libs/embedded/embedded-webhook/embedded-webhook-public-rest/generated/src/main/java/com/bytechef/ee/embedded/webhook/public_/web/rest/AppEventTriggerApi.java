@@ -46,8 +46,8 @@ public interface AppEventTriggerApi {
 
     String PATH_EXECUTE_WORKFLOWS = "/app-events";
     /**
-     * POST /app-events : Execute workflows
-     * Execute workflows.
+     * POST /app-events : Trigger all subscribed workflows
+     * Fires an App Event for the connected user, starting every one of their enabled workflows that has an App Event trigger. Returns no body; inspect the runs through the workflow executions endpoints.
      *
      * @param xEnvironment The environment. (optional)
      * @return Successful operation. (status code 204)
@@ -63,8 +63,8 @@ public interface AppEventTriggerApi {
      */
     @Operation(
         operationId = "executeWorkflows",
-        summary = "Execute workflows",
-        description = "Execute workflows.",
+        summary = "Trigger all subscribed workflows",
+        description = "Fires an App Event for the connected user, starting every one of their enabled workflows that has an App Event trigger. Returns no body; inspect the runs through the workflow executions endpoints.",
         tags = { "app-event-trigger" },
         responses = {
             @ApiResponse(responseCode = "204", description = "Successful operation."),
