@@ -1,0 +1,81 @@
+---
+title: "API Platform"
+description: Publish workflows as your own REST API — collections of endpoints with API-client credentials.
+---
+
+<EEBadge />
+
+The **API Platform** turns workflows into a REST API you can hand to consumers:
+
+- **API Collections** — group workflows from a deployed project into a collection of HTTP endpoints. Each endpoint maps a method and path to a workflow; the collection is served under your instance's API host.
+- **API Clients** — issue credential keys to the applications that will call your collections, so access can be granted and revoked per consumer.
+
+The sidebar entry is **API Collections**; API Clients is the second page of the same API Platform section, at `/automation/api-platform/api-clients`.
+
+{/* TODO screenshot: API Collections page — a collection expanded to show its endpoints (method, path, workflow) */}
+
+## Create an API collection
+
+1. Open **API Collections** from the sidebar and click **New API Collection**.
+2. Pick the **Project** and **Project Version** whose workflows the collection exposes.
+3. Give the collection a **Name** and optional **Description**.
+4. Set the **Context Path** — the path segment your endpoints are served under — and the **Collection Version** (defaults to `1`).
+5. Optionally add **Tags**, then save.
+
+Each endpoint is served under `/api/o/v{collectionVersion}/{contextPath}/{path}`. Add endpoints to the collection to map an **HTTP method** (DELETE, GET, PATCH, POST, or PUT) and **path** to a specific **workflow**. Each endpoint row carries an **enabled** switch — it toggles the underlying workflow's enabled flag *in the project deployment*, the same switch you set when deploying, so turning an endpoint off there turns the workflow off everywhere. Use the collection's row menu to edit it, change its project version, or delete it, and filter the list by **project** or **tag** from the left sidebar.
+
+{/* TODO screenshot: Create API Collection dialog — Project and Project Version selectors, Name, Context Path, and Collection Version fields */}
+
+## What a workflow needs to be callable
+
+An endpoint only works if the workflow it points at starts with the **API Platform → New API Request** trigger
+(`apiPlatform/v1/newApiRequest`). The handler looks that trigger up by name when a request arrives, so a workflow
+without it cannot be served.
+
+The trigger is where you declare the endpoint's contract, as JSON schemas:
+
+| Field | What it holds |
+|---|---|
+| **Request** | Schemas for the request's **Headers**, **Parameters**, and **Body**. The parameters schema also receives any URI-template variables matched out of the endpoint path. |
+| **Response** | Schemas for the **Success**, **Invalid Input**, **Internal Error**, and **Forbidden** responses. |
+| **Timeout (ms)** | How long the caller's request is held open. The maximum wait is **5 minutes**. |
+
+Calls are **synchronous**: the request is held open until the workflow completes and is then answered with the
+workflow's output, on the request thread rather than by polling. There is no fire-and-forget variant of this trigger,
+so design the workflow to finish quickly and shape its final step's output like the response you want the caller to
+see. Long-running work is a better fit for a webhook-triggered workflow plus a callback or a status endpoint.
+
+This is the same **trigger in, response out** model as [subflows](/platform/automation/build/workflows/subflows) — an
+HTTP caller here plays the role a parent workflow plays there. The difference: the API Platform has a real external
+caller, and the trigger itself shapes the response (there is no separate "return response" action — the workflow's
+output *is* the response).
+
+<Callout type="warn" title="Why an endpoint might return 404">
+    The handler answers `404` before running anything if either switch is off:
+
+    - the **workflow** is not enabled inside its project deployment, or
+    - the **project deployment** itself is not enabled.
+
+    Both are checked, so enabling one is not enough.
+</Callout>
+
+## Access control
+
+Every request to `/api/o/...` must carry a credential as a Bearer header, plus the environment it targets:
+
+```
+Authorization: Bearer <your-api-key>
+X-ENVIRONMENT: PRODUCTION
+```
+
+`X-ENVIRONMENT` defaults to `PRODUCTION` when omitted, and the collection is looked up in that environment — so a
+collection created in Development is not reachable without naming it.
+
+**API Clients** (**API Platform → API Clients**) let you register a named client per consuming application. Creating
+one shows its secret key **once**; it cannot be viewed again, so store it before closing the dialog. The list shows
+each client's name, created date, and last-used date, and a client can be renamed or deleted independently of the
+others.
+
+## Reference
+
+- [Subflows](/platform/automation/build/workflows/subflows) — the same trigger-in/response-out model, for workflow-to-workflow calls instead of HTTP.

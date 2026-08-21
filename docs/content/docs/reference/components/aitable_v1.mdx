@@ -66,7 +66,7 @@ Name: createRecord
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | spaceId | Space ID | STRING |  | false |
 | datasheetId | Datasheet ID | STRING <details> <summary> Depends On </summary> spaceId </details> | AITable Datasheet ID | true |
-| fields | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> datasheetId </details> |  | null |
+| fields | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> datasheetId </details> |  | false |
 
 #### Example JSON Structure
 ```json
@@ -153,7 +153,7 @@ Name: updateRecord
 | spaceId | Space ID | STRING |  | false |
 | datasheetId | Datasheet ID | STRING <details> <summary> Depends On </summary> spaceId </details> | AITable Datasheet ID | true |
 | recordId | Record ID | STRING | ID of the record to update. | true |
-| fields | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> datasheetId </details> |  | null |
+| fields | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> datasheetId </details> |  | false |
 
 #### Example JSON Structure
 ```json

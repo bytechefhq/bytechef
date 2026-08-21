@@ -1,0 +1,70 @@
+---
+title: DigitalOcean
+description: Learn how to deploy ByteChef on DigitalOcean's cloud platform
+---
+
+ByteChef runs on DigitalOcean as the container image `docker.bytechef.io/bytechef/bytechef:latest` on port `8080`. Two managed paths are common: the **App Platform** (fully managed containers) or a **Droplet** running Docker. Both pair with a DigitalOcean **Managed PostgreSQL** database.
+
+## Prerequisites
+
+- A DigitalOcean account (and `doctl` if you prefer the CLI).
+- A **Managed PostgreSQL 15+** database cluster, with a `bytechef` database and its connection details (host, port, user, password). DigitalOcean managed databases require SSL — append `?sslmode=require` to the JDBC URL.
+
+## Deploy
+
+Pick the path that matches how you want to run the container. Both pair with the same managed
+PostgreSQL database.
+
+<Tabs items={['App Platform', 'Droplet with Docker']}>
+<Tab value="App Platform">
+
+1. Create a new App and choose **Docker Hub / Container Registry** as the source, pointing at `docker.bytechef.io/bytechef/bytechef:latest`.
+2. Set the **HTTP port** to `8080`.
+3. Add the environment variables below, marking the secret ones as encrypted:
+
+   ```bash
+   BYTECHEF_DATASOURCE_URL=jdbc:postgresql://<db-host>:25060/bytechef?sslmode=require
+   BYTECHEF_DATASOURCE_USERNAME=<db-user>
+   BYTECHEF_DATASOURCE_PASSWORD=<db-password>
+   BYTECHEF_ENCRYPTION_PROVIDER=property
+   BYTECHEF_ENCRYPTION_PROPERTY_KEY=<stable-encryption-key>
+   BYTECHEF_SECURITY_REMEMBER_ME_KEY=<stable-remember-me-key>
+   BYTECHEF_PUBLIC_URL=https://bytechef.example.com
+   ```
+
+4. Set the App's health check to `GET /actuator/health/readiness` on port `8080`.
+5. Deploy. App Platform terminates TLS and gives the app a public URL — set `BYTECHEF_PUBLIC_URL` to that URL.
+
+App Platform containers have ephemeral local storage, and file storage defaults to **`filesystem`** — so set `BYTECHEF_FILE_STORAGE_PROVIDER=jdbc` explicitly to keep files in the database rather than on a disk that disappears with the container.
+
+</Tab>
+<Tab value="Droplet with Docker">
+
+1. Create a Droplet from the **Docker** Marketplace image (or install Docker on a plain Droplet).
+2. Run the container, pointing it at your managed database:
+
+   ```bash
+   docker run --name bytechef -d -p 8080:8080 --restart unless-stopped \
+       --env BYTECHEF_DATASOURCE_URL="jdbc:postgresql://<db-host>:25060/bytechef?sslmode=require" \
+       --env BYTECHEF_DATASOURCE_USERNAME=<db-user> \
+       --env BYTECHEF_DATASOURCE_PASSWORD=<db-password> \
+       --env BYTECHEF_ENCRYPTION_PROVIDER=property \
+       --env BYTECHEF_ENCRYPTION_PROPERTY_KEY=<stable-encryption-key> \
+       --env BYTECHEF_SECURITY_REMEMBER_ME_KEY=<stable-remember-me-key> \
+       --env BYTECHEF_PUBLIC_URL=https://bytechef.example.com \
+       docker.bytechef.io/bytechef/bytechef:latest
+   ```
+
+3. Front the Droplet with a reverse proxy (nginx, Caddy) or a DigitalOcean Load Balancer to terminate HTTPS, forwarding to port `8080`.
+
+</Tab>
+</Tabs>
+
+## Access the instance
+
+Open your public URL and click **Create account** to register the first user.
+
+{/* TODO screenshot: the ByteChef first-login screen reached at the DigitalOcean App Platform / Droplet public URL, with the "Create account" link visible */}
+
+Use **stable** values for `BYTECHEF_ENCRYPTION_PROPERTY_KEY` and `BYTECHEF_SECURITY_REMEMBER_ME_KEY` (see [Configuration](/platform/use-bytechef/self-hosted/configuration)) so credentials and sessions survive redeploys.
+

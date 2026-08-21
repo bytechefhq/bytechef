@@ -1,0 +1,9 @@
+{
+  "$schema": "../../../../../../.source/json-schema/docs.meta.json",
+  "title": "Quick Start",
+  "pages": [
+    "build-first-workflow",
+    "star-repository-on-github",
+    "configure-workflow-trigger"
+  ]
+}

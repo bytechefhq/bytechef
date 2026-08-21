@@ -26,10 +26,7 @@ Version: 1
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | token | Bot Token | STRING |  | true |
-
-
-
-![anl-c-discord-md](https://static.scarf.sh/a.png?x-pxid=8dad9aeb-34e5-47b6-917f-5423fe8d2b0c)
+| publicKey | Application Public Key | STRING | The Discord app's public key. When set, field-less approval requests use in-place Approve/Discard interaction buttons resolved through the app's Interactions Endpoint URL (&lt;public-url&gt;/discord/interactivity), verified by the Ed25519 request signature. Also set bytechef.webhook.discord.public-key to the same value. Leave empty to deliver approval links to the hosted form. | false |
 ## Connection Setup
 
 [Setting up OAuth2](https://discordjs.guide/preparations/adding-your-bot-to-servers.html#bot-invite-links)
@@ -331,4 +328,3 @@ Type: OBJECT
 If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
 
 To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
-

@@ -1,0 +1,218 @@
+---
+title: Quick Start
+description: Ship your first embedded integration in about 15 minutes.
+---
+
+{/* TODO screenshot: the Embedded Quick Start landing page */}
+
+---
+
+This guide walks you through every step needed to embed a working integration inside your product: setting up Signing Keys, publishing an integration, fetching it from your backend, and rendering the Connect dialog with the React SDK.
+
+<Callout title="Prefer working from a runnable example?">
+    The **[Sample App](/platform/embedded/get-started/quick-start/sample-app)** is a complete Next.js + Fastify reference implementation that demonstrates this entire flow plus several other embedded patterns (Automations API, ComponentKit, MCP servers, and tool-based AI chat). Clone it if you'd rather read working code than follow steps.
+</Callout>
+
+<Callout title="Before you start">
+    You'll need:
+    - A ByteChef Enterprise Edition deployment running with `bytechef.edition=ee`.
+    - Admin access to the ByteChef UI.
+    - A React or Next.js app where you want to embed the connect flow.
+</Callout>
+
+---
+
+## 1. Create a Signing Key
+
+Signing Keys produce an RSA keypair. The **public key stays in ByteChef**; the **private key is shown to you once** and you use it in your backend to sign JWTs that authenticate each end user into the embedded session.
+
+1. In the ByteChef UI, go to **Embedded → Settings → Signing Keys**.
+2. Click **New Signing Key** and give it a name (e.g. `web-app-dev`).
+3. Copy the **private key** that's displayed — you will not see it again.
+4. Note the **Key Id** (`kid`) shown in the table after the dialog closes.
+
+{/* TODO screenshot: the Create Signing Key dialog, including the one-time secret reveal state */}
+
+You'll store the private key as a secret in your backend (e.g. `BYTECHEF_SIGNING_KEY` env var) and reference the `kid` when signing.
+
+---
+
+## 2. Create an API Key (optional, for server-to-server calls)
+
+If your backend needs to call the embedded API on behalf of your users without minting a JWT — listing a user's integrations, managing their workflows, executing a component action — create an API Key:
+
+1. Go to **Embedded → Settings → API Keys**.
+2. Click **New API Key**, give it a name.
+3. Copy the **secret key** — also shown only once.
+
+Use it in an `Authorization: Bearer <secret>` header against the public API's `/{externalUserId}`-prefixed routes, e.g. `GET /api/embedded/v1/{externalUserId}/integrations` — with an API Key, the connected user is identified by the path segment instead of a JWT `sub` claim. That path segment is required: a request without it has no user to resolve and is rejected, which is why API Keys do not work on the `/api/embedded/internal` endpoints (including workflow executions, which live only there and are read from the ByteChef admin UI or with a Signing Key JWT).
+
+---
+
+## 3. Build and publish an Integration
+
+1. Go to **Embedded → Integrations** and click **New Integration**.
+2. Choose a component (e.g. **Gmail**) and give the integration a name.
+3. ByteChef opens the workflow editor with a default workflow. Add triggers and actions as needed.
+4. When ready, click the **Publish** button in the editor header, optionally add a version **Description** in the popover, and confirm. This creates a new version (`V1 PUBLISHED`).
+
+{/* TODO screenshot: the integration editor header with the Publish control open */}
+
+---
+
+## 4. Create an Instance Configuration
+
+A configuration deploys a published integration version into a specific environment so connected users can activate it.
+
+1. Go to **Embedded → Integration Configurations** and click **New Instance Configuration**.
+2. Pick your integration, choose the published version, and confirm the environment.
+3. Save and toggle the configuration **on**.
+
+{/* TODO screenshot: the New Instance Configuration dialog with its integration, environment and connection fields */}
+
+---
+
+## 5. Generate a JWT for an end user
+
+In your backend, mint a short-lived JWT for the user you want to authorize. Use RS256 and set the `kid` header to the Key Id from step 1.
+
+```ts
+// Node.js example using jsonwebtoken
+import jwt from 'jsonwebtoken';
+
+const token = jwt.sign(
+    {
+        sub: externalUserId, // your user's unique id; ByteChef stores it as the external user id
+        iat: Math.floor(Date.now() / 1000),
+    },
+    process.env.BYTECHEF_SIGNING_PRIVATE_KEY!,
+    {
+        algorithm: 'RS256',
+        expiresIn: '10m',
+        keyid: process.env.BYTECHEF_SIGNING_KEY_ID!,
+    }
+);
+```
+
+Keep the TTL short (10 minutes is a good default) and mint a fresh token per session.
+
+<Callout title="Connected Users are created automatically">
+    There is no "create connected user" endpoint. The first request authenticated with a user's JWT (or with an API Key against that user's `/{externalUserId}/…` routes) automatically creates the **Connected User** record for that external id. If a user was disabled by an admin, later requests are rejected until they are re-enabled under **Embedded → Connected Users**.
+</Callout>
+
+---
+
+## 6. Install the React SDK
+
+```package-install
+npm install @bytechef/embedded
+```
+
+---
+
+## 7. Render the Connect dialog
+
+Hand the JWT to `useConnectDialog`, along with the `integrationId` of the configuration you want the user to connect:
+
+```tsx
+'use client';
+import {useConnectDialog} from '@bytechef/embedded';
+
+export function ConnectGmailButton({jwtToken, integrationId}: {
+    jwtToken: string;
+    integrationId: string;
+}) {
+    const {openDialog} = useConnectDialog({
+        baseUrl: 'https://your-bytechef-host.example.com',
+        environment: 'DEVELOPMENT',
+        integrationId,
+        jwtToken,
+    });
+
+    return <button onClick={openDialog}>Connect Gmail</button>;
+}
+```
+
+When the user clicks the button, the SDK opens the ByteChef-hosted connect dialog, walks them through OAuth (or whatever the integration requires), and stores their credentials as a **Connection** under their **Connected User** record.
+
+{/* TODO screenshot: the ByteChef Connect dialog as it renders inside a host application, showing the integration list and a Connect button */}
+
+<Callout title="Component-defined workflow inputs">
+    Beyond connecting and enabling workflows, the connect dialog can also collect **workflow inputs** from the user. When a workflow input references a component (for example, "pick a Slack channel" or "choose a HubSpot pipeline"), the dialog renders the component's own input group — including dynamic dropdowns whose options are fetched live against the user's connection. Dependent fields resolve in order, so a selection can filter the next one (for example, choose a workspace and then one of its channels). This works the same for workflows you expose as MCP tools. The user's selections are saved per integration instance, so each connected user configures the workflow with their own data without you building any of those forms yourself.
+
+    The dialog can also collect a **[Field Mapping](/platform/embedded/build/workflows/field-mapping)** — let the user pick a remote object type and map your application's fields to the connected integration's fields, with the option lists fetched live against their connection.
+
+    Not every input belongs in front of the end user. An input declared `internalOnly` in the workflow definition is filtered out of the connect dialog — see [internal-only workflow inputs](/platform/embedded/configure/instance-configurations#internal-only-workflow-inputs). Inputs are end-user-facing by default.
+</Callout>
+
+---
+
+## 8. Trigger workflows with an App Event (optional)
+
+If your integration's workflows use an **App Event trigger**, your backend fires every subscribed workflow for the connected user by `POST`ing to the embedded API:
+
+```http
+POST /api/embedded/v1/app-events HTTP/1.1
+Host: your-bytechef-host.example.com
+Authorization: Bearer <end-user JWT>
+X-Environment: DEVELOPMENT
+```
+
+The connected user is identified by the JWT `sub` claim. ByteChef looks up that user's enabled integration instances and starts an execution for every enabled workflow that carries an **App Event** trigger. The endpoint takes no request body and no event name, so the App Event Id selected on a trigger does not narrow the fan-out — see [App Events](/platform/embedded/build/app-events) for what that means in practice.
+
+See **[App Events](/platform/embedded/build/app-events)** for how to declare event names and JSON schemas.
+
+---
+
+## 9. Inspect what happened
+
+- **Embedded → Connected Users** — confirm your end user appears with the integrations they connected.
+- **Embedded → Connections** — see the credentials they authorized.
+- **Embedded → Automations** — view the active workflows for each user.
+- **Embedded → Workflow Executions** — drill into every run, step by step.
+
+---
+
+## Let your users build their own workflows (optional)
+
+`@bytechef/embedded` also exports `EmbeddedWorkflowBuilder`, which embeds the full ByteChef workflow editor directly in your product so your end users can author and edit their own automations. It loads the builder in an iframe and is configured with the same end-user JWT:
+
+```tsx
+'use client';
+import {EmbeddedWorkflowBuilder} from '@bytechef/embedded';
+
+export function WorkflowEditor({jwtToken, workflowUuid, sharedConnectionIds}: {
+    jwtToken: string;
+    workflowUuid: string;
+    sharedConnectionIds: number[];
+}) {
+    return (
+        <div style={{height: '100vh', position: 'relative', width: '100%'}}>
+            <EmbeddedWorkflowBuilder
+                baseUrl="https://your-bytechef-host.example.com"
+                connectionDialogAllowed
+                environment="DEVELOPMENT"
+                jwtToken={jwtToken}
+                sharedConnectionIds={sharedConnectionIds}
+                workflowUuid={workflowUuid}
+            />
+        </div>
+    );
+}
+```
+
+Pass `includeComponents={['slack', 'gmail', ...]}` to restrict the component palette to a specific set (omit it to allow all). The parent container must be positioned (`position: relative`) with a defined height because the builder fills it.
+
+You can also generate a starter workflow for a user from a natural-language prompt *(coming soon — depends on the AI Copilot, which is on the upcoming release track)* — `POST /api/embedded/v1/automation/workflows/generate` with `{ "prompt": "..." }` returns a new workflow UUID built by AI Copilot, which you can then open in the builder.
+
+---
+
+## Next steps
+
+- Connect-dialog branding customization is on the roadmap; today the dialog ships with a neutral built-in theme.
+- Add more integrations and version them — publish a `V2` while `V1` continues running for existing users.
+- Restrict integrations or individual workflows to a subset of users with **[Permission Expressions](/platform/embedded/build/integrations)**.
+- Create the equivalent instance configuration in Staging and Production. Each environment keeps its own configurations, so you recreate (or re-point) a configuration per environment — there is no promote operation that moves one between them.
+- Expose components as **[MCP Servers](/platform/embedded/configure/mcp-servers)** so AI agents can use them as tools.
+
+Stuck? Contact [support@bytechef.io](mailto:support@bytechef.io).

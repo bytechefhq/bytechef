@@ -3,5 +3,28 @@
   "description": "The API reference docs",
   "icon": "Play",
   "root": true,
-  "pages": ["index"]
+  "pages": [
+    "index",
+    "--- Automation ---",
+    "automation-workflow-execution",
+    "automation-project-code-workflow",
+    "automation-project-git",
+    "--- Embedded ---",
+    "embedded-action",
+    "embedded-tool",
+    "embedded-workflow-execution",
+    "embedded-tool-invocation",
+    "embedded-configuration-integration",
+    "embedded-configuration-integration-instance",
+    "embedded-configuration-integration-instance-workflow",
+    "embedded-configuration-connection",
+    "embedded-configuration-connected-user",
+    "embedded-configuration-connected-user-project-workflow",
+    "embedded-configuration-automation-workflow-project",
+    "embedded-webhook-app-event-trigger",
+    "embedded-webhook-request-trigger",
+    "automation-bridge",
+    "--- Platform ---",
+    "custom-components"
+  ]
 }

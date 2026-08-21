@@ -1,0 +1,58 @@
+---
+title: OAuth2 Clients
+description: Clients registered against the embedded OAuth2 authorization server (including dynamically registered MCP clients) — list and revoke them.
+ee: true
+comingSoon: true
+---
+
+When ByteChef runs its own OAuth2 authorization server, MCP clients and other OAuth2-capable integrations register themselves with it automatically through Dynamic Client Registration (DCR). **Settings → OAuth2 Clients** is the admin surface for that client store: it lists every registered client and lets an administrator revoke one by deleting it.
+
+<Callout title="Availability">
+    This page is Enterprise Edition and restricted to the `ADMIN` authority — the check sits on `RegisteredClientFacade`, so it applies to every caller, not just the UI. The list only has content when the embedded authorization server is enabled with `bytechef.oauth2.authorization-server.enabled=true` (`BYTECHEF_OAUTH2_AUTHORIZATION_SERVER_ENABLED`), which is off by default.
+</Callout>
+
+---
+
+## How clients get here
+
+You do not create clients on this page. Entries appear as a side effect of an OAuth2 client connecting to one of ByteChef's [MCP server](/platform/settings/mcp-server) endpoints:
+
+1. An OAuth2-capable MCP client — for example a claude.ai web integration, which cannot send custom headers — makes its first unauthenticated request to an MCP endpoint.
+2. The authorization server advertises its authorization metadata, and the client registers itself via Dynamic Client Registration.
+3. The user completes an authorization-code + PKCE flow using their existing ByteChef login, followed by a consent screen.
+4. The registered client is persisted and appears in this list.
+
+Because registration is dynamic, the list reflects clients that have actually connected — there is no manual "add client" step. See [MCP Server → OAuth2](/platform/settings/mcp-server#oauth2-optional) for the connecting side of this flow.
+
+{/* TODO screenshot: Settings → OAuth2 Clients — the registered clients table showing the Name, Client ID, Issued, and Scopes columns with a delete (trash) icon at the end of each row */}
+
+## The clients table
+
+Each registered client is one row:
+
+| Column | Description |
+|---|---|
+| **Name** | The client's display name (`clientName`) as supplied at registration. May be blank. |
+| **Client ID** | The OAuth2 client identifier issued to the client. |
+| **Issued** | Local date and time the client ID was issued (`clientIdIssuedAt`). |
+| **Scopes** | The scopes granted to the client, joined with commas. |
+
+Rows are ordered newest-issued first (`ORDER BY client_id_issued_at DESC`). Each row ends with a **Delete client** trash icon.
+
+When no clients have registered yet, the table is replaced by an empty state titled **No OAuth2 Clients** with the message "Clients registered through Dynamic Client Registration will appear here."
+
+## Revoke a client
+
+Deleting a client both removes its registration and revokes the tokens it currently holds.
+
+1. Click the **Delete client** trash icon at the end of the row.
+2. Confirm in the **Are you absolutely sure?** dialog — "This action cannot be undone. This will permanently delete the OAuth2 client and revoke its authorizations."
+
+On delete the server first removes the client's rows from `oauth2_authorization`, invalidating its access and refresh tokens, and then removes the record from `oauth2_registered_client`. Any MCP assistant connected through that client must re-register — its next request triggers a fresh Dynamic Client Registration and a new consent flow.
+
+{/* TODO screenshot: the "Are you absolutely sure?" delete confirmation dialog with its Cancel and Delete buttons */}
+
+## What this page does not show
+
+- **No client secret.** Secrets are never returned to the admin UI; there is no reveal, copy, or rotate action. To rotate a client's credentials, delete it and let it re-register.
+- **No edit.** Registered clients are read-only apart from deletion — you cannot rename a client or change its scopes, redirect URIs, or grant types here. Those values are fixed at registration time.

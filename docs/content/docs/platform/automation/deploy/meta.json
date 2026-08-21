@@ -1,0 +1,12 @@
+{
+  "$schema": "../../../../../.source/json-schema/docs.meta.json",
+  "title": "Deploy",
+  "description": "Deploy workflows and expose them to callers and agents.",
+  "pages": [
+    "deploy-workflows",
+    "chats",
+    "environments",
+    "api-platform",
+    "mcp-servers"
+  ]
+}

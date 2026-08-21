@@ -1,0 +1,43 @@
+---
+title: "AWS S3 Session Repository"
+description: "Stores agent session events as JSON objects in an Amazon S3 bucket."
+---
+
+
+Categories: Artificial Intelligence
+
+
+Type: awsSessionChatMemory/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### custom
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| accessKeyId | Access Key ID | STRING |  | true |
+| secretAccessKey | Secret Access Key | STRING |  | true |
+| region | Region | STRING |  | true |
+| bucket | Bucket | STRING |  | true |
+| keyPrefix | Key Prefix | STRING | Optional prefix prepended to every session object key. | false |
+
+
+
+
+
+
+<hr />
+
+
+
+

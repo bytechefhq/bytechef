@@ -4,6 +4,8 @@ description: "This is a sample Pet Store Server based on the OpenAPI 3.0 specifi
 ---
 
 
+Categories: 
+
 
 Type: petstore/v1
 
@@ -215,7 +217,7 @@ Name: createUsersWithListInput
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| __items | Items | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(username), STRING\(firstName), STRING\(lastName), STRING\(email), STRING\(password), STRING\(phone), INTEGER\(userStatus)&#125;] </details> |  | null |
+| __items | Items | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(username), STRING\(firstName), STRING\(lastName), STRING\(email), STRING\(password), STRING\(phone), INTEGER\(userStatus)&#125;] </details> |  | false |
 
 #### Example JSON Structure
 ```json
@@ -1006,7 +1008,7 @@ Name: uploadFile
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | petId | Pet Id | INTEGER | ID of pet to update | true |
 | additionalMetadata | Additional Metadata | STRING | Additional Metadata | false |
-| fileEntry | | FILE_ENTRY |  | null |
+| fileEntry | | FILE_ENTRY |  | false |
 
 #### Example JSON Structure
 ```json

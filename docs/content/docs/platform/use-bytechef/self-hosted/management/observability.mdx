@@ -1,0 +1,192 @@
+---
+title: "Observability"
+description: "Turn on OpenTelemetry traces, logs, and metrics — the exact properties, default OTLP endpoints, sampling, and collector wiring, grounded in the shipped configuration."
+---
+
+ByteChef is built on the standard JVM observability triad — **traces, logs, and metrics** — over open protocols, so it wires into the stack you already operate. Nothing in the pipeline is ByteChef-specific: if your tooling speaks OTLP, you point ByteChef at it and you are done.
+
+This page is the whole surface: what each signal contains, the exact properties that turn it on, their defaults, and where they map in Spring Boot.
+
+<Callout type="info">
+  Observability ships **disabled by default**. Every signal stays off until you point it at a collector and flip the enable flag — so a fresh install never tries to export to `localhost:4318` and fill your logs with connection errors.
+</Callout>
+
+## The pipeline, in one sentence
+
+ByteChef's observability is standard Spring Boot Actuator + Micrometer + Micrometer Tracing exporting over **OTLP/HTTP**. There is no ByteChef-specific agent or protocol — if your stack speaks OTLP, you point ByteChef at it and you're done. The Enterprise `observability-config` module adds the glue described in [What the EE module installs](#what-the-ee-module-installs) below.
+
+## What each signal carries
+
+**Traces.** API calls, workflow executions, task dispatches, and component invocations each produce
+OpenTelemetry spans, correlated under one trace id per logical operation. A webhook trigger that fans
+out into parallel tasks appears as a single trace with the whole task tree; an execution that hops
+coordinator → broker → worker keeps one continuous trace across the services, because W3C trace
+context propagates on every hop.
+
+**Logs.** Under the `prod` profile ByteChef emits **Elastic Common Schema JSON** to the console
+(`logging.structured.format.console: ecs`); the `dev` profile uses a human-readable pattern instead.
+Either way every line carries the active `traceId` and `spanId` through Spring Boot's correlation
+pattern, and the current tenant id is published to the SLF4J MDC as `tenantId`, so you can filter by
+tenant and pivot from a log line to its containing trace. When log export is enabled, the same
+records are also shipped over OTLP.
+
+**Metrics.** Micrometer meters for HTTP requests, the JVM, Logback, the process, and the system.
+See [Metrics detail](#metrics-detail) below.
+
+## Default OTLP endpoints
+
+All three signals export over OTLP/HTTP. The shipped defaults assume an [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/) reachable on `localhost:4318`:
+
+| Signal | Default endpoint |
+|---|---|
+| Traces | `http://localhost:4318/v1/traces` |
+| Logs | `http://localhost:4318/v1/logs` |
+| Metrics | `http://localhost:4318/v1/metrics` |
+
+Override each endpoint independently — you can send traces to one backend and metrics to another, or point all three at a single collector that fans out.
+
+## Turning the signals on
+
+ByteChef exposes **per-signal toggles**, so you can enable traces without paying for metric export. The shipped defaults:
+
+```yaml
+bytechef:
+  observability:
+    logging:
+      enabled: false
+      endpoint: http://localhost:4318/v1/logs
+    metrics:
+      enabled: false
+      endpoint: http://localhost:4318/v1/metrics
+    tracing:
+      enabled: false
+      endpoint: http://localhost:4318/v1/traces
+```
+
+As environment variables (Spring relaxed binding — uppercase, dots become underscores):
+
+```bash
+BYTECHEF_OBSERVABILITY_TRACING_ENABLED=true
+BYTECHEF_OBSERVABILITY_TRACING_ENDPOINT=http://otel-collector:4318/v1/traces
+
+BYTECHEF_OBSERVABILITY_LOGGING_ENABLED=true
+BYTECHEF_OBSERVABILITY_LOGGING_ENDPOINT=http://otel-collector:4318/v1/logs
+
+BYTECHEF_OBSERVABILITY_METRICS_ENABLED=true
+BYTECHEF_OBSERVABILITY_METRICS_ENDPOINT=http://otel-collector:4318/v1/metrics
+```
+
+<Callout type="warn">
+  There are three per-signal flags and **no** `bytechef.observability.enabled` master switch — and the
+  two ways of setting it fail differently. `bytechef` properties bind with `ignoreUnknownFields =
+  false`, so an unrecognised key **in a YAML or properties file fails the boot** with a binding error,
+  while the same key **supplied as an environment variable is silently ignored** — Spring exempts the
+  environment and system-properties sources from that check. Carrying `BYTECHEF_OBSERVABILITY_ENABLED`
+  forward from an older configuration therefore looks like a crash in one deployment and like
+  observability quietly never exporting in another, from the identical mistake.
+</Callout>
+
+## Sampling
+
+The shipped default is `management.tracing.sampling.probability: 1.0` — **every** request is traced. That's the right default for correctness and for low-to-moderate traffic. For high-throughput production, lower it (e.g. `0.1` for 10%) by overriding the property, or — preferably — do **tail-based sampling at the collector** so you keep all error and slow traces while dropping the boring ones.
+
+## What is measured
+
+Micrometer is configured to publish HTTP, JVM, Logback, process, and system meters, each tagged `application=${spring.application.name}`. Latency distributions are exported as histograms with the `0 / 0.5 / 0.75 / 0.95 / 0.99 / 1.0` percentiles precomputed, so you can build percentile-based latency SLOs without client-side estimation.
+
+That is enough for the three common SLO shapes without writing custom instrumentation: latency from
+the precomputed `http.server.requests` percentiles, availability from the same meter's outcome/status
+tags (client errors and server errors are distinguishable), and saturation from the JVM and
+connection-pool meters, which show pressure building before it becomes user-visible.
+
+## What you get end to end
+
+Beyond exporting the three signals, the platform wires them together so a single request stays
+traceable across every hop:
+
+- **Logs carry the trace they belong to**, so you can pivot from a log line to its trace, and back,
+  in Grafana or Datadog.
+- **Every HTTP response carries an `X-Trace-Id` header**, so a customer report or a browser network
+  tab is enough to find the trace — no log searching to correlate.
+- **A trace survives async boundaries.** Work handed to a background thread, the coordinator, or the
+  worker that finally runs the task stays on the trace the request started.
+- **JVM metrics follow OpenTelemetry naming**, so they line up with the rest of your telemetry rather
+  than needing per-name translation.
+
+## Actuator endpoints
+
+Observability also exposes the Spring Boot Actuator surface. Health probes are split into Kubernetes-friendly `liveness` and `readiness` groups. Note which endpoints are open:
+
+- `GET /actuator/health/liveness` — liveness probe. **Unauthenticated.**
+- `GET /actuator/health/readiness` — readiness probe. **Unauthenticated.**
+- `GET /actuator/health` — full details. **Unauthenticated**: the security chain permits `/actuator/health/**` for everyone, and `management.endpoint.health.showDetails` ships as `always`, so component-level detail (including database health) is returned to any caller.
+- `GET /actuator/info`, `/actuator/metrics`, `/actuator/metrics/**`, `/actuator/prometheus` — also **unauthenticated**, so the Prometheus scrape endpoint needs no credentials.
+- Everything else under `/actuator/**` — including `/actuator/env`, `/actuator/configprops`, `/actuator/loggers`, `/actuator/threaddump` and `/actuator/logfile` — requires the system administrator account (HTTP Basic; see [Monitoring](/platform/use-bytechef/self-hosted/management/monitoring)).
+
+<Callout type="warn">
+  The shipped configuration exposes a fixed list of web endpoints — `configprops`, `env`, `health`, `info`, `logfile`, `loggers`, `prometheus`, `threaddump`, `caches`, `liquibase` — and the health, info, metrics and prometheus ones are reachable without credentials. In production, put the whole management surface behind your ingress or network policy so only your platform team and probes can reach it.
+</Callout>
+
+## Quick start: local collector
+
+To see traces, logs, and metrics end-to-end on a laptop:
+
+1. Run an OpenTelemetry Collector exposing OTLP/HTTP on `4318` (the [contrib image](https://github.com/open-telemetry/opentelemetry-collector-releases) works), with exporters to Jaeger/Tempo (traces), Loki (logs), and Prometheus (metrics).
+2. Start ByteChef with the enable flags on and the endpoints pointed at the collector.
+3. Trigger a workflow. The trace shows the webhook → coordinator → worker → component span tree; the log lines for that execution carry the same `traceId`; the metrics appear within one `10s` step.
+
+## Where it all goes
+
+ByteChef doesn't care which backend you run — point the collector wherever you already operate:
+
+| Stack | Wiring |
+|---|---|
+| **Datadog** | OTLP to the Datadog Agent's OTLP receiver (traces + metrics + logs), or OTLP straight to Datadog's intake. |
+| **Splunk** | OTLP to the Splunk OpenTelemetry Collector, or OTLP straight to Splunk Observability Cloud's ingest. |
+| **Grafana stack** | Traces → Tempo, logs → Loki, metrics → Mimir/Prometheus, dashboards in Grafana. |
+| **Honeycomb** | OTLP traces and metrics to Honeycomb; logs to your log backend with trace-ID correlation. |
+| **AWS** | OTLP via the ADOT collector to CloudWatch / X-Ray. |
+
+You don't have to commit to one — the collector fans out to multiple backends.
+
+### Datadog and Splunk (direct OTLP)
+
+Because export is plain OTLP/HTTP, Datadog and Splunk need no ByteChef-specific integration — you point the same per-signal endpoints at their OTLP receivers.
+
+{/* Commented out until the AI Gateway ships; tracked in .agents/coming-soon-inventory.md.
+The AI Gateway's request telemetry rides the same pipeline: its `ai_gateway.*` Micrometer meters (trace count,
+latency timer, budget/rate-limit rejections) and the spans it emits flow to whichever backend you configure, so
+gateway spend, latency, and routing show up alongside the rest of your platform metrics _(the AI Gateway
+itself is coming soon — not yet available in the latest released version)_. */}
+
+**Datadog** — run the Datadog Agent with its OTLP receiver enabled (`otlp_config.receiver.protocols.http.endpoint: 0.0.0.0:4318`) and point ByteChef at it (the Agent attaches your API key, so no key handling in ByteChef):
+
+```bash
+BYTECHEF_OBSERVABILITY_TRACING_ENABLED=true
+BYTECHEF_OBSERVABILITY_TRACING_ENDPOINT=http://datadog-agent:4318/v1/traces
+BYTECHEF_OBSERVABILITY_METRICS_ENABLED=true
+BYTECHEF_OBSERVABILITY_METRICS_ENDPOINT=http://datadog-agent:4318/v1/metrics
+BYTECHEF_OBSERVABILITY_LOGGING_ENABLED=true
+BYTECHEF_OBSERVABILITY_LOGGING_ENDPOINT=http://datadog-agent:4318/v1/logs
+```
+
+**Splunk** — send to a Splunk OpenTelemetry Collector, or directly to Splunk Observability Cloud's ingest for your realm (`https://ingest.<realm>.signalfx.com/v2/...`) with the access token supplied by the collector or a gateway in front of ByteChef:
+
+```bash
+BYTECHEF_OBSERVABILITY_TRACING_ENABLED=true
+BYTECHEF_OBSERVABILITY_TRACING_ENDPOINT=http://splunk-otel-collector:4318/v1/traces
+BYTECHEF_OBSERVABILITY_METRICS_ENABLED=true
+BYTECHEF_OBSERVABILITY_METRICS_ENDPOINT=http://splunk-otel-collector:4318/v1/metrics
+BYTECHEF_OBSERVABILITY_LOGGING_ENABLED=true
+BYTECHEF_OBSERVABILITY_LOGGING_ENDPOINT=http://splunk-otel-collector:4318/v1/logs
+```
+
+<Callout type="info">
+  Running the vendor's collector/agent in front of ByteChef is the recommended shape: it owns the API-key/token and any batching or tail-sampling, keeping credentials out of ByteChef's config. ByteChef only ever speaks OTLP/HTTP to a local endpoint.
+</Callout>
+
+## See also
+
+- [Monitoring](/platform/use-bytechef/self-hosted/management/monitoring) — health probes and the administrator credentials that guard the management surface.
+- [Message brokers](/platform/use-bytechef/self-hosted/configuration/message-brokers) — the broker whose queue depth and consumer lag you will want to alert on.
+- [Environment variables](/platform/use-bytechef/self-hosted/configuration/environment-variables#observability-configuration) — the observability variables and their defaults.

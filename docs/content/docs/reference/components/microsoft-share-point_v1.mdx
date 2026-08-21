@@ -259,7 +259,7 @@ Name: createListItem
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | siteId | Site ID | STRING | The ID of the SharePoint site. | true |
 | listId | List ID | STRING <details> <summary> Depends On </summary> siteId </details> |  | true |
-| columns | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> siteId, listId </details> |  | null |
+| columns | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> siteId, listId </details> |  | false |
 
 #### Example JSON Structure
 ```json
@@ -851,7 +851,7 @@ Only way of finding Site ID in Microsoft SharePoint is using Microsoft Graph API
 3. Then use this Microsoft Graph API endpoint; `GET https://graph.microsoft.com/v1.0/sites/company.sharepoint.com:/sites/Finance`
 4. You will get your folder ID.
 
-### How to find your Folder of File ID
+### How to find your Folder or File ID
 
 Only way of finding Folder or File ID in Microsoft SharePoint is using Microsoft Graph API endpoint: `GET https://graph.microsoft.com/v1.0/sites/{site-id}/drives`.
 

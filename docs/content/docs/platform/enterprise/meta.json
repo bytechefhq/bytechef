@@ -1,0 +1,7 @@
+{
+  "$schema": "../../../../.source/json-schema/docs.meta.json",
+  "title": "Enterprise",
+  "description": "Enterprise Edition capabilities and where each is documented",
+  "icon": "Building",
+  "pages": ["index"]
+}

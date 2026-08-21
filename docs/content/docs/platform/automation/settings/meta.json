@@ -1,0 +1,10 @@
+{
+  "$schema": "../../../../../.source/json-schema/docs.meta.json",
+  "title": "Settings",
+  "description": "Automation settings",
+  "pages": [
+    "users",
+    "git-configuration",
+    "api-keys"
+  ]
+}

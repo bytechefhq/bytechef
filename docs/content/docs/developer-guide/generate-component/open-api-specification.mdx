@@ -17,3 +17,17 @@ title: "OpenAPI Specification"
       ./bytechef.sh component init --open-api-path ../../server/libs/modules/components/newcomponent/openapi.yaml --output-path ../../server/libs/modules/components --name newcomponent --version 1
       ```
     - This command initializes the component based on the OpenAPI specification, placing the generated files in the specified output path.
+    - `bytechef.sh` is a thin wrapper around `./gradlew -p cli/cli-app run`. Its working directory is `cli/cli-app`, which is why the paths above are relative to it, and it appends `--internal-component true` so the generated module is laid out as a component that ships with the platform.
+
+`component init` accepts:
+
+| Option | Meaning |
+|---|---|
+| `--name`, `-n` | Component name (required). Lower-cased before use. |
+| `--output-path`, `-o` | Directory the generated module is written to (required). |
+| `--open-api-path` | Path or URL of the OpenAPI specification. Without it the command does nothing. |
+| `--version`, `-v` | Component version. Defaults to `1`. |
+| `--base-package-name` | Package for the generated classes. Defaults to `com.bytechef.component`. |
+| `--internal-component` | Whether the component ships with the platform. Defaults to `false`; `bytechef.sh` passes `true`. |
+
+If you would rather run the CLI as a standalone binary — for a component you keep outside this repository — build it once with `./gradlew :cli:cli-app:installDist` and call `cli/cli-app/build/install/bytechef/bin/bytechef`. The binary runs from your current working directory, so paths behave as you expect, and it does **not** pass `--internal-component`.

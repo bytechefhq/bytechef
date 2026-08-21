@@ -1,0 +1,83 @@
+---
+title: Self-Hosted
+description: Deploy and operate ByteChef on your own infrastructure.
+---
+
+import {Card, Cards} from "fumadocs-ui/components/card";
+import {Activity, Container, Layers, Settings} from "lucide-react";
+
+Run ByteChef on your own infrastructure — Docker, Kubernetes, AWS, Azure, Google Cloud, or
+DigitalOcean — with full control over data, networking, and customization.
+
+<Cards>
+  <Card icon={<Container className="text-blue-300" />} title="Installation" href="/platform/use-bytechef/self-hosted/installation/local-docker">
+    Pick a deployment target and get an instance running.
+  </Card>
+
+  <Card icon={<Settings className="text-purple-300" />} title="Configuration" href="/platform/use-bytechef/self-hosted/configuration">
+    Configuration, environment variables.
+  </Card>
+
+    <Card icon={<Settings className="text-purple-300" />} title="Management" href="/platform/use-bytechef/self-hosted/management/monitoring">
+      Upgrades, and backups.
+    </Card>
+
+  <Card icon={<Layers className="text-amber-300" />} title="Architecture" href="/platform/use-bytechef/self-hosted/architecture">
+    Understand the layered architecture you're deploying.
+  </Card>
+</Cards>
+
+## Deployment models
+
+The same artifact runs in two shapes. Pick by workload, not by company size.
+
+### The server
+
+One process carrying the workflow engine, every domain service, and the HTTP API. PostgreSQL is the
+only hard dependency; Redis is optional. This is the fastest path to a working environment and what
+almost every deployment should run. Start at
+[Local Docker](/platform/use-bytechef/self-hosted/installation/local-docker).
+
+To handle more load, run several instances against the same database. A handful of settings have to
+be aligned first — a shared encryption key, a shared message broker and cache, a fixed remember-me
+key, and migrations owned by one instance — see
+[Running multiple instances](/platform/use-bytechef/self-hosted/configuration#running-multiple-instances).
+
+### Single-shot
+
+The [runtime job runner](/platform/use-bytechef/self-hosted/runtime-job) boots, executes exactly one
+workflow, and exits with the workflow's status. No database, no broker, no triggers — for batch runs
+whose schedule already lives in Airflow, a CI pipeline, or a Kubernetes `CronJob`. Enterprise Edition.
+
+## Supported substrates
+
+| Substrate | Recommended for | Notes |
+|---|---|---|
+| [Docker / Docker Compose](/platform/use-bytechef/self-hosted/installation/local-docker) | Dev, demo, and small production | A reference `docker-compose.yml` is shipped with the platform, pulling `docker.bytechef.io/bytechef/bytechef`. |
+| [Kubernetes](/platform/use-bytechef/self-hosted/installation/kubernetes) | Production deployments of any size | A Helm chart for the monolith lives at `kubernetes/helm/bytechef`. |
+| [AWS](/platform/use-bytechef/self-hosted/installation/aws-ec2) | Cloud-native deployments on AWS | EC2 or ECS; SQS as the message broker, S3 for file storage, and EventBridge Scheduler as the scheduler backend are all supported. |
+| [Google Cloud](/platform/use-bytechef/self-hosted/installation/google-cloud) | Cloud-native deployments on GCP | Postgres on Cloud SQL. |
+| [Azure](/platform/use-bytechef/self-hosted/installation/azure) | Cloud-native deployments on Azure | Postgres on Azure Database for PostgreSQL. |
+| [DigitalOcean](/platform/use-bytechef/self-hosted/installation/digitalocean) | Small to mid-size deployments | Reference deployment available. |
+
+The Helm chart templates the deployment, service, ingress, ConfigMap, Secret, service account, and an
+HPA. Note that it ships `replicaCount: 1` and sets no broker or cache variables, so the default values
+run the in-memory broker. Raising `replicaCount` (or enabling the HPA) on its own gives you replicas
+that cannot hand each other work — add the shared-instance settings under `env.normal` first, per
+[Running multiple instances](/platform/use-bytechef/self-hosted/configuration#running-multiple-instances).
+
+## Your perimeter, your secrets
+
+- **Credentials never leave your network.** Connection credentials are encrypted at rest in your own
+  database with a key you supply — see
+  [Encryption of stored credentials](/platform/use-bytechef/self-hosted/configuration#encryption-of-stored-credentials).
+- **Telemetry is opt-in and points at your stack.** OpenTelemetry export ships **disabled**; every
+  signal stays off until you set an endpoint and flip the flag
+  ([Observability](/platform/use-bytechef/self-hosted/management/observability)). Product
+  analytics are the exception: `bytechef.analytics.enabled` is `false` in the base configuration, but
+  the `prod` profile the published container image runs sets it to `true`, so set
+  `BYTECHEF_ANALYTICS_ENABLED=false` explicitly if you do not want it.
+- **AI traffic is routable.** You choose which providers receive prompts and where their keys live.
+- **Nothing is settings-screen-only.** Every instance-wide option is externalized configuration, so
+  the same image behaves differently per environment based on what you pass in
+  ([Configuration](/platform/use-bytechef/self-hosted/configuration)).

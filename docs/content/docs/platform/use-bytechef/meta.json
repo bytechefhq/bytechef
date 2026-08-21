@@ -1,0 +1,10 @@
+{
+  "$schema": "../../../../.source/json-schema/docs.meta.json",
+  "title": "Use ByteChef",
+  "description": "Deploy ByteChef on your own infrastructure",
+  "icon": "Server",
+  "pages": [
+    "cloud",
+    "self-hosted"
+  ]
+}

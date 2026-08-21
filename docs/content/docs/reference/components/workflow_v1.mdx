@@ -87,5 +87,42 @@ The output for this action is dynamic and may vary depending on the input parame
 
 
 
+### New Workflow Error
+Name: newWorkflowError
+
+`Triggers when a workflow run fails. Set this workflow as the error workflow of a project or of a single workflow to receive its failures.`
+
+Type: STATIC_WEBHOOK
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| execution | OBJECT <details> <summary> Properties </summary> &#123;STRING\(jobId), STRING\(url), &#123;STRING\(message), STRING\(stackTrace)&#125;\(error), STRING\(lastTaskExecuted), INTEGER\(autoRecoveryAttempts)&#125; </details> |  |
+| workflow | OBJECT <details> <summary> Properties </summary> &#123;STRING\(projectId), STRING\(projectWorkflowId), STRING\(workflowId), STRING\(label)&#125; </details> |  |
+| environment | STRING |  |
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "New Workflow Error",
+  "name" : "newWorkflowError",
+  "type" : "workflow/v1/newWorkflowError"
+}
+```
+
+
+
 
 

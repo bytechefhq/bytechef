@@ -1,0 +1,99 @@
+---
+title: Introduction
+description: Build an embedded iPaaS into your product with ByteChef Embedded.
+---
+
+import {Card, Cards} from "fumadocs-ui/components/card";
+import {Link2, Package, PanelsTopLeft, Rocket} from "lucide-react";
+
+<EEBadge />
+
+ByteChef **Embedded** lets you offer native third-party integrations inside your own SaaS product. Your users authenticate with the services they already use (Gmail, Slack, HubSpot, AWS S3, and 200+ more), and your application triggers workflows on their behalf — all without your team having to build and maintain those integrations yourself.
+
+<Callout title="Enterprise Edition only">
+    Embedded requires an Enterprise Edition deployment (`bytechef.edition=ee`). The open-source (CE) build doesn't expose the `/embedded` UI or APIs.
+</Callout>
+
+---
+
+## Get started
+
+Three short pages take you from zero to a working connect flow — or follow the single-page [Quick Start](/platform/embedded/get-started/quick-start) that covers the same ground end-to-end:
+
+<Cards>
+  <Card icon={<Package className="text-purple-300" />} title="Installing the SDK" href="/platform/embedded/get-started/initial-setup/installing-the-sdk">
+    Install `@bytechef/embedded` and authenticate your end users with signed JWTs.
+  </Card>
+  <Card icon={<Link2 className="text-blue-300" />} title="Adding an Integration" href="/platform/embedded/get-started/initial-setup/adding-an-integration">
+    Choose a component, register a developer app, and publish the integration.
+  </Card>
+  <Card icon={<PanelsTopLeft className="text-green-300" />} title="Displaying the Connect Dialog" href="/platform/embedded/get-started/initial-setup/displaying-the-connect-dialog">
+    Open the hosted dialog so users can authorize integrations from your app.
+  </Card>
+  <Card icon={<Rocket />} title="Sample App" href="/platform/embedded/get-started/quick-start/sample-app">
+    A runnable Next.js + Fastify reference implementation of the whole flow.
+  </Card>
+</Cards>
+
+---
+
+## What you get
+
+| Capability | What it means for your product |
+|---|---|
+| **200+ pre-built integrations** | Drop-in connectors for the SaaS apps your users already work with. |
+| **Embeddable React SDK** | `useConnectDialog` renders a branded connect-and-authorize flow, and `EmbeddedWorkflowBuilder` embeds the full workflow editor — both inside your app. |
+| **Per-user connection store** | Each of your end users gets their own credentials, isolated by environment (Development / Staging / Production). |
+| **App Events** | Define events in your product (e.g. `user.signed_up`, `order.placed`) and let your customers attach workflows to them. |
+| **Permission expressions** | Scope integrations and individual workflows to a subset of your connected users with a SpEL expression. |
+| **AI workflow generation** *(coming soon)* | Generate a starter workflow for a user from a natural-language prompt via the embedded Copilot API. |
+| **Workflow execution history** | Every run, step by step, in the ByteChef admin UI — read-only, and served by the internal API rather than the public one. |
+| **MCP Servers** *(coming soon)* | Expose components as Model Context Protocol tool servers for AI agents (in your product or your customer's). |
+
+### Going deeper
+
+- [White-label execution](/platform/embedded/get-started/white-label-execution) — the workflow engine running inside your product, branded as yours.
+- [Tenant-isolated security](/platform/embedded/get-started/tenant-isolated-security) — the multi-tenant defaults each connected user's data sits behind.
+- [Permission expressions](/platform/embedded/build/permission-expressions) — gate which integrations and workflows each connected user sees.
+- [Embedded Configuration APIs](/openapi/embedded-configuration-integration) — programmatic CRUD for integrations, workflows, and connections, designed for product surfaces.
+- [MCP servers](/platform/embedded/configure/mcp-servers) *(coming soon)* — surface each tenant's workflows as MCP tools for their agents.
+
+---
+
+## How the pieces fit together
+
+```
+Your product (web app, mobile, backend)
+        │
+        │ 1. Backend signs a short-lived JWT using a Signing Key
+        │ 2. Frontend passes JWT to @bytechef/embedded
+        │
+        ▼
+   ByteChef Embedded
+   ├── Integrations         — templates you build for your customers
+   ├── Configurations       — published integration versions per environment
+   ├── Connected Users      — your end users (identified by externalUserId)
+   ├── Connections          — per-user credentials for each integration
+   ├── App Events           — events your product fires to trigger workflows
+   ├── Automations          — workflows running for each connected user (feature-flagged)
+   ├── Executions           — history of every workflow run
+   └── MCP Servers          — components exposed as MCP tools (coming soon)
+```
+
+The mental model is bidirectional:
+
+- **Your product → ByteChef:** authenticate end users (JWT signed with a Signing Key), fire App Events that trigger workflows, optionally call internal APIs server-to-server with an API Key.
+- **ByteChef → third-party services:** runs your published workflows using each connected user's credentials.
+
+---
+
+## When to use Embedded vs. Automation
+
+ByteChef ships two modes:
+
+| Mode | Use it when |
+|---|---|
+| **Automation** | You're running workflows for yourself or your internal team. You own the connections and the workflows. |
+| **Embedded** | You're shipping integrations *to your customers* inside your product. Each customer has their own connections, and you ship integration templates that they configure and activate. |
+
+If you're not sure, you probably want **Automation**.

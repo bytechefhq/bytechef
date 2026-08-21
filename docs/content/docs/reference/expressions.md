@@ -111,7 +111,6 @@ Most of the literals are similar to JSON ones, in fact in many cases JSON struct
 | `{1,2,3,4}` | a list of integers from 1 to 4 | `List[Integer]` |
 | `{:}` | an empty object | `Map{}` |
 | `{john:300, alex:400}` | an object (name-value collection) | `Map{alex: Integer(400), john: Integer(300)}` |
-| `#input` | variable | - |
 | `'AA' + 'BB'` | `"AABB"` | `String` |
 
 ## Arithmetic Operators
@@ -121,7 +120,7 @@ The `+`, `-`, `*` arithmetic operators work as expected.
 | Operator | Equivalent symbolic operator | Example expression | Result |
 |----------|-----------------------------|-------------------|--------|
 | `div` | `/` | `7 div 2` | `3` |
-| `div` | `/` | `7.0 div 2` | `2.3333333333` |
+| `div` | `/` | `7.0 div 2` | `3.5` |
 | `mod` | `%` | `23 mod 7` | `2` |
 
 ## Conditional Operators
@@ -175,6 +174,10 @@ substring('someValue', 4)
 
 ByteChef provides built-in functions to help with various type operations.
 
+Built-in functions are only resolved in **formula** expressions — the ones that start with `=`. A plain
+`${...}` text expression accepts a value accessor and nothing else, so `substring(...)` inside `${}` is
+left unresolved. Write `=substring(${step_1.text}, 4)` instead.
+
 ## Accessing Elements of a List or a Map
 
 | Expression | Result | Type |
@@ -185,12 +188,15 @@ ByteChef provides built-in functions to help with various type operations.
 | `{jan:{age:24}, alex:{age: 30}}['alex']['age']` | `30` | `Integer` |
 | `{foo: 1L, bar: 2L, tar: 3L}.?[#this.key == "foo" OR #this.value > 2L]` | `{'tar': 3, 'foo': 1}` | `Map[String, Long]` |
 
-Attempting to access non-present elements will cause exceptions. For lists, they are thrown at runtime, and for maps, they occur before deployment during expression validation.
+Attempting to access non-present elements fails. Both cases are detected when the expression is
+evaluated, not before — there is no pre-deployment expression validation that resolves map keys.
+When evaluation fails, ByteChef leaves the expression unresolved and passes the raw text through
+rather than aborting the step, so an unexpected literal in a step's input is the symptom to look for.
 
 | Expression | Error |
 |------------|------------------------------------------------|
-| `{1,2,3,4}[4]` | Runtime error: Index out of bounds |
-| `{jan:300, alex:400}['anna']` | Compilation error: No property 'anna' in map |
+| `{1,2,3,4}[4]` | Index out of bounds |
+| `{jan:300, alex:400}['anna']` | No property 'anna' in map |
 
 ## Filtering Lists
 
@@ -203,9 +209,9 @@ Special variable `#this` is used to operate on a single element of a list.
 | Expression | Result | Type |
 |------------|--------|------|
 | `{1,2,3,4}.?[#this ge 3]` | `{3, 4}` | `List[Integer]` |
-| `usersList.?[#this.firstName == 'john']` | `{'john doe'}` | `List[String]` |
-| `{1,2,3,4}.^[#this ge 3]` | `{3}` | `Integer` |
-| `{1,2,3,4}.$[#this ge 3]` | `{4}` | `Integer` |
+| `usersList.?[#this.firstName == 'john']` | the matching user objects | `List[Map]` |
+| `{1,2,3,4}.^[#this ge 3]` | `3` | `Integer` |
+| `{1,2,3,4}.$[#this ge 3]` | `4` | `Integer` |
 
 ## Transforming Lists
 
@@ -234,7 +240,7 @@ Note: `toMap()` function can be applied to lists of maps where each map contains
 
 When accessing nested structures, handle null fields to avoid errors. SpEL's safe navigation operator (`?.`) is a shorthand for the conditional operator: `someVar?.b` is equivalent to `someVar != null ? someVar.b : null`.
 
-| Expression | #var value | Result | Type |
+| Expression | `var` value | Result | Type |
 |------------|------------|--------|------|
 | `var.foo` | `{foo: 5}` | `5` | `Integer` |
 | `var.foo` | `null` | `java.lang.NullPointerException` | `java.lang.NullPointerException` |
@@ -256,7 +262,7 @@ Instead, use the equivalent built-in functions provided by ByteChef.
 
 | Expression | Result | Type |
 |------------|--------|------|
-| `{1, 2, 3, 4}.?[#this > 1].![#this > 2 ? #this * 2 : #this]` | `{2, 6, 8}` | `List[Double]` |
+| `{1, 2, 3, 4}.?[#this > 1].![#this > 2 ? #this * 2 : #this]` | `{2, 6, 8}` | `List[Integer]` |
 
 ## Type Conversions
 
@@ -316,13 +322,14 @@ Implicit conversion occurs when an input value of one type is used in a context 
 |---|---|
 | concat(str1, str2) | Concatenates two strings or two lists. |
 | contains(str, substr) | Checks if a string contains a substring. |
+| equalsIgnoreCase(str1, str2) | Compares two strings for equality, ignoring case differences. |
 | format(formatStr, args...) | Formats a string using a format string and arguments (similar to String.format). |
-| indexOf(str, substr) | Returns the index of the first occurrence of a substring in a string. |
-| join(list, delimiter) | Joins a list of strings with a delimiter. |
-| lastIndexOf(str, substr) | Returns the index of the last occurrence of a substring in a string. |
+| indexOf(str, substr, [fromIndex]) | Returns the index of the first occurrence of a substring in a string, optionally starting at `fromIndex`. |
+| join(separator, list) | Joins the values of a list into one string, separated by `separator`. Note the separator comes first: `=join(',', ${list})`. |
+| lastIndexOf(str, substr, [fromIndex]) | Returns the index of the last occurrence of a substring in a string. |
 | length(str) | Returns the length of a string. |
-| split(str, delimiter) | Splits a string by a delimiter and returns a list of strings. |
-| substring(str, start, end) | Returns a substring from start index to end index. |
+| split(str, delimiter) | Splits a string by a delimiter, which is treated as a regular expression, and returns a list of strings. |
+| substring(str, beginIndex, [endIndex]) | Returns a substring starting at `beginIndex` (inclusive). Without `endIndex` it runs to the end of the string; with it, `endIndex` is exclusive. |
 
 ### Date and Time Functions
 
@@ -339,7 +346,7 @@ Implicit conversion occurs when an input value of one type is used in a context 
 | minusSeconds(date, seconds) | Subtracts the specified number of seconds from a date. |
 | minusWeeks(date, weeks) | Subtracts the specified number of weeks from a date. |
 | minusYears(date, years) | Subtracts the specified number of years from a date. |
-| now() | Returns the current date and time. |
+| now() | Returns the current instant, in UTC. |
 | parseDate(dateStr, [format]) | Parses a string into a date. If no format is provided, uses ISO format. |
 | parseDateTime(dateTimeStr, [format]) | Parses a string into a date-time. If no format is provided, uses ISO format. |
 | plusDays(date, days) | Adds the specified number of days to a date. |
@@ -351,7 +358,7 @@ Implicit conversion occurs when an input value of one type is used in a context 
 | plusSeconds(date, seconds) | Adds the specified number of seconds to a date. |
 | plusWeeks(date, weeks) | Adds the specified number of weeks to a date. |
 | plusYears(date, years) | Adds the specified number of years to a date. |
-| timestamp() | Returns the current timestamp in milliseconds. |
+| timestamp() | Returns the current time as a Unix timestamp in milliseconds. |
 
 ### List Functions
 
@@ -361,12 +368,12 @@ Implicit conversion occurs when an input value of one type is used in a context 
 | addAll(list1, list2) | Adds all elements from list2 to list1 and returns a new list. |
 | concat(list1, list2) | Concatenates two lists. |
 | contains(list, element) | Returns true if list contains the specified element. |
-| flatten(list) | Flattens a nested list into a single list. |
+| flatten(list) | Flattens a list of lists into a single list. |
 | range(start, end) | Creates a list of integers from start to end (inclusive). |
 | remove(list, element) | Removes an element from a list and returns the modified list. |
 | set(list, index, element) | Sets an element at a specific index in a list and returns the modified list. |
 | size(list) | Returns the size of a list. If list is null returns -1. |
-| sort(list) | Sorts a list in ascending order. |
+| sort(list) | Sorts a collection in natural order and returns a new list. |
 
 ### Map Functions
 
@@ -375,11 +382,11 @@ Implicit conversion occurs when an input value of one type is used in a context 
 | put(map, key, value) | Adds a key-value pair to a map and returns a new map. |
 | putAll(map1, map2) | Adds all key-value pairs from map2 to map1 and returns a new map. |
 | remove(map, key) | Removes a key-value pair from a map and returns the modified map. |
-| size(map) | Returns the size of a map. |
 | toMap(list) | Converts a list of maps with "key" and "value" entries to a single map. |
 
-### System Functions
+### Utility Functions
 
 | Function | Description |
 |---|---|
-| uuid() | Generates a random UUID. |
+| config(propertyName) | Reads a server configuration property by name. It is gated by an allowlist of property-name prefixes (`bytechef.workflow.config.allowed-prefixes`) that is empty by default, so on a stock deployment every call fails and the function reads nothing. |
+| uuid() | Generates a random UUID (version 4). |

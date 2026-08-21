@@ -1,0 +1,85 @@
+---
+title: Components
+description: The built-in component library — what a component is, how actions and triggers work, and where to find the full reference.
+---
+
+A **component** is ByteChef's unit of integration: a bundle of *actions*, *triggers*, and a *connection*
+definition wrapping a single external system or capability. When you add a step to a workflow you are
+picking one component's action; when you start a workflow from an outside event you are picking one
+component's trigger.
+
+| Part | What it is |
+|---|---|
+| **Action** | An operation the workflow performs — create a record, send a message, read a file. Takes typed input properties, returns a typed output the next steps can read. |
+| **Trigger** | An event that starts a workflow — a webhook arriving, a schedule firing, a polled resource changing. |
+| **Connection** | How the component authenticates. Configured once per credential and reused by every step that talks to that system. |
+
+Components are what the [workflow editor](/platform/automation/build/workflows/workflows) offers in its
+step picker, and the same set is available to [AI agents](/platform/automation/build/workflows/ai/agent) as
+tools.
+
+---
+
+## Finding a component
+
+The full, always-current catalog is generated from the components themselves and published under
+**[Component Reference](/reference/components)** — every action, every trigger, every connection
+property, per component. More than 250 components ship in the current release.
+
+A rough map of what the catalog covers:
+
+| Category | Examples |
+|---|---|
+| **CRM & sales** | Salesforce, HubSpot, Pipedrive, Apollo, ZoomInfo, Active Campaign, Freshsales |
+| **Project management** | Jira, Asana, Linear, Notion, ClickUp, Monday, Trello |
+| **Communication** | Slack, Microsoft Teams, Discord, Telegram, Twilio, Zoom |
+| **Email** | Google Mail, Microsoft Outlook 365, Brevo, Mailchimp, SendGrid, Resend |
+| **E-commerce** | Shopify, Stripe, WooCommerce, QuickBooks, Xero |
+| **Cloud storage** | Google Drive, Dropbox, Box, Microsoft OneDrive, AWS S3 |
+| **Productivity** | Google Docs, Google Sheets, Microsoft Excel, Airtable, Notion |
+| **Developer tools** | GitHub, GitLab, Bitbucket, PagerDuty, Jenkins |
+| **AI / ML** | OpenAI, Anthropic, Mistral, Gemini, Ollama, Perplexity |
+| **Vector stores & memory** | Pinecone, Qdrant, Weaviate, Milvus, pgVector, chat-memory elements |
+| **Databases** | MySQL, PostgreSQL, MongoDB, Supabase, Snowflake, Google BigQuery |
+| **Helpers** | HTTP Client, GraphQL Client, JSON Helper, XML Helper, Date Helper, Math Helper, JWT Helper, Logger |
+| **Files** | CSV, JSON, XML, XLSX, ODS, PDF Helper, File Storage, FTP |
+| **Web** | Firecrawl, ZenRows, Browser Use, Brave, Tavily |
+
+[Flow controls](/platform/automation/build/workflows/flow-controls) — Condition, Branch, Loop, Loop
+Break, Each, Map, Parallel, Fork/Join, Subflow, On-Error, Terminate, Wait for Approval — are not
+components. They are task dispatchers with their own
+[reference section](/reference/flow-controls).
+
+---
+
+## Versions
+
+Every component carries a version, written into the workflow as part of the step's type
+(`slack/v1/sendMessage`). The whole catalog is on `v1` today. Because the version is recorded per
+step, a future version of a component can be introduced without disturbing workflows already built
+against the current one — they keep running the version they were authored with until you change the
+step.
+
+---
+
+## When the catalog doesn't cover your need
+
+In rough order of effort:
+
+1. **A Script step** — a few lines of JavaScript, Python, or Ruby inside the workflow, for logic that
+   exists in one place only. See [Scripting languages](/platform/automation/build/workflows/code-workflows#scripting-languages).
+2. **The HTTP Client component** — a typed HTTP request against any REST API, without writing or
+   building anything.
+3. **An [API connector](/platform/settings/components/api-connectors)** — point at an OpenAPI
+   specification and get a component with one action per endpoint, no code.
+4. **A [custom component](/platform/settings/components/custom-components)** — hand-written, with its
+   own actions, triggers, and connection definition, when none of the above fit.
+
+---
+
+## Source-available
+
+The components under `server/libs/modules/components/` in the ByteChef repository are Apache 2.0
+licensed, so an integration you depend on can be read, patched, or forked rather than waited on. Each
+component ships a `README` alongside its source, and the reference section above is regenerated from
+those READMEs on every build.

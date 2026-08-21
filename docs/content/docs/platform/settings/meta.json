@@ -1,0 +1,19 @@
+{
+  "$schema": "../../../../.source/json-schema/docs.meta.json",
+  "title": "Settings",
+  "description": "The platform administration",
+  "icon": "Server",
+  "pages": [
+    "workspaces",
+    "users",
+    "identity-providers",
+    "connections",
+    "ai-providers",
+    "mcp-server",
+    "components",
+    "admin-api-keys",
+    "audit-events",
+    "notifications",
+    "license"
+  ]
+}

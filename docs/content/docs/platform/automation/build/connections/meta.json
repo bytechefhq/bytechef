@@ -1,0 +1,9 @@
+{
+  "$schema": "../../../../../../.source/json-schema/docs.meta.json",
+  "title": "Connections",
+  "description": "Connect and manage third-party application connections",
+  "pages": [
+    "authentication",
+    "troubleshooting"
+  ]
+}

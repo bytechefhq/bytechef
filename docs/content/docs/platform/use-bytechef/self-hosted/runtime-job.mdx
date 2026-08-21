@@ -1,0 +1,315 @@
+---
+title: Runtime Job Runner
+description: A single-shot binary that boots, runs exactly one workflow, and exits with the workflow's status — no database, no broker, no long-running server.
+ee: true
+---
+
+Most of ByteChef runs as long-lived services. The Runtime Job app (`runtime-job-app`) is the
+opposite: an on-demand, single-shot binary that boots, executes exactly one workflow to completion,
+and shuts down with an exit code that reflects the outcome. On Kubernetes it maps one-to-one onto a
+`Job` — the pod is created, the workflow runs, the pod terminates.
+
+Reach for it for batch processing, for runs whose schedule already lives in another system
+(Kubernetes `CronJob`, Airflow, a CI pipeline), and for embedding workflow execution into products
+that own their own orchestration.
+
+<Callout type="info">
+  The Runtime Job app is an **Enterprise Edition** component; it lives at
+  `server/ee/apps/runtime-job-app`.
+</Callout>
+
+## No database, no broker, no state
+
+The app carries the full Atlas workflow engine — coordinator, worker, and the task dispatchers —
+inside a single process, but replaces every piece of shared infrastructure with an in-process
+equivalent:
+
+| Platform concern | Long-lived services | Runtime Job app |
+|---|---|---|
+| Execution state | PostgreSQL | In-memory repositories, discarded on exit |
+| Message broker | Redis / Kafka / SQS / RabbitMQ | In-process `memory` broker |
+| Cache | Redis or Caffeine | Caffeine |
+| Connections | Encrypted credential store in the database | Passed as JSON at launch, held in memory only |
+| Triggers | Scheduler service, webhook ingress | None — the workflow starts when the process starts |
+
+There is nothing to provision and nothing to clean up. Everything the run needs arrives through the
+process arguments and environment variables; everything the run produced ends up wherever the
+workflow itself sent it.
+
+<Callout type="warn">
+  Because execution state is in memory, run history is not persisted anywhere. The container logs and
+  the exit code are the record.
+</Callout>
+
+## Exit codes
+
+The process exit code is the workflow outcome. A `JobStatusApplicationEvent` listener shuts the
+Spring context down as soon as the job reaches a terminal status:
+
+| Exit code | Meaning |
+|---|---|
+| `0` | The job completed. |
+| non-zero | The job failed, or the app could not start — missing `--workflow`, unparseable `--parameters` / `--connections` JSON, or a workflow the configured sources cannot resolve. |
+
+This is what makes the app composable with external orchestrators: a Kubernetes `Job` with
+`restartPolicy: Never` retries per its `backoffLimit`, Airflow marks the task failed, a CI step goes
+red — all driven by the exit code alone.
+
+## Command-line arguments
+
+| Argument | Required | Description |
+|---|---|---|
+| `--workflow=<file>` | Yes | The workflow file. Only the base name without its extension is used to look the workflow up, so `--workflow=/workflows/daily-sync.json` and `--workflow=daily-sync.json` resolve identically. The file itself must be discoverable through one of the configured [workflow sources](#workflow-sources). |
+| `--parameters=<json>` | No | JSON object of the workflow's input values, e.g. `'{"batchDate": "2026-07-09"}'`. |
+| `--connections=<json>` | No | JSON object mapping connection names to their parameters — see [Connections](#connections). |
+
+```bash
+java -jar runtime-job-app.jar \
+  --workflow=daily-sync.json \
+  --parameters='{"batchDate": "2026-07-09"}' \
+  --connections='{"openAi": {"token": "sk-..."}}'
+```
+
+## Usage
+
+### Plain JAR
+
+```bash
+# Build
+./gradlew :server:ee:apps:runtime-job-app:build
+
+# Run
+java -jar server/ee/apps/runtime-job-app/build/libs/runtime-job-app-*.jar \
+  --workflow=workflow.json \
+  --parameters='{"message": "Processing batch job"}' \
+  --connections='{"openAi": {"token": "sk-your-openai-token"}}'
+```
+
+### Gradle (development)
+
+```bash
+./gradlew :server:ee:apps:runtime-job-app:bootRun \
+  --args='--workflow=workflow.json --connections={"openAi":{"token":"test-token"}}'
+```
+
+### Docker
+
+There is **no published image** for the Runtime Job app — build it yourself from the Dockerfile
+shipped with the app and, for Kubernetes, push it to your own registry.
+
+```bash
+# Build the application and the image
+./gradlew :server:ee:apps:runtime-job-app:build
+docker build -t bytechef-runtime-job server/ee/apps/runtime-job-app/
+
+# Run a workflow, mounting the workflows directory
+docker run --rm \
+  -v $(pwd)/workflows:/workflows \
+  -e BYTECHEF_WORKFLOW_REPOSITORY_FILESYSTEM_LOCATION_PATTERN='/workflows/*.json' \
+  bytechef-runtime-job \
+  --workflow=daily-sync.json \
+  --connections='{"openAi": {"token": "sk-..."}}'
+
+echo $?   # 0 on success, non-zero on failure
+
+# For Kubernetes: tag and push to your own registry
+docker tag bytechef-runtime-job your-registry.example.com/bytechef-runtime-job:latest
+docker push your-registry.example.com/bytechef-runtime-job:latest
+```
+
+The container entrypoint forwards all arguments to the application, so `args` in a pod spec (or the
+arguments after the image name in `docker run`) become the `--workflow` / `--parameters` /
+`--connections` options. The `-v` flag mounts your workflow directory into the container, so the
+workflow file does not need to be baked into the image.
+
+## Workflow sources
+
+The app resolves the workflow by base name against the repositories enabled in configuration:
+
+- **Filesystem** — enabled by default, reading
+  `${user.home}/bytechef/data/workflows/*.{json|yml|yaml}`. Point
+  `BYTECHEF_WORKFLOW_REPOSITORY_FILESYSTEM_LOCATION_PATTERN` at a mounted volume to feed workflows in
+  from a ConfigMap or shared storage.
+- **Classpath** — enabled by default, reading `workflows/*.{json|yml|yaml}` from inside the JAR.
+  Useful when baking a fixed workflow into a custom image.
+- **Git** — clone workflows from a repository at startup:
+  `BYTECHEF_WORKFLOW_REPOSITORY_GIT_ENABLED=true` plus `..._GIT_URL`, `..._GIT_BRANCH`,
+  `..._GIT_SEARCH_PATHS`, `..._GIT_USERNAME`, `..._GIT_PASSWORD`.
+
+Subworkflows reached through the `subflow` dispatcher resolve through the same sources as the main
+workflow.
+
+## Connections
+
+There is no credential store, so connections are supplied inline as a JSON object whose keys are
+connection names:
+
+```json
+{
+  "openAi": {"token": "sk-your-key"},
+  "postgresql_1": {"host": "db.internal", "port": 5432, "username": "etl", "password": "..."}
+}
+```
+
+For each task, `RuntimeTaskDispatcherPreSendProcessor` resolves the connection in this order:
+
+1. **By task name** — a key matching the workflow task's `name` (e.g. `openAi_1`) binds to that task
+   only. Use this to give two tasks of the same component different credentials.
+2. **By component name** — otherwise a key matching the component name (e.g. `openAi`) is shared by
+   every task of that component.
+3. **No match** — the task runs with no connection parameters. That is appropriate only for
+   components that do not need one; a component that does will fail the task, and with it the job.
+
+```json
+// Option A: shared across every openAi task
+{"openAi": {"token": "sk-shared-token"}}
+
+// Option B: per-task credentials
+{"openAi_1": {"token": "sk-token-for-task1"},
+ "openAi_2": {"token": "sk-token-for-task2"}}
+```
+
+<Callout type="warn">
+  **The `--connections` value is written to the log.** On startup the app logs the workflow name, the
+  parameters and the connections argument at `INFO`, and the `prod` profile logs `com.bytechef` at
+  `INFO` — so the credentials appear verbatim in the container's stdout on every run. Since the
+  container log is also the only record of the run, treat that log as credential-bearing: restrict who
+  can read it, and set a retention window on it. Storing the JSON in a Kubernetes `Secret` and
+  expanding it into the argument (as below) keeps it out of the *manifest*, but not out of the log.
+</Callout>
+
+Nothing is persisted beyond that: there is no credential store, so the parsed values live only in the
+process memory of the run and are gone when it exits.
+
+## Configuration via environment variables
+
+The app is a standard Spring Boot binary, so every `bytechef.*` property binds from an environment
+variable through relaxed binding. The ones that matter for ephemeral runs:
+
+| Environment variable | Default | Purpose |
+|---|---|---|
+| `SPRING_PROFILES_ACTIVE` | — | Set to `prod` for INFO-level `com.bytechef` logging; the `dev` profile logs it at DEBUG. Note that INFO is already enough to put the `--connections` value in the log. |
+| `BYTECHEF_WORKFLOW_REPOSITORY_FILESYSTEM_LOCATION_PATTERN` | `${user.home}/bytechef/data/workflows/*.{json\|yml\|yaml}` | Where to find workflow files. |
+| `BYTECHEF_WORKFLOW_REPOSITORY_GIT_ENABLED` (+ `_URL`, `_BRANCH`, `_SEARCH_PATHS`, `_USERNAME`, `_PASSWORD`) | `false` | Pull workflows from Git instead of a volume. |
+| `BYTECHEF_FILE_STORAGE_PROVIDER` | `filesystem` | Where file entries (large task outputs, file properties) are stored during the run. |
+| `BYTECHEF_FILE_STORAGE_FILESYSTEM_BASEDIR` | `${user.home}/bytechef/data/file-storage` | Base directory for the filesystem provider. |
+| `BYTECHEF_DATA_STORAGE_PROVIDER` | `filesystem` | Where workflow data-storage values are kept for the run. |
+| `BYTECHEF_WORKFLOW_OUTPUT_STORAGE_PROVIDER` | `filesystem` | Where task and job outputs are kept for the run. |
+| `BYTECHEF_ENCRYPTION_PROVIDER` | `filesystem` | Set to `property` with `BYTECHEF_ENCRYPTION_PROPERTY_KEY` to avoid writing a generated key to an ephemeral filesystem. |
+| `BYTECHEF_WORKER_TASK_SUBSCRIPTIONS_DEFAULT` | `10` | Concurrent task consumers within the run. |
+
+The Runtime Job app ships only the filesystem and database file-storage backends, so
+`BYTECHEF_FILE_STORAGE_PROVIDER=aws` is not available in this distribution.
+
+## Kubernetes example
+
+A complete `Job` that mounts the workflow from a ConfigMap and injects credentials from a Secret.
+Kubernetes expands `$(VAR)` references in `args`, so the connections JSON never appears in the
+manifest:
+
+```yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: daily-sync
+spec:
+  backoffLimit: 2
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: runtime-job
+          image: your-registry.example.com/bytechef-runtime-job:latest
+          args:
+            - --workflow=daily-sync.json
+            - --parameters={"batchDate": "2026-07-09"}
+            - --connections=$(CONNECTIONS)
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: prod
+            - name: BYTECHEF_WORKFLOW_REPOSITORY_FILESYSTEM_LOCATION_PATTERN
+              value: /workflows/*.json
+            - name: CONNECTIONS
+              valueFrom:
+                secretKeyRef:
+                  name: daily-sync-connections
+                  key: connections.json
+          volumeMounts:
+            - name: workflows
+              mountPath: /workflows
+      volumes:
+        - name: workflows
+          configMap:
+            name: daily-sync-workflow
+```
+
+Wrap the same template in a `CronJob` for recurring batch runs — the external scheduler owns the
+cadence; ByteChef owns the execution.
+
+## What's inside — and what isn't
+
+The app compiles in a curated set of components (HTTP client, script, the AI/LLM providers, the
+database components, the Google and Microsoft suites, and the most-used SaaS connectors) plus every
+control-flow task dispatcher: `approval`, `branch`, `condition`, `each`, `fork-join`, `loop`,
+`map`, `parallel`, and `subflow`. It is a subset of the full platform's component catalog —
+check the app's `build.gradle.kts` if you need to confirm a specific component is present.
+
+Deliberately absent, because a single-shot process has no use for them:
+
+- **Triggers.** No scheduler, no webhook listener; the trigger scheduler is a no-op implementation.
+  The workflow starts when the process starts. Anything time- or event-driven belongs to the
+  orchestrator that launches the pod.
+- **The UI and the REST API.** Build and test workflows on a regular ByteChef instance, then hand the
+  exported JSON to the Runtime Job app.
+- **Execution history and audit records.** Output goes to stdout/stderr and to whatever the workflow
+  itself writes; capture it in your job runner's logs.
+- **Multi-node scaling.** One run is one process. Scale by launching more pods, not bigger ones.
+
+Observability is thinner here than on the server, and worth checking before you rely on it. Spring
+Boot Actuator is on the classpath, so the health and `/actuator/metrics` endpoints exist for the life
+of the process. What is **not** there: no Micrometer Prometheus registry ships with the app, so there
+is no `/actuator/prometheus` endpoint and the `management.prometheus.*` keys in its configuration have
+nothing to act on; and unlike the server, the app maps no `bytechef.observability.*` block onto the
+`management.*` OTLP keys, so no signal is exported by default. To export from a run, set the Spring
+Boot `management.*` OTLP properties directly — see
+[Observability](/platform/use-bytechef/self-hosted/management/observability) for their names.
+
+In practice a run is over before a scrape interval elapses, which is why the container log and the
+exit code are the record.
+
+## Error handling and debugging
+
+The process exits non-zero when the `--workflow` argument is missing, when the workflow file cannot
+be found or parsed, when a task fails for want of a connection it needs, or when workflow execution
+fails for any other reason. Pair that with your CI's failure handling: a non-zero exit fails the step.
+
+Raise the log level for a single run without changing the image:
+
+```bash
+java -jar runtime-job-app.jar \
+  --workflow=workflow.json \
+  --logging.level.com.bytechef=DEBUG
+```
+
+The `dev` profile already logs `com.bytechef` at DEBUG and everything else at INFO; the `prod`
+profile logs both at INFO.
+
+## When to reach for it
+
+| Scenario | Right tool |
+|---|---|
+| Interactive workflows, triggers, webhooks, execution history, the UI | The ByteChef server |
+| Continuous, always-on processing | The ByteChef server |
+| Nightly batch, a CI step, an externally scheduled one-shot run | Runtime Job app |
+| A run that must leave no standing infrastructure behind | Runtime Job app |
+| The schedule already lives in Airflow, GitHub Actions, or a Kubernetes `CronJob` | Runtime Job app |
+| You want centralized governance, RBAC, and stored run history | The ByteChef server |
+
+The workflow definition is the same either way — a workflow exported from a ByteChef instance runs
+unchanged on the Runtime Job app.
+
+## See also
+
+- [Self-hosted](/platform/use-bytechef/self-hosted) — the always-on server alternative.
+- [Environment variables](/platform/use-bytechef/self-hosted/configuration/environment-variables) — every property the app binds.
+- [Architecture](/platform/use-bytechef/self-hosted/architecture) — the Atlas engine this app embeds whole.

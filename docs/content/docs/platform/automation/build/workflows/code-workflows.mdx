@@ -1,0 +1,557 @@
+---
+title: Code Workflows
+description: Define a whole workflow in code — the Java and script contracts, deploying an artifact through the API, and dropping a script into a single step.
+comingSoon: true
+ee: true
+---
+
+A **code workflow** is a workflow defined entirely in code — you deploy an artifact (a Java jar, or a
+JavaScript / Python / Ruby script) and ByteChef runs it as a workflow, on the same execution engine and
+with the same execution history as a workflow built on the canvas. Only the authoring and the
+lifecycle differ.
+
+<Callout title="Enterprise Edition only">
+    Code workflows require an Enterprise Edition deployment (`bytechef.edition=ee`).
+</Callout>
+
+## When to use one
+
+- The logic is easier to express — and to review — as code than as a node graph: heavy branching, data
+  structures, algorithms.
+- You want workflows to live in Git, reviewed in pull requests and shipped through CI.
+- You're generating workflows programmatically.
+
+For the wider picture of how this sits next to the canvas and the Script step, see
+[Build approaches](/platform/automation/build/workflows/build-approaches).
+
+## Languages
+
+The language is taken from the uploaded file's extension.
+
+| Language | Artifact | Extension |
+|---|---|---|
+| Java | jar | `.jar` |
+| JavaScript | script file | `.js` |
+| Python | script file | `.py` |
+| Ruby | script file | `.rb` |
+
+The three script languages run on the GraalVM polyglot runtime — the same runtime behind the
+[Script component](#scripting-languages). Anything else is rejected as an unsupported language.
+
+---
+
+## The script contract
+
+A script-language code workflow is a **single file** whose completion value is an object exposing
+these members:
+
+| Member | Type | Required |
+|---|---|---|
+| `name` | String | Yes |
+| `version` | String | No — defaults to `0.0.1` |
+| `description` | String | No |
+| `workflows` | array of `{ name, label, description, tasks }` | No |
+
+Each entry in `tasks` is `{ name, label, description, perform }`. `perform` is the function the engine
+calls when the task runs; its return value becomes the task's output.
+
+```javascript
+({
+    name: "orders",
+    version: "1.0.0",
+    workflows: [
+        {
+            name: "sync-orders",
+            label: "Sync orders",
+            tasks: [
+                {
+                    name: "fetch-orders",
+                    label: "Fetch orders",
+                    perform: function () {
+                        return {count: 0};
+                    }
+                }
+            ]
+        }
+    ]
+})
+```
+
+The object is expressed in each language's natural shape — a bare object literal (`({ ... })`) in
+JavaScript, a `types.SimpleNamespace` in Python, a core `Struct` in Ruby. What matters is that the
+file's completion value exposes the members above by name.
+
+The `name` at the top level is the project's identity: deploying again under the same name updates
+that project rather than creating a second one.
+
+## The Java contract
+
+A Java code workflow is a jar containing a `ProjectHandler` implementation, discovered through the
+standard Java `ServiceLoader` mechanism — so the jar must carry a
+`META-INF/services/com.bytechef.automation.project.ProjectHandler` entry naming your class, whether you
+write that file yourself or generate it (Google's `@AutoService` is the usual way). The handler returns
+a `ProjectDefinition`, which the `ProjectDsl` and `WorkflowDsl` builders assemble:
+
+```java
+public class OrdersProjectHandler implements ProjectHandler {
+
+    @Override
+    public ProjectDefinition getDefinition() {
+        return ProjectDsl.project("orders")
+            .version("1.0.0")
+            .workflows(
+                WorkflowDsl.workflow("sync-orders")
+                    .label("Sync orders")
+                    .tasks(
+                        WorkflowDsl.task("fetch-orders")
+                            .label("Fetch orders")
+                            .perform(() -> Map.of("count", 0))));
+    }
+}
+```
+
+`ProjectHandler`, `ProjectDefinition` and `WorkflowDsl` come from the ByteChef backend SDK
+(`sdks/backend/automation/project-api` and `sdks/backend/java/workflow-api`) — compile the jar against
+those and nothing else from the platform.
+
+Each loaded jar gets its own isolating class loader, so two code workflows can depend on different
+versions of the same library without colliding.
+
+## Deploying a code workflow
+
+Code workflows are deployed programmatically; the natural home is your CI pipeline — build the
+artifact, then push it through the deploy endpoint:
+
+```
+POST /api/automation/v1/projects/deploy
+```
+
+A multipart request with a `projectFile` part and an optional `workspaceId`. It is part of the public
+[Projects API](/openapi/automation-project-code-workflow) and is authenticated with a workspace API key.
+
+Two things to know about what the endpoint does:
+
+- **It deploys *and* publishes.** Unlike the canvas, where publishing is a separate action, a deploy is
+  itself the release action — the deployed version becomes the published one in the same call.
+- **It upserts by name.** The project is matched on the `name` in the definition. First deploy creates
+  the project; every deploy after that adds a new version to it.
+
+A second endpoint, `POST /api/automation/v1/projects/{id}/git/pull`, pulls a project from its
+configured Git repository instead of taking an upload.
+
+---
+
+## Scripting languages
+
+Not every piece of logic deserves its own workflow. When a single step needs a transformation no
+component captures — reshaping a payload, computing a value, parsing an odd format — the **Script
+component** drops a few lines of code into an otherwise visual workflow, without a separate language
+toolchain or deploy step.
+
+### Three languages, one runtime
+
+| Language | Typical use |
+|---|---|
+| **JavaScript** | The default for most scripting; convenient JSON handling, familiar syntax. |
+| **Python** | Data manipulation and transformations where the Python idiom is cleaner. |
+| **Ruby** | Teams that prefer Ruby; common for text processing. |
+
+All three run on **GraalVM**, so the platform needs no per-language toolchain installed alongside it.
+Each action's entry point is a `perform` function taking the step's input and a context:
+
+```javascript
+function perform(input, context) {
+    return input.items.filter((item) => item.active);
+}
+```
+
+### Calling a component from a script
+
+`context.component.<componentName>.<actionName>(input)` invokes any built-in component's action from
+inside the script. Connections are wired in the script editor rather than in code: open the code
+editor, add the component, name the connection, and pick the credential. Where a component has more
+than one connection wired, name the one you want as a second argument:
+
+```javascript
+function perform(input, context) {
+    context.component.googleMaps.getAddress({latitude: 12.5, longitude: 45.8}, "googleMaps2");
+
+    return null;
+}
+```
+
+See the [Script component reference](/reference/components/script_v1) for the full walkthrough.
+
+### Beyond a plain step
+
+The Script component also contributes cluster elements in the same three languages: **tools**, which
+let an [AI agent](/platform/automation/build/workflows/ai/agent) call a script the way it calls any
+other tool, and **item processors** for
+[data streams](/platform/automation/build/workflows/data-streams).
+
+### Editing and running a script
+
+Opening a script property full-screen gives you a Monaco editor — syntax highlighting follows the
+action's language — with **Run**, which executes the script against the step's input and shows the
+result, plus a side panel listing the step's input data and the component connections the script can
+reach. Saving is a normal workflow save.
+
+### Limits
+
+Scripts execute in a GraalVM guest context with the runtime's default restrictions: no host class
+access, no filesystem access, no subprocess execution, no thread creation. Concurrency inside a script
+is therefore not available — use the workflow's own
+[flow controls](/platform/automation/build/workflows/flow-controls) to parallelize.
+
+There is no configurable per-script CPU or memory budget. For unbounded or long-running computation,
+write a [custom component](/platform/settings/components/custom-components) instead.
+
+### Script or custom component?
+
+| Reach for a script when… | Reach for a custom component when… |
+|---|---|
+| The logic is small and used in one place. | The logic is reused across workflows. |
+| It is genuinely one-off. | It deserves its own typed schema. |
+| You're iterating. | You're shipping behaviour others will depend on. |
+
+A common progression: prototype in a script, promote it to a custom component once it stabilizes.
+
+One cost worth knowing about when you make that call: every script execution builds a fresh guest
+context and re-evaluates the source, so a script step pays a small start-up cost on each run that a
+custom component — initialized once — does not. For most workflows the difference is invisible; for a
+step on a very hot path it is a reason to promote.
+
+---
+
+## Not yet available
+
+Everything in this section is on the upcoming release track. Today a code workflow is authored outside
+the product and deployed through the API described above; its `perform` functions take no arguments and
+cannot call components, and a script-language workflow declares no inputs, outputs, triggers or
+connections.
+
+### Authoring in the browser
+
+Script-language code workflows become creatable and editable directly in ByteChef, without a separate
+build-and-upload step. A code-backed project opens a **source editor** in place of the visual canvas.
+Saves are compile-gated — invalid source is rejected with the loader's error — and **name-locked**: the
+`name` declared in the code cannot change after the project is created.
+
+Editor saves update the project's **draft** version only: deployments keep running the last published
+version until you publish from the project header, exactly like visual workflows. Iterating on a draft
+is safe — workflow identity is preserved across saves and publishes, so test configurations and
+connections carry over.
+
+On the **Projects** page, the dropdown next to **New Project** gains a **New Code Workflow** entry:
+provide a name, pick a language, and ByteChef creates the project as a draft with a starter source.
+
+The same authoring flow arrives for
+[embedded integrations](/platform/embedded/build/integrations), which are keyed on `componentName`
+(and `componentVersion`) instead of a project name.
+
+### The task perform context
+
+`perform` gains a `context` argument — `perform(context)` — exposing the component catalog and
+execution-log access:
+
+- `context.component.<componentName>.<actionName>(input, connectionName, clusterElements)` — invokes
+  any built-in component action. `input` is the action's input parameters; `connectionName` (optional)
+  names one of the task's declared connections. A name with no wired connection, on an action that
+  requires one, fails with an error naming the connection. `clusterElements` (optional) wires an action
+  that reads cluster elements — an AI agent's chat above all.
+- `context.connection(connectionName)` — returns a declared connection's parameters, for when you build
+  a request yourself rather than through a component action: a region, tenant or account id, a base
+  URL. The map carries the connection's credentials too, so treat it as sensitive.
+- `context.input()` — the workflow's inputs plus the output of every task that already ran, keyed by
+  name. `context.input(name)` reads one entry and fails on an unknown name, so a typo surfaces where it
+  happens rather than as a `null` further down; use `context.input()[name]` when absence is a
+  legitimate outcome. A workflow input and a task output sit side by side at the top level, each under
+  its own name — including names a `${...}` reference could never reach, like `my-task-1`. The snapshot
+  is taken when the task is dispatched, so it does not change while the task runs, and a task that has
+  not run yet is simply absent from it.
+- `context.parameters()` — the task's own declared parameters, with any `${...}` in them already
+  evaluated. Separate from `input()`: one is the task's configuration, the other is the run's data.
+- `context.log(level, message)` — writes to the task's execution log. A script names the level as a
+  string (`"trace"`, `"debug"`, `"info"`, `"warn"`, `"error"`, case-insensitive) and anything else fails
+  rather than being logged at a level you did not ask for; Java tasks pass the `TaskContext.LogLevel`
+  enum.
+
+```javascript
+perform: function (context) {
+    const customerId = context.input().customerId;
+    const previous = context.input("fetch-customer");
+
+    const response = context.component.httpClient.get(
+        {uri: "https://api.example.com/customers/" + customerId + "/items"}, "my-connection");
+
+    context.log("info", "fetched " + response.body.length + " items for " + previous.name);
+
+    return response.body;
+}
+```
+
+Java tasks get the same capability through the SDK's `TaskContext`:
+
+```java
+WorkflowDsl.task("my-task")
+    .perform(context -> context.component(
+        "httpClient", "get",
+        Map.of("uri", "https://api.example.com/customers/" + context.input("fetch-customer")),
+        "my-connection"));
+```
+
+```java
+WorkflowDsl.task("my-task")
+    .perform(context -> {
+        context.log(TaskContext.LogLevel.INFO, "my-task ran");
+
+        return context.input("fetch-customer");
+    });
+```
+
+Zero-argument perform functions keep working on every path — the context is simply not passed to them.
+
+### Declaring inputs, outputs and a trigger
+
+A workflow can declare what it accepts, what it returns, and what starts it:
+
+```javascript tab="JavaScript"
+{
+    name: "orders",
+    inputs: [{name: "orderId", label: "Order ID", type: "STRING", required: true}],
+    outputs: [{name: "customer", task: "fetch-customer"}, {name: "ok", value: true}],
+    triggers: [{name: "daily", type: "schedule/v1/interval", parameters: {interval: 1, unit: "DAY"}}],
+    tasks: [ /* ... */ ]
+}
+```
+
+```java tab="Java"
+WorkflowDsl.workflow("orders")
+    .inputs(input("orderId").label("Order ID").required(true))
+    .outputs(output("customer").task("fetch-customer"))
+    .triggers(trigger("daily", "schedule/v1/interval").parameters(Map.of("interval", 1, "unit", "DAY")))
+```
+
+**Inputs** are what test configuration prompts for and what a caller passes; at run time each arrives
+in `context.input()` under its own name, in the same namespace as the task outputs — so an input and a
+task cannot share a name.
+
+**Outputs** are evaluated when the workflow completes and become its result — the body a synchronous
+caller receives, and what a workflow-execution read reports for an asynchronous run. An entry names
+either a `task`, whose output becomes the value, or a literal/expression `value`. Prefer `task` for a
+task output: a task name here is free-form, and a hyphenated one cannot be written as a `${...}`
+reference at all.
+
+**Triggers** are not code — a trigger names a component trigger the platform already provides
+(`schedule/v1/interval`, `workflow/v1/newWorkflowCall`, a webhook) with its parameters, so a code
+workflow starts exactly the way a visually built one does. Without one, it runs only when something
+calls it.
+
+### Running tasks concurrently
+
+Tasks run in order by default. To run independent work at the same time, group it: a `parallel` group
+dispatches its tasks all at once, and a `forkJoin` group runs each branch concurrently while the tasks
+within a branch stay in order.
+
+```javascript tab="JavaScript"
+tasks: [
+    {name: "fetch-order", perform: (context) => /* ... */},
+    {
+        name: "enrich",
+        type: "parallel",
+        tasks: [
+            {name: "fetch-customer", perform: (context) => /* ... */},
+            {name: "fetch-inventory", perform: (context) => /* ... */}
+        ]
+    },
+    {
+        name: "notify",
+        type: "forkJoin",
+        branches: [
+            [{name: "post-slack", perform: /* ... */}, {name: "record-slack", perform: /* ... */}],
+            [{name: "send-email", perform: /* ... */}]
+        ]
+    },
+    {name: "summarize", perform: (context) => context.input("fetch-customer")}
+]
+```
+
+```java tab="Java"
+WorkflowDsl.workflow("orders")
+    .tasks(
+        task("fetch-order").perform(context -> /* ... */),
+        parallel("enrich")
+            .tasks(
+                task("fetch-customer").perform(context -> /* ... */),
+                task("fetch-inventory").perform(context -> /* ... */)),
+        forkJoin("notify")
+            .branches(
+                branch(task("post-slack").perform(/* ... */), task("record-slack").perform(/* ... */)),
+                branch(task("send-email").perform(/* ... */))),
+        task("summarize").perform(context -> context.input("fetch-customer")));
+```
+
+**A parallel group's tasks cannot read each other.** They start together, so a sibling has not produced
+anything yet and `context.input(siblingName)` fails. Whatever they need must come from before the
+group; a task after the group reads all of their outputs normally. Tasks within one fork/join branch do
+run in sequence, so they can read each other.
+
+Two more rules, both checked when the source is saved rather than when it runs: task names are flat and
+must be unique across the whole workflow, nesting included (a name is what the engine keys a task's
+output by), and a group cannot contain another group.
+
+Concurrency has to come from these groups rather than from threads inside a `perform` — script tasks
+run in a strict sandbox with thread creation off, and work a task spawns itself would be invisible to
+the engine.
+
+### Task parameters
+
+A task can declare parameters of its own, which ride on the task node and are evaluated against the job
+context before the task runs — so a value may be a `${...}` expression:
+
+```javascript
+{name: "my-task", parameters: {retries: 3, region: "${region}"}, perform: (context) => /* ... */}
+```
+
+Read them back with `context.parameters()` — deliberately *not* through `context.input()`, so a
+parameter is never mistaken for a task's output. A literal in the perform is simpler when the value
+never changes; parameters earn their keep when the value comes from the workflow definition rather than
+the code, which also makes it visible to the editor and the API.
+
+### Declaring connections
+
+A task can declare the connections its perform uses, making the requirement readable from the generated
+workflow definition and validated at save/deploy time (a declared name with no matching connection logs
+a warning):
+
+```javascript
+{
+    name: "my-task",
+    connections: [
+        {componentName: "httpClient", name: "billing-api"},
+        {componentName: "slack", componentVersion: 1, name: "slack-prod"}
+    ],
+    perform: function (context) { /* ... */ }
+}
+```
+
+A map keyed by connection name is accepted too, if you prefer it:
+
+```javascript
+connections: {
+    "billing-api": {componentName: "httpClient"},
+    "slack-prod": {componentName: "slack", componentVersion: 1}
+}
+```
+
+```java
+WorkflowDsl.task("my-task")
+    .connections(
+        connection("httpClient", "billing-api"),
+        connection("slack", 1, "slack-prod"))
+    .perform(context -> /* ... */);
+```
+
+The declared `name` is the same value the perform passes as `connectionName`. Declaring a connection
+makes it appear wherever the platform asks you to wire connections — the **Test Configuration** dialog
+in the editor and the deployment's connection step — so each environment picks its own credentials,
+exactly like a visual workflow's nodes. A `connectionName` that was never declared and wired cannot
+resolve, so the call fails at run time. `componentVersion` is optional and pins to the component's
+latest version at save time.
+
+### Calling an AI agent
+
+Some actions read more than input and a connection. The AI Agent's `chat` resolves its model, tools,
+memory and RAG from **cluster elements** — on a canvas those are the nodes you drag onto the agent. A
+code workflow has no such node, so it composes them as a third argument to the call:
+
+```javascript
+{
+    name: "ask-agents",
+    connections: [
+        {componentName: "openAi", name: "openai-prod"},
+        {componentName: "anthropic", name: "anthropic-prod"},
+        {componentName: "slack", name: "slack-prod"}
+    ],
+    perform: function (context) {
+        const draft = context.component.aiAgent.chat({messages: [{role: "user", content: "Draft a reply"}]}, null, {
+            model: {type: "openAi/v1/model", connection: "openai-prod", parameters: {model: "gpt-4o"}},
+            tools: [{type: "slack/v1/sendMessage", connection: "slack-prod", name: "post_to_slack"}]
+        });
+
+        return context.component.aiAgent.chat({messages: [{role: "user", content: "Review: " + draft}]}, null, {
+            model: {type: "anthropic/v1/model", connection: "anthropic-prod",
+                    parameters: {model: "claude-sonnet-5"}}
+        });
+    }
+}
+```
+
+Elements go on the call rather than on the task because a code task orchestrates: the example above
+drafts with one model and reviews with another, and declaring one element set per task would force each
+of those into its own task — which is the opposite of why you wrote the orchestration as code.
+
+The map is keyed by cluster element type (`model`, `tools`, `chatMemory`, `rag`, …). A type that takes
+several elements takes a list. Each element is:
+
+| Member | | |
+| --- | --- | --- |
+| `type` | required | `<componentName>/v<version>/<elementName>`, e.g. `openAi/v1/model` |
+| `connection` | optional | names one of the **task's declared connections** |
+| `name` | optional | for a tool, what the model calls it; defaults to the element name in `type` |
+| `parameters` | optional | the element's own parameters |
+
+What you cannot write here is a connection. An element *names* one the task declared, so credentials
+stay wired by the user per environment exactly as for any other task, and a name the task never
+declared fails the call. Naming a tool matters more in code than on a canvas: the list is written by
+hand, and without a `name` the model sees the platform's generated `SLACK_SendMessage`.
+
+Java tasks compose the same thing through the SDK, which builds the identical structure:
+
+```java
+WorkflowDsl.task("ask-agent")
+    .connections(connection("openAi", "openai-prod"), connection("slack", "slack-prod"))
+    .perform(context -> context.component(
+        "aiAgent", "chat", Map.of("messages", messages), null,
+        clusterElements()
+            .element(
+                "model",
+                clusterElement("openAi/v1/model")
+                    .connection("openai-prod")
+                    .parameter("model", "gpt-4o"))
+            .elements(
+                "tools",
+                clusterElement("slack/v1/sendMessage")
+                    .connection("slack-prod")
+                    .name("post_to_slack"))));
+```
+
+<Callout type="warn">
+    Nothing about an element is checked when you save. Elements are written in code rather than
+    declared, so a wrong type or a misspelled parameter surfaces when the task runs, not before — only
+    the connection reference can be checked, and only at call time. For the same reason the composition
+    is invisible to the platform: no definition records which model a task uses, so nothing can report
+    or govern it the way it can for a visual agent node.
+</Callout>
+
+Composing elements is supported in code workflow tasks only. The Script component shares the same
+`context.component` surface, but a script task declares no connections for an element to name, so
+passing elements there fails with an error saying so.
+
+### Copilot
+
+The in-editor [AI Copilot](/platform/automation/build/ai-copilot) panel routes to
+code-workflow-aware Ask and Build assistants whenever a code-backed project or integration is open, on
+both the automation and embedded surfaces. In the
+[AI Hub](/platform/automation/build/hub), the `buildCodeWorkflow` specialist lists,
+explains, creates, and updates code workflows, and can open one in its right panel.
+
+### Hardening controls
+
+Administrators can restrict how Java code workflows are handled — the same pair of controls as
+[custom components](/platform/settings/components/custom-components):
+
+- `BYTECHEF_WORKFLOW_CODE_WORKFLOW_JAVA_ENABLED=false` rejects new Java code-workflow uploads while
+  script languages and previously uploaded artifacts keep working.
+- `BYTECHEF_WORKFLOW_CODE_WORKFLOW_JAVA_LOADER=ESPRESSO` executes Java code workflows inside a
+  sandboxed GraalVM Espresso guest JVM instead of an in-process class loader.
