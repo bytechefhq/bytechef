@@ -46,8 +46,8 @@ public interface RequestTriggerApi {
 
     String PATH_EXECUTE_WORKFLOW = "/workflows/{workflowUuid}";
     /**
-     * POST /workflows/{workflowUuid} : Execute workflows
-     * Execute workflows.
+     * POST /workflows/{workflowUuid} : Execute a workflow
+     * Executes a single workflow through its Request trigger and returns the result the workflow produces.
      *
      * @param workflowUuid The workflow uuid. (required)
      * @param xEnvironment The environment. (optional)
@@ -64,8 +64,8 @@ public interface RequestTriggerApi {
      */
     @Operation(
         operationId = "executeWorkflow",
-        summary = "Execute workflows",
-        description = "Execute workflows.",
+        summary = "Execute a workflow",
+        description = "Executes a single workflow through its Request trigger and returns the result the workflow produces.",
         tags = { "request-trigger" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The result returned by the workflow's request trigger.", content = {
