@@ -5,7 +5,7 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {AppSidebarFooter} from './AppSidebarFooter';
 
-const {logoutMock} = vi.hoisted(() => ({logoutMock: vi.fn()}));
+const {logoutMock} = vi.hoisted(() => ({logoutMock: vi.fn(() => Promise.resolve())}));
 
 vi.mock('@/shared/middleware/graphql', () => ({
     useEnvironmentsQuery: () => ({data: {environments: []}}),
