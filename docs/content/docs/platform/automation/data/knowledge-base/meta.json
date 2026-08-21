@@ -1,0 +1,9 @@
+{
+  "$schema": "../../../../../../.source/json-schema/docs.meta.json",
+  "pages": [
+    "create-a-knowledge-base",
+    "add-documents",
+    "search",
+    "use-in-workflows"
+  ]
+}

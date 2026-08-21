@@ -1,0 +1,9 @@
+{
+  "$schema": "../../../../../../.source/json-schema/docs.meta.json",
+  "title": "Voice",
+  "description": "Build and test browser voice workflows",
+  "pages": [
+    "quickstart",
+    "editor-testing"
+  ]
+}

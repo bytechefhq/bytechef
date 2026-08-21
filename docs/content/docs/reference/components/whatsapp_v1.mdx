@@ -27,6 +27,7 @@ Version: 1
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | systemUserAccessToken | System user access token | STRING |  | true |
 | phoneNumberId | Phone number ID | STRING |  | true |
+| appSecret | App secret | STRING | The Meta app's secret. When set, approval request messages use in-place Approve/Discard reply buttons resolved through the webhook, and the webhook signature is verified against this secret. Leave empty to deliver approval links to the hosted form. | false |
 
 
 

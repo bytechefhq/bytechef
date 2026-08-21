@@ -2,6 +2,24 @@
 title: "Property"
 ---
 
+Properties describe the inputs a component's action, trigger, or connection collects from the user. Each property type below has a dedicated factory method (`string`, `integer`, `array`, ...) plus type-specific options, but they all share a common set of methods inherited from the base property builder.
+
+Two further factory methods exist alongside the ones documented below: `nullable(String name)` for a property whose only value is null, and `dynamicProperties(String name)` for a placeholder whose properties are computed at configuration time.
+
+### Common Property Methods
+
+These methods are available on every value property (`string`, `integer`, `number`, `bool`, `date`, `dateTime`, `time`, `array`, `object`, `fileEntry`):
+
+- `label(String label)` - Human-readable label shown above the field in the UI.
+- `description(String description)` - Help text describing the property (shown as a tooltip).
+- `placeholder(String placeholder)` - Placeholder text shown inside an empty field.
+- `required(boolean required)` - Marks the property as required; the workflow cannot run until it is set.
+- `hidden(boolean hidden)` - Hides the property from the UI (useful for constant values set via `defaultValue`).
+- `advancedOption(boolean advancedOption)` - Moves the property under the collapsible **Advanced** section in the Properties tab.
+- `displayCondition(String displayCondition)` - Shows the property only when the given expression evaluates to true, so a field can depend on what the user picked in another field.
+- `expressionEnabled(boolean expressionEnabled)` - Controls whether the field accepts `${...}` data-pill expressions (enabled by default).
+- `metadata(String key, String value)` / `metadata(Map<String, Object> metadata)` - Attaches arbitrary metadata to the property.
+
 ### Array Property
 
 The `ModifiableArrayProperty` class is a customizable property type designed to handle array values within a component.
@@ -57,7 +75,7 @@ The `ModifiableFileEntryProperty` class is a customizable property type designed
 
 The `ModifiableIntegerProperty` class is a customizable property type designed to handle integer values within a component.
 
-- `integer(String name)` - Initializes a new `ModifiableTimeProperty` with the specified name.
+- `integer(String name)` - Initializes a new `ModifiableIntegerProperty` with the specified name.
 - `defaultValue(long value)` - Sets the default value for the property.
 - `exampleValue(long exampleValue)` - Provides an example value for illustrative purposes.
 - `optionsLookupDependsOn(String... optionsLookupDependsOn)` - Defines dependencies for option lookups.
@@ -118,7 +136,7 @@ The `ModifiableStringProperty` class is a customizable property type designed to
 
 The `ModifiableTimeProperty` class is a customizable property type designed to handle time values within a component.
 
-- `time(String name)` - Initializes a new `ModifiableTiimeProperty` with the specified name.
+- `time(String name)` - Initializes a new `ModifiableTimeProperty` with the specified name.
 - `defaultValue(LocalTime defaultValue)`- Specifies the default value for the property.
 - `exampleValue(LocalTime exampleValue)`- Provides an example value for illustrative purposes.
 - `optionsLookupDependsOn(String... optionsLookupDependsOn)`- Defines dependencies for option lookups.

@@ -1,0 +1,145 @@
+---
+title: Troubleshooting
+description: Inspect a running ByteChef instance, restart it after a configuration change, and diagnose the failures that come up most often
+---
+
+Configuration is read once, at startup — so most "I changed it and nothing happened" reports are a
+missing restart rather than a wrong value. This page covers how to see what a running instance
+actually resolved, how to restart it, and how to diagnose the failures that come up most often.
+
+## Inspecting a running instance
+
+### Docker
+
+```bash
+# Full container configuration
+docker inspect bytechef
+
+# Just the ByteChef environment variables the container actually received
+docker exec bytechef env | grep BYTECHEF
+```
+
+### Kubernetes
+
+```bash
+# The rendered deployment
+kubectl get deployment bytechef -o yaml
+
+# Non-sensitive values (ConfigMap) and secrets, as the chart names them
+kubectl get configmap bytechef-envs -o yaml
+kubectl get secret bytechef-secrets -o yaml
+
+# Pod status
+kubectl get pods -l app.kubernetes.io/name=bytechef
+```
+
+The ConfigMap and Secret are named after the Helm release, so `bytechef-envs` and
+`bytechef-secrets` assume `helm install bytechef ...`. Substitute your release name otherwise.
+
+ByteChef also serves its resolved configuration over Actuator — see
+[Verifying the resolved configuration](/platform/use-bytechef/self-hosted/configuration#verifying-the-resolved-configuration),
+which shows the values as the application bound them rather than as the platform passed them in.
+
+## Restarting after a configuration change
+
+Environment variables are evaluated at startup, so a change to any of these needs a restart before
+it takes effect:
+
+- Database connection settings
+- Encryption provider or key
+- Feature flags
+- Public URL and other network settings
+- Observability settings
+
+```bash
+# Docker
+docker restart bytechef
+
+# Docker Compose
+docker compose restart bytechef
+
+# Kubernetes
+kubectl rollout restart deployment/bytechef
+```
+
+## Reading the logs
+
+```bash
+# Docker
+docker logs -f bytechef                              # follow
+docker logs --tail 100 bytechef                      # last 100 lines
+docker logs --since 2026-01-27T10:00:00 bytechef     # since a timestamp
+
+# Kubernetes
+kubectl logs -f deployment/bytechef                  # follow
+kubectl logs --tail=100 deployment/bytechef          # last 100 lines
+kubectl logs --previous deployment/bytechef          # the previous container, after a crash
+```
+
+`kubectl logs --previous` is the one to reach for when a pod is crash-looping: by the time you
+look, the current container may not have logged the failure yet.
+
+## Common failures
+
+### The instance will not start
+
+Read the startup logs first — schema migrations run on start, so a migration or database failure
+surfaces there rather than as a health-check failure:
+
+```bash
+docker logs bytechef
+kubectl logs deployment/bytechef
+```
+
+An instance killed shortly after start with no error of its own is usually out of memory. ByteChef
+needs at least 4 GB of RAM.
+
+### The database is unreachable
+
+Check connectivity from inside the container, so you are testing the same network path the
+application uses:
+
+```bash
+# Docker
+docker exec bytechef nc -zv postgres 5432
+
+# Kubernetes
+kubectl exec deployment/bytechef -- nc -zv postgres 5432
+```
+
+If the host resolves but the port refuses, the database is up but not accepting connections from
+this network — check the security group, firewall rule, or `pg_hba.conf`.
+
+### Email is not being delivered
+
+```bash
+docker exec bytechef env | grep BYTECHEF_MAIL
+```
+
+`MailService` warn-skips rather than failing when no mail host is configured, so a missing
+`BYTECHEF_MAIL_HOST` produces silence in the application and a warning in the log, not an error to
+the user. See [Environment Variables](/platform/use-bytechef/self-hosted/configuration/environment-variables#mail-configuration)
+for the full set.
+
+### OAuth2 callbacks fail
+
+Check the redirect URI the instance is handing to providers:
+
+```bash
+docker exec bytechef env | grep -E 'BYTECHEF_OAUTH2_REDIRECT_URI|BYTECHEF_PUBLIC_URL'
+```
+
+`BYTECHEF_OAUTH2_REDIRECT_URI` defaults to `BYTECHEF_PUBLIC_URL` + `/callback`, so on an instance
+behind a proxy or load balancer, an unset or wrong `BYTECHEF_PUBLIC_URL` is the usual cause — the
+instance advertises its internal address and the provider redirects the user somewhere unreachable.
+The resulting URL must be:
+
+- publicly reachable,
+- registered in the OAuth2 provider's allowed redirect URIs, exactly,
+- HTTPS, if the provider requires it.
+
+## See also
+
+- [Monitoring](/platform/use-bytechef/self-hosted/management/monitoring) — health probes and the management surface
+- [Crash Recovery](/platform/use-bytechef/self-hosted/management/crash-recovery) — what recovers a job whose worker died
+- [Observability](/platform/use-bytechef/self-hosted/management/observability) — metrics, logs, and traces

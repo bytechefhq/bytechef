@@ -53,6 +53,73 @@ Version: 1
 ## Actions
 
 
+### Make Outbound Call
+Name: makeCall
+
+`Initiates an outbound voice call via the Infobip Calls API and executes a real-time workflow synchronously during the call. The action blocks until the call completes, allowing real-time audio processing and AI conversations over media streaming.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| to | To | STRING | The phone number to call in E.164 format. | true |
+| from | From | STRING | The caller ID (your Infobip voice number) in E.164 format. | true |
+| callsConfigurationId | Calls Configuration ID | STRING | The Infobip Calls configuration ID that the outbound call is placed under. Created in the Infobip portal or via the Calls API. | true |
+| applicationId | Application ID | STRING | Optional Infobip application (subaccount) ID the call belongs to. | false |
+| subWorkflow | Real-Time Workflow | STRING | The workflow ID to execute synchronously during the phone call. This workflow handles real-time audio processing and AI responses via media streaming. | true |
+| timeout | Ring Timeout | INTEGER | Maximum time in seconds to wait for the call to be answered. If not answered within this time, the call fails. | false |
+| maxDuration | Max Call Duration | INTEGER | Maximum duration in minutes to wait for the call to complete. After this time, the action returns with a timeout status. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Make Outbound Call",
+  "name" : "makeCall",
+  "parameters" : {
+    "to" : "",
+    "from" : "",
+    "callsConfigurationId" : "",
+    "applicationId" : "",
+    "subWorkflow" : "",
+    "timeout" : 1,
+    "maxDuration" : 1
+  },
+  "type" : "infobip/v1/makeCall"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| callId | STRING | Unique identifier for the call |
+| state | STRING | Final call state (FINISHED, timeout) |
+| duration | INTEGER | Call duration in seconds |
+| direction | STRING | Call direction (OUTBOUND) |
+
+
+
+
+#### Output Example
+```json
+{
+  "callId" : "",
+  "state" : "",
+  "duration" : 1,
+  "direction" : ""
+}
+```
+
+
+
+
 ### Send SMS
 Name: sendSMS
 
@@ -134,7 +201,7 @@ Name: sendWhatsappTemplateMessage
 | from | From | STRING | Registered WhatsApp sender number. Must be in international format and comply with WhatsApp's requirements. | true |
 | to | To | STRING | Message recipient number. Must be in international format. | true |
 | templateName | Template Name | STRING <details> <summary> Depends On </summary> from </details> | Name of the WhatsApp template to use. | true |
-| placeholders | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> templateName </details> |  | null |
+| placeholders | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> templateName </details> |  | false |
 
 #### Example JSON Structure
 ```json
@@ -259,6 +326,56 @@ Type: OBJECT
 ## Triggers
 
 
+### Inbound Voice Call
+Name: inboundCall
+
+`Triggers when an inbound voice call is received via Infobip. The call is streamed to a real-time workflow for audio processing and AI conversation over media streaming.`
+
+Type: STATIC_WEBHOOK
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| subWorkflow | Real-Time Workflow | STRING | The workflow ID to execute synchronously during the phone call. This workflow handles real-time audio processing and AI responses. | true |
+| signatureSecret | Webhook Signature Secret | STRING | Optional shared secret used to verify the HMAC signature Infobip sends on signed webhooks. When set, requests with a missing or invalid signature are rejected. Leave empty to skip signature verification. | false |
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| callId | STRING | Unique identifier for the call |
+| from | STRING | Caller phone number |
+| to | STRING | Called phone number |
+| direction | STRING | Call direction (INBOUND) |
+| state | STRING | Call state |
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "Inbound Voice Call",
+  "name" : "inboundCall",
+  "parameters" : {
+    "subWorkflow" : "",
+    "signatureSecret" : ""
+  },
+  "type" : "infobip/v1/inboundCall"
+}
+```
+
+
+
 ### New SMS Message
 Name: newSMS
 
@@ -367,3 +484,25 @@ Use a keyword when you want to:
 If you do **not** need keyword‑based routing and want to handle all incoming messages for a number with a single workflow, you can leave the keyword field empty (or follow your Infobip configuration strategy).
 
 For detailed information about how keywords work in Infobip, see the [official documentation](https://www.infobip.com/docs/numbers/keywords-and-actions#configure-keywords-keywords).
+
+### Voice Calls (Real-Time Media Streaming)
+
+The **Make Outbound Call** action and the **Inbound Voice Call** trigger stream call audio to a real-time
+sub-workflow over a WebSocket bridge, enabling live audio processing and AI voice conversations.
+
+#### Operator setup
+
+- **Enable media replacement.** Bidirectional audio (the sub-workflow both *receiving* caller audio and
+  *sending* audio back into the call) requires **media replacement** to be enabled on the Infobip
+  media-stream configuration. Without it, streaming is receive-only and the caller will not hear the
+  workflow's responses.
+- **Public URL.** ByteChef must be reachable at a public HTTPS URL so Infobip can open the `wss://` media
+  stream back to the platform bridge.
+- **Calls configuration.** Outbound calls require a Calls configuration ID (created in the Infobip portal
+  or via the Calls API); optionally scope calls to a subaccount with an application ID.
+- **Webhook signature (recommended).** Set a **Webhook Signature Secret** on the Inbound Voice Call trigger
+  to reject unsigned or tampered inbound-call webhooks. Leave it empty to skip verification.
+
+> Note: the Infobip Calls API endpoints, field names, webhook signature header, and call-state values used by
+> these operations follow Infobip's documented conventions. Verify them against your account's Calls API
+> version before relying on voice in production.

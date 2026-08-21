@@ -1,0 +1,80 @@
+---
+title: Crash Recovery
+description: The coordinator-side monitors that recover orphaned jobs after a worker or coordinator crash, bound how long a run may take, and purge expired execution history.
+comingSoon: true
+---
+
+A process can die mid-run, leaving a job marked `STARTED` that nothing is working on any more.
+ByteChef ships three monitors that detect and recover that state automatically. Detection lives
+**outside** the Atlas engine — only the heartbeat primitives are engine-owned.
+
+## Orphaned-job recovery
+
+Workers publish a heartbeat for every in-flight task every **30 seconds**. The coordinator re-saves
+the `STARTED` task row on each heartbeat, bumping its last-modified timestamp.
+
+`OrphanedJobRecoveryMonitor` runs every minute and treats a job as orphaned only when the job row
+**and** all of its non-terminal task executions have gone stale past the staleness threshold — a
+child task's heartbeat keeps its control-flow parent tasks alive transitively, so a long-running
+`loop` or `fork-join` is not mistaken for a crash.
+
+Recovery marks the tasks and the job `FAILED`. The normal job-status fan-out fires, and the run
+becomes resumable through the existing resume path.
+
+| Variable | Purpose | Default |
+|---|---|---|
+| `BYTECHEF_WORKFLOW_EXECUTION_RECOVERY_ENABLED` | Enable the monitor. | `true` |
+| `BYTECHEF_WORKFLOW_EXECUTION_RECOVERY_STALENESS_THRESHOLD` | How long a job and its non-terminal tasks must go without a heartbeat before being treated as orphaned (ISO-8601 duration). | `PT5M` |
+| `BYTECHEF_WORKFLOW_EXECUTION_RECOVERY_AUTO_RESUME` | Also re-dispatch the recovered run automatically. | `false` |
+| `BYTECHEF_WORKFLOW_EXECUTION_RECOVERY_MAX_AUTO_RESUME_ATTEMPTS` | Cap on automatic resume attempts per job, tracked in job metadata. | `3` |
+
+Auto-resume is at-least-once: the interrupted task re-runs from the last completed node, so the
+components in that step must tolerate being executed twice.
+
+<Callout type="info">
+  A deployment whose service implementations do not support the stale-row queries — a lightweight app
+  variant, for example — skips orphan detection entirely rather than failing.
+</Callout>
+
+## Per-run timeouts
+
+`JobTimeoutMonitor` runs every minute and fails `STARTED` jobs whose runtime exceeds the plan's
+`asyncRunTimeout` (see [Plan limits](/platform/use-bytechef/self-hosted/configuration/plan-limits))
+or the operator fallback below. With neither set it is a no-op.
+
+| Variable | Purpose | Default |
+|---|---|---|
+| `BYTECHEF_WORKFLOW_EXECUTION_TIMEOUT_ENABLED` | Enable the timeout monitor. | `true` |
+| `BYTECHEF_WORKFLOW_EXECUTION_TIMEOUT_DEFAULT_TIMEOUT` | Fallback run-duration limit when the plan defines none (ISO-8601 duration, e.g. `PT1H`). Unset means no timeout. | - |
+
+There is deliberately no auto-resume for a timed-out run — it would immediately exceed again.
+
+## Retention purging
+
+`JobRetentionMonitor` sweeps every **6 hours**, per tenant, and permanently deletes finished jobs
+older than the plan's `logRetentionDays` or the operator fallback below. The delete cascades to the
+job's task executions, its job and task output blobs, its context rows, and its
+`CURRENT_EXECUTION`-scoped data-storage rows. Subflow child jobs are skipped — the parent's delete
+covers them.
+
+| Variable | Purpose | Default |
+|---|---|---|
+| `BYTECHEF_WORKFLOW_EXECUTION_RETENTION_ENABLED` | Enable the retention monitor. | `true` |
+| `BYTECHEF_WORKFLOW_EXECUTION_RETENTION_DEFAULT_RETENTION_DAYS` | Fallback retention window in days when the plan defines none. Unset means execution history is kept forever. | - |
+
+Blob and context cleanup is best-effort: a storage failure never blocks the row delete, so a run can
+be purged from the database while a stored output blob briefly outlives it.
+
+## Broker redelivery
+
+Recovering the *job* is only half the story; a task that was dispatched but never acknowledged has to
+be delivered again. On AMQP and Kafka that is the broker's own redelivery, and it works today. On the
+Redis broker it will be a pending-entry sweep: each consumer reads its stream's pending entries
+(XPENDING), claims those idle past the threshold (XCLAIM), and re-runs them through the normal
+invoke-then-ack path, giving the same at-least-once semantics as the other brokers. See
+[Message brokers](/platform/use-bytechef/self-hosted/configuration/message-brokers).
+
+## See also
+
+- [Environment variables](/platform/use-bytechef/self-hosted/configuration/environment-variables#execution-recovery) — the full recovery, timeout, and retention variable reference.
+- [Plan limits](/platform/use-bytechef/self-hosted/configuration/plan-limits) — where `asyncRunTimeout` and `logRetentionDays` come from.

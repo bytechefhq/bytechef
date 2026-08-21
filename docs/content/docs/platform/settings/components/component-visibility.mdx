@@ -1,0 +1,67 @@
+---
+title: Component Visibility
+description: Curate which components — and which of their actions and triggers — builders can see and run, enforced at listing time and again at execution time.
+ee: true
+comingSoon: true
+---
+
+**Settings → Components → Component Visibility** lets an administrator curate the component catalog. Each component — and, individually, each of its actions and triggers — can be switched off tenant-wide, disappearing from builders' component lists and refusing to execute even when a workflow references it directly.
+
+<Callout title="Availability">
+    Component policies are an Enterprise Edition feature and require the `ADMIN` or `USER` authority on an EE deployment. In Community Edition every component is always available.
+</Callout>
+
+---
+
+## The page
+
+The tab shows a **Search components** box that filters by title or name, and a list of every registered component. Each row carries the component's icon, title, description, and an on/off switch.
+
+Expand a row with its chevron to reveal that component's individual **actions and triggers**, each with its own switch. Disabling one operation leaves the rest of the component usable.
+
+{/* TODO screenshot: Settings → Components page, Component Visibility tab — the search box and the component list with each row showing icon, title, description, and an on/off toggle, one row expanded to show its per-action and per-trigger switches */}
+
+Toggling a switch updates optimistically and rolls back if the mutation fails.
+
+## How enforcement works
+
+- **Default is enabled.** A component with no policy row is available. Policy state only comes into existence when you switch something off, so a fresh installation behaves exactly like Community Edition.
+- **Scope is tenant-wide.** A disabled component is disabled for every workspace, project, and environment in the tenant. There is no per-workspace override.
+- **Changes propagate within seconds.** Enforcement reads a per-tenant cache with a **10-second** write TTL, so a toggle takes effect across the platform within roughly ten seconds without a database probe on every component listing.
+- **Rows are a deny-list.** The `component_policy` table holds only what is switched off; the presence of an operation row means that operation is disabled, and its absence means enabled.
+
+### Two independent layers
+
+| Layer | Effect |
+|---|---|
+| **Listing** | The component (or the individual action or trigger) disappears from component lists — builders no longer see it in the workflow editor palette. |
+| **Execution** | Any attempt to run it — as an action, a trigger, or an agent cluster element — is rejected. |
+
+The execution layer is what makes this a control rather than a UI filter. A workflow that already references a disabled component keeps its definition, but the referencing steps **fail at run time** while the policy is in place. Re-enabling restores them without any workflow change.
+
+The rejection messages are exact:
+
+```
+Component '<name>' is disabled by an administrator and cannot be executed.
+Action '<name>' of component '<component>' is disabled by an administrator and cannot be executed.
+Trigger '<name>' of component '<component>' is disabled by an administrator and cannot be executed.
+```
+
+If you disable something production workflows depend on, expect those executions to start failing within the cache window.
+
+## API
+
+The tab is backed by four admin-only GraphQL operations:
+
+| Operation | Effect |
+|---|---|
+| `componentPolicies` (query) | Lists every registry component with its tenant-wide `enabled` flag. Components with no policy row report enabled. |
+| `componentOperationPolicies(componentName)` (query) | Lists the disabled operations of one component — deny-list rows only. |
+| `updateComponentPolicy(name, enabled)` (mutation) | Enables or disables one component tenant-wide. |
+| `updateComponentOperationPolicy(componentName, operationType, operationName, enabled)` (mutation) | Disables or re-enables a single action or trigger. `operationType` is `ACTION` or `TRIGGER`. |
+
+## How it composes
+
+- **With roles.** [Roles](/platform/settings/users#roles-and-permissions) control *who* can do *what* with the resources they can reach; component policies control *which integration surface exists at all*. A user holding every role still cannot run a disabled component.
+- **With connection visibility.** [Visibility](/platform/settings/connections) governs who can reuse a credential; a component policy removes the component underneath it, so existing connections for a disabled component have nothing to run against until it is re-enabled.
+- **With custom components.** Policies apply to the component registry as a whole, so [custom components](/platform/settings/components/custom-components) and [API connectors](/platform/settings/components/api-connectors) can be toggled the same way as built-in ones.

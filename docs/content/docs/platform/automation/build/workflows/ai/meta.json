@@ -1,0 +1,10 @@
+{
+  "$schema": "../../../../../../../.source/json-schema/docs.meta.json",
+  "title": "AI",
+  "description": "Build, evaluate, and protect AI agents in ByteChef",
+  "pages": [
+    "agent",
+    "universal-ai",
+    "agentic-patterns"
+  ]
+}

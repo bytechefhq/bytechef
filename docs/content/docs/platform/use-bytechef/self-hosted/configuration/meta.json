@@ -1,0 +1,11 @@
+{
+  "$schema": "../../../../../../.source/json-schema/docs.meta.json",
+  "title": "Configuration",
+  "description": "Configure and operate ByteChef on your own infrastructure",
+  "pages": [
+    "environment-variables",
+    "message-brokers",
+    "file-storage",
+    "plan-limits"
+  ]
+}

@@ -1,0 +1,42 @@
+---
+title: "Troubleshooting"
+description: "Common issues and solutions when setting up or using connections in ByteChef."
+---
+
+## OAuth 2.0 Issues
+
+### *Redirect URI Mismatch*
+This error usually occurs when the Redirect URI configured in the third-party application (e.g., Google Cloud Console, GitHub Developer Settings) doesn't match the one ByteChef is using.
+- **Solution**: When you configure an OAuth 2.0 connection with your own app credentials, the connection dialog shows a read-only **Redirect URI** field with a copy button. Copy that exact value and register it as the authorized redirect (callback) URI in your service provider's settings. It typically ends in `/callback` (for example `http://127.0.0.1:5173/callback` when running locally). If you are using a ByteChef predefined app instead, no redirect URI configuration is required.
+
+### *Access Denied* or *Invalid Permissions*
+This happens when the user doesn't have sufficient permissions to authorize ByteChef or when the requested scopes are not allowed by the service provider.
+- **Solution**: Check that your account has the necessary administrative rights and that the required scopes are enabled in the service provider's application settings.
+
+## API Key, Bearer and Basic Auth Issues
+
+### *Unauthorized* or 401 Errors
+This usually means the API key, token, username, or password is incorrect.
+- **Solution**: Double-check your credentials and ensure they are active. Some API keys or tokens might have expiration dates or restricted permissions.
+
+### *Forbidden* or 403 Errors
+The credentials are correct, but the account doesn't have permission to perform the requested action.
+- **Solution**: Verify that your API key, token, or account has the necessary permissions (scopes) for the specific operation you're trying to perform in your workflow.
+
+## General Connection Issues
+
+### Connection Timeouts
+ByteChef may time out if the third-party service is slow to respond.
+- **Solution**: Check the service provider's status page to see if they are experiencing any downtime.
+
+### Can't Delete a Connection
+The **Delete** action is disabled while a connection is still in use.
+- **Solution**: A connection that is currently **Active** must be detached from every workflow first. Open the connection's ellipsis menu, choose **Disconnect from all**, then delete it.
+
+### Wrong Environment
+Connections are scoped per environment, so a connection created in *development* will not appear when a project is deployed to *production*.
+- **Solution**: Use the environment selector in the page header to confirm you are viewing (and creating) connections in the correct environment.
+
+---
+
+Still having trouble? Reach out to our support team or join our community Discord.

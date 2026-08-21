@@ -69,23 +69,23 @@ Name: ask
 | numBatch | Num batch | INTEGER | Prompt processing maximum batch size. | false |
 | numGpu | Num GPU | INTEGER | The number of layers to send to the GPU(s). On macOS it defaults to 1 to enable metal support, 0 to disable. 1 here indicates that NumGPU should be set dynamically | false |
 | mainGpu | Main GPU | INTEGER | When using multiple GPUs this option controls which GPU is used for small tensors for which the overhead of splitting the computation across all GPUs is not worthwhile. The GPU in question will use slightly more VRAM to store a scratch buffer for temporary results. | false |
-| lowVram | Low VRAM | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> |  | null |
-| f16kv | F16 KV | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> |  | null |
+| lowVram | Low VRAM | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> |  | false |
+| f16kv | F16 KV | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> |  | false |
 | logitsAll | Logits all | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Return logits for all the tokens, not just the last one. To enable completions to return logprobs, this must be true. | false |
 | vocabOnly | Vocab only | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Load only the vocabulary, not the weights. | false |
 | useMmap | Use MMap | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | By default, models are mapped into memory, which allows the system to load only the necessary parts of the model as needed. However, if the model is larger than your total amount of RAM or if your system is low on available memory, using mmap might increase the risk of pageouts, negatively impacting performance. Disabling mmap results in slower load times but may reduce pageouts if you’re not using mlock. Note that if the model is larger than the total amount of RAM, turning off mmap would prevent the model from loading at all. | false |
 | useMlock | Use MLock | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Lock the model in memory, preventing it from being swapped out when memory-mapped. This can improve performance but trades away some of the advantages of memory-mapping by requiring more RAM to run and potentially slowing down load times as the model loads into RAM. | false |
 | numThread | Num thread | INTEGER | Sets the number of threads to use during computation. By default, Ollama will detect this for optimal performance. It is recommended to set this value to the number of physical CPU cores your system has (as opposed to the logical number of cores). 0 = let the runtime decide | false |
-| numKeep | Nul keep | INTEGER |  | null |
+| numKeep | Nul keep | INTEGER |  | false |
 | tfsz | Tfs Z | NUMBER | Tail-free sampling is used to reduce the impact of less probable tokens from the output. A higher value (e.g., 2.0) will reduce the impact more, while a value of 1.0 disables this setting. | false |
-| typicalP | Typical P | NUMBER |  | null |
+| typicalP | Typical P | NUMBER |  | false |
 | repeatLastN | Repeat last N | INTEGER | Sets how far back for the model to look back to prevent repetition. (Default: 64, 0 = disabled, -1 = num_ctx) | false |
 | repeatPenalty | Repeat penalty | NUMBER | Sets how strongly to penalize repetitions. A higher value (e.g., 1.5) will penalize repetitions more strongly, while a lower value (e.g., 0.9) will be more lenient. | false |
 | mirostat | Mirostat | INTEGER | Enable Mirostat sampling for controlling perplexity. (default: 0, 0 = disabled, 1 = Mirostat, 2 = Mirostat 2.0) | false |
 | mirostatTau | Mirostat Tau | NUMBER | Controls the balance between coherence and diversity of the output. A lower value will result in more focused and coherent text. | false |
 | mirostatEta | Mirostat Eta | NUMBER | Influences how quickly the algorithm responds to feedback from the generated text. A lower learning rate will result in slower adjustments, while a higher learning rate will make the algorithm more responsive. | false |
-| penalizeNewLine | Penalize new line | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> |  | null |
-| truncate | Truncate | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> |  | null |
+| penalizeNewLine | Penalize new line | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> |  | false |
+| truncate | Truncate | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> |  | false |
 
 #### Example JSON Structure
 ```json

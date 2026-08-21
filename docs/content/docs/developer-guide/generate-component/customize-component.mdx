@@ -24,6 +24,10 @@ title: "Customize Component"
       }
       ```
 
+The icon and category you set here determine how the generated component is presented in the workflow editor: once the module is on the classpath and the server is running, it appears (with its icon) under the chosen category in the editor's component panel.
+
+{/* TODO screenshot: the generated component listed with its icon under its chosen category in the workflow editor's component panel */}
+
 ### Connection
 
 If your component requires custom authentication parameters, override the `modifyConnection(ModifiableConnectionDefinition modifiableConnectionDefinition)` method in `NewComponentComponentHandler`.
@@ -152,7 +156,8 @@ For implementation details, refer to examples from existing components such as [
 2. Regenerate the Component:
     - Run the following command to regenerate the component:
     ```bash
-   ./bytechef.sh component init --open-api-path ../../server/libs/modules/components/newcomponent/openapi.yaml --output-path ../../server/libs/modules/components --name newcomponent
-    ``
+    ./bytechef.sh component init --open-api-path ../../server/libs/modules/components/newcomponent/openapi.yaml --output-path ../../server/libs/modules/components --name newcomponent
+    ```
+
 For implementation details, refer to examples from existing components such as [`Airtable`](https://github.com/bytechefhq/bytechef/blob/master/server/libs/modules/components/airtable).
 

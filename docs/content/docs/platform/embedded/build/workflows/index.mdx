@@ -1,0 +1,149 @@
+---
+title: "Workflows"
+description: "Author the workflows inside an integration using the integration-scoped workflow editor — switch between an integration's workflows, test them, and publish a new integration version."
+---
+
+The **integration workflow editor** is where your team builds the workflows that make up an integration. You open it from the [Integrations](/platform/embedded/build/integrations) list — click an integration's name or use its **View Workflows** menu action — and it opens on one of the integration's workflows.
+
+The visual canvas itself (adding triggers and actions, wiring nodes, configuring properties, using data pills) works exactly the same as the automation project editor. This page covers only what is **specific to integrations**: the workflows sidebar, the integration breadcrumb, the settings menu, test execution, and integration versioning/publishing. For the canvas mechanics, see **[Building Workflows](/platform/automation/build/workflows/projects)**.
+
+{/* TODO screenshot: the full integration workflow editor — left workflows sidebar, integration + workflow breadcrumb, canvas, and the header action buttons on the right */}
+
+---
+
+## Editor layout
+
+| Area | What it is |
+|---|---|
+| **Workflows sidebar** (left) | Switch between the workflows in the integration, search and sort them, and add a new workflow. Toggle it with the sidebar button at the far left of the header. |
+| **Breadcrumb** (header, left) | Shows the integration name and a **workflow selector** dropdown for switching workflows. |
+| **Header actions** (header, right) | Settings menu, output panel, test/chat, and publish. |
+| **Canvas** (center) | The visual workflow editor — same as the [automation workflow editor](/platform/automation/build/workflows/projects). |
+
+---
+
+## Switching between an integration's workflows
+
+An integration can contain many workflows. There are two ways to move between them:
+
+- **Breadcrumb workflow selector** — click the workflow name in the header breadcrumb and pick another workflow from the **Workflows** dropdown.
+- **Workflows sidebar** — click any workflow card in the left sidebar. The currently open workflow is highlighted.
+
+### Using the workflows sidebar
+
+{/* TODO screenshot: the left workflows sidebar showing the integration selector, search box, sort menu, New Workflow button, and workflow cards */}
+
+1. Open the sidebar with the sidebar toggle button at the far left of the header (if it is collapsed).
+2. Use the **integration selector** at the top of the sidebar to change which integration's workflows are listed. Selecting the "all" option lists workflows across every integration, grouped by integration.
+3. Type in the **Search workflows** box to filter the list by name.
+4. Click the **sort** button (funnel icon) to reorder the list:
+
+   | Option | Order |
+   |---|---|
+   | **Last edited** | Most recently modified first (default). |
+   | **Date created** | Newest first. |
+   | **A-Z** | Alphabetical by workflow name. |
+   | **Z-A** | Reverse alphabetical. |
+
+5. Each workflow card shows the workflow's component icons, its name, and when it was last edited. Click a card to open that workflow.
+
+### Adding a workflow
+
+Click **New Workflow** in the sidebar (or **New Workflow** from the integration's menu on the Integrations list). In the dialog, provide a workflow **Label** and an optional **Description**, then save. ByteChef adds the workflow to the current integration and opens it in the editor.
+
+---
+
+## Settings menu
+
+Click the **settings** (gear) button in the header to open the settings menu. It has two tabs: **Workflow** and **Integration**.
+
+{/* TODO screenshot: the settings menu open, showing the Workflow and Integration tabs */}
+
+### Workflow tab
+
+| Action | Description |
+|---|---|
+| **Edit** | Rename the current workflow or change its description. |
+| **Export** | Download the current workflow definition as a file. |
+| **Delete** | Permanently delete the current workflow. A confirmation dialog appears first. |
+
+### Integration tab
+
+| Action | Description |
+|---|---|
+| **Edit** | Open the integration dialog to change the integration's name, category, tags, or [permission expression](/platform/embedded/build/permission-expressions). |
+| **Import Workflow** | Add a workflow to the integration by uploading a `.json`, `.yaml`, or `.yml` workflow definition file. |
+| **Integration History** | Open the version history panel (see [below](#integration-version-history)). |
+| **Delete** | Permanently delete the integration and every workflow it contains. |
+
+Deleting an integration asks **"Are you absolutely sure?"** and warns that the action cannot be undone and will permanently delete the integration and the workflows it contains. Click **Delete** to confirm or **Cancel** to abort.
+
+---
+
+## Testing a workflow
+
+Use the header action buttons on the right to run and inspect the workflow you are editing.
+
+| Button | Action |
+|---|---|
+| **Test** | Run the current workflow once for testing. The label changes based on the trigger — for a chat-based trigger the button reads **Chat** instead and starts the chat. |
+| **Stop** | Appears while a test run is in progress. Click it to stop the running workflow. |
+| **Output** (chevron icon) | Toggle the output panel that shows the current workflow's most recent test execution output. |
+
+{/* TODO screenshot: the header action buttons — Output, Test/Chat, and Publish — with the output panel open below the canvas */}
+
+The **Test** button is disabled until every required workflow input parameter, connection, and component property is set. Hover the button to see why it is disabled.
+
+Test runs execute against the **draft** version of the integration and are for building and verifying workflows — they do not affect connected users. Connected users only ever run **published** versions activated through [Integration Configurations](/platform/embedded/configure/instance-configurations).
+
+---
+
+## Publishing an integration version
+
+Publishing snapshots the integration's current draft workflows into a new, immutable **published version** that you can then activate for connected users.
+
+1. Click **Publish** in the header.
+2. In the popover, optionally enter a **Description** (up to 256 characters) summarizing what changed in this version.
+3. Click **Publish**.
+
+{/* TODO screenshot: the Publish popover with the Description field and the Publish button */}
+
+When you publish, ByteChef:
+
+- Increments the integration's version number.
+- Duplicates each of the integration's workflows so the newly published version is frozen and independent of continued draft editing.
+- Records the description and publish timestamp in the version history.
+
+Editing continues on the draft; published versions are never changed. Only published versions can be activated in an environment through [Integration Configurations](/platform/embedded/configure/instance-configurations).
+
+### Integration version history
+
+Open **Integration History** from the settings menu's **Integration** tab to view the **Integration Version History** panel.
+
+{/* TODO screenshot: the Integration Version History panel listing versions with status badges and descriptions */}
+
+Each entry shows:
+
+- The version number (for example, `V1`, `V2`).
+- The publish date and time (published versions only).
+- A status badge — **PUBLISHED** or **DRAFT**.
+- The description you entered when publishing, expandable to read the full text ("No description." when none was provided).
+
+The current draft version appears at the top and cannot be expanded, since it has no publish record yet.
+
+---
+
+## AI Copilot
+
+> **Coming soon.** The AI Copilot is on the upcoming release track and is not yet available in the latest released version of ByteChef.
+
+The integration workflow editor includes the [AI Copilot](/platform/automation/build/ai-copilot) panel — an integration-scoped assistant with **Ask** and **Build** modes for understanding and building the current integration's workflows. Copilot is an Enterprise Edition feature and is disabled by default.
+
+---
+
+## Related
+
+- **[Integrations](/platform/embedded/build/integrations)** — the list where you create and manage integrations.
+- **[Building Workflows](/platform/automation/build/workflows/projects)** — the shared visual editor mechanics (canvas, nodes, properties, data pills).
+- **[Integration Configurations](/platform/embedded/configure/instance-configurations)** — activate a published version for connected users.
+- **[Permission Expressions](/platform/embedded/build/permission-expressions)** — restrict which connected users see an integration or a specific workflow.

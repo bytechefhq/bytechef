@@ -4,6 +4,8 @@
   "icon": "Blocks",
   "root": true,
   "pages": [
+    "index",
+    "architecture",
     "build-component",
     "generate-component",
     "working-with-triggers",

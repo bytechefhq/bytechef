@@ -1,0 +1,21 @@
+{
+  "$schema": "../../../../../../.source/json-schema/docs.meta.json",
+  "title": "Workflows",
+  "description": "An introduction to building and managing projects and workflows in ByteChef.",
+  "pages": [
+    "projects",
+    "workflows",
+    "components",
+    "ai",
+    "templates",
+    "build-approaches",
+    "code-workflows",
+    "flow-controls",
+    "subflows",
+    "data-pills",
+    "data-streams",
+    "human-in-the-loop",
+    "forms",
+    "error-workflows/index"
+  ]
+}

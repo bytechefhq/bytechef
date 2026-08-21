@@ -1,0 +1,6 @@
+{
+  "$schema": "../../../../../.source/json-schema/docs.meta.json",
+  "title": "Data",
+  "description": "Data tables, the knowledge base, and asset files.",
+  "pages": ["data-tables", "knowledge-base", "asset-files"]
+}

@@ -1,0 +1,9 @@
+{
+  "$schema": "../../../../../../.source/json-schema/docs.meta.json",
+  "title": "AI Agents",
+  "description": "AI Agents workspace settings.",
+  "pages": [
+    "guardrails",
+    "system-prompt"
+  ]
+}

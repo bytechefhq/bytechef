@@ -1,9 +1,39 @@
 ---
 title: "Generate Component"
+description: "Scaffold a new component from an OpenAPI specification using the ByteChef CLI."
 ---
 
 ## Generate Component [toc]
 
-In the following steps, we will learn how to generate a new component using our application. This application is designed to assist you in generating components from OpenAPI specifications efficiently and accurately.
+In the following steps, we will learn how to generate a new component from an OpenAPI specification using the ByteChef CLI (`cli/cli-app`). The CLI reads your API's OpenAPI definition and scaffolds a full component module — actions, properties, and a connection — so you don't have to write them by hand.
 
-OpenAPI, formerly known as Swagger, is a specification for building APIs that allows developers to define their API's structure in a standardized format. By using this application, you can streamline the process of creating components by automatically generating code based on your OpenAPI definitions.
+OpenAPI, formerly known as Swagger, is a specification for building APIs that allows developers to define their API's structure in a standardized format. By using the CLI, you can streamline the process of creating components by automatically generating code based on your OpenAPI definitions.
+
+## Steps
+
+<Steps>
+<Step>
+
+**[Initial setup](/developer-guide/generate-component/initial-setup)** — create the component package and register it in the Gradle build.
+
+</Step>
+<Step>
+
+**[OpenAPI specification](/developer-guide/generate-component/open-api-specification)** — add your `openapi.yaml` and run the CLI `component init` command to generate the component.
+
+</Step>
+<Step>
+
+**[Customize the component](/developer-guide/generate-component/customize-component)** — set the icon and category, adjust the connection and actions, and enable dynamic options, dynamic properties, dynamic output, and AI Agent tools via OpenAPI extensions.
+
+</Step>
+<Step>
+
+**[Create a trigger](/developer-guide/generate-component/create-trigger)** — triggers are not generated from OpenAPI, so add them manually and wire them into the generated handler.
+
+</Step>
+</Steps>
+
+The result is the same kind of component module you would author by hand; once it is on the classpath, it appears in the workflow editor's component panel alongside the built-in connectors.
+
+> Generating a component only scaffolds the code. For APIs with non-standard behavior, or for triggers, you will still edit the generated classes as described in [Customize the component](/developer-guide/generate-component/customize-component) and [Create a trigger](/developer-guide/generate-component/create-trigger). If you prefer to write everything yourself, see [Build a component by hand](/developer-guide/build-component/initial-setup) instead.

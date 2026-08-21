@@ -22,3 +22,91 @@ Type: condition/v1
 
 
 
+<hr />
+
+# Additional Instructions
+
+The Condition flow control evaluates a logical expression and routes execution down one of two
+paths: **true** or **false**. Use it for binary decisions — threshold checks, validation, or simple
+yes/no branching.
+
+## Usage
+
+### Step 1: Add Condition to your workflow
+
+Select **Condition** from the **Flows** component panel and add it where the workflow needs to
+branch. The node creates two paths, **True** and **False**.
+
+### Step 2: Choose how to express the condition
+
+The **Raw Expression** toggle decides which of two editors you get. See
+[Expressions](/reference/expressions) for the full expression language.
+
+**Raw Expression enabled** — write the expression directly in the **Expression** field:
+
+```
+${order_1.total} > 1000
+${user_1.verified} == true && ${user_1.age} >= 18
+```
+
+Values like `${order_1.total}` come from data pills — output produced by an earlier component or
+trigger, or a value you configured by hand.
+
+**Raw Expression disabled** — build the condition visually. Conditions are structured as **OR**
+groups, each containing one or more **AND** conditions:
+
+1. Click **Add OR Condition** to create a group.
+2. Inside a group, click **Add AND Condition** to add a comparison.
+3. Pick the comparison type: Boolean, Date Time, Number, or String.
+
+Each comparison takes **Value 1**, an **Operation**, and (for every operation except `Empty`)
+**Value 2**.
+
+### Step 3: Build the two paths
+
+Add the components that should run when the condition is true to the **True** path, and those for
+the false case to the **False** path.
+
+## Available operations
+
+The operations offered depend on the comparison type you pick.
+
+### String
+
+| Operation | Meaning |
+|---|---|
+| `Equals` | Exact match |
+| `Equals Ignore Case` | Case-insensitive match |
+| `Not Equals` | Not equal to |
+| `Contains` | Value 1 includes Value 2 |
+| `Not Contains` | Value 1 does not include Value 2 |
+| `Starts With` | Value 1 begins with Value 2 |
+| `Ends With` | Value 1 ends with Value 2 |
+| `Regex` | Value 1 matches the regular expression in Value 2 |
+| `Empty` | Value 1 is an empty string — takes no Value 2 |
+
+### Number
+
+| Operation | Meaning |
+|---|---|
+| `Equals` | Value 1 equals Value 2 |
+| `Not Equals` | Value 1 does not equal Value 2 |
+| `Greater` | Value 1 is greater than Value 2 |
+| `Greater or Equals` | Value 1 is greater than or equal to Value 2 |
+| `Less` | Value 1 is less than Value 2 |
+| `Less or Equals` | Value 1 is less than or equal to Value 2 |
+| `Empty` | Value 1 is absent — takes no Value 2 |
+
+### Boolean
+
+| Operation | Meaning |
+|---|---|
+| `Equals` | Value 1 equals Value 2 |
+| `Not Equals` | Value 1 does not equal Value 2 |
+
+### Date Time
+
+| Operation | Meaning |
+|---|---|
+| `After` | Value 1 is later than Value 2 |
+| `Before` | Value 1 is earlier than Value 2 |

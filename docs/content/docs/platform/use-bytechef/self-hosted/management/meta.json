@@ -1,0 +1,12 @@
+{
+  "$schema": "../../../../../../.source/json-schema/docs.meta.json",
+  "title": "Management",
+  "description": "Manage ByteChef on your own infrastructure",
+  "pages": [
+    "monitoring",
+    "upgrades",
+    "observability",
+    "crash-recovery",
+    "troubleshooting"
+  ]
+}

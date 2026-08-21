@@ -1,0 +1,360 @@
+---
+title: "Human-in-the-Loop (Approval)"
+description: "Pause a workflow for a person to approve, reject, or fill in structured input before execution continues."
+---
+
+A **human-in-the-loop (HITL)** step pauses workflow execution and waits for a person
+to either click *Approve* / *Discard* or submit a short form. When the response
+comes in, the workflow resumes from that exact step with the human's answer
+available as output data to downstream tasks.
+
+ByteChef ships HITL as a first-class workflow primitive through the
+[**Approval**](/reference/components/approval_v1) component. The component is also
+exposed as an AI-agent tool, so agents can request human confirmation before
+taking irreversible action.
+
+---
+
+## When to use it
+
+- **Approving an action a workflow is about to take** — a refund above a
+  threshold, sending a contract, deleting customer data.
+- **Manual triage on automation output** — a sales lead the AI scored as hot,
+  a draft reply that needs human sign-off, a flagged moderation case.
+- **Collecting structured input mid-flow** — asking for an extra field that the
+  trigger didn't carry (e.g. "what discount should we apply?").
+- **Guardrailing AI agents** — let the agent draft the response and call
+  `requestApproval` as a tool, then send only what the human approved.
+
+---
+
+## How it works
+
+The Approval component combines three platform mechanics:
+
+1. **Suspend / resume** — when `Request Approval` runs, the action calls
+   `context.suspend(...)` with a 60-day expiry. The task state is persisted,
+   the worker is freed, and the job sits idle until a callback arrives.
+2. **A signed resume URL** — the framework derives a cryptographically signed
+   `jobResumeId` from the current job. The internal callback endpoint is
+   `POST /job/resume/{id}`; the user-facing form route is `/resume/{id}`.
+   Both target the same signed token, but the form lives outside `/api/` so
+   it can be hit anonymously from an email link.
+3. **Approval channels** (cluster elements) — children attached to the
+   Approval component decide *how* to reach the human. Today: **Slack**,
+   **Gmail**, **Microsoft Outlook 365**, and the in-app **Approval Task**.
+   Each channel receives the same `formUrl` and renders it however makes
+   sense for that medium (Slack action buttons, an HTML email, or a row in
+   the Approval Tasks inbox).
+
+When the human responds, the SPA `POST`s the form data back to
+`/job/resume/{id}`. The action's `resumePerform` reshapes the payload into the
+output schema and the workflow continues with the next task — `approved`
+(boolean) and any submitted field values are now available as data pills.
+
+> **Public URL required.** The resume URL is generated from
+> `bytechef.public-url` (or the `BYTECHEF_PUBLIC_URL` env var). If that is
+> unset or the workflow is being tested in the editor, the action falls
+> back to an error: *"Cannot generate approval form URL. Ensure the server's
+> public URL is configured…"*. Set the public URL to something the approver
+> can actually reach (your domain, an ngrok tunnel for dev, etc.).
+
+---
+
+## Two interaction modes
+
+The same `Request Approval` action covers both styles depending on whether
+you configure form inputs:
+
+### 1. One-click approve / discard
+
+Leave **Form Inputs** empty. Channels render two buttons — **Approve** and
+**Discard** — that link to `{formUrl}?approved=true|false`. The SPA
+auto-submits on load, so the approver never sees the form. Output is just
+`{ "approved": true|false }`.
+
+Use this when the workflow just needs a yes/no gate.
+
+### 2. Structured form
+
+Add one or more **Form Inputs**. Channels render a single **Open Approval
+Form** link/button that opens the dynamic form in the browser. The approver
+fills in the fields, hits *Approve* or *Discard*, and the workflow resumes
+with each field name as a data pill.
+
+Available field types: Checkbox, Custom HTML, Date Picker, Datetime Picker,
+Email, File, Hidden Field, Input, Number, Password, Radio Button, Select
+(single or multi), and Textarea.
+
+The action's output schema is generated dynamically from your field
+definitions — `approved` plus one property per `fieldName` typed to match
+the field type (e.g. a Date Picker named `dueDate` becomes a `DATE` output
+property). That means downstream tasks can reference
+`${approval_1.approved}` and `${approval_1.dueDate}` natively, without a
+follow-up parse step.
+
+---
+
+## Approval channels
+
+A channel is a [cluster element](/reference/components) typed
+`APPROVAL_CHANNELS`, attached to the Approval component as a child. Add as
+many as you like; each one fans out a notification with the same form URL.
+If you list both Slack and Gmail, the approver gets both — whoever clicks
+first wins; subsequent clicks return *"Form no longer available."*
+
+| Channel | Component | Behavior |
+|---|---|---|
+| **Slack** | [`slack/v1`](/reference/components/slack_v1) | Posts a message to a channel/DM. Empty form → primary "Approve" + danger "Discard" buttons. With form fields → single "Open Approval Form" button. |
+| **Gmail** | [`google-mail/v1`](/reference/components/google-mail_v1) | Sends an HTML email with the form title/description and either Approve/Discard hyperlinks or an "Open Approval Form" link. |
+| **Microsoft Outlook 365** | [`microsoft-outlook-365/v1`](/reference/components/microsoft-outlook-365_v1) | Sends an HTML email (same layout as Gmail) via Outlook 365 — the choice for organizations on Microsoft 365. |
+| **Approval Task** | `approvalTask/v1` | Creates a row in the in-app **Approval Tasks** page (sidebar inbox). No external delivery — useful when approvers already live in ByteChef. |
+
+Adding more channels later (Teams, Discord, SMS, custom) is a matter of
+implementing the `ApprovalChannelFunction` interface and registering it as a
+cluster element with `type(APPROVAL_CHANNELS)` — see
+[Build a Component](/developer-guide/build-component/initial-setup).
+
+> **Why fan-out, not first-touch routing?** Approvals are time-sensitive and
+> different humans live in different tools. Sending the same form URL to
+> every channel keeps the design simple: the form itself is the source of
+> truth, and the first response wins.
+
+---
+
+## Building an approval step
+
+{/* TODO screenshot: workflow editor with an approval task node selected — its properties panel showing the interaction mode and approval channel */}
+
+1. In the workflow editor, click **+** and search for **Approval**.
+2. Select the **Request Approval** action.
+3. Set **Form Title** and **Form Description** (these become the message
+   subject in Gmail/Slack and the page heading in the form UI).
+4. Add **Form Inputs** if you want structured input — leave empty for
+   yes/no.
+5. Add one or more channels as cluster element children. For Slack, pick
+   the channel/user; for Gmail, set the `To` and `Subject`; for Approval
+   Task, no config is required.
+6. Wire downstream tasks to read `${approval_1.approved}` (and any field
+   names you defined) from the approval step's output.
+
+A typical pattern is a [Condition](/reference/flow-controls/condition_v1)
+right after the approval to branch on `approved == true` vs. `approved == false`.
+
+### Example workflow snippet
+
+```yaml
+tasks:
+  - name: approval_1
+    type: approval/v1/requestApproval
+    label: "Approve refund"
+    parameters:
+      formTitle: "Refund request"
+      formDescription: "Customer ${trigger_1.email} requested a $${trigger_1.amount} refund."
+    clusterElements:
+      approvalChannels:
+        - name: slack_notify
+          type: slack/v1/slack
+          parameters:
+            channel: "C01234567"
+  - name: condition_1
+    type: condition/v1
+    parameters:
+      rawExpression: true
+      expression: "${approval_1.approved} == true"
+```
+
+---
+
+## Using approval as an AI-agent tool
+
+The same `Request Approval` is registered as a `TOOLS`-type cluster element
+on the Approval component, so it can be attached to an
+[**AI Agent**](/reference/components/ai-agent_v1) under the *Tools* slot.
+When the agent decides it needs human sign-off, it calls the tool, the
+underlying action suspends the agent's task, the channels notify the
+approver, and the resumed response is fed back into the agent's next turn.
+
+This lets you build agents that:
+
+- Draft an email, ask the user to confirm or edit before sending.
+- Propose a code change, get explicit approval before opening the PR.
+- Schedule a meeting, but ask the human "is this time OK?" first.
+
+The agent treats the result the same as any other tool call output — the
+`approved` flag plus any form fields are visible in the agent's reasoning.
+
+---
+
+## The Approval Tasks page
+
+If you use the **Approval Task** channel, requests land in the **Approval Tasks**
+inbox — a list of requests beside a detail pane, scoped to one environment.
+Responding there resumes the workflow the same way an external link would.
+
+Use this when approvers are already ByteChef users (operations, ops-on-call,
+team leads) and you don't want to depend on Slack or email delivery.
+
+See [Approval Tasks](/platform/automation/monitor/approval-tasks) for the page
+itself — its filters, the fields on a request, and why an inbox can look empty.
+
+---
+
+## Lifecycle & limits
+
+- **Default expiry: 60 days.** After that the suspended task is GC'd and the
+  resume URL returns HTTP 410 Gone. Channels that present a link will show
+  *"Form no longer available."*
+- **One submission per request.** The resume token is single-use; once the
+  job advances, further submissions to the same URL are rejected.
+- **Editor preview skips channel dispatch.** When you run the workflow in
+  the editor (test mode), the action still produces a `formUrl` you can open
+  by hand, but it does *not* call out to Slack / Gmail / Approval Task. Use
+  a real deployment to exercise the full delivery path.
+- **No `publicUrl` → no approval.** Without a configured public URL, the
+  action throws at perform time rather than silently creating an unreachable
+  URL.
+
+---
+
+## Coming soon: expanded approvals
+
+<Callout type="warn" title="Coming soon">
+  The capabilities in this section — the extra delivery channels, in-place
+  messenger resolution, the Approval Gate for AI-agent tools, the pending
+  approvals inbox, expiry reminders and escalation, and MCP/A2A approval
+  elicitation — are on the upcoming release track and are not yet available
+  in the latest released version of ByteChef.
+</Callout>
+
+ByteChef separates two disjoint human-in-the-loop primitives: **Approval** (a
+decision, described on this page) and **Ask User Question** (the LLM asking a
+clarifying question — no decision semantics, answered inline in the agent's
+conversation). Typing in chat never resolves an approval, in either
+direction — only a card's buttons or the hosted form do. A reviewer's comment
+travels back on both outcomes — approve-with-note and reject-with-note
+alike — under the reserved `comment` key of the approval outcome (a
+user-defined form field named `comment` takes precedence).
+
+### Approval Gate: guarding AI-agent tools
+
+Add an **Approval Gate** tool to an AI Agent and attach the tools it should
+gate beneath it. Every invocation of a gated tool pauses the run and shows
+the reviewer the tool's name and the AI-chosen arguments. Approve executes
+the call with exactly those arguments; Discard feeds a "denied by reviewer"
+response back into the agent loop so it can re-plan. Enforcement is in the
+platform — the model cannot call a gated tool without approval, and it never
+sees the gate itself, only the tools it gates.
+
+An agent can carry several gates, each with its own channels and its own
+expiry, so a destructive tool can escalate to Slack within four hours while a
+routine one goes to chat with a week to respond. Give each gate a name — it
+appears in the approval request and groups the tools in the editor.
+
+### More delivery channels
+
+Beyond Slack, Gmail, Microsoft Outlook 365, and Approval Task, more channels
+will be available: **Chat** (an inline card in the conversation that started
+the run — no connection needed, but the workflow needs a chat trigger; a run
+started by webhook or schedule with only the chat channel pauses without a
+live card and stays resolvable from the pending approvals list and the
+hosted form), **Discord**, **Telegram**, **Mattermost**, **Rocket.Chat**,
+generic SMTP **Email**, **WhatsApp** (Meta Cloud, Twilio, or Infobip —
+free-form messages only deliver inside an open 24-hour customer-service
+window, so pair WhatsApp with a fallback channel for cold outreach), and
+**SMS** (Twilio or Infobip).
+
+An Approval Gate left with no channels configured defaults to the chat
+channel. If the workflow has no chat trigger, workflow validation will warn
+about a task or gate whose channels resolve to chat only — including a gate
+sitting on that implicit chat default — since the run would then pause with
+no live card for anyone to see.
+
+Channels fan out simultaneously; the first response wins. Delivery is
+best-effort per channel — a channel that fails to send is logged and skipped
+while the others still deliver, and the step only fails when every
+configured channel fails.
+
+Some channels will resolve **in place**, without leaving the messenger:
+Slack (set the app's signing secret on the connection and point its
+Interactivity Request URL at `<public-url>/slack/interactivity`), WhatsApp
+via Meta Cloud (set the app secret on the connection), Telegram (set a
+webhook secret token on the connection), and Discord (set the app's public
+key on the connection). Mattermost also resolves in place through its
+interactive-message callback, but because that callback is unsigned, it
+cannot attribute the resolving user. Twilio/Infobip SMS and WhatsApp, and
+Rocket.Chat, stay on hosted-form links.
+
+A one-click Approve/Discard link never resolves the approval on page open:
+it lands on the hosted form with the decision pre-selected, and a single
+Confirm click submits it — this keeps email link scanners and messenger
+preview bots, which follow links in delivered messages, from silently
+resolving approvals.
+
+### Where the approval card will appear
+
+Beyond the workflow editor's test chat, an inline approval card (and its
+resumed continuation) will appear on the Chats page, in AI Hub workflow
+chats, and in the `@bytechef/chat` embeddable widget. An MCP tool call
+paused on an approval will return an `approval_required` result with the
+hosted form URL — clients that support URL elicitation are prompted to open
+the form, clients that support only form elicitation get an inline
+approve/comment form, and once approved the same tool call returns the
+resumed run's real output (including chained approvals, up to three
+elicitation rounds per call). An A2A `message/send` call will surface the
+paused task with `input-required` status and the form URL; a later
+`tasks/get` returns the final output once it's resolved.
+
+The Approval Tasks page will also gain a **pending run approvals** section
+listing every run currently blocked on an approval, regardless of which
+channel delivered it.
+
+### Expiry, reminders, and escalation
+
+Today the expiry is a fixed 60 days, set by the action itself and not
+configurable (see [Lifecycle & limits](#lifecycle--limits) above). Coming with
+this work: **Expires In** / **Expires In Unit** properties that make the window
+per-request, plus automatic reminders and escalation layered on top of it and
+operator-facing controls for all three.
+
+An expired approval can no longer be resolved. A background sweep
+(`bytechef.workflow.execution.approval-expiry.enabled`, on by default) fails
+the paused run shortly after expiry so it doesn't linger, and a matching
+Approval Tasks entry is marked Expired instead of staying open with a dead
+link (that reconciliation has its own toggle,
+`bytechef.automation.approval-task.reconciliation.enabled`). Operators can
+watch `bytechef_approval_pending` (a gauge of runs currently blocked on an
+approval) and `bytechef_approval_expired` (a counter of approvals that
+lapsed, tagged by source); per-channel delivery is tracked separately by
+`bytechef_approval_request` (successes) and
+`bytechef_approval_delivery_failure` (failures), both tagged by channel.
+
+A subscribed notification (email, webhook, or Slack) will fire once, a
+configurable lead time before an approval expires — default 24 hours,
+`bytechef.workflow.execution.approval-reminder.lead-time`, disable with
+`bytechef.workflow.execution.approval-reminder.enabled=false`. A separate
+notification will fire once an approval has sat unresolved past a
+configured duration, routed to a different audience than the reminder (an
+on-call channel or a manager, for example) — set
+`bytechef.workflow.execution.approval-escalation.after` to a duration to
+enable it; with no default set, escalation is opt-in and does nothing until
+`after` is configured. Disable the escalation sweep on its own with
+`bytechef.workflow.execution.approval-escalation.enabled=false`.
+
+### Outcome shape
+
+The approval step's output stays flat — `approved`, `comment`, `approvedBy`,
+plus one key per form field. `approvedBy` will carry the resolver's identity
+only when the resolving channel authenticated the clicking user (an
+in-place resolution with a verified signature); the anonymous hosted form
+has no trusted identity, so `approvedBy` is absent there and a value
+supplied in the form body is stripped rather than trusted.
+
+---
+
+## Related
+
+- [`approval/v1`](/reference/components/approval_v1) — the current approval
+  component reference.
+- `approval-task/v1` — the in-app task channel component (creates rows in
+  the **Approval Tasks** sidebar inbox).

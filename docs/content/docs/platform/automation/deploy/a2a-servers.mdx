@@ -1,0 +1,84 @@
+---
+title: A2A Servers
+description: Expose an agent-backed workflow as an A2A (Agent2Agent) server so external agents can discover and call it.
+comingSoon: true
+---
+
+An **A2A Server** exposes an agent-backed workflow over the [Agent2Agent (A2A) protocol](https://a2a-protocol.org)
+so that external A2A clients — another agent, Claude, Cursor, or your own code — can discover it through an **agent
+card** and send it tasks. Where an [MCP Server](/platform/automation/deploy/mcp-servers) publishes your tools *to* an assistant, an
+A2A Server publishes a whole **agent** that other agents can delegate work to.
+
+Each server gives you a secret-key URL. The agent card lives at:
+
+```
+GET  https://<your-host>/api/automation/a2a/<secretKey>/.well-known/agent-card.json
+```
+
+and the JSON-RPC endpoint (where clients send `message/send` and `message/stream`) is:
+
+```
+POST https://<your-host>/api/automation/a2a/<secretKey>
+```
+
+---
+
+## Create an A2A server
+
+1. In the Automation workspace, open **A2A Servers** from the sidebar (under **Deploy**).
+2. Click **New A2A Server**.
+3. Give it a **name** and a **description** — both appear on the agent card that external clients read.
+4. Choose whether to **require authentication** (see [Authentication](#authentication) below), and whether the server
+   is **enabled**.
+
+Each server belongs to a single environment (Development, Staging, or Production), selected with the environment
+switcher, so you can expose a different agent per environment. A server exposes nothing until you add workflows to it.
+Its agent-card URL is printed on the server's row in the list.
+
+---
+
+## Expose workflows as skills
+
+Open a server's menu and choose **Manage Skills**.
+
+1. **Select a project** and a published **version**.
+2. **Select the workflows** to expose. Only workflows with a **New Workflow Call** trigger
+   (`workflow/v1/newWorkflowCall`) are eligible — that trigger is what lets the workflow be invoked as an agent skill.
+3. Optionally give each one a **skill name** and **skill description**. Left blank, they fall back to the workflow's
+   own label and description.
+
+Each selected workflow becomes a **skill** on the agent card. When an external client sends a task with `message/send`,
+the server runs the **first** exposed workflow — the message text is passed to it as the `message` input — synchronously,
+and returns the workflow's output as the agent's response. Additional skills are advertised on the card but are not
+individually addressable through `message/send`, so put the workflow you want called first.
+
+<Callout type="info">
+    A `message/stream` call is answered over Server-Sent Events with a `working` status event followed by a final
+    `TaskStatusUpdateEvent`. Streaming is event-level, not token-level: ByteChef runs the workflow to completion, so
+    the agent card advertises `streaming: false` while streaming clients still receive a valid SSE response.
+
+    Tasks are held in a bounded in-memory cache, not durable storage, so `tasks/get` and `tasks/cancel` reach a recent
+    task rather than an arbitrarily old one.
+</Callout>
+
+---
+
+## Authentication
+
+The secret key in the URL is itself a capability — a client must know it to reach the server. On top of that:
+
+- **Require authentication on** (default): the client must also present a ByteChef **API key** as a `Bearer` token in
+  the `Authorization` header, along with an `X-ENVIRONMENT` header naming the environment (`PRODUCTION` when omitted).
+  Requests without a valid, environment-matching Automation API key are rejected.
+- **Require authentication off**: possession of the secret-key URL is sufficient; no API key is required. Use this only
+  for low-risk agents or short-lived testing.
+
+The secret key doubles as the tenant anchor, so a request is always scoped to the tenant that owns the server.
+
+---
+
+## Call an A2A server from another ByteChef agent
+
+An AI Agent can delegate a task to any A2A server (yours or a third party's) with the **Agent Client Tool**
+(`sendTaskToRemoteAgent`) from the AI Agent Utils component: point it at the remote agent's base URL, and it resolves
+the agent card, sends the task, and returns the response.

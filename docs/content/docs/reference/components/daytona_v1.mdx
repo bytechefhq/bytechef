@@ -1,0 +1,264 @@
+---
+title: "Daytona"
+description: "Daytona provides secure and elastic infrastructure for running AI-generated code in isolated sandboxes."
+---
+
+
+Categories: Developer Tools, Artificial Intelligence
+
+
+Type: daytona/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### Bearer Token
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| token | API Key | STRING | Your Daytona API key. | true |
+| baseUrl | Base URL | STRING | The Daytona API base URL. Change only for self-hosted deployments. | true |
+
+
+
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Execute Code
+Name: executeCode
+
+`Generates and runs code in a secure, isolated Daytona sandbox and returns its output. Use this to execute AI-generated code (data analysis, calculations, scripts) safely and get the result back.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| language | Language | STRING <details> <summary> Options </summary> <span>python</span>, <span>typescript</span>, <span>javascript</span>, <span>bash</span> </details> | The programming language of the code to execute. | true |
+| code | Code | STRING | The source code to execute in the sandbox. | true |
+| sandboxId | Sandbox ID | STRING | Run in an existing sandbox to preserve state across turns. Leave empty to create a fresh, ephemeral sandbox for this run. A reused sandbox is never deleted by this action. | false |
+| keepSandbox | Keep Sandbox | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | When creating a new sandbox, keep it alive after the run (instead of deleting it) so it can be reused via its returned Sandbox ID. Ignored when a Sandbox ID is supplied. | false |
+| timeout | Timeout | INTEGER | Maximum time in seconds to wait for the code to finish executing. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Execute Code",
+  "name" : "executeCode",
+  "parameters" : {
+    "language" : "",
+    "code" : "",
+    "sandboxId" : "",
+    "keepSandbox" : false,
+    "timeout" : 1
+  },
+  "type" : "daytona/v1/executeCode"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| exitCode | INTEGER | The exit code of the executed code (0 indicates success). |
+| stdout | STRING | The standard output produced by the code. |
+| success | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the code finished with a zero exit code. |
+| sandboxId | STRING | The sandbox the code ran in (reuse it to preserve state). |
+| charts | ARRAY <details> <summary> Items </summary> [] </details> | Chart artifacts (e.g. matplotlib) captured during execution, if any. |
+
+
+
+
+#### Output Example
+```json
+{
+  "exitCode" : 1,
+  "stdout" : "",
+  "success" : false,
+  "sandboxId" : "",
+  "charts" : [ ]
+}
+```
+
+
+
+
+### Create Sandbox
+Name: createSandbox
+
+`Creates a persistent, isolated Daytona sandbox and returns its ID. Reuse the ID across executeCode and uploadFile calls to preserve state, then delete it with deleteSandbox when done.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| language | Language | STRING <details> <summary> Options </summary> <span>python</span>, <span>typescript</span>, <span>javascript</span>, <span>bash</span> </details> | The default language runtime for the sandbox. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Sandbox",
+  "name" : "createSandbox",
+  "parameters" : {
+    "language" : ""
+  },
+  "type" : "daytona/v1/createSandbox"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| sandboxId | STRING | The ID of the created sandbox. |
+
+
+
+
+#### Output Example
+```json
+{
+  "sandboxId" : ""
+}
+```
+
+
+
+
+### Delete Sandbox
+Name: deleteSandbox
+
+`Deletes a Daytona sandbox and frees its resources.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| sandboxId | Sandbox ID | STRING | The ID of the sandbox to delete. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Delete Sandbox",
+  "name" : "deleteSandbox",
+  "parameters" : {
+    "sandboxId" : ""
+  },
+  "type" : "daytona/v1/deleteSandbox"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| deleted | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the sandbox was deleted. |
+
+
+
+
+#### Output Example
+```json
+{
+  "deleted" : false
+}
+```
+
+
+
+
+### Upload File
+Name: uploadFile
+
+`Uploads a file into a Daytona sandbox at the given path.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| sandboxId | Sandbox ID | STRING | The ID of the sandbox to upload the file into. | true |
+| path | Path | STRING | The absolute destination path inside the sandbox (e.g. /home/daytona/data.csv). | true |
+| file | File | FILE_ENTRY | The file to upload. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Upload File",
+  "name" : "uploadFile",
+  "parameters" : {
+    "sandboxId" : "",
+    "path" : "",
+    "file" : {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    }
+  },
+  "type" : "daytona/v1/uploadFile"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| path | STRING | The destination path the file was uploaded to. |
+
+
+
+
+#### Output Example
+```json
+{
+  "path" : ""
+}
+```
+
+
+
+
+
+

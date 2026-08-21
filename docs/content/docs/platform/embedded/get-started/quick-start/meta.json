@@ -1,0 +1,8 @@
+{
+  "$schema": "../../../../../../.source/json-schema/docs.meta.json",
+  "title": "Quick Start",
+  "description": "Quick Start with Embedded",
+  "pages": [
+    "sample-app/index"
+  ]
+}

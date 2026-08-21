@@ -33,9 +33,13 @@ class MyComponentHandlerTest {
 ```
 
 How it works:
-- JsonFileAssert.assertEquals writes the file if it doesn't exist, and on subsequent runs performs a strict JSON comparison.
+- `JsonFileAssert.assertEquals` writes the file under `src/test/resources/` when it is missing, then reads the copy on the **test classpath** (`build/resources/test/`) and performs a strict JSON comparison against it.
 
-- To intentionally update the snapshot: delete `src/test/resources/definition/<file>.json` and re-run the test to regenerate it, then commit the change. See contributing guide instructions.
+- Because the comparison reads the build output, deleting only the source file is not enough. To intentionally update the snapshot, delete **both**:
+  - `src/test/resources/definition/<file>.json`
+  - `build/resources/test/definition/<file>.json`
+
+  Then re-run the test. The run that finds no file writes a fresh one; run the test once more to compare against it, and commit the regenerated JSON.
 
 Tip: Every component module should have one ComponentHandlerTest like this.
 
@@ -83,5 +87,5 @@ Remember:
 
 If you change your component definition, remember to update the snapshot JSON:
 
-- Delete `src/test/resources/definition/<component>_v<version>.json`
+- Delete `src/test/resources/definition/<component>_v<version>.json` **and** `build/resources/test/definition/<component>_v<version>.json`
 - Re-run the Component Handler Test to regenerate

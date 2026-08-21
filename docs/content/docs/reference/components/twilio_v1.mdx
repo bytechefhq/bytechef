@@ -336,6 +336,8 @@ Type: STATIC_WEBHOOK
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | subWorkflow | Real-Time Workflow | STRING | The workflow ID to execute synchronously during the phone call. This workflow handles real-time audio processing and AI responses. | true |
+| authToken | Auth Token | STRING | Your Twilio account auth token. When set, the incoming request's X-Twilio-Signature is verified and unsigned or forged requests are rejected. Leave empty to skip verification. | false |
+| streamTokenSecret | Stream Token Secret | STRING | Optional shared secret used to sign the media-stream WebSocket URL (a WebSocket upgrade cannot carry X-Twilio-Signature). Set the same value as bytechef.twilio.stream-token.secret on the server so the connection is verified on connect. Leave empty to skip. | false |
 
 
 #### Output
@@ -365,7 +367,9 @@ Type: OBJECT
   "label" : "Inbound Voice Call",
   "name" : "inboundCall",
   "parameters" : {
-    "subWorkflow" : ""
+    "subWorkflow" : "",
+    "authToken" : "",
+    "streamTokenSecret" : ""
   },
   "type" : "twilio/v1/inboundCall"
 }
@@ -380,6 +384,12 @@ Name: newWhatsappMessage
 
 Type: STATIC_WEBHOOK
 
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| number | Number | STRING | The WhatsApp-enabled Twilio number this channel listens on. | false |
+
 
 #### Output
 
@@ -390,6 +400,9 @@ The output for this action is dynamic and may vary depending on the input parame
 {
   "label" : "New WhatsApp Message",
   "name" : "newWhatsappMessage",
+  "parameters" : {
+    "number" : ""
+  },
   "type" : "twilio/v1/newWhatsappMessage"
 }
 ```

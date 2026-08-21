@@ -1,0 +1,11 @@
+{
+  "$schema": "../../../../.source/json-schema/docs.meta.json",
+  "title": "Your Account",
+  "description": "Your account settings",
+  "icon": "User",
+  "pages": [
+    "profile",
+    "appearance",
+    "active-sessions"
+  ]
+}

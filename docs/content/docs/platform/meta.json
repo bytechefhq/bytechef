@@ -1,12 +1,18 @@
 {
+  "$schema": "../../../.source/json-schema/docs.meta.json",
   "title": "Platform",
   "description": "The platform guide",
-  "icon": "Layers",
   "root": true,
+  "icon": "Layers",
   "pages": [
-    "overview",
-    "copilot",
-    "mcp-server",
-    "ai"
+    "index",
+    "what-is-bytechef",
+    "glossary",
+    "use-bytechef",
+    "automation",
+    "embedded",
+    "settings",
+    "your-account",
+    "enterprise/index"
   ]
 }

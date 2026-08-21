@@ -169,6 +169,61 @@ This action does not produce any output.
 
 
 
+### Remove File from AI Skill
+Name: removeFileFromAiSkill
+
+`Removes a single file from an existing AI skill archive.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| id | ID | INTEGER | The ID of the AI skill to remove the file from. | true |
+| path | Path | STRING | The path of the file to remove within the skill archive. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Remove File from AI Skill",
+  "name" : "removeFileFromAiSkill",
+  "parameters" : {
+    "id" : 1,
+    "path" : ""
+  },
+  "type" : "aiAgentUtils/v1/removeFileFromAiSkill"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER |  |
+| name | STRING |  |
+| description | STRING |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : 1,
+  "name" : "",
+  "description" : ""
+}
+```
+
+
+
+
 ### Update AI Skill
 Name: updateAiSkill
 
