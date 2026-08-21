@@ -12,7 +12,7 @@ import WorkflowExecutionsTabsPanel from '@/shared/components/workflow-executions
 import WorkflowTaskExecutionItem from '@/shared/components/workflow-executions/WorkflowTaskExecutionItem';
 import WorkflowTriggerExecutionItem from '@/shared/components/workflow-executions/WorkflowTriggerExecutionItem';
 import {WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
-import {ChevronDownIcon, RefreshCwIcon, RefreshCwOffIcon, WorkflowIcon} from 'lucide-react';
+import {RefreshCwIcon, RefreshCwOffIcon, WorkflowIcon, XIcon} from 'lucide-react';
 import {useCallback, useMemo} from 'react';
 
 import useWorkflowExecutions from './properties/hooks/useWorkflowExecutions';
@@ -72,8 +72,8 @@ const WorkflowExecutionsTestOutput = ({
     }, [handleBreadcrumbNavigate, subflowStack.length]);
 
     return (
-        <div className="flex size-full flex-col">
-            <div className="flex items-center justify-between border-b border-stroke-neutral-secondary py-1">
+        <div className="flex h-full w-full flex-col rounded-lg border border-stroke-neutral-secondary bg-surface-neutral-primary">
+            <div className="flex items-center justify-between border-b border-stroke-neutral-primary">
                 {job ? (
                     <WorkflowExecutionsHeader job={job} triggerExecution={triggerExecution} />
                 ) : (
@@ -82,7 +82,7 @@ const WorkflowExecutionsTestOutput = ({
 
                 {onCloseClick && (
                     <button className="p-2" onClick={onCloseClick}>
-                        <ChevronDownIcon className="h-5" />
+                        <XIcon className="h-4" />
                     </button>
                 )}
             </div>
@@ -95,7 +95,7 @@ const WorkflowExecutionsTestOutput = ({
                                 <RefreshCwIcon className="size-5" />
                             </span>
 
-                            <span className="text-muted-foreground">Workflow is running...</span>
+                            <span className="text-content-neutral-secondary">Workflow is running...</span>
                         </div>
                     )}
 
@@ -110,7 +110,7 @@ const WorkflowExecutionsTestOutput = ({
                             {workflowTestExecution?.job && !jobFailedWithNoExecutions && (
                                 <ResizablePanelGroup orientation="horizontal">
                                     <ResizablePanel
-                                        className="flex flex-col overflow-hidden py-4"
+                                        className="flex flex-col overflow-hidden"
                                         defaultSize={resizablePanelSize}
                                     >
                                         {subflowStack.length === 0 && rootJob && (
@@ -170,9 +170,9 @@ const WorkflowExecutionsTestOutput = ({
                                         </ScrollArea>
                                     </ResizablePanel>
 
-                                    <ResizableHandle className="bg-muted" />
+                                    <ResizableHandle className="bg-surface-neutral-secondary" />
 
-                                    <ResizablePanel className="flex min-h-0 flex-col space-y-4 overflow-hidden p-4">
+                                    <ResizablePanel className="flex min-h-0 flex-col space-y-4 overflow-hidden">
                                         {job && (
                                             <WorkflowExecutionsTabsPanel
                                                 activeTab={activeTab}
@@ -192,7 +192,7 @@ const WorkflowExecutionsTestOutput = ({
                             )}
 
                             {!workflowTestExecution?.job && (
-                                <div className="flex size-full items-center justify-center gap-x-1 p-3 text-muted-foreground">
+                                <div className="flex size-full items-center justify-center gap-x-1 p-3 text-content-neutral-secondary">
                                     <RefreshCwOffIcon className="size-5" />
 
                                     <span>The workflow has not yet been executed.</span>
