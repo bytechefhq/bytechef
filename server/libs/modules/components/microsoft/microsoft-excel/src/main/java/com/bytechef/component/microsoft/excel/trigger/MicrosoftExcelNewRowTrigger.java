@@ -28,17 +28,20 @@ import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.OptionsFunction;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
-import com.bytechef.component.microsoft.excel.util.MicrosoftExcelRowUtils;
 import com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils;
 import com.bytechef.microsoft.commons.MicrosoftUtils;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Marija Horvat
  */
 public class MicrosoftExcelNewRowTrigger {
+
+    private static final String KNOWN_ROW_HASHES = "knownRowHashes";
 
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newRow")
         .title("New Row")
@@ -69,26 +72,31 @@ public class MicrosoftExcelNewRowTrigger {
         Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters,
         TriggerContext context) {
 
-        int lastRowIndex = closureParameters.getInteger("lastRowIndex", 0);
+        List<List<Object>> rows = MicrosoftExcelUtils.getUsedRangeValues(inputParameters, context);
 
-        int currentRowCount = MicrosoftExcelUtils.getLastUsedRowIndex(inputParameters, context);
+        Set<Integer> knownRowHashes = new HashSet<>(
+            closureParameters.getList(KNOWN_ROW_HASHES, Integer.class, List.of()));
 
-        if (currentRowCount <= lastRowIndex) {
-            return new PollOutput(List.of(), Map.of("lastRowIndex", lastRowIndex), false);
-        }
-
+        List<Integer> currentRowHashes = new ArrayList<>();
         List<Map<String, Object>> newRows = new ArrayList<>();
 
-        for (int rowNum = lastRowIndex + 1; rowNum <= currentRowCount; rowNum++) {
-            List<Object> row = MicrosoftExcelRowUtils.getRowFromWorksheet(inputParameters, context, rowNum);
+        // Rows are matched by content hash rather than position so that a row inserted in the
+        // middle of the worksheet is still detected as new, instead of being confused with
+        // whichever row happens to shift into the last position (see #4362).
+        for (List<Object> row : rows) {
+            if (row.isEmpty()) {
+                continue;
+            }
 
-            if (!row.isEmpty()) {
-                Map<String, Object> mappedRow = MicrosoftExcelUtils.getMapOfValuesForRow(inputParameters, context, row);
+            int rowHash = row.hashCode();
 
-                newRows.add(mappedRow);
+            currentRowHashes.add(rowHash);
+
+            if (!knownRowHashes.contains(rowHash)) {
+                newRows.add(MicrosoftExcelUtils.getMapOfValuesForRow(inputParameters, context, row));
             }
         }
 
-        return new PollOutput(newRows, Map.of("lastRowIndex", currentRowCount), false);
+        return new PollOutput(newRows, Map.of(KNOWN_ROW_HASHES, currentRowHashes), false);
     }
 }
