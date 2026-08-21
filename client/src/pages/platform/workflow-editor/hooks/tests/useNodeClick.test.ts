@@ -141,9 +141,6 @@ describe('useNodeClick', () => {
         expect(currentNode?.label).toBe('Fallback Label');
     });
 
-    // Merged-entity behavior (see docs/agents/merge-current-node-component.md, risk #3): the single
-    // currentNode is cleared to an empty description on click, and preserves the previous node's
-    // displayConditions (the carry that the old currentComponent projection used to hold).
     it('should clear currentNode description and preserve displayConditions from the previous node', async () => {
         useWorkflowNodeDetailsPanelStore.setState({
             currentNode: makeNodeData({
