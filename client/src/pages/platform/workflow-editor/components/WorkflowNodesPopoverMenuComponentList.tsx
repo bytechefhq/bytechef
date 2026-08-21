@@ -75,7 +75,6 @@ const WorkflowNodesPopoverMenuComponentList = memo(
         const ff_797 = getFeatureFlag('ff-797');
         const ff_3158 = getFeatureFlag('ff-3158');
         const ff_3827 = getFeatureFlag('ff-3827');
-        const ff_3839 = getFeatureFlag('ff-3839');
 
         const knowledgeBaseEnabled = useApplicationInfoStore((state) => state.ai.knowledgeBase.enabled);
 
@@ -131,10 +130,8 @@ const WorkflowNodesPopoverMenuComponentList = memo(
                 return [];
             }
 
-            return componentsWithActions
-                .filter((component) => hasClusterElementType(component, clusterElementType))
-                .filter(({name}) => (!ff_3839 && name !== 'aiAgent') || ff_3839);
-        }, [componentsWithActions, clusterElementType, ff_3839]);
+            return componentsWithActions.filter((component) => hasClusterElementType(component, clusterElementType));
+        }, [componentsWithActions, clusterElementType]);
 
         return (
             <div className={twMerge('rounded-lg', actionPanelOpen ? 'w-node-popover-width' : 'w-full')}>
