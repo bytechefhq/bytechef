@@ -117,7 +117,7 @@ arriving soon was not helping a reader.
 | [`/developer-guide/architecture`](/developer-guide/architecture) | **AI & Agents** | **all commented out** |
 | [`/platform/automation/ai/skills`](/platform/automation/ai/skills) | Create With AI; The Skills Copilot; Skills as Tools for Other Agents; Test with Evals | rendered |
 | [`/platform/automation/build/connections`](/platform/automation/build/connections) | Get Started; Managing Connections | rendered |
-| [`/platform/automation/build/workflows/ai/agent`](/platform/automation/build/workflows/ai/agent) | Chat Memory Slot; Chat memory vs Auto Memory; Guardrails Slot; The Agent Utils toolset; Test with Evals; **Realtime Chat** | **1 of 6 commented out** |
+| [`/platform/automation/build/workflows/ai/agent`](/platform/automation/build/workflows/ai/agent) | Chat Memory Slot; Chat memory vs Auto Memory; Guardrails Slot; Tools Slot; The Agent Utils toolset; Test with Evals; **Realtime Chat** | **1 of 6 commented out** |
 | [`/platform/automation/build/workflows/ai/agent/agent-utils`](/platform/automation/build/workflows/ai/agent/agent-utils) | Ask User Question; Agent Client; Auto Memory | rendered |
 | [`/platform/automation/build/workflows/flow-controls`](/platform/automation/build/workflows/flow-controls) | (page intro); Outputs; Graph | rendered |
 | [`/platform/automation/build/workflows/human-in-the-loop`](/platform/automation/build/workflows/human-in-the-loop) | Coming soon: expanded approvals | rendered |
