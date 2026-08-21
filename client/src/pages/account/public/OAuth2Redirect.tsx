@@ -1,7 +1,8 @@
 import LoadingIcon from '@/components/LoadingIcon';
+import {consumeLoginRedirect} from '@/shared/auth/login-redirect-utils';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
-import {useEffect} from 'react';
+import {useEffect, useState} from 'react';
 import {Navigate, useNavigate} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -17,13 +18,15 @@ const OAuth2Redirect = () => {
 
     const navigate = useNavigate();
 
+    const [redirect] = useState(() => consumeLoginRedirect() ?? '/');
+
     useEffect(() => {
         getAccount()
             .then((account) => {
                 if (account) {
                     analytics.identify(account);
 
-                    navigate('/', {replace: true});
+                    navigate(redirect, {replace: true});
                 } else {
                     navigate('/login?error=oauth2', {replace: true});
                 }
@@ -31,10 +34,10 @@ const OAuth2Redirect = () => {
             .catch(() => {
                 navigate('/login?error=oauth2', {replace: true});
             });
-    }, [analytics, getAccount, navigate]);
+    }, [analytics, getAccount, navigate, redirect]);
 
     if (authenticated) {
-        return <Navigate replace to="/" />;
+        return <Navigate replace to={redirect} />;
     }
 
     return (
