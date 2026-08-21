@@ -8,6 +8,8 @@ import { createMetadata, getPageImage } from '@/lib/metadata';
 import { source } from '@/lib/source';
 import { Wrapper } from '@/components/preview/wrapper';
 import { Mermaid } from '@/components/mdx/mermaid';
+import { ComingSoonBadge } from '@/components/coming-soon-badge';
+import { EEBadge } from '@/components/ee-badge';
 import { Feedback } from '@/components/feedback';
 import { onRateAction, owner, repo } from '@/lib/github';
 import {
@@ -23,11 +25,7 @@ import { LLMCopyButton, ViewOptions } from '@/components/ai/page-actions';
 import { Banner } from 'fumadocs-ui/components/banner';
 import { Installation } from '@/components/preview/installation';
 import { Customisation } from '@/components/preview/customisation';
-import {
-  DocsBody,
-  DocsPage,
-  PageLastUpdate,
-} from 'fumadocs-ui/layouts/docs/page';
+import { DocsPage, PageLastUpdate } from 'fumadocs-ui/layouts/docs/page';
 import { NotFound } from '@/components/not-found';
 // import { getSuggestions } from '@/app/(docs)/[...slug]/suggestions';
 import { PathUtils } from 'fumadocs-core/source';
@@ -53,32 +51,40 @@ export default async function Page(props: PageProps<'/[...slug]'>) {
       <NotFound getSuggestions={() => Promise.resolve([])} />
     );
 
-  if (page.data.type === 'openapi') {
-    const { APIPage } = await import('@/components/api-page');
-    return (
-      <DocsPage full>
-        <h1 className="text-[1.75em] font-semibold">{page.data.title}</h1>
-
-        <DocsBody>
-          <APIPage {...page.data.getAPIPageProps()} />
-        </DocsBody>
-      </DocsPage>
-    );
-  }
-
   const { body: Mdx, toc, lastModified } = await page.data.load();
+
+  // Generated OpenAPI operation pages carry `full: true`. Passing it through is what gives
+  // fumadocs-openapi room for its two-column reference layout — request and parameters on the
+  // left, code samples and response examples on the right. Without it the page renders in the
+  // constrained article width beside a TOC column, and those right-hand panels collapse below
+  // the fold, which reads as "the API page is not interactive".
+  const isFullWidth = page.data.full === true;
 
   return (
     <DocsPage
+      full={isFullWidth}
       toc={toc}
       tableOfContent={{
+        enabled: !isFullWidth,
         style: 'clerk',
       }}
     >
+      {(page.data.ee || page.data.comingSoon) && (
+        <div className="flex flex-row flex-wrap items-center gap-2 -mb-2">
+          {page.data.ee && <EEBadge />}
+          {page.data.comingSoon && <ComingSoonBadge />}
+        </div>
+      )}
       <h1 className="text-[1.75em] font-semibold">{page.data.title}</h1>
       <p className="text-lg text-fd-muted-foreground mb-2">
         {page.data.description}
       </p>
+      {page.data.comingSoon && (
+        <Callout type="warn" title="Coming soon" className="not-prose mb-4">
+          This capability is not available in the latest released version of
+          ByteChef.
+        </Callout>
+      )}
       <div className="flex flex-row flex-wrap gap-2 items-center border-b pb-6">
         <LLMCopyButton markdownUrl={`${page.url}.mdx`} />
         <ViewOptions
@@ -86,7 +92,11 @@ export default async function Page(props: PageProps<'/[...slug]'>) {
           githubUrl={`https://github.com/${owner}/${repo}/blob/master/docs/content/docs/${page.path}`}
         />
       </div>
-      <div className="prose flex-1 text-fd-foreground/90">
+      <div
+        className={
+          isFullWidth ? 'flex-1' : 'prose flex-1 text-fd-foreground/90'
+        }
+      >
         {page.data.preview && <PreviewRenderer preview={page.data.preview} />}
         <Mdx
           components={getMDXComponents({
