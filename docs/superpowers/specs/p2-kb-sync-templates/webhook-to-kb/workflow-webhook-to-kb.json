@@ -1,0 +1,35 @@
+{
+  "label": "Webhook → Knowledge Base",
+  "description": "Exposes a webhook URL; every POST body becomes a Knowledge Base document. Auto-replies with HTTP 200 — the caller doesn't wait for indexing. Use this when the source you want to sync doesn't have a list API: CI publish hooks, CMS save events, Zapier/n8n exports, GitHub release hooks, etc.",
+  "inputs": [
+    {
+      "name": "knowledgeBaseId",
+      "label": "Target Knowledge Base",
+      "type": "INTEGER",
+      "required": true
+    }
+  ],
+  "triggers": [
+    {
+      "label": "Inbound webhook",
+      "name": "trigger_1",
+      "type": "webhook/v1/autoRespondWithHTTP200",
+      "parameters": {}
+    }
+  ],
+  "tasks": [
+    {
+      "label": "Load payload into KB",
+      "name": "loadPayload_1",
+      "type": "ai_vectorstore_knowledgebase/v1/load",
+      "parameters": {
+        "knowledgeBaseId": "${knowledgeBaseId}"
+      },
+      "metadata": {
+        "ui": {
+          "note": "Pick a string-based Document Reader cluster element and wire its content property to ${trigger_1.body}. For JSON payloads, prefer a transform step that extracts and pretty-prints the relevant fields before loading — otherwise the KB ends up indexing the JSON envelope rather than the actual content."
+        }
+      }
+    }
+  ]
+}

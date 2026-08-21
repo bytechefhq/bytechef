@@ -1,0 +1,10 @@
+{
+  "authorName": "ByteChef",
+  "authorEmail": "support@bytechef.io",
+  "authorRole": "Maintainer",
+  "authorSocialLinks": "https://github.com/bytechefhq",
+  "categories": ["Knowledge Base", "Webhook"],
+  "description": "Push-mode KB ingest. The workflow exposes a webhook URL — every payload posted to it is loaded as a single document into a Knowledge Base. Useful for sources without a list API, or for pushing CI/CD artifacts and CMS publish events directly into the agent's reach.",
+  "lastModifiedDate": "2026-04-29T00:00:00Z",
+  "projectVersion": 1
+}

@@ -1,0 +1,10 @@
+{
+  "authorName": "ByteChef",
+  "authorEmail": "support@bytechef.io",
+  "authorRole": "Maintainer",
+  "authorSocialLinks": "https://github.com/bytechefhq",
+  "categories": ["Knowledge Base", "GitHub"],
+  "description": "Daily poll of a GitHub repository path (typically /docs or /README*). Fetches each file's content and loads it into a workspace Knowledge Base — keeps engineering docs, runbooks, and ADRs queryable from the agent.",
+  "lastModifiedDate": "2026-04-29T00:00:00Z",
+  "projectVersion": 1
+}

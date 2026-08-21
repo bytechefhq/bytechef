@@ -1,0 +1,10 @@
+{
+  "authorName": "ByteChef",
+  "authorEmail": "support@bytechef.io",
+  "authorRole": "Maintainer",
+  "authorSocialLinks": "https://github.com/bytechefhq",
+  "categories": ["Knowledge Base", "Confluence"],
+  "description": "Hourly poll of a Confluence space. Pulls every page and loads it into a workspace Knowledge Base. Requires the Confluence component to be installed — see the README in this template directory for the upstream-component prerequisite.",
+  "lastModifiedDate": "2026-04-29T00:00:00Z",
+  "projectVersion": 1
+}

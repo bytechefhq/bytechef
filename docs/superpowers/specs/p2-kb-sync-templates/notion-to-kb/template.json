@@ -1,0 +1,10 @@
+{
+  "authorName": "ByteChef",
+  "authorEmail": "support@bytechef.io",
+  "authorRole": "Maintainer",
+  "authorSocialLinks": "https://github.com/bytechefhq",
+  "categories": ["Knowledge Base", "Notion"],
+  "description": "Polls a Notion database every hour and loads every item as a document into a workspace Knowledge Base. Works alongside manual uploads — both end up in the same KB and both are searchable from the agent.",
+  "lastModifiedDate": "2026-04-29T00:00:00Z",
+  "projectVersion": 1
+}

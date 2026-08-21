@@ -1,0 +1,10 @@
+{
+  "authorName": "ByteChef",
+  "authorEmail": "support@bytechef.io",
+  "authorRole": "Maintainer",
+  "authorSocialLinks": "https://github.com/bytechefhq",
+  "categories": ["Knowledge Base", "Google Drive"],
+  "description": "Polls a Google Drive folder every hour, downloads every file under it, and loads each into a workspace Knowledge Base. Picks up new and modified files automatically; deletions are not propagated.",
+  "lastModifiedDate": "2026-04-29T00:00:00Z",
+  "projectVersion": 1
+}

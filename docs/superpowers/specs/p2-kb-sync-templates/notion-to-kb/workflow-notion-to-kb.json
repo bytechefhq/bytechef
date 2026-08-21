@@ -1,0 +1,62 @@
+{
+  "label": "Notion → Knowledge Base",
+  "description": "Hourly poll of a Notion database. Lists every database item, then loads each one into the configured Knowledge Base. Modified-since filtering can be added once the workflow runtime exposes the trigger's last-fired timestamp; until then the KB load action's content-hash dedup prevents re-embedding identical pages.",
+  "inputs": [
+    {
+      "name": "knowledgeBaseId",
+      "label": "Target Knowledge Base",
+      "description": "The Knowledge Base to load Notion pages into. Pick from the dropdown after forking — the inputs panel resolves it against the current workspace.",
+      "type": "INTEGER",
+      "required": true
+    },
+    {
+      "name": "databaseId",
+      "label": "Notion Database ID",
+      "description": "The Notion database to sync. Open the database in Notion → … menu → Copy link → the id is the 32-char hex segment before the ?v=… query.",
+      "type": "STRING",
+      "required": true
+    }
+  ],
+  "triggers": [
+    {
+      "label": "Every hour",
+      "name": "trigger_1",
+      "type": "schedule/v1/cron",
+      "parameters": {
+        "expression": "0 0 * * * *",
+        "timezone": "UTC"
+      }
+    }
+  ],
+  "tasks": [
+    {
+      "label": "List Notion database items",
+      "name": "listItems_1",
+      "type": "notion/v1/listDatabaseItems",
+      "parameters": {
+        "databaseId": "${databaseId}"
+      }
+    },
+    {
+      "label": "Load each page into the Knowledge Base",
+      "name": "each_1",
+      "type": "each/v1/each",
+      "parameters": {
+        "items": "${listItems_1.results}",
+        "iteratee": {
+          "label": "Load page",
+          "name": "loadPage_1",
+          "type": "ai_vectorstore_knowledgebase/v1/load",
+          "parameters": {
+            "knowledgeBaseId": "${knowledgeBaseId}"
+          },
+          "metadata": {
+            "ui": {
+              "note": "TODO: pick a Document Reader cluster element after forking. For Notion, the Tika reader works on the page export; alternatively use a fetch step (notion/v1/getPageOrBlockChildren) to pull the page content first and feed it as a string into the reader."
+            }
+          }
+        }
+      }
+    }
+  ]
+}

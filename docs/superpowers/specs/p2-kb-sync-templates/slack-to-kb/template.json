@@ -1,0 +1,10 @@
+{
+  "authorName": "ByteChef",
+  "authorEmail": "support@bytechef.io",
+  "authorRole": "Maintainer",
+  "authorSocialLinks": "https://github.com/bytechefhq",
+  "categories": ["Knowledge Base", "Slack"],
+  "description": "Daily ingest of a Slack channel into a workspace Knowledge Base — useful for capturing oncall threads, support transcripts, or design discussions. PREREQUISITE: a Slack channel-history action; the in-tree Slack component currently only exposes message-send actions (see server/libs/modules/components/slack/).",
+  "lastModifiedDate": "2026-04-29T00:00:00Z",
+  "projectVersion": 1
+}
