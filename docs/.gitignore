@@ -27,6 +27,30 @@ yarn-error.log*
 .vercel
 next-env.d.ts
 
-# openapi
-content/docs/openapi/**/*.mdx
-!content/docs/openapi/index.mdx
+# openapi — one directory per spec, written by `npm run generate:openapi`, which
+# `npm run build` runs before `next build`. These names mirror the SPECS keys in
+# lib/openapi/index.ts; add a line here when you add a spec there.
+#
+# The generator emits BOTH .mdx pages and a meta.json per group, so ignore the directories
+# rather than a file extension — ignoring only *.mdx previously left the group meta.json
+# files tracked, where they drifted whenever GROUP_META changed and were rewritten in place
+# by the jsonSchema plugin on every fumadocs-mdx run.
+content/docs/openapi/automation-workflow-execution/
+content/docs/openapi/automation-project-code-workflow/
+content/docs/openapi/automation-project-git/
+content/docs/openapi/embedded-action/
+content/docs/openapi/embedded-tool/
+content/docs/openapi/embedded-workflow-execution/
+content/docs/openapi/embedded-tool-invocation/
+content/docs/openapi/embedded-configuration-integration/
+content/docs/openapi/embedded-configuration-integration-instance/
+content/docs/openapi/embedded-configuration-integration-instance-workflow/
+content/docs/openapi/embedded-configuration-connection/
+content/docs/openapi/embedded-configuration-connected-user/
+content/docs/openapi/embedded-configuration-connected-user-project-workflow/
+content/docs/openapi/embedded-configuration-automation-workflow-project/
+content/docs/openapi/embedded-webhook-app-event-trigger/
+content/docs/openapi/embedded-webhook-request-trigger/
+content/docs/openapi/automation-bridge/
+content/docs/openapi/custom-components/
+# openapi/index.mdx and openapi/meta.json are hand-written and stay tracked.

@@ -18,7 +18,6 @@ import type { Nodes } from 'hast';
  * still have to add stringify layer from `remark-mdx`.
  */
 export async function getLLMText(page: Page) {
-  if (page.data.type === 'openapi') return '';
   const tree = await page.data.getMDAST();
   const tasks: Promise<void>[] = [];
 

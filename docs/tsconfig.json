@@ -2,6 +2,12 @@
 {
   "extends": "./tsconfig/nextjs.json",
   "compilerOptions": {
+    "ignoreDeprecations": "6.0",
+    // The `scripts/*.mts` files run under `node --experimental-strip-types`, which resolves imports
+    // at runtime and so needs the real `.ts` extension on relative paths. Allowed here rather than
+    // rewriting those imports, which would break the scripts. Safe because the base config sets
+    // `noEmit`.
+    "allowImportingTsExtensions": true,
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"],
@@ -11,6 +17,7 @@
   "include": [
     "next-env.d.ts",
     "**/*.ts",
+    "**/*.mts",
     "content/**/*.mdx",
     "**/*.tsx",
     ".next/types/**/*.ts"

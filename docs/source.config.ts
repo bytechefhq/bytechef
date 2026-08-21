@@ -20,6 +20,17 @@ export const docs = defineDocs({
        * API routes only
        */
       method: z.string().optional(),
+      /**
+       * The page documents an Enterprise Edition capability in full. Sections that are
+       * only partly EE keep the inline <EEBadge /> instead.
+       */
+      ee: z.boolean().default(false),
+      /**
+       * The capability is implemented but not in the latest released version. Read by the
+       * marketing site as the authoritative feature-status gate, which is why it is a
+       * structured field rather than prose.
+       */
+      comingSoon: z.boolean().default(false),
     }),
     postprocess: {
       includeProcessedMarkdown: true,
