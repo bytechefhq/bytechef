@@ -166,7 +166,6 @@ function App() {
     useFetchInterceptor();
 
     const ff_1023 = useFeatureFlagsStore()('ff-1023');
-    const ff_1779 = useFeatureFlagsStore()('ff-1779');
     const ff_2446 = useFeatureFlagsStore()('ff-2446');
     const ff_2311 = useFeatureFlagsStore()('ff-2311');
     const ff_2396 = useFeatureFlagsStore()('ff-2396');
@@ -205,14 +204,7 @@ function App() {
             return ff_2446;
         }
 
-        if (
-            (ff_1779 && navItem.href === '/embedded/automation-workflows') ||
-            navItem.href !== '/embedded/automation-workflows'
-        ) {
-            return true;
-        }
-
-        return false;
+        return true;
     });
 
     let navigation: NavigationType[] = [];
