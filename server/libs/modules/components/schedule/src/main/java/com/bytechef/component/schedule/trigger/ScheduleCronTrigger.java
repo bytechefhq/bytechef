@@ -43,17 +43,18 @@ public class ScheduleCronTrigger {
 
     public final ModifiableTriggerDefinition triggerDefinition = trigger("cron")
         .title("Cron")
-        .description("Trigger off based on a custom schedule.")
+        .description("Runs the workflow on a custom schedule defined by a cron expression.")
         .type(TriggerType.LISTENER)
         .properties(
             string(EXPRESSION)
-                .label("Expression")
+                .label("Cron Expression")
                 .description(
-                    "The chron schedule expression. Format: [Minute] [Hour] [Day of Month] [Month] [Day of Week]")
+                    "The cron expression that defines when the workflow runs (without the seconds field). Format: " +
+                        "minute hour day-of-month month day-of-week.")
                 .required(true),
             string(TIMEZONE)
                 .label("Timezone")
-                .description("The timezone at which the cron expression will be scheduled.")
+                .description("The time zone used to interpret the schedule.")
                 .options(ScheduleUtils.getTimeZoneOptions())
                 .required(true))
         .output(
