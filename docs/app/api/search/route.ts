@@ -7,8 +7,6 @@ export const { GET } = createSearchAPI('advanced', {
     const pages = source.getPages();
     const indexes = await Promise.all(
       pages.map(async (page) => {
-        if (page.data.type === 'openapi') return undefined;
-
         const loaded = await page.data.load();
 
         return {

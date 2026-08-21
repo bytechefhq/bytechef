@@ -3,29 +3,23 @@ import {
   type InferPageType,
   type LoaderPlugin,
   loader,
-  multiple,
 } from 'fumadocs-core/source';
-import { openapiPlugin, openapiSource } from 'fumadocs-openapi/server';
+import { openapiPlugin } from 'fumadocs-openapi/server';
 import { docs } from 'fumadocs-mdx:collections/server';
 import { lucideIconsPlugin } from 'fumadocs-core/source/lucide-icons';
-import { openapi } from '@/lib/openapi';
 
+// OpenAPI pages come from the MDX files `npm run generate:openapi` emits into
+// content/docs/openapi/(generated). `openapiPlugin()` decorates their page-tree entries (method
+// badge, webhook label) from the `_openapi` frontmatter it finds there.
 export const source = loader(
-  multiple({
-    docs: docs.toFumadocsSource(),
-    openapi: await openapiSource(openapi, {
-      baseDir: 'openapi/(generated)',
-    }),
-  }),
+  docs.toFumadocsSource(),
   {
     baseUrl: '/',
     plugins: [pageTreeCodeTitles(), featureFlagsPlugin(), lucideIconsPlugin(), openapiPlugin()],
   },
 );
 
-const FEATURE_FLAG_PAGES: Record<string, string> = {
-  '/platform/copilot': 'ff-1570',
-};
+const FEATURE_FLAG_PAGES: Record<string, string> = {};
 
 function getEnabledFeatureFlags(): Set<string> {
   const flags = new Set<string>();
