@@ -23,7 +23,7 @@ Two ways something here is hidden, and the tables below mark both:
 
 Both are reversible and neither deletes anything.
 
-**44 whole-page** (15 hidden) · **29 partial** pages (6 with a commented-out section)
+**46 whole-page** (15 hidden) · **29 partial** pages (6 with a commented-out section)
 
 ---
 
@@ -50,6 +50,7 @@ Both are reversible and neither deletes anything.
 | Asset Files | [`/platform/automation/data/asset-files`](/platform/automation/data/asset-files) | CE | visible |
 | Sources | [`/platform/automation/data/knowledge-base/sources`](/platform/automation/data/knowledge-base/sources) | CE | **hidden** |
 | A2A Servers | [`/platform/automation/deploy/a2a-servers`](/platform/automation/deploy/a2a-servers) | CE | **hidden** |
+| API Platform | [`/platform/automation/deploy/api-platform`](/platform/automation/deploy/api-platform) | — | visible |
 | Guardrails | [`/platform/automation/settings/ai-agents/guardrails`](/platform/automation/settings/ai-agents/guardrails) | EE | **hidden** |
 | System Prompt | [`/platform/automation/settings/ai-agents/system-prompt`](/platform/automation/settings/ai-agents/system-prompt) | EE | **hidden** |
 | AI Hub Connectors | [`/platform/automation/settings/ai-hub-connectors`](/platform/automation/settings/ai-hub-connectors) | EE | **hidden** |
@@ -63,6 +64,7 @@ Both are reversible and neither deletes anything.
 |---|---|---|---|
 | Automation Code Workflows | [`/platform/embedded/build/automations/automation-code-workflows`](/platform/embedded/build/automations/automation-code-workflows) | CE | visible |
 | Automation workflows | [`/platform/embedded/build/automations/automation-workflows`](/platform/embedded/build/automations/automation-workflows) | EE | visible |
+| Unified API | [`/platform/embedded/build/unified-api`](/platform/embedded/build/unified-api) | — | visible |
 
 ### Platform Settings
 
