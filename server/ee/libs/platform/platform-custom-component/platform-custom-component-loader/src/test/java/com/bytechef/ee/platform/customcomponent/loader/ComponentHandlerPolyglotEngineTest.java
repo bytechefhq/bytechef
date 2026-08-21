@@ -38,8 +38,13 @@ import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.ai.agent.BaseToolFunction;
 import com.bytechef.platform.component.definition.ParametersFactory;
+import com.bytechef.platform.component.polyglot.PolyglotSandbox;
+import com.bytechef.platform.component.polyglot.PolyglotSandboxSettings;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import org.graalvm.polyglot.PolyglotException;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -49,6 +54,49 @@ import org.mockito.ArgumentCaptor;
  * @author Ivica Cardic
  */
 class ComponentHandlerPolyglotEngineTest {
+
+    @AfterEach
+    void afterEach() {
+        PolyglotSandbox.setSettings(PolyglotSandboxSettings.defaults());
+    }
+
+    /**
+     * A custom component's definition is user-supplied script, evaluated in full at load time - top-level work
+     * included. It gets the same sandbox and the same ceilings the component's perform functions get, or an uploaded
+     * component can burn a thread before it ever declares an action.
+     */
+    @Test
+    void testLoadEnforcesCpuLimitOnDefinitionScript() {
+        PolyglotSandbox.setSettings(
+            new PolyglotSandboxSettings(
+                true, Duration.ofSeconds(1), PolyglotSandboxSettings.DEFAULT_MAX_HEAP_MEMORY,
+                PolyglotSandboxSettings.DEFAULT_MAX_CONCURRENT_EXECUTIONS));
+
+        String script = """
+            ({
+                name: 'test-component',
+                version: 1,
+                actions: [],
+                filler: (function () {
+                    let total = 0;
+
+                    for (let i = 0; i < 200000000; i++) {
+                        total += i;
+                    }
+
+                    return total;
+                })()
+            })
+            """;
+
+        PolyglotException polyglotException = assertThrows(
+            PolyglotException.class, () -> ComponentHandlerPolyglotEngine.load("js", script));
+
+        assertTrue(
+            polyglotException.getMessage()
+                .contains("CPU time limit"),
+            polyglotException.getMessage());
+    }
 
     @Test
     void testLoadRegistersDeclaredStaticConnection() throws Exception {
