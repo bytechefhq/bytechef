@@ -304,6 +304,7 @@ Tools turn workflow components into actions the agent can call mid-conversation.
 | MCP Client | [mcpClient/v1](/reference/components/mcp-client_v1) | Connect the agent to an external MCP server and expose that server's tools to the model. |
 | Vector store / Knowledge Base search | The Search tool cluster element on any [supported vector store](#compatible-vector-stores) or [knowledgeBase/v1](/reference/components/knowledgeBase_v1) | Let the agent search a vector store or Knowledge Base *on demand* — retrieval as a tool the model chooses to call, complementing the always-on [RAG slot](#rag-slot). |
 | Script | [script/v1](/reference/components/script_v1) | Run custom Python, JavaScript, or Ruby as a tool when no built-in action fits. |
+| AI Agent *(coming soon)* | [aiAgent/v1](/reference/components/ai-agent_v1) | Let one agent call another as a tool, for the agent-of-agents compositions described above — a sub-agent owns a self-contained domain and returns a result to its caller. |
 
 ### Supplying tool parameters with fromAi
 
