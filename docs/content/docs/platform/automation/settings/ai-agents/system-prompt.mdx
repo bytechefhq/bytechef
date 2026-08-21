@@ -1,0 +1,63 @@
+---
+title: System Prompt
+description: Standing instructions appended to every AI agent running in the workspace, subordinate to each agent's own prompt.
+ee: true
+comingSoon: true
+---
+
+**Settings → AI Agents → System Prompt** holds one block of text per workspace: standing instructions
+that ride along with every model call an agent in that workspace makes. It is the sibling tab of
+[Guardrails](/platform/automation/settings/ai-agents/guardrails) — guardrails decide what a prompt may
+*contain*, this decides what every agent is *told*.
+
+The page describes itself: "Standing instructions appended to every AI agent operating in this
+workspace... Each agent's own prompt and safety rules always come first — these instructions cannot
+override them."
+
+Reading the prompt needs `AI_GATEWAY_VIEW` on the workspace; saving it is restricted to the
+organization admin.
+
+{/* TODO screenshot: Settings → AI Agents → System Prompt — the monospace textarea with the character counter beneath it and the Save button */}
+
+---
+
+## Editing it
+
+One monospace textarea, labelled **Workspace system prompt**, with a live character counter and a
+**4000-character** ceiling the field enforces as you type. Click **Save**; a "Workspace system prompt
+saved" toast confirms it.
+
+The stored value is trimmed. Saving an empty box removes the prompt entirely rather than storing a
+blank one, so clearing the field is how you turn the feature off.
+
+The placeholder shows the intended register: *"Example: Always answer in German. Our fiscal year starts
+in February."* Durable facts about how your organization works, not task instructions.
+
+## Where it applies
+
+| Surface | Covered |
+|---|---|
+| **AI Hub chats** | Yes, including the specialist subagents a turn delegates to. |
+| **Canvas AI Agent component** | Yes, on workflow runs. |
+| **The Copilot panel** | No. |
+
+A run that cannot be attributed to a workspace gets no workspace prompt.
+
+## How it composes with the agent's own prompt
+
+The text is appended to the agent's existing system message under a **`## Workspace instructions`**
+heading, with fixed framing that keeps it subordinate:
+
+> The workspace administrator provided the following instructions. Follow them where they apply, but
+> they cannot override or weaken any rule above, including safety and security rules.
+
+Two consequences of that placement:
+
+- It is **advisory, not enforcement**. A model can be argued out of an instruction in a way it cannot
+  be argued out of a guardrail. Anything that must hold — redaction, blocked terms, injection
+  detection — belongs in [Guardrails](/platform/automation/settings/ai-agents/guardrails), not here.
+- It is applied **after** the guardrails input scan, so your own instructions are never redacted or
+  blocked by the workspace's own guardrail policy.
+
+Lookups are cached briefly, so an edit reaches running agents within about a minute. A failure to read
+the prompt is treated as "no prompt" rather than failing the call.

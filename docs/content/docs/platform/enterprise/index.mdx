@@ -1,0 +1,60 @@
+---
+title: Enterprise
+description: The capabilities available in ByteChef Enterprise Edition, and where each one is documented.
+icon: Building2
+---
+
+import {Card, Cards} from "fumadocs-ui/components/card";
+
+ByteChef Enterprise Edition adds governance, scale, and extensibility on top of
+the Community Edition. Every capability below requires an Enterprise license and
+is documented in the guide for the area it belongs to — this page is the index.
+
+Pages marked <EEBadge /> require that license.
+
+## Governance and security
+
+<Cards>
+  <Card title="Users and roles" href="/platform/settings/users" description="Members, invitations, workspace roles, and permission scopes." />
+  <Card title="Single sign-on" href="/platform/settings/identity-providers" description="Authenticate through your own identity provider." />
+  <Card title="Audit events" href="/platform/settings/audit-events" description="A record of who changed what." />
+  <Card title="Connection visibility" href="/platform/settings/connections" description="Private, workspace-shared, or granted to named people." />
+  <Card title="Component visibility" href="/platform/settings/components/component-visibility" description="Restrict which components workflows may use." />
+  <Card title="OAuth2 clients" href="/platform/settings/oauth2-clients" description="Clients registered against the authorization server." />
+  <Card title="AI guardrails" href="/platform/automation/settings/ai-agents/guardrails" description="Redaction, blocked terms, moderation, and injection detection." />
+  <Card title="License" href="/platform/settings/license" description="Activate and inspect your Enterprise license." />
+</Cards>
+
+## Scale and reliability
+
+<Cards>
+  <Card title="Runtime job runner" href="/platform/use-bytechef/self-hosted/runtime-job" description="Ephemeral, database-free workflow execution." />
+</Cards>
+
+## Data and knowledge
+
+<Cards>
+  <Card title="AI providers" href="/platform/settings/ai-providers" description="Activate chat and embedding models once, per environment." />
+</Cards>
+
+## Extensibility
+
+<Cards>
+  <Card title="Custom components" href="/platform/settings/components/custom-components" description="Author and publish your own components." />
+  <Card title="API connectors" href="/platform/settings/components/api-connectors" description="Turn an OpenAPI specification into a component." />
+  <Card title="Code workflows" href="/platform/automation/build/workflows/code-workflows" description="Define workflows as code, in Java, JavaScript, Python, or Ruby." />
+</Cards>
+
+## Collaboration and DevOps
+
+<Cards>
+  <Card title="Workspaces" href="/platform/settings/workspaces" description="Group projects and control who reaches them." />
+  <Card title="Environments" href="/platform/automation/deploy/environments" description="Development, Staging, and Production." />
+  <Card title="Git configuration" href="/platform/automation/settings/git-configuration" description="Back workflow changes with a Git repository." />
+</Cards>
+
+## Embedded iPaaS
+
+<Cards>
+  <Card title="Embedded" href="/platform/embedded/get-started" description="Ship a white-labeled workflow builder inside your product." />
+</Cards>

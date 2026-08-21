@@ -27,6 +27,7 @@ Version: 1
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | clientId | Client Id | STRING |  | true |
 | clientSecret | Client Secret | STRING |  | true |
+| signingSecret | Signing Secret | STRING | The Slack app's signing secret. When set, approval request messages use in-place Approve/Discard buttons resolved directly in Slack — configure the app's Interactivity Request URL to &lt;public-url&gt;/slack/interactivity. When unset, buttons link to the hosted approval form. | false |
 
 
 
@@ -377,6 +378,46 @@ The output for this action is dynamic and may vary depending on the input parame
   "label" : "Any Event",
   "name" : "anyEvent",
   "type" : "slack/v1/anyEvent"
+}
+```
+#### How to set up trigger
+
+To find out how to set up trigger, click [here](/reference/components/slack_v1#enable-event-subscription).
+
+
+
+### New Message
+Name: newMessage
+
+`Triggers when a user posts a message to a subscribed Slack channel. Events that are not messages and messages carrying no text are ignored, as are messages the bot itself posted, so an automation never responds to its own reply.`
+
+Type: STATIC_WEBHOOK
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| conversationId | STRING | Identifier of the conversation the message was posted to. |
+| message | STRING | Text of the message. |
+| attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> | Files that arrived with the message. |
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "New Message",
+  "name" : "newMessage",
+  "type" : "slack/v1/newMessage"
 }
 ```
 #### How to set up trigger

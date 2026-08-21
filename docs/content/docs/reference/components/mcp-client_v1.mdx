@@ -39,7 +39,7 @@ Version: 1
 | tokenUrl | Token URL | STRING |  | true |
 | clientId | Client Id | STRING |  | true |
 | clientSecret | Client Secret | STRING |  | true |
-| headerPrefix | Header Prefix | STRING |  | null |
+| headerPrefix | Header Prefix | STRING |  | false |
 | scopes | Scopes | STRING | Optional comma-delimited list of scopes | false |
 
 
@@ -53,7 +53,7 @@ Version: 1
 | tokenUrl | Token URL | STRING |  | true |
 | clientId | Client Id | STRING |  | true |
 | clientSecret | Client Secret | STRING |  | true |
-| headerPrefix | Header Prefix | STRING |  | null |
+| headerPrefix | Header Prefix | STRING |  | false |
 | scopes | Scopes | STRING | Optional comma-delimited list of scopes | false |
 
 
@@ -77,7 +77,7 @@ Name: callTool
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | toolName | Tool Name | STRING | The name of the tool to call on the MCP server. | true |
-| toolArguments | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> toolName </details> |  | null |
+| toolArguments | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> toolName </details> |  | false |
 
 #### Example JSON Structure
 ```json

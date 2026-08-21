@@ -1,0 +1,165 @@
+---
+title: Error Workflows
+description: Run a designated workflow when an automation run fails — the inter-workflow counterpart to the On Error task dispatcher.
+comingSoon: true
+---
+
+An **error workflow** is a normal workflow that runs automatically when another workflow's run ends
+`FAILED`. It receives the failed run's details — which job, which task, what error — as its input,
+so it can notify someone, log the failure somewhere durable, or kick off a remediation. This is
+ByteChef's version of n8n's error workflow / Error Trigger pair.
+
+## How this differs from the On Error task dispatcher
+
+An error workflow is easy to mistake for the [On Error](/reference/flow-controls/on-error_v1) flow
+control, but they solve different problems and compose without overlapping:
+
+- **On Error is *intra*-workflow.** It catches a failing step inside a single workflow and runs a
+  recovery branch in its place. If that branch completes, the run ends **`COMPLETED`** — as far as
+  the platform is concerned, nothing failed.
+- **An error workflow is *inter*-workflow.** It only fires when a run ends **`FAILED`**, i.e. the
+  error escaped every On Error branch in that workflow. A workflow with a solid On Error branch
+  around its risky step may never trigger its error workflow at all.
+- **`finalize`** is still the `finally` block for a workflow's own tasks, unaffected by either of
+  the above.
+
+There's no precedence to configure between the two — On Error runs first, as part of the workflow
+itself, and an error workflow only ever sees what On Error didn't catch.
+
+## Build an error workflow
+
+Any workflow becomes eligible to act as an error handler by adding the **New Workflow Error**
+trigger (`workflow/newWorkflowError`) — a trigger on the built-in Workflow component, alongside New
+Workflow Call. Its presence is the only thing that makes a workflow selectable as an error workflow;
+the trigger declares an output schema so the editor shows data pills for the failed run's details,
+but the workflow is started directly by the coordinator, not over a webhook.
+
+Build the rest of the workflow normally — read the input, send a Slack message, write a row to a
+data table, whatever the escalation should be.
+
+## Configure it
+
+Both the project default and any per-workflow override live in the same place: the **Settings**
+(gear icon) menu in the project header of the workflow editor. That menu has a **Workflow** tab and
+a **Project** tab.
+
+### Project default
+
+On the **Project** tab, **Error Workflow** opens a dialog with a single **Handler workflow**
+dropdown. Pick **None** to leave the project without a default, or pick any eligible workflow to
+run it whenever a workflow in this project fails and hasn't overridden or disabled the default.
+
+The dropdown only lists workflows that are eligible to act as a handler — same-project workflows
+that carry the `workflow/newWorkflowError` trigger. If none exist yet, the dialog shows a hint
+instead of an empty dropdown:
+
+> No eligible handlers yet — add a New Workflow Error trigger to a workflow in this project first.
+
+Under the hood this saves through the `updateProjectErrorWorkflow` mutation
+(`errorProjectWorkflowId: null` clears the default):
+
+```graphql
+mutation {
+    updateProjectErrorWorkflow(projectId: 123, errorProjectWorkflowId: 456)
+}
+```
+
+### Per-workflow override
+
+On the **Workflow** tab (with a workflow open in the editor), **Error Handling** opens a dialog
+with three radio options:
+
+- **Inherit project default** — use whatever the project's default handler is (or none, if the
+  project has none configured). This is the default state for every workflow.
+- **Override** — pick a different eligible handler for just this workflow, from the same
+  same-project, New-Workflow-Error-trigger-filtered list used by the project dialog (with the
+  workflow itself excluded, since it can't be its own handler). The radio is disabled when no
+  eligible workflow exists besides the current one.
+- **Disabled** — opt this workflow out of error handling entirely, even if the project has a
+  default configured.
+
+This saves through `updateProjectWorkflowErrorWorkflow`, which carries both fields at once —
+`errorWorkflowDisabled` is a separate boolean rather than overloading the nullable reference,
+because `null` already means "inherit the project default":
+
+```graphql
+mutation {
+    updateProjectWorkflowErrorWorkflow(
+        projectId: 123
+        projectWorkflowId: 789
+        errorProjectWorkflowId: 456
+        errorWorkflowDisabled: false
+    )
+}
+```
+
+The referenced workflow — for either the project default or a per-workflow override — is validated
+at configuration time, not at failure time, so a broken reference can't surface as a second failure
+while the first one is being handled:
+
+- it must belong to the **same project** as the workflow(s) it will handle,
+- it must carry the `workflow/newWorkflowError` trigger,
+- it cannot be the workflow it's configured on.
+
+Resolution at failure time is: **workflow override → project default → none** (and disabled always
+wins over both).
+
+## The payload
+
+The error workflow receives exactly these fields as its input — no task inputs or outputs from the
+failed run are copied over. The `jobId` is the handle; a handler that needs more can fetch it
+through the existing execution APIs.
+
+Like every other trigger in ByteChef, the payload is nested under the **New Workflow Error**
+trigger's node name, not passed at the top level — that's also why the editor's data pills for
+this trigger are prefixed with its node name (`${newWorkflowError_1.execution.jobId}`, for
+example, if the trigger node is named `newWorkflowError_1`). Reference the fields below through
+that prefix, matching whatever the trigger node is actually named in your workflow.
+
+| Field | Type | Notes |
+|---|---|---|
+| `execution.jobId` | string | The failed run's job id. |
+| `execution.url` | string \| null | Link to the failed run's execution detail page. **`null`** when `bytechef.public-url` is unset or blank. |
+| `execution.error.message` | string | The failure message, or a generic placeholder if none was captured. |
+| `execution.error.stackTrace` | string \| null | The captured stack trace, if any. |
+| `execution.lastTaskExecuted` | string \| null | The name of the task that actually failed. **`null`** if the run failed before any task started. |
+| `execution.autoRecoveryAttempts` | integer | How many times this run has already been auto-recovered after a crash. `0` for a run that never needed recovery. |
+| `workflow.projectId` | string | The failed workflow's project. |
+| `workflow.projectWorkflowId` | string | The failed workflow's project-workflow id. |
+| `workflow.workflowId` | string | The failed workflow's id. |
+| `workflow.label` | string | The failed workflow's label. |
+| `environment` | string \| null | The environment the failed run executed in (Development / Staging / Production). |
+
+## Limits
+
+- **Requires a local project-workflow lookup.** Resolving the handler means reading the failing
+  workflow's project-workflow configuration. Where that lookup is unavailable, the listener detects
+  it, logs it once instead of on every failed job, and records it under a distinct metric outcome
+  rather than treating it as a recurring error — no error workflow dispatches, and there is no
+  partial behaviour to rely on.
+- **Same project only.** A handler must live in the project of the workflow it's handling; there's
+  no cross-project or embedded-integration equivalent. Embedded integrations have no project for the
+  config to hang off in the first place.
+- **Depth-1 recursion cap.** If an error workflow's own run fails, it does **not** trigger another
+  error workflow. The coordinator stamps the handler's job with `errorHandlerFor=<failedJobId>` in
+  its metadata, and any job carrying that key is skipped before anything else is checked. Without
+  this, a handler with a bug in it would spawn a new handler run every time it failed, forever. A
+  broken handler's own failures are still visible through `JOB_FAILED` notifications and workflow
+  alert rules — that's the intended escalation path for a handler that's itself broken.
+- **Subflow child runs are skipped.** Only a top-level run dispatches a handler. A child job
+  launched by a Subflow step carries a parent task-execution id, and the listener skips it — the
+  failure surfaces on the parent run, which is where the handler fires from.
+- **Admission gates are not bypassed.** The handler run goes through the normal job-creation path,
+  so plan rate limits, the concurrency gate, and the monthly cost cap all apply exactly as they
+  would for any other run. A bad deploy that fails 5,000 runs is bounded by those gates rather than
+  becoming an unbounded job storm.
+- **No deduplication.** Failures aren't collapsed or throttled: N failed runs can produce up to N
+  handler runs. There's no windowing or per-project rate limiting specific to this feature — the
+  plan's admission gates are what keep a failure storm from becoming a resource problem, not a
+  dedup step.
+
+## Reference
+
+- [On Error](/reference/flow-controls/on-error_v1) — the intra-workflow catch this feature complements.
+- [Flow Controls](/platform/automation/build/workflows/flow-controls) — where On Error sits among the other task dispatchers.
+- [Subflows](/platform/automation/build/workflows/subflows) — the Workflow component's other trigger, New Workflow Call.

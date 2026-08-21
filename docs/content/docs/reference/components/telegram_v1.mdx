@@ -26,6 +26,7 @@ Version: 1
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | botToken | Bot Token | STRING |  | true |
+| webhookSecretToken | Webhook Secret Token | STRING | Optional secret token set when registering this bot's webhook (setWebhook) at &lt;public-url&gt;/telegram/interactivity. When set, field-less approval requests use in-place Approve/Discard buttons resolved through that webhook, verified against this token. Use a bot dedicated to approvals, since a bot has a single webhook. Leave empty to deliver approval links to the hosted form. | false |
 
 
 

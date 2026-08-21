@@ -29,6 +29,8 @@ Name: requestApproval
 | formTitle | Form Title | STRING | The title for the approval form. Displayed as the main heading. | false |
 | formDescription | Form Description | STRING | A description shown under the form title. Use \n or &lt;br&gt; for line breaks. | false |
 | inputs | Form Inputs | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(fieldType), STRING\(fieldLabel), STRING\(fieldName), STRING\(fieldDescription), STRING\(placeholder), STRING\(defaultValue), STRING\(defaultValue), [&#123;STRING\(label), STRING\(value)&#125;]\(fieldOptions), BOOLEAN\(multipleChoice), INTEGER\(minSelection), INTEGER\(maxSelection), BOOLEAN\(required)&#125;] </details> | Define the form input fields for the approval request. | false |
+| expiresIn | Expires In | INTEGER | How long the approval request stays resolvable. When it lapses, the request can no longer be approved and the paused run is failed. Defaults to 60 days. | false |
+| expiresInUnit | Expires In Unit | STRING <details> <summary> Options </summary> <span>HOURS</span>, <span>DAYS</span> </details> | The time unit for the Expires In value. | false |
 
 #### Example JSON Structure
 ```json
@@ -53,7 +55,9 @@ Name: requestApproval
       "minSelection" : 1,
       "maxSelection" : 1,
       "required" : false
-    } ]
+    } ],
+    "expiresIn" : 1,
+    "expiresInUnit" : ""
   },
   "type" : "approval/v1/requestApproval"
 }

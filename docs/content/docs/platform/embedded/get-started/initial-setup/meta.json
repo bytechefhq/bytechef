@@ -1,0 +1,10 @@
+{
+  "$schema": "../../../../../../.source/json-schema/docs.meta.json",
+  "title": "Initial Setup",
+  "description": "Initial setup for Embedded",
+  "pages": [
+    "installing-the-sdk",
+    "adding-an-integration",
+    "displaying-the-connect-dialog"
+  ]
+}

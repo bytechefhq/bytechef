@@ -1,0 +1,495 @@
+---
+title: "Asset File"
+description: "Work with ByteChef workspace asset files: upload, download, list, rename and delete binary files stored in the workspace asset file infrastructure."
+---
+
+
+Categories: Helpers
+
+
+Type: assetFile/v1
+
+<hr />
+
+
+
+
+## Actions
+
+
+### Upload Asset File
+Name: uploadAssetFile
+
+`Upload a workflow file entry into the asset file storage of the workspace owning this workflow. The file is stored in the environment the workflow runs in.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| file | File | FILE_ENTRY | File entry to upload. | true |
+| filename | Filename | STRING | Optional filename override; defaults to the file entry's filename. | false |
+| contentType | Content Type | STRING | Optional content type override; defaults to the file entry's mime type. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Upload Asset File",
+  "name" : "uploadAssetFile",
+  "parameters" : {
+    "file" : {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    },
+    "filename" : "",
+    "contentType" : ""
+  },
+  "type" : "assetFile/v1/uploadAssetFile"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER |  |
+| name | STRING |  |
+| description | STRING |  |
+| mimeType | STRING |  |
+| sizeBytes | INTEGER |  |
+| source | STRING | Source of the file: USER_UPLOAD or AI_GENERATED. |
+| tagIds | ARRAY <details> <summary> Items </summary> [INTEGER] </details> |  |
+| createdDate | DATE_TIME |  |
+| createdBy | STRING |  |
+| lastModifiedDate | DATE_TIME |  |
+| lastModifiedBy | STRING |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : 1,
+  "name" : "",
+  "description" : "",
+  "mimeType" : "",
+  "sizeBytes" : 1,
+  "source" : "",
+  "tagIds" : [ 1 ],
+  "createdDate" : "2021-01-01T00:00:00",
+  "createdBy" : "",
+  "lastModifiedDate" : "2021-01-01T00:00:00",
+  "lastModifiedBy" : ""
+}
+```
+
+
+
+
+### Download Asset File
+Name: downloadAssetFile
+
+`Download the binary content of an asset file as a workflow file entry.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| assetFileId | Asset File ID | INTEGER | Identifier of the asset file whose content to download. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Download Asset File",
+  "name" : "downloadAssetFile",
+  "parameters" : {
+    "assetFileId" : 1
+  },
+  "type" : "assetFile/v1/downloadAssetFile"
+}
+```
+
+#### Output
+
+
+
+Type: FILE_ENTRY
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| extension | STRING |  |
+| mimeType | STRING |  |
+| name | STRING |  |
+| url | STRING |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "extension" : "",
+  "mimeType" : "",
+  "name" : "",
+  "url" : ""
+}
+```
+
+
+
+
+### Get Asset File
+Name: getAssetFile
+
+`Fetch metadata for a single asset file by id.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| assetFileId | Asset File ID | INTEGER | Identifier of the asset file to fetch. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Asset File",
+  "name" : "getAssetFile",
+  "parameters" : {
+    "assetFileId" : 1
+  },
+  "type" : "assetFile/v1/getAssetFile"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER |  |
+| name | STRING |  |
+| description | STRING |  |
+| mimeType | STRING |  |
+| sizeBytes | INTEGER |  |
+| source | STRING | Source of the file: USER_UPLOAD or AI_GENERATED. |
+| tagIds | ARRAY <details> <summary> Items </summary> [INTEGER] </details> |  |
+| createdDate | DATE_TIME |  |
+| createdBy | STRING |  |
+| lastModifiedDate | DATE_TIME |  |
+| lastModifiedBy | STRING |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : 1,
+  "name" : "",
+  "description" : "",
+  "mimeType" : "",
+  "sizeBytes" : 1,
+  "source" : "",
+  "tagIds" : [ 1 ],
+  "createdDate" : "2021-01-01T00:00:00",
+  "createdBy" : "",
+  "lastModifiedDate" : "2021-01-01T00:00:00",
+  "lastModifiedBy" : ""
+}
+```
+
+
+
+
+### Find Asset Files
+Name: findAssetFiles
+
+`List the asset files of the workspace owning this workflow, in the environment the workflow runs in. Optionally filter by tag ids.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| tagIds | Tag IDs | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | Optional list of tag ids to filter by; only files tagged with at least one of the given tags are returned. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Find Asset Files",
+  "name" : "findAssetFiles",
+  "parameters" : {
+    "tagIds" : [ 1 ]
+  },
+  "type" : "assetFile/v1/findAssetFiles"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER |  |
+| name | STRING |  |
+| description | STRING |  |
+| mimeType | STRING |  |
+| sizeBytes | INTEGER |  |
+| source | STRING | Source of the file: USER_UPLOAD or AI_GENERATED. |
+| tagIds | ARRAY <details> <summary> Items </summary> [INTEGER] </details> |  |
+| createdDate | DATE_TIME |  |
+| createdBy | STRING |  |
+| lastModifiedDate | DATE_TIME |  |
+| lastModifiedBy | STRING |  |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "id" : 1,
+  "name" : "",
+  "description" : "",
+  "mimeType" : "",
+  "sizeBytes" : 1,
+  "source" : "",
+  "tagIds" : [ 1 ],
+  "createdDate" : "2021-01-01T00:00:00",
+  "createdBy" : "",
+  "lastModifiedDate" : "2021-01-01T00:00:00",
+  "lastModifiedBy" : ""
+} ]
+```
+
+
+
+
+### Update Asset File Content
+Name: updateAssetFileContent
+
+`Replace the binary content of an existing asset file.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| assetFileId | Asset File ID | INTEGER | Identifier of the asset file whose content to replace. | true |
+| file | File | FILE_ENTRY | File entry whose content replaces the existing asset file content. | true |
+| contentType | Content Type | STRING | Optional content type override; defaults to the file entry's mime type. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Update Asset File Content",
+  "name" : "updateAssetFileContent",
+  "parameters" : {
+    "assetFileId" : 1,
+    "file" : {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    },
+    "contentType" : ""
+  },
+  "type" : "assetFile/v1/updateAssetFileContent"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER |  |
+| name | STRING |  |
+| description | STRING |  |
+| mimeType | STRING |  |
+| sizeBytes | INTEGER |  |
+| source | STRING | Source of the file: USER_UPLOAD or AI_GENERATED. |
+| tagIds | ARRAY <details> <summary> Items </summary> [INTEGER] </details> |  |
+| createdDate | DATE_TIME |  |
+| createdBy | STRING |  |
+| lastModifiedDate | DATE_TIME |  |
+| lastModifiedBy | STRING |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : 1,
+  "name" : "",
+  "description" : "",
+  "mimeType" : "",
+  "sizeBytes" : 1,
+  "source" : "",
+  "tagIds" : [ 1 ],
+  "createdDate" : "2021-01-01T00:00:00",
+  "createdBy" : "",
+  "lastModifiedDate" : "2021-01-01T00:00:00",
+  "lastModifiedBy" : ""
+}
+```
+
+
+
+
+### Rename Asset File
+Name: renameAssetFile
+
+`Rename an asset file.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| assetFileId | Asset File ID | INTEGER | Identifier of the asset file to rename. | true |
+| newName | New Name | STRING | New name for the asset file. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Rename Asset File",
+  "name" : "renameAssetFile",
+  "parameters" : {
+    "assetFileId" : 1,
+    "newName" : ""
+  },
+  "type" : "assetFile/v1/renameAssetFile"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER |  |
+| name | STRING |  |
+| description | STRING |  |
+| mimeType | STRING |  |
+| sizeBytes | INTEGER |  |
+| source | STRING | Source of the file: USER_UPLOAD or AI_GENERATED. |
+| tagIds | ARRAY <details> <summary> Items </summary> [INTEGER] </details> |  |
+| createdDate | DATE_TIME |  |
+| createdBy | STRING |  |
+| lastModifiedDate | DATE_TIME |  |
+| lastModifiedBy | STRING |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : 1,
+  "name" : "",
+  "description" : "",
+  "mimeType" : "",
+  "sizeBytes" : 1,
+  "source" : "",
+  "tagIds" : [ 1 ],
+  "createdDate" : "2021-01-01T00:00:00",
+  "createdBy" : "",
+  "lastModifiedDate" : "2021-01-01T00:00:00",
+  "lastModifiedBy" : ""
+}
+```
+
+
+
+
+### Delete Asset File
+Name: deleteAssetFile
+
+`Delete an asset file by id.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| assetFileId | Asset File ID | INTEGER | Identifier of the asset file to delete. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Delete Asset File",
+  "name" : "deleteAssetFile",
+  "parameters" : {
+    "assetFileId" : 1
+  },
+  "type" : "assetFile/v1/deleteAssetFile"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| deleted | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> |  |
+| assetFileId | INTEGER |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "deleted" : false,
+  "assetFileId" : 1
+}
+```
+
+
+
+
+
+

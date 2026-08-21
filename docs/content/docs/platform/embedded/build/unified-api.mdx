@@ -1,0 +1,202 @@
+---
+title: "Unified API"
+description: "One normalized, provider-agnostic REST schema across many CRM and Accounting providers — integrate once, support many."
+---
+
+The **Unified API** is a normalized REST layer that gives you a single schema across many third-party providers in the same category. Instead of learning HubSpot's account model, then Pipedrive's, then Xero's, you write against one ByteChef `account` shape and ByteChef translates every request and response to whichever provider your connected user actually connected.
+
+## Why a unified API
+
+An embedded product that supports "CRM" usually means supporting five CRMs, each with its own object model, field names, pagination scheme, and auth. The Unified API collapses that fan-out:
+
+- **Integrate once.** Build your feature against the unified `account` (or `contact`, `opportunity`, …) model. Adding a new provider in the same category requires no code change on your side.
+- **Provider-agnostic.** The same request works whether the connected user is on HubSpot, Pipedrive, or Xero — ByteChef maps unified fields to the provider's fields and back.
+- **Connected-user scoped.** Every call runs against the calling connected user's own connection, so you never handle provider credentials directly.
+
+Under the hood the Unified API is built on the same [component connectors](/platform/embedded/build/integrations) that power everything else in Embedded. Each supporting provider component ships a mapping between its native model and the unified model; the Unified API sits on top of those component connections and does the translation for you.
+
+<Callout title="Enterprise Edition, feature-flagged">
+    The Unified API is an Enterprise Edition surface and is gated behind a deployment feature flag. When the flag is enabled, the Unified API categories also appear as filters on the [Integrations](/platform/embedded/build/integrations) list.
+</Callout>
+
+## Categories and models
+
+The Unified API is organized into **categories** (a domain such as CRM or Accounting) and, within each category, a catalog of normalized **models** (common objects). The category model catalogs are:
+
+| Category | Models |
+|---|---|
+| CRM | `account`, `contact`, `lead`, `opportunity`, `engagement`, `note`, `task`, `user` |
+| Accounting | `account`, `contact`, `address`, `attachment`, `company_info`, `credit_note`, `expense`, `balance_sheet`, `cash_flow_statement`, and more |
+
+<Callout title="Currently exposed endpoints">
+    The model catalogs above define the normalized schema. The REST endpoints wired today are the **Account** resource in both the **CRM** and **Accounting** categories. Additional model endpoints follow the same request/response contract as they are enabled.
+</Callout>
+
+Provider coverage today includes HubSpot and Pipedrive (CRM) and Xero (Accounting). Because the mapping lives in each provider component, coverage grows as more components implement the unified mapping — with no change to your integration code.
+
+## Base path and endpoint shape
+
+All Unified API endpoints live under the embedded API, namespaced by category:
+
+```
+/api/embedded/v1/unified/{category}
+```
+
+`{category}` is `crm` or `accounting`. Each resource exposes standard REST operations. For the **Account** resource:
+
+| Method | Path | Operation | Success |
+|---|---|---|---|
+| `POST` | `/accounts` | Create an account | `200` with `{ "id": "..." }` |
+| `GET` | `/accounts/{account_id}` | Get a single account | `200` with the account object |
+| `GET` | `/accounts` | List accounts (paginated) | `200` with a page slice |
+| `PATCH` | `/accounts/{account_id}` | Update an account | `204 No Content` |
+
+Full example paths:
+
+```
+GET   /api/embedded/v1/unified/crm/accounts
+POST  /api/embedded/v1/unified/crm/accounts
+GET   /api/embedded/v1/unified/accounting/accounts/{account_id}
+```
+
+## Authentication
+
+Every request is authenticated as a connected user with a bearer token:
+
+```
+Authorization: Bearer <connected-user-token>
+```
+
+The token resolves the calling **connected user**; ByteChef then selects that user's integration instance and connection for the target category and runs the operation against the provider they connected. A caller can never reach another connected user's connection — an `x-instance-id` that does not belong to the resolved connected user is rejected. See [connected users](/platform/embedded/monitor/connected-users) and [tenant-isolated security](/platform/embedded/get-started/tenant-isolated-security).
+
+## Request headers
+
+| Header | Required | Description |
+|---|---|---|
+| `Authorization` | Yes | `Bearer <connected-user-token>` — identifies the connected user. |
+| `X-Environment` | No | Target environment: `TEST` or `PRODUCTION`. |
+| `x-instance-id` | No | The integration instance ID identifying the connected user's specific integration instance. When omitted, ByteChef picks the connected user's integration instance for the requested category. |
+
+## Common query parameters
+
+| Parameter | Applies to | Description |
+|---|---|---|
+| `include_raw_data` | `GET` account, `GET` accounts | When `true`, includes the untranslated raw payload from the third-party provider alongside the unified fields (`remoteData`). |
+| `size` | `GET` accounts | Number of items to return per page. |
+| `sort` | `GET` accounts | Field to sort by. |
+| `direction` | `GET` accounts | Sort direction. |
+| `continuationToken` | `GET` accounts | Opaque cursor for the next page (see [Pagination](#pagination)). |
+
+## Pagination
+
+List endpoints use **cursor-based pagination**. A list response is a page slice:
+
+| Field | Type | Description |
+|---|---|---|
+| `content` | array | The list of unified objects for this page. |
+| `hasNext` | boolean | Whether another page is available. |
+| `size` | integer | The requested page size. |
+| `continuationToken` | string / null | Cursor to fetch the next page. `null` when there is no next page. |
+
+To page forward, pass the `continuationToken` from one response as the `continuationToken` query parameter of the next request:
+
+```
+GET /api/embedded/v1/unified/crm/accounts?size=50
+GET /api/embedded/v1/unified/crm/accounts?size=50&continuationToken=<token-from-previous-response>
+```
+
+The continuation token encodes the query filter it was issued for. Changing the `sort` or `direction` while paging with a token is rejected — start a fresh page (drop the token) whenever you change the filter.
+
+## Example: create an account
+
+Request:
+
+```http
+POST /api/embedded/v1/unified/crm/accounts HTTP/1.1
+Authorization: Bearer <connected-user-token>
+X-Environment: PRODUCTION
+Content-Type: application/json
+
+{
+  "name": "ByteChef",
+  "description": "Integration API",
+  "industry": "Software",
+  "numberOfEmployees": 120,
+  "website": "https://bytechef.io/"
+}
+```
+
+Response:
+
+```json
+{ "id": "1234" }
+```
+
+## Example: list accounts
+
+Request:
+
+```http
+GET /api/embedded/v1/unified/crm/accounts?size=2 HTTP/1.1
+Authorization: Bearer <connected-user-token>
+X-Environment: PRODUCTION
+```
+
+Response:
+
+```json
+{
+  "content": [
+    {
+      "id": "1234",
+      "name": "ByteChef",
+      "industry": "Software",
+      "website": "https://bytechef.io/",
+      "remoteId": "account_1234",
+      "createdDate": "2023-02-27T00:00:00Z",
+      "lastModifiedDate": "2023-02-27T00:00:00Z"
+    }
+  ],
+  "hasNext": true,
+  "size": 2,
+  "continuationToken": "cD0yMDIxLTAxLTA2KzAzJTNBMjQ..."
+}
+```
+
+## Unified account fields
+
+A subset of the normalized **CRM account** model:
+
+| Field | Type | Description |
+|---|---|---|
+| `id` | string | The unified account ID. |
+| `name` | string | The account (company) name. |
+| `description` | string | Free-text description. |
+| `industry` | string | Industry classification. |
+| `numberOfEmployees` | integer | Employee count. |
+| `website` | string | Company website URL. |
+| `addresses` | array | Postal addresses. |
+| `emails` | array | Email addresses. |
+| `phones` | array | Phone numbers. |
+| `lifecycleStage` | object | Lifecycle stage of the account. |
+| `ownerId` | string | ID of the owning user. |
+| `lastActivityDate` | date-time | Timestamp of the last activity. |
+| `customFields` | object | Provider-specific custom fields passed through unchanged. |
+| `remoteId` | string | The record's ID in the third-party provider. |
+| `remoteData` | object | The raw provider payload, present when `include_raw_data=true`. |
+| `createdDate` | date-time | When the record was created. |
+| `lastModifiedDate` | date-time | When the record was last modified. |
+
+The **Accounting account** model is different — it carries fields such as `accountNumber`, `classification`, `currency`, `currentBalance`, `status`, `type`, and `parentAccountId`. Each category defines its own normalized schema; the shared machinery (auth, pagination, `remoteData`, `customFields`) is the same across both.
+
+## How it relates to component connectors
+
+The Unified API does not replace [components](/platform/embedded/build/integrations) — it composes them:
+
+- A connected user still connects a specific provider (HubSpot, Pipedrive, Xero) through the normal [connection flow](/platform/embedded/build/connections).
+- Each supporting provider component declares how its native objects map to the unified model.
+- When you call the Unified API, ByteChef looks up the connected user's connection for the category, invokes the matching component action, and translates between the unified schema and the provider's schema in both directions.
+
+That means you get the breadth of the component catalog with the ergonomics of a single, stable schema — integrate once against the Unified API, and every provider that implements the mapping is available to your connected users automatically.
+
+{/* TODO screenshot: the Unified API category filter (Accounting / CRM) on the Integrations list, shown when the Unified API feature flag is enabled */}

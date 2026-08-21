@@ -1,0 +1,90 @@
+---
+title: License
+description: Activate and inspect your Enterprise license — upload the .lic file, read its entitlements, and understand grace and expiry.
+ee: true
+comingSoon: true
+---
+
+**Settings → License** is where an administrator uploads the Enterprise license file and reads what it entitles. The page requires the `ADMIN` authority. In the latest released version of ByteChef, Enterprise activation is controlled by the `bytechef.edition` configuration alone.
+
+---
+
+{/* TODO screenshot: Settings → License page — the .lic file drop zone with the Upload License button (no license yet), or the activated License Details card (status badge, Holder, Expires At, Allowed Jobs, Max Users, Features) with the Replace / Remove buttons */}
+
+## Validation is local and offline
+
+The license is a signed `.lic` file verified with an **Ed25519** signature against a public key baked into the build. Verification happens locally — there is no callback to a vendor licensing server on the normal path. The file is read at boot, validated, and used to decide which Enterprise features to activate.
+
+Periodic online check-in against Keygen exists but is **disabled by default**; see [Configuration](#configuration) below.
+
+## Uploading a license
+
+With no license active, the page shows a drop zone that accepts `.lic` files only. Drop the file on it (or browse to it) and click **Upload License**.
+
+The platform also seeds itself on first boot from a bootstrap file at `bytechef.licence.path`, or from a license supplied inline in the `BYTECHEF_LICENSE` environment variable.
+
+## License details
+
+Once a license is active, the page shows a **License Details** card with a status badge and the license attributes:
+
+| Field | Meaning |
+|---|---|
+| **Holder Name** / **Holder Email** | Who the license was issued to. |
+| **Issued At** / **Expires At** | Validity window. |
+| **Allowed Jobs** / **Jobs Used This Month** | The job allowance and consumption against it. |
+| **Max Users** | The seat ceiling. |
+| **Features** | The entitled feature keys (see below). |
+
+**Replace License** swaps in a new file. **Remove License** deletes it after a confirmation, reverting the platform to Community Edition.
+
+### Status
+
+| Badge | Meaning |
+|---|---|
+| **Valid** | Within the validity window, or a license with no expiry date. |
+| **In grace** | Past `Expires At` but still inside the grace period — the platform keeps operating normally. |
+| **Expired** | Past the grace period. Enterprise features stop activating. |
+| **Invalid** | The file failed signature verification. |
+
+A missing license reads as no license at all rather than as an error.
+
+## Entitled features
+
+The **Features** list on the card holds feature keys parsed out of the license file. The keys the platform recognises:
+
+`sso`, `audit-log`, `custom-components`, `component-policies`, `api-connectors`, `ai-providers`, `ai-copilot`, `git-sync`, `admin-api-keys`, `connection-visibility`, `mcp-server`.
+
+A key the platform does not recognise is logged and ignored rather than treated as an error, so a license issued for a newer release stays usable.
+
+<Callout title="Enforcement is license-wide, not per key">
+    Today the keys are recorded and displayed but not individually enforced. What gates Enterprise functionality is the license **status**: while it is neither Valid nor In grace, every Enterprise endpoint responds `402 Payment Required` with `{"errorKey":"LICENCE_REQUIRED"}` and the license's own status. Treat the Features list as a record of what you are entitled to, not as a set of per-feature switches.
+</Callout>
+
+## Moving from Community to Enterprise
+
+There is one distribution and one database schema. Liquibase filters changelogs by deployment topology (`mono`, `configuration`, `coordinator`, `multitenant`), never by edition, so the Enterprise-owned tables exist either way. Switching editions is therefore configuration plus a license, not a data migration:
+
+1. Set `bytechef.edition=ee` and restart. Enterprise beans register on that property alone.
+2. Activate a license — upload the `.lic` file on this page, or seed it at boot through `bytechef.licence.path` or `BYTECHEF_LICENSE`.
+
+Until a license is active, Enterprise endpoints answer `402` (see the callout above); the Community surface is unaffected throughout.
+
+Because both editions run the same engine, the same workflow format, the same component model, and the same schema, existing projects, workflows, connections, and execution history carry over unchanged — there is nothing to export or re-import.
+
+Going the other way, **Remove License** on this page reverts the platform to Community Edition after a confirmation. Your data is untouched; the Enterprise-only surfaces simply stop being served.
+
+## Configuration
+
+| Property | Default | Purpose |
+|---|---|---|
+| `bytechef.edition` | `ee` | Selects the edition at startup. Enterprise beans register only when this is `ee`. |
+| `bytechef.licence.public-key` | *(baked-in key)* | Ed25519 public key used to verify licence signatures, as raw 32-byte hex. Overrides the default. |
+| `bytechef.licence.path` | *(unset)* | Path to a bootstrap `.lic` file. Seeds the database on first boot if the licence table is empty. |
+| `bytechef.licence.grace-period-days` | `14` | Days the instance keeps running after expiry before enforcement kicks in. |
+| `bytechef.licence.account-id` | *(unset)* | Keygen account id. Required only for online check-in. |
+| `bytechef.licence.check-in.enabled` | `false` | Whether periodic online check-in against Keygen runs. |
+| `bytechef.licence.check-in.interval` | `24h` | How often the instance checks in. |
+
+Note the British spelling in the property namespace (`licence`), which differs from the page title.
+
+The `BYTECHEF_LICENSE` environment variable supplies a licence inline at bootstrap, as an alternative to `bytechef.licence.path`.

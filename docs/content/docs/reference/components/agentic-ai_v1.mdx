@@ -1,0 +1,64 @@
+---
+title: "Agentic AI"
+description: "With the Agentic AI, you can define a goal and let the AI autonomously plan and execute tools to achieve it using the Embabel Agent framework with GOAP planning."
+---
+
+
+Categories: Artificial Intelligence
+
+
+Type: agenticAi/v1
+
+<hr />
+
+
+
+
+## Actions
+
+
+### Run
+Name: run
+
+`Run the agentic AI to autonomously achieve a goal. The GOAP planner selects and orders configured actions based on their input/output bindings, choosing any valid path from the seeded input binding to the goal output binding.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| goalDescription | Goal Description | STRING | Describe the goal the agentic AI should achieve using the configured actions. | true |
+| goalOutputBinding | Goal Output Binding | STRING | The output binding that, once produced on the blackboard, satisfies the goal. Must match the output binding of at least one configured action. | true |
+| goalMode | Goal Mode | STRING <details> <summary> Options </summary> <span>STRUCTURAL</span>, <span>SMART</span> </details> | Structural: the goal is satisfied as soon as the goal output binding is produced. Smart: additionally asks an LLM to judge whether the produced value actually satisfies the goal description; the planner may backtrack and try alternative action paths if not. Smart mode adds an LLM call per evaluation. | true |
+| systemPrompt | System Prompt | STRING | System prompt to the model. | false |
+| response | Response | OBJECT <details> <summary> Properties </summary> &#123;STRING\(responseFormat), STRING\(responseSchema)&#125; </details> | The response from the API. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Run",
+  "name" : "run",
+  "parameters" : {
+    "goalDescription" : "",
+    "goalOutputBinding" : "",
+    "goalMode" : "",
+    "systemPrompt" : "",
+    "response" : {
+      "responseFormat" : "",
+      "responseSchema" : ""
+    }
+  },
+  "type" : "agenticAi/v1/run"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+
+
+
+

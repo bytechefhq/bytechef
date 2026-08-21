@@ -1,0 +1,68 @@
+---
+title: "Tenant-Isolated Security"
+description: "What keeps one customer's workflows, credentials and data away from another's — what you get by default, and what stays your responsibility."
+---
+
+When you embed ByteChef, every one of your customers is a **tenant**. The failure that matters is one
+tenant seeing another's data: their workflows, their credentials, their execution history. This page
+is what you can tell your own security reviewers — what the platform guarantees, what you have to do
+to keep it true, and where the boundary stops.
+
+## What you get without configuring anything
+
+**A customer's data is reachable only from that customer's tenant.** Every request — an API call, a
+webhook, a scheduled run, an MCP call — resolves which tenant it belongs to *before* it touches any
+data, and stays pinned to that tenant for its whole life. There is no "list everything" call to get
+wrong: the APIs list what is in one tenant, not what exists.
+
+**A credential belongs to the customer who authorized it.** Connections are encrypted before they
+reach the database and are never returned by a read — the API obfuscates them on the way out. A
+connection your customer authorizes is bound to their own record, so it is never offered to another
+customer, and the plaintext exists only in memory while their own workflow is running.
+
+**A customer's own end users stay separated too.** Inside one tenant, each connected user's
+connections are reachable only through that user's own integration instances.
+
+**Knowledge bases don't bleed.** One tenant's indexed documents are never searched by another's.
+
+**Logs are attributable.** Every log line carries the tenant it was written for, so you can hand one
+customer their own audit trail without filtering by guesswork.
+
+You do not switch any of this on. It is how the platform runs, including on a single-tenant
+deployment — there, everything simply resolves to one tenant.
+
+## Where the boundary stops
+
+Four things are worth knowing before you describe isolation to a customer, because none of them is
+what a reader would assume:
+
+**The encryption key is per deployment, not per tenant.** Separation of credentials comes from the
+tenant boundary, not from separate key material. A single key protects everything in the deployment
+against a stolen database; it does not make one tenant's ciphertext unreadable to another tenant's
+code path. If a customer needs their secrets in their own vault, external secret managers are
+*(coming soon)*.
+
+**Queues are shared.** Runs for different tenants pass through the same message broker, each message
+carrying the tenant it belongs to. The data each run reads and writes is isolated; the pipe is not.
+
+**Metrics and traces are not tagged by tenant.** Logs are. If you need per-customer dashboards or
+per-customer alerting, derive them from the logs or add the tag in your own collector.
+
+**There is no per-tenant rate limiting.** One customer's traffic can affect another's latency. That
+limit belongs at your ingress — see below.
+
+## What stays yours to do
+
+- [ ] **Issue a distinct token per tenant.** Never let a "master" token serve runtime traffic; a
+      token is what decides which tenant a request lands in.
+- [ ] **Rate-limit per tenant at your own ingress**, so one noisy customer cannot degrade the rest.
+- [ ] **Supply the encryption key from your secret manager**, not a checked-in config file
+      (`BYTECHEF_ENCRYPTION_PROVIDER=PROPERTY`).
+- [ ] **Back the key up separately from the database.** A restored database without its key is
+      unreadable — every stored credential is lost.
+
+## See also
+
+- [White-Label Execution](/platform/embedded/get-started/white-label-execution) — what your customers see
+- [Multi-tenancy](/platform/use-bytechef/self-hosted/architecture#multi-tenancy) — how the isolation is implemented
+- [Encryption of stored credentials](/platform/use-bytechef/self-hosted/configuration#encryption-of-stored-credentials) — key handling and rotation

@@ -1,0 +1,114 @@
+---
+title: Git Configuration
+description: Connect a workspace to a Git repository so projects push their workflows on publish and can be pulled back from a branch.
+comingSoon: true
+---
+
+<EEBadge />
+
+A visual workflow has a canonical file form — a single JSON document holding its tasks, their
+parameters, its trigger configuration, its connection references (by name, never by secret), and
+its input and output schemas. Connecting a workspace to a Git repository turns that file into the
+thing your team reviews: projects push their workflows to a branch when they publish, and can be
+pulled back from that branch afterwards.
+
+<Callout>
+    Git integration is gated behind the **`ff-1039`** feature flag as well as Enterprise Edition. With
+    the flag off, the **Git Configuration** settings entry and the per-project Git menu items are
+    hidden.
+</Callout>
+
+---
+
+## Configure the repository
+
+The repository is configured once per workspace, by an admin.
+
+{/* TODO screenshot: Settings → Git Configuration page — the URL, Username, and Password fields with the Save button */}
+
+1. Go to **Settings → Git Configuration** in the Automation area.
+2. Fill in **URL** — the Git repository URL. Any HTTPS remote works: GitHub, GitLab, Bitbucket, or
+   self-hosted.
+3. Fill in **Username** and **Password**. The password field accepts a personal access token, which
+   is what most hosts want.
+4. Click **Save**.
+
+Every project in the workspace shares this one repository. The stored password is never sent back to
+the browser — the field reads `********` once a password is saved, and saving the form with that
+placeholder untouched leaves the existing password in place. Type a new value only when you actually
+mean to rotate the credential.
+
+## Point a project at a branch
+
+Each project then picks its branch. Open a project's **⋮** menu on the Projects list — or the
+project editor's **Settings** menu, **Project** tab — and choose **Git Configuration**:
+
+1. In the **Update Git Configuration** dialog, pick a **Branch**. The dropdown lists the
+   repository's actual remote branches, so a typo can't silently create one.
+2. Turn **Enabled** on.
+3. Save.
+
+One project maps to one branch. The sibling **Pull Project from Git** menu item stays disabled until
+the project's Git configuration is enabled.
+
+### Required permissions
+
+| Action | Permission |
+|---|---|
+| Read or configure the workspace repository | `WORKSPACE_MANAGE` on the workspace. The settings page itself is additionally restricted to the organization admin authority. |
+| Push (publishing with sync enabled) | `DEPLOYMENT_PUSH` on the project |
+| Pull Project from Git, and listing the remote branches | `DEPLOYMENT_PULL` on the project |
+
+---
+
+## Push on publish
+
+With the project's Git configuration enabled, **publishing the project pushes it**. There is no
+separate push action.
+
+- The commit message is the version description you type at publish time. If you leave it empty, the
+  commit message is `Update workflows`.
+- After the push, the version's description is annotated with the repository URL, the branch, and the
+  commit hash — so a ByteChef version and a Git commit each point at the other.
+- The push writes the complete workflow set of the project's latest version and clears everything
+  else from the branch first, so a workflow deleted from the project disappears from the branch on
+  the next publish.
+
+Each workflow is one file, named after its label with the workflow's format as the extension —
+a workflow labelled `Invoice Import` becomes `Invoice Import.json`. Renaming a workflow therefore
+renames its file.
+
+## Pull from Git
+
+**Pull Project from Git** reads the workflow files from the project's configured branch and:
+
+1. Matches each file to an existing workflow **by label**. A file whose label has no match becomes a
+   new workflow; a file that matches updates the existing one.
+2. Publishes a new project version, whose description records the Git commit message, the repository,
+   the branch, and the commit hash.
+
+Because a pull ends in a publish, anything that landed on the branch — a merged pull request, a
+`git revert`, a cross-repo refactor — arrives as an ordinary immutable version, deployable exactly
+like one published from the editor.
+
+<Callout type="warn">
+    Matching is by label, and a pull never deletes. A file removed from the branch leaves its workflow
+    in the project; renaming a workflow in ByteChef without renaming its file produces a second
+    workflow on the next pull.
+</Callout>
+
+---
+
+## Working from either side
+
+The two directions are meant to be mixed:
+
+- **UI to Git** — build in the visual editor, publish, and the push happens for you. Suited to
+  prototyping and to teams whose primary builders are not developers.
+- **Git to UI** — edit the JSON in your editor, open a pull request, merge it, then pull. Suited to
+  refactors, bulk edits, and any change your review policy requires a PR for.
+
+Once the workflows are files on a branch, the ordinary repository tooling applies to them: diffs in
+pull requests, `git blame` on a task or an expression, CODEOWNERS to require a specific team's
+review, `git bisect` to find the change that introduced a regression, and `git revert` plus a pull to
+undo a change as a new version.

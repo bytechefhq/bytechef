@@ -8,6 +8,7 @@ The component definition describes a reusable integration component (its metadat
 
 - `component(String name)` - Builds a new `ModifiableComponentDefinition` with the specified backend ID. The name is the component ID used internally and in workflow JSON.
 - [`actions(A... actionDefinitions)`](/developer-guide/component-specification/action) - Declares the actions exposed by this component.
+- `agentChannels(ModifiableAgentChannelDefinition... agentChannels)` - Declares that this component can carry an AI agent's conversation. See [Agent channels](#agent-channels) below.
 - `categories(ComponentCategory... category)` / `categories(List<ComponentCategory> categories)` - Assigns UI categories for grouping and discovery in the catalog. See [ComponentCategory](https://github.com/bytechefhq/bytechef/blob/master/sdks/backend/java/component-api/src/main/java/com/bytechef/component/definition/ComponentCategory.java).
 - [`connection(ModifiableConnectionDefinition connectionDefinition)`](/developer-guide/component-specification/connection) - Defines the connection used by actions/triggers. If not set, actions can still run without a connection if they don't require one.
 - `customAction(boolean customAction)` - If true, enables the Custom Action feature in the UI (typically for REST/OpenAPI‑based connectors).
@@ -30,3 +31,56 @@ private static final ComponentDefinition COMPONENT_DEFINITION = component("textH
         .categories(ComponentCategory.HELPERS)
         .actions(TextHelperUpperCaseAction.ACTION_DEFINITION);
 ```
+
+### Agent channels
+
+An **agent channel** is a way an AI agent can be reached and can answer: a trigger that receives an incoming message and, usually, an action that sends the reply. Declaring one makes your component selectable as a channel on any agent — no change is needed anywhere else in the platform.
+
+The channel contract is three fields. Each end of the channel states where they live on it, in its own vocabulary:
+
+| Field | On the trigger (`agentRequest()`) | On the reply action (`agentReply()`) |
+|---|---|---|
+| `conversationId` | path into the trigger's output identifying who to answer. Defaults to `"conversationId"` | the action property that addresses the reply. **No default** — omit it when the reply is a synchronous response and needs no address |
+| `message` | path into the trigger's output holding the incoming text. Defaults to `"message"` | the action property the agent's answer is written to. Defaults to `"message"` |
+| `attachments` | path into the trigger's output holding incoming files. **No default** — omitting it means this channel carries no attachments | the action property carrying outgoing files. Reserved; not wired yet |
+
+Because the request side defaults to the contract's own names, a trigger whose output already *is* the contract (build it with `ComponentDsl.agentChannelRequest()`) needs nothing but a bare `agentRequest()`. A trigger with its own payload shape spells the paths out, dots included — e.g. `.conversationId("message.chat.id")`.
+
+Pair them on the component with `agentChannel(name, trigger[, replyAction])`. The `name` is the channel's stored key and must be unique across all components:
+
+```java
+// trigger
+public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newChatRequest")
+        .title("New Chat Request")
+        .output(...)
+        .agentRequest(agentRequest().attachments(ATTACHMENTS))
+        .webhookRequest(ChatNewRequestTrigger::getWebhookResult);
+
+// reply action
+public static final ModifiableActionDefinition ACTION_DEFINITION = action("responseToRequest")
+        .title("Response to Request")
+        .agentReply(agentReply().attachments(ATTACHMENTS))
+        .perform(ChatResponseToRequestAction::perform);
+
+// component
+private static final ComponentDefinition COMPONENT_DEFINITION = component("chat")
+        .title("Chat")
+        .agentChannels(
+                agentChannel("chat", ChatNewRequestTrigger.TRIGGER_DEFINITION,
+                        ChatResponseToRequestAction.ACTION_DEFINITION)
+                                .title("Chat")
+                                .approvalChannel("chat"));
+```
+
+Optional on `agentChannel(...)`:
+
+- `title(String title)` / `description(String description)` - How the channel is labelled in the agent UI. Defaults to the component's own title, which is wrong whenever one component exposes a channel that is not the whole component (Twilio's channel is titled "Twilio (WhatsApp)").
+- `approvalChannel(String elementName)` - Which of this component's `APPROVAL_CHANNELS` cluster elements a human approval request is delivered through on this channel. Omit it and the channel simply cannot carry approvals.
+- `triggerParameters(Map<String, Object> triggerParameters)` - Parameters pinned onto the generated trigger node, for a trigger whose output shape depends on its own input.
+
+Optional on `agentReply()`:
+
+- `channelParameter(String rowKey, String property)` - A value the user configures on the channel itself is copied into `property` on every reply. Twilio's `number` becomes the reply's `From` this way; `rowKey` must name a property the paired trigger declares.
+- `fixedParameter(String property, Object value)` - A reply parameter pinned by the declaration, e.g. `useTemplate = false`.
+
+Everything is validated when the component loads: a path or property name that the paired trigger or action does not declare fails fast, rather than producing an agent that silently replies nowhere. A trigger that receives an event it should not act on declines by returning an empty collection from its webhook handler — the agent run never starts.

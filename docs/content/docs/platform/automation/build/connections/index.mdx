@@ -1,0 +1,72 @@
+---
+title: "Connections"
+description: "Learn how to connect and manage third-party application connections in ByteChef."
+---
+
+## What are Connections?
+
+Connections in ByteChef are secure links between your ByteChef account and external services. They store authentication details and configuration needed to interact with these services through your workflows.
+
+Think of a connection as a bridge: one end is in ByteChef, and the other is in your favorite app (like Slack, Google Drive, or Salesforce). Once this bridge is built, ByteChef can safely walk across it to send or retrieve data.
+
+## Key Features
+
+- **Centralized Management**: View, edit, and monitor all your connections in one place.
+- **Reusable**: Create a connection once and use it across dozens of different workflows.
+- **Secure**: All credentials are encrypted at rest with AES-GCM, an authenticated encryption mode.
+- **Easy Setup**: Guided wizards help you navigate the authentication process for each service.
+- **Sharing**: (Enterprise) Share connections with your team while maintaining control over permissions.
+
+## Get Started
+
+{/* TODO screenshot: Connections page — connection list with the Create Connection dialog open showing the component picker and auth fields */}
+
+Setting up a connection is a quick process:
+
+1. **Navigate to Connections**: Click the **Connections** tab in the main sidebar.
+2. **Choose a Service**: Click **New Connection** and search for the application you want to connect.
+3. **Authenticate**: Follow the prompts to authorize ByteChef. This might involve logging in via OAuth, pasting an API Key, or providing basic credentials.
+4. **Name and Save**: Give your connection a descriptive name (e.g., `Company Slack - Marketing`) to help you identify it later.
+
+<Callout type="warn" title="Coming soon">
+  External credential stores are on the upcoming release track and are not yet available in the latest released version of ByteChef. Once available: if your administrator has configured an external secret backend, the create dialog shows a **Credential storage** selector. Choosing a non-default store lets you toggle **Register existing credential** and reference a secret that already lives in that store by its path or UUID, instead of typing the credentials into ByteChef. The selector only appears when more than one credential store is available, and it cannot be changed after the connection is created.
+</Callout>
+
+Connections are scoped to the currently selected **environment** (development, staging, or production). Use the environment selector in the page header to switch between them.
+
+## Managing Connections
+
+The **Connections** page lists every connection with its component icon, name, tags, and status badges (**Active/Not Active** and the credential status). Use the left sidebar to filter the list by **component** or by **tag**.
+
+Each connection has an ellipsis (three-dots) menu with the following actions:
+
+- **Edit**: Rename the connection or update its tags.
+- **Disconnect from all**: Detach the connection from every workflow currently using it. A connection must be disconnected before it can be deleted.
+- **Delete**: Permanently remove the connection.
+
+<Callout type="warn" title="Coming soon">
+  Connection visibility is on the upcoming release track and is not yet available in the latest released version of ByteChef. Once available, an Enterprise Edition connection carries a **visibility** scope shown as a badge on its row, and a **Change visibility** control offers **Shared with workspace** (the default), **Private**, and **Specific people** — the last granting named workspace members access to a connection that stays private to everyone else.
+</Callout>
+
+## Popular Integrations
+
+- [Connect to Google Workspace](/reference/components/google-application-setup_v1)
+- [Connect to Microsoft 365](/reference/components/microsoft-graph-application-setup_v1)
+- [Connect to Slack](/reference/components/slack_v1)
+
+## Authentication Methods
+
+ByteChef supports various authentication methods to accommodate the security requirements of different services:
+
+- **OAuth 2.0**: The industry standard for secure authorization. It redirects you to the app's own login page so ByteChef never sees your password.
+- **API Key**: A secret token provided by the service that you paste into ByteChef.
+- **Bearer Token**: A security token that gives access to the bearer.
+- **Basic Auth**: Traditional username and password authentication, typically used by internal or legacy systems.
+
+Learn more about [Authentication Methods](/platform/automation/build/connections/authentication).
+
+## Next Steps
+
+- [Authentication](/platform/automation/build/connections/authentication) - Learn about different authentication methods.
+- [Troubleshooting](/platform/automation/build/connections/troubleshooting) - Fix common connection errors.
+- [Connections Reference](/reference/components) - Detailed reference for all supported connections.

@@ -1,0 +1,32 @@
+{
+  "$schema": "../../../../.source/json-schema/docs.meta.json",
+  "title": "Embedded",
+  "description": "The embedded guide",
+  "icon": "LayoutTemplate",
+  "pages": [
+    "--- Get Started ---",
+    "get-started/index",
+    "get-started/white-label-execution",
+    "get-started/tenant-isolated-security",
+    "get-started/quick-start",
+    "get-started/initial-setup",
+    "--- Build ---",
+    "build/integrations",
+    "build/workflows",
+    "build/automations",
+    "build/permission-expressions",
+    "build/app-events",
+    "build/connections",
+    "build/component-kit",
+    "build/unified-api",
+    "--- Configure ---",
+    "configure/instance-configurations",
+    "configure/mcp-servers",
+    "--- Monitor ---",
+    "monitor/workflow-executions",
+    "monitor/connected-users",
+    "--- Administration ---",
+    "administration/signing-keys",
+    "administration/api-keys"
+  ]
+}

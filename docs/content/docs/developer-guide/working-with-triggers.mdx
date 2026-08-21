@@ -15,7 +15,12 @@ description: "Working with Triggers as a developer"
     - Copy the first address listed under "Forwarding". This will be used as your webhook URL.
     ![ngork example](/ngrok.png)
 
-## If You Are Using IntelliJ IDEA
+## Configure the webhook URL
+
+Where the ngrok URL goes depends on how you run the server.
+
+<Tabs items={['IntelliJ IDEA', 'Without IntelliJ']}>
+<Tab value="IntelliJ IDEA">
 
 1. Open Bytechef Codebase:
     - Navigate to bytechef/server/apps/server-app/src/main/resources/config.
@@ -35,7 +40,8 @@ description: "Working with Triggers as a developer"
 
 5. Start the ByteChef application.
 
-## If You Are Not Using IntelliJ
+</Tab>
+<Tab value="Without IntelliJ">
 
 1. Navigate to the `BYTECHEF_HOME/server` directory create a file named `local.env`
 2. Add the following configuration, replacing (first address under Forwarding) with the ngrok URL you copied:
@@ -46,3 +52,6 @@ description: "Working with Triggers as a developer"
 3. Start the ByteChef application.
 
 **Note:** Docker has to be restarted in order to update any changes made to `BYTECHEF_HOME/server/local.env` file.
+
+</Tab>
+</Tabs>

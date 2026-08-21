@@ -65,7 +65,7 @@ Name: createRecords
 | workspaceId | Workspace ID | STRING | ID of the workspace. | false |
 | baseId | Base ID | STRING <details> <summary> Depends On </summary> workspaceId </details> | ID of the base. | false |
 | tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId </details> | ID of the table. | true |
-| tableColumns | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> tableId </details> |  | null |
+| tableColumns | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> tableId </details> |  | false |
 
 #### Example JSON Structure
 ```json
@@ -319,7 +319,7 @@ Name: updateRecords
 | workspaceId | Workspace ID | STRING | ID of the workspace. | false |
 | baseId | Base ID | STRING <details> <summary> Depends On </summary> workspaceId </details> | ID of the base. | false |
 | tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId </details> | ID of the table. | true |
-| tableColumns | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> tableId </details> |  | null |
+| tableColumns | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> tableId </details> |  | false |
 
 #### Example JSON Structure
 ```json

@@ -1,6 +1,69 @@
 ---
-title: Overview
+title: API Reference
+description: Public REST APIs you can call from your application — generated from ByteChef's OpenAPI specifications.
 ---
 
-This is currently in development. For more information please contact [support@bytechef.io](mailto:support@bytechef.io).
+ByteChef exposes six public REST APIs for use from your own applications:
 
+**Automation**
+
+- **[Workflow Executions](/openapi/automation-workflow-execution)** — fetch a workspace's workflow executions, and a single execution with its full detail.
+- **[Projects](/openapi/automation-project-code-workflow)** — deploy a code-based project (CI/CD-style integration).
+- **[Git](/openapi/automation-project-git)** — pull a project from its configured git repository.
+
+**Embedded**
+
+- **[Actions](/openapi/embedded-action)** — execute a component action for a connected user.
+- **[Tools](/openapi/embedded-tool)** — list a connected user's available tools, and execute one.
+- **[Workflow Executions](/openapi/embedded-workflow-execution)** — fetch a tenant's workflow executions.
+- **[Tool Invocations](/openapi/embedded-tool-invocation)** — fetch a connected user's tool and action invocation history.
+- **[Integrations](/openapi/embedded-configuration-integration)** — the integrations available to your customers.
+- **[Integration Instances](/openapi/embedded-configuration-integration-instance)** — a connected user's instance of an integration.
+- **[Instance Workflows](/openapi/embedded-configuration-integration-instance-workflow)** — enable, disable and configure an instance's workflows.
+- **[Connections](/openapi/embedded-configuration-connection)** — list, delete and reauthorize a connected user's connections.
+- **[Connected Users](/openapi/embedded-configuration-connected-user)** — update a connected user.
+- **[User Workflows](/openapi/embedded-configuration-connected-user-project-workflow)** — a connected user's own workflows, including generation from a prompt.
+- **[Workflow Catalog](/openapi/embedded-configuration-automation-workflow-project)** — the catalog projects available to connected users.
+- **[App Events](/openapi/embedded-webhook-app-event-trigger)** — fire an App Event to start every subscribed workflow.
+- **[Request Trigger](/openapi/embedded-webhook-request-trigger)** — execute a single workflow synchronously and return its result.
+- **[Automation Bridge](/openapi/automation-bridge)** — deploy a code-native automation project into the embedded catalog. *Coming soon*.
+
+**Platform**
+
+- **[Custom Components](/openapi/custom-components)** — deploy a custom component to the platform. *Coming soon*.
+
+---
+
+## Base URLs
+
+| API | Base path |
+|---|---|
+| Automation (all three) | `/api/automation/v1` |
+| Custom Components | `/api/platform/v1` |
+| Embedded (all) | `/api/embedded/v1` |
+
+Prefix the operation path you see on each reference page with the corresponding base path, then with your ByteChef host (e.g. `https://your-bytechef-host.example.com`).
+
+---
+
+## Authentication
+
+Every API takes a bearer token in the `Authorization` header. Which token depends on the API, and — for
+the embedded APIs — on the shape of the operation path.
+
+| API | Accepted token |
+|---|---|
+| Automation (all three) | A workspace **API Key**. |
+| Custom Components | An **API Key** whose owning user holds the admin authority. *Coming soon* — restricting this to Admin API Keys specifically, so workspace and embedded keys are rejected on `/api/platform/v1`. |
+| Automation Bridge | An **Admin API Key** — authenticated as your own user rather than as a connected user, so a Signing Key JWT is not accepted. *Coming soon*, along with the API itself. |
+| Embedded — Actions, Tools, Workflow Executions, Tool Invocations | An **API Key**, or a per-end-user JWT signed by your backend with a **Signing Key**. Every operation carries `{externalUserId}` in its path, so both work. |
+| Embedded — Integrations, Integration Instances, Instance Workflows, Connections, Connected Users, User Workflows, Workflow Catalog | An **API Key** on the `{externalUserId}/…` operations; a **Signing Key** JWT on the rest. |
+| Embedded — App Events, Request Trigger | A **Signing Key** JWT. Neither operation carries `{externalUserId}` in its path, so an API Key has no user to act for and is rejected. |
+
+Both embedded token types act on behalf of one connected user: an API Key takes the user from the
+`{externalUserId}` path segment, a Signing Key JWT takes it from the token's `sub` claim. That is why
+browser-originated calls, which have no user id in the path, need a JWT.
+
+Pass an optional `X-Environment` header (`DEVELOPMENT`, `STAGING`, or `PRODUCTION`) to scope the request to a specific environment. If omitted, ByteChef uses `PRODUCTION`. On the Automation and Embedded workflow-executions endpoints the header also selects which environment's executions are returned.
+
+See [Signing Keys](/platform/embedded/administration/signing-keys) and [Embedded API Keys](/platform/embedded/administration/api-keys) for the embedded credentials, and [API Keys](/platform/automation/settings/api-keys) for the automation one.

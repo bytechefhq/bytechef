@@ -1,0 +1,69 @@
+---
+title: API Keys
+description: Keys for the automation public API, bound to a workspace and environment.
+comingSoon: true
+---
+
+<EEBadge />
+
+A **workspace API key** is scoped to a workspace *and* an environment, and authenticates calls to the [automation public API](/platform/automation/deploy/api-platform), where workflows are published as REST endpoints.
+
+Because these keys are scoped to both, the key you present must match the workspace *and* the environment of the API you are calling.
+
+<Callout title="Availability">
+    Workspace API keys are Enterprise Edition. In automation the page is behind any of `ff-1025`, `ff-1039`, or `ff-4814`; in the embedded product it is behind `ff-520`. When no required flag is on, the page is hidden from the Settings sidebar.
+</Callout>
+
+For account-scoped keys used for administration and the management MCP server, see [Admin API Keys](/platform/settings/admin-api-keys). Both pages share the same layout, dialogs, and actions.
+
+---
+
+## The page
+
+**Settings → API Keys** is headed "Do not share your API key with others or expose it in the browser or other client-side code.", with an **Environment** selector and — once at least one key exists — a **New API Key** button. With no keys yet, the body shows an empty state titled **No API Keys** with the message "Get started by creating a new API key."
+
+| Column | Description |
+|---|---|
+| **Name** | The label you gave the key. |
+| **Secret Key** | A masked preview — the full secret is shown only once, at creation. |
+| **Created Date** | When the key was created. |
+| **Last Used Date** | When the key last authenticated a request. |
+| **Created By** | Who created it. |
+
+Each row ends with an **edit** (pencil) and a **delete** (trash) icon.
+
+{/* TODO screenshot: Settings → API Keys page — header with the Environment selector and the New API Key button, and the keys table below */}
+
+## Workspace and environment binding
+
+A new key is bound to the workspace you are in and to the environment active in the **Environment** selector at the moment of creation. Switching the selector re-lists the keys for that environment; it does not move an existing key.
+
+## Create a key
+
+1. Confirm the **Environment** selector is set to the environment the key should be bound to.
+2. Click **New API Key**, enter a **Name** of at least 2 characters, and click **Create API Key**.
+3. The dialog switches to **Save your API Key** and shows the full secret exactly once. Click **Copy**, store the secret somewhere safe, then click **Done**.
+
+The full key cannot be viewed again through ByteChef. If you lose it, delete the key and create a new one.
+
+{/* TODO screenshot: Create API Key dialog in the "Save your API Key" state — the read-only secret field, the Copy button, the one-time-reveal warning text, and the Done button */}
+
+## Rename a key
+
+Click the **edit** (pencil) icon, change the **Name**, and click **Save**. Only the name changes; the secret is unaffected.
+
+## Revoke a key
+
+Deleting a key is how you revoke it — there is no enable/disable toggle. Click the **delete** (trash) icon and confirm in the **Are you absolutely sure?** dialog. Any client presenting the deleted key is rejected immediately; other keys are unaffected.
+
+Creation and deletion are recorded in the [audit log](/platform/settings/audit-events) as `WORKSPACE_API_KEY_CREATED` and `WORKSPACE_API_KEY_DELETED`.
+
+## Authenticating a call
+
+Send the key as a Bearer header:
+
+```
+Authorization: Bearer <your-api-key>
+```
+
+Target the key's environment with the `X-ENVIRONMENT` header. It defaults to `PRODUCTION` when omitted. On this path an unrecognised value is not handled — the header is parsed with a bare enum conversion, so a typo surfaces as a server error rather than an authentication failure. Send an exact environment name.

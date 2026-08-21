@@ -1,0 +1,15 @@
+{
+  "$schema": "../../../../../.source/json-schema/docs.meta.json",
+  "title": "Build",
+  "description": "Integrations, workflows, connections, and the component kit.",
+  "pages": [
+    "integrations",
+    "workflows",
+    "automations",
+    "connections",
+    "app-events",
+    "component-kit",
+    "unified-api",
+    "permission-expressions"
+  ]
+}
