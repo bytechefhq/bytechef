@@ -43,7 +43,7 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
                     (isFeatureFlagEnabled('ff-1025') ||
                         isFeatureFlagEnabled('ff-1039') ||
                         isFeatureFlagEnabled('ff-4814'))) ||
-                (currentType === PlatformType.EMBEDDED && isFeatureFlagEnabled('ff-520'))
+                currentType === PlatformType.EMBEDDED
             );
         }
 
