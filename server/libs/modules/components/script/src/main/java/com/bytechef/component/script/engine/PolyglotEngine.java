@@ -28,9 +28,6 @@ import com.bytechef.platform.component.polyglot.PolyglotSandbox;
 import com.bytechef.platform.component.polyglot.PolyglotValues;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.locks.ReentrantLock;
-import org.graalvm.polyglot.Context;
-import org.graalvm.polyglot.Engine;
 import org.graalvm.polyglot.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
@@ -42,10 +39,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class PolyglotEngine {
 
-    private static final ReentrantLock LOCK = new ReentrantLock();
-
-    private static Engine engine;
-
     private final ApplicationContext applicationContext;
 
     public PolyglotEngine(ApplicationContext applicationContext) {
@@ -56,7 +49,7 @@ public class PolyglotEngine {
         String languageId, Parameters inputParameters, Map<String, ComponentConnection> componentConnections,
         JobContextAware jobContextAware) {
 
-        try (Context polyglotContext = PolyglotSandbox.newContext(getEngine(), languageId)) {
+        return PolyglotSandbox.call(languageId, polyglotContext -> {
             polyglotContext.eval(languageId, inputParameters.getString(SCRIPT, switch (languageId) {
                 case "java" ->
                     "public static Object perform(Map<String, ?> input, Context context) {\n\treturn null;\n}";
@@ -85,24 +78,7 @@ public class PolyglotEngine {
                 .execute(PolyglotValues.copyToGuestValue(inputMap, languageId), contextProxyObject);
 
             return PolyglotValues.copyFromPolyglotContext(PolyglotValues.copyToJavaValue(value));
-        }
-    }
-
-    private static Engine getEngine() {
-        if (engine == null) {
-            LOCK.lock();
-
-            try {
-                if (engine == null) {
-                    engine = Engine.newBuilder()
-                        .build();
-                }
-            } finally {
-                LOCK.unlock();
-            }
-        }
-
-        return engine;
+        });
     }
 
     @SuppressWarnings("unchecked")

@@ -24,8 +24,6 @@ import java.time.LocalDate;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
-import org.graalvm.polyglot.Context;
-import org.graalvm.polyglot.Engine;
 import org.graalvm.polyglot.Value;
 import org.junit.jupiter.api.Test;
 
@@ -88,20 +86,77 @@ public class PolyglotValuesTest {
             .encodeToString(input));
     }
 
-    private static Object roundTrip(Object hostValue) {
-        Engine engine = Engine.newBuilder()
-            .build();
+    @Test
+    public void testGuestMapSupportsPythonDictSubscript() {
+        // GraalPy exposes a foreign object's members as attributes only, so a map handed to a python guest has
+        // to carry hash entries for the idiomatic input['key'] to resolve.
+        assertThat(evalWithGuestMap("python", "def f(value):\n    return value['name']")).isEqualTo("ByteChef");
+    }
 
-        try (Context context = PolyglotSandbox.newContext(engine, LANGUAGE_ID)) {
+    @Test
+    public void testGuestMapSupportsPythonAttributeAccess() {
+        // The python script templates and the shipped workflow fixtures read input.name, so member access has to
+        // keep working alongside the dict subscript added above.
+        assertThat(evalWithGuestMap("python", "def f(value):\n    return value.name")).isEqualTo("ByteChef");
+        assertThat(evalWithGuestMap("python", "def f(value):\n    return value.nested.inner")).isEqualTo("deep");
+    }
+
+    @Test
+    public void testGuestMapSupportsPythonDictProtocol() {
+        assertThat(evalWithGuestMap("python", "def f(value):\n    return dict(value)['name']"))
+            .isEqualTo("ByteChef");
+        assertThat(evalWithGuestMap("python", "def f(value):\n    return 'name' in value")).isEqualTo(true);
+        assertThat(evalWithGuestMap("python", "def f(value):\n    return value.get('name')")).isEqualTo("ByteChef");
+        assertThat(evalWithGuestMap("python", "def f(value):\n    return list(value.keys())[0]")).isEqualTo("name");
+    }
+
+    @Test
+    public void testGuestMapSupportsJavaScriptMemberAndIndexAccess() {
+        assertThat(evalWithGuestMap("js", "(function (value) { return value.name; })")).isEqualTo("ByteChef");
+        assertThat(evalWithGuestMap("js", "(function (value) { return value['name']; })")).isEqualTo("ByteChef");
+    }
+
+    @Test
+    public void testGuestMapIsNestedPerLanguage() {
+        assertThat(evalWithGuestMap("python", "def f(value):\n    return value['nested']['inner']"))
+            .isEqualTo("deep");
+        assertThat(evalWithGuestMap("js", "(function (value) { return value.nested.inner; })")).isEqualTo("deep");
+    }
+
+    /**
+     * Hands {@code {"name": "ByteChef", "nested": {"inner": "deep"}}} to a guest function written in the given language
+     * and returns what that function read back out, as a host value.
+     */
+    private static Object evalWithGuestMap(String languageId, String functionSource) {
+        Map<String, Object> hostMap = Map.of("name", "ByteChef", "nested", Map.of("inner", "deep"));
+
+        return PolyglotSandbox.call(languageId, context -> {
+            Value function;
+
+            if ("python".equals(languageId)) {
+                context.eval(languageId, functionSource);
+
+                function = context.getBindings(languageId)
+                    .getMember("f");
+            } else {
+                function = context.eval(languageId, functionSource);
+            }
+
+            Value value = function.execute(PolyglotValues.copyToGuestValue(hostMap, languageId));
+
+            return PolyglotValues.copyFromPolyglotContext(PolyglotValues.copyToJavaValue(value));
+        });
+    }
+
+    private static Object roundTrip(Object hostValue) {
+        return PolyglotSandbox.call(LANGUAGE_ID, context -> {
             context.getBindings(LANGUAGE_ID)
                 .putMember("value", PolyglotValues.copyToGuestValue(hostValue, LANGUAGE_ID));
 
             Value value = context.eval(LANGUAGE_ID, "value");
 
             return PolyglotValues.copyFromPolyglotContext(PolyglotValues.copyToJavaValue(value));
-        } finally {
-            engine.close();
-        }
+        });
     }
 
 }

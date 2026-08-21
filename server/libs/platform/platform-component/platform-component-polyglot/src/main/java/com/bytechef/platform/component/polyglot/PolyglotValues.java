@@ -27,6 +27,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
 import org.graalvm.polyglot.Value;
 import org.graalvm.polyglot.proxy.ProxyArray;
 import org.graalvm.polyglot.proxy.ProxyDate;
@@ -44,6 +46,13 @@ import org.graalvm.polyglot.proxy.ProxyTime;
 public final class PolyglotValues {
 
     private static final Base64.Encoder ENCODER = Base64.getEncoder();
+
+    // Languages that need a map to answer subscript access as well as member access; see MemberAndHashMapProxy
+    // for why the two cannot be collapsed. JavaScript resolves both spellings against members alone, so it stays
+    // on a plain ProxyObject, whose semantics are what Object.keys and JSON.stringify already expect.
+    // RUBY-DISABLED: ruby indexes hashes with input['key'] too, so it likely belongs in this set, but the
+    // language is not installed and the behavior cannot be verified. Re-check when ruby is restored.
+    private static final Set<String> HASH_ACCESS_LANGUAGE_IDS = Set.of("python");
 
     private PolyglotValues() {
     }
@@ -87,6 +96,21 @@ public final class PolyglotValues {
         return object;
     }
 
+    /**
+     * Converts a guest {@link Value} into host-native objects.
+     *
+     * <p>
+     * Aggregates are walked element by element rather than mapped with {@code Value.as(Map.class)} /
+     * {@code Value.as(List.class)}: those are host object mappings of mutable target types, which every
+     * {@link org.graalvm.polyglot.SandboxPolicy} above {@code TRUSTED} forbids outright - under CONSTRAINED they fail
+     * with "Unsupported target type". Hash entries are read before members because a python dict reports both, and its
+     * contents are the hash entries; a member walk would yield its attributes instead. An executable value is kept
+     * callable rather than walked, so a guest function reached through a definition tree can still be invoked; such a
+     * value is valid only while the owning context is open.
+     *
+     * @param value the guest value to convert, may be {@code null}
+     * @return the host-native representation of {@code value}
+     */
     public static Object copyToJavaValue(Value value) {
         if (value == null) {
             return null;
@@ -109,14 +133,67 @@ public final class PolyglotValues {
         } else if (value.isString()) {
             return value.asString();
         } else if (value.hasArrayElements()) {
-            return value.as(List.class);
+            return copyArrayToJavaValue(value);
+        } else if (value.hasHashEntries()) {
+            return copyHashEntriesToJavaValue(value);
+        } else if (value.canExecute()) {
+            return toHostFunction(value);
         } else if (value.hasMembers()) {
-            return value.as(Map.class);
+            return copyMembersToJavaValue(value);
         } else if (value.isProxyObject()) {
             return value.asProxyObject();
         }
 
         throw new IllegalArgumentException("Cannot copy value %s to java type.".formatted(value));
+    }
+
+    private static List<Object> copyArrayToJavaValue(Value value) {
+        List<Object> list = new ArrayList<>();
+
+        for (long index = 0; index < value.getArraySize(); index++) {
+            list.add(copyToJavaValue(value.getArrayElement(index)));
+        }
+
+        return list;
+    }
+
+    private static Map<String, Object> copyHashEntriesToJavaValue(Value value) {
+        Map<String, Object> map = new HashMap<>();
+
+        Value iterator = value.getHashEntriesIterator();
+
+        while (iterator.hasIteratorNextElement()) {
+            Value entry = iterator.getIteratorNextElement();
+
+            map.put(entry.getArrayElement(0)
+                .asString(), copyToJavaValue(entry.getArrayElement(1)));
+        }
+
+        return map;
+    }
+
+    /**
+     * Wraps an executable guest value so it stays callable on the host side.
+     *
+     * <p>
+     * Checked before members because a guest function reports both, and walking its members would quietly yield an
+     * empty map where a caller expects something to call. The returned function spreads its argument array over the
+     * guest call, matching what {@code Value.as(new TypeLiteral<Function<Object[], Object>>() {})} produced, and
+     * converts the result so callers receive host-native values rather than a {@link Value} that dies with the context.
+     * The function itself is only callable while the owning context is open.
+     */
+    private static Function<Object[], Object> toHostFunction(Value value) {
+        return arguments -> copyToJavaValue(value.execute(arguments == null ? new Object[0] : arguments));
+    }
+
+    private static Map<String, Object> copyMembersToJavaValue(Value value) {
+        Map<String, Object> map = new HashMap<>();
+
+        for (String key : value.getMemberKeys()) {
+            map.put(key, copyToJavaValue(value.getMember(key)));
+        }
+
+        return map;
     }
 
     public static Object copyToGuestValue(Object value, String languageId) {
@@ -157,7 +234,7 @@ public final class PolyglotValues {
                 proxyMap.put((String) entry.getKey(), copyToGuestValue(entry.getValue(), languageId));
             }
 
-            return ProxyObject.fromMap(proxyMap);
+            return toGuestMap(proxyMap, languageId);
         } else if (value instanceof Number number) {
             return number;
         } else if (value instanceof String string) {
@@ -171,9 +248,24 @@ public final class PolyglotValues {
                 proxyMap.put((String) entry.getKey(), copyToGuestValue(entry.getValue(), languageId));
             }
 
-            return ProxyObject.fromMap(proxyMap);
+            return toGuestMap(proxyMap, languageId);
         } else {
             throw new IllegalArgumentException("Cannot copy value %s to %s type.".formatted(value, languageId));
         }
+    }
+
+    /**
+     * Wraps an already-converted map in the guest proxy representation the given language can index.
+     *
+     * @param proxyMap   the map whose values are already guest values
+     * @param languageId the id of the language the map is handed to
+     * @return a {@link MemberAndHashMapProxy} for languages that need subscript access, a {@link ProxyObject} otherwise
+     */
+    private static Object toGuestMap(Map<String, Object> proxyMap, String languageId) {
+        if (HASH_ACCESS_LANGUAGE_IDS.contains(languageId)) {
+            return new MemberAndHashMapProxy(proxyMap);
+        }
+
+        return ProxyObject.fromMap(proxyMap);
     }
 }
