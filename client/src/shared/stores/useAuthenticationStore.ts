@@ -19,7 +19,7 @@ export interface AuthenticationI {
     clearAuthentication: () => void;
     getAccount: () => Promise<UserI | undefined>;
     login: (email: string, password: string, rememberMe: boolean) => Promise<UserI | undefined>;
-    logout: () => void;
+    logout: () => Promise<void>;
     reset: () => void;
     verifyMfa: (code: string) => Promise<UserI | undefined>;
 }

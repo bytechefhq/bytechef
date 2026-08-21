@@ -80,10 +80,14 @@ export function AppSidebarFooter() {
 
     const {data: workspaces} = useGetUserWorkspacesQuery(account?.id!, !!account);
 
-    const handleLogOutClick = () => {
+    const handleLogOutClick = async () => {
         analytics.reset();
-        queryClient.resetQueries();
-        logout();
+
+        await queryClient.cancelQueries();
+
+        await logout();
+
+        queryClient.clear();
     };
 
     const handlePlatformTypeChange = (value: string) => {

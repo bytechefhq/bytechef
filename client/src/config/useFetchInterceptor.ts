@@ -36,6 +36,17 @@ function handlesErrorInline(url: string): boolean {
     return url.includes('/approval-form/');
 }
 
+const AUTHENTICATION_REQUIRED_ERROR_CODE = 'AUTHENTICATION_REQUIRED';
+
+interface GraphQlErrorI {
+    extensions?: {errorCode?: string};
+    message?: string;
+}
+
+function isAuthenticationError(error: GraphQlErrorI): boolean {
+    return error.extensions?.errorCode === AUTHENTICATION_REQUIRED_ERROR_CODE;
+}
+
 function resolveUrl(input: RequestInfo | URL): string {
     if (typeof input === 'string') {
         return input;
@@ -161,10 +172,19 @@ export default function useFetchInterceptor() {
 
                     clonedResponse
                         .json()
-                        .then((data: {errors?: Array<{message?: string}>}) => {
-                            if (data.errors?.length) {
+                        .then((data: {errors?: Array<GraphQlErrorI>}) => {
+                            const errors = data.errors ?? [];
+
+                            if (errors.some(isAuthenticationError)) {
+                                clearAuthentication();
+                                clearCurrentWorkspaceId();
+
+                                return;
+                            }
+
+                            if (errors.length) {
                                 const errorMessage = [
-                                    ...new Set(data.errors.map((error) => error.message || 'Unknown error')),
+                                    ...new Set(errors.map((error) => error.message || 'Unknown error')),
                                 ].join('\n');
 
                                 showErrorToast(toastId, 'Error', {description: errorMessage});
