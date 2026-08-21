@@ -167,9 +167,7 @@ function App() {
 
     const ff_1023 = useFeatureFlagsStore()('ff-1023');
     const ff_2446 = useFeatureFlagsStore()('ff-2446');
-    const ff_2311 = useFeatureFlagsStore()('ff-2311');
     const ff_2396 = useFeatureFlagsStore()('ff-2396');
-    const ff_2894 = useFeatureFlagsStore()('ff-2894');
 
     const filteredAutomationNavigation = automationNavigation.filter((navItem) => {
         if (
@@ -182,10 +180,6 @@ function App() {
 
         if (navItem.href === '/automation/api-platform') {
             return ff_1023;
-        }
-
-        if (navItem.href === '/automation/chat') {
-            return ff_2311 || ff_2894;
         }
 
         if (navItem.href === '/automation/knowledge-bases') {
