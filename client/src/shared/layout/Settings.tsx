@@ -47,6 +47,10 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
             );
         }
 
+        if (navItem.href === 'mcp-server') {
+            return isFeatureFlagEnabled('ff-2197');
+        }
+
         if (navItem.href === 'admin-api-keys') {
             return isFeatureFlagEnabled('ff-1024');
         }
