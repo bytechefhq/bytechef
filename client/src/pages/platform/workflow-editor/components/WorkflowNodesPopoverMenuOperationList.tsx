@@ -11,7 +11,6 @@ import {ActionDefinitionKeys} from '@/shared/queries/platform/actionDefinitions.
 import {ClusterElementDefinitionKeys} from '@/shared/queries/platform/clusterElementDefinitions.queries';
 import {TriggerDefinitionKeys} from '@/shared/queries/platform/triggerDefinitions.queries';
 import {DEFINITION_STALE_TIME} from '@/shared/queries/queryConstants';
-import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {ClickedOperationType, ClusterElementItemType, NodeDataType, PropertyAllType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
 import {ComponentIcon, Loader2Icon} from 'lucide-react';
@@ -97,9 +96,6 @@ const WorkflowNodesPopoverMenuOperationList = ({
             }))
         );
 
-    const ff_2311 = useFeatureFlagsStore()('ff-2311');
-    const ff_2894 = useFeatureFlagsStore()('ff-2894');
-
     const {captureComponentUsed} = useAnalytics();
 
     const {updateWorkflowMutation} = useWorkflowEditor();
@@ -121,42 +117,9 @@ const WorkflowNodesPopoverMenuOperationList = ({
         return matchingOperations;
     }, [clusterElementType, clusterElements]);
 
-    const isOperationVisible = useCallback(
-        (operationName: string): boolean => {
-            if (ff_2894) {
-                return true;
-            }
-
-            if (['streamChat', 'streamResponseToRequest'].includes(operationName)) {
-                return false;
-            }
-
-            if (!ff_2311 && operationName === 'streamAsk') {
-                return false;
-            }
-
-            return true;
-        },
-        [ff_2311, ff_2894]
-    );
-
     const operations = useMemo(
-        () =>
-            (trigger
-                ? triggers
-                : clusterElementsCanvasOpen && clusterElement
-                  ? clusterElementOperations
-                  : actions
-            )?.filter((operation) => isOperationVisible(operation.name)),
-        [
-            trigger,
-            triggers,
-            clusterElementsCanvasOpen,
-            clusterElement,
-            clusterElementOperations,
-            actions,
-            isOperationVisible,
-        ]
+        () => (trigger ? triggers : clusterElementsCanvasOpen && clusterElement ? clusterElementOperations : actions),
+        [trigger, triggers, clusterElementsCanvasOpen, clusterElement, clusterElementOperations, actions]
     );
 
     const getNodeData = useCallback(

@@ -74,7 +74,6 @@ const WorkflowNodesPopoverMenuComponentList = memo(
 
         const ff_797 = getFeatureFlag('ff-797');
         const ff_3158 = getFeatureFlag('ff-3158');
-        const ff_3827 = getFeatureFlag('ff-3827');
 
         const knowledgeBaseEnabled = useApplicationInfoStore((state) => state.ai.knowledgeBase.enabled);
 
@@ -112,9 +111,9 @@ const WorkflowNodesPopoverMenuComponentList = memo(
                 return [];
             }
 
-            let triggerComponents = componentsWithActions
-                .filter(({triggersCount}) => triggersCount && triggersCount > 0)
-                .filter(({name}) => (!ff_3827 && name !== 'form') || ff_3827);
+            let triggerComponents = componentsWithActions.filter(
+                ({triggersCount}) => triggersCount && triggersCount > 0
+            );
 
             if (clusterElementType) {
                 triggerComponents = triggerComponents.filter((component) =>
@@ -123,7 +122,7 @@ const WorkflowNodesPopoverMenuComponentList = memo(
             }
 
             return triggerComponents;
-        }, [componentsWithActions, clusterElementType, ff_3827]);
+        }, [componentsWithActions, clusterElementType]);
 
         const filteredClusterElementComponentDefinitions = useMemo(() => {
             if (!componentsWithActions || !clusterElementType) {
