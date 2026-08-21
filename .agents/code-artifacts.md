@@ -42,7 +42,7 @@ Spec: `docs/superpowers/specs/2026-08-05-draft-publish-editors-design.md`.
 ### Perform context (custom components & code workflows, 2026-08-06)
 
 - **Shared polyglot module**: CE `platform-component-polyglot` holds the strict sandbox
-  (`PolyglotSandbox.newContext` — pinned restrictions with ONE carve-out: `allowCreateThread(true)`
+  (`PolyglotSandbox.call` — pinned restrictions with ONE carve-out: `allowCreateThread(true)`
   iff ruby is permitted, because TruffleRuby backs host-side hash iteration with fiber-based
   Enumerators), guest↔host marshalling (`PolyglotValues`), and the `context.component` proxy chain
   (`ContextProxyObject`/`ComponentProxyObject`/`ActionProxyObject` over the `ComponentActionInvoker`
@@ -57,11 +57,34 @@ Spec: `docs/superpowers/specs/2026-08-05-draft-publish-editors-design.md`.
   `while(true){}` used to pin a worker thread indefinitely — NOT an isolated heap; that is
   `UNTRUSTED`, which needs polyglot isolate artifacts and cannot host js and python in one JVM
   (one isolate native library per process).
+- **Guest executions run on platform threads, never the caller's virtual thread.** GraalVM meters
+  `sandbox.MaxCPUTime`/`MaxHeapMemory` through `ThreadMXBean.getThreadCpuTime`/`getThreadAllocatedBytes`
+  on the thread that builds AND runs the context; the JDK answers `-1` for virtual threads, so GraalVM
+  refuses to build the context at all ("ThreadMXBean.getThreadCpuTime() is not supported or enabled by
+  the host VM"). server-app sets `spring.threads.virtual.enabled: true` and the in-memory broker uses
+  `newVirtualThreadPerTaskExecutor`, so this hit BOTH the editor test path and workflow task execution.
+  Hence `PolyglotSandbox.call(languageId, ctx -> …)` and no public `newContext`: a context must never
+  outlive the thread its ceilings are measured on. `PolyglotGuestExecutor` hops onto a bounded platform
+  pool (`bytechef.script.sandbox.max-concurrent-executions`, default `max(16, cores*4)`) and carries
+  tenant/environment/tracing/security across via a Micrometer `ContextSnapshot`. The hop is skipped when
+  the caller is already a platform thread or the context carries no thread-metered ceiling — which also
+  stops a guest script that invokes a polyglot custom component from queueing behind itself.
 - **`PolyglotSandbox` owns its engines**, keyed by policy + permitted languages, because GraalVM
   requires a context and its engine to carry the SAME `SandboxPolicy`. Callers no longer pass one
   (the old per-loader `performEngine` fields are gone); every context it builds is a strict perform
   context, so the interop-cache clash that motivated separate engines — mixing strict and permissive
-  contexts on ONE engine — cannot arise. Definition loading keeps its own permissive engine.
+  contexts on ONE engine — cannot arise.
+- **Definition loading is sandboxed too.** A component's / code workflow's definition script is
+  user-supplied and its TOP LEVEL runs in full at load time, so `ComponentHandlerPolyglotEngine.load`,
+  `ProjectHandlerPolyglotEngine.load` and `IntegrationHandlerPolyglotEngine.load` go through
+  `PolyglotSandbox.call` rather than a per-loader `Engine.create()` — the ceilings apply to DECLARING
+  a component, not only to running one (a `while(true){}` at definition top level used to hang the
+  loader thread forever). This works because the load path already reads guest data with
+  `PolyglotValues.copyToJavaValue`, never `Value.as(Map/List/TypeLiteral)`; the remaining `as(...)`
+  calls target immutable types (`String`, `Integer`, `Number`), which CONSTRAINED permits. The
+  Espresso (`java`) paths — `getJavaContext`/`loadJava` — deliberately keep their own permissive
+  engine: they need `IOAccess.ALL`, native access and `java.Classpath` to boot a JAR, none of which
+  any policy above TRUSTED allows.
 - **Never map guest aggregates with `Value.as(Map.class)` / `as(List.class)` / `as(TypeLiteral)` on a
   perform path.** Those are host object mappings of mutable target types, which EVERY policy above
   TRUSTED rejects — the failure is a `ClassCastException: Unsupported target type`, not a policy
