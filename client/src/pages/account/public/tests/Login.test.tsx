@@ -241,3 +241,50 @@ it('should show socials login buttons with correct feature flag', async () => {
     expect(screen.queryByText('Continue with Google')).toBeInTheDocument();
     expect(screen.queryByText('Continue with Github')).toBeInTheDocument();
 });
+
+const renderAuthenticatedLoginPage = (initialEntry: string | {pathname: string; search?: string; state?: unknown}) => {
+    mockAuthenticationStore({authenticated: true});
+
+    render(
+        <MemoryRouter initialEntries={[initialEntry]}>
+            <Routes>
+                <Route element={<Login />} path="/login" />
+
+                <Route element={<div>Landing page</div>} path="/" />
+
+                <Route
+                    element={<div>Template page</div>}
+                    path="/automation/projects/:projectId/templates/:templateName"
+                />
+            </Routes>
+        </MemoryRouter>
+    );
+};
+
+it('should continue to the location recorded in the query string after signing in', () => {
+    renderAuthenticatedLoginPage('/login?redirect=%2Fautomation%2Fprojects%2F1052%2Ftemplates%2Fai-email-classifier');
+
+    expect(screen.getByText('Template page')).toBeInTheDocument();
+});
+
+it('should prefer the location passed through router state over the query string', () => {
+    renderAuthenticatedLoginPage({
+        pathname: '/login',
+        search: '?redirect=%2F',
+        state: {from: {pathname: '/automation/projects/1052/templates/ai-email-classifier'}},
+    });
+
+    expect(screen.getByText('Template page')).toBeInTheDocument();
+});
+
+it('should fall back to the landing page when no location was recorded', () => {
+    renderAuthenticatedLoginPage('/login');
+
+    expect(screen.getByText('Landing page')).toBeInTheDocument();
+});
+
+it('should ignore an off-site location recorded in the query string', () => {
+    renderAuthenticatedLoginPage(`/login?redirect=${encodeURIComponent('https://evil.example')}`);
+
+    expect(screen.getByText('Landing page')).toBeInTheDocument();
+});

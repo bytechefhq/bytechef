@@ -4,6 +4,7 @@ import LoadingIcon from '@/components/LoadingIcon';
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
 import {Checkbox} from '@/components/ui/checkbox';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
+import {getLoginRedirect} from '@/shared/auth/login-redirect-utils';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import PublicLayoutContainer from '@/shared/layout/PublicLayoutContainer';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
@@ -138,7 +139,9 @@ const Login = () => {
         }
     }, [form]);
 
-    const {from} = pageLocation.state || {from: {pathname: '/', search: pageLocation.search}};
+    const {from} = pageLocation.state || {
+        from: getLoginRedirect(pageLocation.search) ?? {pathname: '/', search: pageLocation.search},
+    };
 
     useEffect(() => {
         const company = searchParams.get('company');
