@@ -1,8 +1,11 @@
 import {render, screen, userEvent} from '@/shared/util/test-utils';
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {MemoryRouter} from 'react-router-dom';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {AppSidebarFooter} from './AppSidebarFooter';
+
+const {logoutMock} = vi.hoisted(() => ({logoutMock: vi.fn()}));
 
 vi.mock('@/shared/middleware/graphql', () => ({
     useEnvironmentsQuery: () => ({data: {environments: []}}),
@@ -29,7 +32,7 @@ vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
 vi.mock('@/shared/stores/useAuthenticationStore', () => ({
     useAuthenticationStore: vi.fn(
         (selector: (state: {account: {email: string; id: number} | undefined; logout: () => void}) => unknown) =>
-            selector({account: {email: 'user@localhost.com', id: 1}, logout: vi.fn()})
+            selector({account: {email: 'user@localhost.com', id: 1}, logout: logoutMock})
     ),
 }));
 
@@ -88,5 +91,30 @@ describe('AppSidebarFooter', () => {
         expect(screen.getByText('Log Out')).toBeInTheDocument();
         // Email appears in both the trigger and the open menu.
         expect(screen.getAllByText('user@localhost.com').length).toBeGreaterThanOrEqual(2);
+    });
+
+    it('drops the query cache on log out without refetching anything', async () => {
+        const user = userEvent.setup();
+        const queryClient = new QueryClient();
+
+        const cancelQueriesSpy = vi.spyOn(queryClient, 'cancelQueries');
+        const clearSpy = vi.spyOn(queryClient, 'clear');
+        const resetQueriesSpy = vi.spyOn(queryClient, 'resetQueries');
+
+        render(
+            <QueryClientProvider client={queryClient}>
+                <MemoryRouter>
+                    <AppSidebarFooter />
+                </MemoryRouter>
+            </QueryClientProvider>
+        );
+
+        await user.click(screen.getByRole('button', {name: 'User menu'}));
+        await user.click(screen.getByText('Log Out'));
+
+        expect(resetQueriesSpy).not.toHaveBeenCalled();
+        expect(cancelQueriesSpy).toHaveBeenCalled();
+        expect(logoutMock).toHaveBeenCalled();
+        expect(clearSpy).toHaveBeenCalled();
     });
 });
