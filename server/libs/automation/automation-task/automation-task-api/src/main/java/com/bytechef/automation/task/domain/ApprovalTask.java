@@ -150,13 +150,7 @@ public final class ApprovalTask {
     }
 
     public Environment getEnvironment() {
-        Environment[] environments = Environment.values();
-
-        if (environment < 0 || environment >= environments.length) {
-            throw new IllegalStateException("Invalid environment value: " + environment);
-        }
-
-        return environments[environment];
+        return toEnum(Environment.values(), environment, "environment");
     }
 
     public long getEnvironmentId() {
@@ -164,11 +158,11 @@ public final class ApprovalTask {
     }
 
     public Status getStatus() {
-        return Status.values()[status];
+        return toEnum(Status.values(), status, "status");
     }
 
     public Priority getPriority() {
-        return Priority.values()[priority];
+        return toEnum(Priority.values(), priority, "priority");
     }
 
     public Long getAssigneeId() {
@@ -239,6 +233,15 @@ public final class ApprovalTask {
 
     public void setVersion(int version) {
         this.version = version;
+    }
+
+    private static <T extends Enum<T>> T toEnum(T[] values, int ordinal, String propertyName) {
+        if (ordinal < 0 || ordinal >= values.length) {
+            throw new IllegalStateException(
+                "Invalid %s value: %d, expected 0..%d".formatted(propertyName, ordinal, values.length - 1));
+        }
+
+        return values[ordinal];
     }
 
     @Override
