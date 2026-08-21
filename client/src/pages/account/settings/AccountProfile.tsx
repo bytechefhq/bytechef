@@ -4,9 +4,14 @@ import AccountProfileMfa from '@/pages/account/settings/AccountProfileMfa';
 import AccountProfilePassword from '@/pages/account/settings/AccountProfilePassword';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
+import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import React from 'react';
 
 const AccountProfile = () => {
+    const isFeatureFlagEnabled = useFeatureFlagsStore();
+
+    const identityProvidersEnabled = isFeatureFlagEnabled('ff-1040');
+
     return (
         <LayoutContainer
             header={<Header centerTitle={true} position="main" title="Your profile" />}
@@ -18,9 +23,9 @@ const AccountProfile = () => {
 
                     <AccountProfilePassword />
 
-                    <AccountProfileMfa />
+                    {identityProvidersEnabled && <AccountProfileMfa />}
 
-                    <AccountProfileLinkedAccounts />
+                    {identityProvidersEnabled && <AccountProfileLinkedAccounts />}
                 </div>
             </div>
         </LayoutContainer>
