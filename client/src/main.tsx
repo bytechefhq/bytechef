@@ -4,6 +4,7 @@ import './styles/index.css';
 
 import {TooltipProvider} from '@/components/ui/tooltip';
 import I18n from '@/i18n';
+import {buildLoginPath} from '@/shared/auth/login-redirect-utils';
 import {ConditionalPostHogProvider} from '@/shared/providers/conditional-posthog-provider';
 import {ThemeProvider} from '@/shared/providers/theme-provider';
 import {applicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
@@ -68,7 +69,7 @@ async function renderApp() {
             const result = await authenticationStore.getState().getAccount();
 
             if (!result && window.location.pathname !== '/login') {
-                window.location.pathname = '/login';
+                window.location.replace(buildLoginPath(window.location));
             }
         }
     }

@@ -1,4 +1,5 @@
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {buildLoginPath} from '@/shared/auth/login-redirect-utils';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {getCookie} from '@/shared/util/cookie-utils';
 import fetchIntercept from 'fetch-intercept';
@@ -135,7 +136,7 @@ export default function useFetchInterceptor() {
                     clearCurrentWorkspaceId();
 
                     if (!response.url.endsWith('/api/account')) {
-                        navigate('/login');
+                        navigate(buildLoginPath(window.location));
                     }
 
                     return response;
@@ -226,7 +227,7 @@ export default function useFetchInterceptor() {
                 clearCurrentWorkspaceId();
 
                 if (!url.endsWith('/api/account')) {
-                    navigate('/login');
+                    navigate(buildLoginPath(window.location));
                 }
             }
 
