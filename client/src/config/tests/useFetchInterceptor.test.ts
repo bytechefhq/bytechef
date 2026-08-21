@@ -380,6 +380,52 @@ describe('useFetchInterceptor', () => {
             expect(hoisted.toastError).not.toHaveBeenCalled();
         });
 
+        it('clears the session instead of toasting an unauthenticated GraphQL error', async () => {
+            renderHook(() => useFetchInterceptor());
+
+            const response = createMockResponse({
+                jsonData: {
+                    errors: [{extensions: {errorCode: 'AUTHENTICATION_REQUIRED'}, message: 'Authentication required'}],
+                },
+                status: 200,
+                url: 'http://localhost/graphql',
+            });
+
+            hoisted.registeredHandlers!.response(response);
+
+            await act(async () => {
+                await new Promise((resolve) => setTimeout(resolve, 0));
+            });
+
+            expect(hoisted.toastError).not.toHaveBeenCalled();
+            expect(hoisted.clearAuthentication).toHaveBeenCalled();
+            expect(hoisted.clearCurrentWorkspaceId).toHaveBeenCalled();
+        });
+
+        it('still toasts GraphQL errors carrying an unrelated error code', async () => {
+            renderHook(() => useFetchInterceptor());
+
+            const response = createMockResponse({
+                jsonData: {errors: [{extensions: {errorCode: 'ACCESS_DENIED'}, message: 'Access denied'}]},
+                status: 200,
+                url: 'http://localhost/graphql',
+            });
+
+            hoisted.registeredHandlers!.response(response);
+
+            await act(async () => {
+                await new Promise((resolve) => setTimeout(resolve, 0));
+            });
+
+            expect(hoisted.toastError).toHaveBeenCalledWith('Error', {
+                description: 'Access denied',
+                id: 'fetch-error-200',
+                onAutoClose: expect.any(Function),
+                onDismiss: expect.any(Function),
+            });
+            expect(hoisted.clearAuthentication).not.toHaveBeenCalled();
+        });
+
         it('does not check GraphQL errors for non-graphql URLs', async () => {
             renderHook(() => useFetchInterceptor());
 
