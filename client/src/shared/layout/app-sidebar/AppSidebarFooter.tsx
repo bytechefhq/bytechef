@@ -21,7 +21,6 @@ import {useGetUserWorkspacesQuery} from '@/shared/queries/automation/workspaces.
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {
     AudioLinesIcon,
@@ -72,8 +71,6 @@ export function AppSidebarFooter() {
     const navigate = useNavigate();
 
     const queryClient = useQueryClient();
-
-    const ff_520 = useFeatureFlagsStore()('ff-520');
 
     /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
     const {data: environmentsQuery} = useEnvironmentsQuery();
@@ -191,7 +188,7 @@ export function AppSidebarFooter() {
 
                 <DropdownMenuSeparator />
 
-                {ff_520 && application?.edition === 'EE' && (
+                {application?.edition === 'EE' && (
                     <>
                         <DropdownMenuSub>
                             <DropdownMenuSubTrigger className="cursor-pointer font-semibold">

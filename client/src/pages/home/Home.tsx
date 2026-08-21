@@ -1,6 +1,5 @@
 import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
-import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
-import {useCallback, useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 
 import ModeSelectionDialog from './components/ModeSelectionDialog';
@@ -12,17 +11,7 @@ const Home = () => {
 
     const navigate = useNavigate();
 
-    const ff_520 = useFeatureFlagsStore()('ff-520');
-
-    const memoizedNavigate = useCallback(() => navigate('/automation'), [navigate]);
-
     useEffect(() => {
-        if (!ff_520) {
-            memoizedNavigate();
-
-            return;
-        }
-
         if (currentType !== undefined) {
             if (currentType === PlatformType.AUTOMATION) {
                 navigate('/automation');
@@ -34,9 +23,9 @@ const Home = () => {
         if (currentType === undefined) {
             setIsDialogOpen(true);
         }
-    }, [ff_520, currentType, memoizedNavigate, navigate]);
+    }, [currentType, navigate]);
 
-    if (!ff_520 || !isDialogOpen) {
+    if (!isDialogOpen) {
         return <></>;
     }
 
