@@ -8,6 +8,7 @@ import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useHelpHub} from '@/shared/hooks/useHelpHub';
 import {MobileTopNavigation} from '@/shared/layout/MobileTopNavigation';
+import {TrialBanner} from '@/shared/layout/TrialBanner';
 import {AppSidebar} from '@/shared/layout/app-sidebar/AppSidebar';
 import {EditionType, useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
@@ -131,9 +132,10 @@ const platformNavigation = [
 function App() {
     const [searchOpen, setSearchOpen] = useState(false);
 
-    const {ai, edition} = useApplicationInfoStore(
+    const {ai, billingEnabled, edition} = useApplicationInfoStore(
         useShallow((state) => ({
             ai: state.ai,
+            billingEnabled: state.billing.enabled,
             edition: state.application?.edition,
         }))
     );
@@ -290,35 +292,43 @@ function App() {
     }, [ff_2396]);
 
     return authenticated ? (
-        <SidebarProvider className="h-full" defaultOpen={false}>
-            <AppSidebar navigation={navigation} />
+        <div className="flex h-full flex-col">
+            {billingEnabled && location.pathname.includes('/automation/') && <TrialBanner />}
 
-            <SidebarInset className="flex h-full min-w-0 flex-col">
-                <MobileTopNavigation />
+            {/* transform-gpu gives fixed-position descendants (page sidebars) a containing
+                block scoped to this element, so they render below the banner instead of
+                anchoring to the viewport top and overlapping it. */}
 
-                <div className="flex size-full">
-                    <div className="flex h-full min-w-0 flex-1">
-                        <Outlet />
+            <SidebarProvider className="min-h-0 flex-1 transform-gpu" defaultOpen={false}>
+                <AppSidebar navigation={navigation} />
+
+                <SidebarInset className="flex h-full min-w-0 flex-col">
+                    <MobileTopNavigation />
+
+                    <div className="flex size-full">
+                        <div className="flex h-full min-w-0 flex-1">
+                            <Outlet />
+                        </div>
+
+                        {ai.copilot.enabled && (
+                            <aside className="h-full shrink-0">
+                                <Suspense fallback={null}>
+                                    <CopilotPanel open={copilotPanelOpen} />
+                                </Suspense>
+                            </aside>
+                        )}
                     </div>
+                </SidebarInset>
 
-                    {ai.copilot.enabled && (
-                        <aside className="h-full shrink-0">
-                            <Suspense fallback={null}>
-                                <CopilotPanel open={copilotPanelOpen} />
-                            </Suspense>
-                        </aside>
-                    )}
-                </div>
-            </SidebarInset>
+                <Toaster />
 
-            <Toaster />
-
-            {ff_2396 && searchOpen && (
-                <Suspense fallback={null}>
-                    <GlobalSearchDialog onOpenChange={setSearchOpen} open={searchOpen} />
-                </Suspense>
-            )}
-        </SidebarProvider>
+                {ff_2396 && searchOpen && (
+                    <Suspense fallback={null}>
+                        <GlobalSearchDialog onOpenChange={setSearchOpen} open={searchOpen} />
+                    </Suspense>
+                )}
+            </SidebarProvider>
+        </div>
     ) : (
         <Outlet />
     );

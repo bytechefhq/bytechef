@@ -32,7 +32,7 @@ export function AppSidebar({navigation}: AppSidebarProps) {
     const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
 
     return (
-        <Sidebar className="bg-muted" collapsible="icon">
+        <Sidebar className="h-full bg-muted" collapsible="icon">
             <SidebarHeader>
                 <Link className="flex items-center gap-2 py-1" to="/">
                     <span className="flex size-10 shrink-0 items-center justify-center">
