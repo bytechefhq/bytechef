@@ -4,7 +4,7 @@ import LoadingIcon from '@/components/LoadingIcon';
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
 import {Checkbox} from '@/components/ui/checkbox';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
-import {getLoginRedirect} from '@/shared/auth/login-redirect-utils';
+import {getLoginRedirect, rememberLoginRedirect} from '@/shared/auth/login-redirect-utils';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import PublicLayoutContainer from '@/shared/layout/PublicLayoutContainer';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
@@ -155,6 +155,8 @@ const Login = () => {
                 })
                 .then((data) => {
                     if (data?.redirectUrl) {
+                        rememberLoginRedirect(getLoginRedirect(pageLocation.search));
+
                         window.location.href = data.redirectUrl;
                     }
                 })
@@ -162,7 +164,7 @@ const Login = () => {
                     // fall back to normal login
                 });
         }
-    }, [searchParams]);
+    }, [pageLocation.search, searchParams]);
 
     useEffect(() => {
         if (searchParams.get('error') === 'oauth2') {
@@ -213,6 +215,8 @@ const Login = () => {
                                     icon={<img alt="Google logo" src={googleLogo} />}
                                     label="Continue with Google"
                                     onClick={() => {
+                                        rememberLoginRedirect(getLoginRedirect(pageLocation.search));
+
                                         window.location.href = '/oauth2/authorization/google';
                                     }}
                                     size="lg"
@@ -223,6 +227,8 @@ const Login = () => {
                                     icon={<img alt="Github logo" src={githubLogo} />}
                                     label="Continue with Github"
                                     onClick={() => {
+                                        rememberLoginRedirect(getLoginRedirect(pageLocation.search));
+
                                         window.location.href = '/oauth2/authorization/github';
                                     }}
                                     size="lg"
@@ -282,6 +288,8 @@ const Login = () => {
                                             icon={<ShieldCheckIcon className="size-4" />}
                                             label={`Continue with ${ssoRedirect.providerName}`}
                                             onClick={() => {
+                                                rememberLoginRedirect(getLoginRedirect(pageLocation.search));
+
                                                 window.location.href = ssoRedirect.url;
                                             }}
                                             size="lg"
