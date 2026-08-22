@@ -3,6 +3,7 @@ import {useGetAssetFileQuery} from '@/shared/middleware/graphql';
 import {DownloadIcon, FileTextIcon} from 'lucide-react';
 import {useMemo} from 'react';
 import Markdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 import AssetFileChartPane from './AssetFileChartPane';
 import AssetFileHtmlInteractivePane from './AssetFileHtmlInteractivePane';
@@ -276,10 +277,13 @@ const PreviewPane = ({content, fileId, mimeType, name}: PanePropsI) => {
     if (mimeType === 'text/markdown') {
         return (
             <div
-                className="prose prose-sm size-full overflow-auto p-4 dark:prose-invert"
+                className="prose prose-sm size-full max-w-none overflow-auto p-4 dark:prose-invert prose-table:block prose-table:overflow-x-auto"
                 data-testid="asset-file-markdown-preview"
             >
-                <Markdown>{content}</Markdown>
+                {/* remarkGfm: react-markdown parses CommonMark only, so without it pipe tables, task lists,
+                    strikethrough and autolinks collapse into a single run-on paragraph of literal pipes. */}
+
+                <Markdown remarkPlugins={[remarkGfm]}>{content}</Markdown>
             </div>
         );
     }
@@ -355,7 +359,7 @@ const AssetFileViewer = ({editorContent, fileId, name, onEditorContentChange, vi
 
         return (
             <div className="flex size-full">
-                <div className="size-full flex-1 border-r">
+                <div className="size-full min-w-0 flex-1 border-r">
                     <EditorPane
                         content={effectiveContent}
                         fileId={fileId}
@@ -365,7 +369,7 @@ const AssetFileViewer = ({editorContent, fileId, name, onEditorContentChange, vi
                     />
                 </div>
 
-                <div className="size-full flex-1" data-testid="asset-file-chart-preview">
+                <div className="size-full min-w-0 flex-1" data-testid="asset-file-chart-preview">
                     <AssetFileChartPane spec={spec} />
                 </div>
             </div>
@@ -391,7 +395,7 @@ const AssetFileViewer = ({editorContent, fileId, name, onEditorContentChange, vi
 
         return (
             <div className="flex size-full">
-                <div className="size-full flex-1 border-r">
+                <div className="size-full min-w-0 flex-1 border-r">
                     <EditorPane
                         content={effectiveContent}
                         fileId={fileId}
@@ -401,7 +405,7 @@ const AssetFileViewer = ({editorContent, fileId, name, onEditorContentChange, vi
                     />
                 </div>
 
-                <div className="size-full flex-1">
+                <div className="size-full min-w-0 flex-1">
                     <AssetFileHtmlInteractivePane content={effectiveContent} name={name} />
                 </div>
             </div>
@@ -434,7 +438,7 @@ const AssetFileViewer = ({editorContent, fileId, name, onEditorContentChange, vi
 
     return (
         <div className="flex size-full">
-            <div className="size-full flex-1 border-r">
+            <div className="size-full min-w-0 flex-1 border-r">
                 <EditorPane
                     content={effectiveContent}
                     fileId={fileId}
@@ -444,7 +448,7 @@ const AssetFileViewer = ({editorContent, fileId, name, onEditorContentChange, vi
                 />
             </div>
 
-            <div className="size-full flex-1">
+            <div className="size-full min-w-0 flex-1">
                 <PreviewPane content={effectiveContent} fileId={fileId} mimeType={mimeType} name={name} />
             </div>
         </div>

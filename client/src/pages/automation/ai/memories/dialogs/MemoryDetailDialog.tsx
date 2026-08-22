@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/dialog';
 import {format} from 'date-fns';
 import Markdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 import {AiAutoMemoryI} from '../hooks/useAiAutoMemories';
 
@@ -55,8 +56,11 @@ const MemoryDetailDialog = ({memory, onClose, open}: MemoryDetailDialogProps) =>
                 <div className="flex flex-col gap-3 overflow-y-auto">
                     {memory.description && <p className="text-sm text-muted-foreground">{memory.description}</p>}
 
-                    <div className="prose prose-sm max-w-none overflow-y-auto rounded-md border bg-muted/30 p-4 dark:prose-invert">
-                        <Markdown>{memory.content}</Markdown>
+                    <div className="prose prose-sm max-w-none overflow-y-auto rounded-md border bg-muted/30 p-4 dark:prose-invert prose-table:block prose-table:overflow-x-auto">
+                        {/* remarkGfm: react-markdown is CommonMark-only, and memory content written by the
+                            model routinely contains pipe tables. */}
+
+                        <Markdown remarkPlugins={[remarkGfm]}>{memory.content}</Markdown>
                     </div>
                 </div>
             )}
