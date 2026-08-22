@@ -56,6 +56,7 @@ export type ComponentPropertiesType =
     | {
           componentDefinition: ComponentDefinitionBasic;
           properties?: Array<Property>;
+          workflowNodeName?: string;
       }
     | undefined;
 

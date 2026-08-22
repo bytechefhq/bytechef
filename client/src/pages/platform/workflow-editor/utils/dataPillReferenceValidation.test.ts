@@ -25,6 +25,19 @@ describe('datapillReferenceValidation', () => {
             expect(set.has('airtable.rows[index].id')).toBe(true);
             expect(set.has('airtable.rows[0].id')).toBe(true);
         });
+
+        it('skips malformed datapills instead of throwing', () => {
+            const malformedDataPills = [
+                pill('gmail'),
+                {id: 'broken'} as DataPillType,
+                undefined as unknown as DataPillType,
+            ];
+
+            const set = buildValidDataPillReferenceSet(malformedDataPills);
+
+            expect(set.has('gmail')).toBe(true);
+            expect(set.size).toBe(1);
+        });
     });
 
     describe('isDatapillReferenceValid', () => {
