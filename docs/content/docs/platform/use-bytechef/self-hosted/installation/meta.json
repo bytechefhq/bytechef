@@ -5,7 +5,6 @@
   "pages": [
     "local-docker",
     "kubernetes",
-    "distributed",
     "aws-ec2",
     "aws-ecs",
     "azure",
