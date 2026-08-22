@@ -5,8 +5,12 @@ import {toArrayIndexTemplate} from './dataPillArrayIndex';
 export function buildValidDataPillReferenceSet(dataPills: Array<DataPillType>): Set<string> {
     const validReferences = new Set<string>();
 
-    for (const dataPill of dataPills) {
-        const value = dataPill.value;
+    for (const dataPill of dataPills ?? []) {
+        const value = dataPill?.value;
+
+        if (typeof value !== 'string') {
+            continue;
+        }
 
         validReferences.add(value);
 
