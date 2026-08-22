@@ -19,15 +19,20 @@ export default function getDataPillsFromProperties(
 ) {
     const dataPills: Array<DataPillType> = [];
 
-    properties.forEach((componentProperty, index) => {
+    properties.forEach((componentProperty) => {
         if (!componentProperty) {
             return;
         }
 
-        const {componentDefinition} = componentProperty;
+        const {componentDefinition, workflowNodeName: nodeName} = componentProperty;
 
-        const filteredNodeNames = previousNodeNames.filter((name) => name !== 'manual' && !name.includes('condition'));
-        const nodeName = filteredNodeNames[index];
+        if (!nodeName || nodeName === 'manual' || nodeName.includes('condition')) {
+            return;
+        }
+
+        if (!previousNodeNames.includes(nodeName)) {
+            return;
+        }
 
         dataPills.push({
             componentIcon: componentDefinition.icon,
