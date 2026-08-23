@@ -90,7 +90,7 @@ public class AiAgentUtilsApprovalGateTool {
 
         this.clusterElementDefinition =
             ComponentDsl.<MultipleConnectionsToolCallbackProviderFunction>clusterElement(APPROVAL_GATE)
-                .title("Approval Gate")
+                .title("Approval Gate Tool")
                 .description("Require human approval before the agent may call any tool attached to this gate.")
                 .type(TOOLS)
                 .properties(
