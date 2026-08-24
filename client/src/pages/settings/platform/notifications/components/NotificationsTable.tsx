@@ -1,13 +1,19 @@
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import {Notification} from '@/shared/middleware/platform/notification';
-import {flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
+import {coreTableFeatures} from '@/shared/util/table-features';
+import {TableOptions, flexRender, useTable} from '@tanstack/react-table';
 import {twMerge} from 'tailwind-merge';
 
-const NotificationsTable = ({columns, notifications}: {columns: []; notifications: Notification[]}) => {
-    const table = useReactTable({
+interface NotificationsTableProps {
+    columns: TableOptions<typeof coreTableFeatures, Notification>['columns'];
+    notifications: Notification[];
+}
+
+const NotificationsTable = ({columns, notifications}: NotificationsTableProps) => {
+    const table = useTable({
         columns,
         data: notifications,
-        getCoreRowModel: getCoreRowModel(),
+        features: coreTableFeatures,
     });
 
     return (
@@ -35,7 +41,7 @@ const NotificationsTable = ({columns, notifications}: {columns: []; notification
                             )}
                             key={row.id}
                         >
-                            {row.getVisibleCells().map((cell) => (
+                            {row.getAllCells().map((cell) => (
                                 <TableCell key={cell.id}>
                                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                 </TableCell>

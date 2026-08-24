@@ -43,7 +43,7 @@ const Notifications = () => {
         >
             <PageLoader errors={[notificationsError]} loading={isNotificationsLoading}>
                 {notificationsData && notificationsData?.length > 0 ? (
-                    <NotificationsTable columns={columns as []} notifications={notificationsData!} />
+                    <NotificationsTable columns={columns} notifications={notificationsData!} />
                 ) : (
                     <EmptyList
                         button={

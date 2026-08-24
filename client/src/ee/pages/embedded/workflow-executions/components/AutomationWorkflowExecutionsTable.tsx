@@ -2,10 +2,11 @@ import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/c
 import useWorkflowExecutionSheetStore from '@/pages/automation/workflow-executions/stores/useWorkflowExecutionSheetStore';
 import WorkflowExecutionBadge from '@/shared/components/workflow-executions/WorkflowExecutionBadge';
 import {JobBasic, WorkflowExecution} from '@/shared/middleware/automation/workflow/execution';
-import {CellContext, createColumnHelper, flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
+import {coreTableFeatures} from '@/shared/util/table-features';
+import {CellContext, createColumnHelper, flexRender, useTable} from '@tanstack/react-table';
 import {useShallow} from 'zustand/react/shallow';
 
-const getDuration = (info: CellContext<WorkflowExecution, JobBasic | undefined>) => {
+const getDuration = (info: CellContext<typeof coreTableFeatures, WorkflowExecution, JobBasic | undefined>) => {
     const infoValue = info.getValue();
 
     const startDate = infoValue?.startDate?.getTime();
@@ -16,7 +17,7 @@ const getDuration = (info: CellContext<WorkflowExecution, JobBasic | undefined>)
     }
 };
 
-const columnHelper = createColumnHelper<WorkflowExecution>();
+const columnHelper = createColumnHelper<typeof coreTableFeatures, WorkflowExecution>();
 
 const AutomationWorkflowExecutionsTable = ({data}: {data: WorkflowExecution[]}) => {
     const {setWorkflowExecutionId, setWorkflowExecutionSheetOpen} = useWorkflowExecutionSheetStore(
@@ -26,8 +27,8 @@ const AutomationWorkflowExecutionsTable = ({data}: {data: WorkflowExecution[]}) 
         }))
     );
 
-    const reactTable = useReactTable<WorkflowExecution>({
-        columns: [
+    const reactTable = useTable({
+        columns: columnHelper.columns([
             columnHelper.accessor((row) => row.job, {
                 cell: (info) => <WorkflowExecutionBadge status={info?.getValue()?.status || ''} />,
                 header: 'Status',
@@ -55,9 +56,9 @@ const AutomationWorkflowExecutionsTable = ({data}: {data: WorkflowExecution[]}) 
                 ),
                 header: 'Execution date',
             }),
-        ],
+        ]),
         data,
-        getCoreRowModel: getCoreRowModel(),
+        features: coreTableFeatures,
     });
 
     const headerGroups = reactTable.getHeaderGroups();
@@ -97,7 +98,7 @@ const AutomationWorkflowExecutionsTable = ({data}: {data: WorkflowExecution[]}) 
                             key={row.id}
                             onClick={() => handleRowClick(row.index)}
                         >
-                            {row.getVisibleCells().map((cell, index) => (
+                            {row.getAllCells().map((cell, index) => (
                                 <TableCell className="py-4 whitespace-nowrap" key={`${row.id}_${cell.id}_${index}`}>
                                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                 </TableCell>

@@ -14,15 +14,16 @@ import {ConnectedUser, CredentialStatus} from '@/ee/shared/middleware/embedded/c
 import {useEnableConnectedUserMutation} from '@/ee/shared/mutations/embedded/connectedUsers.mutations';
 import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
 import {ConnectedUserKeys} from '@/ee/shared/queries/embedded/connectedUsers.queries';
+import {coreTableFeatures} from '@/shared/util/table-features';
 import {useQueryClient} from '@tanstack/react-query';
-import {createColumnHelper, flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
+import {createColumnHelper, flexRender, useTable} from '@tanstack/react-table';
 import {EllipsisVerticalIcon} from 'lucide-react';
 import {useMemo, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
-const columnHelper = createColumnHelper<ConnectedUser>();
+const columnHelper = createColumnHelper<typeof coreTableFeatures, ConnectedUser>();
 
 interface ConnectedUserTableProps {
     connectedUsers: ConnectedUser[];
@@ -44,125 +45,127 @@ const ConnectedUserTable = ({connectedUsers}: ConnectedUserTableProps) => {
     });
 
     const columns = useMemo(
-        () => [
-            columnHelper.accessor((row) => row.integrationInstances, {
-                cell: (info) => {
-                    const integrationInstances = info.getValue() ?? [];
+        () =>
+            columnHelper.columns([
+                columnHelper.accessor((row) => row.integrationInstances, {
+                    cell: (info) => {
+                        const integrationInstances = info.getValue() ?? [];
 
-                    if (integrationInstances.length === 0) {
-                        return <CredentialsStatus />;
-                    }
-
-                    let enabled = true;
-
-                    for (const integrationInstance of integrationInstances) {
-                        if (integrationInstance.credentialStatus === CredentialStatus.Invalid) {
-                            enabled = false;
-
-                            break;
+                        if (integrationInstances.length === 0) {
+                            return <CredentialsStatus />;
                         }
-                    }
 
-                    return <CredentialsStatus enabled={enabled} />;
-                },
-                header: 'Status',
-                id: 'status',
-            }),
-            columnHelper.accessor('externalId', {
-                cell: (info) => info.getValue() ?? '',
-                header: 'External Id',
-            }),
-            columnHelper.accessor('name', {
-                cell: (info) => info.getValue() ?? '',
-                header: 'Name',
-            }),
-            columnHelper.accessor('email', {
-                cell: (info) => info.getValue() ?? '',
-                header: 'Email',
-            }),
-            columnHelper.accessor('integrationInstances', {
-                cell: (info) => {
-                    const uniqueComponentNames = Array.from(
-                        new Set(
-                            info
-                                .getValue()
-                                ?.map((integrationInstance) => integrationInstance.componentName)
-                                .filter(Boolean) ?? []
-                        )
-                    );
+                        let enabled = true;
 
-                    return (
-                        <div className="flex space-x-0.5">
-                            {uniqueComponentNames.map((componentName) => {
-                                const componentDefinition = componentDefinitions?.find(
-                                    (componentDefinition) => componentDefinition.name === componentName
-                                );
+                        for (const integrationInstance of integrationInstances) {
+                            if (integrationInstance.credentialStatus === CredentialStatus.Invalid) {
+                                enabled = false;
 
-                                return (
-                                    componentDefinition && (
-                                        <InlineSVG
-                                            className="mr-2 size-6 flex-none"
-                                            key={componentDefinition.name!}
-                                            src={componentDefinition.icon!}
-                                        />
-                                    )
-                                );
-                            })}
-                        </div>
-                    );
-                },
-                header: 'Integrations',
-            }),
-            columnHelper.accessor('createdDate', {
-                cell: (info) => `${info?.getValue()?.toLocaleDateString()} ${info?.getValue()?.toLocaleTimeString()}`,
-                header: 'Created Date',
-            }),
-            columnHelper.display({
-                cell: (info) => (
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button
-                                icon={<EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />}
-                                size="icon"
-                                variant="ghost"
-                            />
-                        </DropdownMenuTrigger>
+                                break;
+                            }
+                        }
 
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuItem data-action="open-sheet" data-index={info.row.index.toString()}>
-                                Details
-                            </DropdownMenuItem>
+                        return <CredentialsStatus enabled={enabled} />;
+                    },
+                    header: 'Status',
+                    id: 'status',
+                }),
+                columnHelper.accessor('externalId', {
+                    cell: (info) => info.getValue() ?? '',
+                    header: 'External Id',
+                }),
+                columnHelper.accessor('name', {
+                    cell: (info) => info.getValue() ?? '',
+                    header: 'Name',
+                }),
+                columnHelper.accessor('email', {
+                    cell: (info) => info.getValue() ?? '',
+                    header: 'Email',
+                }),
+                columnHelper.accessor('integrationInstances', {
+                    cell: (info) => {
+                        const uniqueComponentNames = Array.from(
+                            new Set(
+                                info
+                                    .getValue()
+                                    ?.map((integrationInstance) => integrationInstance.componentName)
+                                    .filter(Boolean) ?? []
+                            )
+                        );
 
-                            <DropdownMenuItem
-                                data-action={connectedUsers[info.row.index].enabled ? 'disable' : 'enable'}
-                                data-index={info.row.index.toString()}
-                            >
-                                {connectedUsers[info.row.index].enabled ? 'Disable' : 'Enable'}
-                            </DropdownMenuItem>
+                        return (
+                            <div className="flex space-x-0.5">
+                                {uniqueComponentNames.map((componentName) => {
+                                    const componentDefinition = componentDefinitions?.find(
+                                        (componentDefinition) => componentDefinition.name === componentName
+                                    );
 
-                            <DropdownMenuSeparator />
+                                    return (
+                                        componentDefinition && (
+                                            <InlineSVG
+                                                className="mr-2 size-6 flex-none"
+                                                key={componentDefinition.name!}
+                                                src={componentDefinition.icon!}
+                                            />
+                                        )
+                                    );
+                                })}
+                            </div>
+                        );
+                    },
+                    header: 'Integrations',
+                }),
+                columnHelper.accessor('createdDate', {
+                    cell: (info) =>
+                        `${info?.getValue()?.toLocaleDateString()} ${info?.getValue()?.toLocaleTimeString()}`,
+                    header: 'Created Date',
+                }),
+                columnHelper.display({
+                    cell: (info) => (
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button
+                                    icon={<EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />}
+                                    size="icon"
+                                    variant="ghost"
+                                />
+                            </DropdownMenuTrigger>
 
-                            <DropdownMenuItem
-                                data-action="delete"
-                                data-index={info.row.index.toString()}
-                                variant="destructive"
-                            >
-                                Delete
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                ),
-                header: '',
-                id: 'actions',
-            }),
-        ],
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuItem data-action="open-sheet" data-index={info.row.index.toString()}>
+                                    Details
+                                </DropdownMenuItem>
+
+                                <DropdownMenuItem
+                                    data-action={connectedUsers[info.row.index].enabled ? 'disable' : 'enable'}
+                                    data-index={info.row.index.toString()}
+                                >
+                                    {connectedUsers[info.row.index].enabled ? 'Disable' : 'Enable'}
+                                </DropdownMenuItem>
+
+                                <DropdownMenuSeparator />
+
+                                <DropdownMenuItem
+                                    data-action="delete"
+                                    data-index={info.row.index.toString()}
+                                    variant="destructive"
+                                >
+                                    Delete
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    ),
+                    header: '',
+                    id: 'actions',
+                }),
+            ]),
         [componentDefinitions, connectedUsers]
     );
 
-    const reactTable = useReactTable<ConnectedUser>({
+    const reactTable = useTable({
         columns,
         data: connectedUsers,
-        getCoreRowModel: getCoreRowModel(),
+        features: coreTableFeatures,
     });
 
     const headerGroups = reactTable.getHeaderGroups();
@@ -208,7 +211,7 @@ const ConnectedUserTable = ({connectedUsers}: ConnectedUserTableProps) => {
                 <TableBody>
                     {rows.map((row) => (
                         <TableRow className="cursor-pointer border-b-border/50" key={row.id}>
-                            {row.getVisibleCells().map((cell) => {
+                            {row.getAllCells().map((cell) => {
                                 let width = '';
                                 if (cell.id.endsWith('integrationInstances')) {
                                     width = '30%';

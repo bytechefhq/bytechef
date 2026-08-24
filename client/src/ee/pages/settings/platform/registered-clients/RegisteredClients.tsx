@@ -19,14 +19,15 @@ import {
     useDeleteRegisteredClientMutation,
     useRegisteredClientsQuery,
 } from '@/shared/middleware/graphql';
+import {coreTableFeatures} from '@/shared/util/table-features';
 import {useQueryClient} from '@tanstack/react-query';
-import {createColumnHelper, flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
+import {createColumnHelper, flexRender, useTable} from '@tanstack/react-table';
 import {KeyIcon, Trash2Icon} from 'lucide-react';
 import {useMemo, useState} from 'react';
 
 type RegisteredClientType = NonNullable<NonNullable<RegisteredClientsQuery['registeredClients']>[number]>;
 
-const columnHelper = createColumnHelper<RegisteredClientType>();
+const columnHelper = createColumnHelper<typeof coreTableFeatures, RegisteredClientType>();
 
 const formatDate = (value: unknown): string => {
     if (value == null) {
@@ -62,44 +63,45 @@ const RegisteredClients = () => {
     );
 
     const columns = useMemo(
-        () => [
-            columnHelper.accessor('clientName', {
-                cell: (info) => info.getValue() ?? '',
-                header: 'Name',
-            }),
-            columnHelper.accessor('clientId', {
-                cell: (info) => info.getValue() ?? '',
-                header: 'Client ID',
-            }),
-            columnHelper.accessor('clientIdIssuedAt', {
-                cell: (info) => formatDate(info.getValue()),
-                header: 'Issued',
-            }),
-            columnHelper.accessor('scopes', {
-                cell: (info) => (info.getValue() ?? []).join(', '),
-                header: 'Scopes',
-            }),
-            columnHelper.display({
-                cell: (info) => (
-                    <Button
-                        aria-label="Delete client"
-                        icon={<Trash2Icon className="h-4 text-destructive" />}
-                        onClick={() => setClientToDelete(info.row.original)}
-                        size="icon"
-                        variant="ghost"
-                    />
-                ),
-                header: '',
-                id: 'actions',
-            }),
-        ],
+        () =>
+            columnHelper.columns([
+                columnHelper.accessor('clientName', {
+                    cell: (info) => info.getValue() ?? '',
+                    header: 'Name',
+                }),
+                columnHelper.accessor('clientId', {
+                    cell: (info) => info.getValue() ?? '',
+                    header: 'Client ID',
+                }),
+                columnHelper.accessor('clientIdIssuedAt', {
+                    cell: (info) => formatDate(info.getValue()),
+                    header: 'Issued',
+                }),
+                columnHelper.accessor('scopes', {
+                    cell: (info) => (info.getValue() ?? []).join(', '),
+                    header: 'Scopes',
+                }),
+                columnHelper.display({
+                    cell: (info) => (
+                        <Button
+                            aria-label="Delete client"
+                            icon={<Trash2Icon className="h-4 text-destructive" />}
+                            onClick={() => setClientToDelete(info.row.original)}
+                            size="icon"
+                            variant="ghost"
+                        />
+                    ),
+                    header: '',
+                    id: 'actions',
+                }),
+            ]),
         []
     );
 
-    const reactTable = useReactTable<RegisteredClientType>({
+    const reactTable = useTable({
         columns,
         data: registeredClients,
-        getCoreRowModel: getCoreRowModel(),
+        features: coreTableFeatures,
     });
 
     return (
@@ -137,7 +139,7 @@ const RegisteredClients = () => {
                             <TableBody>
                                 {reactTable.getRowModel().rows.map((row) => (
                                     <TableRow className="border-b-border/50" key={row.id}>
-                                        {row.getVisibleCells().map((cell) => (
+                                        {row.getAllCells().map((cell) => (
                                             <TableCell
                                                 className={
                                                     cell.id.endsWith('actions')

@@ -1,12 +1,13 @@
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import {JobBasic, WorkflowExecution} from '@/ee/shared/middleware/embedded/workflow/execution';
 import WorkflowExecutionBadge from '@/shared/components/workflow-executions/WorkflowExecutionBadge';
-import {CellContext, createColumnHelper, flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
+import {coreTableFeatures} from '@/shared/util/table-features';
+import {CellContext, createColumnHelper, flexRender, useTable} from '@tanstack/react-table';
 import {useShallow} from 'zustand/react/shallow';
 
 import useWorkflowExecutionSheetStore from '../stores/useWorkflowExecutionSheetStore';
 
-const getDuration = (info: CellContext<WorkflowExecution, JobBasic | undefined>) => {
+const getDuration = (info: CellContext<typeof coreTableFeatures, WorkflowExecution, JobBasic | undefined>) => {
     const infoValue = info.getValue();
 
     const startDate = infoValue?.startDate?.getTime();
@@ -17,7 +18,7 @@ const getDuration = (info: CellContext<WorkflowExecution, JobBasic | undefined>)
     }
 };
 
-const columnHelper = createColumnHelper<WorkflowExecution>();
+const columnHelper = createColumnHelper<typeof coreTableFeatures, WorkflowExecution>();
 
 const EmbeddedWorkflowExecutionsTable = ({data}: {data: WorkflowExecution[]}) => {
     const {setWorkflowExecutionId, setWorkflowExecutionSheetOpen} = useWorkflowExecutionSheetStore(
@@ -27,8 +28,8 @@ const EmbeddedWorkflowExecutionsTable = ({data}: {data: WorkflowExecution[]}) =>
         }))
     );
 
-    const reactTable = useReactTable<WorkflowExecution>({
-        columns: [
+    const reactTable = useTable({
+        columns: columnHelper.columns([
             columnHelper.accessor((row) => row.job, {
                 cell: (info) => <WorkflowExecutionBadge status={info.getValue()?.status || ''} />,
                 header: 'Status',
@@ -64,9 +65,9 @@ const EmbeddedWorkflowExecutionsTable = ({data}: {data: WorkflowExecution[]}) =>
                 ),
                 header: 'Execution date',
             }),
-        ],
+        ]),
         data,
-        getCoreRowModel: getCoreRowModel(),
+        features: coreTableFeatures,
     });
 
     const headerGroups = reactTable.getHeaderGroups();
@@ -106,7 +107,7 @@ const EmbeddedWorkflowExecutionsTable = ({data}: {data: WorkflowExecution[]}) =>
                             key={row.id}
                             onClick={() => handleRowClick(row.index)}
                         >
-                            {row.getVisibleCells().map((cell, index) => (
+                            {row.getAllCells().map((cell, index) => (
                                 <TableCell className="py-4 whitespace-nowrap" key={`${row.id}_${cell.id}_${index}`}>
                                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                 </TableCell>

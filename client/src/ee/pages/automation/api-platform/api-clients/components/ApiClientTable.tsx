@@ -14,13 +14,14 @@ import ApiClientDialog from '@/ee/pages/automation/api-platform/api-clients/comp
 import {ApiClient} from '@/ee/shared/middleware/automation/api-platform';
 import {useDeleteApiClientMutation} from '@/ee/shared/mutations/platform/apiClients.mutations';
 import {ApiClientKeys} from '@/ee/shared/queries/platform/apiClients.queries';
+import {coreTableFeatures} from '@/shared/util/table-features';
 import {useQueryClient} from '@tanstack/react-query';
-import {createColumnHelper, flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
+import {createColumnHelper, flexRender, useTable} from '@tanstack/react-table';
 import {EditIcon, Trash2Icon} from 'lucide-react';
 import {useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-const columnHelper = createColumnHelper<ApiClient>();
+const columnHelper = createColumnHelper<typeof coreTableFeatures, ApiClient>();
 
 interface ApiClientTableProps {
     apiClients: ApiClient[];
@@ -72,59 +73,60 @@ const ApiClientTable = ({apiClients}: ApiClientTableProps) => {
     const [showEditDialog, setShowEditDialog] = useState(false);
 
     const columns = useMemo(
-        () => [
-            columnHelper.accessor('name', {
-                cell: (info) => info.getValue() ?? '',
-                header: 'Name',
-            }),
-            columnHelper.accessor('secretKey', {
-                cell: (info) => info.getValue() ?? '',
-                header: 'Secret Key',
-            }),
-            columnHelper.accessor('createdDate', {
-                cell: (info) => `${info.getValue()?.toLocaleDateString()} ${info.getValue()?.toLocaleTimeString()}`,
-                header: 'Created Date',
-            }),
-            columnHelper.accessor('lastUsedDate', {
-                cell: (info) =>
-                    `${info.getValue()?.toLocaleDateString() ?? ''} ${info.getValue()?.toLocaleTimeString() ?? ''}`,
-                header: 'Last Used Date',
-            }),
-            columnHelper.display({
-                cell: (info) => (
-                    <>
-                        <Button
-                            icon={<EditIcon className="size-4" />}
-                            onClick={() => {
-                                setCurrentApiClient(info.row.original);
-                                setShowEditDialog(true);
-                            }}
-                            size="icon"
-                            variant="ghost"
-                        />
+        () =>
+            columnHelper.columns([
+                columnHelper.accessor('name', {
+                    cell: (info) => info.getValue() ?? '',
+                    header: 'Name',
+                }),
+                columnHelper.accessor('secretKey', {
+                    cell: (info) => info.getValue() ?? '',
+                    header: 'Secret Key',
+                }),
+                columnHelper.accessor('createdDate', {
+                    cell: (info) => `${info.getValue()?.toLocaleDateString()} ${info.getValue()?.toLocaleTimeString()}`,
+                    header: 'Created Date',
+                }),
+                columnHelper.accessor('lastUsedDate', {
+                    cell: (info) =>
+                        `${info.getValue()?.toLocaleDateString() ?? ''} ${info.getValue()?.toLocaleTimeString() ?? ''}`,
+                    header: 'Last Used Date',
+                }),
+                columnHelper.display({
+                    cell: (info) => (
+                        <>
+                            <Button
+                                icon={<EditIcon className="size-4" />}
+                                onClick={() => {
+                                    setCurrentApiClient(info.row.original);
+                                    setShowEditDialog(true);
+                                }}
+                                size="icon"
+                                variant="ghost"
+                            />
 
-                        <Button
-                            icon={<Trash2Icon className="h-4 text-destructive" />}
-                            onClick={() => {
-                                setCurrentApiClient(info.row.original);
-                                setShowDeleteDialog(true);
-                            }}
-                            size="icon"
-                            variant="ghost"
-                        />
-                    </>
-                ),
-                header: '',
-                id: 'actions',
-            }),
-        ],
+                            <Button
+                                icon={<Trash2Icon className="h-4 text-destructive" />}
+                                onClick={() => {
+                                    setCurrentApiClient(info.row.original);
+                                    setShowDeleteDialog(true);
+                                }}
+                                size="icon"
+                                variant="ghost"
+                            />
+                        </>
+                    ),
+                    header: '',
+                    id: 'actions',
+                }),
+            ]),
         []
     );
 
-    const reactTable = useReactTable<ApiClient>({
+    const reactTable = useTable({
         columns,
         data: apiClients,
-        getCoreRowModel: getCoreRowModel(),
+        features: coreTableFeatures,
     });
 
     const headerGroups = reactTable.getHeaderGroups();
@@ -162,7 +164,7 @@ const ApiClientTable = ({apiClients}: ApiClientTableProps) => {
                 <TableBody>
                     {rows.map((row) => (
                         <TableRow className="cursor-pointer border-b-border/50" key={row.id}>
-                            {row.getVisibleCells().map((cell) => (
+                            {row.getAllCells().map((cell) => (
                                 <TableCell
                                     className={twMerge(
                                         'whitespace-nowrap',

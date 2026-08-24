@@ -3,13 +3,14 @@ import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/c
 import SigningKeyDeleteDialog from '@/ee/pages/settings/embedded/signing-keys/components/SigningKeyDeleteDialog';
 import SigningKeyDialog from '@/ee/pages/settings/embedded/signing-keys/components/SigningKeyDialog';
 import {SigningKey} from '@/ee/shared/middleware/embedded/security';
-import {createColumnHelper, flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
+import {coreTableFeatures} from '@/shared/util/table-features';
+import {createColumnHelper, flexRender, useTable} from '@tanstack/react-table';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
 import {ClipboardIcon, EditIcon, Trash2Icon} from 'lucide-react';
 import {useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-const columnHelper = createColumnHelper<SigningKey>();
+const columnHelper = createColumnHelper<typeof coreTableFeatures, SigningKey>();
 
 interface SigningKeyTableProps {
     signingKeys: SigningKey[];
@@ -24,75 +25,81 @@ const SigningKeyTable = ({signingKeys}: SigningKeyTableProps) => {
     const [_, copyToClipboard] = useCopyToClipboard();
 
     const columns = useMemo(
-        () => [
-            columnHelper.accessor('name', {
-                cell: (info) => info.getValue(),
-                header: 'Name',
-            }),
-            columnHelper.accessor('keyId', {
-                cell: (info) => (
-                    <div className="group flex items-center gap-0.5">
-                        <span className="max-w-52 truncate">{info.getValue()}</span>
+        () =>
+            columnHelper.columns([
+                columnHelper.accessor('name', {
+                    cell: (info) => info.getValue(),
+                    header: 'Name',
+                }),
+                columnHelper.accessor('keyId', {
+                    cell: (info) => (
+                        <div className="group flex items-center gap-0.5">
+                            <span className="max-w-52 truncate">{info.getValue()}</span>
 
-                        <Button
-                            className="invisible group-hover:visible"
-                            icon={<ClipboardIcon aria-hidden="true" className="size-4 text-content-neutral-tertiary" />}
-                            onClick={() => copyToClipboard(info.getValue())}
-                            size="icon"
-                            variant="ghost"
-                        />
-                    </div>
-                ),
-                header: 'Key Id',
-            }),
-            columnHelper.accessor('createdDate', {
-                cell: (info) => `${info.getValue()?.toLocaleDateString()} ${info.getValue()?.toLocaleTimeString()}`,
-                header: 'Created Date',
-            }),
-            columnHelper.accessor('lastUsedDate', {
-                cell: (info) =>
-                    `${info.getValue()?.toLocaleDateString() ?? ''} ${info.getValue()?.toLocaleTimeString() ?? ''}`,
-                header: 'Last Used Date',
-            }),
-            columnHelper.accessor('createdBy', {
-                cell: (info) => `${info.getValue()}`,
-                header: 'Created By',
-            }),
-            columnHelper.display({
-                cell: (info) => (
-                    <>
-                        <Button
-                            icon={<EditIcon className="size-4" />}
-                            onClick={() => {
-                                setCurrentSigningKey(info.row.original);
-                                setShowEditDialog(true);
-                            }}
-                            size="icon"
-                            variant="ghost"
-                        />
+                            <Button
+                                className="invisible group-hover:visible"
+                                icon={
+                                    <ClipboardIcon
+                                        aria-hidden="true"
+                                        className="size-4 text-content-neutral-tertiary"
+                                    />
+                                }
+                                onClick={() => copyToClipboard(info.getValue())}
+                                size="icon"
+                                variant="ghost"
+                            />
+                        </div>
+                    ),
+                    header: 'Key Id',
+                }),
+                columnHelper.accessor('createdDate', {
+                    cell: (info) => `${info.getValue()?.toLocaleDateString()} ${info.getValue()?.toLocaleTimeString()}`,
+                    header: 'Created Date',
+                }),
+                columnHelper.accessor('lastUsedDate', {
+                    cell: (info) =>
+                        `${info.getValue()?.toLocaleDateString() ?? ''} ${info.getValue()?.toLocaleTimeString() ?? ''}`,
+                    header: 'Last Used Date',
+                }),
+                columnHelper.accessor('createdBy', {
+                    cell: (info) => `${info.getValue()}`,
+                    header: 'Created By',
+                }),
+                columnHelper.display({
+                    cell: (info) => (
+                        <>
+                            <Button
+                                icon={<EditIcon className="size-4" />}
+                                onClick={() => {
+                                    setCurrentSigningKey(info.row.original);
+                                    setShowEditDialog(true);
+                                }}
+                                size="icon"
+                                variant="ghost"
+                            />
 
-                        <Button
-                            icon={<Trash2Icon className="h-4 text-destructive" />}
-                            onClick={() => {
-                                setCurrentSigningKey(info.row.original);
-                                setShowDeleteDialog(true);
-                            }}
-                            size="icon"
-                            variant="ghost"
-                        />
-                    </>
-                ),
-                header: '',
-                id: 'actions',
-            }),
-        ],
+                            <Button
+                                icon={<Trash2Icon className="h-4 text-destructive" />}
+                                onClick={() => {
+                                    setCurrentSigningKey(info.row.original);
+                                    setShowDeleteDialog(true);
+                                }}
+                                size="icon"
+                                variant="ghost"
+                            />
+                        </>
+                    ),
+                    header: '',
+                    id: 'actions',
+                }),
+            ]),
         [copyToClipboard]
     );
 
-    const reactTable = useReactTable<SigningKey>({
+    const reactTable = useTable({
         columns,
         data: signingKeys,
-        getCoreRowModel: getCoreRowModel(),
+        features: coreTableFeatures,
     });
 
     const headerGroups = reactTable.getHeaderGroups();
@@ -125,7 +132,7 @@ const SigningKeyTable = ({signingKeys}: SigningKeyTableProps) => {
                 <TableBody>
                     {rows.map((row) => (
                         <TableRow className="cursor-pointer border-b-border/50" key={row.id}>
-                            {row.getVisibleCells().map((cell) => (
+                            {row.getAllCells().map((cell) => (
                                 <TableCell
                                     className={twMerge(
                                         'whitespace-nowrap',
