@@ -1,5 +1,5 @@
 /* eslint-disable sort-keys */
-import {DEFAULT_CANVAS_WIDTH, SPACE} from '@/shared/constants';
+import {DEFAULT_CANVAS_WIDTH} from '@/shared/constants';
 import {ComponentDefinitionBasic, TaskDispatcherDefinition, Workflow} from '@/shared/middleware/platform/configuration';
 import {DataPillType, WorkflowNodeType} from '@/shared/types';
 import {Edge, Node, OnEdgesChange, OnNodesChange, applyEdgeChanges, applyNodeChanges} from '@xyflow/react';
@@ -8,6 +8,7 @@ import {create, useStore} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
 import {createDefaultEdges, createDefaultNodes} from '../utils/layoutUtils';
+import stringifyWorkflowDefinition from '../utils/stringifyWorkflowDefinition';
 import {forEachNestedTaskGroup} from '../utils/taskTraversalUtils';
 
 export type WorkflowDataType = {
@@ -334,7 +335,7 @@ const useWorkflowDataStore = create<WorkflowDataStateI>()(
                             nodes: updatedNodes,
                             workflow: {
                                 ...workflow,
-                                definition: JSON.stringify(definition, null, SPACE),
+                                definition: stringifyWorkflowDefinition(definition),
                                 tasks: updatedTasks,
                                 triggers: updatedTriggers,
                                 version: version ?? workflow.version,

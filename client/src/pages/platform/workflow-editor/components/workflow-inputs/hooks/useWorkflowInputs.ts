@@ -1,5 +1,4 @@
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
-import {SPACE} from '@/shared/constants';
 import {WorkflowInput, WorkflowTestConfiguration} from '@/shared/middleware/platform/configuration';
 import {useSaveWorkflowTestConfigurationInputsMutation} from '@/shared/mutations/platform/workflowTestConfigurations.mutations';
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
@@ -11,6 +10,7 @@ import {useForm} from 'react-hook-form';
 import {useShallow} from 'zustand/react/shallow';
 
 import useWorkflowDataStore from '../../../stores/useWorkflowDataStore';
+import stringifyWorkflowDefinition from '../../../utils/stringifyWorkflowDefinition';
 
 interface UseWorkflowInputsProps {
     invalidateWorkflowQueries: () => void;
@@ -163,14 +163,10 @@ export default function useWorkflowInputs({
             {
                 id: workflow.id!,
                 workflow: {
-                    definition: JSON.stringify(
-                        {
-                            ...workflowDefinition,
-                            inputs,
-                        },
-                        null,
-                        SPACE
-                    ),
+                    definition: stringifyWorkflowDefinition({
+                        ...workflowDefinition,
+                        inputs,
+                    }),
                     version: workflow.version,
                 },
             },
@@ -239,14 +235,10 @@ export default function useWorkflowInputs({
             {
                 id: workflow.id!,
                 workflow: {
-                    definition: JSON.stringify(
-                        {
-                            ...definitionObject,
-                            inputs,
-                        },
-                        null,
-                        SPACE
-                    ),
+                    definition: stringifyWorkflowDefinition({
+                        ...definitionObject,
+                        inputs,
+                    }),
                     version: workflow.version,
                 },
             },

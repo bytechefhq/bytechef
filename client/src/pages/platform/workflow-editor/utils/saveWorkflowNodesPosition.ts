@@ -1,9 +1,9 @@
-import {SPACE} from '@/shared/constants';
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {BranchCaseType, NodeDataType, UpdateWorkflowMutationType} from '@/shared/types';
 import {Node} from '@xyflow/react';
 
 import useWorkflowDataStore, {runWithoutHistory} from '../stores/useWorkflowDataStore';
+import stringifyWorkflowDefinition from './stringifyWorkflowDefinition';
 import {
     consumePendingDefinition,
     isWorkflowMutating,
@@ -223,7 +223,7 @@ export default function saveWorkflowNodesPosition({
     // can read the latest positions when it re-runs (e.g. on panel toggle).
     // storeTasks uses fingerprint equality that ignores position metadata,
     // so this is the only way to keep positions in sync without a full refetch.
-    const updatedDefinitionStr = JSON.stringify(workflowDefinition, null, SPACE);
+    const updatedDefinitionStr = stringifyWorkflowDefinition(workflowDefinition);
 
     useWorkflowDataStore.setState((state) => ({
         workflow: {
