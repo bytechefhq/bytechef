@@ -18,6 +18,7 @@ package com.bytechef.atlas.coordinator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -26,7 +27,9 @@ import static org.mockito.Mockito.when;
 import com.bytechef.atlas.configuration.domain.Task;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
 import com.bytechef.atlas.coordinator.event.ResumeJobEvent;
+import com.bytechef.atlas.coordinator.event.StartJobEvent;
 import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
 import com.bytechef.atlas.coordinator.job.JobExecutor;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
@@ -90,6 +93,67 @@ class TaskCoordinatorTest {
 
     @Test
     @SuppressWarnings("unchecked")
+    void testStartOfJobCompletedDuringExecutionDoesNotPublishStartedStatus() {
+        Job job = new Job();
+
+        job.setId(4567L);
+        job.setStatus(Job.Status.STARTED);
+
+        ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
+        JobExecutor jobExecutor = mock(JobExecutor.class);
+        JobService jobService = mock(JobService.class);
+
+        when(jobService.setStatusToStarted(4567L))
+            .thenReturn(job);
+
+        doAnswer(invocation -> {
+            job.setStatus(Job.Status.COMPLETED);
+
+            return null;
+        }).when(jobExecutor)
+            .execute(job);
+
+        TaskCoordinator startingTaskCoordinator = new TaskCoordinator(
+            List.of(), List.of(), eventPublisher, jobExecutor, jobService, taskCompletionHandler,
+            (TaskDispatcher<? super Task>) mock(TaskDispatcher.class), taskExecutionService);
+
+        startingTaskCoordinator.onStartJobEvent(new StartJobEvent(4567L));
+
+        verify(eventPublisher, never()).publishEvent(any(JobStatusApplicationEvent.class));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testStartOfJobStillRunningAfterExecutionPublishesStartedStatus() {
+        Job job = new Job();
+
+        job.setId(4567L);
+        job.setStatus(Job.Status.STARTED);
+
+        ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
+        JobService jobService = mock(JobService.class);
+
+        when(jobService.setStatusToStarted(4567L))
+            .thenReturn(job);
+
+        TaskCoordinator startingTaskCoordinator = new TaskCoordinator(
+            List.of(), List.of(), eventPublisher, mock(JobExecutor.class), jobService, taskCompletionHandler,
+            (TaskDispatcher<? super Task>) mock(TaskDispatcher.class), taskExecutionService);
+
+        startingTaskCoordinator.onStartJobEvent(new StartJobEvent(4567L));
+
+        ArgumentCaptor<JobStatusApplicationEvent> jobStatusApplicationEventArgumentCaptor = ArgumentCaptor.forClass(
+            JobStatusApplicationEvent.class);
+
+        verify(eventPublisher).publishEvent(jobStatusApplicationEventArgumentCaptor.capture());
+
+        JobStatusApplicationEvent jobStatusApplicationEvent = jobStatusApplicationEventArgumentCaptor.getValue();
+
+        assertThat(jobStatusApplicationEvent.getStatus()).isEqualTo(Job.Status.STARTED);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
     void testResumeOfFailedJobDispatchesFailedTaskWithCompletedTaskOutputs() {
         Job job = new Job();
 
@@ -126,9 +190,9 @@ class TaskCoordinatorTest {
         when(taskFileStorage.readContextValue(any()))
             .thenReturn((Map) Map.of("task_1", "task 1 output"));
 
-        TaskExecutionService taskExecutionService = mock(TaskExecutionService.class);
+        TaskExecutionService resumeTaskExecutionService = mock(TaskExecutionService.class);
 
-        when(taskExecutionService.create(any()))
+        when(resumeTaskExecutionService.create(any()))
             .thenAnswer(invocation -> {
                 TaskExecution taskExecution = invocation.getArgument(0);
 
@@ -144,9 +208,9 @@ class TaskCoordinatorTest {
         TaskCoordinator resumingTaskCoordinator = new TaskCoordinator(
             List.of(), List.of(), mock(ApplicationEventPublisher.class),
             new JobExecutor(
-                contextService, SpelEvaluator.create(), taskDispatcher, taskExecutionService, taskFileStorage,
-                workflowService),
-            jobService, taskCompletionHandler, taskDispatcher, taskExecutionService);
+                contextService, SpelEvaluator.create(), mock(ApplicationEventPublisher.class), jobService,
+                taskDispatcher, resumeTaskExecutionService, taskFileStorage, workflowService),
+            jobService, taskCompletionHandler, taskDispatcher, resumeTaskExecutionService);
 
         resumingTaskCoordinator.onResumeJobEvent(new ResumeJobEvent(4567L));
 
@@ -159,7 +223,8 @@ class TaskCoordinatorTest {
         assertThat(dispatchedTaskExecution.getName()).isEqualTo("task_2");
         Map<String, ?> parameters = dispatchedTaskExecution.getParameters();
 
-        assertThat(parameters.get("value")).isEqualTo("task 1 output");
+        assertThat(parameters).extractingByKey("value")
+            .isEqualTo("task 1 output");
         assertThat(job.getStatus()).isEqualTo(Job.Status.STARTED);
         assertThat(job.getEndDate()).isNull();
         assertThat(job.getCurrentTask()).isEqualTo(1);
@@ -203,9 +268,9 @@ class TaskCoordinatorTest {
         when(taskFileStorage.readContextValue(any()))
             .thenReturn((Map) Map.of());
 
-        TaskExecutionService taskExecutionService = mock(TaskExecutionService.class);
+        TaskExecutionService resumeTaskExecutionService = mock(TaskExecutionService.class);
 
-        when(taskExecutionService.create(any()))
+        when(resumeTaskExecutionService.create(any()))
             .thenAnswer(invocation -> {
                 TaskExecution taskExecution = invocation.getArgument(0);
 
@@ -216,12 +281,14 @@ class TaskCoordinatorTest {
 
         TaskDispatcher<? super Task> taskDispatcher = (TaskDispatcher<? super Task>) mock(TaskDispatcher.class);
 
+        JobService jobService = new JobServiceImpl(jobRepository);
+
         TaskCoordinator resumingTaskCoordinator = new TaskCoordinator(
             List.of(), List.of(), mock(ApplicationEventPublisher.class),
             new JobExecutor(
-                mock(ContextService.class), SpelEvaluator.create(), taskDispatcher, taskExecutionService,
-                taskFileStorage, workflowService),
-            new JobServiceImpl(jobRepository), taskCompletionHandler, taskDispatcher, taskExecutionService);
+                mock(ContextService.class), SpelEvaluator.create(), mock(ApplicationEventPublisher.class), jobService,
+                taskDispatcher, resumeTaskExecutionService, taskFileStorage, workflowService),
+            jobService, taskCompletionHandler, taskDispatcher, resumeTaskExecutionService);
 
         resumingTaskCoordinator.onResumeJobEvent(ResumeJobEvent.ofStartedJob(4567L));
 
