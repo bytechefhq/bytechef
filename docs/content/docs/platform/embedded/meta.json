@@ -17,7 +17,6 @@
     "build/app-events",
     "build/connections",
     "build/component-kit",
-    "build/unified-api",
     "--- Configure ---",
     "configure/instance-configurations",
     "configure/mcp-servers",
