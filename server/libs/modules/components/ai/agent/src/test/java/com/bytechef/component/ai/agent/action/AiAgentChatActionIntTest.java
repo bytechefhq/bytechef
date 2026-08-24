@@ -219,7 +219,8 @@ class AiAgentChatActionIntTest {
         TaskCoordinator taskCoordinator = new TaskCoordinator(
             List.of(), List.of(), eventPublisher,
             new JobExecutor(
-                contextService, evaluator, taskDispatcherChain, taskExecutionService, taskFileStorage, workflowService),
+                contextService, evaluator, eventPublisher, jobService, taskDispatcherChain, taskExecutionService,
+                taskFileStorage, workflowService),
             jobService, new TaskCompletionHandlerChain(), taskDispatcherChain, taskExecutionService);
 
         asyncMessageBroker.receive(

@@ -21,7 +21,7 @@ package com.bytechef.atlas.coordinator.task.completion;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
+import com.bytechef.atlas.configuration.util.WorkflowTaskUtils;
 import com.bytechef.atlas.coordinator.job.JobExecutor;
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.Job;
@@ -31,11 +31,8 @@ import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
-import com.bytechef.commons.util.MapUtils;
-import com.bytechef.evaluator.Evaluator;
 import com.bytechef.file.storage.domain.FileEntry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +40,6 @@ import java.util.Objects;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.util.Assert;
 
 /**
@@ -56,8 +52,6 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
     private static final Logger log = LoggerFactory.getLogger(DefaultTaskCompletionHandler.class);
 
     private final ContextService contextService;
-    private final Evaluator evaluator;
-    private final ApplicationEventPublisher eventPublisher;
     private final JobExecutor jobExecutor;
     private final JobService jobService;
     private final TaskExecutionService taskExecutionService;
@@ -66,13 +60,10 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
 
     @SuppressFBWarnings("EI")
     public DefaultTaskCompletionHandler(
-        ContextService contextService, Evaluator evaluator, ApplicationEventPublisher eventPublisher,
-        JobExecutor jobExecutor, JobService jobService, TaskExecutionService taskExecutionService,
-        TaskFileStorage taskFileStorage, WorkflowService workflowService) {
+        ContextService contextService, JobExecutor jobExecutor, JobService jobService,
+        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage, WorkflowService workflowService) {
 
         this.contextService = contextService;
-        this.evaluator = evaluator;
-        this.eventPublisher = eventPublisher;
         this.jobExecutor = jobExecutor;
         this.jobService = jobService;
         this.taskExecutionService = taskExecutionService;
@@ -146,33 +137,13 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
             log.trace("complete: job={}", job);
         }
 
-        Map<String, ?> context = taskFileStorage.readContextValue(
-            contextService.peek(Validate.notNull(job.getId(), "id"), Context.Classname.JOB));
-        Workflow workflow = workflowService.getWorkflow(job.getWorkflowId());
-
-        Map<String, Object> source = MapUtils.toMap(
-            workflow.getOutputs(), Workflow.Output::name, Workflow.Output::value);
-
-        job.setCurrentTask(-1);
-        job.setEndDate(Instant.now());
-        job.setStatus(Job.Status.COMPLETED);
-        job.setOutputs(
-            taskFileStorage.storeJobOutputs(Validate.notNull(job.getId(), "id"), evaluator.evaluate(source, context)));
-
-        job = jobService.update(job);
-
-        eventPublisher.publishEvent(
-            new JobStatusApplicationEvent(Validate.notNull(job.getId(), "id"), job.getStatus()));
-
-        if (log.isDebugEnabled()) {
-            log.debug("Job id={}, label='{}' completed", job.getId(), job.getLabel());
-        }
+        jobExecutor.completeJob(job);
     }
 
     private boolean hasMoreTasks(Job job) {
         Workflow workflow = workflowService.getWorkflow(job.getWorkflowId());
 
-        List<WorkflowTask> workflowTasks = workflow.getTasks();
+        List<WorkflowTask> workflowTasks = WorkflowTaskUtils.removeDisabledTasks(workflow.getTasks());
 
         return job.getCurrentTask() + 1 < workflowTasks.size();
     }
