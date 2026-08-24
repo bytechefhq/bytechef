@@ -3318,6 +3318,9 @@ components:
         description:
           description: "The description of the task."
           type: "string"
+        disabled:
+          description: "When true, the task is skipped during workflow execution."
+          type: "boolean"
         finalize:
           description: "The (optional) list of tasks that are to be executed after\
             \ execution of a task -- regardless of whether it had failed or not."
