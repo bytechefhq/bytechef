@@ -5,6 +5,7 @@
   "pages": [
     "installing-the-sdk",
     "adding-an-integration",
-    "displaying-the-connect-dialog"
+    "displaying-the-connect-dialog",
+    "syncing-connected-users-programmatically"
   ]
 }

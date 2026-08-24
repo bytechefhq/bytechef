@@ -3,6 +3,8 @@ title: Connected Users
 description: View and manage end users who have connected integrations through your embedded iPaaS.
 ---
 
+This page covers the ByteChef console view. For how a Connected User record comes into existence and how your backend attaches a name, email, or its own metadata to it, see [Syncing Connected Users](/platform/embedded/get-started/initial-setup/syncing-connected-users-programmatically).
+
 ![Connected Users overview](connected-users/connected-users-overview.png)
 
 ---
