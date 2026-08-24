@@ -1,6 +1,7 @@
 import {type Locator, type Page, expect} from '@playwright/test';
 
 import sampleWorkflow from '../sampleWorkflow.json';
+import {TIMEOUTS} from '../utils/constants';
 import {
     type WorkflowDefinitionI,
     addArrayItemViaPopover,
@@ -22,6 +23,9 @@ interface ExpectedPropertyValuesI {
 export class WorkflowPage {
     private static readonly arrayPropertyItemLabelRegex = /Array property item at index \d+/;
 
+    // Matches "<workflowNodeName> node" but not the "<workflowNodeName> node actions" menu button.
+    private static readonly workflowNodeLabelRegex = /\snode$/;
+
     private readonly page: Page;
 
     static readonly LONG_DEBOUNCE_MS = 700;
@@ -39,6 +43,7 @@ export class WorkflowPage {
     readonly parentObjectProperty: Locator;
     readonly parentObjectSubPropertyList: Locator;
     readonly workflowDefinition: WorkflowDefinitionI;
+    readonly workflowNodes: Locator;
     readonly subPropertyListItems: Locator;
 
     static assertVar1ArrayParameterIsDefined(arrayValue: unknown): void {
@@ -72,6 +77,7 @@ export class WorkflowPage {
 
     constructor(page: Page) {
         this.page = page;
+        this.workflowNodes = page.getByRole('button', {name: WorkflowPage.workflowNodeLabelRegex});
         this.firstNode = page.getByLabel('var_1 node', {exact: true});
         this.firstTaskComponentConfigurationPanel = page.getByLabel('var_1 component configuration panel');
         this.arrayProperty = this.firstTaskComponentConfigurationPanel.getByLabel('Array property', {exact: true});
@@ -134,5 +140,16 @@ export class WorkflowPage {
         await this.page.waitForURL(`**/projects/${projectId}/project-workflows/${workflowId}`);
 
         await this.page.waitForLoadState('domcontentloaded');
+
+        await this.waitForCanvasReady();
+    }
+
+    /**
+     * `domcontentloaded` fires long before the canvas has its nodes, so callers that immediately start
+     * a short retry loop would spend most of their budget waiting for the editor to load. Gate on the
+     * first rendered node instead.
+     */
+    async waitForCanvasReady(): Promise<void> {
+        await expect(this.workflowNodes.first()).toBeVisible({timeout: TIMEOUTS.EDITOR_CANVAS_READY});
     }
 }

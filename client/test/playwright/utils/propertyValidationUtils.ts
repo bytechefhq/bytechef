@@ -2,6 +2,7 @@ import {type Locator, type Page, expect} from '@playwright/test';
 
 import {WorkflowPage} from '../pages/workflowPage';
 import {clickAndExpectToBeVisible} from './clickAndExpectToBeVisible';
+import {TIMEOUTS} from './constants';
 import {nodeParametersSavePromise} from './workflowUtils';
 
 export function propertyTestingParametersSavePromise(page: Page, valueInBody?: string) {
@@ -64,6 +65,9 @@ export async function openPropertyTestingPanel(page: Page, anchorPropertyLabel: 
     const propertyTestingNode = page.getByLabel('propertyTesting_1 node', {exact: true});
     const configurationPanel = page.getByLabel('propertyTesting_1 component configuration panel');
 
+    // Also reached straight after a reload, where the canvas needs several seconds to mount its nodes.
+    await expect(propertyTestingNode).toBeVisible({timeout: TIMEOUTS.EDITOR_CANVAS_READY});
+
     await clickAndExpectToBeVisible({
         target: configurationPanel,
         trigger: propertyTestingNode,
@@ -71,6 +75,10 @@ export async function openPropertyTestingPanel(page: Page, anchorPropertyLabel: 
 
     const propertiesTabButton = configurationPanel.getByRole('button', {name: 'Properties'});
     const anchorProperty = configurationPanel.getByLabel(anchorPropertyLabel);
+
+    // The panel renders a skeleton tab row until the operation definition resolves, so the Properties
+    // button does not exist yet. Wait it out here rather than inside the short retry budget below.
+    await expect(propertiesTabButton).toBeVisible({timeout: TIMEOUTS.NODE_DETAILS_PANEL_READY});
 
     await clickAndExpectToBeVisible({
         target: anchorProperty,
