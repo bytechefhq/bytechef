@@ -100,7 +100,7 @@ public class TaskCoordinatorConfiguration {
     @Bean
     DefaultTaskCompletionHandler defaultTaskCompletionHandler() {
         return new DefaultTaskCompletionHandler(
-            contextService, evaluator, eventPublisher, jobExecutor(), jobService, taskExecutionService, taskFileStorage,
+            contextService, jobExecutor(), jobService, taskExecutionService, taskFileStorage,
             workflowService);
     }
 
@@ -112,7 +112,8 @@ public class TaskCoordinatorConfiguration {
     @Bean
     JobExecutor jobExecutor() {
         return new JobExecutor(
-            contextService, evaluator, taskDispatcher(), taskExecutionService, taskFileStorage, workflowService);
+            contextService, evaluator, eventPublisher, jobService, taskDispatcher(), taskExecutionService,
+            taskFileStorage, workflowService);
     }
 
     @Bean
