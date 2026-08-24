@@ -40,6 +40,7 @@ import {useUpdateConnectionTagsMutation} from '@/shared/mutations/automation/con
 import {
     useDeleteConnectionMutation,
     useDisconnectConnectionMutation,
+    useUpdateConnectionCredentialsMutation,
     useUpdateConnectionMutation,
 } from '@/shared/mutations/automation/connections.mutations';
 import {ConnectionKeys, useGetConnectionTagsQuery} from '@/shared/queries/automation/connections.queries';
@@ -466,6 +467,7 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
                         connectionsQueryKey={ConnectionKeys.connections}
                         onClose={() => setShowEditDialog(false)}
                         useGetConnectionTagsQuery={() => connectionTagsQueryResult}
+                        useUpdateConnectionCredentialsMutation={useUpdateConnectionCredentialsMutation}
                         useUpdateConnectionMutation={useUpdateConnectionMutation}
                     />
                 )}

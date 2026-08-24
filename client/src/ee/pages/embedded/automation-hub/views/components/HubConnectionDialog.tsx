@@ -38,24 +38,19 @@ const useCreateHubConnectionMutation = (mutationProps?: CreateConnectionMutation
 const useHubConnectionTagsQuery = () => useQuery({queryFn: async () => [], queryKey: HUB_CONNECTION_TAGS_QUERY_KEY});
 
 /**
- * `existingConnectionId` isn't part of `ConnectionI`, so it can't be read off the mutation's
- * variables the way `useCreateHubConnectionMutation` reads `componentName`. `ConnectionDialog`'s own
- * create-path payload (`getNewConnection()`) never carries an `id` either — see `HubConnectionDialog`
- * below for why `connection` is deliberately prefilled without one. So the id is closed over here
- * instead, the same "hook factory" shape `getCreateConnectedUserConnection` uses in
- * `connections.mutations.ts` for the same reason (closing a connected-user id over a mutation hook).
+ * The endpoint replaces the connection's authorization parameters wholesale — a parameter the caller
+ * does not resubmit is cleared — and marks its credentials valid again on success.
  */
-const getReauthorizeHubConnectionMutation =
-    (existingConnectionId: number) => (mutationProps?: ReauthorizeConnectionMutationPropsI) =>
-        useMutation<void, Error, ConnectionI>({
-            mutationFn: (connection) =>
-                new ConnectionApi().reauthorizeFrontendConnection({
-                    id: existingConnectionId,
-                    reauthorizeConnectionRequest: {parameters: connection.parameters},
-                }),
-            onError: mutationProps?.onError,
-            onSuccess: mutationProps?.onSuccess,
-        });
+const useReauthorizeHubConnectionMutation = (mutationProps?: ReauthorizeConnectionMutationPropsI) =>
+    useMutation<void, Error, ConnectionI>({
+        mutationFn: (connection) =>
+            new ConnectionApi().reauthorizeFrontendConnection({
+                id: connection.id!,
+                reauthorizeConnectionRequest: {parameters: connection.parameters},
+            }),
+        onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
+    });
 
 interface HubConnectionDialogProps {
     componentName: string;
@@ -69,10 +64,14 @@ interface HubConnectionDialogProps {
 /**
  * Wraps the shared {@link ConnectionDialog} with the hub's own queries and mutations, so it can be
  * used both to create a brand-new connection and — when `existingConnectionId` is set — to
- * reconnect (reauthorize) an existing one for the same component. Reconnect deliberately prefills
- * `connection` WITHOUT an `id`: `ConnectionDialog` only shows the property/authorization fields (the
- * ones a reauthorize actually needs) when `connection?.id` is falsy — with an `id` present it
- * switches into its "rename only" edit mode instead, which has no way to resubmit credentials.
+ * reconnect (reauthorize) an existing one for the same component. A reconnect passes the real
+ * connection, id and all, and opens the dialog straight into credential-replacement mode via
+ * `startInCredentialsMode`.
+ *
+ * <p>This replaced an earlier workaround that prefilled `connection` WITHOUT an `id`, because the
+ * pre-mode dialog only rendered credential fields while `connection?.id` was falsy. That made the
+ * reconnect run the dialog's create path, which is why it used to report "Connection created" and
+ * why `onCreated` could never fire (the reauthorize endpoint returns no id to fire it with).
  *
  * `existingConnectionVersion` is the reconnected connection's own `Connection.connectionVersion`,
  * so the definition lookup (and the prefilled `connection`) render the authorization fields for
@@ -108,6 +107,7 @@ const HubConnectionDialog = ({
                     ? {
                           componentName,
                           connectionVersion,
+                          id: existingConnectionId,
                           name: componentTitle,
                           parameters: {},
                       }
@@ -115,15 +115,15 @@ const HubConnectionDialog = ({
             }
             connectionTagsQueryKey={HUB_CONNECTION_TAGS_QUERY_KEY}
             connectionsQueryKey={AutomationHubKeys.connections}
-            description={existingConnectionId ? 'Re-enter your credentials to reconnect this account.' : undefined}
             onClose={onClose}
             onConnectionCreate={onCreated}
+            startInCredentialsMode={!!existingConnectionId}
             title={existingConnectionId ? `Reconnect ${componentTitle}` : undefined}
             triggerNode={triggerNode}
             useCreateConnectionMutation={useCreateHubConnectionMutation}
             useGetConnectionTagsQuery={useHubConnectionTagsQuery}
-            useUpdateConnectionMutation={
-                existingConnectionId ? getReauthorizeHubConnectionMutation(existingConnectionId) : undefined
+            useUpdateConnectionCredentialsMutation={
+                existingConnectionId ? useReauthorizeHubConnectionMutation : undefined
             }
         />
     );

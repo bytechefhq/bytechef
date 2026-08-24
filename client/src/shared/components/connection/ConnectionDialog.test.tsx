@@ -13,6 +13,7 @@ import ConnectionDialog from './ConnectionDialog';
 
 const hoisted = vi.hoisted(() => ({
     createMutate: vi.fn(),
+    credentialsMutate: vi.fn(),
     registerMutate: vi.fn(),
     storesQueryResult: {
         data: {connectionCredentialStores: [{readOnly: false, type: 'DATABASE'}]},
@@ -50,6 +51,13 @@ vi.mock('@/shared/mutations/automation/connections.mutations', () => ({
         isPending: false,
         mutate: hoisted.registerMutate,
         mutateAsync: hoisted.registerMutate,
+        reset: vi.fn(),
+    }),
+    useUpdateConnectionCredentialsMutation: () => ({
+        error: null,
+        isPending: false,
+        mutate: hoisted.credentialsMutate,
+        mutateAsync: hoisted.credentialsMutate,
         reset: vi.fn(),
     }),
     useUpdateConnectionMutation: () => ({
@@ -410,5 +418,97 @@ describe('ConnectionDialog visibility', () => {
         // render.
         expect(screen.getByText('Create Connection')).toBeInTheDocument();
         expect(screen.queryByText('Visibility')).not.toBeInTheDocument();
+    });
+});
+
+describe('ConnectionDialog credential replacement', () => {
+    const EXISTING_CONNECTION = {
+        authorizationParameters: {apiKey: '•••••••1234'},
+        authorizationType: 'API_KEY',
+        componentName: 'acme',
+        connectionVersion: 1,
+        credentialStoreType: 'DATABASE',
+        environmentId: 0,
+        id: 42,
+        name: 'Existing Acme Connection',
+        parameters: {},
+        version: 7,
+        visibility: 'WORKSPACE',
+    };
+
+    beforeEach(() => {
+        hoisted.credentialsMutate.mockReset();
+        hoisted.useIsVisibilityEditionEnabled.mockReturnValue(false);
+        hoisted.storesQueryResult = {
+            data: {connectionCredentialStores: [{readOnly: false, type: 'DATABASE'}]},
+            isLoading: false,
+        };
+    });
+
+    it('never carries the stored credentials into the submitted payload', async () => {
+        renderDialog({
+            connection: EXISTING_CONNECTION as never,
+            useUpdateConnectionCredentialsMutation: (() => ({
+                error: null,
+                isPending: false,
+                mutate: hoisted.credentialsMutate,
+                mutateAsync: hoisted.credentialsMutate,
+                reset: vi.fn(),
+            })) as never,
+        });
+
+        await userEvent.click(screen.getByRole('button', {name: /update credentials/i}));
+        await userEvent.click(screen.getByRole('button', {name: /^update credentials$/i}));
+
+        await waitFor(() => {
+            expect(hoisted.credentialsMutate).toHaveBeenCalled();
+        });
+
+        const payload = hoisted.credentialsMutate.mock.calls[0][0];
+
+        // The obfuscated value the server sent back must never round-trip into a write. Anything the user did not
+        // type is absent by construction, because the form is never seeded from the connection.
+        expect(JSON.stringify(payload.parameters)).not.toContain('1234');
+        expect(payload.id).toBe(42);
+        expect(payload.version).toBe(7);
+    });
+
+    it('opens straight into credential entry when the credentials are invalid', () => {
+        renderDialog({
+            connection: {...EXISTING_CONNECTION, credentialStatus: 'INVALID'} as never,
+            useUpdateConnectionCredentialsMutation: (() => ({
+                error: null,
+                isPending: false,
+                mutate: hoisted.credentialsMutate,
+                mutateAsync: hoisted.credentialsMutate,
+                reset: vi.fn(),
+            })) as never,
+        });
+
+        expect(screen.getByText(/these credentials were rejected/i)).toBeInTheDocument();
+    });
+
+    it('does not offer credential updates for externally stored credentials', () => {
+        renderDialog({
+            connection: {...EXISTING_CONNECTION, credentialStoreType: 'AWS_SECRETS_MANAGER'} as never,
+            useUpdateConnectionCredentialsMutation: (() => ({
+                error: null,
+                isPending: false,
+                mutate: hoisted.credentialsMutate,
+                mutateAsync: hoisted.credentialsMutate,
+                reset: vi.fn(),
+            })) as never,
+        });
+
+        // Anchor: the edit dialog itself rendered, so the absence below is the external-store gate.
+        expect(screen.getByText('Edit Connection')).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: /update credentials/i})).not.toBeInTheDocument();
+    });
+
+    it('does not offer credential updates when the caller has not opted in', () => {
+        renderDialog({connection: EXISTING_CONNECTION as never});
+
+        expect(screen.getByText('Edit Connection')).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: /update credentials/i})).not.toBeInTheDocument();
     });
 });

@@ -32,10 +32,13 @@ export interface ConnectionI {
     readonly createdBy?: string;
     readonly createdDate?: Date;
     credentialStatus?: CredentialStatus;
+    credentialStoreType?: 'AWS_SECRETS_MANAGER' | 'DATABASE' | 'HASHICORP_VAULT';
     environmentId?: number;
     readonly id?: number;
     readonly lastModifiedBy?: string;
     readonly lastModifiedDate?: Date;
+    /** True when the platform provisioned the credential rather than the user; it is not ours to rewrite. */
+    readonly managed?: boolean;
     name: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     parameters: {[key: string]: any};

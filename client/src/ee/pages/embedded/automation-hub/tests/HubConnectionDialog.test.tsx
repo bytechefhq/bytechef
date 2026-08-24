@@ -35,6 +35,10 @@ vi.mock('@/shared/components/connection/ConnectionDialog', () => ({
             <span data-testid="has-create-mutation">{String(!!props.useCreateConnectionMutation)}</span>
 
             <span data-testid="has-update-mutation">{String(!!props.useUpdateConnectionMutation)}</span>
+
+            <span data-testid="has-credentials-mutation">{String(!!props.useUpdateConnectionCredentialsMutation)}</span>
+
+            <span data-testid="start-in-credentials-mode">{String(!!props.startInCredentialsMode)}</span>
         </div>
     ),
 }));
@@ -53,21 +57,20 @@ describe('HubConnectionDialog', () => {
         useGetComponentDefinitionsQueryMock.mockReturnValue({data: [], error: null, isLoading: false});
     });
 
-    it('titles and describes the dialog as a reconnect, and supplies the reauthorize mutation hook, when existingConnectionId is set', () => {
+    it('titles the dialog as a reconnect and opens it straight into credential replacement, when existingConnectionId is set', () => {
         render(<HubConnectionDialog componentName="slack" existingConnectionId={1} onClose={vi.fn()} />);
 
         expect(screen.getByTestId('title')).toHaveTextContent('Reconnect Slack');
-        expect(screen.getByTestId('description')).toHaveTextContent(
-            'Re-enter your credentials to reconnect this account.'
-        );
         expect(screen.getByTestId('has-create-mutation')).toHaveTextContent('true');
-        expect(screen.getByTestId('has-update-mutation')).toHaveTextContent('true');
+        expect(screen.getByTestId('has-credentials-mutation')).toHaveTextContent('true');
+        expect(screen.getByTestId('start-in-credentials-mode')).toHaveTextContent('true');
 
-        // Deliberately no `id`: ConnectionDialog only shows the property/authorization fields a
-        // reauthorize needs when `connection?.id` is falsy — see HubConnectionDialog's own comment.
+        // The real id, not the id-less workaround this replaced: the credentials mutation reads it off the
+        // variables, and the dialog needs it to be in edit mode rather than reporting a creation.
         expect(JSON.parse(screen.getByTestId('connection').textContent || 'null')).toEqual({
             componentName: 'slack',
             connectionVersion: 1,
+            id: 1,
             name: 'Slack',
             parameters: {},
         });
@@ -88,6 +91,7 @@ describe('HubConnectionDialog', () => {
         expect(JSON.parse(screen.getByTestId('connection').textContent || 'null')).toEqual({
             componentName: 'slack',
             connectionVersion: 2,
+            id: 1,
             name: 'Slack',
             parameters: {},
         });
@@ -101,18 +105,19 @@ describe('HubConnectionDialog', () => {
         expect(JSON.parse(screen.getByTestId('connection').textContent || 'null')).toEqual({
             componentName: 'slack',
             connectionVersion: 1,
+            id: 1,
             name: 'Slack',
             parameters: {},
         });
     });
 
-    it('keeps the default create title/description and supplies no update mutation hook when existingConnectionId is absent', () => {
+    it('keeps the default create title and supplies no credentials mutation hook when existingConnectionId is absent', () => {
         render(<HubConnectionDialog componentName="slack" onClose={vi.fn()} />);
 
         expect(screen.getByTestId('title')).toHaveTextContent('');
-        expect(screen.getByTestId('description')).toHaveTextContent('');
         expect(screen.getByTestId('has-create-mutation')).toHaveTextContent('true');
-        expect(screen.getByTestId('has-update-mutation')).toHaveTextContent('false');
+        expect(screen.getByTestId('has-credentials-mutation')).toHaveTextContent('false');
+        expect(screen.getByTestId('start-in-credentials-mode')).toHaveTextContent('false');
         expect(screen.getByTestId('connection')).toHaveTextContent('');
     });
 

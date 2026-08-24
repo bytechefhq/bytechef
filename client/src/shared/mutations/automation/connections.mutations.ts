@@ -4,6 +4,7 @@ import {
     ConnectionCredentialStoreType,
     useDisconnectConnectionMutation as useDisconnectConnectionGraphQL,
     useRegisterExistingConnectionMutation as useRegisterExistingConnectionGraphQL,
+    useUpdateConnectionCredentialsMutation as useUpdateConnectionCredentialsGraphQL,
 } from '@/shared/middleware/graphql';
 import {useMutation} from '@tanstack/react-query';
 
@@ -94,6 +95,35 @@ export const useDisconnectConnectionMutation = (mutationProps?: DisconnectConnec
             });
 
             return result.disconnectConnection;
+        },
+        onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
+    });
+};
+
+interface UpdateConnectionCredentialsMutationProps {
+    onError?: (error: Error, variables: Connection) => void;
+    onSuccess?: (result: void, variables: Connection) => void;
+}
+
+/**
+ * Submits replacement credentials for an existing connection. Deliberately shaped like
+ * `useUpdateConnectionMutation` — same `Connection` variables, same `void` result — so `ConnectionDialog` can accept
+ * either through a prop of the same type. Only `id`, `parameters` and `version` are read: the server replaces the
+ * connection's authorization parameters wholesale and ignores everything else on the object.
+ */
+export const useUpdateConnectionCredentialsMutation = (mutationProps?: UpdateConnectionCredentialsMutationProps) => {
+    const graphqlMutation = useUpdateConnectionCredentialsGraphQL();
+
+    return useMutation<void, Error, Connection>({
+        mutationFn: async (connection: Connection) => {
+            await graphqlMutation.mutateAsync({
+                input: {
+                    connectionId: String(connection.id!),
+                    parameters: connection.parameters,
+                    version: connection.version!,
+                },
+            });
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,

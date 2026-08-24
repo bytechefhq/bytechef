@@ -47,7 +47,7 @@ import {
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {QueryKey, UseMutationResult, UseQueryResult, useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
-import {ClipboardIcon, ExternalLinkIcon, RocketIcon} from 'lucide-react';
+import {ClipboardIcon, ExternalLinkIcon, KeyRoundIcon, RocketIcon} from 'lucide-react';
 import {ReactNode, useCallback, useEffect, useMemo, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {Link} from 'react-router-dom';
@@ -95,6 +95,13 @@ interface ConnectionDialogProps {
      */
     showOrganizationOption?: boolean;
     /**
+     * Opens the dialog directly in credential-replacement mode instead of the rename-only edit body. For surfaces
+     * whose entire purpose is reconnecting an account -- the embedded hub's Reconnect action -- where making the user
+     * find an "Update credentials" button first would be pointless. No Back control is rendered in that case: there
+     * is no rename-only body behind it to go back to.
+     */
+    startInCredentialsMode?: boolean;
+    /**
      * Overrides the dialog's default title (`Create Connection` / `Edit Connection`, derived from
      * `connection?.id`). Optional and additive -- every existing caller keeps today's title
      * unchanged. Exists for callers like the hub's reconnect flow, whose `connection` is deliberately
@@ -108,6 +115,15 @@ interface ConnectionDialogProps {
         onError?: (error: Error, variables: ConnectionI) => void;
     }) => UseMutationResult<number, Error, ConnectionI, unknown>;
     useGetConnectionTagsQuery: () => UseQueryResult<Tag[], Error>;
+    /**
+     * Supplied only by surfaces that allow an existing connection's credentials to be replaced. Absent means the
+     * "Update credentials" affordance is not rendered at all, which is how every caller that has not opted in keeps
+     * today's rename-only edit dialog.
+     */
+    useUpdateConnectionCredentialsMutation?: (mutationProps: {
+        onSuccess?: (result: void, variables: ConnectionI) => void;
+        onError?: (error: Error, variables: ConnectionI) => void;
+    }) => UseMutationResult<void, Error, ConnectionI, unknown>;
     useUpdateConnectionMutation?: (mutationProps: {
         onSuccess?: (result: void, variables: ConnectionI) => void;
         onError?: (error: Error, variables: ConnectionI) => void;
@@ -124,15 +140,18 @@ const ConnectionDialog = ({
     onClose,
     onConnectionCreate,
     showOrganizationOption,
+    startInCredentialsMode,
     title,
     triggerNode,
     useCreateConnectionMutation,
     useGetConnectionTagsQuery,
+    useUpdateConnectionCredentialsMutation,
     useUpdateConnectionMutation,
 }: ConnectionDialogProps) => {
     const [authorizationType, setAuthorizationType] = useState<string>();
     const [connectionVersion, setConnectionVersion] = useState(1);
     const [isOpen, setIsOpen] = useState(!triggerNode);
+    const [isUpdatingCredentials, setIsUpdatingCredentials] = useState(false);
     const [oAuth2Error, setOAuth2Error] = useState<string>();
     const [wizardStep, setWizardStep] = useState<'configuration_step' | 'oauth_step'>('configuration_step');
     const [selectedComponentDefinition, setSelectedComponentDefinition] = useState<
@@ -214,6 +233,14 @@ const ConnectionDialog = ({
     const showPicker = stores.length > 1;
     const isEdit = !!connection?.id;
 
+    // A connection whose secret lives in an external store, or that the platform manages on the user's behalf, is not
+    // ours to rewrite: ConnectionServiceImpl throws ReadOnlyCredentialStoreException for the former, and the user
+    // would have typed a secret before finding out. Hide the affordance rather than fail after the fact.
+    const credentialsAreExternallyStored =
+        (!!connection?.credentialStoreType && connection.credentialStoreType !== 'DATABASE') || !!connection?.managed;
+
+    const canUpdateCredentials = isEdit && !!useUpdateConnectionCredentialsMutation && !credentialsAreExternallyStored;
+
     const handleConnectionSuccess = (connectionId: number | void) => {
         queryClient.invalidateQueries({
             queryKey: ComponentDefinitionKeys.componentDefinitions,
@@ -240,6 +267,19 @@ const ConnectionDialog = ({
 
     const connectionMutation = (useUpdateConnectionMutation || useCreateConnectionMutation)!({
         onSuccess: handleConnectionSuccess,
+    });
+
+    const credentialsMutation = useUpdateConnectionCredentialsMutation?.({
+        onSuccess: () => {
+            // Deliberately not "credentials verified": there is no test-connection step, so a successful call means
+            // the values were stored, not that they work. A wrong credential is re-flagged INVALID by
+            // TokenRefreshHandler on the next execution.
+            toast('Credentials updated', {
+                description: 'The new credentials were saved. They are verified the next time the connection runs.',
+            });
+
+            handleConnectionSuccess();
+        },
     });
 
     const registerExistingMutation = useRegisterExistingConnectionMutation({
@@ -290,7 +330,10 @@ const ConnectionDialog = ({
 
     const showConnectionProperties = !connectionDefinitionLoading && !!connectionDefinition?.properties?.length;
 
-    const showOAuth2Step = (isOAuth2AuthorizationType || isOAuth2ImplicitCodeType) && !connection?.id;
+    // Keyed off the mode, not off `connection?.id`: a credential replacement always has an id, and an OAuth2
+    // reconnect still needs the consent step to run.
+    const showOAuth2Step =
+        (isOAuth2AuthorizationType || isOAuth2ImplicitCodeType) && (!connection?.id || isUpdatingCredentials);
 
     const showRedirectUriInput =
         (isOAuth2AuthorizationType || isOAuth2ImplicitCodeType) &&
@@ -307,6 +350,7 @@ const ConnectionDialog = ({
         setTimeout(() => {
             formReset();
 
+            setIsUpdatingCredentials(false);
             setOAuth2Error(undefined);
             setWizardStep('configuration_step');
 
@@ -414,6 +458,21 @@ const ConnectionDialog = ({
     }
 
     function saveConnection(additionalParameters?: object) {
+        // Tested before the `connection?.id` branch below: in this mode an id IS present, so the rename-only branch
+        // would otherwise swallow the submission and silently discard the new credentials.
+        if (isUpdatingCredentials && credentialsMutation) {
+            const {parameters} = getValues();
+
+            return credentialsMutation.mutateAsync({
+                id: connection!.id,
+                parameters: {
+                    ...parameters,
+                    ...additionalParameters,
+                },
+                version: connection!.version,
+            } as ConnectionI);
+        }
+
         if (connection?.id) {
             const {name, tags} = getValues();
 
@@ -490,6 +549,24 @@ const ConnectionDialog = ({
         }
     }, [authorizationsExists, authorizationOptions, selectedComponentDefinition, setValue]);
 
+    // Runs after the effect above so it wins: that one defaults to the FIRST authorization option, which is not
+    // necessarily the one this connection was created with. The type selector is hidden while replacing credentials,
+    // so without this the form would render the wrong component's fields -- or none at all.
+    useEffect(() => {
+        if (!isEdit) {
+            return;
+        }
+
+        if (connection?.authorizationType) {
+            setAuthorizationType(connection.authorizationType);
+            setValue('authorizationType', connection.authorizationType);
+        }
+
+        if (startInCredentialsMode || connection?.credentialStatus === 'INVALID') {
+            setIsUpdatingCredentials(true);
+        }
+    }, [connection?.authorizationType, connection?.credentialStatus, isEdit, setValue, startInCredentialsMode]);
+
     return (
         <Dialog
             onOpenChange={(isOpen) => {
@@ -562,6 +639,16 @@ const ConnectionDialog = ({
 
                         {(wizardStep === 'configuration_step' || oAuth2AuthorizationParametersLoading) && (
                             <>
+                                {isUpdatingCredentials && connection?.credentialStatus === 'INVALID' && (
+                                    <Alert variant="destructive">
+                                        <AlertTitle>These credentials were rejected</AlertTitle>
+
+                                        <AlertDescription>
+                                            Workflows using this connection are blocked until new credentials are saved.
+                                        </AlertDescription>
+                                    </Alert>
+                                )}
+
                                 {!connection?.id && (
                                     <FormField
                                         control={control}
@@ -601,11 +688,13 @@ const ConnectionDialog = ({
                                     />
                                 )}
 
+                                {/* Name and tags belong to the rename-only body; hidden here so the credential
+                                    replacement reads as one job with one outcome. */}
                                 <FormField
                                     control={form.control}
                                     name="name"
                                     render={({field}) => (
-                                        <FormItem>
+                                        <FormItem className={twMerge(isUpdatingCredentials && 'hidden')}>
                                             <FormLabel>Name</FormLabel>
 
                                             <FormControl>
@@ -868,7 +957,7 @@ const ConnectionDialog = ({
                                             </div>
                                         )}
 
-                                        {!connection?.id &&
+                                        {(!connection?.id || isUpdatingCredentials) &&
                                             showAuthorizationProperties &&
                                             !!authorizations?.length &&
                                             authorizations[0]?.properties && (
@@ -899,7 +988,7 @@ const ConnectionDialog = ({
                                     </div>
                                 )}
 
-                                {!tagsLoading && (
+                                {!tagsLoading && !isUpdatingCredentials && (
                                     <FormField
                                         control={control}
                                         name="tags"
@@ -1079,10 +1168,28 @@ const ConnectionDialog = ({
                                 </>
                             )}
 
+                            {canUpdateCredentials && !isUpdatingCredentials && (
+                                <Button onClick={() => setIsUpdatingCredentials(true)} type="button" variant="outline">
+                                    <KeyRoundIcon /> Update credentials
+                                </Button>
+                            )}
+
+                            {/* No Back when the dialog opened straight into this mode: there is no rename-only body
+                                behind it, so Back would strand the user in a state they never chose to enter. */}
+
+                            {isUpdatingCredentials && !startInCredentialsMode && (
+                                <Button
+                                    label="Back"
+                                    onClick={() => setIsUpdatingCredentials(false)}
+                                    type="button"
+                                    variant="outline"
+                                />
+                            )}
+
                             {!showOAuth2Step && (
                                 <Button
                                     disabled={!formState.isValid}
-                                    label="Save"
+                                    label={isUpdatingCredentials ? 'Update credentials' : 'Save'}
                                     onClick={handleSubmit(() => saveConnection())}
                                     type="submit"
                                 />
