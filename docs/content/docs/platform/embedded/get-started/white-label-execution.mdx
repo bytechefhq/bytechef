@@ -1,13 +1,9 @@
 ---
 title: "White-Label Execution"
-description: "Expose ByteChef's workflow engine inside your SaaS. Your customers build integrations; you don't build an integration team."
+description: "Expose ByteChef's workflow engine inside your SaaS. Your customers build integrations; you don't build an integration team — and no tenant can reach another's workflows, credentials or data."
 ---
 
-White-label execution means your customers use the workflow engine and integration builder from inside your product rather than from a ByteChef UI. This page describes what that covers today and what is still on the roadmap.
-
-<Callout type="warn" title="Roadmap notice">
-    This page describes the white-label direction of the embedded platform. Every row marked *planned* in the table below has no configuration surface yet. The embedding mechanics themselves — the connect dialog, the workflow builder, and the public API — are available today; see the [Quick Start](/platform/embedded/get-started/quick-start).
-</Callout>
+White-label execution means your customers use the workflow engine and integration builder from inside your product rather than from a ByteChef UI. Each of them is a **tenant**, and the failure that matters is one tenant seeing another's data. This page covers both halves: what your customers see, and what keeps them apart.
 
 ## The mental model
 
@@ -37,29 +33,19 @@ White-label execution means your customers use the workflow engine and integrati
 
 Your customer never sees "ByteChef." They see your product offering integrations.
 
-## What "white-label" actually covers
-
-| Surface | State |
-|---|---|
-| **UI shell** | **Available.** Your product chrome wraps the builder, which renders in an iframe you position. |
-| **Workflow builder** | **Available**, with a neutral built-in theme. Theming it with your own CSS tokens is *planned*. |
-| **Component catalog** | **Available.** Your customers see the built-in components, restricted to the set you pass as `includeComponents`. |
-| **Customer-facing emails** | *Planned* — sending from your own domain with your templates. |
-| **Webhook URLs** | *Planned* — webhook URLs under your own domain. |
-| **Documentation links** | *Planned* — pointing component help at your help center. |
-| **Error messages** | *Planned* — rewording and localizing engine errors. |
-
 ## How customers interact with it
 
 {/* TODO screenshot: the embedded workflow builder rendered inside a host app's UI, white-labeled with the host product's branding */}
 
-A typical embedded flow:
+Your product chrome wraps the builder, which renders in an iframe you position. A typical embedded flow:
 
 1. **Customer signs in** to your product as they always do.
 2. **Customer navigates to "Integrations"** (or whatever you call it).
 3. **They see a list of integration templates** you've defined for your product — pre-built workflows that solve common scenarios.
 4. **They configure a connection** to their external system (Salesforce, etc.) by completing the standard auth flow. The credentials live in [encrypted credential storage](/platform/use-bytechef/self-hosted/configuration#encryption-of-stored-credentials), scoped to their tenant.
 5. **The workflow runs** every time the trigger fires. Execution history is visible to them; nothing leaves your product.
+
+The component catalog they browse is the built-in one, restricted to the set you pass as `includeComponents`.
 
 ## Two integration models
 
@@ -82,7 +68,64 @@ When a customer's workflow runs:
 - It executes against **their** business logic (your custom components plus the built-in ones).
 - It generates execution history they can see in your product UI.
 
-One customer's run cannot read another's data, connections, or history. See [Tenant-Isolated Security](/platform/embedded/get-started/tenant-isolated-security) for what that covers and what stays your responsibility.
+One customer's run cannot read another's data, connections, or history. The rest of this page is what that covers.
+
+## Tenant-isolated security
+
+This is what you can tell your own security reviewers — what the platform guarantees, what you have to do to keep it true, and where the boundary stops.
+
+### What you get without configuring anything
+
+**A customer's data is reachable only from that customer's tenant.** Every request — an API call, a
+webhook, a scheduled run, an MCP call — resolves which tenant it belongs to *before* it touches any
+data, and stays pinned to that tenant for its whole life. There is no "list everything" call to get
+wrong: the APIs list what is in one tenant, not what exists.
+
+**A credential belongs to the customer who authorized it.** Connections are encrypted before they
+reach the database and are never returned by a read — the API obfuscates them on the way out. A
+connection your customer authorizes is bound to their own record, so it is never offered to another
+customer, and the plaintext exists only in memory while their own workflow is running.
+
+**A customer's own end users stay separated too.** Inside one tenant, each connected user's
+connections are reachable only through that user's own integration instances.
+
+**Knowledge bases don't bleed.** One tenant's indexed documents are never searched by another's.
+
+**Logs are attributable.** Every log line carries the tenant it was written for, so you can hand one
+customer their own audit trail without filtering by guesswork.
+
+You do not switch any of this on. It is how the platform runs, including on a single-tenant
+deployment — there, everything simply resolves to one tenant.
+
+### Where the boundary stops
+
+Four things are worth knowing before you describe isolation to a customer, because none of them is
+what a reader would assume:
+
+**The encryption key is per deployment, not per tenant.** Separation of credentials comes from the
+tenant boundary, not from separate key material. A single key protects everything in the deployment
+against a stolen database; it does not make one tenant's ciphertext unreadable to another tenant's
+code path. If a customer needs their secrets in their own vault, external secret managers are
+*(coming soon)*.
+
+**Queues are shared.** Runs for different tenants pass through the same message broker, each message
+carrying the tenant it belongs to. The data each run reads and writes is isolated; the pipe is not.
+
+**Metrics and traces are not tagged by tenant.** Logs are. If you need per-customer dashboards or
+per-customer alerting, derive them from the logs or add the tag in your own collector.
+
+**There is no per-tenant rate limiting.** One customer's traffic can affect another's latency. That
+limit belongs at your ingress — see below.
+
+### What stays yours to do
+
+- [ ] **Issue a distinct token per tenant.** Never let a "master" token serve runtime traffic; a
+      token is what decides which tenant a request lands in.
+- [ ] **Rate-limit per tenant at your own ingress**, so one noisy customer cannot degrade the rest.
+- [ ] **Supply the encryption key from your secret manager**, not a checked-in config file
+      (`BYTECHEF_ENCRYPTION_PROVIDER=PROPERTY`).
+- [ ] **Back the key up separately from the database.** A restored database without its key is
+      unreadable — every stored credential is lost.
 
 ## Custom components for your product's logic
 
@@ -112,3 +155,8 @@ All of those come with the platform. You build **the product wrapper** — brand
 - The [built-in components](/platform/automation/build/workflows/components) are maintained in ByteChef, so adding a provider is a version bump rather than new integration code.
 - Embedded runs in the ByteChef deployment you already operate — there is no separate service to stand up.
 - You decide what your customers are charged; ByteChef bills you for the deployment.
+
+## See also
+
+- [Multi-tenancy](/platform/use-bytechef/self-hosted/architecture#multi-tenancy) — how the isolation is implemented
+- [Encryption of stored credentials](/platform/use-bytechef/self-hosted/configuration#encryption-of-stored-credentials) — key handling and rotation
