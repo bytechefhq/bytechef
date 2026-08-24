@@ -25,33 +25,34 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 /**
- * Authenticates the embedded admin endpoints as the API key's own ByteChef user, with that user's real authorities.
+ * Authenticates the carved-out embedded endpoints as the API key's own ByteChef user, with that user's real
+ * authorities.
  *
  * <p>
  * {@link EmbeddedApiKeyAuthenticationProvider} deliberately does the opposite: it resolves a {@code ConnectedUser} --
  * the customer's end user, who holds no roles in this tenant -- and issues a principal with zero authorities. That is
- * correct for the tenant-facing embedded API and useless for an admin operation, since no {@code ROLE_ADMIN} facade
- * guard can ever accept it. Admin endpoints under {@code /api/embedded/} are therefore carved out of that configurer
- * and handled here instead.
+ * correct for the connected-user embedded API and useless for an operation guarded by {@code ROLE_ADMIN}, since no such
+ * facade guard can ever accept it. The endpoints that need a real ByteChef user are therefore carved out of that
+ * configurer and handled here instead.
  *
  * <p>
- * Only admin API keys are accepted. An admin key is the one carrying no {@code PlatformType}, since
- * {@code getAdminApiKeys(environmentId)} is {@code getApiKeys(environmentId, null)} -- a non-null type means an
- * automation or embedded key was presented. The operations behind these endpoints act on the whole tenant rather than
- * on one workspace or environment, so accepting a workspace-scoped key would promise a containment they do not provide.
+ * Only a typed API key is accepted -- an {@code AUTOMATION} or an {@code EMBEDDED} key. The admin key, which is the one
+ * carrying no {@code PlatformType}, is rejected here and reserved for the tenant-wide operations under
+ * {@code /api/platform/v1}. Authorization for the operations themselves is unchanged: it stays on the facades, as
+ * {@code ROLE_ADMIN} evaluated against the authorities of the key's owning user.
  *
  * @version ee
  *
  * @author Ivica Cardic
  */
-public class EmbeddedAdminApiKeyAuthenticationProvider implements AuthenticationProvider {
+public class EmbeddedPlatformUserApiKeyAuthenticationProvider implements AuthenticationProvider {
 
     private final ApiKeyService apiKeyService;
     private final AuthorityService authorityService;
     private final UserService userService;
 
     @SuppressFBWarnings("EI")
-    public EmbeddedAdminApiKeyAuthenticationProvider(
+    public EmbeddedPlatformUserApiKeyAuthenticationProvider(
         ApiKeyService apiKeyService, AuthorityService authorityService, UserService userService) {
 
         this.apiKeyService = apiKeyService;
@@ -61,8 +62,8 @@ public class EmbeddedAdminApiKeyAuthenticationProvider implements Authentication
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        EmbeddedAdminApiKeyAuthenticationToken embeddedAdminApiKeyAuthenticationToken =
-            (EmbeddedAdminApiKeyAuthenticationToken) authentication;
+        EmbeddedPlatformUserApiKeyAuthenticationToken embeddedAdminApiKeyAuthenticationToken =
+            (EmbeddedPlatformUserApiKeyAuthenticationToken) authentication;
 
         ApiKey apiKey;
 
@@ -74,8 +75,8 @@ public class EmbeddedAdminApiKeyAuthenticationProvider implements Authentication
             throw new BadCredentialsException("Unknown API secret key", e);
         }
 
-        if (apiKey.getType() != null) {
-            throw new BadCredentialsException("Admin API key required");
+        if (apiKey.getType() == null) {
+            throw new BadCredentialsException("API key required");
         }
 
         org.springframework.security.core.userdetails.User user = userService.fetchUser(apiKey.getUserId())
@@ -85,12 +86,12 @@ public class EmbeddedAdminApiKeyAuthenticationProvider implements Authentication
                 "User with token " + embeddedAdminApiKeyAuthenticationToken.getSecretKey()
                     + " was not found in the database"));
 
-        return new EmbeddedAdminApiKeyAuthenticationToken(user);
+        return new EmbeddedPlatformUserApiKeyAuthenticationToken(user);
     }
 
     @Override
     public boolean supports(Class<?> authentication) {
-        return authentication.equals(EmbeddedAdminApiKeyAuthenticationToken.class);
+        return authentication.equals(EmbeddedPlatformUserApiKeyAuthenticationToken.class);
     }
 
     private org.springframework.security.core.userdetails.User createSpringSecurityUser(String secretKey, User user) {

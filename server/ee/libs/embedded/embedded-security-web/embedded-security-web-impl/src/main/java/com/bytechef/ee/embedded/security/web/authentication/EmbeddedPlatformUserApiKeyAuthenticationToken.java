@@ -15,17 +15,17 @@ import org.springframework.security.core.userdetails.User;
  *
  * @author Ivica Cardic
  */
-public class EmbeddedAdminApiKeyAuthenticationToken extends AbstractApiKeyAuthenticationToken {
+public class EmbeddedPlatformUserApiKeyAuthenticationToken extends AbstractApiKeyAuthenticationToken {
 
     private String secretKey;
 
-    public EmbeddedAdminApiKeyAuthenticationToken(int environment, String secretKey, String tenantId) {
+    public EmbeddedPlatformUserApiKeyAuthenticationToken(int environment, String secretKey, String tenantId) {
         super(environment, tenantId);
 
         this.secretKey = secretKey;
     }
 
-    public EmbeddedAdminApiKeyAuthenticationToken(User user) {
+    public EmbeddedPlatformUserApiKeyAuthenticationToken(User user) {
         super(user);
     }
 

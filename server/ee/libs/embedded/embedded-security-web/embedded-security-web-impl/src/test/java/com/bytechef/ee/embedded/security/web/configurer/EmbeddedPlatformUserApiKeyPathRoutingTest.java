@@ -16,39 +16,39 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
 /**
- * The embedded admin paths are claimed by {@link EmbeddedAdminApiKeySecurityConfigurer} and must be excluded from
- * {@link EmbeddedApiKeySecurityConfigurer}'s connected-user auth, which issues a principal with zero authorities that
- * no {@code ROLE_ADMIN} facade guard can accept.
+ * The carved-out embedded paths are claimed by {@link EmbeddedPlatformUserApiKeySecurityConfigurer} and must be
+ * excluded from {@link EmbeddedApiKeySecurityConfigurer}'s connected-user auth, which issues a principal with zero
+ * authorities that no {@code ROLE_ADMIN} facade guard can accept.
  *
  * <p>
- * Pinned because the failure is silent in both directions: were the carve-out dropped, the admin endpoints would answer
- * 403 forever; were the admin pattern widened, a tenant's end-user credential could reach them.
+ * Pinned because the failure is silent in both directions: were the carve-out dropped, those endpoints would answer 403
+ * forever; were the carve-out pattern widened, a tenant's end-user credential could reach them.
  *
  * @version ee
  *
  * @author Ivica Cardic
  */
-class EmbeddedAdminApiKeyPathRoutingTest {
+class EmbeddedPlatformUserApiKeyPathRoutingTest {
 
-    private static final RequestMatcher ADMIN_MATCHER =
-        regexMatcher(EmbeddedAdminApiKeySecurityConfigurer.PATH_PATTERN);
+    private static final RequestMatcher PLATFORM_USER_MATCHER =
+        regexMatcher(EmbeddedPlatformUserApiKeySecurityConfigurer.PATH_PATTERN);
     private static final RequestMatcher CONNECTED_USER_MATCHER = regexMatcher("^/api/embedded/v[0-9]+/.+");
 
     @Test
-    void testAdminPathsAreClaimedByTheAdminConfigurer() {
+    void testCarvedOutPathsAreClaimedByThePlatformUserConfigurer() {
         for (String path : new String[] {
             "/api/embedded/v1/automation-project-code-workflows",
             "/api/embedded/v1/automation-project-code-workflows/deploy",
             "/api/embedded/v2/automation-project-code-workflows"
         }) {
-            assertThat(ADMIN_MATCHER.matches(request(path)))
-                .as("admin configurer must claim %s", path)
+            assertThat(PLATFORM_USER_MATCHER.matches(request(path)))
+                .as("platform-user configurer must claim %s", path)
                 .isTrue();
         }
     }
 
     @Test
-    void testAdminPathsAreExcludedFromConnectedUserAuth() {
+    void testCarvedOutPathsAreExcludedFromConnectedUserAuth() {
         String path = "/api/embedded/v1/automation-project-code-workflows/deploy";
 
         assertThat(CONNECTED_USER_MATCHER.matches(request(path)))
@@ -66,8 +66,8 @@ class EmbeddedAdminApiKeyPathRoutingTest {
             "/api/embedded/v1/app-events",
             "/api/embedded/v1/workflows/some-uuid"
         }) {
-            assertThat(ADMIN_MATCHER.matches(request(path)))
-                .as("admin configurer must not claim %s", path)
+            assertThat(PLATFORM_USER_MATCHER.matches(request(path)))
+                .as("platform-user configurer must not claim %s", path)
                 .isFalse();
             assertThat(carvedOut(path))
                 .as("connected-user auth must still claim %s", path)
@@ -81,7 +81,7 @@ class EmbeddedAdminApiKeyPathRoutingTest {
     private static boolean carvedOut(String path) {
         HttpServletRequest request = request(path);
 
-        return CONNECTED_USER_MATCHER.matches(request) && !ADMIN_MATCHER.matches(request);
+        return CONNECTED_USER_MATCHER.matches(request) && !PLATFORM_USER_MATCHER.matches(request);
     }
 
     private static HttpServletRequest request(String path) {
