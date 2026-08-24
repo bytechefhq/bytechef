@@ -9,6 +9,8 @@
     "connections",
     "app-events",
     "component-kit",
+    "headless-embedding",
+    "theming-and-localization",
     "permission-expressions"
   ]
 }

@@ -1,0 +1,38 @@
+---
+title: Theming and Localization
+description: What of the embedded surfaces you can brand today, and what is still fixed — styling, copy, language, and the URLs and emails your customers see.
+comingSoon: true
+---
+
+White-labelling has two halves. The **placement** half is available today: your product chrome wraps the embedded surfaces, and your customer never navigates to a ByteChef URL. The **appearance** half is not yet configurable, and this page is the honest inventory of which is which.
+
+## What you control today
+
+- **Where the surfaces sit.** The Connect dialog opens from your own UI, and the workflow builder renders in an iframe you position and size. Your layout, your navigation, your typography around them.
+- **What is in the catalog.** `includeComponents` restricts the workflow builder to the components you choose, and [permission expressions](/platform/embedded/build/permission-expressions) narrow what each connected user is offered. Your customers do not see the full ByteChef catalog unless you want them to.
+- **Which workflows exist.** You author the templates; customers configure them rather than starting from a blank canvas.
+
+## What is fixed
+
+Both SDK surfaces take only functional configuration — the host, the environment, the token, and which integration or workflow to open. Neither accepts styling, copy, or locale, so what renders inside them is ByteChef's neutral default.
+
+| Surface | Status |
+|---|---|
+| **Colors, fonts, spacing** | Fixed. There is no theme prop and no CSS-variable contract to override. |
+| **Language** | English only. No locale option, and no translation files to supply. |
+| **Copy and labels** | Fixed, including validation messages inside the Connect dialog. |
+| **Engine error messages** | Fixed and in English. Surfaced as-is in execution history. |
+| **Webhook URLs** | Served from your ByteChef host, not a domain of yours. |
+| **Customer-facing email** | Not sent from your domain or with your templates. |
+| **Documentation links** | Component help points at ByteChef docs, not your help center. |
+
+## What this means in practice
+
+For most embedded products the gap is smaller than it looks: the surfaces are modal or iframed inside your app, so the visual seam is a panel rather than a page. The two that tend to matter first are **language**, if you sell outside English-speaking markets, and **webhook URLs**, if your customers paste them into a third-party system and would see a ByteChef host.
+
+If either is a requirement rather than a preference, raise it before you build — they are roadmap items, not configuration you have missed.
+
+## Related
+
+- [White-Label Execution](/platform/embedded/get-started/white-label-execution) — what your customers experience, and the tenant isolation behind it.
+- [Component Kit](/platform/embedded/build/component-kit) — bundling your own product as a first-class integration, which is the one piece of the catalog that is unmistakably yours.
