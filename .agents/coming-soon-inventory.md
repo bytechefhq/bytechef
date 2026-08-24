@@ -23,7 +23,7 @@ Two ways something here is hidden, and the tables below mark both:
 
 Both are reversible and neither deletes anything.
 
-**46 whole-page** (15 hidden) · **29 partial** pages (6 with a commented-out section)
+**44 whole-page** (17 hidden) · **29 partial** pages (6 with a commented-out section)
 
 ---
 
@@ -64,7 +64,8 @@ Both are reversible and neither deletes anything.
 |---|---|---|---|
 | Automation Code Workflows | [`/platform/embedded/build/automations/automation-code-workflows`](/platform/embedded/build/automations/automation-code-workflows) | CE | visible |
 | Automation workflows | [`/platform/embedded/build/automations/automation-workflows`](/platform/embedded/build/automations/automation-workflows) | EE | visible |
-| Unified API | [`/platform/embedded/build/unified-api`](/platform/embedded/build/unified-api) | — | visible |
+| Unified API | [`/platform/embedded/build/unified-api`](/platform/embedded/build/unified-api) | — | **hidden** |
+| Field Mapping | [`/platform/embedded/build/workflows/field-mapping`](/platform/embedded/build/workflows/field-mapping) | — | visible |
 
 ### Platform Settings
 
@@ -86,7 +87,7 @@ Both are reversible and neither deletes anything.
 
 | Page | Path | Edition | Sidebar |
 |---|---|---|---|
-| Distributed (Coordinator/Worker) | [`/platform/use-bytechef/self-hosted/installation/distributed`](/platform/use-bytechef/self-hosted/installation/distributed) | CE | visible |
+| Distributed (Coordinator/Worker) | [`/platform/use-bytechef/self-hosted/installation/distributed`](/platform/use-bytechef/self-hosted/installation/distributed) | CE | **hidden** |
 | Crash Recovery | [`/platform/use-bytechef/self-hosted/management/crash-recovery`](/platform/use-bytechef/self-hosted/management/crash-recovery) | CE | visible |
 
 ### Your Account
@@ -99,10 +100,7 @@ Both are reversible and neither deletes anything.
 
 | Page | Path | Edition | Sidebar |
 |---|---|---|---|
-| Embedded Automation Bridge | [`/openapi/automation-bridge`](/openapi/automation-bridge) | — | visible |
 | Deploy a new code based project | [`/openapi/automation-project-code-workflow/deployProject`](/openapi/automation-project-code-workflow/deployProject) | — | visible |
-| Get a workflow execution by id | [`/openapi/automation-workflow-execution/getWorkflowExecution`](/openapi/automation-workflow-execution/getWorkflowExecution) | — | visible |
-| Get workflow executions | [`/openapi/automation-workflow-execution/getWorkflowExecutionsPage`](/openapi/automation-workflow-execution/getWorkflowExecutionsPage) | — | visible |
 | Custom Components | [`/openapi/custom-components`](/openapi/custom-components) | — | visible |
 
 ---
