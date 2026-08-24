@@ -1,6 +1,7 @@
 import {Locator, type Page, expect} from '@playwright/test';
 
 import {clickAndExpectToBeVisible} from './clickAndExpectToBeVisible';
+import {TIMEOUTS} from './constants';
 
 export interface WorkflowDefinitionI {
     tasks?: Array<{
@@ -121,6 +122,9 @@ export async function reopenConfigurationPanel(page: Page): Promise<Locator> {
 
     const reloadedConfigurationPanel = page.getByLabel('var_1 component configuration panel');
 
+    // Called straight after a reload, where the canvas needs several seconds to mount its nodes.
+    await expect(varNode).toBeVisible({timeout: TIMEOUTS.EDITOR_CANVAS_READY});
+
     await clickAndExpectToBeVisible({
         target: reloadedConfigurationPanel,
         trigger: varNode,
@@ -215,6 +219,10 @@ export async function openPropertiesTab(componentConfigurationPanel: Locator): P
     const propertiesTabButton = componentConfigurationPanel.getByRole('button', {name: 'Properties'});
 
     const typeProperty = componentConfigurationPanel.getByLabel('type property');
+
+    // The panel renders a skeleton tab row until the operation definition resolves, so the Properties
+    // button does not exist yet. Wait it out here rather than inside the short retry budget below.
+    await expect(propertiesTabButton).toBeVisible({timeout: TIMEOUTS.NODE_DETAILS_PANEL_READY});
 
     await clickAndExpectToBeVisible({
         target: typeProperty,

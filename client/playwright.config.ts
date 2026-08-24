@@ -1,6 +1,12 @@
 import {defineConfig, devices} from '@playwright/test';
 
 export default defineConfig({
+    // Every property test logs in, creates a project, imports a workflow and then waits for the
+    // workflow editor to mount its canvas and node definitions. Fixture setup counts against the test
+    // timeout, and the default 30s runs out mid-setup once several workers share one dev server.
+    expect: {
+        timeout: 10000,
+    },
     forbidOnly: !!process.env.CI,
     fullyParallel: true,
     projects: [
@@ -14,6 +20,7 @@ export default defineConfig({
     testDir: './test/playwright',
     testIgnore: ['**/utils/**', '**/fixtures/**'],
     testMatch: /.*\.spec\.ts/,
+    timeout: 90000,
     use: {
         actionTimeout: 30000,
         baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5173',
