@@ -82,6 +82,13 @@ const config: NextConfig = {
         permanent: true,
       },
       {
+        // Tenant-Isolated Security merged into the White-Label Execution page.
+        source: '/platform/embedded/get-started/tenant-isolated-security',
+        destination:
+          '/platform/embedded/get-started/white-label-execution#tenant-isolated-security',
+        permanent: true,
+      },
+      {
         source: '/platform/enterprise/collaboration-devops',
         destination: '/platform/enterprise#collaboration-and-devops',
         permanent: true,

@@ -68,7 +68,7 @@ Every request is authenticated as a connected user with a bearer token:
 Authorization: Bearer <connected-user-token>
 ```
 
-The token resolves the calling **connected user**; ByteChef then selects that user's integration instance and connection for the target category and runs the operation against the provider they connected. A caller can never reach another connected user's connection — an `x-instance-id` that does not belong to the resolved connected user is rejected. See [connected users](/platform/embedded/monitor/connected-users) and [tenant-isolated security](/platform/embedded/get-started/tenant-isolated-security).
+The token resolves the calling **connected user**; ByteChef then selects that user's integration instance and connection for the target category and runs the operation against the provider they connected. A caller can never reach another connected user's connection — an `x-instance-id` that does not belong to the resolved connected user is rejected. See [connected users](/platform/embedded/monitor/connected-users) and [tenant-isolated security](/platform/embedded/get-started/white-label-execution#tenant-isolated-security).
 
 ## Request headers
 
