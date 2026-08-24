@@ -182,8 +182,14 @@ public class TaskCoordinator {
             return;
         }
 
-        eventPublisher.publishEvent(
-            new JobStatusApplicationEvent(Validate.notNull(job.getId(), "id"), job.getStatus()));
+        // jobExecutor.execute() completes the job in place - and announces it - when there is nothing to dispatch,
+        // which is the case for a workflow whose every task is disabled. It mutates this very job instance, so a
+        // non-STARTED status here means completion was already published; republishing the pre-execute status would
+        // announce a stale transition after the terminal one.
+        if (job.getStatus() == Job.Status.STARTED) {
+            eventPublisher.publishEvent(
+                new JobStatusApplicationEvent(Validate.notNull(job.getId(), "id"), job.getStatus()));
+        }
     }
 
     /**

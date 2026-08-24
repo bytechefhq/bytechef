@@ -1,0 +1,33 @@
+{
+  "label": "Disabled Node Demo",
+  "outputs": [ {
+    "name": "skippedValue",
+    "value": "${skippedNumber}"
+  }, {
+    "name": "skippedField",
+    "value": "${skippedNumber.someField}"
+  } ],
+  "tasks": [ {
+    "name": "firstNumber",
+    "type": "randomHelper/v1/randomInt",
+    "parameters": {
+      "startInclusive": 1,
+      "endInclusive": 2
+    }
+  }, {
+    "name": "skippedNumber",
+    "type": "randomHelper/v1/randomInt",
+    "disabled": true,
+    "parameters": {
+      "startInclusive": 1,
+      "endInclusive": 2
+    }
+  }, {
+    "name": "lastNumber",
+    "type": "randomHelper/v1/randomInt",
+    "parameters": {
+      "startInclusive": 1,
+      "endInclusive": 2
+    }
+  } ]
+}

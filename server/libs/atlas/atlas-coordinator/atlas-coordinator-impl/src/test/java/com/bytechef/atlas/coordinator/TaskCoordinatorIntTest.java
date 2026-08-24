@@ -26,6 +26,7 @@ import com.bytechef.atlas.configuration.repository.resource.ClassPathResourceWor
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
 import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.repository.jdbc.JdbcContextRepository;
 import com.bytechef.atlas.execution.repository.jdbc.JdbcJobRepository;
@@ -62,6 +63,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import org.junit.jupiter.api.Assertions;
@@ -123,6 +125,74 @@ public class TaskCoordinatorIntTest {
         Job completedJob = executeWorkflow("aGVsbG8y");
 
         Assertions.assertEquals(Job.Status.COMPLETED, completedJob.getStatus());
+    }
+
+    @Test
+    public void testPerformWorkflowWithDisabledTask() {
+        Job completedJob = executeWorkflow("aGVsbG8z");
+
+        Assertions.assertEquals(Job.Status.COMPLETED, completedJob.getStatus());
+
+        List<TaskExecution> taskExecutions = taskExecutionService.getJobTaskExecutions(
+            Objects.requireNonNull(completedJob.getId()));
+
+        Assertions.assertEquals(
+            List.of("firstNumber", "lastNumber"),
+            taskExecutions.stream()
+                .map(TaskExecution::getName)
+                .toList());
+
+        Map<String, ?> outputs = TASK_FILE_STORAGE.readJobOutputs(
+            Objects.requireNonNull(completedJob.getOutputs()));
+
+        Assertions.assertTrue(outputs.containsKey("skippedValue"));
+        Assertions.assertNull(outputs.get("skippedValue"));
+        // A property path off a disabled task name is left as the raw expression string, the same passthrough any
+        // reference to a task that produced no output already gets.
+        Assertions.assertTrue(outputs.containsKey("skippedField"));
+        Assertions.assertEquals("${skippedNumber.someField}", outputs.get("skippedField"));
+    }
+
+    @Test
+    public void testPerformWorkflowWithFirstTaskDisabled() {
+        Job completedJob = executeWorkflow("aGVsbG81");
+
+        Assertions.assertEquals(Job.Status.COMPLETED, completedJob.getStatus());
+
+        List<TaskExecution> taskExecutions = taskExecutionService.getJobTaskExecutions(
+            Objects.requireNonNull(completedJob.getId()));
+
+        Assertions.assertEquals(
+            List.of("secondNumber", "thirdNumber"),
+            taskExecutions.stream()
+                .map(TaskExecution::getName)
+                .toList());
+
+        Map<String, ?> outputs = TASK_FILE_STORAGE.readJobOutputs(
+            Objects.requireNonNull(completedJob.getOutputs()));
+
+        Assertions.assertTrue(outputs.containsKey("skippedValue"));
+        Assertions.assertNull(outputs.get("skippedValue"));
+    }
+
+    @Test
+    public void testPerformWorkflowWithAllTasksDisabled() {
+        Job completedJob = executeWorkflow("aGVsbG80");
+
+        Assertions.assertEquals(Job.Status.COMPLETED, completedJob.getStatus());
+        Assertions.assertEquals(-1, completedJob.getCurrentTask());
+        Assertions.assertNotNull(completedJob.getEndDate());
+
+        List<TaskExecution> taskExecutions = taskExecutionService.getJobTaskExecutions(
+            Objects.requireNonNull(completedJob.getId()));
+
+        Assertions.assertTrue(taskExecutions.isEmpty());
+
+        Map<String, ?> outputs = TASK_FILE_STORAGE.readJobOutputs(
+            Objects.requireNonNull(completedJob.getOutputs()));
+
+        Assertions.assertTrue(outputs.containsKey("skippedValue"));
+        Assertions.assertNull(outputs.get("skippedValue"));
     }
 
     private Job executeWorkflow(String workflowId) {
