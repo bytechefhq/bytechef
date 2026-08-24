@@ -23,7 +23,7 @@ Two ways something here is hidden, and the tables below mark both:
 
 Both are reversible and neither deletes anything.
 
-**45 whole-page** (19 hidden) · **29 partial** pages (6 with a commented-out section)
+**45 whole-page** (20 hidden) · **29 partial** pages (6 with a commented-out section)
 
 ---
 
@@ -62,7 +62,7 @@ Both are reversible and neither deletes anything.
 
 | Page | Path | Edition | Sidebar |
 |---|---|---|---|
-| Automation Code Workflows | [`/platform/embedded/build/automations/automation-code-workflows`](/platform/embedded/build/automations/automation-code-workflows) | CE | visible |
+| Automation Code Workflows | [`/platform/embedded/build/automations/automation-code-workflows`](/platform/embedded/build/automations/automation-code-workflows) | CE | **hidden** |
 | Automation workflows | [`/platform/embedded/build/automations/automation-workflows`](/platform/embedded/build/automations/automation-workflows) | EE | visible |
 | Theming and Localization | [`/platform/embedded/build/theming-and-localization`](/platform/embedded/build/theming-and-localization) | — | visible |
 | Unified API | [`/platform/embedded/build/unified-api`](/platform/embedded/build/unified-api) | — | **hidden** |
