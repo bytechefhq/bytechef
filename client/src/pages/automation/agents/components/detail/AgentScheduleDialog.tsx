@@ -82,6 +82,21 @@ const AgentScheduleDialog = ({onClose, onSubmit, open, pending, schedule}: Agent
         return zones.includes('UTC') ? zones : ['UTC', ...zones];
     }, []);
 
+    // The elements, not just the zone names. Radix renders SelectContent's children even while the select is
+    // closed (into a detached fragment, so each item can register its native option), so without a stable
+    // element identity to bail out on, every keystroke in Name/Cron expression/Prompt re-reconciles ~420
+    // nodes — measured at ~110ms per character. Memoising costs one array and leaves only the one-time mount,
+    // which is what stopped this dialog's specs from timing out under a loaded machine.
+    const timezoneItems = useMemo(
+        () =>
+            timezones.map((zone) => (
+                <SelectItem key={zone} value={zone}>
+                    {zone}
+                </SelectItem>
+            )),
+        [timezones]
+    );
+
     const handleSubmit = () => {
         const cadenceErrors = validateAgentScheduleCadence(cadence);
         // A blank prompt is the one invalid schedule the server accepts: AiAgentWorkflowGenerator bakes the
@@ -163,13 +178,7 @@ const AgentScheduleDialog = ({onClose, onSubmit, open, pending, schedule}: Agent
                                     <SelectValue placeholder="Choose a timezone…" />
                                 </SelectTrigger>
 
-                                <SelectContent>
-                                    {timezones.map((zone) => (
-                                        <SelectItem key={zone} value={zone}>
-                                            {zone}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
+                                <SelectContent>{timezoneItems}</SelectContent>
                             </Select>
                         </div>
                     </div>
