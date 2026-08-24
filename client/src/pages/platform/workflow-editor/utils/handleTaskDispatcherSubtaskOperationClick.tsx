@@ -18,6 +18,7 @@ import saveWorkflowDefinition from './saveWorkflowDefinition';
 import {TASK_DISPATCHER_CONFIG} from './taskDispatcherConfig';
 
 interface HandleTaskDispatcherSubtaskOperationClickProps {
+    clusterRoot?: boolean;
     operation: ClickedOperationType;
     operationDefinition: ActionDefinition;
     placeholderId?: string;
@@ -28,6 +29,7 @@ interface HandleTaskDispatcherSubtaskOperationClickProps {
 }
 
 export default function handleTaskDispatcherSubtaskOperationClick({
+    clusterRoot,
     operation,
     operationDefinition,
     placeholderId,
@@ -59,6 +61,7 @@ export default function handleTaskDispatcherSubtaskOperationClick({
     const workflowNodeName = getFormattedName(operation.componentName!);
 
     const baseNodeData: NodeDataType = {
+        ...(clusterRoot ? {clusterElements: {}} : {}),
         componentName: operation.componentName,
         icon: icon && <InlineSVG className="size-9" loader={<ComponentIcon className="size-9" />} src={icon} />,
         label: componentLabel,
