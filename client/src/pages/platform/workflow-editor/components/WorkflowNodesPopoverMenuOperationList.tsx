@@ -390,6 +390,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
 
                     if (taskDispatcherContext?.taskDispatcherId) {
                         handleTaskDispatcherSubtaskOperationClick({
+                            clusterRoot,
                             operation: clickedOperation,
                             operationDefinition: clickedComponentActionDefinition,
                             queryClient,
@@ -415,6 +416,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
 
                     if (taskDispatcherContext?.taskDispatcherId) {
                         handleTaskDispatcherSubtaskOperationClick({
+                            clusterRoot,
                             operation: clickedOperation,
                             operationDefinition: clickedComponentActionDefinition,
                             placeholderId: sourceNodeId,
@@ -460,6 +462,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
             }
         },
         [
+            clusterRoot,
             componentDefinition,
             loadingOperationName,
             setLatestComponentDefinition,
