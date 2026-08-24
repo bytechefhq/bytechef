@@ -201,6 +201,7 @@ export type NodeDataType = {
     conditionId?: string;
     connectionId?: number;
     description?: string;
+    disabled?: boolean;
     displayConditions?: {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         [key: string]: any;
@@ -210,6 +211,7 @@ export type NodeDataType = {
     forkJoinId?: string;
     forkJoinData?: ForkJoinDataType;
     icon?: ReactNode;
+    isEffectivelyDisabled?: boolean;
     isNestedClusterRoot?: boolean;
     label?: string;
     loopBreakData?: LoopBreakDataType;
@@ -305,6 +307,7 @@ export type WorkflowTaskType = {
     ] & {
         [key: string]: ComponentConnectionType;
     };
+    disabled?: boolean;
     finalize?: Array<WorkflowTaskType>;
     label?: string;
     maxRetries?: number;
