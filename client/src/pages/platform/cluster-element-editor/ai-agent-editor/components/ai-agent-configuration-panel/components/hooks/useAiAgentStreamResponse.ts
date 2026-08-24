@@ -8,11 +8,6 @@ import {useCallback, useMemo} from 'react';
 export const CHAT_OPERATION_NAME = 'chat';
 export const STREAM_CHAT_OPERATION_NAME = 'streamChat';
 
-// A streamed response cannot be validated against a JSON schema, so AiAgentConstants.STREAM_CHAT_PROPERTIES
-// omits the structured output property that AiAgentConstants.CHAT_PROPERTIES declares. Every other property
-// is shared by both actions, which is what makes the switch a toggle rather than a full action select.
-const RESPONSE_PARAMETER_NAME = 'response';
-
 interface UseAiAgentStreamResponseI {
     isStreaming: boolean;
     isStreamingSupported: boolean;
@@ -56,7 +51,7 @@ export default function useAiAgentStreamResponse(): UseAiAgentStreamResponseI {
         (streaming: boolean) => {
             const targetOperationName = streaming ? STREAM_CHAT_OPERATION_NAME : CHAT_OPERATION_NAME;
 
-            if (!rootClusterElementNodeData?.componentName || !updateWorkflowMutation) {
+            if (!rootClusterElementNodeData?.componentName || !updateWorkflowMutation || !rootTask) {
                 return;
             }
 
@@ -65,11 +60,7 @@ export default function useAiAgentStreamResponse(): UseAiAgentStreamResponseI {
                 rootClusterElementNodeData.version ||
                 1;
 
-            const parameters = {...(rootTask?.parameters ?? {})};
-
-            if (streaming) {
-                delete parameters[RESPONSE_PARAMETER_NAME];
-            }
+            const parameters = {...(rootTask.parameters ?? {})};
 
             const updatedRootClusterElementNodeData = {
                 ...rootClusterElementNodeData,
@@ -85,7 +76,7 @@ export default function useAiAgentStreamResponse(): UseAiAgentStreamResponseI {
                 updateWorkflowMutation,
             });
         },
-        [rootClusterElementNodeData, rootTask?.parameters, setRootClusterElementNodeData, updateWorkflowMutation]
+        [rootClusterElementNodeData, rootTask, setRootClusterElementNodeData, updateWorkflowMutation]
     );
 
     return {
