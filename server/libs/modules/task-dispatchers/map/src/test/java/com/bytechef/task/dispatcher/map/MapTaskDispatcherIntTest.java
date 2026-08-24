@@ -121,6 +121,29 @@ public class MapTaskDispatcherIntTest {
         Assertions.assertNull(outputs.get("map"));
     }
 
+    @Test
+    public void testDispatchWithEmptyIterateeCompletesInsteadOfFailing() {
+        assertMapWithNoBodyCompletes("map_v1_empty_iteratee");
+    }
+
+    @Test
+    public void testDispatchWithoutIterateeCompletesInsteadOfFailing() {
+        assertMapWithNoBodyCompletes("map_v1_no_iteratee");
+    }
+
+    private void assertMapWithNoBodyCompletes(String workflowId) {
+        TaskDispatcherJobExecution jobExecution = taskDispatcherJobTestExecutor.execute(
+            EncodingUtils.base64EncodeToString(workflowId),
+            this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories, getTaskHandlerMap());
+
+        Job job = jobExecution.job();
+
+        Assertions.assertEquals(Job.Status.COMPLETED, job.getStatus());
+        Assertions.assertTrue(jobExecution.getExecutionErrors()
+            .isEmpty());
+        Assertions.assertEquals(List.of("done"), testVarTaskHandler.get("afterMap"));
+    }
+
     @SuppressWarnings("PMD")
     private List<TaskCompletionHandlerFactory> getTaskCompletionHandlerFactories(
         ContextService contextService, CounterService counterService, TaskExecutionService taskExecutionService) {

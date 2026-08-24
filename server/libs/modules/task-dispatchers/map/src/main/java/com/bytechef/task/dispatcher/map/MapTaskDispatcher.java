@@ -93,7 +93,7 @@ public class MapTaskDispatcher extends ErrorHandlingTaskDispatcher implements Ta
 
         taskExecution = taskExecutionService.update(taskExecution);
 
-        if (items.isEmpty()) {
+        if (items.isEmpty() || iterateeWorkflowTasks.isEmpty()) {
             taskExecution.setStartDate(Instant.now());
             taskExecution.setEndDate(Instant.now());
             taskExecution.setExecutionTime(0);
