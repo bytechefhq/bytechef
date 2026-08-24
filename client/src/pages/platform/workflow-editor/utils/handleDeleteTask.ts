@@ -1,10 +1,5 @@
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
-import {
-    ON_ERROR_MAIN_BRANCH,
-    ON_ERROR_WIRE_KEY_ERROR_BRANCH,
-    ON_ERROR_WIRE_KEY_MAIN_BRANCH,
-    SPACE,
-} from '@/shared/constants';
+import {ON_ERROR_MAIN_BRANCH, ON_ERROR_WIRE_KEY_ERROR_BRANCH, ON_ERROR_WIRE_KEY_MAIN_BRANCH} from '@/shared/constants';
 import {Workflow, WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {invalidatePreviousWorkflowNodeOutputsForWorkflow} from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {
@@ -21,6 +16,7 @@ import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPa
 import findAndRemoveClusterElement from './findAndRemoveClusterElement';
 import getRecursivelyUpdatedTasks from './getRecursivelyUpdatedTasks';
 import {getTask} from './getTask';
+import stringifyWorkflowDefinition from './stringifyWorkflowDefinition';
 import {TASK_DISPATCHER_CONFIG} from './taskDispatcherConfig';
 import {forEachNestedTaskGroup} from './taskTraversalUtils';
 import {isWorkflowMutating, setWorkflowMutating} from './workflowMutationGuard';
@@ -332,14 +328,10 @@ export default function handleDeleteTask({
     // to prevent stale server data from overwriting the upcoming optimistic update.
     cancelWorkflowQueries();
 
-    const updatedDefinition = JSON.stringify(
-        {
-            ...workflowDefinition,
-            tasks: updatedTasks,
-        },
-        null,
-        SPACE
-    );
+    const updatedDefinition = stringifyWorkflowDefinition({
+        ...workflowDefinition,
+        tasks: updatedTasks,
+    });
 
     const previousWorkflow = workflow;
 
