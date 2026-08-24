@@ -23,7 +23,7 @@ Two ways something here is hidden, and the tables below mark both:
 
 Both are reversible and neither deletes anything.
 
-**44 whole-page** (17 hidden) · **29 partial** pages (6 with a commented-out section)
+**44 whole-page** (19 hidden) · **29 partial** pages (6 with a commented-out section)
 
 ---
 
@@ -100,8 +100,8 @@ Both are reversible and neither deletes anything.
 
 | Page | Path | Edition | Sidebar |
 |---|---|---|---|
-| Deploy a new code based project | [`/openapi/automation-project-code-workflow/deployProject`](/openapi/automation-project-code-workflow/deployProject) | — | visible |
-| Custom Components | [`/openapi/custom-components`](/openapi/custom-components) | — | visible |
+| Deploy a new code based project | [`/openapi/automation-project-code-workflow/deployProject`](/openapi/automation-project-code-workflow/deployProject) | — | **hidden** |
+| Custom Components | [`/openapi/custom-components`](/openapi/custom-components) | — | **hidden** |
 
 ---
 
