@@ -63,7 +63,7 @@ class ArrayPropertyValidator {
         }
 
         if (isTaskTypeArray(nestedPropertyInfos)) {
-            TaskValidator.validateTaskArray(valueJsonNode, propertyPath, errors);
+            TaskValidator.validateTaskArray(valueJsonNode, propertyPath, errors, warnings);
 
             return;
         }
