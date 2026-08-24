@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -268,7 +269,7 @@ class WorkflowNodeOutputFacadeTest {
             WORKFLOW_ID, "action2", ENVIRONMENT_ID))
                 .thenReturn(List.of());
 
-        when(evaluator.evaluate(any(), any()))
+        when(evaluator.evaluate(any(), any(), anyBoolean()))
             .thenAnswer(invocation -> invocation.getArgument(0));
 
         OutputResponse dynamicOutput = new OutputResponse(null, Map.of("dynamic", "result"), null);
@@ -346,7 +347,7 @@ class WorkflowNodeOutputFacadeTest {
             eq(WORKFLOW_ID), anyString(), eq(ENVIRONMENT_ID)))
                 .thenReturn(List.of());
 
-        when(evaluator.evaluate(any(), any()))
+        when(evaluator.evaluate(any(), any(), anyBoolean()))
             .thenAnswer(invocation -> invocation.getArgument(0));
 
         OutputResponse dynamic2Output = new OutputResponse(null, Map.of("d2", "r2"), null);
@@ -436,7 +437,7 @@ class WorkflowNodeOutputFacadeTest {
         when(actionDefinitionService.isDynamicOutputDefined("component", 1, "action1")).thenReturn(true);
         when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(WORKFLOW_ID, ENVIRONMENT_ID))
             .thenReturn(Map.of());
-        when(evaluator.evaluate(any(), any())).thenThrow(new RuntimeException("evaluation error"));
+        when(evaluator.evaluate(any(), any(), anyBoolean())).thenThrow(new RuntimeException("evaluation error"));
 
         try (MockedStatic<WorkflowTrigger> workflowTriggerStatic = mockStatic(WorkflowTrigger.class)) {
             workflowTriggerStatic.when(() -> WorkflowTrigger.of(workflow))
