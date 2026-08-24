@@ -60,9 +60,17 @@ that, then with your ByteChef host — e.g. `https://your-bytechef-host.example.
 
 ## Authentication
 
-Every request carries a bearer token in the `Authorization` header. Which token you can use is not a
-per-endpoint detail — it is the whole reason the reference is split in two, because the two
-credentials identify the connected user in different ways.
+Every request carries a bearer token in the `Authorization` header, and there are two kinds.
+
+An **API Key** authenticates *you*. It is the general ByteChef credential — the Automation and
+Platform APIs take one too — and on the embedded API it acts for whichever connected user the
+`{externalUserId}` path segment names.
+
+A **Signing Key JWT** is specific to the embedded API. It authenticates *one of your end users*
+directly from the browser: your backend signs a short-lived token whose `sub` claim is that user, so
+the operations it reaches carry no user id in their path.
+
+That is what the two sections of this reference correspond to:
 
 | | **Backend** | **Frontend** |
 |---|---|---|
@@ -70,7 +78,7 @@ credentials identify the connected user in different ways.
 | Identifies the user by | the `{externalUserId}` path segment | the token's `sub` claim |
 | Called from | your own server | the browser |
 
-That difference is why the paths differ. An API Key says nothing about which of your end users a call
+It also explains why the paths differ. An API Key says nothing about which of your end users a call
 is for, so those operations carry the id in the path. A JWT already names the user, so its operations
 do not — which in turn means an API Key cannot be used against them: there would be no user to act
 for, and the request is rejected.
