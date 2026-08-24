@@ -40,7 +40,7 @@ import com.bytechef.cli.client.embeddedconfiguration.ApiClient;
   ComponentPropertyGroupModel.JSON_PROPERTY_LABEL,
   ComponentPropertyGroupModel.JSON_PROPERTY_PROPERTIES
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.22.0")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.24.0")
 public class ComponentPropertyGroupModel {
   public static final String JSON_PROPERTY_NAME = "name";
   @jakarta.annotation.Nonnull

@@ -36,7 +36,7 @@ import com.bytechef.cli.client.embeddedconfiguration.ApiClient;
 @JsonPropertyOrder({
   CreateFrontendIntegrationInstanceRequestModel.JSON_PROPERTY_CONNECTION
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.22.0")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.24.0")
 public class CreateFrontendIntegrationInstanceRequestModel {
   public static final String JSON_PROPERTY_CONNECTION = "connection";
   @jakarta.annotation.Nonnull

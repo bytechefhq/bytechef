@@ -38,7 +38,7 @@ import com.bytechef.cli.client.embeddedconfiguration.ApiClient;
   WorkflowModel.JSON_PROPERTY_LABEL,
   WorkflowModel.JSON_PROPERTY_WORKFLOW_UUID
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.22.0")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.24.0")
 public class WorkflowModel {
   public static final String JSON_PROPERTY_DESCRIPTION = "description";
   @jakarta.annotation.Nullable

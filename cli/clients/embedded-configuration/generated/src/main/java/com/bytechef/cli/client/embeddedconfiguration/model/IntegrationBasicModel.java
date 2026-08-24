@@ -45,7 +45,7 @@ import com.bytechef.cli.client.embeddedconfiguration.ApiClient;
   IntegrationBasicModel.JSON_PROPERTY_MULTIPLE_INSTANCES,
   IntegrationBasicModel.JSON_PROPERTY_NAME
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.22.0")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.24.0")
 public class IntegrationBasicModel {
   public static final String JSON_PROPERTY_COMPONENT_NAME = "componentName";
   @jakarta.annotation.Nonnull

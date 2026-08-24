@@ -41,7 +41,7 @@ import com.bytechef.cli.client.embeddedconfiguration.ApiClient;
   OAuth2Model.JSON_PROPERTY_REDIRECT_URI,
   OAuth2Model.JSON_PROPERTY_SCOPES
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.22.0")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.24.0")
 public class OAuth2Model {
   public static final String JSON_PROPERTY_AUTHORIZATION_URL = "authorizationUrl";
   @jakarta.annotation.Nullable

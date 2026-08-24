@@ -18,11 +18,20 @@ import com.bytechef.cli.client.embeddedconfiguration.ApiResponse;
 import com.bytechef.cli.client.embeddedconfiguration.Configuration;
 import com.bytechef.cli.client.embeddedconfiguration.Pair;
 
+import com.bytechef.cli.client.embeddedconfiguration.model.ConnectionInUseErrorModel;
 import com.bytechef.cli.client.embeddedconfiguration.model.ConnectionModel;
+import com.bytechef.cli.client.embeddedconfiguration.model.CreateConnectionRequestModel;
 import com.bytechef.cli.client.embeddedconfiguration.model.EnvironmentModel;
+import com.bytechef.cli.client.embeddedconfiguration.model.ReauthorizeConnectionRequestModel;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.NameValuePair;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 
 import java.io.InputStream;
 import java.io.ByteArrayInputStream;
@@ -46,7 +55,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.22.0")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.24.0")
 public class ConnectionApi {
   /**
    * Utility class for extending HttpRequest.Builder functionality.
@@ -169,6 +178,372 @@ public class ConnectionApi {
       file.deleteOnExit(); // best effort cleanup
     }
     return file;
+  }
+
+  /**
+   * Create a connected user connection
+   * Create a connection for the authenticated connected user.
+   * @param componentName The component name. (required)
+   * @param createConnectionRequestModel  (required)
+   * @param xEnvironment The environment. (optional)
+   * @return Long
+   * @throws ApiException if fails to make API call
+   */
+  public Long createFrontendConnection(@jakarta.annotation.Nonnull String componentName, @jakarta.annotation.Nonnull CreateConnectionRequestModel createConnectionRequestModel, @jakarta.annotation.Nullable EnvironmentModel xEnvironment) throws ApiException {
+    return createFrontendConnection(componentName, createConnectionRequestModel, xEnvironment, null);
+  }
+
+  /**
+   * Create a connected user connection
+   * Create a connection for the authenticated connected user.
+   * @param componentName The component name. (required)
+   * @param createConnectionRequestModel  (required)
+   * @param xEnvironment The environment. (optional)
+   * @param headers Optional headers to include in the request
+   * @return Long
+   * @throws ApiException if fails to make API call
+   */
+  public Long createFrontendConnection(@jakarta.annotation.Nonnull String componentName, @jakarta.annotation.Nonnull CreateConnectionRequestModel createConnectionRequestModel, @jakarta.annotation.Nullable EnvironmentModel xEnvironment, Map<String, String> headers) throws ApiException {
+    ApiResponse<Long> localVarResponse = createFrontendConnectionWithHttpInfo(componentName, createConnectionRequestModel, xEnvironment, headers);
+    return localVarResponse.getData();
+  }
+
+  /**
+   * Create a connected user connection
+   * Create a connection for the authenticated connected user.
+   * @param componentName The component name. (required)
+   * @param createConnectionRequestModel  (required)
+   * @param xEnvironment The environment. (optional)
+   * @return ApiResponse&lt;Long&gt;
+   * @throws ApiException if fails to make API call
+   */
+  public ApiResponse<Long> createFrontendConnectionWithHttpInfo(@jakarta.annotation.Nonnull String componentName, @jakarta.annotation.Nonnull CreateConnectionRequestModel createConnectionRequestModel, @jakarta.annotation.Nullable EnvironmentModel xEnvironment) throws ApiException {
+    return createFrontendConnectionWithHttpInfo(componentName, createConnectionRequestModel, xEnvironment, null);
+  }
+
+  /**
+   * Create a connected user connection
+   * Create a connection for the authenticated connected user.
+   * @param componentName The component name. (required)
+   * @param createConnectionRequestModel  (required)
+   * @param xEnvironment The environment. (optional)
+   * @param headers Optional headers to include in the request
+   * @return ApiResponse&lt;Long&gt;
+   * @throws ApiException if fails to make API call
+   */
+  public ApiResponse<Long> createFrontendConnectionWithHttpInfo(@jakarta.annotation.Nonnull String componentName, @jakarta.annotation.Nonnull CreateConnectionRequestModel createConnectionRequestModel, @jakarta.annotation.Nullable EnvironmentModel xEnvironment, Map<String, String> headers) throws ApiException {
+    HttpRequest.Builder localVarRequestBuilder = createFrontendConnectionRequestBuilder(componentName, createConnectionRequestModel, xEnvironment, headers);
+    try {
+      HttpResponse<InputStream> localVarResponse = memberVarHttpClient.send(
+          localVarRequestBuilder.build(),
+          HttpResponse.BodyHandlers.ofInputStream());
+      if (memberVarResponseInterceptor != null) {
+        memberVarResponseInterceptor.accept(localVarResponse);
+      }
+      InputStream localVarResponseBody = null;
+      try {
+        if (localVarResponse.statusCode()/ 100 != 2) {
+          throw getApiException("createFrontendConnection", localVarResponse);
+        }
+        localVarResponseBody = ApiClient.getResponseBody(localVarResponse);
+        if (localVarResponseBody == null) {
+          return new ApiResponse<Long>(
+              localVarResponse.statusCode(),
+              localVarResponse.headers().map(),
+              null
+          );
+        }
+
+        
+        
+        String responseBody = new String(localVarResponseBody.readAllBytes());
+        Long responseValue = responseBody.isBlank()? null: memberVarObjectMapper.readValue(responseBody, new TypeReference<Long>() {});
+        
+
+        return new ApiResponse<Long>(
+            localVarResponse.statusCode(),
+            localVarResponse.headers().map(),
+            responseValue
+        );
+      } finally {
+        if (localVarResponseBody != null) {
+          localVarResponseBody.close();
+        }
+      }
+    } catch (IOException e) {
+      throw new ApiException(e);
+    }
+    catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new ApiException(e);
+    }
+  }
+
+  private HttpRequest.Builder createFrontendConnectionRequestBuilder(@jakarta.annotation.Nonnull String componentName, @jakarta.annotation.Nonnull CreateConnectionRequestModel createConnectionRequestModel, @jakarta.annotation.Nullable EnvironmentModel xEnvironment, Map<String, String> headers) throws ApiException {
+    // verify the required parameter 'componentName' is set
+    if (componentName == null) {
+      throw new ApiException(400, "Missing the required parameter 'componentName' when calling createFrontendConnection");
+    }
+    // verify the required parameter 'createConnectionRequestModel' is set
+    if (createConnectionRequestModel == null) {
+      throw new ApiException(400, "Missing the required parameter 'createConnectionRequestModel' when calling createFrontendConnection");
+    }
+
+    HttpRequest.Builder localVarRequestBuilder = HttpRequest.newBuilder();
+
+    String localVarPath = "/components/{componentName}/connections"
+        .replace("{componentName}", ApiClient.urlEncode(componentName.toString()));
+
+    localVarRequestBuilder.uri(URI.create(memberVarBaseUri + localVarPath));
+
+    if (xEnvironment != null) {
+      localVarRequestBuilder.header("X-Environment", xEnvironment.toString());
+    }
+    localVarRequestBuilder.header("Content-Type", "application/json");
+    localVarRequestBuilder.header("Accept", "application/json");
+
+    try {
+      byte[] localVarPostBody = memberVarObjectMapper.writeValueAsBytes(createConnectionRequestModel);
+      localVarRequestBuilder.method("POST", HttpRequest.BodyPublishers.ofByteArray(localVarPostBody));
+    } catch (IOException e) {
+      throw new ApiException(e);
+    }
+    if (memberVarReadTimeout != null) {
+      localVarRequestBuilder.timeout(memberVarReadTimeout);
+    }
+    // Add custom headers if provided
+    localVarRequestBuilder = HttpRequestBuilderExtensions.withAdditionalHeaders(localVarRequestBuilder, headers);
+    if (memberVarInterceptor != null) {
+      memberVarInterceptor.accept(localVarRequestBuilder);
+    }
+    return localVarRequestBuilder;
+  }
+
+  /**
+   * Delete a connection
+   * Delete a connection owned by the authenticated connected user.
+   * @param id The id of a connection. (required)
+   * @param xEnvironment The environment. (optional)
+   * @throws ApiException if fails to make API call
+   */
+  public void deleteFrontendConnection(@jakarta.annotation.Nonnull Long id, @jakarta.annotation.Nullable EnvironmentModel xEnvironment) throws ApiException {
+    deleteFrontendConnection(id, xEnvironment, null);
+  }
+
+  /**
+   * Delete a connection
+   * Delete a connection owned by the authenticated connected user.
+   * @param id The id of a connection. (required)
+   * @param xEnvironment The environment. (optional)
+   * @param headers Optional headers to include in the request
+   * @throws ApiException if fails to make API call
+   */
+  public void deleteFrontendConnection(@jakarta.annotation.Nonnull Long id, @jakarta.annotation.Nullable EnvironmentModel xEnvironment, Map<String, String> headers) throws ApiException {
+    deleteFrontendConnectionWithHttpInfo(id, xEnvironment, headers);
+  }
+
+  /**
+   * Delete a connection
+   * Delete a connection owned by the authenticated connected user.
+   * @param id The id of a connection. (required)
+   * @param xEnvironment The environment. (optional)
+   * @return ApiResponse&lt;Void&gt;
+   * @throws ApiException if fails to make API call
+   */
+  public ApiResponse<Void> deleteFrontendConnectionWithHttpInfo(@jakarta.annotation.Nonnull Long id, @jakarta.annotation.Nullable EnvironmentModel xEnvironment) throws ApiException {
+    return deleteFrontendConnectionWithHttpInfo(id, xEnvironment, null);
+  }
+
+  /**
+   * Delete a connection
+   * Delete a connection owned by the authenticated connected user.
+   * @param id The id of a connection. (required)
+   * @param xEnvironment The environment. (optional)
+   * @param headers Optional headers to include in the request
+   * @return ApiResponse&lt;Void&gt;
+   * @throws ApiException if fails to make API call
+   */
+  public ApiResponse<Void> deleteFrontendConnectionWithHttpInfo(@jakarta.annotation.Nonnull Long id, @jakarta.annotation.Nullable EnvironmentModel xEnvironment, Map<String, String> headers) throws ApiException {
+    HttpRequest.Builder localVarRequestBuilder = deleteFrontendConnectionRequestBuilder(id, xEnvironment, headers);
+    try {
+      HttpResponse<InputStream> localVarResponse = memberVarHttpClient.send(
+          localVarRequestBuilder.build(),
+          HttpResponse.BodyHandlers.ofInputStream());
+      if (memberVarResponseInterceptor != null) {
+        memberVarResponseInterceptor.accept(localVarResponse);
+      }
+      InputStream localVarResponseBody = null;
+      try {
+        if (localVarResponse.statusCode()/ 100 != 2) {
+          throw getApiException("deleteFrontendConnection", localVarResponse);
+        }
+        localVarResponseBody = ApiClient.getResponseBody(localVarResponse);
+        if (localVarResponseBody != null) {
+          localVarResponseBody.readAllBytes();
+        }
+        return new ApiResponse<>(
+            localVarResponse.statusCode(),
+            localVarResponse.headers().map(),
+            null
+        );
+      } finally {
+        if (localVarResponseBody != null) {
+          localVarResponseBody.close();
+        }
+      }
+    } catch (IOException e) {
+      throw new ApiException(e);
+    }
+    catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new ApiException(e);
+    }
+  }
+
+  private HttpRequest.Builder deleteFrontendConnectionRequestBuilder(@jakarta.annotation.Nonnull Long id, @jakarta.annotation.Nullable EnvironmentModel xEnvironment, Map<String, String> headers) throws ApiException {
+    // verify the required parameter 'id' is set
+    if (id == null) {
+      throw new ApiException(400, "Missing the required parameter 'id' when calling deleteFrontendConnection");
+    }
+
+    HttpRequest.Builder localVarRequestBuilder = HttpRequest.newBuilder();
+
+    String localVarPath = "/connections/{id}"
+        .replace("{id}", ApiClient.urlEncode(id.toString()));
+
+    localVarRequestBuilder.uri(URI.create(memberVarBaseUri + localVarPath));
+
+    if (xEnvironment != null) {
+      localVarRequestBuilder.header("X-Environment", xEnvironment.toString());
+    }
+    localVarRequestBuilder.header("Accept", "application/json");
+
+    localVarRequestBuilder.method("DELETE", HttpRequest.BodyPublishers.noBody());
+    if (memberVarReadTimeout != null) {
+      localVarRequestBuilder.timeout(memberVarReadTimeout);
+    }
+    // Add custom headers if provided
+    localVarRequestBuilder = HttpRequestBuilderExtensions.withAdditionalHeaders(localVarRequestBuilder, headers);
+    if (memberVarInterceptor != null) {
+      memberVarInterceptor.accept(localVarRequestBuilder);
+    }
+    return localVarRequestBuilder;
+  }
+
+  /**
+   * Get all connected user&#39;s connections
+   * Get every connection owned by the authenticated connected user.
+   * @param xEnvironment The environment. (optional)
+   * @return List&lt;ConnectionModel&gt;
+   * @throws ApiException if fails to make API call
+   */
+  public List<ConnectionModel> getAllFrontendConnections(@jakarta.annotation.Nullable EnvironmentModel xEnvironment) throws ApiException {
+    return getAllFrontendConnections(xEnvironment, null);
+  }
+
+  /**
+   * Get all connected user&#39;s connections
+   * Get every connection owned by the authenticated connected user.
+   * @param xEnvironment The environment. (optional)
+   * @param headers Optional headers to include in the request
+   * @return List&lt;ConnectionModel&gt;
+   * @throws ApiException if fails to make API call
+   */
+  public List<ConnectionModel> getAllFrontendConnections(@jakarta.annotation.Nullable EnvironmentModel xEnvironment, Map<String, String> headers) throws ApiException {
+    ApiResponse<List<ConnectionModel>> localVarResponse = getAllFrontendConnectionsWithHttpInfo(xEnvironment, headers);
+    return localVarResponse.getData();
+  }
+
+  /**
+   * Get all connected user&#39;s connections
+   * Get every connection owned by the authenticated connected user.
+   * @param xEnvironment The environment. (optional)
+   * @return ApiResponse&lt;List&lt;ConnectionModel&gt;&gt;
+   * @throws ApiException if fails to make API call
+   */
+  public ApiResponse<List<ConnectionModel>> getAllFrontendConnectionsWithHttpInfo(@jakarta.annotation.Nullable EnvironmentModel xEnvironment) throws ApiException {
+    return getAllFrontendConnectionsWithHttpInfo(xEnvironment, null);
+  }
+
+  /**
+   * Get all connected user&#39;s connections
+   * Get every connection owned by the authenticated connected user.
+   * @param xEnvironment The environment. (optional)
+   * @param headers Optional headers to include in the request
+   * @return ApiResponse&lt;List&lt;ConnectionModel&gt;&gt;
+   * @throws ApiException if fails to make API call
+   */
+  public ApiResponse<List<ConnectionModel>> getAllFrontendConnectionsWithHttpInfo(@jakarta.annotation.Nullable EnvironmentModel xEnvironment, Map<String, String> headers) throws ApiException {
+    HttpRequest.Builder localVarRequestBuilder = getAllFrontendConnectionsRequestBuilder(xEnvironment, headers);
+    try {
+      HttpResponse<InputStream> localVarResponse = memberVarHttpClient.send(
+          localVarRequestBuilder.build(),
+          HttpResponse.BodyHandlers.ofInputStream());
+      if (memberVarResponseInterceptor != null) {
+        memberVarResponseInterceptor.accept(localVarResponse);
+      }
+      InputStream localVarResponseBody = null;
+      try {
+        if (localVarResponse.statusCode()/ 100 != 2) {
+          throw getApiException("getAllFrontendConnections", localVarResponse);
+        }
+        localVarResponseBody = ApiClient.getResponseBody(localVarResponse);
+        if (localVarResponseBody == null) {
+          return new ApiResponse<List<ConnectionModel>>(
+              localVarResponse.statusCode(),
+              localVarResponse.headers().map(),
+              null
+          );
+        }
+
+        
+        
+        String responseBody = new String(localVarResponseBody.readAllBytes());
+        List<ConnectionModel> responseValue = responseBody.isBlank()? null: memberVarObjectMapper.readValue(responseBody, new TypeReference<List<ConnectionModel>>() {});
+        
+
+        return new ApiResponse<List<ConnectionModel>>(
+            localVarResponse.statusCode(),
+            localVarResponse.headers().map(),
+            responseValue
+        );
+      } finally {
+        if (localVarResponseBody != null) {
+          localVarResponseBody.close();
+        }
+      }
+    } catch (IOException e) {
+      throw new ApiException(e);
+    }
+    catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new ApiException(e);
+    }
+  }
+
+  private HttpRequest.Builder getAllFrontendConnectionsRequestBuilder(@jakarta.annotation.Nullable EnvironmentModel xEnvironment, Map<String, String> headers) throws ApiException {
+
+    HttpRequest.Builder localVarRequestBuilder = HttpRequest.newBuilder();
+
+    String localVarPath = "/connections";
+
+    localVarRequestBuilder.uri(URI.create(memberVarBaseUri + localVarPath));
+
+    if (xEnvironment != null) {
+      localVarRequestBuilder.header("X-Environment", xEnvironment.toString());
+    }
+    localVarRequestBuilder.header("Accept", "application/json");
+
+    localVarRequestBuilder.method("GET", HttpRequest.BodyPublishers.noBody());
+    if (memberVarReadTimeout != null) {
+      localVarRequestBuilder.timeout(memberVarReadTimeout);
+    }
+    // Add custom headers if provided
+    localVarRequestBuilder = HttpRequestBuilderExtensions.withAdditionalHeaders(localVarRequestBuilder, headers);
+    if (memberVarInterceptor != null) {
+      memberVarInterceptor.accept(localVarRequestBuilder);
+    }
+    return localVarRequestBuilder;
   }
 
   /**
@@ -457,6 +832,131 @@ public class ConnectionApi {
     localVarRequestBuilder.header("Accept", "application/json");
 
     localVarRequestBuilder.method("GET", HttpRequest.BodyPublishers.noBody());
+    if (memberVarReadTimeout != null) {
+      localVarRequestBuilder.timeout(memberVarReadTimeout);
+    }
+    // Add custom headers if provided
+    localVarRequestBuilder = HttpRequestBuilderExtensions.withAdditionalHeaders(localVarRequestBuilder, headers);
+    if (memberVarInterceptor != null) {
+      memberVarInterceptor.accept(localVarRequestBuilder);
+    }
+    return localVarRequestBuilder;
+  }
+
+  /**
+   * Reauthorize a connection
+   * Replace the credentials of a connection owned by the authenticated connected user, keeping its id.
+   * @param id The id of a connection. (required)
+   * @param reauthorizeConnectionRequestModel  (required)
+   * @param xEnvironment The environment. (optional)
+   * @throws ApiException if fails to make API call
+   */
+  public void reauthorizeFrontendConnection(@jakarta.annotation.Nonnull Long id, @jakarta.annotation.Nonnull ReauthorizeConnectionRequestModel reauthorizeConnectionRequestModel, @jakarta.annotation.Nullable EnvironmentModel xEnvironment) throws ApiException {
+    reauthorizeFrontendConnection(id, reauthorizeConnectionRequestModel, xEnvironment, null);
+  }
+
+  /**
+   * Reauthorize a connection
+   * Replace the credentials of a connection owned by the authenticated connected user, keeping its id.
+   * @param id The id of a connection. (required)
+   * @param reauthorizeConnectionRequestModel  (required)
+   * @param xEnvironment The environment. (optional)
+   * @param headers Optional headers to include in the request
+   * @throws ApiException if fails to make API call
+   */
+  public void reauthorizeFrontendConnection(@jakarta.annotation.Nonnull Long id, @jakarta.annotation.Nonnull ReauthorizeConnectionRequestModel reauthorizeConnectionRequestModel, @jakarta.annotation.Nullable EnvironmentModel xEnvironment, Map<String, String> headers) throws ApiException {
+    reauthorizeFrontendConnectionWithHttpInfo(id, reauthorizeConnectionRequestModel, xEnvironment, headers);
+  }
+
+  /**
+   * Reauthorize a connection
+   * Replace the credentials of a connection owned by the authenticated connected user, keeping its id.
+   * @param id The id of a connection. (required)
+   * @param reauthorizeConnectionRequestModel  (required)
+   * @param xEnvironment The environment. (optional)
+   * @return ApiResponse&lt;Void&gt;
+   * @throws ApiException if fails to make API call
+   */
+  public ApiResponse<Void> reauthorizeFrontendConnectionWithHttpInfo(@jakarta.annotation.Nonnull Long id, @jakarta.annotation.Nonnull ReauthorizeConnectionRequestModel reauthorizeConnectionRequestModel, @jakarta.annotation.Nullable EnvironmentModel xEnvironment) throws ApiException {
+    return reauthorizeFrontendConnectionWithHttpInfo(id, reauthorizeConnectionRequestModel, xEnvironment, null);
+  }
+
+  /**
+   * Reauthorize a connection
+   * Replace the credentials of a connection owned by the authenticated connected user, keeping its id.
+   * @param id The id of a connection. (required)
+   * @param reauthorizeConnectionRequestModel  (required)
+   * @param xEnvironment The environment. (optional)
+   * @param headers Optional headers to include in the request
+   * @return ApiResponse&lt;Void&gt;
+   * @throws ApiException if fails to make API call
+   */
+  public ApiResponse<Void> reauthorizeFrontendConnectionWithHttpInfo(@jakarta.annotation.Nonnull Long id, @jakarta.annotation.Nonnull ReauthorizeConnectionRequestModel reauthorizeConnectionRequestModel, @jakarta.annotation.Nullable EnvironmentModel xEnvironment, Map<String, String> headers) throws ApiException {
+    HttpRequest.Builder localVarRequestBuilder = reauthorizeFrontendConnectionRequestBuilder(id, reauthorizeConnectionRequestModel, xEnvironment, headers);
+    try {
+      HttpResponse<InputStream> localVarResponse = memberVarHttpClient.send(
+          localVarRequestBuilder.build(),
+          HttpResponse.BodyHandlers.ofInputStream());
+      if (memberVarResponseInterceptor != null) {
+        memberVarResponseInterceptor.accept(localVarResponse);
+      }
+      InputStream localVarResponseBody = null;
+      try {
+        if (localVarResponse.statusCode()/ 100 != 2) {
+          throw getApiException("reauthorizeFrontendConnection", localVarResponse);
+        }
+        localVarResponseBody = ApiClient.getResponseBody(localVarResponse);
+        if (localVarResponseBody != null) {
+          localVarResponseBody.readAllBytes();
+        }
+        return new ApiResponse<>(
+            localVarResponse.statusCode(),
+            localVarResponse.headers().map(),
+            null
+        );
+      } finally {
+        if (localVarResponseBody != null) {
+          localVarResponseBody.close();
+        }
+      }
+    } catch (IOException e) {
+      throw new ApiException(e);
+    }
+    catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new ApiException(e);
+    }
+  }
+
+  private HttpRequest.Builder reauthorizeFrontendConnectionRequestBuilder(@jakarta.annotation.Nonnull Long id, @jakarta.annotation.Nonnull ReauthorizeConnectionRequestModel reauthorizeConnectionRequestModel, @jakarta.annotation.Nullable EnvironmentModel xEnvironment, Map<String, String> headers) throws ApiException {
+    // verify the required parameter 'id' is set
+    if (id == null) {
+      throw new ApiException(400, "Missing the required parameter 'id' when calling reauthorizeFrontendConnection");
+    }
+    // verify the required parameter 'reauthorizeConnectionRequestModel' is set
+    if (reauthorizeConnectionRequestModel == null) {
+      throw new ApiException(400, "Missing the required parameter 'reauthorizeConnectionRequestModel' when calling reauthorizeFrontendConnection");
+    }
+
+    HttpRequest.Builder localVarRequestBuilder = HttpRequest.newBuilder();
+
+    String localVarPath = "/connections/{id}/reauthorize"
+        .replace("{id}", ApiClient.urlEncode(id.toString()));
+
+    localVarRequestBuilder.uri(URI.create(memberVarBaseUri + localVarPath));
+
+    if (xEnvironment != null) {
+      localVarRequestBuilder.header("X-Environment", xEnvironment.toString());
+    }
+    localVarRequestBuilder.header("Content-Type", "application/json");
+    localVarRequestBuilder.header("Accept", "application/json");
+
+    try {
+      byte[] localVarPostBody = memberVarObjectMapper.writeValueAsBytes(reauthorizeConnectionRequestModel);
+      localVarRequestBuilder.method("POST", HttpRequest.BodyPublishers.ofByteArray(localVarPostBody));
+    } catch (IOException e) {
+      throw new ApiException(e);
+    }
     if (memberVarReadTimeout != null) {
       localVarRequestBuilder.timeout(memberVarReadTimeout);
     }

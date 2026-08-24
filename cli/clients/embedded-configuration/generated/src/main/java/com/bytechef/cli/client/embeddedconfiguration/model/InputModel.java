@@ -43,7 +43,7 @@ import com.bytechef.cli.client.embeddedconfiguration.ApiClient;
   InputModel.JSON_PROPERTY_TYPE,
   InputModel.JSON_PROPERTY_COMPONENT_REFERENCE
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.22.0")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.24.0")
 public class InputModel {
   public static final String JSON_PROPERTY_INTERNAL_ONLY = "internalOnly";
   @jakarta.annotation.Nullable

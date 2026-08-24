@@ -36,7 +36,7 @@ import com.bytechef.cli.client.embeddedconfiguration.ApiClient;
   OptionModel.JSON_PROPERTY_LABEL,
   OptionModel.JSON_PROPERTY_VALUE
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.22.0")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.24.0")
 public class OptionModel {
   public static final String JSON_PROPERTY_LABEL = "label";
   @jakarta.annotation.Nonnull

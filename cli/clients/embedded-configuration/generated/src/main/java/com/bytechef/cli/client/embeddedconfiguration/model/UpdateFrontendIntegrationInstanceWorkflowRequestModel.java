@@ -37,7 +37,7 @@ import com.bytechef.cli.client.embeddedconfiguration.ApiClient;
 @JsonPropertyOrder({
   UpdateFrontendIntegrationInstanceWorkflowRequestModel.JSON_PROPERTY_INPUTS
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.22.0")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.24.0")
 public class UpdateFrontendIntegrationInstanceWorkflowRequestModel {
   public static final String JSON_PROPERTY_INPUTS = "inputs";
   @jakarta.annotation.Nullable

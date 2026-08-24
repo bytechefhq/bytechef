@@ -25,26 +25,21 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("Input")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-08-18T00:19:21.376010+02:00[Europe/Zagreb]", comments = "Generator version: 7.24.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-08-24T21:16:52.073543+02:00[Europe/Zagreb]", comments = "Generator version: 7.24.0")
 public class InputModel {
 
-  @JsonInclude(JsonInclude.Include.NON_NULL)
   private Boolean internalOnly = false;
 
-  @JsonInclude(JsonInclude.Include.NON_NULL)
   private @Nullable String label;
 
   private String name;
 
-  @JsonInclude(JsonInclude.Include.NON_NULL)
   private @Nullable String objectName;
 
-  @JsonInclude(JsonInclude.Include.NON_NULL)
   private Boolean required = false;
 
   private InputTypeModel type = InputTypeModel.STRING;
 
-  @JsonInclude(JsonInclude.Include.NON_NULL)
   private @Nullable ComponentInputReferenceModel componentReference;
 
   public InputModel() {

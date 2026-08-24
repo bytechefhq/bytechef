@@ -35,7 +35,7 @@ import com.bytechef.cli.client.embeddedconfiguration.ApiClient;
 @JsonPropertyOrder({
   UpdateFrontendWorkflowConfigurationConnectionRequestModel.JSON_PROPERTY_CONNECTION_ID
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.22.0")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.24.0")
 public class UpdateFrontendWorkflowConfigurationConnectionRequestModel {
   public static final String JSON_PROPERTY_CONNECTION_ID = "connectionId";
   @jakarta.annotation.Nullable

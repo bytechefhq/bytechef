@@ -39,9 +39,10 @@ import com.bytechef.cli.client.embeddedconfiguration.ApiClient;
   AutomationWorkflowProjectModel.JSON_PROPERTY_ID,
   AutomationWorkflowProjectModel.JSON_PROPERTY_NAME,
   AutomationWorkflowProjectModel.JSON_PROPERTY_DESCRIPTION,
-  AutomationWorkflowProjectModel.JSON_PROPERTY_WORKFLOW_TEMPLATES
+  AutomationWorkflowProjectModel.JSON_PROPERTY_WORKFLOW_TEMPLATES,
+  AutomationWorkflowProjectModel.JSON_PROPERTY_KIND
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.22.0")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.24.0")
 public class AutomationWorkflowProjectModel {
   public static final String JSON_PROPERTY_ID = "id";
   @jakarta.annotation.Nullable
@@ -58,6 +59,45 @@ public class AutomationWorkflowProjectModel {
   public static final String JSON_PROPERTY_WORKFLOW_TEMPLATES = "workflowTemplates";
   @jakarta.annotation.Nullable
   private List<AutomationWorkflowProjectWorkflowTemplateModel> workflowTemplates = new ArrayList<>();
+
+  /**
+   * Whether copying this project&#39;s templates creates a per-user copy or a shared reference.
+   */
+  public enum KindEnum {
+    COPY(String.valueOf("COPY")),
+    
+    REFERENCE(String.valueOf("REFERENCE"));
+
+    private String value;
+
+    KindEnum(String value) {
+      this.value = value;
+    }
+
+    @JsonValue
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    @JsonCreator
+    public static KindEnum fromValue(String value) {
+      for (KindEnum b : KindEnum.values()) {
+        if (b.value.equals(value)) {
+          return b;
+        }
+      }
+      throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+  }
+
+  public static final String JSON_PROPERTY_KIND = "kind";
+  @jakarta.annotation.Nullable
+  private KindEnum kind;
 
   public AutomationWorkflowProjectModel() { 
   }
@@ -166,6 +206,30 @@ public class AutomationWorkflowProjectModel {
   }
 
 
+  public AutomationWorkflowProjectModel kind(@jakarta.annotation.Nullable KindEnum kind) {
+    this.kind = kind;
+    return this;
+  }
+
+  /**
+   * Whether copying this project&#39;s templates creates a per-user copy or a shared reference.
+   * @return kind
+   */
+  @jakarta.annotation.Nullable
+  @JsonProperty(value = JSON_PROPERTY_KIND, required = false)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  public KindEnum getKind() {
+    return kind;
+  }
+
+
+  @JsonProperty(value = JSON_PROPERTY_KIND, required = false)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  public void setKind(@jakarta.annotation.Nullable KindEnum kind) {
+    this.kind = kind;
+  }
+
+
   /**
    * Return true if this AutomationWorkflowProject object is equal to o.
    */
@@ -181,12 +245,13 @@ public class AutomationWorkflowProjectModel {
     return Objects.equals(this.id, automationWorkflowProject.id) &&
         Objects.equals(this.name, automationWorkflowProject.name) &&
         Objects.equals(this.description, automationWorkflowProject.description) &&
-        Objects.equals(this.workflowTemplates, automationWorkflowProject.workflowTemplates);
+        Objects.equals(this.workflowTemplates, automationWorkflowProject.workflowTemplates) &&
+        Objects.equals(this.kind, automationWorkflowProject.kind);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, description, workflowTemplates);
+    return Objects.hash(id, name, description, workflowTemplates, kind);
   }
 
   @Override
@@ -197,6 +262,7 @@ public class AutomationWorkflowProjectModel {
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    workflowTemplates: ").append(toIndentedString(workflowTemplates)).append("\n");
+    sb.append("    kind: ").append(toIndentedString(kind)).append("\n");
     sb.append("}");
     return sb.toString();
   }
@@ -264,6 +330,11 @@ public class AutomationWorkflowProjectModel {
           "".equals(suffix) ? "" : String.format(java.util.Locale.ROOT, "%s%d%s", containerPrefix, i, containerSuffix))));
         }
       }
+    }
+
+    // add `kind` to the URL query string
+    if (getKind() != null) {
+      joiner.add(String.format(java.util.Locale.ROOT, "%skind%s=%s", prefix, suffix, ApiClient.urlEncode(ApiClient.valueToString(getKind()))));
     }
 
     return joiner.toString();

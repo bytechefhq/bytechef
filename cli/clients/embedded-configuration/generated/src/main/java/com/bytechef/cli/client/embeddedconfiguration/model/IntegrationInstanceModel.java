@@ -45,7 +45,7 @@ import com.bytechef.cli.client.embeddedconfiguration.ApiClient;
   IntegrationInstanceModel.JSON_PROPERTY_MCP_WORKFLOWS,
   IntegrationInstanceModel.JSON_PROPERTY_WORKFLOWS
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.22.0")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.24.0")
 public class IntegrationInstanceModel {
   public static final String JSON_PROPERTY_ID = "id";
   @jakarta.annotation.Nullable

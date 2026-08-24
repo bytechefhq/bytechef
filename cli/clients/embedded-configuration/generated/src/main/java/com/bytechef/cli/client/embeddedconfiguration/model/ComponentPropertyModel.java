@@ -46,7 +46,7 @@ import com.bytechef.cli.client.embeddedconfiguration.ApiClient;
   ComponentPropertyModel.JSON_PROPERTY_DYNAMIC_OPTIONS,
   ComponentPropertyModel.JSON_PROPERTY_OPTIONS_LOOKUP_DEPENDS_ON
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.22.0")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.24.0")
 public class ComponentPropertyModel {
   public static final String JSON_PROPERTY_NAME = "name";
   @jakarta.annotation.Nonnull

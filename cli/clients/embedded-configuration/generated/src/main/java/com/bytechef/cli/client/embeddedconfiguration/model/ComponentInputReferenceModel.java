@@ -39,7 +39,7 @@ import com.bytechef.cli.client.embeddedconfiguration.ApiClient;
   ComponentInputReferenceModel.JSON_PROPERTY_GROUP_NAME,
   ComponentInputReferenceModel.JSON_PROPERTY_GROUP
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.22.0")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.24.0")
 public class ComponentInputReferenceModel {
   public static final String JSON_PROPERTY_COMPONENT_NAME = "componentName";
   @jakarta.annotation.Nonnull

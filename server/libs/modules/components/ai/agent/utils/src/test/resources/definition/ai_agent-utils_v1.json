@@ -1428,7 +1428,7 @@
       "required": false,
       "type": "STRING"
     } ],
-    "title": "Approval Gate",
+    "title": "Approval Gate Tool",
     "type": {
       "name": "TOOLS",
       "key": "tools",

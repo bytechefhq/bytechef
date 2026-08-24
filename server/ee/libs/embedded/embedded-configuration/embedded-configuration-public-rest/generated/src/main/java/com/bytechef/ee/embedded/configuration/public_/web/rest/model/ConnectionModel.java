@@ -27,26 +27,21 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Connection", description = "Contains all required information to open a connection to a service defined by componentName parameter")
 @JsonTypeName("Connection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-08-18T00:19:21.376010+02:00[Europe/Zagreb]", comments = "Generator version: 7.24.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-08-24T21:16:52.073543+02:00[Europe/Zagreb]", comments = "Generator version: 7.24.0")
 public class ConnectionModel {
 
   private Long id;
 
   private String name;
 
-  @JsonInclude(JsonInclude.Include.NON_NULL)
   private @Nullable EnvironmentModel environment;
 
-  @JsonInclude(JsonInclude.Include.NON_NULL)
   private @Nullable String componentName;
 
-  @JsonInclude(JsonInclude.Include.NON_NULL)
   private @Nullable Integer connectionVersion;
 
-  @JsonInclude(JsonInclude.Include.NON_NULL)
   private @Nullable String authorizationType;
 
-  @JsonInclude(JsonInclude.Include.NON_NULL)
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private @Nullable OffsetDateTime createdDate;
 

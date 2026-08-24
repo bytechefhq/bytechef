@@ -3,6 +3,7 @@ package com.bytechef.ee.embedded.webhook.public_.web.rest.model;
 import java.net.URI;
 import java.util.Objects;
 import com.bytechef.ee.embedded.webhook.public_.web.rest.model.ErrorsInnerModel;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -25,10 +26,9 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("executeWorkflows_400_response")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-01T09:51:24.111920+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-08-20T20:47:01.884417+02:00[Europe/Zagreb]", comments = "Generator version: 7.24.0")
 public class ExecuteWorkflows400ResponseModel {
 
-  @Valid
   private List<@Valid ErrorsInnerModel> errors = new ArrayList<>();
 
   public ExecuteWorkflows400ResponseModel errors(List<@Valid ErrorsInnerModel> errors) {

@@ -19,13 +19,16 @@ import java.util.StringJoiner;
 import java.util.Objects;
 import java.util.Map;
 import java.util.HashMap;
+import com.bytechef.cli.client.embeddedconfiguration.model.AutomationWorkflowProjectComponentModel;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 
@@ -41,9 +44,14 @@ import com.bytechef.cli.client.embeddedconfiguration.ApiClient;
   ConnectedUserProjectWorkflowModel.JSON_PROPERTY_ENABLED,
   ConnectedUserProjectWorkflowModel.JSON_PROPERTY_LABEL,
   ConnectedUserProjectWorkflowModel.JSON_PROPERTY_WORKFLOW_UUID,
-  ConnectedUserProjectWorkflowModel.JSON_PROPERTY_WORKFLOW_VERSION
+  ConnectedUserProjectWorkflowModel.JSON_PROPERTY_WORKFLOW_VERSION,
+  ConnectedUserProjectWorkflowModel.JSON_PROPERTY_KIND,
+  ConnectedUserProjectWorkflowModel.JSON_PROPERTY_CATALOG_WORKFLOW_UUID,
+  ConnectedUserProjectWorkflowModel.JSON_PROPERTY_COPIED_FROM_WORKFLOW_UUID,
+  ConnectedUserProjectWorkflowModel.JSON_PROPERTY_DANGLING,
+  ConnectedUserProjectWorkflowModel.JSON_PROPERTY_COMPONENTS
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.22.0")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.24.0")
 public class ConnectedUserProjectWorkflowModel {
   public static final String JSON_PROPERTY_CREATED_DATE = "createdDate";
   @jakarta.annotation.Nullable
@@ -76,6 +84,61 @@ public class ConnectedUserProjectWorkflowModel {
   public static final String JSON_PROPERTY_WORKFLOW_VERSION = "workflowVersion";
   @jakarta.annotation.Nullable
   private Integer workflowVersion;
+
+  /**
+   * COPY when the workflow is the user&#39;s own editable copy; REFERENCE when it points at a shared catalog workflow.
+   */
+  public enum KindEnum {
+    COPY(String.valueOf("COPY")),
+    
+    REFERENCE(String.valueOf("REFERENCE"));
+
+    private String value;
+
+    KindEnum(String value) {
+      this.value = value;
+    }
+
+    @JsonValue
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    @JsonCreator
+    public static KindEnum fromValue(String value) {
+      for (KindEnum b : KindEnum.values()) {
+        if (b.value.equals(value)) {
+          return b;
+        }
+      }
+      throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+  }
+
+  public static final String JSON_PROPERTY_KIND = "kind";
+  @jakarta.annotation.Nullable
+  private KindEnum kind;
+
+  public static final String JSON_PROPERTY_CATALOG_WORKFLOW_UUID = "catalogWorkflowUuid";
+  @jakarta.annotation.Nullable
+  private String catalogWorkflowUuid;
+
+  public static final String JSON_PROPERTY_COPIED_FROM_WORKFLOW_UUID = "copiedFromWorkflowUuid";
+  @jakarta.annotation.Nullable
+  private String copiedFromWorkflowUuid;
+
+  public static final String JSON_PROPERTY_DANGLING = "dangling";
+  @jakarta.annotation.Nullable
+  private Boolean dangling;
+
+  public static final String JSON_PROPERTY_COMPONENTS = "components";
+  @jakarta.annotation.Nullable
+  private List<AutomationWorkflowProjectComponentModel> components = new ArrayList<>();
 
   public ConnectedUserProjectWorkflowModel() { 
   }
@@ -272,6 +335,134 @@ public class ConnectedUserProjectWorkflowModel {
   }
 
 
+  public ConnectedUserProjectWorkflowModel kind(@jakarta.annotation.Nullable KindEnum kind) {
+    this.kind = kind;
+    return this;
+  }
+
+  /**
+   * COPY when the workflow is the user&#39;s own editable copy; REFERENCE when it points at a shared catalog workflow.
+   * @return kind
+   */
+  @jakarta.annotation.Nullable
+  @JsonProperty(value = JSON_PROPERTY_KIND, required = false)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  public KindEnum getKind() {
+    return kind;
+  }
+
+
+  @JsonProperty(value = JSON_PROPERTY_KIND, required = false)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  public void setKind(@jakarta.annotation.Nullable KindEnum kind) {
+    this.kind = kind;
+  }
+
+
+  public ConnectedUserProjectWorkflowModel catalogWorkflowUuid(@jakarta.annotation.Nullable String catalogWorkflowUuid) {
+    this.catalogWorkflowUuid = catalogWorkflowUuid;
+    return this;
+  }
+
+  /**
+   * For REFERENCE rows, the uuid of the catalog workflow being referenced.
+   * @return catalogWorkflowUuid
+   */
+  @jakarta.annotation.Nullable
+  @JsonProperty(value = JSON_PROPERTY_CATALOG_WORKFLOW_UUID, required = false)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  public String getCatalogWorkflowUuid() {
+    return catalogWorkflowUuid;
+  }
+
+
+  @JsonProperty(value = JSON_PROPERTY_CATALOG_WORKFLOW_UUID, required = false)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  public void setCatalogWorkflowUuid(@jakarta.annotation.Nullable String catalogWorkflowUuid) {
+    this.catalogWorkflowUuid = catalogWorkflowUuid;
+  }
+
+
+  public ConnectedUserProjectWorkflowModel copiedFromWorkflowUuid(@jakarta.annotation.Nullable String copiedFromWorkflowUuid) {
+    this.copiedFromWorkflowUuid = copiedFromWorkflowUuid;
+    return this;
+  }
+
+  /**
+   * For COPY rows, the uuid of the catalog template the copy was created from. Null otherwise.
+   * @return copiedFromWorkflowUuid
+   */
+  @jakarta.annotation.Nullable
+  @JsonProperty(value = JSON_PROPERTY_COPIED_FROM_WORKFLOW_UUID, required = false)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  public String getCopiedFromWorkflowUuid() {
+    return copiedFromWorkflowUuid;
+  }
+
+
+  @JsonProperty(value = JSON_PROPERTY_COPIED_FROM_WORKFLOW_UUID, required = false)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  public void setCopiedFromWorkflowUuid(@jakarta.annotation.Nullable String copiedFromWorkflowUuid) {
+    this.copiedFromWorkflowUuid = copiedFromWorkflowUuid;
+  }
+
+
+  public ConnectedUserProjectWorkflowModel dangling(@jakarta.annotation.Nullable Boolean dangling) {
+    this.dangling = dangling;
+    return this;
+  }
+
+  /**
+   * True when a REFERENCE points at a catalog workflow that is no longer served.
+   * @return dangling
+   */
+  @jakarta.annotation.Nullable
+  @JsonProperty(value = JSON_PROPERTY_DANGLING, required = false)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  public Boolean getDangling() {
+    return dangling;
+  }
+
+
+  @JsonProperty(value = JSON_PROPERTY_DANGLING, required = false)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  public void setDangling(@jakarta.annotation.Nullable Boolean dangling) {
+    this.dangling = dangling;
+  }
+
+
+  public ConnectedUserProjectWorkflowModel components(@jakarta.annotation.Nullable List<AutomationWorkflowProjectComponentModel> components) {
+    this.components = components;
+    return this;
+  }
+
+  public ConnectedUserProjectWorkflowModel addComponentsItem(AutomationWorkflowProjectComponentModel componentsItem) {
+    if (this.components == null) {
+      this.components = new ArrayList<>();
+    }
+    this.components.add(componentsItem);
+    return this;
+  }
+
+  /**
+   * The components used by the workflow.
+   * @return components
+   */
+  @jakarta.annotation.Nullable
+  @JsonProperty(value = JSON_PROPERTY_COMPONENTS, required = false)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  public List<AutomationWorkflowProjectComponentModel> getComponents() {
+    return components;
+  }
+
+
+  @JsonProperty(value = JSON_PROPERTY_COMPONENTS, required = false)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  public void setComponents(@jakarta.annotation.Nullable List<AutomationWorkflowProjectComponentModel> components) {
+    this.components = components;
+  }
+
+
   /**
    * Return true if this ConnectedUserProjectWorkflow object is equal to o.
    */
@@ -291,12 +482,17 @@ public class ConnectedUserProjectWorkflowModel {
         Objects.equals(this.enabled, connectedUserProjectWorkflow.enabled) &&
         Objects.equals(this.label, connectedUserProjectWorkflow.label) &&
         Objects.equals(this.workflowUuid, connectedUserProjectWorkflow.workflowUuid) &&
-        Objects.equals(this.workflowVersion, connectedUserProjectWorkflow.workflowVersion);
+        Objects.equals(this.workflowVersion, connectedUserProjectWorkflow.workflowVersion) &&
+        Objects.equals(this.kind, connectedUserProjectWorkflow.kind) &&
+        Objects.equals(this.catalogWorkflowUuid, connectedUserProjectWorkflow.catalogWorkflowUuid) &&
+        Objects.equals(this.copiedFromWorkflowUuid, connectedUserProjectWorkflow.copiedFromWorkflowUuid) &&
+        Objects.equals(this.dangling, connectedUserProjectWorkflow.dangling) &&
+        Objects.equals(this.components, connectedUserProjectWorkflow.components);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdDate, description, definition, lastModifiedDate, enabled, label, workflowUuid, workflowVersion);
+    return Objects.hash(createdDate, description, definition, lastModifiedDate, enabled, label, workflowUuid, workflowVersion, kind, catalogWorkflowUuid, copiedFromWorkflowUuid, dangling, components);
   }
 
   @Override
@@ -311,6 +507,11 @@ public class ConnectedUserProjectWorkflowModel {
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    workflowUuid: ").append(toIndentedString(workflowUuid)).append("\n");
     sb.append("    workflowVersion: ").append(toIndentedString(workflowVersion)).append("\n");
+    sb.append("    kind: ").append(toIndentedString(kind)).append("\n");
+    sb.append("    catalogWorkflowUuid: ").append(toIndentedString(catalogWorkflowUuid)).append("\n");
+    sb.append("    copiedFromWorkflowUuid: ").append(toIndentedString(copiedFromWorkflowUuid)).append("\n");
+    sb.append("    dangling: ").append(toIndentedString(dangling)).append("\n");
+    sb.append("    components: ").append(toIndentedString(components)).append("\n");
     sb.append("}");
     return sb.toString();
   }
@@ -393,6 +594,36 @@ public class ConnectedUserProjectWorkflowModel {
     // add `workflowVersion` to the URL query string
     if (getWorkflowVersion() != null) {
       joiner.add(String.format(java.util.Locale.ROOT, "%sworkflowVersion%s=%s", prefix, suffix, ApiClient.urlEncode(ApiClient.valueToString(getWorkflowVersion()))));
+    }
+
+    // add `kind` to the URL query string
+    if (getKind() != null) {
+      joiner.add(String.format(java.util.Locale.ROOT, "%skind%s=%s", prefix, suffix, ApiClient.urlEncode(ApiClient.valueToString(getKind()))));
+    }
+
+    // add `catalogWorkflowUuid` to the URL query string
+    if (getCatalogWorkflowUuid() != null) {
+      joiner.add(String.format(java.util.Locale.ROOT, "%scatalogWorkflowUuid%s=%s", prefix, suffix, ApiClient.urlEncode(ApiClient.valueToString(getCatalogWorkflowUuid()))));
+    }
+
+    // add `copiedFromWorkflowUuid` to the URL query string
+    if (getCopiedFromWorkflowUuid() != null) {
+      joiner.add(String.format(java.util.Locale.ROOT, "%scopiedFromWorkflowUuid%s=%s", prefix, suffix, ApiClient.urlEncode(ApiClient.valueToString(getCopiedFromWorkflowUuid()))));
+    }
+
+    // add `dangling` to the URL query string
+    if (getDangling() != null) {
+      joiner.add(String.format(java.util.Locale.ROOT, "%sdangling%s=%s", prefix, suffix, ApiClient.urlEncode(ApiClient.valueToString(getDangling()))));
+    }
+
+    // add `components` to the URL query string
+    if (getComponents() != null) {
+      for (int i = 0; i < getComponents().size(); i++) {
+        if (getComponents().get(i) != null) {
+          joiner.add(getComponents().get(i).toUrlQueryString(String.format(java.util.Locale.ROOT, "%scomponents%s%s", prefix, suffix,
+          "".equals(suffix) ? "" : String.format(java.util.Locale.ROOT, "%s%d%s", containerPrefix, i, containerSuffix))));
+        }
+      }
     }
 
     return joiner.toString();

@@ -35,7 +35,7 @@ import com.bytechef.cli.client.embeddedconfiguration.ApiClient;
 @JsonPropertyOrder({
   CreateFrontendProjectWorkflowRequestModel.JSON_PROPERTY_DEFINITION
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.22.0")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.24.0")
 public class CreateFrontendProjectWorkflowRequestModel {
   public static final String JSON_PROPERTY_DEFINITION = "definition";
   @jakarta.annotation.Nullable

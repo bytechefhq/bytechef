@@ -25,6 +25,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
+import java.time.OffsetDateTime;
 import java.util.Arrays;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
@@ -36,9 +37,13 @@ import com.bytechef.cli.client.embeddedconfiguration.ApiClient;
 @JsonPropertyOrder({
   ConnectionModel.JSON_PROPERTY_ID,
   ConnectionModel.JSON_PROPERTY_NAME,
-  ConnectionModel.JSON_PROPERTY_ENVIRONMENT
+  ConnectionModel.JSON_PROPERTY_ENVIRONMENT,
+  ConnectionModel.JSON_PROPERTY_COMPONENT_NAME,
+  ConnectionModel.JSON_PROPERTY_CONNECTION_VERSION,
+  ConnectionModel.JSON_PROPERTY_AUTHORIZATION_TYPE,
+  ConnectionModel.JSON_PROPERTY_CREATED_DATE
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.22.0")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.24.0")
 public class ConnectionModel {
   public static final String JSON_PROPERTY_ID = "id";
   @jakarta.annotation.Nonnull
@@ -51,6 +56,22 @@ public class ConnectionModel {
   public static final String JSON_PROPERTY_ENVIRONMENT = "environment";
   @jakarta.annotation.Nullable
   private EnvironmentModel environment;
+
+  public static final String JSON_PROPERTY_COMPONENT_NAME = "componentName";
+  @jakarta.annotation.Nullable
+  private String componentName;
+
+  public static final String JSON_PROPERTY_CONNECTION_VERSION = "connectionVersion";
+  @jakarta.annotation.Nullable
+  private Integer connectionVersion;
+
+  public static final String JSON_PROPERTY_AUTHORIZATION_TYPE = "authorizationType";
+  @jakarta.annotation.Nullable
+  private String authorizationType;
+
+  public static final String JSON_PROPERTY_CREATED_DATE = "createdDate";
+  @jakarta.annotation.Nullable
+  private OffsetDateTime createdDate;
 
   public ConnectionModel() { 
   }
@@ -127,6 +148,102 @@ public class ConnectionModel {
   }
 
 
+  public ConnectionModel componentName(@jakarta.annotation.Nullable String componentName) {
+    this.componentName = componentName;
+    return this;
+  }
+
+  /**
+   * The component name.
+   * @return componentName
+   */
+  @jakarta.annotation.Nullable
+  @JsonProperty(value = JSON_PROPERTY_COMPONENT_NAME, required = false)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  public String getComponentName() {
+    return componentName;
+  }
+
+
+  @JsonProperty(value = JSON_PROPERTY_COMPONENT_NAME, required = false)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  public void setComponentName(@jakarta.annotation.Nullable String componentName) {
+    this.componentName = componentName;
+  }
+
+
+  public ConnectionModel connectionVersion(@jakarta.annotation.Nullable Integer connectionVersion) {
+    this.connectionVersion = connectionVersion;
+    return this;
+  }
+
+  /**
+   * The connection version.
+   * @return connectionVersion
+   */
+  @jakarta.annotation.Nullable
+  @JsonProperty(value = JSON_PROPERTY_CONNECTION_VERSION, required = false)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  public Integer getConnectionVersion() {
+    return connectionVersion;
+  }
+
+
+  @JsonProperty(value = JSON_PROPERTY_CONNECTION_VERSION, required = false)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  public void setConnectionVersion(@jakarta.annotation.Nullable Integer connectionVersion) {
+    this.connectionVersion = connectionVersion;
+  }
+
+
+  public ConnectionModel authorizationType(@jakarta.annotation.Nullable String authorizationType) {
+    this.authorizationType = authorizationType;
+    return this;
+  }
+
+  /**
+   * The authorization type name.
+   * @return authorizationType
+   */
+  @jakarta.annotation.Nullable
+  @JsonProperty(value = JSON_PROPERTY_AUTHORIZATION_TYPE, required = false)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  public String getAuthorizationType() {
+    return authorizationType;
+  }
+
+
+  @JsonProperty(value = JSON_PROPERTY_AUTHORIZATION_TYPE, required = false)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  public void setAuthorizationType(@jakarta.annotation.Nullable String authorizationType) {
+    this.authorizationType = authorizationType;
+  }
+
+
+  public ConnectionModel createdDate(@jakarta.annotation.Nullable OffsetDateTime createdDate) {
+    this.createdDate = createdDate;
+    return this;
+  }
+
+  /**
+   * The created date.
+   * @return createdDate
+   */
+  @jakarta.annotation.Nullable
+  @JsonProperty(value = JSON_PROPERTY_CREATED_DATE, required = false)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  public OffsetDateTime getCreatedDate() {
+    return createdDate;
+  }
+
+
+  @JsonProperty(value = JSON_PROPERTY_CREATED_DATE, required = false)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  public void setCreatedDate(@jakarta.annotation.Nullable OffsetDateTime createdDate) {
+    this.createdDate = createdDate;
+  }
+
+
   /**
    * Return true if this Connection object is equal to o.
    */
@@ -141,12 +258,16 @@ public class ConnectionModel {
     ConnectionModel connection = (ConnectionModel) o;
     return Objects.equals(this.id, connection.id) &&
         Objects.equals(this.name, connection.name) &&
-        Objects.equals(this.environment, connection.environment);
+        Objects.equals(this.environment, connection.environment) &&
+        Objects.equals(this.componentName, connection.componentName) &&
+        Objects.equals(this.connectionVersion, connection.connectionVersion) &&
+        Objects.equals(this.authorizationType, connection.authorizationType) &&
+        Objects.equals(this.createdDate, connection.createdDate);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, environment);
+    return Objects.hash(id, name, environment, componentName, connectionVersion, authorizationType, createdDate);
   }
 
   @Override
@@ -156,6 +277,10 @@ public class ConnectionModel {
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    environment: ").append(toIndentedString(environment)).append("\n");
+    sb.append("    componentName: ").append(toIndentedString(componentName)).append("\n");
+    sb.append("    connectionVersion: ").append(toIndentedString(connectionVersion)).append("\n");
+    sb.append("    authorizationType: ").append(toIndentedString(authorizationType)).append("\n");
+    sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("}");
     return sb.toString();
   }
@@ -213,6 +338,26 @@ public class ConnectionModel {
     // add `environment` to the URL query string
     if (getEnvironment() != null) {
       joiner.add(String.format(java.util.Locale.ROOT, "%senvironment%s=%s", prefix, suffix, ApiClient.urlEncode(ApiClient.valueToString(getEnvironment()))));
+    }
+
+    // add `componentName` to the URL query string
+    if (getComponentName() != null) {
+      joiner.add(String.format(java.util.Locale.ROOT, "%scomponentName%s=%s", prefix, suffix, ApiClient.urlEncode(ApiClient.valueToString(getComponentName()))));
+    }
+
+    // add `connectionVersion` to the URL query string
+    if (getConnectionVersion() != null) {
+      joiner.add(String.format(java.util.Locale.ROOT, "%sconnectionVersion%s=%s", prefix, suffix, ApiClient.urlEncode(ApiClient.valueToString(getConnectionVersion()))));
+    }
+
+    // add `authorizationType` to the URL query string
+    if (getAuthorizationType() != null) {
+      joiner.add(String.format(java.util.Locale.ROOT, "%sauthorizationType%s=%s", prefix, suffix, ApiClient.urlEncode(ApiClient.valueToString(getAuthorizationType()))));
+    }
+
+    // add `createdDate` to the URL query string
+    if (getCreatedDate() != null) {
+      joiner.add(String.format(java.util.Locale.ROOT, "%screatedDate%s=%s", prefix, suffix, ApiClient.urlEncode(ApiClient.valueToString(getCreatedDate()))));
     }
 
     return joiner.toString();

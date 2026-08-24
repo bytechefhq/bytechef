@@ -42,7 +42,7 @@ import com.bytechef.cli.client.embeddedconfiguration.ApiClient;
   ComponentInputOptionsRequestModel.JSON_PROPERTY_LOOKUP_DEPENDS_ON_VALUES,
   ComponentInputOptionsRequestModel.JSON_PROPERTY_SEARCH_TEXT
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.22.0")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.24.0")
 public class ComponentInputOptionsRequestModel {
   public static final String JSON_PROPERTY_COMPONENT_NAME = "componentName";
   @jakarta.annotation.Nonnull

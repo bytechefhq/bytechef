@@ -3784,6 +3784,16 @@ export type Mutation = {
   updateComponentOperationPolicy: Scalars['Boolean']['output'];
   /** Enables or disables a component tenant-wide. Admin-only. */
   updateComponentPolicy: ComponentPolicy;
+  /**
+   * Replace an existing connection's authorization parameters. Owner-or-admin only.
+   *
+   * The submitted parameters replace the connection's authorization parameters wholesale — a
+   * credential the caller does not resubmit is cleared, not kept. Connection-level properties
+   * (base URI inputs, region, subdomain) are untouched. Succeeding means the values were stored,
+   * not that they work: there is no test-connection step, so a wrong credential is re-flagged
+   * INVALID by the token refresh handler on the next execution.
+   */
+  updateConnectionCredentials: Scalars['Boolean']['output'];
   updateContextStore: ContextStore;
   updateContextStoreSource: ContextStoreSource;
   /**
@@ -5516,6 +5526,11 @@ export type MutationUpdateComponentOperationPolicyArgs = {
 export type MutationUpdateComponentPolicyArgs = {
   enabled: Scalars['Boolean']['input'];
   name: Scalars['String']['input'];
+};
+
+
+export type MutationUpdateConnectionCredentialsArgs = {
+  input: UpdateConnectionCredentialsInput;
 };
 
 
@@ -8230,6 +8245,12 @@ export type UpdateAssetFileInput = {
 export type UpdateAssetFileTagsInput = {
   id: Scalars['ID']['input'];
   tags: Array<TagInput>;
+};
+
+export type UpdateConnectionCredentialsInput = {
+  connectionId: Scalars['ID']['input'];
+  parameters: Scalars['Map']['input'];
+  version: Scalars['Int']['input'];
 };
 
 export type UpdateContextStoreInput = {

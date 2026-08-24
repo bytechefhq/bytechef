@@ -42,7 +42,7 @@ import com.bytechef.cli.client.embeddedconfiguration.ApiClient;
   ConnectionConfigModel.JSON_PROPERTY_INPUTS,
   ConnectionConfigModel.JSON_PROPERTY_OAUTH2
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.22.0")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.24.0")
 public class ConnectionConfigModel {
   public static final String JSON_PROPERTY_AUTHORIZATION_TYPE = "authorizationType";
   @jakarta.annotation.Nullable

@@ -36,7 +36,7 @@ import com.bytechef.cli.client.embeddedconfiguration.ApiClient;
   McpIntegrationInstanceToolModel.JSON_PROPERTY_ENABLED,
   McpIntegrationInstanceToolModel.JSON_PROPERTY_MCP_TOOL_ID
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.22.0")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.24.0")
 public class McpIntegrationInstanceToolModel {
   public static final String JSON_PROPERTY_ENABLED = "enabled";
   @jakarta.annotation.Nonnull

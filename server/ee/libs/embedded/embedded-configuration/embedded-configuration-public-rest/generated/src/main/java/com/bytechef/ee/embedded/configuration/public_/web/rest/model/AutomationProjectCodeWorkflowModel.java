@@ -1,0 +1,184 @@
+package com.bytechef.ee.embedded.configuration.public_.web.rest.model;
+
+import java.net.URI;
+import java.util.Objects;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationProjectCodeWorkflowTemplateModel;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.annotation.JsonValue;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import org.springframework.lang.Nullable;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+
+import java.util.*;
+import jakarta.annotation.Generated;
+
+/**
+ * An automation workflow catalog project, without the underlying automation project id.
+ */
+
+@Schema(name = "AutomationProjectCodeWorkflow", description = "An automation workflow catalog project, without the underlying automation project id.")
+@JsonTypeName("AutomationProjectCodeWorkflow")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-08-24T21:16:52.073543+02:00[Europe/Zagreb]", comments = "Generator version: 7.24.0")
+public class AutomationProjectCodeWorkflowModel {
+
+  private @Nullable String name;
+
+  /**
+   * Whether copying this project's templates creates a per-user copy or a shared reference.
+   */
+  public enum KindEnum {
+    COPY("COPY"),
+    
+    REFERENCE("REFERENCE");
+
+    private final String value;
+
+    KindEnum(String value) {
+      this.value = value;
+    }
+
+    @JsonValue
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    @JsonCreator
+    public static KindEnum fromValue(String value) {
+      for (KindEnum b : KindEnum.values()) {
+        if (b.value.equalsIgnoreCase(value)) {
+          return b;
+        }
+      }
+      throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+  }
+
+  private @Nullable KindEnum kind;
+
+  private List<@Valid AutomationProjectCodeWorkflowTemplateModel> workflowTemplates = new ArrayList<>();
+
+  public AutomationProjectCodeWorkflowModel name(@Nullable String name) {
+    this.name = name;
+    return this;
+  }
+
+  /**
+   * The name of the automation workflow project.
+   * @return name
+   */
+  
+  @Schema(name = "name", description = "The name of the automation workflow project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("name")
+  public @Nullable String getName() {
+    return name;
+  }
+
+  @JsonProperty("name")
+  public void setName(@Nullable String name) {
+    this.name = name;
+  }
+
+  public AutomationProjectCodeWorkflowModel kind(@Nullable KindEnum kind) {
+    this.kind = kind;
+    return this;
+  }
+
+  /**
+   * Whether copying this project's templates creates a per-user copy or a shared reference.
+   * @return kind
+   */
+  
+  @Schema(name = "kind", description = "Whether copying this project's templates creates a per-user copy or a shared reference.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("kind")
+  public @Nullable KindEnum getKind() {
+    return kind;
+  }
+
+  @JsonProperty("kind")
+  public void setKind(@Nullable KindEnum kind) {
+    this.kind = kind;
+  }
+
+  public AutomationProjectCodeWorkflowModel workflowTemplates(List<@Valid AutomationProjectCodeWorkflowTemplateModel> workflowTemplates) {
+    this.workflowTemplates = workflowTemplates;
+    return this;
+  }
+
+  public AutomationProjectCodeWorkflowModel addWorkflowTemplatesItem(AutomationProjectCodeWorkflowTemplateModel workflowTemplatesItem) {
+    if (this.workflowTemplates == null) {
+      this.workflowTemplates = new ArrayList<>();
+    }
+    this.workflowTemplates.add(workflowTemplatesItem);
+    return this;
+  }
+
+  /**
+   * The list of catalog workflow templates belonging to this project.
+   * @return workflowTemplates
+   */
+  @Valid 
+  @Schema(name = "workflowTemplates", description = "The list of catalog workflow templates belonging to this project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("workflowTemplates")
+  public List<@Valid AutomationProjectCodeWorkflowTemplateModel> getWorkflowTemplates() {
+    return workflowTemplates;
+  }
+
+  @JsonProperty("workflowTemplates")
+  public void setWorkflowTemplates(List<@Valid AutomationProjectCodeWorkflowTemplateModel> workflowTemplates) {
+    this.workflowTemplates = workflowTemplates;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    AutomationProjectCodeWorkflowModel automationProjectCodeWorkflow = (AutomationProjectCodeWorkflowModel) o;
+    return Objects.equals(this.name, automationProjectCodeWorkflow.name) &&
+        Objects.equals(this.kind, automationProjectCodeWorkflow.kind) &&
+        Objects.equals(this.workflowTemplates, automationProjectCodeWorkflow.workflowTemplates);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(name, kind, workflowTemplates);
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("class AutomationProjectCodeWorkflowModel {\n");
+    sb.append("    name: ").append(toIndentedString(name)).append("\n");
+    sb.append("    kind: ").append(toIndentedString(kind)).append("\n");
+    sb.append("    workflowTemplates: ").append(toIndentedString(workflowTemplates)).append("\n");
+    sb.append("}");
+    return sb.toString();
+  }
+
+  /**
+   * Convert the given object to string with each line indented by 4 spaces
+   * (except the first line).
+   */
+  private String toIndentedString(@Nullable Object o) {
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
+  }
+}
+

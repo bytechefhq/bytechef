@@ -23,16 +23,13 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "McpTool", description = "An MCP tool definition.")
 @JsonTypeName("McpTool")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-08-18T00:19:21.376010+02:00[Europe/Zagreb]", comments = "Generator version: 7.24.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-08-24T21:16:52.073543+02:00[Europe/Zagreb]", comments = "Generator version: 7.24.0")
 public class McpToolModel {
 
-  @JsonInclude(JsonInclude.Include.NON_NULL)
   private @Nullable String description;
 
-  @JsonInclude(JsonInclude.Include.NON_NULL)
   private @Nullable Long id;
 
-  @JsonInclude(JsonInclude.Include.NON_NULL)
   private @Nullable String name;
 
   public McpToolModel description(@Nullable String description) {

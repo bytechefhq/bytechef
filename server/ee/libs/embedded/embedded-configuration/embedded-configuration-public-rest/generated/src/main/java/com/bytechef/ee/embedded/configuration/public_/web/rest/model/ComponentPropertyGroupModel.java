@@ -27,15 +27,13 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ComponentPropertyGroup", description = "A resolved component property group rendered as one compound input.")
 @JsonTypeName("ComponentPropertyGroup")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-08-18T00:19:21.376010+02:00[Europe/Zagreb]", comments = "Generator version: 7.24.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-08-24T21:16:52.073543+02:00[Europe/Zagreb]", comments = "Generator version: 7.24.0")
 public class ComponentPropertyGroupModel {
 
   private String name;
 
-  @JsonInclude(JsonInclude.Include.NON_NULL)
   private @Nullable String label;
 
-  @JsonInclude(JsonInclude.Include.NON_NULL)
   private List<@Valid ComponentPropertyModel> properties = new ArrayList<>();
 
   public ComponentPropertyGroupModel() {

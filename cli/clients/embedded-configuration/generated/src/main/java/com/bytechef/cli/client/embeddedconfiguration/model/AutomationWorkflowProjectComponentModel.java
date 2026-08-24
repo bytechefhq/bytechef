@@ -37,7 +37,7 @@ import com.bytechef.cli.client.embeddedconfiguration.ApiClient;
   AutomationWorkflowProjectComponentModel.JSON_PROPERTY_TITLE,
   AutomationWorkflowProjectComponentModel.JSON_PROPERTY_ICON
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.22.0")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.24.0")
 public class AutomationWorkflowProjectComponentModel {
   public static final String JSON_PROPERTY_NAME = "name";
   @jakarta.annotation.Nullable

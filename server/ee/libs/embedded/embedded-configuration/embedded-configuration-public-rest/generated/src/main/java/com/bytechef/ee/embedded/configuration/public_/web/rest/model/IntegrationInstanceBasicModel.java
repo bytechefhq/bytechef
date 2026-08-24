@@ -25,13 +25,11 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstanceBasic", description = "The integration instance represents a configured integration for a specific user, containing connection and status information")
 @JsonTypeName("IntegrationInstanceBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-08-18T00:19:21.376010+02:00[Europe/Zagreb]", comments = "Generator version: 7.24.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-08-24T21:16:52.073543+02:00[Europe/Zagreb]", comments = "Generator version: 7.24.0")
 public class IntegrationInstanceBasicModel {
 
-  @JsonInclude(JsonInclude.Include.NON_NULL)
   private @Nullable Long id;
 
-  @JsonInclude(JsonInclude.Include.NON_NULL)
   private @Nullable CredentialStatusModel credentialStatus;
 
   private Boolean enabled;
