@@ -11,6 +11,7 @@ import {
 } from '@/components/Dialog';
 import {Form} from '@/components/ui/form';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {useCommandIntent} from '@/shared/command-bar/useCommandIntent';
 import CategoryFormField from '@/shared/components/entity-form/CategoryFormField';
 import DescriptionFormField from '@/shared/components/entity-form/DescriptionFormField';
 import NameFormField from '@/shared/components/entity-form/NameFormField';
@@ -26,13 +27,16 @@ import {ReactNode, useState} from 'react';
 import {useForm} from 'react-hook-form';
 
 interface ProjectDialogProps {
+    claimsCreateIntent?: boolean;
     onClose?: (project?: Project) => void;
     onSuccess?: (projectId: number | void) => void;
     project?: Project;
     triggerNode?: ReactNode;
 }
 
-const ProjectDialog = ({onClose, onSuccess, project, triggerNode}: ProjectDialogProps) => {
+const ProjectDialog = ({claimsCreateIntent = false, onClose, onSuccess, project, triggerNode}: ProjectDialogProps) => {
+    useCommandIntent('project.create', () => setIsOpen(true), claimsCreateIntent);
+
     const [isOpen, setIsOpen] = useState(!triggerNode);
 
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);

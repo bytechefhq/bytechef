@@ -99,6 +99,7 @@ export const Connections = () => {
                         connections.length > 0 &&
                         componentDefinitions && (
                             <ConnectionDialog
+                                claimsCreateIntent={true}
                                 componentDefinitions={componentDefinitions}
                                 connection={
                                     {
@@ -158,6 +159,7 @@ export const Connections = () => {
                         actions={
                             componentDefinitions && (
                                 <ConnectionDialog
+                                    claimsCreateIntent={true}
                                     componentDefinitions={componentDefinitions}
                                     connection={
                                         {

@@ -4,6 +4,9 @@ import useFetchInterceptor from '@/config/useFetchInterceptor';
 import {useUserGuiding} from '@/hooks/useUserGuiding';
 import {useCloseProjectsLeftSidebarOnLeave} from '@/pages/automation/project/hooks/useCloseProjectsLeftSidebarOnLeave';
 import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
+import {bootstrapCommandBar} from '@/shared/command-bar/commandBarBootstrap';
+import {useCommandBarStore} from '@/shared/command-bar/useCommandBarStore';
+import {useRegisterNavigationCommands} from '@/shared/command-bar/useRegisterNavigationCommands';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
@@ -12,165 +15,30 @@ import {useOnLogout} from '@/shared/hooks/useOnLogout';
 import {MobileTopNavigation} from '@/shared/layout/MobileTopNavigation';
 import {TrialBanner} from '@/shared/layout/TrialBanner';
 import {AppSidebar} from '@/shared/layout/app-sidebar/AppSidebar';
+import {
+    type NavigationItemI,
+    automationNavigation,
+    embeddedNavigation,
+    platformNavigation,
+} from '@/shared/navigation/navigationItems';
 import {isStandaloneRoute} from '@/shared/navigation/standaloneRoutes';
 import {EditionType, useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
-import {
-    ActivityIcon,
-    FolderIcon,
-    HammerIcon,
-    HistoryIcon,
-    Layers3Icon,
-    LayoutTemplateIcon,
-    Link2Icon,
-    LucideIcon,
-    MessagesSquareIcon,
-    NetworkIcon,
-    RadioTowerIcon,
-    ServerIcon,
-    Settings2Icon,
-    SlidersHorizontalIcon,
-    SquareIcon,
-    Table2Icon,
-    UnplugIcon,
-    UsersIcon,
-    VectorSquareIcon,
-    Workflow,
-    ZapIcon,
-} from 'lucide-react';
-import {Suspense, lazy, useEffect, useLayoutEffect, useState} from 'react';
+import {Suspense, lazy, useEffect, useLayoutEffect} from 'react';
 import {Outlet, useLocation} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
 
 const CopilotPanel = lazy(() => import('@/shared/components/copilot/CopilotPanel'));
-const GlobalSearchDialog = lazy(() => import('@/components/GlobalSearch/GlobalSearchDialog'));
+const CommandBarDialog = lazy(() => import('@/components/CommandBar/CommandBarDialog'));
 
-type NavigationGroupType = {
-    icon: LucideIcon;
-    name: string;
-};
-
-type NavigationType = {
-    group?: NavigationGroupType;
-    name: string;
-    href: string;
-    icon: LucideIcon;
-};
-
-const executionsNavigationGroup: NavigationGroupType = {icon: ActivityIcon, name: 'Executions'};
-
-const serversNavigationGroup: NavigationGroupType = {icon: RadioTowerIcon, name: 'Servers'};
-
-const automationNavigation: NavigationType[] = [
-    {
-        href: '/automation/projects',
-        icon: FolderIcon,
-        name: 'Projects',
-    },
-    {
-        href: '/automation/deployments',
-        icon: Layers3Icon,
-        name: 'Project Deployments',
-    },
-    {
-        href: '/automation/api-platform',
-        icon: LayoutTemplateIcon,
-        name: 'API Collections',
-    },
-    {
-        group: serversNavigationGroup,
-        href: '/automation/mcp-servers',
-        icon: ServerIcon,
-        name: 'MCP Servers',
-    },
-    {
-        group: serversNavigationGroup,
-        href: '/automation/a2a-servers',
-        icon: NetworkIcon,
-        name: 'A2A Servers',
-    },
-    {
-        group: executionsNavigationGroup,
-        href: '/automation/executions',
-        icon: HistoryIcon,
-        name: 'Workflow Executions',
-    },
-    {
-        group: executionsNavigationGroup,
-        href: '/automation/executions/tool-invocations',
-        icon: HammerIcon,
-        name: 'Tool Invocations',
-    },
-    {href: '/automation/connections', icon: Link2Icon, name: 'Connections'},
-    {
-        href: '/automation/datatables',
-        icon: Table2Icon,
-        name: 'Data Tables',
-    },
-    {
-        href: '/automation/knowledge-bases',
-        icon: VectorSquareIcon,
-        name: 'Knowledge Base',
-    },
-    {href: '/automation/chats', icon: MessagesSquareIcon, name: 'Chats'},
-];
-
-const embeddedNavigation: NavigationType[] = [
-    {
-        href: '/embedded/integrations',
-        icon: SquareIcon,
-        name: 'Integrations',
-    },
-    {
-        href: '/embedded/configurations',
-        icon: Settings2Icon,
-        name: 'Integration Configurations',
-    },
-    {href: '/embedded/app-events', icon: ZapIcon, name: 'App Events'},
-    {
-        href: '/embedded/automation-workflows',
-        icon: Workflow,
-        name: 'Automations',
-    },
-    {
-        href: '/embedded/automation-configurations',
-        icon: SlidersHorizontalIcon,
-        name: 'Automation Configurations',
-    },
-    {href: '/embedded/mcp-servers', icon: ServerIcon, name: 'MCP Servers'},
-    {
-        href: '/embedded/connected-users',
-        icon: UsersIcon,
-        name: 'Connected Users',
-    },
-    {
-        group: executionsNavigationGroup,
-        href: '/embedded/executions',
-        icon: HistoryIcon,
-        name: 'Workflow Executions',
-    },
-    {
-        group: executionsNavigationGroup,
-        href: '/embedded/executions/tool-invocations',
-        icon: HammerIcon,
-        name: 'Tool Invocations',
-    },
-    {href: '/embedded/connections', icon: Link2Icon, name: 'Connections'},
-];
-
-const platformNavigation = [
-    {
-        href: '/platform/connectors',
-        icon: UnplugIcon,
-        name: 'Connectors',
-    },
-];
+const NO_NAVIGATION_ITEMS: NavigationItemI[] = [];
 
 function App() {
-    const [searchOpen, setSearchOpen] = useState(false);
+    const commandBarOpen = useCommandBarStore((state) => state.open);
+    const setCommandBarOpen = useCommandBarStore((state) => state.setOpen);
 
     const {ai, billingEnabled, edition} = useApplicationInfoStore(
         useShallow((state) => ({
@@ -261,13 +129,21 @@ function App() {
         return true;
     });
 
-    let navigation: NavigationType[] = [];
+    let navigation: NavigationItemI[] = [];
 
     if (location.pathname.includes('/automation/')) {
         navigation = filteredAutomationNavigation;
     } else if (location.pathname.includes('/embedded/')) {
         navigation = filteredEmbeddedNavigation;
     }
+
+    useRegisterNavigationCommands(ff_2396 ? navigation : NO_NAVIGATION_ITEMS);
+
+    useEffect(() => {
+        if (ff_2396) {
+            bootstrapCommandBar();
+        }
+    }, [ff_2396]);
 
     const standaloneRoute = isStandaloneRoute(location.pathname);
 
@@ -330,7 +206,7 @@ function App() {
 
             if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
                 event.preventDefault();
-                setSearchOpen(true);
+                setCommandBarOpen(true);
             }
         };
 
@@ -339,7 +215,7 @@ function App() {
         return () => {
             document.removeEventListener('keydown', handleKeyDown);
         };
-    }, [ff_2396]);
+    }, [ff_2396, setCommandBarOpen]);
 
     return authenticated ? (
         <div className="flex h-full flex-col">
@@ -370,9 +246,9 @@ function App() {
                     </div>
                 </SidebarInset>
 
-                {ff_2396 && searchOpen && (
+                {ff_2396 && commandBarOpen && (
                     <Suspense fallback={null}>
-                        <GlobalSearchDialog onOpenChange={setSearchOpen} open={searchOpen} />
+                        <CommandBarDialog />
                     </Suspense>
                 )}
             </SidebarProvider>

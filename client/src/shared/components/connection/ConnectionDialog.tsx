@@ -21,6 +21,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
 import {ConnectionI, WorkflowMockProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import {useCommandIntent} from '@/shared/command-bar/useCommandIntent';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import ConnectionParameters from '@/shared/components/connection/ConnectionParameters';
 import {CodePayloadI, TokenPayloadI} from '@/shared/components/connection/oauth2/useOAuth2';
@@ -67,6 +68,7 @@ export interface ConnectionDialogFormProps {
 }
 
 interface ConnectionDialogProps {
+    claimsCreateIntent?: boolean;
     componentDefinition?: ComponentDefinition;
     componentDefinitions: ComponentDefinitionBasic[];
     connection?: ConnectionI | undefined;
@@ -95,6 +97,7 @@ interface ConnectionDialogProps {
 }
 
 const ConnectionDialog = ({
+    claimsCreateIntent = false,
     componentDefinition,
     componentDefinitions,
     connection,
@@ -125,6 +128,8 @@ const ConnectionDialog = ({
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentType = usePlatformTypeStore((state) => state.currentType);
+
+    useCommandIntent('connection.create', () => setIsOpen(true), claimsCreateIntent);
 
     /* eslint-disable @typescript-eslint/no-unused-vars */
     const [_, copyToClipboard] = useCopyToClipboard();
