@@ -27,9 +27,11 @@ interface WorkflowNodeContextMenuProps {
     onRename: () => void;
     onResetPosition: () => void;
     onSwitch: () => void;
+    onToggleDisabled?: () => void;
     showCopyAction?: boolean;
     showCutAction?: boolean;
     showDeleteAction?: boolean;
+    showDisableAction?: boolean;
     showInfoAction?: boolean;
     showRenameAction?: boolean;
     showReplaceAction?: boolean;
@@ -48,9 +50,11 @@ const WorkflowNodeContextMenu = ({
     onRename,
     onResetPosition,
     onSwitch,
+    onToggleDisabled,
     showCopyAction = false,
     showCutAction = false,
     showDeleteAction = false,
+    showDisableAction = false,
     showInfoAction = false,
     showRenameAction = false,
     showReplaceAction = false,
@@ -88,9 +92,11 @@ const WorkflowNodeContextMenu = ({
                 onRename,
                 onResetPosition,
                 onSwitch,
+                onToggleDisabled,
                 showCopyAction,
                 showCutAction,
                 showDeleteAction,
+                showDisableAction,
                 showInfoAction,
                 showRenameAction,
                 showReplaceAction,
@@ -108,9 +114,11 @@ const WorkflowNodeContextMenu = ({
             onRename,
             onResetPosition,
             onSwitch,
+            onToggleDisabled,
             showCopyAction,
             showCutAction,
             showDeleteAction,
+            showDisableAction,
             showInfoAction,
             showRenameAction,
             showReplaceAction,
