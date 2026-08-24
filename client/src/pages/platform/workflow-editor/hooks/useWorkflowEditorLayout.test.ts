@@ -22,14 +22,26 @@ beforeEach(() => {
 
 describe('useWorkflowEditorLayout', () => {
     it('seeds the root cluster element node data when the canvas opens on a main cluster root', () => {
-        renderHook(() => useWorkflowEditorLayout());
+        const {rerender} = renderHook(() => useWorkflowEditorLayout());
 
         act(() => {
             useWorkflowEditorStore.setState({clusterElementsCanvasOpen: true});
             useWorkflowNodeDetailsPanelStore.setState({currentNode: aiAgentRootNode});
         });
 
+        rerender();
+
         expect(useWorkflowEditorStore.getState().rootClusterElementNodeData).toEqual(aiAgentRootNode);
+    });
+
+    it('does not seed while the canvas is closed', () => {
+        renderHook(() => useWorkflowEditorLayout());
+
+        act(() => {
+            useWorkflowNodeDetailsPanelStore.setState({currentNode: aiAgentRootNode});
+        });
+
+        expect(useWorkflowEditorStore.getState().rootClusterElementNodeData).toBeUndefined();
     });
 
     it('ignores a node that is not a main cluster root', () => {
@@ -58,8 +70,8 @@ describe('useWorkflowEditorLayout', () => {
         expect(useWorkflowEditorStore.getState().rootClusterElementNodeData).toBeUndefined();
     });
 
-    // The regression the mirroring effect caused: adding a tool writes the new clusterElements straight to the
-    // editor store, then a save elsewhere re-creates currentNode from its own (older) copy. Mirroring that back
+    // The regression this hook caused: adding a tool writes the new clusterElements straight to the editor
+    // store, then a save elsewhere re-creates currentNode from its own (older) copy. Mirroring that back
     // dropped the just-added tool from the AI Agent editor's list until the page was reloaded.
     it('does not overwrite advanced clusterElements when currentNode is merely re-created', () => {
         renderHook(() => useWorkflowEditorLayout());
@@ -81,7 +93,7 @@ describe('useWorkflowEditorLayout', () => {
                 rootClusterElementNodeData: {
                     ...aiAgentRootNode,
                     clusterElements: advancedClusterElements,
-                } as NodeDataType,
+                } satisfies NodeDataType,
             });
 
             // Same node, new object identity — what a save elsewhere in the editor produces.
@@ -118,7 +130,7 @@ describe('useWorkflowEditorLayout', () => {
         const {result} = renderHook(() => useWorkflowEditorLayout());
 
         act(() => {
-            result.current.handleClusterElementsCanvasOpenChange(true);
+            useWorkflowEditorStore.setState({clusterElementsCanvasOpen: true});
             useWorkflowNodeDetailsPanelStore.setState({currentNode: aiAgentRootNode});
         });
 
