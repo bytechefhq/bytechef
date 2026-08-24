@@ -116,6 +116,52 @@ describe('useAiAgentStreamResponse', () => {
         expect(setRootClusterElementNodeDataMock).toHaveBeenCalledWith(nodeData);
     });
 
+    it('falls back to the node data operation when the workflow has no definition', () => {
+        useWorkflowDataStoreMock.mockImplementation((selector: (state: unknown) => unknown) =>
+            selector({workflow: {id: 'workflow-1'}})
+        );
+
+        const {result} = renderHook(() => useAiAgentStreamResponse());
+
+        expect(result.current.isStreamingSupported).toBe(true);
+        expect(result.current.isStreaming).toBe(false);
+    });
+
+    it('falls back to the node data operation when the definition cannot be parsed', () => {
+        useWorkflowDataStoreMock.mockImplementation((selector: (state: unknown) => unknown) =>
+            selector({workflow: {definition: '{not json', id: 'workflow-1'}})
+        );
+
+        const {result} = renderHook(() => useAiAgentStreamResponse());
+
+        expect(result.current.isStreamingSupported).toBe(true);
+
+        result.current.updateStreaming(true);
+
+        const [{nodeData}] = saveWorkflowDefinitionMock.mock.calls[0];
+
+        expect(nodeData.parameters).toEqual({});
+    });
+
+    it('does not save when the root node data carries no component name', () => {
+        useWorkflowEditorStoreMock.mockImplementation((selector: (state: unknown) => unknown) =>
+            selector({
+                rootClusterElementNodeData: {
+                    ...rootClusterElementNodeData,
+                    componentName: undefined,
+                },
+                setRootClusterElementNodeData: setRootClusterElementNodeDataMock,
+            })
+        );
+
+        const {result} = renderHook(() => useAiAgentStreamResponse());
+
+        result.current.updateStreaming(true);
+
+        expect(saveWorkflowDefinitionMock).not.toHaveBeenCalled();
+        expect(setRootClusterElementNodeDataMock).not.toHaveBeenCalled();
+    });
+
     it('switches the root task back to chat', () => {
         mockStores('streamChat');
 
