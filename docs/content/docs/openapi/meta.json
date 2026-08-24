@@ -5,25 +5,8 @@
   "root": true,
   "pages": [
     "index",
-    "--- Backend (API Key) ---",
-    "embedded-action",
-    "embedded-tool",
-    "embedded-configuration-integration",
-    "embedded-configuration-integration-instance",
-    "embedded-configuration-integration-instance-workflow",
-    "embedded-configuration-connection",
-    "embedded-configuration-connected-user",
-    "embedded-configuration-connected-user-project-workflow",
-    "embedded-configuration-automation-workflow-project",
-    "--- Frontend (Signing Key JWT) ---",
-    "embedded-configuration-integration-frontend",
-    "embedded-configuration-integration-instance-frontend",
-    "embedded-configuration-integration-instance-workflow-frontend",
-    "embedded-configuration-connection-frontend",
-    "embedded-configuration-connected-user-frontend",
-    "embedded-configuration-connected-user-project-workflow-frontend",
-    "embedded-configuration-automation-workflow-project-frontend",
-    "embedded-webhook-app-event-trigger-frontend",
-    "embedded-webhook-request-trigger-frontend"
+    "--- Embedded ---",
+    "backend",
+    "frontend"
   ]
 }

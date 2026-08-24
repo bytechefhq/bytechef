@@ -28,8 +28,8 @@ It's split into two pieces:
 | **Chat MCP** (`/chat-mcp`) | Using a ByteChef **MCP Server** as the tool source for an AI assistant chat. | MCP transport against your MCP Server URL, authenticated with the end-user JWT |
 | **Chat Component Kit** (`/chat-component-kit`) | Exposing every component action available to a user as tools for an AI assistant. | `GET /api/embedded/v1/{externalUserId}/tools` |
 | **Generate a workflow from a prompt** (on `/automations`) | Creating a workflow for the user from a natural-language prompt. | [`POST /api/embedded/v1/automation/workflows/generate`](/platform/embedded/get-started/quick-start#let-your-users-build-their-own-workflows-optional) *(depends on the AI Copilot — coming soon)* |
-| **App Event** (`/app-event`) | Firing an **App Event** from your application to start every one of the connected user's enabled App Event-triggered workflows. | [`POST /api/embedded/v1/app-events`](/openapi/embedded-webhook-app-event-trigger-frontend) |
-| **Request** (`/request`) | Triggering a single workflow synchronously via its **Request trigger** and reading the workflow's response back. | [`POST /api/embedded/v1/workflows/{workflowUuid}`](/openapi/embedded-webhook-request-trigger-frontend) |
+| **App Event** (`/app-event`) | Firing an **App Event** from your application to start every one of the connected user's enabled App Event-triggered workflows. | [`POST /api/embedded/v1/app-events`](/openapi/frontend/embedded-webhook-app-event-trigger) |
+| **Request** (`/request`) | Triggering a single workflow synchronously via its **Request trigger** and reading the workflow's response back. | [`POST /api/embedded/v1/workflows/{workflowUuid}`](/openapi/frontend/embedded-webhook-request-trigger) |
 
 Together these cover the most common embedded integration patterns: the connect flow, programmatic workflow CRUD, ad-hoc action execution, MCP-based tooling, tool-by-tool LLM integration, prompt-based workflow generation, App Event firing, and synchronous request-triggered workflows.
 

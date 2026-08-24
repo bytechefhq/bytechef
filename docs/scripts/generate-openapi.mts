@@ -218,10 +218,24 @@ async function main() {
     }
   }
 
-  const idOf = (schemaId: string, { tag, frontend }: Operation) =>
+  // GROUP_META stays keyed by a flat name, so a group keeps its entry wherever it is filed.
+  const metaKeyOf = (schemaId: string, { tag, frontend }: Operation) =>
     [schemaId, taggedSchemas.has(schemaId) ? tag : null, frontend ? 'frontend' : null]
       .filter(Boolean)
       .join('-');
+
+  // Ids double as output paths, so nesting them nests the sidebar: the embedded specs land under
+  // `<audience>/`, so the sidebar carries a Backend and a Frontend folder under one separator. Other
+  // specs stay flat until there is a second audience to separate them from.
+  const idOf = (schemaId: string, operation: Operation) => {
+    const group = [schemaId, taggedSchemas.has(schemaId) ? operation.tag : null]
+      .filter(Boolean)
+      .join('-');
+
+    if (!schemaId.startsWith('embedded')) return metaKeyOf(schemaId, operation);
+
+    return `${operation.frontend ? 'frontend' : 'backend'}/${group}`;
+  };
 
   const groupIdOf = (entry: { schemaId: string; item?: { path?: string; method?: string } }) => {
     const key = `${(entry.item?.method ?? '').toUpperCase()} ${entry.item?.path ?? ''}`;
@@ -238,25 +252,35 @@ async function main() {
   // schema id rather than by the group ids groupBy produces.
   const groups = Object.keys(SPECS).flatMap((schemaId) => {
     const operations = operationsBySchema.get(schemaId) ?? new Map<string, Operation>();
-    const ids = [...new Set([...operations.values()].map((operation) => idOf(schemaId, operation)))];
+    const seen = new Map<string, string>();
 
-    return ids.map((id) => ({ id, schemaId }));
+    for (const operation of operations.values()) {
+      seen.set(idOf(schemaId, operation), metaKeyOf(schemaId, operation));
+    }
+
+    return [...seen].map(([id, metaKey]) => ({ id, metaKey, schemaId }));
   });
 
   const expectedGroups = groups.map(({ id }) => id);
 
-  const undocumented = expectedGroups.filter((group) => !GROUP_META[group]);
+  const undocumented = groups.filter(({ metaKey }) => !GROUP_META[metaKey]);
 
   if (undocumented.length > 0) {
-    throw new Error(`No GROUP_META entry for: [${undocumented.join(', ')}]. Add one per group.`);
+    throw new Error(
+      `No GROUP_META entry for: [${undocumented.map(({ metaKey }) => metaKey).join(', ')}]. Add one per group.`,
+    );
   }
 
   // Never `rm -rf` OUTPUT_DIR itself — it holds the hand-written openapi/index.mdx and
-  // openapi/meta.json.
+  // openapi/meta.json. Everything below it is generated, so clear whole directories rather than the
+  // expected groups alone: a renamed or renested group would otherwise leave its old pages behind,
+  // out of the nav but still routable.
+  const stale = await readdir(OUTPUT_DIR, { withFileTypes: true }).catch(() => []);
+
   await Promise.all(
-    expectedGroups.map((group) =>
-      rm(path.join(OUTPUT_DIR, group), { recursive: true, force: true }),
-    ),
+    stale
+      .filter((entry) => entry.isDirectory())
+      .map((entry) => rm(path.join(OUTPUT_DIR, entry.name), { recursive: true, force: true })),
   );
 
   await generateFiles({
@@ -269,10 +293,10 @@ async function main() {
     // id: with `groupBy`, a schema's entries are group nodes, and the card writer skips those.
     index: {
       items: (context) =>
-        groups.map(({ id, schemaId }) => ({
+        groups.map(({ id, metaKey, schemaId }) => ({
           path: `${id}/index.mdx`,
-          title: GROUP_META[id].title,
-          description: GROUP_META[id].description,
+          title: GROUP_META[metaKey].title,
+          description: GROUP_META[metaKey].description,
           // generatedEntries is keyed by schema, so a spec split across several groups yields every
           // one of its operations here. Each generated path starts with the directory its group was
           // written to, which is what narrows them back down -- look the entries up by group id and
@@ -286,25 +310,63 @@ async function main() {
     },
   });
 
-  const actualGroups = await readdir(OUTPUT_DIR).catch(() => [] as string[]);
-  const missing = expectedGroups.filter((group) => !actualGroups.includes(group));
+  const missing = (
+    await Promise.all(
+      expectedGroups.map(async (group) =>
+        (await readdir(path.join(OUTPUT_DIR, group)).catch(() => null)) ? null : group,
+      ),
+    )
+  ).filter((group) => group !== null);
 
   if (missing.length > 0) {
-    throw new Error(
-      `Expected groups [${expectedGroups.join(', ')}] in ${OUTPUT_DIR}, missing: [${missing.join(', ')}]. Got: [${actualGroups.join(', ') || '<empty>'}]`,
-    );
+    throw new Error(`Expected groups in ${OUTPUT_DIR}, missing: [${missing.join(', ')}].`);
   }
 
   await Promise.all(
-    expectedGroups.map((group) =>
+    groups.map(({ id, metaKey }) =>
       writeFile(
-        path.join(OUTPUT_DIR, group, 'meta.json'),
+        path.join(OUTPUT_DIR, id, 'meta.json'),
         JSON.stringify(
           (({ title, navTitle, description }) => ({
             title: navTitle ?? title,
             description,
             pages: ['...'],
-          }))(GROUP_META[group]),
+          }))(GROUP_META[metaKey]),
+          null,
+          2,
+        ) + '\n',
+      ),
+    ),
+  );
+
+  const FOLDER_META: Record<string, { title: string; description: string }> = {
+    backend: {
+      title: 'Backend (API Key)',
+      description: "Called from your own server, naming the user in the path.",
+    },
+    frontend: {
+      title: 'Frontend (Signing Key JWT)',
+      description: 'Called from the browser, naming the user through the token.',
+    },
+  };
+
+  // `pages: ['...']` would sort a folder's children by directory order. Order them by where their
+  // entry sits in GROUP_META instead, so the declaration order above is the sidebar order and the
+  // two folders list the same resources in the same sequence.
+  const metaKeyOrder = Object.keys(GROUP_META);
+
+  await Promise.all(
+    Object.entries(FOLDER_META).map(([folder, meta]) =>
+      writeFile(
+        path.join(OUTPUT_DIR, folder, 'meta.json'),
+        JSON.stringify(
+          {
+            ...meta,
+            pages: groups
+              .filter(({ id }) => id.startsWith(`${folder}/`))
+              .sort((a, b) => metaKeyOrder.indexOf(a.metaKey) - metaKeyOrder.indexOf(b.metaKey))
+              .map(({ id }) => id.slice(folder.length + 1)),
+          },
           null,
           2,
         ) + '\n',
@@ -315,14 +377,12 @@ async function main() {
   // fumadocs-openapi's index writer emits only title and description, so a group whose feature is
   // not in the latest release gets its comingSoon frontmatter added here. The docs page component
   // reads that flag to render the badge and the warning callout.
-  const comingSoonPages = expectedGroups.flatMap((group) => {
-    const { comingSoon, comingSoonOperations = [] } = GROUP_META[group];
+  const comingSoonPages = groups.flatMap(({ id, metaKey }) => {
+    const { comingSoon, comingSoonOperations = [] } = GROUP_META[metaKey];
 
     return [
-      ...(comingSoon ? [path.join(OUTPUT_DIR, group, 'index.mdx')] : []),
-      ...comingSoonOperations.map((operationId) =>
-        path.join(OUTPUT_DIR, group, `${operationId}.mdx`),
-      ),
+      ...(comingSoon ? [path.join(OUTPUT_DIR, id, 'index.mdx')] : []),
+      ...comingSoonOperations.map((operationId) => path.join(OUTPUT_DIR, id, `${operationId}.mdx`)),
     ];
   });
 
