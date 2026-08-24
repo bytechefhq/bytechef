@@ -97,7 +97,7 @@ const token = jwt.sign(
 Keep the TTL short (10 minutes is a good default) and mint a fresh token per session.
 
 <Callout title="Connected Users are created automatically">
-    There is no "create connected user" endpoint. The first request authenticated with a user's JWT (or with an API Key against that user's `/{externalUserId}/…` routes) automatically creates the **Connected User** record for that external id. If a user was disabled by an admin, later requests are rejected until they are re-enabled under **Embedded → Connected Users**.
+    There is no "create connected user" endpoint. The first request authenticated with a user's JWT (or with an API Key against that user's `/{externalUserId}/…` routes) automatically creates the **Connected User** record for that external id. If a user was disabled by an admin, later requests are rejected until they are re-enabled under **Embedded → Connected Users**. See [Syncing Connected Users](/platform/embedded/get-started/initial-setup/syncing-connected-users-programmatically) for the identity contract and for attaching your own data to the record.
 </Callout>
 
 ---
