@@ -183,8 +183,8 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
 
                 return triggerDefinitionFacade.executeDynamicProperties(
                     workflowNodeType.name(), workflowNodeType.version(),
-                    workflowNodeType.operation(), propertyName, workflowTrigger.evaluateParameters(inputs, evaluator),
-                    lookupDependsOnPaths, connectionId);
+                    workflowNodeType.operation(), propertyName,
+                    workflowTrigger.evaluateParameters(inputs, evaluator, true), lookupDependsOnPaths, connectionId);
             })
             .orElseGet(() -> {
                 WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
@@ -196,7 +196,7 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
                         taskDispatcherDefinitionService.executeDynamicProperties(
                             workflowNodeType.name(), workflowNodeType.version(), propertyName,
                             workflowTask.evaluateParameters(
-                                (Map<String, Object>) inputs, evaluator)));
+                                (Map<String, Object>) inputs, evaluator, true)));
                 }
 
                 Map<String, ?> outputs = workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
@@ -205,7 +205,7 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
                 return actionDefinitionFacade.executeDynamicProperties(
                     workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(), propertyName,
                     workflowTask.evaluateParameters(
-                        MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs), evaluator),
+                        MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs), evaluator, true),
                     lookupDependsOnPaths, workflowId, connectionId);
             });
     }
