@@ -39,7 +39,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-03T17:58:15.470562+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-08-24T22:46:07.067007+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 @Validated
 @Tag(name = "connected-user-project-workflow", description = "The Embedded Connected User Project Workflow Public API")
 public interface ConnectedUserProjectWorkflowApi {
@@ -296,6 +296,9 @@ public interface ConnectedUserProjectWorkflowApi {
         tags = { "connected-user-project-workflow" },
         responses = {
             @ApiResponse(responseCode = "204", description = "Successful operation.")
+        },
+        security = {
+            @SecurityRequirement(name = "jwtBearerAuth")
         }
     )
     @RequestMapping(
@@ -328,6 +331,9 @@ public interface ConnectedUserProjectWorkflowApi {
         tags = { "connected-user-project-workflow" },
         responses = {
             @ApiResponse(responseCode = "204", description = "Successful operation.")
+        },
+        security = {
+            @SecurityRequirement(name = "bearerAuth")
         }
     )
     @RequestMapping(
@@ -502,6 +508,9 @@ public interface ConnectedUserProjectWorkflowApi {
             @ApiResponse(responseCode = "200", description = "The workflow object.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = ConnectedUserProjectWorkflowModel.class))
             })
+        },
+        security = {
+            @SecurityRequirement(name = "jwtBearerAuth")
         }
     )
     @RequestMapping(
@@ -544,6 +553,9 @@ public interface ConnectedUserProjectWorkflowApi {
             @ApiResponse(responseCode = "200", description = "The workflow object.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ConnectedUserProjectWorkflowModel.class)))
             })
+        },
+        security = {
+            @SecurityRequirement(name = "jwtBearerAuth")
         }
     )
     @RequestMapping(
@@ -587,6 +599,9 @@ public interface ConnectedUserProjectWorkflowApi {
             @ApiResponse(responseCode = "200", description = "The workflow object.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = ConnectedUserProjectWorkflowModel.class))
             })
+        },
+        security = {
+            @SecurityRequirement(name = "bearerAuth")
         }
     )
     @RequestMapping(
@@ -631,6 +646,9 @@ public interface ConnectedUserProjectWorkflowApi {
             @ApiResponse(responseCode = "200", description = "The workflow object.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ConnectedUserProjectWorkflowModel.class)))
             })
+        },
+        security = {
+            @SecurityRequirement(name = "bearerAuth")
         }
     )
     @RequestMapping(
