@@ -1,0 +1,93 @@
+"""
+The kinds of environment-scoped automation resources that can be promoted from one environment to another.
+"""
+enum PromotionResourceType {
+    API_COLLECTION
+    MCP_SERVER
+    A2A_SERVER
+    PROJECT_DEPLOYMENT
+}
+
+"""
+A connection referenced by the source resource being promoted, together with a suggestion for which connection in
+the target environment it should be rewired to.
+"""
+type PromotionConnectionMapping {
+    sourceConnectionId: ID!
+    sourceConnectionName: String!
+    componentName: String!
+    connectionVersion: Int!
+    suggestedTargetConnectionId: ID
+    usedBy: [String!]!
+}
+
+"""
+A project referenced by the source resource being promoted, together with the version already present in the
+target environment, if any.
+"""
+type PromotionProjectPreview {
+    projectId: ID!
+    projectName: String!
+    sourceProjectVersion: Int!
+    targetProjectVersion: Int
+}
+
+"""
+A dry-run preview of promoting one resource from its source environment to a target environment, returned before
+the caller commits to `promoteToEnvironment`.
+"""
+type EnvironmentPromotionPreview {
+    resourceType: PromotionResourceType!
+    sourceId: ID!
+    sourceEnvironmentId: ID!
+    targetEnvironmentId: ID!
+    existingTargetId: ID
+    existingTargetName: String
+    projects: [PromotionProjectPreview!]!
+    connections: [PromotionConnectionMapping!]!
+    warnings: [String!]!
+}
+
+"""
+An explicit source-connection-to-target-connection mapping supplied by the caller for `promoteToEnvironment`.
+"""
+input PromotionConnectionMappingInput {
+    sourceConnectionId: ID!
+    targetConnectionId: ID!
+}
+
+"""
+Input for promoting a resource into another environment.
+"""
+input PromoteToEnvironmentInput {
+    resourceType: PromotionResourceType!
+    sourceId: ID!
+    targetEnvironmentId: ID!
+    connectionMappings: [PromotionConnectionMappingInput!]!
+}
+
+"""
+The outcome of promoting one resource to a target environment.
+"""
+type EnvironmentPromotionResult {
+    targetId: ID!
+    created: Boolean!
+    targetUrl: String
+    unresolvedConnectionIds: [ID!]!
+}
+
+extend type Query {
+    """
+    Preview what promoting a resource into another environment will do (create vs. update, version moves,
+    suggested connection re-bindings, warnings).
+    """
+    environmentPromotionPreview(
+        resourceType: PromotionResourceType!, sourceId: ID!, targetEnvironmentId: ID!): EnvironmentPromotionPreview!
+}
+
+extend type Mutation {
+    """
+    Promote a resource into another environment: creates the counterpart on first promotion, syncs it afterwards.
+    """
+    promoteToEnvironment(input: PromoteToEnvironmentInput!): EnvironmentPromotionResult!
+}
