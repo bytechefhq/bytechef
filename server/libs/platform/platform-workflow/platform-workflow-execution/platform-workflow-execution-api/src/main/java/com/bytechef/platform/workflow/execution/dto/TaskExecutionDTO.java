@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.Strings;
 
 /**
  * @author Ivica Cardic
@@ -90,83 +91,86 @@ public record TaskExecutionDTO(
             .toList();
 
         return topLevelTasks.stream()
-            .map(taskExecutionDTO -> buildTasksTree(taskExecutionDTO, tasksMap))
+            .map(taskExecutionDTO -> buildTaskExecutionTree(taskExecutionDTO, tasksMap))
             .toList();
     }
 
-    private static TaskExecutionDTO buildTasksTree(
+    private static TaskExecutionDTO buildTaskExecutionTree(
         TaskExecutionDTO taskExecutionDTO, Map<Long, List<TaskExecutionDTO>> tasksMap) {
 
-        List<TaskExecutionDTO> matchingChildren = tasksMap.getOrDefault(taskExecutionDTO.id(), List.of());
+        List<TaskExecutionDTO> taskExecutions = tasksMap.getOrDefault(taskExecutionDTO.id(), List.of());
         String type = taskExecutionDTO.type();
 
-        if (type != null && type.toLowerCase()
-            .contains("loop")) {
-            List<List<TaskExecutionDTO>> iterationItems = new ArrayList<>();
-            List<TaskExecutionDTO> currentIterationItems = new ArrayList<>();
+        if (type != null && Strings.CS.contains(type.toLowerCase(), "loop")) {
+            List<List<TaskExecutionDTO>> iterationTaskExecutions = new ArrayList<>();
+            List<TaskExecutionDTO> currentIterationTaskExecutions = new ArrayList<>();
             Integer previousTaskNumber = null;
 
-            for (TaskExecutionDTO child : matchingChildren) {
-                if (child.taskNumber() == 0 && previousTaskNumber != null && !currentIterationItems.isEmpty()) {
-                    iterationItems.add(new ArrayList<>(currentIterationItems));
+            for (TaskExecutionDTO taskExecution : taskExecutions) {
+                if (taskExecution.taskNumber() == 0 && previousTaskNumber != null &&
+                    !currentIterationTaskExecutions.isEmpty()) {
 
-                    currentIterationItems.clear();
+                    iterationTaskExecutions.add(new ArrayList<>(currentIterationTaskExecutions));
+
+                    currentIterationTaskExecutions.clear();
                 }
 
-                currentIterationItems.add(buildTasksTree(child, tasksMap));
+                currentIterationTaskExecutions.add(buildTaskExecutionTree(taskExecution, tasksMap));
 
-                previousTaskNumber = child.taskNumber();
+                previousTaskNumber = taskExecution.taskNumber();
             }
 
-            if (!currentIterationItems.isEmpty()) {
-                iterationItems.add(new ArrayList<>(currentIterationItems));
+            if (!currentIterationTaskExecutions.isEmpty()) {
+                iterationTaskExecutions.add(new ArrayList<>(currentIterationTaskExecutions));
             }
 
-            return new TaskExecutionDTO(taskExecutionDTO, List.of(), iterationItems, taskExecutionDTO.childJob());
+            return new TaskExecutionDTO(
+                taskExecutionDTO, List.of(), iterationTaskExecutions, taskExecutionDTO.childJob());
         }
 
-        if (type != null && type.toLowerCase()
-            .contains("on-error")) {
+        if (type != null && Strings.CS.contains(type.toLowerCase(), "on-error")) {
             WorkflowTask workflowTask = taskExecutionDTO.workflowTask();
 
-            Set<String> mainBranchTaskNames = collectBranchTaskNames(workflowTask, "main-branch");
-            Set<String> errorBranchTaskNames = collectBranchTaskNames(workflowTask, "on-error-branch");
+            Set<String> onErrorBranchTaskNames = getBranchTaskNames(workflowTask, "on-error-branch");
 
-            List<TaskExecutionDTO> mainBranchTasks = new ArrayList<>();
-            List<TaskExecutionDTO> errorBranchTasks = new ArrayList<>();
+            List<TaskExecutionDTO> mainBranchTaskExecutions = new ArrayList<>();
+            List<TaskExecutionDTO> errorBranchTaskExecutions = new ArrayList<>();
 
-            for (TaskExecutionDTO child : matchingChildren) {
-                TaskExecutionDTO builtChild = buildTasksTree(child, tasksMap);
-                String childTaskName = builtChild.workflowTask() == null ? null : builtChild.workflowTask()
-                    .getName();
+            for (TaskExecutionDTO child : taskExecutions) {
+                TaskExecutionDTO taskExecutionTree = buildTaskExecutionTree(child, tasksMap);
 
-                if (childTaskName != null && errorBranchTaskNames.contains(childTaskName)) {
-                    errorBranchTasks.add(builtChild);
-                } else if (childTaskName != null && mainBranchTaskNames.contains(childTaskName)) {
-                    mainBranchTasks.add(builtChild);
+                String workflowTaskName = null;
+
+                if (taskExecutionTree.workflowTask() != null) {
+                    workflowTaskName = taskExecutionTree.workflowTask()
+                        .getName();
+                }
+
+                if (workflowTaskName != null && onErrorBranchTaskNames.contains(workflowTaskName)) {
+                    errorBranchTaskExecutions.add(taskExecutionTree);
                 } else {
-                    mainBranchTasks.add(builtChild);
+                    mainBranchTaskExecutions.add(taskExecutionTree);
                 }
             }
 
             List<List<TaskExecutionDTO>> branchItems = new ArrayList<>();
 
-            if (!mainBranchTasks.isEmpty() || !errorBranchTasks.isEmpty()) {
-                branchItems.add(mainBranchTasks);
-                branchItems.add(errorBranchTasks);
+            if (!mainBranchTaskExecutions.isEmpty() || !errorBranchTaskExecutions.isEmpty()) {
+                branchItems.add(mainBranchTaskExecutions);
+                branchItems.add(errorBranchTaskExecutions);
             }
 
             return new TaskExecutionDTO(taskExecutionDTO, List.of(), branchItems, taskExecutionDTO.childJob());
         }
 
-        List<TaskExecutionDTO> children = matchingChildren.stream()
-            .map(child -> buildTasksTree(child, tasksMap))
+        List<TaskExecutionDTO> children = taskExecutions.stream()
+            .map(child -> buildTaskExecutionTree(child, tasksMap))
             .toList();
 
         return new TaskExecutionDTO(taskExecutionDTO, children, List.of(), taskExecutionDTO.childJob());
     }
 
-    private static Set<String> collectBranchTaskNames(WorkflowTask workflowTask, String branchKey) {
+    private static Set<String> getBranchTaskNames(WorkflowTask workflowTask, String branchKey) {
         if (workflowTask == null) {
             return Set.of();
         }
