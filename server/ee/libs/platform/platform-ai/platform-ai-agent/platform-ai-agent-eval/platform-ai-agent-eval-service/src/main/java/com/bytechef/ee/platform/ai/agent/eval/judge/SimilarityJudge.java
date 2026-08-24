@@ -20,7 +20,6 @@ import io.github.markpollack.judge.DeterministicJudge;
 import io.github.markpollack.judge.context.JudgmentContext;
 import io.github.markpollack.judge.result.Judgment;
 import io.github.markpollack.judge.result.JudgmentStatus;
-import io.github.markpollack.judge.score.NumericalScore;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -59,8 +58,7 @@ public class SimilarityJudge extends DeterministicJudge {
         }
 
         if (resolvedExpectedOutput == null) {
-            return Judgment.error("No expected output provided",
-                new IllegalArgumentException("expectedOutput is null"));
+            return Judgment.error("No expected output provided");
         }
 
         double similarity;
@@ -77,11 +75,19 @@ public class SimilarityJudge extends DeterministicJudge {
             "Similarity score %.4f (%s) is %s the threshold %.4f", similarity, algorithm,
             (similarity >= threshold) ? "at or above" : "below", threshold);
 
-        return Judgment.builder()
-            .score(NumericalScore.normalized(similarity))
-            .status(status)
-            .reasoning(reasoning)
-            .build();
+        if (status == JudgmentStatus.FAIL) {
+            return Judgment.builder()
+                .fail()
+                .score(similarity)
+                .reasoning(reasoning)
+                .build();
+        } else {
+            return Judgment.builder()
+                .pass()
+                .score(similarity)
+                .reasoning(reasoning)
+                .build();
+        }
     }
 
     private double calculateCosineSimilarity(String text1, String text2) {

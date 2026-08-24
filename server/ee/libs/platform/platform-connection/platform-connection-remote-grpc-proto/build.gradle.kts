@@ -5,7 +5,17 @@ plugins {
 }
 
 val protobufVersion = libs.versions.protobuf.get()
-val grpcVersion = libs.versions.grpc.get()
+
+val grpcVersion: String = configurations
+    .detachedConfiguration(
+        dependencies.platform("org.springframework.boot:spring-boot-dependencies:${libs.versions.spring.boot.get()}"),
+        dependencies.create("io.grpc:grpc-stub"))
+    .incoming
+    .resolutionResult
+    .allComponents
+    .first { component -> component.moduleVersion?.name == "grpc-stub" }
+    .moduleVersion!!
+    .version
 
 protobuf {
     protoc {

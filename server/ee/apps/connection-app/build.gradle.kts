@@ -53,7 +53,7 @@ dependencies {
 
     // gRPC server transport for the optional grpc remote transport (bytechef.remote.transport=grpc);
     // the server stays dormant until spring.grpc.server.enabled=true.
-    implementation(libs.org.springframework.grpc.spring.grpc.server.spring.boot.starter)
+    implementation("org.springframework.boot:spring-boot-starter-grpc-server")
 
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-remote-client"))
     implementation(project(":server:ee:libs:embedded:embedded-openapi"))

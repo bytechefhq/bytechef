@@ -99,9 +99,7 @@ public class LlmRuleJudge extends LLMJudge {
             JsonNode explanationNode = jsonNode.get("explanation");
 
             if (passedNode == null || explanationNode == null) {
-                return Judgment.error(
-                    "Failed to parse LLM response",
-                    new IllegalArgumentException("Missing 'passed' or 'explanation' field in response"));
+                return Judgment.error("Failed to parse LLM response");
             }
 
             String explanation = explanationNode.asText();
@@ -112,7 +110,7 @@ public class LlmRuleJudge extends LLMJudge {
 
             return Judgment.fail(explanation);
         } catch (JacksonException jsonProcessingException) {
-            return Judgment.error("Failed to parse LLM response", jsonProcessingException);
+            return Judgment.error("Failed to parse LLM response");
         }
     }
 

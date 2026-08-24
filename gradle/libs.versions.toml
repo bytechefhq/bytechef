@@ -1,31 +1,29 @@
 [versions]
 a2a-java-sdk = "0.3.3.Final"
 anthropic-java = "2.35.0"
-bootui = "1.13.1"
-checkstyle = "13.10.0"
+bootui = "1.14.1"
+checkstyle = "14.0.0"
 com-google-auto-service = "1.1.1"
 findsecbugs = "1.14.0"
 graalvm = "25.2.4"
-grpc = "1.83.1"
 io-modelcontextprotocol-sdk = "2.0.0"
 jackson = "2.19.2"
 jacoco = "0.8.13"
 java = "25"
 jjwt = "0.13.0"
-markpollack-agent-claude = "0.25.0"
-markpollack-agent-judge = "0.13.0"
+markpollack-agent-claude = "0.28.0"
+markpollack-agent-judge = "0.15.0"
 openai-java = "4.38.0"
 org-mapstruct = "1.6.3"
 org-mapstruct-extensions-spring = "2.0.0"
 org-springdoc = "3.1.0"
 pmd = "7.26.0"
-protobuf = "4.35.1"
-spotbugs = "4.10.3"
-spring-ai = "2.0.0"
-spring-boot = "4.0.7"
-spring-cloud-aws = "4.0.2"
-spring-cloud-dependencies = "2025.1.1"
-spring-grpc = "1.0.3"
+protobuf = "4.36.0"
+spotbugs = "4.10.4"
+spring-ai = "2.0.1"
+spring-boot = "4.1.1"
+spring-cloud-aws = "4.1.0"
+spring-cloud-dependencies = "2025.1.3"
 spring-shell = "4.0.1"
 spring-vault = "4.1.0"
 springaicommunity-agent-utils = "0.10.0"
@@ -50,13 +48,13 @@ commons-text = "org.apache.commons:commons-text:1.15.0"
 commons-validator = "commons-validator:commons-validator:1.11.0"
 io-github-a2asdk-a2a-java-sdk-client = { module = "io.github.a2asdk:a2a-java-sdk-client", version.ref = "a2a-java-sdk" }
 io-github-a2asdk-a2a-java-sdk-spec = { module = "io.github.a2asdk:a2a-java-sdk-spec", version.ref = "a2a-java-sdk" }
-io-grpc-grpc-inprocess = { module = "io.grpc:grpc-inprocess", version.ref = "grpc" }
-io-grpc-grpc-netty-shaded = { module = "io.grpc:grpc-netty-shaded", version.ref = "grpc" }
-io-grpc-grpc-protobuf = { module = "io.grpc:grpc-protobuf", version.ref = "grpc" }
-io-grpc-grpc-stub = { module = "io.grpc:grpc-stub", version.ref = "grpc" }
-io-grpc-grpc-testing = { module = "io.grpc:grpc-testing", version.ref = "grpc" }
-io-swagger-core-v3-swagger-annotations = "io.swagger.core.v3:swagger-annotations:2.2.53"
-io-swagger-parser-v3-swagger-parser = "io.swagger.parser.v3:swagger-parser:2.1.46"
+io-grpc-grpc-inprocess = { module = "io.grpc:grpc-inprocess" }
+io-grpc-grpc-netty-shaded = { module = "io.grpc:grpc-netty-shaded" }
+io-grpc-grpc-protobuf = { module = "io.grpc:grpc-protobuf" }
+io-grpc-grpc-stub = { module = "io.grpc:grpc-stub" }
+io-grpc-grpc-testing = { module = "io.grpc:grpc-testing" }
+io-swagger-core-v3-swagger-annotations = "io.swagger.core.v3:swagger-annotations:2.2.54"
+io-swagger-parser-v3-swagger-parser = "io.swagger.parser.v3:swagger-parser:2.1.47"
 jjwt-api = { module = "io.jsonwebtoken:jjwt-api", version.ref = "jjwt" }
 jjwt-impl = { module = "io.jsonwebtoken:jjwt-impl", version.ref = "jjwt" }
 jjwt-jackson = { module = "io.jsonwebtoken:jjwt-jackson", version.ref = "jjwt" }
@@ -92,7 +90,6 @@ org-springaicommunity-spring-ai-session = { module = "org.springaicommunity:spri
 org-springaicommunity-spring-ai-session-jdbc = { module = "org.springaicommunity:spring-ai-session-jdbc", version.ref = "springaicommunity-spring-ai-session" }
 org-springdoc-springdoc-openapi-starter-common = { module = "org.springdoc:springdoc-openapi-starter-common", version.ref = "org-springdoc" }
 org-springdoc-springdoc-openapi-starter-webmvc-scalar = { module = "org.springdoc:springdoc-openapi-starter-webmvc-scalar", version.ref = "org-springdoc" }
-org-springframework-grpc-spring-grpc-server-spring-boot-starter = { module = "org.springframework.grpc:spring-grpc-server-spring-boot-starter", version.ref = "spring-grpc" }
 org-springframework-vault-spring-vault-core = { module = "org.springframework.vault:spring-vault-core", version.ref = "spring-vault" }
 org-wiremock-wiremock = "org.wiremock:wiremock-standalone:3.13.2"
 org-zeroturnaround-zt-exec = "org.zeroturnaround:zt-exec:1.13.0"
@@ -103,8 +100,8 @@ gradle-git-properties = "com.gorylenko.gradle-git-properties:4.0.1"
 io-github-ben-manes-versions = "io.github.ben-manes.versions:0.61.0"
 jib = "com.google.cloud.tools.jib:3.5.4"
 nl-littlerobots-version-catalog-update = "nl.littlerobots.version-catalog-update:1.1.1"
-org-graalvm-buildtools-native = "org.graalvm.buildtools.native:1.1.9"
+org-graalvm-buildtools-native = "org.graalvm.buildtools.native:1.1.10"
 org-openapi-generator = "org.openapi.generator:7.24.0"
 org-sonarqube = "org.sonarqube:7.4.0.8496"
-spotbugs = "com.github.spotbugs:6.5.10"
-spotless = "com.diffplug.gradle.spotless:8.9.0"
+spotbugs = "com.github.spotbugs:6.5.11"
+spotless = "com.diffplug.gradle.spotless:8.10.0"

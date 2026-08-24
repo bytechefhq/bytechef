@@ -48,7 +48,7 @@ public class RegexMatchJudge extends DeterministicJudge {
         try {
             compiledPattern = Pattern.compile(pattern);
         } catch (PatternSyntaxException patternSyntaxException) {
-            return Judgment.error("Invalid regex pattern: " + pattern, patternSyntaxException);
+            return Judgment.error("Invalid regex pattern: " + pattern);
         }
 
         Matcher matcher = compiledPattern.matcher(output);

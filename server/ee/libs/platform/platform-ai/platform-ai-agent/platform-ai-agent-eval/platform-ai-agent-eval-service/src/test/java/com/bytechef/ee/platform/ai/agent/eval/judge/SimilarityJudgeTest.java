@@ -22,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import io.github.markpollack.judge.context.JudgmentContext;
 import io.github.markpollack.judge.result.Judgment;
 import io.github.markpollack.judge.result.JudgmentStatus;
-import io.github.markpollack.judge.score.NumericalScore;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
@@ -39,9 +38,7 @@ class SimilarityJudgeTest {
 
         assertEquals(JudgmentStatus.PASS, judgment.status());
 
-        NumericalScore score = (NumericalScore) judgment.score();
-
-        assertEquals(1.0, score.value(), 0.001);
+        assertEquals(1.0, judgment.score(), 0.001);
     }
 
     @Test
@@ -52,9 +49,7 @@ class SimilarityJudgeTest {
 
         assertEquals(JudgmentStatus.PASS, judgment.status());
 
-        NumericalScore score = (NumericalScore) judgment.score();
-
-        assertTrue(score.value() > 0.5);
+        assertTrue(judgment.score() > 0.5);
     }
 
     @Test
@@ -74,9 +69,7 @@ class SimilarityJudgeTest {
 
         assertEquals(JudgmentStatus.PASS, judgment.status());
 
-        NumericalScore score = (NumericalScore) judgment.score();
-
-        assertEquals(1.0, score.value(), 0.001);
+        assertEquals(1.0, judgment.score(), 0.001);
     }
 
     @Test
@@ -87,9 +80,7 @@ class SimilarityJudgeTest {
 
         assertEquals(JudgmentStatus.PASS, judgment.status());
 
-        NumericalScore score = (NumericalScore) judgment.score();
-
-        assertTrue(score.value() > 0.3);
+        assertTrue(judgment.score() > 0.3);
     }
 
     @Test
@@ -100,9 +91,7 @@ class SimilarityJudgeTest {
 
         assertEquals(JudgmentStatus.FAIL, judgment.status());
 
-        NumericalScore score = (NumericalScore) judgment.score();
-
-        assertEquals(0.0, score.value(), 0.001);
+        assertEquals(0.0, judgment.score(), 0.001);
     }
 
     @Test
@@ -137,9 +126,7 @@ class SimilarityJudgeTest {
 
         assertEquals(JudgmentStatus.PASS, judgment.status());
 
-        NumericalScore score = (NumericalScore) judgment.score();
-
-        assertEquals(1.0, score.value(), 0.001);
+        assertEquals(1.0, judgment.score(), 0.001);
     }
 
     private JudgmentContext buildContext(String agentOutput) {

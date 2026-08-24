@@ -10,5 +10,5 @@ dependencies {
     testImplementation(libs.io.grpc.grpc.inprocess)
     testImplementation(libs.io.grpc.grpc.netty.shaded)
     testImplementation(libs.io.grpc.grpc.testing)
-    testImplementation(libs.org.springframework.grpc.spring.grpc.server.spring.boot.starter)
+    testImplementation("org.springframework.boot:spring-boot-starter-grpc-server")
 }
