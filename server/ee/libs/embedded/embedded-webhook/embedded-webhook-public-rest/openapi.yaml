@@ -52,6 +52,8 @@ paths:
           $ref: "#/components/responses/internalServerError"
         "501":
           $ref: "#/components/responses/notImplemented"
+      security:
+        - jwtBearerAuth: [ ]
   /workflows/{workflowUuid}:
     post:
       description: "Executes a single workflow through its Request trigger and returns the result\
@@ -98,7 +100,14 @@ paths:
           $ref: "#/components/responses/internalServerError"
         "501":
           $ref: "#/components/responses/notImplemented"
+      security:
+        - jwtBearerAuth: [ ]
 components:
+  securitySchemes:
+    jwtBearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   responses:
     badRequest:
       description: Bad request

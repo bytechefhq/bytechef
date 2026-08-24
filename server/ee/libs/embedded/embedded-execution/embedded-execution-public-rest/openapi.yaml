@@ -164,6 +164,9 @@ paths:
           $ref: "#/components/responses/internalServerError"
         "501":
           $ref: "#/components/responses/notImplemented"
+      security:
+        - bearerAuth: [ ]
+        - jwtBearerAuth: [ ]
 #  /components/{componentName}/versions/{componentVersion}/triggers:
 #    get:
 #      description: "Returns a list with all the available triggers for a given component."
@@ -278,6 +281,9 @@ paths:
           $ref: "#/components/responses/internalServerError"
         "501":
           $ref: "#/components/responses/notImplemented"
+      security:
+        - bearerAuth: [ ]
+        - jwtBearerAuth: [ ]
     post:
       description: "Executes a tool and returns the result as the response."
       summary: "Executes a tool and returns the result as the response"
@@ -347,6 +353,9 @@ paths:
           $ref: "#/components/responses/internalServerError"
         "501":
           $ref: "#/components/responses/notImplemented"
+      security:
+        - bearerAuth: [ ]
+        - jwtBearerAuth: [ ]
 #  /subscriptions:
 #    get:
 #      description: "Returns a list with all the available triggers for a given component."
@@ -503,6 +512,14 @@ paths:
 #        "500":
 #          description: "Internal Error"
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+    jwtBearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   responses:
     badRequest:
       description: Bad request

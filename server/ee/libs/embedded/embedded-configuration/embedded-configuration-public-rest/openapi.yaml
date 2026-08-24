@@ -270,6 +270,8 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/ConnectedUserProjectWorkflow"
+      security:
+        - jwtBearerAuth: [ ]
     post:
       description: "Create new workflow and adds it to an existing integration."
       summary: "Create new workflow and adds it to an existing integration"
@@ -325,6 +327,8 @@ paths:
       responses:
         "204":
           description: "Successful operation."
+      security:
+        - jwtBearerAuth: [ ]
     get:
       description: "Get a workflow by workflow reference code."
       summary: "Get a workflow by workflow reference code"
@@ -351,6 +355,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ConnectedUserProjectWorkflow"
+      security:
+        - jwtBearerAuth: [ ]
     put:
       description: "Update an existing workflow."
       summary: "Update an existing workflow"
@@ -964,6 +970,8 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/ConnectedUserProjectWorkflow"
+      security:
+        - bearerAuth: [ ]
     post:
       description: "Create new workflow and adds it to an existing integration."
       summary: "Create new workflow and adds it to an existing integration"
@@ -1031,6 +1039,8 @@ paths:
       responses:
         "204":
           description: "Successful operation."
+      security:
+        - bearerAuth: [ ]
     get:
       description: "Get a workflow by workflow reference code."
       summary: "Get a workflow by workflow reference code"
@@ -1063,6 +1073,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ConnectedUserProjectWorkflow"
+      security:
+        - bearerAuth: [ ]
     put:
       description: "Update an existing workflow."
       summary: "Update an existing workflow"
@@ -1258,7 +1270,7 @@ paths:
           description: "Successful operation."
       security:
         - bearerAuth: [ ]
-  /externalUserId/components/{componentName}/connections:
+  /{externalUserId}/components/{componentName}/connections:
     get:
       description: "Get all connected user's connections."
       summary: "Get all connected user's connections"
@@ -1481,7 +1493,7 @@ paths:
         "401":
           $ref: "#/components/responses/UnauthorizedError"
       security:
-        - jwtBearerAuth: [ ]
+        - bearerAuth: [ ]
   /{externalUserId}/integrations:
     get:
       description: "Get active integrations for particular external user."

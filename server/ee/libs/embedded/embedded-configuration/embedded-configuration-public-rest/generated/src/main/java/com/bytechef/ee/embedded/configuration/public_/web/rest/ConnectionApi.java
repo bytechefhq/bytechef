@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-03T17:58:15.470562+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-08-24T22:46:07.067007+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 @Validated
 @Tag(name = "connection", description = "the connection API")
 public interface ConnectionApi {
@@ -44,9 +44,9 @@ public interface ConnectionApi {
         return Optional.empty();
     }
 
-    String PATH_GET_CONNECTIONS = "/externalUserId/components/{componentName}/connections";
+    String PATH_GET_CONNECTIONS = "/{externalUserId}/components/{componentName}/connections";
     /**
-     * GET /externalUserId/components/{componentName}/connections : Get all connected user&#39;s connections
+     * GET /{externalUserId}/components/{componentName}/connections : Get all connected user&#39;s connections
      * Get all connected user&#39;s connections.
      *
      * @param externalUserId The external user id. (required)
