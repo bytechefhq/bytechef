@@ -37,7 +37,6 @@ them.
 | `embedded-action`, `embedded-tool*`, `embedded-workflow-execution` | `server/ee/libs/embedded/embedded-execution/embedded-execution-public-rest/openapi.yaml` |
 | `embedded-configuration-*` | `server/ee/libs/embedded/embedded-configuration/embedded-configuration-public-rest/openapi.yaml` |
 | `embedded-webhook-*` | `server/ee/libs/embedded/embedded-webhook/embedded-webhook-public-rest/openapi.yaml` |
-| `automation-bridge` | `server/ee/libs/embedded/embedded-configuration/embedded-configuration-admin-rest/openapi.yaml` |
 | `custom-components` | `server/ee/libs/platform/platform-custom-component/platform-custom-component-configuration/platform-custom-component-configuration-rest/openapi.yaml` |
 
 After editing a spec, regenerate from this directory:

@@ -26,7 +26,6 @@ ByteChef exposes five public REST APIs for use from your own applications:
 - **[Workflow Catalog](/openapi/embedded-configuration-automation-workflow-project)** — the catalog projects available to connected users.
 - **[App Events](/openapi/embedded-webhook-app-event-trigger)** — fire an App Event to start every subscribed workflow.
 - **[Request Trigger](/openapi/embedded-webhook-request-trigger)** — execute a single workflow synchronously and return its result.
-- **Automation Bridge** — deploy a code-native automation project into the embedded catalog. *Coming soon*, along with its reference page.
 
 **Platform**
 
@@ -48,14 +47,11 @@ Prefix the operation path you see on each reference page with the corresponding 
 
 ## Authentication
 
-Every API takes a bearer token in the `Authorization` header. Which token depends on the API, and — for
-the embedded APIs — on the shape of the operation path.
+Every API takes a bearer token in the `Authorization` header. Which token applies depends on the shape
+of the operation path.
 
 | API | Accepted token |
 |---|---|
-| Automation (all three) | A workspace **API Key**. |
-| Custom Components | An **API Key** whose owning user holds the admin authority. *Coming soon* — restricting this to Admin API Keys specifically, so workspace and embedded keys are rejected on `/api/platform/v1`. |
-| Automation Bridge | An **Admin API Key** — authenticated as your own user rather than as a connected user, so a Signing Key JWT is not accepted. *Coming soon*, along with the API itself. |
 | Embedded — Actions, Tools, Workflow Executions, Tool Invocations | An **API Key**, or a per-end-user JWT signed by your backend with a **Signing Key**. Every operation carries `{externalUserId}` in its path, so both work. |
 | Embedded — Integrations, Integration Instances, Instance Workflows, Connections, Connected Users, User Workflows, Workflow Catalog | An **API Key** on the `{externalUserId}/…` operations; a **Signing Key** JWT on the rest. |
 | Embedded — App Events, Request Trigger | A **Signing Key** JWT. Neither operation carries `{externalUserId}` in its path, so an API Key has no user to act for and is rejected. |
@@ -64,6 +60,6 @@ Both embedded token types act on behalf of one connected user: an API Key takes 
 `{externalUserId}` path segment, a Signing Key JWT takes it from the token's `sub` claim. That is why
 browser-originated calls, which have no user id in the path, need a JWT.
 
-Pass an optional `X-Environment` header (`DEVELOPMENT`, `STAGING`, or `PRODUCTION`) to scope the request to a specific environment. If omitted, ByteChef uses `PRODUCTION`. On the Automation and Embedded workflow-executions endpoints the header also selects which environment's executions are returned.
+Pass an optional `X-Environment` header (`DEVELOPMENT`, `STAGING`, or `PRODUCTION`) to scope the request to a specific environment. If omitted, ByteChef uses `PRODUCTION`. On the Embedded workflow-executions endpoints the header also selects which environment's executions are returned.
 
-See [Signing Keys](/platform/embedded/administration/signing-keys) and [Embedded API Keys](/platform/embedded/administration/api-keys) for the embedded credentials, and [API Keys](/platform/automation/settings/api-keys) for the automation one.
+See [Signing Keys](/platform/embedded/administration/signing-keys) and [Embedded API Keys](/platform/embedded/administration/api-keys) for the embedded credentials.
