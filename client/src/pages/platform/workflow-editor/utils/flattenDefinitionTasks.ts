@@ -103,7 +103,7 @@ function extractNestedTasks(parameters: Record<string, unknown>): Array<Workflow
     return result;
 }
 
-function isWorkflowTask(value: unknown): value is WorkflowTask {
+export function isWorkflowTask(value: unknown): value is WorkflowTask {
     if (value === null || typeof value !== 'object' || !('name' in value) || !('type' in value)) {
         return false;
     }

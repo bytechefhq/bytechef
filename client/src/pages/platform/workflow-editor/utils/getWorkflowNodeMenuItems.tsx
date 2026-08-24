@@ -1,9 +1,11 @@
 import {NodeDataType} from '@/shared/types';
 import {
     ArrowLeftRightIcon,
+    BanIcon,
     ClipboardPlusIcon,
     CopyIcon,
     InfoIcon,
+    PlayIcon,
     RefreshCcwIcon,
     ScissorsIcon,
     TextCursorInputIcon,
@@ -35,9 +37,11 @@ interface GetWorkflowNodeMenuItemsProps {
     onRename: () => void;
     onResetPosition: () => void;
     onSwitch: () => void;
+    onToggleDisabled?: () => void;
     showCopyAction: boolean;
     showCutAction: boolean;
     showDeleteAction: boolean;
+    showDisableAction: boolean;
     showInfoAction: boolean;
     showRenameAction: boolean;
     showReplaceAction: boolean;
@@ -85,9 +89,11 @@ export function getWorkflowNodeMenuItems({
     onRename,
     onResetPosition,
     onSwitch,
+    onToggleDisabled,
     showCopyAction,
     showCutAction,
     showDeleteAction,
+    showDisableAction,
     showInfoAction,
     showRenameAction,
     showReplaceAction,
@@ -178,9 +184,10 @@ export function getWorkflowNodeMenuItems({
     }
 
     const canRename = showRenameAction && !data.isNestedClusterRoot;
+    const canToggleDisabled = showDisableAction && !!onToggleDisabled;
 
     const hasFirstGroup = showCutAction || showReplaceAction || showCopyAction || canPaste;
-    const hasSecondGroup = canRename || hasSavedPosition || showInfoAction;
+    const hasSecondGroup = canRename || canToggleDisabled || hasSavedPosition || showInfoAction;
 
     if (hasFirstGroup && hasSecondGroup) {
         menuItems.push({key: 'separator-actions', type: 'separator'});
@@ -192,6 +199,16 @@ export function getWorkflowNodeMenuItems({
             key: 'rename',
             label: 'Rename',
             onSelect: onRename,
+            type: 'item',
+        });
+    }
+
+    if (showDisableAction && onToggleDisabled) {
+        menuItems.push({
+            icon: data.disabled ? <PlayIcon className="size-4 shrink-0" /> : <BanIcon className="size-4 shrink-0" />,
+            key: 'toggle-disabled',
+            label: data.disabled ? 'Enable' : 'Disable',
+            onSelect: onToggleDisabled,
             type: 'item',
         });
     }
