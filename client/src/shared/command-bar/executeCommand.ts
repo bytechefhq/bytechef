@@ -1,0 +1,53 @@
+import {
+    type CommandActionType,
+    type CommandContextI,
+    type CommandI,
+    type CommandRunContextI,
+} from '@/shared/command-bar/types';
+import {useCommandIntentStore} from '@/shared/command-bar/useCommandIntentStore';
+import {type NavigateFunction} from 'react-router-dom';
+
+export interface ExecuteCommandOptionsI {
+    closePalette: () => void;
+    context: CommandContextI;
+    navigate: NavigateFunction;
+    onError: (error: unknown) => void;
+    recordRecent: (command: CommandI) => void;
+}
+
+async function runAction(action: CommandActionType, runContext: CommandRunContextI): Promise<void> {
+    switch (action.type) {
+        case 'callback':
+            await action.run(runContext);
+
+            return;
+        case 'intent':
+            useCommandIntentStore.getState().publish(action.key, action.payload);
+
+            return;
+        case 'navigate':
+            await runContext.navigate(action.to);
+
+            return;
+    }
+}
+
+export async function executeCommand(command: CommandI, options: ExecuteCommandOptionsI): Promise<void> {
+    const {closePalette, context, navigate, onError, recordRecent} = options;
+
+    closePalette();
+
+    const runContext: CommandRunContextI = {command, context, navigate};
+
+    try {
+        for (const action of command.actions ?? []) {
+            await runAction(action, runContext);
+        }
+    } catch (error) {
+        onError(error);
+
+        return;
+    }
+
+    recordRecent(command);
+}
