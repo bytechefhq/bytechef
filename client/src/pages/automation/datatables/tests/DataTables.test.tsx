@@ -23,7 +23,13 @@ vi.mock('@/pages/automation/datatables/components/hooks/useDataTables', () => ({
 }));
 
 vi.mock('@/pages/automation/datatables/components/CreateDataTableDialog', () => ({
-    default: () => <button data-testid="create-dialog-trigger">New Table</button>,
+    // Exposes claimsCreateIntent on the rendered node so a test can prove the list page actually opts this
+    // instance into claiming the dataTable.create command intent, rather than merely asserting it renders.
+    default: ({claimsCreateIntent}: {claimsCreateIntent?: boolean}) => (
+        <button data-claims-create-intent={String(claimsCreateIntent)} data-testid="create-dialog-trigger">
+            New Table
+        </button>
+    ),
 }));
 
 vi.mock('@/pages/automation/datatables/components/DataTableList', () => ({
@@ -125,6 +131,12 @@ describe('DataTables', () => {
             expect(screen.getByTestId('create-dialog-trigger')).toBeInTheDocument();
         });
 
+        it('should opt the header CreateDataTableDialog instance into claiming dataTable.create', () => {
+            renderDataTables();
+
+            expect(screen.getByTestId('create-dialog-trigger')).toHaveAttribute('data-claims-create-intent', 'true');
+        });
+
         it('should render left sidebar nav', () => {
             renderDataTables();
 
@@ -140,6 +152,14 @@ describe('DataTables', () => {
 
             expect(screen.getByText('No Data Tables')).toBeInTheDocument();
             expect(screen.getByText('Get started by creating a new data table.')).toBeInTheDocument();
+        });
+
+        it('should opt the empty-state CreateDataTableDialog instance into claiming dataTable.create', () => {
+            hoisted.mockUseDataTables.mockReturnValue({...defaultMockReturn, filteredTables: [], tables: []});
+
+            renderDataTables();
+
+            expect(screen.getByTestId('create-dialog-trigger')).toHaveAttribute('data-claims-create-intent', 'true');
         });
 
         it('should render empty state with tag filter message', () => {

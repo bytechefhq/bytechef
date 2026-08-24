@@ -13,11 +13,23 @@ import {
 } from '@/components/ui/dialog';
 import {Label} from '@/components/ui/label';
 import useCreateDataTableDialog from '@/pages/automation/datatables/components/hooks/useCreateDataTableDialog';
+import {useCommandIntent} from '@/shared/command-bar/useCommandIntent';
 import {ColumnType} from '@/shared/middleware/graphql';
 import {Plus, Trash2} from 'lucide-react';
 import {ReactNode} from 'react';
 
-const CreateDataTableDialog = ({trigger}: {trigger?: ReactNode}) => {
+const CreateDataTableDialog = ({
+    claimsCreateIntent = false,
+    trigger,
+}: {
+    /**
+     * Opts this instance into claiming the `dataTable.create` command intent on mount. Only the list page the
+     * "Create data table" command navigates to should pass `true` -- every other call site (e.g. a single data
+     * table's own page) must leave this `false`, or it becomes an eligible claimant for a stale intent too.
+     */
+    claimsCreateIntent?: boolean;
+    trigger?: ReactNode;
+}) => {
     const {
         baseName,
         canSubmit,
@@ -35,6 +47,8 @@ const CreateDataTableDialog = ({trigger}: {trigger?: ReactNode}) => {
         isPending,
         open,
     } = useCreateDataTableDialog();
+
+    useCommandIntent('dataTable.create', handleOpen, claimsCreateIntent);
 
     const handleDialogOpenChange = (isOpen: boolean) => {
         if (isOpen) {

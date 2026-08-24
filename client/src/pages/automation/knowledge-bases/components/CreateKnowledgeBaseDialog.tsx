@@ -13,16 +13,27 @@ import {
 import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
 import useCreateKnowledgeBaseDialog from '@/pages/automation/knowledge-bases/components/hooks/useCreateKnowledgeBaseDialog';
+import {useCommandIntent} from '@/shared/command-bar/useCommandIntent';
 import {cn} from '@/shared/util/cn-utils';
 import {Loader2, X} from 'lucide-react';
 import {ReactNode} from 'react';
 
 interface CreateKnowledgeBaseDialogProps {
+    /**
+     * Opts this instance into claiming the `knowledgeBase.create` command intent on mount. Only the list page the
+     * "Create knowledge base" command navigates to should pass `true` -- every other call site (e.g. a single
+     * knowledge base's own page) must leave this `false`, or it becomes an eligible claimant for a stale intent too.
+     */
+    claimsCreateIntent?: boolean;
     trigger?: ReactNode;
     workspaceId: string;
 }
 
-const CreateKnowledgeBaseDialog = ({trigger, workspaceId}: CreateKnowledgeBaseDialogProps) => {
+const CreateKnowledgeBaseDialog = ({
+    claimsCreateIntent = false,
+    trigger,
+    workspaceId,
+}: CreateKnowledgeBaseDialogProps) => {
     const {
         canSubmit,
         createMutation,
@@ -46,6 +57,8 @@ const CreateKnowledgeBaseDialog = ({trigger, workspaceId}: CreateKnowledgeBaseDi
         setOverlapSize,
         uploading,
     } = useCreateKnowledgeBaseDialog({workspaceId});
+
+    useCommandIntent('knowledgeBase.create', () => setOpen(true), claimsCreateIntent);
 
     return (
         <Dialog onOpenChange={handleOpenChange} open={open}>

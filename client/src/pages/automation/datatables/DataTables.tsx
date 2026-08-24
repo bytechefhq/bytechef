@@ -53,7 +53,13 @@ const DataTables = () => {
 
                                 <CopilotButton source={Source.DATA_TABLE} />
 
-                                {tables.length > 0 && <CreateDataTableDialog trigger={<Button>New Table</Button>} />}
+                                {tables.length > 0 && (
+                                    // This is the "Create data table" command's target.
+                                    <CreateDataTableDialog
+                                        claimsCreateIntent={true}
+                                        trigger={<Button>New Table</Button>}
+                                    />
+                                )}
                             </div>
                         )
                     }
@@ -85,7 +91,10 @@ const DataTables = () => {
                     <DataTableList allTags={allTags} dataTables={filteredTables} tagsByTableData={tagsByTableData} />
                 ) : (
                     <EmptyList
-                        button={<CreateDataTableDialog trigger={<Button>Create Table</Button>} />}
+                        button={
+                            // This is the "Create data table" command's target.
+                            <CreateDataTableDialog claimsCreateIntent={true} trigger={<Button>Create Table</Button>} />
+                        }
                         icon={<Table2Icon className="size-24 text-stroke-neutral-tertiary" />}
                         message={
                             tagId

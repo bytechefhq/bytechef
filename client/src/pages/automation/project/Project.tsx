@@ -5,6 +5,7 @@ import {useProject} from '@/pages/automation/project/hooks/useProject';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import WorkflowEditorLayout from '@/pages/platform/workflow-editor/WorkflowEditorLayout';
 import WorkflowExecutionsTestOutput from '@/pages/platform/workflow-editor/components/WorkflowExecutionsTestOutput';
+import {useRegisterWorkflowEditorCommands} from '@/pages/platform/workflow-editor/hooks/useRegisterWorkflowEditorCommands';
 import {useRun} from '@/pages/platform/workflow-editor/hooks/useRun';
 import {WorkflowEditorProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
@@ -66,6 +67,7 @@ const Project = () => {
 
     useLoadWorkspacePermissions(currentWorkspaceId);
     useLoadWorkspaceScopes(currentWorkspaceId);
+    useRegisterWorkflowEditorCommands();
 
     const {runDisabled} = useRun();
 

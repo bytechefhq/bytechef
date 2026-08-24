@@ -3,6 +3,9 @@ import {Toaster} from '@/components/ui/sonner';
 import useFetchInterceptor from '@/config/useFetchInterceptor';
 import {useUserGuiding} from '@/hooks/useUserGuiding';
 import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
+import {bootstrapCommandBar} from '@/shared/command-bar/commandBarBootstrap';
+import {useCommandBarStore} from '@/shared/command-bar/useCommandBarStore';
+import {useRegisterNavigationCommands} from '@/shared/command-bar/useRegisterNavigationCommands';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
@@ -10,182 +13,30 @@ import {useHelpHub} from '@/shared/hooks/useHelpHub';
 import {MobileTopNavigation} from '@/shared/layout/MobileTopNavigation';
 import {TrialBanner} from '@/shared/layout/TrialBanner';
 import {AppSidebar} from '@/shared/layout/app-sidebar/AppSidebar';
+import {
+    type NavigationItemI,
+    automationNavigation,
+    embeddedNavigation,
+    platformNavigation,
+} from '@/shared/navigation/navigationItems';
 import useAppSidebarStore from '@/shared/stores/useAppSidebarStore';
 import {EditionType, useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
-import {
-    ActivityIcon,
-    BotIcon,
-    BotMessageSquareIcon,
-    BoxesIcon,
-    CircleIcon,
-    FileTextIcon,
-    FolderIcon,
-    GraduationCapIcon,
-    Layers3Icon,
-    LayoutTemplateIcon,
-    Link2Icon,
-    LucideIcon,
-    MessageSquareIcon,
-    MessagesSquareIcon,
-    NetworkIcon,
-    NotebookPenIcon,
-    RouterIcon,
-    ServerIcon,
-    Settings2Icon,
-    SquareIcon,
-    Table2Icon,
-    UnplugIcon,
-    UsersIcon,
-    VectorSquareIcon,
-    Workflow,
-    ZapIcon,
-} from 'lucide-react';
-import {Suspense, lazy, useEffect, useState} from 'react';
+import {Suspense, lazy, useEffect} from 'react';
 import {Outlet, useLocation} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
 
+const CommandBarDialog = lazy(() => import('@/components/CommandBar/CommandBarDialog'));
 const CopilotPanel = lazy(() => import('@/shared/components/copilot/CopilotPanel'));
-const GlobalSearchDialog = lazy(() => import('@/components/GlobalSearch/GlobalSearchDialog'));
 
-type NavigationType = {
-    name: string;
-    href: string;
-    icon: LucideIcon;
-    group?: string;
-};
-
-const automationNavigation: NavigationType[] = [
-    {
-        href: '/automation/ai-hub',
-        icon: MessagesSquareIcon,
-        name: 'AI Hub',
-    },
-    {href: '/automation/chats', icon: MessageSquareIcon, name: 'Chats'},
-    {href: '/automation/approval-tasks', icon: CircleIcon, name: 'Approval Tasks'},
-    {
-        group: 'Build',
-        href: '/automation/projects',
-        icon: FolderIcon,
-        name: 'Projects',
-    },
-    {group: 'Build', href: '/automation/agents', icon: BotIcon, name: 'Agents'},
-    {group: 'Build', href: '/automation/connections', icon: Link2Icon, name: 'Connections'},
-    {
-        group: 'Deploy',
-        href: '/automation/deployments',
-        icon: Layers3Icon,
-        name: 'Project Deployments',
-    },
-    {
-        group: 'Deploy',
-        href: '/automation/agent-deployments',
-        icon: BotMessageSquareIcon,
-        name: 'Agent Deployments',
-    },
-    {
-        group: 'Deploy',
-        href: '/automation/api-platform',
-        icon: LayoutTemplateIcon,
-        name: 'API Collections',
-    },
-    {
-        group: 'Deploy',
-        href: '/automation/mcp-servers',
-        icon: ServerIcon,
-        name: 'MCP Servers',
-    },
-    {
-        group: 'Deploy',
-        href: '/automation/a2a-servers',
-        icon: NetworkIcon,
-        name: 'A2A Servers',
-    },
-    {group: 'Deploy', href: '/automation/ai/gateway', icon: RouterIcon, name: 'AI Gateway'},
-    {
-        group: 'Monitor',
-        href: '/automation/executions',
-        icon: ActivityIcon,
-        name: 'Executions',
-    },
-    {
-        group: 'Data',
-        href: '/automation/datatables',
-        icon: Table2Icon,
-        name: 'Data Tables',
-    },
-    {
-        group: 'Data',
-        href: '/automation/knowledge-bases',
-        icon: VectorSquareIcon,
-        name: 'Knowledge Base',
-    },
-    {
-        group: 'Data',
-        href: '/automation/context-stores',
-        icon: BoxesIcon,
-        name: 'Context Store',
-    },
-    {
-        group: 'Data',
-        href: '/automation/asset-files',
-        icon: FileTextIcon,
-        name: 'Files',
-    },
-    {group: 'AI', href: '/automation/ai/skills', icon: GraduationCapIcon, name: 'Skills'},
-    {group: 'AI', href: '/automation/ai/memories', icon: NotebookPenIcon, name: 'Memories'},
-];
-
-const embeddedNavigation: NavigationType[] = [
-    {
-        group: 'Build',
-        href: '/embedded/integrations',
-        icon: SquareIcon,
-        name: 'Integrations',
-    },
-    {
-        group: 'Build',
-        href: '/embedded/automation-workflows',
-        icon: Workflow,
-        name: 'Automations',
-    },
-    {group: 'Build', href: '/embedded/connections', icon: Link2Icon, name: 'Connections'},
-    {
-        group: 'Configure',
-        href: '/embedded/configurations',
-        icon: Settings2Icon,
-        name: 'Integration Configurations',
-    },
-    {group: 'Configure', href: '/embedded/app-events', icon: ZapIcon, name: 'App Events'},
-    {group: 'Configure', href: '/embedded/mcp-servers', icon: ServerIcon, name: 'MCP Servers'},
-    {
-        group: 'Monitor',
-        href: '/embedded/executions',
-        icon: ActivityIcon,
-        name: 'Executions',
-    },
-    {
-        group: 'Monitor',
-        href: '/embedded/connected-users',
-        icon: UsersIcon,
-        name: 'Connected Users',
-    },
-];
-
-const platformNavigation = [
-    {
-        href: '/platform/connectors',
-        icon: UnplugIcon,
-        name: 'Connectors',
-    },
-];
+// Stable empty-array identity for the flag-off case -- a fresh `[]` literal on every render would make the
+// memo inside useRegisterNavigationCommands recompute and its effect re-register on every render.
+const NO_NAVIGATION_ITEMS: NavigationItemI[] = [];
 
 function App() {
-    const [searchOpen, setSearchOpen] = useState(false);
-
     const sidebarOpen = useAppSidebarStore((state) => state.open);
     const setSidebarOpen = useAppSidebarStore((state) => state.setOpen);
 
@@ -208,6 +59,8 @@ function App() {
             reset: state.reset,
         }))
     );
+    const commandBarOpen = useCommandBarStore((state) => state.open);
+    const setCommandBarOpen = useCommandBarStore((state) => state.setOpen);
     const copilotPanelOpen = useCopilotPanelStore((state) => state.copilotPanelOpen);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const {currentType, setCurrentType} = usePlatformTypeStore(
@@ -283,13 +136,21 @@ function App() {
         return true;
     });
 
-    let navigation: NavigationType[] = [];
+    let navigation: NavigationItemI[] = [];
 
     if (location.pathname.includes('/automation/')) {
         navigation = filteredAutomationNavigation;
     } else if (location.pathname.includes('/embedded/')) {
         navigation = filteredEmbeddedNavigation;
     }
+
+    useRegisterNavigationCommands(ff_2396 ? navigation : NO_NAVIGATION_ITEMS);
+
+    useEffect(() => {
+        if (ff_2396) {
+            bootstrapCommandBar();
+        }
+    }, [ff_2396]);
 
     useEffect(() => {
         if (account) {
@@ -356,7 +217,7 @@ function App() {
 
             if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
                 event.preventDefault();
-                setSearchOpen(true);
+                setCommandBarOpen(true);
             }
         };
 
@@ -365,7 +226,7 @@ function App() {
         return () => {
             document.removeEventListener('keydown', handleKeyDown);
         };
-    }, [ff_2396]);
+    }, [ff_2396, setCommandBarOpen]);
 
     return authenticated ? (
         <div className="flex h-full flex-col">
@@ -398,9 +259,9 @@ function App() {
 
                 <Toaster />
 
-                {ff_2396 && searchOpen && (
+                {ff_2396 && commandBarOpen && (
                     <Suspense fallback={null}>
-                        <GlobalSearchDialog onOpenChange={setSearchOpen} open={searchOpen} />
+                        <CommandBarDialog />
                     </Suspense>
                 )}
             </SidebarProvider>

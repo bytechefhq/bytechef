@@ -1,19 +1,15 @@
-query automationSearch($query: String!, $limit: Int) {
-    automationSearch(query: $query, limit: $limit) {
+query automationSearch($query: String!, $limit: Int, $types: [SearchAssetType!]) {
+    automationSearch(query: $query, limit: $limit, types: $types) {
         id
         name
         description
         type
+        ... on ProjectSearchResult {
+            projectWorkflowId
+        }
         ... on WorkflowSearchResult {
             projectId
             label
-        }
-        ... on ProjectDeploymentSearchResult {
-            projectName
-        }
-        ... on ApiEndpointSearchResult {
-            collectionId
-            path
         }
         ... on KnowledgeBaseDocumentSearchResult {
             knowledgeBaseId

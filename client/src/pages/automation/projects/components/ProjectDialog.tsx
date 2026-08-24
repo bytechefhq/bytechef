@@ -15,6 +15,7 @@ import {
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Textarea} from '@/components/ui/textarea';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {useCommandIntent} from '@/shared/command-bar/useCommandIntent';
 import ResourceVisibilityPicker from '@/shared/components/visibility/ResourceVisibilityPicker';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useIsVisibilityEditionEnabled} from '@/shared/hooks/useVisibilityFeatureEnabled';
@@ -28,16 +29,25 @@ import {ReactNode, useState} from 'react';
 import {useForm} from 'react-hook-form';
 
 interface ProjectDialogProps {
+    /**
+     * Opts this instance into claiming the `project.create` command intent on mount. Only the list page the
+     * "Create project" command navigates to should pass `true` -- every other call site (e.g. the projects sidebar
+     * or a project's settings menu) must leave this `false`, or it becomes an eligible claimant for a stale intent,
+     * or silently swallows a legitimate one meant for the list page.
+     */
+    claimsCreateIntent?: boolean;
     onClose?: (project?: Project) => void;
     onSuccess?: (projectId: number | void) => void;
     project?: Project;
     triggerNode?: ReactNode;
 }
 
-const ProjectDialog = ({onClose, onSuccess, project, triggerNode}: ProjectDialogProps) => {
+const ProjectDialog = ({claimsCreateIntent = false, onClose, onSuccess, project, triggerNode}: ProjectDialogProps) => {
     const [isOpen, setIsOpen] = useState(!triggerNode);
 
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    useCommandIntent('project.create', () => setIsOpen(true), claimsCreateIntent);
 
     const {captureProjectCreated} = useAnalytics();
 

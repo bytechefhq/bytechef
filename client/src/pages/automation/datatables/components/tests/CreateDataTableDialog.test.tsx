@@ -1,3 +1,4 @@
+import {useCommandIntentStore} from '@/shared/command-bar/useCommandIntentStore';
 import {render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -223,5 +224,33 @@ describe('CreateDataTableDialog with custom trigger', () => {
         render(<CreateDataTableDialog trigger={<button>Custom Trigger</button>} />);
 
         expect(screen.getByRole('button', {name: 'Custom Trigger'})).toBeInTheDocument();
+    });
+});
+
+describe('CreateDataTableDialog command intent claiming', () => {
+    beforeEach(() => {
+        useCommandIntentStore.getState().reset();
+    });
+
+    afterEach(() => {
+        useCommandIntentStore.getState().reset();
+    });
+
+    it('does not claim a pending dataTable.create intent when claimsCreateIntent is false (the default)', () => {
+        useCommandIntentStore.getState().publish('dataTable.create');
+
+        render(<CreateDataTableDialog />);
+
+        expect(hoisted.handleOpen).not.toHaveBeenCalled();
+        expect(useCommandIntentStore.getState().intent).toEqual({key: 'dataTable.create', payload: undefined});
+    });
+
+    it('claims a pending dataTable.create intent when claimsCreateIntent is true', () => {
+        useCommandIntentStore.getState().publish('dataTable.create');
+
+        render(<CreateDataTableDialog claimsCreateIntent={true} />);
+
+        expect(hoisted.handleOpen).toHaveBeenCalledTimes(1);
+        expect(useCommandIntentStore.getState().intent).toBeUndefined();
     });
 });

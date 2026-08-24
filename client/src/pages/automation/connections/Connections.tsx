@@ -100,7 +100,10 @@ export const Connections = () => {
                             <div className="flex items-center gap-1">
                                 <EnvironmentSelect />
 
+                                {/* This is the "Create connection" command's target. */}
+
                                 <ConnectionDialog
+                                    claimsCreateIntent={true}
                                     componentDefinitions={componentDefinitions}
                                     connection={
                                         {
@@ -210,7 +213,9 @@ export const Connections = () => {
                     <EmptyList
                         button={
                             componentDefinitions && (
+                                // This is the "Create connection" command's target.
                                 <ConnectionDialog
+                                    claimsCreateIntent={true}
                                     componentDefinitions={componentDefinitions}
                                     connection={
                                         {

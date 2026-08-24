@@ -67,7 +67,9 @@ const KnowledgeBases = () => {
                                 <CopilotButton source={Source.KNOWLEDGE_BASE} />
 
                                 {knowledgeBases.length > 0 && (
+                                    // This is the "Create knowledge base" command's target.
                                     <CreateKnowledgeBaseDialog
+                                        claimsCreateIntent={true}
                                         trigger={<Button>New Knowledge Base</Button>}
                                         workspaceId={currentWorkspaceId}
                                     />
@@ -130,7 +132,9 @@ const KnowledgeBases = () => {
                         ) : (
                             <EmptyList
                                 button={
+                                    // This is the "Create knowledge base" command's target.
                                     <CreateKnowledgeBaseDialog
+                                        claimsCreateIntent={true}
                                         trigger={<Button>Create Knowledge Base</Button>}
                                         workspaceId={currentWorkspaceId}
                                     />
