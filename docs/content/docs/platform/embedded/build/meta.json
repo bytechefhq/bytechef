@@ -9,7 +9,6 @@
     "connections",
     "app-events",
     "component-kit",
-    "unified-api",
     "permission-expressions"
   ]
 }
