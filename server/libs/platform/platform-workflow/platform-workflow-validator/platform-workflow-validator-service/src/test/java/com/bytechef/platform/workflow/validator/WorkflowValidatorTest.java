@@ -284,7 +284,7 @@ class WorkflowValidatorTest {
             WorkflowValidator.validateWorkflowTasks(
                 taskJsonNodes, taskDefinitionMap, taskOutputMap, new HashMap<>(), errors, warnings);
 
-            assertEquals("[task2] Task 'invalidformat' doesn't exits.", errors.toString());
+            assertEquals("[task2] Task 'invalidformat' doesn't exist.", errors.toString());
             assertEquals("", warnings.toString());
         } catch (Exception e) {
             fail("Should not throw exception: " + e.getMessage());

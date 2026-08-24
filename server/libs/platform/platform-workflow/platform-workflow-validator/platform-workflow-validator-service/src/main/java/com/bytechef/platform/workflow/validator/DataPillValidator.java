@@ -563,7 +563,7 @@ class DataPillValidator {
         List<PropertyInfo> taskDefinition, JsonNode rootParametersJsonNode) {
 
         if (!allTasksMap.containsKey(dataPillExpression)) {
-            StringUtils.appendWithNewline("Task '" + dataPillExpression + "' doesn't exits.", errors);
+            StringUtils.appendWithNewline("Task '" + dataPillExpression + "' doesn't exist.", errors);
 
             return;
         }
