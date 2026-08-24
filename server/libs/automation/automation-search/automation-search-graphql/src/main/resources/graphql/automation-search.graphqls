@@ -1,5 +1,5 @@
 extend type Query {
-    automationSearch(query: String!, limit: Int): [SearchResult!]!
+    automationSearch(query: String!, limit: Int, types: [SearchAssetType!]): [SearchResult!]!
 }
 
 interface SearchResult {
@@ -26,6 +26,7 @@ type ProjectSearchResult implements SearchResult {
     name: String!
     description: String
     type: SearchAssetType!
+    projectWorkflowId: ID
 }
 
 type WorkflowSearchResult implements SearchResult {

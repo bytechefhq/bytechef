@@ -16,8 +16,11 @@
 
 package com.bytechef.automation.search.facade;
 
+import com.bytechef.automation.search.SearchAssetType;
 import com.bytechef.automation.search.SearchResult;
 import java.util.List;
+import java.util.Set;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Facade for searching across all automation entities.
@@ -27,11 +30,12 @@ import java.util.List;
 public interface AutomationSearchFacade {
 
     /**
-     * Search across all automation entities matching the given query.
+     * Search across automation entities matching the given query.
      *
      * @param query the search query string
      * @param limit maximum number of results per category
-     * @return list of search results from all categories
+     * @param types the asset types to search; null or empty searches every type
+     * @return list of search results
      */
-    List<SearchResult<?>> search(String query, int limit);
+    List<SearchResult<?>> search(String query, int limit, @Nullable Set<SearchAssetType> types);
 }

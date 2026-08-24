@@ -16,12 +16,16 @@
 
 package com.bytechef.automation.configuration.search;
 
+import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.search.SearchAssetProvider;
 import com.bytechef.automation.search.SearchAssetType;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 /**
@@ -31,14 +35,22 @@ import org.springframework.stereotype.Component;
 class ProjectSearchAssetProvider implements SearchAssetProvider {
 
     private final ProjectService projectService;
+    private final ProjectWorkflowService projectWorkflowService;
 
-    ProjectSearchAssetProvider(ProjectService projectService) {
+    ProjectSearchAssetProvider(ProjectService projectService, ProjectWorkflowService projectWorkflowService) {
         this.projectService = projectService;
+        this.projectWorkflowService = projectWorkflowService;
     }
 
     @Override
     public List<ProjectSearchResult> search(String query, int limit, Set<Long> workspaceIds) {
         String queryLower = query.toLowerCase(Locale.ROOT);
+
+        Map<Long, Long> projectIdToProjectWorkflowId = projectWorkflowService.getLatestProjectWorkflows()
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    ProjectWorkflow::getProjectId, ProjectWorkflow::getId, (first, second) -> first));
 
         return projectService.getProjects(false, null, null, null, null, null)
             .stream()
@@ -47,7 +59,10 @@ class ProjectSearchAssetProvider implements SearchAssetProvider {
                 project -> containsIgnoreCase(project.getName(), queryLower) ||
                     containsIgnoreCase(project.getDescription(), queryLower))
             .limit(limit)
-            .map(project -> new ProjectSearchResult(project.getId(), project.getName(), project.getDescription()))
+            .map(
+                project -> new ProjectSearchResult(
+                    project.getId(), project.getName(), project.getDescription(),
+                    projectIdToProjectWorkflowId.get(project.getId())))
             .toList();
     }
 

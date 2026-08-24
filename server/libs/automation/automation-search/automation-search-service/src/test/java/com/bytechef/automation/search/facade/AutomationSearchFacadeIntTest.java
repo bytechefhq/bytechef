@@ -128,7 +128,7 @@ class AutomationSearchFacadeIntTest {
 
         workflowSearchAssetProvider.setResults(List.of(new TestSearchResult(1L, SearchAssetType.WORKFLOW)));
 
-        List<SearchResult<?>> results = automationSearchFacade.search("q", 10);
+        List<SearchResult<?>> results = automationSearchFacade.search("q", 10, null);
 
         assertThat(workflowSearchAssetProvider.getWorkspaceIds())
             .containsExactlyInAnyOrder(firstWorkspace.getId(), secondWorkspace.getId());
@@ -139,7 +139,7 @@ class AutomationSearchFacadeIntTest {
     void testCallerWithoutWorkspacesGetsNoResults() {
         workflowSearchAssetProvider.setResults(List.of(new TestSearchResult(1L, SearchAssetType.WORKFLOW)));
 
-        List<SearchResult<?>> results = automationSearchFacade.search("q", 10);
+        List<SearchResult<?>> results = automationSearchFacade.search("q", 10, null);
 
         assertThat(results).isEmpty();
         assertThat(connectionSearchAssetProvider.getWorkspaceIds()).isNull();
@@ -153,12 +153,36 @@ class AutomationSearchFacadeIntTest {
         connectionSearchAssetProvider.setResults(List.of(new TestSearchResult(2L, SearchAssetType.CONNECTION)));
         workflowSearchAssetProvider.setResults(List.of(new TestSearchResult(3L, SearchAssetType.WORKFLOW)));
 
-        List<SearchResult<?>> results = automationSearchFacade.search("q", 10);
+        List<SearchResult<?>> results = automationSearchFacade.search("q", 10, null);
 
         assertThat(connectionSearchAssetProvider.getWorkspaceIds()).containsExactly(workspace.getId());
         assertThat(workflowSearchAssetProvider.getWorkspaceIds()).containsExactly(workspace.getId());
         assertThat(results).containsExactlyInAnyOrder(
             new TestSearchResult(2L, SearchAssetType.CONNECTION), new TestSearchResult(3L, SearchAssetType.WORKFLOW));
+    }
+
+    @Test
+    void testOnlyRequestedTypeProvidersAreQueried() {
+        Workspace workspace = workspaceRepository.save(new Workspace("typed-search-workspace"));
+
+        connectionSearchAssetProvider.setResults(List.of(new TestSearchResult(2L, SearchAssetType.CONNECTION)));
+        workflowSearchAssetProvider.setResults(List.of(new TestSearchResult(3L, SearchAssetType.WORKFLOW)));
+
+        List<SearchResult<?>> results = automationSearchFacade.search("q", 10, Set.of(SearchAssetType.WORKFLOW));
+
+        assertThat(connectionSearchAssetProvider.getWorkspaceIds()).isNull();
+        assertThat(workflowSearchAssetProvider.getWorkspaceIds()).containsExactly(workspace.getId());
+        assertThat(results).containsExactly(new TestSearchResult(3L, SearchAssetType.WORKFLOW));
+    }
+
+    @Test
+    void testEmptyTypesQueriesEveryProvider() {
+        Workspace workspace = workspaceRepository.save(new Workspace("untyped-search-workspace"));
+
+        automationSearchFacade.search("q", 10, Set.of());
+
+        assertThat(connectionSearchAssetProvider.getWorkspaceIds()).containsExactly(workspace.getId());
+        assertThat(workflowSearchAssetProvider.getWorkspaceIds()).containsExactly(workspace.getId());
     }
 
     static class RecordingSearchAssetProvider implements SearchAssetProvider {

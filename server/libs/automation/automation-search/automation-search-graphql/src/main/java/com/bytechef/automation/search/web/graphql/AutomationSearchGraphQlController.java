@@ -17,10 +17,12 @@
 package com.bytechef.automation.search.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.automation.search.SearchAssetType;
 import com.bytechef.automation.search.SearchResult;
 import com.bytechef.automation.search.facade.AutomationSearchFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Set;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
@@ -42,9 +44,12 @@ class AutomationSearchGraphQlController {
     }
 
     @QueryMapping(name = "automationSearch")
-    public List<SearchResult<?>> automationSearch(@Argument String query, @Argument Integer limit) {
+    public List<SearchResult<?>> automationSearch(
+        @Argument String query, @Argument Integer limit, @Argument List<SearchAssetType> types) {
+
         int effectiveLimit = limit != null ? limit : DEFAULT_LIMIT;
 
-        return automationSearchFacade.search(query, effectiveLimit);
+        return automationSearchFacade.search(
+            query, effectiveLimit, types == null ? null : Set.copyOf(types));
     }
 }

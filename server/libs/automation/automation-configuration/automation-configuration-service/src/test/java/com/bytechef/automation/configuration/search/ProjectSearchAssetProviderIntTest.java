@@ -23,6 +23,7 @@ import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfigurationSharedMocks;
 import com.bytechef.automation.configuration.config.TestOwnerContributors;
+import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
@@ -126,6 +127,22 @@ class ProjectSearchAssetProviderIntTest {
         assertThat(projectSearchAssetProvider.search("test project", 10, Set.of(workspace.getId())))
             .extracting(ProjectSearchResult::id)
             .containsExactly(plainProjectId);
+    }
+
+    @Test
+    void testResultCarriesTheProjectWorkflowId() {
+        long projectId = createProjectWithWorkflow(workspace);
+
+        List<ProjectWorkflow> projectWorkflows = projectWorkflowRepository.findAllByProjectId(projectId);
+
+        assertThat(projectWorkflows).hasSize(1);
+
+        ProjectWorkflow projectWorkflow = projectWorkflows.getFirst();
+
+        assertThat(projectSearchAssetProvider.search("test project", 10, Set.of(workspace.getId())))
+            .singleElement()
+            .extracting(ProjectSearchResult::projectWorkflowId)
+            .isEqualTo(projectWorkflow.getId());
     }
 
     private long createProjectWithWorkflow(Workspace projectWorkspace) {

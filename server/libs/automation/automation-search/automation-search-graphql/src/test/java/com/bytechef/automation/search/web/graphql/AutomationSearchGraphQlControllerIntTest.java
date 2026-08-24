@@ -23,6 +23,7 @@ import com.bytechef.automation.search.SearchAssetType;
 import com.bytechef.automation.search.SearchResult;
 import com.bytechef.automation.search.facade.AutomationSearchFacade;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -69,7 +70,7 @@ class AutomationSearchGraphQlControllerIntTest {
         List<SearchResult<?>> searchResults = List.of(
             new ConnectionSearchResult(1L, resultName, "description", searchAssetType));
 
-        when(automationSearchFacade.search("invoice", 5)).thenReturn(searchResults);
+        when(automationSearchFacade.search("invoice", 5, null)).thenReturn(searchResults);
 
         graphQlTester.document(SEARCH_QUERY)
             .execute()
@@ -85,12 +86,12 @@ class AutomationSearchGraphQlControllerIntTest {
             .entity(String.class)
             .isEqualTo(searchAssetType.name());
 
-        verify(automationSearchFacade).search("invoice", 5);
+        verify(automationSearchFacade).search("invoice", 5, null);
     }
 
     @Test
     void testAutomationSearchUsesDefaultLimit() {
-        when(automationSearchFacade.search("invoice", 100)).thenReturn(List.of());
+        when(automationSearchFacade.search("invoice", 100, null)).thenReturn(List.of());
 
         graphQlTester.document("""
             query {
@@ -104,7 +105,26 @@ class AutomationSearchGraphQlControllerIntTest {
             .entityList(Object.class)
             .hasSize(0);
 
-        verify(automationSearchFacade).search("invoice", 100);
+        verify(automationSearchFacade).search("invoice", 100, null);
+    }
+
+    @Test
+    void testAutomationSearchPassesTheRequestedTypes() {
+        when(automationSearchFacade.search("invoice", 100, Set.of(SearchAssetType.WORKFLOW))).thenReturn(List.of());
+
+        graphQlTester.document("""
+            query {
+                automationSearch(query: "invoice", types: [WORKFLOW]) {
+                    id
+                }
+            }
+            """)
+            .execute()
+            .path("automationSearch")
+            .entityList(Object.class)
+            .hasSize(0);
+
+        verify(automationSearchFacade).search("invoice", 100, Set.of(SearchAssetType.WORKFLOW));
     }
 
     private record ConnectionSearchResult(Long id, String name, String description, SearchAssetType type)
