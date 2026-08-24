@@ -16,7 +16,9 @@
 
 package com.bytechef.atlas.execution.facade;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.configuration.util.WorkflowTaskUtils;
 import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
 import com.bytechef.atlas.coordinator.event.ResumeJobEvent;
 import com.bytechef.atlas.coordinator.event.StartJobEvent;
@@ -79,15 +81,23 @@ public class JobFacadeImpl implements JobFacade {
     @Override
     @Transactional(propagation = Propagation.NEVER)
     public long createJob(JobParametersDTO jobParametersDTO) {
-        Job job = jobService.create(jobParametersDTO, workflowService.getWorkflow(jobParametersDTO.getWorkflowId()));
+        Workflow workflow = workflowService.getWorkflow(jobParametersDTO.getWorkflowId());
+
+        Job job = jobService.create(jobParametersDTO, workflow);
 
         long jobId = Validate.notNull(job.getId(), "id");
 
         log.debug("Job id={}, label='{}' created", jobId, job.getLabel());
 
+        Map<String, Object> initialContext = new HashMap<>(job.getInputs());
+
+        for (String disabledTaskName : WorkflowTaskUtils.getDisabledTaskNames(workflow.getTasks())) {
+            initialContext.putIfAbsent(disabledTaskName, null);
+        }
+
         contextService.push(
             jobId, Context.Classname.JOB,
-            taskFileStorage.storeContextValue(jobId, Context.Classname.JOB, job.getInputs()));
+            taskFileStorage.storeContextValue(jobId, Context.Classname.JOB, initialContext));
 
         eventPublisher.publishEvent(new JobStatusApplicationEvent(jobId, job.getStatus()));
         eventPublisher.publishEvent(new StartJobEvent(jobId));
