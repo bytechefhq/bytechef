@@ -140,4 +140,67 @@ describe('flattenDefinitionTasks', () => {
         expect(result).toHaveLength(1);
         expect(result[0].name).toBe('postgresql_1');
     });
+    it('should convert a definition connections map into the DTO connections array', () => {
+        const taskWithConnections = {
+            ...task('script_1', 'script/v1/javascript'),
+            connections: {
+                aiee: {componentName: 'airtable', componentVersion: 1},
+                gm: {componentName: 'googleMail', componentVersion: 1},
+            },
+        } as unknown as WorkflowTask;
+
+        const result = flattenDefinitionTasks([taskWithConnections]);
+
+        expect(result[0].connections).toEqual([
+            {
+                componentName: 'airtable',
+                componentVersion: 1,
+                key: 'aiee',
+                required: false,
+                workflowNodeName: 'script_1',
+            },
+            {
+                componentName: 'googleMail',
+                componentVersion: 1,
+                key: 'gm',
+                required: false,
+                workflowNodeName: 'script_1',
+            },
+        ]);
+    });
+
+    it('should convert definition connections maps on nested subtasks', () => {
+        const nestedTask = {
+            ...task('openAi_1'),
+            connections: {openAi_1: {authorizationRequired: true, componentName: 'openAi', componentVersion: 1}},
+        } as unknown as WorkflowTask;
+
+        const result = flattenDefinitionTasks([task('loop_1', 'loop/v1', {iteratee: [nestedTask]})]);
+
+        expect(result[1].connections).toEqual([
+            {
+                componentName: 'openAi',
+                componentVersion: 1,
+                key: 'openAi_1',
+                required: true,
+                workflowNodeName: 'openAi_1',
+            },
+        ]);
+    });
+
+    it('should leave an already converted connections array untouched', () => {
+        const connections = [
+            {
+                componentName: 'openAi',
+                componentVersion: 1,
+                key: 'openAi_1',
+                required: true,
+                workflowNodeName: 'openAi_1',
+            },
+        ];
+
+        const result = flattenDefinitionTasks([{...task('openAi_1'), connections}]);
+
+        expect(result[0].connections).toBe(connections);
+    });
 });
