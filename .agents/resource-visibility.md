@@ -86,9 +86,14 @@ unguarded until the whole-branch review.
   not a workspace member, so workspace reach would be wrong in a way that crosses customers.
 
 **What sharing exposes.** `WORKSPACE` grants *use plus existence*, not *read plus write*: both REST
-controllers obfuscate `authorizationParameters` and null `parameters`, and no `ConnectionFacade` method
-mutates authorization parameters after creation. A member can run a workflow against a colleague's
-account; they cannot extract or repoint the credential.
+controllers obfuscate `authorizationParameters` and null `parameters`, so a member can never extract a
+credential. Credentials *can* be replaced after creation —
+`ConnectionFacade.replaceAuthorizationParameters`, reached through
+`WorkspaceConnectionFacade.updateConnectionCredentials` — but only by the connection's **owner or an
+admin** (`isResourceOwner || hasResourceRole(…, 'ADMIN')`, the sharing-management posture; the same check
+`ConnectionServiceImpl.validateOwnerOrAdmin` already applies to every parameter write). `CONNECTION_EDIT`
+alone renames and retags, and still cannot repoint a shared connection. A member can run a workflow
+against a colleague's account; they can neither extract nor repoint the credential.
 
 **GraphQL mutations** (owner-or-admin, annotated on the facade so they protect every caller):
 - `setConnectionVisibility(workspaceId, connectionId, visibility)` — rejects `ORGANIZATION` (set
