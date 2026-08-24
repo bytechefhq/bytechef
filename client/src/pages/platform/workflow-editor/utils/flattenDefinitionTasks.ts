@@ -1,5 +1,5 @@
-import {WorkflowTask} from '@/shared/middleware/platform/configuration';
-import {BranchCaseType} from '@/shared/types';
+import {ComponentConnection, WorkflowTask} from '@/shared/middleware/platform/configuration';
+import {BranchCaseType, ComponentConnectionType} from '@/shared/types';
 
 /**
  * Flattens hierarchical definition tasks into a flat array matching the server's
@@ -10,7 +10,7 @@ export function flattenDefinitionTasks(tasks: Array<WorkflowTask>): Array<Workfl
     const result: Array<WorkflowTask> = [];
 
     for (const task of tasks) {
-        result.push(task);
+        result.push(normalizeConnections(task));
 
         if (task.parameters) {
             result.push(...extractNestedTasks(task.parameters));
@@ -18,6 +18,39 @@ export function flattenDefinitionTasks(tasks: Array<WorkflowTask>): Array<Workfl
     }
 
     return result;
+}
+
+type DefinitionComponentConnectionType = ComponentConnectionType & {
+    authorizationRequired?: boolean;
+};
+
+/**
+ * Workflow definitions declare task connections as a map keyed by the connection name, while the
+ * REST DTO exposes them as an array of ComponentConnection. Flattened tasks are written to
+ * `workflow.tasks`, which holds DTOs, so the definition shape has to be converted first.
+ *
+ * `required` is only derived from the definition here. The server additionally ORs in the component
+ * definition's `connectionRequired` flag, so an optimistically flattened task can under-report a
+ * required connection until the update mutation responds with the authoritative task.
+ */
+function normalizeConnections(task: WorkflowTask): WorkflowTask {
+    if (!task.connections || Array.isArray(task.connections)) {
+        return task;
+    }
+
+    const definitionConnections = task.connections as unknown as Record<string, DefinitionComponentConnectionType>;
+
+    const connections: Array<ComponentConnection> = Object.entries(definitionConnections).map(
+        ([key, definitionConnection]) => ({
+            componentName: definitionConnection.componentName,
+            componentVersion: definitionConnection.componentVersion,
+            key,
+            required: definitionConnection.authorizationRequired ?? false,
+            workflowNodeName: task.name,
+        })
+    );
+
+    return {...task, connections};
 }
 
 function extractNestedTasks(parameters: Record<string, unknown>): Array<WorkflowTask> {
