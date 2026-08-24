@@ -20,30 +20,24 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Ivica Cardic
  */
+@ExtendWith(ObjectMapperSetupExtension.class)
 class WorkflowValidatorOptionalLabelTest {
 
     private static final Map<String, List<PropertyInfo>> TASK_DEFINITION_MAP = Map.of(
         "component/v1/action1", List.of(
             new PropertyInfo("name", "STRING", null, false, true, null, null)));
-
-    @BeforeAll
-    public static void beforeAll() {
-        JsonUtils.setObjectMapper(
-            JsonMapper.builder()
-                .build());
-    }
 
     @Test
     void validateWorkflowTasksMissingTaskLabelAddsWarningNotError() {
