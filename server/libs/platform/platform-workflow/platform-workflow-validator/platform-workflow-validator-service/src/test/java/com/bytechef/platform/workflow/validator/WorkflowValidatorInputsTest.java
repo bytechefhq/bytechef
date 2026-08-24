@@ -519,7 +519,7 @@ class WorkflowValidatorInputsTest {
         WorkflowValidator.validateWorkflow(workflow, taskDefProvider, taskOutputProvider, clusterTypesProvider,
             new HashMap<>(), new HashMap<>(), new HashMap<>(), errors, warnings);
 
-        assertEquals("[task_1] Task 'doesNotExist' doesn't exits.", errors.toString());
+        assertEquals("[task_1] Task 'doesNotExist' doesn't exist.", errors.toString());
         assertEquals("", warnings.toString());
     }
 
