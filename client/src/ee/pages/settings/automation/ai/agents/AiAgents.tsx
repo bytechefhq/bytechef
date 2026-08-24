@@ -23,7 +23,17 @@ const AiAgents = () => {
     const currentTab = tab === SYSTEM_PROMPT_TAB ? SYSTEM_PROMPT_TAB : 'guardrails';
 
     return (
-        <LayoutContainer header={<Header centerTitle position="main" title="AI Agents" />} leftSidebarOpen={false}>
+        <LayoutContainer
+            header={
+                <Header
+                    centerTitle
+                    description="Set the content guardrails and the standing system prompt that apply to every AI agent in this workspace."
+                    position="main"
+                    title="AI Agents"
+                />
+            }
+            leftSidebarOpen={false}
+        >
             <div className="flex size-full flex-col">
                 <Tabs
                     className="px-6 pt-2 pb-4"

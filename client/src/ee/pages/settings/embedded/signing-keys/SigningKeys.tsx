@@ -20,6 +20,7 @@ const SigningKeys = () => {
                 header={
                     <Header
                         centerTitle
+                        description="Keys your backend uses to sign the JWTs the embedded SDK presents on behalf of connected users."
                         position="main"
                         right={
                             signingKeys &&

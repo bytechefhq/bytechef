@@ -27,7 +27,14 @@ export default function Appearance() {
 
     return (
         <LayoutContainer
-            header={<Header centerTitle={true} position="main" title="Appearance" />}
+            header={
+                <Header
+                    centerTitle={true}
+                    description="Choose the theme ByteChef uses for your account."
+                    position="main"
+                    title="Appearance"
+                />
+            }
             leftSidebarOpen={false}
         >
             <Form {...form}>

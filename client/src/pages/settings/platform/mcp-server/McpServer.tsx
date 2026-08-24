@@ -47,7 +47,17 @@ const McpServer = () => {
     }, [data?.managementMcpServerUrl]);
 
     return (
-        <LayoutContainer header={<Header centerTitle position="main" title="MCP Server" />} leftSidebarOpen={false}>
+        <LayoutContainer
+            header={
+                <Header
+                    centerTitle
+                    description="Connect AI assistants to ByteChef over the Model Context Protocol."
+                    position="main"
+                    title="MCP Server"
+                />
+            }
+            leftSidebarOpen={false}
+        >
             <div className="max-w-(--breakpoint-lg) p-4 3xl:mx-auto 3xl:w-4/5">
                 {authenticationRequiredData !== undefined && (
                     <div className="mb-4">

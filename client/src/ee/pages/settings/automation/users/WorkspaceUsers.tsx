@@ -197,6 +197,7 @@ const WorkspaceUsers = () => {
             header={
                 <Header
                     centerTitle
+                    description="Members of the current workspace and their workspace roles: invite by email, change a role, or remove a member."
                     position="main"
                     right={
                         canManageMembers ? (

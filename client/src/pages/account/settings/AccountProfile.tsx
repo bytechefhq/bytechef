@@ -14,7 +14,14 @@ const AccountProfile = () => {
 
     return (
         <LayoutContainer
-            header={<Header centerTitle={true} position="main" title="Your profile" />}
+            header={
+                <Header
+                    centerTitle={true}
+                    description="Your account details and password, plus multi-factor authentication and linked accounts."
+                    position="main"
+                    title="Your profile"
+                />
+            }
             leftSidebarOpen={false}
         >
             <div className="w-full p-4 3xl:mx-auto 3xl:w-4/5">

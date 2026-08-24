@@ -59,6 +59,7 @@ const Sessions = () => {
             header={
                 <Header
                     centerTitle={true}
+                    description="Devices and browsers currently signed in to your account; invalidate any session you do not recognize."
                     position="main"
                     right={<Button label="Refresh" onClick={refreshList} />}
                     title={`Active sessions for [${account?.login}]`}

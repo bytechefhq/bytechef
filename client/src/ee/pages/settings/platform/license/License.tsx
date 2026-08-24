@@ -15,7 +15,17 @@ const License = () => {
 
     return (
         <PageLoader errors={[licenceError]} loading={licenceLoading}>
-            <LayoutContainer header={<Header centerTitle position="main" title="License" />} leftSidebarOpen={false}>
+            <LayoutContainer
+                header={
+                    <Header
+                        centerTitle
+                        description="Activate and inspect your Enterprise license: upload the .lic file and read its entitlements, grace, and expiry."
+                        position="main"
+                        title="License"
+                    />
+                }
+                leftSidebarOpen={false}
+            >
                 <div className="mx-auto max-w-2xl py-8">
                     {hasLicence ? <LicenseDetails licence={licence} /> : <LicenseUpload />}
                 </div>

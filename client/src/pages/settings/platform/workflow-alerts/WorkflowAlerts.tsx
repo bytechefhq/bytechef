@@ -81,6 +81,7 @@ const WorkflowAlerts = () => {
             header={
                 <Header
                     centerTitle
+                    description="Alert on workflow execution health: failure rates, latency spikes, cost thresholds, and periods of no activity."
                     position="main"
                     right={<Button icon={<PlusIcon />} label="New Alert Rule" onClick={() => handleOpenDialog()} />}
                     title="Alerts"

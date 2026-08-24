@@ -12,7 +12,14 @@ const GitConfiguration = () => {
 
     return (
         <LayoutContainer
-            header={<Header centerTitle={true} position="main" title="Git Configuration" />}
+            header={
+                <Header
+                    centerTitle={true}
+                    description="Connect this workspace to a Git repository so projects push their workflows on publish and can be pulled back from a branch."
+                    position="main"
+                    title="Git Configuration"
+                />
+            }
             leftSidebarOpen={false}
         >
             <div className="w-full p-4 3xl:mx-auto 3xl:w-4/5">

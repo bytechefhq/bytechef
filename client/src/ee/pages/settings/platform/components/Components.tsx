@@ -50,7 +50,15 @@ const Components = ({tab}: ComponentsProps) => {
 
     return (
         <LayoutContainer
-            header={<Header centerTitle={true} position="main" right={<NewComponentMenu />} title="Components" />}
+            header={
+                <Header
+                    centerTitle={true}
+                    description="Curate which components builders can see, and extend the catalog with custom components and API connectors."
+                    position="main"
+                    right={<NewComponentMenu />}
+                    title="Components"
+                />
+            }
             leftSidebarOpen={false}
         >
             <Tabs className="size-full" onValueChange={(value) => navigate(`../${value}`)} value={tab}>
