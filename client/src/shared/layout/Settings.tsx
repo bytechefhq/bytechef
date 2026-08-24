@@ -60,7 +60,7 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
         }
 
         if (navItem.href === 'mcp-server') {
-            return isFeatureFlagEnabled('ff-2197');
+            return isFeatureFlagEnabled('ff-2197') && mcpServerEnabled;
         }
 
         if (navItem.href === 'admin-api-keys') {
@@ -77,10 +77,6 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
 
         if (navItem.href === 'billing') {
             return billingEnabled;
-        }
-
-        if (navItem.href === 'mcp-server') {
-            return mcpServerEnabled;
         }
 
         return true;
