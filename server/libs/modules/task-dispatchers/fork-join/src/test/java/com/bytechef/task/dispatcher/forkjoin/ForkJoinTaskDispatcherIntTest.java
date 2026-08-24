@@ -73,7 +73,7 @@ public class ForkJoinTaskDispatcherIntTest {
                         taskCompletionHandler, taskDispatcher, taskFileStorage)),
             (
                 eventPublisher, contextService, counterService, taskExecutionService) -> List.of(
-                    (taskDispatcher) -> new ForkJoinTaskDispatcher(
+                    taskDispatcher -> new ForkJoinTaskDispatcher(
                         contextService, counterService, EVALUATOR, eventPublisher, taskDispatcher,
                         taskExecutionService, taskFileStorage)),
             () -> Map.of("var/v1/set", testVarTaskHandler));
@@ -93,7 +93,7 @@ public class ForkJoinTaskDispatcherIntTest {
         TaskHandler<Object> failTaskHandler = taskExecution -> {
             try {
                 slowTaskStartedLatch.await(30, TimeUnit.SECONDS);
-            } catch (InterruptedException interruptedException) {
+            } catch (InterruptedException _) {
                 Thread.currentThread()
                     .interrupt();
             }
@@ -106,7 +106,7 @@ public class ForkJoinTaskDispatcherIntTest {
 
             try {
                 releaseSlowTaskLatch.await(30, TimeUnit.SECONDS);
-            } catch (InterruptedException interruptedException) {
+            } catch (InterruptedException _) {
                 slowTaskInterrupted.set(true);
 
                 Thread.currentThread()
@@ -130,7 +130,7 @@ public class ForkJoinTaskDispatcherIntTest {
                                 taskCompletionHandler, taskDispatcher, taskFileStorage)),
                     (
                         eventPublisher, contextService, counterService, taskExecutionService) -> List.of(
-                            (taskDispatcher) -> new ForkJoinTaskDispatcher(
+                            taskDispatcher -> new ForkJoinTaskDispatcher(
                                 contextService, counterService, EVALUATOR, eventPublisher, taskDispatcher,
                                 taskExecutionService, taskFileStorage)),
                     () -> Map.of(
@@ -148,6 +148,35 @@ public class ForkJoinTaskDispatcherIntTest {
 
     @Test
     @Timeout(60)
+    public void testDispatchWithFullyDisabledBranch() {
+        TaskDispatcherJobExecution jobExecution = taskDispatcherJobTestExecutor.execute(
+            EncodingUtils.base64EncodeToString("fork-join_v1-disabled-branch"),
+            (
+                contextService, counterService, taskExecutionService) -> List.of(
+                    (taskCompletionHandler, taskDispatcher) -> new ForkJoinTaskCompletionHandler(
+                        contextService, counterService, EVALUATOR, taskExecutionService,
+                        taskCompletionHandler, taskDispatcher, taskFileStorage)),
+            (
+                eventPublisher, contextService, counterService, taskExecutionService) -> List.of(
+                    taskDispatcher -> new ForkJoinTaskDispatcher(
+                        contextService, counterService, EVALUATOR, eventPublisher, taskDispatcher,
+                        taskExecutionService, taskFileStorage)),
+            () -> Map.of("var/v1/set", testVarTaskHandler));
+
+        Job job = jobExecution.job();
+
+        Assertions.assertEquals(Job.Status.COMPLETED, job.getStatus());
+        Assertions.assertTrue(jobExecution.getExecutionErrors()
+            .isEmpty());
+
+        Assertions.assertNull(testVarTaskHandler.get("skippedVar"));
+
+        Assertions.assertEquals(100, testVarTaskHandler.get("var2"));
+        Assertions.assertEquals(112, testVarTaskHandler.get("sumVar2"));
+    }
+
+    @Test
+    @Timeout(60)
     public void testDispatchWithEmptyBranch() {
         TaskDispatcherJobExecution jobExecution = taskDispatcherJobTestExecutor.execute(
             EncodingUtils.base64EncodeToString("fork-join_v1-empty-branch"),
@@ -158,7 +187,7 @@ public class ForkJoinTaskDispatcherIntTest {
                         taskCompletionHandler, taskDispatcher, taskFileStorage)),
             (
                 eventPublisher, contextService, counterService, taskExecutionService) -> List.of(
-                    (taskDispatcher) -> new ForkJoinTaskDispatcher(
+                    taskDispatcher -> new ForkJoinTaskDispatcher(
                         contextService, counterService, EVALUATOR, eventPublisher, taskDispatcher,
                         taskExecutionService, taskFileStorage)),
             () -> Map.of("var/v1/set", testVarTaskHandler));

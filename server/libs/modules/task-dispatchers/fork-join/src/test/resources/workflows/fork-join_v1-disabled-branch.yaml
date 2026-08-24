@@ -1,0 +1,20 @@
+---
+label: "Fork/join with a fully disabled branch"
+tasks:
+- name: "fork-join_1"
+  type: "fork-join/v1"
+  parameters:
+    branches:
+    - - name: "skippedVar"
+        type: "var/v1/set"
+        disabled: true
+        parameters:
+          value: 50
+    - - name: "var2"
+        type: "var/v1/set"
+        parameters:
+          value: 100
+      - name: "sumVar2"
+        type: "var/v1/set"
+        parameters:
+          value: "=12 + var2"

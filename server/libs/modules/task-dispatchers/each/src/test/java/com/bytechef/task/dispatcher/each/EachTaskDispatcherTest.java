@@ -54,7 +54,7 @@ import tools.jackson.databind.json.JsonMapper;
 /**
  * @author Arik Cohen
  */
-public class EachTaskDispatcherTest {
+class EachTaskDispatcherTest {
 
     private static final Evaluator EVALUATOR = SpelEvaluator.create();
 
@@ -75,7 +75,7 @@ public class EachTaskDispatcherTest {
     }
 
     @Test
-    public void testEachTaskDispatcherWhenMissingRequiredParameter() {
+    void testEachTaskDispatcherWhenMissingRequiredParameter() {
         EachTaskDispatcher dispatcher = new EachTaskDispatcher(
             contextService, counterService, EVALUATOR, eventPublisher, taskDispatcher, taskExecutionService,
             taskFileStorage);
@@ -90,7 +90,7 @@ public class EachTaskDispatcherTest {
     }
 
     @Test
-    public void testDispatch2() {
+    void testDispatch2() {
         when(contextService.peek(anyLong(), any()))
             .thenReturn(taskFileStorage.storeContextValue(1, Context.Classname.TASK_EXECUTION, Map.of()));
         when(taskExecutionService.create(any()))
@@ -126,7 +126,7 @@ public class EachTaskDispatcherTest {
     }
 
     @Test
-    public void testDispatch3() {
+    void testDispatch3() {
         EachTaskDispatcher dispatcher = new EachTaskDispatcher(
             contextService, counterService, EVALUATOR, eventPublisher, taskDispatcher,
             taskExecutionService, taskFileStorage);
@@ -154,7 +154,7 @@ public class EachTaskDispatcherTest {
     }
 
     @Test
-    public void testDispatchWhenIterateeIsAbsent() {
+    void testDispatchWhenIterateeIsAbsent() {
         EachTaskDispatcher dispatcher = new EachTaskDispatcher(
             contextService, counterService, EVALUATOR, eventPublisher, taskDispatcher,
             taskExecutionService, taskFileStorage);

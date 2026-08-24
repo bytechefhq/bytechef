@@ -36,7 +36,6 @@ import com.bytechef.task.dispatcher.map.completion.MapTaskCompletionHandler;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -81,7 +80,7 @@ public class MapTaskDispatcherIntTest {
         Assertions.assertEquals(
             IntStream.rangeClosed(3, 12)
                 .boxed()
-                .collect(Collectors.toList()),
+                .toList(),
             outputs.get("map"));
     }
 
@@ -101,8 +100,8 @@ public class MapTaskDispatcherIntTest {
             .boxed()
             .map(item1 -> IntStream.rangeClosed(1, item1)
                 .mapToObj(item2 -> item1 + "_" + item2 + 1)
-                .collect(Collectors.toList()))
-            .collect(Collectors.toList());
+                .toList())
+            .toList();
 
         Assertions.assertEquals(expected.size(), actual.size());
         Assertions.assertEquals(expected, actual);
@@ -119,6 +118,53 @@ public class MapTaskDispatcherIntTest {
         Map<String, ?> outputs = taskFileStorage.readJobOutputs(job.getOutputs());
 
         Assertions.assertNull(outputs.get("map"));
+    }
+
+    @Test
+    public void testDispatchWithDisabledIterateeCompletesInsteadOfFailing() {
+        TaskDispatcherJobExecution jobExecution = taskDispatcherJobTestExecutor.execute(
+            EncodingUtils.base64EncodeToString("map_v1_disabled_iteratee"),
+            this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories, getTaskHandlerMap());
+
+        Job job = jobExecution.job();
+
+        Assertions.assertEquals(Job.Status.COMPLETED, job.getStatus());
+        Assertions.assertTrue(jobExecution.getExecutionErrors()
+            .isEmpty());
+
+        Assertions.assertNull(testVarTaskHandler.get("skippedVar"));
+        Assertions.assertEquals(List.of("done"), testVarTaskHandler.get("afterMap"));
+    }
+
+    @SuppressWarnings("PMD")
+    private List<TaskCompletionHandlerFactory> getTaskCompletionHandlerFactories(
+        ContextService contextService, CounterService counterService, TaskExecutionService taskExecutionService) {
+
+        return List.of(
+            (taskCompletionHandler, taskDispatcher) -> new ConditionTaskCompletionHandler(
+                contextService, EVALUATOR, taskCompletionHandler, taskDispatcher, taskExecutionService,
+                taskFileStorage),
+            (taskCompletionHandler, taskDispatcher) -> new MapTaskCompletionHandler(
+                contextService, counterService, EVALUATOR, taskDispatcher, taskCompletionHandler,
+                taskExecutionService, taskFileStorage));
+    }
+
+    @SuppressWarnings("PMD")
+    private List<TaskDispatcherResolverFactory> getTaskDispatcherResolverFactories(
+        ApplicationEventPublisher eventPublisher, ContextService contextService, CounterService counterService,
+        TaskExecutionService taskExecutionService) {
+
+        return List.of(
+            taskDispatcher -> new ConditionTaskDispatcher(
+                contextService, EVALUATOR, eventPublisher, taskDispatcher, taskExecutionService,
+                taskFileStorage),
+            taskDispatcher -> new MapTaskDispatcher(
+                contextService, counterService, EVALUATOR, eventPublisher, taskDispatcher,
+                taskExecutionService, taskFileStorage));
+    }
+
+    private TaskDispatcherJobTestExecutor.TaskHandlerMapSupplier getTaskHandlerMap() {
+        return () -> Map.of("var/v1/set", testVarTaskHandler);
     }
 
     @Test
@@ -142,36 +188,5 @@ public class MapTaskDispatcherIntTest {
         Assertions.assertTrue(jobExecution.getExecutionErrors()
             .isEmpty());
         Assertions.assertEquals(List.of("done"), testVarTaskHandler.get("afterMap"));
-    }
-
-    @SuppressWarnings("PMD")
-    private List<TaskCompletionHandlerFactory> getTaskCompletionHandlerFactories(
-        ContextService contextService, CounterService counterService, TaskExecutionService taskExecutionService) {
-
-        return List.of(
-            (taskCompletionHandler, taskDispatcher) -> new ConditionTaskCompletionHandler(
-                contextService, EVALUATOR, taskCompletionHandler, taskDispatcher, taskExecutionService,
-                taskFileStorage),
-            (taskCompletionHandler, taskDispatcher) -> new MapTaskCompletionHandler(
-                contextService, counterService, EVALUATOR, taskDispatcher, taskCompletionHandler,
-                taskExecutionService, taskFileStorage));
-    }
-
-    @SuppressWarnings("PMD")
-    private List<TaskDispatcherResolverFactory> getTaskDispatcherResolverFactories(
-        ApplicationEventPublisher eventPublisher, ContextService contextService, CounterService counterService,
-        TaskExecutionService taskExecutionService) {
-
-        return List.of(
-            (taskDispatcher) -> new ConditionTaskDispatcher(
-                contextService, EVALUATOR, eventPublisher, taskDispatcher, taskExecutionService,
-                taskFileStorage),
-            (taskDispatcher) -> new MapTaskDispatcher(
-                contextService, counterService, EVALUATOR, eventPublisher, taskDispatcher,
-                taskExecutionService, taskFileStorage));
-    }
-
-    private TaskDispatcherJobTestExecutor.TaskHandlerMapSupplier getTaskHandlerMap() {
-        return () -> Map.of("var/v1/set", testVarTaskHandler);
     }
 }

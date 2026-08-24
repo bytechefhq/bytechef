@@ -1,0 +1,17 @@
+---
+label: "Loop With Disabled Iteratee"
+tasks:
+- name: "loop_1"
+  type: "loop/v1"
+  parameters:
+    items: "=range(1,3)"
+    iteratee:
+    - name: "skippedVar"
+      type: "var/v1/set"
+      disabled: true
+      parameters:
+        value: "=loop_1.item"
+- name: "afterLoop"
+  type: "var/v1/set"
+  parameters:
+    value: "done"
