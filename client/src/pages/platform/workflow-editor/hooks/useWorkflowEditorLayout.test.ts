@@ -7,13 +7,13 @@ import {beforeEach, describe, expect, it} from 'vitest';
 import useWorkflowEditorLayout from './useWorkflowEditorLayout';
 
 const aiAgentRootNode = {
-    clusterElements: {tools: [{name: 'stripe_1'}]},
+    clusterElements: {tools: [{name: 'stripe_1', type: 'stripe/v1/createCustomer'}]},
     clusterRoot: true,
     componentName: 'aiAgent',
     name: 'aiAgent_1',
     type: 'aiAgent/v1/chat',
     workflowNodeName: 'aiAgent_1',
-} as unknown as NodeDataType;
+} satisfies NodeDataType;
 
 beforeEach(() => {
     useWorkflowEditorStore.setState({clusterElementsCanvasOpen: false, rootClusterElementNodeData: undefined});
