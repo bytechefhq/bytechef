@@ -38,6 +38,10 @@ class WorkspaceConnectionFacadeAuthorizationTest {
 
     private static final String ADMIN_EXPRESSION = "hasAuthority(\"ROLE_ADMIN\")";
 
+    private static final String OWNER_OR_ADMIN_EXPRESSION =
+        "@permissionService.isResourceOwner('Connection', #connectionId) || " +
+            "@permissionService.hasResourceRole(#connectionId, 'Connection', 'ADMIN')";
+
     @Test
     void testDisconnectConnectionRequiresAdmin() {
         assertAdminOnly("disconnectConnection");
@@ -46,6 +50,22 @@ class WorkspaceConnectionFacadeAuthorizationTest {
     @Test
     void testRegisterExistingRequiresAdmin() {
         assertAdminOnly("registerExisting");
+    }
+
+    @Test
+    void testUpdateConnectionCredentialsRequiresOwnerOrAdmin() {
+        PreAuthorize preAuthorize = findMethod("updateConnectionCredentials").getAnnotation(PreAuthorize.class);
+
+        assertThat(preAuthorize)
+            .as(
+                "updateConnectionCredentials must be owner-or-admin. Without it, any member holding CONNECTION_EDIT "
+                    + "on a workspace-shared connection could repoint it at an account they control, and every "
+                    + "workflow using that connection would silently follow.")
+            .isNotNull();
+
+        assertThat(preAuthorize.value())
+            .as("Method 'updateConnectionCredentials' @PreAuthorize expression must be owner-or-admin")
+            .isEqualTo(OWNER_OR_ADMIN_EXPRESSION);
     }
 
     private static void assertAdminOnly(String methodName) {

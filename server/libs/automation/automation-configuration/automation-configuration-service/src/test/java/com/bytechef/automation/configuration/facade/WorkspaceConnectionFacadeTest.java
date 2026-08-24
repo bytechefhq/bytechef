@@ -19,6 +19,7 @@ package com.bytechef.automation.configuration.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
@@ -36,6 +37,7 @@ import com.bytechef.automation.configuration.service.WorkspaceConnectionService;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.domain.ConnectionStatus;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.event.ConnectionCreatedEvent;
 import com.bytechef.platform.connection.event.ConnectionDeletedEvent;
@@ -50,6 +52,7 @@ import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
@@ -516,6 +519,53 @@ class WorkspaceConnectionFacadeTest {
                     + "connection its own workspace could not see and no UI could ever share.")
                 .isEqualTo(ResourceVisibility.WORKSPACE);
         }
+    }
+
+    @Test
+    void testUpdateConnectionCredentialsDelegatesToConnectionFacade() {
+        Connection connection = new Connection();
+
+        connection.setId(5L);
+        connection.setVersion(3);
+        connection.setStatus(ConnectionStatus.ACTIVE);
+
+        when(connectionService.getConnection(5L)).thenReturn(connection);
+
+        workspaceConnectionFacade.updateConnectionCredentials(5L, Map.of("apiKey", "new"), 3);
+
+        verify(connectionFacade).replaceAuthorizationParameters(5L, Map.of("apiKey", "new"));
+    }
+
+    @Test
+    void testUpdateConnectionCredentialsRejectsStaleVersion() {
+        Connection connection = new Connection();
+
+        connection.setId(5L);
+        connection.setVersion(4);
+        connection.setStatus(ConnectionStatus.ACTIVE);
+
+        when(connectionService.getConnection(5L)).thenReturn(connection);
+
+        assertThatThrownBy(() -> workspaceConnectionFacade.updateConnectionCredentials(5L, Map.of("apiKey", "new"), 3))
+            .isInstanceOf(ConfigurationException.class);
+
+        verify(connectionFacade, never()).replaceAuthorizationParameters(anyLong(), any());
+    }
+
+    @Test
+    void testUpdateConnectionCredentialsRejectsConnectionPendingReassignment() {
+        Connection connection = new Connection();
+
+        connection.setId(5L);
+        connection.setVersion(3);
+        connection.setStatus(ConnectionStatus.PENDING_REASSIGNMENT);
+
+        when(connectionService.getConnection(5L)).thenReturn(connection);
+
+        assertThatThrownBy(() -> workspaceConnectionFacade.updateConnectionCredentials(5L, Map.of("apiKey", "new"), 3))
+            .isInstanceOf(ConfigurationException.class);
+
+        verify(connectionFacade, never()).replaceAuthorizationParameters(anyLong(), any());
     }
 
     /** Short-circuit sentinel thrown at the persistence boundary to isolate the CE-gate assertion. */

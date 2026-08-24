@@ -20,6 +20,7 @@ import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.credential.store.CredentialStoreType;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Workspace-scoped connection CRUD. The base contract carries only edition-agnostic operations (create, register,
@@ -48,6 +49,14 @@ public interface WorkspaceConnectionFacade {
         long workspaceId, String componentName, Integer connectionVersion, Long environmentId, Long tagId);
 
     void update(long connectionId, String name, List<Tag> tags, int version);
+
+    /**
+     * Replaces the connection's authorization parameters wholesale, so a connection whose credentials stopped working
+     * is reused rather than recreated. Guarded owner-or-admin, not by {@code CONNECTION_EDIT} — see the implementation
+     * for why. {@code version} is checked against the stored connection so a concurrent edit fails cleanly instead of
+     * overwriting a credential someone else just rotated.
+     */
+    void updateConnectionCredentials(long connectionId, Map<String, ?> parameters, int version);
 
     void updateTags(long connectionId, List<Tag> tags);
 }

@@ -28,6 +28,7 @@ import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnCEVersion;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.domain.ConnectionStatus;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.event.ConnectionCreatedEvent;
 import com.bytechef.platform.connection.event.ConnectionDeletedEvent;
@@ -50,6 +51,7 @@ import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -228,6 +230,33 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_EDIT')")
     public void update(long connectionId, String name, List<Tag> tags, int version) {
         connectionFacade.update(connectionId, name, tags, version);
+    }
+
+    /**
+     * Deliberately owner-or-admin rather than {@code CONNECTION_EDIT}: edit scope renames and retags, but letting it
+     * replace credentials would let any member repoint a workspace-shared connection at an account they control, and
+     * every workflow using that connection would silently follow. This is the same posture the sharing mutations use,
+     * and it matches the check {@code ConnectionServiceImpl} already applies to every parameter write.
+     */
+    @Override
+    @PreAuthorize("@permissionService.isResourceOwner('Connection', #connectionId) || " +
+        "@permissionService.hasResourceRole(#connectionId, 'Connection', 'ADMIN')")
+    public void updateConnectionCredentials(long connectionId, Map<String, ?> parameters, int version) {
+        Connection connection = connectionService.getConnection(connectionId);
+
+        if (connection.getStatus() != ConnectionStatus.ACTIVE) {
+            throw new ConfigurationException(
+                "Credentials cannot be replaced on a connection with status %s".formatted(connection.getStatus()),
+                ConnectionErrorType.INVALID_CONNECTION);
+        }
+
+        if (connection.getVersion() != version) {
+            throw new ConfigurationException(
+                "Connection id=%s was modified by someone else; reload and try again".formatted(connectionId),
+                ConnectionErrorType.INVALID_CONNECTION);
+        }
+
+        connectionFacade.replaceAuthorizationParameters(connectionId, parameters);
     }
 
     @Override

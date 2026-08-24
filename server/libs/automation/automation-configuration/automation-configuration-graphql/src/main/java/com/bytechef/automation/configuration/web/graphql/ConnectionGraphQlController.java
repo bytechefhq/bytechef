@@ -21,6 +21,7 @@ import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.credential.store.CredentialStoreType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Map;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.stereotype.Controller;
@@ -59,6 +60,17 @@ public class ConnectionGraphQlController {
 
         return workspaceConnectionFacade.registerExisting(
             input.workspaceId(), connectionDTO, input.credentialStoreType(), input.credentialRef());
+    }
+
+    @MutationMapping(name = "updateConnectionCredentials")
+    public Boolean updateConnectionCredentials(@Argument UpdateConnectionCredentialsInput input) {
+        workspaceConnectionFacade.updateConnectionCredentials(
+            input.connectionId(), input.parameters(), input.version());
+
+        return true;
+    }
+
+    public record UpdateConnectionCredentialsInput(long connectionId, Map<String, Object> parameters, int version) {
     }
 
     public record RegisterExistingConnectionInput(

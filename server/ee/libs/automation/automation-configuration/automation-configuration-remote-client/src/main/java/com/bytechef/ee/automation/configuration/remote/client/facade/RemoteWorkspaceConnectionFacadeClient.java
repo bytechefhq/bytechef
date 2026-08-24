@@ -14,6 +14,7 @@ import com.bytechef.platform.credential.store.CredentialStoreType;
 import com.bytechef.platform.security.domain.ResourceVisibility;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
+import java.util.Map;
 import org.springframework.stereotype.Component;
 
 /**
@@ -67,6 +68,11 @@ public class RemoteWorkspaceConnectionFacadeClient implements WorkspaceConnectio
 
     @Override
     public void update(long connectionId, String name, List<Tag> tags, int version) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void updateConnectionCredentials(long connectionId, Map<String, ?> parameters, int version) {
         throw new UnsupportedOperationException();
     }
 

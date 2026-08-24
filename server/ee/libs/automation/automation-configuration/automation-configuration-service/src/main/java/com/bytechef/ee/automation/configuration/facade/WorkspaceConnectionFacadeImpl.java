@@ -9,6 +9,7 @@ package com.bytechef.ee.automation.configuration.facade;
 
 import static com.bytechef.ee.platform.connection.audit.ConnectionAuditEvent.CONNECTION_ACCESS_GRANTED;
 import static com.bytechef.ee.platform.connection.audit.ConnectionAuditEvent.CONNECTION_ACCESS_REVOKED;
+import static com.bytechef.ee.platform.connection.audit.ConnectionAuditEvent.CONNECTION_CREDENTIALS_UPDATED;
 import static com.bytechef.ee.platform.connection.audit.ConnectionAuditEvent.CONNECTION_VISIBILITY_CHANGED;
 
 import com.bytechef.automation.configuration.domain.WorkspaceConnection;
@@ -36,6 +37,7 @@ import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -162,6 +164,16 @@ public class WorkspaceConnectionFacadeImpl
         resourceGrantService.deleteGrants(CONNECTION, connectionId);
 
         super.delete(connectionId);
+    }
+
+    /**
+     * Overridden purely to attach the audit event; the guard and the behaviour are inherited. No payload beyond
+     * {@code connectionId} — no credential material is ever recorded.
+     */
+    @Override
+    @AuditConnection(event = CONNECTION_CREDENTIALS_UPDATED, connectionId = "#connectionId")
+    public void updateConnectionCredentials(long connectionId, Map<String, ?> parameters, int version) {
+        super.updateConnectionCredentials(connectionId, parameters, version);
     }
 
     private void validateConnectionBelongsToWorkspace(long workspaceId, long connectionId) {

@@ -36,6 +36,20 @@ extend type Mutation {
     disconnectConnection(connectionId: ID!): Boolean!
     """Register an existing connection backed by an externally-provisioned credential (e.g. AWS Secrets Manager)."""
     registerExistingConnection(input: RegisterExistingConnectionInput!): Long!
+    """Replace an existing connection's authorization parameters. Owner-or-admin only.
+
+    The submitted parameters replace the connection's authorization parameters wholesale — a
+    credential the caller does not resubmit is cleared, not kept. Connection-level properties
+    (base URI inputs, region, subdomain) are untouched. Succeeding means the values were stored,
+    not that they work: there is no test-connection step, so a wrong credential is re-flagged
+    INVALID by the token refresh handler on the next execution."""
+    updateConnectionCredentials(input: UpdateConnectionCredentialsInput!): Boolean!
+}
+
+input UpdateConnectionCredentialsInput {
+    connectionId: ID!
+    parameters: Map!
+    version: Int!
 }
 
 input RegisterExistingConnectionInput {

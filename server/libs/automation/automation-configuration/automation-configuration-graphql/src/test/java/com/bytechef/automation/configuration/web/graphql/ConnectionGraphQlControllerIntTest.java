@@ -17,6 +17,7 @@
 package com.bytechef.automation.configuration.web.graphql;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -29,6 +30,7 @@ import com.bytechef.automation.configuration.web.graphql.config.AutomationConfig
 import com.bytechef.automation.configuration.web.graphql.config.AutomationConfigurationGraphQlTestConfiguration;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.credential.store.CredentialStoreType;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.graphql.test.autoconfigure.GraphQlTest;
@@ -134,5 +136,30 @@ public class ConnectionGraphQlControllerIntTest {
         verify(workspaceConnectionFacade).registerExisting(
             eq(1L), any(ConnectionDTO.class), eq(CredentialStoreType.HASHICORP_VAULT),
             eq("secret/data/bytechef/connections/abc-uuid"));
+    }
+
+    @Test
+    void testUpdateConnectionCredentials() {
+        // Given
+        doNothing().when(workspaceConnectionFacade)
+            .updateConnectionCredentials(anyLong(), any(), anyInt());
+
+        // When & Then
+        this.graphQlTester
+            .document("""
+                mutation {
+                    updateConnectionCredentials(input: {
+                        connectionId: "123"
+                        parameters: {apiKey: "new"}
+                        version: 3
+                    })
+                }
+                """)
+            .execute()
+            .path("updateConnectionCredentials")
+            .entity(Boolean.class)
+            .isEqualTo(true);
+
+        verify(workspaceConnectionFacade).updateConnectionCredentials(123L, Map.of("apiKey", "new"), 3);
     }
 }
