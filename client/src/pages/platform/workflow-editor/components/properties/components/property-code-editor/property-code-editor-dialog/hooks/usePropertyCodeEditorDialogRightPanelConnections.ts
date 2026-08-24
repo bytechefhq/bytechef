@@ -62,6 +62,34 @@ export const usePropertyCodeEditorDialogRightPanelConnections = ({
             : workflowNodeName,
     });
 
+    const saveConnections = (workflowDefinition: WorkflowDefinitionType) => {
+        const definition = stringifyWorkflowDefinition(workflowDefinition);
+
+        updateWorkflowMutation!.mutate(
+            {
+                id: workflow.id!,
+                workflow: {
+                    definition,
+                    version: workflow.version,
+                },
+            },
+            {
+                onSuccess: (updatedWorkflow) => {
+                    useWorkflowDataStore.getState().setWorkflow({
+                        ...updatedWorkflow,
+                        definition,
+                    });
+
+                    if (isClusterElement) {
+                        queryClient.invalidateQueries({queryKey: ['clusterElementComponentConnections']});
+                    } else {
+                        queryClient.invalidateQueries({queryKey: ['workflowNodeComponentConnections']});
+                    }
+                },
+            }
+        );
+    };
+
     const handleOnSubmit = (values: z.infer<typeof connectionFormSchema>) => {
         if (!workflow?.definition) {
             return;
@@ -144,31 +172,7 @@ export const usePropertyCodeEditorDialogRightPanelConnections = ({
             };
         }
 
-        const definition = stringifyWorkflowDefinition(workflowDefinition);
-
-        updateWorkflowMutation!.mutate(
-            {
-                id: workflow.id!,
-                workflow: {
-                    definition,
-                    version: workflow.version,
-                },
-            },
-            {
-                onSuccess: (updatedWorkflow) => {
-                    useWorkflowDataStore.getState().setWorkflow({
-                        ...updatedWorkflow,
-                        definition,
-                    });
-
-                    if (isClusterElement) {
-                        queryClient.invalidateQueries({queryKey: ['clusterElementComponentConnections']});
-                    } else {
-                        queryClient.invalidateQueries({queryKey: ['workflowNodeComponentConnections']});
-                    }
-                },
-            }
-        );
+        saveConnections(workflowDefinition);
     };
 
     const handleOnRemoveClick = (workflowConnectionKey: string) => {
@@ -249,31 +253,7 @@ export const usePropertyCodeEditorDialogRightPanelConnections = ({
             };
         }
 
-        const definition = stringifyWorkflowDefinition(workflowDefinition);
-
-        updateWorkflowMutation!.mutate(
-            {
-                id: workflow.id!,
-                workflow: {
-                    definition,
-                    version: workflow.version,
-                },
-            },
-            {
-                onSuccess: (updatedWorkflow) => {
-                    useWorkflowDataStore.getState().setWorkflow({
-                        ...updatedWorkflow,
-                        definition,
-                    });
-
-                    if (isClusterElement) {
-                        queryClient.invalidateQueries({queryKey: ['clusterElementComponentConnections']});
-                    } else {
-                        queryClient.invalidateQueries({queryKey: ['workflowNodeComponentConnections']});
-                    }
-                },
-            }
-        );
+        saveConnections(workflowDefinition);
     };
 
     return {
