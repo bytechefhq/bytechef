@@ -20,18 +20,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Ivica Cardic
  */
+@ExtendWith(ObjectMapperSetupExtension.class)
 class WorkflowValidatorNestedTaskReferenceTest {
 
     private static final PropertyInfo ACTION_OUTPUT =
@@ -59,13 +60,6 @@ class WorkflowValidatorNestedTaskReferenceTest {
 
     private static final Map<String, PropertyInfo> TASK_OUTPUT_MAP = Map.of(
         "component/v1/action1", ACTION_OUTPUT);
-
-    @BeforeAll
-    public static void beforeAll() {
-        JsonUtils.setObjectMapper(
-            JsonMapper.builder()
-                .build());
-    }
 
     @Test
     void validateWorkflowTasksResolvesBareReferenceToTaskNestedInCondition() {
