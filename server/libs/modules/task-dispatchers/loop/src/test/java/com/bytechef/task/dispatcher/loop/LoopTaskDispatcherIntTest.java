@@ -28,6 +28,7 @@ import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.evaluator.SpelEvaluator;
+import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.workflow.task.dispatcher.test.annotation.TaskDispatcherIntTest;
 import com.bytechef.platform.workflow.task.dispatcher.test.task.handler.TestVarTaskHandler;
 import com.bytechef.platform.workflow.task.dispatcher.test.workflow.TaskDispatcherJobTestExecutor;
@@ -35,16 +36,18 @@ import com.bytechef.platform.workflow.task.dispatcher.test.workflow.TaskDispatch
 import com.bytechef.task.dispatcher.condition.ConditionTaskDispatcher;
 import com.bytechef.task.dispatcher.condition.completion.ConditionTaskCompletionHandler;
 import com.bytechef.task.dispatcher.loop.completion.LoopTaskCompletionHandler;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import org.awaitility.Awaitility;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 
@@ -195,6 +198,55 @@ public class LoopTaskDispatcherIntTest {
         Assertions.assertTrue(status.isTerminated());
     }
 
+    @Test
+    void testLoopWithDisabledIterateeCompletesInsteadOfFailing() {
+        taskDispatcherJobExecution = taskDispatcherJobTestExecutor.execute(
+            EncodingUtils.base64EncodeToString("loop_v1_disabled_iteratee"), this::getTaskCompletionHandlerFactories,
+            this::getTaskDispatcherResolverFactories, getTaskHandlerMap());
+
+        assertNoTaskErrors(taskDispatcherJobExecution);
+
+        Job job = taskDispatcherJobExecution.job();
+
+        Assertions.assertEquals(Job.Status.COMPLETED, job.getStatus());
+
+        Assertions.assertNull(testVarTaskHandler.get("skippedVar"));
+        Assertions.assertEquals(List.of("done"), testVarTaskHandler.get("afterLoop"));
+
+        TaskExecution parentTaskExecution = findParentLoopTask();
+
+        Assertions.assertNotNull(parentTaskExecution.getEndDate(), "Loop parent must have endDate");
+        Assertions.assertEquals(TaskExecution.Status.COMPLETED, parentTaskExecution.getStatus());
+    }
+
+    @Test
+    @Timeout(30)
+    void testWorkflowWithEveryTaskDisabledCompletes() {
+        taskDispatcherJobExecution = taskDispatcherJobTestExecutor.execute(
+            EncodingUtils.base64EncodeToString("loop_v1_all_disabled"), this::getTaskCompletionHandlerFactories,
+            this::getTaskDispatcherResolverFactories, getTaskHandlerMap());
+
+        assertNoTaskErrors(taskDispatcherJobExecution);
+
+        Job job = taskDispatcherJobExecution.job();
+
+        Assertions.assertEquals(Job.Status.COMPLETED, job.getStatus());
+
+        Assertions.assertNull(testVarTaskHandler.get("innerVar"));
+        Assertions.assertNull(testVarTaskHandler.get("afterLoop"));
+    }
+
+    @Test
+    void testLoopWithEmptyIterateeFails() {
+        ExecutionException executionException = Assertions.assertThrows(
+            ExecutionException.class,
+            () -> taskDispatcherJobTestExecutor.execute(
+                EncodingUtils.base64EncodeToString("loop_v1_empty_iteratee"), this::getTaskCompletionHandlerFactories,
+                this::getTaskDispatcherResolverFactories, getTaskHandlerMap()));
+
+        Assertions.assertEquals("'iteratee' must contain at least one task", executionException.getMessage());
+    }
+
     @RepeatedTest(10)
     void testLoopOverSmallItemsNoResidualStarted() {
         taskDispatcherJobExecution = taskDispatcherJobTestExecutor.execute(
@@ -240,47 +292,27 @@ public class LoopTaskDispatcherIntTest {
     }
 
     private void assertAllTasksTerminated() {
-        long timeoutMillis = TimeUnit.SECONDS.toMillis(30);
-        long pollDelayMillis = 50L;
-        long start = System.currentTimeMillis();
+        Awaitility.await()
+            .atMost(Duration.ofSeconds(30))
+            .pollInterval(Duration.ofMillis(50))
+            .untilAsserted(() -> {
+                List<TaskExecution> nonTerminatedTaskExecutions = taskDispatcherJobExecution.jobTaskExecutions()
+                    .stream()
+                    .filter(taskExecution -> {
+                        TaskExecution.Status status = taskExecution.getStatus();
 
-        while (true) {
-            List<TaskExecution> taskExecutions = taskDispatcherJobExecution.jobTaskExecutions();
+                        return status != null && !status.isTerminated();
+                    })
+                    .toList();
 
-            boolean allTerminated = true;
-
-            for (TaskExecution taskExecution : taskExecutions) {
-                TaskExecution.Status status = taskExecution.getStatus();
-
-                if (!(status == null || status.isTerminated())) {
-                    allTerminated = false;
-
-                    break;
-                }
-            }
-
-            if (allTerminated) {
-                return;
-            }
-
-            if (System.currentTimeMillis() - start > timeoutMillis) {
-                List<TaskExecution> currentExecutions = taskDispatcherJobExecution.jobTaskExecutions();
-
-                String message = currentExecutions.stream()
-                    .map(te -> "TaskExecution " + te.getId() + " (" + te.getName() + ") status=" + te.getStatus())
-                    .collect(Collectors.joining(System.lineSeparator()));
-
-                Assertions.fail("Not all TaskExecutions terminated within timeout. Current statuses:\n" + message);
-            }
-
-            try {
-                Thread.sleep(pollDelayMillis);
-            } catch (InterruptedException e) {
-                Thread.currentThread()
-                    .interrupt();
-                Assertions.fail("Interrupted while waiting for task terminations");
-            }
-        }
+                Assertions.assertTrue(
+                    nonTerminatedTaskExecutions.isEmpty(),
+                    () -> "Not all TaskExecutions terminated within timeout. Current statuses:\n" +
+                        nonTerminatedTaskExecutions.stream()
+                            .map(taskExecution -> "TaskExecution " + taskExecution.getId() + " (" +
+                                taskExecution.getName() + ") status=" + taskExecution.getStatus())
+                            .collect(Collectors.joining(System.lineSeparator())));
+            });
     }
 
     private TaskExecution findParentLoopTask() {

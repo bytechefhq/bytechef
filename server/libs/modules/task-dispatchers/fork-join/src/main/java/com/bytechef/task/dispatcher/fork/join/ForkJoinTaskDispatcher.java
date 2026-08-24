@@ -21,6 +21,7 @@ package com.bytechef.task.dispatcher.fork.join;
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.configuration.domain.Task;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
+import com.bytechef.atlas.configuration.util.WorkflowTaskUtils;
 import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
 import com.bytechef.atlas.coordinator.task.dispatcher.ErrorHandlingTaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
@@ -113,12 +114,27 @@ public class ForkJoinTaskDispatcher extends ErrorHandlingTaskDispatcher implemen
         List<List<WorkflowTask>> branchesWorkflowTasks = MapUtils.getRequiredList(
             taskExecution.getParameters(), ForkJoinTaskDispatcherConstants.BRANCHES, new TypeReference<>() {});
 
+        boolean branchesEmptiedByDisabledTasks = WorkflowTaskUtils.isEmptiedByDisabledTasks(
+            taskExecution.getWorkflowTask(), ForkJoinTaskDispatcherConstants.BRANCHES);
+
+        for (int i = 0; i < branchesWorkflowTasks.size(); i++) {
+            List<WorkflowTask> branchWorkflowTasks = branchesWorkflowTasks.get(i);
+
+            Validate.isTrue(
+                !branchWorkflowTasks.isEmpty() || branchesEmptiedByDisabledTasks,
+                "branch " + i + " does not contain any tasks");
+        }
+
         taskExecution.setStartDate(Instant.now());
         taskExecution.setStatus(TaskExecution.Status.STARTED);
 
         taskExecution = taskExecutionService.update(taskExecution);
 
-        if (branchesWorkflowTasks.isEmpty()) {
+        long dispatchedBranchCount = branchesWorkflowTasks.stream()
+            .filter(branchWorkflowTasks -> !branchWorkflowTasks.isEmpty())
+            .count();
+
+        if (dispatchedBranchCount == 0) {
             taskExecution.setStartDate(Instant.now());
             taskExecution.setEndDate(Instant.now());
             taskExecution.setExecutionTime(0);
@@ -127,7 +143,7 @@ public class ForkJoinTaskDispatcher extends ErrorHandlingTaskDispatcher implemen
         } else {
             long taskExecutionId = Validate.notNull(taskExecution.getId(), "id");
 
-            counterService.set(taskExecutionId, branchesWorkflowTasks.size());
+            counterService.set(taskExecutionId, dispatchedBranchCount);
 
             long taskExecutionJobId = Validate.notNull(
                 taskExecution.getJobId(), "'taskExecution.jobId' must not be null");
@@ -135,7 +151,9 @@ public class ForkJoinTaskDispatcher extends ErrorHandlingTaskDispatcher implemen
             for (int i = 0; i < branchesWorkflowTasks.size(); i++) {
                 List<WorkflowTask> branchWorkflowTasks = branchesWorkflowTasks.get(i);
 
-                Validate.isTrue(!branchWorkflowTasks.isEmpty(), "branch " + i + " does not contain any tasks");
+                if (branchWorkflowTasks.isEmpty()) {
+                    continue;
+                }
 
                 WorkflowTask branchWorkflowTask = branchWorkflowTasks.getFirst();
 

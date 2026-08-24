@@ -25,6 +25,7 @@ import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConst
 
 import com.bytechef.atlas.configuration.domain.Task;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
+import com.bytechef.atlas.configuration.util.WorkflowTaskUtils;
 import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
 import com.bytechef.atlas.coordinator.task.dispatcher.ErrorHandlingTaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
@@ -90,12 +91,19 @@ public class LoopTaskDispatcher extends ErrorHandlingTaskDispatcher implements T
             .toList();
         List<?> items = MapUtils.getList(taskExecution.getParameters(), ITEMS, Collections.emptyList());
 
+        if (loopForever || !items.isEmpty()) {
+            Validate.isTrue(
+                !iterateeWorkflowTasks.isEmpty() ||
+                    WorkflowTaskUtils.isEmptiedByDisabledTasks(taskExecution.getWorkflowTask(), ITERATEE),
+                "'iteratee' must contain at least one task");
+        }
+
         taskExecution.setStartDate(Instant.now());
         taskExecution.setStatus(TaskExecution.Status.STARTED);
 
         taskExecution = taskExecutionService.update(taskExecution);
 
-        if (loopForever || !items.isEmpty()) {
+        if (!iterateeWorkflowTasks.isEmpty() && (loopForever || !items.isEmpty())) {
             WorkflowTask iterateeWorkflowTask = iterateeWorkflowTasks.getFirst();
 
             TaskExecution subTaskExecution = TaskExecution.builder()
