@@ -8,6 +8,7 @@ import {extractClusterElementIcons} from '../../cluster-element-editor/utils/clu
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import {mapHandlePosition} from '../utils/directionUtils';
 import {CONFIGURED_CLUSTER_ROOT_HANDLE_OFFSET, REGULAR_NODE_HANDLE_OFFSET} from '../utils/postDagreConstraints';
+import DisabledNodeBadge from './DisabledNodeBadge';
 import styles from './NodeTypes.module.css';
 
 const MAX_VISIBLE_CLUSTER_ELEMENT_ICONS = 5;
@@ -44,7 +45,12 @@ const ReadOnlyNode = ({data}: {data: NodeDataType}) => {
         : REGULAR_NODE_HANDLE_OFFSET;
 
     return (
-        <div className="relative flex cursor-grab items-center justify-center">
+        <div
+            className={twMerge(
+                'relative flex cursor-grab items-center justify-center',
+                data.isEffectivelyDisabled && 'opacity-50 grayscale'
+            )}
+        >
             <div
                 className={twMerge(
                     'flex items-center justify-center rounded-md border-2 border-stroke-neutral-tertiary bg-surface-neutral-primary p-4 text-primary shadow-sm',
@@ -78,7 +84,11 @@ const ReadOnlyNode = ({data}: {data: NodeDataType}) => {
             </div>
 
             <div className="ml-2 flex w-full min-w-max flex-col items-start">
-                <span className="font-semibold">{data.title || data.label}</span>
+                <div className="flex items-center gap-1">
+                    <span className="font-semibold">{data.title || data.label}</span>
+
+                    {data.disabled && <DisabledNodeBadge />}
+                </div>
 
                 {data.operationName && <pre className="text-sm">{data.operationName}</pre>}
 
