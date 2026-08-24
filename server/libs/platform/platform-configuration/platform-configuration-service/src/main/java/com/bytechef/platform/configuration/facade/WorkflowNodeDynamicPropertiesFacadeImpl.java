@@ -134,7 +134,7 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
         return clusterElementDefinitionFacade.executeDynamicProperties(
             clusterElementWorkflowNodeType.name(), clusterElementWorkflowNodeType.version(),
             clusterElementWorkflowNodeType.operation(), propertyName,
-            evaluator.evaluate(clusterElement.getParameters(), context),
+            evaluator.evaluate(clusterElement.getParameters(), context, true),
             workflowTask.getExtensions(), lookupDependsOnPaths, connectionId, clusterElementConnectionIds,
             clusterElementInputParameters);
     }
@@ -149,13 +149,14 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
 
             if (value instanceof ClusterElement clusterElement) {
                 result.put(
-                    clusterElement.getWorkflowNodeName(), evaluator.evaluate(clusterElement.getParameters(), context));
+                    clusterElement.getWorkflowNodeName(),
+                    evaluator.evaluate(clusterElement.getParameters(), context, true));
             } else if (value instanceof List<?> list) {
                 for (Object item : list) {
                     if (item instanceof ClusterElement clusterElement) {
                         result.put(
                             clusterElement.getWorkflowNodeName(),
-                            evaluator.evaluate(clusterElement.getParameters(), context));
+                            evaluator.evaluate(clusterElement.getParameters(), context, true));
                     }
                 }
             }
