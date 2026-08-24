@@ -375,11 +375,7 @@ function App() {
                 block scoped to this element, so they render below the banner instead of
                 anchoring to the viewport top and overlapping it. */}
 
-            <SidebarProvider
-                className="min-h-0 flex-1 transform-gpu"
-                onOpenChange={setSidebarOpen}
-                open={sidebarOpen}
-            >
+            <SidebarProvider className="min-h-0 flex-1 transform-gpu" onOpenChange={setSidebarOpen} open={sidebarOpen}>
                 <AppSidebar navigation={navigation} />
 
                 <SidebarInset className="flex h-full min-w-0 flex-col">
