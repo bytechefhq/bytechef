@@ -53,10 +53,29 @@ const AI_AGENT_DATA = {
     workflowNodeName: 'aiAgent_1',
 } as unknown as NodeDataType;
 
+const DISABLED_BADGE_TITLE = 'Disabled — skipped during execution';
+
 const FRAMED_AI_AGENT_DATA = {
     ...AI_AGENT_DATA,
     clusterFrame: {clusterRootId: 'aiAgent_1', contentOrigin: {x: 32, y: 40}, height: 320, width: 640},
 } as unknown as NodeDataType;
+
+function definitionWithDisabledLoop() {
+    return JSON.stringify({
+        tasks: [
+            {
+                disabled: true,
+                name: 'loop_1',
+                parameters: {iteratee: [{name: 'aiAgent_1', parameters: {}, type: 'aiAgent/v1'}]},
+                type: 'loop/v1',
+            },
+        ],
+    });
+}
+
+function nodeClassName(container: HTMLElement) {
+    return container.querySelector('[data-nodetype="clusterRoot"]')?.className ?? '';
+}
 
 function renderNode(data: NodeDataType) {
     const queryClient = new QueryClient({defaultOptions: {queries: {retry: false}}});
@@ -116,5 +135,44 @@ describe('AiAgentNode', () => {
 
         expect(screen.queryByTestId('handle-target')).not.toBeInTheDocument();
         expect(screen.queryByTestId('handle-source')).not.toBeInTheDocument();
+    });
+
+    it('renders muted when the agent task carries its own disabled flag', () => {
+        const {container} = renderNode({...AI_AGENT_DATA, disabled: true} as NodeDataType);
+
+        expect(nodeClassName(container)).toContain('opacity-50');
+        expect(nodeClassName(container)).toContain('grayscale');
+    });
+
+    it('does not render muted when the agent task is enabled', () => {
+        const {container} = renderNode(AI_AGENT_DATA);
+
+        expect(nodeClassName(container)).not.toContain('opacity-50');
+        expect(nodeClassName(container)).not.toContain('grayscale');
+    });
+
+    it('shows the disabled badge for the agent task own disabled flag', () => {
+        renderNode({...AI_AGENT_DATA, disabled: true} as NodeDataType);
+
+        expect(screen.getByTitle(DISABLED_BADGE_TITLE)).toBeInTheDocument();
+    });
+
+    it('renders muted without a badge when only an ancestor dispatcher is disabled', () => {
+        useWorkflowDataStore.setState({
+            workflow: {
+                definition: definitionWithDisabledLoop(),
+                id: 'workflow-1',
+                nodeNames: [],
+                tasks: [],
+                triggers: [],
+                version: 1,
+            },
+        });
+
+        const {container} = renderNode(AI_AGENT_DATA);
+
+        expect(nodeClassName(container)).toContain('opacity-50');
+        expect(nodeClassName(container)).toContain('grayscale');
+        expect(screen.queryByTitle(DISABLED_BADGE_TITLE)).not.toBeInTheDocument();
     });
 });
