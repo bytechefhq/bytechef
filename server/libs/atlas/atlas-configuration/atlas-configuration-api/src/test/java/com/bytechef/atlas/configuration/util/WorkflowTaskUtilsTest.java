@@ -17,6 +17,8 @@
 package com.bytechef.atlas.configuration.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
@@ -249,5 +251,253 @@ class WorkflowTaskUtilsTest {
                     Map.of("name", "dataTable_6", "type", "dataTable/v1/findRecords"))),
             aiAgentWorkflowTask.getExtensions()
                 .get("clusterElements"));
+    }
+
+    @Test
+    void testRemoveDisabledTasksTopLevel() {
+        List<WorkflowTask> workflowTasks = List.of(
+            new WorkflowTask(Map.of("name", "task1", "type", "component/v1/action")),
+            new WorkflowTask(Map.of("name", "task2", "type", "component/v1/action", "disabled", true)),
+            new WorkflowTask(Map.of("name", "task3", "type", "component/v1/action")));
+
+        List<WorkflowTask> resultWorkflowTasks = WorkflowTaskUtils.removeDisabledTasks(workflowTasks);
+
+        assertEquals(
+            List.of("task1", "task3"),
+            resultWorkflowTasks.stream()
+                .map(WorkflowTask::getName)
+                .toList());
+    }
+
+    @Test
+    void testRemoveDisabledTasksFirstTaskShiftsIndexes() {
+        List<WorkflowTask> workflowTasks = List.of(
+            new WorkflowTask(Map.of("name", "task1", "type", "component/v1/action", "disabled", true)),
+            new WorkflowTask(Map.of("name", "task2", "type", "component/v1/action")),
+            new WorkflowTask(Map.of("name", "task3", "type", "component/v1/action")));
+
+        List<WorkflowTask> resultWorkflowTasks = WorkflowTaskUtils.removeDisabledTasks(workflowTasks);
+
+        assertEquals(
+            List.of("task2", "task3"),
+            resultWorkflowTasks.stream()
+                .map(WorkflowTask::getName)
+                .toList());
+    }
+
+    @Test
+    void testRemoveDisabledTasksInsideConditionCases() {
+        WorkflowTask condition = new WorkflowTask(Map.of(
+            "name", "condition_1",
+            "type", "condition/v1",
+            "parameters", Map.of(
+                "rawExpression", true,
+                "caseTrue", List.of(
+                    Map.of("name", "trueEnabled", "type", "component/v1/action"),
+                    Map.of("name", "trueDisabled", "type", "component/v1/action", "disabled", true)),
+                "caseFalse", List.of(
+                    Map.of("name", "falseEnabled", "type", "component/v1/action"),
+                    Map.of("name", "falseDisabled", "type", "component/v1/action", "disabled", true)))));
+
+        List<WorkflowTask> resultWorkflowTasks = WorkflowTaskUtils.removeDisabledTasks(List.of(condition));
+
+        WorkflowTask resultCondition = resultWorkflowTasks.getFirst();
+        Map<String, ?> resultParameters = resultCondition.getParameters();
+
+        List<?> resultCaseTrue = (List<?>) resultParameters.get("caseTrue");
+        List<?> resultCaseFalse = (List<?>) resultParameters.get("caseFalse");
+
+        assertEquals(1, resultCaseTrue.size());
+        assertEquals(1, resultCaseFalse.size());
+    }
+
+    @Test
+    void testRemoveDisabledTasksInsideBranchCases() {
+        WorkflowTask branch = new WorkflowTask(Map.of(
+            "name", "branch_1",
+            "type", "branch/v1",
+            "parameters", Map.of(
+                "cases", List.of(
+                    Map.of(
+                        "key", "k1",
+                        "tasks", List.of(
+                            Map.of("name", "caseEnabled", "type", "component/v1/action"),
+                            Map.of(
+                                "name", "caseDisabled", "type", "component/v1/action", "disabled", true)))))));
+
+        List<WorkflowTask> resultWorkflowTasks = WorkflowTaskUtils.removeDisabledTasks(List.of(branch));
+
+        WorkflowTask resultBranch = resultWorkflowTasks.getFirst();
+        Map<String, ?> resultParameters = resultBranch.getParameters();
+
+        List<?> resultCases = (List<?>) resultParameters.get("cases");
+        Map<?, ?> resultCase = (Map<?, ?>) resultCases.getFirst();
+        List<?> resultTasks = (List<?>) resultCase.get("tasks");
+
+        assertEquals(1, resultTasks.size());
+    }
+
+    @Test
+    void testRemoveDisabledSingleMapSubtask() {
+        WorkflowTask each = new WorkflowTask(Map.of(
+            "name", "each_1",
+            "type", "each/v1",
+            "parameters", Map.of(
+                "iteratee",
+                Map.of("name", "iterateeTask", "type", "component/v1/action", "disabled", true))));
+
+        List<WorkflowTask> resultWorkflowTasks = WorkflowTaskUtils.removeDisabledTasks(List.of(each));
+
+        WorkflowTask resultEach = resultWorkflowTasks.getFirst();
+        Map<String, ?> resultParameters = resultEach.getParameters();
+
+        assertFalse(resultParameters.containsKey("iteratee"));
+    }
+
+    @Test
+    void testRemoveDisabledTasksInsideForkJoinBranches() {
+        WorkflowTask forkJoin = new WorkflowTask(Map.of(
+            "name", "forkJoin_1",
+            "type", "fork-join/v1",
+            "parameters", Map.of(
+                "branches", List.of(
+                    List.of(
+                        Map.of("name", "branch1Enabled", "type", "component/v1/action"),
+                        Map.of(
+                            "name", "branch1Disabled", "type", "component/v1/action", "disabled", true)),
+                    List.of(
+                        Map.of("name", "branch2Enabled", "type", "component/v1/action"))))));
+
+        List<WorkflowTask> resultWorkflowTasks = WorkflowTaskUtils.removeDisabledTasks(List.of(forkJoin));
+
+        WorkflowTask resultForkJoin = resultWorkflowTasks.getFirst();
+        Map<String, ?> resultParameters = resultForkJoin.getParameters();
+
+        List<?> resultBranches = (List<?>) resultParameters.get("branches");
+        List<?> resultBranch1 = (List<?>) resultBranches.get(0);
+        List<?> resultBranch2 = (List<?>) resultBranches.get(1);
+
+        assertEquals(1, resultBranch1.size());
+        assertEquals(1, resultBranch2.size());
+    }
+
+    @Test
+    void testRemoveDisabledTasksReturnsSameListWhenNothingDisabled() {
+        List<WorkflowTask> workflowTasks = List.of(
+            new WorkflowTask(Map.of("name", "task1", "type", "component/v1/action")),
+            new WorkflowTask(Map.of(
+                "name", "condition_1",
+                "type", "condition/v1",
+                "parameters", Map.of(
+                    "caseTrue", List.of(Map.of("name", "inner1", "type", "component/v1/action"))))));
+
+        List<WorkflowTask> resultWorkflowTasks = WorkflowTaskUtils.removeDisabledTasks(workflowTasks);
+
+        assertEquals(workflowTasks.size(), resultWorkflowTasks.size());
+        assertSame(workflowTasks.get(0), resultWorkflowTasks.get(0));
+        assertSame(workflowTasks.get(1), resultWorkflowTasks.get(1));
+    }
+
+    @Test
+    void testGetDisabledTaskNamesIncludesDescendants() {
+        WorkflowTask condition = new WorkflowTask(Map.of(
+            "name", "condition_1",
+            "type", "condition/v1",
+            "disabled", true,
+            "parameters", Map.of(
+                "caseTrue", List.of(Map.of("name", "inner1", "type", "component/v1/action")))));
+
+        List<String> disabledTaskNames = WorkflowTaskUtils.getDisabledTaskNames(List.of(condition));
+
+        assertEquals(Set.of("condition_1", "inner1"), Set.copyOf(disabledTaskNames));
+    }
+
+    @Test
+    void testGetDisabledTaskNamesForNestedDisabledUnderEnabledParent() {
+        WorkflowTask loop = new WorkflowTask(Map.of(
+            "name", "loop_1",
+            "type", "loop/v1",
+            "parameters", Map.of(
+                "iteratee", List.of(
+                    Map.of("name", "loopEnabled", "type", "component/v1/action"),
+                    Map.of("name", "loopDisabled", "type", "component/v1/action", "disabled", true)))));
+
+        List<String> disabledTaskNames = WorkflowTaskUtils.getDisabledTaskNames(List.of(loop));
+
+        assertEquals(List.of("loopDisabled"), disabledTaskNames);
+    }
+
+    @Test
+    void testRemoveDisabledTasksInsideFinalize() {
+        WorkflowTask task = new WorkflowTask(Map.of(
+            "name", "task_1",
+            "type", "component/v1/action",
+            "finalize", List.of(
+                Map.of("name", "finalizeEnabled", "type", "component/v1/action"),
+                Map.of("name", "finalizeDisabled", "type", "component/v1/action", "disabled", true))));
+
+        List<WorkflowTask> resultWorkflowTasks = WorkflowTaskUtils.removeDisabledTasks(List.of(task));
+
+        WorkflowTask resultTask = resultWorkflowTasks.getFirst();
+
+        assertEquals(
+            List.of("finalizeEnabled"),
+            resultTask.getFinalize()
+                .stream()
+                .map(WorkflowTask::getName)
+                .toList());
+    }
+
+    @Test
+    void testRemoveDisabledTasksWithWorkflowTaskInstanceInParameters() {
+        WorkflowTask iterateeTask = new WorkflowTask(
+            Map.of("name", "iterateeInstance", "type", "component/v1/action", "disabled", true));
+
+        WorkflowTask loop = new WorkflowTask(Map.of(
+            "name", "loop_1",
+            "type", "loop/v1",
+            "parameters", Map.of("iteratee", iterateeTask)));
+
+        List<WorkflowTask> resultWorkflowTasks = WorkflowTaskUtils.removeDisabledTasks(List.of(loop));
+
+        WorkflowTask resultLoop = resultWorkflowTasks.getFirst();
+        Map<String, ?> resultParameters = resultLoop.getParameters();
+
+        assertFalse(resultParameters.containsKey("iteratee"));
+    }
+
+    @Test
+    void testRemoveDisabledTasksPreservesMaxRetriesAndTaskNumber() {
+        WorkflowTask condition = new WorkflowTask(Map.of(
+            "name", "condition_1",
+            "type", "condition/v1",
+            "maxRetries", 3,
+            "taskNumber", 2,
+            "parameters", Map.of(
+                "caseTrue", List.of(
+                    Map.of("name", "trueEnabled", "type", "component/v1/action"),
+                    Map.of("name", "trueDisabled", "type", "component/v1/action", "disabled", true)))));
+
+        List<WorkflowTask> resultWorkflowTasks = WorkflowTaskUtils.removeDisabledTasks(List.of(condition));
+
+        WorkflowTask resultCondition = resultWorkflowTasks.getFirst();
+
+        assertEquals(3, resultCondition.getMaxRetries());
+        assertEquals(2, resultCondition.getTaskNumber());
+    }
+
+    @Test
+    void testRemoveDisabledTasksReturnsSameInstanceForEnabledNestedWorkflowTaskInstance() {
+        WorkflowTask iterateeTask = new WorkflowTask(
+            Map.of("name", "iterateeInstance", "type", "component/v1/action"));
+
+        WorkflowTask loop = new WorkflowTask(Map.of(
+            "name", "loop_1",
+            "type", "loop/v1",
+            "parameters", Map.of("iteratee", iterateeTask)));
+
+        List<WorkflowTask> resultWorkflowTasks = WorkflowTaskUtils.removeDisabledTasks(List.of(loop));
+
+        assertSame(loop, resultWorkflowTasks.getFirst());
     }
 }

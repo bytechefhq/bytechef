@@ -41,6 +41,7 @@ import org.springframework.util.Assert;
 public class WorkflowTask implements Task, Serializable {
 
     private String description;
+    private boolean disabled;
     private List<WorkflowTask> finalize = Collections.emptyList();
     private String label;
     private final Map<String, Object> extensions = new HashMap<>();
@@ -62,6 +63,8 @@ public class WorkflowTask implements Task, Serializable {
         for (Map.Entry<String, ?> entry : source.entrySet()) {
             if (WorkflowConstants.DESCRIPTION.equals(entry.getKey())) {
                 this.description = MapUtils.getString(source, WorkflowConstants.DESCRIPTION);
+            } else if (WorkflowConstants.DISABLED.equals(entry.getKey())) {
+                this.disabled = MapUtils.getBoolean(source, WorkflowConstants.DISABLED, false);
             } else if (WorkflowConstants.FINALIZE.equals(entry.getKey())) {
                 this.finalize = MapUtils.getList(
                     source, WorkflowConstants.FINALIZE, WorkflowTask.class, Collections.emptyList());
@@ -148,6 +151,11 @@ public class WorkflowTask implements Task, Serializable {
 
     public String getDescription() {
         return description;
+    }
+
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+    public boolean isDisabled() {
+        return disabled;
     }
 
     public <T> T getExtension(String name, Class<T> elementType, T defaultValue) {
@@ -276,6 +284,10 @@ public class WorkflowTask implements Task, Serializable {
             map.put(WorkflowConstants.DESCRIPTION, description);
         }
 
+        if (disabled) {
+            map.put(WorkflowConstants.DISABLED, true);
+        }
+
         map.put(WorkflowConstants.FINALIZE, CollectionUtils.map(finalize, WorkflowTask::toMap));
 
         if (label != null) {
@@ -313,6 +325,7 @@ public class WorkflowTask implements Task, Serializable {
             ", type='" + type + '\'' +
             ", node='" + node + '\'' +
             ", description='" + description + '\'' +
+            ", disabled=" + disabled +
             ", timeout='" + timeout + '\'' +
             ", pre=" + pre +
             ", post=" + post +
