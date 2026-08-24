@@ -18,6 +18,7 @@ package com.bytechef.platform.configuration.facade;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
@@ -25,6 +26,7 @@ import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -164,7 +166,7 @@ class WorkflowNodeDynamicPropertiesFacadeTest {
             clusterElementWorkflowNodeName, expectedConnectionId, "otherElement", 200L);
 
         doReturn(clusterElementParameters).when(evaluator)
-            .evaluate(anyMap(), anyMap());
+            .evaluate(anyMap(), anyMap(), anyBoolean());
         when(clusterElementDefinitionFacade.executeDynamicProperties(
             eq("openai"), eq(1), eq("chat"), eq(propertyName), anyMap(), anyMap(), eq(lookupDependsOnPaths),
             eq(expectedConnectionId), eq(expectedConnectionIds), anyMap()))
@@ -238,7 +240,7 @@ class WorkflowNodeDynamicPropertiesFacadeTest {
         List<Property> expectedProperties = List.of(mock(Property.class));
 
         doReturn(Map.of()).when(evaluator)
-            .evaluate(anyMap(), anyMap());
+            .evaluate(anyMap(), anyMap(), anyBoolean());
         when(clusterElementDefinitionFacade.executeDynamicProperties(
             eq("openai"), eq(1), eq("chat"), eq(propertyName), anyMap(), anyMap(), anyList(), isNull(), anyMap(),
             anyMap()))
@@ -311,7 +313,7 @@ class WorkflowNodeDynamicPropertiesFacadeTest {
         List<Property> expectedProperties = List.of(mock(Property.class));
 
         doReturn(Map.of()).when(evaluator)
-            .evaluate(anyMap(), anyMap());
+            .evaluate(anyMap(), anyMap(), anyBoolean());
         when(clusterElementDefinitionFacade.executeDynamicProperties(
             eq("fieldMapper"), eq(1), eq("map"), eq(propertyName), anyMap(), anyMap(), anyList(), isNull(), anyMap(),
             anyMap()))
@@ -329,6 +331,80 @@ class WorkflowNodeDynamicPropertiesFacadeTest {
 
             verify(workflowNodeOutputFacade).getPreviousWorkflowNodeSampleOutputs(
                 workflowId, workflowNodeName, environmentId);
+        }
+    }
+
+    @Test
+    void testGetClusterElementDynamicPropertiesEvaluatesParametersLeniently() {
+        String workflowId = "workflow1";
+        String workflowNodeName = "aiAgent_1";
+        String clusterElementTypeName = "tools";
+        String clusterElementWorkflowNodeName = "dataTable_5";
+        String propertyName = "values";
+        long environmentId = 1L;
+
+        when(workflowTestConfigurationService.fetchWorkflowTestConfiguration(workflowId, environmentId))
+            .thenReturn(Optional.empty());
+        doReturn(Map.of()).when(workflowTestConfigurationService)
+            .getWorkflowTestConfigurationInputs(workflowId, environmentId);
+
+        Workflow workflow = mock(Workflow.class);
+        WorkflowTask workflowTask = mock(WorkflowTask.class);
+
+        when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
+        when(workflow.getTask(workflowNodeName)).thenReturn(workflowTask);
+        when(workflowTask.getType()).thenReturn("aiAgent/v1/chat");
+        when(workflowTask.getName()).thenReturn(workflowNodeName);
+
+        doReturn(Map.of()).when(workflowNodeOutputFacade)
+            .getPreviousWorkflowNodeSampleOutputs(eq(workflowId), eq(workflowNodeName), eq(environmentId));
+
+        ClusterElementType clusterElementType = new ClusterElementType("tools", "tools", "Tools");
+
+        when(clusterElementDefinitionService.getClusterElementType("aiAgent", 1, clusterElementTypeName))
+            .thenReturn(clusterElementType);
+
+        ClusterElement clusterElement = mock(ClusterElement.class);
+
+        Map<String, Object> clusterElementParameters = Map.of("values", Map.of("handover_reason", "=fromAi()"));
+
+        when(clusterElement.getType()).thenReturn("dataTable/v1/updateRecord");
+        doReturn(clusterElementParameters).when(clusterElement)
+            .getParameters();
+
+        ClusterElementMap clusterElementMap = mock(ClusterElementMap.class);
+
+        when(clusterElementMap.getClusterElement(clusterElementType, clusterElementWorkflowNodeName))
+            .thenReturn(clusterElement);
+        doReturn(Map.of()).when(workflowTask)
+            .getExtensions();
+
+        Map<String, ClusterElement> tools = Map.of("tools", clusterElement);
+
+        doReturn(tools.entrySet()).when(clusterElementMap)
+            .entrySet();
+
+        List<Property> expectedProperties = List.of(mock(Property.class));
+
+        doReturn(clusterElementParameters).when(evaluator)
+            .evaluate(anyMap(), anyMap(), eq(true));
+
+        when(clusterElementDefinitionFacade.executeDynamicProperties(
+            eq("dataTable"), eq(1), eq("updateRecord"), eq(propertyName), anyMap(), anyMap(), anyList(), isNull(),
+            anyMap(), anyMap()))
+                .thenReturn(expectedProperties);
+
+        try (MockedStatic<ClusterElementMap> mockedClusterElementMap = mockStatic(ClusterElementMap.class)) {
+            mockedClusterElementMap.when(() -> ClusterElementMap.of(anyMap()))
+                .thenReturn(clusterElementMap);
+
+            List<Property> result = workflowNodeDynamicPropertiesFacade.getClusterElementDynamicProperties(
+                workflowId, workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName,
+                propertyName, List.of(), environmentId);
+
+            assertEquals(expectedProperties, result);
+
+            verify(evaluator, never()).evaluate(anyMap(), anyMap());
         }
     }
 
