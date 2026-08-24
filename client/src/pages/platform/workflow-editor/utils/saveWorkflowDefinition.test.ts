@@ -380,6 +380,75 @@ describe('saveWorkflowDefinition', () => {
     });
 
     describe('optimistic update', () => {
+        it('should convert definition connections maps into DTO connections arrays', async () => {
+            mockWorkflowState = makeWorkflowState([
+                {
+                    connections: {javascript01: {componentName: 'googleMail', componentVersion: 1}},
+                    name: 'script_1',
+                    parameters: {},
+                    type: 'script/v1/javascript',
+                },
+            ]);
+
+            const mutation = makeMutation();
+
+            await saveWorkflowDefinition({
+                nodeData: {
+                    componentName: 'httpClient',
+                    name: 'httpClient_1',
+                    operationName: 'get',
+                    version: 1,
+                } as unknown as NodeDataType,
+                updateWorkflowMutation: mutation,
+            });
+
+            const optimisticWorkflow = mockWorkflowState.setWorkflow.mock.calls[0][0];
+
+            const scriptTask = optimisticWorkflow.tasks.find((task: {name: string}) => task.name === 'script_1');
+
+            expect(scriptTask.connections).toEqual([
+                {
+                    componentName: 'googleMail',
+                    componentVersion: 1,
+                    key: 'javascript01',
+                    required: false,
+                    workflowNodeName: 'script_1',
+                },
+            ]);
+        });
+
+        it('should keep the definition connections map in the saved definition', async () => {
+            mockWorkflowState = makeWorkflowState([
+                {
+                    connections: {javascript01: {componentName: 'googleMail', componentVersion: 1}},
+                    name: 'script_1',
+                    parameters: {},
+                    type: 'script/v1/javascript',
+                },
+            ]);
+
+            const mutation = makeMutation();
+
+            await saveWorkflowDefinition({
+                nodeData: {
+                    componentName: 'httpClient',
+                    name: 'httpClient_1',
+                    operationName: 'get',
+                    version: 1,
+                } as unknown as NodeDataType,
+                updateWorkflowMutation: mutation,
+            });
+
+            const mutateArgs = (mutation.mutate as ReturnType<typeof vi.fn>).mock.calls[0][0];
+            const savedDefinition = JSON.parse(mutateArgs.workflow.definition);
+
+            const scriptTask = savedDefinition.tasks.find((task: {name: string}) => task.name === 'script_1');
+
+            expect(scriptTask.connections).toEqual({
+                javascript01: {componentName: 'googleMail', componentVersion: 1},
+            });
+        });
+
         it('should update the store with new definition before calling mutate', async () => {
             mockWorkflowState = makeWorkflowState();
             const mutation = makeMutation();
