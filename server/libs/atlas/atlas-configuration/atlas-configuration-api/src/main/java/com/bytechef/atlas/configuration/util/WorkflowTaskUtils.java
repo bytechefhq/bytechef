@@ -67,8 +67,11 @@ public class WorkflowTaskUtils {
                             for (Object curItem : curList) {
                                 Map<String, ?> curMap = (Map<String, ?>) curItem;
 
-                                List<WorkflowTask> curWorkflowTasks = MapUtils.getList(
-                                    curMap, WorkflowConstants.TASKS, WorkflowTask.class, List.of());
+                                List<WorkflowTask> curWorkflowTasks = MapUtils
+                                    .getList(curMap, WorkflowConstants.TASKS, List.of())
+                                    .stream()
+                                    .map(WorkflowTaskUtils::toWorkflowTask)
+                                    .toList();
 
                                 returnedWorkflowTasks.addAll(getTasks(curWorkflowTasks, lastWorkflowNodeName));
                             }
@@ -119,6 +122,15 @@ public class WorkflowTaskUtils {
         }
 
         return resultWorkflowTasks;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static WorkflowTask toWorkflowTask(Object item) {
+        if (item instanceof WorkflowTask workflowTask) {
+            return workflowTask;
+        }
+
+        return new WorkflowTask((Map<String, ?>) item);
     }
 
     private static boolean isWorkflowTaskMap(Map<?, ?> map) {

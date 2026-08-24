@@ -22,6 +22,7 @@ import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
@@ -183,5 +184,70 @@ class WorkflowTaskUtilsTest {
             .collect(Collectors.toSet());
 
         assertEquals(Set.of("loop_1", "logger_1", "dataStorage_1"), names);
+    }
+
+    @Test
+    void testFlattenBranchCaseTaskRetainsClusterElements() {
+        WorkflowTask branch = new WorkflowTask(Map.of(
+            "name", "branch_1",
+            "type", "branch/v1",
+            "parameters", Map.of(
+                "expression", "1",
+                "cases", List.of(
+                    Map.of(
+                        "key", "1",
+                        "tasks", List.of(
+                            Map.of(
+                                "name", "aiAgent_1",
+                                "type", "aiAgent/v1/chat",
+                                "parameters", Map.of("messages", List.of()),
+                                "clusterElements", Map.of(
+                                    "model", Map.of("name", "openAi_1", "type", "openAi/v1/model")))))))));
+
+        WorkflowTask aiAgentWorkflowTask = WorkflowTaskUtils.getTasks(List.of(branch), null)
+            .stream()
+            .filter(workflowTask -> Objects.equals(workflowTask.getName(), "aiAgent_1"))
+            .findFirst()
+            .orElseThrow();
+
+        assertEquals(
+            Map.of("model", Map.of("name", "openAi_1", "type", "openAi/v1/model")),
+            aiAgentWorkflowTask.getExtensions()
+                .get("clusterElements"));
+    }
+
+    @Test
+    void testFlattenBranchCaseTaskRetainsMultipleElementClusterElements() {
+        WorkflowTask branch = new WorkflowTask(Map.of(
+            "name", "branch_1",
+            "type", "branch/v1",
+            "parameters", Map.of(
+                "expression", "1",
+                "cases", List.of(
+                    Map.of(
+                        "key", "1",
+                        "tasks", List.of(
+                            Map.of(
+                                "name", "aiAgent_1",
+                                "type", "aiAgent/v1/chat",
+                                "parameters", Map.of("messages", List.of()),
+                                "clusterElements", Map.of(
+                                    "tools", List.of(
+                                        Map.of("name", "dataTable_5", "type", "dataTable/v1/updateRecord"),
+                                        Map.of("name", "dataTable_6", "type", "dataTable/v1/findRecords"))))))))));
+
+        WorkflowTask aiAgentWorkflowTask = WorkflowTaskUtils.getTasks(List.of(branch), null)
+            .stream()
+            .filter(workflowTask -> Objects.equals(workflowTask.getName(), "aiAgent_1"))
+            .findFirst()
+            .orElseThrow();
+
+        assertEquals(
+            Map.of(
+                "tools", List.of(
+                    Map.of("name", "dataTable_5", "type", "dataTable/v1/updateRecord"),
+                    Map.of("name", "dataTable_6", "type", "dataTable/v1/findRecords"))),
+            aiAgentWorkflowTask.getExtensions()
+                .get("clusterElements"));
     }
 }
