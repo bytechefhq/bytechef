@@ -1,0 +1,16 @@
+{
+  "label": "All Disabled Demo",
+  "outputs": [ {
+    "name": "skippedValue",
+    "value": "${onlyTask}"
+  } ],
+  "tasks": [ {
+    "name": "onlyTask",
+    "type": "randomHelper/v1/randomInt",
+    "disabled": true,
+    "parameters": {
+      "startInclusive": 1,
+      "endInclusive": 2
+    }
+  } ]
+}
