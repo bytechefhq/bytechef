@@ -1,4 +1,3 @@
-import {SPACE} from '@/shared/constants';
 import {Workflow, WorkflowTask, WorkflowTrigger} from '@/shared/middleware/platform/configuration';
 import {
     BranchCaseType,
@@ -14,6 +13,7 @@ import {flattenDefinitionTasks} from './flattenDefinitionTasks';
 import getRecursivelyUpdatedTasks from './getRecursivelyUpdatedTasks';
 import {getTask} from './getTask';
 import insertTaskDispatcherSubtask from './insertTaskDispatcherSubtask';
+import stringifyWorkflowDefinition from './stringifyWorkflowDefinition';
 import {isWorkflowMutating, setWorkflowMutating} from './workflowMutationGuard';
 
 interface SaveWorkflowDefinitionProps {
@@ -294,14 +294,10 @@ function executeWorkflowMutation({
         return;
     }
 
-    const updatedDefinition = JSON.stringify(
-        {
-            ...workflowDefinition,
-            ...definitionUpdate,
-        },
-        null,
-        SPACE
-    );
+    const updatedDefinition = stringifyWorkflowDefinition({
+        ...workflowDefinition,
+        ...definitionUpdate,
+    });
 
     const previousWorkflow = workflow;
 
