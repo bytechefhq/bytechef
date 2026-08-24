@@ -17,12 +17,15 @@
 package com.bytechef.component.ai.vectorstore.s3.connection;
 
 import static com.bytechef.component.ai.vectorstore.s3.constant.S3Constants.ACCESS_KEY_ID;
-import static com.bytechef.component.ai.vectorstore.s3.constant.S3Constants.BUCKET_NAME;
-import static com.bytechef.component.ai.vectorstore.s3.constant.S3Constants.KEY;
+import static com.bytechef.component.ai.vectorstore.s3.constant.S3Constants.DISTANCE_METRIC;
+import static com.bytechef.component.ai.vectorstore.s3.constant.S3Constants.INDEX_NAME;
+import static com.bytechef.component.ai.vectorstore.s3.constant.S3Constants.INITIALIZE_SCHEMA;
 import static com.bytechef.component.ai.vectorstore.s3.constant.S3Constants.REGION;
 import static com.bytechef.component.ai.vectorstore.s3.constant.S3Constants.SECRET_ACCESS_KEY;
+import static com.bytechef.component.ai.vectorstore.s3.constant.S3Constants.VECTOR_BUCKET_NAME;
 import static com.bytechef.component.definition.Authorization.AuthorizationType.CUSTOM;
 import static com.bytechef.component.definition.ComponentDsl.authorization;
+import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
@@ -48,7 +51,7 @@ public class S3Connection {
                         .required(true),
                     string(REGION)
                         .label("Region")
-                        .description("AWS region where the S3 bucket is located.")
+                        .description("AWS region where the S3 vector bucket is located.")
                         .options(
                             option("US East (N. Virginia) [us-east-1]", "us-east-1"),
                             option("US East (Ohio) [us-east-2]", "us-east-2"),
@@ -81,15 +84,31 @@ public class S3Connection {
                             option("China (Ningxia) [cn-northwest-1]", "cn-northwest-1"))
                         .defaultValue("us-east-1")
                         .required(true),
-                    string(BUCKET_NAME)
-                        .label("Bucket Name")
-                        .description("The name of the S3 bucket where the vector store data is persisted.")
+                    string(VECTOR_BUCKET_NAME)
+                        .label("Vector Bucket Name")
+                        .description("The name of the S3 vector bucket that holds the index.")
                         .required(true),
-                    string(KEY)
-                        .label("Key")
-                        .description("The S3 object key (file path) used to store the vector store JSON data.")
-                        .defaultValue("vector-store.json")
-                        .required(true)));
+                    string(INDEX_NAME)
+                        .label("Index Name")
+                        .description("The name of the vector index within the vector bucket.")
+                        .defaultValue("bytechef-index")
+                        .required(true),
+                    bool(INITIALIZE_SCHEMA)
+                        .label("Initialize Schema")
+                        .description(
+                            "Whether to create the vector index if it does not exist yet. An index created by hand " +
+                                "must declare the 'bytechef_content' metadata key as non-filterable, otherwise " +
+                                "loading documents larger than 2 KB fails.")
+                        .defaultValue(true)
+                        .required(true),
+                    string(DISTANCE_METRIC)
+                        .label("Distance Metric")
+                        .description("The distance metric to use when the vector index is created.")
+                        .options(
+                            option("Cosine", "cosine"),
+                            option("Euclidean", "euclidean"))
+                        .defaultValue("cosine")
+                        .required(false)));
 
     private S3Connection() {
     }

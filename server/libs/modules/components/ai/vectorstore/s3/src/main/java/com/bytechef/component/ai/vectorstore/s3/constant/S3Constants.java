@@ -16,28 +16,26 @@
 
 package com.bytechef.component.ai.vectorstore.s3.constant;
 
-import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.QUERY;
+import static com.bytechef.component.ai.vectorstore.s3.vectorstore.S3TextPreservingVectorStore.CONTENT_METADATA_KEY;
 
 import com.bytechef.component.ai.vectorstore.VectorStore;
+import com.bytechef.component.ai.vectorstore.s3.vectorstore.S3TextPreservingVectorStore;
 import com.bytechef.component.definition.Parameters;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.ai.document.Document;
-import org.springframework.ai.document.DocumentReader;
-import org.springframework.ai.document.DocumentTransformer;
 import org.springframework.ai.embedding.EmbeddingModel;
-import org.springframework.ai.vectorstore.SimpleVectorStore;
+import org.springframework.ai.vectorstore.s3.S3VectorStore;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3vectors.S3VectorsClient;
+import software.amazon.awssdk.services.s3vectors.model.ConflictException;
+import software.amazon.awssdk.services.s3vectors.model.CreateIndexRequest;
+import software.amazon.awssdk.services.s3vectors.model.DataType;
+import software.amazon.awssdk.services.s3vectors.model.DistanceMetric;
+import software.amazon.awssdk.services.s3vectors.model.GetIndexRequest;
+import software.amazon.awssdk.services.s3vectors.model.MetadataConfiguration;
+import software.amazon.awssdk.services.s3vectors.model.NotFoundException;
 
 /**
  * @author Marko Krišković
@@ -47,118 +45,87 @@ public class S3Constants {
     private static final Logger log = LoggerFactory.getLogger(S3Constants.class);
 
     public static final String ACCESS_KEY_ID = "accessKeyId";
-    public static final String BUCKET_NAME = "bucketName";
-    public static final String KEY = "key";
+    public static final String DISTANCE_METRIC = "distanceMetric";
+    public static final String INDEX_NAME = "indexName";
+    public static final String INITIALIZE_SCHEMA = "initializeSchema";
     public static final String REGION = "region";
     public static final String S3_VECTOR_STORE = "s3VectorStore";
     public static final String SECRET_ACCESS_KEY = "secretAccessKey";
+    public static final String VECTOR_BUCKET_NAME = "vectorBucketName";
 
-    public static final VectorStore VECTOR_STORE = new VectorStore() {
+    public static final VectorStore VECTOR_STORE = (inputParameters, connectionParameters, embeddingModel) -> {
+        String indexName = connectionParameters.getRequiredString(INDEX_NAME);
+        String vectorBucketName = connectionParameters.getRequiredString(VECTOR_BUCKET_NAME);
 
-        @Override
-        public org.springframework.ai.vectorstore.VectorStore createVectorStore(
-            Parameters inputParameters, Parameters connectionParameters, EmbeddingModel embeddingModel) {
+        S3VectorsClient s3VectorsClient = createS3VectorsClient(connectionParameters);
 
-            SimpleVectorStore vectorStore = SimpleVectorStore.builder(embeddingModel)
-                .build();
-
-            loadFromS3(vectorStore, connectionParameters);
-
-            return vectorStore;
+        if (connectionParameters.getBoolean(INITIALIZE_SCHEMA, true)) {
+            createIndexIfMissing(s3VectorsClient, vectorBucketName, indexName, connectionParameters, embeddingModel);
         }
 
-        @Override
-        public void load(
-            Parameters inputParameters, Parameters connectionParameters, EmbeddingModel embeddingModel,
-            DocumentReader documentReader, List<DocumentTransformer> documentTransformers) {
+        S3VectorStore s3VectorStore = new S3VectorStore.Builder(s3VectorsClient, embeddingModel)
+            .vectorBucketName(vectorBucketName)
+            .indexName(indexName)
+            .build();
 
-            SimpleVectorStore vectorStore = SimpleVectorStore.builder(embeddingModel)
-                .build();
-
-            loadFromS3(vectorStore, connectionParameters);
-
-            List<Document> documents = documentReader.read();
-
-            for (DocumentTransformer transformer : documentTransformers) {
-                documents = transformer.transform(documents);
-            }
-
-            vectorStore.add(documents);
-
-            saveToS3(vectorStore, connectionParameters);
-        }
-
-        @Override
-        public List<Document> search(
-            Parameters inputParameters, Parameters connectionParameters, EmbeddingModel embeddingModel) {
-
-            SimpleVectorStore vectorStore = SimpleVectorStore.builder(embeddingModel)
-                .build();
-
-            loadFromS3(vectorStore, connectionParameters);
-
-            return vectorStore.similaritySearch(inputParameters.getRequiredString(QUERY));
-        }
-
-        private void loadFromS3(SimpleVectorStore vectorStore, Parameters connectionParameters) {
-            String bucketName = connectionParameters.getRequiredString(BUCKET_NAME);
-            String key = connectionParameters.getRequiredString(KEY);
-
-            try (S3Client s3Client = createS3Client(connectionParameters)) {
-                File tempFile = File.createTempFile("s3-vector-store", ".json");
-
-                try {
-                    s3Client.getObject(
-                        GetObjectRequest.builder()
-                            .bucket(bucketName)
-                            .key(key)
-                            .build(),
-                        tempFile.toPath());
-
-                    vectorStore.load(tempFile);
-                } catch (NoSuchKeyException e) {
-                    log.debug("No existing vector store data found in S3 at {}/{}, starting with empty store",
-                        bucketName, key);
-                } finally {
-                    Files.delete(tempFile.toPath());
-                }
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to load vector store from S3", e);
-            }
-        }
-
-        private void saveToS3(SimpleVectorStore vectorStore, Parameters connectionParameters) {
-            try (S3Client s3Client = createS3Client(connectionParameters)) {
-                File tempFile = File.createTempFile("s3-vector-store", ".json");
-
-                try {
-                    vectorStore.save(tempFile);
-
-                    s3Client.putObject(
-                        PutObjectRequest.builder()
-                            .bucket(connectionParameters.getRequiredString(BUCKET_NAME))
-                            .key(connectionParameters.getRequiredString(KEY))
-                            .build(),
-                        tempFile.toPath());
-                } finally {
-                    Files.delete(tempFile.toPath());
-                }
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to save vector store to S3", e);
-            }
-        }
-
-        private S3Client createS3Client(Parameters connectionParameters) {
-            return S3Client.builder()
-                .credentialsProvider(
-                    StaticCredentialsProvider.create(
-                        AwsBasicCredentials.create(
-                            connectionParameters.getRequiredString(ACCESS_KEY_ID),
-                            connectionParameters.getRequiredString(SECRET_ACCESS_KEY))))
-                .region(Region.of(connectionParameters.getRequiredString(REGION)))
-                .build();
-        }
+        return new S3TextPreservingVectorStore(s3VectorStore);
     };
+
+    private static S3VectorsClient createS3VectorsClient(Parameters connectionParameters) {
+        AwsBasicCredentials awsBasicCredentials = AwsBasicCredentials.create(
+            connectionParameters.getRequiredString(ACCESS_KEY_ID),
+            connectionParameters.getRequiredString(SECRET_ACCESS_KEY));
+
+        return S3VectorsClient.builder()
+            .credentialsProvider(StaticCredentialsProvider.create(awsBasicCredentials))
+            .region(Region.of(connectionParameters.getRequiredString(REGION)))
+            .build();
+    }
+
+    /**
+     * An S3 Vectors index cannot be created lazily on first write: its dimension, distance metric and the set of
+     * non-filterable metadata keys are all fixed at creation time. The document text is stored as non-filterable
+     * metadata because filterable metadata is capped at 2 KB per vector, which a typical chunk exceeds.
+     */
+    private static void createIndexIfMissing(
+        S3VectorsClient s3VectorsClient, String vectorBucketName, String indexName, Parameters connectionParameters,
+        EmbeddingModel embeddingModel) {
+
+        try {
+            s3VectorsClient.getIndex(
+                GetIndexRequest.builder()
+                    .vectorBucketName(vectorBucketName)
+                    .indexName(indexName)
+                    .build());
+
+            return;
+        } catch (NotFoundException notFoundException) {
+            log.debug(
+                "No index {} found in vector bucket {}, creating it", indexName, vectorBucketName, notFoundException);
+        }
+
+        DistanceMetric distanceMetric = DistanceMetric.fromValue(
+            connectionParameters.getString(DISTANCE_METRIC, DistanceMetric.COSINE.toString()));
+
+        try {
+            s3VectorsClient.createIndex(
+                CreateIndexRequest.builder()
+                    .vectorBucketName(vectorBucketName)
+                    .indexName(indexName)
+                    .dataType(DataType.FLOAT32)
+                    .dimension(embeddingModel.dimensions())
+                    .distanceMetric(distanceMetric)
+                    .metadataConfiguration(
+                        MetadataConfiguration.builder()
+                            .nonFilterableMetadataKeys(CONTENT_METADATA_KEY)
+                            .build())
+                    .build());
+        } catch (ConflictException conflictException) {
+            log.debug(
+                "Index {} in vector bucket {} was created concurrently", indexName, vectorBucketName,
+                conflictException);
+        }
+    }
 
     private S3Constants() {
     }
