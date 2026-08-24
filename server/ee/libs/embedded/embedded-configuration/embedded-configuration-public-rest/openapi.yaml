@@ -374,7 +374,10 @@ paths:
         - jwtBearerAuth: [ ]
   /connections/{id}/reauthorize:
     post:
-      description: "Replace the credentials of a connection owned by the authenticated connected user, keeping its id."
+      description: "Replace the credentials of a connection owned by the authenticated connected user, keeping its id.\
+        \ The supplied parameters replace the connection's authorization parameters wholesale: a parameter that is not\
+        \ supplied is cleared, not preserved, so submit the complete authorization parameter set. Connection-level\
+        \ properties are untouched. A successful call also marks the connection's credentials valid again."
       summary: "Reauthorize a connection"
       tags:
         - "connection"

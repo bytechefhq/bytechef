@@ -162,7 +162,7 @@ class ConnectedUserConnectionFacadeTest {
 
         facade.reauthorizeConnectedUserConnection(7L, 1L, parameters);
 
-        verify(connectionFacade).updateAuthorization(1L, parameters);
+        verify(connectionFacade).replaceAuthorizationParameters(1L, parameters);
     }
 
     @Test
@@ -175,7 +175,7 @@ class ConnectedUserConnectionFacadeTest {
         assertThrows(
             NoSuchElementException.class, () -> facade.reauthorizeConnectedUserConnection(7L, 9L, parameters));
 
-        verify(connectionFacade, never()).updateAuthorization(anyLong(), any());
+        verify(connectionFacade, never()).replaceAuthorizationParameters(anyLong(), any());
     }
 
     /**
