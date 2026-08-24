@@ -84,6 +84,8 @@ fun shouldIncludeComponent(componentPath: String): Boolean {
 
 dependencies {
     developmentOnly(libs.com.julien.dubois.bootui.bootui.spring.boot.starter)
+    developmentOnly(libs.it.fabioformosa.quartz.manager.quartz.manager.starter.api)
+    developmentOnly(libs.it.fabioformosa.quartz.manager.quartz.manager.starter.ui)
 
     implementation("io.awspring.cloud:spring-cloud-aws-starter-s3")
     implementation("io.awspring.cloud:spring-cloud-aws-starter-sqs")

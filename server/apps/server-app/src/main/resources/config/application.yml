@@ -188,8 +188,11 @@ spring:
   application:
     name: server-app
   autoconfigure:
+    # QuartzManagerApiConfig is replaced by QuartzManagerConfiguration, which repeats the same scan under prefixed
+    # bean names. It is ignored when the developmentOnly Quartz Manager starters are absent.
     exclude:
       com.embabel.agent.autoconfigure.platform.AgentPlatformAutoConfiguration,
+      it.fabioformosa.quartzmanager.api.configuration.QuartzManagerApiConfig,
       org.springaicommunity.agents.claude.autoconfigure.ClaudeAgentAutoConfiguration,
       org.springaicommunity.agents.claude.autoconfigure.ClaudeHookAutoConfiguration,
       org.springframework.ai.model.anthropic.autoconfigure.AnthropicChatAutoConfiguration,
@@ -315,6 +318,16 @@ spring:
   threads:
     virtual:
       enabled: true
+
+# The Quartz Manager starters are developmentOnly dependencies, so these are inert in a packaged application.
+# They are kept outside the dev profile because bootRun puts the starters on the classpath whichever profile is
+# active, and Quartz Manager fails to start without them. Only the dashboard itself is limited to the dev profile.
+quartz-manager:
+  # The dashboard is served at http://localhost:9555/quartz-manager-ui/index.html
+  jobClassPackages: com.bytechef.platform.scheduler.job
+  quartz:
+    # Reuse the application scheduler instead of letting Quartz Manager create an empty one of its own
+    enabled: false
 
 scalar:
   operation-sorter: method
