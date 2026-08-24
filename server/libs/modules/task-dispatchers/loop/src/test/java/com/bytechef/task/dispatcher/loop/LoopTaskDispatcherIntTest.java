@@ -195,6 +195,16 @@ public class LoopTaskDispatcherIntTest {
         Assertions.assertTrue(status.isTerminated());
     }
 
+    @Test
+    void testLoopWithEmptyIterateeCompletesInsteadOfFailing() {
+        assertLoopWithNoBodyCompletes("loop_v1_empty_iteratee");
+    }
+
+    @Test
+    void testLoopWithoutIterateeCompletesInsteadOfFailing() {
+        assertLoopWithNoBodyCompletes("loop_v1_no_iteratee");
+    }
+
     @RepeatedTest(10)
     void testLoopOverSmallItemsNoResidualStarted() {
         taskDispatcherJobExecution = taskDispatcherJobTestExecutor.execute(
@@ -208,6 +218,24 @@ public class LoopTaskDispatcherIntTest {
 
         Assertions.assertNotNull(parent.getEndDate(), "Loop parent must have endDate");
         Assertions.assertEquals(TaskExecution.Status.COMPLETED, parent.getStatus());
+    }
+
+    private void assertLoopWithNoBodyCompletes(String workflowId) {
+        taskDispatcherJobExecution = taskDispatcherJobTestExecutor.execute(
+            EncodingUtils.base64EncodeToString(workflowId), this::getTaskCompletionHandlerFactories,
+            this::getTaskDispatcherResolverFactories, getTaskHandlerMap());
+
+        assertNoTaskErrors(taskDispatcherJobExecution);
+
+        Job job = taskDispatcherJobExecution.job();
+
+        Assertions.assertEquals(Job.Status.COMPLETED, job.getStatus());
+        Assertions.assertEquals(List.of("done"), testVarTaskHandler.get("afterLoop"));
+
+        TaskExecution parentTaskExecution = findParentLoopTask();
+
+        Assertions.assertNotNull(parentTaskExecution.getEndDate(), "Loop parent must have endDate");
+        Assertions.assertEquals(TaskExecution.Status.COMPLETED, parentTaskExecution.getStatus());
     }
 
     private void assertNoTaskErrors(TaskDispatcherJobExecution jobExecution) {

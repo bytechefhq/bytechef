@@ -1,0 +1,16 @@
+---
+label: "Fork/join with an empty branch"
+tasks:
+- name: "fork-join_1"
+  type: "fork-join/v1"
+  parameters:
+    branches:
+    - []
+    - - name: "var2"
+        type: "var/v1/set"
+        parameters:
+          value: 100
+      - name: "sumVar2"
+        type: "var/v1/set"
+        parameters:
+          value: "=12 + var2"

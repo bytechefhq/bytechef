@@ -84,9 +84,8 @@ public class EachTaskDispatcher extends ErrorHandlingTaskDispatcher implements T
 
     @Override
     public void doDispatch(TaskExecution taskExecution) {
-        Map<String, ?> workflowMap = MapUtils.getRequired(
+        Map<String, ?> workflowMap = MapUtils.get(
             taskExecution.getParameters(), ITERATEE, new TypeReference<Map<String, ?>>() {});
-        WorkflowTask iteratee = new WorkflowTask(workflowMap);
         List<Object> items = MapUtils.getRequiredList(taskExecution.getParameters(), ITEMS, Object.class);
 
         taskExecution.setStartDate(Instant.now());
@@ -94,13 +93,15 @@ public class EachTaskDispatcher extends ErrorHandlingTaskDispatcher implements T
 
         taskExecution = taskExecutionService.update(taskExecution);
 
-        if (items.isEmpty()) {
+        if (workflowMap == null || items.isEmpty()) {
             taskExecution.setStartDate(Instant.now());
             taskExecution.setEndDate(Instant.now());
             taskExecution.setExecutionTime(0);
 
             eventPublisher.publishEvent(new TaskExecutionCompleteEvent(taskExecution));
         } else {
+            WorkflowTask iteratee = new WorkflowTask(workflowMap);
+
             counterService.set(Validate.notNull(taskExecution.getId(), "id"), items.size());
 
             for (int i = 0; i < items.size(); i++) {

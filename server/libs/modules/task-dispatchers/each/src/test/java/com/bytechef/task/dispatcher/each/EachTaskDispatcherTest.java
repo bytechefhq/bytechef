@@ -152,4 +152,29 @@ public class EachTaskDispatcherTest {
         verify(taskDispatcher, times(0)).dispatch(any());
         verify(eventPublisher, times(1)).publishEvent(any(TaskExecutionCompleteEvent.class));
     }
+
+    @Test
+    public void testDispatchWhenIterateeIsAbsent() {
+        EachTaskDispatcher dispatcher = new EachTaskDispatcher(
+            contextService, counterService, EVALUATOR, eventPublisher, taskDispatcher,
+            taskExecutionService, taskFileStorage);
+
+        TaskExecution taskExecution = TaskExecution.builder()
+            .id(1L)
+            .workflowTask(
+                new WorkflowTask(
+                    Map.of(
+                        WorkflowConstants.NAME, "name",
+                        WorkflowConstants.TYPE, "type",
+                        WorkflowConstants.PARAMETERS, Map.of("items", Arrays.asList(1, 2, 3)))))
+            .build();
+
+        when(taskExecutionService.update(any()))
+            .thenReturn(taskExecution);
+
+        dispatcher.dispatch(taskExecution);
+
+        verify(taskDispatcher, times(0)).dispatch(any());
+        verify(eventPublisher, times(1)).publishEvent(any(TaskExecutionCompleteEvent.class));
+    }
 }
