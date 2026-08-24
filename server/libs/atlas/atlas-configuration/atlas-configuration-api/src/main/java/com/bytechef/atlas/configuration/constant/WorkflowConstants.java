@@ -29,6 +29,7 @@ public class WorkflowConstants {
 
     public static final String DEFAULT = "default";
     public static final String DESCRIPTION = "description";
+    public static final String DISABLED = "disabled";
     public static final String EVENT = "event";
     public static final String FINALIZE = "finalize";
     public static final String INPUTS = "inputs";
@@ -52,6 +53,6 @@ public class WorkflowConstants {
     public static final String WORKFLOW_ID = "workflowId";
 
     public static final List<String> WORKFLOW_DEFINITION_CONSTANTS = List.of(
-        DEFAULT, DESCRIPTION, FINALIZE, INPUTS, LABEL, METADATA, NAME, NODE, OUTPUTS, PARAMETERS, POST, PRE,
-        MAX_RETRIES, REQUIRED, TASKS, TIMEOUT, TYPE, VALUE);
+        DEFAULT, DESCRIPTION, DISABLED, FINALIZE, INPUTS, LABEL, METADATA, NAME, NODE, OUTPUTS, PARAMETERS, POST,
+        PRE, MAX_RETRIES, REQUIRED, TASKS, TIMEOUT, TYPE, VALUE);
 }
