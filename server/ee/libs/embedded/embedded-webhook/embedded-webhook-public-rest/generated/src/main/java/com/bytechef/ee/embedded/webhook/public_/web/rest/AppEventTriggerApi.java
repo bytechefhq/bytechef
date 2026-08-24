@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-03T17:58:15.253330+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-08-24T22:46:06.977367+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 @Validated
 @Tag(name = "app-event-trigger", description = "The Embedded App Event Trigger Public API")
 public interface AppEventTriggerApi {
@@ -95,6 +95,9 @@ public interface AppEventTriggerApi {
             @ApiResponse(responseCode = "501", description = "Not implemented", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = ExecuteWorkflows400ResponseModel.class))
             })
+        },
+        security = {
+            @SecurityRequirement(name = "jwtBearerAuth")
         }
     )
     @RequestMapping(

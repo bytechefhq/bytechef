@@ -38,7 +38,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-03T17:58:15.294206+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-08-24T22:46:06.978203+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 @Validated
 @Tag(name = "tool", description = "the tool API")
 public interface ToolApi {
@@ -103,6 +103,10 @@ public interface ToolApi {
             @ApiResponse(responseCode = "501", description = "Not implemented", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = ExecuteAction400ResponseModel.class))
             })
+        },
+        security = {
+            @SecurityRequirement(name = "jwtBearerAuth"),
+            @SecurityRequirement(name = "bearerAuth")
         }
     )
     @RequestMapping(
@@ -228,6 +232,10 @@ public interface ToolApi {
             @ApiResponse(responseCode = "501", description = "Not implemented", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = ExecuteAction400ResponseModel.class))
             })
+        },
+        security = {
+            @SecurityRequirement(name = "jwtBearerAuth"),
+            @SecurityRequirement(name = "bearerAuth")
         }
     )
     @RequestMapping(
