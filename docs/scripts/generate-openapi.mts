@@ -11,6 +11,13 @@ const OUTPUT_DIR = path.join(CONTENT_DIR, 'openapi');
 // that a spec declaring a single tag stays one group under its own id -- `custom-components` rather
 // than `custom-components-custom-component`. Retagging an operation moves it between groups without
 // touching this file; adding a tag needs a GROUP_META entry, and the build says so if you forget.
+//
+// Groups split again by audience, so the two ways into the same resource are documented apart
+// rather than interleaved. An operation reachable only with a Signing Key JWT is browser-facing and
+// lands in `<group>-frontend`; one that accepts an API Key is callable from your backend and keeps
+// the bare id. The specs declare this: a JWT resolves the user from the token's `sub` claim, so
+// those paths carry no `{externalUserId}` segment, while an API Key needs that segment to know whom
+// it is acting for.
 
 const GROUP_META: Record<
   string,
@@ -31,16 +38,6 @@ const GROUP_META: Record<
     title: 'Embedded Tools',
     navTitle: 'Tools',
     description: "List a connected user's available tools, and execute one.",
-  },
-  'embedded-workflow-execution': {
-    title: 'Embedded Workflow Executions',
-    navTitle: 'Workflow Executions',
-    description: "Fetch a tenant's workflow executions, and a single execution with its full detail.",
-  },
-  'embedded-tool-invocation': {
-    title: 'Embedded Tool Invocations',
-    navTitle: 'Tool Invocations',
-    description: "Fetch a connected user's direct tool and action invocations.",
   },
   'embedded-configuration-integration': {
     title: 'Embedded Integrations',
@@ -77,16 +74,6 @@ const GROUP_META: Record<
     navTitle: 'Workflow Catalog',
     description: 'List the catalog projects available to connected users.',
   },
-  'embedded-webhook-app-event-trigger': {
-    title: 'Embedded App Events',
-    navTitle: 'App Events',
-    description: "Fire an App Event to start every one of a connected user's subscribed workflows.",
-  },
-  'embedded-webhook-request-trigger': {
-    title: 'Embedded Request Trigger',
-    navTitle: 'Request Trigger',
-    description: "Execute a single workflow through its Request trigger and return its result.",
-  },
   // One entry per tag in the automation spec -- see SPLIT_BY_TAG. The keys are `automation-<tag>`.
   'automation-workflow-execution': {
     title: 'Automation Workflow Executions',
@@ -109,13 +96,53 @@ const GROUP_META: Record<
     description: "Pull a project from its configured git repository.",
     // Deliberately not comingSoon: settings/git-configuration is not flagged.
   },
-  'automation-bridge': {
-    title: 'Embedded Automation Bridge',
-    navTitle: 'Automation Bridge',
-    description:
-      'Public REST API for the embedded automation bridge: deploy a code-native automation project into the catalog, and list what is there.',
-    comingSoon: true,
+  // Browser-facing twins: same resources, reached with a Signing Key JWT.
+  'embedded-configuration-integration-frontend': {
+    title: 'Embedded Integrations (Frontend)',
+    navTitle: 'Integrations',
+    description: "List and fetch the integrations available to the signed-in connected user.",
   },
+  'embedded-configuration-integration-instance-frontend': {
+    title: 'Embedded Integration Instances (Frontend)',
+    navTitle: 'Integration Instances',
+    description: "Create and delete the signed-in connected user's instance of an integration.",
+  },
+  'embedded-configuration-integration-instance-workflow-frontend': {
+    title: 'Embedded Integration Instance Workflows (Frontend)',
+    navTitle: 'Instance Workflows',
+    description: "Enable, disable and configure the workflows of the signed-in user's integration instance.",
+  },
+  'embedded-configuration-connection-frontend': {
+    title: 'Embedded Connections (Frontend)',
+    navTitle: 'Connections',
+    description: "List the signed-in connected user's connections.",
+  },
+  'embedded-configuration-connected-user-frontend': {
+    title: 'Embedded Connected Users (Frontend)',
+    navTitle: 'Connected Users',
+    description: "Update the signed-in connected user.",
+  },
+  'embedded-configuration-connected-user-project-workflow-frontend': {
+    title: 'Embedded Connected User Workflows (Frontend)',
+    navTitle: 'User Workflows',
+    description: "Create, update and manage the signed-in user's own workflows, including generation from a prompt.",
+  },
+  'embedded-configuration-automation-workflow-project-frontend': {
+    title: 'Embedded Workflow Catalog (Frontend)',
+    navTitle: 'Workflow Catalog',
+    description: "List the catalog projects available to the signed-in connected user.",
+  },
+  'embedded-webhook-app-event-trigger-frontend': {
+    title: 'Embedded App Events',
+    navTitle: 'App Events',
+    description: "Fire an App Event to start every one of a connected user's subscribed workflows.",
+  },
+  'embedded-webhook-request-trigger-frontend': {
+    title: 'Embedded Request Trigger',
+    navTitle: 'Request Trigger',
+    description: "Execute a single workflow through its Request trigger and return its result.",
+  },
+
   'custom-components': {
     title: 'Custom Components',
     description: 'Public REST API for deploying a custom component to the platform.',
@@ -137,16 +164,24 @@ function collectEntryPaths(entries: { type?: string; path?: string; entries?: un
   return paths;
 }
 
+interface Operation {
+  tag: string;
+  frontend: boolean;
+}
+
 /**
- * Reads the tag of every operation in a spec, keyed `<METHOD> <path>` -- the only identity
- * fumadocs-openapi hands `groupBy`, which receives `{ schemaId, info, item: { path, method } }` and no tags.
+ * Reads the tag and audience of every operation in a spec, keyed `<METHOD> <path>` -- the only
+ * identity fumadocs-openapi hands `groupBy`, which receives
+ * `{ schemaId, info, item: { path, method } }` and neither tags nor security.
  */
-async function readTagsByOperation(schemaId: keyof typeof SPECS) {
+async function readOperations(schemaId: keyof typeof SPECS) {
   const document = parseYaml(await readFile(SPECS[schemaId], 'utf8'));
-  const tagsByOperation = new Map<string, string>();
+  const operations = new Map<string, Operation>();
 
   for (const [operationPath, pathItem] of Object.entries(document.paths ?? {})) {
-    for (const [method, operation] of Object.entries(pathItem as Record<string, { tags?: string[] }>)) {
+    for (const [method, operation] of Object.entries(
+      pathItem as Record<string, { tags?: string[]; security?: Record<string, unknown>[] }>,
+    )) {
       const tag = operation?.tags?.[0];
 
       if (!tag) {
@@ -155,47 +190,55 @@ async function readTagsByOperation(schemaId: keyof typeof SPECS) {
         );
       }
 
-      tagsByOperation.set(`${method.toUpperCase()} ${operationPath}`, tag);
+      // An operation that accepts an API Key is backend-callable. One left undeclared is treated as
+      // backend too: the automation and platform specs carry no security block, and both take an
+      // API Key.
+      const schemes = (operation.security ?? []).map((requirement) => Object.keys(requirement)[0]);
+      const frontend = schemes.length > 0 && !schemes.includes('bearerAuth');
+
+      operations.set(`${method.toUpperCase()} ${operationPath}`, { tag, frontend });
     }
   }
 
-  return tagsByOperation;
+  return operations;
 }
 
 async function main() {
-  const tagsBySchema = new Map<string, Map<string, string>>();
+  const operationsBySchema = new Map<string, Map<string, Operation>>();
+  // A single-tag spec is already one group; adding its tag would only repeat its own id.
+  const taggedSchemas = new Set<string>();
 
   for (const schemaId of Object.keys(SPECS) as (keyof typeof SPECS)[]) {
-    const tagsByOperation = await readTagsByOperation(schemaId);
+    const operations = await readOperations(schemaId);
 
-    // A single-tag spec is already one group; splitting it would only add its tag to its own id.
-    if (new Set(tagsByOperation.values()).size > 1) {
-      tagsBySchema.set(schemaId, tagsByOperation);
+    operationsBySchema.set(schemaId, operations);
+
+    if (new Set([...operations.values()].map(({ tag }) => tag)).size > 1) {
+      taggedSchemas.add(schemaId);
     }
   }
 
+  const idOf = (schemaId: string, { tag, frontend }: Operation) =>
+    [schemaId, taggedSchemas.has(schemaId) ? tag : null, frontend ? 'frontend' : null]
+      .filter(Boolean)
+      .join('-');
+
   const groupIdOf = (entry: { schemaId: string; item?: { path?: string; method?: string } }) => {
-    const tagsByOperation = tagsBySchema.get(entry.schemaId);
-
-    if (!tagsByOperation) return entry.schemaId;
-
     const key = `${(entry.item?.method ?? '').toUpperCase()} ${entry.item?.path ?? ''}`;
-    const tag = tagsByOperation.get(key);
+    const operation = operationsBySchema.get(entry.schemaId)?.get(key);
 
-    if (!tag) {
-      throw new Error(`No tag found for ${entry.schemaId} operation ${key}; cannot assign it to a group.`);
+    if (!operation) {
+      throw new Error(`No operation found for ${entry.schemaId} ${key}; cannot assign it to a group.`);
     }
 
-    return `${entry.schemaId}-${tag}`;
+    return idOf(entry.schemaId, operation);
   };
 
   // Each group remembers the spec it came from, because `context.generatedEntries` below is keyed by
   // schema id rather than by the group ids groupBy produces.
   const groups = Object.keys(SPECS).flatMap((schemaId) => {
-    const tagsByOperation = tagsBySchema.get(schemaId);
-    const ids = tagsByOperation
-      ? [...new Set([...tagsByOperation.values()].map((tag) => `${schemaId}-${tag}`))]
-      : [schemaId];
+    const operations = operationsBySchema.get(schemaId) ?? new Map<string, Operation>();
+    const ids = [...new Set([...operations.values()].map((operation) => idOf(schemaId, operation)))];
 
     return ids.map((id) => ({ id, schemaId }));
   });
