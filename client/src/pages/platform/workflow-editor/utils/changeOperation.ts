@@ -142,7 +142,7 @@ export default async function changeOperation({
             return;
         }
 
-        const {componentName, description, label, workflowNodeName} = currentNode;
+        const {componentName, description, disabled, label, workflowNodeName} = currentNode;
 
         const name = workflowNodeName || '';
         const parameters = getParametersWithDefaultValues({properties: newOperationProperties});
@@ -152,6 +152,7 @@ export default async function changeOperation({
             nodeData: {
                 componentName,
                 description,
+                disabled,
                 label,
                 name,
                 operationName: newOperationName,
