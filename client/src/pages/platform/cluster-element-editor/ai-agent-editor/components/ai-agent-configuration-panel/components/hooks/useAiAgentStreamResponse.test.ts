@@ -102,7 +102,7 @@ describe('useAiAgentStreamResponse', () => {
         expect(result.current.isStreamingSupported).toBe(false);
     });
 
-    it('switches the root task to streamChat, keeping the prompts and dropping the response format', () => {
+    it('switches the root task to streamChat, keeping every parameter', () => {
         const {result} = renderHook(() => useAiAgentStreamResponse());
 
         result.current.updateStreaming(true);
@@ -111,7 +111,11 @@ describe('useAiAgentStreamResponse', () => {
 
         expect(nodeData.type).toBe('aiAgent/v1/streamChat');
         expect(nodeData.operationName).toBe('streamChat');
-        expect(nodeData.parameters).toEqual({systemPrompt: 'Be helpful', userPrompt: 'Hello'});
+        expect(nodeData.parameters).toEqual({
+            response: {responseFormat: 'JSON'},
+            systemPrompt: 'Be helpful',
+            userPrompt: 'Hello',
+        });
         expect(nodeData.clusterElements).toEqual(rootClusterElementNodeData.clusterElements);
         expect(setRootClusterElementNodeDataMock).toHaveBeenCalledWith(nodeData);
     });
@@ -125,9 +129,13 @@ describe('useAiAgentStreamResponse', () => {
 
         expect(result.current.isStreamingSupported).toBe(true);
         expect(result.current.isStreaming).toBe(false);
+
+        result.current.updateStreaming(true);
+
+        expect(saveWorkflowDefinitionMock).not.toHaveBeenCalled();
     });
 
-    it('falls back to the node data operation when the definition cannot be parsed', () => {
+    it('does not save when the definition cannot be parsed, so the prompts survive', () => {
         useWorkflowDataStoreMock.mockImplementation((selector: (state: unknown) => unknown) =>
             selector({workflow: {definition: '{not json', id: 'workflow-1'}})
         );
@@ -138,9 +146,8 @@ describe('useAiAgentStreamResponse', () => {
 
         result.current.updateStreaming(true);
 
-        const [{nodeData}] = saveWorkflowDefinitionMock.mock.calls[0];
-
-        expect(nodeData.parameters).toEqual({});
+        expect(saveWorkflowDefinitionMock).not.toHaveBeenCalled();
+        expect(setRootClusterElementNodeDataMock).not.toHaveBeenCalled();
     });
 
     it('does not save when the root node data carries no component name', () => {
