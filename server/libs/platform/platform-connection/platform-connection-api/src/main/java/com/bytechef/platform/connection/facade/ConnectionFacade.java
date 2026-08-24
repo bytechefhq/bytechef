@@ -67,13 +67,27 @@ public interface ConnectionFacade {
     void update(long id, String name, List<Tag> tags, int version);
 
     /**
-     * Replaces a connection's credentials in place, keeping its id (and therefore every wiring that already references
-     * it) unchanged. When the merged parameters contain an OAuth2 authorization {@code code}, the authorization-code
-     * exchange is re-run exactly as it is during {@link #create(ConnectionDTO, PlatformType)} and its result is merged
-     * into the parameters before they are persisted. Ownership of {@code id} is enforced by
-     * {@link com.bytechef.platform.connection.service.ConnectionService#updateConnectionParameters(long, Map)}, not by
+     * Replaces a connection's authorization parameters <strong>wholesale</strong> and marks its credentials
+     * {@link Connection.CredentialStatus#VALID} again, keeping the connection's id — and therefore every wiring that
+     * already references it — unchanged.
+     *
+     * <p>
+     * Only the keys the connection definition declares as authorization properties are replaced. Connection-level
+     * properties (base URI inputs, region, subdomain) survive untouched, so a caller never has to enumerate them; an
+     * authorization property the caller does not resubmit is cleared, which is what makes this a replace rather than a
+     * merge.
+     *
+     * <p>
+     * This replaced a merge-based {@code updateAuthorization}, rather than joining it: two near-identical methods
+     * differing only in merge-versus-replace is a trap, because picking the wrong one leaves a stale credential in
+     * place with no failing test to show for it. Both the workspace surface and the embedded reconnect call this one.
+     *
+     * <p>
+     * When the parameters contain an OAuth2 authorization {@code code}, the authorization-code exchange is re-run
+     * exactly as it is during {@link #create(ConnectionDTO, PlatformType)}. Ownership of {@code id} is enforced by
+     * {@link com.bytechef.platform.connection.service.ConnectionService#replaceConnectionParameters(long, Map)}, not by
      * this method.
      */
-    void updateAuthorization(long id, Map<String, ?> parameters);
+    void replaceAuthorizationParameters(long id, Map<String, ?> parameters);
 
 }

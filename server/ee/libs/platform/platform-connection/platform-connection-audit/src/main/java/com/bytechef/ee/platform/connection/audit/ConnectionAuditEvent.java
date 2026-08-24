@@ -88,7 +88,18 @@ public enum ConnectionAuditEvent {
      * A workflow was paused because the connection it depends on is no longer usable. Payload: {@code workflowId} (and
      * any additional context the emitting {@code JobPrincipalAccessor} attaches).
      */
-    WORKFLOW_PAUSED(false);
+    WORKFLOW_PAUSED(false),
+
+    /**
+     * A connection's authorization parameters were replaced. Payload: no additional keys — {@code connectionId}
+     * identifies the row, and no credential material is ever recorded.
+     *
+     * <p>
+     * Marked {@code strictAudit} — replacing a credential changes which external account every workflow using this
+     * connection now acts as, which is the same class of event as a reassignment. A missing trail would hide who
+     * repointed a shared credential, and when.
+     */
+    CONNECTION_CREDENTIALS_UPDATED(true);
 
     private final boolean strictAudit;
 

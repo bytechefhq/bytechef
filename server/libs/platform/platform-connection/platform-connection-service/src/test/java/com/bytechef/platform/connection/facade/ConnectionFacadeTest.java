@@ -25,6 +25,8 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.AuthorizationCallbackResponse;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.platform.component.domain.ConnectionDefinition;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.domain.Connection;
@@ -178,23 +180,7 @@ class ConnectionFacadeTest {
     }
 
     @Test
-    void testUpdateAuthorizationNonOAuthUpdatesParametersDirectly() {
-        ConnectionFacadeImpl facade = newFacade("EE");
-
-        Connection connection = new Connection();
-
-        connection.setId(5L);
-        connection.setComponentName("dummy");
-
-        when(connectionService.getConnection(5L)).thenReturn(connection);
-
-        facade.updateAuthorization(5L, Map.of("apiKey", "new"));
-
-        verify(connectionService).updateConnectionParameters(5L, Map.of("apiKey", "new"));
-    }
-
-    @Test
-    void testUpdateAuthorizationOAuth2AuthorizationCodeMergesCallbackResult() {
+    void testReplaceAuthorizationParametersOAuth2AuthorizationCodeMergesCallbackResult() {
         ConnectionFacadeImpl facade = newFacade("EE");
 
         Connection connection = new Connection();
@@ -206,6 +192,8 @@ class ConnectionFacadeTest {
         connection.setParameters(Map.of(Authorization.CLIENT_ID, "id", Authorization.CLIENT_SECRET, "secret"));
 
         when(connectionService.getConnection(5L)).thenReturn(connection);
+        when(connectionDefinitionService.getConnectionConnectionDefinition("slack", 1))
+            .thenReturn(connectionDefinition());
         when(connectionDefinitionService.getAuthorizationType("slack", 1, AuthorizationType.OAUTH2_AUTHORIZATION_CODE))
             .thenReturn(AuthorizationType.OAUTH2_AUTHORIZATION_CODE);
         when(oAuth2Service.checkPredefinedParameters(eq("slack"), any())).thenReturn(Map.of());
@@ -215,38 +203,97 @@ class ConnectionFacadeTest {
             eq("http://localhost/callback")))
                 .thenReturn(new AuthorizationCallbackResponse(Map.of(Authorization.ACCESS_TOKEN, "tok123")));
 
-        facade.updateAuthorization(5L, Map.of(Authorization.CODE, "auth-code"));
+        facade.replaceAuthorizationParameters(5L, Map.of(Authorization.CODE, "auth-code"));
 
         ArgumentCaptor<Map<String, Object>> captor = ArgumentCaptor.captor();
 
         verify(connectionDefinitionService).executeAuthorizationCallback(
             eq("slack"), eq(1), eq(AuthorizationType.OAUTH2_AUTHORIZATION_CODE), any(),
             eq("http://localhost/callback"));
-        verify(connectionService).updateConnectionParameters(eq(5L), captor.capture());
+        verify(connectionService).replaceConnectionParameters(eq(5L), captor.capture());
 
         assertThat(captor.getValue()).containsEntry(Authorization.ACCESS_TOKEN, "tok123");
     }
 
     @Test
-    void testUpdateAuthorizationStripsStateParameter() {
+    void testReplaceAuthorizationParametersStripsStateParameter() {
         ConnectionFacadeImpl facade = newFacade("EE");
 
         Connection connection = new Connection();
 
         connection.setId(5L);
         connection.setComponentName("dummy");
+        connection.setConnectionVersion(1);
 
         when(connectionService.getConnection(5L)).thenReturn(connection);
+        when(connectionDefinitionService.getConnectionConnectionDefinition("dummy", 1))
+            .thenReturn(connectionDefinition());
 
-        facade.updateAuthorization(5L, Map.of("apiKey", "new", "state", "csrf-token"));
+        facade.replaceAuthorizationParameters(5L, Map.of("apiKey", "new", "state", "csrf-token"));
 
         ArgumentCaptor<Map<String, Object>> captor = ArgumentCaptor.captor();
 
-        verify(connectionService).updateConnectionParameters(eq(5L), captor.capture());
+        verify(connectionService).replaceConnectionParameters(eq(5L), captor.capture());
 
         assertThat(captor.getValue())
             .containsEntry("apiKey", "new")
             .doesNotContainKey("state");
+    }
+
+    @Test
+    void testReplaceAuthorizationParametersDropsUnsubmittedAuthorizationKeys() {
+        ConnectionFacadeImpl facade = newFacade("EE");
+
+        Connection connection = new Connection();
+
+        connection.setId(5L);
+        connection.setComponentName("mailchimp");
+        connection.setConnectionVersion(1);
+        connection.setParameters(Map.of("apiKey", "old", "clientSecret", "old-secret", "region", "us1"));
+
+        when(connectionService.getConnection(5L)).thenReturn(connection);
+        when(connectionDefinitionService.getConnectionConnectionDefinition("mailchimp", 1))
+            .thenReturn(connectionDefinition());
+
+        facade.replaceAuthorizationParameters(5L, Map.of("apiKey", "new"));
+
+        // clientSecret is an authorization property that was not resubmitted, so it is cleared; region is a
+        // connection-level property, so it survives without the caller having to enumerate it.
+        verify(connectionService).replaceConnectionParameters(5L, Map.of("apiKey", "new", "region", "us1"));
+    }
+
+    @Test
+    void testReplaceAuthorizationParametersResetsCredentialStatusToValid() {
+        ConnectionFacadeImpl facade = newFacade("EE");
+
+        Connection connection = new Connection();
+
+        connection.setId(5L);
+        connection.setComponentName("mailchimp");
+        connection.setConnectionVersion(1);
+        connection.setParameters(Map.of("apiKey", "old"));
+
+        when(connectionService.getConnection(5L)).thenReturn(connection);
+        when(connectionDefinitionService.getConnectionConnectionDefinition("mailchimp", 1))
+            .thenReturn(connectionDefinition());
+
+        facade.replaceAuthorizationParameters(5L, Map.of("apiKey", "new"));
+
+        verify(connectionService).updateConnectionCredentialStatus(5L, Connection.CredentialStatus.VALID);
+    }
+
+    /**
+     * A real definition rather than a mock: the production code derives the authorization property names from it, and
+     * that derivation is exactly what these tests are checking.
+     */
+    private static ConnectionDefinition connectionDefinition() {
+        return new ConnectionDefinition(
+            ComponentDsl.connection()
+                .authorizations(
+                    ComponentDsl.authorization(AuthorizationType.API_KEY)
+                        .properties(ComponentDsl.string("apiKey"), ComponentDsl.string("clientSecret")))
+                .properties(ComponentDsl.string("region")),
+            "mailchimp", "Mailchimp", "");
     }
 
     private ConnectionFacadeImpl newFacade(String edition) {
