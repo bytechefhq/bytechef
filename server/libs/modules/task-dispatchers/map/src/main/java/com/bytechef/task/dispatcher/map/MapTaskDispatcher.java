@@ -93,7 +93,10 @@ public class MapTaskDispatcher extends ErrorHandlingTaskDispatcher implements Ta
 
         taskExecution = taskExecutionService.update(taskExecution);
 
-        if (items.isEmpty()) {
+        // Disabling every task inside the iteratee empties that list rather than removing it: the disabled-task
+        // strip runs before the engine sees the workflow. A map with nothing to apply completes just like a map
+        // over an empty item list.
+        if (items.isEmpty() || iterateeWorkflowTasks.isEmpty()) {
             taskExecution.setStartDate(Instant.now());
             taskExecution.setEndDate(Instant.now());
             taskExecution.setExecutionTime(0);

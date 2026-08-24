@@ -195,6 +195,29 @@ public class LoopTaskDispatcherIntTest {
         Assertions.assertTrue(status.isTerminated());
     }
 
+    @Test
+    void testLoopWithDisabledIterateeCompletesInsteadOfFailing() {
+        taskDispatcherJobExecution = taskDispatcherJobTestExecutor.execute(
+            EncodingUtils.base64EncodeToString("loop_v1_disabled_iteratee"), this::getTaskCompletionHandlerFactories,
+            this::getTaskDispatcherResolverFactories, getTaskHandlerMap());
+
+        assertNoTaskErrors(taskDispatcherJobExecution);
+
+        Job job = taskDispatcherJobExecution.job();
+
+        Assertions.assertEquals(Job.Status.COMPLETED, job.getStatus());
+
+        // The loop's only iteratee task is disabled, so the strip leaves an empty iteratee list behind. Nothing is
+        // dispatched inside the loop, and the task following it still runs.
+        Assertions.assertNull(testVarTaskHandler.get("skippedVar"));
+        Assertions.assertEquals(List.of("done"), testVarTaskHandler.get("afterLoop"));
+
+        TaskExecution parentTaskExecution = findParentLoopTask();
+
+        Assertions.assertNotNull(parentTaskExecution.getEndDate(), "Loop parent must have endDate");
+        Assertions.assertEquals(TaskExecution.Status.COMPLETED, parentTaskExecution.getStatus());
+    }
+
     @RepeatedTest(10)
     void testLoopOverSmallItemsNoResidualStarted() {
         taskDispatcherJobExecution = taskDispatcherJobTestExecutor.execute(

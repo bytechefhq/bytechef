@@ -95,7 +95,10 @@ public class LoopTaskDispatcher extends ErrorHandlingTaskDispatcher implements T
 
         taskExecution = taskExecutionService.update(taskExecution);
 
-        if (loopForever || !items.isEmpty()) {
+        // Disabling every task inside the iteratee empties that list rather than removing it: the disabled-task
+        // strip runs before the engine sees the workflow. A loop with nothing to iterate over completes just like
+        // a loop over an empty item list.
+        if (!iterateeWorkflowTasks.isEmpty() && (loopForever || !items.isEmpty())) {
             WorkflowTask iterateeWorkflowTask = iterateeWorkflowTasks.getFirst();
 
             TaskExecution subTaskExecution = TaskExecution.builder()

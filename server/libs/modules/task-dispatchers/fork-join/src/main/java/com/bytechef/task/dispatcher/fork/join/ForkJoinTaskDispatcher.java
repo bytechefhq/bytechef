@@ -118,7 +118,14 @@ public class ForkJoinTaskDispatcher extends ErrorHandlingTaskDispatcher implemen
 
         taskExecution = taskExecutionService.update(taskExecution);
 
-        if (branchesWorkflowTasks.isEmpty()) {
+        // Disabling every task inside a branch empties that branch rather than removing it: the disabled-task
+        // strip runs before the engine sees the workflow. Empty branches are skipped, and the join counter must
+        // count only the branches actually dispatched below or the fork would never complete.
+        long dispatchedBranchCount = branchesWorkflowTasks.stream()
+            .filter(branchWorkflowTasks -> !branchWorkflowTasks.isEmpty())
+            .count();
+
+        if (dispatchedBranchCount == 0) {
             taskExecution.setStartDate(Instant.now());
             taskExecution.setEndDate(Instant.now());
             taskExecution.setExecutionTime(0);
@@ -127,15 +134,20 @@ public class ForkJoinTaskDispatcher extends ErrorHandlingTaskDispatcher implemen
         } else {
             long taskExecutionId = Validate.notNull(taskExecution.getId(), "id");
 
-            counterService.set(taskExecutionId, branchesWorkflowTasks.size());
+            counterService.set(taskExecutionId, dispatchedBranchCount);
 
             long taskExecutionJobId = Validate.notNull(
                 taskExecution.getJobId(), "'taskExecution.jobId' must not be null");
 
+            // The branch index is kept as the index into the ORIGINAL branch list: ForkJoinTaskCompletionHandler
+            // resolves the remaining branch tasks with branchesWorkflowTasks.get(BRANCH), so skipped branches
+            // must not shift the indexes of the surviving ones.
             for (int i = 0; i < branchesWorkflowTasks.size(); i++) {
                 List<WorkflowTask> branchWorkflowTasks = branchesWorkflowTasks.get(i);
 
-                Validate.isTrue(!branchWorkflowTasks.isEmpty(), "branch " + i + " does not contain any tasks");
+                if (branchWorkflowTasks.isEmpty()) {
+                    continue;
+                }
 
                 WorkflowTask branchWorkflowTask = branchWorkflowTasks.getFirst();
 

@@ -84,9 +84,10 @@ public class EachTaskDispatcher extends ErrorHandlingTaskDispatcher implements T
 
     @Override
     public void doDispatch(TaskExecution taskExecution) {
-        Map<String, ?> workflowMap = MapUtils.getRequired(
+        // The iteratee is absent when it is a disabled task: the disabled-task strip removes it before the engine
+        // sees the workflow. An each with nothing to iterate over completes just like one over an empty item list.
+        Map<String, ?> workflowMap = MapUtils.get(
             taskExecution.getParameters(), ITERATEE, new TypeReference<Map<String, ?>>() {});
-        WorkflowTask iteratee = new WorkflowTask(workflowMap);
         List<Object> items = MapUtils.getRequiredList(taskExecution.getParameters(), ITEMS, Object.class);
 
         taskExecution.setStartDate(Instant.now());
@@ -94,13 +95,15 @@ public class EachTaskDispatcher extends ErrorHandlingTaskDispatcher implements T
 
         taskExecution = taskExecutionService.update(taskExecution);
 
-        if (items.isEmpty()) {
+        if (workflowMap == null || items.isEmpty()) {
             taskExecution.setStartDate(Instant.now());
             taskExecution.setEndDate(Instant.now());
             taskExecution.setExecutionTime(0);
 
             eventPublisher.publishEvent(new TaskExecutionCompleteEvent(taskExecution));
         } else {
+            WorkflowTask iteratee = new WorkflowTask(workflowMap);
+
             counterService.set(Validate.notNull(taskExecution.getId(), "id"), items.size());
 
             for (int i = 0; i < items.size(); i++) {

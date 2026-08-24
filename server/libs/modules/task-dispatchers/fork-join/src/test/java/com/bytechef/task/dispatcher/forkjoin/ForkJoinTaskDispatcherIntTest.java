@@ -34,6 +34,7 @@ import java.util.Objects;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -140,5 +141,39 @@ public class ForkJoinTaskDispatcherIntTest {
         Assertions.assertEquals("branch zero output", branchOutputs.get("branch_0"));
         Assertions.assertTrue(branchOutputs.containsKey("branch_1"));
         Assertions.assertNull(branchOutputs.get("branch_1"));
+    }
+
+    // Disabling every task of branch 0 leaves that branch empty. The join counter must be sized from the branches
+    // actually dispatched, otherwise it never reaches zero and the job hangs rather than failing - hence the
+    // explicit timeout.
+    @Test
+    @Timeout(60)
+    public void testDispatchWithFullyDisabledBranch() {
+        TaskDispatcherJobExecution jobExecution = taskDispatcherJobTestExecutor.execute(
+            EncodingUtils.base64EncodeToString("fork-join_v1-disabled-branch"),
+            (
+                contextService, counterService, taskExecutionService) -> List.of(
+                    (taskCompletionHandler, taskDispatcher) -> new ForkJoinTaskCompletionHandler(
+                        contextService, counterService, EVALUATOR, taskExecutionService,
+                        taskCompletionHandler, taskDispatcher, taskFileStorage)),
+            (
+                eventPublisher, contextService, counterService, taskExecutionService) -> List.of(
+                    (taskDispatcher) -> new ForkJoinTaskDispatcher(
+                        contextService, counterService, EVALUATOR, eventPublisher, taskDispatcher,
+                        taskExecutionService, taskFileStorage)),
+            () -> Map.of("var/v1/set", testVarTaskHandler));
+
+        Job job = jobExecution.job();
+
+        Assertions.assertEquals(Job.Status.COMPLETED, job.getStatus());
+        Assertions.assertTrue(jobExecution.getExecutionErrors()
+            .isEmpty());
+
+        Assertions.assertNull(testVarTaskHandler.get("skippedVar"));
+
+        // The surviving branch keeps its original index, so the completion handler still resolves its second task
+        // through branches[1] and chains it after the first one.
+        Assertions.assertEquals(100, testVarTaskHandler.get("var2"));
+        Assertions.assertEquals(112, testVarTaskHandler.get("sumVar2"));
     }
 }

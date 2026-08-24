@@ -130,6 +130,24 @@ public class MapTaskDispatcherIntTest {
         Assertions.assertEquals(expected, outputs.get("map"));
     }
 
+    @Test
+    public void testDispatchWithDisabledIterateeCompletesInsteadOfFailing() {
+        TaskDispatcherJobExecution jobExecution = taskDispatcherJobTestExecutor.execute(
+            EncodingUtils.base64EncodeToString("map_v1_disabled_iteratee"),
+            this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories, getTaskHandlerMap());
+
+        Job job = jobExecution.job();
+
+        Assertions.assertEquals(Job.Status.COMPLETED, job.getStatus());
+        Assertions.assertTrue(jobExecution.getExecutionErrors()
+            .isEmpty());
+
+        // The map's only iteratee task is disabled, so the strip leaves an empty iteratee list behind. Nothing is
+        // dispatched per item, and the task following the map still runs.
+        Assertions.assertNull(testVarTaskHandler.get("skippedVar"));
+        Assertions.assertEquals(List.of("done"), testVarTaskHandler.get("afterMap"));
+    }
+
     @SuppressWarnings("PMD")
     private List<TaskCompletionHandlerFactory> getTaskCompletionHandlerFactories(
         ContextService contextService, CounterService counterService, TaskExecutionService taskExecutionService) {
