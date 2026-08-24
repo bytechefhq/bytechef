@@ -2,5 +2,9 @@
   "$schema": "../../../../../.source/json-schema/docs.meta.json",
   "title": "Configure",
   "description": "Per-customer configuration and MCP exposure.",
-  "pages": ["instance-configurations", "mcp-servers"]
+  "pages": [
+    "instance-configurations",
+    "mcp-servers",
+    "limits"
+  ]
 }
