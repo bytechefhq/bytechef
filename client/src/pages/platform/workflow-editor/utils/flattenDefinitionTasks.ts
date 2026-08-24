@@ -93,7 +93,7 @@ function extractNestedTasks(parameters: Record<string, unknown>): Array<Workflow
         }
 
         // List of lists (e.g., fork-join.branches)
-        if (Array.isArray(firstItem) && firstItem.length > 0 && isWorkflowTask(firstItem[0])) {
+        if (isTaskBranchList(value)) {
             for (const branch of value as Array<Array<WorkflowTask>>) {
                 result.push(...flattenDefinitionTasks(branch));
             }
@@ -101,6 +101,13 @@ function extractNestedTasks(parameters: Record<string, unknown>): Array<Workflow
     }
 
     return result;
+}
+
+export function isTaskBranchList(value: Array<unknown>): boolean {
+    return (
+        value.every((item) => Array.isArray(item)) &&
+        value.some((item) => (item as Array<unknown>).length > 0 && isWorkflowTask((item as Array<unknown>)[0]))
+    );
 }
 
 export function isWorkflowTask(value: unknown): value is WorkflowTask {

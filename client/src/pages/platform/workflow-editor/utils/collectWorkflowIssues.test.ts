@@ -240,4 +240,87 @@ describe('collectWorkflowIssues', () => {
             expect(issues).toEqual([]);
         });
     });
+
+    it('warns about each disabled node a task references', () => {
+        const issues = collectWorkflowIssues({
+            tasks: [
+                {...task('action_1'), disabled: true},
+                {...task('action_3'), disabled: true},
+                task('action_2', {value: '${action_1.body} and ${action_3}'}),
+            ],
+            triggers: [],
+        });
+
+        expect(issues).toEqual([
+            {
+                kind: 'DISABLED_REFERENCE',
+                message: 'References disabled node action_1 — it will not run, so this value will not resolve',
+                nodeName: 'action_2',
+                severity: 'WARNING',
+                source: 'SWEEP',
+            },
+            {
+                kind: 'DISABLED_REFERENCE',
+                message: 'References disabled node action_3 — it will not run, so this value will not resolve',
+                nodeName: 'action_2',
+                severity: 'WARNING',
+                source: 'SWEEP',
+            },
+        ]);
+    });
+
+    it('does not warn on a task that is itself disabled or disabled through its dispatcher', () => {
+        const issues = collectWorkflowIssues({
+            tasks: [
+                {...task('action_1'), disabled: true},
+                {
+                    ...task('condition_1', {
+                        caseTrue: [task('logger_1', {text: '${action_1.body}'})],
+                        expression: 'true',
+                    }),
+                    disabled: true,
+                },
+                task('logger_1', {text: '${action_1.body}'}),
+                {...task('action_2', {value: '${action_1.body}'}), disabled: true},
+            ],
+            triggers: [],
+        });
+
+        expect(issues).toEqual([]);
+    });
+
+    it('warns on the nested task that makes the reference, not on its dispatcher', () => {
+        const issues = collectWorkflowIssues({
+            tasks: [
+                {...task('action_1'), disabled: true},
+                task('condition_1', {
+                    caseTrue: [task('logger_1', {text: '${action_1.body}'})],
+                    expression: 'true',
+                }),
+                task('logger_1', {text: '${action_1.body}'}),
+            ],
+            triggers: [],
+        });
+
+        expect(issues.map((issue) => [issue.kind, issue.nodeName])).toEqual([['DISABLED_REFERENCE', 'logger_1']]);
+    });
+
+    it('warns on a cluster element that references a disabled node', () => {
+        const issues = collectWorkflowIssues({
+            tasks: [
+                {...task('action_1'), disabled: true},
+                {
+                    ...task('aiAgent_1'),
+                    clusterElements: {
+                        tools: [
+                            {name: 'firecrawl_1', parameters: {url: '${action_1.url}'}, type: 'firecrawl/v1/scrape'},
+                        ],
+                    },
+                } as WorkflowTask,
+            ],
+            triggers: [],
+        });
+
+        expect(issues.map((issue) => [issue.kind, issue.nodeName])).toEqual([['DISABLED_REFERENCE', 'firecrawl_1']]);
+    });
 });

@@ -2,7 +2,9 @@ import {WorkflowInput, WorkflowTask, WorkflowTrigger} from '@/shared/middleware/
 
 import {WorkflowIssueI} from '../stores/useWorkflowIssuesStore';
 import getAvailableTaskNamesByTaskName from './getAvailableTaskNamesByTaskName';
+import {getDisabledNodeReferences} from './getDisabledNodeReferences';
 import getDuplicateNodeNames from './getDuplicateNodeNames';
+import {getEffectivelyDisabledTaskNames} from './getEffectivelyDisabledTaskNames';
 import {forEachNestedTaskGroup} from './taskTraversalUtils';
 
 const DATA_PILL_PATTERN = /\$\{([^}]+)}/g;
@@ -88,6 +90,56 @@ function collectExpressions(value: unknown, expressions: Array<string>): void {
     }
 }
 
+function getDisabledReferenceMessage(disabledTaskName: string): string {
+    return `References disabled node ${disabledTaskName} — it will not run, so this value will not resolve`;
+}
+
+function collectDisabledReferenceIssues(
+    nodeName: string,
+    parameters: unknown,
+    disabledTaskNames: Set<string>,
+    issues: Array<WorkflowIssueI>
+): void {
+    for (const disabledTaskName of getDisabledNodeReferences(parameters, disabledTaskNames)) {
+        issues.push({
+            kind: 'DISABLED_REFERENCE',
+            message: getDisabledReferenceMessage(disabledTaskName),
+            nodeName,
+            severity: 'WARNING',
+            source: 'SWEEP',
+        });
+    }
+}
+
+function collectClusterElementDisabledReferenceIssues(
+    clusterElements: unknown,
+    disabledTaskNames: Set<string>,
+    issues: Array<WorkflowIssueI>
+): void {
+    if (!clusterElements || typeof clusterElements !== 'object') {
+        return;
+    }
+
+    for (const clusterElementValue of Object.values(clusterElements)) {
+        const clusterElementItems = Array.isArray(clusterElementValue) ? clusterElementValue : [clusterElementValue];
+
+        for (const clusterElementItem of clusterElementItems) {
+            if (!clusterElementItem || typeof clusterElementItem !== 'object' || !clusterElementItem.name) {
+                continue;
+            }
+
+            collectDisabledReferenceIssues(
+                clusterElementItem.name,
+                clusterElementItem.parameters,
+                disabledTaskNames,
+                issues
+            );
+
+            collectClusterElementDisabledReferenceIssues(clusterElementItem.clusterElements, disabledTaskNames, issues);
+        }
+    }
+}
+
 export default function collectWorkflowIssues({
     inputs = [],
     tasks = [],
@@ -164,6 +216,20 @@ export default function collectWorkflowIssues({
                 severity: 'ERROR',
                 source: 'SWEEP',
             });
+        }
+    }
+
+    const disabledTaskNames = getEffectivelyDisabledTaskNames(tasks);
+
+    if (disabledTaskNames.size > 0) {
+        for (const currentTask of allTasks) {
+            if (disabledTaskNames.has(currentTask.name)) {
+                continue;
+            }
+
+            collectDisabledReferenceIssues(currentTask.name, currentTask.parameters, disabledTaskNames, issues);
+
+            collectClusterElementDisabledReferenceIssues(currentTask.clusterElements, disabledTaskNames, issues);
         }
     }
 

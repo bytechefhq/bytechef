@@ -3,6 +3,7 @@ import {devtools} from 'zustand/middleware';
 
 export type WorkflowIssueKindType =
     | 'BROKEN_REFERENCE'
+    | 'DISABLED_REFERENCE'
     | 'DUPLICATE_NODE_NAME'
     | 'INVALID_CONNECTION'
     | 'LOOKUP_FAILED'
