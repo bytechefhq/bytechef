@@ -2,22 +2,33 @@ import Button from '@/components/Button/Button';
 import {NodeDataType} from '@/shared/types';
 import {Handle, Position} from '@xyflow/react';
 import {memo} from 'react';
+import {twMerge} from 'tailwind-merge';
 
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import {mapHandlePosition} from '../utils/directionUtils';
+import DisabledNodeBadge from './DisabledNodeBadge';
 import styles from './NodeTypes.module.css';
 
 const ReadOnlyNode = ({data}: {data: NodeDataType}) => {
     const layoutDirection = useLayoutDirectionStore((state) => state.layoutDirection);
 
     return (
-        <div className="relative flex cursor-grab items-center justify-center">
+        <div
+            className={twMerge(
+                'relative flex cursor-grab items-center justify-center',
+                data.isEffectivelyDisabled && 'opacity-50 grayscale'
+            )}
+        >
             <Button className="size-18 cursor-grab rounded-md border-2 border-stroke-neutral-tertiary bg-surface-neutral-primary p-4 text-primary shadow-sm hover:border-stroke-brand-secondary-hover hover:bg-surface-neutral-primary hover:shadow-none focus-visible:ring-stroke-brand-focus active:bg-surface-neutral-primary [&_svg]:size-9">
                 {data.icon}
             </Button>
 
             <div className="ml-2 flex w-full min-w-max flex-col items-start">
-                <span className="font-semibold">{data.title || data.label}</span>
+                <div className="flex items-center gap-1">
+                    <span className="font-semibold">{data.title || data.label}</span>
+
+                    {data.disabled && <DisabledNodeBadge />}
+                </div>
 
                 {data.operationName && <pre className="text-sm">{data.operationName}</pre>}
 

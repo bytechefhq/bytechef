@@ -54,6 +54,7 @@ import createParallelEdges from '../utils/createParallelEdges';
 import createParallelNode from '../utils/createParallelNode';
 import {getElkLayoutElements} from '../utils/elkLayoutUtils';
 import extractDefinitionPositions from '../utils/extractDefinitionPositions';
+import {getEffectivelyDisabledTaskNames} from '../utils/getEffectivelyDisabledTaskNames';
 import {isElkLayoutActive} from '../utils/isElkLayoutSupported';
 import {createLayoutRetryState, onLayoutFailure, onLayoutSuccess} from '../utils/layoutRetryController';
 import {
@@ -232,6 +233,12 @@ export default function useLayout({
 
     const tasks = storeTasks || readOnlyWorkflow?.tasks;
     const triggers = storeTriggers || readOnlyWorkflow?.triggers;
+
+    // The read-only canvas (execution detail) has no live store-backed workflow to derive this
+    // from at render time the way WorkflowNode.tsx's useDisabledTaskNames does, so it's computed
+    // once here -- from the same `tasks` this hook already resolved for the executed workflow
+    // version -- and stamped onto each read-only node's data below.
+    const disabledTaskNames = useMemo(() => getEffectivelyDisabledTaskNames(tasks ?? []), [tasks]);
 
     const {initializeWithCanvasWidth, setEdges, setNodes, setSavedPositionCrossAxisShift} = useWorkflowDataStore(
         useShallow((state) => ({
@@ -927,12 +934,16 @@ export default function useLayout({
         if (readOnlyWorkflow) {
             layoutNodes = allNodes.map((node) => {
                 if (node.type === 'workflow' || node.type === 'clusterRoot') {
+                    const nodeData = node.data as NodeDataType;
+
                     return {
                         ...node,
                         data: {
-                            ...node.data,
+                            ...nodeData,
                             clusterElements: undefined,
                             clusterRoot: undefined,
+                            isEffectivelyDisabled:
+                                Boolean(nodeData.disabled) || disabledTaskNames.has(nodeData.workflowNodeName),
                         },
                         type: 'readonly',
                     };

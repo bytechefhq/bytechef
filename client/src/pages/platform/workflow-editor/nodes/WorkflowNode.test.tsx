@@ -8,7 +8,8 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import WorkflowNode from './WorkflowNode';
 
 // Mutable slice of the editor store so each test can toggle which node is being renamed.
-const {directionStoreState, editorStoreState} = vi.hoisted(() => ({
+const {dataStoreState, directionStoreState, editorStoreState} = vi.hoisted(() => ({
+    dataStoreState: {definition: '{}'},
     directionStoreState: {layoutDirection: 'TB'},
     editorStoreState: {renamingNodeName: undefined as string | undefined},
 }));
@@ -75,7 +76,7 @@ vi.mock('../stores/useWorkflowDataStore', () => ({
     default: (selector: (state: Record<string, unknown>) => unknown) =>
         selector({
             incrementLayoutResetCounter: vi.fn(),
-            workflow: {definition: '{}', id: 'workflow-1', tasks: [], triggers: []},
+            workflow: {definition: dataStoreState.definition, id: 'workflow-1', tasks: [], triggers: []},
         }),
 }));
 
@@ -123,6 +124,7 @@ function renderNode(data: NodeDataType = NESTED_CLUSTER_ROOT_DATA, id: string = 
 
 describe('WorkflowNode', () => {
     beforeEach(() => {
+        dataStoreState.definition = '{}';
         directionStoreState.layoutDirection = 'TB';
         editorStoreState.renamingNodeName = undefined;
     });
@@ -141,6 +143,51 @@ describe('WorkflowNode', () => {
         renderNode();
 
         expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+    });
+
+    it('warns that a single referenced disabled node will not resolve', () => {
+        dataStoreState.definition = JSON.stringify({
+            tasks: [{disabled: true, name: 'action_1', parameters: {}, type: 'test/v1/action'}],
+        });
+
+        renderNode(
+            {
+                componentName: 'test',
+                name: 'action_2',
+                parameters: {value: '${action_1.body}'},
+                workflowNodeName: 'action_2',
+            } as unknown as NodeDataType,
+            'action_2'
+        );
+
+        expect(
+            screen.getByTitle('References disabled node action_1 — it will not run, so this value will not resolve')
+        ).toBeInTheDocument();
+    });
+
+    it('warns in the plural when several referenced nodes are disabled', () => {
+        dataStoreState.definition = JSON.stringify({
+            tasks: [
+                {disabled: true, name: 'action_1', parameters: {}, type: 'test/v1/action'},
+                {disabled: true, name: 'action_3', parameters: {}, type: 'test/v1/action'},
+            ],
+        });
+
+        renderNode(
+            {
+                componentName: 'test',
+                name: 'action_2',
+                parameters: {value: '${action_1} and ${action_3}'},
+                workflowNodeName: 'action_2',
+            } as unknown as NodeDataType,
+            'action_2'
+        );
+
+        expect(
+            screen.getByTitle(
+                'References disabled nodes action_1, action_3 — they will not run, so this value will not resolve'
+            )
+        ).toBeInTheDocument();
     });
 
     it('rotates LR condition labels and keeps the pair on one vertical axis', () => {
