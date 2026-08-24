@@ -19,6 +19,7 @@ package com.bytechef.atlas.coordinator.task.completion;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -35,14 +36,12 @@ import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.evaluator.Evaluator;
 import com.bytechef.file.storage.domain.FileEntry;
 import java.util.List;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.SimpleTransactionStatus;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -63,8 +62,6 @@ class DefaultTaskCompletionHandlerTest {
     }
 
     private final ContextService contextService = mock(ContextService.class);
-    private final Evaluator evaluator = mock(Evaluator.class);
-    private final ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
     private final JobExecutor jobExecutor = mock(JobExecutor.class);
     private final JobService jobService = mock(JobService.class);
     private final TaskExecutionService taskExecutionService = mock(TaskExecutionService.class);
@@ -87,7 +84,6 @@ class DefaultTaskCompletionHandlerTest {
         Workflow workflow = mock(Workflow.class);
 
         when(workflow.getTasks()).thenReturn(List.of(mock(WorkflowTask.class)));
-        when(workflow.getOutputs()).thenReturn(List.of());
 
         when(jobService.getTaskExecutionJob(100L)).thenReturn(job);
         when(jobService.update(any())).thenReturn(job);
@@ -97,9 +93,6 @@ class DefaultTaskCompletionHandlerTest {
         when(taskFileStorage.readContextValue(any())).thenReturn(Map.of());
         when(taskFileStorage.storeContextValue(anyLong(), any(), any()))
             .thenReturn(new FileEntry("context", "/tmp/context.json"));
-        when(taskFileStorage.storeJobOutputs(anyLong(), any()))
-            .thenReturn(new FileEntry("outputs", "/tmp/outputs.json"));
-        when(evaluator.evaluate(any(), any())).thenReturn(Map.of());
         when(transactionManager.getTransaction(any())).thenReturn(new SimpleTransactionStatus());
     }
 
@@ -113,12 +106,13 @@ class DefaultTaskCompletionHandlerTest {
         verify(transactionManager).getTransaction(any());
         verify(transactionManager).commit(any());
         verify(transactionManager, never()).rollback(any());
-        verify(jobService).update(any());
+        verify(jobExecutor).completeJob(job);
     }
 
     @Test
     void testHandleRollsBackTransactionOnFailure() {
-        when(jobService.update(any())).thenThrow(new IllegalStateException("persistence failure"));
+        doThrow(new IllegalStateException("persistence failure")).when(jobExecutor)
+            .completeJob(any());
 
         DefaultTaskCompletionHandler taskCompletionHandler = getTaskCompletionHandler(
             new TransactionTemplate(transactionManager));
@@ -135,7 +129,7 @@ class DefaultTaskCompletionHandlerTest {
 
         taskCompletionHandler.handle(taskExecution);
 
-        verify(jobService).update(any());
+        verify(jobExecutor).completeJob(job);
         verify(transactionManager, never()).getTransaction(any());
     }
 
@@ -143,7 +137,7 @@ class DefaultTaskCompletionHandlerTest {
         @Nullable TransactionTemplate transactionTemplate) {
 
         return new DefaultTaskCompletionHandler(
-            contextService, evaluator, eventPublisher, jobExecutor, jobService, taskExecutionService, taskFileStorage,
-            transactionTemplate, workflowService);
+            contextService, jobExecutor, jobService, taskExecutionService, taskFileStorage, transactionTemplate,
+            workflowService);
     }
 }

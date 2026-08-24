@@ -110,7 +110,7 @@ public class TaskCoordinatorConfiguration {
             .getIfAvailable();
 
         return new DefaultTaskCompletionHandler(
-            contextService, evaluator, eventPublisher, jobExecutor(), jobService, taskExecutionService, taskFileStorage,
+            contextService, jobExecutor(), jobService, taskExecutionService, taskFileStorage,
             platformTransactionManager == null ? null : new TransactionTemplate(platformTransactionManager),
             workflowService);
     }
@@ -123,7 +123,8 @@ public class TaskCoordinatorConfiguration {
     @Bean
     JobExecutor jobExecutor() {
         return new JobExecutor(
-            contextService, evaluator, taskDispatcher(), taskExecutionService, taskFileStorage, workflowService);
+            contextService, evaluator, eventPublisher, jobService, taskDispatcher(), taskExecutionService,
+            taskFileStorage, workflowService);
     }
 
     @Bean
