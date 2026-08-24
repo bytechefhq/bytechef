@@ -11,21 +11,38 @@ ByteChef exposes five public REST APIs for use from your own applications:
 - **[Projects](/openapi/automation-project-code-workflow)** — deploy a code-based project (CI/CD-style integration).
 - **[Git](/openapi/automation-project-git)** — pull a project from its configured git repository.
 
-**Embedded**
+Each embedded resource is reachable two ways, and the reference documents them separately because
+the credential decides which one you can use.
+
+**Backend — API Key**
+
+Called from your own server. The connected user is named by the `{externalUserId}` path segment.
 
 - **[Actions](/openapi/embedded-action)** — execute a component action for a connected user.
 - **[Tools](/openapi/embedded-tool)** — list a connected user's available tools, and execute one.
-- **Workflow Executions** — fetch a tenant's workflow executions. Served by the internal API rather than a public spec, so it has no reference page; read executions in the ByteChef admin UI.
-- **Tool Invocations** — fetch a connected user's tool and action invocation history. No public spec yet, so it has no reference page.
 - **[Integrations](/openapi/embedded-configuration-integration)** — the integrations available to your customers.
 - **[Integration Instances](/openapi/embedded-configuration-integration-instance)** — a connected user's instance of an integration.
 - **[Instance Workflows](/openapi/embedded-configuration-integration-instance-workflow)** — enable, disable and configure an instance's workflows.
-- **[Connections](/openapi/embedded-configuration-connection)** — list, delete and reauthorize a connected user's connections.
+- **[Connections](/openapi/embedded-configuration-connection)** — list a connected user's connections.
 - **[Connected Users](/openapi/embedded-configuration-connected-user)** — update a connected user.
 - **[User Workflows](/openapi/embedded-configuration-connected-user-project-workflow)** — a connected user's own workflows, including generation from a prompt.
 - **[Workflow Catalog](/openapi/embedded-configuration-automation-workflow-project)** — the catalog projects available to connected users.
-- **[App Events](/openapi/embedded-webhook-app-event-trigger)** — fire an App Event to start every subscribed workflow.
-- **[Request Trigger](/openapi/embedded-webhook-request-trigger)** — execute a single workflow synchronously and return its result.
+- **Workflow Executions** — fetch a tenant's workflow executions. Served by the internal API rather than a public spec, so it has no reference page; read executions in the ByteChef admin UI.
+- **Tool Invocations** — fetch a connected user's tool and action invocation history. No public spec yet, so it has no reference page.
+
+**Frontend — Signing Key JWT**
+
+Called from the browser with a short-lived token your backend signs. The connected user comes from the token's `sub` claim, so these paths carry no user id.
+
+- **[Integrations](/openapi/embedded-configuration-integration-frontend)** — the integrations available to the signed-in user.
+- **[Integration Instances](/openapi/embedded-configuration-integration-instance-frontend)** — their instance of an integration.
+- **[Instance Workflows](/openapi/embedded-configuration-integration-instance-workflow-frontend)** — enable, disable and configure that instance's workflows.
+- **[Connections](/openapi/embedded-configuration-connection-frontend)** — list their connections.
+- **[Connected Users](/openapi/embedded-configuration-connected-user-frontend)** — update the signed-in user.
+- **[User Workflows](/openapi/embedded-configuration-connected-user-project-workflow-frontend)** — their own workflows, including generation from a prompt.
+- **[Workflow Catalog](/openapi/embedded-configuration-automation-workflow-project-frontend)** — the catalog projects available to them.
+- **[App Events](/openapi/embedded-webhook-app-event-trigger-frontend)** — fire an App Event to start every subscribed workflow.
+- **[Request Trigger](/openapi/embedded-webhook-request-trigger-frontend)** — execute a single workflow synchronously and return its result.
 
 **Platform**
 
@@ -47,19 +64,29 @@ Prefix the operation path you see on each reference page with the corresponding 
 
 ## Authentication
 
-Every API takes a bearer token in the `Authorization` header. Which token applies depends on the shape
-of the operation path.
+Every request carries a bearer token in the `Authorization` header. Which token you can use is not a
+per-endpoint detail — it is the whole reason the reference is split in two, because the two
+credentials identify the connected user in different ways.
 
-| API | Accepted token |
-|---|---|
-| Embedded — Actions, Tools, Workflow Executions, Tool Invocations | An **API Key**, or a per-end-user JWT signed by your backend with a **Signing Key**. Every operation carries `{externalUserId}` in its path, so both work. |
-| Embedded — Integrations, Integration Instances, Instance Workflows, Connections, Connected Users, User Workflows, Workflow Catalog | An **API Key** on the `{externalUserId}/…` operations; a **Signing Key** JWT on the rest. |
-| Embedded — App Events, Request Trigger | A **Signing Key** JWT. Neither operation carries `{externalUserId}` in its path, so an API Key has no user to act for and is rejected. |
+| | **Backend** | **Frontend** |
+|---|---|---|
+| Credential | An **API Key** | A short-lived JWT signed with a **Signing Key** |
+| Identifies the user by | the `{externalUserId}` path segment | the token's `sub` claim |
+| Called from | your own server | the browser |
 
-Both embedded token types act on behalf of one connected user: an API Key takes the user from the
-`{externalUserId}` path segment, a Signing Key JWT takes it from the token's `sub` claim. That is why
-browser-originated calls, which have no user id in the path, need a JWT.
+That difference is why the paths differ. An API Key says nothing about which of your end users a call
+is for, so those operations carry the id in the path. A JWT already names the user, so its operations
+do not — which in turn means an API Key cannot be used against them: there would be no user to act
+for, and the request is rejected.
 
-Pass an optional `X-Environment` header (`DEVELOPMENT`, `STAGING`, or `PRODUCTION`) to scope the request to a specific environment. If omitted, ByteChef uses `PRODUCTION`. On the Embedded workflow-executions endpoints the header also selects which environment's executions are returned.
+**Actions** and **Tools** are the exception that proves the rule. Their paths carry
+`{externalUserId}`, so either credential resolves a user and both are accepted; they are listed under
+Backend because that is how they are normally called.
 
-See [Signing Keys](/platform/embedded/administration/signing-keys) and [Embedded API Keys](/platform/embedded/administration/api-keys) for the embedded credentials.
+Mint frontend tokens as described in [Installing the SDK](/platform/embedded/get-started/initial-setup/installing-the-sdk#2-generate-a-user-token-in-your-backend)
+— the private key never reaches the browser, and the token is short-lived. See
+[Signing Keys](/platform/embedded/administration/signing-keys) and
+[Embedded API Keys](/platform/embedded/administration/api-keys) for issuing each credential.
+
+Pass an optional `X-Environment` header (`DEVELOPMENT`, `STAGING`, or `PRODUCTION`) to scope the
+request to a specific environment. If omitted, ByteChef uses `PRODUCTION`.
