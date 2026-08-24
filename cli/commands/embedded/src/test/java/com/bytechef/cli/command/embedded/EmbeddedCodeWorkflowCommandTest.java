@@ -53,7 +53,7 @@ class EmbeddedCodeWorkflowCommandTest {
     }
 
     @Test
-    void testListHitsThePlatformAdminSurfaceNotTheEmbeddedConnectedUserSurface() throws Exception {
+    void testListHitsTheCarvedOutSurfaceNotTheEmbeddedConnectedUserSurface() throws Exception {
         try (StubApi stub = StubApi.start(200, "[]")) {
             int code = CliApplication.execute(new String[] {
                 "embedded", "code-workflow", "list", "--host", stub.host(), "--token", "btc_x", "--environment",
@@ -63,8 +63,8 @@ class EmbeddedCodeWorkflowCommandTest {
             assertEquals(0, code);
             assertTrue(
                 stub.lastPath()
-                    .startsWith("/api/platform/v1/automation-project-code-workflows"),
-                "expected path /api/platform/v1/automation-project-code-workflows but was " + stub.lastPath());
+                    .startsWith("/api/embedded/v1/automation-project-code-workflows"),
+                "expected path /api/embedded/v1/automation-project-code-workflows but was " + stub.lastPath());
         }
     }
 }

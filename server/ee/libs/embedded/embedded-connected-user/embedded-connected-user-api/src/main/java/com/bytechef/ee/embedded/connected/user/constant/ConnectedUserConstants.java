@@ -47,8 +47,8 @@ public final class ConnectedUserConstants {
      * the segment stays reserved so a stale caller of the old URL is rejected at authentication instead of minting.
      */
     public static final Set<String> FRONTEND_RESERVED_PATH_SEGMENTS = Set.of(
-        "app-events", "automation", "components", "connections", "external", "integration-instances", "integrations",
-        "me", "unified", "workflows");
+        "app-events", "automation", "automation-project-code-workflows", "components", "connections", "external",
+        "integration-instances", "integrations", "me", "unified", "workflows");
 
     private ConnectedUserConstants() {
     }

@@ -96,9 +96,13 @@ inbound-call model doesn't fit a CLI.
 
 ## Embedded code-workflow commands
 
-Deploy-once, reference-per-user catalog projects (the admin-only counterpart to the connected-user-scoped
-`embedded integration`/`embedded workflow` commands above). These hit `<host>/api/platform/v1/automation-project-code-workflows`
+Deploy-once, reference-per-user catalog projects (the tenant-wide counterpart to the connected-user-scoped
+`embedded integration`/`embedded workflow` commands above). These hit `<host>/api/embedded/v1/automation-project-code-workflows`
 authenticated with the profile's API token (configured via `bytechef configure --token ...`) — no `--external-user-id`.
+
+Unlike the other embedded commands, these two act for your own ByteChef user rather than for a connected
+user, so the profile token must be an **API Key whose owning user holds the admin authority**. An Admin
+API Key is rejected here — it is reserved for `/api/platform/v1`.
 
 ```bash
 bytechef embedded code-workflow deploy --file ./project.js
@@ -115,7 +119,7 @@ shared reference), and workflow templates. It deliberately does not reuse the em
 `getFrontendProjects` endpoint — that endpoint's connected-user auth converter incidentally treats
 a no-`--external-user-id` path as belonging to a connected user literally named `automation`,
 silently creating that phantom row per tenant/environment as a side effect. `list` instead stays on
-the same admin surface as `deploy`.
+the same carved-out surface as `deploy`.
 
 ## Component scaffolding
 

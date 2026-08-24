@@ -16,8 +16,8 @@
 
 package com.bytechef.cli.command.embedded;
 
-import com.bytechef.cli.client.embeddedconfigurationadmin.ApiException;
-import com.bytechef.cli.client.embeddedconfigurationadmin.model.AutomationProjectCodeWorkflowDeployResultModel;
+import com.bytechef.cli.client.embeddedconfiguration.ApiException;
+import com.bytechef.cli.client.embeddedconfiguration.model.AutomationProjectCodeWorkflowDeployResultModel;
 import com.bytechef.cli.core.config.CliConfig;
 import com.bytechef.cli.core.error.CliException;
 import com.bytechef.cli.core.output.OutputRenderer;
@@ -31,18 +31,24 @@ import org.springframework.shell.core.command.annotation.Option;
 
 /**
  * Commands for deploying and listing automation code workflows served through the embedded bridge (deploy-once,
- * reference-per-user catalog projects) -- the admin-only counterpart to the connected-user-scoped
+ * reference-per-user catalog projects) -- the tenant-wide counterpart to the connected-user-scoped
  * {@code embedded integration} commands.
  *
  * <p>
- * Both operations go through the {@code /api/platform/v1/**} admin surface (matched by
- * {@code PlatformApiKeySecurityConfigurer}), not the {@code /api/embedded/internal/**} surface used by the admin
- * console: the latter is matched by {@code EmbeddedApiKeySecurityConfigurer}'s connected-user auth, which requires a
- * {@code /v<n>/{externalUserId}/} path segment and grants zero authorities, so a plain profile Bearer token could never
- * satisfy the facade's {@code ROLE_ADMIN} guard through it. Listing deliberately does not reuse the embedded
- * public-rest {@code getFrontendProjects} endpoint either: its no-externalUserId path incidentally matches that same
- * connected-user auth converter's regex (capturing the literal segment {@code "automation"}), which silently fabricates
- * a phantom connected user per tenant/environment as a side effect.
+ * Both operations go through {@code /api/embedded/v1/automation-project-code-workflows}, not the
+ * {@code /api/embedded/internal/**} surface used by the admin console: the latter is matched by
+ * {@code EmbeddedApiKeySecurityConfigurer}'s connected-user auth, which requires a {@code /v<n>/{externalUserId}/} path
+ * segment and grants zero authorities, so a plain profile Bearer token could never satisfy the facade's
+ * {@code ROLE_ADMIN} guard through it. These two paths are carved out of that configurer by
+ * {@code EmbeddedPlatformUserApiKeySecurityConfigurer}, which authenticates the profile token as its own ByteChef user
+ * with that user's real authorities. The profile therefore needs an API Key whose owning user holds the admin
+ * authority; an Admin API Key is rejected, as it is reserved for {@code /api/platform/v1}.
+ *
+ * <p>
+ * Listing deliberately does not reuse the embedded public-rest {@code getFrontendProjects} endpoint: its
+ * no-externalUserId path incidentally matches that same connected-user auth converter's regex (capturing the literal
+ * segment {@code "automation"}), which silently fabricates a phantom connected user per tenant/environment as a side
+ * effect.
  *
  * @author Ivica Cardic
  */
@@ -73,7 +79,7 @@ public class EmbeddedCodeWorkflowCommand {
 
         try {
             AutomationProjectCodeWorkflowDeployResultModel result =
-                EmbeddedConfigurationClientFactory.automationProjectCodeWorkflowAdminApi(config)
+                EmbeddedConfigurationClientFactory.automationProjectCodeWorkflowApi(config)
                     .deployAutomationProjectCodeWorkflow(projectFile);
 
             System.out.println("Project deployed.");
@@ -104,7 +110,7 @@ public class EmbeddedCodeWorkflowCommand {
 
         try {
             new OutputRenderer(System.out).render(
-                EmbeddedConfigurationClientFactory.automationProjectCodeWorkflowAdminApi(config)
+                EmbeddedConfigurationClientFactory.automationProjectCodeWorkflowApi(config)
                     .listAutomationProjectCodeWorkflows(),
                 output);
         } catch (ApiException e) {

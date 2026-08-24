@@ -22,9 +22,9 @@ import com.bytechef.cli.core.error.CliException;
 import org.junit.jupiter.api.Test;
 
 /**
- * Pins the admin ({@code /api/platform/v1/**}) client's {@code toCliException} status-code mapping, which mirrors the
- * plain public-API client's mapping ({@code AutomationClientFactory}/the embedded connected-user client) -- including
- * the 404 branch that was previously missing on the internal client's overload.
+ * Pins the embedded-configuration client's {@code toCliException} status-code mapping, which mirrors
+ * {@code AutomationClientFactory}'s -- including the 404 branch that was once missing on the separate admin client's
+ * overload, before that client was folded into this one.
  *
  * @author Ivica Cardic
  */
@@ -33,7 +33,7 @@ class EmbeddedConfigurationClientFactoryTest {
     @Test
     void testToCliExceptionMapsUnauthorizedToExitCode2() {
         CliException exception = EmbeddedConfigurationClientFactory.toCliException(
-            new com.bytechef.cli.client.embeddedconfigurationadmin.ApiException(401, "Unauthorized"));
+            new com.bytechef.cli.client.embeddedconfiguration.ApiException(401, "Unauthorized"));
 
         assertEquals(2, exception.exitCode());
     }
@@ -41,7 +41,7 @@ class EmbeddedConfigurationClientFactoryTest {
     @Test
     void testToCliExceptionMapsForbiddenToExitCode2() {
         CliException exception = EmbeddedConfigurationClientFactory.toCliException(
-            new com.bytechef.cli.client.embeddedconfigurationadmin.ApiException(403, "Forbidden"));
+            new com.bytechef.cli.client.embeddedconfiguration.ApiException(403, "Forbidden"));
 
         assertEquals(2, exception.exitCode());
     }
@@ -49,7 +49,7 @@ class EmbeddedConfigurationClientFactoryTest {
     @Test
     void testToCliExceptionMapsNotFoundToExitCode3() {
         CliException exception = EmbeddedConfigurationClientFactory.toCliException(
-            new com.bytechef.cli.client.embeddedconfigurationadmin.ApiException(404, "Not Found"));
+            new com.bytechef.cli.client.embeddedconfiguration.ApiException(404, "Not Found"));
 
         assertEquals(3, exception.exitCode());
     }
@@ -57,7 +57,7 @@ class EmbeddedConfigurationClientFactoryTest {
     @Test
     void testToCliExceptionMapsOtherStatusToExitCode1() {
         CliException exception = EmbeddedConfigurationClientFactory.toCliException(
-            new com.bytechef.cli.client.embeddedconfigurationadmin.ApiException(500, "Server Error"));
+            new com.bytechef.cli.client.embeddedconfiguration.ApiException(500, "Server Error"));
 
         assertEquals(1, exception.exitCode());
     }

@@ -92,7 +92,6 @@ dependencies {
     implementation(project(":server:ee:libs:core:tenant:tenant-remote-rest"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-graphql"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-instance-impl"))
-    implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-admin-rest"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-public-rest"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-remote-rest"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-rest:embedded-configuration-rest-impl"))

@@ -5,15 +5,15 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.embedded.configuration.admin.web.rest;
+package com.bytechef.ee.embedded.configuration.public_.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.ee.embedded.configuration.admin.web.rest.model.AutomationProjectCodeWorkflowDeployResultModel;
-import com.bytechef.ee.embedded.configuration.admin.web.rest.model.AutomationWorkflowProjectModel;
-import com.bytechef.ee.embedded.configuration.admin.web.rest.model.AutomationWorkflowProjectWorkflowTemplateModel;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
 import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectCodeWorkflowFacade;
 import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectFacade;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationProjectCodeWorkflowDeployResultModel;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationProjectCodeWorkflowModel;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationProjectCodeWorkflowTemplateModel;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.security.constant.AuthorityConstants;
@@ -28,23 +28,25 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
- * Admin-API counterpart of {@code AutomationProjectCodeWorkflowApiController} (embedded internal). That internal
- * endpoint is reachable only through {@code EmbeddedApiKeySecurityConfigurer}'s connected-user auth, which requires a
- * {@code /v<n>/{externalUserId}/} path segment and grants zero authorities -- a plain API-key bearer token can never
- * satisfy the facade's {@code ROLE_ADMIN} guard through it.
+ * Token-authenticated counterpart of {@code AutomationProjectCodeWorkflowApiController} (embedded internal). That
+ * internal endpoint is reachable only through {@code EmbeddedApiKeySecurityConfigurer}'s connected-user auth, which
+ * requires a {@code /v<n>/{externalUserId}/} path segment and grants zero authorities -- a plain API-key bearer token
+ * can never satisfy the facade's {@code ROLE_ADMIN} guard through it.
  *
  * <p>
- * This controller is mounted on {@code /api/embedded/v1/**} alongside the rest of the embedded API, and carved out of
- * that connected-user configurer by {@code EmbeddedAdminApiKeySecurityConfigurer}, whose {@code PATH_PATTERN} the two
- * share. That configurer authenticates the bearer token as the key's own ByteChef user with their real Spring
- * authorities, and accepts admin API keys only -- these operations act on the whole tenant rather than on one workspace
- * or environment.
+ * This controller is mounted on {@code /api/embedded/v1/**} alongside the rest of the embedded public API, and carved
+ * out of that connected-user configurer by {@code EmbeddedPlatformUserApiKeySecurityConfigurer}, whose
+ * {@code PATH_PATTERN} the two share. That configurer authenticates the bearer token as the key's own ByteChef user
+ * with their real Spring authorities, and accepts a typed {@code AUTOMATION} or {@code EMBEDDED} key -- the admin key
+ * is reserved for the tenant-wide operations under {@code /api/platform/v1}.
  *
  * <p>
  * Deploying through here creates the same embedded relation as the internal endpoint: the resulting catalog
  * {@code Project} is resolved/created through {@code AutomationWorkflowProjectFacade}'s marker convention, so the
  * automation project stays hidden behind the embedded automation-workflow-project entity. Never expose {@code Project}
- * ids on this surface -- only embedded-entity identifiers are meant to reach embedded callers.
+ * ids on this surface -- only embedded-entity identifiers are meant to reach embedded callers. That is why
+ * {@link AutomationProjectCodeWorkflowModel} is mapped by hand here rather than reusing
+ * {@code AutomationWorkflowProjectMapper}, whose model carries the automation project id.
  *
  * <p>
  * Authorization note: the {@code ROLE_ADMIN} guard lives on
@@ -54,9 +56,9 @@ import org.springframework.web.multipart.MultipartFile;
  *
  * <p>
  * {@link #listAutomationProjectCodeWorkflows()} deliberately does not mirror
- * {@code AutomationWorkflowProjectApiController#getFrontendProjects} (embedded public-rest): that endpoint is matched
- * by {@code EmbeddedApiKeySecurityConfigurer}'s connected-user auth, whose externalUserId regex incidentally captures
- * the literal path segment {@code "automation"} for a no-externalUserId path and silently creates a phantom
+ * {@code AutomationWorkflowProjectApiController#getFrontendProjects}: that endpoint is matched by
+ * {@code EmbeddedApiKeySecurityConfigurer}'s connected-user auth, whose externalUserId regex incidentally captures the
+ * literal path segment {@code "automation"} for a no-externalUserId path and silently creates a phantom
  * {@code ConnectedUser} row per tenant/environment as a side effect. Listing here instead reuses
  * {@link AutomationWorkflowProjectFacade#getPublishedProjects()} directly, with no connected-user identity involved.
  * That facade method itself carries no {@code @PreAuthorize} -- it also backs the public connected-user catalog
@@ -68,17 +70,17 @@ import org.springframework.web.multipart.MultipartFile;
  *
  * @author Ivica Cardic
  */
-@RestController("com.bytechef.ee.embedded.configuration.admin.web.rest.AutomationProjectCodeWorkflowAdminApiController")
+@RestController("com.bytechef.ee.embedded.configuration.public_.web.rest.AutomationProjectCodeWorkflowApiController")
 @RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}/v1")
 @ConditionalOnCoordinator
 @ConditionalOnEEVersion
-public class AutomationProjectCodeWorkflowAdminApiController implements AutomationProjectCodeWorkflowAdminApi {
+public class AutomationProjectCodeWorkflowApiController implements AutomationProjectCodeWorkflowApi {
 
     private final AutomationWorkflowProjectCodeWorkflowFacade automationWorkflowProjectCodeWorkflowFacade;
     private final AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
 
     @SuppressFBWarnings("EI")
-    public AutomationProjectCodeWorkflowAdminApiController(
+    public AutomationProjectCodeWorkflowApiController(
         AutomationWorkflowProjectCodeWorkflowFacade automationWorkflowProjectCodeWorkflowFacade,
         AutomationWorkflowProjectFacade automationWorkflowProjectFacade) {
 
@@ -105,8 +107,8 @@ public class AutomationProjectCodeWorkflowAdminApiController implements Automati
 
     @Override
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
-    public ResponseEntity<List<AutomationWorkflowProjectModel>> listAutomationProjectCodeWorkflows() {
-        List<AutomationWorkflowProjectModel> models = automationWorkflowProjectFacade.getPublishedProjects()
+    public ResponseEntity<List<AutomationProjectCodeWorkflowModel>> listAutomationProjectCodeWorkflows() {
+        List<AutomationProjectCodeWorkflowModel> models = automationWorkflowProjectFacade.getPublishedProjects()
             .stream()
             .map(this::toModel)
             .toList();
@@ -114,19 +116,19 @@ public class AutomationProjectCodeWorkflowAdminApiController implements Automati
         return ResponseEntity.ok(models);
     }
 
-    private AutomationWorkflowProjectModel toModel(AutomationWorkflowProjectDTO project) {
-        List<AutomationWorkflowProjectWorkflowTemplateModel> workflowTemplateModels = project.workflowTemplates()
+    private AutomationProjectCodeWorkflowModel toModel(AutomationWorkflowProjectDTO project) {
+        List<AutomationProjectCodeWorkflowTemplateModel> workflowTemplateModels = project.workflowTemplates()
             .stream()
-            .map(workflowTemplate -> new AutomationWorkflowProjectWorkflowTemplateModel()
+            .map(workflowTemplate -> new AutomationProjectCodeWorkflowTemplateModel()
                 .label(workflowTemplate.label()))
             .toList();
 
-        return new AutomationWorkflowProjectModel()
+        return new AutomationProjectCodeWorkflowModel()
             .name(project.name())
             .kind(
                 project.codeWorkflowProject()
-                    ? AutomationWorkflowProjectModel.KindEnum.REFERENCE
-                    : AutomationWorkflowProjectModel.KindEnum.COPY)
+                    ? AutomationProjectCodeWorkflowModel.KindEnum.REFERENCE
+                    : AutomationProjectCodeWorkflowModel.KindEnum.COPY)
             .workflowTemplates(workflowTemplateModels);
     }
 }

@@ -3,6 +3,11 @@
 # /integration-instances/**, /integrations/**) is JWT-only by design -- add its literal first path segment to
 # ConnectedUserConstants.FRONTEND_RESERVED_PATH_SEGMENTS (embedded-connected-user-api) so
 # EmbeddedApiKeyAuthenticationConverter rejects non-JWT tokens on it instead of minting a phantom ConnectedUser.
+#
+# /automation-project-code-workflows/** is the one exception: it carries no {externalUserId} and is not JWT-only.
+# EmbeddedPlatformUserApiKeySecurityConfigurer claims it outright, so EmbeddedApiKeyAuthenticationConverter never runs
+# on it. Its segment is still in FRONTEND_RESERVED_PATH_SEGMENTS, so narrowing that carve-out cannot silently expose it
+# to a phantom ConnectedUser.
 openapi: "3.0.1"
 info:
   title: "The Embedded Public V1 API"
@@ -20,6 +25,8 @@ tags:
     description: "The Embedded Automation Workflow Project Public API"
   - name: "connected-user-project-workflow"
     description: "The Embedded Connected User Project Workflow Public API"
+  - name: "automation-project-code-workflow"
+    description: "The Embedded Automation Project Code Workflow Public API"
 paths:
   /automation/projects:
     get:
@@ -1917,8 +1924,93 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
       security:
         - bearerAuth: [ ]
+  /automation-project-code-workflows:
+    get:
+      description: "List catalog projects in the embedded automation bridge. Unlike the connected-user-scoped\
+        \ endpoints on this API, this operation is authenticated as the API key's own ByteChef user and does not\
+        \ fabricate a connected-user identity."
+      summary: "List catalog projects in the embedded automation bridge"
+      tags:
+        - "automation-project-code-workflow"
+      operationId: "listAutomationProjectCodeWorkflows"
+      responses:
+        "200":
+          description: "The list of automation workflow projects."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/AutomationProjectCodeWorkflow"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: [ ]
+  /automation-project-code-workflows/deploy:
+    post:
+      description: "Deploy a new automation code workflow into the embedded catalog. Unlike the connected-user-scoped\
+        \ endpoints on this API, this operation is authenticated as the API key's own ByteChef user and does not\
+        \ fabricate a connected-user identity."
+      summary: "Deploy a new automation code workflow into the embedded catalog"
+      tags:
+        - "automation-project-code-workflow"
+      operationId: "deployAutomationProjectCodeWorkflow"
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: "object"
+              properties:
+                projectFile:
+                  description: "The file of a code-native automation project."
+                  type: "string"
+                  format: "binary"
+        required: true
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AutomationProjectCodeWorkflowDeployResult"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: [ ]
 components:
   schemas:
+    AutomationProjectCodeWorkflowDeployResult:
+      type: "object"
+      properties:
+        warnings:
+          type: "array"
+          items:
+            type: "string"
+    AutomationProjectCodeWorkflow:
+      type: "object"
+      description: "An automation workflow catalog project, without the underlying automation project id."
+      properties:
+        name:
+          description: "The name of the automation workflow project."
+          type: "string"
+        kind:
+          description: "Whether copying this project's templates creates a per-user copy or a shared reference."
+          type: "string"
+          enum:
+            - "COPY"
+            - "REFERENCE"
+        workflowTemplates:
+          description: "The list of catalog workflow templates belonging to this project."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/AutomationProjectCodeWorkflowTemplate"
+    AutomationProjectCodeWorkflowTemplate:
+      type: "object"
+      description: "A catalog workflow template within an automation workflow project."
+      properties:
+        label:
+          description: "The label of the workflow."
+          type: "string"
     ConnectedUserProjectWorkflow:
       description: "A group of tasks that make one logical workflow."
       type: "object"

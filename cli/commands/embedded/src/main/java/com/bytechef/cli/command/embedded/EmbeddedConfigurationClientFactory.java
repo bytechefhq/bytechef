@@ -18,6 +18,7 @@ package com.bytechef.cli.command.embedded;
 
 import com.bytechef.cli.client.embeddedconfiguration.ApiClient;
 import com.bytechef.cli.client.embeddedconfiguration.ApiException;
+import com.bytechef.cli.client.embeddedconfiguration.api.AutomationProjectCodeWorkflowApi;
 import com.bytechef.cli.client.embeddedconfiguration.api.AutomationWorkflowProjectApi;
 import com.bytechef.cli.client.embeddedconfiguration.api.ConnectedUserApi;
 import com.bytechef.cli.client.embeddedconfiguration.api.ConnectedUserProjectWorkflowApi;
@@ -76,43 +77,11 @@ final class EmbeddedConfigurationClientFactory {
         return new ConnectedUserApi(apiClient(config));
     }
 
+    static AutomationProjectCodeWorkflowApi automationProjectCodeWorkflowApi(CliConfig config) {
+        return new AutomationProjectCodeWorkflowApi(apiClient(config));
+    }
+
     static CliException toCliException(ApiException exception) {
-        int status = exception.getCode();
-
-        if (status == 401 || status == 403) {
-            return new CliException(2, "Authentication failed (HTTP " + status + ").");
-        }
-
-        if (status == 404) {
-            return new CliException(3, "Not found (HTTP 404).");
-        }
-
-        return new CliException(1, "Request failed (HTTP " + status + ").");
-    }
-
-    /**
-     * Builds a client for the {@code /api/platform/v1/**} admin surface. This surface is matched by
-     * {@code PlatformApiKeySecurityConfigurer}, so a plain profile Bearer token reaches the facade with the underlying
-     * user's real authorities -- the same mechanism documented for {@code /api/platform/v1/custom-components/deploy}.
-     */
-    static com.bytechef.cli.client.embeddedconfigurationadmin.ApiClient platformApiClient(CliConfig config) {
-        com.bytechef.cli.client.embeddedconfigurationadmin.ApiClient apiClient =
-            new com.bytechef.cli.client.embeddedconfigurationadmin.ApiClient();
-
-        apiClient.updateBaseUri(AuthInterceptor.baseUri(config, "/api/platform/v1"));
-        apiClient.setRequestInterceptor(new AuthInterceptor(config));
-
-        return apiClient;
-    }
-
-    static com.bytechef.cli.client.embeddedconfigurationadmin.api.AutomationProjectCodeWorkflowAdminApi
-        automationProjectCodeWorkflowAdminApi(CliConfig config) {
-
-        return new com.bytechef.cli.client.embeddedconfigurationadmin.api.AutomationProjectCodeWorkflowAdminApi(
-            platformApiClient(config));
-    }
-
-    static CliException toCliException(com.bytechef.cli.client.embeddedconfigurationadmin.ApiException exception) {
         int status = exception.getCode();
 
         if (status == 401 || status == 403) {
