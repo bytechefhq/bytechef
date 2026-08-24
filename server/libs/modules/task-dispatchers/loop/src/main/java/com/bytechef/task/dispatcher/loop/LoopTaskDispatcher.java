@@ -95,7 +95,7 @@ public class LoopTaskDispatcher extends ErrorHandlingTaskDispatcher implements T
 
         taskExecution = taskExecutionService.update(taskExecution);
 
-        if (loopForever || !items.isEmpty()) {
+        if (!iterateeWorkflowTasks.isEmpty() && (loopForever || !items.isEmpty())) {
             WorkflowTask iterateeWorkflowTask = iterateeWorkflowTasks.getFirst();
 
             TaskExecution subTaskExecution = TaskExecution.builder()
