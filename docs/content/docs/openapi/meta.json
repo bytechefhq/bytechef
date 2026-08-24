@@ -5,9 +5,6 @@
   "root": true,
   "pages": [
     "index",
-    "--- Automation ---",
-    "automation-project-code-workflow",
-    "automation-project-git",
     "--- Embedded ---",
     "embedded-action",
     "embedded-tool",
@@ -19,8 +16,6 @@
     "embedded-configuration-connected-user-project-workflow",
     "embedded-configuration-automation-workflow-project",
     "embedded-webhook-app-event-trigger",
-    "embedded-webhook-request-trigger",
-    "--- Platform ---",
-    "custom-components"
+    "embedded-webhook-request-trigger"
   ]
 }
