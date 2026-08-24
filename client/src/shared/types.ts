@@ -208,6 +208,7 @@ export type NodeDataType = {
     conditionId?: string;
     connectionId?: number;
     description?: string;
+    disabled?: boolean;
     displayConditions?: {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         [key: string]: any;
@@ -219,6 +220,13 @@ export type NodeDataType = {
     graphData?: GraphDataType;
     graphId?: string;
     icon?: ReactNode;
+    /**
+     * Set only on the execution-detail read-only canvas: whether this node is disabled or sits
+     * under a disabled ancestor, computed once in `useLayout.tsx` from the executed workflow
+     * version's tasks (that canvas has no live store-backed workflow to derive it from at
+     * render time the way `WorkflowNode.tsx` does via `useDisabledTaskNames`).
+     */
+    isEffectivelyDisabled?: boolean;
     isNestedClusterRoot?: boolean;
     label?: string;
     loopBreakData?: LoopBreakDataType;
@@ -328,6 +336,7 @@ export type WorkflowTaskType = {
     ] & {
         [key: string]: ComponentConnectionType;
     };
+    disabled?: boolean;
     finalize?: Array<WorkflowTaskType>;
     label?: string;
     maxRetries?: number;

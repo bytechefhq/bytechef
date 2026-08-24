@@ -299,6 +299,38 @@ describe('saveWorkflowDefinition', () => {
             // Should not call mutate when no changes detected and no operationName
             expect(mutation.mutate).not.toHaveBeenCalled();
         });
+
+        it('should preserve the disabled flag when saving an already-disabled task', async () => {
+            mockWorkflowState = makeWorkflowState([
+                {
+                    disabled: true,
+                    name: 'httpClient_1',
+                    parameters: {url: 'http://old.com'},
+                    type: 'httpClient/v1/get',
+                },
+            ]);
+            const mutation = makeMutation();
+
+            await saveWorkflowDefinition({
+                nodeData: {
+                    componentName: 'httpClient',
+                    disabled: true,
+                    name: 'httpClient_1',
+                    operationName: 'get',
+                    parameters: {url: 'http://new.com'},
+                    type: 'httpClient/v1/get',
+                    version: 1,
+                } as unknown as NodeDataType,
+                updateWorkflowMutation: mutation,
+            });
+
+            expect(mutation.mutate).toHaveBeenCalledOnce();
+
+            const mutateArgs = (mutation.mutate as ReturnType<typeof vi.fn>).mock.calls[0][0];
+            const updatedDefinition = JSON.parse(mutateArgs.workflow.definition);
+
+            expect(updatedDefinition.tasks[0].disabled).toBe(true);
+        });
     });
 
     describe('mutation guard', () => {

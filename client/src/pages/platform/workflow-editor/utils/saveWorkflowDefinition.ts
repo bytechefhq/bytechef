@@ -57,6 +57,7 @@ export default async function saveWorkflowDefinition({
         clusterElements,
         componentName,
         description,
+        disabled,
         label,
         maxRetries,
         metadata,
@@ -112,6 +113,7 @@ export default async function saveWorkflowDefinition({
     const newTask: WorkflowTask = {
         clusterElements,
         description,
+        disabled,
         label,
         maxRetries,
         metadata,

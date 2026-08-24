@@ -979,11 +979,12 @@ export default function useWorkflowNodeDetailsPanel({
                 queryKey: WorkflowNodeOptionKeys.clusterElementNodeOptions,
             });
 
-            const {componentName, description, label, workflowNodeName} = currentNode;
+            const {componentName, description, disabled, label, workflowNodeName} = currentNode;
 
             const nodeData: NodeDataType = {
                 componentName,
                 description,
+                disabled,
                 label,
                 name: workflowNodeName || currentNode?.workflowNodeName || '',
                 operationName: newOperationName,
