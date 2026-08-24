@@ -1,9 +1,9 @@
-import {SPACE} from '@/shared/constants';
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {BranchCaseType, UpdateWorkflowMutationType} from '@/shared/types';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import {clearTaskPositions} from './clearAllNodePositions';
+import stringifyWorkflowDefinition from './stringifyWorkflowDefinition';
 import {
     drainPendingDefinitionMutation,
     hasPendingDefinition,
@@ -176,7 +176,7 @@ export default function removeWorkflowNodePosition({
 
     // Update the store's definition immediately so the layout effect
     // reads the correct positions when incrementLayoutResetCounter fires.
-    const updatedDefinitionStr = JSON.stringify(workflowDefinition, null, SPACE);
+    const updatedDefinitionStr = stringifyWorkflowDefinition(workflowDefinition);
 
     useWorkflowDataStore.setState((state) => ({
         workflow: {

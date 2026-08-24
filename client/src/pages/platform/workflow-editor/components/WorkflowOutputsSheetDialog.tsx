@@ -14,7 +14,6 @@ import {
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import PropertyMentionsInput from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInput';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
-import {SPACE} from '@/shared/constants';
 import {Workflow, WorkflowInput} from '@/shared/middleware/platform/configuration';
 import {WorkflowDefinitionType} from '@/shared/types';
 import {zodResolver} from '@hookform/resolvers/zod';
@@ -22,6 +21,8 @@ import {Editor} from '@tiptap/react';
 import {ReactNode, useRef, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {z} from 'zod';
+
+import stringifyWorkflowDefinition from '../utils/stringifyWorkflowDefinition';
 
 const formSchema = z.object({
     name: z.string().min(2, {
@@ -83,14 +84,10 @@ const WorkflowOutputsSheetDialog = ({
             {
                 id: workflow.id!,
                 workflow: {
-                    definition: JSON.stringify(
-                        {
-                            ...workflowDefinition,
-                            outputs,
-                        },
-                        null,
-                        SPACE
-                    ),
+                    definition: stringifyWorkflowDefinition({
+                        ...workflowDefinition,
+                        outputs,
+                    }),
                     version: workflow.version,
                 },
             },

@@ -416,7 +416,14 @@ describe('saveWorkflowDefinition', () => {
 
             const mutateArgs = (mutation.mutate as ReturnType<typeof vi.fn>).mock.calls[0][0];
 
-            expect(mutateArgs.workflow.definition).not.toContain('"connections"');
+            const savedDefinition = JSON.parse(mutateArgs.workflow.definition);
+            const savedConditionTask = savedDefinition.tasks.find(
+                (task: {name: string}) => task.name === 'condition_1'
+            );
+            const savedNestedTask = savedConditionTask.parameters.caseTrue[0];
+
+            expect(savedNestedTask.name).toBe('condition_2');
+            expect(savedNestedTask).not.toHaveProperty('connections');
         });
 
         it('should convert definition connections maps into DTO connections arrays', async () => {
