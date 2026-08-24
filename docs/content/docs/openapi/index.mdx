@@ -3,11 +3,11 @@ title: API Reference
 description: Public REST APIs you can call from your application — generated from ByteChef's OpenAPI specifications.
 ---
 
-ByteChef exposes six public REST APIs for use from your own applications:
+ByteChef exposes five public REST APIs for use from your own applications:
 
 **Automation**
 
-- **[Workflow Executions](/openapi/automation-workflow-execution)** — fetch a workspace's workflow executions, and a single execution with its full detail.
+- **Workflow Executions** — fetch a workspace's workflow executions, and a single execution with its full detail. No reference page yet; its spec is not wired into the docs build.
 - **[Projects](/openapi/automation-project-code-workflow)** — deploy a code-based project (CI/CD-style integration).
 - **[Git](/openapi/automation-project-git)** — pull a project from its configured git repository.
 
@@ -15,8 +15,8 @@ ByteChef exposes six public REST APIs for use from your own applications:
 
 - **[Actions](/openapi/embedded-action)** — execute a component action for a connected user.
 - **[Tools](/openapi/embedded-tool)** — list a connected user's available tools, and execute one.
-- **[Workflow Executions](/openapi/embedded-workflow-execution)** — fetch a tenant's workflow executions.
-- **[Tool Invocations](/openapi/embedded-tool-invocation)** — fetch a connected user's tool and action invocation history.
+- **Workflow Executions** — fetch a tenant's workflow executions. Served by the internal API rather than a public spec, so it has no reference page; read executions in the ByteChef admin UI.
+- **Tool Invocations** — fetch a connected user's tool and action invocation history. No public spec yet, so it has no reference page.
 - **[Integrations](/openapi/embedded-configuration-integration)** — the integrations available to your customers.
 - **[Integration Instances](/openapi/embedded-configuration-integration-instance)** — a connected user's instance of an integration.
 - **[Instance Workflows](/openapi/embedded-configuration-integration-instance-workflow)** — enable, disable and configure an instance's workflows.
@@ -26,7 +26,7 @@ ByteChef exposes six public REST APIs for use from your own applications:
 - **[Workflow Catalog](/openapi/embedded-configuration-automation-workflow-project)** — the catalog projects available to connected users.
 - **[App Events](/openapi/embedded-webhook-app-event-trigger)** — fire an App Event to start every subscribed workflow.
 - **[Request Trigger](/openapi/embedded-webhook-request-trigger)** — execute a single workflow synchronously and return its result.
-- **[Automation Bridge](/openapi/automation-bridge)** — deploy a code-native automation project into the embedded catalog. *Coming soon*.
+- **Automation Bridge** — deploy a code-native automation project into the embedded catalog. *Coming soon*, along with its reference page.
 
 **Platform**
 

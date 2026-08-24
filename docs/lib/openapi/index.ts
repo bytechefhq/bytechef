@@ -26,12 +26,6 @@ export const SPECS = {
   ),
   // Not a *-public-rest module: this one carries both openapi.yaml (public, bearer only) and
   // openapi-internal.yaml (session-authenticated, admin console). Wire the public one only.
-  // Also /api/platform/v1, and likewise not a *-public-rest module: the embedded automation bridge's
-  // admin surface, reachable with a bearer token rather than a connected-user identity.
-  'automation-bridge': path.join(
-    SPECS_ROOT,
-    'embedded/embedded-configuration/embedded-configuration-admin-rest/openapi.yaml',
-  ),
   'custom-components': path.join(
     SPECS_ROOT,
     'platform/platform-custom-component/platform-custom-component-configuration/platform-custom-component-configuration-rest/openapi.yaml',
