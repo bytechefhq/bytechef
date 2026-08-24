@@ -34,6 +34,8 @@ import tools.jackson.databind.json.JsonMapper;
 /**
  * Covers duplicate node-name detection across the task-dispatcher nesting shapes, complementing the top-level checks in
  * {@link WorkflowValidatorTest}.
+ *
+ * @author Marko Kriskovic
  */
 class WorkflowValidatorDuplicateNodeNamesTest {
 

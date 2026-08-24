@@ -101,7 +101,7 @@ public class WorkflowValidator {
         Map<String, List<String>> clusterTypesMap, StringBuilder errors, StringBuilder warnings) {
 
         try {
-            validateWorkflowStructure(workflow, errors);
+            validateWorkflowStructure(workflow, errors, warnings);
 
             JsonNode workflowJsonNode = com.bytechef.commons.util.JsonUtils.readTree(workflow);
 
@@ -113,7 +113,7 @@ public class WorkflowValidator {
             List<JsonNode> inputJsonNodes = new ArrayList<>();
             List<JsonNode> taskJsonNodes = new ArrayList<>();
 
-            processInputs(taskOutputMap, workflowJsonNode, inputJsonNodes, errors);
+            processInputs(taskOutputMap, workflowJsonNode, inputJsonNodes, errors, warnings);
             processTriggers(
                 taskDefinitionProvider, taskOutputProvider, taskDefinitionMap, taskOutputMap, warnings,
                 workflowJsonNode, taskJsonNodes);
@@ -182,7 +182,7 @@ public class WorkflowValidator {
         String task, TaskDefinitionProvider taskDefinitionProvider, StringBuilder errors, StringBuilder warnings) {
 
         try {
-            TaskValidator.validateTaskStructure(task, errors);
+            TaskValidator.validateTaskStructure(task, errors, warnings);
 
             JsonNode taskJsonNode = com.bytechef.commons.util.JsonUtils.readTree(task);
 
@@ -348,7 +348,7 @@ public class WorkflowValidator {
             taskOutputPropertyInfoMap.put(type, nestedTaskOutput);
         }
 
-        TaskValidator.validateTaskStructure(nestedTaskJsonNode.toString(), errors);
+        TaskValidator.validateTaskStructure(nestedTaskJsonNode.toString(), errors, warnings);
 
         return type;
     }
@@ -474,7 +474,7 @@ public class WorkflowValidator {
 
     private static void processInputs(
         Map<String, @Nullable PropertyInfo> taskOutputMap, JsonNode workflowJsonNode, List<JsonNode> inputJsonNodes,
-        StringBuilder errors) {
+        StringBuilder errors, StringBuilder warnings) {
 
         JsonNode inputsJsonNode = workflowJsonNode.get("inputs");
 
@@ -497,7 +497,7 @@ public class WorkflowValidator {
 
             inputJsonNodes.add(inputJsonNode);
 
-            validateInputFields(inputJsonNode, errors);
+            validateInputFields(inputJsonNode, errors, warnings);
 
             JsonNode typeJsonNode = inputJsonNode.get("type");
             JsonNode nameJsonNode = inputJsonNode.get("name");
@@ -516,7 +516,9 @@ public class WorkflowValidator {
         }
     }
 
-    private static void validateInputFields(JsonNode inputJsonNode, StringBuilder errors) {
+    private static void validateInputFields(
+        JsonNode inputJsonNode, StringBuilder errors, StringBuilder warnings) {
+
         String name = "";
 
         if (inputJsonNode.has("name")) {
@@ -529,8 +531,8 @@ public class WorkflowValidator {
 
         String prefix = name.isEmpty() ? "" : "[" + name + "] ";
 
-        FieldValidator.appendErrorRequiredStringField(inputJsonNode, "name", errors);
-        FieldValidator.appendErrorRequiredStringField(inputJsonNode, "label", errors);
+        FieldValidator.validateRequiredStringField(inputJsonNode, "name", errors);
+        FieldValidator.validateOptionalStringField(inputJsonNode, "label", errors, warnings);
 
         if (!inputJsonNode.has("type")) {
             StringUtils.appendWithNewline(prefix + "Missing required field: type", errors);
@@ -721,8 +723,9 @@ public class WorkflowValidator {
      *
      * @param workflow the workflow JSON string to validate
      * @param errors   StringBuilder to collect validation errors
+     * @param warnings StringBuilder to collect validation warnings
      */
-    static void validateWorkflowStructure(String workflow, StringBuilder errors) {
+    static void validateWorkflowStructure(String workflow, StringBuilder errors, StringBuilder warnings) {
         JsonNode workflowJsonNode = JsonNodeUtils.parseJsonWithErrorHandling(workflow, errors);
 
         if (workflowJsonNode == null) {
@@ -733,8 +736,8 @@ public class WorkflowValidator {
             return;
         }
 
-        FieldValidator.appendErrorRequiredStringField(workflowJsonNode, "label", errors);
-        FieldValidator.appendErrorRequiredStringField(workflowJsonNode, "description", errors);
+        FieldValidator.validateOptionalStringField(workflowJsonNode, "label", errors, warnings);
+        FieldValidator.validateRequiredStringField(workflowJsonNode, "description", errors);
         validateWorkflowTriggerFields(workflowJsonNode, errors);
         validateRequiredArrayField(workflowJsonNode, errors);
 

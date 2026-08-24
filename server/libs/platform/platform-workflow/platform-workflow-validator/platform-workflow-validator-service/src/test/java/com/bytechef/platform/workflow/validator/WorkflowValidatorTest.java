@@ -546,7 +546,7 @@ class WorkflowValidatorTest {
 
         StringBuilder errors = new StringBuilder();
 
-        TaskValidator.validateTaskStructure(invalidTask, errors);
+        TaskValidator.validateTaskStructure(invalidTask, errors, new StringBuilder());
 
         String string = errors.toString();
 
@@ -565,7 +565,7 @@ class WorkflowValidatorTest {
             """;
         StringBuilder errors = new StringBuilder();
 
-        TaskValidator.validateTaskStructure(invalidTask, errors);
+        TaskValidator.validateTaskStructure(invalidTask, errors, new StringBuilder());
 
         String string = errors.toString();
 
@@ -589,7 +589,7 @@ class WorkflowValidatorTest {
 
         StringBuilder errors = new StringBuilder();
 
-        TaskValidator.validateTaskStructure(invalidTask, errors);
+        TaskValidator.validateTaskStructure(invalidTask, errors, new StringBuilder());
 
         String string = errors.toString();
 
@@ -597,7 +597,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskStructureMissingLabelAddsError() {
+    void validateTaskStructureMissingLabelAddsWarning() {
         String invalidTask = """
             {
                 "name": "testTask",
@@ -607,10 +607,12 @@ class WorkflowValidatorTest {
             """;
 
         StringBuilder errors = new StringBuilder();
+        StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskStructure(invalidTask, errors);
+        TaskValidator.validateTaskStructure(invalidTask, errors, warnings);
 
-        assertEquals("[testTask] Missing required field: label", errors.toString());
+        assertEquals("", errors.toString());
+        assertEquals("[testTask] Missing recommended field: label", warnings.toString());
     }
 
     @Test
@@ -625,7 +627,7 @@ class WorkflowValidatorTest {
 
         StringBuilder errors = new StringBuilder();
 
-        TaskValidator.validateTaskStructure(invalidTask, errors);
+        TaskValidator.validateTaskStructure(invalidTask, errors, new StringBuilder());
 
         assertEquals("[testTask] Missing required field: type", errors.toString());
     }
@@ -642,7 +644,7 @@ class WorkflowValidatorTest {
 
         StringBuilder errors = new StringBuilder();
 
-        TaskValidator.validateTaskStructure(invalidTask, errors);
+        TaskValidator.validateTaskStructure(invalidTask, errors, new StringBuilder());
 
         assertEquals("Missing required field: name", errors.toString());
     }
@@ -660,7 +662,7 @@ class WorkflowValidatorTest {
 
         StringBuilder errors = new StringBuilder();
 
-        TaskValidator.validateTaskStructure(invalidTask, errors);
+        TaskValidator.validateTaskStructure(invalidTask, errors, new StringBuilder());
 
         assertEquals("[testTask] Field 'label' must be a string", errors.toString());
     }
@@ -678,7 +680,7 @@ class WorkflowValidatorTest {
 
         StringBuilder errors = new StringBuilder();
 
-        TaskValidator.validateTaskStructure(invalidTask, errors);
+        TaskValidator.validateTaskStructure(invalidTask, errors, new StringBuilder());
 
         assertEquals("Field 'name' must be a string", errors.toString());
     }
@@ -696,7 +698,7 @@ class WorkflowValidatorTest {
 
         StringBuilder errors = new StringBuilder();
 
-        TaskValidator.validateTaskStructure(invalidTask, errors);
+        TaskValidator.validateTaskStructure(invalidTask, errors, new StringBuilder());
 
         assertEquals("[testTask] Field 'type' must be a string", errors.toString());
     }
@@ -714,7 +716,7 @@ class WorkflowValidatorTest {
 
         StringBuilder errors = new StringBuilder();
 
-        TaskValidator.validateTaskStructure(validTask, errors);
+        TaskValidator.validateTaskStructure(validTask, errors, new StringBuilder());
 
         assertEquals("", errors.toString());
     }
@@ -732,7 +734,7 @@ class WorkflowValidatorTest {
 
         StringBuilder errors = new StringBuilder();
 
-        TaskValidator.validateTaskStructure(validTask, errors);
+        TaskValidator.validateTaskStructure(validTask, errors, new StringBuilder());
 
         assertEquals("", errors.toString());
     }
@@ -757,7 +759,7 @@ class WorkflowValidatorTest {
 
             StringBuilder errors = new StringBuilder();
 
-            TaskValidator.validateTaskStructure(validTask, errors);
+            TaskValidator.validateTaskStructure(validTask, errors, new StringBuilder());
 
             assertEquals("", errors.toString(), "Type should be valid: " + type);
         }
@@ -775,7 +777,7 @@ class WorkflowValidatorTest {
 
         StringBuilder errors = new StringBuilder();
 
-        TaskValidator.validateTaskStructure(invalidTask, errors);
+        TaskValidator.validateTaskStructure(invalidTask, errors, new StringBuilder());
 
         assertEquals("[testTask] Missing required field: parameters", errors.toString());
     }
@@ -793,7 +795,7 @@ class WorkflowValidatorTest {
 
         StringBuilder errors = new StringBuilder();
 
-        TaskValidator.validateTaskStructure(invalidTask, errors);
+        TaskValidator.validateTaskStructure(invalidTask, errors, new StringBuilder());
 
         assertEquals("[testTask] Field 'parameters' must be an object", errors.toString());
     }
@@ -804,7 +806,7 @@ class WorkflowValidatorTest {
 
         StringBuilder errors = new StringBuilder();
 
-        TaskValidator.validateTaskStructure(invalidTask, errors);
+        TaskValidator.validateTaskStructure(invalidTask, errors, new StringBuilder());
 
         assertEquals("Task must be an object", errors.toString());
     }
@@ -2621,7 +2623,7 @@ class WorkflowValidatorTest {
 
         StringBuilder errors = new StringBuilder();
 
-        WorkflowValidator.validateWorkflowStructure(validWorkflow, errors);
+        WorkflowValidator.validateWorkflowStructure(validWorkflow, errors, new StringBuilder());
 
         assertEquals("", errors.toString());
     }
@@ -2646,13 +2648,13 @@ class WorkflowValidatorTest {
 
         StringBuilder errors = new StringBuilder();
 
-        WorkflowValidator.validateWorkflowStructure(validWorkflow, errors);
+        WorkflowValidator.validateWorkflowStructure(validWorkflow, errors, new StringBuilder());
 
         assertEquals("", errors.toString());
     }
 
     @Test
-    void validateWorkflowStructureMissingLabelAddsError() {
+    void validateWorkflowStructureMissingLabelAddsWarning() {
         String invalidWorkflow = """
             {
                 "description": "workflowDescription",
@@ -2669,10 +2671,12 @@ class WorkflowValidatorTest {
             """;
 
         StringBuilder errors = new StringBuilder();
+        StringBuilder warnings = new StringBuilder();
 
-        WorkflowValidator.validateWorkflowStructure(invalidWorkflow, errors);
+        WorkflowValidator.validateWorkflowStructure(invalidWorkflow, errors, warnings);
 
-        assertEquals("Missing required field: label", errors.toString());
+        assertEquals("", errors.toString());
+        assertEquals("Missing recommended field: label", warnings.toString());
     }
 
     @Test
@@ -2695,7 +2699,7 @@ class WorkflowValidatorTest {
 
         StringBuilder errors = new StringBuilder();
 
-        WorkflowValidator.validateWorkflowStructure(invalidWorkflow, errors);
+        WorkflowValidator.validateWorkflowStructure(invalidWorkflow, errors, new StringBuilder());
 
         assertEquals("Field 'label' must be a string", errors.toString());
     }
@@ -2719,7 +2723,7 @@ class WorkflowValidatorTest {
 
         StringBuilder errors = new StringBuilder();
 
-        WorkflowValidator.validateWorkflowStructure(invalidWorkflow, errors);
+        WorkflowValidator.validateWorkflowStructure(invalidWorkflow, errors, new StringBuilder());
 
         assertEquals("Missing required field: description", errors.toString());
     }
@@ -2744,7 +2748,7 @@ class WorkflowValidatorTest {
 
         StringBuilder errors = new StringBuilder();
 
-        WorkflowValidator.validateWorkflowStructure(invalidWorkflow, errors);
+        WorkflowValidator.validateWorkflowStructure(invalidWorkflow, errors, new StringBuilder());
 
         assertEquals("Field 'description' must be a string", errors.toString());
     }
@@ -2762,7 +2766,7 @@ class WorkflowValidatorTest {
 
         StringBuilder errors = new StringBuilder();
 
-        WorkflowValidator.validateWorkflowStructure(invalidWorkflow, errors);
+        WorkflowValidator.validateWorkflowStructure(invalidWorkflow, errors, new StringBuilder());
 
         assertEquals("Missing required field: triggers", errors.toString());
     }
@@ -2781,7 +2785,7 @@ class WorkflowValidatorTest {
 
         StringBuilder errors = new StringBuilder();
 
-        WorkflowValidator.validateWorkflowStructure(invalidWorkflow, errors);
+        WorkflowValidator.validateWorkflowStructure(invalidWorkflow, errors, new StringBuilder());
 
         assertEquals("Field 'triggers' must be an array", errors.toString());
     }
@@ -2811,7 +2815,7 @@ class WorkflowValidatorTest {
 
         StringBuilder errors = new StringBuilder();
 
-        WorkflowValidator.validateWorkflowStructure(workflow, errors);
+        WorkflowValidator.validateWorkflowStructure(workflow, errors, new StringBuilder());
 
         assertEquals("", errors.toString());
     }
@@ -2832,7 +2836,7 @@ class WorkflowValidatorTest {
 
         StringBuilder errors = new StringBuilder();
 
-        WorkflowValidator.validateWorkflowStructure(invalidWorkflow, errors);
+        WorkflowValidator.validateWorkflowStructure(invalidWorkflow, errors, new StringBuilder());
 
         assertEquals("Trigger must be an object", errors.toString());
     }
@@ -2856,7 +2860,7 @@ class WorkflowValidatorTest {
 
         StringBuilder errors = new StringBuilder();
 
-        WorkflowValidator.validateWorkflowStructure(invalidWorkflow, errors);
+        WorkflowValidator.validateWorkflowStructure(invalidWorkflow, errors, new StringBuilder());
 
         assertEquals("Missing required field: tasks", errors.toString());
     }
@@ -2881,7 +2885,7 @@ class WorkflowValidatorTest {
 
         StringBuilder errors = new StringBuilder();
 
-        WorkflowValidator.validateWorkflowStructure(invalidWorkflow, errors);
+        WorkflowValidator.validateWorkflowStructure(invalidWorkflow, errors, new StringBuilder());
 
         assertEquals("Field 'tasks' must be an array", errors.toString());
     }
@@ -2891,7 +2895,7 @@ class WorkflowValidatorTest {
         String invalidWorkflow = "\"not an object\"";
 
         StringBuilder errors = new StringBuilder();
-        WorkflowValidator.validateWorkflowStructure(invalidWorkflow, errors);
+        WorkflowValidator.validateWorkflowStructure(invalidWorkflow, errors, new StringBuilder());
 
         assertTrue(errors.toString()
             .contains("Workflow must be an object"));
@@ -2902,7 +2906,7 @@ class WorkflowValidatorTest {
         String invalidWorkflow = "{invalid json}";
 
         StringBuilder errors = new StringBuilder();
-        WorkflowValidator.validateWorkflowStructure(invalidWorkflow, errors);
+        WorkflowValidator.validateWorkflowStructure(invalidWorkflow, errors, new StringBuilder());
 
         String string = errors.toString();
 
@@ -2967,7 +2971,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateWorkflowTasksInvalidTaskStructureAddsError() {
+    void validateWorkflowTasksInvalidTaskStructureAddsWarning() {
         String tasksJson = """
             [
                 {
@@ -2997,8 +3001,8 @@ class WorkflowValidatorTest {
             WorkflowValidator.validateWorkflowTasks(
                 taskJsonNodes, taskDefinitionMap, taskOutputMap, new HashMap<>(), errors, warnings);
 
-            assertEquals("[testTask1] Missing required field: label", errors.toString());
-            assertEquals("", warnings.toString());
+            assertEquals("", errors.toString());
+            assertEquals("[testTask1] Missing recommended field: label", warnings.toString());
         } catch (Exception e) {
             fail("Should not throw exception: " + e.getMessage());
         }
@@ -3331,11 +3335,10 @@ class WorkflowValidatorTest {
             WorkflowValidator.validateWorkflowTasks(
                 taskJsonNodes, taskDefinitionMap, taskOutputMap, new HashMap<>(), errors, warnings);
 
-            assertEquals("""
-                [invalidTask] Missing required field: label
-                [invalidTask] Property 'age' has incorrect type. Expected: integer, but got: string""",
+            assertEquals(
+                "[invalidTask] Property 'age' has incorrect type. Expected: integer, but got: string",
                 errors.toString());
-            assertEquals("", warnings.toString());
+            assertEquals("[invalidTask] Missing recommended field: label", warnings.toString());
         } catch (Exception e) {
             fail("Should not throw exception: " + e.getMessage());
         }
@@ -3896,7 +3899,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateWorkflowInvalidStructureHasErrors() {
+    void validateWorkflowInvalidStructureHasWarnings() {
         String workflow = """
             {
                 "description": "Missing label",
@@ -3920,8 +3923,8 @@ class WorkflowValidatorTest {
         WorkflowValidator.validateWorkflow(workflow, taskDefProvider, taskOutputProvider, clusterTypesProvider,
             new HashMap<>(), new HashMap<>(), new HashMap<>(), errors, warnings);
 
-        assertEquals("Missing required field: label", errors.toString());
-        assertEquals("", warnings.toString());
+        assertEquals("", errors.toString());
+        assertEquals("Missing recommended field: label", warnings.toString());
     }
 
     @Test
@@ -4327,7 +4330,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateSingleTaskInvalidStructureHasErrors() {
+    void validateSingleTaskInvalidStructureHasWarnings() {
         String task = """
             {
                 "name": "test_task",
@@ -4343,8 +4346,8 @@ class WorkflowValidatorTest {
 
         WorkflowValidator.validateSingleTask(task, taskDefProvider, errors, warnings);
 
-        assertEquals("[test_task] Missing required field: label", errors.toString());
-        assertEquals("", warnings.toString());
+        assertEquals("", errors.toString());
+        assertEquals("[test_task] Missing recommended field: label", warnings.toString());
     }
 
     @Test

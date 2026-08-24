@@ -30,10 +30,26 @@ class FieldValidator {
     private FieldValidator() {
     }
 
+    public static void validateOptionalStringField(
+        JsonNode jsonNode, String fieldName, StringBuilder errors, StringBuilder warnings) {
+
+        if (!jsonNode.has(fieldName)) {
+            StringUtils.appendWithNewline("Missing recommended field: " + fieldName, warnings);
+
+            return;
+        }
+
+        JsonNode fieldJsonNode = jsonNode.get(fieldName);
+
+        if (!fieldJsonNode.isTextual()) {
+            StringUtils.appendWithNewline("Field '" + fieldName + "' must be a string", errors);
+        }
+    }
+
     /**
      * Validates that a required string field exists and is of correct type.
      */
-    public static void appendErrorRequiredStringField(JsonNode jsonNode, String fieldName, StringBuilder errors) {
+    public static void validateRequiredStringField(JsonNode jsonNode, String fieldName, StringBuilder errors) {
         if (!jsonNode.has(fieldName)) {
             StringUtils.appendWithNewline("Missing required field: " + fieldName, errors);
         } else {
