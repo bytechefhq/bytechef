@@ -94,7 +94,11 @@ public class WorkflowTrigger implements Serializable, Trigger {
     }
 
     public Map<String, ?> evaluateParameters(Map<String, ?> context, Evaluator evaluator) {
-        WorkflowTrigger workflowTrigger = new WorkflowTrigger(evaluator.evaluate(toMap(), context));
+        return evaluateParameters(context, evaluator, false);
+    }
+
+    public Map<String, ?> evaluateParameters(Map<String, ?> context, Evaluator evaluator, boolean lenient) {
+        WorkflowTrigger workflowTrigger = new WorkflowTrigger(evaluator.evaluate(toMap(), context, lenient));
 
         return workflowTrigger.getParameters();
     }

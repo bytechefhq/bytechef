@@ -108,7 +108,11 @@ public class WorkflowTask implements Task, Serializable {
     }
 
     public Map<String, ?> evaluateParameters(Map<String, ?> context, Evaluator evaluator) {
-        WorkflowTask workflowTask = new WorkflowTask(evaluator.evaluate(toMap(), context));
+        return evaluateParameters(context, evaluator, false);
+    }
+
+    public Map<String, ?> evaluateParameters(Map<String, ?> context, Evaluator evaluator, boolean lenient) {
+        WorkflowTask workflowTask = new WorkflowTask(evaluator.evaluate(toMap(), context, lenient));
 
         return workflowTask.getParameters();
     }
