@@ -1,0 +1,57 @@
+---
+title: Failures and Retries
+description: What the engine does when a step fails — the retry it performs on its own, the error branch you can author, and what is not available from your product.
+---
+
+When a step in a connected user's workflow fails, the engine does not give up immediately. Knowing exactly what it does — and what it does not — is what lets you tell a customer whether a failure was transient or final.
+
+## What happens on a failed step
+
+1. The step is marked failed and, if it has retries left, **the engine re-dispatches it**.
+2. Each retry increments the attempt count and waits longer than the last.
+3. When retries are exhausted, the failure propagates: parent steps are marked failed and the run ends as **`FAILED`**.
+4. Unless the step sits inside an **on-error** branch, in which case that branch runs instead and the workflow continues.
+
+A run ends in one of five states: `CREATED`, `STARTED`, `COMPLETED`, `FAILED`, `STOPPED`.
+
+## Retries
+
+Retries are **off by default**. A step retries only if its workflow task sets `maxRetries`:
+
+```json
+{
+  "label": "Create contact",
+  "name": "createContact",
+  "type": "hubspot/v1/createContact",
+  "maxRetries": 3
+}
+```
+
+The delay between attempts grows with each one — roughly two seconds, then four, then six. That backoff is fixed: `maxRetries` is the only retry setting a workflow definition can express, so the delay is not tunable per step.
+
+<Callout type="warn" title="Retry re-runs the step, not the workflow">
+    A retry re-dispatches that one step with the same input. Steps that already succeeded do not run again. This makes retries safe for a failed write only if the step itself is idempotent — a retried "create" against a provider that does not deduplicate can produce two records.
+</Callout>
+
+Retries suit transient faults: a provider timeout, a 5xx, a rate-limit rejection. They do not help with bad input or a revoked credential, which will fail identically every attempt and only delay the final failure.
+
+## Error branches
+
+For failures you want to handle rather than retry, wrap the step in an **on-error** branch. The error is captured and the branch runs, so the workflow can notify someone, write a fallback record, or exit cleanly instead of ending as `FAILED`. This is authored in the workflow itself and applies to every connected user running that workflow.
+
+## What your product can see
+
+Every attempt is recorded. A run's execution history shows each step with its inputs, outputs, and the error that failed it, including the retried attempts — so "it failed three times two seconds apart" is visible rather than inferred. See [Workflow Executions](/platform/embedded/monitor/workflow-executions).
+
+## What is not available yet
+
+<Callout type="warn" title="No replay from your product">
+    There is no embedded endpoint to re-run a failed execution. ByteChef can restart a job internally, but that surface is not part of the embedded API, so you cannot offer your customers a "retry this run" button. Today the options are to have the trigger fire again, or to author retries into the workflow up front.
+</Callout>
+
+Two related gaps worth planning around:
+
+- **No failure notifications.** Nothing pushes an alert when a connected user's run fails — no webhook, no email, no destination you can point at Slack or a monitoring tool. To notify your customers, poll executions and raise the alert in your own product.
+- **No automatic retry policy.** Retries are per-step and authored into the workflow. There is no deployment-wide or per-customer policy that retries failures you did not anticipate.
+
+Both are on the roadmap; neither is configurable today.
