@@ -380,6 +380,45 @@ describe('saveWorkflowDefinition', () => {
     });
 
     describe('optimistic update', () => {
+        it('should strip array shaped connections left in the definition by earlier client versions', async () => {
+            mockWorkflowState = makeWorkflowState([
+                {
+                    name: 'condition_1',
+                    parameters: {
+                        caseFalse: [],
+                        caseTrue: [
+                            {
+                                connections: [],
+                                finalize: [],
+                                name: 'condition_2',
+                                parameters: {caseFalse: [], caseTrue: []},
+                                post: [],
+                                pre: [],
+                                type: 'condition/v1',
+                            },
+                        ],
+                    },
+                    type: 'condition/v1',
+                },
+            ]);
+
+            const mutation = makeMutation();
+
+            await saveWorkflowDefinition({
+                nodeData: {
+                    componentName: 'httpClient',
+                    name: 'httpClient_1',
+                    operationName: 'get',
+                    version: 1,
+                } as unknown as NodeDataType,
+                updateWorkflowMutation: mutation,
+            });
+
+            const mutateArgs = (mutation.mutate as ReturnType<typeof vi.fn>).mock.calls[0][0];
+
+            expect(mutateArgs.workflow.definition).not.toContain('"connections"');
+        });
+
         it('should convert definition connections maps into DTO connections arrays', async () => {
             mockWorkflowState = makeWorkflowState([
                 {
