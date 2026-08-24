@@ -341,7 +341,7 @@ class WorkflowValidatorInputsTest {
     }
 
     @Test
-    void validateWorkflowMissingInputLabelHasErrors() {
+    void validateWorkflowMissingInputLabelHasWarnings() {
         String workflow = """
             {
                 "label": "Test Workflow",
@@ -372,8 +372,8 @@ class WorkflowValidatorInputsTest {
         WorkflowValidator.validateWorkflow(workflow, taskDefProvider, taskOutputProvider, clusterTypesProvider,
             new HashMap<>(), new HashMap<>(), new HashMap<>(), errors, warnings);
 
-        assertEquals("Missing required field: label", errors.toString());
-        assertEquals("", warnings.toString());
+        assertEquals("", errors.toString());
+        assertEquals("Missing recommended field: label", warnings.toString());
     }
 
     @Test

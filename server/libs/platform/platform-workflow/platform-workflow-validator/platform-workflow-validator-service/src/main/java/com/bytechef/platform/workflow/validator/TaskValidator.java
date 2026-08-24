@@ -66,7 +66,7 @@ class TaskValidator {
             int errorsStart = errors.length();
             int warningsStart = warnings.length();
 
-            validateTaskStructureFields(taskJsonNode, errors);
+            validateTaskStructureFields(taskJsonNode, errors, warnings);
 
             List<PropertyInfo> taskDefinition = validateTaskParameters(taskJsonNode, context);
 
@@ -212,8 +212,9 @@ class TaskValidator {
      *
      * @param taskJson the task JSON string to validate
      * @param errors   StringBuilder to collect validation errors
+     * @param warnings StringBuilder to collect validation warnings
      */
-    public static void validateTaskStructure(String taskJson, StringBuilder errors) {
+    public static void validateTaskStructure(String taskJson, StringBuilder errors, StringBuilder warnings) {
         JsonNode taskJsonNode = JsonNodeUtils.parseJsonWithErrorHandling(taskJson, errors);
 
         if (taskJsonNode == null) {
@@ -235,17 +236,21 @@ class TaskValidator {
         }
 
         int errorsStart = errors.length();
+        int warningsStart = warnings.length();
 
-        validateTaskStructureFields(taskJsonNode, errors);
+        validateTaskStructureFields(taskJsonNode, errors, warnings);
 
         if (!taskName.isEmpty()) {
             prefixTaskMessages(errors, errorsStart, taskName);
+            prefixTaskMessages(warnings, warningsStart, taskName);
         }
     }
 
-    private static void validateTaskStructureFields(JsonNode taskJsonNode, StringBuilder errors) {
-        FieldValidator.appendErrorRequiredStringField(taskJsonNode, "label", errors);
-        FieldValidator.appendErrorRequiredStringField(taskJsonNode, "name", errors);
+    private static void validateTaskStructureFields(
+        JsonNode taskJsonNode, StringBuilder errors, StringBuilder warnings) {
+
+        FieldValidator.validateOptionalStringField(taskJsonNode, "label", errors, warnings);
+        FieldValidator.validateRequiredStringField(taskJsonNode, "name", errors);
         appendErrorTaskTypeField(taskJsonNode, errors);
         appendErrorRequiredObjectField(taskJsonNode, errors);
     }
@@ -253,7 +258,9 @@ class TaskValidator {
     /**
      * Validates an array containing TASK objects.
      */
-    public static void validateTaskArray(JsonNode arrayValueJsonNode, String propertyPath, StringBuilder errors) {
+    public static void validateTaskArray(
+        JsonNode arrayValueJsonNode, String propertyPath, StringBuilder errors, StringBuilder warnings) {
+
         for (int i = 0; i < arrayValueJsonNode.size(); i++) {
             JsonNode taskJsonNode = arrayValueJsonNode.get(i);
             String path = propertyPath + "[" + i + "]";
@@ -263,7 +270,7 @@ class TaskValidator {
 
                 StringUtils.appendWithNewline(ValidationErrorUtils.typeError(path, "object", actualType), errors);
             } else {
-                validateTaskStructureFields(taskJsonNode, errors);
+                validateTaskStructureFields(taskJsonNode, errors, warnings);
 
                 if (taskJsonNode.has("parameters") && taskJsonNode.has("type")) {
                     JsonNode parametersJsonNode = taskJsonNode.get("parameters");
@@ -337,12 +344,6 @@ class TaskValidator {
 
             String type = typeJsonNode.asString();
 
-            List<String> taskNames = context.getTaskNames();
-
-            if (!taskNames.contains(name)) {
-                taskNames.add(name);
-            }
-
             Map<String, JsonNode> allTasksMap = context.getAllTasksMap();
 
             allTasksMap.put(name, nestedTaskJsonNode);
@@ -350,6 +351,39 @@ class TaskValidator {
             Map<String, String> taskNameToTypeMap = context.getTaskNameToTypeMap();
 
             taskNameToTypeMap.put(name, type);
+        }
+    }
+
+    private static void appendErrorRequiredObjectField(JsonNode jsonNode, StringBuilder errors) {
+        if (!jsonNode.has("parameters")) {
+            StringUtils.appendWithNewline("Missing required field: " + "parameters", errors);
+        } else {
+            JsonNode fieldJsonNode = jsonNode.get("parameters");
+
+            if (!fieldJsonNode.isObject()) {
+                StringUtils.appendWithNewline("Field '" + "parameters" + "' must be an object", errors);
+            }
+        }
+    }
+
+    private static void appendErrorTaskTypeField(JsonNode taskJsonNode, StringBuilder errors) {
+        if (!taskJsonNode.has("type")) {
+            StringUtils.appendWithNewline("Missing required field: type", errors);
+        } else {
+            JsonNode typeJsonNode = taskJsonNode.get("type");
+
+            if (!typeJsonNode.isString()) {
+                StringUtils.appendWithNewline("Field 'type' must be a string", errors);
+            } else {
+                String typeValue = typeJsonNode.asString();
+
+                Matcher matcher = TYPE_PATTERN.matcher(typeValue);
+
+                if (!matcher.matches()) {
+                    StringUtils.appendWithNewline(
+                        "Field 'type' must match pattern: (alphanumeric|-)+/v(numeric)+(/(alphanumeric)+)?", errors);
+                }
+            }
         }
     }
 
@@ -363,6 +397,23 @@ class TaskValidator {
         for (PropertyInfo propertyInfo : taskDefinition) {
             processTaskArrayProperty(parametersJsonNode, propertyInfo, context);
         }
+    }
+
+    @Nullable
+    private static List<PropertyInfo> getObjectItemProperties(PropertyInfo propertyInfo) {
+        List<PropertyInfo> propertyInfos = propertyInfo.nestedProperties();
+
+        if (!"ARRAY".equalsIgnoreCase(propertyInfo.type()) || propertyInfos == null || propertyInfos.size() != 1) {
+            return null;
+        }
+
+        PropertyInfo propertyInfosFirst = propertyInfos.getFirst();
+
+        if (!"OBJECT".equalsIgnoreCase(propertyInfosFirst.type())) {
+            return null;
+        }
+
+        return propertyInfosFirst.nestedProperties();
     }
 
     /**
@@ -446,18 +497,10 @@ class TaskValidator {
         }
     }
 
-    /**
-     * Processes a single property that might contain nested tasks. Part of Chain of Responsibility pattern.
-     */
     private static void processTaskArrayProperty(
         JsonNode parametersJsonNode, PropertyInfo propertyInfo, ValidationContext context) {
 
         String propertyName = propertyInfo.name();
-
-        // Check if this is a TASK type array
-        if (!isTaskTypeArray(propertyInfo)) {
-            return;
-        }
 
         JsonNode jsonNode = parametersJsonNode.get(propertyName);
 
@@ -465,7 +508,23 @@ class TaskValidator {
             return;
         }
 
-        processNestedTaskArray(jsonNode, context);
+        if (isTaskTypeArray(propertyInfo)) {
+            processNestedTaskArray(jsonNode, context);
+
+            return;
+        }
+
+        List<PropertyInfo> itemPropertyInfos = getObjectItemProperties(propertyInfo);
+
+        if (itemPropertyInfos == null) {
+            return;
+        }
+
+        for (JsonNode itemJsonNode : jsonNode) {
+            if (itemJsonNode.isObject()) {
+                findAndValidateNestedTasks(itemJsonNode, itemPropertyInfos, context);
+            }
+        }
     }
 
     private static void validateDataPills(
@@ -480,7 +539,7 @@ class TaskValidator {
      * Validates the structure of a nested task.
      */
     private static void validateTaskStructure(JsonNode nestedTaskJsonNode, ValidationContext context) {
-        validateTaskStructureFields(nestedTaskJsonNode, context.getErrors());
+        validateTaskStructureFields(nestedTaskJsonNode, context.getErrors(), context.getWarnings());
     }
 
     /**
@@ -524,23 +583,6 @@ class TaskValidator {
             nestedTaskJsonNode, context, nestedTaskDefinition, true);
     }
 
-    /**
-     * Validates that a required object field exists and is of correct type.
-     */
-    private static void
-        appendErrorRequiredObjectField(JsonNode jsonNode, StringBuilder errors) {
-        if (!jsonNode.has("parameters")) {
-            StringUtils.appendWithNewline("Missing required field: " + "parameters", errors);
-        } else {
-            JsonNode fieldJsonNode = jsonNode.get("parameters");
-
-            if (!fieldJsonNode.isObject()) {
-                StringUtils.appendWithNewline(
-                    "Field '" + "parameters" + "' must be an object", errors);
-            }
-        }
-    }
-
     @Nullable
     private static List<PropertyInfo> validateTaskParameters(JsonNode taskJsonNode, ValidationContext context) {
         JsonNode typeJsonNode = taskJsonNode.get("type");
@@ -563,29 +605,5 @@ class TaskValidator {
         }
 
         return taskDefinition;
-    }
-
-    /**
-     * Validates task type field against required pattern.
-     */
-    private static void appendErrorTaskTypeField(JsonNode taskJsonNode, StringBuilder errors) {
-        if (!taskJsonNode.has("type")) {
-            StringUtils.appendWithNewline("Missing required field: type", errors);
-        } else {
-            JsonNode typeJsonNode = taskJsonNode.get("type");
-
-            if (!typeJsonNode.isString()) {
-                StringUtils.appendWithNewline("Field 'type' must be a string", errors);
-            } else {
-                String typeValue = typeJsonNode.asString();
-
-                Matcher matcher = TYPE_PATTERN.matcher(typeValue);
-
-                if (!matcher.matches()) {
-                    StringUtils.appendWithNewline(
-                        "Field 'type' must match pattern: (alphanumeric|-)+/v(numeric)+(/(alphanumeric)+)?", errors);
-                }
-            }
-        }
     }
 }

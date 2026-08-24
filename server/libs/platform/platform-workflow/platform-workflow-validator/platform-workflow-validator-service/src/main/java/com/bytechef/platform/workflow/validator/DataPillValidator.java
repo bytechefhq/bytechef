@@ -286,7 +286,7 @@ class DataPillValidator {
                     warnings, context, text, allTasksMap, taskDefinition, rootParametersJsonNode);
             } else {
                 validateTaskReference(
-                    dataPillExpression, fieldPath, taskOutput, taskNames, taskNameToTypeMap, errors, taskDefinition,
+                    dataPillExpression, fieldPath, taskOutput, allTasksMap, taskNameToTypeMap, errors, taskDefinition,
                     rootParametersJsonNode);
             }
         }
@@ -558,11 +558,11 @@ class DataPillValidator {
     }
 
     private static void validateTaskReference(
-        String dataPillExpression, String fieldPath, Map<String, PropertyInfo> taskOutput, List<String> taskNames,
-        Map<String, String> taskNameToTypeMap, StringBuilder errors, List<PropertyInfo> taskDefinition,
-        JsonNode rootParametersJsonNode) {
+        String dataPillExpression, String fieldPath, Map<String, PropertyInfo> taskOutput,
+        Map<String, JsonNode> allTasksMap, Map<String, String> taskNameToTypeMap, StringBuilder errors,
+        List<PropertyInfo> taskDefinition, JsonNode rootParametersJsonNode) {
 
-        if (!taskNames.contains(dataPillExpression)) {
+        if (!allTasksMap.containsKey(dataPillExpression)) {
             StringUtils.appendWithNewline("Task '" + dataPillExpression + "' doesn't exits.", errors);
 
             return;
