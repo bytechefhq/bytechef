@@ -21,8 +21,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.security.ProjectVisibilityFilter;
 import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
 import com.bytechef.automation.configuration.service.ResourceVisibilityResolver.VisibilityRecord;
 import com.bytechef.platform.security.domain.ResourceVisibility;
@@ -50,8 +52,13 @@ class ProjectSearchAssetProviderTest {
         when(projectService.getProjects(false, null, null, null, null, null))
             .thenReturn(List.of(project(VISIBLE_PROJECT_ID), project(HIDDEN_PROJECT_ID)));
 
+        ProjectWorkflowService projectWorkflowService = mock(ProjectWorkflowService.class);
+
+        when(projectWorkflowService.getLatestProjectWorkflows()).thenReturn(List.of());
+
         ProjectSearchAssetProvider projectSearchAssetProvider = new ProjectSearchAssetProvider(
-            projectService, new ProjectVisibilityFilter(objectProvider(visibleOnly(VISIBLE_PROJECT_ID))));
+            projectService, new ProjectVisibilityFilter(objectProvider(visibleOnly(VISIBLE_PROJECT_ID))),
+            projectWorkflowService);
 
         List<ProjectSearchResult> projectSearchResults = projectSearchAssetProvider.search("project", 10);
 
@@ -66,18 +73,77 @@ class ProjectSearchAssetProviderTest {
         when(projectService.getProjects(false, null, null, null, null, null))
             .thenReturn(List.of(project(VISIBLE_PROJECT_ID), project(HIDDEN_PROJECT_ID)));
 
+        ProjectWorkflowService projectWorkflowService = mock(ProjectWorkflowService.class);
+
+        when(projectWorkflowService.getLatestProjectWorkflows()).thenReturn(List.of());
+
         ProjectSearchAssetProvider projectSearchAssetProvider = new ProjectSearchAssetProvider(
             projectService,
             new ProjectVisibilityFilter(
                 objectProvider(
                     (resourceType, workspaceId, candidates) -> candidates.stream()
                         .map(VisibilityRecord::id)
-                        .collect(Collectors.toSet()))));
+                        .collect(Collectors.toSet()))),
+            projectWorkflowService);
 
         List<ProjectSearchResult> projectSearchResults = projectSearchAssetProvider.search("project", 10);
 
         assertThat(projectSearchResults).extracting(ProjectSearchResult::id)
             .containsExactly(VISIBLE_PROJECT_ID, HIDDEN_PROJECT_ID);
+    }
+
+    @Test
+    void testResultCarriesTheFirstProjectWorkflowId() {
+        ProjectService projectService = mock(ProjectService.class);
+        ProjectVisibilityFilter projectVisibilityFilter = mock(ProjectVisibilityFilter.class);
+        ProjectWorkflowService projectWorkflowService = mock(ProjectWorkflowService.class);
+
+        Project project = mock(Project.class);
+
+        when(project.getId()).thenReturn(5L);
+        when(project.getName()).thenReturn("Billing");
+        when(project.getWorkspaceId()).thenReturn(10L);
+        when(projectService.getProjects(false, null, null, null, null, null)).thenReturn(List.of(project));
+        when(projectVisibilityFilter.filterVisible(List.of(project))).thenReturn(List.of(project));
+
+        ProjectWorkflow projectWorkflow = mock(ProjectWorkflow.class);
+
+        when(projectWorkflow.getId()).thenReturn(77L);
+        when(projectWorkflow.getProjectId()).thenReturn(5L);
+        when(projectWorkflowService.getLatestProjectWorkflows()).thenReturn(List.of(projectWorkflow));
+
+        ProjectSearchAssetProvider provider = new ProjectSearchAssetProvider(
+            projectService, projectVisibilityFilter, projectWorkflowService);
+
+        List<ProjectSearchResult> results = provider.search("bill", 10);
+
+        assertThat(results).singleElement()
+            .extracting(ProjectSearchResult::projectWorkflowId)
+            .isEqualTo(77L);
+    }
+
+    @Test
+    void testProjectWorkflowIdIsNullWhenTheProjectHasNoWorkflows() {
+        ProjectService projectService = mock(ProjectService.class);
+        ProjectVisibilityFilter projectVisibilityFilter = mock(ProjectVisibilityFilter.class);
+        ProjectWorkflowService projectWorkflowService = mock(ProjectWorkflowService.class);
+
+        Project project = mock(Project.class);
+
+        when(project.getId()).thenReturn(5L);
+        when(project.getName()).thenReturn("Billing");
+        when(projectService.getProjects(false, null, null, null, null, null)).thenReturn(List.of(project));
+        when(projectVisibilityFilter.filterVisible(List.of(project))).thenReturn(List.of(project));
+        when(projectWorkflowService.getLatestProjectWorkflows()).thenReturn(List.of());
+
+        ProjectSearchAssetProvider provider = new ProjectSearchAssetProvider(
+            projectService, projectVisibilityFilter, projectWorkflowService);
+
+        List<ProjectSearchResult> results = provider.search("bill", 10);
+
+        assertThat(results).singleElement()
+            .extracting(ProjectSearchResult::projectWorkflowId)
+            .isNull();
     }
 
     @SuppressWarnings("unchecked")

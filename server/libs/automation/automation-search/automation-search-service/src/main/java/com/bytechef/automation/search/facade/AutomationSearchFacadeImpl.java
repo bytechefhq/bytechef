@@ -19,6 +19,7 @@ package com.bytechef.automation.search.facade;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.search.SearchAssetProvider;
+import com.bytechef.automation.search.SearchAssetType;
 import com.bytechef.automation.search.SearchResult;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.tenant.TenantContext;
@@ -28,6 +29,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -55,7 +57,7 @@ public class AutomationSearchFacadeImpl implements AutomationSearchFacade {
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<SearchResult<?>> search(String query, int limit) {
+    public List<SearchResult<?>> search(String query, int limit, @Nullable Set<SearchAssetType> types) {
         List<CompletableFuture<List<SearchResult<?>>>> futures = new ArrayList<>();
 
         String currentTenantId = TenantContext.getCurrentTenantId();
@@ -69,7 +71,15 @@ public class AutomationSearchFacadeImpl implements AutomationSearchFacade {
         // Resolved once here rather than per provider — the answer is the same for every one of them.
         Set<Long> accessibleWorkspaceIds = getAccessibleWorkspaceIds();
 
-        for (SearchAssetProvider provider : providers) {
+        // Filtered before the fan-out, not after: a type-scoped sub-mode (e.g. "Open workflow") must only query the
+        // providers it needs, not query every provider and discard the rest.
+        List<SearchAssetProvider> requestedProviders = types == null || types.isEmpty()
+            ? providers
+            : providers.stream()
+                .filter(provider -> types.contains(provider.getAssetType()))
+                .toList();
+
+        for (SearchAssetProvider provider : requestedProviders) {
             CompletableFuture<List<SearchResult<?>>> future = CompletableFuture.supplyAsync(() -> {
                 SecurityContextHolder.setContext(securityContext);
 

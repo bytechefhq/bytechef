@@ -28,6 +28,8 @@ import com.bytechef.automation.search.SearchResult;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -72,13 +74,68 @@ class AutomationSearchFacadeImplTest {
         AutomationSearchFacadeImpl facade = new AutomationSearchFacadeImpl(
             List.of(provider), userService, workspaceFacade);
 
-        List<SearchResult<?>> results = facade.search("q", 10);
+        List<SearchResult<?>> results = facade.search("q", 10, null);
 
         List<Object> ids = results.stream()
             .map(searchResult -> (Object) searchResult.id())
             .toList();
 
         assertThat(ids).containsExactlyInAnyOrder(1L, 3L);
+    }
+
+    @Test
+    void testOnlyRequestedTypeProvidersAreCalled() {
+        UserService userService = mock(UserService.class);
+        WorkspaceFacade workspaceFacade = mock(WorkspaceFacade.class);
+
+        User user = mock(User.class);
+
+        when(user.getId()).thenReturn(1L);
+        when(userService.getCurrentUser()).thenReturn(user);
+
+        Workspace accessible = mock(Workspace.class);
+
+        when(accessible.getId()).thenReturn(10L);
+        when(workspaceFacade.getUserWorkspaces(1L)).thenReturn(List.of(accessible));
+
+        AtomicBoolean connectionProviderCalled = new AtomicBoolean();
+
+        SearchAssetProvider workflowProvider = new RecordingProvider(SearchAssetType.WORKFLOW, new AtomicBoolean());
+        SearchAssetProvider connectionProvider = new RecordingProvider(
+            SearchAssetType.CONNECTION, connectionProviderCalled);
+
+        AutomationSearchFacadeImpl facade = new AutomationSearchFacadeImpl(
+            List.of(workflowProvider, connectionProvider), userService, workspaceFacade);
+
+        facade.search("q", 10, Set.of(SearchAssetType.WORKFLOW));
+
+        assertThat(connectionProviderCalled).isFalse();
+    }
+
+    @Test
+    void testNullTypesMeansEveryProvider() {
+        UserService userService = mock(UserService.class);
+        WorkspaceFacade workspaceFacade = mock(WorkspaceFacade.class);
+
+        User user = mock(User.class);
+
+        when(user.getId()).thenReturn(1L);
+        when(userService.getCurrentUser()).thenReturn(user);
+
+        Workspace accessible = mock(Workspace.class);
+
+        when(accessible.getId()).thenReturn(10L);
+        when(workspaceFacade.getUserWorkspaces(1L)).thenReturn(List.of(accessible));
+
+        AtomicBoolean connectionProviderCalled = new AtomicBoolean();
+
+        AutomationSearchFacadeImpl facade = new AutomationSearchFacadeImpl(
+            List.of(new RecordingProvider(SearchAssetType.CONNECTION, connectionProviderCalled)), userService,
+            workspaceFacade);
+
+        facade.search("q", 10, null);
+
+        assertThat(connectionProviderCalled).isTrue();
     }
 
     private record TestResult(Long id, Long workspaceId) implements SearchResult<Long> {
@@ -96,6 +153,21 @@ class AutomationSearchFacadeImplTest {
         @Override
         public SearchAssetType type() {
             return SearchAssetType.WORKFLOW;
+        }
+    }
+
+    private record RecordingProvider(SearchAssetType assetType, AtomicBoolean called) implements SearchAssetProvider {
+
+        @Override
+        public List<? extends SearchResult> search(String query, int limit) {
+            called.set(true);
+
+            return List.of();
+        }
+
+        @Override
+        public SearchAssetType getAssetType() {
+            return assetType;
         }
     }
 }

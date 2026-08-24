@@ -78,7 +78,7 @@ class AutomationSearchFacadeSecurityContextTest {
         // and CompletableFuture.allOf(...).join() rethrows it out of search(). The other half is that the filtering
         // still happened — the colleague's PRIVATE project is decided by comparing its owner to the principal the
         // pooled thread was handed, so a context that arrived empty could not have excluded it either.
-        List<SearchResult<?>> searchResults = automationSearchFacade.search("project", 10);
+        List<SearchResult<?>> searchResults = automationSearchFacade.search("project", 10, null);
 
         List<Object> ids = searchResults.stream()
             .map(searchResult -> (Object) searchResult.id())

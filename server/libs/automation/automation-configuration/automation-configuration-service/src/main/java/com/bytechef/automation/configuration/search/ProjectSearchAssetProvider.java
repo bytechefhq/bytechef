@@ -17,13 +17,17 @@
 package com.bytechef.automation.configuration.search;
 
 import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.domain.SystemProjects;
 import com.bytechef.automation.configuration.security.ProjectVisibilityFilter;
 import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.search.SearchAssetProvider;
 import com.bytechef.automation.search.SearchAssetType;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 /**
@@ -34,10 +38,15 @@ class ProjectSearchAssetProvider implements SearchAssetProvider {
 
     private final ProjectService projectService;
     private final ProjectVisibilityFilter projectVisibilityFilter;
+    private final ProjectWorkflowService projectWorkflowService;
 
-    ProjectSearchAssetProvider(ProjectService projectService, ProjectVisibilityFilter projectVisibilityFilter) {
+    ProjectSearchAssetProvider(
+        ProjectService projectService, ProjectVisibilityFilter projectVisibilityFilter,
+        ProjectWorkflowService projectWorkflowService) {
+
         this.projectService = projectService;
         this.projectVisibilityFilter = projectVisibilityFilter;
+        this.projectWorkflowService = projectWorkflowService;
     }
 
     @Override
@@ -50,6 +59,12 @@ class ProjectSearchAssetProvider implements SearchAssetProvider {
                 .filter(project -> !SystemProjects.isSystemProject(project))
                 .toList());
 
+        Map<Long, Long> projectIdToProjectWorkflowId = projectWorkflowService.getLatestProjectWorkflows()
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    ProjectWorkflow::getProjectId, ProjectWorkflow::getId, (first, second) -> first));
+
         return projects.stream()
             .filter(
                 project -> containsIgnoreCase(project.getName(), queryLower) ||
@@ -57,7 +72,8 @@ class ProjectSearchAssetProvider implements SearchAssetProvider {
             .limit(limit)
             .map(
                 project -> new ProjectSearchResult(
-                    project.getId(), project.getName(), project.getDescription(), project.getWorkspaceId()))
+                    project.getId(), project.getName(), project.getDescription(),
+                    projectIdToProjectWorkflowId.get(project.getId()), project.getWorkspaceId()))
             .toList();
     }
 
