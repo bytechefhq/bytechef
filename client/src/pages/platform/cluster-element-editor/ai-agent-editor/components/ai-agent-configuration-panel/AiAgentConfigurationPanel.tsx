@@ -1,5 +1,6 @@
 import AiAgentModelSelectField from '@/pages/platform/cluster-element-editor/ai-agent-editor/components/ai-agent-configuration-panel/components/AiAgentModelSelectField';
 import AiAgentPromptField from '@/pages/platform/cluster-element-editor/ai-agent-editor/components/ai-agent-configuration-panel/components/AiAgentPromptField';
+import AiAgentStreamResponseField from '@/pages/platform/cluster-element-editor/ai-agent-editor/components/ai-agent-configuration-panel/components/AiAgentStreamResponseField';
 import AiAgentTools from '@/pages/platform/cluster-element-editor/ai-agent-editor/components/ai-agent-configuration-panel/components/AiAgentTools';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import {useShallow} from 'zustand/shallow';
@@ -42,6 +43,8 @@ export function AiAgentConfigurationPanel() {
             <h2 className="font-medium">Configuration</h2>
 
             <AiAgentModelSelectField />
+
+            <AiAgentStreamResponseField />
 
             {PROMPT_FIELDS.map((field) => (
                 <AiAgentPromptField
