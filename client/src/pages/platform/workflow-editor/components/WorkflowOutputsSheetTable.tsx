@@ -12,13 +12,13 @@ import {
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import WorkflowOutputsSheetDialog from '@/pages/platform/workflow-editor/components/WorkflowOutputsSheetDialog';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
-import {SPACE} from '@/shared/constants';
 import {Workflow, WorkflowInput} from '@/shared/middleware/platform/configuration';
 import {WorkflowDefinitionType} from '@/shared/types';
 import {CableIcon, EditIcon, Trash2Icon} from 'lucide-react';
 import {useState} from 'react';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
+import stringifyWorkflowDefinition from '../utils/stringifyWorkflowDefinition';
 import WorkflowOutputValue from './WorkflowOutputValue';
 
 const WorkflowOutputsSheetTable = ({workflow}: {workflow: Workflow}) => {
@@ -42,14 +42,10 @@ const WorkflowOutputsSheetTable = ({workflow}: {workflow: Workflow}) => {
         updateWorkflowMutation!.mutate({
             id: workflow.id!,
             workflow: {
-                definition: JSON.stringify(
-                    {
-                        ...definitionObject,
-                        outputs,
-                    },
-                    null,
-                    SPACE
-                ),
+                definition: stringifyWorkflowDefinition({
+                    ...definitionObject,
+                    outputs,
+                }),
                 version: workflow.version,
             },
         });

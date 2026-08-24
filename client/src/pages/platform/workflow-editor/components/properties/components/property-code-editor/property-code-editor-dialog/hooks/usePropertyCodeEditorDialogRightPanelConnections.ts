@@ -4,7 +4,7 @@ import {useConnectionNoteStore} from '@/pages/platform/workflow-editor/stores/us
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
-import {SPACE} from '@/shared/constants';
+import stringifyWorkflowDefinition from '@/pages/platform/workflow-editor/utils/stringifyWorkflowDefinition';
 import {ComponentConnection, Workflow} from '@/shared/middleware/platform/configuration';
 import {useGetWorkflowTestConfigurationConnectionsQuery} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
@@ -144,7 +144,7 @@ export const usePropertyCodeEditorDialogRightPanelConnections = ({
             };
         }
 
-        const definition = JSON.stringify(workflowDefinition, null, SPACE);
+        const definition = stringifyWorkflowDefinition(workflowDefinition);
 
         updateWorkflowMutation!.mutate(
             {
@@ -249,7 +249,7 @@ export const usePropertyCodeEditorDialogRightPanelConnections = ({
             };
         }
 
-        const definition = JSON.stringify(workflowDefinition, null, SPACE);
+        const definition = stringifyWorkflowDefinition(workflowDefinition);
 
         updateWorkflowMutation!.mutate(
             {
