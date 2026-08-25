@@ -782,6 +782,7 @@ include("server:ee:libs:platform:platform-ai:platform-ai-gateway:platform-ai-gat
 include("server:ee:libs:platform:platform-ai:platform-ai-gateway:platform-ai-gateway-service")
 include("server:ee:libs:platform:platform-ai:platform-ai-guardrails:platform-ai-guardrails-api")
 include("server:ee:libs:platform:platform-ai:platform-ai-guardrails:platform-ai-guardrails-graphql")
+include("server:ee:libs:platform:platform-ai:platform-ai-guardrails:platform-ai-guardrails-opennlp")
 include("server:ee:libs:platform:platform-ai:platform-ai-guardrails:platform-ai-guardrails-service")
 include("server:ee:libs:platform:platform-ai:platform-ai-model-catalog:platform-ai-model-catalog-api")
 include("server:ee:libs:platform:platform-ai:platform-ai-model-catalog:platform-ai-model-catalog-service")

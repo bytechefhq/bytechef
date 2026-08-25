@@ -21,6 +21,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -692,6 +693,7 @@ public class ApplicationProperties {
         private Copilot copilot = new Copilot();
         private Firecrawl firecrawl = new Firecrawl();
         private Gateway gateway = new Gateway();
+        private Guardrails guardrails = new Guardrails();
         private Hub hub = new Hub();
         private KnowledgeBase knowledgeBase = new KnowledgeBase();
         private Mcp mcp = new Mcp();
@@ -718,6 +720,10 @@ public class ApplicationProperties {
 
         public Gateway getGateway() {
             return gateway;
+        }
+
+        public Guardrails getGuardrails() {
+            return guardrails;
         }
 
         public Hub getHub() {
@@ -766,6 +772,10 @@ public class ApplicationProperties {
 
         public void setGateway(Gateway gateway) {
             this.gateway = gateway;
+        }
+
+        public void setGuardrails(Guardrails guardrails) {
+            this.guardrails = guardrails;
         }
 
         public void setHub(Hub hub) {
@@ -1404,6 +1414,62 @@ public class ApplicationProperties {
 
                 public void setProvider(String provider) {
                     this.provider = provider;
+                }
+            }
+        }
+
+        public static class Guardrails {
+
+            private OpenNlp openNlp = new OpenNlp();
+
+            public OpenNlp getOpenNlp() {
+                return openNlp;
+            }
+
+            public void setOpenNlp(OpenNlp openNlp) {
+                this.openNlp = openNlp;
+            }
+
+            public static class OpenNlp {
+
+                private boolean enabled;
+
+                private Map<String, String> entityModels = new LinkedHashMap<>();
+
+                private double minConfidence = 0.85;
+
+                private String tokenizerModel;
+
+                public boolean isEnabled() {
+                    return enabled;
+                }
+
+                public void setEnabled(boolean enabled) {
+                    this.enabled = enabled;
+                }
+
+                public Map<String, String> getEntityModels() {
+                    return entityModels;
+                }
+
+                public void setEntityModels(Map<String, String> entityModels) {
+                    this.entityModels = entityModels;
+                }
+
+                public double getMinConfidence() {
+                    return minConfidence;
+                }
+
+                public void setMinConfidence(double minConfidence) {
+                    this.minConfidence = minConfidence;
+                }
+
+                public String getTokenizerModel() {
+                    return tokenizerModel;
+                }
+
+                public void setTokenizerModel(String tokenizerModel) {
+                    this.tokenizerModel = tokenizerModel;
                 }
             }
         }
