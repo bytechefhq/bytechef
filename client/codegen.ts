@@ -89,6 +89,7 @@ const config: CodegenConfig = {
         '../server/ee/libs/embedded/embedded-configuration/embedded-configuration-graphql/src/main/resources/graphql/*.graphqls',
         '../server/ee/libs/embedded/embedded-connected-user/embedded-connected-user-graphql/src/main/resources/graphql/*.graphqls',
         '../server/ee/libs/embedded/embedded-ai/embedded-ai-mcp-graphql/src/main/resources/graphql/*.graphqls',
+        '../server/ee/libs/platform/platform-variable/platform-variable-graphql/src/main/resources/graphql/*.graphqls',
         '../server/ee/libs/platform/platform-ai/platform-ai-agent/platform-ai-agent-eval/platform-ai-agent-eval-graphql/src/main/resources/graphql/**/*.graphqls',
         '../server/libs/automation/automation-ai/automation-ai-auto-memory/automation-ai-auto-memory-graphql/src/main/resources/graphql/*.graphqls',
         '../server/libs/platform/platform-ai/platform-ai-skill/platform-ai-skill-graphql/src/main/resources/graphql/**/*.graphqls',

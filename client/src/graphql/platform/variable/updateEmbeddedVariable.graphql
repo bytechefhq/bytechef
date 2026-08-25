@@ -1,0 +1,7 @@
+mutation updateEmbeddedVariable($environmentId: ID!, $id: ID!, $input: VariableInput!) {
+    updateEmbeddedVariable(environmentId: $environmentId, id: $id, input: $input) {
+        id
+        name
+        value
+    }
+}

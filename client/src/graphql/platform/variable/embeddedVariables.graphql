@@ -1,0 +1,12 @@
+query embeddedVariables($environmentId: ID!) {
+    embeddedVariables(environmentId: $environmentId) {
+        id
+        name
+        value
+        environmentId
+        createdBy
+        createdDate
+        lastModifiedBy
+        lastModifiedDate
+    }
+}

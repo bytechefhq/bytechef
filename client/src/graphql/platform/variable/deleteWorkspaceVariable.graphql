@@ -1,0 +1,3 @@
+mutation deleteWorkspaceVariable($workspaceId: ID!, $environmentId: ID!, $id: ID!) {
+    deleteWorkspaceVariable(workspaceId: $workspaceId, environmentId: $environmentId, id: $id)
+}
