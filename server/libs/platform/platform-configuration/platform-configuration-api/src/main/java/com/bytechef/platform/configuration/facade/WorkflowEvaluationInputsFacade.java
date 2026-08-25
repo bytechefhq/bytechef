@@ -20,10 +20,9 @@ import java.util.Map;
 
 /**
  * The inputs half of the editor's evaluation context: the workflow's test-configuration inputs plus, when the EE
- * variables resolver is present, the {@code vars} snapshot — the same shape a real job's inputs have. Every
- * editor-side preview site (dynamic properties, options, descriptions, sample outputs, script previews, trigger
- * tests) concats this with previous-node sample outputs, so this is the single place that knows how {@code vars}
- * reaches previews.
+ * variables resolver is present, the {@code vars} snapshot — the same shape a real job's inputs have. Every editor-side
+ * preview site (dynamic properties, options, descriptions, sample outputs, script previews, trigger tests) concats this
+ * with previous-node sample outputs, so this is the single place that knows how {@code vars} reaches previews.
  *
  * @author Ivica Cardic
  */
