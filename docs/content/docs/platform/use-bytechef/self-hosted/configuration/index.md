@@ -119,7 +119,7 @@ them, so storage cost tracks the retention policy rather than growing without bo
 | [Environment variables](/platform/use-bytechef/self-hosted/configuration/environment-variables) | The complete, categorized reference for every setting and its default. |
 | [Message brokers](/platform/use-bytechef/self-hosted/configuration/message-brokers) | Choosing the broker that carries task dispatches between the coordinator and the workers. |
 | [File storage](/platform/use-bytechef/self-hosted/configuration/file-storage) | Where the opaque bytes a workflow produces are kept - S3, the filesystem, or the database. |
-| [Plan limits](/platform/use-bytechef/self-hosted/configuration/plan-limits) | Rate limits, concurrency slots, cost caps, and resource quotas per tenant. |
+| [Plan limits](/platform/use-bytechef/self-hosted/configuration/plan-limits) *(coming soon)* | Rate limits, concurrency slots, cost caps, and resource quotas per tenant. |
 
 ## Edition, tenancy, and sign-up
 
