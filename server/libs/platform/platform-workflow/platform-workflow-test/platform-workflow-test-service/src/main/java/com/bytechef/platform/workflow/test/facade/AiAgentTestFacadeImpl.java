@@ -26,6 +26,7 @@ import com.bytechef.platform.ai.util.TokenUsageHolder;
 import com.bytechef.platform.ai.util.TokenUsageHolder.TokenUsage;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
+import com.bytechef.platform.configuration.facade.WorkflowEvaluationInputsFacade;
 import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.definition.WorkflowNodeType;
@@ -45,6 +46,7 @@ public class AiAgentTestFacadeImpl implements AiAgentTestFacade {
     private final ActionDefinitionFacade actionDefinitionFacade;
     private final Evaluator evaluator;
     private final TempFileStorage tempFileStorage;
+    private final WorkflowEvaluationInputsFacade workflowEvaluationInputsFacade;
     private final WorkflowNodeOutputFacade workflowNodeOutputFacade;
     private final WorkflowService workflowService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
@@ -52,12 +54,14 @@ public class AiAgentTestFacadeImpl implements AiAgentTestFacade {
     @SuppressFBWarnings("EI")
     public AiAgentTestFacadeImpl(
         ActionDefinitionFacade actionDefinitionFacade, Evaluator evaluator, TempFileStorage tempFileStorage,
+        WorkflowEvaluationInputsFacade workflowEvaluationInputsFacade,
         WorkflowNodeOutputFacade workflowNodeOutputFacade, WorkflowService workflowService,
         WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         this.actionDefinitionFacade = actionDefinitionFacade;
         this.evaluator = evaluator;
         this.tempFileStorage = tempFileStorage;
+        this.workflowEvaluationInputsFacade = workflowEvaluationInputsFacade;
         this.workflowNodeOutputFacade = workflowNodeOutputFacade;
         this.workflowService = workflowService;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
@@ -99,8 +103,7 @@ public class AiAgentTestFacadeImpl implements AiAgentTestFacade {
             taskParameters.put(AiAgentSimulationConstants.TOOL_SIMULATIONS, toolSimulations);
         }
 
-        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
-            workflowId, environmentId);
+        Map<String, ?> inputs = workflowEvaluationInputsFacade.getEvaluationInputs(workflowId, environmentId);
 
         Map<String, ?> outputs = workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
             workflowId, workflowNodeName, environmentId);

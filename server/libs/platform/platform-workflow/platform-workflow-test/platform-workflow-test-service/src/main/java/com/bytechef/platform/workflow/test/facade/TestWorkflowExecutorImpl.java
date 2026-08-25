@@ -51,6 +51,7 @@ import com.bytechef.platform.configuration.service.WorkflowTestConfigurationServ
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.job.sync.SseStreamBridge;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
+import com.bytechef.platform.variable.WorkflowVariablesResolver;
 import com.bytechef.platform.workflow.JobInputConstants;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution.Status;
@@ -80,6 +81,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import tools.jackson.core.type.TypeReference;
 
 /**
@@ -102,6 +104,7 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
     private final WorkflowNodeOutputFacade workflowNodeOutputFacade;
     private final WorkflowService workflowService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
+    private final ObjectProvider<WorkflowVariablesResolver> workflowVariablesResolverObjectProvider;
 
     @SuppressFBWarnings("EI")
     public TestWorkflowExecutorImpl(
@@ -110,7 +113,8 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
         TaskDispatcherDefinitionService taskDispatcherDefinitionService,
         TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage, WorkflowService workflowService,
         WorkflowNodeOutputFacade workflowNodeOutputFacade,
-        WorkflowTestConfigurationService workflowTestConfigurationService) {
+        WorkflowTestConfigurationService workflowTestConfigurationService,
+        ObjectProvider<WorkflowVariablesResolver> workflowVariablesResolverObjectProvider) {
 
         this.componentDefinitionService = componentDefinitionService;
         this.contextService = contextService;
@@ -123,6 +127,7 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
         this.workflowService = workflowService;
         this.workflowNodeOutputFacade = workflowNodeOutputFacade;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
+        this.workflowVariablesResolverObjectProvider = workflowVariablesResolverObjectProvider;
     }
 
     @Override
@@ -432,6 +437,16 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
                 inputs = MapUtils.concat(
                     inputs, Map.of(JobInputConstants.TRIGGER_NAME_INPUT, matchedTriggerName));
             }
+        }
+
+        WorkflowVariablesResolver workflowVariablesResolver = workflowVariablesResolverObjectProvider.getIfAvailable();
+
+        if (workflowVariablesResolver != null) {
+            inputs = MapUtils.concat(
+                inputs,
+                Map.<String, Object>of(
+                    JobInputConstants.VARIABLES_INPUT,
+                    workflowVariablesResolver.resolveForWorkflow(workflowId, environmentId)));
         }
 
         return new WorkflowTestParameters(

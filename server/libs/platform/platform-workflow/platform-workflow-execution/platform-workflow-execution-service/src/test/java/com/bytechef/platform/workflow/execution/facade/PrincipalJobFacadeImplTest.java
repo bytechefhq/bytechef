@@ -17,6 +17,7 @@
 package com.bytechef.platform.workflow.execution.facade;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -36,6 +37,8 @@ import com.bytechef.platform.plan.domain.PlanTier;
 import com.bytechef.platform.plan.provider.PlanLimitsProvider;
 import com.bytechef.platform.plan.provider.PlanOveragePolicyProvider;
 import com.bytechef.platform.plan.provider.PlanSpendProvider;
+import com.bytechef.platform.variable.WorkflowVariablesResolver;
+import com.bytechef.platform.workflow.JobInputConstants;
 import com.bytechef.platform.workflow.execution.exception.JobCostLimitExceededException;
 import com.bytechef.platform.workflow.execution.service.LicenceJobUsageService;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
@@ -44,6 +47,7 @@ import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.ObjectProvider;
@@ -73,6 +77,9 @@ class PrincipalJobFacadeImplTest {
     @Mock
     private LicenceJobUsageService licenceJobUsageService;
 
+    @Mock
+    private WorkflowVariablesResolver workflowVariablesResolver;
+
     @Test
     void testCreatePrincipalLinkedJobCreatesJobAndLinksPrincipal() {
         long referenceJobId = 100L;
@@ -83,12 +90,12 @@ class PrincipalJobFacadeImplTest {
 
         when(principalJobService.fetchJobPrincipalId(referenceJobId, PlatformType.AUTOMATION))
             .thenReturn(Optional.of(principalId));
-        when(jobFacade.createJob(jobParametersDTO)).thenReturn(newJobId);
+        when(jobFacade.createJob(any(JobParametersDTO.class))).thenReturn(newJobId);
 
         PrincipalJobFacadeImpl facade = new PrincipalJobFacadeImpl(
             principalJobService, jobFacade, jobService, workflowService, licenceJobUsageService,
             emptyObjectProvider(), emptyObjectProvider(), emptyObjectProvider(), emptyObjectProvider(),
-            emptyObjectProvider(), emptyObjectProvider());
+            emptyObjectProvider(), emptyObjectProvider(), emptyObjectProvider());
 
         long result = facade.createPrincipalLinkedJob(referenceJobId, jobParametersDTO, PlatformType.AUTOMATION);
 
@@ -113,7 +120,7 @@ class PrincipalJobFacadeImplTest {
         PrincipalJobFacadeImpl facade = new PrincipalJobFacadeImpl(
             principalJobService, jobFacade, jobService, workflowService, licenceJobUsageService,
             emptyObjectProvider(), emptyObjectProvider(), emptyObjectProvider(), emptyObjectProvider(),
-            emptyObjectProvider(), emptyObjectProvider());
+            emptyObjectProvider(), emptyObjectProvider(), emptyObjectProvider());
 
         IllegalStateException exception = assertThrows(
             IllegalStateException.class,
@@ -144,7 +151,8 @@ class PrincipalJobFacadeImplTest {
         PrincipalJobFacadeImpl facade = new PrincipalJobFacadeImpl(
             principalJobService, jobFacade, jobService, workflowService, licenceJobUsageService,
             emptyObjectProvider(), emptyObjectProvider(), objectProviderOf(planLimitsProvider),
-            emptyObjectProvider(), objectProviderOf(planSpendProvider), emptyObjectProvider());
+            emptyObjectProvider(), objectProviderOf(planSpendProvider), emptyObjectProvider(),
+            emptyObjectProvider());
 
         assertThrows(
             JobCostLimitExceededException.class,
@@ -169,7 +177,8 @@ class PrincipalJobFacadeImplTest {
         PrincipalJobFacadeImpl facade = new PrincipalJobFacadeImpl(
             principalJobService, jobFacade, jobService, workflowService, licenceJobUsageService,
             emptyObjectProvider(), emptyObjectProvider(), objectProviderOf(planLimitsProvider),
-            emptyObjectProvider(), objectProviderOf(planSpendProvider), emptyObjectProvider());
+            emptyObjectProvider(), objectProviderOf(planSpendProvider), emptyObjectProvider(),
+            emptyObjectProvider());
 
         assertEquals(300L, facade.createJob(jobParametersDTO, 1L, PlatformType.AUTOMATION));
     }
@@ -193,7 +202,8 @@ class PrincipalJobFacadeImplTest {
         PrincipalJobFacadeImpl facade = new PrincipalJobFacadeImpl(
             principalJobService, jobFacade, jobService, workflowService, licenceJobUsageService,
             emptyObjectProvider(), emptyObjectProvider(), objectProviderOf(planLimitsProvider),
-            objectProviderOf(planOveragePolicyProvider), objectProviderOf(planSpendProvider), emptyObjectProvider());
+            objectProviderOf(planOveragePolicyProvider), objectProviderOf(planSpendProvider), emptyObjectProvider(),
+            emptyObjectProvider());
 
         assertEquals(400L, facade.createJob(jobParametersDTO, 1L, PlatformType.AUTOMATION));
     }
@@ -215,13 +225,84 @@ class PrincipalJobFacadeImplTest {
         PrincipalJobFacadeImpl facade = new PrincipalJobFacadeImpl(
             principalJobService, jobFacade, jobService, workflowService, licenceJobUsageService,
             emptyObjectProvider(), emptyObjectProvider(), objectProviderOf(planLimitsProvider),
-            objectProviderOf(planOveragePolicyProvider), objectProviderOf(planSpendProvider), emptyObjectProvider());
+            objectProviderOf(planOveragePolicyProvider), objectProviderOf(planSpendProvider), emptyObjectProvider(),
+            emptyObjectProvider());
 
         assertThrows(
             JobCostLimitExceededException.class,
             () -> facade.createJob(jobParametersDTO, 1L, PlatformType.AUTOMATION));
 
         verify(jobFacade, never()).createJob(any(JobParametersDTO.class));
+    }
+
+    @Test
+    void testCreateJobSeedsVarsInputWhenResolverPresent() {
+        JobParametersDTO jobParametersDTO = new JobParametersDTO("wf-1", Map.of("name", "x"), Map.of());
+
+        when(workflowVariablesResolver.resolveForJobPrincipal(7L, PlatformType.AUTOMATION))
+            .thenReturn(Map.of("API_URL", "https://api"));
+        when(jobFacade.createJob(any(JobParametersDTO.class))).thenReturn(200L);
+
+        PrincipalJobFacadeImpl facade = new PrincipalJobFacadeImpl(
+            principalJobService, jobFacade, jobService, workflowService, licenceJobUsageService,
+            emptyObjectProvider(), emptyObjectProvider(), emptyObjectProvider(), emptyObjectProvider(),
+            emptyObjectProvider(), emptyObjectProvider(), objectProviderOf(workflowVariablesResolver));
+
+        facade.createJob(jobParametersDTO, 7L, PlatformType.AUTOMATION);
+
+        ArgumentCaptor<JobParametersDTO> captor = ArgumentCaptor.forClass(JobParametersDTO.class);
+
+        verify(jobFacade).createJob(captor.capture());
+
+        Map<String, Object> inputs = captor.getValue()
+            .getInputs();
+
+        assertEquals("x", inputs.get("name"));
+        assertEquals(Map.of("API_URL", "https://api"), inputs.get(JobInputConstants.VARIABLES_INPUT));
+    }
+
+    @Test
+    void testCreateJobDoesNotAddVarsWithoutResolver() {
+        JobParametersDTO jobParametersDTO = new JobParametersDTO("wf-1", Map.of("name", "x"), Map.of());
+
+        when(jobFacade.createJob(any(JobParametersDTO.class))).thenReturn(200L);
+
+        PrincipalJobFacadeImpl facade = new PrincipalJobFacadeImpl(
+            principalJobService, jobFacade, jobService, workflowService, licenceJobUsageService,
+            emptyObjectProvider(), emptyObjectProvider(), emptyObjectProvider(), emptyObjectProvider(),
+            emptyObjectProvider(), emptyObjectProvider(), emptyObjectProvider());
+
+        facade.createJob(jobParametersDTO, 7L, PlatformType.AUTOMATION);
+
+        ArgumentCaptor<JobParametersDTO> captor = ArgumentCaptor.forClass(JobParametersDTO.class);
+
+        verify(jobFacade).createJob(captor.capture());
+        assertFalse(captor.getValue()
+            .getInputs()
+            .containsKey(JobInputConstants.VARIABLES_INPUT));
+    }
+
+    @Test
+    void testCallerSuppliedVarsInputIsOverwritten() {
+        JobParametersDTO jobParametersDTO = new JobParametersDTO(
+            "wf-1", Map.of(JobInputConstants.VARIABLES_INPUT, Map.of("EVIL", "1")), Map.of());
+
+        when(workflowVariablesResolver.resolveForJobPrincipal(7L, PlatformType.AUTOMATION)).thenReturn(Map.of());
+        when(jobFacade.createJob(any(JobParametersDTO.class))).thenReturn(200L);
+
+        PrincipalJobFacadeImpl facade = new PrincipalJobFacadeImpl(
+            principalJobService, jobFacade, jobService, workflowService, licenceJobUsageService,
+            emptyObjectProvider(), emptyObjectProvider(), emptyObjectProvider(), emptyObjectProvider(),
+            emptyObjectProvider(), emptyObjectProvider(), objectProviderOf(workflowVariablesResolver));
+
+        facade.createJob(jobParametersDTO, 7L, PlatformType.AUTOMATION);
+
+        ArgumentCaptor<JobParametersDTO> captor = ArgumentCaptor.forClass(JobParametersDTO.class);
+
+        verify(jobFacade).createJob(captor.capture());
+        assertEquals(Map.of(), captor.getValue()
+            .getInputs()
+            .get(JobInputConstants.VARIABLES_INPUT));
     }
 
     @SuppressWarnings("unchecked")

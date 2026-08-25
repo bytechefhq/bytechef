@@ -21,6 +21,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -45,6 +46,7 @@ import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.job.sync.SseStreamBridge;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
+import com.bytechef.platform.variable.WorkflowVariablesResolver;
 import com.bytechef.platform.workflow.JobInputConstants;
 import com.bytechef.platform.workflow.test.dto.WorkflowTestExecutionDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -60,6 +62,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * @author Ivica Cardic
@@ -99,7 +102,7 @@ public class TestWorkflowExecutorTest {
             mock(com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService.class),
             mock(com.bytechef.atlas.execution.service.TaskExecutionService.class),
             mock(com.bytechef.atlas.file.storage.TaskFileStorage.class), workflowService, workflowNodeOutputFacade,
-            workflowTestConfigurationService);
+            workflowTestConfigurationService, emptyObjectProvider());
     }
 
     @Test
@@ -158,6 +161,62 @@ public class TestWorkflowExecutorTest {
         assertThat(metaMap.get("nodeA")).containsEntry("connKey", 42L);
         assertThat(result).isNotNull();
         assertThat(result.triggerExecution()).isNull();
+    }
+
+    @Test
+    void executeSyncSeedsVarsInputWhenResolverPresent() {
+        // Given a workflow without triggers
+        when(workflowService.getWorkflow(anyString())).thenReturn(workflow);
+        when(workflow.getExtensions(anyString(), any(), anyList())).thenReturn(Collections.emptyList());
+
+        // And test configuration with inputs and one connection mapping
+        Map<String, Object> cfgInputs = Map.of("cfgKey", "cfgVal");
+
+        List<WorkflowTestConfigurationConnection> connections = List.of(
+            new WorkflowTestConfigurationConnection(42L, "connKey", "nodeA"));
+
+        WorkflowTestConfiguration workflowTestConfiguration = new WorkflowTestConfiguration(
+            ENVIRONMENT_ID, cfgInputs, WORKFLOW_ID, connections);
+
+        when(workflowTestConfigurationService.fetchWorkflowTestConfiguration(WORKFLOW_ID, ENVIRONMENT_ID))
+            .thenReturn(Optional.of(workflowTestConfiguration));
+
+        // And a resolver bean is present
+        WorkflowVariablesResolver workflowVariablesResolver = mock(WorkflowVariablesResolver.class);
+
+        when(workflowVariablesResolver.resolveForWorkflow(eq(WORKFLOW_ID), anyLong())).thenReturn(Map.of("A", "1"));
+
+        testWorkflowExecutor = new TestWorkflowExecutorImpl(
+            componentDefinitionService, mock(com.bytechef.atlas.execution.service.ContextService.class),
+            mock(com.bytechef.evaluator.Evaluator.class), mock(com.bytechef.atlas.execution.service.JobService.class),
+            jobSyncExecutor,
+            mock(com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService.class),
+            mock(com.bytechef.atlas.execution.service.TaskExecutionService.class),
+            mock(com.bytechef.atlas.file.storage.TaskFileStorage.class), workflowService, workflowNodeOutputFacade,
+            workflowTestConfigurationService, objectProviderOf(workflowVariablesResolver));
+
+        // And a job is executed
+        Job job = mock(Job.class);
+
+        when(jobSyncExecutor.startJob(any(JobParametersDTO.class))).thenReturn(1L);
+        when(jobSyncExecutor.awaitJob(anyLong(), any(Boolean.class), any())).thenReturn(job);
+        when(job.getId()).thenReturn(1L);
+
+        // When
+        Map<String, Object> inputs = new HashMap<>();
+
+        inputs.put("inKey", "inVal");
+
+        testWorkflowExecutor.executeSync(WORKFLOW_ID, inputs, ENVIRONMENT_ID);
+
+        // Then the job was started with a vars input resolved for the workflow
+        ArgumentCaptor<JobParametersDTO> captor = ArgumentCaptor.forClass(JobParametersDTO.class);
+
+        verify(jobSyncExecutor).startJob(captor.capture());
+
+        JobParametersDTO jobParametersDTO = captor.getValue();
+
+        assertThat(jobParametersDTO.getInputs()).containsEntry(JobInputConstants.VARIABLES_INPUT, Map.of("A", "1"));
     }
 
     @Test
@@ -596,5 +655,19 @@ public class TestWorkflowExecutorTest {
         testWorkflowExecutor.stop(555L);
 
         verify(jobSyncExecutor).stopJob(555L);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> ObjectProvider<T> emptyObjectProvider() {
+        return (ObjectProvider<T>) mock(ObjectProvider.class);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> ObjectProvider<T> objectProviderOf(T instance) {
+        ObjectProvider<T> objectProvider = (ObjectProvider<T>) mock(ObjectProvider.class);
+
+        when(objectProvider.getIfAvailable()).thenReturn(instance);
+
+        return objectProvider;
     }
 }

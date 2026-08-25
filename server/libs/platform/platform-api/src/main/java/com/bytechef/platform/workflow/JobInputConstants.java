@@ -18,7 +18,8 @@ package com.bytechef.platform.workflow;
 
 /**
  * Reserved job-input keys the platform seeds alongside user/trigger inputs. Reserved keys use a double-underscore
- * prefix; workflow input names with that prefix are rejected at validation time so user inputs can never collide.
+ * prefix, except {@link #VARIABLES_INPUT}, which is reserved by name; workflow input names matching either rule are
+ * rejected at validation time so user inputs can never collide.
  *
  * @author Ivica Cardic
  */
@@ -29,6 +30,14 @@ public final class JobInputConstants {
      * downstream expressions (e.g. an agent workflow's branch dispatcher) ask "which trigger fired" portably.
      */
     public static final String TRIGGER_NAME_INPUT = "__triggerName";
+
+    /**
+     * Key under which the workspace / organization variables snapshot is seeded into a job's inputs at creation time,
+     * so {@code ${vars.NAME}} resolves against the flat job context. Deliberately NOT {@code __}-prefixed for
+     * ergonomics, which is why {@code vars} is additionally reserved as an input name and node name by
+     * {@code WorkflowValidatorFacade}. Populated only when a {@code WorkflowVariablesResolver} bean is present (EE).
+     */
+    public static final String VARIABLES_INPUT = "vars";
 
     private JobInputConstants() {
     }

@@ -31,6 +31,8 @@ import com.bytechef.platform.ratelimit.ConcurrentExecutionGate;
 import com.bytechef.platform.ratelimit.PlanLimitRejectionCounter;
 import com.bytechef.platform.ratelimit.RateLimitPolicy;
 import com.bytechef.platform.ratelimit.RateLimiter;
+import com.bytechef.platform.variable.WorkflowVariablesResolver;
+import com.bytechef.platform.workflow.JobInputConstants;
 import com.bytechef.platform.workflow.execution.exception.JobConcurrencyLimitExceededException;
 import com.bytechef.platform.workflow.execution.exception.JobCostLimitExceededException;
 import com.bytechef.platform.workflow.execution.exception.JobRateLimitExceededException;
@@ -39,6 +41,8 @@ import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -66,6 +70,7 @@ public class PrincipalJobFacadeImpl implements PrincipalJobFacade {
     private final ObjectProvider<PlanOveragePolicyProvider> planOveragePolicyProviderObjectProvider;
     private final ObjectProvider<PlanSpendProvider> planSpendProviderObjectProvider;
     private final ObjectProvider<RateLimiter> rateLimiterObjectProvider;
+    private final ObjectProvider<WorkflowVariablesResolver> workflowVariablesResolverObjectProvider;
 
     @SuppressFBWarnings("EI")
     public PrincipalJobFacadeImpl(
@@ -76,7 +81,8 @@ public class PrincipalJobFacadeImpl implements PrincipalJobFacade {
         ObjectProvider<PlanLimitsProvider> planLimitsProviderObjectProvider,
         ObjectProvider<PlanOveragePolicyProvider> planOveragePolicyProviderObjectProvider,
         ObjectProvider<PlanSpendProvider> planSpendProviderObjectProvider,
-        ObjectProvider<RateLimiter> rateLimiterObjectProvider) {
+        ObjectProvider<RateLimiter> rateLimiterObjectProvider,
+        ObjectProvider<WorkflowVariablesResolver> workflowVariablesResolverObjectProvider) {
 
         this.principalJobService = principalJobService;
         this.jobFacade = jobFacade;
@@ -89,6 +95,31 @@ public class PrincipalJobFacadeImpl implements PrincipalJobFacade {
         this.planOveragePolicyProviderObjectProvider = planOveragePolicyProviderObjectProvider;
         this.planSpendProviderObjectProvider = planSpendProviderObjectProvider;
         this.rateLimiterObjectProvider = rateLimiterObjectProvider;
+        this.workflowVariablesResolverObjectProvider = workflowVariablesResolverObjectProvider;
+    }
+
+    /**
+     * Copies {@code jobParametersDTO} with the principal's variables snapshot under
+     * {@link JobInputConstants#VARIABLES_INPUT}. No resolver bean (CE) leaves the inputs untouched; with a resolver
+     * (EE) the key is always written -- an empty map included -- and overwrites any caller-supplied {@code vars}, since
+     * the name is reserved.
+     */
+    private JobParametersDTO withVariables(JobParametersDTO jobParametersDTO, long jobPrincipalId, PlatformType type) {
+        WorkflowVariablesResolver workflowVariablesResolver = workflowVariablesResolverObjectProvider.getIfAvailable();
+
+        if (workflowVariablesResolver == null) {
+            return jobParametersDTO;
+        }
+
+        Map<String, Object> inputs = new HashMap<>(jobParametersDTO.getInputs());
+
+        inputs.put(
+            JobInputConstants.VARIABLES_INPUT, workflowVariablesResolver.resolveForJobPrincipal(jobPrincipalId, type));
+
+        return new JobParametersDTO(
+            jobParametersDTO.getWorkflowId(), jobParametersDTO.getParentTaskExecutionId(), inputs,
+            jobParametersDTO.getLabel(), jobParametersDTO.getPriority(), jobParametersDTO.getWebhooks(),
+            jobParametersDTO.getMetadata());
     }
 
     private void countRejection(String limit) {
@@ -233,9 +264,11 @@ public class PrincipalJobFacadeImpl implements PrincipalJobFacade {
 
     @Override
     public long createChildJob(long parentJobId, JobParametersDTO jobParametersDTO, PlatformType platformType) {
-        long childJobId = jobFacade.createJob(jobParametersDTO);
-
         Optional<Long> principalId = principalJobService.fetchJobPrincipalId(parentJobId, platformType);
+
+        long childJobId = jobFacade.createJob(
+            principalId.map(id -> withVariables(jobParametersDTO, id, platformType))
+                .orElse(jobParametersDTO));
 
         if (principalId.isPresent()) {
             principalJobService.create(childJobId, principalId.get(), platformType);
@@ -257,7 +290,7 @@ public class PrincipalJobFacadeImpl implements PrincipalJobFacade {
         admitMonthlyCostCap();
         admitConcurrentExecution();
 
-        long jobId = jobFacade.createJob(jobParametersDTO);
+        long jobId = jobFacade.createJob(withVariables(jobParametersDTO, jobPrincipalId, type));
 
         principalJobService.create(jobId, jobPrincipalId, type);
 
@@ -280,7 +313,7 @@ public class PrincipalJobFacadeImpl implements PrincipalJobFacade {
                 "Cannot create principal-linked job: no principal found for reference job %d (type=%s)"
                     .formatted(referenceJobId, platformType)));
 
-        long jobId = jobFacade.createJob(jobParametersDTO);
+        long jobId = jobFacade.createJob(withVariables(jobParametersDTO, principalId, platformType));
 
         principalJobService.create(jobId, principalId, platformType);
 
@@ -292,7 +325,9 @@ public class PrincipalJobFacadeImpl implements PrincipalJobFacade {
     public Job createJobWithoutDispatch(JobParametersDTO jobParametersDTO, long jobPrincipalId, PlatformType type) {
         licenceJobUsageService.consumeOrThrow();
 
-        Job job = jobService.create(jobParametersDTO, workflowService.getWorkflow(jobParametersDTO.getWorkflowId()));
+        Job job = jobService.create(
+            withVariables(jobParametersDTO, jobPrincipalId, type),
+            workflowService.getWorkflow(jobParametersDTO.getWorkflowId()));
 
         principalJobService.create(Validate.notNull(job.getId(), "id"), jobPrincipalId, type);
 

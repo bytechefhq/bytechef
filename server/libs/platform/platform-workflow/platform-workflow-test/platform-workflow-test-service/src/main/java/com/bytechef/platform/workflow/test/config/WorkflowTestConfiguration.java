@@ -53,6 +53,7 @@ import com.bytechef.message.broker.memory.AsyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
+import com.bytechef.platform.configuration.facade.WorkflowEvaluationInputsFacade;
 import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.file.storage.TempFileStorage;
@@ -60,6 +61,7 @@ import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
 import com.bytechef.platform.job.sync.file.storage.InMemoryTaskFileStorage;
 import com.bytechef.platform.job.sync.simulation.WorkflowSimulationFacade;
 import com.bytechef.platform.job.sync.simulation.WorkflowSimulationFacadeImpl;
+import com.bytechef.platform.variable.WorkflowVariablesResolver;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalFactory;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver;
@@ -92,6 +94,7 @@ import com.bytechef.task.dispatcher.subflow.event.listener.SubflowJobStatusEvent
 import com.bytechef.task.dispatcher.terminate.TerminateTaskDispatcher;
 import com.bytechef.tenant.TenantContext;
 import java.util.List;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -108,12 +111,13 @@ public class WorkflowTestConfiguration {
     @Bean
     AiAgentTestFacade aiAgentTestFacade(
         ActionDefinitionFacade actionDefinitionFacade, Evaluator evaluator, TempFileStorage tempFileStorage,
+        WorkflowEvaluationInputsFacade workflowEvaluationInputsFacade,
         WorkflowNodeOutputFacade workflowNodeOutputFacade, WorkflowService workflowService,
         WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         return new AiAgentTestFacadeImpl(
-            actionDefinitionFacade, evaluator, tempFileStorage, workflowNodeOutputFacade, workflowService,
-            workflowTestConfigurationService);
+            actionDefinitionFacade, evaluator, tempFileStorage, workflowEvaluationInputsFacade,
+            workflowNodeOutputFacade, workflowService, workflowTestConfigurationService);
     }
 
     @Bean
@@ -123,7 +127,8 @@ public class WorkflowTestConfiguration {
         TaskDispatcherDefinitionService taskDispatcherDefinitionService, TaskExecutor taskExecutor,
         TaskHandlerRegistry taskHandlerRegistry,
         WorkflowNodeOutputFacade workflowNodeOutputFacade,
-        WorkflowService workflowService, WorkflowTestConfigurationService workflowTestConfigurationService) {
+        WorkflowService workflowService, WorkflowTestConfigurationService workflowTestConfigurationService,
+        ObjectProvider<WorkflowVariablesResolver> workflowVariablesResolverObjectProvider) {
 
         ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository());
         CounterService counterService = new CounterServiceImpl(new InMemoryCounterRepository());
@@ -157,7 +162,7 @@ public class WorkflowTestConfiguration {
                 taskExecutionService, taskExecutor, taskHandlerRegistry, taskFileStorage, 300,
                 workflowService),
             taskDispatcherDefinitionService, taskExecutionService, taskFileStorage, workflowService,
-            workflowNodeOutputFacade, workflowTestConfigurationService);
+            workflowNodeOutputFacade, workflowTestConfigurationService, workflowVariablesResolverObjectProvider);
     }
 
     @Bean

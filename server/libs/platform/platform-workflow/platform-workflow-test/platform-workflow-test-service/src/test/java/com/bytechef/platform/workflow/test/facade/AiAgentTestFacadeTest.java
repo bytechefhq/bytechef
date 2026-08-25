@@ -34,6 +34,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
+import com.bytechef.platform.configuration.facade.WorkflowEvaluationInputsFacade;
 import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.file.storage.TempFileStorage;
@@ -69,6 +70,9 @@ public class AiAgentTestFacadeTest {
     private TempFileStorage tempFileStorage;
 
     @Mock
+    private WorkflowEvaluationInputsFacade workflowEvaluationInputsFacade;
+
+    @Mock
     private WorkflowNodeOutputFacade workflowNodeOutputFacade;
 
     @Mock
@@ -82,8 +86,8 @@ public class AiAgentTestFacadeTest {
     @BeforeEach
     void beforeEach() {
         aiAgentTestFacade = new AiAgentTestFacadeImpl(
-            actionDefinitionFacade, evaluator, tempFileStorage, workflowNodeOutputFacade, workflowService,
-            workflowTestConfigurationService);
+            actionDefinitionFacade, evaluator, tempFileStorage, workflowEvaluationInputsFacade,
+            workflowNodeOutputFacade, workflowService, workflowTestConfigurationService);
     }
 
     @Test
@@ -105,8 +109,8 @@ public class AiAgentTestFacadeTest {
         Map<String, Object> inputs = Map.of("inputKey", "inputValue");
         Map<String, Object> outputs = Map.of("outputKey", "outputValue");
 
-        doReturn(inputs).when(workflowTestConfigurationService)
-            .getWorkflowTestConfigurationInputs(WORKFLOW_ID, ENVIRONMENT_ID);
+        doReturn(inputs).when(workflowEvaluationInputsFacade)
+            .getEvaluationInputs(WORKFLOW_ID, ENVIRONMENT_ID);
         doReturn(outputs).when(workflowNodeOutputFacade)
             .getPreviousWorkflowNodeSampleOutputs(WORKFLOW_ID, WORKFLOW_NODE_NAME, ENVIRONMENT_ID);
 
@@ -157,8 +161,8 @@ public class AiAgentTestFacadeTest {
         doReturn(Map.of()).when(workflowTask)
             .getExtensions();
 
-        doReturn(Map.of()).when(workflowTestConfigurationService)
-            .getWorkflowTestConfigurationInputs(WORKFLOW_ID, ENVIRONMENT_ID);
+        doReturn(Map.of()).when(workflowEvaluationInputsFacade)
+            .getEvaluationInputs(WORKFLOW_ID, ENVIRONMENT_ID);
         doReturn(Map.of()).when(workflowNodeOutputFacade)
             .getPreviousWorkflowNodeSampleOutputs(WORKFLOW_ID, WORKFLOW_NODE_NAME, ENVIRONMENT_ID);
 
@@ -218,8 +222,8 @@ public class AiAgentTestFacadeTest {
         doReturn(Map.of("tools", "${toolsList}")).when(workflowTask)
             .getExtensions();
 
-        doReturn(Map.of()).when(workflowTestConfigurationService)
-            .getWorkflowTestConfigurationInputs(WORKFLOW_ID, ENVIRONMENT_ID);
+        doReturn(Map.of()).when(workflowEvaluationInputsFacade)
+            .getEvaluationInputs(WORKFLOW_ID, ENVIRONMENT_ID);
         doReturn(Map.of()).when(workflowNodeOutputFacade)
             .getPreviousWorkflowNodeSampleOutputs(WORKFLOW_ID, WORKFLOW_NODE_NAME, ENVIRONMENT_ID);
 
@@ -264,8 +268,8 @@ public class AiAgentTestFacadeTest {
         doReturn(Map.of()).when(workflowTask)
             .getExtensions();
 
-        doReturn(Map.of()).when(workflowTestConfigurationService)
-            .getWorkflowTestConfigurationInputs(WORKFLOW_ID, ENVIRONMENT_ID);
+        doReturn(Map.of()).when(workflowEvaluationInputsFacade)
+            .getEvaluationInputs(WORKFLOW_ID, ENVIRONMENT_ID);
         doReturn(Map.of()).when(workflowNodeOutputFacade)
             .getPreviousWorkflowNodeSampleOutputs(WORKFLOW_ID, WORKFLOW_NODE_NAME, ENVIRONMENT_ID);
 
