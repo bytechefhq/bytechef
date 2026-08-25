@@ -74,6 +74,26 @@ const GROUP_META: Record<
     navTitle: 'Workflow Catalog',
     description: 'List the catalog projects available to connected users.',
   },
+  'embedded-workflow-execution': {
+    title: 'Embedded Workflow Executions',
+    navTitle: 'Workflow Executions',
+    description: "Fetch a tenant's workflow executions, and a single execution with its full detail.",
+    // The public executions endpoints are on the upcoming release track, as their automation twin below.
+    comingSoon: true,
+  },
+  'embedded-tool-invocation': {
+    title: 'Embedded Tool Invocations',
+    navTitle: 'Tool Invocations',
+    description: "Fetch a connected user's tool and action invocation history.",
+    comingSoon: true,
+  },
+  'embedded-configuration-automation-project-code-workflow': {
+    title: 'Embedded Automation Bridge',
+    navTitle: 'Automation Bridge',
+    description:
+      'List the catalog projects of the embedded automation bridge, and deploy a code-native automation project into it.',
+    comingSoon: true,
+  },
   // One entry per tag in the automation spec -- see SPLIT_BY_TAG. The keys are `automation-<tag>`.
   'automation-workflow-execution': {
     title: 'Automation Workflow Executions',

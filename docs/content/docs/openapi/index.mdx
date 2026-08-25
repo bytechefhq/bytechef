@@ -28,8 +28,9 @@ Called from your own server. The connected user is named by the `{externalUserId
 - **[Connected Users](/openapi/backend/embedded-configuration-connected-user)** - update a connected user.
 - **[User Workflows](/openapi/backend/embedded-configuration-connected-user-project-workflow)** - a connected user's own workflows, including generation from a prompt.
 - **[Workflow Catalog](/openapi/backend/embedded-configuration-automation-workflow-project)** - the catalog projects available to connected users.
-- **Workflow Executions** - fetch a tenant's workflow executions. Served by the internal API rather than a public spec, so it has no reference page; read executions in the ByteChef admin UI.
-- **Tool Invocations** - fetch a connected user's tool and action invocation history. No public spec yet, so it has no reference page.
+- **[Workflow Executions](/openapi/backend/embedded-workflow-execution)** - fetch a tenant's workflow executions, and a single execution with its full detail. <ComingSoonBadge />
+- **[Tool Invocations](/openapi/backend/embedded-tool-invocation)** - fetch a connected user's tool and action invocation history. <ComingSoonBadge />
+- **[Automation Bridge](/openapi/backend/embedded-configuration-automation-project-code-workflow)** - list the catalog projects of the embedded automation bridge, and deploy a code-native automation project into it. <ComingSoonBadge />
 
 **Frontend - Signing Key JWT**
 

@@ -23,7 +23,7 @@ Two ways something here is hidden, and the tables below mark both:
 
 Both are reversible and neither deletes anything.
 
-**45 whole-page** (20 hidden) · **30 partial** pages (7 with a commented-out section)
+**50 whole-page** (22 hidden) · **30 partial** pages (7 with a commented-out section)
 
 ---
 
@@ -102,6 +102,11 @@ Both are reversible and neither deletes anything.
 | Page | Path | Edition | Sidebar |
 |---|---|---|---|
 | Deploy a new code based project | [`/openapi/automation-project-code-workflow/deployProject`](/openapi/automation-project-code-workflow/deployProject) | — | **hidden** |
+| Get a workflow execution by id | [`/openapi/automation-workflow-execution/getWorkflowExecution`](/openapi/automation-workflow-execution/getWorkflowExecution) | — | **hidden** |
+| Get workflow executions | [`/openapi/automation-workflow-execution/getWorkflowExecutionsPage`](/openapi/automation-workflow-execution/getWorkflowExecutionsPage) | — | **hidden** |
+| Embedded Automation Bridge | [`/openapi/backend/embedded-configuration-automation-project-code-workflow`](/openapi/backend/embedded-configuration-automation-project-code-workflow) | — | visible |
+| Embedded Tool Invocations | [`/openapi/backend/embedded-tool-invocation`](/openapi/backend/embedded-tool-invocation) | — | visible |
+| Embedded Workflow Executions | [`/openapi/backend/embedded-workflow-execution`](/openapi/backend/embedded-workflow-execution) | — | visible |
 | Custom Components | [`/openapi/custom-components`](/openapi/custom-components) | — | **hidden** |
 
 ---
